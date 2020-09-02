@@ -41,11 +41,8 @@ class ModelCompositor {
 
   predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
     let suggestionDistribution: Distribution<Suggestion> = [];
+    let lexicalModel = this.lexicalModel;
     let punctuation = this.punctuation;
-
-    // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
-    // When true, we can use an 'associative array' to de-duplicate everything.
-    let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
 
     if(!(transformDistribution instanceof Array)) {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
@@ -64,39 +61,107 @@ class ModelCompositor {
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
 
-    if(!this.contextTracker) {
-      // TODO:  base-case:  pure predict, no correct.
-    } else { // TODO:  whitespace, backspace filtering.
-      let contextState = this.contextTracker.analyzeState(this.lexicalModel, postContext, !this.isEmpty(inputTransform) ? transformDistribution : null);
-      let searchSpace = contextState.searchSpace;
+    let rawPredictions: [Distribution<Suggestion>, ProbabilityMass<Transform>][]
 
-      // Now... run that search!
+    if(!this.contextTracker) {
+      // Generates raw prediction distributions for each valid input.  Can only 'correct'
+      // against the final input.
+      //
+      // This is the old, 12.0-13.0 'correction' style.
+      rawPredictions = transformDistribution.map(function(alt) {
+        let transform = alt.sample;
+
+        // Filter out special keys unless they're expected.
+        if(this.isWhitespace(transform) && !allowSpace) {
+          return null;
+        } else if(this.isBackspace(transform) && !allowBksp) {
+          return null;
+        }
+
+        return [this.lexicalModel.predict(transform, context), alt];
+      }, this);
+    } else {
+      let contextState = this.contextTracker.analyzeState(this.lexicalModel, 
+                                                          postContext, 
+                                                          !this.isEmpty(inputTransform) ? 
+                                                                        transformDistribution: 
+                                                                        [{sample: inputTransform, p: 1.0}]
+                                                          );
+
+      // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
+      //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
+      
+      // Rather than go "full hog" and make a priority queue out of the eventual, future competing search spaces...
+      // let's just note that right now, there will only ever be one.
+      //
+      // The 'eventual' logic will be significantly more complex, though still manageable.
+      let searchSpace = contextState.searchSpace[0];
+
+      // TODO:  whitespace, backspace filtering.  Do it here.
+      //        Whitespace is probably fine, actually.  Less sure about backspace.
+
+      rawPredictions = [];
+      for(let correctionSet of searchSpace.getBestMatches()) {
+        let [tokenizedCorrections, cost] = correctionSet;
+        let corrections = tokenizedCorrections.map(function(tokenizedCorrection): [USVString, LexiconTraversal] {
+          let prefix = tokenizedCorrection.map(value => value.key).join('');
+          let finalTraversal: LexiconTraversal;
+          if(prefix == '') {
+            finalTraversal = lexicalModel.traverseFromRoot();
+          } else {
+            finalTraversal = tokenizedCorrection[tokenizedCorrection.length - 1].traversal;
+          }
+
+          return [prefix, finalTraversal];
+        }, this);
+
+        // Corrections obtained:  now to predict from them!
+        corrections.forEach(function(correctionTuple) {
+          let [correction, traversal] = correctionTuple;
+
+          // For now, a 'hacked' re-use of the model's existing `.predict()` method.
+          // Ideally, we'd just use the prefix to look up possible words.
+          let correctionTransform: Transform = {
+            insert: correction,  // insert correction string
+            deleteLeft: lexicalModel.wordbreak(context).length // remove actual token string
+          }
+
+          // Hmm.  Getting the predictions here might actually be a bit tricky.
+          let rawPredictSet = lexicalModel.predict(correctionTransform, context);
+          rawPredictions.push([rawPredictSet, {
+            sample: correctionTransform,
+            p: Math.exp(-cost)
+          }]);
+        }, this);
+
+        if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
+          break;
+        }
+      }
     }
 
-    for(let alt of transformDistribution) {
-      let transform = alt.sample;
+    // Remove `null` entries.
+    rawPredictions = rawPredictions.filter(tuple => !!tuple);
 
-      // Filter out special keys unless they're expected.
-      if(this.isWhitespace(transform) && !allowSpace) {
-        continue;
-      } else if(this.isBackspace(transform) && !allowBksp) {
-        continue;
-      }
+    // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
+    // When true, we can use an 'associative array' to de-duplicate everything.
+    let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
 
-      let preserveWhitespace: boolean = false;
-      if(this.isWhitespace(transform)) {
-        // Detect start of new word; prevent whitespace loss here.
-        let postContext = models.applyTransform(transform, context);
-        preserveWhitespace = (this.lexicalModel.wordbreak(postContext) == '');
-      }
-
-      let distribution = this.lexicalModel.predict(transform, context);
-
+    for(let [distribution, input] of rawPredictions) {
       distribution.forEach(function(pair: ProbabilityMass<Suggestion>) {
+        let transform = input.sample;
+        let inputProb = input.p;
         // Let's not rely on the model to copy transform IDs.
         // Only bother is there IS an ID to copy.
         if(transform.id !== undefined) {
           pair.sample.transformId = transform.id;
+        }
+
+        let preserveWhitespace: boolean = false;
+        if(this.isWhitespace(transform)) {
+          // Detect start of new word; prevent whitespace loss here.
+          let postContext = models.applyTransform(transform, context);
+          preserveWhitespace = (this.lexicalModel.wordbreak(postContext) == '');
         }
 
         // Prepends the original whitespace, ensuring it is preserved if
@@ -122,13 +187,13 @@ class ModelCompositor {
         } else {
           let existingSuggestion = suggestionDistribMap[displayText];
           if(existingSuggestion) {
-            existingSuggestion.p += pair.p * alt.p;
+            existingSuggestion.p += pair.p * inputProb;
           } else {
-            let compositedPair = {sample: pair.sample, p: pair.p * alt.p};
+            let compositedPair = {sample: pair.sample, p: pair.p * inputProb};
             suggestionDistribMap[displayText] = compositedPair;
           }
         }
-      });
+      }, this);
     }
 
     // Generate a default 'keep' option if one was not otherwise produced.
