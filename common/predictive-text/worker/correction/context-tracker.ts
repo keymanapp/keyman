@@ -22,7 +22,7 @@ namespace correction {
     // Leaves 'design space' for if/when we add support for phrase-level corrections/predictions.
     searchSpace: SearchSpace[] = [];
 
-    toKeyedSequence() {
+    toRawTokenization() {
       // TODO:  support token replacement (for accepted suggestions).
       let sequence: USVString[] = [];
       
@@ -101,7 +101,7 @@ namespace correction {
                                matchState: TrackedContextState, 
                                transformDistribution?: ProbabilityMass<Transform>[]): TrackedContextState {
       // Map the previous tokenized state to an edit-distance friendly version.
-      let matchContext: USVString[] = matchState.toKeyedSequence();
+      let matchContext: USVString[] = matchState.toRawTokenization();
 
       // Inverted order, since 'match' existed before our new context.
       let mapping = ClassicalDistanceCalculation.computeDistance(matchContext.map(value => ({key: value})),
