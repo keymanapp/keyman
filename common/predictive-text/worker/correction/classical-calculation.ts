@@ -177,7 +177,7 @@ namespace correction {
       let insertParentCost = this.getCostAt(row, col-1);
       let deleteParentCost = this.getCostAt(row-1, col);
       let substitutionParentCost = this.getCostAt(row-1, col-1);
-      let [lastInputIndex, lastMatchIndex] = = ClassicalDistanceCalculation.getTransposeParent(this, row, col);
+      let [lastInputIndex, lastMatchIndex] = ClassicalDistanceCalculation.getTransposeParent(this, row, col);
       if(lastInputIndex >= 0 && lastMatchIndex >= 0) {
         // OK, a transposition source is quite possible.  Still need to do more vetting, to be sure.
         let expectedCost = 1;
@@ -189,7 +189,7 @@ namespace correction {
           ops = ops.concat( Array(count).fill('transpose-delete') );
           expectedCost += count;
         } else {
-          let count = col - transposeParent[1] - 1;
+          let count = col - lastMatchIndex - 1;
           ops = ops.concat( Array(count).fill('transpose-insert') );
           expectedCost += count;
         }
