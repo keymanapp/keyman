@@ -1,3 +1,5 @@
+/// <reference path="distance-modeler.ts" />
+
 namespace correction {
   export class TrackedContextSuggestion {
     suggestion: Suggestion;

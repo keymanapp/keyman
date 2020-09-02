@@ -1,13 +1,17 @@
 /// <reference path="../node_modules/@keymanapp/models-templates/src/index.ts" />
-/// <reference path="correction/distance-modeler.ts" />
+/// <reference path="correction/context-tracker.ts" />
 
 class ModelCompositor {
   private lexicalModel: LexicalModel;
+  private contextTracker?: correction.ContextTracker;
   private static readonly MAX_SUGGESTIONS = 12;
   private readonly punctuation: LexicalModelPunctuation;
 
   constructor(lexicalModel: LexicalModel) {
     this.lexicalModel = lexicalModel;
+    if(lexicalModel.traverseFromRoot) {
+      this.contextTracker = new correction.ContextTracker();
+    }
     this.punctuation = ModelCompositor.determinePunctuationFromModel(lexicalModel);
   }
 
@@ -29,6 +33,10 @@ class ModelCompositor {
 
   protected isBackspace(transform: Transform): boolean {
     return transform.insert == "" && transform.deleteLeft > 0;
+  }
+
+  protected isEmpty(transform: Transform): boolean {
+    return transform.insert == '' && transform.deleteLeft == 0;
   }
 
   predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
@@ -55,6 +63,15 @@ class ModelCompositor {
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
+
+    if(!this.contextTracker) {
+      // TODO:  base-case:  pure predict, no correct.
+    } else { // TODO:  whitespace, backspace filtering.
+      let contextState = this.contextTracker.analyzeState(this.lexicalModel, postContext, !this.isEmpty(inputTransform) ? transformDistribution : null);
+      let searchSpace = contextState.searchSpace;
+
+      // Now... run that search!
+    }
 
     for(let alt of transformDistribution) {
       let transform = alt.sample;
