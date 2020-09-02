@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var ContextTracker = require('../../../build/intermediate/index').correction.ContextTracker;
 
-describe.only('ContextTracker', function() {
+describe('ContextTracker', function() {
   function toWrapperDistribution(transform) {
     return [{
       sample: transform,
