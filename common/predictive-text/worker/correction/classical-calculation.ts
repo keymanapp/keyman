@@ -177,15 +177,15 @@ namespace correction {
       let insertParentCost = this.getCostAt(row, col-1);
       let deleteParentCost = this.getCostAt(row-1, col);
       let substitutionParentCost = this.getCostAt(row-1, col-1);
-      let transposeParent = ClassicalDistanceCalculation.getTransposeParent(this, row, col);
-      if(transposeParent[0] >= 0 && transposeParent[1] >= 0) {
+      let [lastInputIndex, lastMatchIndex] = = ClassicalDistanceCalculation.getTransposeParent(this, row, col);
+      if(lastInputIndex >= 0 && lastMatchIndex >= 0) {
         // OK, a transposition source is quite possible.  Still need to do more vetting, to be sure.
         let expectedCost = 1;
 
         // This transposition includes either 'transpose-insert' or 'transpose-delete' operations.
         ops = ['transpose-start']; // always needs a 'start'.
-        if(transposeParent[0] != row-1) {
-          let count = row - transposeParent[0] - 1;
+        if(lastInputIndex != row-1) {
+          let count = row - lastInputIndex - 1;
           ops = ops.concat( Array(count).fill('transpose-delete') );
           expectedCost += count;
         } else {
@@ -196,10 +196,10 @@ namespace correction {
         ops.push('transpose-end');
 
         // Double-check our expectations.
-        if(this.getCostAt(transposeParent[0]-1, transposeParent[1]-1) != currentCost - expectedCost) {
+        if(this.getCostAt(lastInputIndex-1, lastMatchIndex-1) != currentCost - expectedCost) {
           ops = null;
         }
-        parent = [transposeParent[0]-1, transposeParent[1]-1];
+        parent = [lastInputIndex-1, lastMatchIndex-1];
       }
 
       if(ops) {
