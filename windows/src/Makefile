@@ -36,7 +36,6 @@ TARGETS=ext global buildtools developer engine desktop support
 MANIFESTS=engine desktop developer
 !endif
 
-TARGETS=ext global buildtools engine desktop
 RELEASE_TARGETS=desktop
 CLEANS=test unit-tests cleanroot
 
