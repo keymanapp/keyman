@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
-  protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
   private Uri data;
@@ -254,21 +253,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
-    boolean didCheckUserData = prefs.getBoolean(MainActivity.didCheckUserDataKey, false);
-    if (!didCheckUserData && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)) {
-      try {
-        Intent getUserdataIntent = new Intent("keyman.ACTION_GET_USERDATA");
-        startActivityForResult(getUserdataIntent, 0);
-      } catch (Exception e) {
-        KMLog.LogException(TAG, "", e);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(MainActivity.didCheckUserDataKey, true);
-        editor.commit();
-        checkGetStarted();
-      }
-    } else {
-      checkGetStarted();
-    }
+    checkGetStarted();
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -280,7 +265,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       checkGetStarted();
       return;
     } else {
-      boolean didFail = false;
       ClipData userdata = returnIntent.getClipData();
       int len = userdata.getItemCount();
       for (int i = 0; i < len; i++) {
@@ -312,15 +296,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           }
         } catch (Exception e) {
           KMLog.LogException(TAG, "", e);
-          didFail = true;
         }
-      }
-
-      if (!didFail) {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(MainActivity.didCheckUserDataKey, true);
-        editor.commit();
       }
 
       checkGetStarted();
