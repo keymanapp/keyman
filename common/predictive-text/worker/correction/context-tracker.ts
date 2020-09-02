@@ -6,8 +6,7 @@ namespace correction {
 
   export class TrackedContextToken {
     raw: string;
-    // TODO:  -> inputs:  ProbabilityDistribution[] // 
-    transforms: Transform[];
+    transformDistributions: ProbabilityMass<Transform>[][];
     replacements: TrackedContextSuggestion;
     activeReplacement: number = -1;
   }
@@ -18,6 +17,9 @@ namespace correction {
     poppedHead: boolean;
     pushedTail: boolean;
     
+    // Tracks all search spaces starting at the current token.
+    // In the lm-layer's current form, this should only ever have one entry.
+    // Leaves 'design space' for if/when we add support for phrase-level corrections/predictions.
     searchSpace: SearchSpace[] = [];
 
     toKeyedSequence() {
@@ -95,7 +97,9 @@ namespace correction {
   }
 
   export class ContextTracker extends CircularArray<TrackedContextState> {
-    static attemptMatchContext(tokenizedContext: USVString[], matchState: TrackedContextState, transform: Transform): TrackedContextState {
+    static attemptMatchContext(tokenizedContext: USVString[], 
+                               matchState: TrackedContextState, 
+                               transformDistribution?: ProbabilityMass<Transform>[]): TrackedContextState {
       // Map the previous tokenized state to an edit-distance friendly version.
       let matchContext: USVString[] = matchState.toKeyedSequence();
 
@@ -134,8 +138,20 @@ namespace correction {
       // If we've made it here... success!  We have a context match!
       let newState = new TrackedContextState();
       newState.tokens = Array.from(matchState.tokens);
+      // Since we're continuing a previously-cached context, we can reuse the same SearchSpace
+      // to continue making predictions.
+      newState.searchSpace = matchState.searchSpace;
 
-      // TODO:  Is this an adequate check for its two sub-branches?
+      /* Assumption:  This is an adequate check for its two sub-branches.
+       *
+       * Basis:
+       * - Assumption: one keystroke may only cause a single token to rotate out of context.
+       *   - That is, no "reasonable" keystroke would emit enough code points to 'bump' two words simultaneously.
+       *   - ... This one may need to be loosened a bit... but it should be enough for initial correction testing as-is.
+       * - Assumption:  one keystroke may only cause a single token to be appended to the context
+       *   - That is, no "reasonable" keystroke would emit a Transform adding two separate word tokens
+       *     - For languages using whitespace to word-break, said keystroke would have to include said whitespace to break the assumption.
+       */ 
       if(editPath.length > 1) {
         if(poppedHead) {
           newState.tokens.splice(0, 2);  // Chop off the first token and its subsequent 'whitespace' token.
@@ -144,36 +160,49 @@ namespace correction {
           let whitespaceToken = new TrackedContextToken();
 
           // ASSUMPTION:  any transform that triggers this case is a pure-whitespace Transform.
-          whitespaceToken.transforms = [transform]; // Track the Transform that resulted in the whitespace 'token'.
+          //              Worth note:  when invalid, the lm-layer already has problems in other aspects too.
+          whitespaceToken.transformDistributions = [transformDistribution]; // Track the Transform that resulted in the whitespace 'token'.
                                                     // Will be needed for phrase-level correction/prediction.
           whitespaceToken.raw = null;
           newState.tokens.push(whitespaceToken);
 
           let emptyToken = new TrackedContextToken();
           emptyToken.raw = '';
-          emptyToken.transforms = [];
+          emptyToken.transformDistributions = [];
           newState.tokens.push(emptyToken);
         } else {
+          // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
+          //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
           let editedToken = newState.tokens[newState.tokens.length - 1];
-          editedToken.transforms.push(transform);
-          editedToken.raw = models.applyTransform(transform, {left: editedToken.raw, startOfBuffer: false, endOfBuffer: false}).left;
+          if(transformDistribution && transformDistribution.length > 0) {
+            editedToken.transformDistributions.push(transformDistribution);
+          }
+          // Replace old token's raw-text with new token's raw-text.
+          editedToken.raw = tokenizedContext[tokenizedContext.length - 1];
         }
       }
       return newState;
     }
 
-    static modelContextState(tokenizedContext: USVString[]): TrackedContextState {
+    static modelContextState(tokenizedContext: USVString[], traversalRoot: LexiconTraversal): TrackedContextState {
       let baseTokens = tokenizedContext.map(function(entry) {
         let token = new TrackedContextToken();
         token.raw = entry;
         if(token.raw) {
-          token.transforms = [{
+          let tokenTransform = {
             insert: entry,
             deleteLeft: 0
-          }];
+          };
+          // Build a single-entry prob-distribution array... where the single distribution is 100% for the token's actual form.
+          // Basically, assume the token was the correct input, since we lack any actual probability data about the keystrokes
+          // that generated it.
+          token.transformDistributions = [[{
+            sample: tokenTransform,
+            p: 1.0
+          }]];
         } else {
           // Helps model context-final wordbreaks.
-          token.transforms = [];
+          token.transformDistributions = [];
         }
         return token;
       });
@@ -184,7 +213,7 @@ namespace correction {
 
       while(baseTokens.length > 0) {
         let whitespaceToken = new TrackedContextToken();
-        whitespaceToken.transforms = [];
+        whitespaceToken.transformDistributions = [];
         whitespaceToken.raw = null;
 
         finalTokens.push(whitespaceToken);
@@ -195,20 +224,38 @@ namespace correction {
       state.poppedHead = false;
       state.pushedTail = false;
       state.tokens = finalTokens;
+      state.searchSpace = [new SearchSpace(traversalRoot)];
 
       return state;
     }
 
-    analyzeState(model: LexicalModel, context: Context, transform: Transform): TrackedContextState {
+    /**
+     * Compares the current, post-input context against the most recently-seen contexts from previous prediction calls, returning
+     * the most information-rich `TrackedContextState` possible.  If a match is found, the state will be annotated with the
+     * input information provided to previous prediction calls and persisted correction-search calculations for re-use.
+     * 
+     * @param model 
+     * @param context 
+     * @param mainTransform 
+     * @param transformDistribution 
+     */
+    analyzeState(model: LexicalModel, 
+                 context: Context, 
+                 transformDistribution?: ProbabilityMass<Transform>[]): TrackedContextState {
+      if(!model.traverseFromRoot) {
+        // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)
+        // Without it, no 'corrections' may be made; the model can only be used to predict, not correct.
+        throw "This lexical model does not provide adequate data for correction algorithms and context reuse";
+      }
+
       let tokenizedContext = model.tokenize(context);
 
       if(tokenizedContext.length > 0) {
         for(let i = this.count - 1; i >= 0; i--) {
-          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item[i], transform);
+          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item[i], transformDistribution);
 
           if(resultState) {
             resultState.context = context;
-            // TODO:  assign SearchSpace (used for any edits to final token)
             this.enqueue(resultState);
             return resultState;
           }
@@ -217,9 +264,8 @@ namespace correction {
 
       // Else:  either empty OR we've detected a 'new context'.  Initialize from scratch; no prior input information is
       // available.  Only the results of the prior inputs are known.
-      let state = ContextTracker.modelContextState(tokenizedContext);
+      let state = ContextTracker.modelContextState(tokenizedContext, model.traverseFromRoot());
       state.context = context;
-      // TODO:  assign SearchSpace (used for any edits to final token)
       this.enqueue(state);
       return state;
     }

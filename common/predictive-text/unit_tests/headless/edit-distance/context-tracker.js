@@ -1,9 +1,15 @@
 var assert = require('chai').assert;
-var ClassicalDistanceCalculation = require('../../../build/intermediate').correction.ClassicalDistanceCalculation;
 var ContextTracker = require('../../../build/intermediate/index').correction.ContextTracker;
 
-describe('ContextTracker', function() {
-  describe.only('attemptMatchContext', function() {
+describe.only('ContextTracker', function() {
+  function toWrapperDistribution(transform) {
+    return [{
+      sample: transform,
+      p: 1.0
+    }];
+  }
+
+  describe('attemptMatchContext', function() {
     it("properly matches and aligns when lead token is removed", function() {
       let existingContext = ["an", "apple", "a", "day", "keeps", "the", "doctor"];
       let transform = {
@@ -15,7 +21,7 @@ describe('ContextTracker', function() {
       let rawTokens = ["apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor"];
 
       let existingState = ContextTracker.modelContextState(existingContext);
-      let state = ContextTracker.attemptMatchContext(newContext, existingState, transform);
+      let state = ContextTracker.attemptMatchContext(newContext, existingState, toWrapperDistribution(transform));
       assert.isNotNull(state);
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
     });
@@ -27,10 +33,11 @@ describe('ContextTracker', function() {
         deleteLeft: 0
       }
       let newContext = Array.from(existingContext);
+      newContext[newContext.length - 1] = 'doctor';
       let rawTokens = ["an", null, "apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor"];
 
       let existingState = ContextTracker.modelContextState(existingContext);
-      let state = ContextTracker.attemptMatchContext(newContext, existingState, transform);
+      let state = ContextTracker.attemptMatchContext(newContext, existingState, toWrapperDistribution(transform));
       assert.isNotNull(state);
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
     });
@@ -46,13 +53,13 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", null, "apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor", null, ""];
 
       let existingState = ContextTracker.modelContextState(existingContext);
-      let state = ContextTracker.attemptMatchContext(newContext, existingState, transform);
+      let state = ContextTracker.attemptMatchContext(newContext, existingState, toWrapperDistribution(transform));
       assert.isNotNull(state);
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
 
       // The 'wordbreak' transform
-      assert.isNotEmpty(state.tokens[state.tokens.length - 2].transforms);
-      assert.isEmpty(state.tokens[state.tokens.length - 1].transforms);
+      assert.isNotEmpty(state.tokens[state.tokens.length - 2].transformDistributions);
+      assert.isEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
     });
 
     it("properly matches and aligns when lead token is removed AND a 'wordbreak' is added'", function() {
@@ -67,13 +74,13 @@ describe('ContextTracker', function() {
       let rawTokens = ["apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor", null, ""];
 
       let existingState = ContextTracker.modelContextState(existingContext);
-      let state = ContextTracker.attemptMatchContext(newContext, existingState, transform);
+      let state = ContextTracker.attemptMatchContext(newContext, existingState, toWrapperDistribution(transform));
       assert.isNotNull(state);
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
 
       // The 'wordbreak' transform
-      assert.isNotEmpty(state.tokens[state.tokens.length - 2].transforms);
-      assert.isEmpty(state.tokens[state.tokens.length - 1].transforms);
+      assert.isNotEmpty(state.tokens[state.tokens.length - 2].transformDistributions);
+      assert.isEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
     });
   });
 
@@ -94,38 +101,4 @@ describe('ContextTracker', function() {
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
     });
   });
-
-  // describe('context alignment', function() {
-  //   it("scratchspace 1", function() {
-  //     let context1 = ["an", "apple", "a", "day", "keeps", "the", "doctor"];
-  //     let context2 = ["apple", "a", "day", "keeps", "the", "doctor", "away"];
-
-  //     let buffer = ClassicalDistanceCalculation.computeDistance(context1.map(value => ({key: value})), context2.map(value => ({key: value})), 1);
-
-  //     console.log('-------------------');
-  //     console.log(context1);
-  //     console.log('->');
-  //     console.log(context2);
-  //     console.log();
-  //     console.log("Distance: " + buffer.getHeuristicFinalCost());
-  //     console.log(buffer.editPath());
-  //     console.log();
-  //   });
-
-  //   it("scratchspace 2", function() {
-  //     let context1 = ["an", "apple", "a", "day", "keeps", "the", "doctor"];
-  //     let context2 = ["apple", "a", "day", "keeps", "the", "doctors"];
-
-  //     let buffer = ClassicalDistanceCalculation.computeDistance(context1.map(value => ({key: value})), context2.map(value => ({key: value})), 1);
-
-  //     console.log('-------------------');
-  //     console.log(context1);
-  //     console.log('->');
-  //     console.log(context2);
-  //     console.log();
-  //     console.log("Distance: " + buffer.getHeuristicFinalCost());
-  //     console.log(buffer.editPath());
-  //     console.log();
-  //   });
-  // });
 });
