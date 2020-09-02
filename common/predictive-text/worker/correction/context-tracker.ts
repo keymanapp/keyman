@@ -6,7 +6,7 @@ namespace correction {
 
   export class TrackedContextToken {
     raw: string;
-    transformDistributions: ProbabilityMass<Transform>[][];
+    transformDistributions: Distribution<Transform>[];
     replacements: TrackedContextSuggestion;
     activeReplacement: number = -1;
   }
@@ -99,7 +99,7 @@ namespace correction {
   export class ContextTracker extends CircularArray<TrackedContextState> {
     static attemptMatchContext(tokenizedContext: USVString[], 
                                matchState: TrackedContextState, 
-                               transformDistribution?: ProbabilityMass<Transform>[]): TrackedContextState {
+                               transformDistribution?: Distribution<Transform>): TrackedContextState {
       // Map the previous tokenized state to an edit-distance friendly version.
       let matchContext: USVString[] = matchState.toRawTokenization();
 
@@ -241,7 +241,7 @@ namespace correction {
      */
     analyzeState(model: LexicalModel, 
                  context: Context, 
-                 transformDistribution?: ProbabilityMass<Transform>[]): TrackedContextState {
+                 transformDistribution?: Distribution<Transform>): TrackedContextState {
       if(!model.traverseFromRoot) {
         // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)
         // Without it, no 'corrections' may be made; the model can only be used to predict, not correct.
