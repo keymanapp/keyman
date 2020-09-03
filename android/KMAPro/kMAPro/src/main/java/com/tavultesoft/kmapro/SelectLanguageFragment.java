@@ -56,6 +56,8 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   private static String languageID = null;
   private ArrayList<String> languageList = null;
   private ArrayList<Keyboard> addKeyboardsList = null;
+  private String title_no_install = null;
+  private TextView textView;
   private File packagePath;
   private OnLanguagesSelectedListener callback;
 
@@ -110,7 +112,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     final String keyboardID = keyboard.getKeyboardID();
     final String keyboardName = keyboard.getKeyboardName();
     String title_install = String.format(getString(R.string.title_select_languages_for_package), keyboardName);
-    String title_no_install = getString(R.string.all_languages_installed);
+    title_no_install = getString(R.string.all_languages_installed);
 
     final Toolbar toolbar = v.findViewById(R.id.list_toolbar);
     ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -132,7 +134,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
       }
     }
 
-    final TextView textView = v.findViewById(R.id.bar_title);
+    textView = v.findViewById(R.id.bar_title);
     textView.setText(title_no_install);
     if (titleFont != null) {
       textView.setTypeface(titleFont, Typeface.BOLD);
@@ -218,10 +220,39 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
             addKeyboardsList.add(k);
           }
         }
+
+        // Disable install button if no languages selected or all languages already installed
+        checkLanguages();
       }
     });
 
     return v;
+  }
+
+  /**
+   * Validates a language has been selected in the "Select Language" step.
+   * @return VerificationError
+   */
+  public VerificationError checkLanguages() {
+    StepperLayout mStepperLayout = (StepperLayout) getActivity().findViewById(R.id.stepperLayout);
+
+    // Only applies if stepper is in "Select Language" step
+    if ((isInstallingPackage && mStepperLayout.getCurrentStepPosition() == 1) ||
+        (!isInstallingPackage && mStepperLayout.getCurrentStepPosition() == 0)) {
+      if (languageList.size() == 0 && addKeyboardsList.size() == 0) {
+        mStepperLayout.setNextButtonVerificationFailed(true);
+        return new VerificationError("No languages selected");
+      } else if (textView.getText().equals(title_no_install)) {
+        mStepperLayout.setNextButtonVerificationFailed(true);
+        return new VerificationError("All languages already installed");
+      } else {
+        mStepperLayout.setNextButtonVerificationFailed(false);
+      }
+    } else {
+      mStepperLayout.setNextButtonVerificationFailed(false);
+    }
+
+    return null;
   }
 
   @Override
@@ -254,13 +285,16 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   }
   @Override
   public VerificationError verifyStep() {
-    return null;
+    return checkLanguages();
   }
+
   @Override
   public void onSelected() {
+    checkLanguages();
   }
   @Override
   public void onError(@NonNull VerificationError error) {
+    // do nothing
   }
 
 }
