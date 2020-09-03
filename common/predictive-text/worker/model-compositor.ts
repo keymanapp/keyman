@@ -130,7 +130,7 @@ class ModelCompositor {
           let rawPredictSet = lexicalModel.predict(correctionTransform, context);
           rawPredictions.push([rawPredictSet, {
             sample: correctionTransform,
-            p: Math.exp(-cost)
+            p: Math.exp(-cost)  // The obtained cost (currently) actually DOES map to a log-space probability.
           }]);
         }, this);
 
@@ -238,6 +238,11 @@ class ModelCompositor {
     });
 
     let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map(function(value) {
+      if(value.sample['p']) {
+        // Use of the Trie model actually exposes this to KMW.
+        // So, we'll overwrite the in-lexicon probability with the final predicted probability.
+        value.sample['p'] = value.p;
+      }
       return value.sample;
     });
 

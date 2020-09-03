@@ -140,10 +140,23 @@ namespace correction {
 
       // If we've made it here... success!  We have a context match!
       let newState = new TrackedContextState();
-      newState.tokens = Array.from(matchState.tokens);
+
+      // Be sure to deep-copy the tokens!  Pointer-aliasing is bad here.
+      newState.tokens = matchState.tokens.map(function(token) {
+        let copy = new TrackedContextToken();
+        copy.raw = token.raw;
+        copy.replacements = token.replacements
+        copy.activeReplacement = token.activeReplacement;
+        copy.transformDistributions = token.transformDistributions;
+
+        return copy;
+      });
+
       // Since we're continuing a previously-cached context, we can reuse the same SearchSpace
       // to continue making predictions.
       newState.searchSpace = matchState.searchSpace;
+      newState.poppedHead = poppedHead;
+      newState.pushedTail = pushedTail;
 
       /* Assumption:  This is an adequate check for its two sub-branches.
        *
@@ -305,14 +318,6 @@ namespace correction {
       let state = ContextTracker.modelContextState(tokenizedContext, model.traverseFromRoot());
       state.context = context;
       this.enqueue(state);
-
-      // Initialize the search space's inputs!
-      state.searchSpace.forEach(function(space) {
-        if(state.tokens.length > 0) {
-          let finalToken = state.tokens[state.tokens.length - 1];
-          finalToken.transformDistributions.forEach(distrib => space.addInput(distrib));
-        }
-      });
       return state;
     }
   }
