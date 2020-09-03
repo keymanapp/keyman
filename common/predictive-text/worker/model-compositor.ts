@@ -274,10 +274,12 @@ class ModelCompositor {
         // For analysis / debugging
         value.sample['lexical-p'] =  value.sample['p'];
         value.sample['correction-p'] = value.p / value.sample['p'];
+        // Use of the Trie model always exposed the lexical model's probability for a word to KMW.
+        // It's useful for debugging right now, so may as well repurpose it as the posterior.
+        //
+        // We still condition on 'p' existing so that test cases aren't broken.
+        value.sample['p'] = value.p;
       }
-      // Use of the Trie model always exposed the lexical model's probability for a word to KMW.
-      // It's useful for debugging right now, so may as well repurpose it as the posterior.
-      value.sample['p'] = value.p;
       return value.sample;
     });
 
