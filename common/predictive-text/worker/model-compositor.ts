@@ -154,6 +154,7 @@ class ModelCompositor {
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
 
+      let bestCorrectionCost: number;
       for(let correctionSet of searchSpace.getBestMatches()) {
         let [tokenizedCorrections, cost] = correctionSet;
         let corrections = tokenizedCorrections.map(function(tokenizedCorrection): [USVString, LexiconTraversal] {
@@ -180,6 +181,10 @@ class ModelCompositor {
             // TODO:  return type from getBestMatches() needs to return the final Transform's ID if possible.
           }
 
+          if(bestCorrectionCost === undefined) {
+            bestCorrectionCost = cost;
+          }
+
           // Hmm.  Getting the predictions here might actually be a bit tricky.
           return {
             sample: correctionTransform, 
@@ -195,6 +200,9 @@ class ModelCompositor {
         // it's technically possible that we return too few.
 
         if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
+          break;
+        } else if(cost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+          // Very useful for stopping 'sooner' when words reach a sufficient length.
           break;
         }
       }

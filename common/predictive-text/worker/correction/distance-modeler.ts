@@ -187,7 +187,20 @@ namespace correction {
     buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchEdge[] {
       let edges: SearchEdge[] = [];
 
+      /* 
+       * If the probability of an input is less than the highest probability * the base edit-distance likelihood,
+       * don't build an edge for it; just rely on edits from the highest-probability edge.
+       * 
+       * We may be able to be stricter, but this should be a decent start.
+       * 
+       * Note:  thanks to ModelCompositor.predict, we know the distribution is pre-sorted.
+       */
       for(let probMass of inputDistribution) {
+        if(probMass.p < inputDistribution[0].p * Math.exp(-SearchSpace.EDIT_DISTANCE_COST_SCALE)) {
+          // Again, we're pre-sorted.  All further entries will be too low-cost to consider.
+          break;
+        }
+
         let edgeCalc = this.calculation;
         let transform = probMass.sample;
         if(transform.deleteLeft) {
