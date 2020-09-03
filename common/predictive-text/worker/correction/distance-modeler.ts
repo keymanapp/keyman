@@ -88,7 +88,7 @@ namespace correction {
       // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
       // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
       // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
-      return 5 * this.knownCost + this.inputSamplingCost;
+      return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.knownCost + this.inputSamplingCost;
     }
 
     get mapKey(): string {
@@ -159,7 +159,7 @@ namespace correction {
       // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
       // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
       // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
-      return 5 * this.knownCost + this.inputSamplingCost;
+      return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.knownCost + this.inputSamplingCost;
     }
 
     buildInsertionEdges(): SearchEdge[] {
@@ -274,6 +274,8 @@ namespace correction {
   // The set of search spaces corresponding to the same 'context' for search.
   // Whenever a wordbreak boundary is crossed, a new instance should be made.
   export class SearchSpace {
+    static readonly EDIT_DISTANCE_COST_SCALE = 5;
+
     private tierOrdering: SearchSpaceTier[] = [];
     private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
     private inputSequence: Distribution<Transform>[] = [];
