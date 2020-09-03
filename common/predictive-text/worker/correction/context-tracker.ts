@@ -8,7 +8,7 @@ namespace correction {
 
   export class TrackedContextToken {
     raw: string;
-    transformDistributions: Distribution<Transform>[];
+    transformDistributions: Distribution<Transform>[] = [];
     replacements: TrackedContextSuggestion;
     activeReplacement: number = -1;
   }
@@ -116,11 +116,14 @@ namespace correction {
       let poppedHead = false;
       let pushedTail = false;
 
-      // First entry:  may not be an 'insert' or a 'transpose' op.
-      if(editPath[0] == 'insert' || editPath[0].indexOf('transpose') >= 0) {
-        return null;
-      } else if(editPath[0] == 'delete') {
-        poppedHead = true; // a token from the previous state has been wholly removed.
+      // Matters greatly when starting from a nil context.
+      if(editPath.length > 1) {
+        // First entry:  may not be an 'insert' or a 'transpose' op.
+        if(editPath[0] == 'insert' || editPath[0].indexOf('transpose') >= 0) {
+          return null;
+        } else if(editPath[0] == 'delete') {
+          poppedHead = true; // a token from the previous state has been wholly removed.
+        }
       }
 
       // Last entry:  may not be a 'delete' or a 'transpose' op.
@@ -211,7 +214,12 @@ namespace correction {
       } else {
         // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
         //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
-        let editedToken = newState.tokens[newState.tokens.length - 1];
+        let editedToken: TrackedContextToken;
+        if(editPath[tailIndex] == 'insert') {
+          editedToken = new TrackedContextToken();
+        } else {
+          editedToken = newState.tokens[newState.tokens.length - 1]; 
+        }
         if(transformDistribution && transformDistribution.length > 0) {
           editedToken.transformDistributions.push(transformDistribution);
           if(newState.searchSpace) {
