@@ -16,20 +16,6 @@ namespace correction {
     return arg1.currentCost - arg2.currentCost;
   }
 
-  export const QUEUE_SPACE_COMPARATOR: models.Comparator<SearchSpaceTier> = function(space1, space2) {
-    let node1 = space1.correctionQueue.peek();
-    let node2 = space2.correctionQueue.peek();
-    
-    // Guards, just in case one of the search spaces ever has an empty node.
-    if(node1 && node2) {
-      return node1.currentCost - node2.currentCost;
-    } else if(node2) {
-      return 1;
-    } else {
-      return -1;
-    }
-  }
-
   // Represents an 'edge' to a potential 'node' on the (conceptual) graph used to search for best-fitting
   // corrections by the correction-search algorithm.  Stores the cost leading to the new node, though it may be
   // an overestimate when the edit distance is greater than the current search threshold.
@@ -287,11 +273,15 @@ namespace correction {
   // The set of search spaces corresponding to the same 'context' for search.
   // Whenever a wordbreak boundary is crossed, a new instance should be made.
   export class SearchSpace {
+
+    private QUEUE_SPACE_COMPARATOR: models.Comparator<SearchSpaceTier>;
+
     static readonly EDIT_DISTANCE_COST_SCALE = 5;
 
     private tierOrdering: SearchSpaceTier[] = [];
     private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
     private inputSequence: Distribution<Transform>[] = [];
+    private minInputCost: number[] = [];
     private rootNode: SearchNode;
 
     // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time 
@@ -305,7 +295,9 @@ namespace correction {
     private processedEdgeSet: {[mapKey: string]: SearchEdge} = {};
 
     constructor(traversalRoot: LexiconTraversal) {
-      this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(QUEUE_SPACE_COMPARATOR);
+      // Constructs the comparator needed for the following line.
+      this.buildQueueSpaceComparator();
+      this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
       this.rootNode = new SearchNode(traversalRoot);
 
       this.completedPaths = [this.rootNode];
@@ -316,12 +308,65 @@ namespace correction {
       this.selectionQueue.enqueue(baseTier);
     }
 
+    private buildQueueSpaceComparator() {
+      let searchSpace = this;
+
+      this.QUEUE_SPACE_COMPARATOR = function(space1, space2) {
+        let node1 = space1.correctionQueue.peek();
+        let node2 = space2.correctionQueue.peek();
+
+        let index1 = space1.index;
+        let index2 = space2.index;
+
+        let tierMinCost: number = 0;
+        let sign = 1;
+
+        if(index2 < index1) {
+          let temp = index2;
+          index2 = index1;
+          index1 = temp;
+
+          sign = -1;
+        }
+
+        // TODO:  rework this as a constant property of each tier.  We can simply update the costs as new inputs arrive,
+        //        which will also reduce the number of needed calculations.
+        //
+        // Boost the cost of the lower tier by the minimum cost possible for the missing inputs between them.
+        // In essence, compare the nodes as if the lower tier had the most likely input appended for each such 
+        // input missing at the lower tier.
+        //
+        // A 100% admissible heuristic to favor a deeper search, since the added cost is guaranteed if the path
+        // is traversed further.
+        //
+        // Remember, tier index i's last used input was from input index i-1.  
+        // As a result, i is the first needed input index, with index2 - 1 the last entry needed to match them.
+        for(let i=index1; i < index2; i++) {
+          tierMinCost = tierMinCost + searchSpace.minInputCost[i];
+        }
+        
+        // Guards, just in case one of the search spaces ever has an empty node.
+        if(node1 && node2) {
+          // If node1 is lower-tier, node1 is the one in need of boosted cost.
+          // `sign` flips it when node2 is lower tier.
+          return node1.currentCost - node2.currentCost + sign * tierMinCost;
+        } else if(node2) {
+          return 1;
+        } else {
+          return -1;
+        }
+      }
+    }
+
     increaseMaxEditDistance() {
       this.tierOrdering.forEach(function(tier) { tier.increaseMaxEditDistance() });
     }
 
     addInput(inputDistribution: Distribution<Transform>) {
       this.inputSequence.push(inputDistribution);
+
+      // Assumes that `inputDistribution` is already sorted.
+      this.minInputCost.push(-Math.log(inputDistribution[0].p));
 
       // With a newly-available input, we can extend new input-dependent paths from 
       // our previously-reached 'extractedResults' nodes.
@@ -405,7 +450,7 @@ namespace correction {
           nextTier.correctionQueue.enqueueAll(deletionEdges.concat(substitutionEdges));
 
           // So, we simply rebuild the selection queue.
-          this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(QUEUE_SPACE_COMPARATOR, this.tierOrdering);
+          this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR, this.tierOrdering);
 
           // We didn't reach an end-node, so we just end the iteration and continue the search.
         }
