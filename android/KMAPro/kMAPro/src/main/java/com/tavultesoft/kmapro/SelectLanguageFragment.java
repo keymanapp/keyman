@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment;
 import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
-import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.packages.PackageProcessor;
@@ -231,6 +230,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
 
   /**
    * Validates a language has been selected in the "Select Language" step.
+   * Also enables/disables "NEXT" button accordingly.
    * @return VerificationError
    */
   public VerificationError checkLanguages() {
@@ -239,12 +239,13 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     // Only applies if stepper is in "Select Language" step
     if ((isInstallingPackage && mStepperLayout.getCurrentStepPosition() == 1) ||
         (!isInstallingPackage && mStepperLayout.getCurrentStepPosition() == 0)) {
-      if (languageList.size() == 0 && addKeyboardsList.size() == 0) {
-        mStepperLayout.setNextButtonVerificationFailed(true);
-        return new VerificationError("No languages selected");
-      } else if (textView.getText().equals(title_no_install)) {
+      // Two scenarios to disable "NEXT" button
+      if (title_no_install != null && textView.getText().equals(title_no_install)) {
         mStepperLayout.setNextButtonVerificationFailed(true);
         return new VerificationError("All languages already installed");
+      } else if (languageList.size() == 0 && addKeyboardsList.size() == 0) {
+        mStepperLayout.setNextButtonVerificationFailed(true);
+        return new VerificationError("No languages selected");
       } else {
         mStepperLayout.setNextButtonVerificationFailed(false);
       }
@@ -282,6 +283,10 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   @Override
   public void onBackClicked(StepperLayout.OnBackClickedCallback callback) {
     callback.goToPrevStep();
+
+    // Re-enable "NEXT" button
+    StepperLayout mStepperLayout = (StepperLayout) getActivity().findViewById(R.id.stepperLayout);
+    mStepperLayout.setNextButtonVerificationFailed(false);
   }
   @Override
   public VerificationError verifyStep() {
@@ -292,6 +297,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   public void onSelected() {
     checkLanguages();
   }
+
   @Override
   public void onError(@NonNull VerificationError error) {
     // do nothing

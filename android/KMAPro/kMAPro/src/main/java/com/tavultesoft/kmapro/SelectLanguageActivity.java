@@ -79,7 +79,8 @@ public class SelectLanguageActivity extends AppCompatActivity implements
 
   @Override
   public void onError(VerificationError verificationError) {
-    Toast.makeText(this, "SelectLanguageActivity: " + verificationError.getErrorMessage(), Toast.LENGTH_SHORT).show();
+    String msg = TAG + ": " + verificationError.getErrorMessage();
+    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
   }
 
   @Override
