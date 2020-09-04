@@ -63,26 +63,8 @@ begin
 end;
 
 function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
-var
-  FLayoutInstallString: string;
-  reg: TRegistryErrorControlled;
 begin
-  if BCP47Tag <> '' then
-  begin
-    reg := TRegistryErrorControlled.Create(KEY_READ);
-    try
-      FLayoutInstallString := GetLayoutInstallString(LangID, guidProfile);
-      Result :=
-        reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47Tag) and
-        reg.ValueExists(FLayoutInstallString);
-    finally
-      reg.Free;
-    end;
-  end
-  else
-  begin
-    Result := GetBCP47ForTransientTIP(LangID, guidProfile) <> '';
-  end;
+  Result := (LangID <> 0) and (GetBCP47ForTransientTIP(LangID, guidProfile) <> '');
 end;
 
 function GetBCP47ForTransientTIP(LangID: Integer; guidProfile: TGUID): string;
@@ -93,6 +75,8 @@ var
 begin
   Result := '';
 
+  // TODO: read this data once only at start of load of languages rather than
+  // once every language possibility
   reg := TRegistryErrorControlled.Create(KEY_READ);
   try
     FLayoutInstallString := GetLayoutInstallString(LangID, guidProfile);
