@@ -110,6 +110,7 @@ uses
   HTMLHelpViewer,
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.System.TIPMaintenance,
+  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
   KeymanPaths,
   KLog,
   kmint,
@@ -434,10 +435,19 @@ begin
 
     fmUpgradeKeyboards:// I2548
       begin
-        ImportOlderVersionKeyboards8(Pos('admin', FQuery) > 0);   // I4185
-        ImportOlderVersionKeyboards9(Pos('admin', FQuery) > 0);   // I4185
-        ImportOlderVersionKeyboards10(Pos('admin', FQuery) > 0);   // I4185
-        DeleteLegacyKeymanInstalledSystemKeyboards;   // I3613
+        if FQuery='13,backup' then
+          TImportOlderVersionKeyboards11To13.BackupCurrentUser
+        else if FQuery='13,import' then
+          TImportOlderVersionKeyboards11To13.ImportCurrentUser
+        else if FQuery='13,admin' then
+          TImportOlderVersionKeyboards11To13.Execute
+        else
+        begin
+          ImportOlderVersionKeyboards8(Pos('admin', FQuery) > 0);   // I4185
+          ImportOlderVersionKeyboards9(Pos('admin', FQuery) > 0);   // I4185
+          ImportOlderVersionKeyboards10(Pos('admin', FQuery) > 0);   // I4185
+          DeleteLegacyKeymanInstalledSystemKeyboards;   // I3613
+        end;
       end;
 
     fmMigrate:

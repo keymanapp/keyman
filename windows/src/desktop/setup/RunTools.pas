@@ -94,6 +94,7 @@ type
     procedure DeleteBackupPath; // I2747
     procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
     procedure WriteToLog(const msg: string);
+    procedure RunVersion11To13Upgrade(const KMShellPath: WideString);
   public
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
@@ -647,6 +648,7 @@ begin
     RunVersion8Upgrade(FKMShellPath);  // I4293
     RunVersion9Upgrade(FKMShellPath);
     RunVersion10Upgrade(FKMShellPath);
+    RunVersion11To13Upgrade(FKMShellPath);
 
     FKMShellVersion := GetFileVersionString(FKMShellPath);
 
@@ -853,6 +855,13 @@ begin
     s := '"'+KMShellPath+'" -upgradekeyboards='; // I2548
     TUtilExecute.WaitForProcess(s+'10,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
   end;
+end;
+
+procedure TRunTools.RunVersion11To13Upgrade(const KMShellPath: WideString);
+begin
+  // We run this after installation; it is idempotent and will upgrade all keyboards
+  // from earlier versions to version 14+
+  TUtilExecute.WaitForProcess('"'+KMShellPath+'" -upgradekeyboards=13,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
 end;
 
 procedure TRunTools.DeleteBackupPath;  // I2747

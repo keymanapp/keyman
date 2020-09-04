@@ -148,14 +148,12 @@ uses
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
-
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
-
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
   Keyman.Configuration.UI.UfrmDiagnosticTests in 'util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas' {frmDiagnosticTests},
   Keyman.Configuration.System.UmodWebHttpServer in 'web\Keyman.Configuration.System.UmodWebHttpServer.pas' {modWebHttpServer: TDataModule},
@@ -172,7 +170,9 @@ uses
   Keyman.Configuration.System.KeymanUILanguageManager in 'main\Keyman.Configuration.System.KeymanUILanguageManager.pas',
   Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
   Keyman.Configuration.System.TIPMaintenance in 'install\Keyman.Configuration.System.TIPMaintenance.pas',
-  UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress};
+  UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress},
+  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13 in 'main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas',
+  UCreateProcessAsShellUser in '..\..\global\delphi\general\UCreateProcessAsShellUser.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
