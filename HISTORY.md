@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.139 alpha 2020-09-04
+
+* fix(windows): BCP 47 tag canonicalization (#3545)
+* fix(windows): upgrade of profiles from 13.0 (#3552)
+
 ## 14.0.138 alpha 2020-09-02
 
 * feat(windows): map installed bcp47 (#3542)
