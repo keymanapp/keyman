@@ -91,7 +91,6 @@ begin
   if lang = nil then
     Exit(False);
 
-  // TODO: handle errors
   (lang as IKeymanKeyboardLanguageInstalled2).InstallTip(LangID, KeyboardToRemove);
   Result := True;
 end;
@@ -105,7 +104,6 @@ begin
   if lang = nil then
     Exit(False);
 
-  // TODO: handle errors
   (lang as IKeymanKeyboardLanguageInstalled2).RegisterTip(LangID);
   Result := True;
 end;
