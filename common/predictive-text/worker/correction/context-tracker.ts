@@ -128,14 +128,19 @@ namespace correction {
 
       // Last entry:  may not be a 'delete' or a 'transpose' op.
       let tailIndex = editPath.length -1;
+      let ignorePenultimateMatch = false;
       if(editPath[tailIndex] == 'delete' || editPath[0].indexOf('transpose') >= 0) {
         return null;
       } else if(editPath[tailIndex] == 'insert') {
         pushedTail = true;
+      } else if(tailIndex > 0 && editPath[tailIndex-1] == 'insert' && editPath[tailIndex] == 'substitute') {
+        // Tends to happen when accepting suggestions.
+        pushedTail = true;
+        ignorePenultimateMatch = true;
       }
 
       // Now to check everything in-between:  should be exclusively 'match'es.
-      for(let index = 1; index < editPath.length - 2; index++) {
+      for(let index = 1; index < editPath.length - (ignorePenultimateMatch ? 2 : 1); index++) {
         if(editPath[index] != 'match') {
           return null;
         }

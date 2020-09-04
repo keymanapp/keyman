@@ -252,10 +252,8 @@ describe('Correction Distance Modeler', function() {
       
       firstSet = firstSet.value; // Retrieves <actual value>
       // No checks on the first set's cost.
-      assert.equal(firstSet[0].length, 1); // A single sequence ("ten") should be the best match.
-
-      let chars = firstSet[0][0].map(value => value.key);
-      assert.equal(chars.join(''), "ten");
+      assert.equal(firstSet.length, 1); // A single sequence ("ten") should be the best match.
+      assert.equal(firstSet[0].matchString, "ten");
 
       let secondBatch = [
         'beh',  'te',  'tec',
@@ -268,12 +266,10 @@ describe('Correction Distance Modeler', function() {
       assert.isFalse(secondSet.done);
       
       secondSet = secondSet.value; // Retrieves <actual value>
-      assert.isAbove(secondSet[1], firstSet[1]); // assert it 'costs more'.
-      assert.equal(secondSet[0].length, secondBatch.length);
+      assert.isAbove(secondSet[0].totalCost, firstSet[0].totalCost); // assert it 'costs more'.
+      assert.equal(secondSet.length, secondBatch.length);
 
-      let entries = secondSet[0].map(function(sequence) {
-        return sequence.map(value => value.key).join('');
-      }).sort();
+      let entries = secondSet.map(result => result.matchString).sort();
       assert.deepEqual(entries, secondBatch);
 
       let thirdBatch = [
@@ -288,12 +284,10 @@ describe('Correction Distance Modeler', function() {
       assert.isFalse(thirdSet.done);
       
       thirdSet = thirdSet.value; // Retrieves <actual value>
-      assert.isAbove(thirdSet[1], secondSet[1]); // assert it 'costs more'.
-      assert.equal(thirdSet[0].length, thirdBatch.length);
+      assert.isAbove(thirdSet[0].totalCost, secondSet[0].totalCost); // assert it 'costs more'.
+      assert.equal(thirdSet.length, thirdBatch.length);
 
-      entries = thirdSet[0].map(function(sequence) {
-        return sequence.map(value => value.key).join('');
-      }).sort();
+      entries = thirdSet.map(result => result.matchString).sort();
       assert.deepEqual(entries, thirdBatch);
     }
 

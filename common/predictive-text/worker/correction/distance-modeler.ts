@@ -270,6 +270,42 @@ namespace correction {
     }
   }
 
+  export class SearchResult {
+    private resultNode: SearchNode;
+
+    constructor(node: SearchNode) {
+      this.resultNode = node;
+    }
+
+    get inputSequence(): ProbabilityMass<Transform>[] {
+      return this.resultNode.priorInput;
+    }
+
+    get matchSequence(): TraversableToken<USVString>[] {
+      return this.resultNode.calculation.matchSequence;
+    };
+
+    get matchString(): USVString {
+      return this.matchSequence.map(value => value.key).join('');
+    }
+
+    get knownCost(): number {
+      return this.resultNode.knownCost;
+    }
+
+    get inputSamplingCost(): number {
+      return this.resultNode.inputSamplingCost;
+    }
+
+    get totalCost(): number {
+      return this.resultNode.currentCost;
+    }
+
+    get finalTraversal(): LexiconTraversal {
+      return this.resultNode.currentTraversal;
+    }
+  }
+
   // The set of search spaces corresponding to the same 'context' for search.
   // Whenever a wordbreak boundary is crossed, a new instance should be made.
   export class SearchSpace {
@@ -461,17 +497,17 @@ namespace correction {
     }
 
     // Current best guesstimate of how compositor will retrieve ideal corrections.
-    *getBestMatches(): Generator<[TraversableToken<string>[][], number]> { 
+    *getBestMatches(): Generator<SearchResult[]> { 
       // might should also include a 'base cost' parameter of sorts?
       let searchSpace = this;
       let currentReturns: {[mapKey: string]: SearchNode} = {};
 
       class BatchingAssistant {
         currentCost = Number.MIN_SAFE_INTEGER;
-        entries: TraversableToken<string>[][] = [];
+        entries: SearchResult[] = [];
 
-        checkAndAdd(entry: SearchNode): [TraversableToken<string>[][], number] | null {
-          var result: [TraversableToken<string>[][], number] = null;
+        checkAndAdd(entry: SearchNode): SearchResult[] | null {
+          var result: SearchResult[] = null;
 
           if(entry.currentCost > this.currentCost) {
             result = this.tryFinalize();
@@ -491,17 +527,17 @@ namespace correction {
           // Check the generator's local returned-value cache - this determines whether or not we
           // need to add a new 'return' to the batch.
           if(!currentReturns[outputMapKey]) {
-            this.entries.push(entry.calculation.matchSequence);
+            this.entries.push(new SearchResult(entry));
             currentReturns[outputMapKey] = entry;
           }
 
           return result;
         }
 
-        tryFinalize(): [TraversableToken<string>[][], number] | null {
-          var result: [TraversableToken<string>[][], number] = null;
+        tryFinalize(): SearchResult[] | null {
+          var result: SearchResult[] = null;
           if(this.entries.length > 0) {
-            result = [this.entries, this.currentCost];
+            result = this.entries;
             this.entries = [];
           }
 
@@ -510,7 +546,7 @@ namespace correction {
       }
 
       let batcher = new BatchingAssistant();
-      let batch: [TraversableToken<string>[][], number];
+      let batch: SearchResult[];
 
       // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
       let returnedValues = Object.values(this.returnedValues);

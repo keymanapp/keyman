@@ -155,40 +155,38 @@ class ModelCompositor {
       //        Whitespace is probably fine, actually.  Less sure about backspace.
 
       let bestCorrectionCost: number;
-      for(let correctionSet of searchSpace.getBestMatches()) {
-        let [tokenizedCorrections, cost] = correctionSet;
-        let corrections = tokenizedCorrections.map(function(tokenizedCorrection): [USVString, LexiconTraversal] {
-          let prefix = tokenizedCorrection.map(value => value.key).join('');
-          let finalTraversal: LexiconTraversal;
-          if(prefix == '') {
-            finalTraversal = lexicalModel.traverseFromRoot();
-          } else {
-            finalTraversal = tokenizedCorrection[tokenizedCorrection.length - 1].traversal;
-          }
-
-          return [prefix, finalTraversal];
-        }, this);
-
+      for(let matches of searchSpace.getBestMatches()) {
         // Corrections obtained:  now to predict from them!
-        let predictionRoots = corrections.map(function(correctionTuple) {
-          let [correction, traversal] = correctionTuple;
+        let predictionRoots = matches.map(function(match) {
+          let correction = match.matchString;
+          
+          // Worth considering:  extend Traversal to allow direct prediction lookups?
+          // let traversal = match.finalTraversal;
+
+          // Find a proper Transform ID to map the correction to.
+          // Without it, we can't apply the suggestion.
+          let finalInput: Transform;
+          if(match.inputSequence.length > 0) {
+            finalInput = match.inputSequence[match.inputSequence.length - 1].sample;
+          } else {
+            finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
+          }
 
           // For now, a 'hacked' re-use of the model's existing `.predict()` method.
           // Ideally, we'd just use the prefix to look up possible words.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
-            deleteLeft: lexicalModel.wordbreak(context).length // remove actual token string
-            // TODO:  return type from getBestMatches() needs to return the final Transform's ID if possible.
+            deleteLeft: lexicalModel.wordbreak(context).length, // remove actual token string
+            id: finalInput.id
           }
 
           if(bestCorrectionCost === undefined) {
-            bestCorrectionCost = cost;
+            bestCorrectionCost = match.totalCost;
           }
 
-          // Hmm.  Getting the predictions here might actually be a bit tricky.
           return {
-            sample: correctionTransform, 
-            p: Math.exp(-cost)
+            sample: correctionTransform,
+            p: Math.exp(-match.totalCost)
           };
         }, this);
 
@@ -201,7 +199,7 @@ class ModelCompositor {
 
         if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
           break;
-        } else if(cost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+        } else if(matches[0].totalCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
           // Very useful for stopping 'sooner' when words reach a sufficient length.
           break;
         }
