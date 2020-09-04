@@ -320,7 +320,7 @@
         </img>
       </a>
       <span class="language-icon"><xsl:value-of select="substring(bcp47code, 1, 2)" /></span>
-      <span><xsl:value-of select="langname" /></span>
+      <span><xsl:value-of select="langname" /> (<xsl:value-of select="bcp47code" />)</span>
     </div>
   </xsl:template>
 

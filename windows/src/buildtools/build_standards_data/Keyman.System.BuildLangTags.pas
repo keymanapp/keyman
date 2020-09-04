@@ -35,6 +35,7 @@ var
   PreviousField: Boolean;
   FTagMapCount: Integer;
   Tags: TJSONArray;
+  full, base: string;
 
   function Escape(const s: string): string;
   begin
@@ -67,6 +68,11 @@ var
       PreviousField := True;
       Result := Result + fieldname+': true';
     end;
+  end;
+
+  function AddAllTag(const comma, tag, base: string): string;
+  begin
+    Result := Format('%s (tag: ''%s''; base: ''%s'')', [comma, tag, base]);
   end;
 
 begin
@@ -156,10 +162,30 @@ begin
         if i = FLangTags.Count - 1 then comma := '';
         FLangTag := FLangTags.Items[i] as TJSONObject;
         PreviousField := False;
-        FResult.Add('  ('+Field('tag')+Field('full')+Field('iso639_3')+Field('region')+Field('name')+Field('script')+BooleanField('suppress')+Field('windows')+')'+comma);
+        FResult.Add('  ('+
+          Field('tag')+
+          Field('full')+
+          Field('iso639_3')+
+          Field('region')+
+          Field('name')+
+          Field('script')+
+          BooleanField('suppress')+
+          Field('windows')+
+          ')'+comma);
+
+        base := FLangTag.Values['tag'].Value;
+        full := FLangTag.Values['full'].Value;
+
+        Inc(FTagMapCount); // base
+        if full <> base then Inc(FTagMapCount); // full
 
         if FLangTag.Values['tags'] <> nil then
-          Inc(FTagMapCount, (FLangTag.Values['tags'] as TJSONArray).Count);
+        begin
+          Tags := FLangTag.Values['tags'] as TJSONArray;
+          for j := 0 to Tags.Count - 1 do
+            if (Tags.Items[j].Value <> full) and (Tags.Items[j].Value <> base) then
+              Inc(FTagMapCount);
+        end;
       end;
 
       FResult.Add(');');
@@ -171,17 +197,22 @@ begin
       for i := 3 to FLangTags.Count - 1 do
       begin
         FLangTag := FLangTags.Items[i] as TJSONObject;
+
+        base := FLangTag.Values['tag'].Value;
+        full := FLangTag.Values['full'].Value;
+
+        s := '  ' + AddAllTag(comma, base, base);
+        comma := ',';
+        if full <> base then s := s + AddAllTag(comma, full, base);
+
         if FLangTag.Values['tags'] <> nil then
         begin
           Tags := FLangTag.Values['tags'] as TJSONArray;
-          s := '  ';
           for j := 0 to Tags.Count - 1 do
-          begin
-            s := s + Format('%s (tag: ''%s''; base: ''%s'')', [comma, Tags.Items[j].Value, FLangTag.Values['tag'].Value]);
-            comma := ',';
-          end;
-          FResult.Add(s);
+            if (Tags.Items[j].Value <> full) and (Tags.Items[j].Value <> base) then
+              s := s + AddAllTag(comma, Tags.Items[j].Value, base);
         end;
+        FResult.Add(s);
       end;
       FResult.Add(');');
       FResult.Add('');

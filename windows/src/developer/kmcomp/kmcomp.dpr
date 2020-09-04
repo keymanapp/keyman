@@ -104,7 +104,6 @@ uses
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
-  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   TextFileFormat in '..\TIKE\main\TextFileFormat.pas',
   Keyman.Developer.System.Project.kmnProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
   Keyman.Developer.System.Project.kpsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
@@ -118,7 +117,9 @@ uses
   Sentry.Client.Console in '..\..\ext\sentry\Sentry.Client.Console.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
-  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas';
+  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas';
 
 {$R icons.RES}
 {$R version.res}

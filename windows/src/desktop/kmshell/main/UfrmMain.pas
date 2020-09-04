@@ -537,6 +537,7 @@ begin
 
   if GetKeyboardLanguageFromParams(params, kbdlang) then
   begin
+    // TODO: refactor this away?
     if UninstallKeyboardLanguage(GUIDToString(kbdlang.ProfileGUID), False) then
     begin
       RefreshKeymanConfiguration;

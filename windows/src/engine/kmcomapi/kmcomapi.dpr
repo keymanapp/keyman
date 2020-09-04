@@ -151,7 +151,8 @@ uses
   utilicon in '..\..\global\delphi\general\utilicon.pas',
   Keyman.System.MitigateWin10_1803LanguageInstall in 'processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas',
   Keyman.System.Process.KPInstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas',
-  Keyman.System.Process.KPUninstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas';
+  Keyman.System.Process.KPUninstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas';
 
 {$R *.TLB}
 {$R *.RES}
