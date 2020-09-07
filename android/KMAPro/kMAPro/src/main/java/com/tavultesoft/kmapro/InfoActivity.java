@@ -44,7 +44,7 @@ public class InfoActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_info);
 
-    Toolbar toolbar = findViewById(R.id.info_toolbar);
+    Toolbar toolbar = findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
     getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -53,9 +53,8 @@ public class InfoActivity extends AppCompatActivity {
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-    TextView version = new TextView(this);
+    TextView version = findViewById(R.id.bar_title);
     version.setWidth((int) getResources().getDimension(R.dimen.label_width));
-    version.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     version.setGravity(Gravity.CENTER);
 
     // Parse app version string to create a version title (Not using KMManager.getVersion() because that's for KMEA)
@@ -63,7 +62,6 @@ public class InfoActivity extends AppCompatActivity {
 
     String versionTitle = String.format(getString(R.string.title_version), versionStr);
     version.setText(versionTitle);
-    getSupportActionBar().setCustomView(version);
 
     // Extract the the major minor version from the full version string
     String[] versionArray = versionStr.split("\\.", 3);
