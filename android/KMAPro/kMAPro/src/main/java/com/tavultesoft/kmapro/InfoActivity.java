@@ -49,7 +49,7 @@ public class InfoActivity extends AppCompatActivity {
     getSupportActionBar().setTitle(null);
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
-    getSupportActionBar().setLogo(R.drawable.keyman_logo);
+    //getSupportActionBar().setLogo(R.drawable.keyman_logo);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
 
