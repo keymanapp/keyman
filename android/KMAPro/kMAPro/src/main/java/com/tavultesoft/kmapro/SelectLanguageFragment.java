@@ -53,8 +53,8 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   private static final boolean excludeInstalledLanguages = false;
   private static String packageID = null;
   private static String languageID = null;
-  private ArrayList<String> languageList = null;
-  private ArrayList<Keyboard> addKeyboardsList = null;
+  private ArrayList<String> languageList = new ArrayList<String>();
+  private ArrayList<Keyboard> addKeyboardsList = new ArrayList<Keyboard>();
   private String title_no_install = null;
   private TextView textView;
   private File packagePath;
@@ -98,8 +98,6 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     packagePath = (File)bundle.getSerializable("packagePath");
     packageID = bundle.getString("packageID");
     languageID = bundle.getString("languageID");
-    // Initialize the list of selected languages
-    languageList = new ArrayList<String>();
 
     JSONObject pkgInfo = kmpProcessor.loadPackageInfo(packagePath);
     Keyboard keyboard = bundle.containsKey("keyboard") ? (Keyboard)bundle.getSerializable("keyboard") :
@@ -138,8 +136,6 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     if (titleFont != null) {
       textView.setTypeface(titleFont, Typeface.BOLD);
     }
-
-    addKeyboardsList = new ArrayList<Keyboard>();
 
     List<Keyboard> availableKeyboardsList = kmpProcessor.getKeyboardList(
       pkgInfo, packageID, keyboardID, isInstallingPackage, excludeInstalledLanguages);
