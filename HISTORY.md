@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.140 alpha 2020-09-09
+
+* feat(common/models): core edit-distance calculation class (#3526)
+* feat(common/models): Edit path derivation (#3547)
+* feat(common/models):  low-level correction-algorithm infrastructure (#3527)
+* feat(common/models): correction-search algorithm core (#3534)
+
 ## 14.0.139 alpha 2020-09-04
 
 * fix(windows): BCP 47 tag canonicalization (#3545)
