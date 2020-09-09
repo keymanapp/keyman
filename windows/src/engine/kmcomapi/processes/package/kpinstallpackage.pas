@@ -46,9 +46,11 @@ interface
 uses kpbase, keymanapi_TLB;
 
 type
+  TKPInstallPackageOptions = set of (ipForce, ipLegacyRegisterAndInstallProfiles);
+
   TKPInstallPackage = class(TKPBase)
   public
-    procedure Execute(const FileName: string; Force, InstallDefaultLanguage: Boolean);
+    procedure Execute(const FileName: string; Options: TKPInstallPackageOptions);
   end;
 
 implementation
@@ -84,7 +86,7 @@ uses
 { TKPInstallPackage }
 
 
-procedure TKPInstallPackage.Execute(const FileName: string; Force, InstallDefaultLanguage: Boolean);
+procedure TKPInstallPackage.Execute(const FileName: string; Options: TKPInstallPackageOptions);
       function GetHHIcon: string;
       var
         buf: array[0..260] of char;
@@ -118,8 +120,8 @@ var
     FLanguages: TPackageKeyboardLanguageList;
   begin
     FOptions := [ikPartOfPackage];
-    if InstallDefaultLanguage then
-      Include(FOptions, ikInstallDefaultLanguage);
+    if ipLegacyRegisterAndInstallProfiles in Options then
+      Include(FOptions, ikLegacyRegisterAndInstallProfiles);
 
     kbd := inf.Keyboards.ItemByID(GetShortKeyboardName(FileName));
     if Assigned(kbd) and (kbd.Languages.Count > 0) then
@@ -131,14 +133,14 @@ var
 
     with TKPInstallKeyboard.Create(Context) do
     try
-      Execute(FileName, PackageName, FOptions, FLanguages, Force);
+      Execute(FileName, PackageName, FOptions, FLanguages, ipForce in Options);
     finally
       Free;
     end;
   end;
 
 begin
-  KL.MethodEnter(Self, 'Execute', [FileName, Force]);
+  KL.MethodEnter(Self, 'Execute', [FileName, ipForce in Options]);
   try
     if not IsAdministrator then
       Error(KMN_E_Install_KeyboardMustBeInstalledByAdmin);   // I3612
@@ -213,7 +215,7 @@ begin
         PackageName := GetShortPackageName(FileName);
         dest := GetPackageInstallPath(FileName) + '\';
 
-        if PackageInstalled(PackageName, FInstByAdmin) and not Force then
+        if PackageInstalled(PackageName, FInstByAdmin) and not (ipForce in Options) then
           Error(KMN_E_PackageInstall_PackageAlreadyInstalled);
 
         with TRegistryErrorControlled.Create do  // I2890
@@ -257,7 +259,7 @@ begin
             ftPackageFile:
               with TKPInstallPackage.Create(Context) do
               try
-                Execute(dest + inf.Files[i].FileName, Force, InstallDefaultLanguage);
+                Execute(dest + inf.Files[i].FileName, Options);
               finally
                 Free;
               end;

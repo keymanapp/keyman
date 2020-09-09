@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
+import android.net.Uri;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -56,8 +57,16 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
         try {
           if (_d.getCloudParams().target == CloudApiTypes.ApiTarget.LexicalModelPackage) {
             installedLexicalModels = new LinkedList<>();
+
+            // Parse url for the kmp filename
+            Uri uri = Uri.parse(_d.getCloudParams().url);
+            String kmpFilename = uri.getLastPathSegment();
+            if (kmpFilename == null || kmpFilename.isEmpty()) {
+              KMLog.LogError(TAG, "Cloud URL " + _d.getCloudParams().url + " has null model package");
+            }
+
             // Extract the kmp. Validate it contains only lexical models, and then process the lexical model package
-            File kmpFile = new File(cacheDir, FileUtils.getFilename(_d.getCloudParams().url));
+            File kmpFile = new File(cacheDir, kmpFilename);
 
             FileUtils.copy(_d.getDestinationFile(), kmpFile);
 

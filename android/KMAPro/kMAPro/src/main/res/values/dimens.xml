@@ -7,8 +7,9 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="label_width">200dp</dimen>
-    <dimen name="titlebar_label_textsize">4sp</dimen>
-    <dimen name="package_label_width">250dp</dimen>
+    <dimen name="titlebar_label_textsize">16sp</dimen>
+    <dimen name="titlebar_button_height">24dp</dimen>
+    <dimen name="package_label_width">350dp</dimen>
     <dimen name="keyman_bar_height">8dp</dimen>
     <dimen name="checkbox_margin">8dp</dimen>
     <dimen name="checkbox_margin_left">15dp</dimen>

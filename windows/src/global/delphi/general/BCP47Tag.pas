@@ -46,10 +46,8 @@ type
     function IsValid(Constrained: Boolean): Boolean; overload;
     function IsValid(Constrained: Boolean; var msg: string): Boolean; overload;
 
-    function IsCanonical: Boolean; overload;
-    function IsCanonical(var msg: string): Boolean; overload;
 
-    procedure Canonicalize;
+
 
     property Language: string read FLanguage write SetLanguage;
     property ExtLang: string read FExtLang write SetExtLang;
@@ -69,21 +67,11 @@ type
 implementation
 
 uses
-  System.RegularExpressions,
+  System.RegularExpressions;
 
-  Keyman.System.CanonicalLanguageCodeUtils,
-  Keyman.System.LanguageCodeUtils;
 
 { TBCP47Tag }
 
-procedure TBCP47Tag.Canonicalize;
-var
-  newTag: string;
-begin
-  newTag := TCanonicalLanguageCodeUtils.FindBestTag(Tag);
-  if newTag <> '' then
-    SetTag(newTag);
-end;
 
 procedure TBCP47Tag.Clear;
 begin
@@ -104,6 +92,7 @@ constructor TBCP47Tag.Create(tag: string);
 begin
   SetTag(tag);
 end;
+
 
 function TBCP47Tag.GetTag: string;
 begin
@@ -201,28 +190,6 @@ var
   msg: string;
 begin
   Result := IsValid(Constrained, msg);
-end;
-
-function TBCP47Tag.IsCanonical(var msg: string): Boolean;
-var
-  c: string;
-begin
-  // Assumes that the tag is valid.
-
-  // Test language subtag for canonical value
-  c := TLanguageCodeUtils.TranslateISO6393ToBCP47(Language);
-  Result := SameText(c, Language);
-  if not Result then
-  begin
-    msg := '''' + OriginalTag + ''' is a valid tag but is not canonical: '''+Language+''' should be '''+c+'''';
-  end;
-end;
-
-function TBCP47Tag.IsCanonical: Boolean;
-var
-  msg: string;
-begin
-  Result := IsCanonical(msg);
 end;
 
 procedure TBCP47Tag.SetExtension(const Value: string);

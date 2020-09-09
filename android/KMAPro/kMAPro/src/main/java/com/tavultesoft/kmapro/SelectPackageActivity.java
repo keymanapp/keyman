@@ -19,10 +19,12 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.KMLog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +99,11 @@ public final class SelectPackageActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         Bundle bundle = new Bundle();
         bundle.putSerializable("keyboard", packagesList.get(position));
+        String pkgID = hashMap.get(subtitleKey);
+        File packagePath = new File(KMManager.getPackagesDir(), pkgID);
+        bundle.putSerializable("packagePath", packagePath);
+        bundle.putString("packageID", pkgID);
+        bundle.putBoolean("isInstallingPackage", false);
         Intent intent = new Intent(context, SelectLanguageActivity.class);
         intent.putExtras(bundle);
         context.startActivity(intent);

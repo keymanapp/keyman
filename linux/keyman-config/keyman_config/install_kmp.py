@@ -8,6 +8,7 @@ from os import listdir
 from shutil import rmtree
 from enum import Enum
 
+from keyman_config import _
 from keyman_config.get_kmp import get_keyboard_data, user_keyboard_dir, user_keyman_font_dir
 from keyman_config.kmpmetadata import get_metadata, KMFileTypes
 from keyman_config.convertico import extractico, checkandsaveico
@@ -95,16 +96,16 @@ def install_kmp_shared(inputfile, online=False, language=None):
     """
     check_keyman_dir(
         '/usr/local/share',
-        "You do not have permissions to install the keyboard files to the shared area " +
-        "/usr/local/share/keyman")
+        _("You do not have permissions to install the keyboard files to the shared area "
+          "/usr/local/share/keyman"))
     check_keyman_dir(
         '/usr/local/share/doc',
-        "You do not have permissions to install the documentation to the shared " +
-        "documentation area /usr/local/share/doc/keyman")
+        _("You do not have permissions to install the documentation to the shared "
+          "documentation area /usr/local/share/doc/keyman"))
     check_keyman_dir(
         '/usr/local/share/fonts',
-        "You do not have permissions to install the font files to the shared font area " +
-        "/usr/local/share/fonts")
+        _("You do not have permissions to install the font files to the shared font area "
+          "/usr/local/share/fonts"))
 
     packageID = extract_package_id(inputfile)
     packageDir = os.path.join('/usr/local/share/keyman', packageID)
@@ -175,7 +176,7 @@ def install_kmp_shared(inputfile, online=False, language=None):
         for o in os.listdir(packageDir):
             logging.info(o)
         rmtree(packageDir)
-        message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
+        message = _("install_kmp.py: error: No kmp.json or kmp.inf found in {package}").format(package=inputfile)
         raise InstallError(InstallStatus.Abort, message)
 
 
@@ -242,11 +243,33 @@ def install_kmp_user(inputfile, online=False, language=None):
         for o in os.listdir(packageDir):
             logging.info(o)
         rmtree(packageDir)
-        message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
+        message = _("install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}").format(
+            packageFile=inputfile)
         raise InstallError(InstallStatus.Abort, message)
 
 
+# The implementation of this method is a hack.
+# TODO: reimplement normalization according to langtags.json. See implementation for Windows once
+# that is in place.
+def _normalize_language(supportedLanguages, language):
+    if len(supportedLanguages) <= 0:
+        return ''
+
+    if not language:
+        return language
+
+    for supportedLanguage in supportedLanguages:
+        id = supportedLanguage['id']
+        if id == language or id.startswith(language + '-'):
+            return id
+    return None
+
+
 def install_keyboards(keyboards, packageDir, language=None):
+    firstKeyboard = keyboards[0]
+    if firstKeyboard and 'languages' in firstKeyboard and len(firstKeyboard['languages']) > 0:
+        language = _normalize_language(firstKeyboard['languages'], language)
+
     if is_gnome_shell():
         install_keyboards_to_gnome(keyboards, packageDir, language)
     else:

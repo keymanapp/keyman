@@ -12,6 +12,7 @@
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
         <script src="/app/sentry.bundle.min.js"></script>
         <script src="/app/sentry.init.js"></script>
+        <script src="/app/jquery.min.js"></script>
         <title><xsl:value-of select="$locale/string[@name='S_DownloadKeyboard_Title']"/></title>
         <link rel="stylesheet" type="text/css" href="/app/config.css" />
         <style type="text/css">
@@ -57,18 +58,34 @@
 		else return;
 		event.cancelBubble = true; event.returnValue = false;
   }
+
+  // This function is called by the Delphi code when browse events
+  // happen, because we cannot determine the state of history adequately
+  // from within the browser context.
+  function updateBackButtonState(shouldEnable) {
+    document.getElementById('button_back').disabled = !shouldEnable;
+  }
+
+  function goBack() {
+    history.back();
+  }
 ]]></script>
 
       </head>
       <body>
-        <div id="size"></div>
         <iframe id="contentframe" frameborder="0">
           <xsl:attribute name="src"><xsl:value-of select='/Keyman/keyman-com' />/go/windows/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/download-keyboards?version=<xsl:value-of select="/Keyman/Version" /></xsl:attribute>&#160;
         </iframe>
         <div id="footerframe">
-          <!--<div style="float:left; font-size: 13.3px;">
-            <input type="checkbox" id="chkDownloadOnly" /> <label for="chkDownloadOnly"><xsl:value-of select="$locale/string[@name='S_DownloadKeyboard_DownloadOnlyCheckbox']"/></label>
-          </div>-->
+          <div style="float:left; padding-left: 8px">
+            <xsl:call-template name="button">
+              <xsl:with-param name="id">back</xsl:with-param>
+              <xsl:with-param name="disabled">1</xsl:with-param>
+              <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Back']"/></xsl:with-param>
+              <xsl:with-param name="command">javascript:goBack()</xsl:with-param>
+              <xsl:with-param name="width">70px</xsl:with-param>
+            </xsl:call-template>
+          </div>
           <div style="float:right; padding-right: 8px">
             <xsl:call-template name="button">
               <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Cancel']"/></xsl:with-param>

@@ -120,8 +120,6 @@ uses
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
-  kpinstallkeyboardlanguageprofiles in 'processes\keyboard\kpinstallkeyboardlanguageprofiles.pas',
-  kpuninstallkeyboardlanguageprofiles in 'processes\keyboard\kpuninstallkeyboardlanguageprofiles.pas',
   kprecompilemnemonickeyboard in 'processes\keyboard\kprecompilemnemonickeyboard.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',
@@ -151,10 +149,12 @@ uses
   Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   utilicon in '..\..\global\delphi\general\utilicon.pas',
-  Keyman.System.MitigateWin10_1803LanguageInstall in 'processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas';
+  Keyman.System.MitigateWin10_1803LanguageInstall in 'processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas',
+  Keyman.System.Process.KPInstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas',
+  Keyman.System.Process.KPUninstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas';
 
 {$R *.TLB}
-
 {$R *.RES}
 {$R VERSION.RES}
 {$R MANIFEST.RES}

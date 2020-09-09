@@ -89,7 +89,7 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
     */
 
     hashMap = new HashMap<>();
-    hashMap.put(titleKey, getString(R.string.add_language_to_installed_keyboard));
+    hashMap.put(titleKey, getString(R.string.add_languages_to_installed_keyboard));
     hashMap.put(subtitleKey, getString(R.string.add_language_subtext));
     icon = String.valueOf(R.drawable.ic_content_add);
     hashMap.put(iconKey, icon);
@@ -108,7 +108,7 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
         if (itemTitle.equals(getString(R.string.install_from_other_device))) {
           // Scan QR code not implemented yet
           return false;
-        } else if (itemTitle.equals(getString(R.string.add_language_to_installed_keyboard))) {
+        } else if (itemTitle.equals(getString(R.string.add_languages_to_installed_keyboard))) {
           if (KeyboardController.getInstance().getInstalledPackagesList() == null) {
             // Disable if no keyboard packages installed
             return false;
@@ -155,7 +155,7 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
           // TODO
 
         // Add language from keyboard package already installed
-        } else if (itemTitle.equals(getString(R.string.add_language_to_installed_keyboard))) {
+        } else if (itemTitle.equals(getString(R.string.add_languages_to_installed_keyboard))) {
           Intent intent = new Intent(context, SelectPackageActivity.class);
           context.startActivity(intent);
         }

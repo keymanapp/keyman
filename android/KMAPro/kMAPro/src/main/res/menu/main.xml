@@ -20,6 +20,47 @@
         android:id="@+id/action_overflow"
         app:showAsAction="ifRoom"
         android:title="@string/action_overflow"
-        app:actionLayout="@layout/update_count_view" />
+        android:icon="@drawable/ic_light_action_overflow" >
 
+        <menu>
+
+            <item
+                android:id="@+id/action_text_size"
+                android:title="@string/action_text_size"
+                app:showAsAction="always"
+                android:icon="@drawable/ic_light_action_textsize" />
+
+            <item
+                android:id="@+id/action_clear_text"
+                android:title="@string/action_clear_text"
+                app:showAsAction="always"
+                android:icon="@drawable/ic_light_action_trash" />
+
+            <item
+                android:id="@+id/action_info"
+                android:title="@string/action_info"
+                app:showAsAction="always"
+                android:icon="@drawable/ic_light_action_info" />
+
+            <item
+                android:id="@+id/action_get_started"
+                android:title="@string/get_started"
+                app:showAsAction="always"
+                android:icon="@drawable/ic_action_get_started" />
+
+            <item
+                android:id="@+id/action_settings"
+                android:title="@string/action_settings"
+                app:showAsAction="always"
+                android:icon="@drawable/ic_settings" />
+
+            <item
+                android:id="@+id/action_update_keyboards"
+                android:title="@string/action_install_updates"
+                app:showAsAction="always"
+                android:icon="@drawable/ic_cloud_download"
+                app:actionLayout="@layout/update_count_view"/>
+
+        </menu>
+    </item>
 </menu>

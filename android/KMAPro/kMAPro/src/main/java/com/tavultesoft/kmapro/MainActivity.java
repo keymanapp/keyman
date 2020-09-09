@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
-  protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
   private Uri data;
@@ -254,21 +253,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
-    boolean didCheckUserData = prefs.getBoolean(MainActivity.didCheckUserDataKey, false);
-    if (!didCheckUserData && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)) {
-      try {
-        Intent getUserdataIntent = new Intent("keyman.ACTION_GET_USERDATA");
-        startActivityForResult(getUserdataIntent, 0);
-      } catch (Exception e) {
-        KMLog.LogException(TAG, "", e);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(MainActivity.didCheckUserDataKey, true);
-        editor.commit();
-        checkGetStarted();
-      }
-    } else {
-      checkGetStarted();
-    }
+    checkGetStarted();
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -280,7 +265,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       checkGetStarted();
       return;
     } else {
-      boolean didFail = false;
       ClipData userdata = returnIntent.getClipData();
       int len = userdata.getItemCount();
       for (int i = 0; i < len; i++) {
@@ -312,15 +296,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           }
         } catch (Exception e) {
           KMLog.LogException(TAG, "", e);
-          didFail = true;
         }
-      }
-
-      if (!didFail) {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(MainActivity.didCheckUserDataKey, true);
-        editor.commit();
       }
 
       checkGetStarted();
@@ -422,92 +398,54 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     invalidateOptionsMenu();
   }
 
-
+  @SuppressLint("RestrictedApi")
   @Override
   public boolean onPrepareOptionsMenu(final Menu menu) {
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-
-    if(_overflowMenuItem!=null) {
-      final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
-
-      _rootView.findViewById(R.id.counterBackground).setBackground(
-        this.getResources().getDrawable(R.drawable.ic_light_action_overflow));
-
-      _rootView.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          PopupMenu _popup = new PopupMenu(context, _rootView);
-          getMenuInflater().inflate(R.menu.overflow_menu, _popup.getMenu());
-
-          updateUpdateCountIndicator(
-            _popup.getMenu().findItem(R.id.action_update_keyboards),
-            KMManager.getUpdateTool().getOpenUpdateCount(),true);
-
-          _popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem theItem) {
-              return onOptionsItemSelected(theItem);
-            }
-          });
-
-          MenuPopupHelper _menuHelper = new MenuPopupHelper(context, (MenuBuilder) _popup.getMenu(), _rootView);
-          _menuHelper.setForceShowIcon(true);
-          _menuHelper.show();
-        }
-      });
-      return super.onPrepareOptionsMenu(menu);
+    if (_overflowMenuItem != null) {
+      MenuItem updateKeyboards = this.menu.findItem(R.id.action_update_keyboards);
+      updateUpdateCountIndicator(updateKeyboards,
+        KMManager.getUpdateTool().getOpenUpdateCount(), true);
     }
-
-    final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-    if(_keyboardupdate==null)
-      return super.onPrepareOptionsMenu(menu);
-
-    final ViewGroup _rootView = (ViewGroup) _keyboardupdate.getActionView();
-
-    _rootView.findViewById(R.id.counterBackground).setBackground(
-      this.getResources().getDrawable(R.drawable.ic_cloud_download));
-
-    _rootView.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onOptionsItemSelected(_keyboardupdate);
-      }
-    });
     return super.onPrepareOptionsMenu(menu);
   }
 
   private void updateUpdateCountIndicator(int anUpdateCount) {
-    if (menu == null)
+    if (menu == null) {
       return;
+    }
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-    if (_overflowMenuItem != null)
-      updateUpdateCountIndicator(_overflowMenuItem,anUpdateCount,false);
+    if (_overflowMenuItem != null) {
+      updateUpdateCountIndicator(_overflowMenuItem, anUpdateCount, false);
+    }
 
     final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-    if (_keyboardupdate != null)
-      updateUpdateCountIndicator(_keyboardupdate,anUpdateCount,true);
-
+    if (_keyboardupdate != null) {
+      updateUpdateCountIndicator(_keyboardupdate, anUpdateCount, true);
+    }
   }
 
   private void updateUpdateCountIndicator(MenuItem theItem, int anUpdateCount, boolean aHideMenuitem)
   {
     final ViewGroup _rootView = (ViewGroup) theItem.getActionView();
 
-    if(anUpdateCount==0)
-    {
-      if(aHideMenuitem)
+    if(anUpdateCount==0) {
+      if (aHideMenuitem) {
         theItem.setVisible(false);
-      else if(_rootView!=null)
+      } else if (_rootView != null) {
         _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
-    }
-    else {
-      if(aHideMenuitem)
+      }
+    } else {
+      if(aHideMenuitem) {
         theItem.setVisible(true);
-      else if(_rootView!=null)
-      _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
+      } else if(_rootView!=null) {
+        _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
+      }
     }
 
-    if(_rootView==null)
+    if(_rootView==null) {
       return;
+    }
 
     TextView _t = _rootView.findViewById(R.id.update_count_indicator);
     _t.setText(String.valueOf(anUpdateCount));
@@ -865,6 +803,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
       // Request for storage permission
       if (grantResults.length ==2 &&
@@ -1093,7 +1032,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         hashMap.get(KMManager.KMKey_LanguageID),
         hashMap.get(KMManager.KMKey_LanguageName),
         hashMap.get(KMManager.KMKey_Version),
-        hashMap.get(KMManager.KMKey_HelpLink),
+        hashMap.get(KMManager.KMKey_CustomHelpLink),
         hashMap.get(KMManager.KMKey_KMPLink),
         true,
         hashMap.get(KMManager.KMKey_Font),

@@ -9,6 +9,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.5.2'
         classpath 'io.sentry:sentry-android-gradle-plugin:1.7.35'
         classpath 'name.remal:gradle-plugins:1.0.157'
+        classpath 'com.stepstone.stepper:material-stepper:4.3.1'
     }
 }
 

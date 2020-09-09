@@ -474,7 +474,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       let editSequence = [
       //  a     c     c     o     m
         op.m, op.m, op.m, op.m, op.m,
-      // *m    o      d     a     t    e
+      // +m    o      d     a     t    e
         op.i, op.m, op.m, op.m, op.m, op.m
       ];
 
