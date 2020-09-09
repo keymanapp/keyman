@@ -171,7 +171,7 @@ describe('Correction Distance Modeler', function() {
       let tEdge = layer1Queue.dequeue();
       assertEdgeChars(tEdge, 't', 't');
 
-      let layer2Edges = new correction.SearchNode(tEdge).buildSubstitutionEdges(synthDistribution2);
+      let layer2Edges = new correction.SearchNode(rootTraversal, tEdge).buildSubstitutionEdges(synthDistribution2);
       let layer2Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer2Edges);
 
       let eEdge = layer2Queue.dequeue();
@@ -186,9 +186,9 @@ describe('Correction Distance Modeler', function() {
       assert.isOk(ehEdge);
 
       // Final round:  we'll use three nodes and throw all of their results into the same priority queue.
-      let layer3eEdges  = new correction.SearchNode(eEdge).buildSubstitutionEdges(synthDistribution3);
-      let layer3hEdges  = new correction.SearchNode(hEdge).buildSubstitutionEdges(synthDistribution3);
-      let layer3ehEdges = new correction.SearchNode(ehEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3eEdges  = new correction.SearchNode(rootTraversal, eEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3hEdges  = new correction.SearchNode(rootTraversal, hEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3ehEdges = new correction.SearchNode(rootTraversal, ehEdge).buildSubstitutionEdges(synthDistribution3);
       let layer3Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
 
       // Find the first result with an actual word directly represented.
@@ -220,6 +220,151 @@ describe('Correction Distance Modeler', function() {
 
       assert.isTrue(tenFlag && theFlag);
       assert.equal(edge.currentCost, 1.5);
+    });
+  });
+
+  describe('SearchSpaceTier + SearchSpace', function() {
+    var testModel;
+
+    before(function() {
+      testModel = new models.TrieModel(jsonFixture('tries/english-1000'));
+    });
+
+    let checkResults_teh = function(iter) {
+      let firstSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(firstSet.done);
+      
+      firstSet = firstSet.value; // Retrieves <actual value>
+      assert.equal(firstSet[1], 1);
+      assert.equal(firstSet[0].length, 1); // A single sequence ("ten") should be the best match.
+
+      let chars = firstSet[0][0].map(value => value.key);
+      assert.equal(chars.join(''), "ten");
+
+      let secondBatch = [
+        'beh',  'te',  'tec',
+        'tech', 'tel', 'tem',
+        'ter',  'tes', 'th',
+        'the'
+      ];
+
+      let secondSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(secondSet.done);
+      
+      secondSet = secondSet.value; // Retrieves <actual value>
+      assert.equal(secondSet[1], 1.5);
+      assert.equal(secondSet[0].length, secondBatch.length);
+
+      let entries = secondSet[0].map(function(sequence) {
+        return sequence.map(value => value.key).join('');
+      }).sort();
+      assert.deepEqual(entries, secondBatch);
+
+      let thirdBatch = [
+        'cen', 'en',  'gen',
+        'ken', 'len', 'men',
+        'sen', 'tha', 'then',
+        'thi', 'tho', 'thr',
+        'thu', 'wen'
+      ];
+
+      let thirdSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(thirdSet.done);
+      
+      thirdSet = thirdSet.value; // Retrieves <actual value>
+      assert.equal(thirdSet[1], 2);
+      assert.equal(thirdSet[0].length, thirdBatch.length);
+
+      entries = thirdSet[0].map(function(sequence) {
+        return sequence.map(value => value.key).join('');
+      }).sort();
+      assert.deepEqual(entries, thirdBatch);
+    }
+
+    it('Simple search (paralleling "Small integration test")', function() {
+      // The combinatorial effect here is a bit much to fully test.
+      let rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
+
+      let searchSpace = new correction.SearchSpace(rootTraversal);
+
+      // VERY artificial distributions.
+      let synthDistribution1 = [
+        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
+      ];
+
+      let synthDistribution2 = [
+        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
+      ];
+
+      let synthDistribution3 = [
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
+      ];
+
+      searchSpace.addInput(synthDistribution1);
+      searchSpace.addInput(synthDistribution2);
+      searchSpace.addInput(synthDistribution3);
+
+      let iter = searchSpace.getBestMatches();
+      checkResults_teh(iter);
+
+      // Debugging method:  a simple loop for printing out the generated sets, in succession.
+      //
+      // for(let i = 1; i <= 8; i++) {  // After 8 tiers, we run out of entries for this particular case.
+      //   console.log();
+      //   console.log("Batch " + i);
+
+      //   let set = iter.next();
+      //   assert.isFalse(set.done);
+
+      //   set = set.value;
+
+      //   let entries = set[0].map(function(sequence) {
+      //     return sequence.map(value => value.key).join('');
+      //   });
+
+      //   console.log("Entry count: " + set[0].length);
+      //   entries.sort();
+      //   console.log(entries);
+      //   console.log(set[1]);
+      // }
+    });
+
+    it('Allows reiteration (sequentially)', function() {
+      // The combinatorial effect here is a bit much to fully test.
+      let rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
+
+      let searchSpace = new correction.SearchSpace(rootTraversal);
+
+      // VERY artificial distributions.
+      let synthDistribution1 = [
+        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
+      ];
+
+      let synthDistribution2 = [
+        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
+      ];
+
+      let synthDistribution3 = [
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
+      ];
+
+      searchSpace.addInput(synthDistribution1);
+      searchSpace.addInput(synthDistribution2);
+      searchSpace.addInput(synthDistribution3);
+
+      let iter = searchSpace.getBestMatches();
+      checkResults_teh(iter);
+
+      // The key: do we get the same results the second time?
+      // Reset the iterator first...
+      let iter2 = searchSpace.getBestMatches();
+      checkResults_teh(iter2);
     });
   });
 });
