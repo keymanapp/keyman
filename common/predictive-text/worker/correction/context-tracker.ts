@@ -176,6 +176,7 @@ namespace correction {
   }
 
   export class ContextTracker extends CircularArray<TrackedContextState> {
+    // TODO:  Rework to accept the lexical model directly instead.  Needed to properly construct SearchSpace.
     static attemptMatchContext(tokenizedContext: USVString[], 
                                matchState: TrackedContextState,
                                rootTraversal: LexiconTraversal,
