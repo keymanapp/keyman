@@ -43,7 +43,7 @@ uses
   SysUtils,
   keymancontext,
   keymanerrorcodes,
-  kpuninstallkeyboardlanguageprofiles,
+  Keyman.System.Process.KPUninstallKeyboardLanguage,
   utildir,
   utilkeyman,
   utilsystem,
@@ -105,9 +105,9 @@ begin
 
   { Unregister language profiles }
 
-  with TKPUninstallKeyboardLanguageProfiles.Create(Context) do   // I3663
+  with TKPUninstallKeyboardLanguage.Create(Context) do   // I3663
   try
-    Execute(KeyboardName);
+    UnregisterTip(KeyboardName);
   finally
     Free;
   end;

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     return false;
   }
 
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, String languageID) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, ArrayList<String> languageList) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray("languages");
 
     String modelId = jsonEntry.getString("id");

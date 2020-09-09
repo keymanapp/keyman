@@ -107,22 +107,22 @@
   <string name="install_from_other_device" comment="Scan QR Code">Install from other device</string>
 
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
-  <string name="add_language_to_installed_keyboard" comment="Install another language from a keyboard package">Add language to installed keyboard</string>
+  <string name="add_languages_to_installed_keyboard" comment="Install additional languages from a keyboard package">Add languages to installed keyboard</string>
 
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="add_language_subtext" comment="Additional information for adding another language">(from keyboard package)</string>
 
 
-  <!-- Context: Select Package and Select Language menu -->
-  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add a language">Select Keyboard Package</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">Select Keyboard Package</string>
 
-  <!-- Context: Select Package and Select Language menu -->
-  <string name="title_select_language_for_package" comment="Select a language name from the keyboard package">Select language for %1$s</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_languages_for_package" comment="Select language names from the keyboard package">Select languages for %1$s</string>
 
-  <!-- Context: Select Package and Select Language menu -->
+  <!-- Context: Select Package and Select Languages menu -->
   <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">Added language %1$s to %2$s</string>
 
-  <!-- Context: Select Package and Select Language menu -->
+  <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">All languages already installed</string>
 
 
@@ -154,10 +154,13 @@
   <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Failed to extract</string>
 
   <!-- Context: KMP Package strings -->
-  <string name="install_keyboard_package" comment="Title to install keyboard package">Install Keyboard Package %1$s</string>
+  <string name="install_keyboard_package" comment="Title to install keyboard package">Install Keyboard</string>
+
+  <!-- Context: KMP Package welcome.htm title -->
+  <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Welcome to %1$s</string>
 
   <!-- Context: KMP Package strings -->
-  <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Predictive Text Package %1$s</string>
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Dictionary</string>
 
   <!-- Context: KMP Package strings -->
   <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">No new touch-optimized keyboards to install</string>

@@ -6,7 +6,7 @@ import logging
 import requests
 import requests_cache
 import os
-from keyman_config import KeymanApiUrl
+from keyman_config import KeymanApiUrl, KeymanDownloadsUrl
 
 
 def get_package_download_data(packageID, weekCache=False):
@@ -20,7 +20,7 @@ def get_package_download_data(packageID, weekCache=False):
         dict: Keyboard data
     """
     logging.info("Getting download data for package %s", packageID)
-    api_url = "https://downloads.keyman.com/api/keyboard/1.0/" + packageID
+    api_url = KeymanDownloadsUrl + "/api/keyboard/1.0/" + packageID
     logging.debug("At URL %s", api_url)
     cache_dir = keyman_cache_dir()
     current_dir = os.getcwd()

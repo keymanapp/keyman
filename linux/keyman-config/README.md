@@ -7,8 +7,22 @@ then you will need to:
 
 ```bash
 sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil python3-requests \
-    python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli python3-setuptools
+    python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli python3-setuptools python3-pip ibus
 ```
+
+Either `python3-raven` or `python3-sentry-sdk` is required as well. To install it on Ubuntu 18.04 and earlier run:
+
+```bash
+sudo apt install python3-raven
+```
+
+On Ubuntu 20.04 and later:
+
+```bash
+sudo apt install python3-sentry-sdk
+```
+
+(It's also possible to install it with pip: `pip3 install sentry-sdk`)
 
 You will also need `kmflcomp` either from a package or built and installed locally.
 
@@ -101,3 +115,64 @@ You will need the build dependencies as well as the runtime dependencies above
 `sudo apt install dh-python python3-all debhelper help2man`
 
 Run `make deb`. This will build the Debian package in the `make_deb` directory.
+
+## Internationalization
+
+### Create or update i18n template file
+
+Run
+
+```bash
+make update-template
+```
+
+This will create or update the file `locale/keyman-config.pot`.
+
+### Add translations for a new language
+
+To add translations for a new language run (replacing `de_DE` with the desired locale):
+
+```bash
+cd locale
+msginit --locale=de_DE.UTF-8 --width=98 --input keyman-config.pot
+```
+
+This will create the file `locale/de.po`.
+
+**NOTE:** Specifying _UTF-8_ is important if any non-ASCII characters will be used in the
+translation, i.e. always.
+
+**NOTE:** This step is not necessary when using Crowdin
+
+### Update translations
+
+After strings were added or modified the translated po files need to be updated. For this
+call, replacing `de` with the desired locale:
+
+```bash
+make locale/de.po
+```
+
+Alternatively you can also update all po files at once:
+
+```bash
+make update-po
+```
+
+**NOTE:** This step is not necessary when using Crowdin
+
+### Compile translations
+
+To create the binary files for the translations, run:
+
+```bash
+make compile-po
+```
+
+This will create `.mo` files, e.g. `locale/de/LC_MESSAGES/keyman-config.mo`.
+
+### Testing localization
+
+```bash
+LANGUAGE=de ./km-config
+```

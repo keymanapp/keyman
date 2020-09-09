@@ -80,7 +80,7 @@ type
     procedure FinishCacheMSIFile(msiLocation: TInstallInfoFileLocation;
       InstallSuccess: Boolean);
     function InstallMSI(msiLocation: TInstallInfoFileLocation): Boolean;
-    procedure InstallPackages(StartKeyman,StartWithWindows,
+    procedure ConfigFirstRun(StartKeyman,StartWithWindows,
       CheckForUpdates,StartDisabled,StartWithConfiguration,
       AutomaticallyReportUsage: Boolean);
     procedure PrepareForReboot(res: Cardinal);
@@ -94,6 +94,7 @@ type
     procedure DeleteBackupPath; // I2747
     procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
     procedure WriteToLog(const msg: string);
+    procedure RunVersion11To13Upgrade(const KMShellPath: WideString);
   public
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
@@ -217,7 +218,7 @@ begin
       Exit(False);
   end;
 
-  InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,
+  ConfigFirstRun(StartAfterInstall,StartWithWindows,CheckForUpdates,
     StartDisabled,StartWithConfiguration,AutomaticallyReportUsage);
 
   Result := True;
@@ -572,32 +573,23 @@ begin
   end;
 end;
 
-procedure TRunTools.InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,
+procedure TRunTools.ConfigFirstRun(StartKeyman,StartWithWindows,CheckForUpdates,
   StartDisabled,StartWithConfiguration,AutomaticallyReportUsage: Boolean);
 var
   i: Integer;
   s: WideString;
-  pack: TInstallInfoPackage;
-  packLocation: TInstallInfoPackageFileLocation;
   FKMShellPath: WideString;
   FExitCode: Cardinal;
   msiLocation: TInstallInfoFileLocation;
   FKMShellVersion: string;
-begin
-  //if FInstallInfo.Packages.Count = 0 then Exit;  I879
 
-  FKMShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
-  if System.SysUtils.FileExists(FKMShellPath) then
+  procedure DoInstallPackages;
+  var
+    s: string;
+    pack: TInstallInfoPackage;
+    packLocation: TInstallInfoPackageFileLocation;
+    FExitCode: Cardinal;
   begin
-    RunVersion6Upgrade(FKMShellPath);
-    RunVersion7Upgrade(FKMShellPath);  // I2548
-    RunVersion8Upgrade(FKMShellPath);  // I4293
-    RunVersion9Upgrade(FKMShellPath);
-    RunVersion10Upgrade(FKMShellPath);
-
-    FKMShellVersion := GetFileVersionString(FKMShellPath);
-
-    { Install packages for all users }
     s := '-nowelcome -s -i ';
     for pack in FInstallInfo.Packages do
     begin
@@ -615,9 +607,16 @@ begin
             end;
 
           // Need to check kmshell version >= 14.0 for support for non-default
-          // language installation; if installing into an older version, then
-          // the default language for the keyboard will be installed and the
-          // user's language selection will be ignored (sadface).
+          // language registration into local machine context; will not install
+          // current user context.
+          //
+          // If kmshell.exe is an older version, then the default language for
+          // the keyboard will be registered *and* installed, and furthermore,
+          // the user's language selection will be ignored (sadface).
+
+          // Note, if the BCP47 code specified here is in the list of the package's
+          // supported BCP47 codes, then it would have been registered anyway. This
+          // allows for custom BCP47 codes to be registered while elevated.
           if CompareVersions(SKeymanVersion_Min_SpecifyLanguage, FKMShellVersion) >= 0
             then s := s + '"'+packLocation.Path+'='+pack.BCP47+'" '
             else s := s + '"'+packLocation.Path+'" ';  // I3476
@@ -626,7 +625,40 @@ begin
     end;
     TUtilExecute.WaitForProcess('"'+FKMShellPath+'" '+s, ExtractFilePath(FKMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
 
-    { Configure Keyman Desktop for initial install, both local-machine, and current-user }
+    if CompareVersions(SKeymanVersion_Min_SpecifyLanguage, FKMShellVersion) >= 0 then
+    begin
+      // For each package add the BCP47 install details for current user.
+      // This relies on the TIP having been registered by the previous invocation
+      // of kmshell.exe -i
+      s := '-s -install-tips-for-packages ';
+      for pack in FInstallInfo.Packages do
+      begin
+        s := s + '"'+pack.ID+'='+pack.BCP47+'" ';
+      end;
+
+      CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode);
+    end;
+  end;
+begin
+  FKMShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  if System.SysUtils.FileExists(FKMShellPath) then
+  begin
+    RunVersion6Upgrade(FKMShellPath);
+    RunVersion7Upgrade(FKMShellPath);  // I2548
+    RunVersion8Upgrade(FKMShellPath);  // I4293
+    RunVersion9Upgrade(FKMShellPath);
+    RunVersion10Upgrade(FKMShellPath);
+    RunVersion11To13Upgrade(FKMShellPath);
+
+    FKMShellVersion := GetFileVersionString(FKMShellPath);
+
+    // Install packages for all users; keyboard languages (TIPs) are only
+    // installed for the current user
+    if FInstallInfo.Packages.Count > 0 then
+      DoInstallPackages;
+
+    // Configure Keyman Desktop for initial install, both local-machine,
+    // and current-user
     s := '-firstrun=';
 
     if StartWithWindows then s := s + 'StartWithWindows,';
@@ -675,9 +707,6 @@ begin
       if not CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
         LogError('Failed to start Keyman Desktop: '+SysErrorMessage(GetLastError), False); // I2756
     end;
-    //if not VarIsNull(ole_product) then
-    //  ole_product.OpenProduct;
-    //ModalResult := mrOk;
   end;
 
   Status(FInstallInfo.Text(ssStatusComplete));
@@ -826,6 +855,13 @@ begin
     s := '"'+KMShellPath+'" -upgradekeyboards='; // I2548
     TUtilExecute.WaitForProcess(s+'10,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
   end;
+end;
+
+procedure TRunTools.RunVersion11To13Upgrade(const KMShellPath: WideString);
+begin
+  // We run this after installation; it is idempotent and will upgrade all keyboards
+  // from earlier versions to version 14+
+  TUtilExecute.WaitForProcess('"'+KMShellPath+'" -upgradekeyboards=13,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
 end;
 
 procedure TRunTools.DeleteBackupPath;  // I2747

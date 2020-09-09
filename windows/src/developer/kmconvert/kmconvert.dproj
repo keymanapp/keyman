@@ -197,6 +197,7 @@
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -244,6 +245,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Win32\Debug\kmconvert.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>kmconvert.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Release\kmconvert.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>kmconvert.exe</RemoteName>
                         <Overwrite>true</Overwrite>

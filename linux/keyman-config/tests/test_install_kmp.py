@@ -2,7 +2,8 @@
 import unittest
 from unittest.mock import patch, ANY
 
-from keyman_config.install_kmp import install_keyboards_to_ibus, install_keyboards_to_gnome
+from keyman_config.install_kmp import install_keyboards_to_ibus, install_keyboards_to_gnome, \
+    _normalize_language
 
 
 class InstallKmpTests(unittest.TestCase):
@@ -173,6 +174,37 @@ class InstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
             [('xkb', 'en'), ('ibus', 'de:fooDir/foo1.kmx')])
         self.mockRestartIbus.assert_not_called()
+
+    def test_normalizeLanguage(self):
+        # Setup
+        languages = [
+            {'id': 'de'},
+            {'id': 'esi-Latn'},
+        ]
+
+        for data in [
+            {'given': 'de', 'expected': 'de'},
+            {'given': 'esi', 'expected': 'esi-Latn'},
+            {'given': 'esi-Latn', 'expected': 'esi-Latn'},
+            {'given': 'es', 'expected': None},
+            {'given': 'en', 'expected': None},
+            {'given': None, 'expected': None},
+        ]:
+            # Execute
+            result = _normalize_language(languages, data['given'])
+
+            # Verify
+            self.assertEqual(result, data['expected'])
+
+    def test_normalizeLanguage_noLanguages(self):
+        # Setup
+        languages = []
+
+        # Execute
+        result = _normalize_language(languages, 'en')
+
+        # Verify
+        self.assertEqual(result, '')
 
 
 if __name__ == '__main__':

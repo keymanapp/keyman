@@ -1,23 +1,23 @@
 (*
   Name:             UfrmInstallKeyboardLanguage
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      28 May 2014
 
   Modified Date:    1 Sep 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          28 May 2014 - mcdurdin - I4222 - V9.0 - Deprecate osWin2000, osWinXP, osWin2003Server
                     03 Aug 2014 - mcdurdin - I4322 - V9.0 - Specify custom languages (med-high) ? fixup language association dialog, also in installer.
                     01 Sep 2014 - mcdurdin - I4394 - V9.0 - Keyman Desktop Free Edition polish
                     01 Sep 2014 - mcdurdin - I4395 - V9.0 - Restrict associated languages to 1 for Light Edition
-                    
+
 *)
 unit UfrmInstallKeyboardLanguage;   // I4322
 
@@ -93,9 +93,9 @@ type
     editSearch: TEdit;
     gridLanguages: TStringGrid;
     gridLanguageVariants: TStringGrid;
-    procedure cmdOKClick(Sender: TObject);
     procedure TntFormCreate(Sender: TObject);
     procedure TntFormDestroy(Sender: TObject);
+    procedure cmdOKClick(Sender: TObject);
     procedure gridLanguagesClick(Sender: TObject);
     procedure editSearchChange(Sender: TObject);
     procedure gridLanguagesDrawCell(Sender: TObject; ACol, ARow: Integer;
@@ -128,13 +128,13 @@ uses
   Vcl.Themes,
 
   Keyman.Configuration.UI.MitigationForWin10_1803,
-  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils,
+  Keyman.Configuration.System.TIPMaintenance,
+  Keyman.UI.UfrmProgress,
 
   BCP47Tag,
   GetOSVersion,
   kmint,
-  UtilWaitForTSF,
   utilkmshell;
 
 {$R *.dfm}
@@ -142,15 +142,10 @@ uses
 { TfrmInstallKeyboardLanguage }
 
 function InstallKeyboardLanguage(Owner: TForm; const KeyboardID, ISOCode: string; Silent: Boolean): Boolean;
-var
-  n: Integer;
 begin
-  n := kmcom.Keyboards.IndexOf(KeyboardID);
-  if n < 0 then
-    Exit(False);
-
-  kmcom.Keyboards[n].Languages.Install(ISOCode);
-  CheckForMitigationWarningFor_Win10_1803(Silent, '');
+  Result := TTIPMaintenance.DoInstall(KeyboardID, ISOCode);
+  if Result then
+    CheckForMitigationWarningFor_Win10_1803(Silent, '');
 
   Result := True;
 end;
@@ -187,12 +182,14 @@ var
     procedure AddVariant(Lang: TInstLanguage);
     var
       FLanguageVariant: TInstLanguageVariant;
+      Tag: string;
       i: Integer;
     begin
-      with TBCP47Tag.Create(lpLocaleString) do
+      Tag := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(lpLocaleString);
+      with TBCP47Tag.Create(Tag) do
       try
+        // TODO: Is this correct?
         Script := Lang.Script;
-        Canonicalize;
         for i := 0 to Lang.Variants.Count - 1 do
           if SameText(Lang.Variants[i].Code, Tag) then
             Exit;
@@ -251,44 +248,45 @@ begin
 end;
 
 procedure TfrmInstallKeyboardLanguage.cmdOKClick(Sender: TObject);
-var
-  FLanguageVariant: TInstLanguageVariant;
-  FCode: string;
-  n: Integer;
-  FKeyboardID: string;
 begin
-  FLanguageVariant := gridLanguageVariants.Objects[0, gridLanguageVariants.Row] as TInstLanguageVariant;
-  if not Assigned(FLanguageVariant)
-    then FCode := FCustomLanguage.Tag // Using a custom code
-    else FCode := FLanguageVariant.Code;
+  if TfrmProgress.Execute(Self,
+    function(Manager: IProgressManager): Boolean
+    var
+      FLanguageVariant: TInstLanguageVariant;
+      FCode: string;
+      n: Integer;
+      FKeyboardID: string;
+    begin
+      Manager.Title := 'Installing Language';
+      Manager.CanCancel := False;
+      Manager.UpdateProgress('Installing Language', 0, 0);
+      FLanguageVariant := gridLanguageVariants.Objects[0, gridLanguageVariants.Row] as TInstLanguageVariant;
+      if not Assigned(FLanguageVariant)
+        then FCode := FCustomLanguage.Tag // Using a custom code
+        else FCode := FLanguageVariant.Code;
 
-  if not kmcom.SystemInfo.IsAdministrator then
-  begin
-    WaitForElevatedConfiguration(Handle, '-ikl "'+FKeyboard.ID+'" "'+FCode+'"');
-  end
-  else
-  begin
-    InstallKeyboardLanguage(Self, FKeyboard.ID, FCode, False);
-  end;
+      TTIPMaintenance.DoInstall(FKeyboard.ID, FCode);
 
-  FKeyboardID := FKeyboard.ID;
-  FKeyboard := nil;
+      FKeyboardID := FKeyboard.ID;
+      FKeyboard := nil;
 
-  kmcom.Languages.Refresh;
-  kmcom.Keyboards.Refresh;
-  n := kmcom.Keyboards.IndexOf(FKeyboardID);
-  if n >= 0
-    then FKeyboard := kmcom.Keyboards[n]
-    else FKeyboard := nil;
+      kmcom.Languages.Refresh;
+      kmcom.Keyboards.Refresh;
+      n := kmcom.Keyboards.IndexOf(FKeyboardID);
+      if n >= 0
+        then FKeyboard := kmcom.Keyboards[n]
+        else FKeyboard := nil;
 
-  if Assigned(FKeyboard) then
-  begin
-    // Because the TSF component is async we have to wait
-    TWaitForTSF.WaitForLanguageProfilesToBeApplied(FKeyboard);
-    FKeyboard := nil;
-    kmcom.Keyboards.Refresh;  // Get updated language profile name after it is loaded
-  end;
-  ModalResult := mrOk;
+      if Assigned(FKeyboard) then
+      begin
+        // Because the TSF component is async we have to wait
+        FKeyboard := nil;
+        kmcom.Keyboards.Refresh;  // Get updated language profile name after it is loaded
+      end;
+      Result := True;
+    end
+  ) then
+    ModalResult := mrOk;
 end;
 
 procedure TfrmInstallKeyboardLanguage.editSearchChange(Sender: TObject);
@@ -312,7 +310,7 @@ begin
       //TODO:BCP47: split BCP-47 into language + script + region here.
       with TBCP47Tag.Create(FKeyboard.Languages[i].BCP47Code) do
       try
-        Canonicalize;
+        Tag := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(Tag);
         if Tag <> '' then
         begin
           FLanguage := TInstLanguage.Create(True, Language, Script, FKeyboard.Languages[i].Name);
@@ -367,6 +365,7 @@ var
   FVariant: TInstLanguageVariant;
   FText: string;
   FFoundCustomTag: Boolean;
+  FAllowableText: string;
 
   procedure AddRow(IsSuggested: Boolean; const Name, LocalName, Script, Code: string; Item: TInstLanguage);
   begin
@@ -412,33 +411,62 @@ begin
     end;
   end;
 
-  if IsValidLocaleName(PChar(FText)) and not (GetOs = osWin7) and not FFoundCustomTag then
+  if not (GetOs = osWin7) and not FFoundCustomTag then
   begin
-    // Adding custom locales supported with Win8 and later
-    FText := TCanonicalLanguageCodeUtils.FindBestTag(FText);
-    if FText <> '' then
-      with TBCP47Tag.Create(FText) do
-      try
-        // Let's lookup the lang - script - region and get a good name
-        FCustomLanguage.Tag := Tag;
-        if not TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, FCustomLanguage.LanguageName) then
-          FCustomLanguage.LanguageName := '';
-        if not TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, FCustomLanguage.ScriptName) then
-          FCustomLanguage.ScriptName := '';
-        if not TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, FCustomLanguage.RegionName) then
-          FCustomLanguage.RegionName := '';
-        FCustomLanguage.FullName := TLanguageCodeUtils.LanguageName(FCustomLanguage.LanguageName,
-          FCustomLanguage.ScriptName, '');
-        AddRow(
-          False,
-          FCustomLanguage.FullName,
-          FCustomLanguage.FullName,
-          FCustomLanguage.ScriptName,
-          FCustomLanguage.Tag, nil);
-      finally
-        Free;
+    if IsValidLocaleName(PChar(FText)) then
+    begin
+      // Adding custom locales supported with Win8 and later
+      FAllowableText := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(FText);
+      if FAllowableText <> '' then
+        with TBCP47Tag.Create(FAllowableText) do
+        try
+          // Let's lookup the lang - script - region and get a good name
+          FCustomLanguage.Tag := Tag;
+          if not TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, FCustomLanguage.LanguageName) then
+            FCustomLanguage.LanguageName := '';
+          if not TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, FCustomLanguage.ScriptName) then
+            FCustomLanguage.ScriptName := '';
+          if not TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, FCustomLanguage.RegionName) then
+            FCustomLanguage.RegionName := '';
+          FCustomLanguage.FullName := TLanguageCodeUtils.LanguageName(FCustomLanguage.LanguageName,
+            FCustomLanguage.ScriptName, '');
+          AddRow(
+            False,
+            FCustomLanguage.FullName,
+            FCustomLanguage.FullName,
+            FCustomLanguage.ScriptName,
+            FCustomLanguage.Tag, nil);
+        finally
+          Free;
+        end;
+      FText := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(FText);
+      if FAllowableText <> FText then
+      begin
+        with TBCP47Tag.Create(FText) do
+        try
+          // Let's lookup the lang - script - region and get a good name
+          FCustomLanguage.Tag := Tag;
+          if not TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, FCustomLanguage.LanguageName) then
+            FCustomLanguage.LanguageName := '';
+          if not TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, FCustomLanguage.ScriptName) then
+            FCustomLanguage.ScriptName := '';
+          if not TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, FCustomLanguage.RegionName) then
+            FCustomLanguage.RegionName := '';
+          FCustomLanguage.FullName := TLanguageCodeUtils.LanguageName(FCustomLanguage.LanguageName,
+            FCustomLanguage.ScriptName, '');
+          AddRow(
+            False,
+            FCustomLanguage.FullName,
+            FCustomLanguage.FullName,
+            FCustomLanguage.ScriptName,
+            FCustomLanguage.Tag, nil);
+        finally
+          Free;
+        end;
       end;
+    end;
   end;
+
 
   gridLanguages.RowCount := n;
 

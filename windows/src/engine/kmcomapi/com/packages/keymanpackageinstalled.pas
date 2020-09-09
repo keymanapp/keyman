@@ -83,6 +83,7 @@ type
 
     { IIntKeymanPackageInstalled }
     procedure RefreshKeyboards;
+    function GetKeyboardLanguageList(const KeyboardID: string): TObject;
   public
     constructor Create(AContext: TKeymanContext; const AName: WideString);
     destructor Destroy; override;
@@ -187,6 +188,19 @@ begin
   if n < 0 then
     Exit(nil);
   Result := Get_Files[n];
+end;
+
+function TKeymanPackageInstalled.GetKeyboardLanguageList(
+  const KeyboardID: string): TObject;
+var
+  k: TPackageKeyboard;
+begin
+  LoadKMPInfFile;
+  for k in FKMPInf.Keyboards do
+    if SameText(k.ID, KeyboardID) then
+      Exit(k.Languages);
+
+  Result := nil;
 end;
 
 function TKeymanPackageInstalled.Get_ReadmeFile: IKeymanPackageContentFile;

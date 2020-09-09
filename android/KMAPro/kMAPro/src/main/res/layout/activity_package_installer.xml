@@ -8,65 +8,21 @@
     tools:context=".PackageActivity" >
 
     <include layout="@layout/titlebar" />
-    <WebView
-        android:id="@+id/packageWebView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/titlebar"
-        android:layout_above="@+id/buttonBar"/>
 
-    <LinearLayout
-        android:id="@+id/buttonBar"
-        style="?android:attr/buttonBarStyle"
+    <!-- Stepper Layout for navigating through package install.
+      Button text set here so we can localize -->
+    <com.stepstone.stepper.StepperLayout
+        android:id="@+id/stepperLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <!-- Spacer to pad buttons to the right -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-      <Button
-        android:id="@+id/finishButton"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="15dp"
-        android:text="@string/label_ok"
-        android:textColor="@color/keyman_blue"
-        android:elevation="1dp"
-        android:singleLine="true"/>
-
-        <Button
-            android:id="@+id/cancelButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="15dp"
-            android:text="@string/label_cancel"
-            android:textColor="@color/keyman_blue"
-            android:elevation="1dp"
-            android:singleLine="true"/>
-
-        <Button
-            android:id="@+id/installButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="15dp"
-            android:text="@string/label_install"
-            android:textColor="@color/keyman_blue">
-            <requestFocus/>
-        </Button>
-
-
-
-    </LinearLayout>
+        app:ms_showBackButtonOnFirstStep="true"
+        app:ms_backButtonColor="@color/keyman_blue"
+        app:ms_backButtonText="@string/label_back"
+        app:ms_nextButtonColor="@color/keyman_blue"
+        app:ms_nextButtonText="@string/label_next"
+        app:ms_completeButtonColor="@color/keyman_blue"
+        app:ms_completeButtonText="@string/label_ok"
+        app:ms_stepperType="dots" />
 
 </RelativeLayout>

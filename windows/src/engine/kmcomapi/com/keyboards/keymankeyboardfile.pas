@@ -51,7 +51,7 @@ type
 
     { IKeymanKeyboardFile }
     procedure Install(Force: WordBool); safecall;
-    function Install2(Force, InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
+    function Install2(Force: WordBool): IKeymanKeyboardInstalled; safecall;
 
     { IKeymanKeyboard }
     function Get_Copyright: WideString; override; safecall;
@@ -78,18 +78,20 @@ type
 implementation
 
 uses
-  Graphics,
+  System.SysUtils,
+  System.Variants,
+  Vcl.Graphics,
+
+  internalinterfaces,
   keymanerrorcodes,
   keymanhotkey,
   kmxfileusedchars,
   kpinstallkeyboard,
   Keyman.System.LanguageCodeUtils,
-  SysUtils,
   utilkeyman,
   utilolepicture,
   utilstr,
-  utilxml,
-  Variants;
+  utilxml;
 
 { TKeymanKeyboardFile }
 
@@ -233,23 +235,19 @@ procedure TKeymanKeyboardFile.Install(Force: WordBool);
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [], nil, Force);
+    Execute(FFileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force);
   finally
     Free;
   end;
 end;
 
-function TKeymanKeyboardFile.Install2(Force, InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled;
+function TKeymanKeyboardFile.Install2(Force: WordBool): IKeymanKeyboardInstalled;
 var
   kki: IKeymanKeyboardsInstalled;
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    if InstallDefaultLanguage then
-      Execute(FFileName, '', [ikInstallDefaultLanguage], nil, Force)
-    else
-      Execute(FFileName, '', [], nil, Force);
-
+    Execute(FFileName, '', [], nil, Force);
   finally
     Free;
   end;
@@ -279,6 +277,8 @@ begin
     'layoutpositional', Get_LayoutType = kltPositional
   ]);
 
+  Result := Result + (FLanguages as IIntKeymanInterface).DoSerialize(Flags, ImagePath, References);
+
   if ((Flags and ksfExportImages) = ksfExportImages) and
     (Assigned(FKeyboardInfo.Icon) or
     Assigned(FKeyboardInfo.Bitmap)) then
@@ -295,7 +295,7 @@ begin
     finally
       Free;
     end;
-      Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
+    Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
   end;
 end;
 

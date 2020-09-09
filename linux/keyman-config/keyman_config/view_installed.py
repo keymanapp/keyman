@@ -12,6 +12,7 @@ gi.require_version('Gdk', '3.0')
 
 from gi.repository import Gtk, GdkPixbuf
 
+from keyman_config import _
 from keyman_config.list_installed_kmp import get_install_area_path, get_installed_kmp, InstallArea
 from keyman_config.welcome import WelcomeView
 from keyman_config.options import OptionsView
@@ -26,7 +27,7 @@ from keyman_config.get_kmp import user_keyboard_dir
 class ViewInstalledWindowBase(Gtk.Window):
     def __init__(self):
         self.accelerators = None
-        Gtk.Window.__init__(self, title="Keyman Configuration")
+        Gtk.Window.__init__(self, title=_("Keyman Configuration"))
         init_accel(self)
 
     def refresh_installed_kmp(self):
@@ -56,11 +57,12 @@ class ViewInstalledWindowBase(Gtk.Window):
     def on_installfile_clicked(self, button):
         logging.debug("Install from file clicked")
         dlg = Gtk.FileChooserDialog(
-            "Choose a kmp file..", self, Gtk.FileChooserAction.OPEN,
+            _("Choose a kmp file..."), self, Gtk.FileChooserAction.OPEN,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         dlg.resize(640, 480)
         filter_text = Gtk.FileFilter()
-        filter_text.set_name("KMP files")
+        # i18n: file type in file selection dialog
+        filter_text.set_name(_("KMP files"))
         filter_text.add_pattern("*.kmp")
         dlg.add_filter(filter_text)
         response = dlg.run()
@@ -135,12 +137,15 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         self.tree = Gtk.TreeView(self.store)
 
         renderer = Gtk.CellRendererPixbuf()
-        column = Gtk.TreeViewColumn("Icon", renderer, pixbuf=0)
+        # i18n: column header in table displaying installed keyboards
+        column = Gtk.TreeViewColumn(_("Icon"), renderer, pixbuf=0)
         self.tree.append_column(column)
         renderer = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn("Name", renderer, text=1)
+        # i18n: column header in table displaying installed keyboards
+        column = Gtk.TreeViewColumn(_("Name"), renderer, text=1)
         self.tree.append_column(column)
-        column = Gtk.TreeViewColumn("Version", renderer, text=2)
+        # i18n: column header in table displaying installed keyboards
+        column = Gtk.TreeViewColumn(_("Version"), renderer, text=2)
         self.tree.append_column(column)
 
         select = self.tree.get_selection()
@@ -153,26 +158,26 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bbox_top = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.VERTICAL)
         bbox_top.set_layout(Gtk.ButtonBoxStyle.START)
 
-        self.uninstall_button = Gtk.Button.new_with_mnemonic("_Uninstall")
-        self.uninstall_button.set_tooltip_text("Uninstall keyboard package")
+        self.uninstall_button = Gtk.Button.new_with_mnemonic(_("_Uninstall"))
+        self.uninstall_button.set_tooltip_text(_("Uninstall keyboard"))
         self.uninstall_button.connect("clicked", self.on_uninstall_clicked)
         self.uninstall_button.set_sensitive(False)
         bbox_top.add(self.uninstall_button)
 
-        self.about_button = Gtk.Button.new_with_mnemonic("_About")
-        self.about_button.set_tooltip_text("About keyboard package")
+        self.about_button = Gtk.Button.new_with_mnemonic(_("_About"))
+        self.about_button.set_tooltip_text(_("About keyboard"))
         self.about_button.connect("clicked", self.on_about_clicked)
         self.about_button.set_sensitive(False)
         bbox_top.add(self.about_button)
 
-        self.help_button = Gtk.Button.new_with_mnemonic("_Help")
-        self.help_button.set_tooltip_text("Help for keyboard package")
+        self.help_button = Gtk.Button.new_with_mnemonic(_("_Help"))
+        self.help_button.set_tooltip_text(_("Help for keyboard"))
         self.help_button.connect("clicked", self.on_help_clicked)
         self.help_button.set_sensitive(False)
         bbox_top.add(self.help_button)
 
-        self.options_button = Gtk.Button.new_with_mnemonic("_Options")
-        self.options_button.set_tooltip_text("Settings for keyboard")
+        self.options_button = Gtk.Button.new_with_mnemonic(_("_Options"))
+        self.options_button.set_tooltip_text(_("Settings for keyboard"))
         self.options_button.connect("clicked", self.on_options_clicked)
         self.options_button.set_sensitive(False)
         bbox_top.add(self.options_button)
@@ -182,23 +187,23 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bbox_bottom = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.VERTICAL)
         bbox_bottom.set_layout(Gtk.ButtonBoxStyle.END)
 
-        button = Gtk.Button.new_with_mnemonic("_Refresh")
-        button.set_tooltip_text("Refresh keyboard package list")
+        button = Gtk.Button.new_with_mnemonic(_("_Refresh"))
+        button.set_tooltip_text(_("Refresh keyboard list"))
         button.connect("clicked", self.on_refresh_clicked)
         bbox_bottom.add(button)
 
-        button = Gtk.Button.new_with_mnemonic("_Download")
-        button.set_tooltip_text("Download and install a keyboard package from the Keyman website")
+        button = Gtk.Button.new_with_mnemonic(_("_Download"))
+        button.set_tooltip_text(_("Download and install a keyboard from the Keyman website"))
         button.connect("clicked", self.on_download_clicked)
         bbox_bottom.add(button)
 
-        button = Gtk.Button.new_with_mnemonic("_Install")
-        button.set_tooltip_text("Install a keyboard package from a file")
+        button = Gtk.Button.new_with_mnemonic(_("_Install"))
+        button.set_tooltip_text(_("Install a keyboard from a file"))
         button.connect("clicked", self.on_installfile_clicked)
         bbox_bottom.add(button)
 
-        button = Gtk.Button.new_with_mnemonic("_Close")
-        button.set_tooltip_text("Close window")
+        button = Gtk.Button.new_with_mnemonic(_("_Close"))
+        button.set_tooltip_text(_("Close window"))
         button.connect("clicked", self.on_close_clicked)
         bind_accelerator(self.accelerators, button, '<Control>q')
         bind_accelerator(self.accelerators, button, '<Control>w')
@@ -215,31 +220,25 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             bmppng = ".bmp.png"  # Icon file extension
 
             if install_area == InstallArea.IA_USER:
-                welcome_file = os.path.join(user_keyboard_dir(kmpdata['packageID']), "welcome.htm")
-                options_file = os.path.join(user_keyboard_dir(kmpdata['packageID']), "options.htm")
-                icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['packageID'] + bmppng)
-                if not os.path.isfile(icofile):
-                    icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['keyboardID'] + bmppng)
+                path = user_keyboard_dir(kmpdata['packageID'])
             elif install_area == InstallArea.IA_SHARED:
-                welcome_file = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], "welcome.htm")
-                options_file = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], "options.htm")
-                icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + bmppng)
-                if not os.path.isfile(icofile):
-                    icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'],
-                                           kmpdata['keyboardID'] + bmppng)
+                path = os.path.join("/usr/local/share/keyman", kmpdata['packageID'])
             else:
-                welcome_file = os.path.join("/usr/share/keyman", kmpdata['packageID'], "welcome.htm")
-                options_file = os.path.join("/usr/share/keyman", kmpdata['packageID'], "options.htm")
-                icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + bmppng)
-                if not os.path.isfile(icofile):
-                    icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + bmppng)
-            if not os.path.isfile(icofile):
-                icofile = find_keyman_image("icon_kmp.png")
+                path = os.path.join("/usr/share/keyman", kmpdata['packageID'])
+
+            welcome_file = os.path.join(path, "welcome.htm")
+            options_file = os.path.join(path, "options.htm")
+            icofile = os.path.join(path, kmpdata['packageID'] + bmppng)
 
             if not os.path.isfile(welcome_file):
                 welcome_file = None
             if not os.path.isfile(options_file):
                 options_file = None
+            if not os.path.isfile(icofile):
+                icofile = os.path.join(path, kmpdata['keyboardID'] + bmppng)
+                if not os.path.isfile(icofile):
+                    icofile = find_keyman_image("icon_kmp.png")
+
             store.append([
                 GdkPixbuf.Pixbuf.new_from_file_at_size(icofile, 16, 16),
                 kmpdata['name'],
@@ -275,10 +274,14 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
     def on_tree_selection_changed(self, selection):
         model, treeiter = selection.get_selected()
         if treeiter is not None:
-            self.uninstall_button.set_tooltip_text("Uninstall keyboard package " + model[treeiter][1])
-            self.help_button.set_tooltip_text("Help for keyboard package " + model[treeiter][1])
-            self.about_button.set_tooltip_text("About keyboard package " + model[treeiter][1])
-            self.options_button.set_tooltip_text("Settings for keyboard package " + model[treeiter][1])
+            self.uninstall_button.set_tooltip_text(
+                _("Uninstall keyboard {package}").format(package=model[treeiter][1]))
+            self.help_button.set_tooltip_text(
+                _("Help for keyboard {package}").format(package=model[treeiter][1]))
+            self.about_button.set_tooltip_text(
+                _("About keyboard {package}").format(package=model[treeiter][1]))
+            self.options_button.set_tooltip_text(
+                _("Settings for keyboard {package}").format(package=model[treeiter][1]))
             logging.debug("You selected %s version %s", model[treeiter][1], model[treeiter][2])
             self.about_button.set_sensitive(True)
             if model[treeiter][4] == InstallArea.IA_USER:
@@ -298,10 +301,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             else:
                 self.options_button.set_sensitive(False)
         else:
-            self.uninstall_button.set_tooltip_text("Uninstall keyboard package")
-            self.help_button.set_tooltip_text("Help for keyboard package")
-            self.about_button.set_tooltip_text("About keyboard package")
-            self.options_button.set_tooltip_text("Settings for keyboard package")
+            self.uninstall_button.set_tooltip_text(_("Uninstall keyboard"))
+            self.help_button.set_tooltip_text(_("Help for keyboard"))
+            self.about_button.set_tooltip_text(_("About keyboard"))
+            self.options_button.set_tooltip_text(_("Settings for keyboard"))
             self.uninstall_button.set_sensitive(False)
             self.about_button.set_sensitive(False)
             self.help_button.set_sensitive(False)
@@ -343,9 +346,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             logging.info("Uninstall keyboard " + model[treeiter][3] + "?")
             dialog = Gtk.MessageDialog(
                 self, 0, Gtk.MessageType.QUESTION,
-                Gtk.ButtonsType.YES_NO, "Uninstall keyboard?")
+                Gtk.ButtonsType.YES_NO, _("Uninstall keyboard package?"))
             dialog.format_secondary_text(
-                "Are you sure that you want to uninstall the " + model[treeiter][1] + " keyboard")
+                _("Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?")
+                .format(keyboard=model[treeiter][1]))
             response = dialog.run()
             dialog.destroy()
             if response == Gtk.ResponseType.YES:

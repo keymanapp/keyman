@@ -5,4 +5,18 @@
     android:id="@+id/titlebar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:layout_alignParentTop="true" />
+    android:layout_alignParentTop="true"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+    <TextView
+        android:id="@id/bar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textSize="@dimen/titlebar_label_textsize"
+        android:textStyle="bold" />
+
+</androidx.appcompat.widget.Toolbar>

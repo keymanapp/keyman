@@ -62,6 +62,7 @@
 		<xsl:param name="default" />
     <xsl:param name="width" />
     <xsl:param name="id" />
+    <xsl:param name="disabled" />
     <xsl:param name="tabid" />
     <xsl:param name="shield" />
 
@@ -74,6 +75,7 @@
               <xsl:otherwise>button</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
+          <xsl:if test="$disabled = 1"><xsl:attribute name="disabled">disabled</xsl:attribute></xsl:if>
           <xsl:attribute name="id">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
@@ -98,6 +100,7 @@
               <xsl:otherwise>button</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
+          <xsl:if test="$disabled = 1"><xsl:attribute name="disabled">disabled</xsl:attribute></xsl:if>
           <xsl:attribute name="ID">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="$caption" /></xsl:attribute>

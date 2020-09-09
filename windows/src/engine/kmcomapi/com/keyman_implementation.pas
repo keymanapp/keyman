@@ -35,7 +35,7 @@ uses
   keymanautoobject, internalinterfaces;
 
 type
-  TKeyman = class(TAutoObject, IKeyman, IIntKeyman)
+  TKeyman = class(TAutoObject, IKeyman, IIntKeyman, IKeymanBCP47Canonicalization)
   private
     FInitialized: Boolean;
     FContext: TKeymanContext;
@@ -62,6 +62,9 @@ type
 
     procedure Apply; safecall;
     procedure Refresh; safecall;
+
+    { IKeymanBCP47Canonicalization }
+    function GetCanonicalTag(const Tag: WideString): WideString; safecall;
 
     { IKeymanObject }
     // Reimplement as a special case for this interface
@@ -92,7 +95,9 @@ uses
   ComServ,
   sysutils,
   klog,
-  utilhandleexception;
+  utilhandleexception,
+
+  Keyman.System.CanonicalLanguageCodeUtils;
 
 const
   SErrorUninitialised = 'Keyman COM API did not initialize successfully';
@@ -236,6 +241,13 @@ end;
 function TKeyman.ObjRelease: Integer;
 begin
   Result := inherited ObjRelease;
+end;
+
+function TKeyman.GetCanonicalTag(const Tag: WideString): WideString;
+begin
+  // We implement this here to avoid sharing standards datasets across
+  // multiple executables
+  Result := TCanonicalLanguageCodeUtils.FindBestTag(Tag, True);
 end;
 
 function TKeyman.Get_AutoApply: WordBool;

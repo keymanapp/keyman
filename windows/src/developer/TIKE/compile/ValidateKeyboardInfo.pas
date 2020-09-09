@@ -31,6 +31,7 @@ uses
   BCP47Tag,
   compile,
 //  Keyman.Developer.System.Project.ProjectLogConsole,
+  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.KeyboardInfoFile,
   Keyman.System.KMXFileLanguages;
 
@@ -90,7 +91,7 @@ begin
         if not IsValid(False, msg) then
           Result := Failed(msg);
 
-        if not IsCanonical(msg) then
+        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False) then
           Result := Failed(msg);
       finally
         Free;
@@ -105,7 +106,7 @@ begin
         if not IsValid(False, msg) then
           Result := Failed(msg);
 
-        if not IsCanonical(msg) then
+        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False) then
           Result := Failed(msg);
       finally
         Free;
