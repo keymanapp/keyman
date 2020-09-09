@@ -91,6 +91,18 @@ declare interface LexicalModel {
   configure(capabilities: Capabilities): Configuration;
 
   /**
+   * Indicates a mapping function used by the model to simplify lookup operations
+   * within the lexicon.  This is expected to result in a many-to-one mapping.
+   * 
+   * Example usages:  
+   * - converting any upper-case characters into lowercase
+   * - removing accent marks that may be difficult to type on standard keyboard layouts
+   * 
+   * @param text 
+   */
+  toKey?(text: USVString): USVString;
+
+  /**
    * Generates predictive suggestions corresponding to the state of context after the proposed
    * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
    * keystroke rather than one actually received.

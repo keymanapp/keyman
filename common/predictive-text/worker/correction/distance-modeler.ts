@@ -32,20 +32,28 @@ namespace correction {
     calculation: ClassicalDistanceCalculation<string, EditToken<string>, TraversableToken<string>>;
     
     currentTraversal: LexiconTraversal;
+    toKey: (wordform: USVString) => USVString = str => str;
     priorInput: RealizedInput;
 
-    constructor(rootTraversal: LexiconTraversal);
+    // Internal lazy-cache for .inputSamplingCost, as it's a bit expensive to re-compute.
+    private _inputCost?: number;
+
+    constructor(rootTraversal: LexiconTraversal, toKey?: (USVString) => USVString);
     constructor(node: SearchNode);
-    constructor(rootTraversal: LexiconTraversal | SearchNode) {
+    constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (USVString) => USVString) {
+      toKey = toKey || (x => x);
+
       if(rootTraversal instanceof SearchNode) {
         let priorNode = rootTraversal;
         this.calculation = priorNode.calculation;
         this.currentTraversal = priorNode.currentTraversal;
         this.priorInput = priorNode.priorInput;
+        this.toKey = priorNode.toKey;
       } else {
         this.calculation = new ClassicalDistanceCalculation();
         this.currentTraversal = rootTraversal;
         this.priorInput = [];
+        this.toKey = toKey;
       }
     }
 
@@ -54,15 +62,17 @@ namespace correction {
     }
 
     get inputSamplingCost(): number {
-      // TODO:  Optimize so that we're not frequently recomputing this?
-      // TODO:  We might should generalize this so that the probability-to-cost function isn't directly hard-coded.
-      //        Seems like a decent first conversion function though, at least.
+      if(this._inputCost !== undefined) {
+        return this._inputCost;
+      } else {
+        let MIN_P = 0.0001;
+        // Should technically re-normalize the sampling distribution.
+        // -ln(p) is smaller for larger probabilities, as ln(p) is always <= 0.  Approaches infinity as p => 0.
 
-      let THRESHOLD = 0.001;
-      // Should technically re-normalize the sampling distribution.
-      // We use -ln(p) because a positive cost is worse.  ln(p) is always <= 0. 
-      // TODO:  probably more efficient to instead use actual probability space... but that'll involve extra changes.
-      return this.priorInput.map(mass => mass.p > THRESHOLD ? mass.p : THRESHOLD).reduce((previous, current) => previous - Math.log(current), 0);
+        // TODO:  probably more efficient to instead use actual 'probability space'... but that'll involve extra changes.
+        this._inputCost = this.priorInput.map(mass => mass.p > MIN_P ? mass.p : MIN_P).reduce((previous, current) => previous - Math.log(current), 0);
+        return this._inputCost;
+      }
     }
 
     // The part used to prioritize our search.
@@ -142,7 +152,7 @@ namespace correction {
           }
 
           // TODO:  Check against cache, write results to that cache.
-          edgeCalc = edgeCalc.addInputChar({key: char});
+          edgeCalc = edgeCalc.addInputChar({key: this.toKey(char)});
         }
 
         let childEdge = new SearchNode(this);
@@ -276,14 +286,11 @@ namespace correction {
     // Signals that the edge has already been processed.
     private processedEdgeSet: {[mapKey: string]: boolean} = {};
 
-    constructor(traversalRoot: LexiconTraversal) {
+    constructor(traversalRoot: LexiconTraversal, toKey?: (USVString) => USVString) {
       // Constructs the comparator needed for the following line.
       this.buildQueueSpaceComparator();
       this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
-      this.rootNode = new SearchNode(traversalRoot);
-      if(!traversalRoot) {
-        console.error();
-      }
+      this.rootNode = new SearchNode(traversalRoot, toKey);
 
       this.completedPaths = [this.rootNode];
 
@@ -407,9 +414,39 @@ namespace correction {
           this.processedEdgeSet[currentNode.mapKey] = true;
         }
 
+        // Stage 1:  filter out nodes/edges we want to prune
+        
+        // Forbid a raw edit-distance of greater than 2.
+        // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
+        let substitutionsOnly = false;
+        if(currentNode.knownCost > 2) {
+          continue;
+        } else if(currentNode.knownCost == 2) {
+          // Hard restriction:  no further edits will be supported.  This helps keep the search
+          // more narrowly focused.
+          substitutionsOnly = true;
+        }
+
+        let tierMinCost = 0;
+        for(let i = 0; i <= bestTier.index; i++) {
+          tierMinCost += this.minInputCost[i];
+        }
+
+        // Thresholds _any_ path, partially based on currently-traversed distance.
+        // Allows a little 'wiggle room' + 2 "hard" edits.
+        // Can be important if needed characters don't actually exist on the keyboard 
+        // ... or even just not the then-current layer of the keyboard.
+        if(currentNode.currentCost > tierMinCost + 2.5 * SearchSpace.EDIT_DISTANCE_COST_SCALE) {
+          continue;
+        }
+
+        // Stage 2:  build remaining edges
+
         // Always possible, as this does not require any new input.
-        let insertionEdges = currentNode.buildInsertionEdges();
-        bestTier.correctionQueue.enqueueAll(insertionEdges);
+        if(!substitutionsOnly) {
+          let insertionEdges = currentNode.buildInsertionEdges();
+          bestTier.correctionQueue.enqueueAll(insertionEdges);
+        }
 
         if(bestTier.index == this.tierOrdering.length - 1) {
           // It was the final tier - store the node for future reference.
@@ -422,10 +459,13 @@ namespace correction {
         } else {
           // Time to construct new edges for the next tier!
           let nextTier = this.tierOrdering[bestTier.index+1];
-          // TODO:  make sure we get this part right.
+          
           let inputIndex = nextTier.index;
 
-          let deletionEdges     = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
+          let deletionEdges = [];
+          if(!substitutionsOnly) {
+            deletionEdges       = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
+          }     
           let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
 
           // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.

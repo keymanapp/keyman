@@ -172,8 +172,7 @@ class ModelCompositor {
             finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
           }
 
-          // For now, a 'hacked' re-use of the model's existing `.predict()` method.
-          // Ideally, we'd just use the prefix to look up possible words.
+          // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
             deleteLeft: lexicalModel.wordbreak(context).length, // remove actual token string

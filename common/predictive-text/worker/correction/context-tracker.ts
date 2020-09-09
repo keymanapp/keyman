@@ -290,7 +290,7 @@ namespace correction {
       return state;
     }
 
-    static modelContextState(tokenizedContext: USVString[], traversalRoot: LexiconTraversal): TrackedContextState {
+    static modelContextState(tokenizedContext: USVString[], lexicalModel: LexicalModel): TrackedContextState {
       let baseTokens = tokenizedContext.map(function(entry) {
         let token = new TrackedContextToken();
         token.raw = entry;
@@ -314,6 +314,7 @@ namespace correction {
       });
 
       // And now build the final context state object, which includes whitespace 'tokens'.
+      let traversalRoot = lexicalModel.traverseFromRoot();
       let state = new TrackedContextState(traversalRoot);
 
       if(baseTokens.length > 0) {
@@ -368,7 +369,7 @@ namespace correction {
       //
       // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
       // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-      let state = ContextTracker.modelContextState(tokenizedContext, model.traverseFromRoot());
+      let state = ContextTracker.modelContextState(tokenizedContext, model);
       state.taggedContext = context;
       this.enqueue(state);
       return state;
