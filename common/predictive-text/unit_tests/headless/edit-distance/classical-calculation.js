@@ -1,5 +1,4 @@
 var assert = require('chai').assert;
-let baseNS = require('../../../build/intermediate');
 var ClassicalDistanceCalculation = require('../../../build/intermediate').correction.ClassicalDistanceCalculation;
 
 function prettyPrintMatrix(matrix) {

@@ -533,5 +533,19 @@ namespace correction {
         }
       }
     }
+
+    get mapKey(): string {
+      let inputString = this.inputSequence.map((value) => value.key).join('');
+      let matchString =  this.matchSequence.map((value) => value.key).join('');
+      return inputString + models.SENTINEL_CODE_UNIT + matchString + models.SENTINEL_CODE_UNIT + this.diagonalWidth;
+    }
+
+    get lastInputEntry(): TInput {
+      return this.inputSequence[this.inputSequence.length-1];
+    }
+
+    get lastMatchEntry(): TMatch {
+      return this.matchSequence[this.matchSequence.length-1];
+    }
   }
 }
