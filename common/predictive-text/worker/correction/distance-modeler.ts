@@ -281,6 +281,9 @@ namespace correction {
       this.buildQueueSpaceComparator();
       this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
       this.rootNode = new SearchNode(traversalRoot);
+      if(!traversalRoot) {
+        console.error();
+      }
 
       this.completedPaths = [this.rootNode];
 
