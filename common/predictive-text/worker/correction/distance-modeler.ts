@@ -286,11 +286,15 @@ namespace correction {
     // Signals that the edge has already been processed.
     private processedEdgeSet: {[mapKey: string]: boolean} = {};
 
-    constructor(traversalRoot: LexiconTraversal, toKey?: (USVString) => USVString) {
+    constructor(model: LexicalModel) {
+      if(!model || !model.traverseFromRoot) {
+        throw "The provided model does not meet the requirements needed to support robust correction searching.";
+      }
+
       // Constructs the comparator needed for the following line.
       this.buildQueueSpaceComparator();
       this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
-      this.rootNode = new SearchNode(traversalRoot, toKey);
+      this.rootNode = new SearchNode(model.traverseFromRoot(), model.toKey ? model.toKey.bind(model) : null);
 
       this.completedPaths = [this.rootNode];
 

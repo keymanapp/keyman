@@ -55,7 +55,7 @@ describe('ModelCompositor', function() {
     var suggestions = composite.predict([thr, the], context);
 
     // Get the top suggest for 'the' and 'thr*'.
-    var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
+    var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'The' || s.displayAs === '“The”'; })[0];
     var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
 
     // Sanity check: do we have actual real-valued probabilities?
