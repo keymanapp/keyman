@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.141 alpha 2020-09-11
+
+* fix(web): default layout shift not changing layer (#3574)
+
 ## 14.0.140 alpha 2020-09-09
 
 * feat(common/models): core edit-distance calculation class (#3526)
