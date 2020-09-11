@@ -179,10 +179,8 @@ namespace correction {
   }
 
   export class ContextTracker extends CircularArray<TrackedContextState> {
-    // TODO:  Rework to accept the lexical model directly instead.  Needed to properly construct SearchSpace.
     static attemptMatchContext(tokenizedContext: USVString[], 
                                matchState: TrackedContextState,
-                               rootTraversal: LexiconTraversal,
                                transformDistribution?: Distribution<Transform>,): TrackedContextState {
       // Map the previous tokenized state to an edit-distance friendly version.
       let matchContext: USVString[] = matchState.toRawTokenization();
@@ -355,7 +353,7 @@ namespace correction {
 
       if(tokenizedContext.length > 0) {
         for(let i = this.count - 1; i >= 0; i--) {
-          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item(i), model.traverseFromRoot(), transformDistribution);
+          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item(i), transformDistribution);
 
           if(resultState) {
             resultState.taggedContext = context;
