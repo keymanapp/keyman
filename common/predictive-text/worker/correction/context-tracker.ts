@@ -45,7 +45,7 @@ namespace correction {
       } else {
         let rootTraversal = obj;
         this.tokens = [];
-        this.indexOffset = Number.MIN_VALUE;
+        this.indexOffset = Number.MIN_SAFE_INTEGER;
 
         if(rootTraversal) {
           this.searchSpace = [new SearchSpace(rootTraversal)];
@@ -69,8 +69,6 @@ namespace correction {
       let state = this;
       if(state.searchSpace.length > 0) {
         token.transformDistributions.forEach(distrib => state.searchSpace[0].addInput(distrib));
-      } else {
-        console.error();
       }
     }
 

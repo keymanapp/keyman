@@ -282,7 +282,7 @@ namespace correction {
       this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
       this.rootNode = new SearchNode(traversalRoot);
       if(!traversalRoot) {
-        console.error();
+        throw "The provided model does not meet the requirements needed to support robust correction searching.";
       }
 
       this.completedPaths = [this.rootNode];
