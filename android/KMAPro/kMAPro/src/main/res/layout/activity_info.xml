@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".InfoActivity" >
 
-    <include layout="@layout/titlebar" />
-
     <WebView
         android:id="@+id/infoWebView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginBottom="?attr/actionBarSize" />
 
-</LinearLayout>
+    <!-- Version string on the bottom of the page -->
+    <include
+        layout="@layout/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

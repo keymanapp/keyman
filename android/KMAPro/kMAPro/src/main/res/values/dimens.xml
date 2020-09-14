@@ -6,7 +6,7 @@
     <dimen name="activity_splash_textsize">20sp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="label_width">250dp</dimen>
+    <dimen name="label_width">350dp</dimen>
     <dimen name="titlebar_label_textsize">16sp</dimen>
     <dimen name="titlebar_button_height">24dp</dimen>
     <dimen name="package_label_width">350dp</dimen>
