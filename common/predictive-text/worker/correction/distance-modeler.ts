@@ -65,7 +65,7 @@ namespace correction {
       if(this._inputCost !== undefined) {
         return this._inputCost;
       } else {
-        let MIN_P = 0.0001;
+        let MIN_P = SearchSpace.MIN_KEYSTROKE_PROBABILITY;
         // Should technically re-normalize the sampling distribution.
         // -ln(p) is smaller for larger probabilities, as ln(p) is always <= 0.  Approaches infinity as p => 0.
 
@@ -265,10 +265,10 @@ namespace correction {
   // The set of search spaces corresponding to the same 'context' for search.
   // Whenever a wordbreak boundary is crossed, a new instance should be made.
   export class SearchSpace {
-
     private QUEUE_SPACE_COMPARATOR: models.Comparator<SearchSpaceTier>;
 
     static readonly EDIT_DISTANCE_COST_SCALE = 5;
+    static readonly MIN_KEYSTROKE_PROBABILITY = 0.0001;
 
     private tierOrdering: SearchSpaceTier[] = [];
     private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
@@ -287,8 +287,10 @@ namespace correction {
     private processedEdgeSet: {[mapKey: string]: boolean} = {};
 
     constructor(model: LexicalModel) {
-      if(!model || !model.traverseFromRoot) {
-        throw "The provided model does not meet the requirements needed to support robust correction searching.";
+      if(!model) {
+        throw "The LexicalModel parameter must not be null / undefined.";
+      } else if(!model.traverseFromRoot) {
+        throw "The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.";
       }
 
       // Constructs the comparator needed for the following line.
