@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.142 alpha 2020-09-15
+
+* chore(deps): bump node-fetch from 2.6.0 to 2.6.1 in /resources/build/version (#3578)
+
 ## 14.0.141 alpha 2020-09-11
 
 * fix(web): default layout shift not changing layer (#3574)
