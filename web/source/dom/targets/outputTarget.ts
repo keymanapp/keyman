@@ -21,5 +21,16 @@ namespace com.keyman.dom.targets {
         elem.dispatchEvent(event);
       }
     }
+
+    apply(transform: Transform) {
+      super.apply(transform);
+
+      let keyman = com.keyman.singleton;
+
+      // Signal the necessary text changes to the embedding app, if it exists.
+      if(keyman['oninserttext'] && keyman.isEmbedded) {
+        keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
+      }
+    }
   }
 }
