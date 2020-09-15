@@ -102,7 +102,6 @@ namespace correction {
           traversal: traversal
         }
 
-        // TODO:  Check against cache(s) & cache results.
         let childCalc = this.calculation.addMatchChar(matchToken);
 
         let searchChild = new SearchNode(this);
@@ -151,7 +150,6 @@ namespace correction {
             char = char + transform.insert[i];
           }
 
-          // TODO:  Check against cache, write results to that cache.
           edgeCalc = edgeCalc.addInputChar({key: this.toKey(char)});
         }
 
@@ -180,7 +178,6 @@ namespace correction {
             traversal: traversal
           }
   
-          // TODO:  Check against cache(s), cache results.
           let childCalc = edge.calculation.addMatchChar(matchToken);
   
           let searchChild = new SearchNode(this);
@@ -262,6 +259,23 @@ namespace correction {
     }
   }
 
+  type NullPath = {
+    type: 'none'
+  }
+
+  type IntermediateSearchPath = {
+    type: 'intermediate',
+    cost: number
+  }
+
+  type CompleteSearchPath = {
+    type: 'complete',
+    cost: number,
+    finalNode: SearchNode
+  }
+
+  type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
+
   // The set of search spaces corresponding to the same 'context' for search.
   // Whenever a wordbreak boundary is crossed, a new instance should be made.
   export class SearchSpace {
@@ -269,6 +283,7 @@ namespace correction {
 
     static readonly EDIT_DISTANCE_COST_SCALE = 5;
     static readonly MIN_KEYSTROKE_PROBABILITY = 0.0001;
+    static readonly DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL = 33; // in milliseconds.
 
     private tierOrdering: SearchSpaceTier[] = [];
     private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
@@ -327,9 +342,6 @@ namespace correction {
           sign = -1;
         }
 
-        // TODO:  rework this as a constant property of each tier.  We can simply update the costs as new inputs arrive,
-        //        which will also reduce the number of needed calculations.
-        //
         // Boost the cost of the lower tier by the minimum cost possible for the missing inputs between them.
         // In essence, compare the nodes as if the lower tier had the most likely input appended for each such 
         // input missing at the lower tier.
@@ -406,93 +418,115 @@ namespace correction {
       }
     }
 
-    findNextMatch(): SearchNode {
-      while(this.hasNextMatchEntry()) {
-        let bestTier = this.selectionQueue.dequeue();
-        let currentNode = bestTier.correctionQueue.dequeue();
+    private handleNextNode(): PathResult {
+      if(!this.hasNextMatchEntry()) {
+        return { type: 'none' };
+      }
+      
+      let bestTier = this.selectionQueue.dequeue();
+      let currentNode = bestTier.correctionQueue.dequeue();
 
-        // Have we already processed a matching edge?  If so, skip it.
-        // We already know the previous edge is of lower cost.
-        if(this.processedEdgeSet[currentNode.mapKey]) {
-          this.selectionQueue.enqueue(bestTier);
-          continue;
-        } else {
-          this.processedEdgeSet[currentNode.mapKey] = true;
-        }
+      let unmatchedResult: IntermediateSearchPath = {
+        type: 'intermediate',
+        cost: currentNode.currentCost
+      }
 
-        // Stage 1:  filter out nodes/edges we want to prune
+      // Have we already processed a matching edge?  If so, skip it.
+      // We already know the previous edge is of lower cost.
+      if(this.processedEdgeSet[currentNode.mapKey]) {
+        this.selectionQueue.enqueue(bestTier);
+        return unmatchedResult;
+      } else {
+        this.processedEdgeSet[currentNode.mapKey] = true;
+      }
+
+      // Stage 1:  filter out nodes/edges we want to prune
+      
+      // Forbid a raw edit-distance of greater than 2.
+      // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
+      let substitutionsOnly = false;
+      if(currentNode.knownCost > 2) {
+        return unmatchedResult;
+      } else if(currentNode.knownCost == 2) {
+        // Hard restriction:  no further edits will be supported.  This helps keep the search
+        // more narrowly focused.
+        substitutionsOnly = true;
+      }
+
+      let tierMinCost = 0;
+      for(let i = 0; i <= bestTier.index; i++) {
+        tierMinCost += this.minInputCost[i];
+      }
+
+      // Thresholds _any_ path, partially based on currently-traversed distance.
+      // Allows a little 'wiggle room' + 2 "hard" edits.
+      // Can be important if needed characters don't actually exist on the keyboard 
+      // ... or even just not the then-current layer of the keyboard.
+      if(currentNode.currentCost > tierMinCost + 2.5 * SearchSpace.EDIT_DISTANCE_COST_SCALE) {
+        return unmatchedResult;
+      }
+
+      // Stage 2:  build remaining edges
+
+      // Always possible, as this does not require any new input.
+      if(!substitutionsOnly) {
+        let insertionEdges = currentNode.buildInsertionEdges();
+        bestTier.correctionQueue.enqueueAll(insertionEdges);
+      }
+
+      if(bestTier.index == this.tierOrdering.length - 1) {
+        // It was the final tier - store the node for future reference.
+        this.completedPaths.push(currentNode);
         
-        // Forbid a raw edit-distance of greater than 2.
-        // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
-        let substitutionsOnly = false;
-        if(currentNode.knownCost > 2) {
-          continue;
-        } else if(currentNode.knownCost == 2) {
-          // Hard restriction:  no further edits will be supported.  This helps keep the search
-          // more narrowly focused.
-          substitutionsOnly = true;
-        }
+        // Since we don't modify any other tier, we may simply reinsert the removed tier.
+        this.selectionQueue.enqueue(bestTier);
 
-        let tierMinCost = 0;
-        for(let i = 0; i <= bestTier.index; i++) {
-          tierMinCost += this.minInputCost[i];
-        }
+        return {
+          type: 'complete',
+          cost: currentNode.currentCost,
+          finalNode: currentNode
+        };
+      } else {
+        // Time to construct new edges for the next tier!
+        let nextTier = this.tierOrdering[bestTier.index+1];
+        
+        let inputIndex = nextTier.index;
 
-        // Thresholds _any_ path, partially based on currently-traversed distance.
-        // Allows a little 'wiggle room' + 2 "hard" edits.
-        // Can be important if needed characters don't actually exist on the keyboard 
-        // ... or even just not the then-current layer of the keyboard.
-        if(currentNode.currentCost > tierMinCost + 2.5 * SearchSpace.EDIT_DISTANCE_COST_SCALE) {
-          continue;
-        }
-
-        // Stage 2:  build remaining edges
-
-        // Always possible, as this does not require any new input.
+        let deletionEdges = [];
         if(!substitutionsOnly) {
-          let insertionEdges = currentNode.buildInsertionEdges();
-          bestTier.correctionQueue.enqueueAll(insertionEdges);
-        }
+          deletionEdges       = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
+        }     
+        let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
 
-        if(bestTier.index == this.tierOrdering.length - 1) {
-          // It was the final tier - store the node for future reference.
-          this.completedPaths.push(currentNode);
-          
-          // Since we don't modify any other tier, we may simply reinsert the removed tier.
-          this.selectionQueue.enqueue(bestTier);
+        // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
+        nextTier.correctionQueue.enqueueAll(deletionEdges.concat(substitutionEdges));
 
-          return currentNode;
-        } else {
-          // Time to construct new edges for the next tier!
-          let nextTier = this.tierOrdering[bestTier.index+1];
-          
-          let inputIndex = nextTier.index;
+        // So, we simply rebuild the selection queue.
+        this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR, this.tierOrdering);
 
-          let deletionEdges = [];
-          if(!substitutionsOnly) {
-            deletionEdges       = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
-          }     
-          let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
-
-          // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
-          nextTier.correctionQueue.enqueueAll(deletionEdges.concat(substitutionEdges));
-
-          // So, we simply rebuild the selection queue.
-          this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR, this.tierOrdering);
-
-          // We didn't reach an end-node, so we just end the iteration and continue the search.
-        }
+        // We didn't reach an end-node, so we just end the iteration and continue the search.
       }
 
       // If we've somehow fully exhausted all search options, indicate that none remain.
-      return null;
+      return unmatchedResult;
     }
 
     // Current best guesstimate of how compositor will retrieve ideal corrections.
-    *getBestMatches(): Generator<SearchResult[]> { 
+    *getBestMatches(waitMillis?: number): Generator<SearchResult[]> { 
       // might should also include a 'base cost' parameter of sorts?
       let searchSpace = this;
       let currentReturns: {[mapKey: string]: SearchNode} = {};
+
+      // JS measures time by the number of milliseconds since Jan 1, 1970.
+      let timeStart = Date.now();
+      let maxTime: number;
+      if(waitMillis == 0) {
+        maxTime = Infinity;
+      } else if(waitMillis == undefined || Number.isNaN(waitMillis)) { // also covers null.
+        maxTime = SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL; 
+      } else  {
+        maxTime = waitMillis;
+      }
 
       class BatchingAssistant {
         currentCost = Number.MIN_SAFE_INTEGER;
@@ -564,17 +598,32 @@ namespace correction {
       }
 
       // Stage 2:  the fun part; actually searching!
+      let timedOut = false;
       do {
-        let newResult = this.findNextMatch();
-        if(!newResult) {
+        let newResult: PathResult;
+
+        // Search for a 'complete' path, skipping all partial paths as long as time remains.
+        do {
+          newResult = this.handleNextNode();
+
+          // (Naive) timeout check!
+          let now = Date.now();
+          if(now - timeStart > maxTime) {
+            timedOut = true;
+          }
+        } while(!timedOut && newResult.type == 'intermediate')
+        
+        // TODO:  check 'cost' on intermediate, running it through batcher to early-detect cost changes.
+        if(newResult.type == 'none') {
           break;
+        } else if(newResult.type == 'complete') {
+          batch = batcher.checkAndAdd(newResult.finalNode);
         }
-        batch = batcher.checkAndAdd(newResult);
 
         if(batch) {
           yield batch;
         }
-      } while(this.hasNextMatchEntry());
+      } while(!timedOut && this.hasNextMatchEntry());
 
       // If we _somehow_ exhaust all search options, make sure to return the final results.
       batch = batcher.tryFinalize();
