@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.143 alpha 2020-09-16
+
+* fix(android/app): Validate language selection for "INSTALL" button (#3579)
+
 ## 14.0.142 alpha 2020-09-15
 
 * chore(deps): bump node-fetch from 2.6.0 to 2.6.1 in /resources/build/version (#3578)
