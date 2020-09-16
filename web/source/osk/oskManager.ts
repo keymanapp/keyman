@@ -1,8 +1,4 @@
 /// <reference path="../kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
-// Includes KMW string extension declarations.
-/// <reference path="../text/kmwstring.ts" /> 
-// Includes the default layout specification.
-/// <reference path="../keyboards/defaultLayouts.ts" /> 
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
 // Includes the banner
@@ -230,7 +226,7 @@ namespace com.keyman.osk {
 
         // Generate a visual keyboard from the layout (or layout default)
         // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
-        if(activeKeyboard && activeKeyboard.layout(device.formFactor as text.FormFactor)) {
+        if(activeKeyboard && activeKeyboard.layout(device.formFactor as utils.FormFactor)) {
           this._GenerateVisualKeyboard(activeKeyboard);
         } else if(!activeKeyboard) {
           this._GenerateVisualKeyboard(null);

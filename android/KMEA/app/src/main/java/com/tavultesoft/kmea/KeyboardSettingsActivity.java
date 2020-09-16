@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.DialogFragment;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,6 +33,10 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.impl.CloudKeyboardPackageDownloadCallback;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -68,21 +73,17 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
     final ListView listView = findViewById(R.id.listView);
 
-    final Keyboard kbd = (Keyboard)getIntent().getSerializableExtra(KMManager.KMKey_Keyboard);
+    Bundle bundle = getIntent().getExtras();
+    if (bundle == null) {
+      return;
+    }
+    final Keyboard kbd = (Keyboard)bundle.getSerializable(KMManager.KMKey_Keyboard);
     final String packageID = kbd.getPackageID();
     final String languageID = kbd.getLanguageID();
     final String languageName = kbd.getLanguageName();
-    final String kbID = kbd.getResourceId();
-    final String kbName = kbd.getResourceName();
+    final String kbID = kbd.getKeyboardID();
+    final String kbName = kbd.getKeyboardName();
     final String kbVersion = kbd.getVersion();
-    String latestKbdCloudVersion = kbVersion;
-
-    // Determine if keyboard update is available from the cloud
-    Dataset dataset = CloudRepository.shared.fetchDataset(this);
-    final Keyboard latestKbd = dataset.keyboards.findMatch(kbd);
-    if (latestKbd != null) {
-      latestKbdCloudVersion = latestKbd.getVersion();
-    }
 
     final TextView textView = findViewById(R.id.bar_title);
     textView.setText(kbName);
@@ -96,8 +97,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
-    // Display notification to download update if latestKbdCloudVersion > kbVersion (installed)
-    if (FileUtils.compareVersions(latestKbdCloudVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+    // Display notification to download update if available
+    if (kbd.hasUpdateAvailable()) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, kbVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }
@@ -106,7 +107,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
     // Display keyboard help link
     hashMap = new HashMap<>();
-    final String customHelpLink = kbd.getCustomHelpLink();
+    final String customHelpLink = kbd.getHelpLink();
     // Check if app declared FileProvider
     icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
@@ -119,9 +120,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);
 
-    // Display uninstall keyboard
-    if (!packageID.equalsIgnoreCase(KMManager.KMDefault_PackageID) ||
-        !kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
+    // If not default keyboard, display uninstall keyboard
+    if (!kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
       hashMap = new HashMap<>();
       hashMap.put(titleKey, getString(R.string.uninstall_keyboard));
       hashMap.put(subtitleKey, "");
@@ -159,10 +159,11 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
         // "Version" link clicked to download latest keyboard version from cloud
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
-          Bundle args = latestKbd.buildDownloadBundle();
+          Bundle args = kbd.buildDownloadBundle();
           Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
           i.putExtras(args);
           startActivity(i);
+          finish();
 
         // "Help" link clicked
         } else if (itemTitle.equals(getString(R.string.help_link))) {
@@ -198,7 +199,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 
-      String url = String.format(QRCodeUtil.QR_BASE, kbID);
+      String url = String.format(QRCodeUtil.QR_CODE_URL_FORMATSTR, kbID);
       Bitmap myBitmap = QRCodeUtil.toBitmap(url);
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);

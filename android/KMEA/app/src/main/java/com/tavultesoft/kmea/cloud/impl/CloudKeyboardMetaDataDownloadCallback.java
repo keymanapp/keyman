@@ -1,7 +1,7 @@
 package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
-import android.util.Log;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -12,7 +12,9 @@ import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,10 +44,6 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
   private static final String TAG = "CloudKeyboardMetaDldCb";
 
-  /**
-   * Additional Cloud API parameter: Is custom keyboard.
-   */
-  public static final String PARAM_IS_CUSTOM = "is_custom";
   /**
    * Additional Cloud API parameter: language id.
    */
@@ -95,7 +93,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       return;
     }
 
-    processCloudResults(aCloudResult);
+    processCloudResults(aContext, aCloudResult);
 
     startDownloads(aContext, aCloudResult);
   }
@@ -152,25 +150,21 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
   /**
    * process the meta data result and prepare the additional downloads.
+   * @param aContext the context
    * @param aMetaDataResult the meta data results
    */
-  private void processCloudResults(List<MetaDataResult> aMetaDataResult) {
-    for(MetaDataResult _r:aMetaDataResult)
-    {
-      if(_r.returnjson.target== CloudApiTypes.ApiTarget.Keyboard)
-      {
-        handleKeyboardMetaData(_r);
+  private void processCloudResults(Context aContext, List<MetaDataResult> aMetaDataResult) {
+    for(MetaDataResult _r:aMetaDataResult) {
+      if (_r.returnjson.target== CloudApiTypes.ApiTarget.Keyboard) {
+        //handleKeyboardMetaData(_r);
       }
-      if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyboardLexicalModels)
-      {
+      if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyboardLexicalModels) {
         JSONArray lmData = _r.returnjson.jsonArray;
         if (lmData != null && lmData.length() > 0) {
-          try
-          {
+          try {
             JSONObject modelInfo = lmData.getJSONObject(0);
 
-            if (modelInfo.has("packageFilename") && modelInfo.has("id"))
-            {
+            if (modelInfo.has("packageFilename") && modelInfo.has("id")) {
               String _modelID = modelInfo.getString("id");
               ArrayList<CloudApiTypes.CloudApiParam> urls = new ArrayList<>();
               urls.add(new CloudApiTypes.CloudApiParam(
@@ -180,8 +174,17 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
               _r.additionalDownloads= urls;
             }
           } catch (JSONException e) {
-            Log.e(TAG, "Error parsing lexical model from api.keyman.com. " + e);
+            KMLog.LogException(TAG, "Error parsing lexical model from api.keyman.com. ", e);
           }
+        }
+      }
+      if (_r.returnjson.target == CloudApiTypes.ApiTarget.PackageVersion) {
+        JSONObject pkgData = _r.returnjson.jsonObject;
+
+        if (pkgData != null) {
+          List<Bundle> updateBundles = new ArrayList<>();
+          CloudDataJsonUtil.processKeyboardPackageUpdateJSON(aContext, pkgData, updateBundles);
+          CloudDataJsonUtil.processLexicalModelPackageUpdateJSON(aContext, pkgData, updateBundles);
         }
       }
     }
@@ -193,15 +196,9 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
    */
   private void handleKeyboardMetaData(MetaDataResult theKbData)
   {
-    if (theKbData.params.getAdditionalProperty(PARAM_IS_CUSTOM,Boolean.class)) {
-      throw new IllegalStateException("Cannot download custom non-KMP keyboard");
-    }
-
     String _key_id = theKbData.params.getAdditionalProperty(PARAM_KB_ID,String.class);
     String _lang_id = theKbData.params.getAdditionalProperty(PARAM_LANG_ID,String.class);
 
-    String _kbIsCustom =
-      theKbData.params.getAdditionalProperty(PARAM_IS_CUSTOM,Boolean.class) ? "Y" : "N";
     JSONObject _kb_data = theKbData.returnjson.jsonObject;
 
     try {
@@ -277,12 +274,11 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       theKbData.additionalDownloadid = CloudKeyboardDataDownloadCallback.createDownloadId(_key_id);
       theKbData.keyboardInfo = CloudDataJsonUtil
         .createKeyboardInfoMap(
-          _pkgID, _lang_id, _langName, _key_id, _kbName, _kbVersion, _kbIsCustom, _font, _oskFont, _customHelpLink);
+          _pkgID, _lang_id, _langName, _key_id, _kbName, _kbVersion, _font, _oskFont, _customHelpLink);
       theKbData.additionalDownloads = urls;
     }
-    catch(JSONException _e)
-    {
-      Log.e(TAG,_e.getLocalizedMessage(),_e);
+    catch(JSONException e) {
+      KMLog.LogException(TAG, "", e);
     }
   }
 

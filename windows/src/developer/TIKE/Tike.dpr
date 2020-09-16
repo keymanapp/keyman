@@ -87,12 +87,10 @@ uses
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
   Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\global\delphi\general\UnitDrawArrow.pas',
-  StockObjects in 'kct\StockObjects.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   custinterfaces in '..\..\global\delphi\cust\custinterfaces.pas',
   CustomisationMessages in '..\..\global\delphi\cust\CustomisationMessages.pas',
-  StockMessages in '..\..\global\delphi\cust\StockMessages.pas',
   HeadingCheckListBox in '..\..\global\delphi\comp\HeadingCheckListBox.pas',
   BitmapEditor in '..\..\global\delphi\comp\BitmapEditor.pas',
   StringGridEditControlled in '..\..\global\delphi\comp\StringGridEditControlled.pas',
@@ -145,7 +143,6 @@ uses
   Keyman.Developer.UI.TikeOnlineUpdateCheck in 'update\Keyman.Developer.UI.TikeOnlineUpdateCheck.pas',
   Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion in 'update\Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion.pas' {frmTikeOnlineUpdateNewVersion},
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
-  MessageDefaults in 'kct\MessageDefaults.pas',
   UfrmDownloadProgress in 'main\UfrmDownloadProgress.pas' {frmDownloadProgress},
   UframeOnScreenKeyboardEditor in 'main\UframeOnScreenKeyboardEditor.pas' {frameOnScreenKeyboardEditor},
   UfrmOSKEditor in 'child\UfrmOSKEditor.pas' {frmOSKEditor},
@@ -254,7 +251,7 @@ uses
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
   Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
-  Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
+  Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas',
   Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas',
   Keyman.UI.FontUtils in '..\..\global\delphi\general\Keyman.UI.FontUtils.pas',
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in '..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
@@ -293,7 +290,8 @@ uses
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
-  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -325,8 +323,8 @@ begin
         if TikeActive then Exit;
         InitClasses;
         Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-        Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-        Application.Run;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  Application.Run;
       end;
     finally
       FInitializeCEF.Free;

@@ -3,6 +3,8 @@
   Description:  Tests for kmx integration
   Create Date:  30 Oct 2018
   Authors:      Marc Durdin (MD), Tim Eves (TSE)
+
+  Note: Exit codes will be 100*LINE + ERROR CODE, e.g. 25005 is code 5 on line 250
 */
 #include <algorithm>
 #include <cctype>
@@ -206,8 +208,8 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
                               << "=" << act.option->value
                 << " persistence requested" << std::endl;
       if (!found) {
-        std::cout << "option " 
-                  << act.option->key 
+        std::cout << "option "
+                  << act.option->key
                   << " saved but no expected output found. Suggestion: update test to include saved option value." << std::endl;
       }
     }
@@ -319,7 +321,7 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
 
   std::cout << "expected  : " << expected << std::endl;
   std::cout << "text store: " << text_store << std::endl;
-  std::cout << "result    : " << buf << std::endl;
+  std::cout << "context   : " << buf << std::endl;
 
   // Compare internal context with expected result
   if (buf != expected) return __LINE__;

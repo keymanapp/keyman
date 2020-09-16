@@ -1,4 +1,4 @@
-/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+/// <reference path="../node_modules/@keymanapp/web-utils/src/kmwstring.ts" />
 
 /***
    KeymanWeb 11.0

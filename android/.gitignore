@@ -34,6 +34,9 @@ gradle_models.ser
 KMEA/app/src/main/assets/
 KMAPro/assets/keyman.js
 
+# KMAPRo default packages
+KMAPro/**/assets/*.kmp
+
 # Eclipse files
 .project
 .settings/

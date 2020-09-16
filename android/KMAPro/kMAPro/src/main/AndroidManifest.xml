@@ -29,9 +29,9 @@
     <!--    how to enable Sentry's debug mode-->
     <meta-data
       android:name="io.sentry.debug" android:value="true" />
-    <!-- Disable monitoring "Application Not Responding" (ANR).  Too many reports at the default 4000 ms -->
+    <!-- Have application handle initializing Sentry -->
     <meta-data
-      android:name="io.sentry.anr.enable" android:value="false" />
+      android:name="io.sentry.auto-init" android:value="false" />
 
     <service
       android:name="com.keyman.android.SystemKeyboard"
@@ -176,7 +176,7 @@
       </intent-filter>
 
       <intent-filter>
-        <!-- keyman:download deep linking to https://keyman.com/keyboards/ -->
+        <!-- keyman:download// deep linking to https://keyman.com/keyboards/ -->
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
@@ -188,7 +188,49 @@
           android:sspPrefix="download" />
 
       </intent-filter>
+
+      <intent-filter android:autoVerify="true">
+        <!-- KMPBrowserActivity converts cloud keyboard package links from http(s)://{HOST}/keyboards/install into /go/package/download
+             Use {HOST} as defined in KMPLink.java
+             Also note, Manifest will OR all the scheme/host/pathPrefix combinations -->
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:host="keyman-staging.com"
+          android:scheme="http"
+          android:pathPrefix="/go/package/download" />
+
+        <data
+          android:host="keyman.com"
+          android:scheme="https"
+          android:pathPrefix="/go/package/download" />
+
+      </intent-filter>
+
+      <intent-filter>
+        <!-- KMAPro should also be able to handle /keyboards/install links and convert to /go/package/download -->
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:host="keyman-staging.com"
+          android:scheme="http"
+          android:pathPrefix="/keyboards/install" />
+
+        <data
+          android:host="keyman.com"
+          android:scheme="https"
+          android:pathPrefix="/keyboards/install" />
+
+      </intent-filter>
+
     </activity>
+
     <activity
       android:name=".InfoActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
@@ -215,6 +257,24 @@
       android:name=".KeymanSettingsActivity"
       android:label="@string/keyman_settings"
       android:parentActivityName=".MainActivity"
+      android:launchMode="singleTask"
+      android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".KeymanSettingsInstallActivity"
+      android:label="@string/app_name"
+      android:parentActivityName=".KeymanSettingsActivity"
+      android:launchMode="singleTask"
+      android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".SelectPackageActivity"
+      android:label="@string/app_name"
+      android:parentActivityName=".KeymanSettingsInstallActivity"
+      android:launchMode="singleTask"
+      android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".SelectLanguageActivity"
+      android:label="@string/app_name"
+      android:parentActivityName=".SelectPackageActivity"
       android:launchMode="singleTask"
       android:theme="@style/AppTheme.Base" />
 

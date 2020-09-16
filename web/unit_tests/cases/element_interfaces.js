@@ -972,7 +972,7 @@ describe('Element Input/Output Interfacing', function() {
   this.timeout(kmwconfig.timeouts.standard);
 
   before(function() {
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
     
     // Make sure the basic SMP extension hooks exist to prevent errors later.
     String.kmwEnableSupplementaryPlane(false);

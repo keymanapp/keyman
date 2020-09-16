@@ -81,7 +81,7 @@ int km::kbp::kmx::DebugLog_1(const char *file, int line, const char *function, c
 const char *km::kbp::kmx::Debug_ModifierName(KMX_UINT modifiers) {
 #ifdef _MSC_VER
   __declspec(thread)
-#endif 
+#endif
   static char buf[256];
   buf[0] = 0;
   for(int i = 0; s_modifier_names[i].name; i++)
@@ -97,7 +97,7 @@ const char *km::kbp::kmx::Debug_ModifierName(KMX_UINT modifiers) {
 const char *km::kbp::kmx::Debug_VirtualKey(KMX_WORD vk) {
 #ifdef _MSC_VER
   __declspec(thread)
-#endif 
+#endif
   static char buf[256];
   if (!ShouldDebug()) {
     return "";
@@ -118,7 +118,7 @@ const char *km::kbp::kmx::Debug_UnicodeString(PKMX_WCHAR s, int x) {
   }
 #ifdef _MSC_VER
   __declspec(thread)
-#endif 
+#endif
   static char bufout[2][128 * 7];
   KMX_WCHAR *p;
   char *q;
@@ -137,12 +137,12 @@ const char *km::kbp::kmx::Debug_UnicodeString(std::u16string s, int x) {
   }
 #ifdef _MSC_VER
   __declspec(thread)
-#endif 
+#endif
   static char bufout[2][128 * 7];
   auto p = s.begin();
   char *q;
   bufout[x][0] = 0;
-  for (q = bufout[x]; (int)(q-bufout[x]) < (128*7) && p != s.end(); p++)
+  for (q = bufout[x]; (intptr_t)(q-bufout[x]) < (128*7) && p != s.end(); p++)
   {
     sprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
   }

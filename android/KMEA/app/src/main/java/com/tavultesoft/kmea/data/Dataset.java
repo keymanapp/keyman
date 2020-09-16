@@ -112,7 +112,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements Li
 
     public Type findMatch(Type target) {
       for(Type obj: data) {
-        if(obj.getResourceId().equals(target.getResourceId()) && obj.getLanguageID().equals(target.getLanguageID())) {
+        if (target.equals(obj)) {
           return obj;
         }
       }

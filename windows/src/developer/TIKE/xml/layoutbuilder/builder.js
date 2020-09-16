@@ -1000,7 +1000,8 @@ $(function () {
   }
 
   this.selectLayer = function (val) {
-    builder.lastLayerIndex = val || $('#selLayer').val();
+    if(val) $('#selLayer').val(val);
+    builder.lastLayerIndex = $('#selLayer').val();
     builder.prepareLayer();
     builder.selectKey($('#kbd > div.row > div.key')[0]);
   }

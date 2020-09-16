@@ -6,4 +6,7 @@
 		<glob pattern="*.kmp"/>
 		<icon name="application-x-kmp"/>
 	</mime-type>
+	<mime-type type="application/keyman">
+		<comment>Keyman keyboard installation link</comment>
+	</mime-type>
 </mime-info>

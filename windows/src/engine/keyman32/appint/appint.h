@@ -76,6 +76,7 @@ public:
 	virtual BOOL QueueAction(int ItemType, DWORD dwData);
   
   BOOL IsQueueEmpty() { return QueueSize == 0; }
+  int GetQueueSize() { return QueueSize; }
 };
 
 class AppContext

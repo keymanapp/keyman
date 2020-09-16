@@ -403,6 +403,7 @@ uses
   KeymanControlMessages,
   KeymanDesktopShell,
   KeymanPaths,
+  KeymanVersion,
   kmint,
   OnlineConstants,
   Winapi.ShellApi,
@@ -1168,7 +1169,7 @@ begin
       if Assigned(FRunningProduct) then
         frmVisualKeyboard.Caption := FRunningProduct.Name
       else
-        frmVisualKeyboard.Caption := MsgFromId(SKOnScreenKeyboardCaption);
+        frmVisualKeyboard.Caption := SKeymanDesktopName;
   end;
 
   if not Assigned(rp) then

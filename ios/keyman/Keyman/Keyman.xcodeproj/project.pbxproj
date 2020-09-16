@@ -17,7 +17,6 @@
 		1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; };
 		1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
-		981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADBC176935E400B62590 /* InfoPlist.strings */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
 		981AFA9819EF44DE006706BF /* 724-info.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725418E4F0930014DF0C /* 724-info.png */; };
 		981AFA9919EF44DE006706BF /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADD1176935E500B62590 /* MainViewController_iPad.xib */; };
@@ -133,6 +132,7 @@
 		CE002CB52408B4A5002026CE /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE002CB42408B4A5002026CE /* Sentry.framework */; };
 		CE1F5ECE23331DA400141F3E /* OfflineHelp.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */; };
 		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
+		CE4C654624D0020900070856 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE4C654424D0020900070856 /* Localizable.strings */; };
 		CE4E73D024170C9A00EBD1A5 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE002CB42408B4A5002026CE /* Sentry.framework */; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
@@ -287,7 +287,6 @@
 		987F3E9C19417F3D00209D4F /* textsize_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_selected@2x.png"; path = "Keyman Icons/textsize_selected@2x.png"; sourceTree = "<group>"; };
 		989E4DBA1B1EB85200A345FB /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Keyman-Free-Info.plist"; sourceTree = "<group>"; };
-		98ABADBD176935E400B62590 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		98ABADC1176935E400B62590 /* Keyman-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Prefix.pch"; sourceTree = "<group>"; };
 		98AD861219B56AAE00D25C26 /* 887-notepad-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected.png"; path = "Keyman Icons/887-notepad-selected.png"; sourceTree = "<group>"; };
 		98AD861319B56AAE00D25C26 /* 887-notepad-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected@2x.png"; path = "Keyman Icons/887-notepad-selected@2x.png"; sourceTree = "<group>"; };
@@ -317,6 +316,7 @@
 		CE002CB42408B4A5002026CE /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = OfflineHelp.bundle; sourceTree = "<group>"; };
 		CE2B1E4B21B6112B007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
+		CE4C654524D0020900070856 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
@@ -538,6 +538,7 @@
 		98ABADB9176935E400B62590 /* Keyman */ = {
 			isa = PBXGroup;
 			children = (
+				CE4C654424D0020900070856 /* Localizable.strings */,
 				162E2C9420926C8600F40769 /* Classes */,
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
@@ -567,7 +568,6 @@
 			isa = PBXGroup;
 			children = (
 				16A9229D20325253003CC98E /* Keyman-Info.plist */,
-				98ABADBC176935E400B62590 /* InfoPlist.strings */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
 				98AFAEDC17FE2B6A00178C0A /* Keyman Navbar */,
 				98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */,
@@ -767,6 +767,7 @@
 			knownRegions = (
 				en,
 				Base,
+				km,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -789,7 +790,6 @@
 				9845A8D41A439F1000544E2E /* 786-browser@3x.png in Resources */,
 				9845A7D31A439A9200544E2E /* InfoViewController_iPhone.xib in Resources */,
 				9845A8B51A439D3000544E2E /* Images.xcassets in Resources */,
-				981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */,
 				9845A8D71A439F1000544E2E /* UIButtonBarArrowRight@2x.png in Resources */,
 				981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */,
 				981AFA9819EF44DE006706BF /* 724-info.png in Resources */,
@@ -870,6 +870,7 @@
 				981AFACE19EF44DE006706BF /* 702-share@2x.png in Resources */,
 				9845A7AC1A43983300544E2E /* kmwb-navbar-Landscape-568h@2x.png in Resources */,
 				9845A8D91A439F1000544E2E /* UIButtonBarStop@2x.png in Resources */,
+				CE4C654624D0020900070856 /* Localizable.strings in Resources */,
 				9845A8D31A439F1000544E2E /* 786-browser@2x.png in Resources */,
 				981AFACF19EF44DE006706BF /* textsize_selected@2x.png in Resources */,
 				CE79CDB52370111200010C06 /* Themes+Colors.xcassets in Resources */,
@@ -970,7 +971,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to perform the dSYM upload\nphaseSentryDsymUpload \"keyman-ios\"\n";
+			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  phaseSentryDsymUpload \"keyman-ios\"\nfi\n";
 		};
 		CE06AA671F161422006D91C3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1020,6 +1021,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1064,14 +1066,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		98ABADBC176935E400B62590 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				98ABADBD176935E400B62590 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1086,6 +1080,14 @@
 				37378F4222C9AA610043F22B /* Base */,
 			);
 			name = MainViewController_iPad.xib;
+			sourceTree = "<group>";
+		};
+		CE4C654424D0020900070856 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE4C654524D0020900070856 /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -1202,7 +1204,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
@@ -1254,7 +1256,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
@@ -1392,7 +1394,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";

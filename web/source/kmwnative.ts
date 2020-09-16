@@ -1,5 +1,3 @@
-// Includes KMW string extension declarations.
-/// <reference path="text/kmwstring.ts" />
 // Contains event management for mobile device rotation events.
 /// <reference path="kmwrotation.ts" />
 

@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -27,6 +26,7 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -40,7 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownloadEventListener, CloudRepository.UpdateHandler{
   private static final String TAG = "ResourceUpdateTool";
@@ -148,7 +147,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       channel.setDescription(description);
       // Register the channel with the system; you can't change the importance
       // or other notification behaviors after this
-      NotificationManager notificationManager = aContext.getSystemService(NotificationManager.class);
+      NotificationManager notificationManager = (NotificationManager) aContext.getSystemService(Context.NOTIFICATION_SERVICE);
       notificationManager.createNotificationChannel(channel);
     }
   }
@@ -276,9 +275,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   private void addOpenUpdate(Bundle theResourceBundle) {
 
     String langid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_ID);
-    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
-      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
-      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
+    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_ID) &&
+      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID) != null &&
+      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID).isEmpty();
 
     if (downloadOnlyLexicalModel) {
       String modelid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
@@ -325,7 +324,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
           }
         }
       } catch (JSONException e) {
-        Log.e(TAG, "JSON Exception parsing ignoreNotifications preference");
+        KMLog.LogException(TAG, "JSON Exception parsing ignoreNotifications preference", e);
       }
     }
 
@@ -366,7 +365,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       editor.putString(PREF_KEY_IGNORE_NOTIFICATIONS, ignoredNotificationsObj.toString());
       editor.commit();
     } catch (JSONException e) {
-      Log.e(TAG, "JSON Exception updating ignoreNotifications preference");
+      KMLog.LogException(TAG, "JSON Exception updating ignoreNotifications preference", e);
     }
   }
 
@@ -379,9 +378,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
     String langid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_ID);
     String langName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_NAME);
-    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
-      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
-      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
+    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_ID) &&
+      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID) != null &&
+      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID).isEmpty();
 
     int  notification_id = this.notificationid.incrementAndGet();
 
@@ -428,6 +427,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       .setContentTitle(currentContext.getString(R.string.keyboard_updates_available))
       .setContentText(message)
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+      .setAutoCancel(true)
       .setContentIntent(startUpdateIntent)
       .setOngoing(true);
 
@@ -522,7 +522,15 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
-    // Do nothing
+    if (! openUpdates.isEmpty() && keyboardsInstalled != null) {
+      for (Map<String, String> k : keyboardsInstalled) {
+        String _langid = k.get(KMManager.KMKey_LanguageID);
+        String _kbid = k.get(KMManager.KMKey_KeyboardID);
+        removeOpenUpdate(createKeyboardId(_langid, _kbid));
+      }
+    }
+
+    tryFinalizeUpdate();
   }
 
   @Override

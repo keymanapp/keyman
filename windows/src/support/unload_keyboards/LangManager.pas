@@ -49,6 +49,8 @@ uses
   Graphics;
 
 type
+  PWord1 = ^Word;
+
   TLangSwitchItemType = (lsitUnknown, lsitWinKeyboard, lsitTIP);   // I4004
 
   TLangSwitchManager = class;
@@ -182,6 +184,11 @@ type
     property HKL: HKL read FHKL;
   end;
 
+const
+  SRegKey_KeyboardLayouts = '\SYSTEM\CurrentControlSet\Control\Keyboard Layouts';
+  SRegKey_KeyboardLayoutPreload = '\Keyboard Layout\Preload';
+  SRegKey_KeyboardLayoutSubstitutes = '\Keyboard Layout\Substitutes';
+
 implementation
 
 uses
@@ -194,7 +201,8 @@ uses
   ErrorControlledRegistry,
   Registry,
   RegistryKeys,
-  WideStrings;
+  WideStrings,
+  keyman_msctf;
 
 { TLangSwitchItems }
 
@@ -249,7 +257,7 @@ var
   ulCount: Cardinal;
   FLanguage: TLangSwitchLanguage;
 begin
-  FProfiles.GetLanguageList(pLangID, ulCount);
+  FProfiles.GetLanguageList(@pLangID, ulCount);
   for I := 0 to ulCount - 1 do
   begin
     FLanguage := TLangSwitchLanguage.Create(Self, pLangID^);
@@ -273,8 +281,8 @@ procedure TLangSwitchManager.EnumTSFKeyboards;
 var
   i: Integer;
   pcFetch: Cardinal;
-  profile: TF_INPUTPROCESSORPROFILE;
-  ppEnum: IEnumTfInputProcessorProfiles;
+  profile: msctf.TF_INPUTPROCESSORPROFILE;
+  ppEnum: msctf.IEnumTfInputProcessorProfiles;
   FItem: TLangSwitchKeyboard;
 begin
   FItem := nil;
@@ -480,7 +488,7 @@ begin
     TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);
 end;
 
-constructor TLangSwitchKeyboard_TIP.Create(AManager: TLangSwitchManager; ALanguage: TLangSwitchLanguage; AProfile: TF_INPUTPROCESSORPROFILE);   // I3961
+constructor TLangSwitchKeyboard_TIP.Create(AManager: TLangSwitchManager; ALanguage: TLangSwitchLanguage; AProfile: msctf.TF_INPUTPROCESSORPROFILE);   // I3961
 var
   FIconFile: string;
   FIconIndex: Integer;

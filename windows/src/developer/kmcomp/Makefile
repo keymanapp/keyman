@@ -21,6 +21,11 @@ build: version.res manifest.res dirs icons
     if exist $(WIN64_TARGET_PATH)\kmcomp.x64.exe del $(WIN64_TARGET_PATH)\kmcomp.x64.exe
     # Delphi does not allow us to build to a different target filename so we rename after build
     ren $(WIN64_TARGET_PATH)\kmcomp.exe kmcomp.x64.exe
+
+    if exist $(WIN64_TARGET_PATH)\kmcomp.x64.map del $(WIN64_TARGET_PATH)\kmcomp.x64.map
+    ren $(WIN64_TARGET_PATH)\kmcomp.map kmcomp.x64.map
+
+    $(SENTRYTOOL_DELPHIPREP) $(WIN64_TARGET_PATH)\kmcomp.x64.exe -dpr kmcomp.dpr
     $(COPY) $(WIN64_TARGET_PATH)\kmcomp.x64.exe $(PROGRAM)\developer\kmcomp.x64.exe
     if exist $(WIN64_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN64_TARGET_PATH)\kmcomp.dbg $(DEBUGPATH)\developer\kmcomp.x64.dbg
 

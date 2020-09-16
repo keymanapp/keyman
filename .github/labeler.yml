@@ -1,0 +1,87 @@
+#
+# This file adds labels based on the scopes in resources/scopes/scopes.json.
+# Currently it must be manually kept up to date. Not all labels are added, only
+# common ones. The others are commented out. There is still some variance between
+# folder names and labels; consider this documentation of that ;-)
+#
+
+android/: android/**
+android/app/: android/KMAPro/**
+#android/browser/:
+android/engine/: android/KMEA/**
+#android/resources/:
+android/samples/: android/Samples/**
+
+common/:
+  - common/**
+  - resources/**
+common/core/: common/core/**
+common/core/desktop/: common/core/desktop/**
+common/core/web/: common/core/web/**
+
+common/models/: common/models/**
+common/models/types/: common/models/types/**
+common/models/templates/: common/models/templates/**
+common/models/wordbreakers/: common/models/wordbreakers/**
+
+common/resources/: resources/**
+
+developer/:
+  - developer/**
+  - windows/src/developer/**
+
+developer/compilers/:
+  - windows/src/developer/kmcomp/**
+  - developer/js/**
+
+developer/ide/:
+  - windows/src/developer/TIKE/**
+
+# developer/resources/
+# developer/tools/
+
+ios/: ios/**
+ios/app/: ios/keyman/**
+# ios/browser/
+ios/engine/: ios/engine/**
+# ios/resources/
+ios/samples/: ios/samples/**
+
+linux/: linux/**
+linux/config/: linux/keyman-config/**
+linux/engine/:
+  - linux/ibus-keyman/**
+  - linux/ibus-kmfl/**
+  - linux/kmflcomp/**
+  - linux/libkmfl/**
+  - linux/scim_kmfl_imengine/**
+# linux/resources/
+# linux/samples/
+
+mac/: mac/**
+# mac/config/:
+mac/engine/: mac/**
+# mac/resources/
+# mac/samples/
+
+oem/: oem/**
+oem/fv/: oem/firstvoices/**
+oem/fv/android/: oem/firstvoices/android/**
+oem/fv/ios/: oem/firstvoices/ios/**
+oem/fv/windows/: oem/firstvoices/windows/**
+
+web/: web/**
+# web/bookmarklet/
+web/engine/: web/source/**
+# web/resources/
+web/ui/: web/source/kmwui*
+web/samples/: web/samples/**
+
+# Somewhat messy since we try and exclude Developer :)
+windows/:
+- any: ['windows/**', '!windows/src/developer/**']
+
+windows/config/: windows/src/desktop/**
+windows/engine/: windows/src/engine/**
+# windows/resources/
+# windows/samples/

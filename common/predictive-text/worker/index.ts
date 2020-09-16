@@ -30,9 +30,8 @@
  */
 
 /// <reference path="../message.d.ts" />
-/// <reference path="../../../web/source/text/kmwstring.ts" />
 /// <reference path="models/dummy-model.ts" />
-/// <reference path="word_breaking/ascii-word-breaker.ts" />
+/// <reference path="../node_modules/@keymanapp/models-wordbreakers/src/index.ts" />
 /// <reference path="./model-compositor.ts" />
 
 /**
@@ -274,14 +273,13 @@ class LMLayerWorker {
    * @param model The loaded language model.
    */
   private transitionToReadyState(model: LexicalModel) {
+    let compositor = new ModelCompositor(model);
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {
         switch(payload.message) {
           case 'predict':
             let {transform, context} = payload;
-            let compositor = new ModelCompositor(model); // Yeah, should probably use a persistent one eventually.
-
             let suggestions = compositor.predict(transform, context);
 
             // Now that the suggestions are ready, send them out!
@@ -304,7 +302,8 @@ class LMLayerWorker {
           default:
           throw new Error(`invalid message; expected one of {'predict', 'unload'} but got ${payload.message}`);
         }
-      }
+      },
+      compositor: compositor
     };
   }
 
@@ -334,6 +333,7 @@ class LMLayerWorker {
     // Assists unit-testing.
     scope['LMLayerWorker'] = worker;
     scope['models'] = models;
+    scope['correction'] = correction;
     scope['wordBreakers'] = wordBreakers;
 
     return worker;
@@ -343,6 +343,7 @@ class LMLayerWorker {
 // Let LMLayerWorker be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
+  module.exports['correction'] = correction;
   module.exports['models'] = models;
   module.exports['wordBreakers'] = wordBreakers;
   /// XXX: export the ModelCompositor for testing.

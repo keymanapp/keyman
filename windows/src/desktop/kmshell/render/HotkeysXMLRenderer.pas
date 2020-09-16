@@ -34,7 +34,6 @@ implementation
 
 uses
   InterfaceHotkeys,
-  kmint,
   SysUtils,
   KeyNames,
   utilxml;

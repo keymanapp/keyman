@@ -3,6 +3,7 @@ unit Keyman.System.KeymanSentryClient;
 interface
 
 uses
+  System.Classes,
   Sentry.Client;
 
 type
@@ -12,6 +13,7 @@ type
   private
     class var FInstance: TKeymanSentryClient;
     class var FClient: TSentryClient;
+    class var FOnBeforeShutdown: TNotifyEvent;
   private
     FFlags: TKeymanSentryClientFlags;
     FProject: TKeymanSentryClientProject;
@@ -33,27 +35,30 @@ type
     class procedure Stop;
     class property Client: TSentryClient read FClient;
     class property Instance: TKeymanSentryClient read FInstance;
+    class property OnBeforeShutdown: TNotifyEvent read FOnBeforeShutdown write FOnBeforeShutdown;
   public
     const LOGGER_DEVELOPER_IDE = 'KeymanDeveloper.IDE';
     const LOGGER_DEVELOPER_TOOLS = 'KeymanDeveloper.Tools';
-    const LOGGER_DESKTOP = 'KeymanDesktop';
-    const LOGGER_DESKTOP_ENGINE = 'KeymanDesktop.Engine';
+    const LOGGER_DESKTOP = 'KeymanWindows';
+    const LOGGER_DESKTOP_ENGINE = 'KeymanWindows.Engine';
+    const S_Sentry_ViewEvent_URL = 'https://sentry.keyman.com/organizations/keyman/projects/%0:s/events/%1:s/'; // Do not localize
   end;
 
 
 implementation
 
 uses
-  System.Classes,
   System.Generics.Collections,
   System.JSON,
   System.StrUtils,
   System.SysUtils,
   System.Win.Registry,
 {$IF NOT DEFINED(CONSOLE)}
+{$IF NOT DEFINED(SENTRY_NOVCL)}
   System.UITypes,
   Vcl.Dialogs,
   Vcl.Forms,
+{$ENDIF}
 {$ENDIF}
 
   sentry,
@@ -67,7 +72,7 @@ const
   SENTRY_DSN_DESKTOP = 'https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5';
   SENTRY_DSN_DEVELOPER = 'https://39b25a09410349a58fe12aaf721565af@sentry.keyman.com/6';
 
-  SENTRY_PROJECT_NAME_DESKTOP = 'keyman-desktop';
+  SENTRY_PROJECT_NAME_DESKTOP = 'keyman-windows';
   SENTRY_PROJECT_NAME_DEVELOPER = 'keyman-developer';
 
   //SENTRY_DSN = 'https://7b1ff1dae2c8495b84f90dadcf512b84@sentry.io/4853461'; <-- this is a testing-only host
@@ -102,9 +107,10 @@ end;
 procedure TKeymanSentryClient.ClientAfterEvent(Sender: TObject;
   EventType: TSentryClientEventType; const EventID, EventClassName, Message: string;
   var EventAction: TSentryClientEventAction);
-{$IF NOT DEFINED(CONSOLE)}
 var
-  AppID, ApplicationTitle, CommandLine, ProjectName: string;
+  AppID, ProjectName: string;
+{$IF NOT DEFINED(CONSOLE)}
+  ApplicationTitle, CommandLine: string;
 {$ENDIF}
 begin
   if EventType = scetException then
@@ -113,30 +119,42 @@ begin
     if FClient.ReportExceptions then
       ReportRemoteErrors(EventID);
 
+    if Assigned(FOnBeforeShutdown) then
+      FOnBeforeShutdown(Self);
+
     if kscfShowUI in FFlags then
     begin
-{$IF DEFINED(CONSOLE)}
-      // Write to console
-      writeln(ErrOutput, 'Fatal error '+EventClassName+': '+Message);
-      if FClient.ReportExceptions then
-        writeln(ErrOutput, 'This error has been automatically reported to the Keyman team.');
-      writeln(ErrOutput);
-{$ELSE}
-      // Launch external gui exception dialog app.
-      // Usage: tsysinfo -c <crashid> <appname> <appid> [sentryprojectname [classname [message]]]
       AppID := LowerCase(ChangeFileExt(ExtractFileName(ParamStr(0)), ''))+'-'+CKeymanVersionInfo.VersionWithTag;
-      if Assigned(Application)
-        then ApplicationTitle := Application.Title
-        else ApplicationTitle := AppID;
 
       if FProject = kscpDesktop
         then ProjectName := SENTRY_PROJECT_NAME_DESKTOP
         else ProjectName := SENTRY_PROJECT_NAME_DEVELOPER;
 
+{$IF DEFINED(CONSOLE)}
+      // Write to console
+      writeln(ErrOutput, 'Fatal error '+EventClassName+': '+Message);
+      if FClient.ReportExceptions then
+      begin
+        writeln(ErrOutput, 'This error has been automatically reported to the Keyman team.');
+        writeln(ErrOutput, '  Identifier:  '+EventID);
+        writeln(ErrOutput, '  Application: '+AppID);
+        writeln(ErrOutput, '  Reported at: '+Format(S_Sentry_ViewEvent_URL, [ProjectName, EventID]));
+      end;
+      writeln(ErrOutput);
+{$ELSE}
+      // Launch external gui exception dialog app.
+      // Usage: tsysinfo -c <crashid> <appname> <appid> [sentryprojectname [classname [message]]]
+{$IF NOT DEFINED(SENTRY_NOVCL)}
+      if Assigned(Application)
+        then ApplicationTitle := Application.Title
+        else ApplicationTitle := AppID;
+{$ELSE}
+      ApplicationTitle := AppID;
+{$ENDIF}
 
       CommandLine := Format('-c "%s" "%s" "%s" "%s" "%s" "%s"', [
         IfThen(EventID = '', '_', EventID),
-        ApplicationTitle,
+        IfThen(ApplicationTitle = '', ChangeFileExt(ExtractFileName(ParamStr(0)),''), ApplicationTitle),
         AppID,
         ProjectName,
         EventClassName,
@@ -146,9 +164,11 @@ begin
       if not TUtilExecute.Shell(0, TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe'),  // I3349
           TKeymanPaths.KeymanEngineInstallPath(''), CommandLine) then
       begin
+{$IF NOT DEFINED(SENTRY_NOVCL)}
         MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered '+
           'starting the exception manager ('+SysErrorMessage(GetLastError)+'). '+
           'This error has been automatically reported to the Keyman team.', mtError, [mbOK], 0);
+{$ENDIF}
       end;
 {$ENDIF}
     end;
@@ -253,7 +273,8 @@ begin
 
   // Note: system proxy is used automatically if no proxy is defined
 
-  o.Release := 'release-'+CKeymanVersionInfo.VersionWithTag;
+  o.Release := 'release-'+CKeymanVersionInfo.VersionWithTag; // matches git tag
+  o.Environment := CKeymanVersionInfo.Environment; // stable, beta, alpha, test, local
 
   if kscfCaptureExceptions in FFlags
     then f := [scfCaptureExceptions]
@@ -286,7 +307,7 @@ begin
   end;
 
   o.HandlerPath := ExtractFilePath(FindSentryDLL) + 'crashpad_handler.exe';
-  o.DatabasePath := TKeymanPaths.ErrorLogPath('sentry-db');
+  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-db';
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;

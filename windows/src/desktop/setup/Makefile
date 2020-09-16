@@ -4,11 +4,14 @@
 
 !include ..\..\Defines.mak
 
-build: version.res manifest.res icons
+build: version.res manifest.res icons locale
     $(DCC32) setup.dpr
     $(TDS2DBG) setup.exe
     $(SENTRYTOOL_DELPHIPREP) setup.exe -dpr setup.dpr
     $(COPY) setup.exe $(PROGRAM)\desktop
+
+locale:
+    $(ROOT)\bin\buildtools\devtools.exe -buildsetupstrings locale\ .\
 
 setup_dialog.res:
     rc setup_dialog.rc

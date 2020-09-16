@@ -91,6 +91,12 @@
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install" Type="string" Value="&amp;Install" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
 
+                <RegistryValue Root="HKCR" Key="keyman" Type="string" Value="URL:Keyman Protocol" />
+                <RegistryValue Root="HKCR" Key="keyman" Name="URL Protocol" Type="string" Value="" />
+                <RegistryValue Root="HKCR" Key="keyman\DefaultIcon" Type="string" Value="" />
+                <RegistryValue Root="HKCR" Key="Keyman\shell\open" Name="FriendlyAppName" Type="string" Value="Keyman Configuration" />
+                <RegistryValue Root="HKCR" Key="keyman\shell\open\command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
+
                 <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
                 <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
                 <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
@@ -184,48 +190,7 @@
                 <RemoveFolder Id="Version90Shortcuts" Directory="ProgramMenuDir90" On="both" />
               </Component>
 
-              <Directory Id="dir_locale" Name="locale">
-                <Directory Id="dir_locale_de" Name="de">
-                  <Component>
-                    <File Id="locale_de" Source="..\..\desktop\kmshell\locale\de\locale.xml" />
-                  </Component>
-                </Directory>
-                <Directory Id="dir_locale_fr" Name="fr">
-                  <Component>
-                    <File Id="locale_fr" Source="..\..\desktop\kmshell\locale\fr\locale.xml" />
-                  </Component>
-                </Directory>
-                <Directory Id="dir_locale_my" Name="my">
-                  <Component>
-                    <File Id="locale_my" Source="..\..\desktop\kmshell\locale\my\locale.xml" />
-                  </Component>
-                </Directory>
-                <Directory Id="dir_locale_pt_br" Name="pt-BR">
-                  <Component>
-                    <File Id="locale_pt_br" Source="..\..\desktop\kmshell\locale\pt-BR\locale.xml" />
-                  </Component>
-                </Directory>
-                <Directory Id="dir_locale_ta" Name="ta">
-                  <Component>
-                    <File Id="locale_ta" Source="..\..\desktop\kmshell\locale\ta\locale.xml" />
-                  </Component>
-                </Directory>
-                <Directory Id="dir_locale_tr" Name="tr">
-                  <Component>
-                    <File Id="locale_tr" Source="..\..\desktop\kmshell\locale\tr\locale.xml" />
-                  </Component>
-                </Directory>
-                <Directory Id="dir_locale_vec" Name="vec">
-                  <Component>
-                    <File Id="locale_vec" Source="..\..\desktop\kmshell\locale\vec\locale.xml" />
-                  </Component>
-                </Directory>
-                <Directory Id="dir_locale_kan_knda_in" Name="kan-Knda-IN">
-                  <Component>
-                    <File Id="locale_kan_knda_in" Source="..\..\desktop\kmshell\locale\kan-Knda-IN\locale.xml" />
-                  </Component>
-                </Directory>
-              </Directory>
+              <Directory Id="dir_locale" Name="locale" />
 
             </Directory>
           </Directory>
@@ -264,15 +229,7 @@
       <ComponentRef Id="removeCU" />
       <ComponentGroupRef Id="DesktopUI" />
       <ComponentGroupRef Id="CEF" />
-
-      <ComponentRef Id="locale_de" />
-      <ComponentRef Id="locale_fr" />
-      <ComponentRef Id="locale_my" />
-      <ComponentRef Id="locale_pt_br" />
-      <ComponentRef Id="locale_ta" />
-      <ComponentRef Id="locale_tr" />
-      <ComponentRef Id="locale_vec" />
-      <ComponentRef Id="locale_kan_knda_in" />
+      <ComponentGroupRef Id="Locale" />
 
       <MergeRef Id='keymanengine' />
     </Feature>

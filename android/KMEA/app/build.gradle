@@ -17,6 +17,7 @@ android {
         // VERSION_CODE and VERSION_NAME from version.gradle
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
+        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
     }
 
     buildTypes {
@@ -61,7 +62,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
+    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'commons-io:commons-io:2.6'
     implementation 'io.sentry:sentry-android:2.0.1'

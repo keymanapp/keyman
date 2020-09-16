@@ -1,7 +1,13 @@
 #! /bin/bash
 # 
 # Compile the KeymanWeb bulk-renderer module for use with developing/running engine tests.
-#
+
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
 # Fails the build if a specified file does not exist.
 assert ( ) {
@@ -21,12 +27,7 @@ fail() {
 }
 
 # Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-echo "Node.js + dependencies check"
-npm install --no-optional
-
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
+verify_npm_setup
 
 # Definition of global compile constants
 COMPILED_FILE="bulk_render.js"

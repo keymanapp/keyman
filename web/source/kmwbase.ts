@@ -2,12 +2,10 @@
 /// <reference path="kmwexthtml.ts" />
 // Includes a promise polyfill (needed for IE)
 /// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
-// Defines build-environment includes, since `tsc` doesn't provide a compile-time define.
-/// <reference path="environment.inc.ts" />
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
 // Defines the core text processor.
-/// <reference path="text/inputProcessor.ts" />
+/// <reference path="../node_modules/@keymanapp/input-processor/src/text/inputProcessor.ts" />
 // Extends KeyboardInterface with DOM-oriented offerings.
 /// <reference path="text/domKbdInterface.ts" />
 // Defines the web-page interface object.
@@ -175,6 +173,25 @@ namespace com.keyman {
       }
 
       dom.DOMEventHandlers.states = new dom.CommonDOMStates();
+    }
+
+    /**
+     * Returns a generalized metadata object about the state of KMW for use with error reporting.
+     */
+    ['getDebugInfo']() {
+      let metadata = {
+        attachType: this.options.attachType,
+        device: this.util.device,
+        initialized: this.initialized,
+        isEmbedded: this.isEmbedded,
+        ui: this.ui ? this.ui.name : null
+      }
+
+      if(this.util.device.touchable) {
+        metadata.ui = 'touch';
+      }
+
+      return metadata;
     }
 
     /**

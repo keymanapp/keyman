@@ -32,16 +32,25 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
   // Set the sentry-db-directory to a writeable location
 
   char szPath[MAX_PATH + 17]; // length(keyman-sentry-db)+1
-  GetTempPathA(MAX_PATH, szPath);
-  char *p = strchr(szPath, 0);
-  if (p > szPath && *(p - 1) != '\\') {
-    *p++ = '\\';
-    *p = 0;
+
+  LPITEMIDLIST pidl;
+  if (SUCCEEDED(SHGetFolderLocation(0, CSIDL_LOCAL_APPDATA, NULL, 0, &pidl))) {
+    if (SUCCEEDED(SHGetPathFromIDListA(pidl, szPath))) {
+      char *p = strchr(szPath, 0);
+      if (p > szPath && *(p - 1) != '\\') {
+        *p++ = '\\';
+        *p = 0;
+      }
+
+      strcat_s(szPath, "sentry-db");
+      sentry_options_set_database_path(options, szPath);
+    }
+    ILFree(pidl);
   }
 
-  strcat_s(szPath, "keyman-sentry-db");
-  sentry_options_set_database_path(options, szPath);
-
+  sentry_options_set_release(options, "release-" KEYMAN_VersionWithTag); // matches git tag
+  sentry_options_set_environment(options, KEYMAN_Environment); // stable, beta, alpha, test, local
+  
   // We don't currently need to set this, because it will be same path
   // as all our c++ executables.
   //sentry_options_set_handler_path(options, "path/to/crashpad_handler");
@@ -64,9 +73,6 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
     g_report_messages = true;
   }
 
-  sentry_options_set_release(options, KEYMAN_VersionWithTag);
-
-  //sentry_options_set_environment(options, NULL);
   //sentry_options_set_dist(options, NULL);
   //sentry_options_set_debug(options, 1);
 
@@ -97,7 +103,7 @@ sentry_value_t CaptureStackTrace(PVOID TopAddr, DWORD FramesToSkip) {
   for (int i = (int)frameCount - 1; i >= 0; i--) {
     sentry_value_t frame = sentry_value_new_object();
     char buf[24];
-    wsprintfA(buf, "0x%x", DWORD_PTR(walked_backtrace[i]));
+    wsprintfA(buf, "0x%Ix", DWORD_PTR(walked_backtrace[i]));
     sentry_value_set_by_key(frame, "instruction_addr", sentry_value_new_string(buf));
     sentry_value_append(frames, frame);
   }
@@ -106,7 +112,7 @@ sentry_value_t CaptureStackTrace(PVOID TopAddr, DWORD FramesToSkip) {
   if (TopAddr != NULL) {
     sentry_value_t frame = sentry_value_new_object();
     char buf[24];
-    wsprintfA(buf, "0x%x", DWORD_PTR(TopAddr));
+    wsprintfA(buf, "0x%Ix", DWORD_PTR(TopAddr));
     sentry_value_set_by_key(frame, "instruction_addr", sentry_value_new_string(buf));
     sentry_value_append(frames, frame);
   }

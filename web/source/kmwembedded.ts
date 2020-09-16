@@ -1,6 +1,4 @@
 // Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
-// Includes KMW string extension declarations.
-/// <reference path="text/kmwstring.ts" />
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 

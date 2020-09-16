@@ -4,7 +4,7 @@
 
 	<xsl:include href="elements.xsl"/>
 
-	<xsl:variable name="locale_hint" select="$locale/Dialog[@Id='Hint'][1]" />
+	<xsl:variable name="dialoginfo_hint" select="$dialoginfo/Dialog[@Id='Hint'][1]" />
 	<xsl:variable name="HintTitle">HintTitle_<xsl:value-of select="/Keyman/Hint/@ID" /></xsl:variable>
 	<xsl:variable name="Hint">Hint_<xsl:value-of select="/Keyman/Hint/@ID" /></xsl:variable>
 
@@ -13,18 +13,18 @@
 		<html>
 			<head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
-				<title><xsl:value-of select="$locale/String[@Id=$HintTitle]" /></title>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>hint.css</xsl:attribute></link>
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
+				<title><xsl:value-of select="$locale/string[@name=$HintTitle]" /></title>
+        <link rel="stylesheet" type="text/css" href="/app/config.css" />
+        <link rel="stylesheet" type="text/css" href="/app/hint.css" />
 				<style type="text/css">
 					* {
-            font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
+            font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI";
           }
 					#container {
-  					width: <xsl:value-of select="$locale_hint/@Width" />px;
-	  				height: <xsl:value-of select="$locale_hint/@Height" />px;
+  					width: <xsl:value-of select="$dialoginfo_hint/@Width" />px;
+	  				height: <xsl:value-of select="$dialoginfo_hint/@Height" />px;
           }
 
         </style>
@@ -53,14 +53,9 @@
           <div id="captionBox"><div id="c1"></div><div id="c2"></div><div id="c3"></div></div>
 
 					<div id="header">
-						<img id="icon" src="hints.png" alt="Hint">
-							<xsl:attribute name="src">
-								<xsl:value-of select="/Keyman/templatepath"/>48.png
-							</xsl:attribute>
-						</img>
-
+						<img id="icon" alt="Hint" src="/app/48.png" />
 						<div id="title">
-							<xsl:value-of select="$locale/String[@Id=$HintTitle]" />
+							<xsl:value-of select="$locale/string[@name=$HintTitle]" />
 						</div>
 					</div>
 
@@ -71,20 +66,20 @@
 					<div id="footer">
 						<div id="checkbox">
 							<input type="checkbox" onclick='javascript:if(this.checked) location.href="keyman:dontshowhint"; else location.href="keyman:showhint";'
-										 style="vertical-align: middle;" id="chkWelcome" />&#160;<label for="chkWelcome"><xsl:value-of select="$locale/String[@Id='S_HintDialog_DontShowHintAgain']"/></label>
+										 style="vertical-align: middle;" id="chkWelcome" />&#160;<label for="chkWelcome"><xsl:value-of select="$locale/string[@name='S_HintDialog_DontShowHintAgain']"/></label>
 						</div>
 
 						<div id="buttons">
 							<xsl:if test="/Keyman/Buttons/Button[@ID='OK']">
                 <xsl:call-template name="button">
-                  <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_OK']"/></xsl:with-param>
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_OK']"/></xsl:with-param>
                   <xsl:with-param name="default" select="1" />
                   <xsl:with-param name="command" select="'keyman:ok'" />
                 </xsl:call-template>
 							</xsl:if>
 							<xsl:if test="/Keyman/Buttons/Button[@ID='Cancel']">
                 <xsl:call-template name="button">
-                  <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:with-param>
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Cancel']"/></xsl:with-param>
                   <xsl:with-param name="command" select="'keyman:cancel'" />
                 </xsl:call-template>
 							</xsl:if>
@@ -97,19 +92,15 @@
 	</xsl:template>
 
 	<xsl:template match="Hint">
-		<xsl:value-of select="$locale/String[@Id=$Hint]" />
+		<xsl:value-of select="$locale/string[@name=$Hint]" />
 	</xsl:template>
 
 <!--
   Example of how to do a custom hint
 
 	<xsl:template match="Hint[@ID='KH_EXITPRODUCT']">
-		<img id="exiticon" alt="icon">
-			<xsl:attribute name="src">
-				<xsl:value-of select="/Keyman/templatepath"/>keyman_48x48.png
-			</xsl:attribute>
-		</img>
-		<xsl:value-of select="$locale/String[@Id=$Hint]" />
+		<img id="exiticon" alt="icon" src="/app/keyman_48x48.png" />
+		<xsl:value-of select="$locale/string[@name=$Hint]" />
 	</xsl:template>
 -->
 

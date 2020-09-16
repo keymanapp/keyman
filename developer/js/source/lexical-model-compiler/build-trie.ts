@@ -1,10 +1,17 @@
 import { readFileSync } from "fs";
+import { log, KeymanCompilerError } from "../errors";
+
+// Supports LF or CRLF line terminators.
+const NEWLINE_SEPARATOR = /\u000d?\u000a/;
 
 /**
- * A word list is an array of pairs: the concrete word form itself, followed by
- * a non-negative count.
+ * A word list is (conceptually) an array of pairs: the concrete word form itself + a
+ * non-negative count.
+ *
+ * Since each word should only appear once within the list, we represent it with
+ * an associative array pattern keyed by the wordform.
  */
-type WordList = [string, number][];
+export type WordList = {[wordform: string]: number};
 
 /**
  * Returns a data structure that can be loaded by the TrieModel.
@@ -19,30 +26,43 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
     throw new TypeError("searchTermToKey must be explicitly specified")
   }
   // Make one big word list out of all of the filenames provided.
-  let wordlist = filenames
-    .map(parseWordListFromFilename)
-    .reduce((bigWordlist, current) => bigWordlist.concat(current), []);
+  let wordlist: WordList = {};
+  filenames.forEach(filename => parseWordListFromFilename(wordlist, filename));
+
   let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.SearchTermToKey);
   return JSON.stringify(trie);
 }
 
 /**
- * Parses a word list from its filename.
- * 
+ * Parses a word list from a file, merging duplicate entries.
+ *
  * The word list may be encoded in:
- * 
+ *
  *  - UTF-8, with or without BOM [exported by most software]
  *  - UTF-16, little endian, with BOM [exported by Microsoft Excel]
- * 
+ *
+ * @param wordlist word list to merge entries into (may have existing entries)
  * @param filename filename of the word list
  */
-export function parseWordListFromFilename(filename: string): WordList {
-  let contents = readFileSync(filename, detectEncoding(filename));
-  return parseWordList(contents);
+export function parseWordListFromFilename(wordlist: WordList, filename: string): void {
+  _parseWordList(wordlist, new WordListFromFilename(filename));
 }
 
 /**
- * Reads a tab-separated values file into a word list.
+ * Parses a word list from a string. The string should have multiple lines
+ * with LF or CRLF line terminators.
+ *
+ * @param wordlist word list to merge entries into (may have existing entries)
+ * @param filename filename of the word list
+ */
+export function parseWordListFromContents(wordlist: WordList, contents: string): void {
+  _parseWordList(wordlist, new WordListFromMemory(contents));
+}
+
+/**
+ * Reads a tab-separated values file into a word list. This function converts all
+ * entries into NFC and merges duplicate entries across wordlists. Duplication is
+ * on the basis of character-for-character equality after normalisation to NFC.
  *
  * Format specification:
  *
@@ -60,20 +80,20 @@ export function parseWordListFromFilename(filename: string): WordList {
  *  - column 2 (optional): the count: a non-negative integer specifying how many
  *    times this entry has appeared in the corpus. Blank means 'indeterminate'.
  *  - column 3 (optional): comment: an informative comment, ignored by the tool.
+ *
+ * @param wordlist word list to merge entries into (may have existing entries)
+ * @param contents contents of the file to import
  */
-export function parseWordList(contents: string): WordList {
-  // Supports LF or CRLF line terminators.
-  const NEWLINE_SEPARATOR = /\u000d?\u000a/;
+function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
-  // TODO: format validation.
-  let lines = contents.split(NEWLINE_SEPARATOR);
 
-  let result: WordList = [];
-  for (let line of lines) {
+  let wordsSeenInThisFile = new Set<string>();
+
+  for (let [lineno, line] of source.lines()) {
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
     // the BOM from every possible start of file -- i.e., beginning of every line.
-    line = line.replace(/^\uFEFF/, '');
+    line = line.replace(/^\uFEFF/, '').trim();
 
     if (line.startsWith('#') || line === "") {
       continue; // skip comments and empty lines
@@ -83,8 +103,20 @@ export function parseWordList(contents: string): WordList {
     let [wordform, countText] = line.split(TAB);
 
     // Clean the word form.
-    // TODO: what happens if we get duplicate forms?
-    wordform = wordform.normalize('NFC').trim();
+    let original = wordform;
+
+    wordform = wordform.normalize('NFC');
+    if (original !== wordform) {
+      // Mixed normalization forms are yucky! Warn about it.
+      log(
+        KeymanCompilerError.CWARN_MixedNormalizationForms,
+        `“${wordform}” is not in Unicode NFC. Automatically converting to NFC.`,
+        {filename: source.name, lineno}
+      )
+    }
+
+    wordform = wordform.trim()
+
     countText = (countText || '').trim();
     let count = parseInt(countText, 10);
 
@@ -94,9 +126,63 @@ export function parseWordList(contents: string): WordList {
       // Treat it like a hapax legonmenom -- it exist, but only once.
       count = 1;
     }
-    result.push([wordform, count]);
+
+    if (wordsSeenInThisFile.has(wordform)) {
+      // The same word seen across multiple files is fine,
+      // but a word seen multiple times in one file is a problem!
+      log(
+        KeymanCompilerError.CWARN_DuplicateWordInSameFile,
+        `duplicate word “${wordform}” found in same file; summing counts`,
+        {filename: source.name, lineno}
+      )
+    }
+    wordsSeenInThisFile.add(wordform);
+
+    wordlist[wordform] = (wordlist[wordform] || 0) + count;
   }
-  return result;
+}
+
+type LineNoAndText = [number, string];
+
+interface WordListSource {
+  readonly name: string;
+  lines(): Iterable<LineNoAndText>;
+}
+
+class WordListFromMemory implements WordListSource {
+  readonly name = '<memory>';
+  private readonly _contents: string;
+
+  constructor(contents: string) {
+    this._contents = contents;
+  }
+
+  *lines() {
+    yield *enumerateLines(this._contents.split(NEWLINE_SEPARATOR));
+  }
+}
+
+class WordListFromFilename {
+  readonly name: string;
+  constructor(filename: string) {
+    this.name = filename;
+  }
+
+  *lines() {
+    let contents = readFileSync(this.name, detectEncoding(this.name));
+    yield *enumerateLines(contents.split(NEWLINE_SEPARATOR));
+  }
+}
+
+/**
+ * Yields pairs of [lineno, line], given an Array of lines.
+ */
+function* enumerateLines(lines: string[]): Generator<LineNoAndText> {
+    let i = 1;
+    for (let line of lines) {
+      yield [i, line];
+      i++;
+    }
 }
 
 namespace Trie {
@@ -227,7 +313,7 @@ namespace Trie {
      * @param words a list of word and count pairs.
      */
     buildFromWordList(words: WordList): Trie {
-      for (let [wordform, weight] of words) {
+      for (let [wordform, weight] of Object.entries(words)) {
         let key = this.toKey(wordform);
         addUnsorted(this.root, { key, weight, content: wordform }, 0);
       }
@@ -399,7 +485,7 @@ namespace Trie {
  * NFKD neutralizes some funky distinctions, e.g., ꬲ, ｅ, e should all be the
  * same character; plus, it's an easy way to separate a Latin character from
  * its diacritics; Even then, orthographies regularly use code points
- * that, under NFKD normalization, do NOT decompose appropriately for your 
+ * that, under NFKD normalization, do NOT decompose appropriately for your
  * language (e.g., SENĆOŦEN, Plains Cree in syllabics).
  *
  * Use this in early iterations of the model. For a production lexical model,
@@ -418,17 +504,17 @@ export function defaultSearchTermToKey(wordform: string): string {
 
 /**
  * Detects the encoding of a text file.
- * 
+ *
  * Supported encodings are:
- * 
+ *
  *  - UTF-8, with or without BOM
  *  - UTF-16, little endian, with BOM
- * 
+ *
  * UTF-16 in big endian is explicitly NOT supported! The reason is two-fold:
  * 1) Node does not support it without resorting to an external library (or
  * swapping every byte in the file!); and 2) I'm not sure anything actually
  * outputs in this format anyway!
- * 
+ *
  * @param filename filename of the file to detect encoding
  */
 function detectEncoding(filename: string): 'utf8' | 'utf16le' {

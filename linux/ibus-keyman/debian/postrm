@@ -16,7 +16,7 @@ case "$1" in
         ibususer=`ps -C ibus-daemon -o user=|grep -v gdm|uniq`
         sudo -H -u "$ibususer" ibus exit
       else
-        ibususer=`ps -C ibus-daemon -o user=`
+        ibususer=`ps -C ibus-daemon -o user=|uniq`
         sudo -H -u "$ibususer" ibus restart
       fi
     fi

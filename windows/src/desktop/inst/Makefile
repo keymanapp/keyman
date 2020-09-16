@@ -6,7 +6,7 @@
 
 # ----------------------------------------------------------------------
 
-DESKTOP_FILES=keymandesktop.wixobj desktopui.wixobj cef.wixobj
+DESKTOP_FILES=keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
 
 manual-setup: check setup
 
@@ -32,6 +32,7 @@ desktop: prereq
     $(MAKE) -fdownload.mak candle
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop.msi -ext WixUIExtension $(DESKTOP_FILES)
     $(SIGNCODE) /d "Keyman Desktop" keymandesktop.msi
+    # TODO: replace buildpkg with kmcomp and remove buildpkg from repository
     $(ROOT)\bin\buildtools\buildpkg -m keymandesktop.msi -s $(ROOT)\bin\desktop -l license.html
     $(SIGNCODE) /d "Keyman Desktop" keymandesktop.exe
     $(MAKE) -fdownload.mak copyredist-desktop
@@ -50,6 +51,7 @@ clean:
     -del /Q desktop_resources.res
     -del /Q desktopui.wxs
     -del /Q cef.wxs
+    -del /Q locale.wxs
 
 check:
     if not exist $(ROOT)\src\engine\inst\keymanengine.msm $(MAKE) check-engine

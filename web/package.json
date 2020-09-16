@@ -1,6 +1,6 @@
 {
   "name": "keyman",
-  "version": "11.0.0",
+  "version": "14.0.144",
   "description": "Facilitates text input in any language.",
   "repository": {
     "type": "git",
@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
+    "@keymanapp/resources-gosh": "^14.0.144",
+    "@keymanapp/web-sentry-manager": "^14.0.144",
+    "@sentry/cli": "^1.52.3",
     "chai": "^4.2.0",
     "google-closure-compiler-java": "^20200224.0.0",
     "html2canvas": "^1.0.0-alpha.12",
@@ -37,15 +40,25 @@
     "karma-teamcity-reporter": "^1.1.0",
     "mocha": "^5.2.0",
     "modernizr": "^3.7.1",
-    "typescript": "^3.7.2"
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "tsc": "tsc",
-    "test": "bash ./unit_tests/test.sh",
+    "test": "gosh ./unit_tests/test.sh",
     "karma": "karma",
-    "modernizr": "modernizr"
+    "lerna": "cd ../ && npm run lerna --",
+    "mocha": "mocha",
+    "modernizr": "modernizr",
+    "sentry-cli": "sentry-cli"
   },
   "dependencies": {
+    "@keymanapp/input-processor": "^14.0.144",
+    "@keymanapp/keyboard-processor": "^14.0.144",
+    "@keymanapp/lexical-model-layer": "^14.0.144",
+    "@keymanapp/models-types": "^14.0.144",
+    "@keymanapp/recorder-core": "^14.0.144",
+    "@keymanapp/web-environment": "^14.0.144",
+    "@keymanapp/web-utils": "^14.0.144",
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0",

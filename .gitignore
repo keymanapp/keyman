@@ -258,3 +258,9 @@ resources/environment.sh
 
 # Copy of the master VERSION.md used for Linux packaging
 /common/core/desktop/VERSION.md
+
+**/node_modules/
+lerna-debug.log
+
+# Cached/auto-compiled Python bytecode
+*.pyc

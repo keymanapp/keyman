@@ -135,22 +135,34 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
   }
 }
 
-PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p)
+PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
 {
+  if(p <= pStart) {
+    assert("Attempted to move prior to start of string");
+    return NULL;
+  }
+
   p--;
   if(*p == UC_SENTINEL_EXTENDEDEND)
   {
     int n = 0;
     while(*p != UC_SENTINEL && n < 10) { p--; n++; }
+
+    if(p < pStart) {
+      // May be a malformed virtual key
+      return pStart;
+    }
     return p;
   }
+
+  if(p == pStart) return p; // Don't allow test before pStart
 
   if(*p >= 0xDC00 && *p <= 0xDFFF && *(p-1) >= 0xD800 && *(p-1) <= 0xDBFF)
   {
     return p-1;
   }
   else if(*(p-1) == UC_SENTINEL) return p-1;
-  else if(*(p-2) == UC_SENTINEL)
+  else if(p > pStart+1 && *(p-2) == UC_SENTINEL)
   {
     switch(*(p-1))
     {
@@ -166,7 +178,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p)
         return p-2;
     }
   }
-  else if(*(p-3) == UC_SENTINEL)
+  else if(p > pStart+2 && *(p-3) == UC_SENTINEL)
   {
     switch(*(p-2))
     {
@@ -176,7 +188,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p)
         return p-3;
     }
   }
-  else if(*(p-4) == UC_SENTINEL)
+  else if(p > pStart+3 && *(p-4) == UC_SENTINEL)
   {
     switch(*(p-3))
     {
@@ -215,7 +227,7 @@ int km::kbp::kmx::xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
 PKMX_WCHAR km::kbp::kmx::xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
 {
   for(PKMX_WCHAR q = incxstr(buf); *buf; buf = q, q = incxstr(buf))
-    if(!u16ncmp(buf, chr, (int)(q-buf)))
+    if(!u16ncmp(buf, chr, (intptr_t)(q-buf)))
       return buf;
   return NULL;
 }
@@ -224,7 +236,7 @@ int km::kbp::kmx::xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
 {
   PKMX_WCHAR nch1 = incxstr(ch1);
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
-  return u16ncmp(ch1, ch2, (int)(nch1-ch1));
+  return u16ncmp(ch1, ch2, (intptr_t)(nch1-ch1));
 }
 
 PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)

@@ -57,6 +57,7 @@ type
   class var
     FInstance: TSentryClient;
   private
+    FSentryInit: Boolean;
     options: psentry_options_t;
     FVectoredExceptionHandler: PVOID;
 
@@ -72,7 +73,7 @@ type
       EventType: TSentryClientEventType);
     procedure DoTerminate;
     function EventIDToString(AGuid: PByte): String;
-    function ConvertRawStackToSentryStack: sentry_value_t;
+    function ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
   public
     constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); virtual;
     destructor Destroy; override;
@@ -160,7 +161,7 @@ begin
   if ExceptionErrorMessage(E, AExceptAddr, Buffer, BufferSize) = 0 then
     StrCopy(Buffer, 'Unknown exception');
 
-  if raw_frame_count = 0 then
+  if (raw_frame_count = 0) or (raw_frames[0] <> NativeUInt(AExceptAddr)) then
   begin
     // If we get here, this is most likely an exception that was
     // never raised, as otherwise our vectored handler should have
@@ -190,20 +191,17 @@ var
   Skip: Integer;
   LastMask: TArithmeticExceptionMask;
 begin
-  if raw_frame_count = 0 then
-  begin
-    // Floating point state may be broken here, so let's mask it out and continue
-    // We'll restore state afterwards
-    LastMask := System.Math.SetExceptionMask([]);
+  // Floating point state may be broken here, so let's mask it out and continue
+  // We'll restore state afterwards
+  LastMask := System.Math.SetExceptionMask([]);
 
-    if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
-      then Skip := DELPHI_FRAMES_TO_SKIP
-      else Skip := 0;
-    CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
+  if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
+    then Skip := DELPHI_FRAMES_TO_SKIP
+    else Skip := 0;
+  CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
 
-    // Restore FP state
-    System.Math.SetExceptionMask(LastMask);
-  end;
+  // Restore FP state
+  System.Math.SetExceptionMask(LastMask);
 
   Result := 0; //EXCEPTION_CONTINUE_SEARCH;
 end;
@@ -246,7 +244,8 @@ begin
   if AOptions.HandlerPath <> '' then
     sentry_options_set_handler_pathw(options, PWideChar(AOptions.HandlerPath));
 
-  sentry_init(options);
+  if sentry_init(options) = 0 then
+    FSentryInit := True;
 
   if scfCaptureExceptions in AFlags then
   begin
@@ -260,7 +259,9 @@ end;
 destructor TSentryClient.Destroy;
 begin
   FInstance := nil;
-  sentry_shutdown;
+  if FSentryInit then
+    sentry_shutdown;
+  FSentryInit := False;
   if FVectoredExceptionHandler <> nil then
     RemoveVectoredExceptionHandler(FVectoredExceptionHandler);
   inherited Destroy;
@@ -309,17 +310,20 @@ end;
 
 function TSentryClient.EventIDToString(AGuid: PByte): String;
 var
-  Guid: PGUID;
+  i: Integer;
+  p: PChar;
 begin
-  Guid := PGUID(@AGuid[0]);
-  // Copied from System.SysUtils.GuidToString and cleaned up for use with Sentry
   SetLength(Result, 32);
-  StrLFmt(PChar(Result), 32, '%.8X%.4X%.4X%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X',   // do not localize
-    [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
-    Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+  p := PChar(Result);
+  for i := 0 to 15 do
+  begin
+    StrLFmt(p, 2, '%.2X', [AGuid^]);
+    Inc(p, 2);
+    Inc(AGuid);
+  end;
 end;
 
-function TSentryClient.ConvertRawStackToSentryStack: sentry_value_t;
+function TSentryClient.ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
 var
   frames, s_frame, stacktrace, thread, threads: sentry_value_t;
   s: AnsiString;
@@ -339,19 +343,24 @@ begin
   stacktrace := sentry_value_new_object;
   sentry_value_set_by_key(stacktrace, 'frames', frames);
 
-  threads := sentry_value_new_list;
-  thread := sentry_value_new_object;
-  sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
-  sentry_value_append(threads, thread);
+  if wrapWithThread then
+  begin
+    threads := sentry_value_new_list;
+    thread := sentry_value_new_object;
+    sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
+    sentry_value_append(threads, thread);
 
-  Result := threads;
+    Result := threads;
+  end
+  else
+    Result := stacktrace;
 end;
 
 function TSentryClient.ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): String;
 var
-  event: sentry_value_t;
+  exc, event: sentry_value_t;
   uuid: sentry_uuid_t;
-  threads: sentry_value_t;
+  stacktrace: sentry_value_t;
 begin
   if FReportExceptions then
   begin
@@ -359,29 +368,25 @@ begin
 
     DoBeforeEvent(event, ExceptionClassName, Message, scetException);
 
-  (*
-    When we set exception information, the report is corrupted. Not sure why. So
-    for now we won't create as an exception event. We still get all the information
-    we want from this.
-
-    Investigating this further at https://forum.sentry.io/t/corrupted-display-when-exception-data-is-set-using-native-sdk/9167/2
-
     exc := sentry_value_new_object;
     sentry_value_set_by_key(exc, 'type', sentry_value_new_string(PAnsiChar(UTF8Encode(ExceptionClassName))));
     sentry_value_set_by_key(exc, 'value', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
-    sentry_value_set_by_key(event, 'exception', exc);
-  *)
-
-    sentry_value_set_by_key(event, 'message', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
-    sentry_value_set_by_key(event, 'logger', sentry_value_new_string(PAnsiChar(UTF8Encode(FLogger))));
 
     if raw_frame_count > 0 then
     begin
-      threads := ConvertRawStackToSentryStack;
-      if threads <> 0 then
-        sentry_value_set_by_key(event, 'threads', threads);
+      stacktrace := ConvertRawStackToSentryStack(false);
+      if stacktrace <> 0 then
+        sentry_value_set_by_key(exc, 'stacktrace', stacktrace);
       raw_frame_count := 0;
     end;
+
+    sentry_value_set_by_key(event, 'exception', exc);
+    sentry_value_set_by_key(event, 'logger', sentry_value_new_string(PAnsiChar(UTF8Encode(FLogger))));
+
+    // We will rebuild the module list at time of event in order to ensure we
+    // don't lose dynamically loaded modules, as far as possible. This is
+    // potentially slow, but this is probably a fatal code path anyway ...
+    sentry_clear_modulecache;
 
     uuid := sentry_capture_event(event);
     Result := EventIDToString(@uuid.bytes[0]);
@@ -423,9 +428,9 @@ begin
     if IncludeStack then
     begin
       CaptureStackTrace(nil, FRAMES_TO_SKIP);
-      if raw_frame_count <> 0 then
+      if raw_frame_count > 0 then
       begin
-        threads := ConvertRawStackToSentryStack;
+        threads := ConvertRawStackToSentryStack(true);
         if threads <> 0 then
           sentry_value_set_by_key(event, 'threads', threads);
         raw_frame_count := 0;
@@ -454,14 +459,17 @@ procedure CaptureStackTrace(TopAddr: Pointer; FramesToSkip: Integer);
 var
   p: PNativeUInt;
 begin
-  raw_frame_count := RtlCaptureStackBackTrace(FramesToSkip, MAX_FRAMES-1, @raw_frames[0], nil);
-
-  p := @raw_frames[raw_frame_count];
+  p := @raw_frames[0];
   if TopAddr <> nil then
   begin
     p^ := NativeUInt(TopAddr);
-    Inc(raw_frame_count);
+    Inc(p);
   end;
+
+  raw_frame_count := RtlCaptureStackBackTrace(FramesToSkip, MAX_FRAMES-1, p, nil);
+
+  if TopAddr <> nil then
+    Inc(raw_frame_count);
 end;
 
 ///

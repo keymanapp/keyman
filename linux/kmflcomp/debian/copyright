@@ -3,10 +3,10 @@ Upstream-Name: kmflcomp
 Upstream-Contact: Doug Rintoul <doug_rintoul@sil.org>
 
 Files: *
-Copyright: Copyright (C) 2005-2018 SIL International
+Copyright: Copyright (C) 2005-2020 SIL International
 License: MIT
 
-Files: src/yacc.c 
+Files: src/yacc.c
        src/yacc.h
 Copyright: Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 License: GPL-2+ with Bison 2.2 exception

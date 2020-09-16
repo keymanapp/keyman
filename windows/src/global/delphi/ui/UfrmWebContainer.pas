@@ -49,24 +49,21 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, UfrmKeymanBase,
-  XMLRenderer, keymanapi_TLB, UserMessages, TempFileManager, Keyman.UI.UframeCEFHost;
+  keymanapi_TLB, UserMessages, Keyman.UI.UframeCEFHost;
 
 type
   TfrmWebContainer = class(TfrmKeymanBase)
     procedure TntFormCreate(Sender: TObject);
-    procedure TntFormDestroy(Sender: TObject);
   private
     FDialogName: WideString;
-    FXMLRenderers: TXMLRenderers;
-    FXMLFileName: TTempFile;
-//    FNoMoreErrors: Boolean;   // I4181
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
-    procedure DownloadUILanguages;
     procedure ContributeUILanguages;
   protected
     cef: TframeCEFHost;
+    FRenderPage: string;
 
+    procedure cefTitleChange(Sender: TObject; const title: string); virtual;
     procedure cefLoadEnd(Sender: TObject); virtual;
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean); virtual;
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean); virtual;
@@ -83,8 +80,7 @@ type
     procedure UILanguage(params: TStringList);
 
 
-    procedure Content_Render(FRefreshKeyman: Boolean = False; const AdditionalData: WideString = ''); virtual;
-    property XMLRenderers: TXMLRenderers read FXMLRenderers;
+    procedure Content_Render(FRefreshKeyman: Boolean = False; const Query: string = ''); virtual;
     procedure WndProc(var Message: TMessage); override;  // I2720
   public
     constructor Create(AOwner: TComponent); override;
@@ -97,21 +93,18 @@ type
 
 procedure CreateForm(InstanceClass: TComponentClass; var Reference);
 
-type
-  TOnDownloadLocale = function(Owner: TForm): Boolean;
-
-var
-  FOnDownloadLocale: TOnDownloadLocale = nil;
-
 implementation
 
 uses
+  System.StrUtils,
+
   uCEFConstants,
   uCEFInterfaces,
   uCEFTypes,
 
   custinterfaces,
   ErrorControlledRegistry,
+  Keyman.Configuration.System.UmodWebHttpServer,
   kmint,
   UILanguages,
   UfrmScriptError,
@@ -130,23 +123,11 @@ begin
 end;
 
 procedure TfrmWebContainer.Content_Render(FRefreshKeyman: Boolean;
-  const AdditionalData: WideString);
+  const Query: string);
 var
   FWidth, FHeight: Integer;
 begin
-  FreeAndNil(FXMLFileName);   // I4181
-
-  try
-    FXMLFileName := FXMLRenderers.RenderToFile(FRefreshKeyman, AdditionalData);
-  except
-    on E:EXMLRenderer do
-    begin
-      ShowMessage(E.Message);
-      Exit;
-    end;
-  end;
-
-  FDialogName := ChangeFileExt(ExtractFileName(FXMLRenderers.RenderTemplate), '');
+  FDialogName := FRenderPage;
   HelpType := htKeyword;
   HelpKeyword := FDialogName;
 
@@ -160,7 +141,7 @@ begin
     ClientHeight := FHeight;
   end;
 
-  cef.Navigate(FXMLFileName.Name);
+  cef.Navigate(modWebHttpServer.Host + '/page/'+FRenderPage+IfThen(Query='','','?'+Query));
 end;
 
 procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);
@@ -177,7 +158,6 @@ procedure TfrmWebContainer.FireCommand(const command: WideString; params: TStrin
 begin
   if command = 'link' then OpenLink(params)
   else if command = 'uilanguage' then UILanguage(params)
-  else if command = 'downloaduilanguages' then DownloadUILanguages
   else if command = 'contributeuilanguages' then ContributeUILanguages   // I4989
   else if command = 'resize' then cef.DoResizeByContent
   else ShowMessage(command + '?' + params.Text);
@@ -208,8 +188,6 @@ end;
 procedure TfrmWebContainer.TntFormCreate(Sender: TObject);
 begin
   inherited;
-  FXMLRenderers := TXMLRenderers.Create;
-
   cef := TframeCEFHost.Create(Self);
   cef.Parent := Self;
   cef.Visible := True;
@@ -220,6 +198,7 @@ begin
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
   cef.OnResizeFromDocument := cefResizeFromDocument;
   cef.OnHelpTopic := cefHelpTopic;
+  cef.OnTitleChange := cefTitleChange;
 end;
 
 procedure TfrmWebContainer.cefCommand(Sender: TObject; const command: string; params: TStringList);
@@ -244,20 +223,6 @@ begin
   end;
 end;
 
-procedure TfrmWebContainer.TntFormDestroy(Sender: TObject);
-begin
-  inherited;
-  FXMLRenderers.Free;
-  FreeAndNil(FXMLFileName);   // I4181
-end;
-
-procedure TfrmWebContainer.DownloadUILanguages;
-begin
-  if Assigned(FOnDownloadLocale) then
-    if FOnDownloadLocale(Self) then
-      Do_Content_Render(True);
-end;
-
 procedure TfrmWebContainer.ContributeUILanguages;   // I4989
 begin
   TUtilExecute.URL(MakeKeymanURL(URLPath_CreateTranslation));
@@ -277,8 +242,6 @@ begin
   AssertVclThread;
   cef.DoResizeByContent;
   Screen.Cursor := crDefault;
-  if ShouldSetCaption then Self.Caption := cef.cef.Browser.MainFrame.Name;
-  if ShouldSetAppTitle then Application.Title := Self.Caption;  // I2786
 end;
 
 procedure TfrmWebContainer.cefPreKeySyncEvent(Sender: TObject;
@@ -298,6 +261,12 @@ begin
   ClientHeight := aheight;
   Left := (Screen.Width - Width) div 2;
   Top := (Screen.Height - Height) div 2;
+end;
+
+procedure TfrmWebContainer.cefTitleChange(Sender: TObject; const title: string);
+begin
+  if ShouldSetCaption then Self.Caption := title;
+  if ShouldSetAppTitle then Application.Title := Self.Caption;  // I2786
 end;
 
 function IsLocalURL(URL: WideString): Boolean;

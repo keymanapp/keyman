@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.KMLog;
 
 import android.view.ContextThemeWrapper;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +17,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 public final class KMTextView extends AppCompatEditText {
+  private static final String TAG = "KMTextView";
   private Context context;
   protected KMHardwareKeyboardInterpreter hardwareKeyboardInterpreter;
 
@@ -154,6 +155,7 @@ public final class KMTextView extends AppCompatEditText {
 
   @Override
   protected void onSelectionChanged(int selStart, int selEnd) {
+    super.onSelectionChanged(selStart, selEnd);
     if (activeView != null && activeView.equals(this)) {
       KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
     }
@@ -198,7 +200,7 @@ public final class KMTextView extends AppCompatEditText {
       dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
       dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
     } catch (Exception e) {
-      Log.e("KMEA Error:", e.toString());
+      KMLog.LogException(TAG, "", e);
     } finally {
       _blockEventProcessing = false;
     }

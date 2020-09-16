@@ -133,7 +133,10 @@ begin
   Result := True;
 end;
 
-function CompareVersions(Version1, Version2: string): Integer; // -1 = Version 1 newer, 1 = Version2 newer
+/// <summary>
+/// -1 = Version 1 newer, 1 = Version2 newer
+/// </summary>
+function CompareVersions(Version1, Version2: string): Integer;
 var
   n1, n2: Integer;
   v1: Integer;

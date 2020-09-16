@@ -519,7 +519,7 @@ begin
                   Break;
                 end;
 
-              s := MsgFromStr(':String[@Caption='''+xmlencode(StripHotkey(CustMenuItems.Items[i].Caption))+''']');
+              s := MsgFromStr(xmlencode(StripHotkey(CustMenuItems.Items[i].Caption)));
               if s = ''
                 then btn.Hint := StripHotkey(CustMenuItems.Items[i].Caption) + FShortCut
                 else btn.Hint := s + FShortCut;

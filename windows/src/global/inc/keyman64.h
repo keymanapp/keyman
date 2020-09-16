@@ -224,7 +224,7 @@ typedef struct tagINTKEYBOARDOPTIONS
 
 typedef struct tagINTKEYBOARDPROFILE
 {
-  WCHAR Locale[LOCALE_NAME_MAX_LENGTH];
+  //WCHAR Locale[LOCALE_NAME_MAX_LENGTH]; This is not currently used in keyman32/64 so we won't load it
   LANGID LangID;
   GUID Guid;
 } INTKEYBOARDPROFILE, *LPINTKEYBOARDPROFILE;

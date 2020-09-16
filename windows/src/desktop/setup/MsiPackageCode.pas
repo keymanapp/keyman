@@ -19,7 +19,10 @@ unit MsiPackageCode;
 
 interface
 
-function GetMSIPackageCode(const FileName: WideString): WideString;
+uses
+  Keyman.Setup.System.InstallInfo;
+
+function GetMSIPackageCode(msiLocation: TInstallInfoFileLocation; const FileName: WideString): WideString;
 
 implementation
 
@@ -28,7 +31,7 @@ uses
   jwawintype, jwawinbase, jwawinerror, jwamsi, jwamsiquery,
   SysUtils, RunTools;
 
-function GetMSIPackageCode(const FileName: WideString): WideString;
+function GetMSIPackageCode(msiLocation: TInstallInfoFileLocation; const FileName: WideString): WideString;
 const
   PID_REVNUMBER = 9;
 var
@@ -39,12 +42,12 @@ var
   buf: array[0..64] of WideChar;
   hSummary: MSIHANDLE;
 begin
-  CheckMSIResult(MsiGetSummaryInformationW(0, PWideChar(FileName), 0, hSummary));
+  CheckMSIResult(msiLocation, MsiGetSummaryInformationW(0, PWideChar(FileName), 0, hSummary));
   sz := 64;
-  CheckMSIResult(MsiSummaryInfoGetPropertyW(hSummary, PID_REVNUMBER, uiDataType, iValue, ftValue, buf, sz));
+  CheckMSIResult(msiLocation, MsiSummaryInfoGetPropertyW(hSummary, PID_REVNUMBER, uiDataType, iValue, ftValue, buf, sz));
   ShowMessage(IntToStr(uiDataType) + #13#10 + buf);
   Result := buf;
-  CheckMSIResult(MsiCloseHandle(hSummary));
+  CheckMSIResult(msiLocation, MsiCloseHandle(hSummary));
 end;
 
 end.

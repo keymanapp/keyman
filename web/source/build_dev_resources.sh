@@ -3,7 +3,13 @@
 # Compiles development-related KeymanWeb resources for use with developing/running tests.
 #   - the Recorder module (for engine tests)
 #   - the DOM module (for touch-alias and element-interface tests)
-#
+
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
 # Fails the build if a specified file does not exist.
 assert ( ) {
@@ -13,27 +19,13 @@ assert ( ) {
     fi
 }
 
-fail() {
-    FAILURE_MSG="$1"
-    if [[ "$FAILURE_MSG" == "" ]]; then
-        FAILURE_MSG="Unknown failure"
-    fi
-    echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
-    exit 1
-}
-
 # Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-echo "Node.js + dependencies check"
-npm install --no-optional
-
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
+verify_npm_setup
 
 # Definition of global compile constants
-SCRIPT_TAGS=( "recorder"                "dev_resources" )
-PRODUCTS=(    "recorder_InputEvents.js" "dev_resources.js")
-FOLDERS=(     "recorder"                "dev_resources")
+SCRIPT_TAGS=( "dev_resources" )
+PRODUCTS=(    "dev_resources.js")
+FOLDERS=(     "dev_resources")
 OUTPUT_BASE="../release"
 PRODUCT_COUNT=${#PRODUCTS[@]}
 

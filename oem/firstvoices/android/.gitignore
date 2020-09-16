@@ -21,6 +21,8 @@
 # Files generated as part of the build
 app/src/main/assets/packages
 app/src/main/assets/keyboards.csv
+app/src/main/assets/fv_all.kmp
+app/src/main/assets/nrc.str.sencoten.model.kmp
 
 # Legacy Eclipse IDE files
 .classpath

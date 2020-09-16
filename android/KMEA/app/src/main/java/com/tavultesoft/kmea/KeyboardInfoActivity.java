@@ -63,8 +63,8 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     listView = (ListView) findViewById(R.id.listView);
     final Keyboard kbd = (Keyboard)getIntent().getSerializableExtra(KMManager.KMKey_Keyboard);
     final String packageID = kbd.getPackageID();
-    final String kbID = kbd.getResourceId();
-    final String kbName = kbd.getResourceName();
+    final String kbID = kbd.getKeyboardID();
+    final String kbName = kbd.getKeyboardName();
     final String kbVersion = kbd.getVersion();
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
@@ -83,7 +83,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
 
     // Display keyboard help link
     hashMap = new HashMap<String, String>();
-    final String customHelpLink = kbd.getCustomHelpLink();
+    final String customHelpLink = kbd.getHelpLink();
     // Check if app declared FileProvider
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
@@ -146,7 +146,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 
-      String url = String.format(QRCodeUtil.QR_BASE, kbID);
+      String url = String.format(QRCodeUtil.QR_CODE_URL_FORMATSTR, kbID);
       Bitmap myBitmap = QRCodeUtil.toBitmap(url);
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);

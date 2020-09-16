@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +30,7 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.util.HashMap;
 
@@ -90,7 +90,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       }
 
       // If the active keyboard is for this language, immediately enact the new pref setting.
-      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).get(KMManager.KMKey_LanguageID);
+      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
       if (kbdLgCode.equals(lgCode)) {
         // Not only registers the model but also applies our modeling preferences.
         KMManager.registerAssociatedLexicalModel(lgCode);
@@ -118,7 +118,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     Bundle bundle = getIntent().getExtras();
     if (bundle == null) {
       // Should never actually happen.
-      Log.e(TAG, "Language data not specified for LanguageSettingsActivity!");
+      KMLog.LogError(TAG, "Language data not specified for LanguageSettingsActivity!");
       finish();
 
       if(KMManager.isDebugMode()) {
@@ -166,7 +166,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
-    textView.setText(getString(R.string.model));
+    textView.setText(getString(R.string.model_label));
 
     lexicalModelTextView = layout.findViewById(R.id.text2);
 
@@ -209,7 +209,9 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         Keyboard kbdInfo = ((FilteredKeyboardsAdapter) listView.getAdapter()).getItem(position);
         Intent intent = new Intent(context, KeyboardSettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        intent.putExtra(KMManager.KMKey_Keyboard, kbdInfo);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(KMManager.KMKey_Keyboard, kbdInfo);
+        intent.putExtras(bundle);
         startActivity(intent);
       }
     });
@@ -235,7 +237,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
-          dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
+          dialogBuilder.setMessage(getString(R.string.cannot_connect));
           dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
           AlertDialog dialog = dialogBuilder.create();
           dialog.show();

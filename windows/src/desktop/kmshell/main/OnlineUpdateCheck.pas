@@ -115,6 +115,19 @@ type
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
   end;
 
+  IOnlineUpdateSharedData = interface
+    ['{7442A323-C1E3-404B-BEEA-5B24A52BBB0E}']
+    function Params: TOnlineUpdateCheckParams;
+  end;
+
+  TOnlineUpdateSharedData = class(TInterfacedObject, IOnlineUpdateSharedData)
+  private
+    FParams: TOnlineUpdateCheckParams;
+  public
+    constructor Create(AParams: TOnlineUpdateCheckParams);
+    function Params: TOnlineUpdateCheckParams;
+  end;
+
 procedure OnlineUpdateAdmin(Path: string);
 
 implementation
@@ -343,7 +356,8 @@ var
   FPackage: IKeymanPackageFile;
 begin
   Result := True;
-  
+
+  // TODO: preserve user language choice with upgrade (use ForceInstall)
   for i := 0 to kmcom.Packages.Count - 1 do
   begin
     pkg := kmcom.Packages[i];
@@ -689,6 +703,19 @@ begin
     Free;
     FPackageUpgradeList.Free;
   end;
+end;
+
+{ TOnlineUpdateSharedData }
+
+constructor TOnlineUpdateSharedData.Create(AParams: TOnlineUpdateCheckParams);
+begin
+  inherited Create;
+  FParams := AParams;
+end;
+
+function TOnlineUpdateSharedData.Params: TOnlineUpdateCheckParams;
+begin
+  Result := FParams;
 end;
 
 end.

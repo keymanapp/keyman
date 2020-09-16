@@ -1,5 +1,3 @@
-/// <reference path="text/outputTarget.ts" />
-
 namespace com.keyman {
   export class AttachmentInfo {
     /**

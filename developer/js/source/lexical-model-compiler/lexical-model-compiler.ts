@@ -9,6 +9,8 @@ import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
 import { createTrieDataStructure, defaultSearchTermToKey } from "./build-trie";
+import {decorateWithJoin} from "./join-word-breaker-decorator";
+import {decorateWithScriptOverrides} from "./script-overrides-decorator";
 
 export default class LexicalModelCompiler {
 
@@ -93,11 +95,44 @@ export class ModelSourceError extends Error {
  * breaking function.
  */
 function compileWordBreaker(spec: WordBreakerSpec): string {
-  if (typeof spec.use === "string") {
+  let wordBreakerCode = compileInnerWordBreaker(spec.use);
+
+  if (spec.joinWordsAt) {
+    wordBreakerCode = compileJoinDecorator(spec, wordBreakerCode);
+  }
+
+  if (spec.overrideScriptDefaults) {
+    wordBreakerCode = compileScriptOverrides(spec, wordBreakerCode);
+  }
+
+  return wordBreakerCode;
+}
+
+function compileJoinDecorator(spec: WordBreakerSpec, existingWordBreakerCode: string) {
+  // Bundle the source of the join decorator, as an IIFE,
+  // like this: (function join(breaker, joiners) {/*...*/}(breaker, joiners))
+  // The decorator will run IMMEDIATELY when the model is loaded,
+  // by the LMLayer returning the decorated word breaker to the
+  // LMLayer model.
+  let joinerExpr: string = JSON.stringify(spec.joinWordsAt)
+  return `(${decorateWithJoin.toString()}(${existingWordBreakerCode}, ${joinerExpr}))`;
+}
+
+function compileScriptOverrides(spec: WordBreakerSpec, existingWordBreakerCode: string) {
+  return `(${decorateWithScriptOverrides.toString()}(${existingWordBreakerCode}, '${spec.overrideScriptDefaults}'))`;
+}
+
+/**
+ * Compiles the base word breaker, that may be decorated later.
+ * Returns the source code of a JavaScript expression.
+ */
+function compileInnerWordBreaker(spec: SimpleWordBreakerSpec): string {
+  if (typeof spec === "string") {
     // It must be a builtin word breaker, so just instantiate it.
-    return `wordBreakers['${spec.use}']`;
+    return `wordBreakers['${spec}']`;
   } else {
-    return spec.use.toString()
+    // It must be a function:
+    return spec.toString()
       // Note: the .toString() might just be the property name, but we want a
       // plain function:
       .replace(/^wordBreak(ing|er)\b/, 'function');

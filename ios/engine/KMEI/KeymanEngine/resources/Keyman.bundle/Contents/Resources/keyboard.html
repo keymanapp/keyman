@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <title>Keyman</title>
         <script src="keymanios.js"></script>
+        <script src="keyman-sentry.js"></script>
         <script type="text/javascript">
             
             console = new Object();
@@ -27,6 +28,11 @@
             var device = 'AppleMobile';
             var oskHeight = 0;
             var oskWidth = 0;
+
+            var sentryManager = new com.keyman.KeymanSentryManager({
+              hostPlatform: "ios"
+            });
+            sentryManager.init();
             
             window.addEventListener('load', init, false);
             
@@ -115,6 +121,7 @@
                 var kmw = window.keyman;
 
                 KeymanWeb.registerStub(stub);
+
                 kmw.setActiveKeyboard(stub.KI, stub.KLC);
                 kmw.osk.show(true);
             }

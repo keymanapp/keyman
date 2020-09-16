@@ -4,7 +4,9 @@
 		"outFile": "../intermediate/keymanweb.js"
   },
   "files": [
-		"includes/dom-lmlayer.ts",
+    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
+    "../node_modules/@keymanapp/web-utils/src/index.ts",
+    "../node_modules/@keymanapp/lexical-model-layer/web-defaultWorker.ts",
 		"kmwbase.ts",
 		"keymanweb.ts",
 		"kmwnative.ts",

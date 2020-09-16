@@ -1,49 +1,64 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.data;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.Map;
 
-public class Keyboard implements Serializable, LanguageResource {
+public class Keyboard extends LanguageResource implements Serializable {
   private static final String TAG = "Keyboard";
   private static final String HELP_URL_FORMATSTR = "https://help.keyman.com/keyboard/%s/%s";
 
-  private String packageID;
-  private String keyboardID;
-  private String keyboardName;
-  private String languageID;
-  private String languageName;
-  private boolean isCustomKeyboard;
   private boolean isNewKeyboard;
   private String font;
   private String oskFont;
-  private String helpLink;
-  private String version;
 
+  // JSON keys
+  private static String KB_NEW_KEYBOARD_KEY = "isNewKeyboard";
+  private static String KB_FONT_KEY = "font";
+  private static String KB_OSK_FONT_KEY = "oskFont";
+
+  private static Keyboard FALLBACK_KEYBOARD;
+
+  /**
+   * Constructor using JSON Objects from installed keyboards list
+   * @param installedObj
+   */
+  public Keyboard(JSONObject installedObj) {
+    this.fromJSON(installedObj);
+  }
+
+  /**
+   * Constructor using JSON Objects from keyboard cloud catalog
+   * @param languageJSON
+   * @param keyboardJSON
+   */
   public Keyboard(JSONObject languageJSON, JSONObject keyboardJSON) {
     try {
       this.packageID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
 
-      this.keyboardID = keyboardJSON.getString(KMManager.KMKey_ID);
+      this.resourceID = keyboardJSON.getString(KMManager.KMKey_ID);
 
-      this.keyboardName = keyboardJSON.getString(KMManager.KMKey_Name);
+      this.resourceName = keyboardJSON.getString(KMManager.KMKey_Name);
 
       // language ID and language name from languageJSON
       this.languageID = languageJSON.getString(KMManager.KMKey_ID).toLowerCase();
       this.languageName = languageJSON.getString(KMManager.KMKey_Name);
-
-      this.isCustomKeyboard = keyboardJSON.has(KMManager.KMKey_CustomKeyboard) &&
-        keyboardJSON.get(KMManager.KMKey_CustomKeyboard).equals("Y");
 
       this.isNewKeyboard = keyboardJSON.has(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
         keyboardJSON.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
@@ -52,83 +67,67 @@ public class Keyboard implements Serializable, LanguageResource {
 
       this.oskFont = keyboardJSON.optString(KMManager.KMKey_OskFont, "");
 
-      this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
+      this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, null);
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
-        String.format(HELP_URL_FORMATSTR, this.keyboardID, this.version));
+        String.format(HELP_URL_FORMATSTR, this.resourceID, this.version));
     } catch (JSONException e) {
-      Log.e(TAG, "Keyboard exception parsing JSON: " + e);
+      KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
   }
 
-  public Keyboard(String packageID, String keyboardID, String keyboardName, String languageID, String languageName,
-                  boolean isCustomKeyboard, boolean isNewKeyboard,
-                  String font, String oskFont, String version, String helpLink) {
+  public Keyboard(String packageID, String keyboardID, String keyboardName,
+                  String languageID, String languageName, String version,
+                  String helpLink, String kmp,
+                  boolean isNewKeyboard, String font, String oskFont) {
+    super(packageID, keyboardID, keyboardName, languageID, languageName, version,
+      (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
+        String.format(HELP_URL_FORMATSTR, keyboardID, version),
+      kmp);
 
-    this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
-    this.keyboardID = keyboardID;
-    this.keyboardName = keyboardName;
-    this.languageID = languageID.toLowerCase();
-    this.languageName = languageName;
-    this.isCustomKeyboard = isCustomKeyboard;
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";
     this.oskFont = (oskFont != null) ? oskFont : "";
-    this.version = (version != null) ? version : "1.0";
-    this.helpLink = (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-      String.format(HELP_URL_FORMATSTR, this.keyboardID, this.version);
   }
 
-  public boolean isCustomKeyboard() { return isCustomKeyboard; }
+  public Keyboard(Keyboard k) {
+    super(k.getPackageID(), k.getKeyboardID(), k.getKeyboardName(),
+      k.getLanguageID(), k.getLanguageName(), k.getVersion(),
+      k.getHelpLink(), k.getUpdateKMP());
+    this.isNewKeyboard = false;
+    this.font = k.getFont();
+    this.oskFont = k.getOSKFont();
+  }
 
-  public boolean isNewKeyboard() { return isNewKeyboard; }
+  public String getKeyboardID() { return getResourceID(); }
+  public String getKeyboardName() { return getResourceName(); }
 
-  public String getResourceId() { return keyboardID; }
+  public boolean getNewKeyboard() { return isNewKeyboard; }
+  public void setNewKeyboard(boolean isNewKeyboard) { this.isNewKeyboard = isNewKeyboard; }
 
   public String getFont() { return font; }
 
   public String getOSKFont() { return oskFont; }
 
-  public String getLanguageID() { return languageID; }
-
-  // Deprecated in Keyman 14.0 for getLanguageID()
-  @Override
-  public String getLanguageCode() { return languageID; }
-
-  public String getLanguageName() { return languageName; }
-
-  public String getResourceName() { return keyboardName; }
-
-  public String getCustomHelpLink() { return helpLink; }
-
-  public String getVersion() { return version; }
-
-  public String getPackageID() { return packageID; }
-
-  // Deprecated in Keyman 14.0 for getPackageID()
-  @Override
-  public String getPackage() { return packageID; }
-
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
 
     bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, keyboardID);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, resourceID);
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, keyboardName);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, resourceName);
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, languageName);
 
-    bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustomKeyboard);
-
     bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, helpLink);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KMP_LINK, kmp);
 
     return bundle;
   }
 
   public boolean equals(Object obj) {
     if(obj instanceof Keyboard) {
-      boolean lgCodeMatch = ((Keyboard) obj).getLanguageID().equals(this.getLanguageID());
-      boolean idMatch = ((Keyboard) obj).getResourceId().equals(this.getResourceId());
+      boolean lgCodeMatch = BCP47.languageEquals(((Keyboard) obj).getLanguageID(), this.getLanguageID());
+      boolean idMatch = ((Keyboard) obj).getKeyboardID().equals(this.getKeyboardID());
 
       return lgCodeMatch && idMatch;
     }
@@ -136,10 +135,67 @@ public class Keyboard implements Serializable, LanguageResource {
     return false;
   }
 
-  @Override
-  public int hashCode() {
-    String id = getResourceId();
-    String lgCode = getLanguageID();
-    return id.hashCode() * lgCode.hashCode();
+  protected void fromJSON(JSONObject installedObj) {
+    super.fromJSON(installedObj);
+    try {
+      this.isNewKeyboard = installedObj.getBoolean(KB_NEW_KEYBOARD_KEY);
+      this.font = installedObj.getString(KB_FONT_KEY);
+      this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "fromJSON exception: ", e);
+    }
+  }
+
+  public JSONObject toJSON() {
+    JSONObject o = super.toJSON();
+    if (o != null) {
+      try {
+        o.put(KB_NEW_KEYBOARD_KEY, this.isNewKeyboard);
+        o.put(KB_FONT_KEY, this.font);
+        o.put(KB_OSK_FONT_KEY, this.oskFont);
+      } catch (JSONException e) {
+        KMLog.LogException(TAG, "toJSON exception: ", e);
+      }
+    }
+    return o;
+  }
+
+  /**
+   * Get the fallback keyboard. If never specified, use sil_euro_latin
+   * @param context Context
+   * @return Keyboard - the fallback keyboard
+   */
+  public static Keyboard getDefaultKeyboard(@NonNull Context context) {
+    if (context == null) {
+      KMLog.LogError(TAG, "getDefaultKeyboard with null context");
+    }
+    if (FALLBACK_KEYBOARD == null) {
+      String version = KMManager.getLatestKeyboardFileVersion(
+        context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID);
+
+      FALLBACK_KEYBOARD = new Keyboard(
+        KMManager.KMDefault_PackageID,
+        KMManager.KMDefault_KeyboardID,
+        KMManager.KMDefault_KeyboardName,
+        KMManager.KMDefault_LanguageID,
+        KMManager.KMDefault_LanguageName,
+        version,
+        null, // will use help.keyman.com link because context required to determine local welcome.htm path,
+        "",
+        false,
+        KMManager.KMDefault_KeyboardFont,
+        KMManager.KMDefault_KeyboardFont);
+    }
+    return FALLBACK_KEYBOARD;
+  }
+
+  /**
+   * Set the fallback keyboard. If keyboard is null, the fallback keyboard will
+   * revert to sil_euro_latin
+   * @param k Keyboard to set as the fallback keyboard
+   */
+  public static void setDefaultKeyboard(Keyboard k) {
+    // If k is null, getDefaultKeyboard() will regenerate fallback keyboard sil_euro_latin
+    FALLBACK_KEYBOARD = k;
   }
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import XCTest
 @testable import KeymanEngine
 
 extension TestUtils {
@@ -74,6 +75,18 @@ extension TestUtils {
       }
 
       userDefaults.userLexicalModels = userModels
+    }
+
+    // Adapted from https://stackoverflow.com/a/39453212.
+    static func setFromPlist(atPath path: String, for storage: Storage) throws {
+      var propertyListFormat = PropertyListSerialization.PropertyListFormat.xml
+      let xml = FileManager.default.contents(atPath: path)!
+
+      let plistDict = try PropertyListSerialization.propertyList(from: xml, options: .mutableContainersAndLeaves, format: &propertyListFormat) as! [String: Any]
+
+      plistDict.forEach({key, value in
+        storage.userDefaults.set(value, forKey: key)
+      })
     }
   }
 }

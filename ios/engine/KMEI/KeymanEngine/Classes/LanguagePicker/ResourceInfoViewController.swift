@@ -9,22 +9,15 @@
 import Foundation
 import UIKit
 
-/**
- * At present, this class only supports keyboard resources.  The base design is partially refactored to
- * eventually support lexical model resources as well, but additional work is needed before this class
- * will be ready... possibly as a common base class. 
- */
-class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
-  // Collectively used to determine if a keyboard may be deleted.
-  var keyboardCount: Int = 0
-  var keyboardIndex: Int = 0
-  var isCustomKeyboard: Bool = false // also used to toggle QR code gen + display
+class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
+  var isCustomKeyboard: Bool = false // legacy; was also used to toggle QR code gen + display
 
-  var keyboardCopyright: String = ""
-
+  // The data backing our UI text in the UITableView.
   private var infoArray = [[String: String]]()
 
-  let resource: LanguageResource
+  let resource: Resource
+  let package: Resource.Package?
+  let mayDelete: Bool
 
   @IBOutlet weak var scrollView: UIScrollView!
   @IBOutlet weak var contentView: UIView!
@@ -35,8 +28,10 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
   @IBOutlet weak var labelHeightConstraint: NSLayoutConstraint!
 
-  init(for resource: LanguageResource) {
+  init(for resource: Resource, mayDelete: Bool = false) {
     self.resource = resource
+    self.package = ResourceFileManager.shared.getInstalledPackage(for: resource)
+    self.mayDelete = mayDelete
 
     super.init(nibName: "ResourceInfoView", bundle: Bundle.init(for: ResourceInfoViewController.self))
   }
@@ -48,20 +43,31 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    var versionLabelKey: String
+    var uninstallLabelKey: String
+
+    if Resource.self == InstallableLexicalModel.self {
+      versionLabelKey = "info-label-version-lexical-model"
+      uninstallLabelKey = "command-uninstall-lexical-model"
+    } else {
+      versionLabelKey = "info-label-version-keyboard"
+      uninstallLabelKey = "command-uninstall-keyboard"
+    }
+
     infoArray = [[String: String]]()
     infoArray.append([
-      "title": "Keyboard version",
+      "title": NSLocalizedString(versionLabelKey, bundle: engineBundle, comment: ""),
       "subtitle": resource.version
       ])
 
     if !isCustomKeyboard {
       infoArray.append([
-        "title": "Help link",
+        "title": NSLocalizedString("info-command-help", bundle: engineBundle, comment: ""),
         "subtitle": ""
         ])
     }
     infoArray.append([
-      "title": "Uninstall keyboard",
+      "title": NSLocalizedString(uninstallLabelKey, bundle: engineBundle, comment: ""),
       "subtitle": ""
       ])
 
@@ -71,16 +77,22 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
     tableView.reloadData()
     
     // Generate & display the QR code!
-    if let resourceURL = resource.sharableURL {
-      if let qrImg = generateQRCode(from: resourceURL) {
-        qrImageView.image = qrImg
+    if package?.distributionMethod ?? .unknown == .cloud {
+      if let resourceURL = resource.sharableURL {
+        if let qrImg = generateQRCode(from: resourceURL) {
+          qrImageView.image = qrImg
+        } else {
+          log.info("Unable to generate QR code for URL: \(resourceURL)")
+        }
       } else {
-        log.info("Unable to generate QR code for URL: \(resourceURL)")
+        // No resource-sharing link available.  Hide the text label!
+        shareLabel.isHidden = true
       }
     } else {
-      // No resource-sharing link available.  Hide the text label!
       shareLabel.isHidden = true
     }
+
+    self.title = resource.name
   }
 
   // Should be supported in iOS 7+.  We only support 9+, so we should be fine here.
@@ -129,32 +141,19 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if !isCustomKeyboard {
       if indexPath.row == 1 {
-        let url = URL(string: "http://help.keyman.com/keyboard/\(resource.id)/\(resource.version)/")!
+        let typeString = resource.fullID.type == .keyboard ? "keyboard" : "lexicalModel"
+        let url = URL(string: "\(KeymanHosts.HELP_KEYMAN_COM)/\(typeString)/\(resource.id)/\(resource.version)/")!
         if let openURL = Manager.shared.openURL {
           _ = openURL(url)
         } else {
           log.error("openURL not set in Manager. Failed to open \(url)")
         }
       } else if indexPath.row == 2 {
-        showDeleteKeyboard()
+        showDeleteResource()
       }
     } else if indexPath.row == 1 {
-      showDeleteKeyboard()
+      showDeleteResource()
     }
-  }
-
-  private func fetchedKeyboardData(_ data: Data) {
-    guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [AnyHashable: Any] else {
-      return
-    }
-    let keyboards = json[Key.language] as? [Any]
-    let kbDict = keyboards?[0] as? [AnyHashable: Any]
-    var info = infoArray[1]
-    let copyright = kbDict?[Key.keyboardCopyright] as? String ?? "Unknown"
-
-    info["subtitle"] = copyright
-    infoArray[1] = info
-    tableView.reloadData()
   }
 
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -167,40 +166,34 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
     if !isCustomKeyboard {
       if indexPath.row == 1 {
         cell.accessoryType = .disclosureIndicator
-      } else if indexPath.row == 2 && !canDeleteKeyboard {
+      } else if indexPath.row == 2 && !mayDelete {
         cell.isUserInteractionEnabled = false
         cell.textLabel?.isEnabled = false
         cell.detailTextLabel?.isEnabled = false
       }
-    } else if indexPath.row == 1 && !canDeleteKeyboard {
+    } else if indexPath.row == 1 && !mayDelete {
       cell.isUserInteractionEnabled = false
       cell.textLabel?.isEnabled = false
       cell.detailTextLabel?.isEnabled = false
     }
   }
 
-  private var canDeleteKeyboard: Bool {
-    if !Manager.shared.canRemoveKeyboards {
-      return false
+  private func showDeleteResource() {
+    var uninstallLabelKey: String
+
+    if Resource.self == InstallableLexicalModel.self {
+      uninstallLabelKey = "command-uninstall-lexical-model-confirm"
+    } else {
+      uninstallLabelKey = "command-uninstall-keyboard-confirm"
     }
 
-    if !Manager.shared.canRemoveDefaultKeyboard {
-      return keyboardIndex != 0
-    }
-
-    if keyboardIndex > 0 {
-      return true
-    }
-    return keyboardCount > 1
-  }
-
-  private func showDeleteKeyboard() {
-    let alertController = UIAlertController(title: title ?? "", message: "Would you like to delete this keyboard?",
+    let uninstallHelp = NSLocalizedString(uninstallLabelKey, bundle: engineBundle, comment: "")
+    let alertController = UIAlertController(title: title ?? "", message: uninstallHelp,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "Cancel",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: nil))
-    alertController.addAction(UIAlertAction(title: "Delete",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-uninstall", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: deleteHandler))
 
@@ -208,8 +201,14 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   }
 
   func deleteHandler(withAction action: UIAlertAction) {
-    if Manager.shared.removeKeyboard(at: keyboardIndex) {
+    if let lexicalModel = resource as? InstallableLexicalModel {
+      if Manager.shared.removeLexicalModel(withFullID: lexicalModel.typedFullID) {
         navigationController?.popToRootViewController(animated: true)
+      }
+    } else if let keyboard = resource as? InstallableKeyboard {
+      if Manager.shared.removeKeyboard(withFullID: keyboard.typedFullID) {
+        navigationController?.popToRootViewController(animated: true)
+      }
     }
   }
 

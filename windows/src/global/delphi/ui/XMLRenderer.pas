@@ -1,18 +1,18 @@
 (*
   Name:             XMLRenderer
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Oct 2006
 
   Modified Date:    1 May 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     06 Oct 2006 - mcdurdin - Move TemplatePath into separate function
                     04 Dec 2006 - mcdurdin - Read xml from locale folder
@@ -43,57 +43,67 @@ unit XMLRenderer;  // I3306
 interface
 
 uses
-  Windows,
-  Classes,
-  keymanapi_TLB,
+  System.Classes,
+  System.Contnrs,
+  System.SysUtils,
+  Winapi.Windows,
+
   custinterfaces,
-  Contnrs,
-  SysUtils,
-  TempFileManager;
+  keymanapi_TLB;
 
 type
   EXMLRenderer = class(Exception)
   end;
 
+  TXMLRenderers = class;
+
   TXMLRenderer = class
   private
+    FOwner: TXMLRenderers;
     FXMLFileName: WideString;
+    function Getkmcom: IKeyman;
   protected
     function XMLData(FRefreshKeyman: Boolean): WideString; virtual; abstract;
     function Stylesheet: WideString; virtual;
+    property kmcom: IKeyman read Getkmcom;
   public
+    constructor Create(AOwner: TXMLRenderers);
     function Render: Boolean;
     function GetXMLData(FRefreshKeyman: Boolean): WideString;
+    property Owner: TXMLRenderers read FOwner;
     property XMLFileName: WideString read FXMLFileName;
   end;
 
   TXMLRenderers = class(TObjectList)
   private
     FRenderTemplate: WideString;
+    Fkmcom: IKeyman;
+    FTempPath: string;
     function GetItem(Index: Integer): TXMLRenderer;
     procedure SetItem(Index: Integer; const Value: TXMLRenderer);
     function GetUILanguages: WideString;
+    function Getkmcom: IKeyman;
   public
     constructor Create;
-    function RenderToFile(FRefreshKeyman: Boolean = False; const AdditionalData: WideString = ''): TTempFile;   // I4181
+    function RenderToString(FRefreshKeyman: Boolean; const AdditionalData: WideString = ''): string;
     function TemplateExists: Boolean;
+    property kmcom: IKeyman read Getkmcom;
     property Items[Index: Integer]: TXMLRenderer read GetItem write SetItem; default;
     property RenderTemplate: WideString read FRenderTemplate write FRenderTemplate;
+    property TempPath: string read FTempPath;
   end;
-
-function GetXMLTemplatePath(const FileName: WideString): WideString;
 
 implementation
 
 uses
+  System.StrUtils,
+  System.TypInfo,
+  System.WideStrUtils,
+
   DebugPaths,
   GetOSVersion,
   KeymanPaths,
   KLog,
-  kmint,
-  WideStrUtils,
-  StrUtils,
-  TypInfo,
   UFixupMissingFile,
   UILanguages,
   Unicode,
@@ -106,6 +116,17 @@ uses
   xmlintf;
 
 { TXMLRendererRenderer }
+
+constructor TXMLRenderer.Create(AOwner: TXMLRenderers);
+begin
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+function TXMLRenderer.Getkmcom: IKeyman;
+begin
+  Result := FOwner.kmcom;
+end;
 
 function TXMLRenderer.GetXMLData(FRefreshKeyman: Boolean): WideString;
 begin
@@ -136,11 +157,19 @@ end;
 constructor TXMLRenderers.Create;
 begin
   inherited Create;
+  FTempPath := KGetTempPath;
 end;
 
 function TXMLRenderers.GetItem(Index: Integer): TXMLRenderer;
 begin
   Result := inherited GetItem(Index) as TXMLRenderer;
+end;
+
+function TXMLRenderers.Getkmcom: IKeyman;
+begin
+  if Fkmcom = nil then
+    Fkmcom := CoKeyman.Create;
+  Result := Fkmcom;
 end;
 
 function TXMLRenderers.GetUILanguages: WideString;
@@ -154,38 +183,25 @@ begin
   end;
 end;
 
-function TXMLRenderers.RenderToFile(FRefreshKeyman: Boolean; const AdditionalData: WideString): TTempFile;   // I4181
+function TXMLRenderers.RenderToString(FRefreshKeyman: Boolean; const AdditionalData: WideString): string;
 var
   i: Integer;
   FOutput: TStrings;
   FTemplatePath: WideString;
   s: WideString;
-  FXMLFileName: TTempFile;
   doc: IXMLDocument;
   xml: IXMLDocument;
 
-    function URLPath(s: WideString): WideString;
-    begin
-      Result := 'file:///'+URLEncode(WideReplaceText(s, '\', '/'));  // I2612
-    end;
-
-    function ScriptURLPath(s: WideString): WideString;
-    begin
-      Result := URLPath(s);
-    end;
-
 begin
-  FXMLFileName := TTempFileManager.Get('.htm');   // I4181
-
-  FTemplatePath := GetXMLTemplatePath(FRenderTemplate);
+  FTemplatePath := TKeymanPaths.KeymanConfigStaticHttpFilesPath;
 
   FOutput := TStringList.Create;
   try
-    with kmint.KeymanCustomisation.CustMessages do
+    with (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation.CustMessages do
     begin
-      s := GetLocalePathForLocale(LanguageCode); // + '/locale.xml';
+      s := GetLocalePathForLocale(LanguageCode);
       if not FileExists(s) then
-        s := FTemplatePath + 'locale.xml';
+        s := FTemplatePath + 'strings.xml';
     end;
 
     FOutput.Add(
@@ -198,10 +214,7 @@ begin
         '<osversion id="'+GetEnumName(TypeInfo(TOS), Ord(GetOs))+'" index="'+IntToStr(Ord(GetOs))+'" />'+
         IfThen(CanElevate, '<canelevate />')+
         IfThen(Assigned(kmcom) and kmcom.SystemInfo.IsAdministrator, '<isadmin />')+   // I3612   // I3626
-        '<templatepath>'+XMLEncode(URLPath(FTemplatePath))+'</templatepath>'+
-        '<scripttemplatepath>'+XMLEncode(ScriptUrlPath(FTemplatePath))+'</scripttemplatepath>'+
         '<uilanguages>'+GetUILanguages+'</uilanguages>'+
-        '<defaultlocalepath>'+XMLEncode(FTemplatePath)+'locale.xml</defaultlocalepath>'+
         '<localepath>'+XMLEncode(s)+'</localepath>');
 
     for i := 0 to Count - 1 do
@@ -228,17 +241,17 @@ begin
     xml.LoadFromFile(FTemplatePath + FRenderTemplate);
 
     doc.Node.transformNode(xml.Node, s);
-    FOutput.Text := s;
+    Result := s;
 
     if KLEnabled or (GetDebugPath('Debug_XMLRenderer', '', False) <> '') then  // I3269   // I3545
+    begin
       doc.SaveToFile(KGetTempFileName('.'+ChangeFileExt(FRenderTemplate,'.xml')));
-
-    FOutput.SaveToFile(FXMLFileName.Name, TEncoding.UTF8);  // I3337   // I4181
+      FOutput.Text := s;
+      FOutput.SaveToFile(KGetTempFileName('.'+ChangeFileExt(FRenderTemplate,'.html')), TEncoding.UTF8);
+    end;
   finally
     FOutput.Free;
   end;
-
-  Result := FXMLFileName;
 end;
 
 procedure TXMLRenderers.SetItem(Index: Integer; const Value: TXMLRenderer);
@@ -250,33 +263,8 @@ function TXMLRenderers.TemplateExists: Boolean;
 var
   FTemplatePath: WideString;
 begin
-  FTemplatePath := GetXMLTemplatePath(FRenderTemplate);
-  Result := FileExists(FTemplatePath + FRenderTemplate);
-end;
-
-function OldXMLTemplatePath: WideString;
-begin
-  Result := GetDebugPath('xmltemplate desktop_pro.kxx',''); // I1803
-  if Result = '' then
-    Result := TKeymanPaths.KeymanDesktopInstallPath;
-  if DirectoryExists(Result + 'xml') then Result := Result + 'xml\';
-end;
-
-function GetXMLTemplatePath(const FileName: WideString): WideString;
-var
-  Customisation: IKeymanCustomisation;
-  CustMessages: IKeymanCustomisationMessages;
-begin
-  Customisation := kmint.KeymanCustomisation;
-  CustMessages := Customisation.CustMessages;
-  with CustMessages do
-  begin
-    Result := GetLocalePathForLocale(LanguageCode);
-
-    if (ExtractFileName(Result) = 'locale.xml') and FileExists(ExtractFilePath(Result) + '\'+FileName)
-      then Result := ExtractFilePath(Result) + '\'
-      else Result := OldXMLTemplatePath;
-  end;
+  FTemplatePath := TKeymanPaths.KeymanConfigStaticHttpFilesPath(FRenderTemplate);
+  Result := FileExists(FTemplatePath);
 end;
 
 end.

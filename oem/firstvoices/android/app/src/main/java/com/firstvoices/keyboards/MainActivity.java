@@ -16,15 +16,21 @@ import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
 
 import com.tavultesoft.kmea.*;
+import com.tavultesoft.kmea.data.Keyboard;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-
     @SuppressWarnings("SetJavascriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SentryAndroid.init(this);
+        SentryAndroid.init(this, options -> {
+          options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
+          options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
+        });
 
         setContentView(R.layout.activity_main);
 
@@ -39,7 +45,47 @@ public class MainActivity extends AppCompatActivity {
         KMManager.initialize(getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
 
         final Context context = this;
-        final String htmlPath = "file:///android_asset/setup/main.html";
+
+        /**
+         * We need to set the default (fallback) keyboard to sil_euro_latin inside the fv_all package
+         * rather than the normal default of sil_euro_latin inside the sil_euro_latin package.
+         * Fallback keyboard needed in case the user never selects a FV keyboard to add
+         * as a system keyboard.
+        */
+        String version = KMManager.getLatestKeyboardFileVersion(
+            context, FVShared.FVDefault_PackageID, KMManager.KMDefault_KeyboardID);
+        KMManager.setDefaultKeyboard(
+            new Keyboard(
+                FVShared.FVDefault_PackageID,
+                KMManager.KMDefault_KeyboardID,
+                KMManager.KMDefault_KeyboardName,
+                KMManager.KMDefault_LanguageID,
+                KMManager.KMDefault_LanguageName,
+                version,
+                null, // will use help.keyman.com link because context required to determine local welcome.htm path,
+                "",
+                false,
+                KMManager.KMDefault_KeyboardFont,
+                KMManager.KMDefault_KeyboardFont)
+        );
+
+        ArrayList<HashMap<String, String>> modelsList = KMManager.getLexicalModelsList(context);
+        if (modelsList == null || modelsList.size() == 0) {
+          String lexicalModelVersion = KMManager.getLexicalModelPackageVersion(
+            context, FVShared.FVDefault_DictionaryPackageID);
+
+          // Add default dictionaries
+          HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
+          lexicalModelInfo.put(KMManager.KMKey_PackageID, FVShared.FVDefault_DictionaryPackageID);
+          lexicalModelInfo.put(KMManager.KMKey_LanguageID, FVShared.FVDefault_DictionaryLanguageID);
+          lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, FVShared.FVDefault_DictionaryModelID);
+          lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, FVShared.FVDefault_DictionaryModelName);
+          lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, lexicalModelVersion);
+          KMManager.addLexicalModel(context, lexicalModelInfo);
+          KMManager.registerAssociatedLexicalModel(FVShared.FVDefault_DictionaryLanguageID);
+        }
+
+      final String htmlPath = "file:///android_asset/setup/main.html";
         WebView webView = findViewById(R.id.webView);
         webView.addJavascriptInterface(new JSHandler(context), "jsInterface");
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);

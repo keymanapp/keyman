@@ -5,11 +5,12 @@
 # ----------------------------------------------------------------------
 
 TARGETS=keyboard-info keyboard-js-info keyboard-package-versions \
-        kmx-file-languages package-info new-tests
+        kmx-file-languages package-info new-tests jsonutil windows-setup \
+        ui-language-manager
 
-test: 
+test:
     $(MAKE) -DTARGET=test $(TARGETS)
-    
+
 !include ..\Header.mak
 
 # ----------------------------------------------------------------------
@@ -29,9 +30,21 @@ keyboard-js-info:
 kmx-file-languages:
     cd $(ROOT)\src\unit-tests\kmx-file-languages
     $(MAKE) $(TARGET)
-    
+
 package-info:
     cd $(ROOT)\src\unit-tests\package-info
+    $(MAKE) $(TARGET)
+
+jsonutil:
+    cd $(ROOT)\src\unit-tests\jsonutil
+    $(MAKE) $(TARGET)
+
+windows-setup:
+    cd $(ROOT)\src\unit-tests\windows-setup
+    $(MAKE) $(TARGET)
+
+ui-language-manager:
+    cd $(ROOT)\src\unit-tests\ui-language-manager
     $(MAKE) $(TARGET)
 
 new-tests:
@@ -41,7 +54,7 @@ new-tests:
 # ----------------------------------------------------------------------
 
 !include ..\Target.mak
-    
+
 # ----------------------------------------------------------------------
 # EOF
 # ----------------------------------------------------------------------

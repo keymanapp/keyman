@@ -16,7 +16,6 @@ type
     const S_CEF_SubProcess = 'kmbrowserhost.exe';
   public
     const S_KMShell = 'kmshell.exe';
-    const S_Xml_LocaleDef = 'xml\localedef.dtd';
     const S_TSysInfoExe = 'tsysinfo.exe';
     const S_KeymanExe = 'keyman.exe';
     const S_CfgIcon = 'cfgicon.ico';
@@ -32,6 +31,7 @@ type
     class function KeymanEngineInstallDir: string; static;
     class function KeyboardsInstallPath(const filename: string = ''): string; static;
     class function KeyboardsInstallDir: string; static;
+    class function KeymanConfigStaticHttpFilesPath(const filename: string = ''): string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
     class function CEFSubprocessPath: string; static;
@@ -290,6 +290,32 @@ begin
   ForceDirectories(Result);  // I2768
   if app <> '' then
     Result := Result + app + '-' + IntToStr(GetCurrentProcessId) + '.log';
+end;
+
+class function TKeymanPaths.KeymanConfigStaticHttpFilesPath(const filename: string): string;
+var
+  keyman_root: string;
+begin
+  // Look up KEYMAN_ROOT development variable -- if found and executable
+  // within that path then use that as source path
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
+  begin
+    Exit(IncludeTrailingPathDelimiter(keyman_root) + 'windows\src\desktop\kmshell\xml\' + filename);
+  end;
+
+  Result := GetDebugPath('KeymanConfigStaticHttpFilesPath', '');
+  if Result = '' then
+  begin
+    Result := ExtractFilePath(ParamStr(0));
+
+    // The xml files may be in the same folder as the executable
+    // for some 3rd party distributions of Keyman Desktop files.
+    if FileExists(Result + 'xml\strings.xml') then
+      Result := Result + 'xml\';
+  end;
+
+  Result := Result + filename;
 end;
 
 end.

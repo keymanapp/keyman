@@ -1,0 +1,10 @@
+# Editor configuration, see https://editorconfig.org
+[*]
+indent_style = space
+indent_size = 4
+
+[*.sharedmimeinfo]
+indent_style = tab
+
+[Makefile]
+indent_style = tab

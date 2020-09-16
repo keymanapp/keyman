@@ -1,5 +1,3 @@
-/// <reference path="../keyboards/activeLayout.ts" />
-/// <reference path="../utils/version.ts" />
 /// <reference path="preProcessor.ts" />
 
 namespace com.keyman.osk {
@@ -602,7 +600,7 @@ namespace com.keyman.osk {
       var Lkbd=util._CreateElement('div');
       let layout: keyboards.ActiveLayout;
       if(keyboard) {
-        layout = this.layout = keyboard.layout(device.formFactor as text.FormFactor);
+        layout = this.layout = keyboard.layout(device.formFactor as utils.FormFactor);
       } else {
         // This COULD be called with no backing keyboard; KMW will try to force-show the OSK even without 
         // a backing keyboard on mobile, using the most generic default layout as the OSK's base.
@@ -610,7 +608,7 @@ namespace com.keyman.osk {
         // In KMW's current state, it'd take a major break, though - Processor always has an activeKeyboard,
         // even if it's "hollow".
         let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
-        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as text.FormFactor);
+        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as utils.FormFactor);
       }
       this.layers=layout['layer'];
 
@@ -624,7 +622,7 @@ namespace com.keyman.osk {
       // Set flag to add default (US English) key label if specified by keyboard
       layout.keyLabels = keyboard && keyboard.displaysUnderlyingKeys;
 
-      let divLayerContainer = this.deviceDependentLayout(keyboard, device.formFactor as text.FormFactor);
+      let divLayerContainer = this.deviceDependentLayout(keyboard, device.formFactor as utils.FormFactor);
 
       this.ddOSK = true;
 
@@ -661,7 +659,12 @@ namespace com.keyman.osk {
      * @param       {string}              formFactor  layout form factor
      * @return      {Object}                          fully formatted OSK object
      */
-    deviceDependentLayout(keyboard: keyboards.Keyboard, formFactor: text.FormFactor): HTMLDivElement {
+    deviceDependentLayout(keyboard: keyboards.Keyboard, formFactor: utils.FormFactor): HTMLDivElement {
+      if(!keyboard) {
+        // May occasionally be null in embedded contexts; have seen this when iOS engine sets
+        // keyboard height during change of keyboards.
+        keyboard = new keyboards.Keyboard(null);
+      }
       let layout = keyboard.layout(formFactor);
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;

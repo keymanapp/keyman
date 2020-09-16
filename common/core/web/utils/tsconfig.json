@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "module": "none",
+    "inlineSources": true,
+    "sourceMap": true,
+    "declaration": true,
+    "target": "es5",
+    "types": ["node"],
+    "lib": ["es6"],
+    "outFile": "dist/index.js"
+  },
+  "include": [
+    "node_modules/@keymanapp/web-environment/environment.inc.ts",
+    "src/**/*.ts"
+  ]
+}

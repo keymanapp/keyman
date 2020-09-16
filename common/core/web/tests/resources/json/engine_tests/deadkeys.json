@@ -1,0 +1,1835 @@
+{
+  "specVersion": "14.0",
+  "keyboard": {
+    "id": "test_deadkeys",
+    "name": "Keyman Deadkey Stress-Tester",
+    "filename": "resources/keyboards/test_deadkeys.js",
+    "languages": {}
+  },
+  "inputTestSets": [
+    {
+      "constraint": {
+        "target": "hardware",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 66,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "b",
+                "code": "KeyB",
+                "keyCode": 66,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(a)(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 66,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "b",
+                "code": "KeyB",
+                "keyCode": 66,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 66,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "b",
+                "code": "KeyB",
+                "keyCode": 66,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 66,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "b",
+                "code": "KeyB",
+                "keyCode": 66,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(b)+(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 66,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "b",
+                "code": "KeyB",
+                "keyCode": 66,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 66,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "b",
+                "code": "KeyB",
+                "keyCode": 66,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(b)+(a)+(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 67,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "c",
+                "code": "KeyC",
+                "keyCode": 67,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "x"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 68,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "d",
+                "code": "KeyD",
+                "keyCode": 68,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 69,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "e",
+                "code": "KeyE",
+                "keyCode": 69,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(a)(d)(e)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 70,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "f",
+                "code": "KeyF",
+                "keyCode": 70,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 68,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "d",
+                "code": "KeyD",
+                "keyCode": 68,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 69,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "e",
+                "code": "KeyE",
+                "keyCode": 69,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(f)-(a)-(d)-(e)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 83,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "s",
+                "code": "KeyS",
+                "keyCode": 83,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 190,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": ".",
+                "code": "Period",
+                "keyCode": 190,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(a)-(s)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 83,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "s",
+                "code": "KeyS",
+                "keyCode": 83,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 190,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": ".",
+                "code": "Period",
+                "keyCode": 190,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(s)+(a)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 77,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "m",
+                "code": "KeyM",
+                "keyCode": 77,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 190,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": ".",
+                "code": "Period",
+                "keyCode": 190,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "dk(m)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 78,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "n",
+                "code": "KeyN",
+                "keyCode": 78,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 190,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": ".",
+                "code": "Period",
+                "keyCode": 190,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "dk(n)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 79,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "o",
+                "code": "KeyO",
+                "keyCode": 79,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 190,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": ".",
+                "code": "Period",
+                "keyCode": 190,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "dk(o)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 79,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "o",
+                "code": "KeyO",
+                "keyCode": 79,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(o)(o)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 80,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "p",
+                "code": "KeyP",
+                "keyCode": 80,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 81,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "q",
+                "code": "KeyQ",
+                "keyCode": 81,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 82,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "r",
+                "code": "KeyR",
+                "keyCode": 82,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(p)(q)(r)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 16,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Shift",
+                "code": "ShiftRight",
+                "keyCode": 16,
+                "location": 2,
+                "modifierSet": 1
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 80,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "P",
+                "code": "KeyP",
+                "keyCode": 80,
+                "location": 0,
+                "modifierSet": 1
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 16,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Shift",
+                "code": "ShiftLeft",
+                "keyCode": 16,
+                "location": 1,
+                "modifierSet": 1
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 16,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Shift",
+                "code": "ShiftLeft",
+                "keyCode": 16,
+                "location": 1,
+                "modifierSet": 1
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 16,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Shift",
+                "code": "ShiftLeft",
+                "keyCode": 16,
+                "location": 1,
+                "modifierSet": 1
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 81,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Q",
+                "code": "KeyQ",
+                "keyCode": 81,
+                "location": 0,
+                "modifierSet": 1
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 82,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "R",
+                "code": "KeyR",
+                "keyCode": 82,
+                "location": 0,
+                "modifierSet": 1
+              }
+            }
+          ],
+          "output": "(P)(Q)(R)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 51,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "3",
+                "code": "Digit3",
+                "keyCode": 51,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 190,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": ".",
+                "code": "Period",
+                "keyCode": 190,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "#3"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 81,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "q",
+                "code": "KeyQ",
+                "keyCode": 81,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 16,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Shift",
+                "code": "ShiftLeft",
+                "keyCode": 16,
+                "location": 1,
+                "modifierSet": 1
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 49,
+              "states": 10752,
+              "modifiers": 16,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "!",
+                "code": "Digit1",
+                "keyCode": 49,
+                "location": 0,
+                "modifierSet": 1
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 190,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": ".",
+                "code": "Period",
+                "keyCode": 190,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(qq)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 51,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "3",
+                "code": "Digit3",
+                "keyCode": 51,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 51,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "3",
+                "code": "Digit3",
+                "keyCode": 51,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "(3)(3)"
+        }
+      ]
+    },
+    {
+      "constraint": {
+        "target": "desktop",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(a)(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)+(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)+(a)+(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_C"
+            }
+          ],
+          "output": "x"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_D"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_E"
+            }
+          ],
+          "output": "(a)(d)(e)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_F"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_D"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_E"
+            }
+          ],
+          "output": "(f)-(a)-(d)-(e)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(a)-(s)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(s)+(a)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_M"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(m)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_N"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(n)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_O"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(o)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_P"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_Q"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_R"
+            }
+          ],
+          "output": "(p)(q)(r)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_RSHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_P"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_Q"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_R"
+            }
+          ],
+          "output": "(P)(Q)(R)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_3"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "#3"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_W"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_1"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(ww)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_4"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_4"
+            }
+          ],
+          "output": "(4)(4)"
+        }
+      ]
+    },
+    {
+      "constraint": {
+        "target": "phone",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(a)(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)+(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)+(a)+(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_C"
+            }
+          ],
+          "output": "x"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_D"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_E"
+            }
+          ],
+          "output": "(a)(d)(e)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_F"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_D"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_E"
+            }
+          ],
+          "output": "(f)-(a)-(d)-(e)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(a)-(s)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(s)+(a)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_M"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(m)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_N"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(n)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_O"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(o)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_P"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_Q"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_R"
+            }
+          ],
+          "output": "(p)(q)(r)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_P"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_Q"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_R"
+            }
+          ],
+          "output": "(P)(Q)(R)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_7"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "#7"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_R"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_1"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(rr)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_0"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_0"
+            }
+          ],
+          "output": "(0)(0)"
+        }
+      ]
+    },
+    {
+      "constraint": {
+        "target": "tablet",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(a)(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)+(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_B"
+            }
+          ],
+          "output": "(b)+(a)+(b)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_C"
+            }
+          ],
+          "output": "x"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_D"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_E"
+            }
+          ],
+          "output": "(a)(d)(e)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_F"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_D"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_E"
+            }
+          ],
+          "output": "(f)-(a)-(d)-(e)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(a)-(s)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(s)+(a)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_M"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(m)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_N"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(n)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_O"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "dk(o)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_P"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_Q"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_R"
+            }
+          ],
+          "output": "(p)(q)(r)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_P"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_Q"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_R"
+            }
+          ],
+          "output": "(P)(Q)(R)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_7"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "#7"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_R"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_1"
+            },
+            {
+              "type": "osk",
+              "layer": "shift",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_PERIOD"
+            }
+          ],
+          "output": "(rr)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_0"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_0"
+            }
+          ],
+          "output": "(0)(0)"
+        }
+      ]
+    }
+  ]
+}

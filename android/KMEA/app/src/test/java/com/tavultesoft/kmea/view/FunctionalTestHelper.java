@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 
@@ -48,12 +49,7 @@ class FunctionalTestHelper {
    */
   static void setInitialKeyboard()
   {
-    KMManager.setKeyboard(KMManager.KMDefault_PackageID,
-      KMManager.KMDefault_KeyboardID,
-      KMManager.KMDefault_LanguageID,
-      KMManager.KMDefault_KeyboardName,
-      KMManager.KMDefault_LanguageName,
-      KMManager.KMDefault_KeyboardFont, null);
+    KMManager.setKeyboard(KMManager.getDefaultKeyboard(ApplicationProvider.getApplicationContext()));
   }
 
   /**

@@ -14,8 +14,8 @@ typedef enum keyman_sentry_level_e {
 #define KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS "KeymanDeveloper.Tools"
 #define KEYMAN_SENTRY_LOGGER_DEVELOPER_IDE   "KeymanDeveloper.IDE"
 
-#define KEYMAN_SENTRY_LOGGER_DESKTOP         "KeymanDesktop"
-#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE  "KeymanDesktop.Engine"
+#define KEYMAN_SENTRY_LOGGER_DESKTOP         "KeymanWindows"
+#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE  "KeymanWindows.Engine"
 
 
 int keyman_sentry_init(bool is_keyman_developer, const char *logger);

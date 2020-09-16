@@ -226,12 +226,10 @@
             <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UnitDrawArrow.pas"/>
-        <DCCReference Include="kct\StockObjects.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationStorage.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationMessages.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\HeadingCheckListBox.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\BitmapEditor.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\StringGridEditControlled.pas"/>
@@ -310,7 +308,6 @@
             <Form>frmTikeOnlineUpdateNewVersion</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="kct\MessageDefaults.pas"/>
         <DCCReference Include="main\UfrmDownloadProgress.pas">
             <Form>frmDownloadProgress</Form>
         </DCCReference>
@@ -491,7 +488,7 @@
         <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.Debugger.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.App.pas"/>
-        <DCCReference Include="http\Keyman.Developer.System.HttpServer.Base.pas"/>
+        <DCCReference Include="..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.AppSource.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.UI.FontUtils.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas"/>
@@ -548,6 +545,7 @@
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Vcl.pas"/>
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

@@ -151,29 +151,29 @@
 						</div>
 
 						<div id="inner" onfilterchange="filterchange()">
-							<div id="hinttitle"><b><xsl:value-of select="$locale/String[@Id='S_OSK_Hint_Title']"/></b></div>
-              <div class="hint"><xsl:value-of select="$locale/String[@Id='S_OSK_Hint1']" /></div>
-              <div class="hint"><xsl:value-of select="$locale/String[@Id='S_OSK_Hint2']" /></div>
+							<div id="hinttitle"><b><xsl:value-of select="$locale/string[@name='S_OSK_Hint_Title']"/></b></div>
+              <div class="hint"><xsl:value-of select="$locale/string[@name='S_OSK_Hint1']" /></div>
+              <div class="hint"><xsl:value-of select="$locale/string[@name='S_OSK_Hint2']" /></div>
               <div class="hint">
-                <xsl:value-of select="$locale/String[@Id='S_OSK_Hint3a']" />
+                <xsl:value-of select="$locale/string[@name='S_OSK_Hint3a']" />
                 <xsl:text xml:space="preserve"> </xsl:text>
                 <img alt="icon"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>charmapicon.gif</xsl:attribute></img>
                 <xsl:text xml:space="preserve"> </xsl:text>
-                <xsl:value-of select="$locale/String[@Id='S_OSK_Hint3b']" />
+                <xsl:value-of select="$locale/string[@name='S_OSK_Hint3b']" />
               </div>
               <div class="hint">
-                <xsl:value-of select="$locale/String[@Id='S_OSK_Hint4a']" />
+                <xsl:value-of select="$locale/string[@name='S_OSK_Hint4a']" />
                 <xsl:text xml:space="preserve"> </xsl:text>
                 <img alt="icon"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>fonthinticon.gif</xsl:attribute></img>
                 <xsl:text xml:space="preserve"> </xsl:text>
-                <xsl:value-of select="$locale/String[@Id='S_OSK_Hint4b']" />
+                <xsl:value-of select="$locale/string[@name='S_OSK_Hint4b']" />
               </div>
               <div class="hint">
-                <xsl:value-of select="$locale/String[@Id='S_OSK_Hint5a']" />
+                <xsl:value-of select="$locale/string[@name='S_OSK_Hint5a']" />
                 <xsl:text xml:space="preserve"> </xsl:text>
                 <img alt="icon"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>keyboardhelpicon.gif</xsl:attribute></img>
                 <xsl:text xml:space="preserve"> </xsl:text>
-                <xsl:value-of select="$locale/String[@Id='S_OSK_Hint5b']" />
+                <xsl:value-of select="$locale/string[@name='S_OSK_Hint5b']" />
               </div>
 						</div>
 					</div>

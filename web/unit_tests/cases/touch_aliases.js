@@ -4,7 +4,7 @@ describe('TouchAliasElement', function() {
   this.timeout(kmwconfig.timeouts.standard);
 
   before(function() {
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
   });
 
   beforeEach(function() {

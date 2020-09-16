@@ -5,13 +5,13 @@
   
     <script>
       window['menuframe_activate_keepintouch'] = function() {
-        document.getElementById('keepintouch_frame').src = 'https://keyman.com/go/desktop/10.0/keep-in-touch?embed=1';
+        document.getElementById('keepintouch_frame').src = '<xsl:value-of select='/Keyman/keyman-com' />/go/windows/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/keep-in-touch?embed=1';
       }
     </script>
   
     <div class="header">
       <xsl:call-template name="header_helplinks" />
-      <xsl:value-of select="$locale/String[@Id='S_KeepInTouch']"/>
+      <xsl:value-of select="$locale/string[@name='S_KeepInTouch']"/>
     </div>
         
     <div id="subcontent_keepintouch" class="content">

@@ -117,9 +117,6 @@ const
 
   S_Title_Message = '%0:s has encountered a problem and needs to close.  We are sorry for the inconvenience.';
 
-  S_Sentry_ViewEvent_URL = // Do not localize
-    'https://sentry.keyman.com/organizations/keyman/projects/%0:s/events/%1:s/';
-
   SENTRY_PROJECT_NAME_DESKTOP = 'keyman-desktop';
   SENTRY_PROJECT_NAME_DEVELOPER = 'keyman-developer';
 
@@ -225,7 +222,7 @@ begin
   if GetKeyState(VK_CONTROL) < 0 then
     ShowMessage(Format(SClipboardMessageTech, [FAppID, FCrashID, FEventClassName, FEventMessage]))
   else if GetKeyState(VK_MENU) < 0 then
-    TUtilExecute.URL(Format(S_Sentry_ViewEvent_URL, [FProjectName, FCrashID]));
+    TUtilExecute.URL(Format(TKeymanSentryClient.S_Sentry_ViewEvent_URL, [FProjectName, FCrashID]));
 end;
 
 procedure TfrmExceptionHandler.lblPrivacyClick(Sender: TObject);

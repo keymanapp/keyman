@@ -14,7 +14,7 @@
   Todo:             
   Notes:            
   History:          06 Oct 2006 - mcdurdin - Initial version
-                    05 Dec 2006 - mcdurdin - Refactor using XMLRenderer
+                    05 Dec 2006 - mcdurdin - Refactor using XML-Renderer
                     12 Dec 2006 - mcdurdin - Capitalize form name
                     04 Jan 2007 - mcdurdin - Add proxy support
                     15 Jan 2007 - mcdurdin - Use name of file in Content-Disposition
@@ -32,20 +32,39 @@ unit UfrmInstallKeyboardFromWeb;  // I3306   // I4414
 interface
 
 uses
+  System.Classes,
   System.Contnrs,
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmWebContainer, UfrmDownloadProgress, UfrmKeymanBase;
+  System.SysUtils,
+  System.Variants,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Winapi.Messages,
+  Winapi.Windows,
+  UfrmWebContainer,
+  UfrmDownloadProgress,
+  UfrmKeymanBase;
 
 type
   TfrmInstallKeyboardFromWeb = class(TfrmWebContainer)
     dlgSaveFile: TSaveDialog;
-    procedure TntFormShow(Sender: TObject);
+    procedure TntFormCreate(Sender: TObject);
   private
-    FXML: WideString;
-    FURL: WideString;
-    FFileName: WideString;
-    procedure Download(params: TStringList);
+    FDownloadFilename: string;
+    FDownloadURL: string;
+    frmDownloadProgress: TfrmDownloadProgress;
+    FDownloadStatusText: string;
+    FDownloadStatusCode: Integer;
     procedure DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string;
+      wasHandled: Boolean);
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
+      out Handled: Boolean);
+    procedure cefLoadingStateChange(Sender: TObject; isLoading, canGoBack, canGoForward: Boolean);
+    procedure DownloadAndInstallPackage(const PackageID, BCP47: string);
+    procedure HttpReceiveData(const Sender: TObject; AContentLength,
+      AReadCount: Int64; var Abort: Boolean);
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
@@ -54,167 +73,166 @@ type
 implementation
 
 uses
+  System.Net.HttpClient,
+  System.Net.URLClient,
+  System.RegularExpressions,
+
   httpuploader,
   GlobalProxySettings,
-  UfrmInstallKeyboard,
+  Keyman.Configuration.UI.InstallFile,
+  Keyman.System.LocaleStrings,
+  kmint,
+  MessageIdentifierConsts,
   Upload_Settings,
+  utilfiletypes,
   utildir,
-  VersionInfo,
-  WideStrings,
-  GenericXMLRenderer;
+  VersionInfo;
 
 {$R *.dfm}
 
 { TfrmInstallKeyboardFromWeb }
 
-procedure TfrmInstallKeyboardFromWeb.DoDownload(AOwner: TfrmDownloadProgress;
-    var Result: Boolean);
-var
-  FDepth: Integer;
-
-  procedure DownloadFile(const URL: WideString);
-  var
-    FTempFileName: WideString;
-    FTempDir: WideString;
-    i: Integer;
-    n: Integer;
-  begin
-    if FDepth > 10 then
-    begin
-      ShowMessage('Too many redirections on attempting to load keyboard ' + URL);
-      Exit;
-    end;
-
-    FTempDir := IncludeTrailingPathDelimiter(CreateTempPath);  // I1679
-
-    Inc(FDepth);
-    try
-      with THTTPUploader.Create(AOwner) do
-      try
-        OnCheckCancel := AOwner.HTTPCheckCancel;
-        OnStatus := AOwner.HTTPStatus;
-        Request.Agent := API_UserAgent;
-        Proxy.Server := GetProxySettings.Server;
-        Proxy.Port := GetProxySettings.Port;
-        Proxy.Username := GetProxySettings.Username;
-        Proxy.Password := GetProxySettings.Password;
-        //Request.Protocol := Upload_Protocol;
-        //Request.HostName := Upload_Server;
-        Request.SetURL(URL);// UrlPath := URL;
-        Upload;
-        if Response.StatusCode = 200 then
-        begin
-          n := LastDelimiter('/', Request.UrlPath);
-          if n = 0 then
-          begin
-            ShowMessage('Unable to download file - not a recognised Keyman file: '+Request.URL);
-            Exit;
-          end;
-
-          if Response.ContentDispositionFilename <> '' then
-            FTempFileName := FTempDir + string(Response.ContentDispositionFilename)  // I3310
-          else if FFileName <> '' then
-            FTempFileName := FTempDir + FFileName
-          else
-            FTempFileName := FTempDir + Copy(Request.UrlPath, n+1, Length(Request.UrlPath));
-          n := Pos('?', FTempFileName);
-          if n > 0 then Delete(FTempFileName, n, MAXINT);
-
-          try
-            try
-              with TFileStream.Create(FTempFileName, fmCreate) do
-              try
-                Write(Response.PMessageBody^, Response.MessageBodyLength);
-              finally
-                Free;
-              end;
-            except
-              on E:EFOpenError do
-              begin
-                ShowMessage('Unable to download file: '+E.Message);
-                Exit;
-              end;
-            end;
-
-            if InstallFile(Self, FTempFileName, False, False, '') then Result := True;   // I4414
-          finally
-            if FileExists(FTempFileName) then
-              DeleteFile(FTempFileName);
-          end;
-        end
-        else if Response.StatusCode = 302 then
-        begin
-          with TStringList.Create do
-          try
-            Text := string(Response.Headers);  // I3310
-            for i := 0 to Count - 1 do
-            begin
-              n := Pos(':', Strings[i]);
-              if n > 0 then
-                Strings[i] := Copy(Strings[i], 1, n-1)+'='+Trim(Copy(Strings[i], n+1, Length(Strings[i])));
-            end;
-
-            if Values['Location'] <> '' then
-            begin
-              DownloadFile(Values['Location']);
-              Exit;
-            end;
-          finally
-            Free;
-          end;
-        end
-        else
-          ShowMessage('Unable to load : '+Request.URL+' ... '+IntToStr(Response.StatusCode));
-      finally
-        Free;
-      end;
-    finally
-      Dec(FDepth);
-      DeleteTempPath(FTempDir);
-    end;
-  end;
-
-begin
-  Result := False;
-  FDepth := 0;
-  DownloadFile(FURL);
-end;
-
-procedure TfrmInstallKeyboardFromWeb.Download(params: TStringList);
-begin
-  FURL := params.Values['url'];
-  FFilename := params.Values['filename'];
-
-  with TfrmDownloadProgress.Create(Self) do
-  try
-    Callback := DoDownload;
-    if ShowModal=mrOk then Self.ModalResult := mrOk;
-  finally
-    Free;
-  end;
-end;
-
 procedure TfrmInstallKeyboardFromWeb.FireCommand(const command: WideString;
   params: TStringList);
 begin
-  if command = 'download' then
-  begin
-    Download(params);
-  end
-  else if command = 'footer_cancel' then
+  if command = 'footer_cancel' then
     ModalResult := mrCancel
   else
     inherited;
 end;
 
-procedure TfrmInstallKeyboardFromWeb.TntFormShow(Sender: TObject);
+procedure TfrmInstallKeyboardFromWeb.TntFormCreate(Sender: TObject);
 begin
+  inherited;
   // Ensures keyman.com hosted site opens locally
   cef.ShouldOpenRemoteUrlsInBrowser := False;
-  XMLRenderers.RenderTemplate := 'DownloadKeyboard.xsl';
-  XMLRenderers.Add(TGenericXMLRenderer.Create(FXML + '<Version>'+GetVersionString+'</Version>'));  // I1366 - Add version info
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnLoadingStateChange := cefLoadingStateChange;
+
+  FRenderPage := 'downloadkeyboard';
+
   Content_Render;
-  inherited;
 end;
+
+procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
+begin
+  Handled := TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsInstall);
+end;
+
+procedure TfrmInstallKeyboardFromWeb.cefLoadingStateChange(Sender: TObject;
+  isLoading, canGoBack, canGoForward: Boolean);
+begin
+  if not isLoading then
+  begin
+    if canGoBack
+      then cef.cef.ExecuteJavaScript('updateBackButtonState(true)', cef.cef.Browser.MainFrame.Url)
+      else cef.cef.ExecuteJavaScript('updateBackButtonState(false)', cef.cef.Browser.MainFrame.Url);
+  end;
+end;
+
+procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
+var
+  m: TMatch;
+  uri: TURI;
+  BCP47: string;
+  PackageID: string;
+begin
+
+  m := TRegEx.Match(Url, UrlPath_RegEx_MatchKeyboardsInstall);
+  if m.Success then
+  begin
+    // We want to install the keyboard found in the path.
+    PackageID := m.Groups[1].Value;
+    uri := TURI.Create(url);
+
+    try
+      BCP47 := uri.ParameterByName['bcp47'];
+    except
+      // Sadly TURI does not have a TryGet pattern for parameters
+      on E:ENetURIException do BCP47 := '';
+    end;
+
+    DownloadAndInstallPackage(PackageID, BCP47);
+  end;
+end;
+
+procedure TfrmInstallKeyboardFromWeb.DownloadAndInstallPackage(const PackageID, BCP47: string);
+var
+  FTempDir: string;
+begin
+  FTempDir := IncludeTrailingPathDelimiter(CreateTempPath);  // I1679
+  try
+    FDownloadFilename := FTempDir + PackageID + Ext_PackageFile;
+    FDownloadURL := KeymanCom_Protocol_Server + URLPath_PackageDownload(PackageID, BCP47, False);
+
+    frmDownloadProgress := TfrmDownloadProgress.Create(Self);
+    try
+      frmDownloadProgress.Callback := DoDownload;
+      if frmDownloadProgress.ShowModal <> mrOk then
+      begin
+        ShowMessage(TLocaleStrings.MsgFromIdFormat(kmcom, S_DownloadKeyboard_DownloadError, [FDownloadStatusText, FDownloadStatusCode]));
+        Exit;
+      end;
+    finally
+      frmDownloadProgress.Free;
+    end;
+
+    if TInstallFile.Execute(Self, FDownloadFilename, False, False, '', BCP47) then
+      ModalResult := mrOk;
+
+  finally
+    if FileExists(FDownloadFilename) then
+      System.SysUtils.DeleteFile(FDownloadFilename);
+    DeleteTempPath(FTempDir);
+  end;
+
+end;
+
+procedure TfrmInstallKeyboardFromWeb.HttpReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
+begin
+  frmDownloadProgress.HTTPStatus(nil, 'Downloading '+ExtractFileName(FDownloadFilename), AReadCount, AContentLength);
+  frmDownloadProgress.HTTPCheckCancel(nil, Abort);
+end;
+
+procedure TfrmInstallKeyboardFromWeb.DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
+var
+  Client: THTTPClient;
+  Stream: TStream;
+  Response: IHTTPResponse;
+  FTempFilename: string;
+begin
+  Result := False;
+  FTempFilename := FDownloadFilename + '.download';
+  Client := THTTPClient.Create;
+  try
+    Client.OnReceiveData := HttpReceiveData;
+
+    Stream := TFileStream.Create(FTempFilename, fmCreate);
+    try
+      Response := Client.Get(FDownloadURL, Stream);
+      Result := Response.StatusCode = 200;
+      FDownloadStatusText := Response.StatusText;
+      FDownloadStatusCode := Response.StatusCode;
+    finally
+      Stream.Free;
+    end;
+
+    if FileExists(FTempFilename) then
+    begin
+      if Result then
+      begin
+        if FileExists(FDownloadFilename) then
+          System.SysUtils.DeleteFile(FDownloadFilename);
+        RenameFile(FTempFilename, FDownloadFilename);
+      end
+      else
+        System.SysUtils.DeleteFile(FTempFilename);
+    end;
+  finally
+    Client.Free;
+  end;
+end;
+
 
 end.

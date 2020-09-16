@@ -1,5 +1,533 @@
 # Keyman Version History
 
+## 14.0.143 alpha 2020-09-16
+
+* fix(android/app): Validate language selection for "INSTALL" button (#3579)
+
+## 14.0.142 alpha 2020-09-15
+
+* chore(deps): bump node-fetch from 2.6.0 to 2.6.1 in /resources/build/version (#3578)
+
+## 14.0.141 alpha 2020-09-11
+
+* fix(web): default layout shift not changing layer (#3574)
+
+## 14.0.140 alpha 2020-09-09
+
+* feat(common/models): core edit-distance calculation class (#3526)
+* feat(common/models): Edit path derivation (#3547)
+* feat(common/models):  low-level correction-algorithm infrastructure (#3527)
+* feat(common/models): correction-search algorithm core (#3534)
+
+## 14.0.139 alpha 2020-09-04
+
+* fix(windows): BCP 47 tag canonicalization (#3545)
+* fix(windows): upgrade of profiles from 13.0 (#3552)
+
+## 14.0.138 alpha 2020-09-02
+
+* feat(windows): map installed bcp47 (#3542)
+* fix(windows): simplify profile uninstall (#3543)
+* fix(android/app): Remove unused intent ACTION_GET_USERDATA (#3551)
+* fix(android/engine): Remove notification after installing kbd package (#3546)
+* fix(android): Re-enable monitoring of Application Not Responding (ANR) (#3550)
+
+## 14.0.137 alpha 2020-08-31
+
+* fix(android/engine): Fix package filename when downloading from cloud (#3541)
+* feat(windows): select language at keyboard install (#3524)
+* feat(windows): add langtags.json data (#3529)
+* fix(windows): add transient profile support to keyman32 (#3539)
+
+## 14.0.136 alpha 2020-08-28
+
+* fix(android/app): Inject meta viewport tag for viewing help (#3523)
+* fix(android/app): Fix overflow menu for hdpi devices (#3532)
+* feat(windows): Rework of profile installation - Engine (#3509)
+* feat(windows): profile installation - Keyman for Windows (#3510)
+* feat(windows): profile installation - Support Tool (#3511)
+* chore(windows): remove stockeditor (#3516)
+* fix(windows): refresh configuration after changes (#3517)
+* feat(windows): split language registration on app install (#3520)
+* fix(linux): Improve robustness when installing ibus-keyman (#3535)
+
+## 14.0.135 alpha 2020-08-27
+
+* feat(common/models): override script defaults: spaces break words (#3506)
+* fix(android/engine): Check asset package version before installing (#3514)
+* feat(android): Use Stepper for navigating package installation steps (#3498)
+
+## 14.0.134 alpha 2020-08-26
+
+* [linux] Add packaging of Linux localization files (#3504)
+
+## 14.0.133 alpha 2020-08-25
+
+* feat(common/models): lexicon traversal (#3479)
+* feat(common/models):  actual priority queue for Trie models (#3480)
+* feat(common/models): efficient batch-enqueue (#3486)
+
+## 14.0.132 alpha 2020-08-24
+
+* feat(linux): Small UI improvements (#3495)
+
+## 14.0.131 alpha 2020-08-21
+
+* feat(android/app): Add language picker for keyboard package installation (#3481)
+
+## 14.0.130 alpha 2020-08-19
+
+* fix(android): Fix util to getting the tier on CI builds (#3491)
+
+## 14.0.129 alpha 2020-08-17
+
+* feat(windows): rework download keyboard dialog style (#3463)
+* chore: Add sample vscode settings files (#3249)
+* fix(linux): Lookup language tag from keyboard (#3408)
+
+## 14.0.128 alpha 2020-08-13
+
+* feat(linux): Hook up Sentry for km-config (#3378)
+* chore(linux): Use new staging site names and use variable for downloads.keyman.com (#3406)
+
+## 14.0.127 alpha 2020-08-12
+
+* refactor(common/models): LMLayer state management tweak, persistent ModelCompositor (#3477)
+
+## 14.0.126 alpha 2020-08-10
+
+* fix(android): Add CI script to publish to Play Store (#3469)
+* fix(android): Update sentry plugin to remove obsolete API  use (#3471)
+* feat(ios/app): universal links for keyboard installation (#3466)
+* fix(ios/engine): Proper associating-installer deinitialization, cancellation tests (#3468)
+* refactor(ios): error definitions, i18n (#3470)
+* chore: cleanup keyboardprocessor.h.in (#3473)
+
+## 14.0.125 alpha 2020-08-07
+
+* fix(android): Update Gradle wrapper to 5.6.4 (#3467)
+* feat(ios/engine): Associating package installer (#3458)
+* feat(ios/app):  Associating package installer use within existing install paths (#3465)
+
+## 14.0.124 alpha 2020-08-06
+
+* feat(windows): set default UI language at install (#3438)
+* feat(windows): i18n for Setup (#3444)
+* feat(windows): add globe icon to Configuration UI (#3446)
+* feat(windows): set UI language from Setup preference on first install (#3447)
+* feat(windows): docs on editing translations (#3448)
+* Modify/android/improve string context (#3457)
+* fix(android/app): Fix environment portion of app version string (#3462)
+
+## 14.0.123 alpha 2020-08-05
+
+* feat(android): Use staging help site for pre-release builds (#3453)
+* fix(android): Cleanup string formatting with strings.xml (#3452)
+* chore(android): Add script to find unused strings. Manually remove them (#3456)
+* feat(ios/engine): LanguagePickAssociator progress tracking, base integration with package lang picker (#3455)
+
+## 14.0.122 alpha 2020-08-04
+
+* feat(android/app): Associate app with /keyboards/install links (#3449)
+* fix(android): Update KMPBrowser to pass external links to user browser (#3439)
+* feat(ios/engine): Language-pick associator (#3451)
+
+## 14.0.121 alpha 2020-08-03
+
+* fix(android): Fix KMTextView to compile on Linux (#3442)
+
+## 14.0.120 alpha 2020-07-31
+
+* feat(android): Use api.keyman-staging.com for pre-release builds (#3423)
+* refactor(ios/engine): merges keyboard & lexical model info views, fixes QR code logic (#3432)
+* feat(android): Add app association to keyman.com (#3431)
+* chore(windows): cleanup comments in strings.xml (#3434)
+* feat(ios/engine): language selection during (file-based) package installation (#3416)
+* feat(ios/engine) Package-installer layout optimizations (#3437)
+
+## 14.0.119 alpha 2020-07-30
+
+* feat(windows): convert locale.xml to strings.xml format (#3424)
+* refactor(windows): add translations to windows install (#3428)
+* refactor(windows): remove old locale links (#3429)
+* chore(windows): remove old locale tools (#3430)
+* feat(ios): Start of engine and app internationalization (#2745)
+
+## 14.0.118 alpha 2020-07-29
+
+* fix(android/app): Use go/android/ links to download cloud keyboards (#3343)
+* fix(windows): i18n of strings in Font Helper (#3414)
+* refactor(windows): refactor Dialog elements (#3421)
+* chore(windows): Remove usage page resources (#3422)
+
+## 14.0.117 alpha 2020-07-28
+
+* feat(windows): i18n groundwork (#3411)
+* feat(windows): Removes unused strings from locale.xml (#3412)
+* refactor(ios/engine): package installer tweaks (#3410)
+* chore(ios/engine): more obsoletions (#3407)
+
+## 14.0.116 alpha 2020-07-24
+
+* refactor(ios/engine): builds package download links (#3383)
+* refactor(ios/engine): chained lexical model install callback, fix (#3388)
+* feat(ios/engine): download queue concurrency (#3395)
+* feat(ios/engine): keyboard search core (#3384)
+* feat(ios/engine): support for deferred chaining of lexical model downloads (#3401)
+* docs(linux): Update readme (#3397)
+* feat(ios/engine): use of Keyman staging sites (#3405)
+* feat(linux): keyman:// protocol handler (#3398)
+* chore(ios/engine): dead code removal + deprecations (#3402)
+
+## 14.0.115 alpha 2020-07-23
+
+* feat(windows): keyman: protocol handler (#3382)
+* feat(developer/compilers): logging errors and warnings in the lexical model compiler (#3385)
+
+## 14.0.114 alpha 2020-07-22
+
+* chore(deps): bump lodash from 4.17.15 to 4.17.19 in /web/testing/regression-tests (#3360)
+
+## 14.0.113 alpha 2020-07-21
+
+* refactor(ios/engine): update detection now based upon packages (#3362)
+* refactor(ios/engine): package download notifications (#3363)
+* refactor(ios/engine): package-based resource updates, cloud resource migration (#3372)
+* fix(ios/engine): engine tier enum, proper detection (#3373)
+* refactor(ios/engine): Centralized Keyman domain definitions (#3381)
+* fix(linux): Use language from search when installing keyboard (#3290)
+* refactor(linux): Small refactorings (#3376)
+* refactor(developer/compilers): reading from a wordlist (#3380)
+
+## 14.0.112 alpha 2020-07-20
+
+* refactor(ios/engine): package-version query caching + package state properties (#3335)
+* refactor(ios/engine): keyboard downloads now retrieve KMPs (#3341)
+* refactor(ios/engine):  download queue & download state detection cleanup (#3342)
+* chore(developer): cleanup test constants (#3350)
+* change(common/models/wordbreakers): update word boundary props to 13.0 (#3365)
+* feat(linux): Use staging URLs for alpha version (#3364)
+
+## 14.0.111 alpha 2020-07-16
+
+* fix(android/engine): Update deprecated call to switch system keyboard for Android P (#3353)
+
+## 14.0.110 alpha 2020-07-15
+
+* refactor(developer): hashmap-based wordlist compilation (#3340)
+* chore(linux): Add license details for kmpdetails.* (#3355)
+
+## 14.0.109 alpha 2020-07-14
+
+* refactor(ios/engine): lexical model query & download rework (#3327)
+* refactor(ios/engine): hashable package keys (#3333)
+* fix(ios/engine): version equality (#3334)
+* refactor(linux): make some methods protected (#3291)
+* feat(android/oem): Add nrc.str.sencoten model and update SystemKeyboard from KMAPro (#3332)
+
+## 14.0.108 alpha 2020-07-09
+
+* chore: cleanup global ExtPath (#3315)
+* feat(android): Use build-download-resources.sh for KMApro and FV apps (#3322)
+* refactor(ios/engine): Centralized package download utility function (#3299)
+* fix(android/oem): Add a fallback keyboard to FV Android app (#3323)
+
+## 14.0.107 alpha 2020-07-08
+
+* feat(android): Add additional info on installed keyboards exceptions (#3319)
+
+## 14.0.106 alpha 2020-07-04
+
+* fix(android/app) Download associated dictionary when installing cloud keyboard package (#3307)
+
+## 14.0.105 alpha 2020-07-03
+
+* feat(android): Download default resources at build time (#3300)
+* fix(android/engine): Fix unbound variable in build script (#3308)
+
+## 14.0.104 alpha 2020-07-01
+
+* fix(android): Resize PackageActivity title text (#3297)
+
+## 14.0.103 alpha 2020-06-30
+
+* fix(common/core/web): fixes transcription buffer cap (#3301)
+
+## 14.0.102 alpha 2020-06-29
+
+* fix(android): Use tier to determine keyboard search host (#3296)
+* refactor(ios/engine): Resource download cleanup and mocking prep (#3292)
+* refactor(ios/engine): ID-based download tracking, update notification rework (#3295)
+
+## 14.0.101 alpha 2020-06-26
+
+* feat(linux): address code review comments of #3278 (#3281)
+* fix(linux): Always restart IBus when installing keyboard (#3284)
+* refactor(linux): cleanup code (#3286)
+* fix(linux): Fix crash converting kvk into LDML (#3288)
+* feat(ios/engine): package-version query implementation (#3280)
+
+## 14.0.100 alpha 2020-06-25
+
+* refactor(ios/engine): Download notifications via completion blocks (#3274)
+* refactor(ios/engine): better resource type links (#3276)
+* refactor(ios/engine): Resource-download installation closures (#3277)
+* feat(linux): Install keyboard on Gnome (#3278)
+
+## 14.0.99 alpha 2020-06-24
+
+* feat(ios/engine): adds getInstalledPackage(for:) (#3270)
+* refactor(linux): address code review comments of #3272 (#3275)
+
+## 14.0.98 alpha 2020-06-23
+
+* refactor(ios/engine): reworks download queue objects (#3267)
+* feat(linux): Improve Linux package description (#3268)
+
+## 14.0.97 alpha 2020-06-22
+
+* feat(android): Implement menu to add language for installed keyboard pkg (#3255)
+* fix(mac/resources): altool is failing but we lose the log in CI (#3264)
+* refactor(ios/engine): more notification rework prep (#3262)
+* fix(mac): altool second call report ci errors (#3265)
+* refactor(ios/engine): more dead code removal (#3266)
+
+## 14.0.96 alpha 2020-06-19
+
+* fix(ios/engine): fixes keyboard swapping (#3259)
+* fix(common/resources): shebang for lerna-based Linux builds (#3260)
+* refactor(ios/engine): Notification rework prep, simplification (#3261)
+
+## 14.0.95 alpha 2020-06-19
+
+* feat(android/app): Consolidate install menus (#3245)
+* change(ios/engine): migrates legacy cloud resources to KMP format (#3237)
+* change(ios/engine): Default resource update (#3244)
+* fix(ios/engine): migration of preload-sourced resources (#3247)
+* refactor(common/resources): web-environment package (#3248)
+* chore(linux): Add some unit tests for keyman_config (#3250)
+* chore(linux): Update automatically installed dependencies (#3254)
+* fix(common/resources): web-environment package-lock.json (#3256)
+
+## 14.0.94 alpha 2020-06-16
+
+* feat(linux): Add onboard as recommended package (#3241)
+
+## 14.0.93 alpha 2020-06-15
+
+* fix(developer/ide): double click to change layer update combo (#3240)
+* fix(developer/ide): fix copy and paste in touch editor (#3238)
+
+## 14.0.92 alpha 2020-06-12
+
+* change(ios/engine): Package migration prep (#3229)
+* chore: labeler (#3233)
+* feat(android/engine): Migrate cloud keyboards when updating keyboard package (#3221)
+* refactor(ios/engine): explicitly synchronous Package processing (#3230)
+* feat(ios/engine): KeymanPackage now parses its ID (#3234)
+* fix(windows): sentry exception reports (#3235)
+
+## 14.0.91 alpha 2020-06-11
+
+* chore(android): Remove google-services and update readme (#3228)
+
+## 14.0.90 alpha 2020-06-10
+
+* refactor(ios/engine): Language resource + keying polymorphism (#3220)
+* refactor(ios): Selective resource installation via abstraction (#3207)
+* feat(ios/engine): Generation of kmp.json for non-package resources (#3212)
+
+## 14.0.89 alpha 2020-06-09
+
+* fix(android/engine): Revise updateOldKeyboardsList (#3216)
+* feat(ios/engine): embedded KeymanWeb engine Sentry use (#3218)
+* feat(android): Handle model picker updates (#3209)
+
+## 14.0.88 alpha 2020-06-08
+
+* modify(android/samples): Update addKeyboard syntax for Sample and Test apps (#3213)
+* fix(linux): Restart km-config after installing keyboard (#3214)
+
+## 14.0.87 alpha 2020-06-05
+
+* fix(developer/compilers): normalise touch layout on compile (#3203)
+* feat(android): Add utility to check BCP47 equivalence (#3210)
+* refactor(ios/engine): KMP installation now relies on KeymanPackage class, parses (#3205)
+* refactor(ios/engine): Abstraction of KMP installation methods (#3206)
+* feat(linux): Make two windows modal dialogs (#3211)
+
+## 14.0.86 alpha 2020-06-02
+
+* fix(ios): fixes lerna concurrency workaround and missing func reference (#3192)
+* fix(android/engine): Use available models for ModelPickerActivity() (#3191)
+* feat(android): Add system globe action to show system keyboards (#3197)
+* feat(linux): Open a .kmp file in km-config (#3183)
+* refactor(ios/engine): kmp.json - Keyboard info deserialization (#3193)
+* refactor(ios/engine): kmp.json - Lexical model info deserialization  (#3195)
+* feat(ios/engine): kmp.json - full deserialization (#3198)
+* fix(android): Add wrapper for logging errors & exceptions (#3196)
+* fix(oem/fv/ios): new certificate (#3201)
+
+## 14.0.85 alpha 2020-05-30
+
+* modify(android/engine): Clean up naming for formatting QR code URL (#3187)
+
+## 14.0.84 alpha 2020-05-29
+
+* change(web): Selective Sentry uploads (#3163)
+* refactor(ios/engine): Polishes HTTPDownloader to prep for unit testing (#3179)
+* feat(ios/engine): HTTPDownloader unit testing (#3180)
+*  fix(linux): Disable buttons if no keyboard installed (#3184)
+* change(ios/engine):  Removes unused, deprecated JS/JSON-based adhoc install code (#3186)
+* change(common/lmlayer): move joiner from LMLayer to model compiler (#3071)
+
+## 14.0.83 alpha 2020-05-28
+
+* change(ios): Selective Sentry uploads (#3162)
+* Fix/android/package updates (#3175)
+* fix(common/models/types): fixes models-types build script, sets std header (#3182)
+
+## 14.0.82 alpha 2020-05-27
+
+* fix(ios): fixes build warning on Error coersion, fixes logged error for intermediate embedded state (#3173)
+* fix(linux): Don't fail (un-)install if running multiple ibus (#3169)
+* chore(linux): Update maintainer in package metadata (#3168)
+* feat(linux): Improve appstream metadata (#3176)
+
+## 14.0.81 alpha 2020-05-27
+
+* refactor(resources): convert gosh into npm package 🙃 (#3159)
+* chore(common,web): use consistent TypeScript dep on all packages (#3158)
+* chore(common/resources): add `common/models` to build trigger definitions (#3144)
+* fix(common): adds package-lock.json for gosh package (#3171)
+
+## 14.0.80 alpha 2020-05-25
+
+* fix(android/engine): Remove LanguageListUtil (#3155)
+* refactor(common/lmlayer): create package: @keymanapp/models-templates (#3128)
+
+## 14.0.79 alpha 2020-05-22
+
+* fix(android): Fix system keyboard globe button override (#3140)
+* fix(web/utils): use build script to generate environment.inc.ts (#3146)
+* change(common/core/web,web): update deps to @keymanapp/models-types (#3147)
+
+## 14.0.78 alpha 2020-05-21
+
+* refactor(common/models): factor out word breakers to their own package (#3125)
+* fix(developer): crash when developer starts (#3138)
+* modify(android): Refactor KeyboardPickerActivity (#3113)
+* chore(common/resources): cleanup scopes (#3139)
+* feat(web): starts proper KMW Sentry integration (#3122)
+* refactor(common/models/types): rename @keymanapp/lexical-model-types => @keymanapp/models-types (#3143)
+* change(web/utils): add and distribute type declaration (#3145)
+* fix(common): drops version updates for deprecated common/lexical-model-types (#3148)
+
+## 14.0.77 alpha 2020-05-19
+
+* refactor(web/engine): Moves common utility functions into separate `web-utils` package (#3130)
+* refactor(web/engine): renames DeviceSpec, moves to utils (#3132)
+* fix(ios): Fixes keyboard metadata decoding, tweaks to project files  (#3137)
+* feat(windows): Use http: instead of file: for Configuration UI (#3127)
+
+## 14.0.76 alpha 2020-05-15
+
+* fix(windows): use correct name for Sentry in C++ (#3129)
+* chore: Allow to override hook defs (#3112)
+
+## 14.0.75 alpha 2020-05-13
+
+* feat(android): Add Tamil lexical model to KMSample2 (#3123)
+
+## 14.0.74 alpha 2020-05-11
+
+* fix(windows): kmbrowserhost was missing debug info (#3117)
+
+## 14.0.73 alpha 2020-05-11
+
+* fix(windows): force output keystroke failure (#3083)
+* fix(windows): kmshell title and kmbrowserhost sentry (#3115)
+
+## 14.0.72 alpha 2020-05-08
+
+* fix(ios/oem): Fixes FV app's system keyboard (#3105)
+* fix(ios/oem): FV light mode lock and basic banner fix (#3108)
+* fix(windows): sentry cef shutdown interactions (#3107)
+* feat(android): Migrate installed keyboards list to keyboards_list.json (#3091)
+
+## 14.0.71 alpha 2020-05-08
+
+* fix(windows): use consistent sentry db location (#3100)
+
+## 14.0.70 alpha 2020-05-07
+
+* fix(android): Fix back button after System Keyboard dismissed (#3093)
+* fix(android): Back button to dismiss KMSample2 system keyboard (#3095)
+* fix(oem): Back button to dismiss FV Android system keyboard (#3096)
+
+## 14.0.69 alpha 2020-05-06
+
+* fix(common): npm install required for auto inc lerna versions (#3089)
+* fix(windows): sentry x64 stacks truncated pointers (#3087)
+
+## 14.0.68 alpha 2020-05-06
+
+* fix(common): enable build for win x64, use global VERSION.md and fix decxstr() bug (#3076)
+* modify(android): Add methods to go between LanguageResource and JSON (#3079)
+* feat(common): auto-update for package versioning (#3078)
+
+## 14.0.67 alpha 2020-05-05
+
+* fix(ios): Additional libraries for FirstVoices SWKeyboard (#3080)
+
+## 14.0.66 alpha 2020-05-04
+
+* feat(web): test Recorder overhaul, Node-based tests using Recorder for KeyboardProcessor (#3060)
+* fix(ios): fv add sentry framework to carthage build step (#3074)
+
+## 14.0.65 alpha 2020-05-03
+
+* fix(ios): try embed of sentry again for fv (#3072)
+
+## 14.0.64 alpha 2020-05-01
+
+* fix(ios): add sentry framework to fv keyboards (#3069)
+
+## 14.0.63 alpha 2020-05-01
+
+* fix(android): Fix FileUtilsTest to be cross-platform (#3061)
+* fix(windows): add LARGEADDRESSAWARE flag for all CEF processes (#3064)
+* Fix/android/remove more custom (#3051)
+* fix(ios): FV settings bundle for SWKeyboard (#3066)
+* change(common/lmlayer): single-pass join word breaker decorator (#3059)
+
+## 14.0.62 alpha 2020-05-01
+
+* modify(oem): Update DSN for FV Android app (#3050)
+* feat(web/engine): Basic KeyboardProcessor tests (#2994)
+* fix(oem,common): Update FirstVoices build_keyboards.sh script (#3045)
+
+## 14.0.61 alpha 2020-04-30
+
+* chore(deps): bump @actions/http-client from 1.0.3 to 1.0.8 in /resources/build/version (#3047)
+* fix(ios): firstvoices icon and version info (#3044)
+* feat(windows): Sentry integration fixes and polish (#3006)
+* feat(common/lmlayer): compile joinWordsAt property (#3032)
+
+## 14.0.60 alpha 2020-04-29
+
+* feat(common): initial use of lerna (in-repo package links only) (#2997)
+* change(web/engine): spins core/web/keyboard-processor package off from KeymanWeb (#3001)
+* change(web/engine): spins core/web/input-processor package off from KeymanWeb (#3008)
+* chore(common/lmlayer): change author from personal to work affiliation (#3046)
+
+## 14.0.59 alpha 2020-04-29
+
+* chore: merge stable history (#3037)
+* feat(common/lmlayer): create join word breaker decorator (#3021)
+* fix(ios): download fv keyboards (#3040)
+* modify(android): Refactor LanguageResource() and remove "Custom" property (#3033)
+
 ## 14.0.58 alpha 2020-04-28
 
 * change(common/lmlayer): improvements to default searchTermToKey (#3024)

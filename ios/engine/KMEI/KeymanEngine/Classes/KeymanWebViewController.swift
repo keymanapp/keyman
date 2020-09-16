@@ -10,7 +10,7 @@ import UIKit
 import WebKit
 import AudioToolbox
 
-private let keyboardChangeHelpText = "Tap here to change keyboard"
+private let keyboardChangeHelpText = NSLocalizedString("keyboard-help-change", bundle: engineBundle, comment: "")
 
 private let subKeyColor = Colors.popupKey
 private let subKeyColorHighlighted = Colors.popupKeyHighlighted
@@ -238,14 +238,14 @@ extension KeymanWebViewController {
     webView!.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
   }
 
-  private func fontObject(from font: Font?, keyboardID: String, isOsk: Bool) -> [String: Any]? {
+  private func fontObject(from font: Font?, keyboard: InstallableKeyboard, isOsk: Bool) -> [String: Any]? {
     guard let font = font else {
       return nil
     }
     // family does not have to match the name in the font file. It only has to be unique.
     return [
-      "family": "\(keyboardID)__\(isOsk ? "osk" : "display")",
-      "files": font.source.map { storage.fontURL(forKeyboardID: keyboardID, filename: $0).absoluteString }
+      "family": "\(keyboard.id)__\(isOsk ? "osk" : "display")",
+      "files": font.source.map { storage.fontURL(forResource: keyboard, filename: $0)!.absoluteString }
     ]
   }
 
@@ -257,8 +257,13 @@ extension KeymanWebViewController {
       "KL": keyboard.languageName,
       "KF": storage.keyboardURL(for: keyboard).absoluteString
     ]
-    let displayFont = fontObject(from: keyboard.font, keyboardID: keyboard.id, isOsk: false)
-    let oskFont = fontObject(from: keyboard.oskFont, keyboardID: keyboard.id, isOsk: true) ?? displayFont
+
+    if let packageID = keyboard.packageID {
+      stub["KP"] = packageID
+    }
+
+    let displayFont = fontObject(from: keyboard.font, keyboard: keyboard, isOsk: false)
+    let oskFont = fontObject(from: keyboard.oskFont, keyboard: keyboard, isOsk: true) ?? displayFont
     if let displayFont = displayFont {
       stub["KFont"] = displayFont
     }
@@ -565,7 +570,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
           if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
             newKb = kb
           }
-        } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
+        }
+
+        // Failsafe in case the previous lookup fails - at least load A keyboard.
+        if newKb == nil, let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
           newKb = userKbs[0]
         }
       }

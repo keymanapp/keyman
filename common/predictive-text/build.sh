@@ -28,7 +28,6 @@ WORKER_OUTPUT=build/intermediate
 INCLUDES_OUTPUT=build/includes
 NAKED_WORKER=$WORKER_OUTPUT/index.js
 EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
-LEXICAL_MODELS_TYPES=../lexical-model-types
 
 # Builds the top-level JavaScript file for use in browsers (the second stage of compilation)
 build-browser () {
@@ -85,13 +84,14 @@ clean ( ) {
 }
 
 display_usage ( ) {
-  echo "Usage: $0 [-clean] [-test | -tdd]"
+  echo "Usage: $0 [-clean] [-skip-package-install | -S] [-test | -tdd]"
   echo "       $0 -help"
   echo
-  echo "  -clean              to erase pre-existing build products before a re-build"
-  echo "  -help               displays this screen and exits"
-  echo "  -tdd                skips dependency updates, builds, then runs unit tests only"
-  echo "  -test               runs unit and integration tests after building"
+  echo "  -clean                 to erase pre-existing build products before a re-build"
+  echo "  -help                  displays this screen and exits"
+  echo "  -skip-package-install  (or -S) skips dependency updates"
+  echo "  -tdd                   skips dependency updates, builds, then runs unit tests only"
+  echo "  -test                  runs unit and integration tests after building"
 }
 
 # Creates embedded_worker.js. Must be run after the worker is built for the
@@ -135,7 +135,7 @@ wrap-worker-code ( ) {
 ################################ Main script ################################
 
 run_tests=0
-fetch_deps=1
+fetch_deps=true
 unit_tests_only=0
 
 # Process command-line arguments
@@ -149,12 +149,15 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit
       ;;
+    -skip-package-install|-S)
+      fetch_deps=false
+      ;;
     -test)
       run_tests=1
       ;;
     -tdd)
       run_tests=1
-      fetch_deps=0
+      fetch_deps=false
       unit_tests_only=1
       ;;
     *)
@@ -166,17 +169,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Check if Node.JS/npm is installed.
-type npm >/dev/null ||\
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-
-if (( fetch_deps )); then
-  # Before installing, ensure that the local npm package we need can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
-
-  echo "Dependencies check"
-  npm install --no-optional
-fi
-
+verify_npm_setup $fetch_deps
 
 # Ensure that the build-product destination for any generated include .d.ts files exists.
 if ! [ -d $INCLUDES_OUTPUT ]; then

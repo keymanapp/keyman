@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -43,35 +44,9 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
     //        should instead refer to this adapter.)
     super(context, KEYBOARD_LAYOUT_RESOURCE, adapter, new AdapterFilter<Keyboard, Dataset.Keyboards, Void>() {
 
-      // Yeah, so this is a MASSIVE hack.  Right now, it's either this or refactor up to 60
-      // separate references to keyboardList within KeyboardPickerActivity.  Yikes.
       public List<Keyboard> selectFrom(Dataset.Keyboards adapter, Void dummy) {
-        List<HashMap<String, String>> kbdMapList = KeyboardPickerActivity.getKeyboardsList(context);
-        List<Keyboard> kbdList = new ArrayList<>(kbdMapList.size());
-
-        for(HashMap<String, String> kbdMap: kbdMapList) {
-          boolean isCustom = kbdMap.containsKey(KMManager.KMKey_CustomKeyboard) &&
-            kbdMap.get(KMManager.KMKey_CustomKeyboard).equals("Y");
-          boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
-            kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
-
-          Keyboard k = new Keyboard(
-            kbdMap.get(KMManager.KMKey_PackageID),
-            kbdMap.get(KMManager.KMKey_KeyboardID),
-            kbdMap.get(KMManager.KMKey_KeyboardName),
-            kbdMap.get(KMManager.KMKey_LanguageID),
-            kbdMap.get(KMManager.KMKey_LanguageName),
-            isCustom,
-            isNewKeyboard,
-            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
-            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null),
-            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
-            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, "")
-          );
-          kbdList.add(k);
-        }
-
-        return kbdList;
+        // Return the keyboards list
+        return adapter.asList();
       }
     }, null);
   }
@@ -94,9 +69,9 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
       holder = (ViewHolder) convertView.getTag();
     }
 
-    if(kbd.isNewKeyboard())
-      holder.textLang.setText(String.format("[%s]", getContext().getText(R.string.keyboard_picker_new_keyboard_prefix))
-        + " " + kbd.getLanguageName());
+    if(kbd.getNewKeyboard())
+      holder.textLang.setText(String.format(getContext().getString(R.string.keyboard_picker_new_keyboard),
+        kbd.getLanguageName()));
     else
       holder.textLang.setText(kbd.getLanguageName());
     holder.textKbd.setText(kbd.getResourceName());

@@ -5,13 +5,14 @@ import logging
 import os
 from keyman_config import __version__
 
+
 def main():
     parser = argparse.ArgumentParser(description='Show installed Keyman keyboards with name, version, id.')
     parser.add_argument('-l', "--long", help='long format also shows description', action="store_true")
     parser.add_argument('-s', "--shared", help='show those installed in shared areas', action="store_true")
     parser.add_argument('-o', "--os", help='show those installed by the OS', action="store_true")
     parser.add_argument('-u', "--user", help='show those installed in user areas', action="store_true")
-    parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
 
@@ -44,9 +45,11 @@ def print_keyboards(installed_kmp, verbose):
         print(installed_kmp[packageID]['name'] + ", version:", installed_kmp[packageID]['version'] + ", id:", packageID)
         if verbose:
             if installed_kmp[packageID]['version'] != installed_kmp[packageID]['kmpversion']:
-                print("Version mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[packageID]['kmpversion'], installed_kmp[packageID]['version']))
+                print("Version mismatch. Installed keyboard is %s. Website says it is %s."
+                      % (installed_kmp[packageID]['kmpversion'], installed_kmp[packageID]['version']))
             if installed_kmp[packageID]['name'] != installed_kmp[packageID]['kmpname']:
-                print("Name mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[packageID]['name'], installed_kmp[packageID]['kmpname']))
+                print("Name mismatch. Installed keyboard is %s. Website says it is %s."
+                      % (installed_kmp[packageID]['name'], installed_kmp[packageID]['kmpname']))
 
             if installed_kmp[packageID]['description']:
                 print(installed_kmp[packageID]['description'])

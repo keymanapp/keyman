@@ -2,9 +2,12 @@ package com.tavultesoft.kmea.data.adapters;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
+
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import java.util.List;
  * @param <A> The type specification of the Adapter to be nested/linked.
  */
 public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked<Element>, FilterArg> extends ArrayAdapter<Element> implements ListBacked<Element>  {
+  private final static String TAG = "NestedAdapter";
   final A wrappedAdapter;
   final AdapterFilter<Element, A, FilterArg> filter;
   final List<Element> filteredList;
@@ -173,11 +177,19 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
   // These methods allow bypassing of our externally-visible 'linking' versions for operations
   // triggered by the other end of the link.
   protected void _internalAddAll(@NonNull Collection<? extends Element> collection) {
-    super.addAll(collection);
+    try {
+      super.addAll(collection);
+    } catch (UnsupportedOperationException e) {
+      KMLog.LogException(TAG, "_internalAddAll exception ", e);
+    }
   }
 
   protected void _internalClear() {
-    super.clear();
+    try {
+      super.clear();
+    } catch (UnsupportedOperationException e) {
+      KMLog.LogException(TAG, "_internalClear exception ", e);
+    }
   }
 
   // TODO:  As needed, override mutation functions so that we can reflect the changes onto
