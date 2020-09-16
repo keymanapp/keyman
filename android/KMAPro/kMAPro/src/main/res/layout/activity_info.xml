@@ -10,13 +10,19 @@
         android:id="@+id/infoWebView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="?attr/actionBarSize" />
+        android:layout_marginBottom="@dimen/info_label_height"/>
 
     <!-- Version string on the bottom of the page -->
-    <include
-        layout="@layout/titlebar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_alignParentBottom="true" />
+    <TextView
+      android:id="@+id/infoVersion"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/info_label_height"
+      android:layout_gravity="center_horizontal"
+      android:gravity="center"
+      android:ellipsize="end"
+      android:singleLine="true"
+      android:text="@string/title_version"
+      android:textSize="@dimen/info_label_textsize"
+      android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

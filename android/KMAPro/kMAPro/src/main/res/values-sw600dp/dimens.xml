@@ -6,6 +6,8 @@
     -->
     <dimen name="label_width">450dp</dimen>
     <dimen name="titlebar_label_textsize">28sp</dimen>
+    <dimen name="info_label_textsize">14sp</dimen>
+    <dimen name="info_label_height">34dp</dimen>
     <dimen name="product_logo_bottom">196dp</dimen>
     <dimen name="checkbox_margin">18dp</dimen>
     <dimen name="checkbox_margin_left">12dp</dimen>
