@@ -66,7 +66,7 @@ public class SelectLanguageActivity extends AppCompatActivity implements
 
     mStepperLayout = (StepperLayout) findViewById(R.id.stepperLayout);
     mStepperAdapter = new StepperAdapter(getSupportFragmentManager(), this,
-      isInstallingPackage, packagePath, pkgTarget, packageID, pkgName, hasWelcome);
+      isInstallingPackage, packagePath, pkgTarget, packageID, pkgName, keyboard, hasWelcome);
     mStepperLayout.setAdapter(mStepperAdapter);
     mStepperLayout.setListener(this);
 
@@ -79,7 +79,7 @@ public class SelectLanguageActivity extends AppCompatActivity implements
 
   @Override
   public void onError(VerificationError verificationError) {
-    Toast.makeText(this, "onError" + verificationError.getErrorMessage(), Toast.LENGTH_SHORT).show();
+    Toast.makeText(this, verificationError.getErrorMessage(), Toast.LENGTH_SHORT).show();
   }
 
   @Override

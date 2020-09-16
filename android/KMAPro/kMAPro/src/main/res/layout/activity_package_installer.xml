@@ -19,7 +19,7 @@
         app:ms_showBackButtonOnFirstStep="true"
         app:ms_backButtonColor="@color/keyman_blue"
         app:ms_backButtonText="@string/label_back"
-        app:ms_nextButtonColor="@color/keyman_blue"
+        app:ms_nextButtonColor="@color/ms_custom_button_text_color"
         app:ms_nextButtonText="@string/label_next"
         app:ms_completeButtonColor="@color/keyman_blue"
         app:ms_completeButtonText="@string/label_ok"
