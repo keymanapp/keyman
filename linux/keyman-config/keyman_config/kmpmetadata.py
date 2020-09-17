@@ -7,6 +7,7 @@ import sys
 import os.path
 import magic
 from enum import Enum
+from json.decoder import JSONDecodeError
 
 
 class KMFileTypes(Enum):
@@ -441,7 +442,11 @@ def parsemetadata(jsonfile, verbose=False):
 
     if os.path.isfile(jsonfile):
         with open(jsonfile, "r") as read_file:
-            data = json.load(read_file)
+            try:
+                data = json.load(read_file)
+            except JSONDecodeError as e:
+                logging.error("parsemetadata: " + jsonfile + " invalid")
+                sys.exit(1)
             for x in data:
                 if x == 'info':
                     info = data[x]
