@@ -1,4 +1,8 @@
-@echo off    
+@echo off
+
+rem Build agents have a separate signtime script. We don't use 'call' here so
+rem executing that script will terminate this one.
+if exist c:\codesign\signtime.bat c:\codesign\signtime.bat %1 %2 %3 %4 %5 %6 %7 %8
 
 set SERVERLIST=(http://timestamp.comodoca.com/authenticode http://timestamp.verisign.com/scripts/timstamp.dll http://timestamp.globalsign.com/scripts/timestamp.dll http://tsa.starfieldtech.com)
 set RFC3161SERVERLIST=(http://timestamp.comodoca.com/rfc3161)
@@ -14,7 +18,7 @@ set SIGNNAME=Keyman
 if "%SIGNFILE%" == "/d" (
   set SIGNNAME=%7
   set SIGNFILE=%8
-) 
+)
 
 set timestampErrors=0
 
