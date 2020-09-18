@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.144 alpha 2020-09-18
+
+* feat(developer): add viewport to html templates (#3531)
+* fix(windows): use new signtime.bat on build agents (#3586)
+* fix(developer): Touch font size should be string (#3585)
+* fix(android/app): Fix Info page title size (#3571)
+* fix(linux/config): Check if file exists before creating hard links (#3592)
+* fix(windows): remove obsolete releaseCapture calls (#3594)
+* fix(linux/config): Catch if kmp.json is invalid JSON (#3593)
+
 ## 14.0.143 alpha 2020-09-16
 
 * fix(android/app): Validate language selection for "INSTALL" button (#3579)
