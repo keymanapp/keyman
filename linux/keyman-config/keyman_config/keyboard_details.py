@@ -50,7 +50,7 @@ class KeyboardDetailsView(Gtk.Dialog):
             grid = Gtk.Grid()
             self.get_content_area().pack_start(grid, True, True, 12)
             lbl_invalid_metadata = Gtk.Label()
-            lbl_invalid_metadata.set_text(_("ERROR: Could not parse kmp.json in " + packageDir))
+            lbl_invalid_metadata.set_text(_("ERROR: Keyboard metadata is damaged.\nPlease \"Uninstall\" and then \"Install\" the keyboard."))
             lbl_invalid_metadata.set_halign(Gtk.Align.END)
             grid.add(lbl_invalid_metadata)
             self.resize(700, 200)
