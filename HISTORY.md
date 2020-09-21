@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.145 alpha 2020-09-21
+
+* feat(windows): improve keyboard language dialog (#3557)
+* fix(windows): lookup language name on create (#3558)
+
 ## 14.0.144 alpha 2020-09-18
 
 * feat(developer): add viewport to html templates (#3531)
