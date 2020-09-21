@@ -1,5 +1,54 @@
 # Keyman Version History
 
+## 14.0.144 alpha 2020-09-18
+
+* feat(developer): add viewport to html templates (#3531)
+* fix(windows): use new signtime.bat on build agents (#3586)
+* fix(developer): Touch font size should be string (#3585)
+* fix(android/app): Fix Info page title size (#3571)
+* fix(linux/config): Check if file exists before creating hard links (#3592)
+* fix(windows): remove obsolete releaseCapture calls (#3594)
+* fix(linux/config): Catch if kmp.json is invalid JSON (#3593)
+
+## 14.0.143 alpha 2020-09-16
+
+* fix(android/app): Validate language selection for "INSTALL" button (#3579)
+
+## 14.0.142 alpha 2020-09-15
+
+* chore(deps): bump node-fetch from 2.6.0 to 2.6.1 in /resources/build/version (#3578)
+
+## 14.0.141 alpha 2020-09-11
+
+* fix(web): default layout shift not changing layer (#3574)
+
+## 14.0.140 alpha 2020-09-09
+
+* feat(common/models): core edit-distance calculation class (#3526)
+* feat(common/models): Edit path derivation (#3547)
+* feat(common/models):  low-level correction-algorithm infrastructure (#3527)
+* feat(common/models): correction-search algorithm core (#3534)
+
+## 14.0.139 alpha 2020-09-04
+
+* fix(windows): BCP 47 tag canonicalization (#3545)
+* fix(windows): upgrade of profiles from 13.0 (#3552)
+
+## 14.0.138 alpha 2020-09-02
+
+* feat(windows): map installed bcp47 (#3542)
+* fix(windows): simplify profile uninstall (#3543)
+* fix(android/app): Remove unused intent ACTION_GET_USERDATA (#3551)
+* fix(android/engine): Remove notification after installing kbd package (#3546)
+* fix(android): Re-enable monitoring of Application Not Responding (ANR) (#3550)
+
+## 14.0.137 alpha 2020-08-31
+
+* fix(android/engine): Fix package filename when downloading from cloud (#3541)
+* feat(windows): select language at keyboard install (#3524)
+* feat(windows): add langtags.json data (#3529)
+* fix(windows): add transient profile support to keyman32 (#3539)
+
 ## 14.0.136 alpha 2020-08-28
 
 * fix(android/app): Inject meta viewport tag for viewing help (#3523)

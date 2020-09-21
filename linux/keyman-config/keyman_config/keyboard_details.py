@@ -45,7 +45,17 @@ class KeyboardDetailsView(Gtk.Dialog):
         info, system, options, keyboards, files = parsemetadata(kmp_json)
 
         if info is None:
-            raise Exception(_("could not parse kmp.json"), kmp['packageID'], packageDir, kmp_json)
+            # Dialog when invalid metadata
+            self.add_button(_("_Close"), Gtk.ResponseType.CLOSE)
+            grid = Gtk.Grid()
+            self.get_content_area().pack_start(grid, True, True, 12)
+            lbl_invalid_metadata = Gtk.Label()
+            lbl_invalid_metadata.set_text(_("ERROR: Keyboard metadata is damaged.\nPlease \"Uninstall\" and then \"Install\" the keyboard."))
+            lbl_invalid_metadata.set_halign(Gtk.Align.END)
+            grid.add(lbl_invalid_metadata)
+            self.resize(700, 200)
+            self.show_all()
+            return
 
         kbdata = None
         jsonfile = os.path.join(packageDir, kmp['packageID'] + ".json")

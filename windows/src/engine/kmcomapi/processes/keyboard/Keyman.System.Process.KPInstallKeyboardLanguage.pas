@@ -195,6 +195,7 @@ function TKPInstallKeyboardLanguage.ConvertBCP47TagToLangID(Locale: string;
   var LangID: Integer): Boolean;
 var
   Win8Lang: TWindows8Language;
+  tag1, tag2: TBCP47Tag;
 begin
   if FWin8Languages.IsSupported then
   begin
@@ -208,14 +209,28 @@ begin
   end
   else
   begin
-    // Assuming that the tag is a Language-Script-Region triplet at most.
-    // If you use -Variant or -Extension then YMMV.
-    with TBCP47Tag.Create(Locale) do
+    //If tag is a Language-Script-Region triplet at most, then we can use
+    // LocaleNameTOLCID on the Language-Region to get a LangID. If you use
+    // -Variant or -Extension then we won't get a valid LangID. On Win7/8,
+    // this will result in installation under default locale.
+
+    tag1 := TBCP47Tag.Create(Locale);
     try
-      Script := '';
-      Locale := Tag;
+      tag1.Script := '';
+      tag2 := TBCP47Tag.Create(tag1.Language);
+      try
+        tag2.Region := tag1.Region;
+        if tag2.Tag <> tag1.Tag then
+        begin
+          // We have a complex tag, Windows won't convert it with LocaleNameToLCID
+          Exit(False);
+        end;
+      finally
+        tag2.Free;
+      end;
+      Locale := tag1.Tag;
     finally
-      Free;
+      tag1.Free;
     end;
   end;
 

@@ -13,17 +13,18 @@ SCRIPT_ROOT="$(dirname "$THIS_SCRIPT")"
 
 display_usage ( ) {
   echo "test.sh [ -? | -h | -help]"
-  echo "  -CI               to perform continuous-integration friendly tests and reporting"
-  echo "  -headless         to disable the in-browser tests"
-  echo "  -integrated       to disable the 'headless' test suite"
-  echo "  -? | -h | -help   to display this help information"
+  echo "  -CI                    to perform continuous-integration friendly tests and reporting"
+  echo "  -headless              to disable the in-browser tests"
+  echo "  -integrated            to disable the 'headless' test suite"
+  echo "  -skip-package-install  (or -S) skips dependency updates"
+  echo "  -? | -h | -help        to display this help information"
   echo ""
   exit 0
 }
 
 init_dependencies ( ) {
   # Ensure all testing dependencies are in place.
-  verify_npm_setup
+  verify_npm_setup $fetch_deps
 }
 
 test-headless ( ) {
@@ -32,7 +33,7 @@ test-headless ( ) {
     _FLAGS="$_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $_FLAGS ./unit_tests/headless/*.js
+  npm run mocha -- --recursive $_FLAGS ./unit_tests/headless/*.js ./unit_tests/headless/**/*.js
 }
 
 test-browsers ( ) {
@@ -51,11 +52,13 @@ FLAGS="--require ./unit_tests/helpers"
 CI_REPORTING=0
 RUN_HEADLESS=1
 RUN_BROWSERS=1
+fetch_deps=true
+
 # Parse args
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
-    -h|-help|-?)
+    -h|-help)
       display_usage
       exit
       ;;
@@ -67,6 +70,9 @@ while [[ $# -gt 0 ]] ; do
       ;;
     -integrated)
       RUN_HEADLESS=0
+      ;;
+    -skip-package-install|-S)
+      fetch_deps=false
       ;;
   esac
   shift # past argument

@@ -29,9 +29,6 @@
     <!--    how to enable Sentry's debug mode-->
     <meta-data
       android:name="io.sentry.debug" android:value="true" />
-    <!-- Disable monitoring "Application Not Responding" (ANR).  Too many reports at the default 4000 ms -->
-    <meta-data
-      android:name="io.sentry.anr.enable" android:value="false" />
     <!-- Have application handle initializing Sentry -->
     <meta-data
       android:name="io.sentry.auto-init" android:value="false" />

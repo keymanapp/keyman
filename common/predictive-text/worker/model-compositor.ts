@@ -1,4 +1,5 @@
 /// <reference path="../node_modules/@keymanapp/models-templates/src/index.ts" />
+/// <reference path="correction/distance-modeler.ts" />
 
 class ModelCompositor {
   private lexicalModel: LexicalModel;

@@ -47,11 +47,13 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
    * @param pkgTarget
    * @param packageID
    * @param pkgName
+   * @param keyboard
    * @param hasWelcome
    */
   public StepperAdapter(FragmentManager fm, Context context,
                         boolean isInstallingPackage, File tempPackagePath,
                         String pkgTarget, String packageID, String pkgName,
+                        Keyboard keyboard,
                         boolean hasWelcome) {
     super(fm, context);
     this.isInstallingPackage = isInstallingPackage;
@@ -59,6 +61,7 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
     this.pkgTarget = pkgTarget;
     this.packageID = packageID;
     this.pkgName = pkgName;
+    this.keyboard = keyboard;
     this.hasWelcome = hasWelcome;
     this.languageID = null; // not filled
     this.languageCount = 0;
@@ -67,6 +70,7 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
   public StepperAdapter(FragmentManager fm, Context context,
                         boolean isInstallingPackage, File tempPackagePath,
                         String pkgTarget, String packageID, String pkgName,
+                        Keyboard keyboard,
                         boolean hasWelcome,
                         String languageID, int languageCount) {
     super(fm, context);
@@ -75,6 +79,7 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
     this.pkgTarget = pkgTarget;
     this.packageID = packageID;
     this.pkgName = pkgName;
+    this.keyboard = keyboard;
     this.hasWelcome = hasWelcome;
     this.languageID = languageID;
     this.languageCount = languageCount;
@@ -95,6 +100,9 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
           b1.putSerializable("packagePath", tempPackagePath);
           b1.putString("packageID", packageID);
           b1.putString("languageID", languageID);
+          if (keyboard != null) {
+            b1.putSerializable("keyboard", keyboard);
+          }
           step1.setArguments(b1);
           return step1;
         }
@@ -107,6 +115,9 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
           b2.putSerializable("packagePath", tempPackagePath);
           b2.putString("packageID", packageID);
           b2.putString("languageID", languageID);
+          if (keyboard != null) {
+            b2.putSerializable("keyboard", keyboard);
+          }
           step2.setArguments(b2);
           return step2;
         } else {

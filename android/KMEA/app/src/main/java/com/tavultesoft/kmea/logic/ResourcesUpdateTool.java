@@ -147,7 +147,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       channel.setDescription(description);
       // Register the channel with the system; you can't change the importance
       // or other notification behaviors after this
-      NotificationManager notificationManager = aContext.getSystemService(NotificationManager.class);
+      NotificationManager notificationManager = (NotificationManager) aContext.getSystemService(Context.NOTIFICATION_SERVICE);
       notificationManager.createNotificationChannel(channel);
     }
   }
@@ -427,6 +427,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       .setContentTitle(currentContext.getString(R.string.keyboard_updates_available))
       .setContentText(message)
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+      .setAutoCancel(true)
       .setContentIntent(startUpdateIntent)
       .setOngoing(true);
 
@@ -521,7 +522,15 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
-    // Do nothing
+    if (! openUpdates.isEmpty() && keyboardsInstalled != null) {
+      for (Map<String, String> k : keyboardsInstalled) {
+        String _langid = k.get(KMManager.KMKey_LanguageID);
+        String _kbid = k.get(KMManager.KMKey_KeyboardID);
+        removeOpenUpdate(createKeyboardId(_langid, _kbid));
+      }
+    }
+
+    tryFinalizeUpdate();
   }
 
   @Override

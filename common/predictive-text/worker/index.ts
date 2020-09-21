@@ -333,6 +333,7 @@ class LMLayerWorker {
     // Assists unit-testing.
     scope['LMLayerWorker'] = worker;
     scope['models'] = models;
+    scope['correction'] = correction;
     scope['wordBreakers'] = wordBreakers;
 
     return worker;
@@ -342,6 +343,7 @@ class LMLayerWorker {
 // Let LMLayerWorker be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
+  module.exports['correction'] = correction;
   module.exports['models'] = models;
   module.exports['wordBreakers'] = wordBreakers;
   /// XXX: export the ModelCompositor for testing.

@@ -1,18 +1,18 @@
 (*
   Name:             utiltsf
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    3 Jun 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Refactor util functions into multiple units
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     13 Dec 2012 - mcdurdin - I3663 - V9.0 - Uninstall of keyboard does not remove KMTIP entries
@@ -23,8 +23,8 @@ unit utiltsf;
 interface
 
 function TSFInstalled: Boolean;
-function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
-function GetBCP47ForTransientTIP(LangID: Integer; guidProfile: TGUID): string;
+function IsTIPInstalledForCurrentUser(var BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
+function GetBCP47ForInstalledTIP(LangID: Integer; guidProfile: TGUID): string;
 function IsTransientLanguageID(LangID: Integer): Boolean;
 function GetLayoutInstallString(LangID: Integer; guidProfile: TGUID): string;
 
@@ -62,17 +62,25 @@ begin
   ]);
 end;
 
-function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
+function IsTIPInstalledForCurrentUser(var BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
+var
+  s: string;
 begin
-  Result := (LangID <> 0) and (GetBCP47ForTransientTIP(LangID, guidProfile) <> '');
+  s := GetBCP47ForInstalledTIP(LangID, guidProfile);
+  Result := s <> '';
+  if Result then
+    BCP47Tag := s;
 end;
 
-function GetBCP47ForTransientTIP(LangID: Integer; guidProfile: TGUID): string;
+function GetBCP47ForInstalledTIP(LangID: Integer; guidProfile: TGUID): string;
 var
   tag, FLayoutInstallString: string;
   reg: TRegistryErrorControlled;
   tags: TStringList;
 begin
+  // TODO: we could cache this data so we don't have to read and compare for
+  // every installed language -- but let's get the algorithm solid before
+  // optimising.
   Result := '';
 
   // TODO: read this data once only at start of load of languages rather than
