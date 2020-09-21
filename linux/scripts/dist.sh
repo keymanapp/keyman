@@ -69,13 +69,17 @@ done
 for proj in ${extra_projects}; do
     # dist for keyman-config
     if [ "${proj}" == "keyman-config" ]; then
+
         cd keyman-config
-        rm -rf dist
-        python3 setup.py sdist
-        make man
-        cp dist/*.tar.gz ../dist
-    fi
-    if [ "${proj}" == "keyboardprocessor" ]; then
+        vers=`cat ../../VERSION.md`
+        echo "3.0 (native)" > debian/source/format
+        dch keyman-config --newversion ${vers} --force-bad-version --nomultimaint
+        dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
+            --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
+            --tar-ignore=__pycache__ -Zgzip -b .
+        mv ../keyman-config_*.tar.gz ../dist/keyman-config.tar.gz
+        echo "3.0 (quilt)" > debian/source/format
+    elif [ "${proj}" == "keyboardprocessor" ]; then
         cd ../common/core
         vers=`cat ../../VERSION.md`
         kbpvers="keyman-keyboardprocessor-$vers"
@@ -100,19 +104,14 @@ if [ "$1" == "origdist" ]; then
 
     for proj in ${extra_projects}; do
         if [ "${proj}" == "keyman-config" ]; then
-            tmp=`basename keyman\_config*.tar.gz .tar.gz`
-            origname=${tmp/keyman\_config-/keyman-config\_}
-            index=`expr index "${origname}" _`
-            kcversion=${tmp:$index}
-
-            echo "keyman-config version: ${kcversion}"
-
-            tar xf keyman_config-${kcversion}.tar.gz
-            mv keyman_config-${kcversion} keyman-config-${kcversion}
-            tar cfz keyman-config_${kcversion}.orig.tar.gz keyman-config-${kcversion}
-            rm -rf keyman-config-${kcversion} keyman_config-${kcversion}.tar.gz
-        fi
-        if [ "${proj}" == "keyboardprocessor" ]; then
+            vers=`cat ../../VERSION.md`
+            pkgvers="keyman-config-$vers"
+            tar xfz keyman-config.tar.gz
+            mv keyman-config ${pkgvers}
+            tar cfz keyman-config_${vers}.orig.tar.gz ${pkgvers}
+            rm keyman-config.tar.gz
+            rm -rf ${pkgvers}
+        elif [ "${proj}" == "keyboardprocessor" ]; then
             tmp=`basename keyman-keyboardprocessor*.tar.gz .tar.gz`
             origname=${tmp/keyman-keyboardprocessor-/keyman-keyboardprocessor\_}
             index=`expr index "${origname}" _`

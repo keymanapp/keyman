@@ -123,6 +123,28 @@ public class PackageProcessor {
   }
 
   /**
+   * Given temp path of extracted keyboard package kmp file and package ID,
+   * move the tempPath to the permanent packages/ folder
+   * @param tempPath Filepath of temporarily extracted .kmp file
+   * @param packageID String of the package ID
+   */
+  public void moveTempToPackages(File tempPath, String packageID) {
+    File permPath = new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+    try {
+      if (permPath.exists()) {
+        // Out with the old.  "In with the new" is identical to a new package installation.
+        FileUtils.deleteDirectory(permPath);
+      }
+    } catch (IOException e) {
+
+    }
+    // No version conflict!  Proceed with the install!
+    // Unfortunately, the nice recursive method provided by Apache Commons-IO's FileUtils class
+    // isn't available at Android runtime.
+    tempPath.renameTo(permPath);
+  }
+
+  /**
    * Given a directory location for an extracted KMP file, extracts its kmp.json information
    * into a JSON object.  Works on temporary directories and the installed package directory.
    * @param packagePath The extracted location information to retrieve information for.
@@ -388,6 +410,27 @@ public class PackageProcessor {
   }
 
   /**
+   * Parse a kmp.json JSON object and return boolean if the package contains welcome.htm
+   * @param json kmp.json as a JSON object
+   * @return boolean
+   */
+  public boolean hasWelcome(JSONObject json) {
+    try {
+      JSONArray files = json.getJSONArray("files");
+      for (int i=0; i<files.length(); i++) {
+        JSONObject fileInfo = files.getJSONObject(i);
+        if (FileUtils.isWelcomeFile(fileInfo.getString("name"))) {
+          return true;
+        }
+      }
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return false;
+    }
+    return false;
+  }
+
+  /**
    * Compares version information, ideally between the temporary extraction path of a package and its
    * desired installation path, to ensure that no accidental downgrade or side-grade overwrite occurs.
    * @param newPath The path for the (temporarily) extracted, newly downloaded version of the package.
@@ -428,14 +471,14 @@ public class PackageProcessor {
   }
 
   /**
-   * Determines if installing the .kmp would result in a downgrade.  For testing only.
+   * Determines if installing the .kmp would result in a downgrade.
    * @param kmpPath The path to the .kmp to be installed.
    * @param preExtracted Indicates use of a temporary testing 'kmp' that is pre-extracted.
    * @return <code><b>true</b></code> if installing would be a downgrade, otherwise <code><b>false</b></code>.
    * @throws IOException
    * @throws JSONException
    */
-  boolean isDowngrade(File kmpPath, boolean preExtracted) throws IOException, JSONException {
+  public boolean isDowngrade(File kmpPath, boolean preExtracted) throws IOException, JSONException {
     return internalCompareKMPVersion(kmpPath, preExtracted,-1);
   }
 

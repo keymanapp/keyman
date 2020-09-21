@@ -1,4 +1,4 @@
-html, body { 
+html, body {
   overflow: hidden;
 }
 
@@ -6,31 +6,31 @@ div {
   position: absolute;
 }
 
-#background { 
-  background: #79C3DA; z-index: 1; left: 0; top: 0; 
+#background {
+  background: #79C3DA; z-index: 1; left: 0; top: 0;
 }
 
-#foreground { 
-  z-index: 2; left: 0; top: 0; 
+#foreground {
+  z-index: 2; left: 0; top: 0;
 }
 
 #frame {
-  top: 0; left: 0; 
-  height: 244px; 
-  padding: 10px; 
+  top: 0; left: 0;
+  height: 244px;
+  padding: 10px;
 }
 
 #image {
-  top: 0; 
-  left: 0; 
-  height: 250px; 
-  width: 140px; 
+  top: 0;
+  left: 0;
+  height: 250px;
+  width: 140px;
   padding: 5px
 }
 
 .content {
-  left: 150px; top: 0px; 
-  width: 438px; 
+  left: 150px; top: 0px;
+  width: 438px;
   padding: 4px;
   background: white;
   border-left: 2px solid #888888;
@@ -42,20 +42,20 @@ div {
 }
 
 .has_readme .content {
-  height: 226px; 
+  height: 226px;
   visibility: hidden;
 }
 
 .content_selected {
-  left: 150px; top: 0px; 
-  width: 438px; 
+  left: 150px; top: 0px;
+  width: 438px;
   padding: 4px;
   background: white;
   border-left: 2px solid #888888;
   border-top: 2px solid #888888;
   border-right: 2px solid #888888;
   overflow-y: auto;
-  height: 226px; 
+  height: 226px;
   visibility: visible
 }
 
@@ -98,7 +98,7 @@ div {
 }
 
 #footer {
-  top: 260px; 
+  top: 260px;
   left: 0;
   height: 26px;
   vertical-align: middle;
@@ -119,7 +119,7 @@ div {
   font-size: 13.3px;
   padding-right: 10px;
   margin: 1px;
-  vertical-align: top;
+  vertical-align: middle;
 }
 .otherdetails {
   font-size: 13.3px;

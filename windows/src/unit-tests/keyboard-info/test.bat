@@ -21,11 +21,11 @@ if "%1"=="" (
 )
 
 :test-1
-call :should-pass "Valid keyboard info file" test-valid.keyboard_info || goto :eof
+call :should-pass "Valid keyboard info file" test-valid.keyboard_info || exit /b 1
 
-call :should-fail "Keyboard info file with invalid BCP-47 code" test-invalid-language-code.keyboard_info || goto :eof
+call :should-fail "Keyboard info file with invalid BCP-47 code" test-invalid-language-code.keyboard_info || exit /b 1
 
-call :should-fail "Keyboard info file with non-canonical BCP-47 code" test-non-canonical-language-code.keyboard_info || goto :eof
+call :should-fail "Keyboard info file with non-canonical BCP-47 code" test-non-canonical-language-code.keyboard_info || exit /b 1
 
 goto :eof
 
@@ -37,7 +37,7 @@ if %ERRORLEVEL% EQU 0 (
   exit /b 0
 )
 echo %RED%FAILED: expected %2 to be valid.%WHITE% 1>&2
-goto :eof
+exit /b 1
 
 :should-fail
 echo %BLUE%TEST: %1 %WHITE%

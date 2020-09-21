@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
+import android.net.Uri;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -62,8 +63,17 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
         try {
           if (_d.getCloudParams().target == CloudApiTypes.ApiTarget.KeyboardPackage) {
             installedKeyboards = new LinkedList<>();
+
+            // Parse url for the kmp filename
+            Uri uri = Uri.parse(_d.getCloudParams().url);
+            String packageID = uri.getLastPathSegment();
+            if (packageID == null || packageID.isEmpty()) {
+              KMLog.LogError(TAG, "Cloud URL " + _d.getCloudParams().url + " has null packageID");
+            }
+            String kmpFilename = String.format("%s%s", packageID, FileUtils.KEYMANPACKAGE);
+
             // Extract the kmp.
-            File kmpFile = new File(cacheDir, FileUtils.getFilename(_d.getCloudParams().url));
+            File kmpFile = new File(cacheDir, kmpFilename);
 
             FileUtils.copy(_d.getDestinationFile(), kmpFile);
 

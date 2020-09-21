@@ -217,17 +217,19 @@ const
   SRegValue_Legacy_DefaultLanguageID   = 'default language id';                            // LM CU   // I4220
   SRegValue_VisualKeyboard      = 'visual keyboard';                                // LM CU
 
-  SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM CU   // I3581
-
   SRegSubKey_SuggestedLanguages = 'Suggested Languages';                            // LM
 
   { Language Profiles }
 
   {$MESSAGE HINT 'Refactor this to use SRegKeyNode naming (no prefix \); fixup references'}
-  SRegSubKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM CU
-  SRegValue_LanguageProfileLangID = 'LangID';
-  SRegValue_LanguageProfileLocale = 'Locale';
-  SRegValue_LanguageProfileName = 'Name';
+  SRegSubKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM
+  SRegSubKey_TransientLanguageProfiles = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Transient Language Profiles';  // LM
+  SRegValue_LanguageProfileLangID = 'LangID';                                       // LM SRegSubKey_LanguageProfiles
+  SRegValue_LanguageProfileLocale = 'Locale';                                       // LM SRegSubKey_LanguageProfiles
+  SRegValue_LanguageProfileName = 'Name';                                           // LM SRegSubKey_LanguageProfiles
+  SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM SRegSubKey_LanguageProfiles, SRegSubKey_TransientLanguageProfiles
+
+  SRegKey_Keyman_Temp_BackupProfiles = SRegKey_KeymanEngine_CU + '\Temp Backup Profiles'; // CU
 
   { InstalledPackages }
 
@@ -260,6 +262,12 @@ const
   SRegKey_KeyboardLayout_CU = 'keyboard layout';                                       // CU
   SRegKey_KeyboardLayoutPreload_CU = 'keyboard layout\preload';                        // CU
   SRegKey_KeyboardLayoutSubstitutes_CU = 'keyboard layout\substitutes';                // CU
+
+  SRegKey_ControlPanelInternationalUserProfile = 'Control Panel\International\User Profile'; // CU
+
+  SRegValue_CPIUP_Languages = 'Languages';
+  SRegValue_CPIUP_TransientLangId = 'TransientLangId';
+  SRegValue_CPIUP_CachedLanguageName = 'CachedLanguageName';
 
   { User profile keys }
 
@@ -459,6 +467,7 @@ const
 
 function BuildKeyboardOptionKey_CU(const KeyboardID: string): string;
 function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
+function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string;
 
 implementation
 
@@ -470,6 +479,11 @@ end;
 function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
 begin
   Result := SRegKey_InstalledKeyboards_LM + '\' + KeyboardID + SRegSubKey_LanguageProfiles;
+end;
+
+function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string;
+begin
+  Result := SRegKey_InstalledKeyboards_LM + '\' + KeyboardID + '\' + SRegSubKey_SuggestedLanguages;
 end;
 
 end.

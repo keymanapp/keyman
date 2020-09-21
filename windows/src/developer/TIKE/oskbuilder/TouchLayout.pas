@@ -74,7 +74,7 @@ type
   TTouchLayoutSubKey = class(TTouchLayoutObject)
   private
     FNextLayer: string;
-    FFontSize: Integer;
+    FFontSize: string;
     FLayer: string;
     FWidth: Integer;
     FDk: Integer;
@@ -99,7 +99,7 @@ type
     property Layer: string read FLayer write FLayer;
     property NextLayer: string read FNextLayer write FNextLayer;
     property Font: string read FFont write FFont;
-    property FontSize: Integer read FFontSize write FFontSize;
+    property FontSize: string read FFontSize write FFontSize;
   end;
 
   TTouchLayoutSubKeys = class(TObjectList<TTouchLayoutSubKey>)
@@ -108,7 +108,7 @@ type
   TTouchLayoutKey = class(TTouchLayoutObject)
   private
     FNextLayer: string;
-    FFontSize: Integer;
+    FFontSize: string;
     FLayer: string;
     FWidth: Integer;
     FDk: Integer;
@@ -136,7 +136,7 @@ type
     property Layer: string read FLayer write FLayer;
     property NextLayer: string read FNextLayer write FNextLayer;
     property Font: string read FFont write FFont;
-    property FontSize: Integer read FFontSize write FFontSize;
+    property FontSize: string read FFontSize write FFontSize;
     property Sk: TTouchlayoutSubKeys read FSk;
   end;
 
@@ -185,7 +185,7 @@ type
   private
     FName: string;
     FLayers: TTouchLayoutLayers;
-    FFontSize: Integer;   // I4062
+    FFontSize: string;   // I4062
     FDisplayUnderlying: Boolean;
     FFont: string;
   protected
@@ -197,7 +197,7 @@ type
     property DisplayUnderlying: Boolean read FDisplayUnderlying write FDisplayUnderlying;
     property Name: string read FName write FName;
     property Font: string read FFont write FFont;
-    property FontSize: Integer read FFontSize write FFontSize;   // I4062
+    property FontSize: string read FFontSize write FFontSize;   // I4062
     property Layers: TTouchLayoutLayers read FLayers;
   end;
 
@@ -614,7 +614,7 @@ var
   v: TJSONValue;
 begin
   value := '';
-  if not GetValue(name, v) or not (v is TJSONString) then Exit(False);
+  if not GetValue(name, v) then Exit(False);
   value := v.Value;
   Result := True;
 end;

@@ -23,6 +23,7 @@
  */
 
 /// <reference path="common.ts" />
+/// <reference path="priority-queue.ts" />
 
 /**
  * @file trie-model.ts
@@ -160,6 +161,118 @@
 
     public wordbreak(context: Context): USVString {
       return this.getLastWord(context.left);
+    }
+
+    public traverseFromRoot(): LexiconTraversal {
+      return new TrieModel.Traversal(this._trie['root'], '');
+    }
+
+    private static Traversal = class implements LexiconTraversal {
+      /**
+       * The lexical prefix corresponding to the current traversal state.
+       */
+      prefix: String;
+
+      /**
+       * The current traversal node.  Serves as the 'root' of its own sub-Trie,
+       * and we cannot navigate back to its parent.
+       */
+      root: Node;
+
+      constructor(root: Node, prefix: string) {
+        this.root = root;
+        this.prefix = prefix;
+      }
+
+      *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
+        let root = this.root;
+
+        if(root.type == 'internal') {
+          for(let entry of root.values) {
+            let entryNode = root.children[entry];
+
+            // UTF-16 astral plane check.
+            if(models.isHighSurrogate(entry)) {
+              // First code unit of a UTF-16 code point.
+              // For now, we'll just assume the second always completes such a char.
+              //
+              // Note:  Things get nasty here if this is only sometimes true; in the future,
+              // we should compile-time enforce that this assumption is always true if possible.
+              if(entryNode.type == 'internal') {
+                let internalNode = entryNode;
+                for(let lowSurrogate of internalNode.values) {
+                  let prefix = this.prefix + entry + lowSurrogate;
+                  yield {
+                    char: entry + lowSurrogate,
+                    traversal: function() { return new TrieModel.Traversal(internalNode.children[lowSurrogate], prefix) }
+                  }
+                }
+              } else {
+                // Determine how much of the 'leaf' entry has no Trie nodes, emulate them.
+                let fullText = entryNode.entries[0].key;
+                entry = entry + fullText[this.prefix.length + 1]; // The other half of the non-BMP char.
+                let prefix = this.prefix + entry;
+
+                yield {
+                  char: entry,
+                  traversal: function () {return new TrieModel.Traversal(entryNode, prefix)}
+                }
+              }
+            } else if(models.isSentinel(entry)) {
+              continue;
+            } else if(!entry) {
+              // Prevent any accidental 'null' or 'undefined' entries from having an effect.
+              continue;
+            } else {
+              let prefix = this.prefix + entry;
+              yield {
+                char: entry,
+                traversal: function() { return new TrieModel.Traversal(entryNode, prefix)}
+              }
+            }
+          }
+
+          return;
+        } else { // type == 'leaf'
+          let prefix = this.prefix;
+
+          let children = root.entries.filter(function(entry) {
+            return entry.key != prefix && prefix.length < entry.key.length;
+          })
+
+          for(let {key} of children) {
+            let nodeKey = key[prefix.length];
+
+            if(models.isHighSurrogate(nodeKey)) {
+              // Merge the other half of an SMP char in!
+              nodeKey = nodeKey + key[prefix.length+1];
+            }
+            yield {
+              char: nodeKey,
+              traversal: function() { return new TrieModel.Traversal(root, prefix + nodeKey)}
+            }
+          };
+          return;
+        }
+      }
+
+      get entries(): string[] {
+        if(this.root.type == 'leaf') {
+          let prefix = this.prefix;
+          let matches = this.root.entries.filter(function(entry) {
+            return entry.key == prefix;
+          });
+
+          return matches.map(function(value) { return value.content });
+        } else {
+          let matchingLeaf = this.root.children[models.SENTINEL_CODE_UNIT];
+          if(matchingLeaf && matchingLeaf.type == 'leaf') {
+            return matchingLeaf.entries.map(function(value) { return value.content });
+          } else {
+            return [];
+          }
+        }
+      }
     }
   };
 
@@ -315,7 +428,10 @@
    * @param queue
    */
   function getSortedResults(node: Node, prefix: SearchKey, N: number, limit = MAX_SUGGESTIONS): TextWithProbability[] {
-    let queue = new PriorityQueue();
+    let queue = new PriorityQueue(function(a: Weighted, b: Weighted) {
+      // In case of Trie compilation issues that emit `null` or `undefined`
+      return (b ? b.weight : 0) - (a ? a.weight : 0);
+    });
     let results: TextWithProbability[] = [];
 
     if (node.type === 'leaf') {
@@ -338,7 +454,7 @@
       queue.enqueue(node);
       let next: Weighted;
 
-      while (next = queue.pop()) {
+      while (next = queue.dequeue()) {
         if (isNode(next)) {
           // When a node is next up in the queue, that means that next least
           // likely suggestion is among its decsendants.
@@ -375,41 +491,6 @@
   /** TypeScript type guard that returns whether the thing is a Node. */
   function isNode(x: Entry | Node): x is Node {
     return 'type' in x;
-  }
-
-  /**
-   * A priority queue that always pops the highest weighted item.
-   */
-  class PriorityQueue {
-    // TODO: This probable should use a max-heap implementation, but I'm just doing
-    // a O(n log n) sort of the array when an item is popped.
-    private _storage: Weighted[] = [];
-    // TODO: this should have a limit, and ensure small values are not added.
-
-    /**
-     * Enqueues a single element to the priority queue.
-     */
-    enqueue(element: Weighted) {
-      this._storage.push(element);
-    }
-
-    /**
-     * Adds an array of weighted elements to the priority queue.
-     */
-    enqueueAll(elements: Weighted[]) {
-      this._storage = this._storage.concat(elements);
-    }
-
-    /**
-     * Pops the highest weighted item in the queue.
-     */
-    pop(): Weighted {
-      // Lazily sort only when NEEDED.
-      // Sort in descending order of weight, so heaviest weight will be popped
-      // first.
-      this._storage.sort((a, b) => b.weight - a.weight);
-      return this._storage.shift();
-    }
   }
 
   /**

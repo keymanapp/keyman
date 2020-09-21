@@ -3,6 +3,7 @@ unit Windows8LanguageList;
 interface
 
 uses
+  System.Classes,
   System.Generics.Collections,
   BCP47Tag;
 
@@ -12,6 +13,7 @@ type
     FLangID: Integer;
     FLocaleName: string;
     FBCP47Tag: string;
+    FInputMethods: TStrings;
     FTag: TBCP47Tag;
   public
     constructor Create(const ABCP47Tag: string);
@@ -20,6 +22,7 @@ type
     property Tag: TBCP47Tag read FTag;
     property LocaleName: string read FLocaleName;
     property LangID: Integer read FLangID;
+    property InputMethods: TStrings read FInputMethods;
   end;
 
   TWindows8LanguageList = class(TObjectList<TWindows8Language>)
@@ -36,7 +39,6 @@ type
 implementation
 
 uses
-  System.Classes,
   System.SysUtils,
   System.Win.Registry,
   RegistryKeys,
@@ -94,36 +96,36 @@ begin
   Clear;
   with TRegistry.Create do
   try
-    FIsSupported := OpenKeyReadOnly('Control Panel\International\User Profile') and ValueExists('Languages');
+    FIsSupported := OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) and ValueExists(SRegValue_CPIUP_Languages);
     if FIsSupported then
     begin
       FLanguageNames := TStringList.Create;
       FValueNames := TStringList.Create;
       try
-        ReadMultiString('Languages', FLanguageNames);
+        ReadMultiString(SRegValue_CPIUP_Languages, FLanguageNames);
 
         for i := 0 to FLanguageNames.Count - 1 do
         begin
           Language := TWindows8Language.Create(FLanguageNames[i]);
           Add(Language);
-          if OpenKeyReadOnly('\Control Panel\International\User Profile\'+FLanguageNames[i]) then
+          if OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\'+FLanguageNames[i]) then
           begin
-            if ValueExists('TransientLangId') then
-              Language.FLangId := ReadInteger('TransientLangId');
-            if ValueExists('CachedLanguageName') then
-              Language.FLocaleName := LoadIndirectString(ReadString('CachedLanguageName'));
+            if ValueExists(SRegValue_CPIUP_TransientLangId) then
+              Language.FLangId := ReadInteger(SRegValue_CPIUP_TransientLangId);
+            if ValueExists(SRegValue_CPIUP_CachedLanguageName) then
+              Language.FLocaleName := LoadIndirectString(ReadString(SRegValue_CPIUP_CachedLanguageName));
 
-            if Language.FLangId = 0 then
+            FValueNames.Clear;
+            GetValueNames(FValueNames);
+            for j := 0 to FValueNames.Count - 1 do
             begin
-              FValueNames.Clear;
-              GetValueNames(FValueNames);
-              for j := 0 to FValueNames.Count - 1 do
-                if (GetDataType(FValueNames[j]) = rdInteger) and
-                  (Copy(FValueNames[j],5,1) = ':') then
-                begin
+              if (GetDataType(FValueNames[j]) = rdInteger) and
+                (Copy(FValueNames[j],5,1) = ':') then
+              begin
+                Language.FInputMethods.Add(FValueNames[j]);
+                if Language.FLangID = 0 then
                   Language.FLangID := StrToIntDef('$'+Copy(FValueNames[j],1,4),0);
-                  Break;
-                end;
+              end;
             end;
           end;
         end;
@@ -142,12 +144,14 @@ end;
 constructor TWindows8Language.Create(const ABCP47Tag: string);
 begin
   FBCP47Tag := ABCP47Tag;
+  FInputMethods := TStringList.Create;
   FTag := TBCP47Tag.Create(ABCP47Tag);
 end;
 
 destructor TWindows8Language.Destroy;
 begin
   FreeAndNil(FTag);
+  FreeAndNil(FInputMethods);
   inherited Destroy;
 end;
 

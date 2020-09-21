@@ -110,7 +110,7 @@ type
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
     procedure UpdateBaseLayout;   // I4169
-    procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
+    procedure RefreshInstallation;
 
   public
     constructor Create(AContext: TKeymanContext; const Name: string);
@@ -132,12 +132,14 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   custinterfaces,
+  KPInstallKeyboard,
   KPInstallVisualKeyboard,
   KPRecompileMnemonicKeyboard,
   keymanhotkey,
   keymankeyboardlanguagesinstalled,
   keymankeyboardoptions,
   keymanerrorcodes,
+  PackageInfo,
   utilxml;
 
 procedure TKeymanKeyboardInstalled.Uninstall;
@@ -282,7 +284,10 @@ end;
 
 procedure TKeymanKeyboardInstalled.Set_Loaded(Value: WordBool);
 begin
-  FRegKeyboard.Enabled := Value;
+  // TODO: Keyman 14.0 this is currently a no-op. Instead, remove Windows
+  // language associations in order to enable and disable a keyboard. But we
+  // will need to re-implement this so users can still unload keyboards without
+  // uninstalling them completely.
 end;
 
 function TKeymanKeyboardInstalled.Get_IconFilename: WideString;   // I3581
@@ -326,14 +331,6 @@ begin
   if FRegKeyboard.MnemonicLayout
     then Result := kltMnemonic
     else Result := kltPositional;
-end;
-
-procedure TKeymanKeyboardInstalled.ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
-var
-  i: Integer;
-begin
-  for i := 0 to Get_Languages.Count - 1 do
-    (Get_Languages[i] as IIntKeymanKeyboardLanguage).ApplyEnabled(pInputProcessorProfiles, AEnabled);
 end;
 
 procedure TKeymanKeyboardInstalled.ClearVisualKeyboard;
@@ -403,6 +400,31 @@ begin
       FVisualKeyboard := TKeymanVisualKeyboard.Create(Context, FRegKeyboard.VisualKeyboardFileName, Get_ID);
   finally
     Free;
+  end;
+end;
+
+/// <summary>Updates installed keyboard to Keyman 14+ registration pattern</summary>
+/// <remarks>This refreshes all the registered profiles for the keyboard and registers
+/// transient profiles. This function is idempotent. This function requires elevation '
+/// to succeed.</remarks>
+procedure TKeymanKeyboardInstalled.RefreshInstallation;
+var
+  kpik: TKPInstallKeyboard;
+  o: IKeymanPackageInstalled;
+  ll: TPackageKeyboardLanguageList;
+begin
+  kpik := TKPInstallKeyboard.Create(Context);
+  try
+    o := Get_OwnerPackage;
+    if Assigned(o) then
+    begin
+      ll := (o as IIntKeymanPackageInstalled).GetKeyboardLanguageList(Get_ID) as TPackageKeyboardLanguageList;
+      kpik.RegisterProfiles(FRegKeyboard.KeymanFile, o.ID, [ikPartOfPackage], ll);
+    end
+    else
+      kpik.RegisterProfiles(FRegKeyboard.KeymanFile, '', [], nil);
+  finally
+    kpik.Free;
   end;
 end;
 

@@ -13,14 +13,14 @@ from keyman_config.get_kmp import get_download_folder, download_kmp_file
 from keyman_config.install_window import InstallKmpWindow
 from keyman_config.accelerators import init_accel
 from keyman_config.get_info import GetInfo
-from keyman_config import __releaseversion__, __tier__, KeymanComUrl
+from keyman_config import __releaseversion__, __tier__, KeymanComUrl, _
 
 
 class DownloadKmpWindow(Gtk.Dialog):
 
     def __init__(self, parent=None):
         self.accelerators = None
-        Gtk.Dialog.__init__(self, "Download Keyman keyboards", parent)
+        Gtk.Dialog.__init__(self, _("Download Keyman keyboards"), parent)
         self.parentWindow = parent
         self.downloadfile = None
         init_accel(self)
@@ -34,7 +34,7 @@ class DownloadKmpWindow(Gtk.Dialog):
 
         self.get_content_area().pack_start(s, True, True, 0)
 
-        self.add_button("_Close", Gtk.ResponseType.CLOSE)
+        self.add_button(_("_Close"), Gtk.ResponseType.CLOSE)
 
         if self.parentWindow is not None:
             self.getinfo = GetInfo(self.parentWindow.incomplete_kmp)

@@ -8,6 +8,7 @@ from os import listdir
 from shutil import rmtree
 from enum import Enum
 
+from keyman_config import _
 from keyman_config.get_kmp import get_keyboard_data, user_keyboard_dir, user_keyman_font_dir
 from keyman_config.kmpmetadata import get_metadata, KMFileTypes
 from keyman_config.convertico import extractico, checkandsaveico
@@ -95,16 +96,16 @@ def install_kmp_shared(inputfile, online=False, language=None):
     """
     check_keyman_dir(
         '/usr/local/share',
-        "You do not have permissions to install the keyboard files to the shared area " +
-        "/usr/local/share/keyman")
+        _("You do not have permissions to install the keyboard files to the shared area "
+          "/usr/local/share/keyman"))
     check_keyman_dir(
         '/usr/local/share/doc',
-        "You do not have permissions to install the documentation to the shared " +
-        "documentation area /usr/local/share/doc/keyman")
+        _("You do not have permissions to install the documentation to the shared "
+          "documentation area /usr/local/share/doc/keyman"))
     check_keyman_dir(
         '/usr/local/share/fonts',
-        "You do not have permissions to install the font files to the shared font area " +
-        "/usr/local/share/fonts")
+        _("You do not have permissions to install the font files to the shared font area "
+          "/usr/local/share/fonts"))
 
     packageID = extract_package_id(inputfile)
     packageDir = os.path.join('/usr/local/share/keyman', packageID)
@@ -135,13 +136,17 @@ def install_kmp_shared(inputfile, online=False, language=None):
                 logging.info("Installing %s as documentation", f['name'])
                 if not os.path.isdir(kmpdocdir):
                     os.makedirs(kmpdocdir)
-                os.link(fpath, os.path.join(kmpdocdir, f['name']))
+                kmpdocpath = os.path.join(kmpdocdir, f['name'])
+                if not os.path.isfile(kmpdocpath):
+                    os.link(fpath, kmpdocpath)
             elif ftype == KMFileTypes.KM_FONT:
                 # Special handling of font to hard link it into font dir
                 logging.info("Installing %s as font", f['name'])
                 if not os.path.isdir(kmpfontdir):
                     os.makedirs(kmpfontdir)
-                os.link(fpath, os.path.join(kmpfontdir, f['name']))
+                kmpfontpath = os.path.join(kmpfontdir, f['name'])
+                if not os.path.isfile(kmpfontpath):
+                    os.link(fpath, kmpfontpath)
             elif ftype == KMFileTypes.KM_SOURCE:
                 # TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
                 logging.info("Installing %s as keyman file", f['name'])
@@ -175,7 +180,7 @@ def install_kmp_shared(inputfile, online=False, language=None):
         for o in os.listdir(packageDir):
             logging.info(o)
         rmtree(packageDir)
-        message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
+        message = _("install_kmp.py: error: No kmp.json or kmp.inf found in {package}").format(package=inputfile)
         raise InstallError(InstallStatus.Abort, message)
 
 
@@ -207,7 +212,9 @@ def install_kmp_user(inputfile, online=False, language=None):
                 fontsdir = os.path.join(user_keyman_font_dir(), packageID)
                 if not os.path.isdir(fontsdir):
                     os.makedirs(fontsdir)
-                os.link(fpath, os.path.join(fontsdir, f['name']))
+                fontpath = os.path.join(fontsdir, f['name'])
+                if not os.path.isfile(fontpath):
+                    os.link(fpath, fontpath)
                 logging.info("Installing %s as font", f['name'])
             elif ftype == KMFileTypes.KM_OSK:
                 # Special handling to convert kvk into LDML
@@ -242,7 +249,8 @@ def install_kmp_user(inputfile, online=False, language=None):
         for o in os.listdir(packageDir):
             logging.info(o)
         rmtree(packageDir)
-        message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
+        message = _("install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}").format(
+            packageFile=inputfile)
         raise InstallError(InstallStatus.Abort, message)
 
 

@@ -95,7 +95,6 @@ type
     constructor Create(const AName: string);
     destructor Destroy; override;
 
-    procedure ApplySettings(src: TRegKeyboard);
     procedure Load(FLoadKeyboard: Boolean);
     procedure Save;
 
@@ -132,7 +131,7 @@ type
     property KeyboardVersion: string read FKeyboardVersion;   // I4136
 
     { Modifiable settings -- Active Keyboards }
-    property Enabled: Boolean read FEnabled write FEnabled;
+    property Enabled: Boolean read FEnabled;
   end;
 
   TRegKeyboardList = class(TObjectList)
@@ -140,7 +139,6 @@ type
     function Get(Index: Integer): TRegKeyboard;
     procedure Put(Index: Integer; Item: TRegKeyboard);
   public
-    procedure ApplySettings(src: TRegKeyboardList);
     procedure Sort;
     function IndexOfName(const Name: string): Integer;
     procedure Load(FLoadKeyboards: Boolean);
@@ -458,22 +456,6 @@ begin
   finally
     Free;
   end;
-end;
-
-procedure TRegKeyboardList.ApplySettings(src: TRegKeyboardList);
-var
-  i, n: Integer;
-begin
-  for i := 0 to src.Count - 1 do
-  begin
-    n := IndexOfName(src[i].Name);
-    if n >= 0 then Items[n].ApplySettings(src[i]);
-  end;
-end;
-
-procedure TRegKeyboard.ApplySettings(src: TRegKeyboard);
-begin
-  Enabled := src.Enabled;
 end;
 
 destructor TRegKeyboard.Destroy;

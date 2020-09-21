@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+  <item app:state_verification_failed="true" android:color="@color/neutral_3"/>
+  <item android:color="@color/keyman_blue" />
+</selector>

@@ -18,6 +18,60 @@
 declare type USVString = string;
 
 /**
+ * Used to facilitate edit-distance calculations by allowing the LMLayer to
+ * efficiently search the model's lexicon in a Trie-like manner.
+ */
+declare interface LexiconTraversal {
+  /**
+   * Provides an iterable pattern used to search for words with a prefix matching
+   * the current traversal state's prefix when a new character is appended.  Iterating
+   * across `children` provides 'breadth' to a lexical search.
+   * 
+   * For an example with English, if the current traversal state corresponds to 'th', 
+   * children() may return an iterator with states corresponding 'e' 
+   * (for 'the', 'then', 'there'), 'a' (for 'than', 'that'), etc.
+   * 
+   * @param char      A full character (a UTF-16 code point, which may be comprised of two
+   *                  code units) corresponding to the child node, appended to the current
+   *                  node's prefix to produce the child node's prefix.
+   * <p>
+   *                  Example: if the current traversal's represented prefix is 'th', 
+   *                  char = 'e' would indicate a child node with prefix = 'the'.
+   * @param traversal a LexiconTraversal starting from (or "rooted at") the child node.  Use
+   *                  of the returned object provides 'depth' to a lexical search.
+   * <p>
+   *                  Example:
+   * 
+   * - Suppose our current LexiconTraversal represents a prefix of 'th'.
+   * - If `char` = 'e', the child represents a prefix of 'the'.
+   * - Then `traversal` allows traversing the part of the lexicon prefixed by 'the'.
+   */
+  children(): Generator<{char: USVString, traversal: () => LexiconTraversal}>;
+
+  /**
+   * Any entries directly keyed by the currently-represented lookup prefix.  Entries and
+   * children may exist simultaneously, but `entries` must always exist when no children are
+   * available in the returned `children()` iterable.
+   * 
+   * Examples for English:
+   * - search prefix of 'th':  [] - an empty array.  'th' is not a valid English word.
+   * - search prefix of 'the': ['the'].  'then' and 'there' may also exist within the lexicon,
+   *   but they most directly belong to deeper traversal states.
+   * 
+   * May contain multiple children if a lexical model performs 'keying' operations, such as
+   * may result from stripping accent markers from Spanish or French.  In this case, all entries
+   * transformed to the same 'key' should be listed by their key's traversal node.
+   * 
+   * Example using French "accent homographs", where keying operations strip accents:
+   * 
+   * - prefix of 'acre': ['acre', 'âcre']
+   * - prefix of 'crepe': ['crêpe', 'crêpé']
+   * - other examples:  https://www.thoughtco.com/french-accent-homographs-1371072
+   */
+  entries: USVString[];
+}
+
+/**
  * The model implementation, within the Worker.
  */
 declare interface LexicalModel {
@@ -78,6 +132,13 @@ declare interface LexicalModel {
    * @see LexicalModelPunctuation
    */
   readonly punctuation?: LexicalModelPunctuation;
+
+  /**
+   * Lexical models _may_ provide a LexiconTraversal object usable to enhance 
+   * prediction and correction results.  The returned object represents the
+   * unfiltered lexicon (with an empty prefix).
+   */
+  traverseFromRoot?(): LexiconTraversal;
 }
 
 /**

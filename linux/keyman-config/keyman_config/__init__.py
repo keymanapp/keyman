@@ -1,3 +1,4 @@
+import gettext
 import importlib
 import os.path
 import platform
@@ -8,6 +9,16 @@ from .version import __majorversion__
 from .version import __releaseversion__
 from .version import __tier__
 
+
+def _(txt):
+    translation = gettext.dgettext('keyman-config', txt)
+    if translation == txt:
+        translation = gettext.gettext(txt)
+    return translation
+
+
+gettext.bindtextdomain('keyman-config', '/usr/share/locale')
+gettext.textdomain('keyman-config')
 
 if __tier__ == 'alpha':
     # Alpha versions will work against the staging server so that they
@@ -54,4 +65,4 @@ except ImportError:
         })
     except ImportError:
         # even raven is not available. This is the case on Ubuntu 16.04. Just ignore.
-        print('Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting.')
+        print(_('Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting.'))

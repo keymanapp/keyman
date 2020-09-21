@@ -73,6 +73,7 @@ uses
   System.StrUtils,
 
   BCP47Tag,
+  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils,
   KeyboardParser,
   KeymanVersion,
@@ -192,7 +193,7 @@ var
 
       bcp47tag := TBCP47Tag.Create(tag);
       try
-        bcp47tag.Canonicalize;
+        bcp47tag.Tag := TCanonicalLanguageCodeUtils.FindBestTag(bcp47tag.Tag, False);
         Result := Result + '"' + bcp47tag.Tag + '"';
       finally
         bcp47tag.Free;

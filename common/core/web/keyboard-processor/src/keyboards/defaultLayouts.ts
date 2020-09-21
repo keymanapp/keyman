@@ -419,8 +419,12 @@ namespace com.keyman.keyboards {
               if(layerId.indexOf('shift') != -1) {
                 key['sp'] = buttonClasses['SHIFT-ON'];
               } 
-              if((formFactor != 'desktop') && (layerId != 'default')) {
-                key['nextlayer']='default';
+              if(formFactor != 'desktop') {
+                if(layerId != 'default') {
+                  key['nextlayer']='default';
+                } else {
+                  key['nextlayer']='shift';
+                }
               }
               break;
             case 'K_LCTRL':

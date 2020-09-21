@@ -6,3 +6,14 @@ export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
 
 %:
 	dh $@ --with python3 --buildsystem=pybuild --with bash-completion
+
+override_dh_auto_build:
+	make man
+	make compile-po
+	dh_auto_build $@
+
+override_dh_auto_install:
+	install -d $(CURDIR)/debian/keyman/usr/share/
+	cp -r locale/ $(CURDIR)/debian/keyman/usr/share/
+	rm $(CURDIR)/debian/keyman/usr/share/locale/*.po*
+	dh_auto_install $@
