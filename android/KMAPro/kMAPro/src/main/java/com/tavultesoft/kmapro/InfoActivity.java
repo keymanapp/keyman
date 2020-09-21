@@ -7,12 +7,10 @@ package com.tavultesoft.kmapro;
 import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.FormFactor;
-import com.tavultesoft.kmea.util.KMLog;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -20,10 +18,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
-import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 
 public class InfoActivity extends AppCompatActivity {
   private final static String TAG = "InfoActivity";
@@ -44,26 +39,13 @@ public class InfoActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_info);
 
-    Toolbar toolbar = findViewById(R.id.info_toolbar);
-    setSupportActionBar(toolbar);
-    getSupportActionBar().setTitle(null);
-    getSupportActionBar().setDisplayUseLogoEnabled(true);
-    getSupportActionBar().setDisplayShowHomeEnabled(true);
-    getSupportActionBar().setLogo(R.drawable.keyman_logo);
-    getSupportActionBar().setDisplayShowTitleEnabled(false);
-    getSupportActionBar().setDisplayShowCustomEnabled(true);
-
-    TextView version = new TextView(this);
-    version.setWidth((int) getResources().getDimension(R.dimen.label_width));
-    version.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
-    version.setGravity(Gravity.CENTER);
+    TextView version = findViewById(R.id.infoVersion);
 
     // Parse app version string to create a version title (Not using KMManager.getVersion() because that's for KMEA)
     String versionStr = BuildConfig.VERSION_NAME;
 
     String versionTitle = String.format(getString(R.string.title_version), versionStr);
     version.setText(versionTitle);
-    getSupportActionBar().setCustomView(version);
 
     // Extract the the major minor version from the full version string
     String[] versionArray = versionStr.split("\\.", 3);

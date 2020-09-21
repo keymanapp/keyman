@@ -5,7 +5,6 @@
          screen margins) for sw720dp devices (e.g. 10" tablets) here.
     -->
     <dimen name="label_width">500dp</dimen>
-    <dimen name="titlebar_label_textsize">18sp</dimen>
     <dimen name="package_label_width">650dp</dimen>
     <dimen name="product_logo_bottom">196dp</dimen>
     <dimen name="checkbox_margin">8dp</dimen>

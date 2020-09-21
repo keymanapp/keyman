@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 14.0.144 alpha 2020-09-18
+
+* feat(developer): add viewport to html templates (#3531)
+* fix(windows): use new signtime.bat on build agents (#3586)
+* fix(developer): Touch font size should be string (#3585)
+* fix(android/app): Fix Info page title size (#3571)
+* fix(linux/config): Check if file exists before creating hard links (#3592)
+* fix(windows): remove obsolete releaseCapture calls (#3594)
+* fix(linux/config): Catch if kmp.json is invalid JSON (#3593)
+
+## 14.0.143 alpha 2020-09-16
+
+* fix(android/app): Validate language selection for "INSTALL" button (#3579)
+
+## 14.0.142 alpha 2020-09-15
+
+* chore(deps): bump node-fetch from 2.6.0 to 2.6.1 in /resources/build/version (#3578)
+
+## 14.0.141 alpha 2020-09-11
+
+* fix(web): default layout shift not changing layer (#3574)
+
 ## 14.0.140 alpha 2020-09-09
 
 * feat(common/models): core edit-distance calculation class (#3526)
