@@ -226,7 +226,9 @@ namespace com.keyman.text.prediction {
         let reversionPromise: Promise<Suggestion> = new Promise<Suggestion>(function(resolveFunc, rejectFunc) {
           wordbreakPromise.then(function(token) {
             let suggestion: Suggestion = {
-              displayAs: token,
+              // TODO:  This needs to be sourced from the lm-layer side, from the model's
+              // punctuation spec.  Hence the 'outer' TODO.
+              displayAs: '"' + token + '"',
               transform: reversionTranscription.transform,
               transformId: reversionTranscription.token
             }
