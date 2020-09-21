@@ -118,9 +118,10 @@ fi
 BASE_PATH=`dirname $BASH_SOURCE`
 cd $BASE_PATH/../source
 
-./build_dev_resources.sh
+# Compile our testing dependencies; make sure the script fails if compilation fails!
+./build_dev_resources.sh || fail "Dev resource compilation failed."
 cd ../tools/recorder
-./build.sh
+./build.sh || fail "KMW recorder-module compilation failed."
 
 # Run our headless tests first.
 # Since we're using `lerna`, this actually puts us within the projects when run in-repo!
