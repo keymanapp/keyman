@@ -25,6 +25,8 @@ import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -148,31 +150,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
-
-          // Determine if associated lexical model for languageID should be downloaded
-          if (FileUtils.hasKeymanPackageExtension(kmpFilename) && !FileUtils.hasLexicalModelPackageExtension(kmpFilename)
-              && (languageID != null) && !languageID.isEmpty()) {
-
-            // Force the cloud catalog to update
-            if (!didExecuteParser) {
-              didExecuteParser = true;
-              repo = CloudRepository.shared.fetchDataset(context);
-            }
-
-            // Check if associated model is available in the cloud, and that it's not already installed
-            LexicalModel modelInfo = CloudRepository.shared.getAssociatedLexicalModel(context, languageID);
-            if ((modelInfo != null) && (KMManager.getAssociatedLexicalModel(languageID) == null)) {
-              String modelID = modelInfo.getLexicalModelID();
-              String url = modelInfo.getUpdateKMP();
-              if (url != null) {
-                ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
-                _params.add(new CloudApiTypes.CloudApiParam(
-                    CloudApiTypes.ApiTarget.LexicalModelPackage, url));
-                KMKeyboardDownloaderActivity.downloadLexicalModel(context, modelID, _params);
-              }
-            }
-          }
-
           break;
       }
       super.onReceiveResult(resultCode, resultData);
@@ -1025,11 +1002,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
     for(int i=0; i < keyboardsInstalled.size(); i++) {
       HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
+      String languageID = hashMap.get(KMManager.KMKey_LanguageID);
       Keyboard keyboardInfo = new Keyboard(
         hashMap.get(KMManager.KMKey_PackageID),
         hashMap.get(KMManager.KMKey_KeyboardID),
         hashMap.get(KMManager.KMKey_KeyboardName),
-        hashMap.get(KMManager.KMKey_LanguageID),
+        languageID,
         hashMap.get(KMManager.KMKey_LanguageName),
         hashMap.get(KMManager.KMKey_Version),
         hashMap.get(KMManager.KMKey_CustomHelpLink),
@@ -1045,6 +1023,35 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
       }
+
+      // Determine if associated lexical model for languageID should be downloaded
+      if ((languageID != null) && !languageID.isEmpty()) {
+
+        // Force the cloud catalog to update
+        if (!didExecuteParser) {
+          didExecuteParser = true;
+          repo = CloudRepository.shared.fetchDataset(context);
+        }
+
+        // Check if associated model is available in the cloud, and that it's not already installed
+        LexicalModel modelInfo = CloudRepository.shared.getAssociatedLexicalModel(context, languageID);
+        if ((modelInfo != null) && (KMManager.getAssociatedLexicalModel(languageID) == null)) {
+          String modelID = modelInfo.getLexicalModelID();
+          String url = modelInfo.getUpdateKMP();
+          if (url != null) {
+            ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
+            _params.add(new CloudApiTypes.CloudApiParam(
+              CloudApiTypes.ApiTarget.LexicalModelPackage, url));
+
+            // Check if model is already queued to download
+            String _downloadid= CloudLexicalPackageDownloadCallback.createDownloadId(modelID);
+            if(!CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid)) {
+              KMKeyboardDownloaderActivity.downloadLexicalModel(context, modelID, _params);
+            }
+          }
+        }
+      }
+
     }
   }
 
