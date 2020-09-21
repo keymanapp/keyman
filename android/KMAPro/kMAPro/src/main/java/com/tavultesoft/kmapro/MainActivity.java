@@ -959,43 +959,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
-    String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    if (result > 0) {
-      String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-      String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-      String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-      String kbVersion = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
-      String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-      String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      if (languageID.contains(";")) {
-        String[] ids = languageID.split("\\;");
-        String[] names = languageName.split("\\;");
-        int len = ids.length;
-        for (int i = 0; i < len; i++) {
-          String langId = ids[i];
-          String langName = "Unknown";
-          if (i < names.length)
-            langName = names[i];
-          HashMap<String, String> kbInfo = new HashMap<String, String>();
-          kbInfo.put(KMManager.KMKey_PackageID, packageID);
-          kbInfo.put(KMManager.KMKey_KeyboardID, keyboardID);
-          kbInfo.put(KMManager.KMKey_LanguageID, langId);
-          kbInfo.put(KMManager.KMKey_KeyboardName, keyboardName);
-          kbInfo.put(KMManager.KMKey_LanguageName, langName);
-          kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-          kbInfo.put(KMManager.KMKey_Font, kFont);
-          kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
-
-          KMManager.addKeyboard(this, kbInfo);
-
-        }
-      } else {
-        KMManager.addKeyboard(this, keyboardInfo);
-      }
-    } else {
-      // Error notifications previously handled in LanguageListActivity
-    }
+    // Do nothing
   }
 
   @Override
