@@ -79,6 +79,7 @@ type
     procedure OpenLink(params: TStringList);
     procedure UILanguage(params: TStringList);
 
+    function IsLocalUrl(const url: string): Boolean;
 
     procedure Content_Render(FRefreshKeyman: Boolean = False; const Query: string = ''); virtual;
     procedure WndProc(var Message: TMessage); override;  // I2720
@@ -161,6 +162,12 @@ begin
   else if command = 'contributeuilanguages' then ContributeUILanguages   // I4989
   else if command = 'resize' then cef.DoResizeByContent
   else ShowMessage(command + '?' + params.Text);
+end;
+
+/// <summary>Returns true if url is from the local render server</summary>
+function TfrmWebContainer.IsLocalUrl(const url: string): Boolean;
+begin
+  Result := url.StartsWith(modWebHttpServer.Host, True);
 end;
 
 procedure TfrmWebContainer.OpenLink(params: TStringList);
