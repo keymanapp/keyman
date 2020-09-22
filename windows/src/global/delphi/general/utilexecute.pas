@@ -35,7 +35,11 @@ type
     class function WaitForProcess(const cmdline, curdir: string; ShowWindow: Integer = SW_SHOWNORMAL; FOnCallback: TUtilExecuteCallbackWaitEvent = nil): Boolean; overload; static;
     class function WaitForProcess(const cmdline, curdir: string; var EC: Cardinal; ShowWindow: Integer = SW_SHOWNORMAL; FOnCallback: TUtilExecuteCallbackWaitEvent = nil): Boolean; overload; static;
     class function Shell(Handle: HWND; const process, curdir: string; const parameters: string = ''; ShowWindow: Integer = SW_SHOWNORMAL; const Verb: string = 'open'): Boolean; static;
+    class function ShellCurrentUser(Handle: HWND; const process, curdir: string; const parameters: string = ''; ShowWindow: Integer = SW_SHOWNORMAL; const Verb: string = 'open'): Boolean; static;
     class function URL(const url: string): Boolean;
+
+    class function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean): Boolean; overload;
+    class function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean; var AExitCode: Cardinal): Boolean; overload;
   end;
 
 implementation
@@ -169,6 +173,17 @@ begin
   Result := ShellExecute(Handle, PChar(Verb), Pchar(process), PChar(parameters), Pchar(curdir), ShowWindow) > 32;
 end;
 
+class function TUtilExecute.ShellCurrentUser(Handle: HWND; const process,
+  curdir, parameters: string; ShowWindow: Integer; const Verb: string): Boolean;
+begin
+  // Use mysterious ways to get the shell process to launch. There are at least
+  // three different ways to do this. The way we are using has been used by the
+  // bootstrap for years so pretty sure it's robust!
+  // Alternative: https://devblogs.microsoft.com/oldnewthing/20131118-00/?p=2643
+  // Alternative: https://devblogs.microsoft.com/oldnewthing/20190425-00/?p=102443
+  Result := CreateProcessAsShellUser(process, '"'+process+'" '+parameters, False);
+end;
+
 class function TUtilExecute.URL(const url: string): Boolean;
 begin
   Result := ShellExecute(GetActiveWindow, nil, PChar(url), nil, nil, SW_SHOW) >= 32;
@@ -241,4 +256,131 @@ begin
   end;
 end;
 
+// Refactored from UCreateProcessAsShellUser
+
+function GetShellWindow: HWND; stdcall; external user32;
+
+type
+  TCreateProcessWithTokenW = function(hToken: THANDLE; dwLogonFlags: DWORD; lpApplicationName: LPCWSTR; lpCommandLine: LPWSTR;
+  dwCreationFlags: DWORD; lpEnvironment: Pointer; lpCurrentDirectory: LPCWSTR; lpStartupInfo: PSTARTUPINFOW;
+  lpProcessInformation: PPROCESSINFORMATION): BOOL; stdcall;
+
+var
+  CreateProcessWithTokenW: TCreateProcessWithTokenW = nil;
+
+class function TUtilExecute.CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean): Boolean;  // I2757
+var
+  ec: Cardinal;
+begin
+  Result := CreateProcessAsShellUser(process, cmdline, Wait, ec);
+end;
+
+class function TUtilExecute.CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean; var AExitCode: Cardinal): Boolean;  // I2757
+var
+  dwProcessId: Cardinal;
+  hProcess, hShellProcessToken: THandle;
+  hDesktopWindow: THandle;
+  si: TStartupInfoW;
+  pi: TProcessInformation;
+  hPrimaryToken: NativeUInt;  // I3309
+  hCurrentThreadToken: THandle;
+  tkp: TTokenPrivileges;
+  retlen: Cardinal;
+
+  procedure DoWait;
+  var
+    Msg: TMsg;
+    Waiting: Boolean;
+  begin
+    Waiting := True;
+    while Waiting do
+    begin
+      case MsgWaitForMultipleObjects(1, pi.hProcess, FALSE, INFINITE, QS_ALLINPUT) of
+        WAIT_OBJECT_0 + 1:
+          while PeekMessageW(Msg, 0, 0, 0, PM_REMOVE) do
+          begin
+            TranslateMessage(Msg);
+            DispatchMessage(Msg);
+          end;
+        WAIT_OBJECT_0, WAIT_ABANDONED_0:
+          Waiting := False;
+        else
+          Waiting := False;
+      end;
+    end;
+  end;
+const
+  SE_INCREASE_QUOTA_NAME = 'SeIncreaseQuotaPrivilege';
+  TOKEN_ADJUST_SESSIONID = $100;
+begin
+  Result := False;
+
+  FillChar(si, SizeOf(si), 0);
+  si.cb := SizeOf(si);
+
+  FillChar(pi, SizeOf(pi), 0);
+
+  if not Assigned(CreateProcessWithTokenW) then Exit;
+
+  hDesktopWindow := GetShellWindow;
+  if hDesktopWindow = 0 then Exit;
+  if GetWindowThreadProcessId(hDesktopWindow, dwProcessId) = 0 then Exit;
+
+  if not ImpersonateSelf(SecurityImpersonation) then Exit;
+  try
+    if not LookupPrivilegeValue(nil, SE_INCREASE_QUOTA_NAME, tkp.Privileges[0].Luid) then Exit;
+
+    tkp.PrivilegeCount := 1;  // one privilege to set
+    tkp.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
+
+    if not OpenThreadToken(GetCurrentThread, TOKEN_ADJUST_PRIVILEGES, False, hCurrentThreadToken) then Exit;
+    try
+      if not AdjustTokenPrivileges(hCurrentThreadToken, False, tkp, 0, nil, retlen) then Exit;
+
+      hProcess := OpenProcess(PROCESS_QUERY_INFORMATION, False, dwProcessId);
+      if hProcess = 0 then Exit;
+      try
+        if not OpenProcessToken(hProcess, TOKEN_DUPLICATE, hShellProcessToken) then Exit;
+        try
+          if not DuplicateTokenEx(hShellProcessToken, TOKEN_QUERY or TOKEN_ASSIGN_PRIMARY or TOKEN_DUPLICATE or TOKEN_ADJUST_DEFAULT or TOKEN_ADJUST_SESSIONID,
+            nil, SecurityImpersonation, TokenPrimary, hPrimaryToken) then Exit;
+          try
+            if not CreateProcessWithTokenW(hPrimaryToken, 0, PWideChar(process), PWideChar(cmdline), NORMAL_PRIORITY_CLASS, nil, nil, @si, @pi) then Exit;
+          finally
+            CloseHandle(hPrimaryToken);
+          end;
+        finally
+          CloseHandle(hShellProcessToken);
+        end;
+      finally
+        CloseHandle(hProcess);
+      end;
+    finally
+      CloseHandle(hCurrentThreadToken);
+    end;
+  finally
+    RevertToSelf;
+  end;
+
+  Result := True;
+
+  if Wait then  // I2757   // I4318
+  begin
+    DoWait;
+    GetExitCodeProcess(pi.hProcess, AExitCode);
+  end;
+
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+end;
+
+var
+  hAdvApi32: THandle = 0;
+initialization
+  hAdvApi32 := LoadLibrary(advapi32);
+  if hAdvApi32 <> 0 then
+    CreateProcessWithTokenW := GetProcAddress(hAdvApi32, 'CreateProcessWithTokenW');
+finalization
+  if hAdvApi32 <> 0 then
+    FreeLibrary(hAdvApi32);
 end.

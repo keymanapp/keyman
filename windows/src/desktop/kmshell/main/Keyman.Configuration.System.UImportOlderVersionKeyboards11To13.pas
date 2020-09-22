@@ -29,7 +29,6 @@ uses
   Keyman.System.UpgradeRegistryKeys,
   kmint,
   RegistryKeys,
-  UCreateProcessAsShellUser,
   UImportOlderVersionKeyboards9Plus,
   UImportOlderKeyboardUtils,
   utilexecute,
@@ -38,14 +37,14 @@ uses
 class procedure TImportOlderVersionKeyboards11To13.Execute;  // I2361
 begin
   // execute KMshell as login user to backup list of installed Keyman TIPs
-  CreateProcessAsShellUser(ParamStr(0), '"'+ParamStr(0)+'" -upgradekeyboards=13,backup', True);
+  TUtilExecute.CreateProcessAsShellUser(ParamStr(0), '"'+ParamStr(0)+'" -upgradekeyboards=13,backup', True);
 
   // Refreshes the installed TIPs (LM)
   TImportOlderVersionKeyboards11To13.ReRegisterTips;
 
   // This runs after the admin run, we'll take the backed up list of installed
   // Keyman TIPs and re-install them as current user.
-  CreateProcessAsShellUser(ParamStr(0), '"'+ParamStr(0)+'" -upgradekeyboards=13,import', True)
+  TUtilExecute.CreateProcessAsShellUser(ParamStr(0), '"'+ParamStr(0)+'" -upgradekeyboards=13,import', True)
 end;
 
 { TImportOlderVersionKeyboards11To13 }
