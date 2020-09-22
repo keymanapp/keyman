@@ -26,7 +26,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -997,25 +997,25 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           repo = CloudRepository.shared.fetchDataset(context);
         }
 
-        // Check if associated model is available in the cloud, and that it's not already installed
-        LexicalModel modelInfo = CloudRepository.shared.getAssociatedLexicalModel(context, languageID);
-        if ((modelInfo != null) && (KMManager.getAssociatedLexicalModel(languageID) == null)) {
-          String modelID = modelInfo.getLexicalModelID();
-          String url = modelInfo.getUpdateKMP();
-          if (url != null) {
-            ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
-            _params.add(new CloudApiTypes.CloudApiParam(
-              CloudApiTypes.ApiTarget.LexicalModelPackage, url));
+        // Check if associated model is not already installed
+        if (KMManager.getAssociatedLexicalModel(languageID) == null) {
+          String _downloadid = CloudLexicalModelMetaDataDownloadCallback.createDownloadId(languageID);
+          CloudLexicalModelMetaDataDownloadCallback _callback = new CloudLexicalModelMetaDataDownloadCallback();
 
-            // Check if model is already queued to download
-            String _downloadid= CloudLexicalPackageDownloadCallback.createDownloadId(modelID);
-            if(!CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid)) {
-              KMKeyboardDownloaderActivity.downloadLexicalModel(context, modelID, _params);
-            }
-          }
+          Toast.makeText(context,
+            context.getString(R.string.query_associated_model),
+            Toast.LENGTH_SHORT).show();
+
+          ArrayList<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams = new ArrayList<>();
+          String url = CloudRepository.prepareLexicalModelQuery(languageID);
+          aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
+            CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
+
+          CloudDownloadMgr.getInstance().executeAsDownload(
+            context, _downloadid, null, _callback,
+            aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
         }
       }
-
     }
   }
 
