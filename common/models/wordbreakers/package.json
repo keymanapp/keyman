@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/models-wordbreakers",
-  "version": "14.0.146",
+  "version": "14.0.147",
   "description": "Word breakers bundled in the modeling layer",
   "keywords": [
     "lexical model",
@@ -40,7 +40,7 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "@keymanapp/models-types": "^14.0.146",
+    "@keymanapp/models-types": "^14.0.147",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "chai": "^4.2.0",
