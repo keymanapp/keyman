@@ -216,7 +216,7 @@ class ModelCompositor {
       // Combine duplicate samples.
       let displayText = prediction.sample.displayAs;
 
-      if(displayText == keepOptionText || lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) {
+      if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
         keepOption = prediction.sample;
         // Ensure we keep any original casing, etc that may have been stripped.
         keepOption.transform.insert = keepOptionText + punctuation.insertAfterWord;
