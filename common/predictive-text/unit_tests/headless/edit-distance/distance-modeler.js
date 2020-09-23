@@ -7,7 +7,7 @@ function assertEdgeChars(edge, input, match) {
 }
 
 function edgeHasChars(edge, input, match) {
-  if(edge.optimalInput[edge.optimalInput.length - 1].sample.insert != input) {
+  if(edge.priorInput[edge.priorInput.length - 1].sample.insert != input) {
     return false;
   }
 
@@ -16,7 +16,7 @@ function edgeHasChars(edge, input, match) {
 
 function findEdgeWithChars(edgeArray, input, match) {
   let results = edgeArray.filter(function(value) {
-    return value.calculation.lastMatchEntry.key == match && value.optimalInput[value.optimalInput.length - 1].sample.insert == input;
+    return value.calculation.lastMatchEntry.key == match && value.priorInput[value.priorInput.length - 1].sample.insert == input;
   });
 
   assert.equal(results.length, 1);
@@ -47,7 +47,7 @@ describe('Correction Distance Modeler', function() {
 
         let childEdge = edges.filter(value => value.calculation.lastMatchEntry.key == child.char)[0];
         assert.isOk(childEdge);
-        assert.isEmpty(childEdge.optimalInput);
+        assert.isEmpty(childEdge.priorInput);
         assert.isEmpty(childEdge.calculation.inputSequence);
         assert.isAbove(childEdge.currentCost, 0);
       }
@@ -72,13 +72,13 @@ describe('Correction Distance Modeler', function() {
 
       let highCost, lowCost;
       for(let edge of edges) {
-        assert.isNotEmpty(edge.optimalInput);
+        assert.isNotEmpty(edge.priorInput);
         assert.isEmpty(edge.calculation.matchSequence);
 
-        if(edge.optimalInput[0].p == 0.75) {
+        if(edge.priorInput[0].p == 0.75) {
           // 't'.
           lowCost = edge.currentCost;  // higher prob = lower cost.
-        } else if(edge.optimalInput[0].p == 0.25) {
+        } else if(edge.priorInput[0].p == 0.25) {
           // 'h'
           highCost = edge.currentCost;
         } else {
@@ -136,21 +136,21 @@ describe('Correction Distance Modeler', function() {
       assert.equal(edges.length, expectedChildCount);
 
       // One final bit, which is a bit of integration - we know the top two nodes that should result.
-      let queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, edges);
+      let queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, edges);
 
       let firstEdge = queue.dequeue();
-      assert.equal(firstEdge.optimalInput[0].sample.insert, 't');
+      assert.equal(firstEdge.priorInput[0].sample.insert, 't');
       assert.equal(firstEdge.calculation.lastMatchEntry.key, 't');
       assert.isAbove(firstEdge.currentCost, 0);
 
       let secondEdge = queue.dequeue();
-      assert.equal(secondEdge.optimalInput[0].sample.insert, 'h');
+      assert.equal(secondEdge.priorInput[0].sample.insert, 'h');
       assert.equal(secondEdge.calculation.lastMatchEntry.key, 'h');
       assert.isAbove(secondEdge.currentCost, firstEdge.currentCost);
 
       // After this, a 't' input without a matching char.
       let nextEdge = queue.dequeue();
-      assert.equal(nextEdge.optimalInput[0].sample.insert, 't');
+      assert.equal(nextEdge.priorInput[0].sample.insert, 't');
       assert.notEqual(nextEdge.calculation.lastMatchEntry.key, 't');
       assert.isAbove(nextEdge.currentCost, secondEdge.currentCost);
     });
@@ -179,13 +179,13 @@ describe('Correction Distance Modeler', function() {
       ];
 
       let layer1Edges = rootNode.buildSubstitutionEdges(synthDistribution1);
-      let layer1Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer1Edges);
+      let layer1Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer1Edges);
 
       let tEdge = layer1Queue.dequeue();
       assertEdgeChars(tEdge, 't', 't');
 
-      let layer2Edges = new correction.SearchNode(rootTraversal, tEdge).buildSubstitutionEdges(synthDistribution2);
-      let layer2Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer2Edges);
+      let layer2Edges = tEdge.buildSubstitutionEdges(synthDistribution2);
+      let layer2Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer2Edges);
 
       let eEdge = layer2Queue.dequeue();
       assertEdgeChars(eEdge, 'e', 'e');
@@ -199,10 +199,10 @@ describe('Correction Distance Modeler', function() {
       assert.isOk(ehEdge);
 
       // Final round:  we'll use three nodes and throw all of their results into the same priority queue.
-      let layer3eEdges  = new correction.SearchNode(rootTraversal, eEdge).buildSubstitutionEdges(synthDistribution3);
-      let layer3hEdges  = new correction.SearchNode(rootTraversal, hEdge).buildSubstitutionEdges(synthDistribution3);
-      let layer3ehEdges = new correction.SearchNode(rootTraversal, ehEdge).buildSubstitutionEdges(synthDistribution3);
-      let layer3Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
+      let layer3eEdges  = eEdge.buildSubstitutionEdges(synthDistribution3);
+      let layer3hEdges  = hEdge.buildSubstitutionEdges(synthDistribution3);
+      let layer3ehEdges = ehEdge.buildSubstitutionEdges(synthDistribution3);
+      let layer3Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
 
       // Find the first result with an actual word directly represented.
       let bestEdge;
