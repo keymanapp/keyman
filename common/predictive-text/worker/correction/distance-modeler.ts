@@ -257,7 +257,10 @@ namespace correction {
   export class SearchSpace {
 
     private QUEUE_SPACE_COMPARATOR: models.Comparator<SearchSpaceTier>;
-
+    
+    // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
+    // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
+    // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
     static readonly EDIT_DISTANCE_COST_SCALE = 5;
 
     private tierOrdering: SearchSpaceTier[] = [];
