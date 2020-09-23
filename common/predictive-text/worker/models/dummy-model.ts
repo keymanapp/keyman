@@ -82,6 +82,11 @@ namespace models {
       }
     }
 
+    tokenize(context: Context): USVString[] {
+      let words = wordBreakers.default_(context.left);
+      return words.map(span => span.text);
+    }
+
     wordbreak(context: Context): USVString {
       let words = wordBreakers.default_(context.left);
       if (words.length > 0) {

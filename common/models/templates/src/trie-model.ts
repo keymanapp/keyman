@@ -159,6 +159,12 @@
       return '';
     }
 
+    public tokenize(context: Context): USVString[] {
+      let words = this.breakWords(context.left) || [];
+
+      return words.map(span => span.text);
+    }
+
     public wordbreak(context: Context): USVString {
       return this.getLastWord(context.left);
     }
