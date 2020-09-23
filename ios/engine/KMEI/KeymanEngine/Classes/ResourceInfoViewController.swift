@@ -11,8 +11,6 @@ import UIKit
 import WebKit
 
 class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
-  var isCustomKeyboard: Bool = false // legacy; was also used to toggle QR code gen + display
-
   // The data backing our UI text in the UITableView.
   private var infoArray = [[String: String]]()
 
@@ -45,13 +43,16 @@ class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, 
     super.viewDidLoad()
 
     var versionLabelKey: String
+    var helpLabelKey: String
     var uninstallLabelKey: String
 
     if Resource.self == InstallableLexicalModel.self {
       versionLabelKey = "info-label-version-lexical-model"
+      helpLabelKey = "info-command-help-lexical-model"
       uninstallLabelKey = "command-uninstall-lexical-model"
     } else {
       versionLabelKey = "info-label-version-keyboard"
+      helpLabelKey = "info-command-help-keyboard"
       uninstallLabelKey = "command-uninstall-keyboard"
     }
 
@@ -61,9 +62,9 @@ class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, 
       "subtitle": resource.version
       ])
 
-    if !isCustomKeyboard {
+    if package?.pageURL(for: .welcome) != nil {
       infoArray.append([
-        "title": NSLocalizedString("info-command-help", bundle: engineBundle, comment: ""),
+        "title": NSLocalizedString(helpLabelKey, bundle: engineBundle, comment: ""),
         "subtitle": ""
         ])
     }
@@ -124,7 +125,7 @@ class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, 
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if isCustomKeyboard {
+    if package?.pageURL(for: .welcome) == nil {
       return 2
     } else {
       return 3
@@ -139,20 +140,11 @@ class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, 
     return UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
   }
 
-  func showWelcome() {
-    // TODO:
-  }
-
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if !isCustomKeyboard {
+    if package?.pageURL(for: .welcome) != nil {
       if indexPath.row == 1 {
-        let typeString = resource.fullID.type == .keyboard ? "keyboard" : "lexicalModel"
-        let url = URL(string: "\(KeymanHosts.HELP_KEYMAN_COM)/\(typeString)/\(resource.id)/\(resource.version)/")!
-        if let openURL = Manager.shared.openURL {
-          _ = openURL(url)
-        } else {
-          log.error("openURL not set in Manager. Failed to open \(url)")
-        }
+        let welcomeVC = PackageWebViewController(for: package!, page: .welcome)!
+        self.navigationController?.pushViewController(welcomeVC, animated: true)
       } else if indexPath.row == 2 {
         showDeleteResource()
       }
@@ -168,7 +160,7 @@ class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, 
     cell.detailTextLabel?.text = infoArray[indexPath.row]["subtitle"]
     cell.tag = indexPath.row
 
-    if !isCustomKeyboard {
+    if package?.pageURL(for: .welcome) != nil {
       if indexPath.row == 1 {
         cell.accessoryType = .disclosureIndicator
       } else if indexPath.row == 2 && !mayDelete {

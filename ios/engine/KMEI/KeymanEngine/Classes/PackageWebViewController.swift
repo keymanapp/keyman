@@ -43,13 +43,12 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
     let prefs = WKPreferences()
     prefs.javaScriptEnabled = true
     config.preferences = prefs
-    config.suppressesIncrementalRendering = false
 
     webView = WKWebView(frame: CGRect.zero, configuration: config)
     webView!.isOpaque = false
-    webView!.backgroundColor = UIColor.clear
+    webView!.backgroundColor = UIColor.white
     webView!.navigationDelegate = self
-    webView!.scrollView.isScrollEnabled = false
+    webView!.scrollView.isScrollEnabled = true
 
     view = webView
     reloadHomePage()
