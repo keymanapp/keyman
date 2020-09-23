@@ -597,13 +597,16 @@ var
         packLocation := pack.GetBestLocation;
         if Assigned(packLocation) then
         begin
-          LogInfo('Downloading '+packLocation.Url);
           if packLocation.LocationType = iilOnline then
+          begin
+            LogInfo('Downloading '+packLocation.Url);
             if not TResourceDownloader.Execute(FInstallInfo, packLocation, FSilent) then
             begin
               LogInfo('Failed to download '+packLocation.Url); // TODO: can we get more detail?
+              pack.ShouldInstall := False;
               Continue; //
             end;
+          end;
 
           // Need to check kmshell version >= 14.0 for support for non-default
           // language registration into local machine context; will not install
@@ -632,7 +635,8 @@ var
       s := '-s -install-tips-for-packages ';
       for pack in FInstallInfo.Packages do
       begin
-        s := s + '"'+pack.ID+'='+pack.BCP47+'" ';
+        if pack.ShouldInstall then
+          s := s + '"'+pack.ID+'='+pack.BCP47+'" ';
       end;
 
       TUtilExecute.CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode);
