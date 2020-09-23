@@ -73,6 +73,7 @@ type
 
   IIntKeymanKeyboardLanguage = interface   // I4376
     ['{81C18942-3C81-4F50-A64A-35A4FE863177}']
+    procedure Disable;
   end;
 
   IIntKeymanKeyboardsInstalled = interface(IIntKeymanCollection)   // I4381

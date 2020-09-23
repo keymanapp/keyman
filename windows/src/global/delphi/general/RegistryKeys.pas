@@ -193,6 +193,7 @@ const
   SRegKey_ActiveKeyboards_CU = SRegKey_KeymanEngine_CU + '\Active Keyboards';                   // CU
 
   SRegSubKey_KeyboardOptions = 'Options';  // CU\ActiveKeyboards\<id>\Options
+  SRegSubKey_KeyboardLanguages = 'Languages'; //CU\ActiveKeyboards\<id>\Disabled Languages
 
   SRegValue_KeymanID            = 'keyman id';                                      // CU
   SRegValue_Legacy_KeymanInstalledLanguage = 'keyman installed language';                  // CU   // I4220
@@ -468,6 +469,7 @@ const
 function BuildKeyboardOptionKey_CU(const KeyboardID: string): string;
 function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
 function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string;
+function BuildKeyboardLanguagesKey_CU(const KeyboardID: string): string;
 
 implementation
 
@@ -484,6 +486,11 @@ end;
 function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string;
 begin
   Result := SRegKey_InstalledKeyboards_LM + '\' + KeyboardID + '\' + SRegSubKey_SuggestedLanguages;
+end;
+
+function BuildKeyboardLanguagesKey_CU(const KeyboardID: string): string;
+begin
+  Result := SRegKey_ActiveKeyboards_CU + '\' + KeyboardID + '\' + SRegSubKey_KeyboardLanguages;
 end;
 
 end.

@@ -451,6 +451,17 @@ begin
 
   if not InstallLayoutOrTip(PChar(FLayoutInstallString), 0) then   // I4302
     ErrorFmt(KMN_E_ProfileInstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
+
+  //
+  // Record the installation of the language
+  //
+  reg := TRegistry.Create;
+  try
+    if reg.OpenKey(BuildKeyboardLanguagesKey_CU(KeyboardID), True) then
+      reg.WriteString(BCP47Tag, FLayoutInstallString);
+  finally
+    reg.Free;
+  end;
 end;
 
 function TKPInstallKeyboardLanguage.InstallBCP47Language(const FLocaleName: string): Boolean;

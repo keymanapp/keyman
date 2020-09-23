@@ -161,14 +161,21 @@ end;
 
 procedure TKeymanKeyboardsInstalled.Apply;
 var
-  pInputProcessorProfiles: ITfInputProcessorProfiles;
+  i, n: Integer;
 begin
-  OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
-                          IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
   with TRegKeyboardList.Create do
   try
     Load(True);
-    // May do some cleanup
+
+    for i := 0 to FKeyboards.Count - 1 do
+    begin
+      n := IndexOfName((FKeyboards[i] as IKeymanKeyboard).ID);
+      if n >= 0 then
+      begin
+        Items[n].ApplySettings((FKeyboards[i] as IIntKeymanKeyboardInstalled).RegKeyboard);
+      end;
+    end;
+
     Save;
   finally
     Free;
