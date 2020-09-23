@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 14.0.147 alpha 2020-09-23
+
+* feat(common/models): context + input tracking for predictive text (#3549)
+* feat(common/models): initial integration for enhanced corrections (#3555)
+* feat(common/models): correction thresholding, acceptance (#3556)
+* refactor(common/models): distance modeler cleanup (#3565)
+* change(common/models): context tracker cleanup, optimizations, fixes (#3573)
+* feat(common/models): Correction improvement (#3575)
+* feat(common/models): naive correction-algorithm timer (#3581)
+* fix(common/models): Android API compat for upgraded correction-search (#3601)
+* fix(android/app): Query api.keyman.com for downloading associated dictionary (#3606)
+* refactor(web/engine): application of predictive suggestions (#3582)
+* fix(windows): simplify profile repair (#3559)
+
 ## 14.0.146 alpha 2020-09-22
 
 * chore(deps): bump http-proxy from 1.17.0 to 1.18.1 in /web/testing/regression-tests (#3568)
