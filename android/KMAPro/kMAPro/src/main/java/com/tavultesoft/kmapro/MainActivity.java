@@ -25,6 +25,8 @@ import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -148,31 +150,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
-
-          // Determine if associated lexical model for languageID should be downloaded
-          if (FileUtils.hasKeymanPackageExtension(kmpFilename) && !FileUtils.hasLexicalModelPackageExtension(kmpFilename)
-              && (languageID != null) && !languageID.isEmpty()) {
-
-            // Force the cloud catalog to update
-            if (!didExecuteParser) {
-              didExecuteParser = true;
-              repo = CloudRepository.shared.fetchDataset(context);
-            }
-
-            // Check if associated model is available in the cloud, and that it's not already installed
-            LexicalModel modelInfo = CloudRepository.shared.getAssociatedLexicalModel(context, languageID);
-            if ((modelInfo != null) && (KMManager.getAssociatedLexicalModel(languageID) == null)) {
-              String modelID = modelInfo.getLexicalModelID();
-              String url = modelInfo.getUpdateKMP();
-              if (url != null) {
-                ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
-                _params.add(new CloudApiTypes.CloudApiParam(
-                    CloudApiTypes.ApiTarget.LexicalModelPackage, url));
-                KMKeyboardDownloaderActivity.downloadLexicalModel(context, modelID, _params);
-              }
-            }
-          }
-
           break;
       }
       super.onReceiveResult(resultCode, resultData);
@@ -982,54 +959,19 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
-    String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    if (result > 0) {
-      String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-      String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-      String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-      String kbVersion = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
-      String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-      String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      if (languageID.contains(";")) {
-        String[] ids = languageID.split("\\;");
-        String[] names = languageName.split("\\;");
-        int len = ids.length;
-        for (int i = 0; i < len; i++) {
-          String langId = ids[i];
-          String langName = "Unknown";
-          if (i < names.length)
-            langName = names[i];
-          HashMap<String, String> kbInfo = new HashMap<String, String>();
-          kbInfo.put(KMManager.KMKey_PackageID, packageID);
-          kbInfo.put(KMManager.KMKey_KeyboardID, keyboardID);
-          kbInfo.put(KMManager.KMKey_LanguageID, langId);
-          kbInfo.put(KMManager.KMKey_KeyboardName, keyboardName);
-          kbInfo.put(KMManager.KMKey_LanguageName, langName);
-          kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-          kbInfo.put(KMManager.KMKey_Font, kFont);
-          kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
-
-          KMManager.addKeyboard(this, kbInfo);
-
-        }
-      } else {
-        KMManager.addKeyboard(this, keyboardInfo);
-      }
-    } else {
-      // Error notifications previously handled in LanguageListActivity
-    }
+    // Do nothing
   }
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
     for(int i=0; i < keyboardsInstalled.size(); i++) {
       HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
+      String languageID = hashMap.get(KMManager.KMKey_LanguageID);
       Keyboard keyboardInfo = new Keyboard(
         hashMap.get(KMManager.KMKey_PackageID),
         hashMap.get(KMManager.KMKey_KeyboardID),
         hashMap.get(KMManager.KMKey_KeyboardName),
-        hashMap.get(KMManager.KMKey_LanguageID),
+        languageID,
         hashMap.get(KMManager.KMKey_LanguageName),
         hashMap.get(KMManager.KMKey_Version),
         hashMap.get(KMManager.KMKey_CustomHelpLink),
@@ -1044,6 +986,35 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         }
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
+      }
+
+      // Determine if associated lexical model for languageID should be downloaded
+      if ((languageID != null) && !languageID.isEmpty()) {
+
+        // Force the cloud catalog to update
+        if (!didExecuteParser) {
+          didExecuteParser = true;
+          repo = CloudRepository.shared.fetchDataset(context);
+        }
+
+        // Check if associated model is not already installed
+        if (KMManager.getAssociatedLexicalModel(languageID) == null) {
+          String _downloadid = CloudLexicalModelMetaDataDownloadCallback.createDownloadId(languageID);
+          CloudLexicalModelMetaDataDownloadCallback _callback = new CloudLexicalModelMetaDataDownloadCallback();
+
+          Toast.makeText(context,
+            context.getString(R.string.query_associated_model),
+            Toast.LENGTH_SHORT).show();
+
+          ArrayList<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams = new ArrayList<>();
+          String url = CloudRepository.prepareLexicalModelQuery(languageID);
+          aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
+            CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
+
+          CloudDownloadMgr.getInstance().executeAsDownload(
+            context, _downloadid, null, _callback,
+            aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+        }
       }
     }
   }

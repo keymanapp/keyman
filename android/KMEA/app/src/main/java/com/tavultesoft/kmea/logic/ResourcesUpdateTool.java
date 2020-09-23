@@ -505,19 +505,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
-    if (result > 0) {
-      KeyboardPickerActivity.handleDownloadedKeyboard(currentContext, keyboardInfo);
-    } else if (result < 0) {
-      failedUpdateCount++;
-    }
-
-    if (! openUpdates.isEmpty()) {
-      String _langid = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String _kbid = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-      removeOpenUpdate(createKeyboardId(_langid,_kbid));
-    }
-
-    tryFinalizeUpdate();
+    // Do nothing
   }
 
   @Override
