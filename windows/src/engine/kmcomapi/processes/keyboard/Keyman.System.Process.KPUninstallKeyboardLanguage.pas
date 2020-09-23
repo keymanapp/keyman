@@ -252,7 +252,8 @@ begin
     WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
 
   //
-  // Record the installation of the language
+  // Remove the language from our current user Keyman settings (unless we are
+  // actually just disabling the keyboard, not uninstalling it)
   //
   if RemoveCURegistry then
     UninstallCURegistry(KeyboardID, FLayoutInstallString);
@@ -287,9 +288,8 @@ begin
     WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
 
   //
-  // Record the installation of the language. We need to match on the layout
-  // install string because the BCP47Tag is not necessarily identical after
-  // Windows canonicalizes it according to its internal rules
+  // Remove the language from our current user Keyman settings (unless we are
+  // actually just disabling the keyboard, not uninstalling it)
   //
   if RemoveCURegistry then
     UninstallCURegistry(KeyboardID, FLayoutInstallString);
