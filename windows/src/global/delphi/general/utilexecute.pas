@@ -262,8 +262,8 @@ function GetShellWindow: HWND; stdcall; external user32;
 
 type
   TCreateProcessWithTokenW = function(hToken: THANDLE; dwLogonFlags: DWORD; lpApplicationName: LPCWSTR; lpCommandLine: LPWSTR;
-  dwCreationFlags: DWORD; lpEnvironment: Pointer; lpCurrentDirectory: LPCWSTR; lpStartupInfo: PSTARTUPINFOW;
-  lpProcessInformation: PPROCESSINFORMATION): BOOL; stdcall;
+    dwCreationFlags: DWORD; lpEnvironment: Pointer; lpCurrentDirectory: LPCWSTR; lpStartupInfo: PSTARTUPINFOW;
+    lpProcessInformation: PPROCESSINFORMATION): BOOL; stdcall;
 
 var
   CreateProcessWithTokenW: TCreateProcessWithTokenW = nil;
