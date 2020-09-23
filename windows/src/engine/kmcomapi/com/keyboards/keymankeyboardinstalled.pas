@@ -298,17 +298,15 @@ begin
       lang := Get_Languages[i] as IKeymanKeyboardLanguageInstalled2;
       if lang.IsInstalled then
       begin
-        if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
+        if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) and
+            not RegistrationRequired then
+          lang.InstallTip(LangID, TemporaryKeyboardID)
+        else
         begin
-          if not RegistrationRequired then
-            lang.InstallTip(LangID, TemporaryKeyboardID)
-          else
-          begin
-            // The registration for the keyboard TIP has somehow disappeared; this is unexpected.
-            // We don't want to crash, so we'll just try and clean it up. The user will have to
-            // reinstall it, which is not the end of the world.
-            lang.Uninstall;
-          end;
+          // The registration for the keyboard TIP has somehow disappeared; this is unexpected.
+          // We don't want to crash, so we'll just try and clean it up. The user will have to
+          // reinstall it, which is not the end of the world.
+          lang.Uninstall;
         end;
       end;
     end;
