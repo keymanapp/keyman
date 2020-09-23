@@ -172,8 +172,7 @@ class ModelCompositor {
             finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
           }
 
-          // For now, a 'hacked' re-use of the model's existing `.predict()` method.
-          // Ideally, we'd just use the prefix to look up possible words.
+          // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
             deleteLeft: lexicalModel.wordbreak(context).length, // remove actual token string
@@ -217,8 +216,11 @@ class ModelCompositor {
       // Combine duplicate samples.
       let displayText = prediction.sample.displayAs;
 
-      if(displayText == keepOptionText) {
+      if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
         keepOption = prediction.sample;
+        // Ensure we keep any original casing, etc that may have been stripped.
+        keepOption.transform.insert = keepOptionText + punctuation.insertAfterWord;
+        keepOption.displayAs = keepOptionText;
         // Specifying 'keep' helps uses of the LMLayer find it quickly
         // if/when desired.
         keepOption.tag = 'keep';

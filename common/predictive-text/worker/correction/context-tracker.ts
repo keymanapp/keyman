@@ -16,6 +16,7 @@ namespace correction {
   export class TrackedContextState {
     // Stores the source Context (as a debugging reference).  Not currently utilized.
     taggedContext: Context;
+    model: LexicalModel;
 
     tokens: TrackedContextToken[];
     /**
@@ -30,8 +31,8 @@ namespace correction {
     searchSpace: SearchSpace[] = [];
 
     constructor(source: TrackedContextState);
-    constructor(rootTraversal: LexiconTraversal);
-    constructor(obj: TrackedContextState | LexiconTraversal) {
+    constructor(model: LexicalModel);
+    constructor(obj: TrackedContextState | LexicalModel) {
       if(obj instanceof TrackedContextState) {
         let source = obj;
         // Be sure to deep-copy the tokens!  Pointer-aliasing is bad here.
@@ -46,13 +47,15 @@ namespace correction {
         });
         this.searchSpace = obj.searchSpace;
         this.indexOffset = 0;
+        this.model = obj.model;
       } else {
-        let rootTraversal = obj;
+        let lexicalModel = obj;
         this.tokens = [];
         this.indexOffset = Number.MIN_SAFE_INTEGER;
+        this.model = lexicalModel;
 
-        if(rootTraversal) {
-          this.searchSpace = [new SearchSpace(rootTraversal)];
+        if(lexicalModel && lexicalModel.traverseFromRoot) {
+          this.searchSpace = [new SearchSpace(lexicalModel)];
         }
       }
     }
@@ -62,9 +65,9 @@ namespace correction {
       this.indexOffset -= 1;
     }
 
-    pushTail(token: TrackedContextToken, traversalRoot?: LexiconTraversal) {
-      if(traversalRoot) {
-        this.searchSpace = [new SearchSpace(traversalRoot)];
+    pushTail(token: TrackedContextToken) {
+      if(this.model && this.model.traverseFromRoot) {
+        this.searchSpace = [new SearchSpace(this.model)]; // yeah, need to update SearchSpace for compatibility
       } else {
         this.searchSpace = [];
       }
@@ -180,7 +183,6 @@ namespace correction {
   export class ContextTracker extends CircularArray<TrackedContextState> {
     static attemptMatchContext(tokenizedContext: USVString[], 
                                matchState: TrackedContextState,
-                               rootTraversal: LexiconTraversal,
                                transformDistribution?: Distribution<Transform>,): TrackedContextState {
       // Map the previous tokenized state to an edit-distance friendly version.
       let matchContext: USVString[] = matchState.toRawTokenization();
@@ -269,7 +271,7 @@ namespace correction {
           // Continuing the earlier assumption, that 'pure-whitespace Transform' does not emit any initial characters
           // for the new word (token), so the input keystrokes do not correspond to the new text token.
           emptyToken.transformDistributions = [];
-          state.pushTail(emptyToken, rootTraversal);
+          state.pushTail(emptyToken);
         } else {
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
           //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
@@ -284,7 +286,7 @@ namespace correction {
           let token = new TrackedContextToken();
           token.raw = tokenizedContext[0];
           token.transformDistributions = [transformDistribution];
-          state.pushTail(token, rootTraversal);
+          state.pushTail(token);
         } else {
           state.updateTail(transformDistribution, tokenizedContext[0]);
         }
@@ -292,7 +294,7 @@ namespace correction {
       return state;
     }
 
-    static modelContextState(tokenizedContext: USVString[], traversalRoot: LexiconTraversal): TrackedContextState {
+    static modelContextState(tokenizedContext: USVString[], lexicalModel: LexicalModel): TrackedContextState {
       let baseTokens = tokenizedContext.map(function(entry) {
         let token = new TrackedContextToken();
         token.raw = entry;
@@ -316,15 +318,15 @@ namespace correction {
       });
 
       // And now build the final context state object, which includes whitespace 'tokens'.
-      let state = new TrackedContextState(traversalRoot);
+      let state = new TrackedContextState(lexicalModel);
 
       if(baseTokens.length > 0) {
-        state.pushTail(baseTokens.splice(0, 1)[0], traversalRoot);
+        state.pushTail(baseTokens.splice(0, 1)[0]);
       }
 
       while(baseTokens.length > 0) {
         state.pushWhitespaceToTail();
-        state.pushTail(baseTokens.splice(0, 1)[0], traversalRoot);
+        state.pushTail(baseTokens.splice(0, 1)[0]);
       }
 
       return state;
@@ -353,7 +355,7 @@ namespace correction {
 
       if(tokenizedContext.length > 0) {
         for(let i = this.count - 1; i >= 0; i--) {
-          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item(i), model.traverseFromRoot(), transformDistribution);
+          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item(i), transformDistribution);
 
           if(resultState) {
             resultState.taggedContext = context;
@@ -370,7 +372,7 @@ namespace correction {
       //
       // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
       // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-      let state = ContextTracker.modelContextState(tokenizedContext, model.traverseFromRoot());
+      let state = ContextTracker.modelContextState(tokenizedContext, model);
       state.taggedContext = context;
       this.enqueue(state);
       return state;

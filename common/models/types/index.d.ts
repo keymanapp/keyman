@@ -91,6 +91,27 @@ declare interface LexicalModel {
   configure(capabilities: Capabilities): Configuration;
 
   /**
+   * Indicates a mapping function used by the model to simplify lookup operations
+   * within the lexicon.  This is expected to result in a many-to-one mapping, transforming
+   * the input text into a common, simplified 'index'/'key' form shared by all
+   * text forms that a person might reasonably interpret as "the same".
+   * 
+   * Example usages:  
+   * - converting any upper-case characters into lowercase.
+   *   - For English, 'CAT' and 'Cat' might be keyed as 'cat', since users expect all
+   *     three to be treated as the same word.
+   * - removing accent marks that may be difficult to type on standard keyboard layouts
+   *   - For French, users may wish to type "jeune" instead of "jeûne" when lazy or 
+   *     if accent marks cannot be easily input.
+   * 
+   * Providing a function targetted for your language can greatly improve a user's experience
+   * using your dictionary.
+   * @param text The original input text.
+   * @returns The 'keyed' form of that text.
+   */
+  toKey?(text: USVString): USVString;
+
+  /**
    * Generates predictive suggestions corresponding to the state of context after the proposed
    * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
    * keystroke rather than one actually received.

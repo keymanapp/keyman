@@ -96,6 +96,10 @@
       };
     }
 
+    toKey(text: USVString): USVString {
+      return this._trie.toKey(text);
+    }
+
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {

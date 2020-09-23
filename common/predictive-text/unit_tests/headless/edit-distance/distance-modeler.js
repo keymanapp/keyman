@@ -296,7 +296,7 @@ describe('Correction Distance Modeler', function() {
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let searchSpace = new correction.SearchSpace(rootTraversal);
+      let searchSpace = new correction.SearchSpace(testModel);
 
       let iter = searchSpace.getBestMatches();
       let firstSet = iter.next();
@@ -308,7 +308,7 @@ describe('Correction Distance Modeler', function() {
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let searchSpace = new correction.SearchSpace(rootTraversal);
+      let searchSpace = new correction.SearchSpace(testModel);
 
       // VERY artificial distributions.
       let synthDistribution1 = [
@@ -359,7 +359,7 @@ describe('Correction Distance Modeler', function() {
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let searchSpace = new correction.SearchSpace(rootTraversal);
+      let searchSpace = new correction.SearchSpace(testModel);
 
       // VERY artificial distributions.
       let synthDistribution1 = [
@@ -394,7 +394,7 @@ describe('Correction Distance Modeler', function() {
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let searchSpace = new correction.SearchSpace(rootTraversal);
+      let searchSpace = new correction.SearchSpace(testModel);
       let iter = searchSpace.getBestMatches();
 
       // While there's no input, insertion operations can produce suggestions.
