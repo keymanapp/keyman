@@ -329,7 +329,7 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches();
+      let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
       checkResults_teh(iter);
 
       // Debugging method:  a simple loop for printing out the generated sets, in succession.
@@ -380,12 +380,12 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches();
+      let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
       checkResults_teh(iter);
 
       // The key: do we get the same results the second time?
       // Reset the iterator first...
-      let iter2 = searchSpace.getBestMatches();
+      let iter2 = searchSpace.getBestMatches(0); // disables the correction-search timeout.
       checkResults_teh(iter2);
     });
 
