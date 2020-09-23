@@ -131,6 +131,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       tabVC.delegate = self
 
       let tabView = tabVC.view!
+      tabView.translatesAutoresizingMaskIntoConstraints = false
       self.view.addSubview(tabVC.view)
 
       tabView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
