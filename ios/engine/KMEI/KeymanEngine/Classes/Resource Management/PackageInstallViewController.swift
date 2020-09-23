@@ -40,7 +40,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @IBOutlet var iphoneTabViewController: UITabBarController!
 
   let package: Resource.Package
-  var wkWebView: WKWebView?
+  var packagePageController: PackageWebViewController?
   let completionHandler: CompletionHandler
   let defaultLanguageCode: String
   let associators: [LanguagePickAssociator]
@@ -79,10 +79,17 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   override public func viewDidLoad() {
-    wkWebView = WKWebView.init(frame: webViewContainer.frame)
+    // The 'readme' version is guaranteed.
+    // "Embeds" an instance of the more general PackageWebViewController.
+    packagePageController = PackageWebViewController(for: package, page: .readme)!
+    packagePageController!.willMove(toParent: self)
+    let wkWebView = packagePageController!.view
+    wkWebView!.frame = webViewContainer.frame
     wkWebView!.backgroundColor = .white
     wkWebView!.translatesAutoresizingMaskIntoConstraints = false
     webViewContainer.addSubview(wkWebView!)
+    self.addChild(packagePageController!)
+    packagePageController!.didMove(toParent: self)
 
     // Ensure the web view fills its available space.  Required b/c iOS 9 & 10 cannot load
     // these correctly from XIBs.
@@ -169,14 +176,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
         // Since we won't be showing the user a language list, allow them to install from the info view.
         rightNavigationMode = .install
       }
-    }
-  }
-
-  override public func viewWillAppear(_ animated: Bool) {
-    if let readmeURL = package.readmePageURL {
-      wkWebView?.loadFileURL(readmeURL, allowingReadAccessTo: package.sourceFolder)
-    } else {
-      wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
     }
   }
 

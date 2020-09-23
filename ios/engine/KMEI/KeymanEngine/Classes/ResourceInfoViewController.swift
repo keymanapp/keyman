@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import WebKit
 
 class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
   var isCustomKeyboard: Bool = false // legacy; was also used to toggle QR code gen + display
@@ -136,6 +137,10 @@ class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, 
       return cell
     }
     return UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+  }
+
+  func showWelcome() {
+    // TODO:
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
