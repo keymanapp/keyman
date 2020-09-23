@@ -171,8 +171,7 @@ uses
   Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
   Keyman.Configuration.System.TIPMaintenance in 'install\Keyman.Configuration.System.TIPMaintenance.pas',
   UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress},
-  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13 in 'main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas',
-  UCreateProcessAsShellUser in '..\..\global\delphi\general\UCreateProcessAsShellUser.pas';
+  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13 in 'main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
