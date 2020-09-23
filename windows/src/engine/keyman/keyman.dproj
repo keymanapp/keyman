@@ -232,7 +232,6 @@
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.Security.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas"/>
         <DCCReference Include="touchkeyboard\Keyman.System.FrameworkInputPane.pas">
-            <Form>$R ICONS.RES</Form>
         </DCCReference>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Vcl.pas"/>

@@ -18,7 +18,6 @@ uses
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
-  UCreateProcessAsShellUser in '..\..\global\delphi\general\UCreateProcessAsShellUser.pas',
   UfrmRunDesktop in 'UfrmRunDesktop.pas' {frmRunDesktop},
   UfrmInstallOptions in 'UfrmInstallOptions.pas' {frmInstallOptions},
   RunTools in 'RunTools.pas',
