@@ -14,15 +14,94 @@ namespace correction {
   }
 
   export class TrackedContextState {
-    context: Context;
+    // Stores the source Context (as a debugging reference).  Not currently utilized.
+    taggedContext: Context;
+
     tokens: TrackedContextToken[];
-    poppedHead: boolean;
-    pushedTail: boolean;
-    
+    /**
+     * How many tokens were removed from the start of the best-matching ancestor.
+     * Useful for restoring older states, e.g., when the user moves the caret backwards, we can recover the context at that position.
+     */
+    indexOffset: number;
+
     // Tracks all search spaces starting at the current token.
     // In the lm-layer's current form, this should only ever have one entry.
     // Leaves 'design space' for if/when we add support for phrase-level corrections/predictions.
     searchSpace: SearchSpace[] = [];
+
+    constructor(source: TrackedContextState);
+    constructor(rootTraversal: LexiconTraversal);
+    constructor(obj: TrackedContextState | LexiconTraversal) {
+      if(obj instanceof TrackedContextState) {
+        let source = obj;
+        // Be sure to deep-copy the tokens!  Pointer-aliasing is bad here.
+        this.tokens = source.tokens.map(function(token) {
+          let copy = new TrackedContextToken();
+          copy.raw = token.raw;
+          copy.replacements = token.replacements
+          copy.activeReplacement = token.activeReplacement;
+          copy.transformDistributions = token.transformDistributions;
+  
+          return copy;
+        });
+        this.searchSpace = obj.searchSpace;
+        this.indexOffset = 0;
+      } else {
+        let rootTraversal = obj;
+        this.tokens = [];
+        this.indexOffset = Number.MIN_SAFE_INTEGER;
+
+        if(rootTraversal) {
+          this.searchSpace = [new SearchSpace(rootTraversal)];
+        }
+      }
+    }
+
+    popHead() {
+      this.tokens.splice(0, 2);
+      this.indexOffset -= 1;
+    }
+
+    pushTail(token: TrackedContextToken, traversalRoot?: LexiconTraversal) {
+      if(traversalRoot) {
+        this.searchSpace = [new SearchSpace(traversalRoot)];
+      } else {
+        this.searchSpace = [];
+      }
+      this.tokens.push(token);
+
+      let state = this;
+      if(state.searchSpace.length > 0) {
+        token.transformDistributions.forEach(distrib => state.searchSpace[0].addInput(distrib));
+      }
+    }
+
+    pushWhitespaceToTail(transformDistribution: Distribution<Transform> = null) {
+      let whitespaceToken = new TrackedContextToken();
+
+      // Track the Transform that resulted in the whitespace 'token'.
+      // Will be needed for phrase-level correction/prediction.
+      whitespaceToken.transformDistributions = [transformDistribution]; 
+      
+      whitespaceToken.raw = null;
+      this.tokens.push(whitespaceToken);
+    }
+
+    updateTail(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
+      let editedToken = this.tokens[this.tokens.length - 1];
+      
+      // Preserve existing text if new text isn't specified.
+      tokenText = tokenText || (tokenText === '' ? '' : editedToken.raw);
+
+      if(transformDistribution && transformDistribution.length > 0) {
+        editedToken.transformDistributions.push(transformDistribution);
+        if(this.searchSpace) {
+          this.searchSpace.forEach(space => space.addInput(transformDistribution));
+        }
+      }
+      // Replace old token's raw-text with new token's raw-text.
+      editedToken.raw = tokenText;
+    }
 
     toRawTokenization() {
       // TODO:  support token replacement (for accepted suggestions).
@@ -147,24 +226,15 @@ namespace correction {
       }
 
       // If we've made it here... success!  We have a context match!
-      let newState = new TrackedContextState();
-
-      // Be sure to deep-copy the tokens!  Pointer-aliasing is bad here.
-      newState.tokens = matchState.tokens.map(function(token) {
-        let copy = new TrackedContextToken();
-        copy.raw = token.raw;
-        copy.replacements = token.replacements
-        copy.activeReplacement = token.activeReplacement;
-        copy.transformDistributions = token.transformDistributions;
-
-        return copy;
-      });
-
-      // Since we're continuing a previously-cached context, we can reuse the same SearchSpace
-      // to continue making predictions.
-      newState.searchSpace = matchState.searchSpace;
-      newState.poppedHead = poppedHead;
-      newState.pushedTail = pushedTail;
+      let state: TrackedContextState;
+      
+      if(pushedTail) {
+        state = new TrackedContextState(matchState);
+      } else {
+        // Since we're continuing a previously-cached context, we can reuse the same SearchSpace
+        // to continue making predictions.
+        state = matchState;
+      }
 
       /* Assumption:  This is an adequate check for its two sub-branches.
        *
@@ -178,63 +248,48 @@ namespace correction {
        */ 
       if(editPath.length > 1) {
         if(poppedHead) {
-          newState.tokens.splice(0, 2);  // Chop off the first token and its subsequent 'whitespace' token.
+          state.popHead();
         }
+
         if(pushedTail) {
-          let whitespaceToken = new TrackedContextToken();
+          // On suggestion acceptance, we should update the previous final token.
+          if(ignorePenultimateMatch) {
+            // TODO:  We might should track the accepted suggestion as a final transform here.
+            //        The infrastructure to track this doesn't exist quite yet, though.
+            state.updateTail(null, tokenizedContext[tokenizedContext.length-2]);
+          }
 
-          // ASSUMPTION:  any transform that triggers this case is a pure-whitespace Transform.
+          // ASSUMPTION:  any transform that triggers this case is a pure-whitespace Transform, as we
+          //              need a word-break before beginning a new word's context.
           //              Worth note:  when invalid, the lm-layer already has problems in other aspects too.
-          whitespaceToken.transformDistributions = [transformDistribution]; // Track the Transform that resulted in the whitespace 'token'.
-                                                    // Will be needed for phrase-level correction/prediction.
-          
-          // Note:  we don't bother 'correcting' whitespace tokens at this time.
-          //        They don't get any SearchSpace handling.
-
-          whitespaceToken.raw = null;
-          newState.tokens.push(whitespaceToken);
+          state.pushWhitespaceToTail(transformDistribution);
 
           let emptyToken = new TrackedContextToken();
           emptyToken.raw = '';
+          // Continuing the earlier assumption, that 'pure-whitespace Transform' does not emit any initial characters
+          // for the new word (token), so the input keystrokes do not correspond to the new text token.
           emptyToken.transformDistributions = [];
-
-          // For now... new final token => throw out old SearchSpace, use new SearchSpace.
-          if(rootTraversal) {
-            newState.searchSpace = [new correction.SearchSpace(rootTraversal)];
-          }
-          newState.tokens.push(emptyToken);
+          state.pushTail(emptyToken, rootTraversal);
         } else {
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
           //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
-          let editedToken = newState.tokens[newState.tokens.length - 1];
-          if(transformDistribution && transformDistribution.length > 0) {
-            editedToken.transformDistributions.push(transformDistribution);
-            if(newState.searchSpace) {
-              newState.searchSpace.forEach(space => space.addInput(transformDistribution));
-            }
-          }
-          // Replace old token's raw-text with new token's raw-text.
-          editedToken.raw = tokenizedContext[tokenizedContext.length - 1];
+          state.updateTail(transformDistribution, tokenizedContext[tokenizedContext.length-1]);
         }
       } else {
         // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
         //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
-        let editedToken: TrackedContextToken;
+
         if(editPath[tailIndex] == 'insert') {
-          editedToken = new TrackedContextToken();
+          // Construct appropriate initial token.
+          let token = new TrackedContextToken();
+          token.raw = tokenizedContext[0];
+          token.transformDistributions = [transformDistribution];
+          state.pushTail(token, rootTraversal);
         } else {
-          editedToken = newState.tokens[newState.tokens.length - 1]; 
+          state.updateTail(transformDistribution, tokenizedContext[0]);
         }
-        if(transformDistribution && transformDistribution.length > 0) {
-          editedToken.transformDistributions.push(transformDistribution);
-          if(newState.searchSpace) {
-            newState.searchSpace.forEach(space => space.addInput(transformDistribution));
-          }
-        }
-        // Replace old token's raw-text with new token's raw-text.
-        editedToken.raw = tokenizedContext[tokenizedContext.length - 1];
       }
-      return newState;
+      return state;
     }
 
     static modelContextState(tokenizedContext: USVString[], traversalRoot: LexiconTraversal): TrackedContextState {
@@ -260,31 +315,16 @@ namespace correction {
         return token;
       });
 
-      // And now to add the whitespace.
-      let finalTokens: TrackedContextToken[] = [];
+      // And now build the final context state object, which includes whitespace 'tokens'.
+      let state = new TrackedContextState(traversalRoot);
 
       if(baseTokens.length > 0) {
-        finalTokens.push(baseTokens.splice(0, 1)[0]);
+        state.pushTail(baseTokens.splice(0, 1)[0], traversalRoot);
       }
 
       while(baseTokens.length > 0) {
-        let whitespaceToken = new TrackedContextToken();
-        whitespaceToken.transformDistributions = [];
-        whitespaceToken.raw = null;
-
-        finalTokens.push(whitespaceToken);
-        finalTokens.push(baseTokens.splice(0, 1)[0]);
-      }
-
-      let state = new TrackedContextState();
-      state.poppedHead = false;
-      state.pushedTail = false;
-      state.tokens = finalTokens;
-      if(traversalRoot) {
-        state.searchSpace = [new SearchSpace(traversalRoot)];
-        if(finalTokens.length > 0) {
-          state.tokens[state.tokens.length - 1].transformDistributions.forEach(distrib => state.searchSpace[0].addInput(distrib));
-        }
+        state.pushWhitespaceToTail();
+        state.pushTail(baseTokens.splice(0, 1)[0], traversalRoot);
       }
 
       return state;
@@ -316,8 +356,10 @@ namespace correction {
           let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item(i), model.traverseFromRoot(), transformDistribution);
 
           if(resultState) {
-            resultState.context = context;
-            this.enqueue(resultState);
+            resultState.taggedContext = context;
+            if(resultState != this.item(i)) {
+              this.enqueue(resultState);
+            }
             return resultState;
           }
         }
@@ -329,7 +371,7 @@ namespace correction {
       // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
       // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
       let state = ContextTracker.modelContextState(tokenizedContext, model.traverseFromRoot());
-      state.context = context;
+      state.taggedContext = context;
       this.enqueue(state);
       return state;
     }

@@ -54,16 +54,16 @@ namespace com.keyman.text.prediction {
 
     constructor(mock: Mock, config: Configuration) {
       this.left = mock.getTextBeforeCaret();
-      this.startOfBuffer = this.left._kmwLength() > config.leftContextCodePoints;
+      this.startOfBuffer = this.left._kmwLength() <= config.leftContextCodePoints;
       if(!this.startOfBuffer) {
         // Our custom substring version will return the last n characters if param #1 is given -n.
         this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
       }
 
       this.right = mock.getTextAfterCaret();
-      this.endOfBuffer = this.right._kmwLength() > config.leftContextCodePoints;
+      this.endOfBuffer = this.right._kmwLength() <= config.rightContextCodePoints;
       if(!this.endOfBuffer) {
-        this.right = this.right._kmwSubstr(0, config.leftContextCodePoints);
+        this.right = this.right._kmwSubstr(0, config.rightContextCodePoints);
       }
     }
   }
