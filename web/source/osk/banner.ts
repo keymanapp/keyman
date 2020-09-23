@@ -170,7 +170,6 @@ namespace com.keyman.osk {
     private fontFamily?: string;
 
     private _suggestion: Suggestion;
-    private _applyFunctor: () => void = null;
 
     private index: number;
 
@@ -229,9 +228,8 @@ namespace com.keyman.osk {
      * @param {Suggestion} suggestion   Suggestion from the lexical model
      * Description  Update the ID and text of the BannerSuggestionSpec
      */
-    public update(suggestion: Suggestion, applyFunctor?: () => void) {
+    public update(suggestion: Suggestion) {
       this._suggestion = suggestion;
-      this._applyFunctor = applyFunctor || null;
       this.updateText();
     }
 
@@ -246,21 +244,18 @@ namespace com.keyman.osk {
      * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
      * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
      */
-    public apply(target?: text.OutputTarget): [text.Transcription, Promise<string>] {
+    public apply(target?: text.OutputTarget): Promise<Suggestion> {
       let keyman = com.keyman.singleton;
 
       if(this.isEmpty()) {
-        return [null, null];
-      } else if(this._applyFunctor) {
-        this._applyFunctor();
-        return [null, null];
+        return null;
       }
       
       // Find the state of the context at the time the prediction-triggering keystroke was applied.
       let original = keyman.core.languageProcessor.getPredictionState(this._suggestion.transformId);
       if(!original) {
         console.warn("Could not apply the Suggestion!");
-        return [null, null];
+        return null;
       } else {
         if(!target) {
           /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate 
@@ -271,28 +266,7 @@ namespace com.keyman.osk {
         }
 
         // Apply the Suggestion!
-
-        // Step 1:  determine the final output text
-        let final = text.Mock.from(original.preInput);
-        final.apply(this._suggestion.transform);
-
-        // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
-        // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
-        // values as needed for use with their IME interfaces.
-        let transform = final.buildTransformFrom(target);
-        let wordbreakPromise = keyman.core.languageProcessor.wordbreak(target); // Also build the display string for the reversion.
-        target.apply(transform);
-
-        // Signal the necessary text changes to the embedding app, if it exists.
-        if(keyman['oninserttext'] && keyman.isEmbedded) {
-          keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
-        }
-
-        // Build a 'reversion' Transcription that can be used to undo this apply() if needed.
-        let preApply = text.Mock.from(original.preInput);
-
-        preApply.apply(original.transform);
-        return [preApply.buildTranscriptionFrom(target, null), wordbreakPromise];
+        return keyman.core.languageProcessor.acceptSuggestion(this.suggestion, target);
       }
     }
 
@@ -563,8 +537,9 @@ namespace com.keyman.osk {
 
     private recentAccept: boolean = false;
     private recentAccepted: Suggestion;
+    private revertAcceptancePromise: Promise<Suggestion>;
+
     private preAccept: text.Transcription = null;
-    private preAcceptText: string;
     private swallowPrediction: boolean = false;
 
     private previousSuggestions: Suggestion[];
@@ -581,19 +556,21 @@ namespace com.keyman.osk {
     }
 
     private doAccept(suggestion: BannerSuggestion) {
-      let [revert, revertText] = suggestion.apply();
-      
       let _this = this;
 
-      if(revert) {
-        this.preAccept = revert;
-        revertText.then(function (text) {
-          _this.preAcceptText = text;
-        });
-      } else {
-        // If null, it's a blank option; we should effectively never 'accept' it.
+      let keyman = com.keyman.singleton;
+      this.revertAcceptancePromise = suggestion.apply();
+      if(!this.revertAcceptancePromise) {
         return;
       }
+
+      this.revertAcceptancePromise.then(function(suggestion) {
+        // Always null-check!
+        if(suggestion) {
+          _this.preAccept = keyman.core.languageProcessor.getPredictionState(suggestion.transformId);
+          _this.revertSuggestion = suggestion;
+        }
+      });
       
       this.selected = null;
       this.recentAccept = true;
@@ -604,19 +581,12 @@ namespace com.keyman.osk {
       this.previousSuggestions = this.currentSuggestions;
       this.previousTranscriptionID = this.currentTranscriptionID;
 
-      // Request a 'new' prediction based on current context with a nil Transform.
-      let keyman = com.keyman.singleton;
       this.swallowPrediction = true;
-      keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget());
+      this.doUpdate();
     }
 
     private showRevert() {
       // Construct a 'revert suggestion' to facilitate a reversion UI component.
-      this.revertSuggestion = {
-        transform: null, // Will not be accurate because of the backspace, so we'll construct it later.
-        displayAs: '"' + this.preAcceptText + '"'
-      };
-
       this.doRevert = true;
       this.doUpdate();
     }
@@ -728,8 +698,6 @@ namespace com.keyman.osk {
     }
 
     private doUpdate() {
-      let keyman = com.keyman.singleton;
-
       let suggestions = [];
       // Insert 'current text' if/when valid as the leading option.
       if(this.activateKeep() && this.keepSuggestion) {
@@ -742,8 +710,7 @@ namespace com.keyman.osk {
 
       this.options.forEach((option: BannerSuggestion, i: number) => {
         if(i < suggestions.length) {
-          let revertFlag = (i == 0 && this.doRevert);
-          option.update(suggestions[i], revertFlag ? this._applyReversion : null);
+          option.update(suggestions[i]);
         } else {
           option.update(null);
         }
