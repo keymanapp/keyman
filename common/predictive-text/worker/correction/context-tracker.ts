@@ -18,6 +18,10 @@ namespace correction {
     taggedContext: Context;
 
     tokens: TrackedContextToken[];
+    /**
+     * How many tokens were removed from the start of the best-matching ancestor.
+     * Useful for restoring older states, e.g., when the user moves the caret backwards, we can recover the context at that position.
+     */
     indexOffset: number;
 
     // Tracks all search spaces starting at the current token.
