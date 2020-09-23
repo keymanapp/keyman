@@ -122,9 +122,17 @@ wrap-worker-code ( ) {
   # Needed to ensure functionality on some older Android devices.  (API 19-23 or so)
   cat "node_modules/string.prototype.startswith/startswith.js"
 
-  # This one's straight from MDN - I didn't find any NPM ones that don't
-  # use the node `require` statement.
+  # These two are straight from MDN - I didn't find any NPM ones that don't
+  # use the node `require` statement for the second.  They're also relatively
+  # short and simple, which is good.
+  cat "polyfills/array.fill.js"
   cat "polyfills/array.from.js"
+
+  # For Object.values, for iteration over object-based associate arrays.
+  cat "polyfills/object.values.js"
+
+  # Needed to support Symbol.iterator, as used by the correction algorithm.
+  cat "polyfills/symbol-es6.min.js"
 
   echo ""
 
