@@ -21,7 +21,7 @@ describe('ContextTracker', function() {
       let rawTokens = ["apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor"];
 
       let existingState = ContextTracker.modelContextState(existingContext);
-      let state = ContextTracker.attemptMatchContext(newContext, existingState, toWrapperDistribution(transform));
+      let state = ContextTracker.attemptMatchContext(newContext, existingState, null, toWrapperDistribution(transform));
       assert.isNotNull(state);
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
     });
@@ -37,7 +37,7 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", null, "apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor"];
 
       let existingState = ContextTracker.modelContextState(existingContext);
-      let state = ContextTracker.attemptMatchContext(newContext, existingState, toWrapperDistribution(transform));
+      let state = ContextTracker.attemptMatchContext(newContext, existingState, null, toWrapperDistribution(transform));
       assert.isNotNull(state);
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
     });
@@ -53,7 +53,7 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", null, "apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor", null, ""];
 
       let existingState = ContextTracker.modelContextState(existingContext);
-      let state = ContextTracker.attemptMatchContext(newContext, existingState, toWrapperDistribution(transform));
+      let state = ContextTracker.attemptMatchContext(newContext, existingState, null, toWrapperDistribution(transform));
       assert.isNotNull(state);
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
 
@@ -74,7 +74,7 @@ describe('ContextTracker', function() {
       let rawTokens = ["apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor", null, ""];
 
       let existingState = ContextTracker.modelContextState(existingContext);
-      let state = ContextTracker.attemptMatchContext(newContext, existingState, toWrapperDistribution(transform));
+      let state = ContextTracker.attemptMatchContext(newContext, existingState, null, toWrapperDistribution(transform));
       assert.isNotNull(state);
       assert.deepEqual(state.tokens.map(token => token.raw), rawTokens);
 

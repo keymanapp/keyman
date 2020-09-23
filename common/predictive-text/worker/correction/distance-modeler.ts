@@ -3,7 +3,7 @@
 namespace correction {
   type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
-  type TraversableToken<TUnit> = {
+  export type TraversableToken<TUnit> = {
     key: TUnit,
     traversal: LexiconTraversal
   }
@@ -63,12 +63,32 @@ namespace correction {
       // TODO:  Optimize so that we're not frequently recomputing this?
       // TODO:  We might should generalize this so that the probability-to-cost function isn't directly hard-coded.
       //        Seems like a decent first conversion function though, at least.
-      return this.optimalInput.map(mass => mass.p).reduce((previous, current) => previous + (1 - current), 0);
+      //
+      // NOTE:  changes here need to be mirrored in the Node cost function, too!
+      //
+      let THRESHOLD = 0.001;
+      // Should technically re-normalize the sampling distribution.
+      // We use -ln(p) because a positive cost is worse.  ln(p) is always <= 0. 
+      // TODO:  probably more efficient to instead use actual probability space... but that'll involve extra changes.
+      return this.optimalInput.map(mass => mass.p > THRESHOLD ? mass.p : THRESHOLD).reduce((previous, current) => previous - Math.log(current), 0);
+      // Prior mapping:  no THRESHOLD use, previous + (1-current).
     }
 
-    // The part used to prioritize our search.
+    // The part used to prioritize our search.  Will be interpreted as a likelihood in log-space.
     get currentCost(): number {
-      return this.knownCost + this.inputSamplingCost;
+      // - We reintrepret 'known cost' as a psuedo-probability.
+      //   - Noting that 1/e = 0.367879441, an edit-distance cost of 1 may be intepreted as -ln(1/e) - a log-space 'likelihood'.
+      //     - Not exactly normalized, though.
+      // That's a really, really high likelihood, thoough.
+      //
+      // At any rate, we can linearly scale the known-cost to have about whatever probability we want.
+      // If we can state it as p = 1 / (c * e), note then that ln(c * e) = ln(c) + 1.  So, scale * (ln(c) + 1).
+      // If we can state it as e^x, note that ln(e^x) = x * ln(e) = x - just scale by 'x'!
+
+      // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
+      // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
+      // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
+      return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.knownCost + this.inputSamplingCost;
     }
 
     get mapKey(): string {
@@ -117,12 +137,29 @@ namespace correction {
       // TODO:  Optimize so that we're not frequently recomputing this?
       // TODO:  We might should generalize this so that the probability-to-cost function isn't directly hard-coded.
       //        Seems like a decent first conversion function though, at least.
-      return this.priorInput.map(mass => mass.p).reduce((previous, current) => previous + (1 - current), 0);
+
+      let THRESHOLD = 0.001;
+      // Should technically re-normalize the sampling distribution.
+      // We use -ln(p) because a positive cost is worse.  ln(p) is always <= 0. 
+      // TODO:  probably more efficient to instead use actual probability space... but that'll involve extra changes.
+      return this.priorInput.map(mass => mass.p > THRESHOLD ? mass.p : THRESHOLD).reduce((previous, current) => previous - Math.log(current), 0);
     }
 
     // The part used to prioritize our search.
     get currentCost(): number {
-      return this.knownCost + this.inputSamplingCost;
+      // - We reintrepret 'known cost' as a psuedo-probability.
+      //   - Noting that 1/e = 0.367879441, an edit-distance cost of 1 may be intepreted as -ln(1/e) - a log-space 'likelihood'.
+      //     - Not exactly normalized, though.
+      // That's a really, really high likelihood, thoough.
+      //
+      // At any rate, we can linearly scale the known-cost to have about whatever probability we want.
+      // If we can state it as p = 1 / (c * e), note then that ln(c * e) = ln(c) + 1.  So, scale * (ln(c) + 1).
+      // If we can state it as e^x, note that ln(e^x) = x * ln(e) = x - just scale by 'x'!
+
+      // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
+      // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
+      // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
+      return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.knownCost + this.inputSamplingCost;
     }
 
     buildInsertionEdges(): SearchEdge[] {
@@ -237,6 +274,8 @@ namespace correction {
   // The set of search spaces corresponding to the same 'context' for search.
   // Whenever a wordbreak boundary is crossed, a new instance should be made.
   export class SearchSpace {
+    static readonly EDIT_DISTANCE_COST_SCALE = 5;
+
     private tierOrdering: SearchSpaceTier[] = [];
     private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
     private inputSequence: Distribution<Transform>[] = [];
@@ -257,6 +296,11 @@ namespace correction {
       this.rootNode = new SearchNode(traversalRoot);
 
       this.completedPaths = [this.rootNode];
+
+      // Adds a base level queue to handle initial insertions.
+      let baseTier = new SearchSpaceTier(0, this.rootNode.buildInsertionEdges());
+      this.tierOrdering.push(baseTier);
+      this.selectionQueue.enqueue(baseTier);
     }
 
     increaseMaxEditDistance() {
@@ -298,7 +342,12 @@ namespace correction {
     }
 
     private hasNextMatchEntry(): boolean {
-      return this.selectionQueue.peek().correctionQueue.count > 0;
+      let topQueue = this.selectionQueue.peek();
+      if(topQueue) {
+        return topQueue.correctionQueue.count > 0;
+      } else {
+        return false;
+      }
     }
 
     findNextMatch(): SearchNode {
@@ -336,8 +385,8 @@ namespace correction {
           // TODO:  make sure we get this part right.
           let inputIndex = nextTier.index;
 
-          let deletionEdges     = currentNode.buildDeletionEdges(this.inputSequence[inputIndex]);
-          let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex]);
+          let deletionEdges     = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
+          let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
 
           // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
           nextTier.correctionQueue.enqueueAll(deletionEdges.concat(substitutionEdges));
@@ -447,35 +496,6 @@ namespace correction {
       }
 
       return null;
-    }
-  }
-
-  // -- Code after this point is skeletal at best. --
-
-  export class DistanceModelerOptions {
-    minimumPredictions: number;
-  }
-
-  export class DistanceModeler {
-    private options: DistanceModelerOptions;
-    public static readonly DEFAULT_OPTIONS: DistanceModelerOptions = {
-      minimumPredictions: 3
-    }
-
-    // Keep as a 'rotating cache'.  Includes search spaces corresponding to 'revert' commands.
-    private searchSpaces: SearchSpace[] = [];
-
-    private inputs: Distribution<USVString>[] = [];
-    private lexiconRoot: LexiconTraversal;
-
-    constructor(lexiconRoot: LexiconTraversal, options: DistanceModelerOptions = DistanceModeler.DEFAULT_OPTIONS) {
-      this.lexiconRoot = lexiconRoot;
-      this.options = options;
-    }
-
-    addInput(input: Distribution<Transform>) {
-      // TODO:  add 'addInput' operation
-      //        do search space things
     }
   }
 }

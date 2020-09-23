@@ -240,8 +240,8 @@ namespace correction {
         c: number
     ): [number, number] {
       // Block any transpositions where the tokens are identical.
-      // Other operations will be cheaper.
-      if(buffer.inputSequence[r].key == buffer.matchSequence[c].key) {
+      // Other operations will be cheaper.  Also, block cases where 'parents' are impossible.
+      if(r < 0 || c < 0 || buffer.inputSequence[r].key == buffer.matchSequence[c].key) {
         return [-1, -1];
       }
 
