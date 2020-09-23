@@ -12,13 +12,18 @@ describe('ModelCompositor', function() {
       jsonFixture('tries/english-1000')
     );
     var composite = new ModelCompositor(model);
+    
+    // Initialize context
+    let context = {
+      //left: 'Th', startOfBuffer: false, endOfBuffer: true,
+      left: 'th', startOfBuffer: false, endOfBuffer: true,
+    };
+    composite.predict({insert: '', deleteLeft: 0}, context);
+
     // Pretend to fat finger "the" as "thr"
     var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
     var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-    var suggestions = composite.predict([thr, the], {
-      //left: 'Th', startOfBuffer: false, endOfBuffer: true,
-      left: 'th', startOfBuffer: false, endOfBuffer: true,
-    });
+    var suggestions = composite.predict([thr, the], context);
 
     // Get the top suggest for 'the' and 'thr*'.
     var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
