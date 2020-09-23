@@ -101,10 +101,19 @@ public class ResourceDownloadManager {
     baseURL.appendPathComponent("download")
     baseURL.appendPathComponent(packageKey.id)
 
+    var typeForEndpoint: String
+    switch(packageKey.type) {
+      case .keyboard:
+        typeForEndpoint = "keyboard"
+      case .lexicalModel:
+        typeForEndpoint = "model"
+    }
+
     var urlComponents = URLComponents(string: baseURL.absoluteString)!
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "platform", value: "ios"),
-      URLQueryItem(name: "tier", value: (Version.currentTagged.tier ?? .stable).rawValue)
+      URLQueryItem(name: "tier", value: (Version.currentTagged.tier ?? .stable).rawValue),
+      URLQueryItem(name: "type", value: typeForEndpoint)
     ]
 
     if let version = version {
@@ -130,9 +139,6 @@ public class ResourceDownloadManager {
                                                                 completionBlock: CompletionHandler<FullID.Resource.Package>?)
   where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
     let packageKey = KeymanPackage.Key(id: fullID.id, type: fullID.type)
-    // TODO:  Currently invalid for model downloads.
-    //
-    //        Fortunately, this currently only affects legacy APIs.
     let packageURL = defaultDownloadURL(forPackage: KeymanPackage.Key(id: fullID.id, type: fullID.type),
                                         andResource: fullID,
                                         asUpdate: asUpdate)
@@ -257,11 +263,11 @@ public class ResourceDownloadManager {
         log.info("Fetched lexical model list for "+languageID+".")
 
         let closure = completionClosure ?? self.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
-        // Its format is not yet supported for lexical models.
-//        let downloadURL = self.defaultDownloadURL(forPackage: lexicalModel.packageKey,
-//                                                  andResource: lexicalModel.fullID,
-//                                                  asUpdate: false)
-        self.downloadPackage(withKey: lexicalModel.packageKey, from: results[0].1, completionBlock: closure)
+        let downloadURL = self.defaultDownloadURL(forPackage: lexicalModel.packageKey,
+                                                  andResource: lexicalModel.fullID,
+                                                  asUpdate: false)
+
+        self.downloadPackage(withKey: lexicalModel.packageKey, from: downloadURL, completionBlock: closure)
       }
     }
   }

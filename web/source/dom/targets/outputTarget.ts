@@ -21,5 +21,18 @@ namespace com.keyman.dom.targets {
         elem.dispatchEvent(event);
       }
     }
+
+    apply(transform: Transform) {
+      super.apply(transform);
+
+      // This class has non-integrated unit tests in which the `singleton` object doesn't exist.
+      // Thus, we need to test for this case.
+      let keyman = com.keyman['singleton'];
+
+      // Signal the necessary text changes to the embedding app, if it exists.
+      if(keyman && keyman['oninserttext'] && keyman.isEmbedded) {
+        keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
+      }
+    }
   }
 }

@@ -96,6 +96,10 @@
       };
     }
 
+    toKey(text: USVString): USVString {
+      return this._trie.toKey(text);
+    }
+
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
@@ -157,6 +161,12 @@
       }
 
       return '';
+    }
+
+    public tokenize(context: Context): USVString[] {
+      let words = this.breakWords(context.left) || [];
+
+      return words.map(span => span.text);
     }
 
     public wordbreak(context: Context): USVString {

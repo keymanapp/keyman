@@ -54,16 +54,16 @@ namespace com.keyman.text.prediction {
 
     constructor(mock: Mock, config: Configuration) {
       this.left = mock.getTextBeforeCaret();
-      this.startOfBuffer = this.left._kmwLength() > config.leftContextCodePoints;
+      this.startOfBuffer = this.left._kmwLength() <= config.leftContextCodePoints;
       if(!this.startOfBuffer) {
         // Our custom substring version will return the last n characters if param #1 is given -n.
         this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
       }
 
       this.right = mock.getTextAfterCaret();
-      this.endOfBuffer = this.right._kmwLength() > config.leftContextCodePoints;
+      this.endOfBuffer = this.right._kmwLength() <= config.rightContextCodePoints;
       if(!this.endOfBuffer) {
-        this.right = this.right._kmwSubstr(0, config.leftContextCodePoints);
+        this.right = this.right._kmwSubstr(0, config.rightContextCodePoints);
       }
     }
   }
@@ -184,6 +184,64 @@ namespace com.keyman.text.prediction {
       this.emit("invalidatesuggestions", 'new');
 
       return this.predict_internal(transcription);
+    }
+
+    public acceptSuggestion(suggestion: Suggestion, outputTarget: OutputTarget): Promise<Suggestion> {
+      if(!outputTarget) {
+        throw "Accepting suggestions requires a destination OutputTarget instance."
+      }
+      
+      // Find the state of the context at the time the suggestion was generated.
+      // This may refer to the context before an input keystroke or before application
+      // of a predictive suggestion.
+      let original = this.getPredictionState(suggestion.transformId);
+      if(!original) {
+        console.warn("Could not apply the Suggestion!");
+        return null;
+      } else {
+        // Apply the Suggestion!
+
+        // Step 1:  determine the final output text
+        let final = text.Mock.from(original.preInput);
+        final.apply(suggestion.transform);
+
+        // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
+        // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
+        // values as needed for use with their IME interfaces.
+        let transform = final.buildTransformFrom(outputTarget);
+        let wordbreakPromise = this.wordbreak(outputTarget); // Also build the display string for the reversion.
+        outputTarget.apply(transform);
+
+        // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
+        // replacing the suggestion transform with the original input text.
+        let preApply = text.Mock.from(original.preInput);
+        preApply.apply(original.transform);
+
+        let reversionTranscription = preApply.buildTranscriptionFrom(outputTarget, null);
+        this.recordTranscription(reversionTranscription);
+
+        // TODO:  Also tell lm-layer we accepted the suggestion
+        // The 'reversion promise' should be returned from the lm-layer, not constructed here.
+        // (Needed for proper displayAs syntax!)
+        let reversionPromise: Promise<Suggestion> = new Promise<Suggestion>(function(resolveFunc, rejectFunc) {
+          wordbreakPromise.then(function(token) {
+            let suggestion: Suggestion = {
+              // TODO:  This needs to be sourced from the lm-layer side, from the model's
+              // punctuation spec.  Hence the 'outer' TODO.
+              displayAs: '"' + token + '"',
+              transform: reversionTranscription.transform,
+              transformId: reversionTranscription.token
+            }
+
+            resolveFunc(suggestion);
+          });
+        });
+
+        // Also, request new prediction set based on the resulting context.
+        this.predictFromTarget(outputTarget);
+
+        return reversionPromise;
+      }
     }
 
     public predictFromTarget(outputTarget: OutputTarget): Promise<Suggestion[]> {

@@ -199,10 +199,6 @@ public class CloudApiTypes {
       this.callback = callback;
     }
 
-    public boolean isResultsReady() {
-      return resultsReady;
-    }
-
     public void setResultsReady() {
       this.resultsReady = true;
     }

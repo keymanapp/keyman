@@ -95,7 +95,7 @@ begin
     if SameText((FLanguages[i] as IKeymanKeyboardLanguageInstalled).BCP47Code, FCanonicalBCP47Tag) then
       Exit(nil);
 
-  FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, 0, GUID_NULL, BCP47Tag);
+  FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, 0, GUID_NULL, '');
   FLanguages.Add(FKeyboardLanguage);
   Result := FKeyboardLanguage;
 end;
@@ -187,7 +187,7 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
         BCP47Tag := GetBCP47ForInstalledTIP(LangID, FGUID);
         if (BCP47Tag <> '') and (IndexOfBCP47Code(BCP47Tag) < 0) then
         begin
-          FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, BCP47Tag, LangID, FGUID, BCP47Tag); // TODO: get language name
+          FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, BCP47Tag, LangID, FGUID, '');
           FLanguages.Add(FKeyboardLanguage);
         end;
       end;

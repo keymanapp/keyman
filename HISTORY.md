@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.146 alpha 2020-09-22
+
+* chore(deps): bump http-proxy from 1.17.0 to 1.18.1 in /web/testing/regression-tests (#3568)
+* feat(ios/engine): go/package use for model pkg downloads (#3603)
+
+## 14.0.145 alpha 2020-09-21
+
+* feat(windows): improve keyboard language dialog (#3557)
+* fix(windows): lookup language name on create (#3558)
+
 ## 14.0.144 alpha 2020-09-18
 
 * feat(developer): add viewport to html templates (#3531)

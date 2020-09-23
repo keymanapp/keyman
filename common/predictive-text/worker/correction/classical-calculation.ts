@@ -240,8 +240,8 @@ namespace correction {
         c: number
     ): [number, number] {
       // Block any transpositions where the tokens are identical.
-      // Other operations will be cheaper.
-      if(buffer.inputSequence[r].key == buffer.matchSequence[c].key) {
+      // Other operations will be cheaper.  Also, block cases where 'parents' are impossible.
+      if(r < 0 || c < 0 || buffer.inputSequence[r].key == buffer.matchSequence[c].key) {
         return [-1, -1];
       }
 
@@ -546,6 +546,26 @@ namespace correction {
 
     get lastMatchEntry(): TMatch {
       return this.matchSequence[this.matchSequence.length-1];
+    }
+    
+    static computeDistance<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
+        input: TInput[],
+        match: TMatch[],
+        bandSize: number = 1) {
+      // Initialize the calculation buffer, setting the diagonal width (as appropriate) in advance.
+      let buffer = new ClassicalDistanceCalculation<TUnit, TInput, TMatch>();
+      bandSize = bandSize || 1;
+      buffer.diagonalWidth = bandSize;
+    
+      for(let i = 0; i < input.length; i++) {
+        buffer = buffer.addInputChar(input[i]);
+      }
+    
+      for(let j = 0; j < match.length; j++) {
+        buffer = buffer.addMatchChar(match[j]);
+      }
+    
+      return buffer;
     }
   }
 }

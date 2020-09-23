@@ -102,6 +102,8 @@
     <string name="keyboard_qr_code" comment="QR Code description">
       Scan this code to load this\nkeyboard on another device</string>
 
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
 
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Would you like to download the latest version of this dictionary?</string>
