@@ -2,7 +2,7 @@
  * Copyright (C) 2019 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.tavultesoft.kmapro;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +25,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.ModelPickerActivity;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;

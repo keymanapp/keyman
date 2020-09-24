@@ -35,8 +35,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     languagesPreference.setKey(KeymanSettingsActivity.installedLanguagesKey);
     languagesPreference.setTitle(getInstalledLanguagesText());
     languagesPreference.setWidgetLayoutResource(R.layout.preference_icon_layout);
-    Intent languagesIntent = new Intent();
-    languagesIntent.setClassName(context.getPackageName(), "com.tavultesoft.kmea.LanguagesSettingsActivity");
+    Intent languagesIntent = new Intent(context, LanguagesSettingsActivity.class);
     languagesIntent.putExtra(KMManager.KMKey_DisplayKeyboardSwitcher, false);
     languagesPreference.setIntent(languagesIntent);
 

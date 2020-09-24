@@ -25,7 +25,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMPBrowserActivity;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.MapCompat;
 
