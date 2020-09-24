@@ -189,7 +189,7 @@
 
       </intent-filter>
 
-      <intent-filter android:autoVerify="true">
+      <intent-filter android:priority="50" android:autoVerify="true" >
         <!-- KMPBrowserActivity converts cloud keyboard package links from http(s)://{HOST}/keyboards/install into /go/package/download
              Use {HOST} as defined in KMPLink.java
              Also note, Manifest will OR all the scheme/host/pathPrefix combinations -->
@@ -210,7 +210,7 @@
 
       </intent-filter>
 
-      <intent-filter>
+      <intent-filter android:priority="50">
         <!-- KMAPro should also be able to handle /keyboards/install links and convert to /go/package/download -->
         <action android:name="android.intent.action.VIEW" />
 
