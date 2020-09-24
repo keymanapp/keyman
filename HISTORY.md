@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.148 alpha 2020-09-24
+
+* fix(windows): hint dialog was blank when elevated (#3604)
+* fix(android): Log errors for crashes involving Keyboard Picker (#3499)
+
 ## 14.0.147 alpha 2020-09-23
 
 * feat(common/models): context + input tracking for predictive text (#3549)
