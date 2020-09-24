@@ -546,6 +546,7 @@
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

@@ -48,6 +48,13 @@ const
   URLPath_KeymanLanguageLookup = '/go/developer/'+SKeymanVersion+'/language-lookup';
   URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
   URLPath_KeymanDeveloperHome = '/go/developer/'+SKeymanVersion+'/home';
+  URLPath_KeymanDeveloperHome_Presentation = '/developer';
+
+  URLPath_KeymanDeveloper_HelpKeyboards = '/go/developer/'+SKeymanVersion+'/help-keyboards';
+  URLPath_KeymanDeveloper_HelpPackages = '/go/developer/'+SKeymanVersion+'/help-packages';
+  URLPath_KeymanDeveloper_HelpMobile = '/go/developer/'+SKeymanVersion+'/help-mobile';
+  URLPath_KeymanDeveloper_KeymanWeb = '/go/developer/'+SKeymanVersion+'/keymanweb';
+  URLPath_KeymanDeveloper_KeymanEngineHome = '/go/developer/'+SKeymanVersion+'/keyman-engine-home';
 
   URLPath_KeymanDeveloper_KeymanForAndroidDownload = '/go/developer/'+SKeymanVersion+'/android-app';
   URLPath_KeymanDeveloper_KeymanForIosDownload = '/go/developer/'+SKeymanVersion+'/ios-app';
