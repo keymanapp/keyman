@@ -18,6 +18,7 @@ import com.tavultesoft.kmea.util.KMLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.Serializable;
 
 public class Keyboard extends LanguageResource implements Serializable {
@@ -173,6 +174,11 @@ public class Keyboard extends LanguageResource implements Serializable {
       String version = KMManager.getLatestKeyboardFileVersion(
         context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID);
 
+      // If local help file doesn't exist, it will default to help.keyman.com link
+      File helpFile = new File(KMManager.getPackagesDir(),
+        KMManager.KMDefault_PackageID + File.separator + FileUtils.WELCOME_HTM);
+      String helpFileStr = helpFile.exists() ? helpFile.toString() : null;
+
       FALLBACK_KEYBOARD = new Keyboard(
         KMManager.KMDefault_PackageID,
         KMManager.KMDefault_KeyboardID,
@@ -180,7 +186,7 @@ public class Keyboard extends LanguageResource implements Serializable {
         KMManager.KMDefault_LanguageID,
         KMManager.KMDefault_LanguageName,
         version,
-        null, // will use help.keyman.com link because context required to determine local welcome.htm path,
+        helpFileStr,
         "",
         false,
         KMManager.KMDefault_KeyboardFont,
