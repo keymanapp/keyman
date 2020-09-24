@@ -43,6 +43,7 @@ import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.HelpFile;
+import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
 
@@ -155,6 +156,9 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
+        if (hashMap == null) {
+          KMLog.LogError(TAG, "map is null, position is " + position);
+        }
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
         // "Version" link clicked to download latest keyboard version from cloud

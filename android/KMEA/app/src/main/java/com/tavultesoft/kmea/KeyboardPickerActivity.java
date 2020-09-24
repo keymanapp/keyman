@@ -469,11 +469,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
   @SuppressWarnings("unchecked")
   private static ArrayList<HashMap<String, String>> getList(Context context, String filename) {
     ArrayList<HashMap<String, String>> list = null;
-    if (context == null) {
-      KMLog.LogError(TAG, "getList() where context is null.");
-      return list;
-    }
-
     File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), filename);
     if (file.exists()) {
       try {
