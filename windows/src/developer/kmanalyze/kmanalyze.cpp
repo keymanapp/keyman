@@ -158,7 +158,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
         if (sp->dwSystemID == TSS_COMPILEDVERSION)
         {
           char buf2[256];
-          wsprintf(buf2, "Wrong File Version: file version is %ls", ((PBYTE)kbp) + (DWORD)sp->dpString);
+          wsprintf(buf2, "Wrong File Version: file version is %ls", ((PBYTE)kbp) + (INT_PTR)sp->dpString);
           delete buf;
           Err(buf2);
           return FALSE;
@@ -219,7 +219,7 @@ BOOL VerifyChecksum(LPBYTE buf, LPDWORD CheckSum, DWORD sz)
 //}
 
 TESTS *DoGroupAnalysis(LPKEYBOARD kbd, LPGROUP gp, std::vector<LPGROUP> & tree, TEST *base_test) {
-  
+
   //
   // Prevent recursion
   //
@@ -282,9 +282,9 @@ TESTS *DoGroupAnalysis(LPKEYBOARD kbd, LPGROUP gp, std::vector<LPGROUP> & tree, 
     if (base_test) {
       std::wstring c1 = context.length() > base_test->context.length() ? context : base_test->context;
       //std::wstring c2 = context.length() > base_test->context.length() ? base_test->context : context;
-      
+
       //if(c1.compare(c1.length() - c2.length(), c2.length(), c2) != 0) {
-        // TODO: We are not comparing like with like ... so continue; but this naive test does not take into account 
+        // TODO: We are not comparing like with like ... so continue; but this naive test does not take into account
         // stores, which we need to, in order to make this work well.
       //}
 
@@ -315,12 +315,12 @@ TESTS *DoGroupAnalysis(LPKEYBOARD kbd, LPGROUP gp, std::vector<LPGROUP> & tree, 
         if (!new_tests) return NULL;
         // TODO: Then multiplying new_tests for each subsequent group I guess!?
         found = TRUE;
-        break; 
+        break;
       }
     }
     if (!found) {
       // TODO: Support use() in rule and use() in match
-      // check for use in match or extra 
+      // check for use in match or extra
       PWCHAR pc = gp->dpMatch;
       if (pc && *pc == UC_SENTINEL && *(pc + 1) == CODE_USE) {
         new_tests = DoGroupAnalysis(kbd, &kbd->dpGroupArray[*(pc + 2) - 1], tree, &t0);
@@ -437,7 +437,7 @@ std::wstring GetModifierName(UINT modifier) {
     if (str.size()) str += L" | ";
     str += buf;
   }
-  
+
   wsprintfW(buf, L" /* 0x%x */", originalModifier);
   if (!str.size()) str += L"0";
   str += buf;
@@ -493,7 +493,7 @@ void PrintTests(TESTS *tests, char *keyboardID, wchar_t *keyboardName, char *key
     fprintf(fp, "}%s\n", (i == tests->size() - 1 ? "" : ","));
   }
 
-  fprintf(fp, 
+  fprintf(fp,
     "  }\n"
     "}"/*);\n"
     "})();\n"*/
@@ -504,7 +504,7 @@ void PrintTests(TESTS *tests, char *keyboardID, wchar_t *keyboardName, char *key
 
 void RemoveDuplicateTests(TESTS *tests) {
   // TODO: sort tests by key, modifier, context
-  
+
   // Then remove duplicates
 }
 
@@ -564,16 +564,16 @@ void PrintRule(LPKEYBOARD kbd, LPKEY kp) {
   for (PWCHAR pc = kp->dpContext; pc && *pc; pc = incxstr(pc)) {
     if (*pc == UC_SENTINEL) {
       switch (*(pc + 1)) {
-      case CODE_ANY:			
+      case CODE_ANY:
         sp = &kbd->dpStoreArray[*(pc + 2) - 1];
         context.push_back(NextUTF32(sp->dpString));
         break;
-      case CODE_NOTANY:   
+      case CODE_NOTANY:
         assert(FALSE); //TODO
-      case CODE_INDEX:		
+      case CODE_INDEX:
         assert(FALSE); //TODO
       case CODE_DEADKEY:
-        
+
         case CODE_EXTENDED:		p += 2; while (*p != UC_SENTINEL_EXTENDEDEND) p++; return p + 1;
         case CODE_CLEARCONTEXT: return p + 1;
         case CODE_CALL:			return p + 1;

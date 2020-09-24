@@ -1,18 +1,18 @@
 /*
   Name:             appint
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      5 Nov 2007
 
   Modified Date:    23 Jun 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          05 Nov 2007 - mcdurdin - I1129 - Fix irregular behaviour with context rules in debugger
                     27 Jan 2009 - mcdurdin - I1797 - Add fallback for AIWin2000 app integration
                     11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
@@ -75,9 +75,9 @@ WCHAR *AppContext::BufMax(int n)  // Used only by IMX DLLs
 	if(CurContext == p || n == 0) return p; /* empty context or 0 characters requested, return pointer to end of context */  // I3091
 
   WCHAR *q = p;  // I3091
-	for(; p > CurContext && (int)(q-p) < n; p = decxstr(p, CurContext));  // I3091
+	for(; p > CurContext && (INT_PTR)(q-p) < n; p = decxstr(p, CurContext));  // I3091
 
-  if((int)(q-p) > n) p = incxstr(p); /* Copes with deadkey or supplementary pair at start of returned buffer making it too long */  // I3091
+  if((INT_PTR)(q-p) > n) p = incxstr(p); /* Copes with deadkey or supplementary pair at start of returned buffer making it too long */  // I3091
 
   return p;  // I3091
 }
@@ -112,9 +112,9 @@ void AppContext::Get(WCHAR *buf, int bufsize)
 		*buf = *p; buf++;
 		if(*p >= 0xD800 && *p <= 0xDBFF) { *buf = *(++p); bufsize--; buf++; }
 	}
-	//wcsncpy(buf, CurContext, bufsize); 
+	//wcsncpy(buf, CurContext, bufsize);
 	*buf = 0;
-	//buf[bufsize-1] = 0; 
+	//buf[bufsize-1] = 0;
 }
 
 void AppContext::CopyFrom(AppContext *source)   // I3575
@@ -129,21 +129,21 @@ void AppContext::Set(const WCHAR *buf)
 {
 	const WCHAR *p;
 	WCHAR *q;
-	for(p = buf, q = CurContext; *p && (int)(q-CurContext) < MAXCONTEXT - 1; p++, q++)
+	for(p = buf, q = CurContext; *p && (INT_PTR)(q-CurContext) < MAXCONTEXT - 1; p++, q++)
 	{
 		*q = *p;
 		if(*p >= 0xD800 && *p <= 0xDBFF) { *(++q) = *(++p); }
 	}
 	*q = 0;
-  pos = (int)(q-CurContext);  // I1129 - Irregular behaviour with context rules
-	CurContext[MAXCONTEXT-1] = 0; 
+  pos = (int)(INT_PTR)(q-CurContext);  // I1129 - Irregular behaviour with context rules
+	CurContext[MAXCONTEXT-1] = 0;
 }
 
 BOOL AppContext::CharIsDeadkey()
 {
 	if(pos < 3) // code_sentinel, deadkey, #, 0
 		return FALSE;
-	return CurContext[pos-3] == UC_SENTINEL && 
+	return CurContext[pos-3] == UC_SENTINEL &&
 		   CurContext[pos-2] == CODE_DEADKEY;
 }
 
@@ -159,7 +159,7 @@ BOOL AppContext::CharIsSurrogatePair()
 /* AppActionQueue */
 
 AppActionQueue::AppActionQueue()
-{ 
+{
 	ResetQueue();
 }
 
