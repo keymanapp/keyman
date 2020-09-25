@@ -1,18 +1,18 @@
 /*
   Name:             Compiler
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     23 Aug 2006 - mcdurdin - Add VISUALKEYBOARD, KMW_RTL, KMW_HELPFILE, KMW_HELPTEXT, KMW_EMBEDJS system stores
                     14 Sep 2006 - mcdurdin - Support icons in version 7
@@ -96,7 +96,7 @@ BOOL IsValidCallStore(PFILE_STORE fs);
 BOOL IsSameToken(PWSTR *p, PWSTR token);
 DWORD GetRHS(PFILE_KEYBOARD fk, PWSTR p, PWSTR buf, int bufsize, int offset, int IsUnicode);
 PWSTR GetDelimitedString(PWSTR *p, PWSTR Delimiters, WORD Flags);
-DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int max, int offset, PWSTR *newp, int isVKey, 
+DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int max, int offset, PWSTR *newp, int isVKey,
 	int isUnicode);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PWSTR p);
@@ -150,17 +150,17 @@ const PWCHAR LineTokens[] = {
 #define SSN__PREFIX		L"&"
 
 const PWCHAR StoreTokens[TSS__MAX+2] = {
-	L"", 
-	SSN__PREFIX L"BITMAP", 
+	L"",
+	SSN__PREFIX L"BITMAP",
 	SSN__PREFIX L"COPYRIGHT",
-	SSN__PREFIX L"HOTKEY", 
-	SSN__PREFIX L"LANGUAGE", 
+	SSN__PREFIX L"HOTKEY",
+	SSN__PREFIX L"LANGUAGE",
 	SSN__PREFIX L"LAYOUT",
-	SSN__PREFIX L"MESSAGE", 
-	SSN__PREFIX L"NAME", 
+	SSN__PREFIX L"MESSAGE",
+	SSN__PREFIX L"NAME",
 	SSN__PREFIX L"VERSION",
-	SSN__PREFIX L"CAPSONONLY", 
-	SSN__PREFIX L"CAPSALWAYSOFF", 
+	SSN__PREFIX L"CAPSONONLY",
+	SSN__PREFIX L"CAPSALWAYSOFF",
 	SSN__PREFIX L"SHIFTFREESCAPS",
 	SSN__PREFIX L"LANGUAGENAME",
 	L"",
@@ -247,7 +247,7 @@ BOOL AddCompileString(LPSTR buf)
     (*msgproc)(currentLine+1, CWARN_Info, buf);
 	return FALSE;
 }
-	
+
 BOOL AddCompileMessage(DWORD msg)
 {
 	char szText[SZMAX_ERRORTEXT+1+280];
@@ -282,7 +282,7 @@ BOOL AddCompileMessage(DWORD msg)
 
 	return FALSE;
 }
-	
+
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
 	HANDLE hInfile = INVALID_HANDLE_VALUE, hOutfile = INVALID_HANDLE_VALUE;
@@ -301,8 +301,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
 	PSTR p;
 	if(p = strrchr(pszInfile, '\\'))
 	{
-		strncpy_s(CompileDir, _countof(CompileDir), pszInfile, (int)(p-pszInfile+1));  // I3481
-		CompileDir[(int)(p-pszInfile+1)] = 0;
+		strncpy_s(CompileDir, _countof(CompileDir), pszInfile, (INT_PTR)(p-pszInfile+1));  // I3481
+		CompileDir[(INT_PTR)(p-pszInfile+1)] = 0;
 	}
 	else
 		CompileDir[0] = 0;
@@ -335,7 +335,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   {
     return CERR_CannotCreateTempfile;
   }
-	
+
 	hOutfile = CreateFileA(pszOutfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if(hOutfile == INVALID_HANDLE_VALUE) SetError(CERR_CannotCreateOutfile);
 
@@ -351,7 +351,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
 	}
 	else
 		AddCompileMessage(CERR_InvalidValue);
-	
+
 	CloseHandle(hInfile);
 	CloseHandle(hOutfile);
 
@@ -385,8 +385,8 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
 	PSTR p;
 	if(p = strrchr(pszInfile, '\\'))
 	{
-		strncpy_s(CompileDir, _countof(CompileDir), pszInfile, (int)(p-pszInfile+1));  // I3481
-		CompileDir[(int)(p-pszInfile+1)] = 0;
+		strncpy_s(CompileDir, _countof(CompileDir), pszInfile, (INT_PTR)(p-pszInfile+1));  // I3481
+		CompileDir[(INT_PTR)(p-pszInfile+1)] = 0;
 	}
 	else
 		CompileDir[0] = 0;
@@ -442,7 +442,7 @@ void GetVersionInfo(DWORD *VersionMajor, DWORD *VersionMinor)
 BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 {
 	PWSTR str, p;
-	
+
 	DWORD msg;
 
 	FMnemonicLayout = FALSE;
@@ -475,7 +475,7 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 	fk->dwBitmapSize = 0;
 	fk->dwHotKey = 0;
 
-	/* Add a store for the Keyman 6.0 copyright information string */ 
+	/* Add a store for the Keyman 6.0 copyright information string */
 
 	DWORD vmajor, vminor;
 	GetVersionInfo(&vmajor, &vminor);
@@ -488,7 +488,7 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 	//delete pw;
 
 	/* Add a system store for the Keyman edition number */
-	
+
 	swprintf(str, LINESIZE, L"%d", 0);  // I3481
 	AddStore(fk, TSS_CUSTOMKEYMANEDITION, str);
 	PWSTR tbuf = strtowstr((char*) "Keyman");
@@ -525,13 +525,13 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 	SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
 	currentLine = 0;
 
-	/* Reindex the list of codeconstants after stores added */ 
+	/* Reindex the list of codeconstants after stores added */
 
 	CodeConstants->reindex();
 
-	/* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */ 
+	/* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
 	while((msg = ReadLine(hInfile, str, FALSE)) == CERR_None)
-    { 
+    {
 		if(GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
 		msg = ParseLine(fk, str);
 		if(msg != CERR_None) SetError(msg);
@@ -543,7 +543,7 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 
 	if(FSaveDebug) RecordDeadkeyNames(fk);
 
-	/* Add the compiler version as a system store */ 
+	/* Add the compiler version as a system store */
 	if((msg = AddCompilerVersionStore(fk)) != CERR_None) SetError(msg);
 
   if((msg = BuildVKDictionary(fk)) != CERR_None) SetError(msg);  // I3438
@@ -578,7 +578,7 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
 	else if(*p != '>') return CERR_InvalidToken;
 	else BeginMode = BEGIN_ANSI;
 
-	if((msg = GetRHS(fk, p, tstr, 80, (int)(p-pp), FALSE)) != CERR_None) return msg;
+	if((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p-pp), FALSE)) != CERR_None) return msg;
 
 	if(tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) return CERR_InvalidBegin;
 
@@ -619,7 +619,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 
 	p = str;
 	pp = str;
-	
+
 	switch(LineTokenType(&p))
     {
 	case T_BLANK:
@@ -648,7 +648,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if( !q ) return CERR_InvalidName;
-		
+
 		if((msg = AddStore(fk, TSS_NAME, q)) != CERR_None) return msg;
 		break;
 
@@ -659,7 +659,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 
 		if((msg = AddStore(fk, TSS_COPYRIGHT, q)) != CERR_None) return msg;
 		break;
-	
+
   case T_MESSAGE:
     WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
@@ -696,12 +696,12 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_CAPSALWAYSOFF, L"1")) != CERR_None) return msg;
 		break;
-	
+
 	case T_CAPSON:
     WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_CAPSONONLY, L"1")) != CERR_None) return msg;
 		break;
-	
+
 	case T_SHIFT:
     WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_SHIFTFREESCAPS, L"1")) != CERR_None) return msg;
@@ -748,7 +748,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		if(fk->currentGroup == 0xFFFFFFFF) return CERR_CodeInvalidInThisSection;
 		{
 		  PWCHAR buf = new WCHAR[GLOBAL_BUFSIZE];
-		  if((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE-1, (int)(p-pp), IsUnicode)) != CERR_None)
+		  if((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE-1, (int)(INT_PTR)(p-pp), IsUnicode)) != CERR_None)
 		  {
 		    delete buf;
 		    return msg;
@@ -758,12 +758,12 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
         delete buf;
         return msg;
       }
-      
+
       gp = &fk->dpGroupArray[fk->currentGroup];
-		
+
 		  gp->dpMatch = new WCHAR[wcslen(buf) + 1];
 		  wcscpy_s(gp->dpMatch, wcslen(buf)+1, buf);  // I3481
-		  
+
 		  delete buf;
 
 		  if(FSaveDebug)
@@ -786,7 +786,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		if(fk->currentGroup == 0xFFFFFFFF) return CERR_CodeInvalidInThisSection;
 		{
 		  PWCHAR buf = new WCHAR[GLOBAL_BUFSIZE];
-      if((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE, (int)(p-pp), IsUnicode)) != CERR_None) 
+      if((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE, (int)(INT_PTR)(p-pp), IsUnicode)) != CERR_None)
       {
         delete buf;
         return msg;
@@ -798,10 +798,10 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
       }
 
 		  gp = &fk->dpGroupArray[fk->currentGroup];
-		
+
 		  gp->dpNoMatch = new WCHAR[wcslen(buf) + 1];
 		  wcscpy_s(gp->dpNoMatch, wcslen(buf)+1, buf);  // I3481
-		  
+
 		  delete buf;
 
 		  if(FSaveDebug)
@@ -830,13 +830,13 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
 
 	gp = new FILE_GROUP[fk->cxGroupArray + 1];
 	if(!gp) return CERR_CannotAllocateMemory;
-	
+
 	if(fk->dpGroupArray)
     {
 		memcpy(gp, fk->dpGroupArray, sizeof(FILE_GROUP) * fk->cxGroupArray);
 		delete fk->dpGroupArray;
 	}
-	
+
 	fk->dpGroupArray = gp;
 	gp = &fk->dpGroupArray[fk->cxGroupArray];
 	fk->cxGroupArray++;
@@ -851,7 +851,7 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
 
 	gp->fUsingKeys = FALSE;
 	if(IsSameToken(&p, L"using") && IsSameToken(&p, L"keys")) gp->fUsingKeys = TRUE;
-	
+
 	safe_wcsncpy(gp->szName, q, SZMAX_GROUPNAME);
 
 	if(FSaveDebug)
@@ -894,7 +894,7 @@ WCHAR VKToChar(WORD keyCode, UINT shiftFlags)
 		n = keyCode - '0';
 		return ((shiftFlags & K_SHIFTFLAG) ? shiftedDigit[n] : keyCode);
 	}
-	
+
 	if(keyCode >= 'A' && keyCode <= 'Z')
 	{
 		Shift = (shiftFlags & K_SHIFTFLAG);
@@ -912,7 +912,7 @@ WCHAR VKToChar(WORD keyCode, UINT shiftFlags)
 
 	switch(keyCode)
 	{
-	case VK_ACCENT:	
+	case VK_ACCENT:
 		return Shift ? '~' : '`';
 	case VK_HYPHEN:
 		return Shift ? '_' : '-';
@@ -970,11 +970,11 @@ DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 {
 	PFILE_GROUP gp;
 
-	if(fk->currentGroup == 0xFFFFFFFF) return CERR_None; 
+	if(fk->currentGroup == 0xFFFFFFFF) return CERR_None;
 		// Just got to first group - so nothing to finish yet
 
 	gp = &fk->dpGroupArray[fk->currentGroup];
-	
+
 	// Finish off the previous group stuff!
 	qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), cmpkeys);
 
@@ -1007,13 +1007,13 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
 
 	sp = new FILE_STORE[fk->cxStoreArray+1];
 	if(!sp) return CERR_CannotAllocateMemory;
-	
+
 	if(fk->dpStoreArray)
     {
 		memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
 		delete fk->dpStoreArray;
 	}
-	
+
 	fk->dpStoreArray = sp;
 	sp = &fk->dpStoreArray[fk->cxStoreArray];
 
@@ -1028,7 +1028,7 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
   {
     PWCHAR temp = new WCHAR[GLOBAL_BUFSIZE];
 
-	  if((msg = GetXString(fk, p, L"c\n", temp, GLOBAL_BUFSIZE-1, (int)(p-pp), &p, FALSE, TRUE)) != CERR_None)
+	  if((msg = GetXString(fk, p, L"c\n", temp, GLOBAL_BUFSIZE-1, (int)(INT_PTR)(p-pp), &p, FALSE, TRUE)) != CERR_None)
 	  {
 	    delete temp;
 	    return msg;
@@ -1037,11 +1037,11 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
   	sp->dwSystemID = i;
 	  sp->dpString = new WCHAR[wcslen(temp)+1];
 	  wcscpy_s(sp->dpString, wcslen(temp)+1, temp);  // I3481
-	  
+
 	  delete temp;
 	}
 
-	if(xstrlen(sp->dpString) == 1 && *sp->dpString != UC_SENTINEL && 
+	if(xstrlen(sp->dpString) == 1 && *sp->dpString != UC_SENTINEL &&
 		sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0))
 	{
     // In this case, we want to change behaviour for older versioned keyboards so that
@@ -1059,7 +1059,7 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
 
 	fk->cxStoreArray++;	// increment now, because GetXString refers to stores
 
-	if(i > 0) 
+	if(i > 0)
 		if((msg = ProcessSystemStore(fk, i, sp)) != CERR_None) return msg;
 
 	return CERR_None;
@@ -1071,13 +1071,13 @@ DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID)
 
 	sp = new FILE_STORE[fk->cxStoreArray+1];
 	if(!sp) return CERR_CannotAllocateMemory;
-	
+
 	if(fk->dpStoreArray)
 	{
 		memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
 		delete fk->dpStoreArray;
 	}
-  
+
 	fk->dpStoreArray = sp;
 	sp = &fk->dpStoreArray[fk->cxStoreArray];
 
@@ -1111,7 +1111,7 @@ DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str)
 
 	sp = new FILE_STORE[fk->cxStoreArray+1];
 	if(!sp) return CERR_CannotAllocateMemory;
-	
+
 	if(fk->dpStoreArray)
 	{
 		memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
@@ -1146,45 +1146,45 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 	DWORD msg;
 	PWSTR p, q;
 	char *pp;
-	
+
 	if(!pssBuf) pssBuf = new WCHAR[GLOBAL_BUFSIZE];
 	PWCHAR buf = pssBuf;
 
 	switch(SystemID)
 	{
 	case TSS_BITMAP:
-		if((msg = ImportBitmapFile(fk, sp->dpString, &fk->dwBitmapSize, &fk->lpBitmap)) != CERR_None) 
+		if((msg = ImportBitmapFile(fk, sp->dpString, &fk->dwBitmapSize, &fk->lpBitmap)) != CERR_None)
 			return msg;
 		break;
-	
+
 	case TSS_CALLDEFINITION:
 		break;
-	
+
 	case TSS_CALLDEFINITION_LOADFAILED:
 		break;
-	
+
 	case TSS_CAPSALWAYSOFF:
 		if(*sp->dpString == L'1') fk->dwFlags |= KF_CAPSALWAYSOFF;
 		break;
-	
+
 	case TSS_CAPSONONLY:
 		if(*sp->dpString == L'1') fk->dwFlags |= KF_CAPSONONLY;
 		break;
-	
+
 	case TSS_COMPILEDVERSION:
 		break;
 
 	case TSS_COPYRIGHT:
 		break;
-	
+
 	case TSS_DEBUG_LINE:
 		break;
-	
+
 	case TSS_ETHNOLOGUECODE:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_EthnologueCode);
     if((msg = ProcessEthnologueStore(sp->dpString)) != CERR_None) return msg;  // I2646
 		break;
-	
+
 	case TSS_HOTKEY:
 		if((msg = ProcessHotKey(sp->dpString, &fk->dwHotKey)) != CERR_None) return msg;
 
@@ -1205,7 +1205,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		delete pp;
     CodeConstants->reindex();   // I4982
 		break;
-	
+
 	case TSS_LANGUAGE:
     {
       wchar_t *context = NULL;
@@ -1222,12 +1222,12 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
       }
       else
   		  j = xatoi(&q);
-  		
+
 	    if(i < 1 || j < 1 || i > 0x3FF || j > 0x3F) return CERR_InvalidLanguageLine;
 		  if(i >= 0x200 || j >= 0x20) AddWarning(CWARN_CustomLanguagesNotSupported);
-		
+
 		  fk->KeyboardID = (DWORD) MAKELANGID(i, j);
-    
+
 		  swprintf(buf, GLOBAL_BUFSIZE, L"%x %x", i, j);  // I3481
 		  delete sp->dpString;
 		  sp->dpString = new WCHAR[wcslen(buf)+1];
@@ -1272,7 +1272,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     if (wcstof(p, NULL) < 5.0) {
       AddWarning(CWARN_OldVersion);
     }
-		
+
 		if(wcsncmp(p, L"3.0", 3) == 0)       fk->version = VERSION_50;   //0x0a0b000n= a.bn
 		else if(wcsncmp(p, L"3.1", 3) == 0)  fk->version = VERSION_50;   //all versions < 5.0
 		else if(wcsncmp(p, L"3.2", 3) == 0)  fk->version = VERSION_50;   //we compile as if
@@ -1345,7 +1345,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 
 		    j = SUBLANGID(n);
 		    i = PRIMARYLANGID(n);
-  		
+
 	      if(i < 1 || j < 1 || i > 0x3FF || j > 0x3F) return CERR_InvalidLanguageLine;
 
         swprintf(r, szQ - (size_t)(r-q), L"x%04.4x ", n);  // I3481
@@ -1394,8 +1394,8 @@ BOOL IsValidKeyboardVersion(WCHAR *dpString) {   // I4140
     while(iswdigit(*dpString)) {
       dpString++;
     }
-    if(*dpString == '.') { 
-      dpString++; 
+    if(*dpString == '.') {
+      dpString++;
       if(!iswdigit(*dpString)) {
         return FALSE;
       }
@@ -1460,7 +1460,7 @@ DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PWSTR context, PW
 			  for(q = context, i = 1; *q && i < contextOffset; q=incxstr(q), i++);
 
 			  if(*q == 0)	{
-				  if(!gp->fUsingKeys) 
+				  if(!gp->fUsingKeys)
             // no key in the rule, so offset is past end of context
             return CERR_IndexDoesNotPointToAny;
 				  if(i < contextOffset) // I4914
@@ -1470,7 +1470,7 @@ DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PWSTR context, PW
 			  }
 
 			  // find the any
-			  if(*q != UC_SENTINEL || *(q+1) != CODE_ANY) 
+			  if(*q != UC_SENTINEL || *(q+1) != CODE_ANY)
           return CERR_IndexDoesNotPointToAny;
 
         int anyStore = *(q+2) - 1;
@@ -1511,7 +1511,7 @@ DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
 	PFILE_GROUP gp;
 	PFILE_KEY kp;
   PWCHAR pklIn, pklKey, pklOut;
-	
+
 	pklIn = new WCHAR[GLOBAL_BUFSIZE];    // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer
 	pklKey = new WCHAR[GLOBAL_BUFSIZE];
 	pklOut = new WCHAR[GLOBAL_BUFSIZE];
@@ -1526,19 +1526,19 @@ DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
 	  pp = str;
 
 	  if(gp->fUsingKeys) {
-		  if((msg = GetXString(fk, str, L"+", pklIn, GLOBAL_BUFSIZE-1, (int)(str-pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+		  if((msg = GetXString(fk, str, L"+", pklIn, GLOBAL_BUFSIZE-1, (int)(INT_PTR)(str-pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
 
 		  str = p + 1;
-		  if((msg = GetXString(fk, str, L">", pklKey, GLOBAL_BUFSIZE-1, (int)(str-pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+		  if((msg = GetXString(fk, str, L">", pklKey, GLOBAL_BUFSIZE-1, (int)(INT_PTR)(str-pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
 		  if(pklKey[0] == 0) return CERR_ZeroLengthString;
 		  if(xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
 	  } else {
-		  if((msg = GetXString(fk, str, L">", pklIn, GLOBAL_BUFSIZE-1, (int)(str-pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+		  if((msg = GetXString(fk, str, L">", pklIn, GLOBAL_BUFSIZE-1, (int)(INT_PTR)(str-pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
 		  if(pklIn[0] == 0) return CERR_ZeroLengthString;
 	  }
 
 	  str = p + 1;
-	  if((msg = GetXString(fk, str, L"c\n", pklOut, GLOBAL_BUFSIZE-1, (int)(str-pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+	  if((msg = GetXString(fk, str, L"c\n", pklOut, GLOBAL_BUFSIZE-1, (int)(INT_PTR)(str-pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
 
 	  if(pklOut[0] == 0) return CERR_ZeroLengthString;
 
@@ -1555,7 +1555,7 @@ DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
 		  memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
 		  delete gp->dpKeyArray;
 	  }
-  	
+
 	  gp->dpKeyArray = kp;
 	  kp = &gp->dpKeyArray[gp->cxKeyArray];
 	  gp->cxKeyArray++;
@@ -1629,9 +1629,9 @@ DWORD ExpandKp_ReplaceIndex(PFILE_KEYBOARD fk, PFILE_KEY k, DWORD keyIndex, int 
         {
 			s = &fk->dpStoreArray[*(pIndex+2) - 1];
 			for(i = 0, pStore = s->dpString; i < nAnyIndex; i++, pStore = incxstr(pStore));
-			PWSTR qStore = incxstr(pStore); 
+			PWSTR qStore = incxstr(pStore);
 
-			int w = (int)(qStore - pStore);
+			int w = (int)(INT_PTR)(qStore - pStore);
 			if(w > 4)
 			{
 				*pIndex = UC_SENTINEL;
@@ -1668,7 +1668,7 @@ DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, DWORD storeIndex)
 	keyIndex = xstrlen(dpContext) + 1;
 
 	/*
-	 Now we change them to plain characters in the output in multiple rules, 
+	 Now we change them to plain characters in the output in multiple rules,
 	 and set the keystroke to the appropriate character in the store.
 	*/
 
@@ -1676,7 +1676,7 @@ DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, DWORD storeIndex)
 	if(!k) return CERR_CannotAllocateMemory;
 	memcpy(k, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
 
-	kpp = &k[(int)(kpp - gp->dpKeyArray)];
+	kpp = &k[(INT_PTR)(kpp - gp->dpKeyArray)];
 
 	delete gp->dpKeyArray;
 	gp->dpKeyArray = k;
@@ -1767,7 +1767,7 @@ LinePrefixType GetLinePrefixType(PWSTR *p)
   while(iswspace(*s)) s++;
 
   PWSTR q = s;
-	
+
 	if(*s != '$') return lptNone;
 
   /* I1569 - fix named constants at the start of the line */
@@ -1837,7 +1837,7 @@ int LineTokenType(PWSTR *str)
 	return T_UNKNOWN;
 }
 
-const PWSTR DeadKeyChars = 
+const PWSTR DeadKeyChars =
 	L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
 
 BOOL strvalidchrs(PWSTR q, PWSTR chrs)
@@ -1856,14 +1856,14 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 	BOOL finished = FALSE;
 	WCHAR c;
 	PSTR codename;
-	
+
   PWCHAR tstr = NULL;
   int tstrMax = 0;
 
   tstr = new WCHAR[max];    // I2432 - Allocate buffers each line -- slightly slower but safer than keeping a single buffer - GetXString is re-entrant with if()
   tstrMax = max;
 
-  __try 
+  __try
   {
     *tstr = 0;
 
@@ -1876,7 +1876,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  while(iswspace(*p) && !wcschr(token, *p)) p++;
 		  if(!*p) break;
 
-		  ErrChr = (int)(p - str) + offset + 1;
+		  ErrChr = (int)(INT_PTR)(p - str) + offset + 1;
 
   /*
   char *tokenTypes[] = {
@@ -1948,20 +1948,20 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  case 1:
 			  q = wcschr(p+1, '\"');
 			  if(!q) return CERR_UnterminatedString;
-			  if((int)(q-p) - 1 + mx > max) return CERR_UnterminatedString;
+			  if((INT_PTR)(q-p) - 1 + mx > max) return CERR_UnterminatedString;
 			  if(sFlag) return CERR_StringInVirtualKeySection;
-		      wcsncat_s(tstr, max, p+1, (int)(q-p)-1);  // I3481
-			  mx += (int)(q-p)-1;
+		      wcsncat_s(tstr, max, p+1, (INT_PTR)(q-p)-1);  // I3481
+			  mx += (int)(INT_PTR)(q-p)-1;
 			  tstr[mx] = 0;
 			  p = q+1;
 			  continue;
 		  case 2:
 			  q = wcschr(p+1, '\'');
 			  if(!q) return CERR_UnterminatedString;
-			  if((int)(q-p) - 1 + mx > max) return CERR_UnterminatedString;
+			  if((INT_PTR)(q-p) - 1 + mx > max) return CERR_UnterminatedString;
 			  if(sFlag) return CERR_StringInVirtualKeySection;
-			  wcsncat_s(tstr, max, p+1, (int)(q-p)-1);  // I3481
-			  mx += (int)(q-p)-1;
+			  wcsncat_s(tstr, max, p+1, (INT_PTR)(q-p)-1);  // I3481
+			  mx += (int)(INT_PTR)(q-p)-1;
 			  tstr[mx] = 0;
 			  p = q+1;
 			  continue;
@@ -1977,7 +1977,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  if(_wcsicmp(q, fk->dpStoreArray[i].szName) == 0) break;
 			  }
 			  if(i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
-  			
+
 			  if(!*fk->dpStoreArray[i].dpString) return CERR_ZeroLengthString;
         CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
@@ -2066,7 +2066,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  if(_wcsicmp(q, fk->dpStoreArray[i].szName) == 0) break;
 			  }
 			  if(i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
-  			
+
         CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
 			  for(q = fk->dpStoreArray[i].dpString; *q; q++)
@@ -2276,7 +2276,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         // version to 10.0. This makes an assumption that if we are using these features in a keyboard and it has no version specified, that we want to use the features
         // in the web target platform, even if there are platform() rules excluding this possibility. In that (rare) situation, the keyboard developer should simply specify
         // the &version to be 9.0 or whatever to avoid this behaviour.
-        if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) && 
+        if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
             CompileTarget == CKF_KEYMANWEB &&
             fk->dwFlags & KF_AUTOMATICVERSION) {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_100, 0);
@@ -2310,11 +2310,11 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 					  q++;
 					  while(iswspace(*q)) q++;
 					  if(*q != ']') return CERR_InvalidToken;
-					  break; /* out of while loop */ 
+					  break; /* out of while loop */
 				  }
-  	
+
 				  for(j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
-  			
+
 				  if(*q == 0) return CERR_InvalidToken;
 
           WCHAR vkname[SZMAX_VKDICTIONARYNAME];  // I3438
@@ -2349,7 +2349,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           tstr[mx++] = (int)i;
 
 					if(FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) AddWarning(CWARN_VirtualKeyWithMnemonicLayout);  // I3438
-  
+
 				  while(iswspace(*q)) q++;
 			  }
 			  tstr[mx++] = UC_SENTINEL_EXTENDEDEND;
@@ -2468,7 +2468,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  ErrChr = 0;
       return CERR_None;
     }
-  
+
   }
   __finally
   {
@@ -2517,7 +2517,7 @@ DWORD process_if_synonym(DWORD dwSystemID, PFILE_KEYBOARD fk, LPWSTR q, LPWSTR t
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (WCHAR) CODE_IFSYSTEMSTORE;
   tstr[(*mx)++] = (WCHAR)(dwSystemID+1);   // I4785
-  tstr[(*mx)++] = 2; 
+  tstr[(*mx)++] = 2;
   tstr[(*mx)++] = (WCHAR)(dwStoreID+1);
   tstr[(*mx)] = 0;
 
@@ -2534,12 +2534,12 @@ DWORD process_if(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)  // I3431
   while(*s && *s != L' ' && *s != L'!' && *s != L'=') s++;
   r = s;
   while(*s == L' ') s++;
-  if(*s == L'!') 
+  if(*s == L'!')
   {
     s++;
     not = TRUE;
   }
-    
+
   if(*s != '=') return CERR_InvalidIf;
   s++;
   while(*s == ' ') s++;
@@ -2589,7 +2589,7 @@ DWORD process_if(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)  // I3431
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (WCHAR) code;
   tstr[(*mx)++] = (WCHAR)(i+1);
-  tstr[(*mx)++] = not ? 1 : 2; 
+  tstr[(*mx)++] = not ? 1 : 2;
   tstr[(*mx)++] = (WCHAR)(dwStoreID+1);
   tstr[(*mx)] = 0;
 
@@ -2777,8 +2777,8 @@ DWORD ProcessEthnologueStore(PWSTR p) // I2646
   while(*p)
   {
     while(wcschr(L" ,;", *p))
-    { 
-      if(*p != ' ') res = CWARN_PunctuationInEthnologueCode; 
+    {
+      if(*p != ' ') res = CWARN_PunctuationInEthnologueCode;
       p++;
     }
     if(q == p) return CERR_InvalidEthnologueCode;
@@ -2834,8 +2834,8 @@ DWORD ProcessHotKey(PWSTR p, DWORD *hk)
         {
 			while(iswspace(*q)) q++;
 
-			if(_wcsnicmp(q, L"ALT", 3) == 0) sFlag |= HK_ALT, q += 3; 
-			else if(_wcsnicmp(q, L"CTRL", 4) == 0) sFlag |= HK_CTRL, q += 4; 
+			if(_wcsnicmp(q, L"ALT", 3) == 0) sFlag |= HK_ALT, q += 3;
+			else if(_wcsnicmp(q, L"CTRL", 4) == 0) sFlag |= HK_CTRL, q += 4;
 			else if(_wcsnicmp(q, L"SHIFT", 5) == 0) sFlag |= HK_SHIFT, q += 5;
 			else if(towupper(*q) != 'K') return CERR_InvalidToken;
 		} while(towupper(*q) != 'K');
@@ -2849,11 +2849,11 @@ DWORD ProcessHotKey(PWSTR p, DWORD *hk)
 		}
 		else return CERR_NoTokensFound;
 
-		j = (int) (r-q);
+		j = (int)(INT_PTR) (r-q);
 
 		for(i = 0; i <= VK__MAX; i++)  // I3438
 			if( j == (int)wcslen(VKeyNames[i]) && _wcsnicmp(q, VKeyNames[i], j) == 0) break;
-		
+
 		if(i == VK__MAX + 1) return CERR_InvalidToken;  // I3438
 
 		*hk = i | sFlag;
@@ -2925,11 +2925,11 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 
 	// Calculate how much memory to allocate
 
-	size = sizeof(COMP_KEYBOARD) + 
-			fk->cxGroupArray * sizeof(COMP_GROUP) +  
+	size = sizeof(COMP_KEYBOARD) +
+			fk->cxGroupArray * sizeof(COMP_GROUP) +
 			fk->cxStoreArray * sizeof(COMP_STORE) +
-			/*wcslen(fk->szName)*2 + 2 + 
-			wcslen(fk->szCopyright)*2 + 2 + 
+			/*wcslen(fk->szName)*2 + 2 +
+			wcslen(fk->szCopyright)*2 + 2 +
 			wcslen(fk->szLanguageName)*2 + 2 +
 			wcslen(fk->szMessage)*2 + 2 +*/
 			fk->dwBitmapSize;
@@ -2943,7 +2943,7 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 			size += wcslen(fkp->dpOutput)*2 + 2;
 			size += wcslen(fkp->dpContext)*2 + 2;
 		}
-		
+
 		if( fgp->dpMatch ) size += wcslen(fgp->dpMatch)*2 + 2;
 		if( fgp->dpNoMatch ) size += wcslen(fgp->dpNoMatch)*2 + 2;
 	}
@@ -2970,7 +2970,7 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 	ck->StartGroup[0] = fk->StartGroup[0];
 	ck->StartGroup[1] = fk->StartGroup[1];
 	ck->dwHotKey = fk->dwHotKey;
-	
+
 	ck->dwFlags = fk->dwFlags;
 
 	offset = sizeof(COMP_KEYBOARD);
@@ -3098,7 +3098,7 @@ DWORD ReadLine(HANDLE hInfile, PWSTR wstr, BOOL PreProcess)
 	if(SetFilePointer(hInfile, 0, NULL, FILE_CURRENT) == GetFileSize(hInfile, NULL))
 		// Always a "\r\n" to the EOF, avoids funny bugs
 		wcscat_s(str, _countof(str), L"\r\n");  // I3481
-	
+
 	if(len == 0) return CERR_EndOfFile;
 
 	for(p = str, n = 0; n < len; n++, p++)
@@ -3106,7 +3106,7 @@ DWORD ReadLine(HANDLE hInfile, PWSTR wstr, BOOL PreProcess)
 		if(currentQuotes != 0)
     {
 			if( *p == L'\n' )
-      { 
+      {
         *p = 0;  // I2525
          wcscpy_s(wstr, LINESIZE, str);  // I3481
          return (PreProcess ? CERR_None : CERR_UnterminatedString);
@@ -3124,9 +3124,9 @@ DWORD ReadLine(HANDLE hInfile, PWSTR wstr, BOOL PreProcess)
 			*p = L' ';
 			continue;
 		}
-		if( LineCarry ) 
+		if( LineCarry )
 		{
-			switch( *p ) 
+			switch( *p )
 			{
 			case L' ':
 			case L'\t':
@@ -3175,7 +3175,7 @@ DWORD ReadLine(HANDLE hInfile, PWSTR wstr, BOOL PreProcess)
 
 	if( *p == L'\n' ) currentLine++;
 
-	SetFilePointer(hInfile, -(int)(len*2 - (DWORD)(p-str)*2 - 2), NULL, FILE_CURRENT);
+	SetFilePointer(hInfile, -(int)(len*2 - (INT_PTR)(p-str)*2 - 2), NULL, FILE_CURRENT);
 
 	p--;
 	while(p >= str && iswspace(*p)) p--;
@@ -3419,10 +3419,10 @@ BOOL IsValidCallStore(PFILE_STORE fs)
 	PWSTR p;
 	for(i = 0, p = fs->dpString; *p; p++)
 		if(*p == ':') i++;
-		else if(!((*p >= 'a' && *p <= 'z') || 
-				  (*p >= 'A' && *p <= 'Z') || 
-				  (*p >= '0' && *p <= '9') || 
-				  *p == '.' || 
+		else if(!((*p >= 'a' && *p <= 'z') ||
+				  (*p >= 'A' && *p <= 'Z') ||
+				  (*p >= '0' && *p <= '9') ||
+				  *p == '.' ||
 				  *p == '_'))
 			return FALSE;
 
@@ -3434,7 +3434,7 @@ HANDLE CreateTempFile()
 	char szTempPathBuffer[MAX_PATH], szTempFileName[MAX_PATH];   // I3228   // I3510
   if(!GetTempPath(MAX_PATH, szTempPathBuffer)) return INVALID_HANDLE_VALUE;
 	if(!GetTempFileName(szTempPathBuffer, "kmx", 0, szTempFileName)) return INVALID_HANDLE_VALUE;     // I3228   // I3510
-	return CreateFile(szTempFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
+	return CreateFile(szTempFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
 	FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
 }
 
@@ -3467,18 +3467,18 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
     p = buf;
     poutbuf = outbuf;
     if (hasPreamble) {
-      // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a 
+      // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a
       // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
       ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
-      WriteFile(hOutfile, outbuf, (int)(poutbuf - outbuf) * 2, &len2, NULL);
+      WriteFile(hOutfile, outbuf, (DWORD)(INT_PTR)(poutbuf - outbuf) * 2, &len2, NULL);
     }
     else {
       // No preamble, so we attempt to read as strict UTF-8 and fall back to ANSI if that fails
       ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
       if (cr == sourceIllegal) {
         // Not a valid UTF-8 file, so fall back to ANSI
-        //AddCompileMessage(CINFO_NonUnicodeFile); 
-        // note, while this message is defined, for now we will not emit it 
+        //AddCompileMessage(CINFO_NonUnicodeFile);
+        // note, while this message is defined, for now we will not emit it
         // because we don't support HINT/INFO messages yet and we don't want
         // this to cause a blocking compile at this stage
         poutbuf = strtowstr((PSTR)buf);
@@ -3486,7 +3486,7 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
         delete poutbuf;
       }
       else {
-        WriteFile(hOutfile, outbuf, (int)(poutbuf - outbuf) * 2, &len2, NULL);
+        WriteFile(hOutfile, outbuf, (DWORD)(INT_PTR)(poutbuf - outbuf) * 2, &len2, NULL);
       }
     }
   }

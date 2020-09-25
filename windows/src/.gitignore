@@ -32,3 +32,6 @@ global/delphi/cust/MessageIdentifierConsts.pas
 # Breakpad files generated for Sentry
 **/*.sym
 
+# Coverity intermediate folder and files
+cov-int/
+keyman-windows-coverity.tgz
