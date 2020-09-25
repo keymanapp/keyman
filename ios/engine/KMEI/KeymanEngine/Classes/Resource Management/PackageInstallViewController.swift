@@ -10,7 +10,7 @@ import Foundation
 import WebKit
 import DeviceKit
 
-public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate {
+public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
   private enum NavigationMode: Int {  // b/c hashable
     // left nav
     case cancel
@@ -49,6 +49,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   private var leftNavMode: NavigationMode = .cancel
   private var rightNavMode: NavigationMode = .none
   private var navMapping: [NavigationMode : UIBarButtonItem] = [:]
+
+  private var dismissalBlock: (() -> Void)? = nil
 
   public init(for package: Resource.Package,
               defaultLanguageCode: String? = nil,
@@ -305,7 +307,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     }
 
     // First, show the package's welcome - if it exists.
-    if let welcomeVC = PackageWebViewController(for: package, page: .welcome, onDismissal: dismissalBlock) {
+    if let welcomeVC = PackageWebViewController(for: package, page: .welcome) {
+      self.dismissalBlock = dismissalBlock
+
       let subNavVC = UINavigationController(rootViewController: welcomeVC)
       _ = subNavVC.view
 
@@ -313,16 +317,30 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
                                                               bundle: engineBundle,
                                                               comment: ""),
                                      style: .plain,
-                                     target: welcomeVC,
-                                     action: #selector(welcomeVC.onClose))
+                                     target: self,
+                                     action: #selector(self.onWelcomeDismissed))
 
       // The view's navigation buttoms need to be set on its controller's navigation item,
       // not the UINavigationController's navigationItem.
       welcomeVC.navigationItem.rightBarButtonItem = doneItem
+
+      // We need to listen to delegated presentation events on the view-controller being presented.
+      // This version handles iOS 13's "page sheet" slide-dismissal.
+      subNavVC.presentationController?.delegate = self
+
       self.present(subNavVC, animated: true, completion: nil)
     } else {
       dismissalBlock()
     }
+  }
+
+  public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    onWelcomeDismissed()
+  }
+
+  @objc private func onWelcomeDismissed() {
+    self.dismissalBlock?()
+    self.dismissalBlock = nil
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {
