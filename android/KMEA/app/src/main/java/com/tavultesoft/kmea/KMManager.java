@@ -394,10 +394,10 @@ public final class KMManager {
 
   public static boolean executeHardwareKeystroke(
     int code, int shift, KeyboardType keyboard, int lstates, int eventModifiers) {
-    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       InAppKeyboard.executeHardwareKeystroke(code, shift, lstates, eventModifiers);
       return true;
-    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       SystemKeyboard.executeHardwareKeystroke(code, shift, lstates, eventModifiers);
       return true;
     }
@@ -483,7 +483,7 @@ public final class KMManager {
   }
 
   public static void onStartInput(EditorInfo attribute, boolean restarting) {
-    if (!restarting) {
+    if (!restarting && SystemKeyboard != null) {
       String packageName = attribute.packageName;
       int inputType = attribute.inputType;
       if (packageName.equals("android") && inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
@@ -1789,6 +1789,12 @@ public final class KMManager {
 
     private void pageLoaded(WebView view, String url) {
       Log.d("KMEA", "pageLoaded: [inapp] " + url);
+      if (InAppKeyboard == null) {
+        KMLog.LogError(TAG, "pageLoaded and InAppKeyboard null");
+        InAppKeyboardLoaded = false;
+        return;
+      }
+
       if (url.startsWith("file")) { //endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
 
@@ -1839,6 +1845,12 @@ public final class KMManager {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
       Log.d("KMEA", "shouldOverrideUrlLoading [inapp]: "+url);
+      if (InAppKeyboard == null) {
+        KMLog.LogError(TAG, "shouldOverrideUrlLoading and InAppKeyboard null");
+        InAppKeyboardLoaded = false;
+        return false;
+      }
+
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
@@ -2019,6 +2031,12 @@ public final class KMManager {
 
     private void pageLoaded(WebView view, String url) {
       Log.d("KMEA", "pageLoaded: [system] " + url);
+      if (SystemKeyboard == null) {
+        KMLog.LogError(TAG, "pageLoaded and SystemKeyboard null");
+        SystemKeyboardLoaded = false;
+        return;
+      }
+
       if (url.startsWith("file:")) {
         SystemKeyboardLoaded = true;
         if (!SystemKeyboard.keyboardSet) {
@@ -2068,6 +2086,12 @@ public final class KMManager {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+      if (SystemKeyboard == null) {
+        KMLog.LogError(TAG, "shouldOverrideUrlLoading and SystemKeyboard null");
+        SystemKeyboardLoaded = false;
+        return false;
+      }
+
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
