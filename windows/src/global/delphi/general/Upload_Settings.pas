@@ -61,6 +61,7 @@ const
 
   URLPath_Support = '/go/'+SKeymanVersion+'/support';
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
+  URLPath_Privacy_Presentation = '/privacy';
   URLPath_Community = '/go/'+SKeymanVersion+'/community';
 
   // Keyboard download and installation
