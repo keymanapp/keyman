@@ -2,7 +2,7 @@
  * Copyright (C) 2019 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.tavultesoft.kmapro;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +25,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.ModelPickerActivity;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -54,9 +57,6 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
   private final static String TAG = "LanguageSettingsAct";
 
-  private final static String predictionPrefSuffix = ".mayPredict";
-  private final static String correctionPrefSuffix = ".mayCorrect";
-
   private class PreferenceToggleListener implements View.OnClickListener {
     String prefsKey;
     String lgCode;
@@ -74,7 +74,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       SharedPreferences.Editor prefEditor = prefs.edit();
 
       // predictionsToggle overrides correctionToggle and correctionsTextView
-      if (prefsKey.endsWith(predictionPrefSuffix)) {
+      if (prefsKey.endsWith(KMManager.predictionPrefSuffix)) {
         boolean override = toggle.isChecked();
         overrideCorrectionsToggle(override);
       }
@@ -141,8 +141,8 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     // The following two layouts/toggles will need to link with these objects.
     Context appContext = this.getApplicationContext();
     prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = prefs.getBoolean(getLanguagePredictionPreferenceKey(lgCode), true);
-    boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(lgCode), true);
+    boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(lgCode), true);
+    boolean mayCorrect = prefs.getBoolean(KMManager.getLanguageCorrectionPreferenceKey(lgCode), true);
 
     RelativeLayout layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
 
@@ -150,7 +150,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     correctionsTextView.setText(getString(R.string.enable_corrections));
     correctionsToggle = layout.findViewById(R.id.toggle);
     correctionsToggle.setChecked(mayCorrect); // Link to persistent option storage!  Also needs handler.
-    String prefsKey = getLanguageCorrectionPreferenceKey(lgCode);
+    String prefsKey = KMManager.getLanguageCorrectionPreferenceKey(lgCode);
     correctionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
 
     layout = (RelativeLayout)findViewById(R.id.predictions_toggle);
@@ -159,7 +159,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     textView.setText(getString(R.string.enable_predictions));
     SwitchCompat predictionsToggle = layout.findViewById(R.id.toggle);
     predictionsToggle.setChecked(mayPredict); // Link to persistent option storage!  Also needs handler.
-    prefsKey = getLanguagePredictionPreferenceKey(lgCode);
+    prefsKey = KMManager.getLanguagePredictionPreferenceKey(lgCode);
     predictionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
 
     overrideCorrectionsToggle(mayPredict);
@@ -291,14 +291,6 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   @Override
   public void onBackPressed() {
     finish();
-  }
-
-  public static String getLanguagePredictionPreferenceKey(String langID) {
-    return langID + predictionPrefSuffix;
-  }
-
-  public static String getLanguageCorrectionPreferenceKey(String langID) {
-    return langID + correctionPrefSuffix;
   }
 
   /**

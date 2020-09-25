@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2019 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmea;
+package com.tavultesoft.kmapro;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,6 +33,9 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.ConfirmDialogFragment;
+import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.cloud.impl.CloudKeyboardPackageDownloadCallback;

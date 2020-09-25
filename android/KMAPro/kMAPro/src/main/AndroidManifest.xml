@@ -189,7 +189,7 @@
 
       </intent-filter>
 
-      <intent-filter android:autoVerify="true">
+      <intent-filter android:priority="50" android:autoVerify="true" >
         <!-- KMPBrowserActivity converts cloud keyboard package links from http(s)://{HOST}/keyboards/install into /go/package/download
              Use {HOST} as defined in KMPLink.java
              Also note, Manifest will OR all the scheme/host/pathPrefix combinations -->
@@ -210,7 +210,7 @@
 
       </intent-filter>
 
-      <intent-filter>
+      <intent-filter android:priority="50">
         <!-- KMAPro should also be able to handle /keyboards/install links and convert to /go/package/download -->
         <action android:name="android.intent.action.VIEW" />
 
@@ -244,6 +244,10 @@
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"></activity>
     <activity
+      android:name=".KMPBrowserActivity"
+      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+      android:label="@string/app_name"></activity>
+    <activity
       android:name=".PackageActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"></activity>
@@ -265,6 +269,22 @@
       android:parentActivityName=".KeymanSettingsActivity"
       android:launchMode="singleTask"
       android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".LanguagesSettingsActivity"
+      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+      android:label="@string/app_name"
+      android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".LanguageSettingsActivity"
+      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+      android:label="@string/app_name"
+      android:parentActivityName=".LanguagesSettingsActivity"
+      android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".KeyboardSettingsActivity"
+      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+      android:label="@string/app_name"
+      android:theme="@style/Theme.AppCompat.Light.Dialog" />
     <activity
       android:name=".SelectPackageActivity"
       android:label="@string/app_name"

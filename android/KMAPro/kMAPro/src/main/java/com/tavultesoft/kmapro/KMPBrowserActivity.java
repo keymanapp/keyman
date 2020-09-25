@@ -2,7 +2,7 @@
  * Copyright (C) 2020 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.tavultesoft.kmapro;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

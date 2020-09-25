@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMPBrowserActivity;
 import com.tavultesoft.kmea.data.Keyboard;
 
 import android.os.Bundle;

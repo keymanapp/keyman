@@ -140,6 +140,9 @@ public final class KMManager {
   protected static KMKeyboard SystemKeyboard = null;
   protected static HashMap<String, String> currentLexicalModel = null;
 
+  public final static String predictionPrefSuffix = ".mayPredict";
+  public final static String correctionPrefSuffix = ".mayCorrect";
+
   /**
    * Banner state value: "blank" - no banner available.
    */
@@ -443,6 +446,14 @@ public final class KMManager {
       SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
       SystemKeyboard.loadKeyboard();
     }
+  }
+
+  public static String getLanguagePredictionPreferenceKey(String langID) {
+    return langID + predictionPrefSuffix;
+  }
+
+  public static String getLanguageCorrectionPreferenceKey(String langID) {
+    return langID + correctionPrefSuffix;
   }
 
   public static void hideSystemKeyboard() {
@@ -1017,8 +1028,8 @@ public final class KMManager {
     // When entering password field, mayPredict should override to false
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     boolean mayPredict = (mayPredictOverride) ? false :
-      prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
-    boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
+      prefs.getBoolean(getLanguagePredictionPreferenceKey(languageID), true);
+    boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params;
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
@@ -1947,7 +1958,7 @@ public final class KMManager {
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         boolean modelPredictionPref = false;
         if(currentLexicalModel != null) {
-          modelPredictionPref = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+          modelPredictionPref = prefs.getBoolean(getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
         }
         currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
@@ -2205,7 +2216,7 @@ public final class KMManager {
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         boolean modelPredictionPref = false;
         if(currentLexicalModel != null) {
-          modelPredictionPref = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+          modelPredictionPref = prefs.getBoolean(getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
         }
         currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;

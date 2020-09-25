@@ -71,11 +71,9 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.appcompat.widget.PopupMenu;
 
 import android.text.Html;
 import android.util.Log;
@@ -123,39 +121,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
 
-  private class DownloadResultReceiver extends ResultReceiver {
-    public DownloadResultReceiver(Handler handler) {
-      super(handler);
-    }
-
-    @Override
-    protected void onReceiveResult(int resultCode, Bundle resultData) {
-      if (progressDialog != null && progressDialog.isShowing()) {
-        progressDialog.dismiss();
-      };
-      progressDialog = null;
-      switch(resultCode) {
-        case FileUtils.DOWNLOAD_ERROR :
-          Toast.makeText(getApplicationContext(), "Download failed",
-            Toast.LENGTH_SHORT).show();
-          break;
-        case FileUtils.DOWNLOAD_SUCCESS :
-          String downloadedFilename = resultData.getString("filename");
-          String languageID = resultData.getString("language");
-          String kmpFilename = resultData.getString("destination") + File.separator + downloadedFilename;
-
-          Bundle bundle = new Bundle();
-          bundle.putString("kmpFile", kmpFilename);
-          bundle.putString("language", languageID);
-          Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
-          packageIntent.putExtras(bundle);
-          startActivity(packageIntent);
-          break;
-      }
-      super.onReceiveResult(resultCode, resultData);
-    }
-  }
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
@@ -168,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     });
 
     checkStoragePermission(null);
-    resultReceiver = new DownloadResultReceiver(new Handler());
+    resultReceiver = new DownloadResultReceiver(new Handler(), context);
 
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
@@ -551,6 +516,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
         url = url.toLowerCase();
         try {
+          progressDialog = new ProgressDialog(MainActivity.this);
+          progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
+          progressDialog.setCancelable(false);
+          progressDialog.show();
+          resultReceiver.setProgressDialog(progressDialog);
+
           // Download the KMP to app cache
           Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
           downloadIntent.putExtra("url", url);
@@ -558,11 +529,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           downloadIntent.putExtra("language", languageID);
           downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
           downloadIntent.putExtra("receiver", resultReceiver);
-
-          progressDialog = new ProgressDialog(MainActivity.this);
-          progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
-          progressDialog.setCancelable(false);
-          progressDialog.show();
 
           startService(downloadIntent);
         } catch (Exception e) {
