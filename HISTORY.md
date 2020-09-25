@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.149 alpha 2020-09-25
+
+* fix(windows): add back support for disabling keyboards (#3607)
+* fix(windows): bootstrap package install specified language bugs (#3609)
+* fix(windows): bootstrap should skip install of failed downloads (#3610)
+* refactor(android/app): Move Settings activities from KMEA to KMAPro (#3614)
+* fix(android/app): Change install intent to MainActivity (#3615)
+* fix(windows): cleanup pointer to int typecasts (#3612)
+* fix(developer): hardcoded urls in debugger (#3613)
+* fix(developer): Project window and About window hardcoded urls (#3618)
+* fix(windows): cleanup hardcoded urls in tsysinfo (#3619)
+
 ## 14.0.148 alpha 2020-09-24
 
 * fix(windows): hint dialog was blank when elevated (#3604)
