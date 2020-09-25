@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 2/09/2020 8:08:53 AM from Type Library described below.
+// File generated on 23/09/2020 5:09:37 PM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -1704,7 +1704,9 @@ type
     procedure RegisterTip(LangID: Integer); safecall;
     procedure InstallTip(LangID: Integer; const TemporaryKeyboardToRemove: WideString); safecall;
     function Get_IsRegistered: WordBool; safecall;
+    function Get_WindowsBCP47Code: WideString; safecall;
     property IsRegistered: WordBool read Get_IsRegistered;
+    property WindowsBCP47Code: WideString read Get_WindowsBCP47Code;
   end;
 
 // *********************************************************************//
@@ -1719,6 +1721,7 @@ type
     procedure RegisterTip(LangID: Integer); dispid 405;
     procedure InstallTip(LangID: Integer; const TemporaryKeyboardToRemove: WideString); dispid 406;
     property IsRegistered: WordBool readonly dispid 501;
+    property WindowsBCP47Code: WideString readonly dispid 502;
     property OwnerKeyboard: IKeymanKeyboardInstalled readonly dispid 4;
     property ProfileGUID: {NOT_OLEAUTO(TGUID)}OleVariant readonly dispid 5;
     procedure Uninstall; dispid 6;

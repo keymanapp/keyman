@@ -283,11 +283,48 @@ begin
 end;
 
 procedure TKeymanKeyboardInstalled.Set_Loaded(Value: WordBool);
+var
+  i: Integer;
+  lang: IKeymanKeyboardLanguageInstalled2;
+  LangID: Integer;
+  TemporaryKeyboardID: WideString;
+  RegistrationRequired: WordBool;
 begin
-  // TODO: Keyman 14.0 this is currently a no-op. Instead, remove Windows
-  // language associations in order to enable and disable a keyboard. But we
-  // will need to re-implement this so users can still unload keyboards without
-  // uninstalling them completely.
+  if Value then
+  begin
+    FRegKeyboard.Enabled := True;
+    for i := 0 to Get_Languages.Count - 1 do
+    begin
+      lang := Get_Languages[i] as IKeymanKeyboardLanguageInstalled2;
+      if lang.IsInstalled then
+      begin
+        if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) and
+            not RegistrationRequired then
+          lang.InstallTip(LangID, TemporaryKeyboardID)
+        else
+        begin
+          // The registration for the keyboard TIP has somehow disappeared; this is unexpected.
+          // We don't want to crash, so we'll just try and clean it up. The user will have to
+          // reinstall it, which is not the end of the world.
+          lang.Uninstall;
+        end;
+      end;
+    end;
+  end
+  else
+  begin
+    FRegKeyboard.Enabled := False;
+    for i := 0 to Get_Languages.Count - 1 do
+    begin
+      lang := Get_Languages[i] as IKeymanKeyboardLanguageInstalled2;
+      if lang.IsInstalled then
+      begin
+        (lang as IIntKeymanKeyboardLanguage).Disable;
+      end;
+    end;
+  end;
+
+  (Context.Keyboards as IKeymanKeyboardsInstalled).Apply;
 end;
 
 function TKeymanKeyboardInstalled.Get_IconFilename: WideString;   // I3581

@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 2/09/2020 8:20:10 AM (- $Rev: 12980 $, 129133765).
+// File generated on 23/09/2020 5:25:25 PM (- $Rev: 12980 $, 651560046).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -990,6 +990,8 @@ library keymanapi
     HRESULT _stdcall InstallTip([in] long LangID, [in] BSTR TemporaryKeyboardToRemove);
     [propget, id(0x000001F5)]
     HRESULT _stdcall IsRegistered([out, retval] VARIANT_BOOL* Value);
+    [propget, id(0x000001F6)]
+    HRESULT _stdcall WindowsBCP47Code([out, retval] BSTR* Value);
   };
 
   [

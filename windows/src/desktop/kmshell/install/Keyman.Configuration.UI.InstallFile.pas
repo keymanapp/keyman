@@ -158,6 +158,7 @@ begin
   begin
     try
       kmcom.Keyboards.Refresh;
+      kmcom.Keyboards.Apply;
 
       FilenameBCP47 := Filenames[i].Split(['=']);
       Filename := FilenameBCP47[0];
