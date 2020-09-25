@@ -380,10 +380,40 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       cell.selectedBackgroundView = selectionColor
     }
 
+    cell.selectionStyle = .default
+    cell.isUserInteractionEnabled = true
+    cell.backgroundColor = .none
+    var isAlreadyInstalled: Bool = false
+
+    // Check:  is the language ALREADY installed?
+    let language = languages[indexPath.row].id
+    if let installedResources: [Resource] = Storage.active.userDefaults.userResources(ofType: Resource.self) {
+      installedResources.forEach { resource in
+        if resource.packageKey == package.key {
+          // The resource is from this package.
+          if resource.languageID == language {
+            cell.selectionStyle = .none
+            cell.isUserInteractionEnabled = false
+            cell.accessoryType = .checkmark
+            isAlreadyInstalled = true
+          }
+        }
+      }
+    }
+
     switch indexPath.section {
       case 0:
         let index = indexPath.row
         cell.detailTextLabel?.text = languages[index].name
+        if isAlreadyInstalled {
+          cell.detailTextLabel?.textColor = .gray // helps indicate 'disabled'
+        } else {
+          if #available(*, iOS 13.0) {
+            cell.detailTextLabel?.textColor = .label
+          } else {
+            cell.detailTextLabel?.textColor = .black
+          }
+        }
         return cell
       default:
         return cell
@@ -391,6 +421,15 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard let cell = tableView.cellForRow(at: indexPath) else {
+      return
+    }
+
+    guard cell.isUserInteractionEnabled == true else {
+      tableView.deselectRow(at: indexPath, animated: false)
+      return
+    }
+
     navigationItem.rightBarButtonItem?.isEnabled = true
     tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
 
@@ -398,6 +437,15 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   public func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+    guard let cell = tableView.cellForRow(at: indexPath) else {
+      return
+    }
+
+    guard cell.isUserInteractionEnabled == true else {
+      tableView.deselectRow(at: indexPath, animated: false)
+      return
+    }
+
     if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 {
       rightNavigationMode = .none
     } else {
