@@ -49,6 +49,9 @@ const
   URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
   URLPath_KeymanDeveloperHome = '/go/developer/'+SKeymanVersion+'/home';
 
+  URLPath_KeymanDeveloper_KeymanForAndroidDownload = '/go/developer/'+SKeymanVersion+'/android-app';
+  URLPath_KeymanDeveloper_KeymanForIosDownload = '/go/developer/'+SKeymanVersion+'/ios-app';
+
   URLPath_Support = '/go/'+SKeymanVersion+'/support';
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
   URLPath_Community = '/go/'+SKeymanVersion+'/community';
