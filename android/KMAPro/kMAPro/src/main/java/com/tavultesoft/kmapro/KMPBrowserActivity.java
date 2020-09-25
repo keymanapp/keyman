@@ -8,31 +8,21 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.Tier;
 import com.tavultesoft.kmea.util.KMPLink;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.tavultesoft.kmea.util.KMPLink.KMP_PRODUCTION_HOST;
-import static com.tavultesoft.kmea.util.KMPLink.KMP_STAGING_HOST;
 
 public class KMPBrowserActivity extends AppCompatActivity {
   private static final String TAG = "KMPBrowserActivity";
@@ -93,8 +83,9 @@ public class KMPBrowserActivity extends AppCompatActivity {
           Uri downloadURI = KMPLink.getKeyboardDownloadLink(url);
 
           // Create intent with keyboard download link for KMAPro main activity to handle
-          Intent intent = new Intent(Intent.ACTION_VIEW, downloadURI);
-          startActivityForResult(intent, 1);
+          Intent intent = new Intent(context, MainActivity.class);
+          intent.setData(downloadURI);
+          startActivity(intent);
 
           // Finish activity
           finish();
