@@ -282,20 +282,47 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   @objc func installBtnHandler() {
-    // If it is not the root view of a navigationController, just pop it off the stack.
-    if let navVC = self.navigationController, navVC.viewControllers[0] != self {
-      navVC.popViewController(animated: true)
-    } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
-      dismiss(animated: true)
-    }
-
     let selectedItems = self.languageTable.indexPathsForSelectedRows ?? []
     let selectedLanguageCodes = selectedItems.map { self.languages[$0.row].id }
 
     let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
 
     self.completionHandler(selectedResources.map { $0.typedFullID })
-    self.associators.forEach { $0.pickerFinalized() }
+
+    let dismissalBlock = {
+      // If it is not the root view of a navigationController, just pop it off the stack.
+      if let navVC = self.navigationController {
+       if navVC.viewControllers[0] != self {
+        navVC.popViewController(animated: true)
+        } else {
+          self.dismiss(animated: true)
+        }
+      } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
+        self.dismiss(animated: true)
+      }
+
+      self.associators.forEach { $0.pickerFinalized() }
+    }
+
+    // First, show the package's welcome - if it exists.
+    if let welcomeVC = PackageWebViewController(for: package, page: .welcome, onDismissal: dismissalBlock) {
+      let subNavVC = UINavigationController(rootViewController: welcomeVC)
+      _ = subNavVC.view
+
+      let doneItem = UIBarButtonItem(title: NSLocalizedString("command-done",
+                                                              bundle: engineBundle,
+                                                              comment: ""),
+                                     style: .plain,
+                                     target: welcomeVC,
+                                     action: #selector(welcomeVC.onClose))
+
+      // The view's navigation buttoms need to be set on its controller's navigation item,
+      // not the UINavigationController's navigationItem.
+      welcomeVC.navigationItem.rightBarButtonItem = doneItem
+      self.present(subNavVC, animated: true, completion: nil)
+    } else {
+      dismissalBlock()
+    }
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {

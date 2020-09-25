@@ -15,9 +15,12 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
   private let package: KeymanPackage
   private let homePage: KeymanPackagePage
 
-  public init?(for package: KeymanPackage, page: KeymanPackagePage) {
+  private let onDismissal: (() -> Void)?
+
+  public init?(for package: KeymanPackage, page: KeymanPackagePage, onDismissal: (() -> Void)? = nil) {
     self.package = package
     self.homePage = page
+    self.onDismissal = onDismissal
 
     switch(page) {
       case .readme:
@@ -66,5 +69,9 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
         let url = package.pageURL(for: self.homePage)! // we already know it exists
         webView.loadFileURL(url, allowingReadAccessTo: package.sourceFolder)
     }
+  }
+
+  @objc func onClose() {
+    self.onDismissal?()
   }
 }
