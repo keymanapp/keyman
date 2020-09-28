@@ -45,6 +45,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   let defaultLanguageCode: String
   let associators: [LanguagePickAssociator]
   let languages: [Language]
+  let preinstalledLanguageCodes: Set<String>
 
   private var leftNavMode: NavigationMode = .cancel
   private var rightNavMode: NavigationMode = .none
@@ -60,8 +61,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     self.completionHandler = completionHandler
     self.languages = package.languages
 
-    let packageFirstLangCode = package.installableResourceSets[0][0].languageID
-    self.defaultLanguageCode = package.languages.contains(where: { $0.id == defaultLanguageCode }) ? defaultLanguageCode! : packageFirstLangCode
     self.associators = languageAssociators
 
     var xib: String
@@ -71,6 +70,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       xib = "PackageInstallView_iPhone"
     }
 
+    self.preinstalledLanguageCodes = PackageInstallViewController<Resource>.checkPreinstalledResources(package: package)
+    self.defaultLanguageCode = PackageInstallViewController<Resource>.chooseDefaultSelectedLanguage(from: package, promptingCode: defaultLanguageCode, preinstalleds: self.preinstalledLanguageCodes)
     super.init(nibName: xib, bundle: Bundle.init(for: PackageInstallViewController.self))
 
     _ = view
@@ -78,6 +79,52 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  // Must be static if we want the resulting value to be stored via `let` semantics during init.
+  private static func checkPreinstalledResources(package: Resource.Package) -> Set<String> {
+    var preinstalleds: Set<String> = Set()
+
+    guard let typedPackage = package as? TypedKeymanPackage<Resource> else {
+      log.warning("Cannot check for previously-installed resources of unexpected type")
+      return preinstalleds
+    }
+
+    if let installedResources: [Resource] = Storage.active.userDefaults.userResources(ofType: Resource.self) {
+      installedResources.forEach { resource in
+        if resource.packageKey == package.key {
+          // The resource is from this package.
+          let langResources = typedPackage.installables(forLanguage: resource.languageID)
+          if langResources.contains(where: { $0.typedFullID == resource.typedFullID }){
+            preinstalleds.insert(resource.languageID)
+          }
+        }
+      }
+    }
+
+    return preinstalleds
+  }
+
+  private static func chooseDefaultSelectedLanguage(from package: Resource.Package,
+                                                    promptingCode defaultLanguageCode: String?,
+                                                    preinstalleds: Set<String>) -> String {
+    // If a default language code was specified, always pre-select it by default.
+    // Even if the corresponding resource was already installed - the user may be 'manually updating' it.
+    if package.languages.contains(where: { $0.id == defaultLanguageCode }) {
+      return defaultLanguageCode!
+    }
+
+    // Otherwise... find the first not-already-installed language code.  For now, at least.
+    let uninstalledSet = package.installableResourceSets.first { set in
+      return set.contains(where: { !preinstalleds.contains($0.languageID) })
+    }
+
+    if uninstalledSet != nil {
+      return uninstalledSet!.first{ !preinstalleds.contains($0.languageID) }!.languageID
+    }
+
+    // Failing that... just return the very first language and be done with it.
+    return package.installableResourceSets[0][0].languageID
   }
 
   override public func viewDidLoad() {
@@ -359,12 +406,12 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "any"
     var cell: UITableViewCell
+    // The checkmark is not properly managed by default.
+    let shouldCheck = languageTable.indexPathsForSelectedRows?.contains(indexPath) ?? false
 
     if let reusedCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       cell = reusedCell
 
-      // The checkmark is not properly managed by default.
-      let shouldCheck = languageTable.indexPathsForSelectedRows?.contains(indexPath) ?? false
       // Note for later:  also ensure that it wasn't already installed.  (exception to rule above)
       cell.accessoryType = shouldCheck ? .checkmark : .none
     } else {
@@ -380,39 +427,31 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       cell.selectedBackgroundView = selectionColor
     }
 
-    cell.selectionStyle = .default
     cell.isUserInteractionEnabled = true
     cell.backgroundColor = .none
-    var isAlreadyInstalled: Bool = false
-
-    // Check:  is the language ALREADY installed?
-    let language = languages[indexPath.row].id
-    if let installedResources: [Resource] = Storage.active.userDefaults.userResources(ofType: Resource.self) {
-      installedResources.forEach { resource in
-        if resource.packageKey == package.key {
-          // The resource is from this package.
-          if resource.languageID == language {
-            cell.selectionStyle = .none
-            cell.isUserInteractionEnabled = false
-            cell.accessoryType = .checkmark
-            isAlreadyInstalled = true
-          }
-        }
-      }
-    }
 
     switch indexPath.section {
       case 0:
         let index = indexPath.row
         cell.detailTextLabel?.text = languages[index].name
-        if isAlreadyInstalled {
-          cell.detailTextLabel?.textColor = .gray // helps indicate 'disabled'
+
+        // Check:  is the language ALREADY installed?
+        let langCode = languages[indexPath.row].id
+
+        if self.preinstalledLanguageCodes.contains(langCode) && !shouldCheck {
+          cell.isUserInteractionEnabled = false
+          cell.accessoryType = .checkmark
+          cell.detailTextLabel?.textColor = .systemGray
+          if(langCode != self.defaultLanguageCode) {
+            cell.tintColor = .systemGray // Makes the checkmark gray, too.
+          }
         } else {
           if #available(*, iOS 13.0) {
             cell.detailTextLabel?.textColor = .label
           } else {
             cell.detailTextLabel?.textColor = .black
           }
+          cell.tintColor = .systemBlue
         }
         return cell
       default:
@@ -430,7 +469,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       return
     }
 
-    navigationItem.rightBarButtonItem?.isEnabled = true
+    rightNavigationMode = .install
     tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
 
     associators.forEach { $0.selectLanguages( Set([languages[indexPath.row].id]) ) }
@@ -446,7 +485,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       return
     }
 
-    if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 {
+    if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 && self.preinstalledLanguageCodes.count == 0 {
       rightNavigationMode = .none
     } else {
       rightNavigationMode = .install
