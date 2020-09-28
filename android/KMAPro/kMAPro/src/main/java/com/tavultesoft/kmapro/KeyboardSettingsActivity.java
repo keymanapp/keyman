@@ -125,7 +125,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     infoList.add(hashMap);
 
     // If not default keyboard, display uninstall keyboard
-    if (!kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
+    if (!(kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID) &&
+        languageID.equalsIgnoreCase(KMManager.KMDefault_LanguageID))) {
       hashMap = new HashMap<>();
       hashMap.put(titleKey, getString(R.string.uninstall_keyboard));
       hashMap.put(subtitleKey, "");
