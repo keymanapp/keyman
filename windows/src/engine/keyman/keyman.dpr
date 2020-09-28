@@ -87,7 +87,6 @@ uses
   UfrmLanguageSwitch in 'langswitch\UfrmLanguageSwitch.pas' {frmLanguageSwitch},
   Glossary in '..\..\global\delphi\general\Glossary.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
-  LayeredFormUtils in '..\..\global\delphi\general\LayeredFormUtils.pas',
   UfrmOSKOnScreenKeyboard in 'viskbd\UfrmOSKOnScreenKeyboard.pas' {frmOSKOnScreenKeyboard},
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   UfrmVisualKeyboard in 'viskbd\UfrmVisualKeyboard.pas' {frmVisualKeyboard},

@@ -1038,9 +1038,13 @@ begin   // I3933
 
   hwnd := FLastFocus;// kmcom.Control.LastFocusWindow;
 
-  AttachThreadInput(GetCurrentThreadId, GetWindowThreadProcessId(hwnd, nil), TRUE);
-  Winapi.Windows.SetForegroundWindow(frmKeymanMenu.Handle);
-  AttachThreadInput(GetCurrentThreadId, GetwindowThreadProcessId(hwnd, nil), FALSE);
+  if not IsDebuggerPresent then
+  begin
+    // We don't risk attaching to the debugger thread because that can cause a deadlock
+    AttachThreadInput(GetCurrentThreadId, GetWindowThreadProcessId(hwnd, nil), TRUE);
+    Winapi.Windows.SetForegroundWindow(frmKeymanMenu.Handle);
+    AttachThreadInput(GetCurrentThreadId, GetwindowThreadProcessId(hwnd, nil), FALSE);
+  end;
 
   frmKeymanMenu.PopupEx(mnu, pt.x, pt.y, IconRect)   // I3990
 end;
