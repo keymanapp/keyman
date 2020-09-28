@@ -22,6 +22,12 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     case install
   }
 
+  private enum CellStyle {
+    case none
+    case preinstalled
+    case install
+  }
+
   public typealias CompletionHandler = ([Resource.FullID]?) -> Void
 
   // Needed to support iOS 9 + 10.
@@ -406,14 +412,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "any"
     var cell: UITableViewCell
-    // The checkmark is not properly managed by default.
-    let shouldCheck = languageTable.indexPathsForSelectedRows?.contains(indexPath) ?? false
 
     if let reusedCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       cell = reusedCell
-
-      // Note for later:  also ensure that it wasn't already installed.  (exception to rule above)
-      cell.accessoryType = shouldCheck ? .checkmark : .none
     } else {
       let selectionColor = UIView()
 
@@ -436,26 +437,46 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
         cell.detailTextLabel?.text = languages[index].name
 
         // Check:  is the language ALREADY installed?
-        let langCode = languages[indexPath.row].id
-
-        if self.preinstalledLanguageCodes.contains(langCode) && !shouldCheck {
-          cell.isUserInteractionEnabled = false
-          cell.accessoryType = .checkmark
-          cell.detailTextLabel?.textColor = .systemGray
-          if(langCode != self.defaultLanguageCode) {
-            cell.tintColor = .systemGray // Makes the checkmark gray, too.
-          }
+        // The checkmark is not properly managed by default.
+        let shouldCheck = languageTable.indexPathsForSelectedRows?.contains(indexPath) ?? false
+        if self.preinstalledLanguageCodes.contains(languageCodeForCellAt(indexPath)) {
+          setCellStyle(cell, style: shouldCheck ? .install : .preinstalled)
         } else {
-          if #available(*, iOS 13.0) {
-            cell.detailTextLabel?.textColor = .label
-          } else {
-            cell.detailTextLabel?.textColor = .black
-          }
-          cell.tintColor = .systemBlue
+          setCellStyle(cell, style: shouldCheck ? .install : .none)
         }
         return cell
       default:
         return cell
+    }
+  }
+
+  private func languageCodeForCellAt(_ indexPath: IndexPath) -> String {
+    return languages[indexPath.row].id
+  }
+
+  private func setCellStyle(_ cell: UITableViewCell, style: CellStyle) {
+    var textColor: UIColor
+    if #available(*, iOS 13.0) {
+      textColor = .label
+    } else {
+      textColor = .black
+    }
+
+    switch style {
+      case .none:
+        cell.detailTextLabel?.textColor = textColor
+
+        cell.accessoryType = .none
+      case .preinstalled:
+        cell.detailTextLabel?.textColor = .systemGray
+
+        cell.accessoryType = .checkmark
+        cell.tintColor = .systemGray
+      case .install:
+        cell.detailTextLabel?.textColor = textColor
+
+        cell.accessoryType = .checkmark
+        cell.tintColor = .systemBlue
     }
   }
 
@@ -470,7 +491,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     }
 
     rightNavigationMode = .install
-    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+    setCellStyle(cell, style: .install)
 
     associators.forEach { $0.selectLanguages( Set([languages[indexPath.row].id]) ) }
   }
@@ -480,17 +501,14 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       return
     }
 
-    guard cell.isUserInteractionEnabled == true else {
-      tableView.deselectRow(at: indexPath, animated: false)
-      return
-    }
-
     if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 && self.preinstalledLanguageCodes.count == 0 {
       rightNavigationMode = .none
     } else {
       rightNavigationMode = .install
     }
-    tableView.cellForRow(at: indexPath)?.accessoryType = .none
+
+    let wasPreinstalled = self.preinstalledLanguageCodes.contains(languageCodeForCellAt(indexPath))
+    setCellStyle(cell, style: wasPreinstalled ? .preinstalled : .none)
 
     associators.forEach { $0.deselectLanguages( Set([languages[indexPath.row].id]) ) }
   }
