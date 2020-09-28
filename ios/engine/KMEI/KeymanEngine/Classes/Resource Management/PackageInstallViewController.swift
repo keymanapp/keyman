@@ -10,7 +10,7 @@ import Foundation
 import WebKit
 import DeviceKit
 
-public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate {
+public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
   private enum NavigationMode: Int {  // b/c hashable
     // left nav
     case cancel
@@ -40,7 +40,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @IBOutlet var iphoneTabViewController: UITabBarController!
 
   let package: Resource.Package
-  var wkWebView: WKWebView?
+  var packagePageController: PackageWebViewController?
   let completionHandler: CompletionHandler
   let defaultLanguageCode: String
   let associators: [LanguagePickAssociator]
@@ -49,6 +49,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   private var leftNavMode: NavigationMode = .cancel
   private var rightNavMode: NavigationMode = .none
   private var navMapping: [NavigationMode : UIBarButtonItem] = [:]
+
+  private var dismissalBlock: (() -> Void)? = nil
 
   public init(for package: Resource.Package,
               defaultLanguageCode: String? = nil,
@@ -79,10 +81,17 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   override public func viewDidLoad() {
-    wkWebView = WKWebView.init(frame: webViewContainer.frame)
+    // The 'readme' version is guaranteed.
+    // "Embeds" an instance of the more general PackageWebViewController.
+    packagePageController = PackageWebViewController(for: package, page: .readme)!
+    packagePageController!.willMove(toParent: self)
+    let wkWebView = packagePageController!.view
+    wkWebView!.frame = webViewContainer.frame
     wkWebView!.backgroundColor = .white
     wkWebView!.translatesAutoresizingMaskIntoConstraints = false
     webViewContainer.addSubview(wkWebView!)
+    self.addChild(packagePageController!)
+    packagePageController!.didMove(toParent: self)
 
     // Ensure the web view fills its available space.  Required b/c iOS 9 & 10 cannot load
     // these correctly from XIBs.
@@ -124,6 +133,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       tabVC.delegate = self
 
       let tabView = tabVC.view!
+      tabView.translatesAutoresizingMaskIntoConstraints = false
       self.view.addSubview(tabVC.view)
 
       tabView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
@@ -169,14 +179,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
         // Since we won't be showing the user a language list, allow them to install from the info view.
         rightNavigationMode = .install
       }
-    }
-  }
-
-  override public func viewWillAppear(_ animated: Bool) {
-    if let readmeURL = package.readmePageURL {
-      wkWebView?.loadFileURL(readmeURL, allowingReadAccessTo: package.sourceFolder)
-    } else {
-      wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
     }
   }
 
@@ -282,20 +284,63 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   @objc func installBtnHandler() {
-    // If it is not the root view of a navigationController, just pop it off the stack.
-    if let navVC = self.navigationController, navVC.viewControllers[0] != self {
-      navVC.popViewController(animated: true)
-    } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
-      dismiss(animated: true)
-    }
-
     let selectedItems = self.languageTable.indexPathsForSelectedRows ?? []
     let selectedLanguageCodes = selectedItems.map { self.languages[$0.row].id }
 
     let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
 
     self.completionHandler(selectedResources.map { $0.typedFullID })
-    self.associators.forEach { $0.pickerFinalized() }
+
+    let dismissalBlock = {
+      // If it is not the root view of a navigationController, just pop it off the stack.
+      if let navVC = self.navigationController {
+       if navVC.viewControllers[0] != self {
+        navVC.popViewController(animated: true)
+        } else {
+          self.dismiss(animated: true)
+        }
+      } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
+        self.dismiss(animated: true)
+      }
+
+      self.associators.forEach { $0.pickerFinalized() }
+    }
+
+    // First, show the package's welcome - if it exists.
+    if let welcomeVC = PackageWebViewController(for: package, page: .welcome) {
+      self.dismissalBlock = dismissalBlock
+
+      let subNavVC = UINavigationController(rootViewController: welcomeVC)
+      _ = subNavVC.view
+
+      let doneItem = UIBarButtonItem(title: NSLocalizedString("command-done",
+                                                              bundle: engineBundle,
+                                                              comment: ""),
+                                     style: .plain,
+                                     target: self,
+                                     action: #selector(self.onWelcomeDismissed))
+
+      // The view's navigation buttoms need to be set on its controller's navigation item,
+      // not the UINavigationController's navigationItem.
+      welcomeVC.navigationItem.rightBarButtonItem = doneItem
+
+      // We need to listen to delegated presentation events on the view-controller being presented.
+      // This version handles iOS 13's "page sheet" slide-dismissal.
+      subNavVC.presentationController?.delegate = self
+
+      self.present(subNavVC, animated: true, completion: nil)
+    } else {
+      dismissalBlock()
+    }
+  }
+
+  public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    onWelcomeDismissed()
+  }
+
+  @objc private func onWelcomeDismissed() {
+    self.dismissalBlock?()
+    self.dismissalBlock = nil
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {
