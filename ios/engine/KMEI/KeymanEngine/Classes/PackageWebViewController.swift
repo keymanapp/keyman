@@ -67,4 +67,21 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
         webView.loadFileURL(url, allowingReadAccessTo: package.sourceFolder)
     }
   }
+
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    guard let _ = webView.url else {
+      return
+    }
+
+    // Inject a meta viewport tag into the head of the file if it doesn't exist
+    webView.evaluateJavaScript("""
+      if(!document.querySelectorAll('meta[name=viewport]').length) {
+        let meta=document.createElement('meta');
+        meta.name='viewport';
+        meta.content='width=device-width, initial-scale=1';
+        document.head.appendChild(meta);
+      }
+      """
+    );
+  }
 }
