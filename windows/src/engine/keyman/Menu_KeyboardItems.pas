@@ -55,11 +55,30 @@ uses
   SysUtils,
   utilhotkey;
 
+type
+  TKeymanToolButton = class(TToolButton)   // I4606
+  private
+    FKeyboardName, FCmdLine: string;
+  public
+    property KeyboardName: string read FKeyboardName write FKeyboardName;
+    property CmdLine: string read FCmdLine write FCmdLine;
+  end;
+
 function CreateKeymanMenuItem(FKeyman: IKeyman; Owner: TPopupMenu; cmi: IKeymanCustomisationMenuItem): TKeymanMenuItem;
 
 procedure BuildCustMenu(FKeyman: IKeyman; FMenu: TPopupMenu; Location: TCustomisationMenuItemLocation);   // I3933
 
-procedure AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: TImageList; MenuClick: TNotifyEvent);
+function AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: TImageList; MenuClick: TNotifyEvent): TArray<TKeymanToolButton>;
+
+///  <summary>Adds all loaded keyboards as menu items to the popupmenu</summary>
+///  <param name="FKeyman">Reference to IKeyman</param>
+///  <param name="mnu">Menu to populate</param>
+///  <param name="MenuClick">Event to assign to OnClick of each created menu item</param>
+///  <param name="cmi">Parent customisation menu item, or nil if not being created as
+///  part of a customised menu</param>
+///  <remarks>Each menu item add will receive the Keyman menu formatting and style</remark>
+procedure AddKeyboardItems(FKeyman: IKeyman; mnu: TPopupMenu; MenuClick: TNotifyEvent;   // I3960
+  cmi: IKeymanCustomisationMenuItem);   // I3933   // I4390
 
 implementation
 
@@ -183,8 +202,6 @@ var
   j: Integer;
 begin
   { Use the lang switch manager to get the list of installed languages }
-
-  frmKeyman7Main.LangSwitchManager.Refresh;   // I4207 ?? is this really needed
 
   for i := 0 to frmKeyman7Main.LangSwitchManager.LanguageCount - 1 do   // I3933
   begin
@@ -385,14 +402,9 @@ begin
     end;
 end;
 
+function AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: TImageList; MenuClick: TNotifyEvent): TArray<TKeymanToolButton>;
 
-
-
-
-
-procedure AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: TImageList; MenuClick: TNotifyEvent);
-
-  procedure CreateKeyboardToolbarItem(Language: TLangSwitchLanguage; Keyboard: TLangSwitchKeyboard);   // I3933
+  function CreateKeyboardToolbarItem(Language: TLangSwitchLanguage; Keyboard: TLangSwitchKeyboard): TKeymanToolButton;   // I3933
   var
     btn: TKeymanToolButton;
     kbd: IKeymanKeyboardInstalled;
@@ -458,14 +470,20 @@ procedure AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: 
         btn.Hint := StringReplace(FCaption, '&', '&&', [rfReplaceAll]);
 
       btn.Width := 23;
-      btn.Left := 0;
+      if toolbar.ControlCount = 0 then
+        btn.Left := 0
+      else
+        btn.Left := toolbar.Controls[toolbar.ControlCount - 1].Left +
+                    toolbar.Controls[toolbar.ControlCount - 1].Width;
       btn.OnClick := MenuClick;
 
       btn.Down := Keyboard.Active;
 
       // TODO: Support icon for TSF TIPs
 
-      toolbar.InsertControl(btn);
+      btn.Parent := toolbar;
+
+      Result := btn;
     finally
       bmp.Free;
     end;
@@ -473,20 +491,19 @@ procedure AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: 
 
 
 var
-  i: Integer;
+  i, j, n: Integer;
   FLanguage: TLangSwitchLanguage;
-  j: Integer;
 begin
-  { Use the lang switch manager to get the list of installed languages }
-
-  frmKeyman7Main.LangSwitchManager.Refresh;   // I4207 ?? is this really needed
-
+  n := 0;
+  SetLength(Result, 0);
   for i := 0 to frmKeyman7Main.LangSwitchManager.LanguageCount - 1 do   // I3933
   begin
     FLanguage := frmKeyman7Main.LangSwitchManager.Languages[i];
+    SetLength(Result, Length(Result) + FLanguage.KeyboardCount);
     for j := 0 to FLanguage.KeyboardCount - 1 do
     begin
-      CreateKeyboardToolbarItem(FLanguage, FLanguage.Keyboards[j]);
+      Result[n] := CreateKeyboardToolbarItem(FLanguage, FLanguage.Keyboards[j]);
+      Inc(n);
     end;
   end;
 end;
