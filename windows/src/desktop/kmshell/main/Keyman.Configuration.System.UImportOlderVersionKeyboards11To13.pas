@@ -32,6 +32,7 @@ uses
   UImportOlderVersionKeyboards9Plus,
   UImportOlderKeyboardUtils,
   utilexecute,
+  utilkmshell,
   utiltsf;
 
 class procedure TImportOlderVersionKeyboards11To13.Execute;  // I2361
@@ -53,7 +54,6 @@ type
   TUpgradeKeyboard = record
     KeyboardID: string;
     BCP47Code: string;
-    LangID: Integer;
   end;
   TUpgradeKeyboardList = class(TList<TUpgradeKeyboard>);
 
@@ -82,13 +82,9 @@ class procedure TImportOlderVersionKeyboards11To13.BackupCurrentUser;
             r.GetKeyNames(profiles);
             for profile in profiles do
             begin
-              if r.OpenKeyReadOnly('\' + BuildKeyboardLanguageProfilesKey_LM(keyboard) + '\' + profile) and r.ValueExists(SRegValue_LanguageProfileLangID) then
-              begin
-                uk.KeyboardID := keyboard;
-                uk.LangID := r.ReadInteger(SRegValue_LanguageProfileLangID);
-                uk.BCP47Code := profile;
-                Result.Add(uk);
-              end;
+              uk.KeyboardID := keyboard;
+              uk.BCP47Code := profile;
+              Result.Add(uk);
             end;
           end;
         end;
@@ -114,16 +110,12 @@ begin
     i := 0;
     for uk in uks do
     begin
-
       // For transient language codes, we will need to install using an assigned id
       // which may vary, so we will work from the BCP47 code.
-      if IsTransientLanguageID(uk.LangID)
-        then r.WriteString(IntToStr(i), uk.KeyboardID+'='+uk.BCP47Code)
-        else r.WriteString(IntToStr(i), uk.KeyboardID+'='+IntToStr(uk.LangID));
+      r.WriteString(IntToStr(i), uk.KeyboardID+'='+uk.BCP47Code);
       Inc(i);
     end;
 
-    // TODO: save keyboards that are disabled (i.e. listed in Installed but not Active)
   finally
     r.Free;
     uks.Free;
@@ -180,6 +172,7 @@ begin
     keys.Free;
   end;
 
+  // The following code re-registers all the profiles
   kmcom.Refresh;
   (kmcom.Keyboards as IKeymanKeyboardsInstalled2).RefreshInstalledKeyboards;
 end;
@@ -208,11 +201,10 @@ begin
 
     for s in strings do
     begin
-      // each string is saved in BackupCurrentUser and is keyboardid=langid|bcp47
+      // each string is saved in BackupCurrentUser and is keyboardid=bcp47
       p := r.ReadString(s).Split(['=']);
       KeyboardID := p[0];
       BCP47Code := p[1];
-      LangID := StrToIntDef(BCP47Code, 0);
       kbd := kmcom.Keyboards[KeyboardID];
       if not Assigned(kbd) then
       begin
@@ -220,66 +212,83 @@ begin
         Continue;
       end;
 
-      if LangID = 0 then
+      // Installing a language is a 2-step process. (We can assume that
+      // the transient language codes have been installed correctly as Register
+      // would have been called immediately prior to this.)
+      lang := nil;
+      BCP47Code := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Code);
+      for i := 0 to kbd.Languages.Count - 1 do
       begin
-        // Installing a transient language is a 2-step process. We can assume that
-        // the transient language codes have been installed correctly as Register
-        // would have been called immediately prior to this.
-        lang := nil;
-        BCP47Code := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Code);
-        for i := 0 to kbd.Languages.Count - 1 do
+        if SameText(kbd.Languages[i].BCP47Code, BCP47Code) then
         begin
-          if SameText(kbd.Languages[i].BCP47Code, BCP47Code) then
-          begin
-            lang := kbd.Languages[i] as IKeymanKeyboardLanguageInstalled2;
-            Break;
-          end;
+          lang := kbd.Languages[i] as IKeymanKeyboardLanguageInstalled2;
+          Break;
         end;
+      end;
 
+      if lang = nil then
+      begin
+        // The BCP47 code was not in the list of languages; this could possibly
+        // happen if we had registered a code that was canonicalized differently
+        // in the past?
+        lang := (kbd.Languages as IKeymanKeyboardLanguagesInstalled2).Add(BCP47Code) as IKeymanKeyboardLanguageInstalled2;
         if lang = nil then
         begin
-          // The BCP47 code was not in the list of languages; this could possibly
-          // happen if we had registered a code that was canonicalized differently
-          // in the past?
-          lang := (kbd.Languages as IKeymanKeyboardLanguagesInstalled2).Add(BCP47Code) as IKeymanKeyboardLanguageInstalled2;
-          if lang = nil then
-          begin
-            // This should never happen, because .Add only fails if the language
-            // is already in the list, which we just searched through, or if the
-            // BCP47Code is empty
-            Continue;
-          end;
-        end;
-
-        if lang.IsInstalled then
-        begin
-          // Don't attempt to reinstall; this should not normally be the case but
-          // if we canonicalize two languages which were previously installed into
-          // a single code, then in theory this could happen.
+          // This should never happen, because .Add only fails if the language
+          // is already in the list, which we just searched through, or if the
+          // BCP47Code is empty
           Continue;
         end;
+      end;
 
-        if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
+      if lang.IsInstalled then
+      begin
+        // Don't attempt to reinstall; this should not normally be the case but
+        // if we canonicalize two languages which were previously installed into
+        // a single code, then in theory this could happen.
+        Continue;
+      end;
+
+      if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
+      begin
+        if RegistrationRequired then
         begin
-          if not RegistrationRequired then
-            lang.InstallTip(LangID, TemporaryKeyboardID)
-          else
-          begin
-            // This should not happen; installed languages would have been registered
-            // in the Register step.
-          end;
+          // This can happen for custom language codes. TODO: This is not ideal because of potential for multiple elevation prompts
+          WaitForElevatedConfiguration(0, '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'"');
         end;
-      end
-      else
-        kbd.Languages.InstallByLangID(LangID);
+
+        lang.InstallTip(LangID, TemporaryKeyboardID);
+      end;
     end;
 
     r.CloseKey;
     r.DeleteKey(SRegKey_Keyman_Temp_BackupProfiles);
+
+    //
+    // Reapply the loaded state for keyboards; this may cause TIPs to disappear again
+    //
+
+    kmcom.Refresh;
+
+    if r.OpenKeyReadOnly('\' + SRegKey_ActiveKeyboards_CU) then
+    begin
+      strings.Clear;
+      r.GetKeyNames(strings);
+      for s in strings do
+      begin
+        kbd := kmcom.Keyboards[s];
+        if Assigned(kbd) then
+          kbd.Loaded := r.OpenKeyReadOnly('\' + SRegKey_ActiveKeyboards_CU + '\' + s) and r.ValueExists(SRegValue_KeymanID);
+      end;
+    end;
+
   finally
     strings.Free;
     r.Free;
   end;
+
+  kmcom.Apply;
+  kmcom.Refresh;
 end;
 
 end.
