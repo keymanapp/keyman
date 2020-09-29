@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.151 alpha 2020-09-29
+
+* fix(windows): Buffer overrun in firstrun (#3634)
+* fix(windows): upgrading transitional profiles (#3635)
+* fix(android/engine): Fix undetermined lexical model package ID (#3624)
+
 ## 14.0.150 alpha 2020-09-28
 
 * feat(windows): overflow menu for osk toolbar (#3626)
