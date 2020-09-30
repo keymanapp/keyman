@@ -45,11 +45,11 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 
 	// Calculate how much memory to allocate
 
-	size = sizeof(COMP_KEYBOARD) + 
-			fk->cxGroupArray * sizeof(COMP_GROUP) +  
+	size = sizeof(COMP_KEYBOARD) +
+			fk->cxGroupArray * sizeof(COMP_GROUP) +
 			fk->cxStoreArray * sizeof(COMP_STORE) +
-			/*wcslen(fk->szName)*2 + 2 + 
-			wcslen(fk->szCopyright)*2 + 2 + 
+			/*wcslen(fk->szName)*2 + 2 +
+			wcslen(fk->szCopyright)*2 + 2 +
 			wcslen(fk->szLanguageName)*2 + 2 +
 			wcslen(fk->szMessage)*2 + 2 +*/
 			fk->dwBitmapSize;
@@ -62,7 +62,7 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 			size += wcslen(fkp->dpOutput)*2 + 2;
 			size += wcslen(fkp->dpContext)*2 + 2;
 		}
-		
+
 		if( fgp->dpMatch ) size += wcslen(fgp->dpMatch)*2 + 2;
 		if( fgp->dpNoMatch ) size += wcslen(fgp->dpNoMatch)*2 + 2;
 	}
@@ -91,7 +91,7 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 	ck->StartGroup[0] = fk->StartGroup[0];
 	ck->StartGroup[1] = fk->StartGroup[1];
 	ck->dwHotKey = fk->dwHotKey;
-	
+
 	ck->dwFlags = fk->dwFlags;
 
 	offset = sizeof(COMP_KEYBOARD);
@@ -168,12 +168,12 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 		offset += gp->cxKeyArray * sizeof(COMP_KEY);
 		for(j = 0; j < gp->cxKeyArray; j++, kp++, fkp++) {
 			kp->Key = fkp->Key;
-			kp->Line = fkp->Line; 
+			kp->Line = fkp->Line;
 			kp->ShiftFlags = fkp->ShiftFlags;
 			kp->dpOutput = offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fkp->dpOutput);  // I3481   // I3641
 			offset += wcslen(fkp->dpOutput)*2 + 2;
-      
+
 
   		kp->dpContext = offset;
 	  	wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fkp->dpContext);  // I3481   // I3641
@@ -191,15 +191,23 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 	  ck->dpBitmapOffset = 0;
   }
 
-	if(offset != size) return CERR_SomewhereIGotItWrong;
+	if(offset != size)
+  {
+    delete[] buf;
+    return CERR_SomewhereIGotItWrong;
+  }
 
 	SetChecksum(buf, &ck->dwCheckSum, size);
 
 	WriteFile(hOutfile, buf, size, &offset, NULL);
 
-	if(offset != size) return CERR_UnableToWriteFully;
+	if(offset != size)
+  {
+    delete[] buf;
+    return CERR_UnableToWriteFully;
+  }
 
-	delete buf;
+	delete[] buf;
 
 	return CERR_None;
 }
