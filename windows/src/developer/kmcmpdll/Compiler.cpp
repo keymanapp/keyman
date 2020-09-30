@@ -447,11 +447,14 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 
 	FMnemonicLayout = FALSE;
 
-	str = new WCHAR[LINESIZE];
-	if(!str) SetError(CERR_CannotAllocateMemory);
+  if (!fk) {
+    SetError(CERR_SomewhereIGotItWrong);
+  }
 
-	//fk = new FILE_KEYBOARD;
-	if(!fk) SetError(CERR_CannotAllocateMemory);
+	str = new WCHAR[LINESIZE];
+  if (!str) {
+    SetError(CERR_CannotAllocateMemory);
+  }
 
 	fk->KeyboardID = 0;
 	fk->version = 0;
@@ -1115,7 +1118,7 @@ DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str)
 	if(fk->dpStoreArray)
 	{
 		memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-		delete fk->dpStoreArray;
+		delete[] fk->dpStoreArray;
 	}
 
 	fk->dpStoreArray = sp;
@@ -1346,7 +1349,10 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		    j = SUBLANGID(n);
 		    i = PRIMARYLANGID(n);
 
-	      if(i < 1 || j < 1 || i > 0x3FF || j > 0x3F) return CERR_InvalidLanguageLine;
+        if (i < 1 || j < 1 || i > 0x3FF || j > 0x3F) {
+          delete q;
+          return CERR_InvalidLanguageLine;
+        }
 
         swprintf(r, szQ - (size_t)(r-q), L"x%04.4x ", n);  // I3481
 
@@ -1427,7 +1433,7 @@ BOOL GetFileVersion(char *filename, WORD *d1, WORD *d2, WORD *d3, WORD *d4)
 	*d3 = HIWORD(vffi->dwFileVersionLS);
 	*d4 = LOWORD(vffi->dwFileVersionLS);
 
-	delete p;
+	delete[] p;
 	return TRUE;
 }
 
@@ -2521,7 +2527,7 @@ DWORD process_if_synonym(DWORD dwSystemID, PFILE_KEYBOARD fk, LPWSTR q, LPWSTR t
   tstr[(*mx)++] = (WCHAR)(dwStoreID+1);
   tstr[(*mx)] = 0;
 
-  delete temp;
+  delete[] temp;
 
   return CERR_None;
 }
@@ -2574,7 +2580,7 @@ DWORD process_if(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)  // I3431
 
   if((msg = GetXString(fk, s, L"", temp, GLOBAL_BUFSIZE-1, 0, &r, FALSE, TRUE)) != CERR_None)
   {
-	  delete temp;
+	  delete[] temp;
 	  return msg;
   }
 
@@ -2582,7 +2588,7 @@ DWORD process_if(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)  // I3431
 
   if((msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) != CERR_None)
   {
-    delete temp;
+    delete[] temp;
     return msg;
   }
 
@@ -3203,7 +3209,7 @@ DWORD GetRHS(PFILE_KEYBOARD fk, PWSTR p, PWSTR buf, int bufsize, int offset, int
 
 void safe_wcsncpy(PWSTR out, PWSTR in, int cbMax)
 {
-	wcsncpy_s(out, cbMax, in, cbMax);  // I3481
+	wcsncpy_s(out, cbMax, in, cbMax - 1);  // I3481
 	out[cbMax-1] = 0;
 }
 
@@ -3354,7 +3360,7 @@ DWORD BuildVKDictionary(PFILE_KEYBOARD fk)  // I3438
 
   DWORD dwStoreID;
   DWORD msg = AddStore(fk, TSS_VKDICTIONARY, storeval, &dwStoreID);
-  delete storeval;
+  delete[] storeval;
   return msg;
 }
 
@@ -3392,7 +3398,7 @@ int GetDeadKey(PFILE_KEYBOARD fk, PWSTR p)
 	{
 		PFILE_DEADKEY dk = new FILE_DEADKEY[fk->cxDeadKeyArray+10];
 		memcpy(dk, fk->dpDeadKeyArray, fk->cxDeadKeyArray * sizeof(FILE_DEADKEY));
-		delete fk->dpDeadKeyArray;
+		delete[] fk->dpDeadKeyArray;
 		fk->dpDeadKeyArray = dk;
 	}
 	wcsncpy_s(fk->dpDeadKeyArray[fk->cxDeadKeyArray].szName, _countof(fk->dpDeadKeyArray[fk->cxDeadKeyArray].szName), p, SZMAX_DEADKEYNAME);  // I3481
@@ -3408,7 +3414,7 @@ void RecordDeadkeyNames(PFILE_KEYBOARD fk)
 	DWORD i;
 	for(i = 0; i < fk->cxDeadKeyArray; i++)
 	{
-		swprintf(buf, _countof(buf), L"%s%d %s", DEBUGSTORE_DEADKEY, i, fk->dpDeadKeyArray[i].szName);  // I3481
+		swprintf(buf, _countof(buf), L"%ls%d %ls", DEBUGSTORE_DEADKEY, i, fk->dpDeadKeyArray[i].szName);  // I3481
 		AddDebugStore(fk, buf);
 	}
 }
