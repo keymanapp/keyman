@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.152 alpha 2020-09-30
+
+* fix(ios/engine): package installation language-picker improvements (#3623)
+
 ## 14.0.151 alpha 2020-09-29
 
 * fix(windows): Buffer overrun in firstrun (#3634)
