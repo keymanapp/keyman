@@ -60,4 +60,15 @@ namespace models {
   export function isSentinel(char: string): boolean {
     return char == models.SENTINEL_CODE_UNIT;
   }
+
+  export function transformToSuggestion(transform: Transform): Suggestion;
+  export function transformToSuggestion(transform: Transform, p: number): Suggestion & {p: number}; 
+  export function transformToSuggestion(transform: Transform, p?: number): Suggestion & {p?: number} {
+    return {
+      transform: transform,
+      transformId: transform.id,
+      displayAs: transform.insert,
+      p: p
+    };
+  }
 }
