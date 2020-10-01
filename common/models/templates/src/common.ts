@@ -61,6 +61,13 @@ namespace models {
     return char == models.SENTINEL_CODE_UNIT;
   }
 
+  /**
+   * Builds a Suggestion based on a Transform corresponding to a predictive-text op.
+   * 
+   * Assumes that the Transform's `insert` property represents a completed word,
+   * as models generally delete the whole prefix, replacing it with the full lexical entry.
+   * @param transform 
+   */
   export function transformToSuggestion(transform: Transform): Suggestion;
   export function transformToSuggestion(transform: Transform, p: number): Suggestion & {p: number}; 
   export function transformToSuggestion(transform: Transform, p?: number): Suggestion & {p?: number} {
