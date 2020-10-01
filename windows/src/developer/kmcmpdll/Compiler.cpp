@@ -1303,8 +1303,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
       wchar_t *pp = wcsrchr(p, L'\\');
       if (!pp) {
         pp = p;
-      }
-      else {
+      } else {
         pp++;
       }
       q = new WCHAR[wcslen(pp) + 1];
@@ -1504,8 +1503,7 @@ DWORD CheckUseStatementsInOutput(PWSTR output) {   // I4867
   for (p = output; *p; p = incxstr(p)) {
     if (*p == UC_SENTINEL && *(p + 1) == CODE_USE) {
       HasUse = TRUE;
-    }
-    else if (HasUse) {
+    } else if (HasUse) {
       AddWarning(CWARN_UseNotLastStatementInRule);
       return FALSE;
     }
@@ -1541,8 +1539,7 @@ DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
       if ((msg = GetXString(fk, str, L">", pklKey, GLOBAL_BUFSIZE - 1, (int)(INT_PTR)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
       if (pklKey[0] == 0) return CERR_ZeroLengthString;
       if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
-    }
-    else {
+    } else {
       if ((msg = GetXString(fk, str, L">", pklIn, GLOBAL_BUFSIZE - 1, (int)(INT_PTR)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
       if (pklIn[0] == 0) return CERR_ZeroLengthString;
     }
