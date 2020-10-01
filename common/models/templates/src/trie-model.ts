@@ -127,7 +127,10 @@
       return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => 
         models.transformToSuggestion({
           insert: text,
+          // Delete whatever the prefix that the user wrote.
           deleteLeft: leftDelOffset + prefix.kmwLength()
+          // Note: a separate capitalization/orthography engine can take this
+          // result and transform it as needed.
         },
         p
       )));
