@@ -307,7 +307,12 @@ class ModelCompositor {
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(contextState) {
-      // TODO:  context tracking enhancements
+      contextState.tokens[contextState.tokens.length - 1].replacements = suggestions.map(function(suggestion) {
+        return {
+          suggestion: suggestion,
+          tokenWidth: 1
+        }
+      });
     }
 
     return suggestions;
@@ -386,7 +391,7 @@ class ModelCompositor {
     }
 
     let postContextTokens = this.lexicalModel.tokenize(context); //.wordbreak(postContext);
-    let revertedPrefix = postContextTokens[postContextTokens.length - 1];
+    let revertedPrefix = postContextTokens[postContextTokens.length - 1] || '';
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;

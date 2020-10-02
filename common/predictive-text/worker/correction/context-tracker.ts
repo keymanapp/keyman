@@ -333,6 +333,13 @@ namespace correction {
         state.pushTail(baseTokens.splice(0, 1)[0]);
       }
 
+      if(state.tokens.length == 0) {
+        let token = new TrackedContextToken();
+        token.raw = '';
+
+        state.pushTail(token);
+      }
+
       return state;
     }
 
