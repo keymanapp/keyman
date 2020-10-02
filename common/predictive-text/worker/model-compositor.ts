@@ -384,13 +384,14 @@ class ModelCompositor {
     reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
+    let postContext = context;
     if(postTransform) {
       // Now that we've built the reversion based upon the Suggestion's original context,
-      // we may safely manipulate it in order to get a proper 'displayAs' string.
-      context = models.applyTransform(postTransform, context);
+      // we manipulate it in order to get a proper 'displayAs' string.
+      postContext = models.applyTransform(postTransform, postContext);
     }
 
-    let postContextTokens = this.lexicalModel.tokenize(context); //.wordbreak(postContext);
+    let postContextTokens = this.lexicalModel.tokenize(postContext); //.wordbreak(postContext);
     let revertedPrefix = postContextTokens[postContextTokens.length - 1] || '';
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
@@ -412,8 +413,15 @@ class ModelCompositor {
     
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
     if(this.contextTracker) {
-      let contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
-      contextState.tokens[contextState.tokens.length - 1].activeReplacementId = suggestion.id;
+      let contextState = this.contextTracker.newest;
+      if(!contextState) {
+        contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
+      }
+      let lastToken = contextState.tokens[contextState.tokens.length - 1];
+      
+      lastToken.activeReplacementId = suggestion.id;
+      let acceptedContext = models.applyTransform(suggestion.transform, context);
+      this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
     }
 
     return reversion;
