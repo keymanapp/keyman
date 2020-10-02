@@ -125,6 +125,9 @@ Message       | Direction          | Parameters          | Expected reply      |
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
 `wordbreak`   | LMLayer → worker   | context             | Yes - `currentword` | Yes
 `currentword` | LMLayer → keyboard | string              | No                  | Yes
+`accept`      | keyboard → LMLayer | suggestion,         | Yes - `reversion`   | Yes
+                                   | context, transform  |                     |
+              
 
 ### Message: `config`
 

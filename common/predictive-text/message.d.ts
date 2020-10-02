@@ -30,8 +30,8 @@ type Token = number;
 /**
  * The valid outgoing message kinds.
  */
-type OutgoingMessageKind = 'error' | 'ready' | 'suggestions' | 'currentword';
-type OutgoingMessage = ErrorMessage | ReadyMessage | SuggestionMessage | CurrentWordMessage;
+type OutgoingMessageKind = 'error' | 'ready' | 'suggestions' | 'currentword' | 'postaccept';
+type OutgoingMessage = ErrorMessage | ReadyMessage | SuggestionMessage | CurrentWordMessage | PostAcceptMessage;
 
 interface ErrorMessage {
   message: 'error';
@@ -84,6 +84,25 @@ interface CurrentWordMessage {
    * of its source message - the 'wordbreak' message with matching Token value.
    */
   word: USVString;
+}
+
+/**
+ * Returns the results of a 'wordbreak' request:  a 'reversion' Suggestion and an
+ * array of new, word-initial Suggestions.
+ */
+interface PostAcceptMessage {
+  message: 'postaccept';
+
+  /**
+   * Opaque, unique token that pairs this message
+   * with the wordbreak message that initiated it.
+   */
+  token: Token;
+
+  /**
+   * A 'Suggestion' that will return the context to its prior state.
+   */
+  reversion: Suggestion;
 }
 
 /**

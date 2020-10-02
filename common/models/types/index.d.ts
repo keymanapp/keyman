@@ -238,6 +238,8 @@ declare interface Suggestion {
   tag?: SuggestionTag;
 }
 
+interface Reversion extends Suggestion { }
+
 /**
  * A tag indicating the nature of the current suggestion.
  * 
@@ -251,8 +253,7 @@ declare interface Suggestion {
  *  
  * If left undefined, the consumers will assume this is a prediction.
  */
-type SuggestionTag = undefined | 'keep' | 'correction' | 'emoji';
-
+type SuggestionTag = undefined | 'keep' | 'revert' | 'correction' | 'emoji';
 
 /**
  * The text and environment surrounding the insertion point (text cursor).

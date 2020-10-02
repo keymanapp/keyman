@@ -102,9 +102,9 @@ describe('ModelCompositor', function() {
   
         var keep;
         if(quoteStyle) {
-          keep = compositor.toAnnotatedKeepSuggestion(baseSuggestion, quoteStyle);
+          keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep', quoteStyle);
         } else {
-          keep = compositor.toAnnotatedKeepSuggestion(baseSuggestion);
+          keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep');
         }
 
         // Make sure we didn't accidentally leak any mutations to the parameter.
