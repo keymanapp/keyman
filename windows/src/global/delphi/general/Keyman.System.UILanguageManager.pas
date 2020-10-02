@@ -33,7 +33,7 @@ begin
 
   if GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, @ulNumLanguages, nil, @cchLanguagesBuffer) then
   begin
-    pwszLanguagesBuffer := AllocMem(cchLanguagesBuffer);
+    pwszLanguagesBuffer := AllocMem(cchLanguagesBuffer * sizeof(Char));
     try
       if GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, @ulNumLanguages, pwszLanguagesBuffer, @cchLanguagesBuffer) then
       begin

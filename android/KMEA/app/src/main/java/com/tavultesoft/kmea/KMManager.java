@@ -624,8 +624,13 @@ public final class KMManager {
 
         // Copy asset KMP files
         if (isPackageFile) {
-          copyAsset(context, assetFile, "", true);
           kmpFile = new File(getResourceRoot(), assetFile);
+          if (kmpFile.exists()) {
+            // Skip if kmp file already exists.
+            // Admittedly, we'll miss out on kmp updates with Keyman upgrades
+            continue;
+          }
+          copyAsset(context, assetFile, "", true);
           tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
 
           // Determine package info

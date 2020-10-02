@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 14.0.152 alpha 2020-09-30
+
+* fix(ios/engine): package installation language-picker improvements (#3623)
+
+## 14.0.151 alpha 2020-09-29
+
+* fix(windows): Buffer overrun in firstrun (#3634)
+* fix(windows): upgrading transitional profiles (#3635)
+* fix(android/engine): Fix undetermined lexical model package ID (#3624)
+
+## 14.0.150 alpha 2020-09-28
+
+* feat(windows): overflow menu for osk toolbar (#3626)
+* feat(windows): scrollable keyboard menu (#3627)
+* fix(android/app): Allow uninstalling sil_euro_latin for non-default languages (#3628)
+* feat(ios/engine): Utilizes packages' welcome pages (#3622)
+* fix(android/app): Only copy asset .kmp file if it doesn't exist (#3629)
+
 ## 14.0.149 alpha 2020-09-25
 
 * fix(windows): add back support for disabling keyboards (#3607)

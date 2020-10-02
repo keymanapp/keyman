@@ -4,6 +4,7 @@
 package com.tavultesoft.kmea.data;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -45,14 +46,14 @@ public class LexicalModel extends LanguageResource implements Serializable {
       String packageID = "";
       if (lexicalModelJSON.has(KMManager.KMKey_PackageID)) {
         packageID = lexicalModelJSON.getString(KMManager.KMKey_PackageID);
-      } else if (kmp != null && FileUtils.hasLexicalModelPackageExtension(kmp)) {
-        // Extract package ID from packageFilename
-        String filename = FileUtils.getFilename(kmp);
-        // Truncate .model.kmp file extension
-        packageID = filename.replace(FileUtils.MODELPACKAGE, "");
+      } else if (kmp != null) {
+        Uri uri = Uri.parse(kmp);
+        // Extract package ID from uri
+        packageID = uri.getLastPathSegment();
       } else {
         // Invalid Package ID
-        KMLog.LogError(TAG, "Invalid package ID");
+        KMLog.LogExceptionWithData(TAG, "Invalid package ID with lexicalModelJSON",
+          "lexicalModelJSON", lexicalModelJSON.toString(4), null);
       }
 
       String resourceID = lexicalModelJSON.getString(KMManager.KMKey_ID);

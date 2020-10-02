@@ -964,7 +964,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         }
 
         // Check if associated model is not already installed
-        if (KMManager.getAssociatedLexicalModel(languageID) == null) {
+        if ((KMManager.getAssociatedLexicalModel(languageID) == null) && KMManager.hasConnection(context)) {
           String _downloadid = CloudLexicalModelMetaDataDownloadCallback.createDownloadId(languageID);
           CloudLexicalModelMetaDataDownloadCallback _callback = new CloudLexicalModelMetaDataDownloadCallback();
 
