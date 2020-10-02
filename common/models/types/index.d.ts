@@ -217,6 +217,14 @@ declare interface Suggestion {
   transformId?: number;
 
   /**
+   * A unique identifier for the Suggestion itself, not shared with any others -
+   * even for Suggestions sourced from the same Transform. 
+   * 
+   * The lm-layer is responsible for setting this field, not models.
+   */
+  id?: number;
+
+  /**
    * The suggested update to the buffer. Note that this transform should
    * be applied AFTER the instigating transform, if any.
    */

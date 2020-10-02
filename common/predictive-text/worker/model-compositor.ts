@@ -7,6 +7,8 @@ class ModelCompositor {
   private static readonly MAX_SUGGESTIONS = 12;
   private readonly punctuation: LexicalModelPunctuation;
 
+  private SUGGESTION_ID_SEED = 0;
+
   constructor(lexicalModel: LexicalModel) {
     this.lexicalModel = lexicalModel;
     if(lexicalModel.traverseFromRoot) {
@@ -297,6 +299,9 @@ class ModelCompositor {
           suggestion.transform.deleteRight = mergedTransform.deleteRight;
         }
       }
+
+      suggestion.id = compositor.SUGGESTION_ID_SEED;
+      compositor.SUGGESTION_ID_SEED++;
     });
 
     // Store the suggestions on the final token of the current context state (if it exists).
@@ -390,10 +395,13 @@ class ModelCompositor {
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
     let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
+    reversion.id = this.SUGGESTION_ID_SEED;
+    this.SUGGESTION_ID_SEED++;
     
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
     if(this.contextTracker) {
-      // TODO:  implement.
+      let contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
+      contextState.tokens[contextState.tokens.length - 1].activeReplacementId = suggestion.id;
     }
 
     return reversion;

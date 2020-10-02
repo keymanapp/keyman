@@ -240,6 +240,7 @@ namespace com.keyman.text.prediction {
             // The ID part is critical; the reversion can't be applied without it.
             transformId: reversionTranscription.token,
             displayAs: reversion.displayAs,
+            id: reversion.id,
             tag: reversion.tag
           }
           // // If using the version from lm-layer:

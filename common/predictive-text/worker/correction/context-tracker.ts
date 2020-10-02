@@ -9,8 +9,8 @@ namespace correction {
   export class TrackedContextToken {
     raw: string;
     transformDistributions: Distribution<Transform>[] = [];
-    replacements: TrackedContextSuggestion;
-    activeReplacement: number = -1;
+    replacements: TrackedContextSuggestion[];
+    activeReplacementId: number = -1;
 
     get isNew(): boolean {
       return this.transformDistributions.length == 0;
@@ -44,7 +44,7 @@ namespace correction {
           let copy = new TrackedContextToken();
           copy.raw = token.raw;
           copy.replacements = token.replacements
-          copy.activeReplacement = token.activeReplacement;
+          copy.activeReplacementId = token.activeReplacementId;
           copy.transformDistributions = token.transformDistributions;
   
           return copy;
