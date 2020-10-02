@@ -68,7 +68,7 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
     WCHAR windowinfo[1024];
     wsprintfW(windowinfo,
       DEBUG_PLATFORM_STRINGW TAB //"Platform" TAB
-      L"%s" TAB  //"Process" TAB
+      L"%ls" TAB  //"Process" TAB
       L"%x" TAB  //"PID" TAB
       L"%x" TAB  //"TID" TAB
       L"%x" TAB  //"ShiftState" TAB
@@ -77,15 +77,15 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
       L"%x" TAB  //"FocusHWND" TAB
       L"%8x" TAB //"ActiveHKL" TAB
       L"%hs:%d" TAB  //"SourceFile" TAB
-      L"%s\n",     //"Message"
+      L"%ls\n",     //"Message"
       sProcessName,                    //"Process" TAB
-      pid,                             //"PID" TAB
-      tid,                             //"TID" TAB
-      shiftState,                      //"ShiftState" TAB
-      actualShiftState,                // ActualShiftState TAB
-      tickCount,                       //"TickCount" TAB
-      gti.hwndFocus,                   //"FocusHWND" TAB
-      activeHKL,                       //"ActiveHKL" TAB
+      (unsigned int) pid,                             //"PID" TAB
+      (unsigned int) tid,                             //"TID" TAB
+      (unsigned int) shiftState,                      //"ShiftState" TAB
+      (unsigned int) actualShiftState,                // ActualShiftState TAB
+      (int) tickCount,                       //"TickCount" TAB
+      (unsigned int) gti.hwndFocus,                   //"FocusHWND" TAB
+      (unsigned int) activeHKL,                       //"ActiveHKL" TAB
       file, line,                      //"SourceFile" TAB
       msg);                            //"Message"
 

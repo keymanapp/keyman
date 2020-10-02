@@ -47,7 +47,7 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
   if(!_td) return FALSE;
 	if(_td->ForceFileName[0])
 	{
-		strncpy_s(buf, nbuf, _td->ForceFileName, nbuf);
+		strncpy_s(buf, nbuf, _td->ForceFileName, nbuf - 1);
 		buf[nbuf-1] = 0;
 		return TRUE;
 	}
@@ -84,7 +84,7 @@ BOOL LoadlpKeyboard(int i)
 	if(_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
 	char buf[256];
-	if(!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 256)) return FALSE;
+	if(!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
 
 	if(!LoadKeyboard(buf, &_td->lpKeyboards[i].Keyboard)) return FALSE;   // I5136
 
@@ -205,11 +205,14 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 	CloseHandle(hFile);
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
+  if (!_td) {
+    delete[] buf;
+    return FALSE;
+  }
 
 	if(*LPDWORD(filebase) != FILEID_COMPILED)
 	{
-		delete buf; 
+		delete[] buf; 
     Err("Invalid file");
     return FALSE;
 	}

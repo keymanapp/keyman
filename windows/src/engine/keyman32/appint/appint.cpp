@@ -160,6 +160,7 @@ BOOL AppContext::CharIsSurrogatePair()
 
 AppActionQueue::AppActionQueue()
 {
+  memset(Queue, 0, sizeof(APPACTIONQUEUEITEM) * MAXACTIONQUEUE);
 	ResetQueue();
 }
 
@@ -192,4 +193,5 @@ BOOL AppActionQueue::QueueAction(int ItemType, DWORD dwData)
 AppIntegration::AppIntegration()
 {
 	hwnd = NULL;
+  FShiftFlags = 0;
 }

@@ -246,10 +246,17 @@ void DoCWMF(UINT msg)
 
 void DoChangeWindowMessageFilter()
 {
-	PChangeWindowMessageFilter = (BOOL (WINAPI *)(UINT,DWORD))GetProcAddress(LoadLibrary("user32"), "ChangeWindowMessageFilter");
+  HMODULE hUser32 = LoadLibrary("user32");
+  if (!hUser32)
+    return;
 
-	if(!PChangeWindowMessageFilter)
-		return;
+	PChangeWindowMessageFilter = (BOOL (WINAPI *)(UINT,DWORD))GetProcAddress(hUser32, "ChangeWindowMessageFilter");
+
+  if (!PChangeWindowMessageFilter)
+  {
+    FreeLibrary(hUser32);
+    return;
+  }
 
 	DoCWMF(wm_keyman);   // I3594
   DoCWMF(wm_keyman_keyevent);
@@ -263,6 +270,8 @@ void DoChangeWindowMessageFilter()
     DoCWMF(wm_keymanshift);
     DoCWMF(wm_keyman_control);   // I4714
     DoCWMF(wm_keyman_control_internal);   // I4714
+
+    FreeLibrary(hUser32);
 }
 
 BOOL InitThread(HWND hwnd)
@@ -591,7 +600,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 
-  strncpy(_td->ForceFileName, FileName, MAX_PATH);
+  strncpy(_td->ForceFileName, FileName, MAX_PATH - 1);
 	_td->ForceFileName[MAX_PATH-1] = 0;
 
 	if(_td->lpActiveKeyboard)
@@ -767,7 +776,7 @@ BOOL ConvertStringToGuid(WCHAR *buf, GUID *guid)   // I3581
 }
 
 void LoadBaseLayoutSettings() {   // I4552   // I4583
-  char underlyingLayout[16];
+  char underlyingLayout[16] = "";
   wchar_t baseLayout[MAX_PATH];
   DWORD dwUnderlyingLayout = 0;
 
@@ -776,7 +785,7 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 	if(reg->OpenKeyReadOnly(REGSZ_KeymanCU)) {
 		if(reg->ReadString(REGSZ_UnderlyingLayout, underlyingLayout, 15)) {
       dwUnderlyingLayout = strtoul(underlyingLayout, NULL, 16);   // I4516   // I4581
-      wsprintf(underlyingLayout, "%08x", dwUnderlyingLayout);   // I3759   // I4581
+      wsprintf(underlyingLayout, "%08x", (unsigned int) dwUnderlyingLayout);   // I3759   // I4581
     } else {
 			underlyingLayout[0] = 0;
     }
@@ -797,7 +806,7 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 
     if(GetLocaleInfoW(LOWORD(dwUnderlyingLayout), LOCALE_SISO639LANGNAME, langName, _countof(langName)) > 0 &&
       GetLocaleInfoW(LOWORD(dwUnderlyingLayout), LOCALE_SISO3166CTRYNAME, countryName, _countof(countryName)) > 0) {   // I4588   // I4786
-      wsprintfW(baseLayoutAlt, L"%s-%s", langName, countryName);
+      wsprintfW(baseLayoutAlt, L"%ls-%ls", langName, countryName);
       Globals::SetBaseKeyboardName(baseLayout, baseLayoutAlt);
     } else {
       Globals::SetBaseKeyboardName(baseLayout, L"en-US");   // I4786
@@ -864,7 +873,7 @@ void RefreshKeyboards(BOOL Initialising)
 	char oldname[_MAX_FNAME];
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(_td->FInRefreshKeyboards) return;
+  if(!_td || _td->FInRefreshKeyboards) return;
   _td->FInRefreshKeyboards = TRUE;
 
   // Can happen when multiple top-level windows for one process
@@ -922,7 +931,7 @@ void RefreshKeyboards(BOOL Initialising)
 				if(_td->lpKeyboards)
 				{
 					memcpy(kp, _td->lpKeyboards, sizeof(INTKEYBOARDINFO)*_td->nKeyboards);
-					delete _td->lpKeyboards;
+					delete[] _td->lpKeyboards;
 				}
 				_td->nKeyboards = nk + 1;
 				_td->lpKeyboards = kp;

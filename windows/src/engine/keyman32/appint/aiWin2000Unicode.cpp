@@ -303,7 +303,7 @@ BOOL AIWin2000Unicode::PostKeys()
 
   SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input finished");
 
-  delete pInputs;
+  delete[] pInputs;
 
   return TRUE;
 }
