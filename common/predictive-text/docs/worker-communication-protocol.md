@@ -125,8 +125,9 @@ Message       | Direction          | Parameters          | Expected reply      |
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
 `wordbreak`   | LMLayer → worker   | context             | Yes - `currentword` | Yes
 `currentword` | LMLayer → keyboard | string              | No                  | Yes
-`accept`      | keyboard → LMLayer | suggestion,         | Yes - `reversion`   | Yes
+`accept`      | keyboard → LMLayer | suggestion,         | Yes - `postaccept`  | Yes
                                    | context, transform  |                     |
+`postaccept`  | LMLayer → keyboard | reversion           | No                  | Yes
               
 
 ### Message: `config`
@@ -460,6 +461,40 @@ following the last wordbreaking character(s) to the left of the insertion
 point.  If no such wordform exists, this returns an empty string.
 
 This message **MUST** be in response to a `wordbreak` message, and it
+**MUST** respond with the corresponding [token][Tokens].
+
+### Message: `accept`
+
+The `accept` message is sent from the keyboard to the LMLayer.  This
+message tells the LMLayer that a previously-returned `suggestion` 
+(from a `predict`-`suggestions` pair) has been accepted by the user.  
+The LMLayer **SHOULD** respond to each `accept` message with a 
+`postaccept` message providing a `reversion` capable of undoing it.
+
+The keyboard **MUST** send the `suggestion` and `context` parameters.
+The keyboard **MUST** send a unique token.  The `postTransform` parameter is 
+optional, but highly suggested.
+
+The semantics of the `accept` message **MUST** be from the perspective
+of this sequence of events:
+
+1. A user has just selected the `suggestion` as valid.
+2. The keystroke triggering the `suggestion` has NOT been committed to 
+   the `context`.
+3. Before the user inputs any additional keystrokes, which would trigger
+   new suggestions.
+
+Use of the `postTransform` parameter facilitates including the `suggestion`-
+triggering keystroke's `transform` as part of the corresponding `reversion`
+necessary to revert acceptance of the `suggestion`.
+
+### Message: `postaccept`
+
+The `postaccept` message is sent from the keyboard to the LMLayer.  This
+message sends a `reversion` capable of undoing acceptance of the `suggestion`
+just accepted by the triggering `accept` message.
+
+This message **MUST** be in response to a `postaccept` message, and it
 **MUST** respond with the corresponding [token][Tokens].
 
 #### Examples
