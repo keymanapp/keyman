@@ -84,8 +84,8 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
       (unsigned int) shiftState,                      //"ShiftState" TAB
       (unsigned int) actualShiftState,                // ActualShiftState TAB
       (int) tickCount,                       //"TickCount" TAB
-      (unsigned int) gti.hwndFocus,                   //"FocusHWND" TAB
-      (unsigned int) activeHKL,                       //"ActiveHKL" TAB
+      PtrToInt(gti.hwndFocus),                   //"FocusHWND" TAB
+      PtrToInt(activeHKL),                       //"ActiveHKL" TAB
       file, line,                      //"SourceFile" TAB
       msg);                            //"Message"
 

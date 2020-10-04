@@ -201,17 +201,17 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
 	char ds[256];
 
 	if(msg->message == wm_keymankeydown)
-    wsprintf(ds, "DebugMessage(%x, wm_keymankeydown: %s lParam: %X) [message flags: %x time: %d]", (unsigned int) msg->hwnd, 
+    wsprintf(ds, "DebugMessage(%x, wm_keymankeydown: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
       Debug_VirtualKey((WORD) msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
 	else if(msg->message == wm_keymankeyup)
-    wsprintf(ds, "DebugMessage(%x, wm_keymankeyup: %s lParam: %X) [message flags: %x time: %d]", (unsigned int) msg->hwnd,
+    wsprintf(ds, "DebugMessage(%x, wm_keymankeyup: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
       Debug_VirtualKey((WORD) msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
   else if (msg->message == wm_keyman_keyevent)
-    wsprintf(ds, "DebugMessage(%x, wm_keyman_keyevent: %s lParam: %X) [message flags: %x time: %d]", (unsigned int) msg->hwnd,
+    wsprintf(ds, "DebugMessage(%x, wm_keyman_keyevent: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
       Debug_VirtualKey((WORD)msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
   else if(msg->message == WM_KEYDOWN || msg->message == WM_KEYUP || msg->message == WM_SYSKEYDOWN || msg->message == WM_SYSKEYUP)
     wsprintf(ds, "DebugMessage(%x, %s, wParam: %s, lParam: %X) [message flags: %x time: %d extra: %x]", 
-      (unsigned int) msg->hwnd,
+      PtrToInt(msg->hwnd),
       msgnames[msg->message-WM_KEYDOWN],
       Debug_VirtualKey((WORD) msg->wParam),
       (unsigned int) msg->lParam,
@@ -220,7 +220,7 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
       (unsigned int) GetMessageExtraInfo());
 	else if(msg->message >= WM_KEYDOWN && msg->message <= WM_UNICHAR)
     wsprintf(ds, "DebugMessage(%x, %s, wParam: '%c' (U+%04X), lParam: %X) [message flags: %x time: %d extra: %x]", 
-      (unsigned int) msg->hwnd,
+      PtrToInt(msg->hwnd),
       msgnames[msg->message-WM_KEYDOWN],
       msg->wParam,
       msg->wParam, 
@@ -229,7 +229,7 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
       (int) msg->time,
       (unsigned int) GetMessageExtraInfo());
 	else
-    wsprintf(ds, "%x: %d: wParam: %d, lParam: %X [message flags: %x time: %d]", (unsigned int) msg->hwnd, msg->message, msg->wParam, (unsigned int) msg->lParam, wParam, (int) msg->time);
+    wsprintf(ds, "%x: %d: wParam: %d, lParam: %X [message flags: %x time: %d]", PtrToInt(msg->hwnd), msg->message, msg->wParam, (unsigned int) msg->lParam, wParam, (int) msg->time);
 
 	SendDebugMessage(msg->hwnd, sdmMessage, 0, ds);
 }

@@ -180,7 +180,7 @@ void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground) {   
 }
 
 void PrepareLanguageSwitchString(UINT langid, HKL hkl, char *str) {
-  wsprintf(str, "%d|%d|%d", (int) GetCurrentThreadId(), langid, (int) hkl);   // I4285
+  wsprintf(str, "%d|%d|%d", (int) GetCurrentThreadId(), langid, PtrToInt(hkl));   // I4285
 }
 
 void PrepareLanguageSwitchString(UINT langid, GUID clsid, GUID guidProfile, char *str) {
