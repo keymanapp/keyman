@@ -28,7 +28,7 @@
 
 int WINAPI msgproc(int line, DWORD dwMsgCode, LPSTR szText)
 {
-	printf("line %d  error %x  %s\n", line, dwMsgCode, szText);
+	printf("line %d  error %x  %s\n", line, (unsigned int) dwMsgCode, szText);
 	return 1;
 }
 
