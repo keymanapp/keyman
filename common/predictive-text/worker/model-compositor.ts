@@ -289,7 +289,12 @@ class ModelCompositor {
 
         // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
         if(prefixTransform) {
-          models.prependTransform(suggestion.transform, prefixTransform);
+          let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
+
+          // Cannot directly re-assign b/c `pair.sample.transform` is `readonly`.
+          suggestion.transform.insert = mergedTransform.insert;
+          suggestion.transform.deleteLeft = mergedTransform.deleteLeft;
+          suggestion.transform.deleteRight = mergedTransform.deleteRight;
         }
       }
     });
@@ -364,7 +369,8 @@ class ModelCompositor {
       deleteLeft: insertedLength
     };
 
-    // This restores the state BEFORE postTransform.  So, we simply apply postTransform.
+    // The code above restores the state to the context at the time the `Suggestion` was created.
+    // `postTransform` handles any missing context that came later.
     reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
 
     // Step 2:  building the proper 'displayAs' string for the Reversion

@@ -24,21 +24,6 @@ namespace models {
   }
 
   /**
-   *
-   * @param transform Merges one transform into another, mutating the first parameter to
-   *                  include the effects of the second while preserving its insertions.
-   * @param prefix
-   */
-  export function prependTransform(transform: Transform, prefix: Transform) {
-    // TODO:  Might be replaceable with buildMergedTransform(prefix, transform)?
-    transform.insert = prefix.insert + transform.insert;
-    transform.deleteLeft += prefix.deleteLeft;
-    if(prefix.deleteRight) {
-      transform.deleteRight = (transform.deleteRight || 0) + prefix.deleteRight;
-    }
-  }
-
-  /**
    * Merges two Transforms as if they were applied to a `Context` successively.
    * @param first 
    * @param second 
