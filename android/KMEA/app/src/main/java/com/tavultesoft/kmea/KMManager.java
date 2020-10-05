@@ -217,12 +217,12 @@ public final class KMManager {
   public static final String KMDefault_LexicalModelPackages = "models";
 
   // Default Keyboard Info
-  public static final String KMDefault_PackageID = "sil_euro_latin";
-  public static final String KMDefault_KeyboardID = "sil_euro_latin";
-  public static final String KMDefault_LanguageID = "en";
-  public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
-  public static final String KMDefault_LanguageName = "English";
-  public static final String KMDefault_KeyboardFont = "DejaVuSans.ttf";
+  public static final String KMDefault_PackageID = "sil_krx_latn_azerty";
+  public static final String KMDefault_KeyboardID = "sil_krx_latn_azerty";
+  public static final String KMDefault_LanguageID = "krx-latn";
+  public static final String KMDefault_KeyboardName = "Karon (SIL) Azerty Keyboard";
+  public static final String KMDefault_LanguageName = "Karon";
+  public static final String KMDefault_KeyboardFont = ""; //"DejaVuSans.ttf";
   public static final String KMDefault_KeyboardKMP = KMDefault_PackageID + FileUtils.KEYMANPACKAGE;
 
   // Default Dictionary Info

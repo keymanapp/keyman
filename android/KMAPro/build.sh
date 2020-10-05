@@ -91,13 +91,13 @@ fi
 
 
 # Download default keyboard and dictionary
-if [ "$DO_KEYBOARDS_DOWNLOAD" = true ]; then
-  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
-fi
+#if [ "$DO_KEYBOARDS_DOWNLOAD" = true ]; then
+#  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
+#fi
 
-if [ "$DO_MODELS_DOWNLOAD" = true ]; then
-  downloadModelPackage "$MODEL_PACKAGE_ID" "$MODELS_TARGET"
-fi
+#if [ "$DO_MODELS_DOWNLOAD" = true ]; then
+#  downloadModelPackage "$MODEL_PACKAGE_ID" "$MODELS_TARGET"
+#fi
 
 if [ "$ONLY_DEBUG" = true ]; then
   BUILD_FLAGS="assembleDebug lintDebug"
