@@ -1,18 +1,18 @@
 /*
   Name:             mcompile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      24 Apr 2014
 
   Modified Date:    8 Apr 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          24 Apr 2014 - mcdurdin - I4174 - V9 - mcompile logs should be stored in diag folder
                     16 Jun 2014 - mcdurdin - I4273 - V9.0 - Convert keyboards to Unicode before installing
                     23 Jun 2014 - mcdurdin - I4279 - V9.0 - mcompile fails to start when converting keyboard to Unicode
@@ -82,7 +82,7 @@ int run(int argc, wchar_t * argv[])
     }
 
     //DeleteReallocatedPointers(kmxfile); :TODO
-    delete kmxfile;
+    delete[] kmxfile;
 
     return 0;   // I4279
   }
@@ -92,11 +92,11 @@ int run(int argc, wchar_t * argv[])
 
   wchar_t *infile = argv[n], *indll = argv[n+1], *kbid = argv[n+2], *outfile = argv[n+3];
 
-  wprintf(L"mcompile%s \"%s\" \"%s\" \"%s\" \"%s\"\n", bDeadkeyConversion ? L" -d":L"", infile, indll, kbid, outfile);   // I4174
+  wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d":L"", infile, indll, kbid, outfile);   // I4174
 
   // 1. Load the keyman keyboard file
 
-  // 2. For each key on the system layout, determine its output character and perform a 
+  // 2. For each key on the system layout, determine its output character and perform a
   //    1-1 replacement on the keyman keyboard of that character with the base VK + shift
   //    state.  This fixup will transform the char to a vk, which will avoid any issues
   //    with the key.
@@ -107,8 +107,8 @@ int run(int argc, wchar_t * argv[])
   //  rule for that deadkey, e.g. [K_LBRKT] > dk(c101)
   //
   //  Next, update each rule that references the output from that deadkey to add an extra
-  //  context deadkey at the end of the context match, e.g. 'a' dk(c101) + [K_SPACE] > 'b'.  
-  //  This will require a memory layout change for the .kmx file, plus fixups on the 
+  //  context deadkey at the end of the context match, e.g. 'a' dk(c101) + [K_SPACE] > 'b'.
+  //  This will require a memory layout change for the .kmx file, plus fixups on the
   //  context+output index offsets
   //
   //  --> virtual character keys
@@ -117,7 +117,7 @@ int run(int argc, wchar_t * argv[])
   //  switch the shift state from the VIRTUALCHARKEY to VIRTUALKEY, without changing any
   //  other properties of the key.
   //
-  
+
   // 3. Write the new keyman keyboard file
 
   if(!LoadNewLibrary(indll)) {
@@ -167,7 +167,7 @@ const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCT
 //
 // TranslateKey
 //
-// For each key rule on the keyboard, remap its key to the 
+// For each key rule on the keyboard, remap its key to the
 // correct shift state and key.  Adjust the LCTRL+RALT -> RALT if necessary
 //
 void TranslateKey(LPKEY key, WORD vk, UINT shift, WCHAR ch) {
@@ -391,7 +391,7 @@ void ConvertDeadkey(LPKEYBOARD kbd, WORD vk, UINT shift, WCHAR deadkey) {
 
   GetDeadkeys(deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs
   while(*pdk) {
-    // Look up the ch 
+    // Look up the ch
     UINT vkUnderlying = VKUnderlyingLayoutToVKUS(*pdk);
     TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
@@ -435,7 +435,7 @@ BOOL DoConvert(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I455
     // Go through each possible key on the keyboard
     for(int i = 0; VKMap[i]; i++) {   // I4651
       UINT vkUnderlying = VKUSToVKUnderlyingLayout(VKMap[i]);
-      
+
       WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
 
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
