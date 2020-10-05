@@ -162,7 +162,7 @@ NMAKE=nmake.exe
 CL=cl.exe
 MSBUILD=msbuild.exe
 # /maxcpucount see https://devblogs.microsoft.com/cppblog/precompiled-header-pch-issues-and-recommendations/
-MT="C:\Program Files (x86)\Windows Kits\8.1\bin\x86\mt.exe"
+MT=mt.exe
 VCBUILD=error
 
 !IFDEF DEBUG
