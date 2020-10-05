@@ -386,14 +386,19 @@ namespace com.keyman.text {
       osk.vkbd.keyPending = null;
 
       // Changes for Build 353 to resolve KMEI popup key issues      
-      keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
-      
-      var t=keyName.split('-'),layer=(t.length>1?t[0]:core.keyboardProcessor.layerId);
-      keyName=t[t.length-1];
+      keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
+      // Can't just split on '-' because some layers like ctrl-shift contain it.
+      let separatorIndex = keyName.lastIndexOf('-');
+      var layer = core.keyboardProcessor.layerId;
+      if (separatorIndex > 0) {
+        layer = keyName.substring(0, separatorIndex);
+        keyName = keyName.substring(separatorIndex+1);
+      }
       if(layer == 'undefined') {
         layer=core.keyboardProcessor.layerId;
       }
-      
+      //console.warn("separatorIndex: " + separatorIndex + ", layer: " + layer + ", keyName: " + keyName);
+
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
       var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(layer);
