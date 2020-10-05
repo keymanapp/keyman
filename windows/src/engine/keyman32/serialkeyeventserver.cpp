@@ -61,6 +61,18 @@ private:
 public:
 
   SerialKeyEventServer() {
+    m_idThread = 0;
+    m_hThread = NULL;
+    m_hThreadExitEvent = NULL;
+    memset(m_ModifierKeyboardState, 0, 256);
+    m_hKeyEvent = NULL;
+    m_hKeyMutex = NULL;
+    m_hMMF = NULL;
+    m_hwnd = NULL;
+    m_nInputs = 0;
+    m_pInputs = NULL;
+    m_pSharedData = NULL;
+
     // We create the file mapping and global data on the main thread but release it on the 
     // local thread. This ensures that these objects are available for other processes to
     // open even if we haven't completed startup of the local thread.
@@ -102,6 +114,10 @@ public:
         DebugLastError("CloseHandle(m_hThreadExitEvent)");
       }
     }
+
+    // Normally, this is cleaned up by thread termination, but this
+    // handles error conditions better
+    CloseSharedData(); 
   }
 
   virtual HWND GetWindow() const {
@@ -170,21 +186,25 @@ private:
       DebugLastError("CloseHandle(m_hKeyMutex)");
       bRet = FALSE;
     }
+    m_hKeyMutex = NULL;
 
     if (m_hKeyEvent != NULL && !CloseHandle(m_hKeyEvent)) {
       DebugLastError("CloseHandle(m_hKeyEvent)");
       bRet = FALSE;
     }
+    m_hKeyEvent = NULL;
 
     if (m_pSharedData != NULL && !UnmapViewOfFile((LPCVOID)m_pSharedData)) {
       DebugLastError("CloseHandle(m_pSharedData)");
       bRet = FALSE;
     }
+    m_pSharedData = NULL;
 
     if (m_hMMF != NULL && !CloseHandle(m_hMMF)) {
       DebugLastError("CloseHandle(m_hMMF)");
       bRet = FALSE;
     }
+    m_hMMF = NULL;
 
     return bRet;
   }
@@ -268,7 +288,8 @@ private:
     }
 
     if (m_pInputs != NULL) {
-      delete m_pInputs;
+      delete[] m_pInputs;
+      m_pInputs = NULL;
     }
   }
 

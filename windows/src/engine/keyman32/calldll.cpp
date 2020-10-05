@@ -43,7 +43,7 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 
 	char drive[_MAX_DRIVE], dir[_MAX_DIR], fullname[_MAX_PATH], newdllname[_MAX_FNAME];
 
-	strcpy(fullname, kbdpath);
+	strcpy_s(fullname, _countof(fullname), kbdpath);
 	_splitpath_s(fullname, drive, _countof(drive), dir, _countof(dir), NULL, 0, NULL, 0);   // I3547
 
 #ifdef _WIN64
@@ -160,7 +160,7 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 			if(!q || !r)
 			{
 				s->dwSystemID = TSS_CALLDEFINITION_LOADFAILED;
-				delete p;
+				delete[] p;
 				continue;
 			}
 
@@ -168,7 +168,7 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 			if(imd && AddIMDLLHook(imd, r, i, &s->dpString)) s->dwSystemID = TSS_CALLDEFINITION;
 			else s->dwSystemID = TSS_CALLDEFINITION_LOADFAILED;
 
-			delete p;
+			delete[] p;
 		}
 	}
 
@@ -225,7 +225,7 @@ void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
 {
 	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Enter");
 
-	if(storenum < 0 || storenum >= lpkbi->Keyboard->cxStoreArray) return;
+	if(storenum >= lpkbi->Keyboard->cxStoreArray) return;
 
 	LPSTORE s = &lpkbi->Keyboard->dpStoreArray[storenum];
 	if(s->dwSystemID != TSS_CALLDEFINITION) return;

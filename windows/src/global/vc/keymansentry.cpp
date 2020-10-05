@@ -50,7 +50,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
 
   sentry_options_set_release(options, "release-" KEYMAN_VersionWithTag); // matches git tag
   sentry_options_set_environment(options, KEYMAN_Environment); // stable, beta, alpha, test, local
-  
+
   // We don't currently need to set this, because it will be same path
   // as all our c++ executables.
   //sentry_options_set_handler_path(options, "path/to/crashpad_handler");
@@ -59,7 +59,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
   if (RegOpenKeyExA(HKEY_CURRENT_USER, key, 0, KEY_READ, &hkey) == ERROR_SUCCESS) {
     DWORD dwType, dwValue, dwValueSize = 4;
 
-    g_report_exceptions = 
+    g_report_exceptions =
       RegQueryValueExA(hkey, REGSZ_AutomaticallyReportErrors, NULL, &dwType, (LPBYTE)&dwValue, &dwValueSize) != ERROR_SUCCESS || dwType != REG_DWORD || dwValue != 0;
 
     dwValueSize = 4;
@@ -133,7 +133,7 @@ void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress)
   const int FRAMES_TO_SKIP = 0;
 
   char message[64];
-  wsprintfA(message, "Exception %x at %p", ExceptionCode, ExceptionAddress);
+  wsprintfA(message, "Exception %x at %p", (unsigned int) ExceptionCode, ExceptionAddress);
 
   if (g_report_exceptions) {
     event = sentry_value_new_event();

@@ -104,8 +104,8 @@ BOOL SelectKeyboard(DWORD KeymanID)
 				ResetCapsLock();
 
         SelectApplicationIntegration();   // I4287
-				if(!_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
-				_td->state.windowunicode = _td->app->IsUnicode();
+				if(_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
+				_td->state.windowunicode = !_td->app || _td->app->IsUnicode();
 
 				ActivateDLLs(_td->lpActiveKeyboard);
 
@@ -180,14 +180,14 @@ void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground) {   
 }
 
 void PrepareLanguageSwitchString(UINT langid, HKL hkl, char *str) {
-  wsprintf(str, "%d|%d|%d", GetCurrentThreadId(), langid, hkl);   // I4285
+  wsprintf(str, "%d|%d|%d", (int) GetCurrentThreadId(), langid, PtrToInt(hkl));   // I4285
 }
 
 void PrepareLanguageSwitchString(UINT langid, GUID clsid, GUID guidProfile, char *str) {
   WCHAR clsidstr[40], profilestr[40];
   StringFromGUID2(clsid, clsidstr, _countof(clsidstr));
   StringFromGUID2(guidProfile, profilestr, _countof(profilestr));
-  wsprintf(str, "%d|%d|%ws|%ws", GetCurrentThreadId(), langid, clsidstr, profilestr);   // I4285
+  wsprintf(str, "%d|%d|%ls|%ls", (int) GetCurrentThreadId(), langid, clsidstr, profilestr);   // I4285
 }
 
 void ReportActiveKeyboard(PKEYMAN64THREADDATA _td, WORD wCommand) {   // I3933   // I3949

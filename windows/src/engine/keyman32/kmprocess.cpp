@@ -640,14 +640,14 @@ BOOL IsMatchingPlatform(LPSTORE s)  // I3432
     if(!IsMatchingPlatformString(platform))
     {
       s->dwSystemID = TSS_PLATFORM_NOMATCH;
-      delete t;
+      delete[] t;
       return FALSE;
     }
     platform = wcstok_s(NULL, L" ", &context);
   }
 
   s->dwSystemID = TSS_PLATFORM_MATCH;
-  delete t;
+  delete[] t;
   return TRUE;
 }
 
