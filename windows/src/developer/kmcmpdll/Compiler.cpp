@@ -1481,10 +1481,10 @@ DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PWSTR context, PW
 
         int anyStore = *(q + 2) - 1;
 
-        if (xstrlen(fk->dpStoreArray[indexStore].dpString) < xstrlen(fk->dpStoreArray[anyStore].dpString))
+        if (xstrlen(fk->dpStoreArray[indexStore].dpString) < xstrlen(fk->dpStoreArray[anyStore].dpString)) {
           AddWarning(CWARN_IndexStoreShort);
-      }
-      else if (*(p + 1) == CODE_CONTEXTEX) {
+        }
+      } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);
         if (contextOffset > xstrlen(context))
           return CERR_ContextExHasInvalidOffset;
