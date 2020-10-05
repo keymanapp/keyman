@@ -86,7 +86,6 @@ class ModelCompositor {
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
 
-    let predictionRoots: ProbabilityMass<Transform>[]
     let rawPredictions: Distribution<Suggestion> = [];
 
     // Used to restore whitespaces if operations would remove them.
@@ -94,6 +93,8 @@ class ModelCompositor {
 
     // Section 1:  determining 'prediction roots'.
     if(!this.contextTracker) {
+      let predictionRoots: ProbabilityMass<Transform>[];
+
       // Generates raw prediction distributions for each valid input.  Can only 'correct'
       // against the final input.
       //
@@ -143,7 +144,6 @@ class ModelCompositor {
       let newEmptyToken = false;
       // Detect if we're starting a new context state.
       let contextTokens = contextState.tokens;
-      let prefixTransform: Transform;
       if(contextTokens.length == 0 || contextTokens[contextTokens.length - 1].isNew) {
         if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
           newEmptyToken = true;
@@ -153,8 +153,6 @@ class ModelCompositor {
 
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
-
-      // TODO: If a brand new token with no text available, bypass the search.  Or... fix the search?
 
       let bestCorrectionCost: number;
       for(let matches of searchSpace.getBestMatches()) {
@@ -287,6 +285,11 @@ class ModelCompositor {
     suggestions.forEach(function(suggestion) {
       if (suggestion.transform.insert.length > 0) {
         suggestion.transform.insert += punctuation.insertAfterWord;
+
+        // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
+        if(prefixTransform) {
+          models.prependTransform(suggestion.transform, prefixTransform);
+        }
       }
     });
 
