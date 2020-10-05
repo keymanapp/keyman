@@ -54,19 +54,6 @@ class ModelCompositor {
           pair.sample.transformId = transform.id;
         }
 
-        let preserveWhitespace: boolean = false;
-        if(this.isWhitespace(transform)) {
-          // Detect start of new word; prevent whitespace loss here.
-          let postContext = models.applyTransform(transform, context);
-          preserveWhitespace = (this.lexicalModel.wordbreak(postContext) == '');
-        }
-
-        // Prepends the original whitespace, ensuring it is preserved if
-        // the suggestion is accepted.
-        if(preserveWhitespace) {
-          models.prependTransform(pair.sample.transform, transform);
-        }
-
         let prediction = {sample: pair.sample, p: pair.p * inputProb};
         return prediction;
       }, this);
@@ -102,25 +89,34 @@ class ModelCompositor {
     let predictionRoots: ProbabilityMass<Transform>[]
     let rawPredictions: Distribution<Suggestion> = [];
 
-    // Section 1:  determining 'prediction roots'.
+    // Used to restore whitespaces if operations would remove them.
+    let prefixTransform: Transform;
 
+    // Section 1:  determining 'prediction roots'.
     if(!this.contextTracker) {
       // Generates raw prediction distributions for each valid input.  Can only 'correct'
       // against the final input.
       //
       // This is the old, 12.0-13.0 'correction' style.
-      predictionRoots = transformDistribution.map(function(alt) {
-        let transform = alt.sample;
+      if(allowSpace) {
+        // Detect start of new word; prevent whitespace loss here.
+        //let postContext = models.applyTransform(inputTransform, context);
+        predictionRoots = [{sample: inputTransform, p: 1.0}];
+        prefixTransform = inputTransform;
+      } else {
+        predictionRoots = transformDistribution.map(function(alt) {
+          let transform = alt.sample;
 
-        // Filter out special keys unless they're expected.
-        if(this.isWhitespace(transform) && !allowSpace) {
-          return null;
-        } else if(this.isBackspace(transform) && !allowBksp) {
-          return null;
-        }
+          // Filter out special keys unless they're expected.
+          if(this.isWhitespace(transform) && !allowSpace) {
+            return null;
+          } else if(this.isBackspace(transform) && !allowBksp) {
+            return null;
+          }
 
-        return alt;
-      }, this);
+          return alt;
+        }, this);
+      }
 
       // Remove `null` entries.
       predictionRoots = predictionRoots.filter(tuple => !!tuple);
@@ -144,8 +140,21 @@ class ModelCompositor {
       // The 'eventual' logic will be significantly more complex, though still manageable.
       let searchSpace = contextState.searchSpace[0];
 
+      let newEmptyToken = false;
+      // Detect if we're starting a new context state.
+      let contextTokens = contextState.tokens;
+      let prefixTransform: Transform;
+      if(contextTokens.length == 0 || contextTokens[contextTokens.length - 1].isNew) {
+        if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
+          newEmptyToken = true;
+          prefixTransform = inputTransform;
+        }
+      }
+
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
+
+      // TODO: If a brand new token with no text available, bypass the search.  Or... fix the search?
 
       let bestCorrectionCost: number;
       for(let matches of searchSpace.getBestMatches()) {
@@ -168,7 +177,8 @@ class ModelCompositor {
           // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
-            deleteLeft: lexicalModel.wordbreak(context).length, // remove actual token string
+            // remove actual token string.  If new token, there should be nothing to delete.
+            deleteLeft: newEmptyToken ? 0 : lexicalModel.wordbreak(context).length, 
             id: finalInput.id
           }
 
