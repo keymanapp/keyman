@@ -17,8 +17,6 @@ uses
   Keyman.System.Standards.LangTagsRegistry,
   System.SysUtils;
 
-// TODO: Make this a COM API function so we aren't shipping 3+MB of standards data multiple times
-
 ///
 ///<summary>Find a language code with appropriate script and region subtags</summary>
 ///<remarks>
