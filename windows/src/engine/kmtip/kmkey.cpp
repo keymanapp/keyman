@@ -56,6 +56,8 @@ public:
     _fUpdate = fUpdate;
     _fPreserved = fPreserved;   // I3588
     _dwDeepIntegration = dwDeepIntegration;   // I4375
+    _hr = S_FALSE;
+    _ec = 0;
   }
 
   // ITfEditSession
@@ -245,7 +247,7 @@ HRESULT WINAPI CKeymanEditSession::KeymanProcessOutput(int n, WCHAR *buf, int nb
   if (ShouldDebug()) {
     char *p = debugstr(buf);
     SendDebugMessageFormat(L"KeymanProcessOutput: fUpdate = %d, deleting %d, inserting %d '%hs'", _fUpdate, n, nbuf, p);   // I4262
-    delete p;
+    delete[] p;
   }
 
   if (_fUpdate) {
