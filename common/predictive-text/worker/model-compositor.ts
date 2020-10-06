@@ -101,7 +101,6 @@ class ModelCompositor {
       // This is the old, 12.0-13.0 'correction' style.
       if(allowSpace) {
         // Detect start of new word; prevent whitespace loss here.
-        //let postContext = models.applyTransform(inputTransform, context);
         predictionRoots = [{sample: inputTransform, p: 1.0}];
         prefixTransform = inputTransform;
       } else {
