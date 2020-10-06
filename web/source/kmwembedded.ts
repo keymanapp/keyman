@@ -490,6 +490,12 @@ namespace com.keyman.text {
    *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
+    let Codes = com.keyman.text.Codes;
+    if (code == Codes.keyCodes['K_TAB'] || code == Codes.keyCodes['K_ENTER']) {
+      // Let embedded device handle K_TAB and K_ENTER
+      return true;
+    }
+
     let keyman = com.keyman.singleton;
     if(!keyman.core.activeKeyboard || code == 0) {
       return false;
