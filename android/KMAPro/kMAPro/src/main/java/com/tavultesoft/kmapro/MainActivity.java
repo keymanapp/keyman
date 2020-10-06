@@ -711,6 +711,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       @Override
       public void onClick(DialogInterface dialog, int which) {
         textView.setText("");
+        KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
       }
     });
 
