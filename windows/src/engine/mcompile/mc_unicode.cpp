@@ -261,11 +261,11 @@ const WCHAR cp1252[256] = {
 void InplaceUnicode(PWSTR p) {
   while(p && *p) {
     if(*p != UC_SENTINEL) {
-      if(*p >= 0 && *p <= 0xFF) {
+      if(*p <= 0xFF) {
         *p = cp1252[*p];
       }
     }
-     
+
     p = incxstr(p);
   }
 }
@@ -276,7 +276,7 @@ BOOL ConvertKeyboardToUnicode(LPKEYBOARD kbd) {
   LPKEY kp;
   DWORD i, j;
 
-  if(kbd->StartGroup[BEGIN_UNICODE] >= 0 && kbd->StartGroup[BEGIN_UNICODE] < kbd->cxGroupArray) {
+  if(kbd->StartGroup[BEGIN_UNICODE] < kbd->cxGroupArray) {
     // Keyboard is already Unicode
     return TRUE;
   }

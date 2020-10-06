@@ -236,6 +236,23 @@ begin
 
   LangID := LocaleNameToLCID(PWideChar(Locale), 0);
 
+  if (PRIMARYLANGID(LangID) = 0) and (
+    (SUBLANGID(LangID) < 8) or
+    (SUBLANGID(LangID) > 11)
+  ) then
+  begin
+    // LocaleNameToLCID can return a language code that is 'transient' but
+    // outside of the supported range of $2000, $2400, $2800, $2C00. For
+    // example, we have seen values of $3000, $3400, $3800.
+    // Set-WinUserLanguageList refuses to play ball with these values, so we
+    // reject them as invalid.
+    //
+    // This may be a bug in Windows? TODO: Investigate further and report to
+    // Microsoft
+    Exit(False);
+  end;
+
+
   case LangID of
     LOCALE_CUSTOM_DEFAULT,
     LOCALE_CUSTOM_UNSPECIFIED,

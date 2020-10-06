@@ -5,7 +5,7 @@
 BOOL AddCompileString(LPSTR buf);
 BOOL AddCompileMessage(DWORD msg);
 
-#define SetError(err)       { if(AddCompileMessage(err)) return FALSE; }
+#define SetError(err)       { if(AddCompileMessage(err) || (err & (CERR_MEMORY|CERR_FATAL))) return FALSE; }
 #define AddWarning(warn)    { if(AddCompileMessage(warn)) return FALSE; }
 
 extern BOOL FWarnDeprecatedCode;

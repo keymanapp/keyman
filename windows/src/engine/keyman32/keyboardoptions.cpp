@@ -102,7 +102,7 @@ void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
     {
       if(r.ValueExists(kp->Keyboard->dpStoreArray[nStoreToReset].dpName))
       {
-        WCHAR val[255];
+        WCHAR val[256];
         if(!r.ReadString(kp->Keyboard->dpStoreArray[nStoreToReset].dpName, val, sizeof(val) / sizeof(val[0]))) return;
         if(!val[0]) return;
         val[255] = 0;

@@ -11,6 +11,7 @@ private:
   
 public:
   SharedBufferManager() {
+    m_pSharedData = NULL;
     m_hMMF = OpenFileMapping(FILE_MAP_READ, FALSE, GLOBAL_SHAREDBUFFER_FILE_MAPPING_NAME);
     if (!m_hMMF) {
       DebugLastError("OpenFileMapping");
