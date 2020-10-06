@@ -1,5 +1,5 @@
 /*
- * Unit tests for the priority queue.
+ * Unit tests for quote behaviors.
  */
 
 var assert = require('chai').assert;

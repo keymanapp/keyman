@@ -71,11 +71,15 @@ namespace models {
   export function transformToSuggestion(transform: Transform): Suggestion;
   export function transformToSuggestion(transform: Transform, p: number): Suggestion & {p: number}; 
   export function transformToSuggestion(transform: Transform, p?: number): Suggestion & {p?: number} {
-    return {
+    let suggestion: Suggestion & {p?: number} = {
       transform: transform,
       transformId: transform.id,
-      displayAs: transform.insert,
-      p: p
+      displayAs: transform.insert
     };
+
+    if(p === 0 || p) {
+      suggestion.p = p;
+    }
+    return suggestion;
   }
 }
