@@ -193,6 +193,11 @@ test-uiaccess:
 # * tar must be on path
 #
 
+!ifndef COVBUILD
+test-coverity:
+    echo Set variable COVBUILD to covbuild.exe
+    exit 1
+!else
 test-coverity:
     cd $(ROOT)\src
     if exist cov-int rd /s/q cov-int
@@ -218,6 +223,7 @@ test-coverity-internal:
     $(MAKE) build
     cd $(ROOT)\src\engine\mcompile
     $(MAKE) build
+!endif
 
 # Build a release
 

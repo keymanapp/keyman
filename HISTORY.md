@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 14.0.154 alpha 2020-10-05
+
+* fix(windows): Upgrading keyboards with transient profiles (#3637)
+* fix(windows): upgrading disabled keyboards (#3638)
+* fix(developer): coverity reports for compiler (#3640)
+* fix(windows): coverity reports for mcompile (#3641)
+* fix(windows): coverity reports for kmtip (#3642)
+* fix(windows): coverity reports for keyman32 (#3649)
+* chore: exclude parens if no scope in commit msg (#3653)
+
+## 14.0.153 alpha 2020-10-02
+
+* chore(deps): bump @actions/core from 1.2.2 to 1.2.6 in /resources/build/version (#3646)
+* fix(android/app): Switch system keyboard in KMPBrowserActivity (#3648)
+
 ## 14.0.152 alpha 2020-09-30
 
 * fix(ios/engine): package installation language-picker improvements (#3623)

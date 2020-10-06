@@ -172,18 +172,23 @@ BOOL NamedCodeConstants::LoadFile(const char *filename)
 
 void NamedCodeConstants::reindex()
 {
-	qsort(entries, nEntries, sizeof(NCCENTRY), sort_entries);
+  if (entries != NULL) {
+    qsort(entries, nEntries, sizeof(NCCENTRY), sort_entries);
+  }
 
 	char c = '.', d;
 	int i;
 
 	for(i = 0; i < 128; i++) chrindexes[i] = -1;
-	for(i = 0; i < nEntries; i++)
-	{
-		d = toupper(entries[i].name[0]);
-		if(d != c && d >= 32 && d <= 127) 
-			chrindexes[c = d] = i;
-	}
+
+  if (entries != NULL) {
+    for (i = 0; i < nEntries; i++)
+    {
+      d = toupper(entries[i].name[0]);
+      if (d != c && d >= 32 && d <= 127)
+        chrindexes[c = d] = i;
+    }
+  }
 }
 
 int NamedCodeConstants::GetCode(const char *codename, DWORD *storeIndex)

@@ -229,7 +229,7 @@ class ModelCompositor {
         }
 
         keepOption = models.transformToSuggestion(keepTransform, prediction.p);
-        keepOption = this.toAnnotatedKeepSuggestion(keepOption, true);
+        keepOption = this.toAnnotatedKeepSuggestion(keepOption, models.QuoteBehavior.noQuotes);
       } else {
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
@@ -296,25 +296,18 @@ class ModelCompositor {
     return suggestions;
   }
 
-  private toAnnotatedKeepSuggestion(suggestion: Suggestion & {p?: number}, noQuotes: boolean = false): Suggestion & {p?: number} {
-    let { open, close } = this.punctuation.quotesForKeepSuggestion;
-    
-    if(noQuotes) {
-      open = '';
-      close = '';
-    } else if(this.punctuation.isRTL) {
-      let temp = close;
-      close = open;
-      open = temp;
-    }
+  private toAnnotatedKeepSuggestion(suggestion: Suggestion & {p?: number}, 
+                                    quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Suggestion & {p?: number} {
+    // A method-internal 'import' of the enum.
+    let QuoteBehavior = models.QuoteBehavior;
 
     return {
       transform: suggestion.transform,
       transformId: suggestion.transformId,
-      displayAs: open + suggestion.displayAs + close,
+      displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, this.punctuation, QuoteBehavior.useQuotes),
       tag: 'keep',
       p: suggestion.p
-    }
+    };
   }
 
   /**

@@ -259,6 +259,9 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 AITIP::AITIP() {
   ::AIWin2000Unicode();   // I3574
 
+  FIsDebugControlWindow = FALSE;
+  useLegacy = FALSE;
+
 	WM_KEYMANDEBUG_CANDEBUG         = RegisterWindowMessage("WM_KEYMANDEBUG_CANDEBUG");
 	WM_KEYMANDEBUG_GETUNICODESTATUS = RegisterWindowMessage("WM_KEYMANDEBUG_GETUNICODESTATUS");
 	WM_KEYMANDEBUG_GETCONTEXT       = RegisterWindowMessage("WM_KEYMANDEBUG_GETCONTEXT");
@@ -548,7 +551,7 @@ BOOL AITIP::PostKeys() {
     SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::PostKeys: no output");
   }
 
-  delete OutBuf;   // I4272
+  delete[] OutBuf;   // I4272
 
 	QueueSize = 0;
 	return TRUE;
@@ -643,7 +646,7 @@ void FillStoreOffsets(AIDEBUGINFO *di)
 		if(n == MAXSTOREOFFSETS*2) break;
 	}
 
-	if(n < MAXSTOREOFFSETS*2)
+	if(n < MAXSTOREOFFSETS*2 - 1)
 		for(p = di->Rule->dpOutput; *p; p = incxstr(p))
 		{
 			if(*p == UC_SENTINEL && *(p+1) == CODE_INDEX)

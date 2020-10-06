@@ -96,7 +96,12 @@ function prepend_scope() {
     else
       postfix=""
     fi
-    prefix="$TYPE($SCOPE): $EXTRA_WHITESPACE"
+
+    if [ -z "$SCOPE" ]; then
+      prefix="$TYPE: $EXTRA_WHITESPACE"
+    else
+      prefix="$TYPE($SCOPE): $EXTRA_WHITESPACE"
+    fi
 
     # Reuse any existing message text, wrapping it in our conventional commit formatting before
     # presenting it to the user for any final edits.
