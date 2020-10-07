@@ -42,6 +42,9 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit
       ;;
+    -dry-run)
+      should_dry_run=1
+      ;;
     -test)
       run_tests=1
       install_dependencies=0
