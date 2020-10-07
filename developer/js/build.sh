@@ -82,12 +82,10 @@ done
 
 # Dry run settings
 if (( should_dry_run )); then
-  DRY_RUN="echo dry run:"
+  DRY_RUN=--dry-run
 else
   DRY_RUN=
 fi
-
-# We now ignore the version and tier strings.
 
 publish_version=`cat "$KEYMAN_ROOT/VERSION.md"`
 publish_tier=`cat "$KEYMAN_ROOT/TIER.md"`
@@ -149,5 +147,5 @@ if (( should_publish )); then
   # a package in the @keymanapp scope on the public npm package index.
   #
   # See `npm help publish` for more details.
-  $DRY_RUN npm publish --access public --tag "${npm_dist_tag:=latest}" || fail "Could not publish ${npm_dist_tag} release."
+  npm publish $DRY_RUN --access public --tag "${npm_dist_tag:=latest}" || fail "Could not publish ${npm_dist_tag} release."
 fi
