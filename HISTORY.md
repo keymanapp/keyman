@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.155 alpha 2020-10-07
+
+* refactor(common/models): centralizes suggestion & keep inits (#3645)
+* fix(common/models): predictions after typed whitespace (#3657)
+* fix(web): Fix how layer is separated from key name (#3659)
+
 ## 14.0.154 alpha 2020-10-05
 
 * fix(windows): Upgrading keyboards with transient profiles (#3637)

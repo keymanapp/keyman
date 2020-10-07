@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/models-types",
-  "version": "14.0.155",
+  "version": "14.0.156",
   "description": "Type definitions in used in the modeling (lexical model/predictive text) component of Keyman.",
   "types": "./index.d.ts",
   "scripts": {
