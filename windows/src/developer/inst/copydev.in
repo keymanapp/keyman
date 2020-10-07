@@ -73,9 +73,9 @@ heat-model-compiler:
     cd $(KEYMAN_MODELCOMPILER_ROOT)
 
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh -version "$VERSION" -tier "$(TIER)"
+    $(GIT_BASH_FOR_KEYMAN) build.sh
 !else
-    start /wait .\build.sh -version "$VERSION" -tier "$(TIER)"
+    start /wait .\build.sh
 !endif
     # We use `npm pack` to extract only the aspects of the model-compiler actually needed for distribution.
     # While we could use npm-bundle or similar, that adds extra, unwanted cruft; our approach gives us more
