@@ -40,7 +40,6 @@ class ModelCompositor {
   }
 
   private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): Distribution<Suggestion> {
-    let punctuation = this.punctuation;
     let returnedPredictions: Distribution<Suggestion> = [];
 
     for(let correction of corrections) {
@@ -66,12 +65,6 @@ class ModelCompositor {
         // the suggestion is accepted.
         if(preserveWhitespace) {
           models.prependTransform(pair.sample.transform, transform);
-        }
-        
-        // The model is trying to add a word; thus, add some custom formatting
-        // to that word.
-        if (pair.sample.transform.insert.length > 0) {
-          pair.sample.transform.insert += punctuation.insertAfterWord;
         }
 
         let prediction = {sample: pair.sample, p: pair.p * inputProb};
@@ -217,13 +210,18 @@ class ModelCompositor {
       let displayText = prediction.sample.displayAs;
 
       if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
-        keepOption = prediction.sample;
-        // Ensure we keep any original casing, etc that may have been stripped.
-        keepOption.transform.insert = keepOptionText + punctuation.insertAfterWord;
-        keepOption.displayAs = keepOptionText;
-        // Specifying 'keep' helps uses of the LMLayer find it quickly
-        // if/when desired.
-        keepOption.tag = 'keep';
+        // Preserve the original, pre-keyed version of the text.
+        let baseTransform = prediction.sample.transform;
+
+        let keepTransform = {
+          insert: keepOptionText,
+          deleteLeft: baseTransform.deleteLeft,
+          deleteRight: baseTransform.deleteRight,
+          id: baseTransform.id
+        }
+
+        keepOption = models.transformToSuggestion(keepTransform, prediction.p);
+        keepOption = this.toAnnotatedKeepSuggestion(keepOption, models.QuoteBehavior.noQuotes);
       } else {
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
@@ -236,32 +234,11 @@ class ModelCompositor {
 
     // Generate a default 'keep' option if one was not otherwise produced.
     if(!keepOption && keepOptionText != '') {
-      keepOption = {
-        displayAs: keepOptionText,
-        transformId: inputTransform.id,
-        // Replicate the original transform, modified for appropriate language insertion syntax.
-        transform: {
-          insert: inputTransform.insert + punctuation.insertAfterWord,
-          deleteLeft: inputTransform.deleteLeft,
-          deleteRight: inputTransform.deleteRight,
-          id: inputTransform.id
-        },
-        tag: 'keep'
-      };
-    }
+      let keepTransform = models.transformToSuggestion(inputTransform, 1);  // 1 is a filler value; goes unused b/c is for a 'keep'.
+      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
+      keepTransform.displayAs = keepOptionText;
 
-    // Add the surrounding quotes to the "keep" option's display string:
-    if (keepOption) {
-      let { open, close } = punctuation.quotesForKeepSuggestion;
-      
-      // Should we also ensure that we're using the default quote marks first?
-      // Or is it reasonable to say that the "left" mark is always the one
-      // called "open"?
-      if(!punctuation.isRTL) {
-        keepOption.displayAs = open + keepOption.displayAs + close;
-      } else {
-        keepOption.displayAs = close + keepOption.displayAs + open;
-      }
+      keepOption = this.toAnnotatedKeepSuggestion(keepTransform);
     }
 
     // Section 3:  Finalize suggestions, truncate list to the N (MAX_SUGGESTIONS) most optimal, return.
@@ -295,7 +272,29 @@ class ModelCompositor {
       suggestions = [ keepOption ].concat(suggestions);
     }
 
+    // Apply 'after word' punctuation.  We delay until now so that utility functions relying on the
+    // unmodified Transform may execute properly.
+    suggestions.forEach(function(suggestion) {
+      if (suggestion.transform.insert.length > 0) {
+        suggestion.transform.insert += punctuation.insertAfterWord;
+      }
+    });
+
     return suggestions;
+  }
+
+  private toAnnotatedKeepSuggestion(suggestion: Suggestion & {p?: number}, 
+                                    quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Suggestion & {p?: number} {
+    // A method-internal 'import' of the enum.
+    let QuoteBehavior = models.QuoteBehavior;
+
+    return {
+      transform: suggestion.transform,
+      transformId: suggestion.transformId,
+      displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, this.punctuation, QuoteBehavior.useQuotes),
+      tag: 'keep',
+      p: suggestion.p
+    };
   }
 
   /**

@@ -2,6 +2,8 @@
  * Integration tests for the model compositor with the trie model.
  */
 
+const { models } = require('../../build/intermediate');
+
 var assert = require('chai').assert;
 var TrieModel = require('../../build/intermediate').models.TrieModel;
 var ModelCompositor = require('../../build/intermediate').ModelCompositor;
@@ -65,5 +67,71 @@ describe('ModelCompositor', function() {
     assert.isBelow(theSuggestion.p, 1.0);
     // 'the' should be the intended the result here.
     assert.isAbove(theSuggestion.p, thrSuggestion.p);
+  });
+
+  // The nomenclature's a minor sneak-peek from child PRs.
+  describe('toAnnotatedSuggestion', function() {
+    let baseSuggestion = {
+      transform: {
+        insert: 'hello',
+        deleteLeft: 0,
+        id: 0
+      },
+      transformId: 0,
+      displayAs: 'hello'
+    };
+
+    let englishPunctuation = {
+      quotesForKeepSuggestion: { open: `“`, close: `”`},
+      insertAfterWord: ' '
+    };
+
+    let angledPunctuation = {
+      quotesForKeepSuggestion: { open: `«`, close: `»`},
+      insertAfterWord: " "
+    }
+
+    describe("'keep'", function() {
+      let annotationTest = function(punctuation, displayText, quoteStyle) {
+        let options = {
+          punctuation: punctuation
+        };
+  
+        let model = new models.DummyModel(options);
+        let compositor = new ModelCompositor(model);
+  
+        var keep;
+        if(quoteStyle) {
+          keep = compositor.toAnnotatedKeepSuggestion(baseSuggestion, quoteStyle);
+        } else {
+          keep = compositor.toAnnotatedKeepSuggestion(baseSuggestion);
+        }
+
+        // Make sure we didn't accidentally leak any mutations to the parameter.
+        assert.notDeepEqual(keep, baseSuggestion);
+  
+        assert.equal(keep.displayAs, displayText);
+        assert.equal(keep.tag, 'keep');
+      }
+
+      it('quoteBehavior: (.default)', function() {
+        annotationTest(englishPunctuation, "“hello”");
+        annotationTest(angledPunctuation, "«hello»");
+      });
+
+      it('quoteBehavior: .useQuotes', function() {
+        annotationTest(englishPunctuation, "“hello”", models.QuoteBehavior.useQuotes);
+        annotationTest(angledPunctuation, "«hello»", models.QuoteBehavior.useQuotes);
+      });
+
+      it('quoteBehavior: .noQuotes', function() {
+        annotationTest(englishPunctuation, "hello", models.QuoteBehavior.noQuotes);
+        annotationTest(angledPunctuation, "hello", models.QuoteBehavior.noQuotes);
+      });
+
+      it.skip('RTL test', function() {
+        // TODO:
+      });
+    });
   });
 });
