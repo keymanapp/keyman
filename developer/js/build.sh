@@ -24,79 +24,73 @@ build () {
 }
 
 display_usage ( ) {
-  echo "Usage: $0 [-test] [-version version] [-tier tier]"
+  echo "Usage: $0 [-test] [-publish-to-npm]"
   echo "       $0 -help"
   echo
   echo "  -help               displays this screen and exits"
-  echo "  -version version    sets the package version before building"
   echo "  -test               runs unit tests after building"
   echo "  -tdd                runs unit tests WITHOUT building"
   echo "  -publish-to-npm     publishes the current version to the npm package index"
-  echo "  -tier tier          also sets the package version tier and npm tag (alpha, beta, stable) before building or publishing"
-  echo "                      If version has 4 components, only first three are used."
+  echo "  -dry-run            do build, etc, but don't actually publish"
 }
 
 ################################ Main script ################################
 
 run_tests=0
 install_dependencies=1
-publish_version=
-publish_tier=
-lastkey=
 should_publish=0
 npm_dist_tag=
+should_dry_run=0
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
   key="$1"
-  if [[ -z "$lastkey" ]]; then
-    case $key in
-      -help|-h)
-        display_usage
-        exit
-        ;;
-      -skip-package-install|-S)
-        install_dependencies=0
-        ;;
-      -test)
-        run_tests=1
-        ;;
-      -tdd)
-        run_tests=1
-        install_dependencies=0
-        ;;
-      -version)
-        lastkey=$key
-        ;;
-      -tier)
-        lastkey=$key
-        ;;
-      -publish-to-npm)
-        should_publish=1
-        ;;
-      *)
-        echo "$0: invalid option: $key"
-        display_usage
-        exit $EX_USAGE
-    esac
-  else
-    case $lastkey in
-      -version)
-        publish_version=$key
-        ;;
-      -tier)
-        publish_tier=$key
-        ;;
-      *)
-        # Should be impossible to reach ;-)
-        echo "$0: invalid option: $lastkey"
-        display_usage
-        exit $EX_USAGE
-    esac
-    lastkey=
-  fi
+  case $key in
+    -help|-h)
+      display_usage
+      exit
+      ;;
+    -dry-run)
+      should_dry_run=1
+      ;;
+    -skip-package-install|-S)
+      install_dependencies=0
+      ;;
+    -test)
+      run_tests=1
+      ;;
+    -tdd)
+      run_tests=1
+      install_dependencies=0
+      ;;
+    -version)
+      echo "Warning: -version is now ignored"
+      ;;
+    -tier)
+      echo "Warning: -tier is now ignored"
+      ;;
+    -publish-to-npm)
+      should_publish=1
+      ;;
+    *)
+      echo "$0: invalid option: $key"
+      display_usage
+      exit $EX_USAGE
+  esac
   shift # past the processed argument
 done
+
+# Dry run settings
+if (( should_dry_run )); then
+  DRY_RUN="echo dry run:"
+else
+  DRY_RUN=
+fi
+
+# We now ignore the version and tier strings.
+
+publish_version=`cat "$KEYMAN_ROOT/VERSION.md"`
+publish_tier=`cat "$KEYMAN_ROOT/TIER.md"`
 
 # Validate the publish_version
 if [ ! -z "$publish_version" ]; then
@@ -155,5 +149,5 @@ if (( should_publish )); then
   # a package in the @keymanapp scope on the public npm package index.
   #
   # See `npm help publish` for more details.
-  npm publish --access public --tag "${npm_dist_tag:=latest}" || fail "Could not publish ${npm_dist_tag} release."
+  $DRY_RUN npm publish --access public --tag "${npm_dist_tag:=latest}" || fail "Could not publish ${npm_dist_tag} release."
 fi
