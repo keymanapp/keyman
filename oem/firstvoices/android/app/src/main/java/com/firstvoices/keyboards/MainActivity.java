@@ -10,8 +10,6 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.crashlytics.android.Crashlytics;
-import io.fabric.sdk.android.Fabric;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.*;
@@ -22,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
         new FVShared(this);
