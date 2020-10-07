@@ -284,6 +284,7 @@ class ModelCompositor {
 
     // Apply 'after word' punctuation and set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    let compositor = this;
     suggestions.forEach(function(suggestion) {
       if (suggestion.transform.insert.length > 0) {
         suggestion.transform.insert += punctuation.insertAfterWord;
