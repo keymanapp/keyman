@@ -289,6 +289,7 @@ class ModelCompositor {
         // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
         if(prefixTransform) {
           let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
+          mergedTransform.id = suggestion.transformId;
 
           // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
           // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
