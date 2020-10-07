@@ -371,12 +371,12 @@ class ModelCompositor {
       deleteLeft: insertedLength
     };
 
-    // The code above restores the state to the context at the time the `Suggestion` was created.
-    // `postTransform` handles any missing context that came later.
-    reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
-
     // Step 2:  building the proper 'displayAs' string for the Reversion
     if(postTransform) {
+      // The code above restores the state to the context at the time the `Suggestion` was created.
+      // `postTransform` handles any missing context that came later.
+      reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
+
       // Now that we've built the reversion based upon the Suggestion's original context,
       // we may safely manipulate it in order to get a proper 'displayAs' string.
       context = models.applyTransform(postTransform, context);
