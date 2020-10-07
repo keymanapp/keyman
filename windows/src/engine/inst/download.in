@@ -8,8 +8,8 @@ default:
   echo Please don't call this file directly -- used by Makefile
 
 copyredist:
-  -mkdir $(ROOT)\release\$VERSION
-  copy /Y $(ROOT)\src\engine\inst\keymanengine.msm $(ROOT)\release\$VERSION\keymanengine-$VERSION.msm
+  -mkdir $(ROOT)\release\$Version
+  copy /Y $(ROOT)\src\engine\inst\keymanengine.msm $(ROOT)\release\$Version\keymanengine-$VersionWithTag.msm
 
 prepareredist:
   rem
@@ -18,4 +18,4 @@ clean:
   rem
 
 candle:
-  $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -ext WixUtilExtension keymanengine.wxs components.wxs
+  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -ext WixUtilExtension keymanengine.wxs components.wxs

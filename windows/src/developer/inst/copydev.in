@@ -1,7 +1,7 @@
 !include ..\..\Defines.mak
 
 ##
-## In this file, $VERSION and $RELEASE will be replaced by mkver. These are not
+## In this file, $Version, $VersionWin and $VersionRelease will be replaced by mkver. These are not
 ## Make variables, but mkver variables.
 ##
 
@@ -22,19 +22,19 @@ KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
 KEYMAN_MODELCOMPILER_ROOT=$(KEYMAN_ROOT)\developer\js
 
 copykmdev: makeinstaller
-    -mkdir $(ROOT)\release\$VERSION
-    copy /Y $(ROOT)\src\developer\inst\keymandeveloper.msi $(ROOT)\release\$VERSION\keymandeveloper.msi
-    copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$VERSION.exe $(ROOT)\release\$VERSION\keymandeveloper-$VERSION.exe
+    -mkdir $(ROOT)\release\$Version
+    copy /Y $(ROOT)\src\developer\inst\keymandeveloper.msi $(ROOT)\release\$Version\keymandeveloper.msi
+    copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$VersionWithTag.exe $(ROOT)\release\$Version\keymandeveloper-$VersionWithTag.exe
 
 test-releaseexists:
-    if exist $(ROOT)\release\$VERSION\keymandeveloper*.msi echo. & echo Release $VERSION already exists. Delete it or update src\version.txt and try again & exit 1
+    if exist $(ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update src\version.txt and try again & exit 1
 
 candle: heat-cef heat-xml heat-templates heat-model-compiler
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE kmdev.wxs
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease kmdev.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
 
 clean-heat: clean-heat-model-compiler
 
@@ -141,9 +141,9 @@ clean-heat-model-compiler:
 makeinstaller:
     cd $(ROOT)\src\developer\inst
     echo [Setup] > setup.inf
-    echo Version=$VERSION >> setup.inf
+    echo Version=$Version >> setup.inf
     echo MSIFileName=keymandeveloper.msi >> setup.inf
-    echo Title=Keyman Developer $RELEASE >>setup.inf
+    echo Title=Keyman Developer $VersionRelease >>setup.inf
     $(WZZIP) setup.zip keymandeveloper.msi setup.inf
-    copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$VERSION.exe
-    $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$VERSION.exe
+    copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$VersionWithTag.exe
+    $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$VersionWithTag.exe
