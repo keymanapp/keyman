@@ -21,12 +21,14 @@
     "@keymanapp/resources-gosh": "^14.0.155",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
+    "mocha-teamcity-reporter": "^3.0.0",
     "typescript": "^3.8.3"
   },
   "scripts": {
     "lerna": "cd ../ && npm run lerna --",
     "tsc": "tsc",
-    "test": "gosh ./unit_tests/test.sh"
+    "test": "gosh ./test.sh",
+    "mocha": "mocha"
   },
   "dependencies": {
     "@keymanapp/keyboard-processor": "^14.0.155",

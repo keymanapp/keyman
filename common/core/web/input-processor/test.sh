@@ -57,12 +57,11 @@ test-headless ( ) {
   npm run mocha -- --recursive $FLAGS ./tests/cases/
 }
 
-# Build test dependency
-pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
-./build.sh -skip-package-install || fail "recorder-core compilation failed."
+# First, run tests on the keyboard processor.
+pushd $WORKING_DIRECTORY/node_modules/@keymanapp/keyboard-processor
+./test.sh -skip-package-install || fail "Tests failed by dependencies; aborting integration tests."
 popd
 
-# Run headless (browserless) tests.
-echo "${TERM_HEADING}Running Keyboard Processor test suite${NORMAL}"
-test-headless || fail "Keyboard Processor tests failed!"
-
+# Now we run our local tests.
+echo "${TERM_HEADING}Running Input Processor test suite${NORMAL}"
+test-headless || fail "Input Processor tests failed!"

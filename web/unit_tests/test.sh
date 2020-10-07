@@ -125,9 +125,8 @@ cd ../tools/recorder
 # Run our headless tests first.
 # Since we're using `lerna`, this actually puts us within the projects when run in-repo!
 
-# First:  Keyboard Processor tests.
-echo "${TERM_HEADING}Running Keyboard Processor test suite${NORMAL}"
-pushd $WORKING_DIRECTORY/node_modules/@keymanapp/keyboard-processor
+# First:  Web-core tests.
+pushd $WORKING_DIRECTORY/node_modules/@keymanapp/input-processor
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd
