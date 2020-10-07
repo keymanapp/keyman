@@ -76,11 +76,8 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.3.1'
 
     /* We only want these Firebase Crashlytics dependencies for KMEA */
-    implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.google.firebase:firebase-analytics:17.6.0'
     implementation 'com.google.firebase:firebase-crash:16.2.1'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
 
     // Generate QR Codes
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
