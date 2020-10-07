@@ -319,7 +319,8 @@ namespace correction {
       this.completedPaths = [this.rootNode];
 
       // Adds a base level queue to handle initial insertions.
-      let baseTier = new SearchSpaceTier(0, this.rootNode.buildInsertionEdges());
+      // Start with _just_ the root node.  Necessary for proper empty-token, empty-input handling!
+      let baseTier = new SearchSpaceTier(0, [this.rootNode]);
       this.tierOrdering.push(baseTier);
       this.selectionQueue.enqueue(baseTier);
     }
