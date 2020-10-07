@@ -310,7 +310,7 @@ class ModelCompositor {
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(contextState) {
-      contextState.tokens[contextState.tokens.length - 1].replacements = suggestions.map(function(suggestion) {
+      contextState.tail.replacements = suggestions.map(function(suggestion) {
         return {
           suggestion: suggestion,
           tokenWidth: 1
@@ -420,9 +420,8 @@ class ModelCompositor {
       if(!contextState) {
         contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
       }
-      let lastToken = contextState.tokens[contextState.tokens.length - 1];
       
-      lastToken.activeReplacementId = suggestion.id;
+      contextState.tail.activeReplacementId = suggestion.id;
       let acceptedContext = models.applyTransform(suggestion.transform, context);
       this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
     }

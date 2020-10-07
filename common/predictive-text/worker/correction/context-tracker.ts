@@ -90,6 +90,14 @@ namespace correction {
       }
     }
 
+    get head(): TrackedContextToken {
+      return this.tokens[0];
+    }
+
+    get tail(): TrackedContextToken {
+      return this.tokens[this.tokens.length - 1];
+    }
+
     popHead() {
       this.tokens.splice(0, 2);
       this.indexOffset -= 1;
@@ -121,7 +129,7 @@ namespace correction {
     }
 
     updateTail(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
-      let editedToken = this.tokens[this.tokens.length - 1];
+      let editedToken = this.tail;
       
       // Preserve existing text if new text isn't specified.
       tokenText = tokenText || (tokenText === '' ? '' : editedToken.raw);
@@ -284,7 +292,7 @@ namespace correction {
         if(ignorePenultimateMatch) {
           // For this case, we were likely called by ModelCompositor.acceptSuggestion(), which
           // would have marked the accepted suggestion.
-          matchState.tokens[matchState.tokens.length - 1].replacementText = tokenizedContext[tokenizedContext.length-2];
+          matchState.tail.replacementText = tokenizedContext[tokenizedContext.length-2];
         }
 
         state = new TrackedContextState(matchState);
