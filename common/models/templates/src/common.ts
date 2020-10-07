@@ -50,7 +50,7 @@ namespace models {
       deleteLeft: first.deleteLeft + mergedSecondDelete,
       // As `first` would affect the context before `second` could take effect,
       // this is the correct way to merge `deleteRight`.
-      deleteRight: (first.deleteRight || 0) + second.deleteRight
+      deleteRight: (first.deleteRight || 0) + (second.deleteRight || 0)
     }
   }
 

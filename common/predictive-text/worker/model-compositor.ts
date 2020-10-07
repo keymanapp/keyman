@@ -284,7 +284,6 @@ class ModelCompositor {
 
     // Apply 'after word' punctuation and set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
-    let compositor = this;
     suggestions.forEach(function(suggestion) {
       if (suggestion.transform.insert.length > 0) {
         suggestion.transform.insert += punctuation.insertAfterWord;
@@ -292,11 +291,14 @@ class ModelCompositor {
         // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
         if(prefixTransform) {
           let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
+          mergedTransform.id = suggestion.transformId;
 
-          // Cannot directly re-assign b/c `pair.sample.transform` is `readonly`.
-          suggestion.transform.insert = mergedTransform.insert;
-          suggestion.transform.deleteLeft = mergedTransform.deleteLeft;
-          suggestion.transform.deleteRight = mergedTransform.deleteRight;
+          // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
+          // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
+          let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
+          
+          // Assignment via by-reference behavior, as suggestion is an object
+          mutableSuggestion.transform = mergedTransform;
         }
       }
 
@@ -379,13 +381,13 @@ class ModelCompositor {
       deleteLeft: insertedLength
     };
 
-    // The code above restores the state to the context at the time the `Suggestion` was created.
-    // `postTransform` handles any missing context that came later.
-    reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
-
     // Step 2:  building the proper 'displayAs' string for the Reversion
     let postContext = context;
     if(postTransform) {
+      // The code above restores the state to the context at the time the `Suggestion` was created.
+      // `postTransform` handles any missing context that came later.
+      reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
+
       // Now that we've built the reversion based upon the Suggestion's original context,
       // we manipulate it in order to get a proper 'displayAs' string.
       postContext = models.applyTransform(postTransform, postContext);
