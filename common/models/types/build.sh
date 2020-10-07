@@ -32,6 +32,7 @@ run_tests=0
 install_dependencies=1
 should_publish=0
 npm_dist_tag=
+should_dry_run=0
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
