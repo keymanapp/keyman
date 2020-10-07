@@ -14,6 +14,7 @@
     <ProjectGuid>{A4DF65F2-7C94-4CE9-93CD-625641B056B5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>importkeyboard</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
