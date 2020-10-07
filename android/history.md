@@ -1,5 +1,11 @@
 # Keyman for Android Version History
 
+## 2020-10-07 13.0.6219 stable
+* Bug fix:
+  * Fix how layer is separated from key name (updated Keyman Web Engine #3674)
+* Change:
+  * Remove deprecated Crashlytics SDK from build (#3674)
+
 ## 2020-09-02 13.0.6218 stable
 * Bug fix:
   * Dismiss notifications when touched (#3548)
