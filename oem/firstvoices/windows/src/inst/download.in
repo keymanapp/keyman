@@ -20,5 +20,5 @@ clean:
 
 candle-desktop:
   $(WIXHEAT) dir ..\xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
-  $(WIXCANDLE) -dOEMNAME="$(OEMNAME)" -dPRODUCTNAME="$(PRODUCTNAME)" -dROOT="$(ROOT)" -dVERSION=$VersionWin -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\xml firstvoices.wxs desktopui.wxs
+  $(WIXCANDLE) -dOEMNAME="$(OEMNAME)" -dPRODUCTNAME="$(PRODUCTNAME)" -dROOT="$(ROOT)" -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\xml firstvoices.wxs desktopui.wxs
 

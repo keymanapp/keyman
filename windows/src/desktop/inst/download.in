@@ -31,7 +31,7 @@ candle: candle-desktop candle-cef candle-locale
 
 candle-desktop:
   $(WIXHEAT) dir ..\kmshell\xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
-  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\kmshell\xml keymandesktop.wxs desktopui.wxs
+  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\kmshell\xml keymandesktop.wxs desktopui.wxs
 
 #
 # Chromium Embedded Framework
@@ -47,7 +47,7 @@ heat-cef:
   -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
 
 candle-cef: heat-cef
-  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
+  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
 
 #
 # Locale files
@@ -56,4 +56,4 @@ candle-cef: heat-cef
 candle-locale:
   # locale files are in desktop/locale/*
   $(WIXHEAT) dir ..\kmshell\locale -o locale.wxs -ag -cg Locale -dr INSTALLDIR -var var.LOCALESOURCE -wx -nologo
-  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 -dLOCALESOURCE=..\kmshell\locale locale.wxs
+  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dLOCALESOURCE=..\kmshell\locale locale.wxs

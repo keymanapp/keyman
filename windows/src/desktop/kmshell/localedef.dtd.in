@@ -1,7 +1,7 @@
   <!ENTITY Company "">
   <!ENTITY ProductName "Keyman Desktop">
   <!ENTITY Edition "">
-  <!ENTITY Version "$RELEASE">
+  <!ENTITY Version "$VersionRelease">
   
   <!ENTITY EvaluationPeriod "30">
 
