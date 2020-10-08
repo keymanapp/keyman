@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.157 alpha 2020-10-08
+
+* fix(windows): show version with tag in setup (#3682)
+* fix(windows): keyman desktop setup filename (#3684)
+
 ## 14.0.156 alpha 2020-10-08
 
 * chore(windows): Move to Windows SDK 10.0.17763.0 (#3654)
