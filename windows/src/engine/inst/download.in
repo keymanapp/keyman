@@ -9,7 +9,7 @@ default:
 
 copyredist:
   -mkdir $(ROOT)\release\$Version
-  copy /Y $(ROOT)\src\engine\inst\keymanengine.msm $(ROOT)\release\$Version\keymanengine-$VersionWithTag.msm
+  copy /Y $(ROOT)\src\engine\inst\keymanengine.msm $(ROOT)\release\$Version\keymanengine-$Version.msm
 
 prepareredist:
   rem

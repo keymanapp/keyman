@@ -10,7 +10,7 @@ default:
 copyredist-desktop:
   -mkdir $(ROOT)\release\$Version
   copy /Y firstvoices.msi $(ROOT)\release\$Version\firstvoices.msi
-  copy /Y firstvoices.exe $(ROOT)\release\$Version\firstvoices-$VersionWithTag.exe
+  copy /Y firstvoices.exe $(ROOT)\release\$Version\firstvoices-$Version.exe
 
 prepareredist:
   rem prepareredist

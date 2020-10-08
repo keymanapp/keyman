@@ -120,6 +120,7 @@
 
 # /developer/inst/
 /windows/src/developer/inst/*.wixpdb
+/windows/src/developer/inst/download.mak
 /windows/src/developer/inst/copydev.mak
 
 # /developer/kmcmpdll/
