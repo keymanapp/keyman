@@ -341,7 +341,7 @@ class ModelCompositor {
     return {
       transform: suggestion.transform,
       transformId: suggestion.transformId,
-      displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, this.punctuation, QuoteBehavior.useQuotes),
+      displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, this.punctuation, defaultQuoteBehavior),
       tag: annotationType,
       p: suggestion.p
     };

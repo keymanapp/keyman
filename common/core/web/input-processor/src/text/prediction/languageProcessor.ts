@@ -186,7 +186,7 @@ namespace com.keyman.text.prediction {
       return this.predict_internal(transcription);
     }
 
-    public applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget): Promise<Suggestion> {
+    public applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget): Promise<Reversion> {
       if(!outputTarget) {
         throw "Accepting suggestions requires a destination OutputTarget instance."
       }
