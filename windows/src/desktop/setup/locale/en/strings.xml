@@ -55,6 +55,9 @@ Restart now?</string>
   <string name="ssOptionsUpgradeKeyboards">Upgrade keyboards installed with older versions to version $VERSION</string>
   <string name="ssOptionsAutomaticallyReportUsage">Share anonymous usage statistics with keyman.com</string>
 
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup version: %0:s</string>
+
   <!-- Parameters: %0:s: version -->
   <string name="ssOptionsInstallKeyman">Install $APPNAME %0:s</string>
 

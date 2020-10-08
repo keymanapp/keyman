@@ -85,6 +85,8 @@ type
     ssOptionsPackageLanguageAssociation,
     ssOptionsDefaultLanguage,
 
+    ssInstallerVersion,
+
     { Download dialog }
 
     ssDownloadingTitle,
