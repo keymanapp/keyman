@@ -1,7 +1,7 @@
 !include ..\..\Defines.mak
 
 ##
-## In this file, $Version, $VersionWin, $VersionRelease and $Version will be replaced by mkver. These are not
+## In this file, $Version, $VersionWin, and $VersionRelease will be replaced by mkver. These are not
 ## Make variables, but mkver variables.
 ##
 
