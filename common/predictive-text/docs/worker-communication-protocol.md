@@ -480,13 +480,24 @@ of this sequence of events:
 
 1. A user has just selected the `suggestion` as valid.
 2. The keystroke triggering the `suggestion` has NOT been committed to 
-   the `context`.
+   the `context`.  Its Transform data is sent as the `postTransform`
+   parameter.  (The "post" nomenclature component signifies that 
+   `postTransform` comes temporally "after" this context state.)
 3. Before the user inputs any additional keystrokes, which would trigger
    new suggestions.
 
-Use of the `postTransform` parameter facilitates including the `suggestion`-
-triggering keystroke's `transform` as part of the corresponding `reversion`
-necessary to revert acceptance of the `suggestion`.
+The `postTransform` parameter allows the base keystroke, which has **NOT**
+been applied to the provided `context`, to be restored by the `reversion` 
+that undoes acceptance of the `suggestion`.  
+
+For reference, compare this to the ["Message: `predict`" section](#message-predict)
+For Suggestions returned by a `predict`->`suggestions` message sequence:
+
+* `predict`'s `context` there should match `context` here.
+* `predict`'s `transform` there should match `postTransform` here.
+
+These serve as a snapshot in time of the state in which the Suggestion was
+generated.
 
 ### Message: `postaccept`
 
