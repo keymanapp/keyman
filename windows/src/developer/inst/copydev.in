@@ -27,7 +27,7 @@ copykmdev: makeinstaller
     copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$VersionWithTag.exe $(ROOT)\release\$Version\keymandeveloper-$VersionWithTag.exe
 
 test-releaseexists:
-    if exist $(ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update src\version.txt and try again & exit 1
+    if exist $(ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update VERSION.md and try again & exit 1
 
 candle: heat-cef heat-xml heat-templates heat-model-compiler
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease kmdev.wxs
