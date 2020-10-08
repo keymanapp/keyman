@@ -100,9 +100,9 @@ interface PostAcceptMessage {
   token: Token;
 
   /**
-   * A 'Suggestion' that will return the context to its prior state.
+   * A 'Reversion' that will return the context to its prior state.
    */
-  reversion: Suggestion;
+  reversion: Reversion;
 }
 
 /**
