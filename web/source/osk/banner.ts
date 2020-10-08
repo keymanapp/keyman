@@ -251,21 +251,18 @@ namespace com.keyman.osk {
         return null;
       }
       
-      // Find the state of the context at the time the prediction-triggering keystroke was applied.
-      let original = keyman.core.languageProcessor.getPredictionState(this._suggestion.transformId);
-      if(!original) {
-        console.warn("Could not apply the Suggestion!");
+      if(!target) {
+        /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate 
+          * everything if/when the active `OutputTarget` changes, though we haven't gotten that 
+          * far in implementation yet.
+          */
+        target = dom.Utils.getOutputTarget();
+      }
+
+      if(this._suggestion.tag == 'revert') {
+        keyman.core.languageProcessor.applyReversion(this._suggestion as Reversion, target);
         return null;
       } else {
-        if(!target) {
-          /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate 
-           * everything if/when the active `OutputTarget` changes, though we haven't gotten that 
-           * far in implementation yet.
-           */
-          target = dom.Utils.getOutputTarget();
-        }
-
-        // Apply the Suggestion!
         return keyman.core.languageProcessor.applySuggestion(this.suggestion, target);
       }
     }
@@ -539,7 +536,6 @@ namespace com.keyman.osk {
     private recentAccepted: Suggestion;
     private revertAcceptancePromise: Promise<Reversion>;
 
-    private preAccept: text.Transcription = null;
     private swallowPrediction: boolean = false;
 
     private previousSuggestions: Suggestion[];
@@ -558,16 +554,23 @@ namespace com.keyman.osk {
     private doAccept(suggestion: BannerSuggestion) {
       let _this = this;
 
-      let keyman = com.keyman.singleton;
       this.revertAcceptancePromise = suggestion.apply();
       if(!this.revertAcceptancePromise) {
+        // We get here either if suggestion acceptance fails or if it was a reversion.
+        if(suggestion.suggestion.tag == 'revert') {
+          // Reversion state management
+          this.recentAccept = false;
+          this.doRevert = false;
+          this.recentRevert = true;
+
+          this.doUpdate();
+        }
         return;
       }
 
       this.revertAcceptancePromise.then(function(suggestion) {
         // Always null-check!
         if(suggestion) {
-          _this.preAccept = keyman.core.languageProcessor.getPredictionState(suggestion.transformId);
           _this.revertSuggestion = suggestion;
         }
       });
@@ -592,26 +595,6 @@ namespace com.keyman.osk {
     }
 
     private _applyReversion: () => void = function(this: SuggestionManager): void {
-      let keyman = com.keyman.singleton;
-
-      let current = dom.Utils.getOutputTarget();
-      let priorState = this.preAccept;
-
-      // Step 1:  construct the reverted state.
-      let target = text.Mock.from(priorState.preInput);
-      target.apply(priorState.transform);
-
-      // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
-      // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
-      // values as needed for use with their IME interfaces.
-      let transform = target.buildTransformFrom(current);
-      current.apply(transform);
-
-      // Signal the necessary text changes to the embedding app, if it exists.
-      if(keyman['oninserttext'] && keyman.isEmbedded) {
-        keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
-      }
-
       this.currentSuggestions = this.previousSuggestions; // Restore to the previous state's Suggestion list.
       this.currentTranscriptionID = this.previousTranscriptionID;
 
@@ -621,12 +604,6 @@ namespace com.keyman.osk {
         this.rejectedSuggestions.push(this.recentAccepted);
         this.currentSuggestions.splice(rejectIndex, 1); // removes this.recentAccepted from this.currentSuggestions.
       }
-
-      // Other state maintenance
-      this.recentAccept = false;
-      this.doRevert = false;
-      this.recentRevert = true;
-      this.doUpdate();
     }.bind(this);
 
     /**

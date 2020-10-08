@@ -209,7 +209,6 @@ namespace com.keyman.text.prediction {
         // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
         // values as needed for use with their IME interfaces.
         let transform = final.buildTransformFrom(outputTarget);
-        let wordbreakPromise = this.wordbreak(outputTarget); // Also build the display string for the reversion.
         outputTarget.apply(transform);
 
         // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
@@ -254,6 +253,44 @@ namespace com.keyman.text.prediction {
       }
     }
 
+    public applyReversion(reversion: Reversion, outputTarget: OutputTarget) {
+      if(!outputTarget) {
+        throw "Accepting suggestions requires a destination OutputTarget instance."
+      }
+      
+      // Find the state of the context at the time the suggestion was generated.
+      // This may refer to the context before an input keystroke or before application
+      // of a predictive suggestion.
+      let original = this.getPredictionState(reversion.transformId);
+      if(!original) {
+        console.warn("Could not apply the Suggestion!");
+        return;
+      }
+      
+      // Apply the Reversion!
+
+      // Step 1:  determine the final output text
+      let final = text.Mock.from(original.preInput);
+      final.apply(reversion.transform);
+
+      // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
+      // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
+      // values as needed for use with their IME interfaces.
+      let transform = final.buildTransformFrom(outputTarget);
+      outputTarget.apply(transform);
+
+      let promise = this.lmEngine.revertSuggestion(reversion, new TranscriptionContext(original.preInput, this.configuration))
+
+      let lp = this;
+      return promise.then(function(suggestions: Suggestion[]) {
+        let result = new ReadySuggestions(suggestions, transform.id);
+        lp.emit("suggestionsready", result);
+        lp.currentPromise = null;
+
+        return suggestions;
+      });
+    }
+
     public predictFromTarget(outputTarget: OutputTarget): Promise<Suggestion[]> {
       if(!outputTarget) {
         return null;
@@ -288,7 +325,7 @@ namespace com.keyman.text.prediction {
         }
 
         return suggestions;
-      })
+      });
     }
 
     private recordTranscription(transcription: Transcription) {
