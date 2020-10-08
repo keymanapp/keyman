@@ -30,8 +30,8 @@ type Token = number;
 /**
  * The valid outgoing message kinds.
  */
-type OutgoingMessageKind = 'error' | 'ready' | 'suggestions' | 'currentword' | 'postaccept';
-type OutgoingMessage = ErrorMessage | ReadyMessage | SuggestionMessage | CurrentWordMessage | PostAcceptMessage;
+type OutgoingMessageKind = 'error' | 'ready' | 'suggestions' | 'currentword' | 'postaccept' | 'postrevert';
+type OutgoingMessage = ErrorMessage | ReadyMessage | SuggestionMessage | CurrentWordMessage | PostAcceptMessage | PostRevertMessage;
 
 interface ErrorMessage {
   message: 'error';
@@ -95,7 +95,7 @@ interface PostAcceptMessage {
 
   /**
    * Opaque, unique token that pairs this message
-   * with the wordbreak message that initiated it.
+   * with the accept message that initiated it.
    */
   token: Token;
 
@@ -103,6 +103,22 @@ interface PostAcceptMessage {
    * A 'Reversion' that will return the context to its prior state.
    */
   reversion: Reversion;
+}
+
+interface PostRevertMessage {
+  message: 'postrevert';
+
+  /**
+   * Opaque, unique token that pairs this message
+   * with the revert message that initiated it.
+   */
+  token: Token;
+
+  /**
+   * The original set of Suggestions returned that included the
+   * reverted Suggestion
+   */
+  suggestions: Suggestion[];
 }
 
 /**

@@ -128,6 +128,8 @@ Message       | Direction          | Parameters          | Expected reply      |
 `accept`      | keyboard → LMLayer | suggestion,         | Yes - `postaccept`  | Yes
                                    | context, transform  |                     |
 `postaccept`  | LMLayer → keyboard | reversion           | No                  | Yes
+`revert`      | keyboard → LMLayer | reversion, context  | Yes - `reversion`   | Yes
+`postrevert`  | LMLayer → keyboard | suggestions         | No                  | Yes
               
 
 ### Message: `config`
