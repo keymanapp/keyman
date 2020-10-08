@@ -398,8 +398,15 @@ describe('Correction Distance Modeler', function() {
       let iter = searchSpace.getBestMatches();
 
       // While there's no input, insertion operations can produce suggestions.
-      let results = iter.next();
-      assert.isFalse(results.done);
+      let resultState = iter.next();
+      let results = resultState.value;
+
+      // Just one suggestion should be returned.
+      assert.equal(results.length, 1);
+      assert.equal(results[0].totalCost, 0);             // Gives a perfect match
+      assert.equal(results[0].inputSequence.length, 0);  // for a state with no input and 
+      assert.equal(results[0].matchString, '');          // an empty match string.
+      assert.isFalse(resultState.done);
     });
   });
 });

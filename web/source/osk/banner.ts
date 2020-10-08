@@ -266,7 +266,7 @@ namespace com.keyman.osk {
         }
 
         // Apply the Suggestion!
-        return keyman.core.languageProcessor.acceptSuggestion(this.suggestion, target);
+        return keyman.core.languageProcessor.applySuggestion(this.suggestion, target);
       }
     }
 

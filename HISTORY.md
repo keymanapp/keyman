@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 14.0.156 alpha 2020-10-08
+
+* chore(windows): Move to Windows SDK 10.0.17763.0 (#3654)
+* fix(windows): Some registry keys could have incorrect permissions 🍒 (#3668)
+* fix(developer): ci uses repo tier and version (#3670)
+* fix(windows): update CI for publishing desktop help (#3671)
+* fix(web): ci uses repo tier and version (#3672)
+* fix(windows): improve version numbers (#3678)
+* chore: don't add tag to version in filenames (#3681)
+
+## 14.0.155 alpha 2020-10-07
+
+* refactor(common/models): centralizes suggestion & keep inits (#3645)
+* fix(common/models): predictions after typed whitespace (#3657)
+* fix(web): Fix how layer is separated from key name (#3659)
+
 ## 14.0.154 alpha 2020-10-05
 
 * fix(windows): Upgrading keyboards with transient profiles (#3637)

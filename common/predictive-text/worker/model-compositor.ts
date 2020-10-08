@@ -40,7 +40,6 @@ class ModelCompositor {
   }
 
   private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): Distribution<Suggestion> {
-    let punctuation = this.punctuation;
     let returnedPredictions: Distribution<Suggestion> = [];
 
     for(let correction of corrections) {
@@ -53,25 +52,6 @@ class ModelCompositor {
         // Only bother is there IS an ID to copy.
         if(transform.id !== undefined) {
           pair.sample.transformId = transform.id;
-        }
-
-        let preserveWhitespace: boolean = false;
-        if(this.isWhitespace(transform)) {
-          // Detect start of new word; prevent whitespace loss here.
-          let postContext = models.applyTransform(transform, context);
-          preserveWhitespace = (this.lexicalModel.wordbreak(postContext) == '');
-        }
-
-        // Prepends the original whitespace, ensuring it is preserved if
-        // the suggestion is accepted.
-        if(preserveWhitespace) {
-          models.prependTransform(pair.sample.transform, transform);
-        }
-        
-        // The model is trying to add a word; thus, add some custom formatting
-        // to that word.
-        if (pair.sample.transform.insert.length > 0) {
-          pair.sample.transform.insert += punctuation.insertAfterWord;
         }
 
         let prediction = {sample: pair.sample, p: pair.p * inputProb};
@@ -106,28 +86,37 @@ class ModelCompositor {
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
 
-    let predictionRoots: ProbabilityMass<Transform>[]
     let rawPredictions: Distribution<Suggestion> = [];
 
-    // Section 1:  determining 'prediction roots'.
+    // Used to restore whitespaces if operations would remove them.
+    let prefixTransform: Transform;
 
+    // Section 1:  determining 'prediction roots'.
     if(!this.contextTracker) {
+      let predictionRoots: ProbabilityMass<Transform>[];
+
       // Generates raw prediction distributions for each valid input.  Can only 'correct'
       // against the final input.
       //
       // This is the old, 12.0-13.0 'correction' style.
-      predictionRoots = transformDistribution.map(function(alt) {
-        let transform = alt.sample;
+      if(allowSpace) {
+        // Detect start of new word; prevent whitespace loss here.
+        predictionRoots = [{sample: inputTransform, p: 1.0}];
+        prefixTransform = inputTransform;
+      } else {
+        predictionRoots = transformDistribution.map(function(alt) {
+          let transform = alt.sample;
 
-        // Filter out special keys unless they're expected.
-        if(this.isWhitespace(transform) && !allowSpace) {
-          return null;
-        } else if(this.isBackspace(transform) && !allowBksp) {
-          return null;
-        }
+          // Filter out special keys unless they're expected.
+          if(this.isWhitespace(transform) && !allowSpace) {
+            return null;
+          } else if(this.isBackspace(transform) && !allowBksp) {
+            return null;
+          }
 
-        return alt;
-      }, this);
+          return alt;
+        }, this);
+      }
 
       // Remove `null` entries.
       predictionRoots = predictionRoots.filter(tuple => !!tuple);
@@ -150,6 +139,16 @@ class ModelCompositor {
       //
       // The 'eventual' logic will be significantly more complex, though still manageable.
       let searchSpace = contextState.searchSpace[0];
+
+      let newEmptyToken = false;
+      // Detect if we're starting a new context state.
+      let contextTokens = contextState.tokens;
+      if(contextTokens.length == 0 || contextTokens[contextTokens.length - 1].isNew) {
+        if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
+          newEmptyToken = true;
+          prefixTransform = inputTransform;
+        }
+      }
 
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
@@ -175,7 +174,8 @@ class ModelCompositor {
           // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
-            deleteLeft: lexicalModel.wordbreak(context).length, // remove actual token string
+            // remove actual token string.  If new token, there should be nothing to delete.
+            deleteLeft: newEmptyToken ? 0 : lexicalModel.wordbreak(context).length, 
             id: finalInput.id
           }
 
@@ -217,13 +217,18 @@ class ModelCompositor {
       let displayText = prediction.sample.displayAs;
 
       if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
-        keepOption = prediction.sample;
-        // Ensure we keep any original casing, etc that may have been stripped.
-        keepOption.transform.insert = keepOptionText + punctuation.insertAfterWord;
-        keepOption.displayAs = keepOptionText;
-        // Specifying 'keep' helps uses of the LMLayer find it quickly
-        // if/when desired.
-        keepOption.tag = 'keep';
+        // Preserve the original, pre-keyed version of the text.
+        let baseTransform = prediction.sample.transform;
+
+        let keepTransform = {
+          insert: keepOptionText,
+          deleteLeft: baseTransform.deleteLeft,
+          deleteRight: baseTransform.deleteRight,
+          id: baseTransform.id
+        }
+
+        keepOption = models.transformToSuggestion(keepTransform, prediction.p);
+        keepOption = this.toAnnotatedKeepSuggestion(keepOption, models.QuoteBehavior.noQuotes);
       } else {
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
@@ -236,32 +241,11 @@ class ModelCompositor {
 
     // Generate a default 'keep' option if one was not otherwise produced.
     if(!keepOption && keepOptionText != '') {
-      keepOption = {
-        displayAs: keepOptionText,
-        transformId: inputTransform.id,
-        // Replicate the original transform, modified for appropriate language insertion syntax.
-        transform: {
-          insert: inputTransform.insert + punctuation.insertAfterWord,
-          deleteLeft: inputTransform.deleteLeft,
-          deleteRight: inputTransform.deleteRight,
-          id: inputTransform.id
-        },
-        tag: 'keep'
-      };
-    }
+      let keepTransform = models.transformToSuggestion(inputTransform, 1);  // 1 is a filler value; goes unused b/c is for a 'keep'.
+      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
+      keepTransform.displayAs = keepOptionText;
 
-    // Add the surrounding quotes to the "keep" option's display string:
-    if (keepOption) {
-      let { open, close } = punctuation.quotesForKeepSuggestion;
-      
-      // Should we also ensure that we're using the default quote marks first?
-      // Or is it reasonable to say that the "left" mark is always the one
-      // called "open"?
-      if(!punctuation.isRTL) {
-        keepOption.displayAs = open + keepOption.displayAs + close;
-      } else {
-        keepOption.displayAs = close + keepOption.displayAs + open;
-      }
+      keepOption = this.toAnnotatedKeepSuggestion(keepTransform);
     }
 
     // Section 3:  Finalize suggestions, truncate list to the N (MAX_SUGGESTIONS) most optimal, return.
@@ -295,7 +279,34 @@ class ModelCompositor {
       suggestions = [ keepOption ].concat(suggestions);
     }
 
+    // Apply 'after word' punctuation.  We delay until now so that utility functions relying on the
+    // unmodified Transform may execute properly.
+    suggestions.forEach(function(suggestion) {
+      if (suggestion.transform.insert.length > 0) {
+        suggestion.transform.insert += punctuation.insertAfterWord;
+
+        // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
+        if(prefixTransform) {
+          models.prependTransform(suggestion.transform, prefixTransform);
+        }
+      }
+    });
+
     return suggestions;
+  }
+
+  private toAnnotatedKeepSuggestion(suggestion: Suggestion & {p?: number}, 
+                                    quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Suggestion & {p?: number} {
+    // A method-internal 'import' of the enum.
+    let QuoteBehavior = models.QuoteBehavior;
+
+    return {
+      transform: suggestion.transform,
+      transformId: suggestion.transformId,
+      displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, this.punctuation, QuoteBehavior.useQuotes),
+      tag: 'keep',
+      p: suggestion.p
+    };
   }
 
   /**
