@@ -1,7 +1,7 @@
 !include ..\..\Defines.mak
 
 ##
-## In this file, $Version, $VersionWin, $VersionRelease and $VersionWithTag will be replaced by mkver. These are not
+## In this file, $Version, $VersionWin, $VersionRelease and $Version will be replaced by mkver. These are not
 ## Make variables, but mkver variables.
 ##
 
@@ -24,7 +24,7 @@ KEYMAN_MODELCOMPILER_ROOT=$(KEYMAN_ROOT)\developer\js
 copykmdev: makeinstaller
     -mkdir $(ROOT)\release\$Version
     copy /Y $(ROOT)\src\developer\inst\keymandeveloper.msi $(ROOT)\release\$Version\keymandeveloper.msi
-    copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$VersionWithTag.exe $(ROOT)\release\$Version\keymandeveloper-$VersionWithTag.exe
+    copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$Version.exe $(ROOT)\release\$Version\keymandeveloper-$Version.exe
 
 test-releaseexists:
     if exist $(ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update VERSION.md and try again & exit 1
@@ -145,5 +145,5 @@ makeinstaller:
     echo MSIFileName=keymandeveloper.msi >> setup.inf
     echo Title=Keyman Developer $VersionRelease >>setup.inf
     $(WZZIP) setup.zip keymandeveloper.msi setup.inf
-    copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$VersionWithTag.exe
-    $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$VersionWithTag.exe
+    copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$Version.exe
+    $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$Version.exe
