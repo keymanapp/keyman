@@ -525,7 +525,7 @@ namespace com.keyman.text {
     try {
       // Now that we've manually constructed a proper keystroke-sourced KeyEvent, pass control
       // off to the processor for its actual execution.
-      return !keyman.core.processKeyEvent(Lkc);
+      return !!keyman.core.processKeyEvent(Lkc);
     } catch (err) {
       console.error(err.message, err);
       return false;
