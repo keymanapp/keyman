@@ -14,7 +14,7 @@ default:
 copyredist-desktop:
   -mkdir $(ROOT)\release\$Version
   copy /Y keymandesktop.msi $(ROOT)\release\$Version\keymandesktop.msi
-  copy /Y keymandesktop.exe $(ROOT)\release\$Version\keymandesktop-$Version.exe
+  copy /Y keymandesktop.exe $(ROOT)\release\$Version\keyman-$Version.exe
   copy /Y $(ROOT)\bin\desktop\setup.exe $(ROOT)\release\$Version\setup.exe
 
 prepareredist:
