@@ -495,6 +495,8 @@ For Suggestions returned by a `predict`->`suggestions` message sequence:
 
 * `predict`'s `context` there should match `context` here.
 * `predict`'s `transform` there should match `postTransform` here.
+    - In the case that a distribution of Transforms was specified, rather than 
+    just one, only the 'base' keystroke's Transform should be used.
 
 These serve as a snapshot in time of the state in which the Suggestion was
 generated.
