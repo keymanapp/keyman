@@ -238,7 +238,9 @@ declare interface Suggestion {
   tag?: SuggestionTag;
 }
 
-interface Reversion extends Suggestion { }
+interface Reversion extends Suggestion {
+  tag: 'revert';
+}
 
 /**
  * A tag indicating the nature of the current suggestion.
