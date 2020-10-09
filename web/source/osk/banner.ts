@@ -412,10 +412,6 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.removeListener('tryaccept', manager.tryAccept);
       keyman.core.languageProcessor.removeListener('tryrevert', manager.tryRevert);
     }
-
-    rotateSuggestions() {
-      this.manager.rotateSuggestions();
-    }
   }
 
   export class SuggestionManager extends dom.UITouchHandlerBase<HTMLDivElement> {
@@ -530,20 +526,13 @@ namespace com.keyman.osk {
     private keepSuggestion: Suggestion;
     private revertSuggestion: Reversion;
 
-    private currentTranscriptionID: number;
-
     private recentAccept: boolean = false;
-    private recentAccepted: Suggestion;
     private revertAcceptancePromise: Promise<Reversion>;
 
     private swallowPrediction: boolean = false;
 
-    private previousSuggestions: Suggestion[];
-    private previousTranscriptionID: number;
-
     private doRevert: boolean = false;
     private recentRevert: boolean = false;
-    private rejectedSuggestions: Suggestion[] = [];
 
     constructor(div: HTMLElement, options: BannerSuggestion[]) {
       // TODO:  Determine appropriate CSS styling names, etc.
@@ -579,10 +568,6 @@ namespace com.keyman.osk {
       this.recentAccept = true;
       this.doRevert = false;
       this.recentRevert = false;
-      this.recentAccepted = suggestion.suggestion;
-
-      this.previousSuggestions = this.currentSuggestions;
-      this.previousTranscriptionID = this.currentTranscriptionID;
 
       this.swallowPrediction = true;
       this.doUpdate();
@@ -593,18 +578,6 @@ namespace com.keyman.osk {
       this.doRevert = true;
       this.doUpdate();
     }
-
-    private _applyReversion: () => void = function(this: SuggestionManager): void {
-      this.currentSuggestions = this.previousSuggestions; // Restore to the previous state's Suggestion list.
-      this.currentTranscriptionID = this.previousTranscriptionID;
-
-      let rejectIndex = this.currentSuggestions.indexOf(this.recentAccepted);
-      if(rejectIndex != -1) {
-        // Denote the previous suggestion as rejected and update the 'valid' suggestion list accordingly.
-        this.rejectedSuggestions.push(this.recentAccepted);
-        this.currentSuggestions.splice(rejectIndex, 1); // removes this.recentAccepted from this.currentSuggestions.
-      }
-    }.bind(this);
 
     /**
      * Receives messages from the keyboard that the 'accept' keystroke has been entered.
@@ -657,7 +630,6 @@ namespace com.keyman.osk {
         this.recentAccept = false;
         this.doRevert = false;
         this.recentRevert = false;
-        this.rejectedSuggestions = [];
 
         if(source == 'context') {
           this.swallowPrediction = false;
@@ -694,23 +666,6 @@ namespace com.keyman.osk {
       });
     }
 
-    public rotateSuggestions() {
-      if(this.currentSuggestions.length > 0) {
-        let replaceCount = SuggestionBanner.SUGGESTION_LIMIT - (this.activateKeep() ? 1 : 0);
-        let rotating = this.currentSuggestions.splice(0, replaceCount);
-
-        this.rejectedSuggestions = this.rejectedSuggestions.concat(rotating);
-      } 
-      
-      // If we just removed the last available suggestions, it's time to refresh the list.
-      if(this.currentSuggestions.length == 0) {
-        this.currentSuggestions = this.rejectedSuggestions;
-        this.rejectedSuggestions = [];
-      }
-
-      this.doUpdate();
-    }
-
     /**
      * Function updateSuggestions
      * Scope       Public
@@ -723,7 +678,6 @@ namespace com.keyman.osk {
       let suggestions = prediction.suggestions;
 
       this.currentSuggestions = suggestions;
-      this.currentTranscriptionID = prediction.transcriptionID;
 
       // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
       // and prevent it from being hidden after reversion operations.
@@ -742,7 +696,6 @@ namespace com.keyman.osk {
         this.recentAccept = false;
         this.doRevert = false;
         this.recentRevert = false;
-        this.rejectedSuggestions = [];
       } else { // This prediction was triggered by a recent 'accept.'  Now that it's fulfilled, we clear the flag.
         this.swallowPrediction = false;
       }
