@@ -410,7 +410,10 @@ class ModelCompositor {
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
     let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
-    if(suggestion.id) {
+    if(suggestion.transformId || suggestion.transformId === 0) {
+      reversion.transformId = suggestion.transformId;
+    }
+    if(suggestion.id || suggestion.id === 0) {
       // Since a reversion inverts its source suggestion, we set its ID to be the 
       // additive inverse of the source suggestion's ID.  Makes easy mapping /
       // verification later.
