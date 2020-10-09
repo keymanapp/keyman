@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.158 alpha 2020-10-09
+
+* feat(common/models): 'revert' now uses model's punctuation (#3647)
+* fix(windows): launch configuration non-elevated (#3691)
+* fix(windows): disabled keyboards listed in hotkeys (#3693)
+
 ## 14.0.157 alpha 2020-10-08
 
 * fix(windows): show version with tag in setup (#3682)
