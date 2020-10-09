@@ -317,15 +317,6 @@ namespace com.keyman.text {
     keymanweb.modelManager.register(model);
   };
 
-  keymanweb['showNewSuggestions'] = function() {
-    let keyman = com.keyman.singleton;
-
-    if(keyman['osk'].banner['activeBanner'] instanceof com.keyman.osk.SuggestionBanner) {
-      let banner = keyman['osk'].banner['activeBanner'];
-      banner.rotateSuggestions();
-    }
-  }
-
   /**
    * Function called by Android and iOS when a device-implemented keyboard popup is displayed or hidden
    * 
