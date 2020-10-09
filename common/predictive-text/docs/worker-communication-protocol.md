@@ -125,6 +125,10 @@ Message       | Direction          | Parameters          | Expected reply      |
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
 `wordbreak`   | LMLayer → worker   | context             | Yes - `currentword` | Yes
 `currentword` | LMLayer → keyboard | string              | No                  | Yes
+`accept`      | keyboard → LMLayer | suggestion,         | Yes - `postaccept`  | Yes
+                                   | context, transform  |                     |
+`postaccept`  | LMLayer → keyboard | reversion           | No                  | Yes
+              
 
 ### Message: `config`
 
@@ -457,6 +461,53 @@ following the last wordbreaking character(s) to the left of the insertion
 point.  If no such wordform exists, this returns an empty string.
 
 This message **MUST** be in response to a `wordbreak` message, and it
+**MUST** respond with the corresponding [token][Tokens].
+
+### Message: `accept`
+
+The `accept` message is sent from the keyboard to the LMLayer.  This
+message tells the LMLayer that a previously-returned `suggestion` 
+(from a `predict`-`suggestions` pair) has been accepted by the user.  
+The LMLayer **SHOULD** respond to each `accept` message with a 
+`postaccept` message providing a `reversion` capable of undoing it.
+
+The keyboard **MUST** send the `suggestion` and `context` parameters.
+The keyboard **MUST** send a unique token.  The `postTransform` parameter is 
+optional, but highly suggested.
+
+The semantics of the `accept` message **MUST** be from the perspective
+of this sequence of events:
+
+1. A user has just selected the `suggestion` as valid.
+2. The keystroke triggering the `suggestion` has NOT been committed to 
+   the `context`.  Its Transform data is sent as the `postTransform`
+   parameter.  (The "post" nomenclature component signifies that 
+   `postTransform` comes temporally "after" this context state.)
+3. Before the user inputs any additional keystrokes, which would trigger
+   new suggestions.
+
+The `postTransform` parameter allows the base keystroke, which has **NOT**
+been applied to the provided `context`, to be restored by the `reversion` 
+that undoes acceptance of the `suggestion`.  
+
+For reference, compare this to the ["Message: `predict`" section](#message-predict)
+For Suggestions returned by a `predict`->`suggestions` message sequence:
+
+* `predict`'s `context` there should match `context` here.
+* `predict`'s `transform` there should match `postTransform` here.
+    - In the case that a distribution of Transforms was specified, rather than 
+    just one, only the 'base' keystroke's Transform should be used.
+
+These serve as a snapshot in time of the state in which the Suggestion was
+generated.
+
+### Message: `postaccept`
+
+The `postaccept` message is sent from the keyboard to the LMLayer.  This
+message sends a `reversion` capable of undoing acceptance of the `suggestion`
+just accepted by the triggering `accept` message.
+
+This message **MUST** be in response to a `postaccept` message, and it
 **MUST** respond with the corresponding [token][Tokens].
 
 #### Examples

@@ -24,16 +24,33 @@ namespace models {
   }
 
   /**
-   *
-   * @param transform Merges one transform into another, mutating the first parameter to
-   *                  include the effects of the second.
-   * @param prefix
+   * Merges two Transforms as if they were applied to a `Context` successively.
+   * @param first 
+   * @param second 
    */
-  export function prependTransform(transform: Transform, prefix: Transform) {
-    transform.insert = prefix.insert + transform.insert;
-    transform.deleteLeft += prefix.deleteLeft;
-    if(prefix.deleteRight) {
-      transform.deleteRight = (transform.deleteRight || 0) + prefix.deleteRight;
+  export function buildMergedTransform(first: Transform, second: Transform): Transform {
+    // These exist to avoid parameter mutation.
+    let mergedFirstInsert: string = first.insert;
+    let mergedSecondDelete: number = second.deleteLeft;
+
+    // The 'fun' case:  the second Transform wants to delete something from the first.
+    if(second.deleteLeft) {
+      let firstLength = first.insert.kmwLength();
+      if(firstLength <= second.deleteLeft) {
+        mergedFirstInsert = '';
+        mergedSecondDelete = second.deleteLeft - firstLength;
+      } else {
+        mergedFirstInsert = first.insert.kmwSubstr(0, firstLength - second.deleteLeft);
+        mergedSecondDelete = 0;
+      }
+    }
+
+    return {
+      insert: mergedFirstInsert + second.insert,
+      deleteLeft: first.deleteLeft + mergedSecondDelete,
+      // As `first` would affect the context before `second` could take effect,
+      // this is the correct way to merge `deleteRight`.
+      deleteRight: (first.deleteRight || 0) + (second.deleteRight || 0)
     }
   }
 

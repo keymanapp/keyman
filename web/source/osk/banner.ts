@@ -244,7 +244,7 @@ namespace com.keyman.osk {
      * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
      * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
      */
-    public apply(target?: text.OutputTarget): Promise<Suggestion> {
+    public apply(target?: text.OutputTarget): Promise<Reversion> {
       let keyman = com.keyman.singleton;
 
       if(this.isEmpty()) {
@@ -531,13 +531,13 @@ namespace com.keyman.osk {
 
     private currentSuggestions: Suggestion[] = [];
     private keepSuggestion: Suggestion;
-    private revertSuggestion: Suggestion;
+    private revertSuggestion: Reversion;
 
     private currentTranscriptionID: number;
 
     private recentAccept: boolean = false;
     private recentAccepted: Suggestion;
-    private revertAcceptancePromise: Promise<Suggestion>;
+    private revertAcceptancePromise: Promise<Reversion>;
 
     private preAccept: text.Transcription = null;
     private swallowPrediction: boolean = false;
