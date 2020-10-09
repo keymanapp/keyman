@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# set -e: Terminate script if a command returns an error
+set -e
+
 WORKING_DIRECTORY=`pwd`
 
 ## START STANDARD BUILD SCRIPT INCLUDE
