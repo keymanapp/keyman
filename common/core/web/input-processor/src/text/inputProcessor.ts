@@ -128,18 +128,24 @@ namespace com.keyman.text {
 
               let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, mock, keyEvent.device);
               let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
-              if(alternateBehavior) {
-                // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
-                //       so a user should never have intended to type it.  Should probably renormalize 
-                //       the distribution afterward, though...
-                
+              
+              // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
+              // so we expect users to never intend their use.
+              let totalMass = 0;
+              if(alternateBehavior && !alternateBehavior.beep) {
                 let transform: Transform = alternateBehavior.transcription.transform;
                 
                 // Ensure that the alternate's token id matches that of the current keystroke, as we only
                 // record the matched rule's context (since they match)
                 transform.id = ruleBehavior.transcription.token;
                 alternates.push({sample: transform, 'p': pair.p});
+                totalMass += pair.p;
               }
+
+              // Renormalizes the distribution.
+              alternates.forEach(function(alt) {
+                alt.p /= totalMass;
+              });
             }
           }
         }
