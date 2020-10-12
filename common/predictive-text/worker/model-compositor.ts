@@ -5,7 +5,7 @@ class ModelCompositor {
   private lexicalModel: LexicalModel;
   private contextTracker?: correction.ContextTracker;
   private static readonly MAX_SUGGESTIONS = 12;
-  private readonly punctuation: LexicalModelPunctuation;
+  readonly punctuation: LexicalModelPunctuation;
 
   constructor(lexicalModel: LexicalModel) {
     this.lexicalModel = lexicalModel;
