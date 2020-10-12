@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.159 alpha 2020-10-12
+
+* fix(web): unit test script failure on compilation failures (#3597)
+
 ## 14.0.158 alpha 2020-10-09
 
 * feat(common/models): 'revert' now uses model's punctuation (#3647)
