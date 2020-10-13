@@ -320,6 +320,27 @@ interface ProbabilityMass<T> {
 
 declare type Distribution<T> = ProbabilityMass<T>[];
 
+/**
+ * A type augmented with an optional probability.
+ */
+type Outcome<T> = T & {
+  /**
+   * [optional] probability of this outcome.
+   */
+  p?: number;
+};
+
+/**
+ * A type augmented with a probability.
+ */
+type WithOutcome<T> = T & {
+  /**
+   * Probability of this outcome.
+   */
+  p: number;
+};
+
+
 
 /******************************** Messaging ********************************/
 

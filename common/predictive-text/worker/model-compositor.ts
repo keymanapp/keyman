@@ -316,18 +316,18 @@ class ModelCompositor {
     return suggestions;
   }
 
-  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number}, 
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
     annotationType: SuggestionTag,
-    quoteBehavior?: models.QuoteBehavior): Suggestion & {p?: number};
-  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number},
+    quoteBehavior?: models.QuoteBehavior): Outcome<Suggestion>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>,
     annotationType: 'keep',
-    quoteBehavior?: models.QuoteBehavior): Keep & {p?: number};
-  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number}, 
+    quoteBehavior?: models.QuoteBehavior): Outcome<Keep>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
     annotationType: 'revert',
-    quoteBehavior?: models.QuoteBehavior): Reversion & {p?: number};
-  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number}, 
+    quoteBehavior?: models.QuoteBehavior): Outcome<Reversion>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
                                 annotationType: SuggestionTag,
-                                quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Suggestion & {p?: number} {
+                                quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Outcome<Suggestion> {
     // A method-internal 'import' of the enum.
     let QuoteBehavior = models.QuoteBehavior;
 
