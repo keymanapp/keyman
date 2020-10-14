@@ -149,6 +149,11 @@ declare interface LexicalModel {
    * unfiltered lexicon (with an empty prefix).
    */
   traverseFromRoot?(): LexiconTraversal;
+
+  /**
+   * Returns the wordbreaker defined for the model (if it exists).
+   */
+  wordbreaker?: WordBreakingFunction;
 }
 
 /**

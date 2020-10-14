@@ -25,7 +25,7 @@ namespace models {
 
   export function tokenize(wordBreaker: WordBreakingFunction, context: Context): Tokenization {
     let leftSpans  = wordBreaker(context.left) || [];
-    let rightSpans = wordBreaker(context.right) || [];
+    let rightSpans = wordBreaker(context.right || '') || [];
 
     let tokenization: Tokenization = {
       left: leftSpans.map(span => span.text),

@@ -83,7 +83,7 @@ class ModelCompositor {
     let allowBksp = this.isBackspace(inputTransform);
 
     let postContext = models.applyTransform(inputTransform, context);
-    let keepOptionText = this.lexicalModel.wordbreak(postContext);
+    let keepOptionText = this.wordbreak(postContext);
     let keepOption: Keep = null;
 
     let rawPredictions: Distribution<Suggestion> = [];
@@ -176,7 +176,7 @@ class ModelCompositor {
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
             // remove actual token string.  If new token, there should be nothing to delete.
-            deleteLeft: newEmptyToken ? 0 : lexicalModel.wordbreak(context).length, 
+            deleteLeft: newEmptyToken ? 0 : this.wordbreak(context).length, 
             id: finalInput.id
           }
 
@@ -397,8 +397,9 @@ class ModelCompositor {
       context = models.applyTransform(postTransform, context);
     }
 
-    let postContextTokens = this.lexicalModel.tokenize(context); //.wordbreak(postContext);
-    let revertedPrefix = postContextTokens[postContextTokens.length - 1];
+    let wordbreaker = this.lexicalModel.wordbreaker || wordBreakers.default;
+    let postContextTokens = models.tokenize(wordbreaker, context); //.wordbreak(postContext);
+    let revertedPrefix = postContextTokens.left[postContextTokens.left.length - 1];
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
@@ -414,6 +415,12 @@ class ModelCompositor {
     }
 
     return reversion;
+  }
+
+  private wordbreak(context: Context): string {
+    let wordbreaker = this.lexicalModel.wordbreaker || wordBreakers.default;
+
+    return models.wordbreak(wordbreaker, context);
   }
 }
 

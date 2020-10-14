@@ -151,6 +151,10 @@
       }
     }
 
+    get wordbreaker(): WordBreakingFunction {
+      return this.breakWords;
+    }
+
     public traverseFromRoot(): LexiconTraversal {
       return new TrieModel.Traversal(this._trie['root'], '');
     }

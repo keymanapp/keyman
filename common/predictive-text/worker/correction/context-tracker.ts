@@ -355,11 +355,11 @@ namespace correction {
         throw "This lexical model does not provide adequate data for correction algorithms and context reuse";
       }
 
-      let tokenizedContext = model.tokenize(context);
+      let tokenizedContext = models.tokenize(model.wordbreaker || wordBreakers.default, context);
 
-      if(tokenizedContext.length > 0) {
+      if(tokenizedContext.left.length > 0) {
         for(let i = this.count - 1; i >= 0; i--) {
-          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item(i), transformDistribution);
+          let resultState = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), transformDistribution);
 
           if(resultState) {
             resultState.taggedContext = context;
@@ -376,7 +376,7 @@ namespace correction {
       //
       // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
       // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-      let state = ContextTracker.modelContextState(tokenizedContext, model);
+      let state = ContextTracker.modelContextState(tokenizedContext.left, model);
       state.taggedContext = context;
       this.enqueue(state);
       return state;
