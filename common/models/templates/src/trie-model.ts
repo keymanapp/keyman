@@ -22,8 +22,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+// Worth noting:  we're starting to get quite a 'library' of common model/LMLayer functionality.
+// Should probably make a 'lm-utils' submodule.
 /// <reference path="common.ts" />
 /// <reference path="priority-queue.ts" />
+/// <reference path="tokenization.ts" />
 
 /**
  * @file trie-model.ts
