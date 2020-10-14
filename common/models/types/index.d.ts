@@ -242,6 +242,16 @@ interface Reversion extends Suggestion {
   tag: 'revert';
 }
 
+interface Keep extends Suggestion {
+  tag: 'keep';
+
+  /**
+   * Notes whether or not the Suggestion may actually be suggested by the model.
+   * Should be `false` if the model does not actually predict the current text.
+   */
+  matchesModel: boolean;
+}
+
 /**
  * A tag indicating the nature of the current suggestion.
  * 

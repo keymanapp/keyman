@@ -84,7 +84,7 @@ class ModelCompositor {
 
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
-    let keepOption: Suggestion = null;
+    let keepOption: Keep = null;
 
     let rawPredictions: Distribution<Suggestion> = [];
 
@@ -228,8 +228,13 @@ class ModelCompositor {
           id: baseTransform.id
         }
 
-        keepOption = models.transformToSuggestion(keepTransform, prediction.p);
-        keepOption = this.toAnnotatedSuggestion(keepOption, 'keep',  models.QuoteBehavior.noQuotes);
+        let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
+        keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
+        keepOption.matchesModel = true;
+
+        // Since we replaced the original Suggestion with a keep-annotated one,
+        // we must manually preserve the transform ID.
+        keepOption.transformId = prediction.sample.transformId;
       } else {
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
@@ -247,6 +252,7 @@ class ModelCompositor {
       keepTransform.displayAs = keepOptionText;
 
       keepOption = this.toAnnotatedSuggestion(keepTransform, 'keep');
+      keepOption.matchesModel = false;
     }
 
     // Section 3:  Finalize suggestions, truncate list to the N (MAX_SUGGESTIONS) most optimal, return.
@@ -277,7 +283,7 @@ class ModelCompositor {
     });
 
     if(keepOption) {
-      suggestions = [ keepOption ].concat(suggestions);
+      suggestions = [ keepOption as Suggestion ].concat(suggestions);
     }
 
     // Apply 'after word' punctuation and set suggestion IDs.  
@@ -313,6 +319,9 @@ class ModelCompositor {
   private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number}, 
     annotationType: SuggestionTag,
     quoteBehavior?: models.QuoteBehavior): Suggestion & {p?: number};
+  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number},
+    annotationType: 'keep',
+    quoteBehavior?: models.QuoteBehavior): Keep & {p?: number};
   private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number}, 
     annotationType: 'revert',
     quoteBehavior?: models.QuoteBehavior): Reversion & {p?: number};

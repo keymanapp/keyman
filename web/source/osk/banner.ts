@@ -530,7 +530,7 @@ namespace com.keyman.osk {
     private initNewContext: boolean = true;
 
     private currentSuggestions: Suggestion[] = [];
-    private keepSuggestion: Suggestion;
+    private keepSuggestion: Keep;
     private revertSuggestion: Reversion;
 
     private currentTranscriptionID: number;
@@ -700,7 +700,9 @@ namespace com.keyman.osk {
     private doUpdate() {
       let suggestions = [];
       // Insert 'current text' if/when valid as the leading option.
-      if(this.activateKeep() && this.keepSuggestion) {
+      // Since we don't yet do auto-corrections, we only show 'keep' whenever it's
+      // a valid word (according to the model).
+      if(this.activateKeep() && this.keepSuggestion && this.keepSuggestion.matchesModel) {
         suggestions.push(this.keepSuggestion);
       } else if(this.doRevert) {
         suggestions.push(this.revertSuggestion);
@@ -752,7 +754,7 @@ namespace com.keyman.osk {
       // and prevent it from being hidden after reversion operations.
       for(let s of suggestions) {
         if(s.tag == 'keep') {
-          this.keepSuggestion = s;
+          this.keepSuggestion = s as Keep;
         }
       }
 
