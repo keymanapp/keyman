@@ -163,7 +163,7 @@ describe('Tokenization functions', function() {
       let srok = { // Khmer romanization of 'ស្រុក'
         text: 'ស្រុក',
         start: 0,
-        end: 5,
+        end: 5, // ្រ = ្ + រ
         length: 5
       };
 
@@ -184,12 +184,12 @@ describe('Tokenization functions', function() {
       let khmer = { // Khmer romanization of 'ខ្មែរ'
         text: 'ខ្មែរ',
         start: 0,
-        end: 5,
+        end: 5, //  ្ម = ្ + ម
         length: 5
       }
 
       // Step 2: Allow shifting a defined 'constant' span without mutating the definition.
-      let shiftIndex = function(span, delta) {
+      let shiftSpan = function(span, delta) {
         // Avoid mutating the parameter!
         shiftedSpan = {
           text: span.text,
@@ -212,12 +212,12 @@ describe('Tokenization functions', function() {
         case 'ខ្មែរ':
           return [khmer];
         case 'ស្រុកខ្មែរ':
-          return [srok, shiftIndex(khmer, 5)]; // array of the two.
+          return [srok, shiftSpan(khmer, srok.length)]; // array of the two.
         case 'កខ្មែរ':
           // I'd admittedly be at least somewhat surprised if a real wordbreaker got this 
           // and similar situations perfectly right... but at least it gives us what
           // we need for a test.
-          return [k, shiftIndex(khmer, 1)];
+          return [k, shiftSpan(khmer, k.length)];
         default:
           throw "Dummying error - no return value specified for \"" + text + "\"!";
       }
@@ -227,7 +227,7 @@ describe('Tokenization functions', function() {
       // The two words:
       // - ស្រុក - 'land'
       // - ខ្មែរ - 'Khmer'
-      // Translation:  Cambodia (informal)
+      // Translation:  Cambodia (informal), lit:  "Khmer land" / "land of [the] Khmer"
 
       let context = {
         left: "ស្រុក",
