@@ -49,6 +49,10 @@ namespace com.keyman.text {
 
     baseLayout: string;
 
+    // May be overridden in embedded contexts to ensure keystrokes normally
+    // handled by the browser can be properly handled within that context.
+    forceSyntheticDefaults: boolean = false;
+
     // Callbacks for various feedback types
     beepHandler?: BeepHandler;
     warningLogger?: LogMessageHandler;
@@ -65,10 +69,7 @@ namespace com.keyman.text {
     }
 
     private installInterface() {
-      // TODO:  replace 'window' with a (currently-unwritten) utility call that retrieves 
-      //        the global object (whether browser, Node, WebWorker).
-      //
-      //        We must ensure that the keyboard can find the API functions at the expected place.
+      // We must ensure that the keyboard can find the API functions at the expected place.
       let globalThis = utils.getGlobalObject();
       globalThis[KeyboardInterface.GLOBAL_NAME] = this.keyboardInterface;
 
@@ -151,7 +152,7 @@ namespace com.keyman.text {
           // Back to the standard default, pending normal matching.
           matched = false;
         }
-      }
+      } 
 
       let isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
@@ -161,6 +162,8 @@ namespace com.keyman.text {
           if(special == EmulationKeystrokes.Backspace) {
             // A browser's default backspace may fail to delete both parts of an SMP character.
             this.keyboardInterface.defaultBackspace(Lkc.Ltarg);
+          } else if(this.forceSyntheticDefaults && special == EmulationKeystrokes.Space) {
+            this.keyboardInterface.output(0, outputTarget, ' ');
           } else if(special || DefaultOutput.isCommand(Lkc)) { // Filters out 'commands' like TAB.
             // We only do the "for special emulation" cases under the condition above... aside from backspace
             // Let the browser handle those.
