@@ -27,6 +27,25 @@ describe('Tokenization functions', function() {
       assert.deepEqual(tokenization, expectedResult);
     });
 
+    it('tokenizes English using defaults, pre-whitespace caret, partial context', function() {
+      let context = {
+        left: "quick brown fox",        // No "The"
+        right: " jumped over the lazy", // No "dog"
+        startOfBuffer: false,
+        endOfBuffer: false
+      };
+
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      let expectedResult = {
+        left: ['quick', 'brown', 'fox'],
+        right: ['jumped', 'over', 'the', 'lazy'],
+        caretSplitsToken: false
+      };
+
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
     it('tokenizes English using defaults, post-whitespace caret', function() {
       let context = {
         left: "The quick brown fox ",
@@ -42,6 +61,27 @@ describe('Tokenization functions', function() {
       let expectedResult = {
         left: ['The', 'quick', 'brown', 'fox', ''],
         right: ['jumped', 'over', 'the', 'lazy', 'dog'],
+        caretSplitsToken: true
+      };
+
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('tokenizes English using defaults, post-whitespace caret, partial context', function() {
+      let context = {
+        left: "quick brown fox ",
+        right: "jumped over the lazy",
+        startOfBuffer: false,
+        endOfBuffer: false
+      };
+
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      // Technically, we're editing the start of the first token on the right
+      // when in this context.
+      let expectedResult = {
+        left: ['quick', 'brown', 'fox', ''],
+        right: ['jumped', 'over', 'the', 'lazy'],
         caretSplitsToken: true
       };
 
@@ -64,6 +104,55 @@ describe('Tokenization functions', function() {
         caretSplitsToken: true
       };
 
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('empty context case', function() {
+      // Wordbreaking on a empty space => no word.
+      let context = {
+        left: '', startOfBuffer: true,
+        right: '', endOfBuffer: true
+      };
+  
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      let expectedResult = {
+        left: [],
+        right: [],
+        caretSplitsToken: false
+      };
+  
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('nil context case', function() {
+      // Wordbreaking on a empty space => no word.
+      let tokenization = models.tokenize(wordBreakers.default, null);
+
+      let expectedResult = {
+        left: [],
+        right: [],
+        caretSplitsToken: false
+      };
+  
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('near-empty context:  one space before caret', function() {
+      // Wordbreaking on a empty space => no word.
+      let context = {
+        left: ' ', startOfBuffer: true,
+        right: '', endOfBuffer: true
+      };
+  
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      let expectedResult = {
+        left: [''],
+        right: [],
+        caretSplitsToken: false
+      };
+  
       assert.deepEqual(tokenization, expectedResult);
     });
 

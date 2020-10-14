@@ -24,7 +24,13 @@ namespace models {
   }
 
   export function tokenize(wordBreaker: WordBreakingFunction, context: Context): Tokenization {
-    let leftSpans  = wordBreaker(context.left) || [];
+    context = context || {
+      left: undefined,
+      startOfBuffer: undefined,
+      endOfBuffer: undefined
+    };
+
+    let leftSpans  = wordBreaker(context.left || '') || [];
     let rightSpans = wordBreaker(context.right || '') || [];
 
     let tokenization: Tokenization = {
