@@ -245,6 +245,13 @@ interface ReadyMessage {
      * bisect graphical clusters.
      */
     rightContextCodePoints: number,
+
+    /**
+     * Whether or not the model appends characters to Suggestions for
+     * wordbreaking purposes.  (These characters need not be whitespace
+     * or actual wordbreak characters.)
+     */
+    wordbreaksAfterSuggestions: boolean
   };
 }
 ```

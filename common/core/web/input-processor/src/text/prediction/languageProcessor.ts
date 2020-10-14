@@ -209,7 +209,6 @@ namespace com.keyman.text.prediction {
         // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
         // values as needed for use with their IME interfaces.
         let transform = final.buildTransformFrom(outputTarget);
-        let wordbreakPromise = this.wordbreak(outputTarget); // Also build the display string for the reversion.
         outputTarget.apply(transform);
 
         // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
@@ -355,14 +354,22 @@ namespace com.keyman.text.prediction {
       this._mayCorrect = flag;
     }
 
+    public get wordbreaksAfterSuggestions() {
+      return this.configuration.wordbreaksAfterSuggestions;
+    }
+
     public tryAcceptSuggestion(source: string): boolean {
-      // Handlers of this event should return 'false' when the 'try' is successful.
-      return !this.emit('tryaccept', source);
+      let returnObj = {shouldSwallow: false};
+      this.emit('tryaccept', source, returnObj);
+
+      return returnObj.shouldSwallow;
     }
 
     public tryRevertSuggestion(): boolean {
-      // Handlers of this event should return 'false' when the 'try' is successful.
-      return !this.emit('tryrevert', null);
+      let returnObj = {shouldSwallow: false};
+      this.emit('tryrevert', null, returnObj);
+
+      return returnObj.shouldSwallow;
     }
   }
 }

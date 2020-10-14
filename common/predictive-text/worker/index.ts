@@ -198,7 +198,12 @@ class LMLayerWorker {
         configuration.rightContextCodePoints = this._platformCapabilities.maxRightContextCodePoints || 0;
       }
 
-      this.transitionToReadyState(model);
+      let compositor = this.transitionToReadyState(model);
+      // This test allows models to directly specify the property without it being auto-overridden by
+      // this default.
+      if(configuration.wordbreaksAfterSuggestions === undefined) {
+        configuration.wordbreaksAfterSuggestions = (compositor.punctuation.insertAfterWord != '');
+      }
       this.cast('ready', { configuration });
     } catch (err) {
       this.error("loadModel failed!", err);
@@ -272,7 +277,7 @@ class LMLayerWorker {
    *
    * @param model The loaded language model.
    */
-  private transitionToReadyState(model: LexicalModel) {
+  private transitionToReadyState(model: LexicalModel): ModelCompositor {
     let compositor = new ModelCompositor(model);
     this.state = {
       name: 'ready',
@@ -314,6 +319,8 @@ class LMLayerWorker {
       },
       compositor: compositor
     };
+
+    return compositor;
   }
 
   /**

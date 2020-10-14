@@ -634,15 +634,20 @@ namespace com.keyman.osk {
      * Should return 'false' if the current state allows accepting a suggestion and act accordingly.
      * Otherwise, return true.
      */
-    tryAccept: (source: string) => boolean = function(this: SuggestionManager, source: string): boolean {
+    tryAccept: (source: string) => boolean = function(this: SuggestionManager, source: string, returnObj: {shouldSwallow: boolean}) {
+      let keyman = com.keyman.singleton;
+
       if(!this.recentAccept && this.selected) {
         this.doAccept(this.selected);
-        return false;
+        returnObj.shouldSwallow = true;
       } else if(this.recentAccept && source == 'space') {
         this.recentAccept = false;
-        return false; // Swallows a single space post-accept.
+        // If the model doesn't insert wordbreaks, don't swallow the space.  If it does, 
+        // we consider that insertion to be the results of the first post-accept space.
+        returnObj.shouldSwallow = !!keyman.core.languageProcessor.wordbreaksAfterSuggestions;
+      } else {
+        returnObj.shouldSwallow = false;
       }
-      return true;  // Not yet implemented
     }.bind(this);
 
     /**
@@ -650,7 +655,7 @@ namespace com.keyman.osk {
      * Should return 'false' if the current state allows reverting a recently-applied suggestion and act accordingly.
      * Otherwise, return true.
      */
-    tryRevert: () => boolean = function(this: SuggestionManager): boolean {
+    tryRevert: () => boolean = function(this: SuggestionManager, returnObj: {shouldSwallow: boolean}) {
       // Has the revert keystroke (BKSP) already been sent once since the last accept?
       if(this.doRevert) {
         // If so, clear the 'revert' option and start doing normal predictions again.
@@ -662,7 +667,9 @@ namespace com.keyman.osk {
         this.swallowPrediction = true;
       }
 
-      return true;
+      // We don't yet actually do key-based reversions.
+      returnObj.shouldSwallow = false;
+      return;
     }.bind(this);
 
     /**

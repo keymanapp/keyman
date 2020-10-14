@@ -379,6 +379,16 @@ declare interface Configuration {
   rightContextCodePoints: number;
   /** deprecated; use `leftContextCodePoints` instead! */
   rightContextCodeUnits?: number,
+
+  /**
+   * Whether or not the model appends characters to Suggestions for
+   * wordbreaking purposes.  (These characters need not be whitespace
+   * or actual wordbreak characters.)
+   * 
+   * If not specified, this will be auto-detected based on the model's
+   * punctuation properties (if they exist).
+   */
+  wordbreaksAfterSuggestions?: boolean
 }
 
 
