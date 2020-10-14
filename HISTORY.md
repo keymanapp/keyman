@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.160 alpha 2020-10-14
+
+* feat(common/models): disables "keep" when word is not suggestion otherwise (#3700)
+* feat(common/core/web): selective wordbreak swallowing after accepting suggestions (#3702)
+* refactor(common/models): extract Outcome type (#3705)
+
 ## 14.0.159 alpha 2020-10-12
 
 * fix(web): unit test script failure on compilation failures (#3597)
