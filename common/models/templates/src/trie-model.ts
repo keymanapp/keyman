@@ -137,7 +137,7 @@
 
       /* Helper */
 
-      function makeDistribution(suggestions: (Suggestion & {p: number})[]): Distribution<Suggestion> {
+      function makeDistribution(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
         let distribution: Distribution<Suggestion> = [];
 
         for(let s of suggestions) {
