@@ -124,7 +124,7 @@
 
       // All text to the left of the cursor INCLUDING anything that has
       // just been typed.
-      let prefix = this.getLastWord(newContext.left);
+      let prefix = models.getLastPreCaretToken(this.breakWords, newContext);
 
       // Return suggestions from the trie.
       return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => 
@@ -149,29 +149,6 @@
 
         return distribution;
       }
-    }
-
-    /**
-     * Get the last word of the phrase, or nothing.
-     * @param fullLeftContext the entire left context of the string.
-     */
-    private getLastWord(fullLeftContext: string): string {
-      let words = this.breakWords(fullLeftContext)
-      if (words.length > 0) {
-        return words.pop().text;
-      }
-
-      return '';
-    }
-
-    public tokenize(context: Context): USVString[] {
-      let words = this.breakWords(context.left) || [];
-
-      return words.map(span => span.text);
-    }
-
-    public wordbreak(context: Context): USVString {
-      return this.getLastWord(context.left);
     }
 
     public traverseFromRoot(): LexiconTraversal {

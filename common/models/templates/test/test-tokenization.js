@@ -6,7 +6,7 @@ var assert = require('chai').assert;
 var models = require('../').models;
 var wordBreakers = require('@keymanapp/models-wordbreakers').wordBreakers;
 
-describe.only('Tokenization functions', function() {
+describe('Tokenization functions', function() {
   describe('tokenize', function() {
     it('tokenizes English using defaults, pre-whitespace caret', function() {
       let context = {
@@ -180,6 +180,90 @@ describe.only('Tokenization functions', function() {
       };
 
       assert.deepEqual(tokenization, expectedResult);
+    });
+  });
+
+  describe('getLastPreCaretToken', function() {
+    it('with pre-whitespace caret', function() {
+      let context = {
+        left: "The quick brown fox",
+        right: " jumped over the lazy dog",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.getLastPreCaretToken(wordBreakers.default, context);
+
+      assert.equal(tokenization, 'fox');
+    });
+
+    it('with post-whitespace caret', function() {
+      let context = {
+        left: "The quick brown fox ",
+        right: "jumped over the lazy dog",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.getLastPreCaretToken(wordBreakers.default, context);
+
+      assert.equal(tokenization, '');
+    });
+
+    it('within a token', function() {
+      let context = {
+        left: "The quick brown fox jum",
+        right: "ped over the lazy dog",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.getLastPreCaretToken(wordBreakers.default, context);
+
+      assert.equal(tokenization, 'jum');
+    });
+  });
+
+  describe('wordbreak', function() {
+    it('with pre-whitespace caret', function() {
+      let context = {
+        left: "The quick brown fox",
+        right: " jumped over the lazy dog",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.wordbreak(wordBreakers.default, context);
+
+      assert.equal(tokenization, 'fox');
+    });
+
+    it('with post-whitespace caret', function() {
+      let context = {
+        left: "The quick brown fox ",
+        right: "jumped over the lazy dog",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.wordbreak(wordBreakers.default, context);
+
+      assert.equal(tokenization, '');
+    });
+
+    // This version is subject to change.  In the future, we may wish the wordbreak
+    // operation to include "the rest of the word" - the post-caret part.
+    it('within a token', function() {
+      let context = {
+        left: "The quick brown fox jum",
+        right: "ped over the lazy dog",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.wordbreak(wordBreakers.default, context);
+
+      assert.equal(tokenization, 'jum');
     });
   });
 });

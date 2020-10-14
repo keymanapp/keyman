@@ -63,20 +63,23 @@ namespace models {
     return tokenization;
   }
 
-  // /**
-  //  * Get the last word of the phrase, or nothing.
-  //  * @param fullLeftContext the entire left context of the string.
-  //  */
-  // export function getLastWord(wordBreaker: WordBreakingFunction, fullLeftContext: string): string {
-  //   let words = wordBreaker(fullLeftContext);
-  //   if (words.length > 0) {
-  //     return words.pop().text;
-  //   }
+  /**
+   * Get the last word of the phrase before the caret or nothing.
+   * @param fullLeftContext the entire left context of the string.
+   */
+  export function getLastPreCaretToken(wordBreaker: WordBreakingFunction, context: Context): string {
+    let tokenization = tokenize(wordBreaker, context);
+    if (tokenization.left.length > 0) {
+      return tokenization.left.pop();
+    }
 
-  //   return '';
-  // }
+    return '';
+  }
 
-  // export function wordbreak(wordBreaker: WordBreakingFunction, context: Context): USVString {
-  //   return getLastWord(wordBreaker, context.left);
-  // }
+  // While it is currently identical to getLastWord, this may change in the future.
+  // It's best not to write ourselves into a corner on this one, as disambiguating later
+  // would likely be pretty painful.
+  export function wordbreak(wordBreaker: WordBreakingFunction, context: Context): USVString {
+    return getLastPreCaretToken(wordBreaker, context);
+  }
 }
