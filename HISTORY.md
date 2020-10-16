@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.161 alpha 2020-10-16
+
+* fix(common/core/web): fixes revert event bug (#3709)
+
 ## 14.0.160 alpha 2020-10-14
 
 * feat(common/models): disables "keep" when word is not suggestion otherwise (#3700)
