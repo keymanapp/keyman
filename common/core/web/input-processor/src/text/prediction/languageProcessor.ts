@@ -367,7 +367,7 @@ namespace com.keyman.text.prediction {
 
     public tryRevertSuggestion(): boolean {
       let returnObj = {shouldSwallow: false};
-      this.emit('tryrevert', null, returnObj);
+      this.emit('tryrevert', returnObj);
 
       return returnObj.shouldSwallow;
     }
