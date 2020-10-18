@@ -833,8 +833,6 @@ void RefreshKeyboardProfiles(INTKEYBOARDINFO *kp, BOOL isTransient) {
     {
       char bufProfile[LOCALE_NAME_MAX_LENGTH];
       int nProfile = 0;
-      kp->nProfiles = 0;
-      kp->Profiles = NULL;
       while (reg2->GetKeyNames(bufProfile, LOCALE_NAME_MAX_LENGTH, nProfile))
       {
         RegistryReadOnly *reg3 = Reg_GetKeymanInstalledKeyboard(kp->Name);
@@ -858,6 +856,7 @@ void RefreshKeyboardProfiles(INTKEYBOARDINFO *kp, BOOL isTransient) {
           reg3->ReadString(REGWSZ_ProfileGUID, bufW, _countof(bufW));
           ConvertStringToGuid(bufW, &ikp->Guid);
           ikp->LangID = (LANGID)reg3->ReadInteger(REGSZ_LanguageProfiles_LangID);
+          SendDebugMessageFormat(0, sdmGlobal, 0, "Found profile %ls, language id %x for keyboard %s", bufW, ikp->LangID, kp->Name);
         }
         delete reg3;
         nProfile++;
@@ -943,6 +942,8 @@ void RefreshKeyboards(BOOL Initialising)
 
 			/* Read the shadow keyboard id */    // I3613
 
+      kp->nProfiles = 0;
+      kp->Profiles = NULL;
       RefreshKeyboardProfiles(kp, FALSE); // Read standard profiles
       RefreshKeyboardProfiles(kp, TRUE);  // Read transient profiles
 
