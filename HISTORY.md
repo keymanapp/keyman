@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.162 alpha 2020-10-18
+
+* fix(web): Let embedded device handle K_TAB or K_ENTER (#3664)
+
 ## 14.0.161 alpha 2020-10-16
 
 * fix(common/core/web): fixes revert event bug (#3709)
