@@ -88,12 +88,31 @@ describe('Tokenization functions', function() {
       assert.deepEqual(tokenization, expectedResult);
     });
 
-    it('tokenizes English using defaults, splitting caret', function() {
+    it('tokenizes English using defaults, splitting caret, complete context (start, end == true)', function() {
       let context = {
         left: "The quick brown fox jum",
         right: "ped over the lazy dog",
         startOfBuffer: true,
         endOfBuffer: true
+      };
+
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      let expectedResult = {
+        left: ['The', 'quick', 'brown', 'fox', 'jum'],
+        right: ['ped', 'over', 'the', 'lazy', 'dog'],
+        caretSplitsToken: true
+      };
+
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('tokenizes English using defaults, splitting caret, incomplete context (start, end == false)', function() {
+      let context = {
+        left: "The quick brown fox jum",
+        right: "ped over the lazy dog",
+        startOfBuffer: false,
+        endOfBuffer: false
       };
 
       let tokenization = models.tokenize(wordBreakers.default, context);

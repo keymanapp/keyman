@@ -23,7 +23,7 @@ namespace models {
     caretSplitsToken: boolean
   }
 
-  export function tokenize(wordBreaker: WordBreakingFunction, context: Context): Tokenization {
+  export function tokenize(wordBreaker: WordBreakingFunction, context?: Partial<Context>): Tokenization {
     context = context || {
       left: undefined,
       startOfBuffer: undefined,
