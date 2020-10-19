@@ -430,10 +430,10 @@ begin
   // Do we need scrollable keyboard list? Only if it's greater than 75% of screen height
   //
 
-  ScrollableView := TotalKeyboardHeight > (Screen.Height * 1 div 5);
+  ScrollableView := TotalKeyboardHeight > (Screen.Height * 3 div 4);
   if ScrollableView then
   begin
-    TotalKeyboardHeight := Screen.Height * 1 div 5;
+    TotalKeyboardHeight := Screen.Height * 3 div 4;
 
     // Calculate the maximum scroll
     TempItemHeight := 0;
