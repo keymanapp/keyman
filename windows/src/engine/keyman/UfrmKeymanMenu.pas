@@ -362,11 +362,12 @@ end;
 procedure TfrmKeymanMenu.PopupEx(mnu: TPopupMenu; X, Y: Integer; IconRect: TRect);   // I3990
 var
   kmi: TKeymanMenuItem;
-  i, ItemWidth, ItemHeight: Integer;
+  i, ItemWidth, ItemHeight, TempItemHeight: Integer;
   v: Integer;
 begin
   Fmnu := mnu;
 
+  MaxScrollPosition := 0;
   MaxKeyboardWidth := 0;
   MaxItemWidth := 0;
   TotalKeyboardHeight := 0;
@@ -411,7 +412,6 @@ begin
           MaxKeyboardWidth := ItemWidth;
 
         Inc(TotalKeyboardHeight, ItemHeight);
-        Inc(MaxScrollPosition);
       end
       else
       begin
@@ -426,16 +426,34 @@ begin
     end;
   end;
 
-  Dec(MaxScrollPosition); // Don't allow scroll off the end of the list
-
   //
   // Do we need scrollable keyboard list? Only if it's greater than 75% of screen height
   //
 
-  ScrollableView := TotalKeyboardHeight > (Screen.Height * 3 div 4);
+  ScrollableView := TotalKeyboardHeight > (Screen.Height * 1 div 5);
   if ScrollableView then
   begin
-    TotalKeyboardHeight := Screen.Height * 3 div 4;
+    TotalKeyboardHeight := Screen.Height * 1 div 5;
+
+    // Calculate the maximum scroll
+    TempItemHeight := 0;
+    for i := Fmnu.Items.Count - 1 downto 0 do
+    begin
+      if Fmnu.Items[i] is TKeymanMenuItem then
+      begin
+        kmi := Fmnu.Items[i] as TKeymanMenuItem;
+        kmi.OnMeasureItem(kmi, Canvas, ItemWidth, ItemHeight);
+        if (kmi.CMIItemType = _mitKeyboardsList) then
+        begin
+          Inc(TempItemHeight, ItemHeight);
+          if TempItemHeight > TotalKeyboardHeight - ScrollBoxHeight*2 then
+          begin
+            MaxScrollPosition := i + 1;
+            Break;
+          end;
+        end;
+      end;
+    end;
   end;
 
   if not FIsKeyboardMenu then
@@ -726,18 +744,6 @@ begin
   if not Assigned(Fmnu) or not Assigned(Fmnu.Items) then Exit;  // I2884
 
   case Key of
-    {VK_NEXT:
-      begin
-        Key := 0;
-        if ScrollableView and (ScrollPosition < MaxScrollPosition) then
-          Inc(ScrollPosition);
-      end;
-    VK_PRIOR:
-      begin
-        Key := 0;
-        if ScrollableView and (ScrollPosition > 0) then
-          Dec(ScrollPosition);
-      end;}
     VK_UP:
       begin
         Key := 0;
@@ -819,7 +825,8 @@ begin
     if FSelectedItemIndex < ScrollPosition then
       ScrollPosition := FSelectedItemIndex
     else
-      while FItemRects[FSelectedItemIndex].Top + FItemOffsets[FSelectedItemIndex] < 0 do
+      while (FItemRects[FSelectedItemIndex].Top + FItemOffsets[FSelectedItemIndex] < 0) or
+        (FItemRects[FSelectedItemIndex].Bottom + FItemOffsets[FSelectedItemIndex] > ScrollRects[1].Top) do
       begin
         Inc(ScrollPosition);
         RecalculateScrollPositions;
