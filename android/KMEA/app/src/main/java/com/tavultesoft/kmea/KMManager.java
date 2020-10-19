@@ -1796,7 +1796,6 @@ public final class KMManager {
       Log.d("KMEA", "pageLoaded: [inapp] " + url);
       if (InAppKeyboard == null) {
         KMLog.LogError(TAG, "pageLoaded and InAppKeyboard null");
-        InAppKeyboardLoaded = false;
         return;
       }
 
@@ -1852,7 +1851,6 @@ public final class KMManager {
       Log.d("KMEA", "shouldOverrideUrlLoading [inapp]: "+url);
       if (InAppKeyboard == null) {
         KMLog.LogError(TAG, "shouldOverrideUrlLoading and InAppKeyboard null");
-        InAppKeyboardLoaded = false;
         return false;
       }
 
@@ -2038,7 +2036,6 @@ public final class KMManager {
       Log.d("KMEA", "pageLoaded: [system] " + url);
       if (SystemKeyboard == null) {
         KMLog.LogError(TAG, "pageLoaded and SystemKeyboard null");
-        SystemKeyboardLoaded = false;
         return;
       }
 
@@ -2093,7 +2090,6 @@ public final class KMManager {
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
       if (SystemKeyboard == null) {
         KMLog.LogError(TAG, "shouldOverrideUrlLoading and SystemKeyboard null");
-        SystemKeyboardLoaded = false;
         return false;
       }
 
@@ -2300,6 +2296,11 @@ public final class KMManager {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
+          if (InAppKeyboard == null) {
+            KMLog.LogError(TAG, "dispatchKey failed: InAppKeyboard is null");
+            return;
+          }
+
           if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
             if ((KMTextView.activeView == null) && isDebugMode()) {
               Log.w(HANDLER_TAG, "dispatchKey failed: activeView is null");
@@ -2331,6 +2332,11 @@ public final class KMManager {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
+          if (InAppKeyboard == null) {
+            KMLog.LogError(TAG, "insertText failed: InAppKeyboard is null");
+            return;
+          }
+
           if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
             if ((KMTextView.activeView == null) && isDebugMode()) {
               Log.w("IAK: JS Handler", "insertText failed: activeView is null");
@@ -2422,6 +2428,11 @@ public final class KMManager {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
+          if (SystemKeyboard == null) {
+            KMLog.LogError(TAG, "dispatchKey failed: SystemKeyboard is null");
+            return;
+          }
+
           if (SystemKeyboard.subKeysWindow != null) {
             return;
           }
@@ -2456,6 +2467,11 @@ public final class KMManager {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
+          if (SystemKeyboard == null) {
+            KMLog.LogError(TAG, "insertText failed: SystemKeyboard is null");
+            return;
+          }
+
           if (SystemKeyboard.subKeysWindow != null) {
             return;
           }
