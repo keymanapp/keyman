@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.163 alpha 2020-10-19
+
+* fix(web): Remove base key from popup keys (#3718)
+
 ## 14.0.162 alpha 2020-10-18
 
 * fix(web): Let embedded device handle K_TAB or K_ENTER (#3664)
