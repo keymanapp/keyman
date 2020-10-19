@@ -1509,10 +1509,7 @@ namespace com.keyman.osk {
       subKeys.id='kmw-popup-keys';
       this.popupBaseKey = e;
 
-      // Does the popup array include the base key?   *** condition for phone only ***
-      if(device.formFactor == 'phone') {
-        this.prependBaseKey(e);
-      }
+      // No longer prepend base key to popup array
 
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
