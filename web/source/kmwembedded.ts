@@ -57,7 +57,7 @@ namespace com.keyman.osk {
         var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
             yBase = dom.Utils.getAbsoluteY(key);
 
-        // No longer prepend base key to subkey array
+        // #3718: No longer prepend base key to subkey array
 
         this.popupBaseKey = key;
         this.popupPending=true;
