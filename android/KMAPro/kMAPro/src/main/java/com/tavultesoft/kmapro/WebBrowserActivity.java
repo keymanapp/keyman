@@ -323,7 +323,10 @@ public class WebBrowserActivity extends AppCompatActivity {
           try {
             new URL(urlStr);
           } catch (MalformedURLException e) {
-            KMLog.LogException(TAG, "", e);
+            // Intentionally not logging "No protocol" exception because it may be a query
+            if (e != null && !e.getMessage().startsWith("no protocol:")) {
+              KMLog.LogException(TAG, "", e);
+            }
 
             if (Patterns.WEB_URL.matcher(String.format("%s%s", "http://", urlStr)).matches()) {
               urlStr = String.format("%s%s", "http://", urlStr);
