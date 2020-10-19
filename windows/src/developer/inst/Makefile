@@ -15,15 +15,15 @@ setup:
     #
 
     cd $(ROOT)\src\developer\inst
-    $(MKVER_U) copydev.in copydev.mak
+    $(MKVER_U) download.in download.mak
 
     #
     # Build the installation archive
     #
 
-    $(MAKE) -fcopydev.mak candle
+    $(MAKE) -fdownload.mak candle
     $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf -out keymandeveloper.msi -ext WixUIExtension $(DEVELOPER_FILES)
-    $(MAKE) -fcopydev.mak clean-heat
+    $(MAKE) -fdownload.mak clean-heat
 
     #
     # Sign the installation archive
@@ -36,7 +36,7 @@ setup:
     #
 
     cd $(ROOT)\src\developer\inst
-    $(MAKE) -fcopydev.mak
+    $(MAKE) -fdownload.mak
 
 build:
     @rem
@@ -49,7 +49,7 @@ backup:
 
 clean:
     cd $(ROOT)\src\developer\inst
-    -del /Q copydev.mak
+    -del /Q download.mak
     -del /Q *.msi
     -del /Q *.msp
     -del /Q *.wixobj
@@ -66,9 +66,9 @@ clean:
 
 test-releaseexists:
     cd $(ROOT)\src\developer\inst
-    $(MKVER_U) copydev.in copydev.mak
+    $(MKVER_U) download.in download.mak
 
-    $(MAKE) -fcopydev.mak test-releaseexists
+    $(MAKE) -fdownload.mak test-releaseexists
 
 install:
     @rem

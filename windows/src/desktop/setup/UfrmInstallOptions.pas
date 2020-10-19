@@ -48,6 +48,7 @@ type
     lblDefaultKeymanSettings: TLabel;
     lblSelectModulesToInstall: TLabel;
     lblAssociatedKeyboardLanguage: TLabel;
+    lblInstallerVersion: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
   private
@@ -97,6 +98,7 @@ implementation
 
 uses
   bootstrapmain,
+  KeymanVersion,
   SetupStrings;
 
 { TfrmInstallOptions }
@@ -124,6 +126,8 @@ begin
   chkAutomaticallyReportUsage.Visible := FAllowOptions;
   chkCheckForUpdates.Visible := FAllowOptions;
   chkStartWithWindows.Visible := FAllowOptions;
+
+  lblInstallerVersion.Caption := FInstallInfo.Text(ssInstallerVersion, [KeymanVersion.CKeymanVersionInfo.VersionWithTag]);
 
   SetupDynamicOptions;
 end;

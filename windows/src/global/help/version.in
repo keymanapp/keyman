@@ -1,5 +1,5 @@
 <?php
-  $COPYRIGHT = "Copyright &copy;1994-2001 Tavultesoft";
-  $KEYMANVERSION = "$VERSION";
+  $COPYRIGHT = "Copyright &copy;1994-2020 SIL International";
+  $KEYMANVERSION = "$Version";
   $DOCVERSION = "$DATE";
 ?>

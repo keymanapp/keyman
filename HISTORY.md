@@ -1,5 +1,50 @@
 # Keyman Version History
 
+## 14.0.162 alpha 2020-10-18
+
+* fix(web): Let embedded device handle K_TAB or K_ENTER (#3664)
+
+## 14.0.161 alpha 2020-10-16
+
+* fix(common/core/web): fixes revert event bug (#3709)
+
+## 14.0.160 alpha 2020-10-14
+
+* feat(common/models): disables "keep" when word is not suggestion otherwise (#3700)
+* feat(common/core/web): selective wordbreak swallowing after accepting suggestions (#3702)
+* refactor(common/models): extract Outcome type (#3705)
+
+## 14.0.159 alpha 2020-10-12
+
+* fix(web): unit test script failure on compilation failures (#3597)
+
+## 14.0.158 alpha 2020-10-09
+
+* feat(common/models): 'revert' now uses model's punctuation (#3647)
+* fix(windows): launch configuration non-elevated (#3691)
+* fix(windows): disabled keyboards listed in hotkeys (#3693)
+
+## 14.0.157 alpha 2020-10-08
+
+* fix(windows): show version with tag in setup (#3682)
+* fix(windows): keyman desktop setup filename (#3684)
+
+## 14.0.156 alpha 2020-10-08
+
+* chore(windows): Move to Windows SDK 10.0.17763.0 (#3654)
+* fix(windows): Some registry keys could have incorrect permissions 🍒 (#3668)
+* fix(developer): ci uses repo tier and version (#3670)
+* fix(windows): update CI for publishing desktop help (#3671)
+* fix(web): ci uses repo tier and version (#3672)
+* fix(windows): improve version numbers (#3678)
+* chore: don't add tag to version in filenames (#3681)
+
+## 14.0.155 alpha 2020-10-07
+
+* refactor(common/models): centralizes suggestion & keep inits (#3645)
+* fix(common/models): predictions after typed whitespace (#3657)
+* fix(web): Fix how layer is separated from key name (#3659)
+
 ## 14.0.154 alpha 2020-10-05
 
 * fix(windows): Upgrading keyboards with transient profiles (#3637)

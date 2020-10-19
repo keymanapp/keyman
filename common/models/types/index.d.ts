@@ -238,6 +238,20 @@ declare interface Suggestion {
   tag?: SuggestionTag;
 }
 
+interface Reversion extends Suggestion {
+  tag: 'revert';
+}
+
+interface Keep extends Suggestion {
+  tag: 'keep';
+
+  /**
+   * Notes whether or not the Suggestion may actually be suggested by the model.
+   * Should be `false` if the model does not actually predict the current text.
+   */
+  matchesModel: boolean;
+}
+
 /**
  * A tag indicating the nature of the current suggestion.
  * 
@@ -251,8 +265,7 @@ declare interface Suggestion {
  *  
  * If left undefined, the consumers will assume this is a prediction.
  */
-type SuggestionTag = undefined | 'keep' | 'correction' | 'emoji';
-
+type SuggestionTag = undefined | 'keep' | 'revert' | 'correction' | 'emoji';
 
 /**
  * The text and environment surrounding the insertion point (text cursor).
@@ -306,6 +319,27 @@ interface ProbabilityMass<T> {
 }
 
 declare type Distribution<T> = ProbabilityMass<T>[];
+
+/**
+ * A type augmented with an optional probability.
+ */
+type Outcome<T> = T & {
+  /**
+   * [optional] probability of this outcome.
+   */
+  p?: number;
+};
+
+/**
+ * A type augmented with a probability.
+ */
+type WithOutcome<T> = T & {
+  /**
+   * Probability of this outcome.
+   */
+  p: number;
+};
+
 
 
 /******************************** Messaging ********************************/
@@ -366,6 +400,16 @@ declare interface Configuration {
   rightContextCodePoints: number;
   /** deprecated; use `leftContextCodePoints` instead! */
   rightContextCodeUnits?: number,
+
+  /**
+   * Whether or not the model appends characters to Suggestions for
+   * wordbreaking purposes.  (These characters need not be whitespace
+   * or actual wordbreak characters.)
+   * 
+   * If not specified, this will be auto-detected based on the model's
+   * punctuation properties (if they exist).
+   */
+  wordbreaksAfterSuggestions?: boolean
 }
 
 

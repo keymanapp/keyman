@@ -186,7 +186,7 @@ namespace com.keyman.text.prediction {
       return this.predict_internal(transcription);
     }
 
-    public acceptSuggestion(suggestion: Suggestion, outputTarget: OutputTarget): Promise<Suggestion> {
+    public applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget): Promise<Reversion> {
       if(!outputTarget) {
         throw "Accepting suggestions requires a destination OutputTarget instance."
       }
@@ -209,7 +209,6 @@ namespace com.keyman.text.prediction {
         // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
         // values as needed for use with their IME interfaces.
         let transform = final.buildTransformFrom(outputTarget);
-        let wordbreakPromise = this.wordbreak(outputTarget); // Also build the display string for the reversion.
         outputTarget.apply(transform);
 
         // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
@@ -220,25 +219,34 @@ namespace com.keyman.text.prediction {
         let reversionTranscription = preApply.buildTranscriptionFrom(outputTarget, null);
         this.recordTranscription(reversionTranscription);
 
-        // TODO:  Also tell lm-layer we accepted the suggestion
-        // The 'reversion promise' should be returned from the lm-layer, not constructed here.
-        // (Needed for proper displayAs syntax!)
-        let reversionPromise: Promise<Suggestion> = new Promise<Suggestion>(function(resolveFunc, rejectFunc) {
-          wordbreakPromise.then(function(token) {
-            let suggestion: Suggestion = {
-              // TODO:  This needs to be sourced from the lm-layer side, from the model's
-              // punctuation spec.  Hence the 'outer' TODO.
-              displayAs: '"' + token + '"',
-              transform: reversionTranscription.transform,
-              transformId: reversionTranscription.token
-            }
+        // Builds the reversion option according to the loaded lexical model's known
+        // syntactic properties.
+        let suggestionContext = new TranscriptionContext(original.preInput, this.configuration);
 
-            resolveFunc(suggestion);
-          });
-        });
+        // We must accept the Suggestion from its original context, which was before
+        // `original.transform` was applied.
+        let reversionPromise: Promise<Reversion> = this.lmEngine.acceptSuggestion(suggestion, suggestionContext, original.transform);
 
         // Also, request new prediction set based on the resulting context.
-        this.predictFromTarget(outputTarget);
+        let lp = this;
+        reversionPromise = reversionPromise.then(function(reversion) {
+          let mappedReversion: Reversion = {
+            // The lm-layer's generated transform deletes more than is necessary,
+            // even if it re-inserts it afterward.  This may cause loss of 
+            // restorable deadkeys, so it's best to use Web's pre-calculated
+            // version above.
+            transform: reversionTranscription.transform,
+            // The ID part is critical; the reversion can't be applied without it.
+            transformId: reversionTranscription.token,
+            displayAs: reversion.displayAs,
+            tag: reversion.tag
+          }
+          // // If using the version from lm-layer:
+          // let mappedReversion = reversion;
+          // mappedReversion.transformId = reversionTranscription.token;
+          lp.predictFromTarget(outputTarget);
+          return mappedReversion;
+        });
 
         return reversionPromise;
       }
@@ -346,14 +354,22 @@ namespace com.keyman.text.prediction {
       this._mayCorrect = flag;
     }
 
+    public get wordbreaksAfterSuggestions() {
+      return this.configuration.wordbreaksAfterSuggestions;
+    }
+
     public tryAcceptSuggestion(source: string): boolean {
-      // Handlers of this event should return 'false' when the 'try' is successful.
-      return !this.emit('tryaccept', source);
+      let returnObj = {shouldSwallow: false};
+      this.emit('tryaccept', source, returnObj);
+
+      return returnObj.shouldSwallow;
     }
 
     public tryRevertSuggestion(): boolean {
-      // Handlers of this event should return 'false' when the 'try' is successful.
-      return !this.emit('tryrevert', null);
+      let returnObj = {shouldSwallow: false};
+      this.emit('tryrevert', returnObj);
+
+      return returnObj.shouldSwallow;
     }
   }
 }

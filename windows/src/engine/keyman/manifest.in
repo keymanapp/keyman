@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
-	<assemblyIdentity type="win32" name="tavultesoft.keymanengine.keyman" version="$VERSION" processorArchitecture="x86"/>
+	<assemblyIdentity type="win32" name="tavultesoft.keymanengine.keyman" version="$VersionWin" processorArchitecture="x86"/>
 	<description>Keyman Engine</description>
 	<trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
 		<security>

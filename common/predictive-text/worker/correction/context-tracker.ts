@@ -11,6 +11,10 @@ namespace correction {
     transformDistributions: Distribution<Transform>[] = [];
     replacements: TrackedContextSuggestion;
     activeReplacement: number = -1;
+
+    get isNew(): boolean {
+      return this.transformDistributions.length == 0;
+    }
   }
 
   export class TrackedContextState {
