@@ -5,7 +5,7 @@ class ModelCompositor {
   private lexicalModel: LexicalModel;
   private contextTracker?: correction.ContextTracker;
   private static readonly MAX_SUGGESTIONS = 12;
-  private readonly punctuation: LexicalModelPunctuation;
+  readonly punctuation: LexicalModelPunctuation;
 
   constructor(lexicalModel: LexicalModel) {
     this.lexicalModel = lexicalModel;
@@ -40,7 +40,6 @@ class ModelCompositor {
   }
 
   private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): Distribution<Suggestion> {
-    let punctuation = this.punctuation;
     let returnedPredictions: Distribution<Suggestion> = [];
 
     for(let correction of corrections) {
@@ -53,25 +52,6 @@ class ModelCompositor {
         // Only bother is there IS an ID to copy.
         if(transform.id !== undefined) {
           pair.sample.transformId = transform.id;
-        }
-
-        let preserveWhitespace: boolean = false;
-        if(this.isWhitespace(transform)) {
-          // Detect start of new word; prevent whitespace loss here.
-          let postContext = models.applyTransform(transform, context);
-          preserveWhitespace = (this.lexicalModel.wordbreak(postContext) == '');
-        }
-
-        // Prepends the original whitespace, ensuring it is preserved if
-        // the suggestion is accepted.
-        if(preserveWhitespace) {
-          models.prependTransform(pair.sample.transform, transform);
-        }
-        
-        // The model is trying to add a word; thus, add some custom formatting
-        // to that word.
-        if (pair.sample.transform.insert.length > 0) {
-          pair.sample.transform.insert += punctuation.insertAfterWord;
         }
 
         let prediction = {sample: pair.sample, p: pair.p * inputProb};
@@ -104,30 +84,40 @@ class ModelCompositor {
 
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
-    let keepOption: Suggestion = null;
+    let keepOption: Keep = null;
 
-    let predictionRoots: ProbabilityMass<Transform>[]
     let rawPredictions: Distribution<Suggestion> = [];
 
-    // Section 1:  determining 'prediction roots'.
+    // Used to restore whitespaces if operations would remove them.
+    let prefixTransform: Transform;
+    let contextState: correction.TrackedContextState = null;
 
+    // Section 1:  determining 'prediction roots'.
     if(!this.contextTracker) {
+      let predictionRoots: ProbabilityMass<Transform>[];
+
       // Generates raw prediction distributions for each valid input.  Can only 'correct'
       // against the final input.
       //
       // This is the old, 12.0-13.0 'correction' style.
-      predictionRoots = transformDistribution.map(function(alt) {
-        let transform = alt.sample;
+      if(allowSpace) {
+        // Detect start of new word; prevent whitespace loss here.
+        predictionRoots = [{sample: inputTransform, p: 1.0}];
+        prefixTransform = inputTransform;
+      } else {
+        predictionRoots = transformDistribution.map(function(alt) {
+          let transform = alt.sample;
 
-        // Filter out special keys unless they're expected.
-        if(this.isWhitespace(transform) && !allowSpace) {
-          return null;
-        } else if(this.isBackspace(transform) && !allowBksp) {
-          return null;
-        }
+          // Filter out special keys unless they're expected.
+          if(this.isWhitespace(transform) && !allowSpace) {
+            return null;
+          } else if(this.isBackspace(transform) && !allowBksp) {
+            return null;
+          }
 
-        return alt;
-      }, this);
+          return alt;
+        }, this);
+      }
 
       // Remove `null` entries.
       predictionRoots = predictionRoots.filter(tuple => !!tuple);
@@ -135,12 +125,12 @@ class ModelCompositor {
       // Running in bulk over all suggestions, duplicate entries may be possible.
       rawPredictions = this.predictFromCorrections(predictionRoots, context);
     } else {
-      let contextState = this.contextTracker.analyzeState(this.lexicalModel, 
-                                                          postContext, 
-                                                          !this.isEmpty(inputTransform) ? 
-                                                                        transformDistribution: 
-                                                                        [{sample: inputTransform, p: 1.0}]
-                                                          );
+      contextState = this.contextTracker.analyzeState(this.lexicalModel, 
+                                                      postContext, 
+                                                      !this.isEmpty(inputTransform) ? 
+                                                                    transformDistribution: 
+                                                                    [{sample: inputTransform, p: 1.0}]
+                                                      );
 
       // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
       //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -150,6 +140,16 @@ class ModelCompositor {
       //
       // The 'eventual' logic will be significantly more complex, though still manageable.
       let searchSpace = contextState.searchSpace[0];
+
+      let newEmptyToken = false;
+      // Detect if we're starting a new context state.
+      let contextTokens = contextState.tokens;
+      if(contextTokens.length == 0 || contextTokens[contextTokens.length - 1].isNew) {
+        if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
+          newEmptyToken = true;
+          prefixTransform = inputTransform;
+        }
+      }
 
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
@@ -175,7 +175,8 @@ class ModelCompositor {
           // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
-            deleteLeft: lexicalModel.wordbreak(context).length, // remove actual token string
+            // remove actual token string.  If new token, there should be nothing to delete.
+            deleteLeft: newEmptyToken ? 0 : lexicalModel.wordbreak(context).length, 
             id: finalInput.id
           }
 
@@ -217,13 +218,23 @@ class ModelCompositor {
       let displayText = prediction.sample.displayAs;
 
       if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
-        keepOption = prediction.sample;
-        // Ensure we keep any original casing, etc that may have been stripped.
-        keepOption.transform.insert = keepOptionText + punctuation.insertAfterWord;
-        keepOption.displayAs = keepOptionText;
-        // Specifying 'keep' helps uses of the LMLayer find it quickly
-        // if/when desired.
-        keepOption.tag = 'keep';
+        // Preserve the original, pre-keyed version of the text.
+        let baseTransform = prediction.sample.transform;
+
+        let keepTransform = {
+          insert: keepOptionText,
+          deleteLeft: baseTransform.deleteLeft,
+          deleteRight: baseTransform.deleteRight,
+          id: baseTransform.id
+        }
+
+        let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
+        keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
+        keepOption.matchesModel = true;
+
+        // Since we replaced the original Suggestion with a keep-annotated one,
+        // we must manually preserve the transform ID.
+        keepOption.transformId = prediction.sample.transformId;
       } else {
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
@@ -236,32 +247,12 @@ class ModelCompositor {
 
     // Generate a default 'keep' option if one was not otherwise produced.
     if(!keepOption && keepOptionText != '') {
-      keepOption = {
-        displayAs: keepOptionText,
-        transformId: inputTransform.id,
-        // Replicate the original transform, modified for appropriate language insertion syntax.
-        transform: {
-          insert: inputTransform.insert + punctuation.insertAfterWord,
-          deleteLeft: inputTransform.deleteLeft,
-          deleteRight: inputTransform.deleteRight,
-          id: inputTransform.id
-        },
-        tag: 'keep'
-      };
-    }
+      let keepTransform = models.transformToSuggestion(inputTransform, 1);  // 1 is a filler value; goes unused b/c is for a 'keep'.
+      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
+      keepTransform.displayAs = keepOptionText;
 
-    // Add the surrounding quotes to the "keep" option's display string:
-    if (keepOption) {
-      let { open, close } = punctuation.quotesForKeepSuggestion;
-      
-      // Should we also ensure that we're using the default quote marks first?
-      // Or is it reasonable to say that the "left" mark is always the one
-      // called "open"?
-      if(!punctuation.isRTL) {
-        keepOption.displayAs = open + keepOption.displayAs + close;
-      } else {
-        keepOption.displayAs = close + keepOption.displayAs + open;
-      }
+      keepOption = this.toAnnotatedSuggestion(keepTransform, 'keep');
+      keepOption.matchesModel = false;
     }
 
     // Section 3:  Finalize suggestions, truncate list to the N (MAX_SUGGESTIONS) most optimal, return.
@@ -292,10 +283,66 @@ class ModelCompositor {
     });
 
     if(keepOption) {
-      suggestions = [ keepOption ].concat(suggestions);
+      suggestions = [ keepOption as Suggestion ].concat(suggestions);
+    }
+
+    // Apply 'after word' punctuation and set suggestion IDs.  
+    // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    suggestions.forEach(function(suggestion) {
+      if (suggestion.transform.insert.length > 0) {
+        suggestion.transform.insert += punctuation.insertAfterWord;
+
+        // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
+        if(prefixTransform) {
+          let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
+          mergedTransform.id = suggestion.transformId;
+
+          // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
+          // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
+          let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
+          
+          // Assignment via by-reference behavior, as suggestion is an object
+          mutableSuggestion.transform = mergedTransform;
+        }
+      }
+    });
+
+    // Store the suggestions on the final token of the current context state (if it exists).
+    // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
+    if(contextState) {
+      // TODO:  context tracking enhancements
     }
 
     return suggestions;
+  }
+
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
+    annotationType: SuggestionTag,
+    quoteBehavior?: models.QuoteBehavior): Outcome<Suggestion>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>,
+    annotationType: 'keep',
+    quoteBehavior?: models.QuoteBehavior): Outcome<Keep>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
+    annotationType: 'revert',
+    quoteBehavior?: models.QuoteBehavior): Outcome<Reversion>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
+                                annotationType: SuggestionTag,
+                                quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Outcome<Suggestion> {
+    // A method-internal 'import' of the enum.
+    let QuoteBehavior = models.QuoteBehavior;
+
+    let defaultQuoteBehavior = QuoteBehavior.noQuotes;
+    if(annotationType == 'keep' || annotationType == 'revert') {
+      defaultQuoteBehavior = QuoteBehavior.useQuotes;
+    } 
+
+    return {
+      transform: suggestion.transform,
+      transformId: suggestion.transformId,
+      displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, this.punctuation, defaultQuoteBehavior),
+      tag: annotationType,
+      p: suggestion.p
+    };
   }
 
   /**
@@ -325,6 +372,48 @@ class ModelCompositor {
     return {
       insertAfterWord, quotesForKeepSuggestion, isRTL
     }
+  }
+
+  acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
+    // Step 1:  generate and save the reversion's Transform.
+    let sourceTransform = suggestion.transform;
+    let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
+    // right deletion is currently not implemented.
+    let insertedLength = sourceTransform.insert.kmwLength();
+
+    let reversionTransform: Transform = {
+      insert: deletedLeftChars,
+      deleteLeft: insertedLength
+    };
+
+    // Step 2:  building the proper 'displayAs' string for the Reversion
+    if(postTransform) {
+      // The code above restores the state to the context at the time the `Suggestion` was created.
+      // `postTransform` handles any missing context that came later.
+      reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
+
+      // Now that we've built the reversion based upon the Suggestion's original context,
+      // we may safely manipulate it in order to get a proper 'displayAs' string.
+      context = models.applyTransform(postTransform, context);
+    }
+
+    let postContextTokens = this.lexicalModel.tokenize(context); //.wordbreak(postContext);
+    let revertedPrefix = postContextTokens[postContextTokens.length - 1];
+
+    let firstConversion = models.transformToSuggestion(reversionTransform);
+    firstConversion.displayAs = revertedPrefix;
+    
+    // Build the actual Reversion, which is technically an annotated Suggestion.
+    // Since we're outside of the standard `predict` control path, we'll need to
+    // set the Reversion's ID directly.
+    let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
+    
+    // Step 3:  if we track Contexts, update the tracking data as appropriate.
+    if(this.contextTracker) {
+      // TODO:  implement.
+    }
+
+    return reversion;
   }
 }
 

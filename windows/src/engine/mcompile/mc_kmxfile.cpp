@@ -40,26 +40,31 @@ BOOL LoadKeyboard(LPWSTR fileName, LPKEYBOARD *lpKeyboard) {
 
   filebase = buf;
 
-	ReadFile(hFile, filebase, sz, &sz, NULL);
+	if(!ReadFile(hFile, filebase, sz, &sz, NULL)) {
+    Err(L"errReadFile");
+    CloseHandle(hFile);
+    delete[] buf;
+    return FALSE;
+  }
 	CloseHandle(hFile);
 
 	if(!VerifyKeyboard(filebase, sz)) {
     Err(L"errVerifyKeyboard");
-    delete buf; 
+    delete[] buf;
     return FALSE;
   }
 
 	kbp = FixupKeyboard(buf, filebase, sz);
   if(!kbp) {
     Err(L"errFixupKeyboard");
-    delete buf; 
+    delete[] buf;
     return FALSE;
   }
 
-	if(kbp->dwIdentifier != FILEID_COMPILED) { 
-    Err(L"errNotFileID"); 
-    delete buf; 
-    return FALSE; 
+	if(kbp->dwIdentifier != FILEID_COMPILED) {
+    Err(L"errNotFileID");
+    delete[] buf;
+    return FALSE;
   }
 
 	*lpKeyboard = kbp;
@@ -93,7 +98,7 @@ LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize) {
 	}
 
 	for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)	{
-    gp->dpName = StringOffset(base, cgp->dpName); 
+    gp->dpName = StringOffset(base, cgp->dpName);
 		gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
 		if(cgp->dpMatch != NULL) gp->dpMatch = (PWSTR) (base + cgp->dpMatch);
 		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PWSTR) (base + cgp->dpNoMatch);
@@ -124,12 +129,12 @@ BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz) {
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
   PCOMP_STORE csp;
 
-	/* Check file version */ 
+	/* Check file version */
 
-	if(ckbp->dwFileVersion < VERSION_MIN || 
-	   ckbp->dwFileVersion > VERSION_MAX) { 
-		/* Old or new version -- identify the desired program version */ 
-		if(VerifyChecksum(filebase, sz)) { 
+	if(ckbp->dwFileVersion < VERSION_MIN ||
+	   ckbp->dwFileVersion > VERSION_MAX) {
+		/* Old or new version -- identify the desired program version */
+		if(VerifyChecksum(filebase, sz)) {
 			for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++) {
 				if(csp->dwSystemID == TSS_COMPILEDVERSION) {
 					wchar_t buf2[256];
@@ -144,12 +149,12 @@ BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz) {
       }
 		}
 		Err(L"errWrongFileVersion");
-		return FALSE; 
+		return FALSE;
 	}
-	
-	if(!VerifyChecksum(filebase, sz)) { 
-    Err(L"errBadChecksum"); 
-    return FALSE; 
+
+	if(!VerifyChecksum(filebase, sz)) {
+    Err(L"errBadChecksum");
+    return FALSE;
   }
 
   return TRUE;

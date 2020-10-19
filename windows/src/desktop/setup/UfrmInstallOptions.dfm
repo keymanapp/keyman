@@ -74,6 +74,13 @@ object frmInstallOptions: TfrmInstallOptions
     Font.Style = [fsBold]
     ParentFont = False
   end
+  object lblInstallerVersion: TLabel
+    Left = 8
+    Top = 358
+    Width = 102
+    Height = 16
+    Caption = 'lblInstallerVersion'
+  end
   object chkStartWithWindows: TCheckBox
     Left = 8
     Top = 100

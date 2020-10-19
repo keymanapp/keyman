@@ -244,7 +244,7 @@ namespace com.keyman.osk {
      * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
      * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
      */
-    public apply(target?: text.OutputTarget): Promise<Suggestion> {
+    public apply(target?: text.OutputTarget): Promise<Reversion> {
       let keyman = com.keyman.singleton;
 
       if(this.isEmpty()) {
@@ -266,7 +266,7 @@ namespace com.keyman.osk {
         }
 
         // Apply the Suggestion!
-        return keyman.core.languageProcessor.acceptSuggestion(this.suggestion, target);
+        return keyman.core.languageProcessor.applySuggestion(this.suggestion, target);
       }
     }
 
@@ -530,14 +530,14 @@ namespace com.keyman.osk {
     private initNewContext: boolean = true;
 
     private currentSuggestions: Suggestion[] = [];
-    private keepSuggestion: Suggestion;
-    private revertSuggestion: Suggestion;
+    private keepSuggestion: Keep;
+    private revertSuggestion: Reversion;
 
     private currentTranscriptionID: number;
 
     private recentAccept: boolean = false;
     private recentAccepted: Suggestion;
-    private revertAcceptancePromise: Promise<Suggestion>;
+    private revertAcceptancePromise: Promise<Reversion>;
 
     private preAccept: text.Transcription = null;
     private swallowPrediction: boolean = false;
@@ -634,15 +634,20 @@ namespace com.keyman.osk {
      * Should return 'false' if the current state allows accepting a suggestion and act accordingly.
      * Otherwise, return true.
      */
-    tryAccept: (source: string) => boolean = function(this: SuggestionManager, source: string): boolean {
+    tryAccept: (source: string) => boolean = function(this: SuggestionManager, source: string, returnObj: {shouldSwallow: boolean}) {
+      let keyman = com.keyman.singleton;
+
       if(!this.recentAccept && this.selected) {
         this.doAccept(this.selected);
-        return false;
+        returnObj.shouldSwallow = true;
       } else if(this.recentAccept && source == 'space') {
         this.recentAccept = false;
-        return false; // Swallows a single space post-accept.
+        // If the model doesn't insert wordbreaks, don't swallow the space.  If it does, 
+        // we consider that insertion to be the results of the first post-accept space.
+        returnObj.shouldSwallow = !!keyman.core.languageProcessor.wordbreaksAfterSuggestions;
+      } else {
+        returnObj.shouldSwallow = false;
       }
-      return true;  // Not yet implemented
     }.bind(this);
 
     /**
@@ -650,7 +655,7 @@ namespace com.keyman.osk {
      * Should return 'false' if the current state allows reverting a recently-applied suggestion and act accordingly.
      * Otherwise, return true.
      */
-    tryRevert: () => boolean = function(this: SuggestionManager): boolean {
+    tryRevert: () => boolean = function(this: SuggestionManager, returnObj: {shouldSwallow: boolean}) {
       // Has the revert keystroke (BKSP) already been sent once since the last accept?
       if(this.doRevert) {
         // If so, clear the 'revert' option and start doing normal predictions again.
@@ -662,7 +667,9 @@ namespace com.keyman.osk {
         this.swallowPrediction = true;
       }
 
-      return true;
+      // We don't yet actually do key-based reversions.
+      returnObj.shouldSwallow = false;
+      return;
     }.bind(this);
 
     /**
@@ -700,7 +707,9 @@ namespace com.keyman.osk {
     private doUpdate() {
       let suggestions = [];
       // Insert 'current text' if/when valid as the leading option.
-      if(this.activateKeep() && this.keepSuggestion) {
+      // Since we don't yet do auto-corrections, we only show 'keep' whenever it's
+      // a valid word (according to the model).
+      if(this.activateKeep() && this.keepSuggestion && this.keepSuggestion.matchesModel) {
         suggestions.push(this.keepSuggestion);
       } else if(this.doRevert) {
         suggestions.push(this.revertSuggestion);
@@ -752,7 +761,7 @@ namespace com.keyman.osk {
       // and prevent it from being hidden after reversion operations.
       for(let s of suggestions) {
         if(s.tag == 'keep') {
-          this.keepSuggestion = s;
+          this.keepSuggestion = s as Keep;
         }
       }
 

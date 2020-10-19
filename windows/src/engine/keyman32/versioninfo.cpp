@@ -52,6 +52,8 @@ void GetWindowsVersion(char *buf)
 		if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 )
 			pos = "Microsoft Windows 7";
 
+    // TODO: Update this for Win8, Win10, etc
+
 		// Test for product type.
 
     if ( osvi.wProductType == VER_NT_WORKSTATION )
@@ -77,16 +79,16 @@ void GetWindowsVersion(char *buf)
     if ( osvi.dwMajorVersion <= 4 )
     {
       wsprintf (verinfo, "version %d.%d %s (Build %d)",
-         osvi.dwMajorVersion,
-         osvi.dwMinorVersion,
+         (int) osvi.dwMajorVersion,
+         (int) osvi.dwMinorVersion,
          osvi.szCSDVersion,
-         osvi.dwBuildNumber & 0xFFFF);
+         (int)(osvi.dwBuildNumber & 0xFFFF));
     }
     else
     { 
       wsprintf (verinfo, "version %s (Build %d)",
          osvi.szCSDVersion,
-         osvi.dwBuildNumber & 0xFFFF);
+         (int)(osvi.dwBuildNumber & 0xFFFF));
     }
     break;
 
@@ -121,6 +123,6 @@ void GetWindowsVersion(char *buf)
          break;
    }
 
-   wsprintf(buf, "Platform %s OS %s%s%s %s", pplatform, pos, pextra ? " " : "", pextra, verinfo);
+   wsprintf(buf, "Platform %s OS %s %s %s", pplatform, pos, *pextra ? " " : "", pextra, verinfo);
 }
 #pragma warning(default: 4996) 

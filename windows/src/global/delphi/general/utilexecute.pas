@@ -309,6 +309,24 @@ var
       end;
     end;
   end;
+
+  function IsElevated: Boolean;
+  var
+    hToken: THandle;
+    Elevation: TTokenElevation;
+    cbSize: DWORD;
+  begin
+    if OpenProcessToken(GetCurrentProcess, TOKEN_QUERY, hToken) then
+    try
+      cbSize := sizeof(TTokenElevation);
+      if GetTokenInformation(hToken, TokenElevation, @Elevation, sizeof(TTokenElevation), cbSize) then
+        Exit(Elevation.TokenIsElevated <> 0);
+    finally
+      CloseHandle(hToken);
+    end;
+    Result := False;
+  end;
+
 const
   SE_INCREASE_QUOTA_NAME = 'SeIncreaseQuotaPrivilege';
   TOKEN_ADJUST_SESSIONID = $100;
@@ -320,46 +338,53 @@ begin
 
   FillChar(pi, SizeOf(pi), 0);
 
-  if not Assigned(CreateProcessWithTokenW) then Exit;
+  if not IsElevated then
+  begin
+    if not CreateProcessW(PWideChar(process), PWideChar(cmdline), nil, nil, False, NORMAL_PRIORITY_CLASS, nil, nil, si, pi) then Exit;
+  end
+  else
+  begin
+    if not Assigned(CreateProcessWithTokenW) then Exit;
 
-  hDesktopWindow := GetShellWindow;
-  if hDesktopWindow = 0 then Exit;
-  if GetWindowThreadProcessId(hDesktopWindow, dwProcessId) = 0 then Exit;
+    hDesktopWindow := GetShellWindow;
+    if hDesktopWindow = 0 then Exit;
+    if GetWindowThreadProcessId(hDesktopWindow, dwProcessId) = 0 then Exit;
 
-  if not ImpersonateSelf(SecurityImpersonation) then Exit;
-  try
-    if not LookupPrivilegeValue(nil, SE_INCREASE_QUOTA_NAME, tkp.Privileges[0].Luid) then Exit;
-
-    tkp.PrivilegeCount := 1;  // one privilege to set
-    tkp.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
-
-    if not OpenThreadToken(GetCurrentThread, TOKEN_ADJUST_PRIVILEGES, False, hCurrentThreadToken) then Exit;
+    if not ImpersonateSelf(SecurityImpersonation) then Exit;
     try
-      if not AdjustTokenPrivileges(hCurrentThreadToken, False, tkp, 0, nil, retlen) then Exit;
+      if not LookupPrivilegeValue(nil, SE_INCREASE_QUOTA_NAME, tkp.Privileges[0].Luid) then Exit;
 
-      hProcess := OpenProcess(PROCESS_QUERY_INFORMATION, False, dwProcessId);
-      if hProcess = 0 then Exit;
+      tkp.PrivilegeCount := 1;  // one privilege to set
+      tkp.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
+
+      if not OpenThreadToken(GetCurrentThread, TOKEN_ADJUST_PRIVILEGES, False, hCurrentThreadToken) then Exit;
       try
-        if not OpenProcessToken(hProcess, TOKEN_DUPLICATE, hShellProcessToken) then Exit;
+        if not AdjustTokenPrivileges(hCurrentThreadToken, False, tkp, 0, nil, retlen) then Exit;
+
+        hProcess := OpenProcess(PROCESS_QUERY_INFORMATION, False, dwProcessId);
+        if hProcess = 0 then Exit;
         try
-          if not DuplicateTokenEx(hShellProcessToken, TOKEN_QUERY or TOKEN_ASSIGN_PRIMARY or TOKEN_DUPLICATE or TOKEN_ADJUST_DEFAULT or TOKEN_ADJUST_SESSIONID,
-            nil, SecurityImpersonation, TokenPrimary, hPrimaryToken) then Exit;
+          if not OpenProcessToken(hProcess, TOKEN_DUPLICATE, hShellProcessToken) then Exit;
           try
-            if not CreateProcessWithTokenW(hPrimaryToken, 0, PWideChar(process), PWideChar(cmdline), NORMAL_PRIORITY_CLASS, nil, nil, @si, @pi) then Exit;
+            if not DuplicateTokenEx(hShellProcessToken, TOKEN_QUERY or TOKEN_ASSIGN_PRIMARY or TOKEN_DUPLICATE or TOKEN_ADJUST_DEFAULT or TOKEN_ADJUST_SESSIONID,
+              nil, SecurityImpersonation, TokenPrimary, hPrimaryToken) then Exit;
+            try
+              if not CreateProcessWithTokenW(hPrimaryToken, 0, PWideChar(process), PWideChar(cmdline), NORMAL_PRIORITY_CLASS, nil, nil, @si, @pi) then Exit;
+            finally
+              CloseHandle(hPrimaryToken);
+            end;
           finally
-            CloseHandle(hPrimaryToken);
+            CloseHandle(hShellProcessToken);
           end;
         finally
-          CloseHandle(hShellProcessToken);
+          CloseHandle(hProcess);
         end;
       finally
-        CloseHandle(hProcess);
+        CloseHandle(hCurrentThreadToken);
       end;
     finally
-      CloseHandle(hCurrentThreadToken);
+      RevertToSelf;
     end;
-  finally
-    RevertToSelf;
   end;
 
   Result := True;

@@ -123,6 +123,9 @@ BOOL OpenTSF(PKEYMAN64THREADDATA _td)
 BOOL CloseTSF()
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return FALSE;
+  }
 
   /*if(_td->dwSinkCookie != (DWORD)-1 && _td->pSource) {
     _td->pSource->UnadviseSink(_td->dwSinkCookie);

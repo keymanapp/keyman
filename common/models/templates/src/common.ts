@@ -24,16 +24,33 @@ namespace models {
   }
 
   /**
-   *
-   * @param transform Merges one transform into another, mutating the first parameter to
-   *                  include the effects of the second.
-   * @param prefix
+   * Merges two Transforms as if they were applied to a `Context` successively.
+   * @param first 
+   * @param second 
    */
-  export function prependTransform(transform: Transform, prefix: Transform) {
-    transform.insert = prefix.insert + transform.insert;
-    transform.deleteLeft += prefix.deleteLeft;
-    if(prefix.deleteRight) {
-      transform.deleteRight = (transform.deleteRight || 0) + prefix.deleteRight;
+  export function buildMergedTransform(first: Transform, second: Transform): Transform {
+    // These exist to avoid parameter mutation.
+    let mergedFirstInsert: string = first.insert;
+    let mergedSecondDelete: number = second.deleteLeft;
+
+    // The 'fun' case:  the second Transform wants to delete something from the first.
+    if(second.deleteLeft) {
+      let firstLength = first.insert.kmwLength();
+      if(firstLength <= second.deleteLeft) {
+        mergedFirstInsert = '';
+        mergedSecondDelete = second.deleteLeft - firstLength;
+      } else {
+        mergedFirstInsert = first.insert.kmwSubstr(0, firstLength - second.deleteLeft);
+        mergedSecondDelete = 0;
+      }
+    }
+
+    return {
+      insert: mergedFirstInsert + second.insert,
+      deleteLeft: first.deleteLeft + mergedSecondDelete,
+      // As `first` would affect the context before `second` could take effect,
+      // this is the correct way to merge `deleteRight`.
+      deleteRight: (first.deleteRight || 0) + (second.deleteRight || 0)
     }
   }
 
@@ -59,5 +76,27 @@ namespace models {
 
   export function isSentinel(char: string): boolean {
     return char == models.SENTINEL_CODE_UNIT;
+  }
+
+  /**
+   * Builds a Suggestion based on a Transform corresponding to a predictive-text op.
+   * 
+   * Assumes that the Transform's `insert` property represents a completed word,
+   * as models generally delete the whole prefix, replacing it with the full lexical entry.
+   * @param transform 
+   */
+  export function transformToSuggestion(transform: Transform): Suggestion;
+  export function transformToSuggestion(transform: Transform, p: number): WithOutcome<Suggestion>; 
+  export function transformToSuggestion(transform: Transform, p?: number): Outcome<Suggestion> {
+    let suggestion: Outcome<Suggestion> = {
+      transform: transform,
+      transformId: transform.id,
+      displayAs: transform.insert
+    };
+
+    if(p === 0 || p) {
+      suggestion.p = p;
+    }
+    return suggestion;
   }
 }

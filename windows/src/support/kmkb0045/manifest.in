@@ -5,7 +5,7 @@
   <assemblyIdentity
     type="win32"
     name="tavultesoft.keymanengine.kmkb0045"
-    version="$VERSION"
+    version="$VersionWin"
     processorArchitecture="x86"/>
 
   <description>Tavultesoft KMKB0045</description>
