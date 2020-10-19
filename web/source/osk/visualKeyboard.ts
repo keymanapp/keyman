@@ -1509,7 +1509,7 @@ namespace com.keyman.osk {
       subKeys.id='kmw-popup-keys';
       this.popupBaseKey = e;
 
-      // No longer prepend base key to popup array
+      // #3718: No longer prepend base key to popup array
 
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
