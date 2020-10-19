@@ -5,7 +5,7 @@ class ModelCompositor {
   private lexicalModel: LexicalModel;
   private contextTracker?: correction.ContextTracker;
   private static readonly MAX_SUGGESTIONS = 12;
-  private readonly punctuation: LexicalModelPunctuation;
+  readonly punctuation: LexicalModelPunctuation;
 
   constructor(lexicalModel: LexicalModel) {
     this.lexicalModel = lexicalModel;
@@ -84,12 +84,13 @@ class ModelCompositor {
 
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
-    let keepOption: Suggestion = null;
+    let keepOption: Keep = null;
 
     let rawPredictions: Distribution<Suggestion> = [];
 
     // Used to restore whitespaces if operations would remove them.
     let prefixTransform: Transform;
+    let contextState: correction.TrackedContextState = null;
 
     // Section 1:  determining 'prediction roots'.
     if(!this.contextTracker) {
@@ -124,12 +125,12 @@ class ModelCompositor {
       // Running in bulk over all suggestions, duplicate entries may be possible.
       rawPredictions = this.predictFromCorrections(predictionRoots, context);
     } else {
-      let contextState = this.contextTracker.analyzeState(this.lexicalModel, 
-                                                          postContext, 
-                                                          !this.isEmpty(inputTransform) ? 
-                                                                        transformDistribution: 
-                                                                        [{sample: inputTransform, p: 1.0}]
-                                                          );
+      contextState = this.contextTracker.analyzeState(this.lexicalModel, 
+                                                      postContext, 
+                                                      !this.isEmpty(inputTransform) ? 
+                                                                    transformDistribution: 
+                                                                    [{sample: inputTransform, p: 1.0}]
+                                                      );
 
       // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
       //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -227,8 +228,13 @@ class ModelCompositor {
           id: baseTransform.id
         }
 
-        keepOption = models.transformToSuggestion(keepTransform, prediction.p);
-        keepOption = this.toAnnotatedKeepSuggestion(keepOption, models.QuoteBehavior.noQuotes);
+        let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
+        keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
+        keepOption.matchesModel = true;
+
+        // Since we replaced the original Suggestion with a keep-annotated one,
+        // we must manually preserve the transform ID.
+        keepOption.transformId = prediction.sample.transformId;
       } else {
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
@@ -245,7 +251,8 @@ class ModelCompositor {
       // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
       keepTransform.displayAs = keepOptionText;
 
-      keepOption = this.toAnnotatedKeepSuggestion(keepTransform);
+      keepOption = this.toAnnotatedSuggestion(keepTransform, 'keep');
+      keepOption.matchesModel = false;
     }
 
     // Section 3:  Finalize suggestions, truncate list to the N (MAX_SUGGESTIONS) most optimal, return.
@@ -276,35 +283,64 @@ class ModelCompositor {
     });
 
     if(keepOption) {
-      suggestions = [ keepOption ].concat(suggestions);
+      suggestions = [ keepOption as Suggestion ].concat(suggestions);
     }
 
-    // Apply 'after word' punctuation.  We delay until now so that utility functions relying on the
-    // unmodified Transform may execute properly.
+    // Apply 'after word' punctuation and set suggestion IDs.  
+    // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
     suggestions.forEach(function(suggestion) {
       if (suggestion.transform.insert.length > 0) {
         suggestion.transform.insert += punctuation.insertAfterWord;
 
         // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
         if(prefixTransform) {
-          models.prependTransform(suggestion.transform, prefixTransform);
+          let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
+          mergedTransform.id = suggestion.transformId;
+
+          // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
+          // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
+          let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
+          
+          // Assignment via by-reference behavior, as suggestion is an object
+          mutableSuggestion.transform = mergedTransform;
         }
       }
     });
 
+    // Store the suggestions on the final token of the current context state (if it exists).
+    // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
+    if(contextState) {
+      // TODO:  context tracking enhancements
+    }
+
     return suggestions;
   }
 
-  private toAnnotatedKeepSuggestion(suggestion: Suggestion & {p?: number}, 
-                                    quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Suggestion & {p?: number} {
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
+    annotationType: SuggestionTag,
+    quoteBehavior?: models.QuoteBehavior): Outcome<Suggestion>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>,
+    annotationType: 'keep',
+    quoteBehavior?: models.QuoteBehavior): Outcome<Keep>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
+    annotationType: 'revert',
+    quoteBehavior?: models.QuoteBehavior): Outcome<Reversion>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
+                                annotationType: SuggestionTag,
+                                quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Outcome<Suggestion> {
     // A method-internal 'import' of the enum.
     let QuoteBehavior = models.QuoteBehavior;
+
+    let defaultQuoteBehavior = QuoteBehavior.noQuotes;
+    if(annotationType == 'keep' || annotationType == 'revert') {
+      defaultQuoteBehavior = QuoteBehavior.useQuotes;
+    } 
 
     return {
       transform: suggestion.transform,
       transformId: suggestion.transformId,
-      displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, this.punctuation, QuoteBehavior.useQuotes),
-      tag: 'keep',
+      displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, this.punctuation, defaultQuoteBehavior),
+      tag: annotationType,
       p: suggestion.p
     };
   }
@@ -336,6 +372,48 @@ class ModelCompositor {
     return {
       insertAfterWord, quotesForKeepSuggestion, isRTL
     }
+  }
+
+  acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
+    // Step 1:  generate and save the reversion's Transform.
+    let sourceTransform = suggestion.transform;
+    let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
+    // right deletion is currently not implemented.
+    let insertedLength = sourceTransform.insert.kmwLength();
+
+    let reversionTransform: Transform = {
+      insert: deletedLeftChars,
+      deleteLeft: insertedLength
+    };
+
+    // Step 2:  building the proper 'displayAs' string for the Reversion
+    if(postTransform) {
+      // The code above restores the state to the context at the time the `Suggestion` was created.
+      // `postTransform` handles any missing context that came later.
+      reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
+
+      // Now that we've built the reversion based upon the Suggestion's original context,
+      // we may safely manipulate it in order to get a proper 'displayAs' string.
+      context = models.applyTransform(postTransform, context);
+    }
+
+    let postContextTokens = this.lexicalModel.tokenize(context); //.wordbreak(postContext);
+    let revertedPrefix = postContextTokens[postContextTokens.length - 1];
+
+    let firstConversion = models.transformToSuggestion(reversionTransform);
+    firstConversion.displayAs = revertedPrefix;
+    
+    // Build the actual Reversion, which is technically an annotated Suggestion.
+    // Since we're outside of the standard `predict` control path, we'll need to
+    // set the Reversion's ID directly.
+    let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
+    
+    // Step 3:  if we track Contexts, update the tracking data as appropriate.
+    if(this.contextTracker) {
+      // TODO:  implement.
+    }
+
+    return reversion;
   }
 }
 

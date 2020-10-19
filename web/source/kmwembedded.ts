@@ -493,8 +493,9 @@ namespace com.keyman.text {
    *  @param  {number}  shift  shift state (0x01=left ctrl 0x02=right ctrl 0x04=left alt 0x08=right alt
    *                                        0x10=shift 0x20=ctrl 0x40=alt)
    *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
+   *  @return {boolean} false when KMW _has_ fully handled the event and true when not.
    **/            
-  keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
+  keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0): boolean {
     let keyman = com.keyman.singleton;
     if(!keyman.core.activeKeyboard || code == 0) {
       return false;
@@ -525,7 +526,9 @@ namespace com.keyman.text {
     try {
       // Now that we've manually constructed a proper keystroke-sourced KeyEvent, pass control
       // off to the processor for its actual execution.
-      return keyman.core.processKeyEvent(Lkc) != null;
+
+      // Should return 'false' when KMW _has_ fully handled the event and 'true' when not.
+      return !keyman.core.processKeyEvent(Lkc);
     } catch (err) {
       console.error(err.message, err);
       return false;
