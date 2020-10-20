@@ -49,10 +49,6 @@ namespace com.keyman.text {
 
     baseLayout: string;
 
-    // May be overridden in embedded contexts to ensure keystrokes normally
-    // handled by the browser can be properly handled within that context.
-    forceSyntheticDefaults: boolean = false;
-
     // Callbacks for various feedback types
     beepHandler?: BeepHandler;
     warningLogger?: LogMessageHandler;
@@ -138,9 +134,6 @@ namespace com.keyman.text {
             case EmulationKeystrokes.Enter:
               outputTarget.handleNewlineAtCaret();
               break;
-            case EmulationKeystrokes.Space:
-              this.keyboardInterface.output(0, outputTarget, ' ');
-              break;
             // case '\u007f': // K_DEL
               // // For (possible) future implementation.
               // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
@@ -162,8 +155,6 @@ namespace com.keyman.text {
           if(special == EmulationKeystrokes.Backspace) {
             // A browser's default backspace may fail to delete both parts of an SMP character.
             this.keyboardInterface.defaultBackspace(Lkc.Ltarg);
-          } else if(this.forceSyntheticDefaults && special == EmulationKeystrokes.Space) {
-            this.keyboardInterface.output(0, outputTarget, ' ');
           } else if(special || DefaultOutput.isCommand(Lkc)) { // Filters out 'commands' like TAB.
             // We only do the "for special emulation" cases under the condition above... aside from backspace
             // Let the browser handle those.

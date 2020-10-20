@@ -1488,12 +1488,6 @@ namespace com.keyman.dom {
       this.keyman.core.keyboardProcessor.warningLogger = console.warn.bind(console);
       this.keyman.core.keyboardProcessor.errorLogger = console.error.bind(console);
 
-      if(this.keyman.isEmbedded) {
-        // Tell the KeyboardProcessor to auto-emulate SPACE as a default, even
-        // for physical devices, when in an embedded context.
-        this.keyman.core.keyboardProcessor.forceSyntheticDefaults = true;
-      }
-
       // Local function to convert relative to absolute URLs
       // with respect to the source path, server root and protocol 
       var fixPath = function(p) {
