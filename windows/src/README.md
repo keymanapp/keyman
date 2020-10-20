@@ -90,7 +90,7 @@ In Visual Studio 2017, you need to have the following installed:
 
 #### Individual components
 * Windows Universal CRT SDK
-* Windows 8.1 SDK
+* Windows 10.0.17763.0 SDK
 
 Configure Visual Studio to use two-space tab stops:
 1. Open the options dialog: Tools > Options.

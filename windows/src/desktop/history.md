@@ -1,5 +1,11 @@
 # Keyman Desktop Version History
 
+## 2020-10-08 13.0.113 stable
+* Bug fix(Windows): Fix situation where Keyman might not work with Windows Store apps (#3667)
+
+## 2020-02-19 13.0.100 stable
+* Chore: Keyman Desktop 13.0.100 release
+
 ## 2020-02-04 13.0.67 beta
 * Bug Fix(System): Windows touch keyboard would be dismissed on each keystroke if Keyman was running (#2580)
 
