@@ -12,4 +12,5 @@ begin Unicode > use(main)
 
 group(main) using keys
 
-+ [K_X] > beep
++ [K_X] > 'x' beep
++ [SHIFT K_X] > 'X' beep
