@@ -7,6 +7,8 @@ class ModelCompositor {
   private static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
 
+  private SUGGESTION_ID_SEED = 0;
+
   constructor(lexicalModel: LexicalModel) {
     this.lexicalModel = lexicalModel;
     if(lexicalModel.traverseFromRoot) {
@@ -288,6 +290,7 @@ class ModelCompositor {
 
     // Apply 'after word' punctuation and set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    let compositor = this;
     suggestions.forEach(function(suggestion) {
       if (suggestion.transform.insert.length > 0) {
         suggestion.transform.insert += punctuation.insertAfterWord;
@@ -305,12 +308,20 @@ class ModelCompositor {
           mutableSuggestion.transform = mergedTransform;
         }
       }
+
+      suggestion.id = compositor.SUGGESTION_ID_SEED;
+      compositor.SUGGESTION_ID_SEED++;
     });
 
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(contextState) {
-      // TODO:  context tracking enhancements
+      contextState.tail.replacements = suggestions.map(function(suggestion) {
+        return {
+          suggestion: suggestion,
+          tokenWidth: 1
+        }
+      });
     }
 
     return suggestions;
@@ -387,18 +398,19 @@ class ModelCompositor {
     };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
+    let postContext = context;
     if(postTransform) {
       // The code above restores the state to the context at the time the `Suggestion` was created.
       // `postTransform` handles any missing context that came later.
       reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
 
       // Now that we've built the reversion based upon the Suggestion's original context,
-      // we may safely manipulate it in order to get a proper 'displayAs' string.
-      context = models.applyTransform(postTransform, context);
+      // we manipulate it in order to get a proper 'displayAs' string.
+      postContext = models.applyTransform(postTransform, postContext);
     }
 
-    let postContextTokens = this.lexicalModel.tokenize(context); //.wordbreak(postContext);
-    let revertedPrefix = postContextTokens[postContextTokens.length - 1];
+    let postContextTokens = this.lexicalModel.tokenize(postContext); //.wordbreak(postContext);
+    let revertedPrefix = postContextTokens[postContextTokens.length - 1] || '';
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
@@ -407,10 +419,26 @@ class ModelCompositor {
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
     let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
+    if(suggestion.id) {
+      // Since a reversion inverts its source suggestion, we set its ID to be the 
+      // additive inverse of the source suggestion's ID.  Makes easy mapping /
+      // verification later.
+      reversion.id = -suggestion.id;
+    } else {
+      reversion.id = -this.SUGGESTION_ID_SEED;
+      this.SUGGESTION_ID_SEED++;
+    }
     
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
     if(this.contextTracker) {
-      // TODO:  implement.
+      let contextState = this.contextTracker.newest;
+      if(!contextState) {
+        contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
+      }
+      
+      contextState.tail.activeReplacementId = suggestion.id;
+      let acceptedContext = models.applyTransform(suggestion.transform, context);
+      this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
     }
 
     return reversion;

@@ -129,7 +129,7 @@ interface AcceptMessage {
   /**
    * The Suggestion being accepted.  The ID must be assigned.
    */
-  suggestion: Suggestion;
+  suggestion: Suggestion & {id: number};
 
   /**
    * The context (text to the left and text to right) at the

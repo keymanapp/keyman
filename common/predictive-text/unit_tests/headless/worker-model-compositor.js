@@ -165,6 +165,7 @@ describe('ModelCompositor', function() {
           id: 0
         },
         transformId: 0,
+        id: 1,
         displayAs: 'hello'
       };
   
@@ -180,6 +181,7 @@ describe('ModelCompositor', function() {
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.id, -baseSuggestion.id);
 
       // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
       //            Does this include characters not considered when the Suggestion was built?
@@ -205,6 +207,7 @@ describe('ModelCompositor', function() {
           id: 0
         },
         transformId: 0,
+        id: 0,
         displayAs: 'world'
       };
   
@@ -220,6 +223,7 @@ describe('ModelCompositor', function() {
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.id, -baseSuggestion.id);
 
       // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
       //            Does this include characters not considered when the Suggestion was built?
@@ -245,6 +249,7 @@ describe('ModelCompositor', function() {
           id: 0
         },
         transformId: 0,
+        id: 0,
         displayAs: 'world'
       };
   
@@ -253,6 +258,7 @@ describe('ModelCompositor', function() {
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext);
+      assert.equal(reversion.id, -baseSuggestion.id);
 
       // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
       //            Does this include characters not considered when the Suggestion was built?
@@ -278,6 +284,7 @@ describe('ModelCompositor', function() {
           id: 0
         },
         transformId: 0,
+        id: 0,
         displayAs: 'hello'
       };
   
@@ -293,6 +300,7 @@ describe('ModelCompositor', function() {
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.id, -baseSuggestion.id);
 
       // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
       //            Does this include characters not considered when the Suggestion was built?
