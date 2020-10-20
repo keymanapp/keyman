@@ -144,16 +144,30 @@ declare interface LexicalModel {
   readonly punctuation?: LexicalModelPunctuation;
 
   /**
+   * Returns the wordbreaker defined for the model (if it exists).
+   */
+  wordbreaker?: WordBreakingFunction;
+
+  /**
+   * **NOTE:  _Deprecated!_**
+   * 
+   * Performs a wordbreak operation given the current context state, returning whatever word
+   * or word fragment exists that starts before the caret but after the most recent whitespace
+   * preceding the caret.  If no such text exists, the empty string is returned.
+   * 
+   * This function is designed for use in generating display text for 'keep' `Suggestions`
+   * and display text for reverting any previously-applied `Suggestions`.
+   * @param context 
+   * @deprecated
+   */
+  wordbreak?(context: Context): USVString;
+
+  /**
    * Lexical models _may_ provide a LexiconTraversal object usable to enhance 
    * prediction and correction results.  The returned object represents the
    * unfiltered lexicon (with an empty prefix).
    */
   traverseFromRoot?(): LexiconTraversal;
-
-  /**
-   * Returns the wordbreaker defined for the model (if it exists).
-   */
-  wordbreaker?: WordBreakingFunction;
 }
 
 /**

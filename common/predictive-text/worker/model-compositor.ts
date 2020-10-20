@@ -397,9 +397,7 @@ class ModelCompositor {
       context = models.applyTransform(postTransform, context);
     }
 
-    let wordbreaker = this.lexicalModel.wordbreaker || wordBreakers.default;
-    let postContextTokens = models.tokenize(wordbreaker, context); //.wordbreak(postContext);
-    let revertedPrefix = postContextTokens.left[postContextTokens.left.length - 1];
+    let revertedPrefix = this.wordbreak(context);
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
@@ -418,9 +416,22 @@ class ModelCompositor {
   }
 
   private wordbreak(context: Context): string {
-    let wordbreaker = this.lexicalModel.wordbreaker || wordBreakers.default;
+    let model = this.lexicalModel;
 
-    return models.wordbreak(wordbreaker, context);
+    if(model.wordbreaker || !model.wordbreak) {
+      // We don't need a 12.0 / 13.0 compatibility mode here.
+      // We're either relying on defaults or on the 14.0+ wordbreaker spec.
+      let wordbreaker = model.wordbreaker || wordBreakers.default;
+
+      return models.wordbreak(wordbreaker, context);
+    } else {
+      // 1.  This model does not provide a model following the 14.0+ wordbreaking spec
+      // 2.  This model DOES define a custom wordbreaker following the 12.0-13.0 spec.
+
+      // Since the model relies on custom wordbreaking behavior, we need to use the
+      // old, deprecated wordbreaking pattern.
+      return model.wordbreak(context);
+    }
   }
 }
 
