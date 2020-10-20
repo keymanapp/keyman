@@ -35,7 +35,6 @@ namespace correction {
 
     revert() {
       delete this.activeReplacementId;
-      delete this.replacements;
     }
   }
 
@@ -188,7 +187,7 @@ namespace correction {
         return undefined;
       }
 
-      return this.item[0];
+      return this.item(0);
     }
 
     get newest(): Item {
@@ -196,7 +195,7 @@ namespace correction {
         return undefined;
       }
 
-      return this.item[this.count - 1];
+      return this.item(this.count - 1);
     }
 
     enqueue(item: Item): Item {
@@ -224,6 +223,21 @@ namespace correction {
       }
     }
 
+    popNewest(): Item {
+      if(this.currentTail == this.currentHead) {
+        return null;
+      } else {
+        let item = this.circle[this.currentHead];
+        this.currentHead = (this.currentHead - 1 + this.maxCount) % this.maxCount;
+        return item;
+      }
+    }
+
+    /**
+     * Returns items contained within the circular array, ordered from 'oldest' to 'newest' -
+     * the same order in which the items will be dequeued.
+     * @param index 
+     */
     item(index: number) {
       if(index >= this.count) {
         throw "Invalid array index";

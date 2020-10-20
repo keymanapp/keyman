@@ -419,7 +419,10 @@ class ModelCompositor {
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
     let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
-    if(suggestion.id) {
+    if(suggestion.transformId != null) {
+      reversion.transformId = suggestion.transformId;
+    }
+    if(suggestion.id != null) {
       // Since a reversion inverts its source suggestion, we set its ID to be the 
       // additive inverse of the source suggestion's ID.  Makes easy mapping /
       // verification later.
@@ -442,6 +445,49 @@ class ModelCompositor {
     }
 
     return reversion;
+  }
+
+  applyReversion(reversion: Reversion, context: Context): Suggestion[] {
+    // If we are unable to track context (because the model does not support LexiconTraversal),
+    // we need a "fallback" strategy.
+    let compositor = this;
+    let fallbackSuggestions = function() {
+      let revertedContext = models.applyTransform(reversion.transform, context);
+      return compositor.predict({ insert: '', deleteLeft: 0}, revertedContext);
+    }
+
+    if(!this.contextTracker) {
+      return fallbackSuggestions();
+    }
+
+    // When the context is tracked, we prefer the tracked information.
+    let contextMatchFound = false;
+    for(let c = this.contextTracker.count - 1; c >= 0; c--) {
+      let contextState = this.contextTracker.item(c);
+
+      if(contextState.tail.activeReplacementId == -reversion.id) {
+        contextMatchFound = true;
+        break;
+      }
+    }
+
+    if(!contextMatchFound) {
+      return fallbackSuggestions();
+    }
+
+    // Remove all contexts more recent than the one we're reverting to.
+    while(this.contextTracker.newest.tail.activeReplacementId != -reversion.id) {
+      this.contextTracker.popNewest();
+    }
+
+    this.contextTracker.newest.tail.revert();
+
+    // Will need to be modified a bit if/when phrase-level suggestions are implemented.
+    // Those will be tracked on the first token of the phrase, which won't be the tail
+    // if they cover multiple tokens.
+    return this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
+      return trackedSuggestion.suggestion;
+    });
   }
 }
 
