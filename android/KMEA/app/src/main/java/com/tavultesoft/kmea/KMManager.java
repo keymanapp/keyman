@@ -125,6 +125,8 @@ public final class KMManager {
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
 
+  private static boolean didLogHardwareKeystrokeException = false;
+
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   // This is used to keep track of the starting system keyboard index while the screen is locked
@@ -400,6 +402,9 @@ public final class KMManager {
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       SystemKeyboard.executeHardwareKeystroke(code, shift, lstates, eventModifiers);
       return true;
+    } else if (!didLogHardwareKeystrokeException) {
+      KMLog.LogError(TAG, "executeHardwareKeystroke: " + keyboard.toString() + " keyboard is null");
+      didLogHardwareKeystrokeException = true;
     }
 
     return false;
