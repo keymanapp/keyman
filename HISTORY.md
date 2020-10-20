@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.164 alpha 2020-10-20
+
+* feat(common/models):  context tracking of accepted Suggestions (#3663)
+* feat(common/models): context reversion modeling (#3685)
+* fix(windows): RefreshKeyboards loses some profiles (#3714)
+* fix(windows): icons missing in Configuration (#3717)
+* fix(windows): tweak scrolling in keyboard menu (#3719)
+* fix(developer): crash creating basic project (#3716)
+
 ## 14.0.163 alpha 2020-10-19
 
 * fix(web): Remove base key from popup keys (#3718)
