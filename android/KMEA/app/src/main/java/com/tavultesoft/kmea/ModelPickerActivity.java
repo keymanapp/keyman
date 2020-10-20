@@ -143,7 +143,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
           // If we had a previously-installed lexical model, we should 'deinstall' it so that only
           // one model is actively linked to any given language.
-          if(!modelInstalled) {
+          if(!modelInstalled && !immediateRegister) {
             // While awkward, we must obtain the preInstalledModelMap before any installations occur.
             // We don't want to remove the model we just installed, after all!
             HashMap<String, String> preInstalledModelMap = KMManager.getAssociatedLexicalModel(languageID);

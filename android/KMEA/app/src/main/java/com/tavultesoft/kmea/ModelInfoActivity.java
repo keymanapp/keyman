@@ -79,7 +79,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
     hashMap.put(titleKey, getString(R.string.model_version));
     hashMap.put(subtitleKey, modelVersion);
     // Display notification to download update if available
-    if (lm.hasUpdateAvailable()) {
+    if (lm.hasUpdateAvailable(modelVersion)) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, modelVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }

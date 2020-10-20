@@ -3,9 +3,11 @@
  */
 package com.tavultesoft.kmea.data;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONException;
@@ -65,10 +67,21 @@ public abstract class LanguageResource implements Serializable {
 
   /**
    * Helper method if the language resource has an updated kmp package available to download from the cloud
+   * The version in the kmp link is compared to the currentVersion
+   * @param currentVersion String of the currently installed version
    * @return boolean true if an updated kmp package is available
    */
-  public boolean hasUpdateAvailable() {
-    return (kmp != null && !kmp.isEmpty());
+  public boolean hasUpdateAvailable(String currentVersion) {
+    boolean updateAvailable = false;
+    if (kmp != null && !kmp.isEmpty()) {
+      Uri uri = Uri.parse(kmp);
+      String availableVersion = uri.getQueryParameter("version");
+      if (FileUtils.compareVersions(currentVersion, availableVersion) == FileUtils.VERSION_LOWER) {
+        updateAvailable = true;
+      }
+    }
+
+    return updateAvailable;
   }
 
   public int hashCode() {

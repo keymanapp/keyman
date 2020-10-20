@@ -168,13 +168,15 @@ public class CloudRepository {
 
   // Should be called whenever a new language code starts being managed in order to help signal
   // retrieval of the language code's lexical models.
-  public void invalidateLexicalModelCache(@NonNull Context context) {
+  public void invalidateLexicalModelCache(@NonNull Context context, boolean deleteCacheFile) {
     this.invalidateLexicalCache = true;
 
-    // We should also pre-emptively clear out the old cache file
-    // in case of an app close or crash.
-    File file = CloudDataJsonUtil.getLexicalModelCacheFile(context);
-    file.delete();
+    if (deleteCacheFile) {
+      // We should also pre-emptively clear out the old cache file
+      // in case of an app close or crash.
+      File file = CloudDataJsonUtil.getLexicalModelCacheFile(context);
+      file.delete();
+    }
   }
 
   private CloudApiTypes.CloudApiParam prepareResourcesUpdateQuerty(Context aContext) {
