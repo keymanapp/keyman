@@ -226,8 +226,11 @@ namespace com.keyman.osk {
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
 
-        // Disabled by mcdurdin 2020-04-09; dotted circle display is inconsistent on iOS/Safari
-        // at least and doesn't combine with diacritic marks. 
+        // Disabled by mcdurdin 2020-10-19; dotted circle display is inconsistent on iOS/Safari
+        // at least and doesn't combine with diacritic marks. For consistent display, it may be
+        // necessary to build a custom font that does not depend on renderer choices for base 
+        // mark display -- e.g. create marks with custom base included, potentially even on PUA 
+        // code points and use those in rendering the OSK. See #3039 for more details.
         // keyText = '\u25cc' + keyText;
 
         if(activeKeyboard && activeKeyboard.isRTL) {
