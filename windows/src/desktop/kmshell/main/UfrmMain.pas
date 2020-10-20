@@ -277,6 +277,7 @@ var
   sharedDataIntf: IConfigMainSharedData;
   sharedData: TConfigMainSharedData;
   s: string;
+  xml: string;
 begin
   if FPageTag > 0 then
   begin
@@ -301,9 +302,10 @@ begin
     XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))
   ]) + DefaultServersXMLTags + DefaultVersionXMLTags;
 
+  xml := FXMLRenderers.RenderToString(FRefreshKeyman, s);
   sharedData.Init(
     FXMLRenderers.TempPath,
-    FXMLRenderers.RenderToString(FRefreshKeyman, s),
+    xml,
     FKeyboardXMLRenderer.FileReferences.ToStringArray
   );
 
