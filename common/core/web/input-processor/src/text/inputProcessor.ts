@@ -117,6 +117,7 @@ namespace com.keyman.text {
             let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
     
+            let totalMass = 0; // Tracks sum of non-error probabilities.
             for(let pair of keyEvent.keyDistribution) {
               let mock = Mock.from(preInputMock);
               
@@ -131,7 +132,6 @@ namespace com.keyman.text {
               
               // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
               // so we expect users to never intend their use.
-              let totalMass = 0;
               if(alternateBehavior && !alternateBehavior.beep) {
                 let transform: Transform = alternateBehavior.transcription.transform;
                 
@@ -141,12 +141,13 @@ namespace com.keyman.text {
                 alternates.push({sample: transform, 'p': pair.p});
                 totalMass += pair.p;
               }
-
-              // Renormalizes the distribution.
-              alternates.forEach(function(alt) {
-                alt.p /= totalMass;
-              });
             }
+
+            // Renormalizes the distribution, as any error (beep) results
+            // will result in a distribution that doesn't sum to 1 otherwise.
+            alternates.forEach(function(alt) {
+              alt.p /= totalMass;
+            });
           }
         }
 
