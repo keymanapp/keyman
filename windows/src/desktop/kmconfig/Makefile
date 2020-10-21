@@ -1,0 +1,32 @@
+#
+# KMConfig Makefile
+#
+
+!include ..\..\Defines.mak
+
+build: version.res manifest.res #icons
+    $(DELPHI_MSBUILD) kmconfig.dproj /p:Platform=Win32
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmconfig.exe
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmconfig.exe -dpr kmconfig.exe
+    $(COPY) $(WIN32_TARGET_PATH)\kmconfig.exe $(PROGRAM)\desktop
+    if exist $(WIN32_TARGET_PATH)\kmconfig.exe $(COPY) $(WIN32_TARGET_PATH)\kmconfig.exe $(DEBUGPATH)\desktop
+
+#icons:
+    #rc icons.rc
+
+clean: def-clean
+
+signcode:
+    $(SIGNCODE) /d "Keyman for Windows" $(PROGRAM)\desktop\kmconfig.exe
+
+backup:
+    $(WZZIP) $(BUILD)\desktop\kmconfig.zip  $(BACKUPDEFAULTS) kmconfig.exe
+
+test-manifest:
+    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+    $(MT) -nologo -inputresource:$(PROGRAM)\desktop\kmconfig.exe -validate_manifest
+
+install:
+    copy $(ROOT)\bin\desktop\kmconfig.exe "$(INSTALLPATH_KEYMANDESKTOP)"
+
+!include ..\..\Target.mak
