@@ -125,6 +125,7 @@ type
     function GetOptionFromParams(params: TStringList; out option: IKeymanOption): Boolean;
     procedure Options_ResetHints;
     procedure Options_BaseKeyboard;   // I4169
+    procedure Options_SettingsManager;
 
     function GetHotkeyFromParams(params: TStringList;
       out hotkey: IKeymanHotkey): Boolean;
@@ -184,6 +185,7 @@ uses
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
   Keyman.Configuration.UI.InstallFile,
+  Keyman.Configuration.UI.UfrmSettingsManager,
   RegistryKeys,
   ShellApi,
   StrUtils,
@@ -332,6 +334,8 @@ begin
   else if command = 'options_clickcheck' then Options_ClickCheck(params)
   else if command = 'options_resethints' then Options_ResetHints
   else if command = 'options_basekeyboard' then Options_BaseKeyboard   // I4169
+  else if command = 'options_settingsmanager' then Options_SettingsManager
+
   else if command = 'language_underlyingkeyboard' then Options_BaseKeyboard
 
   else if command = 'hotkey_set' then Hotkey_Set(params)
@@ -729,6 +733,20 @@ end;
 procedure TfrmMain.Options_BaseKeyboard;   // I4169
 begin
   WaitForElevatedConfiguration(Handle, '-basekeyboard');
+  kmcom.Options.Refresh;
+  Do_Content_Render(True);
+end;
+
+procedure TfrmMain.Options_SettingsManager;
+begin
+  if kmcom.SystemInfo.IsAdministrator then
+  begin
+    if not TfrmSettingsManager.Execute then
+      Exit;
+  end
+  else
+    WaitForElevatedConfiguration(Handle, '-settings');
+
   kmcom.Options.Refresh;
   Do_Content_Render(True);
 end;

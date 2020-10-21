@@ -325,6 +325,17 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.Settings.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.SettingsManager.pas"/>
+        <DCCReference Include="settings\Keyman.Configuration.UI.UfrmSettingsManager.pas">
+            <Form>frmSettingsManager</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="settings\Keyman.Configuration.UI.UfrmSettingsAddTSFApp.pas">
+            <Form>frmSettingsAddTSFApp</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

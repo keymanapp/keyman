@@ -134,6 +134,7 @@ input[type='submit'], input[type='button'], button
   border-radius: 4px;
   color: #33333f;
   border: none;
+  vertical-align: top;
 }
 
 input[type='submit']:disabled, input[type='button']:disabled, button:disabled
