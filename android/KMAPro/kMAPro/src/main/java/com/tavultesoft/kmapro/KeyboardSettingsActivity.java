@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2019 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmea;
+package com.tavultesoft.kmapro;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,6 +33,9 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.ConfirmDialogFragment;
+import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.cloud.impl.CloudKeyboardPackageDownloadCallback;
@@ -43,6 +46,7 @@ import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.HelpFile;
+import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
 
@@ -121,7 +125,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     infoList.add(hashMap);
 
     // If not default keyboard, display uninstall keyboard
-    if (!kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
+    if (!(kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID) &&
+        languageID.equalsIgnoreCase(KMManager.KMDefault_LanguageID))) {
       hashMap = new HashMap<>();
       hashMap.put(titleKey, getString(R.string.uninstall_keyboard));
       hashMap.put(subtitleKey, "");
@@ -155,6 +160,9 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
+        if (hashMap == null) {
+          KMLog.LogError(TAG, "map is null, position is " + position);
+        }
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
         // "Version" link clicked to download latest keyboard version from cloud

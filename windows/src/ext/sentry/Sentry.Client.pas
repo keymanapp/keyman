@@ -247,6 +247,15 @@ begin
   if sentry_init(options) = 0 then
     FSentryInit := True;
 
+  {$WARN SYMBOL_PLATFORM OFF} // W1002 Symbol 'CmdLine' is specific to a platform
+  if CmdLine <> nil then
+  begin
+    sentry_set_tag('keyman.commandline', PAnsiChar(AnsiString(string(CmdLine))));
+  end;
+  {$WARN SYMBOL_PLATFORM DEFAULT}
+
+  sentry_set_tag('keyman.executable', PAnsiChar(AnsiString(ParamStr(0))));
+
   if scfCaptureExceptions in AFlags then
   begin
     // This allows us to capture call stacks from the original exception context

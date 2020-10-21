@@ -198,7 +198,12 @@ class LMLayerWorker {
         configuration.rightContextCodePoints = this._platformCapabilities.maxRightContextCodePoints || 0;
       }
 
-      this.transitionToReadyState(model);
+      let compositor = this.transitionToReadyState(model);
+      // This test allows models to directly specify the property without it being auto-overridden by
+      // this default.
+      if(configuration.wordbreaksAfterSuggestions === undefined) {
+        configuration.wordbreaksAfterSuggestions = (compositor.punctuation.insertAfterWord != '');
+      }
       this.cast('ready', { configuration });
     } catch (err) {
       this.error("loadModel failed!", err);
@@ -272,15 +277,15 @@ class LMLayerWorker {
    *
    * @param model The loaded language model.
    */
-  private transitionToReadyState(model: LexicalModel) {
+  private transitionToReadyState(model: LexicalModel): ModelCompositor {
     let compositor = new ModelCompositor(model);
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {
         switch(payload.message) {
           case 'predict':
-            let {transform, context} = payload;
-            let suggestions = compositor.predict(transform, context);
+            var {transform, context} = payload;
+            var suggestions = compositor.predict(transform, context);
 
             // Now that the suggestions are ready, send them out!
             this.cast('suggestions', {
@@ -299,12 +304,32 @@ class LMLayerWorker {
           case 'unload':
             this.unloadModel();
             break;
+          case 'accept':
+            var {suggestion, context, postTransform} = payload;
+            var reversion = compositor.acceptSuggestion(suggestion, context, postTransform);
+
+            this.cast('postaccept', {
+              token: payload.token,
+              reversion: reversion
+            });
+            break;
+          case 'revert':
+              var {reversion, context} = payload;
+              var suggestions: Suggestion[] = compositor.applyReversion(reversion, context);
+
+              this.cast('postrevert', {
+                token: payload.token,
+                suggestions: suggestions
+              });
+              break;
           default:
-          throw new Error(`invalid message; expected one of {'predict', 'unload'} but got ${payload.message}`);
+            throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'revert', 'unload'} but got ${payload.message}`);
         }
       },
       compositor: compositor
     };
+
+    return compositor;
   }
 
   /**

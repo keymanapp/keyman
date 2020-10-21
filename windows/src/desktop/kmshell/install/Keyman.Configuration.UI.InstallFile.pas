@@ -14,7 +14,7 @@ type
       Keyboard: IKeymanKeyboardInstalled); static;
     class procedure AddDefaultLanguageHotkeys(
       InstalledKeyboards: array of IKeymanKeyboardInstalled); static;
-    class procedure InstallKeyboardPackageLanguage(
+    class procedure RegisterKeyboardPackageLanguage(
       FPackage: IKeymanPackageInstalled; const BCP47: string); static;
   public
     class function BrowseAndInstallKeyboardFromFile(Owner: TComponent): Boolean; static;
@@ -158,6 +158,7 @@ begin
   begin
     try
       kmcom.Keyboards.Refresh;
+      kmcom.Keyboards.Apply;
 
       FilenameBCP47 := Filenames[i].Split(['=']);
       Filename := FilenameBCP47[0];
@@ -167,8 +168,9 @@ begin
       begin
         FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True);
         if Length(FilenameBCP47) > 1
-          then InstallKeyboardPackageLanguage(FPackage, FilenameBCP47[1])
-          else InstallKeyboardPackageLanguage(FPackage, '');
+          then RegisterKeyboardPackageLanguage(FPackage, FilenameBCP47[1])
+          else RegisterKeyboardPackageLanguage(FPackage, '');
+          // The keyboard will be installed for current user as a separate step
       end
       else
       begin
@@ -220,7 +222,7 @@ begin
   end;
 end;
 
-class procedure TInstallFile.InstallKeyboardPackageLanguage(FPackage: IKeymanPackageInstalled; const BCP47: string);
+class procedure TInstallFile.RegisterKeyboardPackageLanguage(FPackage: IKeymanPackageInstalled; const BCP47: string);
 var
   DefaultBCP47Language: string;
   i: Integer;
@@ -236,11 +238,11 @@ begin
       DefaultBCP47Language := FPackage.Keyboards[i].DefaultBCP47Languages;
       if DefaultBCP47Language.Contains(' ') then
         DefaultBCP47Language := DefaultBCP47Language.Split([' '])[0];
-      TTIPMaintenance.DoInstall(FPackage.Keyboards[i].ID, DefaultBCP47Language);
+      TTIPMaintenance.DoRegister(FPackage.Keyboards[i].ID, DefaultBCP47Language);
     end;
   end
   else if FPackage.Keyboards.Count > 0 then
-    TTIPMaintenance.DoInstall(FPackage.Keyboards[0].ID, BCP47);
+    TTIPMaintenance.DoRegister(FPackage.Keyboards[0].ID, BCP47);
 end;
 
 class procedure TInstallFile.AddDefaultLanguageHotkey(Keyboard: IKeymanKeyboardInstalled);

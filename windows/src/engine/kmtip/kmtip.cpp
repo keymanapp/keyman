@@ -79,6 +79,14 @@ CKMTipTextService::CKMTipTextService()
    // I3582
     _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
 
+    memset(&guidActiveProfile, 0, sizeof(GUID));
+    _keystrokeSinkInitialized = FALSE;
+    _hKeyman = NULL;
+    _dwActiveLanguageProfileNotifySinkCookie = 0;
+    _PreservedKeys = NULL;
+    _cPreservedKeyCount = 0;
+    _dwDeepIntegration = 0;
+
     _cRef = 1;
     ThreadThis = this;
 }

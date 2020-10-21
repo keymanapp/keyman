@@ -26,6 +26,23 @@ public enum KMPError : String, Error {
   }
 }
 
+public enum KeymanPackagePage {
+  case welcome
+  case readme
+  case custom(bundledPath: String)
+
+  var path: String {
+    switch(self) {
+      case .welcome:
+        return "welcome.htm"
+      case .readme:
+        return "readme.htm"
+      case .custom(let path):
+        return path
+    }
+  }
+}
+
 /**
  * Common base class for the different KeymanPackage types.  If Swift had abstract classes, this would be one.
  *
@@ -300,7 +317,7 @@ public class KeymanPackage {
   }
   
   public func infoHtml() -> String {
-    if let readmeURL = self.readmePageURL {
+    if let readmeURL = self.pageURL(for: .readme) {
       if let html = try? String(contentsOfFile: readmeURL.path, encoding: String.Encoding.utf8) {
         return html
       }
@@ -309,24 +326,10 @@ public class KeymanPackage {
     return defaultInfoHtml()
   }
 
-  public var readmePageURL: URL? {
-    let readmeURL = self.sourceFolder.appendingPathComponent("readme.htm")
+  public func pageURL(for page: KeymanPackagePage) -> URL? {
+    let url = self.sourceFolder.appendingPathComponent(page.path)
 
-    if FileManager.default.fileExists(atPath: readmeURL.path) {
-      return readmeURL
-    } else {
-      return nil
-    }
-  }
-
-  public var welcomePageURL: URL? {
-    let welcomeURL = self.sourceFolder.appendingPathComponent("welcome.htm")
-
-    if FileManager.default.fileExists(atPath: welcomeURL.path) {
-      return welcomeURL
-    } else {
-      return nil
-    }
+    return FileManager.default.fileExists(atPath: url.path) ? url : nil
   }
 
   public var version: Version {

@@ -1,4 +1,4 @@
-﻿/*
+/*
   Name:             inserttext
   Copyright:        Copyright (C) SIL International.
   Documentation:    
@@ -268,7 +268,7 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
     if(ShouldDebug()) {
       char *p = debugstr(buf);
       Log(L"GetLeftOfSelection(%d) = %hs [%d fetched]", n, p, cFetched);
-      delete p;
+      delete[] p;
     }
 #ifdef DEBUG_PSEUDO   // I3607
     DePseudofy(buf);   // I3564

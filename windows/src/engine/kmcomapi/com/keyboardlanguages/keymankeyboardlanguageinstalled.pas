@@ -1,18 +1,18 @@
 (*
   Name:             keymankeyboardlanguageinstalled
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      16 Apr 2014
 
   Modified Date:    4 Nov 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          16 Apr 2014 - mcdurdin - I4169 - V9.0 - Mnemonic layouts should be recompiled to positional based on user-selected base keyboard
                     17 Aug 2014 - mcdurdin - I4376 - V9.0 - Unticked keyboards in configuration should be removed from language profile
                     04 Nov 2014 - mcdurdin - I4494 - Crash calling TSF [CrashID:kmshell.exe_9.0.473.0_2C45D42D_EOleSysError]
@@ -39,6 +39,7 @@ type
     FOwner: IKeymanKeyboardInstalled;
     FProfileGUID: TGUID;
     FIsInstalled: Boolean;
+    FWindowsBCP47Code: string;
   protected
     function Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
       override;
@@ -59,8 +60,10 @@ type
       const TemporaryKeyboardToRemove: WideString); safecall;
     procedure RegisterTip(LangID: Integer); safecall;
     function Get_IsRegistered: WordBool; safecall;
+    function Get_WindowsBCP47Code: WideString; safecall;
 
     { IIntKeymanKeyboardLanguageInstalled }
+    procedure Disable;
   public
     constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string;
       ALangID: Integer; AProfileGUID: TGUID; const AName: string);
@@ -72,11 +75,13 @@ uses
   System.SysUtils,
   System.Variants,
   System.Win.ComObj,
+  System.Win.Registry,
 
   glossary,
   keymanerrorcodes,
   Keyman.System.Process.KPInstallKeyboardLanguage,
   Keyman.System.Process.KPUninstallKeyboardLanguage,
+  RegistryKeys,
   utiltsf,
   utilxml;
 
@@ -85,16 +90,52 @@ uses
 constructor TKeymanKeyboardLanguageInstalled.Create(AContext: TKeymanContext;
   AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string;
   ALangID: Integer; AProfileGUID: TGUID; const AName: string);
-var
-  BCP47Code: string;
+
+  function IsLanguageInstalledForKeyboard: Boolean;
+  var
+    reg: TRegistry;
+  begin
+    reg := TRegistry.Create(KEY_READ);
+    try
+      Result :=
+        reg.OpenKeyReadOnly(BuildKeyboardLanguagesKey_CU(FOwner.ID)) and
+        reg.ValueExists(ABCP47Code);
+    finally
+      reg.Free;
+    end;
+  end;
+
 begin
   FOwner := AOwner;
   FProfileGUID := AProfileGUID;
-  BCP47Code := ABCP47Code;
-  // Note, if the TIP is installed, the BCP47Code may be modified to match the
-  // canonicalization that Windows gives it.
-  FIsInstalled := IsTIPInstalledForCurrentUser(BCP47Code, ALangID, AProfileGUID);
-  inherited Create(AContext, AOwner, BCP47Code, ALangID, AName);
+  FWindowsBCP47Code := ABCP47Code;
+
+  // Note, if the TIP is installed, the WindowsBCP47Code may be modified to
+  // match the canonicalization that Windows gives it. The primary difference
+  // will usually be that a region code may be stripped if Windows only
+  // recognises a single region for the language. This data is not available to
+  // us, though, so we just have to rely on what Windows reports back to us.
+
+  // We test both if the TIP is installed, and if it is expected to be installed
+  // according to Keyman's registry settings. This caters for when a user adds the
+  // keyboard outside of Keyman (IsTIPInstalledForCurrentUser), and when a keyboard
+  // is installed but not loaded (IsLanguageInstalledForKeyboard).
+  FIsInstalled :=
+    IsTIPInstalledForCurrentUser(FWindowsBCP47Code, ALangID, AProfileGUID) or
+    IsLanguageInstalledForKeyboard;
+
+  inherited Create(AContext, AOwner, ABCP47Code, ALangID, AName);
+end;
+
+procedure TKeymanKeyboardLanguageInstalled.Disable;
+begin
+  if Get_IsInstalled then
+    with TKPUninstallKeyboardLanguage.Create(Context) do
+    try
+      UninstallTip(FOwner.ID, Get_LangID, Get_ProfileGUID, False);
+    finally
+      Free;
+    end;
 end;
 
 function TKeymanKeyboardLanguageInstalled.FindInstallationLangID(
@@ -179,6 +220,11 @@ begin
   Result := FProfileGUID;
 end;
 
+function TKeymanKeyboardLanguageInstalled.Get_WindowsBCP47Code: WideString;
+begin
+  Result := FWindowsBCP47Code;
+end;
+
 procedure TKeymanKeyboardLanguageInstalled.Install;
 begin
   if not Get_IsInstalled then
@@ -208,7 +254,7 @@ begin
   if Get_IsInstalled then
     with TKPUninstallKeyboardLanguage.Create(Context) do
     try
-      UninstallTip(FOwner.ID, Get_LangID, Get_ProfileGUID);
+      UninstallTip(FOwner.ID, Get_LangID, Get_ProfileGUID, True);
     finally
       Free;
     end;

@@ -65,7 +65,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     #endif
 
     Manager.applicationGroupIdentifier = "group.KM4I"
-    Manager.shared.openURL = UIApplication.shared.openURL
 
     // TODO:  Assign a subclassed version of InputViewController that implements the image stuff.
     Manager.shared.inputViewController = KeyboardViewController(forSystem: false)

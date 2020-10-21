@@ -89,8 +89,17 @@ begin
       FNewVersion := node.Values['version'].Value;
       FFileName := node.Values['file'].Value;
       FInstallURL := node.Values['url'].Value;
-      FInstallSize := (node.Values['size'] as TJSONNumber).AsInt64;
-      FStatus := ucrsUpdateReady;
+      if node.Values['size'] is TJSONNumber then
+      begin
+        FInstallSize := (node.Values['size'] as TJSONNumber).AsInt64;
+        FStatus := ucrsUpdateReady;
+      end
+      else
+      begin
+        FInstallSize := 0;
+        FStatus := ucrsNoUpdate;
+        FErrorMessage := 'No valid updates found.';
+      end;
     end
     else
     begin

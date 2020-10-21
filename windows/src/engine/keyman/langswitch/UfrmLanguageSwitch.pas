@@ -150,8 +150,7 @@ uses
   KeymanControlMessages,
   keymanapi_TLB,
   UfrmKeyman7Main,
-  utilhotkey,
-  LayeredFormUtils;
+  utilhotkey;
 
 const
   MLanguageFontHeight = -14;
@@ -378,9 +377,7 @@ end;
 
 procedure TfrmLanguageSwitch.FormShow(Sender: TObject);
 begin
-  if TLayeredFormUtils.ShouldUseAlpha  // I2555
-    then FTransparency := CTransparencyMask
-    else FTransparency := CNoTransparencyMask;
+  FTransparency := CNoTransparencyMask;
 
   MeasureFormSize;
 

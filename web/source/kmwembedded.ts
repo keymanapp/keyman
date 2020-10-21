@@ -40,7 +40,7 @@ namespace com.keyman.osk {
     }
   };
 
-  // iOS now relies upon native-mode popup key management, so we only implement these hybrid-targetted
+  // iOS now relies upon native-mode popup key management, so we only implement these hybrid-targeted
   // methods when embedding in Android.
   let device = com.keyman.singleton.util.device;
 
@@ -56,10 +56,8 @@ namespace com.keyman.osk {
       if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
         var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
             yBase = dom.Utils.getAbsoluteY(key);
-        
-        if(util.device.formFactor == 'phone') {
-          this.prependBaseKey(key);
-        }
+
+        // #3718: No longer prepend base key to subkey array
 
         this.popupBaseKey = key;
         this.popupPending=true;
@@ -317,15 +315,6 @@ namespace com.keyman.text {
     keymanweb.modelManager.register(model);
   };
 
-  keymanweb['showNewSuggestions'] = function() {
-    let keyman = com.keyman.singleton;
-
-    if(keyman['osk'].banner['activeBanner'] instanceof com.keyman.osk.SuggestionBanner) {
-      let banner = keyman['osk'].banner['activeBanner'];
-      banner.rotateSuggestions();
-    }
-  }
-
   /**
    * Function called by Android and iOS when a device-implemented keyboard popup is displayed or hidden
    * 
@@ -386,14 +375,19 @@ namespace com.keyman.text {
       osk.vkbd.keyPending = null;
 
       // Changes for Build 353 to resolve KMEI popup key issues      
-      keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
-      
-      var t=keyName.split('-'),layer=(t.length>1?t[0]:core.keyboardProcessor.layerId);
-      keyName=t[t.length-1];
+      keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
+
+      // Can't just split on '-' because some layers like ctrl-shift contain it.
+      let separatorIndex = keyName.lastIndexOf('-');
+      var layer = core.keyboardProcessor.layerId;
+      if (separatorIndex > 0) {
+        layer = keyName.substring(0, separatorIndex);
+        keyName = keyName.substring(separatorIndex+1);
+      }
       if(layer == 'undefined') {
         layer=core.keyboardProcessor.layerId;
       }
-      
+
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
       var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(layer);
@@ -488,8 +482,9 @@ namespace com.keyman.text {
    *  @param  {number}  shift  shift state (0x01=left ctrl 0x02=right ctrl 0x04=left alt 0x08=right alt
    *                                        0x10=shift 0x20=ctrl 0x40=alt)
    *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
+   *  @return {boolean} false when KMW _has_ fully handled the event and true when not.
    **/            
-  keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
+  keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0): boolean {
     let keyman = com.keyman.singleton;
     if(!keyman.core.activeKeyboard || code == 0) {
       return false;
@@ -520,7 +515,9 @@ namespace com.keyman.text {
     try {
       // Now that we've manually constructed a proper keystroke-sourced KeyEvent, pass control
       // off to the processor for its actual execution.
-      return keyman.core.processKeyEvent(Lkc) != null;
+
+      // Should return 'false' when KMW _has_ fully handled the event and 'true' when not.
+      return !keyman.core.processKeyEvent(Lkc);
     } catch (err) {
       console.error(err.message, err);
       return false;

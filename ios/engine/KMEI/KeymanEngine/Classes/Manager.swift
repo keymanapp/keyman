@@ -119,6 +119,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// where it is safe. However, the entire Keyman Engine framework must be compiled with extension-safe APIs.
   ///
   /// Set this to `UIApplication.shared.openURL` in your application.
+  @available(*, deprecated)
   public var openURL: ((URL) -> Bool)?
 
   var currentKeyboardID: FullKeyboardID?

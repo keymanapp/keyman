@@ -8,16 +8,7 @@ var ModelCompositor = require('../../build/intermediate').ModelCompositor;
 
 describe('Custom Punctuation', function () {
   it('appears in the keep suggestion', function () {
-    let dummySuggestions = [
-      {
-        transform: {
-          insert: 'Hrllo',
-          deleteLeft: 0,
-        },
-        tag: 'keep',
-        displayAs: 'Hrllo',
-      },
-      {
+    let dummySuggestions = [{
         transform: {
           insert: 'Hello',
           deleteLeft: 0,

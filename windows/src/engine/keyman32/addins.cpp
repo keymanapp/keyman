@@ -38,7 +38,7 @@ void Addin_Release()
 				if(_td->Addins[i].Uninitialise) (*_td->Addins[i].Uninitialise)();
 				FreeLibrary(_td->Addins[i].hAddin);
 			}
-		delete _td->Addins;
+		delete[] _td->Addins;
 	}
 	_td->Addins = NULL;
 	_td->nAddins = 0;
@@ -56,14 +56,14 @@ void ReadAddins(HKEY hkey)
   if(reg->OpenKeyReadOnly(hkey == HKEY_CURRENT_USER ? REGSZ_KeymanAddinsCU : REGSZ_KeymanAddinsLM))
 	{
 		int n = _td->nAddins;
-		char buf[128], buf2[512];
+    char buf[128];
 		while(reg->GetValueNames(buf, 128, n))
 		{
 			Addin *a = new Addin[n+1];
 			if(_td->Addins) 
 			{
 				memcpy(a, _td->Addins, n * sizeof(Addin));
-				delete _td->Addins;
+				delete[] _td->Addins;
 			}
 			_td->Addins = a;
 			_td->Addins[n].hAddin = 0;
@@ -74,17 +74,9 @@ void ReadAddins(HKEY hkey)
 			_td->Addins[n].Uninitialise = NULL;
 			_td->Addins[n].ShouldProcess = NULL;
 			strcpy(_td->Addins[n].ClassName, buf);
-			reg->ReadString(buf, buf2, 512);
-			//char *p = strtok(buf2, ",");
-			//if(p)
-			//{
-				_td->Addins[n].Application[0] = 0;
-				//strcpy(Addins[n].Application, p);
-				//p = strtok(NULL, ",");
-				strcpy(_td->Addins[n].AddinName, buf2); //p);
-				//SendDebugMessageFormat(GetFocus(), sdmGlobal, 0, "Addins: ReadAddins: App=%s Addin=%s %d", Addins[n].Application, Addins[n].AddinName, Addins[n].hAddin);
-				n++;
-			//}
+			reg->ReadString(buf, _td->Addins[n].AddinName, 260);
+	  	_td->Addins[n].Application[0] = 0;
+			n++;
 		}
 		_td->nAddins = n;
 	}

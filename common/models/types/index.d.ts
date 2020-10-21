@@ -91,6 +91,27 @@ declare interface LexicalModel {
   configure(capabilities: Capabilities): Configuration;
 
   /**
+   * Indicates a mapping function used by the model to simplify lookup operations
+   * within the lexicon.  This is expected to result in a many-to-one mapping, transforming
+   * the input text into a common, simplified 'index'/'key' form shared by all
+   * text forms that a person might reasonably interpret as "the same".
+   * 
+   * Example usages:  
+   * - converting any upper-case characters into lowercase.
+   *   - For English, 'CAT' and 'Cat' might be keyed as 'cat', since users expect all
+   *     three to be treated as the same word.
+   * - removing accent marks that may be difficult to type on standard keyboard layouts
+   *   - For French, users may wish to type "jeune" instead of "jeûne" when lazy or 
+   *     if accent marks cannot be easily input.
+   * 
+   * Providing a function targetted for your language can greatly improve a user's experience
+   * using your dictionary.
+   * @param text The original input text.
+   * @returns The 'keyed' form of that text.
+   */
+  toKey?(text: USVString): USVString;
+
+  /**
    * Generates predictive suggestions corresponding to the state of context after the proposed
    * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
    * keystroke rather than one actually received.
@@ -113,6 +134,12 @@ declare interface LexicalModel {
    * space for use in determining the most optimal overall suggestions.
    */
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
+
+  /**
+   * Tokenizes the current context state, returning an array of all resulting tokens.
+   * @param context 
+   */
+  tokenize(context: Context): USVString[];
 
   /**
    * Performs a wordbreak operation given the current context state, returning whatever word
@@ -190,6 +217,14 @@ declare interface Suggestion {
   transformId?: number;
 
   /**
+   * A unique identifier for the Suggestion itself, not shared with any others -
+   * even for Suggestions sourced from the same Transform. 
+   * 
+   * The lm-layer is responsible for setting this field, not models.
+   */
+  id?: number;
+
+  /**
    * The suggested update to the buffer. Note that this transform should
    * be applied AFTER the instigating transform, if any.
    */
@@ -211,6 +246,20 @@ declare interface Suggestion {
   tag?: SuggestionTag;
 }
 
+interface Reversion extends Suggestion {
+  tag: 'revert';
+}
+
+interface Keep extends Suggestion {
+  tag: 'keep';
+
+  /**
+   * Notes whether or not the Suggestion may actually be suggested by the model.
+   * Should be `false` if the model does not actually predict the current text.
+   */
+  matchesModel: boolean;
+}
+
 /**
  * A tag indicating the nature of the current suggestion.
  * 
@@ -224,8 +273,7 @@ declare interface Suggestion {
  *  
  * If left undefined, the consumers will assume this is a prediction.
  */
-type SuggestionTag = undefined | 'keep' | 'correction' | 'emoji';
-
+type SuggestionTag = undefined | 'keep' | 'revert' | 'correction' | 'emoji';
 
 /**
  * The text and environment surrounding the insertion point (text cursor).
@@ -279,6 +327,27 @@ interface ProbabilityMass<T> {
 }
 
 declare type Distribution<T> = ProbabilityMass<T>[];
+
+/**
+ * A type augmented with an optional probability.
+ */
+type Outcome<T> = T & {
+  /**
+   * [optional] probability of this outcome.
+   */
+  p?: number;
+};
+
+/**
+ * A type augmented with a probability.
+ */
+type WithOutcome<T> = T & {
+  /**
+   * Probability of this outcome.
+   */
+  p: number;
+};
+
 
 
 /******************************** Messaging ********************************/
@@ -339,6 +408,16 @@ declare interface Configuration {
   rightContextCodePoints: number;
   /** deprecated; use `leftContextCodePoints` instead! */
   rightContextCodeUnits?: number,
+
+  /**
+   * Whether or not the model appends characters to Suggestions for
+   * wordbreaking purposes.  (These characters need not be whitespace
+   * or actual wordbreak characters.)
+   * 
+   * If not specified, this will be auto-detected based on the model's
+   * punctuation properties (if they exist).
+   */
+  wordbreaksAfterSuggestions?: boolean
 }
 
 

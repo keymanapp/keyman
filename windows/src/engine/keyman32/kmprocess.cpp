@@ -1,18 +1,18 @@
 /*
   Name:             kmprocess
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    28 Mar 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Remove NoSetShift flag
                     04 Jan 2007 - mcdurdin - Add CODE_NOTANY
                     22 Jan 2007 - mcdurdin - Fix for K_NPENTER
@@ -128,7 +128,7 @@ BOOL ProcessHook()
       SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%s'",
         Debug_VirtualKey(_td->state.vkey), getcontext_debug());
     }
-	
+
 		AIDEBUGKEYINFO keyinfo;
 		keyinfo.shiftFlags = Globals::get_ShiftState();
 		keyinfo.VirtualKey = _td->state.vkey;
@@ -228,7 +228,7 @@ BOOL ProcessGroup(LPGROUP gp)
 	for(i = 0; i < _td->state.lpkb->cxGroupArray; i++)
 		if(gp == &_td->state.lpkb->dpGroupArray[i])
 		{
-			if(_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard)) 
+			if(_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard))
 				SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Entering group %d of %d, context '%s'", i+1, _td->state.lpkb->cxGroupArray, getcontext_debug());
 			sdmfI = i;
 			break;
@@ -258,7 +258,7 @@ BOOL ProcessGroup(LPGROUP gp)
 	*/
 
   if(ShouldDebug(sdmKeyboard))
-	  SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "state.vkey: %s shiftFlags: %x; charCode: %X", 
+	  SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "state.vkey: %s shiftFlags: %x; charCode: %X",
       Debug_VirtualKey(_td->state.vkey), Globals::get_ShiftState(), _td->state.charCode);   // I4582
 
 	if(gp)
@@ -270,12 +270,12 @@ BOOL ProcessGroup(LPGROUP gp)
 			{
 				if(kkp->dpContext[0] != 0) break; else continue;
 			}
-	
+
 			//if(kkp->Key == state.vkey)
-			//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, 0, "kkp->Key: %d kkp->ShiftFlags: %x", 
+			//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, 0, "kkp->Key: %d kkp->ShiftFlags: %x",
 			//	kkp->Key, kkp->ShiftFlags);
 
-			/* Keyman 6.0: support Virtual Characters */ 
+			/* Keyman 6.0: support Virtual Characters */
 			if(IsEquivalentShift(kkp->ShiftFlags, Globals::get_ShiftState()))
 			{
         if(kkp->Key > VK__MAX && kkp->Key == _td->state.vkey) break;	// I3438   // I4582
@@ -298,7 +298,7 @@ BOOL ProcessGroup(LPGROUP gp)
 		 Context is not kept for virtual keys being output.
 		*/
 
-		if(_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard)) SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, 
+		if(_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard)) SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0,
 			"No match was found in group %d of %d", sdmfI, _td->state.lpkb->cxGroupArray);
 
 		if(!gp || (_td->state.charCode == 0 && gp->fUsingKeys))   // I4585
@@ -307,7 +307,7 @@ BOOL ProcessGroup(LPGROUP gp)
       BOOL fIsBackspace = _td->state.vkey == VK_BACK && (Globals::get_ShiftState() & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(/*_td->app->DebugControlled() &&*/ fIsBackspace) {   // I4838   // I4933
-        	//if(_td->state.msg.message == wm_keymankeydown) 
+        	//if(_td->state.msg.message == wm_keymankeydown)
 				  //	_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
 				if(_td->state.msg.message == wm_keymankeydown) {   // I4933
           if(!_td->app->IsLegacy()) {   // I4933
@@ -383,14 +383,14 @@ BOOL ProcessGroup(LPGROUP gp)
 		}
 		else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0 && _td->state.msg.message != wm_keymankeyup)
 		{
-			/* NoMatch rule found, and is a character key */ 
+			/* NoMatch rule found, and is a character key */
 			_td->app->QueueDebugInformation(QID_NOMATCH_ENTER, gp, NULL, NULL, gp->dpNoMatch, 0);
 			PostString(gp->dpNoMatch, &_td->state.msg, _td->state.lpkb, NULL);
 			_td->app->QueueDebugInformation(QID_NOMATCH_EXIT, gp, NULL, NULL, gp->dpNoMatch, 0);
 		}
 		else if (_td->state.charCode != 0 && _td->state.charCode != 0xFFFF && _td->state.msg.message != wm_keymankeyup && gp->fUsingKeys)
 		{
-			/* No rule found, is a character key */ 
+			/* No rule found, is a character key */
 			// 7.0.239.0: I994 - Workaround output order issues - we will use the TSF to output all characters...
 			// if(app->Type1() == AIType_TIP) { fOutputKeystroke = TRUE; return FALSE; } // Don't swallow keystroke
 
@@ -448,7 +448,7 @@ BOOL ProcessGroup(LPGROUP gp)
 			    case CODE_DEADKEY: _td->app->QueueAction(QIT_BACK, BK_DEADKEY); break;
 					case CODE_NUL: break;	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
         }
-      else 
+      else
 			{
 				_td->app->QueueAction(QIT_BACK, 0);
 			}
@@ -478,7 +478,7 @@ BOOL ProcessGroup(LPGROUP gp)
 }
 
 /*
-*	int PostString( LPSTR str, BOOL *useMode, LPMSG mp, 
+*	int PostString( LPSTR str, BOOL *useMode, LPMSG mp,
 *	LPKEYBOARD lpkb );
 *
 *	Parameters:	str		Pointer to string to send
@@ -513,7 +513,7 @@ int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
             {
 		    case CODE_EXTENDED:				// Start of a virtual key section w/shift codes
 			    p++;
-				
+
 				shift = *p; //(*p<<8) | *(p+1);
 				_td->app->QueueAction(QIT_VSHIFTDOWN, shift);
 
@@ -523,7 +523,7 @@ int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
 				_td->app->QueueAction(QIT_VKEYUP, *p);
 
 				_td->app->QueueAction(QIT_VSHIFTUP, shift);
-				
+
 				p++; // CODE_EXTENDEDEND
 				////// CODE_EXTENDEDEND will be incremented by loop
 
@@ -561,7 +561,7 @@ int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
 				CallDLL(_td->lpActiveKeyboard, *p-1);
 			    if(_td->state.StopOutput) return psrPostMessages;
 				FoundUse = TRUE;
-				break; 
+				break;
 			case CODE_USE:					// use another group
 			  p++;
 			  ProcessGroup(&lpkb->dpGroupArray[*p-1]);
@@ -640,14 +640,14 @@ BOOL IsMatchingPlatform(LPSTORE s)  // I3432
     if(!IsMatchingPlatformString(platform))
     {
       s->dwSystemID = TSS_PLATFORM_NOMATCH;
-      delete t;
+      delete[] t;
       return FALSE;
     }
     platform = wcstok_s(NULL, L" ", &context);
   }
 
   s->dwSystemID = TSS_PLATFORM_MATCH;
-  delete t;
+  delete[] t;
   return TRUE;
 }
 
@@ -676,7 +676,7 @@ BOOL ContextMatch(LPKEY kkp)
   if(!_td) return FALSE;
 
 	memset(_td->IndexStack, 0, GLOBAL_ContextStackSize*sizeof(WORD));  // I3158   // I3524
-	
+
 	p = kkp->dpContext;
 
 	if(*p == 0)
@@ -701,7 +701,7 @@ BOOL ContextMatch(LPKEY kkp)
     {
     	s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(pp+2))-1];  // I2590
       t = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(pp+4))-1];  // I2590
-      
+
       bEqual = wcscmp(s->dpString, t->dpString) == 0;
       if(*(pp+3) == 1 && bEqual) return FALSE;  // I2590
       if(*(pp+3) == 2 && !bEqual) return FALSE;  // I2590
@@ -731,7 +731,7 @@ BOOL ContextMatch(LPKEY kkp)
           bEqual = wcscmp(ss, t->dpString) == 0;
         }
       }
-      
+
       if(*(pp+3) == 1 && bEqual) return FALSE;  // I2590
       if(*(pp+3) == 2 && !bEqual) return FALSE;  // I2590
     }
@@ -770,14 +770,14 @@ BOOL ContextMatch(LPKEY kkp)
 
         temp = xstrchr(s->dpString, q);
 
-        /*SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard ,kkp->Line, "ContextMatch: CODE_ANY [%x %x %x %x %x %x %x %x %x %x] [%x %x %x] %d", 
-          s->dpString[0], s->dpString[1], s->dpString[2], 
-          s->dpString[3], s->dpString[4], s->dpString[5], 
-          s->dpString[6], s->dpString[7], s->dpString[8], 
+        /*SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard ,kkp->Line, "ContextMatch: CODE_ANY [%x %x %x %x %x %x %x %x %x %x] [%x %x %x] %d",
+          s->dpString[0], s->dpString[1], s->dpString[2],
+          s->dpString[3], s->dpString[4], s->dpString[5],
+          s->dpString[6], s->dpString[7], s->dpString[8],
           s->dpString[9],
           q[0], q[1], q[2],
-          (temp ? (int)(temp-s->dpString) : 0));*/
-        
+          (temp ? (INT_PTR)(temp-s->dpString) : 0));*/
+
         if(temp != NULL)  // I1622
           *indexp = (WORD) xstrpos(temp, s->dpString);
 
@@ -790,7 +790,7 @@ BOOL ContextMatch(LPKEY kkp)
 	      s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(p+2))-1];
 
         if((temp = xstrchr(s->dpString, q)) != NULL)   // I1622
-          return FALSE; 
+          return FALSE;
 
 				//if((temp = xstrchr(s->dpString, GetSuppChar(q))) != NULL)
 				//  return FALSE;
@@ -801,7 +801,7 @@ BOOL ContextMatch(LPKEY kkp)
 
 				for(temp = s->dpString; *temp && n > 0; temp = incxstr(temp), n--);
 				if(n != 0) return FALSE;
-				if(xchrcmp(temp, q) != 0) return FALSE; 
+				if(xchrcmp(temp, q) != 0) return FALSE;
         ////if(GetSuppChar(temp) != GetSuppChar(q)) return FALSE; // I1622
 				break;
 			case CODE_CONTEXTEX:
@@ -819,7 +819,7 @@ BOOL ContextMatch(LPKEY kkp)
 				return FALSE;
 			}
 		}
-		else if(xchrcmp(p, q) != 0) //GetSuppChar(p) != GetSuppChar(q)) 
+		else if(xchrcmp(p, q) != 0) //GetSuppChar(p) != GetSuppChar(q))
 		{
     	//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(p));
 	    //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(q));

@@ -13,8 +13,6 @@ import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.cloud.impl.CloudKeyboardPackageDownloadCallback;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.cloud.impl.CloudKeyboardDataDownloadCallback;
-import com.tavultesoft.kmea.cloud.impl.CloudKeyboardMetaDataDownloadCallback;
 import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
 
 import java.util.ArrayList;

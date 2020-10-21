@@ -1,18 +1,18 @@
 (*
   Name:             UfrmInstallKeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    1 May 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Check if keyboard is already installed and uninstall if so
                     06 Oct 2006 - mcdurdin - Display welcome after package install
@@ -468,7 +468,11 @@ procedure TfrmInstallKeyboard.InstallTipForKeyboard(const BCP47Tag: string);
 var
   i: Integer;
 begin
+  // Ensure keyboard is recorded in CU registry before we install the TIP, otherwise it will be marked as disabled by default,
+  // as installing the TIP adds CU registry settings, potentially confusing the keyboard settings
   kmcom.Refresh;
+  kmcom.Apply;
+  // Install the TIP for the current user
   if Assigned(FKeyboard) then
   begin
     if BCP47Tag <> ''

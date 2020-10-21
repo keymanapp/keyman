@@ -42,6 +42,7 @@ public class CloudRepository {
 
   public static final String API_MODEL_QUERY = "?q";
   public static final String API_MODEL_FORMATSTR = "https://%s/model%s";
+  public static final String API_MODEL_LANGUAGE_FORMATSTR = "https://%s/model?q=bcp47:%s";
   public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android%s%s";
 
   private Dataset memCachedDataset;
@@ -223,6 +224,11 @@ public class CloudRepository {
 //      lexicalURL = lexicalURL.substring(0, lexicalURL.lastIndexOf(','));
 
     /* do what's possible here, rather than in the Task */
+  }
+
+  public static String prepareLexicalModelQuery(String languageID) {
+    String lexicalURL = String.format(API_MODEL_LANGUAGE_FORMATSTR, getHost(), languageID);
+    return lexicalURL;
   }
 
   /**

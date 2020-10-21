@@ -378,7 +378,6 @@ class LanguageSettingsViewController: UITableViewController {
       let thisKb = globalUserKeyboards[kbIndex]
       let mayDelete = mayDeleteKeyboard(keyboardIndex: index, keyboardCount: globalUserKeyboards.count)
       let infoView = ResourceInfoViewController(for: thisKb, mayDelete: mayDelete)
-      infoView.isCustomKeyboard = thisKb.isCustom
       navigationController?.pushViewController(infoView, animated: true)
     } else {
       log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")

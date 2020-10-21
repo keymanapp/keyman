@@ -48,13 +48,29 @@ const
   URLPath_KeymanLanguageLookup = '/go/developer/'+SKeymanVersion+'/language-lookup';
   URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
   URLPath_KeymanDeveloperHome = '/go/developer/'+SKeymanVersion+'/home';
+  URLPath_KeymanDeveloperHome_Presentation = '/developer';
+
+  URLPath_KeymanDeveloper_HelpKeyboards = '/go/developer/'+SKeymanVersion+'/help-keyboards';
+  URLPath_KeymanDeveloper_HelpPackages = '/go/developer/'+SKeymanVersion+'/help-packages';
+  URLPath_KeymanDeveloper_HelpMobile = '/go/developer/'+SKeymanVersion+'/help-mobile';
+  URLPath_KeymanDeveloper_KeymanWeb = '/go/developer/'+SKeymanVersion+'/keymanweb';
+  URLPath_KeymanDeveloper_KeymanEngineHome = '/go/developer/'+SKeymanVersion+'/keyman-engine-home';
+
+  URLPath_KeymanDeveloper_KeymanForAndroidDownload = '/go/developer/'+SKeymanVersion+'/android-app';
+  URLPath_KeymanDeveloper_KeymanForIosDownload = '/go/developer/'+SKeymanVersion+'/ios-app';
 
   URLPath_Support = '/go/'+SKeymanVersion+'/support';
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
+  URLPath_Privacy_Presentation = '/privacy';
   URLPath_Community = '/go/'+SKeymanVersion+'/community';
 
   // Keyboard download and installation
-  URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://[^/]+/keyboards/install/([^?/]+)(?:\?(.+))?$';
+  URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/keyboards/install/([^?/]+)(?:\?(.+))?$';
+                                  // e.g. https://keyman.com/keyboards/install/foo
+  UrlPath_RegEx_MatchKeyboardsRoot = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/keyboards([/?].*)?$';
+                               // e.g. http://keyman.com.local/keyboards/foo
+  UrlPath_RegEx_MatchKeyboardsGo = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/go/windows/[^/]+/download-keyboards';
+                             // e.g. https://keyman-staging.com/go/windows/14.0/download-keyboards?version=14.0.146.0
 
 function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
 

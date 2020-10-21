@@ -22,17 +22,26 @@ type
     /// <summary>Uninstalls a TIP for the current user for a given keyboard</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
     /// <param name="LangID">The transient profile to uninstall, $2000, $2400, $2800, $2C00</param>
-    procedure UninstallTip(const KeyboardID: string; LangID: Integer; ProfileGUID: TGUID); overload;
+    /// <param name="RemoveCURegistry">If we are actually 'disabling' the Keyman keyboard,
+    /// this should be False, otherwise for a full uninstall set to True because we do want
+    /// to remove the Keyman registry settings</param>
+    procedure UninstallTip(const KeyboardID: string; LangID: Integer; ProfileGUID: TGUID; RemoveCURegistry: Boolean); overload;
 
     /// <summary>Uninstalls all TIPs for the current user for a given keyboard</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
-    procedure UninstallTip(const KeyboardID: string); overload;
+    /// <param name="RemoveCURegistry">If we are actually 'disabling' the Keyman keyboard,
+    /// this should be False, otherwise for a full uninstall set to True because we do want
+    /// to remove the Keyman registry settings</param>
+    procedure UninstallTip(const KeyboardID: string; RemoveCURegistry: Boolean); overload;
 
   protected
     /// <summary>Uninstalls a TIP for the current user for a given keyboard</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
     /// <param name="BCP47Tag">This should be a BCP47 tag that is currently installed</param>
-    procedure UninstallTip(KeyboardID, BCP47Tag: string); overload;
+    /// <param name="RemoveCURegistry">If we are actually 'disabling' the Keyman keyboard,
+    /// this should be False, otherwise for a full uninstall set to True because we do want
+    /// to remove the Keyman registry settings</param>
+    procedure UninstallTip(KeyboardID, BCP47Tag: string; RemoveCURegistry: Boolean); overload;
 
     /// <summary>Unregisters a TIP from the Local Machine registry</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
@@ -48,6 +57,8 @@ type
     procedure DoUnregisterTip(const KeyboardID, BCP47Tag: string; pInputProcessorProfileMgr: ITfInputProcessorProfileMgr);
     procedure DoUnregisterTipTransientProfile(const KeyboardID: string; LangID: Word; pInputProcessorProfileMgr: ITfInputProcessorProfileMgr);
     function GetInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+    procedure UninstallCURegistry(const KeyboardID,
+      LayoutInstallString: string);
   end;
 
 implementation
@@ -196,7 +207,7 @@ begin
   DoUnregisterTip(KeyboardID, BCP47Tag, GetInputProcessorProfileMgr);
 end;
 
-procedure TKPUninstallKeyboardLanguage.UninstallTip(KeyboardID, BCP47Tag: string);
+procedure TKPUninstallKeyboardLanguage.UninstallTip(KeyboardID, BCP47Tag: string; RemoveCURegistry: Boolean);
 var
   reg: TRegistry;
   FIsAdmin: Boolean;
@@ -239,9 +250,16 @@ begin
 
   if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
     WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
+
+  //
+  // Remove the language from our current user Keyman settings (unless we are
+  // actually just disabling the keyboard, not uninstalling it)
+  //
+  if RemoveCURegistry then
+    UninstallCURegistry(KeyboardID, FLayoutInstallString);
 end;
 
-procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID: string; LangID: Integer; ProfileGUID: TGUID);
+procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID: string; LangID: Integer; ProfileGUID: TGUID; RemoveCURegistry: Boolean);
 var
   FIsAdmin: Boolean;
   BCP47Tag, FLayoutInstallString: string;
@@ -268,9 +286,43 @@ begin
   FLayoutInstallString := GetLayoutInstallString(LangID, ProfileGUID);
   if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
     WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
+
+  //
+  // Remove the language from our current user Keyman settings (unless we are
+  // actually just disabling the keyboard, not uninstalling it)
+  //
+  if RemoveCURegistry then
+    UninstallCURegistry(KeyboardID, FLayoutInstallString);
 end;
 
-procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID: string);
+procedure TKPUninstallKeyboardLanguage.UninstallCURegistry(const KeyboardID, LayoutInstallString: string);
+var
+  reg: TRegistry;
+  str: TStringList;
+  name: string;
+begin
+  str := TStringList.Create;
+  reg := TRegistry.Create;
+  try
+    if reg.OpenKey(BuildKeyboardLanguagesKey_CU(KeyboardID), True) then
+    begin
+      reg.GetValueNames(str);
+      for name in str do
+      begin
+        if reg.ReadString(name) = LayoutInstallString then
+        begin
+          reg.DeleteValue(name);
+          Exit;
+        end;
+      end;
+    end;
+  finally
+    reg.Free;
+    str.Free;
+  end;
+end;
+
+procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID: string; RemoveCURegistry: Boolean);
 var
   sLocales: TStrings;
   sLocale: string;
@@ -298,7 +350,7 @@ begin
 
     for sLocale in sLocales do
       // Note: if TIP is not installed, this still succeeds
-      UninstallTip(KeyboardID, sLocale);
+      UninstallTip(KeyboardID, sLocale, RemoveCURegistry);
   finally
     sLocales.Free;
   end;

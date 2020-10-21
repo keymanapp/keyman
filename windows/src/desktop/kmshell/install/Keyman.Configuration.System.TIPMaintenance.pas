@@ -79,7 +79,9 @@ begin
   if pack.Keyboards.Count = 0 then
     Exit(False);
 
-  Result := DoInstall(pack.Keyboards[0].ID, BCP47Tag);
+  if BCP47Tag = ''
+    then Result := DoInstall(pack.Keyboards[0].ID, GetFirstLanguage(pack.Keyboards[0] as IKeymanKeyboardInstalled))
+    else Result := DoInstall(pack.Keyboards[0].ID, BCP47Tag);
 end;
 
 class function TTIPMaintenance.InstallTip(LangID: Integer; const KeyboardID, BCP47Tag,
@@ -91,7 +93,6 @@ begin
   if lang = nil then
     Exit(False);
 
-  // TODO: handle errors
   (lang as IKeymanKeyboardLanguageInstalled2).InstallTip(LangID, KeyboardToRemove);
   Result := True;
 end;
@@ -105,7 +106,6 @@ begin
   if lang = nil then
     Exit(False);
 
-  // TODO: handle errors
   (lang as IKeymanKeyboardLanguageInstalled2).RegisterTip(LangID);
   Result := True;
 end;

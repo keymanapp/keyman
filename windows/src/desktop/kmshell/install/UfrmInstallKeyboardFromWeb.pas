@@ -86,6 +86,7 @@ uses
   Upload_Settings,
   utilfiletypes,
   utildir,
+  utilexecute,
   VersionInfo;
 
 {$R *.dfm}
@@ -117,7 +118,17 @@ end;
 
 procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
 begin
-  Handled := TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsInstall);
+  // This introduces some deeper knowledge of URL paths in Keyman Configuration, which is
+  // a bit of a shame, because we try to keep our internal knowledge to /go/ urls on
+  // keyman.com. However, there is not really any great way around this that I've found,
+  // which allows us to handle internal navigation on the keyboard search and still lets
+  // us open other URLs that may be in the search results in an external browser.
+  Handled :=
+    TRegEx.IsMatch(Url, URLPath_RegEx_MatchKeyboardsInstall) or       // capture https://keyman.com/keyboards/install/*
+    (not TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsRoot) and    // don't capture https://keyman.com/keyboards*
+    not Url.StartsWith('keyman:') and                                 // don't capture keyman:*
+    not IsLocalUrl(Url) and                                           // don't capture the external frame or its resources
+    not TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsGo));         // don't capture the launch url https://keyman.com/go/windows/download-keyboards
 end;
 
 procedure TfrmInstallKeyboardFromWeb.cefLoadingStateChange(Sender: TObject;
@@ -154,6 +165,11 @@ begin
     end;
 
     DownloadAndInstallPackage(PackageID, BCP47);
+  end
+  else if Url.StartsWith('http:') or Url.StartsWith('https:') then
+  begin
+    if not TUtilExecute.URL(Url) then
+      ShowMessage(SysErrorMessage(GetLastError));
   end;
 end;
 

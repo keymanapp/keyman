@@ -25,6 +25,8 @@ import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -69,11 +71,9 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.appcompat.widget.PopupMenu;
 
 import android.text.Html;
 import android.util.Log;
@@ -121,64 +121,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
 
-  private class DownloadResultReceiver extends ResultReceiver {
-    public DownloadResultReceiver(Handler handler) {
-      super(handler);
-    }
-
-    @Override
-    protected void onReceiveResult(int resultCode, Bundle resultData) {
-      if (progressDialog != null && progressDialog.isShowing()) {
-        progressDialog.dismiss();
-      };
-      progressDialog = null;
-      switch(resultCode) {
-        case FileUtils.DOWNLOAD_ERROR :
-          Toast.makeText(getApplicationContext(), "Download failed",
-            Toast.LENGTH_SHORT).show();
-          break;
-        case FileUtils.DOWNLOAD_SUCCESS :
-          String downloadedFilename = resultData.getString("filename");
-          String languageID = resultData.getString("language");
-          String kmpFilename = resultData.getString("destination") + File.separator + downloadedFilename;
-
-          Bundle bundle = new Bundle();
-          bundle.putString("kmpFile", kmpFilename);
-          bundle.putString("language", languageID);
-          Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
-          packageIntent.putExtras(bundle);
-          startActivity(packageIntent);
-
-          // Determine if associated lexical model for languageID should be downloaded
-          if (FileUtils.hasKeymanPackageExtension(kmpFilename) && !FileUtils.hasLexicalModelPackageExtension(kmpFilename)
-              && (languageID != null) && !languageID.isEmpty()) {
-
-            // Force the cloud catalog to update
-            if (!didExecuteParser) {
-              didExecuteParser = true;
-              repo = CloudRepository.shared.fetchDataset(context);
-            }
-
-            // Check if associated model is available in the cloud, and that it's not already installed
-            LexicalModel modelInfo = CloudRepository.shared.getAssociatedLexicalModel(context, languageID);
-            if ((modelInfo != null) && (KMManager.getAssociatedLexicalModel(languageID) == null)) {
-              String modelID = modelInfo.getLexicalModelID();
-              String url = modelInfo.getUpdateKMP();
-              if (url != null) {
-                ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
-                _params.add(new CloudApiTypes.CloudApiParam(
-                    CloudApiTypes.ApiTarget.LexicalModelPackage, url));
-                KMKeyboardDownloaderActivity.downloadLexicalModel(context, modelID, _params);
-              }
-            }
-          }
-
-          break;
-      }
-      super.onReceiveResult(resultCode, resultData);
-    }
-  }
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
@@ -191,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     });
 
     checkStoragePermission(null);
-    resultReceiver = new DownloadResultReceiver(new Handler());
+    resultReceiver = new DownloadResultReceiver(new Handler(), context);
 
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
@@ -574,6 +516,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
         url = url.toLowerCase();
         try {
+          progressDialog = new ProgressDialog(MainActivity.this);
+          progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
+          progressDialog.setCancelable(false);
+          progressDialog.show();
+          resultReceiver.setProgressDialog(progressDialog);
+
           // Download the KMP to app cache
           Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
           downloadIntent.putExtra("url", url);
@@ -581,11 +529,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           downloadIntent.putExtra("language", languageID);
           downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
           downloadIntent.putExtra("receiver", resultReceiver);
-
-          progressDialog = new ProgressDialog(MainActivity.this);
-          progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
-          progressDialog.setCancelable(false);
-          progressDialog.show();
 
           startService(downloadIntent);
         } catch (Exception e) {
@@ -982,54 +925,19 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
-    String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    if (result > 0) {
-      String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-      String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-      String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-      String kbVersion = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
-      String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-      String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      if (languageID.contains(";")) {
-        String[] ids = languageID.split("\\;");
-        String[] names = languageName.split("\\;");
-        int len = ids.length;
-        for (int i = 0; i < len; i++) {
-          String langId = ids[i];
-          String langName = "Unknown";
-          if (i < names.length)
-            langName = names[i];
-          HashMap<String, String> kbInfo = new HashMap<String, String>();
-          kbInfo.put(KMManager.KMKey_PackageID, packageID);
-          kbInfo.put(KMManager.KMKey_KeyboardID, keyboardID);
-          kbInfo.put(KMManager.KMKey_LanguageID, langId);
-          kbInfo.put(KMManager.KMKey_KeyboardName, keyboardName);
-          kbInfo.put(KMManager.KMKey_LanguageName, langName);
-          kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-          kbInfo.put(KMManager.KMKey_Font, kFont);
-          kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
-
-          KMManager.addKeyboard(this, kbInfo);
-
-        }
-      } else {
-        KMManager.addKeyboard(this, keyboardInfo);
-      }
-    } else {
-      // Error notifications previously handled in LanguageListActivity
-    }
+    // Do nothing
   }
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
     for(int i=0; i < keyboardsInstalled.size(); i++) {
       HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
+      String languageID = hashMap.get(KMManager.KMKey_LanguageID);
       Keyboard keyboardInfo = new Keyboard(
         hashMap.get(KMManager.KMKey_PackageID),
         hashMap.get(KMManager.KMKey_KeyboardID),
         hashMap.get(KMManager.KMKey_KeyboardName),
-        hashMap.get(KMManager.KMKey_LanguageID),
+        languageID,
         hashMap.get(KMManager.KMKey_LanguageName),
         hashMap.get(KMManager.KMKey_Version),
         hashMap.get(KMManager.KMKey_CustomHelpLink),
@@ -1044,6 +952,35 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         }
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
+      }
+
+      // Determine if associated lexical model for languageID should be downloaded
+      if ((languageID != null) && !languageID.isEmpty()) {
+
+        // Force the cloud catalog to update
+        if (!didExecuteParser) {
+          didExecuteParser = true;
+          repo = CloudRepository.shared.fetchDataset(context);
+        }
+
+        // Check if associated model is not already installed
+        if ((KMManager.getAssociatedLexicalModel(languageID) == null) && KMManager.hasConnection(context)) {
+          String _downloadid = CloudLexicalModelMetaDataDownloadCallback.createDownloadId(languageID);
+          CloudLexicalModelMetaDataDownloadCallback _callback = new CloudLexicalModelMetaDataDownloadCallback();
+
+          Toast.makeText(context,
+            context.getString(R.string.query_associated_model),
+            Toast.LENGTH_SHORT).show();
+
+          ArrayList<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams = new ArrayList<>();
+          String url = CloudRepository.prepareLexicalModelQuery(languageID);
+          aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
+            CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
+
+          CloudDownloadMgr.getInstance().executeAsDownload(
+            context, _downloadid, null, _callback,
+            aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+        }
       }
     }
   }

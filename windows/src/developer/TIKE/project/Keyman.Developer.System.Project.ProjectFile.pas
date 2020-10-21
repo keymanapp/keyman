@@ -332,6 +332,7 @@ uses
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.ProjectLoader,
   Keyman.Developer.System.Project.ProjectSaver,
+  Keyman.Developer.System.Project.UrlRenderer,
   RedistFiles,
   RegistryKeys,
   UMD5Hash,
@@ -881,6 +882,12 @@ begin
           userdoc := nil;
         end;
       end;
+
+      //
+      // Inject state URLs into the loaded file
+      //
+
+      TProjectUrlRenderer.AddUrls(doc.documentElement);
 
       xsl := MSXMLDOMDocumentFactory.CreateDOMDocument;
       try

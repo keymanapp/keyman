@@ -68,7 +68,7 @@ public class CloudDownloadMgr{
   }
 
   /**
-   * Append downloadreceiver to the main context.
+   * Remove downloadreceiver from the main context.
    * @param aContext the context
    */
   public synchronized void shutdown(Context aContext)

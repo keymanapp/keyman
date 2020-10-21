@@ -10,7 +10,7 @@ import Foundation
 import WebKit
 import DeviceKit
 
-public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate {
+public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
   private enum NavigationMode: Int {  // b/c hashable
     // left nav
     case cancel
@@ -19,6 +19,12 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     // right nav
     case none
     case next
+    case install
+  }
+
+  private enum CellStyle {
+    case none
+    case preinstalled
     case install
   }
 
@@ -40,15 +46,18 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @IBOutlet var iphoneTabViewController: UITabBarController!
 
   let package: Resource.Package
-  var wkWebView: WKWebView?
+  var packagePageController: PackageWebViewController?
   let completionHandler: CompletionHandler
   let defaultLanguageCode: String
   let associators: [LanguagePickAssociator]
   let languages: [Language]
+  let preinstalledLanguageCodes: Set<String>
 
   private var leftNavMode: NavigationMode = .cancel
   private var rightNavMode: NavigationMode = .none
   private var navMapping: [NavigationMode : UIBarButtonItem] = [:]
+
+  private var dismissalBlock: (() -> Void)? = nil
 
   public init(for package: Resource.Package,
               defaultLanguageCode: String? = nil,
@@ -58,8 +67,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     self.completionHandler = completionHandler
     self.languages = package.languages
 
-    let packageFirstLangCode = package.installableResourceSets[0][0].languageID
-    self.defaultLanguageCode = package.languages.contains(where: { $0.id == defaultLanguageCode }) ? defaultLanguageCode! : packageFirstLangCode
     self.associators = languageAssociators
 
     var xib: String
@@ -69,6 +76,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       xib = "PackageInstallView_iPhone"
     }
 
+    self.preinstalledLanguageCodes = PackageInstallViewController<Resource>.checkPreinstalledResources(package: package)
+    self.defaultLanguageCode = PackageInstallViewController<Resource>.chooseDefaultSelectedLanguage(from: package, promptingCode: defaultLanguageCode, preinstalleds: self.preinstalledLanguageCodes)
     super.init(nibName: xib, bundle: Bundle.init(for: PackageInstallViewController.self))
 
     _ = view
@@ -78,11 +87,64 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     fatalError("init(coder:) has not been implemented")
   }
 
+  // Must be static if we want the resulting value to be stored via `let` semantics during init.
+  private static func checkPreinstalledResources(package: Resource.Package) -> Set<String> {
+    var preinstalleds: Set<String> = Set()
+
+    guard let typedPackage = package as? TypedKeymanPackage<Resource> else {
+      log.warning("Cannot check for previously-installed resources of unexpected type")
+      return preinstalleds
+    }
+
+    if let installedResources: [Resource] = Storage.active.userDefaults.userResources(ofType: Resource.self) {
+      installedResources.forEach { resource in
+        if resource.packageKey == package.key {
+          // The resource is from this package.
+          let langResources = typedPackage.installables(forLanguage: resource.languageID)
+          if langResources.contains(where: { $0.typedFullID == resource.typedFullID }){
+            preinstalleds.insert(resource.languageID)
+          }
+        }
+      }
+    }
+
+    return preinstalleds
+  }
+
+  private static func chooseDefaultSelectedLanguage(from package: Resource.Package,
+                                                    promptingCode defaultLanguageCode: String?,
+                                                    preinstalleds: Set<String>) -> String {
+    // If a default language code was specified, always pre-select it by default.
+    // Even if the corresponding resource was already installed - the user may be 'manually updating' it.
+    if package.languages.contains(where: { $0.id == defaultLanguageCode }) {
+      return defaultLanguageCode!
+    }
+
+    // Otherwise... find the first not-already-installed language code.  For now, at least.
+    let uninstalledSet = package.installableResourceSets.first { set in
+      return set.contains(where: { !preinstalleds.contains($0.languageID) })
+    }
+
+    if uninstalledSet != nil {
+      return uninstalledSet!.first{ !preinstalleds.contains($0.languageID) }!.languageID
+    }
+
+    // Failing that... just return the very first language and be done with it.
+    return package.installableResourceSets[0][0].languageID
+  }
+
   override public func viewDidLoad() {
-    wkWebView = WKWebView.init(frame: webViewContainer.frame)
+    // The 'readme' version is guaranteed.
+    // "Embeds" an instance of the more general PackageWebViewController.
+    packagePageController = PackageWebViewController(for: package, page: .readme)!
+    packagePageController!.willMove(toParent: self)
+    let wkWebView = packagePageController!.view
+    wkWebView!.frame = webViewContainer.frame
     wkWebView!.backgroundColor = .white
     wkWebView!.translatesAutoresizingMaskIntoConstraints = false
     webViewContainer.addSubview(wkWebView!)
+    self.addChild(packagePageController!)
+    packagePageController!.didMove(toParent: self)
 
     // Ensure the web view fills its available space.  Required b/c iOS 9 & 10 cannot load
     // these correctly from XIBs.
@@ -124,6 +186,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       tabVC.delegate = self
 
       let tabView = tabVC.view!
+      tabView.translatesAutoresizingMaskIntoConstraints = false
       self.view.addSubview(tabVC.view)
 
       tabView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
@@ -169,14 +232,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
         // Since we won't be showing the user a language list, allow them to install from the info view.
         rightNavigationMode = .install
       }
-    }
-  }
-
-  override public func viewWillAppear(_ animated: Bool) {
-    if let readmeURL = package.readmePageURL {
-      wkWebView?.loadFileURL(readmeURL, allowingReadAccessTo: package.sourceFolder)
-    } else {
-      wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
     }
   }
 
@@ -282,20 +337,63 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   @objc func installBtnHandler() {
-    // If it is not the root view of a navigationController, just pop it off the stack.
-    if let navVC = self.navigationController, navVC.viewControllers[0] != self {
-      navVC.popViewController(animated: true)
-    } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
-      dismiss(animated: true)
-    }
-
     let selectedItems = self.languageTable.indexPathsForSelectedRows ?? []
     let selectedLanguageCodes = selectedItems.map { self.languages[$0.row].id }
 
     let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
 
     self.completionHandler(selectedResources.map { $0.typedFullID })
-    self.associators.forEach { $0.pickerFinalized() }
+
+    let dismissalBlock = {
+      // If it is not the root view of a navigationController, just pop it off the stack.
+      if let navVC = self.navigationController {
+       if navVC.viewControllers[0] != self {
+        navVC.popViewController(animated: true)
+        } else {
+          self.dismiss(animated: true)
+        }
+      } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
+        self.dismiss(animated: true)
+      }
+
+      self.associators.forEach { $0.pickerFinalized() }
+    }
+
+    // First, show the package's welcome - if it exists.
+    if let welcomeVC = PackageWebViewController(for: package, page: .welcome) {
+      self.dismissalBlock = dismissalBlock
+
+      let subNavVC = UINavigationController(rootViewController: welcomeVC)
+      _ = subNavVC.view
+
+      let doneItem = UIBarButtonItem(title: NSLocalizedString("command-done",
+                                                              bundle: engineBundle,
+                                                              comment: ""),
+                                     style: .plain,
+                                     target: self,
+                                     action: #selector(self.onWelcomeDismissed))
+
+      // The view's navigation buttoms need to be set on its controller's navigation item,
+      // not the UINavigationController's navigationItem.
+      welcomeVC.navigationItem.rightBarButtonItem = doneItem
+
+      // We need to listen to delegated presentation events on the view-controller being presented.
+      // This version handles iOS 13's "page sheet" slide-dismissal.
+      subNavVC.presentationController?.delegate = self
+
+      self.present(subNavVC, animated: true, completion: nil)
+    } else {
+      dismissalBlock()
+    }
+  }
+
+  public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    onWelcomeDismissed()
+  }
+
+  @objc private func onWelcomeDismissed() {
+    self.dismissalBlock?()
+    self.dismissalBlock = nil
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {
@@ -317,11 +415,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
     if let reusedCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       cell = reusedCell
-
-      // The checkmark is not properly managed by default.
-      let shouldCheck = languageTable.indexPathsForSelectedRows?.contains(indexPath) ?? false
-      // Note for later:  also ensure that it wasn't already installed.  (exception to rule above)
-      cell.accessoryType = shouldCheck ? .checkmark : .none
     } else {
       let selectionColor = UIView()
 
@@ -335,30 +428,87 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       cell.selectedBackgroundView = selectionColor
     }
 
+    cell.isUserInteractionEnabled = true
+    cell.backgroundColor = .none
+
     switch indexPath.section {
       case 0:
         let index = indexPath.row
         cell.detailTextLabel?.text = languages[index].name
+
+        // Check:  is the language ALREADY installed?
+        // The checkmark is not properly managed by default.
+        let shouldCheck = languageTable.indexPathsForSelectedRows?.contains(indexPath) ?? false
+        if self.preinstalledLanguageCodes.contains(languageCodeForCellAt(indexPath)) {
+          setCellStyle(cell, style: shouldCheck ? .install : .preinstalled)
+        } else {
+          setCellStyle(cell, style: shouldCheck ? .install : .none)
+        }
         return cell
       default:
         return cell
     }
   }
 
+  private func languageCodeForCellAt(_ indexPath: IndexPath) -> String {
+    return languages[indexPath.row].id
+  }
+
+  private func setCellStyle(_ cell: UITableViewCell, style: CellStyle) {
+    var textColor: UIColor
+    if #available(*, iOS 13.0) {
+      textColor = .label
+    } else {
+      textColor = .black
+    }
+
+    switch style {
+      case .none:
+        cell.detailTextLabel?.textColor = textColor
+
+        cell.accessoryType = .none
+      case .preinstalled:
+        cell.detailTextLabel?.textColor = .systemGray
+
+        cell.accessoryType = .checkmark
+        cell.tintColor = .systemGray
+      case .install:
+        cell.detailTextLabel?.textColor = textColor
+
+        cell.accessoryType = .checkmark
+        cell.tintColor = .systemBlue
+    }
+  }
+
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    navigationItem.rightBarButtonItem?.isEnabled = true
-    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+    guard let cell = tableView.cellForRow(at: indexPath) else {
+      return
+    }
+
+    guard cell.isUserInteractionEnabled == true else {
+      tableView.deselectRow(at: indexPath, animated: false)
+      return
+    }
+
+    rightNavigationMode = .install
+    setCellStyle(cell, style: .install)
 
     associators.forEach { $0.selectLanguages( Set([languages[indexPath.row].id]) ) }
   }
 
   public func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-    if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 {
+    guard let cell = tableView.cellForRow(at: indexPath) else {
+      return
+    }
+
+    if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 && self.preinstalledLanguageCodes.count == 0 {
       rightNavigationMode = .none
     } else {
       rightNavigationMode = .install
     }
-    tableView.cellForRow(at: indexPath)?.accessoryType = .none
+
+    let wasPreinstalled = self.preinstalledLanguageCodes.contains(languageCodeForCellAt(indexPath))
+    setCellStyle(cell, style: wasPreinstalled ? .preinstalled : .none)
 
     associators.forEach { $0.deselectLanguages( Set([languages[indexPath.row].id]) ) }
   }

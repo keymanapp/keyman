@@ -2,7 +2,7 @@
  * Copyright (C) 2019 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.tavultesoft.kmapro;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -33,6 +33,8 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
+import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.KMManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;

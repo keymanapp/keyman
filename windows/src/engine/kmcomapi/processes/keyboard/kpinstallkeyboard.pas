@@ -109,6 +109,7 @@ uses
   kmxfileconsts,
   utilicon,
   utilstr,
+  utiltsf,
   keymanapi_TLB;
 
 procedure TKPInstallKeyboard.Execute(const FileName, PackageID: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
@@ -403,7 +404,7 @@ begin
               r.WriteString(BCP47Tag, PackageLanguageMetadata[i].Name);
               kpil := TKPInstallKeyboardLanguage.Create(Context);
               try
-                if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, []) then
+                if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, []) and not IsTransientLanguageID(LangID) then
                   kpil.RegisterTip(kbdname, BCP47Tag, ki.KeyboardName, LangID, FIconFileName, PackageLanguageMetadata[i].Name);
               finally
                 kpil.Free;

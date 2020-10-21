@@ -72,16 +72,12 @@ BOOL CKMTipTextService::RegisterProfiles()
 
     hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER,
                           IID_ITfInputProcessorProfiles, (void**)&pInputProcessProfiles);
-    if (hr != S_OK)
+    if (hr != S_OK || pInputProcessProfiles == NULL)
         return FALSE;
 
     hr = pInputProcessProfiles->Register(c_clsidKMTipTextService);
-    if (hr != S_OK)
-        goto Exit;
 
-Exit:
-    if(pInputProcessProfiles != NULL)  // I2794
-      pInputProcessProfiles->Release();
+    pInputProcessProfiles->Release();
 
     return (hr == S_OK);
 #endif

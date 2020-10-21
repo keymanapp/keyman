@@ -136,13 +136,17 @@ def install_kmp_shared(inputfile, online=False, language=None):
                 logging.info("Installing %s as documentation", f['name'])
                 if not os.path.isdir(kmpdocdir):
                     os.makedirs(kmpdocdir)
-                os.link(fpath, os.path.join(kmpdocdir, f['name']))
+                kmpdocpath = os.path.join(kmpdocdir, f['name'])
+                if not os.path.isfile(kmpdocpath):
+                    os.link(fpath, kmpdocpath)
             elif ftype == KMFileTypes.KM_FONT:
                 # Special handling of font to hard link it into font dir
                 logging.info("Installing %s as font", f['name'])
                 if not os.path.isdir(kmpfontdir):
                     os.makedirs(kmpfontdir)
-                os.link(fpath, os.path.join(kmpfontdir, f['name']))
+                kmpfontpath = os.path.join(kmpfontdir, f['name'])
+                if not os.path.isfile(kmpfontpath):
+                    os.link(fpath, kmpfontpath)
             elif ftype == KMFileTypes.KM_SOURCE:
                 # TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
                 logging.info("Installing %s as keyman file", f['name'])
@@ -208,7 +212,9 @@ def install_kmp_user(inputfile, online=False, language=None):
                 fontsdir = os.path.join(user_keyman_font_dir(), packageID)
                 if not os.path.isdir(fontsdir):
                     os.makedirs(fontsdir)
-                os.link(fpath, os.path.join(fontsdir, f['name']))
+                fontpath = os.path.join(fontsdir, f['name'])
+                if not os.path.isfile(fontpath):
+                    os.link(fpath, fontpath)
                 logging.info("Installing %s as font", f['name'])
             elif ftype == KMFileTypes.KM_OSK:
                 # Special handling to convert kvk into LDML

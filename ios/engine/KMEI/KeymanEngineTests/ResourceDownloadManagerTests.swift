@@ -32,7 +32,7 @@ class ResourceDownloadManagerTests: XCTestCase {
     }
   }
 
-  func testDefaultDownloadURL() {
+  func testDefaultKeyboardDownloadURL() {
     let tier = Version.currentTagged.tier ?? .stable
     let root = "/go/package/download"
 
@@ -45,6 +45,9 @@ class ResourceDownloadManagerTests: XCTestCase {
     XCTAssertTrue(basic_khmer_angkor_components.queryItems!.contains { item in
       return item.name == "tier" && item.value == tier.rawValue
     })
+    XCTAssertTrue(basic_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "type" && item.value == "keyboard"
+    })
 
     let adv_khmer_angkor_url = downloadManager!.defaultDownloadURL(forPackage: TestUtils.Packages.Keys.khmer_angkor, andResource: TestUtils.Keyboards.khmer_angkor.fullID, withVersion: Version("1.0.6"), asUpdate: true)
     let adv_khmer_angkor_components = URLComponents(string: adv_khmer_angkor_url.absoluteString)!
@@ -56,6 +59,9 @@ class ResourceDownloadManagerTests: XCTestCase {
       return item.name == "tier" && item.value == tier.rawValue
     })
     XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "type" && item.value == "keyboard"
+    })
+    XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
       return item.name == "update" && item.value == "1"
     })
     XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
@@ -64,6 +70,11 @@ class ResourceDownloadManagerTests: XCTestCase {
     XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
       return item.name == "bcp47" && item.value == "km"
     })
+  }
+
+  func testDefaultLexicalModelDownloadURL() {
+    let tier = Version.currentTagged.tier ?? .stable
+    let root = "/go/package/download"
 
     let basic_mtnt_components = URLComponents(string: downloadManager!.defaultDownloadURL(forPackage: TestUtils.Packages.Keys.nrc_en_mtnt).absoluteString)!
 
@@ -73,6 +84,31 @@ class ResourceDownloadManagerTests: XCTestCase {
     })
     XCTAssertTrue(basic_mtnt_components.queryItems!.contains { item in
       return item.name == "tier" && item.value == tier.rawValue
+    })
+    XCTAssertTrue(basic_mtnt_components.queryItems!.contains { item in
+      return item.name == "type" && item.value == "model"
+    })
+
+    let adv_mtnt_url = downloadManager!.defaultDownloadURL(forPackage: TestUtils.Packages.Keys.nrc_en_mtnt, andResource: TestUtils.LexicalModels.mtnt.fullID, withVersion: Version(TestUtils.LexicalModels.mtnt.version), asUpdate: true)
+    let adv_mtnt_components = URLComponents(string: adv_mtnt_url.absoluteString)!
+    XCTAssertEqual(adv_mtnt_components.path, "\(root)/nrc.en.mtnt")
+    XCTAssertTrue(adv_mtnt_components.queryItems!.contains { item in
+      return item.name == "platform" && item.value == "ios"
+    })
+    XCTAssertTrue(adv_mtnt_components.queryItems!.contains { item in
+      return item.name == "tier" && item.value == tier.rawValue
+    })
+    XCTAssertTrue(adv_mtnt_components.queryItems!.contains { item in
+      return item.name == "type" && item.value == "model"
+    })
+    XCTAssertTrue(adv_mtnt_components.queryItems!.contains { item in
+      return item.name == "update" && item.value == "1"
+    })
+    XCTAssertTrue(adv_mtnt_components.queryItems!.contains { item in
+      return item.name == "version" && item.value == TestUtils.LexicalModels.mtnt.version
+    })
+    XCTAssertTrue(adv_mtnt_components.queryItems!.contains { item in
+      return item.name == "bcp47" && item.value == "en"
     })
   }
 

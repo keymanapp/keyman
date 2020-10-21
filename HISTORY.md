@@ -1,5 +1,138 @@
 # Keyman Version History
 
+## 14.0.163 alpha 2020-10-19
+
+* fix(web): Remove base key from popup keys (#3718)
+
+## 14.0.162 alpha 2020-10-18
+
+* fix(web): Let embedded device handle K_TAB or K_ENTER (#3664)
+
+## 14.0.161 alpha 2020-10-16
+
+* fix(common/core/web): fixes revert event bug (#3709)
+
+## 14.0.160 alpha 2020-10-14
+
+* feat(common/models): disables "keep" when word is not suggestion otherwise (#3700)
+* feat(common/core/web): selective wordbreak swallowing after accepting suggestions (#3702)
+* refactor(common/models): extract Outcome type (#3705)
+
+## 14.0.159 alpha 2020-10-12
+
+* fix(web): unit test script failure on compilation failures (#3597)
+
+## 14.0.158 alpha 2020-10-09
+
+* feat(common/models): 'revert' now uses model's punctuation (#3647)
+* fix(windows): launch configuration non-elevated (#3691)
+* fix(windows): disabled keyboards listed in hotkeys (#3693)
+
+## 14.0.157 alpha 2020-10-08
+
+* fix(windows): show version with tag in setup (#3682)
+* fix(windows): keyman desktop setup filename (#3684)
+
+## 14.0.156 alpha 2020-10-08
+
+* chore(windows): Move to Windows SDK 10.0.17763.0 (#3654)
+* fix(windows): Some registry keys could have incorrect permissions 🍒 (#3668)
+* fix(developer): ci uses repo tier and version (#3670)
+* fix(windows): update CI for publishing desktop help (#3671)
+* fix(web): ci uses repo tier and version (#3672)
+* fix(windows): improve version numbers (#3678)
+* chore: don't add tag to version in filenames (#3681)
+
+## 14.0.155 alpha 2020-10-07
+
+* refactor(common/models): centralizes suggestion & keep inits (#3645)
+* fix(common/models): predictions after typed whitespace (#3657)
+* fix(web): Fix how layer is separated from key name (#3659)
+
+## 14.0.154 alpha 2020-10-05
+
+* fix(windows): Upgrading keyboards with transient profiles (#3637)
+* fix(windows): upgrading disabled keyboards (#3638)
+* fix(developer): coverity reports for compiler (#3640)
+* fix(windows): coverity reports for mcompile (#3641)
+* fix(windows): coverity reports for kmtip (#3642)
+* fix(windows): coverity reports for keyman32 (#3649)
+* chore: exclude parens if no scope in commit msg (#3653)
+
+## 14.0.153 alpha 2020-10-02
+
+* chore(deps): bump @actions/core from 1.2.2 to 1.2.6 in /resources/build/version (#3646)
+* fix(android/app): Switch system keyboard in KMPBrowserActivity (#3648)
+
+## 14.0.152 alpha 2020-09-30
+
+* fix(ios/engine): package installation language-picker improvements (#3623)
+
+## 14.0.151 alpha 2020-09-29
+
+* fix(windows): Buffer overrun in firstrun (#3634)
+* fix(windows): upgrading transitional profiles (#3635)
+* fix(android/engine): Fix undetermined lexical model package ID (#3624)
+
+## 14.0.150 alpha 2020-09-28
+
+* feat(windows): overflow menu for osk toolbar (#3626)
+* feat(windows): scrollable keyboard menu (#3627)
+* fix(android/app): Allow uninstalling sil_euro_latin for non-default languages (#3628)
+* feat(ios/engine): Utilizes packages' welcome pages (#3622)
+* fix(android/app): Only copy asset .kmp file if it doesn't exist (#3629)
+
+## 14.0.149 alpha 2020-09-25
+
+* fix(windows): add back support for disabling keyboards (#3607)
+* fix(windows): bootstrap package install specified language bugs (#3609)
+* fix(windows): bootstrap should skip install of failed downloads (#3610)
+* refactor(android/app): Move Settings activities from KMEA to KMAPro (#3614)
+* fix(android/app): Change install intent to MainActivity (#3615)
+* fix(windows): cleanup pointer to int typecasts (#3612)
+* fix(developer): hardcoded urls in debugger (#3613)
+* fix(developer): Project window and About window hardcoded urls (#3618)
+* fix(windows): cleanup hardcoded urls in tsysinfo (#3619)
+
+## 14.0.148 alpha 2020-09-24
+
+* fix(windows): hint dialog was blank when elevated (#3604)
+* fix(android): Log errors for crashes involving Keyboard Picker (#3499)
+
+## 14.0.147 alpha 2020-09-23
+
+* feat(common/models): context + input tracking for predictive text (#3549)
+* feat(common/models): initial integration for enhanced corrections (#3555)
+* feat(common/models): correction thresholding, acceptance (#3556)
+* refactor(common/models): distance modeler cleanup (#3565)
+* change(common/models): context tracker cleanup, optimizations, fixes (#3573)
+* feat(common/models): Correction improvement (#3575)
+* feat(common/models): naive correction-algorithm timer (#3581)
+* fix(common/models): Android API compat for upgraded correction-search (#3601)
+* fix(android/app): Query api.keyman.com for downloading associated dictionary (#3606)
+* refactor(web/engine): application of predictive suggestions (#3582)
+* fix(windows): simplify profile repair (#3559)
+
+## 14.0.146 alpha 2020-09-22
+
+* chore(deps): bump http-proxy from 1.17.0 to 1.18.1 in /web/testing/regression-tests (#3568)
+* feat(ios/engine): go/package use for model pkg downloads (#3603)
+
+## 14.0.145 alpha 2020-09-21
+
+* feat(windows): improve keyboard language dialog (#3557)
+* fix(windows): lookup language name on create (#3558)
+
+## 14.0.144 alpha 2020-09-18
+
+* feat(developer): add viewport to html templates (#3531)
+* fix(windows): use new signtime.bat on build agents (#3586)
+* fix(developer): Touch font size should be string (#3585)
+* fix(android/app): Fix Info page title size (#3571)
+* fix(linux/config): Check if file exists before creating hard links (#3592)
+* fix(windows): remove obsolete releaseCapture calls (#3594)
+* fix(linux/config): Catch if kmp.json is invalid JSON (#3593)
+
 ## 14.0.143 alpha 2020-09-16
 
 * fix(android/app): Validate language selection for "INSTALL" button (#3579)

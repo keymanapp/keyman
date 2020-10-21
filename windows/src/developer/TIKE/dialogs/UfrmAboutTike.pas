@@ -79,14 +79,14 @@ procedure TfrmAboutTike.FormCreate(Sender: TObject);
 begin
   inherited;
   Caption := SCaption;
-  lblWebsite.Caption := MakeKeymanURL(URLPath_KeymanDeveloperHome);
+  lblWebsite.Caption := MakeKeymanURL(URLPath_KeymanDeveloperHome_Presentation);
   lblVersion.Caption := 'Version ' + GetVersionString;
   lblCopyright.Caption := GetVersionCopyright;
 end;
 
 procedure TfrmAboutTike.lblWebsiteClick(Sender: TObject);
 begin
-  TUtilExecute.URL(lblWebsite.Caption);  // I3349
+  TUtilExecute.URL(MakeKeymanURL(URLPath_KeymanDeveloperHome));  // I3349
 end;
 
 function TfrmAboutTike.GetHelpTopic: string;

@@ -8,9 +8,9 @@ default:
   echo Please don't call this file directly -- used by Makefile
 
 copyredist-desktop:
-  -mkdir $(ROOT)\release\$VERSION
-  copy /Y firstvoices.msi $(ROOT)\release\$VERSION\firstvoices.msi
-  copy /Y firstvoices.exe $(ROOT)\release\$VERSION\firstvoices-$VERSION.exe
+  -mkdir $(ROOT)\release\$Version
+  copy /Y firstvoices.msi $(ROOT)\release\$Version\firstvoices.msi
+  copy /Y firstvoices.exe $(ROOT)\release\$Version\firstvoices-$Version.exe
 
 prepareredist:
   rem prepareredist
@@ -20,5 +20,5 @@ clean:
 
 candle-desktop:
   $(WIXHEAT) dir ..\xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
-  $(WIXCANDLE) -dOEMNAME="$(OEMNAME)" -dPRODUCTNAME="$(PRODUCTNAME)" -dROOT="$(ROOT)" -dVERSION=$VERSION -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\xml firstvoices.wxs desktopui.wxs
+  $(WIXCANDLE) -dOEMNAME="$(OEMNAME)" -dPRODUCTNAME="$(PRODUCTNAME)" -dROOT="$(ROOT)" -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\xml firstvoices.wxs desktopui.wxs
 

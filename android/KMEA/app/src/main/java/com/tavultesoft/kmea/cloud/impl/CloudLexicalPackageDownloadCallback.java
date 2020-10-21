@@ -64,6 +64,9 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
             if (kmpFilename == null || kmpFilename.isEmpty()) {
               KMLog.LogError(TAG, "Cloud URL " + _d.getCloudParams().url + " has null model package");
             }
+            if (!kmpFilename.endsWith(FileUtils.MODELPACKAGE)) {
+              kmpFilename = kmpFilename + FileUtils.MODELPACKAGE;
+            }
 
             // Extract the kmp. Validate it contains only lexical models, and then process the lexical model package
             File kmpFile = new File(cacheDir, kmpFilename);

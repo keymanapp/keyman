@@ -147,7 +147,6 @@ uses
   SFX,
   TntDialogHelp,
   ErrorControlledRegistry,
-  UCreateProcessAsShellUser,
   utilsystem,
   utilexecute,
   VersionInfo;
@@ -598,13 +597,16 @@ var
         packLocation := pack.GetBestLocation;
         if Assigned(packLocation) then
         begin
-          LogInfo('Downloading '+packLocation.Url);
           if packLocation.LocationType = iilOnline then
+          begin
+            LogInfo('Downloading '+packLocation.Url);
             if not TResourceDownloader.Execute(FInstallInfo, packLocation, FSilent) then
             begin
               LogInfo('Failed to download '+packLocation.Url); // TODO: can we get more detail?
+              pack.ShouldInstall := False;
               Continue; //
             end;
+          end;
 
           // Need to check kmshell version >= 14.0 for support for non-default
           // language registration into local machine context; will not install
@@ -633,10 +635,11 @@ var
       s := '-s -install-tips-for-packages ';
       for pack in FInstallInfo.Packages do
       begin
-        s := s + '"'+pack.ID+'='+pack.BCP47+'" ';
+        if pack.ShouldInstall then
+          s := s + '"'+pack.ID+'='+pack.BCP47+'" ';
       end;
 
-      CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode);
+      TUtilExecute.CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode);
     end;
   end;
 begin
@@ -687,7 +690,7 @@ begin
     TUtilExecute.WaitForProcess('"'+FKMShellPath+'" '+s, ExtractFilePath(FKMShellPath), SW_SHOWNORMAL, WaitFor); // I2605 - for admin-installed packages  // I3349
 
     FExitCode := 0;
-    if not CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode) then // I2757
+    if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode) then // I2757
       LogError('Failed to setup default options for Keyman Desktop: '+SysErrorMessage(GetLastError))
     else if FExitCode = 2 then
     begin
@@ -704,7 +707,7 @@ begin
       s := '"'+FKMShellPath+'"';
       if StartWithConfiguration then
         s := s + ' -startWithConfiguration';
-      if not CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
+      if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
         LogError('Failed to start Keyman Desktop: '+SysErrorMessage(GetLastError), False); // I2756
     end;
   end;

@@ -96,6 +96,10 @@
       };
     }
 
+    toKey(text: USVString): USVString {
+      return this._trie.toKey(text);
+    }
+
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
@@ -120,22 +124,20 @@
       let prefix = this.getLastWord(newContext.left);
 
       // Return suggestions from the trie.
-      return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => ({
-        transform: {
-          // Insert the suggestion from the Trie, verbatim
+      return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => 
+        models.transformToSuggestion({
           insert: text,
           // Delete whatever the prefix that the user wrote.
+          deleteLeft: leftDelOffset + prefix.kmwLength()
           // Note: a separate capitalization/orthography engine can take this
           // result and transform it as needed.
-          deleteLeft: leftDelOffset + prefix.kmwLength(),
         },
-        displayAs: text,
-        p: p
-      })));
+        p
+      )));
 
       /* Helper */
 
-      function makeDistribution(suggestions: (Suggestion & {p: number})[]): Distribution<Suggestion> {
+      function makeDistribution(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
         let distribution: Distribution<Suggestion> = [];
 
         for(let s of suggestions) {
@@ -157,6 +159,12 @@
       }
 
       return '';
+    }
+
+    public tokenize(context: Context): USVString[] {
+      let words = this.breakWords(context.left) || [];
+
+      return words.map(span => span.text);
     }
 
     public wordbreak(context: Context): USVString {

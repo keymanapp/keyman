@@ -3,109 +3,57 @@
 namespace correction {
   type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
-  type TraversableToken<TUnit> = {
+  export type TraversableToken<TUnit> = {
     key: TUnit,
     traversal: LexiconTraversal
-  }
-
-  export const QUEUE_EDGE_COMPARATOR: models.Comparator<SearchEdge> = function(arg1, arg2) {
-    return arg1.currentCost - arg2.currentCost;
   }
 
   export const QUEUE_NODE_COMPARATOR: models.Comparator<SearchNode> = function(arg1, arg2) {
     return arg1.currentCost - arg2.currentCost;
   }
 
-  export const QUEUE_SPACE_COMPARATOR: models.Comparator<SearchSpaceTier> = function(space1, space2) {
-    let node1 = space1.correctionQueue.peek();
-    let node2 = space2.correctionQueue.peek();
-    
-    // Guards, just in case one of the search spaces ever has an empty node.
-    if(node1 && node2) {
-      return node1.currentCost - node2.currentCost;
-    } else if(node2) {
-      return 1;
-    } else {
-      return -1;
-    }
-  }
-
-  // Represents an 'edge' to a potential 'node' on the (conceptual) graph used to search for best-fitting
-  // corrections by the correction-search algorithm.  Stores the cost leading to the new node, though it may be
-  // an overestimate when the edit distance is greater than the current search threshold.
+  // Represents a processed node for the correction-search's search-space's tree-like graph.  May represent
+  // internal and 'leaf' nodes on said graph, as well as the overall root of the search.  Also used to represent
+  // edges on the graph TO said nodes - there's a bit of overloading here.  Either way, it stores the cost of the 
+  // optimum path used to reach the ndoe.
+  //
+  // The stored path cost may be an overestimate when the edit distance is greater than the current search threshold.  The
+  // first version of the node to be dequeued from SearchSpace's priority queue hierarchy 'wins' and is taken as the absolute
+  // minimum; subsequent versions are ignored as suboptimal.
+  //
+  // Provides functions usable to enumerate across the node's outward edges to new nodes for continued search.
+  // Most of the actual calculations occur as part of this process.
   //
   // For nodes with raw edit-distance cost within the current threshold for correction searches, we do have admissibility.
   // If not enough nodes are available within that threshold, however, admissibility may be lost, leaving our search as a
   // heuristic.
-  class SearchEdge {
-    // Existing calculation from prior rounds to use as source.
-    calculation: ClassicalDistanceCalculation<string, EditToken<string>, TraversableToken<string>>;
-
-    // The sequence of input 'samples' taken from specified input distributions.
-    optimalInput: RealizedInput;
-
-    // Returns the new input character + probabilty component to add in the current search space's
-    // calculation layer.
-    get currentInput(): ProbabilityMass<Transform> {
-      if(!Array.isArray(this.optimalInput)) {
-        return undefined;
-      }
-
-      let length = this.optimalInput.length;
-      return this.optimalInput[length-1];
-    }
-    
-    get knownCost(): number {
-      return this.calculation.getHeuristicFinalCost();
-    }
-
-    get inputSamplingCost(): number {
-      // TODO:  Optimize so that we're not frequently recomputing this?
-      // TODO:  We might should generalize this so that the probability-to-cost function isn't directly hard-coded.
-      //        Seems like a decent first conversion function though, at least.
-      return this.optimalInput.map(mass => mass.p).reduce((previous, current) => previous + (1 - current), 0);
-    }
-
-    // The part used to prioritize our search.
-    get currentCost(): number {
-      return this.knownCost + this.inputSamplingCost;
-    }
-
-    get mapKey(): string {
-      // TODO:  correct, as Transforms don't convert nicely to strings.
-      let inputString = this.optimalInput.map((value) => '+' + value.sample.insert + '-' + value.sample.deleteLeft).join('');
-      let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
-      // TODO:  might should also track diagonalWidth.
-      return inputString + models.SENTINEL_CODE_UNIT + matchString;
-    }
-  }
-
-  // Represents a processed node for the correction-search's search-space's tree-like graph.  May represent
-  // internal and 'leaf' nodes on said graph, as well as the overall root of the search.
-  //
-  // Provides functions usable to enumerate across the node's outward edges to new nodes for continued search.
-  // Most of the actual calculations occur as part of this process.
   //
   export class SearchNode {
     calculation: ClassicalDistanceCalculation<string, EditToken<string>, TraversableToken<string>>;
     
     currentTraversal: LexiconTraversal;
+    toKey: (wordform: USVString) => USVString = str => str;
     priorInput: RealizedInput;
 
-    constructor(rootTraversal: LexiconTraversal, edge?: SearchEdge) {
-      if(edge) {
-        this.calculation = edge.calculation;
+    // Internal lazy-cache for .inputSamplingCost, as it's a bit expensive to re-compute.
+    private _inputCost?: number;
 
-        if(edge.calculation.lastMatchEntry) {
-          this.currentTraversal = edge.calculation.lastMatchEntry.traversal;
-        } else {
-          this.currentTraversal = rootTraversal;
-        }
-        this.priorInput = edge.optimalInput;
+    constructor(rootTraversal: LexiconTraversal, toKey?: (USVString) => USVString);
+    constructor(node: SearchNode);
+    constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (USVString) => USVString) {
+      toKey = toKey || (x => x);
+
+      if(rootTraversal instanceof SearchNode) {
+        let priorNode = rootTraversal;
+        this.calculation = priorNode.calculation;
+        this.currentTraversal = priorNode.currentTraversal;
+        this.priorInput = priorNode.priorInput;
+        this.toKey = priorNode.toKey;
       } else {
         this.calculation = new ClassicalDistanceCalculation();
         this.currentTraversal = rootTraversal;
         this.priorInput = [];
+        this.toKey = toKey;
       }
     }
 
@@ -114,32 +62,52 @@ namespace correction {
     }
 
     get inputSamplingCost(): number {
-      // TODO:  Optimize so that we're not frequently recomputing this?
-      // TODO:  We might should generalize this so that the probability-to-cost function isn't directly hard-coded.
-      //        Seems like a decent first conversion function though, at least.
-      return this.priorInput.map(mass => mass.p).reduce((previous, current) => previous + (1 - current), 0);
+      if(this._inputCost !== undefined) {
+        return this._inputCost;
+      } else {
+        let MIN_P = SearchSpace.MIN_KEYSTROKE_PROBABILITY;
+        // Should technically re-normalize the sampling distribution.
+        // -ln(p) is smaller for larger probabilities, as ln(p) is always <= 0.  Approaches infinity as p => 0.
+
+        // TODO:  probably more efficient to instead use actual 'probability space'... but that'll involve extra changes.
+        this._inputCost = this.priorInput.map(mass => mass.p > MIN_P ? mass.p : MIN_P).reduce((previous, current) => previous - Math.log(current), 0);
+        return this._inputCost;
+      }
     }
 
     // The part used to prioritize our search.
     get currentCost(): number {
-      return this.knownCost + this.inputSamplingCost;
+      // - We reintrepret 'known cost' as a psuedo-probability.
+      //   - Noting that 1/e = 0.367879441, an edit-distance cost of 1 may be intepreted as -ln(1/e) - a log-space 'likelihood'.
+      //     - Not exactly normalized, though.
+      // That's a really, really high likelihood, thoough.
+      //
+      // At any rate, we can linearly scale the known-cost to have about whatever probability we want.
+      // If we can state it as p = 1 / (c * e), note then that ln(c * e) = ln(c) + 1.  So, scale * (ln(c) + 1).
+      // If we can state it as e^x, note that ln(e^x) = x * ln(e) = x - just scale by 'x'!
+
+      // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
+      // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
+      // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
+      return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.knownCost + this.inputSamplingCost;
     }
 
-    buildInsertionEdges(): SearchEdge[] {
-      let edges: SearchEdge[] = [];
+    buildInsertionEdges(): SearchNode[] {
+      let edges: SearchNode[] = [];
 
       for(let lexicalChild of this.currentTraversal.children()) {
+        let traversal = lexicalChild.traversal();
         let matchToken = {
           key: lexicalChild.char,
-          traversal: lexicalChild.traversal()
+          traversal: traversal
         }
 
-        // TODO:  Check against cache(s) & cache results.
         let childCalc = this.calculation.addMatchChar(matchToken);
 
-        let searchChild = new SearchEdge();
+        let searchChild = new SearchNode(this);
         searchChild.calculation = childCalc;
-        searchChild.optimalInput = this.priorInput;
+        searchChild.priorInput = this.priorInput;
+        searchChild.currentTraversal = traversal;
 
         edges.push(searchChild);
       }
@@ -147,10 +115,23 @@ namespace correction {
       return edges;
     }
 
-    buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchEdge[] {
-      let edges: SearchEdge[] = [];
+    buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
+      let edges: SearchNode[] = [];
 
+      /* 
+       * If the probability of an input is less than the highest probability * the base edit-distance likelihood,
+       * don't build an edge for it; just rely on edits from the highest-probability edge.
+       * 
+       * We may be able to be stricter, but this should be a decent start.
+       * 
+       * Note:  thanks to ModelCompositor.predict, we know the distribution is pre-sorted.
+       */
       for(let probMass of inputDistribution) {
+        if(probMass.p < inputDistribution[0].p * Math.exp(-SearchSpace.EDIT_DISTANCE_COST_SCALE)) {
+          // Again, we're pre-sorted.  All further entries will be too low-cost to consider.
+          break;
+        }
+
         let edgeCalc = this.calculation;
         let transform = probMass.sample;
         if(transform.deleteLeft) {
@@ -169,13 +150,12 @@ namespace correction {
             char = char + transform.insert[i];
           }
 
-          // TODO:  Check against cache, write results to that cache.
-          edgeCalc = edgeCalc.addInputChar({key: char});
+          edgeCalc = edgeCalc.addInputChar({key: this.toKey(char)});
         }
 
-        let childEdge = new SearchEdge();
+        let childEdge = new SearchNode(this);
         childEdge.calculation = edgeCalc;
-        childEdge.optimalInput = inputPath;
+        childEdge.priorInput = inputPath;
 
         edges.push(childEdge);
       }
@@ -185,24 +165,25 @@ namespace correction {
 
     // While this may SEEM to be unnecessary, note that sometimes substitutions (which are computed
     // via insert + delete) may be lower cost than both just-insert and just-delete.
-    buildSubstitutionEdges(inputDistribution: Distribution<Transform>): SearchEdge[] {
+    buildSubstitutionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
       // Handles the 'input' component.
       let intermediateEdges = this.buildDeletionEdges(inputDistribution);
-      let edges: SearchEdge[] = [];
+      let edges: SearchNode[] = [];
 
       for(let lexicalChild of this.currentTraversal.children()) {
         for(let edge of intermediateEdges) {
+          let traversal = lexicalChild.traversal();
           let matchToken = {
             key: lexicalChild.char,
-            traversal: lexicalChild.traversal()
+            traversal: traversal
           }
   
-          // TODO:  Check against cache(s), cache results.
           let childCalc = edge.calculation.addMatchChar(matchToken);
   
-          let searchChild = new SearchEdge();
+          let searchChild = new SearchNode(this);
           searchChild.calculation = childCalc;
-          searchChild.optimalInput = edge.optimalInput;
+          searchChild.priorInput = edge.priorInput;
+          searchChild.currentTraversal = traversal;
   
           edges.push(searchChild);
         }
@@ -210,16 +191,24 @@ namespace correction {
 
       return edges;
     }
+
+    get mapKey(): string {
+      let inputString = this.priorInput.map((value) => '+' + value.sample.insert + '-' + value.sample.deleteLeft).join('');
+      let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
+
+      // TODO:  might should also track diagonalWidth.
+      return inputString + models.SENTINEL_CODE_UNIT + matchString;
+    }
   }
 
   class SearchSpaceTier {
-    correctionQueue: models.PriorityQueue<SearchEdge>;
+    correctionQueue: models.PriorityQueue<SearchNode>;
     processed: SearchNode[] = [];
     index: number;
 
-    constructor(index: number, initialEdges?: SearchEdge[]) {
+    constructor(index: number, initialEdges?: SearchNode[]) {
       this.index = index;
-      this.correctionQueue = new models.PriorityQueue<SearchEdge>(QUEUE_EDGE_COMPARATOR, initialEdges);
+      this.correctionQueue = new models.PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, initialEdges);
     }
 
     increaseMaxEditDistance() {
@@ -230,33 +219,157 @@ namespace correction {
       entries.forEach(function(edge) { edge.calculation = edge.calculation.increaseMaxDistance(); });
 
       // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
-      this.correctionQueue = new models.PriorityQueue<SearchEdge>(QUEUE_EDGE_COMPARATOR, entries);
+      this.correctionQueue = new models.PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
     }
   }
+
+  export class SearchResult {
+    private resultNode: SearchNode;
+
+    constructor(node: SearchNode) {
+      this.resultNode = node;
+    }
+
+    get inputSequence(): ProbabilityMass<Transform>[] {
+      return this.resultNode.priorInput;
+    }
+
+    get matchSequence(): TraversableToken<USVString>[] {
+      return this.resultNode.calculation.matchSequence;
+    };
+
+    get matchString(): USVString {
+      return this.matchSequence.map(value => value.key).join('');
+    }
+
+    get knownCost(): number {
+      return this.resultNode.knownCost;
+    }
+
+    get inputSamplingCost(): number {
+      return this.resultNode.inputSamplingCost;
+    }
+
+    get totalCost(): number {
+      return this.resultNode.currentCost;
+    }
+
+    get finalTraversal(): LexiconTraversal {
+      return this.resultNode.currentTraversal;
+    }
+  }
+
+  type NullPath = {
+    type: 'none'
+  }
+
+  type IntermediateSearchPath = {
+    type: 'intermediate',
+    cost: number
+  }
+
+  type CompleteSearchPath = {
+    type: 'complete',
+    cost: number,
+    finalNode: SearchNode
+  }
+
+  type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
   // The set of search spaces corresponding to the same 'context' for search.
   // Whenever a wordbreak boundary is crossed, a new instance should be made.
   export class SearchSpace {
+    private QUEUE_SPACE_COMPARATOR: models.Comparator<SearchSpaceTier>;
+    
+    // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
+    // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
+    // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
+    static readonly EDIT_DISTANCE_COST_SCALE = 5;
+    static readonly MIN_KEYSTROKE_PROBABILITY = 0.0001;
+    static readonly DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL = 33; // in milliseconds.
+
     private tierOrdering: SearchSpaceTier[] = [];
     private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
     private inputSequence: Distribution<Transform>[] = [];
+    private minInputCost: number[] = [];
     private rootNode: SearchNode;
 
     // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time 
     // is cheaper than iteratively building a priority queue.
     private completedPaths: SearchNode[];
+
+    // Marks all results that have already been returned since the last input was received.
     private returnedValues: {[mapKey: string]: SearchNode} = {};
 
-    // Lingering question - can we get away with storing a single bit instead?
-    // For now, it's best to wait for the full implementation... just in case we do
-    // find a secondary use for this.
-    private processedEdgeSet: {[mapKey: string]: SearchEdge} = {};
+    // Signals that the edge has already been processed.
+    private processedEdgeSet: {[mapKey: string]: boolean} = {};
 
-    constructor(traversalRoot: LexiconTraversal) {
-      this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(QUEUE_SPACE_COMPARATOR);
-      this.rootNode = new SearchNode(traversalRoot);
+    constructor(model: LexicalModel) {
+      if(!model) {
+        throw "The LexicalModel parameter must not be null / undefined.";
+      } else if(!model.traverseFromRoot) {
+        throw "The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.";
+      }
+
+      // Constructs the comparator needed for the following line.
+      this.buildQueueSpaceComparator();
+      this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
+      this.rootNode = new SearchNode(model.traverseFromRoot(), model.toKey ? model.toKey.bind(model) : null);
 
       this.completedPaths = [this.rootNode];
+
+      // Adds a base level queue to handle initial insertions.
+      // Start with _just_ the root node.  Necessary for proper empty-token, empty-input handling!
+      let baseTier = new SearchSpaceTier(0, [this.rootNode]);
+      this.tierOrdering.push(baseTier);
+      this.selectionQueue.enqueue(baseTier);
+    }
+
+    private buildQueueSpaceComparator() {
+      let searchSpace = this;
+
+      this.QUEUE_SPACE_COMPARATOR = function(space1, space2) {
+        let node1 = space1.correctionQueue.peek();
+        let node2 = space2.correctionQueue.peek();
+
+        let index1 = space1.index;
+        let index2 = space2.index;
+
+        let tierMinCost: number = 0;
+        let sign = 1;
+
+        if(index2 < index1) {
+          let temp = index2;
+          index2 = index1;
+          index1 = temp;
+
+          sign = -1;
+        }
+
+        // Boost the cost of the lower tier by the minimum cost possible for the missing inputs between them.
+        // In essence, compare the nodes as if the lower tier had the most likely input appended for each such 
+        // input missing at the lower tier.
+        //
+        // A 100% admissible heuristic to favor a deeper search, since the added cost is guaranteed if the path
+        // is traversed further.
+        //
+        // Remember, tier index i's last used input was from input index i-1.  
+        // As a result, i is the first needed input index, with index2 - 1 the last entry needed to match them.
+        for(let i=index1; i < index2; i++) {
+          tierMinCost = tierMinCost + searchSpace.minInputCost[i];
+        }
+        
+        // Guards, just in case one of the search spaces ever has an empty node.
+        if(node1 && node2) {
+          // If node1 is lower-tier, node1 is the one in need of boosted cost.
+          // `sign` flips it when node2 is lower tier.
+          return node1.currentCost - node2.currentCost + sign * tierMinCost;
+        } else if(node2) {
+          return 1;
+        } else {
+          return -1;
+        }
+      }
     }
 
     increaseMaxEditDistance() {
@@ -266,9 +379,12 @@ namespace correction {
     addInput(inputDistribution: Distribution<Transform>) {
       this.inputSequence.push(inputDistribution);
 
+      // Assumes that `inputDistribution` is already sorted.
+      this.minInputCost.push(-Math.log(inputDistribution[0].p));
+
       // With a newly-available input, we can extend new input-dependent paths from 
       // our previously-reached 'extractedResults' nodes.
-      let newlyAvailableEdges: SearchEdge[] = [];
+      let newlyAvailableEdges: SearchNode[] = [];
       let batches = this.completedPaths.map(function(node) {
         let deletions = node.buildDeletionEdges(inputDistribution);
         let substitutions = node.buildSubstitutionEdges(inputDistribution);
@@ -298,73 +414,130 @@ namespace correction {
     }
 
     private hasNextMatchEntry(): boolean {
-      return this.selectionQueue.peek().correctionQueue.count > 0;
+      let topQueue = this.selectionQueue.peek();
+      if(topQueue) {
+        return topQueue.correctionQueue.count > 0;
+      } else {
+        return false;
+      }
     }
 
-    findNextMatch(): SearchNode {
-      while(this.hasNextMatchEntry()) {
-        let bestTier = this.selectionQueue.dequeue();
+    private handleNextNode(): PathResult {
+      if(!this.hasNextMatchEntry()) {
+        return { type: 'none' };
+      }
+      
+      let bestTier = this.selectionQueue.dequeue();
+      let currentNode = bestTier.correctionQueue.dequeue();
 
-        let incomingEdge = bestTier.correctionQueue.dequeue();
+      let unmatchedResult: IntermediateSearchPath = {
+        type: 'intermediate',
+        cost: currentNode.currentCost
+      }
 
-        // Have we already processed a matching edge?  If so, skip it.
-        // We already know the previous edge is of lower cost.
-        if(this.processedEdgeSet[incomingEdge.mapKey]) {
-          this.selectionQueue.enqueue(bestTier);
-          continue;
-        } else {
-          this.processedEdgeSet[incomingEdge.mapKey] = incomingEdge;
-        }
+      // Have we already processed a matching edge?  If so, skip it.
+      // We already know the previous edge is of lower cost.
+      if(this.processedEdgeSet[currentNode.mapKey]) {
+        this.selectionQueue.enqueue(bestTier);
+        return unmatchedResult;
+      } else {
+        this.processedEdgeSet[currentNode.mapKey] = true;
+      }
 
-        let currentNode = new SearchNode(this.rootNode.currentTraversal, incomingEdge);
+      // Stage 1:  filter out nodes/edges we want to prune
+      
+      // Forbid a raw edit-distance of greater than 2.
+      // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
+      let substitutionsOnly = false;
+      if(currentNode.knownCost > 2) {
+        return unmatchedResult;
+      } else if(currentNode.knownCost == 2) {
+        // Hard restriction:  no further edits will be supported.  This helps keep the search
+        // more narrowly focused.
+        substitutionsOnly = true;
+      }
 
-        // Always possible, as this does not require any new input.
+      let tierMinCost = 0;
+      for(let i = 0; i <= bestTier.index; i++) {
+        tierMinCost += this.minInputCost[i];
+      }
+
+      // Thresholds _any_ path, partially based on currently-traversed distance.
+      // Allows a little 'wiggle room' + 2 "hard" edits.
+      // Can be important if needed characters don't actually exist on the keyboard 
+      // ... or even just not the then-current layer of the keyboard.
+      if(currentNode.currentCost > tierMinCost + 2.5 * SearchSpace.EDIT_DISTANCE_COST_SCALE) {
+        return unmatchedResult;
+      }
+
+      // Stage 2:  build remaining edges
+
+      // Always possible, as this does not require any new input.
+      if(!substitutionsOnly) {
         let insertionEdges = currentNode.buildInsertionEdges();
         bestTier.correctionQueue.enqueueAll(insertionEdges);
+      }
 
-        if(bestTier.index == this.tierOrdering.length - 1) {
-          // It was the final tier - store the node for future reference.
-          this.completedPaths.push(currentNode);
-          
-          // Since we don't modify any other tier, we may simply reinsert the removed tier.
-          this.selectionQueue.enqueue(bestTier);
+      if(bestTier.index == this.tierOrdering.length - 1) {
+        // It was the final tier - store the node for future reference.
+        this.completedPaths.push(currentNode);
+        
+        // Since we don't modify any other tier, we may simply reinsert the removed tier.
+        this.selectionQueue.enqueue(bestTier);
 
-          return currentNode;
-        } else {
-          // Time to construct new edges for the next tier!
-          let nextTier = this.tierOrdering[bestTier.index+1];
-          // TODO:  make sure we get this part right.
-          let inputIndex = nextTier.index;
+        return {
+          type: 'complete',
+          cost: currentNode.currentCost,
+          finalNode: currentNode
+        };
+      } else {
+        // Time to construct new edges for the next tier!
+        let nextTier = this.tierOrdering[bestTier.index+1];
+        
+        let inputIndex = nextTier.index;
 
-          let deletionEdges     = currentNode.buildDeletionEdges(this.inputSequence[inputIndex]);
-          let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex]);
+        let deletionEdges = [];
+        if(!substitutionsOnly) {
+          deletionEdges       = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
+        }     
+        let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
 
-          // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
-          nextTier.correctionQueue.enqueueAll(deletionEdges.concat(substitutionEdges));
+        // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
+        nextTier.correctionQueue.enqueueAll(deletionEdges.concat(substitutionEdges));
 
-          // So, we simply rebuild the selection queue.
-          this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(QUEUE_SPACE_COMPARATOR, this.tierOrdering);
+        // So, we simply rebuild the selection queue.
+        this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR, this.tierOrdering);
 
-          // We didn't reach an end-node, so we just end the iteration and continue the search.
-        }
+        // We didn't reach an end-node, so we just end the iteration and continue the search.
       }
 
       // If we've somehow fully exhausted all search options, indicate that none remain.
-      return null;
+      return unmatchedResult;
     }
 
     // Current best guesstimate of how compositor will retrieve ideal corrections.
-    *getBestMatches(): Generator<[TraversableToken<string>[][], number]> { 
+    *getBestMatches(waitMillis?: number): Generator<SearchResult[]> { 
       // might should also include a 'base cost' parameter of sorts?
       let searchSpace = this;
       let currentReturns: {[mapKey: string]: SearchNode} = {};
 
+      // JS measures time by the number of milliseconds since Jan 1, 1970.
+      let timeStart = Date.now();
+      let maxTime: number;
+      if(waitMillis == 0) {
+        maxTime = Infinity;
+      } else if(waitMillis == undefined || Number.isNaN(waitMillis)) { // also covers null.
+        maxTime = SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL; 
+      } else  {
+        maxTime = waitMillis;
+      }
+
       class BatchingAssistant {
         currentCost = Number.MIN_SAFE_INTEGER;
-        entries: TraversableToken<string>[][] = [];
+        entries: SearchResult[] = [];
 
-        checkAndAdd(entry: SearchNode): [TraversableToken<string>[][], number] | null {
-          var result: [TraversableToken<string>[][], number] = null;
+        checkAndAdd(entry: SearchNode): SearchResult[] | null {
+          var result: SearchResult[] = null;
 
           if(entry.currentCost > this.currentCost) {
             result = this.tryFinalize();
@@ -384,17 +557,17 @@ namespace correction {
           // Check the generator's local returned-value cache - this determines whether or not we
           // need to add a new 'return' to the batch.
           if(!currentReturns[outputMapKey]) {
-            this.entries.push(entry.calculation.matchSequence);
+            this.entries.push(new SearchResult(entry));
             currentReturns[outputMapKey] = entry;
           }
 
           return result;
         }
 
-        tryFinalize(): [TraversableToken<string>[][], number] | null {
-          var result: [TraversableToken<string>[][], number] = null;
+        tryFinalize(): SearchResult[] | null {
+          var result: SearchResult[] = null;
           if(this.entries.length > 0) {
-            result = [this.entries, this.currentCost];
+            result = this.entries;
             this.entries = [];
           }
 
@@ -403,7 +576,7 @@ namespace correction {
       }
 
       let batcher = new BatchingAssistant();
-      let batch: [TraversableToken<string>[][], number];
+      let batch: SearchResult[];
 
       // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
       let returnedValues = Object.values(this.returnedValues);
@@ -429,53 +602,40 @@ namespace correction {
       }
 
       // Stage 2:  the fun part; actually searching!
+      let timedOut = false;
       do {
-        let newResult = this.findNextMatch();
-        if(!newResult) {
+        let newResult: PathResult;
+
+        // Search for a 'complete' path, skipping all partial paths as long as time remains.
+        do {
+          newResult = this.handleNextNode();
+
+          // (Naive) timeout check!
+          let now = Date.now();
+          if(now - timeStart > maxTime) {
+            timedOut = true;
+          }
+        } while(!timedOut && newResult.type == 'intermediate')
+        
+        // TODO:  check 'cost' on intermediate, running it through batcher to early-detect cost changes.
+        if(newResult.type == 'none') {
           break;
+        } else if(newResult.type == 'complete') {
+          batch = batcher.checkAndAdd(newResult.finalNode);
         }
-        batch = batcher.checkAndAdd(newResult);
 
         if(batch) {
           yield batch;
         }
-      } while(this.hasNextMatchEntry());
+      } while(!timedOut && this.hasNextMatchEntry());
 
+      // If we _somehow_ exhaust all search options, make sure to return the final results.
       batch = batcher.tryFinalize();
       if(batch) {
         yield batch;
       }
 
       return null;
-    }
-  }
-
-  // -- Code after this point is skeletal at best. --
-
-  export class DistanceModelerOptions {
-    minimumPredictions: number;
-  }
-
-  export class DistanceModeler {
-    private options: DistanceModelerOptions;
-    public static readonly DEFAULT_OPTIONS: DistanceModelerOptions = {
-      minimumPredictions: 3
-    }
-
-    // Keep as a 'rotating cache'.  Includes search spaces corresponding to 'revert' commands.
-    private searchSpaces: SearchSpace[] = [];
-
-    private inputs: Distribution<USVString>[] = [];
-    private lexiconRoot: LexiconTraversal;
-
-    constructor(lexiconRoot: LexiconTraversal, options: DistanceModelerOptions = DistanceModeler.DEFAULT_OPTIONS) {
-      this.lexiconRoot = lexiconRoot;
-      this.options = options;
-    }
-
-    addInput(input: Distribution<Transform>) {
-      // TODO:  add 'addInput' operation
-      //        do search space things
     }
   }
 }
