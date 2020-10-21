@@ -165,12 +165,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.1'
     implementation 'com.google.android.material:material:1.0.0'
     api (name:'keyman-engine', ext:'aar')
-    implementation "com.google.firebase:firebase-analytics:17.2.1"
+    implementation "com.google.firebase:firebase-analytics:17.6.0"
     implementation "com.google.firebase:firebase-messaging:20.0.1"
     implementation "com.google.firebase:firebase-crash:16.2.1"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {

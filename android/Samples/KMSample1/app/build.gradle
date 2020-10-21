@@ -33,7 +33,4 @@ dependencies {
     api(name: 'keyman-engine', ext: 'aar')
     implementation "com.google.firebase:firebase-core:17.2.1"
     implementation "com.google.firebase:firebase-crash:16.2.1"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
 }

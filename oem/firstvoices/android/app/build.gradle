@@ -117,9 +117,6 @@ dependencies {
     implementation "com.google.firebase:firebase-analytics:17.2.1"
     implementation "com.google.firebase:firebase-messaging:20.0.1"
     implementation "com.google.firebase:firebase-crash:16.2.1"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
     implementation 'androidx.preference:preference:1.1.0'
 }
 
