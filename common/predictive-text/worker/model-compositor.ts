@@ -409,7 +409,7 @@ class ModelCompositor {
       postContext = models.applyTransform(postTransform, postContext);
     }
 
-    let revertedPrefix = this.wordbreak(context);
+    let revertedPrefix = this.wordbreak(postContext);
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
