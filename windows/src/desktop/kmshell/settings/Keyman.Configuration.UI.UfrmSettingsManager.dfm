@@ -24,8 +24,8 @@ object frmSettingsManager: TfrmSettingsManager
   PixelsPerInch = 96
   TextHeight = 13
   object imgElevate: TImage
-    Left = 328
-    Top = 364
+    Left = 346
+    Top = 363
     Width = 16
     Height = 16
     Anchors = [akLeft, akBottom]
@@ -58,7 +58,6 @@ object frmSettingsManager: TfrmSettingsManager
       D5DFFB3B3821E08F41FDD60889043F01326A2C20F97EFC660000000049454E44
       AE426082}
     Visible = False
-    ExplicitTop = 434
   end
   object lblDefault: TLabel
     Left = 8
@@ -119,7 +118,6 @@ object frmSettingsManager: TfrmSettingsManager
     OnClick = gridDebugOptionClick
     OnDrawCell = gridDebugOptionDrawCell
     OnSetEditText = gridDebugOptionSetEditText
-    ExplicitHeight = 313
   end
   object memoDescription: TMemo
     Left = 8
@@ -131,7 +129,6 @@ object frmSettingsManager: TfrmSettingsManager
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 1
-    ExplicitTop = 336
   end
   object cmdApply: TButton
     Left = 528
@@ -142,8 +139,6 @@ object frmSettingsManager: TfrmSettingsManager
     Caption = '&Apply'
     TabOrder = 2
     OnClick = cmdApplyClick
-    ExplicitLeft = 735
-    ExplicitTop = 332
   end
   object cmdClearAll: TButton
     Left = 561
@@ -154,8 +149,6 @@ object frmSettingsManager: TfrmSettingsManager
     Caption = '&Reset all to default'
     TabOrder = 3
     OnClick = cmdClearAllClick
-    ExplicitLeft = 768
-    ExplicitTop = 301
   end
   object cmdClose: TButton
     Left = 621
@@ -166,19 +159,16 @@ object frmSettingsManager: TfrmSettingsManager
     Caption = 'Close'
     TabOrder = 4
     OnClick = cmdCloseClick
-    ExplicitLeft = 828
-    ExplicitTop = 332
   end
   object editRegKey: TEdit
     Left = 8
     Top = 361
-    Width = 319
+    Width = 336
     Height = 21
     Anchors = [akLeft, akBottom]
     ParentColor = True
     ReadOnly = True
     TabOrder = 5
-    ExplicitTop = 431
   end
   object editDefault: TEdit
     Left = 53
@@ -189,7 +179,6 @@ object frmSettingsManager: TfrmSettingsManager
     ParentColor = True
     ReadOnly = True
     TabOrder = 6
-    ExplicitTop = 458
   end
   object cmdReset: TButton
     Left = 269
@@ -200,7 +189,6 @@ object frmSettingsManager: TfrmSettingsManager
     Caption = '&Reset'
     TabOrder = 7
     OnClick = cmdResetClick
-    ExplicitTop = 458
   end
   object cmdExport: TButton
     Left = 561
@@ -211,8 +199,6 @@ object frmSettingsManager: TfrmSettingsManager
     Caption = '&Export...'
     TabOrder = 8
     OnClick = cmdExportClick
-    ExplicitLeft = 768
-    ExplicitTop = 239
   end
   object chkShowDevelopmentSettings: TCheckBox
     Left = 360
@@ -223,8 +209,6 @@ object frmSettingsManager: TfrmSettingsManager
     Caption = 'Show Development Settings'
     TabOrder = 9
     OnClick = chkShowDevelopmentSettingsClick
-    ExplicitLeft = 567
-    ExplicitTop = 340
   end
   object cmdImport: TButton
     Left = 561
@@ -235,8 +219,6 @@ object frmSettingsManager: TfrmSettingsManager
     Caption = '&Import...'
     TabOrder = 10
     OnClick = cmdImportClick
-    ExplicitLeft = 768
-    ExplicitTop = 270
   end
   object cmdTSFApplicationSettings: TButton
     Left = 8
@@ -247,7 +229,6 @@ object frmSettingsManager: TfrmSettingsManager
     Caption = '&Add TSF Override...'
     TabOrder = 11
     OnClick = cmdTSFApplicationSettingsClick
-    ExplicitTop = 485
   end
   object dlgImport: TOpenDialog
     DefaultExt = 'json'

@@ -288,8 +288,8 @@ procedure TfrmSettingsManager.gridDebugOptionClick(Sender: TObject);
 begin
   memoDescription.Text := SelectedSetting.Base.Description;
   if SelectedSetting.Base.RootKey = HKCU
-    then editRegKey.Text := 'HKCU\'+SelectedSetting.Base.Key
-    else editRegKey.Text := 'HKLM\'+SelectedSetting.Base.Key;
+    then editRegKey.Text := 'HKCU\'+SelectedSetting.Base.Key + ': '+SelectedSetting.Base.Name
+    else editRegKey.Text := 'HKLM\'+SelectedSetting.Base.Key + ': '+SelectedSetting.Base.Name;
   editDefault.Text := SelectedSetting.Base.DefaultAsString;
   imgElevate.Visible := not IsAdmin and SelectedSetting.Base.RequiresAdministrator;
 

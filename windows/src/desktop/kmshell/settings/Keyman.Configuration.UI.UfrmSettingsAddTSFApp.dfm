@@ -3,9 +3,10 @@ object frmSettingsAddTSFApp: TfrmSettingsAddTSFApp
   Top = 0
   ActiveControl = editFilename
   BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
   Caption = 'Text Services Framework Application Overrides'
-  ClientHeight = 138
-  ClientWidth = 441
+  ClientHeight = 139
+  ClientWidth = 442
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,6 +14,7 @@ object frmSettingsAddTSFApp: TfrmSettingsAddTSFApp
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poOwnerFormCenter
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
