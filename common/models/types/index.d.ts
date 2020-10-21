@@ -144,19 +144,37 @@ declare interface LexicalModel {
   readonly punctuation?: LexicalModelPunctuation;
 
   /**
-   * Returns the wordbreaker defined for the model (if it exists).
+   * Returns the wordbreaker function defined for the model (if it exists).  This 
+   * wordbreaker should operate on a plain JS `string`, fully tokenizing it into 
+   * separate words according to the syntactical rules of the modeled language.
+   * 
+   * Needed to support many of the enhancements in 14.0, as enhanced wordbreaking / 
+   * tokenization is necessary for properly tracking possible "fat finger" inputs 
+   * and intermediate calculations (increasing prediction quality) and preventing
+   * their misuse when starting new words.
    */
   wordbreaker?: WordBreakingFunction;
 
   /**
-   * **NOTE:  _Deprecated!_**
-   * 
    * Performs a wordbreak operation given the current context state, returning whatever word
    * or word fragment exists that starts before the caret but after the most recent whitespace
    * preceding the caret.  If no such text exists, the empty string is returned.
    * 
    * This function is designed for use in generating display text for 'keep' `Suggestions`
    * and display text for reverting any previously-applied `Suggestions`.
+   * 
+   * ------------------
+   * 
+   * **NOTE:  _Deprecated_** and replaced by `wordbreaker` in 14.0.  You may still wish 
+   * to implement this function by reusing your `wordbreaker` definition if the model 
+   * may see use on Keyman 12.0 or 13.0, generally by returning `wordbreaker(context.left)`.
+   * 
+   * As this function only tokenizes a single word from the context, it is insufficient for
+   * supporting many of the predictive-text enhancements introduced in Keyman 14.  Its
+   * intermediate calculations are tracked on a per-word basis and the increased detail
+   * provided by `wordbreaker` helps with stability, validating the engine's use of 
+   * the current context.
+   * 
    * @param context 
    * @deprecated
    */
