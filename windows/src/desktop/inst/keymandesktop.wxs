@@ -228,6 +228,7 @@
       <ComponentRef Id="menutitle.png" />
       <ComponentRef Id="unicodedata.mdb" />
       <ComponentRef Id="kmbrowserhost.exe" />
+      <ComponentRef Id="kmconfig.exe" />
 
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="removeCU" />
