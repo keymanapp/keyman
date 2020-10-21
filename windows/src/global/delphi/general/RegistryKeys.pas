@@ -134,6 +134,9 @@ const
   SRegValue_SwitchLanguageWithKeyboard        = 'switch language with keyboard'; // CU, default true
   SRegValue_SwitchLanguageForAllApplications  = 'switch language for all applications'; // CU, default true
 
+  SRegValue_DeepTSFIntegration = 'deep tsf integration'; // LM, 0=disable, 1=enable, 2=default
+  SRegKey_AppIntegration = SRegKey_KeymanEngine_LM + '\App Integration'; //KM
+
   { On Screen Keyboard Settings }
 
   SRegKey_KeymanOSK_CU         = SRegKey_KeymanEngine_CU + '\On Screen Keyboard';
