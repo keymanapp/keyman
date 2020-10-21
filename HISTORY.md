@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.165 alpha 2020-10-21
+
+* fix(web): K_SPACE handling for embedded mode, hardware keystrokes (#3707)
+
 ## 14.0.164 alpha 2020-10-20
 
 * feat(common/models):  context tracking of accepted Suggestions (#3663)
