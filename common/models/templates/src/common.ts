@@ -86,9 +86,9 @@ namespace models {
    * @param transform 
    */
   export function transformToSuggestion(transform: Transform): Suggestion;
-  export function transformToSuggestion(transform: Transform, p: number): Suggestion & {p: number}; 
-  export function transformToSuggestion(transform: Transform, p?: number): Suggestion & {p?: number} {
-    let suggestion: Suggestion & {p?: number} = {
+  export function transformToSuggestion(transform: Transform, p: number): WithOutcome<Suggestion>; 
+  export function transformToSuggestion(transform: Transform, p?: number): Outcome<Suggestion> {
+    let suggestion: Outcome<Suggestion> = {
       transform: transform,
       transformId: transform.id,
       displayAs: transform.insert

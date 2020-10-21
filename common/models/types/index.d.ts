@@ -237,6 +237,14 @@ declare interface Suggestion {
   transformId?: number;
 
   /**
+   * A unique identifier for the Suggestion itself, not shared with any others -
+   * even for Suggestions sourced from the same Transform. 
+   * 
+   * The lm-layer is responsible for setting this field, not models.
+   */
+  id?: number;
+
+  /**
    * The suggested update to the buffer. Note that this transform should
    * be applied AFTER the instigating transform, if any.
    */
@@ -339,6 +347,27 @@ interface ProbabilityMass<T> {
 }
 
 declare type Distribution<T> = ProbabilityMass<T>[];
+
+/**
+ * A type augmented with an optional probability.
+ */
+type Outcome<T> = T & {
+  /**
+   * [optional] probability of this outcome.
+   */
+  p?: number;
+};
+
+/**
+ * A type augmented with a probability.
+ */
+type WithOutcome<T> = T & {
+  /**
+   * Probability of this outcome.
+   */
+  p: number;
+};
+
 
 
 /******************************** Messaging ********************************/

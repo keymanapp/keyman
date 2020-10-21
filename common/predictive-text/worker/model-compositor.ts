@@ -7,6 +7,8 @@ class ModelCompositor {
   private static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
 
+  private SUGGESTION_ID_SEED = 0;
+
   constructor(lexicalModel: LexicalModel) {
     this.lexicalModel = lexicalModel;
     if(lexicalModel.traverseFromRoot) {
@@ -288,6 +290,7 @@ class ModelCompositor {
 
     // Apply 'after word' punctuation and set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    let compositor = this;
     suggestions.forEach(function(suggestion) {
       if (suggestion.transform.insert.length > 0) {
         suggestion.transform.insert += punctuation.insertAfterWord;
@@ -305,29 +308,37 @@ class ModelCompositor {
           mutableSuggestion.transform = mergedTransform;
         }
       }
+
+      suggestion.id = compositor.SUGGESTION_ID_SEED;
+      compositor.SUGGESTION_ID_SEED++;
     });
 
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(contextState) {
-      // TODO:  context tracking enhancements
+      contextState.tail.replacements = suggestions.map(function(suggestion) {
+        return {
+          suggestion: suggestion,
+          tokenWidth: 1
+        }
+      });
     }
 
     return suggestions;
   }
 
-  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number}, 
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
     annotationType: SuggestionTag,
-    quoteBehavior?: models.QuoteBehavior): Suggestion & {p?: number};
-  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number},
+    quoteBehavior?: models.QuoteBehavior): Outcome<Suggestion>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>,
     annotationType: 'keep',
-    quoteBehavior?: models.QuoteBehavior): Keep & {p?: number};
-  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number}, 
+    quoteBehavior?: models.QuoteBehavior): Outcome<Keep>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
     annotationType: 'revert',
-    quoteBehavior?: models.QuoteBehavior): Reversion & {p?: number};
-  private toAnnotatedSuggestion(suggestion: Suggestion & {p?: number}, 
+    quoteBehavior?: models.QuoteBehavior): Outcome<Reversion>;
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
                                 annotationType: SuggestionTag,
-                                quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Suggestion & {p?: number} {
+                                quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Outcome<Suggestion> {
     // A method-internal 'import' of the enum.
     let QuoteBehavior = models.QuoteBehavior;
 
@@ -387,14 +398,15 @@ class ModelCompositor {
     };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
+    let postContext = context;
     if(postTransform) {
       // The code above restores the state to the context at the time the `Suggestion` was created.
       // `postTransform` handles any missing context that came later.
       reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
 
       // Now that we've built the reversion based upon the Suggestion's original context,
-      // we may safely manipulate it in order to get a proper 'displayAs' string.
-      context = models.applyTransform(postTransform, context);
+      // we manipulate it in order to get a proper 'displayAs' string.
+      postContext = models.applyTransform(postTransform, postContext);
     }
 
     let revertedPrefix = this.wordbreak(context);
@@ -406,13 +418,75 @@ class ModelCompositor {
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
     let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
+    if(suggestion.transformId != null) {
+      reversion.transformId = suggestion.transformId;
+    }
+    if(suggestion.id != null) {
+      // Since a reversion inverts its source suggestion, we set its ID to be the 
+      // additive inverse of the source suggestion's ID.  Makes easy mapping /
+      // verification later.
+      reversion.id = -suggestion.id;
+    } else {
+      reversion.id = -this.SUGGESTION_ID_SEED;
+      this.SUGGESTION_ID_SEED++;
+    }
     
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
     if(this.contextTracker) {
-      // TODO:  implement.
+      let contextState = this.contextTracker.newest;
+      if(!contextState) {
+        contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
+      }
+      
+      contextState.tail.activeReplacementId = suggestion.id;
+      let acceptedContext = models.applyTransform(suggestion.transform, context);
+      this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
     }
 
     return reversion;
+  }
+
+  applyReversion(reversion: Reversion, context: Context): Suggestion[] {
+    // If we are unable to track context (because the model does not support LexiconTraversal),
+    // we need a "fallback" strategy.
+    let compositor = this;
+    let fallbackSuggestions = function() {
+      let revertedContext = models.applyTransform(reversion.transform, context);
+      return compositor.predict({ insert: '', deleteLeft: 0}, revertedContext);
+    }
+
+    if(!this.contextTracker) {
+      return fallbackSuggestions();
+    }
+
+    // When the context is tracked, we prefer the tracked information.
+    let contextMatchFound = false;
+    for(let c = this.contextTracker.count - 1; c >= 0; c--) {
+      let contextState = this.contextTracker.item(c);
+
+      if(contextState.tail.activeReplacementId == -reversion.id) {
+        contextMatchFound = true;
+        break;
+      }
+    }
+
+    if(!contextMatchFound) {
+      return fallbackSuggestions();
+    }
+
+    // Remove all contexts more recent than the one we're reverting to.
+    while(this.contextTracker.newest.tail.activeReplacementId != -reversion.id) {
+      this.contextTracker.popNewest();
+    }
+
+    this.contextTracker.newest.tail.revert();
+
+    // Will need to be modified a bit if/when phrase-level suggestions are implemented.
+    // Those will be tracked on the first token of the phrase, which won't be the tail
+    // if they cover multiple tokens.
+    return this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
+      return trackedSuggestion.suggestion;
+    });
   }
 
   private wordbreak(context: Context): string {

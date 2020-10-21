@@ -285,7 +285,7 @@ class LMLayerWorker {
         switch(payload.message) {
           case 'predict':
             var {transform, context} = payload;
-            let suggestions = compositor.predict(transform, context);
+            var suggestions = compositor.predict(transform, context);
 
             // Now that the suggestions are ready, send them out!
             this.cast('suggestions', {
@@ -313,8 +313,17 @@ class LMLayerWorker {
               reversion: reversion
             });
             break;
+          case 'revert':
+              var {reversion, context} = payload;
+              var suggestions: Suggestion[] = compositor.applyReversion(reversion, context);
+
+              this.cast('postrevert', {
+                token: payload.token,
+                suggestions: suggestions
+              });
+              break;
           default:
-          throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'unload'} but got ${payload.message}`);
+            throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'revert', 'unload'} but got ${payload.message}`);
         }
       },
       compositor: compositor

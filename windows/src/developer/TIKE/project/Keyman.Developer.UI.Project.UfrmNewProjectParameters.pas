@@ -179,6 +179,7 @@ begin
   inherited;
   editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
 
+  dlgBrowse := TBrowse4Folder.Create(Self);
   dlgBrowse.InitialDir := editPath.Text;
   dlgBrowse.Options := [OnlySelectFileSysDir, ShowEditBox, UseNewDialogStyle];
   dlgBrowse.Root := Desktop;
