@@ -23,7 +23,7 @@ backup:
     $(WZZIP) $(BUILD)\desktop\kmconfig.zip  $(BACKUPDEFAULTS) kmconfig.exe
 
 test-manifest:
-    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+    # test that linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\kmconfig.exe -validate_manifest
 
 install:
