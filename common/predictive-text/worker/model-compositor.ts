@@ -85,7 +85,7 @@ class ModelCompositor {
     let allowBksp = this.isBackspace(inputTransform);
 
     let postContext = models.applyTransform(inputTransform, context);
-    let keepOptionText = this.lexicalModel.wordbreak(postContext);
+    let keepOptionText = this.wordbreak(postContext);
     let keepOption: Keep = null;
 
     let rawPredictions: Distribution<Suggestion> = [];
@@ -178,7 +178,7 @@ class ModelCompositor {
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
             // remove actual token string.  If new token, there should be nothing to delete.
-            deleteLeft: newEmptyToken ? 0 : lexicalModel.wordbreak(context).length, 
+            deleteLeft: newEmptyToken ? 0 : this.wordbreak(context).length, 
             id: finalInput.id
           }
 
@@ -409,8 +409,7 @@ class ModelCompositor {
       postContext = models.applyTransform(postTransform, postContext);
     }
 
-    let postContextTokens = this.lexicalModel.tokenize(postContext); //.wordbreak(postContext);
-    let revertedPrefix = postContextTokens[postContextTokens.length - 1] || '';
+    let revertedPrefix = this.wordbreak(postContext);
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
@@ -488,6 +487,25 @@ class ModelCompositor {
     return this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
       return trackedSuggestion.suggestion;
     });
+  }
+
+  private wordbreak(context: Context): string {
+    let model = this.lexicalModel;
+
+    if(model.wordbreaker || !model.wordbreak) {
+      // We don't need a 12.0 / 13.0 compatibility mode here.
+      // We're either relying on defaults or on the 14.0+ wordbreaker spec.
+      let wordbreaker = model.wordbreaker || wordBreakers.default;
+
+      return models.wordbreak(wordbreaker, context);
+    } else {
+      // 1.  This model does not provide a model following the 14.0+ wordbreaking spec
+      // 2.  This model DOES define a custom wordbreaker following the 12.0-13.0 spec.
+
+      // Since the model relies on custom wordbreaking behavior, we need to use the
+      // old, deprecated wordbreaking pattern.
+      return model.wordbreak(context);
+    }
   }
 }
 
