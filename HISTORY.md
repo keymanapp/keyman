@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.166 alpha 2020-10-22
+
+* fix(web): disable U+25CC for diacritics (#3039)
+* refactor(common/models): Common tokenization and wordbreaking functions (#3706)
+* fix(windows): setup status showed only 'removing older versions' (#3735)
+* fix(windows): improve tsysinfo upload messages (#3727)
+* chore(windows): update msgping to Winsdk 10 (#3728)
+* fix(android/engine): Improve KMManager robustness (#3721)
+* feat(common/core/web): fat-finger ignores inputs that beep (#3701)
+
 ## 14.0.165 alpha 2020-10-21
 
 * fix(web): K_SPACE handling for embedded mode, hardware keystrokes (#3707)
