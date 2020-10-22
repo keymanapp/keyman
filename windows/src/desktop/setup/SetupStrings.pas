@@ -49,6 +49,7 @@ type
     ssExitButton,
 
     ssStatusInstalling,
+    ssStatusRemovingOlderVersions,
     ssStatusComplete,
 
     ssQueryRestart,
