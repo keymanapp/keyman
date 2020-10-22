@@ -4,8 +4,11 @@
 
 package com.tavultesoft.kmapro;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.KMPLink;
@@ -320,18 +323,31 @@ public class WebBrowserActivity extends AppCompatActivity {
           InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
           imm.hideSoftInputFromWindow(addressField.getWindowToken(), 0);
           String urlStr = v.getText().toString();
-          try {
-            new URL(urlStr);
-          } catch (MalformedURLException e) {
-            KMLog.LogException(TAG, "", e);
 
-            if (Patterns.WEB_URL.matcher(String.format("%s%s", "http://", urlStr)).matches()) {
-              urlStr = String.format("%s%s", "http://", urlStr);
-            } else {
-              urlStr = String.format("https://www.google.com/search?q=%s", urlStr);
+          boolean valid = false;
+          String originalUrl = urlStr;
+          while(!valid) {
+            try {
+              new URL(urlStr);
+              valid = true;
+            } catch (MalformedURLException e) {
+              // Intentionally not logging exception because it may be a query
+
+              if (Patterns.WEB_URL.matcher("http://" + urlStr).matches()) {
+                urlStr = "http://" + urlStr;
+                valid = true;
+              } else {
+                try {
+                  urlStr = String.format("https://www.google.com/search?q=%s",
+                    URLEncoder.encode(originalUrl, StandardCharsets.UTF_8.displayName()));
+                  valid = true; // no need to test again; we'll assume it's valid this time
+                } catch (UnsupportedEncodingException ue) {
+                  urlStr = String.format("https://www.google.com/search?q=%s", originalUrl);
+                  break;
+                }
+              }
             }
           }
-
           webView.loadUrl(urlStr);
           addressField.clearFocus();
           handled = true;
