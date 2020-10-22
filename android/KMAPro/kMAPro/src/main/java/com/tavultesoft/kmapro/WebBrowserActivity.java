@@ -334,7 +334,7 @@ public class WebBrowserActivity extends AppCompatActivity {
               // Intentionally not logging exception because it may be a query
 
               if (Patterns.WEB_URL.matcher("http://" + urlStr).matches()) {
-                urlStr = "http://" + originalUrl;
+                urlStr = "http://" + urlStr;
                 valid = true;
               } else {
                 try {
