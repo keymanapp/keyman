@@ -175,7 +175,9 @@ public class CloudRepository {
       // We should also pre-emptively clear out the old cache file
       // in case of an app close or crash.
       File file = CloudDataJsonUtil.getLexicalModelCacheFile(context);
-      file.delete();
+      if (file != null) {
+        file.delete();
+      }
     }
   }
 
