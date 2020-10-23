@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.167 alpha 2020-10-23
+
+* fix(android/browser): Improve how embedded browser handles input (#3722)
+
 ## 14.0.166 alpha 2020-10-22
 
 * fix(web): disable U+25CC for diacritics (#3039)
