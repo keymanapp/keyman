@@ -84,7 +84,7 @@ begin
     writeln('Commands:');
     writeln('  import <settings.json>   Imports settings into local machine registry');
     writeln('  export <settings.json>   Exports settings from local machine registry to file');
-    writeln('  reset [id]               Resets one or all settings to default');
+    writeln('  reset [-a] [id]          Resets one or all settings to default');
     writeln('  set id value             Sets setting identified by id to value');
     writeln('  show [-a] [id]           Lists one or all settings; -a to show all, even empty settings');
     writeln('Note: registry changes may require elevation to succeed.');
@@ -135,8 +135,12 @@ var
 begin
   if ID = '' then
   begin
-    Settings.Reset;
+    Log('A setting ID must be specified, or -a for all settings');
+  end
+  else if SameText(ID, '-a') then
+  begin
     TKeymanSettingsManager.Load(Settings);
+    Settings.Reset;
     if Settings.Modified then
     begin
       TKeymanSettingsManager.Save(Settings, IsAdmin);
@@ -197,6 +201,7 @@ class function TKMConfig.SetValue(const ID, Value: string): Boolean;
 var
   Setting: TKeymanSetting;
 begin
+  TKeymanSettingsManager.Load(Settings);
   Setting := Settings.Find(ID);
 
   if not Assigned(Setting) then
