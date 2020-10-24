@@ -153,7 +153,7 @@ void DeleteLeftOfSelection(TfEditCookie ec, ITfContext *pContext, LONG n)
 
 char *debugstr(PWSTR buf) {
 	WCHAR *p;
-	char *bufout = new char[20*7];
+	char *bufout = new char[20*7+1];
 	char *q;
   *bufout = 0;
 	for(p = buf, q = bufout; *p && (p-buf < 20); p++)
