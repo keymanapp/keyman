@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.168 alpha 2020-10-24
+
+* chore(android): Update dependencies (#3738)
+
 ## 14.0.167 alpha 2020-10-23
 
 * fix(android/browser): Improve how embedded browser handles input (#3722)
