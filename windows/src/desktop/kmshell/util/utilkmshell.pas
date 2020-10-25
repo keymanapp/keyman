@@ -97,8 +97,6 @@ function ValidDirectory(const dir: string): string;
 
 function GetLongFile(APath:String):String;
 
-function RunReboot(const msg, failuremsg: WideString): Boolean;
-
 function TSFInstalled: Boolean;
 
 function GetLongFileName(const fname: string): string;
@@ -506,61 +504,6 @@ begin
   end;
 
   while (s <> '') and CharInSet(s[1], [' ', #9, #13, #10]) do Delete(s,1,1);  // I3310
-end;
-
-function RunReboot(const msg, failuremsg: WideString): Boolean;
-var
-  hToken: THandle;
-  tkp: TTokenPrivileges;
-  len: DWord;
-begin
-  Result := False;
-  KL.Log('RunReboot - enter');
-  if (msg <> '') and (MessageDlg(msg, mtWarning, mbOkCancel, 0) = mrCancel) then
-  begin
-    KL.Log('RunReboot - cancelled');
-    Exit;
-  end;
-
-  // Get a token for this process.
-  if not OpenProcessToken(GetCurrentProcess, TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, hToken) then
-  begin
-    KL.Log('RunReboot - failed to OpenProcessToken');
-    ShowMessage(failuremsg);
-    Exit;
-  end;
-
-  // Get the LUID for the shutdown privilege.
-
-  LookupPrivilegeValue(nil, PCHAR('SeShutdownPrivilege') {SE_SHUTDOWN_NAME}, tkp.Privileges[0].Luid);
-
-  tkp.PrivilegeCount := 1;  // one privilege to set
-  tkp.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
-
-  // Get the shutdown privilege for this process.
-
-  AdjustTokenPrivileges(hToken, False, tkp, 0, nil, len);
-
-  // Cannot test the return value of AdjustTokenPrivileges.
-
-  if GetLastError() <> ERROR_SUCCESS then
-  begin
-    KL.Log('RunReboot - failed to AdjustTokenPrivileges');
-    ShowMessage(failuremsg);
-    Exit;
-  end;
-
-  // Shut down the system
-  if not ExitWindowsEx(EWX_REBOOT, 0) then
-  begin
-    KL.Log('RunReboot - failed to ExitWindowsEx');
-    ShowMessage(failuremsg);
-    Exit;
-  end;
-
-  KL.Log('RunReboot - restarting now');
-
-  Result := True;
 end;
 
 function GetLongFile(APath:String):String;

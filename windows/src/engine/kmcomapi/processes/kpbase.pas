@@ -30,7 +30,6 @@ type
     procedure ErrorFmt(ErrorCode: Cardinal; Args: OleVariant);
     procedure Warn(WarnCode: Cardinal);
     procedure WarnFmt(WarnCode: Cardinal; Args: OleVariant);
-    procedure SetReboot; deprecated;
   public
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
@@ -64,11 +63,6 @@ end;
 procedure TKPBase.ErrorFmt(ErrorCode: Cardinal; Args: OleVariant);
 begin
   (FContext as TKeymanContext).Errors.AddFmt(ErrorCode, Args, kesError);
-end;
-
-procedure TKPBase.SetReboot;
-begin
-  (FContext as TKeymanContext).SystemInfo.SetReboot;
 end;
 
 procedure TKPBase.Warn(WarnCode: Cardinal);

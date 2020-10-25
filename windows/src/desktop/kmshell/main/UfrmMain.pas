@@ -131,7 +131,6 @@ type
     procedure RefreshKeymanConfiguration;
     procedure Keyboard_Download;
     function GetHotkeyLanguageFromParams(params: TStringList; out lang: IKeymanLanguage): Boolean;
-    function MustReboot: Boolean;
     function SaveAll: Boolean;
     procedure KeyboardLanguage_Install(Params: TStringList);   // I3624
     procedure KeyboardLanguage_Uninstall(Params: TStringList);   // I3624
@@ -239,12 +238,6 @@ procedure TfrmMain.TntFormClose(Sender: TObject; var Action: TCloseAction);
 begin
   inherited;
   FClosing := True;
-
-  KL.Log('Testing kmcom.errors.rebootrequired: %s', [booltostr(kmcom.SystemInfo.RebootRequired)]);
-  if kmcom.SystemInfo.RebootRequired then
-    RunReboot('Windows must be restarted for changes to complete.  Restart now?',
-      'Windows did not initiate the restart successfully.  You will need to restart manually.');
-
   Action := caFree;
 end;
 
@@ -475,8 +468,6 @@ end;
 
 procedure TfrmMain.Keyboard_Install;
 begin
-  if MustReboot then Exit;  // I2789
-
   if TInstallFile.BrowseAndInstallKeyboardFromFile(Self) then
   begin
     RefreshKeymanConfiguration;
@@ -488,8 +479,6 @@ var
   kbd: IKeymanKeyboardInstalled;
   kbdID: WideString;
 begin
-  if MustReboot then Exit;  // I2789
-
   if GetKeyboardFromParams(params, kbd) then
   begin
     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
@@ -507,8 +496,6 @@ procedure TfrmMain.KeyboardLanguage_Uninstall(Params: TStringList);   // I3624
 var
   kbdlang: IKeymanKeyboardLanguageInstalled;
 begin
-  if MustReboot then Exit;  // I2789
-
   if GetKeyboardLanguageFromParams(params, kbdlang) then
   begin
     // TODO: refactor this away?
@@ -523,8 +510,6 @@ procedure TfrmMain.KeyboardLanguage_Install(Params: TStringList);   // I3624
 var
   kbd: IKeymanKeyboardInstalled;
 begin
-  if MustReboot then Exit;  // I2789
-
   if GetKeyboardFromParams(params, kbd) then
   begin
     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
@@ -545,8 +530,6 @@ var
   pkg: IKeymanPackageInstalled;
   pkgID: WideString;
 begin
-  if MustReboot then Exit;  // I2789
-
   if GetPackageFromParams(params, pkg) then
   begin
     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
@@ -557,19 +540,6 @@ begin
       RefreshKeymanConfiguration;
     end;
   end;
-end;
-
-function TfrmMain.MustReboot: Boolean;
-begin
-  KL.Log('Testing kmcom.errors.rebootrequired before install/uninstall of keyboards: %s', [booltostr(kmcom.SystemInfo.RebootRequired)]);
-  if kmcom.SystemInfo.RebootRequired then
-  begin
-    Result := True;
-    RunReboot('Windows must be restarted for changes to complete before you can install or uninstall any more keyboards.  Restart now?',
-      'Windows did not initiate the restart successfully.  You will need to restart manually.');
-  end
-  else
-    Result := False;
 end;
 
 procedure TfrmMain.Package_Welcome(Params: TStringList);
@@ -769,7 +739,7 @@ begin
             on E:Exception do KL.Log(E.Message);
           end;
         end;
-      oucSuccess, oucSuccessReboot:
+      oucSuccess:
         RefreshKeymanConfiguration;
     end
   finally
