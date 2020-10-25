@@ -309,7 +309,7 @@ begin
     FKeyboardXMLRenderer.FileReferences.ToStringArray
   );
 
-  Content_Render(FRefreshKeyman, 'tag='+IntToStr(FPageTag));
+  Content_Render('tag='+IntToStr(FPageTag));
 end;
 
 procedure TfrmMain.FireCommand(const command: WideString; params: TStringList);

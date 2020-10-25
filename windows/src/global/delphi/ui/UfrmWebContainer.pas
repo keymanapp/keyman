@@ -81,7 +81,7 @@ type
 
     function IsLocalUrl(const url: string): Boolean;
 
-    procedure Content_Render(FRefreshKeyman: Boolean = False; const Query: string = ''); virtual;
+    procedure Content_Render(const Query: string = ''); virtual;
     procedure WndProc(var Message: TMessage); override;  // I2720
   public
     constructor Create(AOwner: TComponent); override;
@@ -123,8 +123,7 @@ begin
   Application.CreateForm(InstanceClass, Reference);
 end;
 
-procedure TfrmWebContainer.Content_Render(FRefreshKeyman: Boolean;
-  const Query: string);
+procedure TfrmWebContainer.Content_Render(const Query: string);
 var
   FWidth, FHeight: Integer;
 begin
@@ -147,7 +146,7 @@ end;
 
 procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);
 begin
-  Content_Render(FRefreshKeyman);   // I4088
+  Content_Render;   // I4088
 end;
 
 constructor TfrmWebContainer.Create(AOwner: TComponent);
