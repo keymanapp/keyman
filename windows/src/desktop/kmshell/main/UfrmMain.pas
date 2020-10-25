@@ -96,11 +96,6 @@ type
 
     DebuggingChecked: Boolean;   // I3630
 
-    dlgOpenAddin: TOpenDialog;
-    dlgOpenVisualKeyboard: TOpenDialog;
-
-    procedure dlgOpenVisualKeyboardCanClose(Sender: TObject; var CanClose: Boolean);
-
     procedure Keyboard_Install;
     procedure Keyboard_Uninstall(Params: TStringList);
     procedure Keyboard_Options(Params: TStringList);
@@ -109,7 +104,6 @@ type
     function Keyboards_Save: Boolean;
     function Options_Save: Boolean;
     procedure Options_Init;
-    procedure InitNonVisualComponents;
     procedure Keyboard_ClickCheck(params: TStringList);
     function GetKeyboardFromParams(params: TStringList; out kbd: IKeymanKeyboardInstalled): Boolean;
     function GetPackageFromParams(params: TStringList; out pkg: IKeymanPackageInstalled): Boolean;
@@ -117,9 +111,6 @@ type
     procedure Package_Welcome(Params: TStringList);
     procedure Footer_Ok;
     procedure Footer_Cancel;
-
-    procedure Keyboard_InstallVisualKeyboard(params: TStringList);
-    procedure Keyboard_UninstallVisualKeyboard(params: TStringList);
 
     procedure Options_ClickCheck(params: TStringList);
     function GetOptionFromParams(params: TStringList; out option: IKeymanOption): Boolean;
@@ -225,8 +216,6 @@ begin
 
   kmcom.AutoApply := False;
 
-  InitNonVisualComponents;
-
   Icon.ReleaseHandle;
   Icon.Handle := DuplicateIcon(hInstance, Application.Icon.Handle);
 
@@ -320,8 +309,6 @@ begin
   else if command = 'keyboard_uninstall' then Keyboard_Uninstall(params)
   else if command = 'keyboard_options' then Keyboard_Options(params)
   else if command = 'keyboard_clickcheck' then Keyboard_ClickCheck(params)
-  else if command = 'keyboard_installvisualkeyboard' then Keyboard_InstallVisualKeyboard(params)
-  else if command = 'keyboard_uninstallvisualkeyboard' then Keyboard_UninstallVisualKeyboard(params)
 
   else if command = 'keyboardlanguage_install' then KeyboardLanguage_Install(params)   // I3624
   else if command = 'keyboardlanguage_uninstall' then KeyboardLanguage_Uninstall(params)   // I3624
@@ -379,21 +366,6 @@ begin
   Close;
 
   kmcom.Apply; // I1338 - eliminate unneccesary re-render
-end;
-
-procedure TfrmMain.InitNonVisualComponents;
-begin
-  dlgOpenAddin := TOpenDialog.Create(Self);
-  dlgOpenAddin.Filter :=
-      'Keyman add-ins (*.kma, *.kmp)|*.kma;*.kmp|Keyman add-in files (*' +
-      '.kma)|*.kma|Keyman packaged add-ins (*.kmp)|*.kmp|All files (*.*' +
-      ')|*.*';
-  dlgOpenAddin.Title := 'Install Add-in';
-
-  dlgOpenVisualKeyboard := TOpenDialog.Create(Self);
-  dlgOpenVisualKeyboard.Filter := 'On screen keyboard files (*.kvk)|*.kvk|All files (*.*)|*.*';
-  dlgOpenVisualKeyboard.Title := 'Install Keyman Keyboard';
-  dlgOpenVisualKeyboard.OnCanClose := dlgOpenVisualKeyboardCanClose;
 end;
 
 {-------------------------------------------------------------------------------
@@ -630,25 +602,6 @@ begin
     kbd.Loaded := StrToBool(params.Values['value']); //, 'true');
 end;
 
-procedure TfrmMain.Keyboard_InstallVisualKeyboard(params: TStringList);
-var
-  kbd: IKeymanKeyboardInstalled;
-begin
-  if GetKeyboardFromParams(params, kbd) and not Assigned(kbd.VisualKeyboard) then
-    if dlgOpenVisualKeyboard.Execute then
-    begin
-      try
-        kbd.InstallVisualKeyboard(dlgOpenVisualKeyboard.FileName);
-      except
-        on E:EOleException do // I1084, I1005 - Installing an invalid KVK file
-          ShowMessage(E.Message);
-      end;
-      kbd := nil; // I773 - mcd - because Do_Content_Render reloads the keyman objects when Refresh-Keyman=true
-      Do_Content_Render(True);
-    end;
-  kbd := nil;
-end;
-
 procedure TfrmMain.Keyboard_Options(Params: TStringList);
 var
   kbd: IKeymanKeyboardInstalled;
@@ -666,60 +619,6 @@ begin
     kbd := nil;
     ShowKeyboardOptions(Self, kbdID);
   end;
-end;
-
-procedure TfrmMain.Keyboard_UninstallVisualKeyboard(params: TStringList);
-var
-  kbd: IKeymanKeyboardInstalled;
-  vk: IKeymanVisualKeyboard;
-begin
-  if GetKeyboardFromParams(params, kbd) then
-  begin
-    vk := kbd.VisualKeyboard;
-    if Assigned(vk) and (MessageDlg(MsgFromIdFormat(SKUninstallOnScreenKeyboard, [kbd.Name]),
-      mtConfirmation, mbOkCancel, 0) = mrOk) then
-    begin
-      try
-        vk.Uninstall;
-        vk := nil;
-      except
-        on E:EOleException do // I1084, I1005 - Installing an invalid KVK file
-          ShowMessage(E.Message);
-      end;
-      kbd := nil; // I773 - mcd - because Do_Content_Render reloads the keyman objects when Refresh-Keyman=true
-      Do_Content_Render(True);
-    end;
-    kbd := nil;
-  end;
-end;
-
-procedure TfrmMain.dlgOpenVisualKeyboardCanClose(Sender: TObject; var CanClose: Boolean);
-begin
-{  CanClose := False;
-  if FileExists(dlgOpenVisualKeyboard.FileName) then
-  begin
-    try
-      with TVisualKeyboard.Create do
-      try
-        LoadFromFile(dlgOpenVisualKeyboard.FileName);
-        if LowerCase(Header.AssociatedKeyboard) =
-            LowerCase(SelectedRegKeyboard.Name) then
-          CanClose := True
-        else if MessageDlg('This visual keyboard is not designed for the keyboard you have selected.  Use it anyway?',
-            mtConfirmation, mbOkCancel, 0) = mrOk then
-          CanClose := True;
-      finally
-        Free;
-      end;
-    except
-      on E:Exception do
-      begin
-        WideShowMessage(E.Message);
-        CanClose := False;
-      end;
-    end;
-    //if IsVisualKeyboardAssociatedWithCorrectFile then CanClose := True;
-  end;}
 end;
 
 {-------------------------------------------------------------------------------
