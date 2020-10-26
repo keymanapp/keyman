@@ -93,54 +93,49 @@ type
 
     FKeyboardXMLRenderer: TKeyboardListXMLRenderer;
     FXMLRenderers: TXMLRenderers;
-
-    DebuggingChecked: Boolean;   // I3630
+    wm_keyman_refresh: Integer;
 
     procedure Keyboard_Install;
     procedure Keyboard_Uninstall(Params: TStringList);
     procedure Keyboard_Options(Params: TStringList);
-
     procedure Keyboards_Init;
-    function Keyboards_Save: Boolean;
-    function Options_Save: Boolean;
-    procedure Options_Init;
+    procedure Keyboard_Download;
+    procedure KeyboardLanguage_Install(Params: TStringList);   // I3624
+    procedure KeyboardLanguage_Uninstall(Params: TStringList);   // I3624
+    function GetKeyboardLanguageFromParams(params: TStringList;
+      out kbdlang: IKeymanKeyboardLanguageInstalled): Boolean;   // I3624
     procedure Keyboard_ClickCheck(params: TStringList);
     function GetKeyboardFromParams(params: TStringList; out kbd: IKeymanKeyboardInstalled): Boolean;
+
     function GetPackageFromParams(params: TStringList; out pkg: IKeymanPackageInstalled): Boolean;
     procedure Package_Uninstall(Params: TStringList);
     procedure Package_Welcome(Params: TStringList);
-    procedure Footer_Ok;
-    procedure Footer_Cancel;
 
+    procedure Options_Init;
     procedure Options_ClickCheck(params: TStringList);
     function GetOptionFromParams(params: TStringList; out option: IKeymanOption): Boolean;
     procedure Options_ResetHints;
     procedure Options_BaseKeyboard;   // I4169
 
-    function GetHotkeyFromParams(params: TStringList;
-      out hotkey: IKeymanHotkey): Boolean;
     procedure Hotkey_Set(params: TStringList);
     procedure Hotkey_Clear(params: TStringList);
-    function Hotkeys_Save: Boolean;
+    function GetHotkeyFromParams(params: TStringList;
+      out hotkey: IKeymanHotkey): Boolean;
+    function GetHotkeyLanguageFromParams(params: TStringList; out lang: IKeymanLanguage): Boolean;
+
     procedure Support_Diagnostics;
     procedure Support_Online;
     procedure Support_UpdateCheck;
     procedure Support_ProxyConfig;
     procedure Support_ContactSupport(params: TStringList);   // I4390
+
     procedure OpenSite(params: TStringList);
     procedure RefreshKeymanConfiguration;
-    procedure Keyboard_Download;
-    function GetHotkeyLanguageFromParams(params: TStringList; out lang: IKeymanLanguage): Boolean;
-    function SaveAll: Boolean;
-    procedure KeyboardLanguage_Install(Params: TStringList);   // I3624
-    procedure KeyboardLanguage_Uninstall(Params: TStringList);   // I3624
-    function GetKeyboardLanguageFromParams(params: TStringList;
-      out kbdlang: IKeymanKeyboardLanguageInstalled): Boolean;   // I3624
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
     class function ShouldRegisterWindow: Boolean; override;  // I2720
-    function ShouldSetAppTitle: Boolean; override;  // I2786
+    function ShouldSetAppTitle: Boolean; override;   // I2786
   public
     procedure Do_Content_Render(FRefreshKeyman: Boolean); override;
   end;
@@ -212,8 +207,6 @@ begin
 
   // Prevents keep-in-touch opening in browser
   cef.ShouldOpenRemoteUrlsInBrowser := False;
-
-  kmcom.AutoApply := False;
 
   Icon.ReleaseHandle;
   Icon.Handle := DuplicateIcon(hInstance, Application.Icon.Handle);
@@ -324,41 +317,11 @@ begin
 
   else if command = 'contact_support' then Support_ContactSupport(params)   // I4390
 
-
   else if command = 'opensite' then OpenSite(params)
-
-  else if command = 'footer_ok' then Footer_OK
-  else if command = 'footer_cancel' then Footer_Cancel
 
   else if command = 'help' then Application.HelpJump('context_'+lowercase(DialogName))
 
   else inherited;
-end;
-
-procedure TfrmMain.Footer_Cancel;
-begin
-  Close;
-  // Instantiate a new IKeyman, and Apply to force all changes to be consistent
-  CoKeyman.Create.Apply;
-end;
-
-function TfrmMain.SaveAll: Boolean;  // I2789
-begin
-  Result :=
-    Keyboards_Save and
-    Options_Save and
-    Hotkeys_Save;
-end;
-
-procedure TfrmMain.Footer_Ok;
-begin
-  kmcom.AutoApply := False;
-
-  if not SaveAll then Exit; // I2789
-
-  Close;
-
-  kmcom.Apply; // I1338 - eliminate unneccesary re-render
 end;
 
 {-------------------------------------------------------------------------------
@@ -558,18 +521,15 @@ procedure TfrmMain.Keyboards_Init;
 begin
 end;
 
-function TfrmMain.Keyboards_Save: Boolean;
-begin
-  kmcom.Keyboards.Apply;
-  Result := True;
-end;
-
 procedure TfrmMain.Keyboard_ClickCheck(params: TStringList);
 var
   kbd: IKeymanKeyboardInstalled;
 begin
   if GetKeyboardFromParams(params, kbd) then
+  begin
     kbd.Loaded := StrToBool(params.Values['value']); //, 'true');
+    kmcom.Keyboards.Apply;
+  end;
 end;
 
 procedure TfrmMain.Keyboard_Options(Params: TStringList);
@@ -609,6 +569,14 @@ begin
   if GetOptionFromParams(params, option) and option.Enabled then
   begin
     option.Value := not option.Value;
+
+    if (option.ID = 'koDebugging') and option.Value then
+      ShowMessage(MsgFromId(SKDebuggingWarning));
+
+    kmcom.Errors.Clear;
+    kmcom.Options.Apply;
+    if kmcom.Errors.Count > 0 then
+      ShowMessage(kmcom.Errors[0].Description);
   end
   else
     ShowMessage(params.Text);
@@ -616,28 +584,12 @@ end;
 
 procedure TfrmMain.Options_Init;
 begin
-  DebuggingChecked := kmcom.Options['koDebugging'].Value;   // I3630
 end;
 
 procedure TfrmMain.Options_ResetHints;
 begin
   ResetAllHints;
   ShowMessage(MsgFromId(SKHintsReset));
-end;
-
-function TfrmMain.Options_Save: Boolean;
-begin
-  if (kmcom.Options['koDebugging'].Value <> DebuggingChecked) and kmcom.Options['koDebugging'].Value then
-    ShowMessage(MsgFromId(SKDebuggingWarning));
-
-  kmcom.Errors.Clear;
-  kmcom.Options.Apply;
-  if kmcom.Errors.Count > 0 then
-    ShowMessage(kmcom.Errors[0].Description);
-
-  DebuggingChecked := kmcom.Options['koDebugging'].Value;
-
-  Result := True;
 end;
 
 {-------------------------------------------------------------------------------
@@ -651,20 +603,23 @@ var
 begin
   if GetHotkeyLanguageFromParams(params, lang2) then
   begin
-    if ChangeHotkey(Self, MsgFromIdFormat(SKSetHotkey_Language, [lang2.LocaleName + ' ('+lang2.LayoutName+')']), lang2.Hotkey) then
-    begin
-      Do_Content_Render(False);
-    end;
+    if not ChangeHotkey(Self, MsgFromIdFormat(SKSetHotkey_Language, [lang2.LocaleName + ' ('+lang2.LayoutName+')']), lang2.Hotkey) then
+      Exit;
+    kmcom.Languages.Apply;
   end
   else if GetHotkeyFromParams(params, hotkey) then
   begin
-    if ChangeHotkey(Self, MsgFromId(SKSetHotkey_Interface), hotkey) then
-    begin
-      Do_Content_Render(False);
-    end;
+    if not ChangeHotkey(Self, MsgFromId(SKSetHotkey_Interface), hotkey) then
+      Exit;
+    kmcom.Hotkeys.Apply;
   end
   else
+  begin
     ShowMessage(params.Text);
+    Exit;
+  end;
+
+  Do_Content_Render(False);
 end;
 
 procedure TfrmMain.Hotkey_Clear(params: TStringList);
@@ -675,19 +630,17 @@ begin
   if GetHotkeyLanguageFromParams(params, lang2) then
   begin
     lang2.Hotkey.Clear;
-    Do_Content_Render(False);
+    kmcom.Languages.Apply;
   end
   else if GetHotkeyFromParams(params, hotkey) then
   begin
     hotkey.Clear;
-    Do_Content_Render(False);
+    kmcom.Hotkeys.Apply;
   end
-end;
+  else
+    Exit;
 
-function TfrmMain.Hotkeys_Save: Boolean;
-begin
-  kmcom.Hotkeys.Apply;
-  Result := True;
+  Do_Content_Render(False);
 end;
 
 {-------------------------------------------------------------------------------
