@@ -359,7 +359,28 @@ namespace correction {
           token.transformDistributions = [transformDistribution];
           state.pushTail(token);
         } else {
-          state.updateTail(transformDistribution, tokenizedContext[0]);
+          // Consider backspace entry for this case?
+          let primaryInput = transformDistribution[0].sample;
+          if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0) {
+            // It's a backspace transform; time for special handling!
+            //
+            // For now, with 14.0, we simply compress all remaining Transforms for the token into a single
+            // one.  Probabalistically modeling BKSP is quite complex, so we simplify by assuming everything
+            // remaining after a BKSP is 'true' and 'intended' text.
+            let compactedTransform: Transform = {
+              insert: tokenizedContext[0],
+              deleteLeft: 0,
+              id: primaryInput.id  // We compact all previous transforms into the new one.
+            };
+            state.tokens.pop();
+
+            let compactedToken = new TrackedContextToken();
+            compactedToken.raw = tokenizedContext[0];
+            compactedToken.transformDistributions = [[{sample: compactedTransform, p: 1.0}]];
+            state.pushTail(compactedToken);
+          } else {
+            state.updateTail(transformDistribution, tokenizedContext[0]);
+          }
         }
       }
       return state;
