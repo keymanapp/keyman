@@ -144,13 +144,12 @@ namespace correction {
     }
 
     toRawTokenization() {
-      // TODO:  support token replacement (for accepted suggestions).
       let sequence: USVString[] = [];
       
       for(let token of this.tokens) {
         // Hide any tokens representing wordbreaks.  (Thinking ahead to phrase-level possibilities)
-        if(token.raw !== null) {
-          sequence.push(token.raw);
+        if(token.currentText !== null) {
+          sequence.push(token.currentText);
         }
       }
 
