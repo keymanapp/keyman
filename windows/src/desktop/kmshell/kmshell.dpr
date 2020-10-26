@@ -171,7 +171,12 @@ uses
   Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
   Keyman.Configuration.System.TIPMaintenance in 'install\Keyman.Configuration.System.TIPMaintenance.pas',
   UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress},
-  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13 in 'main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas';
+  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13 in 'main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas',
+  Keyman.System.Settings in '..\..\global\delphi\general\Keyman.System.Settings.pas',
+  Keyman.System.SettingsManager in '..\..\global\delphi\general\Keyman.System.SettingsManager.pas',
+  Keyman.Configuration.UI.UfrmSettingsManager in 'settings\Keyman.Configuration.UI.UfrmSettingsManager.pas' {frmSettingsManager},
+  Keyman.Configuration.UI.UfrmSettingsAddTSFApp in 'settings\Keyman.Configuration.UI.UfrmSettingsAddTSFApp.pas' {frmSettingsAddTSFApp},
+  Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

@@ -89,6 +89,7 @@ type
                     fmUpgradeMnemonicLayout,    // I4553
                     fmRepair,
                     fmKeepInTouch,
+                    fmSettings,
 
                     // Commands from Keyman Engine
                     fmShowHint,
@@ -111,6 +112,7 @@ uses
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
+  Keyman.Configuration.UI.UfrmSettingsManager,
   KeymanPaths,
   KLog,
   kmint,
@@ -275,6 +277,7 @@ begin
         FParentWindow := StrToIntDef(ParamStr(i), 0);
       end
       else if s = '-showhelp' then FMode := fmShowHelp
+      else if s = '-settings' then FMode := fmSettings
 
       else Exit;
     end
@@ -538,6 +541,11 @@ begin
         ExitCode := 0;
     fmKeepInTouch:
       ShowKeepInTouchForm(True);   // I4658
+
+    fmSettings:
+      if TfrmSettingsManager.Execute
+        then ExitCode := 0
+        else ExitCode := 1;
 
     fmShowHint:
       if ShowKMShellHintQuery(FParentWindow, FirstKeyboardFileName) = mrOk
