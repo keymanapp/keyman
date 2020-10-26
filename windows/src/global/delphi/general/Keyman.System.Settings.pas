@@ -333,7 +333,7 @@ const
       Key: SRegKey_KeymanDebug_CU;
       Description: 'Protocol for api.keyman.com; use this when debugging '+
                    'Keyman with a local api.keyman.com instance';
-      DefaultStr: 'https'
+      DefaultDesc: 'https'
     ),
 
     // Upload_Settings.API_Server
@@ -344,7 +344,7 @@ const
       Key: SRegKey_KeymanDebug_CU;
       Description: 'Host for api.keyman.com; use this when debugging '+
                    'Keyman with a local api.keyman.com instance';
-      DefaultStr: 'api.keyman.com'
+      DefaultDesc: 'api.keyman.com'
     ),
 
     // Upload_Settings.KeymanCom_Protocol_Server
@@ -355,7 +355,7 @@ const
       Key: SRegKey_KeymanDebug_CU;
       Description: 'URL to keyman.com; use this when debugging Keyman with a '+
                    'local keyman.com instance';
-      DefaultStr: 'https://keyman.com'
+      DefaultDesc: 'https://keyman.com'
     ),
 
     // TIKE:RedistFiles.GetHelpURL
@@ -365,7 +365,7 @@ const
       RootKey: HKCU;
       Key: SRegKey_KeymanDebug_CU;
       Description: 'Base URL for Keyman Developer documentation';
-      DefaultStr: 'https://keyman.com/go/developer/'+SKeymanVersion+'/docs'
+      DefaultDesc: 'https://keyman.com/go/developer/'+SKeymanVersion+'/docs'
     ),
 
     //
