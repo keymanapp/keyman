@@ -84,7 +84,7 @@ begin
   if doc.Values[app] is TJSONObject then
   begin
     node := doc.Values[app] as TJSONObject;
-    if CompareVersions(node.Values['version'].Value, FCurrentVersion) > 0 then
+    if CompareVersions(node.Values['version'].Value, FCurrentVersion) < 0 then
     begin
       FNewVersion := node.Values['version'].Value;
       FFileName := node.Values['file'].Value;

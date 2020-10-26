@@ -56,6 +56,7 @@ type
     OldVersion, NewVersion: string;
     DownloadURL: string;
     SavePath: string;
+    FileName: string;
     DownloadSize: Integer;
     Install: Boolean;
   end;
@@ -64,6 +65,7 @@ type
     OldVersion, NewVersion: string;
     DownloadURL: string;
     SavePath: string;
+    FileName: string;
     DownloadSize: Integer;
     Install: Boolean;
   end;
@@ -85,7 +87,6 @@ type
   private
     FSilent: Boolean;
     FForce: Boolean;
-    FCurrentVersion: string;
     FParams: TOnlineUpdateCheckParams;
 
     FErrorMessage: string;
@@ -111,7 +112,6 @@ type
     constructor Create(AForce, ASilent: Boolean);
     destructor Destroy; override;
     function Run: TOnlineUpdateCheckResult;
-    property CurrentVersion: string read FCurrentVersion write FCurrentVersion;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
   end;
 
@@ -135,9 +135,11 @@ implementation
 uses
   Vcl.Dialogs,
   Vcl.Forms,
+
   GlobalProxySettings,
   KLog,
   keymanapi_TLB,
+  KeymanVersion,
   kmint,
   OnlineConstants,
   ErrorControlledRegistry,
@@ -167,7 +169,6 @@ begin
   inherited Create;
 
   FShowErrors := True;
-  FCurrentVersion := GetVersionString;
   FParams.Result := oucUnknown;
 
   FSilent := ASilent;
@@ -212,20 +213,6 @@ end;
 procedure TOnlineUpdateCheck.DoDownloadUpdates(AOwner: TfrmDownloadProgress; var Result: Boolean);
 var
   i: Integer;
-
-    function GetSavePath(const url: string): string;
-    var
-      n: Integer;
-    begin
-      n := LastDelimiter('/', url);
-      if n = 0 then
-      begin
-        Result := '';
-        ShowMessage('Unable to download file - not a recognised URL: '+url);
-        Exit;
-      end;
-      Result := DownloadTempPath + Copy(url,n+1,Length(url));
-    end;
 
     function DownloadFile(const url, savepath: string): TModalResult;
     begin
@@ -278,14 +265,14 @@ begin
         Inc(FDownload.TotalDownloads);
         Inc(FDownload.TotalSize, FParams.Packages[i].DownloadSize);
 
-        FParams.Packages[i].SavePath := GetSavePath(FParams.Packages[i].DownloadURL);
+        FParams.Packages[i].SavePath := DownloadTempPath + FParams.Packages[i].FileName; 
       end;
 
     if FParams.Keyman.Install then
     begin
       Inc(FDownload.TotalDownloads);
       Inc(FDownload.TotalSize, FParams.Keyman.DownloadSize);
-      FParams.Keyman.SavePath := GetSavePath(FParams.Keyman.DownloadURL);
+      FParams.Keyman.SavePath := DownloadTempPath + FParams.Keyman.FileName;
     end;
 
     FDownload.StartPosition := 0;
@@ -422,7 +409,6 @@ begin
   { We have an update available }
   with OnlineUpdateNewVersion(nil) do
   try
-    CurrentVersion := GetVersionString;
     Params := Self.FParams;
     if ShowModal <> mrYes then
     begin
@@ -559,11 +545,12 @@ begin
     with THTTPUploader.Create(nil) do
     try
       ShowUI := not FSilent;
-      Fields.Add('Version', ansistring(FCurrentVersion));
+      Fields.Add('version', ansistring(CKeymanVersionInfo.Version));
+      Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
       for i := 0 to kmcom.Packages.Count - 1 do
       begin
         pkg := kmcom.Packages[i];
-        Fields.Add(ansistring('Package_'+pkg.ID), ansistring(pkg.Version));
+        Fields.Add(ansistring('package_'+pkg.ID), ansistring(pkg.Version));
         pkg := nil;
       end;
         
@@ -574,12 +561,12 @@ begin
 
       Request.HostName := API_Server;
       Request.Protocol := API_Protocol;
-      Request.UrlPath := API_Path_UpdateCheck_Desktop;
+      Request.UrlPath := API_Path_UpdateCheck_Windows;
       //OnStatus :=
       Upload;
       if Response.StatusCode = 200 then
       begin
-        if ucr.Parse(Response.MessageBodyAsString, 'windows', FCurrentVersion) then
+        if ucr.Parse(Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
         begin
           SetLength(FParams.Packages,0);
           for i := Low(ucr.Packages) to High(ucr.Packages) do
@@ -597,6 +584,7 @@ begin
               FParams.Packages[j].NewVersion := ucr.Packages[i].NewVersion;
               FParams.Packages[j].DownloadSize := ucr.Packages[i].DownloadSize;
               FParams.Packages[j].DownloadURL := ucr.Packages[i].DownloadURL;
+              FParams.Packages[j].FileName := ucr.Packages[i].FileName;
               pkg := nil;
             end
             else
@@ -614,6 +602,7 @@ begin
                 FParams.Keyman.NewVersion := ucr.NewVersion;
                 FParams.Keyman.DownloadURL := ucr.InstallURL;
                 FParams.Keyman.DownloadSize := ucr.InstallSize;
+                FParams.Keyman.FileName := ucr.FileName;
               end;
           end;
 
