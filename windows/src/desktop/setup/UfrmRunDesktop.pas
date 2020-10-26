@@ -51,6 +51,7 @@ uses
   System.SysUtils,
   System.UITypes,
   System.Variants,
+  Vcl.AppEvnts,
   Vcl.ComCtrls,
   Vcl.Controls,
   Vcl.Dialogs,
@@ -81,6 +82,7 @@ type
     lblActions: TLabel;
     cbLanguage: TComboBox;
     lblGlobe: TLabel;
+    appevents: TApplicationEvents;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);
@@ -91,6 +93,7 @@ type
     procedure lblLicenseClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure cbLanguageClick(Sender: TObject);
+    procedure appeventsMessage(var Msg: tagMSG; var Handled: Boolean);
   private
     g_iCurPos, g_iProgress, g_iProgressTotal: Integer;
     g_bCancelInstall, g_bScriptInProgress, g_bForwardProgress, g_bFirstTime, g_bEnableActionData: Boolean;
@@ -710,6 +713,17 @@ end;
 procedure TfrmRunDesktop.URLLabelMouseEnter(Sender: TObject);
 begin
   (Sender as TLabel).Font.Style := [fsUnderline];
+end;
+
+procedure TfrmRunDesktop.appeventsMessage(var Msg: tagMSG;
+  var Handled: Boolean);
+begin
+  if (Msg.message = WM_SYSCOMMAND) and (Msg.wParam = SC_RESTORE) then
+  begin
+    // Handle the case where Win+M pressed, window never restores
+    // Only really happens with Splash.
+    PostMessage(Handle, WM_SHOWWINDOW, 1, SW_PARENTOPENING);
+  end;
 end;
 
 procedure TfrmRunDesktop.BackupKey(Root: HKEY; Path: WideString); // I2642

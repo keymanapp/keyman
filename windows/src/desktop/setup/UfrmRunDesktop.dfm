@@ -615,4 +615,9 @@ object frmRunDesktop: TfrmRunDesktop
       OnClick = cbLanguageClick
     end
   end
+  object appevents: TApplicationEvents
+    OnMessage = appeventsMessage
+    Left = 336
+    Top = 184
+  end
 end
