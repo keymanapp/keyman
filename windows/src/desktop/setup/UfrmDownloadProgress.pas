@@ -106,9 +106,13 @@ begin
       then ModalResult := mrOk
       else ModalResult := mrCancel;
   except
-    on E:Exception do
+    on E:EHTTPUploader do
     begin
       ShowMessage(E.Message);
+      ModalResult := mrCancel;
+    end;
+    on E:EHTTPUploaderCancel do
+    begin
       ModalResult := mrCancel;
     end;
   end;
