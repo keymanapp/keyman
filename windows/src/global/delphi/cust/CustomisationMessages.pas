@@ -100,7 +100,7 @@ function TCustomisationMessageManager.GetAvailableLanguages: string;
       FLocaleDoc.validateOnParse := False;
       FLocaleDoc.load(path);
       if FLocaleDoc.documentElement <> nil
-        then Result := (FLocaleDoc.documentElement.tagName = 'Locale')
+        then Result := (FLocaleDoc.documentElement.tagName = 'resources')
         else Result := False;
     except
       Result := False;
