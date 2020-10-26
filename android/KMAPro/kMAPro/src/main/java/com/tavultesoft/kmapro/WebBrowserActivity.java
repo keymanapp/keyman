@@ -46,7 +46,7 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tavultesoft.kmea.util.KMLog;
+import static android.app.Application.getProcessName;
 
 public class WebBrowserActivity extends AppCompatActivity {
   private static final String TAG = "WebBrowserActivity";
@@ -60,12 +60,25 @@ public class WebBrowserActivity extends AppCompatActivity {
   private String loadedFont;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
+  private static boolean didSetDataDirectorySuffix = false;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     final Context context = this;
+
+    // Difference processes in the same application cannot directly share WebView-related data
+    // https://developer.android.com/reference/android/webkit/WebView.html#setDataDirectorySuffix(java.lang.String)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+       Log.d(TAG, "didSetDataDirectorySuffix: " + didSetDataDirectorySuffix);
+       if (!didSetDataDirectorySuffix) {
+         String processName = getProcessName();
+         WebView.setDataDirectorySuffix(processName);
+         Log.d(TAG, "process name: " + processName);
+         didSetDataDirectorySuffix = true;
+       }
+    }
 
     setContentView(R.layout.activity_web_browser);
 
