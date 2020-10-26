@@ -294,7 +294,7 @@ class LMLayerWorker {
             });
             break;
           case 'wordbreak':
-            let brokenWord = model.wordbreak(payload.context);
+            let brokenWord = models.wordbreak(model.wordbreaker || wordBreakers.default, payload.context);
 
             this.cast('currentword', {
               token: payload.token,

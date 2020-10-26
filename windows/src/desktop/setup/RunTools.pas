@@ -511,9 +511,8 @@ begin
     end
     else
     begin
-      Status('Removing older versions');
       // Remove older versions of Keyman now. We'll still get the upgrade desired
-      // because we've backed up the relevant keys for reapplication post-install
+      // because we've backed up the relevant keys for reapplication post-install.
       // Version 11 and later do not need this treatment as they are upgraded in-place
       // with the file and registry locations remaining static
       if (MsiGetProductCode(ProductCode_Keyman7_1Light, pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
@@ -522,11 +521,11 @@ begin
          (MsiGetProductCode(ProductCode_Keyman9, pcode) = ERROR_SUCCESS) or // Keyman 9.0
          (MsiGetProductCode(ProductCode_Keyman10, pcode) = ERROR_SUCCESS) then // Keyman 10.0
       begin
+        Status(FInstallInfo.Text(ssStatusRemovingOlderVersions));
         MsiConfigureProduct(pcode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT);
         // We'll ignore errors ...
       end;
     end;
-
 
     { Log the install to the diag folder }
 
@@ -539,6 +538,7 @@ begin
 
     FCacheFileName := CacheMSIFile(msiLocation);  // I3476
 
+    Status(FInstallInfo.Text(ssStatusInstalling));
     res := MsiInstallProductW(PWideChar(FCacheFileName), PWideChar(ReinstallMode));
 
     FinishCacheMSIFile(msiLocation,  // I3476

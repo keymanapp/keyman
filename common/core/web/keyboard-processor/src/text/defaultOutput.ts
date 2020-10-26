@@ -5,7 +5,6 @@
 
 namespace com.keyman.text {
   export enum EmulationKeystrokes {
-    Space = ' ',
     Enter = '\n',
     Backspace = '\b'
   }
@@ -116,9 +115,6 @@ namespace com.keyman.text {
           return EmulationKeystrokes.Backspace;
         case Codes.keyCodes['K_ENTER']:
           return EmulationKeystrokes.Enter;
-        // (Probably) only here for legacy reasons; it's always been handled alongside the other two.
-        case Codes.keyCodes['K_SPACE']:
-          return EmulationKeystrokes.Space;
         // case Codes.keyCodes['K_DEL']:
         //   return '\u007f'; // 127, ASCII / Unicode control code for DEL.
         default:
@@ -188,7 +184,9 @@ namespace com.keyman.text {
 
       // Now that keyShiftState is either 0 or 1, we can use the following structure to determine the default output.
       try {
-        if(n >= Codes.keyCodes['K_0'] && n <= Codes.keyCodes['K_9']) { // The number keys.
+        if(n == Codes.keyCodes['K_SPACE']) {
+          return ' ';
+        } else if(n >= Codes.keyCodes['K_0'] && n <= Codes.keyCodes['K_9']) { // The number keys.
           return Codes.codesUS[keyShiftState][0][n-Codes.keyCodes['K_0']];
         } else if(n >= Codes.keyCodes['K_A'] && n <= Codes.keyCodes['K_Z']) { // The base letter keys
           return String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.

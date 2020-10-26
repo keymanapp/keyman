@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
   <string name="ssLanguageName">English</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
   <string name="ssTitle">Install $APPNAME $VERSION</string>
@@ -28,6 +28,7 @@
   <string name="ssExitButton">E&amp;xit</string>
 
   <string name="ssStatusInstalling">Installing $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Removing older versions</string>
   <string name="ssStatusComplete">Installation Complete</string>
 
   <string name="ssQueryRestart">You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.
