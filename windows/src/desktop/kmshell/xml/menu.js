@@ -55,12 +55,15 @@ var menudiv = null, global_menu_elem_name = null;
 
     q = menudiv.children[0];
     q.focus();
+
+    document.getElementById('menubackground').className = 'show';
   }
 
   function HideMenu() {
     if(event.srcElement != menudiv) {
       global_menu_elem_name = null;
       menudiv.style.visibility='hidden';
+      document.getElementById('menubackground').className = '';
       try {
         if(lastfocus_item != null) lastfocus_item.focus();
       } catch(e) {
