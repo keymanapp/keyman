@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.169 alpha 2020-10-26
+
+* feat(common/core/web): simplify corrective distribution (#3726)
+* fix(windows): restore Setup after minimize (#3739)
+* fix(windows): buffer overrun in debug function (#3745)
+* fix(windows): download error dialog could be blank (#3747)
+* feat: Keyman Settings Manager base classes (#2456)
+* feat(windows): kmconfig console app (#3732)
+* feat(windows): kmconfig GUI (in kmshell) (#3733)
+* feat(windows): Apps for Controlling Browser TSF integration (#3734)
+
 ## 14.0.168 alpha 2020-10-24
 
 * chore(android): Update dependencies (#3738)
