@@ -35,8 +35,8 @@ const
   API_Path_UpdateCheck_Developer = '/developer/'+SKeymanVersion+'/update';
   
   // TODO: use /windows/ instead of /desktop/
-  API_Path_SubmitDiag = '/desktop/'+SKeymanVersion+'/submitdiag';
-  API_Path_IsOnline = '/desktop/'+SKeymanVersion+'/isonline';
+  API_Path_SubmitDiag = '/desktop/13.0/submitdiag'; // version will only update when the api changes
+  API_Path_IsOnline = '/desktop/13.0/isonline'; // version will only update when the api changes
 
   // https://www.keyman.com/ - web pages
   URLPath_CreateTranslation = '/go/windows/'+SKeymanVersion+'/create-locale';
