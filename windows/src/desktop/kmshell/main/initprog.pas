@@ -376,7 +376,7 @@ begin
   
   { Run app reconfiguration tasks }
 
-  TKeymanStartTask.Recreate;
+  TKeymanStartTask.RecreateTask;
 
   UILanguages.CreateUILanguages;
 
