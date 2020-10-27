@@ -71,11 +71,9 @@ public class WebBrowserActivity extends AppCompatActivity {
     // Difference processes in the same application cannot directly share WebView-related data
     // https://developer.android.com/reference/android/webkit/WebView.html#setDataDirectorySuffix(java.lang.String)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-       Log.d(TAG, "didSetDataDirectorySuffix: " + didSetDataDirectorySuffix);
        if (!didSetDataDirectorySuffix) {
          String processName = getProcessName();
          WebView.setDataDirectorySuffix(processName);
-         Log.d(TAG, "process name: " + processName);
          didSetDataDirectorySuffix = true;
        }
     }

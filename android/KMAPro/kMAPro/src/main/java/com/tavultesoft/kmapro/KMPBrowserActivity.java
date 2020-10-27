@@ -60,7 +60,6 @@ public class KMPBrowserActivity extends AppCompatActivity {
       if (!didSetDataDirectorySuffix) {
         String processName = getProcessName();
         WebView.setDataDirectorySuffix(processName);
-        Log.d(TAG, "process name: " + processName);
         didSetDataDirectorySuffix = true;
       }
     }
