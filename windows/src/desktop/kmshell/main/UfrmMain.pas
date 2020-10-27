@@ -224,14 +224,6 @@ begin
   Options_Init;
 
   FRenderPage := 'keyman'; // TODO: rename to 'configmain'
-  FXMLRenderers := TXMLRenderers.Create;
-  FXMLRenderers.RenderTemplate := 'Keyman.xsl';
-  FKeyboardXMLRenderer := TKeyboardListXMLRenderer.Create(FXMLRenderers);
-  FXMLRenderers.Add(FKeyboardXMLRenderer);
-  FXMLRenderers.Add(THotkeysXMLRenderer.Create(FXMLRenderers));
-  FXMLRenderers.Add(TOptionsXMLRenderer.Create(FXMLRenderers));
-  FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
-  FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
 
   Do_Content_Render(False);
 end;
@@ -246,7 +238,6 @@ end;
 procedure TfrmMain.TntFormDestroy(Sender: TObject);
 begin
   Application.OnActivate := nil;
-  FreeAndNil(FXMLRenderers);
   if FPageTag > 0 then
     modWebHttpServer.SharedData.Remove(FPageTag);
   inherited;
@@ -262,6 +253,8 @@ var
   sharedData: TConfigMainSharedData;
   s: string;
   xml: string;
+  FKeyboardXMLRenderer: TKeyboardListXMLRenderer;
+  FXMLRenderers: TXMLRenderers;
 begin
   if FPageTag > 0 then
   begin
@@ -286,12 +279,25 @@ begin
     XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))
   ]) + DefaultServersXMLTags + DefaultVersionXMLTags;
 
-  xml := FXMLRenderers.RenderToString(FRefreshKeyman, s);
-  sharedData.Init(
-    FXMLRenderers.TempPath,
-    xml,
-    FKeyboardXMLRenderer.FileReferences.ToStringArray
-  );
+  FXMLRenderers := TXMLRenderers.Create;
+  try
+    FXMLRenderers.RenderTemplate := 'Keyman.xsl';
+    FKeyboardXMLRenderer := TKeyboardListXMLRenderer.Create(FXMLRenderers);
+    FXMLRenderers.Add(FKeyboardXMLRenderer);
+    FXMLRenderers.Add(THotkeysXMLRenderer.Create(FXMLRenderers));
+    FXMLRenderers.Add(TOptionsXMLRenderer.Create(FXMLRenderers));
+    FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
+    FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
+
+    xml := FXMLRenderers.RenderToString(FRefreshKeyman, s);
+    sharedData.Init(
+      FXMLRenderers.TempPath,
+      xml,
+      FKeyboardXMLRenderer.FileReferences.ToStringArray
+    );
+  finally
+    FXMLRenderers.Free;
+  end;
 
   Content_Render('tag='+IntToStr(FPageTag));
 end;

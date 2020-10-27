@@ -21,6 +21,7 @@
   display: block; 
   padding: 4px 4px 4px 28px; 
   margin: 1px;
+  cursor: default;
 }
  
 .hover
@@ -34,4 +35,19 @@
 .down
 { 
   background: #DB704F; 
+}
+
+#menubackground {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(64,64,64,0.1);
+  display: none;
+}
+
+#menubackground.show {
+  display: block;
+  z-index: 99;
 }
