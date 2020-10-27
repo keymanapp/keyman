@@ -95,6 +95,11 @@ type
     FXMLRenderers: TXMLRenderers;
     wm_keyman_refresh: Integer;
 
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string;
+      isPopup, wasHandled: Boolean);
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
+      isPopup: Boolean; out Handled: Boolean);
+
     procedure Keyboard_Install;
     procedure Keyboard_Uninstall(Params: TStringList);
     procedure Keyboard_Options(Params: TStringList);
@@ -209,6 +214,8 @@ begin
 
   // Prevents keep-in-touch opening in browser
   cef.ShouldOpenRemoteUrlsInBrowser := False;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
 
   Icon.ReleaseHandle;
   Icon.Handle := DuplicateIcon(hInstance, Application.Icon.Handle);
@@ -553,6 +560,20 @@ begin
     kbd := nil;
     ShowKeyboardOptions(Self, kbdID);
   end;
+end;
+
+procedure TfrmMain.cefBeforeBrowse(Sender: TObject; const Url: string;
+  isPopup, wasHandled: Boolean);
+begin
+  if isPopup then
+    if not TUtilExecute.URL(Url) then
+      ShowMessage(SysErrorMessage(GetLastError));
+end;
+
+procedure TfrmMain.cefBeforeBrowseSync(Sender: TObject; const Url: string;
+  isPopup: Boolean; out Handled: Boolean);
+begin
+  Handled := isPopup;
 end;
 
 {-------------------------------------------------------------------------------
