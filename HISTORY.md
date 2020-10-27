@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.170 alpha 2020-10-27
+
+* fix(windows): Remove double refresh (#3754)
+* fix(windows): Keyman Configuration changes apply instantly (#3753)
+* fix(windows): Make help button work (#3760)
+* fix(windows): use new windows url for online update check (#3761)
+* fix(windows): Community button had wrong link (#3764)
+* fix(windows): Crash in Keep in Touch external link (#3763)
+* fix(windows): Fix multiple issues with UI locales (#3766)
+* fix(android/engine): Only get keyboard version for cloud/ (#3740)
+
 ## 14.0.169 alpha 2020-10-26
 
 * feat(common/core/web): simplify corrective distribution (#3726)
