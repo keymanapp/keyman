@@ -93,65 +93,50 @@ type
 
     FKeyboardXMLRenderer: TKeyboardListXMLRenderer;
     FXMLRenderers: TXMLRenderers;
-
-    DebuggingChecked: Boolean;   // I3630
-
-    dlgOpenAddin: TOpenDialog;
-    dlgOpenVisualKeyboard: TOpenDialog;
-
-    procedure dlgOpenVisualKeyboardCanClose(Sender: TObject; var CanClose: Boolean);
+    wm_keyman_refresh: Integer;
 
     procedure Keyboard_Install;
     procedure Keyboard_Uninstall(Params: TStringList);
     procedure Keyboard_Options(Params: TStringList);
-
     procedure Keyboards_Init;
-    function Keyboards_Save: Boolean;
-    function Options_Save: Boolean;
-    procedure Options_Init;
-    procedure InitNonVisualComponents;
+    procedure Keyboard_Download;
+    procedure KeyboardLanguage_Install(Params: TStringList);   // I3624
+    procedure KeyboardLanguage_Uninstall(Params: TStringList);   // I3624
+    function GetKeyboardLanguageFromParams(params: TStringList;
+      out kbdlang: IKeymanKeyboardLanguageInstalled): Boolean;   // I3624
     procedure Keyboard_ClickCheck(params: TStringList);
     function GetKeyboardFromParams(params: TStringList; out kbd: IKeymanKeyboardInstalled): Boolean;
+
     function GetPackageFromParams(params: TStringList; out pkg: IKeymanPackageInstalled): Boolean;
     procedure Package_Uninstall(Params: TStringList);
     procedure Package_Welcome(Params: TStringList);
-    procedure Footer_Ok;
-    procedure Footer_Cancel;
 
-    procedure Keyboard_InstallVisualKeyboard(params: TStringList);
-    procedure Keyboard_UninstallVisualKeyboard(params: TStringList);
-
+    procedure Options_Init;
     procedure Options_ClickCheck(params: TStringList);
     function GetOptionFromParams(params: TStringList; out option: IKeymanOption): Boolean;
     procedure Options_ResetHints;
     procedure Options_BaseKeyboard;   // I4169
     procedure Options_SettingsManager;
 
-    function GetHotkeyFromParams(params: TStringList;
-      out hotkey: IKeymanHotkey): Boolean;
     procedure Hotkey_Set(params: TStringList);
     procedure Hotkey_Clear(params: TStringList);
-    function Hotkeys_Save: Boolean;
+    function GetHotkeyFromParams(params: TStringList;
+      out hotkey: IKeymanHotkey): Boolean;
+    function GetHotkeyLanguageFromParams(params: TStringList; out lang: IKeymanLanguage): Boolean;
+
     procedure Support_Diagnostics;
     procedure Support_Online;
     procedure Support_UpdateCheck;
     procedure Support_ProxyConfig;
     procedure Support_ContactSupport(params: TStringList);   // I4390
+
     procedure OpenSite(params: TStringList);
     procedure RefreshKeymanConfiguration;
-    procedure Keyboard_Download;
-    function GetHotkeyLanguageFromParams(params: TStringList; out lang: IKeymanLanguage): Boolean;
-    function MustReboot: Boolean;
-    function SaveAll: Boolean;
-    procedure KeyboardLanguage_Install(Params: TStringList);   // I3624
-    procedure KeyboardLanguage_Uninstall(Params: TStringList);   // I3624
-    function GetKeyboardLanguageFromParams(params: TStringList;
-      out kbdlang: IKeymanKeyboardLanguageInstalled): Boolean;   // I3624
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
     class function ShouldRegisterWindow: Boolean; override;  // I2720
-    function ShouldSetAppTitle: Boolean; override;  // I2786
+    function ShouldSetAppTitle: Boolean; override;   // I2786
   public
     procedure Do_Content_Render(FRefreshKeyman: Boolean); override;
   end;
@@ -225,10 +210,6 @@ begin
   // Prevents keep-in-touch opening in browser
   cef.ShouldOpenRemoteUrlsInBrowser := False;
 
-  kmcom.AutoApply := False;
-
-  InitNonVisualComponents;
-
   Icon.ReleaseHandle;
   Icon.Handle := DuplicateIcon(hInstance, Application.Icon.Handle);
 
@@ -252,12 +233,6 @@ procedure TfrmMain.TntFormClose(Sender: TObject; var Action: TCloseAction);
 begin
   inherited;
   FClosing := True;
-
-  KL.Log('Testing kmcom.errors.rebootrequired: %s', [booltostr(kmcom.SystemInfo.RebootRequired)]);
-  if kmcom.SystemInfo.RebootRequired then
-    RunReboot('Windows must be restarted for changes to complete.  Restart now?',
-      'Windows did not initiate the restart successfully.  You will need to restart manually.');
-
   Action := caFree;
 end;
 
@@ -311,7 +286,7 @@ begin
     FKeyboardXMLRenderer.FileReferences.ToStringArray
   );
 
-  Content_Render(FRefreshKeyman, 'tag='+IntToStr(FPageTag));
+  Content_Render('tag='+IntToStr(FPageTag));
 end;
 
 procedure TfrmMain.FireCommand(const command: WideString; params: TStringList);
@@ -322,8 +297,6 @@ begin
   else if command = 'keyboard_uninstall' then Keyboard_Uninstall(params)
   else if command = 'keyboard_options' then Keyboard_Options(params)
   else if command = 'keyboard_clickcheck' then Keyboard_ClickCheck(params)
-  else if command = 'keyboard_installvisualkeyboard' then Keyboard_InstallVisualKeyboard(params)
-  else if command = 'keyboard_uninstallvisualkeyboard' then Keyboard_UninstallVisualKeyboard(params)
 
   else if command = 'keyboardlanguage_install' then KeyboardLanguage_Install(params)   // I3624
   else if command = 'keyboardlanguage_uninstall' then KeyboardLanguage_Uninstall(params)   // I3624
@@ -348,56 +321,11 @@ begin
 
   else if command = 'contact_support' then Support_ContactSupport(params)   // I4390
 
-
   else if command = 'opensite' then OpenSite(params)
-
-  else if command = 'footer_ok' then Footer_OK
-  else if command = 'footer_cancel' then Footer_Cancel
 
   else if command = 'help' then Application.HelpJump('context_'+lowercase(DialogName))
 
   else inherited;
-end;
-
-procedure TfrmMain.Footer_Cancel;
-begin
-  Close;
-  // Instantiate a new IKeyman, and Apply to force all changes to be consistent
-  CoKeyman.Create.Apply;
-end;
-
-function TfrmMain.SaveAll: Boolean;  // I2789
-begin
-  Result :=
-    Keyboards_Save and
-    Options_Save and
-    Hotkeys_Save;
-end;
-
-procedure TfrmMain.Footer_Ok;
-begin
-  kmcom.AutoApply := False;
-
-  if not SaveAll then Exit; // I2789
-
-  Close;
-
-  kmcom.Apply; // I1338 - eliminate unneccesary re-render
-end;
-
-procedure TfrmMain.InitNonVisualComponents;
-begin
-  dlgOpenAddin := TOpenDialog.Create(Self);
-  dlgOpenAddin.Filter :=
-      'Keyman add-ins (*.kma, *.kmp)|*.kma;*.kmp|Keyman add-in files (*' +
-      '.kma)|*.kma|Keyman packaged add-ins (*.kmp)|*.kmp|All files (*.*' +
-      ')|*.*';
-  dlgOpenAddin.Title := 'Install Add-in';
-
-  dlgOpenVisualKeyboard := TOpenDialog.Create(Self);
-  dlgOpenVisualKeyboard.Filter := 'On screen keyboard files (*.kvk)|*.kvk|All files (*.*)|*.*';
-  dlgOpenVisualKeyboard.Title := 'Install Keyman Keyboard';
-  dlgOpenVisualKeyboard.OnCanClose := dlgOpenVisualKeyboardCanClose;
 end;
 
 {-------------------------------------------------------------------------------
@@ -507,8 +435,6 @@ end;
 
 procedure TfrmMain.Keyboard_Install;
 begin
-  if MustReboot then Exit;  // I2789
-
   if TInstallFile.BrowseAndInstallKeyboardFromFile(Self) then
   begin
     RefreshKeymanConfiguration;
@@ -520,8 +446,6 @@ var
   kbd: IKeymanKeyboardInstalled;
   kbdID: WideString;
 begin
-  if MustReboot then Exit;  // I2789
-
   if GetKeyboardFromParams(params, kbd) then
   begin
     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
@@ -539,8 +463,6 @@ procedure TfrmMain.KeyboardLanguage_Uninstall(Params: TStringList);   // I3624
 var
   kbdlang: IKeymanKeyboardLanguageInstalled;
 begin
-  if MustReboot then Exit;  // I2789
-
   if GetKeyboardLanguageFromParams(params, kbdlang) then
   begin
     // TODO: refactor this away?
@@ -555,8 +477,6 @@ procedure TfrmMain.KeyboardLanguage_Install(Params: TStringList);   // I3624
 var
   kbd: IKeymanKeyboardInstalled;
 begin
-  if MustReboot then Exit;  // I2789
-
   if GetKeyboardFromParams(params, kbd) then
   begin
     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
@@ -577,8 +497,6 @@ var
   pkg: IKeymanPackageInstalled;
   pkgID: WideString;
 begin
-  if MustReboot then Exit;  // I2789
-
   if GetPackageFromParams(params, pkg) then
   begin
     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
@@ -589,19 +507,6 @@ begin
       RefreshKeymanConfiguration;
     end;
   end;
-end;
-
-function TfrmMain.MustReboot: Boolean;
-begin
-  KL.Log('Testing kmcom.errors.rebootrequired before install/uninstall of keyboards: %s', [booltostr(kmcom.SystemInfo.RebootRequired)]);
-  if kmcom.SystemInfo.RebootRequired then
-  begin
-    Result := True;
-    RunReboot('Windows must be restarted for changes to complete before you can install or uninstall any more keyboards.  Restart now?',
-      'Windows did not initiate the restart successfully.  You will need to restart manually.');
-  end
-  else
-    Result := False;
 end;
 
 procedure TfrmMain.Package_Welcome(Params: TStringList);
@@ -620,37 +525,15 @@ procedure TfrmMain.Keyboards_Init;
 begin
 end;
 
-function TfrmMain.Keyboards_Save: Boolean;
-begin
-  kmcom.Keyboards.Apply;
-  Result := True;
-end;
-
 procedure TfrmMain.Keyboard_ClickCheck(params: TStringList);
 var
   kbd: IKeymanKeyboardInstalled;
 begin
   if GetKeyboardFromParams(params, kbd) then
+  begin
     kbd.Loaded := StrToBool(params.Values['value']); //, 'true');
-end;
-
-procedure TfrmMain.Keyboard_InstallVisualKeyboard(params: TStringList);
-var
-  kbd: IKeymanKeyboardInstalled;
-begin
-  if GetKeyboardFromParams(params, kbd) and not Assigned(kbd.VisualKeyboard) then
-    if dlgOpenVisualKeyboard.Execute then
-    begin
-      try
-        kbd.InstallVisualKeyboard(dlgOpenVisualKeyboard.FileName);
-      except
-        on E:EOleException do // I1084, I1005 - Installing an invalid KVK file
-          ShowMessage(E.Message);
-      end;
-      kbd := nil; // I773 - mcd - because Do_Content_Render reloads the keyman objects when Refresh-Keyman=true
-      Do_Content_Render(True);
-    end;
-  kbd := nil;
+    kmcom.Keyboards.Apply;
+  end;
 end;
 
 procedure TfrmMain.Keyboard_Options(Params: TStringList);
@@ -670,60 +553,6 @@ begin
     kbd := nil;
     ShowKeyboardOptions(Self, kbdID);
   end;
-end;
-
-procedure TfrmMain.Keyboard_UninstallVisualKeyboard(params: TStringList);
-var
-  kbd: IKeymanKeyboardInstalled;
-  vk: IKeymanVisualKeyboard;
-begin
-  if GetKeyboardFromParams(params, kbd) then
-  begin
-    vk := kbd.VisualKeyboard;
-    if Assigned(vk) and (MessageDlg(MsgFromIdFormat(SKUninstallOnScreenKeyboard, [kbd.Name]),
-      mtConfirmation, mbOkCancel, 0) = mrOk) then
-    begin
-      try
-        vk.Uninstall;
-        vk := nil;
-      except
-        on E:EOleException do // I1084, I1005 - Installing an invalid KVK file
-          ShowMessage(E.Message);
-      end;
-      kbd := nil; // I773 - mcd - because Do_Content_Render reloads the keyman objects when Refresh-Keyman=true
-      Do_Content_Render(True);
-    end;
-    kbd := nil;
-  end;
-end;
-
-procedure TfrmMain.dlgOpenVisualKeyboardCanClose(Sender: TObject; var CanClose: Boolean);
-begin
-{  CanClose := False;
-  if FileExists(dlgOpenVisualKeyboard.FileName) then
-  begin
-    try
-      with TVisualKeyboard.Create do
-      try
-        LoadFromFile(dlgOpenVisualKeyboard.FileName);
-        if LowerCase(Header.AssociatedKeyboard) =
-            LowerCase(SelectedRegKeyboard.Name) then
-          CanClose := True
-        else if MessageDlg('This visual keyboard is not designed for the keyboard you have selected.  Use it anyway?',
-            mtConfirmation, mbOkCancel, 0) = mrOk then
-          CanClose := True;
-      finally
-        Free;
-      end;
-    except
-      on E:Exception do
-      begin
-        WideShowMessage(E.Message);
-        CanClose := False;
-      end;
-    end;
-    //if IsVisualKeyboardAssociatedWithCorrectFile then CanClose := True;
-  end;}
 end;
 
 {-------------------------------------------------------------------------------
@@ -758,6 +587,14 @@ begin
   if GetOptionFromParams(params, option) and option.Enabled then
   begin
     option.Value := not option.Value;
+
+    if (option.ID = 'koDebugging') and option.Value then
+      ShowMessage(MsgFromId(SKDebuggingWarning));
+
+    kmcom.Errors.Clear;
+    kmcom.Options.Apply;
+    if kmcom.Errors.Count > 0 then
+      ShowMessage(kmcom.Errors[0].Description);
   end
   else
     ShowMessage(params.Text);
@@ -765,28 +602,12 @@ end;
 
 procedure TfrmMain.Options_Init;
 begin
-  DebuggingChecked := kmcom.Options['koDebugging'].Value;   // I3630
 end;
 
 procedure TfrmMain.Options_ResetHints;
 begin
   ResetAllHints;
   ShowMessage(MsgFromId(SKHintsReset));
-end;
-
-function TfrmMain.Options_Save: Boolean;
-begin
-  if (kmcom.Options['koDebugging'].Value <> DebuggingChecked) and kmcom.Options['koDebugging'].Value then
-    ShowMessage(MsgFromId(SKDebuggingWarning));
-
-  kmcom.Errors.Clear;
-  kmcom.Options.Apply;
-  if kmcom.Errors.Count > 0 then
-    ShowMessage(kmcom.Errors[0].Description);
-
-  DebuggingChecked := kmcom.Options['koDebugging'].Value;
-
-  Result := True;
 end;
 
 {-------------------------------------------------------------------------------
@@ -800,20 +621,23 @@ var
 begin
   if GetHotkeyLanguageFromParams(params, lang2) then
   begin
-    if ChangeHotkey(Self, MsgFromIdFormat(SKSetHotkey_Language, [lang2.LocaleName + ' ('+lang2.LayoutName+')']), lang2.Hotkey) then
-    begin
-      Do_Content_Render(False);
-    end;
+    if not ChangeHotkey(Self, MsgFromIdFormat(SKSetHotkey_Language, [lang2.LocaleName + ' ('+lang2.LayoutName+')']), lang2.Hotkey) then
+      Exit;
+    kmcom.Languages.Apply;
   end
   else if GetHotkeyFromParams(params, hotkey) then
   begin
-    if ChangeHotkey(Self, MsgFromId(SKSetHotkey_Interface), hotkey) then
-    begin
-      Do_Content_Render(False);
-    end;
+    if not ChangeHotkey(Self, MsgFromId(SKSetHotkey_Interface), hotkey) then
+      Exit;
+    kmcom.Hotkeys.Apply;
   end
   else
+  begin
     ShowMessage(params.Text);
+    Exit;
+  end;
+
+  Do_Content_Render(False);
 end;
 
 procedure TfrmMain.Hotkey_Clear(params: TStringList);
@@ -824,19 +648,17 @@ begin
   if GetHotkeyLanguageFromParams(params, lang2) then
   begin
     lang2.Hotkey.Clear;
-    Do_Content_Render(False);
+    kmcom.Languages.Apply;
   end
   else if GetHotkeyFromParams(params, hotkey) then
   begin
     hotkey.Clear;
-    Do_Content_Render(False);
+    kmcom.Hotkeys.Apply;
   end
-end;
+  else
+    Exit;
 
-function TfrmMain.Hotkeys_Save: Boolean;
-begin
-  kmcom.Hotkeys.Apply;
-  Result := True;
+  Do_Content_Render(False);
 end;
 
 {-------------------------------------------------------------------------------
@@ -888,7 +710,7 @@ begin
             on E:Exception do KL.Log(E.Message);
           end;
         end;
-      oucSuccess, oucSuccessReboot:
+      oucSuccess:
         RefreshKeymanConfiguration;
     end
   finally

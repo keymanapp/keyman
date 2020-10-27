@@ -47,7 +47,7 @@ uses
 type
   EOnlineUpdateCheck = class(Exception);
 
-  TOnlineUpdateCheckResult = (oucUnknown, oucShutDown, oucSuccess, oucNoUpdates, oucFailure, oucSuccessReboot, oucOffline);
+  TOnlineUpdateCheckResult = (oucUnknown, oucShutDown, oucSuccess, oucNoUpdates, oucFailure, oucOffline);
 
   TOnlineUpdateCheckParamsPackage = record
     ID: string;
@@ -194,7 +194,7 @@ function TOnlineUpdateCheck.Run: TOnlineUpdateCheckResult;
 begin
   Result := DoRun;
 
-  if Result in [oucShutDown, oucSuccess, oucSuccessReboot] then
+  if Result in [oucShutDown, oucSuccess] then
   begin
     kmcom.Keyboards.Refresh;
     kmcom.Keyboards.Apply;
@@ -487,9 +487,6 @@ begin
       end;
     end;
   end;
-
-  if (FParams.Result = oucSuccess) and kmcom.SystemInfo.RebootRequired then
-    FParams.Result := oucSuccessReboot;
 end;
 
 procedure TOnlineUpdateCheck.ShutDown;

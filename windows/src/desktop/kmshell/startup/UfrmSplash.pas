@@ -278,10 +278,6 @@ begin
 
     until False;
 
-    if kmcom.SystemInfo.RebootRequired then
-      RunReboot('Windows must be restarted for changes to complete.  Restart now?',
-        'Windows did not initiate the restart successfully.  You will need to restart manually.');
-
     if kmcom.Options[KeymanOptionName(TUtilKeymanOption.koCheckForUpdates)].Value then
     begin
       if not kmcom.Control.IsOnlineUpdateCheckOpen then

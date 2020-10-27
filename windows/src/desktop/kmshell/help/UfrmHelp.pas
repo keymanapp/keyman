@@ -131,7 +131,7 @@ begin
     then FQuery := Format('?keyboard=%s', [UrlEncode(FActiveKeyboard.Name)])
     else FQuery := '';
 
-  Content_Render(False, FQuery);
+  Content_Render(FQuery);
   inherited;
 end;
 

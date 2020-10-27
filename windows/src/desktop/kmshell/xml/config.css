@@ -128,6 +128,12 @@
   border-right: 1px solid #6D6C6F;
 }
 
+.footer_instant {
+  font-size: 12px;
+  padding-top: 3px;
+  padding-right: 3px;
+}
+
 input[type='submit'], input[type='button'], button
 {
   background: #F68924;
