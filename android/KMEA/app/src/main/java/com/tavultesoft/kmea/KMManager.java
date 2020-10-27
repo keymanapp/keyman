@@ -1393,7 +1393,7 @@ public final class KMManager {
         kbVersion = kbInfo.getVersion();
         if (kbVersion != null) {
           // See if update is available
-          if (kbInfo.hasUpdateAvailable(kbVersion)) {
+          if (kbInfo.hasUpdateAvailable()) {
             kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
           } else {
             kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;

@@ -102,7 +102,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
     // Display notification to download update if available
-    if (kbd.hasUpdateAvailable(kbVersion)) {
+    if (kbd.hasUpdateAvailable()) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, kbVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }

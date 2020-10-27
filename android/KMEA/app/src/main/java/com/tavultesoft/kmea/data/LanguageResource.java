@@ -67,18 +67,12 @@ public abstract class LanguageResource implements Serializable {
 
   /**
    * Helper method if the language resource has an updated kmp package available to download from the cloud
-   * The version in the kmp link is compared to the currentVersion
-   * @param currentVersion String of the currently installed version
    * @return boolean true if an updated kmp package is available
    */
-  public boolean hasUpdateAvailable(String currentVersion) {
+  public boolean hasUpdateAvailable() {
     boolean updateAvailable = false;
     if (kmp != null && !kmp.isEmpty()) {
-      Uri uri = Uri.parse(kmp);
-      String availableVersion = uri.getQueryParameter("version");
-      if (FileUtils.compareVersions(currentVersion, availableVersion) == FileUtils.VERSION_LOWER) {
-        updateAvailable = true;
-      }
+      updateAvailable = true;
     }
 
     return updateAvailable;
