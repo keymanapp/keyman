@@ -560,6 +560,8 @@ end;
 
 procedure THTTPUploader.ReadResponseBody(hRequest: HINTERNET);
 var
+  ShortURL: string;
+  SplitURL: TArray<string>;
 	dwBufferLength, dwReserved, dwBytesRead, dwTotalBytes, dwBytesAvailable: DWORD;
   pMessageBody, p: PAnsiChar;
 begin
@@ -573,7 +575,10 @@ begin
   if not HttpQueryInfoA(hRequest, HTTP_QUERY_CONTENT_LENGTH or HTTP_QUERY_FLAG_NUMBER, @dwTotalBytes, dwBufferLength, dwReserved) then   // I4989
     dwTotalBytes := 0;
 
-  DoStatus('Downloading', 0, dwTotalBytes);
+  SplitURL := Request.URL.Split(['?'], MaxInt);
+  SplitURL := SplitURL[0].Split(['/'], MaxInt);
+  ShortURL := SplitURL[High(SplitURL)];
+  DoStatus('Downloading '+ShortURL, 0, dwTotalBytes);
 
   dwBytesAvailable := 65536;
   dwBytesRead := 1;
@@ -601,7 +606,7 @@ begin
       Inc(p, FResponse.MessageBodyLength);
       CopyMemory(p, pMessageBody, dwBytesRead);
       FResponse.MessageBodyLength := FResponse.MessageBodyLength + Integer(dwBytesRead);
-      DoStatus('Downloading', FResponse.MessageBodyLength, dwTotalBytes);
+      DoStatus('Downloading '+ShortURL, FResponse.MessageBodyLength, dwTotalBytes);
 
       DoProcessMessages;
     end;

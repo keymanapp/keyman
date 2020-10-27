@@ -724,6 +724,8 @@ extern "C" DWORD _declspec(dllexport) WINAPI GetActiveKeymanID()
 //
 //---------------------------------------------------------------------------------------------------------
 
+// This function prevents a refresh event from being processed more than once
+// by a thread, for instance if a thread has multiple top-level windows
 BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
@@ -734,35 +736,46 @@ BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
     return TRUE;
   }
   return FALSE;
-  /*LONG lOriginal, lResult;
-  do {
-    lOriginal = _td->RefreshTag_Process;
-    lResult = max(lOriginal, tag);
-  } while(InterlockedCompareExchange(&_td->RefreshTag_Process, lResult, lOriginal) != lOriginal);
-    
-  return lResult > lOriginal;*/
 }
 
 void HandleRefresh(int code, LONG tag)
 {
 	switch(code)
 	{
-	case KR_REQUEST_REFRESH: 
+	case KR_REQUEST_REFRESH:
+    // This is sent by Keyman COM API, ApplyToRunningKeymanEngine
 		SendDebugMessageFormat(0,sdmGlobal,0,"#### Refresh Requested ####");
-		//PostMessage(GetDesktopWindow(), wm_keyman_refresh, KR_PRE_REFRESH, 0);
+
+    // We ask any controller window to tell all instances of keyman32/keyman64
+    // that a refresh is coming through
 		Globals::PostControllers(wm_keyman_refresh, KR_PRE_REFRESH, 0);
+
+    // We need to tell the controller windows to refresh themselves also
 		Globals::PostControllers(wm_keyman_control, KMC_REFRESH, 0);
 		break;
 
 	case KR_PRE_REFRESH:
+#ifndef _WIN64
+    // We only need to broadcast the message from Win32; this avoids
+    // a double-broadcast which could happen if both keyman32 and keyman64
+    // receive the message, as they have independently managed RefreshTags
+
+    // All controllers will receive this message; only one need act on it
     tag = InterlockedIncrement(Globals::RefreshTag());
     
-    if(UpdateRefreshTag(tag))
-  		RefreshKeyboards(FALSE); // The Keyman window gets the update first
-    PostMessage(HWND_BROADCAST, wm_keyman_refresh, KR_REFRESH, tag);
-		break;
+    if (UpdateRefreshTag(tag)) {
+      // The Keyman process gets the update first
+      RefreshKeyboards(FALSE); 
+      PostMessage(HWND_BROADCAST, wm_keyman_refresh, KR_REFRESH, tag);
+    }
+#endif
+
+    break;
 
 	case KR_REFRESH:
+    // All threads need to have their keyboard list
+    // refreshed after an update, but only once per
+    // refresh request
     if(UpdateRefreshTag(tag))
       RefreshKeyboards(FALSE);
 

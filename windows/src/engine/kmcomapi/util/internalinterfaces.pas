@@ -89,8 +89,6 @@ type
   IIntKeymanPackagesInstalled = IIntKeymanCollection;
 
   IIntKeymanSystemInfo = interface(IIntKeymanInterface)
-    ['{90E3F800-E232-4C12-B7B0-7EFE43B71585}']
-    procedure SetReboot; safecall;
   end;
 
   IIntKeymanOptions = IIntKeymanCollection;
