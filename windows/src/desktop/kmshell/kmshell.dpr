@@ -176,7 +176,9 @@ uses
   Keyman.System.SettingsManager in '..\..\global\delphi\general\Keyman.System.SettingsManager.pas',
   Keyman.Configuration.UI.UfrmSettingsManager in 'settings\Keyman.Configuration.UI.UfrmSettingsManager.pas' {frmSettingsManager},
   Keyman.Configuration.UI.UfrmSettingsAddTSFApp in 'settings\Keyman.Configuration.UI.UfrmSettingsAddTSFApp.pas' {frmSettingsAddTSFApp},
-  Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas';
+  Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas',
+  Keyman.System.KeymanStartTask in 'util\Keyman.System.KeymanStartTask.pas',
+  TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

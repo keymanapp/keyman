@@ -447,6 +447,8 @@ const
 
   SRegValue_Flag_UseRegisterHotkey = 'Flag_UseRegisterHotkey';
   SRegValue_Flag_ShouldSerializeInput = 'Flag_ShouldSerializeInput';
+  SRegValue_Flag_UseAutoStartTask = 'Flag_UseAutoStartTask';
+
 // Fixed path names
 const
   // PF = CSIDL_PROGRAM_FILES
