@@ -91,10 +91,6 @@ type
     FPageTag: Integer;
     FClosing: Boolean;
 
-    FKeyboardXMLRenderer: TKeyboardListXMLRenderer;
-    FXMLRenderers: TXMLRenderers;
-    wm_keyman_refresh: Integer;
-
     procedure cefBeforeBrowse(Sender: TObject; const Url: string;
       isPopup, wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
