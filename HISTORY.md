@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.171 alpha 2020-10-28
+
+* fix(android/browser): Fix slow input in embedded browser (WebViews) (#3768)
+* chore(common/models): fixes context tracking with accepted suggestions (#3767)
+* chore(windows): small cleanups (#3774)
+
 ## 14.0.170 alpha 2020-10-27
 
 * fix(windows): Remove double refresh (#3754)
