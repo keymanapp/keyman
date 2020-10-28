@@ -60,6 +60,10 @@ extern const int VKContextReset[256];
 
 DWORD TSFShiftToShift(LPARAM shift);   // I3588
 
+extern "C" __declspec(dllexport) BOOL WINAPI TIPIsKeymanRunning() {
+  return Globals::get_Keyman_Initialised() && !Globals::get_Keyman_Shutdown();
+}
+
 extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) {   // I3581
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
