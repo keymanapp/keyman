@@ -46,6 +46,26 @@ interface WordBreakerSpec {
 type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
 
 /**
+ * Simplifies input text to facilitate finding entries within a lexical model's
+ * lexicon.
+ * @since 11.0
+ */
+type SimpleWordformToKeySpec = (term: string) => string;
+
+/**
+ * Simplifies input text to facilitate finding entries within a lexical model's
+ * lexicon, using the model's `applyCasing` function to assist in the keying process.
+ * @since 14.0
+ */
+ type CasedWordformToKeySpec = (term: string, applyCasing?: CasingFunction) => string;
+
+/**
+ * Simplifies input text to facilitate finding entries within a lexical model's
+ * lexicon.
+ */
+type WordformToKeySpec = SimpleWordformToKeySpec | CasedWordformToKeySpec;
+
+/**
  * Override the default word breaking behaviour for some scripts.
  *
  * There is currently only one option:
@@ -80,6 +100,28 @@ interface LexicalModelSource extends LexicalModelDeclaration {
   readonly rootClass?: string
 
   /**
+   * Indicates that the language being modeled has syntactic casing rules.  When set to 
+   * `true`, suggestions will attempt to match the case of the input text even if
+   * the lexicon entries use a different casing scheme due to search term keying effects.
+   * @since 14.0
+   */
+  readonly languageUsesCasing?: boolean
+
+  /**
+   * Specifies the casing rules for a language.  Should implement three casing forms:
+   * - 'lower' -- a fully-lowercased version of the text appropriate for the language's
+   *   use of the writing system.
+   * - 'upper' -- a fully-uppercased version of the text
+   * - 'initial' -- a version preserving the input casing aside from the initial character,
+   *   which is uppercased (like with proper nouns and sentence-initial words in English
+   *   sentences.)
+   * 
+   * This is only utilized if `languageUsesCasing` is defined and set to `true`.
+   * @since 14.0
+   */
+  readonly applyCasing?: CasingFunction
+
+  /**
    * Which word breaker to use. Choose from:
    *
    *  - 'default' -- breaks according to Unicode UAX #29 §4.1 Default Word
@@ -91,10 +133,10 @@ interface LexicalModelSource extends LexicalModelDeclaration {
   readonly wordBreaker?: WordBreakerSpec | SimpleWordBreakerSpec;
 
   /**
-   * How to simplify words, to convert them into simplifired search keys
+   * How to simplify words, to convert them into simplified search keys
    * This often involves removing accents, lowercasing, etc.
    */
-  readonly searchTermToKey?: (term: string) => string;
+  readonly searchTermToKey?: WordformToKeySpec;
 
   /**
    * Punctuation and spacing suggested by the model.

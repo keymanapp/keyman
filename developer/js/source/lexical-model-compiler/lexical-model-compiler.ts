@@ -8,7 +8,7 @@
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
-import { createTrieDataStructure, defaultSearchTermToKey } from "./build-trie";
+import { createTrieDataStructure, defaultCasedSearchTermToKey, defaultSearchTermToKey } from "./build-trie";
 import {decorateWithJoin} from "./join-word-breaker-decorator";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator";
 
@@ -50,7 +50,22 @@ export default class LexicalModelCompiler {
         let filenames = modelSource.sources.map(filename => path.join(sourcePath, filename));
 
         // Use the default search term to key function, if left unspecified.
-        let searchTermToKey = modelSource.searchTermToKey || defaultSearchTermToKey;
+        // TODO:  Ensuring it compiles properly.  This block is kinda pseudocode.
+        let searchTermToKey: WordformToKeySpec = modelSource.searchTermToKey 
+        if(!searchTermToKey) {
+          if(modelSource.languageUsesCasing) {
+            // TODO:  flesh out properly.  Refer to `wordBreakerSourceCode` below?
+            // This line is kinda pseudocode.
+            // The result value needs to be accessible separately so that the custom
+            // applyCasing is defined on the model.
+            let applyCasingSourceCode = modelSource.applyCasing;
+            searchTermToKey = defaultCasedSearchTermToKey(applyCasingSourceCode);
+          } else if(modelSource.languageUsesCasing == false) {
+            searchTermToKey = defaultSearchTermToKey;
+          } else {
+            searchTermToKey = defaultCasedSearchTermToKey(defaultApplyCasingSourceCode);
+          }
+        }
 
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(filenames, searchTermToKey)

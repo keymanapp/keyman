@@ -493,12 +493,18 @@ namespace Trie {
  * language. There is a chance the default will work properly out of the box.
  */
 export function defaultSearchTermToKey(wordform: string): string {
-  return Array.from(wordform)
-    .map(c => c.toLowerCase())
-    .join('')
-    .normalize('NFKD')
-    // Remove any combining diacritics (if input is in NFKD)
-    .replace(/[\u0300-\u036F]/g, '');
+  return wordform
+      .normalize('NFKD')
+      // Remove any combining diacritics (if input is in NFKD)
+      .replace(/[\u0300-\u036F]/g, '');
+}
+
+export function defaultCasedSearchTermToKey(applyCasing: CasingFunction): WordformToKeySpec {
+  return function(wordform: string) {
+    return Array.from(defaultSearchTermToKey(wordform))
+             .map(c => applyCasing('lower', c))
+             .join('');
+  }
 }
 
 

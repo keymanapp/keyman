@@ -117,8 +117,7 @@ declare interface LexicalModel {
    * @param form 
    * @param text 
    */
-  applyCasing?(form: CasingEnum, text: string,
-              defaultApplyCasing: (form: CasingEnum, text: string) => string): string
+  applyCasing?(form: CasingEnum, text: string): string
 
   /**
    * Indicates a mapping function used by the model to simplify lookup operations

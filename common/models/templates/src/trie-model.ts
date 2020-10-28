@@ -96,6 +96,9 @@
     readonly applyCasing?: CasingFunction;
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
+      this.languageUsesCasing = options.languageUsesCasing;
+      this.applyCasing = options.applyCasing;
+
       this._trie = new Trie(
         trieData['root'],
         trieData['totalWeight'],
@@ -103,9 +106,6 @@
       );
       this.breakWords = options.wordBreaker || getDefaultWordBreaker();
       this.punctuation = options.punctuation;
-      this.languageUsesCasing = options.languageUsesCasing;
-      
-      this.applyCasing = options.applyCasing;
     }
 
     configure(capabilities: Capabilities): Configuration {
