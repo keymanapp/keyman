@@ -100,35 +100,9 @@
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
-   // I3616   // I4169   // I5136
-//
-// WARNING: Virtual key output is partially supported in this file, however
-//			it has never been fully debugged; several known problems exist:
-//				1) Interference with backspace			
-//				2) Performance hit
-//			some code has been commented out; you may wish to debug and
-//			uncomment this code if you find it necessary to support it.
-//			(We also ran out of time in testing and debugging it; it is
-//			very complex and totally illogical - just to encourage you to
-//			start with it!)
-//
 
 #include "pch.h"
 #include "serialkeyeventserver.h"
-
-/*
- If DEBUG is defined, give information in the map file about PRIVATE (=static)
- functions that don't normally appear in the map file.
-*/
-
-//#define CERTCHECK_DISABLE
-
-#define KEYMAN_MSGFLAG 0x4000000L
-#define DEBUGLOG
-
-LRESULT CALLBACK kmnKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
-int MapVirtualKeys(int keyCode, UINT shiftFlags);
-int KPostMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 HINSTANCE g_hInstance;
 
@@ -138,16 +112,6 @@ HINSTANCE g_hInstance;
 /*                                                                                         */ 
 /*******************************************************************************************/ 
 
-BOOL TestDebugProcess()
-{
-  /*WCHAR buf[260];
-  GetModuleFileNameW(NULL, buf, 260);
-  if(wcsicmp(buf, L"c:\\temp\\keymanx64.exe") != 0) return FALSE;*/
-  return TRUE;
-}
-
-BOOL ShouldAttachToProcess();
-
 BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved) 
 {
   UNREFERENCED_PARAMETER(reserved);
@@ -155,46 +119,27 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 	switch(fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-    //if(!TestDebugProcess()) return FALSE;
-    //if(!ShouldAttachToProcess()) return FALSE;
-    OutputThreadDebugString("DLL_PROCESS_ATTACH");
+    //OutputThreadDebugString("DLL_PROCESS_ATTACH");
     if(!Globals_InitProcess()) return FALSE;
 		break;
 	case DLL_PROCESS_DETACH:
-    //if(!TestDebugProcess()) return FALSE;
     if (reserved == NULL) {
-      OutputThreadDebugString("DLL_PROCESS_DETACH not terminating");
       // If reserved == NULL, that means the library is being unloaded, but
       // the process is not terminating.
-      //
-      // We only cleanup after ourselves if the process is not terminating
-      // because of an issue with the order of DLL detach: if msctf.dll is
-      // detached first, then we end up causing an exception in msctf when
-      // we try to do our cleanup in CloseTSF.
-      //
-      // https://devblogs.microsoft.com/oldnewthing/20120105-00/?p=8683
-      //
-      // See https://github.com/keymanapp/keyman/issues/1723 for details
-      // relating to SumatraPDF. Note that this is hard to reproduce; I
-      // have been unable to reproduce the issue on my test machines.
-      //
-      // Note: Keyman may be violating a loader lock rule by calling 
-      // CloseTSF from here. This needs further investigation...
+      //OutputThreadDebugString("DLL_PROCESS_DETACH not terminating");
       UninitialiseProcess(FALSE);
       Globals_UninitProcess();
     }
     else {
-      OutputThreadDebugString("DLL_PROCESS_DETACH terminating");
+      //OutputThreadDebugString("DLL_PROCESS_DETACH terminating");
     }
 		break;
 	case DLL_THREAD_ATTACH:
-    //if(!TestDebugProcess()) return FALSE;
-    OutputThreadDebugString("DLL_THREAD_ATTACH");
+    //OutputThreadDebugString("DLL_THREAD_ATTACH");
     Globals_InitThread();
 		break;
 	case DLL_THREAD_DETACH:
-    //if(!TestDebugProcess()) return FALSE;
-    OutputThreadDebugString("DLL_THREAD_DETACH");
+    //OutputThreadDebugString("DLL_THREAD_DETACH");
     UninitialiseProcess(FALSE);
     Globals_UninitThread();
 		break;
@@ -204,9 +149,13 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 
 void UninitDebuggingEx();
 
+/**
+ * Frees memory and cleans up
+ *
+ * @param Lock    If FALSE, does not attempt to release other DLLs (e.g. call()ed DLLs)
+ */
 BOOL UninitialiseProcess(BOOL Lock) 
 {
-  //SendDebugMessageFormat(0, sdmGlobal, 0, "DLL_PROCESS_DETACH");
   if(!Globals_ProcessInitialised()) return TRUE;
 
 	ReleaseKeyboards(Lock);
@@ -981,6 +930,7 @@ void RefreshKeyboards(BOOL Initialising)
 
   _td->FInRefreshKeyboards = FALSE;
 }
+
 void ReleaseKeyboards(BOOL Lock)
 {
   OutputThreadDebugString("ReleaseKeyboards");
@@ -1030,71 +980,6 @@ PWSTR GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
 
   return NULL;
 }
-
-
-BOOL ShouldAttachToProcess()
-{
-  return TRUE;
-#if 0
-  char buf[MAX_PATH];  -- if you return false, the DLL repeatedly attempts to attach to the process for every message received by the process -- oops!
-
-  HINSTANCE hinst = GetModuleHandle(LIBRARY_NAME);
-
-  if(!GetModuleFileName(hinst, buf, MAX_PATH)) return 0;
-  
-	char drive[_MAX_DRIVE], dir[_MAX_DIR];
-
-	_splitpath_s(buf, drive, _countof(drive), dir, _countof(dir), NULL, 0, NULL, 0);   // I3547
-	_makepath_s(buf, _countof(buf), drive, dir, "process", ".cfg");   // I3547
-
-  HANDLE hConfig = CreateFile(buf, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-  if(hConfig != INVALID_HANDLE_VALUE)
-  {
-    DWORD sz = 0;
-    if(ReadFile(hConfig, buf, MAX_PATH-1, &sz, NULL))
-    {
-      CloseHandle(hConfig);
-      assert(sz < MAX_PATH);
-      buf[sz] = 0;
-      _strlwr(buf);
-      if(strstr(buf, "attachtoallprocesses") != NULL) return TRUE;
-    }
-    else
-      CloseHandle(hConfig);
-  }
-
-  if(!GetModuleFileName(NULL, buf, MAX_PATH)) return 0;
-  
-  char *p = buf + lstrlen(buf) - lstrlen("cmd.exe");
-  if(p >= buf && !lstrcmpi(p, "cmd.exe")) return 0; /* NEVER, EVER, ATTACH TO CMD */
-  if(p >= buf && !lstrcmpi(p, "dwm.exe")) return 0; /* NEVER, EVER, ATTACH TO DWM */
-
-  p = buf + lstrlen(buf) - lstrlen("csrss.exe");
-  if(p >= buf && !lstrcmpi(p, "csrss.exe")) return 0; /* NEVER, EVER, ATTACH TO CSRSS */
-  if(p >= buf && !lstrcmpi(p, "lsass.exe")) return 0; /* NEVER, EVER, ATTACH TO CSRSS */
-  if(p >= buf && !lstrcmpi(p, "mstsc.exe")) return 0; /* NEVER, EVER, ATTACH TO RDPCLIENT */
-
-  p = buf + lstrlen(buf) - lstrlen("ehmsas.exe");
-  if(p >= buf && !lstrcmpi(p, "ehmsas.exe")) return 0; /* NEVER, EVER, ATTACH TO ehmsas */
-
-  p = buf + lstrlen(buf) - lstrlen("regedit.exe");
-  if(p >= buf && !lstrcmpi(p, "svchost.exe")) return 0; /* NEVER, EVER, ATTACH TO SVCHOST */
-  if(p >= buf && !lstrcmpi(p, "wininit.exe")) return 0; /* NEVER, EVER, ATTACH TO WININIT */
-  if(p >= buf && !lstrcmpi(p, "rdpclip.exe")) return 0; /* NEVER, EVER, ATTACH TO WININIT */
-  if(p >= buf && !lstrcmpi(p, "wuauclt.exe")) return 0; /* NEVER, EVER, ATTACH TO WINDEBUG */
-
-  p = buf + lstrlen(buf) - lstrlen("winlogon.exe");
-  if(p >= buf && !lstrcmpi(p, "services.exe")) return 0; /* NEVER, EVER, ATTACH TO SERVICES */
-  if(p >= buf && !lstrcmpi(p, "winlogon.exe")) return 0; /* NEVER, EVER, ATTACH TO WINLOGON */
-  if(p >= buf && !lstrcmpi(p, "windebug.exe")) return 0; /* NEVER, EVER, ATTACH TO WINDEBUG */
-
-  p = buf + lstrlen(buf) - lstrlen("vmwareuser.exe");
-  if(p >= buf && !lstrcmpi(p, "vmwareuser.exe")) return 0; /* NEVER, EVER, ATTACH TO VMWAREUSER */
-
-  return TRUE;
-#endif
-}
-
 
 void PostDummyKeyEvent() {  // I3301 - Handle I3250 regression with inadvertent menu activation with Alt keys   // I3534   // I4844
   keybd_event((BYTE) Globals::get_vk_prefix(), SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0); // I3250 - is this unnecessary?

@@ -72,7 +72,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) 
       for(int j = 0; j < _td->lpKeyboards[i].nProfiles; j++) {
         if(IsEqualGUID(_td->lpKeyboards[i].Profiles[j].Guid, *profile)) {
           SelectKeyboard(_td->lpKeyboards[i].KeymanID);   // I3594
-          ReportActiveKeyboard(_td, PC_UPDATE);   // I3961
+          ReportActiveKeyboard(PC_UPDATE);   // I3961
           return TRUE;
         }
       }
@@ -81,7 +81,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) 
 
   SendDebugMessage(0, sdmAIDefault, 0, "TIPActivateKeyboard: Could not find profile");
   SelectKeyboard(KEYMANID_NONKEYMAN);   // I3594
-  ReportActiveKeyboard(_td, PC_UPDATE);   // I3961
+  ReportActiveKeyboard(PC_UPDATE);   // I3961
   return FALSE;
 }
 
