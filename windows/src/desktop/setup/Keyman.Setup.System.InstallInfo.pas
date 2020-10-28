@@ -449,7 +449,7 @@ begin
       else if zip.IndexOf('kmp.inf') >= 0 then
       begin
         // Read kmp.inf (phooey)
-        zip.Extract('kmp.inf', FTempPath + 'kmp.inf', False);
+        zip.Extract('kmp.inf', FTempPath, False);
         p.FileName := FTempPath + 'kmp.inf';
         p.LoadIni;
         Exit(True);
