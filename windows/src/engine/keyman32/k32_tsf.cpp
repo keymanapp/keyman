@@ -69,82 +69,47 @@ public
 };
 #endif
 
-BOOL OpenTSF(PKEYMAN64THREADDATA _td)
-{
-  if(_td->TSFFailed) return FALSE;
-  
-  if(_td->pInputProcessorProfileMgr != NULL) return TRUE;
+BOOL OpenTSF(PTSFINTERFACES pTSF) {
+  if(pTSF->pInputProcessorProfileMgr != NULL) return TRUE;
 
-  _td->hMSCTF = LoadLibrary(TEXT("msctf.dll"));
-  if(_td->hMSCTF != NULL)
-  {
+  pTSF->hMSCTF = LoadLibrary(TEXT("msctf.dll"));
+  if(pTSF->hMSCTF != NULL) {
     PTF_CREATEINPUTPROCESSORPROFILES pfnCreateInputProcessorProfiles;
-    pfnCreateInputProcessorProfiles = (PTF_CREATEINPUTPROCESSORPROFILES)GetProcAddress(_td->hMSCTF, "TF_CreateInputProcessorProfiles");
+    pfnCreateInputProcessorProfiles = (PTF_CREATEINPUTPROCESSORPROFILES)GetProcAddress(pTSF->hMSCTF, "TF_CreateInputProcessorProfiles");
 
-    if(pfnCreateInputProcessorProfiles)
-    {
+    if(pfnCreateInputProcessorProfiles) {
       HRESULT hr;
 
-      hr = (*pfnCreateInputProcessorProfiles)(&_td->pInputProcessorProfiles);
-      if(SUCCEEDED(hr))
-      {
-        //_td->pSink = new KeymanLangProfileNotifySink();
-        //_td->pSink->AddRef();
-        hr = _td->pInputProcessorProfiles->QueryInterface(IID_ITfInputProcessorProfileMgr, (void **) &_td->pInputProcessorProfileMgr);
-        if(SUCCEEDED(hr))
-        {
-          /*ITfSource *pSource;
-
-          hr = _td->pInputProcessorProfiles->QueryInterface(IID_ITfSource, (void **) &pSource);
-          if(SUCCEEDED(hr)) {
-            pSource->AdviseSink(IID_ITfLanguageProfileNotifySink, (ITfLanguageProfileNotifySink *) _td->pSink, &_td->dwSinkCookie);
-            pSource->Release();
-          }*/
-
+      hr = (*pfnCreateInputProcessorProfiles)(&pTSF->pInputProcessorProfiles);
+      if(SUCCEEDED(hr)) {
+        hr = pTSF->pInputProcessorProfiles->QueryInterface(IID_ITfInputProcessorProfileMgr, (void **) &pTSF->pInputProcessorProfileMgr);
+        if(SUCCEEDED(hr)) {
           return TRUE;
         }
 
-        _td->pInputProcessorProfiles->Release();
+        pTSF->pInputProcessorProfiles->Release();
       }
     }
 
-    FreeLibrary(_td->hMSCTF);
+    FreeLibrary(pTSF->hMSCTF);
   }
   
-  _td->pInputProcessorProfileMgr = NULL;
-  _td->pInputProcessorProfiles = NULL;
+  pTSF->pInputProcessorProfileMgr = NULL;
+  pTSF->pInputProcessorProfiles = NULL;
   
-  _td->hMSCTF = NULL;
-  _td->TSFFailed = TRUE;
+  pTSF->hMSCTF = NULL;
   
   return FALSE;
 }
 
-BOOL CloseTSF()
-{
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if (!_td) {
-    return FALSE;
-  }
+void CloseTSF(PTSFINTERFACES pTSF) {
+  if(pTSF->pInputProcessorProfileMgr) pTSF->pInputProcessorProfileMgr->Release();
+  pTSF->pInputProcessorProfileMgr = NULL;
 
-  /*if(_td->dwSinkCookie != (DWORD)-1 && _td->pSource) {
-    _td->pSource->UnadviseSink(_td->dwSinkCookie);
-    _td->pSource->Release();
-  }
-  _td->dwSinkCookie = (DWORD)-1;
-  _td->pSource = NULL;
-  _td->pSink->Release();
-  _td->pSink = NULL;*/
+  if(pTSF->pInputProcessorProfiles) pTSF->pInputProcessorProfiles->Release();
+  pTSF->pInputProcessorProfiles = NULL;
   
-  if(_td->pInputProcessorProfileMgr) _td->pInputProcessorProfileMgr->Release();
-  _td->pInputProcessorProfileMgr = NULL;
-
-  if(_td->pInputProcessorProfiles) _td->pInputProcessorProfiles->Release();
-  _td->pInputProcessorProfiles = NULL;
-  
-  if(_td->hMSCTF) FreeLibrary(_td->hMSCTF);
-  _td->hMSCTF = NULL;
-
-  return TRUE;
+  if(pTSF->hMSCTF) FreeLibrary(pTSF->hMSCTF);
+  pTSF->hMSCTF = NULL;
 }
 

@@ -419,9 +419,9 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd);
 
 #include "k32_tsf.h"
 
-void ReportActiveKeyboard(PKEYMAN64THREADDATA _td, WORD wCommand);   // I3933   // I3949
-void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
-BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD KeymanID, BOOL foreground);   // I3933   // I3949   // I4271
+void ReportActiveKeyboard(WORD wCommand);   // I3933   // I3949
+void SelectKeyboardHKL(DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
+BOOL SelectKeyboardTSF(DWORD KeymanID, BOOL foreground);   // I3933   // I3949   // I4271
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
 
 #endif
