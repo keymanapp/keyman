@@ -112,9 +112,6 @@
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="add_language_subtext" comment="Additional information for adding another language">(from keyboard package)</string>
 
-  <!-- Context: Keyman Settings "Install from keyman.com" menu -->
-  <string name="switching_keyboard" comment="Switching to another keyboard">Switching to another keyboard</string>
-
   <!-- Context: Select Package and Select Languages menu -->
   <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">Select Keyboard Package</string>
 
