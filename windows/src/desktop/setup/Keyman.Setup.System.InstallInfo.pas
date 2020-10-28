@@ -104,7 +104,6 @@ type
   TInstallInfo = class
   private
     FAppName: WideString;
-    FMSIOptions: string;  // I3126
     FPackages: TInstallInfoPackages;
     FStrings: TStrings;
     FTitleImageFilename: string;
@@ -127,7 +126,7 @@ type
 
     procedure LocatePackagesAndTierFromFilename(Filename: string);
     procedure LocatePackagesFromParameter(const Param: string);
-    procedure LocatePackagesInPath(const path: string);
+    procedure LoadLocalPackagesMetadata;
 
     function CheckMsiAndPackageUpgradeScenarios: Boolean;
 
@@ -136,7 +135,6 @@ type
 
     property TempPath: string read FTempPath;
 
-    property Strings: TStrings read FStrings;
     property EditionTitle: WideString read FAppName;
 
     property MsiLocations: TInstallInfoFileLocations read FMsiLocations;
@@ -147,7 +145,6 @@ type
     property IsInstalled: Boolean read FIsInstalled;
     property IsNewerAvailable: Boolean read FIsNewerAvailable;
 
-    property MSIOptions: string read FMSIOptions;  // I3126
     property Packages: TInstallInfoPackages read FPackages;
     property TitleImageFilename: string read FTitleImageFilename;
     property StartDisabled: Boolean read FStartDisabled;
@@ -167,6 +164,7 @@ uses
   System.Zip,
   Winapi.Windows,
 
+  Keyman.Setup.System.MsiUtils,
   Keyman.Setup.System.SetupUILanguageManager,
   KeymanVersion,
   kmpinffile,
@@ -240,7 +238,6 @@ var
   val, nm: WideString;
   pack: TInstallInfoPackage;
   packLocation: TInstallInfoPackageFileLocation;
-  res: TMatch;
   FVersion, FMSIFileName: string;
 begin
   FInSetup := False;
@@ -255,6 +252,9 @@ begin
     begin
       if Trim(Strings[i]) = '' then Continue;
 
+      nm := KeyNames[i];
+      val := ValueFromIndex[i];
+
       if Copy(Strings[i], 1, 1) = '[' then
       begin
         FInSetup := WideSameText(Strings[i], '[Setup]');
@@ -263,50 +263,38 @@ begin
       end
       else if FInSetup then
       begin
-        nm := Names[i]; val := ValueFromIndex[i];
-        if WideSameText(nm, 'Version') then FVersion := val
-        else if WideSameText(nm, 'AppName') then FAppName := val
+        if WideSameText(nm, 'AppName') then FAppName := val
         else if WideSameText(nm, 'MSIFileName') then FMSIFileName := SetupInfPath + val
         else if WideSameText(nm, 'TitleImage') then FTitleImageFileName := SetupInfPath + val
-        else if WideSameText(nm, 'MSIOptions') then FMSIOptions := val   // I3126
         else if WideSameText(nm, 'StartWithConfiguration') then FStartWithConfiguration := StrToBoolDef(val, False)
         else if WideSameText(nm, 'StartDisabled') then FStartDisabled := StrToBoolDef(val, False);
       end
       else if FInPackages then
       begin
-        if System.SysUtils.FileExists(SetupInfPath + Names[i]) then
+        if System.SysUtils.FileExists(SetupInfPath + nm) then
         begin
-          pack := FPackages.FindById(ChangeFileExt(Names[i], ''), True);
+          pack := FPackages.FindById(ChangeFileExt(nm, ''), True);
           packLocation := TInstallInfoPackageFileLocation.Create(iilLocal);
+          packLocation.Path := SetupInfPath + nm;
           pack.Locations.Add(packLocation);
-
-          packLocation.Path := SetupInfPath + Names[i];
-          res := TRegEx.Match(ValueFromIndex[i], '/^(.+) ((\d+\.)*\d+)$');
-          if res.Success then
-          begin
-            packLocation.Name := res.Groups[1].Value;
-            packLocation.Version := res.Groups[2].Value;
-          end
-          else
-          begin
-            packLocation.Name := ValueFromIndex[i];
-            packLocation.Version := '0';
-          end;
+          // Previously, the Name and Version of the package would be read from
+          // setup.inf. Now, we load these details from the packages themselves
         end;
       end
       else if FInStrings then
         FStrings.Add(Strings[i]);
     end;
 
-    if (FVersion = '') then
-      raise EInstallInfo.Create('setup.inf is corrupt (code 1).  Setup cannot continue.');
-
     if System.SysUtils.FileExists(FMSIFileName) then  // I3476
     begin
-      location := TInstallInfoFileLocation.Create(iilLocal);
-      location.Path := FMSIFileName;
-      location.Version := FVersion;
-      FMsiLocations.Add(location);
+      FVersion := GetMsiVersion(FMSIFileName);
+      if FVersion <> '' then
+      begin
+        location := TInstallInfoFileLocation.Create(iilLocal);
+        location.Path := FMSIFileName;
+        location.Version := FVersion;
+        FMsiLocations.Add(location);
+      end;
     end;
 
     if not System.SysUtils.FileExists(FTitleImageFileName) then  // I3476
@@ -377,50 +365,36 @@ begin
   end;
 end;
 
-procedure TInstallInfo.LocatePackagesInPath(const path: string);
+procedure TInstallInfo.LoadLocalPackagesMetadata;
 var
-  f: TSearchRec;
-  id, p: string;
   pack: TInstallInfoPackage;
   packLocation: TInstallInfoPackageFileLocation;
   lang: TPackageKeyboardLanguage;
   iipl: TInstallInfoPackageLanguage;
 begin
-  p := IncludeTrailingPathDelimiter(path);
-  if FindFirst(p+'*'+Ext_PackageFile, 0, f) = 0 then
+  for pack in FPackages do
   begin
-    repeat
-      if SameText(ExtractFileExt(f.Name), Ext_PackageFile) then
+    for packLocation in pack.Locations do
+    begin
+      if (packLocation.LocationType = iilLocal) and GetPackageMetadata(packLocation.Path, packLocation.LocalPackage) then
       begin
-        packLocation := TInstallInfoPackageFileLocation.Create(iilLocal);
-        if GetPackageMetadata(p + f.Name, packLocation.LocalPackage) then
+        packLocation.Size := FileSizeByName(packLocation.Path);
+        packLocation.Name := packLocation.LocalPackage.Info.Desc[PackageInfo_Name];
+        packLocation.Version := packLocation.LocalPackage.Info.Desc[PackageInfo_Version];
+
+        if packLocation.LocalPackage.Keyboards.Count = 1 then
         begin
-          id := ChangeFileExt(f.Name, '').ToLower;
-
-          pack := FPackages.FindById(id, True);
-          packLocation.Size := FileSizeByName(p + f.Name);
-          packLocation.Name := packLocation.LocalPackage.Info.Desc[PackageInfo_Name];
-          packLocation.Version := packLocation.LocalPackage.Info.Desc[PackageInfo_Version];
-          packLocation.Path := p + f.Name;
-
-          if packLocation.LocalPackage.Keyboards.Count = 1 then
+          // We only populate the language list if there is a single keyboard
+          // in the package. Otherwise, we let Keyman install default lang
+          // for each keyboard in the package.
+          for lang in packLocation.LocalPackage.Keyboards[0].Languages do
           begin
-            // We only populate the language list if there is a single keyboard
-            // in the package. Otherwise, we let Keyman install default lang
-            // for each keyboard in the package.
-            for lang in packLocation.LocalPackage.Keyboards[0].Languages do
-            begin
-              iipl := TInstallInfoPackageLanguage.Create(lang.ID, lang.Name);
-              packLocation.Languages.Add(iipl);
-            end;
+            iipl := TInstallInfoPackageLanguage.Create(lang.ID, lang.Name);
+            packLocation.Languages.Add(iipl);
           end;
-          pack.Locations.Add(packLocation);
-        end
-        else
-          packLocation.Free;
+        end;
       end;
-    until FindNext(f) <> 0;
-    System.SysUtils.FindClose(f);
+    end;
   end;
 end;
 
@@ -655,7 +629,7 @@ end;
 
 
 // Pulled from IdGlobalProtocols so we don't have to import it
-// OS-independant version
+// OS-independent version
 function FileSizeByName(const AFilename: string): Int64;
 var
   LHandle : THandle;

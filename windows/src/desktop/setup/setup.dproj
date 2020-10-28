@@ -109,11 +109,10 @@
         <DCCReference Include="resource.pas"/>
         <DCCReference Include="SetupStrings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="MsiPackageCode.pas"/>
+        <DCCReference Include="Keyman.Setup.System.MsiUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
         <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\UCreateProcessAsShellUser.pas"/>
         <DCCReference Include="UfrmRunDesktop.pas">
             <Form>frmRunDesktop</Form>
         </DCCReference>
@@ -145,10 +144,14 @@
         <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.MITLicense.pas"/>
         <DCCReference Include="Keyman.Setup.System.Locales.pas">
-            <Form>$R icons.res</Form>
+            <Form>,
+  Keyman.System.UILanguageManager in &apos;..\..\global\delphi\general\Keyman.System.UILanguageManager.pas&apos; {$R icons.res</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UILanguageManager.pas">
-            <Form>$R icons.res</Form>
+            <Form>,
+  Keyman.Setup.System.SetupUILanguageManager in &apos;Keyman.Setup.System.SetupUILanguageManager.pas&apos;;
+
+{$R icons.res</Form>
         </DCCReference>
         <DCCReference Include="Keyman.Setup.System.SetupUILanguageManager.pas"/>
         <BuildConfiguration Include="Debug">
