@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.172 alpha 2020-10-29
+
+* fix(windows): Start Keyman on Demand - tasks (#3773)
+* fix(windows): remove msctf free from DllMain (#3779)
+* fix(windows): error reading kmp.inf in setup (#3781)
+* chore(web): Update keymanweb-osk.ttf to v. 2.100 (#3782)
+* fix(android/engine): Fix issues when re-installing lexical-models (#3731)
+
 ## 14.0.171 alpha 2020-10-28
 
 * fix(android/browser): Fix slow input in embedded browser (WebViews) (#3768)
