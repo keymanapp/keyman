@@ -83,6 +83,9 @@ type
     cbLanguage: TComboBox;
     lblGlobe: TLabel;
     appevents: TApplicationEvents;
+    sbActionText: TScrollBox;
+    panActionText: TPanel;
+    panInnerContent: TPanel;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);
@@ -653,7 +656,6 @@ begin
     s := FInstallInfo.Text(ssActionInstall)+#13#10+s;
 
   lblActions.Caption := s.Trim;
-  lblActions.Top := panContent.ClientHeight - lblActions.Height - 4;
   lblActions.Invalidate;
   panContent.Invalidate;
 end;
