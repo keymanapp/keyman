@@ -41,11 +41,11 @@ type
     lblStatus: TLabel;
     procedure cmdCancelClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
   private
     FCallback: TDownloadProgressCallback;
     FCancel: Boolean;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER;
+    procedure SetProgressPosition(Position: Integer);
   public
     function Status(const Message: string; Position: Integer; Total: Integer = -1): Boolean;
     procedure HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
@@ -64,12 +64,6 @@ begin
   FCancel := True;
 end;
 
-procedure TfrmDownloadProgress.FormCreate(Sender: TObject);
-begin
-//  cmdCancel.Caption := MsgFromId(SKButtonCancel);
-//  Caption := MsgFromId(SKDownloadProgress_Title);
-end;
-
 procedure TfrmDownloadProgress.FormShow(Sender: TObject);
 begin
   PostMessage(Handle, WM_USER, 0, 0); // Starts process after form displays
@@ -85,18 +79,15 @@ procedure TfrmDownloadProgress.HTTPStatus(Sender: THTTPUploader;
 begin
   if Total = 0
     then progress.Max := 100
-    else progress.Max := Total;
-  progress.Position := Position;
-  progress.Update;
+    else progress.Max := Integer(Total);
+  SetProgressPosition(Integer(Position));
   lblStatus.Caption := Message;
   lblStatus.Update;
   Application.ProcessMessages;
 end;
 
-function TfrmDownloadProgress.Status(const Message: string; Position,
-  Total: Integer): Boolean;
+procedure TfrmDownloadProgress.SetProgressPosition(Position: Integer);
 begin
-  if Total > 0 then progress.Max := Total;
   progress.Position := Position;
   if (Position < progress.Max) then
   begin
@@ -109,6 +100,13 @@ begin
     progress.StepBy(-1);
   end;
   progress.Update;
+end;
+
+function TfrmDownloadProgress.Status(const Message: string; Position,
+  Total: Integer): Boolean;
+begin
+  if Total > 0 then progress.Max := Total;
+  SetProgressPosition(Position);
   lblStatus.Caption := Message;
   lblStatus.Update;
   Application.ProcessMessages;
