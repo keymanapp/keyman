@@ -5,6 +5,12 @@
   <string name="ssInstallSuccess">$APPNAME $VERSION has been installed successfully.</string>
   <string name="ssCancelQuery">Are you sure you want to cancel the installation of $APPNAME?</string>
 
+  <string name="ssBootstrapExtractingBundle">Extracting bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Checking packages...</string>
+  <string name="ssBootstrapCheckingForUpdates">Checking online for updates...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Checking installed versions...</string>
+  <string name="ssBootstrapReady">Finishing up...</string>
+
   <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
   <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
 

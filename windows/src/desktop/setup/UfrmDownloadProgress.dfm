@@ -32,6 +32,8 @@ object frmDownloadProgress: TfrmDownloadProgress
     Top = 44
     Width = 281
     Height = 17
+    DoubleBuffered = False
+    ParentDoubleBuffered = False
     TabOrder = 0
   end
   object cmdCancel: TButton

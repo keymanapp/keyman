@@ -97,7 +97,9 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="bootstrapmain.pas"/>
-        <DCCReference Include="UfrmDownloadProgress.pas"/>
+        <DCCReference Include="UfrmDownloadProgress.pas">
+            <Form>frmDownloadProgress</Form>
+        </DCCReference>
         <DCCReference Include="CommonControls.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>

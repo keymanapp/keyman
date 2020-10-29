@@ -47,7 +47,7 @@ type
     FCancel: Boolean;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER;
   public
-
+    function Status(const Message: string; Position: Integer; Total: Integer = -1): Boolean;
     procedure HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
     procedure HTTPStatus(Sender: THTTPUploader; const Message: string; Position, Total: Int64);  // I2855
     property Callback: TDownloadProgressCallback read FCallback write FCallback;
@@ -91,6 +91,28 @@ begin
   lblStatus.Caption := Message;
   lblStatus.Update;
   Application.ProcessMessages;
+end;
+
+function TfrmDownloadProgress.Status(const Message: string; Position,
+  Total: Integer): Boolean;
+begin
+  if Total > 0 then progress.Max := Total;
+  progress.Position := Position;
+  if (Position < progress.Max) then
+  begin
+    // This 'hack' encourages the progress bar to move immediately to the
+    // requested position, because otherwise it animates into position, which
+    // won't happen because we're doing all the work on the main thread. It is
+    // not worth refactoring into a threaded model for the sake of the progress
+    // bar!
+    progress.StepBy(1);
+    progress.StepBy(-1);
+  end;
+  progress.Update;
+  lblStatus.Caption := Message;
+  lblStatus.Update;
+  Application.ProcessMessages;
+  Result := not FCancel;
 end;
 
 procedure TfrmDownloadProgress.WMUserFormShown(var Message: TMessage);
