@@ -200,7 +200,7 @@ begin
     then StatusMax := 6 + FInstallInfo.Packages.Count
     else StatusMax := FInstallInfo.Packages.Count;
 
-  msiLocation := FInstallInfo.BestMsi;
+  msiLocation := FInstallInfo.MsiInstallLocation;
   if Assigned(msiLocation) and FInstallInfo.ShouldInstallKeyman then
   begin
     if msiLocation.LocationType = iilOnline then
@@ -598,7 +598,7 @@ var
     begin
       if pack.ShouldInstall then
       begin
-        packLocation := pack.GetBestLocation;
+        packLocation := pack.InstallLocation;
         if Assigned(packLocation) then
         begin
           if packLocation.LocationType = iilOnline then
@@ -672,7 +672,7 @@ begin
     if CheckForUpdates then s := s + 'CheckForUpdates,';
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
-    msiLocation := FInstallInfo.BestMsi;
+    msiLocation := FInstallInfo.MsiInstallLocation;
     if Assigned(msiLocation) and (
         (FInstallInfo.InstalledVersion.Version = '') or (FInstallInfo.InstalledVersion.ProductCode <> msiLocation.ProductCode)
       ) then

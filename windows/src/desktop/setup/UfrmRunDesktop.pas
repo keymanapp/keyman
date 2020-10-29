@@ -605,13 +605,13 @@ begin
   s := '';
   if FInstallInfo.ShouldInstallKeyman then
   begin
-    FLocationType := FInstallInfo.BestMsi.LocationType;
+    FLocationType := FInstallInfo.MsiInstallLocation.LocationType;
 
     if FLocationType = iilOnline
-      then downloadSize := '('+FormatFileSize(FInstallInfo.BestMsi.Size)+')'
+      then downloadSize := FInstallInfo.Text(ssActionDownload, [FormatFileSize(FInstallInfo.MsiInstallLocation.Size)])
       else downloadSize := '';
 
-    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.BestMsi.Version, downloadSize]) + #13#10;
+    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.MsiInstallLocation.Version, downloadSize]) + #13#10;
 
     Found := True;
   end
@@ -622,7 +622,7 @@ begin
   begin
     if pack.ShouldInstall then
     begin
-      packLocation := pack.GetBestLocation;
+      packLocation := pack.InstallLocation;
       if Assigned(packLocation) then
       begin
         if pack.BCP47 <> ''
@@ -630,7 +630,7 @@ begin
           else langname := '';
 
         if packLocation.LocationType = iilOnline
-          then downloadSize := '('+FormatFileSize(packLocation.Size)+')'
+          then downloadSize := FInstallInfo.Text(ssActionDownload, [FormatFileSize(packLocation.Size)])
           else downloadSize := '';
 
         if langname <> ''
@@ -649,13 +649,13 @@ begin
 
   if not Found then
     s := FInstallInfo.Text(ssActionNothingToInstall)
-  else if FLocationType = iilOnline then
-    s := FInstallInfo.Text(ssActionDownloadAndInstall)+#13#10+s
   else
     s := FInstallInfo.Text(ssActionInstall)+#13#10+s;
 
   lblActions.Caption := s.Trim;
   lblActions.Top := panContent.ClientHeight - lblActions.Height - 4;
+  lblActions.Invalidate;
+  panContent.Invalidate;
 end;
 
 procedure TfrmRunDesktop.FormKeyDown(Sender: TObject; var Key: Word;
