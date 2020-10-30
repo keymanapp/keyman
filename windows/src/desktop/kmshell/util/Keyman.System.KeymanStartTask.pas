@@ -16,7 +16,9 @@ type
 implementation
 
 uses
+  System.SysUtils,
   System.Variants,
+  System.Win.ComObj,
   Winapi.ActiveX,
   Winapi.Windows,
 
@@ -24,6 +26,8 @@ uses
   KeymanPaths,
   KeymanVersion,
   RegistryKeys,
+  Keyman.System.KeymanSentryClient,
+  Sentry.Client,
   TaskScheduler_TLB;
 
 { TKeymanStartTask }
@@ -53,42 +57,75 @@ var
   pEventTrigger: IEventTrigger;
   pAction: IExecAction;
 begin
-  pService := CoTaskScheduler_.Create;
-  pService.Connect(EmptyParam, EmptyParam, EmptyParam, EmptyParam);
-
-  // Create or open the Keyman task folder
   try
-    pTaskFolder := pService.GetFolder('\' + CTaskFolderName);
+    pService := CoTaskScheduler_.Create;
+    pService.Connect(EmptyParam, EmptyParam, EmptyParam, EmptyParam);
+
+    // Create or open the Keyman task folder
+    try
+      pTaskFolder := pService.GetFolder('\' + CTaskFolderName);
+    except
+      on E:EOleException do
+      begin
+        // Don't report if the folder doesn't exist, because we need to create it
+        if E.ErrorCode <> HResultFromWin32(ERROR_FILE_NOT_FOUND) then
+          TKeymanSentryClient.ReportHandledException(E, 'Failed to get task folder');
+
+        try
+          pTaskFolder := pService.GetFolder('\').CreateFolder(CTaskFolderName, EmptyParam);
+        except
+          on E:EOleException do
+          begin
+            // Don't report if we might have a race (someone else created it at
+            // the same time we did)
+            if E.ErrorCode <> HResultFromWin32(ERROR_ALREADY_EXISTS) then
+              TKeymanSentryClient.ReportHandledException(E, 'Failed to create task folder');
+
+            // well let's try one last time to get the folder
+            try
+              pTaskFolder := pService.GetFolder('\' + CTaskFolderName);
+            except
+              on E:EOleException do
+              begin
+                TKeymanSentryClient.ReportHandledException(E, 'Failed to get task folder, second try');
+                Exit;
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+
+    // Create a new task
+    pTask := pService.NewTask(0);
+
+    pRegInfo := pTask.RegistrationInfo;
+    pRegInfo.Author := CTaskAuthor;
+    pRegInfo.Description := CTaskDescription;
+    pRegInfo.Version := CKeymanVersionInfo.VersionWithTag;
+
+    pSettings := pTask.Settings;
+    pSettings.DisallowStartIfOnBatteries := False;
+    pSettings.StopIfGoingOnBatteries := False;
+    pSettings.ExecutionTimeLimit := 'PT0S'; // no time limit
+    pSettings.Priority := 4; // https://github.com/microsoft/WinDev/issues/55
+
+    // Start the task when Keyman event 256 is logged
+    pEventTrigger := pTask.Triggers.Create(TASK_TRIGGER_EVENT) as IEventTrigger;
+    pEventTrigger.Id := CTaskEventTriggerId;
+    pEventTrigger.Subscription := CTaskTrigger;
+
+    // Action is to run keyman.exe as login user
+    pAction := pTask.Actions.Create(TASK_ACTION_EXEC) as IExecAction;
+    pAction.Path := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_KeymanExe);
+    pAction.Arguments := CKeymanExeStartArguments;
+
+    pTaskFolder.RegisterTaskDefinition(CTaskName, pTask, TASK_CREATE_OR_UPDATE or TASK_IGNORE_REGISTRATION_TRIGGERS,
+      EmptyParam, EmptyParam, TASK_LOGON_NONE, EmptyParam);
   except
-    pTaskFolder := pService.GetFolder('\').CreateFolder(CTaskFolderName, EmptyParam);
+    on E:Exception do
+      TKeymanSentryClient.ReportHandledException(E, 'Failed to create task');
   end;
-
-  // Create a new task
-  pTask := pService.NewTask(0);
-
-  pRegInfo := pTask.RegistrationInfo;
-  pRegInfo.Author := CTaskAuthor;
-  pRegInfo.Description := CTaskDescription;
-  pRegInfo.Version := CKeymanVersionInfo.VersionWithTag;
-
-  pSettings := pTask.Settings;
-  pSettings.DisallowStartIfOnBatteries := False;
-  pSettings.StopIfGoingOnBatteries := False;
-  pSettings.ExecutionTimeLimit := 'PT0S'; // no time limit
-  pSettings.Priority := 4; // https://github.com/microsoft/WinDev/issues/55
-
-  // Start the task when Keyman event 256 is logged
-  pEventTrigger := pTask.Triggers.Create(TASK_TRIGGER_EVENT) as IEventTrigger;
-  pEventTrigger.Id := CTaskEventTriggerId;
-  pEventTrigger.Subscription := CTaskTrigger;
-
-  // Action is to run keyman.exe as login user
-  pAction := pTask.Actions.Create(TASK_ACTION_EXEC) as IExecAction;
-  pAction.Path := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_KeymanExe);
-  pAction.Arguments := CKeymanExeStartArguments;
-
-  pTaskFolder.RegisterTaskDefinition(CTaskName, pTask, TASK_CREATE_OR_UPDATE or TASK_IGNORE_REGISTRATION_TRIGGERS,
-    EmptyParam, EmptyParam, TASK_LOGON_NONE, EmptyParam);
 end;
 
 class procedure TKeymanStartTask.DeleteTask;
@@ -96,25 +133,39 @@ var
   pService: ITaskService;
   pTaskFolder: ITaskFolder;
 begin
-  pService := CoTaskScheduler_.Create;
-  pService.Connect(EmptyParam, EmptyParam, EmptyParam, EmptyParam);
   try
-    pTaskFolder := pService.GetFolder('\'+CTaskFolderName);
-  except
-    // Assume that the folder doesn't exist, nothing to do
-    Exit;
-  end;
+    pService := CoTaskScheduler_.Create;
+    pService.Connect(EmptyParam, EmptyParam, EmptyParam, EmptyParam);
+    try
+      pTaskFolder := pService.GetFolder('\'+CTaskFolderName);
+    except
+      on E:EOleException do
+      begin
+        if E.ErrorCode = HResultFromWin32(ERROR_FILE_NOT_FOUND) then
+          // Assume that the folder doesn't exist, nothing to do
+          Exit;
+      end;
+    end;
 
-  try
-    pTaskFolder.DeleteTask(CTaskName, 0);
-  except
-    // We'll assume that the task doesn't exist, and continue
-  end;
+    try
+      pTaskFolder.DeleteTask(CTaskName, 0);
+    except
+      on E:EOleException do
+      begin
+        if E.ErrorCode = HResultFromWin32(ERROR_FILE_NOT_FOUND) then
+          // Assume that the task doesn't exist, nothing to do
+          Exit;
+      end;
+    end;
 
-  if pTaskFolder.GetTasks(0).Count = 0 then
-  begin
-    pTaskFolder := nil;
-    pService.GetFolder('\').DeleteFolder(CTaskFolderName, 0);
+    if pTaskFolder.GetTasks(0).Count = 0 then
+    begin
+      pTaskFolder := nil;
+      pService.GetFolder('\').DeleteFolder(CTaskFolderName, 0);
+    end;
+  except
+    on E:Exception do
+      TKeymanSentryClient.ReportHandledException(E, 'Failed to delete task');
   end;
 end;
 
