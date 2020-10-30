@@ -26,6 +26,7 @@ type
       override;
 
     function GetLangName: string; virtual;
+    procedure SetLangID(Value: Integer);
 
     { IKeymanKeyboardLanguage }
     function Get_BCP47Code: WideString; safecall;
@@ -144,6 +145,11 @@ begin
     'langid', IntToHex(Get_LangID, 4),
     'bcp47code', FBCP47Code,
     'langname', GetLangName]);
+end;
+
+procedure TKeymanKeyboardLanguage.SetLangID(Value: Integer);
+begin
+  FLangID := Value;
 end;
 
 end.
