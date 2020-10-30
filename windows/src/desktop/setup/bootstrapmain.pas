@@ -191,18 +191,20 @@ BEGIN
             Exit;
           end;
 
+          FInstallInfo.CheckPackageLocations;
+
           // If the user is trying to install on downlevel version of Windows (Vista or earlier),
           // we can simplify their life by installing the packages into an existing Keyman
           // install, or point them to the old version of Keyman otherwise.
           if CheckForOldVersionScenario then   // I4460
             Exit;
 
-          TRunTools.CheckInstalledVersion(FInstallInfo.BestMsi);
+          TRunTools.CheckInstalledVersion(FInstallInfo.MsiInstallLocation);
 
           // Looks for installation state for Keyman, and determines best packages for installation.
           // If no .msi can be found, and Keyman is not installed, this will show/log an error and
           // abort installation.
-          if not FInstallInfo.CheckMsiAndPackageUpgradeScenarios then
+          if not FInstallInfo.CheckMsiUpgradeScenarios then
           begin
             // TODO: this should be refactored together with the retry strategy for online check above
             // TODO: Delineate between log messages and dialogs.
@@ -331,7 +333,7 @@ procedure InstallKeyboardsInOldVersion(const ShellPath: string);   // I4460
   var
     location: TInstallInfoPackageFileLocation;
   begin
-    location := pack.GetBestLocation;
+    location := pack.InstallLocation;
     if Assigned(location) and pack.ShouldInstall then
     begin
       if location.LocationType = iilOnline then

@@ -87,14 +87,16 @@ type
     FBCP47: string;
     FLocations: TInstallInfoPackageFileLocations;
     FShouldInstall: Boolean;
+    FInstallLocation: TInstallInfoPackageFileLocation;
+    function GetBestLocation: TInstallInfoPackageFileLocation;
   public
     constructor Create(const AID: string; const ABCP47: string = '');
     destructor Destroy; override;
-    function GetBestLocation: TInstallInfoPackageFileLocation; // TODO: make private and calculate in CheckMsiAndPackageUpgradeScenarios
     property ID: string read FID;
     property BCP47: string read FBCP47 write FBCP47;
     property ShouldInstall: Boolean read FShouldInstall write FShouldInstall;
     property Locations: TInstallInfoPackageFileLocations read FLocations;
+    property InstallLocation: TInstallInfoPackageFileLocation read FInstallLocation write FInstallLocation;
   end;
 
   TInstallInfoPackages = class(TObjectList<TInstallInfoPackage>)
@@ -117,6 +119,7 @@ type
     FTempPath: string;
     FShouldInstallKeyman: Boolean;
     FTier: string;
+    FMsiInstallLocation: TInstallInfoFileLocation;
     function GetBestMsi: TInstallInfoFileLocation;
     function GetPackageMetadata(const KmpFilename: string; p: TPackage): Boolean;
   public
@@ -128,7 +131,8 @@ type
     procedure LocatePackagesFromParameter(const Param: string);
     procedure LoadLocalPackagesMetadata;
 
-    function CheckMsiAndPackageUpgradeScenarios: Boolean;
+    function CheckMsiUpgradeScenarios: Boolean;
+    procedure CheckPackageLocations;
 
     function Text(const Name: TInstallInfoText): WideString; overload;
     function Text(const Name: TInstallInfoText; const Args: array of const): WideString; overload;
@@ -138,7 +142,7 @@ type
     property EditionTitle: WideString read FAppName;
 
     property MsiLocations: TInstallInfoFileLocations read FMsiLocations;
-    property BestMsi: TInstallInfoFileLocation read GetBestMsi;
+    property MsiInstallLocation: TInstallInfoFileLocation read FMsiInstallLocation write FMsiInstallLocation;
 
     // Keyman Installer information
     property InstalledVersion: TMSIInfo read FInstalledVersion write FInstalledVersion;
@@ -448,7 +452,7 @@ begin
   Result := WideFormat(Text(Name), Args);
 end;
 
-function TInstallInfo.CheckMsiAndPackageUpgradeScenarios: Boolean;
+function TInstallInfo.CheckMsiUpgradeScenarios: Boolean;
 begin
     // Keyman install scenarios
   // 1. Keyman latest version already installed --> nothing to do
@@ -473,6 +477,7 @@ begin
   // 3D: Fail
 
   FBestMsi := GetBestMsi;
+  FMsiInstallLocation := FBestMsi;
 
   FIsInstalled := FInstalledVersion.Version <> '';
 
@@ -489,6 +494,13 @@ begin
   Result := FIsInstalled or FIsNewerAvailable;
 end;
 
+procedure TInstallInfo.CheckPackageLocations;
+var
+  pack: TInstallInfoPackage;
+begin
+  for pack in FPackages do
+    pack.InstallLocation := pack.GetBestLocation;
+end;
 
 { TInstallInfoPackage }
 
