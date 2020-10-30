@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.173 alpha 2020-10-30
+
+* fix(windows): Cleanup setup.inf processing and CompareVersions function (#3790)
+* fix(windows): setup now allows choice of source (#3794)
+* fix(windows): show bootstrap progress in setup (#3792)
+* fix(windows): cleanup setup action list (#3793)
+* chore(android/engine): Remove use of lexical-model catalog (#3803)
+* fix(windows): disabling/enabling a profile could have wrong association (#3799)
+* fix(windows): keyboard menu could get out of sync (#3800)
+* fix(windows): crash installing package with a race (#3805)
+* fix(windows): Handle failure on task creation (#3804)
+
 ## 14.0.172 alpha 2020-10-29
 
 * fix(windows): Start Keyman on Demand - tasks (#3773)
