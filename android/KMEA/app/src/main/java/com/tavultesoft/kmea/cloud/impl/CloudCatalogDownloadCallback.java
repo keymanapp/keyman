@@ -133,7 +133,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
 
   protected void ensureInitCloudReturn(Context aContext, Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple)
   {
-    jsonTuple.keyboardJSON = ensureInit(aContext,aDataSet,jsonTuple.keyboardJSON);
     jsonTuple.lexicalModelJSON = ensureInit(aContext,aDataSet, jsonTuple.lexicalModelJSON);
     jsonTuple.packagesJSON = ensureInit(aContext, aDataSet, jsonTuple.packagesJSON);
   }
