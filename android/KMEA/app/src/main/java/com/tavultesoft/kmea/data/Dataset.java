@@ -340,7 +340,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements Li
     this.languageMetadata.clear();
   }
 
-  // TODO:  Do we need to override any of this class's menbers in case someone SOMEHOW constructs
+  // TODO:  Do we need to override any of this class's members in case someone SOMEHOW constructs
   //        a LanguageDataset from outside the Dataset class?
 
   @Override
