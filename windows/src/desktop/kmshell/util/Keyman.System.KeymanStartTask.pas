@@ -63,7 +63,7 @@ begin
 
     // Create or open the Keyman task folder
     try
-      pTaskFolder := pService.GetFolder('\*' + CTaskFolderName);
+      pTaskFolder := pService.GetFolder('\' + CTaskFolderName);
     except
       on E:EOleException do
       begin
