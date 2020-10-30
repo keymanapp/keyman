@@ -40,8 +40,6 @@ public class CloudRepository {
   public static final String API_PRODUCTION_HOST = "api.keyman.com";
   public static final String API_STAGING_HOST = "api.keyman-staging.com";
 
-  public static final String API_MODEL_QUERY = "?q";
-  public static final String API_MODEL_FORMATSTR = "https://%s/model%s";
   public static final String API_MODEL_LANGUAGE_FORMATSTR = "https://%s/model?q=bcp47:%s";
   public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android%s%s";
 
@@ -168,16 +166,20 @@ public class CloudRepository {
 
   // Should be called whenever a new language code starts being managed in order to help signal
   // retrieval of the language code's lexical models.
-  public void invalidateLexicalModelCache(@NonNull Context context) {
+  public void invalidateLexicalModelCache(@NonNull Context context, boolean deleteCacheFile) {
     this.invalidateLexicalCache = true;
 
-    // We should also pre-emptively clear out the old cache file
-    // in case of an app close or crash.
-    File file = CloudDataJsonUtil.getLexicalModelCacheFile(context);
-    file.delete();
+    if (deleteCacheFile) {
+      // We should also pre-emptively clear out the old cache file
+      // in case of an app close or crash.
+      File file = CloudDataJsonUtil.getLexicalModelCacheFile(context);
+      if (file != null) {
+        file.delete();
+      }
+    }
   }
 
-  private CloudApiTypes.CloudApiParam prepareResourcesUpdateQuerty(Context aContext) {
+  private CloudApiTypes.CloudApiParam prepareResourcesUpdateQuery(Context aContext) {
     // Keyman cloud keyboard
     // Append each keyboard id
     String keyboardQuery = "";
@@ -201,29 +203,6 @@ public class CloudRepository {
     String queryURL = String.format(API_PACKAGE_VERSION_FORMATSTR, getHost(), keyboardQuery, lexicalModelQuery);
     return new CloudApiTypes.CloudApiParam(
       CloudApiTypes.ApiTarget.PackageVersion, queryURL).setType(CloudApiTypes.JSONType.Object);
-  }
-
-  private CloudApiTypes.CloudApiParam prepareLexicalModelUpdateQuery(Context aContext)
-  {
-    // This allows us to directly get the full lexical model catalog.
-    // TODO:  Remove and replace with commented-out code below once the proper multi-language
-    //        query is ready!
-    String lexicalURL = String.format(API_MODEL_FORMATSTR, getHost(), API_MODEL_QUERY);
-
-    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL)
-      .setType(CloudApiTypes.JSONType.Array);
-
-    // TODO: We want a list of lexical models for every language with an installed resource (kbd, lex model)
-
-//      String lexicalURL = String.format(API_MODEL_FORMATSTR, getHost(), "?q=bcp47:");
-//
-//      for(String lgCode: languageCodes) {
-//        lexicalURL = String.format("%s%s,", lexicalURL, lgCode);
-//      }
-//
-//      lexicalURL = lexicalURL.substring(0, lexicalURL.lastIndexOf(','));
-
-    /* do what's possible here, rather than in the Task */
   }
 
   public static String prepareLexicalModelQuery(String languageID) {
@@ -402,8 +381,7 @@ public class CloudRepository {
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>(2);
 
     if (!cacheValid) {
-      cloudQueries.add(prepareLexicalModelUpdateQuery(context));
-      cloudQueries.add(prepareResourcesUpdateQuerty(context));
+      cloudQueries.add(prepareResourcesUpdateQuery(context));
     }
 
     int cloudQueryEntries = cloudQueries.size();

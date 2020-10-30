@@ -72,8 +72,8 @@ type
 
   PCEFTitleChangeEventData = ^TCEFTitleChangeEventData;
 
-  TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; out Handled: Boolean) of object;
-  TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; wasHandled: Boolean) of object;
+  TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean) of object;
+  TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean) of object;
   TCEFCommandEvent = procedure(Sender: TObject; const command: string; params: TStringList) of object;
 
   TCEFHostPreKeySyncEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean) of object;
@@ -180,7 +180,7 @@ type
 
     procedure CreateBrowser;
     procedure Navigate; overload;
-    procedure DoBeforeBrowse(const url: string; out Handled: Boolean; ShouldOpenUrlIfNotHandled: Boolean);
+    procedure DoBeforeBrowse(const url: string; isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
   public
     procedure DoResizeByContent;
     procedure SetFocus; override;
@@ -434,28 +434,30 @@ procedure TframeCEFHost.Handle_CEF_BEFOREBROWSE(var message: TMessage);
 var
   params: TStringList;
   url: string;
-  wasHandled,
+  isPopup, wasHandled,
   shouldOpenUrlIfNotHandled: Boolean;
 begin
   AssertVclThread;
+
   params := TStringList(message.LParam);
   url := params[0];
-  params.Delete(0);
-
-  wasHandled := Boolean(message.WParamLo);
-  shouldOpenUrlIfNotHandled := Boolean(message.WParamHi);
+  wasHandled := (message.WParam and 1) = 1;
+  shouldOpenUrlIfNotHandled := (message.WParam and 2) = 2;
+  isPopup := (message.WParam and 4) = 4;
 
   if wasHandled then
   begin
     if Assigned(FOnBeforeBrowse) then
     begin
-      FOnBeforeBrowse(Self, url, Boolean(message.WParam));
+      FOnBeforeBrowse(Self, url, isPopup, wasHandled);
     end;
 
-    if FShouldOpenRemoteUrlsInBrowser and (params.Count = 0) and not IsLocalURL(URL) then
+    if FShouldOpenRemoteUrlsInBrowser and not IsLocalURL(URL) then
+    begin
       {$MESSAGE HINT 'Refactor how remote URLs are handled'}
       // TODO: refactor links
       TUtilExecute.URL(url);
+    end;
   end
   else if shouldOpenUrlIfNotHandled then
     cef.LoadURL(url);
@@ -489,12 +491,13 @@ procedure TframeCEFHost.cefBeforeBrowse(Sender: TObject;
 begin
   AssertCefThread;
 
-  DoBeforeBrowse(request.Url, Result, False);
+  DoBeforeBrowse(request.Url, False, False, Result);
 end;
 
-procedure TframeCEFHost.DoBeforeBrowse(const url: string; out Handled: Boolean; ShouldOpenUrlIfNotHandled: Boolean);
+procedure TframeCEFHost.DoBeforeBrowse(const url: string; isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
 var
   params: TStringList;
+  wParam: DWORD;
 begin
   AssertCefThread;
 
@@ -502,7 +505,7 @@ begin
 
   if Assigned(FOnBeforeBrowseSync) then
   begin
-    FOnBeforeBrowseSync(Self, url, Handled);
+    FOnBeforeBrowseSync(Self, url, isPopup, Handled);
   end;
 
   if not Handled and GetParamsFromURL(Url, params) then
@@ -519,24 +522,16 @@ begin
       Handled := True;
 
     params := TStringList.Create;
-    params.Insert(0, Url);
-    PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, MAKELONG(WORD(Handled), WORD(ShouldOpenUrlIfNotHandled)), LPARAM(params));
+    params.Add(Url);
+    wParam := 0;
+    if Handled then
+      wParam := wParam or 1;
+    if ShouldOpenUrlIfNotHandled then
+      wParam := wParam or 2;
+    if isPopup then
+      wParam := wParam or 4;
+    PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, wParam, LPARAM(params));
   end;
-
-  {params := nil;
-
-  if not Handled then
-    Handled := GetParamsFromURL(Url, params);
-
-  if not Handled and FShouldOpenRemoteUrlsInBrowser and not IsLocalURL(URL) then
-    Handled := True;
-
-  if not Assigned(params) then
-    params := TStringList.Create;
-
-  params.Insert(0, Url);
-
-  PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, MAKELONG(WORD(Handled), WORD(ShouldOpenUrlIfNotHandled)), LPARAM(params));}
 end;
 
 procedure TframeCEFHost.cefBeforeClose(Sender: TObject; const browser: ICefBrowser);
@@ -711,7 +706,7 @@ procedure TframeCEFHost.cefBeforePopup(Sender: TObject;
   var settings: TCefBrowserSettings; var noJavascriptAccess, Result: Boolean);
 begin
   AssertCefThread;
-  DoBeforeBrowse(targetUrl, Result, True);
+  DoBeforeBrowse(targetUrl, True, True, Result);
 end;
 
 procedure TframeCEFHost.cefRunContextMenu(Sender: TObject;

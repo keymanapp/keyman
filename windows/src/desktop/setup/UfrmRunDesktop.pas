@@ -51,6 +51,7 @@ uses
   System.SysUtils,
   System.UITypes,
   System.Variants,
+  Vcl.AppEvnts,
   Vcl.ComCtrls,
   Vcl.Controls,
   Vcl.Dialogs,
@@ -81,6 +82,10 @@ type
     lblActions: TLabel;
     cbLanguage: TComboBox;
     lblGlobe: TLabel;
+    appevents: TApplicationEvents;
+    sbActionText: TScrollBox;
+    panActionText: TPanel;
+    panInnerContent: TPanel;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);
@@ -91,6 +96,7 @@ type
     procedure lblLicenseClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure cbLanguageClick(Sender: TObject);
+    procedure appeventsMessage(var Msg: tagMSG; var Handled: Boolean);
   private
     g_iCurPos, g_iProgress, g_iProgressTotal: Integer;
     g_bCancelInstall, g_bScriptInProgress, g_bForwardProgress, g_bFirstTime, g_bEnableActionData: Boolean;
@@ -602,13 +608,13 @@ begin
   s := '';
   if FInstallInfo.ShouldInstallKeyman then
   begin
-    FLocationType := FInstallInfo.BestMsi.LocationType;
+    FLocationType := FInstallInfo.MsiInstallLocation.LocationType;
 
     if FLocationType = iilOnline
-      then downloadSize := '('+FormatFileSize(FInstallInfo.BestMsi.Size)+')'
+      then downloadSize := FInstallInfo.Text(ssActionDownload, [FormatFileSize(FInstallInfo.MsiInstallLocation.Size)])
       else downloadSize := '';
 
-    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.BestMsi.Version, downloadSize]) + #13#10;
+    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.MsiInstallLocation.Version, downloadSize]) + #13#10;
 
     Found := True;
   end
@@ -619,7 +625,7 @@ begin
   begin
     if pack.ShouldInstall then
     begin
-      packLocation := pack.GetBestLocation;
+      packLocation := pack.InstallLocation;
       if Assigned(packLocation) then
       begin
         if pack.BCP47 <> ''
@@ -627,7 +633,7 @@ begin
           else langname := '';
 
         if packLocation.LocationType = iilOnline
-          then downloadSize := '('+FormatFileSize(packLocation.Size)+')'
+          then downloadSize := FInstallInfo.Text(ssActionDownload, [FormatFileSize(packLocation.Size)])
           else downloadSize := '';
 
         if langname <> ''
@@ -646,13 +652,12 @@ begin
 
   if not Found then
     s := FInstallInfo.Text(ssActionNothingToInstall)
-  else if FLocationType = iilOnline then
-    s := FInstallInfo.Text(ssActionDownloadAndInstall)+#13#10+s
   else
     s := FInstallInfo.Text(ssActionInstall)+#13#10+s;
 
   lblActions.Caption := s.Trim;
-  lblActions.Top := panContent.ClientHeight - lblActions.Height - 4;
+  lblActions.Invalidate;
+  panContent.Invalidate;
 end;
 
 procedure TfrmRunDesktop.FormKeyDown(Sender: TObject; var Key: Word;
@@ -710,6 +715,17 @@ end;
 procedure TfrmRunDesktop.URLLabelMouseEnter(Sender: TObject);
 begin
   (Sender as TLabel).Font.Style := [fsUnderline];
+end;
+
+procedure TfrmRunDesktop.appeventsMessage(var Msg: tagMSG;
+  var Handled: Boolean);
+begin
+  if (Msg.message = WM_SYSCOMMAND) and (Msg.wParam = SC_RESTORE) then
+  begin
+    // Handle the case where Win+M pressed, window never restores
+    // Only really happens with Splash.
+    PostMessage(Handle, WM_SHOWWINDOW, 1, SW_PARENTOPENING);
+  end;
 end;
 
 procedure TfrmRunDesktop.BackupKey(Root: HKEY; Path: WideString); // I2642

@@ -134,6 +134,9 @@ const
   SRegValue_SwitchLanguageWithKeyboard        = 'switch language with keyboard'; // CU, default true
   SRegValue_SwitchLanguageForAllApplications  = 'switch language for all applications'; // CU, default true
 
+  SRegValue_DeepTSFIntegration = 'deep tsf integration'; // LM, 0=disable, 1=enable, 2=default
+  SRegKey_AppIntegration = SRegKey_KeymanEngine_LM + '\App Integration'; //KM
+
   { On Screen Keyboard Settings }
 
   SRegKey_KeymanOSK_CU         = SRegKey_KeymanEngine_CU + '\On Screen Keyboard';
@@ -443,6 +446,9 @@ const
   SRegKey_KeymanEngineDebug_CU = SRegKey_KeymanEngineRoot_CU + '\Debug';
 
   SRegValue_Flag_UseRegisterHotkey = 'Flag_UseRegisterHotkey';
+  SRegValue_Flag_ShouldSerializeInput = 'Flag_ShouldSerializeInput';
+  SRegValue_Flag_UseAutoStartTask = 'Flag_UseAutoStartTask';
+
 // Fixed path names
 const
   // PF = CSIDL_PROGRAM_FILES

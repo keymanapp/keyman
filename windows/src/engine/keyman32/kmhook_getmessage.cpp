@@ -380,23 +380,21 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
   UNREFERENCED_PARAMETER(hwnd);
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
 
 	switch(wParam)
 	{
   case KMCI_GETACTIVEKEYBOARD:   // I3933
-    ReportActiveKeyboard(_td, LOWORD(lParam));   // I3949
+    ReportActiveKeyboard(LOWORD(lParam));   // I3949
     break;
 
   case KMCI_SELECTKEYBOARD_BACKGROUND:   // I4271
   case KMCI_SELECTKEYBOARD:   // I3933
-    SelectKeyboardHKL(_td, (DWORD) lParam, wParam == KMCI_SELECTKEYBOARD);
+    SelectKeyboardHKL((DWORD) lParam, wParam == KMCI_SELECTKEYBOARD);
     break;
 
   case KMCI_SELECTKEYBOARD_BACKGROUND_TSF:   // I4271
   case KMCI_SELECTKEYBOARD_TSF:   // I3933
-    SelectKeyboardTSF(_td, (DWORD) lParam, wParam == KMCI_SELECTKEYBOARD_TSF);
+    SelectKeyboardTSF((DWORD) lParam, wParam == KMCI_SELECTKEYBOARD_TSF);
     break;
 
   case KMCI_SETFOREGROUND:   // I3933

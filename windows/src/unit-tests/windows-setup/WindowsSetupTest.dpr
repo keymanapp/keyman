@@ -30,7 +30,8 @@ uses
   kmpinffile in '..\..\global\delphi\general\kmpinffile.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
   Keyman.Setup.System.SetupUILanguageManager in '..\..\desktop\setup\Keyman.Setup.System.SetupUILanguageManager.pas',
-  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas';
+  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
+  Keyman.Setup.System.MsiUtils in '..\..\desktop\setup\Keyman.Setup.System.MsiUtils.pas';
 
 var
   runner : ITestRunner;

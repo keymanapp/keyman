@@ -69,9 +69,6 @@
 /*                                                                         */
 /***************************************************************************/
 
-//__declspec(align(4)) LONG RefreshTag_Process = 0;
-//__declspec(align(4)) LONG FInRefreshKeyboards = 0;
-
 UINT 
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
@@ -143,8 +140,6 @@ void Globals_UninitThread()
     OutputThreadDebugString("Globals_UninitThread aborted without cleanup");
     return;
   }
-
-  CloseTSF();   // I3933
 
   ISerialKeyEventClient::Shutdown();
 
@@ -280,8 +275,10 @@ static wchar_t
 __declspec(align(8)) static UINT
   f_vk_prefix = 0;
 
+#ifndef _WIN64
 __declspec(align(8)) static LONG
   f_RefreshTag = 0;
+#endif
 
 static BOOL 
   f_debug_KeymanLog = FALSE, 
@@ -321,7 +318,9 @@ DWORD *Globals::InitialisingThread()  { return &f_InitialisingThread; }   // I43
 
 DWORD *Globals::ShiftState()          { return &f_ShiftState;         }
 
+#ifndef _WIN64
 LONG *Globals::RefreshTag()           { return &f_RefreshTag;         }
+#endif
 
 HHOOK Globals::get_hhookCallWndProc()   { return f_hhookCallWndProc;   }
 HHOOK Globals::get_hhookGetMessage()    { return f_hhookGetMessage;    }
@@ -440,7 +439,9 @@ BOOL Globals::ResetControllers()  // I3092
   f_FSingleThread = FALSE;
   f_hwndIM = 0;
 	f_hwndIMAlways = 0;
+#ifndef _WIN64
   f_RefreshTag = 0;
+#endif
 
   Globals::Unlock();
 

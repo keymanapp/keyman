@@ -39,6 +39,7 @@
 #include "editsess.h"
 #include "Compiler.h"
 #include "registry.h"
+#include "..\keymanmc\keymanmc.h"
 
 struct deadkeyinfo
 {
@@ -48,9 +49,8 @@ struct deadkeyinfo
 class CKeymanEditSession : public CEditSessionBase
 {
 public:
-  CKeymanEditSession(ITfContext *pContext, HMODULE hKeyman, WPARAM wParam, LPARAM lParam, BOOL fUpdate, BOOL fPreserved, DWORD dwDeepIntegration) : CEditSessionBase(pContext)   // I3588   // I4375
+  CKeymanEditSession(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL fUpdate, BOOL fPreserved, DWORD dwDeepIntegration) : CEditSessionBase(pContext)   // I3588   // I4375
   {
-    _hKeyman = hKeyman;
     _wParam = wParam;
     _lParam = lParam;   // I3589
     _fUpdate = fUpdate;
@@ -71,39 +71,11 @@ private:
   BOOL _fUpdate;
   BOOL _fPreserved;   // I3588
   HRESULT _hr;
-  HMODULE _hKeyman;
   WPARAM _wParam;
   LPARAM _lParam;   // I3589
   DWORD _dwDeepIntegration;   // I4375
   TfEditCookie _ec;
 };
-
-BOOL CKMTipTextService::_CheckKeymanLoaded() {   // I4274
-  HMODULE hKeyman;
-  LogEnter();
-
-#ifdef _WIN64
-  hKeyman = GetModuleHandle("keyman64.dll");   // I3549
-#else
-  hKeyman = GetModuleHandle("keyman32.dll");
-#endif
-
-  if (hKeyman == NULL) {
-    _hKeyman = NULL;
-    return FALSE;
-  }
-
-  if (hKeyman != _hKeyman) {
-    _hKeyman = NULL;
-
-    if (!_LoadKeyman() || !_InitKeyman()) {
-      return FALSE;
-    }
-    TIPNotifyActivate(&guidActiveProfile);
-  }
-
-  return TRUE;
-}
 
 #define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
 
@@ -126,13 +98,13 @@ BOOL CKMTipTextService::_KeymanProcessKeystroke(ITfContext *pContext, WPARAM wPa
     return FALSE;   // I4378
   }
 
-  if (!_CheckKeymanLoaded()) {   // I4274
-    Log(L"_KeymanProcessKeystroke: _CheckKeymanLoaded failed");
+  if (!Keyman32Interface::TIPIsKeymanRunning()) {
+    _TryAndStartKeyman();
     return FALSE;
   }
 
   // we'll insert a char ourselves in place of this keystroke
-  if ((pEditSession = new CKeymanEditSession(pContext, _hKeyman, wParam, lParam, fUpdate, fPreserved, _dwDeepIntegration)) == NULL) {  // I3588   // I3589   // I4375
+  if ((pEditSession = new CKeymanEditSession(pContext, wParam, lParam, fUpdate, fPreserved, _dwDeepIntegration)) == NULL) {  // I3588   // I3589   // I4375
     Log(L"_KeymanProcessKeystroke: new CKeymanEditSession failed, out of memory?");
     hr = E_OUTOFMEMORY;
   }
@@ -190,13 +162,6 @@ extern "C" __declspec(dllexport) HRESULT WINAPI ExtKeymanGetContext(int n, PWSTR
   return res;
 }
 
-typedef BOOL(WINAPI *PTIPACTIVATEFUNC)(BOOL fActivate);
-typedef BOOL(WINAPI *PTIPACTIVATEKEYBOARDFUNC)(GUID *profile);   // I3581
-typedef HRESULT(WINAPI *PKEYMANPROCESSOUTPUTFUNC)(int n, WCHAR *buf, int nbuf);   // I3567
-typedef HRESULT(WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);   // I3567
-typedef BOOL(WINAPI *PTIPPROCESSKEYFUNC)(WPARAM wParam, LPARAM lParam, PKEYMANPROCESSOUTPUTFUNC outfunc,   // I3588   // I3589
-  PKEYMANGETCONTEXTFUNC ctfunc, BOOL Updateable, BOOL Preserved);
-
 STDAPI CKeymanEditSession::DoEditSession(TfEditCookie ec)
 {
   LogEnter();
@@ -207,19 +172,11 @@ STDAPI CKeymanEditSession::DoEditSession(TfEditCookie ec)
 
   ExtEditSession = this;
 
-  PTIPPROCESSKEYFUNC pTIPProcessKey = (PTIPPROCESSKEYFUNC)GetProcAddress(_hKeyman, "TIPProcessKey");
-  if (!pTIPProcessKey)
-  {
-    DebugLastError(L"GetProcAddress");
-    _hr = E_FAIL;
+  if (!Keyman32Interface::TIPProcessKey(_wParam, _lParam, ExtKeymanProcessOutput, ExtKeymanGetContext, _fUpdate, _fPreserved)) {
+    SendDebugMessage(L"DoEditSession: TIPProcessKey did not handle the keystroke");
+    _hr = E_FAIL; // TODO: use S_FALSE -> this tells _KeymanProcessKeystroke to pass keystroke on
   }
-  else
-  {
-    if (!(*pTIPProcessKey)(_wParam, _lParam, ExtKeymanProcessOutput, ExtKeymanGetContext, _fUpdate, _fPreserved)) {
-      SendDebugMessage(L"DoEditSession: TIPProcessKey did not handle the keystroke");
-      _hr = E_FAIL; // TODO: use S_FALSE -> this tells _KeymanProcessKeystroke to pass keystroke on
-    }
-  }
+
   ExtEditSession = NULL;
 
   // Call keyman32.processtipkey; this may call "KeymanGetContext(n, buf)";
@@ -303,17 +260,7 @@ BOOL CKMTipTextService::TIPNotifyActivate(GUID *guidProfile)   // I3581   // I42
     return FALSE;   // I3590
   }
 
-  if (!_LoadKeyman()) {
-    DebugLastError(L"GetModuleHandle(keymanxx.dll)");
-    return FALSE;
-  }
-
-  PTIPACTIVATEKEYBOARDFUNC pTIPActivateKeyboard = (PTIPACTIVATEKEYBOARDFUNC)GetProcAddress(_hKeyman, "TIPActivateKeyboard");
-  if (!pTIPActivateKeyboard) {
-    DebugLastError(L"GetProcAddress(TIPActivateKeyboard)");
-    return FALSE;
-  }
-  if (!(*pTIPActivateKeyboard)(guidProfile)) {
+  if (!Keyman32Interface::TIPActivateKeyboard(guidProfile)) {
     SendDebugMessage(L"TIPNotifyActivate: TIPActivateKeyboard failed");
     return FALSE;
   }
@@ -325,33 +272,11 @@ BOOL CKMTipTextService::TIPNotifyActivate(GUID *guidProfile)   // I3581   // I42
   return TRUE;
 }
 
-BOOL CKMTipTextService::_LoadKeyman()   // I3590
-{
-
-#ifdef _WIN64
-  _hKeyman = GetModuleHandle("keyman64.dll");   // I3549
-#else
-  _hKeyman = GetModuleHandle("keyman32.dll");
-#endif
-
-  return _hKeyman != NULL;
-}
-
 BOOL CKMTipTextService::_InitKeyman()   // I3590   // I4274
 {
   LogEnter();
-  if (_hKeyman == NULL) {
-    return FALSE;
-  }
 
-  PTIPACTIVATEFUNC pTIPActivate = (PTIPACTIVATEFUNC)GetProcAddress(_hKeyman, "TIPActivateEx");   // I3581
-  if (!pTIPActivate) {
-    _hKeyman = 0;
-    return FALSE;
-  }
-
-  if (!(*pTIPActivate)(TRUE)) {
-    _hKeyman = 0;
+  if (!Keyman32Interface::TIPActivateEx(TRUE)) {
     return FALSE;
   }
 
@@ -361,11 +286,16 @@ BOOL CKMTipTextService::_InitKeyman()   // I3590   // I4274
 void CKMTipTextService::_UninitKeyman() {
   LogEnter();
 
-  if (_hKeyman != NULL) {
-    PTIPACTIVATEFUNC pTIPActivate = (PTIPACTIVATEFUNC)GetProcAddress(_hKeyman, "TIPActivateEx");   // I3581
-    if (pTIPActivate) {
-      (*pTIPActivate)(FALSE);
-    }
+  Keyman32Interface::TIPActivateEx(FALSE);
+}
+
+void CKMTipTextService::_TryAndStartKeyman() {
+  HANDLE hEventSource = RegisterEventSource(NULL, "Keyman");
+  if (!hEventSource) {
+    // This is unlikely to occur, but if it does, there's probably
+    // not much we can do about it; it's not like we can report an event...
+    return;
   }
-  _hKeyman = NULL;
+  ReportEvent(hEventSource, EVENTLOG_INFORMATION_TYPE, SIMPLE_CATEGORY, MSG_START_KEYMAN_ON_DEMAND, NULL, 0, 0, NULL, NULL);
+  DeregisterEventSource(hEventSource);
 }

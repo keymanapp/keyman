@@ -142,6 +142,20 @@
         <File Id="mcompile.exe" Name='mcompile.exe' KeyPath="yes" Source="..\..\..\bin\engine\mcompile.exe" />
       </Component>
 
+      <Component Guid="{7D3374DC-7B4E-4593-819E-B212E876BDAF}">
+        <File Id="keymanmc.dll" Name="keymanmc.dll" KeyPath="yes" Source="..\..\..\bin\engine\keymanmc.dll" />
+        <util:EventSource 
+          CategoryCount="1" 
+          CategoryMessageFile="[#keymanmc.dll]" 
+          EventMessageFile="[#keymanmc.dll]" 
+          Log="Application" 
+          Name="Keyman"
+          SupportsInformationals="yes"
+          SupportsErrors="yes"
+          SupportsWarnings="yes"
+        />
+      </Component>
+
       <Component Guid="{FA89BC70-11F3-4DAF-A0B4-6EBA64FC6C5C}" Id="tsysinfo.xslts">
         <File Id="base.xslt" Name='base.xslt'                 Source='..\..\engine\tsysinfo\base.xslt' />
         <File Id="si_browsers.xslt" Name='si_browsers.xslt'   Source='..\..\engine\tsysinfo\si_browsers.xslt' />

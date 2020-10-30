@@ -2,7 +2,7 @@
 # Keyman Desktop Makefile
 #
 
-TARGETS=kmshell kmbrowserhost setup insthelp
+TARGETS=kmshell kmconfig kmbrowserhost setup insthelp
 RELEASE_TARGETS=help
 CLEANS=inst clean-desktop
 MANIFESTS=kmshell setup insthelp
@@ -13,6 +13,10 @@ MANIFESTS=kmshell setup insthelp
 
 kmshell:
     cd $(ROOT)\src\desktop\kmshell
+    $(MAKE) $(TARGET)
+
+kmconfig:
+    cd $(ROOT)\src\desktop\kmconfig
     $(MAKE) $(TARGET)
 
 kmbrowserhost:

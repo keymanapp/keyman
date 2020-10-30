@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,18 +17,17 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.util.KMPLink;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class KMPBrowserActivity extends AppCompatActivity implements KeyboardEventHandler.OnKeyboardEventListener {
+import static android.app.Application.getProcessName;
+
+public class KMPBrowserActivity extends AppCompatActivity {
   private static final String TAG = "KMPBrowserActivity";
 
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
@@ -46,12 +46,23 @@ public class KMPBrowserActivity extends AppCompatActivity implements KeyboardEve
   private WebView webView;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
+  private static boolean didSetDataDirectorySuffix = false;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     final Context context = this;
+
+    // Difference processes in the same application cannot directly share WebView-related data
+    // https://developer.android.com/reference/android/webkit/WebView.html#setDataDirectorySuffix(java.lang.String)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      if (!didSetDataDirectorySuffix) {
+        String processName = getProcessName();
+        WebView.setDataDirectorySuffix(processName);
+        didSetDataDirectorySuffix = true;
+      }
+    }
 
     setContentView(R.layout.activity_kmp_browser);
 
@@ -136,7 +147,6 @@ public class KMPBrowserActivity extends AppCompatActivity implements KeyboardEve
   @Override
   protected void onResume() {
     super.onResume();
-    KMManager.addKeyboardEventListener(this);
 
     if (webView != null) {
       webView.reload();
@@ -146,38 +156,11 @@ public class KMPBrowserActivity extends AppCompatActivity implements KeyboardEve
   @Override
   protected void onPause() {
     super.onPause();
-    KMManager.removeKeyboardEventListener(this);
   }
 
   @Override
   protected void onDestroy() {
     super.onDestroy();
-  }
-
-  @Override
-  public void onKeyboardLoaded(KMManager.KeyboardType keyboardType) {
-    // Mitigation for https://github.com/keymanapp/keyman/issues/1963
-    // Due to latency, switch from Keyman system keyboard to another
-    if (KMManager.getKMKeyboard(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM) != null) {
-      Toast.makeText(getApplicationContext(), getString(R.string.switching_keyboard),
-        Toast.LENGTH_SHORT).show();
-      KMManager.advanceToNextInputMode();
-    }
-  }
-
-  @Override
-  public void onKeyboardChanged(String newKeyboard) {
-    // Do nothing
-  }
-
-  @Override
-  public void onKeyboardShown() {
-    //
-  }
-
-  @Override
-  public void onKeyboardDismissed() {
-    // Do nothing
   }
 
   @Override

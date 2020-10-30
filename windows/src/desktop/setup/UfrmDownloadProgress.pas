@@ -41,13 +41,13 @@ type
     lblStatus: TLabel;
     procedure cmdCancelClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
   private
     FCallback: TDownloadProgressCallback;
     FCancel: Boolean;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER;
+    procedure SetProgressPosition(Position: Integer);
   public
-
+    function Status(const Message: string; Position: Integer; Total: Integer = -1): Boolean;
     procedure HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
     procedure HTTPStatus(Sender: THTTPUploader; const Message: string; Position, Total: Int64);  // I2855
     property Callback: TDownloadProgressCallback read FCallback write FCallback;
@@ -62,12 +62,6 @@ procedure TfrmDownloadProgress.cmdCancelClick(Sender: TObject);
 begin
   inherited;
   FCancel := True;
-end;
-
-procedure TfrmDownloadProgress.FormCreate(Sender: TObject);
-begin
-//  cmdCancel.Caption := MsgFromId(SKButtonCancel);
-//  Caption := MsgFromId(SKDownloadProgress_Title);
 end;
 
 procedure TfrmDownloadProgress.FormShow(Sender: TObject);
@@ -85,12 +79,38 @@ procedure TfrmDownloadProgress.HTTPStatus(Sender: THTTPUploader;
 begin
   if Total = 0
     then progress.Max := 100
-    else progress.Max := Total;
-  progress.Position := Position;
-  progress.Update;
+    else progress.Max := Integer(Total);
+  SetProgressPosition(Integer(Position));
   lblStatus.Caption := Message;
   lblStatus.Update;
   Application.ProcessMessages;
+end;
+
+procedure TfrmDownloadProgress.SetProgressPosition(Position: Integer);
+begin
+  progress.Position := Position;
+  if (Position < progress.Max) then
+  begin
+    // This 'hack' encourages the progress bar to move immediately to the
+    // requested position, because otherwise it animates into position, which
+    // won't happen because we're doing all the work on the main thread. It is
+    // not worth refactoring into a threaded model for the sake of the progress
+    // bar!
+    progress.StepBy(1);
+    progress.StepBy(-1);
+  end;
+  progress.Update;
+end;
+
+function TfrmDownloadProgress.Status(const Message: string; Position,
+  Total: Integer): Boolean;
+begin
+  if Total > 0 then progress.Max := Total;
+  SetProgressPosition(Position);
+  lblStatus.Caption := Message;
+  lblStatus.Update;
+  Application.ProcessMessages;
+  Result := not FCancel;
 end;
 
 procedure TfrmDownloadProgress.WMUserFormShown(var Message: TMessage);
@@ -106,9 +126,13 @@ begin
       then ModalResult := mrOk
       else ModalResult := mrCancel;
   except
-    on E:Exception do
+    on E:EHTTPUploader do
     begin
       ShowMessage(E.Message);
+      ModalResult := mrCancel;
+    end;
+    on E:EHTTPUploaderCancel do
+    begin
       ModalResult := mrCancel;
     end;
   end;

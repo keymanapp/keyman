@@ -9,7 +9,7 @@ inherited frmDownloadProgress: TfrmDownloadProgress
   Font.Name = 'Tahoma'
   Position = poScreenCenter
   ExplicitWidth = 311
-  ExplicitHeight = 180
+  ExplicitHeight = 177
   PixelsPerInch = 96
   TextHeight = 13
   object lblStatus: TLabel
@@ -19,6 +19,7 @@ inherited frmDownloadProgress: TfrmDownloadProgress
     Height = 33
     Alignment = taCenter
     AutoSize = False
+    EllipsisPosition = epWordEllipsis
     WordWrap = True
   end
   object progress: TProgressBar

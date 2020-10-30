@@ -81,7 +81,6 @@ CKMTipTextService::CKMTipTextService()
 
     memset(&guidActiveProfile, 0, sizeof(GUID));
     _keystrokeSinkInitialized = FALSE;
-    _hKeyman = NULL;
     _dwActiveLanguageProfileNotifySinkCookie = 0;
     _PreservedKeys = NULL;
     _cPreservedKeyCount = 0;
@@ -207,11 +206,9 @@ STDAPI CKMTipTextService::ActivateEx(ITfThreadMgr *ptim, TfClientId tid, DWORD d
     goto ExitError;
 	}
 
-  if(_LoadKeyman()) {   // I3590   // I4274
-    if(!_InitKeyman()) {
-		  Log(L"Could not initialise Keyman");
-      goto ExitError;
-	  }
+  if(!_InitKeyman()) {
+		Log(L"Could not initialise Keyman");
+    goto ExitError;
   }
 
   // start tracking the focus doc
@@ -248,12 +245,11 @@ STDAPI CKMTipTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClient
     goto ExitError;
 	}
 
-  if(_LoadKeyman()) {   // I4274
-    if(!_InitKeyman())	{
-		  Log(L"Could not initialise Keyman");
-      goto ExitError;
-	  }
-  }
+  if(!_InitKeyman())	{
+    _TryAndStartKeyman();
+		Log(L"Could not initialise Keyman");
+    //goto ExitError;
+	}
 
   // start tracking the focus doc
   if (_pThreadMgr->GetFocus(&pFocusDoc) == S_OK)
