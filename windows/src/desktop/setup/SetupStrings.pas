@@ -31,6 +31,12 @@ type
     ssInstallSuccess,
     ssCancelQuery,
 
+    ssBootstrapExtractingBundle,
+    ssBootstrapCheckingPackages,
+    ssBootstrapCheckingForUpdates,
+    ssBootstrapCheckingInstalledVersions,
+    ssBootstrapReady,
+
     ssActionInstallKeyman,
     ssActionInstallPackage,
     ssActionInstallPackageLanguage,

@@ -2,7 +2,7 @@ program setup;
 
 uses
   bootstrapmain in 'bootstrapmain.pas',
-  UfrmDownloadProgress in 'UfrmDownloadProgress.pas',
+  UfrmDownloadProgress in 'UfrmDownloadProgress.pas' {frmDownloadProgress},
   CommonControls in 'CommonControls.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',

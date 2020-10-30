@@ -14,7 +14,6 @@ object frmDownloadProgress: TfrmDownloadProgress
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
-  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -32,6 +31,8 @@ object frmDownloadProgress: TfrmDownloadProgress
     Top = 44
     Width = 281
     Height = 17
+    DoubleBuffered = False
+    ParentDoubleBuffered = False
     TabOrder = 0
   end
   object cmdCancel: TButton
