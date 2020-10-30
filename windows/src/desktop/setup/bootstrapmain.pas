@@ -170,24 +170,9 @@ BEGIN
           // the -p parameter, e.g. -p khmer_angkor=km,sil_euro_latin=fr
           FInstallInfo.LocatePackagesFromParameter(FPackages);
 
-          // Packages that have been extracted from the SFX archive are in
-          // the TempPath
-          FInstallInfo.LocatePackagesInPath(FInstallInfo.TempPath);
-
-          // Finally, look also for any .kmp packages in the same folder as
-          // this executable
-          FInstallInfo.LocatePackagesInPath(ProgramPath);
-
           // Lookup a tier from command line parameter
           if FTier <> '' then
             FInstallInfo.Tier := FTier;
-
-          // Try and get information from online
-          if not GetResourcesFromOnline(FSilent, FForceOffline) then
-          begin
-            SetExitVal(ERROR_FILE_NOT_FOUND);
-            Exit;
-          end;
 
           // This loads setup.inf, if present, for various additional strings and settings
           // The bundled installer usually contains a setup.inf.
@@ -195,6 +180,16 @@ BEGIN
             FInstallInfo.LoadSetupInf(FInstallInfo.TempPath)
           else if FileExists(ProgramPath + 'setup.inf') then
             FInstallInfo.LoadSetupInf(ProgramPath);
+
+          // Finally, load details for any .kmp packages referenced in setup.inf
+          FInstallInfo.LoadLocalPackagesMetadata;
+
+          // Try and get information from online
+          if not GetResourcesFromOnline(FSilent, FForceOffline) then
+          begin
+            SetExitVal(ERROR_FILE_NOT_FOUND);
+            Exit;
+          end;
 
           // If the user is trying to install on downlevel version of Windows (Vista or earlier),
           // we can simplify their life by installing the packages into an existing Keyman
