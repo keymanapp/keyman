@@ -3,6 +3,7 @@ package com.tavultesoft.kmea;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.LexicalModel;
@@ -26,6 +31,7 @@ import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +46,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
   private static Toolbar toolbar = null;
   private static ListView listView = null;
 
+  private DataSetObserver repoObserver;
   private static Dataset repo;
   private boolean didExecuteParser = false;
 
@@ -53,7 +60,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
-    setContentView(R.layout.activity_list_layout);
+    setContentView(R.layout.activity_list_with_progress_layout);
 
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
@@ -65,6 +72,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
     Bundle bundle = getIntent().getExtras();
     String newLanguageID = bundle.getString(KMManager.KMKey_LanguageID);
     String newCustomHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink, "");
+    String associatedLexicalModel = bundle.getString("associatedLexicalModel", "");
 
     // Sometimes we need to re-initialize the list of models that are displayed in the ListView
     languageID = newLanguageID;
@@ -75,6 +83,60 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
+
+    repo = CloudRepository.shared.fetchDataset(context);
+    //didExecuteParser = true;
+
+    LexicalModel lm = CloudRepository.shared.getAssociatedLexicalModel(context, newLanguageID);
+    if (associatedLexicalModel.isEmpty() && lm == null) {
+      if (KMManager.hasConnection(context)) {
+        // Query to install associated lexical model
+        String _downloadid = CloudLexicalModelMetaDataDownloadCallback.createDownloadId(newLanguageID);
+        CloudLexicalModelMetaDataDownloadCallback _callback = new CloudLexicalModelMetaDataDownloadCallback();
+
+        Toast.makeText(context,
+          context.getString(R.string.query_associated_model),
+          Toast.LENGTH_SHORT).show();
+
+        ArrayList<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams = new ArrayList<>();
+        String url = CloudRepository.prepareLexicalModelQuery(newLanguageID);
+        aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
+          CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
+
+        CloudDownloadMgr.getInstance().executeAsDownload(
+          context, _downloadid, null, _callback,
+          aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+      } else {
+        Toast.makeText(context,
+          "Network access needed to check for available dictionary",
+          Toast.LENGTH_LONG).show();
+      }
+    }
+
+    repoObserver = new DataSetObserver() {
+      @Override public void onChanged() {
+        updateProgressBar();
+      }
+    };
+    repo.registerDataSetObserver(repoObserver);
+
+    updateProgressBar();
+  }
+
+  /**
+   * switch between progress and listview
+   */
+  private void updateProgressBar() {
+    RelativeLayout _progress = findViewById(R.id.progress);
+    boolean _updaterunning = CloudRepository.shared.updateIsRunning();
+    ListView _list = findViewById(R.id.listView);
+    if (_updaterunning) {
+      _progress.setVisibility(View.VISIBLE);
+      _list.setVisibility(View.GONE);
+    } else {
+      _progress.setVisibility(View.GONE);
+      _list.setVisibility(View.VISIBLE);
+    }
   }
 
   @Override
@@ -191,6 +253,11 @@ public final class ModelPickerActivity extends AppCompatActivity {
   protected void onPause() {
     super.onPause();
 
+  }
+
+  @Override protected void onDestroy() {
+    super.onDestroy();
+    repo.unregisterDataSetObserver(repoObserver);
   }
 
   @Override

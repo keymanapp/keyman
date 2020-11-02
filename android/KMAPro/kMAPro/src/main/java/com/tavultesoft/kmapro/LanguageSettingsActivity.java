@@ -28,11 +28,9 @@ import androidx.appcompat.widget.Toolbar;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.ModelPickerActivity;
-import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
-import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 
 import java.util.HashMap;
@@ -183,6 +181,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         bundle.putString(KMManager.KMKey_LanguageID, lgCode);
         bundle.putString(KMManager.KMKey_LanguageName, lgName);
         bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
+        bundle.putString("associatedLexicalModel", associatedLexicalModel);
         Intent i = new Intent(context, ModelPickerActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.putExtras(bundle);

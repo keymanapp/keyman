@@ -108,6 +108,9 @@
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Would you like to download the latest version of this dictionary?</string>
 
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">No dictionary to download</string>
+
     <!-- Context: Model Updates -->
     <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">The resource catalog is unavailable</string>
 
