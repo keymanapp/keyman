@@ -123,7 +123,7 @@
       The catalog is still downloading; please try again in a moment!</string>
 
     <!-- Context: Background download messages-->
-    <string name="progress_message_catalog_download_is_running" comment="Progress notification that the resource catalog update is still running ">The catalog is still downloading!</string>
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">Checking for resource</string>
 
     <!-- Context: Background download messages-->
     <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">Downloading keyboard started in Background</string>
@@ -172,6 +172,10 @@
 
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dictionary</string>
+
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">Check for available dictionary</string>
+
 
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Dictionary: %1$s</string>

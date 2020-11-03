@@ -27,6 +27,8 @@ import java.util.List;
 public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownloadCallback<Void,
   List<CloudLexicalModelMetaDataDownloadCallback.MetaDataResult>>
 {
+  private static boolean updateIsRunning = false;
+
   /**
    * the metadata result and all necessary downloads which should be started
    */
@@ -82,6 +84,7 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
       String msg = aContext.getString(R.string.catalog_unavailable);
       Toast.makeText(aContext, msg, Toast.LENGTH_SHORT).show();
       KMLog.LogError(TAG, "Could not reach server");
+      updateFinished();
       return;
     }
 
@@ -175,7 +178,17 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
    */
   public static String createDownloadId(String aLanguageId)
   {
+    updateIsRunning = true;
     return "metadata_" + aLanguageId;
+  }
+
+  public void updateFinished()
+  {
+    updateIsRunning=false;
+  }
+
+  public static boolean updateIsRunning() {
+    return updateIsRunning;
   }
 
 }

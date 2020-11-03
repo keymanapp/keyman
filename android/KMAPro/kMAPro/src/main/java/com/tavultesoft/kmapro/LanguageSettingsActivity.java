@@ -181,7 +181,6 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         bundle.putString(KMManager.KMKey_LanguageID, lgCode);
         bundle.putString(KMManager.KMKey_LanguageName, lgName);
         bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
-        bundle.putString("associatedLexicalModel", associatedLexicalModel);
         Intent i = new Intent(context, ModelPickerActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.putExtras(bundle);
@@ -260,20 +259,21 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     updateActiveLexicalModel();
   }
 
+  /**
+   * Updates the active lexical model label with the name of the associated lexical model.
+   * If there's no associated lexical model, the label displays a prompt to check for an available model.
+   */
   public void updateActiveLexicalModel() {
     HashMap<String, String> lexModelMap = KMManager.getAssociatedLexicalModel(lgCode);
     if(lexModelMap != null) {
       associatedLexicalModel = lexModelMap.get(KMManager.KMKey_LexicalModelName);
     } else {
-      associatedLexicalModel = "";
+      // Prompt to check for available dictionary
+      associatedLexicalModel = getString(R.string.check_available_model);
     }
-    if (!associatedLexicalModel.isEmpty()) {
-      lexicalModelTextView.setText(associatedLexicalModel);
-      lexicalModelTextView.setEnabled(true);
-    } else {
-      lexicalModelTextView.setText("");
-      lexicalModelTextView.setEnabled(false);
-    }
+
+    lexicalModelTextView.setText(associatedLexicalModel);
+    lexicalModelTextView.setEnabled(true);
   }
 
   @Override
