@@ -223,13 +223,6 @@ public final class ModelPickerActivity extends AppCompatActivity {
     Intent i = getIntent();
     listView.setSelectionFromTop(i.getIntExtra("listPosition", 0),
       i.getIntExtra("offsetY", 0));
- /*
-  } else {
-    // Forces a display refresh.
-    ((ModelPickerActivity.FilteredLexicalModelAdapter) listView.getAdapter()).notifyDataSetChanged();
-  }*/
-
-
   }
 
   /**
