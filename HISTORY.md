@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.174 alpha 2020-11-03
+
+* chore(common): improve build README.md (#3812)
+
 ## 14.0.173 alpha 2020-10-30
 
 * fix(windows): Cleanup setup.inf processing and CompareVersions function (#3790)
