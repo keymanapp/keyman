@@ -8,10 +8,10 @@
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
-import { createTrieDataStructure, 
-         defaultSearchTermToKey, 
+import { createTrieDataStructure } from "./build-trie";
+import { defaultSearchTermToKey, 
          defaultCasedSearchTermToKey,
-         defaultApplyCasing } from "./build-trie";
+         defaultApplyCasing } from "./lexical-mapping-defaults";
 import {decorateWithJoin} from "./join-word-breaker-decorator";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator";
 
@@ -75,7 +75,9 @@ export default class LexicalModelCompiler {
             // applyCasing is defined here.
             // Unfortunately, this only works conceptually.  .toString on a closure
             // does not result in proper compilation.
-            searchTermToKey = defaultCasedSearchTermToKey(applyCasing);
+            searchTermToKey = function(text: string) {
+              return defaultCasedSearchTermToKey(text, applyCasing);
+            }
           } else if(modelSource.languageUsesCasing == false) {
             searchTermToKey = defaultSearchTermToKey;
           } else {
@@ -83,7 +85,9 @@ export default class LexicalModelCompiler {
             // which expects a lowercased default.
             // Unfortunately, this only works conceptually.  .toString on a closure
             // does not result in proper compilation.
-            searchTermToKey = defaultCasedSearchTermToKey(defaultApplyCasing);
+            searchTermToKey = function(text: string) {
+              return defaultCasedSearchTermToKey(text, defaultApplyCasing);
+            }
           }
         }
 
