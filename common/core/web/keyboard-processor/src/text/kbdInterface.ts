@@ -163,6 +163,12 @@ namespace com.keyman.text {
       } 
       this._cache[n][ln] = val; 
     }
+
+    clone(): CachedContextEx {
+      let r = new CachedContextEx();
+      r._cache = this._cache;
+      return r;
+    }
   };
 
   //#endregion
@@ -172,6 +178,7 @@ namespace com.keyman.text {
 
     cachedContext: CachedContext = new CachedContext();
     cachedContextEx: CachedContextEx = new CachedContextEx();
+    ruleContextEx: CachedContextEx;
 
     activeTargetOutput: OutputTarget;
     ruleBehavior: RuleBehavior;
@@ -405,6 +412,7 @@ namespace com.keyman.text {
     fullContextMatch(n: number, outputTarget: OutputTarget, rule: ContextEntry[]): boolean {
       // Stage one:  build the context index map.
       var fullContext = this._BuildExtendedContext(n, rule.length, outputTarget);
+      this.ruleContextEx = this.cachedContextEx.clone();
       var context = fullContext.valContext;
       var deadContext = fullContext.deadContext;
 
@@ -457,7 +465,7 @@ namespace com.keyman.text {
                   deadContext[i].set();
                 }
                 // 'n' for 'notany'.  If we actually match or if we have nul context (\uFFFE), notany fails.
-              } else if(r.n && (result || context[i] !== NUL_CONTEXT)) {
+              } else if(r.n && (result || context[i] === NUL_CONTEXT)) {
                 mismatch = true;
               }
               break;
@@ -787,7 +795,36 @@ namespace com.keyman.text {
       outputTarget.restoreProperties();
     }
   
-    
+    /**
+     * `contextExOutput` function emits the character or object at `contextOffset` from the
+     * current matched rule's context. Introduced in Keyman 14.0, in order to resolve a
+     * gap between desktop and web core functionality for context(n) matching on notany().
+     * See #917 for additional detail.
+     * @alias       KNO
+     * @public
+     * @param       {number}        Pdn            number of characters to delete left of cursor
+     * @param       {OutputTarget}  outputTarget   target to output to 
+     * @param       {number}        contextLength  length of current rule context to retrieve
+     * @param       {number}        contextOffset  offset from start of current rule context, 1-based
+     */
+    contextExOutput(Pdn: number, outputTarget: OutputTarget, contextLength: number, contextOffset: number): void {
+      this.resetContextCache();
+
+      if(Pdn >= 0) {
+        this.output(Pdn, outputTarget, "");
+      }
+
+      const context = this.ruleContextEx.get(contextLength, contextLength);
+      const dk = context.deadContext[contextOffset-1], vc = context.valContext[contextOffset-1];
+      if(dk) {
+        outputTarget.insertDeadkeyBeforeCaret(dk.d);
+      } else if(typeof vc == 'string') {
+        this.output(-1, outputTarget, vc);
+      } else {
+        throw new Error("contextExOutput: should never be a numeric valContext with no corresponding deadContext");
+      }
+    }
+
     /**
      * Function     deadkeyOutput KDO      
      * Scope        Public
@@ -994,6 +1031,7 @@ namespace com.keyman.text {
       exportKBCallback('KDC', 'deleteContext');
       exportKBCallback('KO', 'output');
       exportKBCallback('KDO', 'deadkeyOutput');
+      exportKBCallback('KNO', 'contextExOutput');
       exportKBCallback('KIO', 'indexOutput');
       exportKBCallback('KIFS', 'ifStore');
       exportKBCallback('KSETS', 'setStore');

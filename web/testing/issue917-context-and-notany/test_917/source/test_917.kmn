@@ -1,0 +1,36 @@
+﻿c test_917 generated from template at 2020-11-04 06:59:27
+c with name "test_917"
+c store(&VERSION) '14.0'
+store(&NAME) 'test_917'
+store(&COPYRIGHT) '©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'test_917.kvks'
+store(&LAYOUTFILE) 'test_917.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c type: 'abc' > 'abc'
+c type: 'xbc' > 'xBC'
+c type: 'dbc' > DK(1) 'BC'
+store(vow) 'aeiou'
+notany(vow) 'b' + 'c' > context(1) 'BC'
++ 'd' > dk(1)
+dk(1) 'BC' + '?' > 'pass!'
+
+c type: 'adcd' > 'a' DK(1) 'XX'
+c type: 'adcd?' > 'pass!'
+c type: 'axcd' > 'axXX'
+c type: 'axcd?' > 'axXX?'
+'a' notany(vow) 'c' + 'd' > context(1) context(2) 'XX'
+'a' dk(1) 'XX' + '?' > 'pass!'
+
+c Test for AdjustIndex correctness
+c type: 'fghi' > 'fgXX'
+c type: 'fghi?' > 'fgXX?'
+c type: 'fdhi' > 'f' DK(1) 'XX'
+c type: 'fdhi?' > 'pass!'
+if(&platform = 'web') 'f' notany(vow) 'h' + 'i' > context(2) context(3) 'XX'
+'f' dk(1) 'XX' + '?' > 'pass!'
