@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.175 alpha 2020-11-04
+
+* feat(android/engine): Add check for associated model on ModelPickerActivity (#3808)
+
 ## 14.0.174 alpha 2020-11-03
 
 * chore(common): improve build README.md (#3812)
