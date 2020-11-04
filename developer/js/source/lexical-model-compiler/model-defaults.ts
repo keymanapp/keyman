@@ -48,11 +48,27 @@ export function defaultSearchTermToKey(wordform: string): string {
  * language. There is a chance the default will work properly out of the box.
  */
 export function defaultCasedSearchTermToKey(wordform: string, applyCasing: CasingFunction): string {
-  return Array.from(defaultSearchTermToKey(wordform))
-              .map(c => applyCasing('lower', c))
-              .join('');
+  // While this is a bit WET, as the basic `defaultSearchTermToKey` exists and performs some of
+  // the same functions, repetition is the easiest way to allow the function to be safely compiled 
+  // with ease by use of `.toString()`.
+  return Array.from(wordform
+        .normalize('NFKD')
+        // Remove any combining diacritics (if input is in NFKD)
+        .replace(/[\u0300-\u036F]/g, '')
+      ) // end of `Array.from`
+      .map(c => applyCasing('lower', c))
+      .join('');
 }
 
+/**
+ * Specifies default casing behavior for lexical models when `languageUsesCasing` is
+ * set to true.
+ * @param casing One of 'lower' (lowercased), 'upper' (uppercased), or 'initial'.  
+ * 
+ * 'initial' is designed to cover cases like sentence-initial & proper noun capitalization in English.
+ * This may be overwritten as appropriate in model-specific implementations.
+ * @param text The text to be modified.
+ */
 export function defaultApplyCasing(casing: CasingEnum, text: string): string {
   switch(casing) {
     case 'lower':
@@ -77,6 +93,7 @@ export function defaultApplyCasing(casing: CasingEnum, text: string): string {
       }
 
       // Capitalizes the first code unit of the string, leaving the rest intact.
-      return text.substring(0, headUnitLength).toUpperCase().concat(text.substring(headUnitLength));
+      return text.substring(0, headUnitLength).toUpperCase() // head - uppercased
+             .concat(text.substring(headUnitLength));        // tail - lowercased
   }
 }

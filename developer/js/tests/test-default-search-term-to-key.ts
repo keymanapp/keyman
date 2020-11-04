@@ -1,7 +1,7 @@
 
 import 'mocha';
 import {assert} from 'chai';
-import { defaultSearchTermToKey } from '../dist/lexical-model-compiler/build-trie';
+import { defaultSearchTermToKey } from '../dist/lexical-model-compiler/model-defaults';
 
 
 describe('The default searchTermToKey() function', function () {

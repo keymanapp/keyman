@@ -9,9 +9,7 @@ import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
 import { createTrieDataStructure } from "./build-trie";
-import { defaultSearchTermToKey, 
-         defaultCasedSearchTermToKey,
-         defaultApplyCasing } from "./lexical-mapping-defaults";
+import { ModelPseudoclosure } from "./model-pseudoclosure";
 import {decorateWithJoin} from "./join-word-breaker-decorator";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator";
 
@@ -52,55 +50,22 @@ export default class LexicalModelCompiler {
         // file, rather than the current working directory.
         let filenames = modelSource.sources.map(filename => path.join(sourcePath, filename));
 
-        // Determine the model's `applyCasing` function / implementation.
-        // Conceptually correct... but closures make actual compilation far trickier.
-        // casingClosure.toString() will not yield a proper compilation.
-        let applyCasing: CasingFunction = defaultApplyCasing;
-        if(modelSource.languageUsesCasing) {
-          applyCasing = modelSource.applyCasing || defaultApplyCasing;
+        let pseudoclosure = new ModelPseudoclosure(modelSource);
 
-          // Since the defined casing function may expect to take our default implementation
-          // as a parameter, we can define the full implementation via closure capture.
-          let casingClosure: CasingFunction = function(casing: CasingEnum, text: string) {
-            return applyCasing(casing, text, defaultApplyCasing);
-          }
-          // Kept as a separate line for easier comparison / debugging.
-          applyCasing = casingClosure;
-        }
-
-        // Use the default search term to key function, if left unspecified.
-        let searchTermToKey: WordformToKeySpec = modelSource.searchTermToKey 
-        if(!searchTermToKey) {
-          if(modelSource.languageUsesCasing) {
-            // applyCasing is defined here.
-            // Unfortunately, this only works conceptually.  .toString on a closure
-            // does not result in proper compilation.
-            searchTermToKey = function(text: string) {
-              return defaultCasedSearchTermToKey(text, applyCasing);
-            }
-          } else if(modelSource.languageUsesCasing == false) {
-            searchTermToKey = defaultSearchTermToKey;
-          } else {
-            // If languageUsesCasing is not defined, then we use pre-14.0 behavior, 
-            // which expects a lowercased default.
-            // Unfortunately, this only works conceptually.  .toString on a closure
-            // does not result in proper compilation.
-            searchTermToKey = function(text: string) {
-              return defaultCasedSearchTermToKey(text, defaultApplyCasing);
-            }
-          }
-        }
+        // TODO: the connection here is still rough, may not be fully syntactically correct.
+        func += pseudoclosure.compilePseudoclosure();
 
         // Needs the actual searchTermToKey closure...
         // Which needs the actual applyCasing closure as well.
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
-          createTrieDataStructure(filenames, searchTermToKey)
+          createTrieDataStructure(filenames, pseudoclosure.searchTermToKey)
         }, {\n`;
 
         let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
         func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
 
-        func += `  searchTermToKey: ${searchTermToKey.toString()},\n`;
+        // START - the lexical mapping option block
+        func += `  searchTermToKey: ${pseudoclosure.compileSearchTermToKey()},\n`;
 
         if(modelSource.languageUsesCasing != null) {
           func += `  languageUsesCasing: ${modelSource.languageUsesCasing},\n`;
@@ -109,8 +74,9 @@ export default class LexicalModelCompiler {
         }
 
         if(modelSource.languageUsesCasing) {
-          func += `  applyCasing: ${compileApplyCasing(applyCasing)},\n`;
+          func += `  applyCasing: ${pseudoclosure.compileApplyCasing()},\n`;
         }
+        // END - the lexical mapping option block.
 
         if (modelSource.punctuation) {
           func += `  punctuation: ${JSON.stringify(modelSource.punctuation)},\n`;
@@ -188,14 +154,6 @@ function compileInnerWordBreaker(spec: SimpleWordBreakerSpec): string {
       // plain function:
       .replace(/^wordBreak(ing|er)\b/, 'function');
   }
-}
-
-/**
- * Compiles the `applyCasing` function, returning the source code of the
- * full closure's JavaScript representation.
- */
-function compileApplyCasing(closure: CasingFunction) {
-  return closure.toString().replace(/^applyCasing\b/, 'function');
 }
 
 /**
