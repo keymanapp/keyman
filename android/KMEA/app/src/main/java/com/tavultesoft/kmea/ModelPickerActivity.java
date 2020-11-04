@@ -115,7 +115,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
           aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
       } else {
         Toast.makeText(context,
-          "Network access needed to check for available dictionary",
+          context.getString(R.string.cannot_connect),
           Toast.LENGTH_LONG).show();
       }
 
