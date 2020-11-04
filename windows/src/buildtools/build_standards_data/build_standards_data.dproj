@@ -93,7 +93,6 @@
         <DCCReference Include="Keyman.System.BuildISO6393Registry.pas"/>
         <DCCReference Include="Keyman.Console.BuildStandardsData.pas"/>
         <DCCReference Include="Keyman.System.BuildLCIDToBCP47Registry.pas"/>
-        <DCCReference Include="Keyman.System.BuildNRSIAllTags.pas"/>
         <DCCReference Include="Keyman.System.BuildLangTags.pas"/>
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
         <BuildConfiguration Include="Release">
