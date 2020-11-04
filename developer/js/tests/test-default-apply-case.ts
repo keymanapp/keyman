@@ -3,7 +3,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { defaultApplyCasing } from '../dist/lexical-model-compiler/model-defaults';
 
-describe.only('The default applyCasing() function', function () {
+describe('The default applyCasing() function', function () {
   // // --------
   // // Definitions toward SMP testing.
   // // Ref: https://unicode.org/charts/nameslist/n_1D400.html
