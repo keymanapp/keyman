@@ -53,6 +53,16 @@
     searchTermToKey?: (searchTerm: string) => string;
 
     /**
+     * Indicates that the model's written form has 'casing' behavior.
+     */
+    languageUsesCasing?: boolean;
+
+    /**
+     * Specifies a function used to apply the language's casing rules to a word.
+     */
+    applyCasing?: CasingFunction;
+
+    /**
      * Any punctuation to expose to the user.
      */
     punctuation?: LexicalModelPunctuation;
@@ -81,6 +91,9 @@
     private _trie: Trie;
     readonly breakWords: WordBreakingFunction;
     readonly punctuation?: LexicalModelPunctuation;
+    readonly languageUsesCasing?: boolean;
+
+    readonly applyCasing?: CasingFunction;
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(
@@ -90,6 +103,9 @@
       );
       this.breakWords = options.wordBreaker || getDefaultWordBreaker();
       this.punctuation = options.punctuation;
+      this.languageUsesCasing = options.languageUsesCasing;
+      
+      this.applyCasing = options.applyCasing;
     }
 
     configure(capabilities: Capabilities): Configuration {
