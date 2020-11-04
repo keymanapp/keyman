@@ -1,0 +1,46 @@
+﻿c test_917 generated from template at 2020-11-04 06:59:27
+c with name "test_917"
+c store(&VERSION) '14.0'
+store(&NAME) 'Test #917 - notany() and context()'
+store(&COPYRIGHT) '©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'web'
+c store(&VISUALKEYBOARD) 'test_917.kvks'
+c store(&LAYOUTFILE) 'test_917.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c type: 'abc' > 'abc'
+c type: 'xbc' > 'xBC'
+c type: 'dbc' > DK(1) 'BC'
+c type: 'dbc1' > 'pass!'
+c 
+store(vow) 'aeiou'
+notany(vow) 'b' + 'c' > context(1) 'BC'
++ 'd' > dk(1)
+dk(1) 'BC' + '1' > 'pass!'
+
+c type: 'adcd' > 'a' DK(1) 'XX'
+c type: 'adcd1' > 'pass!'
+c type: 'axcd' > 'axXX'
+c type: 'axcd1' > 'axXX1'
+'a' notany(vow) 'c' + 'd' > context(1) context(2) 'XX'
+'a' dk(1) 'XX' + '1' > 'pass!'
+
+c Test for AdjustIndex correctness
+c type: 'fghi' > 'fgXX'
+c type: 'fghi1' > 'fgXX1'
+c type: 'fdhi' > 'f' DK(1) 'XX'
+c type: 'fdhi1' > 'pass!'
+if(&platform = 'web') 'f' notany(vow) 'h' + 'i' > context(2) context(3) 'XX'
+
+c this platform matches for node-based tests ('web' doesn't!)
+if(&platform = 'native') 'f' notany(vow) 'h' + 'i' > context(2) context(3) 'XX'
+'f' dk(1) 'XX' + '1' > 'pass!'
+
+
+c Test notany issue also resolved by #3817
+c type: 'yz' > 'pass!'
+notany(vow) + 'z' > 'pass!'
