@@ -218,6 +218,7 @@ type
     function JavaScript_String(ch: DWord): string;  // I2242
 
     function IsKeyboardVersion10OrLater: Boolean;
+    function IsKeyboardVersion14OrLater: Boolean;
 
     procedure ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971
     function ExpandSentinel(pwsz: PWideChar): TSentinelRecord;
@@ -936,9 +937,17 @@ var
           end;
         CODE_DEADKEY:
           Result := Result + nlt + Format('k.KDO(%d,t,%d);', [len, recContext.Deadkey.Deadkey]);   // I4611
+        CODE_NOTANY:
+          begin
+            // #917: Minimum version required is 14.0: the KNO function was only added for 14.0
+            // Note that this is checked in compiler.cpp as well, so this error can probably never occur
+            if not IsKeyboardVersion14OrLater then
+              ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement notany in context() match requires version 14.0+ of KeymanWeb', [GetCodeName(recContext.Code)]));  // I1971   // I4061
+            Result := Result + nlt + Format('k.KNO(%d,t,%d,%d);', [len, AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext)), AdjustIndex(fkp.dpContext, ContextIndex)]);
+          end;
         else
         begin
-          ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement %s is not currently supported in CODE_CONTEXT match', [GetCodeName(recContext.Code)]));  // I1971   // I4061
+          ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement %s is not currently supported in context() match', [GetCodeName(recContext.Code)]));  // I1971   // I4061
         //CODE_NUL: ;     // todo: check if context is longer than that...
           Result := Result + nlt + '/*.*/ ';   // I4611
         end;
@@ -2172,6 +2181,11 @@ end;
 function TCompileKeymanWeb.IsKeyboardVersion10OrLater: Boolean;
 begin
   Result := fk.version >= VERSION_100;
+end;
+
+function TCompileKeymanWeb.IsKeyboardVersion14OrLater: Boolean;
+begin
+  Result := fk.version >= VERSION_140;
 end;
 
 procedure TCompileKeymanWeb.CheckStoreForInvalidFunctions(key: PFILE_KEY; store: PFILE_STORE);  // I1520
