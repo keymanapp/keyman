@@ -463,8 +463,13 @@ begin
     else if FRGFDeadKey[ss, False] then
     begin
       // It's a dead key
+      // This does not match the "Fill from layout" result because deadkeys are
+      // left blank in "Fill from layout". However, this is better because it
+      // matches the actual Windows layout. "Fill from layout" cannot deduce the
+      // character to put onto a deadkey currently (unlike Windows deadkeys,
+      // there is no isolated "default" for a Keyman deadkey).
       vkk := TVisualKeyboardKey.Create;
-      vkk.VKey := FVK;
+      vkk.VKey := MapScanCodeToUSVK(FSC);
       vkk.Text := st[1];
       vkk.Flags := [kvkkUnicode];
       vkk.Shift := KBDShiftStateToVisualKeyboardShiftState[ss];
@@ -486,7 +491,7 @@ begin
       begin
         // It's some characters; put 'em in there.
         vkk := TVisualKeyboardKey.Create;
-        vkk.VKey := FVK;
+        vkk.VKey := MapScanCodeToUSVK(FSC);
         vkk.Text := st;
         vkk.Flags := [kvkkUnicode];
         vkk.Shift := KBDShiftStateToVisualKeyboardShiftState[ss];
