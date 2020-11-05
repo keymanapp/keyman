@@ -15,10 +15,11 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
 
 display_usage ( ) {
-  echo "test.sh [-skip-package-install] [-CI] [ -? | -h | -help]"
+  echo "test.sh [-skip-package-install|-S] [-CI] [ -? | -h | -help]"
   echo "  -CI                    to perform continuous-integration friendly tests and reporting formatted for TeamCity"
   echo "  -? | -h | -help        to display this help information"
   echo "  -skip-package-install  to bypass refreshing dependencies.  Useful when called by scripts that pre-fetch"
+  echo "  (or -S)"
   echo ""
   exit 0
 }
@@ -32,15 +33,16 @@ FETCH_DEPS=true
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
-    -h|-help|-?)
+    -h|-help|-\?)
       display_usage
       exit
       ;;
     -CI)
       CI_REPORTING=1
       ;;
-    -skip-package-install)
+    -skip-package-install|-S)
       FETCH_DEPS=false
+      ;;
   esac
   shift # past argument
 done
@@ -57,10 +59,12 @@ test-headless ( ) {
   npm run mocha -- --recursive $FLAGS ./tests/cases/
 }
 
-# First, run tests on the keyboard processor.
-pushd $WORKING_DIRECTORY/node_modules/@keymanapp/keyboard-processor
-./test.sh -skip-package-install || fail "Tests failed by dependencies; aborting integration tests."
-popd
+if [ $FETCH_DEPS = true ]; then
+  # First, run tests on the keyboard processor.
+  pushd $WORKING_DIRECTORY/node_modules/@keymanapp/keyboard-processor
+  ./test.sh -skip-package-install || fail "Tests failed by dependencies; aborting integration tests."
+  popd
+fi
 
 # Now we run our local tests.
 echo "${TERM_HEADING}Running Input Processor test suite${NORMAL}"
