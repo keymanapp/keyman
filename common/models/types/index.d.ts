@@ -496,8 +496,7 @@ declare interface WordBreakingFunction {
 }
 
 declare interface CasingFunction {
-  (caseToApply: CasingEnum, text: string): string;
-  (caseToApply: CasingEnum, text: string, defaultApplyCasing: (caseToApply: CasingEnum, text: string) => string): string;
+  (caseToApply: CasingEnum, text: string, defaultApplyCasing?: CasingFunction): string;
 }
 
 /**

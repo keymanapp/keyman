@@ -151,7 +151,7 @@ describe('Model definition pseudoclosures', function () {
 
     let modelSource: LexicalModelSource = {
       languageUsesCasing: true,
-      applyCasing: turkishCasing as CasingFunction,
+      applyCasing: turkishCasing,
       searchTermToKey: function(wordform: string, applyCasing: CasingFunction): string {
         return Array.from(wordform
           .normalize('NFC')  // Mostly to avoid decomposing 'İ'
