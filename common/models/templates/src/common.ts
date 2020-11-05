@@ -107,13 +107,12 @@ namespace models {
       case 'upper':
         return text.toUpperCase();
       case 'initial':
-        let headCode = text.charCodeAt(0);
         // The length of the first code unit, as measured in code points.
         let headUnitLength = 1;
   
         // Is the first character a high surrogate, indicating possible use of UTF-16 
         // surrogate pairs?  Also, is the string long enough for there to BE a pair?
-        if(text.length > 1 && headCode >= 0xD800 && headCode <= 0xDBFF) {
+        if(text.length > 1 && isHighSurrogate(text.charAt(0))) {
           // It's possible, so now we check for low surrogates.
           let lowSurrogateCode = text.charCodeAt(1);
   

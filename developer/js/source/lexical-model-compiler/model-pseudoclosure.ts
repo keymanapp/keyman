@@ -203,7 +203,8 @@ export class ModelPseudoclosure {
   compileSearchTermToKey(): string {
     let PSEUDOCLOSURE = ModelPseudoclosure.COMPILED_NAME;
 
-    // TODO:  consider - should it write the full line, or just the JSON value for the entry?
+    // Simply point the model to the constructed closure defined by `compilePseudoclosure`.
+    // See "START - compiled closures" section.
     return `${PSEUDOCLOSURE}.searchTermToKey`;
   }
 
@@ -214,7 +215,8 @@ export class ModelPseudoclosure {
   compileApplyCasing(): string {
     let PSEUDOCLOSURE = ModelPseudoclosure.COMPILED_NAME;
 
-    // TODO:  consider - should it write the full line, or just the JSON value for the entry?
+    // Simply point the model to the constructed closure defined by `compilePseudoclosure`.
+    // See "START - compiled closures" section.
     return `${PSEUDOCLOSURE}.applyCasing`;
   }
 }

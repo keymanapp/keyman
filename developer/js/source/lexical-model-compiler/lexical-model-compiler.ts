@@ -51,8 +51,7 @@ export default class LexicalModelCompiler {
         let filenames = modelSource.sources.map(filename => path.join(sourcePath, filename));
 
         let pseudoclosure = new ModelPseudoclosure(modelSource);
-
-        // TODO: the connection here is still rough, may not be fully syntactically correct.
+        
         func += pseudoclosure.compilePseudoclosure();
 
         // Needs the actual searchTermToKey closure...
