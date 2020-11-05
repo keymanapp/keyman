@@ -236,8 +236,9 @@ public final class KMManager {
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
-  protected static final String KMFilename_JSEngine = "keyman.js";
+  protected static final String KMFilename_JSEngine = "keymanandroid.js";
   protected static final String KMFilename_JSEngine_Sourcemap = "keyman.js.map";
+  protected static final String KMFilename_JSSentry = "keyman-sentry.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
@@ -570,6 +571,7 @@ public final class KMManager {
       // Copy KMW files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
+      copyAsset(context, KMFilename_JSSentry, "", true);
       if(KMManager.isDebugMode()) {
         copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
       }

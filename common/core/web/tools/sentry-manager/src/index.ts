@@ -15,12 +15,13 @@ namespace com.keyman {
     keymanPlatform: string;
 
     static STANDARD_ALIASABLE_FILES = {
-      'keymanweb.js':    'keymanweb.js',
-      'keymanios.js':    'keyman.js',      // iOS's embedded name -> embedded compilation
-      'kmwuibutton.js':  'kmwuibutton.js',
-      'kmwuifloat.js':   'kmwuifloat.js',
-      'kmwuitoggle.js':  'kmwuitoggle.js',
-      'kmwuitoolbar.js': 'kmwuitoolbar.js'
+      'keymanweb.js':     'keymanweb.js',
+      'keymanandroid.js': 'keyman.js',      // Android's embedded name -> embedded compilation
+      'keymanios.js':     'keyman.js',      // iOS's embedded name -> embedded compilation
+      'kmwuibutton.js':   'kmwuibutton.js',
+      'kmwuifloat.js':    'kmwuifloat.js',
+      'kmwuitoggle.js':   'kmwuitoggle.js',
+      'kmwuitoolbar.js':  'kmwuitoolbar.js'
       // Also add entries for the naming system used by Android and iOS - and map them to the EMBEDDED upload, not the std 'native' one.
     }
 
@@ -32,7 +33,7 @@ namespace com.keyman {
       this.keymanPlatform = options.hostPlatform;
     }
 
-    // If we've recognized one of our source files, 
+    // If we've recognized one of our source files,
     aliasFilename(filename: string): string|null {
       if(!this.mayAlias(filename)) {
         return null;
@@ -95,7 +96,7 @@ namespace com.keyman {
     }
 
     /**
-     * Pre-processes a Sentry event object (in-place) to provide more metadata and enhance 
+     * Pre-processes a Sentry event object (in-place) to provide more metadata and enhance
      * the Sentry server's ability to match the error against release artifacts.
      * @param event A Sentry-generated event
      */
@@ -115,8 +116,8 @@ namespace com.keyman {
     /**
      * Allows debugging our custom event preparation code without bombarding Sentry with errors
      * during development.
-     * 
-     * Note that Sentry expects us either to return the event object to be sent or to return `null` 
+     *
+     * Note that Sentry expects us either to return the event object to be sent or to return `null`
      * if we want to prevent the event from being sent to the server.
      * @param event
      */

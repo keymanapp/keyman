@@ -31,8 +31,14 @@ gradle_models.ser
 **/keyman-engine.aar
 
 # keymanweb dependencies
-KMEA/app/src/main/assets/
-KMAPro/assets/keyman.js
+KMEA/**/assets/ajax-loader.gif
+KMEA/**/assets/keymanandroid.js
+KMEA/**/assets/keyman.js.map
+KMEA/**/assets/keyman-sentry.js
+KMEA/**/assets/kmwosk.css
+
+# keymanweb OSK font
+KMEA/**/assets/keymanweb-osk.*
 
 # KMAPRo default packages
 KMAPro/**/assets/*.kmp
