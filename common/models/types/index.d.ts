@@ -142,8 +142,8 @@ declare interface LexicalModel {
 
   /**
    * Generates predictive suggestions corresponding to the state of context after the proposed
-   * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
-   * keystroke rather than one actually received.
+   * transform is applied to it.  Each returned `Suggestion` should replace the entire 
+   * word / text token, rather than leaving part of it unaltered.
    * 
    * This method should NOT attempt to perform any form of correction; this is modeled within a
    * separate component of the LMLayer predictive engine.  That is, "th" + "e" should not be
@@ -152,7 +152,9 @@ declare interface LexicalModel {
    * 
    * However, addition of diacritics to characters (which may transform the underlying char code 
    * when Unicode-normalized) is permitted.  For example, "pur" + "e" may reasonably predict
-   * "purée", where "e" has been transformed to "é" as part of the suggestion.
+   * "purée", where "e" has been transformed to "é" as part of the suggestion.  When possible, 
+   * it is recommended to accomplish this by defining a `toKey` (`searchTermToKey` in model
+   * source) instead.
    * 
    * When both prediction and correction are permitted, said component (the `ModelCompositor`) will 
    * generally call this method once per 'likely' generated corrected state of the context, 
@@ -160,8 +162,7 @@ declare interface LexicalModel {
    * @param transform A Transform corresponding to a recent input keystroke
    * @param context A depiction of the context to which `transform` is applied.
    * @returns A probability distribution (`Distribution<Suggestion>`) on the resulting `Suggestion` 
-   * space for use in determining the most optimal overall suggestions.  Each returned `Suggestion`
-   * should replace the entire word / text token, rather than leaving part of it unaltered.
+   * space for use in determining the most optimal overall suggestions.  
    */
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
 
