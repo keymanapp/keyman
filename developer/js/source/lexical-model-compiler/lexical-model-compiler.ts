@@ -69,9 +69,7 @@ export default class LexicalModelCompiler {
 
         if(modelSource.languageUsesCasing != null) {
           func += `  languageUsesCasing: ${modelSource.languageUsesCasing},\n`;
-        } else {
-          func += `  languageUsesCasing: false, \n`;
-        }
+        } // else leave undefined.
 
         if(modelSource.languageUsesCasing) {
           func += `  applyCasing: ${pseudoclosure.compileApplyCasing()},\n`;
