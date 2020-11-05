@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.176 alpha 2020-11-05
+
+* fix(developer): remove obsolete NRSIAllTags (#3819)
+* fix(developer): Incorrect script:language map (#3818)
+* fix(android/app): Remove network check on "Get Started" menu (#3823)
+
 ## 14.0.175 alpha 2020-11-04
 
 * feat(android/engine): Add check for associated model on ModelPickerActivity (#3808)
