@@ -94,7 +94,6 @@
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <BuildConfiguration Include="Release">
