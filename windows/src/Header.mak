@@ -2,6 +2,8 @@
 # Header.mak - used for makefiles which are in parent folders
 #
 
+HEADER_MAK=1
+
 !IFNDEF TARGETS
 !ERROR You must define the targets before including the Header.mak file!
 !ENDIF

@@ -70,9 +70,12 @@ vcvars32:
 # This command injects the current version and tier into the VERSION_WIN and VERSION_TIER defines and then
 # calls "make wrap-symbols", but it only runs if the symbols folder exists
 
+!IFNDEF HEADER_MAK
+# we don't want this target for Makefiles with Header.mak, as they just call into sub-projects
 symbols:
     if exist $(KEYMAN_SYMSTOREPATH) \
       cmd /C \
         for /f %v in ($(KEYMAN_ROOT)\VERSION.md) do \
           for /f %t in ($(KEYMAN_ROOT)\TIER.md) do \
             $(MAKE) -DVERSION_TIER=%t -DVERSION_WIN=%v wrap-symbols
+!ENDIF
