@@ -1,5 +1,6 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
+var fs = require('fs');
 
 let LMLayerWorker = require('../../build/intermediate');
 
@@ -25,7 +26,10 @@ describe('LMLayerWorker', function() {
       // Sending it the `load` message should notify us that it's loaded!
       worker.onMessage(createMessageEventWithData({
         message: 'load',
-        model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        source: {
+          type: 'file',
+          file: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        }
       }));
       assert(fakePostMessage.calledOnce);
     });
@@ -69,7 +73,10 @@ describe('LMLayerWorker', function() {
       // Send a message; we should get something back.
       worker.onMessage(createMessageEventWithData({
         message: 'load',
-        model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        source: {
+          type: 'file',
+          file: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        }
       }));
 
       // It called the postMessage() in its global scope. 
@@ -128,7 +135,7 @@ describe('LMLayerWorker', function() {
       }, /invalid message/i);
     });
 
-    it('should send back a "ready" message', function () {
+    it('should send back a "ready" message when given a file', function () {
       var fakePostMessage = sinon.fake();
       var context = {
         postMessage: fakePostMessage
@@ -140,12 +147,40 @@ describe('LMLayerWorker', function() {
 
       worker.onMessage(createMessageEventWithData({
         message: 'load',
-        model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        source: {
+          type: 'file',
+          file: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        }
       }));
 
       assert(fakePostMessage.calledOnceWith(sinon.match({
         message: 'ready'
       })));
+    });
+
+    it('should send back a "ready" message when given raw code', function () {
+      var fakePostMessage = sinon.fake();
+      var context = {
+        postMessage: fakePostMessage
+      };
+      context.importScripts = importScriptsWith(context);
+
+      var worker = LMLayerWorker.install(context);
+      configWorker(worker);
+
+      let modelCode = fs.readFileSync("./unit_tests/in_browser/resources/models/simple-dummy.js").toString();
+
+      worker.onMessage(createMessageEventWithData({
+        message: 'load',
+        source: {
+          type: 'raw',
+          code: modelCode
+        }
+      }));
+
+      assert(fakePostMessage.calledOnceWith(sinon.match({
+        message: 'ready'
+      })), 'mocked callback was not called');
     });
 
     it('should send back configuration', function () {
@@ -162,7 +197,10 @@ describe('LMLayerWorker', function() {
       var maxCodeUnits = 64;
       worker.onMessage(createMessageEventWithData({
         message: 'load',
-        model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        source: {
+          type: 'file',
+          file: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        }
       }));
 
       sinon.assert.calledWithMatch(fakePostMessage, {

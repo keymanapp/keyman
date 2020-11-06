@@ -90,15 +90,25 @@ namespace com.keyman.text.prediction {
     /**
      * Initializes the LMLayer worker with a path to the desired model file.
      */
-    loadModel(modelFilePath: string): Promise<Configuration> {
+    loadModel(modelSource: string, loadType: 'file' | 'raw' = 'file'): Promise<Configuration> {
       return new Promise((resolve, _reject) => {
         // Sets up so the promise is resolved in the onMessage() callback, when it receives
         // the 'ready' message.
         this._declareLMLayerReady = resolve;
 
+        let modelSourceSpec: any = {
+          type: loadType
+        };
+
+        if(loadType == 'file') {
+          modelSourceSpec.file = modelSource;
+        } else {
+          modelSourceSpec.code = modelSource;
+        }
+
         this._worker.postMessage({
           message: 'load',
-          model: modelFilePath
+          source: modelSourceSpec
         });
       });
     }

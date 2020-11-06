@@ -1,4 +1,5 @@
 var assert = require('chai').assert;
+var fs = require('fs');
 let LMLayer = require('../../build/headless');
 
 /*
@@ -11,7 +12,7 @@ let LMLayer = require('../../build/headless');
  */
 describe('LMLayer using dummy model', function () {
   describe('Prediction', function () {
-    it('will predict future suggestions', function () {
+    it('will predict future suggestions (loaded from file)', function () {
       var lmLayer = new LMLayer(capabilities());
 
       // We're testing many as asynchronous messages in a row.
@@ -20,6 +21,37 @@ describe('LMLayer using dummy model', function () {
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
         "unit_tests/in_browser/resources/models/simple-dummy.js"
+      ).then(function (actualConfiguration) {
+        return Promise.resolve();
+      }).then(function () {
+        return lmLayer.predict(zeroTransform(), emptyContext());
+      }).then(function (suggestions) {
+        assert.deepEqual(suggestions, iGotDistractedByHazel()[0]);
+        return lmLayer.predict(zeroTransform(), emptyContext());
+      }).then(function (suggestions) {
+        assert.deepEqual(suggestions, iGotDistractedByHazel()[1]);
+        return lmLayer.predict(zeroTransform(), emptyContext());
+      }).then(function (suggestions) {
+        assert.deepEqual(suggestions, iGotDistractedByHazel()[2]);
+        return lmLayer.predict(zeroTransform(), emptyContext());
+      }).then(function (suggestions) {
+        assert.deepEqual(suggestions, iGotDistractedByHazel()[3]);
+        lmLayer.shutdown();
+        return Promise.resolve();
+      });
+    });
+
+    it('will predict future suggestions (loaded from raw source)', function () {
+      var lmLayer = new LMLayer(capabilities());
+
+      // We're running headlessly, so the path can be relative to the npm root directory.
+      let modelCode = fs.readFileSync("./unit_tests/in_browser/resources/models/simple-dummy.js").toString();
+
+      // We're testing many as asynchronous messages in a row.
+      // this would be cleaner using async/await syntax.
+      // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
+      return lmLayer.loadModel(
+        modelCode, 'raw'
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
