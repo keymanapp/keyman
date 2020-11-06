@@ -16,13 +16,17 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Developer Decompiler" $(PROGRAM)\developer\kmdecomp.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\developer\kmdecomp.exe /t keyman-developer
+    $(SYMSTORE) $(DEBUGPATH)\developer\kmdecomp.pdb /t keyman-developer
+
 backup:
-    $(WZZIP) $(BUILD)\developer\kmdecomp.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmdecomp.exe 
- 
+    $(WZZIP) $(BUILD)\developer\kmdecomp.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmdecomp.exe
+
 test-manifest:
     @rem This target needed as dependency for KMDECOMP
 
 install:
     $(COPY) $(PROGRAM)\developer\kmdecomp.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmdecomp.exe"
-    
+
 !include ..\..\Target.mak

@@ -21,6 +21,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Developer Conversion Utility" $(PROGRAM)\developer\kmconvert.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\developer\kmconvert.exe /t keyman-developer
+    $(SYMSTORE) $(DEBUGPATH)\developer\kmconvert.dbg /t keyman-developer
+
 backup:
     $(WZZIP) $(BUILD)\developer\kmconvert.zip  $(BACKUPDEFAULTS) kmconvert.exe
 

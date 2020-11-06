@@ -273,3 +273,21 @@ MKVER_V=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -v $(MKVER_VERSION_TXT) version.in v
 MKVER_M=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -m manifest.in manifest.xml
 # Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out>
 MKVER_U=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -u
+
+#
+# Symstore
+#
+
+# KEYMAN_SYMSTOREPATH defaults to sibling folder "symbols". If it is not present,
+# then we won't attempt to write symbols to the store.
+!IFNDEF KEYMAN_SYMSTOREPATH
+KEYMAN_SYMSTOREPATH=$(KEYMAN_ROOT)\..\symbols
+!ENDIF
+
+# This command depends on VERSION_WIN and VERSION_TIER being defined, through
+# `make symbols` (i.e. don't call `make wrap-symbols`)
+SYMSTORE="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe" add \
+    /s "$(KEYMAN_SYMSTOREPATH)" \
+    /v "$(VERSION_WIN)" \
+    /c "Version: $(VERSION_WIN)-$(VERSION_TIER)" \
+    /compress /f

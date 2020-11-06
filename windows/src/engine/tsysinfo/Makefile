@@ -28,6 +28,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Engine Diagnostics" $(PROGRAM)\engine\tsysinfo.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\engine\tsysinfo.exe /t keyman-engine-windows
+    $(SYMSTORE) $(DEBUGPATH)\engine\tsysinfo.dbg /t keyman-engine-windows
+
 backup:
     $(WZZIP) $(BUILD)\engine\tsysinfo.zip  $(BACKUPDEFAULTS) tsysinfo.exe
 

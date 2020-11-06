@@ -18,6 +18,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Engine Mnemonic Keyboard Recompiler" $(PROGRAM)\engine\mcompile.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\engine\mcompile.exe /t keyman-engine-windows
+    $(SYMSTORE) $(DEBUGPATH)\engine\mcompile.pdb /t keyman-engine-windows
+
 backup:
     $(WZZIP) $(BUILD)\engine\mcompile.exe  $(BACKUPDEFAULTS) mcompile.exe
 

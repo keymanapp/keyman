@@ -25,6 +25,10 @@ clean: def-clean
 signcode:
     rem SIGNCODE /d "Keyman Desktop Setup" $(PROGRAM)\desktop\setup.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\setup.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\setup.dbg /t keyman-windows
+
 backup:
     $(WZZIP) $(BUILD)\desktop\setup.zip  $(BACKUPDEFAULTS) setup.exe
 

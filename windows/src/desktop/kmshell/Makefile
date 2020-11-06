@@ -34,6 +34,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Desktop" $(PROGRAM)\desktop\kmshell.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\kmshell.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\kmshell.dbg /t keyman-windows
+
 backup:
     $(WZZIP) $(BUILD)\desktop\kmshell.zip  $(BACKUPDEFAULTS) kmshell.exe
 

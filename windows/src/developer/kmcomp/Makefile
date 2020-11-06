@@ -39,6 +39,12 @@ signcode:
     $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(PROGRAM)\developer\kmcomp.exe
     $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(PROGRAM)\developer\kmcomp.x64.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\developer\kmcomp.exe /t keyman-developer
+    $(SYMSTORE) $(PROGRAM)\developer\kmcomp.x64.exe /t keyman-developer
+    $(SYMSTORE) $(DEBUGPATH)\developer\kmcomp.dbg /t keyman-developer
+    #TODO: $(SYMSTORE) $(DEBUGPATH)\developer\kmcomp.x64.dbg /t keyman-developer
+
 backup:
     $(WZZIP) $(BUILD)\developer\kmcomp.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmcomp.exe $(PROGRAM)\developer\kmcomp.x64.exe
 

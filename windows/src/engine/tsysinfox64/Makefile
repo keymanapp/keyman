@@ -14,6 +14,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Engine x64 Diagnostics" $(PROGRAM)\engine\tsysinfox64.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\engine\tsysinfox64.exe /t keyman-engine-windows
+    #$(SYMSTORE) $(DEBUGPATH)\engine\tsysinfox64.dbg /t keyman-engine-windows
+
 backup:
     $(WZZIP) $(BUILD)\engine\tsysinfox64.zip  $(BACKUPDEFAULTS) $(WIN64_TARGET_PATH)\*.map $(WIN64_TARGET_PATH)\tsysinfox64.exe
 
