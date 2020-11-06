@@ -26,7 +26,7 @@ namespace com.keyman.text {
   type PlainKeyboardStore = string;
 
   export type KeyboardStoreElement = (string|StoreNonCharEntry);
-  export type ComplexKeyboardStore = KeyboardStoreElement[]; 
+  export type ComplexKeyboardStore = KeyboardStoreElement[];
 
   type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
 
@@ -65,12 +65,12 @@ namespace com.keyman.text {
     /** Discriminant field - 'i' for `index()`.
      */
     ['t']: 'i';
-    
+
     /**
      * Value: the Store from which to output
      */
     ['i']: KeyboardStore;
-    
+
     /**
      * Offset: the offset in context for the corresponding `any()`.
      */
@@ -81,7 +81,7 @@ namespace com.keyman.text {
     /** Discriminant field - 'c' for `context()`.
      */
     ['t']: 'c';
-    
+
     /**
      * Value:  The offset into the current rule's context to be matched.
      */
@@ -108,16 +108,16 @@ namespace com.keyman.text {
   /**
    * Cache of context storing and retrieving return values from KC
    * Must be reset prior to each keystroke and after any text changes
-   * MCD 3/1/14   
-   **/         
+   * MCD 3/1/14
+   **/
   class CachedContext {
     _cache: string[][];
-    
-    reset(): void { 
-      this._cache = []; 
+
+    reset(): void {
+      this._cache = [];
     }
 
-    get(n: number, ln: number): string { 
+    get(n: number, ln: number): string {
       // return null; // uncomment this line to disable context caching
       if(typeof this._cache[n] == 'undefined') {
         return null;
@@ -127,22 +127,22 @@ namespace com.keyman.text {
       return this._cache[n][ln];
     }
 
-    set(n: number, ln: number, val: string): void { 
-      if(typeof this._cache[n] == 'undefined') { 
-        this._cache[n] = []; 
-      } 
-      this._cache[n][ln] = val; 
+    set(n: number, ln: number, val: string): void {
+      if(typeof this._cache[n] == 'undefined') {
+        this._cache[n] = [];
+      }
+      this._cache[n][ln] = val;
     }
   };
 
   type CachedExEntry = {valContext: (string|number)[], deadContext: text.Deadkey[]};
-  /** 
-   * An extended version of cached context storing designed to work with 
+  /**
+   * An extended version of cached context storing designed to work with
    * `fullContextMatch` and its helper functions.
    */
   class CachedContextEx {
     _cache: CachedExEntry[][];
-    
+
     reset(): void {
       this._cache = [];
     }
@@ -157,11 +157,11 @@ namespace com.keyman.text {
       return this._cache[n][ln];
     }
 
-    set(n: number, ln: number, val: CachedExEntry): void { 
-      if(typeof this._cache[n] == 'undefined') { 
-        this._cache[n] = []; 
-      } 
-      this._cache[n][ln] = val; 
+    set(n: number, ln: number, val: CachedExEntry): void {
+      if(typeof this._cache[n] == 'undefined') {
+        this._cache[n] = [];
+      }
+      this._cache[n][ln] = val;
     }
 
     clone(): CachedContextEx {
@@ -198,7 +198,7 @@ namespace com.keyman.text {
 
     constructor(variableStoreSerializer: VariableStoreSerializer = null) {
       this.systemStores = {};
-      
+
       this.systemStores[KeyboardInterface.TSS_PLATFORM] = new PlatformSystemStore(this);
       this.systemStores[KeyboardInterface.TSS_LAYER] = new MutableSystemStore(KeyboardInterface.TSS_LAYER, 'default');
 
@@ -208,61 +208,61 @@ namespace com.keyman.text {
     /**
      * Function     KSF
      * Scope        Public
-     * 
+     *
      * Saves the document's current focus settings on behalf of the keyboard.  Often paired with insertText.
-     */    
+     */
     saveFocus(): void { }
 
     /**
      * A text-insertion method used by custom OSKs for helpHTML interaction, like with sil_euro_latin.
-     * 
+     *
      * This function currently bypasses web-core's standard text handling control path and all predictive text processing.
      * It also has DOM-dependencies that help ensure KMW's active OutputTarget retains focus during use.
      */
     insertText?: (Ptext: string, PdeadKey: number) => boolean;
-    
+
     /**
-     * Function     registerKeyboard  KR                    
+     * Function     registerKeyboard  KR
      * Scope        Public
      * @param       {Object}      Pk      Keyboard  object
      * Description  Registers a keyboard with KeymanWeb once its script has fully loaded.
-     * 
+     *
      *              In web-core, this also activates the keyboard; in other modules, this method
      *              may be replaced with other implementations.
-     */    
+     */
     registerKeyboard(Pk): void {
-      // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale, 
+      // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale,
       //        by DOM-aware code.
       let keyboard = new keyboards.Keyboard(Pk);
       this.activeKeyboard = keyboard;
     }
 
     /**
-     * Used by DOM-aware KeymanWeb to add keyboard stubs, used by the `KeyboardManager` type 
+     * Used by DOM-aware KeymanWeb to add keyboard stubs, used by the `KeyboardManager` type
      * to optimize resource use.
-     */    
+     */
     registerStub?: (Pstub) => number;
 
     /**
      * Get *cached or uncached* keyboard context for a specified range, relative to caret
-     * 
+     *
      * @param       {number}      n       Number of characters to move back from caret
      * @param       {number}      ln      Number of characters to return
      * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-     * @return      {string}              Context string 
-     * 
+     * @return      {string}              Context string
+     *
      * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
      *             KC(2,1,Pelem) == "e"
      *             KC(3,3,Pelem) == "def"
      *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
-     */    
-    
+     */
+
     context(n: number, ln: number, outputTarget: OutputTarget): string {
       var v = this.cachedContext.get(n, ln);
       if(v !== null) {
         return v;
       }
-      
+
       var r = this.KC_(n, ln, outputTarget);
       this.cachedContext.set(n, ln, r);
       return r;
@@ -270,17 +270,17 @@ namespace com.keyman.text {
 
     /**
      * Get (uncached) keyboard context for a specified range, relative to caret
-     * 
+     *
      * @param       {number}      n       Number of characters to move back from caret
      * @param       {number}      ln      Number of characters to return
      * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-     * @return      {string}              Context string 
-     * 
+     * @return      {string}              Context string
+     *
      * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
      *             KC(2,1,Pelem) == "e"
      *             KC(3,3,Pelem) == "def"
      *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
-     */    
+     */
     private KC_(n: number, ln: number, outputTarget: OutputTarget): string {
       var tempContext = '';
 
@@ -292,29 +292,29 @@ namespace com.keyman.text {
 
       return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
     }
-    
+
     /**
-     * Function     nul           KN    
+     * Function     nul           KN
      * Scope        Public
      * @param       {number}      n       Length of context to check
      * @param       {Object}      Ptarg   Element to work with (must be currently focused element)
      * @return      {boolean}             True if length of context is less than or equal to n
      * Description  Test length of context, return true if the length of the context is less than or equal to n
-     * 
+     *
      * Example     [abc|def] as INPUT, with the caret position marked by |:
      *             KN(3,Pelem) == TRUE
      *             KN(2,Pelem) == FALSE
      *             KN(4,Pelem) == TRUE
-     */    
+     */
     nul(n: number, outputTarget: OutputTarget): boolean {
       var cx=this.context(n+1, 1, outputTarget);
-      
+
       // With #31, the result will be a replacement character if context is empty.
       return cx === "\uFFFE";
     }
 
     /**
-     * Function     contextMatch  KCM   
+     * Function     contextMatch  KCM
      * Scope        Public
      * @param       {number}      n       Number of characters to move back from caret
      * @param       {Object}      Ptarg   Focused element
@@ -322,7 +322,7 @@ namespace com.keyman.text {
      * @param       {number}      ln      Number of characters to return
      * @return      {boolean}             True if selected context matches val
      * Description  Test keyboard context for match
-     */    
+     */
     contextMatch(n: number, outputTarget: OutputTarget, val: string, ln: number): boolean {
       var cx=this.context(n, ln, outputTarget);
       if(cx === val) {
@@ -334,14 +334,14 @@ namespace com.keyman.text {
 
     /**
      * Builds the *cached or uncached* keyboard context for a specified range, relative to caret
-     * 
+     *
      * @param       {number}      n       Number of characters to move back from caret
      * @param       {number}      ln      Number of characters to return
      * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-     * @return      {Array}               Context array (of strings and numbers) 
+     * @return      {Array}               Context array (of strings and numbers)
      */
     private _BuildExtendedContext(n: number, ln: number, outputTarget: OutputTarget): CachedExEntry {
-      var cache: CachedExEntry = this.cachedContextEx.get(n, ln); 
+      var cache: CachedExEntry = this.cachedContextEx.get(n, ln);
       if(cache !== null) {
         return cache;
       } else {
@@ -405,7 +405,7 @@ namespace com.keyman.text {
      * @param         {Object}    Ptarg   Focused element
      * @param         {Array}     rule    An array of ContextEntries to match.
      * @return        {boolean}           True if the fully-specified rule context matches the current KMW state.
-     * 
+     *
      * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
      * near-directly modeling (externally) the compiled form of Desktop rules' context section.
      */
@@ -439,7 +439,7 @@ namespace com.keyman.text {
           var r = rule[i] as ContextNonCharEntry;
           switch(r.t) {
             case 'd':
-              // We still need to set a flag here; 
+              // We still need to set a flag here;
               if(r['d'] !== context[i]) {
                 mismatch = true;
               } else {
@@ -479,7 +479,7 @@ namespace com.keyman.text {
                 deadContext[i].set();
               }
               break;
-            case 'c':            
+            case 'c':
               if(context[r.c - 1] !== context[i]) {
                 mismatch = true;
               } else if(deadContext[i] !== undefined) {
@@ -508,12 +508,12 @@ namespace com.keyman.text {
     }
 
     /**
-     * Function     KIK      
+     * Function     KIK
      * Scope        Public
      * @param       {Object}  e   keystroke event
      * @return      {boolean}     true if keypress event
      * Description  Test if event as a keypress event
-     */    
+     */
     isKeypress(e: KeyEvent): boolean {
       if(this.activeKeyboard.isMnemonic) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
@@ -521,16 +521,16 @@ namespace com.keyman.text {
         return KeyMapping._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
       }
     }
-    
+
     /**
-     * Function     keyMatch      KKM      
+     * Function     keyMatch      KKM
      * Scope        Public
      * @param       {Object}      e           keystroke event
      * @param       {number}      Lruleshift
      * @param       {number}      Lrulekey
      * @return      {boolean}                 True if key matches rule
      * Description  Test keystroke with modifiers against rule
-     */    
+     */
     keyMatch(e: KeyEvent, Lruleshift:number, Lrulekey:number): boolean {
       var retVal = false; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
@@ -543,7 +543,7 @@ namespace com.keyman.text {
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
       }
-        
+
       if(e.LisVirtualKey || keyCode > 255) {
         if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255)) { // added keyCode test to support extended keys
           retVal = ((Lrulekey == keyCode) && ((Lruleshift & modifierBitmask) == e.Lmodifiers)); //I3318, I3555
@@ -562,7 +562,7 @@ namespace com.keyman.text {
      * Function     stateMatch    KSM
      * Scope        Public
      * @param       {Object}      e       keystroke event
-     * @param       {number}      Lstate  
+     * @param       {number}      Lstate
      * Description  Test keystroke against state key rules
      */
     stateMatch(e: KeyEvent, Lstate: number) {
@@ -575,7 +575,7 @@ namespace com.keyman.text {
      * @param       {Object}      e
      * @return      {Object}              Object with event's virtual key flag, key code, and modifiers
      * Description  Get object with extended key event information
-     */    
+     */
     keyInformation(e: KeyEvent): KeyInformation {
       var ei = new KeyInformation();
       ei['vk'] = e.LisVirtualKey;
@@ -585,24 +585,24 @@ namespace com.keyman.text {
     };
 
     /**
-     * Function     deadkeyMatch  KDM      
+     * Function     deadkeyMatch  KDM
      * Scope        Public
      * @param       {number}      n       offset from current cursor position
      * @param       {Object}      Ptarg   target element
      * @param       {number}      d       deadkey
      * @return      {boolean}             True if deadkey found selected context matches val
      * Description  Match deadkey at current cursor position
-     */    
+     */
     deadkeyMatch(n: number, outputTarget: OutputTarget, d: number): boolean {
       return outputTarget.hasDeadkeyMatch(n, d);
     }
-      
+
     /**
-     * Function     beep          KB      
+     * Function     beep          KB
      * Scope        Public
      * @param       {Object}      Pelem     element to flash
      * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
-     */    
+     */
     beep(outputTarget: OutputTarget): void {
       this.resetContextCache();
 
@@ -632,21 +632,21 @@ namespace com.keyman.text {
         return store;
       }
     }
-    
+
     /**
-     * Function     any           KA      
+     * Function     any           KA
      * Scope        Public
-     * @param       {number}      n     character position (index) 
+     * @param       {number}      n     character position (index)
      * @param       {string}      ch    character to find in string
-     * @param       {string}      s     'any' string   
+     * @param       {string}      s     'any' string
      * @return      {boolean}           True if character found in 'any' string, sets index accordingly
      * Description  Test for character matching
-     */    
+     */
     any(n: number, ch: KeyboardStoreElement, s: KeyboardStore): boolean {
       if(ch == '') {
         return false;
       }
-      
+
       s = this._ExplodeStore(s);
       var Lix = -1;
       for(var i=0; i < s.length; i++) {
@@ -666,18 +666,18 @@ namespace com.keyman.text {
 
     /**
      * Function     _Index
-     * Scope        Public 
+     * Scope        Public
      * @param       {string}      Ps      string
      * @param       {number}      Pn      index
      * Description  Returns the character from a store string according to the offset in the index array
      */
-    _Index(Ps: KeyboardStore, Pn: number): KeyboardStoreElement {        
+    _Index(Ps: KeyboardStore, Pn: number): KeyboardStoreElement {
       Ps = this._ExplodeStore(Ps);
 
       if(this._AnyIndices[Pn-1] < Ps.length) {   //I3319
         return Ps[this._AnyIndices[Pn-1]];
       } else {
-        /* Should not be possible for a compiled keyboard, but may arise 
+        /* Should not be possible for a compiled keyboard, but may arise
         * during the development of handwritten keyboards.
         */
         console.warn("Unmatched contextual index() statement detected in rule with index " + Pn + "!");
@@ -722,16 +722,16 @@ namespace com.keyman.text {
         } else { // For keyboards developed during 10.0's alpha phase - t:'d' was assumed.
           this.deadkeyOutput(Pdn, outputTarget, indexChar['d']);
         }
-      } 
+      }
     }
-    
-    
+
+
     /**
-     * Function     deleteContext KDC  
+     * Function     deleteContext KDC
      * Scope        Public
      * @param       {number}      dn      number of context entries to overwrite
-     * @param       {Object}      Pelem   element to output to 
-     * @param       {string}      s       string to output   
+     * @param       {Object}      Pelem   element to output to
+     * @param       {string}      s       string to output
      * Description  Keyboard output
      */
     deleteContext(dn: number, outputTarget: OutputTarget): void {
@@ -773,11 +773,11 @@ namespace com.keyman.text {
     }
 
     /**
-     * Function     output        KO  
+     * Function     output        KO
      * Scope        Public
      * @param       {number}      dn      number of characters to overwrite
-     * @param       {Object}      Pelem   element to output to 
-     * @param       {string}      s       string to output   
+     * @param       {Object}      Pelem   element to output to
+     * @param       {string}      s       string to output
      * Description  Keyboard output
      */
     output(dn: number, outputTarget: OutputTarget, s:string): void {
@@ -794,16 +794,16 @@ namespace com.keyman.text {
       outputTarget.insertTextBeforeCaret(s);
       outputTarget.restoreProperties();
     }
-  
+
     /**
      * `contextExOutput` function emits the character or object at `contextOffset` from the
      * current matched rule's context. Introduced in Keyman 14.0, in order to resolve a
      * gap between desktop and web core functionality for context(n) matching on notany().
      * See #917 for additional detail.
-     * @alias       KNO
+     * @alias       KCXO
      * @public
      * @param       {number}        Pdn            number of characters to delete left of cursor
-     * @param       {OutputTarget}  outputTarget   target to output to 
+     * @param       {OutputTarget}  outputTarget   target to output to
      * @param       {number}        contextLength  length of current rule context to retrieve
      * @param       {number}        contextOffset  offset from start of current rule context, 1-based
      */
@@ -826,13 +826,13 @@ namespace com.keyman.text {
     }
 
     /**
-     * Function     deadkeyOutput KDO      
+     * Function     deadkeyOutput KDO
      * Scope        Public
-     * @param       {number}      Pdn     no of character to overwrite (delete) 
-     * @param       {Object}      Pelem   element to output to 
+     * @param       {number}      Pdn     no of character to overwrite (delete)
+     * @param       {Object}      Pelem   element to output to
      * @param       {number}      Pd      deadkey id
      * Description  Record a deadkey at current cursor position, deleting Pdn characters first
-     */    
+     */
     deadkeyOutput(Pdn: number, outputTarget: OutputTarget, Pd: number): void {
       this.resetContextCache();
 
@@ -843,36 +843,36 @@ namespace com.keyman.text {
       outputTarget.insertDeadkeyBeforeCaret(Pd);
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
     }
-    
+
     /**
-     * KIFS compares the content of a system store with a string value 
-     * 
+     * KIFS compares the content of a system store with a string value
+     *
      * @param       {number}      systemId    ID of the system store to test (only TSS_LAYER currently supported)
      * @param       {string}      strValue    String value to compare to
-     * @param       {Object}      Pelem       Currently active element (may be needed by future tests)     
-     * @return      {boolean}                 True if the test succeeds 
-     */       
+     * @param       {Object}      Pelem       Currently active element (may be needed by future tests)
+     * @return      {boolean}                 True if the test succeeds
+     */
     ifStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       var result=true;
       let store = this.systemStores[systemId];
       if(store) {
         result = store.matches(strValue);
       }
-      return result; //Moved from previous line, now supports layer selection, Build 350 
+      return result; //Moved from previous line, now supports layer selection, Build 350
     }
 
     /**
-     * KSETS sets the value of a system store to a string  
-     * 
+     * KSETS sets the value of a system store to a string
+     *
      * @param       {number}      systemId    ID of the system store to set (only TSS_LAYER currently supported)
-     * @param       {string}      strValue    String to set as the system store content 
-     * @param       {Object}      Pelem       Currently active element (may be needed in future tests)     
+     * @param       {string}      strValue    String to set as the system store content
+     * @param       {Object}      Pelem       Currently active element (may be needed in future tests)
      * @return      {boolean}                 True if command succeeds
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
-     * 
+     *
      * Note that option/variable stores are instead set within keyboard script code, as they only
      * affect keyboard behavior.
-     */    
+     */
     setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       this.resetContextCache();
       if(systemId == KeyboardInterface.TSS_LAYER) {
@@ -885,15 +885,15 @@ namespace com.keyman.text {
 
     /**
      * Load an option store value from a cookie or default value
-     * 
+     *
      * @param       {string}      kbdName     keyboard internal name
      * @param       {string}      storeName   store (option) name, embedded in cookie name
      * @param       {string}      dfltValue   default value
-     * @return      {string}                  current or default option value   
-     * 
+     * @return      {string}                  current or default option value
+     *
      * This will only ever be called when the keyboard is loaded, as it is used by keyboards
      * to initialize a store value on the keyboard's script object.
-     */    
+     */
     loadStore(kbdName: string, storeName:string, dfltValue:string): string {
       this.resetContextCache();
       if(this.variableStoreSerializer) {
@@ -905,16 +905,16 @@ namespace com.keyman.text {
     }
 
     /**
-     * Save an option store value to a cookie 
-     * 
+     * Save an option store value to a cookie
+     *
      * @param       {string}      storeName   store (option) name, embedded in cookie name
      * @param       {string}      optValue    option value to save
      * @return      {boolean}                 true if save successful
-     * 
+     *
      * Note that a keyboard will freely manipulate the value of its variable stores on the
      * script object within its own code.  This function's use is merely to _persist_ that
      * value across sessions, providing a custom user default for later uses of the keyboard.
-     */    
+     */
     saveStore(storeName:string, optValue:string): boolean {
       this.resetContextCache();
       var kbd=this.activeKeyboard;
@@ -964,12 +964,12 @@ namespace com.keyman.text {
 
       outputTarget.invalidateSelection();
 
-      outputTarget.deadkeys().resetMatched();       // I3318    
+      outputTarget.deadkeys().resetMatched();       // I3318
       this.resetContextCache();
 
       // Capture the initial state of the OutputTarget before any rules are matched.
       let preInput = Mock.from(outputTarget);
-      
+
       // Establishes the results object, allowing corresponding commands to set values here as appropriate.
       this.ruleBehavior = new RuleBehavior();
 
@@ -1000,7 +1000,7 @@ namespace com.keyman.text {
      * Publishes the KeyboardInterface's shorthand API names.  As this assigns the current functions
      * held by the longform versions, note that this should be called after replacing any of them via
      * JS method extension.
-     * 
+     *
      * DOM-aware KeymanWeb should call this after its domKbdInterface.ts code is loaded, as it replaces
      * a few.  (This is currently done within its kmwapi.ts.)
      */
@@ -1031,7 +1031,7 @@ namespace com.keyman.text {
       exportKBCallback('KDC', 'deleteContext');
       exportKBCallback('KO', 'output');
       exportKBCallback('KDO', 'deadkeyOutput');
-      exportKBCallback('KNO', 'contextExOutput');
+      exportKBCallback('KCXO', 'contextExOutput');
       exportKBCallback('KIO', 'indexOutput');
       exportKBCallback('KIFS', 'ifStore');
       exportKBCallback('KSETS', 'setStore');
