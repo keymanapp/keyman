@@ -275,14 +275,12 @@ class LMLayerWorker {
         if(payload.source.type == 'file') {
           _this.loadModelFile(payload.source.file);
         } else {
+          // Creates a closure capturing all top-level names that the model must be able to reference.
+          // `eval` runs by scope rules; our virtualized worker needs a special scope for this to work.
+          //
+          // Reference: https://stackoverflow.com/a/40108685
+          // Note that we don't need `this`, but we do need the namespaces seen below. 
           let code = payload.source.code;
-
-          // let scope = {
-          //   LMLayerWorker: LMLayerWorker,
-          //   models: models,
-          //   wordBreakers: wordBreakers,
-          //   correction: correction
-          // };
           let evalInContext = function(LMLayerWorker, models, correction, wordBreakers) {
             eval(code);
           }
