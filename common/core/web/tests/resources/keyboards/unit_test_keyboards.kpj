@@ -4,6 +4,8 @@
     <BuildPath></BuildPath>
     <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
     <WarnDeprecatedCode>True</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
   </Options>
   <Files>
     <File>
@@ -37,6 +39,17 @@
       <Details>
         <Name>Simple Deadkeys</Name>
         <Copyright>© 2018 SIL International</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_1bccf5634ecd6605fe682279eed62c73</ID>
+      <Filename>test_917.kmn</Filename>
+      <Filepath>test_917.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test #917 - notany() and context()</Name>
+        <Copyright>©</Copyright>
       </Details>
     </File>
   </Files>
