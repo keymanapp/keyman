@@ -1,18 +1,18 @@
 (*
   Name:             CompileKeymanWeb
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      26 Apr 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          26 Apr 2006 - mcdurdin - Add support for ContextEx and Context, and lots of polish
                     21 Jun 2006 - mcdurdin - Add embedded javascript output (for IMX support)
                     21 Jun 2006 - mcdurdin - Add semicolons as necessary to javascript
@@ -89,10 +89,10 @@
                     27 May 2015 - mcdurdin - I4724 - Compiler generates warnings for JSON files if output path is source path
                     24 Aug 2015 - mcdurdin - I4872 - OSK font and Touch Layout font should be the same in Developer
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     28 Feb 2018 - jahorton - GH 281 - Changed the compilation targets for KMW 10 to better support deadkeys.
-                    
+
 *)
 unit CompileKeymanWeb;  // I3306  // I3310
 
@@ -939,11 +939,11 @@ var
           Result := Result + nlt + Format('k.KDO(%d,t,%d);', [len, recContext.Deadkey.Deadkey]);   // I4611
         CODE_NOTANY:
           begin
-            // #917: Minimum version required is 14.0: the KNO function was only added for 14.0
+            // #917: Minimum version required is 14.0: the KCXO function was only added for 14.0
             // Note that this is checked in compiler.cpp as well, so this error can probably never occur
             if not IsKeyboardVersion14OrLater then
               ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement notany in context() match requires version 14.0+ of KeymanWeb', [GetCodeName(recContext.Code)]));  // I1971   // I4061
-            Result := Result + nlt + Format('k.KNO(%d,t,%d,%d);', [len, AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext)), AdjustIndex(fkp.dpContext, ContextIndex)]);
+            Result := Result + nlt + Format('k.KCXO(%d,t,%d,%d);', [len, AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext)), AdjustIndex(fkp.dpContext, ContextIndex)]);
           end;
         else
         begin
