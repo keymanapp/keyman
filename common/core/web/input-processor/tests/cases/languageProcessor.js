@@ -14,9 +14,20 @@ String.kmwEnableSupplementaryPlane(false);
 
 // Test the KeyboardProcessor interface.
 describe('LanguageProcessor', function() {
-  it('attempts to run unit tests', function() {
-    let languageProcessor = new com.keyman.text.prediction.LanguageProcessor();
+  describe('[[constructor]]', function () {
+    it('should initialize without errors', function () {
+      let lp = new com.keyman.text.prediction.LanguageProcessor();
+      assert.isNotNull(lp);
+    });
 
-    assert.isOk(languageProcessor);
+    it('has expected default values after initialization', function () {
+      let languageProcessor = new com.keyman.text.prediction.LanguageProcessor();
+
+      // These checks are lifted from the keyboard-processor init checks found in
+      // common/core/web/keyboard-processor/tests/cases/basic-init.js.
+      assert.isUndefined(languageProcessor.activeModel);
+      assert.isFalse(languageProcessor.isActive);
+      assert.isTrue(languageProcessor.mayPredict);
+    });
   });
 });

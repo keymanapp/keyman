@@ -313,7 +313,7 @@ namespace com.keyman.text.prediction {
         this._mayPredict = false;
         return false;
       }
-      return this.activeModel && this._mayPredict;
+      return (this.activeModel || false) && this._mayPredict;
     }
 
     public canEnable(): boolean {
