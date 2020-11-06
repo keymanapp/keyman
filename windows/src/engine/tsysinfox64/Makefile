@@ -6,7 +6,7 @@
 
 build: version.res manifest.res dirs
     $(DELPHI_MSBUILD) tsysinfox64.dproj /p:Platform=Win64
-    $(SENTRYTOOL_DELPHIPREP) $(WIN64_TARGET_PATH)\tsysinfox64.exe -dpr tsysinfox64.dpr
+    #$(SENTRYTOOL_DELPHIPREP) $(WIN64_TARGET_PATH)\tsysinfox64.exe -dpr tsysinfox64.dpr
     $(COPY) $(WIN64_TARGET_PATH)\tsysinfox64.exe $(PROGRAM)\engine
 
 clean: def-clean
