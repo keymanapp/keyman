@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.177 alpha 2020-11-07
+
+* fix(developer): support for notany() and context() (#3816)
+* fix(web): support for notany() and context() (#3817)
+* fix(developer): debug window inherits editor font (#3829)
+
 ## 14.0.176 alpha 2020-11-05
 
 * fix(developer): remove obsolete NRSIAllTags (#3819)
