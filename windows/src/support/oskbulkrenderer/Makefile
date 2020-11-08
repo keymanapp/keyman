@@ -21,4 +21,7 @@ signcode:
 backup:
     rem No source code backup needed
 
+wrap-symbols:
+    @rem
+
 !include ..\..\Target.mak
