@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ModelPseudoclosure } from '../dist/lexical-model-compiler/model-pseudoclosure';
+import { ModelDefinitions } from '../dist/lexical-model-compiler/model-definitions';
 
 describe('Model definition pseudoclosures', function () {
   describe('14.0 defaults', function() {
@@ -13,7 +13,7 @@ describe('Model definition pseudoclosures', function () {
         format: 'trie-1.0'
       };
 
-      let pseudoclosure = new ModelPseudoclosure(modelSource);
+      let pseudoclosure = new ModelDefinitions(modelSource);
 
       const testCases: [string, string, string][] = [
         // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
@@ -61,7 +61,7 @@ describe('Model definition pseudoclosures', function () {
         format: 'trie-1.0'
       };
 
-      let pseudoclosure = new ModelPseudoclosure(modelSource);
+      let pseudoclosure = new ModelDefinitions(modelSource);
 
       const testCases: [string, string][] = [
         // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
@@ -99,7 +99,7 @@ describe('Model definition pseudoclosures', function () {
       format: 'trie-1.0'
     };
 
-    let pseudoclosure = new ModelPseudoclosure(modelSource);
+    let pseudoclosure = new ModelDefinitions(modelSource);
 
     const testCases: [string, string][] = [
       // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
@@ -163,7 +163,7 @@ describe('Model definition pseudoclosures', function () {
       format: 'trie-1.0'
     };
 
-    let pseudoclosure = new ModelPseudoclosure(modelSource);
+    let pseudoclosure = new ModelDefinitions(modelSource);
 
     const testCases: [string, string, string][] = [
       ['İstanbul', 'istanbul', 'istanbul'],
