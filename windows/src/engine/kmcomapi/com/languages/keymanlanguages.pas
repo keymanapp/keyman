@@ -141,10 +141,12 @@ begin
         FProfileMgr.EnumProfiles(pLangID^, ppEnum);
         while ppEnum.Next(1, profile, pcFetch) = S_OK do
         begin
-//          if (profile.dwFlags and TF_IPP_FLAG_ENABLED) = 0 then   // I4207
-//          begin
-//            Continue;
-//          end;
+          if (profile.dwFlags and TF_IPP_FLAG_ENABLED) = 0 then
+          begin
+            // Keyman 14 no longer disables profiles when it is not running, so
+            // we can always skip keyboards that are not enabled.
+            Continue;
+          end;
 
           if profile.dwProfileType = TF_PROFILETYPE_KEYBOARDLAYOUT then
           begin

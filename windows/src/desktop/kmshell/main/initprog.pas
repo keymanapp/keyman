@@ -89,6 +89,7 @@ type
                     fmUpgradeMnemonicLayout,    // I4553
                     fmRepair,
                     fmKeepInTouch,
+                    fmSettings,
 
                     // Commands from Keyman Engine
                     fmShowHint,
@@ -111,6 +112,8 @@ uses
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
+  Keyman.Configuration.UI.UfrmSettingsManager,
+  Keyman.System.KeymanStartTask,
   KeymanPaths,
   KLog,
   kmint,
@@ -275,6 +278,7 @@ begin
         FParentWindow := StrToIntDef(ParamStr(i), 0);
       end
       else if s = '-showhelp' then FMode := fmShowHelp
+      else if s = '-settings' then FMode := fmSettings
 
       else Exit;
     end
@@ -370,7 +374,9 @@ begin
 
   FMutex := nil;  // I2720
   
-  { Locate the appropriate product }
+  { Run app reconfiguration tasks }
+
+  TKeymanStartTask.RecreateTask;
 
   UILanguages.CreateUILanguages;
 
@@ -539,6 +545,11 @@ begin
     fmKeepInTouch:
       ShowKeepInTouchForm(True);   // I4658
 
+    fmSettings:
+      if TfrmSettingsManager.Execute
+        then ExitCode := 0
+        else ExitCode := 1;
+
     fmShowHint:
       if ShowKMShellHintQuery(FParentWindow, FirstKeyboardFileName) = mrOk
         then ExitCode := 0
@@ -549,9 +560,6 @@ begin
 
   if FMode <> fmMain then
   begin
-    if kmcom.SystemInfo.RebootRequired then
-      RunReboot('Windows must be restarted for changes to complete.  Restart now?',
-        'Windows did not initiate the restart successfully.  You will need to restart manually.');
     ApplicationRunning := True;
     Application.Run;
     ApplicationRunning := False;

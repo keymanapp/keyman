@@ -52,10 +52,3 @@ How to run the tests
 
     ./build.sh -test
 
-
-How to update the package version
----------------------------------
-
-**NOTE**: this step should only be performed on the CI server:
-
-    ./build.sh -version MAJOR.MINOR.${BUILD_NUMBER} [-tier (alpha|beta)]

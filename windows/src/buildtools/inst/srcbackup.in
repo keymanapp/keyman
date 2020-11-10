@@ -5,6 +5,6 @@
 !include ..\..\Defines.mak
 
 srcbackup:
-    -mkdir $(ROOT)\release\$VERSION
+    -mkdir $(ROOT)\release\$Version
     cd $(ROOT)\src
-    $(WZZIP) -r -x!*.ipch -x!*.sdf -x!*.db $(ROOT)\release\$VERSION\src-$VERSION.zip *.*
+    $(WZZIP) -r -x!*.ipch -x!*.sdf -x!*.db $(ROOT)\release\$Version\src-$Version.zip *.*

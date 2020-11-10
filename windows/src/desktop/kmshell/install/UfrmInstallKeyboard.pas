@@ -205,7 +205,7 @@ begin
     Data := TInstallKeyboardSharedData.Create(FXML, FTempPath, FPackagePath, FFiles);
     PageTag := modWebHttpServer.SharedData.Add(Data);
     FRenderPage := 'installkeyboard';
-    Content_Render(False, 'tag='+IntToStr(PageTag));
+    Content_Render('tag='+IntToStr(PageTag));
   finally
     Screen.Cursor := crDefault;
   end;
@@ -222,23 +222,26 @@ begin
   Result := '';
   doc := LoadXMLData(xml);
 
-  node := doc.DocumentElement.ChildNodes.FindNode('readme');
-  if Assigned(node) then
+  if Assigned(doc.DocumentElement) then
   begin
-    Result := node.NodeValue;
-    node.NodeValue := ExtractFileName(Result);
-    Result := ExtractFilePath(Result);
-  end;
+    node := doc.DocumentElement.ChildNodes.FindNode('readme');
+    if Assigned(node) then
+    begin
+      Result := node.NodeValue;
+      node.NodeValue := ExtractFileName(Result);
+      Result := ExtractFilePath(Result);
+    end;
 
-  node := doc.DocumentElement.ChildNodes.FindNode('graphic');
-  if Assigned(node) then
-  begin
-    Result := node.NodeValue;
-    node.NodeValue := ExtractFileName(Result);
-    Result := ExtractFilePath(Result);
-  end;
+    node := doc.DocumentElement.ChildNodes.FindNode('graphic');
+    if Assigned(node) then
+    begin
+      Result := node.NodeValue;
+      node.NodeValue := ExtractFileName(Result);
+      Result := ExtractFilePath(Result);
+    end;
 
-  doc.SaveToXML(xml);
+    doc.SaveToXML(xml);
+  end;
 end;
 
 procedure TfrmInstallKeyboard.TntFormDestroy(Sender: TObject);

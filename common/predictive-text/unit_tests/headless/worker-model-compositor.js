@@ -102,9 +102,9 @@ describe('ModelCompositor', function() {
   
         var keep;
         if(quoteStyle) {
-          keep = compositor.toAnnotatedKeepSuggestion(baseSuggestion, quoteStyle);
+          keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep', quoteStyle);
         } else {
-          keep = compositor.toAnnotatedKeepSuggestion(baseSuggestion);
+          keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep');
         }
 
         // Make sure we didn't accidentally leak any mutations to the parameter.
@@ -132,6 +132,343 @@ describe('ModelCompositor', function() {
       it.skip('RTL test', function() {
         // TODO:
       });
+    });
+  });
+
+  describe('acceptSuggestion', function() {
+    let acceptanceTest = function(punctuation, suggestion, context, postTransform) {
+      let options = {
+        punctuation: punctuation
+      };
+
+      let model = new models.DummyModel(options);
+      let compositor = new ModelCompositor(model);
+
+      return compositor.acceptSuggestion(suggestion, context, postTransform);
+    }
+
+    let englishPunctuation = {
+      quotesForKeepSuggestion: { open: `“`, close: `”`},
+      insertAfterWord: ' '
+    };
+
+    let angledPunctuation = {
+      quotesForKeepSuggestion: { open: `«`, close: `»`},
+      insertAfterWord: " "
+    }
+
+    it('first word of context, postTransform provided, .deleteLeft = 0', function() {
+      let baseSuggestion = {
+        transform: {
+          insert: 'hello ',
+          deleteLeft: 2,
+          id: 0
+        },
+        transformId: 0,
+        id: 1,
+        displayAs: 'hello'
+      };
+  
+      let baseContext = {
+        left: 'he', startOfBuffer: true, endOfBuffer: true
+      }
+    
+      // Represents the keystroke that triggered the suggestion.  It's not technically part
+      // of the Context when the suggestion is built.
+      let postTransform = {
+        insert: 'l',
+        deleteLeft: 0
+      }
+
+      let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.id, -baseSuggestion.id);
+
+      // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
+      //            Does this include characters not considered when the Suggestion was built?
+      let unappliedContext = models.applyTransform(postTransform, baseContext);
+      let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
+      assert.equal(appliedContext.left, "hello ");
+
+      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      assert.deepEqual(revertedContext, unappliedContext);
+
+      // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
+      assert.equal(reversion.displayAs, "“hel”"); // text should _basically_ be a quoted version of `preApplyContext.left`
+
+      let angledReversion = acceptanceTest(angledPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(angledReversion.displayAs, "«hel»");
+    });
+
+    it('second word of context, postTransform provided, .deleteLeft = 0', function() {
+      let baseSuggestion = {
+        transform: {
+          insert: 'world ',
+          deleteLeft: 3,
+          id: 0
+        },
+        transformId: 0,
+        id: 0,
+        displayAs: 'world'
+      };
+  
+      let baseContext = {
+        left: 'hello wot', startOfBuffer: true, endOfBuffer: true
+      }
+    
+      // Represents the keystroke that triggered the suggestion.  It's not technically part
+      // of the Context when the suggestion is built.
+      let postTransform = {
+        insert: 'l',
+        deleteLeft: 0
+      }
+
+      let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.id, -baseSuggestion.id);
+
+      // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
+      //            Does this include characters not considered when the Suggestion was built?
+      let unappliedContext = models.applyTransform(postTransform, baseContext);
+      let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
+      assert.equal(appliedContext.left, "hello world ");
+
+      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      assert.deepEqual(revertedContext, unappliedContext);
+
+      // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
+      assert.equal(reversion.displayAs, "“wotl”"); // text should _basically_ be a quoted version of `preApplyContext.left`
+
+      let angledReversion = acceptanceTest(angledPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(angledReversion.displayAs, "«wotl»");
+    });
+
+    it('second word of context, postTransform undefined', function() {
+      let baseSuggestion = {
+        transform: {
+          insert: 'world ',
+          deleteLeft: 3,
+          id: 0
+        },
+        transformId: 0,
+        id: 0,
+        displayAs: 'world'
+      };
+  
+      let baseContext = {
+        left: 'hello wot', startOfBuffer: true, endOfBuffer: true
+      }
+
+      let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext);
+      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.id, -baseSuggestion.id);
+
+      // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
+      //            Does this include characters not considered when the Suggestion was built?
+      let unappliedContext = models.applyTransform({insert: '', deleteLeft: 0}, baseContext); // to clone the original context.
+      let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
+      assert.equal(appliedContext.left, "hello world ");
+
+      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      assert.deepEqual(revertedContext, unappliedContext);
+
+      // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
+      assert.equal(reversion.displayAs, "“wot”"); // text should _basically_ be a quoted version of `preApplyContext.left`
+
+      let angledReversion = acceptanceTest(angledPunctuation, baseSuggestion, baseContext);
+      assert.equal(angledReversion.displayAs, "«wot»");
+    });
+
+    it('first word of context + postTransform provided, .deleteLeft > 0', function() {
+      let baseSuggestion = {
+        transform: {
+          insert: 'hello ',
+          deleteLeft: 2,
+          id: 0
+        },
+        transformId: 0,
+        id: 0,
+        displayAs: 'hello'
+      };
+  
+      let baseContext = {
+        left: 'he', startOfBuffer: true, endOfBuffer: true
+      }
+    
+      // Represents the keystroke that triggered the suggestion.  It's not technically part
+      // of the Context when the suggestion is built.
+      let postTransform = {
+        insert: 'i',
+        deleteLeft: 1
+      }
+
+      let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.id, -baseSuggestion.id);
+
+      // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
+      //            Does this include characters not considered when the Suggestion was built?
+      let unappliedContext = models.applyTransform(postTransform, baseContext);
+      let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
+      assert.equal(appliedContext.left, "hello ");
+
+      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      assert.deepEqual(revertedContext, unappliedContext);
+
+      // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
+      assert.equal(reversion.displayAs, "“hi”"); // text should _basically_ be a quoted version of `preApplyContext.left`
+
+      let angledReversion = acceptanceTest(angledPunctuation, baseSuggestion, baseContext, postTransform);
+      assert.equal(angledReversion.displayAs, "«hi»");
+    });
+  });
+
+  describe('acceptReversion', function() {
+    let executeAcceptance = function(model, suggestion, context, postTransform) {
+      let compositor = new ModelCompositor(model);
+
+      return {compositor: compositor, reversion: compositor.acceptSuggestion(suggestion, context, postTransform)};
+    }
+
+    let englishPunctuation = {
+      quotesForKeepSuggestion: { open: `“`, close: `”`},
+      insertAfterWord: ' '
+    };
+
+    // While this isn't a state the LMLayer should ever operate within, this provides
+    // a useful base state for developing further tests against the method.
+    it('model without traversals: returns appropriate suggestions upon reversion', function() {
+      // This setup matches 'acceptSuggestion' the test case
+      // it('first word of context + postTransform provided, .deleteLeft > 0')
+      // seen earlier in the file.
+
+      let baseSuggestion = {
+        transform: {
+          insert: 'hello ',
+          deleteLeft: 2,
+          id: 0
+        },
+        transformId: 0,
+        id: 0,
+        displayAs: 'hello'
+      };
+  
+      let baseContext = {
+        left: 'he', startOfBuffer: true, endOfBuffer: true
+      }
+    
+      // Represents the keystroke that triggered the suggestion.  It's not technically part
+      // of the Context when the suggestion is built.
+      let postTransform = {
+        insert: 'i',
+        deleteLeft: 1
+      }
+
+      let model = new models.DummyModel({punctuation: englishPunctuation});
+      let compositor = new ModelCompositor(model);
+
+      let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.id, -baseSuggestion.id);
+
+      let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
+      assert.equal(appliedContext.left, "hello ");
+
+      let suggestions = compositor.applyReversion(reversion, appliedContext);
+      
+      // As this test is a bit... 'hard-wired', we only get the 'keep' suggestion.
+      // It should still be accurate, though.
+      assert.equal(suggestions.length, 1);
+
+      let expectedTransform = {
+        insert: '',  // Keeps current context the same.
+        deleteLeft: 0
+      }
+      assert.deepEqual(suggestions[0].transform, expectedTransform);
+    });
+
+    it('model with traversals: returns appropriate suggestions upon reversion', function() {
+      // This setup matches 'acceptSuggestion' the test case
+      // it('first word of context + postTransform provided, .deleteLeft > 0')
+      // seen earlier in the file.
+  
+      let baseContext = {
+        left: 'he', startOfBuffer: true, endOfBuffer: true
+      }
+    
+      // Represents the keystroke that triggered the suggestion.  It's not technically part
+      // of the Context when the suggestion is built.
+      let postTransform = {
+        insert: 'i',
+        deleteLeft: 1,
+        id: 13
+      }
+
+      let model = new models.TrieModel(jsonFixture('tries/english-1000'), {punctuation: englishPunctuation});
+      let compositor = new ModelCompositor(model);
+
+      let initialSuggestions = compositor.predict(postTransform, baseContext);
+      let keepSuggestion = initialSuggestions[0];
+      assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
+
+      let baseSuggestion = initialSuggestions[1];
+      let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.id, -baseSuggestion.id);
+
+      let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
+      let reversionSuggestions = compositor.applyReversion(reversion, appliedContext);
+      
+      // The returned suggestion list should match the original suggestion list.
+      assert.deepEqual(reversionSuggestions, initialSuggestions);
+    });
+
+    it('model with traversals: properly tracks context state', function() {
+      // Could be merged with the previous test case, but I think it's good to have the error
+      // sets flagged separately.
+  
+      let baseContext = {
+        left: 'he', startOfBuffer: true, endOfBuffer: true
+      }
+    
+      // Represents the keystroke that triggered the suggestion.  It's not technically part
+      // of the Context when the suggestion is built.
+      let postTransform = {
+        insert: 'i',
+        deleteLeft: 1,
+        id: 13
+      }
+
+      let model = new models.TrieModel(jsonFixture('tries/english-1000'), {punctuation: englishPunctuation});
+      let compositor = new ModelCompositor(model);
+
+      let initialSuggestions = compositor.predict(postTransform, baseContext);
+      let keepSuggestion = initialSuggestions[0];
+      assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
+
+      let baseContextState = compositor.contextTracker.analyzeState(model, baseContext);
+      assert.equal(compositor.contextTracker.count, 1);
+
+      let baseSuggestion = initialSuggestions[1];
+      let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
+      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.id, -baseSuggestion.id);
+
+      // Accepting the suggestion adds an extra context state.
+      assert.equal(compositor.contextTracker.count, 2);
+
+      // The replacement should be marked on the context-tracking token.
+      assert.isOk(baseContextState.tail.replacement);
+
+      let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
+      compositor.applyReversion(reversion, appliedContext);
+
+      // Reverting the suggestion should remove that extra state.
+      assert.equal(compositor.contextTracker.count, 1);
+      assert.equal(compositor.contextTracker.item(0), baseContextState);
+
+      // The replacement should no longer be marked for the context-tracking token.
+      assert.isNotOk(baseContextState.tail.replacement);
     });
   });
 });

@@ -152,7 +152,6 @@ uses
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
-  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
   Keyman.Configuration.UI.UfrmDiagnosticTests in 'util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas' {frmDiagnosticTests},
@@ -171,7 +170,14 @@ uses
   Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
   Keyman.Configuration.System.TIPMaintenance in 'install\Keyman.Configuration.System.TIPMaintenance.pas',
   UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress},
-  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13 in 'main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas';
+  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13 in 'main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas',
+  Keyman.System.Settings in '..\..\global\delphi\general\Keyman.System.Settings.pas',
+  Keyman.System.SettingsManager in '..\..\global\delphi\general\Keyman.System.SettingsManager.pas',
+  Keyman.Configuration.UI.UfrmSettingsManager in 'settings\Keyman.Configuration.UI.UfrmSettingsManager.pas' {frmSettingsManager},
+  Keyman.Configuration.UI.UfrmSettingsAddTSFApp in 'settings\Keyman.Configuration.UI.UfrmSettingsAddTSFApp.pas' {frmSettingsAddTSFApp},
+  Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas',
+  Keyman.System.KeymanStartTask in 'util\Keyman.System.KeymanStartTask.pas',
+  TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

@@ -8,12 +8,33 @@ namespace correction {
 
   export class TrackedContextToken {
     raw: string;
+    replacementText: string;
+
     transformDistributions: Distribution<Transform>[] = [];
-    replacements: TrackedContextSuggestion;
-    activeReplacement: number = -1;
+    replacements: TrackedContextSuggestion[];
+    activeReplacementId: number = -1;
 
     get isNew(): boolean {
       return this.transformDistributions.length == 0;
+    }
+
+    get currentText(): string {
+      if(this.replacementText === undefined || this.replacementText === null) {
+        return this.raw;
+      } else {
+        return this.replacementText;
+      }
+    }
+
+    get replacement(): TrackedContextSuggestion {
+      let replacementId = this.activeReplacementId;
+      return this.replacements.find(function(replacement) {
+        return replacement.suggestion.id == replacementId;
+      });
+    }
+
+    revert() {
+      delete this.activeReplacementId;
     }
   }
 
@@ -44,8 +65,12 @@ namespace correction {
           let copy = new TrackedContextToken();
           copy.raw = token.raw;
           copy.replacements = token.replacements
-          copy.activeReplacement = token.activeReplacement;
+          copy.activeReplacementId = token.activeReplacementId;
           copy.transformDistributions = token.transformDistributions;
+
+          if(token.replacementText) {
+            copy.replacementText = token.replacementText;
+          }
   
           return copy;
         });
@@ -62,6 +87,14 @@ namespace correction {
           this.searchSpace = [new SearchSpace(lexicalModel)];
         }
       }
+    }
+
+    get head(): TrackedContextToken {
+      return this.tokens[0];
+    }
+
+    get tail(): TrackedContextToken {
+      return this.tokens[this.tokens.length - 1];
     }
 
     popHead() {
@@ -95,7 +128,7 @@ namespace correction {
     }
 
     updateTail(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
-      let editedToken = this.tokens[this.tokens.length - 1];
+      let editedToken = this.tail;
       
       // Preserve existing text if new text isn't specified.
       tokenText = tokenText || (tokenText === '' ? '' : editedToken.raw);
@@ -111,13 +144,12 @@ namespace correction {
     }
 
     toRawTokenization() {
-      // TODO:  support token replacement (for accepted suggestions).
       let sequence: USVString[] = [];
       
       for(let token of this.tokens) {
         // Hide any tokens representing wordbreaks.  (Thinking ahead to phrase-level possibilities)
-        if(token.raw !== null) {
-          sequence.push(token.raw);
+        if(token.currentText !== null) {
+          sequence.push(token.currentText);
         }
       }
 
@@ -149,6 +181,22 @@ namespace correction {
       return this.circle.length;
     }
 
+    get oldest(): Item {
+      if(this.count == 0) {
+        return undefined;
+      }
+
+      return this.item(0);
+    }
+
+    get newest(): Item {
+      if(this.count == 0) {
+        return undefined;
+      }
+
+      return this.item(this.count - 1);
+    }
+
     enqueue(item: Item): Item {
       var prevItem = null;
       let nextHead = (this.currentHead + 1) % this.maxCount;
@@ -174,6 +222,21 @@ namespace correction {
       }
     }
 
+    popNewest(): Item {
+      if(this.currentTail == this.currentHead) {
+        return null;
+      } else {
+        let item = this.circle[this.currentHead];
+        this.currentHead = (this.currentHead - 1 + this.maxCount) % this.maxCount;
+        return item;
+      }
+    }
+
+    /**
+     * Returns items contained within the circular array, ordered from 'oldest' to 'newest' -
+     * the same order in which the items will be dequeued.
+     * @param index 
+     */
     item(index: number) {
       if(index >= this.count) {
         throw "Invalid array index";
@@ -204,7 +267,8 @@ namespace correction {
       // Matters greatly when starting from a nil context.
       if(editPath.length > 1) {
         // First entry:  may not be an 'insert' or a 'transpose' op.
-        if(editPath[0] == 'insert' || editPath[0].indexOf('transpose') >= 0) {
+        // 'insert' allowed if the next token is 'substitute', as this may occur with an edit path of length 2.
+        if((editPath[0] == 'insert' && !(editPath[1] == 'substitute' && editPath.length == 2)) || editPath[0].indexOf('transpose') >= 0) {
           return null;
         } else if(editPath[0] == 'delete') {
           poppedHead = true; // a token from the previous state has been wholly removed.
@@ -235,6 +299,15 @@ namespace correction {
       let state: TrackedContextState;
       
       if(pushedTail) {
+        // On suggestion acceptance, we should update the previous final token.
+        // We do it first so that the acceptance is replicated in the new TrackedContextState
+        // as well.
+        if(ignorePenultimateMatch) {
+          // For this case, we were likely called by ModelCompositor.acceptSuggestion(), which
+          // would have marked the accepted suggestion.
+          matchState.tail.replacementText = tokenizedContext[tokenizedContext.length-2];
+        }
+
         state = new TrackedContextState(matchState);
       } else {
         // Since we're continuing a previously-cached context, we can reuse the same SearchSpace
@@ -258,13 +331,6 @@ namespace correction {
         }
 
         if(pushedTail) {
-          // On suggestion acceptance, we should update the previous final token.
-          if(ignorePenultimateMatch) {
-            // TODO:  We might should track the accepted suggestion as a final transform here.
-            //        The infrastructure to track this doesn't exist quite yet, though.
-            state.updateTail(null, tokenizedContext[tokenizedContext.length-2]);
-          }
-
           // ASSUMPTION:  any transform that triggers this case is a pure-whitespace Transform, as we
           //              need a word-break before beginning a new word's context.
           //              Worth note:  when invalid, the lm-layer already has problems in other aspects too.
@@ -333,6 +399,13 @@ namespace correction {
         state.pushTail(baseTokens.splice(0, 1)[0]);
       }
 
+      if(state.tokens.length == 0) {
+        let token = new TrackedContextToken();
+        token.raw = '';
+
+        state.pushTail(token);
+      }
+
       return state;
     }
 
@@ -355,11 +428,11 @@ namespace correction {
         throw "This lexical model does not provide adequate data for correction algorithms and context reuse";
       }
 
-      let tokenizedContext = model.tokenize(context);
+      let tokenizedContext = models.tokenize(model.wordbreaker || wordBreakers.default, context);
 
-      if(tokenizedContext.length > 0) {
+      if(tokenizedContext.left.length > 0) {
         for(let i = this.count - 1; i >= 0; i--) {
-          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item(i), transformDistribution);
+          let resultState = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), transformDistribution);
 
           if(resultState) {
             resultState.taggedContext = context;
@@ -376,7 +449,7 @@ namespace correction {
       //
       // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
       // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-      let state = ContextTracker.modelContextState(tokenizedContext, model);
+      let state = ContextTracker.modelContextState(tokenizedContext.left, model);
       state.taggedContext = context;
       this.enqueue(state);
       return state;

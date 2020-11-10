@@ -97,9 +97,7 @@ private:
     BOOL _InitThreadMgrSink();
     BOOL _InitKeystrokeSink();
     BOOL _InitPreservedKeys();   // I4274
-    BOOL _LoadKeyman();
     BOOL _InitKeyman();
-    BOOL _CheckKeymanLoaded();   // I4274
 
     HRESULT _PreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr);
 
@@ -107,6 +105,8 @@ private:
     void _UninitThreadMgrSink();
     void _UninitKeystrokeSink();
     void _UninitKeyman();
+
+    void _TryAndStartKeyman();
   
     HRESULT _UnpreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr);
 
@@ -122,7 +122,6 @@ private:
     BOOL _keystrokeSinkInitialized;
     BOOL fEatenBuf[256];
 
-    HMODULE _hKeyman;
     ITfThreadMgr *_pThreadMgr;
     TfClientId _tfClientId;
 
@@ -137,12 +136,26 @@ private:
     LONG _cRef;     // COM ref count
 };
 
+//
+// Keyman32 interfaces
+//
+
+typedef HRESULT(WINAPI *PKEYMANPROCESSOUTPUTFUNC)(int n, WCHAR *buf, int nbuf);   // I3567
+typedef HRESULT(WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);   // I3567
+
 class Keyman32Interface {
-private:
-  static HMODULE GetHandle();
 public:
-  static void SetFocus(HWND hwndActive, HWND hwndPrevious);
   static void WriteDebugEvent(char *file, int line, PWCHAR msg);
+
+  static BOOL TIPActivateEx(BOOL fActivate);
+  static BOOL TIPActivateKeyboard(GUID *profile);
+
+  static BOOL TIPProcessKey(WPARAM wParam, LPARAM lParam, PKEYMANPROCESSOUTPUTFUNC outfunc,
+    PKEYMANGETCONTEXTFUNC ctfunc, BOOL Updateable, BOOL Preserved);
+
+  static BOOL GetKeyboardPreservedKeys(PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
+
+  static BOOL TIPIsKeymanRunning();
 };
 
 #endif // KMTIP_H

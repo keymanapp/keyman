@@ -73,8 +73,8 @@ type
     cef: TframeCEFHost;
 
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
-    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean);
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean);
     procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
 
     procedure ProjectRefresh(Sender: TObject);
@@ -250,7 +250,7 @@ begin
   FreeAndNil(FNextCommandParams);
 end;
 
-procedure TfrmProject.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
+procedure TfrmProject.cefBeforeBrowse(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean);
 var
   s: string;
 begin
@@ -269,7 +269,7 @@ begin
 end;
 
 procedure TfrmProject.cefBeforeBrowseSync(Sender: TObject;
-  const Url: string; out Handled: Boolean);
+  const Url: string; isPopup: Boolean; out Handled: Boolean);
 begin
   Handled := ShouldHandleNavigation(Url);
 end;

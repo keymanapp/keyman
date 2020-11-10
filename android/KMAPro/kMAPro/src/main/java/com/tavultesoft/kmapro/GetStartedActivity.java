@@ -113,11 +113,9 @@ public class GetStartedActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == 0) {
-          if (KMManager.hasConnection(context)) {
-            // Keyman Settings install activity
-            Intent i = new Intent(context, KeymanSettingsInstallActivity.class);
-            context.startActivity(i);
-          }
+          // Keyman Settings install activity
+          Intent i = new Intent(context, KeymanSettingsInstallActivity.class);
+          context.startActivity(i);
         } else if (position == 1) {
           startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
         } else if (position == 2) {

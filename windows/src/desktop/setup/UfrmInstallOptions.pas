@@ -48,6 +48,8 @@ type
     lblDefaultKeymanSettings: TLabel;
     lblSelectModulesToInstall: TLabel;
     lblAssociatedKeyboardLanguage: TLabel;
+    lblInstallerVersion: TLabel;
+    lblTitleLocation: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
   private
@@ -55,11 +57,13 @@ type
       Package: TInstallInfoPackage;
       Location: TInstallInfoPackageFileLocation;
       CheckBox: TCheckBox;
-      ComboBox: TComboBox;
+      ComboBoxLocation: TComboBox;
+      ComboBoxLanguage: TComboBox;
       function IsValid: Boolean;
     end;
   private
     chkInstallKeyman: TCheckBox;
+    cbKeymanLocation: TComboBox;
     FPackages: array of TPackageControl;
     function GetCanUpgradeKeyman7: Boolean;
     function GetCheckForUpdates: Boolean;
@@ -78,8 +82,8 @@ type
     procedure chkInstallKeyboardClick(Sender: TObject);
     procedure chkInstallKeymanClick(Sender: TObject);
     procedure EnableControls;
-    procedure AddCheckboxPanel(const Text: string; AddCombo: Boolean;
-      var pt: TPoint; var chk: TCheckBox; var cb: TComboBox);
+    procedure AddCheckboxPanel(const Text: string; AddLanguageCombo: Boolean;
+      var pt: TPoint; var chk: TCheckBox; var cbLocation, cbLanguage: TComboBox);
     { Private declarations }
   public
     { Public declarations }
@@ -97,6 +101,7 @@ implementation
 
 uses
   bootstrapmain,
+  KeymanVersion,
   SetupStrings;
 
 { TfrmInstallOptions }
@@ -118,12 +123,15 @@ begin
   lblDefaultKeymanSettings.Caption := FInstallInfo.Text(ssOptionsTitleDefaultKeymanSettings);
   lblSelectModulesToInstall.Caption := FInstallInfo.Text(ssOptionsTitleSelectModulesToInstall);
   lblAssociatedKeyboardLanguage.Caption := FInstallInfo.Text(ssOptionsTitleAssociatedKeyboardLanguage);
+  lblTitleLocation.Caption := FInstallInfo.Text(ssOptionsTitleLocation);
 
   FAllowOptions := not FInstallInfo.IsInstalled and FInstallInfo.IsNewerAvailable;
   lblDefaultKeymanSettings.Visible := FAllowOptions;
   chkAutomaticallyReportUsage.Visible := FAllowOptions;
   chkCheckForUpdates.Visible := FAllowOptions;
   chkStartWithWindows.Visible := FAllowOptions;
+
+  lblInstallerVersion.Caption := FInstallInfo.Text(ssInstallerVersion, [KeymanVersion.CKeymanVersionInfo.VersionWithTag]);
 
   SetupDynamicOptions;
 end;
@@ -188,18 +196,19 @@ begin
   chkUpgradeKeyman7.Checked := Value;
 end;
 
-procedure TfrmInstallOptions.AddCheckboxPanel(const Text: string; AddCombo: Boolean; var pt: TPoint; var chk: TCheckBox; var cb: TComboBox);
+procedure TfrmInstallOptions.AddCheckboxPanel(const Text: string; AddLanguageCombo: Boolean; var pt: TPoint; var chk: TCheckBox; var cbLocation, cbLanguage: TComboBox);
 var
   pan: TPanel;
 begin
   pan := TPanel.Create(Self);
   chk := TCheckBox.Create(Self);
-  cb := TComboBox.Create(Self);
+  cbLocation := TComboBox.Create(Self);
+  cbLocation.Font := Font;
 
   pan.Left := pt.X;
   pan.Top := pt.Y;
-  pan.Width := sbTargets.ClientWidth - GetSystemMetrics(SM_CXVSCROLL);
-  pan.Height := cb.Height + 4;
+  pan.Width := sbTargets.Width - GetSystemMetrics(SM_CXVSCROLL);
+  pan.Height := cbLocation.Height;
   pan.BevelKind := bkTile;
   pan.BevelOuter := bvNone;
   pan.Caption := '';
@@ -207,21 +216,26 @@ begin
   sbTargets.InsertControl(pan);
 
   chk.Left := 2;
-  chk.Top := 4;
-  chk.Width := 2 * sbTargets.ClientWidth div 3 + 1;
+  chk.Top := 2;
+  chk.Width := sbTargets.ClientWidth div 3 + 1;
   chk.Caption := Text;
   pan.InsertControl(chk);
 
-  if AddCombo then
+  if AddLanguageCombo then
   begin
-    cb.Left := pan.ClientWidth - pan.ClientWidth div 3 - 1;
-    cb.Top := 0;
-    cb.Width := pan.ClientWidth div 3;
-    cb.Style := csDropDownList;
-    pan.InsertControl(cb);
-  end
-  else
-    FreeAndNil(cb);
+    cbLanguage := TComboBox.Create(Self);
+    cbLanguage.Left := pan.ClientWidth div 3 + 1;
+    cbLanguage.Top := 0;
+    cbLanguage.Width := pan.ClientWidth div 3;
+    cbLanguage.Style := csDropDownList;
+    pan.InsertControl(cbLanguage);
+  end;
+
+  cbLocation.Left := pan.ClientWidth - pan.ClientWidth div 3 - 1;
+  cbLocation.Top := 0;
+  cbLocation.Width := pan.ClientWidth div 3;
+  cbLocation.Style := csDropDownList;
+  pan.InsertControl(cbLocation);
 
   Inc(pt.Y, pan.Height - 2);
 end;
@@ -232,16 +246,22 @@ var
   packLocation: TInstallInfoPackageFileLocation;
   chk: TCheckBox;
   pt: TPoint;
-  cb: TComboBox;
+  cbLocation, cbLanguage: TComboBox;
   n: Integer;
   Text: string;
   selectedLang, lang: TInstallInfoPackageLanguage;
+  location: TInstallInfoFileLocation;
 begin
   pt.x := 0;
   pt.y := 0;
 
   if FInstallInfo.IsNewerAvailable then
   begin
+    if FInstallInfo.IsInstalled
+      then Text := FInstallInfo.Text(ssOptionsUpgradeKeyman)
+      else Text := FInstallInfo.Text(ssOptionsInstallKeyman);
+
+{
     if not FInstallInfo.IsInstalled then
       case FInstallInfo.BestMsi.LocationType of
         iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallKeyman, [FInstallInfo.BestMsi.Version]);
@@ -252,6 +272,7 @@ begin
         iilLocal:  Text := FInstallInfo.Text(ssOptionsUpgradeKeyman, [FInstallInfo.BestMsi.Version]);
         iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadUpgradeKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
       end;
+}
   end
   else if FInstallInfo.IsInstalled then
   begin
@@ -263,64 +284,89 @@ begin
     Assert(False, 'Offline, Keyman is not installed, and no msi is available');
   end;
 
-  AddCheckboxPanel(Text, False, pt, chkInstallKeyman, cb);
+  AddCheckboxPanel(Text, False, pt, chkInstallKeyman, cbKeymanLocation, cbLanguage);
+
+  for location in FInstallInfo.MsiLocations do
+  begin
+    case location.LocationType of
+      iilLocal: Text := FInstallInfo.Text(ssOptionsInstallKeymanVersion, [location.Version]);
+      iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadKeymanVersion, [location.Version, FormatFileSize(location.Size)]);
+    end;
+    cbKeymanLocation.Items.AddObject(Text, location);
+  end;
+  cbKeymanLocation.ItemIndex := cbKeymanLocation.Items.IndexOfObject(FInstallInfo.MsiInstallLocation);
+
   chkInstallKeyman.Checked := FInstallInfo.ShouldInstallKeyman;
-  chkInstallKeyman.Enabled := FInstallInfo.IsNewerAvailable and FInstallInfo.IsInstalled;
   chkInstallKeyman.OnClick := chkInstallKeymanClick;
+  chkInstallKeyman.Enabled := FInstallInfo.IsNewerAvailable and FInstallInfo.IsInstalled;
+  cbKeymanLocation.Enabled := chkInstallKeyman.Enabled and (cbKeymanLocation.Items.Count > 1);
+
+  lblTitleLocation.Left := cbKeymanLocation.Left + sbTargets.Left;
 
   n := 0;
   SetLength(FPackages, FInstallInfo.Packages.Count);
   for pack in FInstallInfo.Packages do
   begin
-    packLocation := pack.GetBestLocation;
-    if Assigned(packLocation) then
+    packLocation := pack.InstallLocation;
+    if not Assigned(packLocation) then Continue;
+
+    Text := FInstallInfo.Text(ssOptionsInstallPackage, [packLocation.GetNameOrID(pack.ID)]);
+    AddCheckboxPanel(Text, True, pt, chk, cbLocation, cbLanguage);
+    chk.Checked := pack.ShouldInstall;
+    chk.OnClick := chkInstallKeyboardClick;
+
+    for location in pack.Locations DO
     begin
-      case packLocation.LocationType of
-        iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallPackage, [packLocation.GetNameOrID(pack.ID), packLocation.Version]);
-        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadInstallPackage, [packLocation.GetNameOrID(pack.ID), packLocation.Version, FormatFileSize(packLocation.Size)]);
+      case location.LocationType of
+        iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallPackageVersion, [location.Version]);
+        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadPackageVersion, [location.Version, FormatFileSize(location.Size)]);
       end;
-
-      AddCheckboxPanel(Text, True, pt, chk, cb);
-      chk.Checked := pack.ShouldInstall;
-      chk.OnClick := chkInstallKeyboardClick;
-      cb.OnClick := cbInstallKeyboardClick;
-      cb.Hint := FInstallInfo.Text(ssOptionsPackageLanguageAssociation, [packLocation.GetNameOrID(pack.ID)]);
-      cb.ShowHint := True;
-
-      selectedLang := nil;
-      for lang in packLocation.Languages do
-      begin
-        cb.Items.AddObject(lang.Name + ' ('+lang.BCP47+')', lang);
-        if SameText(pack.BCP47, lang.BCP47) then selectedLang := lang;
-      end;
-
-      if cb.Items.Count = 0 then
-        cb.Items.AddObject(FInstallInfo.Text(ssOptionsDefaultLanguage), nil);
-
-      cb.Sorted := True;
-      cb.ItemIndex := cb.Items.IndexOfObject(selectedLang);
-      if cb.ItemIndex < 0 then
-        cb.ItemIndex := 0;
-
-      FPackages[n].Package := pack;
-      FPackages[n].Location := packLocation;
-      FPackages[n].CheckBox := chk;
-      FPackages[n].ComboBox := cb;
-      Inc(n);
+      cbLocation.Items.AddObject(Text, location);
     end;
+    cbLocation.ItemIndex := cbLocation.Items.IndexOfObject(packLocation);
+    cbLocation.OnClick := cbInstallKeyboardClick;
+
+    cbLanguage.OnClick := cbInstallKeyboardClick;
+    cbLanguage.Hint := FInstallInfo.Text(ssOptionsPackageLanguageAssociation, [packLocation.GetNameOrID(pack.ID)]);
+    cbLanguage.ShowHint := True;
+
+    selectedLang := nil;
+    for lang in packLocation.Languages do
+    begin
+      cbLanguage.Items.AddObject(lang.Name + ' ('+lang.BCP47+')', lang);
+      if SameText(pack.BCP47, lang.BCP47) then selectedLang := lang;
+    end;
+
+    if cbLanguage.Items.Count = 0 then
+      cbLanguage.Items.AddObject(FInstallInfo.Text(ssOptionsDefaultLanguage), nil);
+
+    cbLanguage.Sorted := True;
+    cbLanguage.ItemIndex := cbLanguage.Items.IndexOfObject(selectedLang);
+    if cbLanguage.ItemIndex < 0 then
+      cbLanguage.ItemIndex := 0;
+
+    FPackages[n].Package := pack;
+    FPackages[n].Location := packLocation;
+    FPackages[n].CheckBox := chk;
+    FPackages[n].ComboBoxLanguage := cbLanguage;
+    FPackages[n].ComboBoxLocation := cbLocation;
+    Inc(n);
+
+    lblAssociatedKeyboardLanguage.Left := cbLanguage.Left + sbTargets.Left;
   end;
+
+  EnableControls;
+
+  lblAssociatedKeyboardLanguage.Visible := FInstallInfo.Packages.Count > 0;
 
   // Special case: if there are no options to change, don't present them
   if (FInstallInfo.Packages.Count = 0) and not chkInstallKeyman.Enabled then
   begin
     sbTargets.Visible := False;
     lblSelectModulesToInstall.Visible := False;
+    lblAssociatedKeyboardLanguage.Visible := False;
+    lblTitleLocation.Visible := False;
   end;
-
-  lblAssociatedKeyboardLanguage.Visible := FInstallInfo.Packages.Count > 0;
-
-
-  EnableControls;
 end;
 
 procedure TfrmInstallOptions.cmdOKClick(Sender: TObject);
@@ -328,15 +374,17 @@ var
   pack: TPackageControl;
 begin
   FInstallInfo.ShouldInstallKeyman := chkInstallKeyman.Checked;
+  FInstallInfo.MsiInstallLocation := cbKeymanLocation.Items.Objects[cbKeymanLocation.ItemIndex] as TInstallInfoFileLocation;
 
   for pack in FPackages do
     if pack.IsValid then
     begin
       pack.Package.ShouldInstall := pack.CheckBox.Checked;
-      if (pack.ComboBox.ItemIndex < 0) or
-          not Assigned(pack.ComboBox.Items.Objects[pack.ComboBox.ItemIndex])
+      if (pack.ComboBoxLanguage.ItemIndex < 0) or
+          not Assigned(pack.ComboBoxLanguage.Items.Objects[pack.ComboBoxLanguage.ItemIndex])
         then pack.Package.BCP47 := ''
-        else pack.Package.BCP47 := (pack.ComboBox.Items.Objects[pack.ComboBox.ItemIndex] as TInstallInfoPackageLanguage).BCP47;
+        else pack.Package.BCP47 := (pack.ComboBoxLanguage.Items.Objects[pack.ComboBoxLanguage.ItemIndex] as TInstallInfoPackageLanguage).BCP47;
+      pack.Package.InstallLocation := pack.ComboBoxLocation.Items.Objects[pack.ComboBoxLocation.ItemIndex] as TInstallInfoPackageFileLocation;
     end;
 
   ModalResult := mrOk;
@@ -362,12 +410,17 @@ var
   i: Integer;
   e: Boolean;
 begin
+  chkInstallKeyman.Enabled := FInstallInfo.IsNewerAvailable and FInstallInfo.IsInstalled;
+
   e := chkInstallKeyman.Checked;
+  cbKeymanLocation.Enabled := e and (cbKeymanLocation.Items.Count > 1);
+
   for i := 0 to High(FPackages) do
   begin
     if FPackages[i].IsValid then
     begin
-      FPackages[i].ComboBox.Enabled := FPackages[i].CheckBox.Checked;
+      FPackages[i].ComboBoxLanguage.Enabled := FPackages[i].CheckBox.Checked and (FPackages[i].ComboBoxLanguage.Items.Count > 1);
+      FPackages[i].ComboBoxLocation.Enabled := FPackages[i].CheckBox.Checked and (FPackages[i].ComboBoxLocation.Items.Count > 1);
       e := e or FPackages[i].CheckBox.Checked;
     end;
   end;

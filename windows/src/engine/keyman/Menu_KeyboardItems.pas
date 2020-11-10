@@ -293,6 +293,9 @@ begin
   FMenu.Items.Clear;
   FNextMenuItemIsBreak := False;
 
+  FKeyman.Refresh;
+  frmKeyman7Main.LangSwitchManager.Refresh;
+
   with kmint.KeymanCustomisation do
     for i := 1 to CustMenuItems.Count do {$MESSAGE HINT 'This indexing needs to be sorted out'}
     begin

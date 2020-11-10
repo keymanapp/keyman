@@ -211,7 +211,8 @@ end;
 function TKeymanKeyboardInstalled.Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
 var
   FHasVisualKeyboard: Boolean;
-  FBitmap, FEncodings: WideString;
+  FBitmap, FEncodings: string;
+  TempBitmapLockFile: string;
 begin
   FEncodings := '';
   if (Get_Encodings and keymanapi_TLB.keUnicode) = keymanapi_TLB.keUnicode then
@@ -240,7 +241,7 @@ begin
 
   if ((Flags and ksfExportImages) = ksfExportImages) and Assigned(FRegKeyboard.Icon) then
   begin
-    FBitmap := XMLImageTempName(ImagePath, References);
+    FBitmap := XMLImageTempName(ImagePath, TempBitmapLockFile, References);
     with Vcl.Graphics.TBitmap.Create do
     try
       Width := 16;
@@ -250,6 +251,7 @@ begin
     finally
       Free;
     end;
+    DeleteFile(TempBitmapLockFile); // delete after bitmap is saved to avoid races
     Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
   end;
 

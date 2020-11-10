@@ -90,7 +90,6 @@ type
     procedure CheckNewVersion;
     function InstallMSI: Boolean;
     procedure Status(const Text: WideString = '');
-    function CheckDependencies: Boolean;
     procedure DownloadRedistFile(AOwner: TfrmDownloadProgress; var Result: Boolean);
     function InstallNewVersion: Boolean;
     function IsNewerVersionInstalled(const NewVersion: WideString): Boolean;
@@ -221,36 +220,6 @@ end;
 function TfrmRun.IsNewerVersionInstalled(const NewVersion: WideString): Boolean;
 begin
   Result := (FInstalledVersion.Version <> '') and (CompareVersions(NewVersion, FInstalledVersion.Version) >= 0);
-end;
-
-function TfrmRun.CheckDependencies: Boolean;
-const
-  SInternetExplorerHome = 'https://www.microsoft.com/ie/';
-begin
-  Result := False;
-
-  // Check Internet Explorer version
-  Status(FInstallInfo.Text(ssStatusCheckingInternetExplorer));
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKeyReadOnly('Software\Microsoft\Internet Explorer') or not ValueExists('Version') or
-      (CompareVersions(ReadString('Version'), '9.0') > 0) then
-    begin
-      if FSilent or (MessageDlgW(FInstallInfo.Text(ssQueryUpdateInternetExplorer),
-        mtConfirmation, mbOkCancel, 0) = mrCancel) then
-      begin
-        LogError(FInstallInfo.Text(ssRedistIEUpdateRequired), False);
-        Exit;
-      end;
-      TUtilExecute.URL(SInternetExplorerHome);
-      Exit;
-    end;
-  finally
-    Free;
-  end;
-
-  Result := True;
 end;
 
 function TfrmRun.InstallNewVersion: Boolean;
@@ -423,8 +392,6 @@ end;
 
 function TfrmRun.DoInstall(Silent, PromptForReboot: Boolean): Boolean;  // I1901  // I3355   // I3500
 begin
-  Result := False;  // I1901
-
   FPromptForReboot := PromptForReboot;  // I3355   // I3500
   FSilent := Silent;
   
@@ -438,8 +405,6 @@ begin
     EnableWindow(GetDlgItem(Handle, IDC_CHECK1), False);
 
     StatusMax := 6;
-
-    if not CheckDependencies then Exit;
 
     SetupMSI;
 

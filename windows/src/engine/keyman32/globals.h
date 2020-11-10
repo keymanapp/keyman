@@ -92,7 +92,9 @@ public:
 
 	static DWORD *ShiftState();
 
+#ifndef _WIN64
   static LONG *RefreshTag();
+#endif
 
 	static HHOOK get_hhookGetMessage();
 	static HHOOK get_hhookCallWndProc();
@@ -240,10 +242,6 @@ typedef struct tagKEYMAN64THREADDATA
 
   /* TSF Manager Globals */
 
-  HMODULE hMSCTF;
-  ITfInputProcessorProfiles *pInputProcessorProfiles;
-  ITfInputProcessorProfileMgr *pInputProcessorProfileMgr;
-  BOOL TSFFailed;
   WPARAM LastKey;   // I4642
   BYTE LastScanCode;   // I4642
 

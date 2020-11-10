@@ -107,7 +107,7 @@ begin
   PageTag := modWebHttpServer.SharedData.Add(Data);
 
   FRenderPage := 'onlineupdate';
-  Content_Render(False, 'tag='+IntToStr(PageTag));
+  Content_Render('tag='+IntToStr(PageTag));
 end;
 
 end.

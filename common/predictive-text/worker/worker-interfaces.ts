@@ -38,8 +38,8 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak';
-type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage;
+type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak' | 'accept' | 'revert';
+type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage | AcceptMessage | RevertMessage;
 
 /**
  * The structure of a config message.  It should include the platform's supported
@@ -135,6 +135,58 @@ interface WordbreakMessage {
   /**
    * The context (text to the left and text to right) at the
    * insertion point/text cursor.
+   */
+  context: Context;
+}
+
+interface AcceptMessage {
+  message: 'accept';
+
+  /**
+   * Opaque, unique token that pairs this accept message with its return message.
+   */
+  token: Token;
+
+  /**
+   * The Suggestion being accepted.  The ID must be assigned.
+   */
+  suggestion: Suggestion & {id: number};
+
+  /**
+   * The context (text to the left and text to right) at the
+   * insertion point/text cursor, at the moment the Suggestion
+   * was generated.
+   */
+  context: Context;
+
+  /**
+   * A Transform representing any text manipulations applied to 
+   * the Context after the `suggestion` was generated.  
+   * 
+   * Necessary, as Suggestions are generated without applying their
+   * triggering keystroke to the Context.  (The current context is 
+   * thus likely to differ.)
+   */
+  postTransform?: Transform;
+}
+
+interface RevertMessage {
+  message: 'revert';
+
+  /**
+   * Opaque, unique token that pairs this accept message with its return message.
+   */
+  token: Token;
+
+  /**
+   * The Reversion being applied.  The ID must be assigned and should be the additive inverse
+   * of the Suggestion being reverted.
+   */
+  reversion: Reversion;
+
+  /**
+   * The Context being reverted, which should be the same context as resulted from applying the
+   * corresponding Suggestion.
    */
   context: Context;
 }

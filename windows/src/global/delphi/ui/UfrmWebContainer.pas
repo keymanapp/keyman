@@ -58,6 +58,8 @@ type
     FDialogName: WideString;
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
+    procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
+
     procedure ContributeUILanguages;
   protected
     cef: TframeCEFHost;
@@ -81,8 +83,10 @@ type
 
     function IsLocalUrl(const url: string): Boolean;
 
-    procedure Content_Render(FRefreshKeyman: Boolean = False; const Query: string = ''); virtual;
+    procedure Content_Render(const Query: string = ''); virtual;
     procedure WndProc(var Message: TMessage); override;  // I2720
+
+    procedure DoOpenHelp;
   public
     constructor Create(AOwner: TComponent); override;
     procedure SetFocus; override;  // I2720
@@ -123,8 +127,7 @@ begin
   Application.CreateForm(InstanceClass, Reference);
 end;
 
-procedure TfrmWebContainer.Content_Render(FRefreshKeyman: Boolean;
-  const Query: string);
+procedure TfrmWebContainer.Content_Render(const Query: string);
 var
   FWidth, FHeight: Integer;
 begin
@@ -147,7 +150,7 @@ end;
 
 procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);
 begin
-  Content_Render(FRefreshKeyman);   // I4088
+  Content_Render;   // I4088
 end;
 
 constructor TfrmWebContainer.Create(AOwner: TComponent);
@@ -168,6 +171,11 @@ end;
 function TfrmWebContainer.IsLocalUrl(const url: string): Boolean;
 begin
   Result := url.StartsWith(modWebHttpServer.Host, True);
+end;
+
+procedure TfrmWebContainer.DoOpenHelp;
+begin
+  Application.HelpJump('context_'+lowercase(FDialogName));
 end;
 
 procedure TfrmWebContainer.OpenLink(params: TStringList);
@@ -215,7 +223,7 @@ end;
 
 procedure TfrmWebContainer.cefHelpTopic(Sender: TObject);
 begin
-  Application.HelpJump('context_'+lowercase(FDialogName));
+  DoOpenHelp;
 end;
 
 procedure TfrmWebContainer.cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData;
@@ -226,7 +234,7 @@ begin
     if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
       PostMessage(Handle, WM_USER_ContentRender, 0, 0)
     else if e.event.windows_key_code = VK_F1 then
-      Application.HelpJump('context_'+lowercase(FDialogName));
+      DoOpenHelp;
   end;
 end;
 
@@ -279,6 +287,16 @@ end;
 function IsLocalURL(URL: WideString): Boolean;
 begin
   Result := (Copy(URL, 1, 5) = 'file:') or (Copy(URL, 1, 1) = '/');
+end;
+
+procedure TfrmWebContainer.WMSysCommand(var Message: TWMSysCommand);
+begin
+  with Message do
+  begin
+    if (CmdType and $FFF0 = SC_CONTEXTHELP)
+      then DoOpenHelp
+      else inherited;
+  end;
 end;
 
 procedure TfrmWebContainer.WMUser_ContentRender(var Message: TMessage);

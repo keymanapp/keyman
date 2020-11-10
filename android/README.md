@@ -1,7 +1,7 @@
 # Keyman for Android & Keyman Engine for Android
 
 ## Prerequisites
-* Android Studio 3.3.2+
+* Android Studio 4.1+
 * Java SE Development Kit 8 
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 
@@ -52,7 +52,7 @@ Building Keyman Web is a precursor for compiling KMEA, so verify your system has
 jq 1.6+ is used during the build process to determine the latest versions of the default keyboard (sil_euro_latin.kmp) and lexical-model (en.nrc.mtnt.model.kmp) packages to download. For builds on Windows, jq is already included in `/resources/build/`
 
 On Linux
-sudo apt install jq
+`sudo apt install jq`
 
 ### Crash Reporting
 Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server https://sentry.keyman.com. The analytics for Debug are associated with an App Bundle ID `com.tavultesoft.kmapro.debug`.
@@ -185,10 +185,10 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0-alpha03'
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
+    implementation 'com.google.android.material:material:1.2.1'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:2.0.1'
+    implementation 'io.sentry:sentry-android:2.3.0'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {

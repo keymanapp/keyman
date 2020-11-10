@@ -308,7 +308,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       String languageID = keyboardInfo.getLanguageID();
       if (CloudRepository.shared.getAssociatedLexicalModel(context, languageID) == null) {
         // Only invalidate the lexical cache if there's no associated lexical model
-        CloudRepository.shared.invalidateLexicalModelCache(context);
+        CloudRepository.shared.invalidateLexicalModelCache(context, true);
       }
 
       keyboardInfo.setNewKeyboard(true);
@@ -355,8 +355,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
             }
           }
 
-          // Invalidate cache to rebuild the list
-          CloudRepository.shared.invalidateLexicalModelCache(context);
+          // Invalidate cache to rebuild the list (don't delete cache file since we just updated it)
+          CloudRepository.shared.invalidateLexicalModelCache(context, false);
         }
       }
     }
