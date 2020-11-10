@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.178 alpha 2020-11-10
+
+* fix(developer): Remove IE dependency from Developer Setup (#3839)
+
 ## 14.0.177 alpha 2020-11-07
 
 * fix(developer): support for notany() and context() (#3816)
