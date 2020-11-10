@@ -54,6 +54,12 @@ describe('LMLayer using dummy model', function () {
     it('will predict future suggestions (loaded from raw source)', function () {
       var lmLayer = new LMLayer(capabilities());
 
+      var stripIDs = function(suggestions) {
+        suggestions.forEach(function(suggestion) {
+          delete suggestion.id;
+        });
+      };
+
       // We're running headlessly, so the path can be relative to the npm root directory.
       let modelCode = fs.readFileSync("./unit_tests/in_browser/resources/models/simple-dummy.js").toString();
 
