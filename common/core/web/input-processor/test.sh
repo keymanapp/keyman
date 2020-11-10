@@ -51,6 +51,12 @@ if [ $FETCH_DEPS = true ]; then
   verify_npm_setup
 fi
 
+# Ensures that the lexical model compiler has been built locally.
+echo "Preparing the lexical model compiler"
+pushd $WORKING_DIRECTORY/node_modules/@keymanapp/lexical-model-compiler
+npm run build
+popd
+
 test-headless ( ) {
   if (( CI_REPORTING )); then
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
