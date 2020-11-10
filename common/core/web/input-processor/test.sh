@@ -3,6 +3,8 @@
 # We should work within the script's directory, not the one we were called in.
 cd $(dirname "$BASH_SOURCE")
 
+WORKING_DIRECTORY=`pwd`
+
 # Include useful testing resource functions
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -52,7 +54,7 @@ if [ $FETCH_DEPS = true ]; then
 fi
 
 # Ensures that the lexical model compiler has been built locally.
-echo "Preparing the lexical model compiler"
+echo "${TERM_HEADING}Preparing Lexical Model Compiler for test use${NORMAL}"
 pushd $WORKING_DIRECTORY/node_modules/@keymanapp/lexical-model-compiler
 npm run build
 popd
