@@ -67,15 +67,19 @@ describe('LMLayer using dummy model', function () {
       }).then(function () {
         return lmLayer.predict(zeroTransform(), emptyContext());
       }).then(function (suggestions) {
+        stripIDs(suggestions);
         assert.deepEqual(suggestions, iGotDistractedByHazel()[0]);
         return lmLayer.predict(zeroTransform(), emptyContext());
       }).then(function (suggestions) {
+        stripIDs(suggestions);
         assert.deepEqual(suggestions, iGotDistractedByHazel()[1]);
         return lmLayer.predict(zeroTransform(), emptyContext());
       }).then(function (suggestions) {
+        stripIDs(suggestions);
         assert.deepEqual(suggestions, iGotDistractedByHazel()[2]);
         return lmLayer.predict(zeroTransform(), emptyContext());
       }).then(function (suggestions) {
+        stripIDs(suggestions);
         assert.deepEqual(suggestions, iGotDistractedByHazel()[3]);
         lmLayer.shutdown();
         return Promise.resolve();
