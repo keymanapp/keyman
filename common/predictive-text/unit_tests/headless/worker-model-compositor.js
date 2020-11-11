@@ -127,6 +127,7 @@ describe('ModelCompositor', function() {
           displayAs: 'therefore'
         };
 
+        // When integrated, the 'the' string comes from a wordbreak operation on the current context.
         compositor.applySuggestionCasing(suggestion, 'the', 'initial');
         assert.equal(suggestion.displayAs, 'Therefore');
         assert.equal(suggestion.transform.insert, 'Therefore');
