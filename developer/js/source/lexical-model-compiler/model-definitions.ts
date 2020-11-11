@@ -74,7 +74,7 @@ export class ModelDefinitions {
 
         // Since the defined casing function may expect to take our default implementation
         // as a parameter, we can define the full implementation via closure capture.
-        this.applyCasing = function(casing: CasingEnum, text: string) {
+        this.applyCasing = function(casing: CasingForm, text: string) {
           return _this.model.applyCasing(casing, text, _this.defaults.applyCasing);
         };
       } else {

@@ -132,7 +132,7 @@ describe('Model definition pseudoclosures', function () {
   describe('Model-defined applyCasing + (dependent) searchTermToKey', function() {
     // Note:  this test only implements enough Turkish-related stuff to facilitate
     // a functional test.  Not guaranteed to be sufficient for actual Turkish use.
-    let turkishCasing = function(form: CasingEnum, text: string, defaultApplyCasing: (form: CasingEnum, text: string) => string): string {
+    let turkishCasing = function(form: CasingForm, text: string, defaultApplyCasing: (form: CasingForm, text: string) => string): string {
       switch(form) {
       case 'lower':
         return defaultApplyCasing(form, text

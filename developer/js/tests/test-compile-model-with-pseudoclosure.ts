@@ -10,7 +10,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
   const PATH = path.join(__dirname, 'fixtures', MODEL_ID);
 
   describe('specifying custom methods: applyCasing and searchTermToKey', function () {
-    let casingWithPrependedSymbols: CasingFunction = function(casingName: CasingEnum, text: string, defaultApplyCasing: CasingFunction) {
+    let casingWithPrependedSymbols: CasingFunction = function(casingName: CasingForm, text: string, defaultApplyCasing: CasingFunction) {
       switch(casingName) {
         // Use of symbols, and of the `casingName` name, exist to serve as regex targets.
         case 'lower':

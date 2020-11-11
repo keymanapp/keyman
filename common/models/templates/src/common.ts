@@ -100,7 +100,7 @@ namespace models {
     return suggestion;
   }
 
-  export function defaultApplyCasing(casing: CasingEnum, text: string): string {
+  export function defaultApplyCasing(casing: CasingForm, text: string): string {
     switch(casing) {
       case 'lower':
         return text.toLowerCase();
