@@ -17,7 +17,7 @@
  */	
 declare type USVString = string;
 
-declare type CasingEnum = 'lower' | 'initial' | 'upper';
+declare type CasingForm = 'lower' | 'initial' | 'upper';
 
 /**
  * Used to facilitate edit-distance calculations by allowing the LMLayer to
@@ -117,7 +117,7 @@ declare interface LexicalModel {
    * @param form 
    * @param text 
    */
-  applyCasing?(form: CasingEnum, text: string): string
+  applyCasing?(form: CasingForm, text: string): string
 
   /**
    * Indicates a mapping function used by the model to simplify lookup operations
@@ -497,7 +497,7 @@ declare interface WordBreakingFunction {
 }
 
 declare interface CasingFunction {
-  (caseToApply: CasingEnum, text: string, defaultApplyCasing?: CasingFunction): string;
+  (caseToApply: CasingForm, text: string, defaultApplyCasing?: CasingFunction): string;
 }
 
 /**

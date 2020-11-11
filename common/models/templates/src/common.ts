@@ -100,7 +100,7 @@ namespace models {
     return suggestion;
   }
 
-  export function defaultApplyCasing(casing: CasingEnum, text: string): string {
+  export function defaultApplyCasing(casing: CasingForm, text: string): string {
     switch(casing) {
       case 'lower':
         return text.toLowerCase();
@@ -118,7 +118,7 @@ namespace models {
   
           if(lowSurrogateCode >= 0xDC00 && lowSurrogateCode <= 0xDFFF) {
             // We have a surrogate pair; this pair is the 'first' character.
-            headUnitLength++;
+            headUnitLength = 2;
           }
         }
   

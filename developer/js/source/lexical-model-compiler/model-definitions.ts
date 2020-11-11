@@ -12,7 +12,7 @@ import { defaultApplyCasing,
  * will very closely match the organizational patterns of this class in order to 
  * facilitate the maintenance of this approach.
  */
-export class ModelPseudoclosure {
+export class ModelDefinitions {
   static readonly COMPILED_NAME = 'definitions';
   /**
    * A closure fully implementing the model's defined `applyCasing` behavior with
@@ -74,7 +74,7 @@ export class ModelPseudoclosure {
 
         // Since the defined casing function may expect to take our default implementation
         // as a parameter, we can define the full implementation via closure capture.
-        this.applyCasing = function(casing: CasingEnum, text: string) {
+        this.applyCasing = function(casing: CasingForm, text: string) {
           return _this.model.applyCasing(casing, text, _this.defaults.applyCasing);
         };
       } else {
@@ -124,9 +124,8 @@ export class ModelPseudoclosure {
    * This should be written to the file within the same IIFE as the model but BEFORE
    * the model itself, as the model will need to refer to the definitions herein.
    */
-  compilePseudoclosure(): string {
+  compileDefinitions(): string {
     let defn: string = '';
-    let PSEUDOCLOSURE = ModelPseudoclosure.COMPILED_NAME;
     defn += `let ${PSEUDOCLOSURE} = {\n`
 
     // ----------------------
@@ -201,8 +200,6 @@ export class ModelPseudoclosure {
    * compiled pseudoclosure.
    */
   compileSearchTermToKey(): string {
-    let PSEUDOCLOSURE = ModelPseudoclosure.COMPILED_NAME;
-
     // Simply point the model to the constructed closure defined by `compilePseudoclosure`.
     // See "START - compiled closures" section.
     return `${PSEUDOCLOSURE}.searchTermToKey`;
@@ -212,11 +209,11 @@ export class ModelPseudoclosure {
    * Compiles the model-options entry for `applyCasing` in reference to the
    * compiled pseudoclosure.
    */
-  compileApplyCasing(): string {
-    let PSEUDOCLOSURE = ModelPseudoclosure.COMPILED_NAME;
-
-    // Simply point the model to the constructed closure defined by `compilePseudoclosure`.
+  compileApplyCasing(): string {// Simply point the model to the constructed closure defined by `compilePseudoclosure`.
     // See "START - compiled closures" section.
     return `${PSEUDOCLOSURE}.applyCasing`;
   }
 }
+
+// Because it references the class field, this line must come afterward.
+const PSEUDOCLOSURE = ModelDefinitions.COMPILED_NAME;

@@ -101,7 +101,7 @@ describe('The default searchTermToKey() function', function () {
     // as U+0130's default handling is... not ideal in Turkish.
     //
     // Instead, we can get a simple-enough test with inverted casing.
-    let customCasing = function(caseToApply: CasingEnum, 
+    let customCasing = function(caseToApply: CasingForm, 
                                 text: string, 
                                 defaultApplyCasing: CasingFunction): string {
       switch(caseToApply) {
@@ -116,7 +116,7 @@ describe('The default searchTermToKey() function', function () {
         }
     }
 
-    let customCasingClosure = function(caseToApply: CasingEnum, text: string): string {
+    let customCasingClosure = function(caseToApply: CasingForm, text: string): string {
       return customCasing(caseToApply, text, defaultApplyCasing);
     }
   

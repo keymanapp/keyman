@@ -100,8 +100,7 @@ interface LexicalModelSource extends LexicalModelDeclaration {
   readonly rootClass?: string
 
   /**
-   * Indicates that the language being modeled has syntactic casing rules.  When set to 
-   * `true`, suggestions will attempt to match the case of the input text even if
+   * When set to `true`, suggestions will attempt to match the case of the input text even if
    * the lexicon entries use a different casing scheme due to search term keying effects.
    * @since 14.0
    */

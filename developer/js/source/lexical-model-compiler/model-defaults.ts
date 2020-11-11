@@ -69,7 +69,7 @@ export function defaultCasedSearchTermToKey(wordform: string, applyCasing: Casin
  * This may be overwritten as appropriate in model-specific implementations.
  * @param text The text to be modified.
  */
-export function defaultApplyCasing(casing: CasingEnum, text: string): string {
+export function defaultApplyCasing(casing: CasingForm, text: string): string {
   switch(casing) {
     case 'lower':
       return text.toLowerCase();
