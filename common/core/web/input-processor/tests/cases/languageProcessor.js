@@ -91,7 +91,7 @@ describe('LanguageProcessor', function() {
             assert.isOk(suggestions);
             assert.equal(suggestions[0].displayAs, '«li»');
             // Is not actually inserting what is expected at the moment.
-            //assert.equal(suggestions[0].transform.insert, ' ');
+            assert.equal(suggestions[0].transform.insert, ' ');
             assert.equal(suggestions[1].displayAs, 'like');
             assert.equal(suggestions[1].transform.insert, 'like ');
             done();
@@ -205,13 +205,8 @@ describe('LanguageProcessor', function() {
             let languageProcessor = new LanguageProcessor();
             languageProcessor.init();
     
-            let context = new com.keyman.text.Mock("", 1);
-            let postContext = com.keyman.text.Mock.from(context);
-            postContext.apply({
-              insert: 'I',
-              deleteLeft: 0
-            });
-            let transcription = postContext.buildTranscriptionFrom(context, null, null);
+            let contextSource = new com.keyman.text.Mock("I", 1);
+            let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
               languageProcessor.predict(transcription).then(function(suggestions) {

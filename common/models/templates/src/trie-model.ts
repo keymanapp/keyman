@@ -121,7 +121,7 @@
 
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
       // Special-case the empty buffer/transform: return the top suggestions.
-      if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
+      if (!transform.insert && !context.left && !context.right && context.startOfBuffer && context.endOfBuffer) {
         return makeDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
           transform: {
             insert: text,

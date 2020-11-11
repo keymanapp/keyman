@@ -303,21 +303,21 @@ class ModelCompositor {
         compositor.applySuggestionCasing(suggestion, baseWord, currentCasing);
       }
 
-      if (suggestion.transform.insert.length > 0) {
-        suggestion.transform.insert += punctuation.insertAfterWord;
+      // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
+      // for such cases.
+      suggestion.transform.insert += punctuation.insertAfterWord;
 
-        // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
-        if(prefixTransform) {
-          let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
-          mergedTransform.id = suggestion.transformId;
+      // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
+      if(prefixTransform) {
+        let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
+        mergedTransform.id = suggestion.transformId;
 
-          // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
-          // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
-          let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
-          
-          // Assignment via by-reference behavior, as suggestion is an object
-          mutableSuggestion.transform = mergedTransform;
-        }
+        // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
+        // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
+        let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
+        
+        // Assignment via by-reference behavior, as suggestion is an object
+        mutableSuggestion.transform = mergedTransform;
       }
 
       suggestion.id = compositor.SUGGESTION_ID_SEED;
