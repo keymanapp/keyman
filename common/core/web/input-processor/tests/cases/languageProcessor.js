@@ -101,6 +101,180 @@ describe('LanguageProcessor', function() {
           done();
         });
       });
+
+      describe('properly cases generated suggestions', function() {
+        let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
+          format: 'trie-1.0',
+          sources: ['wordlist.tsv'],
+          languageUsesCasing: true,
+          //applyCasing // we rely on the compiler's default implementation here.
+        }, PATH);
+  
+        let modelSpec = {
+          id: MODEL_ID,
+          languages: ['en'],
+          code: modelCode
+        };
+  
+        describe("does not alter casing when input is lowercased", function() {
+          it("when input is fully lowercased", function(done) {
+            let languageProcessor = new LanguageProcessor();
+            languageProcessor.init();
+    
+            let contextSource = new com.keyman.text.Mock("li", 2);
+            let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
+    
+            languageProcessor.loadModel(modelSpec).then(function() {
+              languageProcessor.predict(transcription).then(function(suggestions) {
+                assert.isOk(suggestions);
+                assert.equal(suggestions[1].displayAs, 'like');
+                assert.equal(suggestions[1].transform.insert, 'like ');
+                done();
+              }).catch(done);
+            }).catch(function() {
+              assert.fail("Unexpected model load failure");
+              done();
+            });
+          });
+
+          it("when input has non-initial uppercased letters", function(done) {
+            let languageProcessor = new LanguageProcessor();
+            languageProcessor.init();
+    
+            let contextSource = new com.keyman.text.Mock("lI", 2);
+            let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
+    
+            languageProcessor.loadModel(modelSpec).then(function() {
+              languageProcessor.predict(transcription).then(function(suggestions) {
+                // The source suggestion is simply 'like'.
+                assert.isOk(suggestions);
+                assert.equal(suggestions[1].displayAs, 'like');
+                assert.equal(suggestions[1].transform.insert, 'like ');
+                done();
+              }).catch(done);
+            }).catch(function() {
+              assert.fail("Unexpected model load failure");
+              done();
+            });
+          });
+
+          it("unless the suggestion has uppercased letters", function(done) {
+            let languageProcessor = new LanguageProcessor();
+            languageProcessor.init();
+    
+            let contextSource = new com.keyman.text.Mock("i", 1);
+            let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
+    
+            languageProcessor.loadModel(modelSpec).then(function() {
+              languageProcessor.predict(transcription).then(function(suggestions) {
+                assert.isOk(suggestions);
+                assert.equal(suggestions[1].displayAs, 'I');
+                assert.equal(suggestions[1].transform.insert, 'I ');
+                done();
+              }).catch(done);
+            }).catch(function() {
+              assert.fail("Unexpected model load failure");
+              done();
+            });
+          });
+        });
+
+        describe("uppercases suggestions when input is fully capitalized ", function() {
+          it("for suggestions with default casing  (== 'lower')", function(done) {
+            let languageProcessor = new LanguageProcessor();
+            languageProcessor.init();
+    
+            let contextSource = new com.keyman.text.Mock("LI", 2);
+            let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
+    
+            languageProcessor.loadModel(modelSpec).then(function() {
+              languageProcessor.predict(transcription).then(function(suggestions) {
+                // The source suggestion is simply 'like'.
+                assert.isOk(suggestions);
+                assert.equal(suggestions[1].displayAs, 'LIKE');
+                assert.equal(suggestions[1].transform.insert, 'LIKE ');
+                done();
+              }).catch(done);
+            }).catch(function() {
+              assert.fail("Unexpected model load failure");
+              done();
+            });
+          });
+
+          it("for precapitalized suggestions", function(done) {
+            let languageProcessor = new LanguageProcessor();
+            languageProcessor.init();
+    
+            let context = new com.keyman.text.Mock("", 1);
+            let postContext = com.keyman.text.Mock.from(context);
+            postContext.apply({
+              insert: 'I',
+              deleteLeft: 0
+            });
+            let transcription = postContext.buildTranscriptionFrom(context, null, null);
+
+            languageProcessor.loadModel(modelSpec).then(function() {
+              languageProcessor.predict(transcription).then(function(suggestions) {
+                assert.isOk(suggestions);
+                assert.equal(suggestions[0].displayAs, 'I');
+                assert.equal(suggestions[0].transform.insert, 'I ');
+                done();
+              }).catch(done);
+            }).catch(function() {
+              assert.fail("Unexpected model load failure");
+              done();
+            });
+          });
+        });
+
+        describe("initial-cases suggestions when input uses initial casing ", function() {
+          describe("when input is a single capitalized letter", function() {
+            it("for suggestions with default casing (== 'lower')", function(done) {
+              let languageProcessor = new LanguageProcessor();
+              languageProcessor.init();
+      
+              let contextSource = new com.keyman.text.Mock("L", 1);
+              let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
+      
+              languageProcessor.loadModel(modelSpec).then(function() {
+                languageProcessor.predict(transcription).then(function(suggestions) {
+                  // The source suggestion is simply 'like'.
+                  assert.isOk(suggestions);
+                  assert.equal(suggestions[1].displayAs, 'Like');
+                  assert.equal(suggestions[1].transform.insert, 'Like ');
+                  done();
+                }).catch(done);
+              }).catch(function() {
+                assert.fail("Unexpected model load failure");
+                done();
+              });
+            });
+          });
+
+          describe("input length > 1", function() {
+            it("for suggestions with default casing (== 'lower')", function(done) {
+              let languageProcessor = new LanguageProcessor();
+              languageProcessor.init();
+      
+              let contextSource = new com.keyman.text.Mock("Li", 2);
+              let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
+      
+              languageProcessor.loadModel(modelSpec).then(function() {
+                languageProcessor.predict(transcription).then(function(suggestions) {
+                  // The source suggestion is simply 'like'.
+                  assert.isOk(suggestions);
+                  assert.equal(suggestions[1].displayAs, 'Like');
+                  assert.equal(suggestions[1].transform.insert, 'Like ');
+                  done();
+                }).catch(done);
+              }).catch(function() {
+                assert.fail("Unexpected model load failure");
+                done();
+              });
+            });
+          });
+        });
+      });
     });
   });
 });
