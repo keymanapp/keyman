@@ -10,6 +10,153 @@ var ModelCompositor = require('../../build/intermediate').ModelCompositor;
 
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
+    describe.only('applySuggestionCasing', function() {
+      let plainApplyCasing = function(caseToApply, text) {
+        switch(caseToApply) {
+          case 'lower':
+            return text.toLowerCase();
+          case 'upper':
+            return text.toUpperCase();
+          case 'initial':
+            return plainApplyCasing('upper', text.charAt(0)) . concat(text.substring(1));
+          default:
+            return text;
+        }
+      };
+
+      var plainCasedModel = new TrieModel(
+        jsonFixture('tries/english-1000'), {
+          languageUsesCasing: true,
+          applyCasing: plainApplyCasing,
+          wordBreaker: wordBreakers.default,
+          searchTermToKey: function(text) {
+            // We're dealing with very simple English text; no need to normalize or remove diacritics here.
+            return applyCasing('lower', text);
+          }
+        }
+      );
+
+      it('properly cases suggestions with no suggestion root', function() {
+        var compositor = new ModelCompositor(plainCasedModel);
+
+        let suggestion = {
+          transform: {
+            insert: 'the',
+            deleteLeft: 0
+          },
+          displayAs: 'the'
+        };
+
+        compositor.applySuggestionCasing(suggestion, '', 'initial');
+        assert.equal(suggestion.displayAs, 'The');
+        assert.equal(suggestion.transform.insert, 'The');
+
+        suggestion = {
+          transform: {
+            insert: 'thE',
+            deleteLeft: 0
+          },
+          displayAs: 'thE'
+        };
+
+        compositor.applySuggestionCasing(suggestion, '', 'initial');
+        assert.equal(suggestion.displayAs, 'ThE');
+        assert.equal(suggestion.transform.insert, 'ThE');
+
+        suggestion = {
+          transform: {
+            insert: 'the',
+            deleteLeft: 0
+          },
+          displayAs: 'the'
+        };
+
+        compositor.applySuggestionCasing(suggestion, '', 'upper');
+        assert.equal(suggestion.displayAs, 'THE');
+        assert.equal(suggestion.transform.insert, 'THE');
+      });
+
+      it('properly cases suggestions that fully replace the suggestion root', function() {
+        var compositor = new ModelCompositor(plainCasedModel);
+
+        let suggestion = {
+          transform: {
+            insert: 'therefore',
+            deleteLeft: 3
+          },
+          displayAs: 'therefore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'initial');
+        assert.equal(suggestion.displayAs, 'Therefore');
+        assert.equal(suggestion.transform.insert, 'Therefore');
+
+        suggestion = {
+          transform: {
+            insert: 'thereFore',
+            deleteLeft: 3
+          },
+          displayAs: 'thereFore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'initial');
+        assert.equal(suggestion.displayAs, 'ThereFore');
+        assert.equal(suggestion.transform.insert, 'ThereFore');
+
+        suggestion = {
+          transform: {
+            insert: 'therefore',
+            deleteLeft: 3
+          },
+          displayAs: 'therefore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'upper');
+        assert.equal(suggestion.displayAs, 'THEREFORE');
+        assert.equal(suggestion.transform.insert, 'THEREFORE');
+      });
+
+      it('properly cases suggestions that do not fully replace the suggestion root', function() {
+        var compositor = new ModelCompositor(plainCasedModel);
+
+        let suggestion = {
+          transform: {
+            insert: 'erefore',
+            deleteLeft: 1
+          },
+          displayAs: 'therefore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'initial');
+        assert.equal(suggestion.displayAs, 'Therefore');
+        assert.equal(suggestion.transform.insert, 'Therefore');
+
+        suggestion = {
+          transform: {
+            insert: 'ereFore',
+            deleteLeft: 1
+          },
+          displayAs: 'thereFore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'initial');
+        assert.equal(suggestion.displayAs, 'ThereFore');
+        assert.equal(suggestion.transform.insert, 'ThereFore');
+
+        suggestion = {
+          transform: {
+            insert: 'erefore',
+            deleteLeft: 1
+          },
+          displayAs: 'therefore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'upper');
+        assert.equal(suggestion.displayAs, 'THEREFORE');
+        assert.equal(suggestion.transform.insert, 'THEREFORE');
+      });
+    });
+
     describe('Model uses default-style keying, no casing', function () {
       var uncasedModel = new TrieModel(
         jsonFixture('tries/english-1000'), {
@@ -86,7 +233,7 @@ describe('ModelCompositor', function() {
         }
       };
 
-      var uncasedModel = new TrieModel(
+      var casedModel = new TrieModel(
         jsonFixture('tries/english-1000'), {
           languageUsesCasing: true,
           applyCasing: applyCasing,
@@ -99,7 +246,7 @@ describe('ModelCompositor', function() {
       );
 
       it('should produce suggestions from uncased input', function() {
-        let model = uncasedModel;
+        let model = casedModel;
         var composite = new ModelCompositor(model);
         
         // Initialize context
@@ -127,7 +274,7 @@ describe('ModelCompositor', function() {
       });
 
       it('should produce capitalized suggestions from fully-uppercased input', function() {
-        let model = uncasedModel;
+        let model = casedModel;
         var composite = new ModelCompositor(model);
         
         // Initialize context
@@ -155,7 +302,7 @@ describe('ModelCompositor', function() {
       });
 
       it('should produce "initial-case" suggestions from input with an initial capital', function() {
-        let model = uncasedModel;
+        let model = casedModel;
         var composite = new ModelCompositor(model);
         
         // Initialize context
@@ -183,7 +330,7 @@ describe('ModelCompositor', function() {
       });
 
       it('also from input with partial capitalization when including an initial capital', function() {
-        let model = uncasedModel;
+        let model = casedModel;
         var composite = new ModelCompositor(model);
         
         // Initialize context
