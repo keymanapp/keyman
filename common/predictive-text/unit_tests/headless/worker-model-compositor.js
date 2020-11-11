@@ -10,7 +10,7 @@ var ModelCompositor = require('../../build/intermediate').ModelCompositor;
 
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
-    describe.only('applySuggestionCasing', function() {
+    describe('applySuggestionCasing', function() {
       let plainApplyCasing = function(caseToApply, text) {
         switch(caseToApply) {
           case 'lower':
