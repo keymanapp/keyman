@@ -291,7 +291,7 @@ class ModelCompositor {
 
     // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
-    let currentCasing: CasingEnum = null;
+    let currentCasing: CasingForm = null;
     if(lexicalModel.languageUsesCasing) {
       currentCasing = this.detectCurrentCasing(postContext);
     }
@@ -519,7 +519,7 @@ class ModelCompositor {
     }
   }
 
-  private detectCurrentCasing(context: Context): CasingEnum {
+  private detectCurrentCasing(context: Context): CasingForm {
     let model = this.lexicalModel;
 
     let text = this.wordbreak(context);
