@@ -113,6 +113,7 @@ uses
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
   Keyman.Configuration.UI.UfrmSettingsManager,
+  Keyman.System.KeymanStartTask,
   KeymanPaths,
   KLog,
   kmint,
@@ -373,7 +374,9 @@ begin
 
   FMutex := nil;  // I2720
   
-  { Locate the appropriate product }
+  { Run app reconfiguration tasks }
+
+  TKeymanStartTask.RecreateTask;
 
   UILanguages.CreateUILanguages;
 

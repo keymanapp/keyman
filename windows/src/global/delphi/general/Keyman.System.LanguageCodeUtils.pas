@@ -16,16 +16,13 @@ type
     FBCP47Scripts: TDictionary<string,string>;
     FBCP47Regions: TDictionary<string,string>;
     FSuppressScripts: TDictionary<string,string>;
-    FAllTags: TDictionary<string,TArray<string>>;
 
     class procedure BuildISO6393ToBCP47; static;
     class procedure BuildLCIDToBCP47; static;
     class procedure BuildSubtagRegistry; static;
-    class procedure BuildAllTagsRegistry; static;
     class function GetBCP47Languages: TDictionary<string, string>; static;
     class function GetBCP47Regions: TDictionary<string, string>; static;
     class function GetBCP47Scripts: TDictionary<string, string>; static;
-    class function GetAllTags: TDictionary<string, TArray<string>>; static;
     class function GetSuppressScripts: TDictionary<string, string>; static;
     class procedure BuildSuppressScripts; static;
   public
@@ -44,7 +41,6 @@ type
     class property BCP47Languages: TDictionary<string,string> read GetBCP47Languages;
     class property BCP47Scripts: TDictionary<string,string> read GetBCP47Scripts;
     class property BCP47Regions: TDictionary<string,string> read GetBCP47Regions;
-    class property AllTags: TDictionary<string,TArray<string>> read GetAllTags;
     class property SuppressScripts: TDictionary<string,string> read GetSuppressScripts;
   end;
 
@@ -57,7 +53,6 @@ uses
   Keyman.System.Standards.BCP47SuppressScriptRegistry,
   Keyman.System.Standards.ISO6393ToBCP47Registry,
   Keyman.System.Standards.LCIDToBCP47Registry,
-  Keyman.System.Standards.NRSIAllTagsRegistry,
 
   utilstr;
 
@@ -112,15 +107,6 @@ begin
     Result := '';
 end;
 
-class procedure TLanguageCodeUtils.BuildAllTagsRegistry;
-begin
-  if not Assigned(FAllTags) then
-  begin
-    FAllTags := TDictionary<string,TArray<string>>.Create;
-    TNRSIAllTagsMap.Fill(FAllTags);
-  end;
-end;
-
 class procedure TLanguageCodeUtils.BuildISO6393ToBCP47;
 begin
   if not Assigned(FISO6393ToBCP47) then
@@ -167,12 +153,6 @@ begin
     Result[High(Result)] := code;
     codes := Trim(codes);
   end;
-end;
-
-class function TLanguageCodeUtils.GetAllTags: TDictionary<string, TArray<string>>;
-begin
-  BuildAllTagsRegistry;
-  Result := FAllTags;
 end;
 
 class function TLanguageCodeUtils.GetBCP47Languages: TDictionary<string, string>;
@@ -259,6 +239,5 @@ finalization
   FreeAndNil(TLanguageCodeUtils.FBCP47Languages);
   FreeAndNil(TLanguageCodeUtils.FBCP47Regions);
   FreeAndNil(TLanguageCodeUtils.FBCP47Scripts);
-  FreeAndNil(TLanguageCodeUtils.FAllTags);
 end.
 

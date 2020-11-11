@@ -10,7 +10,6 @@ uses
   Keyman.System.BuildISO6393Registry,
   Keyman.System.BuildLanguageSubtagRegistry,
   Keyman.System.BuildLCIDToBCP47Registry,
-  Keyman.System.BuildNRSIAllTags,
   Keyman.System.BuildLangTags;
 
 procedure Run;
@@ -51,11 +50,6 @@ begin
   begin
     writeln('Building '+ParamStr(3));
     TBuildLCIDToBCP47Registry.Build(ParamStr(2), ParamStr(3));
-  end
-  else if ParamStr(1) = 'alltags' then
-  begin
-    writeln('Building '+ParamStr(3));
-    TBuildNRSIAllTags.Build(ParamStr(2), ParamStr(3));
   end
   else if ParamStr(1) = 'langtags' then
   begin

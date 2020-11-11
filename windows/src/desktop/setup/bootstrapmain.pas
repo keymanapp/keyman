@@ -57,7 +57,6 @@ var
   FInstallInfo: TInstallInfo = nil;
 
 procedure Run;
-
 function FormatFileSize(Size: Integer): string;
 
 implementation
@@ -84,20 +83,45 @@ uses
   SetupForm,
   SFX,
   TntDialogHelp,
+  UfrmDownloadProgress,
   UfrmRunDesktop,
   Upload_Settings,
   utilexecute;
 
-function CheckForOldVersionScenario: Boolean; forward;
-procedure InstallKeyboardsInOldVersion(const ShellPath: string); forward;
-procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string); forward;
-function CreateTempDir: string; forward;
-procedure RemoveTempDir(const path: string); forward;
-procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath, FTier: string); forward;
-procedure SetExitVal(c: Integer); forward;
-function IsKeymanDesktop7Installed: string; forward;
-function IsKeymanDesktop8Installed: string; forward;
-function GetResourcesFromOnline(FSilent: Boolean; var FForceOffline: Boolean): Boolean; forward;
+type
+  TSetupBootstrap = class
+  private
+    ProgramPath: string;
+    FTempPath: string;
+    FExtractOnly: Boolean;
+    FContinueSetup: Boolean;
+    FStartAfterInstall: Boolean;  // I2738
+    FDisableUpgradeFrom6Or7Or8: Boolean; // I2847   // I4293
+    FPromptForReboot: Boolean;  // I3355   // I3500
+    FSilent: Boolean;
+    FForceOffline: Boolean;
+    FTier, FPackages, FExtractOnly_Path: string;
+
+    function CheckForOldVersionScenario: Boolean;
+    procedure InstallKeyboardsInOldVersion(const ShellPath: string);
+    procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string);
+    function CreateTempDir: string;
+    procedure RemoveTempDir(const path: string);
+    procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline,
+      FExtractOnly, FContinueSetup, FStartAfterInstall,
+      FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath,
+      FTier: string);
+    procedure SetExitVal(c: Integer);
+    function IsKeymanDesktop7Installed: string;
+    function IsKeymanDesktop8Installed: string;
+    function GetResourcesFromOnline(FSilent: Boolean;
+      var FForceOffline: Boolean): Boolean;
+    procedure LocateResourcesCallback(Owner: TfrmDownloadProgress;
+      var Result: Boolean);
+    procedure DeletePath(const path: WideString);
+  public
+    procedure Run;
+  end;
 
 var
   FNiceExitCodes: Boolean = True; // always, now
@@ -106,19 +130,22 @@ const
   ICC_PROGRESS_CLASS     = $00000020; // progress
 
 
-
 procedure Run;
 var
-  ProgramPath: string;
-  FTempPath: string;
-  FExtractOnly: Boolean;
-  FContinueSetup: Boolean;
-  FStartAfterInstall: Boolean;  // I2738
-  FDisableUpgradeFrom6Or7Or8: Boolean; // I2847   // I4293
-  FPromptForReboot: Boolean;  // I3355   // I3500
-  FSilent: Boolean;
-  FForceOffline: Boolean;
-  FTier, FPackages, FExtractOnly_Path: string;
+  SetupBootstrap: TSetupBootstrap;
+begin
+  SetupBootstrap := TSetupBootstrap.Create;
+  try
+    SetupBootstrap.Run;
+  finally
+    SetupBootstrap.Free;
+  end;
+end;
+
+procedure TSetupBootstrap.Run;
+var
+  frmDownloadProgress: TfrmDownloadProgress;
+  FResult: Boolean;
 BEGIN
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
   try
@@ -149,77 +176,24 @@ BEGIN
 
           ProgramPath := ExtractFilePath(ParamStr(0));
 
-          // Extract SFX archive into temp path
-
-          ProcessArchive(FInstallInfo.TempPath);
-
-          // Get the list of anticipated packages from:
-          // 1. the program filename
-          // 2. parameters
-          // 3. files extracted from the archive
-          // 4. files in the same folder as this program
-
-          // The filename of this executable can be changed to tell it which
-          // packages to download, e.g. keyman-setup.khmer_angkor.km.exe tells
-          // it to download khmer_angkor from the Keyman cloud and install it
-          // for bcp47 tag km. See the setup documentation for more
-          // examples.
-          FInstallInfo.LocatePackagesAndTierFromFilename(ParamStr(0));
-
-          // Additionally, packages can be specified on the command line, with
-          // the -p parameter, e.g. -p khmer_angkor=km,sil_euro_latin=fr
-          FInstallInfo.LocatePackagesFromParameter(FPackages);
-
-          // Packages that have been extracted from the SFX archive are in
-          // the TempPath
-          FInstallInfo.LocatePackagesInPath(FInstallInfo.TempPath);
-
-          // Finally, look also for any .kmp packages in the same folder as
-          // this executable
-          FInstallInfo.LocatePackagesInPath(ProgramPath);
-
-          // Lookup a tier from command line parameter
-          if FTier <> '' then
-            FInstallInfo.Tier := FTier;
-
-          // Try and get information from online
-          if not GetResourcesFromOnline(FSilent, FForceOffline) then
+          if not FSilent then
           begin
-            SetExitVal(ERROR_FILE_NOT_FOUND);
-            Exit;
-          end;
-
-          // This loads setup.inf, if present, for various additional strings and settings
-          // The bundled installer usually contains a setup.inf.
-          if FileExists(FInstallInfo.TempPath + 'setup.inf') then
-            FInstallInfo.LoadSetupInf(FInstallInfo.TempPath)
-          else if FileExists(ProgramPath + 'setup.inf') then
-            FInstallInfo.LoadSetupInf(ProgramPath);
-
-          // If the user is trying to install on downlevel version of Windows (Vista or earlier),
-          // we can simplify their life by installing the packages into an existing Keyman
-          // install, or point them to the old version of Keyman otherwise.
-          if CheckForOldVersionScenario then   // I4460
-            Exit;
-
-          TRunTools.CheckInstalledVersion(FInstallInfo.BestMsi);
-
-          // Looks for installation state for Keyman, and determines best packages for installation.
-          // If no .msi can be found, and Keyman is not installed, this will show/log an error and
-          // abort installation.
-          if not FInstallInfo.CheckMsiAndPackageUpgradeScenarios then
+            frmDownloadProgress := TfrmDownloadProgress.Create(nil);
+            try
+              frmDownloadProgress.Callback := LocateResourcesCallback;
+              if frmDownloadProgress.ShowModal = mrCancel then
+                Exit;
+            finally
+              frmDownloadProgress.Free;
+            end;
+          end
+          else
           begin
-            // TODO: this should be refactored together with the retry strategy for online check above
-            // TODO: Delineate between log messages and dialogs.
-            // TODO: localize
-            GetRunTools.LogError('A valid Keyman install could not be found offline. Please connect to the Internet or allow this installer through your firewall in order to install Keyman.');
-            SetExitVal(ERROR_NO_MORE_FILES);
-            Exit;
+            FResult := True;
+            LocateResourcesCallback(nil, FResult);
+            if not FResult then
+              Exit;
           end;
-
-          // Default scenario is that if any newer installer is available, then
-          // Setup should install it.
-          FInstallInfo.ShouldInstallKeyman := FInstallInfo.IsNewerAvailable;
 
           with TfrmRunDesktop.Create(nil) do    // I2562
           try
@@ -257,7 +231,100 @@ BEGIN
   end;
 end;
 
-function GetResourcesFromOnline(FSilent: Boolean; var FForceOffline: Boolean): Boolean;
+procedure TSetupBootstrap.LocateResourcesCallback(Owner: TfrmDownloadProgress; var Result: Boolean);
+begin
+  Result := False;
+
+  if Assigned(Owner) then
+  begin
+    Owner.Caption := FInstallInfo.Text(ssApplicationTitle);
+    if not Owner.Status(FInstallInfo.Text(ssBootstrapExtractingBundle), 0, 4) then Exit;
+  end;
+  // Extract SFX archive into temp path
+
+  ProcessArchive(FInstallInfo.TempPath);
+
+  // Get the list of anticipated packages from:
+  // 1. the program filename
+  // 2. parameters
+  // 3. files extracted from the archive
+  // 4. files in the same folder as this program
+
+  // The filename of this executable can be changed to tell it which
+  // packages to download, e.g. keyman-setup.khmer_angkor.km.exe tells
+  // it to download khmer_angkor from the Keyman cloud and install it
+  // for bcp47 tag km. See the setup documentation for more
+  // examples.
+  FInstallInfo.LocatePackagesAndTierFromFilename(ParamStr(0));
+
+  // Additionally, packages can be specified on the command line, with
+  // the -p parameter, e.g. -p khmer_angkor=km,sil_euro_latin=fr
+  FInstallInfo.LocatePackagesFromParameter(FPackages);
+
+  // Lookup a tier from command line parameter
+  if FTier <> '' then
+    FInstallInfo.Tier := FTier;
+
+  // This loads setup.inf, if present, for various additional strings and settings
+  // The bundled installer usually contains a setup.inf.
+  if FileExists(FInstallInfo.TempPath + 'setup.inf') then
+    FInstallInfo.LoadSetupInf(FInstallInfo.TempPath)
+  else if FileExists(ProgramPath + 'setup.inf') then
+    FInstallInfo.LoadSetupInf(ProgramPath);
+
+  if Assigned(Owner) then
+    if not Owner.Status(FInstallInfo.Text(ssBootstrapCheckingPackages), 1) then Exit;
+
+  // Finally, load details for any .kmp packages referenced in setup.inf
+  FInstallInfo.LoadLocalPackagesMetadata;
+
+  if Assigned(Owner) and not FForceOffline then
+    if not Owner.Status(FInstallInfo.Text(ssBootstrapCheckingForUpdates), 2) then Exit;
+
+  // Try and get information from online
+  if not GetResourcesFromOnline(FSilent, FForceOffline) then
+  begin
+    SetExitVal(ERROR_FILE_NOT_FOUND);
+    Exit;
+  end;
+
+  if Assigned(Owner) then
+    if not Owner.Status(FInstallInfo.Text(ssBootstrapCheckingInstalledVersions), 3) then Exit;
+
+  FInstallInfo.CheckPackageLocations;
+
+  // If the user is trying to install on downlevel version of Windows (Vista or earlier),
+  // we can simplify their life by installing the packages into an existing Keyman
+  // install, or point them to the old version of Keyman otherwise.
+  if CheckForOldVersionScenario then   // I4460
+    Exit;
+
+  TRunTools.CheckInstalledVersion(FInstallInfo.MsiInstallLocation);
+
+  // Looks for installation state for Keyman, and determines best packages for installation.
+  // If no .msi can be found, and Keyman is not installed, this will show/log an error and
+  // abort installation.
+  if not FInstallInfo.CheckMsiUpgradeScenarios then
+  begin
+    // TODO: this should be refactored together with the retry strategy for online check above
+    // TODO: Delineate between log messages and dialogs.
+    // TODO: localize
+    GetRunTools.LogError('A valid Keyman install could not be found offline. Please connect to the Internet or allow this installer through your firewall in order to install Keyman.');
+    SetExitVal(ERROR_NO_MORE_FILES);
+    Exit;
+  end;
+
+  // Default scenario is that if any newer installer is available, then
+  // Setup should install it.
+  FInstallInfo.ShouldInstallKeyman := FInstallInfo.IsNewerAvailable;
+
+  if Assigned(Owner) then
+    if not Owner.Status(FInstallInfo.Text(ssBootstrapReady), 4) then Exit;
+
+  Result := True;
+end;
+
+function TSetupBootstrap.GetResourcesFromOnline(FSilent: Boolean; var FForceOffline: Boolean): Boolean;
 begin
   if FForceOffline then
     Exit(True);
@@ -294,7 +361,7 @@ begin
   Result := True;
 end;
 
-function CheckForOldVersionScenario: Boolean;   // I4460
+function TSetupBootstrap.CheckForOldVersionScenario: Boolean;   // I4460
 var
   OldKMShellPath: string;
 begin
@@ -331,12 +398,12 @@ end;
 // an existing Keyman install on downlevel versions of Windows (e.g. Vista). So
 // we are constrained in how we do this -- no ability to do language associations
 // etc.
-procedure InstallKeyboardsInOldVersion(const ShellPath: string);   // I4460
+procedure TSetupBootstrap.InstallKeyboardsInOldVersion(const ShellPath: string);   // I4460
   procedure DoInstall(pack: TInstallInfoPackage; const silentFlag: string);
   var
     location: TInstallInfoPackageFileLocation;
   begin
-    location := pack.GetBestLocation;
+    location := pack.InstallLocation;
     if Assigned(location) and pack.ShouldInstall then
     begin
       if location.LocationType = iilOnline then
@@ -360,7 +427,7 @@ begin
   end;
 end;
 
-procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string);
+procedure TSetupBootstrap.DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string);
 var
   path: string;
 begin
@@ -390,7 +457,7 @@ begin
   SetExitVal(ERROR_SUCCESS);
 end;
 
-function CreateTempDir: string;
+function TSetupBootstrap.CreateTempDir: string;
 var
   buf: array[0..260] of WideChar;
   path: string;
@@ -405,7 +472,7 @@ begin
   Result := IncludeTrailingPathDelimiter(path);
 end;
 
-procedure DeletePath(const path: WideString);
+procedure TSetupBootstrap.DeletePath(const path: WideString);
 var
   fd: TWin32FindDataW;
   n: DWord;
@@ -419,13 +486,13 @@ begin
   RemoveDirectory(PWideChar(path));
 end;
 
-procedure RemoveTempDir(const path: string);
+procedure TSetupBootstrap.RemoveTempDir(const path: string);
 begin
   if path <> '' then
     DeletePath(ExcludeTrailingPathDelimiter(path));  // I3476
 end;
 
-procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath, FTier: string);  // I2847  // I3355   // I3500   // I4293
+procedure TSetupBootstrap.ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath, FTier: string);  // I2847  // I3355   // I3500   // I4293
 var
   i: Integer;
 begin
@@ -486,13 +553,13 @@ begin
   end;
 end;
 
-procedure SetExitVal(c: Integer);
+procedure TSetupBootstrap.SetExitVal(c: Integer);
 begin
   // TODO: write the exit code to the logfile
   ExitCode := c;
 end;
 
-function IsKeymanDesktop7Installed: string;   // I4460
+function TSetupBootstrap.IsKeymanDesktop7Installed: string;   // I4460
 begin
   with CreateHKLMRegistry do
   try
@@ -507,7 +574,7 @@ begin
   end;
 end;
 
-function IsKeymanDesktop8Installed: string;   // I4460
+function TSetupBootstrap.IsKeymanDesktop8Installed: string;   // I4460
 begin
   with CreateHKLMRegistry do
   try

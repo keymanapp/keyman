@@ -63,5 +63,6 @@ pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
 popd
 
 # Run headless (browserless) tests.
+echo "${TERM_HEADING}Running Keyboard Processor test suite${NORMAL}"
 test-headless || fail "Keyboard Processor tests failed!"
 

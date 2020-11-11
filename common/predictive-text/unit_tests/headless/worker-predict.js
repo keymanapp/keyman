@@ -39,7 +39,10 @@ describe('LMLayerWorker', function () {
       
       worker.onMessage(createMessageEventWithData({
         message: 'load',
-        model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        source: {
+          type: 'file',
+          file: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        }
       }));
       sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
         message: 'ready',

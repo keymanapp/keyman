@@ -120,6 +120,7 @@
         <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
         <DCCReference Include="..\..\desktop\setup\Keyman.Setup.System.SetupUILanguageManager.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UILanguageManager.pas"/>
+        <DCCReference Include="..\..\desktop\setup\Keyman.Setup.System.MsiUtils.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

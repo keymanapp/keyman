@@ -31,11 +31,17 @@ type
     ssInstallSuccess,
     ssCancelQuery,
 
+    ssBootstrapExtractingBundle,
+    ssBootstrapCheckingPackages,
+    ssBootstrapCheckingForUpdates,
+    ssBootstrapCheckingInstalledVersions,
+    ssBootstrapReady,
+
     ssActionInstallKeyman,
     ssActionInstallPackage,
     ssActionInstallPackageLanguage,
     ssActionNothingToInstall,
-    ssActionDownloadAndInstall,
+    ssActionDownload,
     ssActionInstall,
 
     ssFreeCaption,
@@ -68,6 +74,7 @@ type
     ssOptionsTitleDefaultKeymanSettings,
     ssOptionsTitleSelectModulesToInstall,
     ssOptionsTitleAssociatedKeyboardLanguage,
+    ssOptionsTitleLocation,
 
     ssOptionsStartWithWindows,
     ssOptionsStartAfterInstall,
@@ -76,13 +83,14 @@ type
     ssOptionsAutomaticallyReportUsage,
 
     ssOptionsInstallKeyman,
-    ssOptionsDownloadInstallKeyman,
     ssOptionsUpgradeKeyman,
-    ssOptionsDownloadUpgradeKeyman,
+    ssOptionsInstallKeymanVersion,
+    ssOptionsDownloadKeymanVersion,
     ssOptionsKeymanAlreadyInstalled,
 
     ssOptionsInstallPackage,
-    ssOptionsDownloadInstallPackage,
+    ssOptionsDownloadPackageVersion,
+    ssOptionsInstallPackageVersion,
     ssOptionsPackageLanguageAssociation,
     ssOptionsDefaultLanguage,
 

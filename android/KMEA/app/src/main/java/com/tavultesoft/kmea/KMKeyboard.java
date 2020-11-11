@@ -432,18 +432,26 @@ final class KMKeyboard extends WebView {
       return false;
 
     boolean retVal = true;
-    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
-    if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
+    // keyboardVersion only needed for legacy cloud/ keyboards.
+    // Otherwise, no need for the JSON overhead of determining the keyboard version from kmp.json
+    String keyboardVersion = packageID.equals(KMManager.KMDefault_UndefinedPackageID) ?
+      KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
+
+    if (!KMManager.shouldAllowSetKeyboard() ||
+        (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
       sendError(packageID, keyboardID, languageID);
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
       languageID = kbInfo.getLanguageID();
       retVal = false;
+
+      // Keyboard changed, so determine version again
+      keyboardVersion = packageID.equals(KMManager.KMDefault_UndefinedPackageID) ?
+        KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
+
     }
     String kbKey = String.format("%s_%s", languageID, keyboardID);
-
-    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
 
     setKeyboardRoot(packageID);
 
@@ -466,8 +474,13 @@ final class KMKeyboard extends WebView {
     }
 
     boolean retVal = true;
-    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
-    if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
+    // keyboardVersion only needed for legacy cloud/ keyboards.
+    // Otherwise, no need for the JSON overhead of determining the keyboard version from kmp.json
+    String keyboardVersion = packageID.equals(KMManager.KMDefault_UndefinedPackageID) ?
+      KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
+
+    if (!KMManager.shouldAllowSetKeyboard() ||
+        (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
       sendError(packageID, keyboardID, languageID);
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
@@ -478,13 +491,13 @@ final class KMKeyboard extends WebView {
       kFont = kbInfo.getFont();
       kOskFont = kbInfo.getOSKFont();
       retVal = false;
+
+      // Keyboard changed, so determine version again
+      keyboardVersion = packageID.equals(KMManager.KMDefault_UndefinedPackageID) ?
+        KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
     String kbKey = String.format("%s_%s", languageID, keyboardID);
-    //if (kbKey.equals(currentKeyboard))
-    //  return false;
-
-    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
 
     setKeyboardRoot(packageID);
     String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);

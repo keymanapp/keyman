@@ -203,6 +203,7 @@ BEGIN
     CERR_90FeatureOnlyEmbedCSS           "Embedding CSS requires store(&version) '9.0'"
     CERR_90FeatureOnlyTargets            "&TARGETS system store requires store(&version) '9.0'"
     CERR_ContextAndIndexInvalidInMatchNomatch "context and index statements cannot be used in a match or nomatch statement"
+    CERR_140FeatureOnlyContextAndNotAnyWeb  "For web and touch platforms, context() statement referring to notany() requires store(&version) '14.0'"
     CWARN_PlatformNotInTargets           "The specified platform is not a target platform"
 END
 

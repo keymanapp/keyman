@@ -2884,9 +2884,7 @@ begin
   FDebugForm.OnClearBreakpoint := DebugClearBreakpoint;
   FDebugForm.OnUpdateExecutionPoint := DebugUpdateExecutionPoint;
   FDebugForm.Visible := True;
-
-
-// TODO:  FDebugForm.EditorMemo := frameSource.memo;
+  FDebugForm.EditorMemo := frameSource;
 
   FDebugStatusForm := TfrmDebugStatus.Create(Self);
   FDebugStatusForm.BorderStyle := bsNone;

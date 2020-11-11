@@ -95,7 +95,7 @@ const
       ValueType: kstInteger
   );
 
-  BaseKeymanSettings: array[0..31] of TKeymanSettingBase = (
+  BaseKeymanSettings: array[0..32] of TKeymanSettingBase = (
 
     // TIKE:UTikeDebugMode.TikeDebugMode
     (
@@ -405,6 +405,20 @@ const
       Description: 'Set to 0 to avoid serializing input. See '+
                    'https://blog.keyman.com/2018/10/the-keyman-keyboard-input-'+
                    'pipeline/ for details';
+      DefaultInt: 1;
+      ValueType: kstInteger
+    ),
+
+    // kmshell:Keyman.System.KeymanStartTask
+    (
+      ID: 'engine.compatibility.use_autostart_task';
+      Name: SRegValue_Flag_UseAutoStartTask;
+      RootKey: HKCU;
+      Key: SRegKey_KeymanEngineDebug_CU;
+      Description: 'Set to 0 to disable the autostart task that starts '+
+                   'Keyman when a Keyman TIP is selected. After making this '+
+                   'change, you will need to open Keyman Configuration once '+
+                   'for it to take effect.';
       DefaultInt: 1;
       ValueType: kstInteger
     ),

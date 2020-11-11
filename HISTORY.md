@@ -1,5 +1,62 @@
 # Keyman Version History
 
+## 14.0.177 alpha 2020-11-07
+
+* fix(developer): support for notany() and context() (#3816)
+* fix(web): support for notany() and context() (#3817)
+* fix(developer): debug window inherits editor font (#3829)
+
+## 14.0.176 alpha 2020-11-05
+
+* fix(developer): remove obsolete NRSIAllTags (#3819)
+* fix(developer): Incorrect script:language map (#3818)
+* fix(android/app): Remove network check on "Get Started" menu (#3823)
+
+## 14.0.175 alpha 2020-11-04
+
+* feat(android/engine): Add check for associated model on ModelPickerActivity (#3808)
+
+## 14.0.174 alpha 2020-11-03
+
+* chore(common): improve build README.md (#3812)
+
+## 14.0.173 alpha 2020-10-30
+
+* fix(windows): Cleanup setup.inf processing and CompareVersions function (#3790)
+* fix(windows): setup now allows choice of source (#3794)
+* fix(windows): show bootstrap progress in setup (#3792)
+* fix(windows): cleanup setup action list (#3793)
+* chore(android/engine): Remove use of lexical-model catalog (#3803)
+* fix(windows): disabling/enabling a profile could have wrong association (#3799)
+* fix(windows): keyboard menu could get out of sync (#3800)
+* fix(windows): crash installing package with a race (#3805)
+* fix(windows): Handle failure on task creation (#3804)
+
+## 14.0.172 alpha 2020-10-29
+
+* fix(windows): Start Keyman on Demand - tasks (#3773)
+* fix(windows): remove msctf free from DllMain (#3779)
+* fix(windows): error reading kmp.inf in setup (#3781)
+* chore(web): Update keymanweb-osk.ttf to v. 2.100 (#3782)
+* fix(android/engine): Fix issues when re-installing lexical-models (#3731)
+
+## 14.0.171 alpha 2020-10-28
+
+* fix(android/browser): Fix slow input in embedded browser (WebViews) (#3768)
+* chore(common/models): fixes context tracking with accepted suggestions (#3767)
+* chore(windows): small cleanups (#3774)
+
+## 14.0.170 alpha 2020-10-27
+
+* fix(windows): Remove double refresh (#3754)
+* fix(windows): Keyman Configuration changes apply instantly (#3753)
+* fix(windows): Make help button work (#3760)
+* fix(windows): use new windows url for online update check (#3761)
+* fix(windows): Community button had wrong link (#3764)
+* fix(windows): Crash in Keep in Touch external link (#3763)
+* fix(windows): Fix multiple issues with UI locales (#3766)
+* fix(android/engine): Only get keyboard version for cloud/ (#3740)
+
 ## 14.0.169 alpha 2020-10-26
 
 * feat(common/core/web): simplify corrective distribution (#3726)

@@ -5,16 +5,23 @@
   <string name="ssInstallSuccess">$APPNAME $VERSION has been installed successfully.</string>
   <string name="ssCancelQuery">Are you sure you want to cancel the installation of $APPNAME?</string>
 
-  <!-- Parameters: %0:s: version, %1:s: (size) -->
+  <string name="ssBootstrapExtractingBundle">Extracting bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Checking packages...</string>
+  <string name="ssBootstrapCheckingForUpdates">Checking online for updates...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Checking installed versions...</string>
+  <string name="ssBootstrapReady">Finishing up...</string>
+
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
   <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
 
-  <!-- Parameters: %0:s: package name %1:s: version %2:s: (size) -->
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
   <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
 
-  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: (size) -->
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
   <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
   <string name="ssActionNothingToInstall">There is nothing to install.</string>
-  <string name="ssActionDownloadAndInstall">Setup will download and install:</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s download)</string>
   <string name="ssActionInstall">Setup will install:</string>
 
   <string name="ssFreeCaption">$APPNAME $VERSION is free and open source</string>
@@ -47,8 +54,9 @@ Restart now?</string>
 
   <string name="ssOptionsTitleInstallOptions">Installation options</string>
   <string name="ssOptionsTitleDefaultKeymanSettings">Default $APPNAME settings</string>
-  <string name="ssOptionsTitleSelectModulesToInstall">Select modules to install or upgrade</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modules to install or upgrade</string>
   <string name="ssOptionsTitleAssociatedKeyboardLanguage">Associated Keyboard Language</string>
+  <string name="ssOptionsTitleLocation">Version to install</string>
 
   <string name="ssOptionsStartWithWindows">Start $APPNAME when Windows starts</string>
   <string name="ssOptionsStartAfterInstall">Start $APPNAME when installation completes</string>
@@ -59,26 +67,25 @@ Restart now?</string>
   <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
   <string name="ssInstallerVersion">Setup version: %0:s</string>
 
-  <!-- Parameters: %0:s: version -->
-  <string name="ssOptionsInstallKeyman">Install $APPNAME %0:s</string>
-
-  <!-- Parameters: %0:s: version, %1:s: size -->
-  <string name="ssOptionsDownloadInstallKeyman">Download and install $APPNAME %0:s (%1:s)</string>
-
-  <!-- Parameters: %0:s: version -->
-  <string name="ssOptionsUpgradeKeyman">Upgrade $APPNAME to %0:s</string>
-
-  <!-- Parameters: %0:s: version, %1:s: size -->
-  <string name="ssOptionsDownloadUpgradeKeyman">Download and upgrade $APPNAME to %0:s (%1:s)</string>
+  <string name="ssOptionsInstallKeyman">Install $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Upgrade $APPNAME</string>
 
   <!-- Parameters: %0:s: installed version -->
   <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s is already installed.</string>
 
-  <!-- Parameters: %0:s: package name %1:s: package version -->
-  <string name="ssOptionsInstallPackage">Install %0:s %1:s</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Download version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
 
-  <!-- Parameters: %0:s: package name %1:s: package version %2:s package size -->
-  <string name="ssOptionsDownloadInstallPackage">Download and install %0:s %1:s (%2:s)</string>
+
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Install %0:s</string>
+
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Download version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Version %0:s</string>
 
   <!-- Parameters: %0:s package name -->
   <string name="ssOptionsPackageLanguageAssociation">Select the language that you wish to associate with %0:s keyboard</string>

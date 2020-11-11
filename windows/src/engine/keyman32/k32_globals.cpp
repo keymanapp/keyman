@@ -141,8 +141,6 @@ void Globals_UninitThread()
     return;
   }
 
-  CloseTSF();   // I3933
-
   ISerialKeyEventClient::Shutdown();
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();

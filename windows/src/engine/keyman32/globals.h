@@ -242,10 +242,6 @@ typedef struct tagKEYMAN64THREADDATA
 
   /* TSF Manager Globals */
 
-  HMODULE hMSCTF;
-  ITfInputProcessorProfiles *pInputProcessorProfiles;
-  ITfInputProcessorProfileMgr *pInputProcessorProfileMgr;
-  BOOL TSFFailed;
   WPARAM LastKey;   // I4642
   BYTE LastScanCode;   // I4642
 

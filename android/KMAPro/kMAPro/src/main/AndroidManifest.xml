@@ -237,15 +237,7 @@
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"></activity>
     <activity
-      android:name=".WebBrowserActivity"
-      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-      android:label="@string/app_name"></activity>
-    <activity
       android:name=".BookmarksActivity"
-      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-      android:label="@string/app_name"></activity>
-    <activity
-      android:name=".KMPBrowserActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"></activity>
     <activity
@@ -298,6 +290,20 @@
       android:parentActivityName=".SelectPackageActivity"
       android:launchMode="singleTask"
       android:theme="@style/AppTheme.Base" />
+
+    <!-- Put other WebViewActivities in a separate process so the Keyboard WebView doesn't lag.
+    Ref https://stackoverflow.com/questions/40650643/timed-out-waiting-on-iinputcontextcallback-with-custom-keyboard-on-android -->
+    <activity
+      android:name=".WebBrowserActivity"
+      android:process=":WebBrowserActivity"
+      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+      android:label="@string/app_name"></activity>
+    <activity
+      android:name=".KMPBrowserActivity"
+      android:process=":KMPBrowserActivity"
+      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+      android:label="@string/app_name"></activity>
+
 
     <provider
       android:name="androidx.core.content.FileProvider"

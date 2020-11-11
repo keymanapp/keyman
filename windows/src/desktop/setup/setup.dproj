@@ -97,7 +97,9 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="bootstrapmain.pas"/>
-        <DCCReference Include="UfrmDownloadProgress.pas"/>
+        <DCCReference Include="UfrmDownloadProgress.pas">
+            <Form>frmDownloadProgress</Form>
+        </DCCReference>
         <DCCReference Include="CommonControls.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
@@ -109,11 +111,10 @@
         <DCCReference Include="resource.pas"/>
         <DCCReference Include="SetupStrings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="MsiPackageCode.pas"/>
+        <DCCReference Include="Keyman.Setup.System.MsiUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
         <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\UCreateProcessAsShellUser.pas"/>
         <DCCReference Include="UfrmRunDesktop.pas">
             <Form>frmRunDesktop</Form>
         </DCCReference>
@@ -144,12 +145,8 @@
         <DCCReference Include="Keyman.Setup.System.ResourceDownloader.pas"/>
         <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.MITLicense.pas"/>
-        <DCCReference Include="Keyman.Setup.System.Locales.pas">
-            <Form>$R icons.res</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\global\delphi\general\Keyman.System.UILanguageManager.pas">
-            <Form>$R icons.res</Form>
-        </DCCReference>
+        <DCCReference Include="Keyman.Setup.System.Locales.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.UILanguageManager.pas"/>
         <DCCReference Include="Keyman.Setup.System.SetupUILanguageManager.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
