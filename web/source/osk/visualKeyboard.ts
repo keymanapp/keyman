@@ -161,9 +161,23 @@ namespace com.keyman.osk {
     protected renameSpecialKey(oldText: string): string {
       let keyman = (<KeymanBase>window['keyman'])
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-      return VisualKeyboard.specialCharacters[oldText] ?
-        String.fromCharCode(0XE000 + VisualKeyboard.specialCharacters[oldText]) :
-        oldText;
+      if(oldText != "*ZWNJ*") {
+        return VisualKeyboard.specialCharacters[oldText] ?
+          String.fromCharCode(0XE000 + VisualKeyboard.specialCharacters[oldText]) :
+          oldText;
+      } else {
+        // Examine platform; choose appropriate symbol.
+        let coreSpec = keyman.util.device.coreSpec;
+        let zeroWidthPUA = 0XE000 + VisualKeyboard.specialCharacters[oldText];
+
+        // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
+        // possible / available though, and there's a different standard symbol on Android.
+        if(coreSpec.OS == com.keyman.utils.OperatingSystem.Android) {
+          zeroWidthPUA += 1; // Use the Android version.
+        } 
+
+        return String.fromCharCode(zeroWidthPUA);
+      }
     }
 
     // Produces a HTMLSpanElement with the key's actual text.
@@ -195,6 +209,14 @@ namespace com.keyman.osk {
 
         // Transforms our *___* special key codes into their corresponding PUA character codes for keyboard display.
         keyText=this.renameSpecialKey(tId);
+      }
+
+      // Some special key codes may be used on standard keys, not just on marked 'special keys'.
+      if(spec['text'] == '*ZWNJ*') {
+        keyText = this.renameSpecialKey(spec['text']);
+        // The special OSK font is not normally used for non-special keys.
+        // We'll need a font override here.
+        spec['font'] = "SpecialOSK";
       }
 
       // Grab our default for the key's font and font size.
@@ -523,7 +545,12 @@ namespace com.keyman.osk {
       '*LAltShift*':      0x67,
       '*RAltShift*':      0x68,
       '*LCtrlShift*':     0x69,
-      '*RCtrlShift*':     0x70
+      '*RCtrlShift*':     0x70,
+      '*RtlEnter*':       0x71,
+      '*RtlBkSp*':         0x72,
+      '*ShiftLock*':       0x73,
+      '*ShiftedLock*':     0x74,
+      '*ZWNJ*':           0x75, // for iOS version, 0x76 for Android version.
     };
 
     /**
