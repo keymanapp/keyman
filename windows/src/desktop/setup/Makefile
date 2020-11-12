@@ -6,8 +6,8 @@
 
 build: version.res manifest.res icons locale
     $(DCC32) setup.dpr
-    $(TDS2DBG) setup.exe
     $(SENTRYTOOL_DELPHIPREP) setup.exe -dpr setup.dpr
+    $(TDS2DBG) setup.exe
     $(COPY) setup.exe $(PROGRAM)\desktop
 
 locale:

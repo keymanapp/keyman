@@ -8,9 +8,10 @@ VERSION_TXT_PATH=..\..
 
 build: dirs version.res
     $(DCC32) insthelper.dpr
-    $(TDS2DBG) insthelper.dll
     $(SENTRYTOOL_DELPHIPREP) insthelper.dll -dpr insthelper.dpr
+    $(TDS2DBG) insthelper.dll
     $(COPY) insthelper.dll $(PROGRAM)\inst
+    $(COPY) insthelper.dbg $(DEBUGPATH)\inst
 
 clean: def-clean
     -del *.dll

@@ -7,8 +7,8 @@
 build: version.res manifest.res dirs icons
     $(DELPHI_MSBUILD) kmconvert.dproj /p:Platform=Win32
 
-    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmconvert.exe
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmconvert.exe -dpr kmconvert.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmconvert.exe
     $(COPY) $(WIN32_TARGET_PATH)\kmconvert.exe $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\kmconvert.dbg $(COPY) $(WIN32_TARGET_PATH)\kmconvert.dbg $(DEBUGPATH)\developer
 

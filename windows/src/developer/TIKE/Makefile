@@ -7,8 +7,8 @@
 build: version.res manifest.res icons dirs xml
     cd $(ROOT)\src\developer\tike
     $(DCC32) tike.dpr
-    $(TDS2DBG) tike.exe
     $(SENTRYTOOL_DELPHIPREP) tike.exe -dpr tike.dpr
+    $(TDS2DBG) tike.exe
     $(COPY) tike.exe $(PROGRAM)\developer
     $(COPY) kmlmc.cmd $(PROGRAM)\developer
     if exist tike.dbg $(COPY) tike.dbg $(DEBUGPATH)\developer

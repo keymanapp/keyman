@@ -8,8 +8,8 @@ build: version.res manifest.res kbd_noicon.res dirs
     gentlb -Tkmcomapi.tlb kmcomapi.ridl
     $(DELPHI_MSBUILD) kmcomapi.dproj /p:Platform=Win32
 
-    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmcomapi.dll
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmcomapi.dll -dpr kmcomapi.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmcomapi.dll
     $(COPY) $(WIN32_TARGET_PATH)\kmcomapi.dll $(PROGRAM)\engine
     if exist $(WIN32_TARGET_PATH)\kmcomapi.dbg $(COPY) $(WIN32_TARGET_PATH)\kmcomapi.dbg $(DEBUGPATH)\engine
 

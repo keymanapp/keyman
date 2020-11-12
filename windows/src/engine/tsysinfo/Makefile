@@ -17,8 +17,8 @@ build: version.res manifest.res dirs
     del tsysinfox64.bin
 
     $(DCC32) tsysinfo.dpr
-    $(TDS2DBG) tsysinfo.exe
     $(SENTRYTOOL_DELPHIPREP) tsysinfo.exe -dpr tsysinfo.dpr
+    $(TDS2DBG) tsysinfo.exe
     $(COPY) tsysinfo.exe $(PROGRAM)\engine
     if exist tsysinfo.dbg $(COPY) tsysinfo.dbg $(DEBUGPATH)\engine
 

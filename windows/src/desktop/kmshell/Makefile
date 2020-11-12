@@ -6,8 +6,8 @@
 
 build: version.res manifest.res icons xml
     $(DCC32) kmshell.dpr
-    $(TDS2DBG) kmshell.exe
     $(SENTRYTOOL_DELPHIPREP) kmshell.exe -dpr kmshell.dpr
+    $(TDS2DBG) kmshell.exe
     $(COPY) kmshell.exe $(PROGRAM)\desktop
     if exist kmshell.dbg $(COPY) kmshell.dbg $(DEBUGPATH)\desktop
 

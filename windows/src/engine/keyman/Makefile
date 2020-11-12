@@ -7,8 +7,8 @@
 build: version.res manifest.res keymanmenuitem.res icons.res osktoolbar.res dirs
     rc langswitch\langswitchmanager.rc
     $(DCC32) keyman.dpr
-    $(TDS2DBG) keyman.exe
     $(SENTRYTOOL_DELPHIPREP) keyman.exe -dpr keyman.dpr
+    $(TDS2DBG) keyman.exe
     $(COPY) keyman.exe $(PROGRAM)\engine
     if exist keyman.dbg $(COPY) keyman.dbg $(DEBUGPATH)\engine
 

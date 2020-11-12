@@ -7,6 +7,7 @@
 build: version.res dirs
     $(MSBUILD) kmanalyze.sln $(MSBUILD_BUILD)
     $(COPY) $(TARGET_PATH)\kmanalyze.exe $(PROGRAM)\developer
+    $(COPY) $(TARGET_PATH)\kmanalyze.pdb $(DEBUGPATH)\developer
 
 clean: def-clean
     $(MSBUILD) kmanalyze.sln $(MSBUILD_CLEAN)
