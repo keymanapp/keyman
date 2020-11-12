@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.180 alpha 2020-11-12
+
+* fix(windows): makefile format error (#3854)
+
 ## 14.0.179 alpha 2020-11-12
 
 * fix(windows): Import OSK wrong for European layouts (#3830)
