@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.179 alpha 2020-11-12
+
+* fix(windows): Import OSK wrong for European layouts (#3830)
+* fix(windows): SizeOfImage header was wrong for dbg (#3833)
+* chore(windows): symbol server support (#3834)
+* fix(windows): sporadic 8087 control word corruption (#3842)
+
 ## 14.0.178 alpha 2020-11-10
 
 * fix(developer): Remove IE dependency from Developer Setup (#3839)
