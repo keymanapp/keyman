@@ -25,6 +25,13 @@ clean: def-clean
 signcode:
     rem SIGNCODE /d "Keyman Developer Setup" $(PROGRAM)\developer\setup.exe
 
+wrap-symbols:
+    # This is slightly non-standard due to renamed devsetup.dbg above
+    # we should be able to clean this up in the future when we remove the
+    # zipped debug symbols
+    $(SYMSTORE) $(PROGRAM)\developer\setup.exe /t keyman-developer
+    $(SYMSTORE) $(ROOT)\src\developer\setup\setup.dbg /t keyman-developer
+
 backup:
     $(WZZIP) $(BUILD)\developer\devsetup.zip  $(BACKUPDEFAULTS) setup.exe
 

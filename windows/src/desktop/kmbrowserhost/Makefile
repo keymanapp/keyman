@@ -23,6 +23,10 @@ signcode:
 install:
     $(COPY) $(PROGRAM)\desktop\kmbrowserhost.exe "$(INSTALLPATH_KEYMANDESKTOP)"
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\kmbrowserhost.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\kmbrowserhost.dbg /t keyman-windows
+
 backup:
     $(WZZIP) $(BUILD)\desktop\kmbrowserhost.zip  $(BACKUPDEFAULTS) $(WIN32_TARGET_PATH)\kmbrowserhost.exe $(WIN32_TARGET_PATH)\kmbrowserhost.dbg
 

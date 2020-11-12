@@ -19,6 +19,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman for Windows" $(PROGRAM)\desktop\kmconfig.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\kmconfig.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\kmconfig.dbg /t keyman-windows
+
 backup:
     $(WZZIP) $(BUILD)\desktop\kmconfig.zip  $(BACKUPDEFAULTS) kmconfig.exe
 

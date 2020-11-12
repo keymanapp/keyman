@@ -15,13 +15,17 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Developer Keyboard Analyzer" $(PROGRAM)\developer\kmanalyze.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\developer\kmanalyze.exe /t keyman-developer
+    $(SYMSTORE) $(DEBUGPATH)\developer\kmanalyze.pdb /t keyman-developer
+
 backup:
     $(WZZIP) $(BUILD)\developer\kmanalyze.exe $(BACKUPDEFAULTS) kmanalyze.exe
 
 test-manifest:
-    @rem 
+    @rem
 
 #install:
 #    $(COPY) $(PROGRAM)\developer\kmanalyze.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmanalyze.exe"
-    
+
 !include ..\..\Target.mak

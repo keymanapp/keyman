@@ -20,6 +20,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Desktop Install Helper" $(ROOT)\bin\desktop\insthelp.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\insthelp.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\insthelp.dbg /t keyman-windows
+
 backup:
     $(WZZIP) $(BUILD)\desktop\insthelp.zip  $(BACKUPDEFAULTS) insthelp.exe
 
