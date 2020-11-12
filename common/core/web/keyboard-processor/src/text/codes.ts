@@ -9,6 +9,7 @@ namespace com.keyman.text {
       "SHIFT":0x0010,
       "CTRL":0x0020,
       "ALT":0x0040,
+      "META":0x0080, // Represents command keys, which some OSes use for shortcuts we don't want to block.
       "CAPS":0x0100,
       "NO_CAPS":0x0200,
       "NUM_LOCK":0x0400,
