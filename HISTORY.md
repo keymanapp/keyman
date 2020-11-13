@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.181 alpha 2020-11-13
+
+* fix(common/core/web): fixes no-output logic check, arrow keys (#3848)
+* fix(common/core/web): adds missing null-check (#3859)
+
 ## 14.0.180 alpha 2020-11-12
 
 * fix(windows): makefile format error (#3854)
