@@ -1664,11 +1664,20 @@ namespace com.keyman.osk {
       var classes=key.className, cs = ' kmw-key-touched';
 
       // For phones, use key preview rather than highlighting the key,
-      // except for space, bksp, enter, shift and popup keys
-      var usePreview = ((this.keytip != null)
-        && (classes.indexOf('kmw-key-shift') < 0)
-        && (classes.indexOf('kmw-spacebar') < 0)
-        && (key.id.indexOf('popup') < 0 ));
+      var usePreview = ((this.keytip != null) && (key.id.indexOf('popup') < 0 ));
+
+      if(usePreview) {
+        // Previews are not permitted for keys using any of the following CSS styles.
+        var excludedClasses = ['kmw-key-shift',    // special keys
+                               'kmw-key-shift-on', // active special keys (shift, when in shift layer
+                               'kmw-spacebar',     // space
+                               'kmw-key-blank',    // Keys that are only used for layout control
+                               'kmw-key-hidden'];
+
+        for(let c=0; c < excludedClasses.length; c++) {
+          usePreview = usePreview && (classes.indexOf(excludedClasses[c]) < 0);
+        }
+      }
 
       if(usePreview) {
         this.showKeyTip(key,on);
