@@ -756,13 +756,87 @@ var NOTANY_NUL_TEST_1 = {
       {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
     ]},
     result: false,
-    msg: "Rule 1: context incorrectly matched a notany character"
+    msg: "Rule 1: did not fail notany on matched character"
   }, {
     sequence: { "output": "a", "inputs": [
       {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
     ]},
     result: false,
-    msg: "Rule 4: context matched with a nul in the notany position"
+    msg: "Rule 1: did not fail notany on nul context"
+  }]
+};
+
+var NOTANY_NUL_TEST_2 = {
+  id: 4,
+  // Match condition for rule
+  rule: [{t: 'a', a:[{d:0},{d:1},{d:2}], n: 1},{t:'a',a:['a', 'b', 'c']}],
+  // Start of context relative to cursor
+  n: 2,
+  ln: 2,
+  // Resulting context map
+  contextCache: ['a', 'a'],
+
+  baseSequence: { "output": "aa", "inputs": [
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 2: did not fail notany on matched deadkey"
+  }, {
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 2: did not fail notany on nul context"
+  }]
+};
+
+var NOTANY_NUL_TEST_3 = {
+  id: 4,
+  // Match condition for rule
+  rule: [{t: 'a', a:[{d:0},'b',{d:2}], n: 1},{t:'a',a:['a', 'b', 'c']}],
+  // Start of context relative to cursor
+  n: 2,
+  ln: 2,
+  // Resulting context map
+  contextCache: [1, 'a'],
+
+  baseSequence: { "output": "a", "inputs": [
+    {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":49,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //0
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 3: did not properly match a deadkey within a mixed notany store"
+  }, {
+    sequence: { "output": "ba", "inputs": [
+      {"type":"key","keyCode":66,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //b
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 3: did not properly match a character within a mixed notany store"
+  }, {
+    sequence: { "output": "aa", "inputs": [
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: true,
+    msg: "Rule 3: context incorrectly matched a character within a mixed notany store"
+  }, {
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 3: did not fail notany on nul context"
   }]
 };
 
@@ -774,7 +848,7 @@ var ANY_INDEX_RULE_SET = [ ANY_INDEX_TEST_1, ANY_INDEX_TEST_2, ANY_INDEX_TEST_3 
 var DEADKEY_STORE_RULE_SET = [ DEADKEY_STORE_TEST_1, DEADKEY_STORE_TEST_2, DEADKEY_STORE_TEST_3,
    DEADKEY_STORE_TEST_4 ];
 
-var NOTANY_NUL_RULE_SET = [ NOTANY_NUL_TEST_1 ];
+var NOTANY_NUL_RULE_SET = [ NOTANY_NUL_TEST_1, NOTANY_NUL_TEST_2, NOTANY_NUL_TEST_3 ];
 
  var FULL_RULE_SET = [].concat(DEADKEY_RULE_SET, ANY_CONTEXT_RULE_SET, ANY_INDEX_RULE_SET,
    DEADKEY_STORE_RULE_SET, NOTANY_NUL_RULE_SET);
@@ -891,6 +965,14 @@ describe('Engine - Context Matching', function() {
   describe('handles interactions between notany and nul in context', function() {
     it('with notany against a store with pure characters:  NOTANY_NUL_TEST_1', function() {
       runEngineRuleSet([NOTANY_NUL_TEST_1]);
+    });
+
+    it('with notany against a store with pure deadkeys:  NOTANY_NUL_TEST_2', function() {
+      runEngineRuleSet([NOTANY_NUL_TEST_2]);
+    });
+
+    it('with notany against a store with mixed characters and deadkeys:  NOTANY_NUL_TEST_2', function() {
+      runEngineRuleSet([NOTANY_NUL_TEST_3]);
     });
   });
 });
