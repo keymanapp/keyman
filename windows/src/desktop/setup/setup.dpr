@@ -2,7 +2,7 @@ program setup;
 
 uses
   bootstrapmain in 'bootstrapmain.pas',
-  UfrmDownloadProgress in 'UfrmDownloadProgress.pas',
+  UfrmDownloadProgress in 'UfrmDownloadProgress.pas' {frmDownloadProgress},
   CommonControls in 'CommonControls.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
@@ -14,7 +14,7 @@ uses
   resource in 'resource.pas',
   SetupStrings in 'SetupStrings.pas',
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
-  MsiPackageCode in 'MsiPackageCode.pas',
+  Keyman.Setup.System.MsiUtils in 'Keyman.Setup.System.MsiUtils.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',

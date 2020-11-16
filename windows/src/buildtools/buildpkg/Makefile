@@ -6,8 +6,8 @@
 
 build: version.res dirs
     $(DCC32) Buildpkg.dpr
-    $(TDS2DBG) buildpkg.exe
     $(SENTRYTOOL_DELPHIPREP) buildpkg.exe -dpr buildpkg.dpr
+    $(TDS2DBG) buildpkg.exe
     $(COPY) Buildpkg.exe $(PROGRAM)\online
     $(COPY) Buildpkg.exe $(PROGRAM)\buildtools
     if exist buildpkg.dbg $(COPY) buildpkg.dbg $(DEBUGPATH)\buildtools

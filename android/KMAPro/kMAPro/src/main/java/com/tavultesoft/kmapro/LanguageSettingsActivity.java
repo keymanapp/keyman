@@ -28,11 +28,9 @@ import androidx.appcompat.widget.Toolbar;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.ModelPickerActivity;
-import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
-import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 
 import java.util.HashMap;
@@ -261,20 +259,21 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     updateActiveLexicalModel();
   }
 
+  /**
+   * Updates the active lexical model label with the name of the associated lexical model.
+   * If there's no associated lexical model, the label displays a prompt to check for an available model.
+   */
   public void updateActiveLexicalModel() {
     HashMap<String, String> lexModelMap = KMManager.getAssociatedLexicalModel(lgCode);
     if(lexModelMap != null) {
       associatedLexicalModel = lexModelMap.get(KMManager.KMKey_LexicalModelName);
     } else {
-      associatedLexicalModel = "";
+      // Prompt to check for available dictionary
+      associatedLexicalModel = getString(R.string.check_available_model);
     }
-    if (!associatedLexicalModel.isEmpty()) {
-      lexicalModelTextView.setText(associatedLexicalModel);
-      lexicalModelTextView.setEnabled(true);
-    } else {
-      lexicalModelTextView.setText("");
-      lexicalModelTextView.setEnabled(false);
-    }
+
+    lexicalModelTextView.setText(associatedLexicalModel);
+    lexicalModelTextView.setEnabled(true);
   }
 
   @Override

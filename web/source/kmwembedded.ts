@@ -40,7 +40,7 @@ namespace com.keyman.osk {
     }
   };
 
-  // iOS now relies upon native-mode popup key management, so we only implement these hybrid-targetted
+  // iOS now relies upon native-mode popup key management, so we only implement these hybrid-targeted
   // methods when embedding in Android.
   let device = com.keyman.singleton.util.device;
 
@@ -56,10 +56,8 @@ namespace com.keyman.osk {
       if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
         var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
             yBase = dom.Utils.getAbsoluteY(key);
-        
-        if(util.device.formFactor == 'phone') {
-          this.prependBaseKey(key);
-        }
+
+        // #3718: No longer prepend base key to subkey array
 
         this.popupBaseKey = key;
         this.popupPending=true;
@@ -316,15 +314,6 @@ namespace com.keyman.text {
   keymanweb['registerModel']=function(model: com.keyman.text.prediction.ModelSpec) {
     keymanweb.modelManager.register(model);
   };
-
-  keymanweb['showNewSuggestions'] = function() {
-    let keyman = com.keyman.singleton;
-
-    if(keyman['osk'].banner['activeBanner'] instanceof com.keyman.osk.SuggestionBanner) {
-      let banner = keyman['osk'].banner['activeBanner'];
-      banner.rotateSuggestions();
-    }
-  }
 
   /**
    * Function called by Android and iOS when a device-implemented keyboard popup is displayed or hidden

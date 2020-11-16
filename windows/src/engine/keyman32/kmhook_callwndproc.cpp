@@ -198,7 +198,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
         break;
 		  case WM_INPUTLANGCHANGE:
         SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_INPUTLANGCHANGE %x %x Hwnd=%x Parent=%x Focus=%x Active=%x", cp->wParam, cp->lParam, cp->hwnd, GetParent(cp->hwnd), GetFocus(), GetActiveWindow());
-          ReportActiveKeyboard(_td, PC_UPDATE);   // I4288
+          ReportActiveKeyboard(PC_UPDATE);   // I4288
 
           // The input language has changed, so tell Keyman window about it
         break;

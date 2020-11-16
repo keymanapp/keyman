@@ -47,6 +47,9 @@ signcode:
 backup:
     @rem
 
+wrap-symbols:
+    @rem
+
 clean:
     cd $(ROOT)\src\developer\inst
     -del /Q download.mak

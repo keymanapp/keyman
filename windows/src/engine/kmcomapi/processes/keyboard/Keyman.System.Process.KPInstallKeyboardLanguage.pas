@@ -49,7 +49,8 @@ type
     ///  <param name="KeyboardID">Keyman keyboard to associate with TIP</param>
     ///  <param name="BCP47Tag">BCP47 tag associated with the TIP</param>
     ///  <param name="LangID">Language ID found with FindInstallationLangID</param>
-    procedure InstallTip(const KeyboardID, BCP47Tag: string; LangID: Integer);
+    ///  <param name="guidProfile">Profile GUID that is assigned on exit</param>
+    procedure InstallTip(const KeyboardID, BCP47Tag: string; LangID: Integer; var guidProfile: TGUID);
 
     ///  <summary>Removes a temporary keyboard layout that was installed by
     ///  FindInstallationLangID. Current User.</summary>
@@ -425,10 +426,9 @@ begin
   Context.Control.AutoApplyKeyman;
 end;
 
-procedure TKPInstallKeyboardLanguage.InstallTip(const KeyboardID, BCP47Tag: string; LangID: Integer);
+procedure TKPInstallKeyboardLanguage.InstallTip(const KeyboardID, BCP47Tag: string; LangID: Integer; var guidProfile: TGUID);
 var
   FIsAdmin: Boolean;
-  guid: TGUID;
   reg: TRegistry;
   RootPath, FLayoutInstallString: string;
 begin
@@ -455,7 +455,7 @@ begin
     if not reg.ValueExists(SRegValue_KeymanProfileGUID) then
       ErrorFmt(KMN_E_ProfileInstall_RegistryCorrupt, VarArrayOf([KeyboardID]));
 
-    guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
+    guidProfile := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
   finally
     reg.Free;
   end;
@@ -464,7 +464,7 @@ begin
   // Install the TIP into Windows
   //
 
-  FLayoutInstallString := GetLayoutInstallString(LangID, guid);
+  FLayoutInstallString := GetLayoutInstallString(LangID, guidProfile);
 
   if not InstallLayoutOrTip(PChar(FLayoutInstallString), 0) then   // I4302
     ErrorFmt(KMN_E_ProfileInstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));

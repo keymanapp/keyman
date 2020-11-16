@@ -1287,6 +1287,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     else if (wcsncmp(p, L"8.0", 3) == 0)  fk->version = VERSION_80;
     else if (wcsncmp(p, L"9.0", 3) == 0)  fk->version = VERSION_90;
     else if (wcsncmp(p, L"10.0", 4) == 0)  fk->version = VERSION_100;
+    else if (wcsncmp(p, L"14.0", 4) == 0)  fk->version = VERSION_140; // Adds support for #917 -- context() with notany() for KeymanWeb
     else return CERR_InvalidVersion;
 
     if (fk->version < VERSION_60) FOldCharPosMatching = TRUE;
@@ -1488,6 +1489,15 @@ DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PWSTR context, PW
         int contextOffset = *(p + 2);
         if (contextOffset > xstrlen(context))
           return CERR_ContextExHasInvalidOffset;
+
+        // Due to a limitation in earlier versions of KeymanWeb, the minimum version
+        // for context() referring to notany() is 14.0. See #917 for details.
+        if (CompileTarget == CKF_KEYMANWEB) {
+          for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
+          if (*q == UC_SENTINEL && *(q + 1) == CODE_NOTANY) {
+            VERIFY_KEYBOARD_VERSION(fk, VERSION_140, CERR_140FeatureOnlyContextAndNotAnyWeb);
+          }
+        }
       }
     }
   }

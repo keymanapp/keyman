@@ -200,13 +200,17 @@ begin
     then StatusMax := 6 + FInstallInfo.Packages.Count
     else StatusMax := FInstallInfo.Packages.Count;
 
-  msiLocation := FInstallInfo.BestMsi;
+  msiLocation := FInstallInfo.MsiInstallLocation;
   if Assigned(msiLocation) and FInstallInfo.ShouldInstallKeyman then
   begin
     if msiLocation.LocationType = iilOnline then
     begin
+      LogInfo('Downloading '+msiLocation.Url);
       if not TResourceDownloader.Execute(FInstallInfo, msiLocation, FSilent) then
+      begin
+        LogInfo('Failed to download '+msiLocation.Url);
         Exit(False);
+      end;
     end;
 
     Status(FInstallInfo.Text(ssStatusInstalling));
@@ -511,9 +515,8 @@ begin
     end
     else
     begin
-      Status('Removing older versions');
       // Remove older versions of Keyman now. We'll still get the upgrade desired
-      // because we've backed up the relevant keys for reapplication post-install
+      // because we've backed up the relevant keys for reapplication post-install.
       // Version 11 and later do not need this treatment as they are upgraded in-place
       // with the file and registry locations remaining static
       if (MsiGetProductCode(ProductCode_Keyman7_1Light, pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
@@ -522,11 +525,11 @@ begin
          (MsiGetProductCode(ProductCode_Keyman9, pcode) = ERROR_SUCCESS) or // Keyman 9.0
          (MsiGetProductCode(ProductCode_Keyman10, pcode) = ERROR_SUCCESS) then // Keyman 10.0
       begin
+        Status(FInstallInfo.Text(ssStatusRemovingOlderVersions));
         MsiConfigureProduct(pcode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT);
         // We'll ignore errors ...
       end;
     end;
-
 
     { Log the install to the diag folder }
 
@@ -539,6 +542,7 @@ begin
 
     FCacheFileName := CacheMSIFile(msiLocation);  // I3476
 
+    Status(FInstallInfo.Text(ssStatusInstalling));
     res := MsiInstallProductW(PWideChar(FCacheFileName), PWideChar(ReinstallMode));
 
     FinishCacheMSIFile(msiLocation,  // I3476
@@ -594,7 +598,7 @@ var
     begin
       if pack.ShouldInstall then
       begin
-        packLocation := pack.GetBestLocation;
+        packLocation := pack.InstallLocation;
         if Assigned(packLocation) then
         begin
           if packLocation.LocationType = iilOnline then
@@ -602,9 +606,9 @@ var
             LogInfo('Downloading '+packLocation.Url);
             if not TResourceDownloader.Execute(FInstallInfo, packLocation, FSilent) then
             begin
-              LogInfo('Failed to download '+packLocation.Url); // TODO: can we get more detail?
+              LogInfo('Failed to download '+packLocation.Url);
               pack.ShouldInstall := False;
-              Continue; //
+              Continue;
             end;
           end;
 
@@ -668,7 +672,7 @@ begin
     if CheckForUpdates then s := s + 'CheckForUpdates,';
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
-    msiLocation := FInstallInfo.BestMsi;
+    msiLocation := FInstallInfo.MsiInstallLocation;
     if Assigned(msiLocation) and (
         (FInstallInfo.InstalledVersion.Version = '') or (FInstallInfo.InstalledVersion.ProductCode <> msiLocation.ProductCode)
       ) then

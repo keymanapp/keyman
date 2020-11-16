@@ -29,7 +29,13 @@
             <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_ProxyConfig']"/></xsl:with-param>
             <xsl:with-param name="command">keyman:support_proxyconfig</xsl:with-param>
           </xsl:call-template>
-      
+
+          <xsl:call-template name="button">
+            <xsl:with-param name="shield">1</xsl:with-param>
+            <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_SettingsManager']"/></xsl:with-param>
+            <xsl:with-param name="command">keyman:options_settingsmanager</xsl:with-param>
+          </xsl:call-template>
+
           <xsl:call-template name="button">
             <xsl:with-param name="shield">1</xsl:with-param>
             <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_BaseKeyboard']"/></xsl:with-param>

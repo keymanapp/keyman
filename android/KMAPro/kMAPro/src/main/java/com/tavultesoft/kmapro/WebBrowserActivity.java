@@ -4,8 +4,11 @@
 
 package com.tavultesoft.kmapro;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.KMPLink;
@@ -43,7 +46,7 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tavultesoft.kmea.util.KMLog;
+import static android.app.Application.getProcessName;
 
 public class WebBrowserActivity extends AppCompatActivity {
   private static final String TAG = "WebBrowserActivity";
@@ -57,12 +60,23 @@ public class WebBrowserActivity extends AppCompatActivity {
   private String loadedFont;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
+  private static boolean didSetDataDirectorySuffix = false;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     final Context context = this;
+
+    // Difference processes in the same application cannot directly share WebView-related data
+    // https://developer.android.com/reference/android/webkit/WebView.html#setDataDirectorySuffix(java.lang.String)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+       if (!didSetDataDirectorySuffix) {
+         String processName = getProcessName();
+         WebView.setDataDirectorySuffix(processName);
+         didSetDataDirectorySuffix = true;
+       }
+    }
 
     setContentView(R.layout.activity_web_browser);
 
@@ -320,18 +334,31 @@ public class WebBrowserActivity extends AppCompatActivity {
           InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
           imm.hideSoftInputFromWindow(addressField.getWindowToken(), 0);
           String urlStr = v.getText().toString();
-          try {
-            new URL(urlStr);
-          } catch (MalformedURLException e) {
-            KMLog.LogException(TAG, "", e);
 
-            if (Patterns.WEB_URL.matcher(String.format("%s%s", "http://", urlStr)).matches()) {
-              urlStr = String.format("%s%s", "http://", urlStr);
-            } else {
-              urlStr = String.format("https://www.google.com/search?q=%s", urlStr);
+          boolean valid = false;
+          String originalUrl = urlStr;
+          while(!valid) {
+            try {
+              new URL(urlStr);
+              valid = true;
+            } catch (MalformedURLException e) {
+              // Intentionally not logging exception because it may be a query
+
+              if (Patterns.WEB_URL.matcher("http://" + urlStr).matches()) {
+                urlStr = "http://" + urlStr;
+                valid = true;
+              } else {
+                try {
+                  urlStr = String.format("https://www.google.com/search?q=%s",
+                    URLEncoder.encode(originalUrl, StandardCharsets.UTF_8.displayName()));
+                  valid = true; // no need to test again; we'll assume it's valid this time
+                } catch (UnsupportedEncodingException ue) {
+                  urlStr = String.format("https://www.google.com/search?q=%s", originalUrl);
+                  break;
+                }
+              }
             }
           }
-
           webView.loadUrl(urlStr);
           addressField.clearFocus();
           handled = true;

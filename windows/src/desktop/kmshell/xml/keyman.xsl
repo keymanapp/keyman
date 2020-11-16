@@ -37,6 +37,7 @@
 
         <div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10">
           <div id="header-pad"></div>
+          <div id="menubackground" onmousedown="HideMenu()"></div>
           <div id="menuframe" tabindex="-1">
             <div id="state"><xsl:value-of select="/Keyman/state"/></div>
             <xsl:call-template name="menuframe" />

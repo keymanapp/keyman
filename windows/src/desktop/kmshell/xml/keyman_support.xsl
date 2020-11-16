@@ -23,7 +23,7 @@
           <p><xsl:value-of select="$locale/string[@name='S_Support_ContactInstructions_Free']"/></p>
           <xsl:call-template name="button">
             <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_CommunitySupport']"/></xsl:with-param>
-            <xsl:with-param name="command">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/community/</xsl:with-param>
+            <xsl:with-param name="command">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/community</xsl:with-param>
             <xsl:with-param name="width">220px</xsl:with-param>
           </xsl:call-template>
         </div>

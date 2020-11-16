@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=keyman32 kmcomapi keyman tsysinfox64 tsysinfo keyman64 keymanx64 mcompile inst kmtip
+TARGETS=keymanmc keyman32 kmcomapi keyman tsysinfox64 tsysinfo keyman64 keymanx64 mcompile inst kmtip
 MANIFESTS=keyman tsysinfo tsysinfox64 keymanx64 mcompile
 CLEANS=clean-engine
 
@@ -18,6 +18,10 @@ keyman: redist
 
 kmcomapi:
     cd $(ROOT)\src\engine\kmcomapi
+    $(MAKE) $(TARGET)
+
+keymanmc:
+    cd $(ROOT)\src\engine\keymanmc
     $(MAKE) $(TARGET)
 
 keyman32-build:

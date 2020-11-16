@@ -1,5 +1,128 @@
 # Keyman Version History
 
+## 14.0.181 alpha 2020-11-13
+
+* fix(common/core/web): fixes no-output logic check, arrow keys (#3848)
+* fix(common/core/web): adds missing null-check (#3859)
+
+## 14.0.180 alpha 2020-11-12
+
+* fix(windows): makefile format error (#3854)
+
+## 14.0.179 alpha 2020-11-12
+
+* fix(windows): Import OSK wrong for European layouts (#3830)
+* fix(windows): SizeOfImage header was wrong for dbg (#3833)
+* chore(windows): symbol server support (#3834)
+* fix(windows): sporadic 8087 control word corruption (#3842)
+
+## 14.0.178 alpha 2020-11-10
+
+* fix(developer): Remove IE dependency from Developer Setup (#3839)
+
+## 14.0.177 alpha 2020-11-07
+
+* fix(developer): support for notany() and context() (#3816)
+* fix(web): support for notany() and context() (#3817)
+* fix(developer): debug window inherits editor font (#3829)
+
+## 14.0.176 alpha 2020-11-05
+
+* fix(developer): remove obsolete NRSIAllTags (#3819)
+* fix(developer): Incorrect script:language map (#3818)
+* fix(android/app): Remove network check on "Get Started" menu (#3823)
+
+## 14.0.175 alpha 2020-11-04
+
+* feat(android/engine): Add check for associated model on ModelPickerActivity (#3808)
+
+## 14.0.174 alpha 2020-11-03
+
+* chore(common): improve build README.md (#3812)
+
+## 14.0.173 alpha 2020-10-30
+
+* fix(windows): Cleanup setup.inf processing and CompareVersions function (#3790)
+* fix(windows): setup now allows choice of source (#3794)
+* fix(windows): show bootstrap progress in setup (#3792)
+* fix(windows): cleanup setup action list (#3793)
+* chore(android/engine): Remove use of lexical-model catalog (#3803)
+* fix(windows): disabling/enabling a profile could have wrong association (#3799)
+* fix(windows): keyboard menu could get out of sync (#3800)
+* fix(windows): crash installing package with a race (#3805)
+* fix(windows): Handle failure on task creation (#3804)
+
+## 14.0.172 alpha 2020-10-29
+
+* fix(windows): Start Keyman on Demand - tasks (#3773)
+* fix(windows): remove msctf free from DllMain (#3779)
+* fix(windows): error reading kmp.inf in setup (#3781)
+* chore(web): Update keymanweb-osk.ttf to v. 2.100 (#3782)
+* fix(android/engine): Fix issues when re-installing lexical-models (#3731)
+
+## 14.0.171 alpha 2020-10-28
+
+* fix(android/browser): Fix slow input in embedded browser (WebViews) (#3768)
+* chore(common/models): fixes context tracking with accepted suggestions (#3767)
+* chore(windows): small cleanups (#3774)
+
+## 14.0.170 alpha 2020-10-27
+
+* fix(windows): Remove double refresh (#3754)
+* fix(windows): Keyman Configuration changes apply instantly (#3753)
+* fix(windows): Make help button work (#3760)
+* fix(windows): use new windows url for online update check (#3761)
+* fix(windows): Community button had wrong link (#3764)
+* fix(windows): Crash in Keep in Touch external link (#3763)
+* fix(windows): Fix multiple issues with UI locales (#3766)
+* fix(android/engine): Only get keyboard version for cloud/ (#3740)
+
+## 14.0.169 alpha 2020-10-26
+
+* feat(common/core/web): simplify corrective distribution (#3726)
+* fix(windows): restore Setup after minimize (#3739)
+* fix(windows): buffer overrun in debug function (#3745)
+* fix(windows): download error dialog could be blank (#3747)
+* feat: Keyman Settings Manager base classes (#2456)
+* feat(windows): kmconfig console app (#3732)
+* feat(windows): kmconfig GUI (in kmshell) (#3733)
+* feat(windows): Apps for Controlling Browser TSF integration (#3734)
+
+## 14.0.168 alpha 2020-10-24
+
+* chore(android): Update dependencies (#3738)
+
+## 14.0.167 alpha 2020-10-23
+
+* fix(android/browser): Improve how embedded browser handles input (#3722)
+
+## 14.0.166 alpha 2020-10-22
+
+* fix(web): disable U+25CC for diacritics (#3039)
+* refactor(common/models): Common tokenization and wordbreaking functions (#3706)
+* fix(windows): setup status showed only 'removing older versions' (#3735)
+* fix(windows): improve tsysinfo upload messages (#3727)
+* chore(windows): update msgping to Winsdk 10 (#3728)
+* fix(android/engine): Improve KMManager robustness (#3721)
+* feat(common/core/web): fat-finger ignores inputs that beep (#3701)
+
+## 14.0.165 alpha 2020-10-21
+
+* fix(web): K_SPACE handling for embedded mode, hardware keystrokes (#3707)
+
+## 14.0.164 alpha 2020-10-20
+
+* feat(common/models):  context tracking of accepted Suggestions (#3663)
+* feat(common/models): context reversion modeling (#3685)
+* fix(windows): RefreshKeyboards loses some profiles (#3714)
+* fix(windows): icons missing in Configuration (#3717)
+* fix(windows): tweak scrolling in keyboard menu (#3719)
+* fix(developer): crash creating basic project (#3716)
+
+## 14.0.163 alpha 2020-10-19
+
+* fix(web): Remove base key from popup keys (#3718)
+
 ## 14.0.162 alpha 2020-10-18
 
 * fix(web): Let embedded device handle K_TAB or K_ENTER (#3664)

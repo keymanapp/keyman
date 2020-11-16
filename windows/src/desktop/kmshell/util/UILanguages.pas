@@ -111,6 +111,8 @@ begin
     FLanguagesAvailableString := MsgFromId(SKDefaultLanguageCode)+#13#10+GetAvailableLanguages;
     FLanguages.Text := FLanguagesAvailableString;
 
+    // TODO: with 8 languages this takes about 1/8 second on a fast computer
+    // So as translations grow this may become a bottleneck when starting Keyman.
     for i := 0 to FLanguages.Count - 1 do
       FLanguages[i] := FLanguages[i] + '=' + MessageFromID(StringFromMsgId(SKUILanguageNameWithEnglish), FLanguages[i]);
   end;

@@ -55,6 +55,7 @@
         <DCC_K>false</DCC_K>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <SanitizedProjectName>SentryClientTest</SanitizedProjectName>
+        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;svnui;mbColorLibD10;dsnapcon;FireDACADSDriver;scFontCombo;DCPdelphi2009;FireDACMSAccDriver;fmxFireDAC;vclimg;Jcl;FireDAC;vcltouch;JvCore;vcldb;bindcompfmx;svn;FireDACSqliteDriver;FireDACPgDriver;inetdb;CEF4Delphi;soaprtl;DbxCommonDriver;fmx;FireDACIBDriver;fmxdae;xmlrtl;soapmidas;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;EmbeddedWebBrowser_XE;VCLRESTComponents;soapserver;dbxcds;VclSmp;JvDocking;adortl;JclVcl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;keyman_components;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -85,7 +86,6 @@
         <DCC_MapFile>3</DCC_MapFile>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>..\..\..\..\..\..\sentry-native\sentry-delphi-test\(None)</Manifest_File>
-        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -94,7 +94,6 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
         <DCC_MapFile>3</DCC_MapFile>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>..\..\..\..\..\..\sentry-native\sentry-delphi-test\(None)</Manifest_File>

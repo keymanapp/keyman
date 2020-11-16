@@ -136,10 +136,24 @@ declare interface LexicalModel {
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
 
   /**
-   * Tokenizes the current context state, returning an array of all resulting tokens.
-   * @param context 
+   * Punctuation and presentational settings that the underlying lexical model
+   * expects to be applied at higher levels. e.g., the ModelCompositor.
+   * 
+   * @see LexicalModelPunctuation
    */
-  tokenize(context: Context): USVString[];
+  readonly punctuation?: LexicalModelPunctuation;
+
+  /**
+   * Returns the wordbreaker function defined for the model (if it exists).  This 
+   * wordbreaker should operate on a plain JS `string`, fully tokenizing it into 
+   * separate words according to the syntactical rules of the modeled language.
+   * 
+   * Needed to support many of the enhancements in 14.0, as enhanced wordbreaking / 
+   * tokenization is necessary for properly tracking possible "fat finger" inputs 
+   * and intermediate calculations (increasing prediction quality) and preventing
+   * their misuse when starting new words.
+   */
+  wordbreaker?: WordBreakingFunction;
 
   /**
    * Performs a wordbreak operation given the current context state, returning whatever word
@@ -148,17 +162,23 @@ declare interface LexicalModel {
    * 
    * This function is designed for use in generating display text for 'keep' `Suggestions`
    * and display text for reverting any previously-applied `Suggestions`.
-   * @param context 
-   */
-  wordbreak(context: Context): USVString;
-
-  /**
-   * Punctuation and presentational settings that the underlying lexical model
-   * expects to be applied at higher levels. e.g., the ModelCompositor.
    * 
-   * @see LexicalModelPunctuation
+   * ------------------
+   * 
+   * **NOTE:  _Deprecated_** and replaced by `wordbreaker` in 14.0.  You may still wish 
+   * to implement this function by reusing your `wordbreaker` definition if the model 
+   * may see use on Keyman 12.0 or 13.0, generally by returning `wordbreaker(context.left)`.
+   * 
+   * As this function only tokenizes a single word from the context, it is insufficient for
+   * supporting many of the predictive-text enhancements introduced in Keyman 14.  Its
+   * intermediate calculations are tracked on a per-word basis and the increased detail
+   * provided by `wordbreaker` helps with stability, validating the engine's use of 
+   * the current context.
+   * 
+   * @param context 
+   * @deprecated
    */
-  readonly punctuation?: LexicalModelPunctuation;
+  wordbreak?(context: Context): USVString;
 
   /**
    * Lexical models _may_ provide a LexiconTraversal object usable to enhance 
@@ -215,6 +235,14 @@ declare interface Suggestion {
    * not handle this field.
    */
   transformId?: number;
+
+  /**
+   * A unique identifier for the Suggestion itself, not shared with any others -
+   * even for Suggestions sourced from the same Transform. 
+   * 
+   * The lm-layer is responsible for setting this field, not models.
+   */
+  id?: number;
 
   /**
    * The suggested update to the buffer. Note that this transform should

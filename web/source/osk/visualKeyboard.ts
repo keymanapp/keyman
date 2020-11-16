@@ -225,7 +225,13 @@ namespace com.keyman.osk {
       var width: number = OSKKey.getTextWidth(osk, keyText, styleSpec);
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
-        keyText = '\u25cc' + keyText;
+
+        // Disabled by mcdurdin 2020-10-19; dotted circle display is inconsistent on iOS/Safari
+        // at least and doesn't combine with diacritic marks. For consistent display, it may be
+        // necessary to build a custom font that does not depend on renderer choices for base 
+        // mark display -- e.g. create marks with custom base included, potentially even on PUA 
+        // code points and use those in rendering the OSK. See #3039 for more details.
+        // keyText = '\u25cc' + keyText;
 
         if(activeKeyboard && activeKeyboard.isRTL) {
           // Add the RTL marker to ensure it displays properly.
@@ -1509,10 +1515,7 @@ namespace com.keyman.osk {
       subKeys.id='kmw-popup-keys';
       this.popupBaseKey = e;
 
-      // Does the popup array include the base key?   *** condition for phone only ***
-      if(device.formFactor == 'phone') {
-        this.prependBaseKey(e);
-      }
+      // #3718: No longer prepend base key to popup array
 
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
@@ -1599,43 +1602,7 @@ namespace com.keyman.osk {
       }
     }
 
-    /**
-     * Prepend the base key to the touch-hold key array (for phones)
-     *
-     * @param {Object}  e   base key object
-     */
-    prependBaseKey(e: KeyElement) {
-      // This is a tag we set on the key element during its construction.
-      let subKeys: OSKKeySpec[] = e['subKeys'];
-      let keyman = com.keyman.singleton;
 
-      if(e && typeof(e.id) != 'undefined') {
-        //TODO: refactor this, it's pretty messy...
-        var i,
-          idx = e.id.split('-'),
-          baseId = e['keyId'],
-          layer = e['key'].spec['layer'],
-          sp = e['key'].spec['sp'],
-          nextlayer = e['key'].spec['nextlayer'];
-
-        if(typeof subKeys != 'undefined' && subKeys.length > 0 && (subKeys[0].id != baseId || subKeys[0].layer != layer)) {
-          var eCopy = new OSKKeySpec(baseId, '', undefined, sp, nextlayer);  // {'id':baseId,'layer':'','key':undefined};
-          if(layer != '') {
-            eCopy['layer'] = layer;
-          }
-
-          for(i = 0; i < e.childNodes.length; i++) {
-            if(keyman.util.hasClass(<HTMLElement> e.childNodes[i], 'kmw-key-text')) {
-              break;
-            }
-          }
-          if(i < e.childNodes.length) {
-            eCopy['text'] = e.childNodes[i].textContent;
-          }
-          subKeys.splice(0, 0, eCopy);
-        }
-      }
-    }
     //#endregion
 
     /**
@@ -1697,11 +1664,20 @@ namespace com.keyman.osk {
       var classes=key.className, cs = ' kmw-key-touched';
 
       // For phones, use key preview rather than highlighting the key,
-      // except for space, bksp, enter, shift and popup keys
-      var usePreview = ((this.keytip != null)
-        && (classes.indexOf('kmw-key-shift') < 0)
-        && (classes.indexOf('kmw-spacebar') < 0)
-        && (key.id.indexOf('popup') < 0 ));
+      var usePreview = ((this.keytip != null) && (key.id.indexOf('popup') < 0 ));
+
+      if(usePreview) {
+        // Previews are not permitted for keys using any of the following CSS styles.
+        var excludedClasses = ['kmw-key-shift',    // special keys
+                               'kmw-key-shift-on', // active special keys (shift, when in shift layer
+                               'kmw-spacebar',     // space
+                               'kmw-key-blank',    // Keys that are only used for layout control
+                               'kmw-key-hidden'];
+
+        for(let c=0; c < excludedClasses.length; c++) {
+          usePreview = usePreview && (classes.indexOf(excludedClasses[c]) < 0);
+        }
+      }
 
       if(usePreview) {
         this.showKeyTip(key,on);

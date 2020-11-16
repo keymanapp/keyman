@@ -13,14 +13,14 @@ build:
 
   cd $(ROOT)\src\global\wix
   $(MAKE) $(TARGET)
-  
+
 build-release:
   @rem
 
 clean:
   -del $(ROOT)\src\global\delphi\general\keymanversion_build.inc
   -del $(ROOT)\src\global\inc\keymanversion_build.h
-  
+
   cd $(ROOT)\src\global\delphi
   $(MAKE) clean
 
@@ -38,10 +38,13 @@ signcode:
 
 backup:
   @rem
-  
+
 test-manifest:
   @rem
-  
+
+wrap-symbols:
+  @rem
+
 install:
   cd $(ROOT)\src\global\delphi
   $(MAKE) install

@@ -84,7 +84,6 @@
         <DCC_UsePackage>vclie50;Vcl50;Inetdb50;Inet50;Vcldb50;Vclx50;Vclbde50;proide50;keyman_components;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DebugSourcePath>C:\keyman\7.0\src\keyman\kmshell\startup\;$(DebugSourcePath)</DebugSourcePath>
-        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
@@ -137,6 +136,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <Debugger_HostApplication>C:\Projects\keyman\open\windows\src\test\test-kmcomapi-win64\Win64\Debug\kmcomapi_win64_host.exe</Debugger_HostApplication>
         <Debugger_RunParams>-r:Keyman.Test.Console.KeymanAPIHost.TKeymanAPITest.Test_IKeymanPackageInstalled,Keyman.Test.Console.KeymanAPIHost.TKeymanAPITest.Test_IKeymanPackageFile</Debugger_RunParams>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -287,7 +287,6 @@
         <DCCReference Include="com\keyboardlanguages\keymankeyboardlanguagefile.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilicon.pas"/>
         <DCCReference Include="processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas"/>

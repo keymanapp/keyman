@@ -136,6 +136,11 @@ begin
       Request.UrlPath := API_Path_SubmitDiag;
 
       Upload;
+      if Response.StatusCode <> 200 then
+      begin
+        ShowMessage('The report was not successfully sent. An error was returned: '+IntToStr(Response.StatusCode));
+        Exit;
+      end;
       s := Trim(string(Response.MessageBodyAsString));
       if Copy(s,1,7) = '<error>' then
       begin
