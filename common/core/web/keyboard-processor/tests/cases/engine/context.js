@@ -5,6 +5,27 @@ let vm = require('vm');
 let KeyboardProcessor = require('../../../dist');
 let KMWRecorder = require('../../../../tools/recorder/dist/nodeProctor');
 
+/* 
+ * ABOUT THIS TEST SUITE
+ * ---------------------
+ * 
+ * This suite contains two types of tests, both designed to test all possible variations
+ * of behaviors that `KeyboardInterface.fullContextMatch` may be expected to handle.
+ * 
+ * Type 1:  White-box tests for validity of the generated context-cache
+ * - uses only the `baseSequence` of each test spec definition; does not
+ *   use any `fullMatchDefs` entries.
+ * - uses the specified `contextCache` entry of each test spec in assertions
+ * - CTRL+F `Tests "stage 1" of fullContextMatch` for more details.
+ * 
+ * Type 2:  Black-box rule-matching tests
+ * - uses both `baseSequence` and `fullMatchDefs` entries of a test spec
+ * - tests that each simulation sequence's output either passes or fails against
+ *   the specified rule, asserting against the specified `result` value.
+ *   - Currently, `result` is always `true` for each spec's `baseSequence`.
+ *     It should be a removable limitation, though.
+ */
+
 // Required initialization setup.
 global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 
@@ -878,7 +899,7 @@ var NOTANY_NUL_TEST_2 = {
   ]},
   fullMatchDefs: [{
     sequence: { "output": "a", "inputs": [
-      {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+      {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
       {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
     ]},
     result: false,
