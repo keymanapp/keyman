@@ -66,6 +66,11 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
 /*
  *  Start definition of isolated rule tests for validity of `fullContextMatch` (KFCM) components.
  */
+
+ /* Keyman language equivalent:
+ *
+ * dk(1) > 'success'
+ */
 var DEADKEY_TEST_1 = {
   id: 1,
   // Match condition for rule
@@ -104,6 +109,10 @@ var DEADKEY_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * 'a' dk(0) dk(1) 'b' > 'success'
+ */
 var DEADKEY_TEST_2 = {
   id: 2,
   // Match condition for rule
@@ -172,6 +181,10 @@ var DEADKEY_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * dk(0) 'a' dk(0) dk(0) 'b' > 'success'
+ */
 var DEADKEY_TEST_3 = {
   id: 3,
   // Match condition for rule
@@ -261,6 +274,10 @@ var DEADKEY_TEST_3 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * 'a' dk(0) dk(0) 'b' dk(0) > 'success'
+ */
 var DEADKEY_TEST_4 = {
   id: 4,
   // Match condition for rule
@@ -283,6 +300,10 @@ var DEADKEY_TEST_4 = {
   // No specialized fullMatchDefs here, as any appended deadkeys are automatically 'in context' for rules.
 };
 
+/* Keyman language equivalent:
+ *
+ * 'a' 'b' 'b' 'a' > 'success'
+ */
 var DEADKEY_TEST_5 = {
   id: 5,
   // Match condition for rule
@@ -303,6 +324,10 @@ var DEADKEY_TEST_5 = {
   ]}
 };
 
+/* Keyman language equivalent:
+ *
+ * dk(1) dk(2) dk(0) dk(1) dk(2) > 'success'
+ */
 var DEADKEY_TEST_6 = {
   id: 6,
   // Match condition for rule
@@ -324,6 +349,10 @@ var DEADKEY_TEST_6 = {
   ]}
 };
 
+/* Keyman language equivalent:
+ *
+ * 'c' 'a' 'b' context(3) context(2) > 'success'
+ */
 var ANY_CONTEXT_TEST_1 = {
   id: 1,
   // Match condition for rule
@@ -364,6 +393,11 @@ var ANY_CONTEXT_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(bc) 'bc'
+ * 'c' 'a' any(bc) context(3) 'a' > 'success'
+ */
 var ANY_CONTEXT_TEST_2 = {
   id: 2,
   // Match condition for rule
@@ -404,6 +438,13 @@ var ANY_CONTEXT_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(ac) 'ac'
+ * store(bc) 'bc'
+ * 
+ * 'c' any(ac) any(bc) context(3) context(2) > 'success'
+ */
 var ANY_CONTEXT_TEST_3 = {
   id: 3,
   // Match condition for rule
@@ -454,6 +495,13 @@ var ANY_CONTEXT_TEST_3 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(ab) 'ab'
+ * store(bc) 'bc'
+ * 
+ * 'c' any(ab) index(bc, 2) 'a' > 'success'
+ */
 var ANY_INDEX_TEST_1 = {
   id: 1,
   // Match condition for rule
@@ -494,6 +542,13 @@ var ANY_INDEX_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(ab) 'ab'
+ * store(bc) 'bc'
+ * 
+ * 'c' any(ab) index(bc, 2) index(bc, 2) index(ab, 2) > 'success'
+ */
 var ANY_INDEX_TEST_2 = {
   id: 2,
   // Match condition for rule
@@ -534,6 +589,13 @@ var ANY_INDEX_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(ab) 'ab'
+ * store(bc) 'bc'
+ * 
+ * 'c' any(ab) any(bc) index(bc, 3) index(ab, 2) > 'success'
+ */
 var ANY_INDEX_TEST_3 = {
   id: 3,
   // Match condition for rule
@@ -594,6 +656,11 @@ var ANY_INDEX_TEST_3 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) dk(1) dk(2)
+ * any(match) > 'success'
+ */
 var DEADKEY_STORE_TEST_1 = {
   id: 1,
   // Match condition for rule
@@ -622,6 +689,11 @@ var DEADKEY_STORE_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) 'b' dk(2)
+ * any(match) > 'success'
+ */
 var DEADKEY_STORE_TEST_2 = {
   id: 2,
   // Match condition for rule
@@ -650,6 +722,13 @@ var DEADKEY_STORE_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) dk(1) dk(2)
+ * store(abc) 'abc'
+ * 
+ * any(match) index(abc, 1) > 'success'
+ */
 var DEADKEY_STORE_TEST_3 = {
   id: 3,
   // Match condition for rule
@@ -704,6 +783,11 @@ var DEADKEY_STORE_TEST_3 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) dk(1) dk(2)
+ * any(match) context(1) > 'success'
+ */
 var DEADKEY_STORE_TEST_4 = {
   id: 4,
   // Match condition for rule
@@ -736,8 +820,13 @@ var DEADKEY_STORE_TEST_4 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) 'abc'
+ * notany(match) any(match) > 'success'
+ */
 var NOTANY_NUL_TEST_1 = {
-  id: 4,
+  id: 1,
   // Match condition for rule
   rule: [{t: 'a', a:['a','b','c'], n: 1},{t:'a',a:['a', 'b', 'c']}],
   // Start of context relative to cursor
@@ -766,8 +855,15 @@ var NOTANY_NUL_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) dk(1) dk(2)
+ * store(abc) 'abc'
+ * 
+ * notany(match) any(abc) > 'success'
+ */
 var NOTANY_NUL_TEST_2 = {
-  id: 4,
+  id: 2,
   // Match condition for rule
   rule: [{t: 'a', a:[{d:0},{d:1},{d:2}], n: 1},{t:'a',a:['a', 'b', 'c']}],
   // Start of context relative to cursor
@@ -796,8 +892,15 @@ var NOTANY_NUL_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(first) dk(0) 'b' dk(2)
+ * store(second) 'a' dk(1) 'c'
+ * 
+ * notany(first) any(second) > 'success'
+ */
 var NOTANY_NUL_TEST_3 = {
-  id: 4,
+  id: 3,
   // Match condition for rule
   rule: [{t: 'a', a:[{d:0},'b',{d:2}], n: 1},{t:'a',a:['a', 'b', 'c']}],
   // Start of context relative to cursor
