@@ -464,7 +464,9 @@ namespace com.keyman.text {
                   // It's a deadkey match, so indicate that.
                   deadContext[i].set();
                 }
-                // 'n' for 'notany'.  If we actually match or if we have nul context (\uFFFE), notany fails.
+                // 'n' for 'notany'.
+                // - if `result === true`, `any` would match:  this should thus fail.
+                // - if `context[i] === NUL_CONTEXT`, `notany` should not match.
               } else if(r.n && (result || context[i] === NUL_CONTEXT)) {
                 mismatch = true;
               }
