@@ -107,6 +107,11 @@ heat-model-compiler:
     del kmlmc.tgz
     del kmlmc.tar
 
+    # Reverts the package's package.json to its original version; npm pack sometimes modifies 
+    # the local file, breaking a later-occurring KMW build.
+    git restore package.json
+    git restore package-lock.json
+
     # Step 2 - the model compiler has one in-repo dependency that will also need to be packed.
     # Managing other in-repo dependencies will be simpler; they install into ModelCompiler's
     # extracted bundle.
