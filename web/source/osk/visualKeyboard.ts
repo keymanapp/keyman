@@ -543,10 +543,12 @@ namespace com.keyman.osk {
       '*LCtrlShift*':     0x69,
       '*RCtrlShift*':     0x70,
       '*RtlEnter*':       0x71,
-      '*RtlBkSp*':         0x72,
-      '*ShiftLock*':       0x73,
-      '*ShiftedLock*':     0x74,
-      '*ZWNJ*':           0x75, // for iOS version, 0x76 for Android version.
+      '*RtlBkSp*':        0x72,
+      '*ShiftLock*':      0x73,
+      '*ShiftedLock*':    0x74,
+      '*ZWNJ*':           0x75, // If this one is specified, auto-detection will kick in.
+      '*ZWNJiOS*':        0x75, // The iOS version will be used by default, but the
+      '*ZWNJAndroid*':    0x76, // Android platform has its own default glyph.
     };
 
     /**
