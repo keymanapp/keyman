@@ -194,24 +194,19 @@ namespace com.keyman.osk {
         }
       } else {
         keyText=spec['text'];
+
+        // Unique layer-based transformation:  SHIFT-TAB uses a different glyph.
+        if(keyText == '*Tab*' && this.layer == 'shift') {
+          keyText = '*TabLeft*';
+        }
       }
 
       t.className='kmw-key-text';
 
-      // Use special case lookup for modifier keys
-      if(spec['sp'] == '1' || spec['sp'] == '2') {
-        // Unique layer-based transformation.
-        var tId=((spec['text'] == '*Tab*' && this.layer == 'shift') ? '*TabLeft*' : spec['text']);
-
-        // Transforms our *___* special key codes into their corresponding PUA character codes for keyboard display.
-        keyText=this.renameSpecialKey(tId);
-      }
-
-      // Some special key codes may be used on standard keys, not just on marked 'special keys'.
-      if(spec['text'] == '*ZWNJ*') {
-        keyText = this.renameSpecialKey(spec['text']);
-        // The special OSK font is not normally used for non-special keys.
-        // We'll need a font override here.
+      let specialText = this.renameSpecialKey(keyText);
+      if(specialText != keyText) {
+        // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
+        keyText = specialText;
         spec['font'] = "SpecialOSK";
       }
 
