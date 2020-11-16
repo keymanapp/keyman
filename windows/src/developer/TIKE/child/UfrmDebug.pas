@@ -1171,8 +1171,7 @@ begin
   if FFont = nil then
   begin
     FDefaultFont := True;
-    //TODO:FFont := EditorMemo.AltFont;
-    FFont := Font;  //TODO scrap this
+    FFont := EditorMemo.CharFont;
   end
   else
     FDefaultFont := False;

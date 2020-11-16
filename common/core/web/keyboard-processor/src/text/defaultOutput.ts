@@ -48,7 +48,7 @@ namespace com.keyman.text {
         //   case Codes.keyCodes['K_TABFWD']:
         //     return '\t';
           default:
-           return '';
+           return null;
         }
       }
     }

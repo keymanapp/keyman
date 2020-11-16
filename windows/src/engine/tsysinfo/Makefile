@@ -17,8 +17,8 @@ build: version.res manifest.res dirs
     del tsysinfox64.bin
 
     $(DCC32) tsysinfo.dpr
-    $(TDS2DBG) tsysinfo.exe
     $(SENTRYTOOL_DELPHIPREP) tsysinfo.exe -dpr tsysinfo.dpr
+    $(TDS2DBG) tsysinfo.exe
     $(COPY) tsysinfo.exe $(PROGRAM)\engine
     if exist tsysinfo.dbg $(COPY) tsysinfo.dbg $(DEBUGPATH)\engine
 
@@ -27,6 +27,10 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Engine Diagnostics" $(PROGRAM)\engine\tsysinfo.exe
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\engine\tsysinfo.exe /t keyman-engine-windows
+    $(SYMSTORE) $(DEBUGPATH)\engine\tsysinfo.dbg /t keyman-engine-windows
 
 backup:
     $(WZZIP) $(BUILD)\engine\tsysinfo.zip  $(BACKUPDEFAULTS) tsysinfo.exe

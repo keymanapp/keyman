@@ -4,7 +4,7 @@
 
 !include ..\..\Defines.mak
 
-build: 
+build:
 	mc -U keymanmc.mc
 	rc keymanmc.rc
 	link -dll -noentry keymanmc.res
@@ -19,6 +19,9 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\keymanmc.dll
+
+wrap-symbols:
+		rem no symbols
 
 backup:
     $(WZZIP) $(BUILD)\engine\keymanmc.zip  $(BACKUPDEFAULTS) keymanmc.dll
