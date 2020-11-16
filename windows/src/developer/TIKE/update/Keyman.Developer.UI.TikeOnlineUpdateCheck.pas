@@ -96,6 +96,7 @@ uses
   KLog,
   ErrorControlledRegistry,
   Keyman.System.UpdateCheckResponse,
+  KeymanVersion,
   RegistryKeys,
   ShellApi,
   Upload_Settings,
@@ -338,7 +339,12 @@ begin
   try
     with THTTPUploader.Create(nil) do
     try
-      Fields.Add('Version', ansistring(FCurrentVersion));
+      Fields.Add('version', ansistring(CKeymanVersionInfo.Version));
+      Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
+      if FForce
+        then Fields.Add('manual', '1')
+        else Fields.Add('manual', '0');
+
       Proxy.Server := FProxyServer;
       Proxy.Port := FProxyPort;
       Proxy.Username := FProxyUsername;
