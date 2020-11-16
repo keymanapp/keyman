@@ -1305,6 +1305,10 @@ namespace com.keyman.dom {
           this.focusLastActiveElement();
         }
       }
+
+      // Test code: intentional error
+      throw Error();
+
     }
 
     /** Sets the active input element only if it is presently null.

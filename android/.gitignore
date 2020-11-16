@@ -36,6 +36,7 @@ KMEA/**/assets/keymanandroid.js
 KMEA/**/assets/keyman.js.map
 KMEA/**/assets/keyman-sentry.js
 KMEA/**/assets/kmwosk.css
+KMEA/**/assets/resources
 
 # keymanweb OSK font
 KMEA/**/assets/keymanweb-osk.*
