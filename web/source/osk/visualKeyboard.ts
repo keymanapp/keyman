@@ -161,23 +161,19 @@ namespace com.keyman.osk {
     protected renameSpecialKey(oldText: string): string {
       let keyman = (<KeymanBase>window['keyman'])
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-      if(oldText != "*ZWNJ*") {
-        return VisualKeyboard.specialCharacters[oldText] ?
-          String.fromCharCode(0XE000 + VisualKeyboard.specialCharacters[oldText]) :
-          oldText;
-      } else {
-        // Examine platform; choose appropriate symbol.
-        let coreSpec = keyman.util.device.coreSpec;
-        let zeroWidthPUA = 0XE000 + VisualKeyboard.specialCharacters[oldText];
-
+      if(oldText == "*ZWNJ*") {
         // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
         // possible / available though, and there's a different standard symbol on Android.
-        if(coreSpec.OS == com.keyman.utils.OperatingSystem.Android) {
-          zeroWidthPUA += 1; // Use the Android version.
-        } 
-
-        return String.fromCharCode(zeroWidthPUA);
+        oldText = keyman.util.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+          "*ZWNJAndroid*" :
+          "*ZWNJiOS*";
       }
+     
+      let zeroWidthPUA = 0XE000 + VisualKeyboard.specialCharacters[oldText];
+        
+      return VisualKeyboard.specialCharacters[oldText] ?
+        String.fromCharCode(0XE000 + VisualKeyboard.specialCharacters[oldText]) :
+        oldText;
     }
 
     // Produces a HTMLSpanElement with the key's actual text.
