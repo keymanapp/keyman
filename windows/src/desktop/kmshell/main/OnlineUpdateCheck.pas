@@ -544,6 +544,10 @@ begin
       ShowUI := not FSilent;
       Fields.Add('version', ansistring(CKeymanVersionInfo.Version));
       Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
+      if FForce
+        then Fields.Add('manual', '1')
+        else Fields.Add('manual', '0');
+
       for i := 0 to kmcom.Packages.Count - 1 do
       begin
         pkg := kmcom.Packages[i];
