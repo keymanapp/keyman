@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.182 alpha 2020-11-16
+
+* fix(web/engine): blocks key previews for blank/hidden keys (#3857)
+* fix(common/core/web): Fixes engine-level context tests, adds notany cases (#3860)
+
 ## 14.0.181 alpha 2020-11-13
 
 * fix(common/core/web): fixes no-output logic check, arrow keys (#3848)
