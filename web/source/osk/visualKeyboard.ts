@@ -169,10 +169,10 @@ namespace com.keyman.osk {
           "*ZWNJiOS*";
       }
      
-      let zeroWidthPUA = 0XE000 + VisualKeyboard.specialCharacters[oldText];
+      let specialCodePUA = 0XE000 + VisualKeyboard.specialCharacters[oldText];
         
       return VisualKeyboard.specialCharacters[oldText] ?
-        String.fromCharCode(0XE000 + VisualKeyboard.specialCharacters[oldText]) :
+        String.fromCharCode(specialCodePUA) :
         oldText;
     }
 
