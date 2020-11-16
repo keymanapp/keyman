@@ -5,8 +5,8 @@
 package com.tavultesoft.kmea.util;
 
 import android.util.Log;
-import io.sentry.core.Sentry;
-import io.sentry.core.SentryLevel;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 
 public final class KMLog {
   private static final String TAG = "KMLog";

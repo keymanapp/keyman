@@ -53,9 +53,9 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.sentry.core.Breadcrumb;
-import io.sentry.core.Sentry;
-import io.sentry.core.SentryLevel;
+import io.sentry.Breadcrumb;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 
 final class KMKeyboard extends WebView {
   private static final String TAG = "KMKeyboard";

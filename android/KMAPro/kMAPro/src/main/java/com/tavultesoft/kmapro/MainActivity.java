@@ -91,7 +91,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import io.sentry.android.core.SentryAndroid;
-import io.sentry.core.Sentry;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
