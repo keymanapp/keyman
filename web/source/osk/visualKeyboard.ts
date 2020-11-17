@@ -161,8 +161,18 @@ namespace com.keyman.osk {
     protected renameSpecialKey(oldText: string): string {
       let keyman = (<KeymanBase>window['keyman'])
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
+      if(oldText == "*ZWNJ*") {
+        // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
+        // possible / available though, and there's a different standard symbol on Android.
+        oldText = keyman.util.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+          "*ZWNJAndroid*" :
+          "*ZWNJiOS*";
+      }
+     
+      let specialCodePUA = 0XE000 + VisualKeyboard.specialCharacters[oldText];
+        
       return VisualKeyboard.specialCharacters[oldText] ?
-        String.fromCharCode(0XE000 + VisualKeyboard.specialCharacters[oldText]) :
+        String.fromCharCode(specialCodePUA) :
         oldText;
     }
 
@@ -184,17 +194,20 @@ namespace com.keyman.osk {
         }
       } else {
         keyText=spec['text'];
+
+        // Unique layer-based transformation:  SHIFT-TAB uses a different glyph.
+        if(keyText == '*Tab*' && this.layer == 'shift') {
+          keyText = '*TabLeft*';
+        }
       }
 
       t.className='kmw-key-text';
 
-      // Use special case lookup for modifier keys
-      if(spec['sp'] == '1' || spec['sp'] == '2') {
-        // Unique layer-based transformation.
-        var tId=((spec['text'] == '*Tab*' && this.layer == 'shift') ? '*TabLeft*' : spec['text']);
-
-        // Transforms our *___* special key codes into their corresponding PUA character codes for keyboard display.
-        keyText=this.renameSpecialKey(tId);
+      let specialText = this.renameSpecialKey(keyText);
+      if(specialText != keyText) {
+        // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
+        keyText = specialText;
+        spec['font'] = "SpecialOSK";
       }
 
       // Grab our default for the key's font and font size.
@@ -523,7 +536,14 @@ namespace com.keyman.osk {
       '*LAltShift*':      0x67,
       '*RAltShift*':      0x68,
       '*LCtrlShift*':     0x69,
-      '*RCtrlShift*':     0x70
+      '*RCtrlShift*':     0x70,
+      '*RTLEnter*':       0x71,
+      '*RTLBkSp*':        0x72,
+      '*ShiftLock*':      0x73,
+      '*ShiftedLock*':    0x74,
+      '*ZWNJ*':           0x75, // If this one is specified, auto-detection will kick in.
+      '*ZWNJiOS*':        0x75, // The iOS version will be used by default, but the
+      '*ZWNJAndroid*':    0x76, // Android platform has its own default glyph.
     };
 
     /**
