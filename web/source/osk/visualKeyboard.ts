@@ -537,8 +537,8 @@ namespace com.keyman.osk {
       '*RAltShift*':      0x68,
       '*LCtrlShift*':     0x69,
       '*RCtrlShift*':     0x70,
-      '*RtlEnter*':       0x71,
-      '*RtlBkSp*':        0x72,
+      '*RTLEnter*':       0x71,
+      '*RTLBkSp*':        0x72,
       '*ShiftLock*':      0x73,
       '*ShiftedLock*':    0x74,
       '*ZWNJ*':           0x75, // If this one is specified, auto-detection will kick in.
