@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.183 alpha 2020-11-17
+
+* feat(windows): major version upgrades (#3866)
+* feat(developer): support major version upgrades (#3868)
+* Delphi version requirement note (#3871)
+* feat(web/engine): updates osk font, adds layout codes for new glyphs (#3851)
+* fix(common/core/web): meta key handling (#3847)
+* feat(common/core/web): input processor unit tests (#3836)
+
 ## 14.0.182 alpha 2020-11-16
 
 * fix(web/engine): blocks key previews for blank/hidden keys (#3857)
