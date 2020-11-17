@@ -9,14 +9,19 @@ namespace com.keyman.text {
       "SHIFT":0x0010,
       "CTRL":0x0020,
       "ALT":0x0040,
-      "META":0x0080, // Represents command keys, which some OSes use for shortcuts we don't want to block.
+      // TENTATIVE:  Represents command keys, which some OSes use for shortcuts we don't
+      // want to block.  No rule will ever target a modifier set with this bit set to 1. 
+      "META":0x0080,
       "CAPS":0x0100,
       "NO_CAPS":0x0200,
       "NUM_LOCK":0x0400,
       "NO_NUM_LOCK":0x0800,
       "SCROLL_LOCK":0x1000,
       "NO_SCROLL_LOCK":0x2000,
-      "VIRTUAL_KEY":0x4000
+      "VIRTUAL_KEY":0x4000,
+      // Reserved:  is VIRTUALCHARKEY on Windows.  All our platforms use the same
+      // code definitions.
+      "VIRTUAL_CHAR_KEY":0x8000
     },
 
     modifierBitmasks: {
