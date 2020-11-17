@@ -49,6 +49,7 @@ begin
     http.Fields.Add('version', AnsiString(currentVersion));
     http.Fields.Add('tier', AnsiString(AInstallInfo.Tier));
     http.Fields.Add('update', '0'); // This is probably a fresh install of a package, not an update
+    http.Fields.Add('manual', '1'); // Treat this as a manual update so the staggered rollout doesn't apply
     for pack in AInstallInfo.Packages do
       http.Fields.Add(AnsiString('package_'+pack.ID), AnsiString(pack.Locations.LatestVersion));
 
