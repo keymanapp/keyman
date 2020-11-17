@@ -2,10 +2,12 @@
 
 ## Mac Tools Requirements/Setup
 
-* Install Xcode 11.3.1 or later (it might also work to use an older version)
-* Install [Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) *see Homebrew note below*
-* Install cocoapods (`sudo gem install cocoapods`) if not already installed.
-* Install coreutils (`brew install coreutils`)
+* Install [Homebrew] *technically optional, but highly recommended*
+* Install Xcode 11.3.1 or later *it might also work to use an older version*
+* Accept the Xcode license `sudo xcodebuild -license accept`
+* Install [Carthage] (`brew install carthage`) *see Homebrew note below*
+* Install [cocoapods] (`brew install cocoapods`)
+* Install [coreutils] (`brew install coreutils`)
 
 ## Keyman for macOS Development
 
@@ -71,8 +73,7 @@ Note: If Carthage prompts you to allow it access to your github credentials, it'
 
 1. Deploy Keyman locally using `./build.sh -deploy local -deploy-only`.
     * This will notarize the app, signing with your local credentials if not already signed, and copy **keyman/mac/Keyman4MacIM/build/Debug/Keyman.app** to **~/Library/Input Methods**
-2. If running for the first time, follow the installation instructions at
-[Install Keyman for macOS](https://help.keyman.com/products/mac/current-version/start/install-keyman).
+2. If running for the first time, follow the installation instructions at [Install Keyman for macOS].
 
 You can also use `./build.sh -no-codesign -deploy local` to do a single-step build, notarize,
 and deploy (see above for faster options).
@@ -108,3 +109,10 @@ If you get this error from xcodebuild:
 Then run this command to fix the build environment:
 
 `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer`
+
+
+[Homebrew]: https://brew.sh/
+[Carthage]: https://github.com/Carthage/Carthage/blob/master/README.md
+[cocoapods]: https://cocoapods.org/
+[coreutils]: https://www.gnu.org/software/coreutils/
+[Install Keyman for macOS]: https://help.keyman.com/products/mac/current-version/start/install-keyman
