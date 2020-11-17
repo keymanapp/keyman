@@ -57,6 +57,7 @@
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
         <SanitizedProjectName>unloadkeyboards</SanitizedProjectName>
+        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>IndyCore160;vcldbx;frx16;TeeDB;IndyProtocols160;EmbeddedWebBrowser_XE;tb2k_d12;vclib;inetdbbde;Tee;Rave100VCL;svnui;ibxpress;vclimg;DCPdelphi2009;frxDB16;intrawebdb_120_160;fmi;mbColorLibD10;fs16;vclactnband;FMXTee;vcldb;TeeUI;bindcompvcl;vcldsnap;vclie;vcltouch;Intraweb_120_160;websnap;vclribbon;VclSmp;frxe16;fsDB16;vcl;PBFolderDialogPackRun;CloudService;CodeSiteExpressPkg;IndySystem160;FmxTeeUI;dsnapcon;vclx;VCLZipD2009_4;webdsnap;svn;keyman_components;bdertl;SpTBXLib_d16;adortl;$(DCC_UsePackage)</DCC_UsePackage>
@@ -90,7 +91,6 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <BT_BuildType>Debug</BT_BuildType>
-        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>

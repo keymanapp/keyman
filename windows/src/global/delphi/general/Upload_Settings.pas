@@ -32,7 +32,7 @@ uses
 const
   // https://api.keyman.com/ - programmatic endpoints
   API_Path_UpdateCheck_Windows = '/windows/14.0/update'; // version will only update when the api changes
-  API_Path_UpdateCheck_Developer = '/developer/'+SKeymanVersion+'/update';
+  API_Path_UpdateCheck_Developer = '/developer/14.0/update'; // version will only update when the api changes
   
   // TODO: use /windows/ instead of /desktop/
   API_Path_SubmitDiag = '/desktop/13.0/submitdiag'; // version will only update when the api changes

@@ -66,6 +66,7 @@
         <DCC_UsePackage>RESTComponents;FireDAC;FireDACSqliteDriver;soaprtl;FireDACIBDriver;soapmidas;FireDACCommon;RESTBackendComponents;soapserver;CloudService;FireDACCommonDriver;inet;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <SanitizedProjectName>oskbulkrenderer</SanitizedProjectName>
+        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
         <Base_Android>true</Base_Android>
@@ -118,7 +119,6 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <Debugger_RunParams>-f -x .kvks .</Debugger_RunParams>
         <Debugger_CWD>c:\temp\x\kbdus\source</Debugger_CWD>
-        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>(None)</Manifest_File>
         <DCC_MapFile>3</DCC_MapFile>
@@ -130,7 +130,6 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>(None)</Manifest_File>
         <DCC_MapFile>3</DCC_MapFile>

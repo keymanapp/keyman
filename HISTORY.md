@@ -1,5 +1,30 @@
 # Keyman Version History
 
+## 14.0.182 alpha 2020-11-16
+
+* fix(web/engine): blocks key previews for blank/hidden keys (#3857)
+* fix(common/core/web): Fixes engine-level context tests, adds notany cases (#3860)
+
+## 14.0.181 alpha 2020-11-13
+
+* fix(common/core/web): fixes no-output logic check, arrow keys (#3848)
+* fix(common/core/web): adds missing null-check (#3859)
+
+## 14.0.180 alpha 2020-11-12
+
+* fix(windows): makefile format error (#3854)
+
+## 14.0.179 alpha 2020-11-12
+
+* fix(windows): Import OSK wrong for European layouts (#3830)
+* fix(windows): SizeOfImage header was wrong for dbg (#3833)
+* chore(windows): symbol server support (#3834)
+* fix(windows): sporadic 8087 control word corruption (#3842)
+
+## 14.0.178 alpha 2020-11-10
+
+* fix(developer): Remove IE dependency from Developer Setup (#3839)
+
 ## 14.0.177 alpha 2020-11-07
 
 * fix(developer): support for notany() and context() (#3816)

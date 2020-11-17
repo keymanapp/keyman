@@ -240,7 +240,6 @@ public final class KMManager {
   protected static final String KMFilename_JSEngine_Sourcemap = "keyman.js.map";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
-  protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
@@ -575,7 +574,6 @@ public final class KMManager {
       }
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
-      copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);

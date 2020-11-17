@@ -58,6 +58,7 @@
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
         <SanitizedProjectName>kmconfig</SanitizedProjectName>
+        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;svnui;mbColorLibD10;dsnapcon;FireDACADSDriver;scFontCombo;DCPdelphi2009;FireDACMSAccDriver;fmxFireDAC;vclimg;Jcl;FireDAC;vcltouch;JvCore;vcldb;bindcompfmx;svn;FireDACSqliteDriver;FireDACPgDriver;inetdb;CEF4Delphi;soaprtl;DbxCommonDriver;fmx;FireDACIBDriver;fmxdae;xmlrtl;soapmidas;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;EmbeddedWebBrowser_XE;VCLRESTComponents;soapserver;dbxcds;VclSmp;JvDocking;adortl;JclVcl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;keyman_components;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -87,7 +88,6 @@
         <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
         <DCC_MapFile>3</DCC_MapFile>
         <Debugger_RunParams>reset engine.compatibility.text_services_framework.notepad.exe 0</Debugger_RunParams>
-        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
         <DCC_Description>Keyman Config</DCC_Description>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -107,7 +107,6 @@
         <DCC_Description>Keyman Config</DCC_Description>
         <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
-        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

@@ -5,6 +5,27 @@ let vm = require('vm');
 let KeyboardProcessor = require('../../../dist');
 let KMWRecorder = require('../../../../tools/recorder/dist/nodeProctor');
 
+/* 
+ * ABOUT THIS TEST SUITE
+ * ---------------------
+ * 
+ * This suite contains two types of tests, both designed to test all possible variations
+ * of behaviors that `KeyboardInterface.fullContextMatch` may be expected to handle.
+ * 
+ * Type 1:  White-box tests for validity of the generated context-cache
+ * - uses only the `baseSequence` of each test spec definition; does not
+ *   use any `fullMatchDefs` entries.
+ * - uses the specified `contextCache` entry of each test spec in assertions
+ * - CTRL+F `Tests "stage 1" of fullContextMatch` for more details.
+ * 
+ * Type 2:  Black-box rule-matching tests
+ * - uses both `baseSequence` and `fullMatchDefs` entries of a test spec
+ * - tests that each simulation sequence's output either passes or fails against
+ *   the specified rule, asserting against the specified `result` value.
+ *   - Currently, `result` is always `true` for each spec's `baseSequence`.
+ *     It should be a removable limitation, though.
+ */
+
 // Required initialization setup.
 global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 
@@ -66,6 +87,11 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
 /*
  *  Start definition of isolated rule tests for validity of `fullContextMatch` (KFCM) components.
  */
+
+ /* Keyman language equivalent:
+ *
+ * dk(1) > 'success'
+ */
 var DEADKEY_TEST_1 = {
   id: 1,
   // Match condition for rule
@@ -104,6 +130,10 @@ var DEADKEY_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * 'a' dk(0) dk(1) 'b' > 'success'
+ */
 var DEADKEY_TEST_2 = {
   id: 2,
   // Match condition for rule
@@ -172,6 +202,10 @@ var DEADKEY_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * dk(0) 'a' dk(0) dk(0) 'b' > 'success'
+ */
 var DEADKEY_TEST_3 = {
   id: 3,
   // Match condition for rule
@@ -261,6 +295,10 @@ var DEADKEY_TEST_3 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * 'a' dk(0) dk(0) 'b' dk(0) > 'success'
+ */
 var DEADKEY_TEST_4 = {
   id: 4,
   // Match condition for rule
@@ -283,6 +321,10 @@ var DEADKEY_TEST_4 = {
   // No specialized fullMatchDefs here, as any appended deadkeys are automatically 'in context' for rules.
 };
 
+/* Keyman language equivalent:
+ *
+ * 'a' 'b' 'b' 'a' > 'success'
+ */
 var DEADKEY_TEST_5 = {
   id: 5,
   // Match condition for rule
@@ -303,6 +345,10 @@ var DEADKEY_TEST_5 = {
   ]}
 };
 
+/* Keyman language equivalent:
+ *
+ * dk(1) dk(2) dk(0) dk(1) dk(2) > 'success'
+ */
 var DEADKEY_TEST_6 = {
   id: 6,
   // Match condition for rule
@@ -324,6 +370,10 @@ var DEADKEY_TEST_6 = {
   ]}
 };
 
+/* Keyman language equivalent:
+ *
+ * 'c' 'a' 'b' context(3) context(2) > 'success'
+ */
 var ANY_CONTEXT_TEST_1 = {
   id: 1,
   // Match condition for rule
@@ -364,6 +414,11 @@ var ANY_CONTEXT_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(bc) 'bc'
+ * 'c' 'a' any(bc) context(3) 'a' > 'success'
+ */
 var ANY_CONTEXT_TEST_2 = {
   id: 2,
   // Match condition for rule
@@ -404,6 +459,13 @@ var ANY_CONTEXT_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(ac) 'ac'
+ * store(bc) 'bc'
+ * 
+ * 'c' any(ac) any(bc) context(3) context(2) > 'success'
+ */
 var ANY_CONTEXT_TEST_3 = {
   id: 3,
   // Match condition for rule
@@ -454,6 +516,13 @@ var ANY_CONTEXT_TEST_3 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(ab) 'ab'
+ * store(bc) 'bc'
+ * 
+ * 'c' any(ab) index(bc, 2) 'a' > 'success'
+ */
 var ANY_INDEX_TEST_1 = {
   id: 1,
   // Match condition for rule
@@ -494,6 +563,13 @@ var ANY_INDEX_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(ab) 'ab'
+ * store(bc) 'bc'
+ * 
+ * 'c' any(ab) index(bc, 2) index(bc, 2) index(ab, 2) > 'success'
+ */
 var ANY_INDEX_TEST_2 = {
   id: 2,
   // Match condition for rule
@@ -534,6 +610,13 @@ var ANY_INDEX_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(ab) 'ab'
+ * store(bc) 'bc'
+ * 
+ * 'c' any(ab) any(bc) index(bc, 3) index(ab, 2) > 'success'
+ */
 var ANY_INDEX_TEST_3 = {
   id: 3,
   // Match condition for rule
@@ -594,6 +677,11 @@ var ANY_INDEX_TEST_3 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) dk(1) dk(2)
+ * any(match) > 'success'
+ */
 var DEADKEY_STORE_TEST_1 = {
   id: 1,
   // Match condition for rule
@@ -622,6 +710,11 @@ var DEADKEY_STORE_TEST_1 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) 'b' dk(2)
+ * any(match) > 'success'
+ */
 var DEADKEY_STORE_TEST_2 = {
   id: 2,
   // Match condition for rule
@@ -642,7 +735,7 @@ var DEADKEY_STORE_TEST_2 = {
     result: false,
     msg: "Rule 2: deadkey not in store mysteriously matched within an any(store) op."
   }, {
-    sequence: { "output": "", "inputs": [
+    sequence: { "output": "b", "inputs": [
       {"type":"key","keyCode":66,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true} //b
     ]},
     result: true,
@@ -650,6 +743,13 @@ var DEADKEY_STORE_TEST_2 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) dk(1) dk(2)
+ * store(abc) 'abc'
+ * 
+ * any(match) index(abc, 1) > 'success'
+ */
 var DEADKEY_STORE_TEST_3 = {
   id: 3,
   // Match condition for rule
@@ -665,7 +765,7 @@ var DEADKEY_STORE_TEST_3 = {
     {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
   ]},
   fullMatchDefs: [{
-    sequence: { "output": "b", "inputs": [
+    sequence: { "output": "a", "inputs": [
       {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //2
       {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
     ]},
@@ -679,7 +779,7 @@ var DEADKEY_STORE_TEST_3 = {
     result: true,
     msg: "Rule 3a: index in deadkey store not properly tracked by indexOutput."
   }, {
-    sequence: { "output": "b", "inputs": [
+    sequence: { "output": "a", "inputs": [
       {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //b
       {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //2
     ]},
@@ -704,6 +804,11 @@ var DEADKEY_STORE_TEST_3 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) dk(1) dk(2)
+ * any(match) context(1) > 'success'
+ */
 var DEADKEY_STORE_TEST_4 = {
   id: 4,
   // Match condition for rule
@@ -736,16 +841,141 @@ var DEADKEY_STORE_TEST_4 = {
   }]
 };
 
+/* Keyman language equivalent:
+ *
+ * store(match) 'abc'
+ * notany(match) any(match) > 'success'
+ */
+var NOTANY_NUL_TEST_1 = {
+  id: 1,
+  // Match condition for rule
+  rule: [{t: 'a', a:['a','b','c'], n: 1},{t:'a',a:['a', 'b', 'c']}],
+  // Start of context relative to cursor
+  n: 2,
+  ln: 2,
+  // Resulting context map
+  contextCache: [1, 'a'],
+
+  baseSequence: { "output": "a", "inputs": [
+    {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "aa", "inputs": [
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 1: did not fail notany on matched character"
+  }, {
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 1: did not fail notany on nul context"
+  }]
+};
+
+/* Keyman language equivalent:
+ *
+ * store(match) dk(0) dk(1) dk(2)
+ * store(abc) 'abc'
+ * 
+ * notany(match) any(abc) > 'success'
+ */
+var NOTANY_NUL_TEST_2 = {
+  id: 2,
+  // Match condition for rule
+  rule: [{t: 'a', a:[{d:0},{d:1},{d:2}], n: 1},{t:'a',a:['a', 'b', 'c']}],
+  // Start of context relative to cursor
+  n: 2,
+  ln: 2,
+  // Resulting context map
+  contextCache: ['a', 'a'],
+
+  baseSequence: { "output": "aa", "inputs": [
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 2: did not fail notany on matched deadkey"
+  }, {
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 2: did not fail notany on nul context"
+  }]
+};
+
+/* Keyman language equivalent:
+ *
+ * store(first) dk(0) 'b' dk(2)
+ * store(second) 'a' dk(1) 'c'
+ * 
+ * notany(first) any(second) > 'success'
+ */
+var NOTANY_NUL_TEST_3 = {
+  id: 3,
+  // Match condition for rule
+  rule: [{t: 'a', a:[{d:0},'b',{d:2}], n: 1},{t:'a',a:['a', 'b', 'c']}],
+  // Start of context relative to cursor
+  n: 2,
+  ln: 2,
+  // Resulting context map
+  contextCache: [1, 'a'],
+
+  baseSequence: { "output": "a", "inputs": [
+    {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":49,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //0
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 3: did not properly match a deadkey within a mixed notany store"
+  }, {
+    sequence: { "output": "ba", "inputs": [
+      {"type":"key","keyCode":66,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //b
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 3: did not properly match a character within a mixed notany store"
+  }, {
+    sequence: { "output": "aa", "inputs": [
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: true,
+    msg: "Rule 3: context incorrectly matched a character within a mixed notany store"
+  }, {
+    sequence: { "output": "a", "inputs": [
+      {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}  //a
+    ]},
+    result: false,
+    msg: "Rule 3: did not fail notany on nul context"
+  }]
+};
+
 var DEADKEY_RULE_SET = [ DEADKEY_TEST_1, DEADKEY_TEST_2, DEADKEY_TEST_3, DEADKEY_TEST_4, 
   DEADKEY_TEST_5, DEADKEY_TEST_6 
 ];
 var ANY_CONTEXT_RULE_SET = [ ANY_CONTEXT_TEST_1, ANY_CONTEXT_TEST_2, ANY_CONTEXT_TEST_3 ];
- var ANY_INDEX_RULE_SET = [ ANY_INDEX_TEST_1, ANY_INDEX_TEST_2, ANY_INDEX_TEST_3 ];
- var DEADKEY_STORE_RULE_SET = [ DEADKEY_STORE_TEST_1, DEADKEY_STORE_TEST_2, DEADKEY_STORE_TEST_3,
+var ANY_INDEX_RULE_SET = [ ANY_INDEX_TEST_1, ANY_INDEX_TEST_2, ANY_INDEX_TEST_3 ];
+var DEADKEY_STORE_RULE_SET = [ DEADKEY_STORE_TEST_1, DEADKEY_STORE_TEST_2, DEADKEY_STORE_TEST_3,
    DEADKEY_STORE_TEST_4 ];
 
+var NOTANY_NUL_RULE_SET = [ NOTANY_NUL_TEST_1, NOTANY_NUL_TEST_2, NOTANY_NUL_TEST_3 ];
+
  var FULL_RULE_SET = [].concat(DEADKEY_RULE_SET, ANY_CONTEXT_RULE_SET, ANY_INDEX_RULE_SET,
-   DEADKEY_STORE_RULE_SET);
+   DEADKEY_STORE_RULE_SET, NOTANY_NUL_RULE_SET);
 
   // -----------
 
@@ -786,73 +1016,87 @@ describe('Engine - Context Matching', function() {
 
   describe('handles simple deadkey contexts', function() {
     it('for the most basic cases:  DEADKEY_TEST_1', function() {
-      runEngineRuleSet(DEADKEY_TEST_1, "Deadkeys");
+      runEngineRuleSet([DEADKEY_TEST_1], "Deadkeys");
     });
 
     it('with deadkey ordering:  DEADKEY_TEST_2', function() {
-      runEngineRuleSet(DEADKEY_TEST_2, "Deadkeys");
+      runEngineRuleSet([DEADKEY_TEST_2], "Deadkeys");
     });
 
     it('with repeated deadkeys:  DEADKEY_TEST_3', function() {
-      runEngineRuleSet(DEADKEY_TEST_3, "Deadkeys");
+      runEngineRuleSet([DEADKEY_TEST_3], "Deadkeys");
     });
 
     it('with caret after deadkey:  DEADKEY_TEST_4', function() {
-      runEngineRuleSet(DEADKEY_TEST_4, "Deadkeys");
+      runEngineRuleSet([DEADKEY_TEST_4], "Deadkeys");
     });
 
     it('with no deadkeys, mid-text:  DEADKEY_TEST_5', function() {
-      runEngineRuleSet(DEADKEY_TEST_5, "Deadkeys");
+      runEngineRuleSet([DEADKEY_TEST_5], "Deadkeys");
     });
 
     it('with long sequence of only deadkeys:  DEADKEY_TEST_6', function() {
-      runEngineRuleSet(DEADKEY_TEST_6, "Deadkeys");
+      runEngineRuleSet([DEADKEY_TEST_6], "Deadkeys");
     });
   });
 
   describe('handles any + context rule interactions', function() {
     it('for basic context matches, no any:  ANY_CONTEXT_TEST_1', function() {
-      runEngineRuleSet(ANY_CONTEXT_TEST_1);
+      runEngineRuleSet([ANY_CONTEXT_TEST_1]);
     });
 
     it('for any + context-of-any matches:  ANY_CONTEXT_TEST_2', function() {
-      runEngineRuleSet(ANY_CONTEXT_TEST_2);
+      runEngineRuleSet([ANY_CONTEXT_TEST_2]);
     });
 
     it('for rules with multiple any + context-of-any pairs:  ANY_CONTEXT_TEST_3', function() {
-      runEngineRuleSet(ANY_CONTEXT_TEST_3);
+      runEngineRuleSet([ANY_CONTEXT_TEST_3]);
     });
   });
 
   describe('handles any + index context interactions', function() {
     it('for basic any + index matches in context:  ANY_INDEX_TEST_1', function() {
-      runEngineRuleSet(ANY_INDEX_TEST_1);
+      runEngineRuleSet([ANY_INDEX_TEST_1]);
     });
 
     it('for one-any to many-index matches in context:  ANY_INDEX_TEST_2', function() {
-      runEngineRuleSet(ANY_INDEX_TEST_2);
+      runEngineRuleSet([ANY_INDEX_TEST_2]);
     });
 
     it('for two any + index pairs in rule:  ANY_INDEX_TEST_3', function() {
-      runEngineRuleSet(ANY_INDEX_TEST_3);
+      runEngineRuleSet([ANY_INDEX_TEST_3]);
     });
   });
   
   describe('handles interactions with deadkeys in stores', function() {
     it('for any on pure deadkey store:  DEADKEY_STORE_TEST_1', function() {
-      runEngineRuleSet(DEADKEY_STORE_TEST_1);
+      runEngineRuleSet([DEADKEY_STORE_TEST_1]);
     });
 
     it('for any on mixed char+deadkey store:  DEADKEY_STORE_TEST_2', function() {
-      runEngineRuleSet(DEADKEY_STORE_TEST_2);
+      runEngineRuleSet([DEADKEY_STORE_TEST_2]);
     });
 
     it('for index matching any on pure deadkey store:  DEADKEY_STORE_TEST_3', function() {
-      runEngineRuleSet(DEADKEY_STORE_TEST_3);
+      runEngineRuleSet([DEADKEY_STORE_TEST_3]);
     });
 
     it('for context matching any on pure deadkey store:  DEADKEY_STORE_TEST_4', function() {
-      runEngineRuleSet(DEADKEY_STORE_TEST_4);
+      runEngineRuleSet([DEADKEY_STORE_TEST_4]);
+    });
+  });
+
+  describe('handles interactions between notany and nul in context', function() {
+    it('with notany against a store with pure characters:  NOTANY_NUL_TEST_1', function() {
+      runEngineRuleSet([NOTANY_NUL_TEST_1]);
+    });
+
+    it('with notany against a store with pure deadkeys:  NOTANY_NUL_TEST_2', function() {
+      runEngineRuleSet([NOTANY_NUL_TEST_2]);
+    });
+
+    it('with notany against a store with mixed characters and deadkeys:  NOTANY_NUL_TEST_2', function() {
+      runEngineRuleSet([NOTANY_NUL_TEST_3]);
     });
   });
 });
