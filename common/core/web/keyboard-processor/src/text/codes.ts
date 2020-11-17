@@ -3,26 +3,24 @@ namespace com.keyman.text {
     // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
     // Compare against /common/core/desktop/src/kmx/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
     modifierCodes: {
-      "LCTRL":0x0001,
-      "RCTRL":0x0002,
-      "LALT":0x0004,
-      "RALT":0x0008,
-      "SHIFT":0x0010,
-      "CTRL":0x0020,
-      "ALT":0x0040,
+      "LCTRL":0x0001,           // LCTRLFLAG
+      "RCTRL":0x0002,           // RCTRLFLAG
+      "LALT":0x0004,            // LALTFLAG
+      "RALT":0x0008,            // RALTFLAG
+      "SHIFT":0x0010,           // K_SHIFTFLAG
+      "CTRL":0x0020,            // K_CTRLFLAG
+      "ALT":0x0040,             // K_ALTFLAG
       // TENTATIVE:  Represents command keys, which some OSes use for shortcuts we don't
       // want to block.  No rule will ever target a modifier set with this bit set to 1. 
-      "META":0x0080,
-      "CAPS":0x0100,
-      "NO_CAPS":0x0200,
-      "NUM_LOCK":0x0400,
-      "NO_NUM_LOCK":0x0800,
-      "SCROLL_LOCK":0x1000,
-      "NO_SCROLL_LOCK":0x2000,
-      "VIRTUAL_KEY":0x4000,
-      // Reserved:  is VIRTUALCHARKEY on Windows.  All our platforms use the same
-      // code definitions.
-      "VIRTUAL_CHAR_KEY":0x8000
+      "META":0x0080,            // K_METAFLAG
+      "CAPS":0x0100,            // CAPITALFLAG
+      "NO_CAPS":0x0200,         // NOTCAPITALFLAG
+      "NUM_LOCK":0x0400,        // NUMLOCKFLAG
+      "NO_NUM_LOCK":0x0800,     // NOTNUMLOCKFLAG
+      "SCROLL_LOCK":0x1000,     // SCROLLFLAG
+      "NO_SCROLL_LOCK":0x2000,  // NOTSCROLLFLAG
+      "VIRTUAL_KEY":0x4000,     // ISVIRTUALKEY
+      "VIRTUAL_CHAR_KEY":0x8000 // VIRTUALCHARKEY // Unused by KMW, but reserved for use by other Keyman engines.
     },
 
     modifierBitmasks: {
