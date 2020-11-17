@@ -1550,12 +1550,11 @@ type
 const
   CRequiredKeys: TRequiredKeys = [K_LOPT, K_BKSP, K_ENTER];   // I4447
 
-  // See also builder.js: specialKeyNames10; visualKeyboard.ts: specialCharacters
+  // See also builder.js: specialCharacters; visualKeyboard.ts: specialCharacters
   CSpecialText10: string =
     '*Shift*'#0'*Enter*'#0'*Tab*'#0'*BkSp*'#0'*Menu*'#0'*Hide*'#0'*Alt*'#0'*Ctrl*'#0'*Caps*'#0+
     '*ABC*'#0'*abc*'#0'*123*'#0'*Symbol*'#0'*Currency*'#0'*Shifted*'#0'*AltGr*'#0'*TabLeft*';
 
-  // See also builder.js: specialKeyNames14; visualKeyboard.ts: specialCharacters
   // these names were added in Keyman 14
   CSpecialText14: string =
     '*RTLEnter*'#0'*RTLBkSp*'#0'*ShiftLock*'#0'*ShiftedLock*'#0'*ZWNJ*'#0'*ZWNJiOS*'#0'*ZWNJAndroid*';
