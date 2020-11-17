@@ -49,7 +49,7 @@ fi
 if [ "${DIST}" != "" ]; then
     distributions="${DIST}"
 else
-    distributions="xenial bionic eoan focal"
+    distributions="xenial bionic focal groovy"
 fi
 
 if [ "${PACKAGEVERSION}" != "" ]; then
