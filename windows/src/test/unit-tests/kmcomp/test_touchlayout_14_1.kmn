@@ -1,0 +1,8 @@
+﻿store(&VERSION) '10.0'
+store(&NAME) 'Touch Layout 14 (against v10)'
+store(&LAYOUTFILE) 'test_touchlayout_14_1.keyman-touch-layout'
+store(&TARGETS) 'web'
+
+begin Unicode > use(main)
+
+group(main) using keys

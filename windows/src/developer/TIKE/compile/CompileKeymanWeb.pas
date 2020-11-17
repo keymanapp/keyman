@@ -1549,6 +1549,17 @@ type
   TKeyIdType = (Key_Invalid, Key_Constant, Key_Touch, Key_Unicode);   // I4142
 const
   CRequiredKeys: TRequiredKeys = [K_LOPT, K_BKSP, K_ENTER];   // I4447
+
+  // See also builder.js: specialKeyNames10; visualKeyboard.ts: specialCharacters
+  CSpecialText10: string =
+    '*Shift*'#0'*Enter*'#0'*Tab*'#0'*BkSp*'#0'*Menu*'#0'*Hide*'#0'*Alt*'#0'*Ctrl*'#0'*Caps*'#0+
+    '*ABC*'#0'*abc*'#0'*123*'#0'*Symbol*'#0'*Currency*'#0'*Shifted*'#0'*AltGr*'#0'*TabLeft*';
+
+  // See also builder.js: specialKeyNames14; visualKeyboard.ts: specialCharacters
+  // these names were added in Keyman 14
+  CSpecialText14: string =
+    '*RTLEnter*'#0'*RTLBkSp*'#0'*ShiftLock*'#0'*ShiftedLock*'#0'*ZWNJ*'#0'*ZWNJiOS*'#0'*ZWNJAndroid*';
+
 var
   FPlatform: TTouchLayoutPlatform;
   FLayer: TTouchLayoutLayer;
@@ -1565,7 +1576,7 @@ var
         ((ch >= $00A0) and (ch <= $10FFFF));
     end;
 
-    function KeyIdType(FId: string): TKeyIdType;   // I4142
+    function KeyIdType(const FId: string): TKeyIdType;   // I4142
     begin
       Result := Key_Invalid;
       case UpCase(FId[1]) of
@@ -1575,7 +1586,7 @@ var
       end;
     end;
 
-    procedure CheckKey(FId, FNextLayer: string; FKeyType: TTouchKeyType);   // I4119
+    procedure CheckKey(const FId, FText, FNextLayer: string; FKeyType: TTouchKeyType);   // I4119
     var
       FValid: TKeyIdType;
       v: Integer;
@@ -1624,6 +1635,29 @@ var
         // Search for the key in the key dictionary - ignore K_LOPT, K_ROPT...
         if FDictionary.IndexOf(FId) < 0 then
           ReportError(0, CWARN_TouchLayoutCustomKeyNotDefined, 'Key "'+FId+'" on layer "'+FLayer.Id+'", platform "'+FPlatform.Name+'", is a custom key but has no corresponding rule in the source.');
+      end;
+
+      //
+      // Check that if the key has a *special* label, it is available in the target version
+      //
+      if FText.StartsWith('*') and FText.EndsWith('*') and (FText.Length > 2) then
+      begin
+        if (CSpecialText10.Contains(FText) or CSpecialText14.Contains(FText)) and
+            not IsKeyboardVersion14OrLater and
+            not (FKeyType in [tktSpecial, tktSpecialActive]) then
+        begin
+          ReportError(0, CWARN_TouchLayoutSpecialLabelOnNormalKey,
+            Format('Key "%s" on layout "%s", platform "%s" is not a Special key but has the special label "%s". This feature is only supported in Keyman 14 or later', [
+              FId, FLayer.Id, FPlatform.Name, FText
+            ]));
+        end
+        else if CSpecialText14.Contains(FText) and not IsKeyboardVersion14OrLater then
+        begin
+          ReportError(0, CWARN_TouchLayoutSpecialLabelRequires14,
+            Format('Key "%s" on layout "%s", platform "%s" has a special label "%s" which is only supported in Keyman 14 or later', [
+              FId, FLayer.Id, FPlatform.Name, FText
+            ]));
+        end;
       end;
     end;
 
@@ -1703,9 +1737,9 @@ begin
           for FRow in FLayer.Rows do
             for FKey in FRow.Keys do
             begin
-              CheckKey(FKey.Id, FKey.NextLayer, FKey.SpT);   // I4119
+              CheckKey(FKey.Id, FKey.Text, FKey.NextLayer, FKey.SpT);   // I4119
               for FSubKey in FKey.Sk do
-                CheckKey(FSubKey.Id, FSubKey.NextLayer, FSubKey.SpT);   // I4119
+                CheckKey(FSubKey.Id, FKey.Text, FSubKey.NextLayer, FSubKey.SpT);   // I4119
             end;
 
           if FRequiredKeys <> CRequiredKeys then
