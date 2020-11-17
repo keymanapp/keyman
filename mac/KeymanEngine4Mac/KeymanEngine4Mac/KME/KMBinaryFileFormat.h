@@ -189,6 +189,8 @@ struct COMP_KEY {
 #define KVKS_RCTRL              0x10
 #define KVKS_LALT               0x20
 #define KVKS_RALT               0x40
+//#define KVKS_META               0x80    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
+                                          // Used internally to ensure Meta-key shortcuts safely bypass rules
 
 
 /*

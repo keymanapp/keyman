@@ -1,6 +1,7 @@
 namespace com.keyman.text {
   export var Codes = {
     // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
+    // Compare against /common/core/desktop/src/kmx/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
     modifierCodes: {
       "LCTRL":0x0001,
       "RCTRL":0x0002,

@@ -269,6 +269,8 @@
 #define K_SHIFTFLAG		0x0010		// Either shift flag
 #define K_CTRLFLAG		0x0020		// Either ctrl flag
 #define K_ALTFLAG		0x0040		// Either alt flag
+//#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
+                                // Used internally to ensure Meta-key shortcuts safely bypass rules
 #define CAPITALFLAG		0x0100		// Caps lock on
 #define NOTCAPITALFLAG	0x0200		// Caps lock NOT on
 #define NUMLOCKFLAG		0x0400		// Num lock on
