@@ -674,7 +674,7 @@ namespace com.keyman.text {
 (function () {
   let ns = com.keyman.text;
 
-  // Let LMLayer be available both in the browser and in Node.
+  // Let the Keyboard Processor be available both in the browser and in Node.
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = ns.KeyboardProcessor;
     //@ts-ignore

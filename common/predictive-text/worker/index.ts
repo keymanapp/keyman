@@ -80,11 +80,13 @@ class LMLayerWorker {
    */
   private _importScripts: ImportScripts;
 
+  private self: any;
+
   private _platformCapabilities: Capabilities;
 
   private _hostURL: string;
 
-  private _currentModelSource: string;
+  private _currentModelSource: ModelSourceSpec;
 
   constructor(options = {
     importScripts: null,
@@ -130,14 +132,23 @@ class LMLayerWorker {
     let im = event.data as IncomingMessage;
     if(im.message == 'load') {
       let data = im as LoadMessage;
-      if(data.model == this._currentModelSource) {
+      let duplicated = false;
+      if(this._currentModelSource && data.source.type == this._currentModelSource.type) {
+        if(data.source.type == 'file' && data.source.file == (this._currentModelSource as ModelFile).file) {
+          duplicated = true;
+        } else if(data.source.type == 'raw' && data.source.code == (this._currentModelSource as ModelEval).code) {
+          duplicated = true;
+        }
+      }
+
+      if(duplicated) {
         // Some JS implementations don't allow web workers access to the console.
         if(typeof console !== 'undefined') {
           console.warn("Duplicate model load message detected - squashing!");
         }
         return;
       } else {
-        this._currentModelSource = data.model;
+        this._currentModelSource = data.source;
       }
     } else if(im.message == 'unload') {
       this._currentModelSource = null;
@@ -256,6 +267,7 @@ class LMLayerWorker {
    * description and capabilities.
    */
   private transitionToLoadingState() {
+    let _this = this;
     this.state = {
       name: 'modelless',
       handleMessage: (payload) => {
@@ -265,7 +277,20 @@ class LMLayerWorker {
         }
 
         // TODO: validate configuration?
-        this.loadModelFile(payload.model);
+        if(payload.source.type == 'file') {
+          _this.loadModelFile(payload.source.file);
+        } else {
+          // Creates a closure capturing all top-level names that the model must be able to reference.
+          // `eval` runs by scope rules; our virtualized worker needs a special scope for this to work.
+          //
+          // Reference: https://stackoverflow.com/a/40108685
+          // Note that we don't need `this`, but we do need the namespaces seen below. 
+          let code = payload.source.code;
+          let evalInContext = function(LMLayerWorker, models, correction, wordBreakers) {
+            eval(code);
+          }
+          evalInContext(_this, models, correction, wordBreakers);
+        }
       }
     };
   }
@@ -353,6 +378,7 @@ class LMLayerWorker {
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
     let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
+    worker.self = scope;
 
     // Ensures that the worker instance is accessible for loaded model scripts.
     // Assists unit-testing.

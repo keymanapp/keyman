@@ -189,3 +189,14 @@ namespace com.keyman.text {
     }
   }
 }
+
+(function () {
+  let ns = com.keyman.text;
+
+  // Let the InputProcessor be available both in the browser and in Node.
+  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ns.InputProcessor;
+    //@ts-ignore
+    ns.InputProcessor.com = com; // Export the root namespace so that all InputProcessor classes are accessible by unit tests.
+  }
+}());
