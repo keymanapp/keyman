@@ -74,6 +74,26 @@ namespace models {
     return codeUnit >= 0xD800 && codeUnit <= 0xDBFF;
   }
 
+    /**
+   * Checks whether or not the specified UCS-2 character corresponds to a UTF-16 low surrogate.
+   * 
+   * @param char A single JavaScript (UCS-2) char corresponding to a single code unit.
+   */
+  export function isLowSurrogate(char: string): boolean;
+  /**
+   * Checks whether or not the specified UCS-2 character corresponds to a UTF-16 low surrogate.
+   * 
+   * @param codeUnit A code unit corresponding to a single UCS-2 char.
+   */
+  export function isLowSurrogate(codeUnit: number): boolean;
+  export function isLowSurrogate(codeUnit: string|number): boolean {
+    if(typeof codeUnit == 'string') {
+      codeUnit = codeUnit.charCodeAt(0);
+    }
+
+    return codeUnit >= 0xDC00 && codeUnit <= 0xDFFF;
+  }
+
   export function isSentinel(char: string): boolean {
     return char == models.SENTINEL_CODE_UNIT;
   }
@@ -98,5 +118,30 @@ namespace models {
       suggestion.p = p;
     }
     return suggestion;
+  }
+
+  export function defaultApplyCasing(casing: CasingForm, text: string): string {
+    switch(casing) {
+      case 'lower':
+        return text.toLowerCase();
+      case 'upper':
+        return text.toUpperCase();
+      case 'initial':
+        // The length of the first code unit, as measured in code points.
+        let headUnitLength = 1;
+  
+        // Is the first character a high surrogate, indicating possible use of UTF-16 
+        // surrogate pairs?  Also, is the string long enough for there to BE a pair?
+        if(text.length > 1 && isHighSurrogate(text.charAt(0))) {
+          // It's possible, so now we check for low surrogates.
+          if(isLowSurrogate(text.charCodeAt(1))) {
+            // We have a surrogate pair; this pair is the 'first' character.
+            headUnitLength = 2;
+          }
+        }
+  
+        // Capitalizes the first code unit of the string, leaving the rest intact.
+        return text.substring(0, headUnitLength).toUpperCase() .concat(text.substring(headUnitLength));
+    }
   }
 }

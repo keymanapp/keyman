@@ -17,6 +17,8 @@
  */	
 declare type USVString = string;
 
+declare type CasingForm = 'lower' | 'initial' | 'upper';
+
 /**
  * Used to facilitate edit-distance calculations by allowing the LMLayer to
  * efficiently search the model's lexicon in a Trie-like manner.
@@ -91,6 +93,33 @@ declare interface LexicalModel {
   configure(capabilities: Capabilities): Configuration;
 
   /**
+   * Indicates that the language represented by the lexical model has syntactic casing
+   * behaviors.  Setting this to true will allow the predictive text engine to
+   * perform casing-based corrections and predictions.
+   * 
+   * If set to `false`, the default behavior for the `toKey` method will not perform
+   * casing modifications and will thus yield case-sensitive results.  This will not occur
+   * if `undefined` for backward-compatibility reasons.
+   */
+  readonly languageUsesCasing?: boolean;
+
+  /**
+   * Represents casing-related syntactical behaviors of the language represented by
+   * this lexical model, modifying input text to follow the specified casing pattern.
+   * 
+   * Implementations may assume that the text represents a single word / 'token' from the
+   * context.
+   * 
+   * Patterns:
+   * - lower: all case-sensitive characters should be lowercased.  Example:  "text123"
+   * - upper: all case-sensitive characters should be uppercased.  Example:  "TEXT123"
+   * - initial:  only the word-initial character should be uppercased.
+   * @param form 
+   * @param text 
+   */
+  applyCasing?(form: CasingForm, text: string): string
+
+  /**
    * Indicates a mapping function used by the model to simplify lookup operations
    * within the lexicon.  This is expected to result in a many-to-one mapping, transforming
    * the input text into a common, simplified 'index'/'key' form shared by all
@@ -131,7 +160,8 @@ declare interface LexicalModel {
    * @param transform A Transform corresponding to a recent input keystroke
    * @param context A depiction of the context to which `transform` is applied.
    * @returns A probability distribution (`Distribution<Suggestion>`) on the resulting `Suggestion` 
-   * space for use in determining the most optimal overall suggestions.
+   * space for use in determining the most optimal overall suggestions.  Each returned `Suggestion`
+   * should replace the entire word / text token, rather than leaving part of it unaltered.
    */
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
 
@@ -463,6 +493,10 @@ declare interface WordBreakingFunction {
   // invariant: for all span[i] and span[i + 1], there does not exist a span[k]
   //            where span[i].end <= span[k].start AND span[k].end <= span[i + 1].start
   (phrase: string): Span[];
+}
+
+declare interface CasingFunction {
+  (caseToApply: CasingForm, text: string, defaultApplyCasing?: CasingFunction): string;
 }
 
 /**
