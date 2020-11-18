@@ -209,6 +209,11 @@ class LMLayerWorker {
         configuration.rightContextCodePoints = this._platformCapabilities.maxRightContextCodePoints || 0;
       }
 
+      // Ensures that default casing rules exist for custom models that request casing rules but don't define them.
+      if(model.languageUsesCasing && !model.applyCasing) {
+        model.applyCasing = models.defaultApplyCasing;
+      }
+
       let compositor = this.transitionToReadyState(model);
       // This test allows models to directly specify the property without it being auto-overridden by
       // this default.

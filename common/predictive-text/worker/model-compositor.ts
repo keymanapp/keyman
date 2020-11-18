@@ -281,6 +281,7 @@ class ModelCompositor {
         // We still condition on 'p' existing so that test cases aren't broken.
         value.sample['p'] = value.p;
       }
+      //
       return value.sample;
     });
 
@@ -288,10 +289,20 @@ class ModelCompositor {
       suggestions = [ keepOption as Suggestion ].concat(suggestions);
     }
 
-    // Apply 'after word' punctuation and set suggestion IDs.  
+    // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    let currentCasing: CasingForm = null;
+    if(lexicalModel.languageUsesCasing) {
+      currentCasing = this.detectCurrentCasing(postContext);
+    }
+
     let compositor = this;
     suggestions.forEach(function(suggestion) {
+      if(currentCasing && currentCasing != 'lower') {
+        suggestion.transform.insert = lexicalModel.applyCasing(currentCasing, suggestion.transform.insert);
+        suggestion.displayAs = lexicalModel.applyCasing(currentCasing, suggestion.displayAs);
+      }
+
       if (suggestion.transform.insert.length > 0) {
         suggestion.transform.insert += punctuation.insertAfterWord;
 
@@ -505,6 +516,35 @@ class ModelCompositor {
       // Since the model relies on custom wordbreaking behavior, we need to use the
       // old, deprecated wordbreaking pattern.
       return model.wordbreak(context);
+    }
+  }
+
+  private detectCurrentCasing(context: Context): CasingForm {
+    let model = this.lexicalModel;
+
+    let text = this.wordbreak(context);
+
+    if(!model.languageUsesCasing) {
+      throw "Invalid attempt to detect casing: languageUsesCasing is set to false";
+    }
+
+    if(!model.applyCasing) {
+      // The worker should automatically 'sub in' default behavior during the model's load if that
+      // function isn't defined explicitly as part of the model.
+      throw "Invalid LMLayer state:  languageUsesCasing is set to true, but no applyCasing function exists";
+    }
+
+    if(model.applyCasing('lower', text) == text) {
+      return 'lower';
+    } else if(model.applyCasing('upper', text) == text) {
+      // If only a single character has been input, assume we're in 'initial' mode.
+      return text.kmwLength() > 1 ? 'upper' : 'initial';
+    } else if(model.applyCasing('initial', text) == text) {
+      // We check 'initial' last, as upper-case input is indistinguishable.
+      return 'initial';
+    } else {
+      // 'null' is returned when no casing pattern matches the input.
+      return null;
     }
   }
 }
