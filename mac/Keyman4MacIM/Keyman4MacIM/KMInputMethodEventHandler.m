@@ -339,7 +339,7 @@ NSRange _previousSelRange;
                         [_easterEggForSentry appendString:characterToAdd];
                         if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
                             NSLog(@"Sentry - Forcing crash now");
-                            [[SentrySDK] crash];
+                            [SentrySDK crash];
                         }
                     }
                     else if (len > 0) {
