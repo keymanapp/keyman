@@ -11,6 +11,8 @@ target 'Keyman' do
   
   target 'KeymanTests' do
     inherit! :search_paths
+    pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '5.2.0'
+    use_frameworks!
     # Pods for testing
   end
 
