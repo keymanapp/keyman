@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.184 alpha 2020-11-18
+
+* feat(developer/compilers): compiler-side groundwork for applyCasing (#3770)
+* feat(common/models): use of applyCasing for suggestions (#3824)
+* feat(common/models): casing for suggestions with partial replacement (#3845)
+* fix(common/core/web): Add environment to web Sentry reports (#3888)
+* fix(android/engine): Update in-app TextView context on pageLoaded (#3867)
+
 ## 14.0.183 alpha 2020-11-17
 
 * feat(windows): major version upgrades (#3866)
