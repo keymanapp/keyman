@@ -34,6 +34,12 @@ lexical-model-compiler:
     start /wait ./build.sh -test
 !endif
 
+# Revert any local changes to the original source; these changes can break
+# later sub-builds.
+    cd $(KEYMAN_ROOT)\developer\js
+		git restore package.json
+		git restore package-lock.json
+
 kmcomp-x64-structures:
 	cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902
 	$(MAKE) $(TARGET)

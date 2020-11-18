@@ -2,71 +2,422 @@
  * Integration tests for the model compositor with the trie model.
  */
 
-const { models } = require('../../build/intermediate');
+const { models, wordBreakers } = require('../../build/intermediate');
 
 var assert = require('chai').assert;
 var TrieModel = require('../../build/intermediate').models.TrieModel;
 var ModelCompositor = require('../../build/intermediate').ModelCompositor;
 
 describe('ModelCompositor', function() {
-  it('should compose suggestions from a fat-fingered keypress (no keying needed)', function () {
-    var model = new TrieModel(
-      jsonFixture('tries/english-1000')
-    );
-    var composite = new ModelCompositor(model);
+  describe('Prediction with 14.0+ models', function() {
+    describe('applySuggestionCasing', function() {
+      let plainApplyCasing = function(caseToApply, text) {
+        switch(caseToApply) {
+          case 'lower':
+            return text.toLowerCase();
+          case 'upper':
+            return text.toUpperCase();
+          case 'initial':
+            return plainApplyCasing('upper', text.charAt(0)) . concat(text.substring(1));
+          default:
+            return text;
+        }
+      };
+
+      var plainCasedModel = new TrieModel(
+        jsonFixture('tries/english-1000'), {
+          languageUsesCasing: true,
+          applyCasing: plainApplyCasing,
+          wordBreaker: wordBreakers.default,
+          searchTermToKey: function(text) {
+            // We're dealing with very simple English text; no need to normalize or remove diacritics here.
+            return applyCasing('lower', text);
+          }
+        }
+      );
+
+      it('properly cases suggestions with no suggestion root', function() {
+        var compositor = new ModelCompositor(plainCasedModel);
+
+        let suggestion = {
+          transform: {
+            insert: 'the',
+            deleteLeft: 0
+          },
+          displayAs: 'the'
+        };
+
+        compositor.applySuggestionCasing(suggestion, '', 'initial');
+        assert.equal(suggestion.displayAs, 'The');
+        assert.equal(suggestion.transform.insert, 'The');
+
+        suggestion = {
+          transform: {
+            insert: 'thE',
+            deleteLeft: 0
+          },
+          displayAs: 'thE'
+        };
+
+        compositor.applySuggestionCasing(suggestion, '', 'initial');
+        assert.equal(suggestion.displayAs, 'ThE');
+        assert.equal(suggestion.transform.insert, 'ThE');
+
+        suggestion = {
+          transform: {
+            insert: 'the',
+            deleteLeft: 0
+          },
+          displayAs: 'the'
+        };
+
+        compositor.applySuggestionCasing(suggestion, '', 'upper');
+        assert.equal(suggestion.displayAs, 'THE');
+        assert.equal(suggestion.transform.insert, 'THE');
+      });
+
+      it('properly cases suggestions that fully replace the suggestion root', function() {
+        var compositor = new ModelCompositor(plainCasedModel);
+
+        let suggestion = {
+          transform: {
+            insert: 'therefore',
+            deleteLeft: 3
+          },
+          displayAs: 'therefore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'initial');
+        assert.equal(suggestion.displayAs, 'Therefore');
+        assert.equal(suggestion.transform.insert, 'Therefore');
+
+        suggestion = {
+          transform: {
+            insert: 'thereFore',
+            deleteLeft: 3
+          },
+          displayAs: 'thereFore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'initial');
+        assert.equal(suggestion.displayAs, 'ThereFore');
+        assert.equal(suggestion.transform.insert, 'ThereFore');
+
+        suggestion = {
+          transform: {
+            insert: 'therefore',
+            deleteLeft: 3
+          },
+          displayAs: 'therefore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'upper');
+        assert.equal(suggestion.displayAs, 'THEREFORE');
+        assert.equal(suggestion.transform.insert, 'THEREFORE');
+      });
+
+      it('properly cases suggestions that do not fully replace the suggestion root', function() {
+        var compositor = new ModelCompositor(plainCasedModel);
+
+        let suggestion = {
+          transform: {
+            insert: 'erefore',
+            deleteLeft: 1
+          },
+          displayAs: 'therefore'
+        };
+
+        // When integrated, the 'the' string comes from a wordbreak operation on the current context.
+        compositor.applySuggestionCasing(suggestion, 'the', 'initial');
+        assert.equal(suggestion.displayAs, 'Therefore');
+        assert.equal(suggestion.transform.insert, 'Therefore');
+
+        suggestion = {
+          transform: {
+            insert: 'ereFore',
+            deleteLeft: 1
+          },
+          displayAs: 'thereFore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'initial');
+        assert.equal(suggestion.displayAs, 'ThereFore');
+        assert.equal(suggestion.transform.insert, 'ThereFore');
+
+        suggestion = {
+          transform: {
+            insert: 'erefore',
+            deleteLeft: 1
+          },
+          displayAs: 'therefore'
+        };
+
+        compositor.applySuggestionCasing(suggestion, 'the', 'upper');
+        assert.equal(suggestion.displayAs, 'THEREFORE');
+        assert.equal(suggestion.transform.insert, 'THEREFORE');
+      });
+    });
+
+    describe('Model uses default-style keying, no casing', function () {
+      var uncasedModel = new TrieModel(
+        jsonFixture('tries/english-1000'), {
+          languageUsesCasing: false,
+          wordBreaker: wordBreakers.default,
+          searchTermToKey: function(text) {
+            // We're dealing with very simple English text; without casing, there's no keying to be done
+            // for such simple data.  No need to normalize or remove diacritics here.
+            return text;
+          }
+        }
+      );
+
+      it('should produce suggestions from uncased input', function() {
+        let model = uncasedModel;
+        var composite = new ModelCompositor(model);
+        
+        // Initialize context
+        let context = {
+          left: 'th', startOfBuffer: false, endOfBuffer: true,
+        };
+        composite.predict({insert: '', deleteLeft: 0}, context);
     
-    // Initialize context
-    let context = {
-      left: 'th', startOfBuffer: false, endOfBuffer: true,
-    };
-    composite.predict({insert: '', deleteLeft: 0}, context);
+        // Pretend to fat finger "the" as "thr"
+        var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
+        var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
+        var suggestions = composite.predict([thr, the], context);
+    
+        // Get the top suggest for 'the' and 'thr*'.
+        var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
+        var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
+    
+        // Sanity check: do we have actual real-valued probabilities?
+        assert.isAbove(thrSuggestion.p, 0.0);
+        assert.isBelow(thrSuggestion.p, 1.0);
+        assert.isAbove(theSuggestion.p, 0.0);
+        assert.isBelow(theSuggestion.p, 1.0);
+        // 'the' should be the intended the result here.
+        assert.isAbove(theSuggestion.p, thrSuggestion.p);
+      });
 
-    // Pretend to fat finger "the" as "thr"
-    var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
-    var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-    var suggestions = composite.predict([thr, the], context);
+      it('should not produce suggestions from cased input', function() {
+        let model = uncasedModel;
+        var composite = new ModelCompositor(model);
+        
+        // Initialize context
+        let context = {
+          left: 'TH', startOfBuffer: false, endOfBuffer: true,
+        };
+        composite.predict({insert: '', deleteLeft: 0}, context);
+    
+        // Pretend to fat finger "the" as "thr"
+        var the = { sample: { insert: 'R', deleteLeft: 0}, p: 0.45 };
+        var thr = { sample: { insert: 'E', deleteLeft: 0}, p: 0.55 };
+        var suggestions = composite.predict([thr, the], context);
+    
+        // We should only receive a 'keep' suggestion.
+        assert.equal(suggestions.length, 1);
+        assert.equal(suggestions[0].tag, 'keep');
+      });
+    });
 
-    // Get the top suggest for 'the' and 'thr*'.
-    var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
-    var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
+    describe('Model uses default-style keying, provides casing', function () {
+      let applyCasing = function(caseToApply, text) {
+        switch(caseToApply) {
+          case 'lower':
+            return text.toLowerCase();
+          case 'upper':
+            return text.toUpperCase();
+          case 'initial':
+            return applyCasing('upper', text.charAt(0)) . concat(text.substring(1));
+          default:
+            return text;
+        }
+      };
 
-    // Sanity check: do we have actual real-valued probabilities?
-    assert.isAbove(thrSuggestion.p, 0.0);
-    assert.isBelow(thrSuggestion.p, 1.0);
-    assert.isAbove(theSuggestion.p, 0.0);
-    assert.isBelow(theSuggestion.p, 1.0);
-    // 'the' should be the intended the result here.
-    assert.isAbove(theSuggestion.p, thrSuggestion.p);
+      var casedModel = new TrieModel(
+        jsonFixture('tries/english-1000'), {
+          languageUsesCasing: true,
+          applyCasing: applyCasing,
+          wordBreaker: wordBreakers.default,
+          searchTermToKey: function(text) {
+            // We're dealing with very simple English text; no need to normalize or remove diacritics here.
+            return applyCasing('lower', text);
+          }
+        }
+      );
+
+      it('should produce suggestions from uncased input', function() {
+        let model = casedModel;
+        var composite = new ModelCompositor(model);
+        
+        // Initialize context
+        let context = {
+          left: 'th', startOfBuffer: false, endOfBuffer: true,
+        };
+        composite.predict({insert: '', deleteLeft: 0}, context);
+    
+        // Pretend to fat finger "the" as "thr"
+        var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
+        var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
+        var suggestions = composite.predict([thr, the], context);
+    
+        // Get the top suggest for 'the' and 'thr*'.
+        var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
+        var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
+    
+        // Sanity check: do we have actual real-valued probabilities?
+        assert.isAbove(thrSuggestion.p, 0.0);
+        assert.isBelow(thrSuggestion.p, 1.0);
+        assert.isAbove(theSuggestion.p, 0.0);
+        assert.isBelow(theSuggestion.p, 1.0);
+        // 'the' should be the intended the result here.
+        assert.isAbove(theSuggestion.p, thrSuggestion.p);
+      });
+
+      it('should produce capitalized suggestions from fully-uppercased input', function() {
+        let model = casedModel;
+        var composite = new ModelCompositor(model);
+        
+        // Initialize context
+        let context = {
+          left: 'TH', startOfBuffer: false, endOfBuffer: true,
+        };
+        composite.predict({insert: '', deleteLeft: 0}, context);
+    
+        // Pretend to fat finger "the" as "thr"
+        var the = { sample: { insert: 'R', deleteLeft: 0}, p: 0.45 };
+        var thr = { sample: { insert: 'E', deleteLeft: 0}, p: 0.55 };
+        var suggestions = composite.predict([thr, the], context);
+    
+        // Get the top suggest for 'the' and 'thr*'.
+        var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'THE' || s.displayAs === '“THE”'; })[0];
+        var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('THR'); })[0];
+    
+        // Sanity check: do we have actual real-valued probabilities?
+        assert.isAbove(thrSuggestion.p, 0.0);
+        assert.isBelow(thrSuggestion.p, 1.0);
+        assert.isAbove(theSuggestion.p, 0.0);
+        assert.isBelow(theSuggestion.p, 1.0);
+        // 'the' should be the intended the result here.
+        assert.isAbove(theSuggestion.p, thrSuggestion.p);
+      });
+
+      it('should produce "initial-case" suggestions from input with an initial capital', function() {
+        let model = casedModel;
+        var composite = new ModelCompositor(model);
+        
+        // Initialize context
+        let context = {
+          left: 'Th', startOfBuffer: false, endOfBuffer: true,
+        };
+        composite.predict({insert: '', deleteLeft: 0}, context);
+    
+        // Pretend to fat finger "the" as "thr"
+        var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
+        var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
+        var suggestions = composite.predict([thr, the], context);
+    
+        // Get the top suggest for 'the' and 'thr*'.
+        var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'The' || s.displayAs === '“The”'; })[0];
+        var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('Thr'); })[0];
+    
+        // Sanity check: do we have actual real-valued probabilities?
+        assert.isAbove(thrSuggestion.p, 0.0);
+        assert.isBelow(thrSuggestion.p, 1.0);
+        assert.isAbove(theSuggestion.p, 0.0);
+        assert.isBelow(theSuggestion.p, 1.0);
+        // 'the' should be the intended the result here.
+        assert.isAbove(theSuggestion.p, thrSuggestion.p);
+      });
+
+      it('also from input with partial capitalization when including an initial capital', function() {
+        let model = casedModel;
+        var composite = new ModelCompositor(model);
+        
+        // Initialize context
+        let context = {
+          left: 'TH', startOfBuffer: false, endOfBuffer: true,
+        };
+        composite.predict({insert: '', deleteLeft: 0}, context);
+    
+        // Pretend to fat finger "the" as "thr"
+        var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
+        var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
+        var suggestions = composite.predict([thr, the], context);
+    
+        // Get the top suggest for 'the' and 'thr*'.
+        var theSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('The'); })[0];
+        var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('Thr'); })[0];
+    
+        // Sanity check: do we have actual real-valued probabilities?
+        assert.isAbove(thrSuggestion.p, 0.0);
+        assert.isBelow(thrSuggestion.p, 1.0);
+        assert.isAbove(theSuggestion.p, 0.0);
+        assert.isBelow(theSuggestion.p, 1.0);
+      });
+    });
   });
 
-  it('should compose suggestions from a fat-fingered keypress (keying needed)', function () {
-    var model = new TrieModel(
-      jsonFixture('tries/english-1000')
-    );
-    var composite = new ModelCompositor(model);
-    
-    // Initialize context
-    let context = {
-      left: 'Th', startOfBuffer: false, endOfBuffer: true,
-    };
-    composite.predict({insert: '', deleteLeft: 0}, context);
-
-    // Pretend to fat finger "the" as "thr"
-    var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
-    var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-    var suggestions = composite.predict([thr, the], context);
-
-    // Get the top suggest for 'the' and 'thr*'.
-    var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'The' || s.displayAs === '“The”'; })[0];
-    var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
-
-    // Sanity check: do we have actual real-valued probabilities?
-    assert.isAbove(thrSuggestion.p, 0.0);
-    assert.isBelow(thrSuggestion.p, 1.0);
-    assert.isAbove(theSuggestion.p, 0.0);
-    assert.isBelow(theSuggestion.p, 1.0);
-    // 'the' should be the intended the result here.
-    assert.isAbove(theSuggestion.p, thrSuggestion.p);
+  describe('Prediction with legacy Models (12.0 / 13.0)', function() {
+    it('should compose suggestions from a fat-fingered keypress (no keying needed)', function () {
+      var model = new TrieModel(
+        jsonFixture('tries/english-1000')
+      );
+      var composite = new ModelCompositor(model);
+      
+      // Initialize context
+      let context = {
+        left: 'th', startOfBuffer: false, endOfBuffer: true,
+      };
+      composite.predict({insert: '', deleteLeft: 0}, context);
+  
+      // Pretend to fat finger "the" as "thr"
+      var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
+      var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
+      var suggestions = composite.predict([thr, the], context);
+  
+      // Get the top suggest for 'the' and 'thr*'.
+      var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
+      var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
+  
+      // Sanity check: do we have actual real-valued probabilities?
+      assert.isAbove(thrSuggestion.p, 0.0);
+      assert.isBelow(thrSuggestion.p, 1.0);
+      assert.isAbove(theSuggestion.p, 0.0);
+      assert.isBelow(theSuggestion.p, 1.0);
+      // 'the' should be the intended the result here.
+      assert.isAbove(theSuggestion.p, thrSuggestion.p);
+    });
+  
+    it('should compose suggestions from a fat-fingered keypress (keying needed)', function () {
+      var model = new TrieModel(
+        jsonFixture('tries/english-1000')
+      );
+      var composite = new ModelCompositor(model);
+      
+      // Initialize context
+      let context = {
+        left: 'Th', startOfBuffer: false, endOfBuffer: true,
+      };
+      composite.predict({insert: '', deleteLeft: 0}, context);
+  
+      // Pretend to fat finger "the" as "thr"
+      var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
+      var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
+      var suggestions = composite.predict([thr, the], context);
+  
+      // Get the top suggest for 'the' and 'thr*'.
+      var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'The' || s.displayAs === '“The”'; })[0];
+      var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
+  
+      // Sanity check: do we have actual real-valued probabilities?
+      assert.isAbove(thrSuggestion.p, 0.0);
+      assert.isBelow(thrSuggestion.p, 1.0);
+      assert.isAbove(theSuggestion.p, 0.0);
+      assert.isBelow(theSuggestion.p, 1.0);
+      // 'the' should be the intended the result here.
+      assert.isAbove(theSuggestion.p, thrSuggestion.p);
+    });
   });
 
   // The nomenclature's a minor sneak-peek from child PRs.
