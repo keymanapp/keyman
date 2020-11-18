@@ -35,9 +35,14 @@ configuration for your build environment.
 
 1. First, open XCode, Preferences, Accounts, and select Manage Certificates for the identity
    you wish to use for signing. Click **+** and select **Developer ID Application**. A
-   certificate will then be generated and listed in your Keychain. Get info for the certificate
-   you generated from Keychain and copy its SHA-1 fingerprint. You'll need to remove spaces
-   from between the hex pairs; you'll use this in step 3.
+   certificate will then be generated and listed in your Keychain. 
+   
+2. Find the SHA-1 hash. To find the certificate in terminal:
+
+   `security find-certificate -Z -c "<your-apple-id>" -a`
+   
+   (If you have more than one, you may need to use Keychain Access to differentiate).
+   Copy the SHA-1 hash from this command's output.
 
 2. Determine the Apple ID details in order to run a build. You may wish to create an
    App-Specific Password at https://appleid.apple.com/ and use this. Your Shortname will
@@ -63,8 +68,9 @@ To build Keyman for macOS, do the following:
 1. Open a Terminal window.
 2. cd to **keyman/mac**. **build.sh** must be run in the directory containing the script.
 3. Build using `./build.sh -no-codesign`. Run `./build.sh -help` to see all options.
-    * If you have signing credentials from the core development team, you can build a signed version by omitting `-no-codesign`. Somewhat misleadingly, `-no-codesign` only stops
-    automatic signing using the certificate maintained by the core development team!
+    * If you have signing credentials from the core development team, you can build a signed 
+      version by omitting `-no-codesign`. Somewhat misleadingly, `-no-codesign` only stops
+      automatic signing using the certificate maintained by the core development team!
     * If you want to deploy, you will need to also add `-config Release`, as a Debug build cannot be notarized.
 
 Note: If Carthage prompts you to allow it access to your github credentials, it's fine to click Deny.
