@@ -121,6 +121,12 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
         self.navigationController?.popViewController(animated: true) // Rewind UI
         finalize(with: parsedLink)
         return
+      } else if UniversalLinks.isExternalLink(link) {
+        decisionHandler(.cancel)
+
+        // Kick this link out to an external Safari process.
+        UniversalLinks.externalLinkLauncher?(link)
+        return
       }
     }
 
