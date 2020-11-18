@@ -56,6 +56,19 @@ public final class KMTextView extends AppCompatEditText {
     init(context);
   }
 
+  /**
+   * Method to update and reset the in-app context.
+   * Assumption: InAppKeyboardLoaded is true
+   */
+  public static void updateTextContext() {
+    KMTextView textView = (KMTextView) activeView;
+    int selStart = textView.getSelectionStart();
+    int selEnd = textView.getSelectionEnd();
+    KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
+    KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
+    KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
+  }
+
   private void init(final Context context) {
     this.context = context;
     this.hardwareKeyboardInterpreter = new KMHardwareKeyboardInterpreter(context, KeyboardType.KEYBOARD_TYPE_INAPP);
@@ -107,12 +120,7 @@ public final class KMTextView extends AppCompatEditText {
         if (hasFocus) {
           activeView = v;
           if (KMManager.InAppKeyboardLoaded) {
-            KMTextView textView = (KMTextView) activeView;
-            int selStart = textView.getSelectionStart();
-            int selEnd = textView.getSelectionEnd();
-            KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
-            KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
-            KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
+            updateTextContext();
           }
           showKeyboard();
         } else {
@@ -179,11 +187,7 @@ public final class KMTextView extends AppCompatEditText {
 
       if (activeView != null && activeView.equals(this)) {
         if (KMManager.InAppKeyboardLoaded) {
-          KMTextView textView = (KMTextView) activeView;
-          int selStart = textView.getSelectionStart();
-          int selEnd = textView.getSelectionEnd();
-          KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
-          KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
+          updateTextContext();
         }
 
         if (keyboardVisible) {
