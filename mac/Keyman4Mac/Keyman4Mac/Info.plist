@@ -30,5 +30,16 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>Keyman</key>
+	<dict>
+		<key>SentryEnvironment</key>
+		<string>local</string>
+		<key>Tier</key>
+		<string>alpha</string>
+		<key>VersionTag</key>
+		<string>-alpha-local</string>
+		<key>VersionWithTag</key>
+		<string>$(PRODUCT_VERSION)-alpha-local</string>
+	</dict>
 </dict>
 </plist>

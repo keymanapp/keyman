@@ -36,7 +36,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>14.0.184</string>
+	<string>Keyman $(PRODUCT_VERSION) for macOS</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -51,7 +51,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>14.0.184</string>
+	<string>$(PRODUCT_VERSION)</string>
 	<key>InputMethodConnectionName</key>
 	<string>Keyman_Input_Connection</string>
 	<key>InputMethodServerControllerClass</key>
@@ -67,7 +67,7 @@
 		<key>VersionTag</key>
 		<string>-alpha-local</string>
 		<key>VersionWithTag</key>
-		<string>14.0.184-alpha-local</string>
+		<string>$(PRODUCT_VERSION)-alpha-local</string>
 	</dict>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
