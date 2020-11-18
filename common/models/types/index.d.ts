@@ -142,8 +142,7 @@ declare interface LexicalModel {
 
   /**
    * Generates predictive suggestions corresponding to the state of context after the proposed
-   * transform is applied to it.  Each returned `Suggestion` should replace the entire 
-   * word / text token, rather than leaving part of it unaltered.
+   * transform is applied to it.
    * 
    * This method should NOT attempt to perform any form of correction; this is modeled within a
    * separate component of the LMLayer predictive engine.  That is, "th" + "e" should not be

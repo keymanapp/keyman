@@ -297,10 +297,10 @@ class ModelCompositor {
     }
 
     let compositor = this;
+    let baseWord = this.wordbreak(context);
     suggestions.forEach(function(suggestion) {
       if(currentCasing && currentCasing != 'lower') {
-        suggestion.transform.insert = lexicalModel.applyCasing(currentCasing, suggestion.transform.insert);
-        suggestion.displayAs = lexicalModel.applyCasing(currentCasing, suggestion.displayAs);
+        compositor.applySuggestionCasing(suggestion, baseWord, currentCasing);
       }
 
       if (suggestion.transform.insert.length > 0) {
@@ -336,6 +336,21 @@ class ModelCompositor {
     }
 
     return suggestions;
+  }
+
+  // Responsible for applying casing rules to suggestions.
+  private applySuggestionCasing(suggestion: Suggestion, baseWord: USVString, casingForm: CasingForm) {
+    // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
+    let unchangedLength  = baseWord.kmwLength() - suggestion.transform.deleteLeft;
+
+    if(unchangedLength > 0) {
+      suggestion.transform.deleteLeft += unchangedLength;
+      suggestion.transform.insert = baseWord.kmwSubstr(0, unchangedLength) + suggestion.transform.insert;
+    }
+
+    // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
+    suggestion.transform.insert = this.lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
+    suggestion.displayAs = this.lexicalModel.applyCasing(casingForm, suggestion.displayAs);
   }
 
   private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
