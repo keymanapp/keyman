@@ -149,7 +149,8 @@ namespace com.keyman {
         beforeSend: this.prepareEventDebugWrapper.bind(this),
         debug: DEBUG,
         dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@sentry.keyman.com/11', // keyman-web DSN
-        release: com.keyman.environment.SENTRY_RELEASE
+        release: com.keyman.environment.SENTRY_RELEASE,
+        environment: com.keyman.environment.ENVIRONMENT
       });
     }
   }
