@@ -294,15 +294,12 @@ execBuildCommand() {
 }
 
 updatePlist() {
-    # TODO: use set_version() to update plist after build instead of the currenet pattern. See ios for example
 	if $UPDATE_VERSION_IN_PLIST ; then
-	    KM_COMPONENT_BASE_PATH="$1"
-	    KM_COMPONENT_NAME="$2"
-		KM_PLIST="$KM_COMPONENT_BASE_PATH/$KM_COMPONENT_NAME/Info.plist"
+		KM_PLIST="$1"
 		if [ ! -f "$KM_PLIST" ]; then
 			fail "File not found: $KM_PLIST"
 		fi
-        echo "Setting $KM_COMPONENT_NAME version to $VERSION in $KM_PLIST"
+        echo "Setting version and related fields to $VERSION_WITH_TAG in $KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set CFBundleVersion $VERSION" "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $VERSION" "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set :Keyman:SentryEnvironment $VERSION_ENVIRONMENT" "$KM_PLIST"
@@ -316,9 +313,9 @@ updatePlist() {
 
 if $DO_KEYMANENGINE ; then
     echo_heading "Building Keyman Engine"
-    updatePlist "$KME4M_BASE_PATH" "$ENGINE_NAME"
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
     execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
+    updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist"
 fi
 
 ### Build Keyman.app (Input Method and Configuration app) ###
@@ -329,13 +326,13 @@ if $DO_KEYMANIM ; then
     pod update
 	pod install
 	cd "$KEYMAN_MAC_BASE_PATH"
-    updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
     execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     if [ "$TEST_ACTION" == "test" ]; then
     	if [ "$CONFIG" == "Debug" ]; then
     		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     	fi
     fi
+    updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist"
 
     # Upload symbols
 
@@ -359,8 +356,8 @@ fi
 
 if $DO_KEYMANTESTAPP ; then
     echo_heading "Building test app"
-    updatePlist "$KMTESTAPP_BASE_PATH" "$TESTAPP_NAME"
     execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
+    updatePlist "$KMTESTAPP_BASE_PATH/build/$CONFIG/$TESTAPP_NAME.app/Contents/Info.plist"
 fi
 
 ### Notarize the app for preprelease ###
