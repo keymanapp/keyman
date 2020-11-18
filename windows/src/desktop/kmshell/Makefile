@@ -6,8 +6,8 @@
 
 build: version.res manifest.res icons xml
     $(DCC32) kmshell.dpr
-    $(TDS2DBG) kmshell.exe
     $(SENTRYTOOL_DELPHIPREP) kmshell.exe -dpr kmshell.dpr
+    $(TDS2DBG) kmshell.exe
     $(COPY) kmshell.exe $(PROGRAM)\desktop
     if exist kmshell.dbg $(COPY) kmshell.dbg $(DEBUGPATH)\desktop
 
@@ -33,6 +33,10 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Desktop" $(PROGRAM)\desktop\kmshell.exe
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\kmshell.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\kmshell.dbg /t keyman-windows
 
 backup:
     $(WZZIP) $(BUILD)\desktop\kmshell.zip  $(BACKUPDEFAULTS) kmshell.exe

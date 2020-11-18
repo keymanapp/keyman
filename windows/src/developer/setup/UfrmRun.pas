@@ -126,6 +126,7 @@ uses
   TntDialogHelp,
   types, upload_settings,
   httpuploader,
+  KeymanVersion,
   Keyman.System.UpdateCheckResponse,
   VersionInfo, GetOSVersion,
   SFX,
@@ -249,8 +250,10 @@ begin
   with THTTPUploader.Create(nil) do
   try
     if FInstalledVersion.Version = ''
-      then Fields.Add('Version', AnsiString(FInstallInfo.Version))
-      else Fields.Add('Version', AnsiString(FInstalledVersion.Version));
+      then Fields.Add('version', AnsiString(FInstallInfo.Version))
+      else Fields.Add('version', AnsiString(FInstalledVersion.Version));
+    Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
+    Fields.Add('manual', '1');
 
     Request.HostName := API_Server;
     Request.Protocol := API_Protocol;

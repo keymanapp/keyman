@@ -6,8 +6,8 @@
 
 build: version.res manifest.res icons locale
     $(DCC32) setup.dpr
-    $(TDS2DBG) setup.exe
     $(SENTRYTOOL_DELPHIPREP) setup.exe -dpr setup.dpr
+    $(TDS2DBG) setup.exe
     $(COPY) setup.exe $(PROGRAM)\desktop
 
 locale:
@@ -24,6 +24,10 @@ clean: def-clean
 
 signcode:
     rem SIGNCODE /d "Keyman Desktop Setup" $(PROGRAM)\desktop\setup.exe
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\setup.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\setup.dbg /t keyman-windows
 
 backup:
     $(WZZIP) $(BUILD)\desktop\setup.zip  $(BACKUPDEFAULTS) setup.exe

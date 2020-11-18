@@ -149,6 +149,14 @@ namespace com.keyman.dom {
           ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0); 
       }
 
+
+      /* Tweak the modifiers if an OS meta key is detected; this will allow meta-key-based 
+       * hotkeys to bypass Keyman processing.  We do this AFTER the chiral modifier filtering
+       * because some keyboards specify their own modifierBitmask, which won't include it.
+       * We don't currently use that reference in this method, but that may change in the future.
+       */
+      s.Lmodifiers |= (e.metaKey ? modifierCodes['META']: 0);
+
       // Mnemonic handling.
       if(activeKeyboard && activeKeyboard.isMnemonic) {
         // The following will never set a code corresponding to a modifier key, so it's fine to do this,

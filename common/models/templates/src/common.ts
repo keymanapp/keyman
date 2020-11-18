@@ -74,6 +74,26 @@ namespace models {
     return codeUnit >= 0xD800 && codeUnit <= 0xDBFF;
   }
 
+    /**
+   * Checks whether or not the specified UCS-2 character corresponds to a UTF-16 low surrogate.
+   * 
+   * @param char A single JavaScript (UCS-2) char corresponding to a single code unit.
+   */
+  export function isLowSurrogate(char: string): boolean;
+  /**
+   * Checks whether or not the specified UCS-2 character corresponds to a UTF-16 low surrogate.
+   * 
+   * @param codeUnit A code unit corresponding to a single UCS-2 char.
+   */
+  export function isLowSurrogate(codeUnit: number): boolean;
+  export function isLowSurrogate(codeUnit: string|number): boolean {
+    if(typeof codeUnit == 'string') {
+      codeUnit = codeUnit.charCodeAt(0);
+    }
+
+    return codeUnit >= 0xDC00 && codeUnit <= 0xDFFF;
+  }
+
   export function isSentinel(char: string): boolean {
     return char == models.SENTINEL_CODE_UNIT;
   }
@@ -114,9 +134,7 @@ namespace models {
         // surrogate pairs?  Also, is the string long enough for there to BE a pair?
         if(text.length > 1 && isHighSurrogate(text.charAt(0))) {
           // It's possible, so now we check for low surrogates.
-          let lowSurrogateCode = text.charCodeAt(1);
-  
-          if(lowSurrogateCode >= 0xDC00 && lowSurrogateCode <= 0xDFFF) {
+          if(isLowSurrogate(text.charCodeAt(1))) {
             // We have a surrogate pair; this pair is the 'first' character.
             headUnitLength = 2;
           }
