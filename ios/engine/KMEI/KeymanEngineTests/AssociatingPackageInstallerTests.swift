@@ -326,7 +326,7 @@ class AssociatingPackageInstallerTests: XCTestCase {
     XCTAssertNil(Storage.active.userDefaults.userLexicalModels)
   }
 
-  func testPackageLanguageMismatch() throws {
+  func testPackageLangCodePartialMatch() throws {
     guard let strPackage = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.fvSencotenKMP) as? KeyboardKeymanPackage else {
       XCTFail()
       return
