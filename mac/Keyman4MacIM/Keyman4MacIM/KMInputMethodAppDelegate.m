@@ -19,8 +19,7 @@
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
-#import <Fabric/Fabric.h>
-#import <Crashlytics/Crashlytics.h>
+@import Sentry;
 
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
@@ -113,15 +112,26 @@ id _lastServerWithOSKShowing = nil;
 
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
-    [[Fabric sharedSDK] setDebug: self.debugMode];
-    [Fabric with:@[[Crashlytics class]]];
+
+    NSDictionary *keymanInfo =[[[NSBundle mainBundle] infoDictionary] objectForKey:@"Keyman"];
+    NSString *sentryEnvironment = [keymanInfo objectForKey:@"SentryEnvironment"];
+    NSString *releaseName = [NSString stringWithFormat:@"release-%@", [keymanInfo objectForKey:@"VersionWithTag"]];
+    
+    [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
+        options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@sentry.keyman.com/9";
+        options.releaseName = releaseName;
+        options.environment = sentryEnvironment;
+        // options.debug = @YES; 
+    }];
+    
+    [SentrySDK captureMessage:@"Starting Keyman [test message]"];
 }
 
 #ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
 - (BOOL)alertShowHelp:(NSAlert *)alert {
-    NSLog(@"Crashlytics - KME: Got call to force crash from engine");
-    [[Crashlytics sharedInstance] crash];
-    NSLog(@"Crashlytics - KME: should not have gotten this far!");
+    NSLog(@"Sentry - KME: Got call to force crash from engine");
+    [SentrySDK crash];
+    NSLog(@"Sentry - KME: should not have gotten this far!");
     return NO;
 }
 #endif

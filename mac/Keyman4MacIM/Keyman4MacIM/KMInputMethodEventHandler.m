@@ -8,7 +8,7 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodEventHandlerProtected.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
-#import <Crashlytics/Crashlytics.h>
+@import Sentry;
 
 @implementation KMInputMethodEventHandler
 
@@ -20,8 +20,8 @@ NSMutableString* _pendingBuffer;
 NSUInteger _numberOfPostedDeletesToExpect = 0;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
-NSMutableString* _easterEggForCrashlytics = nil;
-NSString* const kEasterEggText = @"Crashlytics force now";
+NSMutableString* _easterEggForSentry = nil;
+NSString* const kEasterEggText = @"Sentry force now";
 NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 NSRange _previousSelRange;
@@ -78,13 +78,13 @@ NSRange _previousSelRange;
     //        _clientSelectionCanChangeUnexpectedly = YES;
     //    }
 
-    // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is the current keyboard and you type "Crashlytics force now", it will force a simulated crash to test reporting to fabric.io.
+    // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is the current keyboard and you type "Sentry force now", it will force a simulated crash to test reporting to sentry.keyman.com
     if ([self.AppDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-        NSLog(@"Crashlytics - Preparing to detect Easter egg.");
-        _easterEggForCrashlytics = [[NSMutableString alloc] init];
+        NSLog(@"Sentry - Preparing to detect Easter egg.");
+        _easterEggForSentry = [[NSMutableString alloc] init];
     }
     else
-        _easterEggForCrashlytics = nil;
+        _easterEggForSentry = nil;
 
     // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
     // the context, so we pretend/hope it won't.
@@ -327,24 +327,24 @@ NSRange _previousSelRange;
             actions = [self.kme processEvent:event];
         }
         if (actions.count == 0) {
-            if (_easterEggForCrashlytics != nil) {
+            if (_easterEggForSentry != nil) {
                 NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
-                NSLog(@"Crashlytics - KMX name: %@", kmxName);
+                NSLog(@"Sentry - KMX name: %@", kmxName);
                 if ([kmxName isEqualToString:kEasterEggKmxName]) {
-                    NSUInteger len = [_easterEggForCrashlytics length];
-                    NSLog(@"Crashlytics - Processing character(s): %@", [event characters]);
+                    NSUInteger len = [_easterEggForSentry length];
+                    NSLog(@"Sentry - Processing character(s): %@", [event characters]);
                     if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
                         NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-                        NSLog(@"Crashlytics - Adding character to Easter Egg code string: %@", characterToAdd);
-                        [_easterEggForCrashlytics appendString:characterToAdd];
-                        if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
-                            NSLog(@"Crashlytics - Forcing crash now with API Key: %@", [[Crashlytics sharedInstance] APIKey]);
-                            [[Crashlytics sharedInstance] crash];
+                        NSLog(@"Sentry - Adding character to Easter Egg code string: %@", characterToAdd);
+                        [_easterEggForSentry appendString:characterToAdd];
+                        if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
+                            NSLog(@"Sentry - Forcing crash now");
+                            [[SentrySDK] crash];
                         }
                     }
                     else if (len > 0) {
-                        NSLog(@"Crashlytics - Clearing Easter Egg code string.");
-                        [_easterEggForCrashlytics setString:@""];
+                        NSLog(@"Sentry - Clearing Easter Egg code string.");
+                        [_easterEggForSentry setString:@""];
                     }
                 }
             }

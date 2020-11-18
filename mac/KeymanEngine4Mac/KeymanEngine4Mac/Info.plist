@@ -17,11 +17,22 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>Keyman Engine $(PRODUCT_VERSION) for macOS</string>
+	<string>14.0.184</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(PRODUCT_VERSION)</string>
+	<string>14.0.184</string>
+	<key>Keyman</key>
+	<dict>
+		<key>SentryEnvironment</key>
+		<string>local</string>
+		<key>Tier</key>
+		<string>alpha</string>
+		<key>VersionTag</key>
+		<string>-alpha-local</string>
+		<key>VersionWithTag</key>
+		<string>14.0.184-alpha-local</string>
+	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
 	<key>NSPrincipalClass</key>

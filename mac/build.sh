@@ -37,6 +37,7 @@ display_usage() {
     echo "  -test           Runs unit tests (not applicable to 'testapp' target)"
     echo "  -no-codesign    Disables code-signing for Keyman4MacIM, allowing it to be performed separately later"
     echo "  -quiet          Do not display any output except for warnings and errors."
+    echo "  -upload-sentry  Force upload of symbols to Sentry even on test or local environments."
     echo
     echo "Targets (to be built and, optionally, cleaned and tested):"
     echo "  engine          KeymanEngine4Mac (engine)"
@@ -98,10 +99,6 @@ KM4MIM_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$IM_NAME"
 KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
 KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
-
-# Hard-coded keys. These are safe to distribute.
-
-FABRIC_API_KEY_KEYMAN_DEBUG=68056571ada44ad2d93864380272808ada308b24
 
 # KME4M_BUILD_PATH=engine/KME4M/build
 # APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
@@ -207,6 +204,9 @@ while [[ $# -gt 0 ]] ; do
 #                 DO_KEYMANENGINE=true
 #             fi
             ;;
+        -upload-sentry)
+            UPLOAD_SENTRY=true
+            ;;
         testapp)
             DO_KEYMANTESTAPP=true
             ;;
@@ -245,6 +245,7 @@ displayInfo "" \
     "BUILD_OPTIONS: $BUILD_OPTIONS" \
     "BUILD_ACTIONS: $BUILD_ACTIONS" \
     "TEST_ACTION: $TEST_ACTION" \
+    "UPLOAD_SENTRY: $UPLOAD_SENTRY" \
     ""
 
 ### Validate notarization environment variables ###
@@ -298,20 +299,16 @@ updatePlist() {
 	    KM_COMPONENT_BASE_PATH="$1"
 	    KM_COMPONENT_NAME="$2"
 		KM_PLIST="$KM_COMPONENT_BASE_PATH/$KM_COMPONENT_NAME/Info.plist"
-		if [ -f "$KM_PLIST" ]; then
-			echo "Setting $KM_COMPONENT_NAME version to $VERSION in $KM_PLIST"
-			/usr/libexec/Plistbuddy -c "Set CFBundleVersion $VERSION" "$KM_PLIST"
-			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $VERSION" "$KM_PLIST"
-			if [[ "$CONFIG" == "Release" && "$KM_COMPONENT_NAME" == "$IM_NAME" ]]; then
-				echo "Setting Fabric APIKey for release build in $KM_PLIST"
-				if [ "$FABRIC_API_KEY_KEYMAN4MACIM" == "" ]; then
-				    fail "FABRIC_API_KEY_KEYMAN4MACIM environment variable not set!"
-				fi
-				/usr/libexec/Plistbuddy -c "Set Fabric:APIKey $FABRIC_API_KEY_KEYMAN4MACIM" "$KM_PLIST"
-			fi
-		else
+		if [ ! -f "$KM_PLIST" ]; then
 			fail "File not found: $KM_PLIST"
 		fi
+        echo "Setting $KM_COMPONENT_NAME version to $VERSION in $KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $VERSION" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $VERSION" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:SentryEnvironment $VERSION_ENVIRONMENT" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:Tier $TIER" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionTag $VERSION_TAG" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionWithTag $VERSION_WITH_TAG" "$KM_PLIST"
 	fi
 }
 
@@ -340,19 +337,21 @@ if $DO_KEYMANIM ; then
     	fi
     fi
 
-    # Upload symbols (this was hanging when called from xcodebuild)
-    # Actually, it's probably better from here than in the project as we don't need
-    # to upload symbols when developing within xcode, only when doing a real build
-    # See https://stackoverflow.com/questions/53488083/why-is-fabric-upload-symbols-hanging-on-step-begin-processing-dsym-under-xcode
+    # Upload symbols
 
-    cd "$KM4MIM_BASE_PATH"
-    if [ "${CONFIGURATION}" = "Release" ]; then
-        if [ "${FABRIC_API_KEY_KEYMAN4MACIM}" != "" ]; then
-            Pods/Fabric/upload-symbols -a ${FABRIC_API_KEY_KEYMAN4MACIM} -p mac build/${CONFIGURATION}
+    if $UPLOAD_SENTRY ; then
+        if which sentry-cli >/dev/null; then
+            cd "$KM4MIM_BASE_PATH"
+
+            ERROR=$(sentry-cli upload-dif "build/${CONFIGURATION}" 2>&1 >/dev/null)
+            if [ ! $? -eq 0 ]; then
+                fail "Error: sentry-cli - $ERROR"
+            fi
+        else
+            fail "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
         fi
-    else
-        Pods/Fabric/upload-symbols -a ${FABRIC_API_KEY_KEYMAN_DEBUG} -p mac build/${CONFIGURATION}
     fi
+
     cd "$KEYMAN_MAC_BASE_PATH"
 fi
 
