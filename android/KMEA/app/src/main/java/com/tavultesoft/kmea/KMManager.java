@@ -1866,6 +1866,11 @@ public final class KMManager {
         InAppKeyboard.callJavascriptAfterLoad();
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_LOADED, null);
+
+        // Special handling for in-app TextView context keymanapp/keyman#3809
+        if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
+          KMTextView.updateTextContext();
+        }
       }
     }
 
