@@ -286,8 +286,17 @@ execBuildCommand() {
     typeset ret_code
 
     displayInfo "Building $component:" "$cmnd"
+    set +e
     eval $cmnd
     ret_code=$?
+    set -e
+    if [ $ret_code == 65 ]; then
+        # This is often a codesign failure, possibly due to a timeout. We'll retry once before failing
+        displayInfo "Failed to build with code 65, possibly codesign failure. Retrying build of $component:" "$cmnd"
+        eval $cmnd
+        ret_code=$?
+    fi
+
     if [ $ret_code != 0 ]; then
         fail "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
     fi
