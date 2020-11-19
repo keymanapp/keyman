@@ -126,10 +126,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     super.onCreate(savedInstanceState);
     context = this;
 
-    SentryAndroid.init(context, options -> {
-      options.setRelease("release-"+com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
-      options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
-    });
+    checkSendCrashReport();
+    if (KMManager.getMaySendCrashReport()) {
+      SentryAndroid.init(context, options -> {
+        options.setRelease("release-" + com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
+        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
+      });
+    }
 
     checkStoragePermission(null);
     resultReceiver = new DownloadResultReceiver(new Handler(), context);
@@ -741,6 +744,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       if (shouldShowGetStarted)
         showGetStarted();
     }
+  }
+
+  private void checkSendCrashReport() {
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean maySendCrashReport = prefs.getBoolean(KeymanSettingsActivity.sendCrashReport, true);
+    KMManager.setMaySendCrashReport(maySendCrashReport);
   }
 
   @Override
