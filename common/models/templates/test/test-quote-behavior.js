@@ -31,7 +31,18 @@ describe('Quote behaviors', function() {
     });
 
     it.skip('RTL', function() {
-      // TODO:
+      let englishPunctuation = {
+        quotesForKeepSuggestion: { open: `”`, close: `“`},
+        insertAfterWord: " ",
+        isRTL: false
+      }
+
+      var plainQuotedHello;
+      plainQuotedHello = QuoteBehavior.apply(QuoteBehavior.useQuotes, "hello", englishPunctuation, QuoteBehavior.useQuotes);
+      assert.equal(plainQuotedHello, "”hello“");
+
+      // That said... it's very hard to get an assertion in place regarding the
+      // resulting visual appearance of this test.
     });
   });
 
