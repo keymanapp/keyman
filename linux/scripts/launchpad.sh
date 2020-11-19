@@ -4,14 +4,19 @@
 
 # must be run from linux dir
 
-# parameters: [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"] ./scripts/launchpad.sh
+# parameters: [UPLOAD="yes"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"] ./scripts/launchpad.sh
 # UPLOAD="yes" do the dput for real
-# TIER="<tier>" alpha, beta or stable tier. If not provided, use TIER.md
 # PROJECT="<project>" only upload this project
 # DIST="<dist>" only upload for this distribution
-
+# PACKAGEVERSION="<version>" string to append to the package version. Default to "1~sil1"
 
 set -e
+
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
 if [ "${UPLOAD}" == "yes" ]; then
     SIM=""
@@ -19,21 +24,18 @@ else
     SIM="-s"
 fi
 
-# Determine the tier. First check if TIER.md exists
-if [[ -f ../TIER.md ]]; then
-    tier=`cat ../TIER.md`
-elif [[ -z "${TIER}" ]]; then
+# Check the tier
+if [[ -z "${TIER}" ]]; then
     echo "TIER.md or \${TIER} must be set to (alpha, beta, stable) to use this script"
     exit 1
-else
-    tier="${TIER}"
 fi
 
-if [ "${tier}" == "stable" ]; then
+if [ "${TIER}" == "stable" ]; then
     ppa="ppa:keymanapp/keyman"
 else
     ppa="ppa:keymanapp/keyman-daily"
 fi
+echo "ppa: ${ppa}"
 
 if [ ! `which xmllint` ]; then
     echo "you must install xmllint (libxml2-utils package) to use this script"
@@ -78,7 +80,7 @@ for proj in ${projects}; do
     fi
 
     # Update tier in Debian watch files (replacing any previously set tier)
-    sed -i "s/\$tier\|alpha\|beta\|stable/$tier/g" debian/watch
+    sed -i "s/\$tier\|alpha\|beta\|stable/${TIER}/g" debian/watch
 
     version=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -`
     dirversion=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6`
@@ -90,7 +92,7 @@ for proj in ${projects}; do
     mv ${tarname}-${version}.tar.gz ${BASEDIR}/launchpad
     rm ${proj}*.debian.tar.xz
     cd ${BASEDIR}/launchpad
-    wget -N https://downloads.keyman.com/linux/${tier}/${dirversion}/SHA256SUMS
+    wget -N https://downloads.keyman.com/linux/${TIER}/${dirversion}/SHA256SUMS
     sha256sum -c --ignore-missing SHA256SUMS |grep ${tarname}
     cd ${proj}-${version}
     echo `pwd`

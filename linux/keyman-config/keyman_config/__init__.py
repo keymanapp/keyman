@@ -5,6 +5,7 @@ import platform
 import sys
 
 from .version import __version__
+from .version import __versionwithtag__
 from .version import __majorversion__
 from .version import __releaseversion__
 from .version import __tier__

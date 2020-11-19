@@ -9,7 +9,13 @@
 
 set -e
 
-BASEDIR=`pwd`
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+BASEDIR=$(pwd)
 autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
 extra_projects="keyboardprocessor keyman-config"
 
@@ -53,9 +59,6 @@ mkdir -p dist
 for proj in ${autotool_projects}; do
     echo "configure $proj"
     cd $proj
-    oldvers=`cat VERSION`
-    vers=`./configure -version|grep -E 'kmfl|keyman'|grep -Po "${proj} configure \K[^a-z]*"`
-    echo "$vers" > VERSION
     rm -rf ../build-$proj
     mkdir -p ../build-$proj
     cd ../build-$proj
@@ -63,26 +66,22 @@ for proj in ${autotool_projects}; do
     make dist
     mv *.tar.gz ../dist
     cd $BASEDIR
-    echo "$oldvers" > VERSION
 done
 
 for proj in ${extra_projects}; do
     # dist for keyman-config
     if [ "${proj}" == "keyman-config" ]; then
-
         cd keyman-config
-        vers=`cat ../../VERSION.md`
         echo "3.0 (native)" > debian/source/format
-        dch keyman-config --newversion ${vers} --force-bad-version --nomultimaint
+        dch keyman-config --newversion ${VERSION} --force-bad-version --nomultimaint
         dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
             --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
             --tar-ignore=__pycache__ -Zgzip -b .
-        mv ../keyman-config_*.tar.gz ../dist/keyman-config.tar.gz
+        mv ../keyman-config_*.tar.gz ../dist/keyman-config-${VERSION}.tar.gz
         echo "3.0 (quilt)" > debian/source/format
     elif [ "${proj}" == "keyboardprocessor" ]; then
         cd ../common/core
-        vers=`cat ../../VERSION.md`
-        kbpvers="keyman-keyboardprocessor-$vers"
+        kbpvers="keyman-keyboardprocessor-$VERSION"
         cp -a desktop $kbpvers
         cp ../../VERSION.md $kbpvers
         tar cvzf $kbpvers.tar.gz --exclude=debian --exclude=build --exclude=.gitignore $kbpvers
@@ -96,25 +95,24 @@ done
 if [ "$1" == "origdist" ]; then
     cd dist
     for proj in ${autotool_projects}; do
-        tmp=`basename ${proj}*.tar.gz .tar.gz`
+        tmp=$(basename ${proj}*.tar.gz .tar.gz)
         origname=${tmp/$proj-/$proj\_}
-        index=`expr index "${origname}" _`
+        index=$(expr index "${origname}" _)
         mv $proj*.tar.gz ${origname}.orig.tar.gz
     done
 
     for proj in ${extra_projects}; do
         if [ "${proj}" == "keyman-config" ]; then
-            vers=`cat ../../VERSION.md`
-            pkgvers="keyman-config-$vers"
-            tar xfz keyman-config.tar.gz
+            pkgvers="keyman-config-$VERSION"
+            tar xfz keyman-config-${VERSION}.tar.gz
             mv keyman-config ${pkgvers}
-            tar cfz keyman-config_${vers}.orig.tar.gz ${pkgvers}
-            rm keyman-config.tar.gz
+            tar cfz keyman-config_${VERSION}.orig.tar.gz ${pkgvers}
+            rm keyman-config-${VERSION}.tar.gz
             rm -rf ${pkgvers}
         elif [ "${proj}" == "keyboardprocessor" ]; then
-            tmp=`basename keyman-keyboardprocessor*.tar.gz .tar.gz`
+            tmp=$(basename keyman-keyboardprocessor*.tar.gz .tar.gz)
             origname=${tmp/keyman-keyboardprocessor-/keyman-keyboardprocessor\_}
-            index=`expr index "${origname}" _`
+            index=$(expr index "${origname}" _)
             mv keyman-keyboardprocessor*.tar.gz ${origname}.orig.tar.gz
         fi
     done
