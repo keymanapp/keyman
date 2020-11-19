@@ -1,8 +1,5 @@
 apply plugin: 'com.android.application'
 
-ext.rootPath = '../../../'
-apply from: "$rootPath/version.gradle"
-
 android {
     compileSdkVersion 29
 
@@ -19,11 +16,8 @@ android {
         applicationId "com.keyman.kmsample2"
         minSdkVersion 21
         targetSdkVersion 29
-
-        // VERSION_CODE and VERSION_NAME from version.gradle
-        versionCode VERSION_CODE as Integer
-        versionName VERSION_NAME
-        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
+        versionCode 1
+        versionName "1.0"
     }
     buildTypes {
         release {
