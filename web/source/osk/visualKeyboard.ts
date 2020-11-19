@@ -956,7 +956,7 @@ namespace com.keyman.osk {
       this.touchCount = e.touches.length;
 
       // Get nearest key if touching a hidden key or the end of a key row
-      if((key && (key.className.indexOf('key-hidden') >= 0))
+      if((key && ((key.className.indexOf('key-hidden') >= 0) || (key.className.indexOf('key-blank') >= 0)))
         || t.className.indexOf('kmw-key-row') >= 0) {
         key = this.findNearestKey(e,t);
       }
@@ -1298,8 +1298,12 @@ namespace com.keyman.osk {
       // Find minimum distance from any key
       var k, k0=0, dx, dxMax=24, dxMin=100000, x1, x2;
       for(k = 0; k < t.childNodes.length; k++) {
-        let childNode = t.childNodes[k] as HTMLElement;
-        if(childNode.className !== undefined && childNode.className.indexOf('key-hidden') >= 0) {
+        let childNode = t.childNodes[k] as HTMLElement; // gets the .kmw-key-square containing a key
+        if(childNode.firstChild) {
+          childNode = childNode.firstChild as HTMLElement; // gets the actual key element.
+        }
+        if(childNode.className !== undefined  && (childNode.className.indexOf('key-hidden') >= 0)
+             || (childNode.className.indexOf('key-blank') >= 0)){
           continue;
         }
         x1 = childNode.offsetLeft;
