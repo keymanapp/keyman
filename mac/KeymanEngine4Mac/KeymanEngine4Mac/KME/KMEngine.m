@@ -43,8 +43,8 @@ DWORD VKMap[0x80];
     return regex;
 }
 
-NSMutableString* _easterEggForCrashlytics = nil;
-const NSString* kEasterEggText = @"Cr@shlyt!cs crash#KME";
+NSMutableString* _easterEggForSentry = nil;
+const NSString* kEasterEggText = @"Sentrycrash#KME";
 const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 - (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf {
@@ -71,15 +71,16 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     
     if (useVerboseLogging) {
         NSLog(@"KME - Turning verbose logging on");
-        // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Cr@shlyt!cs crash#KME", it will force a simulated crash to test reporting to fabric.io.
+        // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME", 
+        // it will force a simulated crash to test reporting to sentry.keyman.com.
         NSString * kmxName = [[_kmx filePath] lastPathComponent];
-        NSLog(@"Crashlytics - KME: _kmx name = %@", kmxName);
+        NSLog(@"Sentry - KME: _kmx name = %@", kmxName);
         if ([kEasterEggKmxName isEqualToString:kmxName]) {
-            NSLog(@"Crashlytics - KME: Preparing to detect Easter egg.");
-            _easterEggForCrashlytics = [[NSMutableString alloc] init];
+            NSLog(@"Sentry - KME: Preparing to detect Easter egg.");
+            _easterEggForSentry = [[NSMutableString alloc] init];
         }
         else
-            _easterEggForCrashlytics = nil;
+            _easterEggForSentry = nil;
     }
     else
         NSLog(@"KME - Turning verbose logging off");
@@ -126,7 +127,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     KMCompGroup *gp = [self.kmx.group objectAtIndex:startIndex];
     actions = [self processGroup:gp event:event];
     
-    if (actions.count == 0 && _easterEggForCrashlytics != nil) {
+    if (actions.count == 0 && _easterEggForSentry != nil) {
         [self processPossibleEasterEggCharacterFrom:[event characters]];
     }
     
@@ -134,21 +135,21 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {
-    NSUInteger len = [_easterEggForCrashlytics length];
-    NSLog(@"Crashlytics - KME: Processing character(s): %@", characters);
+    NSUInteger len = [_easterEggForSentry length];
+    NSLog(@"Sentry - KME: Processing character(s): %@", characters);
     if ([characters length] == 1 && [characters characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
         NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-        NSLog(@"Crashlytics - KME: Adding character to Easter Egg code string: %@", characterToAdd);
-        [_easterEggForCrashlytics appendString:characterToAdd];
-        if ([kEasterEggText isEqualToString:_easterEggForCrashlytics]) {
-            NSLog(@"Crashlytics - KME: Forcing crash now!");
+        NSLog(@"Sentry - KME: Adding character to Easter Egg code string: %@", characterToAdd);
+        [_easterEggForSentry appendString:characterToAdd];
+        if ([kEasterEggText isEqualToString:_easterEggForSentry]) {
+            NSLog(@"Sentry - KME: Forcing crash now!");
             // Both of the following approaches do throw an exception that causes control to exit this method,
-            // but at least in my debug builds locally, neither one seems to get picked up by Crashlytics in a
-            // way that results in a new report on Fabric.io
+            // but at least in my debug builds locally, neither one seems to get picked up by Sentry in a
+            // way that results in a new report on sentry.keyman.com
             
 #ifndef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
             //#1
-            @throw ([NSException exceptionWithName:@"CrashlyticsForce" reason:@"Easter egg hit" userInfo:nil]);
+            @throw ([NSException exceptionWithName:@"SentryForce" reason:@"Easter egg hit" userInfo:nil]);
             
             //#2
             //    NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
@@ -163,12 +164,12 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
 #endif
             
-            NSLog(@"Crashlytics - KME: You should not be seeing this line!");
+            NSLog(@"Sentry - KME: You should not be seeing this line!");
         }
     }
     else if (len > 0) {
-        NSLog(@"Crashlytics - KME: Clearing Easter Egg code string.");
-        [_easterEggForCrashlytics setString:@""];
+        NSLog(@"Sentry - KME: Clearing Easter Egg code string.");
+        [_easterEggForSentry setString:@""];
     }
 }
 

@@ -52,26 +52,23 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(PRODUCT_VERSION)</string>
-	<key>Fabric</key>
-	<dict>
-		<key>APIKey</key>
-		<string>68056571ada44ad2d93864380272808ada308b24</string>
-		<key>Kits</key>
-		<array>
-			<dict>
-				<key>KitInfo</key>
-				<dict/>
-				<key>KitName</key>
-				<string>Crashlytics</string>
-			</dict>
-		</array>
-	</dict>
 	<key>InputMethodConnectionName</key>
 	<string>Keyman_Input_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>KMInputController</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
 	<string>KMConfigurationWindowController</string>
+	<key>Keyman</key>
+	<dict>
+		<key>SentryEnvironment</key>
+		<string>local</string>
+		<key>Tier</key>
+		<string>alpha</string>
+		<key>VersionTag</key>
+		<string>-alpha-local</string>
+		<key>VersionWithTag</key>
+		<string>$(PRODUCT_VERSION)-alpha-local</string>
+	</dict>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSBackgroundOnly</key>
@@ -85,7 +82,7 @@
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
+	<string>SentryCrashExceptionApplication</string>
 	<key>TISIntendedLanguage</key>
 	<string>mul</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
