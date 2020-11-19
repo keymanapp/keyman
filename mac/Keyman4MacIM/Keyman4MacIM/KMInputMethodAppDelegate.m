@@ -110,17 +110,38 @@ id _lastServerWithOSKShowing = nil;
     return self;
 }
 
+- (KeymanVersionInfo)versionInfo {
+    KeymanVersionInfo result;
+    // Get version information from Info.plist, which is filled in 
+    // by build.sh.
+    NSDictionary *keymanInfo =[[[NSBundle mainBundle] infoDictionary] objectForKey:@"Keyman"];
+    result.sentryEnvironment = [keymanInfo objectForKey:@"SentryEnvironment"];
+    result.tier = [keymanInfo objectForKey:@"Tier"];
+    result.versionRelease = [keymanInfo objectForKey:@"VersionRelease"];
+    result.versionWithTag = [keymanInfo objectForKey:@"VersionWithTag"];
+    if([result.tier isEqualToString:@"stable"]) {
+        result.keymanCom = @"keyman.com";
+        result.helpKeymanCom = @"help.keyman.com";
+        result.apiKeymanCom = @"api.keyman.com";
+    } 
+    else {
+        result.keymanCom = @"keyman-staging.com";
+        result.helpKeymanCom = @"help.keyman-staging.com";
+        result.apiKeymanCom = @"api.keyman-staging.com";
+    }
+    return result;
+}
+
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
 
-    NSDictionary *keymanInfo =[[[NSBundle mainBundle] infoDictionary] objectForKey:@"Keyman"];
-    NSString *sentryEnvironment = [keymanInfo objectForKey:@"SentryEnvironment"];
-    NSString *releaseName = [NSString stringWithFormat:@"release-%@", [keymanInfo objectForKey:@"VersionWithTag"]];
+    KeymanVersionInfo keymanVersionInfo = [self versionInfo];
+    NSString *releaseName = [NSString stringWithFormat:@"release-%@", keymanVersionInfo.versionWithTag];
     
     [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
         options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@sentry.keyman.com/9";
         options.releaseName = releaseName;
-        options.environment = sentryEnvironment;
+        options.environment = keymanVersionInfo.sentryEnvironment;
         // options.debug = @YES; 
     }];
     

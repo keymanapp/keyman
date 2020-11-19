@@ -10,6 +10,8 @@
 	<string></string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleGetInfoString</key>
+	<string>.</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -40,6 +42,8 @@
 		<string>-alpha-local</string>
 		<key>VersionWithTag</key>
 		<string>$(PRODUCT_VERSION)-alpha-local</string>
+		<key>VersionRelease</key>
+		<string>x.y</string>
 	</dict>
 </dict>
 </plist>

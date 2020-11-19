@@ -30,14 +30,9 @@
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
     [self.window setBackgroundColor:[NSColor whiteColor]];
-    NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-    NSString *build = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString *)kCFBundleVersionKey];
-    if ([version isEqualToString:build]) {
-        [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@", version]];
-    }
-    else {
-        [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@ (build %@)", version, build]];
-    }
+
+    KeymanVersionInfo versionInfo = [[self AppDelegate] versionInfo];
+    [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@", versionInfo.versionWithTag]];
          
     NSMutableString *copyrightInfo = [[NSMutableString alloc] initWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"]];
     [self.copyrightLabel setStringValue:copyrightInfo];
