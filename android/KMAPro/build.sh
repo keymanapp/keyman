@@ -29,15 +29,27 @@ display_usage ( ) {
     echo
     echo "Build Keyman for Android"
     echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
+    echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
     echo "  -debug                  Compile only Debug variant"
     echo "  -download-resources     Download sil_euro_latin.kmp and nrc.en.mtnt.model.kmp from downloads.keyman.com"
     exit 1
+}
+
+function makeLocalSentryRelease() {
+  local SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
+  echo "Making a Sentry release for tag $SENTRY_RELEASE_VERSION"
+  sentry-cli upload-dif -p keyman-android --include-sources
+  sentry-cli releases -p keyman-android files $SENTRY_RELEASE_VERSION upload-sourcemaps ./
+
+  echo "Finalizing release tag $SENTRY_RELEASE_VERSION"
+  sentry-cli releases finalize "$SENTRY_RELEASE_VERSION"
 }
 
 NO_DAEMON=false
 ONLY_DEBUG=false
 DO_KEYBOARDS_DOWNLOAD=false
 DO_MODELS_DOWNLOAD=false
+DO_SENTRY_LOCAL_UPLOAD=false
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -45,6 +57,10 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -no-daemon)
             NO_DAEMON=true
+            ;;
+        -upload-sentry)
+            # Overrides default set by build-utils.sh
+            UPLOAD_SENTRY=true
             ;;
         -debug)
             ONLY_DEBUG=true
@@ -76,11 +92,17 @@ if [[ ! -f "$MODELS_TARGET" ]]; then
   DO_MODELS_DOWNLOAD=true
 fi
 
+# Local development optimization to upload local symbols to Sentry
+if [[ $VERSION_ENVIRONMENT == "local" && $ONLY_DEBUG == true && $UPLOAD_SENTRY == true ]]; then
+  DO_SENTRY_LOCAL_UPLOAD=true
+fi
+
 echo
 echo "NO_DAEMON: $NO_DAEMON"
 echo "ONLY_DEBUG: $ONLY_DEBUG"
 echo "DO_KEYBOARDS_DOWNLOAD: $DO_KEYBOARDS_DOWNLOAD"
 echo "DO_MODELS_DOWNLOAD: $DO_MODELS_DOWNLOAD"
+echo "DO_SENTRY_LOCAL_UPLOAD: $DO_SENTRY_LOCAL_UPLOAD"
 echo
 
 if [ "$NO_DAEMON" = true ]; then
@@ -108,3 +130,7 @@ fi
 
 echo "BUILD_FLAGS $BUILD_FLAGS"
 ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
+
+if [ "$DO_SENTRY_LOCAL_UPLOAD" = true ]; then
+  makeLocalSentryRelease
+fi
