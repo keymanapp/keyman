@@ -166,6 +166,11 @@ public final class KMManager {
   // regardless what the Settings preference is.
   private static boolean mayPredictOverride = false;
 
+  // Boolean for whether a keyboard can send embedded KMW crash reports to Sentry
+  // When maySendCrashReport is false, KMW will still attempt to send crash reports, but it
+  // will be blocked.
+  private static boolean maySendCrashReport = true;
+
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
@@ -975,6 +980,20 @@ public final class KMManager {
   public static boolean getMayPredictOverride() {
     return mayPredictOverride;
   }
+
+  /**
+   * If override is true, embedded KMW crash reports are allowed to be sent to sentry.keyman.com
+   * @param override - boolean
+   */
+  public static void setMaySendCrashReport(boolean override) {
+    maySendCrashReport = override;
+  }
+
+  /**
+   * Get the value of maySendCrashReport. Default is true
+   * @return boolean
+   */
+  public static boolean getMaySendCrashReport() { return maySendCrashReport; };
 
   /**
    * Get the font typeface from a fully pathed font name

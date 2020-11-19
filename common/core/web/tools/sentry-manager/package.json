@@ -21,6 +21,6 @@
   },
   "dependencies": {
     "@keymanapp/web-environment": "^14.0.184",
-    "@sentry/browser": "^5.15.5"
+    "@sentry/browser": "^5.27.4"
   }
 }
