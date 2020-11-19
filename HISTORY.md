@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.185 alpha 2020-11-19
+
+* feat(web/engine): allows touch aliasing away from blank keys (#3858)
+* chore(linux): Additionally build packages for Ubuntu 20.10 (Groovy) (#3876)
+* fix(linux): Remove version.sh and get tier/version from .md files (#3686)
+* fix(android/samples): Remove use of version.gradle in Sample projects (#3899)
+* feat(android/engine): Add embedded KeymanWeb engine crash reporting to Sentry (#3825)
+
 ## 14.0.184 alpha 2020-11-18
 
 * feat(developer/compilers): compiler-side groundwork for applyCasing (#3770)
