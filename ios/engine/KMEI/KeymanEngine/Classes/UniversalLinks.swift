@@ -73,7 +73,7 @@ public class UniversalLinks {
                                                          options: [],
                                                          range: linkRange) {
       return false
-    } else if linkString.starts(with: "keyman: ") {
+    } else if linkString.starts(with: "keyman:") {
       return false
     }
 
