@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 14.0.186 alpha 2020-11-20
+
+* feat(mac): Sentry support (#3886)
+* chore(mac): rewrite plists after build (#3891)
+* fix(mac): add icon for Keyman.app (#3892)
+* fix(mac): codesign resilience (#3893)
+* fix(mac): support page and copyright (#3904)
+* fix(android/oem): Update Sentry library in FV app (#3905)
+* fix(android/app): Install keyboard packages w/o welcome.htm (#3874)
+* fix(web/engine): fixes OSK rotation (#3909)
+* feat(common/core/web): integrated suggestion casing tests (#3887)
+* fix(ios/engine): changes image-banner display logic (#3911)
+
 ## 14.0.185 alpha 2020-11-19
 
 * feat(web/engine): allows touch aliasing away from blank keys (#3858)
