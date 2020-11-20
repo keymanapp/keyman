@@ -212,8 +212,15 @@ public class WebViewFragment extends Fragment implements BlockingStep {
 
   @Override
   public void onCompleteClicked(StepperLayout.OnCompleteClickedCallback callback) {
+    // Send data to calling Activity (1-step stepper)
+    if (isInstallButton) {
+     this.callback.onInstallClicked(pkgTarget, packageID);
+    }
+
+    // Cleanup
     getActivity().finish();
   }
+
   @Override
   public void onBackClicked(StepperLayout.OnBackClickedCallback callback) {
     callback.goToPrevStep();
