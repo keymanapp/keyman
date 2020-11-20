@@ -90,7 +90,6 @@ describe('LanguageProcessor', function() {
           languageProcessor.predict(transcription).then(function(suggestions) {
             assert.isOk(suggestions);
             assert.equal(suggestions[0].displayAs, '«li»');
-            // Is not actually inserting what is expected at the moment.
             assert.equal(suggestions[0].transform.insert, ' ');
             assert.equal(suggestions[1].displayAs, 'like');
             assert.equal(suggestions[1].transform.insert, 'like ');
