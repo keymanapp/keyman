@@ -15,12 +15,12 @@ case "$1" in
         # gnome-shell has multiple ibus-daemon processes and needs exit instead of restart
         ibususer=`ps -C ibus-daemon -o user=|grep -v gdm|uniq`
         if [ "x$ibususer" != "x" ]; then
-          sudo -H -u "$ibususer" ibus exit
+          sudo -H -u "$ibususer" ibus exit || true
         fi
       else
         ibususer=`ps -C ibus-daemon -o user=|uniq`
         if [ "x$ibususer" != "x" ]; then
-          sudo -H -u "$ibususer" ibus restart
+          sudo -H -u "$ibususer" ibus restart || true
         fi
       fi
     fi
