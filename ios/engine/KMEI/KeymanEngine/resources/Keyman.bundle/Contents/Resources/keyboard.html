@@ -90,6 +90,7 @@
             function setOskHeight(height) {
                 var kmw=window['keyman'];
                 oskHeight = height;
+                kmw.core.activeKeyboard.refreshLayouts();
                 kmw.osk.show(true);
                 kmw['correctOSKTextSize']();
             }

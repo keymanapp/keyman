@@ -47,6 +47,8 @@ namespace com.keyman {
       var osk = this.keyman.osk;
       // TODO:  Reattach later in the refactoring process!
       //osk.hideLanguageList();
+      // Force a re-layout for the active keyboard's currently-utilized layout.
+      this.keyman.core.activeKeyboard.refreshLayouts();
       osk._Load();
       if(this.oskVisible) {
         osk._Show();
