@@ -349,6 +349,18 @@ namespace com.keyman.keyboards {
       }
     }
 
+    public refreshLayouts() {
+      let formFactors = [ utils.FormFactor.Desktop, utils.FormFactor.Phone, utils.FormFactor.Tablet ];
+
+      let _this = this;
+
+      formFactors.forEach(function(form) {
+        // Currently doesn't work if we reset it to POLYFILLED, likely due to how 'calibration'
+        // currently works.
+        _this.layoutStates[form] = LayoutState.NOT_LOADED;
+      });
+    }
+
     public markLayoutCalibrated(formFactor: utils.FormFactor) {
       if(this.layoutStates[formFactor] != LayoutState.NOT_LOADED) {
         this.layoutStates[formFactor] = LayoutState.CALIBRATED;
