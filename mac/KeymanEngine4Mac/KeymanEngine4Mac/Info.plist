@@ -32,6 +32,8 @@
 		<string>-alpha-local</string>
 		<key>VersionWithTag</key>
 		<string>$(PRODUCT_VERSION)-alpha-local</string>
+		<key>VersionRelease</key>
+		<string>x.y</string>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
