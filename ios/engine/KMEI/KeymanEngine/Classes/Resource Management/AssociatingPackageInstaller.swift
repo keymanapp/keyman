@@ -211,10 +211,10 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     if let defaultLanguageCode = defaultLanguageCode {
       if package.languages.contains(where: { $0.id == defaultLanguageCode }) {
         self.defaultLgCode = defaultLanguageCode
-      } else if let match = package.languages.first(where: { $0.id.contains(defaultLanguageCode) }) {
+      } else if let match = package.languages.first(where: { $0.id.hasPrefix(defaultLanguageCode) }) {
         // The package specifies a more precise ID
         self.defaultLgCode = match.id
-      } else if let match = package.languages.first(where: { defaultLanguageCode.contains($0.id) }) {
+      } else if let match = package.languages.first(where: { defaultLanguageCode.hasPrefix($0.id) }) {
         // The provided default language code is more precise than the id found in the package
         self.defaultLgCode = match.id
       } else {
