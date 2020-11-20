@@ -13,7 +13,6 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.sentry.android.core.SentryAndroid;
-import io.sentry.core.Sentry;
 
 import com.tavultesoft.kmea.*;
 import com.tavultesoft.kmea.data.Keyboard;
