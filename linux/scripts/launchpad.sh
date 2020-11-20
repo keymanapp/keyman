@@ -37,7 +37,7 @@ else
 fi
 echo "ppa: ${ppa}"
 
-if [ ! `which xmllint` ]; then
+if [ ! $(which xmllint) ]; then
     echo "you must install xmllint (libxml2-utils package) to use this script"
     exit 1
 fi
@@ -61,7 +61,7 @@ else
 fi
 
 
-BASEDIR=`pwd`
+BASEDIR=$(pwd)
 
 rm -rf launchpad
 mkdir -p launchpad
@@ -72,30 +72,28 @@ for proj in ${projects}; do
     else
        cd ${proj}
     fi
+
     if [ "${proj}" == "keyman-config" ]; then
-        tarname="keyman_config"
         make clean
-    else
-        tarname="${proj}"
     fi
 
     # Update tier in Debian watch files (replacing any previously set tier)
-    sed -i "s/\$tier\|alpha\|beta\|stable/${TIER}/g" debian/watch
+    sed "s/\$tier\|alpha\|beta\|stable/${TIER}/g" $BASEDIR/scripts/watch.in > debian/watch
 
-    version=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -`
-    dirversion=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6`
+    version=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -)
+    dirversion=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6)
     echo "${proj} version is ${version}"
     uscan
     cd ..
     mv ${proj}-${version} ${BASEDIR}/launchpad
     mv ${proj}_${version}.orig.tar.gz ${BASEDIR}/launchpad
-    mv ${tarname}-${version}.tar.gz ${BASEDIR}/launchpad
+    mv ${proj}-${version}.tar.gz ${BASEDIR}/launchpad
     rm ${proj}*.debian.tar.xz
     cd ${BASEDIR}/launchpad
     wget -N https://downloads.keyman.com/linux/${TIER}/${dirversion}/SHA256SUMS
-    sha256sum -c --ignore-missing SHA256SUMS |grep ${tarname}
+    sha256sum -c --ignore-missing SHA256SUMS |grep ${proj}
     cd ${proj}-${version}
-    echo `pwd`
+    echo $(pwd)
     cp debian/changelog ../${proj}-changelog
     #TODO separate source builds and dputs for each of $dists?
     for dist in ${distributions}; do
