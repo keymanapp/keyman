@@ -556,7 +556,7 @@ begin
       Continue;
     end;
 
-    raw_frames[n] := frame.AddrPC.Offset;
+    raw_frames[n] := NativeUInt(frame.AddrPC.Offset);
     Inc(n);
   end;
 
