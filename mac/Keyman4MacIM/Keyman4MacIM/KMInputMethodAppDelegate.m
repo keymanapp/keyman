@@ -193,36 +193,6 @@ id _lastServerWithOSKShowing = nil;
                 downloadUrl = [NSURL URLWithString:urlString];
             }
         }
-
-        if (downloadUrl && _downloadFilename) {
-            if (_infoWindow.window != nil)
-                [_infoWindow close];
-
-            [self.downloadInfoView setInformativeText:self.downloadFilename];
-            if (self.configWindow.window != nil) {
-                [self.configWindow.window makeKeyAndOrderFront:nil];
-                if (![[self.configWindow.window childWindows] containsObject:self.downloadKBWindow.window]) {
-                    [self.configWindow.window addChildWindow:self.downloadKBWindow.window ordered:NSWindowAbove];
-                }
-                [self.downloadKBWindow.window centerInParent];
-                [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-                [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
-                                                  modalDelegate:self
-                                                 didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                                    contextInfo:nil];
-                [self downloadKeyboardFromURL:downloadUrl];
-            }
-            else {
-                [self.downloadKBWindow.window centerInParent];
-                [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-                [self.downloadKBWindow.window setLevel:NSFloatingWindowLevel];
-                [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
-                                                  modalDelegate:self
-                                                 didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                                    contextInfo:nil];
-                [self downloadKeyboardFromURL:downloadUrl];
-            }
-        }
     }
 }
 
@@ -1092,16 +1062,55 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return _progressIndicator;
 }
 
+- (void)downloadKeyboardFromKeyboardId:(NSString *)keyboardId {
+    KeymanVersionInfo keymanVersionInfo = [self versionInfo];
+    NSString* url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/go/package/download/%@?platform=macos&tier=%@",
+        keymanVersionInfo.keymanCom, keyboardId, keymanVersionInfo.tier]];  //&bcp47=%@&update=0
+    _downloadFilename = [NSString stringWithFormat:@"%@.kmp", keyboardId];
+    [self downloadKeyboardFromURL:url];
+}
+
 - (void)downloadKeyboardFromURL:(NSURL *)url {
-    if (_connection == nil) {
-        [_downloadInfoView setMessageText:@"Downloading..."];
-        NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
-        [button setTitle:@"Cancel"];
-        [button setTag:-1];
-        [self.progressIndicator setDoubleValue:0];
-        NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
-        _receivedData = [[NSMutableData alloc] initWithLength:0];
-        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    NSURL* downloadUrl = url;
+
+    if (downloadUrl && _downloadFilename) {
+        if (_infoWindow.window != nil)
+            [_infoWindow close];
+
+        [self.downloadInfoView setInformativeText:self.downloadFilename];
+        if (self.configWindow.window != nil) {
+            [self.configWindow.window makeKeyAndOrderFront:nil];
+            if (![[self.configWindow.window childWindows] containsObject:self.downloadKBWindow.window]) {
+                [self.configWindow.window addChildWindow:self.downloadKBWindow.window ordered:NSWindowAbove];
+            }
+            [self.downloadKBWindow.window centerInParent];
+            [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
+            [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
+                                                modalDelegate:self
+                                                didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                                                contextInfo:nil];
+        }
+        else {
+            [self.downloadKBWindow.window centerInParent];
+            [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
+            [self.downloadKBWindow.window setLevel:NSFloatingWindowLevel];
+            [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
+                                                modalDelegate:self
+                                                didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                                                contextInfo:nil];
+        }
+
+        if (_connection == nil) {
+            [_downloadInfoView setMessageText:@"Downloading..."];
+            NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
+            [button setTitle:@"Cancel"];
+            [button setTag:-1];
+            [self.progressIndicator setDoubleValue:0];
+            NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+            _receivedData = [[NSMutableData alloc] initWithLength:0];
+            _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+        }
+
     }
 }
 
@@ -1121,6 +1130,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _downloadFilename = nil;
     _receivedData = nil;
     _expectedBytes = 0;
+}
+
+- (NSURLRequest *)connection:(NSURLConnection *)connection
+             willSendRequest:(nonnull NSURLRequest *)request
+            redirectResponse:(nullable NSURLResponse *)response {
+    return request;
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {

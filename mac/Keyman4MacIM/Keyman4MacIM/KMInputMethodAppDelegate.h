@@ -113,6 +113,7 @@ typedef struct {
 - (NSWindowController *)infoWindow_;
 - (NSWindowController *)kbHelpWindow_;
 - (void)processURL:(NSString*)rawUrl;
+- (void)downloadKeyboardFromKeyboardId:(NSString *)keyboardId;
 - (NSString *)kmxFilePathAtIndex:(NSUInteger)index;
 - (NSString *)packagePathAtIndex:(NSUInteger)index;
 - (NSInteger)indexForPackageFolder:(NSString *)packageFolder;
