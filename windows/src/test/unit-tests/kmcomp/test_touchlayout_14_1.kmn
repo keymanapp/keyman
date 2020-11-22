@@ -1,4 +1,5 @@
-﻿store(&VERSION) '10.0'
+﻿c Tests that the keyboard compile throws a warning for 14.0 touchlayout special keys with no good downgrade path.
+store(&VERSION) '9.0'
 store(&NAME) 'Touch Layout 14 (against v10)'
 store(&LAYOUTFILE) 'test_touchlayout_14_1.keyman-touch-layout'
 store(&TARGETS) 'web'

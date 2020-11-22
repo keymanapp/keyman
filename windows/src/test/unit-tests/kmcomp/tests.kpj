@@ -71,6 +71,22 @@
       </Details>
     </File>
     <File>
+      <ID>id_e61b69a634d77a6427e676e0c7e8deb5</ID>
+      <Filename>test_touchlayout_14_2.kmn</Filename>
+      <Filepath>test_touchlayout_14_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_3469a7aa905ab5d483e0aec3da1bcab9</ID>
+      <Filename>test_touchlayout_14_3.kmn</Filename>
+      <Filepath>test_touchlayout_14_3.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
       <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
       <Filename>test_valid.kmx</Filename>
       <Filepath>test_valid.kmx</Filepath>
@@ -93,14 +109,6 @@
       <FileVersion></FileVersion>
       <FileType>.doc</FileType>
       <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
-    </File>
-    <File>
-      <ID>id_e61b69a634d77a6427e676e0c7e8deb5</ID>
-      <Filename>test_touchlayout_14_2.kmn</Filename>
-      <Filepath>test_touchlayout_14_2.kmn</Filepath>
-      <FileVersion>1.0</FileVersion>
-      <FileType>.kmn</FileType>
-      <Details/>
     </File>
   </Files>
 </KeymanDeveloperProject>

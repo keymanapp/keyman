@@ -196,7 +196,6 @@
 #define CWARN_HotkeyHasInvalidModifier                     0x000020A8
 
 #define CWARN_TouchLayoutSpecialLabelOnNormalKey           0x000020A9
-#define CWARN_TouchLayoutSpecialLabelRequires14            0x000020AA
 
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1

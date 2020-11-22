@@ -1557,7 +1557,21 @@ const
 
   // these names were added in Keyman 14
   CSpecialText14: string =
-    '*RTLEnter*'#0'*RTLBkSp*'#0'*ShiftLock*'#0'*ShiftedLock*'#0'*ZWNJ*'#0'*ZWNJiOS*'#0'*ZWNJAndroid*';
+    '*LTREnter*'#0'*LTRBkSp*'#0'*RTLEnter*'#0'*RTLBkSp*'#0'*ShiftLock*'#0'*ShiftedLock*'#0'*ZWNJ*'#0'*ZWNJiOS*'#0'*ZWNJAndroid*';
+  CSpecialText14ZWNJ: string =
+    '*ZWNJ*'#0'*ZWNJiOS*'#0'*ZWNJAndroid*';
+
+  CSpecialText14Map: array[0..8,0..1] of string = (
+    ('*LTREnter*',    '*Enter*'),
+    ('*LTRBkSp*',     '*BkSp*'),
+    ('*RTLEnter*',    '*Enter*'),
+    ('*RTLBkSp*',     '*BkSp*'),
+    ('*ShiftLock*',   '*Shift*'),
+    ('*ShiftedLock*', '*Shifted*'),
+    ('*ZWNJ*',        '<|>'),
+    ('*ZWNJiOS*',     '<|>'),
+    ('*ZWNJAndroid*', '<|>')
+  );
 
 var
   FPlatform: TTouchLayoutPlatform;
@@ -1641,19 +1655,17 @@ var
       //
       if FText.StartsWith('*') and FText.EndsWith('*') and (FText.Length > 2) then
       begin
+        // We do not support '*special*' labels on non-special keys in Keyman 13
+        // or earlier, except for ZWNJ, which will be transformed in function
+        // TransformSpecialKeys14 to '<|>', and  which does not require the custom
+        // OSK font.
         if (CSpecialText10.Contains(FText) or CSpecialText14.Contains(FText)) and
+            not CSpecialText14ZWNJ.Contains(FText) and
             not IsKeyboardVersion14OrLater and
             not (FKeyType in [tktSpecial, tktSpecialActive]) then
         begin
           ReportError(0, CWARN_TouchLayoutSpecialLabelOnNormalKey,
-            Format('Key "%s" on layout "%s", platform "%s" is not a Special key but has the special label "%s". This feature is only supported in Keyman 14 or later', [
-              FId, FLayer.Id, FPlatform.Name, FText
-            ]));
-        end
-        else if CSpecialText14.Contains(FText) and not IsKeyboardVersion14OrLater then
-        begin
-          ReportError(0, CWARN_TouchLayoutSpecialLabelRequires14,
-            Format('Key "%s" on layout "%s", platform "%s" has a special label "%s" which is only supported in Keyman 14 or later', [
+            Format('Key "%s" on layout "%s", platform "%s" does not have the key type "Special" or "Special (active)" but has the label "%s". This feature is only supported in Keyman 14 or later', [
               FId, FLayer.Id, FPlatform.Name, FText
             ]));
         end;
@@ -1694,6 +1706,24 @@ var
             Inc(gp);
             Inc(fgp);
           end;
+        end;
+      end;
+    end;
+
+    procedure TransformSpecialKeys14(var sLayoutFile: string);
+    var
+      i: Integer;
+    begin
+      // Rewrite Special key labels that are only supported in Keyman 14+
+      // This code is a little ugly but effective.
+      if not IsKeyboardVersion14OrLater then
+      begin
+        for i := 0 to High(CSpecialText14Map) do
+        begin
+          // Assumes the JSON output format will not change
+          if FDebug
+            then sLayoutFile := ReplaceStr(sLayoutFile, '"text": "'+CSpecialText14Map[i][0]+'"', '"text": this._v>13 ? "'+CSpecialText14Map[i][0]+'" : "'+CSpecialText14Map[i][1]+'"')
+            else sLayoutFile := ReplaceStr(sLayoutFile, '"text":"'+CSpecialText14Map[i][0]+'"', '"text":this._v>13?"'+CSpecialText14Map[i][0]+'":"'+CSpecialText14Map[i][1]+'"');
         end;
       end;
     end;
@@ -1749,6 +1779,8 @@ begin
       // If not debugging, then this strips out formatting for a big saving in file size
       // This also normalises any values such as Pad or Width which should be strings
       sLayoutFile := Write(FDebug);
+
+      TransformSpecialKeys14(sLayoutFile);
     finally
       Free;
     end;
@@ -1950,6 +1982,8 @@ begin
     'function %s()%s'+
     '{%s'+
     '%s%s%s'+
+    // Following line caches the Keyman major version
+    '%sthis._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;%s'+
     '%sthis.KI="%s";%s'+
     '%sthis.KN="%s";%s'+
     '%sthis.KMINVER="%d.%d";%s'+
@@ -1967,6 +2001,7 @@ begin
     sName, nl,
     nl,
     FTabStop, JavaScript_SetupDebug, nl,
+    FTabStop, nl,
     FTabStop, sName, nl,
     FTabStop, RequotedString(sFullName), nl,
     FTabStop, (fk.version and VERSION_MASK_MAJOR) shr 8, fk.version and VERSION_MASK_MINOR, nl,
@@ -1986,7 +2021,6 @@ begin
 
   if sLayoutFile <> '' then  // I3483
   begin
-    // Layout file format should be JSON: e.g: {...}
     Result := Result + Format('%sthis.KVKL=%s;%s', [FTabStop, sLayoutFile, nl]);   // I3681
   end;
 

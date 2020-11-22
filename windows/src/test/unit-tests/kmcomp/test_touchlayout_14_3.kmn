@@ -1,7 +1,9 @@
 ﻿c Tests that the keyboard compiles without warnings with 14.0 touchlayout special keys.
-store(&VERSION) '14.0'
+
+VERSION 9.0
 store(&TARGETS) 'web'
-store(&LAYOUTFILE) 'test_touchlayout_14_2.keyman-touch-layout'
+store(&LAYOUTFILE) 'test_touchlayout_14_3.keyman-touch-layout'
+
 begin Unicode > use(main)
 
 group(main) using keys

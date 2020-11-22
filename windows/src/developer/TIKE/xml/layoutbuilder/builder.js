@@ -987,7 +987,7 @@ $(function () {
           .css('font-size', key.fontsize);
 
         if(this.specialCharacters[text])
-          $(nkey).css('font-family', 'KeymanwebOsk').css('font-size', '0.8em');
+          $(nkey).addClass('key-special-text');
 
         $('.text', nkey).text(this.renameSpecialKey(text));
         if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
@@ -1450,6 +1450,12 @@ $(function () {
     $('.text', k).text(builder.renameSpecialKey(val));
     k.data('text', val);
 
+    if(this.specialCharacters[val]) {
+      k.addClass('key-special-text');
+    } else {
+      k.removeClass('key-special-text');
+    }
+
     builder.updateCharacterMap(val, false);
   }
 
@@ -1578,7 +1584,7 @@ $(function () {
         .css('font-family', KVKL[builder.lastPlatform].font);
 
       if(this.specialCharacters[text])
-        $(nkey).css('font-family', 'KeymanwebOsk').css('font-size', '0.8em');
+        $(nkey).addClass('key-special-text');
 
       $('.text', nkey).text(this.renameSpecialKey(text));
       builder.updateKeyId(nkey);

@@ -28,8 +28,9 @@ call :should-fail ".kmn to .kmx, with warning" test_invalid_kmx.kmn || goto :eof
 call :should-fail ".kmn to .js, with warning" test_invalid_js.kmn || goto :eof
 call :should-fail ".kps to .kmp, with warning" test_invalid.kps || goto :eof
 
-call :should-fail "10.0 .kmn with 14.0 touch layout codes" test_touchlayout_14_1.kmn || goto :eof
+call :should-fail "10.0 .kmn with 14.0-only touch layout codes" test_touchlayout_14_1.kmn || goto :eof
 call :should-pass "14.0 .kmn with 14.0 touch layout codes" test_touchlayout_14_2.kmn || goto :eof
+call :should-pass "9.0 .kmn with accepted 14.0 touch layout codes" test_touchlayout_14_2.kmn || goto :eof
 
 goto :eof
 

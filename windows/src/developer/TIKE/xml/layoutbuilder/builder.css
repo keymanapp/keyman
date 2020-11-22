@@ -194,7 +194,9 @@ body {
 .key-spacer { background: #f8f8f8; border-color: #eeeeee; }
 
 /* Select image font for special function keys */
-.key-modifier,.key-modifier-selected { font-family:KeymanwebOsk; font-size: 0.8em;}
+.key-special-text,.key-modifier,.key-modifier-selected { font-family:KeymanwebOsk; font-size: 0.8em;}
+
+
 
 .ui-autocomplete {
   max-height: 100px;

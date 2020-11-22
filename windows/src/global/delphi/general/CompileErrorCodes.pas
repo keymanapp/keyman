@@ -199,7 +199,6 @@ const
   CWARN_HotkeyHasInvalidModifier                    = $20A8;
 
   CWARN_TouchLayoutSpecialLabelOnNormalKey          = $20A9;
-  CWARN_TouchLayoutSpecialLabelRequires14           = $20AA;
 
 implementation
 
