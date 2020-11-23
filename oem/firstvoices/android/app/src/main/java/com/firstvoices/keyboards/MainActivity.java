@@ -10,6 +10,8 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.sentry.android.core.SentryAndroid;
@@ -184,8 +186,13 @@ public class MainActivity extends AppCompatActivity {
         @SuppressWarnings("unused")
         @JavascriptInterface
         public void showSetup() {
-            Intent setupIntent = new Intent(context, SetupActivity.class);
-            context.startActivity(setupIntent);
+            // Ensure a keyboard has been selected first
+            if (didCompleteSelectKeyboard()) {
+              Intent setupIntent = new Intent(context, SetupActivity.class);
+              context.startActivity(setupIntent);
+            } else {
+              Toast.makeText(context, context.getString(R.string.select_keyboard_first), Toast.LENGTH_SHORT).show();
+            }
         }
 
         @SuppressWarnings("unused")
@@ -197,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean didCompleteSelectKeyboard() {
+    private static boolean didCompleteSelectKeyboard() {
         return FVShared.getInstance().activeKeyboardCount() > 0;
     }
 

@@ -4,4 +4,7 @@
     <string name="setup">Setup</string>
     <string name="regions">Regions</string>
     <string name="keyboards">Keyboards</string>
+
+    <!-- Context: Installation Instructions -->
+    <string name="select_keyboard_first">Select Keyboard first</string>
 </resources>
