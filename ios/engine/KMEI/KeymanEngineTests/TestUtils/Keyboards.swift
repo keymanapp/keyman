@@ -13,6 +13,7 @@ extension TestUtils {
   enum Keyboards {
     static let khmerAngkorKMP = TestUtils.keyboardsBundle.url(forResource: "khmer_angkor", withExtension: "kmp")!
     static let silEuroLatinKMP = TestUtils.keyboardsBundle.url(forResource: "sil_euro_latin", withExtension: "kmp")!
+    static let fvSencotenKMP = TestUtils.keyboardsBundle.url(forResource: "fv_sencoten", withExtension: "kmp")!
     
     static let khmer_angkor =  InstallableKeyboard(id: "khmer_angkor",
                                                    name: "Khmer Angkor",
@@ -43,5 +44,15 @@ extension TestUtils {
                                                    font: Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil),
                                                    oskFont: nil,
                                                    isCustom: false)
+
+    static let fv_sencoten = InstallableKeyboard(id: "fv_sencoten",
+                                                 name: "SENĆOŦEN",
+                                                 languageID: "str-latn",
+                                                 languageName: "Salish, Straits (Latin)",
+                                                 version: "9.1",
+                                                 isRTL: false,
+                                                 font: nil,
+                                                 oskFont: nil,
+                                                 isCustom: false)
   }
 }

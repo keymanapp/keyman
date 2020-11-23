@@ -150,7 +150,7 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
 
   public static func defaultDownloadClosure(downloadCompletionBlock: @escaping SearchDownloadHandler<FullKeyboardID>) -> SelectionCompletedHandler<FullKeyboardID> {
     return defaultDownloadClosure(withDownloadManager: ResourceDownloadManager.shared,
-                                              downloadCompletionBlock: downloadCompletionBlock)
+                                  downloadCompletionBlock: downloadCompletionBlock)
   }
 
   // For unit testing.
