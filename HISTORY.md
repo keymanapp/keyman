@@ -792,7 +792,7 @@
 
 * fix(android): Fix FileUtilsTest to be cross-platform (#3061)
 * fix(windows): add LARGEADDRESSAWARE flag for all CEF processes (#3064)
-* fix(android) Remove more custom keyboard fields(#3051)
+* fix(android): Remove more custom keyboard fields(#3051)
 * fix(ios): FV settings bundle for SWKeyboard (#3066)
 * change(common/lmlayer): single-pass join word breaker decorator (#3059)
 
