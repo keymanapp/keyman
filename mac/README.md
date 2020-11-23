@@ -43,6 +43,9 @@ configuration for your build environment.
    
    (If you have more than one, you may need to use Keychain Access to differentiate).
    Copy the SHA-1 hash from this command's output.
+   
+   Take note also of the Development Team ID, found in parentheses at the end of the 
+   `labl` blob line.
 
 2. Determine the Apple ID details in order to run a build. You may wish to create an
    App-Specific Password at https://appleid.apple.com/ and use this. Your Shortname will
@@ -54,13 +57,14 @@ configuration for your build environment.
    Note: Use your Apple ID for `<Username>` and the app-specific password you generated above
    for `<Password>`. You'll use these in the next step as well.
 
-3. Add the following environment variables, probably to your .bashrc file, replacing with the
+3. Add the following environment variables to mac/localenv.sh (or to your .bashrc file), replacing with the
    values you collected in the previous steps:
 
         export CERTIFICATE_ID=<SHA1-Fingerprint>
         export APPSTORECONNECT_PROVIDER=<Shortname>
         export APPSTORECONNECT_USERNAME=<Username>
         export APPSTORECONNECT_PASSWORD=<Password>
+        export DEVELOPMENT_TEAM=<TeamID>
 
 ### Compiling from Command Line
 
