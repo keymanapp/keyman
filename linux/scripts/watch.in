@@ -1,0 +1,3 @@
+version=4
+# Tier set by launchpad.sh script
+https://downloads.keyman.com/linux/$tier/@ANY_VERSION@/@PACKAGE@@ANY_VERSION@@ARCHIVE_EXT@ debian uupdate
