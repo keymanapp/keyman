@@ -1868,7 +1868,7 @@ namespace com.keyman.osk {
         this.hkKey=this.getSpecialKey(nLayer,'K_ROPT');
 
         // Always adjust screen height if iPhone or iPod, to take account of viewport changes
-        if(device.OS == 'iOS' && device.formFactor == 'phone') {
+        if(device.OS == 'iOS') {
           this.adjustHeights();
         }
       }

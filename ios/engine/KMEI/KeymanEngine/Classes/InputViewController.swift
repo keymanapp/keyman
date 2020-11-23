@@ -130,6 +130,9 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     }
     let topBarDelta = hideBanner ? 0 : InputViewController.topBarHeight
 
+    // Sets height before the constraints, as it's the height constraint that triggers OSK resizing.
+    keymanWeb.setBannerHeight(to: Int(InputViewController.topBarHeight))
+
     portraitConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: true)
     landscapeConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: false)
 
@@ -141,8 +144,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
       portraitConstraint?.isActive = false
       landscapeConstraint?.isActive = true
     }
-
-    keymanWeb.setBannerHeight(to: Int(InputViewController.topBarHeight))
   }
 }
 
