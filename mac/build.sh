@@ -35,9 +35,10 @@ display_usage() {
     echo "                  is ignored)."
     echo "  -clean          Removes all previously-existing build products for anything to be built before building."
     echo "  -test           Runs unit tests (not applicable to 'testapp' target)"
-    echo "  -no-codesign    Disables code-signing for Keyman4MacIM, allowing it to be performed separately later"
+    echo "  -no-codesign    Disables code-signing (e.g. when testing offline)"
     echo "  -quiet          Do not display any output except for warnings and errors."
     echo "  -upload-sentry  Force upload of symbols to Sentry even on test or local environments."
+    echo "  -no-pods        Skip updating, installing and rebuilding pods"
     echo
     echo "Targets (to be built and, optionally, cleaned and tested):"
     echo "  engine          KeymanEngine4Mac (engine)"
@@ -45,8 +46,9 @@ display_usage() {
     echo "  testapp         Keyman4Mac (test harness)"
     echo "  If no targets are specified, the default targets are 'engine' and 'im'."
     echo
-    echo "For deployment, even locally, the app must be code-signed and notarized by Apple. This requires a valid code"
-    echo "certificate and an active Appstoreconnect Apple ID. These must be supplied in environment variables:"
+    echo "For deployment, even locally, the app must be code-signed and notarized by Apple (see README.md for more"
+    echo "options). This requires a valid code certificate and an active Appstoreconnect Apple ID. These must be"
+    echo "supplied in environment variables or in localenv.sh in this folder"
     echo
     echo "  * CERTIFICATE_ID: Specifies a certificate from your keychain (e.g. use sha1 or name of certificate)"
     echo "          Use with -no-codesign if you don't have access to the core developer certificates."
@@ -58,6 +60,7 @@ display_usage() {
     echo "            -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off"
     echo "  * APPSTORECONNECT_USERNAME: Your Apple ID login name."
     echo "  * APPSTORECONNECT_PASSWORD: Your Apple ID password (may need to be a app-specific password)."
+    echo "  * DEVELOPMENT_TEAM: Your development team ID; if unspecified uses the default Keyman development team."
     exit 1
 }
 
@@ -119,7 +122,9 @@ UPDATE_VERSION_IN_PLIST=true
 DO_KEYMANENGINE=true
 DO_KEYMANIM=true
 DO_KEYMANTESTAPP=false
-CODESIGNING_SUPPRESSION=""
+DO_CODESIGN=true
+DO_PODS=true
+CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
 BUILD_OPTIONS=""
 BUILD_ACTIONS="build"
 TEST_ACTION=""
@@ -127,6 +132,12 @@ CLEAN=false
 QUIET=false
 NOTARIZE=false
 SKIP_BUILD=false
+UPLOAD_SENTRY=false
+
+# Import local environment variables for build
+if [[ -f $(dirname "$THIS_SCRIPT")/localenv.sh ]]; then
+    . $(dirname "$THIS_SCRIPT")/localenv.sh
+fi
 
 # Parse args
 shopt -s nocasematch
@@ -144,14 +155,12 @@ while [[ $# -gt 0 ]] ; do
                 CONFIG="Release"
             elif [[ "$2" =~ ^(q(uick(local)?)?)$ ]]; then
                 LOCALDEPLOY=true
-                NOTARIZE=false
-                CONFIG="Release"
             elif [[ "$2" =~ ^(p(rep(release)?)?)$ ]]; then
                 PREPRELEASE=true
                 NOTARIZE=true
                 CONFIG="Release"
             elif ! [[ "$2" =~ ^(n(one)?)$ ]]; then
-                fail "Invalid deploy option. Must be 'none', 'local' or 'preprelease'."
+                fail "Invalid deploy option. Must be 'none', 'local', 'quicklocal' or 'preprelease'."
             fi
             shift # past argument
             ;;
@@ -177,6 +186,9 @@ while [[ $# -gt 0 ]] ; do
                 shift # past argument
             fi
             ;;
+        -no-pods)
+            DO_PODS=false
+            ;;
         -clean)
             CLEAN=true
             BUILD_ACTIONS="clean $BUILD_ACTIONS"
@@ -185,12 +197,15 @@ while [[ $# -gt 0 ]] ; do
             TEST_ACTION="test"
             ;;
         -no-codesign)
-            CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
+            DO_CODESIGN=false
             ;;
         -quiet)
             QUIET_FLAG=$1
             BUILD_OPTIONS="$BUILD_OPTIONS $QUIET_FLAG"
             QUIET=true
+            ;;
+        -upload-sentry)
+            UPLOAD_SENTRY=true
             ;;
         -h|-?|-help|--help)
             display_usage
@@ -200,12 +215,6 @@ while [[ $# -gt 0 ]] ; do
             ;;
         im)
             DO_KEYMANIM=true
-#             if [[ -f $KME4M_BUILD_PATH/ ]]; then
-#                 DO_KEYMANENGINE=true
-#             fi
-            ;;
-        -upload-sentry)
-            UPLOAD_SENTRY=true
             ;;
         testapp)
             DO_KEYMANTESTAPP=true
@@ -227,7 +236,6 @@ if $SKIP_BUILD ; then
     BUILD_ACTIONS=""
     TEST_ACTION=""
     BUILD_OPTIONS=""
-    CODESIGNING_SUPPRESSION=""
 fi
 
 BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$VERSION"
@@ -241,7 +249,8 @@ displayInfo "" \
     "DO_KEYMANENGINE: $DO_KEYMANENGINE" \
     "DO_KEYMANIM: $DO_KEYMANIM" \
     "DO_KEYMANTESTAPP: $DO_KEYMANTESTAPP" \
-    "CODESIGNING_SUPPRESSION: $CODESIGNING_SUPPRESSION" \
+    "DO_CODESIGN: $DO_CODESIGN" \
+    "DO_PODS: $DO_PODS" \
     "BUILD_OPTIONS: $BUILD_OPTIONS" \
     "BUILD_ACTIONS: $BUILD_ACTIONS" \
     "TEST_ACTION: $TEST_ACTION" \
@@ -260,7 +269,7 @@ if $LOCALDEPLOY && ! $NOTARIZE ; then
 fi
 
 if $PREPRELEASE || $NOTARIZE ; then
-  if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
+  if [ ! $DO_CODESIGN ] && [ -z "${CERTIFICATE_ID}" ]; then
     fail "Code signing must be configured for deployment. See build.sh -help for details."
   fi
 
@@ -290,12 +299,6 @@ execBuildCommand() {
     eval $cmnd
     ret_code=$?
     set -e
-    if [ $ret_code == 65 ]; then
-        # This is often a codesign failure, possibly due to a timeout. We'll retry once before failing
-        displayInfo "Failed to build with code 65, possibly codesign failure. Retrying build of $component:" "$cmnd"
-        eval $cmnd
-        ret_code=$?
-    fi
 
     if [ $ret_code != 0 ]; then
         fail "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
@@ -323,6 +326,22 @@ updatePlist() {
 	fi
 }
 
+execCodeSign() {
+    # Allow the signing to fail once (network transient error on timestamping)
+    typeset ret_code
+    set +e
+    eval codesign "$@"
+    ret_code=$?
+    if [ $ret_code != 0 ]; then
+        eval codesign $params
+        ret_code=$?
+        if [ $ret_code != 0 ]; then
+            fail "Unable to sign component (exit code $ret_code)"
+        fi
+    fi
+    set -e
+}
+
 ### Build Keyman Engine (kmx processor) ###
 
 if $DO_KEYMANENGINE ; then
@@ -337,8 +356,10 @@ fi
 if $DO_KEYMANIM ; then
     echo_heading "Building Keyman.app"
 	cd "$KM4MIM_BASE_PATH"
-    pod update
-	pod install
+    if $DO_PODS ; then
+        pod update
+	    pod install
+    fi
 	cd "$KEYMAN_MAC_BASE_PATH"
     execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     if [ "$TEST_ACTION" == "test" ]; then
@@ -348,16 +369,36 @@ if $DO_KEYMANIM ; then
     fi
     updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
 
+    if [ "$CONFIG" == "Debug" ]; then
+        ENTITLEMENTS_FILE=Keyman.Debug.entitlements
+    else
+        ENTITLEMENTS_FILE=Keyman.entitlements
+    fi
+
+    if [ -z "$DEVELOPMENT_TEAM" ]; then 
+        DEVELOPMENT_TEAM=3YE4W86L3G
+    fi
+
+    # We need to re-sign the app after updating the plist file
+    if $DO_CODESIGN ; then
+        execCodeSign --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
+
+        execCodeSign --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
+
+        execCodeSign --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
+            --entitlements "$KM4MIM_BASE_PATH/$ENTITLEMENTS_FILE" \
+            --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
+            "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
+    fi
+
     # Upload symbols
 
     if $UPLOAD_SENTRY ; then
+        echo "Uploading symbols to sentry.keyman.com"
+
         if which sentry-cli >/dev/null; then
             cd "$KM4MIM_BASE_PATH"
-
-            ERROR=$(sentry-cli upload-dif "build/${CONFIGURATION}" 2>&1 >/dev/null)
-            if [ ! $? -eq 0 ]; then
-                fail "Error: sentry-cli - $ERROR"
-            fi
+            sentry-cli upload-dif "build/${CONFIGURATION}"
         else
             fail "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
         fi

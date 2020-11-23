@@ -340,7 +340,7 @@
 				TargetAttributes = {
 					984C2AD11A79C98D0023F89D = {
 						CreatedOnToolsVersion = 6.1.1;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					984C2ADC1A79C98D0023F89D = {
 						CreatedOnToolsVersion = 6.1.1;
@@ -575,6 +575,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
 				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
@@ -602,6 +603,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
 				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
