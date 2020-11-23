@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.187 alpha 2020-11-23
+
+* chore(mac): use new keyboard install page (#3908)
+* fix(ios/engine): allows some language-code incomplete matches during package installation (#3884)
+* feat(ios/engine): launches external links outside the app (#3889)
+* chore(linux): Fix launchpad build (closes #3875) (#3913)
+* fix(linux): Don't fail installation if restarting ibus fails (#3915)
+
 ## 14.0.186 alpha 2020-11-20
 
 * feat(mac): Sentry support (#3886)
