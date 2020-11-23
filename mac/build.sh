@@ -175,12 +175,12 @@ while [[ $# -gt 0 ]] ; do
                 if $PREPRELEASE && [[ "$2" != "Release" ]]; then
                     echo "Deployment option 'preprelease' supersedes $2 configuration."
                 else
-                	if [[ "$2" == "r" || "$2" == "R" ]]; then
-                    	CONFIG="Release"
+                    if [[ "$2" == "r" || "$2" == "R" ]]; then
+                        CONFIG="Release"
                     elif [[ "$2" == "d" || "$2" == "D" ]]; then
-                    	CONFIG="Debug"
+                        CONFIG="Debug"
                     else
-                    	CONFIG="$2"
+                        CONFIG="$2"
                     fi
                 fi
                 shift # past argument
@@ -219,12 +219,12 @@ while [[ $# -gt 0 ]] ; do
         testapp)
             DO_KEYMANTESTAPP=true
             ;;
-		*)
-		    if $PROCESSING_TARGETS ; then
-			    fail "Unexpected target: $1. Run with --help for help."
-			else
-			    fail "Unexpected option: $1. Run with --help for help."
-			fi
+        *)
+            if $PROCESSING_TARGETS ; then
+                fail "Unexpected target: $1. Run with --help for help."
+            else
+                fail "Unexpected option: $1. Run with --help for help."
+            fi
             ;;
     esac
     shift # past argument
@@ -285,7 +285,7 @@ if $CLEAN ; then
 fi
 
 if [ "$TEST_ACTION" == "test" ]; then
-	carthage bootstrap
+    carthage bootstrap
 fi
 
 execBuildCommand() {
@@ -306,12 +306,12 @@ execBuildCommand() {
 }
 
 updatePlist() {
-	if $UPDATE_VERSION_IN_PLIST ; then
-		KM_PLIST="$1"
+    if $UPDATE_VERSION_IN_PLIST ; then
+        KM_PLIST="$1"
         APPNAME="$2"
-		if [ ! -f "$KM_PLIST" ]; then
-			fail "File not found: $KM_PLIST"
-		fi
+        if [ ! -f "$KM_PLIST" ]; then
+            fail "File not found: $KM_PLIST"
+        fi
         local YEAR=`date "+%Y"`
         echo "Setting version and related fields to $VERSION_WITH_TAG in $KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set CFBundleVersion $VERSION" "$KM_PLIST"
@@ -323,7 +323,7 @@ updatePlist() {
         /usr/libexec/Plistbuddy -c "Set :Keyman:VersionRelease $VERSION_RELEASE" "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set CFBundleGetInfoString $APPNAME $VERSION_WITH_TAG for macOS, Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set NSHumanReadableCopyright Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
-	fi
+    fi
 }
 
 execCodeSign() {
@@ -333,7 +333,7 @@ execCodeSign() {
     eval codesign "$@"
     ret_code=$?
     if [ $ret_code != 0 ]; then
-        eval codesign $params
+        eval codesign "$@"
         ret_code=$?
         if [ $ret_code != 0 ]; then
             fail "Unable to sign component (exit code $ret_code)"
@@ -355,17 +355,17 @@ fi
 
 if $DO_KEYMANIM ; then
     echo_heading "Building Keyman.app"
-	cd "$KM4MIM_BASE_PATH"
+    cd "$KM4MIM_BASE_PATH"
     if $DO_PODS ; then
         pod update
-	    pod install
+        pod install
     fi
-	cd "$KEYMAN_MAC_BASE_PATH"
+    cd "$KEYMAN_MAC_BASE_PATH"
     execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     if [ "$TEST_ACTION" == "test" ]; then
-    	if [ "$CONFIG" == "Debug" ]; then
-    		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
-    	fi
+        if [ "$CONFIG" == "Debug" ]; then
+            execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+        fi
     fi
     updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
 
