@@ -186,34 +186,27 @@
                          [[OSKKey alloc] initWithKeyCode:MVK_QUOTE caption:@"'" scale:1.0],
                          [[OSKKey alloc] initWithKeyCode:MVK_ENTER caption:@"↵" scale:1.75], nil];
         
-        NSArray *row4 = [self use102ndKey] ?
-            [NSArray arrayWithObjects:
-                         [[OSKKey alloc] initWithKeyCode:MVK_LEFT_SHIFT caption:@"⇧" scale:1.25],
-                         [[OSKKey alloc] initWithKeyCode:MVK_OEM102 caption:@"/" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_Z caption:@"Z" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_X caption:@"X" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_C caption:@"C" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_V caption:@"V" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_B caption:@"B" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_N caption:@"N" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_M caption:@"M" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_COMMA caption:@"," scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_PERIOD caption:@"." scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_SLASH caption:@"/" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_RIGHT_SHIFT caption:@"⇧" scale:2.25], nil] :
-            [NSArray arrayWithObjects:
-                         [[OSKKey alloc] initWithKeyCode:MVK_LEFT_SHIFT caption:@"⇧" scale:2.25],
-                         [[OSKKey alloc] initWithKeyCode:MVK_Z caption:@"Z" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_X caption:@"X" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_C caption:@"C" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_V caption:@"V" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_B caption:@"B" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_N caption:@"N" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_M caption:@"M" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_COMMA caption:@"," scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_PERIOD caption:@"." scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_SLASH caption:@"/" scale:1.0],
-                         [[OSKKey alloc] initWithKeyCode:MVK_RIGHT_SHIFT caption:@"⇧" scale:2.25], nil];
+        NSArray *row4a = [self use102ndKey] ?
+                         [NSArray arrayWithObjects:
+                          [[OSKKey alloc] initWithKeyCode:MVK_LEFT_SHIFT caption:@"⇧" scale:1.25],
+                          [[OSKKey alloc] initWithKeyCode:MVK_OEM102 caption:@"\\" scale:1.0], nil] :
+                         [NSArray arrayWithObjects:
+                          [[OSKKey alloc] initWithKeyCode:MVK_LEFT_SHIFT caption:@"⇧" scale:2.25], nil];
+
+        NSArray *row4b = [NSArray arrayWithObjects:
+                          [[OSKKey alloc] initWithKeyCode:MVK_Z caption:@"Z" scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_X caption:@"X" scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_C caption:@"C" scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_V caption:@"V" scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_B caption:@"B" scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_N caption:@"N" scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_M caption:@"M" scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_COMMA caption:@"," scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_PERIOD caption:@"." scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_SLASH caption:@"/" scale:1.0],
+                          [[OSKKey alloc] initWithKeyCode:MVK_RIGHT_SHIFT caption:@"⇧" scale:2.25], nil];
+                
+        NSArray *row4 = [row4a arrayByAddingObjectsFromArray:row4b];
         
         NSArray *row5 = [NSArray arrayWithObjects:
                          [[OSKKey alloc] initWithKeyCode:MVK_LEFT_CTRL caption:@"Ctrl" scale:1.75],
@@ -350,8 +343,8 @@
         [defNKeys addObjectsFromArray:@[nkey1, nkey2]];
         
         if([self use102ndKey]) {
-            nkey1 = [[NKey alloc] init]; nkey1.flags = 2; nkey1.shift = 0; nkey1.vkey = VK_OEM_102; nkey1.text = @"|"; nkey1.bitmap = nil;
-            nkey2 = [[NKey alloc] init]; nkey2.flags = 2; nkey2.shift = 1; nkey2.vkey = VK_OEM_102; nkey2.text = @"\\"; nkey2.bitmap = nil;
+            nkey1 = [[NKey alloc] init]; nkey1.flags = 2; nkey1.shift = 0; nkey1.vkey = VK_OEM_102; nkey1.text = @"\\"; nkey1.bitmap = nil;
+            nkey2 = [[NKey alloc] init]; nkey2.flags = 2; nkey2.shift = 1; nkey2.vkey = VK_OEM_102; nkey2.text = @"|"; nkey2.bitmap = nil;
             [defNKeys addObjectsFromArray:@[nkey1, nkey2]];
         }
         // row 4
