@@ -55,6 +55,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
     SentryManager.start()
 
+    UniversalLinks.externalLinkLauncher = { url in
+      UIApplication.shared.openURL(url)
+    }
+
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       log.outputLevel = .debug

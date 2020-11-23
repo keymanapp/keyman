@@ -84,4 +84,21 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
       """
     );
   }
+
+  // Used to intercept links that should be handled externally.
+  public func webView(_ webView: WKWebView,
+               decidePolicyFor navigationAction: WKNavigationAction,
+               decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    if let link = navigationAction.request.url {
+      if UniversalLinks.isExternalLink(link) {
+        decisionHandler(.cancel)
+
+        // Kick this link out to an external Safari process.
+        UniversalLinks.externalLinkLauncher?(link)
+        return
+      }
+    }
+
+    decisionHandler(.allow)
+  }
 }
