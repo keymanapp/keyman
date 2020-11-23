@@ -1004,6 +1004,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     VKMap[MVK_SPACE] = VK_SPACE;                    // <Space>
     VKMap[MVK_GRAVE] = VK_GRAVE;                    // `
     VKMap[MVK_BACKSPACE] = VK_BACKSPACE;            // <Backspace>
+    VKMap[MVK_OEM102] = VK_OEM_102;                 // 102nd key (ISO keyboards)
     
     // Num Pad
     VKMap[0x41] = VK_NUMPAD_DECIMAL;                // Decimal .

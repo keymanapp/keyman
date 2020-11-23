@@ -182,6 +182,11 @@ struct COMP_KEY {
 
 /* KVK file format definitions */
 
+#define KVKH_102                0x01
+#define KVKH_DISPLAY_UNDERLYING 0x02
+#define KVKH_USE_UNDERLYING     0x04
+#define KVKH_ALTGR              0x08
+
 #define KVKK_BITMAP             0x01
 #define KVKK_UNICODE            0x02
 

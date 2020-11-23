@@ -13,6 +13,8 @@
 #import "WindowsVKCodes.h"
 #import "NKey.h"
 #import "KMEngine.h"
+#include <Carbon/Carbon.h>
+//ocoa/Framework/HIToolbox/event.h>
 
 @interface OSKView()
 @property (nonatomic, strong) NSArray *oskLayout;
@@ -72,8 +74,34 @@
     return YES;
 }
 
+// Returns TRUE for ISO keyboards or when the .kvk file requests the 102nd key
+// to right of the Left Shift key.
+- (BOOL)use102ndKey {
+    /*
+     Note: LMGetKbdType() does not appear to work reliably; it seems to always
+     return ANSI even when there is a European keyboard plugged in to my Macbook.
+     We'll use it anyway in case better results are found for Macs with native
+     ISO keyboards.
+    */
+    UInt8 kbdType = LMGetKbdType();
+    PhysicalKeyboardLayoutType kbdLayoutType = KBGetLayoutType(kbdType);
+    switch(kbdLayoutType) {
+        case kKeyboardANSI: return _kvk != nil && _kvk.flags & KVKH_102;
+        case kKeyboardJIS:
+        case kKeyboardISO: return YES;
+    }
+    // We don't know what the keyboard is, so let's err on the side of
+    // more keys, not fewer
+    return YES;
+}
+
 - (void)setKvk:(KVKFile *)kvk {
     _kvk = kvk;
+
+    // Force the keyboard to re-layout
+    _oskLayout = nil;
+    _oskDefaultNKeys = nil;
+    
     [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:self.oskCtrlState];
 }
 
@@ -159,7 +187,22 @@
                          [[OSKKey alloc] initWithKeyCode:MVK_QUOTE caption:@"'" scale:1.0],
                          [[OSKKey alloc] initWithKeyCode:MVK_ENTER caption:@"↵" scale:1.75], nil];
         
-        NSArray *row4 = [NSArray arrayWithObjects:
+        NSArray *row4 = [self use102ndKey] ?
+            [NSArray arrayWithObjects:
+                         [[OSKKey alloc] initWithKeyCode:MVK_LEFT_SHIFT caption:@"⇧" scale:1.25],
+                         [[OSKKey alloc] initWithKeyCode:MVK_OEM102 caption:@"/" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_Z caption:@"Z" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_X caption:@"X" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_C caption:@"C" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_V caption:@"V" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_B caption:@"B" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_N caption:@"N" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_M caption:@"M" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_COMMA caption:@"," scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_PERIOD caption:@"." scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_SLASH caption:@"/" scale:1.0],
+                         [[OSKKey alloc] initWithKeyCode:MVK_RIGHT_SHIFT caption:@"⇧" scale:2.25], nil] :
+            [NSArray arrayWithObjects:
                          [[OSKKey alloc] initWithKeyCode:MVK_LEFT_SHIFT caption:@"⇧" scale:2.25],
                          [[OSKKey alloc] initWithKeyCode:MVK_Z caption:@"Z" scale:1.0],
                          [[OSKKey alloc] initWithKeyCode:MVK_X caption:@"X" scale:1.0],
@@ -307,6 +350,11 @@
         nkey2 = [[NKey alloc] init]; nkey2.flags = 2; nkey2.shift = 1; nkey2.vkey = VK_QUOTE; nkey2.text = @"\""; nkey2.bitmap = nil;
         [defNKeys addObjectsFromArray:@[nkey1, nkey2]];
         
+        if([self use102ndKey]) {
+            nkey1 = [[NKey alloc] init]; nkey1.flags = 2; nkey1.shift = 0; nkey1.vkey = VK_OEM_102; nkey1.text = @"|"; nkey1.bitmap = nil;
+            nkey2 = [[NKey alloc] init]; nkey2.flags = 2; nkey2.shift = 1; nkey2.vkey = VK_OEM_102; nkey2.text = @"\\"; nkey2.bitmap = nil;
+            [defNKeys addObjectsFromArray:@[nkey1, nkey2]];
+        }
         // row 4
         nkey1 = [[NKey alloc] init]; nkey1.flags = 2; nkey1.shift = 0; nkey1.vkey = VK_KEY_Z; nkey1.text = @"z"; nkey1.bitmap = nil;
         nkey2 = [[NKey alloc] init]; nkey2.flags = 2; nkey2.shift = 1; nkey2.vkey = VK_KEY_Z; nkey2.text = @"Z"; nkey2.bitmap = nil;
