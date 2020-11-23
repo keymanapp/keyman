@@ -1,61 +1,77 @@
 <!DOCTYPE html>
 
 <html>
-	<head>
-	    <title>FirstVoices Keyboards installation</title>
-	    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" name="viewport">
-	    <link rel="stylesheet" type="text/css" href="android-instructions.css" />
-	    <script language="JavaScript">
-	        function showSetup() {
-	            window.jsInterface.showSetup();
-	        }
+    <head>
+        <title>FirstVoices Keyboards installation</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" name="viewport">
+        <link rel="stylesheet" type="text/css" href="android-instructions.css" />
+        <script language="JavaScript">
+            function showSetup() {
+                window.jsInterface.showSetup();
+            }
 
-	        function showRegionList() {
-	            window.jsInterface.showRegionList();
-	        }
+            function showRegionList() {
+                window.jsInterface.showRegionList();
+            }
 
-	        function setCheckBox1On() {
-	            var checkbox1 = document.getElementById("checkbox1");
-	            if (checkbox1.src != "check-on.png") {
-	                checkbox1.src = "check-on.png";
-	                checkbox1.style.opacity = 1.0;
-	            }
-	        }
+            function setCheckBox1On() {
+                var checkbox1 = document.getElementById("checkbox1");
+                if (checkbox1.src != "check-on.png") {
+                    checkbox1.src = "check-on.png";
+                    checkbox1.style.opacity = 1.0;
+                }
 
-	        function setCheckBox1Off() {
-	            var checkbox1 = document.getElementById("checkbox1");
-	            if (checkbox1.src != "check-off.png") {
-	                checkbox1.src = "check-off.png";
-	                checkbox1.style.opacity = 0.25;
-	            }
-	        }
+                enableButton2();
+            }
 
-	        function setCheckBox2On() {
-	            var checkbox2 = document.getElementById("checkbox2");
-	            if (checkbox2.src != "check-on.png") {
-	                checkbox2.src = "check-on.png";
-	                checkbox2.style.opacity = 1.0;
-	            }
-	        }
+            function setCheckBox1Off() {
+                var checkbox1 = document.getElementById("checkbox1");
+                if (checkbox1.src != "check-off.png") {
+                    checkbox1.src = "check-off.png";
+                    checkbox1.style.opacity = 0.25;
+                }
 
-	        function setCheckBox2Off() {
-	            var checkbox2 = document.getElementById("checkbox2");
-	            if (checkbox2.src != "check-off.png") {
-	                checkbox2.src = "check-off.png";
-	                checkbox2.style.opacity = 0.25;
-	            }
-	        }
-	    </script>
-	</head>
+                disableButton2();
+            }
 
-	<body>
+            function disableButton2() {
+                var button2 = document.getElementById("button2");
+                button2.disabled = true;
+                window.console.log("Disabling button2");
+            }
 
-		<div id="instructions">
-			<div id="logo">
-				<img src="firstvoices-logo.gif" alt="FirstVoices" />
-				<p>Keyboards</p>
-			</div>
+            function enableButton2() {
+                var button2 = document.getElementById("button2");
+                button2.disabled = false;
+                window.console.log("Enabling button2");
+            }
+
+            function setCheckBox2On() {
+                var checkbox2 = document.getElementById("checkbox2");
+                if (checkbox2.src != "check-on.png") {
+                    checkbox2.src = "check-on.png";
+                    checkbox2.style.opacity = 1.0;
+                }
+            }
+
+            function setCheckBox2Off() {
+                var checkbox2 = document.getElementById("checkbox2");
+                if (checkbox2.src != "check-off.png") {
+                    checkbox2.src = "check-off.png";
+                    checkbox2.style.opacity = 0.25;
+                }
+            }
+        </script>
+    </head>
+
+    <body>
+
+        <div id="instructions">
+            <div id="logo">
+                <img src="firstvoices-logo.gif" alt="FirstVoices" />
+                <p>Keyboards</p>
+            </div>
 
             <h2>Installation instructions</h2>
             <div class="steps">
@@ -68,32 +84,33 @@
                 <div class="step">
                     <div class="step-number"><span>2</span></div>
                     <div class="step-instruction">
-                        <p><input type="button" value="Setup" onclick="showSetup()" id="button2" /> <img src="check-off.png" alt="CheckBox" class="checkicon" id="checkbox2" /></p>
+                        <p><input type="button" value="Setup" onclick="showSetup()" id="button2" disabled />
+                             <img src="check-off.png" alt="CheckBox" class="checkicon" id="checkbox2" /></p>
                     </div>
                 </div>
             </div>
-			<h2>To use FirstVoices Keyboards</h2>
-				<p>After completing these steps above, selected FirstVoices keyboards will be available on your Android device.</p>
-		</div>
+            <h2>To use FirstVoices Keyboards</h2>
+                <p>After completing these steps above, selected FirstVoices keyboards will be available on your Android device.</p>
+        </div>
 
-		<div id="supporters">
-			<p>FirstVoices gratefully acknowledges the following supporters of this project:</p>
-			<a href="http://www.newrelationshiptrust.ca/"><img src="nrt.svg" alt="" /></a>
-			<a href="http://www.fpcc.ca/"><img src="fpcc.svg" alt="" /></a>
-			<a href="http://www.languagegeek.com/"><img src="languagegeek.png" alt="" /></a>
-		</div>
+        <div id="supporters">
+            <p>FirstVoices gratefully acknowledges the following supporters of this project:</p>
+            <a href="http://www.newrelationshiptrust.ca/"><img src="nrt.svg" alt="" /></a>
+            <a href="http://www.fpcc.ca/"><img src="fpcc.svg" alt="" /></a>
+            <a href="http://www.languagegeek.com/"><img src="languagegeek.png" alt="" /></a>
+        </div>
 
-		<div id="donation">
-			<p>If you like this app please consider supporting FirstVoices by donating to the First Peoples' Cultural Foundation</p>
-			<p><a href="http://fpcf.ca/donate-now/">Donate</a></p>
-		</div>
+        <div id="donation">
+            <p>If you like this app please consider supporting FirstVoices by donating to the First Peoples' Cultural Foundation</p>
+            <p><a href="http://fpcf.ca/donate-now/">Donate</a></p>
+        </div>
 
-		<div id="footer">
-			<h2>Developed by</h2>
-			<img src="keyman.svg" alt="" />
-			<p>SIL International</p>
-			<p><a href="http://www.keyman.com">www.keyman.com</a></p>
-		</div>
+        <div id="footer">
+            <h2>Developed by</h2>
+            <img src="keyman.svg" alt="" />
+            <p>SIL International</p>
+            <p><a href="http://www.keyman.com">www.keyman.com</a></p>
+        </div>
 
-	</body>
+    </body>
 </html>

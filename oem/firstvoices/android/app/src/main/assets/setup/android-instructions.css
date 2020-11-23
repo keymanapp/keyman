@@ -110,7 +110,7 @@ h2{
 .step-number span {
     display: block;
     height: 30px;
-    line-height: 30px;
+    line-height: 15px;
     margin: 15px auto;
     width: 30px;
     -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
@@ -123,7 +123,7 @@ h2{
     color: white;
     text-align: center;
     font-family: 'Nunito';
-    font-size: 1.5em;
+    font-size: 1.0em;
     font-weight: bold;
 }
 
@@ -155,7 +155,7 @@ h2{
 	height: 30px;
 	line-height: 30px;
 	text-transform: uppercase;
-	width: 150px;
+	width: 180px;
 }
 
 #supporters{

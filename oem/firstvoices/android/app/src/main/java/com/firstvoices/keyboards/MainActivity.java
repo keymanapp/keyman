@@ -10,7 +10,6 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -186,13 +185,8 @@ public class MainActivity extends AppCompatActivity {
         @SuppressWarnings("unused")
         @JavascriptInterface
         public void showSetup() {
-            // Ensure a keyboard has been selected first
-            if (didCompleteSelectKeyboard()) {
-              Intent setupIntent = new Intent(context, SetupActivity.class);
-              context.startActivity(setupIntent);
-            } else {
-              Toast.makeText(context, context.getString(R.string.select_keyboard_first), Toast.LENGTH_SHORT).show();
-            }
+            Intent setupIntent = new Intent(context, SetupActivity.class);
+            context.startActivity(setupIntent);
         }
 
         @SuppressWarnings("unused")
