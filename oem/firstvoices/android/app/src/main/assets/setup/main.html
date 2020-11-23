@@ -38,13 +38,13 @@
             function disableButton2() {
                 var button2 = document.getElementById("button2");
                 button2.disabled = true;
-                window.console.log("Disabling button2");
+                button2.style.opacity = 0.25;
             }
 
             function enableButton2() {
                 var button2 = document.getElementById("button2");
                 button2.disabled = false;
-                window.console.log("Enabling button2");
+                button2.style.opacity = 1.0;
             }
 
             function setCheckBox2On() {
