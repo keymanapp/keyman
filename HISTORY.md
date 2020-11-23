@@ -419,7 +419,7 @@
 * feat(windows): add globe icon to Configuration UI (#3446)
 * feat(windows): set UI language from Setup preference on first install (#3447)
 * feat(windows): docs on editing translations (#3448)
-* Modify/android/improve string context (#3457)
+* change(android): Improve string context to help crowdin translators (#3457)
 * fix(android/app): Fix environment portion of app version string (#3462)
 
 ## 14.0.123 alpha 2020-08-05
@@ -648,7 +648,7 @@
 
 ## 14.0.88 alpha 2020-06-08
 
-* modify(android/samples): Update addKeyboard syntax for Sample and Test apps (#3213)
+* change(android/samples): Update addKeyboard syntax for Sample and Test apps (#3213)
 * fix(linux): Restart km-config after installing keyboard (#3214)
 
 ## 14.0.87 alpha 2020-06-05
@@ -673,7 +673,7 @@
 
 ## 14.0.85 alpha 2020-05-30
 
-* modify(android/engine): Clean up naming for formatting QR code URL (#3187)
+* change(android/engine): Clean up naming for formatting QR code URL (#3187)
 
 ## 14.0.84 alpha 2020-05-29
 
@@ -719,7 +719,7 @@
 
 * refactor(common/models): factor out word breakers to their own package (#3125)
 * fix(developer): crash when developer starts (#3138)
-* modify(android): Refactor KeyboardPickerActivity (#3113)
+* chore(android): Refactor KeyboardPickerActivity (#3113)
 * chore(common/resources): cleanup scopes (#3139)
 * feat(web): starts proper KMW Sentry integration (#3122)
 * refactor(common/models/types): rename @keymanapp/lexical-model-types => @keymanapp/models-types (#3143)
@@ -776,7 +776,7 @@
 ## 14.0.68 alpha 2020-05-06
 
 * fix(common): enable build for win x64, use global VERSION.md and fix decxstr() bug (#3076)
-* modify(android): Add methods to go between LanguageResource and JSON (#3079)
+* change(android): Add methods to go between LanguageResource and JSON (#3079)
 * feat(common): auto-update for package versioning (#3078)
 
 ## 14.0.67 alpha 2020-05-05
@@ -800,13 +800,13 @@
 
 * fix(android): Fix FileUtilsTest to be cross-platform (#3061)
 * fix(windows): add LARGEADDRESSAWARE flag for all CEF processes (#3064)
-* Fix/android/remove more custom (#3051)
+* fix(android): Remove more custom keyboard fields(#3051)
 * fix(ios): FV settings bundle for SWKeyboard (#3066)
 * change(common/lmlayer): single-pass join word breaker decorator (#3059)
 
 ## 14.0.62 alpha 2020-05-01
 
-* modify(oem): Update DSN for FV Android app (#3050)
+* change(oem/fv/android): Update DSN for FV Android app (#3050)
 * feat(web/engine): Basic KeyboardProcessor tests (#2994)
 * fix(oem,common): Update FirstVoices build_keyboards.sh script (#3045)
 
@@ -829,7 +829,7 @@
 * chore: merge stable history (#3037)
 * feat(common/lmlayer): create join word breaker decorator (#3021)
 * fix(ios): download fv keyboards (#3040)
-* modify(android): Refactor LanguageResource() and remove "Custom" property (#3033)
+* change(android): Refactor LanguageResource() and remove "Custom" property (#3033)
 
 ## 14.0.58 alpha 2020-04-28
 
@@ -837,8 +837,8 @@
 
 ## 14.0.57 alpha 2020-04-27
 
-* modify(common): Update to Unicode 13.0 (#3029)
-* modify(android): Refactor Keyboard class to not use Map (#3020)
+* change(common): Update to Unicode 13.0 (#3029)
+* change(android): Refactor Keyboard class to not use Map (#3020)
 
 ## 14.0.56 alpha 2020-04-24
 
@@ -847,7 +847,7 @@
 
 ## 14.0.55 alpha 2020-04-23
 
-* modify(android): Convert LanguageListActivity to utility (#3018)
+* change(android): Convert LanguageListActivity to utility (#3018)
 * refactor(web/engine): successful web-core compilation (#2992)
 * change(common/lmlayer): always bundle searchTermToKey() with model (#2971)
 * change(common/lmlayer): remove NFD table (#3014)
@@ -873,7 +873,7 @@
 
 ## 14.0.51 alpha 2020-04-16
 
-* modify(android): Update minimum SDK to 21 (#2993)
+* change(android): Update minimum SDK to 21 (#2993)
 
 ## 14.0.50 alpha 2020-04-15
 
@@ -924,12 +924,12 @@
 
 * fix(web/engine): default layout fix for chiral keyboards (#2936)
 * fix(android): Fix exception in ResourcesUpdateTool (#2933)
-* modify(android): Update sample and test projects to install asset kmp's (#2935)
+* change(android): Update sample and test projects to install asset kmp's (#2935)
 
 ## 14.0.42 alpha 2020-04-01
 
 * fix(android): Fix globe button crash on 3rd party apps (#2930)
-* modify(android) Install default asset kmp's (#2928)
+* change(android) Install default asset kmp's (#2928)
 
 ## 14.0.41 alpha 2020-03-31
 
@@ -1035,7 +1035,7 @@
 * feat(common): sentry release control (#2794)
 * chore(windows): improve build script tests (#2680)
 * fix(web): enhanced sourcemaps + proper sourcemaps for minified KMW (#2809)
-* feat/common/parse-crowdin Add script to parse crowdin translation file (#2801)
+* feat(common): Add script to parse crowdin translation file (#2801)
 * fix(linux): Fix how keyboardprocessor version is set in dist.sh (#2814)
 * feat(android): Additional Sentry integration (#2810)
 * fix(web): applies base key layer property to unassigned subkeys (#2808)
@@ -1072,7 +1072,7 @@
 ## 14.0.20 alpha 2020-03-08
 
 * feat(windows): Chromium replacement for embedded MSHTML in for Keyman Desktop (#1720)
-* Refactor/common/rename core (#2735)
+* refactor(common): Rename keyboard core (#2735)
 
 ## 14.0.19 alpha 2020-03-06
 
@@ -1082,7 +1082,7 @@
 
 * feat(windows): etl2log support tool (#2758)
 * feat(developer): allow use of ISO9995 in key ids (#2741)
-* Feature: Android - Handle keyman:// protocol to download kmp keyboard (#2734)
+* feat(android): Handle keyman:// protocol to download kmp keyboard (#2734)
 * change(android): Cleanup UI strings (#2751)
 * fix(ios): fixes broken online-help versioned link (#2773)
 
