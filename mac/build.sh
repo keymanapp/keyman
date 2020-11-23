@@ -269,7 +269,7 @@ if $LOCALDEPLOY && ! $NOTARIZE ; then
 fi
 
 if $PREPRELEASE || $NOTARIZE ; then
-  if [ ! $DO_CODESIGN ] && [ -z "${CERTIFICATE_ID}" ]; then
+  if [ ! $DO_CODESIGN ] || [ -z "${CERTIFICATE_ID}" ]; then
     fail "Code signing must be configured for deployment. See build.sh -help for details."
   fi
 
