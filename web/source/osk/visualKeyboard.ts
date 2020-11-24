@@ -1868,6 +1868,8 @@ namespace com.keyman.osk {
         this.hkKey=this.getSpecialKey(nLayer,'K_ROPT');
 
         // Always adjust screen height if iPhone or iPod, to take account of viewport changes
+        // Do NOT condition upon form-factor; this line prevents a bug with displaying
+        // the predictive-text banner on the initial keyboard load.  (Issue #2907)
         if(device.OS == 'iOS') {
           this.adjustHeights();
         }
