@@ -158,15 +158,25 @@ namespace com.keyman.osk {
      *  @param  {string}  oldText
      *  @return {string}
      **/
-    protected renameSpecialKey(oldText: string): string {
+    protected renameSpecialKey(oldText: string, osk: VisualKeyboard): string {
       let keyman = (<KeymanBase>window['keyman'])
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-      if(oldText == "*ZWNJ*") {
-        // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
-        // possible / available though, and there's a different standard symbol on Android.
-        oldText = keyman.util.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
-          "*ZWNJAndroid*" :
-          "*ZWNJiOS*";
+      switch(oldText) {
+        case '*ZWNJ*':
+          // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
+          // possible / available though, and there's a different standard symbol on Android.
+          oldText = keyman.util.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+            '*ZWNJAndroid*' :
+            '*ZWNJiOS*';
+          break;
+        case '*Enter*':
+          oldText = osk.isRTL ? '*RTLEnter*' : '*LTREnter*';
+          break;
+        case '*BkSp*':
+          oldText = osk.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
+          break;
+        default:
+          // do nothing.
       }
      
       let specialCodePUA = 0XE000 + VisualKeyboard.specialCharacters[oldText];
@@ -203,7 +213,7 @@ namespace com.keyman.osk {
 
       t.className='kmw-key-text';
 
-      let specialText = this.renameSpecialKey(keyText);
+      let specialText = this.renameSpecialKey(keyText, osk);
       if(specialText != keyText) {
         // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
         keyText = specialText;
@@ -221,8 +231,6 @@ namespace com.keyman.osk {
       if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != '') {
         ts.fontSize=spec['fontsize'];
       }
-
-      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
 
       // For some reason, fonts will sometimes 'bug out' for the embedded iOS page if we
       // instead assign fontFamily to the existing style 'ts'.  (Occurs in iOS 12.)
@@ -246,7 +254,7 @@ namespace com.keyman.osk {
         // code points and use those in rendering the OSK. See #3039 for more details.
         // keyText = '\u25cc' + keyText;
 
-        if(activeKeyboard && activeKeyboard.isRTL) {
+        if(osk.isRTL) {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }
@@ -323,14 +331,14 @@ namespace com.keyman.osk {
       }
     }
 
-    private processSubkeys(btn: KeyElement) {
+    private processSubkeys(btn: KeyElement, osk: VisualKeyboard) {
       // Add reference to subkey array if defined
       var bsn: number, bsk=btn['subKeys'] = this.spec['sk'];
       // Transform any special keys into their PUA representations.
       for(bsn=0; bsn<bsk.length; bsn++) {
         if(bsk[bsn]['sp'] == '1' || bsk[bsn]['sp'] == '2') {
           var oldText=bsk[bsn]['text'];
-          bsk[bsn]['text']=this.renameSpecialKey(oldText);
+          bsk[bsn]['text']=this.renameSpecialKey(oldText, osk);
         }
 
         // If a subkey doesn't have a defined layer property, copy it from the base key's layer by default.
@@ -412,7 +420,7 @@ namespace com.keyman.osk {
 
       // Handle subkey-related tasks.
       if(typeof(spec['sk']) != 'undefined' && spec['sk'] != null) {
-        this.processSubkeys(btn);
+        this.processSubkeys(btn, osk);
       } else {
         btn['subKeys']=null;
       }
@@ -537,6 +545,9 @@ namespace com.keyman.osk {
       '*RAltShift*':      0x68,
       '*LCtrlShift*':     0x69,
       '*RCtrlShift*':     0x70,
+      // Added in Keyman 14.0.
+      '*LTREnter*':       0x05, // Default alias of '*Enter*'.
+      '*LTRBkSp*':        0x04, // Default alias of '*BkSp*'.
       '*RTLEnter*':       0x71,
       '*RTLBkSp*':        0x72,
       '*ShiftLock*':      0x73,
@@ -554,6 +565,7 @@ namespace com.keyman.osk {
     layout: keyboards.ActiveLayout;
     layers: keyboards.LayoutLayer[];
     private layerId: string = "default";
+    readonly isRTL: boolean;
     layerIndex: number;
 
     device: Device;
@@ -624,6 +636,7 @@ namespace com.keyman.osk {
       let layout: keyboards.ActiveLayout;
       if(keyboard) {
         layout = this.layout = keyboard.layout(device.formFactor as utils.FormFactor);
+        this.isRTL = keyboard.isRTL;
       } else {
         // This COULD be called with no backing keyboard; KMW will try to force-show the OSK even without 
         // a backing keyboard on mobile, using the most generic default layout as the OSK's base.
@@ -632,6 +645,7 @@ namespace com.keyman.osk {
         // even if it's "hollow".
         let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
         layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as utils.FormFactor);
+        this.isRTL = false;
       }
       this.layers=layout['layer'];
 
