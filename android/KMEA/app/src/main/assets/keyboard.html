@@ -77,7 +77,9 @@
         oskHeight = h;
       }
       var kmw=window['keyman'];
-      kmw.core.activeKeyboard.refreshLayouts();
+      if(kmw && kmw.core && kmw.core.activeKeyboard) {
+        kmw.core.activeKeyboard.refreshLayouts();
+      }
       kmw['correctOSKTextSize']();
     }
 
