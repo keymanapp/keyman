@@ -15,7 +15,7 @@
 * fix(mac): add icon for Keyman.app (#3892)
 * fix(mac): codesign resilience (#3893)
 * fix(mac): support page and copyright (#3904)
-* fix(android/oem): Update Sentry library in FV app (#3905)
+* fix(oem/fv/android): Update Sentry library in FV app (#3905)
 * fix(android/app): Install keyboard packages w/o welcome.htm (#3874)
 * fix(web/engine): fixes OSK rotation (#3909)
 * feat(common/core/web): integrated suggestion casing tests (#3887)
@@ -41,7 +41,7 @@
 
 * feat(windows): major version upgrades (#3866)
 * feat(developer): support major version upgrades (#3868)
-* Delphi version requirement note (#3871)
+* docs(windows): Update Delphi version requirement note (#3871)
 * feat(web/engine): updates osk font, adds layout codes for new glyphs (#3851)
 * fix(common/core/web): meta key handling (#3847)
 * feat(common/core/web): input processor unit tests (#3836)
@@ -163,7 +163,7 @@
 
 ## 14.0.164 alpha 2020-10-20
 
-* feat(common/models):  context tracking of accepted Suggestions (#3663)
+* feat(common/models): context tracking of accepted Suggestions (#3663)
 * feat(common/models): context reversion modeling (#3685)
 * fix(windows): RefreshKeyboards loses some profiles (#3714)
 * fix(windows): icons missing in Configuration (#3717)
@@ -231,7 +231,7 @@
 
 ## 14.0.153 alpha 2020-10-02
 
-* chore(deps): bump @actions/core from 1.2.2 to 1.2.6 in /resources/build/version (#3646)
+* chore(common/resources): bump @actions/core from 1.2.2 to 1.2.6 in /resources/build/version (#3646)
 * fix(android/app): Switch system keyboard in KMPBrowserActivity (#3648)
 
 ## 14.0.152 alpha 2020-09-30
@@ -285,7 +285,7 @@
 
 ## 14.0.146 alpha 2020-09-22
 
-* chore(deps): bump http-proxy from 1.17.0 to 1.18.1 in /web/testing/regression-tests (#3568)
+* chore(web): bump http-proxy from 1.17.0 to 1.18.1 in /web/testing/regression-tests (#3568)
 * feat(ios/engine): go/package use for model pkg downloads (#3603)
 
 ## 14.0.145 alpha 2020-09-21
@@ -309,7 +309,7 @@
 
 ## 14.0.142 alpha 2020-09-15
 
-* chore(deps): bump node-fetch from 2.6.0 to 2.6.1 in /resources/build/version (#3578)
+* chore(common/resources): bump node-fetch from 2.6.0 to 2.6.1 in /resources/build/version (#3578)
 
 ## 14.0.141 alpha 2020-09-11
 
@@ -319,7 +319,7 @@
 
 * feat(common/models): core edit-distance calculation class (#3526)
 * feat(common/models): Edit path derivation (#3547)
-* feat(common/models):  low-level correction-algorithm infrastructure (#3527)
+* feat(common/models): low-level correction-algorithm infrastructure (#3527)
 * feat(common/models): correction-search algorithm core (#3534)
 
 ## 14.0.139 alpha 2020-09-04
@@ -367,7 +367,7 @@
 ## 14.0.133 alpha 2020-08-25
 
 * feat(common/models): lexicon traversal (#3479)
-* feat(common/models):  actual priority queue for Trie models (#3480)
+* feat(common/models): actual priority queue for Trie models (#3480)
 * feat(common/models): efficient batch-enqueue (#3486)
 
 ## 14.0.132 alpha 2020-08-24
@@ -385,7 +385,7 @@
 ## 14.0.129 alpha 2020-08-17
 
 * feat(windows): rework download keyboard dialog style (#3463)
-* chore: Add sample vscode settings files (#3249)
+* chore(common/resources): Add sample vscode settings files (#3249)
 * fix(linux): Lookup language tag from keyboard (#3408)
 
 ## 14.0.128 alpha 2020-08-13
@@ -400,7 +400,7 @@
 ## 14.0.126 alpha 2020-08-10
 
 * fix(android): Add CI script to publish to Play Store (#3469)
-* fix(android): Update sentry plugin to remove obsolete API  use (#3471)
+* fix(android): Update sentry plugin to remove obsolete API use (#3471)
 * feat(ios/app): universal links for keyboard installation (#3466)
 * fix(ios/engine): Proper associating-installer deinitialization, cancellation tests (#3468)
 * refactor(ios): error definitions, i18n (#3470)
@@ -410,7 +410,7 @@
 
 * fix(android): Update Gradle wrapper to 5.6.4 (#3467)
 * feat(ios/engine): Associating package installer (#3458)
-* feat(ios/app):  Associating package installer use within existing install paths (#3465)
+* feat(ios/app): Associating package installer use within existing install paths (#3465)
 
 ## 14.0.124 alpha 2020-08-06
 
@@ -489,7 +489,7 @@
 
 ## 14.0.114 alpha 2020-07-22
 
-* chore(deps): bump lodash from 4.17.15 to 4.17.19 in /web/testing/regression-tests (#3360)
+* chore(web): bump lodash from 4.17.15 to 4.17.19 in /web/testing/regression-tests (#3360)
 
 ## 14.0.113 alpha 2020-07-21
 
@@ -506,7 +506,7 @@
 
 * refactor(ios/engine): package-version query caching + package state properties (#3335)
 * refactor(ios/engine): keyboard downloads now retrieve KMPs (#3341)
-* refactor(ios/engine):  download queue & download state detection cleanup (#3342)
+* refactor(ios/engine): download queue & download state detection cleanup (#3342)
 * chore(developer): cleanup test constants (#3350)
 * change(common/models/wordbreakers): update word boundary props to 13.0 (#3365)
 * feat(linux): Use staging URLs for alpha version (#3364)
@@ -526,18 +526,19 @@
 * refactor(ios/engine): hashable package keys (#3333)
 * fix(ios/engine): version equality (#3334)
 * refactor(linux): make some methods protected (#3291)
-* feat(android/oem): Add nrc.str.sencoten model and update SystemKeyboard from KMAPro (#3332)
+* feat(oem/fv/android): Add nrc.str.sencoten model and update SystemKeyboard from KMAPro (#3332)
 
 ## 14.0.108 alpha 2020-07-09
 
 * chore: cleanup global ExtPath (#3315)
-* feat(android): Use build-download-resources.sh for KMApro and FV apps (#3322)
+* feat(android/app): Use build-download-resources.sh for KMApro app (#3322)
+* feat(oem/fv/android): Use build-download-resources.sh for FV app (#3322)
 * refactor(ios/engine): Centralized package download utility function (#3299)
-* fix(android/oem): Add a fallback keyboard to FV Android app (#3323)
+* fix(oem/fv/android): Add a fallback keyboard to FV Android app (#3323)
 
 ## 14.0.107 alpha 2020-07-08
 
-* feat(android): Add additional info on installed keyboards exceptions (#3319)
+* feat(android/engine): Add additional info on installed keyboards exceptions (#3319)
 
 ## 14.0.106 alpha 2020-07-04
 
@@ -666,7 +667,7 @@
 * feat(android): Add system globe action to show system keyboards (#3197)
 * feat(linux): Open a .kmp file in km-config (#3183)
 * refactor(ios/engine): kmp.json - Keyboard info deserialization (#3193)
-* refactor(ios/engine): kmp.json - Lexical model info deserialization  (#3195)
+* refactor(ios/engine): kmp.json - Lexical model info deserialization (#3195)
 * feat(ios/engine): kmp.json - full deserialization (#3198)
 * fix(android): Add wrapper for logging errors & exceptions (#3196)
 * fix(oem/fv/ios): new certificate (#3201)
@@ -680,14 +681,14 @@
 * change(web): Selective Sentry uploads (#3163)
 * refactor(ios/engine): Polishes HTTPDownloader to prep for unit testing (#3179)
 * feat(ios/engine): HTTPDownloader unit testing (#3180)
-*  fix(linux): Disable buttons if no keyboard installed (#3184)
-* change(ios/engine):  Removes unused, deprecated JS/JSON-based adhoc install code (#3186)
+* fix(linux): Disable buttons if no keyboard installed (#3184)
+* change(ios/engine): Removes unused, deprecated JS/JSON-based adhoc install code (#3186)
 * change(common/lmlayer): move joiner from LMLayer to model compiler (#3071)
 
 ## 14.0.83 alpha 2020-05-28
 
 * change(ios): Selective Sentry uploads (#3162)
-* Fix/android/package updates (#3175)
+* change(android/engine): Handle keyboard package updates (#3175)
 * fix(common/models/types): fixes models-types build script, sets std header (#3182)
 
 ## 14.0.82 alpha 2020-05-27
@@ -713,7 +714,7 @@
 
 * fix(android): Fix system keyboard globe button override (#3140)
 * fix(web/utils): use build script to generate environment.inc.ts (#3146)
-* change(common/core/web,web): update deps to @keymanapp/models-types (#3147)
+* change(common/core/web,web): update dependencies to @keymanapp/models-types (#3147)
 
 ## 14.0.78 alpha 2020-05-21
 
@@ -730,7 +731,7 @@
 
 * refactor(web/engine): Moves common utility functions into separate `web-utils` package (#3130)
 * refactor(web/engine): renames DeviceSpec, moves to utils (#3132)
-* fix(ios): Fixes keyboard metadata decoding, tweaks to project files  (#3137)
+* fix(ios): Fixes keyboard metadata decoding, tweaks to project files (#3137)
 * feat(windows): Use http: instead of file: for Configuration UI (#3127)
 
 ## 14.0.76 alpha 2020-05-15
@@ -740,7 +741,7 @@
 
 ## 14.0.75 alpha 2020-05-13
 
-* feat(android): Add Tamil lexical model to KMSample2 (#3123)
+* feat(android/samples): Add Tamil lexical model to KMSample2 (#3123)
 
 ## 14.0.74 alpha 2020-05-11
 
@@ -753,8 +754,8 @@
 
 ## 14.0.72 alpha 2020-05-08
 
-* fix(ios/oem): Fixes FV app's system keyboard (#3105)
-* fix(ios/oem): FV light mode lock and basic banner fix (#3108)
+* fix(oem/fv/ios): Fixes FV app's system keyboard (#3105)
+* fix(oem/fv/ios): FV light mode lock and basic banner fix (#3108)
 * fix(windows): sentry cef shutdown interactions (#3107)
 * feat(android): Migrate installed keyboards list to keyboards_list.json (#3091)
 
@@ -764,13 +765,13 @@
 
 ## 14.0.70 alpha 2020-05-07
 
-* fix(android): Fix back button after System Keyboard dismissed (#3093)
-* fix(android): Back button to dismiss KMSample2 system keyboard (#3095)
-* fix(oem): Back button to dismiss FV Android system keyboard (#3096)
+* fix(android/app): Fix back button after System Keyboard dismissed (#3093)
+* fix(android/samples): Back button to dismiss KMSample2 system keyboard (#3095)
+* fix(oem/fv/android): Back button to dismiss FV Android system keyboard (#3096)
 
 ## 14.0.69 alpha 2020-05-06
 
-* fix(common): npm install required for auto inc lerna versions (#3089)
+* fix(common/resources): npm install required for auto inc lerna versions (#3089)
 * fix(windows): sentry x64 stacks truncated pointers (#3087)
 
 ## 14.0.68 alpha 2020-05-06
@@ -781,39 +782,40 @@
 
 ## 14.0.67 alpha 2020-05-05
 
-* fix(ios): Additional libraries for FirstVoices SWKeyboard (#3080)
+* fix(oem/fv/ios): Additional libraries for FirstVoices SWKeyboard (#3080)
 
 ## 14.0.66 alpha 2020-05-04
 
 * feat(web): test Recorder overhaul, Node-based tests using Recorder for KeyboardProcessor (#3060)
-* fix(ios): fv add sentry framework to carthage build step (#3074)
+* fix(oem/fv/ios): add sentry framework to carthage build step (#3074)
 
 ## 14.0.65 alpha 2020-05-03
 
-* fix(ios): try embed of sentry again for fv (#3072)
+* fix(oem/fv/ios): try embed of sentry again for fv (#3072)
 
 ## 14.0.64 alpha 2020-05-01
 
-* fix(ios): add sentry framework to fv keyboards (#3069)
+* fix(oem/fv/ios): add sentry framework to fv keyboards (#3069)
 
 ## 14.0.63 alpha 2020-05-01
 
 * fix(android): Fix FileUtilsTest to be cross-platform (#3061)
 * fix(windows): add LARGEADDRESSAWARE flag for all CEF processes (#3064)
 * fix(android): Remove more custom keyboard fields(#3051)
-* fix(ios): FV settings bundle for SWKeyboard (#3066)
+* fix(oem/fv/ios): FV settings bundle for SWKeyboard (#3066)
 * change(common/lmlayer): single-pass join word breaker decorator (#3059)
 
 ## 14.0.62 alpha 2020-05-01
 
 * change(oem/fv/android): Update DSN for FV Android app (#3050)
 * feat(web/engine): Basic KeyboardProcessor tests (#2994)
-* fix(oem,common): Update FirstVoices build_keyboards.sh script (#3045)
+* fix(oem/fv/android): Update FirstVoices build_keyboards.sh script (#3045)
+* fix(oem/fv/ios): Update FirstVoices build_keyboards.sh script (#3045)
 
 ## 14.0.61 alpha 2020-04-30
 
-* chore(deps): bump @actions/http-client from 1.0.3 to 1.0.8 in /resources/build/version (#3047)
-* fix(ios): firstvoices icon and version info (#3044)
+* chore(common/resources): bump @actions/http-client from 1.0.3 to 1.0.8 in /resources/build/version (#3047)
+* fix(oem/fv/ios): firstvoices icon and version info (#3044)
 * feat(windows): Sentry integration fixes and polish (#3006)
 * feat(common/lmlayer): compile joinWordsAt property (#3032)
 
@@ -828,7 +830,7 @@
 
 * chore: merge stable history (#3037)
 * feat(common/lmlayer): create join word breaker decorator (#3021)
-* fix(ios): download fv keyboards (#3040)
+* fix(oem/fv/ios): download fv keyboards (#3040)
 * change(android): Refactor LanguageResource() and remove "Custom" property (#3033)
 
 ## 14.0.58 alpha 2020-04-28
@@ -881,7 +883,7 @@
 * feat(android): Download cloud keyboards from https://keyman.com/keyboards (#2953)
 * fix(ios): iOS 13.4 subkey menu workaround (#2959)
 * change(ios): Web-based popup key longpresses (#2968)
-* fix(web):  repairs Web regression test suite (#2973)
+* fix(web): repairs Web regression test suite (#2973)
 * feat(android): Dismiss system keyboard on Back press (#2984)
 
 ## 14.0.49 alpha 2020-04-11
@@ -906,17 +908,17 @@
 
 ## 14.0.45 alpha 2020-04-05
 
-* chore(deps-dev): bump minimist from 1.2.2 to 1.2.3 in /web/testing/regression-tests (#2947)
+* chore(web): bump minimist from 1.2.2 to 1.2.3 in /web/testing/regression-tests (#2947)
 
 ## 14.0.44 alpha 2020-04-03
 
 * refactor(web/engine): begins formally removing DOM-aware keyboard API functions from web-core KeyboardInterface (#2915)
 * refactor(web/engine): start of system store abstraction (#2919)
 * refactor(web/engine): Processor now manages current layer; OSK listens via callback (#2920)
-* refactor(web/engine):  RuleBehavior now headless (#2925)
+* refactor(web/engine): RuleBehavior now headless (#2925)
 * refactor(web/engine): variable store storage abstraction (#2926)
 * fix(web): fixes activeElement typing (#2927)
-* refactor(web/engine): relocates DOM-only parts of Processor  (#2938)
+* refactor(web/engine): relocates DOM-only parts of Processor (#2938)
 * fix(android): Change KeyboardHarness/build.sh to not rebuild KMEA (#2943)
 * feat(android): Propagate languageID when downloading kmp (#2944)
 
@@ -924,7 +926,7 @@
 
 * fix(web/engine): default layout fix for chiral keyboards (#2936)
 * fix(android): Fix exception in ResourcesUpdateTool (#2933)
-* change(android): Update sample and test projects to install asset kmp's (#2935)
+* change(android/samples): Update sample and test projects to install asset kmp's (#2935)
 
 ## 14.0.42 alpha 2020-04-01
 
@@ -985,7 +987,7 @@
 
 ## 14.0.33 alpha 2020-03-23
 
-* fix(android): Update min SDK versions for sample apps (#2872)
+* fix(android/samples): Update min SDK versions for sample apps (#2872)
 * refactor(web/engine): extended abstraction with OutputTarget (#2849)
 * refactor(web/engine): reworks use of embedded's keyman['oninserttext'] (#2850)
 * refactor(web/engine): reworks default output handling to return RuleBehaviors (#2854)
@@ -1002,7 +1004,7 @@
 
 ## 14.0.31 alpha 2020-03-20
 
-* fix(android): Fix min SDK version for Sample and Test apps (#2860)
+* fix(android/samples): Fix min SDK version for Sample and Test apps (#2860)
 
 ## 14.0.30 alpha 2020-03-19
 
@@ -1024,7 +1026,7 @@
 
 ## 14.0.27 alpha 2020-03-17
 
-* chore(deps-dev): bump minimist from 1.2.0 to 1.2.2 in /web/testing/regression-tests (#2829)
+* chore(web): bump minimist from 1.2.0 to 1.2.2 in /web/testing/regression-tests (#2829)
 
 ## 14.0.26 alpha 2020-03-16
 
@@ -1042,7 +1044,7 @@
 * feat(android): Start adding RTL to layouts (#2816)
 * fix(common/lmlayer): fixes word lookup from Tries for SMP script-based languages (#2815)
 * feat(common): add release finalization for Sentry (#2819)
-* fix(web): further fixes BuildVisualKeyboard.  Fixes #2818 (#2822)
+* fix(web): further fixes BuildVisualKeyboard. Fixes #2818 (#2822)
 * fix(web): fixes internal reference for validation tool (#2824)
 
 ## 14.0.24 alpha 2020-03-11
@@ -1067,7 +1069,7 @@
 
 ## 14.0.21 alpha 2020-03-08
 
-* fix(ci): builds were never triggered (#2790)
+* fix(common/resources): builds were never triggered (#2790)
 
 ## 14.0.20 alpha 2020-03-08
 
@@ -1105,24 +1107,24 @@
 ## 14.0.15 alpha 2020-02-24
 
 * fix(android): Sanitize app version string for api query (#2715)
-* chore(ci): Improve output when triggering Jenkins jobs (#2706)
-* fix(ci): Fix increment-version.sh script (#2714)
+* chore(common/resources): Improve output when triggering Jenkins jobs (#2706)
+* fix(common/resources): Fix increment-version.sh script (#2714)
 
 ## 14.0.14 alpha 2020-02-21
 
 * chore(linux): allow to trigger Jenkins build from script (#2697)
 * fix(ios): Resource update issues (#2703)
 * fix(web): Web CI target reversion (#2693)
-* refactor(common): Simplify and improve getting hook directory (#2701)
+* refactor(common/resources): Simplify and improve getting hook directory (#2701)
 
 ## 14.0.13 alpha 2020-02-19
 
 * chore: merge p9s2 beta part 2 to master (#2683)
 
 ## 14.0.12 alpha 2020-02-18
-* test(android): Fix build for KMSample1 project (#2669)
+* fix(android/samples): Fix build for KMSample1 project (#2669)
 * fix(developer): upgrade removes preferences (#2668)
-* chore(ci): Rename trigger-definitions.sh to *.config (#2665)
+* chore(common/resources): Rename trigger-definitions.sh to *.config (#2665)
 
 ## 14.0.11 alpha 2020-02-17
 
@@ -1136,21 +1138,21 @@
 ## 14.0.9 alpha 2020-02-10
 
 * fix(common/core): buffer overrun in context api (#2614)
-* fix(ci): refactor trigger of test builds (#2611)
+* fix(common/resources): refactor trigger of test builds (#2611)
 * fix(linux): Fix packaging of keyman-config on Xenial (#2609)
 
 ## 14.0.8 alpha 2020-02-07
 
-* chore(ci): Tweak history management (#2602)
+* chore(common/resources): Tweak history management (#2602)
 * chore(common): Update README.md (#2598)
 * chore: update history (#2605)
 * chore: merge beta P9S1 changes to master (#2606)
-* chore(ci): is build required? (#2603)
+* chore(common/resources): Add script that checks if build is required (#2603)
 * fix(linux): Install requirements before packaging (#2599)
 
 ## 14.0.7 alpha 2020-02-07
 
-* chore(ci): Tweak history management (#2602)
+* chore(common/resources): Tweak history management (#2602)
 * chore(common): Update README.md (#2598)
 
 ## 14.0.6 alpha 2020-02-06
@@ -1160,20 +1162,20 @@
 
 ## 14.0.5 alpha 2020-02-04
 
-* chore(ci): support test builds on master/beta/stable-x.y (#2576)
+* chore(common/resources): support test builds on master/beta/stable-x.y (#2576)
 
 ## 14.0.4 alpha 2020-02-03
 
-* chore(ci): trigger builds after version increment (#2572)
+* chore(common/resources): trigger builds after version increment (#2572)
 
 ## 14.0.3 alpha 2020-02-03
 
-* chore(ci): increment version final (#2568)
-* chore(ci): add version tags (#2570)
+* chore(common/resources): increment version final (#2568)
+* chore(common/resources): add version tags (#2570)
 
 ## 14.0.2 alpha 2020-01-29
 
-* chore(ci): version tags (#2562)
+* chore(common/resources): version tags (#2562)
 
 ## 14.0.1 alpha 2020-01-29
 
