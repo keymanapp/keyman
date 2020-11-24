@@ -65,6 +65,7 @@ NSRange _previousSelRange;
             [clientAppId isEqual: @"com.adobe.AfterEffects"] ||
             [clientAppId isEqual: @"com.microsoft.VSCode"] ||
             [clientAppId isEqual: @"com.google.Chrome"] ||
+            [clientAppId hasPrefix: @"net.java"] ||
             [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
                /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */);
 
