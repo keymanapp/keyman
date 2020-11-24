@@ -17,19 +17,19 @@
 }
 
 html, body{
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: 0;
 }
 
 html{
-	margin: 0;
-	min-height: 100%;
-	position: relative;
+    margin: 0;
+    min-height: 100%;
+    position: relative;
 }
 
 body{
-	background: #f7511e;
+    background: #f7511e;
     background: -moz-linear-gradient(25deg,  #f7511e 0%, #aa1225 55%, #9f031f 100%);
     background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#f7511e), color-stop(55%,#aa1225), color-stop(100%,#9f031f));
     background: -webkit-linear-gradient(25deg,  #f7511e 0%,#aa1225 55%,#9f031f 100%);
@@ -37,19 +37,19 @@ body{
     background: -ms-linear-gradient(25deg,  #f7511e 0%,#aa1225 55%,#9f031f 100%);
     /*background: linear-gradient(25deg,  #f7511e 0%,#aa1225 55%,#9f031f 100%);*/
 
-	color: #fff;
-	font-family: 'Open Sans';
-	margin: 0 0 200px 0;
+    color: #fff;
+    font-family: 'Open Sans';
+    margin: 0 0 200px 0;
 }
 
 #instructions{
-	padding: 0 30px 10px;
-	width: calc(100% - 60px);
+    padding: 0 30px 10px;
+    width: calc(100% - 60px);
 }
 
 #instructions p{
-	font-size: 0.875em;
-	margin: 15px 0;
+    font-size: 0.875em;
+    margin: 15px 0;
 }
 
 #logo {
@@ -59,8 +59,8 @@ body{
 }
 
 #logo img{
-	max-width: 400px;
-	width: 100%;
+    max-width: 400px;
+    width: 100%;
 }
 
 #logo p{
@@ -73,44 +73,44 @@ body{
 }
 
 h2{
-	color: #ffd988;
-	font-family: 'Nunito';
-	font-size: 1.25em;
-	font-weight: normal;
+    color: #ffd988;
+    font-family: 'Nunito';
+    font-size: 1.25em;
+    font-weight: normal;
 }
 
 .steps{
-	display: table;
-	width: 100%;
+    display: table;
+    width: 100%;
 }
 
 .step{
-	display: table-row;
+    display: table-row;
 }
 
 .step-number, .step-instruction{
-	border-bottom: 1px solid #A0BC76;
-	display: table-cell;
-	vertical-align: top;
+    border-bottom: 1px solid #A0BC76;
+    display: table-cell;
+    vertical-align: top;
 }
 
 .step-number{
-	width: 80px;
+    width: 80px;
 }
 
 .step-number img{
-	display: block;
-	height: 30px;
-	margin: 15px auto;
-	width: 30px;
-	-webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
-	filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+    display: block;
+    height: 30px;
+    margin: 15px auto;
+    width: 30px;
+    -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
 }
 
 .step-number span {
     display: block;
     height: 30px;
-    line-height: 15px;
+    line-height: 25px;
     margin: 15px auto;
     width: 30px;
     -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
@@ -128,34 +128,49 @@ h2{
 }
 
 .steps.use .step-number, .steps.use .step-instruction{
-	border-bottom: 0 none;
+    border-bottom: 0 none;
 }
 
 .step-instruction{
-	margin-top: 10px;
+    margin-top: 10px;
 }
 
 .step-instruction img{
-	-webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
-	filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
-	height: 30px;
-	margin-right: 5px;
-	vertical-align: top;
-	width: 30px;
-	opacity: 0.25;
+    -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+    height: 30px;
+    margin-right: 5px;
+    vertical-align: top;
+    width: 30px;
+    opacity: 0.25;
 }
 
 .step-instruction input[type="button"]{
-	background-color: #DDDDDD;
-	border: 0 none;
-	border-radius: 5px;
-	color: #333;
-	-webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
-	filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
-	height: 30px;
-	line-height: 30px;
-	text-transform: uppercase;
-	width: 180px;
+    background-color: #DDDDDD;
+    border: 0 none;
+    border-radius: 5px;
+    color: #333;
+    -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+    height: 30px;
+    line-height: 30px;
+    width: 150px;
+}
+
+.checkIconOff {
+    alt: 'CheckBoxOff';
+    background: url('check-off.png');
+    opacity: 0.25;
+}
+
+.checkIconOn {
+    alt: 'CheckBoxOn';
+    background: url('check-on.png');
+    opacity: 1.0;
+}
+
+#button2:disabled {
+    opacity: 0.25;
 }
 
 #supporters{
@@ -207,9 +222,9 @@ h2{
 }
 
 #footer{
-	background-color: #605E4B;
-	color: #CFCEC8;
-	height: 200px;
+    background-color: #605E4B;
+    color: #CFCEC8;
+    height: 200px;
     bottom: 0;
     left: 0;
     position: absolute;
@@ -218,15 +233,15 @@ h2{
 }
 
 #footer h2, #footer a{
-	color: #CFCEC8;
+    color: #CFCEC8;
 }
 
 #footer p{
-	font-size: 0.875em;
-	margin: 5px 0;
+    font-size: 0.875em;
+    margin: 5px 0;
 }
 
 #footer img{
-	height: auto;
-	width: 50px;
+    height: auto;
+    width: 50px;
 }

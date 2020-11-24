@@ -15,52 +15,40 @@
                 window.jsInterface.showRegionList();
             }
 
-            function setCheckBox1On() {
-                var checkbox1 = document.getElementById("checkbox1");
-                if (checkbox1.src != "check-on.png") {
-                    checkbox1.src = "check-on.png";
-                    checkbox1.style.opacity = 1.0;
-                }
+            function setCheckBoxOn(id) {
+                var checkbox = document.getElementById(id);
+                if (checkbox) {
+                    if (checkbox.className != "checkIconOn") {
+                    checkbox.className = "checkIconOn";
+                    }
 
-                enableButton2();
+                    if (id == "checkbox1") {
+                        enableButton2();
+                    }
+                }
             }
 
-            function setCheckBox1Off() {
-                var checkbox1 = document.getElementById("checkbox1");
-                if (checkbox1.src != "check-off.png") {
-                    checkbox1.src = "check-off.png";
-                    checkbox1.style.opacity = 0.25;
-                }
+            function setCheckBoxOff(id) {
+                var checkbox = document.getElementById(id);
+                if (checkbox) {
+                    if (checkbox.className != "checkIconOff") {
+                        checkbox.className = "checkIconOff";
+                    }
 
-                disableButton2();
+                    if (id == "checkbox1") {
+                        disableButton2();
+                    }
+                }
             }
 
             function disableButton2() {
                 var button2 = document.getElementById("button2");
                 button2.disabled = true;
-                button2.style.opacity = 0.25;
             }
 
             function enableButton2() {
                 var button2 = document.getElementById("button2");
                 button2.disabled = false;
-                button2.style.opacity = 1.0;
-            }
-
-            function setCheckBox2On() {
-                var checkbox2 = document.getElementById("checkbox2");
-                if (checkbox2.src != "check-on.png") {
-                    checkbox2.src = "check-on.png";
-                    checkbox2.style.opacity = 1.0;
-                }
-            }
-
-            function setCheckBox2Off() {
-                var checkbox2 = document.getElementById("checkbox2");
-                if (checkbox2.src != "check-off.png") {
-                    checkbox2.src = "check-off.png";
-                    checkbox2.style.opacity = 0.25;
-                }
             }
         </script>
     </head>
@@ -78,14 +66,16 @@
                 <div class="step">
                     <div class="step-number"><span>1</span></div>
                     <div class="step-instruction">
-                        <p><input type="button" value="Select keyboards" onclick="showRegionList()" id="button1" /> <img src="check-off.png" alt="CheckBox" class="checkicon" id="checkbox1" /></p>
+                        <p><input type="button" value="Select keyboards" onclick="showRegionList()" id="button1" /> 
+                            <img class="checkIconOff" id="checkbox1" /></p>
                     </div>
                 </div>
                 <div class="step">
                     <div class="step-number"><span>2</span></div>
                     <div class="step-instruction">
+                        <!-- Setup disabled until a keyboard is selected -->
                         <p><input type="button" value="Setup" onclick="showSetup()" id="button2" disabled />
-                             <img src="check-off.png" alt="CheckBox" class="checkicon" id="checkbox2" /></p>
+                             <img class="checkIconOff" id="checkbox2" /></p>
                     </div>
                 </div>
             </div>
@@ -109,7 +99,7 @@
             <h2>Developed by</h2>
             <img src="keyman.svg" alt="" />
             <p>SIL International</p>
-            <p><a href="http://www.keyman.com">www.keyman.com</a></p>
+            <p><a href="https://www.keyman.com">www.keyman.com</a></p>
         </div>
 
     </body>
