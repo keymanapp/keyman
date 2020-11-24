@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.188 alpha 2020-11-24
+
+* Update README.md (#3880)
+* fix(windows): sentry range check error (#3921)
+* chore(common): Clean up commit types in HISTORY.md (#3926)
+* fix(android, ios): adds null guard to refreshLayouts call (#3927)
+* fix(ios/engine): banner inconsistency (#3925)
+* chore(web): adds LTREnter, LTRBkSp, and associated layout mapping (#3937)
+* fix(web): adds null guards for two Sentry errors (#3941)
+* chore(common): additional cleanup to HISTORY.md (#3942)
+
 ## 14.0.187 alpha 2020-11-23
 
 * chore(mac): use new keyboard install page (#3908)
