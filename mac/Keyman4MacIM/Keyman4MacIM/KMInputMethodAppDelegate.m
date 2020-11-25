@@ -294,6 +294,51 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
                     [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
                 }
+
+                switch(sysEvent.keyCode) {
+                    case kVK_Home:
+                    case kVK_PageUp:
+                    case kVK_End:
+                    case kVK_PageDown:
+                        // While these four may not actually move the cursor, this is application-dependent,
+                        // so we'll treat them all as a context change. This means we lose deadkeys if these
+                        // are pressed, but that's actually probably a good thing anyway!
+                    case kVK_LeftArrow:
+                    case kVK_RightArrow:
+                    case kVK_DownArrow:
+                    case kVK_UpArrow:
+                        // Cursor movement means that we need to recheck the context
+                    case kVK_Escape:
+                        // Escape key should be treated as a context reset
+                    case kVK_F1:
+                    case kVK_F2:
+                    case kVK_F3:
+                    case kVK_F4:
+                    case kVK_F5:
+                    case kVK_F6:
+                    case kVK_F7:
+                    case kVK_F8:
+                    case kVK_F9:
+                    case kVK_F10:
+                    case kVK_F11:
+                    case kVK_F12:
+                    case kVK_F13:
+                    case kVK_F14:
+                    case kVK_F15:
+                    case kVK_F16:
+                    case kVK_F17:
+                    case kVK_F18:
+                    case kVK_F19:
+                    case kVK_F20:
+                        // Function keys are command keys, so context is invalid
+                    case kVK_Tab:
+                        // A tab between cells in a Word document, for instance, is a context change
+                    case kVK_ForwardDelete:
+                        // Text modification by the forward delete key should reset context, but
+                        // note that normal Delete (aka Bksp) is already managed by Keyman correctly.
+                        appDelegate.contextChangingEventDetected = YES;
+                        break;
+                }
                 break;
 
             default:
