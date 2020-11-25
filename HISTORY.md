@@ -415,7 +415,7 @@
 * feat(ios/app): universal links for keyboard installation (#3466)
 * fix(ios/engine): Proper associating-installer deinitialization, cancellation tests (#3468)
 * refactor(ios): error definitions, i18n (#3470)
-* chore(common/core/web): cleanup keyboardprocessor.h.in (#3473)
+* chore(common/core/desktop): cleanup keyboardprocessor.h.in (#3473)
 
 ## 14.0.125 alpha 2020-08-07
 
@@ -736,7 +736,7 @@
 * feat(web): starts proper KMW Sentry integration (#3122)
 * refactor(common/models/types): rename @keymanapp/lexical-model-types => @keymanapp/models-types (#3143)
 * change(common/core/web): add and distribute type declaration (#3145)
-* fix(common/resources): drops version updates for deprecated common/lexical-model-types (#3148)
+* fix(common/models/types): drops version updates for deprecated common/lexical-model-types (#3148)
 
 ## 14.0.77 alpha 2020-05-19
 
@@ -789,7 +789,7 @@
 
 * fix(common/core/desktop): enable build for win x64, use global VERSION.md and fix decxstr() bug (#3076)
 * change(android): Add methods to go between LanguageResource and JSON (#3079)
-* feat(common/resources): auto-update for package versioning (#3078)
+* feat(common): auto-update for package versioning (#3078)
 
 ## 14.0.67 alpha 2020-05-05
 
@@ -862,7 +862,7 @@
 
 * change(android): Convert LanguageListActivity to utility (#3018)
 * refactor(web/engine): successful web-core compilation (#2992)
-* change(common/models/developer/compilers): always bundle searchTermToKey() with model (#2971)
+* change(common/models,developer/compilers): always bundle searchTermToKey() with model (#2971)
 * change(common/models): remove NFD table (#3014)
 
 ## 14.0.54 alpha 2020-04-22
