@@ -14,11 +14,11 @@ DEBIAN_SUITES=($UNSTABLE_CODENAME $TESTING_CODENAME $STABLE_CODENAME $STABLE_BAC
     "experimental" "unstable" "testing" "stable")
 
 # List of Ubuntu suites. Update these when needed.
-UBUNTU_SUITES=("eoan" "bionic" "xenial" "trusty")
+UBUNTU_SUITES=("groovy" "focal" "bionic" "xenial")
 
 # Mirrors to use. Update these to your preferred mirror.
 DEBIAN_MIRROR="deb.debian.org"
-UBUNTU_MIRROR="th.archive.ubuntu.com"
+UBUNTU_MIRROR="archive.ubuntu.com"
 
 # Optionally use the changelog of a package to determine the suite to use if
 # none set.

@@ -17,6 +17,8 @@
  */	
 declare type USVString = string;
 
+declare type CasingForm = 'lower' | 'initial' | 'upper';
+
 /**
  * Used to facilitate edit-distance calculations by allowing the LMLayer to
  * efficiently search the model's lexicon in a Trie-like manner.
@@ -91,6 +93,33 @@ declare interface LexicalModel {
   configure(capabilities: Capabilities): Configuration;
 
   /**
+   * Indicates that the language represented by the lexical model has syntactic casing
+   * behaviors.  Setting this to true will allow the predictive text engine to
+   * perform casing-based corrections and predictions.
+   * 
+   * If set to `false`, the default behavior for the `toKey` method will not perform
+   * casing modifications and will thus yield case-sensitive results.  This will not occur
+   * if `undefined` for backward-compatibility reasons.
+   */
+  readonly languageUsesCasing?: boolean;
+
+  /**
+   * Represents casing-related syntactical behaviors of the language represented by
+   * this lexical model, modifying input text to follow the specified casing pattern.
+   * 
+   * Implementations may assume that the text represents a single word / 'token' from the
+   * context.
+   * 
+   * Patterns:
+   * - lower: all case-sensitive characters should be lowercased.  Example:  "text123"
+   * - upper: all case-sensitive characters should be uppercased.  Example:  "TEXT123"
+   * - initial:  only the word-initial character should be uppercased.
+   * @param form 
+   * @param text 
+   */
+  applyCasing?(form: CasingForm, text: string): string
+
+  /**
    * Indicates a mapping function used by the model to simplify lookup operations
    * within the lexicon.  This is expected to result in a many-to-one mapping, transforming
    * the input text into a common, simplified 'index'/'key' form shared by all
@@ -113,8 +142,7 @@ declare interface LexicalModel {
 
   /**
    * Generates predictive suggestions corresponding to the state of context after the proposed
-   * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
-   * keystroke rather than one actually received.
+   * transform is applied to it.
    * 
    * This method should NOT attempt to perform any form of correction; this is modeled within a
    * separate component of the LMLayer predictive engine.  That is, "th" + "e" should not be
@@ -123,7 +151,9 @@ declare interface LexicalModel {
    * 
    * However, addition of diacritics to characters (which may transform the underlying char code 
    * when Unicode-normalized) is permitted.  For example, "pur" + "e" may reasonably predict
-   * "purée", where "e" has been transformed to "é" as part of the suggestion.
+   * "purée", where "e" has been transformed to "é" as part of the suggestion.  When possible, 
+   * it is recommended to accomplish this by defining a `toKey` (`searchTermToKey` in model
+   * source) instead.
    * 
    * When both prediction and correction are permitted, said component (the `ModelCompositor`) will 
    * generally call this method once per 'likely' generated corrected state of the context, 
@@ -131,7 +161,7 @@ declare interface LexicalModel {
    * @param transform A Transform corresponding to a recent input keystroke
    * @param context A depiction of the context to which `transform` is applied.
    * @returns A probability distribution (`Distribution<Suggestion>`) on the resulting `Suggestion` 
-   * space for use in determining the most optimal overall suggestions.
+   * space for use in determining the most optimal overall suggestions.  
    */
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
 
@@ -463,6 +493,10 @@ declare interface WordBreakingFunction {
   // invariant: for all span[i] and span[i + 1], there does not exist a span[k]
   //            where span[i].end <= span[k].start AND span[k].end <= span[i + 1].start
   (phrase: string): Span[];
+}
+
+declare interface CasingFunction {
+  (caseToApply: CasingForm, text: string, defaultApplyCasing?: CasingFunction): string;
 }
 
 /**

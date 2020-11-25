@@ -8,7 +8,8 @@
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
-import { createTrieDataStructure, defaultSearchTermToKey } from "./build-trie";
+import { createTrieDataStructure } from "./build-trie";
+import { ModelDefinitions } from "./model-definitions";
 import {decorateWithJoin} from "./join-word-breaker-decorator";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator";
 
@@ -49,17 +50,30 @@ export default class LexicalModelCompiler {
         // file, rather than the current working directory.
         let filenames = modelSource.sources.map(filename => path.join(sourcePath, filename));
 
-        // Use the default search term to key function, if left unspecified.
-        let searchTermToKey = modelSource.searchTermToKey || defaultSearchTermToKey;
+        let definitions = new ModelDefinitions(modelSource);
+        
+        func += definitions.compileDefinitions();
 
+        // Needs the actual searchTermToKey closure...
+        // Which needs the actual applyCasing closure as well.
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
-          createTrieDataStructure(filenames, searchTermToKey)
+          createTrieDataStructure(filenames, definitions.searchTermToKey)
         }, {\n`;
 
         let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
         func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
 
-        func += `  searchTermToKey: ${searchTermToKey.toString()},\n`;
+        // START - the lexical mapping option block
+        func += `  searchTermToKey: ${definitions.compileSearchTermToKey()},\n`;
+
+        if(modelSource.languageUsesCasing != null) {
+          func += `  languageUsesCasing: ${modelSource.languageUsesCasing},\n`;
+        } // else leave undefined.
+
+        if(modelSource.languageUsesCasing) {
+          func += `  applyCasing: ${definitions.compileApplyCasing()},\n`;
+        }
+        // END - the lexical mapping option block.
 
         if (modelSource.punctuation) {
           func += `  punctuation: ${JSON.stringify(modelSource.punctuation)},\n`;

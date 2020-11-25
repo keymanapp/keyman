@@ -325,4 +325,35 @@ class AssociatingPackageInstallerTests: XCTestCase {
     XCTAssertNil(Storage.active.userDefaults.userKeyboards)
     XCTAssertNil(Storage.active.userDefaults.userLexicalModels)
   }
+
+  func testPackageLangCodePartialMatch() throws {
+    guard let strPackage = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.fvSencotenKMP) as? KeyboardKeymanPackage else {
+      XCTFail()
+      return
+    }
+
+    guard let eurolatinPackage = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as? KeyboardKeymanPackage else {
+      XCTFail()
+      return
+    }
+
+    let strInstaller = AssociatingPackageInstaller(for: strPackage,
+                                                defaultLanguageCode: "str", // correct code:  str-latn
+                                                downloadManager: downloadManager) { _ in
+    }
+
+    // Package does not contain "str", but does contain "str-latn"
+    XCTAssertEqual(strInstaller.defaultLgCode, "str-latn")
+
+    let eurolatinInstaller = AssociatingPackageInstaller(for: eurolatinPackage,
+                                                defaultLanguageCode: "en-fake-bcp", // correct code:  "en"
+                                                downloadManager: downloadManager) { _ in
+    }
+
+    // Package does not contain "en-fake-bcp", but does contain "en".
+    XCTAssertEqual(eurolatinInstaller.defaultLgCode, "en")
+
+    // Note:  the current naive approach isn't exactly BCP-47 subtag aware - it relies on one tag
+    // containing the entire other tag as a substring.
+  }
 }

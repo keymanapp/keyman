@@ -74,6 +74,7 @@
 #define MVK_ENTER           0x24
 
 /* Key Row 4 */
+#define MVK_OEM102          0x34
 #define MVK_Z               0x06
 #define MVK_X               0x07
 #define MVK_C               0x08

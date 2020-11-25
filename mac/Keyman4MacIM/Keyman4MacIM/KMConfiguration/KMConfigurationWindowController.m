@@ -57,9 +57,12 @@
     [_tableView registerForDraggedTypes:@[NSFilenamesPboardType]];
     _lastReloadDate = [NSDate date];
     [self startTimer];
+
+    KeymanVersionInfo versionInfo = [[self AppDelegate] versionInfo];
+    NSString *versionUrl = [NSString stringWithFormat:@"https://%@/products/mac/%@", versionInfo.helpKeymanCom, versionInfo.versionRelease];
     
     [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://help.keyman.com/products/macosx/"]]];
+    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: versionUrl]]];
 
     [self.alwaysShowOSKCheckBox setState:(self.AppDelegate.alwaysShowOSK ? NSOnState : NSOffState)];
     [self.useVerboseLoggingCheckBox setState:(self.AppDelegate.useVerboseLogging ? NSOnState : NSOffState)];

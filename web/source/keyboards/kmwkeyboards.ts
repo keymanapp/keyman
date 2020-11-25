@@ -464,6 +464,7 @@ namespace com.keyman.keyboards {
             
             // Re-initializate OSK before returning if required
             if(this.keymanweb.mustReloadKeyboard) {
+              activeKeyboard.refreshLayouts();
               osk._Load();
             }
             return Promise.resolve();
@@ -489,6 +490,9 @@ namespace com.keyman.keyboards {
       for(Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
         if(this.keyboards[Ln]['KI'] == PInternalName) {
           keyman.core.activeKeyboard = new Keyboard(this.keyboards[Ln]);
+          // As a rotation may have occurred since the keyboard was swapped out,
+          // we should refresh its layouts.
+          keyman.core.activeKeyboard.refreshLayouts();
           this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
         
           // and update the active stub
@@ -503,6 +507,7 @@ namespace com.keyman.keyboards {
         }
       }
 
+      // If we've reached this point, this is the first load request for the requested keyboard.
       if(keyman.core.activeKeyboard == null) {
         for(Ln=0; Ln<this.keyboardStubs.length; Ln++) { // I1511 - array prototype extended
           if((this.keyboardStubs[Ln]['KI'] == PInternalName) 

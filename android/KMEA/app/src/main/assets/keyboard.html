@@ -7,12 +7,19 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, user-scalable=no">
   <title>Keyman</title>
-  <script src="keyman.js"></script>
+  <script src="keymanandroid.js"></script>
+  <script src="keyman-sentry.js"></script>
   <script type="text/javascript">
     var device = window.jsInterface.getDeviceType();
     var oskHeight = window.jsInterface.getKeyboardHeight();
     var oskWidth = 0;
     var fragmentToggle = 0;
+
+    var sentryManager = new com.keyman.KeymanSentryManager({
+      hostPlatform: "android"
+    });
+    sentryManager.init();
+
     window.addEventListener('load', init, false);
 
     function init() {
@@ -70,6 +77,9 @@
         oskHeight = h;
       }
       var kmw=window['keyman'];
+      if(kmw && kmw.core && kmw.core.activeKeyboard) {
+        kmw.core.activeKeyboard.refreshLayouts();
+      }
       kmw['correctOSKTextSize']();
     }
 

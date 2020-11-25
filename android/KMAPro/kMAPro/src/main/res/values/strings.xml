@@ -96,6 +96,14 @@
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
 
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report" comment="permission for sending crash reports">Allow sending crash reports over network</string>
+
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">When on, crash reports will be sent</string>
+
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">When off, crash reports won\'t be sent</string>
 
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">Install from keyman.com</string>
