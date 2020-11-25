@@ -4,12 +4,12 @@
 
 * Update README.md (#3880)
 * fix(windows): sentry range check error (#3921)
-* chore(common): Clean up commit types in HISTORY.md (#3926)
+* chore(common/resources): Clean up commit types in HISTORY.md (#3926)
 * fix(android, ios): adds null guard to refreshLayouts call (#3927)
 * fix(ios/engine): banner inconsistency (#3925)
 * chore(web): adds LTREnter, LTRBkSp, and associated layout mapping (#3937)
 * fix(web): adds null guards for two Sentry errors (#3941)
-* chore(common): additional cleanup to HISTORY.md (#3942)
+* chore(common/resources): additional cleanup to HISTORY.md (#3942)
 
 ## 14.0.187 alpha 2020-11-23
 
@@ -100,7 +100,7 @@
 
 ## 14.0.174 alpha 2020-11-03
 
-* chore(common): improve build README.md (#3812)
+* chore(common/resources): improve build README.md (#3812)
 
 ## 14.0.173 alpha 2020-10-30
 
@@ -415,7 +415,7 @@
 * feat(ios/app): universal links for keyboard installation (#3466)
 * fix(ios/engine): Proper associating-installer deinitialization, cancellation tests (#3468)
 * refactor(ios): error definitions, i18n (#3470)
-* chore: cleanup keyboardprocessor.h.in (#3473)
+* chore(common/core/web): cleanup keyboardprocessor.h.in (#3473)
 
 ## 14.0.125 alpha 2020-08-07
 
@@ -714,7 +714,7 @@
 * refactor(resources): convert gosh into npm package 🙃 (#3159)
 * chore(common,web): use consistent TypeScript dep on all packages (#3158)
 * chore(common/resources): add `common/models` to build trigger definitions (#3144)
-* fix(common): adds package-lock.json for gosh package (#3171)
+* fix(common/resources): adds package-lock.json for gosh package (#3171)
 
 ## 14.0.80 alpha 2020-05-25
 
@@ -736,7 +736,7 @@
 * feat(web): starts proper KMW Sentry integration (#3122)
 * refactor(common/models/types): rename @keymanapp/lexical-model-types => @keymanapp/models-types (#3143)
 * change(common/core/web): add and distribute type declaration (#3145)
-* fix(common): drops version updates for deprecated common/lexical-model-types (#3148)
+* fix(common/resources): drops version updates for deprecated common/lexical-model-types (#3148)
 
 ## 14.0.77 alpha 2020-05-19
 
@@ -787,9 +787,9 @@
 
 ## 14.0.68 alpha 2020-05-06
 
-* fix(common): enable build for win x64, use global VERSION.md and fix decxstr() bug (#3076)
+* fix(common/core/desktop): enable build for win x64, use global VERSION.md and fix decxstr() bug (#3076)
 * change(android): Add methods to go between LanguageResource and JSON (#3079)
-* feat(common): auto-update for package versioning (#3078)
+* feat(common/resources): auto-update for package versioning (#3078)
 
 ## 14.0.67 alpha 2020-05-05
 
@@ -832,7 +832,7 @@
 
 ## 14.0.60 alpha 2020-04-29
 
-* feat(common): initial use of lerna (in-repo package links only) (#2997)
+* feat(common/resources): initial use of lerna (in-repo package links only) (#2997)
 * change(web/engine): spins core/web/keyboard-processor package off from KeymanWeb (#3001)
 * change(web/engine): spins core/web/input-processor package off from KeymanWeb (#3008)
 * chore(common/models): change author from personal to work affiliation (#3046)
@@ -850,7 +850,7 @@
 
 ## 14.0.57 alpha 2020-04-27
 
-* change(common): Update to Unicode 13.0 (#3029)
+* change(common/resources): Update to Unicode 13.0 (#3029)
 * change(android): Refactor Keyboard class to not use Map (#3020)
 
 ## 14.0.56 alpha 2020-04-24
@@ -960,7 +960,7 @@
 * refactor(web): starts OSK preprocessor (#2893)
 * refactor(web): headless device representation (#2894)
 * refactor(web): cleanup for Processor.processKeyEvent (#2899)
-* chore(common): Cleanup unused folders and update README (#2916)
+* chore(common/resources): Cleanup unused folders and update README (#2916)
 
 ## 14.0.39 alpha 2020-03-29
 
@@ -973,7 +973,7 @@
 ## 14.0.37 alpha 2020-03-27
 
 * feat(windows): crash reports in CEF (#2887)
-* feat(common): Use Crowdin CLI (v3) for handling l10n files (#2895)
+* feat(common/resources): Use Crowdin CLI (v3) for handling l10n files (#2895)
 * fix(windows): show error if tsysinfo fails to start; kmcomapi reporting (#2897)
 
 ## 14.0.36 alpha 2020-03-26
@@ -1019,7 +1019,7 @@
 
 ## 14.0.30 alpha 2020-03-19
 
-* docs(common): minor updates to readme (#2856)
+* docs(common/resources): minor updates to readme (#2856)
 
 ## 14.0.29 alpha 2020-03-19
 
@@ -1045,16 +1045,16 @@
 
 ## 14.0.25 alpha 2020-03-13
 
-* feat(common): sentry release control (#2794)
+* feat(common/resources): sentry release control (#2794)
 * chore(windows): improve build script tests (#2680)
 * fix(web): enhanced sourcemaps + proper sourcemaps for minified KMW (#2809)
-* feat(common): Add script to parse crowdin translation file (#2801)
+* feat(common/resources): Add script to parse crowdin translation file (#2801)
 * fix(linux): Fix how keyboardprocessor version is set in dist.sh (#2814)
 * feat(android): Additional Sentry integration (#2810)
 * fix(web): applies base key layer property to unassigned subkeys (#2808)
 * feat(android): Start adding RTL to layouts (#2816)
 * fix(common/models): fixes word lookup from Tries for SMP script-based languages (#2815)
-* feat(common): add release finalization for Sentry (#2819)
+* feat(common/resources): add release finalization for Sentry (#2819)
 * fix(web): further fixes BuildVisualKeyboard. Fixes #2818 (#2822)
 * fix(web): fixes internal reference for validation tool (#2824)
 
@@ -1071,7 +1071,7 @@
 
 ## 14.0.22 alpha 2020-03-09
 
-* fix(common): parameter order incorrect in git diff (#2787)
+* fix(common/resources): parameter order incorrect in git diff (#2787)
 * feat(ios): compilations within Xcode now properly set version (#2775)
 * fix(ios/engine): Fixes context bug for certain keyboard rules after newlines (#2770)
 * feat(android): Update additional main app strings for crowdin (#2793)
@@ -1085,7 +1085,7 @@
 ## 14.0.20 alpha 2020-03-08
 
 * feat(windows): Chromium replacement for embedded MSHTML in for Keyman Desktop (#1720)
-* refactor(common): Rename keyboard core (#2735)
+* refactor(common/core/desktop): Rename keyboard core (#2735)
 
 ## 14.0.19 alpha 2020-03-06
 
@@ -1104,7 +1104,7 @@
 * fix(android) Fix crash on kbdMapList (#2719)
 * fix(developer): crash when switching layout templates (#2726)
 * feat(developer): always save options (#2731)
-* feat(common): Support git worktree when configuring local hooks (#2722)
+* feat(common/resources): Support git worktree when configuring local hooks (#2722)
 * docs(linux): Add linux packaging documentation (#2720)
 * fix(developer): insert from charmap into touch editor 🍒 (#2737)
 * fix(developer): debugger breaking smp with bksp (#2739)
@@ -1148,14 +1148,14 @@
 
 ## 14.0.9 alpha 2020-02-10
 
-* fix(common/core): buffer overrun in context api (#2614)
+* fix(common/core/desktop): buffer overrun in context api (#2614)
 * fix(common/resources): refactor trigger of test builds (#2611)
 * fix(linux): Fix packaging of keyman-config on Xenial (#2609)
 
 ## 14.0.8 alpha 2020-02-07
 
 * chore(common/resources): Tweak history management (#2602)
-* chore(common): Update README.md (#2598)
+* chore(common/resources): Update README.md (#2598)
 * chore: update history (#2605)
 * chore: merge beta P9S1 changes to master (#2606)
 * chore(common/resources): Add script that checks if build is required (#2603)
@@ -1164,7 +1164,7 @@
 ## 14.0.7 alpha 2020-02-07
 
 * chore(common/resources): Tweak history management (#2602)
-* chore(common): Update README.md (#2598)
+* chore(common/resources): Update README.md (#2598)
 
 ## 14.0.6 alpha 2020-02-06
 
