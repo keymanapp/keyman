@@ -566,8 +566,52 @@ $(function () {
   }
   this.lookupKeyNames.sort();
 
-  this.specialKeyNames = ['*Shift*', '*Enter*', '*Tab*', '*BkSp*', '*Menu*', '*Hide*', '*Alt*', '*Ctrl*', '*Caps*',
-      '*ABC*', '*abc*', '*123*', '*Symbol*', '*Currency*', '*Shifted*', '*AltGr*', '*TabLeft*'];
+  // Defines the PUA code mapping for the various 'special' modifier/control keys on keyboards.
+  // This is lifted directly from visualKeyboard.ts and must be kept in sync. See also CompileKeymanWeb.pas: CSpecialText10
+  this.specialCharacters = {
+    '*Shift*':    8,
+    '*Enter*':    5,
+    '*Tab*':      6,
+    '*BkSp*':     4,
+    '*Menu*':     11,
+    '*Hide*':     10,
+    '*Alt*':      25,
+    '*Ctrl*':     1,
+    '*Caps*':     3,
+    '*ABC*':      16,
+    '*abc*':      17,
+    '*123*':      19,
+    '*Symbol*':   21,
+    '*Currency*': 20,
+    '*Shifted*':  8, // set SHIFTED->9 for filled arrow icon
+    '*AltGr*':    2,
+    '*TabLeft*':  7,
+    '*LAlt*':     0x56,
+    '*RAlt*':     0x57,
+    '*LCtrl*':    0x58,
+    '*RCtrl*':    0x59,
+    '*LAltCtrl*':       0x60,
+    '*RAltCtrl*':       0x61,
+    '*LAltCtrlShift*':  0x62,
+    '*RAltCtrlShift*':  0x63,
+    '*AltShift*':       0x64,
+    '*CtrlShift*':      0x65,
+    '*AltCtrlShift*':   0x66,
+    '*LAltShift*':      0x67,
+    '*RAltShift*':      0x68,
+    '*LCtrlShift*':     0x69,
+    '*RCtrlShift*':     0x70,
+    // Following codes introduced in Keyman 14.0
+    '*RTLEnter*':       0x71,
+    '*RTLBkSp*':        0x72,
+    '*ShiftLock*':      0x73,
+    '*ShiftedLock*':    0x74,
+    '*ZWNJ*':           0x75, // If this one is specified, auto-detection will kick in.
+    '*ZWNJiOS*':        0x75, // The iOS version will be used by default, but the
+    '*ZWNJAndroid*':    0x76, // Android platform has its own default glyph.
+  };
+
+  this.specialKeyNames = Object.entries(this.specialCharacters).map(ch => ch[0]);
 
   this.presentations = {
     "tablet-ipad-landscape": { "x": 829, "y": 299, "name": "iPad (landscape)" }, // 829x622 = iPad tablet box size; (97,101)-(926,723)
@@ -736,16 +780,10 @@ $(function () {
   **/
 
   this.renameSpecialKey = function (oldText) {
-    var specialText = this.specialKeyNames;
-    var codePUA = [8, 5, 6, 4, 11, 10, 25, 1, 3, 16, 17, 19, 21, 20, 8, 2, 7]; // set SHIFTED->9 for filled arrow icon
-
     //Note:  U+E000 *is* PUA but was not accepted by IE as a character in the EOT font, so Alt recoded as U+E019
-    for (var i = 0; i < specialText.length; i++) {
-      if (oldText == specialText[i]) {
-        return String.fromCharCode(0xE000 + codePUA[i]);
-      }
-    }
-    return oldText;
+    return this.specialCharacters[oldText] ?
+      String.fromCharCode(0xE000 + this.specialCharacters[oldText]) :
+      oldText;
   }
 
   this.prepareLayers = function () {
@@ -947,6 +985,10 @@ $(function () {
           .css('margin-left', p + 'px')
           .css('font-family', key.font)
           .css('font-size', key.fontsize);
+
+        if(this.specialCharacters[text])
+          $(nkey).addClass('key-special-text');
+
         $('.text', nkey).text(this.renameSpecialKey(text));
         if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
 
@@ -1408,6 +1450,12 @@ $(function () {
     $('.text', k).text(builder.renameSpecialKey(val));
     k.data('text', val);
 
+    if(this.specialCharacters[val]) {
+      k.addClass('key-special-text');
+    } else {
+      k.removeClass('key-special-text');
+    }
+
     builder.updateCharacterMap(val, false);
   }
 
@@ -1534,6 +1582,9 @@ $(function () {
         .data('layer', key.layer)
         .css('width', (100 * 0.7) + 'px')
         .css('font-family', KVKL[builder.lastPlatform].font);
+
+      if(this.specialCharacters[text])
+        $(nkey).addClass('key-special-text');
 
       $('.text', nkey).text(this.renameSpecialKey(text));
       builder.updateKeyId(nkey);
