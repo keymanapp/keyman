@@ -130,6 +130,7 @@
 
 ## 14.0.172 alpha 2020-10-29
 
+* fix(windows): Start Keyman on Demand - keyman32 (#3772)
 * fix(windows): Start Keyman on Demand - tasks (#3773)
 * fix(windows): remove msctf free from DllMain (#3779)
 * fix(windows): error reading kmp.inf in setup (#3781)
@@ -291,6 +292,7 @@
 
 ## 14.0.148 alpha 2020-09-24
 
+* fix(windows): external links should open externally (#3602)
 * fix(windows): hint dialog was blank when elevated (#3604)
 * fix(android): Log errors for crashes involving Keyboard Picker (#3499)
 
@@ -397,6 +399,9 @@
 
 ## 14.0.132 alpha 2020-08-24
 
+* feat(linux): Add link to share online (#3494)
+* docs(common): Clarify l10n readme (#3496)
+* feat(linux): Add i18n for Linux (#3492)
 * feat(linux): Small UI improvements (#3495)
 
 ## 14.0.131 alpha 2020-08-21
@@ -483,6 +488,9 @@
 
 ## 14.0.118 alpha 2020-07-29
 
+* chore(common): unify crowdin.yml (#3418)
+* fix(windows): more i18n cleanup: (#3415)
+* feat(windows): generate message consts at build time (#3413)
 * fix(android/app): Use go/android/ links to download cloud keyboards (#3343)
 * fix(windows): i18n of strings in Font Helper (#3414)
 * refactor(windows): refactor Dialog elements (#3421)
@@ -509,6 +517,11 @@
 
 ## 14.0.115 alpha 2020-07-23
 
+* fix(windows): proxy configuration from system (#3389)
+* fix(windows): hide unavailable options in Setup (#3392)
+* fix(windows): make sure silent is actually silent for setup (#3391)
+* chore(windows): staging site hostnames (#3387)
+* feat(windows): cleanup server names (#3325)
 * feat(windows): keyman: protocol handler (#3382)
 * feat(developer/compilers): logging errors and warnings in the lexical model compiler (#3385)
 
@@ -529,6 +542,12 @@
 
 ## 14.0.112 alpha 2020-07-20
 
+* feat(windows): disable defaults options when Keyman already installed (#3371)
+* feat(windows): setup will retry if offline during initial install steps (#3370)
+* feat(windows): setup select tier from filename or parameter (#3369)
+* fix(windows): re-add license to setup (#3368)
+* feat(windows): strip ' (1)' from filename in setup (#3367)
+* fix(windows): remove large dependencies (#3346)
 * refactor(ios/engine): package-version query caching + package state properties (#3335)
 * refactor(ios/engine): keyboard downloads now retrieve KMPs (#3341)
 * refactor(ios/engine): download queue & download state detection cleanup (#3342)
@@ -542,11 +561,13 @@
 
 ## 14.0.110 alpha 2020-07-15
 
+* fix(developer/compilers): merge duplicate words during compile (#3338)
 * refactor(developer): hashmap-based wordlist compilation (#3340)
 * chore(linux): Add license details for kmpdetails.* (#3355)
 
 ## 14.0.109 alpha 2020-07-14
 
+* feat(windows): New Keyboard Search and Download (#3326)
 * refactor(ios/engine): lexical model query & download rework (#3327)
 * refactor(ios/engine): hashable package keys (#3333)
 * fix(ios/engine): version equality (#3334)
@@ -555,6 +576,11 @@
 
 ## 14.0.108 alpha 2020-07-09
 
+* refactor(windows): PackagesOnly parameter (#3321)
+* chore(windows): code cleanup (#3320)
+* chore(windows): update setup i18n (#3317)
+* chore(windows): Cleanup logging in Windows Setup (#3316)
+* feat(windows): Keyman Setup online bootstrap (#3304)
 * chore: cleanup global ExtPath (#3315)
 * feat(android/app): Use build-download-resources.sh for KMApro app (#3322)
 * feat(oem/fv/android): Use build-download-resources.sh for FV app (#3322)
@@ -703,6 +729,7 @@
 
 ## 14.0.84 alpha 2020-05-29
 
+* change(developer): packs ModelCompiler via npm pack, 7-zip (#3166)
 * change(web): Selective Sentry uploads (#3163)
 * refactor(ios/engine): Polishes HTTPDownloader to prep for unit testing (#3179)
 * feat(ios/engine): HTTPDownloader unit testing (#3180)
@@ -875,6 +902,8 @@
 ## 14.0.55 alpha 2020-04-23
 
 * change(android): Convert LanguageListActivity to utility (#3018)
+* change(android): Change "Get Started" keyboard picker to bring up embedded keyboard search (#3013)
+* feat(common): lerna now npm-installed locally (#3012)
 * refactor(web/engine): successful web-core compilation (#2992)
 * change(common/models,developer/compilers): always bundle searchTermToKey() with model (#2971)
 * change(common/models): remove NFD table (#3014)
@@ -904,6 +933,7 @@
 
 ## 14.0.50 alpha 2020-04-15
 
+* feat(android): Add KMPBrowserActivity for cloud keyboard searches (#2961)
 * fix(android): Handle default font DejaVuSans.ttf (#2981)
 * feat(android): Download cloud keyboards from https://keyman.com/keyboards (#2953)
 * fix(ios): iOS 13.4 subkey menu workaround (#2959)
@@ -917,6 +947,7 @@
 
 ## 14.0.48 alpha 2020-04-07
 
+* feat(windows): Testing Sentry integration (#2923)
 * feat(windows): use crashpad and better call stacks (#2931)
 
 ## 14.0.47 alpha 2020-04-07
@@ -937,6 +968,7 @@
 
 ## 14.0.44 alpha 2020-04-03
 
+* refactor(web/engine): relocates DOM-only parts of Processor (#2922)
 * refactor(web/engine): begins formally removing DOM-aware keyboard API functions from web-core KeyboardInterface (#2915)
 * refactor(web/engine): start of system store abstraction (#2919)
 * refactor(web/engine): Processor now manages current layer; OSK listens via callback (#2920)
@@ -978,6 +1010,7 @@
 
 ## 14.0.39 alpha 2020-03-29
 
+* feat(windows): sentry x64 support (#2898)
 * feat(windows): user control for upload to sentry (#2900)
 
 ## 14.0.38 alpha 2020-03-28
@@ -1013,6 +1046,7 @@
 ## 14.0.33 alpha 2020-03-23
 
 * fix(android/samples): Update min SDK versions for sample apps (#2872)
+* refactor(web/engine): Modularize default key output handling (#2853)
 * refactor(web/engine): extended abstraction with OutputTarget (#2849)
 * refactor(web/engine): reworks use of embedded's keyman['oninserttext'] (#2850)
 * refactor(web/engine): reworks default output handling to return RuleBehaviors (#2854)
@@ -1115,6 +1149,8 @@
 
 ## 14.0.17 alpha 2020-02-26
 
+* feat(ios): KeymanEngine version migration unit tests (#2692)
+* feat(ios): starts iOS unit testing (#2649)
 * fix(android) Fix crash on kbdMapList (#2719)
 * fix(developer): crash when switching layout templates (#2726)
 * feat(developer): always save options (#2731)
@@ -1144,26 +1180,68 @@
 
 ## 14.0.13 alpha 2020-02-19
 
+* fix(linux): setup gschema (#2675)
+* fix(ios): Responsive predictive toggles (#2674)
+* chore(windows): cleanup documentation (#2681)
 * chore: merge p9s2 beta part 2 to master (#2683)
 
 ## 14.0.12 alpha 2020-02-18
 * fix(android/samples): Fix build for KMSample1 project (#2669)
+* fix(developer): crash in context help (#2661)
+* fix(developer): crash importing blank OSK (#2663)
+* fix(common, linux): Misc keyboard processor fixes for Xenial (#2648)
+* fix(linux): Fix tier used in debian watch files (#2664)
+* fix(ios): Engine demo fix (#2662)
+* docs(ios): Updates offline help for new 13.0 content (#2671)
+* fix(developer): upgrade removes preferences 🍒 (#2672)
 * fix(developer): upgrade removes preferences (#2668)
 * chore(common/resources): Rename trigger-definitions.sh to *.config (#2665)
 
 ## 14.0.11 alpha 2020-02-17
 
+* fix(web): Fat-finger complication fixes (#2647)
+* feat(web): restyles prediction banner (#2629)
+* chore(oem): FV iconography update (#2650)
+* feat(mac): install script rather than drag+drop (#2537)
+* fix(common): Update configure-repo.sh to ln commit-msg-defs (#2652)
+* change(web): Testing resources update (#2651)
+* fix(android): Add ability to reinitialize `CloudDownloadMgr` (#2635)
 * chore: merge beta changes to master 🍒 (#2659)
 * fix(mac): invalid build script params removed (#2660)
 
 ## 14.0.10 alpha 2020-02-14
 
+* fix(common/core): buffer overrun in context api 🍒 (#2616)
+* fix(web): patches Float and Toggle UI issues (#2622)
+* change(web): build.sh recompilation of LMLayer only performed when needed (#2623)
+* fix(ios): Fixes in-app use of KMSample2 (#2626)
+* fix(developer): touch layout editor character map integration (#2619)
+* fix(developer/compiler): package: version mismatch (#2620)
+* fix(developer/compiler): compiler sometimes merges touch platform support wrongly in .keyboard_info (#2621)
+* fix(ios): Fixes lexical model url generation for updates (#2627)
+* fix(linux): Cherrypick linux packaging fixes  (#2624)
+* fix(developer/ide): model debugger mime type mismatch (#2633)
+* fix(ios): Fixes invalid keyboard display when backing out of sharing text (#2631)
+* fix(oem): Update version of androidx.appcompat (#2640)
+* change(android): Update in-app help (#2641)
+* fix(developer/ide): Model editor various bugs (#2634)
+* fix(web): fixes positioning of native-mode language menu (#2642)
+* change(android): Update app dependencies (#2644)
+* fix(ios): initial-install check within Migrations (#2646)
+* fix(mac): Modifier keys were resetting cached context (#2588)
 * refactor(mac): initial steps of input pathway (#2643)
 
 ## 14.0.9 alpha 2020-02-10
 
 * fix(common/core/desktop): buffer overrun in context api (#2614)
 * fix(common/resources): refactor trigger of test builds (#2611)
+* fix(ios): fixes installation of default resources and updates them (#2578)
+* chore(android): Update default nrc.en.mtnt.model to 0.1.4 (#2608)
+* chore(common/resources): add build scripts for beta tests 🍒 (#2612)
+* fix(common/resources): don't include build-utils.sh (#2615)
+* fix(common/resources): Fix setting context when >= 64 characters (#2607)
+* fix(ios): Icon image change on light/dark mode transition (#2593)
+* fix(ios): Keyboard banner light/dark transitions (#2594)
 * fix(linux): Fix packaging of keyman-config on Xenial (#2609)
 
 ## 14.0.8 alpha 2020-02-07
@@ -1182,16 +1260,32 @@
 
 ## 14.0.6 alpha 2020-02-06
 
+* fix(windows): Windows touch keyboard would cancel on each keystroke (#2580)
+* fix(linux): Fix 'About' keyboard when missing copyright (#2583)
+* feat(linux): Keyboard options configuration dialog (#2566)
+* feat(common): prepare-commit-msg hook for autogenerated conventional commit messages (#2581)
 * fix(linux): cherry-pick packaging changes from beta branch (#2589)
 * fix(linux): Display the script name in log output (#2591)
 
 ## 14.0.5 alpha 2020-02-04
 
 * chore(common/resources): support test builds on master/beta/stable-x.y (#2576)
+* fix(web): default BKSP output targeting (#2561)
+* fix(linux): Remove cosmic and disco releases (#2574)
 
 ## 14.0.4 alpha 2020-02-03
 
 * chore(common/resources): trigger builds after version increment (#2572)
+* fix(ios): keyboard stability (#2545)
+* fix(web): dev_resource compile fix (#2557)
+* fix(linux): Update launchpad PPA by tier (#2551)
+* fix(android): Fix cancelling ConfirmDialogFragment (#2547)
+* fix(web): Fix K_TAB from external keyboard (#2546)
+* fix(ios): Now (eventually) uses sys pref for kbd clicks (#2550)
+* feat(ios): Deeplink into Keyman settings for system keyboard setup (#2548)
+* fix(common): RTL model specification (#2554)
+* fix(web): Suggestion reordering for RTL languages (#2553)
+* fix(ios): Fixes margins on keyboard in iOS 9/10 (#2560)
 
 ## 14.0.3 alpha 2020-02-03
 
