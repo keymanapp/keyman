@@ -724,7 +724,7 @@
 ## 14.0.79 alpha 2020-05-22
 
 * fix(android): Fix system keyboard globe button override (#3140)
-* fix(web/utils): use build script to generate environment.inc.ts (#3146)
+* fix(common/core/web): use build script to generate environment.inc.ts (#3146)
 * change(common/core/web,web): update dependencies to @keymanapp/models-types (#3147)
 
 ## 14.0.78 alpha 2020-05-21
@@ -735,7 +735,7 @@
 * chore(common/resources): cleanup scopes (#3139)
 * feat(web): starts proper KMW Sentry integration (#3122)
 * refactor(common/models/types): rename @keymanapp/lexical-model-types => @keymanapp/models-types (#3143)
-* change(web/utils): add and distribute type declaration (#3145)
+* change(common/core/web): add and distribute type declaration (#3145)
 * fix(common): drops version updates for deprecated common/lexical-model-types (#3148)
 
 ## 14.0.77 alpha 2020-05-19
@@ -1190,4 +1190,4 @@
 
 ## 14.0.1 alpha 2020-01-29
 
-* chore: Starting 14.0 release
+* chore(common/resources): Starting 14.0 release
