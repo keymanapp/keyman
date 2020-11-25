@@ -1,17 +1,17 @@
 @font-face {
    font-family: "Nunito";
-   src: url("nunito-regular-webfont.eot"); 
+   src: url("nunito-regular-webfont.eot");
    src: url("nunito-regular-webfont.ttf") format("truetype"),
-     url("nunito-regular-webfont.otf") format("opentype"), 
+     url("nunito-regular-webfont.otf") format("opentype"),
      url("nunito-regular-webfont.woff") format("woff"),
      url("nunito-regular-webfont.svg#nunitoregular") format("svg");
 }
 
 @font-face {
    font-family: "Open Sans";
-   src: url("opensans-regular-webfont.eot"); 
+   src: url("opensans-regular-webfont.eot");
    src: url("opensans-regular-webfont.ttf") format("truetype"),
-     url("opensans-regular-webfont.otf") format("opentype"), 
+     url("opensans-regular-webfont.otf") format("opentype"),
      url("opensans-regular-webfont.woff") format("woff"),
      url("opensans-regular-webfont.svg#open_sansregular") format("svg");
 }
@@ -135,14 +135,14 @@ h2{
     margin-top: 10px;
 }
 
-.step-instruction img{
+.step-instruction span{
+    display: inline-block;
     -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
     filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
     height: 30px;
     margin-right: 5px;
     vertical-align: top;
     width: 30px;
-    opacity: 0.25;
 }
 
 .step-instruction input[type="button"]{
@@ -160,12 +160,14 @@ h2{
 .checkIconOff {
     alt: 'CheckBoxOff';
     background: url('check-off.png');
-    opacity: 0.25;
+    background-size: contain;
+    opacity: 0;
 }
 
 .checkIconOn {
     alt: 'CheckBoxOn';
     background: url('check-on.png');
+    background-size: contain;
     opacity: 1.0;
 }
 
