@@ -694,7 +694,7 @@
 * feat(ios/engine): HTTPDownloader unit testing (#3180)
 * fix(linux): Disable buttons if no keyboard installed (#3184)
 * change(ios/engine): Removes unused, deprecated JS/JSON-based adhoc install code (#3186)
-* change(common/lmlayer): move joiner from LMLayer to model compiler (#3071)
+* change(common/models,developer/compilers): move joiner from LMLayer to model compiler (#3071)
 
 ## 14.0.83 alpha 2020-05-28
 
@@ -719,7 +719,7 @@
 ## 14.0.80 alpha 2020-05-25
 
 * fix(android/engine): Remove LanguageListUtil (#3155)
-* refactor(common/lmlayer): create package: @keymanapp/models-templates (#3128)
+* refactor(common/models/templates): create package: @keymanapp/models-templates (#3128)
 
 ## 14.0.79 alpha 2020-05-22
 
@@ -814,7 +814,7 @@
 * fix(windows): add LARGEADDRESSAWARE flag for all CEF processes (#3064)
 * fix(android): Remove more custom keyboard fields(#3051)
 * fix(oem/fv/ios): FV settings bundle for SWKeyboard (#3066)
-* change(common/lmlayer): single-pass join word breaker decorator (#3059)
+* change(common/models/wordbreakers): single-pass join word breaker decorator (#3059)
 
 ## 14.0.62 alpha 2020-05-01
 
@@ -828,25 +828,25 @@
 * chore(common/resources): bump @actions/http-client from 1.0.3 to 1.0.8 in /resources/build/version (#3047)
 * fix(oem/fv/ios): firstvoices icon and version info (#3044)
 * feat(windows): Sentry integration fixes and polish (#3006)
-* feat(common/lmlayer): compile joinWordsAt property (#3032)
+* feat(developer/compilers): compile joinWordsAt property (#3032)
 
 ## 14.0.60 alpha 2020-04-29
 
 * feat(common): initial use of lerna (in-repo package links only) (#2997)
 * change(web/engine): spins core/web/keyboard-processor package off from KeymanWeb (#3001)
 * change(web/engine): spins core/web/input-processor package off from KeymanWeb (#3008)
-* chore(common/lmlayer): change author from personal to work affiliation (#3046)
+* chore(common/models): change author from personal to work affiliation (#3046)
 
 ## 14.0.59 alpha 2020-04-29
 
 * chore: merge stable history (#3037)
-* feat(common/lmlayer): create join word breaker decorator (#3021)
+* feat(common/models/wordbreakers): create join word breaker decorator (#3021)
 * fix(oem/fv/ios): download fv keyboards (#3040)
 * change(android): Refactor LanguageResource() and remove "Custom" property (#3033)
 
 ## 14.0.58 alpha 2020-04-28
 
-* change(common/lmlayer): improvements to default searchTermToKey (#3024)
+* change(developer/compilers): improvements to default searchTermToKey (#3024)
 
 ## 14.0.57 alpha 2020-04-27
 
@@ -856,23 +856,23 @@
 ## 14.0.56 alpha 2020-04-24
 
 * fix(android): Clarify label that shows "Get Started" on startup (#3025)
-* feat(common/lmlayer): allow for verbose word breaker specification (#3023)
+* feat(developer/compilers): allow for verbose word breaker specification (#3023)
 
 ## 14.0.55 alpha 2020-04-23
 
 * change(android): Convert LanguageListActivity to utility (#3018)
 * refactor(web/engine): successful web-core compilation (#2992)
-* change(common/lmlayer): always bundle searchTermToKey() with model (#2971)
-* change(common/lmlayer): remove NFD table (#3014)
+* change(common/models/developer/compilers): always bundle searchTermToKey() with model (#2971)
+* change(common/models): remove NFD table (#3014)
 
 ## 14.0.54 alpha 2020-04-22
 
-* refactor(common/lmlayer): word breaker compilation (#3016)
+* refactor(developer/compilers): word breaker compilation (#3016)
 
 ## 14.0.53 alpha 2020-04-21
 
-* refactor(common/lmlayer): Abstracted connection between LMLayer and Worker initialization (#2986)
-* refactor(common/lmlayer): starts a formal 'headless' mode (#2987)
+* refactor(common/models): Abstracted connection between LMLayer and Worker initialization (#2986)
+* refactor(common/models): starts a formal 'headless' mode (#2987)
 * fix(android): predictive banner display bugfix (#3010)
 * fix(android): Fix system keyboard alignment (#3009)
 
@@ -880,7 +880,7 @@
 
 * refactor(web/engine): precomputation for OSK key events, headless production thereof (#2969)
 * refactor(web/engine): initial ModelManager split (#2974)
-* refactor(web/engine): lm-layer enablement state management rework (#2975)
+* refactor(web/engine): LMLayer enablement state management rework (#2975)
 * refactor(web/engine): predictive data routing, LanguageProcessor as EventEmitter (#2976)
 * refactor(web/engine): web-core build prep (#2982)
 
@@ -899,7 +899,7 @@
 
 ## 14.0.49 alpha 2020-04-11
 
-* chore(common/lmlayer): do not run tests in IE11 in Windows (#2978)
+* chore(common/models): do not run tests in IE11 in Windows (#2978)
 
 ## 14.0.48 alpha 2020-04-07
 
@@ -907,7 +907,7 @@
 
 ## 14.0.47 alpha 2020-04-07
 
-* fix(common/lmlayer): use searchTermToKey() on input (#2954)
+* fix(common/models): use searchTermToKey() on input (#2954)
 * refactor(web/engine): proper split-off of DOM-reliant code (#2939)
 * refactor(web/engine): InputProcessor/KeyboardProcessor split (#2940)
 * fix(ios): prevents in-app keyboard resets (#2951)
@@ -1053,7 +1053,7 @@
 * feat(android): Additional Sentry integration (#2810)
 * fix(web): applies base key layer property to unassigned subkeys (#2808)
 * feat(android): Start adding RTL to layouts (#2816)
-* fix(common/lmlayer): fixes word lookup from Tries for SMP script-based languages (#2815)
+* fix(common/models): fixes word lookup from Tries for SMP script-based languages (#2815)
 * feat(common): add release finalization for Sentry (#2819)
 * fix(web): further fixes BuildVisualKeyboard. Fixes #2818 (#2822)
 * fix(web): fixes internal reference for validation tool (#2824)
