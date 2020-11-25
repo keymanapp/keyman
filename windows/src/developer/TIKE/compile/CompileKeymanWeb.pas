@@ -1655,10 +1655,9 @@ var
       //
       if FText.StartsWith('*') and FText.EndsWith('*') and (FText.Length > 2) then
       begin
-        // We do not support '*special*' labels on non-special keys in Keyman 13
-        // or earlier, except for ZWNJ, which will be transformed in function
-        // TransformSpecialKeys14 to '<|>', and  which does not require the custom
-        // OSK font.
+        // Keyman versions before 14 do not support '*special*' labels on non-special keys.
+        // ZWNJ use, however, is safe because it will be transformed in function
+        // TransformSpecialKeys14 to '<|>',  which does not require the custom OSK font.
         if (CSpecialText10.Contains(FText) or CSpecialText14.Contains(FText)) and
             not CSpecialText14ZWNJ.Contains(FText) and
             not IsKeyboardVersion14OrLater and
@@ -2588,4 +2587,3 @@ begin
 end;
 
 end.
-
