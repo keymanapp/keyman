@@ -21,11 +21,14 @@
 #import "ZipArchive.h"
 @import Sentry;
 
+/** NSUserDefaults keys */
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kKMSavedStoresKey = @"KMSavedStoresKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
+NSString *const kKMLegacyApps = @"KMLegacyApps";
+
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
 NSString *const kPackage = @"[Package]";
@@ -64,6 +67,7 @@ typedef enum {
 @synthesize alwaysShowOSK = _alwaysShowOSK;
 
 id _lastServerWithOSKShowing = nil;
+NSString* _keymanDataPath = nil;
 
 - (id)init {
     self = [super init];
@@ -460,14 +464,37 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return [userData boolForKey:kKMUseVerboseLogging];
 }
 
+/**
+ * Locate and create the Keyman data path; currently in ~/Documents/Keyman-Keyboards
+ */
+- (NSString *)keymanDataPath {
+    if(_keymanDataPath == nil) {
+        NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        _keymanDataPath = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
+
+        NSFileManager *fm = [NSFileManager defaultManager];
+        if (![fm fileExistsAtPath:_keymanDataPath]) {
+            [fm createDirectoryAtPath:_keymanDataPath withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+    }
+    return _keymanDataPath;
+}
+
+/**
+ * Returns the list of user-default legacy apps
+ */
+- (NSArray *)legacyAppsUserDefaults { 
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    return [userData arrayForKey:kKMLegacyApps];
+}
+
+/**
+ * Returns the root folder where keyboards are stored; currently the same
+ * as the keymanDataPath, but may diverge in future versions (possibly a sub-folder)
+ */
 - (NSString *)keyboardsPath {
     if (_keyboardsPath == nil) {
-        NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-        _keyboardsPath = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
-        NSFileManager *fm = [NSFileManager defaultManager];
-        if (![fm fileExistsAtPath:_keyboardsPath]) {
-            [fm createDirectoryAtPath:_keyboardsPath withIntermediateDirectories:YES attributes:nil error:nil];
-        }
+        _keyboardsPath = [self keymanDataPath];
     }
 
     return _keyboardsPath;
