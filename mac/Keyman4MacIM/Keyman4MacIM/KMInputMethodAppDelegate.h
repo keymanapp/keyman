@@ -125,6 +125,8 @@ typedef struct {
 - (NSString *)oskWindowTitle;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 - (KeymanVersionInfo)versionInfo;
+- (NSString *)keymanDataPath;
+- (NSArray *)legacyAppsUserDefaults;
 @end
 
 #endif /* KMInputMethodAppDelegate_h */
