@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 14.0.189 alpha 2020-11-25
+
+* fix(mac): re-sign files post plist update (#3932)
+* fix(mac/engine): wrong variable type (#3933)
+* feat(mac): Add support for "ISO" keyboard layouts (#3924)
+* fix(mac): turn on legacy mode for Java apps (#3944)
+* feat(developer): add new touch layout special tags (#3878)
+* fix(web): default attachment behavior (#3948)
+* fix(mac): arrow keys now reset context (#3946)
+* feat(mac): user-controllable legacy app list (#3949)
+* chore(mac): fix iso section key code (#3952)
+* chore(common/resources): Part 3 of additional HISTORY.md cleanup (#3947)
+
 ## 14.0.188 alpha 2020-11-24
 
 * chore(mac): Update README.md (#3880)
