@@ -49,7 +49,7 @@ fi
 if [ "${DIST}" != "" ]; then
     distributions="${DIST}"
 else
-    distributions="xenial bionic eoan"
+    distributions="bionic focal groovy"
 fi
 
 if [ "${PACKAGEVERSION}" != "" ]; then
@@ -72,6 +72,9 @@ for proj in ${projects}; do
     fi
     if [ "${proj}" == "keyman-config" ]; then
         tarname="keyman_config"
+        # we need to run a build (which also adds the man pages to the debian directory)
+        make
+        # remove build artifacts again (which leaves man pages behind)
         make clean
     else
         tarname="${proj}"
@@ -97,6 +100,7 @@ for proj in ${projects}; do
     cp debian/changelog ../${proj}-changelog
     #TODO separate source builds and dputs for each of $dists?
     for dist in ${distributions}; do
+        export DEB_BUILD_PROFILES=pkg.${proj}.${dist}
         cp ../${proj}-changelog debian/changelog
         dch -v ${version}-${packageversion}~${dist} "source package for PPA"
         dch -D ${dist} -r ""
