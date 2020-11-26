@@ -179,6 +179,9 @@
   <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">No keyboards or predictive text to install</string>
 
   <!-- Context: KMP Package strings -->
+  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Keyboard package has no associated languages to install</string>
+
+  <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Invalid/Missing metadata in package</string>
 
 </resources>

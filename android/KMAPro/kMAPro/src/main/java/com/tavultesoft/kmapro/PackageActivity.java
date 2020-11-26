@@ -111,6 +111,17 @@ public class PackageActivity extends AppCompatActivity implements
     // lexical-model packages will be 0
     final int languageCount = kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0);
 
+    // Sanity check for keyboard packages
+    if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+      if (keyboardCount == 0) {
+        showErrorToast(context, getString(R.string.no_new_touch_keyboards_to_install));
+        finish();
+      } else if (languageCount == 0) {
+        showErrorToast(context, getString(R.string.no_associated_languages));
+        finish();
+      }
+    }
+
     // Silent installation (skip displaying welcome.htm and user confirmation)
     if (silentInstall) {
       installPackage(context, pkgTarget, pkgId, languageList, true);
@@ -178,7 +189,7 @@ public class PackageActivity extends AppCompatActivity implements
 
   @Override
   public void onError(VerificationError verificationError) {
-    Toast.makeText(this, verificationError.getErrorMessage(), Toast.LENGTH_SHORT).show();
+    Toast.makeText(this, verificationError.getErrorMessage(), Toast.LENGTH_LONG).show();
   }
 
   @Override
