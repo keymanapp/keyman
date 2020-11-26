@@ -115,10 +115,8 @@ public class PackageActivity extends AppCompatActivity implements
     if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
       if (keyboardCount == 0) {
         showErrorToast(context, getString(R.string.no_new_touch_keyboards_to_install));
-        finish();
       } else if (languageCount == 0) {
         showErrorToast(context, getString(R.string.no_associated_languages));
-        finish();
       }
     }
 
@@ -235,6 +233,7 @@ public class PackageActivity extends AppCompatActivity implements
     // Setting result to 1 so calling activity will finish too
     setResult(1);
     cleanup();
+    finish();
   }
 
   /**

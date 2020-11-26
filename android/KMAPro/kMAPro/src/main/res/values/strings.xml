@@ -170,7 +170,7 @@
   <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Dictionary</string>
 
   <!-- Context: KMP Package strings -->
-  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">No new touch-optimized keyboards to install</string>
+  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Keyboard package has no touch-optimized keyboards to install</string>
 
   <!-- Context: KMP Package strings -->
   <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">No new predictive text to install</string>
