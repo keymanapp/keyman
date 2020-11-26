@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.190 alpha 2020-11-26
+
+* fix(oem/fv/android): Check keyboard selected  before allowing setup (#3923)
+* chore(common): fixup missing history (#3957)
+
 ## 14.0.189 alpha 2020-11-25
 
 * fix(mac): re-sign files post plist update (#3932)
