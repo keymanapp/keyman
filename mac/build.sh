@@ -458,6 +458,12 @@ if $PREPRELEASE || $NOTARIZE; then
       sleep 30
       xcrun altool --notarization-info "$ALTOOL_UUID" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --output-format xml > "$ALTOOL_LOG_PATH" || (
         ALTOOL_CODE=$?
+        ALTOOL_PRODUCT_ERROR=$(/usr/libexec/PlistBuddy -c "Print product-errors:0:code" "$ALTOOL_LOG_PATH")
+        if [ "$ALTOOL_PRODUCT_ERROR" == 1519 ]; then
+            # Could not find the RequestUUID; this is a temporary error sometimes returned by Apple.
+            # We'll just keep retrying.
+            continue;
+        fi
         cat "$ALTOOL_LOG_PATH"
         fail "altool failed with code $ALTOOL_CODE"
       )
