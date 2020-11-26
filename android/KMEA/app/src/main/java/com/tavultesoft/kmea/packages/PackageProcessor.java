@@ -3,6 +3,8 @@
  */
 package com.tavultesoft.kmea.packages;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.tavultesoft.kmea.KMManager;
@@ -48,6 +50,8 @@ public class PackageProcessor {
   // keys in kmp.json
   public static final String PP_KEYBOARDS_KEY = "keyboards";
   public static final String PP_LEXICAL_MODELS_KEY = "lexicalModels";
+  public static final String PP_FILES_KEY = "files";
+  public static final String PP_FILES_NAME_KEY = "name";
   public static final String PP_LANGUAGES_KEY = "languages";
 
   private static final String TAG = "PackageProcessor";
@@ -270,9 +274,9 @@ public class PackageProcessor {
   }
 
   /**
-   * Parse a kmp.json JSON object and return the keyboard count. Lexical model packages return 0
+   * Parse a kmp.json JSON object and return the touch-layout keyboard count. Lexical model packages return 0
    * @param json kmp.json as a JSON object
-   * @return int of number of keyboards. 0 if not found
+   * @return int of number of touch-layout keyboards. 0 if not found
    */
   public static int getKeyboardCount(JSONObject json) {
     int count = 0;
@@ -280,6 +284,21 @@ public class PackageProcessor {
       if (!json.has(PP_KEYBOARDS_KEY)) {
         return count;
       }
+      // Verify JS file is in the kmp
+      boolean jsKeyboardExists = false;
+      JSONArray files = json.getJSONArray(PP_FILES_KEY);
+      for (int i = 0; i < files.length(); i++) {
+        JSONObject file = files.getJSONObject(i);
+        String filename = file.getString(PP_FILES_NAME_KEY);
+        if (FileUtils.hasJavaScriptExtension(filename)) {
+          jsKeyboardExists = true;
+          break;
+        }
+      }
+      if (!jsKeyboardExists) {
+        return count;
+      }
+
       JSONArray keyboards = json.getJSONArray(PP_KEYBOARDS_KEY);
       count = keyboards.length();
     } catch (JSONException e) {
@@ -753,6 +772,10 @@ public class PackageProcessor {
         Map<String, String>[] maps;
         ArrayList<String> preferredLanguageList;
         JSONArray languages = entries.getJSONObject(i).getJSONArray(PP_LANGUAGES_KEY);
+        if (languages != null && languages.length() == 0) {
+          KMLog.LogError(TAG, packageId + " package has no languages to install");
+          return specs;
+        }
         if (i == 0 && key.equalsIgnoreCase(PP_KEYBOARDS_KEY) && languageList != null && !languageList.isEmpty()) {
           preferredLanguageList = languageList;
         } else {
