@@ -298,13 +298,15 @@ public class PackageProcessor {
         for (int f = 0; f < files.length(); f++) {
           JSONObject file = files.getJSONObject(f);
           String filename = file.getString(PP_FILES_NAME_KEY);
-          if (FileUtils.hasJavaScriptExtension(filename) && filename.equals(expectedKeyboardFilename)) {
+          if (filename != null && filename.equals(expectedKeyboardFilename)) {
             count++;
             break;
           }
         }
       }
     } catch (JSONException e) {
+      // Setting count to 0 due to invalid package
+      count = 0;
       KMLog.LogException(TAG, "", e);
     }
 
