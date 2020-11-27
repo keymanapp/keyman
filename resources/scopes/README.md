@@ -21,3 +21,5 @@ This folder contains definitions for valid scopes and commit types for Keyman.
 * commit-types.schema.json
 
 Any changes MUST be validated against these schemas before commit. One online tool that does this: https://www.jsonschemavalidator.net/
+
+Any changes MUST also be kept in sync with [downloads.keyman.com/api/history](https://github.com/keymanapp/downloads.keyman.com/blob/master/api/historydata.php)
