@@ -598,7 +598,6 @@ procedure TfrmRunDesktop.FillActionText;
 var
   s: string;
   pack: TInstallInfoPackage;
-  FLocationType: TInstallInfoLocationType;
   Found: Boolean;
   langname: string;
   packLocation: TInstallInfoPackageFileLocation;
@@ -608,18 +607,14 @@ begin
   s := '';
   if FInstallInfo.ShouldInstallKeyman then
   begin
-    FLocationType := FInstallInfo.MsiInstallLocation.LocationType;
-
-    if FLocationType = iilOnline
+    if FInstallInfo.MsiInstallLocation.LocationType = iilOnline
       then downloadSize := FInstallInfo.Text(ssActionDownload, [FormatFileSize(FInstallInfo.MsiInstallLocation.Size)])
       else downloadSize := '';
 
     s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.MsiInstallLocation.Version, downloadSize]) + #13#10;
 
     Found := True;
-  end
-  else
-    FLocationType := iilLocal;
+  end;
 
   for pack in FInstallInfo.Packages do
   begin
@@ -642,8 +637,6 @@ begin
 
         s := s + #13#10;
 
-        if packLocation.LocationType = iilOnline then
-          FLocationType := iilOnline;
         Found := True;
       end;
     end;
