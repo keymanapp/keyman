@@ -19,7 +19,7 @@
   </Info>
   <Files>
     <File>
-      <Name>..\..\..\..\..\..\Projects\keyman\app\windows\src\test\unit-tests\kmcomp\EnglishSpanish.kmx</Name>
+      <Name>EnglishSpanish.kmx</Name>
       <Description>Keyboard EnglishSpanish</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
