@@ -74,9 +74,19 @@ NSString *filename = nil; // This is the filename from the FileWrapper (if any)
         }
         return NO;
     }
-    
+
+    // Strip out any browser-appended number, e.g. khmer_angkor (1).kmp
+    // We work on a copy of the file, so this is safe to do -- the fileWrapper
+    // saves to the filename we give it.
+    NSError *error = nil;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@" \\(\\d+\\)\\.kmp$" options:NSRegularExpressionCaseInsensitive error:&error];
+    filename = [regex stringByReplacingMatchesInString:filename 
+                                                      options:0
+                                                        range:NSMakeRange(0, [filename length])
+                                                 withTemplate:@".kmp"];
+
     filenameTempKMP = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
-    assert(filenameTempKMP != nil);
+    assert(filenameTempKMP != nil);    
     NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:filenameTempKMP];
     if (![fileWrapper writeToURL:fileURL options:NSFileWrapperWritingAtomic originalContentsURL:nil error:outError]) {
         filenameTempKMP = nil;
