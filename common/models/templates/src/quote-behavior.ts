@@ -28,14 +28,6 @@ namespace models {
         case QuoteBehavior.useQuotes:
           let {open, close} = punctuation.quotesForKeepSuggestion;
   
-          // TODO:  Is this the right thing to do under RTL?
-          //        We need an extra pass over this section to validate it.
-          if(punctuation.isRTL) {
-            let temp = close;
-            close = open;
-            open = temp;
-          }
-  
           // This part's simple enough, at least.
           return open + text + close;
         default:
