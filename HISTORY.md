@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.191 alpha 2020-11-27
+
+* fix(mac): improve robustness of altool call (#3959)
+* fix(mac): Handle duplicate filenames for packages (#3961)
+* chore(common/resources): Document keeping scopes in sync (#3974)
+* fix(common/models): proper RTL quote ordering (#3897)
+* chore(mac): englishspanish test keyboard (#3976)
+* chore(mac/resources): Catch up mac history for 13.0 releases (#3977)
+* fix(android/engine,android/app) Notify when invalid keyboard package fails to install (#3964)
+* chore(windows): cleanup unused variable (#3978)
+
 ## 14.0.190 alpha 2020-11-26
 
 * fix(oem/fv/android): Check keyboard selected  before allowing setup (#3923)
