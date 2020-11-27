@@ -3,6 +3,8 @@
  */
 package com.tavultesoft.kmea.packages;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.tavultesoft.kmea.KMManager;
@@ -47,7 +49,10 @@ public class PackageProcessor {
 
   // keys in kmp.json
   public static final String PP_KEYBOARDS_KEY = "keyboards";
+  public static final String PP_KEYBOARD_ID_KEY = "id";
   public static final String PP_LEXICAL_MODELS_KEY = "lexicalModels";
+  public static final String PP_FILES_KEY = "files";
+  public static final String PP_FILES_NAME_KEY = "name";
   public static final String PP_LANGUAGES_KEY = "languages";
 
   private static final String TAG = "PackageProcessor";
@@ -185,7 +190,7 @@ public class PackageProcessor {
     }
 
 
-    String keyboardId = jsonEntry.getString("id");
+    String keyboardId = jsonEntry.getString(PP_KEYBOARD_ID_KEY);
     if (touchKeyboardExists(packageId, keyboardId)) {
       HashMap<String, String>[] keyboards = new HashMap[preferredLanguageCount];
       boolean firstLanguageAdded = false;
@@ -194,7 +199,7 @@ public class PackageProcessor {
         keyboards[i] = new HashMap<>();
         keyboards[i].put(KMManager.KMKey_PackageID, packageId);
         keyboards[i].put(KMManager.KMKey_KeyboardName, jsonEntry.getString("name"));
-        keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString("id"));
+        keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString(PP_KEYBOARD_ID_KEY));
 
         int languageIndex = JSONUtils.findID(languages, languageID);
         if (languageIndex == -1) {
@@ -252,7 +257,7 @@ public class PackageProcessor {
       JSONObject languageObj = languages.getJSONObject(0);
       return new Keyboard(
         packageID,
-        keyboardObj.getString("id"),
+        keyboardObj.getString(PP_KEYBOARD_ID_KEY),
         keyboardObj.getString("name"),
         languageObj.getString("id"),
         languageObj.getString("name"),
@@ -270,9 +275,11 @@ public class PackageProcessor {
   }
 
   /**
-   * Parse a kmp.json JSON object and return the keyboard count. Lexical model packages return 0
+   * Parse a kmp.json JSON object and return the number of touch-layout keyboards (.JS) matching
+   * keyboard IDs in the "keyboards" JSONArrray.
+   * Lexical model packages return 0
    * @param json kmp.json as a JSON object
-   * @return int of number of keyboards. 0 if not found
+   * @return int of number of matching touch-layout keyboards. 0 if not found
    */
   public static int getKeyboardCount(JSONObject json) {
     int count = 0;
@@ -280,9 +287,26 @@ public class PackageProcessor {
       if (!json.has(PP_KEYBOARDS_KEY)) {
         return count;
       }
+
+      // Count the number of keyboard ID's that have a matching JS file is in the kmp
       JSONArray keyboards = json.getJSONArray(PP_KEYBOARDS_KEY);
-      count = keyboards.length();
+      for (int k = 0; k <  keyboards.length(); k++) {
+        JSONObject keyboardObj = keyboards.getJSONObject(k);
+        String keyboardID = keyboardObj.getString(PP_KEYBOARD_ID_KEY);
+        String expectedKeyboardFilename = keyboardID + FileUtils.JAVASCRIPT;
+        JSONArray files = json.getJSONArray(PP_FILES_KEY);
+        for (int f = 0; f < files.length(); f++) {
+          JSONObject file = files.getJSONObject(f);
+          String filename = file.getString(PP_FILES_NAME_KEY);
+          if (filename != null && filename.equals(expectedKeyboardFilename)) {
+            count++;
+            break;
+          }
+        }
+      }
     } catch (JSONException e) {
+      // Setting count to 0 due to invalid package
+      count = 0;
       KMLog.LogException(TAG, "", e);
     }
 
@@ -329,7 +353,7 @@ public class PackageProcessor {
       for (int i = 0; i < keyboards.length(); i++) {
         JSONObject keyboard = keyboards.getJSONObject(i);
 
-        if (keyboard.getString("id").equals(kbdId)) {
+        if (keyboard.getString(PP_KEYBOARD_ID_KEY).equals(kbdId)) {
           return keyboard.getString("version");
         }
       }
@@ -632,7 +656,7 @@ public class PackageProcessor {
             return getKeyboards(keyboard, baseKeyboard, excludeInstalledLanguages);
           }
         }
-        else if (keyboardID != null && keyboardID.equals(keyboard.getString("id"))) {
+        else if (keyboardID != null && keyboardID.equals(keyboard.getString(PP_KEYBOARD_ID_KEY))) {
           // Find the keyboard already installed. We'll use it as the base
           // for creating new keyboards
           int baseKeyboardIndex =  KeyboardController.getInstance().getKeyboardIndex(packageID, keyboardID, "");
@@ -674,7 +698,7 @@ public class PackageProcessor {
 
       for (int i=0; i < keyboards.length(); i++) {
         JSONObject keyboard = keyboards.getJSONObject(i);
-        if (keyboardID.equals(keyboard.getString("id"))) {
+        if (keyboardID.equals(keyboard.getString(PP_KEYBOARD_ID_KEY))) {
           Map<String, String>[] maps = processEntry(keyboard, packageID, packageVersion, languageList);
           if (maps != null) {
             // Only returning first keyboard map
@@ -753,6 +777,10 @@ public class PackageProcessor {
         Map<String, String>[] maps;
         ArrayList<String> preferredLanguageList;
         JSONArray languages = entries.getJSONObject(i).getJSONArray(PP_LANGUAGES_KEY);
+        if (languages == null || languages.length() == 0) {
+          KMLog.LogError(TAG, packageId + " package has no languages to install");
+          return specs;
+        }
         if (i == 0 && key.equalsIgnoreCase(PP_KEYBOARDS_KEY) && languageList != null && !languageList.isEmpty()) {
           preferredLanguageList = languageList;
         } else {
