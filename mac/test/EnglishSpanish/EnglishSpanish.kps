@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>14.0.177.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL="">1.0</Version>
+    <Name URL="">EnglishSpanish</Name>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\..\..\..\..\..\Projects\keyman\app\windows\src\test\unit-tests\kmcomp\EnglishSpanish.kmx</Name>
+      <Description>Keyboard EnglishSpanish</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>EnglishSpanish</Name>
+      <ID>englishspanish</ID>
+      <Version>1.0</Version>
+      <Languages/>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>
