@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.192 alpha 2020-11-28
+
+* chore(linux/resources): Cleanup formatting in  history.md (#3983)
+
 ## 14.0.191 alpha 2020-11-27
 
 * fix(mac): improve robustness of altool call (#3959)
