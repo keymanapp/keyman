@@ -90,7 +90,12 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
                decidePolicyFor navigationAction: WKNavigationAction,
                decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
     if let link = navigationAction.request.url {
-      if UniversalLinks.isExternalLink(link) {
+      if link.path.hasPrefix(self.package.sourceFolder.path) {
+        // Links from within the package will show up as 'external' in the condition below!
+        // So, we check against package-internal links first.
+        decisionHandler(.allow)
+        return
+      } else if UniversalLinks.isExternalLink(link) {
         decisionHandler(.cancel)
 
         // Kick this link out to an external Safari process.
