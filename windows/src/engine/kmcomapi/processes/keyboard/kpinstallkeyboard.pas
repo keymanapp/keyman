@@ -283,7 +283,7 @@ begin
     kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardName, Langs[0], IconFileName, '');
     kpil.InstallTip(KeyboardID, BCP47Tag, Langs[0], guid);
   finally
-    Free;
+    kpil.Free;
   end;
 end;
 
@@ -304,7 +304,7 @@ begin
       Result := True;
     end;
   finally
-    Free;
+    kpil.Free;
   end;
 end;
 
