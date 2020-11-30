@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.193 alpha 2020-11-30
+
+* chore: refresh github templates (#3999)
+
 ## 14.0.192 alpha 2020-11-28
 
 * chore(linux/resources): Cleanup formatting in  history.md (#3983)
