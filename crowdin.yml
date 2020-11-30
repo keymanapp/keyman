@@ -28,7 +28,7 @@ files:
   # Android files
 
   - source: /android/KMEA/app/src/main/res/values/strings.xml
-    dest: /android/engine/strings.xml
+    dest: /master/android/engine/strings.xml
     translation: /android/KMEA/app/src/main/res/values-%android_code%/strings.xml
     languages_mapping:
       # Prevent invalid region pap-rPAP
@@ -36,7 +36,7 @@ files:
         pap: pap
 
   - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
-    dest: /android/app/strings.xml
+    dest: /master/android/app/strings.xml
     translation: /android/KMAPro/kMAPro/src/main/res/values-%android_code%/strings.xml
     languages_mapping:
       # Prevent invalid region pap-rPAP
@@ -47,37 +47,37 @@ files:
   # Note: we use type: android for the Windows project files
 
   - source: /windows/src/desktop/kmshell/xml/strings.xml
-    dest: /windows/strings.xml
+    dest: /master/windows/strings.xml
     translation: /windows/src/desktop/kmshell/locale/%locale%/%original_file_name%
     type: android
 
-  - source: /window/src/desktop/setup/locale/en/strings.xml
-    dest: /windows/setup/strings.xml
+  - source: /windows/src/desktop/setup/locale/en/strings.xml
+    dest: /master/windows/setup/strings.xml
     translation: /windows/src/desktop/setup/locale/%locale%/%original_file_name%
     type: android
 
   # iOS files
 
-  - source: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/en.lproj/ResourceInfoView.strings
-    dest: /ios/engine/ResourceInfoView.strings
+  - source: /ios/engine/KMEI/KeymanEngine/Classes/en.lproj/ResourceInfoView.strings
+    dest: /master/ios/engine/ResourceInfoView.strings
     translation: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/%osx_code%/%original_file_name%
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
-    dest: /ios/engine/Localizable.strings
+    dest: /master/ios/engine/Localizable.strings
     translation: /ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.stringsdict
-    dest: /ios/engine/Localizable.stringsdict
+    dest: /master/ios/engine/Localizable.stringsdict
     translation: /ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
 
   - source: /ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings
-    dest: /ios/app/Localizable.strings
+    dest: /master/ios/app/Localizable.strings
     translation: /ios/keyman/Keyman/Keyman/%osx_code%/%original_file_name%
 
   # Linux files
 
   - source: /linux/keyman-config/locale/keyman-config.pot
-    dest: /linux/keyman-config.pot
+    dest: /master/linux/keyman-config.pot
     translation: /linux/keyman-config/locale/%locale_with_underscore%.po
     type: gettext
     update_option: update_as_unapproved
