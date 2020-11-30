@@ -2,11 +2,16 @@ unit Keyman.System.KeymanStartTask;
 
 interface
 
+uses
+  TaskScheduler_TLB;
+
 type
   /// <summary>Create or recreate the automatic task to start Keyman if a TIP
   /// is selected based on an event in the Event Log</summary>
   TKeymanStartTask = class
   private
+    class function GetTaskName: string;
+    class procedure CleanupAlphaTasks(pTaskFolder: ITaskFolder); static;
   public
     class procedure RecreateTask;
     class procedure DeleteTask;
@@ -26,9 +31,9 @@ uses
   KeymanPaths,
   KeymanVersion,
   RegistryKeys,
-  Keyman.System.KeymanSentryClient,
   Sentry.Client,
-  TaskScheduler_TLB;
+  Keyman.System.KeymanSentryClient;
+
 
 { TKeymanStartTask }
 
@@ -45,7 +50,7 @@ const
     '</QueryList>';
   CTaskEventTriggerId = 'Keyman_StartOnDemand';
 
-  CKeymanExeStartArguments = '-kmc start';
+  CKmshellExeStartArguments = '-s';
 
 class procedure TKeymanStartTask.CreateTask;
 var
@@ -96,6 +101,8 @@ begin
       end;
     end;
 
+    CleanupAlphaTasks(pTaskFolder);
+
     // Create a new task
     pTask := pService.NewTask(0);
 
@@ -117,14 +124,16 @@ begin
 
     // Action is to run keyman.exe as login user
     pAction := pTask.Actions.Create(TASK_ACTION_EXEC) as IExecAction;
-    pAction.Path := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_KeymanExe);
-    pAction.Arguments := CKeymanExeStartArguments;
+    pAction.Path := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+    pAction.Arguments := CKMShellExeStartArguments;
 
-    pTaskFolder.RegisterTaskDefinition(CTaskName, pTask, TASK_CREATE_OR_UPDATE or TASK_IGNORE_REGISTRATION_TRIGGERS,
-      EmptyParam, EmptyParam, TASK_LOGON_NONE, EmptyParam);
+    pTaskFolder.RegisterTaskDefinition(GetTaskName, pTask, TASK_CREATE_OR_UPDATE or TASK_IGNORE_REGISTRATION_TRIGGERS,
+      EmptyParam, EmptyParam, TASK_LOGON_INTERACTIVE_TOKEN, EmptyParam);
   except
     on E:Exception do
+    begin
       TKeymanSentryClient.ReportHandledException(E, 'Failed to create task');
+    end;
   end;
 end;
 
@@ -144,29 +153,42 @@ begin
         if E.ErrorCode = HResultFromWin32(ERROR_FILE_NOT_FOUND) then
           // Assume that the folder doesn't exist, nothing to do
           Exit;
+        raise;
       end;
     end;
 
     try
-      pTaskFolder.DeleteTask(CTaskName, 0);
+      pTaskFolder.DeleteTask(GetTaskName, 0);
     except
       on E:EOleException do
       begin
-        if E.ErrorCode = HResultFromWin32(ERROR_FILE_NOT_FOUND) then
-          // Assume that the task doesn't exist, nothing to do
-          Exit;
+        if E.ErrorCode <> HResultFromWin32(ERROR_FILE_NOT_FOUND) then
+          // We ignore when the task doesn't exist, but report other errors
+          TKeymanSentryClient.ReportHandledException(E, 'Failed to delete task '+GetTaskName);
       end;
     end;
+
+    CleanupAlphaTasks(pTaskFolder);
 
     if pTaskFolder.GetTasks(0).Count = 0 then
     begin
       pTaskFolder := nil;
-      pService.GetFolder('\').DeleteFolder(CTaskFolderName, 0);
+      try
+        pService.GetFolder('\').DeleteFolder(CTaskFolderName, 0);
+      except
+        // We'll ignore errors here because other users may have created the
+        // task on their accounts
+      end;
     end;
   except
     on E:Exception do
       TKeymanSentryClient.ReportHandledException(E, 'Failed to delete task');
   end;
+end;
+
+class function TKeymanStartTask.GetTaskName: string;
+begin
+  Result := CTaskName + ' - ' + GetEnvironmentVariable('USERNAME');
 end;
 
 class procedure TKeymanStartTask.RecreateTask;
@@ -178,6 +200,27 @@ begin
   end;
 
   CreateTask;
+end;
+
+class procedure TKeymanStartTask.CleanupAlphaTasks(pTaskFolder: ITaskFolder);
+begin
+  // Cleanup earlier alpha-version tasks: we renamed the task to include the
+  // user's login name in build 14.0.194 of Keyman, so that multiple users could
+  // create the task on the same machine. It's not obvious, but the Tasks
+  // namespace is shared between all users -- non-admin users will not be able
+  // to see or overwrite tasks created by other users; they'd just get a
+  // (silent) access denied result.
+  try
+    pTaskFolder.DeleteTask(CTaskName, 0);
+  except
+    on E:EOleException do
+    begin
+      if (E.ErrorCode <> HResultFromWin32(ERROR_FILE_NOT_FOUND)) and
+        (E.ErrorCode <> HResultFromWin32(ERROR_ACCESS_DENIED)) then
+        // We ignore when the task doesn't exist, but report other errors
+        TKeymanSentryClient.ReportHandledException(E, 'Failed to delete task '+CTaskName);
+    end;
+  end;
 end;
 
 
