@@ -333,7 +333,9 @@ begin
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;
-  FClient.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, 'Started '+ALogger);
+  // We used the 'Started' event when testing Sentry integration in 14.0 alpha
+  // but we don't want or need it for stable.
+  // FClient.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, 'Started '+ALogger);
 end;
 
 destructor TKeymanSentryClient.Destroy;
