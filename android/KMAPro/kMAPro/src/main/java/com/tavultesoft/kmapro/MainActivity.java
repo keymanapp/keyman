@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
         options.setBeforeBreadcrumb((breadcrumb, hint) -> {
-          String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-(.)*$";
+          String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
           if ("navigation".equals(breadcrumb.getCategory()) && breadcrumb.getLevel() == SentryLevel.INFO &&
             ((breadcrumb.getData("from") != null) || (breadcrumb.getData("to") != null)) ) {
             // Sanitize navigation breadcrumbs
