@@ -1,4 +1,4 @@
-# Keyman Desktop and Keyman Developer
+# Keyman for Windows and Keyman Developer
 
 ## Build Prerequisites
 
@@ -26,7 +26,7 @@ For local development you do not need to perform a release build so these are op
 4. Install [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm) to **C:\Program Files (x86)\WiX Toolset v3.11**.
 5. Add the environment variable `KEYMAN_CEF4DELPHI_ROOT`.
 
-## Building Keyman Desktop and Keyman Developer
+## Building Keyman for Windows and Keyman Developer
 
 1. Start 'x64_x86 Cross Tools Command Prompt for VS 2017'.
 2. Run `make build` from the **windows/src** folder.
@@ -37,7 +37,7 @@ you should consider building Keyman under a login user dedicated to it, or in a 
 
 Type `make` to see build targets. Common build targets are:
 
-  `make build` <-- builds Keyman Desktop and Keyman Developer
+  `make build` <-- builds Keyman for Windows and Keyman Developer
   `make clean` <-- remove temporary files and build artifacts
   `make release` <-- makes a release of all Keyman Windows projects
 
@@ -63,7 +63,7 @@ uninstall and reinstall.
 ## Installing Keyman
 
 These steps are only required the first time you install Keyman:
-1. Install release versions of Keyman Desktop and Keyman Developer for the branch in which you are working (
+1. Install release versions of Keyman for Windows and Keyman Developer for the branch in which you are working (
    e.g. for master branch, download latest alpha, for beta, download latest beta, etc).
    * Download from https://keyman.com/downloads/ and run the installers.
 2. Install the Keyman test certificates. Do the following for each KeymanTestCA cert in
@@ -110,8 +110,8 @@ Install Delphi using the following options:
 * No Interbase components required
 
 Delphi 10.3 is supported by default. Delphi 10.2 is no longer supported.
-(The environment variable `DELPHI_VERSION=19.0` is still possible, but there are 
-some dependencies on 10.3 which we have not fixed. This variable can also be 
+(The environment variable `DELPHI_VERSION=19.0` is still possible, but there are
+some dependencies on 10.3 which we have not fixed. This variable can also be
 added to your `UserDefines.mak`.)
 
 ## Environment Variables
@@ -151,15 +151,13 @@ executables when you build a release.
 To include UserDefines.mak in the build, use the command line parameter `-DUSERDEFINES`. You
 can also set an environment variable `USERDEFINES=1` to get the same result.
 
-### KEYMAN_CEF4DELPHI_ROOT - Chromium Embedded Framework in Keyman Developer
+### KEYMAN_CEF4DELPHI_ROOT - Chromium Embedded Framework
 
-Keyman Developer uses Chromium Embedded Framework. The source repo is at
+Keyman and Keyman Developer use Chromium Embedded Framework. The source repo is at
 https://github.com/keymanapp/CEF4Delphi. In order to build the installers, we need to
 source the binary files from the https://github.com/keymanapp/CEF4Delphi_binary repo.
 The `KEYMAN_CEF4DELPHI_ROOT` environment variable should be set to the root of this
 repo on your local machine.
-
-Keyman Desktop does not currently depend on this component.
 
 ### Crash Reporting
 

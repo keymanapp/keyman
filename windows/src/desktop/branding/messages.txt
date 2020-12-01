@@ -5,13 +5,13 @@ object Messages: TStockMessages
       Strings = <
         item
           Name = 'SKApplicationTitle'
-          DefStr = 'Keyman Desktop'
+          DefStr = 'Keyman'
           Comment = 'Used for the title of message boxes and message dialogs'
           Parameters = <>
         end
         item
           Name = 'SKShortApplicationTitle'
-          DefStr = 'Keyman Desktop'
+          DefStr = 'Keyman'
           Parameters = <>
         end
         item
@@ -28,7 +28,7 @@ object Messages: TStockMessages
         item
           Name = 'SKUILanguageNameWithEnglish'
           DefStr = 'English'
-          Comment = 
+          Comment =
             'Show the name of the UI language, localised, with English name i' +
             'n parentheses (this message is used when the user gets stuck in ' +
             'a strange UI language)'
@@ -43,7 +43,7 @@ object Messages: TStockMessages
         item
           Name = 'SKDefaultLanguageCode'
           DefStr = 'en'
-          Comment = 
+          Comment =
             'The default language code for this product.  This should be the ' +
             'language that the product is created in'
           Parameters = <>
@@ -55,14 +55,14 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKUILanguageHelp'
-          DefStr = 
+          DefStr =
             'Choose the language that you want displayed in the $(SKShortAppl' +
             'icationTitle) interface.'
           Parameters = <>
         end
         item
           Name = 'SKMenu_NoKeyboardsInstalled'
-          DefStr = 
+          DefStr =
             'No keyboard layouts are installed.'#13#10'Choose "Configuration" to in' +
             'stall'#13#10'a keyboard layout for your language.'
           Parameters = <>
@@ -75,15 +75,15 @@ object Messages: TStockMessages
         item
           Name = 'SKBalloonClickToSelectKeyboard'
           DefStr = 'Click this icon to select a keyboard'
-          Comment = 
-            'Balloon that shows when Keyman Desktop icon is first shown durin' +
+          Comment =
+            'Balloon that shows when Keyman icon is first shown durin' +
             'g the tutorial'
           Parameters = <>
         end
         item
           Name = 'SKBalloonOSKClosed'
-          DefStr = 
-            'Keyman Desktop is still running.  Click this icon to use your la' +
+          DefStr =
+            'Keyman is still running.  Click this icon to use your la' +
             'nguage keyboard at any time'
           Comment = 'Balloon that shows when OSK is closed'
           Parameters = <>
@@ -104,10 +104,10 @@ object Messages: TStockMessages
       Strings = <
         item
           Name = 'SKPackageAlreadyInstalled'
-          DefStr = 
+          DefStr =
             'A package with the name %0:s is already installed.  Do you want ' +
             'to uninstall it and install the new one?'
-          Comment = 
+          Comment =
             'This message is shown during the package installation process wh' +
             'en an existingpackage with the same name is already installed.'
           Parameters = <
@@ -118,7 +118,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKKeyboardAlreadyInstalled'
-          DefStr = 
+          DefStr =
             'A keyboard with the name '#39'%0:s'#39' is already installed.  If you co' +
             'ntinue, it will be uninstalled before the new one is installed. ' +
             ' Continue?'
@@ -130,7 +130,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKKeyboardPartOfPackage'
-          DefStr = 
+          DefStr =
             'The keyboard '#39'%0:s'#39' is part of package '#39'%1:s'#39'.  You must uninsta' +
             'll the entire package.  Continue?'
           Parameters = <
@@ -145,17 +145,17 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKInstallOnlyAsAdmin'
-          DefStr = 
+          DefStr =
             'You can only install or uninstall keyboards as Administrator.  U' +
             'se Control Panel to select languages for use as a normal user.'
           Parameters = <>
         end
         item
           Name = 'SKUninstallOnScreenKeyboard'
-          DefStr = 
+          DefStr =
             'Are you sure you want to remove the on screen keyboard installed' +
             ' for %0:s?'
-          Comment = 
+          Comment =
             'Displayed when the user chooses "Uninstall on screen keyboard" i' +
             'n the Configuration dialog'
           Parameters = <
@@ -193,7 +193,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKSelectKeyboardsBlurb'
-          DefStr = 
+          DefStr =
             'You cannot install all the keyboards in this package.  You can i' +
             'nstall a maximum of %0:d additional keyboards.  Please select th' +
             'e keyboards you wish to install from this package.'
@@ -201,7 +201,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKUninstallRequireAdmin'
-          DefStr = 
+          DefStr =
             'You can only uninstall the keyboard '#39'%0:s'#39' if you are an Adminis' +
             'trator'
           Parameters = <
@@ -213,7 +213,7 @@ object Messages: TStockMessages
         item
           Name = 'SKUninstallPackageFonts'
           DefStr = 'The following fonts will also be uninstalled: %0:s.'
-          Comment = 
+          Comment =
             'Text embedded in SKUninstallPackage when fonts are ready for uni' +
             'nstall.'
           Parameters = <
@@ -233,7 +233,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKCouldNotFindHelp'
-          DefStr = 
+          DefStr =
             'The help file $(SKOnlineHelpFile) could not be found in the appl' +
             'ication folder.  Please Repair or Reinstall $(SKShortApplication' +
             'Title) to fix this issue.'
@@ -274,7 +274,7 @@ object Messages: TStockMessages
       Strings = <
         item
           Name = 'SKDebuggingWarning'
-          DefStr = 
+          DefStr =
             'Keyman debug information will be stored in a text file called ke' +
             'ymanlog\system.log on your desktop.  You should exit Keyman befo' +
             're reading or deleting this file.'#13#10#13#10'WARNING: This file can grow' +
@@ -288,7 +288,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKSurrogatesRequiresRestart'
-          DefStr = 
+          DefStr =
             'Changing the setting of Surrogates requires Windows to be restar' +
             'ted.  Do you want to restart Windows now?'
           Parameters = <>
@@ -300,7 +300,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKCouldNotPrintKeyboard'
-          DefStr = 
+          DefStr =
             'The keyboard could not be printed successfully.  Please save to ' +
             'a web page and print manually.'
           Parameters = <>
@@ -349,13 +349,13 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKCannotStartProduct'
-          DefStr = 
-            'Keyman Desktop failed to start.  Please check your security sett' +
+          DefStr =
+            'Keyman failed to start.  Please check your security sett' +
             'ings to make sure that the program keyman.exe is allowed to star' +
             't before continuing.  The error returned was:'#13#10#13#10'"%0:s"'#13#10#13#10'Do yo' +
-            'u want to try and start Keyman Desktop again now?'
-          Comment = 
-            'This message appears when Keyman Desktop fails to start keyman.e' +
+            'u want to try and start Keyman again now?'
+          Comment =
+            'This message appears when Keyman fails to start keyman.e' +
             'xe due to an access denied or file not found error'
           Parameters = <
             item
@@ -365,9 +365,9 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKWelcome_PleaseStartKeymanDesktop'
-          DefStr = 
-            'Keyman Desktop is not running.  Please start Keyman Desktop from' +
-            ' the Start Menu, under the Programs/Keyman Desktop sub menu, or ' +
+          DefStr =
+            'Keyman is not running.  Please start Keyman from' +
+            ' the Start Menu, under the Programs/Keyman sub menu, or ' +
             'click Cancel to exit the tutorial.'
           Parameters = <>
         end>
@@ -377,7 +377,7 @@ object Messages: TStockMessages
       Strings = <
         item
           Name = 'SKUnicodeData_DatabaseCouldNotBeDeleted'
-          DefStr = 
+          DefStr =
             'The Unicode Character database could not be deleted for a rebuil' +
             'd.  Error details are: %0:s'
           Parameters = <
@@ -388,7 +388,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKUnicodeData_CouldNotCreateDatabase'
-          DefStr = 
+          DefStr =
             'The Unicode Character database could not be created and has been' +
             ' disabled.  Error details are: %0:s'
           Parameters = <
@@ -399,14 +399,14 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKUnicodeData_Build'
-          DefStr = 
+          DefStr =
             'The Character Map has a database of characters that needs to be ' +
             'built before it can be used.  Build it now?'
           Parameters = <>
         end
         item
           Name = 'SKUnicodeData_DatabaseLoadFailedRebuild'
-          DefStr = 
+          DefStr =
             'The Unicode character database did not load successfully (%0:s).' +
             '  Rebuild it now?'
           Parameters = <
@@ -517,7 +517,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'koTurnOnSurrogates'
-          DefStr = 
+          DefStr =
             'Turn on Unicode supplementary character display (requires restar' +
             't)'
           Parameters = <>
@@ -561,14 +561,14 @@ object Messages: TStockMessages
         item
           Name = 'SKSetHotkey_Interface'
           DefStr = 'Set interface hotkey'
-          Comment = 
+          Comment =
             'Message displayed when changing an interface hotkey (e.g. show m' +
             'enu or show on screen keyboard)'
           Parameters = <>
         end
         item
           Name = 'SKUnsafeHotkey'
-          DefStr = 
+          DefStr =
             'The hotkey %0:s will conflict with normal keyboard use.  You sho' +
             'uld use at least Ctrl or Alt.  Do you want to change this now?'
           Parameters = <
@@ -579,7 +579,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKHotkeyConflicts_Keyboard'
-          DefStr = 
+          DefStr =
             'The hotkey %0:s conflicts with the hotkey selected for keyboard ' +
             '%1:s.  If you continue, the hotkey for keyboard %1:s will be cle' +
             'ared.  Continue?'
@@ -595,7 +595,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKHotkeyConflicts_Product'
-          DefStr = 
+          DefStr =
             'The hotkey %0:s conflicts with a hotkey for the product %1:s.  I' +
             'f you continue, the conflicting hotkey will be cleared.  Continu' +
             'e?'
@@ -647,14 +647,14 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKUpdate_UnableToContact'
-          DefStr = 
+          DefStr =
             'Unable to contact keyman.com - please make sure you have an acti' +
             've Internet connection and try again.'
           Parameters = <>
         end
         item
           Name = 'SKUpdate_UnableToContact_Error'
-          DefStr = 
+          DefStr =
             'Unable to contact keyman.com - please make sure you have an acti' +
             've Internet connection and try again.  The error received was: %' +
             '0:s'
@@ -686,7 +686,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKUpdate_IconTitle'
-          DefStr = 'Updates for Keyman Desktop are now available'
+          DefStr = 'Updates for Keyman are now available'
           Parameters = <>
         end
         item
@@ -709,7 +709,7 @@ object Messages: TStockMessages
         item
           Name = 'SKSelectDrive_Title'
           DefStr = 'Select Drive'
-          Comment = 
+          Comment =
             'Title for dialog that displays when selecting a drive for loadin' +
             'g activation file from'
           Parameters = <>
@@ -729,7 +729,7 @@ object Messages: TStockMessages
       Strings = <
         item
           Name = 'SKAllLanguageSettingsTestedOK'
-          DefStr = 
+          DefStr =
             'All the Windows language settings appear to be correctly configu' +
             'red for your language(s).'
           Parameters = <>
@@ -774,7 +774,7 @@ object Messages: TStockMessages
         end
         item
           Name = 'SKLangCheck_Uniscribe_Update'
-          DefStr = 
+          DefStr =
             'Keyman Uniscribe Manager is required to enable display of your l' +
             'anguage'
           Parameters = <>

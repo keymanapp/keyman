@@ -48,9 +48,9 @@
         <xsl:for-each select="/TavultesoftSystemInformation/TSI_Keyman/KeymanDiagnosticRecord/Keyman/Registry/LocalMachine/Key">
           <xsl:call-template name="Registry" />
         </xsl:for-each>
-        
+
         <h2>Current User registry settings</h2>
-        
+
         <xsl:for-each select="/TavultesoftSystemInformation/TSI_Keyman/KeymanDiagnosticRecord/Keyman/Registry/CurrentUser/Key">
           <xsl:call-template name="Registry" />
         </xsl:for-each>
@@ -165,9 +165,9 @@
 
   <xsl:template name="KeymanActiveKeyboards">
     <xsl:param name="Version"/>
-    
+
     <xsl:variable name="root" select="concat('hkey_current_user\software\tavultesoft\keyman engine\',$Version,'\active keyboards')" />
-    
+
     <xsl:if test="/TavultesoftSystemInformation/TSI_Keyman/KeymanDiagnosticRecord/Keyman/Registry/CurrentUser//Key[translate(@Path,$uppercase,$lowercase)=$root]">
       <h2><xsl:value-of select="$Version"/> Active Keyboards</h2>
 
@@ -256,7 +256,7 @@
       </xsl:choose>
     </xsl:variable>
     <h2><xsl:value-of select="$EnabledText" /> Language Profiles</h2>
-    
+
     <table>
       <thead>
         <tr>
@@ -295,7 +295,7 @@
           <xsl:when test="@ClassID='{00000000-0000-0000-0000-000000000000}'"></xsl:when>
           <xsl:when test="@ClassID='{7BA04432-8609-4FE6-BFF7-971091DE0933}'">Keyman Desktop 8</xsl:when>
           <xsl:when test="@ClassID='{487EB753-DB93-48C5-9E6A-4398E777C61D}'">Keyman Desktop 9</xsl:when>
-          <xsl:when test="@ClassID='{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}'">Keyman Desktop 10</xsl:when>
+          <xsl:when test="@ClassID='{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}'">Keyman Desktop 10-13, Keyman 14+</xsl:when>
           <xsl:when test="@ClassName != ''">
             <xsl:value-of select="@ClassName"/>
           </xsl:when>
@@ -370,5 +370,5 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>  
-</xsl:stylesheet> 
+  </xsl:template>
+</xsl:stylesheet>

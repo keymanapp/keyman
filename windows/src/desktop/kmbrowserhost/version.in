@@ -18,7 +18,7 @@
         VALUE "LegalCopyright", "© SIL International\0"
         VALUE "LegalTrademarks", "\0"
         VALUE "OriginalFilename", "KMBROWSERHOST.EXE\0"
-        VALUE "ProductName", "Keyman Engine\0"
+        VALUE "ProductName", "Keyman\0"
         VALUE "ProductVersion", "$VERSION\0"
         VALUE "Comments", "\0"
       END

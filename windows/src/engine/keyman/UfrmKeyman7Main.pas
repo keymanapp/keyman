@@ -567,7 +567,7 @@ begin
   finally
     Free;
   end;
-  if Assigned(frmVisualKeyboard) then // I1096 - silent exception when Keyman Desktop closes
+  if Assigned(frmVisualKeyboard) then // I1096 - silent exception when Keyman closes
   begin
     frmVisualKeyboard.Unregister;   // I2444 - Keyman tries to re-init because OSK was not unregistering until after Keyman_Exit
     //frmVisualKeyboard.Hide;

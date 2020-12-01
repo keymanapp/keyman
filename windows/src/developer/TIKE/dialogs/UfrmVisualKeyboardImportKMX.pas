@@ -1,18 +1,18 @@
 (*
   Name:             UfrmVisualKeyboardImportKMX
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Mar 2007
 
   Modified Date:    27 Mar 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Mar 2007 - mcdurdin - I683 - Fixed import of kmx to on screen keyboard
                     30 May 2007 - mcdurdin - I726 - Fixed 102 key not displaying when it should
                     10 Sep 2008 - mcdurdin - I1471 - Add key caps to all non-matched keys (option)
@@ -162,10 +162,10 @@ begin
     Exit;
   end;
 
-  SetStatus('Starting Keyman Desktop');
+  SetStatus('Starting Keyman');
   if not StartKeymanDesktopPro(FWasStarted) then
   begin
-    DoFail('Unable to start Keyman Desktop for debugging - please make sure that Keyman Desktop is correctly installed (the error code was '+IntToHex(GetLastError, 8)+').');  // I3173   // I3504
+    DoFail('Unable to start Keyman for debugging - please make sure that Keyman is correctly installed (the error code was '+IntToHex(GetLastError, 8)+').');  // I3173   // I3504
     Exit;
   end;
 
@@ -537,7 +537,7 @@ var
   i: Integer;
 begin
   FShow102Key := False;
-  
+
   for i := 0 to keys.Count - 1 do
     if TVKKey(keys[i]).vkey = $E2 then
     begin

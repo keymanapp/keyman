@@ -259,7 +259,7 @@ namespace KeyboardLayouts
     Xxxx = 8,                    // 8
     ShftXxxx = Shft | Xxxx,          // 9
   }
-    
+
   public class DeadKey
   {
     private char m_deadchar;
@@ -442,7 +442,7 @@ namespace KeyboardLayouts
         return true;
       }
     }
-    
+
     public bool IsKeymanUsedKey
     {
       get
@@ -457,7 +457,7 @@ namespace KeyboardLayouts
       if(capslock != 0)
         if(caps == 1)  sbState.Append("CAPS ");
         else sbState.Append("NCAPS ");
-        
+
       switch(ss)
       {
         case ShiftState.Base: break;
@@ -746,7 +746,7 @@ namespace KeyboardLayouts
 	  "K_?FE",				// &HFE
 	  "K_?FF"};				// &HFF
 
-  private uint[] USVirtualKeyToScanCode = 
+  private uint[] USVirtualKeyToScanCode =
 {
 	0x00, // L"K_?00",				// &H0
 	0x00, // L"K_LBUTTON",			// &H1
@@ -812,7 +812,7 @@ namespace KeyboardLayouts
 	0x00, // L"K_?3D",				// &H3D
 	0x00, // L"K_?3E",				// &H3E
 	0x00, // L"K_?3F",				// &H3F
-	0x00, // L"K_?40",				// &H40  
+	0x00, // L"K_?40",				// &H40
 
 	0x1E, // L"K_A",					// &H41
 	0x30, // L"K_B",					// &H42
@@ -884,7 +884,7 @@ namespace KeyboardLayouts
 	0x6C, // L"K_F21",				// &H84
 	0x6D, // L"K_F22",				// &H85
 	0x6E, // L"K_F23",				// &H86
-	0x76, // L"K_F24",				// &H87  
+	0x76, // L"K_F24",				// &H87
 
 	0x00, // L"K_?88",				// &H88
 	0x00, // L"K_?89",				// &H89
@@ -893,10 +893,10 @@ namespace KeyboardLayouts
 	0x00, // L"K_?8C",				// &H8C
 	0x00, // L"K_?8D",				// &H8D
 	0x00, // L"K_?8E",				// &H8E
-	0x00, // L"K_?8F",				// &H8F 
+	0x00, // L"K_?8F",				// &H8F
 
 	0x45, // L"K_NUMLOCK",			// &H90
-	0x46, // L"K_SCROL0x00, // L",			// &H91 
+	0x46, // L"K_SCROL0x00, // L",			// &H91
 
 	0x00, // L"K_?92",				// &H92
 	0x00, // L"K_?93",				// &H93
@@ -937,7 +937,7 @@ namespace KeyboardLayouts
 	0x6B, // L"K_?B6",				// &HB6
 	0x21, // L"K_?B7",				// &HB7
 	0x00, // L"K_?B8",				// &HB8
-	0x00, // L"K_?B9",				// &HB9 
+	0x00, // L"K_?B9",				// &HB9
 
 	0x27, // L"K_COLON",				// &HBA
 	0x0D, // L"K_EQUA0x00, // L",				// &HBB
@@ -945,7 +945,7 @@ namespace KeyboardLayouts
 	0x0C, // L"K_HYPHEN",			// &HBD
 	0x34, // L"K_PERIOD",			// &HBE
 	0x35, // L"K_SLASH",				// &HBF
-	0x29, // L"K_BKQUOTE",			// &HC0 
+	0x29, // L"K_BKQUOTE",			// &HC0
 
 	0x73, // L"K_?C1",				// &HC1
 	0x7E, // L"K_?C2",				// &HC2
@@ -972,7 +972,7 @@ namespace KeyboardLayouts
 	0x00, // L"K_?D7",				// &HD7
 	0x00, // L"K_?D8",				// &HD8
 	0x00, // L"K_?D9",				// &HD9
-	0x00, // L"K_?DA",				// &HDA 
+	0x00, // L"K_?DA",				// &HDA
 
 	0x1A, // L"K_LBRKT",				// &HDB
 	0x2B, // L"K_BKSLASH",			// &HDC
@@ -983,14 +983,14 @@ namespace KeyboardLayouts
 	0x00, // L"K_oE1",				// &HE1
 	0x56, // L"K_oE2",				// &HE2
 	0x00, // L"K_oE3",				// &HE3
-	0x00, // L"K_oE4",				// &HE4 
+	0x00, // L"K_oE4",				// &HE4
 
-	0x00, // L"K_?E5",				// &HE5 
+	0x00, // L"K_?E5",				// &HE5
 
-	0x00, // L"K_oE6",				// &HE6 
+	0x00, // L"K_oE6",				// &HE6
 
 	0x00, // L"K_?E7",				// &HE7
-	0x00, // L"K_?E8",				// &HE8 
+	0x00, // L"K_?E8",				// &HE8
 
 	0x71, // L"K_oE9",				// &HE9
 	0x5C, // L"K_oEA",				// &HEA
@@ -1004,7 +1004,7 @@ namespace KeyboardLayouts
 	0x00, // L"K_oF2",				// &HF2
 	0x5F, // L"K_oF3",				// &HF3
 	0x00, // L"K_oF4",				// &HF4
-	0x5E, // L"K_oF5",				// &HF5 
+	0x5E, // L"K_oF5",				// &HF5
 
 	0x00, // L"K_?F6",				// &HF6
 	0x00, // L"K_?F7",				// &HF7
@@ -1024,7 +1024,7 @@ namespace KeyboardLayouts
         if(this.USVirtualKeyToScanCode[i] == this.m_sc) return this.VKeyNames[i];
       return "K_???";
     }
-    
+
     public string LayoutRow(Boolean IsKMW)
     {
       StringBuilder sbRow = new StringBuilder();
@@ -1078,11 +1078,11 @@ namespace KeyboardLayouts
             {
               if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
             }
-            
+
             if(isvalid)
             {
               sbRow.Append(string.Format("+ [{0}{1}] > ", this.GetShiftStateName(capslock, caps, ss, IsKMW), this.GetVKeyName((int)this.VK)));
-            
+
               // It's some characters; put 'em in there.
               StringBuilder sbChar = new StringBuilder((5 * st.Length) + 1);
               for (int ich = 0; ich < st.Length; ich++)
@@ -1148,7 +1148,7 @@ namespace KeyboardLayouts
         return (Loader.XxxxVk == KeysEx.None ? ShiftState.ShftMenuCtrl : ShiftState.ShftXxxx);
       }
     }
-    
+
 
     private static void FillKeyState(KeysEx[] lpKeyState, ShiftState ss, bool fCapsLock)
     {
@@ -1197,7 +1197,7 @@ namespace KeyboardLayouts
               {
                 // We know that this is a dead key coming up, otherwise
                 // this function would never have been called. If we do
-                // *not* get a dead key then that means the state is 
+                // *not* get a dead key then that means the state is
                 // messed up so we run again and again to clear it up.
                 // Risk is technically an infinite loop but per Hiroyama
                 // that should be impossible here.
@@ -1213,7 +1213,7 @@ namespace KeyboardLayouts
               {
                 // That was indeed a base character for our dead key.
                 // And we now have a composite character. Let's run
-                // through one more time to get the actual base 
+                // through one more time to get the actual base
                 // character that made it all possible?
                 char combchar = sbBuffer[0];
                 sbBuffer = new StringBuilder(10);
@@ -1232,9 +1232,9 @@ namespace KeyboardLayouts
                     (char.IsControl(basechar))) ||
                     (basechar.Equals(combchar)))
                 {
-                  // ToUnicodeEx has an internal knowledge about those 
-                  // VK_A ~ VK_Z keys to produce the control characters, 
-                  // when the conversion rule is not provided in keyboard 
+                  // ToUnicodeEx has an internal knowledge about those
+                  // VK_A ~ VK_Z keys to produce the control characters,
+                  // when the conversion rule is not provided in keyboard
                   // layout files
 
                   // Additionally, dead key state is lost for some of these
@@ -1345,19 +1345,19 @@ namespace KeyboardLayouts
 
             int cKeyboards = GetKeyboardLayoutList(0, null);
             IntPtr[] rghkl = new IntPtr[cKeyboards];
-            GetKeyboardLayoutList(cKeyboards, rghkl);            
+            GetKeyboardLayoutList(cKeyboards, rghkl);
             IntPtr hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
             if(hkl == IntPtr.Zero) {
                 Console.WriteLine("Sorry, that keyboard does not seem to be valid.");
                 return;
             }
-            
+
             KeysEx[] lpKeyState = new KeysEx[256];
             VirtualKey[] rgKey = new VirtualKey[256];
             ArrayList alDead = new ArrayList();
 
             // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
-            // values in it. Then, store the SC in each valid VK so it can act as both a 
+            // values in it. Then, store the SC in each valid VK so it can act as both a
             // flag that the VK is valid, and it can store the SC value.
             for(uint sc = 0x01; sc <= 0x7f; sc++) {
                 VirtualKey key = new VirtualKey(hkl, sc);
@@ -1379,7 +1379,7 @@ namespace KeyboardLayouts
                 uint sc = VirtualKey.MapVirtualKeyEx((uint)vk, 0, hkl);
                 uint vkL = VirtualKey.MapVirtualKeyEx(sc, 1, hkl);
                 uint vkR = VirtualKey.MapVirtualKeyEx(sc, 3, hkl);
-                if((vkL != vkR) && 
+                if((vkL != vkR) &&
                     ((uint)vk != vkL)) {
                     switch(vk) {
                         case KeysEx.VK_LCONTROL:
@@ -1423,9 +1423,9 @@ namespace KeyboardLayouts
                                     if((rc == 1) &&
                                         (ss == ShiftState.Ctrl || ss == ShiftState.ShftCtrl) &&
                                         ((int)rgKey[iKey].VK == ((uint)sbBuffer[0] + 0x40))) {
-                                        // ToUnicodeEx has an internal knowledge about those 
-                                        // VK_A ~ VK_Z keys to produce the control characters, 
-                                        // when the conversion rule is not provided in keyboard 
+                                        // ToUnicodeEx has an internal knowledge about those
+                                        // VK_A ~ VK_Z keys to produce the control characters,
+                                        // when the conversion rule is not provided in keyboard
                                         // layout files
                                         continue;
                                     }
@@ -1507,7 +1507,7 @@ namespace KeyboardLayouts
               if (IsKMW)
                 outFile.WriteLine("c Target: KeymanWeb");
               else
-                outFile.WriteLine("c Target: Keyman Desktop");
+                outFile.WriteLine("c Target: Keyman for Windows");
               outFile.WriteLine("c");
 
 
@@ -1554,7 +1554,7 @@ namespace KeyboardLayouts
               }
               outFile.WriteLine();
 
-            }            
+            }
         }
   }
 }

@@ -32,7 +32,7 @@ clean: def-clean
     if exist icons\icons.res del icons\icons.res
 
 signcode:
-    $(SIGNCODE) /d "Keyman Desktop" $(PROGRAM)\desktop\kmshell.exe
+    $(SIGNCODE) /d "Keyman" $(PROGRAM)\desktop\kmshell.exe
 
 wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\desktop\kmshell.exe /t keyman-windows

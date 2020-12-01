@@ -1,18 +1,18 @@
 (*
   Name:             UfrmWebContainer
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Oct 2006
 
   Modified Date:    15 Sep 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Oct 2006 - mcdurdin - Initial version
                     05 Dec 2006 - mcdurdin - Refactor XMLRenderer into this unit
                     12 Dec 2006 - mcdurdin - Size dialog according to locale.xml <Dialog> entry
@@ -29,7 +29,7 @@
                     25 May 2010 - mcdurdin - I1694 - Select Keyman UI language rework
                     17 Dec 2010 - mcdurdin - I2570 - Use new E-mbeddedWB
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies (focus management for web browser)
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman splash from showing multiple copies (focus management for web browser)
                     18 Mar 2011 - mcdurdin - I2786 - Application title is sometimes incorrect
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support

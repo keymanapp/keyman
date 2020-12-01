@@ -20,7 +20,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 shopt -s nullglob
 
 #
-# In this script we update the git repo and copy the Keyman Desktop
+# In this script we update the git repo and copy the Keyman for Windows
 # documentation over. This should be run after a full build.
 #
 
@@ -51,16 +51,16 @@ KEYMANROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 # . "$KEYBOARDROOT/servervars.sh"
 # . "$KEYBOARDROOT/resources/util.sh"
 
-echo "Uploading Keyman Desktop documentation to help.keyman.com"
+echo "Uploading Keyman for Windows documentation to help.keyman.com"
 
 #
-# Uploading Keyman Desktop documentation
+# Uploading Keyman for Windows documentation
 #
 
 ##
 ## Upload documentation updates to help.keyman.com
 ##
-function upload_keyman_desktop_help {
+function upload_keyman_for_windows_help {
 
   #
   # Note: release/packages which contain multiple keyboards should also have the keyboards
@@ -99,7 +99,7 @@ function upload_keyman_desktop_help {
 #
 
 function commit_and_push {
-  echo "Committing and pushing updated Keyman Desktop documentation"
+  echo "Committing and pushing updated Keyman for Windows documentation"
 
   pushd $HELP_KEYMAN_COM
   git config user.name "Keyman Build Server"
@@ -113,7 +113,7 @@ function commit_and_push {
   }
 
   echo "changes added to cache...>>>"
-  git commit -m "Keyman Desktop help deployment (automatic)" || return 1
+  git commit -m "Keyman for Windows help deployment (automatic)" || return 1
   git pull origin master || return 1
   git push origin master || return 1
   popd
@@ -127,5 +127,5 @@ function commit_and_push {
 # Main
 #
 
-upload_keyman_desktop_help || exit 1
+upload_keyman_for_windows_help || exit 1
 commit_and_push || exit 1

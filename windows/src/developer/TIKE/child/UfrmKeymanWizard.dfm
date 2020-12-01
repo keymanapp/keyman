@@ -698,7 +698,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Top = 22
             Width = 482
             Height = 13
-            Caption = 
+            Caption =
               'In Keyman 10, language metadata should now be managed in the pac' +
               'kage, not the keyboard.'
           end
@@ -1093,7 +1093,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           Top = 13
           Width = 333
           Height = 13
-          Caption = 
+          Caption =
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
@@ -1144,7 +1144,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Top = 39
             Width = 259
             Height = 13
-            Caption = 'You can install the keyboard into Keyman Desktop:'
+            Caption = 'You can install the keyboard into Keyman:'
           end
           object lblCompileTargetHeader: TLabel
             Left = 9
@@ -1297,7 +1297,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgBrowseBitmap: TOpenPictureDialog
     DefaultExt = 'ico'
-    Filter = 
+    Filter =
       'All supported files (*.ico, *.bmp)|*.ico;*.bmp|Icon files (*.ico' +
       ')|*.ico|Bitmap files (*.bmp)|*.bmp|All files (*.*)|*.*'
     Options = [ofHideReadOnly, ofCreatePrompt, ofEnableSizing]
@@ -1307,7 +1307,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgSaveExport: TSaveDialog
     DefaultExt = 'kmn'
-    Filter = 
+    Filter =
       'Keyman 5.0 Keyboard Wizard (*.kmn)|*.kmn|Windows NT/2000/XP keyb' +
       'oard (*.dll)|*.dll|Windows 95/98/Me keyboard (*.kbd)|*.kbd'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]

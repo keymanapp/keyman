@@ -296,7 +296,7 @@
     </Control>
 
     <Control Name="cmdCompileInstaller" Title="Compile Installer">
-      <p>Creates a self-extracting installer consisting of the package plus Keyman Desktop or another Keyman Engine product that was created with the Branding Pack.</p>
+      <p>Creates a self-extracting installer consisting of the package plus Keyman or another Keyman Engine product that was created with the Branding Pack.</p>
     </Control>
 
     <Control Name="editInstallerOutputFilename" Title="Installer Output Filename">
@@ -304,11 +304,11 @@
     </Control>
 
     <Control Name="cmdInstallWith" Title="Select Product Installer">
-      <p>Chooses a product installer, such as the Keyman Desktop installation source.  You can download Keyman Desktop installers from tavultesoft.com.</p>
+      <p>Chooses a product installer, such as the Keyman installation source.  You can download Keyman installers from keyman.com.</p>
     </Control>
 
     <Control Name="cmdAddToProject" Title="Add to Project">
-      <p>This option  allows the user to add the compile package to the project, keeping all files together in the one location.</p>
+      <p>This option allows the user to add the compile package to the project, keeping all files together in the one location.</p>
     </Control>
     <Control Name="cmdBuildPackage" Title="Compile Package">
       <p>This option checks the package has all the required files and for any errors.  The success of the compilation is displayed at the bottom of the screen.</p>

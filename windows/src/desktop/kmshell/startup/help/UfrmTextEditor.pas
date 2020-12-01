@@ -1,18 +1,18 @@
 (*  r
   Name:             UfrmTextEditor
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Mar 2008
 
   Modified Date:    1 Sep 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Mar 2008 - mcdurdin - I1248 - Initial version
                     14 Jun 2008 - mcdurdin - I1356 - Refresh fonts when they change
                     14 Jun 2008 - mcdurdin - I1449 - Resize hint bar to size of hint content
@@ -29,7 +29,7 @@
                     03 Feb 2011 - mcdurdin - I2697 - Fix potential race condition on termination of check fonts thread
                     03 Feb 2011 - mcdurdin - I2698 - Font styling shortcuts for text editor
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman D_esktop splash from showing multiple copies
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     08 Jun 2012 - mcdurdin - I3349 - V9.0 - Consolidate all process creation into TUtilExecute
@@ -39,7 +39,7 @@
                     01 May 2014 - mcdurdin - I4181 - V9.0 - Stop using DeleteFileAlways, MOVEFILE_DELAY_UNTIL_REBOOT
                     03 Jul 2014 - mcdurdin - I3674 - V9.0 - Getting Started window gives instructions that are not valid for KM9
                     01 Sep 2014 - mcdurdin - I4397 - V9.0 - Get Started gets impatient and shows nag too quickly on start
-                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman Desktop Free Edition polish
+                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman D_esktop Free Edition polish
 
 *)
 unit UfrmTextEditor;  // I3306

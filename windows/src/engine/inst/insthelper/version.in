@@ -12,7 +12,7 @@
       BLOCK "0C0904E4"
       BEGIN
         VALUE "CompanyName", "SIL International\0"
-        VALUE "FileDescription", "SIL International Keyman Installation Functions\0"
+        VALUE "FileDescription", "Keyman Engine Installation Assistant\0"
         VALUE "FileVersion", "$VERSION\0"
         VALUE "InternalName", "INSTHELPER\0"
         VALUE "LegalCopyright", "© SIL International\0"

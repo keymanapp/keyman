@@ -18,7 +18,7 @@ test-manifest:
 clean: def-clean
 
 signcode:
-    $(SIGNCODE) /d "Keyman Desktop Install Helper" $(ROOT)\bin\desktop\insthelp.exe
+    $(SIGNCODE) /d "Keyman Install Helper" $(ROOT)\bin\desktop\insthelp.exe
 
 wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\desktop\insthelp.exe /t keyman-windows

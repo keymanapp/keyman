@@ -26,15 +26,15 @@ prereq-resources:
     #
     rc desktop_resources.rc
     $(LINKPATH) /DLL /OUT:desktop_resources.dll /RELEASE /NOENTRY /MACHINE:X86 desktop_resources.RES
-    $(SIGNCODE) /d "Keyman Desktop Resources" desktop_resources.dll
+    $(SIGNCODE) /d "Keyman Resources" desktop_resources.dll
 
 desktop: prereq
     $(MAKE) -fdownload.mak candle
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop.msi -ext WixUIExtension $(DESKTOP_FILES)
-    $(SIGNCODE) /d "Keyman Desktop" keymandesktop.msi
+    $(SIGNCODE) /d "Keyman" keymandesktop.msi
     # TODO: replace buildpkg with kmcomp and remove buildpkg from repository
     $(ROOT)\bin\buildtools\buildpkg -m keymandesktop.msi -s $(ROOT)\bin\desktop -l license.html
-    $(SIGNCODE) /d "Keyman Desktop" keymandesktop.exe
+    $(SIGNCODE) /d "Keyman" keymandesktop.exe
     $(MAKE) -fdownload.mak copyredist-desktop
 
 clean:

@@ -16,7 +16,7 @@ begin
   if ParamCount = 0 then
   begin
     Windows.MessageBox(0, 'Usage: tsysinfox64.exe <output.xml>',
-      'Keyman Desktop System Information (X64)', MB_OK or MB_ICONERROR);
+      'Keyman System Information (X64)', MB_OK or MB_ICONERROR);
     Exit;
   end;
 
