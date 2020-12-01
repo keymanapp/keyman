@@ -213,9 +213,11 @@ void keyman_sentry_setexceptionfilter() {
 #endif
 
 void keyman_sentry_report_start() {
-  char buf[256];
-  sprintf_s(buf, "Started %s", g_logger);
-  keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_INFO, buf);
+  // We used the 'Started' event when testing Sentry integration in 14.0 alpha
+  // but we don't want or need it for stable.
+  // char buf[256];
+  // sprintf_s(buf, "Started %s", g_logger);
+  // keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_INFO, buf);
 }
 
 int keyman_sentry_main(bool is_keyman_developer, const char *logger, int argc, char *argv[], int (*run)(int, char**)) {
