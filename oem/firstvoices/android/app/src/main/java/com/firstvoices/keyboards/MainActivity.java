@@ -13,6 +13,7 @@ import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import io.sentry.SentryLevel;
 import io.sentry.android.core.SentryAndroid;
 
 import com.tavultesoft.kmea.*;
@@ -28,8 +29,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SentryAndroid.init(this, options -> {
-          options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
-          options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
+            options.setBeforeBreadcrumb((breadcrumb, hint) -> {
+                String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-(.)*$";
+                if ("navigation".equals(breadcrumb.getCategory()) && breadcrumb.getLevel() == SentryLevel.INFO &&
+                    ((breadcrumb.getData("from") != null) || (breadcrumb.getData("to") != null)) ) {
+                    // Sanitize navigation breadcrumbs
+                    String dataFrom = String.valueOf(breadcrumb.getData("from"));
+                    dataFrom = dataFrom.replaceAll(NAVIGATION_PATTERN, "$1$2");
+                    breadcrumb.setData("from", dataFrom);
+                    String dataTo = String.valueOf(breadcrumb.getData("to"));
+                    dataTo = dataTo.replaceAll(NAVIGATION_PATTERN, "$1$2");
+                    breadcrumb.setData("to", dataTo);
+
+                    return breadcrumb;
+                } else {
+                    return breadcrumb;
+                }
+            });
+            options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
+            options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
         });
 
         setContentView(R.layout.activity_main);
