@@ -229,10 +229,19 @@ begin
 
     Stream := TFileStream.Create(FTempFilename, fmCreate);
     try
-      Response := Client.Get(FDownloadURL, Stream);
-      Result := Response.StatusCode = 200;
-      FDownloadStatusText := Response.StatusText;
-      FDownloadStatusCode := Response.StatusCode;
+      try
+        Response := Client.Get(FDownloadURL, Stream);
+        Result := Response.StatusCode = 200;
+        FDownloadStatusText := Response.StatusText;
+        FDownloadStatusCode := Response.StatusCode;
+      except
+        on E:ENetHTTPClientException do
+        begin
+          FDownloadStatusText := E.Message;
+          FDownloadStatusCode := 0;
+          Result := False;
+        end;
+      end;
     finally
       Stream.Free;
     end;
