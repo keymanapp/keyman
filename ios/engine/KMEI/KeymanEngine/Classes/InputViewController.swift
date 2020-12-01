@@ -507,6 +507,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func reloadIfNeeded() {
     if keymanWeb.shouldReload {
       reload()
+      keymanWeb.shouldReload = false
     }
   }
   
