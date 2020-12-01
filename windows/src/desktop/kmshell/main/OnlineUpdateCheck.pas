@@ -338,32 +338,15 @@ end;
 
 function TOnlineUpdateCheck.DoInstallPackage(Package: TOnlineUpdateCheckParamsPackage): Boolean;
 var
-  i: Integer;
-  pkg: IKeymanPackageInstalled;
-  FPackage: IKeymanPackageFile;
+  FPackage: IKeymanPackageFile2;
 begin
   Result := True;
 
-  // TODO: preserve user language choice with upgrade (use ForceInstall)
-  for i := 0 to kmcom.Packages.Count - 1 do
-  begin
-    pkg := kmcom.Packages[i];
-    if WideSameText(pkg.ID, Package.ID) then
-    begin
-      pkg.Uninstall(True);
-      Break;
-    end;
-  end;
-  pkg := nil;
-  kmcom.Keyboards.Apply;
-
-  FPackage := kmcom.Packages.GetPackageFromFile(Package.SavePath);
-  FPackage.Install(True);
+  FPackage := kmcom.Packages.GetPackageFromFile(Package.SavePath) as IKeymanPackageFile2;
+  FPackage.Install2(True);  // Force overwrites existing package and leaves most settings for it intact
   FPackage := nil;
 
-  kmcom.Keyboards.Refresh;
-  kmcom.Packages.Refresh;
-  //kmcom.Packages.Install(Package.SavePath, kmcom.SystemInfo.IsAdministrator, True,'');
+  kmcom.Refresh;
   SysUtils.DeleteFile(Package.SavePath);
 end;
 
