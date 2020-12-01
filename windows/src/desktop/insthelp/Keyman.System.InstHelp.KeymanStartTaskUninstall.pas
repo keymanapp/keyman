@@ -14,6 +14,7 @@ implementation
 uses
   System.SysUtils,
   System.Variants,
+  System.Win.ComObj,
   Winapi.ActiveX,
   Winapi.Windows,
 
@@ -26,21 +27,23 @@ const
 class procedure TKeymanStartTaskUninstall.ReportEvent(const Message: string);
 var
   hEventLog: THandle;
+  msgs: array[0..0] of PChar;
 begin
   kl.LogError(Message);
   hEventLog := RegisterEventSource(nil, 'Keyman-Uninstall');
+  msgs[0] := PChar(Message);
   Winapi.Windows.ReportEvent(
     hEventLog,
     EVENTLOG_ERROR_TYPE,
-    1,
-    1,
-    nil,
     0,
-    Length(Message) * sizeof(Char),
+    99,
     nil,
-    PChar(Message)
+    1,
+    0,
+    @msgs,
+    nil
   );
-  CloseHandle(hEventLog);
+  DeregisterEventSource(hEventLog);
 end;
 
 class procedure TKeymanStartTaskUninstall.DeleteAllTasks;
@@ -56,9 +59,16 @@ begin
     try
       pTaskFolder := pService.GetFolder('\'+CTaskFolderName);
     except
-      on E:Exception do
+      on E:EOleException do
       begin
         // We can't find the folder, for some unknown reason, so give up
+        if E.ErrorCode <> HResultFromWin32(ERROR_FILE_NOT_FOUND) then
+          ReportEvent('Failed to find '+CTaskFolderName+' task folder: '+E.ClassName+', '+E.Message);
+        Exit;
+      end;
+
+      on E:Exception do
+      begin
         ReportEvent('Failed to find '+CTaskFolderName+' task folder: '+E.ClassName+', '+E.Message);
         Exit;
       end;
@@ -66,8 +76,10 @@ begin
 
     pTasks := pTaskFolder.GetTasks(0);
 
-    for i := 0 to pTasks.Count - 1 do
+    for i := 1 to pTasks.Count do // 1-based collection
+    begin
       pTaskFolder.DeleteTask(pTasks.Item[i].Name, 0);
+    end;
 
     pTaskFolder := nil;
     pService.GetFolder('\').DeleteFolder(CTaskFolderName, 0);
