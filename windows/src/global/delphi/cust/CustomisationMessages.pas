@@ -187,7 +187,7 @@ begin
   FDefaultLocaleDoc.async := False;
   FDefaultLocaleDoc.validateOnParse := False;
 
-  FPath := GetDebugPath('KeymanConfigStaticHttpFilesPath');
+  FPath := GetDebugPath('KeymanConfigStaticHttpFilesPath', ExtractFilePath(FCustStorageFileName));
   if FileExists(FPath + 'strings.xml') then
     FDefaultLocaleDoc.load(FPath + 'strings.xml')
   else if FileExists(ExtractFilePath(FCustStorageFileName) + 'xml\strings.xml') then

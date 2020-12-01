@@ -150,16 +150,16 @@
               </Component>
 
               <Component Id="Reg_RootPath" Guid="*">
-                <RegistryValue KeyPath="yes" Root="HKLM" Key="SOFTWARE\Keyman\Keyman for Windows" Name="root path" Type="string" Value="[INSTALLDIR]" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman for Windows" Name="version" Type="string" Value="$(var.VERSION)" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman for Windows" Name="release" Type="string" Value="$(var.RELEASE)" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman for Windows" Name="charmap source data" Type="string" Value="[INSTALLDIR]" />
-                <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman for Windows" />
+                <RegistryValue KeyPath="yes" Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="root path" Type="string" Value="[INSTALLDIR]" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="version" Type="string" Value="$(var.VERSION)" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="release" Type="string" Value="$(var.RELEASE)" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="charmap source data" Type="string" Value="[INSTALLDIR]" />
+                <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Desktop" />
               </Component>
 
               <Component Id="removeCU" Guid="*">
-                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman for Windows" Name="Install" Type="string" Value="1" />
-                <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman for Windows" />
+                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Desktop" Name="Install" Type="string" Value="1" />
+                <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Desktop" />
                 <RemoveFolder Id="ProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
 
                 <RemoveFile Id="Version70ShortcutKeyman"   Name="Keyman Desktop Light 7.0.lnk"  Directory="ProgramMenuDirLight70" On="both" />

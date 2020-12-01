@@ -161,8 +161,8 @@ const
 
   { Keyman for Windows }
 
-  SRegKey_KeymanDesktopRoot_CU = SRegKey_KeymanRoot_CU + '\Keyman for Windows';
-  SRegKey_KeymanDesktopRoot_LM = SRegKey_KeymanRoot_LM + '\Keyman for Windows';
+  SRegKey_KeymanDesktopRoot_CU = SRegKey_KeymanRoot_CU + '\Keyman Desktop'; // leaving as Keyman Desktop for compatibility
+  SRegKey_KeymanDesktopRoot_LM = SRegKey_KeymanRoot_LM + '\Keyman Desktop'; // leaving as Keyman Desktop for compatibility
   SRegKey_KeymanDesktop_CU     = SRegKey_KeymanDesktopRoot_CU;
   SRegKey_KeymanDesktop_LM     = SRegKey_KeymanDesktopRoot_LM;
 
