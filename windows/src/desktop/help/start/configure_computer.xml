@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="start_configure_computer">
   <title>How To - Set up Your Computer for a Keyman Keyboard</title>
-   <para>Keyman Desktop will automatically set up your computer for best performance with most Keyman keyboards. However, for best performance on some keyboards you may need to manually associate your Keyman keyboard with a Windows language and layout.</para>
+   <para>Keyman will automatically set up your computer for best performance with most Keyman keyboards. However, for best performance on some keyboards you may need to manually associate your Keyman keyboard with a Windows language and layout.</para>
 
    <bridgehead>Benefits of Association</bridgehead>
    <para>Correctly associating your Keyman keyboard has three main benefits.</para>
@@ -29,13 +29,13 @@
 	</orderedlist>
   
   <bridgehead>Association instructions</bridgehead>
-  <note><para>Keyman Desktop allows you to associate multiple Windows languages to a keyboard.</para></note>
+  <note><para>Keyman allows you to associate multiple Windows languages to a keyboard.</para></note>
 	<orderedlist>
 		<listitem>
-      <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+      <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>Configuration…</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>Configuration…</guilabel>.</para>
     </listitem>
     <listitem>
       <para>Select the Keyboard Layouts tab.</para>

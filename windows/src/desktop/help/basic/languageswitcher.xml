@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <section id="basic_languageswitcher" xmlns:xi="http://www.w3.org/2001/XInclude">
   <title>Language Switcher</title>
-  <para>The Keyman Desktop Language Switcher is a single popup menu to let you rapidly switch between any installed Keyman keyboard, Windows language or Windows layout.</para>
+  <para>The Keyman Language Switcher is a single popup menu to let you rapidly switch between any installed Keyman keyboard, Windows language or Windows layout.</para>
   <para>
     <inlinemediaobject>
       <imageobject>
@@ -12,7 +12,7 @@
   </para>  
  
   <bridgehead>Opening and Using the Language Switcher</bridgehead>
-  <para>To open and use the Keyman Desktop Language Switcher </para>
+  <para>To open and use the Keyman Language Switcher </para>
   <orderedlist>
   <listitem>
     <para>Press the Language Switcher hotkey to bring up the Language Switcher. If you are using the default Language Switcher hotkey (<keycap>Left.Alt</keycap> + <keycap>Shift</keycap>) or another hotkey with <keycap>Alt</keycap>, you will need to press and HOLD the <keycap>Alt</keycap> part of the hotkey and press and RELEASE the last key in the hotkey to use the Language Switcher. When you release <keycap>Alt</keycap>, the Language Switcher will close.</para>

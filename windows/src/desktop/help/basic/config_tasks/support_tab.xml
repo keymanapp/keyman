@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <section id="basic_support_tab" xmlns:xi="http://www.w3.org/2001/XInclude">
   <title>Keyman Configuration - Support Tab</title>
-  <para>The Support tab of Keyman Configuration displays Keyman Desktop version information and support tools. You can use the Support tab to send a support request, check Windows language settings, check for updates, and view Keyman Desktop version information.</para>
+  <para>The Support tab of Keyman Configuration displays Keyman version information and support tools. You can use the Support tab to send a support request, check Windows language settings, check for updates, and view Keyman version information.</para>
   <para>
     <inlinemediaobject>
       <imageobject>
@@ -13,10 +13,10 @@
   <para>To open the Support tab of Keyman Configuration:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>Configuration…</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>Configuration…</guilabel>.</para>
     </listitem>
     <listitem>
       <para>Select the Support tab.</para>
@@ -30,7 +30,7 @@
 
 
   <bridgehead>Checking for Updates</bridgehead>
-	<para>To check for Keyman Desktop updates, from the Support tab of Keyman Configuration click the 'Check for Updates' link. You can also download and install Keyman Desktop again from the Keyman website.</para>
+	<para>To check for Keyman updates, from the Support tab of Keyman Configuration click the 'Check for Updates' link. You can also download and install Keyman again from the Keyman website.</para>
 	
   
   <bridgehead>About Version Information</bridgehead>
@@ -38,9 +38,9 @@
    <itemizedlist>
     <listitem>Version Detals
     <itemizedlist>
-      <listitem><para>Edition — Details on your current edition of Keyman Desktop.</para>
+      <listitem><para>Edition — Details on your current edition of Keyman.</para>
       </listitem>
-      <listitem><para>Version — The current Keyman Desktop version number</para></listitem>
+      <listitem><para>Version — The current Keyman version number</para></listitem>
     </itemizedlist>
     </listitem>
    </itemizedlist>

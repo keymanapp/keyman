@@ -4,7 +4,7 @@
   <para>If you will be typing in a right-to-left language (like Arabic, Farsi, Hebrew, or Yiddish) there are three things you should know before you get started.</para>
   <orderedlist>
 	<listitem>
-	  <para>Your computer must be set up for right-to-left language support. Keyman Desktop will automatically set up your computer for most Keyman keyboards that need right-to-left language support. However, you may need to manually adjust your settings for some Keyman keyboards. Otherwise, without right-to-left language support, letters in your right-to-left language might appear in the wrong order, not join correctly, or change after the spacebar is pressed.</para>
+	  <para>Your computer must be set up for right-to-left language support. Keyman will automatically set up your computer for most Keyman keyboards that need right-to-left language support. However, you may need to manually adjust your settings for some Keyman keyboards. Otherwise, without right-to-left language support, letters in your right-to-left language might appear in the wrong order, not join correctly, or change after the spacebar is pressed.</para>
 	  <para>To do this, simply associate the keyboard with a right-to-left Windows language (like Arabic). For instructions on associating a Keyman keyboard with a Windows language, see: <xref linkend="start_configure_computer"></xref></para>
 	</listitem>
 	<listitem>

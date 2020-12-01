@@ -5,14 +5,14 @@
 
 	<para>You may experience an issue in Windows 7 where:</para>
 	<itemizedlist>
-    <listitem>Keyman Desktop is on; and</listitem>
+    <listitem>Keyman is on; and</listitem>
     <listitem>your Keyman keyboard is active, with its icon showing in the Keyman menu; but</listitem>
     <listitem>your Keyman keyboard does not work.</listitem>
     </itemizedlist>
 	
 	<bridgehead>Resolution</bridgehead>
 
-	<para>Unhide the Keyman Desktop menu as described in <link linkend='tutorial_step2'>Step 2</link> of the Getting Started tutorial.</para>
+	<para>Unhide the Keyman menu as described in <link linkend='tutorial_step2'>Step 2</link> of the Getting Started tutorial.</para>
   <para>This can also be resolved by switching language using the Windows Language Bar or the Language Icon</para>
 	
 	<bridgehead>Background</bridgehead>

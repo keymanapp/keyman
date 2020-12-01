@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <section id="context_splash">
-  <title>The Keyman Desktop Splash Screen</title>
+  <title>The Keyman Splash Screen</title>
 
   <para>
     <inlinemediaobject>
@@ -14,5 +14,5 @@
 
   <para>You can stop the splash screen from showing by deselecting the option 'Show this screen at startup'.</para>
 
-  <para>Note: when Keyman Desktop starts with Windows, the splash screen is not shown.</para>
+  <para>Note: when Keyman starts with Windows, the splash screen is not shown.</para>
 </section>

@@ -17,10 +17,10 @@
   <para>To open the On Screen Keyboard:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>On Screen Keyboard</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>On Screen Keyboard</guilabel>.</para>
     </listitem>
   </orderedlist>
 
@@ -58,7 +58,7 @@
   </orderedlist>
       <para>When a Keyman keyboard is on, the black font on the keycaps shows the characters assigned to each key. The blue font on the keycaps shows the characters of the Windows layout currently associated with the Keyman keyboard.</para>
 	  <para>When no Keyman keyboard is on, the blue font on the keycaps shows the characters of your active Windows layout.</para>
-	  <note>Some Keyman keyboards do not have an On Screen Keyboard view. For keyboards designed phonetically, this is because there is not a simple 1-1 correspondence between each key and the letter you want to type. The <link linkend="basic_usage">Keyboard Usage tool</link> is often helpful for these keyboards and Keyman Desktop will switch to this view by default. This option can be changed in <link linkend="basic_options_tab">Keyman Configuration</link>.</note> 
+	  <note>Some Keyman keyboards do not have an On Screen Keyboard view. For keyboards designed phonetically, this is because there is not a simple 1-1 correspondence between each key and the letter you want to type. The <link linkend="basic_usage">Keyboard Usage tool</link> is often helpful for these keyboards and Keyman will switch to this view by default. This option can be changed in <link linkend="basic_options_tab">Keyman Configuration</link>.</note> 
 	  
 <bridgehead>Related Topics</bridgehead>
  <itemizedlist>

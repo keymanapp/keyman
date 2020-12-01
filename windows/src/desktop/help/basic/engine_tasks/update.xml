@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="basic_update">
-  <title>Software Task - Update Keyman Desktop</title>
+  <title>Software Task - Update Keyman</title>
   <bridgehead>Check for Updates Automatically</bridgehead>
-  <para>Keyman Desktop can check for updates automatically once a week. Here's how:</para>
+  <para>Keyman can check for updates automatically once a week. Here's how:</para>
    <orderedlist>
     <listitem>
-	 <para>Open Keyman Desktop.</para>
+	 <para>Open Keyman.</para>
 	</listitem>
 	<listitem>
 	 <para>Open Keyman Configuration, from the Keyman menu (on the Windows Taskbar near the clock).</para>
@@ -28,7 +28,7 @@
      </para>	 
 	</listitem>
 	<listitem>
-     <para>Tick 'Automatically check www.keyman.com weekly for updates.'</para>
+     <para>Tick 'Automatically check keyman.com weekly for updates.'</para>
 	</listitem>
 	<listitem>
 	 <para>Click <guibutton>OK</guibutton> to apply changes.</para>
@@ -46,7 +46,7 @@
      </para> 
 	 
    <bridgehead>Updating Manually</bridgehead>
-   <para>You can manually update Keyman Desktop at any time by downloading and installing it again from the <ulink url="https://www.keyman.com/">Keyman Website</ulink>.</para>  
+   <para>You can manually update Keyman at any time by downloading and installing it again from the <ulink url="https://keyman.com/">Keyman Website</ulink>.</para>  
 	
   <bridgehead>Related Topics</bridgehead>
   <itemizedlist>

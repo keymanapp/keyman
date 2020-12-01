@@ -2,14 +2,14 @@
 <section id="start_download-install_keyboard">
   <title>How To - Download and Install a Keyman Keyboard</title>
   
-  <para>You must have a Keyman keyboard installed to type with Keyman Desktop in your language. You can download and install a Keyman keyboard at the same time you download and install Keyman Desktop. For more information, see:  <xref linkend="start_download-install_keyman"></xref>.</para>
-  <para>You can also add keyboards to Keyman Desktop after you have installed Keyman Desktop. For more information, keep reading.</para>
+  <para>You must have a Keyman keyboard installed to type with Keyman in your language. You can download and install a Keyman keyboard at the same time you download and install Keyman. For more information, see:  <xref linkend="start_download-install_keyman"></xref>.</para>
+  <para>You can also add keyboards to Keyman after you have installed Keyman. For more information, keep reading.</para>
   
-  <bridgehead><anchor id="install_tav"></anchor>Downloading &amp; Installing a Keyman Keyboard within Keyman Desktop</bridgehead>
-  <para>Here's how to download and install a Keyman keyboard within Keyman Desktop:</para>
+  <bridgehead><anchor id="install_tav"></anchor>Downloading &amp; Installing a Keyman Keyboard within Keyman</bridgehead>
+  <para>Here's how to download and install a Keyman keyboard within Keyman:</para>
   <orderedlist>
     <listitem>
-      <para>Start Keyman Desktop.</para>
+      <para>Start Keyman.</para>
 	</listitem>
 	<listitem>
 	  <para>Open Keyman Configuration, from the Keyman menu (on the Windows Taskbar near the clock).</para>
@@ -63,7 +63,7 @@
 	    </itemizedlist>
 	  </tip>
 	  <note><para><guibutton>Install</guibutton> installs the keyboard for anyone who can log on to your computer.  You may be prompted by User Account Control to allow Keyman to make changes to your computer -- click 'Yes'.</para></note>
-      <note>If a keyboard with the same name is already installed, Keyman Desktop will ask you if you want to replace the old keyboard or cancel the installation.</note>
+      <note>If a keyboard with the same name is already installed, Keyman will ask you if you want to replace the old keyboard or cancel the installation.</note>
 
 	</listitem>
 	<listitem>
@@ -76,7 +76,7 @@
    
    <bridgehead><anchor id="install_folder"></anchor>Installing a Keyman Keyboard from a Folder on Your Computer</bridgehead> 
    <para>There are two ways you can install a Keyman keyboard from a folder on your computer. The easiest way is to find the keyboard on your computer and double-click to install it. Keyman keyboards have a file name that ends with .KMX or .KMP.</para>
-   <para>You can also install a keyboard from your computer within Keyman Desktop. Here's how:</para>
+   <para>You can also install a keyboard from your computer within Keyman. Here's how:</para>
   <orderedlist>
     <listitem>
       <para>Start Keyman</para>
@@ -116,7 +116,7 @@
 	    </itemizedlist>
 	  </tip>
 	  <note><para><guibutton>Install</guibutton> installs the keyboard for anyone who can log on to your computer.</para></note>
-      <note>If a keyboard with the same name is already installed, Keyman Desktop will ask you if you want to replace the old keyboard or cancel the installation.</note>
+      <note>If a keyboard with the same name is already installed, Keyman will ask you if you want to replace the old keyboard or cancel the installation.</note>
 	</listitem>
 	<listitem>
       <para>Click <guibutton>OK</guibutton> if asked to configure you computer to work with your new keyboard.</para>

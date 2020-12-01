@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="basic_text_editor" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <title>The Keyman Desktop Text Editor</title>
+  <title>The Keyman Text Editor</title>
   <para>The Keyman Text Editor is a basic text editor for testing your Keyman keyboards.</para>
   
   <para>
@@ -11,16 +11,16 @@
     </inlinemediaobject>
   </para>  
   
-  <note>You do not need to use the Keyman Text Editor to type with Keyman Desktop. You can use Keyman Desktop in almost any application on your computer that accepts keyboard input.</note>
+  <note>You do not need to use the Keyman Text Editor to type with Keyman. You can use Keyman in almost any application on your computer that accepts keyboard input.</note>
   
   <bridgehead>Opening the Text Editor</bridgehead>
   <para>To open the Keyman Text Editor:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>Text Editor…</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>Text Editor…</guilabel>.</para>
     </listitem>
   </orderedlist>
 
