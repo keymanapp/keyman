@@ -1088,6 +1088,7 @@ extension KeymanWebViewController {
         self.keyboardMenuView = KeyboardMenuView(keyFrame: keyFrame, inputViewController: ic,
                                                  closeButtonTitle: closeButtonTitle)
         parentView?.addSubview(self.keyboardMenuView!)
+        self.keyboardMenuView!.flashScrollIndicators()
       }
     }
   }
