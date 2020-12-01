@@ -5,6 +5,8 @@ interface
 type
   TKeymanStartTaskUninstall = class
     class procedure DeleteAllTasks;
+  private
+    class procedure ReportEvent(const Message: string); static;
   end;
 
 implementation
@@ -20,6 +22,26 @@ uses
 
 const
   CTaskFolderName = 'Keyman';
+
+class procedure TKeymanStartTaskUninstall.ReportEvent(const Message: string);
+var
+  hEventLog: THandle;
+begin
+  kl.LogError(Message);
+  hEventLog := RegisterEventSource(nil, 'Keyman-Uninstall');
+  Winapi.Windows.ReportEvent(
+    hEventLog,
+    EVENTLOG_ERROR_TYPE,
+    1,
+    1,
+    nil,
+    0,
+    Length(Message) * sizeof(Char),
+    nil,
+    PChar(Message)
+  );
+  CloseHandle(hEventLog);
+end;
 
 class procedure TKeymanStartTaskUninstall.DeleteAllTasks;
 var
@@ -37,7 +59,7 @@ begin
       on E:Exception do
       begin
         // We can't find the folder, for some unknown reason, so give up
-        kl.LogError('Failed to find '+CTaskFolderName+' task folder: '+E.ClassName+', '+E.Message);
+        ReportEvent('Failed to find '+CTaskFolderName+' task folder: '+E.ClassName+', '+E.Message);
         Exit;
       end;
     end;
@@ -55,7 +77,7 @@ begin
       // Silently ignore errors; this is cleanup that won't really hurt but
       // just be a little messy if it fails -- the scheduled task will never
       // be triggered as the relevant event will never be added!
-      kl.LogError('Failed to delete '+CTaskFolderName+' task folder: '+E.ClassName+', '+E.Message);
+      ReportEvent('Failed to delete '+CTaskFolderName+' task folder: '+E.ClassName+', '+E.Message);
     end;
   end;
 end;
