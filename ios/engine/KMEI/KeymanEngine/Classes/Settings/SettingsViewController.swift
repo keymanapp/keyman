@@ -179,7 +179,7 @@ open class SettingsViewController: UITableViewController {
 
     // Necessary for the keyboard to visually update to match
     // the new setting.
-    Manager.shared.shouldReloadKeyboard = true
+    Manager.shared.inputViewController.setShouldReload()
   }
   
   @objc func showGetStartedSwitchValueChanged(_ sender: Any) {

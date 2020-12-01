@@ -59,6 +59,8 @@ class KeymanWebViewController: UIViewController {
   /// when predictive text is not active
   private var bannerImgPath: String = ""
 
+  var shouldReload: Bool = false
+
   init(storage: Storage) {
     self.storage = storage
     super.init(nibName: nil, bundle: nil)
@@ -559,11 +561,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
-    
-    let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
+
     var newKb = Manager.shared.currentKeyboard
 
-    if !shouldReloadKeyboard { // otherwise, we automatically reload anyway.
+    if !shouldReload { // otherwise, we automatically reload anyway.
       let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
       if newKb == nil {
         if let id = userData.currentKeyboardID {
@@ -594,10 +595,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     fixLayout()
 
     NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb!)
-    if shouldReloadKeyboard {
+    if shouldReload {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
-      Manager.shared.shouldReloadKeyboard = false
+      shouldReload = false
     }
   }
 

@@ -166,7 +166,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var landscapeConstraint: NSLayoutConstraint?
 
   private var keymanWeb: KeymanWebViewController
-  
   private var swallowBackspaceTextChange: Bool = false
 
   open class var isPortrait: Bool {
@@ -263,8 +262,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     if (!Manager.shared.didSynchronize || shouldSynchronize) && Storage.shared != nil {
       Manager.shared.synchronizeSWKeyboard()
-      if Manager.shared.currentKeyboardID != nil || Manager.shared.shouldReloadKeyboard {
-        Manager.shared.shouldReloadKeyboard = true
+      if Manager.shared.currentKeyboardID != nil || keymanWeb.shouldReload {
+        keymanWeb.shouldReload = true
         reload()
       }
       Manager.shared.didSynchronize = true
@@ -295,7 +294,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // Necessary for existing infrastructure to resend info for the keyboard after reloading
     // as system keyboard.  Do NOT perform if in-app, as this unnecessarily resets the WebView.
     if(Manager.shared.isSystemKeyboard) {
-      Manager.shared.shouldReloadKeyboard = true
+      keymanWeb.shouldReload = true
     }
   }
 
@@ -504,9 +503,19 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func reload() {
     keymanWeb.reloadKeyboard()
   }
+
+  func reloadIfNeeded() {
+    if keymanWeb.shouldReload {
+      reload()
+    }
+  }
   
   func setKeyboard(_ kb: InstallableKeyboard) {
     keymanWeb.setKeyboard(kb)
+  }
+
+  func setShouldReload() {
+    keymanWeb.shouldReload = true
   }
     
   func registerLexicalModel(_ lm: InstallableLexicalModel) {

@@ -141,7 +141,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
   }
 
-  var shouldReloadKeyboard = false
   var shouldReloadLexicalModel = false
 
   var _inputViewController: InputViewController?
@@ -752,9 +751,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     // true source of the problems.
     viewController.dismiss(animated: false)
     showKeyboard()
-    if shouldReloadKeyboard {
-      inputViewController.reload()
-    }
+    inputViewController.reloadIfNeeded()
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
     
