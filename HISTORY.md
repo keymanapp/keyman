@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.194 alpha 2020-12-01
+
+* fix(android/app,oem/fv/android): Sanitize Sentry navigation breadcrumbs (#4025)
+* fix(windows): Task creation and deletion cleanup (#4033)
+* fix(windows): crash with package online update (#4034)
+* fix(windows): Keep language associations when updating keyboard (#4035)
+* fix(windows): Handle network errors when downloading keyboards (#4036)
+* chore(windows): disable Sentry 'Started' event (#4037)
+* fix(ios): package-internal links should be considered internal (#4022)
+
 ## 14.0.193 alpha 2020-11-30
 
 * chore: refresh github templates (#3999)
