@@ -32,9 +32,9 @@ const main = async (): Promise<void> => {
 
   const octokit: GitHub = new GitHub(argv.token);
 
-  // Pretend we have a single change. If we chain commands (as in normal usage), 
+  // Pretend we have a single change. If we chain commands (as in normal usage),
   // then we use the real history change count to determine if we continue.
-  let changeCount = 1; 
+  let changeCount = 1;
 
   const version = readFileSync('./VERSION.md', 'utf8').trim();
 
@@ -46,7 +46,7 @@ const main = async (): Promise<void> => {
     logInfo(`# Validating history for ${version}`);
     changeCount = await fixupHistory(octokit, argv.base);
     logInfo(`# ${changeCount} change(s) found for ${version}\n`);
-  } 
+  }
 
   //
   // Increment the version number if history has any entries
@@ -65,8 +65,8 @@ const main = async (): Promise<void> => {
 
 main().then(
   ()=>logInfo('Finished')
-) 
+)
 .catch((error: Error): void => {
   console.error(`An unexpected error occurred: ${error.message}, ${error.stack ?? 'no stack trace'}.`);
-  process.exit(1);
+  process.exit(2);
 });
