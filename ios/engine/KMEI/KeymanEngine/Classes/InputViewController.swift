@@ -288,6 +288,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     setOuterConstraints()
     inputView?.setNeedsUpdateConstraints()
+
+    keymanWeb.verifyLoaded()
   }
 
   open override func viewWillDisappear(_ animated: Bool) {

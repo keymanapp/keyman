@@ -59,6 +59,8 @@ class KeymanWebViewController: UIViewController {
   /// when predictive text is not active
   private var bannerImgPath: String = ""
 
+  var isLoading: Bool = false
+
   init(storage: Storage) {
     self.storage = storage
     super.init(nibName: nil, bundle: nil)
@@ -555,6 +557,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
     delegate?.keyboardLoaded(keymanWeb)
 
+    isLoading = false
     log.info("Loaded keyboard.")
 
     resizeKeyboard()
@@ -963,9 +966,23 @@ extension KeymanWebViewController {
   // MARK: - Show/hide views
   func reloadKeyboard() {
     webView!.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
+    isLoading = true
 
     // Check for a change of "always show banner" state
     updateShowBannerSetting()
+  }
+
+  /*
+   * Implemented as a workaround for a weird bug (likely within iOS) in which the
+   * InputViewController and KeymanWebViewController constructors (and thus, `loadView`)
+   * are sometimes completely bypassed during system-keyboard use.
+   * See https://github.com/keymanapp/keyman/issues/3985
+   */
+  func verifyLoaded() {
+    // Test: are we currently loading?  If so, don't worry 'bout a thing.
+    if !isLoading {
+      webView!.evaluateJavaScript("verifyLoaded()", completionHandler: nil)
+    }
   }
 
   @objc func showHelpBubble() {
