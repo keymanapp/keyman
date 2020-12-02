@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName">English</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
+  <string name="ssTitle">Install $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION has been installed successfully.</string>
+  <string name="ssCancelQuery">Are you sure you want to cancel the installation of $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Extracting bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Checking packages...</string>
+  <string name="ssBootstrapCheckingForUpdates">Checking online for updates...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Checking installed versions...</string>
+  <string name="ssBootstrapReady">Finishing up...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">There is nothing to install.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s download)</string>
+  <string name="ssActionInstall">Setup will install:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION is free and open source</string>
+  <string name="ssLicenseLink">&amp;Read the license</string>
+  <string name="ssInstallOptionsLink">Install &amp;options</string>
+  <string name="ssMessageBoxTitle">$APPNAME Setup</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Install</string>
+  <string name="ssCancelButton">Cancel</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Installing $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Removing older versions</string>
+  <string name="ssStatusComplete">Installation Complete</string>
+  <string name="ssQueryRestart">You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.
+
+Restart now?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows was not able to be automatically restarted.  You should restart Windows before you try and start $APPNAME.</string>
+  <string name="ssMustRestart">You must restart Windows to complete Setup.  When you restart Windows, Setup will finish.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION requires Windows 7 or later to install. However, Keyman Desktop 7, 8 or 9 has been detected. Do you want to install the keyboards included in this installer into the installed Keyman Desktop version?</string>
+  <string name="ssOldOsVersionDownload">This version of $APPNAME requires Windows 7 or later to install. Do you want to download Keyman Desktop 8?</string>
+  <string name="ssOptionsTitle">Install Options</string>
+  <string name="ssOptionsTitleInstallOptions">Installation options</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Default $APPNAME settings</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modules to install or upgrade</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Associated Keyboard Language</string>
+  <string name="ssOptionsTitleLocation">Version to install</string>
+  <string name="ssOptionsStartWithWindows">Start $APPNAME when Windows starts</string>
+  <string name="ssOptionsStartAfterInstall">Start $APPNAME when installation completes</string>
+  <string name="ssOptionsCheckForUpdates">Check for updates online periodically</string>
+  <string name="ssOptionsUpgradeKeyboards">Upgrade keyboards installed with older versions to version $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Share anonymous usage statistics with keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup version: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Install $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Upgrade $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s is already installed.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Download version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Install %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Download version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Version %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Select the language that you wish to associate with %0:s keyboard</string>
+  <string name="ssOptionsDefaultLanguage">Default language</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Downloading %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Downloading %0:s</string>
+  <string name="ssOffline">$APPNAME Setup could not connect to keyman.com to download additional resources.
+
+Please check that you are online, and give $APPNAME Setup permission to access the Internet in your firewall settings.
+
+Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.</string>
+</resources>
