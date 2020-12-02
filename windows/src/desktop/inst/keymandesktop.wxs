@@ -195,7 +195,7 @@
 
                 <RemoveFile Id="Version100ShortcutKeyman"   Name="Keyman Desktop.lnk"  Directory="ProgramMenuDir100" On="both" />
                 <RemoveFile Id="Version100ShortcutKeymanD"  Name="Keyman Desktop.lnk"  Directory="DesktopFolder" On="both" />
-                <RemoveFile Id="Version90ShortcutConfig"   Name="Keyman Configuration.lnk"  Directory="ProgramMenuDir100" On="both" />
+                <RemoveFile Id="Version100ShortcutConfig"   Name="Keyman Configuration.lnk"  Directory="ProgramMenuDir100" On="both" />
 
                 <RemoveFolder Id="Version100Shortcuts" Directory="ProgramMenuDir100" On="both" />
               </Component>
