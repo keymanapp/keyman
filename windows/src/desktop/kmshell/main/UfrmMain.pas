@@ -31,7 +31,7 @@
                     30 May 2007 - mcdurdin - Refactored install keyboard dialog out of UfrmMain
                     30 May 2007 - mcdurdin - I825 - Added proxy username and password
                     30 May 2007 - mcdurdin - I858 - Added Help and Getting Started links
-                    13 Jul 2007 - mcdurdin - I926 - Close down Keyman Desktop when doing an update patch.
+                    13 Jul 2007 - mcdurdin - I926 - Close down Keyman when doing an update patch.
                     23 Aug 2007 - mcdurdin - I956 - Refresh locales after package installation
                     14 Sep 2007 - mcdurdin - I956 - Ensure select language dialog appears after installing locale
                     14 Sep 2007 - mcdurdin - I1061 - "Uninstall keyboard xxx" was not translated (when click Menu/Uninstall keyboard)
@@ -55,7 +55,7 @@
                     18 Mar 2011 - mcdurdin - I2807 - Enable/disable addins
                     18 Mar 2011 - mcdurdin - I2392 - Improve integration of activation server client
                     18 Mar 2011 - mcdurdin - I2789 - Lang Config tasks needs to refresh configuration
-                    18 Mar 2011 - mcdurdin - I2786 - Keyman Configuration app title is "Keyman Desktop" not "Keyman Desktop Configuration"
+                    18 Mar 2011 - mcdurdin - I2786 - Keyman Configuration app title is "Keyman D_esktop" not "Keyman D_esktop Configuration"
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     08 Jun 2012 - mcdurdin - I3349 - V9.0 - Consolidate all process creation into TUtilExecute

@@ -1,18 +1,18 @@
 (*
   Name:             bootstrapmain
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Jun 2007
 
   Modified Date:    23 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Jun 2007 - mcdurdin - Initial version
                     05 Jun 2007 - mcdurdin - I817 - Fix -x option
                     19 Jun 2007 - mcdurdin - I817 - Translate to Unicode and remove Forms dependence
@@ -35,7 +35,7 @@
                     02 Feb 2012 - mcdurdin - I2975 - VistaAltFixUnit can crash on shutdown
                     15 Jun 2012 - mcdurdin - I3355 - Keyman Developer (and Desktop) sometimes reboot automatically with auto upgrade
                     03 Nov 2012 - mcdurdin - I3500 - V9.0 - Merge of I3355 - Keyman Developer (and Desktop) sometimes reboot automatically with auto upgrade
-                    28 Feb 2014 - mcdurdin - I4099 - V9.0 - Keyman Desktop Setup dialog is still 8.0 style
+                    28 Feb 2014 - mcdurdin - I4099 - V9.0 - Keyman Setup dialog is still 8.0 style
                     24 Jun 2014 - mcdurdin - I4293 - V9.0 - Setup bootstrapper does not check for V8 upgrade
                     12 Aug 2014 - mcdurdin - I4365 - V9.0 - Installer still doesn't enforce Win7 or later
                     16 Oct 2014 - mcdurdin - I4460 - V9.0 - Setup bootstrapper should handle upgrade scenarios with a prompt

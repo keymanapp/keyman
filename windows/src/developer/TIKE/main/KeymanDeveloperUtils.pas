@@ -32,8 +32,8 @@
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     17 Aug 2012 - mcdurdin - I3377 - KM9 - Update code references from 8.0 to 9.0
                     19 Oct 2012 - mcdurdin - I3475 - V9.0 - Refactor legacy program execution functions
-                    23 Mar 2012 - mcdurdin - I3283 - Debugger should start Keyman Desktop if not running
-                    03 Nov 2012 - mcdurdin - I3503 - V9.0 - Merge of I3283 - Debugger should start Keyman Desktop if it isn't running
+                    23 Mar 2012 - mcdurdin - I3283 - Debugger should start Keyman if not running
+                    03 Nov 2012 - mcdurdin - I3503 - V9.0 - Merge of I3283 - Debugger should start Keyman if it isn't running
                     21 Aug 2013 - mcdurdin - I3893 - V9.0 - Keyman Developer crashes if Desktop not installed
                     04 Dec 2013 - mcdurdin - I3655 - V9.0 - Keyboard debugger does not appear to function in 9.0.419.0
                     12 Jun 2014 - mcdurdin - I4264 - V9.0 - If Keyman Developer is running, double clicking a file in Explorer doesn't open it
@@ -312,7 +312,7 @@ begin
 
   if not GetKMShellPath(kmshell) then   // I3655
   begin
-    ShowMessage('Keyman Desktop is not installed.  You must install Keyman Desktop to install this keyboard.');
+    ShowMessage('Keyman is not installed.  You must install Keyman to install this keyboard.');
     Exit;
   end;
 
@@ -341,7 +341,7 @@ begin
 
   if not IsKeymanDesktopInstalled then
   begin
-    ShowMessage('Keyman Desktop is not installed.  You must install Keyman Desktop to install this keyboard.');
+    ShowMessage('Keyman is not installed.  You must install Keyman to install this keyboard.');
     Exit;
   end;
 
@@ -350,7 +350,7 @@ begin
   except
     on E:EKeymanPath do
     begin
-      ShowMessage('Keyman Desktop is not installed.  You must install Keyman Desktop to install this keyboard.');
+      ShowMessage('Keyman is not installed.  You must install Keyman to install this keyboard.');
       Exit;
     end;
   end;
@@ -598,7 +598,7 @@ begin
       Application.ProcessMessages;
       if GetTickCount - t > 15000 then
       begin
-        if MessageDlg('Keyman Desktop has not yet started.  Continue waiting?', mtConfirmation, mbOkCancel, 0) = mrCancel then
+        if MessageDlg('Keyman has not yet started.  Continue waiting?', mtConfirmation, mbOkCancel, 0) = mrCancel then
         begin
           SetLastError(ERROR_TIMEOUT);
           Exit;
@@ -631,7 +631,7 @@ begin
 
   if not GetKMShellPath(kmshell) then
   begin
-    ShowMessage('Keyman Desktop is not installed.  You must install Keyman Desktop to continue.');
+    ShowMessage('Keyman is not installed.  You must install Keyman to continue.');
     Exit;
   end;
 

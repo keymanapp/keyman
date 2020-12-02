@@ -1,25 +1,25 @@
 ﻿(*
   Name:             UfrmKeymanMenu
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      25 May 2010
 
   Modified Date:    23 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 May 2010 - mcdurdin - I2226 - Improve Keyman menu
                     25 May 2010 - mcdurdin - I2377 - Keyman menu pops up and off-screen when taskbar is at top of screen
                     30 Nov 2010 - mcdurdin - I2542 - Rework menu styling as per Paul's design
                     10 Dec 2010 - mcdurdin - I2551, I2554 - Keyman crashes when closing menu
                     10 Dec 2010 - mcdurdin - I2555 - Transparency issues in Remote Desktop
                     17 Dec 2010 - mcdurdin - I2542 - Fix horizontal line
-                    11 Jan 2011 - mcdurdin - I2582 - Keyman Desktop menu should pop over OSK
+                    11 Jan 2011 - mcdurdin - I2582 - Keyman menu should pop over OSK
                     31 Jan 2011 - mcdurdin - I2639 - Fix handle and memory leak in Keyman menu
                     31 Jan 2011 - mcdurdin - I2582 - Re-fix for popping over OSK
                     17 Mar 2011 - mcdurdin - I2693 - Crash in Keyman menu with multiple screens and no 'nearest' screen returned
@@ -131,7 +131,7 @@ uses
 
 const
   // +-------------------------------+  H   // I3960
-  // | [] Keyman Desktop             |  I
+  // | [] Keyman                     |  I
   // |===============================|  J
   // |                               |  K
   // |---[] keyboard---|---[] menu---|

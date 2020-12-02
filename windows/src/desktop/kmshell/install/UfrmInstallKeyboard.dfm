@@ -3,7 +3,7 @@ inherited frmInstallKeyboard: TfrmInstallKeyboard
   Top = 193
   BorderIcons = [biSystemMenu, biHelp]
   BorderStyle = bsDialog
-  Caption = 'Keyman Desktop'
+  Caption = 'Keyman'
   ClientHeight = 300
   ClientWidth = 600
   Color = clWindow

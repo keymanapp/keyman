@@ -1,7 +1,7 @@
 object frmDiagnostics: TfrmDiagnostics
   Left = 194
   Top = 111
-  Caption = 'Keyman Desktop System Information'
+  Caption = 'Keyman System Information'
   ClientHeight = 344
   ClientWidth = 565
   Color = clBtnFace
@@ -54,7 +54,7 @@ object frmDiagnostics: TfrmDiagnostics
       Width = 433
       Height = 39
       AutoSize = False
-      Caption = 
+      Caption =
         'If Keyman Support have asked for a diagnostic report from you, y' +
         'ou can click the button below to send the report to Keyman Suppo' +
         'rt.'
@@ -81,8 +81,8 @@ object frmDiagnostics: TfrmDiagnostics
         Top = 12
         Width = 330
         Height = 26
-        Caption = 
-          'Keyman Desktop System Information did not detect any issues in y' +
+        Caption =
+          'Keyman System Information did not detect any issues in y' +
           'our system.'
         WordWrap = True
       end
@@ -106,7 +106,7 @@ object frmDiagnostics: TfrmDiagnostics
         Top = 104
         Width = 400
         Height = 26
-        Caption = 
+        Caption =
           'You may wish to try disabling the programs listed above, if you ' +
           'recognise them, to see if this resolves the problem.'
         WordWrap = True
@@ -132,10 +132,10 @@ object frmDiagnostics: TfrmDiagnostics
         Top = 5
         Width = 379
         Height = 39
-        Caption = 
+        Caption =
           'This diagnostic report contains a list of all the programs curre' +
           'ntly running on your computer, as well as information on the lan' +
-          'guages you have installed and your Keyman Desktop keyboards and ' +
+          'guages you have installed and your Keyman keyboards and ' +
           'options.'
         WordWrap = True
       end
@@ -144,9 +144,9 @@ object frmDiagnostics: TfrmDiagnostics
         Top = 60
         Width = 424
         Height = 26
-        Caption = 
+        Caption =
           'Use this diagnostic report to help resolve any issues that you m' +
-          'ay have experienced while using Keyman Desktop.'
+          'ay have experienced while using Keyman.'
         WordWrap = True
       end
       object Label3: TLabel
@@ -154,7 +154,7 @@ object frmDiagnostics: TfrmDiagnostics
         Top = 100
         Width = 367
         Height = 13
-        Caption = 
+        Caption =
           'You can view all the details of the report by selecting Options/' +
           'Advanced View'
       end
@@ -235,7 +235,7 @@ object frmDiagnostics: TfrmDiagnostics
   end
   object dlgOpen: TOpenDialog
     DefaultExt = 'tsi'
-    Filter = 
+    Filter =
       'Diagnostic Report files (*.tsi, *.xml)|*.tsi;*.xml|Compressed Di' +
       'agnostic Report files (*.tsi)|*.tsi|Diagnostic Report XML files ' +
       '(*.xml)|*.xml|All files (*.*)|*.*'
@@ -244,7 +244,7 @@ object frmDiagnostics: TfrmDiagnostics
   end
   object dlgSave: TSaveDialog
     DefaultExt = 'xml'
-    Filter = 
+    Filter =
       'Diagnostic Report File (*.tsi)|*.tsi|Diagnostic Report XML files' +
       ' (*.xml)|*.xml|All files (*.*)|*.*'
     Left = 448

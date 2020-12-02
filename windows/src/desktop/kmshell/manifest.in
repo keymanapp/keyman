@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-	<assemblyIdentity type="win32" name="tavultesoft.keymandesktop.kmshell" version="$VersionWin" processorArchitecture="x86"/>
-	<description>Keyman Desktop</description>
+	<assemblyIdentity type="win32" name="com.keyman.windows.kmshell" version="$VersionWin" processorArchitecture="x86"/>
+	<description>Keyman Configuration</description>
 	<trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
 		<security>
 			<requestedPrivileges>

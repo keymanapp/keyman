@@ -126,7 +126,7 @@ begin
   // If the current executable is kmshell.exe, then return the folder it is in (unless
   // a debug path overrides it).
   //
-  // Otherwise, Keyman Desktop takes precedence if installed. If it is not installed,
+  // Otherwise, Keyman takes precedence if installed. If it is not installed,
   // check the installed OEM product registry and the first installed OEM product is
   // used. Currently, I assess that the likelihood of two OEM products being installed
   // without Keyman being installed is low, and we can live with the first one taking
@@ -145,7 +145,7 @@ begin
 
   if Result = '' then
   begin
-    // If Keyman Desktop is installed, then use its install path.
+    // If Keyman is installed, then use its install path.
     with TRegistry.Create do  // I2890
     try
       RootKey := HKEY_LOCAL_MACHINE;
@@ -182,7 +182,7 @@ begin
   Result := GetDebugPath('KeymanDesktop', Result);
 
   if Result = '' then
-    raise EKeymanPath.Create('Unable to find the Keyman Desktop directory.  You should reinstall the product.');
+    raise EKeymanPath.Create('Unable to find the Keyman directory.  You should reinstall the product.');
 
   Result := IncludeTrailingPathDelimiter(Result) + filename;
 end;
@@ -225,7 +225,7 @@ end;
 
 class function TKeymanPaths.CEFSubprocessPath: string;
 begin
-  // Normal install location - in Keyman Desktop install folder
+  // Normal install location - in Keyman install folder
   Result := KeymanDesktopInstallPath(S_CEF_SubProcess);
   if FileExists(Result) then Exit;
 
@@ -310,7 +310,7 @@ begin
     Result := ExtractFilePath(ParamStr(0));
 
     // The xml files may be in the same folder as the executable
-    // for some 3rd party distributions of Keyman Desktop files.
+    // for some 3rd party distributions of Keyman files.
     if FileExists(Result + 'xml\strings.xml') then
       Result := Result + 'xml\';
   end;

@@ -68,7 +68,7 @@ end;
 //
 // This is not good for very large archives. We are assuming the archive
 // is small enough to load into memory which should be fine on all modern PCs
-// for Keyman Desktop and Keyman Developer. If files get bigger than a couple
+// for Keyman and Keyman Developer. If files get bigger than a couple
 // of hundred megs, then we should consider saving to temp disk file instead.
 //
 // All this is due to RSP-17889. If this gets fixed, we can eliminate the

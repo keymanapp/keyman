@@ -19,7 +19,7 @@
                     06 Oct 2006 - mcdurdin - Always install keyboards and packages for all users
                     04 Dec 2006 - mcdurdin - Cleanup keyboard and package installation
                     15 Jan 2007 - mcdurdin - Don't reinstall an existing product.pxx (otherwise keyboards are uninstalled!)
-                    16 May 2007 - mcdurdin - I810 - Open uninstall feedback webpage at the end of the Keyman Desktop uninstaller
+                    16 May 2007 - mcdurdin - I810 - Open uninstall feedback webpage at the end of the Keyman uninstaller
                     23 Aug 2007 - mcdurdin - I985 - Fix desktop_xxx.pxx not removed from registry at uninstall
                     14 Sep 2007 - mcdurdin - I985 - desktop_xxx.pxx removal must be done under CU not LM
                     01 Jun 2009 - mcdurdin - Vista TC23 - delete hotkeys key on rollback

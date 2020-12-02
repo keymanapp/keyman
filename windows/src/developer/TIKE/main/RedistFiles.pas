@@ -1,18 +1,18 @@
 (*
   Name:             RedistFiles
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    9 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add UnicodeDataSourcePath and GetXMLTemplatePath functions
                     14 Sep 2006 - mcdurdin - Add GetRedistDesktopPath, GetRedistUIPath and GetReditAddinsPath
@@ -36,7 +36,7 @@ type
 
 const
   CRuntimeFiles: array[0..0] of TRedistFile = (
-    (FileName: 'keymandesktop.msi'; Description: 'Keyman Desktop Installer')
+    (FileName: 'keymandesktop.msi'; Description: 'Keyman Installer')
   );
 
   CRedistFiles: array[0..11] of TRedistFile = (

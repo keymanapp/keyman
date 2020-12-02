@@ -1,11 +1,11 @@
   <!ENTITY Company "">
-  <!ENTITY ProductName "Keyman Desktop">
+  <!ENTITY ProductName "Keyman">
   <!ENTITY Edition "">
   <!ENTITY Version "$VersionRelease">
-  
+
   <!ENTITY EvaluationPeriod "30">
 
-  
+
   <!ENTITY Name "&ProductName;">
   <!ENTITY Name_CNV "&Company;&#160;&ProductName;&#160;&Version;">
   <!ENTITY Name_CN "&Company;&#160;&ProductName;">

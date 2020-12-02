@@ -1,5 +1,5 @@
 #
-# Keyman Desktop Makefile
+# Keyman for Windows Makefile
 #
 
 TARGETS=kmshell kmconfig kmbrowserhost setup insthelp

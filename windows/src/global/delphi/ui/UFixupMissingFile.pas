@@ -1,18 +1,18 @@
 (*
   Name:             UFixupMissingFile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      28 Aug 2008
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          28 Aug 2008 - mcdurdin - I1607 - Fix crash if xsl file is missing
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
 *)
@@ -56,7 +56,7 @@ begin
 {  err := MsiGetProductCode(componentcode, productcode);
   if err <> ERROR_SUCCESS then
   begin
-    raise EFixupMissingFile.Create('Keyman Desktop could not be repaired.  Please reinstall this product.'#13#10#13#10+
+    raise EFixupMissingFile.Create('Keyman could not be repaired.  Please reinstall this product.'#13#10#13#10+
       'Error message was: MsiGetProductCode: '+SysErrorMessage(err));
   end;}
 
@@ -65,14 +65,14 @@ begin
 //  err := MsiInstallMissingFile(productcode, PChar(WideCharToString(PWideChar(path))));
     if err <> ERROR_SUCCESS then
     begin
-      raise EFixupMissingFile.Create('Keyman Desktop could not be repaired.  Please reinstall this product.'#13#10#13#10+
+      raise EFixupMissingFile.Create('Keyman could not be repaired.  Please reinstall this product.'#13#10#13#10+
         'Error message was: MsiReinstallProduct: '+SysErrorMessage(err));
     end;
     Inc(i);
     err := MsiEnumClients(componentcode, i, productcode);
   end;
   if err <> ERROR_NO_MORE_ITEMS then
-    raise EFixupMissingFile.Create('Keyman Desktop could not be repaired.  Please reinstall this product.'#13#10#13#10+
+    raise EFixupMissingFile.Create('Keyman could not be repaired.  Please reinstall this product.'#13#10#13#10+
       'Error message was: MsiEnumClients: '+SysErrorMessage(err));
 
 end;

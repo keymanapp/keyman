@@ -19,7 +19,7 @@
                     05 Dec 2006 - mcdurdin - Refactor rendering process into TXMLRenderers
                     12 Dec 2006 - mcdurdin - Clean up locale references
                     04 Jan 2007 - mcdurdin - Encode entities in XML render
-                    19 Jun 2007 - mcdurdin - I899 - Translate XSLT within Keyman Desktop rather than relying on IE
+                    19 Jun 2007 - mcdurdin - I899 - Translate XSLT within Keyman rather than relying on IE
                     13 Jul 2007 - mcdurdin - I902 - Resolve externals when loading XML files
                     23 Aug 2007 - mcdurdin - I956 - support locale install from packages
                     27 Mar 2008 - mcdurdin - Relocated
@@ -35,7 +35,7 @@
                     23 Mar 2012 - mcdurdin - I3269 - Add Debug_XMLRenderer DebugPath to allow writing temp .xml file
                     04 Nov 2012 - mcdurdin - I3545 - V9.0 - Merge of I3269 - Add Debug_XMLRenderer DebugPath to allow writing temp .xml file
                     01 Dec 2012 - mcdurdin - I3612 - V9.0 - Keyboard install should run as Admin only
-                    02 Dec 2012 - mcdurdin - I3626 - V9.0 - Keyman Desktop Help window crashes
+                    02 Dec 2012 - mcdurdin - I3626 - V9.0 - Keyman Help window crashes
                     01 May 2014 - mcdurdin - I4181 - V9.0 - Stop using DeleteFileAlways, MOVEFILE_DELAY_UNTIL_REBOOT
 *)
 unit XMLRenderer;  // I3306

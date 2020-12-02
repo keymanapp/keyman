@@ -1,23 +1,23 @@
 (*
   Name:             keymansysteminfo
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    26 Dec 2013
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Add Serialize, EngineInstallPath, EngineVersion
                     04 Dec 2006 - mcdurdin - Add RunDiagnostics function
                     15 Jan 2007 - mcdurdin - Fix call to tsysinfo.exe (quoted string)
                     12 Mar 2010 - mcdurdin - I2230 - Resolve crashes due to incorrect reference counting
-                    26 Dec 2013 - mcdurdin - I4013 - V9.0 - Merge of I3911 - Keyman Desktop Support page shows wrong Engine version
+                    26 Dec 2013 - mcdurdin - I4013 - V9.0 - Merge of I3911 - Keyman Support page shows wrong Engine version
 *)
 unit keymansysteminfo;
 
@@ -77,7 +77,7 @@ begin
   Result := buf;
 end;
 
-function TKeymanSystemInfo.Serialize(Flags: TOleEnum; const ImagePath: WideString; 
+function TKeymanSystemInfo.Serialize(Flags: TOleEnum; const ImagePath: WideString;
   References: TStrings): WideString;
 begin
   Result := XMLFormat([

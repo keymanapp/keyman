@@ -1,18 +1,18 @@
 (*
   Name:             utilkeymanoption
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    6 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     04 Dec 2006 - mcdurdin - Remove descriptions (localized)
                     16 May 2007 - mcdurdin - I819 - Add Test Keyman Functioning option
@@ -33,7 +33,7 @@
                     28 May 2014 - mcdurdin - I4243 - V9.0 - Remove kmuspmgr and keymanuc
                     16 Jun 2014 - mcdurdin - I4271 - V9.0 - Switch language for all applications is not working
                     28 Aug 2014 - mcdurdin - I4390 - V9.0 - Free vs Pro
-                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman Desktop Free Edition polish
+                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman D_esktop Free Edition polish
                     14 Nov 2014 - mcdurdin - I4515 - V9.0 - Switch for all apps is not disabled in Win 8
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
 *)

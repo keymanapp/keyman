@@ -83,7 +83,7 @@ begin
       try
         if FInitializeCEF.Start then
         begin
-          Application.Title := 'Keyman Desktop System Information';
+          Application.Title := 'Keyman System Information';
           Application.Initialize;
           Application.CreateForm(TfrmDiagnostics, frmDiagnostics);
           Application.Run;

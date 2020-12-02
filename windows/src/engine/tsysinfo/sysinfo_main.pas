@@ -7,12 +7,12 @@
 
   Modified Date:    15 Apr 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          13 May 2005 - mcdurdin - Integrated into kmshell from tsysinfo
                     15 Apr 2015 - mcdurdin - I4659 - V9.0 - Add more detailed keyboard diagnostics
 *)
@@ -125,7 +125,7 @@ uses
 {$R *.dfm}
 
 const
-  SCaption = 'Keyman Desktop System Information';
+  SCaption = 'Keyman System Information';
 
 procedure KeymanDiag;
 begin

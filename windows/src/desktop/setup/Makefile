@@ -23,7 +23,7 @@ clean: def-clean
     rem if exist icons\icons.res del icons\icons.res
 
 signcode:
-    rem SIGNCODE /d "Keyman Desktop Setup" $(PROGRAM)\desktop\setup.exe
+    rem SIGNCODE /d "Keyman Setup" $(PROGRAM)\desktop\setup.exe
 
 wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\desktop\setup.exe /t keyman-windows

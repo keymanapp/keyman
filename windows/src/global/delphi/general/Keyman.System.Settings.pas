@@ -202,13 +202,13 @@ const
       Description: 'Path for xml\osk templates for visual keyboard export'
     ),
 
-    // kmshell:XMLRenderer.TXMLRenderers.OldXMLTemplatePath
+    // kmshell:KeymanPaths.TKeymanPaths.KeymanConfigStaticHttpFilesPath
     (
       ID: 'development.paths.renderer_template';
-      Name: 'xmltemplate desktop_pro.kxx';
+      Name: 'KeymanConfigStaticHttpFilesPath';
       RootKey: HKCU;
       Key: SRegKey_KeymanDebug_CU;
-      Description: 'Path to xml UI templates for Keyman Desktop; you may need '+
+      Description: 'Path to xml UI templates for Keyman; you may need '+
                    'to set this value when running debug builds of Keyman '+
                    'Configuration'
     ),

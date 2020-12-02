@@ -16,12 +16,12 @@ Include Paths:     N/A
 Installation notes
 ------------------
 
-Download from site above.  
+Download from site above.
 
 Build notes
 -----------
 
-DocBook XSL is used for building the Keyman Desktop help files. We may be able to eliminate this in the future
+DocBook XSL is used for building the Keyman help files. We may be able to eliminate this in the future
 by rewriting the help files in another format.
 
 License - Custom
