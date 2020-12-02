@@ -133,7 +133,10 @@ begin
   Result := True;
 end;
 
-function CompareVersions(Version1, Version2: string): Integer; // -1 = Version 1 newer, 1 = Version2 newer
+/// <summary>
+/// -1 = Version 1 newer, 1 = Version2 newer
+/// </summary>
+function CompareVersions(Version1, Version2: string): Integer;
 var
   n1, n2: Integer;
   v1: Integer;
@@ -179,12 +182,12 @@ begin
   begin
     if Version2='' then
       Exit; // 1.02.3 vs 1.2.3 - same version, just formatting difference
-    // 1.2.3 vs 1.2 - Version1 is newer
-    Result := -1;
-  end
-  else
     // 1.2 vs 1.2.3 - Version2 is newer
     Result := 1;
+  end
+  else
+    // 1.2.3 vs 1.2 - Version1 is newer
+    Result := -1;
 end;
 
 initialization

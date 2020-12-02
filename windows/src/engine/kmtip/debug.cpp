@@ -65,19 +65,19 @@ void InitDebugging() {
     VS_FIXEDFILEINFO *ffi;
     DWORD sz;
     UINT ffilen;
-    char *buf = new char[1024], fname[260];
+    char fname[260];
 
     GetModuleFileName(GetModuleHandle("kmtip.dll"), fname, 260);
     sz = GetFileVersionInfoSize(fname, 0);
     if (sz > 0) {
-      buf = new char[sz];
+      char *buf = new char[sz];
       GetFileVersionInfo(fname, 0, sz, buf);
       VerQueryValue(buf, "\\", (void **)&ffi, &ffilen);
 
       SendDebugMessageFormat(L"kmtip version: %d.%d.%d.%d",
         HIWORD(ffi->dwProductVersionMS), LOWORD(ffi->dwProductVersionMS),
         HIWORD(ffi->dwProductVersionLS), LOWORD(ffi->dwProductVersionLS));
-      delete buf; // I2157
+      delete[] buf; // I2157
     }
     else {
       SendDebugMessage(L"kmtip version: damaged");
@@ -115,3 +115,8 @@ void DebugLastError_1(char *file, int line, char *func, PWCHAR msg, DWORD err) {
   }
 }
 
+void WINAPI Keyman_Diagnostic(int mode) {
+  if (mode == 0) {
+    RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
+  }
+}

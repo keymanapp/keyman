@@ -4,22 +4,23 @@
 
 	<xsl:include href="elements.xsl"/>
 
-	<xsl:variable name="locale_help" select="$locale/Dialog[@Id='Help'][1]" />
+	<xsl:variable name="dialoginfo_help" select="$dialoginfo/Dialog[@Id='Help'][1]" />
 
 	<xsl:template match="/">
 
 		<html>
 			<head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
-        <title><xsl:value-of select="$locale/String[@Id='S_HelpTitle']" /></title>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
+        <title><xsl:value-of select="$locale/string[@name='S_HelpTitle']" /></title>
+        <link rel="stylesheet" type="text/css" href="/app/config.css" />
 				<style type="text/css">
-					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
+					* { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
 
 					body { padding: 0px; margin: 0px; overflow: hidden;
-					width: <xsl:value-of select="$locale_help/@Width" />px;
-					height: <xsl:value-of select="$locale_help/@Height" />px;
+					width: <xsl:value-of select="$dialoginfo_help/@Width" />px;
+					height: <xsl:value-of select="$dialoginfo_help/@Height" />px;
 					background: white; border: none; }
 					html { padding: 0px; margin: 0px; overflow: hidden; }
 
@@ -27,10 +28,10 @@
 					width: 100%;
 					height: 100%;
 					}
-					
+
 					#size { position: absolute; left: 0; top: 0;
-						width: <xsl:value-of select="$locale_help/@Width" />px;
-						height: <xsl:value-of select="$locale_help/@Height" />px;
+						width: <xsl:value-of select="$dialoginfo_help/@Width" />px;
+						height: <xsl:value-of select="$dialoginfo_help/@Height" />px;
           }
 
           #captionBox {
@@ -117,7 +118,7 @@
           float: right;
           padding: 10px;
           }
-          
+
           #help {
             margin: 60px 0 0 0;
           }
@@ -148,12 +149,9 @@
 				<div id="container">
           <div id="captionBox"><div id="c1"></div><div id="c2"></div><div id="c3"></div></div>
 					<div id="header">
-						<img id="icon" alt="Help">
-							<xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>48.png</xsl:attribute>
-						</img>
-
+						<img id="icon" alt="Help" src="/app/48.png" />
 						<div id="title">
-							<xsl:value-of select="$locale/String[@Id='S_HelpTitle']" />
+							<xsl:value-of select="$locale/string[@name='S_HelpTitle']" />
 						</div>
 					</div>
 
@@ -161,31 +159,31 @@
 						<xsl:if test="/Keyman/Keyboard">
 							<div>
 								<a href="javascript:location.href='keyman:openkeyboardhelp'">
-									<xsl:value-of select="$locale/String[@Id='S_Help_Keyboard_Prefix']" />
+									<xsl:value-of select="$locale/string[@name='S_Help_Keyboard_Prefix']" />
 									<xsl:value-of select="/Keyman/Keyboard/@Name"/>
-									<xsl:value-of select="$locale/String[@Id='S_Help_Keyboard_Suffix']" />
+									<xsl:value-of select="$locale/string[@name='S_Help_Keyboard_Suffix']" />
 								</a>
 							</div>
 						</xsl:if>
 						<div>
 							<a href="javascript:location.href='keyman:openproducthelp'">
-								<xsl:value-of select="$locale/String[@Id='S_Help_Product']" />
+								<xsl:value-of select="$locale/string[@name='S_Help_Product']" />
 							</a>
 						</div>
 					</div>
-					
+
 					<div id="footer">
 						<div id="buttons">
                 <xsl:call-template name="button">
-                  <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:with-param>
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Cancel']"/></xsl:with-param>
                   <xsl:with-param name="command" select="'keyman:cancel'" />
                 </xsl:call-template>
 						</div>
 					</div>
-				</div>							 
+				</div>
 			</body>
 
 		</html>
 	</xsl:template>
-	
+
 </xsl:stylesheet>

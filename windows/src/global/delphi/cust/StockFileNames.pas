@@ -23,15 +23,13 @@ unit StockFileNames;
 interface
 
 const StockFileName_TrayIcon = 'trayicon.ico'; // do not localise
-const StockFileName_Messages = 'messages.txt'; // do not localise
 const StockFileName_Menu     = 'menu.txt';     // do not localise
 
 const StockFileName_AppIcon = 'appicon.ico';    // do not localise
 const StockFileName_ConfigIcon = 'cfgicon.ico'; // do not localise
 
-const SStockFileNames: array[0..4] of string = (
+const SStockFileNames: array[0..3] of string = (
   StockFileName_TrayIcon,
-  StockFileName_Messages,
   StockFileName_Menu,
   StockFileName_AppIcon,
   StockFileName_ConfigIcon);

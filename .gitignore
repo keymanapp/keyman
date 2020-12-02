@@ -120,6 +120,7 @@
 
 # /developer/inst/
 /windows/src/developer/inst/*.wixpdb
+/windows/src/developer/inst/download.mak
 /windows/src/developer/inst/copydev.mak
 
 # /developer/kmcmpdll/
@@ -256,8 +257,14 @@ compile_flags.txt
 # Auto-generated resource script
 resources/environment.sh
 
-# Keyman translations from https://crowdin.com/project/keyman
-.crowdin-tmp/
-crowdin/
-
+# Copy of the master VERSION.md used for Linux packaging
 /common/core/desktop/VERSION.md
+
+**/node_modules/
+lerna-debug.log
+
+# Cached/auto-compiled Python bytecode
+*.pyc
+
+# Debian watch file - we generate it from watch.in
+watch

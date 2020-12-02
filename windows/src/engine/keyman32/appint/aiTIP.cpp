@@ -1,18 +1,18 @@
 /*
   Name:             aiTIP
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Jun 2007
 
   Modified Date:    23 Feb 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Jun 2007 - mcdurdin - I890 - Fix deadkeys in TSF
                     13 Jul 2007 - mcdurdin - I934 - Prep for x64
                     27 Jan 2009 - mcdurdin - I1797 - Add fallback for AIWin2000 app integration
@@ -60,6 +60,10 @@ extern const int VKContextReset[256];
 
 DWORD TSFShiftToShift(LPARAM shift);   // I3588
 
+extern "C" __declspec(dllexport) BOOL WINAPI TIPIsKeymanRunning() {
+  return Globals::get_Keyman_Initialised() && !Globals::get_Keyman_Shutdown();
+}
+
 extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) {   // I3581
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
@@ -68,16 +72,17 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) 
       for(int j = 0; j < _td->lpKeyboards[i].nProfiles; j++) {
         if(IsEqualGUID(_td->lpKeyboards[i].Profiles[j].Guid, *profile)) {
           SelectKeyboard(_td->lpKeyboards[i].KeymanID);   // I3594
-          break;
+          ReportActiveKeyboard(PC_UPDATE);   // I3961
+          return TRUE;
         }
       }
     }
-  } else {
-    SelectKeyboard(KEYMANID_NONKEYMAN);   // I3594
   }
-  
-  ReportActiveKeyboard(_td, PC_UPDATE);   // I3961
-  return TRUE;
+
+  SendDebugMessage(0, sdmAIDefault, 0, "TIPActivateKeyboard: Could not find profile");
+  SelectKeyboard(KEYMANID_NONKEYMAN);   // I3594
+  ReportActiveKeyboard(PC_UPDATE);   // I3961
+  return FALSE;
 }
 
 extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateEx(BOOL FActivate) {  // I3581
@@ -97,7 +102,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateEx(BOOL FActivate) {  //
 void ProcessToggleChange(UINT key) {   // I4793
   UINT flag = 0;
 
-  switch(key) {  
+  switch(key) {
     case VK_CAPITAL: flag = CAPITALFLAG; break;
     case VK_NUMLOCK: flag = NUMLOCKFLAG; break;
     default: return;
@@ -155,7 +160,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 		  return FALSE;
 	  }
   }
-	  
+
   DWORD LocalShiftState = Globals::get_ShiftState();
 
   if(!Preserved) {
@@ -163,14 +168,14 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
     case VK_CAPITAL:
       if(!isUp) ProcessToggleChange((UINT) wParam);   // I4793
       if (!Updateable) {
-        // We only want to process the Caps Lock key event once -- 
+        // We only want to process the Caps Lock key event once --
         // in the first pass (!Updateable).
         KeyCapsLockPress(isUp);   // I4548
       }
       return FALSE;
     case VK_SHIFT:
       if (!Updateable) {
-        // We only want to process the Shift key event once -- 
+        // We only want to process the Shift key event once --
         // in the first pass (!Updateable).
         KeyShiftPress(isUp);   // I4548
       }
@@ -192,7 +197,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
     SendDebugMessageFormat(0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
     *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;   // I3588
   }
-	
+
 	_td->TIPFUpdateable = Updateable;
   _td->TIPFPreserved = Preserved;   // I4290
 
@@ -258,6 +263,9 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 AITIP::AITIP() {
   ::AIWin2000Unicode();   // I3574
 
+  FIsDebugControlWindow = FALSE;
+  useLegacy = FALSE;
+
 	WM_KEYMANDEBUG_CANDEBUG         = RegisterWindowMessage("WM_KEYMANDEBUG_CANDEBUG");
 	WM_KEYMANDEBUG_GETUNICODESTATUS = RegisterWindowMessage("WM_KEYMANDEBUG_GETUNICODESTATUS");
 	WM_KEYMANDEBUG_GETCONTEXT       = RegisterWindowMessage("WM_KEYMANDEBUG_GETCONTEXT");
@@ -275,7 +283,7 @@ BOOL AITIP::CanHandleWindow(HWND ahwnd) {
   return TRUE;   // I3574
 }
 
-BOOL AITIP::HandleWindow(HWND ahwnd) { 
+BOOL AITIP::HandleWindow(HWND ahwnd) {
   FIsDebugControlWindow = IsDebugControlWindow(ahwnd);
   return AIWin2000Unicode::HandleWindow(ahwnd);   // I3574
 }
@@ -284,7 +292,7 @@ BOOL AITIP::IsWindowHandled(HWND ahwnd) {
   return AIWin2000Unicode::IsWindowHandled(ahwnd);   // I3574
 }
 
-BOOL AITIP::IsUnicode() { 
+BOOL AITIP::IsUnicode() {
 	return TRUE;
 }
 
@@ -336,7 +344,7 @@ void AITIP::MergeContextWithCache(PWSTR buf, AppContext *local_context) {   // I
   SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::MergeContextWithCache TIP:'%s' Context:'%s' DKContext:'%s'",
       mc1, mc2, mc3);
 
-  delete mc1; 
+  delete mc1;
   delete mc2;
   delete mc3;
 #endif
@@ -370,7 +378,7 @@ void AITIP::ReadContext() {
       SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: full context [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
     }
     useLegacy = FALSE;   // I3575
-		
+
     // If the text content of the context is identical, inject the deadkeys
     // Otherwise, reset the cachedContext to match buf, no deadkeys
 
@@ -389,7 +397,7 @@ void AITIP::ReadContext() {
 
 AppContextWithStores::AppContextWithStores(int nKeyboardOptions) : AppContext() {   // I4978
   this->nKeyboardOptions = nKeyboardOptions;
-  KeyboardOptions = new INTKEYBOARDOPTIONS[nKeyboardOptions]; 
+  KeyboardOptions = new INTKEYBOARDOPTIONS[nKeyboardOptions];
   memset(KeyboardOptions, 0, sizeof(INTKEYBOARDOPTIONS) * nKeyboardOptions);
 }
 
@@ -517,7 +525,7 @@ BOOL AITIP::PostKeys() {
 
   int bk=0;
 	WCHAR *OutBuf = new WCHAR[QueueSize+1], *p = OutBuf;   // I4272
-	
+
   *OutBuf = 0;
 
 	for(int n = 0; n < QueueSize; n++) {
@@ -541,13 +549,13 @@ BOOL AITIP::PostKeys() {
 	}
 
 	if(_td->TIPProcessOutput && (bk > 0 || OutBuf[0])) {
-  	SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::PostKeys: output bk=%d outcount=%d", bk, (int)(p-OutBuf));
-		(*_td->TIPProcessOutput)(bk, OutBuf, (int)(p - OutBuf));
+  	SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::PostKeys: output bk=%d outcount=%d", bk, (INT_PTR)(p-OutBuf));
+		(*_td->TIPProcessOutput)(bk, OutBuf, (int)(INT_PTR)(p - OutBuf));
   } else {
     SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::PostKeys: no output");
   }
 
-  delete OutBuf;   // I4272
+  delete[] OutBuf;   // I4272
 
 	QueueSize = 0;
 	return TRUE;
@@ -642,7 +650,7 @@ void FillStoreOffsets(AIDEBUGINFO *di)
 		if(n == MAXSTOREOFFSETS*2) break;
 	}
 
-	if(n < MAXSTOREOFFSETS*2)
+	if(n < MAXSTOREOFFSETS*2 - 1)
 		for(p = di->Rule->dpOutput; *p; p = incxstr(p))
 		{
 			if(*p == UC_SENTINEL && *(p+1) == CODE_INDEX)
@@ -670,7 +678,7 @@ BOOL AITIP::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR
 	di.Group = Group;			// LPGROUP
 	di.Output = foutput;		// PWSTR
 	di.Flags = dwExtraFlags;	// DWORD
-	
+
 	if(di.Rule) FillStoreOffsets(&di);
 
 	// data required

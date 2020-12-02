@@ -5,7 +5,7 @@ Build-Depends: debhelper (>=9~),
 Section: text
 Priority: optional
 Maintainer: Debian Input Method Team <debian-input-method@lists.debian.org>
-Uploaders: Daniel Glassey <wdg@debian.org>
+Uploaders: Daniel Glassey <wdg@debian.org>, Keyman team <support@keyman.com>
 Standards-Version: 3.9.8
 Homepage: https://www.keyman.com
 Vcs-Browser: https://salsa.debian.org/input-method-team/keyman-keyboardprocessor

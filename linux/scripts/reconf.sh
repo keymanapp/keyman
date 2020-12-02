@@ -38,14 +38,13 @@ if [ "$1" != "" ]; then
     fi
 fi
 
-. "$BASEDIR/scripts/version.sh"
-version
+echo "Found tier ${TIER}, version ${VERSION}"
 
 # autoreconf the projects
 for proj in ${autotool_projects}; do
     if [ "${proj}" != "keyman-config" ]; then
         cd $proj
-        echo "Reconfiguring $proj to version `cat VERSION`"
+        echo "Reconfiguring $proj to version ${VERSION}"
         autoreconf -if
         cd $BASEDIR
     fi
@@ -61,7 +60,8 @@ for proj in ${extra_projects}; do
         cd keyman-config
         make clean
         cd keyman_config
-        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" version.py.in > version.py
+        sed -e "s/_VERSION_/${VERSION}/g" -e "s/_VERSIONWITHTAG_/${VERSION_WITH_TAG}/g" -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" \
+            -e "s/_RELEASEVERSION_/${VERSION_RELEASE}/g" -e "s/_TIER_/${TIER}/g" version.py.in > version.py
     fi
     cd $BASEDIR
 done

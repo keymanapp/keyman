@@ -158,6 +158,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   */
 
   DebugLog("m_state.vkey: %s shiftFlags: %x; charCode: %X", Debug_VirtualKey(m_state.vkey), m_modifiers, m_state.charCode);   // I4582
+  DebugLog("m_context: %s",  Debug_UnicodeString(m_context.GetFullContext()));
 
   if(gp)
   {
@@ -264,7 +265,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   p = kkp->dpOutput;
   if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT)
   {
-    for(p = decxstr((KMX_WCHAR *) u16chr(m_miniContext, 0)); p >= m_miniContext; p = decxstr(p))
+    for(p = decxstr((KMX_WCHAR *) u16chr(m_miniContext, 0), m_miniContext); p >= m_miniContext; p = decxstr(p, m_miniContext))
     {
       if(*p == UC_SENTINEL)
         switch(*(p+1))

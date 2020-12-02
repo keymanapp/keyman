@@ -1,5 +1,11 @@
 # Keyman for macOS Version History
 
+## 2020-05-08 13.0.101 stable
+* No change (Added jq-win64.exe to common resources)
+
+## 2020-02-19 13.0.100 stable
+* 13.0 stable release
+
 ## 2020-02-14 13.0.17 beta
 * Feature: Keyman now includes an installer for macOS to streamline the install experience (#2537)
 * Bug fix: Modifier keys no longer cause keyboards to work incorrectly in several apps (#2588)

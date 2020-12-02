@@ -1,6 +1,14 @@
 #!/bin/bash
 # Build Keyman Engine Android and KMAPro
 
+# Set sensible script defaults:
+# set -e: Terminate script if a command returns an error
+set -e
+# set -u: Terminate script if an unset variable is used
+#set -u: Not set because of $RELEASE_OEM
+# set -x: Debugging use, print each statement
+# set -x
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -38,7 +46,7 @@ cd "$KEYMAN_ROOT/android"
 
 if [ ! -z "$RELEASE_OEM" ]; then
   pushd "$KEYMAN_ROOT/oem/firstvoices/android"
-  ./build.sh -lib-nobuild "$@"
+  ./build.sh -download-keyboards -lib-nobuild "$@"
 
   if [ $? -ne 0 ]; then
     die "ERROR: oem/firstvoices/android/build.sh failed"

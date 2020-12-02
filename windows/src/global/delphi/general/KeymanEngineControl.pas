@@ -32,6 +32,8 @@ type
     procedure DisableUserInterface; safecall;
     procedure EnableUserInterface; safecall;
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
+
+    procedure DiagnosticTestException; safecall;
   end;
 
 implementation

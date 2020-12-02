@@ -8,6 +8,9 @@
 # coverage anyway. To avoid uploading too many unnecessary files, we only
 # upload those three folders.
 #
+# This script also uploads sourcemap data for Developer web pages and for
+# Desktop configuration pages.
+#
 # Prerequisites: SENTRY_AUTH_TOKEN, SENTRY_URL, SENTRY_ORG variables must
 # be configured.
 #
@@ -39,10 +42,12 @@ cd "$KEYMAN_ROOT/windows/src"
 #
 
 echo "Uploading symbols for desktop/"
-sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb desktop
+sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb desktop --include-sources
+sentry-cli releases -p keyman-windows files "release-$VERSION_WITH_TAG" upload-sourcemaps desktop/kmshell/xml
 
 echo "Uploading symbols for engine/"
-sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb engine
+sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb engine --include-sources
 
 echo "Uploading symbols for developer/"
-sentry-cli upload-dif -p keyman-developer -t breakpad -t pdb developer
+sentry-cli upload-dif -p keyman-developer -t breakpad -t pdb developer --include-sources
+sentry-cli releases -p keyman-developer files "release-$VERSION_WITH_TAG" upload-sourcemaps developer/TIKE/xml

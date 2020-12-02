@@ -1,5 +1,6 @@
 var assert = chai.assert;
 var LMLayer = com.keyman.text.prediction.LMLayer;
+var DefaultWorker = com.keyman.text.prediction.DefaultWorker;
 
 describe('LMLayerWorker', function () {
   // This one makes multiple subsequent calls across the WebWorker boundary, so we should be generous here.
@@ -15,7 +16,7 @@ describe('LMLayerWorker', function () {
 
   describe('Usage within a Web Worker', function () {
     it('should install itself in the worker context', function (done) {
-      let uri = LMLayer.asBlobURI(LMLayerWorkerCode);
+      let uri = DefaultWorker.asBlobURI(LMLayerWorkerCode);
       let worker = new Worker(uri);
       worker.onmessage = function thisShouldBeCalled(message) {
         done();
@@ -29,7 +30,10 @@ describe('LMLayerWorker', function () {
       worker.postMessage({
         message: 'load',
         // Since the worker's based in a blob, it's not on the 'same domain'.  We need to absolute-path the model file.
-        model: document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
+        source: {
+          type: 'file',
+          file: document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
+        }
       });
     });
   });

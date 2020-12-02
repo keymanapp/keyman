@@ -13,6 +13,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -40,6 +41,7 @@ public class PackageProcessorTest {
   private static final int TEST_GFF_KBD_COUNT = 1;
   private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
+  private static final String TEST_GFF_KBD_NAME = "Amharic";
 
   private static final String TEST_EN_CUSTOM_MODEL_NAME = "example.en.custom";
   private static final File TEST_EN_CUSTOM_MODEL_KMP_FILE = new File(TEST_RESOURCE_ROOT, "packages" +
@@ -133,9 +135,8 @@ public class PackageProcessorTest {
     Assert.assertNotNull(json);
     String pkgVersion = PP.getPackageVersion(json);
 
-    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion);
-    // Only the first language is installed with the keyboard
-    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
+    ArrayList<String> languageList = new ArrayList<String>();
+    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageList);
 
     HashMap<String, String> amharic = new HashMap<String, String>();
     amharic.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
@@ -144,10 +145,37 @@ public class PackageProcessorTest {
     amharic.put(KMManager.KMKey_LanguageID, "am");
     amharic.put(KMManager.KMKey_LanguageName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    amharic.put(KMManager.KMKey_CustomKeyboard, "Y");
     amharic.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
+    // If languageID doesn't match, verify only the first language is installed with the keyboard
     Assert.assertEquals(amharic, keyboards[0]);
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
+
+    String languageID = "am";
+    languageList.add(languageID);
+    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageList);
+
+    // Verify "am" matched
+    Assert.assertEquals(amharic, keyboards[0]);
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
+
+    languageList.remove(0);
+    languageID = "GEZ";
+    languageList.add(languageID);
+    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageList);
+
+    HashMap<String, String> geez = new HashMap<String, String>();
+    geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
+    geez.put(KMManager.KMKey_KeyboardName, "Amharic");
+    geez.put(KMManager.KMKey_KeyboardID, "gff_amh_7");
+    geez.put(KMManager.KMKey_LanguageID, "gez");
+    geez.put(KMManager.KMKey_LanguageName, "Ge'ez");
+    geez.put(KMManager.KMKey_KeyboardVersion, "1.4");
+    geez.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
+
+    // Verify "gez" matched
+    Assert.assertEquals(geez, keyboards[0]);
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
   }
 
   @Test
@@ -204,7 +232,7 @@ public class PackageProcessorTest {
   }
 
   @Test
-  public void test_keyboardVersion() throws Exception {
+  public void test_keyboardVersion() {
     JSONObject json = PP.loadPackageInfo(tempPkg);
 
     Assert.assertEquals("1.4", PackageProcessor.getKeyboardVersion(json, TEST_GFF_KBD_ID));

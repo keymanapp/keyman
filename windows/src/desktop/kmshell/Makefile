@@ -5,17 +5,16 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons xml
-    $(MKVER_U) localedef.dtd.in xml\localedef.dtd
     $(DCC32) kmshell.dpr
-    $(TDS2DBG) kmshell.exe
     $(SENTRYTOOL_DELPHIPREP) kmshell.exe -dpr kmshell.dpr
+    $(TDS2DBG) kmshell.exe
     $(COPY) kmshell.exe $(PROGRAM)\desktop
     if exist kmshell.dbg $(COPY) kmshell.dbg $(DEBUGPATH)\desktop
 
 icons:
     rc icons.rc
 
-xml:
+xml: sentry-init.js
     cd $(ROOT)\src\desktop\kmshell\xml
     -del /q $(ROOT)\bin\desktop\xml\*
     copy * $(ROOT)\bin\desktop\xml\   #
@@ -24,13 +23,20 @@ xml:
     mkdir $(ROOT)\bin\desktop\locale
     xcopy /S /I $(ROOT)\src\desktop\kmshell\locale $(ROOT)\bin\desktop\locale\
 
+sentry-init.js:
+    cd $(ROOT)\src\desktop\kmshell\xml
+    $(MKVER_U) sentry.init.js.in sentry.init.js
+
 clean: def-clean
     if exist MessageIdentifiers.pas del MessageIdentifiers.pas
     if exist icons\icons.res del icons\icons.res
-    if exist xml\localedef.dtd del xml\localedef.dtd
 
 signcode:
     $(SIGNCODE) /d "Keyman Desktop" $(PROGRAM)\desktop\kmshell.exe
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\kmshell.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\kmshell.dbg /t keyman-windows
 
 backup:
     $(WZZIP) $(BUILD)\desktop\kmshell.zip  $(BACKUPDEFAULTS) kmshell.exe

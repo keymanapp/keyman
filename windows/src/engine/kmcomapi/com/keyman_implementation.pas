@@ -35,7 +35,7 @@ uses
   keymanautoobject, internalinterfaces;
 
 type
-  TKeyman = class(TAutoObject, IKeyman, IIntKeyman)
+  TKeyman = class(TAutoObject, IKeyman, IIntKeyman, IKeymanBCP47Canonicalization)
   private
     FInitialized: Boolean;
     FContext: TKeymanContext;
@@ -62,6 +62,9 @@ type
 
     procedure Apply; safecall;
     procedure Refresh; safecall;
+
+    { IKeymanBCP47Canonicalization }
+    function GetCanonicalTag(const Tag: WideString): WideString; safecall;
 
     { IKeymanObject }
     // Reimplement as a special case for this interface
@@ -90,10 +93,11 @@ implementation
 uses
   Classes,
   ComServ,
-  errlogpath,
   sysutils,
   klog,
-  utilhandleexception;
+  utilhandleexception,
+
+  Keyman.System.CanonicalLanguageCodeUtils;
 
 const
   SErrorUninitialised = 'Keyman COM API did not initialize successfully';
@@ -102,9 +106,6 @@ procedure TKeyman.Initialize;
 begin
   KL.MethodEnter(Self, 'Initialize', []);
   try
-    // I1642 move GetErrLogPath out of DllMain - causes memory issues later due to COM calls
-    ForceDirectories(GetErrLogPath);
-
     inherited;
 
     try
@@ -122,7 +123,6 @@ begin
       on E:Exception do
       begin
         LogException('TKeyman', E, ExceptAddr);
-        SysUtils.ShowException(ExceptObject, ExceptAddr);
         FInitialized := False;
       end;
     end;
@@ -243,8 +243,16 @@ begin
   Result := inherited ObjRelease;
 end;
 
+function TKeyman.GetCanonicalTag(const Tag: WideString): WideString;
+begin
+  // We implement this here to avoid sharing standards datasets across
+  // multiple executables
+  Result := TCanonicalLanguageCodeUtils.FindBestTag(Tag, True);
+end;
+
 function TKeyman.Get_AutoApply: WordBool;
 begin
+  if not FInitialized then raise Exception.Create(SErrorUninitialised);
   Result := FControl.AutoApply;
 end;
 
@@ -252,6 +260,7 @@ procedure TKeyman.Apply;
 var
   AutoApply: Boolean;
 begin
+  if not FInitialized then raise Exception.Create(SErrorUninitialised);
   AutoApply := FControl.AutoApply;
   FControl.AutoApply := False;
   try
@@ -267,6 +276,7 @@ end;
 
 procedure TKeyman.Set_AutoApply(Value: WordBool);
 begin
+  if not FInitialized then raise Exception.Create(SErrorUninitialised);
   FControl.AutoApply := Value;
 end;
 

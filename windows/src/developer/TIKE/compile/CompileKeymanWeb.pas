@@ -1,18 +1,18 @@
 (*
   Name:             CompileKeymanWeb
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      26 Apr 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          26 Apr 2006 - mcdurdin - Add support for ContextEx and Context, and lots of polish
                     21 Jun 2006 - mcdurdin - Add embedded javascript output (for IMX support)
                     21 Jun 2006 - mcdurdin - Add semicolons as necessary to javascript
@@ -89,10 +89,10 @@
                     27 May 2015 - mcdurdin - I4724 - Compiler generates warnings for JSON files if output path is source path
                     24 Aug 2015 - mcdurdin - I4872 - OSK font and Touch Layout font should be the same in Developer
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     28 Feb 2018 - jahorton - GH 281 - Changed the compilation targets for KMW 10 to better support deadkeys.
-                    
+
 *)
 unit CompileKeymanWeb;  // I3306  // I3310
 
@@ -218,6 +218,7 @@ type
     function JavaScript_String(ch: DWord): string;  // I2242
 
     function IsKeyboardVersion10OrLater: Boolean;
+    function IsKeyboardVersion14OrLater: Boolean;
 
     procedure ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971
     function ExpandSentinel(pwsz: PWideChar): TSentinelRecord;
@@ -936,9 +937,17 @@ var
           end;
         CODE_DEADKEY:
           Result := Result + nlt + Format('k.KDO(%d,t,%d);', [len, recContext.Deadkey.Deadkey]);   // I4611
+        CODE_NOTANY:
+          begin
+            // #917: Minimum version required is 14.0: the KCXO function was only added for 14.0
+            // Note that this is checked in compiler.cpp as well, so this error can probably never occur
+            if not IsKeyboardVersion14OrLater then
+              ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement notany in context() match requires version 14.0+ of KeymanWeb', [GetCodeName(recContext.Code)]));  // I1971   // I4061
+            Result := Result + nlt + Format('k.KCXO(%d,t,%d,%d);', [len, AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext)), AdjustIndex(fkp.dpContext, ContextIndex)]);
+          end;
         else
         begin
-          ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement %s is not currently supported in CODE_CONTEXT match', [GetCodeName(recContext.Code)]));  // I1971   // I4061
+          ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement %s is not currently supported in context() match', [GetCodeName(recContext.Code)]));  // I1971   // I4061
         //CODE_NUL: ;     // todo: check if context is longer than that...
           Result := Result + nlt + '/*.*/ ';   // I4611
         end;
@@ -1540,6 +1549,30 @@ type
   TKeyIdType = (Key_Invalid, Key_Constant, Key_Touch, Key_Unicode);   // I4142
 const
   CRequiredKeys: TRequiredKeys = [K_LOPT, K_BKSP, K_ENTER];   // I4447
+
+  // See also builder.js: specialCharacters; visualKeyboard.ts: specialCharacters
+  CSpecialText10: string =
+    '*Shift*'#0'*Enter*'#0'*Tab*'#0'*BkSp*'#0'*Menu*'#0'*Hide*'#0'*Alt*'#0'*Ctrl*'#0'*Caps*'#0+
+    '*ABC*'#0'*abc*'#0'*123*'#0'*Symbol*'#0'*Currency*'#0'*Shifted*'#0'*AltGr*'#0'*TabLeft*';
+
+  // these names were added in Keyman 14
+  CSpecialText14: string =
+    '*LTREnter*'#0'*LTRBkSp*'#0'*RTLEnter*'#0'*RTLBkSp*'#0'*ShiftLock*'#0'*ShiftedLock*'#0'*ZWNJ*'#0'*ZWNJiOS*'#0'*ZWNJAndroid*';
+  CSpecialText14ZWNJ: string =
+    '*ZWNJ*'#0'*ZWNJiOS*'#0'*ZWNJAndroid*';
+
+  CSpecialText14Map: array[0..8,0..1] of string = (
+    ('*LTREnter*',    '*Enter*'),
+    ('*LTRBkSp*',     '*BkSp*'),
+    ('*RTLEnter*',    '*Enter*'),
+    ('*RTLBkSp*',     '*BkSp*'),
+    ('*ShiftLock*',   '*Shift*'),
+    ('*ShiftedLock*', '*Shifted*'),
+    ('*ZWNJ*',        '<|>'),
+    ('*ZWNJiOS*',     '<|>'),
+    ('*ZWNJAndroid*', '<|>')
+  );
+
 var
   FPlatform: TTouchLayoutPlatform;
   FLayer: TTouchLayoutLayer;
@@ -1556,7 +1589,7 @@ var
         ((ch >= $00A0) and (ch <= $10FFFF));
     end;
 
-    function KeyIdType(FId: string): TKeyIdType;   // I4142
+    function KeyIdType(const FId: string): TKeyIdType;   // I4142
     begin
       Result := Key_Invalid;
       case UpCase(FId[1]) of
@@ -1566,7 +1599,7 @@ var
       end;
     end;
 
-    procedure CheckKey(FId, FNextLayer: string; FKeyType: TTouchKeyType);   // I4119
+    procedure CheckKey(const FId, FText, FNextLayer: string; FKeyType: TTouchKeyType);   // I4119
     var
       FValid: TKeyIdType;
       v: Integer;
@@ -1616,6 +1649,26 @@ var
         if FDictionary.IndexOf(FId) < 0 then
           ReportError(0, CWARN_TouchLayoutCustomKeyNotDefined, 'Key "'+FId+'" on layer "'+FLayer.Id+'", platform "'+FPlatform.Name+'", is a custom key but has no corresponding rule in the source.');
       end;
+
+      //
+      // Check that if the key has a *special* label, it is available in the target version
+      //
+      if FText.StartsWith('*') and FText.EndsWith('*') and (FText.Length > 2) then
+      begin
+        // Keyman versions before 14 do not support '*special*' labels on non-special keys.
+        // ZWNJ use, however, is safe because it will be transformed in function
+        // TransformSpecialKeys14 to '<|>',  which does not require the custom OSK font.
+        if (CSpecialText10.Contains(FText) or CSpecialText14.Contains(FText)) and
+            not CSpecialText14ZWNJ.Contains(FText) and
+            not IsKeyboardVersion14OrLater and
+            not (FKeyType in [tktSpecial, tktSpecialActive]) then
+        begin
+          ReportError(0, CWARN_TouchLayoutSpecialLabelOnNormalKey,
+            Format('Key "%s" on layout "%s", platform "%s" does not have the key type "Special" or "Special (active)" but has the label "%s". This feature is only supported in Keyman 14 or later', [
+              FId, FLayer.Id, FPlatform.Name, FText
+            ]));
+        end;
+      end;
     end;
 
     procedure CheckDictionaryKeyValidity;   // I4142
@@ -1652,6 +1705,24 @@ var
             Inc(gp);
             Inc(fgp);
           end;
+        end;
+      end;
+    end;
+
+    procedure TransformSpecialKeys14(var sLayoutFile: string);
+    var
+      i: Integer;
+    begin
+      // Rewrite Special key labels that are only supported in Keyman 14+
+      // This code is a little ugly but effective.
+      if not IsKeyboardVersion14OrLater then
+      begin
+        for i := 0 to High(CSpecialText14Map) do
+        begin
+          // Assumes the JSON output format will not change
+          if FDebug
+            then sLayoutFile := ReplaceStr(sLayoutFile, '"text": "'+CSpecialText14Map[i][0]+'"', '"text": this._v>13 ? "'+CSpecialText14Map[i][0]+'" : "'+CSpecialText14Map[i][1]+'"')
+            else sLayoutFile := ReplaceStr(sLayoutFile, '"text":"'+CSpecialText14Map[i][0]+'"', '"text":this._v>13?"'+CSpecialText14Map[i][0]+'":"'+CSpecialText14Map[i][1]+'"');
         end;
       end;
     end;
@@ -1694,9 +1765,9 @@ begin
           for FRow in FLayer.Rows do
             for FKey in FRow.Keys do
             begin
-              CheckKey(FKey.Id, FKey.NextLayer, FKey.SpT);   // I4119
+              CheckKey(FKey.Id, FKey.Text, FKey.NextLayer, FKey.SpT);   // I4119
               for FSubKey in FKey.Sk do
-                CheckKey(FSubKey.Id, FSubKey.NextLayer, FSubKey.SpT);   // I4119
+                CheckKey(FSubKey.Id, FKey.Text, FSubKey.NextLayer, FSubKey.SpT);   // I4119
             end;
 
           if FRequiredKeys <> CRequiredKeys then
@@ -1704,11 +1775,11 @@ begin
         end;
       end;
 
-      if not FDebug then   // I4139
-      begin
-        // This strips out formatting for a big saving in file size
-        sLayoutFile := Save(False);
-      end;
+      // If not debugging, then this strips out formatting for a big saving in file size
+      // This also normalises any values such as Pad or Width which should be strings
+      sLayoutFile := Write(FDebug);
+
+      TransformSpecialKeys14(sLayoutFile);
     finally
       Free;
     end;
@@ -1910,6 +1981,8 @@ begin
     'function %s()%s'+
     '{%s'+
     '%s%s%s'+
+    // Following line caches the Keyman major version
+    '%sthis._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;%s'+
     '%sthis.KI="%s";%s'+
     '%sthis.KN="%s";%s'+
     '%sthis.KMINVER="%d.%d";%s'+
@@ -1927,6 +2000,7 @@ begin
     sName, nl,
     nl,
     FTabStop, JavaScript_SetupDebug, nl,
+    FTabStop, nl,
     FTabStop, sName, nl,
     FTabStop, RequotedString(sFullName), nl,
     FTabStop, (fk.version and VERSION_MASK_MAJOR) shr 8, fk.version and VERSION_MASK_MINOR, nl,
@@ -1946,7 +2020,6 @@ begin
 
   if sLayoutFile <> '' then  // I3483
   begin
-    // Layout file format should be JSON: e.g: {...}
     Result := Result + Format('%sthis.KVKL=%s;%s', [FTabStop, sLayoutFile, nl]);   // I3681
   end;
 
@@ -2174,6 +2247,11 @@ end;
 function TCompileKeymanWeb.IsKeyboardVersion10OrLater: Boolean;
 begin
   Result := fk.version >= VERSION_100;
+end;
+
+function TCompileKeymanWeb.IsKeyboardVersion14OrLater: Boolean;
+begin
+  Result := fk.version >= VERSION_140;
 end;
 
 procedure TCompileKeymanWeb.CheckStoreForInvalidFunctions(key: PFILE_KEY; store: PFILE_STORE);  // I1520
@@ -2509,4 +2587,3 @@ begin
 end;
 
 end.
-

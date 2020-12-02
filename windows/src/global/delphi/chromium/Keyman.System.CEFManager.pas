@@ -27,6 +27,8 @@ type
     FWindows: TList<IKeymanCEFHost>;
     FShutdownCompletionHandler: TNotifyEvent;
     procedure CompletionHandler(Sender: IKeymanCEFHost);
+    procedure Cleanup(Sender: TObject);
+    procedure LaunchWatchdog;
   public
     const ProcessMessage_GetWindowSize = 'ProcessMessage_ResizeByContent';
   public
@@ -48,12 +50,11 @@ implementation
 uses
   System.SysUtils,
   Winapi.ShlObj,
+  Winapi.Tlhelp32,
   Winapi.Windows,
 
-//  ExternalExceptionHandler,
   KeymanPaths,
   KeymanVersion,
-//  RedistFiles,
   RegistryKeys,
   VersionInfo,
   uCEFConstants,
@@ -62,18 +63,11 @@ uses
   uCEFMiscFunctions,
   uCEFProcessMessage,
   uCEFTypes;
-//  UTikeDebugMode;
 
 procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
                                                     sourceProcess : TCefProcessId;
                                               const message       : ICefProcessMessage;
                                               var   aHandled      : boolean); forward;
-
-procedure GlobalCEFApp_UncaughtException(const browser    : ICefBrowser;
-                                         const frame      : ICefFrame;
-                                         const context    : ICefv8Context;
-                                         const e          : ICefV8Exception;
-                                         const stackTrace : ICefV8StackTrace); forward;
 { TInitializeCEF }
 
 procedure TCEFManager.CompletionHandler(Sender: IKeymanCEFHost);
@@ -118,17 +112,24 @@ begin
   GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36 (TIKE/'+SKeymanVersion+')';
 
   GlobalCEFApp.OnProcessMessageReceived := GlobalCEFApp_ProcessMessageReceived;
-  GlobalCEFApp.OnUncaughtException := GlobalCEFApp_UncaughtException;
-  GlobalCEFApp.UncaughtExceptionStackSize := 64;
+
+  // We no longer attempt to cleanup before shutdown, and rely on the child cef
+  // processes to do the cleanup, which is more reliable.
+  // TKeymanSentryClient.OnBeforeShutdown := Self.Cleanup;
+end;
+
+procedure TCEFManager.Cleanup(Sender: TObject);
+begin
+  FreeAndNil(FWindows);
+  GlobalCEFApp.Free;
+  GlobalCEFApp := nil;
+  FInitializeCEF := nil;
 end;
 
 destructor TCEFManager.Destroy;
 begin
   Assert(FWindows.Count = 0);
-  FreeAndNil(FWindows);
-  GlobalCEFApp.Free;
-  GlobalCEFApp := nil;
-  FInitializeCEF := nil;
+  Cleanup(nil);
   inherited Destroy;
 end;
 
@@ -139,12 +140,80 @@ end;
 
 function TCEFManager.Start: Boolean;
 begin
+  if GlobalCEFApp.ProcessType <> ptBrowser then
+  begin
+    LaunchWatchdog;
+  end;
+
   Result := GlobalCEFApp.StartMainProcess;
 end;
 
 function TCEFManager.StartSubProcess: Boolean;
 begin
+  LaunchWatchdog;
   Result := GlobalCEFApp.StartSubProcess;
+end;
+
+/// Start a watchdog thread to terminate process when parent does
+///
+/// Description: This should be run only in the context of the child process.
+/// It will normally only happen in an abnormal termination of the parent
+/// process (because otherwise the main thread of the child process receives an
+/// orderly request to shut down, and does so), but in the situation where the
+/// parent process disappears without making that request, this lets the child
+/// process do the work.
+///
+/// This is probably a gap in Chromium Embedded Framework but AFAICT it has not
+/// been resolved and this was the suggested fix, e.g. at
+/// https://magpcss.org/ceforum/viewtopic.php?p=37820&sid=11f6fcabc4089e41283bd5b9ec17267e#p37820
+/// which I have taken and cleaned up because it seemed appropriate.
+///
+procedure TCEFManager.LaunchWatchdog;
+
+  function GetParentProcess: THandle;
+  var
+    Snapshot: THandle;
+    ProcessEntry: TProcessEntry32;
+    CurrentProcessId: DWORD;
+  begin
+    Snapshot := CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if Snapshot = INVALID_HANDLE_VALUE then
+      Exit(0);
+
+    FillChar(ProcessEntry, sizeof(TProcessEntry32), 0);
+    ProcessEntry.dwSize := sizeof(TProcessEntry32);
+    CurrentProcessId := GetCurrentProcessId;
+
+    if Process32First(Snapshot, ProcessEntry) then
+    begin
+      repeat
+        if ProcessEntry.th32ProcessID = CurrentProcessId then
+          Break;
+      until not Process32Next(Snapshot, ProcessEntry);
+    end;
+
+    CloseHandle(Snapshot);
+
+    if ProcessEntry.th32ProcessID <> CurrentProcessId then
+      Exit(0);
+
+    Result := OpenProcess(SYNCHRONIZE, False, ProcessEntry.th32ParentProcessID);
+  end;
+
+var
+  hParentProcess: THandle;
+begin
+  hParentProcess := GetParentProcess;
+  if hParentProcess <> 0 then
+  begin
+    TThread.CreateAnonymousThread(
+      procedure
+      begin
+        WaitForSingleObject(hParentProcess, INFINITE);
+        ExitProcess(0);
+      end
+    ).Start;
+  end;
 end;
 
 function TCEFManager.StartShutdown(CompletionHandler: TNotifyEvent): Boolean;
@@ -218,34 +287,6 @@ begin
       aHandled := True;
     end;
   end;
-end;
-
-
-procedure GlobalCEFApp_UncaughtException(const browser    : ICefBrowser;
-                                         const frame      : ICefFrame;
-                                         const context    : ICefv8Context;
-                                         const e          : ICefV8Exception;
-                                         const stackTrace : ICefV8StackTrace);
-var
-  log, id: string;
-  I: Integer;
-begin
-  id := LowerCase(ExtractFileName(ParamStr(0)))+'_'+GetVersionString+'_script_unknown';
-  I := string(frame.Url).LastDelimiter('/');
-  id := id + '_' + string(frame.Url).SubString(I + 1) + '_' + IntToStr(e.LineNumber);
-
-  log := 'Stack Trace:'#13#10;
-
-  for i := 0 to stackTrace.FrameCount - 1 do
-  begin
-    log := log + '  ' + stackTrace.Frame[i].FunctionName + ' ('+stackTrace.Frame[i].ScriptNameOrSourceUrl+':'+IntToStr(stackTrace.Frame[i].LineNumber)+')'#13#10;
-  end;
-
-  CefLog('CEFManager', 1, CEF_LOG_SEVERITY_ERROR, 'Error '+id+', '+e.Message+' in '+frame.Url);
-
-  {$MESSAGE HINT 'TODO: support exceptions in js windows'}
-  //LogExceptionToExternalHandler(id, 'Error occurred at line '+IntToStr(e.LineNumber)+' of '+e.ScriptResourceName,
-  //  e.Message, log);
 end;
 
 end.

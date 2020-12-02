@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>14.0.24.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Name URL="">keyboardharness</Name>
+    <Version URL="">1.0</Version>
+    <Copyright URL="">©2020 SIL International</Copyright>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\..\..\..\..\..\..\web\testing\chirality\chirality.js</Name>
+      <Description>File chirality.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>..\..\..\..\..\..\..\web\testing\platform\platformtest.js</Name>
+      <Description>File platformtest.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>code2001.ttf</Name>
+      <Description>Font Code2001</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ttf</FileType>
+    </File>
+    <File>
+      <Name>longpress.js</Name>
+      <Description>File longpress.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Development Chirality Test Keyboard</Name>
+      <ID>chirality</ID>
+      <Version></Version>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+    </Keyboard>
+    <Keyboard>
+      <Name>PlatformTest</Name>
+      <ID>platformtest</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+    </Keyboard>
+    <Keyboard>
+      <Name>longpress</Name>
+      <ID>longpress</ID>
+      <Version>1.0</Version>
+      <OSKFont>code2001.ttf</OSKFont>
+      <DisplayFont>code2001.ttf</DisplayFont>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

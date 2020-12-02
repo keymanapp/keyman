@@ -5,7 +5,8 @@
 
 module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude)
-  basePath: '..',
+  // set to Keyman repo base.
+  basePath: '../..',
 
   // Safeguards against disconnecting after starting tests.
   browserNoActivityTimeout: 60000,
@@ -36,33 +37,33 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
-    'unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
+    'web/unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
+    'web/unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
                                           // Includes KMW's Device class, which is used by test_utils below.
-    'unit_tests/dev_resources.js',  // Defines com.keyman.dom objects separate from KMW for unit testing.
-    'unit_tests/test_init_check.js', // Ensures that tests will initialize properly
-    'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
-    'unit_tests/cases/**/*.js', // Where the tests actually reside.
-    'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
-    {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
-    {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'release/unminified/web/**/*.png', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'release/unminified/web/**/*.eot', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'release/unminified/web/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'release/unminified/web/**/*.woff', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
-    {pattern: 'release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
-    {pattern: 'unit_tests/recorder_InputEvents.js.map', watched: true, served: true, included: false},
-    {pattern: 'unit_tests/element-interface.js.map', watched: true, served: true, included: false},
-    {pattern: 'unit_tests/dev_resources.js.map', watched: true, served: true, included: false},
-    {pattern: 'unit_tests/fixtures/**/*.html', watched: true} // HTML structures useful for testing.
+    'web/unit_tests/dev_resources.js',  // Defines com.keyman.dom objects separate from KMW for unit testing.
+    'web/unit_tests/test_init_check.js', // Ensures that tests will initialize properly
+    'web/unit_tests/test_utils.js', // A basic utility script useful for constructing tests
+    'web/unit_tests/cases/**/*.js', // Where the tests actually reside.
+    'common/core/web/tests/resources/json/**/*.json', // Where pre-loaded JSON resides.
+    {pattern: 'common/core/web/tests/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
+    {pattern: 'common/core/web/tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
+    {pattern: 'web/release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/release/unminified/web/**/*.png', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/release/unminified/web/**/*.eot', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/release/unminified/web/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/release/unminified/web/**/*.woff', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
+    {pattern: 'web/release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
+    {pattern: 'web/unit_tests/recorder_InputEvents.js.map', watched: true, served: true, included: false},
+    {pattern: 'web/unit_tests/element-interface.js.map', watched: true, served: true, included: false},
+    {pattern: 'web/unit_tests/dev_resources.js.map', watched: true, served: true, included: false}
   ],
 
   proxies: {
-    "/source/": "/base/release/unminified/web/",
-    "/resources/": "/base/unit_tests/resources/",
-    "/source/recorder_InputEvents.js.map": "/base/unit_tests/recorder_InputEvents.js.map"
+    "/source/": "/base/web/release/unminified/web/",
+    "/resources/": "/base/common/core/web/tests/resources/",
+    "/source/recorder_InputEvents.js.map": "/base/common/core/web/tests/recorder_InputEvents.js.map"
   },
 
 
@@ -73,13 +74,17 @@ module.exports = {
   // preprocess matching files before serving them to the browser
   // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
   preprocessors: {
-    'unit_tests/fixtures/**/*.html'	: ['html2js'],
-    'unit_tests/json/**/*.json' : ['json_fixtures']
+    'common/core/web/tests/resources/fixtures/**/*.html'	: ['html2js'],
+    'common/core/web/tests/resources/json/**/*.json' : ['json_fixtures']
+  },
+
+  html2JsPreprocessor: {
+    stripPrefix: 'common/core/web/tests/resources/'
   },
 
   // Settings to properly configure how JSON fixtures are automatically loaded by Karma.
   jsonFixturesPreprocessor: {
-    stripPrefix: 'unit_tests/json',
+    stripPrefix: 'common/core/web/tests/resources/json',
     variableName: '__json__'
   },
 

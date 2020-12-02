@@ -26,7 +26,7 @@ if(typeof MockTests == 'undefined') {
     MockTests.initBase = function() {
       var id = DynamicElements.addInput();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.Input(elem);
+      var wrapper = new com.keyman.dom.targets.Input(elem);
 
       return wrapper;
     }
@@ -65,7 +65,7 @@ describe('OutputTarget Mocking', function() {
   this.timeout(kmwconfig.timeouts.standard);
 
   before(function() {
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
     
     // Make sure the basic SMP extension hooks exist to prevent errors later.
     String.kmwEnableSupplementaryPlane(true);

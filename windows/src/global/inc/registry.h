@@ -90,7 +90,10 @@
 #define REGSZ_KeymanError		"keyman error"
    // I3613
 #define REGSZ_LanguageProfiles "Language Profiles"
+#define REGSZ_TransientLanguageProfiles "Transient Language Profiles"
 #define REGSZ_ProfileGUID   "profile guid"
+#define REGWSZ_ProfileGUID L"" ## REGSZ_ProfileGUID
+#define REGSZ_LanguageProfiles_LangID "LangID"
 
 #define REGSZ_LayoutID			"layout id"
 
@@ -125,6 +128,13 @@
 /* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 
 #define REGSZ_DeepTSFIntegration  "deep tsf integration"
+
+/* Privacy settings - all DWORD 0/1 */
+
+#define REGSZ_IDEOptions_CU   ( REGSZ_KeymanDeveloperCU "\\IDE\\Options" )
+
+#define REGSZ_AutomaticallyReportErrors "automatically report errors"              // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
+#define REGSZ_AutomaticallyReportUsage  "automatically report usage"               // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
 
 /* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry 
    correctly -- readonly wherever possible. */

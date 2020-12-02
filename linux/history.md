@@ -1,15 +1,21 @@
 # Keyman for Linux Version History
 
-# 2020-02-18 13.0.30 beta
+## 2020-02-20 13.0.101 stable
+* Bug Fix: Add Keyman gsettings schema to manifest (#2688)
+
+## 2020-02-19 13.0.100 stable
+* 13.0 stable release
+
+## 2020-02-18 13.0.30 beta
 * Bug Fix:
   * Include Keyman gsettings schema for packaging (#2675)
 
-# 2020-02-17 13.0.29 beta
+## 2020-02-17 13.0.29 beta
 * Bug Fix:
   * Fix how tier is determined for debian watch files (#2664)
   * Fix keyboard processor compilation for Xenial (#2648)
 
-# 2020-02-11 13.0.28 beta
+## 2020-02-11 13.0.28 beta
 * Bug Fix:
   * Incorporate packaging fixes from 14.0 development (#2624)
 

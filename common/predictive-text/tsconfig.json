@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "outFile": "build/headless.js",
     "module": "none",
-    "outFile": "./build/index.js",
     "inlineSources": true,
     "sourceMap": true,
     "target": "es5",
-    "lib": ["es6", "dom"]
+    "lib": ["es6"]
   },
   "include" : [
     "./*.ts"
   ],
   "exclude" : [
+    "web-defaultWorker.ts",
     "node_modules",
     "testing"
   ]

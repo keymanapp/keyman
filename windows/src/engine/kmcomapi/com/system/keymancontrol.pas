@@ -107,7 +107,6 @@ type
     FAutoApply: Boolean;
     FKeymanCustomisation: IKeymanCustomisation;
 
-    procedure RefreshWndProc(var Message: TMessage);
     function RunKeymanConfiguration(const filename: string): Boolean;
     procedure ApplyToRunningKeymanEngine;
     function FindMasterControllerWindow: THandle;
@@ -147,6 +146,8 @@ type
     procedure EnableUserInterface; safecall;
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
 
+    procedure DiagnosticTestException; safecall;
+
     { IIntKeymanControl }
     procedure AutoApplyKeyman;
     procedure ApplyKeyman;
@@ -180,7 +181,6 @@ uses
   keymanerrorcodes, psapi, Variants, KLog;
 
 var
-  wm_keyman_refresh: Integer = 0;
   wm_keyman: Integer = 0;
 
 {$IFNDEF WIN64}
@@ -352,20 +352,25 @@ begin
 end;
 
 procedure TKeymanControl.ApplyToRunningKeymanEngine;
-const
-  KR_REQUEST_REFRESH = 0;
-var
-  msg: TMsg;
 begin
-  // This convoluted way of refreshing keyman ensures that km is init for the thread.  Other methods would work but this is easiest
-  // Note that this creates a message queue on the thread which means it should be avoided for console apps, etc.
-  if wm_keyman_refresh = 0 then
-    wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
-  RefreshHandle := AllocateHWnd(RefreshWndProc);
-  PostMessage(RefreshHandle, wm_keyman_refresh, KR_REQUEST_REFRESH, 0);
-  GetMessage(msg, RefreshHandle, wm_keyman_refresh, wm_keyman_refresh);
-  DispatchMessage(msg);
-  DeallocateHWnd(RefreshHandle);
+  // This convoluted way of refreshing keyman ensures that km is init for the thread.
+  // Other methods would work but this is easiest
+  TThread.CreateAnonymousThread(
+    procedure
+    const
+      KR_REQUEST_REFRESH = 0;
+    var
+      msg: TMsg;
+      wm_keyman_refresh: UINT;
+    begin
+      wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
+      RefreshHandle := AllocateHWnd(nil);
+      PostMessage(RefreshHandle, wm_keyman_refresh, KR_REQUEST_REFRESH, 0);
+      GetMessage(msg, RefreshHandle, wm_keyman_refresh, wm_keyman_refresh);
+      DispatchMessage(msg);
+      DeallocateHWnd(RefreshHandle);
+    end
+  ).Start;
 end;
 
 constructor TKeymanControl.Create(AContext: TKeymanContext);
@@ -436,10 +441,9 @@ begin
     FKeymanCustomisation.Refresh;
 end;
 
-procedure TKeymanControl.RefreshWndProc(var Message: TMessage);
+procedure TKeymanControl.DiagnosticTestException;
 begin
-  with Message do
-    Result := DefWindowProc(RefreshHandle, Msg, WParam, LParam);
+  raise Exception.Create('Testing safecall wrappering of exception for Sentry');
 end;
 
 procedure TKeymanControl.DisableUserInterface;
@@ -470,19 +474,6 @@ begin
 end;
 
 
-{procedure TKeymanVisualKeyboard.Print;  // I2329
-var
-  pkg: IKeymanPackageInstalled;
-  kbd: IKeymanKeyboardInstalled;
-begin
-  kbd := GetOwnerKeyboard;
-  if not Assigned(kbd) then Exit;
-  pkg := kbd.Get_OwnerPackage;
-  if Assigned(pkg) then
-    Context.Control.RunKeymanConfiguration('-kp "'+kbd.ID+'"');
-end;}
-
-
 {**
   Control of startup and shutdown of keyman32.dll -- implemented only by 32 bit;
   generally these functions are intended to be used only by keyman.exe.
@@ -494,9 +485,7 @@ begin
   Error(Cardinal(E_NOTIMPL));
 {$ELSE}
   LoadKeyman32;
-
   StartKeyman32;
-  (Context.Keyboards as IIntKeymanKeyboardsInstalled).StartKeyboards;   // I4381
 {$ENDIF}
 end;
 
@@ -504,9 +493,6 @@ procedure TKeymanControl.StopKeyman32Engine;   // I5133
 begin
 {$IFDEF WIN64}
   Error(Cardinal(E_NOTIMPL));
-{$ELSE}
-  if Context.Keyboards <> nil then
-    (Context.Keyboards as IIntKeymanKeyboardsInstalled).StopKeyboards;   // I4381
 {$ENDIF}
 end;
 

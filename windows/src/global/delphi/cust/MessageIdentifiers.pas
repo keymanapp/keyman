@@ -22,7 +22,6 @@ unit MessageIdentifiers;
 interface
 
 uses
-  keymanapi_TLB,
   MessageIdentifierConsts;
 
 function MsgFromId(const msgid: TMessageIdentifier): WideString;
@@ -31,30 +30,23 @@ function MsgFromIdFormat(const msgid: TMessageIdentifier; const args: array of c
 
 implementation
 
-uses SysUtils, Unicode, kmint, custinterfaces;
-
+uses
+  kmint,
+  Keyman.System.LocaleStrings;
 
 function MsgFromStr(const str: WideString): WideString;
 begin
-  if kmcom = nil
-    then Result := str
-    else Result := Trim(kmint.KeymanCustomisation.CustMessages.MessageFromID(str));
+  Result := TLocaleStrings.MsgFromStr(kmcom, str);
 end;
 
 function MsgFromId(const msgid: TMessageIdentifier): WideString;
 begin
-  if kmcom = nil
-    then Result := IntToStr(Ord(msgid))
-    else Result := Trim(kmint.KeymanCustomisation.CustMessages.MessageFromID(StringFromMsgId(msgid)));
+  Result := TLocaleStrings.MsgFromId(kmcom, msgid);
 end;
 
 function MsgFromIdFormat(const msgid: TMessageIdentifier; const args: array of const): WideString;
 begin
-  try
-    Result := WideFormat(MsgFromId(msgid), args);
-  except
-    Result := MsgFromId(msgid) + ' (error displaying message parameters)';
-  end;
+  Result := TLocaleStrings.MsgFromIdFormat(kmcom, msgid, args);
 end;
 
 end.

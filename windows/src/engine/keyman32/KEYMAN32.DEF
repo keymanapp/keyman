@@ -19,6 +19,7 @@ EXPORTS
       TIPActivateEx
       TIPActivateKeyboard
 			TIPProcessKey
+      TIPIsKeymanRunning
       GetKeyboardPreservedKeys
 
 			GetActiveKeymanID
@@ -36,3 +37,5 @@ EXPORTS
   	  Keyman_WriteDebugEvent
 
       Keyman_UpdateTouchPanelVisibility
+
+      Keyman_Diagnostic

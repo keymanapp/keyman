@@ -27,6 +27,19 @@ object frmVisualKeyboard: TfrmVisualKeyboard
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
+  object imgDown: TImage
+    Left = 224
+    Top = 80
+    Width = 105
+    Height = 105
+    Picture.Data = {
+      07544269746D61707E000000424D7E000000000000003E000000280000001000
+      000010000000010001000000000040000000C40E0000C40E0000020000000200
+      0000FFFFFF00000000000000000000000000000000000180000003C0000007E0
+      00000FF000001FF800003FFC00007FFE00000000000000000000000000000000
+      00000000000000000000}
+    Visible = False
+  end
   object panContent: TPanel
     AlignWithMargins = True
     Left = 2
@@ -50,7 +63,6 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       BevelOuter = bvNone
       TabOrder = 0
       Visible = False
-      ExplicitHeight = 198
     end
     object panEntryHelper: TPanel
       Left = 0
@@ -61,7 +73,6 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       BevelOuter = bvNone
       TabOrder = 1
       Visible = False
-      ExplicitHeight = 198
     end
     object panKeyboard: TPanel
       Left = 0
@@ -78,7 +89,6 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       ParentBackground = False
       TabOrder = 2
       VerticalAlignment = taAlignTop
-      ExplicitHeight = 198
     end
     object status: TStatusBar
       Left = 0
@@ -227,7 +237,6 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       TabOrder = 5
       VerticalAlignment = taAlignTop
       Visible = False
-      ExplicitHeight = 198
     end
     object panFontHelper: TPanel
       Left = 0
@@ -245,7 +254,6 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       TabOrder = 6
       VerticalAlignment = taAlignTop
       Visible = False
-      ExplicitHeight = 198
     end
   end
   object tmrFade: TTimer
@@ -275,5 +283,10 @@ object frmVisualKeyboard: TfrmVisualKeyboard
   object ilKeyboards: TexImageList
     Left = 136
     Top = 64
+  end
+  object mnuKeyboards: TPopupMenu
+    Images = ilKeyboards
+    Left = 264
+    Top = 120
   end
 end

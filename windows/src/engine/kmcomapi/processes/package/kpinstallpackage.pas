@@ -46,11 +46,11 @@ interface
 uses kpbase, keymanapi_TLB;
 
 type
+  TKPInstallPackageOptions = set of (ipForce, ipLegacyRegisterAndInstallProfiles);
+
   TKPInstallPackage = class(TKPBase)
-  private
-    procedure UpdateLocaleDoctype(const path: WideString);
   public
-    procedure Execute(const FileName: string; Force: Boolean);
+    procedure Execute(const FileName: string; Options: TKPInstallPackageOptions);
   end;
 
 implementation
@@ -86,7 +86,7 @@ uses
 { TKPInstallPackage }
 
 
-procedure TKPInstallPackage.Execute(const FileName: string; Force: Boolean);
+procedure TKPInstallPackage.Execute(const FileName: string; Options: TKPInstallPackageOptions);
       function GetHHIcon: string;
       var
         buf: array[0..260] of char;
@@ -115,9 +115,14 @@ var
 
   procedure InstallKeyboard(FileName: string);
   var
+    FOptions: TKPInstallKeyboardOptions;
     kbd: TPackageKeyboard;
     FLanguages: TPackageKeyboardLanguageList;
   begin
+    FOptions := [ikPartOfPackage];
+    if ipLegacyRegisterAndInstallProfiles in Options then
+      Include(FOptions, ikLegacyRegisterAndInstallProfiles);
+
     kbd := inf.Keyboards.ItemByID(GetShortKeyboardName(FileName));
     if Assigned(kbd) and (kbd.Languages.Count > 0) then
     begin
@@ -128,14 +133,14 @@ var
 
     with TKPInstallKeyboard.Create(Context) do
     try
-      Execute(FileName, PackageName, [ikPartOfPackage], FLanguages, Force);
+      Execute(FileName, PackageName, FOptions, FLanguages, ipForce in Options);
     finally
       Free;
     end;
   end;
 
 begin
-  KL.MethodEnter(Self, 'Execute', [FileName, Force]);
+  KL.MethodEnter(Self, 'Execute', [FileName, ipForce in Options]);
   try
     if not IsAdministrator then
       Error(KMN_E_Install_KeyboardMustBeInstalledByAdmin);   // I3612
@@ -210,7 +215,7 @@ begin
         PackageName := GetShortPackageName(FileName);
         dest := GetPackageInstallPath(FileName) + '\';
 
-        if PackageInstalled(PackageName, FInstByAdmin) and not Force then
+        if PackageInstalled(PackageName, FInstByAdmin) and not (ipForce in Options) then
           Error(KMN_E_PackageInstall_PackageAlreadyInstalled);
 
         with TRegistryErrorControlled.Create do  // I2890
@@ -248,21 +253,13 @@ begin
         for i := 0 to inf.Files.Count - 1 do
         begin
           case inf.Files[i].FileType of
-            ftOther, ftXMLFile:
-              begin
-                if Copy(inf.Files[i].FileName, 1, 7) = 'locale-' then
-                begin
-                  // Update the locale file's
-                  UpdateLocaleDoctype(dest + inf.Files[i].FileName);
-                end;
-              end;
             ftKeymanFile:
               InstallKeyboard(dest + inf.Files[i].FileName);
 
             ftPackageFile:
               with TKPInstallPackage.Create(Context) do
               try
-                Execute(dest + inf.Files[i].FileName, Force);
+                Execute(dest + inf.Files[i].FileName, Options);
               finally
                 Free;
               end;
@@ -346,45 +343,5 @@ begin
   end;
 end;
 
-procedure TKPInstallPackage.UpdateLocaleDoctype(const path: WideString);
-var
-  I: Integer;
-  localedefpath: WideString;
-  ss: Widestring;
-  n1: Integer;
-  n2: Integer;
-  l: Integer;
-begin
-  localedefpath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_Xml_LocaleDef);
-
-  with TStringList.Create do
-  try
-    LoadFromFile(path);  // Rely on preamble for encoding
-    ss := Text;   // I1320 - fix locale.xml doctype parsing and replacement
-
-    n1 := Pos('<!DOCTYPE', string(ss));
-    if n1 > 0 then
-    begin
-      i := 1; n2 := n1 + 8; l := Length(ss);
-      while (i > 0) and (n2 <= l) do
-      begin
-        case ss[n2] of
-          '<': Inc(i);
-          '>': Dec(i);
-        end;
-        Inc(n2);
-      end;
-
-      if n2 <= l then
-      begin
-        Text := Copy(ss, 1, n1-1) + '<!DOCTYPE Locale SYSTEM '''+localedefpath+'''>' + Copy(ss, n2+1, l);
-
-        SaveToFile(path);  // Stay with previous encoding
-      end;
-    end;
-  finally
-    Free;
-  end;
-end;
-
 end.
+

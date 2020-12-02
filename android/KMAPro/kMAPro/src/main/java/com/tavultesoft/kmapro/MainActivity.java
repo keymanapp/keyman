@@ -24,16 +24,25 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
+import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMPLink;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.net.Uri.Builder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -62,12 +71,9 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.widget.PopupMenu;
 
 import android.text.Html;
 import android.util.Log;
@@ -84,8 +90,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.sentry.SentryLevel;
 import io.sentry.android.core.SentryAndroid;
-import io.sentry.core.Sentry;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -94,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   // Fields used for installing kmp packages
   private static final int PERMISSION_REQUEST_STORAGE = 0;
   public static final int READ_REQUEST_CODE = 42;
-  Uri data;
 
   private static final String TAG = "MainActivity";
 
@@ -106,44 +111,15 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
-  protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
+  private Uri data;
 
+  private static Dataset repo;
+  private boolean didExecuteParser = false;
 
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
-
-  private class DownloadResultReceiver extends ResultReceiver {
-    public DownloadResultReceiver(Handler handler) {
-      super(handler);
-    }
-
-    @Override
-    protected void onReceiveResult(int resultCode, Bundle resultData) {
-      if (progressDialog != null && progressDialog.isShowing()) {
-        progressDialog.dismiss();
-      };
-      progressDialog = null;
-      switch(resultCode) {
-        case FileUtils.DOWNLOAD_ERROR :
-          Toast.makeText(getApplicationContext(), "Download failed",
-            Toast.LENGTH_SHORT).show();
-          break;
-        case FileUtils.DOWNLOAD_SUCCESS :
-          String downloadedFilename = resultData.getString("filename");
-          String kmpFilename = resultData.getString("destination") + File.separator + downloadedFilename;
-
-          Bundle bundle = new Bundle();
-          bundle.putString("kmpFile", kmpFilename);
-          Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
-          packageIntent.putExtras(bundle);
-          startActivity(packageIntent);
-          break;
-      }
-      super.onReceiveResult(resultCode, resultData);
-    }
-  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -151,9 +127,33 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     super.onCreate(savedInstanceState);
     context = this;
 
-    SentryAndroid.init(context);
+    checkSendCrashReport();
+    if (KMManager.getMaySendCrashReport()) {
+      SentryAndroid.init(context, options -> {
+        options.setBeforeBreadcrumb((breadcrumb, hint) -> {
+          String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
+          if ("navigation".equals(breadcrumb.getCategory()) && breadcrumb.getLevel() == SentryLevel.INFO &&
+            ((breadcrumb.getData("from") != null) || (breadcrumb.getData("to") != null)) ) {
+            // Sanitize navigation breadcrumbs
+            String dataFrom = String.valueOf(breadcrumb.getData("from"));
+            dataFrom = dataFrom.replaceAll(NAVIGATION_PATTERN, "$1$2");
+            breadcrumb.setData("from", dataFrom);
+            String dataTo = String.valueOf(breadcrumb.getData("to"));
+            dataTo = dataTo.replaceAll(NAVIGATION_PATTERN, "$1$2");
+            breadcrumb.setData("to", dataTo);
 
-    resultReceiver = new DownloadResultReceiver(new Handler());
+            return breadcrumb;
+          } else {
+            return breadcrumb;
+          }
+        });
+        options.setRelease("release-" + com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
+        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
+      });
+    }
+
+    checkStoragePermission(null);
+    resultReceiver = new DownloadResultReceiver(new Handler(), context);
 
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
@@ -161,6 +161,43 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     KMManager.executeResourceUpdate(this);
+
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    // Add default keyboard
+    boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
+    if (!installDefaultKeyboard) {
+      if (!KMManager.keyboardExists(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
+          KMManager.KMDefault_LanguageID)) {
+        KMManager.addKeyboard(this, KMManager.getDefaultKeyboard(getApplicationContext()));
+      }
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.putBoolean(defaultKeyboardInstalled, true);
+      editor.commit();
+    }
+
+    // Add default dictionary
+    boolean installDefaultDictionary = prefs.getBoolean(defaultDictionaryInstalled, false);
+    if (!installDefaultDictionary) {
+      LexicalModel defaultLexicalModel = LexicalModel.getDefaultLexicalModel(context);
+      HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
+      lexicalModelInfo.put(KMManager.KMKey_PackageID, defaultLexicalModel.getPackageID());
+      lexicalModelInfo.put(KMManager.KMKey_LanguageID, defaultLexicalModel.getLanguageID());
+      lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, defaultLexicalModel.getLexicalModelID());
+      lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, defaultLexicalModel.getLexicalModelName());
+      lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, defaultLexicalModel.getVersion());
+      /*
+      // If welcome.htm exists, add custom help link
+      welcomeFile = new File(KMManager.getLexicalModelsDir(), KMManager.KMDefault_DictionaryPackageID + File.separator + FileUtils.WELCOME_HTM);
+      lexicalModelInfo.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+       */
+      KMManager.addLexicalModel(context, lexicalModelInfo);
+      KMManager.registerAssociatedLexicalModel(KMManager.KMDefault_LanguageID);
+
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.putBoolean(defaultDictionaryInstalled, true);
+      editor.commit();
+    }
+
     setContentView(R.layout.activity_main);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
@@ -173,26 +210,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
 
     textView = (KMTextView) findViewById(R.id.kmTextView);
-    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     textView.setText(prefs.getString(userTextKey, ""));
     textSize = prefs.getInt(userTextSizeKey, minTextSize);
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
-    boolean didCheckUserData = prefs.getBoolean(MainActivity.didCheckUserDataKey, false);
-    if (!didCheckUserData && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)) {
-      try {
-        Intent getUserdataIntent = new Intent("keyman.ACTION_GET_USERDATA");
-        startActivityForResult(getUserdataIntent, 0);
-      } catch (Exception e) {
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(MainActivity.didCheckUserDataKey, true);
-        editor.commit();
-        checkGetStarted();
-      }
-    } else {
-      checkGetStarted();
-    }
+    checkGetStarted();
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -204,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       checkGetStarted();
       return;
     } else {
-      boolean didFail = false;
       ClipData userdata = returnIntent.getClipData();
       int len = userdata.getItemCount();
       for (int i = 0; i < len; i++) {
@@ -235,17 +257,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             inputStream.close();
           }
         } catch (Exception e) {
-          didFail = true;
-          Log.e(TAG, e.getMessage());
+          KMLog.LogException(TAG, "", e);
         }
-      }
-
-      if (!didFail) {
-        KMManager.updateOldKeyboardsList(this);
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(MainActivity.didCheckUserDataKey, true);
-        editor.commit();
       }
 
       checkGetStarted();
@@ -258,42 +271,23 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
 
-    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    SharedPreferences.Editor editor = prefs.edit();
-
-    // Check if default keyboard should be added
-    if (!KMManager.keyboardExists(this, KMManager.KMDefault_UndefinedPackageID,
-        KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
-      boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
-      if (!installDefaultKeyboard) {
-        HashMap<String, String> kbInfo = new HashMap<String, String>();
-        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-        kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
-        kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
-        kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
-        kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-        kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
-          this, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
-        kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
-        KMManager.addKeyboard(this, kbInfo);
-      }
-
-      editor.putBoolean(defaultKeyboardInstalled, true);
-      editor.commit();
-    }
-
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
 
-    checkAndInstallDefaultDictionary();
+    // Get calling activity
+    ComponentName component = this.getCallingActivity();
+    String caller = null;
+    if (component != null) {
+      caller = component.getClassName();
+    }
 
     Intent intent = getIntent();
     data = intent.getData();
 
     if (data != null) {
-
-      switch (data.getScheme().toLowerCase()) {
+      String scheme = data.getScheme().toLowerCase();
+      switch (scheme) {
         // content:// Android DownloadManager
         // file:// Chrome downloads and Filebrowsers
         case "content":
@@ -302,13 +296,35 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           break;
         case "http" :
         case "https" :
-          downloadKMP();
+          // Might need to modify link like KMPBrowserActivity
+          String link = data.toString();
+          if (KMPLink.isKeymanInstallLink(link)) {
+            data = KMPLink.getKeyboardDownloadLink(link);
+          }
+          downloadKMP(scheme);
           break;
         case "keyman" :
-          downloadKMP();
+          // Only accept download links from Keyman browser activities
+          if (KMPLink.isKeymanDownloadLink(data.toString()) && caller != null &&
+            (caller.equalsIgnoreCase("com.tavultesoft.kmea.KMPBrowserActivity") ||
+             caller.equalsIgnoreCase("com.tavultesoft.kmapro.WebBrowserActivity"))) {
+
+            // Convert opaque URI to hierarchical URI so the query parameters can be parsed
+            Builder builder = new Uri.Builder();
+            builder.scheme("https")
+              .authority("keyman.com")
+              .appendPath("keyboards")
+              .encodedQuery(data.getEncodedQuery());
+            data = Uri.parse(builder.build().toString());
+            downloadKMP(scheme);
+          } else {
+            String msg = "Unrecognized scheme: " + scheme;
+            KMLog.LogError(TAG, msg);
+          }
           break;
         default :
-          Log.e(TAG, "Unrecognized protocol " + data.getScheme());
+          String msg = "Unrecognized scheme: " + scheme;
+          KMLog.LogError(TAG, msg);
       }
     }
     intent.setData(null);
@@ -344,92 +360,54 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     invalidateOptionsMenu();
   }
 
-
+  @SuppressLint("RestrictedApi")
   @Override
   public boolean onPrepareOptionsMenu(final Menu menu) {
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-
-    if(_overflowMenuItem!=null) {
-      final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
-
-      _rootView.findViewById(R.id.counterBackground).setBackground(
-        this.getResources().getDrawable(R.drawable.ic_light_action_overflow));
-
-      _rootView.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          PopupMenu _popup = new PopupMenu(context, _rootView);
-          getMenuInflater().inflate(R.menu.overflow_menu, _popup.getMenu());
-
-          updateUpdateCountIndicator(
-            _popup.getMenu().findItem(R.id.action_update_keyboards),
-            KMManager.getUpdateTool().getOpenUpdateCount(),true);
-
-          _popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem theItem) {
-              return onOptionsItemSelected(theItem);
-            }
-          });
-
-          MenuPopupHelper _menuHelper = new MenuPopupHelper(context, (MenuBuilder) _popup.getMenu(), _rootView);
-          _menuHelper.setForceShowIcon(true);
-          _menuHelper.show();
-        }
-      });
-      return super.onPrepareOptionsMenu(menu);
+    if (_overflowMenuItem != null) {
+      MenuItem updateKeyboards = this.menu.findItem(R.id.action_update_keyboards);
+      updateUpdateCountIndicator(updateKeyboards,
+        KMManager.getUpdateTool().getOpenUpdateCount(), true);
     }
-
-    final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-    if(_keyboardupdate==null)
-      return super.onPrepareOptionsMenu(menu);
-
-    final ViewGroup _rootView = (ViewGroup) _keyboardupdate.getActionView();
-
-    _rootView.findViewById(R.id.counterBackground).setBackground(
-      this.getResources().getDrawable(R.drawable.ic_cloud_download));
-
-    _rootView.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onOptionsItemSelected(_keyboardupdate);
-      }
-    });
     return super.onPrepareOptionsMenu(menu);
   }
 
   private void updateUpdateCountIndicator(int anUpdateCount) {
-    if (menu == null)
+    if (menu == null) {
       return;
+    }
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-    if (_overflowMenuItem != null)
-      updateUpdateCountIndicator(_overflowMenuItem,anUpdateCount,false);
+    if (_overflowMenuItem != null) {
+      updateUpdateCountIndicator(_overflowMenuItem, anUpdateCount, false);
+    }
 
     final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-    if (_keyboardupdate != null)
-      updateUpdateCountIndicator(_keyboardupdate,anUpdateCount,true);
-
+    if (_keyboardupdate != null) {
+      updateUpdateCountIndicator(_keyboardupdate, anUpdateCount, true);
+    }
   }
 
   private void updateUpdateCountIndicator(MenuItem theItem, int anUpdateCount, boolean aHideMenuitem)
   {
     final ViewGroup _rootView = (ViewGroup) theItem.getActionView();
 
-    if(anUpdateCount==0)
-    {
-      if(aHideMenuitem)
+    if(anUpdateCount==0) {
+      if (aHideMenuitem) {
         theItem.setVisible(false);
-      else if(_rootView!=null)
+      } else if (_rootView != null) {
         _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
-    }
-    else {
-      if(aHideMenuitem)
+      }
+    } else {
+      if(aHideMenuitem) {
         theItem.setVisible(true);
-      else if(_rootView!=null)
-      _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
+      } else if(_rootView!=null) {
+        _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
+      }
     }
 
-    if(_rootView==null)
+    if(_rootView==null) {
       return;
+    }
 
     TextView _t = _rootView.findViewById(R.id.update_count_indicator);
     _t.setText(String.valueOf(anUpdateCount));
@@ -519,70 +497,62 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     resizeTextView(false);
   }
 
-  private void checkAndInstallDefaultDictionary() {
-    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-
-    // Check if default dictionary model package should be installed
-    // This also depends on a current keyboard being loaded
-    HashMap<String, String> curKbInfo = KMManager.getCurrentKeyboardInfo(this);
-    if (!KMManager.lexicalModelExists(this, KMManager.KMDefault_DictionaryPackageID,
-        KMManager.KMDefault_LanguageID, KMManager.KMDefault_DictionaryModelID) && curKbInfo != null) {
-      boolean installDefaultDictionary = prefs.getBoolean(defaultDictionaryInstalled, false);
-      if (!installDefaultDictionary) {
-        File defaultDictionaryKMP = new File(
-          new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
-        Uri uri = FileProvider.getUriForFile(
-          context, FileProviderUtils.getAuthority(context), defaultDictionaryKMP);
-        useLocalKMP(context, uri, true);
-      }
-
-      SharedPreferences.Editor editor = prefs.edit();
-      editor.putBoolean(defaultDictionaryInstalled, true);
-      editor.commit();
-    }
-  }
-
   /**
-   * Parse the URI data to determine the URL for the .kmp keyboard package.
+   * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
+   * If URL is valid, download the kmp.
+   * @param scheme String of the URI's scheme.
    *
    */
-  private void downloadKMP() {
-    Intent downloadIntent;
-    String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
-    if (url == null) {
-      url = data.toString();
+  private void downloadKMP(String scheme) {
+    if (data == null) {
+      String message = "Download failed. Invalid URL.";
+      Toast.makeText(getApplicationContext(), message,
+        Toast.LENGTH_SHORT).show();
+      return;
     }
-    if (url != null) {
-      // URL contains KMP to download in background.
-      boolean isCustom = FileUtils.isCustomKeyboard(url);
-
-      String filename = data.getQueryParameter("filename");
-      if (filename == null) {
-        int index = url.lastIndexOf("/") + 1;
-        if (index >= 0 && index <= url.length()) {
-          filename = url.substring(index);
-        }
+    try {
+      // Initial try with Keyman 13.0 download link
+      String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
+      if (url == null) {
+        url = data.toString();
       }
+      if (url != null) {
+        // Create filename by extracting packageID from query or urlNoQuery
+        String filename = data.getQueryParameter("id");
+        if (filename == null) {
+          String urlNoQuery = data.getPath();
+          filename = FileUtils.getFilename(urlNoQuery);
+        }
+        if (!filename.endsWith(FileUtils.KEYMANPACKAGE)) {
+          filename += FileUtils.KEYMANPACKAGE;
+        }
 
-      // Only handle ad-hoc kmp packages or from keyman.com
-      if (FileUtils.hasKeymanPackageExtension(url) || data.getScheme().toLowerCase().equals("keyman")) {
+        // Parse query for the BCP 47 language ID
+        String languageID = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
+        // TODO: Using "tag" for now, but production will be KMKeyboardDownloaderActivity.KMKey_BCP47
+        if (languageID == null) {
+          languageID = data.getQueryParameter("tag");
+        }
+
+        url = url.toLowerCase();
         try {
+          progressDialog = new ProgressDialog(MainActivity.this);
+          progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
+          progressDialog.setCancelable(false);
+          progressDialog.show();
+          resultReceiver.setProgressDialog(progressDialog);
+
           // Download the KMP to app cache
-          downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
+          Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
           downloadIntent.putExtra("url", url);
           downloadIntent.putExtra("filename", filename);
+          downloadIntent.putExtra("language", languageID);
           downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
           downloadIntent.putExtra("receiver", resultReceiver);
 
-          progressDialog = new ProgressDialog(MainActivity.this);
-          String ellipsisStr = "\u2026";
-          progressDialog.setMessage(String.format("%s\n%s%s",
-            getString(R.string.downloading_keyboard_package), filename, ellipsisStr));
-          progressDialog.setCancelable(false);
-          progressDialog.show();
-
           startService(downloadIntent);
         } catch (Exception e) {
+          KMLog.LogException(TAG, "", e);
           if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
           }
@@ -594,6 +564,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         Toast.makeText(getApplicationContext(), message,
           Toast.LENGTH_SHORT).show();
       }
+    } catch (UnsupportedOperationException e) {
+      String message = "Download failed. Invalid URL.";
+      KMLog.LogException(TAG,  message, e);
+      Toast.makeText(getApplicationContext(), message,
+        Toast.LENGTH_SHORT).show();
     }
   }
 
@@ -691,7 +666,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     final View textSizeController = inflater.inflate(R.layout.text_size_controller, null);
     final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_textsize);
-    dialogBuilder.setTitle(String.format("%s: %d", getString(R.string.action_text_size), textSize));
+    dialogBuilder.setTitle(String.format(getString(R.string.text_size), textSize));
     dialogBuilder.setView(textSizeController);
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
@@ -722,7 +697,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         textSize = progress + minTextSize;
         textView.setTextSize((float) textSize);
-        dialog.setTitle(String.format("%s: %d", getString(R.string.action_text_size), textSize));
+        dialog.setTitle(String.format(getString(R.string.text_size), textSize));
       }
     });
 
@@ -751,7 +726,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_trash);
     dialogBuilder.setTitle(getString(R.string.action_clear_text));
-    dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.all_text_will_be_cleared)));
+    dialogBuilder.setMessage(getString(R.string.all_text_will_be_cleared));
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
@@ -774,7 +749,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     boolean showGetStarted = prefs.getBoolean(GetStartedActivity.showGetStartedKey, true);
     if (showGetStarted) {
       boolean shouldShowGetStarted = false;
-      ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
+      List<Keyboard> kbList = KMManager.getKeyboardsList(this);
       if (kbList != null && kbList.size() < 2)
         shouldShowGetStarted = true;
 
@@ -789,11 +764,20 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
   }
 
+  private void checkSendCrashReport() {
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean maySendCrashReport = prefs.getBoolean(KeymanSettingsActivity.sendCrashReport, true);
+    KMManager.setMaySendCrashReport(maySendCrashReport);
+  }
+
   @Override
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
       // Request for storage permission
-      if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+      if (grantResults.length ==2 &&
+          grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+          grantResults[1] == PackageManager.PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
         useLocalKMP(context, data);
       } else {
@@ -808,8 +792,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void checkStoragePermission(Uri data) {
     // Check if the Storage permission has been granted
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
-        PackageManager.PERMISSION_GRANTED) {
+      if ((checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) &&
+          (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
         useLocalKMP(context, data);
       } else {
         // Permission is missing and must be requested
@@ -822,27 +806,36 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   /**
-   * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} permission
+   * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} and
+   *              {@link android.Manifest.permission#WRITE_EXTERNAL_STORAGE} permissions
    */
   private void requestStoragePermission() {
-    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
+        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
       // Provide additional rationale to the user if the permission was not granted
-      String message = "To install keyboard package, allow Keyman permission to read storage.";
+      String message = "To install keyboard packages, allow Keyman permission to read/write storage.";
       Toast.makeText(getApplicationContext(), message ,
         Toast.LENGTH_LONG).show();
-      ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+      ActivityCompat.requestPermissions(this,
+        new String[]{
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE},
         PERMISSION_REQUEST_STORAGE);
     } else {
-      // Request the permission. The result will be received in onRequestPermissionResult().
-      ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+      // Request the permission. The result will be received in onRequestPermissionsResult().
+      ActivityCompat.requestPermissions(this,
+        new String[]{
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE},
         PERMISSION_REQUEST_STORAGE);
     }
   }
 
   // TODO: Move this to KMEA during Keyman 13.0 refactoring
   public static void useLocalKMP(Context context, Uri data) {
-    useLocalKMP(context, data, false);
+    if (data != null) {
+      useLocalKMP(context, data, false);
+    }
   }
 
   public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
@@ -891,8 +884,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     } catch (Exception e) {
       String message = "Access denied to " + filename +
         ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
+      KMLog.LogException(TAG, "Unable to copy " + filename + " to app cache ", e);
       Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-      Log.e(TAG, "Unable to copy " + filename + " to app cache");
       return;
     }
 
@@ -958,62 +951,62 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
-    String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    if (result > 0) {
-      String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-      String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-      String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-      String kbVersion = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
-      String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-      String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      if (languageID.contains(";")) {
-        String[] ids = languageID.split("\\;");
-        String[] names = languageName.split("\\;");
-        int len = ids.length;
-        for (int i = 0; i < len; i++) {
-          String langId = ids[i];
-          String langName = "Unknown";
-          if (i < names.length)
-            langName = names[i];
-          HashMap<String, String> kbInfo = new HashMap<String, String>();
-          kbInfo.put(KMManager.KMKey_PackageID, packageID);
-          kbInfo.put(KMManager.KMKey_KeyboardID, keyboardID);
-          kbInfo.put(KMManager.KMKey_LanguageID, langId);
-          kbInfo.put(KMManager.KMKey_KeyboardName, keyboardName);
-          kbInfo.put(KMManager.KMKey_LanguageName, langName);
-          kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-          kbInfo.put(KMManager.KMKey_Font, kFont);
-          kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
-
-          KMManager.addKeyboard(this, kbInfo);
-
-        }
-      } else {
-        KMManager.addKeyboard(this, keyboardInfo);
-      }
-    } else {
-      // Error notifications handled in LanguageListActivity
-    }
+    // Do nothing
   }
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
     for(int i=0; i < keyboardsInstalled.size(); i++) {
-      HashMap<String, String> keyboardInfo = new HashMap<>(keyboardsInstalled.get(i));
+      HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
+      String languageID = hashMap.get(KMManager.KMKey_LanguageID);
+      Keyboard keyboardInfo = new Keyboard(
+        hashMap.get(KMManager.KMKey_PackageID),
+        hashMap.get(KMManager.KMKey_KeyboardID),
+        hashMap.get(KMManager.KMKey_KeyboardName),
+        languageID,
+        hashMap.get(KMManager.KMKey_LanguageName),
+        hashMap.get(KMManager.KMKey_Version),
+        hashMap.get(KMManager.KMKey_CustomHelpLink),
+        hashMap.get(KMManager.KMKey_KMPLink),
+        true,
+        hashMap.get(KMManager.KMKey_Font),
+        hashMap.get(KMManager.KMKey_OskFont));
+
       if (i == 0) {
         if (KMManager.addKeyboard(this, keyboardInfo)) {
-          String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-          String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-          String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-          String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-          String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-          String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-          String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+          KMManager.setKeyboard(keyboardInfo);
         }
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
+      }
+
+      // Determine if associated lexical model for languageID should be downloaded
+      if ((languageID != null) && !languageID.isEmpty()) {
+
+        // Force the cloud catalog to update
+        if (!didExecuteParser) {
+          didExecuteParser = true;
+          repo = CloudRepository.shared.fetchDataset(context);
+        }
+
+        // Check if associated model is not already installed
+        if ((KMManager.getAssociatedLexicalModel(languageID) == null) && KMManager.hasConnection(context)) {
+          String _downloadid = CloudLexicalModelMetaDataDownloadCallback.createDownloadId(languageID);
+          CloudLexicalModelMetaDataDownloadCallback _callback = new CloudLexicalModelMetaDataDownloadCallback();
+
+          Toast.makeText(context,
+            context.getString(R.string.query_associated_model),
+            Toast.LENGTH_SHORT).show();
+
+          ArrayList<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams = new ArrayList<>();
+          String url = CloudRepository.prepareLexicalModelQuery(languageID);
+          aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
+            CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
+
+          CloudDownloadMgr.getInstance().executeAsDownload(
+            context, _downloadid, null, _callback,
+            aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+        }
       }
     }
   }
@@ -1021,7 +1014,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
     String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
-      KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID) :
+      KMManager.getCurrentKeyboardInfo(this).getLanguageID() :
       KMManager.KMDefault_LanguageID;
     boolean matchingModel = false;
 

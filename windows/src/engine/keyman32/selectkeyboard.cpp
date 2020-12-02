@@ -104,8 +104,8 @@ BOOL SelectKeyboard(DWORD KeymanID)
 				ResetCapsLock();
 
         SelectApplicationIntegration();   // I4287
-				if(!_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
-				_td->state.windowunicode = _td->app->IsUnicode();
+				if(_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
+				_td->state.windowunicode = !_td->app || _td->app->IsUnicode();
 
 				ActivateDLLs(_td->lpActiveKeyboard);
 
@@ -131,7 +131,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
 }
 
 
-BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD dwIdentity, BOOL foreground)   // I3933   // I3949   // I4271
+BOOL SelectKeyboardTSF(DWORD dwIdentity, BOOL foreground)   // I3933   // I3949   // I4271
 {
   if (!foreground && IsFocusedThread()) {
     return FALSE;   // I4277
@@ -147,57 +147,68 @@ BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD dwIdentity, BOOL foregroun
     return FALSE;
   }
 
-  if(!OpenTSF(_td)) return FALSE;
+  TSFINTERFACES tsf = { NULL };
+
+  if(!OpenTSF(&tsf)) return FALSE;
 
   BOOL bResult = FALSE;
 
   SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Selecting language identity=%d %x [%d]", dwIdentity, skb.LangID, foreground);
-  HRESULT hr = _td->pInputProcessorProfiles->ChangeCurrentLanguage(skb.LangID);
+  HRESULT hr = tsf.pInputProcessorProfiles->ChangeCurrentLanguage(skb.LangID);
   if(SUCCEEDED(hr)) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Activating profile");
-    hr = _td->pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_INPUTPROCESSOR, skb.LangID, skb.CLSID, skb.GUIDProfile, NULL, TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);   // I4714
+    hr = tsf.pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_INPUTPROCESSOR, skb.LangID, skb.CLSID, skb.GUIDProfile, NULL, TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);   // I4714
     bResult = SUCCEEDED(hr);
   }
+
+  CloseTSF(&tsf);
 
   SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Exiting with %x", hr);
   return bResult;
 }
 
-void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground) {   // I3933   // I3949   // I4271
-    if(!foreground && IsFocusedThread()) {
-      return;   // I4277
+void SelectKeyboardHKL(DWORD hkl, BOOL foreground) {   // I3933   // I3949   // I4271
+  if(!foreground && IsFocusedThread()) {
+    return;   // I4277
+  }
+
+  TSFINTERFACES tsf = { NULL };
+  if(OpenTSF(&tsf)) {
+    LANGID langid = HKLToLanguageID(ForceKeymanIDToHKL(hkl)); // I3191
+    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating language %x [%d]", langid, foreground);
+    HRESULT hr = tsf.pInputProcessorProfiles->ChangeCurrentLanguage(langid);
+    if(SUCCEEDED(hr)) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating keyboard layout %x for %x", hkl, langid);
+      hr = tsf.pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_KEYBOARDLAYOUT, langid, CLSID_NULL, GUID_NULL, ForceKeymanIDToHKL(hkl), TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE); // I3191   // I4714
     }
-    if(OpenTSF(_td)) {
-        LANGID langid = HKLToLanguageID(ForceKeymanIDToHKL(hkl)); // I3191
-        SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating language %x [%d]", langid, foreground);
-        HRESULT hr = _td->pInputProcessorProfiles->ChangeCurrentLanguage(langid);
-        if(SUCCEEDED(hr)) {
-          SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating keyboard layout %x for %x", hkl, langid);
-            hr = _td->pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_KEYBOARDLAYOUT, langid, CLSID_NULL, GUID_NULL, ForceKeymanIDToHKL(hkl), TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE); // I3191   // I4714
-        }
-        SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Exiting with %x", hr);
-    }
+    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Exiting with %x", hr);
+    CloseTSF(&tsf);
+  }
 }
 
 void PrepareLanguageSwitchString(UINT langid, HKL hkl, char *str) {
-  wsprintf(str, "%d|%d|%d", GetCurrentThreadId(), langid, hkl);   // I4285
+  wsprintf(str, "%d|%d|%d", (int) GetCurrentThreadId(), langid, PtrToInt(hkl));   // I4285
 }
 
 void PrepareLanguageSwitchString(UINT langid, GUID clsid, GUID guidProfile, char *str) {
   WCHAR clsidstr[40], profilestr[40];
   StringFromGUID2(clsid, clsidstr, _countof(clsidstr));
   StringFromGUID2(guidProfile, profilestr, _countof(profilestr));
-  wsprintf(str, "%d|%d|%ws|%ws", GetCurrentThreadId(), langid, clsidstr, profilestr);   // I4285
+  wsprintf(str, "%d|%d|%ls|%ls", (int) GetCurrentThreadId(), langid, clsidstr, profilestr);   // I4285
 }
 
-void ReportActiveKeyboard(PKEYMAN64THREADDATA _td, WORD wCommand) {   // I3933   // I3949
-  //OutputDebugString("ReportActiveKeyboard\n");
-  if(OpenTSF(_td) && IsFocusedThread()) {   // I4277
-    TF_INPUTPROCESSORPROFILE profile;
-    if(SUCCEEDED(_td->pInputProcessorProfileMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile))) {
-      ReportKeyboardChanged(wCommand, profile.dwProfileType, profile.langid, profile.hkl, profile.clsid, profile.guidProfile);
-    }
+void ReportActiveKeyboard(WORD wCommand) {   // I3933   // I3949
+  if (!IsFocusedThread()) return;
+
+  TSFINTERFACES tsf = { NULL };
+
+  if (!OpenTSF(&tsf)) return;
+
+  TF_INPUTPROCESSORPROFILE profile;
+  if(SUCCEEDED(tsf.pInputProcessorProfileMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile))) {
+    ReportKeyboardChanged(wCommand, profile.dwProfileType, profile.langid, profile.hkl, profile.clsid, profile.guidProfile);
   }
+  CloseTSF(&tsf);
 }
 
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile) {

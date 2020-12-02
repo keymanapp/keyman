@@ -27,4 +27,23 @@ public struct Language: Codable {
 
   /// Font for the OSK.
   public let oskFont: Font?
+
+  init(from kmpLanguage: KMPLanguage) {
+    self.name = kmpLanguage.name
+    self.id = kmpLanguage.languageId
+
+    keyboards = nil
+    lexicalModels = nil
+    font = nil
+    oskFont = nil
+  }
+
+  init(name: String, id: String, keyboards: [Keyboard]?, lexicalModels: [LexicalModel]?, font: Font?, oskFont: Font?) {
+    self.name = name
+    self.id = id
+    self.keyboards = keyboards
+    self.lexicalModels = lexicalModels
+    self.font = font
+    self.oskFont = oskFont
+  }
 }

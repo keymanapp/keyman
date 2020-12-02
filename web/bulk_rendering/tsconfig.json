@@ -8,6 +8,8 @@
 	"target": "es5"
 	},
   "files": [
+		"../node_modules/@keymanapp/web-utils/src/index.ts",
+		"../node_modules/@keymanapp/lexical-model-layer/message.d.ts",
 		"renderer_core.ts"
   ]
 }

@@ -123,7 +123,7 @@ class SubKeysView: UIView {
     super.init(frame: CGRect(x: viewPosX, y: viewPosY, width: viewWidth, height: viewHeight))
 
     super.backgroundColor = UIColor.clear
-    isUserInteractionEnabled = false
+    //isUserInteractionEnabled = false
 
     addSubview(containerView)
     let fontSize = buttonHeight * (UIDevice.current.userInterfaceIdiom == .pad ? 0.4 : 0.5)

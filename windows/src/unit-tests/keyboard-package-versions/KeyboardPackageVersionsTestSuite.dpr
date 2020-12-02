@@ -93,11 +93,12 @@ uses
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
-  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   TextFileFormat in '..\..\developer\TIKE\main\TextFileFormat.pas',
   Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
-  Keyman.System.PackageInfoRefreshLexicalModels in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas';
+  Keyman.System.PackageInfoRefreshLexicalModels in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
+  Keyman.Developer.System.Project.UrlRenderer in '..\..\developer\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas';
 
 var
   runner : ITestRunner;

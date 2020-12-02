@@ -57,7 +57,8 @@ tests = [
   '039 - generic ctrlalt',
   '040 - long context',
   '041 - long context and deadkeys',
-  '042 - long context and split deadkeys'
+  '042 - long context and split deadkeys',
+  '043 - output and keystroke'
 ]
 
 if build_machine.system() == 'windows'

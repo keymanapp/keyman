@@ -10,10 +10,26 @@ import UIKit
 import WebKit
 import AudioToolbox
 
-private let keyboardChangeHelpText = "Tap here to change keyboard"
+private let keyboardChangeHelpText = NSLocalizedString("keyboard-help-change", bundle: engineBundle, comment: "")
 
 private let subKeyColor = Colors.popupKey
 private let subKeyColorHighlighted = Colors.popupKeyHighlighted
+
+// We subclass for one critical reason - by default, WebViews may become first responder...
+// a detail that is really, REALLY bad for a WebView in a keyboard.
+//
+// Minor reference here: https://stackoverflow.com/questions/39829863/can-a-uiwebview-handle-user-interaction-without-becoming-first-responder
+//
+// Confirmed issue existed within app during workaround for https://github.com/keymanapp/keyman/issues/2716
+class KeymanWebView: WKWebView {
+  override public var canBecomeFirstResponder: Bool {
+    return false;
+  }
+
+  override public func becomeFirstResponder() -> Bool {
+    return false;
+  }
+}
 
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
@@ -22,7 +38,7 @@ class KeymanWebViewController: UIViewController {
   private var useSpecialFont = false
 
   // Views
-  var webView: WKWebView?
+  var webView: KeymanWebView?
   var activeModel: Bool = false
   private var helpBubbleView: PopoverView?
   private var keyPreviewView: KeyPreviewView?
@@ -101,7 +117,7 @@ class KeymanWebViewController: UIViewController {
     userContentController.add(self, name: "keyman")
     config.userContentController = userContentController
 
-    webView = WKWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
+    webView = KeymanWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
     webView!.isOpaque = false
     webView!.translatesAutoresizingMaskIntoConstraints = false
     webView!.backgroundColor = UIColor.clear
@@ -111,10 +127,10 @@ class KeymanWebViewController: UIViewController {
     view = webView
 
     // Set UILongPressGestureRecognizer to show sub keys
-    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
-    hold.minimumPressDuration = 0.5
-    hold.delegate = self
-    view.addGestureRecognizer(hold)
+//    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
+//    hold.minimumPressDuration = 0.5
+//    hold.delegate = self
+//    view.addGestureRecognizer(hold)
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
                                            name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -222,14 +238,14 @@ extension KeymanWebViewController {
     webView!.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
   }
 
-  private func fontObject(from font: Font?, keyboardID: String, isOsk: Bool) -> [String: Any]? {
+  private func fontObject(from font: Font?, keyboard: InstallableKeyboard, isOsk: Bool) -> [String: Any]? {
     guard let font = font else {
       return nil
     }
     // family does not have to match the name in the font file. It only has to be unique.
     return [
-      "family": "\(keyboardID)__\(isOsk ? "osk" : "display")",
-      "files": font.source.map { storage.fontURL(forKeyboardID: keyboardID, filename: $0).absoluteString }
+      "family": "\(keyboard.id)__\(isOsk ? "osk" : "display")",
+      "files": font.source.map { storage.fontURL(forResource: keyboard, filename: $0)!.absoluteString }
     ]
   }
 
@@ -241,8 +257,13 @@ extension KeymanWebViewController {
       "KL": keyboard.languageName,
       "KF": storage.keyboardURL(for: keyboard).absoluteString
     ]
-    let displayFont = fontObject(from: keyboard.font, keyboardID: keyboard.id, isOsk: false)
-    let oskFont = fontObject(from: keyboard.oskFont, keyboardID: keyboard.id, isOsk: true) ?? displayFont
+
+    if let packageID = keyboard.packageID {
+      stub["KP"] = packageID
+    }
+
+    let displayFont = fontObject(from: keyboard.font, keyboard: keyboard, isOsk: false)
+    let oskFont = fontObject(from: keyboard.oskFont, keyboard: keyboard, isOsk: true) ?? displayFont
     if let displayFont = displayFont {
       stub["KFont"] = displayFont
     }
@@ -430,10 +451,15 @@ extension KeymanWebViewController: WKScriptMessageHandler {
                             subkeyIDs: subkeyIDs,
                             subkeyTexts: subkeyTexts,
                             useSpecialFont: useSpecialFont)
+
+      self.touchHoldBegan()
     } else if fragment.hasPrefix("#menuKeyDown-") {
+      perform(#selector(self.menuKeyHeld), with: self, afterDelay: 0.5)
       menuKeyDown(self)
       delegate?.menuKeyDown(self)
     } else if fragment.hasPrefix("#menuKeyUp-") {
+      // Blocks summoning the globe-key menu for quick taps.  (Hence the 0.5 delay.)
+      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.menuKeyHeld), object: self)
       menuKeyUp(self)
       delegate?.menuKeyUp(self)
     } else if fragment.hasPrefix("#hideKeyboard-") {
@@ -544,7 +570,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
           if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
             newKb = kb
           }
-        } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
+        }
+
+        // Failsafe in case the previous lookup fails - at least load A keyboard.
+        if newKb == nil, let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
           newKb = userKbs[0]
         }
       }
@@ -575,10 +604,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
   func updateShowBannerSetting() {
     let userData = Storage.active.userDefaults
     let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-    if Manager.shared.isSystemKeyboard || alwaysShow {
-      showBanner(true)
-    } else {
+    if !Manager.shared.isSystemKeyboard {
       showBanner(false)
+    } else {
+      showBanner(alwaysShow)
     }
   }
   
@@ -656,6 +685,40 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
     return true
   }
 
+  // An adaptation of holdAction, just for direct taps.
+  @objc func tapAction(_ sender: UITapGestureRecognizer) {
+    switch sender.state {
+    case .ended:
+      // Touch Ended
+      guard let subKeysView = subKeysView else {
+        return
+      }
+
+      let touchPoint = sender.location(in: subKeysView.containerView)
+      var buttonClicked = false
+      for button in subKeys {
+        if button.frame.contains(touchPoint) {
+          button.isEnabled = true
+          button.isHighlighted = true
+          button.backgroundColor = subKeyColorHighlighted
+          button.sendActions(for: .touchUpInside)
+
+          buttonClicked = true
+        } else {
+          button.isHighlighted = false
+          button.isEnabled = false
+          button.backgroundColor = subKeyColor
+        }
+      }
+
+      if !buttonClicked {
+        clearSubKeyArrays()
+      }
+    default:
+      return
+    }
+  }
+
   @objc func holdAction(_ sender: UILongPressGestureRecognizer) {
     switch sender.state {
     case .ended:
@@ -679,16 +742,17 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
         clearSubKeyArrays()
       }
     case .began:
-      // Touch & Hold Began
-      let touchPoint = sender.location(in: sender.view)
-      // Check if touch was for language menu button
-      languageMenuPosition { keyFrame in
-        if keyFrame.contains(touchPoint) {
-          self.delegate?.menuKeyHeld(self)
-          return
-        }
-        self.touchHoldBegan()
-      }
+//      // Touch & Hold Began
+//      let touchPoint = sender.location(in: sender.view)
+//      // Check if touch was for language menu button
+//      languageMenuPosition { keyFrame in
+//        if keyFrame.contains(touchPoint) {
+//          self.delegate?.menuKeyHeld(self)
+//          return
+//        }
+//        self.touchHoldBegan()
+//      }
+      return
     default:
       // Hold & Move
       guard let subKeysView = subKeysView else {
@@ -770,7 +834,19 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
     dismissKeyPreview()
     subKeysView = SubKeysView(keyFrame: subKeyAnchor, subKeys: subKeys)
     view.addSubview(subKeysView!)
+
+    let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapAction))
+    subKeysView!.addGestureRecognizer(tap)
+
+    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
+    hold.minimumPressDuration = 0.01
+    hold.delegate = self
+    subKeysView!.addGestureRecognizer(hold)
     setPopupVisible(true)
+  }
+
+  @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
+    self.delegate?.menuKeyHeld(self)
   }
 
   @objc func subKeyButtonClick(_ sender: UIButton) {

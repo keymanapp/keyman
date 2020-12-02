@@ -117,8 +117,9 @@ begin
           DoError(Format(SError_LanguageTagIsNotValid, [lm.ID, lang.ID, msg]), plsError);
           Result := False;
         end
-        else if not IsCanonical(msg) then
+        else if not TCanonicalLanguageCodeUtils.IsCanonical(tag, msg, False) then
         begin
+
           DoError(Format(SWarning_LanguageTagIsNotCanonical, [lm.ID, lang.ID, msg]), plsWarning);
         end;
       finally

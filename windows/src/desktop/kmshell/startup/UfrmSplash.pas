@@ -72,7 +72,6 @@ type
     class function ShouldRegisterWindow: Boolean; override; // I2720
     function ShouldSetAppTitle: Boolean; override;  // I2786
   public
-    procedure Do_Content_Render(FRefreshKeyman: Boolean); override;
     property ShowConfigurationOnLoad: Boolean read FShowConfigurationOnLoad write FShowConfigurationOnLoad;
   end;
 
@@ -84,10 +83,8 @@ implementation
 uses
   ComObj,
   custinterfaces,
-  GenericXMLRenderer,
   GetOSVersion,
   initprog,
-  KeyboardListXMLRenderer,
   KeymanControlMessages,
   KeymanOptionNames,
   kmcomapi_errors,
@@ -104,9 +101,7 @@ uses
   Upload_Settings,
   utilexecute,
   utilfocusappwnd,
-  utilkmshell,
-  utilxml,
-  VersionInfo, ActiveX;
+  utilkmshell;
 
 {$R *.DFM}
 
@@ -136,41 +131,9 @@ end;
 
 procedure TfrmSplash.TntFormShow(Sender: TObject);
 begin
+  FRenderPage := 'splash';
   Do_Content_Render(False);
   inherited;
-end;
-
-function EscapeString(const str: WideString): WideString;
-var
-  i: Integer;
-begin
-  Result := '';
-  for i := 1 to Length(str) do
-  begin
-    case str[i] of
-      '"':     Result := Result + '\"';
-      #0..#31: Result := Result + '\x'+IntToHex(Ord(str[i]), 2);
-      '\':     Result := Result + '\\';
-      else     Result := Result + str[i];
-    end;
-  end;
-end;
-
-procedure TfrmSplash.Do_Content_Render(FRefreshKeyman: Boolean);
-var
-  xml: WideString;
-begin
-  xml := '';
-
-  xml := xml + '<Version>'+xmlencode(MsgFromIdFormat(SKSplashVersion, [GetVersionString]))+'</Version>';
-//  xml := xml + '<Keyboards)Count>'+IntToStr(kmcom.Keyboards.Count)+'</KeyboardCount>';
-
-  XMLRenderers.RenderTemplate := 'Splash.xsl';
-  XMLRenderers.Clear;
-  XMLRenderers.Add(TGenericXMLRenderer.Create(xml));
-  XMLRenderers.Add(TKeyboardListXMLRenderer.Create);
-
-  Content_Render;
 end;
 
 procedure TfrmSplash.WMUser(var Message: TMessage);
@@ -314,10 +277,6 @@ begin
       end;
 
     until False;
-
-    if kmcom.SystemInfo.RebootRequired then
-      RunReboot('Windows must be restarted for changes to complete.  Restart now?',
-        'Windows did not initiate the restart successfully.  You will need to restart manually.');
 
     if kmcom.Options[KeymanOptionName(TUtilKeymanOption.koCheckForUpdates)].Value then
     begin

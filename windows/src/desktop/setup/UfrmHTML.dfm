@@ -14,6 +14,7 @@ object frmHTML: TfrmHTML
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
+  OnDestroy = FormDestroy
   DesignSize = (
     666
     313)

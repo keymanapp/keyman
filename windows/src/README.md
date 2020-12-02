@@ -3,7 +3,7 @@
 ## Build Prerequisites
 
 1. Install [VS2017 Community Edition](#visual-studio-2017-community-edition-setup-requirements).
-2. Install [Delphi 10.2 or Delphi 10.3](#delphi-setup-requirements).
+2. Install [Delphi 10.3](#delphi-setup-requirements).
 3. Install [git](https://git-scm.com/download/win).
 4. Install [nodejs](https://nodejs.org/en/download/).
 5. Follow steps in /web/README.md to install prerequisites for building KeymanWeb (included in Keyman Developer)
@@ -91,7 +91,7 @@ In Visual Studio 2017, you need to have the following installed:
 
 #### Individual components
 * Windows Universal CRT SDK
-* Windows 8.1 SDK
+* Windows 10.0.17763.0 SDK
 
 Configure Visual Studio to use two-space tab stops:
 1. Open the options dialog: Tools > Options.
@@ -109,8 +109,10 @@ Install Delphi using the following options:
 * No other 3rd party components required
 * No Interbase components required
 
-Delphi 10.3 is supported by default. For Delphi 10.2, set the environment variable
-`DELPHI_VERSION=19.0`. This variable can also be added to your `UserDefines.mak`.
+Delphi 10.3 is supported by default. Delphi 10.2 is no longer supported.
+(The environment variable `DELPHI_VERSION=19.0` is still possible, but there are 
+some dependencies on 10.3 which we have not fixed. This variable can also be 
+added to your `UserDefines.mak`.)
 
 ## Environment Variables
 
@@ -158,3 +160,13 @@ The `KEYMAN_CEF4DELPHI_ROOT` environment variable should be set to the root of t
 repo on your local machine.
 
 Keyman Desktop does not currently depend on this component.
+
+### Crash Reporting
+
+Crash report dialogs as shown by tsysinfo have a few special secret hotkeys
+useful for development purposes:
+
+1. Ctrl+C - copy details to clipboard
+2. Ctrl+Shift+C - copy more details to clipboard
+3. Alt+DblClk on icon - open sentry site to event
+4. Ctrl+DblClk on icon - show more details in message box

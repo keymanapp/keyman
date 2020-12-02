@@ -101,6 +101,9 @@ type
     chkAutoSaveBeforeCompiling: TCheckBox;
     chkOSKAutoSaveBeforeImporting: TCheckBox;
     chkDebuggerAutoResetBeforeCompiling: TCheckBox;
+    gbPrivacy: TGroupBox;
+    chkReportUsage: TCheckBox;
+    chkReportErrors: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -199,6 +202,9 @@ begin
 
     editWebHostDefaultPort.Text := IntToStr(WebHostDefaultPort);   // I4021
 
+    chkReportUsage.Checked := ReportUsage;
+    chkReportErrors.Checked := ReportErrors;
+
     lblEditorCustomTheme.Caption := '';
     if EditorTheme = '' then
       cbEditorTheme.ItemIndex := 0
@@ -294,6 +300,9 @@ begin
 
     ExternalEditorPath := editExternalEditorPath.Text;
     DefaultProjectPath := IncludeTrailingPathDelimiter(editDefaultProjectPath.Text);
+
+    ReportUsage := chkReportUsage.Checked;
+    ReportErrors := chkReportErrors.Checked;
 
     Write;
   end;

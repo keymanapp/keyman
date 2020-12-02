@@ -44,6 +44,16 @@ extern NSString *const kReadMeFile;
 extern NSString *const kVersion;
 extern NSString *const kWebSite;
 
+typedef struct {
+    NSString *sentryEnvironment;
+    NSString *versionRelease;
+    NSString *versionWithTag;
+    NSString *tier;
+    NSString *keymanCom;
+    NSString *helpKeymanCom;
+    NSString *apiKeymanCom;
+} KeymanVersionInfo;
+
 @interface KMInputMethodAppDelegate : NSObject
 #define USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE 1
 #ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
@@ -103,6 +113,7 @@ extern NSString *const kWebSite;
 - (NSWindowController *)infoWindow_;
 - (NSWindowController *)kbHelpWindow_;
 - (void)processURL:(NSString*)rawUrl;
+- (void)downloadKeyboardFromKeyboardId:(NSString *)keyboardId;
 - (NSString *)kmxFilePathAtIndex:(NSUInteger)index;
 - (NSString *)packagePathAtIndex:(NSUInteger)index;
 - (NSInteger)indexForPackageFolder:(NSString *)packageFolder;
@@ -113,7 +124,9 @@ extern NSString *const kWebSite;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;
 - (NSString *)oskWindowTitle;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
-
+- (KeymanVersionInfo)versionInfo;
+- (NSString *)keymanDataPath;
+- (NSArray *)legacyAppsUserDefaults;
 @end
 
 #endif /* KMInputMethodAppDelegate_h */

@@ -3,6 +3,9 @@
 <head>
   <meta charset='utf-8'>
 
+  <script src="/app/lib/sentry/bundle.min.js"></script>
+  <script src="/app/lib/sentry/init.js"></script>
+
   <!-- Set the viewport width to match iOS device widths
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />   -->
   <meta name="viewport" content="width=device-width,user-scalable=no" />
@@ -29,8 +32,10 @@
   <div id='content'>
     <div id='top-toolbar'>
       <div class='control' id='controls'>
-        <a href='https://keyman.com/go/developer/10.0/ios-app' target='_blank' class='install-link'>Install Keyman for iOS</a>
-        <a href='https://keyman.com/go/developer/10.0/android-app' target='_blank' class='install-link'>Install Keyman for Android</a>
+        <!-- these links are assigned from data in /inc/packages.json after page load so that URLs can
+             be dynamically set according to version and tier. -->
+        <a id='install-link-ios' href='#' target='_blank' class='install-link'>Install Keyman for iOS</a>
+        <a id='install-link-android' href='#' target='_blank' class='install-link'>Install Keyman for Android</a>
       </div>
     </div>
 
@@ -43,9 +48,9 @@
     [Test Online].</p>
 
   </div>
-  <!-- The following dynamic script will register each of the additional packages -->
 <script>
-  var packages = null, packagesJSON = '';
+  // The following dynamic script will register each of the additional packages
+  var packagesJSON = '';
 
   function ajaxRequest(){
     var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE
@@ -67,7 +72,12 @@
     var dataJSON = JSON.stringify(data);
     if(packagesJSON !== dataJSON) {
       packagesJSON = dataJSON;
-      packages = data;
+
+      if(data.urls) {
+        document.getElementById('install-link-ios').href = data.urls.installLinkIos;
+        document.getElementById('install-link-android').href = data.urls.installLinkAndroid;
+      }
+
       if(!data.packages) {
         return false;
       }

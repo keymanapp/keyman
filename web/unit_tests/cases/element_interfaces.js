@@ -24,7 +24,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.Input.setupElement = function() {
       var id = DynamicElements.addInput();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.Input(elem);
+      var wrapper = new com.keyman.dom.targets.Input(elem);
 
       return {elem: elem, wrapper: wrapper};
     }
@@ -70,7 +70,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.TextArea.setupElement = function() {
       var id = DynamicElements.addText();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.TextArea(elem);
+      var wrapper = new com.keyman.dom.targets.TextArea(elem);
 
       return {elem: elem, wrapper: wrapper};
     }
@@ -120,7 +120,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.ContentEditable.setupElement = function() {
       var id = DynamicElements.addEditable();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.ContentEditable(elem);
+      var wrapper = new com.keyman.dom.targets.ContentEditable(elem);
 
       return {elem: elem, wrapper: wrapper, node: null};
     }
@@ -128,7 +128,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.ContentEditable.setupDummyElement = function() {
       var id = DynamicElements.addEditable();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.ContentEditable(elem);
+      var wrapper = new com.keyman.dom.targets.ContentEditable(elem);
 
       return {elem: elem, wrapper: wrapper, node: null};
     }
@@ -224,8 +224,8 @@ if(typeof InterfaceTests == 'undefined') {
           elem1 = document.getElementById(id1);
           elem2 = document.getElementById(id2);
 
-          obj.mainPair =  {elem: elem1, wrapper: new com.keyman.dom.DesignIFrame(elem1), document: elem1.contentWindow.document};
-          obj.dummyPair = {elem: elem2, wrapper: new com.keyman.dom.DesignIFrame(elem2), document: elem1.contentWindow.document};
+          obj.mainPair =  {elem: elem1, wrapper: new com.keyman.dom.targets.DesignIFrame(elem1), document: elem1.contentWindow.document};
+          obj.dummyPair = {elem: elem2, wrapper: new com.keyman.dom.targets.DesignIFrame(elem2), document: elem1.contentWindow.document};
 
           done();
         });
@@ -321,7 +321,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.TouchAlias.setupElement = function() {
       var id = DynamicElements.addTouchAlias();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.TouchAlias(elem);
+      var wrapper = new com.keyman.dom.targets.TouchAlias(elem);
 
       return {elem: elem, wrapper: wrapper};
     }
@@ -972,7 +972,7 @@ describe('Element Input/Output Interfacing', function() {
   this.timeout(kmwconfig.timeouts.standard);
 
   before(function() {
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
     
     // Make sure the basic SMP extension hooks exist to prevent errors later.
     String.kmwEnableSupplementaryPlane(false);

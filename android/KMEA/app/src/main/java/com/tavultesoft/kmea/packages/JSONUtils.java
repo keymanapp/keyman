@@ -10,6 +10,7 @@ import java.util.Map;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.JSONParser;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,7 +73,6 @@ public class JSONUtils {
                 kbdObj.put(KMManager.KMKey_Name, kbdName);
                 kbdObj.put("filename", kbdFilename);
                 kbdObj.put(KMManager.KMKey_KeyboardVersion, kbdVersion);
-                kbdObj.put(KMManager.KMKey_CustomKeyboard, "Y");
                 if (kmpKeyboardObj.has(KMManager.KMKey_DisplayFont)) {
                  kbdObj.put(KMManager.KMKey_Font, kmpKeyboardObj.getString(KMManager.KMKey_DisplayFont));
                 }
@@ -113,7 +113,7 @@ public class JSONUtils {
               }
             }
           } catch (JSONException e) {
-            Log.e(TAG, "getLanguages() Error parsing " + file.getName());
+            KMLog.LogException(TAG, "getLanguages() Error parsing " + file.getName(), e);
           }
         }
       }
@@ -139,12 +139,12 @@ public class JSONUtils {
     try {
       for (int i=0; i < a.length(); i++) {
         JSONObject o = a.getJSONObject(i);
-        if (o.getString("id").equals(id)) {
+        if (o.getString("id").toLowerCase().equals(id.toLowerCase())) {
           return i;
         }
       }
     } catch (JSONException e) {
-      Log.e(TAG, "find ID() error: " + e);
+      KMLog.LogException(TAG, "find ID() error: ", e);
     }
     return ret;
   }
@@ -167,7 +167,7 @@ public class JSONUtils {
         }
       }
     } catch (JSONException e) {
-      Log.e(TAG, "findHelp() error: " + e);
+      KMLog.LogException(TAG, "findHelp() error: ", e);
     }
     return false;
   }
@@ -192,7 +192,7 @@ public class JSONUtils {
       options.put("fontBaseUri", "https://s.keyman.com/font/deploy/");
       options.put("keyboardVersion", "current");
     } catch (JSONException e) {
-      Log.e(TAG, "defaultOptions() error: " + e);
+      KMLog.LogException(TAG, "defaultOptions() error: ", e);
     }
     return options;
   }
@@ -237,7 +237,6 @@ public class JSONUtils {
                 modelObj.put(KMManager.KMKey_Name, modelName);
                 modelObj.put("filename", modelFilename);
                 modelObj.put(KMManager.KMKey_LexicalModelVersion, packageVersion);
-                modelObj.put(KMManager.KMKey_CustomModel, "Y");
                 if (containsHelp) {
                   File welcomeFile = new File(pkg, "welcome.htm");
                   modelObj.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
@@ -275,7 +274,7 @@ public class JSONUtils {
               }
             }
           } catch (JSONException e) {
-            Log.e(TAG, "getLexicalModels() Error parsing " + file.getName());
+            KMLog.LogException(TAG, "getLexicalModels() Error parsing " + file.getName(), e);
           }
         }
       }

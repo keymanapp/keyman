@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 21/02/2018 8:54:28 PM (- $Rev: 12980 $, 726708000).
+// File generated on 23/09/2020 5:25:25 PM (- $Rev: 12980 $, 651560046).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -59,6 +59,13 @@ library keymanapi
   interface IKeymanKeyboardLanguage;
   interface IKeymanKeyboardLanguagesInstalled;
   interface IKeymanKeyboardLanguagesFile;
+  interface IKeymanKeyboardsInstalled2;
+  interface IKeymanPackagesInstalled2;
+  interface IKeymanKeyboardFile2;
+  interface IKeymanPackageFile2;
+  interface IKeymanKeyboardLanguageInstalled2;
+  interface IKeymanKeyboardLanguagesInstalled2;
+  interface IKeymanBCP47Canonicalization;
 
 
   [
@@ -140,6 +147,14 @@ library keymanapi
     kotBool = 1,
     kotLong = 2,
     kotString = 3
+  };
+
+  [
+    uuid(74E0C84B-5025-44B2-A5CA-ECD324E7FCA4)
+  ]
+  enum tagKeymanInstallFlags
+  {
+    kifInstallTransientLanguage = 1
   };
 
   [
@@ -906,12 +921,110 @@ library keymanapi
   };
 
   [
+    uuid(EA57C94F-C140-485E-941A-3F1D5A229024),
+    version(14.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanKeyboardsInstalled2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardsInstalled2: IKeymanKeyboardsInstalled
+  {
+    [id(0x00000013)]
+    HRESULT _stdcall Install2([in] BSTR Filename, [in] VARIANT_BOOL Force, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
+    [id(0x00000259)]
+    HRESULT _stdcall RefreshInstalledKeyboards(void);
+  };
+
+  [
+    uuid(F23B9848-2AEF-4A2B-BC3A-292E3A00D691),
+    version(14.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanPackagesInstalled2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanPackagesInstalled2: IKeymanPackagesInstalled
+  {
+    [id(0x00000013)]
+    HRESULT _stdcall Install2([in] BSTR Filename, [in] VARIANT_BOOL Force, [out, retval] IKeymanPackageInstalled** PackageResult);
+  };
+
+  [
+    uuid(EDE4326B-51F4-42D5-8251-B20B71993EC8),
+    version(14.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanKeyboardFile2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardFile2: IKeymanKeyboardFile
+  {
+    [id(0x00000193)]
+    HRESULT _stdcall Install2([in] VARIANT_BOOL Force, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
+  };
+
+  [
+    uuid(9B43B6BC-C622-47EF-915E-6780CF53BAAA),
+    version(14.0),
+    helpstring("https://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanPackageFile2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanPackageFile2: IKeymanPackageFile
+  {
+    [id(0x00000101)]
+    HRESULT _stdcall Install2([in] VARIANT_BOOL Force, [out, retval] IKeymanPackageInstalled** PackageResult);
+  };
+
+  [
+    uuid(414C26E6-BFAC-4A70-9EA1-E525BA9BBA7E),
+    version(14.0),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardLanguageInstalled2: IKeymanKeyboardLanguageInstalled
+  {
+    [id(0x00000194)]
+    HRESULT _stdcall FindInstallationLangID([out] long* LangID, [out] BSTR* TemporaryKeyboardID, [out] VARIANT_BOOL* RegistrationRequired, [in] enum tagKeymanInstallFlags Flags, [out, retval] VARIANT_BOOL* Result);
+    [id(0x00000195)]
+    HRESULT _stdcall RegisterTip([in] long LangID);
+    [id(0x00000196)]
+    HRESULT _stdcall InstallTip([in] long LangID, [in] BSTR TemporaryKeyboardToRemove);
+    [propget, id(0x000001F5)]
+    HRESULT _stdcall IsRegistered([out, retval] VARIANT_BOOL* Value);
+    [propget, id(0x000001F6)]
+    HRESULT _stdcall WindowsBCP47Code([out, retval] BSTR* Value);
+  };
+
+  [
+    uuid(628FF2E6-B490-462E-8FC7-7AE53B9D392C),
+    version(14.0),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardLanguagesInstalled2: IKeymanKeyboardLanguagesInstalled
+  {
+    [id(0x00000259)]
+    HRESULT _stdcall Add([in] BSTR BCP47Tag, [out, retval] IKeymanKeyboardLanguageInstalled** Result);
+  };
+
+  [
+    uuid(CA3B3B00-EA42-4EED-9043-D1A1F1842D52),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanBCP47Canonicalization: IKeymanObject
+  {
+    [id(0x0000012D)]
+    HRESULT _stdcall GetCanonicalTag([in] BSTR Tag, [out, retval] BSTR* Result);
+  };
+
+  [
     uuid(CF46549D-4D2D-4679-A2E1-23A815F172F8),
     version(10.0)
   ]
   coclass Keyman
   {
     [default] interface IKeyman;
+    interface IKeymanBCP47Canonicalization;
   };
 
 };

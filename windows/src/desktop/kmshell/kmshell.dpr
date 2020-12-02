@@ -1,6 +1,7 @@
 program kmshell;
 
 uses
+  Winapi.Windows,
   comobj,
   Forms,
   SysUtils,
@@ -48,7 +49,7 @@ uses
   UfrmInstallKeyboardFromWeb in 'install\UfrmInstallKeyboardFromWeb.pas' {frmInstallKeyboardFromWeb},
   UfrmWebContainer in '..\..\global\delphi\ui\UfrmWebContainer.pas' {frmWebContainer},
   MessageIdentifierConsts in '..\..\global\delphi\cust\MessageIdentifierConsts.pas',
-  UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress},
+  Keyman.UI.UfrmProgress in '..\..\global\delphi\general\Keyman.UI.UfrmProgress.pas' {frmProgress},
   kmcomapi_errors in '..\..\global\delphi\general\kmcomapi_errors.pas',
   GenericXMLRenderer in 'render\GenericXMLRenderer.pas',
   help in 'main\help.pas',
@@ -70,12 +71,10 @@ uses
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   UImportOlderVersionKeyboards in 'main\UImportOlderVersionKeyboards.pas',
   UImportOlderKeyboardUtils in 'main\UImportOlderKeyboardUtils.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
-  DownloadLocale in 'install\DownloadLocale.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   UILanguages in 'util\UILanguages.pas',
   utilmsxml in '..\..\global\delphi\general\utilmsxml.pas',
@@ -83,7 +82,6 @@ uses
   UfrmOnlineUpdateIcon in 'main\UfrmOnlineUpdateIcon.pas' {frmOnlineUpdateIcon},
   KeymanTrayIcon in '..\..\engine\keyman\KeymanTrayIcon.pas',
   UImportOlderVersionKeyboards10 in 'main\UImportOlderVersionKeyboards10.pas',
-  FixupLocaleDoctype in '..\..\global\delphi\general\FixupLocaleDoctype.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   UfrmPrintOSK in 'util\UfrmPrintOSK.pas' {frmPrintOSK},
@@ -136,18 +134,10 @@ uses
   VisualKeyboardLoaderXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardSaverBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
-  UtilWaitForTSF in 'util\UtilWaitForTSF.pas',
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
   JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
-  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
-  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
   Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas',
-  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
-  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
-  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   UImportOlderVersionKeyboards9 in 'main\UImportOlderVersionKeyboards9.pas',
   Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
   UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas',
@@ -158,13 +148,48 @@ uses
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
-  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  Keyman.Configuration.UI.UfrmDiagnosticTests in 'util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas' {frmDiagnosticTests},
+  Keyman.Configuration.System.UmodWebHttpServer in 'web\Keyman.Configuration.System.UmodWebHttpServer.pas' {modWebHttpServer: TDataModule},
+  Keyman.Configuration.System.HttpServer.App in 'web\Keyman.Configuration.System.HttpServer.App.pas',
+  Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas',
+  Keyman.Configuration.System.HttpServer.SharedData in 'web\Keyman.Configuration.System.HttpServer.SharedData.pas',
+  Keyman.Configuration.System.HttpServer.App.OnlineUpdate in 'web\Keyman.Configuration.System.HttpServer.App.OnlineUpdate.pas',
+  Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas',
+  Keyman.Configuration.System.HttpServer.App.InstallKeyboard in 'web\Keyman.Configuration.System.HttpServer.App.InstallKeyboard.pas',
+  Keyman.Configuration.System.HttpServer.App.ProxyConfiguration in 'web\Keyman.Configuration.System.HttpServer.App.ProxyConfiguration.pas',
+  Keyman.Configuration.System.HttpServer.App.ConfigMain in 'web\Keyman.Configuration.System.HttpServer.App.ConfigMain.pas',
+  Keyman.Configuration.UI.InstallFile in 'install\Keyman.Configuration.UI.InstallFile.pas',
+  Keyman.Configuration.UI.KeymanProtocolHandler in 'install\Keyman.Configuration.UI.KeymanProtocolHandler.pas',
+  Keyman.Configuration.System.KeymanUILanguageManager in 'main\Keyman.Configuration.System.KeymanUILanguageManager.pas',
+  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
+  Keyman.Configuration.System.TIPMaintenance in 'install\Keyman.Configuration.System.TIPMaintenance.pas',
+  UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress},
+  Keyman.Configuration.System.UImportOlderVersionKeyboards11To13 in 'main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas',
+  Keyman.System.Settings in '..\..\global\delphi\general\Keyman.System.Settings.pas',
+  Keyman.System.SettingsManager in '..\..\global\delphi\general\Keyman.System.SettingsManager.pas',
+  Keyman.Configuration.UI.UfrmSettingsManager in 'settings\Keyman.Configuration.UI.UfrmSettingsManager.pas' {frmSettingsManager},
+  Keyman.Configuration.UI.UfrmSettingsAddTSFApp in 'settings\Keyman.Configuration.UI.UfrmSettingsAddTSFApp.pas' {frmSettingsAddTSFApp},
+  Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas',
+  Keyman.System.KeymanStartTask in 'util\Keyman.System.KeymanStartTask.pas',
+  TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
 
+// CEF3 needs to set the LARGEADDRESSAWARE flag which allows 32-bit processes to use up to 3GB of RAM.
+// If you don't add this flag the rederer process will crash when you try to load large images.
+{$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
+
+const
+  LOGGER_DESKTOP_KMSHELL = TKeymanSentryClient.LOGGER_DESKTOP + '.kmshell';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_KMSHELL);
   try
     CoInitFlags := COINIT_APARTMENTTHREADED;
     FInitializeCEF := TCEFManager.Create;
@@ -172,7 +197,13 @@ begin
       if FInitializeCEF.Start then
       try
         Application.Initialize;
-        Run;
+        Application.Title := 'Keyman Configuration';
+        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+  try
+          Run;
+        finally
+          FreeAndNil(modWebHttpServer);
+        end;
       except
         on E:Exception do
           SentryHandleException(E);

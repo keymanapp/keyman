@@ -1,13 +1,12 @@
 package com.tavultesoft.kmea.util;
 
-import android.util.Log;
-
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public final class Connection {
+  private static final String TAG = "Connection";
   private static final int MAX_REDIRECTS = 5;
   private static final int TIMEOUT = 20 * 1000; // seconds
 
@@ -30,7 +29,7 @@ public final class Connection {
         return urlConnection.getInputStream();
       }
     } catch (IOException e) {
-      Log.e("Connection", "getInputStream failed: " + e);
+      KMLog.LogException(TAG, "getInputStream failed: ", e);
     }
     return urlConnection.getErrorStream();
   };
@@ -101,7 +100,7 @@ public final class Connection {
         }
       }
     } catch (Exception e) {
-      Log.e("Connection", "Initialization failed:" + e);
+      KMLog.LogException(TAG, "Initialization failed:", e);
     }
 
     return ret;

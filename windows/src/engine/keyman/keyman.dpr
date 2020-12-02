@@ -75,7 +75,6 @@ uses
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',
   WideStringClass in '..\..\global\delphi\general\WideStringClass.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
@@ -88,7 +87,6 @@ uses
   UfrmLanguageSwitch in 'langswitch\UfrmLanguageSwitch.pas' {frmLanguageSwitch},
   Glossary in '..\..\global\delphi\general\Glossary.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
-  LayeredFormUtils in '..\..\global\delphi\general\LayeredFormUtils.pas',
   UfrmOSKOnScreenKeyboard in 'viskbd\UfrmOSKOnScreenKeyboard.pas' {frmOSKOnScreenKeyboard},
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   UfrmVisualKeyboard in 'viskbd\UfrmVisualKeyboard.pas' {frmVisualKeyboard},
@@ -114,14 +112,7 @@ uses
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   Windows8LanguageList in '..\..\global\delphi\general\Windows8LanguageList.pas',
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
-  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
-  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
-  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
-  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
-  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.DebugLogClient in '..\..\global\delphi\debug\Keyman.System.DebugLogClient.pas',
   Keyman.System.DebugLogCommon in '..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas',
   Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas',
@@ -131,7 +122,8 @@ uses
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
-  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}
@@ -141,9 +133,10 @@ uses
 // PEOPTFLAGS $140 turns on Data Execution Prevention
 //
 {$SETPEOPTFLAGS $140}
-
+const
+  LOGGER_DESKTOP_ENGINE_KEYMAN = TKeymanSentryClient.LOGGER_DESKTOP_ENGINE + '.keyman';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_ENGINE_KEYMAN);
   try
     Run;
   finally

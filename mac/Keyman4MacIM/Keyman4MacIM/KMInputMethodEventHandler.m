@@ -8,7 +8,7 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodEventHandlerProtected.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
-#import <Crashlytics/Crashlytics.h>
+@import Sentry;
 
 @implementation KMInputMethodEventHandler
 
@@ -20,8 +20,8 @@ NSMutableString* _pendingBuffer;
 NSUInteger _numberOfPostedDeletesToExpect = 0;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
-NSMutableString* _easterEggForCrashlytics = nil;
-NSString* const kEasterEggText = @"Crashlytics force now";
+NSMutableString* _easterEggForSentry = nil;
+NSString* const kEasterEggText = @"Sentry force now";
 NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 NSRange _previousSelRange;
@@ -42,22 +42,33 @@ NSRange _previousSelRange;
     return self;
 }
 
-// This is the public initializer.
-- (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
-    self.senderForDeleteBack = sender;
-    // TODO: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
-    // with Apple's IM framework) have a problem in that if the user selects a different font (or other
-    // formatting) and then types a sequence that causes characters to be added to the document and then
-    // subsequently replaced, the replacement causes the formatting decision to be forgotten. This can be
-    // "fixed" by treating them as legacy apps, but it causes other problems.
-    BOOL legacy = ([clientAppId isEqual: @"com.github.atom"] ||
+/**
+ * Checks if the client app requires legacy input mode, first by checking the user defaults, if they exist,
+ * then, by our hard-coded list.
+ */
+- (BOOL)isClientAppLegacy:(NSString *)clientAppId {
+    NSArray *legacyAppsUserDefaults = [self.AppDelegate legacyAppsUserDefaults];
+
+    BOOL result = NO;
+
+    if(legacyAppsUserDefaults != nil) {
+        result = [self isClientAppLegacy:clientAppId fromArray:legacyAppsUserDefaults];
+    }
+
+    if(!result) {
+        // TODO: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
+        // with Apple's IM framework) have a problem in that if the user selects a different font (or other
+        // formatting) and then types a sequence that causes characters to be added to the document and then
+        // subsequently replaced, the replacement causes the formatting decision to be forgotten. This can be
+        // "fixed" by treating them as legacy apps, but it causes other problems.
+        result = ([clientAppId isEqual: @"com.github.atom"] ||
             [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
             [clientAppId isEqual: @"org.libreoffice.script"] ||
             [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
             [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
-            [clientAppId isEqual: @"com.microsoft.Word"] ||
+            //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
             [clientAppId isEqual: @"org.openoffice.script"] ||
             [clientAppId isEqual: @"com.adobe.illustrator"] ||
             [clientAppId isEqual: @"com.adobe.InDesign"] ||
@@ -65,26 +76,51 @@ NSRange _previousSelRange;
             [clientAppId isEqual: @"com.adobe.AfterEffects"] ||
             [clientAppId isEqual: @"com.microsoft.VSCode"] ||
             [clientAppId isEqual: @"com.google.Chrome"] ||
+            [clientAppId hasPrefix: @"net.java"] ||
             [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
-               /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */);
+            /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
+        );
+    }
 
-    // We used to default to NO, so these were the obvious exceptions. But then we realized that
-    // in any app, command keys can change the selection, so now we default to YES, and only have
-    // a few situations where we pretend it can't. This flag should probably be renamed to something
-    // like "disregardPossibleSelectionChanges".
-    //    if ([clientAppId isEqual: @"com.google.Chrome"] ||
-    //        [clientAppId isEqual: @"com.apple.Terminal"] ||
-    //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-    //        _clientSelectionCanChangeUnexpectedly = YES;
-    //    }
+    return result;
+}
 
-    // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is the current keyboard and you type "Crashlytics force now", it will force a simulated crash to test reporting to fabric.io.
+/**
+ * Checks user defaults array for a list of possible regexes to match a client app id
+ */
+- (BOOL)isClientAppLegacy:(NSString *)clientAppId fromArray:(NSArray *)legacyApps {
+    for(id legacyApp in legacyApps) {
+        if(![legacyApp isKindOfClass:[NSString class]]) {
+            NSLog(@"isClientAppLegacy:fromArray: LegacyApps user defaults array should contain only strings");
+        } else {
+            NSError *error = nil;
+            NSRange range =  NSMakeRange(0, clientAppId.length);
+            
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) legacyApp options: 0 error: &error];
+            if([regex matchesInString:clientAppId options:0 range:range]) {
+                return YES;
+            }
+        }
+    }
+
+    return NO;
+}
+
+// This is the public initializer.
+- (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
+    self.senderForDeleteBack = sender;
+
+    BOOL legacy = [self isClientAppLegacy:clientAppId];
+
+    // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
+    // the current keyboard and you type "Sentry force now", it will force a simulated crash to 
+    // test reporting to sentry.keyman.com
     if ([self.AppDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-        NSLog(@"Crashlytics - Preparing to detect Easter egg.");
-        _easterEggForCrashlytics = [[NSMutableString alloc] init];
+        NSLog(@"Sentry - Preparing to detect Easter egg.");
+        _easterEggForSentry = [[NSMutableString alloc] init];
     }
     else
-        _easterEggForCrashlytics = nil;
+        _easterEggForSentry = nil;
 
     // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
     // the context, so we pretend/hope it won't.
@@ -327,24 +363,24 @@ NSRange _previousSelRange;
             actions = [self.kme processEvent:event];
         }
         if (actions.count == 0) {
-            if (_easterEggForCrashlytics != nil) {
+            if (_easterEggForSentry != nil) {
                 NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
-                NSLog(@"Crashlytics - KMX name: %@", kmxName);
+                NSLog(@"Sentry - KMX name: %@", kmxName);
                 if ([kmxName isEqualToString:kEasterEggKmxName]) {
-                    NSUInteger len = [_easterEggForCrashlytics length];
-                    NSLog(@"Crashlytics - Processing character(s): %@", [event characters]);
+                    NSUInteger len = [_easterEggForSentry length];
+                    NSLog(@"Sentry - Processing character(s): %@", [event characters]);
                     if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
                         NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-                        NSLog(@"Crashlytics - Adding character to Easter Egg code string: %@", characterToAdd);
-                        [_easterEggForCrashlytics appendString:characterToAdd];
-                        if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
-                            NSLog(@"Crashlytics - Forcing crash now with API Key: %@", [[Crashlytics sharedInstance] APIKey]);
-                            [[Crashlytics sharedInstance] crash];
+                        NSLog(@"Sentry - Adding character to Easter Egg code string: %@", characterToAdd);
+                        [_easterEggForSentry appendString:characterToAdd];
+                        if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
+                            NSLog(@"Sentry - Forcing crash now");
+                            [SentrySDK crash];
                         }
                     }
                     else if (len > 0) {
-                        NSLog(@"Crashlytics - Clearing Easter Egg code string.");
-                        [_easterEggForCrashlytics setString:@""];
+                        NSLog(@"Sentry - Clearing Easter Egg code string.");
+                        [_easterEggForSentry setString:@""];
                     }
                 }
             }

@@ -26,6 +26,7 @@ type
       override;
 
     function GetLangName: string; virtual;
+    procedure SetLangID(Value: Integer);
 
     { IKeymanKeyboardLanguage }
     function Get_BCP47Code: WideString; safecall;
@@ -47,7 +48,9 @@ uses
   System.Variants,
   System.Win.ComObj,
 
+  BCP47Tag,
   glossary,
+  Keyman.System.Standards.LangTagsRegistry,
   keymanerrorcodes,
   utiltsf,
   utilxml;
@@ -56,12 +59,39 @@ uses
 
 constructor TKeymanKeyboardLanguage.Create(AContext: TKeymanContext;
   AOwner: IKeymanKeyboard; const ABCP47Code: string; ALangID: Integer; const AName: string);
+var
+  LangTag: TLangTag;
+  TempTag: string;
+  bcp47tag: TBCP47Tag;
 begin
   FContext := AContext;
   FOwner := AOwner;
   FBCP47Code := ABCP47Code;
   FLangID := ALangID;
-  FName := AName;
+
+  if AName <> '' then
+    // If the name is passed in, it comes from the package/keyboard metadata
+    FName := AName
+  else if TLangTagsMap.AllTags.TryGetValue(ABCP47Code, TempTag) and
+      TLangTagsMap.LangTags.TryGetValue(TempTag, LangTag) then
+    // No name is passed in, so we'll get it from langtags if possible
+    FName := LangTag.name
+  else
+  begin
+    // It's not a tag in langtags, so we'll lookup just the language subtag
+    bcp47tag := TBCP47Tag.Create(ABCP47Code);
+    try
+      if TLangTagsMap.AllTags.TryGetValue(bcp47tag.Language, TempTag) and
+          TLangTagsMap.LangTags.TryGetValue(TempTag, LangTag) then
+        FName := LangTag.name
+      else
+        // Still no luck, we'll just use the BCP47 tag
+        FName := ABCP47Code;
+    finally
+      bcp47tag.Free;
+    end;
+  end;
+
   inherited Create(AContext, IKeymanKeyboardLanguage);
 end;
 
@@ -115,6 +145,11 @@ begin
     'langid', IntToHex(Get_LangID, 4),
     'bcp47code', FBCP47Code,
     'langname', GetLangName]);
+end;
+
+procedure TKeymanKeyboardLanguage.SetLangID(Value: Integer);
+begin
+  FLangID := Value;
 end;
 
 end.

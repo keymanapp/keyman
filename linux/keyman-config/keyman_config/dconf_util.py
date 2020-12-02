@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
-import logging
-from gi.repository import Gio, Gtk
+from gi.repository import Gio
 
 # DConf path destkop/ibus/keyman/options
 DCONF_BASE = "com.keyman.options"
@@ -55,7 +54,7 @@ def set_option(info, options):
         # Convert dictionary of options into a list of comma-separated option strings
         list_options = []
         for key, value in options.items():
-            list_options.append(key+"="+value)
+            list_options.append(key + "=" + value)
 
         child_schema = get_child_schema(info)
         child_schema.set_strv("options", list_options)

@@ -1,0 +1,84 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{38F30CBD-8380-4272-8138-79D9D7535D06}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="kmshell\kmshell.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmbrowserhost\kmbrowserhost.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="setup\setup.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmconfig\kmconfig.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="insthelp\insthelp.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="kmshell">
+        <MSBuild Projects="kmshell\kmshell.dproj"/>
+    </Target>
+    <Target Name="kmshell:Clean">
+        <MSBuild Projects="kmshell\kmshell.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="kmshell:Make">
+        <MSBuild Projects="kmshell\kmshell.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="kmbrowserhost">
+        <MSBuild Projects="kmbrowserhost\kmbrowserhost.dproj"/>
+    </Target>
+    <Target Name="kmbrowserhost:Clean">
+        <MSBuild Projects="kmbrowserhost\kmbrowserhost.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="kmbrowserhost:Make">
+        <MSBuild Projects="kmbrowserhost\kmbrowserhost.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="setup">
+        <MSBuild Projects="setup\setup.dproj"/>
+    </Target>
+    <Target Name="setup:Clean">
+        <MSBuild Projects="setup\setup.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="setup:Make">
+        <MSBuild Projects="setup\setup.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="kmconfig">
+        <MSBuild Projects="kmconfig\kmconfig.dproj"/>
+    </Target>
+    <Target Name="kmconfig:Clean">
+        <MSBuild Projects="kmconfig\kmconfig.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="kmconfig:Make">
+        <MSBuild Projects="kmconfig\kmconfig.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="insthelp">
+        <MSBuild Projects="insthelp\insthelp.dproj"/>
+    </Target>
+    <Target Name="insthelp:Clean">
+        <MSBuild Projects="insthelp\insthelp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="insthelp:Make">
+        <MSBuild Projects="insthelp\insthelp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="kmshell;kmbrowserhost;setup;kmconfig;insthelp"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="kmshell:Clean;kmbrowserhost:Clean;setup:Clean;kmconfig:Clean;insthelp:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="kmshell:Make;kmbrowserhost:Make;setup:Make;kmconfig:Make;insthelp:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

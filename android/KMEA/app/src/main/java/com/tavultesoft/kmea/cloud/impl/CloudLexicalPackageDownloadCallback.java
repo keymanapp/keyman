@@ -1,7 +1,7 @@
 package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
-import android.util.Log;
+import android.net.Uri;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -12,6 +12,7 @@ import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONException;
 
@@ -54,11 +55,21 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
       {
 
         try {
-
-          if (_d.getCloudParams().target== CloudApiTypes.ApiTarget.LexicalModelPackage) {
+          if (_d.getCloudParams().target == CloudApiTypes.ApiTarget.LexicalModelPackage) {
             installedLexicalModels = new LinkedList<>();
+
+            // Parse url for the kmp filename
+            Uri uri = Uri.parse(_d.getCloudParams().url);
+            String kmpFilename = uri.getLastPathSegment();
+            if (kmpFilename == null || kmpFilename.isEmpty()) {
+              KMLog.LogError(TAG, "Cloud URL " + _d.getCloudParams().url + " has null model package");
+            }
+            if (!kmpFilename.endsWith(FileUtils.MODELPACKAGE)) {
+              kmpFilename = kmpFilename + FileUtils.MODELPACKAGE;
+            }
+
             // Extract the kmp. Validate it contains only lexical models, and then process the lexical model package
-            File kmpFile = new File(cacheDir, FileUtils.getFilename(_d.getCloudParams().url));
+            File kmpFile = new File(cacheDir, kmpFilename);
 
             FileUtils.copy(_d.getDestinationFile(), kmpFile);
 
@@ -69,9 +80,8 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
             }
           }
         }
-        catch (IOException | JSONException _e)
-        {
-          Log.e(TAG,_e.getLocalizedMessage(),_e);
+        catch (IOException | JSONException e) {
+          KMLog.LogException(TAG, "", e);
         }
       }
       else
@@ -91,11 +101,11 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
       aContext.getString(R.string.dictionary_download_finished),
       Toast.LENGTH_SHORT).show();
 
-    if(aCloudResult.installedLexicalModels != null)
+    if(aCloudResult.installedResource != null)
     {
       KeyboardEventHandler.notifyListeners(KMKeyboardDownloaderActivity.getKbDownloadEventListeners(),
         KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
-        aCloudResult.installedLexicalModels, aCloudResult.kbdResult);
+        aCloudResult.installedResource, aCloudResult.kbdResult);
     }
   }
 

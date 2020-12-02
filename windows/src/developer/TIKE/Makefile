@@ -7,17 +7,21 @@
 build: version.res manifest.res icons dirs xml
     cd $(ROOT)\src\developer\tike
     $(DCC32) tike.dpr
-    $(TDS2DBG) tike.exe
     $(SENTRYTOOL_DELPHIPREP) tike.exe -dpr tike.dpr
+    $(TDS2DBG) tike.exe
     $(COPY) tike.exe $(PROGRAM)\developer
     $(COPY) kmlmc.cmd $(PROGRAM)\developer
     if exist tike.dbg $(COPY) tike.dbg $(DEBUGPATH)\developer
 
-xml: pull-keymanweb pull-npm
+xml: pull-keymanweb pull-npm sentry-init.js
     cd $(ROOT)\src\developer\tike\xml
     -del /q $(ROOT)\bin\developer\xml\*
     xcopy /s /y * $(ROOT)\bin\developer\xml
     cd $(ROOT)\src\developer\tike
+
+sentry-init.js:
+    cd $(ROOT)\src\developer\tike\xml\app\lib\sentry
+    $(MKVER_U) init.js.in init.js
 
 pull-npm:
     #
@@ -67,6 +71,10 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Developer" $(PROGRAM)\developer\tike.exe
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\developer\tike.exe /t keyman-developer
+    $(SYMSTORE) $(DEBUGPATH)\developer\tike.dbg /t keyman-developer
 
 backup:
     $(WZZIP) $(BUILD)\developer\tike.zip  $(BACKUPDEFAULTS) tike.exe

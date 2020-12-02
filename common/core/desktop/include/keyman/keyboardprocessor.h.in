@@ -256,7 +256,7 @@ km_kbp_context_items_from_utf8(char const *text,
 ### `km_kbp_context_items_to_utf16`
 ##### Description:
 Convert a context item array into a UTF-16 encoded string placing it into
-the supplied buffer of specified size, and return the number codepoints
+the supplied buffer of specified size, and return the number of code units
 actually used in the conversion. If null is passed as the buffer the
 number codeunits required is returned. This will strip markers from the
 context during the conversion.
@@ -269,11 +269,11 @@ context during the conversion.
 ##### Parameters:
 - __context_items__: A pointer to the start of an array `km_kbp_context_item`.
     Must be terminated with a type of `KM_KBP_CT_END`.
-- __buf__: A pointer to the buffer to place the UTF-16 string into. May be be
-    null to request size calculation.
+- __buf__: A pointer to the buffer to place the UTF-16 string into.
+    May be null to request size calculation.
 - __buf_size__: a pointer to the result variable:
-    A pointer the size of the supplied buffer in codeunits or filled with the
-    size required if `buf` is null.
+    The size of the supplied buffer in codeunits if `buf` is given.
+    On return will be the size required if `buf` is null.
 
 ```c
 */
@@ -288,7 +288,7 @@ km_kbp_context_items_to_utf16(km_kbp_context_item const *item,
 ### `km_kbp_context_items_to_utf8`
 ##### Description:
 Convert a context item array into a UTF-8 encoded string placing it into
-the supplied buffer of specified size, and return the number codepoints
+the supplied buffer of specified size, and return the number of code units
 actually used in the conversion. If null is passed as the buffer the
 number codeunits required is returned. This will strip markers from the
 context during the conversion.
@@ -301,11 +301,11 @@ context during the conversion.
 ##### Parameters:
 - __context_items__: A pointer to the start of an array `km_kbp_context_item`.
     Must be terminated with a type of `KM_KBP_CT_END`.
-- __buf__: A pointer to the buffer to place the UTF-8 string into. May be be
-    null to request size calculation.
+- __buf__: A pointer to the buffer to place the UTF-8 string into.
+    May be null to request size calculation.
 - __buf_size__: a pointer to the result variable:
-    A pointer the size of the supplied buffer in codeunits or filled with the
-    size required if `buf` is null.
+    The size of the supplied buffer in codeunits if `buf` is given.
+    On return will be the size required if `buf` is null.
 
 ```c
 */

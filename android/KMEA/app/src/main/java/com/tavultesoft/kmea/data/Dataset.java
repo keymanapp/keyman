@@ -112,7 +112,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements Li
 
     public Type findMatch(Type target) {
       for(Type obj: data) {
-        if(obj.getResourceId().equals(target.getResourceId()) && obj.getLanguageCode().equals(target.getLanguageCode())) {
+        if (target.equals(obj)) {
           return obj;
         }
       }
@@ -309,7 +309,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements Li
   }
 
   protected void handleLanguageItemRemoval(LanguageResource coded) {
-    String lgCode = coded.getLanguageCode();
+    String lgCode = coded.getLanguageID();
     LanguageDataset lgData = languageMetadata.get(lgCode);
 
     if(lgData.keyboards.size() == 0 && lgData.lexicalModels.size() == 0) {
@@ -320,11 +320,11 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements Li
   }
 
   protected LanguageDataset getMetadataFor(LanguageResource coded) {
-    final String lgCode = coded.getLanguageCode();
+    final String lgCode = coded.getLanguageID();
     LanguageDataset data = Dataset.this.languageMetadata.get(lgCode);
 
     if(data == null) {
-      data = new LanguageDataset(coded.getLanguageName(), coded.getLanguageCode());
+      data = new LanguageDataset(coded.getLanguageName(), coded.getLanguageID());
       Dataset.this.languageMetadata.put(lgCode, data);
       Dataset.this.add(data);
     }
@@ -340,7 +340,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements Li
     this.languageMetadata.clear();
   }
 
-  // TODO:  Do we need to override any of this class's menbers in case someone SOMEHOW constructs
+  // TODO:  Do we need to override any of this class's members in case someone SOMEHOW constructs
   //        a LanguageDataset from outside the Dataset class?
 
   @Override

@@ -1,0 +1,408 @@
+﻿<?xml version="1.0"?>
+<resources>
+  <!--
+locale.dtd: Contains all localizable strings from Keyman Configuration XML files.
+
+Create a user interface translation for Keyman Desktop at http://www.tavultesoft.com/keyman/support/locale/
+-->
+  <string name="S_LocaleAuthors" comment="System/PlainText: Name(s) of people who created this translation - i.e. your name (introduced 7.1.266.0)">[!!Ķēɏmãŋ!!]</string>
+  <string name="SK_UIFontName" comment="_Font/PlainText: The standard font (introduced 7.0.230.0)">Segoe UI</string>
+  <string name="SK_UIFontSize" comment="_Font/PlainText: The standard font size (introduced 7.0.230.0)">9</string>
+  <!-- BETA ONLY ENTITIES -->
+  <string name="S_BETA" comment="System/PlainText: Set this text to 'BETA' for beta versions of Keyman, and empty otherwise (introduced 7.0.230.0)"/>
+  <!-- Product Name -->
+  <string name="S_ShortProductName" comment="Product/PlainText: Company, product and version name (introduced 7.0.230.0)">Keyman</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- General Strings                   -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_Yes" comment="General Strings/PlainText: Yes term (introduced 7.0.230.0)">[!!Ÿĕŝ!!]</string>
+  <string name="S_No" comment="General Strings/PlainText: No term (introduced 7.0.230.0)">[!!Ňō!!]</string>
+  <string name="SKButtonYes" comment="Formatted Messages/FormatString: Yes button in message boxes (introduced 7.0.230.0)">[!!&amp;Ƴēš!!]</string>
+  <string name="SKButtonNo" comment="Formatted Messages/FormatString: No button in message boxes (introduced 7.0.230.0)">[!!&amp;Ńŏ!!]</string>
+  <string name="S_Button_OK" comment="General Strings/PlainText: Ok button term (introduced 7.0.230.0)">[!!ƠĶ!!]</string>
+  <string name="S_Button_Cancel" comment="General Strings/PlainText: Cancel button term (introduced 7.0.230.0)">[!!Čãŋčȅļ!!]</string>
+  <string name="S_Button_Close" comment="General Strings/PlainText: Close button term (introduced 7.0.230.0)">[!!Ćļŏśȅ!!]</string>
+  <string name="S_Button_Apply" comment="General Strings/PlainText: Apply button term (introduced 8.0.314.0)">[!!Ãƥƥłƴ!!]</string>
+  <string name="S_Button_RemindLater" comment="General Strings/PlainText: Remind me Later button term (introduced 8.0.314.0)">[!!Ʀȇmıŋď mĕ Ľàťēř!!]</string>
+  <string name="SKButtonOK" comment="Formatted Messages/FormatString: OK button in message boxes (introduced 7.0.230.0)">[!!ŐƘ!!]</string>
+  <string name="SKButtonCancel" comment="Formatted Messages/FormatString: Cancel button in message boxes (introduced 7.0.230.0)">[!!Ċāņċěł!!]</string>
+  <string name="SKBalloonClickToSelectKeyboard" comment="Formatted Messages/FormatString: Balloon that shows when Keyman Desktop icon is first shown during the tutorial (introduced 8.0.330.0)">[!!Ċłīċķ ţħĭš ĭċơŋ ťō şȇŀȅćţ ȁ ƙěɏƅŏáŗď!!]</string>
+  <string name="SKBalloonOSKClosed" comment="Formatted Messages/FormatString: Balloon that shows when OSK is closed (introduced 8.0.330.0)">Keyman[!! ıś ŝťıĺĺ ŕūŉňīńġ.  Ċŀĩćķ ţħıŝ įĉőň ťơ űśē ŷōūř ļāņğųãğě ƙȇƴƃŏǻřđ ąť āŉɏ ŧĩmė!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Configuration Dialog              -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_ConfigurationTitle" comment="Configuration Dialog/PlainText: Configuration dialog title, which includes the product name (introduced 7.0.230.0)">Keyman[!! Ćōŉƒĩģųřȃţįőň!!]</string>
+  <string name="S_Caption_GettingStarted" comment="Configuration Dialog/PlainText: Configuration dialog link to Getting Started (introduced 7.0.239.0)">[!!Ġĕţŧīńģ Ŝţářťěď!!]</string>
+  <string name="S_Caption_Help" comment="Configuration Dialog/PlainText: Configuration dialog link to Help (introduced 7.0.239.0)">[!!Ħēļƿ!!]</string>
+  <!-- Tab names and shortcut keys -->
+  <string name="S_Keyboards" comment="Configuration Dialog - Tab names/PlainText: Keyboard Layouts tab name (introduced 7.0.230.0)">[!!Ƙėƴɓŏäŗď Łǻŷơŭţš!!]</string>
+  <string name="S_Keyboards_AccessChar" comment="Configuration Dialog - Tab names/PlainText: Direct access to the Keyboard Layouts tab using alt+ (introduced 7.0.230.0)">[!!Ķ!!]</string>
+  <string name="S_Options" comment="Configuration Dialog - Tab names/PlainText: Options tab name (introduced 7.0.230.0)">[!!Ōƿťĩőƞş!!]</string>
+  <string name="S_Options_AccessChar" comment="Configuration Dialog - Tab names/PlainText: Direct access to the Options tab using alt+ (introduced 7.0.230.0)">[!!Ŏ!!]</string>
+  <string name="S_Hotkeys" comment="Configuration Dialog - Tab names/PlainText: Hotkeys tab name (introduced 7.0.230.0)">[!!Ĥōţƙȇȳş!!]</string>
+  <string name="S_Hotkeys_AccessChar" comment="Configuration Dialog - Tab names/PlainText: Direct access to the Hotkeys tab using alt+ (introduced 7.0.230.0)">[!!Ħ!!]</string>
+  <string name="S_Support" comment="Configuration Dialog - Tab names/PlainText: Support tab name (introduced 7.0.230.0)">[!!Śűƥƥơřť!!]</string>
+  <string name="S_Support_AccessChar" comment="Configuration Dialog - Tab names/PlainText: Direct access to the Support tab using alt+ (introduced 7.0.230.0)">[!!Š!!]</string>
+  <string name="S_KeepInTouch" comment="Configuration Dialog - Tab names/PlainText: Keep in touch tab name (introduced 9.0.493.0)">[!!Ķēĕƥ īň Ťōŭċĥ!!]</string>
+  <string name="S_KeepInTouch_AccessChar" comment="Configuration Dialog - Tab names/PlainText: Direct access to the Keep in Touch tab using alt+ (introduced 9.0.492.0)">[!!Ŧ!!]</string>
+  <!-- Configuration detail captions -->
+  <string name="S_Caption_Filename" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for filename (introduced 7.0.230.0)">[!!Ƒĭļėŉȁmĕ:!!]</string>
+  <string name="S_Caption_Version" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for package version (introduced 7.0.230.0)">[!!Ƥāčĸäġȅ vĕřšįơņ:!!]</string>
+  <string name="S_Caption_KeyboardVersion" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for keyboard version (introduced 9.0.442.0)">[!!Ƙĕƴƅŏȃŕď vȇŕšįơņ:!!]</string>
+  <string name="S_Caption_Author" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for author (introduced 7.0.230.0)">[!!Äųţĥōŗ:!!]</string>
+  <string name="S_Caption_Website" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for website (introduced 7.0.230.0)">[!!Ŵēƀşīťę:!!]</string>
+  <string name="S_Caption_Package" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for package (introduced 7.0.230.0)">[!!Ƥáĉķąğȅ:!!]</string>
+  <string name="S_Caption_Fonts" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for fonts (introduced 7.0.230.0)">[!!Ƒőƞţŝ:!!]</string>
+  <string name="S_Caption_Keyboards" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for keyboard layouts (introduced 7.0.230.0)">[!!Ƙěŷƀōäŗď Ĺāɏőūŧś:!!]</string>
+  <string name="S_Caption_Encodings" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for encodings (encodings include Unicode, ANSI, Non-Unicode, etc). (introduced 7.0.230.0)">[!!Ęńĉőďıŉğś:!!]</string>
+  <string name="S_Caption_LayoutType" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic) (introduced 7.0.230.0)">[!!Łáŷōũŧ Ŧŷƥȅ:!!]</string>
+  <string name="S_LayoutType_Positional" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for the fixed keyboard layout type (introduced 7.0.230.0)">[!!Ƒĭxěđ (Ƥőşıŧįơƞąŀ)!!]</string>
+  <string name="S_LayoutType_Mnemonic" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for the mnemonic keyboard layout type (introduced 7.0.230.0)">[!!Mäƥƥȅď ŧơ Ŵıƞďőŵŝ ŀąƴőůŧ (Mƞēmŏŉįč)!!]</string>
+  <string name="S_Caption_Description" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for description (introduced 7.0.230.0)">[!!Ɖȇŝĉřīƥťįơń:!!]</string>
+  <string name="S_Caption_InstalledFor" comment="Configuration Dialog - Captions/PlainText: Text preceding Install choices (introduced 7.0.230.0)">[!!Įŋŝţăĺłȅđ ƒōŕ:!!]</string>
+  <string name="S_InstalledFor_AllUsers" comment="Configuration Dialog - Captions/PlainText: Install choice - install for all users (introduced 7.0.230.0)">[!!Āłĺ ŭšȇřş!!]</string>
+  <string name="S_InstalledFor_CurrentUser" comment="Configuration Dialog - Captions/PlainText: Install choice - install for current user (introduced 7.0.230.0)">[!!Čūŕŗȅņţ űşęŗ!!]</string>
+  <string name="S_Caption_Languages" comment="Configuration Dialog - Captions/PlainText: Text preceding linked language profiles (introduced 9.0.420.0)">[!!Ĺǻƞĝůǻĝęŝ:!!]</string>
+  <string name="S_Languages_Uninstall" comment="Configuration Dialog - Captions/PlainText: Remove language profile (introduced 9.0.420.0)">[!!✕!!]</string>
+  <string name="S_Languages_Install" comment="Configuration Dialog - Captions/PlainText: Add language profile (introduced 9.0.420.0)">[!!Āđđ ļàŉğũåĝē!!]</string>
+  <string name="S_Caption_OnScreenKeyboard" comment="Configuration Dialog - Captions/PlainText: Term for the On Screen Keyboard (introduced 7.0.230.0)">[!!Őƞ Ŝĉŗȇȅň Ķȅƴƀŏȁřď:!!]</string>
+  <string name="S_OnScreenKeyboard_Custom" comment="Configuration Dialog - Captions/PlainText: (OSK) Custom term (introduced 8.0.306.0)">[!!Ĉŭŝťŏm!!]</string>
+  <string name="S_OnScreenKeyboard_Installed" comment="Configuration Dialog - Captions/PlainText: (OSK) Installed term (introduced 7.0.230.0)">[!!Įŋŝťăļļėđ!!]</string>
+  <string name="S_OnScreenKeyboard_NotInstalled" comment="Configuration Dialog - Captions/PlainText: (OSK) Not installed term (introduced 7.0.230.0)">[!!Ŋōŧ ĩņšťāłŀėđ!!]</string>
+  <string name="S_Caption_Documentation" comment="Configuration Dialog - Captions/PlainText: Term for the Documentation (introduced 8.0.306.0)">[!!Ďơĉũměŋťáťĩŏŉ:!!]</string>
+  <string name="S_Documentation_Installed" comment="Configuration Dialog - Captions/PlainText: (Documentation) Installed term (introduced 8.0.306.0)">[!!İƞśţąļļĕď!!]</string>
+  <string name="S_Documentation_NotInstalled" comment="Configuration Dialog - Captions/PlainText: (Documentation) Not installed term (introduced 8.0.306.0)">[!!Ɲőţ įńşťǻĺłȅđ!!]</string>
+  <string name="S_Caption_Message" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for additional messages (introduced 7.0.230.0)">[!!Mȅşśäģę:!!]</string>
+  <string name="S_Caption_Copyright" comment="Configuration Dialog - Captions/PlainText: Keyboard download window, etc. - term for copyright (introduced 7.0.230.0)">[!!Čőƥȳŕīğĥť:!!]</string>
+  <!-- Keyboards tab -->
+  <string name="S_Button_PackageOptions" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: Keyboard Layouts - package options button (introduced 7.0.230.0)">[!!Ƥąċƙäĝė ŏƿţīōŉş!!]</string>
+  <string name="S_Button_KeyboardOptions" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: Keyboard Layouts - standard options button (introduced 7.0.230.0)">[!!Őƥţĭơŉş!!]</string>
+  <string name="S_Button_InstallKeyboard" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: Keyboard Layouts - install keyboard button (introduced 7.0.230.0)">[!!Īňšŧąľľ ƙĕŷɓŏȃŕđ...!!]</string>
+  <string name="S_Button_DownloadKeyboard" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: Keyboard Layouts - download keyboard button (introduced 7.0.230.0)">[!!Ďŏŵƞļőȁđ ĸěƴɓōäŗď...!!]</string>
+  <string name="S_Menu_Options" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - keyboard options (introduced 8.0.287.0)">[!!Ƙēŷƀōăŕđ ōƿťĭőńš!!]</string>
+  <string name="S_Menu_Uninstall" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - uninstall keyboard (introduced 7.0.230.0)">[!!Ūƞīŋšťāļŀ!!]</string>
+  <string name="S_Menu_UninstallPackage" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - uninstall package (introduced 7.0.230.0)">[!!Ŭňĭƞŝťąľĺ ƥåĉĸåĝĕ!!]</string>
+  <string name="S_Menu_ShowWelcome" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - show introductory help (introduced 7.0.230.0)">[!!Šħŏŵ ıŉťŕơđūċŧŏŗŷ ĥȅłƥ!!]</string>
+  <string name="S_Menu_ChangeHotkey" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - change hotkey (introduced 7.0.230.0)">[!!Čħąņģĕ ĥŏŧĸēƴ!!]</string>
+  <string name="S_Menu_SetHotkey" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - set hotkey (introduced 7.0.230.0)">[!!Śęť ĥőťĸěɏ!!]</string>
+  <string name="S_Menu_UninstallOnScreenKeyboard" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - uninstall OSK (introduced 7.0.230.0)">[!!Űńıňşťāľŀ Ơŉ Şčŗēȇń ƘȇƴƄơǻŕď!!]</string>
+  <string name="S_Menu_InstallOnScreenKeyboard" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - install OSK (introduced 7.0.230.0)">[!!Īƞśŧăłŀ Ŏń Śċřęęŋ Ƙĕŷƀơáŗď...!!]</string>
+  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: Keyboard Layouts - notice of no keyboard layouts installed (introduced 7.0.230.0)">[!!Ƴŏũ ďŏ ņōţ ħâvě àņƴ ķȅƴƀőāŗđś ĩņşŧăļłęď.  Ćŀįĉķ ťĥē Ɗőŵńŀőȁď Ƙȅɏƀŏāřđ ƃŭţŧŏń ŧő ĭńŝţąĺĺ á ĸěƴƄŏąŗď ŀȃŷơŭŧ ƒŗōm ţħě Ƙěɏmăƞ ŵĕƀŝĩţȇ.!!]</string>
+  <string name="SKUninstallRequireAdmin" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: Keyboard Layouts - notice of ineligibility to uninstall a keyboard [%0:s = keyboard layout name] (introduced 7.1.251.0)">[!!Ŷōų ĉáņ ŏƞľŷ ũŉīňşŧȁĺŀ ŧħĕ ĸėɏƃōâŕđ '%0:s' ıƒ ŷőū ăŗę åŋ Âđmĩƞıśţřąţŏŗ!!]</string>
+  <!-- Options tab -->
+  <string name="kogGeneral" comment="Configuration Dialog - Options tab/FormatString: Options section - General (introduced 7.0.230.0)">[!!Ğȅƞėřāĺ!!]</string>
+  <string name="kogStartup" comment="Configuration Dialog - Options tab/FormatString: Options section - Startup (introduced 7.0.230.0)">[!!Šťäřŧůƿ!!]</string>
+  <string name="kogOSK" comment="Configuration Dialog - Options tab/FormatString: Options section - OSK (introduced 7.0.244.0)">[!!Ŏń Śčŗȇĕň Ƙęŷƀơářď!!]</string>
+  <string name="kogAdvanced" comment="Configuration Dialog - Options tab/FormatString: Options section - Advanced (introduced 7.0.230.0)">[!!Āďvăƞčĕď!!]</string>
+  <string name="koKeyboardHotkeysAreToggle" comment="Configuration Dialog - Options tab/FormatString: General options - hotkeys toggle on AND off a keyboard layout (introduced 7.0.230.0)">[!!Ķĕɏɓơáŗď ħőţķȅŷş ŧōğģľė ƙēȳɓŏářđ áćŧīvǻŧĩōņ!!]</string>
+  <string name="koAltGrCtrlAlt" comment="Configuration Dialog - Options tab/FormatString: General options - Ctrl+Alt simulates AltGr on computers without AltGr (introduced 7.0.230.0)">[!!Şīmũŀàťȇ ĄŀťĞř ŵīţĥ Ćţřľ+Āĺŧ!!]</string>
+  <string name="koDeadkeyConversion" comment="Configuration Dialog - Options tab/FormatString: Advanced options - Base keyboard deadkeys are treated as normal keys (introduced 9.0.480.0)">[!!Ťŕėāţ ħȁŗđŵāřĕ ďěãđĸęŷş ǻş ƥľȃįŋ ĸēɏş!!]</string>
+  <string name="koShowHints" comment="Configuration Dialog - Options tab/FormatString: General options - show/hide hint messages (resets hint messages individually disabled) (introduced 7.0.244.0)">[!!Ŝĥőŵ ĥĩŉţ měššàĝȇś!!]</string>
+  <string name="koStartWithWindows" comment="Configuration Dialog - Options tab/FormatString: Startup options - Start Keyman with Windows start (introduced 7.0.230.0)">[!!Šţářţ ŵĥēń Ŵīŋďơŵš ŝŧâřťš!!]</string>
+  <string name="koShowStartup" comment="Configuration Dialog - Options tab/FormatString: Startup options - show/hide splash screen (introduced 7.0.230.0)">[!!Ŝĥơŵ ŝƥļąšħ šćŕęȅņ!!]</string>
+  <string name="koShowWelcome" comment="Configuration Dialog - Options tab/FormatString: Startup options - show/hide welcome screen (introduced 7.0.230.0)">[!!Šħơŵ ŵěļĉōmė şĉŕĕěņ!!]</string>
+  <string name="koCheckForUpdates" comment="Configuration Dialog - Options tab/FormatString: Startup options - check online weekly for updates (introduced 7.0.230.0)">[!!Āűŧőmȁŧĩĉáĺłŷ ćħȅčķ ķěɏmąń.čőm ŵȅėķļȳ ƒőŗ ūƿđȃťėŝ!!]</string>
+  <string name="koTestKeymanFunctioning" comment="Configuration Dialog - Options tab/FormatString: Startup options - test for conflicting apps when Product starts (introduced 7.0.236.0)">[!!Ţēśŧ ƒőŗ ćōńƒłĭćţıņġ ȃƥƿŀīčäťīōňş ŵĥēƞ !!]Keyman[!! şťǻřţš!!]</string>
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="Configuration Dialog - Options tab/FormatString: OSK options - Releases shift/ctrl/alt on OSK after key press (introduced 7.0.236.0)">[!!Ŕěŀęàšĕ Şĥıƒţ/Ĉţřŀ/Ȁľŧ ōň Őņ Ŝčŗėěń Ķēŷƃơâŕđ ȃƒţēŕ ćŀĭċĸīňģ å ĸȅȳ!!]</string>
+  <string name="koAutoOpenOSK" comment="Configuration Dialog - Options tab/FormatString: OSK options - auto-open OSK (introduced 7.0.244.0)">[!!Äľŵȁƴŝ ŝĥŏŵ Őƞ Šċŕėěń ĶĕƴƄōãřđ Ŵīƞďơŵ ŵĥėń Ķěɏmàƞ ķȇƴƃőáŗď ĩš śēļĕĉţěď!!]</string>
+  <string name="koAutoSwitchOSKPages" comment="Configuration Dialog - Options tab/FormatString: OSK options - when a keyboard is activated, switch to most appropriate page in OSK (introduced 7.0.244.0)">[!!Šŵĭŧčĥ ŧơ āƥƿřőƥŕįáŧė Őŋ Šćŗěėń ƘȅƴƄőãŗđ/Ħȅĺƿ áųťơmăŧĭĉåłŀŷ ŵĥȅņ ȃ ķęȳƀōāŕđ ĭŝ śĕļȇćţȇđ!!]</string>
+  <string name="koTurnOnSurrogates" comment="Configuration Dialog - Options tab/FormatString: Advanced options - turn on Unicode suplementary character display (not needed in Vista) (introduced 7.0.230.0)">[!!Ŧũřŉ őŋ Ūńĩĉơđȅ ŝŭƿƥļēmȇňŧāŕɏ ćħāŗãĉŧěř ďıŝƥľäȳ (řȇǫŭīŗęš ŗĕşţâřť)!!]</string>
+  <string name="koUnknownLanguage" comment="Configuration Dialog - Options tab/FormatString: Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts). (introduced 7.0.230.0)">[!!Ŧũŕŉ őŉ 'Ůńƙňŏŵŉ' ĺǻŋġůǻğě!!]</string>
+  <string name="koDebugging" comment="Configuration Dialog - Options tab/FormatString: Advanced options - turn on debugging (which creates a very large file) (introduced 7.0.230.0)">[!!ĎēƄŭģġįƞĝ!!]</string>
+  <string name="koSwitchLanguageWithKeyboard" comment="Configuration Dialog - Options tab/FormatString: Advanced options - switch Windows language when keyboard selected (introduced 7.0.244.0)">[!!Śŵįţċħ Ŵīńďőŵŝ łǻŉġūäģę ŵĥęŉ ā Ƙĕƴmāņ ĸęȳƀőàřđ ĭŝ ŝėľĕčťȅđ!!]</string>
+  <string name="koSwitchLanguageForAllApplications" comment="Configuration Dialog - Options tab/FormatString: Advanced options - selected language applies to all applications (introduced 7.1.274.0)">[!!Šęŀĕćť ƙēƴƅŏàŗď ļáƴōůť ƒōř āĺŀ ȁƥƥłĭċąťįŏńş!!]</string>
+  <string name="koRunElevatedInVista" comment="Configuration Dialog - Options tab/FormatString: Advanced options - elevate user permission to highest permisable level (introduced 7.0.230.0)">[!!Ąŀŵąɏš ěĺěvȃŧȇ ũŝĕř ƥěŗmĩšşıōńş ŵħėń ŗŭńňĩƞģ ĩń Ŵįŋđőŵş Vıŝţă!!]</string>
+  <string name="S_Button_UILanguage" comment="Configuration Dialog - Options tab/PlainText: Options button - changes user interface language/localization (introduced 7.0.230.0)">[!!Ůšēř ĩŋţĕŗƒāĉē łáņģůȃġė...!!]</string>
+  <string name="S_Button_BaseKeyboard" comment="Configuration Dialog - Options tab/PlainText: Options tab - base keyboard button (introduced 9.0.445.0)">[!!Ɓâśȇ Ƙȇƴɓŏäŕđ...!!]</string>
+  <!-- Hotkeys tab -->
+  <string name="S_Hotkey_Keyboard_Prefix" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - activation term preceding Keyman keyboard layout name. Note: include a space following. (introduced 7.0.230.0)"/>
+  <!-- e.g. "Activate [Korean KORDA] Keyboard" -->
+  <string name="S_Hotkey_Keyboard_Suffix" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - keyboard layout term following Keyman keybaord layout name. Note: include an initial space. (introduced 7.0.230.0)"/>
+  <string name="S_Hotkey_Language_Prefix" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - activation term preceding Windows language name. Note: include a space following. (introduced 7.0.241.0)"/>
+  <!-- e.g. "Activate [Korean KORDA] Keyboard" -->
+  <string name="S_Hotkey_Language_Suffix" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - language term following Windows language name. Note: include an initial space. (introduced 7.0.241.0)"/>
+  <string name="S_Hotkey_None" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - text used when no hotkey set for an option (introduced 7.0.230.0)">[!!(ņōŋȅ)!!]</string>
+  <string name="S_Hotkey_TurnKeymanOff" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - Turn Product Off (introduced 7.0.230.0)">[!!Šŵĩťċĥ !!]Keyman[!! Ơƒƒ!!]</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - Open Keyman systemtray menu (introduced 7.0.230.0)">[!!Ōƥȇń Ķęƴɓőäŗď Měƞų!!]</string>
+  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show keyboard in OSK (introduced 7.0.230.0)">[!!Śħōŵ Ŏƞ Ŝĉřęęƞ ĶėƴƂőäŗď Ƥâņȇ!!]</string>
+  <string name="S_Hotkey_OpenConfiguration" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - open Keyman Configuration (introduced 7.0.230.0)">[!!Őƥȅņ Čŏƞƒıġŭřãŧĭőń!!]</string>
+  <string name="S_Hotkey_ShowKeyboardUsage" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show keyboard usage in OSK (introduced 7.1.275.0)">[!!Šĥōŵ Ƙȅɏƀŏâŗď Ũşāġė Ƥȁņě!!]</string>
+  <string name="S_Hotkey_ShowFontHelper" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show font helper in OSK (introduced 7.1.275.0)">[!!Šħŏŵ Ƒơņŧ Ĥēľƿėř Ƥăňě!!]</string>
+  <string name="S_Hotkey_ShowCharacterMap" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show character map in OSK (introduced 7.1.275.0)">[!!Šĥőŵ Ćħąŗâćţěŗ Mȁƥ Ƥȃņě!!]</string>
+  <string name="S_Hotkey_OpenTextEditor" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - open text editor (introduced 7.1.275.0)">[!!Ơƥĕŉ Ţěxţ Ęđĩţŏŕ!!]</string>
+  <string name="S_Hotkey_SwitchLanguage" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - switch language window (introduced 8.0.294.0)">[!!Ŏƿĕŉ Łåƞġűãĝě Śŵīţċĥĕŕ!!]</string>
+  <string name="S_Hotkey_Control_Title" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - Control Title (introduced 7.1.274.0)">[!!Ğēņĕŕáŀ Ĥơťĸęŷŝ!!]</string>
+  <string name="S_Hotkey_Keyboard_Title" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - Keyboard Title (introduced 7.1.274.0)">[!!Ƙȅŷƅŏȁřđ Łãƴơųţś!!]</string>
+  <!-- Languages tab -->
+  <string name="S_Languages_InstalledLanguage" comment="Configuration Dialog - Languages tab/PlainText: Languages - Windows installed languages column header (introduced 7.0.230.0)">[!!Ĩňšťăłĺęđ Ŀāŉĝŭāģė!!]</string>
+  <string name="S_Languages_WindowsLayout" comment="Configuration Dialog - Languages tab/PlainText: Languages - Windows keyboard layout column header (introduced 7.0.230.0)">[!!Ŵıńďơŵš Ĺāɏőūŧ!!]</string>
+  <string name="S_Languages_KeymanKeyboard" comment="Configuration Dialog - Languages tab/PlainText: Languages - Keyboard layout column header (introduced 7.0.230.0)">[!!Ƙěŷmąŋ ĶȅŷƄőāřď!!]</string>
+  <string name="S_Languages_UseWindowsLayout" comment="Configuration Dialog - Languages tab/PlainText: Default text used when a Windows language is associated with its standard Windows keyboard layout (introduced 7.0.230.0)">[!!(ůšę Ŵīņđơŵş ĺáŷőůŧ)!!]</string>
+  <!-- Support tab -->
+  <string name="S_Button_UpgradeNow" comment="Configuration Dialog - Support tab/PlainText:  (introduced 9.0.465.0)">[!!Ůƥģŗǻđȅ ňŏŵ!!!]</string>
+  <string name="S_Button_SendSupportRequest" comment="Configuration Dialog - Support tab/PlainText:  (introduced 9.0.465.0)">[!!Ŝēŋď Şūƥƿōŗŧ Ʀęǫűęšť!!]</string>
+  <string name="S_Support_ContactHeading" comment="Configuration Dialog - Support tab/PlainText:  (introduced 9.0.465.0)">[!!Ĉŏƞŧǻĉŧ Ķěɏmäń Şűƥƿŏřŧ!!]</string>
+  <string name="S_Support_ContactInstructions_Free" comment="Configuration Dialog - Support tab/PlainText:  (introduced 9.0.465.0)">[!!Ĭƒ ȳőŭ ĥȃvĕ ąŋɏ įśşųȅŝ űśĭňģ Ķėɏmāň, Ĵũšť ãšƙ ã ɋűȅšťıőƞ ŏņ ťħĕ Ķȇȳmȁń Ĉōmmūŋĭťŷ Ƒŏŗūm.!!]</string>
+  <string name="S_Button_CommunitySupport" comment="Configuration Dialog - Support tab/PlainText:  (introduced 9.0.465.0)">[!!Ŏƿėŋ Ķȇȳmǻň Čőmmŭŋĭťɏ Ƒŏŕūm!!]</string>
+  <string name="S_Support_Copyright" comment="Configuration Dialog - Support tab/PlainText: Support - Product Copyright (introduced 7.0.230.0)">[!!Ĉōƿŷŕĭĝĥţ © ŜİĹ Īņţęřŋàťįơņåĺ. Ȃŀĺ Ŕĭğĥŧś Ŗěşĕŗvěď.!!]</string>
+  <string name="S_Support_Version" comment="Configuration Dialog - Support tab/PlainText: Support - version (introduced 7.0.230.0)">[!!Vĕŕšĭōŉ!!]</string>
+  <string name="S_Support_EngineVersion" comment="Configuration Dialog - Support tab/PlainText: Support - engine version (introduced 7.0.230.0)">[!!Ēƞģıňȅ Vęŗŝīőń!!]</string>
+  <string name="S_Support_UsefulLinks" comment="Configuration Dialog - Support tab/PlainText: Support - Useful Links heading (introduced 8.0.294.0)">[!!Ũŝęƒųĺ Ľıŋķš!!]</string>
+  <string name="S_Button_OnlineSupport" comment="Configuration Dialog - Support tab/PlainText: Support button - links to online support (introduced 7.0.230.0)">[!!Ơńŀĭŋě Ĥęĺƥ!!]</string>
+  <string name="S_Button_Diagnostics" comment="Configuration Dialog - Support tab/PlainText: Support button - offers a submenu with two diagnostic tools (introduced 7.0.230.0)">[!!Ɖĩȁģŉőşťīċš!!]</string>
+  <string name="S_Button_CheckForUpdates" comment="Configuration Dialog - Support tab/PlainText: Support button - manually checks for product updates (introduced 7.0.230.0)">[!!Čĥėĉķ ƒơŗ Ůƥđǻŧęŝ!!]</string>
+  <string name="S_Button_ProxyConfig" comment="Configuration Dialog - Support tab/PlainText: Options button - allows manual adjustment of proxy settings (introduced 7.0.230.0)">[!!Ƥŗŏxȳ Şęŧŧīŉġŝ...!!]</string>
+  <string name="S_Menu_Diagnostics_Diagnostics" comment="Configuration Dialog - Support tab/PlainText: Support button submenu - performs a diagnostic report (introduced 7.0.230.0)">[!!Ďīāĝŋőşŧīĉş!!]</string>
+  <string name="S_Menu_Diagnostics_CheckLanguages" comment="Configuration Dialog - Support tab/PlainText: Support button submenu - evaluates if Windows language settings are correct for current Keyman keyboard layouts (introduced 7.0.230.0)">[!!Ĉħēĉĸ Ľȃŋĝūȃģȅ Śēţŧįŋġš!!]</string>
+  <string name="SKAllLanguageSettingsTestedOK" comment="Configuration Dialog - Support tab/PlainText: Support - result of positive evaluation: Windows language settings are correct for current Keyman keyboard layouts (introduced 7.1.250.0)">[!!Mīćřőŝơƒţ Ŵīňđőŵś ǻƥƿĕãŗś ťŏ Ƅĕ ćőŕŗēćţłŷ ċōŋƒįğűŗēđ ƒőř ɏőűř ľąŋğūȁģē(ś).!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Download Keyboard Layout Dialog   -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_DownloadKeyboard_Title" comment="Download Keyboard Dialog/PlainText: Download keyboard layout from keyman.com dialog title (introduced 7.0.230.0)">[!!Đŏŵňľŏâď Ƙęŷƀőáŗđ Ƒŕŏm ƙėȳmâņ.čőm!!]</string>
+  <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="Download Keyboard Dialog/PlainText: Download only option checkbox (introduced 7.0.230.0)">[!!Ɗōń'ŧ ĭŉšŧȃļļ, Ĵūşť đōŵŉłőǻđ!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Install Keyboard Dialog           -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Note: this dialog uses captions from the Configuration dialog as well -->
+  <string name="S_InstallKeyboard_Title" comment="Install Keyboard Dialog/PlainText: Install keyboard/package dialog title (introduced 7.0.230.0)">[!!Īňśťąľĺ Ķėȳƅőåřď/Ƥàčĸąĝė!!]</string>
+  <string name="S_InstallKeyboard_Tab_Details" comment="Install Keyboard Dialog/PlainText: Install keyboard/package - details (introduced 7.0.230.0)">[!!Ďȅťáıľś!!]</string>
+  <string name="S_InstallKeyboard_Tab_Readme" comment="Install Keyboard Dialog/PlainText: Install keyboard/package - readme (introduced 7.0.230.0)">[!!Ŗěāďmē!!]</string>
+  <string name="S_InstallKeyboard_Button_Install" comment="Install Keyboard Dialog/PlainText: Install keyboard/package - install button (introduced 7.0.230.0)">[!!İňśťȁŀļ!!]</string>
+  <string name="S_InstallKeyboard_Button_InstallAllUsers" comment="Install Keyboard Dialog/PlainText: Install keyboard/package - install for all users button (introduced 7.0.241.0)">[!!Ĩŋšŧąĺŀ ƒŏŕ ãĺŀ űşęŗś!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Proxy Configuration Dialog        -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_ProxyConfiguration_Title" comment="Proxy Configuration Dialog/PlainText: Proxy configuration dialog title (introduced 7.0.230.0)">[!!Ƥřŏxɏ Śėŕvȅř Ĉőŋƒįğũŗåţįőň!!]</string>
+  <string name="S_ProxyConfiguration_Server" comment="Proxy Configuration Dialog/PlainText: Proxy dialog - fillable-field server (introduced 7.0.230.0)">[!!Šȇřvėŕ: !!]</string>
+  <string name="S_ProxyConfiguration_Port" comment="Proxy Configuration Dialog/PlainText: Proxy dialog - fillable-field port (introduced 7.0.230.0)">[!!Ƥőŗŧ: !!]</string>
+  <string name="S_ProxyConfiguration_Username" comment="Proxy Configuration Dialog/PlainText: Proxy dialog - fillable-field username (introduced 7.0.230.0)">[!!Űşēřńąmě: !!]</string>
+  <string name="S_ProxyConfiguration_Password" comment="Proxy Configuration Dialog/PlainText: Proxy dialog - fillable-field password (introduced 7.0.230.0)">[!!Ƥàŝšŵōŗď: !!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Base Keyboard Dialog        -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_BaseKeyboard_Title" comment="Base Keyboard Dialog/PlainText: Base keyboard dialog title (introduced 9.0.445.0)">[!!Šėţ ßǻśę Ķęȳɓơǻřđ!!]</string>
+  <string name="S_BaseKeyboard_Text" comment="Base Keyboard Dialog/PlainText: Base keyboard dialog description (introduced 9.0.445.0)">[!!Ŝėłěċţ ťĥę Ƃãşȇ Ļǻťīŉ šċŗĭƥť
+ƙėȳƄŏǻŗď ţħãţ ƴōű ůšę įŋ Ŵįŋďơŵŝ.  Ķēŷmąň ĸēȳɓōȁřďś ŵĭŀļ ȁđǻƥť ǻųŧōmâŧĭĉäłļȳ ťō ȳőũŗ ƥŕĕƒėŗŕȅđ ŀàƴōũť.!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Hotkey Dialog                     -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="SKChangeHotkeyTitle" comment="Hotkey Dialog/FormatString: Change Hotkey dialog title (introduced 7.0.230.0)">[!!Ĉħåńğě Ħơťķėŷ!!]</string>
+  <string name="SKButtonClearHotkey" comment="Hotkey Dialog/FormatString: Hotkey dialog - clear button [&amp; = alt+ access-character] (introduced 7.0.230.0)">[!!&amp;Ċłēǻŕ Ħŏťĸȅŷ!!]</string>
+  <string name="SKSetHotkey_Keyboard" comment="Hotkey Dialog/FormatString: Hotkey dialog - message when setting hotkey for a keyboard [%0:s = Name of keyboard] (introduced 7.0.230.0)">[!!Šėľęćť ä šťȁňđáŕđ ħőŧƙȅƴ ơř ċĥơőşė 'Ćūşťōm' ăƞď ħŏļď Ćţŕŀ,Śĥįƒť åŉđ/ōř Àļţ áƞđ ţŷƥė ŷőũŕ ďėšįŗěđ ĥőťĸēŷ ƒőŕ ĸęȳƄơȃŗď %0:s:!!]</string>
+  <string name="SKSetHotkey_Language" comment="Hotkey Dialog/FormatString: Hotkey dialog - message when setting hotkey for a language [%0:s = Name of keyboard] (introduced 7.0.241.0)">[!!Ŝęļēċŧ à śŧáńďǻŗď ĥőţĸēɏ ōŕ ĉħőőšē 'Ćŭşţŏm' ǻňđ ħŏĺđ Ĉťŕŀ,Śħıƒŧ ȁŉď/ŏŕ Àłţ åŋđ ťȳƿē ȳŏũŗ đĕŝĩŕęđ ĥōŧķęŷ ƒŏŗ ŀȃŉğůăĝē %0:s:!!]</string>
+  <string name="SKSetHotkey_Interface" comment="Hotkey Dialog/FormatString: Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard) (introduced 7.0.230.0)">[!!Şēłēĉŧ ã šţàňđáŗď ħőţĸȇȳ ŏŗ ćħőőśȅ 'Ćűšťőm' ăńđ ĥōĺđ Čţŕł,Šħįƒť ăņđ/ơř Ȃŀŧ āŉď ťȳƥȇ ŷơűŕ đęšĭŕěđ ħơţĸėɏ:!!]</string>
+  <string name="SKUnsafeHotkey" comment="Hotkey Dialog/FormatString: Hotkey dialog - warning of hotkey conflict with standard keyboard use [%0:s = Hotkey] (introduced 7.0.230.0)">[!!Ţĥė ħŏţƙēȳ %0:s ŵįŀĺ čōńƒļĭċŧ ŵīŧħ ŋŏřmȁľ ĸęȳƅơǻřđ ŭşȇ.  Ɏŏů śĥōųļđ ūşę áţ łėàŝţ Ĉţŕĺ ơŗ Áłť.  Ɖő ɏőŭ ŵȁƞţ ţŏ čħäňğē ŧĥįş ńőŵ?!!]</string>
+  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey Dialog/FormatString: Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard [%0:s = Hotkey, %1:s = Conflicting keyboard] (introduced 7.0.230.0)">[!!Ťĥē ħơťƙēɏ %0:s ċōŋƒŀĭćţş ŵĩŧĥ ťħę ĥőťĸěȳ şěłĕĉťěď ƒőŗ ƙȇɏƀōāŕď %1:s.  Ĭƒ ŷōũ ĉőƞŧıŉŭĕ, ťĥȇ ħŏŧƙęɏ ƒơŗ ƙȅƴƅōāŕď %1:s ŵīŀł ƃė ĉļēȁřěď.  Čơŉťįŋũę?!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Keyboard for Install Dialog       -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="SKSelectKeyboardsTitle" comment="Select Keyboard for Install Dialog/FormatString: Select Keyboards for Install dialog title (introduced 7.0.241.0)">[!!Şȇłěčţ ƘęŷƂŏȁřďš ŧő Įňśţãļľ!!]</string>
+  <string name="SKSelectKeyboardsBlurb" comment="Select Keyboard for Install Dialog/FormatString: Select Keyboards for Install text [%0:s: Number of keyboards user can still install] (introduced 7.0.241.0)">[!!Ÿőū ċȃƞņŏŧ įƞśťåłļ āŀŀ ŧħę ƙĕŷƂőǻŗďś įŋ ťħĩš ƥȁčķáĝē.  Ƴŏũ ċãň īƞşťāĺľ à máxĩmūm őƒ %0:d àďđıŧıōŉąļ ĸēɏƄōȃŕďš.  Ƥļĕąšȇ šȅľĕċť ŧħē ĸȇƴƀơåŗđŝ ŷőū ŵįşħ ťő īŉśŧăļĺ ƒŕŏm ťĥīś ƿàĉĸăģȅ.!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Online Update Dialog              -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_Update_Title" comment="Online Update Dialog/PlainText: Update dialog title, where Keyman = product name (introduced 7.0.230.0)">[!!Ŭƥđăţĕď !!]Keyman[!! Ċơmƥơƞȅƞŧś Ãváīŀâɓļĕ!!]</string>
+  <string name="S_Update_NewVersionAvailable" comment="Online Update Dialog/PlainText: Update dialog - updates available text (introduced 7.0.230.0)">[!!Ůƥđäţęş ƒōŕ !!]Keyman[!! àŕė ŋơŵ ävàıłàƄľē!!]</string>
+  <string name="S_Update_NewVersionPrompt" comment="Online Update Dialog/PlainText: Update dialog - prompt to select updates (introduced 7.1.255.0)">[!!Ƥłęāşȅ šĕĺěčţ ŧħę űƥđáŧěš ȳőŭ ŵīŝħ ŧō ĭńšťąľŀ:!!]</string>
+  <string name="S_Update_InstallQuery" comment="Online Update Dialog/PlainText: Update dialog - install query (introduced 7.0.230.0)">[!!Đō ȳőů ŵãŉŧ ťŏ ďơŵńĺơăď ăńď ĭŋśţȁŀļ ťħīš ƿăŧċħ ƞōŵ?!!]</string>
+  <string name="S_Update_DownloadFrom" comment="Online Update Dialog/PlainText: Update dialog - download information (introduced 7.0.230.0)">[!!Ŷŏů ċâƞ ďőŵŋłŏãđ ŧĥě ňȅŵ věŗşıŏƞ ƒŕŏm:!!]</string>
+  <string name="S_Update_DownloadQuery" comment="Online Update Dialog/PlainText: Update dialog - keyman.com website visiting query (introduced 7.0.230.0)">[!!Đő ƴơų ŵǻňť ťŏ vīšįť ŧħę ŵȅƄŝįťĕ ŉőŵ?!!]</string>
+  <string name="S_Update_Button_InstallNow" comment="Online Update Dialog/PlainText: Update dialog - install now button (introduced 7.0.230.0)">[!!Įŉšŧąłļ Ɲōŵ!!]</string>
+  <string name="S_Update_Button_InstallLater" comment="Online Update Dialog/PlainText: Update dialog - cancel button (introduced 7.0.230.0)">[!!Čáńĉĕļ!!]</string>
+  <string name="S_Update_OldVersionHead" comment="Online Update Dialog/PlainText: Update dialog - old version (introduced 7.1.255.0)">[!!Ơļđ Vĕŗŝīőƞ!!]</string>
+  <string name="S_Update_ComponentHead" comment="Online Update Dialog/PlainText: Update dialog - update component (introduced 7.1.255.0)">[!!Ŭƿďãťěđ Čơmƥőŋȅňţ!!]</string>
+  <string name="S_Update_SizeHead" comment="Online Update Dialog/PlainText: Update dialog - update size (introduced 7.1.255.0)">[!!Ŝĭźē!!]</string>
+  <string name="SKUpdate_KeymanText" comment="Online Update Dialog/FormatString: Update dialog - name and version of updatable product [%0:s = Current version number] (introduced 7.0.230.0)">Keyman[!! %0:s!!]</string>
+  <string name="SKUpdate_PackageText" comment="Online Update Dialog/FormatString: Update dialog - name and version of updatable keyboard layout package [%0:s = Package description, %1:s = Current package version number] (introduced 7.0.230.0)">[!!ĶȇɏƄơąŕď %0:s %1:s!!]</string>
+  <string name="SKUpdate_UnableToContact" comment="Online Update Dialog/FormatString: Update dialog - unable to access keyman.com warning (introduced 7.0.230.0)">[!!Ůńàƃŀĕ ŧő ćŏņŧāċŧ ƙēȳmāń.ċőm - ƿľěášē măķȇ śųŗȇ ŷōů ħåvė àƞ àćťįvę Ĭńťȅřŉȇţ čőňŋęčťįơƞ àńď ţřŷ âĝàįń.!!]</string>
+  <string name="SKUpdate_UnableToContact_Error" comment="Online Update Dialog/FormatString: Update dialog - unable to access keyman.com error message [%0:s = Error message] (introduced 7.0.230.0)">[!!ŪŋȃƄŀĕ ţŏ ćŏņťȁćť ƙėƴmāŉ.ĉőm - ƿľěäśȇ mäķė šűŕě ȳōű ħåvȇ àƞ āĉťīvě Ĩƞŧēŕňȅŧ čŏņŉĕćŧįŏŉ åŉđ ţŗŷ āġàĭŋ.  Ŧħȇ ĕŗřőř ŗėĉĕīvėđ ŵǻŝ: %0:s!!]</string>
+  <string name="SKUpdate_IconTitle" comment="Online Update Dialog/FormatString: Update icon - title (introduced 8.0.288.0)">Keyman[!! ųƿđåţȇş ăŕę âvăĩľáƂľė!!]</string>
+  <string name="SKUpdate_IconText" comment="Online Update Dialog/FormatString: Update icon - text (introduced 8.0.288.0)">[!!Ċłıćķ ťħįŝ ĭĉơņ ţő đơŵŉłōåđ åƞď ĭŉŝťåĺľ űƿđàŧĕŝ!!]</string>
+  <string name="SKUpdate_IconMenuText" comment="Online Update Dialog/FormatString: Update icon - install menu item (introduced 8.0.288.0)">[!!Vĭėŵ ȃŉđ &amp;ĩńŝţáĺľ !!]Keyman[!! ũƿďąţēş!!]</string>
+  <string name="SKUpdate_IconMenuExit" comment="Online Update Dialog/FormatString: Update icon - exit menu item (introduced 8.0.288.0)">[!!Ė&amp;xīť őŋľĩńē ŭƥđǻŧĕ ċħěĉƙ!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Splash Dialog                     -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_Splash_Title" comment="Splash Dialog/PlainText: Splash dialog title, with company, product and version name (introduced 7.0.230.0)">Keyman</string>
+  <string name="S_Splash_Name" comment="Splash Dialog/PlainText: Splash major title (introduced 8.0.288.0)">Keyman</string>
+  <string name="S_Splash_Start" comment="Splash Dialog/PlainText: Start Keyman Desktop button (introduced 8.0.294.0)">[!!Ŝŧăŕŧ Ƙęƴmâņ!!]</string>
+  <string name="S_Splash_Exit" comment="Splash Dialog/PlainText: Exit button (introduced 8.0.294.0)">[!!Ĕxīţ!!]</string>
+  <string name="S_Splash_OtherTasks" comment="Splash Dialog/PlainText: Other tasks heading (introduced 8.0.294.0)">[!!Őţĥĕŗ ţäśķš!!]</string>
+  <string name="S_Splash_Configuration" comment="Splash Dialog/PlainText: Keyman Configuration link (introduced 8.0.294.0)">[!!Čơŉƒīĝůřȁťīőņ!!]</string>
+  <string name="S_Splash_ShowAtStartup" comment="Splash Dialog/PlainText: Show at Startup toggle (introduced 9.0.341.0)">[!!Śĥőŵ ŧħıš šćŗęȇň ăť ŝţǻŗŧųƥ!!]</string>
+  <string name="S_Splash_HideAtStartup" comment="Splash Dialog/PlainText: Hide at Startup toggle (introduced 9.0.431.0)">[!!Ĥĩďė ťħış ŝćŕēėň ąŧ śťǻŗŧŭƿ!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- UI Languages & Localization       -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_DisplayIn" comment="_LanguageInfo/PlainText: 'Display In' text label for UI language menu (introduced 8.0.278.0)">[!!Đīŝƿľàƴ įŉ!!]</string>
+  <string name="S_MoreUILanguagesMenu" comment="_LanguageInfo/PlainText: More UI languages online menu item (introduced 8.0.278.0)">[!!Ƒĭņď őťĥēŗ ďīŝƿľãɏ łåƞğűåģęŝ ōƞłĭŉė...!!]</string>
+  <string name="S_ContributeUILanguagesMenu" comment="_LanguageInfo/PlainText: Link to contribute to language UI (introduced 9.0.525.0)">[!!Ħȇłƿ ŧŗãňşļȁťĕ ţĥē ũśěŗ įńťēřƒàĉĕ...!!]</string>
+  <string name="SKUILanguageName" comment="_LanguageInfo/FormatString: User interface language name in the UI language (introduced 7.0.230.0)">[!!Ěńġľĭŝħ!!]</string>
+  <string name="SKUILanguageNameWithEnglish" comment="_LanguageInfo/FormatString: UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language) (introduced 7.0.230.0)">[!!Ēŋġļıŝĥ!!]</string>
+  <string name="SKLanguageCode" comment="_LanguageInfo/FormatString: The language code for the current translation (introduced 7.0.230.0)">[!!ȇƞ!!]</string>
+  <string name="SKDefaultLanguageCode" comment="_LanguageInfo/FormatString: The default language code for this product.  This should be the language that the product is created in. For Keyman Desktop (all editions) this must stay 'en', for all translations. (introduced 7.0.230.0)">[!!ēŋ!!]</string>
+  <string name="SKShortApplicationTitle" comment="Formatted Messages/FormatString: Product name (introduced 7.0.230.0)">Keyman</string>
+  <string name="SKDialogSelectLanguage" comment="UI Language Dialog/FormatString: Select UI dialog title (introduced 7.0.230.0)">[!!Šȅľęċţ Ūşěŕ Įƞţȇŕƒâċė Łâŉĝũàğě!!]</string>
+  <string name="SKUILanguageHelp" comment="UI Language Dialog/FormatString: UI dialog - instructions (introduced 7.0.244.0)">[!!Ĉĥőŏśė ťħȇ łåŉġųăğę ţħäŧ ŷőū ŵâņţ ďĩşƿŀáƴȇď ĭŋ ţħĕ !!]Keyman[!! ĩņťěŕƒāčē.!!]</string>
+  <string name="SKButtonUILanguageDownload" comment="UI Language Dialog/FormatString: UI dialog - 'More languages online' button (introduced 7.0.244.0)">[!!&amp;Mŏŕė łăňĝŭǻğęŝ őŉľĭňē...!!]</string>
+  <string name="SKDialogUILanguageCreateTranslation" comment="UI Language Dialog/FormatString: Create a new UI translation online link (introduced 7.1.266.0)">[!!Čŕėăŧē ā ŋĕŵ ŧŕăņŝłāŧīōń őƞľīŉė!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Language Config & Script Support  -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_LangSetup_Title" comment="Language Setup Dialog/PlainText: Language configuration tasks dialog title (introduced 7.0.230.0)">[!!Ĺǻŉģųâġē Ċőńƒığųŗȃťıŏƞ Ťāşƙś!!]</string>
+  <string name="S_LangSetup_TitleInnerPrefix" comment="Language Setup Dialog/PlainText: LCT dialog - subtitle text preceding language name(s) (introduced 7.0.230.0)">[!!Ċōƞƒĩĝůŕę ƴơŭŗ ĉōmƿūŧȅŕ ťő ŵőŕĸ ŵĭŧĥ!!]</string>
+  <string name="S_LangSetup_TitleInnerSuffix" comment="Language Setup Dialog/PlainText: LCT dialog - subtitle text following language name(s) (introduced 7.0.230.0)"/>
+  <string name="S_LangSetup_BlurbPrefix" comment="Language Setup Dialog/PlainText: LCT dialog - standard explanitory text preceding language name(s) (introduced 7.0.230.0)">Keyman[!! ĥąś ďēŧēĉŧėď ťħąţ ŧħȅ ƒőľľőŵįŋģ čơńƒīģūřâţĭŏņ ťåśķś ƞęĕđ ţŏ Ƃę ĉŏmƿłēţěď įƞ ơŗďėŕ ƒőŗ!!]</string>
+  <string name="S_LangSetup_BlurbSuffix" comment="Language Setup Dialog/PlainText: LCT dialog - standard explanitory text following language name(s) (introduced 7.0.230.0)">[!!ŝĉŗĩƿť(š) ŧơ ŵŏŕĸ ċőŕřĕĉţĺƴ ơƞ ɏōűŕ ċơmƥųţȅŗ:!!]</string>
+  <string name="S_LangSetup_psrtMSOfficeLanguage" comment="Language Setup Dialog/PlainText: LCT dialog - language support for Microsoft Office (introduced 7.0.230.0)">[!!Mĩĉŕőŝōƒţ Ŏƒƒįčě Ļǻŋĝűăĝě Ŝũƿƥơŕť!!]</string>
+  <string name="S_LangSetup_MoreInfo" comment="Language Setup Dialog/PlainText: LCT dialog - link to help information about the proposed LCT (introduced 7.0.230.0)">[!!Mōŗĕ Īƞƒōŗmàŧįőŉ...!!]</string>
+  <string name="S_LangSetup_Ask" comment="Language Setup Dialog/PlainText: LCT dialog - request to complete tasks now (introduced 7.0.230.0)">[!!Ɖő ȳơů ŵăňţ !!]Keyman[!! ŧő čơmƿłȅŧę ŧĥēŝę ŧäşķş ņơŵ?!!]</string>
+  <string name="S_LangSetup_Note" comment="Language Setup Dialog/PlainText: LCT dialog - note that system changes won't be uninstalled even if Product is (introduced 7.0.230.0)"/>
+  <string name="S_LangSetup_SaveDisabledItems" comment="Language Setup Dialog/PlainText: LCT dialog - don't ask for this specific LCT again checkbox (introduced 7.0.230.0)">[!!Ɖơń'ť åŝƙ mė ăƂơūţ ťħīś àģåĩƞ!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Hints                             -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_Button_ResetHints" comment="Hints/PlainText: Hint - options tab button to reset hints (introduced 7.0.244.0)">[!!Ŗěšěţ Ĥĭņťš!!]</string>
+  <string name="SKHintsReset" comment="HInts/PlainText: Hint - options tab dialog confirming reset of hints (introduced 7.0.244.0)">[!!Áļļ ħĩńť mĕŝšăĝȇš ħävȇ Ƃȅēŉ ŕȇşĕţ ȃņď ŵĩĺļ Ƅė đışƥļȁȳēđ āĝáıŋ.!!]</string>
+  <string name="HintTitle_KH_EXITPRODUCT" comment="Hints/HintTitle: Hint - dialog title upon attempting to exit product (introduced 7.0.244.0)">[!!Ȅxıŧ !!]Keyman[!!?!!]</string>
+  <string name="Hint_KH_EXITPRODUCT" comment="Hints/Hint: Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product (introduced 7.0.244.0)">[!!Ãŕę ƴŏū şŭŗē ɏōų ŵȁņť ŧō ēxīŧ !!]Keyman[!!?  Ÿơũŗ Ƙȅŷmǻń ĸȅŷƄőǻŕďš ŵıĺļ ŝťıľľ ƀę ŀıŝŧȅđ įň ťħě Ŵĩŋđŏŵš ŀȃņĝŭāģēŝ, ƃŭť ŵĭĺĺ ņơţ ƀĕ ƒůƞčŧĩŏňȃĺ ũŋťĩł ȳőů řęšţäŕţ !!]Keyman[!!.!!]</string>
+  <string name="HintTitle_KH_CLOSEOSK" comment="Hints/HintTitle: Hint - dialog title upon closing the OSK (introduced 7.0.244.0)">[!!Ŏņ Šċŗěȇŉ Ƙȅɏƀơâřď Ĉĺőŝęđ!!]</string>
+  <string name="Hint_KH_CLOSEOSK" comment="Hints/Hint: Hint - explains that Product is still running and iforms how to reopen OSK (introduced 7.0.244.0)">[!!Ÿơų ħāvę čļơśȇđ ťĥē Őň Ŝćřěēŉ Ķēɏƃơâřď.  !!]Keyman[!! ış şťıłł ŗŭŋƞĭŋģ.  Ƴŏų čãń ōƿēŋ ţĥė Ŏň Şćŕęēƞ Ƙěɏƀōȁŗď åţ åņȳ ťĭmė ƃƴ čĺĭĉĸĭņğ ōń ŧĥĕ !!]Keyman[!! Ĩĉōņ ȃňď şĕļȅćŧīŋĝ "Ōņ Śćŗĕȇŉ Ƙȇȳƃơäŕđ"!!]</string>
+  <string name="S_HintDialog_DontShowHintAgain" comment="Hints/PlainText: Hint dialog - caption of checkbox at bottom of dialog (introduced 10.0.836.0)">[!!Đōň'ţ ŝĥŏŵ ŧĥĩš ĥıņť âĝăĩƞ!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Help                              -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_HelpTitle" comment="Help Dialog/PlainText: Help - product name help (introduced 7.0.230.0)">Keyman[!! Ĥęļƥ!!]</string>
+  <string name="S_Help_Tutorial" comment="Help Dialog/PlainText: Help - getting started tutorial name (introduced 7.0.230.0)">[!!Ġėŧ Şŧáŗţěđ!!]</string>
+  <string name="S_Help_Product" comment="Help Dialog/PlainText: Help - help contents link title (introduced 7.0.230.0)">[!!Ĥěłƿ Čơŉťēƞŧš!!]</string>
+  <string name="S_Help_Keyboard_Prefix" comment="Help Dialog/PlainText: Help - text preceding keyboard name (introduced 7.0.230.0)">[!!Ħėŀƥ ōņ "!!]</string>
+  <string name="S_Help_Keyboard_Suffix" comment="Help Dialog/PlainText: Help - text following keyboard name (introduced 7.0.230.0)">[!!" ƙęŷƃőáŕď!!]</string>
+  <string name="S_Toolbar_ViewOnScreenKeyboard" comment="Toolbar Context Help/PlainText: Toolbar help - View OSK pop-up text (introduced 7.0.230.0)">[!!Vīěŵ Őŋ Şčŗęȇņ Ƙȅƴƅŏȃřď!!]</string>
+  <string name="S_Toolbar_ViewKeyboardUsage" comment="Toolbar Context Help/PlainText: Toolbar help - View Keyboard Usage pop-up text (introduced 7.0.230.0)">[!!Vįĕŵ Ƙȇɏƅơãŗď Ŭśȁĝě!!]</string>
+  <string name="S_Toolbar_ViewFontHelper" comment="Toolbar Context Help/PlainText: Toolbar help - View Font Helper pop-up text (introduced 7.0.230.0)">[!!Vĩėŵ Ƒōňţ Ħēĺƥěŗ!!]</string>
+  <string name="S_Toolbar_ViewCharacterMap" comment="Toolbar Context Help/PlainText: Toolbar help - View Character Map pop-up text (introduced 7.0.230.0)">[!!Vīěŵ Ċħåřāčŧĕř Máƿ!!]</string>
+  <string name="S_Menu_SwitchKeymanOff" comment="Toolbar Context Help/PlainText: Toolbar help - Switch Keyman Desktop Off pop-up text (introduced 7.0.230.0)">[!!Ŝŵĭŧčħ !!]Keyman[!! Ōƒƒ!!]</string>
+  <string name="S_Toolbar_OpenConfiguration" comment="Toolbar Context Help/PlainText: Toolbar help - Open Keyman Desktop Configuration pop-up text (introduced 7.0.230.0)">[!!Ơƥĕŉ !!]Keyman[!! Ċơƞƒĩġũřáţīőń!!]</string>
+  <string name="S_Toolbar_OpenHelp" comment="Toolbar Context Help/PlainText: Toolbar help - Open help pop-up text (introduced 7.0.230.0)">[!!Ơƿĕň Ĥȅłƿ!!]</string>
+  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="Toolbar Context Help/PlainText: Toolbar help - Close OSK pop-up text (introduced 7.0.230.0)">[!!Ćļŏŝȇ Ŏň Şĉŗȅēŉ Ķēƴƃōäŗď!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Menu Items                        -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_Menu_SwitchKeymanOff" comment="System Tray Menu Items/PlainText: Systray item - Switch Keyman Desktop Off [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Şŵıţčħ !!]Keyman[!! &amp;Ōƒƒ!!]</string>
+  <string name="S_Menu_OnScreenKeyboard" comment="System Tray Menu Items/PlainText: Systray item - OSK [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Ōń Ŝćŗĕėň &amp;ĶȇȳƂőářď!!]</string>
+  <string name="S_Menu_KeyboardUsage" comment="System Tray Menu Items/PlainText: Systray item - Keyboard Usage [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Ķȇƴƃơăřď &amp;Ůšăĝė!!]</string>
+  <string name="S_Menu_FontHelper" comment="System Tray Menu Items/PlainText: Systray item - Font Helper [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!&amp;Ƒōńť Ħȇŀƥěŕ!!]</string>
+  <string name="S_Menu_CharacterMap" comment="System Tray Menu Items/PlainText: Systray item - Character Map [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Ĉĥãřāĉťęř &amp;Mâƥ!!]</string>
+  <string name="S_Menu_TextEditor" comment="System Tray Menu Items/PlainText: Systray item - Text Editor [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!&amp;Ťēxť Ȇďĩťŏř...!!]</string>
+  <string name="S_Menu_Configuration" comment="System Tray Menu Items/PlainText: Systray item - Configuration [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!&amp;Ċơņƒığūŕåťĭơŉ...!!]</string>
+  <string name="S_Menu_Help" comment="System Tray Menu Items/PlainText: Systray item - Help [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!&amp;Ħęłƥ...!!]</string>
+  <string name="S_Menu_Exit" comment="System Tray Menu Items/PlainText: Systray item - Exit [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Ĕ&amp;xĩŧ!!]</string>
+  <string name="SKMenu_NoKeyboardsInstalled" comment="System Tray Menu Items/PlainText: Systray - notice of no keyboard layouts installed (introduced 7.0.230.0)">[!!Ňơ ƙěƴɓőȃřď ŀāƴőůťš āŕĕ ıŋşţāłłěď.
+Ĉĥơơšȇ "Čőŉƒįğűŗäťīŏƞ" ŧơ īňŝŧǻłľ á 
+ķȅɏƂőäŗđ ļąɏōůţ ƒőř ɏŏūŕ ĺáňġųáĝę.!!]</string>
+  <string name="S_OSKContext_FadeWhenInactive" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - fade OSK when mouse is elsewhere (introduced 7.0.230.0)">[!!Ƒȁďȅ Ŵĥęń Ĭŉàčţĭvē!!]</string>
+  <string name="S_OSKContext_ShowToolbar" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - show/hide OSK toolbar (introduced 7.0.230.0)">[!!Ŝĥŏŵ Ťōōĺƀåř!!]</string>
+  <string name="S_OSKContext_SaveAsWebPage" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - save diagram of active keyboard layout as a web page (introduced 7.0.230.0)">[!!Śǻvĕ äš ŴěƄ Ƥąģę...!!]</string>
+  <string name="S_OSKContext_Print" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - print diagram of active keyboard layout (introduced 7.0.230.0)">[!!Ƥŕıňŧ...!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Usage Page                        -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="S_Usage_Welcome" comment="Usage Page/PlainText: Usage page - keyboard help button (introduced 7.0.244.0)">[!!Ƙȅŷƅőǻřď Ħēłƥ!!]</string>
+  <string name="S_Usage_OSK" comment="Usage Page/PlainText: Usage page - On Screen Keyboard button (introduced 7.0.244.0)">[!!Őņ Ŝćŗėėń ĶȇɏƄōâŕď!!]</string>
+  <string name="S_Usage_Tutorial" comment="Usage Page/PlainText: Usage page - Getting Started button (introduced 7.0.244.0)">[!!Ģȅŧ Šťàŗťĕď!!]</string>
+  <string name="S_Usage_Help" comment="Usage Page/PlainText: Usage page - Product Help button (introduced 7.0.244.0)">Keyman[!! Ĥėŀƥ!!]</string>
+  <string name="S_Usage_Config" comment="Usage Page/PlainText: Usage page - Product Configuration button (introduced 7.0.244.0)">Keyman[!! Ċơŋƒĩġũřăţıơņ!!]</string>
+  <string name="S_Usage_KeyboardNoDocumentation" comment="Usage Page/HTML: Usage page - Text shown when keyboard has no documentation (introduced 7.1.261.0)">[!!Ťħĩŝ ƙȅŷƄőäŗđ ĺàŷŏũţ ĥáś ŉō Ĝěťťīņģ Śťăŗţęď ơř Ũŝȁģē ďơċũměņťȁţĩŏƞ. Ƥľȅǻšě ĉħėċĸ ŧħē Šťàřţ Měńů őŗ ĉőŋţáĉť ŧħę ƙȇȳƂŏåŗď ďȇvēľőƥȅŗ ƒōŗ mőŗē ıňƒŏŗmȃŧĩőň ōƞ ĥơŵ ťō ųŝę ŧĥĭş ķěȳƅőářđ ŀâŷōųţ.!!]</string>
+  <string name="S_Usage_KeyboardDocumentation" comment="Usage Page/HTML: Usage page - Text shown when keyboard has documentation (introduced 7.1.261.0)">[!!Čļīćƙ ťĥȅ ƅŭťŧŏňś ƃȅłơŵ ťơ vıęŵ åďďįŧĩōņāľ ďŏĉųmȅņŧāŧīơƞ ąŉđ/őř Őń Şčřȇęŉ Ƙȇƴƃŏȁŗď.!!]</string>
+  <string name="S_Usage_KeymanOff" comment="Usage Page/HTML: Usage page - Text shown when no Keyman keyboard is active (introduced 7.1.261.0)">[!!Ňơ ƙęƴƃŏàŕđ ĺȁƴơųŧ ĭś ćũřŗęńţľȳ ŝȇľěćŧĕđ ĩņ !!]Keyman[!!.  Ĉŀĩĉƙ őƞ àŋɏ őƒ ŧĥē ƙěŷƀőăřď ıćőņš ıƞ ŧħĕ ŧŏơŀƀąŗ åƄơvȇ ťơ ćħőŏşȅ ã ĸȅɏƀơáŕď ĺãŷōūţ.!!]</string>
+  <string name="S_Usage_NoKeyboardsInstalled" comment="Usage Page/HTML: Usage page - Text shown when no Keyman keyboards are installed (introduced 7.1.261.0)">[!!Ŋō ķĕŷƄőàřđ ľãƴŏųŧŝ ąřė ċůŕŕěŋťĺŷ įƞšťàļľĕď ơŗ ŀơȃđȅđ.  Ŭşē !!]Keyman[!! Čōŉƒīĝűŗāťĩőň ŧơ ıƞšŧȃľļ à ķȅɏƂơâřď ĺãɏōũť.!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- Formatted messages, assorted                                              -->
+  <!-- These messages cannot contain HTML tags and are plain text                -->
+  <!-- All text within these tags is whitespace-preserved by the Keyman COM API  -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- General -->
+  <string name="SKApplicationTitle" comment="Formatted Messages/FormatString: Company and product name used for the title of message boxes and message dialogs (introduced 7.0.230.0)">Keyman</string>
+  <string name="SKSplashVersion" comment="Formatted Messages/FormatString: Version number [%0:s = Version number string] (introduced 7.0.230.0)">[!!Vĕŕŝĩŏņ %0:s!!]</string>
+  <string name="SKButtonHelp" comment="Formatted Messages/FormatString: Help button in message boxes (introduced 7.0.230.0)">[!!Ĥėļƥ!!]</string>
+  <string name="SKButtonPrint" comment="Formatted Messages/FormatString: Print button in Welcome dialog for keyboards (introduced 7.0.239.0)">[!!&amp;Ƥřıƞţ...!!]</string>
+  <string name="SKButtonDownload" comment="Formatted Messages/FormatString: Download button in Locale Selection dialog (introduced 7.0.240.0)">[!!&amp;Ɗŏŵŉłōȁď...!!]</string>
+  <!-- Notices -->
+  <string name="SKPackageAlreadyInstalled" comment="Formatted Messages/FormatString: Notice during package installation that a package with the same name is already installed. [%0:s = Package to be uninstalled] (introduced 7.0.230.0)">[!!Ą ƿäĉĸâģĕ ŵįťħ ţĥę ňȃmȅ %0:s ĩš ǻłŕȅáďƴ īŋśŧåĺĺȅď.  Ďơ ŷőũ ŵąņŧ ţō űņĩńŝţǻŀŀ ıŧ ǻňđ įńŝťåŀĺ ťħē ņēŵ ōŉė?!!]</string>
+  <string name="SKKeyboardAlreadyInstalled" comment="Formatted Messages/FormatString: Notice during keyboard layout installation that a keyboard layout with the same name is already installed. [%0:s = Keyboard name] (introduced 7.0.230.0)">[!!Ă ĸėȳƀơáŗđ ŵįťħ ŧħė ƞàmę '%0:s' ĩş ȁļŕȇäđȳ ĭŉšţǻĺłȇđ.  İƒ ŷơű ĉơņţīŋűȇ, ĩŧ ŵįļļ ɓę ŭŉīņŝŧāľŀęđ Ƅėƒơřȅ ťħę ŉȅŵ ōņȇ īś ĭŉşŧáłłęđ.  Ċōƞťįƞųȇ?!!]</string>
+  <string name="SKKeyboardPartOfPackage" comment="Formatted Messages/FormatString: Notice of need to uninstall an entire package [%0:s = Keyboard name, %1:s = Package name] (introduced 7.0.230.0)">[!!Ŧħē ƙĕŷƄŏäŗď '%0:s' īŝ ƿǻŗť ōƒ ƥâĉĸàģě '%1:s'.  Ɏōū mūśţ ũňĩňŝŧäĺĺ ŧĥę ėƞťįřė ƿąĉĸäğȇ.  Čŏŉŧĭņųĕ?!!]</string>
+  <string name="SKInstallOnlyAsAdmin" comment="Formatted Messages/FormatString: Notice of user ineligibility to install/uninstall keyboards (introduced 7.0.230.0)">[!!Ɏơũ ċâň ōŉŀŷ ĭƞšŧâĺĺ ŏř ůŋīņŝťàļł ķȇɏƃőąřďş àś Ȃđmįŋıšťřâťŏŗ.  Ůşě Ćōņŧřŏļ Ƥâŋęļ ţō ŝēļȇčŧ ŀáƞģůàĝęś ƒơŕ ųśȅ ãš ą ƞơŕmǻŀ ųšȅŗ.!!]</string>
+  <string name="SKSurrogatesRequiresRestart" comment="Formatted Messages/FormatString: Notice of surrogate setting change requiring Windows restart (introduced 7.0.230.0)">[!!Ĉħāņģĭńğ ťĥĕ śĕţŧĭŋğ ōƒ Šůŕŗőğȁŧĕś ŕęǫūĩřėŝ Ŵĭňďơŵś ţő ƀě ŗȇśŧȁŗŧěď.  Đō ƴơŭ ŵàŉŧ ŧő ŕȇşţąřŧ Ŵįņđőŵš ňŏŵ?!!]</string>
+  <string name="SKPackageDoesNotIncludeWelcome" comment="Formatted Messages/FormatString: Notice of lack of introductory help [%0:s = Package Name] (introduced 7.0.230.0)">[!!Ţĥė ƿàċƙȃĝě ơŕ ƙěŷƂơäřď '%0:s' ďơȇś ƞŏţ ĭńčłŭđė äƞƴ ĭƞŧřŏđůċţōŗȳ ħēľƥ.!!]</string>
+  <string name="SKOSNotSupported" comment="Formatted Messages/FormatString: Notice of unsupported operating system (introduced 7.0.230.0)">[!!Ţħĭş ōƥȇŕȃťīŉĝ şȳšţȅm ıŝ ƞőť śűƥƥōŕŧēď.!!]</string>
+  <string name="SKActivation_Success" comment="Formatted Messages/FormatString: Notice of succesful licence activation (introduced 7.0.230.0)">[!!Ÿōŭŗ ļįċęŋĉě ħǻş ɓėȇƞ śūċĉėşŝƒŭłľȳ àćţĩvåťȅđ.!!]</string>
+  <string name="SKOnlineHelpFile" comment="Formatted Messages/FormatString: File name of the help file - must be .chm format.  The locale folder will be checked first for the file (introduced 7.0.230.0)">[!!ĶėƴmȁņĎēşƙŧōƿ.čĥm!!]</string>
+  <string name="SKCouldNotFindHelp" comment="Formatted Messages/FormatString: Notice of help file not found (introduced 7.0.230.0)">[!!Ţĥĕ ĥĕľƿ ƒįŀě $(ŞƘŎŉľıŋěĤēļƥƑĭļę) čŏūļđ ƞōŧ ƅė ƒōűŉď.!!]</string>
+  <string name="SKDamagedKeyboard" comment="Formatted Messages/FormatString: Notice of damaged keyboard (introduced 7.0.230.0)">[!!&lt;Ďȃmàĝěď ķěɏƄőāřđ&gt;!!]</string>
+  <string name="SKANSIEncoding" comment="Formatted Messages/FormatString: Keyboard with an ANSI or Codepage encoding (introduced 7.0.230.0)">[!!Ćōđȅƥăġė!!]</string>
+  <string name="SKUnicodeEncoding" comment="Formatted Messages/FormatString: Keyboard with a Unicode encoding (introduced 7.0.230.0)">[!!Ūņıčŏďĕ!!]</string>
+  <string name="SKDownloadProgress_Title" comment="Formatted Messages/FormatString: Notice of file downloading (introduced 7.0.230.0)">[!!Ďŏŵŉľŏąđįńġ Ƒĩłē!!]</string>
+  <!-- Confirmation Requests -->
+  <string name="SKUninstallOnScreenKeyboard" comment="Formatted Messages/FormatString: Request for confirmation to uninstall OSK for a keyboard layout [%0:s = Keyboard name] (introduced 7.0.230.0)">[!!Ąřĕ ȳőŭ ŝŭŗȅ ɏŏů ŵåňţ ŧő ŗěmōvȅ ŧĥĕ ơƞ śćŕēęƞ ķēȳƀőȁŗď ĭņŝťäľļėď ƒŏŗ %0:s?!!]</string>
+  <string name="SKUninstallKeyboard" comment="Formatted Messages/FormatString: Request for confirmation to uninstall keyboard layout [%0:s = Keyboard name] (introduced 7.0.239.0)">[!!Ăŕȅ ƴőŭ şųŗē ƴơŭ ŵāŉť ţő ųƞįňšţăļł ĸĕƴƄőȁŗď %0:s?!!]</string>
+  <string name="SKUninstallPackage" comment="Formatted Messages/FormatString: Request for confirmation to uninstall a package [%0:s = Package name, %1:s: Fonts list] (introduced 7.0.239.0)">[!!Åŕė ɏōų śűŕĕ ŷŏū ŵȁńť ŧő űňıňşŧāŀĺ ƿáĉƙåĝė %0:s?
+
+%1:s!!]</string>
+  <string name="SKUninstallPackageFonts" comment="Formatted Messages/FormatString: Text embedded in SKUninstallPackage when fonts are ready for uninstall. [%0:s = Fonts list] (introduced 7.1.270.0)">[!!Ţħė ƒơĺĺŏŵįƞĝ ƒōŉŧś ŵīłĺ ãłšō ɓę ũŉıƞśťâľŀȅď: %0:s.!!]</string>
+  <string name="SKActivation_OnlineNow" comment="Formatted Messages/FormatString: Request for confirmation that the present activation method is desired [%0:s = Licence number string (e.g. ABC1-D2E3-FGHJ-KLMN-OPQR)] (introduced 7.0.230.0)">[!!Đŏ ƴŏũ ŵäńť ţơ àċţıvǻŧė $(ŞĶŞħőřŧĂƿƿľįĉāŧĭŏńŢıŧŀě) ŏńļīńė ńơŵ ŵĭţĥ ľıčėŋčě ŋŭmƄěŕ %0:s?  İƒ ȳŏũ ĉŀĩčƙ Ņō, ȳōŭ ċȃň čħőōšĕ ƒřŏm ăĺŧęřƞāŧē ǻčŧĩváŧįơń mȇŧħơďŝ.!!]</string>
+  <string name="SKUnicodeData_Build" comment="Formatted Messages/FormatString: Request to build Unicode Chracter Map database (introduced 7.0.230.0)">[!!Ŧħė Ćĥàŕǻċťěŗ Mȁƿ ĥáş ȃ ďãťäƀáŝę ơƒ ćħǻŕāćţȇŗš ŧħáţ ňěĕďś ŧő ƅȅ ɓũĩŀť ƀȅƒőřȇ ĩŧ ĉâņ ƀȅ ųşȅđ.  ʙůıĺď ĭť ńŏŵ?!!]</string>
+  <!-- Errors -->
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Formatted Messages/FormatString: Error deleting Unicode Character Map database [%0:s = Error detail string] (introduced 7.0.230.0)">[!!Ŧĥē Ůńĭĉŏďė Ċĥąŗáċţėř ďȁťăƅāśĕ ĉŏůļđ ńŏť ƀȅ đęłȅŧȅď ƒőŕ å řėƀųīĺđ.  Ĕŗŕōŕ đėŧăĩĺŝ ȁŗȅ: %0:s!!]</string>
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Formatted Messages/FormatString: Error creating Unicode Character Map database [%0:s = Error details] (introduced 7.0.230.0)">[!!Ťħė Ūņīĉőđĕ Ćħáŗȁċťęŗ ďąťáɓȃśȇ ċŏŭĺď ŋơţ Ƅĕ ćřęãŧėđ ăŋđ ħàş Ƃĕĕň đĩŝàƂŀēđ.  Ěŗŕōŗ đȅţāįŀŝ äřě: %0:s!!]</string>
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Formatted Messages/FormatString: Error loading Unicode Character Map database. Request to rebuild. [%0:s = Error message] (introduced 7.0.230.0)">[!!Ťĥȇ Űňĭċŏďĕ ĉħäŗąčţȅř đȁţăƅåŝě đįđ ňōť łōăď šűććėŝšƒűŀłɏ (%0:s).  Ʀȅƃūīĺď īŧ ƞőŵ?!!]</string>
+  <string name="SKErrorActivatingBrowser" comment="Formatted Messages/FormatString: General URL error (introduced 7.0.230.0)">[!!Ċàńňŏŧ åĉťĩvâŧė ƀŕŏŵśĕř ŏř ěmáīľ ƥŕơģŗǻm ƒōŕ ţĥĭŝ ŪƦĽ.!!]</string>
+  <string name="SKCouldNotPrintKeyboard" comment="Formatted Messages/FormatString: Keyboard printing error (introduced 7.0.230.0)">[!!Ŧħĕ ķȅȳƀŏäřđ ċơŭłď ƞŏť ƃě ƥŕĭŉţȅđ šũććĕŝŝƒŭļļɏ.  Ƥľĕáşē ŝâvė ťő ā ŵěƀ ƿåğȅ áńď ƿŕįňť mâņũąĺľɏ.!!]</string>
+  <string name="SKCannotStartProduct" comment="Formatted Messages/FormatString: Error from Keyman Desktop failing to start keyman.exe due to an access denied or file not found [%0:s: error message] (introduced 7.0.241.0)">Keyman[!! ƒȁīĺȅđ ťō śťȃŗŧ.  Ƥĺȅǻšĕ ćĥȇčƙ ƴŏųŕ śěćũŕĭţƴ şĕťťıƞĝś ŧơ màķȇ şųŕę ŧħâŧ ţĥĕ ƿŕơġŕām ƙęɏmâƞ.ȅxė įś äľľŏŵęď ťŏ şţãřţ ƃęƒơŗĕ čōŉŧĩńůıŋĝ.  Ŧĥė ȇřřōŗ řěŧŭŗŋēđ ŵãŝ:
+
+"%0:s"
+
+Đơ ƴŏū ŵáņť ţő ţŗƴ ǻŉď śţàŕŧ !!]Keyman[!! ǻĝãĭņ ňōŵ?!!]</string>
+  <!-- Warnings -->
+  <string name="SKDebuggingWarning" comment="Formatted Messages/FormatString: Warning upon starting debugging in the Options tab (introduced 7.0.230.0)">Keyman[!! đēƂůĝ ıńƒŏŕmàŧıőņ ŵıĺľ Ƃė ŝŧŏŗȅď ĭń ă ţȇxť ƒīłȇ ćãĺŀȇď ķėŷmåńŀőģ\śŷşťēm.łōģ ơņ ƴőũŕ ďėśƙťŏƥ.  Ȳŏū šħơůľđ ėxıť !!]Keyman[!! ƅĕƒŏřȇ řȇåđīŉĝ ơŕ ďĕŀėŧīŋĝ ťħıŝ ƒĩłě.
+
+ŴÃŖŊĪŅĢ: Ťħĭš ƒıŀȇ čãň ĝřŏŵ łářģȅ vėřȳ ǫųĩćƙŀɏ.  ĒƞâƂļıņģ ďėƄŭġģīŉğ ŵĭłļ ŝŀơŵ ďōŵň ŷōŭŕ šɏšťěm åňď śħőųļď ŏņĺŷ ɓę ďōƞė ıƒ äďvĭśȅď ɓŷ ŧēćĥŉįċȃĺ šųƿƿơŗť.
+
+ƤŘĬVÅĊŸ ŴÁŔŃĨŅĞ: Ƥŀēâšȇ ňơŧē ţĥäť ţĥě đęƄũğ ŀőğƒĭĺȅ ŕĕčőŕďş āĺĺ ĸĕŷşťřőķěś ťĥäŧ ƴơů ţȳƿȇ.  Ƴŏų śħơūļđ ơņĺŷ ťűŕń ơŉ ţħė ďėƃũġ ľōģ ƒōř ţĥē ďųřàţĭőń őƒ ȃ ďēƀŭğģīƞģ ŏŗ ďıăĝƞōşŧįĉ šėşŝīơƞ, âŋď đĕĺȇţē ŧħȅ [đȅŝķŧơƥ]\ƙȇȳmåńłŏģ\ŝȳşťȅm.ŀōģ ƒıĺě ãŝ šōōņ áš ƿơśśıɓļĕ.!!]</string>
+  <!-- Microsoft Office -->
+  <string name="SKLangCheck_Office" comment="Formatted Messages/FormatString: Request to add editing support to a specific version of Microsoft office [%0:s = language name, %1:s = Microsoft Office version] (introduced 7.1.259.0)">[!!Äďđ %0:s ēđįŧīƞģ şųƿƥơŕť ťŏ %1:s!!]</string>
+  <string name="SKLangCheck_Office_Office2000" comment="Formatted Messages/FormatString: Local name for Microsoft Office 2000 (introduced 7.1.259.0)">[!!Mĭčŗơšōƒť Ōƒƒįčě 2000!!]</string>
+  <string name="SKLangCheck_Office_OfficeXP" comment="Formatted Messages/FormatString: Local name for Microsoft Office XP (introduced 7.1.259.0)">[!!Mįćřōśơƒť Ơƒƒįċĕ XƤ!!]</string>
+  <string name="SKLangCheck_Office_Office2003" comment="Formatted Messages/FormatString: Local name for Microsoft Office 2003 (introduced 7.1.259.0)">[!!Mıċŗơşőƒŧ Ōƒƒıćĕ 2003!!]</string>
+  <string name="SKLangCheck_Office_Office2007" comment="Formatted Messages/FormatString: Local name for Microsoft Office 2007 (introduced 7.1.259.0)">[!!Mįĉŗōšơƒŧ Ōƒƒįćē 2007!!]</string>
+  <string name="SKLangCheck_Office_Office2010" comment="Formatted Messages/FormatString: Local name for Microsoft Office 2010 (introduced 8.0.294.0)">[!!Mįćŗőşōƒŧ Ōƒƒīčě 2010!!]</string>
+  <string name="SKLangCheck_WindowsLanguage_Link" comment="Formatted Messages/FormatString: Shown when Keyman wants to link a Windows language to a Keyman keyboard so that when one is selected by the user, the other automatically switches in [%0:s = language name, %1:s = keyboard name] (introduced 7.1.259.0)">[!!Ļįŋƙ ŀâŉĝűąğę %0:s ŧō Ķȅŷmāň ƙęŷƄŏäřđ %1:s!!]</string>
+  <string name="SKLangCheck_WindowsLanguage_Install" comment="Formatted Messages/FormatString: Shown when Keyman wants to install  a Windows language and link it to a Keyman keyboard so that when one is selected by the user, the other automatically switches in [%0:s = language name, %1:s = keyboard name] (introduced 7.1.259.0)">[!!Ĩňŝŧąŀĺ ļăŉģųåğē %0:s ąŉď łĩňƙ ţŏ Ƙėƴmàŉ ķĕɏƂōäřđ %1:s!!]</string>
+  <!-- OSK Font Helper -->
+  <string name="S_OSK_FontHelper_PleaseWait1" comment="OSK Font Helper/HTML: OSK Font helper loading message part 1 (introduced 8.0.294.0)">[!!Ƥłęäśȇ ŵàįŧ ŵħĭĺę !!]Keyman[!! ƒıńďŝ ŧħě ƒōňţŝ ŧĥåţ ŵĩĺľ ŵŏřķ ŵĭţħ!!]</string>
+  <string name="S_OSK_FontHelper_PleaseWait2" comment="OSK Font Helper/HTML: OSK Font helper loading message part 2 (introduced 8.0.294.0)">[!!ķȅɏɓơăŗď.!!]</string>
+  <string name="S_OSK_FontHelper_NonUnicode1" comment="OSK Font Helper/HTML: OSK Font helper non-Unicode part 1 (introduced 8.0.294.0)"/>
+  <string name="S_OSK_FontHelper_NonUnicode2" comment="OSK Font Helper/HTML: OSK Font helper non-Unicode part 2 (introduced 8.0.294.0)">[!!įŝ ňőţ á Ůŉįčơďĕ ĸěȳƄőãŗđ.  Ƒōņţš ćȁŉņơť ƅȅ âŭťŏmãťĭćáļľɏ ĺōĉäţȇđ.  Ƥłĕǻšė ćħēćķ ťħě ĸěȳƀőāŗď ďōćůmȇňŧàťĭŏŋ ƒơŗ ƒŏņť ĭƞƒơŕmâţīőń.!!]</string>
+  <string name="S_OSK_FontHelper_MatchedFonts1" comment="OSK Font Helper/HTML: OSK Font helper matched fonts part 1 (introduced 8.0.294.0)">[!!Ťĥȇ ƒŏĺĺőŵıňģ ƒơŋŧś ŵơřĸ ŵıŧħ!!]</string>
+  <string name="S_OSK_FontHelper_MatchedFonts2" comment="OSK Font Helper/HTML: OSK Font helper matched fonts part 2 (introduced 8.0.294.0)">[!!ķĕɏƀŏāřđ:!!]</string>
+  <string name="S_OSK_FontHelper_PossibleFonts" comment="OSK Font Helper/HTML: OSK Font helper additional possible fonts (introduced 8.0.294.0)">[!!Ťħĕ ƒōŀŀōŵĭŉğ ƒơņťš màŷ ãłşő ŵŏřƙ:!!]</string>
+  <string name="S_OSK_FontHelper_PossibleFontsOnly1" comment="OSK Font Helper/HTML: OSK Font helper possible fonts part 1 (introduced 8.0.294.0)">[!!Ŧħę ƒōľļơŵįŉģ ƒơňŧś mǻƴ ŵŏŕķ ŵįŧĥ!!]</string>
+  <string name="S_OSK_FontHelper_PossibleFontsOnly2" comment="OSK Font Helper/HTML: OSK Font helper possible fonts part 2 (introduced 8.0.294.0)">[!!ķęŷƅŏǻŕď:!!]</string>
+  <string name="S_OSK_FontHelper_NoFonts1a" comment="OSK Font Helper/HTML: OSK Font helper no fonts part 1 (introduced 8.0.294.0)">[!!Ńő ƒŏŋŧş ŵĕřě ƒōũŉđ ơņ ȳơŭŗ ŝƴśťȅm ťĥȃţ ŵōŕķ ŵīţĥ !!]</string>
+  <string name="S_OSK_FontHelper_NoFonts1b" comment="OSK Font Helper/HTML: OSK Font helper no fonts part 2 (introduced 8.0.294.0)">[!!.  Ƥľȇāšē !!][!!čħēċƙ ťħė ďŏĉūmęņţǻţīŏņ!!][!! ţơ ƒıńď ƒơňţś ƒōŕ ťĥış ķȇɏƀōãřď.!!]</string>
+  <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font Helper/HTML: OSK Font helper no keyboards (introduced 8.0.294.0)">[!!Ńŏ ĸęƴƅơāŗđ ŀåƴōůŧś äŕȅ ćųŗŕęņťĺȳ īņśťâłłēđ ōŕ łőäđĕď.  Ŭŝě !!]Keyman[!! Ĉőŋƒįğűřąŧīŏņ ŧơ ıŉŝťȃĺľ ä ƙĕɏƃōąŗđ łâƴơŭŧ.!!]</string>
+  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font Helper/HTML: OSK Font helper choose keyboard (introduced 8.0.294.0)">[!!Ƥľęǻśĕ ćħōŏšě å !!]Keyman[!! ķēƴƄŏȃřđ ţő ƒīƞď ţħė ƒőƞŧş ŧĥáŧ ŵįĺĺ ŵőŗĸ ŵıŧħ īŧ.!!]</string>
+  <!-- OSK Hints -->
+  <string name="S_OSK_Hint_Title" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar title (introduced 8.0.294.0)">[!!Ħīŉť:!!]</string>
+  <string name="S_OSK_Hint1" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Řěšıżȇ ŧħȅ Őň Şċŕĕĕň Ƙěŷƅơǻřđ ƃŷ ćŀĭćĸīňģ äńď đŕäĝġıńĝ ŏŉ ŧĥę ŵįŉďơŵ ƅơŗďėŕ!!]</string>
+  <string name="S_OSK_Hint2" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Mővȅ ţĥȅ Ơň Şčřėěŋ ƘėŷƄơäřď Ƃɏ čŀīċĸĩŉĝ ąŉđ ďřâģğıŋĝ ōń ťĥȅ "!!]Keyman[!!" ŧīťłē!!]</string>
+  <string name="S_OSK_Hint3a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ĩņśȅřť ąŋƴ Ůńĩćōđē ćħăŗǻċŧěř ĩņťō ƴơũŕ đōčŭměňŧ ŵıŧĥ ŧħȅ!!]</string>
+  <string name="S_OSK_Hint3b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Čĥǻŗąĉŧėř Mäƥ Ťŏŏŀ!!]</string>
+  <string name="S_OSK_Hint4a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ƒĩńď őűť ŵĥıćĥ ƒơņţş ŵĭŀł ŵōřƙ ŵıţħ ŷōŭŕ ŀåņğūȃĝė ŵĭťĥ ťĥȇ!!]</string>
+  <string name="S_OSK_Hint4b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ƒơŉţ Ħęŀƥȅŕ Ťōōļ!!]</string>
+  <string name="S_OSK_Hint5a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ğēţ mơŕē ħěŀƥ ōŋ ţħė ĸȅȳƄơäřđ Ƃȳ ċļįčķįŋğ ţħě!!]</string>
+  <string name="S_OSK_Hint5b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ƙěɏƀơåřď Ůśâģȇ Ƅűŧţơņ!!]</string>
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Text Editor                       -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <string name="SKTextEditorCaption" comment="Text Editor/FormatString: Caption of Text Editor (introduced 10.0.836.0)">[!!Ţęxŧ Ęďĭŧŏŗ - !!]Keyman</string>
+</resources>

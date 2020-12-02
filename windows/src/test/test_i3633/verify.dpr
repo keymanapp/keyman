@@ -36,8 +36,9 @@ begin
     Delete(s,1,1);
   end;
 
-  if str[0].ToLower.Contains('sentry.dll') then
-    // We don't verify sentry.dll because it's not our file
+  if str[0].ToLower.Contains('sentry.') or str[0].ToLower.Contains('crashpad_handler') or str[0].ToLower.Contains('keymanmc') then
+    // We don't verify sentry.dll or sentry.x64.dll or crashpad_handler.exe because they're not our files
+    // We don't verify keymanmc.dll because it has no version resources, as it is mc-generated
     Exit('');
 
   { Check each element of string }

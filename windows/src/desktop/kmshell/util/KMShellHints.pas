@@ -43,8 +43,8 @@ implementation
 uses
   Hints,
   KeymanControlMessages,
-  UfrmHint,
-  XMLRenderer;
+  KeymanPaths,
+  UfrmHint;
 
 function ShowKMShellHintQuery(AParentWindow: THandle; AHint: string): TModalResult; overload;
 var
@@ -59,14 +59,14 @@ begin
     else Result := ShowKMShellHintQuery(AParentWindow, h, [mbOk], mrOk);
 end;
 
-function ShowKMShellHintQuery(AParentWindow: THandle; AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult; overload
+function ShowKMShellHintQuery(AParentWindow: THandle; AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult; overload;
 var
   wm_keyman_control: Integer;
 begin
   Result := ADefaultResult;
   if IsHintEnabled(AHint) then
   begin
-    if FileExists(GetXMLTemplatePath('hint.xsl')+'hint.xsl') then
+    if FileExists(TKeymanPaths.KeymanConfigStaticHttpFilesPath('hint.xsl')) then
     begin
       with TfrmHint.Create(Screen.ActiveForm) do
       try

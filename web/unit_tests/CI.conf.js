@@ -93,12 +93,6 @@ module.exports = function(config) {
       browser: 'chrome',
       browser_version: '70.0'
     },
-    bs_ie_win: {
-      os: 'Windows',
-      os_version: '10',
-      browser: 'ie',
-      browser_version: '11.0'
-    },
     bs_edge_win: {
       os: 'Windows',
       os_version: '10',

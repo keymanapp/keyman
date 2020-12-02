@@ -11,7 +11,7 @@
   
     <div class="header">
       <xsl:call-template name="header_helplinks" />
-      <xsl:value-of select="$locale/String[@Id='S_KeepInTouch']"/>
+      <xsl:value-of select="$locale/string[@name='S_KeepInTouch']"/>
     </div>
         
     <div id="subcontent_keepintouch" class="content">

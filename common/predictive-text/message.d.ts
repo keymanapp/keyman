@@ -20,7 +20,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="./node_modules/@keymanapp/lexical-model-types/index.d.ts" />
+/// <reference path="./node_modules/@keymanapp/models-types/index.d.ts" />
 
 /**
  * Tokens are signed 31-bit integers!
@@ -30,8 +30,8 @@ type Token = number;
 /**
  * The valid outgoing message kinds.
  */
-type OutgoingMessageKind = 'error' | 'ready' | 'suggestions' | 'currentword';
-type OutgoingMessage = ErrorMessage | ReadyMessage | SuggestionMessage | CurrentWordMessage;
+type OutgoingMessageKind = 'error' | 'ready' | 'suggestions' | 'currentword' | 'postaccept' | 'postrevert';
+type OutgoingMessage = ErrorMessage | ReadyMessage | SuggestionMessage | CurrentWordMessage | PostAcceptMessage | PostRevertMessage;
 
 interface ErrorMessage {
   message: 'error';
@@ -84,6 +84,41 @@ interface CurrentWordMessage {
    * of its source message - the 'wordbreak' message with matching Token value.
    */
   word: USVString;
+}
+
+/**
+ * Returns the results of a 'wordbreak' request:  a 'reversion' Suggestion and an
+ * array of new, word-initial Suggestions.
+ */
+interface PostAcceptMessage {
+  message: 'postaccept';
+
+  /**
+   * Opaque, unique token that pairs this message
+   * with the accept message that initiated it.
+   */
+  token: Token;
+
+  /**
+   * A 'Reversion' that will return the context to its prior state.
+   */
+  reversion: Reversion;
+}
+
+interface PostRevertMessage {
+  message: 'postrevert';
+
+  /**
+   * Opaque, unique token that pairs this message
+   * with the revert message that initiated it.
+   */
+  token: Token;
+
+  /**
+   * The original set of Suggestions returned that included the
+   * reverted Suggestion
+   */
+  suggestions: Suggestion[];
 }
 
 /**

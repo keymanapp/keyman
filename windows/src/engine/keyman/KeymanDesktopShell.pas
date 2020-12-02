@@ -44,7 +44,7 @@ end;
 
 class function TKeymanDesktopShell.RunKeymanConfiguration(params: string = ''): Boolean;
 begin
-  Result := TUtilExecute.Shell(0, GetShellPath, GetRootPath, params);
+  Result := TUtilExecute.ShellCurrentUser(0, GetShellPath, GetRootPath, params);
 end;
 
 class function TKeymanDesktopShell.WaitForKeymanConfiguration(

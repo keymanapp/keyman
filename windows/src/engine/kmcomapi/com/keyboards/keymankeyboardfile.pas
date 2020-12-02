@@ -37,7 +37,7 @@ uses
   keymankeyboard, keymancontext, Classes, PackageInfo, keymankeyboardlanguagesfile;
 
 type
-  TKeymanKeyboardFile = class(TKeymanKeyboard, IKeymanKeyboardFile)
+  TKeymanKeyboardFile = class(TKeymanKeyboard, IKeymanKeyboardFile, IKeymanKeyboardFile2)
   private
     FFileName: WideString;
     FError: Boolean;
@@ -51,6 +51,7 @@ type
 
     { IKeymanKeyboardFile }
     procedure Install(Force: WordBool); safecall;
+    function Install2(Force: WordBool): IKeymanKeyboardInstalled; safecall;
 
     { IKeymanKeyboard }
     function Get_Copyright: WideString; override; safecall;
@@ -77,18 +78,20 @@ type
 implementation
 
 uses
-  Graphics,
+  System.SysUtils,
+  System.Variants,
+  Vcl.Graphics,
+
+  internalinterfaces,
   keymanerrorcodes,
   keymanhotkey,
   kmxfileusedchars,
   kpinstallkeyboard,
   Keyman.System.LanguageCodeUtils,
-  SysUtils,
   utilkeyman,
   utilolepicture,
   utilstr,
-  utilxml,
-  Variants;
+  utilxml;
 
 { TKeymanKeyboardFile }
 
@@ -232,15 +235,32 @@ procedure TKeymanKeyboardFile.Install(Force: WordBool);
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [], nil, Force);
+    Execute(FFileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force);
   finally
     Free;
   end;
 end;
 
+function TKeymanKeyboardFile.Install2(Force: WordBool): IKeymanKeyboardInstalled;
+var
+  kki: IKeymanKeyboardsInstalled;
+begin
+  with TKPInstallKeyboard.Create(Context) do
+  try
+    Execute(FFileName, '', [], nil, Force);
+  finally
+    Free;
+  end;
+
+  kki := Context.Keyboards as IKeymanKeyboardsInstalled;
+  kki.Refresh;
+  Result := kki.Items[FFileName];
+end;
+
 function TKeymanKeyboardFile.Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
 var
-  FBitmap, FEncodings: WideString;
+  FBitmap, FEncodings: string;
+  TempBitmapLockFile: string;
 begin
   FEncodings := '';
   if (Get_Encodings and keymanapi_TLB.keUnicode) = keymanapi_TLB.keUnicode then
@@ -258,11 +278,13 @@ begin
     'layoutpositional', Get_LayoutType = kltPositional
   ]);
 
+  Result := Result + (FLanguages as IIntKeymanInterface).DoSerialize(Flags, ImagePath, References);
+
   if ((Flags and ksfExportImages) = ksfExportImages) and
     (Assigned(FKeyboardInfo.Icon) or
     Assigned(FKeyboardInfo.Bitmap)) then
   begin
-    FBitmap := XMLImageTempName(ImagePath, References);
+    FBitmap := XMLImageTempName(ImagePath, TempBitmapLockFile, References);
     with TBitmap.Create do
     try
       Width := 16;
@@ -274,7 +296,8 @@ begin
     finally
       Free;
     end;
-      Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
+    DeleteFile(TempBitmapLockFile); // delete after bitmap is saved to avoid races
+    Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
   end;
 end;
 

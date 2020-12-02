@@ -156,8 +156,8 @@ var
   t: string;
 begin
   inherited;
-  tag.Language := TKMXFileLanguages.TranslateISO6393ToBCP47(cbLanguageTag.Text);
-  t := TCanonicalLanguageCodeUtils.FindBestTag(Tag.Tag);
+  tag.Tag := TKMXFileLanguages.TranslateISO6393ToBCP47(cbLanguageTag.Text);
+  t := TCanonicalLanguageCodeUtils.FindBestTag(Tag.Tag, False);
   if t <> '' then
   begin
     with TBCP47Tag.Create(t) do

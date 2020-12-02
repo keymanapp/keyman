@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_55abd0597033c670d69a8049d90982c2</ID>
+      <Filename>test_chirality.kmn</Filename>
+      <Filepath>test_chirality.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>KeymanWeb Chirality Tester</Name>
+        <Copyright>© 2018 SIL International</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_3231ed6d20c5d360f38e7d605c555ddd</ID>
+      <Filename>test_deadkeys.kmn</Filename>
+      <Filepath>test_deadkeys.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Keyman Deadkey Stress-Tester</Name>
+        <Copyright>© 2018 SIL International</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_fdd96e92194d4f53b0983bf31ab1f58f</ID>
+      <Filename>test_simple_deadkeys.kmn</Filename>
+      <Filepath>test_simple_deadkeys.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Simple Deadkeys</Name>
+        <Copyright>© 2018 SIL International</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_1bccf5634ecd6605fe682279eed62c73</ID>
+      <Filename>test_917.kmn</Filename>
+      <Filepath>test_917.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test #917 - notany() and context()</Name>
+        <Copyright>©</Copyright>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

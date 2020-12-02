@@ -6,6 +6,14 @@
 # KMEA - Keyman Engine Android
 # KMW  - Keyman Web
 
+# Set sensible script defaults:
+# set -e: Terminate script if a command returns an error
+set -e
+# set -u: Terminate script if an unset variable is used
+set -u
+# set -x: Debugging use, print each statement
+# set -x
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -13,7 +21,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage ( ) {
-    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test]"
+    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test] | [-upload-sentry] | [-debug]"
     echo
     echo "Build Keyman Engine Android (KMEA) using Keyman Web (KMW) artifacts"
     echo "  -no-kmw-build           Don't build KMW. Just copy existing artifacts"
@@ -21,6 +29,8 @@ display_usage ( ) {
     echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
     echo "  -no-test                Don't run the unit-test suite.  Use for development builds"
     echo "                          to facilitate manual debugging and testing"
+    echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
+    echo "  -debug                  Local debug build; use for development builds"
     exit 1
 }
 
@@ -54,7 +64,8 @@ DO_BUILD=true
 DO_COPY=true
 DO_TEST=true
 NO_DAEMON=false
-EMBED_BUILD=-embed
+DEBUG_BUILD=false
+KMWFLAGS=-embed
 KMW_PATH=
 
 # Parse args
@@ -72,9 +83,13 @@ while [[ $# -gt 0 ]] ; do
         -no-daemon)
             NO_DAEMON=true
             ;;
+        -upload-sentry)
+            # Overrides default set by build-utils.sh
+            UPLOAD_SENTRY=true
+            ;;
         -debug)
             DEBUG_BUILD=true
-            EMBED_BUILD=-debug_embedded
+            KMWFLAGS=-debug_embedded
             KMW_PATH=unminified
             ;;
         -h|-?)
@@ -87,13 +102,20 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
+# Local development optimization - cross-target Sentry uploading when requested
+# by developer. As it's not CI, the Web artifacts won't exist otherwise...
+# unless the developer manually runs the correct build configuration accordingly.
+if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $UPLOAD_SENTRY == true ]]; then
+    KMWFLAGS="$KMWFLAGS -upload-sentry"
+fi
+
 echo
 echo "DO_BUILD: $DO_BUILD"
 echo "DO_COPY: $DO_COPY"
 echo "DO_TEST: $DO_TEST"
 echo "NO_DAEMON: $NO_DAEMON"
 echo "DEBUG_BUILD: $DEBUG_BUILD"
-echo "EMBED_BUILD: $EMBED_BUILD"
+echo "KMWFLAGS: $KMWFLAGS"
 echo "KMW_PATH: $KMW_PATH"
 echo
 
@@ -111,7 +133,7 @@ if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
     cd $KMW_SOURCE
 
-    ./build.sh $EMBED_BUILD
+    ./build.sh $KMWFLAGS
 
     if [ $? -ne 0 ]; then
         die "ERROR: keymanweb build failed. Exiting"
@@ -120,17 +142,15 @@ fi
 if [ "$DO_COPY" = true ]; then
     echo "Copying KMW artifacts"
     cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/keyman.js $KMEA_ASSETS/keyman.js
+    cp $KMW_ROOT/release/$KMW_PATH/embedded/keyman.js $KMEA_ASSETS/keymanandroid.js
+    cp $KMW_ROOT/release/$KMW_PATH/embedded/keyman.js.map $KMEA_ASSETS/keyman.js.map
     cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.eot $KMEA_ASSETS/keymanweb-osk.eot
     cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.woff $KMEA_ASSETS/keymanweb-osk.woff
+
+    cp $KMW_ROOT/node_modules/@keymanapp/web-sentry-manager/dist/index.js $KMEA_ASSETS/keyman-sentry.js
+
     if [ $? -ne 0 ]; then
         die "ERROR: copying artifacts failed"
-    fi
-    if [ "$DEBUG_BUILD" = true ]; then
-      echo "Copying debug artifacts"
-      cp -R $KMW_ROOT/release/$KMW_PATH/embedded/* $KMEA_ASSETS/
     fi
 fi
 
@@ -172,6 +192,6 @@ echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
 mv $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
-cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/keyman-engine.aar
+cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/KeyboardHarness/app/libs/keyman-engine.aar
 
 cd ..\

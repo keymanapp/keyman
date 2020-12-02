@@ -520,10 +520,10 @@ inherited frmAboutTike: TfrmAboutTike
   object lblWebsite: TLabel
     Left = 125
     Top = 135
-    Width = 176
+    Width = 128
     Height = 13
     Cursor = crHandPoint
-    Caption = 'http://www.keyman.com/developer/'
+    Caption = '(url for keyman developer)'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -11

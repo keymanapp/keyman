@@ -52,6 +52,7 @@ type
     editName: TEdit;
     procedure cmdSendClick(Sender: TObject);
     procedure lblPrivacyStatementClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     FStatusProgress: TProgressBar;
     FStatusCaption: TLabel;
@@ -66,7 +67,6 @@ type
 implementation
 
 uses
-  ErrLogPath,
   GlobalProxySettings,
   Math,
   UfrmProgress,
@@ -136,6 +136,11 @@ begin
       Request.UrlPath := API_Path_SubmitDiag;
 
       Upload;
+      if Response.StatusCode <> 200 then
+      begin
+        ShowMessage('The report was not successfully sent. An error was returned: '+IntToStr(Response.StatusCode));
+        Exit;
+      end;
       s := Trim(string(Response.MessageBodyAsString));
       if Copy(s,1,7) = '<error>' then
       begin
@@ -166,9 +171,15 @@ begin
   FStatusCaption := nil;
 end;
 
+procedure TfrmEmail.FormCreate(Sender: TObject);
+begin
+  lblPrivacyStatement.Hint := MakeKeymanURL(URLPath_Privacy_Presentation);
+  lblSecure.Caption := 'This report will be sent to '+MakeAPIURL('/');
+end;
+
 procedure TfrmEmail.lblPrivacyStatementClick(Sender: TObject);
 begin
-  TUtilExecute.URL(lblPrivacyStatement.Hint);  // I3349
+  TUtilExecute.URL(MakeKeymanURL(URLPath_Privacy));  // I3349
 end;
 
 end.

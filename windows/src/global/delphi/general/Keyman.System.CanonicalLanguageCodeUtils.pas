@@ -4,7 +4,9 @@ interface
 
 type
   TCanonicalLanguageCodeUtils = class
-    class function FindBestTag(const Tag: string): string;
+    class function FindBestTag(const Tag: string; AddRegion: Boolean): string;
+    class function IsCanonical(const Tag: string; AddRegion: Boolean): Boolean; overload;
+    class function IsCanonical(const Tag: string; var Msg: string; AddRegion: Boolean): Boolean; overload;
   end;
 
 implementation
@@ -12,52 +14,19 @@ implementation
 uses
   BCP47Tag,
   Keyman.System.LanguageCodeUtils,
+  Keyman.System.Standards.LangTagsRegistry,
   System.SysUtils;
 
-//
-// Find a language code with appropriate script and region subtags
-//
-// 1. if suppress-script is present and equal to the script of the tag, remove script
-// 2. otherwise, if suppress-script is not present, and no script is given, find
-//    appropriate script from alltags.
-// 3. finally, if no appropriate script is given, return '', because we'll need user
-//    to figure out the script themselves
-//
-// TODO: This code is not really 100% correct. We need to revisit how language tags
-//       are constructed and the point at which we do canonicalization. There are
-//       also competing requirements; for instance, Windows requires a script in
-//       some language tags where other operating systems might now.
-//
-class function TCanonicalLanguageCodeUtils.FindBestTag(const Tag: string): string;
+///
+///<summary>Find a language code with appropriate script and region subtags</summary>
+///<remarks>
+///  This will canonicalize known tags, then apply rules to ensure script subtag
+///  is present if not suppressed, and add a default region if none given.
+///</remarks>
+class function TCanonicalLanguageCodeUtils.FindBestTag(const Tag: string; AddRegion: Boolean): string;
 var
   t: TBCP47Tag;
-  script: string;
-var
-  v: TArray<string>;
-
-  function GetBestTagFromArray(a: TArray<string>): string;
-  var
-    i: Integer;
-  begin
-    // If the tag is in the list of valid tags, use it. #2046.
-    for i := 0 to High(a) do
-      if SameText(a[i], Tag) then
-        Exit(a[i]);
-
-    // Otherwise, use the most complete tag
-    for i := High(a) downto 0 do
-    begin
-      with TBCP47Tag.Create(a[i]) do
-      try
-        if not IsCanonical then
-          Continue;
-      finally
-        Free;
-      end;
-      Exit(a[i]);
-    end;
-    Result := '';
-  end;
+  LangTag: TLangTag;
 begin
   if Tag = '' then
     Exit('');
@@ -66,45 +35,59 @@ begin
   try
     if t.Tag = '' then
       Exit('');
-    if TLanguageCodeUtils.SuppressScripts.TryGetValue(t.Language, script) then
+
+    // First, canonicalize any unnecessary ISO639-3 codes
+    t.Language := TLanguageCodeUtils.TranslateISO6393ToBCP47(t.Language);
+
+
+    // Lookup the tag first, canonicalize to the base tag for known tags
+    if TLangTagsMap.AllTags.TryGetValue(t.Tag, Result) then
     begin
-      if SameText(t.Script, script) or (t.Script = '') then
-      begin
-        // The script should be suppressed because it is known to Windows (**really?)
-        // We won't do a region check because this is not really required.
-        t.Script := '';
-        Exit(t.Tag);
-      end;
+      t.Tag := Result;
     end;
 
-    //
-    // Lookup the full tag first.
-    //
-    if TLanguageCodeUtils.AllTags.TryGetValue(t.Tag, v) then
-      Exit(GetBestTagFromArray(v));
+    if not TLangTagsMap.LangTags.TryGetValue(t.Language, LangTag) then
+    begin
+       // Not a valid language subtag but perhaps it's a custom language
+       // We'll make no further assumptions
+      Exit(t.Tag);
+    end;
 
-    //
-    // Full tag not found, so reduce to Lang-Script
-    //
-    if (t.Script <> '') and TLanguageCodeUtils.AllTags.TryGetValue(t.Language+'-'+t.Script, v) then
-      Exit(GetBestTagFromArray(v));
+    // Then, lookup the lang-script and see if there is a suppress-script
+    if SameText(t.Script, LangTag.script) and LangTag.suppress then
+      t.Script := ''
+    // Or add the default script in if it is missing and not a suppress-script
+    else if (t.Script = '') and not LangTag.suppress then
+      t.Script := LangTag.script;
 
-    //
-    // Check Lang-Region
-    //
-    if (t.Region <> '') and TLanguageCodeUtils.AllTags.TryGetValue(t.Language+'-'+t.Region, v) then
-      Exit(GetBestTagFromArray(v));
+    // Add the region if not specified
+    // For Windows scenarios, we'll want to add a region. For cross-platform,
+    // we probably don't want to.
+    if (t.Region = '') and AddRegion then
+      t.Region := LangTag.region;
 
-    //
-    // Finally, check just Lang
-    //
-    if TLanguageCodeUtils.AllTags.TryGetValue(t.Language, v) then
-      Exit(GetBestTagFromArray(v));
+    Exit(t.Tag);
   finally
     t.Free;
   end;
+end;
 
-  Result := '';
+class function TCanonicalLanguageCodeUtils.IsCanonical(const Tag: string; AddRegion: Boolean): Boolean;
+begin
+  Result := SameText(Tag, FindBestTag(Tag, AddRegion));
+end;
+
+class function TCanonicalLanguageCodeUtils.IsCanonical(const Tag: string;
+  var Msg: string; AddRegion: Boolean): Boolean;
+var
+  c: string;
+begin
+  c := FindBestTag(Tag, AddRegion);
+  Result := SameText(c, Tag);
+  if not Result then
+  begin
+    msg := '''' + Tag + ''' is a valid tag but is not canonical: it should be '''+c+'''';
+  end;
 end;
 
 end.

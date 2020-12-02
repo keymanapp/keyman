@@ -7,8 +7,8 @@
 build: version.res manifest.res keymanmenuitem.res icons.res osktoolbar.res dirs
     rc langswitch\langswitchmanager.rc
     $(DCC32) keyman.dpr
-    $(TDS2DBG) keyman.exe
     $(SENTRYTOOL_DELPHIPREP) keyman.exe -dpr keyman.dpr
+    $(TDS2DBG) keyman.exe
     $(COPY) keyman.exe $(PROGRAM)\engine
     if exist keyman.dbg $(COPY) keyman.dbg $(DEBUGPATH)\engine
 
@@ -16,6 +16,10 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\keyman.exe
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\engine\keyman.dll /t keyman-engine-windows
+    $(SYMSTORE) $(DEBUGPATH)\engine\keyman.dbg /t keyman-engine-windows
 
 backup:
     $(WZZIP) $(BUILD)\engine\keyman.zip $(BACKUPDEFAULTS) keyman.exe
@@ -39,7 +43,6 @@ debug-manifest:
 
 install:
     $(COPY) $(PROGRAM)\engine\keyman.exe "$(INSTALLPATH_KEYMANENGINE)"
-    $(COPY) keyman.rsm "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
     grep -c "uiAccess=\"true\"" manifest.in

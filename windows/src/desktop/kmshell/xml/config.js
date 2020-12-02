@@ -14,11 +14,11 @@ function _$(e)
 
 function windowResize()
 {
-  var 
-    eContent = _$('contentframe'), 
-    eFooter = _$('footerframe'), 
+  var
+    eContent = _$('contentframe'),
+    eFooter = _$('footerframe'),
     eMenu = _$('menuframe');
-    
+
   if(eContent && eFooter && eMenu)
   {
     eContent.style.height = (document.body.offsetHeight - eFooter.offsetHeight - 1) + 'px';
@@ -26,7 +26,7 @@ function windowResize()
     eContent.style.left = eMenu.offsetWidth + 'px';
     eContent.style.top = 0 + 'px';
     eMenu.style.height = (document.body.offsetHeight - eFooter.offsetHeight - eMenu.offsetTop) + 'px';
-    
+
     var h = (eContent.offsetHeight - 37 - 2) + 'px'; // header height and border height
     _$('subcontent_keyboards').style.height = h;
     _$('subcontent_options').style.height = h;
@@ -42,23 +42,23 @@ function windowResize()
 doAttachEvent(window, 'resize', windowResize);
 doAttachEvent(window, 'load', windowResize);
 document.addEventListener("DOMContentLoaded", windowResize);
-  
+
   function list_mousedown(event,n)
   {
     var e = document.getElementById('list_'+n);
     window.setTimeout(function() { e.focus(); }, 10);
   }
-  
+
   function list_focus(event,n)
   {
     return true;
   }
-  
+
   function list_blur(event,n)
   {
     return true;
   }
-    
+
   function list_keydown(event,n)
   {
     switch(event.keyCode)
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
           elem.children[i].focus();
           break;
         }
-        
+
       }
       break;
     case 38:    // up
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
         event.cancelBubble=true;
         return true;
       }
-      
+
       // find prev list element
       var elem = event.srcElement.parentElement;
       for(var i = 0; i < elem.children.length; i++) {
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
         event.cancelBubble=true;
         return true;
       }
-      
+
       // find next file element
       var elem = event.srcElement.parentElement;
       for(var i = 0; i < elem.children.length; i++) {
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
       if( document.getElementById('menu_options_'+n) != null ) {
         var x = document.getElementById('list_'+n).offsetLeft + document.getElementById('menuframe').offsetWidth + 100;
         var y = document.getElementById('list_'+n).offsetTop + document.getElementById('keyboards_header').offsetHeight + 10;
-      
+
         ShowMenu( 'options_'+n, 'left', x, y);
       }
       event.cancelBubble = true;
@@ -161,26 +161,26 @@ document.addEventListener("DOMContentLoaded", windowResize);
 
   document.onfocusin = function() {
     var itemtype, blah, elemid;
-    
+
     globalfocus = event.srcElement;
     if(!event.srcElement) { return true; }
     elemid = event.srcElement.id;
-    if(typeof elemid != 'string') { 
+    if(typeof elemid != 'string') {
       // e.g. if document has received focus, id may be undefined
       return true;
     }
     itemtype = elemid.substr(0, 5);
-    
+
     if(event.srcElement.className.substr(0,8) != 'menuitem' && event.srcElement != menudiv
           && menudiv != null && menudiv.style.visibility=='visible') HideMenu();
-    
+
     if(globalfocus_item != null) {
       if(globalfocus_item != event.srcElement && !globalfocus_item.contains(event.srcElement)) {
         /* globalfocus_item.style.background = '';
         globalfocus_item.style.filter = ''; */
         $(globalfocus_item).removeClass('list_item_focus');
         globalfocus_item = null;
-      }        
+      }
     }
     if( event.srcElement.className.indexOf('list_item') >= 0 ) {
       globalfocus_item = event.srcElement;
@@ -190,8 +190,8 @@ document.addEventListener("DOMContentLoaded", windowResize);
       return true;
     }
     return true;
-  }        
-  
+  }
+
   function list_detail(event,n) {
     var k = document.getElementById('list_'+n);
     $(k).toggleClass('expanded');
@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
     save_state();
     return false;
   }
-  
+
   var loading_state = false;
 
   function save_state() {
@@ -207,15 +207,24 @@ document.addEventListener("DOMContentLoaded", windowResize);
     var state = {
       activeIndex: menuframe_activeindex,
       keyboards: [],
-      keyboardsScrollTop: $('#subcontent_keyboards').scrollTop()
+      // TODO: scrollTop is not known when element is display:none
+      keyboardsScrollTop: $('#subcontent_keyboards').scrollTop(),
+      optionsScrollTop: $('#subcontent_options').scrollTop(),
+      hotkeysScrollTop: $('#subcontent_hotkeys').scrollTop()
     };
     var keyboards = $('div.list_item');
     keyboards.each(function(index) {
-      state.keyboards.push({name: $(this).data('name'), expanded: $(this).hasClass('expanded')});
+      const name = $(this).data('name');
+      if(name) {
+        state.keyboards.push({name: name, expanded: $(this).hasClass('expanded')});
+      }
     });
-    $('#state').text(JSON.stringify(state));
+    const stateJson = JSON.stringify(state);
+    const params = new URLSearchParams(window.location.search);
+    const PageTag = params.get('tag');
+    jQuery.post('/data/keyman/state', { tag: PageTag, state: stateJson });
   }
-  
+
   function load_state() {
     loading_state = true;
     var s = $('#state').text();
@@ -235,21 +244,29 @@ document.addEventListener("DOMContentLoaded", windowResize);
             $('div.list_item[data-name="'+state.keyboards[i].name+'"]').addClass('expanded');
         }
       }
-      if(state.keyboardsScrollTop) {
-      //alert(state.keyboardsScrollTop);
-        window.setTimeout(function() { $('#subcontent_keyboards').scrollTop(state.keyboardsScrollTop); }, 1);
-      //alert($('#subcontent_keyboards').scrollTop());
-      }
+      window.setTimeout(function() {
+        if(state.keyboardsScrollTop) {
+          $('#subcontent_keyboards').scrollTop(state.keyboardsScrollTop);
+        }
+        if(state.optionsScrollTop) {
+          $('#subcontent_options').scrollTop(state.optionsScrollTop);
+        }
+        if(state.hotkeysScrollTop) {
+          $('#subcontent_hotkeys').scrollTop(state.hotkeysScrollTop);
+        }
+      }, 1);
     }
     loading_state = false;
   }
-  
+
   $( document ).ready(function() {
     load_state();
     $('#subcontent_keyboards').scroll(function() { save_state(); });
+    $('#subcontent_options').scroll(function() { save_state(); });
+    $('#subcontent_hotkeys').scroll(function() { save_state(); });
   });
-  
-  
+
+
 function submitSupportRequest() {
   location.href = 'keyman:contact_support?message='+encodeURIComponent($('#contact_support').val());
 }

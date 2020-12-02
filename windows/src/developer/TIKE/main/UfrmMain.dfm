@@ -3091,11 +3091,15 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object Options1: TMenuItem
         Action = modActionsMain.actToolsOptions
       end
-      object DebugTests1: TMenuItem
+      object mnuToolsDebugTests: TMenuItem
         Caption = 'Debug Tests'
-        object CrashTest1: TMenuItem
-          Caption = 'Crash Test'
-          OnClick = crash1Click
+        object mnuToolsDebugTestsExceptionTest: TMenuItem
+          Caption = '&Exception Test'
+          OnClick = mnuToolsDebugTestsExceptionTestClick
+        end
+        object mnuToolsDebugTestsCompilerExceptionTest: TMenuItem
+          Caption = '&Compiler Exception Test'
+          OnClick = mnuToolsDebugTestsCompilerExceptionTestClick
         end
       end
     end

@@ -1,18 +1,18 @@
 /*
   Name:             keymanx64
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      11 Dec 2009
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
                     03 Oct 2011 - mcdurdin - I3093 - Keyman Engine x64 shows a garbled error message if it cannot start
                     03 Oct 2011 - mcdurdin - I3092 - Keyman Engine does not restart nicely if shutdown uncleanly
@@ -22,6 +22,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
 #include "keymanx64.h"   // I5136
+#include "keymansentry.h"
 
 // Forward declarations of functions included in this code module
 ATOM             MyRegisterClass(HINSTANCE hInstance);
@@ -30,7 +31,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL             Fail(HWND, PWSTR);
 BOOL             UniqueInstance();
 
-// Global constants 
+// Global constants
 
 //#define KMC_GETLOADED 3
 
@@ -58,10 +59,10 @@ HWND hwndController = NULL, hwndControllerOwner = NULL;  // keyman x86 controlle
 
 // Global strings
 
-const PWSTR 
+const PWSTR
   szWindowClass = L"Keymanx64", // Do not localize
   szWindowTitle = L"Keymanx64", // Do not localize
-  
+
   szTitle = L"Keyman Engine x64",
   szError_Keymanx86NotFound = L"Keyman Engine x86 is not running.  Do not run keymanx64.exe -- it must be started by Keyman Engine x86",
   szError_Keymanx86NotFound_Comms = L"Keyman Engine x86 has closed unexpectedly.  Closing down Keyman Engine x64",
@@ -84,6 +85,8 @@ const PWSTR
 
 //const char *szGPA_ChangeWindowMessageFilter = "ChangeWindowMessageFilter"; // Do not localize
 
+#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64 KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ".keymanx64"
+
 //
 //   FUNCTION: _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int
 //
@@ -99,18 +102,37 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+
+  keyman_sentry_init(false, KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
+  keyman_sentry_setexceptionfilter();
+
+  // We used the 'Started' event when testing Sentry integration in 14.0 alpha
+  // but we don't want or need it for stable.
+  // keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_INFO, "Started " KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
+
+  if (!wcscmp(lpCmdLine, L"-sentry-client-test-exception")) {
+    keyman_sentry_test_crash();
+  }
 
 	MSG msg;
 
-  if(!UniqueInstance())
-    return Fail(0, szError_CannotRunMultipleInstances);
+  if (!UniqueInstance()) {
+    Fail(0, szError_CannotRunMultipleInstances);
+    keyman_sentry_shutdown();
+    return 1;
+  }
 
-	if(!MyRegisterClass(hInstance))
-    return Fail(0, szError_FailedToRegister);
+  if (!MyRegisterClass(hInstance)) {
+    Fail(0, szError_FailedToRegister);
+    keyman_sentry_shutdown();
+    return 1;
+  }
 
-	if (!InitInstance (hInstance, nCmdShow))
-		return Fail(0, szError_FailedToInitInstance);
+  if (!InitInstance(hInstance, nCmdShow)) {
+    Fail(0, szError_FailedToInitInstance);
+    keyman_sentry_shutdown();
+    return 1;
+  }
 
 	// Main message loop:
 	while (GetMessage(&msg, NULL, 0, 0))
@@ -118,6 +140,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+
+  keyman_sentry_shutdown();
 
 	return (int) msg.wParam;
 }
@@ -130,10 +154,10 @@ BOOL UniqueInstance()
   switch(WaitForSingleObject(hMutex, 0))
   {
     case WAIT_ABANDONED:
-    case WAIT_OBJECT_0: 
+    case WAIT_OBJECT_0:
       return TRUE;
     case WAIT_FAILED:
-    case WAIT_TIMEOUT: 
+    case WAIT_TIMEOUT:
       return FALSE;
   }
   return FALSE;
@@ -189,6 +213,19 @@ BOOL Fail(HWND hwnd, PWSTR msg)
   }
   else
     wsprintfW(outbuf, szFail_ErrorFormat_OtherUnknown, msg);
+
+  size_t sz = WideCharToMultiByte(CP_UTF8, 0, outbuf, -1, NULL, 0, NULL, NULL);
+  if (sz == 0) return FALSE;
+
+  char *buffer = (char *) calloc(sz, sizeof(char));
+  if (buffer == NULL) return FALSE;
+
+  if (WideCharToMultiByte(CP_UTF8, 0, outbuf, -1, buffer, (int) sz, NULL, NULL) != 0) {
+    buffer[sz - 1] = 0;
+    keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_ERROR, buffer, true);
+  }
+
+  free(buffer);
 
   MessageBox(hwnd, outbuf, szTitle, MB_OK | MB_ICONERROR);
 

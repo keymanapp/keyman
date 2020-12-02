@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/lexical-model-compiler",
-  "version": "13.0.2500-alpha",
+  "version": "14.0.195",
   "description": "Keyman Developer lexical model compiler",
   "keywords": [
     "keyboard",
@@ -12,7 +12,6 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha",
-    "install": "npm link @keymanapp/lexical-model-types",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -38,11 +37,14 @@
     "node": ">=12.0.0"
   },
   "dependencies": {
+    "@keymanapp/models-types": "^14.0.195",
     "commander": "^3.0.0",
-    "typescript": "^3.2.4",
+    "typescript": "^3.8.3",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
+    "@keymanapp/models-templates": "^14.0.195",
+    "@keymanapp/models-wordbreakers": "^14.0.195",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.6",

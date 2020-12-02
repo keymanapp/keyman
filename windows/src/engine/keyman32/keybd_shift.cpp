@@ -67,18 +67,21 @@ void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, UL
   switch(vk) {
   case VK_RCONTROL:
     flags |= KEYEVENTF_EXTENDEDKEY;
+    /*fallthrough*/
   case VK_LCONTROL:
     vk = VK_CONTROL;
     break;
 
   case VK_RMENU:
     flags |= KEYEVENTF_EXTENDEDKEY;
+    /*fallthrough*/
   case VK_LMENU:
     vk = VK_MENU;
     break;
 
   case VK_RSHIFT:
     scan = SCANCODE_RSHIFT; // from kbd.h
+    /*fallthrough*/
   case VK_LSHIFT:
     vk = VK_SHIFT;
     break;

@@ -4,7 +4,7 @@
 
 NOTARGET_SIGNCODE=yes
 
-TARGETS=devtools sentrytool tds2dbg genkmnp getfilelocks isadmin mkver stockeditor \
+TARGETS=devtools sentrytool tds2dbg genkmnp getfilelocks isadmin mkver \
   xslt buildunidata build_standards_data buildpkg test-klog delphiprojectmanager #help
 CLEANS=inst clean-buildtools
 
@@ -50,10 +50,6 @@ mkver:
 
 isadmin:
     cd $(ROOT)\src\buildtools\isadmin
-    $(MAKE) $(TARGET)
-
-stockeditor:
-    cd $(ROOT)\src\buildtools\stockeditor
     $(MAKE) $(TARGET)
 
 xslt:

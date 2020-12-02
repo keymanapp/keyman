@@ -17,8 +17,20 @@ describe('LMLayerWorker', function () {
 
       // Initialize the worker with a model that will produce one suggestion.
       var fakePostMessage = sinon.fake();
+      var filteredFakePostMessage = function(event) {
+        if(event.message == 'suggestions') {
+          let suggestions = event.suggestions;
+
+          // Strip any IDs set by the model compositor.
+          suggestions.forEach(function(suggestion) {
+            delete suggestion.id;
+          });
+        }
+
+        fakePostMessage(event);
+      }
       var context = {
-        postMessage: fakePostMessage
+        postMessage: filteredFakePostMessage
       };
       context.importScripts = importScriptsWith(context);
 
@@ -27,7 +39,10 @@ describe('LMLayerWorker', function () {
       
       worker.onMessage(createMessageEventWithData({
         message: 'load',
-        model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        source: {
+          type: 'file',
+          file: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+        }
       }));
       sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
         message: 'ready',

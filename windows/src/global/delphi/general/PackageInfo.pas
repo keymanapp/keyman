@@ -397,6 +397,7 @@ type
     procedure SaveXML;
 
     procedure LoadJSON;
+    procedure LoadJSONFromStream(Stream: TStream);
     procedure SaveJSON;
 
     function SaveXMLToText: WideString;
@@ -1478,6 +1479,21 @@ begin
   with TStringStream.Create('', TEncoding.UTF8) do
   try
     LoadFromFile(FileName);
+    FJSON := TJSONObject.ParseJSONValue(DataString) as TJSONObject;
+  finally
+    Free;
+  end;
+
+  DoLoadJSON(FJSON);
+end;
+
+procedure TPackage.LoadJSONFromStream(Stream: TStream);
+var
+  FJSON: TJSONObject;
+begin
+  with TStringStream.Create('', TEncoding.UTF8) do
+  try
+    LoadFromStream(Stream);
     FJSON := TJSONObject.ParseJSONValue(DataString) as TJSONObject;
   finally
     Free;

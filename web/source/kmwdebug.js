@@ -12,7 +12,7 @@ if(!window['keyman']['initialized']) {
 
   (function() 
   {
-    var keymanweb=window['keyman'],util=keymanweb['util'],kbdInterface=keymanweb['interface'];
+    var keymanweb=window['keyman'],util=keymanweb['util'],kbdInterface=keymanweb.core.kbdInterface;
     
     keymanweb._LogDebug = true; //false; // typeof(debug) == 'undefined' ? true : debug;
     if(util.device.formFactor == 'phone')return; // I3363 (Build 301)

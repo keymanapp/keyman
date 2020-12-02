@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}</ProjectGuid>
     <RootNamespace>Keyman32</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -131,7 +131,6 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;..\..\global\inc;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>

@@ -70,6 +70,10 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
   MAKEFLAG_RELEASE_OEM=-DRELEASE_OEM
 !ENDIF
 
+!IFDEF QUICK_BUILD_KEYMAN
+  MAKEFLAG_QUICK_BUILD_KEYMAN=-DQUICK_BUILD_KEYMAN
+!ENDIF
+
 #
 # USERDEFINES allows the developer to specify overrides for various settings. We need a variable
 # because Makefiles cannot test for file existence
@@ -93,7 +97,7 @@ DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\$(DELPHI_VERSION)\bin
 # Pass local configuration through to sub-instances of MAKE
 #
 
-MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
+MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_QUICK_BUILD_KEYMAN) $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
 
 #
 # Delphi build commands
@@ -158,7 +162,7 @@ NMAKE=nmake.exe
 CL=cl.exe
 MSBUILD=msbuild.exe
 # /maxcpucount see https://devblogs.microsoft.com/cppblog/precompiled-header-pch-issues-and-recommendations/
-MT="C:\Program Files (x86)\Windows Kits\8.1\bin\x86\mt.exe"
+MT=mt.exe
 VCBUILD=error
 
 !IFDEF DEBUG
@@ -269,3 +273,40 @@ MKVER_V=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -v $(MKVER_VERSION_TXT) version.in v
 MKVER_M=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -m manifest.in manifest.xml
 # Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out>
 MKVER_U=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -u
+
+#
+# Symstore
+#
+
+# KEYMAN_SYMSTOREPATH defaults to sibling folder "symbols". If it is not present,
+# then we won't attempt to write symbols to the store.
+!IFNDEF KEYMAN_SYMSTOREPATH
+KEYMAN_SYMSTOREPATH=$(KEYMAN_ROOT)\..\symbols
+!ENDIF
+
+# Nearly matches algorithm from resources/build/build-utils.sh
+# For now, we'll use it only for SYMSTORE, where it is for reference
+# only. Thus using the variable name __VERSION_WITH_TAG. Issues:
+# 1. always appends tier, even for stable
+# 2. test builds will append a branch name for master/beta/stable-x.y
+# 3. this is only available for `make symbols` (VERSION_WIN, VERSION_TIER
+#    are defined in Targets.mak only here)
+# Fixing this properly would be possible but take a fair bit more
+# work than I want to do just now. The intent is to make it possible to find
+# symbols in the symstore index which we can purge later on.
+__VERSION_WITH_TAG=$(VERSION_WIN)-$(VERSION_TIER)
+!IFNDEF TEAMCITY_VERSION
+  __VERSION_WITH_TAG=$(__VERSION_WITH_TAG)-local
+!ELSE
+!IFDEF TEAMCITY_PR_NUMBER
+  __VERSION_WITH_TAG=$(__VERSION_WITH_TAG)-test-$(TEAMCITY_PR_NUMBER)
+!ENDIF
+!ENDIF
+
+# This command depends on VERSION_WIN and VERSION_TIER being defined, through
+# `make symbols` (i.e. don't call `make wrap-symbols`)
+SYMSTORE="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe" add \
+    /s "$(KEYMAN_SYMSTOREPATH)" \
+    /v "$(VERSION_WIN)" \
+    /c "Version: $(__VERSION_WITH_TAG)" \
+    /compress /f

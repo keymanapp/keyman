@@ -64,7 +64,7 @@ uses
   MessageIdentifiers,
   utildir,
   utilexecute,
-  utilxml;
+  utilhttp;
 
 { TfrmHelp }
 
@@ -119,27 +119,20 @@ end;
 procedure TfrmHelp.TntFormCreate(Sender: TObject);
 begin
   inherited;
-  XMLRenderers.RenderTemplate := 'Help.xsl';
+  FRenderPage := 'help';
 end;
 
 procedure TfrmHelp.WMUserFormShown(var Message: TMessage);
 var
-  FXML: WideString;
+  FQuery: string;
 begin
   FormStyle := fsStayOnTop;   // I4209
-  if FActiveKeyboard <> nil then
-  begin
-    FXML :=
-      '<Keyboard Name="'+XMLEncode(FActiveKeyboard.Name)+'" />';
-  end
-  else
-    FXML := '';
-  if not XMLRenderers.TemplateExists then DoHelpTarget(htProduct)
-  else
-  begin
-    Content_Render(False, FXML);
-    inherited;
-  end;
+  if FActiveKeyboard <> nil
+    then FQuery := Format('?keyboard=%s', [UrlEncode(FActiveKeyboard.Name)])
+    else FQuery := '';
+
+  Content_Render(FQuery);
+  inherited;
 end;
 
 procedure TfrmHelp.OpenKeyboardHelp;

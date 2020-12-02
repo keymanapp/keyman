@@ -9,15 +9,18 @@
 import Foundation
 
 /// A complete identifier for an `InstallableLexicalModel`. LexicalModels must have unique `FullLexicalModelID`s.
-public struct FullLexicalModelID: Codable {
+public struct FullLexicalModelID: Codable, LanguageResourceFullID, Equatable {
+  public typealias Resource = InstallableLexicalModel
+  
   public var lexicalModelID: String
   public var languageID: String
-}
 
-// MARK: - Equatable
-extension FullLexicalModelID: Equatable {
-  public static func ==(lhs: FullLexicalModelID, rhs: FullLexicalModelID) -> Bool {
-    return lhs.lexicalModelID == rhs.lexicalModelID && lhs.languageID == rhs.languageID
+  public var id: String {
+    return lexicalModelID
+  }
+
+  public var type: LanguageResourceType {
+    return .lexicalModel
   }
 }
 

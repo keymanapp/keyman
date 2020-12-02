@@ -21,6 +21,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Engine x64" $(PROGRAM)\engine\keyman64.dll
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\engine\keyman64.dll /t keyman-engine-windows
+    $(SYMSTORE) $(DEBUGPATH)\engine\keyman64.pdb /t keyman-engine-windows
+
 backup:
     $(WZZIP) $(BUILD)\engine\keyman64.zip  $(BACKUPDEFAULTS) keyman64.dll
 

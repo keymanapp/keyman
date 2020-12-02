@@ -2,30 +2,24 @@
 /// <reference path="kmwexthtml.ts" />
 // Includes a promise polyfill (needed for IE)
 /// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
-// Defines build-environment includes, since `tsc` doesn't provide a compile-time define.
-/// <reference path="environment.inc.ts" />
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
 // Defines the core text processor.
-/// <reference path="text/processor.ts" />
+/// <reference path="../node_modules/@keymanapp/input-processor/src/text/inputProcessor.ts" />
+// Extends KeyboardInterface with DOM-oriented offerings.
+/// <reference path="text/domKbdInterface.ts" />
 // Defines the web-page interface object.
-/// <reference path="kmwdom.ts" />
+/// <reference path="dom/domManager.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
-// Defines the keyboard callback object.
-/// <reference path="text/kbdInterface.ts" />
-// Defines keyboard data & management classes.
-/// <reference path="kmwkeyboards.ts" />
-// Defines built-in keymapping.
-/// <reference path="kmwkeymaps.ts" />
+// Defines keyboard management classes.
+/// <reference path="keyboards/kmwkeyboards.ts" />
 // Defines KMW's hotkey management object.
 /// <reference path="kmwhotkeys.ts" />
 // Defines the ui management code that tracks UI activation and such.
 /// <reference path="kmwuimanager.ts" />
 // Defines OSK management code.
 /// <reference path="osk/oskManager.ts" />
-// Defines the language modeling layer (for use in autocorrect and text prediction)
-/// <reference path="includes/lmlayer.ts" />
 // Defines the model manager.
 /// <reference path="text/prediction/modelManager.ts" />
 
@@ -55,7 +49,8 @@ namespace com.keyman {
 
     initialized: number;       // Signals the initialization state of the KeymanWeb system.
     isHeadless = false;        // Indicates that KMW lacks any access to the DOM.  Nothing yet implemented for '= true'.
-    'build' = 300;           // TS needs this to be defined within the class.
+    'build' = 300;             // TS needs this to be defined within the class.
+    _BrowserIsSafari: boolean; // A legacy browser-check variable.
 
     // Used as placeholders during initialization.
     // The corresponding class properties should be dropped after a refactor;
@@ -68,16 +63,14 @@ namespace com.keyman {
     ['util']: Util;
     ['osk']: com.keyman.osk.OSKManager;
     ['ui']: any;
-    ['interface']: text.KeyboardInterface;
-    keyboardManager: KeyboardManager;
-    domManager: DOMManager;
+    keyboardManager: keyboards.KeyboardManager;
+    domManager: dom.DOMManager;
     hotkeyManager: HotkeyManager;
     uiManager: UIManager;
-    keyMapManager: KeyMapManager;
-    textProcessor: text.Processor;
+    core: text.InputProcessor;
     modelManager: text.prediction.ModelManager;
 
-    touchAliasing: DOMEventHandlers;
+    touchAliasing: dom.DOMEventHandlers;
 
     // Defines option-tracking object as a string map.
     options: { [name: string]: string; } = {
@@ -113,15 +106,30 @@ namespace com.keyman {
     constructor() {
       // Allow internal minification of the public modules.
       this.util = this['util'] = new Util(this);
-      window['KeymanWeb'] = this.interface = this['interface'] = new text.KeyboardInterface();
       this.ui = this['ui'] = {};
 
-      this.keyboardManager = new KeyboardManager(this);
-      this.domManager = new DOMManager(this);
+      this.keyboardManager = new keyboards.KeyboardManager(this);
+      this.domManager = new dom.DOMManager(this);
       this.hotkeyManager = new HotkeyManager(this);
       this.uiManager = new UIManager(this);
-      this.keyMapManager = new KeyMapManager();
-      this.textProcessor = new text.Processor();
+
+      // I732 START - Support for European underlying keyboards #1
+      var baseLayout: string;
+      if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
+        baseLayout = window['KeymanWeb_BaseLayout'];
+      } else {
+        baseLayout = 'us';
+      }
+      this._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      
+
+      this.core = new text.InputProcessor({
+        baseLayout: baseLayout,
+        variableStoreSerializer: new dom.VariableStoreCookieSerializer()
+      });
+
+      // Used by the embedded apps.
+      this['interface'] = this.core.keyboardInterface;
+      
       this.modelManager = new text.prediction.ModelManager();
       this.osk = this['osk'] = new com.keyman.osk.OSKManager();
 
@@ -158,13 +166,32 @@ namespace com.keyman {
       this.osk.shutdown();
       this.util.shutdown();
       this.keyboardManager.shutdown();
-      this.modelManager.shutdown();
+      this.core.languageProcessor.shutdown();
 
       if(this.ui && this.ui.shutdown) {
         this.ui.shutdown();
       }
 
-      DOMEventHandlers.states = new CommonDOMStates();
+      dom.DOMEventHandlers.states = new dom.CommonDOMStates();
+    }
+
+    /**
+     * Returns a generalized metadata object about the state of KMW for use with error reporting.
+     */
+    ['getDebugInfo']() {
+      let metadata = {
+        attachType: this.options.attachType,
+        device: this.util.device,
+        initialized: this.initialized,
+        isEmbedded: this.isEmbedded,
+        ui: this.ui ? this.ui.name : null
+      }
+
+      if(this.util.device.touchable) {
+        metadata.ui = 'touch';
+      }
+
+      return metadata;
     }
 
     /**
@@ -202,12 +229,12 @@ namespace com.keyman {
       if (!e) {
         e = window.event as E;
         if(!e) {
-          var elem: HTMLElement|Document = this.domManager.getLastActiveElement();
+          var elem: HTMLElement = this.domManager.getLastActiveElement();
           if(elem) {
-            elem = elem.ownerDocument;
+            let doc = elem.ownerDocument;
             var win: Window;
-            if(elem) {
-              win = elem.defaultView;
+            if(doc) {
+              win = doc.defaultView;
             }
             if(!win) {
               return null;
@@ -295,10 +322,11 @@ namespace com.keyman {
     /**
      * Build 362: removeKeyboards() remove keyboard from list of available keyboards
      * 
-     * @param {string} x keyboard name string
+     * @param {string}  x      keyboard name string
+     * @param {boolean} force  When true, also drops the cached keyboard object
      * 
      */  
-    ['removeKeyboards'](x) {
+    ['removeKeyboards'](x, force?) {
       return this.keyboardManager.removeKeyboards(x);
     }
 
@@ -342,11 +370,19 @@ namespace com.keyman {
      * Scope       Public
      * @param      {Object=}  k0 
      * @return     {boolean}
-     * Description Tests if active keyboard (or optional argument) uses a pick list (Chinese, Japanese, Korean, etc.)
+     * Description Tests if active keyboard (or specified keyboard script object, as optional argument) 
+     *             uses a pick list (Chinese, Japanese, Korean, etc.)
      *             (This function accepts either keyboard structure.)   
      */    
-    ['isCJK'](k0) { 
-      return this.keyboardManager.isCJK(k0);
+    ['isCJK'](k0?) { 
+      var kbd: keyboards.Keyboard;
+      if(k0) {
+        kbd = new keyboards.Keyboard(k0);
+      } else {
+        kbd = this.core.activeKeyboard;
+      }
+
+      return kbd && kbd.isCJK;
     }
 
     /**
@@ -357,7 +393,13 @@ namespace com.keyman {
      * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
      */
     ['isChiral'](k0?) {
-      return this.keyboardManager.isChiral(k0);
+      var kbd: keyboards.Keyboard;
+      if(k0) {
+        kbd = new keyboards.Keyboard(k0);
+      } else {
+        kbd = this.core.activeKeyboard;
+      }
+      return kbd.isChiral;
     }
 
     /**
@@ -424,10 +466,20 @@ namespace com.keyman {
     /**
      * Function     resetContext
      * Scope        Public
-     * Description  Revert OSK to default layer and clear any deadkeys and modifiers
+     * @param       {Object} e      The element whose context should be cleared.  If null, the currently-active element will be chosen.
+     * Description  Reverts the OSK to the default layer, clears any processing caches and modifier states, 
+     *              and clears deadkeys and prediction-processing states on the active element (if it exists)
      */
-    ['resetContext']() {
-      this.interface.resetContext();
+    ['resetContext'](e?: HTMLElement) {
+      let elem = e;
+      if(!elem) {
+        elem = dom.DOMEventHandlers.states.activeElement;
+      }
+      let outputTarget = dom.Utils.getOutputTarget(elem);
+      if(outputTarget) {
+        outputTarget.resetContext();
+      }
+      this.core.resetContext();
     };
 
     /**
@@ -436,7 +488,7 @@ namespace com.keyman {
      * Description  Set OSK to numeric layer if it exists
      */
     ['setNumericLayer']() {
-      this.interface.setNumericLayer();
+      this.core.keyboardProcessor.setNumericLayer(this.util.device.coreSpec);
     };
 
     /**
@@ -632,6 +684,9 @@ if(!window['keyman'] || !window['keyman']['loaded']) {
      * We only recreate the 'keyman' object if it's not been loaded.
      * As this is the base object, not creating it prevents a KMW system reset.
      */
-    window['keyman'] = com.keyman.singleton = new KeymanBase();
+    window['keyman'] = com.keyman['singleton'] = com.keyman.singleton = new KeymanBase();
+
+    // TODO:  Eliminate the need for this.  Will require more refactoring & redesign to drop.
+    window['keyman'].core.languageProcessor.init();
   })();
 }

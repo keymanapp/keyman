@@ -19,7 +19,7 @@
     </listitem>
     <listitem>
 	  <para>Select your language from the list. If your language is not in the list, click <guibutton>Find other display languages online…</guibutton>.</para>
-	  <note>If your language is not available online, you can write your own translation for your language using our local editor. For more information, see <xref linkend="advanced_locale_edit"></xref>.</note>
+	  <note>If your language is not available online, you can write your own translation for your language using our locale editor. For more information, see <xref linkend="advanced_locale_edit"></xref>.</note>
     </listitem>
 	<listitem>
 	  <para>Restart Keyman Desktop for the language changes to take effect for the entire program.</para>

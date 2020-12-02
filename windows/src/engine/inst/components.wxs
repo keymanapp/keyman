@@ -112,6 +112,14 @@
         <File Id="sentry.dll" KeyPath="yes" />
       </Component>
 
+      <Component Guid="{909DABBB-914F-4ADF-8391-BB293778D70E}">
+        <File Id="sentry.x64.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Guid="{AF7C9288-7085-4C02-AA79-9DA4F152BDBB}">
+        <File Name="crashpad_handler.exe" KeyPath="yes" />
+      </Component>
+
       <Component Guid="{B8867245-9570-4B63-B631-00F1474F71D4}">
         <File Id="tsysinfo.exe" Name="tsysinfo.exe" KeyPath="yes" />
         <RegistryValue Root="HKCR" Key=".tsi" Type="string" Value="Keyman.File.Diagnostics" />
@@ -132,6 +140,20 @@
 
       <Component Guid="{FB88ED52-C8F9-44F8-91F2-D0E377504C0D}">
         <File Id="mcompile.exe" Name='mcompile.exe' KeyPath="yes" Source="..\..\..\bin\engine\mcompile.exe" />
+      </Component>
+
+      <Component Guid="{7D3374DC-7B4E-4593-819E-B212E876BDAF}">
+        <File Id="keymanmc.dll" Name="keymanmc.dll" KeyPath="yes" Source="..\..\..\bin\engine\keymanmc.dll" />
+        <util:EventSource 
+          CategoryCount="1" 
+          CategoryMessageFile="[#keymanmc.dll]" 
+          EventMessageFile="[#keymanmc.dll]" 
+          Log="Application" 
+          Name="Keyman"
+          SupportsInformationals="yes"
+          SupportsErrors="yes"
+          SupportsWarnings="yes"
+        />
       </Component>
 
       <Component Guid="{FA89BC70-11F3-4DAF-A0B4-6EBA64FC6C5C}" Id="tsysinfo.xslts">

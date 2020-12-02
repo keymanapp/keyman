@@ -28,7 +28,9 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.FileProviderUtils;
+import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.HelpFile;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
@@ -59,12 +61,11 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     getSupportActionBar().setDisplayShowTitleEnabled(false);
 
     listView = (ListView) findViewById(R.id.listView);
-
-    final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
-    final String kbID = getIntent().getStringExtra(KMManager.KMKey_KeyboardID);
-    String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
-    final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
-    final boolean isCustomKeyboard = getIntent().getBooleanExtra(KMManager.KMKey_CustomKeyboard, false);
+    final Keyboard kbd = (Keyboard)getIntent().getSerializableExtra(KMManager.KMKey_Keyboard);
+    final String packageID = kbd.getPackageID();
+    final String kbID = kbd.getKeyboardID();
+    final String kbName = kbd.getKeyboardName();
+    final String kbVersion = kbd.getVersion();
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
     textView.setText(kbName);
@@ -82,8 +83,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
 
     // Display keyboard help link
     hashMap = new HashMap<String, String>();
-    final String helpUrlStr = getIntent().getStringExtra(KMManager.KMKey_HelpLink);
-    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
+    final String customHelpLink = kbd.getHelpLink();
     // Check if app declared FileProvider
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
@@ -123,7 +123,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == 1) {
-          if (customHelpLink != null) {
+          if (FileUtils.isWelcomeFile(customHelpLink)) {
             // Display local welcome.htm help file, including associated assets
             Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
 
@@ -132,7 +132,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
             }
           } else {
             Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(helpUrlStr));
+            i.setData(Uri.parse(customHelpLink));
             startActivity(i);
           }
         }
@@ -146,7 +146,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 
-      String url = String.format("%s%s", QRCodeUtil.QR_BASE, kbID);
+      String url = String.format(QRCodeUtil.QR_CODE_URL_FORMATSTR, kbID);
       Bitmap myBitmap = QRCodeUtil.toBitmap(url);
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);

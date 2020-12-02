@@ -148,7 +148,7 @@ begin
     begin
       if kmcom.Hotkeys[j].RawValue = NewHotkey then
       begin
-        case MessageDlg(MsgFromIdFormat(SKHotkeyConflicts_Product, [HotkeyText, MsgFromId(SKApplicationTitle)]), mtConfirmation, mbYesNoCancel, 0) of
+        case MessageDlg(MsgFromIdFormat(SKHotkeyConflicts_Interface, [HotkeyText]), mtConfirmation, mbYesNoCancel, 0) of
           mrYes:    kmcom.Hotkeys[j].Clear;
           mrNo:     Exit;
           mrCancel: Exit;

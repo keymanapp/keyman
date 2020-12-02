@@ -28,6 +28,7 @@ public:
   void Get(KMX_WCHAR *buf, int bufsize);
   void Set(const KMX_WCHAR *buf);
   KMX_WCHAR *Buf(int n);
+  KMX_WCHAR *GetFullContext() { return CurContext; }
   KMX_BOOL CharIsDeadkey();
   KMX_BOOL CharIsSurrogatePair();
 };

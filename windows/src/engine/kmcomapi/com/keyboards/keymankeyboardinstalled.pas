@@ -110,7 +110,7 @@ type
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
     procedure UpdateBaseLayout;   // I4169
-    procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
+    procedure RefreshInstallation;
 
   public
     constructor Create(AContext: TKeymanContext; const Name: string);
@@ -132,12 +132,14 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   custinterfaces,
+  KPInstallKeyboard,
   KPInstallVisualKeyboard,
   KPRecompileMnemonicKeyboard,
   keymanhotkey,
   keymankeyboardlanguagesinstalled,
   keymankeyboardoptions,
   keymanerrorcodes,
+  PackageInfo,
   utilxml;
 
 procedure TKeymanKeyboardInstalled.Uninstall;
@@ -209,7 +211,8 @@ end;
 function TKeymanKeyboardInstalled.Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
 var
   FHasVisualKeyboard: Boolean;
-  FBitmap, FEncodings: WideString;
+  FBitmap, FEncodings: string;
+  TempBitmapLockFile: string;
 begin
   FEncodings := '';
   if (Get_Encodings and keymanapi_TLB.keUnicode) = keymanapi_TLB.keUnicode then
@@ -238,7 +241,7 @@ begin
 
   if ((Flags and ksfExportImages) = ksfExportImages) and Assigned(FRegKeyboard.Icon) then
   begin
-    FBitmap := XMLImageTempName(ImagePath, References);
+    FBitmap := XMLImageTempName(ImagePath, TempBitmapLockFile, References);
     with Vcl.Graphics.TBitmap.Create do
     try
       Width := 16;
@@ -248,6 +251,7 @@ begin
     finally
       Free;
     end;
+    DeleteFile(TempBitmapLockFile); // delete after bitmap is saved to avoid races
     Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
   end;
 
@@ -281,8 +285,48 @@ begin
 end;
 
 procedure TKeymanKeyboardInstalled.Set_Loaded(Value: WordBool);
+var
+  i: Integer;
+  lang: IKeymanKeyboardLanguageInstalled2;
+  LangID: Integer;
+  TemporaryKeyboardID: WideString;
+  RegistrationRequired: WordBool;
 begin
-  FRegKeyboard.Enabled := Value;
+  if Value then
+  begin
+    FRegKeyboard.Enabled := True;
+    for i := 0 to Get_Languages.Count - 1 do
+    begin
+      lang := Get_Languages[i] as IKeymanKeyboardLanguageInstalled2;
+      if lang.IsInstalled then
+      begin
+        if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) and
+            not RegistrationRequired then
+          lang.InstallTip(LangID, TemporaryKeyboardID)
+        else
+        begin
+          // The registration for the keyboard TIP has somehow disappeared; this is unexpected.
+          // We don't want to crash, so we'll just try and clean it up. The user will have to
+          // reinstall it, which is not the end of the world.
+          lang.Uninstall;
+        end;
+      end;
+    end;
+  end
+  else
+  begin
+    FRegKeyboard.Enabled := False;
+    for i := 0 to Get_Languages.Count - 1 do
+    begin
+      lang := Get_Languages[i] as IKeymanKeyboardLanguageInstalled2;
+      if lang.IsInstalled then
+      begin
+        (lang as IIntKeymanKeyboardLanguage).Disable;
+      end;
+    end;
+  end;
+
+  (Context.Keyboards as IKeymanKeyboardsInstalled).Apply;
 end;
 
 function TKeymanKeyboardInstalled.Get_IconFilename: WideString;   // I3581
@@ -326,14 +370,6 @@ begin
   if FRegKeyboard.MnemonicLayout
     then Result := kltMnemonic
     else Result := kltPositional;
-end;
-
-procedure TKeymanKeyboardInstalled.ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
-var
-  i: Integer;
-begin
-  for i := 0 to Get_Languages.Count - 1 do
-    (Get_Languages[i] as IIntKeymanKeyboardLanguage).ApplyEnabled(pInputProcessorProfiles, AEnabled);
 end;
 
 procedure TKeymanKeyboardInstalled.ClearVisualKeyboard;
@@ -403,6 +439,31 @@ begin
       FVisualKeyboard := TKeymanVisualKeyboard.Create(Context, FRegKeyboard.VisualKeyboardFileName, Get_ID);
   finally
     Free;
+  end;
+end;
+
+/// <summary>Updates installed keyboard to Keyman 14+ registration pattern</summary>
+/// <remarks>This refreshes all the registered profiles for the keyboard and registers
+/// transient profiles. This function is idempotent. This function requires elevation '
+/// to succeed.</remarks>
+procedure TKeymanKeyboardInstalled.RefreshInstallation;
+var
+  kpik: TKPInstallKeyboard;
+  o: IKeymanPackageInstalled;
+  ll: TPackageKeyboardLanguageList;
+begin
+  kpik := TKPInstallKeyboard.Create(Context);
+  try
+    o := Get_OwnerPackage;
+    if Assigned(o) then
+    begin
+      ll := (o as IIntKeymanPackageInstalled).GetKeyboardLanguageList(Get_ID) as TPackageKeyboardLanguageList;
+      kpik.RegisterProfiles(FRegKeyboard.KeymanFile, o.ID, [ikPartOfPackage], ll);
+    end
+    else
+      kpik.RegisterProfiles(FRegKeyboard.KeymanFile, '', [], nil);
+  finally
+    kpik.Free;
   end;
 end;
 

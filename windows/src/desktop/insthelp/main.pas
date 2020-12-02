@@ -1,18 +1,18 @@
 (*
   Name:             main
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    10 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Added rootdir to product install
                     28 Sep 2006 - mcdurdin - Added Check for Updates and Start With Windows
@@ -41,18 +41,21 @@ procedure Run;
 
 implementation
 
-uses SysUtils, Windows, wininet, klog, utilfiletypes, RegistryKeys, versioninfo,
-  KeymanPaths,
-  utilexecute;
+uses
+  System.SysUtils,
+  Winapi.Windows,
+  Keyman.System.InstHelp.KeymanStartTaskUninstall,
+  klog,
+  RegistryKeys;
 
 procedure UninstallUser;
 var
-  hk: Windows.HKEY;
-  hkeyBackup: Windows.HKEY;
+  hk: Winapi.Windows.HKEY;
+  hkeyBackup: Winapi.Windows.HKEY;
   n: Integer;
   szValueName, szData: array[0..127] of char;
   cValueName, cbData, dwType: Cardinal;
-  hkey: Windows.HKEY;
+  hkey: Winapi.Windows.HKEY;
 begin
   KL.MethodEnter(nil, 'Uninstall', []);
   try
@@ -85,12 +88,7 @@ begin
       RegCloseKey(hkey);
     end;
 
-    if RegOpenKeyEx(HKEY_CURRENT_USER, SRegKey_InternetExplorerFeatureBrowserEmulation_CU, 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then   // I4436
-    begin
-      RegDeleteValue(hk, Pchar(TKeymanPaths.S_KMShell));
-      RegDeleteValue(hk, Pchar(TKeymanPaths.S_KeymanExe));
-      RegCloseKey(hk);
-    end;
+    TKeymanStartTaskUninstall.DeleteAllTasks;
   finally
     KL.MethodExit(nil, 'Uninstall');
   end;
@@ -134,7 +132,7 @@ begin
       else
       begin
         KL.LogError('Invalid parameters: '+CmdLine);
-        Windows.MessageBox(0, 'Usage: insthelp -uu|-rcu|-rlm', 'insthelp', MB_ICONERROR or MB_OK);
+        Winapi.Windows.MessageBox(0, 'Usage: insthelp -uu|-rcu|-rlm', 'insthelp', MB_ICONERROR or MB_OK);
         Exit;
       end;
     finally
@@ -144,7 +142,7 @@ begin
     on E:Exception do
     begin
       KL.LogError('Exception %s: %s', [E.ClassName, E.Message]);
-      Windows.MessageBox(0, PChar('Exception '+E.ClassName+': '+E.Message), 'insthelp', MB_ICONERROR or MB_OK);
+      Winapi.Windows.MessageBox(0, PChar('Exception '+E.ClassName+': '+E.Message), 'insthelp', MB_ICONERROR or MB_OK);
     end;
   end;
 end;

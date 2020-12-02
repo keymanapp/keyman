@@ -1,18 +1,18 @@
 /*
   Name:             kmdecomp
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      12 Oct 2012
 
   Modified Date:    12 Oct 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          12 Oct 2012 - mcdurdin - I3467 - V9.0 - Upgrade KMDECOMP to compile with KM9 source tree
 */
 
@@ -20,6 +20,7 @@
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
+#include <keymansentry.h>
 
 #define _KEYMAN64_LIGHT
 #include "keyman64.h"
@@ -29,6 +30,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 extern BOOL VerifyChecksum(LPBYTE buf, LPDWORD CheckSum, DWORD sz);
 void Err(char *p);
 int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *filename, char *bmpfile);
+int run(int argc, char *argv[]);
 
 /*
  * Keyman
@@ -39,7 +41,14 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
  *
  */
 
+#define KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS_KMDECOMP KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS ".kmdecomp"
+
 int main(int argc, char *argv[])
+{
+  return keyman_sentry_main(TRUE, KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS_KMDECOMP, argc, argv, run);
+}
+
+int run(int argc, char *argv[])
 {
 	LPKEYBOARD kbd;
 	LPBYTE lpBitmap;
@@ -62,7 +71,7 @@ int main(int argc, char *argv[])
 	_makepath_s(buf2, _MAX_PATH, drive, dir, filename, ".bmp");
 
 	int n = SaveKeyboardSource(kbd, lpBitmap, cbBitmap, buf, buf2);
-	
+
 	if(lpBitmap) delete lpBitmap;
 
 	delete kbd;
@@ -128,29 +137,29 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 
 	if(kbp->dwIdentifier != FILEID_COMPILED) { delete buf; Err("errNotFileID"); return FALSE; }
 
-	/* Check file version */ 
+	/* Check file version */
 
-	if(ckbp->dwFileVersion < VERSION_MIN || 
-	   ckbp->dwFileVersion > VERSION_MAX) 
-	{ 
-		/* Old or new version -- identify the desired program version */ 
-		if(VerifyChecksum(buf, &kbp->dwCheckSum, sz)) 
-		{ 
+	if(ckbp->dwFileVersion < VERSION_MIN ||
+	   ckbp->dwFileVersion > VERSION_MAX)
+	{
+		/* Old or new version -- identify the desired program version */
+		if(VerifyChecksum(buf, &kbp->dwCheckSum, sz))
+		{
 			kbp->dpStoreArray = (LPSTORE) (buf + ckbp->dpStoreArray);
 			for(sp = kbp->dpStoreArray, i = 0; i < kbp->cxStoreArray; i++, sp++)
 				if(sp->dwSystemID == TSS_COMPILEDVERSION)
 				{
 					char buf2[256];
-					wsprintf(buf2, "Wrong File Version: file version is %ls", ((PBYTE)kbp) + (DWORD)sp->dpString);
+					wsprintf(buf2, "Wrong File Version: file version is %ls", ((PBYTE)kbp) + (INT_PTR)sp->dpString);
 					delete buf;
 					Err(buf2);
 					return FALSE;
 				}
 		}
 		delete buf; Err("Unknown File Version: try using the latest version of KMDECOMP");
-		return FALSE; 
+		return FALSE;
 	}
-	
+
 	if(!VerifyChecksum(buf, &kbp->dwCheckSum, sz)) { delete buf; Err("Bad Checksum in file"); return FALSE; }
 
 	kbp->dpStoreArray = (LPSTORE) (buf + ckbp->dpStoreArray);
@@ -160,7 +169,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 	//kbp->dpCopyright = (PWSTR) (buf + ckbp->dpCopyright);
 	//kbp->dpMessage = (PWSTR) (buf + ckbp->dpMessage);
 	//kbp->dpLanguageName = (PWSTR) (buf + ckbp->dpLanguageName);
-		
+
 	if(ckbp->dwBitmapSize > 0)
 	{
 	  *lpBitmap = new BYTE[ckbp->dwBitmapSize];

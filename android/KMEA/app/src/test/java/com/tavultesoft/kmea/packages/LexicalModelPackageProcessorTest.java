@@ -13,6 +13,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,8 +65,10 @@ public class LexicalModelPackageProcessorTest {
 
     Assert.assertNotNull(json);
     String pkgVersion = lmPP.getPackageVersion(json);
+    ArrayList<String> languageList = new ArrayList<String>();
+    languageList.add("en");
 
-    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom", pkgVersion);
+    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom", pkgVersion, languageList);
 
     HashMap<String, String> en_custom = new HashMap<String, String>();
     en_custom.put(KMManager.KMKey_PackageID, "example.en.custom");

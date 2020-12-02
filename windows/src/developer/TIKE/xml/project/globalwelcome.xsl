@@ -14,7 +14,7 @@
         <div id="pageheader">
             <div class='pagetext'>
               <p><img src='res/keymandeveloper.png' alt='Keyman Developer' /></p>
-              <p id='header-link'><a target='_blank' href='https://keyman.com/go/developer/12.0/home'>https://keyman.com/developer/</a></p>
+              <p id='header-link'><a><xsl:attribute name="href"><xsl:value-of select='/Data/DeveloperUrls/Url[@id="home"]/@href' /></xsl:attribute><xsl:value-of select='/Data/DeveloperUrls/Url[@id="home-presentation"]/@href' /></a></p>
               <p id='header-version'>Version <xsl:value-of select="/Data/Version" /></p>
               <div id='header-sil'>
                 <img src='res/sil.png' />

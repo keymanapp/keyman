@@ -7,12 +7,19 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, user-scalable=no">
   <title>Keyman</title>
-  <script src="keyman.js"></script>
+  <script src="keymanandroid.js"></script>
+  <script src="keyman-sentry.js"></script>
   <script type="text/javascript">
     var device = window.jsInterface.getDeviceType();
     var oskHeight = window.jsInterface.getKeyboardHeight();
     var oskWidth = 0;
     var fragmentToggle = 0;
+
+    var sentryManager = new com.keyman.KeymanSentryManager({
+      hostPlatform: "android"
+    });
+    sentryManager.init();
+
     window.addEventListener('load', init, false);
 
     function init() {
@@ -39,7 +46,7 @@
 
       kmw.addEventListener('keyboardloaded', setIsChiral);
       kmw.addEventListener('keyboardchange', setIsChiral);
-      kmw.addEventListener('mm.modelchange', onModelChange);
+      kmw.core.languageProcessor.on('statechange', onStateChange);
 
       notifyHost('pageLoaded');
     }
@@ -70,6 +77,9 @@
         oskHeight = h;
       }
       var kmw=window['keyman'];
+      if(kmw && kmw.core && kmw.core.activeKeyboard) {
+        kmw.core.activeKeyboard.refreshLayouts();
+      }
       kmw['correctOSKTextSize']();
     }
 
@@ -95,8 +105,8 @@
       window.jsInterface.beepKeyboard();
     }
 
-    function onModelChange(change) {
-      //window.console.log('onModelChange change: ' + change);
+    function onStateChange(change) {
+      //window.console.log('onStateChange change: ' + change);
 
       // Refresh KMW OSK
       var kmw=window['keyman'];
@@ -118,7 +128,7 @@
 
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, kbdFile, font, oskFont, package) {
       var kmw=window['keyman'];
-      var kbdInterface=kmw['interface'];
+      var kbdInterface=window.KeymanWeb;
 
       // Defaults for missing arguments
       switch (arguments.length) {
@@ -309,7 +319,7 @@
       var kmw=window['keyman'];
       //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
-        if (!kmw['executeHardwareKeystroke'](code, shift, lstates)) {
+        if (kmw['executeHardwareKeystroke'](code, shift, lstates)) { // false if matched, true if not
           // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
           window.jsInterface.dispatchKey(code, eventModifiers);
         }

@@ -3,7 +3,7 @@ object frmDownloadProgress: TfrmDownloadProgress
   Top = 0
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'Downloading Update'
+  Caption = 'Download Progress'
   ClientHeight = 148
   ClientWidth = 305
   Color = clBtnFace
@@ -12,7 +12,7 @@ object frmDownloadProgress: TfrmDownloadProgress
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
+  OldCreateOrder = True
   Position = poScreenCenter
   OnShow = FormShow
   PixelsPerInch = 96
@@ -31,6 +31,8 @@ object frmDownloadProgress: TfrmDownloadProgress
     Top = 44
     Width = 281
     Height = 17
+    DoubleBuffered = False
+    ParentDoubleBuffered = False
     TabOrder = 0
   end
   object cmdCancel: TButton

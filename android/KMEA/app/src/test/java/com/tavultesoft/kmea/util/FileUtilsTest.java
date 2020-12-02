@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowLog;
 
+import java.io.File;
 import java.util.List;
 
 @RunWith(RobolectricTestRunner.class)
@@ -25,32 +26,10 @@ public class FileUtilsTest {
     Assert.assertEquals(4, logs.size());
 
     Assert.assertEquals("Connection", logs.get(2).tag);
-    Assert.assertEquals("Initialization failed:java.net.MalformedURLException: no protocol: invalidURL", logs.get(2).msg);
+    Assert.assertEquals("Initialization failed:\njava.net.MalformedURLException: no protocol: invalidURL", logs.get(2).msg);
 
     Assert.assertEquals("FileUtils", logs.get(3).tag);
     Assert.assertEquals("Could not download filename ", logs.get(3).msg);
-  }
-
-  @Test
-  public void test_isCustomKeyboard() {
-    // True because URL is null or empty (doesn't match *.keyman.com)
-    Assert.assertTrue(FileUtils.isCustomKeyboard(null));
-    Assert.assertTrue(FileUtils.isCustomKeyboard(""));
-
-    Assert.assertFalse(FileUtils.isCustomKeyboard("http://keyman.com/"));
-    Assert.assertFalse(FileUtils.isCustomKeyboard("https://keyman.com/"));
-    Assert.assertFalse(FileUtils.isCustomKeyboard("http://api.keyman.com/"));
-    Assert.assertFalse(FileUtils.isCustomKeyboard("https://api.keyman.com/"));
-    Assert.assertFalse(FileUtils.isCustomKeyboard("https://keyman.com/keyboard/khmer_angkor"));
-
-    // True because trailing slash is missing
-    Assert.assertTrue(FileUtils.isCustomKeyboard("http://keyman.com"));
-    Assert.assertTrue(FileUtils.isCustomKeyboard("https://keyman.com"));
-    Assert.assertTrue(FileUtils.isCustomKeyboard("http://api.keyman.com"));
-    Assert.assertTrue(FileUtils.isCustomKeyboard("https://api.keyman.com"));
-
-    // "custom" site
-    Assert.assertTrue(FileUtils.isCustomKeyboard("https://amerikeyman.com/"));
   }
 
   @Test
@@ -191,6 +170,30 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void test_hasLexicalModelPackageExtension() {
+    String filename = "test/abc.kmp";
+    Assert.assertFalse(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.KMP";
+    Assert.assertFalse(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.kmpo";
+    Assert.assertFalse(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.model.kmp";
+    Assert.assertTrue(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.MODEL.KMP";
+    Assert.assertTrue(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.MODEL.KMPO";
+    Assert.assertFalse(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "";
+    Assert.assertFalse(FileUtils.hasLexicalModelPackageExtension(filename));
+  }
+
+  @Test
   public void test_hasKeymanPackageExtension() {
     String filename = "test/abc.kmp";
     Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
@@ -237,7 +240,7 @@ public class FileUtilsTest {
     filename = "test/welcome.HTM";
     Assert.assertTrue(FileUtils.isWelcomeFile(filename));
 
-    filename = "test\\welcome.htm";
+    filename = "test" + File.separator + "welcome.htm";
     Assert.assertTrue(FileUtils.isWelcomeFile(filename));
 
     filename = "test/WELCOME.HTM";

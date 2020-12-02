@@ -84,7 +84,6 @@
         <DCC_UsePackage>vclie50;Vcl50;Inetdb50;Inet50;Vcldb50;Vclx50;Vclbde50;proide50;keyman_components;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DebugSourcePath>C:\keyman\7.0\src\keyman\kmshell\startup\;$(DebugSourcePath)</DebugSourcePath>
-        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
@@ -110,12 +109,14 @@
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
         <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <DCC_DebugInformation>2</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_MajorVer>1</VerInfo_MajorVer>
         <VerInfo_Build>0</VerInfo_Build>
         <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
+        <DCC_DebugInformation>2</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;KLOG;$(DCC_Define)</DCC_Define>
@@ -135,6 +136,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <Debugger_HostApplication>C:\Projects\keyman\open\windows\src\test\test-kmcomapi-win64\Win64\Debug\kmcomapi_win64_host.exe</Debugger_HostApplication>
         <Debugger_RunParams>-r:Keyman.Test.Console.KeymanAPIHost.TKeymanAPITest.Test_IKeymanPackageInstalled,Keyman.Test.Console.KeymanAPIHost.TKeymanAPITest.Test_IKeymanPackageFile</Debugger_RunParams>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -238,7 +240,6 @@
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
         <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\MessageDefaults.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanEngineControl.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
@@ -251,7 +252,6 @@
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\IntegerArray.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanControlMessages.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
         <DCCReference Include="util\internalinterfaces.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
@@ -261,9 +261,6 @@
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockMessages.pas"/>
-        <DCCReference Include="processes\keyboard\kpinstallkeyboardlanguageprofiles.pas"/>
-        <DCCReference Include="processes\keyboard\kpuninstallkeyboardlanguageprofiles.pas"/>
         <DCCReference Include="processes\keyboard\kprecompilemnemonickeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\input_installlayoutortip.pas"/>
@@ -290,12 +287,12 @@
         <DCCReference Include="com\keyboardlanguages\keymankeyboardlanguagefile.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilicon.pas"/>
-        <DCCReference Include="processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas">
-            <Form>$R *.TLB</Form>
-        </DCCReference>
+        <DCCReference Include="processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas"/>
+        <DCCReference Include="processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas"/>
+        <DCCReference Include="processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <RidlCompile Include="kmcomapi.ridl"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -348,8 +345,8 @@
                     <VersionInfoKeys Name="Comments">www.greatis.com</VersionInfoKeys>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>

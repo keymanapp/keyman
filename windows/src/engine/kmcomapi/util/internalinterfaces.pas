@@ -68,30 +68,27 @@ type
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
     procedure UpdateBaseLayout;   // I4169
-    procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
+    procedure RefreshInstallation;
   end;
 
   IIntKeymanKeyboardLanguage = interface   // I4376
     ['{81C18942-3C81-4F50-A64A-35A4FE863177}']
-    procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
+    procedure Disable;
   end;
 
   IIntKeymanKeyboardsInstalled = interface(IIntKeymanCollection)   // I4381
     ['{B03FF25E-E3D8-4D0C-AC7D-68717FFD4473}']
-    procedure StartKeyboards;   // I4381
-    procedure StopKeyboards;   // I4381
   end;
 
   IIntKeymanPackageInstalled = interface(IIntKeymanInterface)
     ['{1B0AEAAF-5638-4FF3-BC02-308D42574CAF}']
     procedure RefreshKeyboards;
+    function GetKeyboardLanguageList(const KeyboardID: string): TObject;
   end;
 
   IIntKeymanPackagesInstalled = IIntKeymanCollection;
 
   IIntKeymanSystemInfo = interface(IIntKeymanInterface)
-    ['{90E3F800-E232-4C12-B7B0-7EFE43B71585}']
-    procedure SetReboot; safecall;
   end;
 
   IIntKeymanOptions = IIntKeymanCollection;

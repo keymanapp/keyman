@@ -33,8 +33,10 @@ uses
 type
   TfrmOnlineUpdateNewVersion = class(TfrmWebContainer)
     procedure TntFormShow(Sender: TObject);
+    procedure TntFormDestroy(Sender: TObject);
   private
     FParams: TOnlineUpdateCheckParams;
+    PageTag: Integer;
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
   public
@@ -47,11 +49,11 @@ implementation
 
 uses
   kmint,
+  Keyman.Configuration.System.UmodWebHttpServer,
   MessageIdentifiers,
   MessageIdentifierConsts,
   strutils,
-  utilxml,
-  GenericXMLRenderer;
+  utilxml;
 
 {$R *.DFM}
 
@@ -82,56 +84,30 @@ begin
     inherited;
 end;
 
+procedure TfrmOnlineUpdateNewVersion.TntFormDestroy(Sender: TObject);
+begin
+  inherited;
+  modWebHttpServer.SharedData.Remove(PageTag);
+end;
+
 procedure TfrmOnlineUpdateNewVersion.TntFormShow(Sender: TObject);
 var
-  xml: WideString;
   i: Integer;
+  Data: IOnlineUpdateSharedData;
 begin
   inherited;
 
-  xml := '';
-
-  if (FParams.Keyman.DownloadURL <> '') then
-  begin
+  if FParams.Keyman.DownloadURL <> '' then
     FParams.Keyman.Install := True;
-    xml := xml +
-      '<Update>'+
-        '<index>0</index>'+
-        IfThen(not kmcom.SystemInfo.IsAdministrator, '<RequiresAdmin />')+
-        '<Keyman>'+
-          '<Text>'+xmlencode(MsgFromIdFormat(SKUpdate_KeymanText, [FParams.Keyman.NewVersion]))+'</Text>'+
-          '<NewVersion>'+xmlencode(FParams.Keyman.NewVersion)+'</NewVersion>'+
-          '<OldVersion>'+xmlencode(FParams.Keyman.OldVersion)+'</OldVersion>'+
-          '<DownloadSize>'+xmlencode(Format('%d', [FParams.Keyman.DownloadSize div 1024]))+'KB</DownloadSize>'+
-          '<DownloadURL>'+xmlencode(FParams.Keyman.DownloadURL)+'</DownloadURL>'+
-        '</Keyman>'+
-      '</Update>';
-  end;
 
   for i := 0 to High(FParams.Packages) do
-  begin
     FParams.Packages[i].Install := True;
-    xml := xml +
-      '<Update>'+
-        '<index>'+IntToStr(i+1)+'</index>'+
-        IfThen(not kmcom.SystemInfo.IsAdministrator, '<RequiresAdmin />')+
-        '<Package>'+
-          '<Text>'+xmlencode(MsgFromIdFormat(SKUpdate_PackageText, [FParams.Packages[i].Description, FParams.Packages[i].NewVersion]))+'</Text>'+
-          '<NewVersion>'+xmlencode(FParams.Packages[i].NewVersion)+'</NewVersion>'+
-          '<OldVersion>'+xmlencode(FParams.Packages[i].OldVersion)+'</OldVersion>'+
-          '<DownloadSize>'+xmlencode(Format('%d', [FParams.Packages[i].DownloadSize div 1024]))+'KB</DownloadSize>'+
-          '<DownloadURL>'+xmlencode(FParams.Packages[i].DownloadURL)+'</DownloadURL>'+
-        '</Package>'+
-      '</Update>';
 
-//    '<NewVersionText>'+xmlencode(MsgFromIdFormat(SKUpdate_NewVersionText, [FNewVersion, FCurrentVersion]))+'</NewVersionText>'+
-//    '<PatchText>'+xmlencode(MsgFromIdFormat(SKUpdate_PatchText, [FPatchSize div 1024]))+'</PatchText>';
-  end;
+  Data := TOnlineUpdateSharedData.Create(FParams);
+  PageTag := modWebHttpServer.SharedData.Add(Data);
 
-  XMLRenderers.RenderTemplate := 'OnlineUpdate.xsl';
-  XMLRenderers.Add(TGenericXMLRenderer.Create(xml));
-
-  Content_Render;
+  FRenderPage := 'onlineupdate';
+  Content_Render('tag='+IntToStr(PageTag));
 end;
 
 end.

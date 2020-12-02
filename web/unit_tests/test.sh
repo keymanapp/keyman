@@ -1,5 +1,17 @@
 #! /bin/bash
 
+# set -e: Terminate script if a command returns an error
+set -e
+
+WORKING_DIRECTORY=`pwd`
+
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 # A simple utility script to facilitate our different modes for unit-testing KMW.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
 
@@ -60,6 +72,7 @@ get_browser_set_for_OS
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
 DEBUG=false
 FLAGS=
+HEADLESS_FLAGS=-skip-package-install
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -67,6 +80,7 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -CI)
             CONFIG=CI.conf.js
+            HEADLESS_FLAGS="$HEADLESS_FLAGS -CI"
             ;;
         -log-level)
             shift
@@ -107,8 +121,21 @@ fi
 BASE_PATH=`dirname $BASH_SOURCE`
 cd $BASE_PATH/../source
 
-./build_dev_resources.sh
+# Compile our testing dependencies; make sure the script fails if compilation fails!
+./build_dev_resources.sh || fail "Dev resource compilation failed."
+cd ../tools/recorder
+./build.sh || fail "KMW recorder-module compilation failed."
 
+# Run our headless tests first.
+# Since we're using `lerna`, this actually puts us within the projects when run in-repo!
+
+# First:  Web-core tests.
+pushd $WORKING_DIRECTORY/node_modules/@keymanapp/input-processor
+./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
+# Once done, now we run the integrated (KeymanWeb) tests.
+popd
+
+echo "${TERM_HEADING}Running KeymanWeb integration test suite${NORMAL}"
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
 npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
 

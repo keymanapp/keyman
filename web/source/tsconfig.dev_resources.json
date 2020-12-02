@@ -8,7 +8,10 @@
 	"target": "es5"
 	},
   "files": [
-    "text/outputTarget.ts",
-    "dom/wrapElement.ts"
+		"../node_modules/@keymanapp/keyboard-processor/src/text/outputTarget.ts",
+    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
+		"../node_modules/@keymanapp/web-utils/src/index.ts",
+		"../node_modules/@keymanapp/lexical-model-layer/message.d.ts",
+    "dom/targets/wrapElement.ts"
   ]
 }

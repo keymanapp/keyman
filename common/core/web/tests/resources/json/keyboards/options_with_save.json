@@ -1,0 +1,10 @@
+{
+  "id": "options_with_save",
+  "name":"Variable-store test kbd: options_with_save",
+  "languages":{
+    "id":"en",
+    "name": "English",
+    "region": "World"
+  },
+  "filename":"resources/keyboards/options_with_save.js"
+}

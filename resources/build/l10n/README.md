@@ -1,12 +1,88 @@
 # Localization Maintenance
 
-Localization for Keyman is handled at https://crowdin.com/project/keyman
+Localization for Keyman is maintained at https://crowdin.com/project/keyman
 
-In order to incorporate those files into the Keyman platforms:
-1. Download the translations to `/.crowdin-tmp/Keyman.zip`
-2. From git bash, run `./parse-crowdin.sh` with the specified platforms
-Platform options: `-all`, `-android`, `-common`, `-developer`, `-ios`, `-linux`, `-mac`, `-web`, `-windows`
+Downloading and updating files between Keyman and Crowdin happens automatically
+on GitHub by way of the Crowdin git integration. The configuration file for all platforms
+is a YAML file named `/crowdin.yml`.
 
-This will extract `/.crowdin-tmp/Keyman.zip` into `/crowdin/` and copy files to the respective platforms.
+The only thing that needs to be done manually is to update `crowdin.yml` if new files get added
+(and of course translating the strings on the [Crowdin website](https://crowdin.com/project/keyman)).
 
-TODO: Add parameter to select locales
+## Manual up- and download with Crowdin CLI
+
+The following describes how alternatively the Crowdin CLI (v3) tool could be used to
+automate downloading and updating files between Keyman and Crowdin.
+
+On Windows, use `crowdin.bat` instead of `crowdin` for all the syntax below.
+
+### Add File
+
+When adding new files to https://crowdin.com/project/keyman/settings#files
+also go to the file "Settings" and edit **Resulting file after translations export:**.
+This is where the translated files will appear in the Crowdin download (`Keyman.zip`) which also
+determines where the translated files get extracted locally into the Keyman project.
+
+For example, `android/KMEA/strings.xml` string uses
+
+```
+/android/KMEA/app/src/main/res/values-%android_code%/strings.xml
+```
+
+### Setup
+
+Install the [Crowdin CLI (v3)](https://support.crowdin.com/cli-tool-v3/) for your OS.
+Note, it has a prerequisite on Java 8.
+
+#### Environment Variables
+
+In Crowdin, create a [personal access token](https://crowdin.com/settings#api-key)
+and set it as an environment variable `CROWDIN_PERSONAL_TOKEN`.
+
+Also copy the [project id](https://crowdin.com/project/keyman/settings#api)
+from API v2 and set it as an environment variable `CROWDIN_PROJECT_ID`.
+
+#### Testing Crowdin CLI is Set Up Correctly
+
+To check your CLI setup, in the repo root folder,
+
+```bash
+crowdin list project
+```
+
+You should see the CLI fetching project info and generating a list of files associated with the
+project.
+
+### Downloading from Crowdin
+
+To download the latest translations from Crowdin (all platforms), open a command line at the repo
+root folder and run:
+
+```bash
+crowdin download
+```
+
+To download latest translations for the specific language:
+
+```bash
+crowdin download -l {language_code}
+```
+
+To display a list of latest translations from Crowdin:
+
+```bash
+crowdin download --dryrun
+```
+
+### Uploading to crowdin
+
+To upload source files to Crowdin:
+
+```bash
+crowdin upload sources
+```
+
+## Tip
+
+Microsoft offers a website that allows to check how terms used in Windows are translated
+in different languages: https://www.microsoft.com/en-us/language/Search.

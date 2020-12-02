@@ -1,5 +1,4 @@
 // Includes version-related functionality
-///<reference path="utils/version.ts"/>
 ///<reference path="utils/styleConstants.ts" />
 
 // The Device object definition -------------------------------------------------
@@ -248,6 +247,13 @@ namespace com.keyman {
       }
 
       return this._styles;
+    }
+
+    /**
+     * Returns a slimmer, web-core compatible version of this object.
+     */
+    public get coreSpec(): utils.DeviceSpec {
+      return new utils.DeviceSpec(this.browser, this.formFactor, this.OS, this.touchable);
     }
   }
 }

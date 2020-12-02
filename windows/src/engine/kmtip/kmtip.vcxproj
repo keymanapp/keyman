@@ -20,6 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{93391ECB-E2F1-4D23-B85E-6FDEB7ACF9B4}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -136,7 +137,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\keyman32\keyman32.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\x86\kmtip.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\kmtip.def</ModuleDefinitionFile>
@@ -186,7 +187,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\keyman64.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\x64\kmtip64.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\kmtip64.def</ModuleDefinitionFile>
@@ -217,7 +218,6 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;..\..\global\inc;..\..\resellers;C:\Program Files\Microsoft Platform SDK\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;KMTIP_EXPORTS;_KEYMAN64_LIGHT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>./</AssemblerListingLocation>
@@ -236,7 +236,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\keyman32\keyman32.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\x86\kmtip.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\kmtip.def</ModuleDefinitionFile>
@@ -285,7 +285,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\keyman64.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\x64\kmtip64.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\kmtip64.def</ModuleDefinitionFile>

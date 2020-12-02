@@ -7,6 +7,7 @@ import subprocess
 gi.require_version('IBus', '1.0')
 from gi.repository import IBus, Gio
 
+
 def get_ibus_bus():
     try:
         for i in range(10000):
@@ -19,6 +20,7 @@ def get_ibus_bus():
         logging.warning(e)
     logging.warning("could not find connected IBus.Bus")
     return None
+
 
 def install_to_ibus(bus, keyboard_id):
     try:
@@ -39,8 +41,9 @@ def install_to_ibus(bus, keyboard_id):
         logging.warning("Failed to set up install %s to IBus", keyboard_id)
         logging.warning(e)
 
+
 def uninstall_from_ibus(bus, keyboard_id):
-# need to uninstall for all installed langs
+    # need to uninstall for all installed langs
     try:
         # logging.debug("getting bus")
         # bus = IBus.Bus()
@@ -56,9 +59,11 @@ def uninstall_from_ibus(bus, keyboard_id):
         logging.warning("Failed to uninstall keyboard %s", keyboard_id)
         logging.warning(e)
 
+
 def restart_ibus_subp():
     logging.info("restarting IBus by subprocess")
     subprocess.run(["ibus", "restart"])
+
 
 def restart_ibus(bus=None):
     try:
@@ -71,9 +76,11 @@ def restart_ibus(bus=None):
         logging.warning("Failed to restart IBus")
         logging.warning(e)
 
+
 def bus_has_engine(bus, name):
     engines = bus.get_engines_by_names([name])
     return len(engines)
+
 
 def get_current_engine(bus):
     try:
@@ -91,10 +98,10 @@ def change_to_keyboard(bus, keyboard_id):
     try:
         contextname = bus.current_input_context()
         ic = IBus.InputContext.get_input_context(contextname, bus.get_connection())
-        if bus_has_engine(bus, name) <= 0:
-            logging.warning("Could not find engine %s"%name)
+        if bus_has_engine(bus, keyboard_id) <= 0:
+            logging.warning("Could not find engine %s" % keyboard_id)
         else:
-            ic.set_engine(name)
+            ic.set_engine(keyboard_id)
     except Exception as e:
         logging.warning("Failed to change keyboard")
         logging.warning(e)

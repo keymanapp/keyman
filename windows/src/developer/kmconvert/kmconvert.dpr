@@ -44,7 +44,6 @@ uses
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
-  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
   Keyman.System.PackageInfoRefreshKeyboards in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
   Keyman.Developer.System.Project.ProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.ProjectFile.pas',
@@ -83,25 +82,30 @@ uses
   CompileErrorCodes in '..\..\global\delphi\general\CompileErrorCodes.pas',
   Keyman.Developer.System.ModelProjectTemplate in 'Keyman.Developer.System.ModelProjectTemplate.pas',
   Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
-  Keyman.Developer.System.Project.wordlistTsvProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
+  Keyman.Developer.System.Project.wordlistTsvProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas' {$R icons.RES},
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Console in '..\..\ext\sentry\Sentry.Client.Console.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
-  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas';
+  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
+  Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas';
 
 {$R icons.RES}
 {$R version.res}
 {$R manifest.res}
 
+const
+  LOGGER_DEVELOPER_TOOLS_KMCONVERT = TKeymanSentryClient.LOGGER_DEVELOPER_TOOLS + '.kmconvert';
 begin
-  TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper);
+  TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper, LOGGER_DEVELOPER_TOOLS_KMCONVERT);
   try
     try
+      TKeymanSentryClient.Validate;
       Run;
     except
       on E: Exception do
-        SentryHandleException(E);
+        if not SentryHandleException(E) then raise;
     end;
   finally
     TKeymanSentryClient.Stop;

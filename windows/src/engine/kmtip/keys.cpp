@@ -261,8 +261,6 @@ STDAPI CKMTipTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lP
 // pass through to Keyman keyboard
 //----------------------------------------------------------------------------
 
-typedef BOOL (WINAPI *GetKeyboardPreservedKeys)(PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
-
 HRESULT CKMTipTextService::_PreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)   // I3588
 {
   LogEnter();
@@ -270,18 +268,7 @@ HRESULT CKMTipTextService::_PreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)   //
   _PreservedKeys = NULL;
   _cPreservedKeyCount = 0;
 
-  if(!_LoadKeyman()) {   // I4274
-    return E_FAIL;
-  }
-
-  GetKeyboardPreservedKeys pGetKeyboardPreservedKeys = (GetKeyboardPreservedKeys)GetProcAddress(_hKeyman, "GetKeyboardPreservedKeys");
-  if(pGetKeyboardPreservedKeys == NULL) 
-  {
-    DebugLastError(L"GetProcAddress");
-    return E_FAIL;
-  }
-
-  if(!(*pGetKeyboardPreservedKeys)(NULL, &_cPreservedKeyCount))
+  if(!Keyman32Interface::GetKeyboardPreservedKeys(NULL, &_cPreservedKeyCount))
   {
     Log(L"GetKeyboardPreservedKeys failed");
     return E_FAIL;
@@ -289,7 +276,7 @@ HRESULT CKMTipTextService::_PreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)   //
 
   _PreservedKeys = new PreservedKey[_cPreservedKeyCount];
 
-  if(!(*pGetKeyboardPreservedKeys)(&_PreservedKeys, &_cPreservedKeyCount))
+  if(!Keyman32Interface::GetKeyboardPreservedKeys(&_PreservedKeys, &_cPreservedKeyCount))
   {
     Log(L"GetKeyboardPreservedKeys(2nd) failed");
     return E_FAIL;
@@ -362,11 +349,6 @@ HRESULT CKMTipTextService::_UnpreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)
 STDMETHODIMP CKMTipTextService::OnPreservedKey(ITfContext *pContext, REFGUID rguid, BOOL *pfEaten)
 {
   LogEnter();
-  if(!_CheckKeymanLoaded()) {   // I4325
-    Log(L"_CheckKeymanLoaded failed");
-    _UninitKeystrokeSink();
-    return E_FAIL;
-  }
 
   for(size_t i = 0; i < _cPreservedKeyCount; i++)   // I3588
   {

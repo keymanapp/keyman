@@ -1,97 +1,139 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.data;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.util.BCP47;
+import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-public class LexicalModel implements Serializable, LanguageResource {
-  public final Map<String, String> map;
+public class LexicalModel extends LanguageResource implements Serializable {
+  private static final String TAG = "lexicalModel";
 
-  /* TODO:  (v13 refactor)
-   * Drop the HashMap and instead directly represent the following as object properties:
-   *
-   *   hashMap.put(KMManager.KMKey_PackageID, packageID);
-   *   hashMap.put(KMManager.KMKey_LanguageID, languageID);
-   *   hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
-   *   hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
-   *   hashMap.put(KMManager.KMKey_LanguageName, langName);
-   *   hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
-   *   hashMap.put(KMManager.KMKey_CustomModel, isCustom);
+  /**
+   * Constructor using JSON Object from installed lexical models list
+   * @param installedObj
    */
-
-  public LexicalModel(Map<String, String> modelData) {
-    this.map = modelData;
+  public LexicalModel(JSONObject installedObj) {
+    this.fromJSON(installedObj);
   }
 
-  public String getResourceId() {
-    return this.map.get(KMManager.KMKey_LexicalModelID);
+  /**
+   * Construct a list of LexicalModel using JSON Object (from either installed KMP or lexical model cloud catalog).
+   * Adds a model for each language found
+   * @param lexicalModelJSON
+   * @param fromKMP boolean - if true, only the first language in an array is processed
+   */
+  public static List<LexicalModel> LexicalModelList(JSONObject lexicalModelJSON, boolean fromKMP) {
+    List<LexicalModel> lexicalModelList = new ArrayList<>();
+    try {
+      String kmp = lexicalModelJSON.optString("packageFilename", "");
+
+      String packageID = "";
+      if (lexicalModelJSON.has(KMManager.KMKey_PackageID)) {
+        packageID = lexicalModelJSON.getString(KMManager.KMKey_PackageID);
+      } else if (kmp != null) {
+        Uri uri = Uri.parse(kmp);
+        // Extract package ID from uri
+        packageID = uri.getLastPathSegment();
+      } else {
+        // Invalid Package ID
+        KMLog.LogExceptionWithData(TAG, "Invalid package ID with lexicalModelJSON",
+          "lexicalModelJSON", lexicalModelJSON.toString(4), null);
+      }
+
+      String resourceID = lexicalModelJSON.getString(KMManager.KMKey_ID);
+
+      String resourceName = lexicalModelJSON.getString(KMManager.KMKey_Name);
+
+      // Cloud data may not contain lexical model version, so fallback to (package) version
+      String version = lexicalModelJSON.optString(KMManager.KMKey_Version, "1.0");
+      version = lexicalModelJSON.optString(KMManager.KMKey_LexicalModelVersion, version);
+
+      String helpLink = ""; // TOODO: Handle help links
+
+      // language ID and language name from lexicalModelJSON. Iterate through language array
+      String languageID = "", languageName = "";
+      Object obj = lexicalModelJSON.getJSONArray("languages");
+      // If processing JSONObject from kmp file, only handle the first language.
+      int itemsToProcess = (fromKMP) ? 1 : ((JSONArray)obj).length();
+      for (int i=0; i<itemsToProcess; i++) {
+        if (((JSONArray) obj).get(i) instanceof String) {
+          // language name not provided so re-use language ID
+          languageID = lexicalModelJSON.getJSONArray("languages").getString(i).toLowerCase();
+          languageName = languageID;
+        } else if (((JSONArray) obj).get(i) instanceof JSONObject) {
+          JSONObject languageObj = lexicalModelJSON.getJSONArray("languages").getJSONObject(i);
+          languageID = languageObj.getString(KMManager.KMKey_ID).toLowerCase();
+          languageName = languageObj.getString(KMManager.KMKey_Name);
+        }
+
+        lexicalModelList.add(new LexicalModel(packageID, resourceID, resourceName,
+          languageID, languageName, version, helpLink, kmp));
+      }
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "Lexical model exception parsing JSON: ", e);
+    }
+    return lexicalModelList;
+  }
+
+  public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName,
+                      String languageID, String languageName,  String version,
+                      String helpLink, String kmp) {
+    // TODO: handle help links
+    super(packageID, lexicalModelID, lexicalModelName, languageID, languageName,
+        version, "", kmp);
   }
 
   @Override
-  public String getLanguageCode() {
-    return this.map.get(KMManager.KMKey_LanguageID);
+  public String getKey() {
+    return String.format("%s_%s_%s", packageID, languageID, resourceID);
   }
 
-  public String getLanguageName() {
-    return this.map.get(KMManager.KMKey_LanguageName);
-  }
-
-  public String getResourceName() {
-    return this.map.get(KMManager.KMKey_LexicalModelName);
-  }
-
-  public String getVersion() {
-    return this.map.get(KMManager.KMKey_LexicalModelVersion);
-  }
-
-  public String getPackage() {
-    return this.map.get(KMManager.KMKey_PackageID);
-  }
-
-  public String getCustomHelpLink() {
-    if (this.map.containsKey(KMManager.KMKey_CustomHelpLink)) {
-      return this.map.get(KMManager.KMKey_CustomHelpLink);
-    }
-    return null;
-  }
+  public String getLexicalModelID() { return getResourceID(); }
+  public String getLexicalModelName() { return getResourceName(); }
 
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
 
     // Make sure we have an actual download URL.  If not, we can't build a proper download bundle -
     // the downloader conditions on this URL's existence in 12.0!
-    String modelURL = map.get(KMManager.KMKey_LexicalModelPackageFilename);
-    if(modelURL == null) {
+    if(kmp == null) {
       return null;
-    } else if (modelURL.equals("")) {
+    } else if (kmp.equals("")) {
       return null;
     }
 
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, getPackage());
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, getResourceId());
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, getLanguageCode());
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, getResourceName());
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, getLanguageName());
-    bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL, modelURL);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, resourceID);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, resourceName);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, languageName);
 
-    String customHelpLink = map.get(KMManager.KMKey_CustomHelpLink);
-    if (customHelpLink != null) {
-      bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, customHelpLink);
-    }
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, helpLink);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KMP_LINK, kmp);
 
     return bundle;
   }
 
   public boolean equals(Object obj) {
     if(obj instanceof LexicalModel) {
-      boolean lgCodeMatch = ((LexicalModel) obj).getLanguageCode().equals(this.getLanguageCode());
-      boolean idMatch = ((LexicalModel) obj).getResourceId().equals(this.getResourceId());
+      boolean lgCodeMatch = BCP47.languageEquals(((LexicalModel) obj).getLanguageID(), this.getLanguageID());
+      boolean idMatch = ((LexicalModel) obj).getLexicalModelID().equals(this.getLexicalModelID());
 
       return lgCodeMatch && idMatch;
     }
@@ -99,8 +141,27 @@ public class LexicalModel implements Serializable, LanguageResource {
     return false;
   }
 
-  @Override
-  public int hashCode() {
-    return getResourceId().hashCode() * getLanguageCode().hashCode();
+  protected void fromJSON(JSONObject installedObj) {
+    super.fromJSON(installedObj);
+  }
+
+  public JSONObject toJSON() {
+    return super.toJSON();
+  }
+
+  // default nrc.en.mtnt English dictionary
+  public static final LexicalModel getDefaultLexicalModel(Context context) {
+    String version = KMManager.getLexicalModelPackageVersion(
+      context, KMManager.KMDefault_DictionaryPackageID);
+
+    return new LexicalModel(
+      KMManager.KMDefault_DictionaryPackageID,
+      KMManager.KMDefault_DictionaryModelID,
+      KMManager.KMDefault_DictionaryModelName,
+      KMManager.KMDefault_LanguageID,
+      KMManager.KMDefault_LanguageName,
+      version,
+      "", // help link
+      ""); // kmp link
   }
 }

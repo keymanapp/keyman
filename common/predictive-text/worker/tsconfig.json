@@ -4,9 +4,14 @@
     "declaration": true,
     "module": "none",
     "outFile": "../build/intermediate/index.js",
-    "inlineSources": true,
     "sourceMap": true,
     "lib": ["webworker", "es6"],
-    "target": "es5"
-  }
+    "target": "es5",
+    "downlevelIteration": true
+  },
+  "include": [
+    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
+    "../node_modules/@keymanapp/web-utils/src/index.ts",
+    "./**/*.ts",
+  ]
 }

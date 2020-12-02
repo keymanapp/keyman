@@ -13,16 +13,14 @@ private let toolbarButtonTag = 100
 class LanguageSettingsViewController: UITableViewController {
   let language: Language
   private var settingsArray = [[String: String]]()
-  private var keyboardRepository: KeyboardRepository?
 
   private var doPredictionsSwitch: UISwitch?
   private var doCorrectionsSwitch: UISwitch?
   private var doCorrectionsLabel: UILabel?
   private var correctionsCell: UITableViewCell?
 
-  public init(_ keyboardRepository: KeyboardRepository?, _ inLanguage: Language) {
+  public init(_ inLanguage: Language) {
     language = inLanguage
-    self.keyboardRepository = keyboardRepository
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -37,7 +35,8 @@ class LanguageSettingsViewController: UITableViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    title = "\(language.name) Settings"
+    let titleFormat = NSLocalizedString("menu-langsettings-title", bundle: engineBundle, comment: "")
+    title = String.localizedStringWithFormat(titleFormat, language.name)
     log.info("viewDidLoad: LanguageSettingsViewController title: \(title ?? "<empty>")")
 
     if Manager.shared.canAddNewKeyboards {
@@ -193,9 +192,11 @@ class LanguageSettingsViewController: UITableViewController {
     var title: String
     switch (section) {
     case 0:
-      title = "Keyboards"
+      // We do NOT use a general-use "keyboards" entry because different languages have different
+      // pluralization rules, and it's a major assumption to assume which is preferred for general use.
+      title = NSLocalizedString("menu-langsettings-section-keyboards", bundle: engineBundle, comment: "")
     case 1:
-      title = "Language settings"
+      title = NSLocalizedString("menu-langsettings-section-settings", bundle: engineBundle, comment: "")
     default:
       title = "unknown header"
     }
@@ -235,30 +236,21 @@ class LanguageSettingsViewController: UITableViewController {
       cell.accessoryType = .none
       switch indexPath.row {
         case 0:
-          cell.textLabel?.text = "Enable predictions"
+          cell.textLabel?.text = NSLocalizedString("menu-langsettings-toggle-predict", bundle: engineBundle, comment: "")
         case 1:
           doCorrectionsLabel = cell.textLabel
-          cell.textLabel?.text = "Enable corrections"
+          cell.textLabel?.text = NSLocalizedString("menu-langsettings-toggle-correct", bundle: engineBundle, comment: "")
           cell.textLabel?.isEnabled = !(doCorrectionsSwitch?.isHidden ?? false)
         case 2:
-          cell.textLabel?.text = "Dictionaries"
+          cell.textLabel?.text = NSLocalizedString("menu-langsettings-label-lexical-models", bundle: engineBundle, comment: "")
           cell.accessoryType = .disclosureIndicator
-          if let modelCt = language.lexicalModels?.count {
-            switch modelCt {
-            case 0:
-              cell.detailTextLabel?.text = "no dictionaries installed"
-            case 1:
-              cell.detailTextLabel?.text = "\(language.lexicalModels![0].name)"
-            default:
-              cell.detailTextLabel?.text = "\(modelCt) dictionaries installed"
-            }
+          let modelCt = language.lexicalModels?.count ?? 0
+          if modelCt != 1 {
+            let formatString = NSLocalizedString("menu-langsettings-lexical-model-count", bundle: engineBundle, comment: "")
+            cell.detailTextLabel?.text = String.localizedStringWithFormat(formatString, modelCt)
           } else {
-            cell.detailTextLabel?.text = "no dictionaries installed"
+            cell.detailTextLabel?.text = "\(language.lexicalModels![0].name)"
           }
-        case 3: // future
-          cell.textLabel?.text = "Manage dictionary"
-          cell.accessoryType = .disclosureIndicator
-          cell.isUserInteractionEnabled = false
 
         default:
           cell.textLabel?.text = "error"
@@ -308,16 +300,26 @@ class LanguageSettingsViewController: UITableViewController {
   }
   
   @objc func addClicked(_ sender: Any) {
-    showAddLanguageKeyboard()
+    let keyboardSearchVC = KeyboardSearchViewController(languageCode: self.language.id,
+                                                        keyboardSelectionBlock: KeyboardSearchViewController.defaultDownloadClosure() { result in
+      switch result {
+        case .cancelled:
+          break
+        case .error(let error):
+          if let error = error {
+            log.error(String(describing: error))
+          }
+        case .success(let package, let fullID):
+          ResourceFileManager.shared.doInstallPrompt(for: package as! KeyboardKeymanPackage,
+                                                     defaultLanguageCode: fullID.languageID,
+                                                     in: self.navigationController!,
+                                                     withAssociators: [.lexicalModels])
+      }
+    })
+
+    navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
-  
-  func showAddLanguageKeyboard() {
-    let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
-    button?.isEnabled = false
-    let vc = LanguageDetailViewController(keyboardRepository, language: language)
-    vc.title = "Add new \(language.name) keyboard"
-    navigationController?.pushViewController(vc, animated: true)
-  }
+
   
   private func performAction(for indexPath: IndexPath) {
     switch indexPath.section {
@@ -374,55 +376,35 @@ class LanguageSettingsViewController: UITableViewController {
       }
       let kbIndex:Int = index
       let thisKb = globalUserKeyboards[kbIndex]
-      let infoView = ResourceInfoViewController(for: thisKb)
-      infoView.title = thisKb.name
-      infoView.keyboardCount = globalUserKeyboards.count
-      infoView.keyboardIndex = index
-      infoView.isCustomKeyboard = thisKb.isCustom
+      let mayDelete = mayDeleteKeyboard(keyboardIndex: index, keyboardCount: globalUserKeyboards.count)
+      let infoView = ResourceInfoViewController(for: thisKb, mayDelete: mayDelete)
       navigationController?.pushViewController(infoView, animated: true)
     } else {
       log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
       return
     }
   }
-  
+
+  private func mayDeleteKeyboard(keyboardIndex: Int, keyboardCount: Int) -> Bool {
+    if !Manager.shared.canRemoveKeyboards {
+      return false
+    }
+
+    if !Manager.shared.canRemoveDefaultKeyboard {
+      return keyboardIndex != 0
+    }
+
+    if keyboardIndex > 0 {
+      return true
+    }
+    return keyboardCount > 1
+  }
+
   func showLexicalModelsView() {
     //LanguageLexicalModelPickerViewController? (should show just the models for this language)
     let lmListView = LexicalModelPickerViewController(self.language)
     lmListView.language = self.language
     navigationController?.pushViewController(lmListView, animated: true)
- }
-  
-  func showLexicalModelInfoView() {
-    if let lm = language.lexicalModels?[safe: 0] {
-      let version = lm.version
-      let matchingFullID = FullLexicalModelID(lexicalModelID: lm.id, languageID: language.id)
-      
-      let userData = Storage.active.userDefaults
-      
-      if let globalUserLexicalModels = userData.userLexicalModels {
-        if let index = globalUserLexicalModels.firstIndex(where: { $0.fullID == matchingFullID }) {
-          guard index < globalUserLexicalModels.count else {
-            return
-          }
-          let lmIndex:Int = index
-          let thisLm = globalUserLexicalModels[lmIndex]
-          let infoView = LexicalModelInfoViewController()
-          infoView.title = thisLm.name
-          infoView.lexicalModelCount = globalUserLexicalModels.count
-          infoView.lexicalModelIndex = index
-          infoView.lexicalModelID = thisLm.id
-          infoView.languageID = language.id
-          infoView.lexicalModelVersion = version ?? InstallableConstants.defaultVersion
-          infoView.isCustomLexicalModel = thisLm.isCustom
-          navigationController?.pushViewController(infoView, animated: true)
-        } else {
-          log.error("this lexical model \(matchingFullID) not found among language's installed lexical model!")
-        }
-      } else {
-        log.error("no lexical models in the global models list!")
-      }
-    }
   }
   
     /*

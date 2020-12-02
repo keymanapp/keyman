@@ -3,8 +3,9 @@
   <xsl:template match="/">
     <html>
       <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
         <meta charset="UTF-8" />
+        <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>
+        <script src="/app/lib/sentry/init.js"><xsl:text> </xsl:text></script>
 
         <title>Help</title>
         <style>

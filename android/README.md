@@ -1,7 +1,7 @@
 # Keyman for Android & Keyman Engine for Android
 
 ## Prerequisites
-* Android Studio 3.3.2+
+* Android Studio 4.1+
 * Java SE Development Kit 8 
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 
@@ -14,8 +14,8 @@ https://github.com/ojdkbuild/ojdkbuild
 2. On on windows: use the default java path C:\Program Files\Java to avoid error message "Error 0x80010135 Path Too Long".
 3. Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-1.8.0.232-1
 
-## Minimum Android Requirements
-Keyman for Android has a minSdkVersion of 16 for [Android 4.1 Jelly Bean](https://developer.android.com/about/versions/android-4.1)
+## Keyman Minimum Android Requirements
+Keyman for Android has a minSdkVersion of 21 for [Android 5.0 Lollipop](https://developer.android.com/about/versions/lollipop)
 
 ## Setup Android Studio
 
@@ -48,6 +48,12 @@ Keyman for Android (formerly named KMAPro) can be built from a command line (pre
 
 Building Keyman Web is a precursor for compiling KMEA, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
 
+### Install JQ
+jq 1.6+ is used during the build process to determine the latest versions of the default keyboard (sil_euro_latin.kmp) and lexical-model (en.nrc.mtnt.model.kmp) packages to download. For builds on Windows, jq is already included in `/resources/build/`
+
+On Linux
+`sudo apt install jq`
+
 ### Crash Reporting
 Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server https://sentry.keyman.com. The analytics for Debug are associated with an App Bundle ID `com.tavultesoft.kmapro.debug`.
 
@@ -64,12 +70,14 @@ export SENTRY_PROJECT=keyman-android
 To validate your configuration, from the `android/` folder run `sentry-cli info`.
  
 ### Compiling From Command Line
-1. Launch a command prompt
-2. Change to one of these directories depending on what you want to compile:
-    * For compiling KMEA and KMAPro, cd to the directory **keyman/android**
-    * For compiling only KMAPro, cd to the directory **keyman/android/KMAPro**
-3. `./build.sh -debug`
-4. The APK will be found in **KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
+1. Launch a command prompt and cd to the directory **keyman/android**
+2. Run the top level build script `./build.sh -debug` which will:
+    * Compile KMEA (and its KMW dependency)
+    * Download default keyboard and dictionary resources as needed
+    * Compile KMAPro
+    * Note: to force an update to the latest keyboard and dictionary packages, use the `-download-resources` flag.
+
+3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
 
 ### Compiling From Android Studio
 1. Ensure that [Keyman Engine for Android](#how-to-build-keyman-engine-for-android) is built.
@@ -128,16 +136,14 @@ Building these projects follow the same steps as KMAPro:
 
 **android/Tests/KeyboardHarness** app is a test harness for developers to troubleshoot keyboards.
 
-1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/cloud/*.
-
-   For users of Keyman Engine pre 10.0, use the folders
-*android/Tests/KeyboardHarness/app/src/main/assets/languages/* and
-*android/Tests/KeyboardHarness/app/src/main/assets/fonts/* respectively.
-
-2. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
-3. cd to android/Tests/KeyboardHarness/
-4. `./build.sh`
-5. Open Android Studio to run the app
+1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/*.
+2. In Keyman Developer
+  * Open the `keyboardharness.kpj` project and add your keyboard files to the keyboard package.
+  * Build the keyboardharness.kmp keyboard package
+3. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
+4. cd to android/Tests/KeyboardHarness/
+5. `./build.sh`
+6. Open Android Studio to run the app
 
 --------------------------------------------------------------
 
@@ -154,7 +160,21 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
     b. If you choose to use your own build of the Keyman Engine, get the library from **android/Samples/KMSample1/app/libs/keyman-engine.aar**
 2. Open your project in Android Studio.
 3. Open **build.gradle** (Module: app) in "Gradle Scripts".
-4. After the `android {}` object, include the following:
+4. Check that the `android{}` object, includes the following:
+```gradle
+android {
+    compileSdkVersion 29
+
+    // Don't compress kmp files so they can be copied via AssetManager
+    aaptOptions {
+        noCompress "kmp"
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+```
+5. After the `android {}` object, include the following:
 ````gradle
 repositories {
     flatDir {
@@ -165,15 +185,10 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.1'
-    implementation 'com.google.android.material:material:1.0.0'
-    api (name:'keyman-engine', ext:'aar')
-    implementation "com.google.firebase:firebase-analytics:17.2.1"
-    implementation "com.google.firebase:firebase-messaging:20.0.1"
-    implementation "com.google.firebase:firebase-crash:16.2.1"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
+    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
+    implementation 'com.google.android.material:material:1.2.1'
+    api(name: 'keyman-engine', ext: 'aar')
+    implementation 'io.sentry:sentry-android:2.3.0'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {

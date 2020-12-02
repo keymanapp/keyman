@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  tools:context=".SelectLanguageActivity" >
+
+  <include layout="@layout/titlebar" />
+
+  <!-- Stepper Layout for button controls.
+    Button text set here so we can localize -->
+  <com.stepstone.stepper.StepperLayout
+    android:id="@+id/stepperLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    app:ms_showBackButtonOnFirstStep="true"
+    app:ms_backButtonColor="@color/keyman_blue"
+    app:ms_backButtonText="@string/label_back"
+    app:ms_nextButtonColor="@color/keyman_blue"
+    app:ms_nextButtonText="@string/label_next"
+    app:ms_completeButtonColor="@color/keyman_blue"
+    app:ms_completeButtonText="@string/label_ok"
+    app:ms_stepperType="dots" />
+
+</RelativeLayout>

@@ -17,6 +17,7 @@ typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 // MARK: - Constants
 
 // Possible states that a keyboard or lexical model can be in
+@available(*, deprecated, message: "Version checks against keyboards and models are now based on their package.  Use `KeymanPackage.InstallationState` and `KeymanPackage.VersionState` instead.")
 public enum KeyboardState {
   case needsDownload
   case needsUpdate
@@ -32,11 +33,10 @@ public enum VibrationSupport {
   case taptic // Has the Taptic engine, allowing use of UIImpactFeedbackGenerator for customizable vibrations
 }
 
-// Strings
-private let keyboardChangeHelpText = "Tap here to change keyboard"
-
-// URLs - used for reachability test
-private let keymanHostName = "api.keyman.com"
+/**
+ * Obtains the bundle for KeymanEngine.framework.
+ */
+internal let engineBundle: Bundle = Bundle(for: Manager.self)
 
 public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
@@ -86,9 +86,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// The default value is false.
   public var canRemoveDefaultKeyboard = false
 
-  public let apiKeyboardRepository: APIKeyboardRepository
-    
-    
   // TODO: Change API to not disable removing as well
   /// Allow users to add new lexical models in the lexical model picker.
   ///  - Default value is true.
@@ -116,14 +113,13 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// The last lexical model CAN be removed, as this is an optional feature
   /// The default value is true.
   public var canRemoveDefaultLexicalModel = true
-  
-  public let apiLexicalModelRepository: APILexicalModelRepository
 
   /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
   /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
   /// where it is safe. However, the entire Keyman Engine framework must be compiled with extension-safe APIs.
   ///
   /// Set this to `UIApplication.shared.openURL` in your application.
+  @available(*, deprecated)
   public var openURL: ((URL) -> Bool)?
 
   var currentKeyboardID: FullKeyboardID?
@@ -169,15 +165,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   //private var downloadQueue: HTTPDownloader?
   private var reachability: Reachability!
   var didSynchronize = false
-  
-  
-  private var keyboardDownloadCompletedObserver: NotificationObserver?
 
   // MARK: - Object Admin
 
   private override init() {
-    apiKeyboardRepository = APIKeyboardRepository()
-    apiLexicalModelRepository = APILexicalModelRepository()
     super.init()
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
@@ -210,7 +201,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     updateUserKeyboards(with: Defaults.keyboard)
 
     do {
-      try reachability = Reachability(hostname: keymanHostName)
+      try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
       log.error("Could not start Reachability object: \(error)")
     }
@@ -224,11 +215,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         log.error("failed to start Reachability notifier: \(error)")
       }
     }
-    
-    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadCompleted,
-      observer: self,
-      function: Manager.keyboardDownloadCompleted)
 
     // We used to preload the old KeymanWebViewController, but now that it's embedded within the
     // InputViewController, that's not exactly viable.
@@ -302,10 +288,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     currentKeyboardID = kb.fullID
 
     if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: fontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: fontFilename)!)
     }
     if let oskFontFilename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: oskFontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: oskFontFilename)!)
     }
 
     inputViewController.setKeyboard(kb)
@@ -342,27 +328,26 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   /// Adds a new keyboard to the list in the keyboard picker if it doesn't already exist.
   /// The keyboard must be downloaded (see `downloadKeyboard()`) or preloaded (see `preloadLanguageFile()`)
+  @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
-    let keyboardPath = Storage.active.keyboardURL(for: keyboard).path
-    if !FileManager.default.fileExists(atPath: keyboardPath) {
-      log.error("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist")
-      return
-    }
+    var kbdToInstall = keyboard
 
-    // Get keyboards list if it exists in user defaults, otherwise create a new one
-    let userDefaults = Storage.active.userDefaults
-    var userKeyboards = userDefaults.userKeyboards ?? []
-
-    // Update keyboard if it exists
-    if let index = userKeyboards.firstIndex(where: { $0.fullID == keyboard.fullID }) {
-      userKeyboards[index] = keyboard
+    // 3rd party installation of keyboards (13.0 and before):
+    // - Manager.shared.preloadFiles was called first to import the file resources
+    // - Then Manager.shared.addKeyboard installs the keyboard.
+    //
+    // Since 3rd-party uses never provided kmp.json files, we need to instant-migrate
+    // them here.
+    if !Migrations.resourceHasPackageMetadata(keyboard) {
+      let wrappedKbds = Migrations.migrateToKMPFormat([keyboard])
+      guard wrappedKbds.count == 1 else {
+        log.error("Could not properly import keyboard")
+        return
+      }
+      kbdToInstall = wrappedKbds[0]
     } else {
-      userKeyboards.append(keyboard)
+      ResourceFileManager.shared.addResource(kbdToInstall)
     }
-
-    userDefaults.userKeyboards = userKeyboards
-    userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
-    userDefaults.synchronize()
   }
     
     
@@ -407,29 +392,27 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   *   The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
   *   I believe this is background-thread-safe (no UI done)
   */
+  @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   static public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-    let lexicalModelPath = Storage.active.lexicalModelURL(for: lexicalModel).path
-    if !FileManager.default.fileExists(atPath: lexicalModelPath) {
-      log.error("Could not add lexical model with ID: \(lexicalModel.id) because the lexical model file does not exist")
-      return
-    }
-    
-    // Get lexical models list if it exists in user defaults, otherwise create a new one
-    let userDefaults = Storage.active.userDefaults
-    var userLexicalModels = userDefaults.userLexicalModels ?? []
-    
-    // Update lexical model if it exists
-    if let index = userLexicalModels.firstIndex(where: { $0.fullID == lexicalModel.fullID }) {
-      userLexicalModels[index] = lexicalModel
+    var modelToInstall = lexicalModel
+
+    // Potential 3rd party installation of lexical models (12.0, 13.0):
+    // - Manager.shared.preloadFiles was called first to import the file resources
+    // - Then Manager.addLexicalModel installs the lexical model.
+    //
+    // Since 3rd-party uses never provided kmp.json files, we need to instant-migrate
+    // them here.
+    if !Migrations.resourceHasPackageMetadata(lexicalModel) {
+      let wrappedModels = Migrations.migrateToKMPFormat([lexicalModel])
+      guard wrappedModels.count == 1 else {
+        log.error("Could not properly import lexical model")
+        return
+      }
+      modelToInstall = wrappedModels[0]
     } else {
-      userLexicalModels.append(lexicalModel)
+      ResourceFileManager.shared.addResource(modelToInstall)
     }
-    
-    userDefaults.userLexicalModels = userLexicalModels
-    userDefaults.set([Date()], forKey: Key.synchronizeSWLexicalModel)
-    userDefaults.synchronize()
-    log.info("Added lexical model ID: \(lexicalModel.id) name: \(lexicalModel.name)")
-}
+  }
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed
@@ -470,7 +453,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
 
     if !userKeyboards.contains(where: { $0.id == kb.id }) {
-      let keyboardDir = Storage.active.keyboardDir(forID: kb.id)
+      // TODO:  should make sure that there are no resources in the package,
+      //        rather than just 'no matching keyboards'.
+      let keyboardDir = Storage.active.resourceDir(for: kb)!
       FontManager.shared.unregisterFonts(in: keyboardDir, fromSystemOnly: false)
       log.info("Deleting directory \(keyboardDir)")
       if (try? FileManager.default.removeItem(at: keyboardDir)) == nil {
@@ -552,7 +537,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     
     if !userLexicalModels.contains(where: { $0.id == lm.id }) {
-      let lexicalModelDir = Storage.active.lexicalModelDir(forID: lm.id)
+      let lexicalModelDir = Storage.active.resourceDir(for: lm)!
       FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
       log.info("Deleting directory \(lexicalModelDir)")
       if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
@@ -591,9 +576,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list
   public func fontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
-    if let filename = kb?.font?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
+    if let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID),
+       let filename = kb.font?.source.first(where: { $0.hasFontExtension }) {
+      let fontURL = Storage.active.fontURL(forResource: kb, filename: filename)!
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -603,9 +588,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list
   func oskFontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
-    if let filename = kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
+    if let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID),
+       let filename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
+      let fontURL = Storage.active.fontURL(forResource: kb, filename: filename)!
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -613,191 +598,29 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     
   // MARK: - Adhoc keyboards
   public func parseKbdKMP(_ folder: URL, isCustom: Bool) throws -> Void {
-    do {
-      var path = folder
-      path.appendPathComponent("kmp.json")
-      let data = try Data(contentsOf: path, options: .mappedIfSafe)
-      let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-      if let jsonResult = jsonResult as? [String:AnyObject] {
-        if let keyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
-          for k in keyboards {
-            let name = k["name"] as! String
-            let keyboardID = k["id"] as! String
-            let version = k["version"] as! String
-            //true if the keyboard targets a right-to-left script. false if absent.
-            let isrtl: Bool =  k["rtl"] as? Bool ?? false
+    guard let kmp = KeymanPackage.parse(folder) as? KeyboardKeymanPackage else {
+      throw KMPError.wrongPackageType
+    }
 
-            var oskFont: Font?
-            let osk = k["oskFont"] as? String
-            if let _ = osk {
-              oskFont = Font(filename: osk!)
-            }
-            var displayFont: Font?
-            let font = k["displayFont"] as? String
-            if let _ = font {
-              displayFont = Font(filename: font!)
-            }
-            
-            //TODO: handle errors if languages do not exist
-            var languageName = ""
-            var languageId = ""
-            
-            var installableKeyboards : [InstallableKeyboard] = []
-            if let langs = k["languages"] as? [[String:String]] {
-              for l in langs {
-                languageName = l["name"]!
-                languageId = l["id"]!
-                
-                installableKeyboards.append( InstallableKeyboard(
-                  id: keyboardID,
-                  name: name,
-                  languageID: languageId,
-                  languageName: languageName,
-                  version: version,
-                  isRTL: isrtl,
-                  font: displayFont,
-                  oskFont: oskFont,
-                  isCustom: isCustom))
-              }
-            }
-            
-            do {
-              try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
-                                                      withIntermediateDirectories: true)
-            } catch {
-              log.error("Could not create dir for download: \(error)")
-              throw KMPError.fileSystem
-            }
-            
-            var haveInstalledOne = false
-            for keyboard in installableKeyboards {
-              let storedPath = Storage.active.keyboardURL(for: keyboard)
-              
-              var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
-              if let osk = osk {
-                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
-                installableFiles.append([osk, oskPath])
-              }
-              
-              if let font = font {
-                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
-                installableFiles.append([font, displayPath])
-              }
-              do {
-                for item in installableFiles {
-                  var filePath = folder
-                  if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-                    try FileManager.default.removeItem(at: item[1] as! URL)
-                  }
-                  filePath.appendPathComponent(item[0] as! String)
-                  try FileManager.default.copyItem(at: filePath,
-                                                   to: item[1] as! URL)
-                  
-                }
-              } catch {
-                log.error("Error saving the download: \(error)")
-                throw KMPError.copyFiles
-              }
-              if !haveInstalledOne {
-                Manager.shared.addKeyboard(keyboard)
-                haveInstalledOne = true
-              }
-            }
-          }
-        }
+    for resourceSet in kmp.installables {
+      for resource in resourceSet {
+        try ResourceFileManager.shared.install(resourceWithID: resource.fullID, from: kmp)
+        // Install the keyboard for only the first language pairing defined in the package.
+        break
       }
-    } catch {
-      log.error("error parsing keyboard kmp: \(error)")
-      throw KMPError.invalidPackage
     }
   }
     
   // MARK: - Adhoc lexical models
   static public func parseLMKMP(_ folder: URL, isCustom: Bool) throws -> Void {
-    do {
-      var path = folder
-      path.appendPathComponent("kmp.json")
-      let data = try Data(contentsOf: path, options: .mappedIfSafe)
-      let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-      if let jsonResult = jsonResult as? [String:AnyObject] {
-        var version: String = "1.0"
+    guard let kmp = KeymanPackage.parse(folder) as? LexicalModelKeymanPackage else {
+      throw KMPError.wrongPackageType
+    }
 
-        if let info = jsonResult["info"] as? [String:AnyObject] {
-          if let versionEntry = info["version"] as? [String:AnyObject] {
-            if let description = versionEntry["description"] as? String {
-              version = description;
-            }
-          }
-        }
-
-        // Version uses a 'conditional initializer'.  If it fails, the version info is invalid.
-        if let _ = Version(version) {
-          // No problem
-        } else {
-          // Lazy-handle the error and replace version with 1.0.  Legacy decision from 2005.
-          version = "1.0"
-        }
-
-        if let lexicalModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
-          for k in lexicalModels {
-            let name = k["name"] as! String
-            let lexicalModelID = k["id"] as! String
-            
-            //TODO: handle errors if languages do not exist
-            //var languageName = ""
-            var languageId = ""
-            
-            var installableLexicalModels : [InstallableLexicalModel] = []
-            if let langs = k["languages"] as? [[String:String]] {
-              for l in langs {
-                //languageName = l["name"]!
-                languageId = l["id"]!
-                
-                installableLexicalModels.append( InstallableLexicalModel(
-                  id: lexicalModelID,
-                  name: name,
-                  languageID: languageId,
-//                  languageName: languageName,
-                  version: version,
-                  isCustom: isCustom))
-              }
-            }
-            
-            do {
-              try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
-                                                      withIntermediateDirectories: true)
-            } catch {
-              log.error("Could not create dir for download: \(error)")
-              throw KMPError.fileSystem
-            }
-            
-            for lexicalModel in installableLexicalModels {
-              let storedPath = Storage.active.lexicalModelURL(for: lexicalModel)
-              
-              let installableFiles: [[Any]] = [["\(lexicalModelID).model.js", storedPath]]
-              do {
-                for item in installableFiles {
-                  var filePath = folder
-                  if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-                    try FileManager.default.removeItem(at: item[1] as! URL)
-                  }
-                  filePath.appendPathComponent(item[0] as! String)
-                  try FileManager.default.copyItem(at: filePath,
-                                                   to: item[1] as! URL)
-                  
-                }
-              } catch {
-                log.error("Error saving the lexical model download: \(error)")
-                throw KMPError.copyFiles
-              }
-              Manager.addLexicalModel(lexicalModel)
-            }
-          }
-        }
+    try kmp.installables.forEach { resourceSet in
+      try resourceSet.forEach { resource in
+        try ResourceFileManager.shared.install(resourceWithID: resource.fullID, from: kmp)
       }
-    } catch {
-      log.error("error parsing lexical model kmp: \(error)")
-      throw KMPError.invalidPackage
     }
   }
   
@@ -818,8 +641,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   // MARK: - Loading custom keyboards
   /// Preloads the JS and font files required for a keyboard.
+  @available(*, deprecated, message: "Use ResourceFileManager's methods to install resources from KMPs.")
   public func preloadFiles(forKeyboardID keyboardID: String, at urls: [URL], shouldOverwrite: Bool) throws {
-    let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
+    let keyboardDir = Storage.active.legacyKeyboardDir(forID: keyboardID)
     try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
     for url in urls {
       try Storage.copy(at: url,
@@ -997,16 +821,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       return .none
     }
   }
-  
-  // Keyboard download notification observers
-  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    // There's little harm in reloading the keyboard (and thus, KMW) for a clean reset
-    // after resource downloads or updates.  That said, we should avoid *directly*
-    // triggering an immediate reset, as an extra reset will occur once we leave the
-    // settings menu.  The delay also helps any chained downloads (keyboard > lexical model)
-    // to fully complete first.
-    shouldReloadKeyboard = true
-  }
 
   /*-----------------------------
    *    Legacy API endpoints    -
@@ -1017,35 +831,34 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
    * the data for apps built on older versions of KMEI, though.
    */
 
-  public func downloadKeyboard(from url: URL) {
-    ResourceDownloadManager.shared.downloadKeyboard(from: url)
-  }
-
   public func downloadKeyboard(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
+    let kbdFullID = FullKeyboardID(keyboardID: withID, languageID: languageID)
+    let completionBlock = ResourceDownloadManager.shared.standardKeyboardInstallCompletionBlock(forFullID: kbdFullID, withModel: true)
     ResourceDownloadManager.shared.downloadKeyboard(withID: withID,
                                                     languageID: languageID,
                                                     isUpdate: isUpdate,
-                                                    fetchRepositoryIfNeeded: fetchRepositoryIfNeeded)
-  }
-
-  // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
-  public func downloadLexicalModel(from url: URL) {
-    ResourceDownloadManager.shared.downloadLexicalModel(from: url)
+                                                    fetchRepositoryIfNeeded: fetchRepositoryIfNeeded,
+                                                    completionBlock: completionBlock)
   }
 
   // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
   public func downloadLexicalModel(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
+    let lmFullID = FullLexicalModelID(lexicalModelID: withID, languageID: languageID)
+    let completionBlock = ResourceDownloadManager.shared.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
     ResourceDownloadManager.shared.downloadLexicalModel(withID: withID,
                                                         languageID: languageID,
                                                         isUpdate: isUpdate,
-                                                        fetchRepositoryIfNeeded: fetchRepositoryIfNeeded)
+                                                        fetchRepositoryIfNeeded: fetchRepositoryIfNeeded,
+                                                        completionBlock: completionBlock)
   }
 
+  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     return ResourceDownloadManager.shared.stateForKeyboard(withID: keyboardID)
   }
 
   // Technically new, but it does closely parallel an old API point.
+  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForLexicalModel(withID modelID: String) -> KeyboardState {
     return ResourceDownloadManager.shared.stateForLexicalModel(withID: modelID)
   }

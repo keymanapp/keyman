@@ -28,10 +28,16 @@ default:
 
 # ----------------------------------------------------------------------
 
+!ifdef QUICK_BUILD_KEYMAN
+TARGETS=ext global buildtools engine desktop
+MANIFESTS=engine desktop
+!else
 TARGETS=ext global buildtools developer engine desktop support
+MANIFESTS=engine desktop developer
+!endif
+
 RELEASE_TARGETS=desktop
 CLEANS=test unit-tests cleanroot
-MANIFESTS=engine desktop developer
 
 EXCLUDEPATHDEFINES=1
 BUILDPREREQ=global-versions
@@ -66,12 +72,12 @@ developer: global
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
-engine: global
+engine: global message-constants
     cd $(ROOT)\src\engine
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
-desktop: global
+desktop: global message-constants
     cd $(ROOT)\src\desktop
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
@@ -180,17 +186,62 @@ test-uiaccess:
     $(MAKE) test-uiaccess
     cd $(ROOT)\src
 
+#
+# Build Keyman projects for coverity; call this with
+#   make test-coverity
+# * Set environment variable COVBUILD to path to cov-build.exe
+# * tar must be on path
+#
+
+!ifndef COVBUILD
+test-coverity:
+    echo Set variable COVBUILD to covbuild.exe
+    exit 1
+!else
+test-coverity:
+    cd $(ROOT)\src
+    if exist cov-int rd /s/q cov-int
+    if exist keyman-windows-coverity.tgz del keyman-windows-coverity.tgz
+    $(COVBUILD) --dir cov-int $(MAKE) test-coverity-internal
+    tar cvzf keyman-windows-coverity.tgz cov-int
+    rd /s/q cov-int
+    echo Manual upload keyman-windows-coverity.tgz to coverity
+    # TODO: automated upload as part of build
+
+test-coverity-internal:
+    cd $(ROOT)\src\developer\kmanalyze
+    $(MAKE) build
+    cd $(ROOT)\src\developer\kmcmpdll
+    $(MAKE) build
+    cd $(ROOT)\src\engine\keyman32
+    $(MAKE) build
+    cd $(ROOT)\src\engine\keyman64
+    $(MAKE) build
+    cd $(ROOT)\src\engine\keymanx64
+    $(MAKE) build
+    cd $(ROOT)\src\engine\kmtip
+    $(MAKE) build
+    cd $(ROOT)\src\engine\mcompile
+    $(MAKE) build
+!endif
+
 # Build a release
 
 build-release-wrapper: clean-output global-versions
     cd $(ROOT)\src
     $(MAKE) dirs
     $(MAKE) build-tools
+!ifdef QUICK_BUILD_KEYMAN
+    $(MAKE) build
+    $(MAKE) build-release
+    $(MAKE) signcode
+!else
     $(MAKE) build unit-tests
     $(MAKE) build-release
     $(MAKE) signcode
     $(MAKE) -DTARGET=test test
     $(MAKE) backup
+!endif
 
     cd $(ROOT)\src\engine\inst
     $(MAKE)
@@ -198,6 +249,8 @@ build-release-wrapper: clean-output global-versions
     cd $(ROOT)\src\desktop\inst
     $(MAKE) setup
 
+!ifdef QUICK_BUILD_KEYMAN
+!else
     cd $(ROOT)\src
     $(MAKE) build-release-wrapper-oem
 
@@ -206,6 +259,7 @@ build-release-wrapper: clean-output global-versions
 
     cd $(ROOT)\src\buildtools\inst
     $(MAKE)
+!endif
 
 build-release-wrapper-oem:
 !ifdef RELEASE_OEM
@@ -233,6 +287,9 @@ build-tools: global-versions
     # We'll build a default PathDefines.mak if it is missing here so we can
     # go on and do the rest of the build
     $(PROGRAM)\buildtools\devtools -ti
+
+message-constants: build-tools
+    $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
 
 #
 # Remove all files from output folders to ensure no legacy files left in a release

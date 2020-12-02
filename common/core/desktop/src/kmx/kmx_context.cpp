@@ -16,6 +16,8 @@ KMX_Context::KMX_Context()
 
 void KMX_Context::Add(KMX_WCHAR ch)
 {
+  DebugLog("KMX_Context::Add(%x): ENTER [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
+
   if(pos == MAXCONTEXT - 1)
   {
     memmove(CurContext, &CurContext[1], MAXCONTEXT*2 - 2); pos--;
@@ -24,7 +26,7 @@ void KMX_Context::Add(KMX_WCHAR ch)
   CurContext[pos++] = ch;
   CurContext[pos] = 0;
 
-  DebugLog("KMX_Context: Add(%x) [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
+  //DebugLog("KMX_Context::Add(%x):  EXIT [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
 }
 
 
@@ -32,7 +34,7 @@ KMX_WCHAR *KMX_Context::Buf(int n)
 {
   KMX_WCHAR *p;
 
-  for(p = (KMX_WCHAR *) u16chr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p), n--);
+  for(p = (KMX_WCHAR *) u16chr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p, CurContext), n--);
 
   if(n > 0) return NULL;
   return p;
@@ -40,6 +42,7 @@ KMX_WCHAR *KMX_Context::Buf(int n)
 
 void KMX_Context::Delete()
 {
+  DebugLog("KMX_Context::Delete: ENTER: %s", Debug_UnicodeString(CurContext));
   if (CharIsDeadkey()) {
     pos -= 2;
   } else if (CharIsSurrogatePair()) {
@@ -48,10 +51,12 @@ void KMX_Context::Delete()
 
   if(pos > 0) pos--;
   CurContext[pos] = 0;
+  //DebugLog("KMX_Context::Delete:  EXIT: %s", Debug_UnicodeString(CurContext));
 }
 
 void KMX_Context::Reset()
 {
+  DebugLog("KMX_Context::Reset");
   pos = 0;
   CurContext[0] = 0;
 }
@@ -76,6 +81,7 @@ void KMX_Context::CopyFrom(KMX_Context *source)   // I3575
 
 void KMX_Context::Set(const KMX_WCHAR *buf)
 {
+  DebugLog("KMX_Context::Set(%s): ENTER: %s", Debug_UnicodeString(buf), Debug_UnicodeString(CurContext, 1));
   const KMX_WCHAR *p;
   KMX_WCHAR *q;
 
@@ -84,14 +90,14 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
   // of the string, not the start
   p = u16chr(buf, 0);
   q = (KMX_WCHAR*)p;
-  while(p > buf && (int)(q-p) < MAXCONTEXT - 1) {
-    p = decxstr((KMX_WCHAR*)p);
+  while(p > buf && (intptr_t)(q-p) < MAXCONTEXT - 1) {
+    p = decxstr((KMX_WCHAR*)p, (KMX_WCHAR*)buf);
   }
 
   // If the first character in the buffer is a surrogate pair,
   // or a deadkey, our buffer may be too long, so move to the
   // next character in the buffer
-  if ((int)(q-p) > MAXCONTEXT - 1) {
+  if ((intptr_t)(q-p) > MAXCONTEXT - 1) {
     p = incxstr((KMX_WCHAR*)p);
   }
 
@@ -101,15 +107,17 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
   }
 
   *q = 0;
-  pos = (int)(q-CurContext);
-  CurContext[MAXCONTEXT-1] = 0; 
+  pos = (intptr_t)(q-CurContext);
+  CurContext[MAXCONTEXT-1] = 0;
+
+  //DebugLog("KMX_Context::Set(%s):  EXIT: %s", Debug_UnicodeString(buf), Debug_UnicodeString(CurContext, 1));
 }
 
 KMX_BOOL KMX_Context::CharIsDeadkey()
 {
   if(pos < 3)
     return FALSE;
-  return CurContext[pos-3] == UC_SENTINEL && 
+  return CurContext[pos-3] == UC_SENTINEL &&
        CurContext[pos-2] == CODE_DEADKEY;
 }
 

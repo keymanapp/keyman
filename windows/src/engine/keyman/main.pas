@@ -1,18 +1,18 @@
 (*
   Name:             main
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     02 Aug 2006 - mcdurdin - Timeout when Beta expires
                     04 Dec 2006 - mcdurdin - Block Keyman loading if KM5/6 running
@@ -35,8 +35,9 @@ uses
   Vcl.Dialogs,
   Vcl.Forms,
   Winapi.Windows,
-  System.Win.Registry,
+  System.Classes,
   System.SysUtils,
+  System.Win.Registry,
 
   GetOsVersion,
   Keyman.System.Security,
@@ -160,6 +161,7 @@ var
   sCommand: string;
 begin
   Result := False;
+
   if LowerCase(ParamStr(1)) <> '-kmc' then Exit;
 
   sCommand := LowerCase(ParamStr(2));
@@ -174,6 +176,9 @@ begin
     FCommand := KMC_HideVisualKeyboard
   else Exit;
 
+  FEnableCrashTest := ParamStr(3) = '-sentry-client-test-exception';
+
+
   Result := True;
 end;
 
@@ -185,17 +190,30 @@ end;
 procedure InitialiseRegistrySecurity;
 var
   r: TRegistry;
+
+  procedure ProcessKey(const root: string);
+  var
+    s: string;
+    str: TStringList;
+  begin
+    if r.OpenKey('\' + root, True) then
+    begin
+      str := TStringList.Create;
+      try
+        r.GetKeyNames(str);
+        GrantPermissionToAllApplicationPackages(r.CurrentKey, KEY_READ);
+        for s in str do
+          ProcessKey(root + '\' + s);
+      finally
+        str.Free;
+      end;
+    end;
+  end;
+
 begin
   r := TRegistry.Create;
   try
-    if r.OpenKey(SRegKey_KeymanRoot_CU, True) then
-    begin
-      GrantPermissionToAllApplicationPackages(r.CurrentKey, KEY_READ);
-      // #1680 - on some systems, HKCU\Software\Keyman\Keyman Engine is not
-      // inheriting permissions from HKCU\Software\Keyman
-      if r.OpenKey('\' + SRegKey_KeymanEngineRoot_CU, True) then
-        GrantPermissionToAllApplicationPackages(r.CurrentKey, KEY_READ);
-    end;
+    ProcessKey(SRegKey_KeymanRoot_CU);
   finally
     r.Free;
   end;
