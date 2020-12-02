@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="basic_toolbox">
-  <title>The Keyman Desktop Toolbox</title>
-  <para>The Keyman Toolbox contains a collection of tools for working with Keyman Desktop.</para>
+  <title>The Keyman Toolbox</title>
+  <para>The Keyman Toolbox contains a collection of tools for working with Keyman.</para>
   <para>
     <inlinemediaobject>
       <imageobject>
@@ -14,10 +14,10 @@
   <para>To display the Keyman Toolbox:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>On Screen Keyboard</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>On Screen Keyboard</guilabel>.</para>
     </listitem>
   </orderedlist>
   <note>The Keyman Toolbox is displayed by default in the last position it was used. It will be displayed initially in the bottom right hand corner of the screen.</note>
@@ -149,7 +149,7 @@
             <para>Open Help</para>
           </entry>
           <entry>
-            <para>Opens <link linkend='basic_help'>Keyman Desktop Help</link>.</para>
+            <para>Opens <link linkend='basic_help'>Keyman Help</link>.</para>
           </entry>
         </row>
         <row>
@@ -166,7 +166,7 @@
             <para>Close Keyman Toolbox</para>
           </entry>
           <entry>
-            <para>Closes the Keyman Toolbox but does not exit Keyman Desktop.  The Keyman Toolbox can be displayed again by following the instructions at the top of this help topic.</para>
+            <para>Closes the Keyman Toolbox but does not exit Keyman.  The Keyman Toolbox can be displayed again by following the instructions at the top of this help topic.</para>
           </entry>
         </row>
       </tbody>
@@ -237,7 +237,7 @@
       </imageobject>
     </inlinemediaobject>
   </para>   
-  <para>At the bottom of the Keyman Toolbox, a hint bar shows handy tips on how to use Keyman Desktop and access some of the more       advanced features available.  The hint bar will slowly cycle through the available hints, or you can use the arrow buttons on the right of the hint bar to cycle through the hints yourself.</para>
+  <para>At the bottom of the Keyman Toolbox, a hint bar shows handy tips on how to use Keyman and access some of the more       advanced features available.  The hint bar will slowly cycle through the available hints, or you can use the arrow buttons on the right of the hint bar to cycle through the hints yourself.</para>
   <para>You can close the hint bar by clicking the X icon on the right hand side of the hint bar.  This X icon is not the same as the Close Keyman Toolbox button at the top of the window!</para>
   <para>To access the hint bar again, open the <link linkend="basic_options_tab">Options tab</link> of Keyman Configuration and click <guibutton>Reset Hints</guibutton>.</para>
   

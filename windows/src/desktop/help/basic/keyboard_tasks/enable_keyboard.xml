@@ -13,10 +13,10 @@
 	<note>You need to have an application open for your Keyman keyboard to load correctly.</note>
    </listitem>
    <listitem>
-    <para>Start Keyman Desktop.</para>
+    <para>Start Keyman.</para>
    </listitem>
    <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     <para>
         <inlinemediaobject>
           <imageobject>
@@ -37,10 +37,10 @@
     <para>Open an application to type in, like MS Word.</para>
    </listitem>
    <listitem>
-    <para>Start Keyman Desktop.</para>
+    <para>Start Keyman.</para>
    </listitem>
    <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     <para>
         <inlinemediaobject>
           <imageobject>
@@ -72,7 +72,7 @@
 	<note>You need to have an application open for your Keyman keyboard to load correctly.</note>
    </listitem>
    <listitem>
-    <para>Start Keyman Desktop.</para>
+    <para>Start Keyman.</para>
    </listitem>
    <listitem>
     <para>Press the Language Switcher hotkey to bring up the Language Switcher. If you are using the default Language Switcher hotkey (<keycap>Left.Alt</keycap> + <keycap>Shift</keycap>) or another hotkey with <keycap>Alt</keycap>, you will need to press and HOLD the <keycap>Alt</keycap> part of the hotkey and press and RELEASE the last key in the hotkey to use the Language Switcher. When you release <keycap>Alt</keycap>, the Language Switcher will close.</para>
@@ -100,7 +100,7 @@
     <para>Open an application to type in, like MS Word.</para>
    </listitem>
    <listitem>
-    <para>Start Keyman Desktop.</para>
+    <para>Start Keyman.</para>
    </listitem>
    <listitem>
     <para>Press and release the hotkey for your Keyman keyboard.</para>

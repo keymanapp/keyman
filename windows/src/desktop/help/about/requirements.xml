@@ -2,7 +2,7 @@
 <section id="about_requirements">
   <title>System Requirements</title>
   <bridgehead>Supported Windows Operating Systems</bridgehead>
-  <para>Keyman Desktop 10.0 fully supports 32-bit <emphasis>and</emphasis> 64-bit versions of the following Windows operating systems:</para>
+  <para>Keyman fully supports 32-bit <emphasis>and</emphasis> 64-bit versions of the following Windows operating systems:</para>
   <itemizedlist>
     <listitem>
       <para>Windows 7</para>
@@ -23,8 +23,8 @@
       <para>Windows Server 2012 and 2012 R2</para>
     </listitem>
   </itemizedlist>
-  <note>Keyman Desktop works slightly differently in different versions of Windows. Older versions of Windows have more language limitations and need extra configuration.</note>  
+  <note>Keyman works slightly differently in different versions of Windows. Older versions of Windows have more language limitations and need extra configuration.</note>  
   <bridgehead>Resource Requirements</bridgehead>
-  <para>Keyman Desktop 10.0 has minimal resource requirements. Any computer that can run Windows 7 should be able to run Keyman Desktop without trouble.</para>
+  <para>Keyman has minimal resource requirements. Any computer that can run Windows 7 should be able to run Keyman without trouble.</para>
 	
 </section>

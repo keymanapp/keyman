@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="basic_uninstall">
-  <title>Software Task - Uninstall Keyman Desktop</title>
-  <para>To uninstall Keyman Desktop:</para>
+  <title>Software Task - Uninstall Keyman</title>
+  <para>To uninstall Keyman:</para>
    <orderedlist>
 	<listitem>
-	 <para>Close Keyman Desktop.</para>
+	 <para>Close Keyman.</para>
 	</listitem>
     <listitem>
 	 <para>Open Windows Control Panel.</para>
@@ -13,7 +13,7 @@
 	 <para>Select 'Add or Remove Programs' or 'Programs and Features' or 'Uninstall a program'.</para>
 	</listitem>
 	<listitem>
-	 <para>Click Keyman Desktop 10.0 in the list.</para>
+	 <para>Click Keyman in the list.</para>
 	</listitem>
 	<listitem>
 	 <para>Click <guibutton>Remove</guibutton> or <guibutton>Uninstall</guibutton> or right-click 'Uninstall'.</para>

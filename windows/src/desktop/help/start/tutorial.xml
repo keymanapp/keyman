@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="start_tutorial">
-  <title>Getting Started with Keyman Desktop</title>
-  <para>Follow these steps for a basic introduction to Keyman Desktop:</para>
-   <note><application>Keyman Desktop</application> must be installed first. For help on installing <application>Keyman Desktop</application>, please see: <xref linkend="start_download-install_keyman"></xref>.</note> 
+  <title>Getting Started with Keyman</title>
+  <para>Follow these steps for a basic introduction to Keyman:</para>
+   <note><application>Keyman</application> must be installed first. For help on installing <application>Keyman</application>, please see: <xref linkend="start_download-install_keyman"></xref>.</note> 
 
 			<bridgehead>Step 1</bridgehead>
 			
@@ -12,11 +12,11 @@
 					</imageobject>
 				</inlinemediaobject>
 				
-			<para>Check the Windows Taskbar near the clock to see if Keyman Desktop is running. If it is running you will see the Keyman Desktop icon: <inlinemediaobject><imageobject><imagedata fileref='desktop_images/icon-keyman.png'></imagedata></imageobject></inlinemediaobject></para>
+			<para>Check the Windows Taskbar near the clock to see if Keyman is running. If it is running you will see the Keyman icon: <inlinemediaobject><imageobject><imagedata fileref='desktop_images/icon-keyman.png'></imagedata></imageobject></inlinemediaobject></para>
 		 
 			<bridgehead><anchor id="tutorial_step2"></anchor>Step 2</bridgehead>
 			
-			<para>If the Keyman Desktop icon is in the Windows Taskbar near the clock, continue on to <link linkend='tutorial_step5'>Step 5</link>.</para>
+			<para>If the Keyman icon is in the Windows Taskbar near the clock, continue on to <link linkend='tutorial_step5'>Step 5</link>.</para>
 			<para>
 				<inlinemediaobject>
 					<imageobject>
@@ -24,13 +24,13 @@
 					</imageobject>
 				</inlinemediaobject>
 			</para>
-			<para>If the Keyman Desktop icon is not on the Windows Taskbar near the clock, click the arrow or triangle next to the clock:</para>
+			<para>If the Keyman icon is not on the Windows Taskbar near the clock, click the arrow or triangle next to the clock:</para>
 					<itemizedlist>
 					 <listitem>
-						<para>You will see a collection of icons. If the Keyman Desktop icon (<inlinemediaobject><imageobject><imagedata fileref='desktop_images/icon-keyman.png'></imagedata></imageobject></inlinemediaobject>) is not in this collection, Keyman Desktop is not running. Read steps 3 and 4 to learn how to start Keyman Desktop.</para> 
+						<para>You will see a collection of icons. If the Keyman icon (<inlinemediaobject><imageobject><imagedata fileref='desktop_images/icon-keyman.png'></imagedata></imageobject></inlinemediaobject>) is not in this collection, Keyman is not running. Read steps 3 and 4 to learn how to start Keyman.</para> 
 					 </listitem>
 					 <listitem>
-						<para>If the Keyman Desktop icon is in this collection, you should move it permanently to the Windows Taskbar. Here's how:</para>
+						<para>If the Keyman icon is in this collection, you should move it permanently to the Windows Taskbar. Here's how:</para>
 							<itemizedlist>
 								<listitem>
 									<para>On Windows 7:</para>
@@ -52,7 +52,7 @@
 												</para>
 											</listitem>
 											<listitem>
-												<para>Click <guibutton>OK</guibutton> to apply changes. The Keyman Desktop icon will now always appear in the Windows Taskbar near the clock, if Keyman Desktop is on.</para>
+												<para>Click <guibutton>OK</guibutton> to apply changes. The Keyman icon will now always appear in the Windows Taskbar near the clock, if Keyman is on.</para>
 											</listitem>
 											<listitem>
 												<para>Continue on to <link linkend='tutorial_step5'>Step 5</link> of this guide.</para>
@@ -96,7 +96,7 @@
 												</para>
                       </listitem>
 											<listitem>
-												<para>Click <guibutton>OK</guibutton> to apply changes. The Keyman Desktop icon will now always appear in the Windows Taskbar near the clock, if Keyman Desktop is on.</para>
+												<para>Click <guibutton>OK</guibutton> to apply changes. The Keyman icon will now always appear in the Windows Taskbar near the clock, if Keyman is on.</para>
 											</listitem>
 											<listitem>
 												<para>Continue on to <link linkend='tutorial_step5'>Step 5</link> of this guide.</para>
@@ -140,7 +140,7 @@
 												</para>
                       </listitem>
 											<listitem>
-												<para>The Keyman Desktop icon will now always appear in the Windows Taskbar near the clock, if Keyman Desktop is on.</para>
+												<para>The Keyman icon will now always appear in the Windows Taskbar near the clock, if Keyman is on.</para>
 											</listitem>
 											<listitem>
 												<para>Continue on to <link linkend='tutorial_step5'>Step 5</link> of this guide.</para>
@@ -153,7 +153,7 @@
        
 			<bridgehead>Step 3</bridgehead>
 		
-			<para>To Start Keyman Desktop, click on the Windows Start Menu, select All Programs, and select Keyman Desktop.</para>
+			<para>To Start Keyman, click on the Windows Start Menu, select All Programs, and select Keyman.</para>
   
         
 			<bridgehead>Step 4</bridgehead>
@@ -164,7 +164,7 @@
 					</imageobject>
 				</inlinemediaobject>
 				
-		    <para>Keyman Desktop will now be running and the Keyman Desktop icon will be on the Windows Taskbar near the clock.</para>
+		    <para>Keyman will now be running and the Keyman icon will be on the Windows Taskbar near the clock.</para>
         
 			<bridgehead><anchor id="tutorial_step5"></anchor>Step 5</bridgehead>
 			
@@ -205,7 +205,7 @@
         
 			<bridgehead>Step 9</bridgehead>
           
-		    <para>To return to using your normal keyboard, open the Keyman menu and click 'Switch Keyman Desktop Off'.</para>
+		    <para>To return to using your normal keyboard, open the Keyman menu and click 'Switch Keyman Off'.</para>
 
 
   <bridgehead>Related Topics</bridgehead>

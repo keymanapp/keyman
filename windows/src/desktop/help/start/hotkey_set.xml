@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="start_hotkey_set" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <title>How To - Set Hotkeys for Keyman Desktop, Keyman Keyboards and Windows Languages</title>
+  <title>How To - Set Hotkeys for Keyman, Keyman Keyboards and Windows Languages</title>
 
-  <para>A hotkey is a keyboard shortcut. In <application>Keyman Desktop</application> these are used to turn on and off Keyman Desktop functions, Keyman keyboards and Windows languages.</para>
-  <para>To set the hotkey for a <application>Keyman Desktop</application> function, Keyman keyboard or Windows language:</para>
+  <para>A hotkey is a keyboard shortcut. In <application>Keyman</application> these are used to turn on and off Keyman functions, Keyman keyboards and Windows languages.</para>
+  <para>To set the hotkey for a <application>Keyman</application> function, Keyman keyboard or Windows language:</para>
   <orderedlist>
     <listitem>
       <para>Open Keyman Configuration, from the Keyman menu in the Windows taskbar.</para>

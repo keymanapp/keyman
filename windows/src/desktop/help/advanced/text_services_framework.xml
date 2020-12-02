@@ -17,13 +17,12 @@
   
   <!--need double-check, I don't if the second sentence is true.-->
   <para>With Keyman Desktop 9 and later versions, all keyboards are registered through the Windows interfaces, and the
-  key advantage is that Keyman Desktop now automatically detects applications that have support for TSF and upgrades the experience for those applications.</para>
-  <para>For those applications that support TSF, the most important advantage is that Keyman Desktop can read the current 'context' from the application. The 
-  'context' is the characters on the screen around the insertion point. Earlier versions of Keyman Desktop remembered the context while inputting text, but as
-  soon as an arrow key was pressed,   or the mouse clicked, Keyman Desktop would forget the context. This means that existing text can be edited in a   
+  key advantage is that Keyman now automatically detects applications that have support for TSF and upgrades the experience for those applications.</para>
+  <para>For those applications that support TSF, the most important advantage is that Keyman can read the current 'context' from the application. The 
+  'context' is the characters on the screen around the insertion point. Earlier versions of Keyman remembered the context while inputting text, but as
+  soon as an arrow key was pressed,   or the mouse clicked, Keyman would forget the context. This means that existing text can be edited in a   
   much more intuitive manner when using TSF.</para>
   <bridgehead>What applications support TSF?</bridgehead><!--update needed-->
-  <para>At the time of the release of Keyman Desktop 9.0, TSF was fully supported by some Windows Vista and Windows 7 components, along with Microsoft Word and
-  Microsoft Publisher. Other applications support TSF to a varying degree.</para>
+  <para>TSF is supported by a wide range of software and Windows components.</para>
  
 </section>

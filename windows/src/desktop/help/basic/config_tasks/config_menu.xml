@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="basic_config_menu">
-  <title>Keyman Desktop Configuration</title>
-  <para>Keyman Configuration is the central control panel for Keyman Desktop. Use Keyman Configuration to purchase and activate Keyman Desktop, switch the language of Keyman Desktop menus, install and uninstall keyboards, change options, set hotkeys, disable addins, associate languages, check for updates and run support diagnostics.</para> 
+  <title>Keyman Configuration</title>
+  <para>Keyman Configuration is the central control panel for Keyman. Use Keyman Configuration to purchase and activate Keyman, switch the language of Keyman menus, install and uninstall keyboards, change options, set hotkeys, disable addins, associate languages, check for updates and run support diagnostics.</para> 
    <para>
     <inlinemediaobject>
       <imageobject>
@@ -14,10 +14,10 @@
   <para>To open Keyman Configuration:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>Configuration…</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>Configuration…</guilabel>.</para>
     </listitem>
   </orderedlist>
 

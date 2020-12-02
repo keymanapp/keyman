@@ -4,12 +4,12 @@
                  [<!ENTITY % xinclude SYSTEM "../../global/xml/xinclude.mod"> %xinclude;]
 ><!-- http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd -->
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
-  <title>Keyman Desktop User Guide</title>
+  <title>Keyman User Guide</title>
 
    <!-- About -->
 
   <chapter id="about">
-    <title>About Keyman Desktop</title>
+    <title>About Keyman</title>
     <xi:include href="about/welcome.xml" />
     <xi:include href="about/whatsnew.xml" />
     <xi:include href="about/requirements.xml" />

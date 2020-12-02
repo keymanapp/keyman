@@ -14,10 +14,10 @@
   <para>To open the Keyboard Layouts tab of Keyman Configuration:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>Configuration…</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>Configuration…</guilabel>.</para>
     </listitem>
     <listitem>
       <para>Select the Keyboard Layouts tab.</para>
@@ -32,7 +32,7 @@
 		<para>To install a keyboard layout from a local folder, see: <link linkend='install_folder'>Installing a Keyman keyboard from a Folder on Your Computer</link></para>
 	</listitem>
 	<listitem>
-		<para>To install a keyboard layout online, see: <link linkend='install_tav'>Downloading &amp; Installing a Keyman Keyboard within Keyman Desktop</link></para>
+		<para>To install a keyboard layout online, see: <link linkend='install_tav'>Downloading &amp; Installing a Keyman Keyboard within Keyman</link></para>
 	</listitem>
    </itemizedlist>
 

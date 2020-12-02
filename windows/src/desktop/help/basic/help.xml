@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="basic_help">
-  <title>The Keyman Desktop Help Menu</title>
-  <para>The Keyman Desktop Help menu gives you comprehensive help for every aspect of Keyman Desktop.</para> 
+  <title>The Keyman Help Menu</title>
+  <para>The Keyman Help menu gives you comprehensive help for every aspect of Keyman.</para> 
   
-  <tip>All of the help available through the Keyman Desktop Help menu is also available online through the <ulink url='http://help.keyman.com/products/desktop/10.0/'>Help Documentation</ulink> section of the Keyman Desktop help site.</tip>
+  <tip>All of the help available through the Keyman Help menu is also available online through the <ulink url='http://help.keyman.com/products/windows/'>Help Documentation</ulink> section of the Keyman help site.</tip>
 
   <bridgehead>Opening Help</bridgehead>
   <!--there seem be no popup dialogue box as such in v10.0-->
-  <para>To open Keyman Desktop Help:</para>
+  <para>To open Keyman Help:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>Help…</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>Help…</guilabel>.</para>
     </listitem>
     <listitem>
       <para>Select Help Contents.</para>
@@ -28,15 +28,15 @@
   </orderedlist>
  
   <bridgehead>Using Help</bridgehead>
-  <para>Keyman Desktop Help is divided into seven sections:</para>
+  <para>Keyman Help is divided into seven sections:</para>
   <orderedlist>
-   <listitem><para>About Keyman Desktop — Provides general information and licensing details about the current version of Keyman Desktop.</para></listitem> 
-   <listitem><para>Getting Started — Includes all the help you need to start using Keyman Desktop quickly.</para></listitem> 
-   <listitem><para>Basic Help — Gives a detailed overview of all of the basic features of Keyman Desktop.</para></listitem> 
-   <listitem><para>Advanced Help — Gives an overview of more advanced Keyman Desktop features.</para></listitem> 
+   <listitem><para>About Keyman — Provides general information and licensing details about the current version of Keyman.</para></listitem> 
+   <listitem><para>Getting Started — Includes all the help you need to start using Keyman quickly.</para></listitem> 
+   <listitem><para>Basic Help — Gives a detailed overview of all of the basic features of Keyman.</para></listitem> 
+   <listitem><para>Advanced Help — Gives an overview of more advanced Keyman features.</para></listitem> 
    <listitem><para>Common Questions — Includes a selection of the most frequently asked questions.</para></listitem> 
    <listitem><para>Troubleshooting Index — Provides reference guides for specific issues.</para></listitem> 
-   <listitem><para>Context Help — Links context-sensitive help (accesible throughout Keyman Desktop using <keycap>F1</keycap>) to the correct help topics.</para></listitem> 
+   <listitem><para>Context Help — Links context-sensitive help (accesible throughout Keyman using <keycap>F1</keycap>) to the correct help topics.</para></listitem> 
   </orderedlist>
   
   <bridgehead>Related Topics</bridgehead>

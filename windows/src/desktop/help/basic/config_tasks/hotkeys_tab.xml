@@ -2,7 +2,7 @@
 <section id="basic_hotkeys_tab" xmlns:xi="http://www.w3.org/2001/XInclude">
  <title>Keyman Configuration - Hotkeys Tab</title>
   
-<para>The Hotkeys tab of Keyman Configuration lets you set hotkeys for Keyman Desktop functions, Keyman keyboards and Windows languages.</para>
+<para>The Hotkeys tab of Keyman Configuration lets you set hotkeys for Keyman functions, Keyman keyboards and Windows languages.</para>
   <para>
     <inlinemediaobject>
       <imageobject>
@@ -15,10 +15,10 @@
   <para>To open the Hotkeys tab of Keyman Configuration:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>Configuration…</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>Configuration…</guilabel>.</para>
     </listitem>
     <listitem>
       <para>Select the Hotkeys tab.</para>
@@ -50,13 +50,13 @@
 	</note>
   
   <bridgehead>About Hotkeys</bridgehead>
-  <para>The General Hotkeys section of the Hotkeys tab lists hotkeys for Keyman Desktop functions:</para>
+  <para>The General Hotkeys section of the Hotkeys tab lists hotkeys for Keyman functions:</para>
   <itemizedlist>
 	<listitem>
-		<para>Switch Keyman Desktop Off — Switches all Keyman Desktop keyboards off, but does not exit Keyman Desktop.</para>
+		<para>Switch Keyman Off — Switches to your default Windows keyboard, but does not exit Keyman.</para>
     </listitem>
 	<listitem>
-		<para>Open Keyboard Menu — Opens the  <link linkend='basic_traymenu'>Keyman Desktop Menu</link>.</para>
+		<para>Open Keyboard Menu — Opens the  <link linkend='basic_traymenu'>Keyman Menu</link>.</para>
     </listitem>
 	<listitem>
 		<para>Open Language Switcher — Opens the <link linkend='basic_languageswitcher'>Language Switcher</link>.</para>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="troubleshooting_excel">
-  <title>How To - Use Keyman Desktop in Excel</title>
+  <title>How To - Use Keyman in Excel</title>
 	<bridgehead>Using Keyman in Excel with the / Key</bridgehead>
 
 	<para>Keyboard layouts which rely on the '/' key cause difficulty in Microsoft Excel. In order to provide legacy compatibility with Lotus 1-2-3, by default using the '/' key in Excel activates keyboard shortcuts. There are two solutions to this problem.</para>

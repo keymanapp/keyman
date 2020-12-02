@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="troubleshooting_bootstrapper">
-  <title>How To - Use the Keyman Desktop Setup Bootstrapper</title>
+  <title>How To - Use the Keyman Setup Bootstrapper</title>
 	<bridgehead>About the Bootstrapper</bridgehead>
 
-<para>The Keyman Desktop installation bootstrapper is a self-extracting executable file that contains a Windows Installer technology MSI file, and optionally keyboards.</para>
+<para>The Keyman installation bootstrapper is a self-extracting executable file that contains a Windows Installer technology MSI file, and optionally keyboards.</para>
 
 <para>The bootstrapper:</para>
 <orderedlist>
 	<listitem><para>Checks the system before starting the installation to ensure that all prerequisites are met, and optionally downloads and installs the prerequisites.</para></listitem>
-	<listitem><para>Optionally checks online for an updated version of Keyman Desktop before installing.</para></listitem>
-    <listitem><para>Starts the Keyman Desktop Windows Installer MSI package.</para></listitem>
+	<listitem><para>Optionally checks online for an updated version of Keyman before installing.</para></listitem>
+    <listitem><para>Starts the Keyman Windows Installer MSI package.</para></listitem>
 	<listitem><para>Installs any keyboards included.</para></listitem>
-    <listitem><para>Starts Keyman Desktop after the install completes.</para></listitem>
+    <listitem><para>Starts Keyman after the install completes.</para></listitem>
 </orderedlist>
 	
 <bridgehead>Command Line Options</bridgehead>

@@ -2,8 +2,8 @@
 <section id="basic_usage">
   <title>Keyman Toolbox - Keyboard Usage</title>
   
-  <para>The Keyboard Usage tool of the <link linkend="basic_toolbox">Keyman Toolbox</link> shows helpful hints on how to use the currently selected Keyman Desktop keyboard.</para>
-  <para>The Keyman Desktop 10.0 allows you to select either Keyboard Usage or the On-Screen Keyboard</para>
+  <para>The Keyboard Usage tool of the <link linkend="basic_toolbox">Keyman Toolbox</link> shows helpful hints on how to use the currently selected Keyman keyboard.</para>
+  <para>Keyman allows you to select either Keyboard Usage or the On-Screen Keyboard</para>
   <para>
     <inlinemediaobject>
       <imageobject>
@@ -16,15 +16,15 @@
   <para>To open the Keyboard Usage tool:</para>
   <orderedlist>
     <listitem>
-    <para>Click on the <guiicon>Keyman Desktop</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
+    <para>Click on the <guiicon>Keyman</guiicon> icon <inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-keyman.png" /></imageobject></inlinemediaobject>, on the Windows Taskbar near the clock.</para>
     </listitem>
     <listitem>
-      <para>From the Keyman Desktop menu, select <guilabel>Keyboard Usage</guilabel>.</para>
+      <para>From the Keyman menu, select <guilabel>Keyboard Usage</guilabel>.</para>
     </listitem>
   </orderedlist>
   
   <bridgehead>Using Keyboard Usage</bridgehead>
-  <para>The content of the Keyboard Usage tool changes depending on the active Keyman Desktop keyboard:</para>
+  <para>The content of the Keyboard Usage tool changes depending on the active Keyman keyboard:</para>
 	<itemizedlist>
 		<listitem>
 			<para>Some keyboards include dynamic help in Keyboard Usage. This help allows you to click on a letter to insert it into your document directly.</para>
