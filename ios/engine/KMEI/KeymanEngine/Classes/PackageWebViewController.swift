@@ -42,7 +42,22 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
     let config = WKWebViewConfiguration()
     let prefs = WKPreferences()
     prefs.javaScriptEnabled = true
+
+    // Inject a meta viewport tag into the head of the file if it doesn't exist
+    let metaViewportInjection = """
+      if(!document.querySelectorAll('meta[name=viewport]').length) {
+        let meta=document.createElement('meta');
+        meta.name='viewport';
+        meta.content='width=device-width, initial-scale=1';
+        document.head.appendChild(meta);
+      }
+      """
+
+    let injection = WKUserScript(source: metaViewportInjection, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+    let controller = WKUserContentController()
+    controller.addUserScript(injection)
     config.preferences = prefs
+    config.userContentController = controller
 
     webView = WKWebView(frame: CGRect.zero, configuration: config)
     webView!.isOpaque = false
@@ -72,17 +87,6 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
     guard let _ = webView.url else {
       return
     }
-
-    // Inject a meta viewport tag into the head of the file if it doesn't exist
-    webView.evaluateJavaScript("""
-      if(!document.querySelectorAll('meta[name=viewport]').length) {
-        let meta=document.createElement('meta');
-        meta.name='viewport';
-        meta.content='width=device-width, initial-scale=1';
-        document.head.appendChild(meta);
-      }
-      """
-    );
   }
 
   // Used to intercept links that should be handled externally.
