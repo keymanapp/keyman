@@ -142,6 +142,10 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     fatalError("init(coder:) has not been implemented")
   }
 
+  func flashScrollIndicators() {
+    tableView?.flashScrollIndicators()
+  }
+
   override func draw(_ rect: CGRect) {
     let keyWidth = keyFrame.width
     let keyHeight = keyFrame.height
