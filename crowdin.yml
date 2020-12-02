@@ -7,8 +7,8 @@
 #
 project_id_env: "CROWDIN_PROJECT_ID"
 api_token_env: "CROWDIN_PERSONAL_TOKEN"
-base_path: . # local base path
-base_url: https://api.crowdin.com
+base_path: "." # local base path
+base_url: "https://api.crowdin.com"
 
 #
 # Choose file structure in Crowdin
@@ -51,14 +51,14 @@ files:
     translation: /windows/src/desktop/kmshell/locale/%locale%/%original_file_name%
     type: android
 
-  - source: /window/src/desktop/setup/locale/en/strings.xml
+  - source: /windows/src/desktop/setup/locale/en/strings.xml
     dest: /windows/setup/strings.xml
     translation: /windows/src/desktop/setup/locale/%locale%/%original_file_name%
     type: android
 
   # iOS files
 
-  - source: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/en.lproj/ResourceInfoView.strings
+  - source: /ios/engine/KMEI/KeymanEngine/Classes/en.lproj/ResourceInfoView.strings
     dest: /ios/engine/ResourceInfoView.strings
     translation: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/%osx_code%/%original_file_name%
 
