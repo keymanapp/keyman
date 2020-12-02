@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.195 alpha 2020-12-02
+
+* chore(windows): remove obsolete newhelp folder (#4048)
+* feat(ios/engine): keyboard-menu scroll indicator now flashes when opened (#4043)
+* fix(ios): better meta viewport consistency (#4045)
+* fix(windows): Rename to Keyman in help files (#4049)
+* chore(common/resources): Fix dest paths for crowdin strings (#3995)
+* fix(windows): Rename to Keyman (#4050)
+* fix(ios/engine): adds check for keyboard load success, auto-reset on load failure (#4054)
+
 ## 14.0.194 alpha 2020-12-01
 
 * fix(android/app,oem/fv/android): Sanitize Sentry navigation breadcrumbs (#4025)
