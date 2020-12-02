@@ -976,6 +976,7 @@ extension KeymanWebViewController {
    * Implemented as a workaround for a weird bug (likely within iOS) in which the
    * InputViewController and KeymanWebViewController constructors (and thus, `loadView`)
    * are sometimes completely bypassed during system-keyboard use.
+   * See https://github.com/keymanapp/keyman/issues/3985
    */
   func verifyLoaded() {
     // Test: are we currently loading?  If so, don't worry 'bout a thing.
