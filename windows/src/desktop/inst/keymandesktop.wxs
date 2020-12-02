@@ -51,7 +51,7 @@
     </Upgrade>
 
     <Property Id='OLDINSTALLDIR'>
-      <RegistrySearch Id='oldinstalldir_search' Key='Software\Keyman\Keyman for Windows' Root='HKLM' Name='root path' Type='raw' />
+      <RegistrySearch Id='oldinstalldir_search' Key='Software\Keyman\Keyman Desktop' Root='HKLM' Name='root path' Type='raw' />
     </Property>
 
     <Property Id='OnlineProductID' Value='30' />
