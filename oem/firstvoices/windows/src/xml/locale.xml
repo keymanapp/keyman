@@ -13,7 +13,7 @@
 <!--
 locale.dtd: Contains all localizable strings from Keyman Configuration XML files.
 
-Create a user interface translation for Keyman Desktop at http://www.tavultesoft.com/keyman/support/locale/
+Create a user interface translation for Keyman for Windows at https://translate.keyman.com/
 -->
 
 <String Group="System" Type="PlainText" Id="S_LocaleAuthors" Version="7.1.266.0" Description="Name(s) of people who created this translation - i.e. your name">Keyman</String>
@@ -48,7 +48,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Formatted Messages" Type="FormatString" Id="SKButtonOK" Version="7.0.230.0" Description="OK button in message boxes">OK</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKButtonCancel"  Version="7.0.230.0" Description="Cancel button in message boxes">Cancel</String>
 
-<String Group="Formatted Messages" Type="FormatString" Id="SKBalloonClickToSelectKeyboard" Version="8.0.330.0" Description="Balloon that shows when Keyman Desktop icon is first shown during the tutorial">Click this icon to select a keyboard</String>
+<String Group="Formatted Messages" Type="FormatString" Id="SKBalloonClickToSelectKeyboard" Version="8.0.330.0" Description="Balloon that shows when Keyman icon is first shown during the tutorial">Click this icon to select a keyboard</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKBalloonOSKClosed" Version="8.0.330.0" Description="Balloon that shows when OSK is closed">&Name; is still running.  Click this icon to use your language keyboard at any time</String>
   
 <!-- - - - - - - - - - - - - - - - - - -->
@@ -336,7 +336,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Name" Version="8.0.288.0" Description="Splash major title">&Name;</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Version" Version="8.0.288.0" Description="Splash major version"></String>
 
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">Start Keyman</String>
+<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman button">Start Keyman</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Exit" Version="8.0.294.0" Description="Exit button">Exit</String>
   
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_OtherTasks" Version="8.0.294.0" Description="Other tasks heading">Other tasks</String>
@@ -354,7 +354,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <String Group="_LanguageInfo" Type="FormatString" Id="SKUILanguageName" Version="7.0.230.0" Description="User interface language name in the UI language">English</String>
 <String Group="_LanguageInfo" Type="FormatString" Id="SKUILanguageNameWithEnglish" Version="7.0.230.0" Description="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">English</String>
 <String Group="_LanguageInfo" Type="FormatString" Id="SKLanguageCode" Version="7.0.230.0" Description="The language code for the current translation">en</String>
-<String Group="_LanguageInfo" Type="FormatString" Id="SKDefaultLanguageCode" Version="7.0.230.0" Description="The default language code for this product.  This should be the language that the product is created in. For Keyman Desktop (all editions) this must stay 'en', for all translations.">en</String>
+<String Group="_LanguageInfo" Type="FormatString" Id="SKDefaultLanguageCode" Version="7.0.230.0" Description="The default language code for this product.  This should be the language that the product is created in. For Keyman (all editions) this must stay 'en', for all translations.">en</String>
 
 <String Group="Formatted Messages" Type="FormatString" Id="SKShortApplicationTitle" Version="7.0.230.0" Description="Product name">&Name;</String>
 
@@ -422,8 +422,8 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewKeyboardUsage" Version="7.0.230.0" Description="Toolbar help - View Keyboard Usage pop-up text">View Keyboard Usage</String>
 <String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewFontHelper" Version="7.0.230.0" Description="Toolbar help - View Font Helper pop-up text">View Font Helper</String>
 <String Group="Toolbar Context Help" Type="PlainText" Caption="View Character Map" Version="7.0.230.0" Description="Toolbar help - View Character Map pop-up text">View Character Map</String>
-<String Group="Toolbar Context Help" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Description="Toolbar help - Switch Keyman Desktop Off pop-up text">Switch &Name; Off</String>
-<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_OpenConfiguration" Version="7.0.230.0" Description="Toolbar help - Open Keyman Desktop Configuration pop-up text">Open &Name; Configuration</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Description="Toolbar help - Switch Keyman Off pop-up text">Switch &Name; Off</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_OpenConfiguration" Version="7.0.230.0" Description="Toolbar help - Open Keyman Configuration pop-up text">Open &Name; Configuration</String>
 <String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_OpenHelp" Version="7.0.230.0" Description="Toolbar help - Open help pop-up text">Open Help</String>
 <String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - Close OSK pop-up text">Close On Screen Keyboard</String>
 
@@ -431,7 +431,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <!-- Menu Items                        -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">Switch &Name; &amp;Off</String> 
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Off">Switch &Name; &amp;Off</String> 
 <String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_OnScreenKeyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">On Screen &amp;Keyboard</String>
 <String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_KeyboardUsage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">Keyboard &amp;Usage</String>
 <String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_FontHelper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">&amp;Font Helper</String>
@@ -513,7 +513,7 @@ keyboard layout for your language.</String>
 
 <String Group="Formatted Messages" Type="FormatString" Id="SKErrorActivatingBrowser" Version="7.0.230.0" Description="General URL error">Cannot activate browser or email program for this URL.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKCouldNotPrintKeyboard" Version="7.0.230.0" Description="Keyboard printing error">The keyboard could not be printed successfully.  Please save to a web page and print manually.</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKCannotStartProduct" Version="7.0.241.0" Parameters="%0:s: error message" Description="Error from Keyman Desktop failing to start keyman.exe due to an access denied or file not found">&Name; failed to start.  Please check your security settings to make sure that the program keyman.exe is allowed to start before continuing.  The error returned was:
+<String Group="Formatted Messages" Type="FormatString" Id="SKCannotStartProduct" Version="7.0.241.0" Parameters="%0:s: error message" Description="Error from Keyman failing to start keyman.exe due to an access denied or file not found">&Name; failed to start.  Please check your security settings to make sure that the program keyman.exe is allowed to start before continuing.  The error returned was:
 
 "%0:s"
 

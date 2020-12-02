@@ -103,39 +103,6 @@
                 <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="Install" Type="string" Value="1" />
                 <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\$(var.OEMNAME)\$(var.PRODUCTNAME)" />
                 <RemoveFolder Id="ProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
-
-<!-- TODO: Remove old links for existing versions      
-                <RemoveFile Id="Version70ShortcutKeyman"   Name="Keyman Desktop Light 7.0.lnk"  Directory="ProgramMenuDirLight70" On="both" />
-                <RemoveFile Id="Version71ShortcutKeyman"   Name="Keyman Desktop Light 7.1.lnk"  Directory="ProgramMenuDirLight71" On="both" />
-                <RemoveFile Id="Version70ShortcutKeymanD"  Name="Keyman Desktop Light 7.0.lnk"  Directory="DesktopFolder" On="both" />
-                <RemoveFile Id="Version71ShortcutKeymanD"  Name="Keyman Desktop Light 7.1.lnk"  Directory="DesktopFolder" On="both" />
-                <RemoveFile Id="Version70ShortcutConfig"   Name="Keyman Configuration.lnk"  Directory="ProgramMenuDirLight70" On="both" />
-                <RemoveFile Id="Version71ShortcutConfig"   Name="Keyman Configuration.lnk"  Directory="ProgramMenuDirLight71" On="both" />
-
-                <RemoveFile Id="Version70ShortcutKeymanP"  Name="Keyman Desktop Professional 7.0.lnk"  Directory="ProgramMenuDirPro70" On="both" />
-                <RemoveFile Id="Version71ShortcutKeymanP"  Name="Keyman Desktop Professional 7.1.lnk"  Directory="ProgramMenuDirPro71" On="both" />
-                <RemoveFile Id="Version70ShortcutKeymanDP" Name="Keyman Desktop Professional 7.0.lnk"  Directory="DesktopFolder" On="both" />
-                <RemoveFile Id="Version71ShortcutKeymanDP" Name="Keyman Desktop Professional 7.1.lnk"  Directory="DesktopFolder" On="both" />
-                <RemoveFile Id="Version70ShortcutConfigP"  Name="Keyman Configuration.lnk"  Directory="ProgramMenuDirPro70" On="both" />
-                <RemoveFile Id="Version71ShortcutConfigP"  Name="Keyman Configuration.lnk"  Directory="ProgramMenuDirPro71" On="both" />
-
-                <RemoveFolder Id="Version70ShortcutsL" Directory="ProgramMenuDirLight70" On="both" />
-                <RemoveFolder Id="Version70ShortcutsP" Directory="ProgramMenuDirPro70" On="both" />
-                <RemoveFolder Id="Version71ShortcutsL" Directory="ProgramMenuDirLight71" On="both" />
-                <RemoveFolder Id="Version71ShortcutsP" Directory="ProgramMenuDirPro71" On="both" />
-
-                <RemoveFile Id="Version80ShortcutKeyman"   Name="Keyman Desktop 8.0.lnk"  Directory="ProgramMenuDir80" On="both" />
-                <RemoveFile Id="Version80ShortcutKeymanD"  Name="Keyman Desktop 8.0.lnk"  Directory="DesktopFolder" On="both" />
-                <RemoveFile Id="Version80ShortcutConfig"   Name="Keyman Configuration.lnk"  Directory="ProgramMenuDir80" On="both" />
-                
-                <RemoveFolder Id="Version80Shortcuts" Directory="ProgramMenuDir80" On="both" />
-
-                <RemoveFile Id="Version90ShortcutKeyman"   Name="Keyman Desktop 9.0.lnk"  Directory="ProgramMenuDir90" On="both" />
-                <RemoveFile Id="Version90ShortcutKeymanD"  Name="Keyman Desktop 9.0.lnk"  Directory="DesktopFolder" On="both" />
-                <RemoveFile Id="Version90ShortcutConfig"   Name="Keyman Configuration.lnk"  Directory="ProgramMenuDir90" On="both" />
-
-                <RemoveFolder Id="Version90Shortcuts" Directory="ProgramMenuDir90" On="both" />
--->
               </Component>
 
               <Directory Id="dir_locale" Name="locale" />
