@@ -164,8 +164,8 @@
             <Form>frmWebContainer</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
-        <DCCReference Include="util\UfrmDownloadProgress.pas">
-            <Form>frmDownloadProgress</Form>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.UI.UfrmProgress.pas">
+            <Form>frmProgress</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\kmcomapi_errors.pas"/>
         <DCCReference Include="render\GenericXMLRenderer.pas"/>
@@ -201,7 +201,6 @@
         <DCCReference Include="main\UImportOlderVersionKeyboards.pas"/>
         <DCCReference Include="main\UImportOlderKeyboardUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
-        <DCCReference Include="install\DownloadLocale.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="util\UILanguages.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilmsxml.pas"/>
@@ -213,7 +212,6 @@
         </DCCReference>
         <DCCReference Include="..\..\engine\keyman\KeymanTrayIcon.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards10.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\FixupLocaleDoctype.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="util\UfrmPrintOSK.pas">
@@ -276,18 +274,10 @@
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
-        <DCCReference Include="util\UtilWaitForTSF.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards9.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards9Plus.pas"/>
@@ -301,6 +291,11 @@
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Vcl.pas"/>
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas">
             <Form>frmDiagnosticTests</Form>
@@ -319,6 +314,29 @@
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.InstallKeyboard.pas"/>
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.ProxyConfiguration.pas"/>
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.ConfigMain.pas"/>
+        <DCCReference Include="install\Keyman.Configuration.UI.InstallFile.pas"/>
+        <DCCReference Include="install\Keyman.Configuration.UI.KeymanProtocolHandler.pas"/>
+        <DCCReference Include="main\Keyman.Configuration.System.KeymanUILanguageManager.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.UILanguageManager.pas"/>
+        <DCCReference Include="install\Keyman.Configuration.System.TIPMaintenance.pas"/>
+        <DCCReference Include="util\UfrmDownloadProgress.pas">
+            <Form>frmDownloadProgress</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="main\Keyman.Configuration.System.UImportOlderVersionKeyboards11To13.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.Settings.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.SettingsManager.pas"/>
+        <DCCReference Include="settings\Keyman.Configuration.UI.UfrmSettingsManager.pas">
+            <Form>frmSettingsManager</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="settings\Keyman.Configuration.UI.UfrmSettingsAddTSFApp.pas">
+            <Form>frmSettingsAddTSFApp</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas"/>
+        <DCCReference Include="util\Keyman.System.KeymanStartTask.pas"/>
+        <DCCReference Include="..\..\global\delphi\winapi\TaskScheduler_TLB.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -411,15 +429,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmshell.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

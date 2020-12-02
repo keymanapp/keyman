@@ -30,22 +30,10 @@ android {
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
         //println "===END DUMP==="
 
-        String env_services_json_file = System.getenv('services_json_file')
-
-        if (env_services_json_file != null) {
-            env_services_json_file = String.valueOf(env_services_json_file)
-            println "Copying production google-services.json and using at kMAPro/"
-            copy {
-                from env_services_json_file
-                include '*.json'
-                into './'
-            }
-        }
-
-        // VERSION_CODE and VERSION_NAME from version.gradle
+        // VERSION strings from version.gradle
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
-        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
+        buildConfigField 'String', 'VERSION_ENVIRONMENT', '"'+VERSION_ENVIRONMENT+'"'
     }
 
     String env_release_store_file = System.getenv("release_store_file")
@@ -131,11 +119,12 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.stepstone.stepper:material-stepper:4.3.1'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:2.0.1'
-    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'io.sentry:sentry-android:3.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
 
     // Add dependency for generating QR Codes
     // (Even though it's embedded in KMEA, because we're manually copying keyman-engine.aar,
@@ -157,5 +146,3 @@ dependencies {
     println it.properties.entrySet()*.toString()
             .sort().toString().replaceAll(", ","\n")
 }*/
-
-apply plugin: 'com.google.gms.google-services'

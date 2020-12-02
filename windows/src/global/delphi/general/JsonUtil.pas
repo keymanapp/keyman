@@ -37,8 +37,7 @@ function LoadJSONFromFile(const Filename: string; var Offset: Integer): TJSONObj
 implementation
 
 uses
-  Soap.XsBuiltIns,
-
+  System.DateUtils,
   System.StrUtils,
   System.SysUtils;
 
@@ -132,33 +131,12 @@ end;
 
 function JSONDateToDateTime(const Value: string; var DateTime: TDateTime): Boolean;
 begin
-  try
-    with TXSDateTime.Create do
-    try
-      XSToNative(Value);
-      DateTime := AsDateTime;
-      Result := True;
-    finally
-      Free;
-    end;
-  except
-    Result := False;
-  end;
+  Result := TryISO8601ToDate(Value, DateTime, False);
 end;
 
 function DateTimeToJSONDate(ADateTime: TDateTime): string;
 begin
-  try
-    with TXSDateTime.Create do
-    try
-      AsDateTime := ADateTime;
-      Result := NativeToXS;
-    finally
-      Free;
-    end;
-  except
-    Result := '';
-  end;
+  Result := DateToISO8601(ADateTime, False);
 end;
 
 function LoadJSONFromFile(const Filename: string; var Offset: Integer): TJSONObject;

@@ -10,11 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.impl.CloudKeyboardDataDownloadCallback;
-import com.tavultesoft.kmea.cloud.impl.CloudKeyboardMetaDataDownloadCallback;
+import com.tavultesoft.kmea.cloud.impl.CloudKeyboardPackageDownloadCallback;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
@@ -31,23 +33,22 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_LANG_NAME = "KMKeyboardActivity.langName";
   public static final String ARG_MODEL_ID = "KMKeyboardActivity.modelID";
   public static final String ARG_MODEL_NAME = "KMKeyboardActivity.modelName";
-  public static final String ARG_MODEL_URL = "KMKeyboardActivity.modelURL";
   public static final String ARG_CUSTOM_HELP_LINK = "KMKeyboardActivity.customHelpLink";
-
-  public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/4.0/languages";
-  public static final String kKeymanApiModelURL = "https://api.keyman.com/model";
+  public static final String ARG_KMP_LINK = "KMKeyboardActivity.kmpLink";
 
   private static final String TAG = "KMKbdDownloaderActivity"; // TAG needs to be less than 28 chars
 
   // Keyman public keys
-  public static final String KMKey_URL = "url";
+  public static final String KMKey_BCP47 = "bcp47";
+  public static final String KMKey_Filename = "filename";
   public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_LanguageKeyboards = "keyboards";
-  public static final String KMKey_BCP47 = "bcp47";
-  public static final String KMKey_Options = "options";
   public static final String KMKey_Language = "language";
   public static final String KMKey_Languages = "languages";
-  public static final String KMKey_Filename = "filename";
+  public static final String KMKey_Options = "options";
+  public static final String KMKey_Platform = "platform";
+  public static final String KMKey_Tier = "tier";
+  public static final String KMKey_URL = "url";
 
   // Keyman internal keys
   public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
@@ -87,19 +88,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     langID = bundle.getString(ARG_LANG_ID);
     langName = bundle.getString(ARG_LANG_NAME);
 
-    downloadOnlyLexicalModel = bundle.containsKey(ARG_MODEL_URL) &&
-      bundle.getString(ARG_MODEL_URL) != null &&
-      !bundle.getString(ARG_MODEL_URL).isEmpty();
+    modelID = bundle.getString(ARG_MODEL_ID);
+    modelName = bundle.getString(ARG_MODEL_NAME);
+    kbID = bundle.getString(ARG_KB_ID);
+    kbName = bundle.getString(ARG_KB_NAME);
+    url = bundle.getString(ARG_KMP_LINK);
 
-    if (downloadOnlyLexicalModel) {
-      modelID = bundle.getString(ARG_MODEL_ID);
-      modelName = bundle.getString(ARG_MODEL_NAME);
-      url = bundle.getString(ARG_MODEL_URL);
-    } else {
-
-      kbID = bundle.getString(ARG_KB_ID);
-      kbName = bundle.getString(ARG_KB_NAME);
-    }
+    downloadOnlyLexicalModel = (modelID != null && !modelID.isEmpty());
 
     // Download keyboard from cloud server
     String title = String.format("%s: %s", langName, kbName);
@@ -121,6 +116,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     dialog.show(getFragmentManager(), "dialog");
   }
 
+  private ArrayList<CloudApiTypes.CloudApiParam> prepareCloudApiParamsForKeyboardPackageDownload() {
+    ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
+    _params.add(new CloudApiTypes.CloudApiParam(
+      CloudApiTypes.ApiTarget.KeyboardPackage, url));
+    return _params;
+  }
+
   /**
    * prepare cloud api params for lexical models download.
    * @return the result
@@ -140,14 +142,14 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * @param aPreparedCloudApiParams the prepared api params
    */
   public static void downloadKeyboard(Context context,
-                                                           String aLangId, String aKbId,
-                                                           List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams)
+                                       String aLangId, String aKbId,
+                                       List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams)
   {
-    String _downloadid= CloudKeyboardMetaDataDownloadCallback.createDownloadId(aLangId , aKbId);
+    String _downloadid= CloudKeyboardPackageDownloadCallback.createDownloadId(aLangId , aKbId);
 
     if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid)
        ||  CloudDownloadMgr.getInstance().alreadyDownloadingData(
-              CloudKeyboardDataDownloadCallback.createDownloadId(aKbId)))
+      CloudKeyboardPackageDownloadCallback.createDownloadId(aLangId, aKbId)))
     {
       Toast.makeText(context,
         context.getString(R.string.keyboard_download_is_running_in_background),
@@ -155,7 +157,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     }
     else
     {
-      CloudKeyboardMetaDataDownloadCallback _callback = new CloudKeyboardMetaDataDownloadCallback();
+      CloudKeyboardPackageDownloadCallback _callback = new CloudKeyboardPackageDownloadCallback();
+      _callback.setLanguageID(aLangId);
 
       Toast.makeText(context,
         context.getString(R.string.keyboard_download_start_in_background),
@@ -182,25 +185,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     }
 
     ArrayList<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
-
-    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(this);
-
-    // Keyman cloud
-    // Sanitize appVersion to #.#.# to match the API spec
-    String appVersion = KMManager.getVersion();
-    String _remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
-      kKeymanApiBaseURL, langID, kbID, appVersion, deviceType);
     cloudQueries.add(
       new CloudApiTypes.CloudApiParam(
-        CloudApiTypes.ApiTarget.Keyboard, _remoteUrl)
-        .setType(CloudApiTypes.JSONType.Object)
-        .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_LANG_ID,langID)
-         .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_KB_ID,kbID));
-
-    String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, langID);
-    cloudQueries.add(new CloudApiTypes.CloudApiParam(
-      CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
-      .setType(CloudApiTypes.JSONType.Array));
+        CloudApiTypes.ApiTarget.KeyboardPackage, url));
 
     return cloudQueries;
   }
@@ -212,8 +199,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * @param aPreparedCloudApiParams the prepared api params
    */
   public static void downloadLexicalModel(Context context,
-                                                               String aModelId,
-                                                               List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams) {
+                                          String aModelId,
+                                          List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams) {
 
 
     String _downloadid= CloudLexicalPackageDownloadCallback.createDownloadId(aModelId);

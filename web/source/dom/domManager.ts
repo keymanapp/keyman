@@ -1542,11 +1542,6 @@ namespace com.keyman.dom {
       opt['keyboards'] = fixPath(opt['keyboards']);
       opt['fonts'] = fixPath(opt['fonts']);    
 
-      // Set element attachment type    
-      if(opt['attachType'] == '') {
-        opt['attachType'] = 'auto';
-      }
-
       // Set default device options
       this.keyman.setDefaultDeviceOptions(opt);   
       

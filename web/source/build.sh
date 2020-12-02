@@ -16,7 +16,7 @@ WORKING_DIRECTORY=`pwd`
 cd "$(dirname "$THIS_SCRIPT")"
 
 display_usage ( ) {
-    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean]"
+    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean] [-upload-sentry]"
     echo
     echo "  -ui               to compile only desktop user interface modules"
     echo "  -test             to compile for testing without copying resources or" 
@@ -28,6 +28,7 @@ display_usage ( ) {
     echo "  -no_minify        to disable the minification '/release/' build sections -"  
     echo "                      the '/release/unminified' subfolders will still be built."
     echo "  -clean            to erase pre-existing build products before the build."
+    echo "  -upload-sentry    to upload debug symbols to our Sentry server"
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
     exit 1
@@ -234,7 +235,6 @@ set_default_vars ( ) {
     BUILD_DEBUG_EMBED=false
     BUILD_COREWEB=true
     DO_MINIFY=true
-    DO_NATIVE_SENTRY=true
     FETCH_DEPS=true
 }
 
@@ -272,7 +272,6 @@ while [[ $# -gt 0 ]] ; do
             BUILD_FULLWEB=false
             BUILD_UI=false
             BUILD_COREWEB=false
-            DO_NATIVE_SENTRY=false
             ;;
         -web)
             set_default_vars
@@ -285,21 +284,40 @@ while [[ $# -gt 0 ]] ; do
             BUILD_COREWEB=false
             BUILD_FULLWEB=false
             BUILD_DEBUG_EMBED=true
-            DO_NATIVE_SENTRY=false
             ;;
         -h|-?)
             display_usage
             ;;
         -no_minify)
             DO_MINIFY=false
-            DO_NATIVE_SENTRY=false
             ;;
         -clean)
             clean
             ;;
+        -upload-sentry)
+            # Overrides default value provided by resources/build_utils.sh
+            UPLOAD_SENTRY=true
+            ;;
     esac
     shift # past argument
 done
+
+# No Sentry uploading if not a release build and not directly specified.
+# Defaults (that "release build" part) set by resources/build_utils.sh
+
+# `./build.sh` and `./build.sh -embed` calls may upload 'embedded' artifacts to Sentry.
+if [[ $UPLOAD_SENTRY = true ]] && [[ $BUILD_EMBED = true ]] && [[ $DO_MINIFY = true ]]; then
+    UPLOAD_EMBED_SENTRY=true
+else
+    UPLOAD_EMBED_SENTRY=false
+fi
+
+# `./build.sh` and `./build.sh -web` calls may upload 'web' / 'native' artifacts to Sentry.
+if [[ $UPLOAD_SENTRY = true ]] && [[ $BUILD_FULLWEB = true ]] && [[ $DO_MINIFY = true ]]; then
+    UPLOAD_WEB_SENTRY=true
+else
+    UPLOAD_WEB_SENTRY=false
+fi
 
 readonly BUILD_LMLAYER
 readonly BUILD_UI
@@ -308,6 +326,8 @@ readonly BUILD_FULLWEB
 readonly BUILD_DEBUG_EMBED
 readonly BUILD_COREWEB
 readonly DO_MINIFY
+readonly UPLOAD_WEB_SENTRY
+readonly UPLOAD_EMBED_SENTRY
 
 if [ $FETCH_DEPS = true ]; then
     # Ensure the dependencies are downloaded.
@@ -358,13 +378,12 @@ if [ $BUILD_CORE = true ]; then
     echo ""
 fi
 
-# Generates a linkable TS file; defined in resources/build-utils.sh.
-exportEnvironmentDefinitionTS
-
 if [ $FULL_BUILD = true ]; then
     echo Compiling version $VERSION
     echo ""
 fi
+
+### -embed section start
 
 if [ $BUILD_EMBED = true ]; then
     echo Compile KMEI/KMEA version $VERSION
@@ -401,15 +420,33 @@ if [ $BUILD_EMBED = true ]; then
         echo
         echo KMEA/KMEI version $VERSION compiled and saved under $EMBED_OUTPUT
         echo
+    fi
 
-        # We always publish "embedded" mode to Sentry when minifying.
-        pushd $EMBED_OUTPUT
+    if [ $BUILD_DEBUG_EMBED = true ]; then
+        # We currently have an issue with sourcemaps for minified versions in embedded contexts.
+        # We should use the unminified one instead for now.
+        cp $EMBED_OUTPUT_NO_MINI/keyman.js $EMBED_OUTPUT/keyman.js
+        # Copy the sourcemap.
+        cp $EMBED_OUTPUT_NO_MINI/keyman.js.map $EMBED_OUTPUT/keyman.js.map
+        echo Uncompiled embedded application saved as keyman.js
+    fi
+
+    if [ $UPLOAD_EMBED_SENTRY = true ]; then
+        if [ $BUILD_DEBUG_EMBED = true ]; then
+            ARTIFACT_FOLDER="release/unminified/embedded"
+            pushd $EMBED_OUTPUT_NO_MINI
+        else
+            ARTIFACT_FOLDER="release/embedded"
+            pushd $EMBED_OUTPUT
+        fi
         echo "Uploading to Sentry..."
-        npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/embedded --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+        npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
         echo "Upload successful."
         popd
     fi
 fi
+
+### -embed section complete.
 
 if [ $BUILD_COREWEB = true ]; then
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
@@ -489,21 +526,11 @@ if [ $BUILD_UI = true ]; then
     fi
 fi
 
-# Has its own flag due to complex logic.  Should run if $DO_MINIFY && ($BUILD_COREWEB || $BUILD_UI)
-# If only one of the two (COREWEB, UI) is run, we assume the un-run portion is 'current' and still upload it.
-if [ $DO_NATIVE_SENTRY = true ]; then
+# We can only upload 'web' / 'native' artifacts after ALL are done compiling.
+if [ $UPLOAD_WEB_SENTRY = true ]; then
     pushd $WEB_OUTPUT
     echo "Uploading to Sentry..."
     npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
     echo "Upload successful."
     popd
-fi
-
-if [ $BUILD_DEBUG_EMBED = true ]; then
-    # We currently have an issue with sourcemaps for minified versions.
-    # We should use the unminified one instead for now.
-    cp $EMBED_OUTPUT_NO_MINI/keyman.js $EMBED_OUTPUT/keyman.js
-    # Copy the sourcemap.
-    cp $EMBED_OUTPUT_NO_MINI/keyman.js.map $EMBED_OUTPUT/keyman.js.map
-    echo Uncompiled embedded application saved as keyman.js
 fi

@@ -1,0 +1,24 @@
+[
+    {
+        "id": "nrc.en.mtnt",
+        "name": "English language model mined from MTNT",
+        "license": "mit",
+        "version": "0.1.4",
+        "languages": [
+            "en",
+            "en-us",
+            "en-ca"
+        ],
+        "authorName": "Eddie Antonio Santos",
+        "jsFileSize": 3435679,
+        "jsFilename": "https://downloads.keyman.com/models/nrc.en.mtnt/0.1.4/nrc.en.mtnt.model.js",
+        "sourcePath": "release/nrc/nrc.en.mtnt",
+        "authorEmail": "easantos@ualberta.ca",
+        "description": "A unigram language model for English derived from the MTNT corpus <http://www.cs.cmu.edu/~pmichel1/mtnt/>. This corpus itself is gathered from Reddit, so it is unfiltered internet discussion. This is not humanity at its prettiest!",
+        "packageFileSize": 432645,
+        "packageFilename": "https://downloads.keyman.com/models/nrc.en.mtnt/0.1.4/nrc.en.mtnt.model.kmp",
+        "packageIncludes": [],
+        "lastModifiedDate": "2020-05-29T10:35:33.706Z",
+        "minKeymanVersion": "12.0"
+    }
+]

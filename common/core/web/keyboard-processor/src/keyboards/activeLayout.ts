@@ -403,6 +403,26 @@ namespace com.keyman.keyboards {
           // If the key lacks an ID, just skip it.  Sometimes used for padding.
           if(!key.id) {
             return;
+          } else {
+            // Attempt to filter out known non-output keys.
+            // Results in a more optimized distribution.
+            switch(key.id) {
+              case 'K_SHIFT':
+              case 'K_LOPT':
+              case 'K_ROPT':
+              case 'K_NUMLOCK': // Often used for numeric layers.
+              case 'K_CAPS':
+                // As these aren't output keys, they shouldn't be possible fat-finger targets.
+                return;
+              default:
+                // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
+                // layer shifting keys.  To be safe, we currently let K_TABBACK and 
+                // K_TABFWD through, though we might be able to drop them too.
+                let code = com.keyman.text.Codes[key.id];
+                if(code > 50000 && code < 50011) {
+                  return;
+                }
+            }
           }
           // These represent the within-key distance of the touch from the key's center.
           // Both should be on the interval [0, 0.5].

@@ -22,9 +22,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.StdCtrls, msctf,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.StdCtrls, Winapi.msctf,
 
-  System.Generics.Collections;
+  System.Generics.Collections, Vcl.ExtCtrls, Vcl.ComCtrls;
 
 type
   TKeyboardItemLegacyRegistry = record
@@ -95,15 +95,61 @@ type
 type
   TForm1 = class(TForm)
     grid: TStringGrid;
-    cmdUnload: TButton;
-    cmdExit: TButton;
-    cmdRefresh: TButton;
-    cmdLoadKeyboardLayout: TButton;
-    Button1: TButton;
-    Button2: TButton;
     memoDetail: TMemo;
-    Button3: TButton;
+    pages: TPageControl;
+    tabInputMethodStatus: TTabSheet;
+    tabLoadKeyboardLayout: TTabSheet;
+    cmdLoadKeyboardLayout1: TButton;
+    editLoadKeyboardLayout_KLID: TEdit;
+    tabRegisterProfile: TTabSheet;
+    cmdITfInputProcessorProfileMgrRegisterProfile: TButton;
+    ITfInputProcessorProfileMgrUnregisterProfile: TButton;
+    cmdUnloadKeyboardLayout: TButton;
+    chkLoadKeyboardLayout_KLF_ACTIVATE: TCheckBox;
+    chkLoadKeyboardLayout_KLF_NOTELLSHELL: TCheckBox;
+    chkLoadKeyboardLayout_KLF_REORDER: TCheckBox;
+    chkLoadKeyboardLayout_KLF_REPLACELANG: TCheckBox;
+    chkLoadKeyboardLayout_KLF_SUBSTITUTE_OK: TCheckBox;
+    chkLoadKeyboardLayout_KLF_SETFORPROCESS: TCheckBox;
+    editUnloadKeyboardLayout_HKL: TEdit;
+    chkRegisterProfile_EnabledByDefault: TCheckBox;
+    chkRegisterProfile_TF_RP_HIDDENINSETTINGUI: TCheckBox;
+    chkRegisterProfile_TF_RP_LOCALPROCESS: TCheckBox;
+    chkRegisterProfile_TF_RP_LOCALTHREAD: TCheckBox;
+    editRegisterProfile_LangID: TEdit;
+    editRegisterProfile_ProfileGUID: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    cmdRegisterProfile_NewGUID: TButton;
+    editRegisterProfile_Desc: TEdit;
+    Label3: TLabel;
+    TabSheet2: TTabSheet;
+    cmdITfInputProcessorProfilesRegister: TButton;
+    cmdITfInputProcessorProfilesAddLanguageProfile: TButton;
+    cmdITfInputProcessorProfilesEnableLanguageProfile: TButton;
+    chkUnregisterProfile_TF_URP_ALLPROFILES: TCheckBox;
+    chkUnregisterProfile_TF_URP_LOCALPROCESS: TCheckBox;
+    chkUnregisterProfile_TF_URP_LOCALTHREAD: TCheckBox;
+    TabSheet3: TTabSheet;
+    cmdInstallLayoutOrTip: TButton;
+    cmdInstallLayoutOrTipUserReg: TButton;
+    editInstallLayoutOrTip_psz: TEdit;
+    chkInstallLayoutOrTip_ILOT_UNINSTALL: TCheckBox;
+    chkInstallLayoutOrTip_ILOT_DEFPROFILE: TCheckBox;
+    chkInstallLayoutOrTip_ILOT_DEFUSER4: TCheckBox;
+    chkInstallLayoutOrTip_ILOT_NOAPPLYTOCURRENTSESSION: TCheckBox;
+    chkInstallLayoutOrTip_ILOT_DISABLED: TCheckBox;
+    chkInstallLayoutOrTip_ILOT_CLEANINSTALL: TCheckBox;
+    Panel1: TPanel;
+    cmdRefresh: TButton;
+    cmdExit: TButton;
     Button4: TButton;
+    Button3: TButton;
+    Button2: TButton;
+    Button1: TButton;
+    cmdLoadKeyboardLayout: TButton;
+    cmdUnload: TButton;
+    Splitter1: TSplitter;
     procedure FormCreate(Sender: TObject);
     procedure cmdUnloadClick(Sender: TObject);
     procedure cmdExitClick(Sender: TObject);
@@ -113,6 +159,15 @@ type
     procedure Button2Click(Sender: TObject);
     procedure gridClick(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure cmdInstallLayoutOrTipClick(Sender: TObject);
+    procedure cmdITfInputProcessorProfileMgrRegisterProfileClick(Sender: TObject);
+    procedure cmdLoadKeyboardLayout1Click(Sender: TObject);
+    procedure ITfInputProcessorProfileMgrUnregisterProfileClick(
+      Sender: TObject);
+    procedure cmdUnloadKeyboardLayoutClick(Sender: TObject);
+    procedure cmdInstallLayoutOrTipUserRegClick(Sender: TObject);
+    procedure pagesChange(Sender: TObject);
+    procedure cmdRegisterProfile_NewGUIDClick(Sender: TObject);
   private
 //    FKeyboards: TKeyboardItems;
 //    rk: array of TRegKeyboard;
@@ -149,6 +204,7 @@ uses
   System.Win.Registry,
   Winapi.ActiveX,
 
+  keyman_msctf,
   input_installlayoutortip,
   glossary,
   LangManager,
@@ -171,8 +227,9 @@ var
   pInputProcessorProfiles: ITfInputProcessorProfiles;
   pInputProcessorProfileMgr: ItfInputProcessorProfileMgr;
   langid: Word;
-  clsid: GUID;
-  guidProfile: GUID;
+  clsid: TGUID;
+  guidProfile: TGUID;
+  catid: TGUID;
 
   function GetDefaultHKL: HKL;   // I3581   // I3619   // I3619
   begin
@@ -189,7 +246,8 @@ begin
 
   // Get default language
   langid := HKLToLanguageID(GetDefaultHKL);
-  if pInputProcessorProfiles.GetDefaultLanguageProfile(langid, GUID_TFCAT_TIP_KEYBOARD, clsid, guidProfile) <> S_OK then
+  catid := GUID_TFCAT_TIP_KEYBOARD;
+  if pInputProcessorProfiles.GetDefaultLanguageProfile(langid, catid, clsid, guidProfile) <> S_OK then
   begin
     ShowMessage('oops');
   end;
@@ -208,8 +266,8 @@ var
   pInputProcessorProfiles: ITfInputProcessorProfiles;
   pInputProcessorProfileMgr: ItfInputProcessorProfileMgr;
   langid: Word;
-  clsid: GUID;
-  guidProfile: GUID;
+  clsid: TGUID;
+  guidProfile: TGUID;
 
 begin
   kbd := grid.Objects[0, grid.Row] as TKeyboardItem;
@@ -236,7 +294,6 @@ begin
 //    if not UnloadKeyboardLayout(kbd.FLegacyLoaded.Handle) then
 //      RaiseLastOSError;
   RefreshLanguages;
-  FillGrid;
 //  InstallLayoutOrTip(
 end;
 
@@ -268,7 +325,7 @@ begin
 
 
 
-  FProfiles.GetLanguageList(pLangID, ulCount);
+  FProfiles.GetLanguageList(@pLangID, ulCount);
   for I := 0 to ulCount - 1 do
   begin
     FLanguage := TLangSwitchLanguage.Create(nil, pLangID^);
@@ -319,16 +376,61 @@ begin
   RefreshLanguages;
 end;
 
+procedure TForm1.cmdRegisterProfile_NewGUIDClick(Sender: TObject);
+var
+  g: TGUID;
+begin
+  CreateGUID(g);
+  editRegisterProfile_ProfileGUID.Text := GUIDToString(g);
+end;
+
 procedure TForm1.cmdUnloadClick(Sender: TObject);
 var
+  lang: TLanguageItem;
   kbd: TKeyboardItem;
+  guid, clsid: TGUID;
+  pInputProcessorProfiles: ITfInputProcessorProfiles;
+  pInputProcessorProfileMgr: ItfInputProcessorProfileMgr;
 begin
   kbd := grid.Objects[0, grid.Row] as TKeyboardItem;
+  lang := grid.Objects[1, grid.Row] as TLanguageItem;
+
+  if kbd.FLegacyRegistry.Exists then
+  begin
+    if not InstallLayoutOrTip(PChar(Format('%04.4x:%08.8x', [lang.LanguageID, kbd.FLegacyRegistry.Preload])), ILOT_UNINSTALL) then
+      ShowMessage(SysErrorMessage(GetLastError));
+  end;
+
   if kbd.FLegacyLoaded.Exists then
+  begin
     if not UnloadKeyboardLayout(kbd.FLegacyLoaded.Handle) then
-      RaiseLastOSError;
+      ShowMessage(SysErrorMessage(GetLastError));
+  end
+  else
+  begin
+    if kbd.FTSFLoaded.Exists then
+    begin
+      if not InstallLayoutOrTip(PChar(Format('%04.4x:%s%s', [lang.LanguageID, GUIDToString(kbd.FTSFLoaded.Profile.clsid), GUIDToString(kbd.FTSFLoaded.Profile.guidProfile)])), ILOT_UNINSTALL) then
+        ShowMessage(SysErrorMessage(GetLastError));
+    end;
+
+    if kbd.FTSFRegistry.Exists then
+    begin
+      OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
+                                IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
+
+      if not Supports(pInputProcessorProfiles, IID_ITfInputProcessorProfileMgr, pInputProcessorProfileMgr) then   // I3743
+        raise Exception.Create('Missing interface IID_ITfInputProcessorProfileMgr');
+
+      // TODO: use these from registry settings
+      clsid := kbd.FTSFLoaded.Profile.clsid;
+      guid := kbd.FTSFLoaded.Profile.guidProfile;
+
+      OleCheck(pInputProcessorProfileMgr.UnregisterProfile(clsid, kbd.FTSFLoaded.Profile.langid, guid, 0));
+    end;
+  end;
+
   RefreshLanguages;
-  FillGrid;
 end;
 
 procedure TForm1.EnumLegacyLoaded;
@@ -377,6 +479,7 @@ procedure TForm1.gridClick(Sender: TObject);
 begin
   FillMemo;
 end;
+
 
 procedure TForm1.EnumLegacyRegistry;
 type
@@ -639,8 +742,8 @@ begin
     grid.ColWidths[x] := w + 8;
     Inc(gw, w + 9);
   end;
-  ClientWidth := (ClientWidth-grid.ClientWidth) + gw - 1;
-  ClientHeight := (ClientHeight-grid.ClientHeight) + (grid.DefaultRowHeight+1) * grid.RowCount - 1;
+
+  FillMemo;
 end;
 
 procedure TForm1.FillMemo;
@@ -773,6 +876,147 @@ destructor TLanguageItem.Destroy;
 begin
   FreeAndNil(FKeyboards);
   inherited Destroy;
+end;
+
+{ RegisterProfile tab }
+
+procedure TForm1.cmdITfInputProcessorProfileMgrRegisterProfileClick(Sender: TObject);
+var
+  langid: WORD;
+  guid, clsid: TGUID;
+  pInputProcessorProfiles: ITfInputProcessorProfiles;
+  pInputProcessorProfileMgr: ItfInputProcessorProfileMgr;
+  dwFlags: DWORD;
+  bEnabledByDefault: Integer;
+begin
+  OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
+                          IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
+
+  if not Supports(pInputProcessorProfiles, IID_ITfInputProcessorProfileMgr, pInputProcessorProfileMgr) then   // I3743
+    raise Exception.Create('Missing interface IID_ITfInputProcessorProfileMgr');
+
+  clsid := StringToGUID('{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}');
+
+  langid := StrToInt('$'+editRegisterProfile_LangID.Text);
+  guid := StringToGUID(editRegisterProfile_ProfileGUID.Text);
+
+  if chkRegisterProfile_EnabledByDefault.Checked
+    then bEnabledByDefault := 1
+    else bEnabledByDefault := 0;
+
+  dwFlags := 0;
+  if chkRegisterProfile_TF_RP_HIDDENINSETTINGUI.Checked then dwFlags := dwFlags or TF_RP_HIDDENINSETTINGUI;
+  if chkRegisterProfile_TF_RP_LOCALPROCESS.Checked then dwFlags := dwFlags or TF_RP_LOCALPROCESS;
+  if chkRegisterProfile_TF_RP_LOCALTHREAD.Checked then dwFlags := dwFlags or TF_RP_LOCALTHREAD;
+
+  OleCheck(pInputProcessorProfileMgr.RegisterProfile(
+    clsid,
+    langid,
+    guid,
+    PChar(editRegisterProfile_Desc.Text),
+    Length(editRegisterProfile_Desc.Text),
+    nil,
+    0,
+    0,
+    0,
+    0,
+    bEnabledByDefault,
+    dwFlags));
+
+  editInstallLayoutOrTip_psz.Text := IntToHex(langid, 4) + ':' + GUIDToString(clsid) + GUIDToString(guid);
+end;
+
+procedure TForm1.ITfInputProcessorProfileMgrUnregisterProfileClick(
+  Sender: TObject);
+var
+  guid, clsid: TGUID;
+  pInputProcessorProfiles: ITfInputProcessorProfiles;
+  pInputProcessorProfileMgr: ItfInputProcessorProfileMgr;
+  dwFlags: DWORD;
+begin
+  OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
+                          IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
+
+  if not Supports(pInputProcessorProfiles, IID_ITfInputProcessorProfileMgr, pInputProcessorProfileMgr) then   // I3743
+    raise Exception.Create('Missing interface IID_ITfInputProcessorProfileMgr');
+
+  clsid := StringToGUID('{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}');
+  guid := StringToGuid(editRegisterProfile_ProfileGUID.Text);
+  dwFlags := 0;
+  if chkUnregisterProfile_TF_URP_ALLPROFILES.Checked then dwFlags := dwFlags or TF_URP_ALLPROFILES;
+  if chkUnregisterProfile_TF_URP_LOCALPROCESS.Checked then dwFlags := dwFlags or TF_URP_LOCALPROCESS;
+  if chkUnregisterProfile_TF_URP_LOCALTHREAD.Checked then dwFlags := dwFlags or TF_URP_LOCALTHREAD;
+  OleCheck(pInputProcessorProfileMgr.UnregisterProfile(clsid, StrToInt('$'+editRegisterProfile_LangID.Text), guid, dwFlags));
+end;
+
+procedure TForm1.pagesChange(Sender: TObject);
+begin
+  if pages.ActivePage = tabInputMethodStatus then
+    RefreshLanguages;
+end;
+
+{ LoadKeyboardLayout tab }
+
+procedure TForm1.cmdLoadKeyboardLayout1Click(Sender: TObject);
+var
+  h: HKL;
+  flags: UINT;
+begin
+  flags := 0;
+  if chkLoadKeyboardLayout_KLF_ACTIVATE.Checked      then flags := flags or chkLoadKeyboardLayout_KLF_ACTIVATE.Tag;
+  if chkLoadKeyboardLayout_KLF_NOTELLSHELL.Checked   then flags := flags or chkLoadKeyboardLayout_KLF_NOTELLSHELL.Tag;
+  if chkLoadKeyboardLayout_KLF_REORDER.Checked       then flags := flags or chkLoadKeyboardLayout_KLF_REORDER.Tag;
+  if chkLoadKeyboardLayout_KLF_REPLACELANG.Checked   then flags := flags or chkLoadKeyboardLayout_KLF_REPLACELANG.Tag;
+  if chkLoadKeyboardLayout_KLF_SUBSTITUTE_OK.Checked then flags := flags or chkLoadKeyboardLayout_KLF_SUBSTITUTE_OK.Tag;
+  if chkLoadKeyboardLayout_KLF_SETFORPROCESS.Checked then flags := flags or chkLoadKeyboardLayout_KLF_SETFORPROCESS.Tag;
+
+  h := LoadKeyboardLayout(PChar(editLoadKeyboardLayout_KLID.Text), flags);
+  if h = 0 then RaiseLastOSError;
+
+  editUnloadKeyboardLayout_HKL.Text := IntToHex(h, 8);
+end;
+
+procedure TForm1.cmdUnloadKeyboardLayoutClick(Sender: TObject);
+var
+  h: Integer;
+begin
+  h := StrToInt('$'+editUnloadKeyboardLayout_HKL.Text);
+  if not UnloadKeyboardLayout(h) then
+    RaiseLastOSError;
+end;
+
+{ InstallLayoutOrTip tab }
+
+procedure TForm1.cmdInstallLayoutOrTipClick(Sender: TObject);
+var
+  dwFlags: DWORD;
+begin
+  dwFlags := 0;
+  if chkInstallLayoutOrTip_ILOT_UNINSTALL.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_UNINSTALL.Tag;
+  if chkInstallLayoutOrTip_ILOT_DEFPROFILE.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_DEFPROFILE.Tag;
+  if chkInstallLayoutOrTip_ILOT_DEFUSER4.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_DEFUSER4.Tag;
+  if chkInstallLayoutOrTip_ILOT_NOAPPLYTOCURRENTSESSION.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_NOAPPLYTOCURRENTSESSION.Tag;
+  if chkInstallLayoutOrTip_ILOT_DISABLED.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_DISABLED.Tag;
+  if chkInstallLayoutOrTip_ILOT_CLEANINSTALL.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_CLEANINSTALL.Tag;
+
+  if not InstallLayoutOrTip(PChar(editInstallLayoutOrTip_psz.Text), dwFlags) then
+    RaiseLastOSError;
+end;
+
+
+procedure TForm1.cmdInstallLayoutOrTipUserRegClick(Sender: TObject);
+var
+  dwFlags: DWORD;
+begin
+  dwFlags := 0;
+  if chkInstallLayoutOrTip_ILOT_UNINSTALL.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_UNINSTALL.Tag;
+  if chkInstallLayoutOrTip_ILOT_DEFPROFILE.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_DEFPROFILE.Tag;
+  if chkInstallLayoutOrTip_ILOT_NOAPPLYTOCURRENTSESSION.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_NOAPPLYTOCURRENTSESSION.Tag;
+  if chkInstallLayoutOrTip_ILOT_DISABLED.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_DISABLED.Tag;
+  if chkInstallLayoutOrTip_ILOT_CLEANINSTALL.Checked then dwFlags := dwFlags or chkInstallLayoutOrTip_ILOT_CLEANINSTALL.Tag;
+
+  if not InstallLayoutOrTipUserReg(nil, nil, nil, PChar(editInstallLayoutOrTip_psz.Text), dwFlags) then
+    RaiseLastOSError;
 end;
 
 end.

@@ -5,5 +5,7 @@
 # 2) we can import it in setup.py for the same reason
 # 3) we can import it into your module module
 __version__ = "_VERSION_"
+__versionwithtag__ = "_VERSIONWITHTAG_"
 __majorversion__ = "_MAJORVERSION_"
 __releaseversion__ = "_RELEASEVERSION_"
+__tier__ = "_TIER_"

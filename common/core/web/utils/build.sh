@@ -28,9 +28,6 @@ set_default_vars ( ) {
 
 set_default_vars
 
-# Generates a linkable TS file; defined in resources/build-utils.sh.
-exportEnvironmentDefinitionTS && mv environment.inc.ts src/
-
 # Parse args
 while [[ $# -gt 0 ]] ; do
     key="$1"

@@ -1,0 +1,309 @@
+﻿<?xml version="1.0"?>
+<resources>
+  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="/PlainText: ">Screenပေါ်သုံးကီးဘုတ်ကို ပိတ်</string>
+  <string name="S_Menu_Exit" comment="/PlainText: ">E&amp;xit</string>
+  <string name="S_OSKContext_FadeWhenInactive" comment="/PlainText: ">မလုပ်ဆောင်နေသောအခါတွင် မှိန်ဖျော့ထားပါ</string>
+  <string name="S_Menu_Help" comment="/PlainText: ">&amp;အကူအညီ..</string>
+  <string name="Hint_KH_CLOSEOSK" comment="/Hint: ">Screenပေါ်ကီးဘုတ်ကို ပိတ်ထားပါပြီ။  Keymanက ဆက်လက်လည်ပတ်နေဆဲဖြစ်ပါသည်။ အချိန်မရွေး  KeymanIconကိုနှိပ်ပြီး တော့ "မျက်နှာပြင်ပေါ်ရှိကီးဘုတ်ကို ရွေးပြီး" Screenမှာပေါ်တဲ့ကီးဘုတ်ကို ပြန်ဖွင့်နိုင်ပါတယ်</string>
+  <string name="Hint_KH_EXITPRODUCT" comment="/Hint: ">Keyman ကနေထွက်ဖို့သေချာပါသလား။  သင့်ရဲ့ကီးမန်းကီးဘုတ်များက ဝင်းဒိုးဘာသာစကားများထဲမှာ ဆက်လက်ရှိနေပါလိမ့်မည်။ ဒါပေမယ့်Keymanကိုပြန်မစမစချင်းတော့ အလုပ်လုပ်လိမ့်မည်မဟုတ်ပါ</string>
+  <string name="HintTitle_KH_CLOSEOSK" comment="/HintTitle: ">Screen ပေါ်ကီးဘုတ်ကိုပိတ်ပြီး</string>
+  <string name="HintTitle_KH_EXITPRODUCT" comment="/HintTitle: ">ထွက်ပါ Keyman?</string>
+  <string name="koAltGrCtrlAlt" comment="/FormatString: ">Simulate AltGr with Ctrl+Alt</string>
+  <string name="koAutoOpenOSK" comment="/FormatString: ">ကီးမန်းကီးဘုတ်ကို ရွေးသည့်အခါတိုင်း Screenမှာပေါ်မှာမြင်ရမည့်ကီးဘုတ် ကိုပြပါ</string>
+  <string name="koAutoSwitchOSKPages" comment="/FormatString: ">ကီးဘုတ်ကိုရွေးချယ်ပြီးပါက သင့်လျော်သော Screenမှာပေါ်မှာမြင်ရမည့်ကီးဘုတ်/အကူအညီကို အလိုအလျောက်ပြပါ</string>
+  <string name="koCheckForUpdates" comment="/FormatString: ">www.tavultesoft.com ကိုအပတ်စဉ် အဆင့်မြှင့်တင်နိုင်ရန်စစ်ဆေးပါ</string>
+  <string name="koDebugging" comment="/FormatString: ">Debugging</string>
+  <string name="kogAdvanced" comment="/FormatString: ">အဆင့်မြင့်</string>
+  <string name="kogGeneral" comment="/FormatString: ">General</string>
+  <string name="kogOSK" comment="/FormatString: ">Screenမှာပေါ်မှာမြင်ရမည့်ကီးဘုတ်</string>
+  <string name="kogStartup" comment="/FormatString: ">အစပြု</string>
+  <string name="koKeyboardHotkeysAreToggle" comment="/FormatString: ">ကီးဘုတ် hotkeys togggle ကီးဘုတ် အသက်သွင်းခြင်း</string>
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="/FormatString: ">Screenမှာပေါ်မှာမြင်ရမည့်ကီးဘုတ်တွင် ကီးကိုနှိပ်ပြီးလျှင်Shift/Ctrl/Alt ကိုလွှတ်လိုက်ပါ</string>
+  <string name="koRunElevatedInVista" comment="/FormatString: ">ဝင်းဒိုး Vista မှာသုံးတိုင်း အသုံးပြုသူရဲ့ခွင့်ပြုချက်ကို အမြင့်ဆုံးအထိ ခွင့်ပြုပါ</string>
+  <string name="koShowHints" comment="/FormatString: ">အရိပ်အမွက် စကားစုကိုပြပါ</string>
+  <string name="koShowStartup" comment="/FormatString: ">splash screen ကိုပြပါ</string>
+  <string name="koShowWelcome" comment="/FormatString: ">Welcome screen ကိုပြပါ</string>
+  <string name="koStartWithWindows" comment="/FormatString: ">ဝင်းဒိုးစတက်တာနဲ့ စသုံးပါ</string>
+  <string name="koSwitchLanguageForAllApplications" comment="/FormatString: ">application အားလုံးအတွက် ကီးဘုတ်လက်ကွက်ကို ရွေးချယ်ပါ</string>
+  <string name="koSwitchLanguageWithKeyboard" comment="/FormatString: ">ကီးမန်းကီးဘုတ်ကို ရွေးပြီးလျှင် ဝင်းဒိုးဘာသာစကားကို ဖွင့်ပါ</string>
+  <string name="koTestKeymanFunctioning" comment="/FormatString: ">Keymanစသည့်အချိန် တွင် အဆင်မပြေပဲညိနိုင်သော application များကို စစ်ဆေးခြင်း </string>
+  <string name="koTurnOnSurrogates" comment="/FormatString: ">ယူနီကုဒ် အပို အက္ခရာ ဖော်ပြမှုကို ဖွင့်ပါ( Restart လုပ်ရန်လိုသည်)</string>
+  <string name="koUnknownLanguage" comment="/FormatString: ">"အမည်မသိ"ဘာသာစကားကိုဖွင့်ပါ</string>
+  <string name="S_Menu_OnScreenKeyboard" comment="/PlainText: ">&amp;Screen ပေါ်ကီးဘုတ်</string>
+  <string name="S_Toolbar_OpenHelp" comment="/PlainText: ">အကူအညီကိုဖွင့်ပါ</string>
+  <string name="S_Toolbar_OpenConfiguration" comment="/PlainText: ">Keymanရဲ့စနစ်ပိုင်းဆိုင်ရာကို ဖွင့်ပါ</string>
+  <string name="S_OSKContext_Print" comment="/PlainText: ">ပရင့်ထုတ်</string>
+  <string name="S_BaseKeyboard_Text" comment="/PlainText: ">သင် ဝင်ဒိုးမှာသုံး လက်တင်ဘာသာစကား အခြေခံကီးဘုတ်ကို ရွေးချယ်ပါ။  Keyman ကီးဘုတ်သည် သင်ရည်ညွန်းသော ပုံစံသို့ အလိုအလျောက် ပြောင်းပေးလိမ့်မည်</string>
+  <string name="S_BaseKeyboard_Title" comment="/PlainText: ">အခြေခံ ကီးဘုတ်ကို သတ်မှတ်ပါ</string>
+  <string name="S_BETA" comment="/PlainText: "/>
+  <string name="S_Button_Apply" comment="/PlainText: ">အသုံးပြုပါ</string>
+  <string name="S_Button_BaseKeyboard" comment="/PlainText: ">အခြေခံကီးဘုတ်</string>
+  <string name="S_Button_Cancel" comment="/PlainText: ">ပယ်ဖျက်ပါ</string>
+  <string name="S_Button_CheckForUpdates" comment="/PlainText: ">အဆင့်မြှင့်နိုင်မှု ကို စစ်ဆေးပါ</string>
+  <string name="S_Button_Close" comment="/PlainText: ">ပိတ်ပါ</string>
+  <string name="S_Button_CommunitySupport" comment="/PlainText: ">ကီးမန်းရဲ့ အသိုင်းအဝိုင်း ဖိုရမ်ကိုဖွင့်ပါ</string>
+  <string name="S_Button_Diagnostics" comment="/PlainText: ">ပြဿနာရှာဖွေရေး</string>
+  <string name="S_Button_DownloadKeyboard" comment="/PlainText: ">ကီးဘုတ်ကို ဒေါင်းလုဒ်ဆွဲ</string>
+  <string name="S_Button_InstallKeyboard" comment="/PlainText: ">ကီးဘုတ်ကို တပ်ဆင်</string>
+  <string name="S_Button_KeyboardOptions" comment="/PlainText: ">ရွေးချယ်မှုများ</string>
+  <string name="S_Button_OK" comment="/PlainText: ">အိုကေ</string>
+  <string name="S_Button_OnlineSupport" comment="/PlainText: ">အွန်လိုင်းအကူအညီ</string>
+  <string name="S_Button_PackageOptions" comment="/PlainText: ">Package options</string>
+  <string name="S_Button_ProxyConfig" comment="/PlainText: ">Proxy Settings...</string>
+  <string name="S_Button_RemindLater" comment="/PlainText: ">နောက်မှသတိပေးပါ</string>
+  <string name="S_Button_ResetHints" comment="/PlainText: ">အရိပ်အမွက်များကို ပြန်စရန်</string>
+  <string name="S_Button_SendSupportRequest" comment="/PlainText: ">အကူအညီအတွက် တောင်းဆိုမှုကို ပို့ပါ</string>
+  <string name="S_Button_UILanguage" comment="/PlainText: ">အသုံးပြုသူအတွက်ဘာသာစကားစနစ်</string>
+  <string name="S_Button_UpgradeNow" comment="/PlainText: ">အဆင့်မြှင့်ပါ</string>
+  <string name="S_Caption_Author" comment="/PlainText: ">ရေးသားသူ:</string>
+  <string name="S_Caption_Copyright" comment="/PlainText: ">မူပိုင်ခွင့်:</string>
+  <string name="S_Caption_Description" comment="/PlainText: ">ဖေါ်ပြချက်:</string>
+  <string name="S_Caption_Documentation" comment="/PlainText: ">မှတ်တမ်းတင်ခြင်း:</string>
+  <string name="S_Caption_Encodings" comment="/PlainText: ">Encodings:</string>
+  <string name="S_Caption_Filename" comment="/PlainText: ">ဖိုင်အမည်:</string>
+  <string name="S_Caption_Fonts" comment="/PlainText: ">ဖောင့်များ:</string>
+  <string name="S_Caption_GettingStarted" comment="/PlainText: ">စတင်အသုံးပြုခြင်း</string>
+  <string name="S_Caption_Help" comment="/PlainText: ">အကူအညီ</string>
+  <string name="S_Caption_InstalledFor" comment="/PlainText: ">အတွက်တပ်ဆင်:</string>
+  <string name="S_Caption_Keyboards" comment="/PlainText: ">ကီးဘုတ်လက်ကွက်များ:</string>
+  <string name="S_Caption_KeyboardVersion" comment="/PlainText: ">ကီးဘုတ်ဗားရှင်းများ:</string>
+  <string name="S_Caption_Languages" comment="/PlainText: ">ဘာသာစကားများ:</string>
+  <string name="S_Caption_LayoutType" comment="/PlainText: ">လက်ကွက်အမျိုးအစား:</string>
+  <string name="S_Caption_Message" comment="/PlainText: ">ပန်ကြားစာ:</string>
+  <string name="S_Caption_OnScreenKeyboard" comment="/PlainText: ">Screenပေါ်မှကီးဘုတ်:</string>
+  <string name="S_Caption_Package" comment="/PlainText: ">Package:</string>
+  <string name="S_Caption_Version" comment="/PlainText: ">Package version:</string>
+  <string name="S_Caption_Website" comment="/PlainText: ">ဝက်ဘ်ဆိုဒ်:</string>
+  <string name="S_ConfigurationTitle" comment="/PlainText: ">Keyman Configuration</string>
+  <string name="S_DisplayIn" comment="/PlainText: ">ဖော်ပြမည့် ဘာသာစကား</string>
+  <string name="S_Documentation_Installed" comment="/PlainText: ">တပ်ဆင်ပြီး:</string>
+  <string name="S_Documentation_NotInstalled" comment="/PlainText: ">မတပ်ဆင်ထား:</string>
+  <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="/PlainText: ">မတပ်ဆင်ပါနဲ့။ ဒေါင်းလုဒ်ပဲလုပ်ပါ</string>
+  <string name="S_DownloadKeyboard_Title" comment="/PlainText: ">Tavultesoftကနေ ကီးဘုတ်ကို ဒေါင်းလုဒ်ဆွဲပါ</string>
+  <string name="S_Help_Keyboard_Prefix" comment="/PlainText: ">Help on "</string>
+  <string name="S_Help_Keyboard_Suffix" comment="/PlainText: ">" keyboard</string>
+  <string name="S_Help_Product" comment="/PlainText: ">အကူအညီအဆက်အသွယ်များ</string>
+  <string name="S_Help_Tutorial" comment="/PlainText: ">စသုံးစို့</string>
+  <string name="S_HelpTitle" comment="/PlainText: ">Keyman  အကူအညီ</string>
+  <string name="S_Hotkey_Control_Title" comment="/PlainText: ">အသုံးများသော</string>
+  <string name="S_Hotkey_Keyboard_Prefix" comment="/PlainText: ">ကီးဘုတ်</string>
+  <string name="S_Hotkey_Keyboard_Suffix" comment="/PlainText: "> ကို ရွေးပါ</string>
+  <string name="S_Hotkey_Keyboard_Title" comment="/PlainText: ">ကီးဘုတ်များ</string>
+  <string name="S_Hotkey_Language_Prefix" comment="/PlainText: "> ဘသာစကား</string>
+  <string name="S_Hotkey_Language_Suffix" comment="/PlainText: "> ကို ရွေးပါ</string>
+  <string name="S_Hotkey_None" comment="/PlainText: ">(ဘာမှမရှိ)</string>
+  <string name="S_Hotkey_OpenConfiguration" comment="/PlainText: ">အစိတ်အပိုင်းများဖွဲ့စည်းရာကိုဖွင့်</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="/PlainText: ">ကီးဘုတ်မီနူးကိုဖွင့်ပါ</string>
+  <string name="S_Hotkey_OpenTextEditor" comment="/PlainText: ">စာသားအယ်ဒီတာကိုဖွင့်ပါ</string>
+  <string name="S_Hotkey_ShowCharacterMap" comment="/PlainText: ">စာသားမြေပုံကိုပြပါ</string>
+  <string name="S_Hotkey_ShowFontHelper" comment="/PlainText: ">ဖောင့်အကူအညီကိုပြပါ</string>
+  <string name="S_Hotkey_ShowKeyboardUsage" comment="/PlainText: ">ကီးဘုတ်အသုံးပြုမှုကိုပြပါ</string>
+  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="/PlainText: ">Screenမှာပေါ်တဲ့ကီးဘုတ်ကိုပြပါ</string>
+  <string name="S_Hotkey_SwitchLanguage" comment="/PlainText: ">ဘာသာစကားပြောင်းလဲမှုကိုဖွင့်ပါ</string>
+  <string name="S_Hotkey_TurnKeymanOff" comment="/PlainText: ">ဖွင့်ပါ၊ အမည်ကို၊ ပိတ်</string>
+  <string name="S_Hotkeys" comment="/PlainText: ">Hotkeys</string>
+  <string name="S_Hotkeys_AccessChar" comment="/PlainText: ">H</string>
+  <string name="S_InstalledFor_AllUsers" comment="/PlainText: ">အသုံးပြုသူအားလုံး:</string>
+  <string name="S_InstalledFor_CurrentUser" comment="/PlainText: ">လက်ရှိသုံးသူ:</string>
+  <string name="S_InstallKeyboard_Button_Install" comment="/PlainText: ">တပ်ဆင်ပါ</string>
+  <string name="S_InstallKeyboard_Button_InstallAllUsers" comment="/PlainText: ">အသုံးပြုသူအားလုံးအတွက်တပ်ဆင်ပါ</string>
+  <string name="S_InstallKeyboard_Tab_Details" comment="/PlainText: ">အသေးစိတ်</string>
+  <string name="S_InstallKeyboard_Tab_Readme" comment="/PlainText: ">ဖတ်ပါ</string>
+  <string name="S_InstallKeyboard_Title" comment="/PlainText: ">ကီးဘုတ်/Package ကို တပ်ဆင်ပါ</string>
+  <string name="S_Keyboards" comment="/PlainText: ">ကီးဘုတ်လက်ကွက်များ</string>
+  <string name="S_Keyboards_AccessChar" comment="/PlainText: ">K</string>
+  <string name="S_Keyboards_NoKeyboardsInstalled" comment="/: ">ကီးဘုတ်မတပ်ဆင်ထားပါ။ ကီးဘုတ်ဒေါင်းလုဒ် ခလုတ်ကို နှိပ်ပြီး Tavultesoft website ကနေ ကီးဘုတ်ကို တပ်ဆင်ပါ။</string>
+  <string name="S_LangSetup_Ask" comment="/: ">သင်က Keyman ကို ဒီ လုပ်ဆောင်ချက်တွေကို ယခုပြီးစေချင်ပါသလား</string>
+  <string name="S_LangSetup_BlurbPrefix" comment="/: ">Keyman က အောက်ပါ စနစ်ပိုင်းဆိုင် ရာအလုပ်တွေကို ပြီးမြောက်ဖို့ လိုကြောင်းစစ်ဆေး တွေ့ရှိပါတယ်။</string>
+  <string name="S_LangSetup_BlurbSuffix" comment="/: ">သင့်ကွန်ပျူတာမှာမှန်ကန်စွာပေါ်ဖို့ script(s)</string>
+  <string name="S_LangSetup_MoreInfo" comment="/: ">နောက်ထပ် သတင်းအချက်အလက်</string>
+  <string name="S_LangSetup_Note" comment="/: "/>
+  <string name="S_LangSetup_psrtMSOfficeLanguage" comment="/: ">Microsoft Office Language Support</string>
+  <string name="S_LangSetup_SaveDisabledItems" comment="/: ">ဒီအကြောင်းထပ်မမေးပါနဲ့</string>
+  <string name="S_LangSetup_Title" comment="/: ">Language Configuration Tasks</string>
+  <string name="S_LangSetup_TitleInnerPrefix" comment="/: ">Configure your computer to work with</string>
+  <string name="S_LangSetup_TitleInnerSuffix" comment="/: "/>
+  <string name="S_Languages_Install" comment="/PlainText: ">ဘာသာစကားထည့်ပါ:</string>
+  <string name="S_Languages_InstalledLanguage" comment="/PlainText: ">တပ်ဆင်ထားသော ဘာသာစကား</string>
+  <string name="S_Languages_KeymanKeyboard" comment="/PlainText: ">ကီးမန်း ကီးဘုတ်</string>
+  <string name="S_Languages_Uninstall" comment="/PlainText: ">✕</string>
+  <string name="S_Languages_UseWindowsLayout" comment="/PlainText: ">(ဝင်းဒိုး အပြင်အဆင်ကို အသုံးပြုပါ)</string>
+  <string name="S_Languages_WindowsLayout" comment="/PlainText: ">ဝင်းဒိုး အပြင်အဆင်</string>
+  <string name="S_LayoutType_Mnemonic" comment="/PlainText: ">ဝင်းဒိုး လက်ကွက် ကို သတ်မှတ်ပြီး(အတိုကောက်)</string>
+  <string name="S_LayoutType_Positional" comment="/PlainText: ">ပုံသေချထားပြီး:</string>
+  <string name="S_LocaleAuthors" comment="/PlainText: ">Tavultesoft</string>
+  <string name="S_Menu_ChangeHotkey" comment="/PlainText: ">hotkeyပြောင်းလဲပါ</string>
+  <string name="S_Menu_Diagnostics_CheckLanguages" comment="/PlainText: ">ဘာသာစကားချိန်ညှိရန်နေရာကိုစစ်ကြည့်ပါ</string>
+  <string name="S_Menu_Diagnostics_Diagnostics" comment="/PlainText: ">ပြဿနာရှာဖွေရေး</string>
+  <string name="S_Menu_InstallOnScreenKeyboard" comment="/PlainText: "> Screen ပေါ်ကီးဘုတ်ကိုတပ်ဆင်ပါ</string>
+  <string name="S_Menu_Options" comment="/PlainText: ">ကီးဘုတ် ရွေးချယ်မှုများ</string>
+  <string name="S_Menu_SetHotkey" comment="/PlainText: ">hotkeyသတ်မှတ်ပါ</string>
+  <string name="S_Menu_ShowWelcome" comment="/PlainText: ">အကူအညီကိုဖော်ပြပါ</string>
+  <string name="S_Menu_Uninstall" comment="/PlainText: ">ဖယ်ရှားခြင်း</string>
+  <string name="S_Menu_UninstallOnScreenKeyboard" comment="/PlainText: ">Screen ပေါ်ကကီးဘုတ်ကို ဖယ်ရှားပါ</string>
+  <string name="S_Menu_UninstallPackage" comment="/PlainText: "> packageကိုဖယ်ရှားပါ</string>
+  <string name="S_MoreUILanguagesMenu" comment="/PlainText: ">အွန်လိုင်းမှာ အခြား ဘာသာစကားများကို ရှာပါ...</string>
+  <string name="S_No" comment="/PlainText: ">မလုပ်ပါ</string>
+  <string name="S_OnScreenKeyboard_Custom" comment="/PlainText: ">စိတ်ကြိုက်</string>
+  <string name="S_OnScreenKeyboard_Installed" comment="/PlainText: ">တပ်ဆင်ပြီး</string>
+  <string name="S_OnScreenKeyboard_NotInstalled" comment="/PlainText: ">မတပ်ဆင်ထား</string>
+  <string name="S_Options" comment="/PlainText: ">ရွေးချယ်စရာများ</string>
+  <string name="S_Options_AccessChar" comment="/PlainText: ">O</string>
+  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="/HTML: ">&amp;Name; ကီးဘုတ် တစ်ခုကို ရွေးချယ်ပြီး ဒါနဲ့ အလုပ်လုပ်မယ့်ဖောင့်ကို ရှာပါ</string>
+  <string name="S_OSK_FontHelper_MatchedFonts1" comment="/HTML: ">အောက်ပါဖောင့်များသည် အလုပ်လုပ်နိုင်ပါသည်၊၊</string>
+  <string name="S_OSK_FontHelper_MatchedFonts2" comment="/HTML: ">ကီးဘုတ်:</string>
+  <string name="S_OSK_FontHelper_NoFonts1a" comment="/HTML: ">သင့်ရဲ့စနစ်ထဲမှာ အလုပ်လုပ်နိုင်တဲ့ဖောင့်များမရှိပါ</string>
+  <string name="S_OSK_FontHelper_NoFonts1b" comment="/HTML: ">သင့်ရဲ့ဘာသာစကားနဲ့ကိုက်ညီမယ့်ဖောင့်ကို သင့်ရဲ့စနစ်ထဲမှာ မတွေ့ရှိပါ။ကျေးဇူးပြုပြီးပါဝင်သောမှတ်တမ်းများကို ဖတ်ရှုပါသို့မဟုတ် Tavultesoft ရဲ့အကူအညီကို ဒီ ကီးဘုတ်အတွက်ဖောင့်များကို ရှာဖို့ ဆက်သွယ်ပါ</string>
+  <string name="S_OSK_FontHelper_NoKeyboards" comment="/HTML: ">လက်ရှိကီးဘုတ် လက်ကွက်များကို တပ်ဆင်ထားခြင်းမရှိပါ။ &amp;Name; Configuration ကိုသုံးပြီး ကီးဘုတ် လက်ကွက်ကို တပ်ဆင်ပါ</string>
+  <string name="S_OSK_FontHelper_NonUnicode1" comment="/HTML: "/>
+  <string name="S_OSK_FontHelper_NonUnicode2" comment="/HTML: ">က ယူနီကုဒ် ကီးဘုတ်မဟုတ်ပါ။ ဖောင့်ကို အလိုအလျောက်သတ်မှတ်လို့မရပါ။ ဖောင့်အတွက်လိုအပ်တဲ့ အချက်အလက်များကို ကီးဘုတ် မှတ်တမ်းမှာ စစ်ကြည့်ပါ</string>
+  <string name="S_OSK_FontHelper_PleaseWait1" comment="/HTML: ">&amp;Name;က အလုပ်လုပ်နိုင်မယ့်ဖောင့်ကို ရှာနေတုန်းခတ္တစောင့်ပါ</string>
+  <string name="S_OSK_FontHelper_PleaseWait2" comment="/HTML: ">ကီးဘုတ်</string>
+  <string name="S_OSK_FontHelper_PossibleFonts" comment="/HTML: ">အောက်ပါဖောင့်များက အလုပ်လုပ်ကောင်းလုပ်နိုင်ပါမည်။</string>
+  <string name="S_OSK_FontHelper_PossibleFontsOnly1" comment="/HTML: ">အောက်ပါဖောင့်များက အလုပ်လုပ်ပါသည်</string>
+  <string name="S_OSK_FontHelper_PossibleFontsOnly2" comment="/HTML: ">ကီးဘုတ်:</string>
+  <string name="S_OSK_Hint_Title" comment="/Plain Text: ">အရိပ်အမွက်:</string>
+  <string name="S_OSK_Hint1" comment="/Plain Text: ">မျက်နှာပြင်မှာပေါ်တဲ့ကီးဘုတ်ကို ကလစ်နှိပ်ပြီး ဝင်းဒိုး Screen ပေါ်မှာ ပွတ်ဆွဲခြင်းဖြင့် ချုံ့နိုင်ပါသည်။</string>
+  <string name="S_OSK_Hint2" comment="/Plain Text: ">"Keyman"ခေါင်းစီးလေးပေါ်မှာ ကလစ်နှိပ်ပြီး  ပွတ်ဆွဲခြင်းဖြင့် မျက်နှာပြင်မှာပေါ်သော ကီးဘုတ်ကို ရွှေ့ယူနိုင်ပါသည်။</string>
+  <string name="S_OSK_Hint3a" comment="/Plain Text: ">သင့်ရဲ့ မှတ်တမ်းမှတ်ရာထဲ ကို ယူနီကုဒ် အက္ခရာတွေကို ထည့်သွင်း</string>
+  <string name="S_OSK_Hint3b" comment="/Plain Text: ">အက္ခရာမြေပုံTool</string>
+  <string name="S_OSK_Hint4a" comment="/Plain Text: ">ဘယ်ဖောင့်တွေက သင့်ရဲ့ဘာသာစကားနဲ့ကိုက်ညီမှုရှိသလဲရှာဖွေလိုက်ပါ</string>
+  <string name="S_OSK_Hint4b" comment="/Plain Text: ">ဖောင့်အကူအညီ Tool</string>
+  <string name="S_OSK_Hint5a" comment="/Plain Text: ">ကီးဘုတ် အတွက်အကူအညီကိုကလစ်နှိပ်ပြီး</string>
+  <string name="S_OSK_Hint5b" comment="/Plain Text: ">ကီးဘုတ် အသုံးပြုမှုခလုတ်</string>
+  <string name="S_ProxyConfiguration_Password" comment="/PlainText: ">Password:</string>
+  <string name="S_ProxyConfiguration_Port" comment="/PlainText: ">Port:</string>
+  <string name="S_ProxyConfiguration_Server" comment="/PlainText: ">Server:</string>
+  <string name="S_ProxyConfiguration_Title" comment="/PlainText: ">Proxy Server Configuration</string>
+  <string name="S_ProxyConfiguration_Username" comment="/PlainText: ">Username:</string>
+  <string name="S_ShortProductName" comment="/PlainText: ">Keyman</string>
+  <string name="S_Splash_Configuration" comment="/PlainText: ">စနစ်ပိုင်းဆိုင်ရာ</string>
+  <string name="S_Splash_Exit" comment="/PlainText: ">ထွက်ရန်</string>
+  <string name="S_Splash_HideAtStartup" comment="/PlainText: ">စစခြင်းမှာ ဒီScreenကို ဖျောက်ထားပါ</string>
+  <string name="S_Splash_Name" comment="/PlainText: ">Keyman</string>
+  <string name="S_Splash_OtherTasks" comment="/PlainText: ">အခြားလုပ်ဆောင်ချက်များ</string>
+  <string name="S_Splash_ShowAtStartup" comment="/PlainText: ">စစခြင်းမှာ ဒီScreenကိုပြပါ</string>
+  <string name="S_Splash_Start" comment="/PlainText: ">Start Keyman</string>
+  <string name="S_Splash_Title" comment="/: ">Keyman</string>
+  <string name="S_Support" comment="/PlainText: ">အကူအညီ</string>
+  <string name="S_Support_AccessChar" comment="/PlainText: ">S</string>
+  <string name="S_Support_ContactHeading" comment="/PlainText: ">ကီးမန်း အကူအညီပေးရေးကိုဆက်သွယ်ပါ</string>
+  <string name="S_Support_ContactInstructions_Free" comment="/PlainText: ">ကီးမန်းကိုသုံးပြီး အကြောင်းကိစ္စတစ်ခုခုရှိပါက ကီ:မန်း အသိုင်းအဝိုင်း ဖိုရမ်မှာမေးပါ</string>
+  <string name="S_Support_Copyright" comment="/PlainText: ">မူပိုင်ခွင့်© Tavultesoft Pty Ltd. မူပိုင်ခွင့်ကိုလက်ဝယ်ထားသည်။</string>
+  <string name="S_Support_EngineVersion" comment="/PlainText: ">အင်္ဂလိပ်ဘာသာဗားရှင်း</string>
+  <string name="S_Support_UsefulLinks" comment="/PlainText: ">အသုံးဝင်Linksများ</string>
+  <string name="S_Support_Version" comment="/PlainText: ">ဗားရှင်း</string>
+  <string name="S_Update_Button_InstallLater" comment="/PlainText: ">ပယ်ဖျက်</string>
+  <string name="S_Update_Button_InstallNow" comment="/PlainText: ">ယခုပဲ တပ်ဆင်ပါ</string>
+  <string name="S_Update_ComponentHead" comment="/PlainText: ">ပါဝင်မှုများကို အဆင့်မြှင့်တင်ပြီး</string>
+  <string name="S_Update_DownloadFrom" comment="/PlainText: ">ဗားရှင်းအသစ်ကိုဒေါင်းလုဒ်ဆွဲနိုင်ပါသည် ..မှ..</string>
+  <string name="S_Update_DownloadQuery" comment="/PlainText: ">ဝက်ဘ်ဆိုဒ်ကို ဃခုသွားရောက်လည်ပတ်ချင်ပါသလား</string>
+  <string name="S_Update_InstallQuery" comment="/PlainText: ">ဒီpatch  ကို ယခု ဒေါင်းလုဒ်ဆွဲပြီး တပ်ဆင်ချင်ပါသလား</string>
+  <string name="S_Update_NewVersionAvailable" comment="/PlainText: ">Keymanအတွက် မွမ်းမံမှုများကို ရရှိနိုင်ပါပြီ</string>
+  <string name="S_Update_NewVersionPrompt" comment="/PlainText: ">သင်တပ်ဆင်ချင်တဲ့မွမ်းမံမှုများကို ရွေးချယ်ပါ</string>
+  <string name="S_Update_OldVersionHead" comment="/PlainText: ">ဗားရှင်းအဟောင်း</string>
+  <string name="S_Update_SizeHead" comment="/PlainText: ">အရွယ်</string>
+  <string name="S_Update_Title" comment="/PlainText: ">မွမ်းမံထားသော Keyman အစိတ်အပိုင်းများကို ရရှိနိုင်ပါသည်</string>
+  <string name="S_Usage_Config" comment="/PlainText: ">Keyman စနစ်ပိုင်းဆိုင်ရာ</string>
+  <string name="S_Usage_Help" comment="/PlainText: ">Keyman အကူအညီ</string>
+  <string name="S_Usage_KeyboardDocumentation" comment="/HTML: ">မျက်နှာပြင်ပေါ်သုံးကီးဘုတ်အတွက် အပို မှတ်တမ်းမှတ်ရာများကို ကြည့်ရန် အောက်ပါ ခလုတ်ကိုနှိပ်ပါ</string>
+  <string name="S_Usage_KeyboardNoDocumentation" comment="/HTML: ">ဒီကီးဘုတ် လက်ကွက်မှာ စတင်သုံးစွဲခြင်းနဲ့ မှတ်တမ်းမှတ်ရာများဖတ်ရှုရန်များမပါဝင်ပါ။ Start Menu သို့မဟုတ် ကီးဘုတ် ဖန်တီးသူကိုဆက်သွယ်ပြီး ဒီကီးဘုတ်ကို ဘယ်လိုသုံးရမလဲ မေးမြန်းပါ</string>
+  <string name="S_Usage_KeymanOff" comment="/HTML: "> &amp;Name;မှာမည်သည့်ကီးဘုတ်လက်ကွက်မှမရွေးချယ်ထားပါ။ အပေါ်မှာရှိတဲ့ toolbarထဲက ကီးဘုတ်ပုံတစ်ခုခုကိုရွေးပြီး ကီးဘုတ်လက်ကွက် သတ်မှတ်ပါ</string>
+  <string name="S_Usage_NoKeyboardsInstalled" comment="/HTML: ">မည်သည့်ကီးဘုတ်ကိုမျှမတပ်ဆင်ထားပါ။ &amp;Name;စနစ်ဆိုင်ရာကို သုံးပြီး ကီ:ဘုတ်လက်ကွက်တစ်ခုခုထည့်သွင်းပါ</string>
+  <string name="S_Usage_OSK" comment="/PlainText: "> Screen မှာပေါ်ကီးဘုတ်</string>
+  <string name="S_Usage_Tutorial" comment="/PlainText: ">စတင်အသုံးပြုပါ</string>
+  <string name="S_Usage_Welcome" comment="/PlainText: ">ကီးဘုတ်အကူအညီ</string>
+  <string name="S_Yes" comment="/PlainText: ">လုပ်မည်</string>
+  <string name="S_OSKContext_SaveAsWebPage" comment="/PlainText: ">ဝက်ဘ်စာမျက်နှာအဖြစ်သိမ်းပါ</string>
+  <string name="S_OSKContext_ShowToolbar" comment="/PlainText: ">Toolbar ကိုပြပါ</string>
+  <string name="SK_UIFontName" comment="/PlainText: ">Segoe UI</string>
+  <string name="SK_UIFontSize" comment="/PlainText: ">9</string>
+  <string name="SKActivation_OnlineNow" comment="/FormatString: ">$(SKShortApplicationTitle) ကို အွန်လိုင်းချိတ်ပြီး လိုင်စင်နံပါတ် %0:s ဖြင့် သင်အသက်သွင်းချင်ပါသလား။
+မလုပ်ပါကိုနှိပ်လျှင် အခြားအသက်သွင်းသည့်နည်းလမ်းများ ကိုရွေးချယ်နိုင်ပါသည်။</string>
+  <string name="SKActivation_Success" comment="/FormatString: ">သင့်လိုင်စင်ကီးကိုအောင်မြင်စွာ အတည်ပြုအသက်သွင်းပြီးပါပြီ။</string>
+  <string name="SKAllLanguageSettingsTestedOK" comment="/: ">မိုက်ခရိုဆော့ဖ် ဝင်းဒိုးက သင့်ဘာသာစကားအတွက် မှန်ကန်စွာအစီအစဉ်ချထားပုံရသည်။</string>
+  <string name="SKANSIEncoding" comment="/FormatString: ">ကုဒ်စာမျက်နှာ</string>
+  <string name="SKApplicationTitle" comment="/FormatString: ">Keyman</string>
+  <string name="SKBalloonClickToSelectKeyboard" comment="/FormatString: ">ကီးဘုတ်ကိုရွေးရန်ဒီပုံကိုနှိပ်ပါ</string>
+  <string name="SKBalloonOSKClosed" comment="/FormatString: ">Keymanက လည်ပတ်နေဆဲပါ။ ပုံကိုနှိပ်ပြီး သင့်ရဲ့ဘာသာစကားကီးဘုတ်ကို ဘယ်အချိန်ဖြစ်ဖြစ်ရွေးနိုင်ပါသည်။</string>
+  <string name="SKButtonCancel" comment="/FormatString: ">ပယ်ဖျက်</string>
+  <string name="SKButtonClearHotkey" comment="/FormatString: ">&amp;ရှင်းလင်းပါ Hotkey </string>
+  <string name="SKButtonDownload" comment="/FormatString: ">&amp;ဒေါင်းလုဒ်</string>
+  <string name="SKButtonHelp" comment="/FormatString: ">အကူအညီ</string>
+  <string name="SKButtonNo" comment="/FormatString: ">&amp;မလုပ်ပါ</string>
+  <string name="SKButtonOK" comment="/FormatString: ">အိုကေ</string>
+  <string name="SKButtonPrint" comment="/FormatString: ">&amp;ပရင့်ထုတ်ပါ</string>
+  <string name="SKButtonUILanguageDownload" comment="/Format String: ">&amp; နောက်ထပ်အွန်လိုင်းမှာရှိသော ဘာသာစကားများ.....</string>
+  <string name="SKButtonYes" comment="/FormatString: ">&amp;လုပ်မည်</string>
+  <string name="SKCannotStartProduct" comment="/FormatString: ">Keymanကစတင်ရန် မအောင်မြင်ပါ။ security settingsကိုစစ်ဆေးပြီး program keyman.exe ကို စတင်ရန် ခွင့်ပြုထားခြင်းရှိမရှိ သေချာအောင် ကြည့်ပါ ။ "%0:s"အယ်ရာ။   Keyman ကို နောက်တစ်ခေါက် ပြန်စကြည့်ဦးမလား </string>
+  <string name="SKChangeHotkeyTitle" comment="/FormatString: ">Hotkey ကိုပြောင်းလဲပါ</string>
+  <string name="SKCouldNotFindHelp" comment="/FormatString: ">အကူအညီအတွက် $(SKOnlineHelpFile) ကိုရှာမတွေ့ပါ</string>
+  <string name="SKCouldNotPrintKeyboard" comment="/FormatString: ">ကီးဘုတ်ို အောင်မြင်စွာ ပရင့် ထုတ်လို့မရပါ။ ဝက်ဘ်စာမျက်နှာမှာသိမ်းဆည်းပြီး ထုတ်ယူပါ</string>
+  <string name="SKDamagedKeyboard" comment="/FormatString: ">&lt;ကီးဘုတ်ထိခိုက်ခြင်း&gt;	</string>
+  <string name="SKDebuggingWarning" comment="/FormatString: ">Keyman debug information will be stored in a text file called keymanlog\system.log on your desktop. You should exit Keyman before reading or deleting this file. WARNING: This file can grow large very quickly. Enabling debugging will slow down your system and should only be done if advised by Tavultesoft support. PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type. You should only turn on the debug log for the duration of a debugging or diagnostic session, and delete the [desktop]\keymanlog\system.log file as soon as possible</string>
+  <string name="SKDefaultLanguageCode" comment="/FormatString: ">en</string>
+  <string name="SKDialogSelectLanguage" comment="/FormatString: ">သုံးစွဲသူအတွက်ဘာသာစကားကို ရွေးချယ်ပါ</string>
+  <string name="SKDialogUILanguageCreateTranslation" comment="/FormatString: ">အွန်လိုင်းဘာသာပြန်မှုအသစ်ကို ဖန်တီးပါ</string>
+  <string name="SKDownloadProgress_Title" comment="/FormatString: ">ဖိုင်ကိုဒေါင်းလုဒ်ဆွဲနေသည်</string>
+  <string name="SKErrorActivatingBrowser" comment="/FormatString: ">ဒီ URLအတွက် browser သို့မဟုတ် email program ကိုအသက်သွင်းအတည်ပြုလို့မရပါ</string>
+  <string name="SKHintsReset" comment="/PlainText: ">အရိပ်အမွက် စကားစုများအားလုံးကို ပြန်စမှာဖြစ်ပြီး ပြန်လည်ဖော်ပြပေးပါလိမ့်မည်။</string>
+  <string name="SKHotkeyConflicts_Keyboard" comment="/FormatString: ">hotkey %0:s က ကီးဘုတ် %1:sအတွက် ရွေးချယ်ထားတဲ့ hotkey တွေနဲ့သဟဇာတမဖြစ်ပါ။ ဆက်လုပ်မယ်ဆိုလျှင် ကီးဘုတ် %1:sအတွက်ရွေးထားတဲ့ hotkeyများကို ရှင်းလင်းပစ်ပါလိမ့်မည်။ ဆက်လုပ်မှာလား</string>
+  <string name="SKInstallOnlyAsAdmin" comment="/FormatString: ">Administratorအနေနဲ့ ပဲသင်က ကီးဘုတ်ကိုတပ်ဆင်တာ ပြန်ဖြုတ်တာ တွေပြုလုပ်လို့ရပါတယ်။ Control Panel ထဲဝင်ပြီး languagesကိုရွေးကာ သာမာန်အသုံးပြုသူအဖြစ် ရွေးချယ်ပါ</string>
+  <string name="SKKeyboardAlreadyInstalled" comment="/FormatString: ">'%0:s'အမည်နဲ့ကီးဘုတ်က တပ်ဆင်ထားပြီးပါပြီ။ သင်ဆက်လုပ်မယ်ဆိုလျှင် လက်ရှိကီးဘုတ်ကို ဖြုတ်ပြီး အသစ်ကို တပ်ဆင်ပါလိမ့်မယ်။ ဆက်လုပ်မှာလား ။</string>
+  <string name="SKKeyboardPartOfPackage" comment="/FormatString: ">ကီးဘုတ်'%0:s'က  package '%1:s'ရဲ့အစိတ်အပိုင်းဖြစ်ပါသည်။ packageတစ်ခုလုံးကိုပြန်ဖြုတ်ပစ်ရမည်။ ဆက်လုပ်မှာလား ။</string>
+  <string name="SKLangCheck_Office" comment="/FormatString: ">%0:s editing support to %1:s ကိုထည့်ပါ</string>
+  <string name="SKLangCheck_Office_Office2000" comment="/FormatString: ">Microsoft Office 2000</string>
+  <string name="SKLangCheck_Office_Office2003" comment="/FormatString: ">Microsoft Office 2003</string>
+  <string name="SKLangCheck_Office_Office2007" comment="/FormatString: ">Microsoft Office 2007</string>
+  <string name="SKLangCheck_Office_Office2010" comment="/FormatString: ">Microsoft Office 2010</string>
+  <string name="SKLangCheck_Office_OfficeXP" comment="/FormatString: ">Microsoft Office XP</string>
+  <string name="SKLangCheck_WindowsLanguage_Install" comment="/FormatString: ">ဘာသာစကား%0:s ကို တပ်ဆင်ပြီး Keyman ကီးဘုတ်%1:s ကိုလင့်ခ်ချိတ်ပါ</string>
+  <string name="SKLangCheck_WindowsLanguage_Link" comment="/FormatString: ">ဘာသာစကား %0:s ကို  Keyman keyboard %1:s သို့ချိတ်ဆက်ပါ</string>
+  <string name="SKLanguageCode" comment="/FormatString: ">my</string>
+  <string name="SKMenu_NoKeyboardsInstalled" comment="/: ">ကီးဘုတ်လက်ကွက်တစ်ခုမှမသွင်းရသေးပါ။"စနစ်ပိုင်းဆိုင်ရာ"ကို ရွေးချယ်ပြီး သင့်ဘာသာစကားအတွက် ကီးဘုတ်တစ်ခုထည့်ပါ</string>
+  <string name="SKOnlineHelpFile" comment="/FormatString: ">KeymanDesktop.chm</string>
+  <string name="SKOSNotSupported" comment="/FormatString: ">လက်ရှိ စက်လည်ပတ်သော စနစ်ကို ထောက်ပံ့ထားခြင်းမရှိပါ။ အသေးစိတ်သိရှိနိုင်ရန် Tavultesoft သို့ဆက်သွယ်ပါ</string>
+  <string name="SKPackageAlreadyInstalled" comment="/FormatString: ">%0:s အမည်ရှိ package တစ်ခုကို တပ်ဆင်ထားပြီးပါပြီ။ ဒီဟာကိုပြန်ဖြုတ်ပြီး အသစ် ထပ်သွင်းချင်ပါသလား</string>
+  <string name="SKPackageDoesNotIncludeWelcome" comment="/FormatString: ">ကီးဘုတ်'%0:s' သို့မဟုတ် package မှာ စတင်အသုံးပြုချိန် အကူအညီမပါရှိပါ။</string>
+  <string name="SKSelectKeyboardsBlurb" comment="/FormatString: ">ဒီpackageထဲက ကီးဘုတ်များအားလုံးကို တပ်ဆင်လို့မရပါ။ အများဆုံး  %0:d အပိုကီးဘုတ်များကိုပဲ တပ်ဆင်လို့ရပါတယ်။ ဒီ packageထဲက တပ်ဆင်ချင်တဲ့ကီးဘုတ်များကိုရွေးချယ်ပါ</string>
+  <string name="SKSelectKeyboardsTitle" comment="/FormatString: ">တပ်ဆင်ရန်ကီးဘုတ်ကိုရွေးချယ်ပါ</string>
+  <string name="SKSetHotkey_Interface" comment="/FormatString: ">ပုံမှန် hotkeyများကို ရွေးချယ်ပါ သို့မဟုတ် "စိတ်ကြိုက်" ကိုရွေးပြီးCtrl,Shift နှင့်/သို့မဟုတ် Alt  တိုကို တွဲနှိပ်ပြီး သင်သတ်မှတ်ချင်တဲ့ hotkey ကိုနှိပ်ပါ</string>
+  <string name="SKSetHotkey_Keyboard" comment="/FormatString: ">ကီ:ဘုတ် %0:s:အတွက်
+ပုံမှန် hotkeyများကို ရွေးချယ်ပါ သို့မဟုတ် "စိတ်ကြိုက်" ကိုရွေးပြီးCtrl,Shift နှင့်/သို့မဟုတ် Alt  တိုကို တွဲနှိပ်ပြီး သင်သတ်မှတ်ချင်တဲ့ hotkey ကိုနှိပ်ပါ</string>
+  <string name="SKSetHotkey_Language" comment="/FormatString: ">ဘာသာစကား %0:s:အတွက်ပုံမှန် hotkeyများကို ရွေးချယ်ပါ သို့မဟုတ် "စိတ်ကြိုက်" ကိုရွေးပြီးCtrl,Shift နှင့်/သို့မဟုတ် Alt  တိုကို တွဲနှိပ်ပြီး သင်သတ်မှတ်ချင်တဲ့ hotkey ကိုနှိပ်ပါ</string>
+  <string name="SKShortApplicationTitle" comment="/FormatString: ">Keyman</string>
+  <string name="SKSplashVersion" comment="/FormatString: ">Version %0:s</string>
+  <string name="SKSurrogatesRequiresRestart" comment="/FormatString: ">Surrogates ရဲ့ setting ကိုပြောင်းလဲခြင်းဟာ ဝင်းဒိုးကို ပြန်စအောင် လုပ်ပါလိမ့်မည်။ အခု ဝင်းဒိုးက အစက ပြန်စမှာလား</string>
+  <string name="SKUILanguageHelp" comment="/Format String: ">Keymanရဲ့အသုံးပြုသူ အတွက်ပေါ် စေချင်တဲ့ ဘာသာစကား ကို⁣ရွေးပါ</string>
+  <string name="SKUILanguageName" comment="/FormatString: ">မြန်မာဘာသာ</string>
+  <string name="SKUILanguageNameWithEnglish" comment="/FormatString: ">မြန်မာဘာသာ (Myanmar)</string>
+  <string name="SKUnicodeData_Build" comment="/FormatString: ">အက္ခရာမြေပုံ မှာ အသုံးမပြုရသေးခင်တည်ဆောက်ရတဲ့ အက္ခရာစကားလုံးများရဲ့ဒေတာဘေ့စ် ရှိပါတယ်။  အခုတည်ဆောက်မှာလား</string>
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="/FormatString: ">ယူနီကုဒ် အက္ခရာ ဒေတာဘေ့စ်ကို လက်တလောမဖန်တီးနိုင်ဘဲ ရပ်ဆိုင်းထားပါသည်။  Error details are: %0:s</string>
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="/FormatString: ">ယူနီကုဒ် အက္ခရာ ဒေတာဘေ့စ် ကို ပြန်လည်တည်ဆောက်ဖို့အတွက် ဖျက်လို့မရပါ။ Error details are: %0:s</string>
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="/FormatString: ">ယူနီကုဒ် အက္ခရာ ဒေတာဘေ့စ် ကိုအောင်မြင်စွာ မထည့်သွင်းနိုင်ပါ။ ပြန်လည်တည်ဆောက်မှာလား</string>
+  <string name="SKUnicodeEncoding" comment="/FormatString: ">ယူနီကုဒ်</string>
+  <string name="SKUninstallKeyboard" comment="/FormatString: ">%0:s ကီးဘုတ်ကို ပြန်ဖြုတ်ဖို့ သေချာပြီလား</string>
+  <string name="SKUninstallOnScreenKeyboard" comment="/FormatString: ">%0:s အတွက်တပ်ဆင်ထားတဲ့ Screenမှာပေါ်သောကီးဘုတ်ကို ဖယ်ရှားမှာသေချာလား</string>
+  <string name="SKUninstallPackage" comment="/FormatString: "> package %0:s? %1:s ကို ပြန်ဖြုတ်မှာ သေချာလား</string>
+  <string name="SKUninstallPackageFonts" comment="/FormatString: ">အောက်ပါဖော်ပြပါဖောင့်များကို ဖယ်ရှားပစ်ပါလိမ့်မယ်။  %0:s</string>
+  <string name="SKUninstallRequireAdmin" comment="/PlainText: ">သင်ကAdministratorဖြစ်မှ ကီးဘုတ် '%0:s'ကို ဖယ်ရှားလို့ရပါမယ်</string>
+  <string name="SKUnsafeHotkey" comment="/FormatString: ">hotkey %0:s ကပုံမှန်ကီးဘုတ် အသုံး နှင့် အဆင်မပြေမှုများဖြစ်ပေါ်ပါလိမ့်မည်။ သင်က အနည်းဆုံး Ctrl သို့မဟုတ် Altကိုသုံးဖို့လိုပါလိမ့်မည်။ အခု ပြောင်းချင်ပါသလား</string>
+  <string name="SKUpdate_IconMenuExit" comment="/FormatString: ">E&amp;xit အွန်လိုင်း မွမ်းမံမှု ကို စစ်ဆေးခြင်း</string>
+  <string name="SKUpdate_IconMenuText" comment="/FormatString: ">&amp; ကိုကြည့်ပြီး Keymanမွမ်းမံမှုများကို တပ်ဆင်ပါ</string>
+  <string name="SKUpdate_IconText" comment="/FormatString: ">ပုံကိုနှိပ်ပြီး မွမ်းမံမှုများကို ဒေါင်းလုဒ်ဆွဲပြီးတပ်ဆင်ပါ</string>
+  <string name="SKUpdate_IconTitle" comment="/FormatString: ">Keyman မွမ်းမံမှုများရရှိနိုင်ပါသည်။</string>
+  <string name="SKUpdate_KeymanText" comment="/FormatString: ">Keyman %0:s</string>
+  <string name="SKUpdate_PackageText" comment="/FormatString: ">ကီးဘုတ် %0:s %1:s</string>
+  <string name="SKUpdate_UnableToContact" comment="/FormatString: ">Tavultesoft ဝက်ဘ်ဆိုဒ် ကိုဆက်သွယ်လို့မရပါ။- အင်တာနက်လိုင်းရမရ အရင်စစ်ဆေးပြီးနောက်တစ်ခေါက် ကြိုးစားပါ</string>
+  <string name="SKUpdate_UnableToContact_Error" comment="/FormatString: ">Tavultesoft ဝက်ဘ်ဆိုဒ် ကိုဆက်သွယ်လို့မရပါ။- အင်တာနက်လိုင်းရမရ အရင်စစ်ဆေးပြီးနောက်တစ်ခေါက် ကြိုးစားပါ။ The error received was: %0:s</string>
+  <string name="S_Menu_SwitchKeymanOff" comment="/PlainText: ">Keyman ကိုပိတ်</string>
+  <string name="S_Toolbar_ViewCharacterMap" comment="/PlainText: ">အက္ခရာမြေပုံကိုကြည့်ပါ</string>
+  <string name="S_Toolbar_ViewFontHelper" comment="/PlainText: ">ဖောင့်အကူအညီကိုကြည့်ပါ</string>
+  <string name="S_Toolbar_ViewKeyboardUsage" comment="/PlainText: ">ကီးဘုတ်အသုံးပြုမှုကိုကြည့်ပါ</string>
+  <string name="S_Toolbar_ViewOnScreenKeyboard" comment="/PlainText: ">Screenပေါ်သုံးကီ:ဘုတ်ကိုကြည့်ပါ</string>
+  <string name="S_KeepInTouch" comment="Configuration Dialog - Tab names/PlainText: Keep in touch tab name (introduced 9.0.493.0)">Keep in Touch</string>
+  <string name="S_KeepInTouch_AccessChar" comment="Configuration Dialog - Tab names/PlainText: Direct access to the Keep in Touch tab using alt+ (introduced 9.0.492.0)">T</string>
+  <string name="koDeadkeyConversion" comment="Configuration Dialog - Options tab/FormatString: Advanced options - Base keyboard deadkeys are treated as normal keys (introduced 9.0.480.0)">Treat hardware deadkeys as plain keys</string>
+  <string name="S_ContributeUILanguagesMenu" comment="_LanguageInfo/PlainText: Link to contribute to language UI (introduced 9.0.525.0)">Help translate the user interface...</string>
+  <string name="S_HintDialog_DontShowHintAgain" comment="Hints/PlainText: Hint dialog - caption of checkbox at bottom of dialog (introduced 10.0.836.0)">Don't show this hint again</string>
+</resources>

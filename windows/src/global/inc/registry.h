@@ -90,7 +90,10 @@
 #define REGSZ_KeymanError		"keyman error"
    // I3613
 #define REGSZ_LanguageProfiles "Language Profiles"
+#define REGSZ_TransientLanguageProfiles "Transient Language Profiles"
 #define REGSZ_ProfileGUID   "profile guid"
+#define REGWSZ_ProfileGUID L"" ## REGSZ_ProfileGUID
+#define REGSZ_LanguageProfiles_LangID "LangID"
 
 #define REGSZ_LayoutID			"layout id"
 

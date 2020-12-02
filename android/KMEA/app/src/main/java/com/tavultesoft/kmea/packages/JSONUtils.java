@@ -10,6 +10,7 @@ import java.util.Map;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.JSONParser;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -112,7 +113,7 @@ public class JSONUtils {
               }
             }
           } catch (JSONException e) {
-            Log.e(TAG, "getLanguages() Error parsing " + file.getName());
+            KMLog.LogException(TAG, "getLanguages() Error parsing " + file.getName(), e);
           }
         }
       }
@@ -143,7 +144,7 @@ public class JSONUtils {
         }
       }
     } catch (JSONException e) {
-      Log.e(TAG, "find ID() error: " + e);
+      KMLog.LogException(TAG, "find ID() error: ", e);
     }
     return ret;
   }
@@ -166,7 +167,7 @@ public class JSONUtils {
         }
       }
     } catch (JSONException e) {
-      Log.e(TAG, "findHelp() error: " + e);
+      KMLog.LogException(TAG, "findHelp() error: ", e);
     }
     return false;
   }
@@ -191,7 +192,7 @@ public class JSONUtils {
       options.put("fontBaseUri", "https://s.keyman.com/font/deploy/");
       options.put("keyboardVersion", "current");
     } catch (JSONException e) {
-      Log.e(TAG, "defaultOptions() error: " + e);
+      KMLog.LogException(TAG, "defaultOptions() error: ", e);
     }
     return options;
   }
@@ -273,7 +274,7 @@ public class JSONUtils {
               }
             }
           } catch (JSONException e) {
-            Log.e(TAG, "getLexicalModels() Error parsing " + file.getName());
+            KMLog.LogException(TAG, "getLexicalModels() Error parsing " + file.getName(), e);
           }
         }
       }

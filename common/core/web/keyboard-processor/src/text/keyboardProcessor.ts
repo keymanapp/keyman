@@ -65,10 +65,7 @@ namespace com.keyman.text {
     }
 
     private installInterface() {
-      // TODO:  replace 'window' with a (currently-unwritten) utility call that retrieves 
-      //        the global object (whether browser, Node, WebWorker).
-      //
-      //        We must ensure that the keyboard can find the API functions at the expected place.
+      // We must ensure that the keyboard can find the API functions at the expected place.
       let globalThis = utils.getGlobalObject();
       globalThis[KeyboardInterface.GLOBAL_NAME] = this.keyboardInterface;
 
@@ -137,9 +134,6 @@ namespace com.keyman.text {
             case EmulationKeystrokes.Enter:
               outputTarget.handleNewlineAtCaret();
               break;
-            case EmulationKeystrokes.Space:
-              this.keyboardInterface.output(0, outputTarget, ' ');
-              break;
             // case '\u007f': // K_DEL
               // // For (possible) future implementation.
               // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
@@ -151,7 +145,7 @@ namespace com.keyman.text {
           // Back to the standard default, pending normal matching.
           matched = false;
         }
-      }
+      } 
 
       let isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
@@ -192,7 +186,7 @@ namespace com.keyman.text {
       Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
-      if(Lkc.kName.substr(0,2) == 'U_') {
+      if(Lkc.kName && Lkc.kName.substr(0,2) == 'U_') {
         Lkc.LisVirtualKey=false;
       }
 
@@ -680,7 +674,7 @@ namespace com.keyman.text {
 (function () {
   let ns = com.keyman.text;
 
-  // Let LMLayer be available both in the browser and in Node.
+  // Let the Keyboard Processor be available both in the browser and in Node.
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = ns.KeyboardProcessor;
     //@ts-ignore

@@ -65,6 +65,7 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <ImageDebugInfo>true</ImageDebugInfo>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <Icon_MainIcon>setup_Icon.ico</Icon_MainIcon>
@@ -86,35 +87,34 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>--test-dialog</Debugger_RunParams>
+        <Debugger_RunParams>-p khmer_angkor=km,sil_euro_latin=fr</Debugger_RunParams>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="bootstrapmain.pas"/>
-        <DCCReference Include="UfrmDownloadProgress.pas"/>
+        <DCCReference Include="UfrmDownloadProgress.pas">
+            <Form>frmDownloadProgress</Form>
+        </DCCReference>
         <DCCReference Include="CommonControls.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="TntDialogHelp.pas"/>
-        <DCCReference Include="httpuploader_messageprocessor_windows.pas"/>
         <DCCReference Include="SetupForm.pas"/>
         <DCCReference Include="resource.pas"/>
         <DCCReference Include="SetupStrings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="MsiPackageCode.pas"/>
+        <DCCReference Include="Keyman.Setup.System.MsiUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
         <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\UCreateProcessAsShellUser.pas"/>
         <DCCReference Include="UfrmRunDesktop.pas">
             <Form>frmRunDesktop</Form>
         </DCCReference>
@@ -132,6 +132,22 @@
         <DCCReference Include="..\..\global\delphi\setup\SFX.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas"/>
+        <DCCReference Include="Keyman.Setup.System.InstallInfo.pas"/>
+        <DCCReference Include="Keyman.Setup.System.OnlineResourceCheck.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
+        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
+        <DCCReference Include="Keyman.Setup.System.ResourceDownloader.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.MITLicense.pas"/>
+        <DCCReference Include="Keyman.Setup.System.Locales.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.UILanguageManager.pas"/>
+        <DCCReference Include="Keyman.Setup.System.SetupUILanguageManager.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -183,33 +199,8 @@
                     <VersionInfoKeys Name="Comments"/>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvAppFrmDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvAppFrmDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvBandsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvBandsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCmpDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCmpDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCryptDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCryptDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCustomDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCustomDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDotNetCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDotNetCtrlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvGlobusDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvGlobusDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvHMIDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvHMIDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvJansDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvJansDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvManagedThreadsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvManagedThreadsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvMMDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvMMDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvNetDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvNetDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPascalInterpreterDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPascalInterpreterDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPrintPreviewDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPrintPreviewDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvRuntimeDesignDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvRuntimeDesignDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvSystemDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvSystemDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDBDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDBDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDlgsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDlgsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPageCompsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPageCompsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPluginSystemDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPluginSystemDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvStdCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvStdCtrlsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>

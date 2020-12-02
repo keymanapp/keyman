@@ -10,9 +10,11 @@ import android.util.Log;
 import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -58,39 +60,21 @@ public class KeyboardController {
       list = new ArrayList<Keyboard>();
       if (keyboards_dat.exists() && !keyboards_json.exists()) {
         try {
-          // Migrate installed_keyboards.dat to installed_keyboards.json
+          // Migrate installed_keyboards.dat to keyboards_list.json
           ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(keyboards_dat));
           ArrayList<HashMap<String, String>> dat_list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
           inputStream.close();
-
-          for(HashMap<String, String> kbdMap : dat_list) {
-            boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
-              kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
-
-            Keyboard k = new Keyboard(
-              kbdMap.get(KMManager.KMKey_PackageID),
-              kbdMap.get(KMManager.KMKey_KeyboardID),
-              kbdMap.get(KMManager.KMKey_KeyboardName),
-              kbdMap.get(KMManager.KMKey_LanguageID),
-              kbdMap.get(KMManager.KMKey_LanguageName),
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
-              isNewKeyboard,
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
-            );
-            list.add(k);
-          }
-
+          list = KMManager.updateOldKeyboardsList(context, dat_list);
         } catch (Exception e) {
-          Log.e(TAG, "Exception migrating installed_keyboards.dat");
-          list.add(Keyboard.DEFAULT_KEYBOARD);
+          KMLog.LogException(TAG, "Exception migrating installed_keyboards.dat", e);
+          list.add(Keyboard.getDefaultKeyboard(context));
         }
       } else if (keyboards_json.exists()) {
+        JSONArray json_list = null;
         try {
-          // Get installed keyboards from installed_keyboards.json
+          // Get installed keyboards from keyboards_list.json
           JSONParser jsonParser = new JSONParser();
-          JSONArray json_list = jsonParser.getJSONObjectFromFile(keyboards_json, JSONArray.class);
+          json_list = jsonParser.getJSONObjectFromFile(keyboards_json, JSONArray.class);
           if (json_list != null) {
             // Can't foreach JSONArray
             for (int i=0; i<json_list.length(); i++) {
@@ -100,24 +84,30 @@ public class KeyboardController {
                 list.add(k);
               }
             }
+          } else {
+            KMLog.LogError(TAG, KMFilename_Installed_KeyboardsList + " is null");
           }
         } catch (Exception e) {
-          Log.e(TAG, "Exception reading installed_keyboards.json");
-          list.add(Keyboard.DEFAULT_KEYBOARD);
+          KMLog.LogExceptionWithData(TAG, "Exception reading " + KMFilename_Installed_KeyboardsList,
+            KMFilename_Installed_KeyboardsList, json_list, e);
+          list.add(Keyboard.getDefaultKeyboard(context));
         }
       } else {
         // No installed keyboards lists
         // 3rd-party OEM may not have sil_euro_latin, so don't assign a default keyboard
-        //list.add(Keyboard.DEFAULT_KEYBOARD);
+        //list.add(Keyboard.getDefaultKeyboard(context));
         Log.w(TAG, "initialize with no default keyboard");
       }
 
       // We'd prefer not to overwrite a file if it exists
       if (!keyboards_json.exists() && list != null && list.size() > 0) {
         save(context);
-      }
 
-      // TODO when feature stabilized: Delete legacy keyboards_list.dat (KMManager.KMFilename_KeyboardsList)
+        // Now we can delete legacy keyboards list
+        if (keyboards_dat.exists()) {
+          keyboards_dat.delete();
+        }
+      }
     }
     isInitialized = true;
   }
@@ -128,11 +118,42 @@ public class KeyboardController {
    */
   public List<Keyboard> get() {
     if (!isInitialized) {
-      Log.e(TAG, "get while KeyboardController() not initialized");
+      KMLog.LogError(TAG, "get while KeyboardController() not initialized");
       return null;
     }
     synchronized (list) {
       return list;
+    }
+  }
+
+  /**
+   * Returns the list of installed keyboards with unique packageID/keyboardID
+   */
+  public List<Keyboard> getInstalledPackagesList() {
+    if (!isInitialized) {
+      KMLog.LogError(TAG, "getInstalledPackagesList while KeyboardController() not initialized");
+      return null;
+    }
+    synchronized (list) {
+      List<Keyboard> packagesList = new ArrayList<Keyboard>();
+      // Iterate through the installed keyboards list to find unique packageID/keyboardID
+      for (int i=0; i<list.size(); i++) {
+        Keyboard k = list.get(i);
+        String pkgID = k.getPackageID();
+        String keyboardID = k.getKeyboardID();
+        // Ignore "cloud" keyboards"
+        if (pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+          continue;
+        }
+
+        // If we search getKeyboardIndex with blank languageID, it will give us the first
+        // unique pkgID/keyboardID keyboard in the list
+        int firstMatchingIndex = getKeyboardIndex(pkgID, keyboardID, "");
+        if (firstMatchingIndex != KeyboardController.INDEX_NOT_FOUND && (firstMatchingIndex == i)) {
+          packagesList.add(k);
+        }
+      }
+      return packagesList;
     }
   }
 
@@ -143,10 +164,10 @@ public class KeyboardController {
    */
   public Keyboard getKeyboardInfo(int index) {
     if (!isInitialized) {
-      Log.e(TAG, "getKeyboardInfo while KeyboardController() not initialized");
+      KMLog.LogError(TAG, "getKeyboardInfo while KeyboardController() not initialized");
       return null;
     } else if (index < 0) {
-      Log.e(TAG, "getKeyboardInfo with invalid index: " + index);
+      KMLog.LogError(TAG, "getKeyboardInfo with invalid index: " + index);
       return null;
     }
 
@@ -157,7 +178,7 @@ public class KeyboardController {
       }
     }
 
-    Log.e(TAG, "getKeyboardInfo failed with index " + index);
+    Log.w(TAG, "getKeyboardInfo failed with index " + index);
     return null;
   }
 
@@ -170,7 +191,7 @@ public class KeyboardController {
   public int getKeyboardIndex(String key) {
     int index = INDEX_NOT_FOUND;
     if (!isInitialized || list == null) {
-      Log.e(TAG, "getIndexOfKey while KeyboardController() not initialized");
+      KMLog.LogError(TAG, "getIndexOfKey while KeyboardController() not initialized");
       return index;
     }
     if (key == null || key.isEmpty()) {
@@ -186,7 +207,44 @@ public class KeyboardController {
       }
     }
 
-    Log.e(TAG, "getKeyboardIndex failed for key " + key);
+    Log.w(TAG, "getKeyboardIndex failed for key " + key);
+    return index;
+  }
+
+  /**
+   * Given a packageID, keyboardID, and languageID, return the index of the matching keyboard.
+   * If language ID not specified, only the package ID and keyboard ID are matched
+   * @param packageID - String of the package ID
+   * @param keyboardID - String of the keyboard ID
+   * @param languageID - String of the language ID (optional)
+   * @return int - Index of the matching keyboard
+   */
+  public int getKeyboardIndex(String packageID, String keyboardID, String languageID) {
+    int index = INDEX_NOT_FOUND;
+    if (!isInitialized || list == null) {
+      KMLog.LogError(TAG, "getIndexOfKey while KeyboardController() not initialized");
+      return index;
+    }
+    if (packageID == null || packageID.isEmpty() || keyboardID == null || keyboardID.isEmpty()) {
+      return index;
+    }
+
+    boolean matchLanguage = (languageID != null && !languageID.isEmpty());
+
+    synchronized (list) {
+      for (int i=0; i<list.size(); i++) {
+        Keyboard k = list.get(i);
+        if (k.getPackageID().equals(packageID) && k.getKeyboardID().equals(keyboardID)) {
+          if ( (matchLanguage && BCP47.languageEquals(k.getLanguageID(), languageID)) ||
+              !matchLanguage ) {
+            return i;
+          }
+        }
+      }
+    }
+
+    Log.w(TAG, "getKeyboardIndex failed for packageID: " + packageID +
+      ", keyboardID: " + keyboardID + ", languageID: " + languageID);
     return index;
   }
 
@@ -200,13 +258,25 @@ public class KeyboardController {
   }
 
   /**
+   * Given a package ID, keyboard ID, and language ID, return if the keyboard exists
+   * in the installed keyboards list
+   * @param packageID - String of the package ID
+   * @param keyboardID - String of the keyboard ID
+   * @param languageID - String of the language ID
+   * @return boolean whether the matching keyboard exists
+   */
+  public boolean keyboardExists(String packageID, String keyboardID, String languageID) {
+    return getKeyboardIndex(packageID, keyboardID, languageID) != INDEX_NOT_FOUND;
+  }
+
+  /**
    * Add a new keyboard to the keyboard list. If the keyboard already exists, the keyboard
    * information is updated.
    * @param newKeyboard
    */
   public void add(Keyboard newKeyboard) {
     if (!isInitialized || list == null) {
-      Log.e(TAG, "add while KeyboardController() not initialized");
+      KMLog.LogError(TAG, "add while KeyboardController() not initialized");
       return;
     }
 
@@ -222,6 +292,27 @@ public class KeyboardController {
 
       // Add new keyboard
       list.add(newKeyboard);
+    }
+  }
+
+  /**
+   * Update a keyboard entry at a specified index
+   * @param index int of the keyboard index to update
+   * @param currentKeyboard Keyboard info
+   */
+  public void set(int index, Keyboard currentKeyboard) {
+    if (!isInitialized || list == null) {
+      KMLog.LogError(TAG, "set while KeyboardController() not initialized");
+      return;
+    }
+
+    if (index < 0 || index >= list.size()) {
+      KMLog.LogError(TAG, "set with index: " + index + " out of bounds");
+      return;
+    }
+
+    synchronized (list) {
+      list.set(index, currentKeyboard);
     }
   }
 
@@ -263,7 +354,8 @@ public class KeyboardController {
       return result;
     }
 
-    result = FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
+    result = FileUtils.saveList(new File(context.getDir("userdata", Context.MODE_PRIVATE),
+      KMFilename_Installed_KeyboardsList), arr);
     return result;
   }
 }

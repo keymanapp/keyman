@@ -156,7 +156,9 @@
 
         NSString *linkFormat = @"<a href='%@'>%@</a>";
         NSString *packageId = [self.packagePath lastPathComponent];
-        NSString *shareUrl = [NSString stringWithFormat:@"https://keyman.com/go/keyboard/%@/share", packageId];
+
+        KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
+        NSString *shareUrl = [NSString stringWithFormat:@"https://%@/go/keyboard/%@/share", keymanVersionInfo.keymanCom, packageId];
         NSString *name = [[self.infoDict objectForKey:kName] objectAtIndex:0];
         if (name == nil)
             name = @"Unknown Keyboard Package";

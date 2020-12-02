@@ -49,7 +49,7 @@ class FunctionalTestHelper {
    */
   static void setInitialKeyboard()
   {
-    KMManager.setKeyboard(Keyboard.DEFAULT_KEYBOARD);
+    KMManager.setKeyboard(KMManager.getDefaultKeyboard(ApplicationProvider.getApplicationContext()));
   }
 
   /**

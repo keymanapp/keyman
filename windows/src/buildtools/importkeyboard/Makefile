@@ -15,6 +15,10 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Developer Tools" $(PROGRAM)\buildtools\importkeyboard.exe
 
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\buildtools\importkeyboard.exe /t keyman-developer
+    $(SYMSTORE) $(DEBUGPATH)\buildtools\importkeyboard.pdb /t keyman-developer
+
 backup:
     $(WZZIP) $(BUILD)\buildtools\importkeyboard.zip  $(BACKUPDEFAULTS) importkeyboard.exe
 

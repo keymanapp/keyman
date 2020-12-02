@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/models-types",
-  "version": "14.0.80",
+  "version": "14.0.195",
   "description": "Type definitions in used in the modeling (lexical model/predictive text) component of Keyman.",
   "types": "./index.d.ts",
   "scripts": {
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman/tree/master/common/models/types#readme",
   "devDependencies": {
-    "typescript": "^3.6.3"
+    "typescript": "^3.8.3"
   },
   "files": [
     "README.md",

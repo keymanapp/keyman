@@ -5,9 +5,16 @@
     "common/core/web/tools/recorder",
     "common/core/web/tools/sentry-manager",
     "common/core/web/utils",
+    "developer/js",
     "common/models/*",
     "common/predictive-text",
+    "resources/gosh",
+    "resources/web-environment",
     "web"
   ],
-  "version": "14.0.80"
+  "hoist": [
+    "lerna",
+    "typescript"
+  ],
+  "version": "14.0.195"
 }

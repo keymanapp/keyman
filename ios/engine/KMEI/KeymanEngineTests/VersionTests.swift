@@ -28,7 +28,7 @@ class VersionTests: XCTestCase {
 
     XCTAssertNotNil(tagged, "Could not construct Verison instance from a text-tagged version string")
     XCTAssertTrue(tagged! == Version("14.0.18")!, "Did not produce expected version from text-tagged version string")
-    XCTAssertEqual(tagged!.tier, "alpha", "Did not properly store a tagged version's tier information")
+    XCTAssertEqual(tagged!.tier, .alpha, "Did not properly store a tagged version's tier information")
   }
 
   func testVersionComparison() {
@@ -61,6 +61,34 @@ class VersionTests: XCTestCase {
     let complex = Version("11.0.65.17.8")!
 
     XCTAssertTrue(complex.majorMinor == Version("11.0")!, "Did not properly trim off excess version components")
+  }
+
+  func testEquals() {
+    let simple = Version("12.0")!
+    let other = Version("12.0")!
+
+    XCTAssertTrue(simple == other)
+
+    let longer = Version("12.0.0.0")!
+
+    XCTAssertTrue(simple == longer)
+
+    let unequal_1 = Version("12.0.0.1")!
+
+    XCTAssertFalse(simple == unequal_1)
+    XCTAssertFalse(longer == unequal_1)
+
+    let diffMajor = Version("13.0")!
+
+    XCTAssertFalse(simple == diffMajor)
+
+    // Tests in "optional" mode.  Was trickier than it would appear!
+    XCTAssertEqual(Version("12.0"), Version("12.0"))
+
+    // Some tests against major-version zero to ensure the edge case is covered.
+    XCTAssertEqual(Version("0"), Version("0"))
+    XCTAssertEqual(Version("0"), Version("0.0"))
+    XCTAssertNotEqual(Version("0"), Version("0.0.1"))
   }
 
   func testValidCurrentEngineVersion() {

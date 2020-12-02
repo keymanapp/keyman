@@ -11,10 +11,7 @@
   font-family: SpecialOSK;
   font-style:  normal;
   font-weight: normal;
-  src: url('keymanweb-osk.eot');   
-  src: url('keymanweb-osk.eot?#iefix') format('embedded-opentype'), 
-    url('keymanweb-osk.ttf')  format('truetype'),
-    url('keymanweb-osk.woff') format('woff');     
+  src: url('keymanweb-osk.ttf')  format('truetype');     
 }
 
 /* kmw-key-square applies only to OSK key elements, kmw-key-square-ex applies only to popup key elements */

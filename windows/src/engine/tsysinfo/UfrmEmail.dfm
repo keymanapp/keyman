@@ -15,6 +15,7 @@ object frmEmail: TfrmEmail
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object lblEmail: TLabel
@@ -53,15 +54,15 @@ object frmEmail: TfrmEmail
     FocusControl = editTitle
   end
   object lblSecure: TLabel
-    Left = 200
-    Top = 314
-    Width = 238
+    Left = 180
+    Top = 313
+    Width = 154
     Height = 13
-    Caption = 'This report will be sent to https://api.keyman.com/'
+    Caption = 'This report will be sent to (api url)'
   end
   object Image1: TImage
     Left = 472
-    Top = 312
+    Top = 311
     Width = 12
     Height = 15
     AutoSize = True
@@ -114,7 +115,6 @@ object frmEmail: TfrmEmail
     Width = 83
     Height = 13
     Cursor = crHandPoint
-    Hint = 'http://www.keyman.com/privacy'
     Caption = 'privacy statement'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue

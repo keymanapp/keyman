@@ -4,6 +4,8 @@
     <BuildPath>$SOURCEPATH</BuildPath>
     <CompilerWarningsAsErrors>True</CompilerWarningsAsErrors>
     <WarnDeprecatedCode>True</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
   </Options>
   <Files>
     <File>
@@ -57,6 +59,32 @@
         <Name>Test invalid kmx</Name>
         <Version>1.0</Version>
       </Details>
+    </File>
+    <File>
+      <ID>id_3a8dda74b9f39a1b0d2477ee066a9f3e</ID>
+      <Filename>test_touchlayout_14_1.kmn</Filename>
+      <Filepath>test_touchlayout_14_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Touch Layout 14 (against v10)</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_e61b69a634d77a6427e676e0c7e8deb5</ID>
+      <Filename>test_touchlayout_14_2.kmn</Filename>
+      <Filepath>test_touchlayout_14_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_3469a7aa905ab5d483e0aec3da1bcab9</ID>
+      <Filename>test_touchlayout_14_3.kmn</Filename>
+      <Filepath>test_touchlayout_14_3.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
     </File>
     <File>
       <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>

@@ -42,6 +42,7 @@ object frameCEFHost: TframeCEFHost
     OnWidgetCompMsg = cefWidgetCompMsg
     OnProcessMessageReceived = cefProcessMessageReceived
     OnLoadEnd = cefLoadEnd
+    OnLoadingStateChange = cefLoadingStateChange
     OnSetFocus = cefSetFocus
     OnRunContextMenu = cefRunContextMenu
     OnPreKeyEvent = cefPreKeyEvent

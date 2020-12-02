@@ -14,7 +14,7 @@
 # KeymanWeb is copied from /web/src during Developer build
 developer/TIKE/xml/kmw/resource
 
-# These res files are generated during build
+# These files are generated during build
 developer/TIKE/icons.res
 developer/kmcmpdll/Compiler.res
 developer/kmcomp/icons.res
@@ -22,6 +22,8 @@ engine/keyman32/KEYMAN32.res
 engine/keyman64/Keyman64.res
 engine/keymanx64/keymanx64.res
 engine/mcompile/Release/
+tds_file.txt
+global/delphi/cust/MessageIdentifierConsts.pas
 
 # These are built from corresponding manifest.in and version.in
 **/manifest.xml
@@ -29,3 +31,7 @@ engine/mcompile/Release/
 
 # Breakpad files generated for Sentry
 **/*.sym
+
+# Coverity intermediate folder and files
+cov-int/
+keyman-windows-coverity.tgz

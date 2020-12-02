@@ -1,0 +1,149 @@
+!include ..\..\Defines.mak
+
+##
+## In this file, $Version, $VersionWin, and $VersionRelease will be replaced by mkver. These are not
+## Make variables, but mkver variables.
+##
+
+# In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
+!ifndef TIER
+TIER=alpha
+!endif
+
+# We use different directories so that heat generates
+# different identifiers for the various folders
+KEYMAN_WIX_TEMP_BASE=$(TEMP)\keyman_wix_build
+KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build\xml
+KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build\cef
+KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build\templates
+KEYMAN_WIX_TEMP_MODELCOMPILER=$(TEMP)\keyman_wix_build\ModelCompiler
+
+KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
+KEYMAN_MODELCOMPILER_ROOT=$(KEYMAN_ROOT)\developer\js
+
+copykmdev: makeinstaller
+    -mkdir $(ROOT)\release\$Version
+    copy /Y $(ROOT)\src\developer\inst\keymandeveloper.msi $(ROOT)\release\$Version\keymandeveloper.msi
+    copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$Version.exe $(ROOT)\release\$Version\keymandeveloper-$Version.exe
+
+test-releaseexists:
+    if exist $(ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update VERSION.md and try again & exit 1
+
+candle: heat-cef heat-xml heat-templates heat-model-compiler
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease kmdev.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
+
+clean-heat: clean-heat-model-compiler
+
+heat-xml:
+    # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)
+    mkdir $(KEYMAN_WIX_TEMP_XML)
+    xcopy $(ROOT)\src\developer\TIKE\xml\* $(KEYMAN_WIX_TEMP_XML)\ /s
+    -del /f /s /q $(KEYMAN_WIX_TEMP_XML)\Thumbs.db
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)\app\node_modules
+    -for /f %i in ('dir /a:d /s /b $(KEYMAN_WIX_TEMP_XML)\.vs') do rd /s /q %i
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_XML) -o xml.wxs -ag -cg XML -dr INSTALLDIR -var var.XmlSourceDir -wx -nologo
+    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)
+
+heat-templates:
+    # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_TEMPLATES)
+    mkdir $(KEYMAN_WIX_TEMP_TEMPLATES)
+    xcopy $(KEYMAN_DEVELOPER_TEMPLATES_ROOT)\* $(KEYMAN_WIX_TEMP_TEMPLATES)\ /s
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_TEMPLATES) -o templates.wxs -ag -cg Templates -dr dirProjects -var var.TemplatesSourceDir -wx -nologo
+    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_TEMPLATES)
+
+heat-cef:
+    # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
+    mkdir $(KEYMAN_WIX_TEMP_CEF)
+    xcopy $(KEYMAN_CEF4DELPHI_ROOT)\* $(KEYMAN_WIX_TEMP_CEF)\ /s
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_CEF) -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
+    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
+
+heat-model-compiler:
+    # Build kmlmc
+    cd $(KEYMAN_MODELCOMPILER_ROOT)
+
+!ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) build.sh
+!else
+    start /wait .\build.sh
+!endif
+    # We use `npm pack` to extract only the aspects of the model-compiler actually needed for distribution.
+    # While we could use npm-bundle or similar, that adds extra, unwanted cruft; our approach gives us more
+    # control of the set of files distributed with the Keyman Developer installer.
+    #
+    # For users on other operating systems, node.js is a dependency and the compiler can be installed with
+    # `npm install @keymanapp/lexical-model-compiler`.
+
+    # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+
+    # Step 1 - npm-pack the model compiler package, then unpack it in our bundling directory.
+    # This automatically strips the package to its barebones.
+    npm pack
+    ren keymanapp-lexical-model-compiler*.tgz kmlmc.tgz
+    move kmlmc.tgz $(KEYMAN_WIX_TEMP_BASE)
+
+    # We extract the npm-packed version of the model compiler in order to reproduce our needed bundle.
+    cd $(KEYMAN_WIX_TEMP_BASE)
+
+    # Requires use of 7-zip, which we're already depending on elsewhere in the build process.
+    $(WZZIPPATH) x kmlmc.tgz
+    $(WZZIPPATH) x kmlmc.tar
+
+    # Creates the directory referenced by $(KEYMAN_WIX_TEMP_MODELCOMPILER).
+    move package ModelCompiler
+
+    # Cleans up the npm pack artifacts, which are no longer needed.
+    del kmlmc.tgz
+    del kmlmc.tar
+
+    # Step 2 - the model compiler has one in-repo dependency that will also need to be packed.
+    # Managing other in-repo dependencies will be simpler; they install into ModelCompiler's
+    # extracted bundle.
+    cd $(KEYMAN_MODELCOMPILER_ROOT)\node_modules\@keymanapp\models-types
+    npm pack
+    ren keymanapp-models-types*.tgz kmtypes.tgz
+    move kmtypes.tgz $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+
+    # Step 3 - install just the bare essentials by using our packed local dependency, followed by
+    # all external production dependencies.
+    cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+    # package-lock.json wasn't bundled; this is needed to keep dependency versions consistent.
+    copy $(KEYMAN_MODELCOMPILER_ROOT)\package-lock.json $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+    npm install kmtypes.tgz --production --no-optional
+    npm install --production --no-optional
+
+    # Clean up the npm pack artifacts for the dependencies.
+    del kmtypes.tgz
+
+    # We don't need the unit tests
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\tests
+
+    # Build the .wxs file
+    cd $(ROOT)\src\developer\inst
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_MODELCOMPILER) -o kmlmc.wxs -ag -cg ModelCompiler -dr INSTALLDIR -var var.ModelCompilerSourceDir -wx -nologo
+
+clean-heat-model-compiler:
+    # the production build generates files that are not in source, e.g. .ps1 scripts
+    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+
+makeinstaller:
+    cd $(ROOT)\src\developer\inst
+    echo [Setup] > setup.inf
+    echo Version=$Version >> setup.inf
+    echo MSIFileName=keymandeveloper.msi >> setup.inf
+    echo Title=Keyman Developer $VersionRelease >>setup.inf
+    $(WZZIP) setup.zip keymandeveloper.msi setup.inf
+    copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$Version.exe
+    $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$Version.exe

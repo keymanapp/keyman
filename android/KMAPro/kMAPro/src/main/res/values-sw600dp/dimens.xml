@@ -4,12 +4,14 @@
          Customize dimensions originally defined in res/values/dimens.xml (such as
          screen margins) for sw600dp devices (e.g. 7" tablets) here.
     -->
-    <dimen name="label_width">400dp</dimen>
-    <dimen name="titlebar_label_textsize">6.75sp</dimen>
+    <dimen name="label_width">450dp</dimen>
+    <dimen name="titlebar_label_textsize">28sp</dimen>
+    <dimen name="info_label_textsize">14sp</dimen>
+    <dimen name="info_label_height">34dp</dimen>
     <dimen name="product_logo_bottom">196dp</dimen>
     <dimen name="checkbox_margin">18dp</dimen>
     <dimen name="checkbox_margin_left">12dp</dimen>
     <dimen name="checkbox_padding">10dp</dimen>
     <dimen name="preference_icon">32dp</dimen>
-  <dimen name="update_indicator_bg_margin">10dp</dimen>
+    <dimen name="update_indicator_bg_margin">10dp</dimen>
 </resources>

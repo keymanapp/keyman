@@ -6,14 +6,14 @@
 available_platforms=(android ios linux mac web windows)
 
 # the base folder for each pattern does not need to be included, nor oem folders
-# e.g. android='common/predictive-text|common/lexical-model-types'
-# will expand into android='^(android|(oem/[^/]+/android)|common/predictive-text|common/lexical-model-types)'
+# e.g. android='common/models|common/predictive-text'
+# will expand into android='^(android|(oem/[^/]+/android)|common/models|common/predictive-text)'
 
-watch_android='web|common/predictive-text|common/lexical-model-types'
-watch_ios='web|common/predictive-text|common/lexical-model-types'
+watch_android='web|common/models|common/predictive-text|common/lexical-model-types'
+watch_ios='web|common/models|common/predictive-text|common/lexical-model-types'
 watch_linux='common/engine'
 watch_mac='common/engine'
-watch_web='common/predictive-text|common/lexical-model-types'
+watch_web='common/models|common/predictive-text|common/lexical-model-types'
 
 # Windows currently builds Developer and Desktop, so we need everything from common,developer,web
 watch_windows='common|developer|web'

@@ -38,8 +38,8 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak';
-type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage;
+type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak' | 'accept' | 'revert';
+type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage | AcceptMessage | RevertMessage;
 
 /**
  * The structure of a config message.  It should include the platform's supported
@@ -54,6 +54,27 @@ interface ConfigMessage {
   capabilities: Capabilities;
 }
 
+interface ModelFile {
+  type: 'file';
+
+  /**
+   * The model should be loaded from a file via importScripts.
+   */
+  file: string;
+}
+
+interface ModelEval {
+  type: 'raw';
+
+  /**
+   * Rather than loading a file, this specifies the contents that would normally be within
+   * a .model.ts file.  Useful for dynamically-compiled models that occur when testing.
+   */
+  code: string;
+}
+
+type ModelSourceSpec = ModelFile | ModelEval;
+
 /**
  * The structure of an initialization message. It should include the model (either in
  * source code or parameter form), as well as the keyboard's capabilities.
@@ -64,7 +85,7 @@ interface LoadMessage {
   /**
    * The model's compiled JS file.
    */
-  model: string;
+  source: ModelSourceSpec;
 }
 
 /**
@@ -118,19 +139,87 @@ interface WordbreakMessage {
   context: Context;
 }
 
+interface AcceptMessage {
+  message: 'accept';
+
+  /**
+   * Opaque, unique token that pairs this accept message with its return message.
+   */
+  token: Token;
+
+  /**
+   * The Suggestion being accepted.  The ID must be assigned.
+   */
+  suggestion: Suggestion & {id: number};
+
+  /**
+   * The context (text to the left and text to right) at the
+   * insertion point/text cursor, at the moment the Suggestion
+   * was generated.
+   */
+  context: Context;
+
+  /**
+   * A Transform representing any text manipulations applied to 
+   * the Context after the `suggestion` was generated.  
+   * 
+   * Necessary, as Suggestions are generated without applying their
+   * triggering keystroke to the Context.  (The current context is 
+   * thus likely to differ.)
+   */
+  postTransform?: Transform;
+}
+
+interface RevertMessage {
+  message: 'revert';
+
+  /**
+   * Opaque, unique token that pairs this accept message with its return message.
+   */
+  token: Token;
+
+  /**
+   * The Reversion being applied.  The ID must be assigned and should be the additive inverse
+   * of the Suggestion being reverted.
+   */
+  reversion: Reversion;
+
+  /**
+   * The Context being reverted, which should be the same context as resulted from applying the
+   * corresponding Suggestion.
+   */
+  context: Context;
+}
 
 /**
- * Represents a state in the LMLayer.
+ * The LMLayer can be in one of the following states. The LMLayer can only produce predictions in the 'ready' state.
  */
-interface LMLayerWorkerState {
-  /**
-   * Informative property. Name of the state. Currently, the LMLayerWorker can only
-   * be the following states:
-   */
-  name: 'unconfigured' | 'modelless' | 'ready';
+type LMLayerWorkerState = LMLayerWorkerUnconfiguredState | LMLayerWorkerModellessState | LMLayerWorkerReadyState;
+
+/**
+ * Represents the unconfigured state of the LMLayer.
+ */
+interface LMLayerWorkerUnconfiguredState {
+  name: 'unconfigured';
   handleMessage(payload: IncomingMessage): void;
 }
 
+/**
+ * Represents the pre-model-load state of the LMLayer.
+ */
+interface LMLayerWorkerModellessState {
+  name: 'modelless';
+  handleMessage(payload: IncomingMessage): void;
+}
+
+/**
+ * Represents the 'ready' state of the LMLayer.
+ */
+interface LMLayerWorkerReadyState {
+  name: 'ready';
+  handleMessage(payload: IncomingMessage): void;
+  compositor: ModelCompositor;
+}
 
 /**
  * Constructors that return worker internal models.

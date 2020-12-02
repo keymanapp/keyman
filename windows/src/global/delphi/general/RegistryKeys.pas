@@ -103,8 +103,6 @@ const
 
   SRegValue_Engine_OEMProductPath = 'oem product path';
 
-  SRegValue_Transparency = 'transparency';                                          // CU, 0 or missing = heuristic, 1 = force enable, 2 = force disable, I2555
-
 //  SRegValue_UnknownLayoutID         = 'unknown layout id';                          // LM
     SRegValue_Legacy_Default_UnknownLayoutID = '000005FE';   // I4220
 
@@ -135,6 +133,9 @@ const
   SRegValue_AutoSwitchOSKPages                = 'auto switch osk pages'; // CU, default true
   SRegValue_SwitchLanguageWithKeyboard        = 'switch language with keyboard'; // CU, default true
   SRegValue_SwitchLanguageForAllApplications  = 'switch language for all applications'; // CU, default true
+
+  SRegValue_DeepTSFIntegration = 'deep tsf integration'; // LM, 0=disable, 1=enable, 2=default
+  SRegKey_AppIntegration = SRegKey_KeymanEngine_LM + '\App Integration'; //KM
 
   { On Screen Keyboard Settings }
 
@@ -193,6 +194,7 @@ const
   SRegKey_ActiveKeyboards_CU = SRegKey_KeymanEngine_CU + '\Active Keyboards';                   // CU
 
   SRegSubKey_KeyboardOptions = 'Options';  // CU\ActiveKeyboards\<id>\Options
+  SRegSubKey_KeyboardLanguages = 'Languages'; //CU\ActiveKeyboards\<id>\Disabled Languages
 
   SRegValue_KeymanID            = 'keyman id';                                      // CU
   SRegValue_Legacy_KeymanInstalledLanguage = 'keyman installed language';                  // CU   // I4220
@@ -217,17 +219,19 @@ const
   SRegValue_Legacy_DefaultLanguageID   = 'default language id';                            // LM CU   // I4220
   SRegValue_VisualKeyboard      = 'visual keyboard';                                // LM CU
 
-  SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM CU   // I3581
-
   SRegSubKey_SuggestedLanguages = 'Suggested Languages';                            // LM
 
   { Language Profiles }
 
   {$MESSAGE HINT 'Refactor this to use SRegKeyNode naming (no prefix \); fixup references'}
-  SRegSubKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM CU
-  SRegValue_LanguageProfileLangID = 'LangID';
-  SRegValue_LanguageProfileLocale = 'Locale';
-  SRegValue_LanguageProfileName = 'Name';
+  SRegSubKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM
+  SRegSubKey_TransientLanguageProfiles = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Transient Language Profiles';  // LM
+  SRegValue_LanguageProfileLangID = 'LangID';                                       // LM SRegSubKey_LanguageProfiles
+  SRegValue_LanguageProfileLocale = 'Locale';                                       // LM SRegSubKey_LanguageProfiles
+  SRegValue_LanguageProfileName = 'Name';                                           // LM SRegSubKey_LanguageProfiles
+  SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM SRegSubKey_LanguageProfiles, SRegSubKey_TransientLanguageProfiles
+
+  SRegKey_Keyman_Temp_BackupProfiles = SRegKey_KeymanEngine_CU + '\Temp Backup Profiles'; // CU
 
   { InstalledPackages }
 
@@ -240,10 +244,6 @@ const
   { Latin keyboard cache }
 
   SRegKey_LatinKeyboardCache_LM = SRegKey_KeymanEngine_LM + '\Latin Keyboard Cache';      // LM   // I4169
-
-  { Internet Explorer feature control }
-
-  SRegKey_InternetExplorerFeatureBrowserEmulation_CU = 'Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION';   // I4436
 
   { System KeyboardLayouts }
 
@@ -264,6 +264,12 @@ const
   SRegKey_KeyboardLayout_CU = 'keyboard layout';                                       // CU
   SRegKey_KeyboardLayoutPreload_CU = 'keyboard layout\preload';                        // CU
   SRegKey_KeyboardLayoutSubstitutes_CU = 'keyboard layout\substitutes';                // CU
+
+  SRegKey_ControlPanelInternationalUserProfile = 'Control Panel\International\User Profile'; // CU
+
+  SRegValue_CPIUP_Languages = 'Languages';
+  SRegValue_CPIUP_TransientLangId = 'TransientLangId';
+  SRegValue_CPIUP_CachedLanguageName = 'CachedLanguageName';
 
   { User profile keys }
 
@@ -440,6 +446,9 @@ const
   SRegKey_KeymanEngineDebug_CU = SRegKey_KeymanEngineRoot_CU + '\Debug';
 
   SRegValue_Flag_UseRegisterHotkey = 'Flag_UseRegisterHotkey';
+  SRegValue_Flag_ShouldSerializeInput = 'Flag_ShouldSerializeInput';
+  SRegValue_Flag_UseAutoStartTask = 'Flag_UseAutoStartTask';
+
 // Fixed path names
 const
   // PF = CSIDL_PROGRAM_FILES
@@ -463,6 +472,8 @@ const
 
 function BuildKeyboardOptionKey_CU(const KeyboardID: string): string;
 function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
+function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string;
+function BuildKeyboardLanguagesKey_CU(const KeyboardID: string): string;
 
 implementation
 
@@ -474,6 +485,16 @@ end;
 function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
 begin
   Result := SRegKey_InstalledKeyboards_LM + '\' + KeyboardID + SRegSubKey_LanguageProfiles;
+end;
+
+function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string;
+begin
+  Result := SRegKey_InstalledKeyboards_LM + '\' + KeyboardID + '\' + SRegSubKey_SuggestedLanguages;
+end;
+
+function BuildKeyboardLanguagesKey_CU(const KeyboardID: string): string;
+begin
+  Result := SRegKey_ActiveKeyboards_CU + '\' + KeyboardID + '\' + SRegSubKey_KeyboardLanguages;
 end;
 
 end.

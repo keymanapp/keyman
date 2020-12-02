@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.util.Log;
 
+import com.tavultesoft.kmea.util.KMLog;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -60,13 +62,13 @@ public class CloudDownloadMgr{
       aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     } catch (IllegalStateException e) {
       String message = "initialize error: ";
-      Log.e(TAG, message + e);
+      KMLog.LogException(TAG, message, e);
     }
     isInitialized = true;
   }
 
   /**
-   * Append downloadreceiver to the main context.
+   * Remove downloadreceiver from the main context.
    * @param aContext the context
    */
   public synchronized void shutdown(Context aContext)
@@ -77,7 +79,7 @@ public class CloudDownloadMgr{
       aContext.unregisterReceiver(completeListener);
     } catch (IllegalStateException e) {
       String message = "shutdown error: ";
-      Log.e(TAG, message + e);
+      KMLog.LogException(TAG, message, e);
     }
     isInitialized = false;
   }
@@ -138,7 +140,7 @@ public class CloudDownloadMgr{
 
       CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(anInternalDownloadId);
       if(_parentSet==null) {
-        Log.e(TAG, "Download with ID " + anInternalDownloadId + " is not available");
+        KMLog.LogError(TAG, "Download with ID " + anInternalDownloadId + " is not available");
         return;
       }
       _parentSet.setDone(anInternalDownloadId);

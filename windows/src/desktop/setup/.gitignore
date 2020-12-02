@@ -1,0 +1,7 @@
+Keyman.Setup.System.Locales.pas
+Keyman.Setup.System.Locale.*.pas
+
+# These files are often copied in for testing purposes -- ignore them
+*.msi
+*.kmp
+setup.inf

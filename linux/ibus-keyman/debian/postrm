@@ -13,11 +13,15 @@ case "$1" in
       ! gspid=`ps -C gnome-shell -o pid=|head -n 1`
       if [ "x$gspid" != "x" ]; then
         # gnome-shell has multiple ibus-daemon processes and needs exit instead of restart
-        ibususer=`ps -C ibus-daemon -o user=|grep -v gdm|uniq`
-        sudo -H -u "$ibususer" ibus exit
+        ibususers=`ps -C ibus-daemon -o user=|grep -v gdm|uniq`
+        for ibususer in $ibususers; do
+          sudo -H -u "$ibususer" ibus exit || true
+        done
       else
-        ibususer=`ps -C ibus-daemon -o user=`
-        sudo -H -u "$ibususer" ibus restart
+        ibususers=`ps -C ibus-daemon -o user=|uniq`
+        for ibususer in $ibususers; do
+          sudo -H -u "$ibususer" ibus restart || true
+        done
       fi
     fi
   ;;

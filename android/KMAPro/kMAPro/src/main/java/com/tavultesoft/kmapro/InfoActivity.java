@@ -4,13 +4,13 @@
 
 package com.tavultesoft.kmapro;
 
+import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.FormFactor;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -18,15 +18,14 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
-import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 
 public class InfoActivity extends AppCompatActivity {
-
+  private final static String TAG = "InfoActivity";
   private WebView webView;
-  private final String kmHelpBaseUrl = "https://help.keyman.com/products/android";
+  private final String HELP_PRODUCTION_HOST = "help.keyman.com";
+  private final String HELP_STAGING_HOST = "help.keyman-staging.com";
+  private final String HELP_BASE_FORMAT_STR = "https://%s/products/android/%s/%s?embed=android&formfactor=%s";
   private String kmUrl = "";
   private final String htmlPath = "file:///android_asset/info/products/android";
   private final String htmlPage = "index.php";
@@ -40,34 +39,13 @@ public class InfoActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_info);
 
-    Toolbar toolbar = findViewById(R.id.info_toolbar);
-    setSupportActionBar(toolbar);
-    getSupportActionBar().setTitle(null);
-    getSupportActionBar().setDisplayUseLogoEnabled(true);
-    getSupportActionBar().setDisplayShowHomeEnabled(true);
-    getSupportActionBar().setLogo(R.drawable.keyman_logo);
-    getSupportActionBar().setDisplayShowTitleEnabled(false);
-    getSupportActionBar().setDisplayShowCustomEnabled(true);
+    TextView version = findViewById(R.id.infoVersion);
 
-    TextView version = new TextView(this);
-    version.setWidth((int) getResources().getDimension(R.dimen.label_width));
-    version.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
-    version.setGravity(Gravity.CENTER);
+    // Parse app version string to create a version title (Not using KMManager.getVersion() because that's for KMEA)
+    String versionStr = BuildConfig.VERSION_NAME;
 
-    // Parse to create a version title
-    String versionStr = "";
-    PackageInfo pInfo;
-    try {
-      pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-      versionStr = pInfo.versionName;
-    } catch (NameNotFoundException e) {
-      // Fallback to a "current" version. This does not need to be maintained
-      versionStr = "12.0.0.0";
-    }
-
-    String versionTitle = String.format("%s: %s", getString(R.string.title_version), versionStr);
+    String versionTitle = String.format(getString(R.string.title_version), versionStr);
     version.setText(versionTitle);
-    getSupportActionBar().setCustomView(version);
 
     // Extract the the major minor version from the full version string
     String[] versionArray = versionStr.split("\\.", 3);
@@ -83,7 +61,17 @@ public class InfoActivity extends AppCompatActivity {
       formFactor = "tablet";
     }
 
-    kmUrl = String.format("%s/%s/%s?embed=android&formfactor=%s", kmHelpBaseUrl, majorMinorVersion, htmlPage, formFactor);
+    String helpHost = "";
+    switch (KMManager.getTier(BuildConfig.VERSION_NAME)) {
+      case ALPHA:
+      case BETA:
+        helpHost = HELP_STAGING_HOST;
+        break;
+      default:
+        helpHost = HELP_PRODUCTION_HOST;
+    }
+
+    kmUrl = String.format(HELP_BASE_FORMAT_STR, helpHost, majorMinorVersion, htmlPage, formFactor);
     // The offline mirroring process (currently) adds .html to the end of the whole string.
     kmOfflineUrl = String.format("%s/%s/%s.html", htmlPath, formFactor, htmlPage);
     webView = (WebView) findViewById(R.id.infoWebView);

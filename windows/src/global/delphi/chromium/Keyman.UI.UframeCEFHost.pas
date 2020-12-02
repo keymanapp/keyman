@@ -40,6 +40,12 @@ const
   CEF_COMMAND = WM_USER + 310;
   CEF_RESIZEFROMDOCUMENT = WM_USER + 311;
   CEF_SETFOCUS = WM_USER + 312;
+  CEF_LOADINGSTATECHANGE = WM_USER + 313;
+
+
+  CEF_LOADINGSTATECHANGE_ISLOADING = $0001;
+  CEF_LOADINGSTATECHANGE_CANGOBACK = $0002;
+  CEF_LOADINGSTATECHANGE_CANGOFORWARD = $0004;
 
 type
   TCEFHostKeyEventData = record
@@ -66,14 +72,15 @@ type
 
   PCEFTitleChangeEventData = ^TCEFTitleChangeEventData;
 
-  TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; out Handled: Boolean) of object;
-  TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; wasHandled: Boolean) of object;
+  TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean) of object;
+  TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean) of object;
   TCEFCommandEvent = procedure(Sender: TObject; const command: string; params: TStringList) of object;
 
   TCEFHostPreKeySyncEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean) of object;
   TCEFHostKeyEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean) of object;
   TCEFHostTitleChangeEvent = procedure(Sender: TObject; const title: string) of object;
   TCEFHostResizeFromDocumentEvent = procedure(Sender: TObject; width, height: Integer) of object;
+  TCEFHostLoadingStateChangeEvent = procedure(Sender: TObject; isLoading, canGoBack, canGoForward: Boolean) of object;
 
   TframeCEFHost = class(TForm, IKeymanCEFHost)
     tmrRefresh: TTimer;
@@ -122,6 +129,8 @@ type
       const browser: ICefBrowser; sourceProcess: TCefProcessId;
       const message: ICefProcessMessage; out Result: Boolean);
     procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
+    procedure cefLoadingStateChange(Sender: TObject; const browser: ICefBrowser;
+      isLoading, canGoBack, canGoForward: Boolean);
   private
     FApplicationHandle: THandle;
     FNextURL: string;
@@ -141,6 +150,8 @@ type
     FOnCommand: TCEFCommandEvent;
     FOnResizeFromDocument: TCEFHostResizeFromDocumentEvent;
     FOnHelpTopic: TNotifyEvent;
+    FIsCreated: Boolean;
+    FOnLoadingStateChange: TCEFHostLoadingStateChangeEvent;
 
     procedure CallbackWndProc(var Message: TMessage);
 
@@ -158,6 +169,7 @@ type
     procedure Handle_CEF_COMMAND(var message: TMessage);
     procedure Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);
     procedure Handle_CEF_SETFOCUS(var message: TMessage);
+    procedure Handle_CEF_LOADINGSTATECHANGE(var message: TMessage);
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -168,7 +180,7 @@ type
 
     procedure CreateBrowser;
     procedure Navigate; overload;
-    procedure DoBeforeBrowse(const url: string; out Handled: Boolean; ShouldOpenUrlIfNotHandled: Boolean);
+    procedure DoBeforeBrowse(const url: string; isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
   public
     procedure DoResizeByContent;
     procedure SetFocus; override;
@@ -187,6 +199,7 @@ type
     property OnPreKeySyncEvent: TCEFHostPreKeySyncEvent read FOnPreKeySyncEvent write FOnPreKeySyncEvent;
     property OnKeyEvent: TCEFHostKeyEvent read FOnKeyEvent write FOnKeyEvent;
     property OnResizeFromDocument: TCEFHostResizeFromDocumentEvent read FOnResizeFromDocument write FOnResizeFromDocument;
+    property OnLoadingStateChange: TCEFHostLoadingStateChangeEvent read FOnLoadingStateChange write FOnLoadingStateChange;
   end;
 
 // Helpers to make sure we don't accidentally code
@@ -315,6 +328,7 @@ end;
 procedure TframeCEFHost.CreateBrowser;
 begin
   AssertVclThread;
+  FIsCreated := True;
   tmrCreateBrowser.Enabled := not cef.CreateBrowser(cefwp);
 end;
 
@@ -330,6 +344,13 @@ begin
   AssertVclThread;
   if FNextURL = '' then
     Exit;
+
+  if not FIsCreated then
+  begin
+    cef.DefaultUrl := FNextURL;
+    FNextURL := '';
+    Exit;
+  end;
 
   if not cef.Initialized then
   begin
@@ -366,6 +387,7 @@ begin
     CEF_COMMAND: Handle_CEF_COMMAND(Message);
     CEF_RESIZEFROMDOCUMENT: Handle_CEF_RESIZEFROMDOCUMENT(Message);
     CEF_SETFOCUS: Handle_CEF_SETFOCUS(Message);
+    CEF_LOADINGSTATECHANGE: Handle_CEF_LOADINGSTATECHANGE(Message);
   end;
 
   if Self <> nil then
@@ -412,28 +434,30 @@ procedure TframeCEFHost.Handle_CEF_BEFOREBROWSE(var message: TMessage);
 var
   params: TStringList;
   url: string;
-  wasHandled,
+  isPopup, wasHandled,
   shouldOpenUrlIfNotHandled: Boolean;
 begin
   AssertVclThread;
+
   params := TStringList(message.LParam);
   url := params[0];
-  params.Delete(0);
-
-  wasHandled := Boolean(message.WParamLo);
-  shouldOpenUrlIfNotHandled := Boolean(message.WParamHi);
+  wasHandled := (message.WParam and 1) = 1;
+  shouldOpenUrlIfNotHandled := (message.WParam and 2) = 2;
+  isPopup := (message.WParam and 4) = 4;
 
   if wasHandled then
   begin
     if Assigned(FOnBeforeBrowse) then
     begin
-      FOnBeforeBrowse(Self, url, Boolean(message.WParam));
+      FOnBeforeBrowse(Self, url, isPopup, wasHandled);
     end;
 
-    if FShouldOpenRemoteUrlsInBrowser and (params.Count = 0) and not IsLocalURL(URL) then
+    if FShouldOpenRemoteUrlsInBrowser and not IsLocalURL(URL) then
+    begin
       {$MESSAGE HINT 'Refactor how remote URLs are handled'}
       // TODO: refactor links
       TUtilExecute.URL(url);
+    end;
   end
   else if shouldOpenUrlIfNotHandled then
     cef.LoadURL(url);
@@ -467,12 +491,13 @@ procedure TframeCEFHost.cefBeforeBrowse(Sender: TObject;
 begin
   AssertCefThread;
 
-  DoBeforeBrowse(request.Url, Result, False);
+  DoBeforeBrowse(request.Url, False, False, Result);
 end;
 
-procedure TframeCEFHost.DoBeforeBrowse(const url: string; out Handled: Boolean; ShouldOpenUrlIfNotHandled: Boolean);
+procedure TframeCEFHost.DoBeforeBrowse(const url: string; isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
 var
   params: TStringList;
+  wParam: DWORD;
 begin
   AssertCefThread;
 
@@ -480,7 +505,7 @@ begin
 
   if Assigned(FOnBeforeBrowseSync) then
   begin
-    FOnBeforeBrowseSync(Self, url, Handled);
+    FOnBeforeBrowseSync(Self, url, isPopup, Handled);
   end;
 
   if not Handled and GetParamsFromURL(Url, params) then
@@ -497,24 +522,16 @@ begin
       Handled := True;
 
     params := TStringList.Create;
-    params.Insert(0, Url);
-    PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, MAKELONG(WORD(Handled), WORD(ShouldOpenUrlIfNotHandled)), LPARAM(params));
+    params.Add(Url);
+    wParam := 0;
+    if Handled then
+      wParam := wParam or 1;
+    if ShouldOpenUrlIfNotHandled then
+      wParam := wParam or 2;
+    if isPopup then
+      wParam := wParam or 4;
+    PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, wParam, LPARAM(params));
   end;
-
-  {params := nil;
-
-  if not Handled then
-    Handled := GetParamsFromURL(Url, params);
-
-  if not Handled and FShouldOpenRemoteUrlsInBrowser and not IsLocalURL(URL) then
-    Handled := True;
-
-  if not Assigned(params) then
-    params := TStringList.Create;
-
-  params.Insert(0, Url);
-
-  PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, MAKELONG(WORD(Handled), WORD(ShouldOpenUrlIfNotHandled)), LPARAM(params));}
 end;
 
 procedure TframeCEFHost.cefBeforeClose(Sender: TObject; const browser: ICefBrowser);
@@ -550,6 +567,19 @@ procedure TframeCEFHost.cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
 begin
   AssertCefThread;
   PostMessage(FCallbackWnd, CEF_LOADEND, httpStatusCode, 0);
+end;
+
+procedure TframeCEFHost.cefLoadingStateChange(Sender: TObject;
+  const browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean);
+var
+  v: Integer;
+begin
+  AssertCefThread;
+  v := 0;
+  if isLoading then v := v or CEF_LOADINGSTATECHANGE_ISLOADING;
+  if canGoBack then v := v or CEF_LOADINGSTATECHANGE_CANGOBACK;
+  if canGoForward then v := v or CEF_LOADINGSTATECHANGE_CANGOFORWARD;
+  PostMessage(FCallbackWnd, CEF_LOADINGSTATECHANGE, v, 0);
 end;
 
 procedure TframeCEFHost.Handle_CEF_KEYEVENT(var message: TMessage);
@@ -590,6 +620,19 @@ begin
 
   if Assigned(FOnLoadEnd) then
     FOnLoadEnd(Self);
+end;
+
+procedure TframeCEFHost.Handle_CEF_LOADINGSTATECHANGE(var message: TMessage);
+begin
+  if csDestroying in ComponentState then
+    Exit;
+  AssertVclThread;
+
+  if Assigned(FOnLoadingStateChange) then
+    FOnLoadingStateChange(Self,
+      (message.WParam and CEF_LOADINGSTATECHANGE_ISLOADING) <> 0,
+      (message.WParam and CEF_LOADINGSTATECHANGE_CANGOBACK) <> 0,
+      (message.WParam and CEF_LOADINGSTATECHANGE_CANGOFORWARD) <> 0);
 end;
 
 procedure TframeCEFHost.Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);
@@ -663,7 +706,7 @@ procedure TframeCEFHost.cefBeforePopup(Sender: TObject;
   var settings: TCefBrowserSettings; var noJavascriptAccess, Result: Boolean);
 begin
   AssertCefThread;
-  DoBeforeBrowse(targetUrl, Result, True);
+  DoBeforeBrowse(targetUrl, True, True, Result);
 end;
 
 procedure TframeCEFHost.cefRunContextMenu(Sender: TObject;

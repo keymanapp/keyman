@@ -80,11 +80,13 @@ class LMLayerWorker {
    */
   private _importScripts: ImportScripts;
 
+  private self: any;
+
   private _platformCapabilities: Capabilities;
 
   private _hostURL: string;
 
-  private _currentModelSource: string;
+  private _currentModelSource: ModelSourceSpec;
 
   constructor(options = {
     importScripts: null,
@@ -130,14 +132,23 @@ class LMLayerWorker {
     let im = event.data as IncomingMessage;
     if(im.message == 'load') {
       let data = im as LoadMessage;
-      if(data.model == this._currentModelSource) {
+      let duplicated = false;
+      if(this._currentModelSource && data.source.type == this._currentModelSource.type) {
+        if(data.source.type == 'file' && data.source.file == (this._currentModelSource as ModelFile).file) {
+          duplicated = true;
+        } else if(data.source.type == 'raw' && data.source.code == (this._currentModelSource as ModelEval).code) {
+          duplicated = true;
+        }
+      }
+
+      if(duplicated) {
         // Some JS implementations don't allow web workers access to the console.
         if(typeof console !== 'undefined') {
           console.warn("Duplicate model load message detected - squashing!");
         }
         return;
       } else {
-        this._currentModelSource = data.model;
+        this._currentModelSource = data.source;
       }
     } else if(im.message == 'unload') {
       this._currentModelSource = null;
@@ -198,7 +209,17 @@ class LMLayerWorker {
         configuration.rightContextCodePoints = this._platformCapabilities.maxRightContextCodePoints || 0;
       }
 
-      this.transitionToReadyState(model);
+      // Ensures that default casing rules exist for custom models that request casing rules but don't define them.
+      if(model.languageUsesCasing && !model.applyCasing) {
+        model.applyCasing = models.defaultApplyCasing;
+      }
+
+      let compositor = this.transitionToReadyState(model);
+      // This test allows models to directly specify the property without it being auto-overridden by
+      // this default.
+      if(configuration.wordbreaksAfterSuggestions === undefined) {
+        configuration.wordbreaksAfterSuggestions = (compositor.punctuation.insertAfterWord != '');
+      }
       this.cast('ready', { configuration });
     } catch (err) {
       this.error("loadModel failed!", err);
@@ -251,6 +272,7 @@ class LMLayerWorker {
    * description and capabilities.
    */
   private transitionToLoadingState() {
+    let _this = this;
     this.state = {
       name: 'modelless',
       handleMessage: (payload) => {
@@ -260,7 +282,20 @@ class LMLayerWorker {
         }
 
         // TODO: validate configuration?
-        this.loadModelFile(payload.model);
+        if(payload.source.type == 'file') {
+          _this.loadModelFile(payload.source.file);
+        } else {
+          // Creates a closure capturing all top-level names that the model must be able to reference.
+          // `eval` runs by scope rules; our virtualized worker needs a special scope for this to work.
+          //
+          // Reference: https://stackoverflow.com/a/40108685
+          // Note that we don't need `this`, but we do need the namespaces seen below. 
+          let code = payload.source.code;
+          let evalInContext = function(LMLayerWorker, models, correction, wordBreakers) {
+            eval(code);
+          }
+          evalInContext(_this, models, correction, wordBreakers);
+        }
       }
     };
   }
@@ -272,16 +307,15 @@ class LMLayerWorker {
    *
    * @param model The loaded language model.
    */
-  private transitionToReadyState(model: LexicalModel) {
+  private transitionToReadyState(model: LexicalModel): ModelCompositor {
+    let compositor = new ModelCompositor(model);
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {
         switch(payload.message) {
           case 'predict':
-            let {transform, context} = payload;
-            let compositor = new ModelCompositor(model); // Yeah, should probably use a persistent one eventually.
-
-            let suggestions = compositor.predict(transform, context);
+            var {transform, context} = payload;
+            var suggestions = compositor.predict(transform, context);
 
             // Now that the suggestions are ready, send them out!
             this.cast('suggestions', {
@@ -290,7 +324,7 @@ class LMLayerWorker {
             });
             break;
           case 'wordbreak':
-            let brokenWord = model.wordbreak(payload.context);
+            let brokenWord = models.wordbreak(model.wordbreaker || wordBreakers.default, payload.context);
 
             this.cast('currentword', {
               token: payload.token,
@@ -300,11 +334,32 @@ class LMLayerWorker {
           case 'unload':
             this.unloadModel();
             break;
+          case 'accept':
+            var {suggestion, context, postTransform} = payload;
+            var reversion = compositor.acceptSuggestion(suggestion, context, postTransform);
+
+            this.cast('postaccept', {
+              token: payload.token,
+              reversion: reversion
+            });
+            break;
+          case 'revert':
+              var {reversion, context} = payload;
+              var suggestions: Suggestion[] = compositor.applyReversion(reversion, context);
+
+              this.cast('postrevert', {
+                token: payload.token,
+                suggestions: suggestions
+              });
+              break;
           default:
-          throw new Error(`invalid message; expected one of {'predict', 'unload'} but got ${payload.message}`);
+            throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'revert', 'unload'} but got ${payload.message}`);
         }
-      }
+      },
+      compositor: compositor
     };
+
+    return compositor;
   }
 
   /**
@@ -328,11 +383,13 @@ class LMLayerWorker {
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
     let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
+    worker.self = scope;
 
     // Ensures that the worker instance is accessible for loaded model scripts.
     // Assists unit-testing.
     scope['LMLayerWorker'] = worker;
     scope['models'] = models;
+    scope['correction'] = correction;
     scope['wordBreakers'] = wordBreakers;
 
     return worker;
@@ -342,6 +399,7 @@ class LMLayerWorker {
 // Let LMLayerWorker be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
+  module.exports['correction'] = correction;
   module.exports['models'] = models;
   module.exports['wordBreakers'] = wordBreakers;
   /// XXX: export the ModelCompositor for testing.

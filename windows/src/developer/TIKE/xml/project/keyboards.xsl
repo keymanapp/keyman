@@ -45,7 +45,7 @@
           </ul>
 
           <p>
-            It's a good idea to read <a href='https://keyman.com/go/developer/10.0/help-keyboards'>Developing Open Source Keyboards</a> for guidelines
+            It's a good idea to read <a><xsl:attribute name="href"><xsl:value-of select='/KeymanDeveloperProject/DeveloperUrls/Url[@id="help-keyboards"]/@href' /></xsl:attribute>Developing Open Source Keyboards</a> for guidelines
             on preparing open source keyboards for sharing through the Keyman keyboard repositories. Also see the Distribution tab for more on
             distributing your completed keyboards.
           </p>

@@ -5,7 +5,6 @@ interface
 
 uses
   System.AnsiStrings,
-  System.Math,
   System.SysUtils,
   Winapi.ImageHlp,
   Winapi.Windows,
@@ -73,7 +72,7 @@ type
       EventType: TSentryClientEventType);
     procedure DoTerminate;
     function EventIDToString(AGuid: PByte): String;
-    function ConvertRawStackToSentryStack: sentry_value_t;
+    function ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
   public
     constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); virtual;
     destructor Destroy; override;
@@ -176,6 +175,25 @@ begin
 end;
 
 ///
+/// This is a thread-safe version of Set8087CW that avoids the global
+/// variable Default8087CW. We would get occasional situations where
+/// exceptions were raised on 2 threads simultaneously, which could lead to a
+/// race where the first thread set Default8087CW to $1340, and then the second
+/// thread would read that and think that is the default to keep. We want to
+/// avoid touching Default8087CW altogether here.
+///
+/// See also https://stackoverflow.com/a/39684636/1836776 and RSP-13643.
+///
+procedure Set8087CW_Threadsafe(ANewCW: Word);
+var
+  L8087CW: Word;
+asm
+  mov L8087CW, ANewCW
+  fnclex
+  fldcw L8087CW
+end;
+
+///
 /// First chance exception handler. We just want to take a copy of the raw
 /// stack here.
 ///
@@ -189,11 +207,12 @@ const
 {$ENDIF}
 var
   Skip: Integer;
-  LastMask: TArithmeticExceptionMask;
+  LastMask: WORD;
 begin
   // Floating point state may be broken here, so let's mask it out and continue
   // We'll restore state afterwards
-  LastMask := System.Math.SetExceptionMask([]);
+  LastMask := Get8087CW;
+  Set8087CW_Threadsafe($1332);
 
   if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
     then Skip := DELPHI_FRAMES_TO_SKIP
@@ -201,7 +220,7 @@ begin
   CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
 
   // Restore FP state
-  System.Math.SetExceptionMask(LastMask);
+  Set8087CW_Threadsafe(LastMask);
 
   Result := 0; //EXCEPTION_CONTINUE_SEARCH;
 end;
@@ -246,6 +265,15 @@ begin
 
   if sentry_init(options) = 0 then
     FSentryInit := True;
+
+  {$WARN SYMBOL_PLATFORM OFF} // W1002 Symbol 'CmdLine' is specific to a platform
+  if CmdLine <> nil then
+  begin
+    sentry_set_tag('keyman.commandline', PAnsiChar(AnsiString(string(CmdLine))));
+  end;
+  {$WARN SYMBOL_PLATFORM DEFAULT}
+
+  sentry_set_tag('keyman.executable', PAnsiChar(AnsiString(ParamStr(0))));
 
   if scfCaptureExceptions in AFlags then
   begin
@@ -323,7 +351,7 @@ begin
   end;
 end;
 
-function TSentryClient.ConvertRawStackToSentryStack: sentry_value_t;
+function TSentryClient.ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
 var
   frames, s_frame, stacktrace, thread, threads: sentry_value_t;
   s: AnsiString;
@@ -343,19 +371,24 @@ begin
   stacktrace := sentry_value_new_object;
   sentry_value_set_by_key(stacktrace, 'frames', frames);
 
-  threads := sentry_value_new_list;
-  thread := sentry_value_new_object;
-  sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
-  sentry_value_append(threads, thread);
+  if wrapWithThread then
+  begin
+    threads := sentry_value_new_list;
+    thread := sentry_value_new_object;
+    sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
+    sentry_value_append(threads, thread);
 
-  Result := threads;
+    Result := threads;
+  end
+  else
+    Result := stacktrace;
 end;
 
 function TSentryClient.ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): String;
 var
-  event: sentry_value_t;
+  exc, event: sentry_value_t;
   uuid: sentry_uuid_t;
-  threads: sentry_value_t;
+  stacktrace: sentry_value_t;
 begin
   if FReportExceptions then
   begin
@@ -363,29 +396,20 @@ begin
 
     DoBeforeEvent(event, ExceptionClassName, Message, scetException);
 
-  (*
-    When we set exception information, the report is corrupted. Not sure why. So
-    for now we won't create as an exception event. We still get all the information
-    we want from this.
-
-    Investigating this further at https://forum.sentry.io/t/corrupted-display-when-exception-data-is-set-using-native-sdk/9167/2
-
     exc := sentry_value_new_object;
     sentry_value_set_by_key(exc, 'type', sentry_value_new_string(PAnsiChar(UTF8Encode(ExceptionClassName))));
     sentry_value_set_by_key(exc, 'value', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
-    sentry_value_set_by_key(event, 'exception', exc);
-  *)
-
-    sentry_value_set_by_key(event, 'message', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
-    sentry_value_set_by_key(event, 'logger', sentry_value_new_string(PAnsiChar(UTF8Encode(FLogger))));
 
     if raw_frame_count > 0 then
     begin
-      threads := ConvertRawStackToSentryStack;
-      if threads <> 0 then
-        sentry_value_set_by_key(event, 'threads', threads);
+      stacktrace := ConvertRawStackToSentryStack(false);
+      if stacktrace <> 0 then
+        sentry_value_set_by_key(exc, 'stacktrace', stacktrace);
       raw_frame_count := 0;
     end;
+
+    sentry_value_set_by_key(event, 'exception', exc);
+    sentry_value_set_by_key(event, 'logger', sentry_value_new_string(PAnsiChar(UTF8Encode(FLogger))));
 
     // We will rebuild the module list at time of event in order to ensure we
     // don't lose dynamically loaded modules, as far as possible. This is
@@ -434,7 +458,7 @@ begin
       CaptureStackTrace(nil, FRAMES_TO_SKIP);
       if raw_frame_count > 0 then
       begin
-        threads := ConvertRawStackToSentryStack;
+        threads := ConvertRawStackToSentryStack(true);
         if threads <> 0 then
           sentry_value_set_by_key(event, 'threads', threads);
         raw_frame_count := 0;
@@ -532,7 +556,7 @@ begin
       Continue;
     end;
 
-    raw_frames[n] := frame.AddrPC.Offset;
+    raw_frames[n] := NativeUInt(frame.AddrPC.Offset);
     Inc(n);
   end;
 

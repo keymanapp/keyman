@@ -104,7 +104,7 @@ begin
   ]);
 
   FRenderPage := 'hint';
-  Content_Render(False, query);
+  Content_Render(query);
   inherited;
 end;
 

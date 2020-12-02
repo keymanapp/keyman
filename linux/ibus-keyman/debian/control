@@ -1,12 +1,14 @@
 Source: ibus-keyman
 Section: utils
 Priority: optional
-Maintainer: Daniel Glassey <wdg@debian.org>
+Maintainer: Keyman team <support@keyman.com>
 Build-Depends: debhelper (>= 9), autotools-dev, dh-autoreconf, pkg-config,
  libkmnkbp-dev (>=0.0.0~), libibus-1.0-dev (>= 1.2), libjson-glib-dev (>= 1.4.0) <!pkg.keyman-config.xenial>,
  libjson-glib-dev (= 1.1.2) <pkg.keyman-config.xenial>, libgtk-3-dev
 Standards-Version: 4.5.0
-Homepage: http://www.keyman.com
+Vcs-Git: https://github.com/keymanapp/keyman.git
+Vcs-Browser: https://github.com/keymanapp/keyman
+Homepage: https://www.keyman.com
 
 Package: ibus-keyman
 Architecture: any
@@ -28,4 +30,3 @@ Description: Keyman engine for IBus
  This package provides the Keyman IM engine for IBus. With this module, you can
  use keyboard layouts designed for Keyman version 11 or earlier under the IBus
  platform.
- 

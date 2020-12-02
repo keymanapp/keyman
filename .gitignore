@@ -120,6 +120,7 @@
 
 # /developer/inst/
 /windows/src/developer/inst/*.wixpdb
+/windows/src/developer/inst/download.mak
 /windows/src/developer/inst/copydev.mak
 
 # /developer/kmcmpdll/
@@ -261,3 +262,9 @@ resources/environment.sh
 
 **/node_modules/
 lerna-debug.log
+
+# Cached/auto-compiled Python bytecode
+*.pyc
+
+# Debian watch file - we generate it from watch.in
+watch

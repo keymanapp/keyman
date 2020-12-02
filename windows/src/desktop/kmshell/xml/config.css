@@ -128,12 +128,25 @@
   border-right: 1px solid #6D6C6F;
 }
 
+.footer_instant {
+  font-size: 12px;
+  padding-top: 3px;
+  padding-right: 3px;
+}
+
 input[type='submit'], input[type='button'], button
 {
   background: #F68924;
   border-radius: 4px;
   color: #33333f;
   border: none;
+  vertical-align: top;
+}
+
+input[type='submit']:disabled, input[type='button']:disabled, button:disabled
+{
+  color: #c0c0cf;
+  background: #80808f;
 }
 
 a.hotkey:link, a.hotkey:visited

@@ -101,7 +101,8 @@ uses
 
   JsonUtil,
   KeymanDeveloperOptions,
-  RedistFiles;
+  RedistFiles,
+  Upload_Settings;
 
 const
   TestFontName: array[TKeyboardFont] of string = (   // I4409
@@ -323,15 +324,17 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
     jsonArray: TJSONArray;
     jsonPackage: TJSONObject;
     key: string;
+    jsonUrls: TJSONObject;
   begin
     // Get dynamic keyboard registration
     FPackagesCS.Enter;   // I4036
     try
 
       json := TJSONObject.Create;
-      jsonArray := TJSONArray.Create;
       try
         try
+          jsonArray := TJSONArray.Create;
+
           for key in FPackages.Keys do
           begin
             jsonPackage := TJSONObject.Create;
@@ -342,6 +345,11 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
           end;
 
           json.AddPair('packages', jsonArray);
+
+          jsonUrls := TJSONObject.Create;
+          jsonUrls.AddPair('installLinkAndroid', MakeKeymanURL(URLPath_KeymanDeveloper_KeymanForAndroidDownload));
+          jsonUrls.AddPair('installLinkIos', MakeKeymanURL(URLPath_KeymanDeveloper_KeymanForIosDownload));
+          json.AddPair('urls', jsonUrls);
 
           AResponseInfo.CharSet := 'UTF-8';
           AResponseInfo.ContentType := 'application/json';

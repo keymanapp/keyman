@@ -13,9 +13,13 @@ engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanios.js
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanweb-osk.ttf
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/kmwosk.css
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman.js.map
+engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman-sentry.js
 Keyman 2*
 Carthage
 
 # Explicitly ignores just the SWKeyboard scheme; testing against different
 # targets makes a lot of noise.
 **/SWKeyboard.scheme
+
+# Ignores exported localization files.
+en.xcloc

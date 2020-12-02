@@ -17,6 +17,7 @@ uses
   Xml.Win.msxmldom,
 
   Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.UrlRenderer,
   RegistryKeys,
   VersionInfo,
   utilsystem;
@@ -55,6 +56,8 @@ begin
       node := doc.createElement('Version');
       node.appendChild(doc.createTextNode(GetVersionString));
       root.appendChild(node);
+
+      TProjectUrlRenderer.AddUrls(root);
 
       xsl := MSXMLDOMDocumentFactory.CreateDOMDocument;
       try

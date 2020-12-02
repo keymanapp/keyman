@@ -22,8 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.util.Connection;
-
-import android.util.Log;
+import com.tavultesoft.kmea.util.KMLog;
 
 public final class JSONParser {
   private final String TAG = "JSONParser";
@@ -49,23 +48,23 @@ public final class JSONParser {
         obj = (T) new JSONArray(jsonStr);
       }
     } catch (UnsupportedEncodingException e) {
-      Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
+      KMLog.LogException(logTag, "", e);
       obj = null;
       System.err.println(e);
     } catch (InterruptedIOException e) {
       // Disregard from cancelling action
-      Log.e(logTag, (e.getMessage() == null) ? "InterruptedIOException" : e.getMessage());
+      KMLog.LogException(logTag, "", e);
       obj = null;
     } catch (IOException e) {
-      Log.e(logTag, (e.getMessage() == null) ? "IOException" : e.getMessage());
+      KMLog.LogException(logTag, "", e);
       obj = null;
       System.err.println(e);
     } catch (JSONException e) {
-      Log.e(logTag, (e.getMessage() == null) ? "JSONException" : e.getMessage());
+      KMLog.LogException(logTag, "", e);
       obj = null;
       System.err.println(e);
     } catch (Exception e) {
-      Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
+      KMLog.LogException(logTag, "", e);
       obj = null;
       System.err.println(e);
     }
@@ -90,7 +89,7 @@ public final class JSONParser {
       jsonObj = getJSONObjectFromReader(reader, type);
     } catch (FileNotFoundException e) {
       String errorString = (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage();
-      Log.e(TAG, "JSONObjectFromFile error " + errorString);
+      KMLog.LogException(TAG, "JSONObjectFromFile error ", e);
       jsonObj = null;
       System.err.println(e);
     } finally {
@@ -98,7 +97,7 @@ public final class JSONParser {
         try {
           reader.close();
         } catch (IOException e) {
-          Log.e(TAG, "getJSONObjectFromFile error: " + e);
+          KMLog.LogException(TAG, "getJSONObjectFromFile error: ", e);
           // Ignore.
         }
       }
@@ -145,11 +144,11 @@ public final class JSONParser {
         obj = (T) getJSONObjectFromReader(reader, type);
       }
     } catch (UnsupportedEncodingException e) {
-      Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
+      KMLog.LogException(logTag, "", e);
       obj = null;
       System.err.println(e);
     } catch (Exception e) {
-      Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
+      KMLog.LogException(logTag, "", e);
       obj = null;
       System.err.println(e);
     } finally {
@@ -159,6 +158,7 @@ public final class JSONParser {
         try {
           reader.close();
         } catch (IOException e) {
+          KMLog.LogException(logTag, "", e);
           // Ignore.
         }
       }
@@ -179,6 +179,7 @@ public final class JSONParser {
     try {
       return getJSONObjectFromString(java.net.URLDecoder.decode(str, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
+      KMLog.LogException(TAG, "", e);
       return null;
     }
   }

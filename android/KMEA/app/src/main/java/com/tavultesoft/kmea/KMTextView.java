@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.KMLog;
 
 import android.view.ContextThemeWrapper;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +17,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 public final class KMTextView extends AppCompatEditText {
+  private static final String TAG = "KMTextView";
   private Context context;
   protected KMHardwareKeyboardInterpreter hardwareKeyboardInterpreter;
 
@@ -53,6 +54,19 @@ public final class KMTextView extends AppCompatEditText {
   public KMTextView(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
     init(context);
+  }
+
+  /**
+   * Method to update and reset the in-app context.
+   * Assumption: InAppKeyboardLoaded is true
+   */
+  public static void updateTextContext() {
+    KMTextView textView = (KMTextView) activeView;
+    int selStart = textView.getSelectionStart();
+    int selEnd = textView.getSelectionEnd();
+    KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
+    KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
+    KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
   }
 
   private void init(final Context context) {
@@ -106,12 +120,7 @@ public final class KMTextView extends AppCompatEditText {
         if (hasFocus) {
           activeView = v;
           if (KMManager.InAppKeyboardLoaded) {
-            KMTextView textView = (KMTextView) activeView;
-            int selStart = textView.getSelectionStart();
-            int selEnd = textView.getSelectionEnd();
-            KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
-            KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
-            KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
+            updateTextContext();
           }
           showKeyboard();
         } else {
@@ -154,6 +163,7 @@ public final class KMTextView extends AppCompatEditText {
 
   @Override
   protected void onSelectionChanged(int selStart, int selEnd) {
+    super.onSelectionChanged(selStart, selEnd);
     if (activeView != null && activeView.equals(this)) {
       KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
     }
@@ -177,11 +187,7 @@ public final class KMTextView extends AppCompatEditText {
 
       if (activeView != null && activeView.equals(this)) {
         if (KMManager.InAppKeyboardLoaded) {
-          KMTextView textView = (KMTextView) activeView;
-          int selStart = textView.getSelectionStart();
-          int selEnd = textView.getSelectionEnd();
-          KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
-          KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
+          updateTextContext();
         }
 
         if (keyboardVisible) {
@@ -198,7 +204,7 @@ public final class KMTextView extends AppCompatEditText {
       dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
       dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
     } catch (Exception e) {
-      Log.e("KMEA Error:", e.toString());
+      KMLog.LogException(TAG, "", e);
     } finally {
       _blockEventProcessing = false;
     }

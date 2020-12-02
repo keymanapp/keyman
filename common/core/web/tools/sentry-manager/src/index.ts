@@ -7,21 +7,25 @@ namespace com.keyman {
    */
   let DEBUG = false;
 
-  type Options = typeof KeymanSentryManager.DEFAULT_OPTIONS;
+  type Options = {
+    hostPlatform: "native-web" | "ios" | "android"
+  };
 
   export class KeymanSentryManager {
     keymanPlatform: string;
 
     static STANDARD_ALIASABLE_FILES = {
-      'keymanweb.js':    'keymanweb.js',
-      'kmwuibutton.js':  'kmwuibutton.js',
-      'kmwuifloat.js':   'kmwuifloat.js',
-      'kmwuitoggle.js':  'kmwuitoggle.js',
-      'kmwuitoolbar.js': 'kmwuitoolbar.js'
+      'keymanweb.js':     'keymanweb.js',
+      'keymanandroid.js': 'keyman.js',      // Android's embedded name -> embedded compilation
+      'keymanios.js':     'keyman.js',      // iOS's embedded name -> embedded compilation
+      'kmwuibutton.js':   'kmwuibutton.js',
+      'kmwuifloat.js':    'kmwuifloat.js',
+      'kmwuitoggle.js':   'kmwuitoggle.js',
+      'kmwuitoolbar.js':  'kmwuitoolbar.js'
       // Also add entries for the naming system used by Android and iOS - and map them to the EMBEDDED upload, not the std 'native' one.
     }
 
-    static DEFAULT_OPTIONS = {
+    static DEFAULT_OPTIONS: Options = {
       hostPlatform: "native-web"
     }
 
@@ -29,7 +33,7 @@ namespace com.keyman {
       this.keymanPlatform = options.hostPlatform;
     }
 
-    // If we've recognized one of our source files, 
+    // If we've recognized one of our source files,
     aliasFilename(filename: string): string|null {
       if(!this.mayAlias(filename)) {
         return null;
@@ -60,6 +64,12 @@ namespace com.keyman {
 
       // Iterate through all wrapped exceptions.
       for(let e of exception.values) {
+        // If Sentry was unable to generate a stacktrace, there's no path filtering to
+        // perform on its stack frames.
+        if(!e.stacktrace) {
+          continue;
+        }
+
         for(let frame of e.stacktrace.frames) {
           let URL = frame.filename as string;
           let filename: string = '';
@@ -86,7 +96,7 @@ namespace com.keyman {
     }
 
     /**
-     * Pre-processes a Sentry event object (in-place) to provide more metadata and enhance 
+     * Pre-processes a Sentry event object (in-place) to provide more metadata and enhance
      * the Sentry server's ability to match the error against release artifacts.
      * @param event A Sentry-generated event
      */
@@ -106,8 +116,8 @@ namespace com.keyman {
     /**
      * Allows debugging our custom event preparation code without bombarding Sentry with errors
      * during development.
-     * 
-     * Note that Sentry expects us either to return the event object to be sent or to return `null` 
+     *
+     * Note that Sentry expects us either to return the event object to be sent or to return `null`
      * if we want to prevent the event from being sent to the server.
      * @param event
      */
@@ -140,7 +150,8 @@ namespace com.keyman {
         beforeSend: this.prepareEventDebugWrapper.bind(this),
         debug: DEBUG,
         dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@sentry.keyman.com/11', // keyman-web DSN
-        release: com.keyman.environment.SENTRY_RELEASE
+        release: com.keyman.environment.SENTRY_RELEASE,
+        environment: com.keyman.environment.ENVIRONMENT
       });
     }
   }

@@ -73,6 +73,8 @@ uses
   LanguagesXMLRenderer,
   OptionsXMLRenderer,
   SupportXMLRenderer,
+  Upload_Settings,
+  utilkmshell,
   utilxml;
 
 { THttpServerApp }
@@ -242,7 +244,7 @@ begin
   if PageTag <> '' then
     PageTag := '<PageTag>'+PageTag+'</PageTag>';
 
-  FXML := FXMLRenderers.RenderToString(False, s + PageTag);
+  FXML := FXMLRenderers.RenderToString(False, s + PageTag + DefaultServersXMLTags + DefaultVersionXMLTags);
 
   FResponseInfo.ContentStream := TStringStream.Create(FXML, TEncoding.UTF8);
   FResponseInfo.FreeContentStream := True;

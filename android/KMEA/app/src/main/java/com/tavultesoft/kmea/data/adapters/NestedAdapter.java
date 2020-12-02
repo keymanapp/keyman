@@ -7,6 +7,8 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 
+import com.tavultesoft.kmea.util.KMLog;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -178,7 +180,7 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
     try {
       super.addAll(collection);
     } catch (UnsupportedOperationException e) {
-      Log.e(TAG, "_internalAddAll exception " + e);
+      KMLog.LogException(TAG, "_internalAddAll exception ", e);
     }
   }
 
@@ -186,7 +188,7 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
     try {
       super.clear();
     } catch (UnsupportedOperationException e) {
-      Log.e(TAG, "_internalClear exception " + e);
+      KMLog.LogException(TAG, "_internalClear exception ", e);
     }
   }
 

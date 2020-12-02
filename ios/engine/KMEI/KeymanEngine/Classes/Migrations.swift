@@ -16,10 +16,10 @@ private enum MigrationLevel {
 
 struct VersionResourceSet {
   var version: Version
-  var resources: [LanguageResource]
+  var resources: [AnyLanguageResource]
   // but how to handle deprecation?
 
-  init(version: Version, resources: [LanguageResource]) {
+  init(version: Version, resources: [AnyLanguageResource]) {
     self.version = version
     self.resources = resources
   }
@@ -50,32 +50,53 @@ public enum Migrations {
                                          oskFont: nil,
                                          isCustom: false)
 
+    let sil_euro_latin_1_8_1 = InstallableKeyboard(id: "sil_euro_latin",
+                                                   name: "EuroLatin (SIL)",
+                                                   languageID: "en",
+                                                   languageName: "English",
+                                                   version: "1.8.1",
+                                                   isRTL: false,
+                                                   font: font,
+                                                   oskFont: nil,
+                                                   isCustom: false)
+
+    let sil_euro_latin_1_9_1 = InstallableKeyboard(id: "sil_euro_latin",
+                                                   name: "EuroLatin (SIL)",
+                                                   languageID: "en",
+                                                   languageName: "English",
+                                                   version: "1.9.1",
+                                                   isRTL: false,
+                                                   font: font,
+                                                   oskFont: nil,
+                                                   isCustom: false)
+
     let nrc_en_mtnt_0_1_2 = InstallableLexicalModel(id: "nrc.en.mtnt",
                                                     name: "English dictionary (MTNT)",
                                                     languageID: "en",
                                                     version: "0.1.2",
                                                     isCustom: false)
 
-    let sil_euro_latin = Defaults.keyboard  // We're already storing the exact metadata needed.
     let nrc_en_mtnt = Defaults.lexicalModel
 
     // Unknown transition point:  european
     // Before v11:  european2
-    // Before v12:  sil_euro_latin
-    // At v12:      sil_euro_latin + nrc.en.mtnt (lex model)
+    // Before v12:  sil_euro_latin 1.8.1
+    // At v12:      sil_euro_latin 1.8.1 + nrc.en.mtnt (lex model)
     var timeline: [VersionResourceSet] = []
 
     let legacy_resources = VersionResourceSet(version: Version.fallback, resources: [european])
     let v10_resources = VersionResourceSet(version: Version("10.0")!, resources: [european2])
-    let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin])
-    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin, nrc_en_mtnt_0_1_2])
-    let v13_resources = VersionResourceSet(version: Version("13.0.65")!, resources: [sil_euro_latin, nrc_en_mtnt])
+    let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin_1_8_1])
+    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin_1_8_1, nrc_en_mtnt_0_1_2])
+    let v13_resources = VersionResourceSet(version: Version("13.0.65")!, resources: [sil_euro_latin_1_8_1, nrc_en_mtnt])
+    let v14_resources = VersionResourceSet(version: Version("14.0.0")!, resources: [sil_euro_latin_1_9_1, nrc_en_mtnt])
 
     timeline.append(legacy_resources)
     timeline.append(v10_resources)
     timeline.append(v11_resources)
     timeline.append(v12_resources)
     timeline.append(v13_resources)
+    timeline.append(v14_resources)
 
     return timeline
   }()
@@ -104,6 +125,16 @@ public enum Migrations {
         }
       } else {
         log.info("Documents directory structure compatible with \(Version.fileBrowserImplemented)")
+      }
+
+      if version < Version.packageBasedFileReorg {
+        do {
+          try migrateCloudResourcesToKMPFormat()
+        } catch {
+          log.error("Could not migrate pre-existing resources to KMP-style file organization")
+        }
+      } else {
+        log.info("Resource directories already migrated to package-based format; kmp.jsons already exist.")
       }
     }
 
@@ -364,6 +395,7 @@ public enum Migrations {
     return Font(family: family, source: files)
   }
 
+  // OLD legacy migration.
   static func migrateForKMP(storage: Storage) {
     let languageDir = storage.baseDir.appendingPathComponent("languages")
     let fontDir = storage.baseDir.appendingPathComponent("fonts")
@@ -406,7 +438,7 @@ public enum Migrations {
 
     // Copy files
     for (keyboardID, urls) in urlsForKeyboard {
-      let keyboardDir = storage.keyboardDir(forID: keyboardID)
+      let keyboardDir = storage.legacyKeyboardDir(forID: keyboardID)
       do {
         try FileManager.default.createDirectory(at: keyboardDir,
                                                 withIntermediateDirectories: true,
@@ -489,5 +521,187 @@ public enum Migrations {
         log.info("Unexpected file found in documents folder during upgrade: \(fileURL)")
       }
     }
+  }
+
+  static func migrateCloudResourcesToKMPFormat() throws {
+    let userDefaults = Storage.active.userDefaults
+
+    if var userKeyboards = userDefaults.userKeyboards {
+      userKeyboards = migrateToKMPFormat(userKeyboards)
+      userDefaults.userKeyboards = userKeyboards
+    }
+
+    if var userLexicalModels = userDefaults.userLexicalModels {
+      userLexicalModels = migrateToKMPFormat(userLexicalModels)
+      userDefaults.userLexicalModels = userLexicalModels
+    }
+  }
+
+  static func migrateToKMPFormat<Resource: KMPInitializableLanguageResource>(
+        _ resources: [Resource]) -> [Resource]
+        where Resource.Package: TypedKeymanPackage<Resource> {
+    // Step 1 - drop version numbers from all filenames.  KMP installations don't include them, and
+    // the version numbered filenames will actually interfere with migration.
+    resources.forEach { resource in
+      let srcLocation = Storage.active.legacyResourceURL(for: resource)!
+      let dstLocation = Storage.active.resourceURL(for: resource)!
+
+      do {
+        if FileManager.default.fileExists(atPath: srcLocation.path) {
+          try FileManager.default.moveItem(at: srcLocation, to: dstLocation)
+        }
+      } catch {
+        log.error("Could not remove version number from filename for resource \(resource.packageID ?? "<no package>").\(resource.id)")
+        log.error("Source: \(srcLocation)")
+      }
+    }
+
+    // Step 2 - analyze all locally-cached KMPs for possible resource sources.
+    var allLocalPackages: [(KeymanPackage, URL)] = []
+    do {
+      let cachedKMPsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+      let files = try FileManager.default.contentsOfDirectory(atPath: cachedKMPsDirectory.path)
+      let kmpFiles = files.filter { $0.suffix(4).lowercased() == ".kmp" }
+
+      allLocalPackages = kmpFiles.compactMap { file in
+        let filePath = cachedKMPsDirectory.appendingPathComponent(file)
+        do {
+          let tuple = try (ResourceFileManager.shared.prepareKMPInstall(from: filePath), filePath)
+          return tuple
+        } catch {
+          log.error("Could not load kmp.info for \(filePath)")
+          return nil
+        }
+      }
+    } catch {
+      log.error("Could not check contents of Documents directory for resource-migration assist")
+    }
+
+    // Filters out Packages that don't contain the matching resource type.
+    let localPackages: [(Resource.Package, URL)] = allLocalPackages.compactMap { tuple in
+      if let package = tuple.0 as? Resource.Package {
+        return (package, tuple.1)
+      } else {
+        return nil
+      }
+    }
+
+    // Step 3 - determine which resources were installed from our locally-available KMPs,
+    //          then migrate by reinstalling the KMP.
+    var matched: [Resource] = []
+
+    localPackages.forEach { (package, kmpFile) in
+      let packageMatches: [Resource] = resources.compactMap { resource in
+        if let possibleMatch = package.findResource(withID: resource.typedFullID) {
+          if possibleMatch.version == resource.version {
+            return resource
+          }
+        }
+        // else, for either if-condition.
+        return nil
+      }
+
+      // All resources within packageMatches were sourced from the current package.
+      // Time to set migrate these.  Overwrites any obstructing files with the
+      // the decompressed KMP's contents.
+      do {
+        // We've already parsed the metadata, but now we need to have the files ready for install.
+        try packageMatches.forEach { resource in
+          try ResourceFileManager.shared.install(resourceWithID: resource.typedFullID, from: package)
+          matched.append(package.findResource(withID: resource.typedFullID)!)
+        }
+      } catch {
+        log.error("Could not install resource from locally-cached package: \(String(describing: error))")
+      }
+    }
+
+    // Step 4 - anything unmatched is a cloud resource.  Autogenerate a kmp.json for it
+    //          so that it becomes its own package.  (Is already installed in own subdir.)
+    let unmatched: [Resource] = resources.compactMap { resource in
+      // Return the resource only if it isn't in the 'matched' array,
+      return matched.contains(where: { $0.typedFullID == resource.typedFullID }) ? nil : resource
+    }
+
+    var wrapperPackages: [Resource.Package] = []
+
+    // The following block loads any already-migrated local resources; there's a chance we may
+    // need to merge new resources into an autogenerated kmp.json.  (Cloud JS workaround - data
+    // loss prevention)
+    //
+    // In a manner, this re-migrates them harmlessly.  Safe to eliminate the block below
+    // once Cloud JS downloads are removed in favor of KMP downloads, at which point this
+    // method will only ever be called a single time.
+    wrapperPackages = ResourceFileManager.shared.installedPackages.compactMap { package in
+      // We only consider appending resources to existing kmp.jsons if the kmp.jsons were
+      // produced during resource migration.  We don't alter Developer-compiled kmp.jsons.
+      if package.metadata.isAutogeneratedWrapper {
+        return package as? Resource.Package // also ensures it's the right package type.
+      } else {
+        return nil
+      }
+    }
+
+    for resource in unmatched {
+      // Did we already build a matching wrapper package?
+      let packageMatches: [Resource.Package] = wrapperPackages.compactMap { package in
+        let metadata: Resource.Metadata? = package.findMetadataMatchFor(resource: resource, ignoreLanguage: true, ignoreVersion: true)
+        return (metadata != nil) ? package : nil
+      }
+
+      if packageMatches.count > 0 {
+        // We did!  Add this resource to the existing metadata object.
+        var resourceMetadata: Resource.Metadata = packageMatches[0].findMetadataMatchFor(resource: resource, ignoreLanguage: true, ignoreVersion: true)!
+        // Ensure we don't accidentally make a duplicate entry.
+        // Of particular interest while the Cloud-download stop-gap measure is in place.
+        if !resourceMetadata.languages.contains(where: {
+          return $0.languageId == resource.languageID
+        }) {
+          resourceMetadata.languages.append(KMPLanguage(from: resource)!)
+          // Update the installable resources listing!
+          packageMatches[0].setInstallableResourceSets(for: [resourceMetadata])
+        }
+      } else {
+        // Time for a new wrapper package!
+        let location = Storage.active.resourceDir(for: resource)!
+        let migrationPackage = KeymanPackage.forMigration(of: resource, at: location)!
+        wrapperPackages.append(migrationPackage as! Resource.Package)
+      }
+    }
+
+    // Step 5 - write out the finalized metadata for the new 'wrapper' Packages
+    for package in wrapperPackages {
+      let folderURL = Storage.active.packageDir(for: package)
+      let metadataFile = folderURL!.appendingPathComponent("kmp.json")
+      let encoder = JSONEncoder()
+      do {
+        let metadataJSON = try encoder.encode(package.metadata)
+        FileManager.default.createFile(atPath: metadataFile.path, contents: metadataJSON, attributes: .none)
+        // write to location.
+      } catch {
+        log.error("Could not generate kmp.json for legacy resource!")
+      }
+    }
+
+    // Step 6 - return the Resources that map to the original argument.
+
+    // Each wrapper package contains only a single resource.  .installables[0] returns all
+    // LanguageResource pairings for that script resource.
+    let wrappedResources: [Resource] = wrapperPackages.flatMap { $0.installables[0] }
+
+    let mappedResources: [Resource] = wrappedResources.compactMap { resource in
+      if resources.contains(where: { $0.typedFullID == resource.typedFullID}) {
+        return resource
+      } else {
+        return nil
+      }
+    }
+
+    return matched + mappedResources
+  }
+
+  internal static func resourceHasPackageMetadata<Resource: LanguageResource>(_ resource: Resource) -> Bool {
+    var resourceDir = Storage.active.resourceDir(for: resource)!
+    resourceDir.appendPathComponent("kmp.json")
+    return FileManager.default.fileExists(atPath: resourceDir.path)
   }
 }

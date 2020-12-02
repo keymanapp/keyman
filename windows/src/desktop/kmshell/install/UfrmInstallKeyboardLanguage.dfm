@@ -47,6 +47,7 @@ inherited frmInstallKeyboardLanguage: TfrmInstallKeyboardLanguage
     TabOrder = 0
     TextHint = 'Search for language'
     OnChange = editSearchChange
+    OnKeyDown = editSearchKeyDown
   end
   object gridLanguages: TStringGrid
     Left = 73
@@ -77,12 +78,12 @@ inherited frmInstallKeyboardLanguage: TfrmInstallKeyboardLanguage
     Top = 208
     Width = 519
     Height = 185
+    ColCount = 4
     DefaultRowHeight = 20
     FixedCols = 0
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
     TabOrder = 2
     ColWidths = (
-      64
       64
       64
       64

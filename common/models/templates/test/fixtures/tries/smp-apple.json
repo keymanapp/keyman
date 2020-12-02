@@ -1,0 +1,47 @@
+{
+  "totalWeight":2,
+  "root": {
+    "type":"internal","weight":1,
+    "values":["\ud835"],
+    "children": {
+      "\ud835": {
+        "type":"internal",
+        "weight":1,
+        "values":["\uddba"],
+        "children":{
+          "\uddba": {
+            "type":"internal",
+            "weight":1,
+            "values":["\ud835"],
+            "children":{
+              "\ud835": {
+                "type":"internal",
+                "weight":1,
+                "values":["\uddc9"],
+                "children": {
+                  "\uddc9":{
+                    "type":"internal",
+                    "weight":1,
+                    "values":["p","\ud835"],
+                    "children":{
+                      "p": {
+                        "type":"leaf",
+                        "weight":1,
+                        "entries":[{"key":"𝖺𝗉pl𝖾","weight":1,"content":"𝖺𝗉pl𝖾"}]
+                      },
+                      "\ud835": {
+                        "type":"leaf",
+                        "weight":1,
+                        "entries":[{"key":"𝖺𝗉𝗉𝗅𝖾","weight":1,"content":"𝖺𝗉𝗉𝗅𝖾"}]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

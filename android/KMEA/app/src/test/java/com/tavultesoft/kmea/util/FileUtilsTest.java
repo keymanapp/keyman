@@ -26,35 +26,10 @@ public class FileUtilsTest {
     Assert.assertEquals(4, logs.size());
 
     Assert.assertEquals("Connection", logs.get(2).tag);
-    Assert.assertEquals("Initialization failed:java.net.MalformedURLException: no protocol: invalidURL", logs.get(2).msg);
+    Assert.assertEquals("Initialization failed:\njava.net.MalformedURLException: no protocol: invalidURL", logs.get(2).msg);
 
     Assert.assertEquals("FileUtils", logs.get(3).tag);
     Assert.assertEquals("Could not download filename ", logs.get(3).msg);
-  }
-
-  @Test
-  public void test_isKeymanLink() {
-    Assert.assertFalse(FileUtils.isKeymanLink(null));
-    Assert.assertFalse(FileUtils.isKeymanLink(""));
-
-    // Valid Keyman links
-    Assert.assertTrue(FileUtils.isKeymanLink("keyman:download?keyboard"));
-    Assert.assertTrue(FileUtils.isKeymanLink("Keyman:Download?keyboard"));
-
-    // keyman:// invalid
-    Assert.assertFalse(FileUtils.isKeymanLink("keyman://keyboard"));
-    Assert.assertFalse(FileUtils.isKeymanLink("Keyman://keyboard"));
-    Assert.assertFalse(FileUtils.isKeymanLink("keyman:download//keyboard"));
-    Assert.assertFalse(FileUtils.isKeymanLink("keyman://download/keyboard"));
-
-    // link missing query
-    Assert.assertFalse(FileUtils.isKeymanLink("keyman:download?"));
-
-    // Other methods not supported
-    Assert.assertFalse(FileUtils.isKeymanLink("keyman:method//keyboard"));
-    Assert.assertFalse(FileUtils.isKeymanLink("keyman:method?keyboard"));
-
-    Assert.assertFalse(FileUtils.isKeymanLink("example:keyman?"));
   }
 
   @Test

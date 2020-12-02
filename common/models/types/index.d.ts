@@ -17,6 +17,62 @@
  */	
 declare type USVString = string;
 
+declare type CasingForm = 'lower' | 'initial' | 'upper';
+
+/**
+ * Used to facilitate edit-distance calculations by allowing the LMLayer to
+ * efficiently search the model's lexicon in a Trie-like manner.
+ */
+declare interface LexiconTraversal {
+  /**
+   * Provides an iterable pattern used to search for words with a prefix matching
+   * the current traversal state's prefix when a new character is appended.  Iterating
+   * across `children` provides 'breadth' to a lexical search.
+   * 
+   * For an example with English, if the current traversal state corresponds to 'th', 
+   * children() may return an iterator with states corresponding 'e' 
+   * (for 'the', 'then', 'there'), 'a' (for 'than', 'that'), etc.
+   * 
+   * @param char      A full character (a UTF-16 code point, which may be comprised of two
+   *                  code units) corresponding to the child node, appended to the current
+   *                  node's prefix to produce the child node's prefix.
+   * <p>
+   *                  Example: if the current traversal's represented prefix is 'th', 
+   *                  char = 'e' would indicate a child node with prefix = 'the'.
+   * @param traversal a LexiconTraversal starting from (or "rooted at") the child node.  Use
+   *                  of the returned object provides 'depth' to a lexical search.
+   * <p>
+   *                  Example:
+   * 
+   * - Suppose our current LexiconTraversal represents a prefix of 'th'.
+   * - If `char` = 'e', the child represents a prefix of 'the'.
+   * - Then `traversal` allows traversing the part of the lexicon prefixed by 'the'.
+   */
+  children(): Generator<{char: USVString, traversal: () => LexiconTraversal}>;
+
+  /**
+   * Any entries directly keyed by the currently-represented lookup prefix.  Entries and
+   * children may exist simultaneously, but `entries` must always exist when no children are
+   * available in the returned `children()` iterable.
+   * 
+   * Examples for English:
+   * - search prefix of 'th':  [] - an empty array.  'th' is not a valid English word.
+   * - search prefix of 'the': ['the'].  'then' and 'there' may also exist within the lexicon,
+   *   but they most directly belong to deeper traversal states.
+   * 
+   * May contain multiple children if a lexical model performs 'keying' operations, such as
+   * may result from stripping accent markers from Spanish or French.  In this case, all entries
+   * transformed to the same 'key' should be listed by their key's traversal node.
+   * 
+   * Example using French "accent homographs", where keying operations strip accents:
+   * 
+   * - prefix of 'acre': ['acre', 'âcre']
+   * - prefix of 'crepe': ['crêpe', 'crêpé']
+   * - other examples:  https://www.thoughtco.com/french-accent-homographs-1371072
+   */
+  entries: USVString[];
+}
+
 /**
  * The model implementation, within the Worker.
  */
@@ -37,9 +93,56 @@ declare interface LexicalModel {
   configure(capabilities: Capabilities): Configuration;
 
   /**
+   * Indicates that the language represented by the lexical model has syntactic casing
+   * behaviors.  Setting this to true will allow the predictive text engine to
+   * perform casing-based corrections and predictions.
+   * 
+   * If set to `false`, the default behavior for the `toKey` method will not perform
+   * casing modifications and will thus yield case-sensitive results.  This will not occur
+   * if `undefined` for backward-compatibility reasons.
+   */
+  readonly languageUsesCasing?: boolean;
+
+  /**
+   * Represents casing-related syntactical behaviors of the language represented by
+   * this lexical model, modifying input text to follow the specified casing pattern.
+   * 
+   * Implementations may assume that the text represents a single word / 'token' from the
+   * context.
+   * 
+   * Patterns:
+   * - lower: all case-sensitive characters should be lowercased.  Example:  "text123"
+   * - upper: all case-sensitive characters should be uppercased.  Example:  "TEXT123"
+   * - initial:  only the word-initial character should be uppercased.
+   * @param form 
+   * @param text 
+   */
+  applyCasing?(form: CasingForm, text: string): string
+
+  /**
+   * Indicates a mapping function used by the model to simplify lookup operations
+   * within the lexicon.  This is expected to result in a many-to-one mapping, transforming
+   * the input text into a common, simplified 'index'/'key' form shared by all
+   * text forms that a person might reasonably interpret as "the same".
+   * 
+   * Example usages:  
+   * - converting any upper-case characters into lowercase.
+   *   - For English, 'CAT' and 'Cat' might be keyed as 'cat', since users expect all
+   *     three to be treated as the same word.
+   * - removing accent marks that may be difficult to type on standard keyboard layouts
+   *   - For French, users may wish to type "jeune" instead of "jeûne" when lazy or 
+   *     if accent marks cannot be easily input.
+   * 
+   * Providing a function targetted for your language can greatly improve a user's experience
+   * using your dictionary.
+   * @param text The original input text.
+   * @returns The 'keyed' form of that text.
+   */
+  toKey?(text: USVString): USVString;
+
+  /**
    * Generates predictive suggestions corresponding to the state of context after the proposed
-   * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
-   * keystroke rather than one actually received.
+   * transform is applied to it.
    * 
    * This method should NOT attempt to perform any form of correction; this is modeled within a
    * separate component of the LMLayer predictive engine.  That is, "th" + "e" should not be
@@ -48,7 +151,9 @@ declare interface LexicalModel {
    * 
    * However, addition of diacritics to characters (which may transform the underlying char code 
    * when Unicode-normalized) is permitted.  For example, "pur" + "e" may reasonably predict
-   * "purée", where "e" has been transformed to "é" as part of the suggestion.
+   * "purée", where "e" has been transformed to "é" as part of the suggestion.  When possible, 
+   * it is recommended to accomplish this by defining a `toKey` (`searchTermToKey` in model
+   * source) instead.
    * 
    * When both prediction and correction are permitted, said component (the `ModelCompositor`) will 
    * generally call this method once per 'likely' generated corrected state of the context, 
@@ -56,20 +161,9 @@ declare interface LexicalModel {
    * @param transform A Transform corresponding to a recent input keystroke
    * @param context A depiction of the context to which `transform` is applied.
    * @returns A probability distribution (`Distribution<Suggestion>`) on the resulting `Suggestion` 
-   * space for use in determining the most optimal overall suggestions.
+   * space for use in determining the most optimal overall suggestions.  
    */
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
-
-  /**
-   * Performs a wordbreak operation given the current context state, returning whatever word
-   * or word fragment exists that starts before the caret but after the most recent whitespace
-   * preceding the caret.  If no such text exists, the empty string is returned.
-   * 
-   * This function is designed for use in generating display text for 'keep' `Suggestions`
-   * and display text for reverting any previously-applied `Suggestions`.
-   * @param context 
-   */
-  wordbreak(context: Context): USVString;
 
   /**
    * Punctuation and presentational settings that the underlying lexical model
@@ -78,6 +172,50 @@ declare interface LexicalModel {
    * @see LexicalModelPunctuation
    */
   readonly punctuation?: LexicalModelPunctuation;
+
+  /**
+   * Returns the wordbreaker function defined for the model (if it exists).  This 
+   * wordbreaker should operate on a plain JS `string`, fully tokenizing it into 
+   * separate words according to the syntactical rules of the modeled language.
+   * 
+   * Needed to support many of the enhancements in 14.0, as enhanced wordbreaking / 
+   * tokenization is necessary for properly tracking possible "fat finger" inputs 
+   * and intermediate calculations (increasing prediction quality) and preventing
+   * their misuse when starting new words.
+   */
+  wordbreaker?: WordBreakingFunction;
+
+  /**
+   * Performs a wordbreak operation given the current context state, returning whatever word
+   * or word fragment exists that starts before the caret but after the most recent whitespace
+   * preceding the caret.  If no such text exists, the empty string is returned.
+   * 
+   * This function is designed for use in generating display text for 'keep' `Suggestions`
+   * and display text for reverting any previously-applied `Suggestions`.
+   * 
+   * ------------------
+   * 
+   * **NOTE:  _Deprecated_** and replaced by `wordbreaker` in 14.0.  You may still wish 
+   * to implement this function by reusing your `wordbreaker` definition if the model 
+   * may see use on Keyman 12.0 or 13.0, generally by returning `wordbreaker(context.left)`.
+   * 
+   * As this function only tokenizes a single word from the context, it is insufficient for
+   * supporting many of the predictive-text enhancements introduced in Keyman 14.  Its
+   * intermediate calculations are tracked on a per-word basis and the increased detail
+   * provided by `wordbreaker` helps with stability, validating the engine's use of 
+   * the current context.
+   * 
+   * @param context 
+   * @deprecated
+   */
+  wordbreak?(context: Context): USVString;
+
+  /**
+   * Lexical models _may_ provide a LexiconTraversal object usable to enhance 
+   * prediction and correction results.  The returned object represents the
+   * unfiltered lexicon (with an empty prefix).
+   */
+  traverseFromRoot?(): LexiconTraversal;
 }
 
 /**
@@ -129,6 +267,14 @@ declare interface Suggestion {
   transformId?: number;
 
   /**
+   * A unique identifier for the Suggestion itself, not shared with any others -
+   * even for Suggestions sourced from the same Transform. 
+   * 
+   * The lm-layer is responsible for setting this field, not models.
+   */
+  id?: number;
+
+  /**
    * The suggested update to the buffer. Note that this transform should
    * be applied AFTER the instigating transform, if any.
    */
@@ -150,6 +296,20 @@ declare interface Suggestion {
   tag?: SuggestionTag;
 }
 
+interface Reversion extends Suggestion {
+  tag: 'revert';
+}
+
+interface Keep extends Suggestion {
+  tag: 'keep';
+
+  /**
+   * Notes whether or not the Suggestion may actually be suggested by the model.
+   * Should be `false` if the model does not actually predict the current text.
+   */
+  matchesModel: boolean;
+}
+
 /**
  * A tag indicating the nature of the current suggestion.
  * 
@@ -163,8 +323,7 @@ declare interface Suggestion {
  *  
  * If left undefined, the consumers will assume this is a prediction.
  */
-type SuggestionTag = undefined | 'keep' | 'correction' | 'emoji';
-
+type SuggestionTag = undefined | 'keep' | 'revert' | 'correction' | 'emoji';
 
 /**
  * The text and environment surrounding the insertion point (text cursor).
@@ -218,6 +377,27 @@ interface ProbabilityMass<T> {
 }
 
 declare type Distribution<T> = ProbabilityMass<T>[];
+
+/**
+ * A type augmented with an optional probability.
+ */
+type Outcome<T> = T & {
+  /**
+   * [optional] probability of this outcome.
+   */
+  p?: number;
+};
+
+/**
+ * A type augmented with a probability.
+ */
+type WithOutcome<T> = T & {
+  /**
+   * Probability of this outcome.
+   */
+  p: number;
+};
+
 
 
 /******************************** Messaging ********************************/
@@ -278,6 +458,16 @@ declare interface Configuration {
   rightContextCodePoints: number;
   /** deprecated; use `leftContextCodePoints` instead! */
   rightContextCodeUnits?: number,
+
+  /**
+   * Whether or not the model appends characters to Suggestions for
+   * wordbreaking purposes.  (These characters need not be whitespace
+   * or actual wordbreak characters.)
+   * 
+   * If not specified, this will be auto-detected based on the model's
+   * punctuation properties (if they exist).
+   */
+  wordbreaksAfterSuggestions?: boolean
 }
 
 
@@ -303,6 +493,10 @@ declare interface WordBreakingFunction {
   // invariant: for all span[i] and span[i + 1], there does not exist a span[k]
   //            where span[i].end <= span[k].start AND span[k].end <= span[i + 1].start
   (phrase: string): Span[];
+}
+
+declare interface CasingFunction {
+  (caseToApply: CasingForm, text: string, defaultApplyCasing?: CasingFunction): string;
 }
 
 /**

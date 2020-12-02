@@ -1,11 +1,11 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.util;
 
 import android.content.Context;
-import android.os.Build;
-import android.util.Log;
 
-import com.tavultesoft.kmea.KMManager;
-
+import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.io.BufferedInputStream;
@@ -18,8 +18,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
   * Limitations:
@@ -115,8 +113,8 @@ public final class FileUtils {
         ret = DOWNLOAD_SUCCESS;
       }
     } catch (Exception e) {
+      KMLog.LogException(TAG, "Download failed! Error: ", e);
       ret = -1;
-      Log.e("FileUtils", "Download failed! Error: " + e);
     } finally {
       if (ret > 0) {
         if (tmpFile.exists() && tmpFile.length() > 0) {
@@ -136,7 +134,7 @@ public final class FileUtils {
         if (tmpFile != null && tmpFile.exists()) {
           tmpFile.delete();
         }
-        Log.e("FileUtils", "Could not download filename " + filename);
+        KMLog.LogError(TAG, "Could not download filename " + filename);
       }
 
       Connection.disconnect();
@@ -219,23 +217,36 @@ public final class FileUtils {
     }
   }
 
-  public static boolean saveList(Context context, String listName, JSONArray arr) {
-    boolean result;
+  /**
+   * Write obj Object to filepath
+   * @param File path to filename to write
+   * @param obj JSONObject or JSONArray to save
+   * @return boolean if the save was successful
+   */
+  public static boolean saveList(File filepath, Object obj) {
+    boolean result = false;
     final int INDENT = 2; // 2 spaces indent
     try {
-      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), listName);
-      OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-      outputStream.write(arr.toString(INDENT));
+      OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(filepath), StandardCharsets.UTF_8);
+      if (obj instanceof JSONObject) {
+        outputStream.write(((JSONObject)obj).toString(INDENT));
+        result = true;
+      } else if (obj instanceof JSONArray) {
+        outputStream.write(((JSONArray) obj).toString(INDENT));
+        result = true;
+      } else {
+        KMLog.LogError(TAG, "saveList failed. arr not JSONObject or JSONArray");
+      }
       outputStream.flush();
       outputStream.close();
-      result = true;
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save " + listName + ". Error: " + e);
+      KMLog.LogException(TAG, "saveList failed to save " + filepath.getName() + ". Error: ", e);
       result = false;
     }
 
     return result;
   }
+
   /**
    * Utility to parse a URL and extract the filename
    * @param urlStr String
@@ -250,38 +261,6 @@ public final class FileUtils {
         filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
     }
     return filename;
-  }
-
-  /**
-   * Utility to parse a URL and determine if it's a valid keyman:<method>
-   * Currently, only "keyman" scheme with "download" path and query is supported.
-   * Legacy keyman:// protocol is deprecated and not supported.
-   * @param u String of the URL
-   * @return boolean true if URL is a supported Keyman link
-   */
-  public static boolean isKeymanLink(String u) {
-    boolean ret = false;
-    if (u == null) {
-      return ret;
-    }
-    String lowerU = u.toLowerCase();
-    Pattern pattern = Pattern.compile("^keyman:(\\w+)\\?(.+)");
-    Matcher matcher = pattern.matcher(lowerU);
-    // Check URL starts with "keyman"
-    if (matcher.matches() && (matcher.group(1) != null)) {
-      // For now, only handle "download"
-      switch (matcher.group(1).toLowerCase()) {
-        case "download":
-          if (matcher.group(2) != null) {
-            // Contains query
-            ret = true;
-          }
-          break;
-        default:
-          ret = false;
-      }
-    }
-    return ret;
   }
 
   /**
@@ -418,7 +397,7 @@ public final class FileUtils {
       int i = Integer.parseInt(s);
       retVal = new Integer(i);
     } catch (Exception e) {
-      Log.e("FileUtils", "parseInteger Error: " + e);
+      KMLog.LogException(TAG, "parseInteger Error: ", e);
       retVal = null;
     }
 

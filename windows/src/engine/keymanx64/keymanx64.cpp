@@ -1,18 +1,18 @@
 /*
   Name:             keymanx64
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      11 Dec 2009
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
                     03 Oct 2011 - mcdurdin - I3093 - Keyman Engine x64 shows a garbled error message if it cannot start
                     03 Oct 2011 - mcdurdin - I3092 - Keyman Engine does not restart nicely if shutdown uncleanly
@@ -31,7 +31,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL             Fail(HWND, PWSTR);
 BOOL             UniqueInstance();
 
-// Global constants 
+// Global constants
 
 //#define KMC_GETLOADED 3
 
@@ -59,10 +59,10 @@ HWND hwndController = NULL, hwndControllerOwner = NULL;  // keyman x86 controlle
 
 // Global strings
 
-const PWSTR 
+const PWSTR
   szWindowClass = L"Keymanx64", // Do not localize
   szWindowTitle = L"Keymanx64", // Do not localize
-  
+
   szTitle = L"Keyman Engine x64",
   szError_Keymanx86NotFound = L"Keyman Engine x86 is not running.  Do not run keymanx64.exe -- it must be started by Keyman Engine x86",
   szError_Keymanx86NotFound_Comms = L"Keyman Engine x86 has closed unexpectedly.  Closing down Keyman Engine x64",
@@ -106,7 +106,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
   keyman_sentry_init(false, KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
   keyman_sentry_setexceptionfilter();
 
-  keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_INFO, "Started " KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
+  // We used the 'Started' event when testing Sentry integration in 14.0 alpha
+  // but we don't want or need it for stable.
+  // keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_INFO, "Started " KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
 
   if (!wcscmp(lpCmdLine, L"-sentry-client-test-exception")) {
     keyman_sentry_test_crash();
@@ -152,10 +154,10 @@ BOOL UniqueInstance()
   switch(WaitForSingleObject(hMutex, 0))
   {
     case WAIT_ABANDONED:
-    case WAIT_OBJECT_0: 
+    case WAIT_OBJECT_0:
       return TRUE;
     case WAIT_FAILED:
-    case WAIT_TIMEOUT: 
+    case WAIT_TIMEOUT:
       return FALSE;
   }
   return FALSE;

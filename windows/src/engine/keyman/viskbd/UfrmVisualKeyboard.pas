@@ -100,14 +100,6 @@ uses
 type
   TOSKActivePage = (apKeyboard, apCharacterMap, apEntryHelper, apFontHelper, apUndefined);
 
-  TKeymanToolButton = class(TToolButton)   // I4606
-  private
-    FKeyboardName, FCmdLine: string;
-  public
-    property KeyboardName: string read FKeyboardName write FKeyboardName;
-    property CmdLine: string read FCmdLine write FCmdLine;
-  end;
-
   TKeymanCustomisationMenuItem_Clone = class(TInterfacedObject, IKeymanCustomisationMenuItem)
   public
     function Get_Action: TOleEnum; safecall;
@@ -140,6 +132,8 @@ type
     ilKeyboards: TexImageList;
     panFontHelper: TPanel;
     tbKeyboards: TToolBar;
+    mnuKeyboards: TPopupMenu;
+    imgDown: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -185,6 +179,9 @@ type
     FRegistered: Boolean;
     FLastTotalKeyboards: Integer;   // I4606
 
+    FKeyboardButtons: TArray<TKeymanToolButton>;
+    btnKeyboardMenu: TToolButton;
+
     procedure ResetShiftStates;  // I1144
 
     procedure LoadSettings;
@@ -198,6 +195,7 @@ type
     procedure WMWindowPosChanging(var Message: TWMWindowPosChanging); message WM_WINDOWPOSCHANGING;
     procedure UpdateConstraints(Resize: Boolean = False);
 
+    procedure FixKeyboardToolbarOverflow;
 
     procedure WMMouseActivate(var Message: TWMMouseActivate); message WM_MOUSEACTIVATE;
 
@@ -223,6 +221,7 @@ type
     procedure KeyboardButtonClick(Sender: TObject);
     procedure BtnHideHint(Sender: TObject);
     procedure BtnShowHint(Sender: TObject);
+    procedure KeyboardMenuClick(Sender: TObject);
   protected
     procedure CreateParams(var Params: TCreateParams); override;
   public
@@ -279,6 +278,7 @@ uses
   psapi,
   ErrorControlledRegistry,
   KeymanDesktopShell,
+  KeymanMenuItem,
   RegistryKeys,
   Keyman.System.Util.RenderLanguageIcon,
   UfrmKeyman7Main,
@@ -320,6 +320,7 @@ begin
 
   ilToolbar.InitializeImageList;
   ilKeyboards.InitializeImageList;
+  ilKeyboards.AddMasked(imgDown.Picture.Bitmap, clWhite);
   ScreenSnap := True;
   SnapBuffer := 8;
 
@@ -360,7 +361,10 @@ begin
     for i := tbKeyboards.ButtonCount - 1 downto 0 do   // I4606
       tbKeyboards.Buttons[i].Free;
 
+    btnKeyboardMenu := nil;
     btnKeyboardHelp := nil;
+    ilKeyboards.Clear;
+    ilKeyboards.AddMasked(imgDown.Picture.Bitmap, clWhite);
 
     WidthSet := False;
 
@@ -397,17 +401,20 @@ begin
             begin
               tbLeft.Perform(TB_AUTOSIZE, 0, 0);
 
-              AddKeyboardToolbarItems(kmcom, tbKeyboards, ilKeyboards, KeyboardButtonClick);
+              FKeyboardButtons := AddKeyboardToolbarItems(kmcom, tbKeyboards, ilKeyboards, KeyboardButtonClick);
 
-{              FKeyboardMenuButton := TToolButton.Create(Self);
-              FKeyboardMenuButton.Left := x;
-              FKeyboardMenuButton.Width := 23;
-              tbKeyboards.InsertControl(FKeyboardMenuButton);
-              //btn.Tag := CustMenuItems.Items[i].Action;
-              //btn.ShowHint := True;
-              //FKeyboardMenuButton.OnMouseEnter := BtnShowKeyboardHint;
-              //FKeyboardMenuButton.OnMouseLeave := BtnHideKeyboardHint;
-              FKeyboardMenuButton.OnClick := KeyboardMenuClick;}
+              btnKeyboardMenu := TKeymanToolButton.Create(Self);
+              btnKeyboardMenu.Width := 23;
+              btnKeyboardMenu.ImageIndex := 0;
+              btnKeyboardMenu.OnClick := KeyboardMenuClick;
+              if tbKeyboards.ControlCount > 0 then
+                btnKeyboardMenu.Left := tbKeyboards.Controls[tbKeyboards.ControlCount - 1].Left +
+                                        tbKeyboards.Controls[tbKeyboards.ControlCount - 1].Width
+              else
+                btnKeyboardMenu.Left := 0;
+              btnKeyboardMenu.Parent := tbKeyboards;
+
+              FixKeyboardToolbarOverflow;
               x := 0;
               tb := tbRight;
             end;
@@ -519,7 +526,7 @@ begin
                   Break;
                 end;
 
-              s := MsgFromStr(':String[@Caption='''+xmlencode(StripHotkey(CustMenuItems.Items[i].Caption))+''']');
+              s := MsgFromStr(xmlencode(StripHotkey(CustMenuItems.Items[i].Caption)));
               if s = ''
                 then btn.Hint := StripHotkey(CustMenuItems.Items[i].Caption) + FShortCut
                 else btn.Hint := s + FShortCut;
@@ -662,6 +669,7 @@ end;
 procedure TfrmVisualKeyboard.FormResize(Sender: TObject);
 begin
   Update;
+  FixKeyboardToolbarOverflow;
 end;
 
 procedure TfrmVisualKeyboard.SetTopMost(ATopMost: Boolean);   // I4208
@@ -708,13 +716,66 @@ var
   id: string;
   kbd: TLangSwitchKeyboard;
 begin
-  if not (Sender is TKeymanToolButton) then
+  if Sender is TKeymanToolButton then
+    id := (Sender as TKeymanToolButton).KeyboardName
+  else if Sender is TKeymanMenuItem then
+    id := (Sender as TKeymanMenuItem).Keyboard.ID
+  else
     Exit;
-
-  id := (Sender as TKeymanToolButton).KeyboardName;
   kbd := frmKeyman7Main.LangSwitchManager.FindKeyboard(id);
   if Assigned(kbd) then
     frmKeyman7Main.ActivateKeyboard(kbd);
+end;
+
+procedure TfrmVisualKeyboard.KeyboardMenuClick(Sender: TObject);
+var
+  pt: TPoint;
+  i: Integer;
+  mi: TKeymanMenuItem;
+  j: Integer;
+  id: string;
+begin
+  pt := btnKeyboardMenu.ClientToScreen(Point(0, btnKeyboardMenu.ClientRect.Bottom));
+  mnuKeyboards.Items.Clear;
+  AddKeyboardItems(kmcom, mnuKeyboards, KeyboardButtonClick, nil);
+
+  for i := 0 to mnuKeyboards.Items.Count - 1 do
+  begin
+    mi := mnuKeyboards.Items[i] as TKeymanMenuItem;
+    id := mi.Keyboard.ID;
+    for j := 0 to High(FKeyboardButtons) do
+      if FKeyboardButtons[j].KeyboardName = id then
+      begin
+        mi.Visible := not FKeyboardButtons[j].Visible;
+        mi.Checked := FKeyboardButtons[j].Marked;
+        Break;
+      end;
+  end;
+
+  mnuKeyboards.Popup(pt.X, pt.Y);
+end;
+
+procedure TfrmVisualKeyboard.FixKeyboardToolbarOverflow;
+var
+  FMaxKeyboardsInToolbar: Integer;
+  i: Integer;
+begin
+  if Length(FKeyboardButtons) = 0 then Exit;
+
+  FMaxKeyboardsInToolbar := (panContent.ClientWidth - tbLeft.Width - tbRight.Width - panTitle.Width) div FKeyboardButtons[0].Width - 2;
+  if FMaxKeyboardsInToolbar > Length(FKeyboardButtons) then
+    FMaxKeyboardsInToolbar := Length(FKeyboardButtons);
+
+  for i := 0 to FMaxKeyboardsInToolbar - 1 do
+    FKeyboardButtons[i].Visible := True;
+
+  if FMaxKeyboardsInToolBar >= 0 then
+    for i := FMaxKeyboardsInToolbar to High(FKeyboardButtons) do
+      FKeyboardButtons[i].Visible := False;
+
+  btnKeyboardMenu.Visible := FMaxKeyboardsInToolbar < Length(FKeyboardButtons);
+
+  UpdateKeyboardIcon;
 end;
 
 procedure TfrmVisualKeyboard.CreateParams(var Params: TCreateParams);
@@ -1066,6 +1127,7 @@ var
   kbd: TLangSwitchKeyboard;
   kbdId: string;
   i: Integer;
+  Found: Boolean;
   btn: TKeymanToolButton;
 begin
   kbd := frmKeyman7Main.LangSwitchManager.ActiveKeyboard;
@@ -1073,13 +1135,21 @@ begin
     then kbdId := kbd.ID
     else kbdId := '';
 
-  for i := 0 to tbKeyboards.ControlCount - 1 do
-    if (tbKeyboards.Controls[i] is TToolButton) then
-    begin
-      btn := tbKeyboards.Controls[i] as TKeymanToolButton;
-      btn.Down := btn.KeyboardName = kbdId;
-      btn.Marked := btn.Down;
-    end;
+  Found := False;
+  for i := 0 to High(FKeyboardButtons) do
+  begin
+    btn := FKeyboardButtons[i];
+    btn.Down := btn.KeyboardName = kbdId;
+    btn.Marked := btn.Down;
+    Found := Found or (btn.Down and btn.Visible);
+  end;
+  if Assigned(btnKeyboardMenu) then
+  begin
+    btnKeyboardMenu.Down := not Found;
+    btnKeyboardMenu.Marked := not Found;
+  end;
+  for i := 0 to mnuKeyboards.Items.Count - 1 do
+    mnuKeyboards.Items[i].Checked := (mnuKeyboards.Items[i] as TKeymanMenuItem).Keyboard.ID = kbdId;
 
   UpdateButtons(kbd, tbLeft);   // I4606
   UpdateButtons(kbd, tbRight);   // I4606

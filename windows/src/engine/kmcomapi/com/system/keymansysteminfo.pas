@@ -99,13 +99,13 @@ end;
 
 procedure TKeymanSystemInfo.SetReboot;
 begin
-  FWantReboot := True;
-  KL.Log('TKeymanErrors.SetReboot.');
+  KL.Log('TKeymanErrors.SetReboot is no longer supported.');
 end;
 
 function TKeymanSystemInfo.Get_RebootRequired: WordBool;
 begin
-  Result := FWantReboot;
+  KL.Log('TKeymanErrors.RebootRequired always returns False.');
+  Result := False;
 end;
 
 end.

@@ -11,6 +11,13 @@ type
 
   TUpdateCheckResponseStatus = (ucrsNoUpdate, ucrsUpdateReady);
 
+  TUpdateCheckResponseLanguage = record
+    ID: string;
+    displayName: string;
+  end;
+
+  TUpdateCheckResponseLanguages = TArray<TUpdateCheckResponseLanguage>;
+
   TUpdateCheckResponsePackage = record
     ID: string;
     NewID: string;
@@ -18,8 +25,10 @@ type
     OldVersion, NewVersion: string;
     DownloadURL: string;
     SavePath: string;
+    FileName: string;
     DownloadSize: Integer;
     Install: Boolean;
+    Languages: TUpdateCheckResponseLanguages;
   end;
 
   TUpdateCheckResponsePackages = TArray<TUpdateCheckResponsePackage>;
@@ -33,12 +42,15 @@ type
     FErrorMessage: string;
     FCurrentVersion: string;
     FPackages: TUpdateCheckResponsePackages;
+    FFileName: string;
     function ParseKeyboards(nodes: TJSONObject): Boolean;
+    function ParseLanguages(i: Integer; v: TJSONValue): Boolean;
   public
     function Parse(const message: AnsiString; const app, currentVersion: string): Boolean;
 
     property CurrentVersion: string read FCurrentVersion;
     property NewVersion: string read FNewVersion;
+    property FileName: string read FFileName;
     property InstallURL: string read FInstallURL;
     property InstallSize: Int64 read FInstallSize;
     property ErrorMessage: string read FErrorMessage;
@@ -75,9 +87,19 @@ begin
     if CompareVersions(node.Values['version'].Value, FCurrentVersion) < 0 then
     begin
       FNewVersion := node.Values['version'].Value;
+      FFileName := node.Values['file'].Value;
       FInstallURL := node.Values['url'].Value;
-      FInstallSize := (node.Values['size'] as TJSONNumber).AsInt64;
-      FStatus := ucrsUpdateReady;
+      if node.Values['size'] is TJSONNumber then
+      begin
+        FInstallSize := (node.Values['size'] as TJSONNumber).AsInt64;
+        FStatus := ucrsUpdateReady;
+      end
+      else
+      begin
+        FInstallSize := 0;
+        FStatus := ucrsNoUpdate;
+        FErrorMessage := 'No valid updates found.';
+      end;
     end
     else
     begin
@@ -112,8 +134,32 @@ begin
     FPackages[i].NewVersion := node.Values['version'].Value;
     FPackages[i].DownloadSize := (node.Values['packageFileSize'] as TJSONNumber).AsInt64;
     FPackages[i].DownloadURL := node.Values['url'].Value;
+    FPackages[i].FileName := node.Values['packageFilename'].Value;
+    if not ParseLanguages(i, node.Values['languages']) then
+      Exit(False);
   end;
 
+  Result := True;
+end;
+
+function TUpdateCheckResponse.ParseLanguages(i: Integer; v: TJSONValue): Boolean;
+var
+  nodes, node: TJSONObject;
+  pair: TJSONPair;
+  j: Integer;
+begin
+  if not Assigned(v) then
+    Exit(True);
+
+  nodes := v.AsType<TJSONObject>;
+  SetLength(FPackages[i].Languages, nodes.Count);
+  for j := 0 to nodes.Count - 1 do
+  begin
+    pair := nodes.Pairs[j];
+    node := pair.JsonValue as TJSONObject;
+    FPackages[i].Languages[j].ID := pair.JsonString.Value;
+    FPackages[i].Languages[j].displayName := node.Values['displayName'].Value;
+  end;
   Result := True;
 end;
 

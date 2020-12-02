@@ -47,7 +47,7 @@ public class CloudDataJsonUtilTest {
     // Test processLexicalModelJSON()
     JSONParser parser = new JSONParser();
     JSONArray cloud = parser.getJSONObjectFromFile(new File(TEST_RESOURCE_ROOT, "sencoten.json"), JSONArray.class);
-      List<LexicalModel> results = CloudDataJsonUtil.processLexicalModelJSON(cloud);
+      List<LexicalModel> results = CloudDataJsonUtil.processLexicalModelJSON(cloud, true);
 
     LexicalModel lmInfo = results.get(0);
     Assert.assertEquals("str-latn", lmInfo.getLanguageID());

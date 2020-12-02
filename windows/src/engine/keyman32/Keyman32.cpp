@@ -100,35 +100,9 @@
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
-   // I3616   // I4169   // I5136
-//
-// WARNING: Virtual key output is partially supported in this file, however
-//			it has never been fully debugged; several known problems exist:
-//				1) Interference with backspace			
-//				2) Performance hit
-//			some code has been commented out; you may wish to debug and
-//			uncomment this code if you find it necessary to support it.
-//			(We also ran out of time in testing and debugging it; it is
-//			very complex and totally illogical - just to encourage you to
-//			start with it!)
-//
 
 #include "pch.h"
 #include "serialkeyeventserver.h"
-
-/*
- If DEBUG is defined, give information in the map file about PRIVATE (=static)
- functions that don't normally appear in the map file.
-*/
-
-//#define CERTCHECK_DISABLE
-
-#define KEYMAN_MSGFLAG 0x4000000L
-#define DEBUGLOG
-
-LRESULT CALLBACK kmnKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
-int MapVirtualKeys(int keyCode, UINT shiftFlags);
-int KPostMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 HINSTANCE g_hInstance;
 
@@ -138,16 +112,6 @@ HINSTANCE g_hInstance;
 /*                                                                                         */ 
 /*******************************************************************************************/ 
 
-BOOL TestDebugProcess()
-{
-  /*WCHAR buf[260];
-  GetModuleFileNameW(NULL, buf, 260);
-  if(wcsicmp(buf, L"c:\\temp\\keymanx64.exe") != 0) return FALSE;*/
-  return TRUE;
-}
-
-BOOL ShouldAttachToProcess();
-
 BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved) 
 {
   UNREFERENCED_PARAMETER(reserved);
@@ -155,46 +119,27 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 	switch(fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-    //if(!TestDebugProcess()) return FALSE;
-    //if(!ShouldAttachToProcess()) return FALSE;
-    OutputThreadDebugString("DLL_PROCESS_ATTACH");
+    //OutputThreadDebugString("DLL_PROCESS_ATTACH");
     if(!Globals_InitProcess()) return FALSE;
 		break;
 	case DLL_PROCESS_DETACH:
-    //if(!TestDebugProcess()) return FALSE;
     if (reserved == NULL) {
-      OutputThreadDebugString("DLL_PROCESS_DETACH not terminating");
       // If reserved == NULL, that means the library is being unloaded, but
       // the process is not terminating.
-      //
-      // We only cleanup after ourselves if the process is not terminating
-      // because of an issue with the order of DLL detach: if msctf.dll is
-      // detached first, then we end up causing an exception in msctf when
-      // we try to do our cleanup in CloseTSF.
-      //
-      // https://devblogs.microsoft.com/oldnewthing/20120105-00/?p=8683
-      //
-      // See https://github.com/keymanapp/keyman/issues/1723 for details
-      // relating to SumatraPDF. Note that this is hard to reproduce; I
-      // have been unable to reproduce the issue on my test machines.
-      //
-      // Note: Keyman may be violating a loader lock rule by calling 
-      // CloseTSF from here. This needs further investigation...
+      //OutputThreadDebugString("DLL_PROCESS_DETACH not terminating");
       UninitialiseProcess(FALSE);
       Globals_UninitProcess();
     }
     else {
-      OutputThreadDebugString("DLL_PROCESS_DETACH terminating");
+      //OutputThreadDebugString("DLL_PROCESS_DETACH terminating");
     }
 		break;
 	case DLL_THREAD_ATTACH:
-    //if(!TestDebugProcess()) return FALSE;
-    OutputThreadDebugString("DLL_THREAD_ATTACH");
+    //OutputThreadDebugString("DLL_THREAD_ATTACH");
     Globals_InitThread();
 		break;
 	case DLL_THREAD_DETACH:
-    //if(!TestDebugProcess()) return FALSE;
-    OutputThreadDebugString("DLL_THREAD_DETACH");
+    //OutputThreadDebugString("DLL_THREAD_DETACH");
     UninitialiseProcess(FALSE);
     Globals_UninitThread();
 		break;
@@ -204,9 +149,13 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 
 void UninitDebuggingEx();
 
+/**
+ * Frees memory and cleans up
+ *
+ * @param Lock    If FALSE, does not attempt to release other DLLs (e.g. call()ed DLLs)
+ */
 BOOL UninitialiseProcess(BOOL Lock) 
 {
-  //SendDebugMessageFormat(0, sdmGlobal, 0, "DLL_PROCESS_DETACH");
   if(!Globals_ProcessInitialised()) return TRUE;
 
 	ReleaseKeyboards(Lock);
@@ -246,10 +195,17 @@ void DoCWMF(UINT msg)
 
 void DoChangeWindowMessageFilter()
 {
-	PChangeWindowMessageFilter = (BOOL (WINAPI *)(UINT,DWORD))GetProcAddress(LoadLibrary("user32"), "ChangeWindowMessageFilter");
+  HMODULE hUser32 = LoadLibrary("user32");
+  if (!hUser32)
+    return;
 
-	if(!PChangeWindowMessageFilter)
-		return;
+	PChangeWindowMessageFilter = (BOOL (WINAPI *)(UINT,DWORD))GetProcAddress(hUser32, "ChangeWindowMessageFilter");
+
+  if (!PChangeWindowMessageFilter)
+  {
+    FreeLibrary(hUser32);
+    return;
+  }
 
 	DoCWMF(wm_keyman);   // I3594
   DoCWMF(wm_keyman_keyevent);
@@ -263,6 +219,8 @@ void DoChangeWindowMessageFilter()
     DoCWMF(wm_keymanshift);
     DoCWMF(wm_keyman_control);   // I4714
     DoCWMF(wm_keyman_control_internal);   // I4714
+
+    FreeLibrary(hUser32);
 }
 
 BOOL InitThread(HWND hwnd)
@@ -591,7 +549,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 
-  strncpy(_td->ForceFileName, FileName, MAX_PATH);
+  strncpy(_td->ForceFileName, FileName, MAX_PATH - 1);
 	_td->ForceFileName[MAX_PATH-1] = 0;
 
 	if(_td->lpActiveKeyboard)
@@ -715,6 +673,8 @@ extern "C" DWORD _declspec(dllexport) WINAPI GetActiveKeymanID()
 //
 //---------------------------------------------------------------------------------------------------------
 
+// This function prevents a refresh event from being processed more than once
+// by a thread, for instance if a thread has multiple top-level windows
 BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
@@ -725,35 +685,46 @@ BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
     return TRUE;
   }
   return FALSE;
-  /*LONG lOriginal, lResult;
-  do {
-    lOriginal = _td->RefreshTag_Process;
-    lResult = max(lOriginal, tag);
-  } while(InterlockedCompareExchange(&_td->RefreshTag_Process, lResult, lOriginal) != lOriginal);
-    
-  return lResult > lOriginal;*/
 }
 
 void HandleRefresh(int code, LONG tag)
 {
 	switch(code)
 	{
-	case KR_REQUEST_REFRESH: 
+	case KR_REQUEST_REFRESH:
+    // This is sent by Keyman COM API, ApplyToRunningKeymanEngine
 		SendDebugMessageFormat(0,sdmGlobal,0,"#### Refresh Requested ####");
-		//PostMessage(GetDesktopWindow(), wm_keyman_refresh, KR_PRE_REFRESH, 0);
+
+    // We ask any controller window to tell all instances of keyman32/keyman64
+    // that a refresh is coming through
 		Globals::PostControllers(wm_keyman_refresh, KR_PRE_REFRESH, 0);
+
+    // We need to tell the controller windows to refresh themselves also
 		Globals::PostControllers(wm_keyman_control, KMC_REFRESH, 0);
 		break;
 
 	case KR_PRE_REFRESH:
+#ifndef _WIN64
+    // We only need to broadcast the message from Win32; this avoids
+    // a double-broadcast which could happen if both keyman32 and keyman64
+    // receive the message, as they have independently managed RefreshTags
+
+    // All controllers will receive this message; only one need act on it
     tag = InterlockedIncrement(Globals::RefreshTag());
     
-    if(UpdateRefreshTag(tag))
-  		RefreshKeyboards(FALSE); // The Keyman window gets the update first
-    PostMessage(HWND_BROADCAST, wm_keyman_refresh, KR_REFRESH, tag);
-		break;
+    if (UpdateRefreshTag(tag)) {
+      // The Keyman process gets the update first
+      RefreshKeyboards(FALSE); 
+      PostMessage(HWND_BROADCAST, wm_keyman_refresh, KR_REFRESH, tag);
+    }
+#endif
+
+    break;
 
 	case KR_REFRESH:
+    // All threads need to have their keyboard list
+    // refreshed after an update, but only once per
+    // refresh request
     if(UpdateRefreshTag(tag))
       RefreshKeyboards(FALSE);
 
@@ -767,7 +738,7 @@ BOOL ConvertStringToGuid(WCHAR *buf, GUID *guid)   // I3581
 }
 
 void LoadBaseLayoutSettings() {   // I4552   // I4583
-  char underlyingLayout[16];
+  char underlyingLayout[16] = "";
   wchar_t baseLayout[MAX_PATH];
   DWORD dwUnderlyingLayout = 0;
 
@@ -776,7 +747,7 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 	if(reg->OpenKeyReadOnly(REGSZ_KeymanCU)) {
 		if(reg->ReadString(REGSZ_UnderlyingLayout, underlyingLayout, 15)) {
       dwUnderlyingLayout = strtoul(underlyingLayout, NULL, 16);   // I4516   // I4581
-      wsprintf(underlyingLayout, "%08x", dwUnderlyingLayout);   // I3759   // I4581
+      wsprintf(underlyingLayout, "%08x", (unsigned int) dwUnderlyingLayout);   // I3759   // I4581
     } else {
 			underlyingLayout[0] = 0;
     }
@@ -797,7 +768,7 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 
     if(GetLocaleInfoW(LOWORD(dwUnderlyingLayout), LOCALE_SISO639LANGNAME, langName, _countof(langName)) > 0 &&
       GetLocaleInfoW(LOWORD(dwUnderlyingLayout), LOCALE_SISO3166CTRYNAME, countryName, _countof(countryName)) > 0) {   // I4588   // I4786
-      wsprintfW(baseLayoutAlt, L"%s-%s", langName, countryName);
+      wsprintfW(baseLayoutAlt, L"%ls-%ls", langName, countryName);
       Globals::SetBaseKeyboardName(baseLayout, baseLayoutAlt);
     } else {
       Globals::SetBaseKeyboardName(baseLayout, L"en-US");   // I4786
@@ -815,15 +786,55 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 // -                                                                                             -
 // -----------------------------------------------------------------------------------------------
 
+void RefreshKeyboardProfiles(INTKEYBOARDINFO *kp, BOOL isTransient) {
+  RegistryReadOnly *reg2 = Reg_GetKeymanInstalledKeyboard(kp->Name);   // I3581
+  if (reg2)
+  {
+    PCSTR RootKey = isTransient ? REGSZ_TransientLanguageProfiles : REGSZ_LanguageProfiles;
+    if (reg2->OpenKeyReadOnly(RootKey))   // I3581
+    {
+      char bufProfile[LOCALE_NAME_MAX_LENGTH];
+      int nProfile = 0;
+      while (reg2->GetKeyNames(bufProfile, LOCALE_NAME_MAX_LENGTH, nProfile))
+      {
+        RegistryReadOnly *reg3 = Reg_GetKeymanInstalledKeyboard(kp->Name);
+        if (reg3->OpenKeyReadOnly(RootKey) &&
+          reg3->OpenKeyReadOnly(bufProfile) &&
+          reg3->ValueExists(REGSZ_LanguageProfiles_LangID) &&
+          reg3->ValueExists(REGSZ_ProfileGUID))
+        {
+          kp->nProfiles++;
+          if (kp->nProfiles == 1) kp->Profiles = new INTKEYBOARDPROFILE[1];
+          else
+          {
+            INTKEYBOARDPROFILE *pProfiles = new INTKEYBOARDPROFILE[kp->nProfiles];   // I3761
+            memcpy(pProfiles, kp->Profiles, sizeof(INTKEYBOARDPROFILE) * (kp->nProfiles - 1));   // I3761
+            delete kp->Profiles;
+            kp->Profiles = pProfiles;
+          }
+          LPINTKEYBOARDPROFILE ikp = &kp->Profiles[kp->nProfiles - 1];   // I3761
+
+          WCHAR bufW[40];
+          reg3->ReadString(REGWSZ_ProfileGUID, bufW, _countof(bufW));
+          ConvertStringToGuid(bufW, &ikp->Guid);
+          ikp->LangID = (LANGID)reg3->ReadInteger(REGSZ_LanguageProfiles_LangID);
+          SendDebugMessageFormat(0, sdmGlobal, 0, "Found profile %ls, language id %x for keyboard %s", bufW, ikp->LangID, kp->Name);
+        }
+        delete reg3;
+        nProfile++;
+      }
+    }
+    delete reg2;
+  }
+}
 void RefreshKeyboards(BOOL Initialising)
 {
   OutputThreadDebugString("RefreshKeyboards");
 	char sz[_MAX_FNAME];
 	char oldname[_MAX_FNAME];
-	RegistryReadOnly *reg2;
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(_td->FInRefreshKeyboards) return;
+  if(!_td || _td->FInRefreshKeyboards) return;
   _td->FInRefreshKeyboards = TRUE;
 
   // Can happen when multiple top-level windows for one process
@@ -881,7 +892,7 @@ void RefreshKeyboards(BOOL Initialising)
 				if(_td->lpKeyboards)
 				{
 					memcpy(kp, _td->lpKeyboards, sizeof(INTKEYBOARDINFO)*_td->nKeyboards);
-					delete _td->lpKeyboards;
+					delete[] _td->lpKeyboards;
 				}
 				_td->nKeyboards = nk + 1;
 				_td->lpKeyboards = kp;
@@ -893,46 +904,10 @@ void RefreshKeyboards(BOOL Initialising)
 
 			/* Read the shadow keyboard id */    // I3613
 
-      reg2 = Reg_GetKeymanInstalledKeyboard(kp->Name);   // I3581
-      if(reg2)
-      {
-        if(reg2->OpenKeyReadOnly(REGSZ_LanguageProfiles))   // I3581
-        {
-          char bufProfile[LOCALE_NAME_MAX_LENGTH];
-          int nProfile = 0;
-          kp->nProfiles = 0;
-          kp->Profiles = NULL;
-          while(reg2->GetKeyNames(bufProfile, LOCALE_NAME_MAX_LENGTH, nProfile))
-          {
-            RegistryReadOnly *reg3 = Reg_GetKeymanInstalledKeyboard(kp->Name);
-            if(reg3->OpenKeyReadOnly(REGSZ_LanguageProfiles) && reg3->OpenKeyReadOnly(bufProfile))
-            {
-              if(reg3->ValueExists(REGSZ_ProfileGUID) && reg3->ValueExists("LangID") && reg3->ValueExists("Locale")) //TODO: constnats
-              {
-                kp->nProfiles++;
-                if(kp->nProfiles == 1) kp->Profiles = new INTKEYBOARDPROFILE[1];
-                else
-                {
-                  INTKEYBOARDPROFILE *pProfiles = new INTKEYBOARDPROFILE[kp->nProfiles];   // I3761
-                  memcpy(pProfiles, kp->Profiles, sizeof(INTKEYBOARDPROFILE) * (kp->nProfiles-1));   // I3761
-                  delete kp->Profiles;
-                  kp->Profiles = pProfiles;
-                }
-                LPINTKEYBOARDPROFILE ikp = &kp->Profiles[kp->nProfiles-1];   // I3761
-
-                WCHAR bufW[40];
-                reg3->ReadString(L"profile guid", bufW, _countof(bufW)); //TODO define string constant
-                ConvertStringToGuid(bufW, &ikp->Guid);
-                reg3->ReadString(L"Locale", ikp->Locale, _countof(ikp->Locale));
-                ikp->LangID = (LANGID) reg3->ReadInteger("LangID");
-              }
-            }
-            delete reg3;
-            nProfile++;
-          }
-        }
-        delete reg2;
-			}
+      kp->nProfiles = 0;
+      kp->Profiles = NULL;
+      RefreshKeyboardProfiles(kp, FALSE); // Read standard profiles
+      RefreshKeyboardProfiles(kp, TRUE);  // Read transient profiles
 
 			kp->Keyboard = NULL;
 
@@ -955,6 +930,7 @@ void RefreshKeyboards(BOOL Initialising)
 
   _td->FInRefreshKeyboards = FALSE;
 }
+
 void ReleaseKeyboards(BOOL Lock)
 {
   OutputThreadDebugString("ReleaseKeyboards");
@@ -1004,71 +980,6 @@ PWSTR GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
 
   return NULL;
 }
-
-
-BOOL ShouldAttachToProcess()
-{
-  return TRUE;
-#if 0
-  char buf[MAX_PATH];  -- if you return false, the DLL repeatedly attempts to attach to the process for every message received by the process -- oops!
-
-  HINSTANCE hinst = GetModuleHandle(LIBRARY_NAME);
-
-  if(!GetModuleFileName(hinst, buf, MAX_PATH)) return 0;
-  
-	char drive[_MAX_DRIVE], dir[_MAX_DIR];
-
-	_splitpath_s(buf, drive, _countof(drive), dir, _countof(dir), NULL, 0, NULL, 0);   // I3547
-	_makepath_s(buf, _countof(buf), drive, dir, "process", ".cfg");   // I3547
-
-  HANDLE hConfig = CreateFile(buf, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-  if(hConfig != INVALID_HANDLE_VALUE)
-  {
-    DWORD sz = 0;
-    if(ReadFile(hConfig, buf, MAX_PATH-1, &sz, NULL))
-    {
-      CloseHandle(hConfig);
-      assert(sz < MAX_PATH);
-      buf[sz] = 0;
-      _strlwr(buf);
-      if(strstr(buf, "attachtoallprocesses") != NULL) return TRUE;
-    }
-    else
-      CloseHandle(hConfig);
-  }
-
-  if(!GetModuleFileName(NULL, buf, MAX_PATH)) return 0;
-  
-  char *p = buf + lstrlen(buf) - lstrlen("cmd.exe");
-  if(p >= buf && !lstrcmpi(p, "cmd.exe")) return 0; /* NEVER, EVER, ATTACH TO CMD */
-  if(p >= buf && !lstrcmpi(p, "dwm.exe")) return 0; /* NEVER, EVER, ATTACH TO DWM */
-
-  p = buf + lstrlen(buf) - lstrlen("csrss.exe");
-  if(p >= buf && !lstrcmpi(p, "csrss.exe")) return 0; /* NEVER, EVER, ATTACH TO CSRSS */
-  if(p >= buf && !lstrcmpi(p, "lsass.exe")) return 0; /* NEVER, EVER, ATTACH TO CSRSS */
-  if(p >= buf && !lstrcmpi(p, "mstsc.exe")) return 0; /* NEVER, EVER, ATTACH TO RDPCLIENT */
-
-  p = buf + lstrlen(buf) - lstrlen("ehmsas.exe");
-  if(p >= buf && !lstrcmpi(p, "ehmsas.exe")) return 0; /* NEVER, EVER, ATTACH TO ehmsas */
-
-  p = buf + lstrlen(buf) - lstrlen("regedit.exe");
-  if(p >= buf && !lstrcmpi(p, "svchost.exe")) return 0; /* NEVER, EVER, ATTACH TO SVCHOST */
-  if(p >= buf && !lstrcmpi(p, "wininit.exe")) return 0; /* NEVER, EVER, ATTACH TO WININIT */
-  if(p >= buf && !lstrcmpi(p, "rdpclip.exe")) return 0; /* NEVER, EVER, ATTACH TO WININIT */
-  if(p >= buf && !lstrcmpi(p, "wuauclt.exe")) return 0; /* NEVER, EVER, ATTACH TO WINDEBUG */
-
-  p = buf + lstrlen(buf) - lstrlen("winlogon.exe");
-  if(p >= buf && !lstrcmpi(p, "services.exe")) return 0; /* NEVER, EVER, ATTACH TO SERVICES */
-  if(p >= buf && !lstrcmpi(p, "winlogon.exe")) return 0; /* NEVER, EVER, ATTACH TO WINLOGON */
-  if(p >= buf && !lstrcmpi(p, "windebug.exe")) return 0; /* NEVER, EVER, ATTACH TO WINDEBUG */
-
-  p = buf + lstrlen(buf) - lstrlen("vmwareuser.exe");
-  if(p >= buf && !lstrcmpi(p, "vmwareuser.exe")) return 0; /* NEVER, EVER, ATTACH TO VMWAREUSER */
-
-  return TRUE;
-#endif
-}
-
 
 void PostDummyKeyEvent() {  // I3301 - Handle I3250 regression with inadvertent menu activation with Alt keys   // I3534   // I4844
   keybd_event((BYTE) Globals::get_vk_prefix(), SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0); // I3250 - is this unnecessary?

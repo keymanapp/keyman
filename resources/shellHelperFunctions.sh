@@ -80,11 +80,13 @@ get_platform_folder() {
 # terminal attached, so not on the build machine.
 if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]]; then
     ERROR_RED=$(tput setaf 1)
+    SUCCESS_GREEN=$(tput setaf 2)
     WARNING_YELLOW=$(tput setaf 3)
     NORMAL=$(tput sgr0)
     TERM_HEADING=$(tput setaf 4)
 else
     ERROR_RED=
+    SUCCESS_GREEN=
     WARNING_YELLOW=
     NORMAL=
     TERM_HEADING=
@@ -303,7 +305,17 @@ verify_npm_setup () {
     # therein will not be affected by `lerna` commands.
     #
     # Calls repo's base package 'bootstrap' script, performing the needed `lerna bootstrap -- --no-optional` command.
-    npm run bootstrap
+    get_builder_OS
+
+    # https://github.com/lerna/lerna/issues/789 - there seems to sometimes be a concurrency issue when
+    # bootstrapping on macOS.
+    if [ ${os_id} == 'mac' ]; then
+      # --concurrency=1 is a modification on the lerna command, not for forwarding through the bootstrap command.
+      # It's a bit tricky.
+      npm run lerna -- bootstrap --concurrency=1 -- --no-optional
+    else
+      npm run bootstrap
+    fi
 
     # Alternatively, without the specific script:
     #   npx lerna bootstrap -- --no-optional             # ONLY SAFE AT REPO'S BASE (otherwise, temporarily re-downloads `lerna`!)

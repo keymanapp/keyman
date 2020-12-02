@@ -3,7 +3,7 @@
   <assemblyIdentity
     type="win32"
     name="tavultesoft.keymandeveloper.insthelp"
-    version="$VERSION"
+    version="$VersionWin"
     processorArchitecture="x86"/>
   <description>Keyman Engine Installation Assistant</description>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">

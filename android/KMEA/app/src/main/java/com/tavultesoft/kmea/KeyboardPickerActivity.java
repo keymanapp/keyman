@@ -20,6 +20,7 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
+import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -252,7 +253,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       outputStream.close();
       result = true;
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save " + listName + ". Error: " + e);
+      KMLog.LogException(TAG, "Failed to save " + listName + ". Error: ", e);
       result = false;
     }
 
@@ -304,15 +305,17 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     List<Keyboard> keyboardsList = KeyboardController.getInstance().get();
 
     if (keyboardInfo != null) {
-      // TODO:  Possible optimization - do we have anything with this language code already?
-      //        Only invalidate the lexical cache if not.
-      CloudRepository.shared.invalidateLexicalModelCache(context);
+      String languageID = keyboardInfo.getLanguageID();
+      if (CloudRepository.shared.getAssociatedLexicalModel(context, languageID) == null) {
+        // Only invalidate the lexical cache if there's no associated lexical model
+        CloudRepository.shared.invalidateLexicalModelCache(context, true);
+      }
 
       keyboardInfo.setNewKeyboard(true);
       KeyboardController.getInstance().add(keyboardInfo);
       result = KeyboardController.getInstance().save(context);
       if (!result) {
-        Log.e(TAG, "addKeyboard failed to save");
+        KMLog.LogError(TAG, "addKeyboard failed to save");
       }
     }
     notifyKeyboardsUpdate(context);
@@ -320,7 +323,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return result;
   }
 
-  protected static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
+  public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
     boolean result = false;
 
     if (lexicalModelsList == null) {
@@ -351,6 +354,9 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
               lexicalModelsList.remove(lexicalModelsList.size() - 1);
             }
           }
+
+          // Invalidate cache to rebuild the list (don't delete cache file since we just updated it)
+          CloudRepository.shared.invalidateLexicalModelCache(context, false);
         }
       }
     }
@@ -463,7 +469,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
   @SuppressWarnings("unchecked")
   private static ArrayList<HashMap<String, String>> getList(Context context, String filename) {
     ArrayList<HashMap<String, String>> list = null;
-
     File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), filename);
     if (file.exists()) {
       try {
@@ -471,7 +476,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
         inputStream.close();
       } catch (Exception e) {
-        Log.e(TAG, "Failed to read " + filename + ". Error: " + e);
+        KMLog.LogException(TAG, "Failed to read " + filename + ". Error: ", e);
         list = null;
       }
     }
@@ -500,8 +505,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         lmMap.get(KMManager.KMKey_LanguageName),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
-        "" // TODO: add model URL
-      );
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_KMPLink, ""));
       lexList.add(m);
     }
 
@@ -540,8 +544,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         lmMap.get(KMManager.KMKey_LanguageName),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
-        "" // model URL
-      );
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_KMPLink, ""));
       lexList.add(m);
     }
     storage.lexicalModels.addAll(lexList);
@@ -582,7 +585,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
    * @param lexicalModelKey - key of "{package ID}_{language ID}_{lexical model ID}"
    * @return Index >= 0 if the lexical model key exists. Otherwise -1
    */
-  protected static int getLexicalModelIndex(Context context, String lexicalModelKey) {
+  public static int getLexicalModelIndex(Context context, String lexicalModelKey) {
     int index = -1;
 
     if (lexicalModelsList == null) {
@@ -607,7 +610,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return index;
   }
 
-  protected static HashMap<String, String> getLexicalModelInfo(Context context,int index) {
+  public static HashMap<String, String> getLexicalModelInfo(Context context,int index) {
     if (index < 0) {
       return null;
     }
@@ -639,6 +642,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       keyboardInfo.get(KMManager.KMKey_LanguageName),
       keyboardInfo.get(KMManager.KMKey_KeyboardVersion),
       keyboardInfo.get(KMManager.KMKey_HelpLink),
+      keyboardInfo.get(KMManager.KMKey_KMPLink),
       isNewKeyboard,
       keyboardInfo.get(KMManager.KMKey_Font),
       keyboardInfo.get(KMManager.KMKey_OskFont));

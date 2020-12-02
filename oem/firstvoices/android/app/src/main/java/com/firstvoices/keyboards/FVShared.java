@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.util.Log;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,7 +39,15 @@ final class FVShared {
 
     private static final String FVKeyboardHelpLink = "http://help.keyman.com/keyboard/";
 
-    private static final String FVDefault_PackageID = "fv_all";
+    public static final String FVDefault_PackageID = "fv_all";
+
+    // Default Dictionary Info
+    public static final String FVDefault_DictionaryPackageID = "nrc.str.sencoten";
+    public static final String FVDefault_DictionaryModelID = "nrc.str.sencoten";
+    public static final String FVDefault_DictionaryModelName = "SENĆOŦEN (Saanich Dialect) Lexical Model";
+    public static final String FVDefault_DictionaryLanguageID = "str-latn";
+    public static final String FVDefault_DictionaryLanguageName = "SENĆOŦEN";
+    public static final String FVDefault_DictionaryKMP = FVDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
     /// Describes a keyboard used in FirstVoices Keyboards
     static class FVKeyboard {
@@ -104,7 +114,7 @@ final class FVShared {
 
     static FVShared getInstance() {
         // This 'singleton' requires initialization, so
-        // we cannot lazily instanatiate.
+        // we cannot lazily instantiate.
         assert(instance != null);
         return instance;
     }
@@ -234,24 +244,22 @@ final class FVShared {
                 KMManager.removeKeyboard(context, i);
         }
 
+        File resourceRoot =  new File(getResourceRoot());
+        PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
+
         // Recreate active keyboards list
         for(FVRegion region : regionList) {
             for(FVKeyboard keyboard : region.keyboards) {
                 if(loadedKeyboards.contains(keyboard.id)) {
-                    // Load the .keyboard_info file and find its first language code
-                    Keyboard kbInfo = new Keyboard(
-                      FVDefault_PackageID, //TODO: we want to share keyboard build scripts between ios and android; can we do this?
+                    // Parse kmp.json for the keyboard info
+                    Keyboard kbd = kmpProcessor.getKeyboard(
+                      FVDefault_PackageID,
                       keyboard.id,
-                      keyboard.name,
-                      "en", //TODO: use language code from kmp.json
-                      keyboard.name,
-                      "1.0", //TODO: use keyboard version from kmp.json
-                      String.format("%s%s", FVKeyboardHelpLink, keyboard.id),
-                      false,
-                      "NotoSansCanadianAboriginal.ttf",
-                      "NotoSansCanadianAboriginal.ttf");
-
-                    KMManager.addKeyboard(context, kbInfo);
+                      null); // get first associated language ID
+                    if (kbd != null) {
+                      // TODO: Override fonts to NotoSansCanadianAboriginal.ttf
+                      KMManager.addKeyboard(context, kbd);
+                    }
                 }
             }
         }
@@ -263,15 +271,8 @@ final class FVShared {
                     KMManager.setKeyboard(context, 0);
             }
             else {
-                // Add a default keyboard in if none are available
-                HashMap<String, String> kbInfo = new HashMap<>();
-                kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
-                kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
-                kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
-                kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
-                kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-                //kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(context, KMManager.KMDefault_KeyboardID));
-                kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
+                // Add a default keyboard if none are available
+                Keyboard kbInfo = KMManager.getDefaultKeyboard(context);
                 KMManager.addKeyboard(context, kbInfo);
             }
         }
@@ -340,7 +341,7 @@ final class FVShared {
         }
     }
 
-    /// Upgrades from an earlier vesion, converting data structures
+    /// Upgrades from an earlier version, converting data structures
     /// The data structures in earlier versions were a bit messy
     @SuppressWarnings("unchecked")
     void upgradeTo12() {

@@ -7,36 +7,36 @@ SIGNCODE_BUILD=1
 !include ..\..\Defines.mak
 
 copydebug:
-    -mkdir $(ROOT)\release\$VERSION
+    -mkdir $(ROOT)\release\$Version
 
     echo mkdir c:\kmsymbols > $(ROOT)\src\install.bat
-    echo mkdir c:\kmsymbols\$VERSION >> $(ROOT)\src\install.bat
-    echo copy *.tds c:\kmsymbols\$VERSION >> $(ROOT)\src\install.bat
-    echo copy *.dbg c:\kmsymbols\$VERSION >> $(ROOT)\src\install.bat
-    echo copy *.pdb c:\kmsymbols\$VERSION >> $(ROOT)\src\install.bat
+    echo mkdir c:\kmsymbols\$Version >> $(ROOT)\src\install.bat
+    echo copy *.tds c:\kmsymbols\$Version >> $(ROOT)\src\install.bat
+    echo copy *.dbg c:\kmsymbols\$Version >> $(ROOT)\src\install.bat
+    echo copy *.pdb c:\kmsymbols\$Version >> $(ROOT)\src\install.bat
     echo regedit /s tds.reg >> $(ROOT)\src\install.bat
     $(WZZIP) $(ROOT)\src\tds.zip $(ROOT)\src\install.bat $(ROOT)\src\buildtools\inst\tds.reg
 
     rem Disabling symsrv upload from the build agents (2018-06-19 mcdurdin)
-    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\debug\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
-    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\bin\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
+    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\debug\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $Version" /c "Release $Version"
+    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\bin\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $Version" /c "Release $Version"
 
     # ping localhost  # delay for a few seconds
     # $(WZSE) $(ROOT)\src\tds.zip -setup -t $(ROOT)\src\buildtools\inst\tds_dialog.txt -c .\install.bat
-    copy $(ROOT)\src\tds.zip $(ROOT)\release\$VERSION\tds-$VERSION.zip
+    copy $(ROOT)\src\tds.zip $(ROOT)\release\$Version\tds-$Version.zip
     -del $(ROOT)\src\tds.zip
 
     del $(ROOT)\src\install.bat
 
     # wait 1 second -- gives winzip time to finish
     # ping -n 2 127.0.0.1
-    # copy $(ROOT)\src\tds.exe $(ROOT)\release\$VERSION\tds-$VERSION.exe
+    # copy $(ROOT)\src\tds.exe $(ROOT)\release\$Version\tds-$Version.exe
     cd $(BUILD)
-    $(WZZIP) -r $(ROOT)\release\$VERSION\debug-$VERSION.zip *.zip
+    $(WZZIP) -r $(ROOT)\release\$Version\debug-$Version.zip *.zip
 
 
 uploadsymbols:
     rem Disabling symsrv upload from the build agents (2018-06-19 mcdurdin)
-    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\debug\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
-    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\bin\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
+    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\debug\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $Version" /c "Release $Version"
+    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\bin\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $Version" /c "Release $Version"
 

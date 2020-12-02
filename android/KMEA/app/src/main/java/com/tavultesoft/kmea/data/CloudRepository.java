@@ -2,7 +2,6 @@ package com.tavultesoft.kmea.data;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +17,8 @@ import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadReturns;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.util.BCP47;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class CloudRepository {
@@ -34,6 +36,12 @@ public class CloudRepository {
   private static final String TAG = "CloudRepository";
 
   public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";
+
+  public static final String API_PRODUCTION_HOST = "api.keyman.com";
+  public static final String API_STAGING_HOST = "api.keyman-staging.com";
+
+  public static final String API_MODEL_LANGUAGE_FORMATSTR = "https://%s/model?q=bcp47:%s";
+  public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android%s%s";
 
   private Dataset memCachedDataset;
   private Calendar lastLoad; // To be used for Dataset caching.
@@ -56,6 +64,33 @@ public class CloudRepository {
     void onUpdateDetection(List<Bundle> updateBundles);
   }
 
+  /**
+   * Get the api.keyman.com host (production vs staging) based on the tier
+   * @return String of api.keyman.com host
+   */
+  public static String getHost() {
+    switch (KMManager.getTier(BuildConfig.VERSION_NAME)) {
+      case ALPHA:
+      case BETA:
+        return API_STAGING_HOST;
+      default:
+        return API_PRODUCTION_HOST;
+    }
+  }
+
+  /**
+   * Get the validity for cached resources (lexical model cache and package-version)
+   * @param context the main activity of the application
+   * @return boolean of the cache validity
+   */
+  public boolean getCacheValidity(@NonNull Context context) {
+    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
+    boolean loadResourcesFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getResourcesCacheFile(context));
+
+    boolean cacheValid = loadLexicalModelsFromCache && loadResourcesFromCache;
+    return cacheValid;
+  }
+
   public boolean hasCache(Context context) {
     if(DEBUG_DISABLE_CACHE) {
       return false;
@@ -64,8 +99,7 @@ public class CloudRepository {
     if(shouldUseMemCache(context)) {
       return true;
     } else {
-      return shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context)) &&
-          shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
+      return getCacheValidity(context);
     }
   }
 
@@ -111,54 +145,69 @@ public class CloudRepository {
     }
   }
 
+  /**
+   * Search the available lexical models list and see there's an associated model for a
+   * given language ID. Available models are from the cloud catalog and locally installed models.
+   * @param context Context
+   * @param languageID String of the language ID to search
+   * @return LexicalModel of an associated lexical model. Null if no match found
+   */
+  public LexicalModel getAssociatedLexicalModel(@NonNull Context context, String languageID) {
+    if (memCachedDataset != null) {
+      for (int i=0; i < memCachedDataset.lexicalModels.getCount(); i++) {
+        LexicalModel lm = memCachedDataset.lexicalModels.getItem(i);
+        if (BCP47.languageEquals(lm.getLanguageID(), languageID)) {
+          return lm;
+        }
+      }
+    }
+    return null;
+  }
+
   // Should be called whenever a new language code starts being managed in order to help signal
   // retrieval of the language code's lexical models.
-  public void invalidateLexicalModelCache(@NonNull Context context) {
+  public void invalidateLexicalModelCache(@NonNull Context context, boolean deleteCacheFile) {
     this.invalidateLexicalCache = true;
 
-    // We should also pre-emptively clear out the old cache file
-    // in case of an app close or crash.
-    File file = CloudDataJsonUtil.getLexicalModelCacheFile(context);
-    file.delete();
+    if (deleteCacheFile) {
+      // We should also pre-emptively clear out the old cache file
+      // in case of an app close or crash.
+      File file = CloudDataJsonUtil.getLexicalModelCacheFile(context);
+      if (file != null) {
+        file.delete();
+      }
+    }
   }
 
-  private CloudApiTypes.CloudApiParam prepareKeyboardUpdateQuery(Context aContext)
-  {
-    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(aContext);
+  private CloudApiTypes.CloudApiParam prepareResourcesUpdateQuery(Context aContext) {
+    // Keyman cloud keyboard
+    // Append each keyboard id
+    String keyboardQuery = "";
+    for(Keyboard k : KeyboardController.getInstance().get()) {
+      String keyboardID = k.getKeyboardID();
+      if (!keyboardQuery.contains(keyboardID)) {
+        keyboardQuery = String.format("%s&keyboard=%s", keyboardQuery, keyboardID);
+      }
+    }
 
-    // Sanitize appVersion to #.#.# to match the API spec
-    // Regex needs to match the entire string
-    String appVersion = KMManager.getVersion();
-    // Retrieves the cloud-based keyboard catalog in Android's preferred format.
-    String keyboardURL = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
-      KMKeyboardDownloaderActivity.kKeymanApiBaseURL, appVersion, deviceType);
+    String lexicalModelQuery = "";
+    for(HashMap<String, String> hashMap : KMManager.getLexicalModelsList(aContext)) {
+      if (hashMap != null && hashMap.containsKey(KMManager.KMKey_LexicalModelID)) {
+        String lexicalModelID = hashMap.get(KMManager.KMKey_LexicalModelID);
+        if (!lexicalModelQuery.contains(lexicalModelID)) {
+          lexicalModelQuery = String.format("%s&model=%s", lexicalModelQuery, lexicalModelID);
+        }
+      }
+    }
 
-    //cloudQueries[cloudQueryEntries++] = new CloudApiParam(ApiTarget.Keyboards, keyboardURL, JSONType.Object);
-   return new CloudApiTypes.CloudApiParam(
-     CloudApiTypes.ApiTarget.Keyboards, keyboardURL).setType(CloudApiTypes.JSONType.Object);
+    String queryURL = String.format(API_PACKAGE_VERSION_FORMATSTR, getHost(), keyboardQuery, lexicalModelQuery);
+    return new CloudApiTypes.CloudApiParam(
+      CloudApiTypes.ApiTarget.PackageVersion, queryURL).setType(CloudApiTypes.JSONType.Object);
   }
 
-  private CloudApiTypes.CloudApiParam prepareLexicalModellUpdateQuery(Context aContext)
-  {
-    // This allows us to directly get the full lexical model catalog.
-    // TODO:  Remove and replace with commented-out code below once the proper multi-language
-    //        query is ready!
-    String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
-
-    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL)
-      .setType(CloudApiTypes.JSONType.Array);
-
-
-    // TODO: We want a list of lexical models for every language with an installed resource (kbd, lex model)
-//      String lexicalURL = String.format("%s?q=bcp47:", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
-//
-//      for(String lgCode: languageCodes) {
-//        lexicalURL = String.format("%s%s,", lexicalURL, lgCode);
-//      }
-//
-//      lexicalURL = lexicalURL.substring(0, lexicalURL.lastIndexOf(','));
-
-    /* do what's possible here, rather than in the Task */
+  public static String prepareLexicalModelQuery(String languageID) {
+    String lexicalURL = String.format(API_MODEL_LANGUAGE_FORMATSTR, getHost(), languageID);
+    return lexicalURL;
   }
 
   /**
@@ -186,10 +235,7 @@ public class CloudRepository {
    */
   public void updateDatasetIfNeeded(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure)
   {
-    boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
-    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
-
-    boolean cacheValid = loadKeyboardsFromCache && loadLexicalModelsFromCache;
+    boolean cacheValid = getCacheValidity(context);
 
     if(cacheValid && shouldUseMemCache(context)) {
       onSuccess.run();
@@ -211,10 +257,7 @@ public class CloudRepository {
    */
   private void preCacheDataSet(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure)
   {
-    boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
-    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
-
-    boolean cacheValid = loadKeyboardsFromCache && loadLexicalModelsFromCache;
+    boolean cacheValid = getCacheValidity(context);
 
     if(cacheValid && shouldUseMemCache(context)) {
       return; // isn't null - checked by `shouldUseCache`.
@@ -241,6 +284,7 @@ public class CloudRepository {
     // Consolidate kmp.json info from packages/
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
+    final boolean fromKMP = true;
 
     try {
       if (kmpLanguagesArray.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).
@@ -248,10 +292,10 @@ public class CloudRepository {
         memCachedDataset.keyboards.addAll(CloudDataJsonUtil.processKeyboardJSON(kmpLanguagesArray, true));
       }
       if (kmpLexicalModelsArray.length() > 0) {
-        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray));
+        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, fromKMP));
       }
     } catch (Exception e) {
-      Log.e(TAG, "preCacheDataSet error " + e);
+      KMLog.LogException(TAG, "preCacheDataSet error ", e);
     }
     CloudCatalogDownloadCallback _download_callback = new CloudCatalogDownloadCallback(
       context, updateHandler, onSuccess, onFailure);
@@ -259,44 +303,42 @@ public class CloudRepository {
     // Default values:  empty JSON instances.  `null` will instead break things.
     JSONObject kbdData = new JSONObject();
     JSONArray lexData = new JSONArray();
+    JSONObject pkgData = new JSONObject();
 
-    if(loadKeyboardsFromCache) {
-      kbdData = CloudDataJsonUtil.getCachedJSONObject(CloudDataJsonUtil.getKeyboardCacheFile(context));
-
-      // In case something went wrong with the last cache attempt, which can cause a null return.
-      if(kbdData == null) {
-        kbdData = new JSONObject();
-        loadKeyboardsFromCache = false;
-      }
-    }
-
-    if(loadLexicalModelsFromCache) {
+    if (cacheValid) {
+      // Get the lexical model info
       lexData = CloudDataJsonUtil.getCachedJSONArray(CloudDataJsonUtil.getLexicalModelCacheFile(context));
 
-      if(lexData == null) {
+      // In case something went wrong with the last cache attempt, which can cause a null return
+      if (lexData == null) {
         lexData = new JSONArray();
-        loadLexicalModelsFromCache = false;
+        cacheValid = false;
+      }
+
+      pkgData = CloudDataJsonUtil.getCachedJSONObject(CloudDataJsonUtil.getResourcesCacheFile(context));
+
+      if (pkgData == null) {
+        pkgData = new JSONObject();
       }
     }
+
     // Reuse any valid parts of the cache.
-    if(loadKeyboardsFromCache || loadLexicalModelsFromCache) {
-      CloudCatalogDownloadReturns jsonData = new CloudCatalogDownloadReturns(kbdData, lexData);
+    if (cacheValid) {
+      CloudCatalogDownloadReturns jsonData = new CloudCatalogDownloadReturns(kbdData, lexData, pkgData);
 
       // Call the processor method directly with the cached API data.
-      _download_callback.processCloudReturns(memCachedDataset,jsonData,
-        loadKeyboardsFromCache && loadLexicalModelsFromCache); // TODO:  Take params for finish, return val for failures
+      _download_callback.processCloudReturns(memCachedDataset, jsonData,
+        cacheValid); // TODO:  Take params for finish, return val for failures
     }
   }
+
   /**
    * Fetches a Dataset object corresponding to keyboards and models available from cache or file cache.
    * @param context   The current Activity requesting the Dataset.
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
   public Dataset fetchDataset(@NonNull Context context) {
-    boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
-    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
-
-    boolean cacheValid = loadKeyboardsFromCache && loadLexicalModelsFromCache;
+    boolean cacheValid = getCacheValidity(context);
 
     if(cacheValid && shouldUseMemCache(context)) {
       return memCachedDataset; // isn't null - checked by `shouldUseCache`.
@@ -321,27 +363,16 @@ public class CloudRepository {
    * @param onFailure  A callback to be triggered upon failure of a query.
    */
   private void downloadMetaDataFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
-    boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
-    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
-
-    boolean cacheValid = loadKeyboardsFromCache && loadLexicalModelsFromCache;
+    boolean cacheValid = getCacheValidity(context);
 
     if(cacheValid && shouldUseMemCache(context)) {
       return; // isn't null - checked by `shouldUseCache`.
     }
 
     // check if cache file is valid
-    if(loadKeyboardsFromCache) {
-      // In case something went wrong with the last cache attempt, which can cause a null return.
-      if(CloudDataJsonUtil.getCachedJSONObject(CloudDataJsonUtil.getKeyboardCacheFile(context)) == null) {
-        loadKeyboardsFromCache = false;
-      }
-    }
-
-    // check if cache file is valid
-    if(loadLexicalModelsFromCache) {
+    if(cacheValid) {
       if(CloudDataJsonUtil.getCachedJSONArray(CloudDataJsonUtil.getLexicalModelCacheFile(context)) == null) {
-        loadLexicalModelsFromCache = false;
+        cacheValid = false;
       }
     }
 
@@ -349,13 +380,8 @@ public class CloudRepository {
     //    int cloudQueryEntries = 0;
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>(2);
 
-    if (!loadKeyboardsFromCache) {
-
-      cloudQueries.add(prepareKeyboardUpdateQuery(context));
-    }
-
-    if (!loadLexicalModelsFromCache) {
-      cloudQueries.add(prepareLexicalModellUpdateQuery(context));
+    if (!cacheValid) {
+      cloudQueries.add(prepareResourcesUpdateQuery(context));
     }
 
     int cloudQueryEntries = cloudQueries.size();
@@ -387,7 +413,7 @@ public class CloudRepository {
       JSONObject json = new JSONObject().put(KMKeyboardDownloaderActivity.KMKey_Languages, languagesArray);
       return new JSONObject().put(KMKeyboardDownloaderActivity.KMKey_Languages, json);
     } catch (JSONException e) {
-      Log.e(TAG, "Failed to properly handle KMP JSON.  Error: " + e);
+      KMLog.LogException(TAG, "Failed to properly handle KMP JSON.  Error: ", e);
       return null;
     }
   }

@@ -87,12 +87,10 @@ uses
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
   Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\global\delphi\general\UnitDrawArrow.pas',
-  StockObjects in 'kct\StockObjects.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   custinterfaces in '..\..\global\delphi\cust\custinterfaces.pas',
   CustomisationMessages in '..\..\global\delphi\cust\CustomisationMessages.pas',
-  StockMessages in '..\..\global\delphi\cust\StockMessages.pas',
   HeadingCheckListBox in '..\..\global\delphi\comp\HeadingCheckListBox.pas',
   BitmapEditor in '..\..\global\delphi\comp\BitmapEditor.pas',
   StringGridEditControlled in '..\..\global\delphi\comp\StringGridEditControlled.pas',
@@ -145,7 +143,6 @@ uses
   Keyman.Developer.UI.TikeOnlineUpdateCheck in 'update\Keyman.Developer.UI.TikeOnlineUpdateCheck.pas',
   Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion in 'update\Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion.pas' {frmTikeOnlineUpdateNewVersion},
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
-  MessageDefaults in 'kct\MessageDefaults.pas',
   UfrmDownloadProgress in 'main\UfrmDownloadProgress.pas' {frmDownloadProgress},
   UframeOnScreenKeyboardEditor in 'main\UframeOnScreenKeyboardEditor.pas' {frameOnScreenKeyboardEditor},
   UfrmOSKEditor in 'child\UfrmOSKEditor.pas' {frmOSKEditor},
@@ -249,7 +246,6 @@ uses
   Keyman.Developer.System.HelpTopics in 'help\Keyman.Developer.System.HelpTopics.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
-  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
@@ -293,7 +289,9 @@ uses
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
-  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
+  Keyman.Developer.System.Project.UrlRenderer in 'project\Keyman.Developer.System.Project.UrlRenderer.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

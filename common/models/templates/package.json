@@ -1,0 +1,57 @@
+{
+  "name": "@keymanapp/models-templates",
+  "version": "14.0.195",
+  "description": "Backing model implementations (templates) for Keyman's modelling layer",
+  "keywords": [
+    "lm",
+    "lmlayer",
+    "lexical",
+    "model",
+    "templates",
+    "modelling",
+    "keyman",
+    "backend"
+  ],
+  "contributors": [
+    "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>"
+  ],
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "directories": {
+    "test": "test"
+  },
+  "files": [
+    "index.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "pretest": "npm run build",
+    "test": "mocha -r test/helpers.js"
+  },
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "devDependencies": {
+    "@keymanapp/models-types": "^14.0.195",
+    "@keymanapp/web-utils": "^14.0.195",
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.4",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@keymanapp/models-wordbreakers": "^14.0.195"
+  }
+}

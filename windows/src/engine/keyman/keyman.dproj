@@ -195,7 +195,6 @@
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
         <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\LayeredFormUtils.pas"/>
         <DCCReference Include="viskbd\UfrmOSKOnScreenKeyboard.pas">
             <Form>frmOSKOnScreenKeyboard</Form>
         </DCCReference>
@@ -225,22 +224,13 @@
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Windows8LanguageList.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogClient.pas"/>
         <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas"/>
         <DCCReference Include="Keyman.System.SharedBuffers.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.Security.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas"/>
-        <DCCReference Include="touchkeyboard\Keyman.System.FrameworkInputPane.pas">
-            <Form>$R ICONS.RES</Form>
-        </DCCReference>
+        <DCCReference Include="touchkeyboard\Keyman.System.FrameworkInputPane.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Vcl.pas"/>
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
@@ -307,9 +297,9 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>keyman.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -319,9 +309,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>keyman.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

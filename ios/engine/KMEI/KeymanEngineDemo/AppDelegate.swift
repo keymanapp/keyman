@@ -19,7 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     KeymanEngine.log.logAppDetails()
     Manager.applicationGroupIdentifier = "group.KMEI"
     Manager.shared.canRemoveDefaultKeyboard = true
-    Manager.shared.openURL = UIApplication.shared.openURL
 
     window = UIWindow(frame: UIScreen.main.bounds)
 

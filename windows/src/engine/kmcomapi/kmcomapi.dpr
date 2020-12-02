@@ -101,7 +101,6 @@ uses
   utildir in '..\..\global\delphi\general\utildir.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
-  MessageDefaults in '..\..\global\delphi\cust\MessageDefaults.pas',
   MessageIdentifierConsts in '..\..\global\delphi\cust\MessageIdentifierConsts.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
@@ -121,9 +120,6 @@ uses
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
-  StockMessages in '..\..\global\delphi\cust\StockMessages.pas',
-  kpinstallkeyboardlanguageprofiles in 'processes\keyboard\kpinstallkeyboardlanguageprofiles.pas',
-  kpuninstallkeyboardlanguageprofiles in 'processes\keyboard\kpuninstallkeyboardlanguageprofiles.pas',
   kprecompilemnemonickeyboard in 'processes\keyboard\kprecompilemnemonickeyboard.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',
@@ -150,13 +146,14 @@ uses
   keymankeyboardlanguagefile in 'com\keyboardlanguages\keymankeyboardlanguagefile.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
-  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   utilicon in '..\..\global\delphi\general\utilicon.pas',
-  Keyman.System.MitigateWin10_1803LanguageInstall in 'processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas';
+  Keyman.System.MitigateWin10_1803LanguageInstall in 'processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas',
+  Keyman.System.Process.KPInstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas',
+  Keyman.System.Process.KPUninstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas';
 
 {$R *.TLB}
-
 {$R *.RES}
 {$R VERSION.RES}
 {$R MANIFEST.RES}
@@ -170,3 +167,5 @@ exports
 begin
     // I1642 move GetErrLogPath out of DllMain - causes memory issues later due to COM calls.  Now in TavultesoftKeyman:Initialize
 end.
+
+

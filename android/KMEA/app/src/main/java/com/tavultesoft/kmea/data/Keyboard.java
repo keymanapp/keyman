@@ -3,17 +3,22 @@
  */
 package com.tavultesoft.kmea.data;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.Serializable;
 
 public class Keyboard extends LanguageResource implements Serializable {
@@ -28,6 +33,8 @@ public class Keyboard extends LanguageResource implements Serializable {
   private static String KB_NEW_KEYBOARD_KEY = "isNewKeyboard";
   private static String KB_FONT_KEY = "font";
   private static String KB_OSK_FONT_KEY = "oskFont";
+
+  private static Keyboard FALLBACK_KEYBOARD;
 
   /**
    * Constructor using JSON Objects from installed keyboards list
@@ -61,26 +68,36 @@ public class Keyboard extends LanguageResource implements Serializable {
 
       this.oskFont = keyboardJSON.optString(KMManager.KMKey_OskFont, "");
 
-      this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
+      this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, null);
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
         String.format(HELP_URL_FORMATSTR, this.resourceID, this.version));
     } catch (JSONException e) {
-      Log.e(TAG, "Keyboard exception parsing JSON: " + e);
+      KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
   }
 
   public Keyboard(String packageID, String keyboardID, String keyboardName,
                   String languageID, String languageName, String version,
-                  String helpLink,
+                  String helpLink, String kmp,
                   boolean isNewKeyboard, String font, String oskFont) {
     super(packageID, keyboardID, keyboardName, languageID, languageName, version,
       (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-        String.format(HELP_URL_FORMATSTR, keyboardID, version));
+        String.format(HELP_URL_FORMATSTR, keyboardID, version),
+      kmp);
 
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";
     this.oskFont = (oskFont != null) ? oskFont : "";
+  }
+
+  public Keyboard(Keyboard k) {
+    super(k.getPackageID(), k.getKeyboardID(), k.getKeyboardName(),
+      k.getLanguageID(), k.getLanguageName(), k.getVersion(),
+      k.getHelpLink(), k.getUpdateKMP());
+    this.isNewKeyboard = false;
+    this.font = k.getFont();
+    this.oskFont = k.getOSKFont();
   }
 
   public String getKeyboardID() { return getResourceID(); }
@@ -103,13 +120,14 @@ public class Keyboard extends LanguageResource implements Serializable {
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, languageName);
 
     bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, helpLink);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KMP_LINK, kmp);
 
     return bundle;
   }
 
   public boolean equals(Object obj) {
     if(obj instanceof Keyboard) {
-      boolean lgCodeMatch = ((Keyboard) obj).getLanguageID().equals(this.getLanguageID());
+      boolean lgCodeMatch = BCP47.languageEquals(((Keyboard) obj).getLanguageID(), this.getLanguageID());
       boolean idMatch = ((Keyboard) obj).getKeyboardID().equals(this.getKeyboardID());
 
       return lgCodeMatch && idMatch;
@@ -125,7 +143,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.font = installedObj.getString(KB_FONT_KEY);
       this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
     } catch (JSONException e) {
-      Log.e(TAG, "fromJSON exception: " + e);
+      KMLog.LogException(TAG, "fromJSON exception: ", e);
     }
   }
 
@@ -137,22 +155,53 @@ public class Keyboard extends LanguageResource implements Serializable {
         o.put(KB_FONT_KEY, this.font);
         o.put(KB_OSK_FONT_KEY, this.oskFont);
       } catch (JSONException e) {
-        Log.e(TAG, "toJSON exception: " + e);
+        KMLog.LogException(TAG, "toJSON exception: ", e);
       }
     }
     return o;
   }
 
-  // Default sil_euro_latin keyboard
-  public static final Keyboard DEFAULT_KEYBOARD = new Keyboard(
-    KMManager.KMDefault_PackageID,
-    KMManager.KMDefault_KeyboardID,
-    KMManager.KMDefault_KeyboardName,
-    KMManager.KMDefault_LanguageID,
-    KMManager.KMDefault_LanguageName,
-    KMManager.KMDefault_KeyboardVersion,
-    null, // will use help.keyman.com link because context required to determine local welcome.htm path
-    false,
-    KMManager.KMDefault_KeyboardFont,
-    KMManager.KMDefault_KeyboardFont);
+  /**
+   * Get the fallback keyboard. If never specified, use sil_euro_latin
+   * @param context Context
+   * @return Keyboard - the fallback keyboard
+   */
+  public static Keyboard getDefaultKeyboard(@NonNull Context context) {
+    if (context == null) {
+      KMLog.LogError(TAG, "getDefaultKeyboard with null context");
+    }
+    if (FALLBACK_KEYBOARD == null) {
+      String version = KMManager.getLatestKeyboardFileVersion(
+        context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID);
+
+      // If local help file doesn't exist, it will default to help.keyman.com link
+      File helpFile = new File(KMManager.getPackagesDir(),
+        KMManager.KMDefault_PackageID + File.separator + FileUtils.WELCOME_HTM);
+      String helpFileStr = helpFile.exists() ? helpFile.toString() : null;
+
+      FALLBACK_KEYBOARD = new Keyboard(
+        KMManager.KMDefault_PackageID,
+        KMManager.KMDefault_KeyboardID,
+        KMManager.KMDefault_KeyboardName,
+        KMManager.KMDefault_LanguageID,
+        KMManager.KMDefault_LanguageName,
+        version,
+        helpFileStr,
+        "",
+        false,
+        KMManager.KMDefault_KeyboardFont,
+        KMManager.KMDefault_KeyboardFont);
+    }
+    return FALLBACK_KEYBOARD;
+  }
+
+  /**
+   * Set the fallback keyboard. If keyboard is null, the fallback keyboard will
+   * revert to sil_euro_latin
+   * @param k Keyboard to set as the fallback keyboard
+   */
+  public static void setDefaultKeyboard(Keyboard k) {
+    // If k is null, getDefaultKeyboard() will regenerate fallback keyboard sil_euro_latin
+    FALLBACK_KEYBOARD = k;
+  }
 }

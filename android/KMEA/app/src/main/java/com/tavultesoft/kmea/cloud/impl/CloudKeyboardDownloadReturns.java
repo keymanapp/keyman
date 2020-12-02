@@ -8,14 +8,14 @@ import java.util.Map;
  */
 public class CloudKeyboardDownloadReturns {
   public final Integer kbdResult;
-  public final List<Map<String, String>> installedLexicalModels;
+  public final List<Map<String, String>> installedResource;
 
   public CloudKeyboardDownloadReturns(Integer i) {
     this(i, null);
   }
 
-  public CloudKeyboardDownloadReturns(Integer i, List<Map<String, String>> installedLexicalModels) {
+  public CloudKeyboardDownloadReturns(Integer i, List<Map<String, String>> installedResource) {
     this.kbdResult = i;
-    this.installedLexicalModels = installedLexicalModels;
+    this.installedResource = installedResource;
   }
 }

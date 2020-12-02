@@ -17,13 +17,17 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:text="@string/title_add_keyboard"
-            android:textSize="16sp"
+            android:textSize="@dimen/titlebar_label_textsize"
             android:textStyle="bold" />
 
     </androidx.appcompat.widget.Toolbar>
 
+    <!-- optional accent -->
     <View
+        android:id="@+id/bar_accent"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_alignParentBottom="true"

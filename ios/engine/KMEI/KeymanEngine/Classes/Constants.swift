@@ -18,6 +18,9 @@ public enum Key {
   /// Array of user lexical models info list in UserDefaults
   static let userLexicalModelsList = "UserLexicalModelsList"
 
+  /// Dictionary of cached query results for a user's installed packages
+  static let userPackageQueryCacheDict = "UserQueryDistributionStateCache"
+
   /// Currently/last selected keyboard info in UserDefaults
   static let userCurrentKeyboard = "UserCurrentKeyboard"
 
@@ -69,7 +72,7 @@ public enum Defaults {
                                                    name: "EuroLatin (SIL)",
                                                    languageID: "en",
                                                    languageName: "English",
-                                                   version: "1.8.1",
+                                                   version: "1.9.1",
                                                    isRTL: false,
                                                    font: font,
                                                    oskFont: nil,
@@ -120,4 +123,23 @@ public enum FileExtensions {
   public static let trueTypeFont = "ttf"
   public static let openTypeFont = "otf"
   public static let configurationProfile = "mobileconfig"
+}
+
+public enum KeymanError: Error, LocalizedError {
+  case unknown
+  // file that is missing, is the file critical?
+  case missingFile(String, Bool)
+
+  var localizedDescription: String {
+    switch self {
+      case .unknown:
+        return engineBundle.localizedString(forKey: "error-unknown", value: nil, table: nil)
+      case .missingFile(_, let isCritical):
+        if isCritical {
+          return engineBundle.localizedString(forKey: "error-missing-file-critical", value: nil, table: nil)
+        } else {
+          return engineBundle.localizedString(forKey: "error-missing-file", value: nil, table: nil)
+        }
+    }
+  }
 }

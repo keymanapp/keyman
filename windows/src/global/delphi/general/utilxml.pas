@@ -30,7 +30,7 @@ uses
 
 function XMLEncode(const s: WideString): WideString;
 function XMLFormat(const Args: array of const): WideString;
-function XMLImageTempName(const ImagePath: WideString; References: TStrings): WideString;
+function XMLImageTempName(const ImagePath: string; var TempLockFile: string; References: TStrings): string;
 
 implementation
 
@@ -138,7 +138,7 @@ begin
   end;
 end;
 
-function XMLImageTempName(const ImagePath: WideString; References: TStrings): WideString;
+function XMLImageTempName(const ImagePath: string; var TempLockFile: string; References: TStrings): string;
 var
   s: string;
   buf: array[0..260] of char;
@@ -146,8 +146,8 @@ begin
   s := ExcludeTrailingPathDelimiter(ImagePath);
   if GetTempFileName(PChar(s), 'kmn', 0, buf) = 0 then
     RaiseLastOSError;
-  DeleteFile(buf);
-  Result := ChangeFileExt(buf, '.bmp');
+  TempLockFile := buf;
+  Result := ChangeFileExt(TempLockFile, '.bmp');
   References.Add(ExtractFileName(Result));
 end;
 

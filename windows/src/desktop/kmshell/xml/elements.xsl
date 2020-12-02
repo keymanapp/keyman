@@ -5,12 +5,13 @@
   <xsl:output method="html" version="1.0" encoding="utf-8" omit-xml-declaration="yes" standalone="yes" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 
   <!-- I978 - locale was not reliably selected due to undefined order of document() loading and | processing -->
-  <xsl:variable name="prilocale" select="document(/Keyman/localepath)/Locale" />
-  <xsl:variable name="altlocale" select="document(/Keyman/defaultlocalepath)/Locale/*[not(@Id = $prilocale//@Id)]" />
+  <xsl:variable name="prilocale" select="document(/Keyman/localepath)/resources" />
+  <xsl:variable name="altlocale" select="document('strings.xml')/resources/*[not(@name = $prilocale//@name)]" />
   <xsl:variable name="comlocale">
       <xsl:copy-of select="$prilocale/*" />
       <xsl:copy-of select="$altlocale" />
   </xsl:variable>
+  <xsl:variable name="dialoginfo" select="document('dialoginfo.xml')/DialogInfo" />
   <xsl:variable name="locale" select="msxsl:node-set($comlocale)" />
 
   <!--
@@ -61,6 +62,7 @@
 		<xsl:param name="default" />
     <xsl:param name="width" />
     <xsl:param name="id" />
+    <xsl:param name="disabled" />
     <xsl:param name="tabid" />
     <xsl:param name="shield" />
 
@@ -73,6 +75,7 @@
               <xsl:otherwise>button</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
+          <xsl:if test="$disabled = 1"><xsl:attribute name="disabled">disabled</xsl:attribute></xsl:if>
           <xsl:attribute name="id">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
@@ -97,6 +100,7 @@
               <xsl:otherwise>button</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
+          <xsl:if test="$disabled = 1"><xsl:attribute name="disabled">disabled</xsl:attribute></xsl:if>
           <xsl:attribute name="ID">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="$caption" /></xsl:attribute>

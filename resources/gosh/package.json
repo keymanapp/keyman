@@ -1,0 +1,25 @@
+{
+  "name": "@keymanapp/resources-gosh",
+  "version": "14.0.195",
+  "description": "Good Ol' Shell",
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "contributors": [
+    "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>"
+  ],
+  "homepage": "https://github.com/keymanapp/keyman",
+  "license": "MIT",
+  "bin": {
+    "gosh": "./gosh.js"
+  },
+  "private": true,
+  "files": [
+    "bin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  }
+}

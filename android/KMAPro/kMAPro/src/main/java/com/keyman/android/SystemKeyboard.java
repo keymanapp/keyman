@@ -9,7 +9,6 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.LanguageSettingsActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.data.Keyboard;
 
@@ -30,7 +29,7 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 
 import io.sentry.android.core.SentryAndroid;
-import io.sentry.core.Sentry;
+import io.sentry.Sentry;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
@@ -142,7 +141,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (kbInfo != null) {
         String langId = kbInfo.getLanguageID();
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(langId), true);
+        boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(langId), true);
         KMManager.setBannerOptions(mayPredict);
       }
     }

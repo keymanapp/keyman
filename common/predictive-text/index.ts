@@ -53,6 +53,8 @@ namespace com.keyman.text.prediction {
     private _declareLMLayerReady: (conf: Configuration) => void;
     private _predictPromises: PromiseStore<Suggestion[]>;
     private _wordbreakPromises: PromiseStore<USVString>;
+    private _acceptPromises: PromiseStore<Reversion>;
+    private _revertPromises: PromiseStore<Suggestion[]>;
     private _nextToken: number;
     private capabilities: Capabilities;
 
@@ -67,8 +69,10 @@ namespace com.keyman.text.prediction {
       this._worker = worker || DefaultWorker.constructInstance();
       this._worker.onmessage = this.onMessage.bind(this)
       this._declareLMLayerReady = null;
-      this._predictPromises = new PromiseStore;
-      this._wordbreakPromises = new PromiseStore<USVString>();
+      this._predictPromises = new PromiseStore();
+      this._wordbreakPromises = new PromiseStore();
+      this._acceptPromises = new PromiseStore();
+      this._revertPromises = new PromiseStore();
       this._nextToken = Number.MIN_SAFE_INTEGER;
 
       this.sendConfig(capabilities);
@@ -90,15 +94,25 @@ namespace com.keyman.text.prediction {
     /**
      * Initializes the LMLayer worker with a path to the desired model file.
      */
-    loadModel(modelFilePath: string): Promise<Configuration> {
+    loadModel(modelSource: string, loadType: 'file' | 'raw' = 'file'): Promise<Configuration> {
       return new Promise((resolve, _reject) => {
         // Sets up so the promise is resolved in the onMessage() callback, when it receives
         // the 'ready' message.
         this._declareLMLayerReady = resolve;
 
+        let modelSourceSpec: any = {
+          type: loadType
+        };
+
+        if(loadType == 'file') {
+          modelSourceSpec.file = modelSource;
+        } else {
+          modelSourceSpec.code = modelSource;
+        }
+
         this._worker.postMessage({
           message: 'load',
-          model: modelFilePath
+          source: modelSourceSpec
         });
       });
     }
@@ -138,6 +152,33 @@ namespace com.keyman.text.prediction {
       });
     }
 
+    acceptSuggestion(suggestion: Suggestion, context: Context, postTransform: Transform): Promise<Reversion> {
+      let token = this._nextToken++;
+      return new Promise((resolve, reject) => {
+        this._acceptPromises.make(token, resolve, reject);
+        this._worker.postMessage({
+          message: 'accept',
+          token: token,
+          suggestion: suggestion,
+          context: context,
+          postTransform: postTransform
+        });
+      });
+    }
+
+    revertSuggestion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
+      let token = this._nextToken++;
+      return new Promise((resolve, reject) => {
+        this._revertPromises.make(token, resolve, reject);
+        this._worker.postMessage({
+          message: 'revert',
+          token: token,
+          reversion: reversion,
+          context: context
+        })
+      });
+    }
+
     // TODO: asynchronous close() method.
     //       Worker code must recognize message and call self.close().
 
@@ -155,6 +196,10 @@ namespace com.keyman.text.prediction {
         this._predictPromises.keep(payload.token, payload.suggestions);
       } else if (payload.message === 'currentword') {
         this._wordbreakPromises.keep(payload.token, payload.word);
+      } else if (payload.message === 'postaccept') {
+        this._acceptPromises.keep(payload.token, payload.reversion);
+      } else if (payload.message === 'postrevert') {
+        this._revertPromises.keep(payload.token, payload.suggestions);
       } else {
         // This branch should never execute, but just in case...
         //@ts-ignore

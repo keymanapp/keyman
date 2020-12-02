@@ -11,6 +11,7 @@
     "outFile": "dist/index.js"
   },
   "include": [
+    "node_modules/@keymanapp/web-environment/environment.inc.ts",
     "src/**/*.ts"
   ]
 }

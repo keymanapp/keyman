@@ -1,18 +1,18 @@
 /*
   Name:             syskbdnt64
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      10 Sep 2008
 
   Modified Date:    4 May 2010
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          10 Sep 2008 - mcdurdin - I1635 - Initial version
                     11 Mar 2009 - mcdurdin - I1894 - Fix threading bugs introduced in I1888
                     30 Nov 2009 - mcdurdin - I934 - Prep for x64 - change UINT to WORD for vkeys
@@ -28,7 +28,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "../../engine/keyman32/kbd.h"	/* DDK kbdlayout */ 
+#include "../../engine/keyman32/kbd.h"	/* DDK kbdlayout */
 
 typedef struct {
     PVK_TO_BIT pVkToBit;     // Virtual Keys -> Mod bits
@@ -128,9 +128,9 @@ BOOL LoadNewLibrary_NT_x64(PWSTR filename) {
   if(hKbdLibrary_x64) FreeLibrary(hKbdLibrary_x64);
 
 	hKbdLibrary_x64 = LoadLibrary(filename);
-	if(!hKbdLibrary_x64) { 	
+	if(!hKbdLibrary_x64) {
 	  LogError(L"LoadNewLibrary_x64: Exit -- could not load library");
-		return FALSE; 
+		return FALSE;
 	}
 
   PKBDLAYERDESCRIPTORFUNC KbdLayerDescriptorFunc = (PKBDLAYERDESCRIPTORFUNC) GetProcAddress(hKbdLibrary_x64, "KbdLayerDescriptor");
@@ -141,7 +141,7 @@ BOOL LoadNewLibrary_NT_x64(PWSTR filename) {
 			return TRUE;
     }
 	}
-				
+
 	FreeLibrary(hKbdLibrary_x64);
 
 	hKbdLibrary_x64 = NULL;
@@ -155,39 +155,39 @@ WCHAR CharFromVK_NT_x64(WORD VKey, UINT ShiftFlags, WCHAR *PDeadKey) {
 	PVK_TO_WCHARS1 pv;
 	PVK_TO_WCHAR_TABLE_x64 pvt;
 	int i;
-	
-	/* MCD 02/12/2002: Fix bug with number pad keys when numlock is on */ 
+
+	/* MCD 02/12/2002: Fix bug with number pad keys when numlock is on */
 
   if(IsNumberPadKey(VKey)) {
     return 0;
   }
 
-	/* Get the appropriate table column for shift state */ 
+	/* Get the appropriate table column for shift state */
 
 	int shift = -1, shiftidx = 0, capslockbit = 0;
 
 	for(PVK_TO_BIT pvtb = KbdTables_x64->pCharModifiers->pVkToBit; pvtb->Vk; pvtb++) {
 		switch(pvtb->Vk) {
-		case VK_MENU:    
+		case VK_MENU:
 			if(ShiftFlags & (LALTFLAG|RALTFLAG)) shiftidx |= pvtb->ModBits; break;
 		case VK_SHIFT:
 			if(ShiftFlags & CAPITALFLAG) capslockbit = pvtb->ModBits;
 			if(ShiftFlags & (K_SHIFTFLAG)) shiftidx |= pvtb->ModBits; break;
-		case VK_CONTROL: 
+		case VK_CONTROL:
 			if(ShiftFlags & (LCTRLFLAG|RCTRLFLAG)) shiftidx |= pvtb->ModBits; break;
 		}
   }
 
-	/* If the shift modifier is unused, don't produce a character */ 
+	/* If the shift modifier is unused, don't produce a character */
 
-	if(shiftidx > KbdTables_x64->pCharModifiers->wMaxModBits || 
+	if(shiftidx > KbdTables_x64->pCharModifiers->wMaxModBits ||
 			KbdTables_x64->pCharModifiers->ModNumber[shiftidx] == 0xF) {
 		return 0;
 	}
 
 	shift = KbdTables_x64->pCharModifiers->ModNumber[shiftidx];
 
-	/* Get the appropriate virtual key */ 
+	/* Get the appropriate virtual key */
 
 	for(i = 0, pvt = KbdTables_x64->pVkToWcharTable; pvt->pVkToWchars; i++, pvt++) {
 		for(pv = pvt->pVkToWchars; pv->VirtualKey;) {
@@ -196,32 +196,32 @@ WCHAR CharFromVK_NT_x64(WORD VKey, UINT ShiftFlags, WCHAR *PDeadKey) {
 					return 0;
         }
 
-				/* Check for Caps Lock */ 
+				/* Check for Caps Lock */
 				if(ShiftFlags & CAPITALFLAG) {
 					if(pv->Attributes & CAPLOK) {
-						/* Invert the state of the SHIFT key */ 
-						shift = KbdTables_x64->pCharModifiers->ModNumber[shiftidx ^ capslockbit]; 
+						/* Invert the state of the SHIFT key */
+						shift = KbdTables_x64->pCharModifiers->ModNumber[shiftidx ^ capslockbit];
           } else if(pv->Attributes & SGCAPS) {
-						pv++; /* Next keystroke has the appropriate capitalised character */ 
+						pv++; /* Next keystroke has the appropriate capitalised character */
           }
 				}
 
-				/* Found the keystroke combination, return the appropriate character (if existing) */ 
+				/* Found the keystroke combination, return the appropriate character (if existing) */
 				switch(pv->wch[shift]) {
 				case WCH_DEAD:
 					pv = (PVK_TO_WCHARS1) ((BYTE *)pv + pvt->cbSize);
           *PDeadKey = pv->wch[shift];
-					return 0xFFFF; /* Don't queue as WM_KEYDOWN -- don't output either */ 
+					return 0xFFFF; /* Don't queue as WM_KEYDOWN -- don't output either */
 				case WCH_NONE:
-					return 0x0000; /* Not a valid key, queue as WM_KEYDOWN */ 
+					return 0x0000; /* Not a valid key, queue as WM_KEYDOWN */
 				}
 
-				return (pv->wch[shift] > 31 && pv->wch[shift] != 127) ? pv->wch[shift] : 0; /* Don't generate 'special chars'; I911 - fix ctrl+bksp */ 
+				return (pv->wch[shift] > 31 && pv->wch[shift] != 127) ? pv->wch[shift] : 0; /* Don't generate 'special chars'; I911 - fix ctrl+bksp */
 			}
 			pv = (PVK_TO_WCHARS1) ((BYTE *)pv + pvt->cbSize);
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -257,20 +257,20 @@ WORD CharToUSVK_NT_x64(WORD ch, WORD *shift)
 	PVK_TO_WCHARS1 pv;
 	PVK_TO_WCHAR_TABLE_x64 pvt;
 	int i, j;
-	
-	/* Find the appropriate keyboard tables */ 
 
-	if(!KbdTables_x64) return 0;				/* Could not load keyboard DLL */ 
+	/* Find the appropriate keyboard tables */
 
-	/* Map the character back to the virtual key */ 
+	if(!KbdTables_x64) return 0;				/* Could not load keyboard DLL */
+
+	/* Map the character back to the virtual key */
 
 	for(i = 0, pvt = KbdTables_x64->pVkToWcharTable; pvt->pVkToWchars; i++, pvt++)
 		for(pv = pvt->pVkToWchars; pv->VirtualKey;)
 		{
 			for(j = 0; j < pvt->nModifications; j++)
-				if(pv->wch[j] == ch) 
+				if(pv->wch[j] == ch)
 				{
-					/* Return the new virtual key */ 
+					/* Return the new virtual key */
           *shift = ModificationToShift_NT_x64(j);
           if(*shift == 0xFFFF) return 0;
           return pv->VirtualKey;
@@ -278,7 +278,7 @@ WORD CharToUSVK_NT_x64(WORD ch, WORD *shift)
 			pv = (PVK_TO_WCHARS1) ((BYTE *)pv + pvt->cbSize);
 		}
 
-	/* Remapping not found */ 
+	/* Remapping not found */
 	return 0;
 }
 
@@ -298,19 +298,19 @@ int GetDeadkeys_NT_x64(WORD DeadKey, WORD *OutputPairs) {
 		}
 	}
   *p = 0;
-  return (int)(p-OutputPairs);
+  return (INT_PTR)(p-OutputPairs);
 }
 
 WORD VKUSToVKUnderlyingLayout_NT_x64(WORD VKey) {
-	
+
 	/* Num lock test -- MCD: 02/12/2002 Fix num lock not working bug */
 
 	if((VKey >= VK_NUMPAD0 && VKey <= VK_NUMPAD9) || VKey == VK_DECIMAL) return VKey;
 
-	/* Find the appropriate keyboard tables */ 
+	/* Find the appropriate keyboard tables */
 
-	if(!KbdTables_x64)				/* Could not load keyboard DLL */ 
-		return VKey;  
+	if(!KbdTables_x64)				/* Could not load keyboard DLL */
+		return VKey;
 
   if(VKey > 255) return VKey;
 
@@ -320,15 +320,15 @@ WORD VKUSToVKUnderlyingLayout_NT_x64(WORD VKey) {
 }
 
 WORD VKUnderlyingLayoutToVKUS_NT_x64(WORD VKey) {
-	
+
 	/* Num lock test -- MCD: 02/12/2002 Fix num lock not working bug */
 
 	if((VKey >= VK_NUMPAD0 && VKey <= VK_NUMPAD9) || VKey == VK_DECIMAL) return VKey;
 
-	/* Find the appropriate keyboard tables */ 
+	/* Find the appropriate keyboard tables */
 
-	if(!KbdTables_x64)				/* Could not load keyboard DLL */ 
-		return VKey;  
+	if(!KbdTables_x64)				/* Could not load keyboard DLL */
+		return VKey;
 
   UINT scan;
   for(scan = 1; scan <= KbdTables_x64->bMaxVSCtoVK; scan++) {
@@ -347,7 +347,7 @@ WORD VKUnderlyingLayoutToVKUS_NT_x64(WORD VKey) {
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
-LPFN_ISWOW64PROCESS 
+LPFN_ISWOW64PROCESS
 fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(L"kernel32"),"IsWow64Process");
 BOOL fStored = FALSE;
 BOOL bIsWow64 = FALSE;
@@ -359,7 +359,7 @@ BOOL IsWow64() {
   if(NULL != fnIsWow64Process) {
     if(!fnIsWow64Process(GetCurrentProcess(),&bIsWow64)){
       // handle error
-      return FALSE;   
+      return FALSE;
     }
   }
   fStored = TRUE;
