@@ -4,7 +4,7 @@ Localization for Keyman is maintained at https://crowdin.com/project/keyman
 
 Downloading and updating files between Keyman and Crowdin happens automatically
 on GitHub by way of the Crowdin git integration. The configuration file for all platforms
-is a YAML file named `/crowdin.yml`.
+is a YAML file named `/crowdin.yml`. Currently, the git integration tracks the `master` branch.
 
 The only thing that needs to be done manually is to update `crowdin.yml` if new files get added
 (and of course translating the strings on the [Crowdin website](https://crowdin.com/project/keyman)).
@@ -54,24 +54,25 @@ You should see the CLI fetching project info and generating a list of files asso
 project.
 
 ### Downloading from Crowdin
+Since Crowdin is tracking the `master` branch, download translations will be zipped into a `master` folder.
 
 To download the latest translations from Crowdin (all platforms), open a command line at the repo
 root folder and run:
 
 ```bash
-crowdin download
+crowdin download -b master
 ```
 
 To download latest translations for the specific language:
 
 ```bash
-crowdin download -l {language_code}
+crowdin download -b master -l {language_code}
 ```
 
 To display a list of latest translations from Crowdin:
 
 ```bash
-crowdin download --dryrun
+crowdin download -b master --dryrun
 ```
 
 ### Uploading to crowdin
