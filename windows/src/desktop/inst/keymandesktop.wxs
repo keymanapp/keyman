@@ -62,7 +62,7 @@
 
       <Directory Id="ProgramFilesFolder" Name=".">
         <Directory Id="KEYMANROOT" Name="Keyman">
-          <Directory Id="KEYMAN" Name="Keyman for Windows">
+          <Directory Id="KEYMAN" Name="Keyman Desktop">
             <Directory Id="INSTALLDIR" Name="." FileSource="..\..\..\bin\desktop\">
 
               <Component>

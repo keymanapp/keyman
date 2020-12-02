@@ -190,7 +190,7 @@ const
       Key: SRegKey_KeymanDebug_CU;
       Description: 'Path for kmshell.exe and related resources; use this when '+
                    'debugging Keyman Configuration';
-      DefaultDesc: '%ProgramFiles(x86)%\Keyman\Keyman for Windows'
+      DefaultDesc: '%ProgramFiles(x86)%\Keyman\Keyman Desktop'
     ),
 
     // VisualKeyboardExportHTML.GetOSKXSLPath
