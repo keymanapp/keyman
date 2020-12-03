@@ -41,7 +41,7 @@ Package: keyman
 Section: utils
 Architecture: all
 Depends: ${misc:Depends}, python3-keyman-config
-Recommends: onboard
+Recommends: onboard-keyman
 Description: Type in your language with Keyman for Linux
  Keyman makes it possible for you to type in over 1,000 languages on Windows, macOS, Linux,
  iPhone, iPad, Android tablets and phones, and even instantly in your web browser. With the
