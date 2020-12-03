@@ -95,14 +95,33 @@ namespace com.keyman {
       event.extra.keymanHostPlatform = this.keymanPlatform;
     }
 
+    // Sanitizes the event object (in-place) to remove sensitive information
+    // from the breadcrumbs and url
+    sanitizeEvent(event: any) {
+      event.breadcrumbs.forEach((b: any) => {
+        if (b.category == 'navigation') {
+          let NAVIGATION_PATTERN = /(.*)?(keyboard\.html#[^-]+)-.*/;
+          b.data.from = b.data.from.replace(NAVIGATION_PATTERN, '$1$2');
+          b.data.to = b.data.to.replace(NAVIGATION_PATTERN, '$1$2');
+        }
+      });
+
+      if (event.request.url) {
+        let URL_PATTERN = /#.*$/;
+        event.request.url = event.request.url.replace(URL_PATTERN, '');
+      }
+    }
+
     /**
      * Pre-processes a Sentry event object (in-place) to provide more metadata and enhance
      * the Sentry server's ability to match the error against release artifacts.
+     * Also will sanitize the Sentry event.
      * @param event A Sentry-generated event
      */
     prepareEvent(event: any): boolean {
       this.pathFilter(event);
       this.attachEventMetadata(event);
+      this.sanitizeEvent(event);
 
       if(DEBUG) {
         console.log("DEBUG:  event object for Sentry")
@@ -148,6 +167,7 @@ namespace com.keyman {
       //@ts-ignore
       Sentry.init({
         beforeSend: this.prepareEventDebugWrapper.bind(this),
+        // Not using beforeBreadcrumb because that caused breadcrumbs to get lost in Sentry
         debug: DEBUG,
         dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@sentry.keyman.com/11', // keyman-web DSN
         release: com.keyman.environment.SENTRY_RELEASE,
