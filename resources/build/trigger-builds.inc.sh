@@ -41,8 +41,7 @@ function triggerTeamCityBuild() {
   local TEAMCITY_SERVER=https://build.palaso.org
 
   local command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID,buildType:(id:$TEAMCITY_BUILDTYPE)'/></lastChanges></build>"
-
-  #debug echo "Call: $command"
+  echo "TeamCity Build Command: $command"
 
   # adjust indentation for output of curl
   echo -n "     "

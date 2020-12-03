@@ -4,11 +4,14 @@ set -e
 set -u
 
 #
-# Usage: increment-version.sh [commit base]
+# Usage: increment-version.sh [-f] [commit base]
 #
 # Increments the patch version on VERSION.md
 #
-# If -commit is specified, pushes the new version
+# If -f is specified, triggers a build even with
+# no detected changes.
+#
+# If commit is specified, pushes the new version
 # to the repository. base snould be either
 # master or beta.
 #
@@ -25,9 +28,17 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 gitbranch=`git branch --show-current`
 
+FORCE=0
+
+if [[ "$1" == "-f" ]]; then
+  FORCE=1
+  shift
+fi
+
 if [[ $# -gt 0 ]]; then
   # We want the action to specify the branch as a consistency check
   # for now at least.
+
   action=$1
   if [[ $# -gt 1 ]]; then
     base=$2
@@ -52,7 +63,8 @@ else
 fi
 
 if [[ $action == help ]]; then
-  echo "Usage: increment-version.sh [commit base]"
+  echo "Usage: increment-version.sh [-f] [commit base]"
+  echo "  -f  forces a build even with no changes"
   echo "  base must be either master or beta."
   echo "  base must be equal to currently checked-out"
   echo "  branch (this may not be required in future)"
@@ -74,15 +86,22 @@ popd > /dev/null
 
 pushd "$KEYMAN_ROOT" > /dev/null
 ABORT=0
-node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" || ABORT=1
+node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" || ABORT=$?
 
 if [[ $ABORT = 1 ]]; then
-  echo "Skipping version increment from $VERSION: no recently merged pull requests were found"
-  if [ ! -z "${TEAMCITY_VERSION-}" ]; then
-    # Send TeamCity a build status
-    echo "##teamcity[buildStatus status='SUCCESS' text='Skipping version increment from $VERSION: no recently merged pull requests were found']"
+  if [[ $FORCE = 0 ]]; then
+    echo "Skipping version increment from $VERSION: no recently merged pull requests were found"
+    if [ ! -z "${TEAMCITY_VERSION-}" ]; then
+      # Send TeamCity a build status
+      echo "##teamcity[buildStatus status='SUCCESS' text='Skipping version increment from $VERSION: no recently merged pull requests were found']"
+    fi
+    exit 0
+  else
+    echo "Force specified; building even though no changes were detected"
   fi
-  exit 0
+elif [[ $ABORT != 0 ]]; then
+  echo "Failed to complete version history check"
+  exit $ABORT
 fi
 popd > /dev/null
 
@@ -116,7 +135,6 @@ if [ "$action" == "commit" ]; then
   # Now that all version-related changes are ready and git-added, it's time to commit.
   git commit -m "$message"
   git push --tags origin "$branch"
-  hub pull-request -f --no-edit -b $base -l auto
   git checkout $base
 
   #
@@ -131,6 +149,14 @@ if [ "$action" == "commit" ]; then
   #
 
   triggerBuilds
+
+  #
+  # Now, create the PR on GitHub which will be merged when ready
+  #
+
+  cd "$KEYMAN_ROOT"
+  git checkout "$branch"
+  hub pull-request -f --no-edit -b $base -l auto
 
   #
   # Done
@@ -148,9 +174,6 @@ if [ "$action" == "commit" ]; then
   # latest history in it. We don't need to cleanup the branch because the CI will
   # do that for us.
   #
-
-  cd "$KEYMAN_ROOT"
-  git checkout "$branch"
 fi
 
 exit 0
