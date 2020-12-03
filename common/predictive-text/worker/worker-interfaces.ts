@@ -38,8 +38,8 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak' | 'accept' | 'revert';
-type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage | AcceptMessage | RevertMessage;
+type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak' | 'accept' | 'revert' | 'reset-context';
+type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage | AcceptMessage | RevertMessage | ResetContextMessage;
 
 /**
  * The structure of a config message.  It should include the platform's supported
@@ -187,6 +187,15 @@ interface RevertMessage {
   /**
    * The Context being reverted, which should be the same context as resulted from applying the
    * corresponding Suggestion.
+   */
+  context: Context;
+}
+
+interface ResetContextMessage {
+  message: 'reset-context';
+
+  /**
+   * The new context to be used as a base for future context mutations and predictions.
    */
   context: Context;
 }

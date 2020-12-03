@@ -534,6 +534,14 @@ class ModelCompositor {
     }
   }
 
+  public resetContext(context: Context) {
+    if(this.contextTracker) {
+      let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
+      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, this.lexicalModel);
+      this.contextTracker.enqueue(contextState);
+    }
+  }
+
   private detectCurrentCasing(context: Context): CasingForm {
     let model = this.lexicalModel;
 

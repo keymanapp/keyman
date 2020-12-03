@@ -229,7 +229,7 @@ extension KeymanWebViewController {
   }
   
   func resetContext() {
-    webView!.evaluateJavaScript("keyman.interface.resetContext();", completionHandler: nil)
+    webView!.evaluateJavaScript("keyman.core.resetContext();", completionHandler: nil)
   }
 
   func setDeviceType(_ idiom: UIUserInterfaceIdiom) {
@@ -573,7 +573,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     if let cursorRange = self.currentCursorRange {
       self.setCursorRange(cursorRange)
     }
-    
+
     setDeviceType(UIDevice.current.userInterfaceIdiom)
     
     let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard

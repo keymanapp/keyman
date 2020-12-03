@@ -272,8 +272,13 @@
                 if(undefined == text) text = '';
                 var ta = document.getElementById('ta');
                 var kmw = window['keyman'];
+
+                let resetContext = ta.value != text
                 ta.value = text;
                 kmw['setActiveElement'](ta);
+                if(resetContext) {
+                  kmw.resetContext();
+                }
                 return ta.value;
             }
             

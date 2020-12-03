@@ -179,6 +179,13 @@ namespace com.keyman.text.prediction {
       });
     }
 
+    resetContext(context: Context) {
+      this._worker.postMessage({
+        message: 'reset-context',
+        context: context
+      });
+    }
+
     // TODO: asynchronous close() method.
     //       Worker code must recognize message and call self.close().
 
