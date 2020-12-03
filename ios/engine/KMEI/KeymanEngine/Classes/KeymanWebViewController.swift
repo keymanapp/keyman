@@ -61,6 +61,9 @@ class KeymanWebViewController: UIViewController {
 
   var isLoading: Bool = false
 
+  private var currentText: String = ""
+  private var currentCursorRange: NSRange? = nil
+
   init(storage: Storage) {
     self.storage = storage
     super.init(nibName: nil, bundle: nil)
@@ -205,6 +208,7 @@ extension KeymanWebViewController {
   func setCursorRange(_ range: NSRange) {
     if range.location != NSNotFound {
       webView!.evaluateJavaScript("setCursorRange(\(range.location),\(range.length));", completionHandler: nil)
+      self.currentCursorRange = range
     }
   }
 
@@ -219,6 +223,8 @@ extension KeymanWebViewController {
     text = text.replacingOccurrences(of: "\\", with: "\\\\")
     text = text.replacingOccurrences(of: "'", with: "\\'")
     text = text.replacingOccurrences(of: "\n", with: "\\n")
+
+    self.currentText = text
     webView!.evaluateJavaScript("setKeymanVal('\(text)');", completionHandler: nil)
   }
   
@@ -561,6 +567,13 @@ extension KeymanWebViewController: KeymanWebDelegate {
     log.info("Loaded keyboard.")
 
     resizeKeyboard()
+
+    // There may have been attempts to set these values before the keyboard loaded!
+    self.setText(self.currentText)
+    if let cursorRange = self.currentCursorRange {
+      self.setCursorRange(cursorRange)
+    }
+    
     setDeviceType(UIDevice.current.userInterfaceIdiom)
     
     let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
