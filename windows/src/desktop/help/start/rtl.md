@@ -1,0 +1,49 @@
+# How To - Type in Right-to-Left Languages
+
+If you will be typing in a right-to-left language (like Arabic, Farsi,
+Hebrew, or Yiddish) there are three things you should know before you
+get started.
+
+1.  Your computer must be set up for right-to-left language support.
+    Keyman will automatically set up your computer for most Keyman
+    keyboards that need right-to-left language support. However, you may
+    need to manually adjust your settings for some Keyman keyboards.
+    Otherwise, without right-to-left language support, letters in your
+    right-to-left language might appear in the wrong order, not join
+    correctly, or change after the spacebar is pressed.
+
+    To do this, simply associate the keyboard with a right-to-left
+    Windows language (like Arabic). For instructions on associating a
+    Keyman keyboard with a Windows language, see:
+    [???](#start_configure_computer)
+
+2.  If you will be using MS Office programs like Word, you should
+    configure MS Office for your right-to-left language. For
+    instructions, see: [???](#start_configure_office)
+
+3.  Each time you start typing with a right-to-left Keyman keyboard, you
+    may need to change the typing direction in the program you are
+    using, from left-to-right to right-to-left. In most Windows programs
+    (including MS Word, Internet Explorer, and Notepad), you can use the
+    following shortcuts to switch direction:
+
+    -   For right-to-left, press: Ctrl + Right.Shift
+
+    -   For left-to-right, press: Ctrl + Left.Shift
+
+    In Firefox:
+
+    -   To toggle between right-to-left and left-to-right, press: Ctrl +
+        Shift + X
+
+**Related Topics**
+
+-   [???](#start_configure_computer)
+
+-   [???](#start_download-install_keyboard)
+
+-   [???](#start_configure_office)
+
+-   [???](#start_font)
+
+-   [???](#basic_enable_keyboard)
