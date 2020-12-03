@@ -41,13 +41,13 @@ uses
 class function TInstallFile.Execute(KeyboardFileNames: TStrings; const FirstKeyboardFileName: string; FSilent, FNoWelcome: Boolean;
   const LogFile: string): Boolean;
 begin
-  if (KeyboardFileNames.Count > 1) or (Pos('=', FirstKeyboardFileName) > 0) then
-  begin
-    Result := TInstallFile.Execute(nil, KeyboardFileNames, FSilent)
-  end
-  else if TKeymanProtocolHandler.CanHandle(FirstKeyboardFileName) then
+  if TKeymanProtocolHandler.CanHandle(FirstKeyboardFileName) then
   begin
     Result := TKeymanProtocolHandler.Handle(nil, FirstKeyboardFileName, FSilent, FNoWelcome, LogFile);
+  end
+  else if (KeyboardFileNames.Count > 1) or (Pos('=', FirstKeyboardFileName) > 0) then
+  begin
+    Result := TInstallFile.Execute(nil, KeyboardFileNames, FSilent)
   end
   // TODO: support bare package ids from command line (if it does not include a file extension, assume it is a .kmp and try and download it)
 //  else if IsNotPackageOrKeyboardFile then
