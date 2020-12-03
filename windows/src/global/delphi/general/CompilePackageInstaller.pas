@@ -241,7 +241,7 @@ var
   s: WideString;
   i: Integer;
   FMSIOptions: WideString;
-  FPackageOutputFileName: string;  // I3126
+  FRedistSetupFile, FPackageOutputFileName: string;  // I3126
 begin
   { Check that the .msi is setup for the package }
 
@@ -294,7 +294,8 @@ begin
         WriteMessage('Redist path not specified, loading default ('+FRedistSetupPath+')');
       end;
 
-      if not FileExists(FRedistSetupPath + 'setup.exe') and not FileExists(FRedistSetupPath) + 'setup-redist.exe' then
+      if not FileExists(FRedistSetupPath + 'setup.exe') or
+         not FileExists(FRedistSetupPath + 'setup-redist.exe') then
       begin
         FatalMessage('setup.exe or setup-redist.exe are missing from redist ('+FRedistSetupPath+').');
         Exit;
