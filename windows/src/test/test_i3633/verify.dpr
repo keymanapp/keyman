@@ -44,8 +44,8 @@ begin
   { Check each element of string }
   if str[1] <> 'Signed' then
   begin
-    FIsSetup := Pos('setup.exe', LowerCase(str[0])) > 0;
-    if not FIsSetup then // setup.exe will not be signed because we sign after appending the zip data
+    FIsSetup := Pos('setup', LowerCase(str[0])) > 0;
+    if not FIsSetup then // developer/setup.exe and desktop/setup-redist.exe will not be signed because we sign after appending the zip data
     begin
       Exit('Unsigned executable');
     end;

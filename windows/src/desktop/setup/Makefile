@@ -10,6 +10,10 @@ build: version.res manifest.res icons locale
     $(TDS2DBG) setup.exe
     $(COPY) setup.exe $(PROGRAM)\desktop
 
+    # This version of setup.exe is for redistribution as a
+    # bundled installer and is not signed
+    $(COPY) setup.exe $(PROGRAM)\desktop\setup-redist.exe
+
 locale:
     $(ROOT)\bin\buildtools\devtools.exe -buildsetupstrings locale\ .\
 
