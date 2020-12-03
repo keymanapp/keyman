@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.196 alpha 2020-12-03
+
+* fix(common): improve increment-version robustness (#4062)
+* fix(ios/engine): preserves early context-setting effects (#4070)
+* feat(linux): Rename onboard package (#4059)
+
 ## 14.0.195 alpha 2020-12-02
 
 * chore(windows): remove obsolete newhelp folder (#4048)
