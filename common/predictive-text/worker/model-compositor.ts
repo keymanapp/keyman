@@ -150,6 +150,7 @@ class ModelCompositor {
         if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
           newEmptyToken = true;
           prefixTransform = inputTransform;
+          context = postContext; // Ensure the whitespace token is preapplied!
         }
       }
 
