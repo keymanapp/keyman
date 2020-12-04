@@ -346,6 +346,16 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     if numCharsToDelete <= 0 {
       textDocumentProxy.insertText(newText)
+
+      // A full-context deletion will report numCharsToDelete == 0 and won't
+      // otherwise delete selected text.
+      if #available(iOSApplicationExtension 11.0, *) {
+        if let selected = textDocumentProxy.selectedText {
+          if selected.count > 0 {
+            textDocumentProxy.deleteBackward()
+          }
+        }
+      }
       return
     }
 
