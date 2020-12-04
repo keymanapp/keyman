@@ -90,7 +90,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.sentry.SentryLevel;
 import io.sentry.android.core.SentryAndroid;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
@@ -130,23 +129,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     checkSendCrashReport();
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
-        options.setBeforeBreadcrumb((breadcrumb, hint) -> {
-          String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
-          if ("navigation".equals(breadcrumb.getCategory()) && breadcrumb.getLevel() == SentryLevel.INFO &&
-            ((breadcrumb.getData("from") != null) || (breadcrumb.getData("to") != null)) ) {
-            // Sanitize navigation breadcrumbs
-            String dataFrom = String.valueOf(breadcrumb.getData("from"));
-            dataFrom = dataFrom.replaceAll(NAVIGATION_PATTERN, "$1$2");
-            breadcrumb.setData("from", dataFrom);
-            String dataTo = String.valueOf(breadcrumb.getData("to"));
-            dataTo = dataTo.replaceAll(NAVIGATION_PATTERN, "$1$2");
-            breadcrumb.setData("to", dataTo);
-
-            return breadcrumb;
-          } else {
-            return breadcrumb;
-          }
-        });
         options.setRelease("release-" + com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });
