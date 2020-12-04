@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 14.0.197 alpha 2020-12-04
+
+* fix(windows): bootstrap installer not signed (#4067)
+* fix(common/core/web): Sanitize embedded KMW Sentry events (#4071)
+* fix(windows): keyman: link with = sign is mishandled (#4069)
+* chore(android/app,oem/fv/android): Revert #4025 (#4076)
+* chore(oem/fv/windows): update oem firstvoices product name (#4052)
+* feat(windows): convert Keyman for Windows help to Markdown (#4074)
+* chore(windows): remove docbook and libxslt (#4075)
+* fix(android/engine): Remove in-app keyboard Sentry log about fallback keyboard (#4078)
+* fix(web/engine): findNearestKey erroneously returned key child (#4077)
+* fix(common/core/web): predictive context reset (#4072)
+* fix(ios/engine): deletion for selected text at the context start (#4080)
+
 ## 14.0.196 alpha 2020-12-03
 
 * fix(common): improve increment-version robustness (#4062)
