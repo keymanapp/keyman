@@ -15,20 +15,18 @@ build-release: chm
 
 install: web
 
-chm: dirs html
-
-html:
+chm: dirs
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh -html
+    $(GIT_BASH_FOR_KEYMAN) build.sh chm
 !else
-    start /wait ./build.sh -html
+    start /wait ./build.sh chm
 !endif
 
 web:
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh -web
+    $(GIT_BASH_FOR_KEYMAN) build.sh web
 !else
-    start /wait ./build.sh -web
+    start /wait ./build.sh web
 !endif
 
 signcode:
