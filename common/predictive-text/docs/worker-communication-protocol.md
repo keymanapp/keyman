@@ -113,7 +113,7 @@ An asynchronous message to predict after typing 'D':
 Message types
 -------------
 
-Currently there are four message types:
+Currently there are a whole bunch of message types:
 
 Message         | Direction          | Parameters          | Expected reply      | Uses token
 ----------------|--------------------|---------------------|---------------------|---------------
