@@ -157,6 +157,8 @@ final class KMKeyboard extends WebView {
           Toast.makeText(context, "Fatal Error with " + currentKeyboard +
             ". Loading default keyboard", Toast.LENGTH_LONG).show();
 
+          // Still send log about falling back to default keyboard (ignore language ID)
+          sendError(packageID, keyboardID, "");
           Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
           if (firstKeyboard != null) {
             // Revert to first keyboard in the list

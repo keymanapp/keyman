@@ -1840,7 +1840,7 @@ public final class KMManager {
             // Revert to default (index 0) or fallback keyboard
             keyboardInfo = KMManager.getKeyboardInfo(context, 0);
             if (keyboardInfo == null) {
-              KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
+              // Not logging to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
               keyboardInfo = KMManager.getDefaultKeyboard(context);
             }
             if (keyboardInfo != null) {
