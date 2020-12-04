@@ -256,7 +256,7 @@
       <!-- Redistributable files -->
 
       <Component Directory="dirRedistSetup">
-        <File Name="setup.exe" Source="..\..\..\bin\desktop\setup.exe" KeyPath="yes" />
+        <File Name="setup.exe" Source="..\..\..\bin\desktop\setup-redist.exe" KeyPath="yes" />
       </Component>
 
     </ComponentGroup>

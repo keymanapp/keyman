@@ -1,18 +1,18 @@
 (*
   Name:             buildpkgmain
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2007
 
   Modified Date:    22 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2007 - mcdurdin - Initial version
                     17 Sep 2007 - mcdurdin - Support output path parameter
                     30 Dec 2010 - mcdurdin - I2562 - EULA as part of setup bootstrapper
@@ -22,7 +22,7 @@
                     11 May 2015 - mcdurdin - I4706 - V9.0 - Update compile logging for silent and warning-as-error cleanness
                     22 Jun 2015 - mcdurdin - I4763 - Package compiler (buildpkg) needs to specify username and password on command line
                     22 Jun 2015 - mcdurdin - I4764 - Buildpkg needs to support different paths for msi and kmp files
-                    
+
 *)
 unit buildpkgmain;  // I3306
 
@@ -62,9 +62,10 @@ begin
   Params := TParams.Create;
 
   if not Params.Completed then
-  begin                                                                        
+  begin
     writeln('buildpkg.exe 1.0');
     writeln('Usage: '+ExtractFileName(ParamStr(0))+' -m <msi filename> [-l <License filename>] [-i <TitleImage filename>] [-a <app name>] (-s <setup.exe folder location>)|(-n <kmp description> <kmp filename>)');   // I2562   // I4763
+    writeln('If setup-redist.exe is in setup folder location, it will be used in preference to setup.exe');
     ExitCode := 3;
     Exit;
   end;
@@ -203,10 +204,10 @@ begin
     Result := False;
     writeln('License File '+LicenseFileName+' does not exist.');
   end;
-  if (RedistPath <> '') and not FileExists(RedistPath + 'setup.exe') then
+  if (RedistPath <> '') and (not FileExists(RedistPath + 'setup.exe') or not FileExists(RedistPath + 'setup-redist.exe')) then
   begin
     Result := False;
-    writeln('File '+RedistPath+'setup.exe does not exist.');
+    writeln('File '+RedistPath+'setup.exe and '+RedistPath+'setup-redist.exe do not exist.');
   end;
 end;
 
