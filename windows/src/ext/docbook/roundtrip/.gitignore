@@ -1,8 +1,0 @@
-Makefile.param
-.param.stripped
-.param.dbkns
-.param.xmlid
-param.xml
-param.xsl
-profile-docbook.xsl
-xref.xsl
