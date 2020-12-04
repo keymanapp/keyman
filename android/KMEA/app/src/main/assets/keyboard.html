@@ -228,8 +228,13 @@
       }
       var ta = document.getElementById('ta');
       var kmw = window['keyman'];
+      var resetContext = ta.value != text;
       ta.value = text;
       kmw['setActiveElement'](ta);
+
+      if(resetContext) {
+        kmw.resetContext();
+      }
     }
 
     function updateKMSelectionRange(start, end) {
