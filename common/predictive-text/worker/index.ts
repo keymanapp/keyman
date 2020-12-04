@@ -344,16 +344,20 @@ class LMLayerWorker {
             });
             break;
           case 'revert':
-              var {reversion, context} = payload;
-              var suggestions: Suggestion[] = compositor.applyReversion(reversion, context);
+            var {reversion, context} = payload;
+            var suggestions: Suggestion[] = compositor.applyReversion(reversion, context);
 
-              this.cast('postrevert', {
-                token: payload.token,
-                suggestions: suggestions
-              });
-              break;
+            this.cast('postrevert', {
+              token: payload.token,
+              suggestions: suggestions
+            });
+            break;
+          case 'reset-context':
+            var {context} = payload;
+            compositor.resetContext(context);
+            break;
           default:
-            throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'revert', 'unload'} but got ${payload.message}`);
+            throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'revert', 'reset-context', 'unload'} but got ${payload.message}`);
         }
       },
       compositor: compositor

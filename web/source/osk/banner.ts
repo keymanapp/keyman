@@ -690,6 +690,7 @@ namespace com.keyman.osk {
 
       // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
       // and prevent it from being hidden after reversion operations.
+      this.keepSuggestion = null;
       for(let s of suggestions) {
         if(s.tag == 'keep') {
           this.keepSuggestion = s as Keep;

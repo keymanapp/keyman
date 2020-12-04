@@ -228,16 +228,25 @@
       }
       var ta = document.getElementById('ta');
       var kmw = window['keyman'];
+      var resetContext = ta.value != text;
       ta.value = text;
       kmw['setActiveElement'](ta);
+
+      if(resetContext) {
+        kmw.resetContext();
+      }
     }
 
     function updateKMSelectionRange(start, end) {
       var ta = document.getElementById('ta');
       var kmw = window['keyman'];
+      var resetContext = (ta.selectionStart != start || ta.selectionEnd != end);
       ta.selectionStart = ta._KeymanWebSelectionStart = start;
       ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
       kmw['setActiveElement'](ta);
+      if(resetContext) {
+        kmw.resetContext();
+      }
     }
 
     function oskCreateKeyPreview(x,y,w,h,t) {

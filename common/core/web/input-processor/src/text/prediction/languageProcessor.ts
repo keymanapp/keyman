@@ -160,9 +160,13 @@ namespace com.keyman.text.prediction {
       if(!this.currentModel || !this.configuration) {
         return;
       }
-      
+
       if(outputTarget) {
-        this.predict_internal(outputTarget.buildTranscriptionFrom(outputTarget, null));
+        let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
+        this.predict_internal(transcription, true);
+      } else {
+        // Shouldn't be possible, and we'll want to know if and when it is.
+        console.warn("OutputTarget missing during an invalidateContext call");
       }
     }
 
@@ -311,13 +315,17 @@ namespace com.keyman.text.prediction {
      * have been raised.
      * @param transcription The triggering transcription (if it exists)
      */
-    private predict_internal(transcription: Transcription): Promise<Suggestion[]> {
+    private predict_internal(transcription: Transcription, resetContext: boolean = false): Promise<Suggestion[]> {
       if(!transcription) {
         return null;
       }
 
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
       this.recordTranscription(transcription);
+
+      if(resetContext) {
+        this.lmEngine.resetContext(context);
+      }
 
       let transform = transcription.transform;
       var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);

@@ -150,6 +150,7 @@ class ModelCompositor {
         if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
           newEmptyToken = true;
           prefixTransform = inputTransform;
+          context = postContext; // Ensure the whitespace token is preapplied!
         }
       }
 
@@ -531,6 +532,14 @@ class ModelCompositor {
       // Since the model relies on custom wordbreaking behavior, we need to use the
       // old, deprecated wordbreaking pattern.
       return model.wordbreak(context);
+    }
+  }
+
+  public resetContext(context: Context) {
+    if(this.contextTracker) {
+      let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
+      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, this.lexicalModel);
+      this.contextTracker.enqueue(contextState);
     }
   }
 

@@ -183,9 +183,9 @@ namespace com.keyman.text {
       return ruleBehavior;
     }
 
-    public resetContext() {
+    public resetContext(outputTarget?: OutputTarget) {
       this.keyboardProcessor.resetContext();
-      this.languageProcessor.invalidateContext();
+      this.languageProcessor.invalidateContext(outputTarget);
     }
   }
 }
