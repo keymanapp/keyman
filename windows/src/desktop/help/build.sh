@@ -185,7 +185,8 @@ if $DO_CHM; then
   build_hhc .
   build_hhc_footer
 
-  "/c/program files (x86)/html help workshop/hhc.exe" keymandesktop.hhp
+  # hhc.exe returns 1 on success!
+  "/c/program files (x86)/html help workshop/hhc.exe" keymandesktop.hhp && false || true
   cp keymandesktop.chm "$THIS_DIR/../../../bin/desktop/keymandesktop.chm"
 
   popd > /dev/null
