@@ -1,4 +1,6 @@
-# How To - Use Keyman in Excel
+---
+title: How To - Use Keyman in Excel
+---
 
 **Using Keyman in Excel with the / Key**
 

@@ -1,4 +1,6 @@
-# How To - Download and Install a Keyman Keyboard
+---
+title: How To - Download and Install a Keyman Keyboard
+---
 
 You must have a Keyman keyboard installed to type with Keyman in your
 language. You can download and install a Keyman keyboard at the same

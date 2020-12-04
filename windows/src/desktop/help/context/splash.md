@@ -1,4 +1,6 @@
-# The Keyman Splash Screen
+---
+title: The Keyman Splash Screen
+---
 
 ![](desktop_images/setup-click3.png)
 

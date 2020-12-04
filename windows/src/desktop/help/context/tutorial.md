@@ -1,1 +1,3 @@
-# Getting Started with Keyman
+---
+title: Getting Started with Keyman
+---

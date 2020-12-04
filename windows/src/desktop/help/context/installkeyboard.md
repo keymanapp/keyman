@@ -1,1 +1,3 @@
-# Install a Keyman Keyboard
+---
+title: Install a Keyman Keyboard
+---

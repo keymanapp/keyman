@@ -1,4 +1,6 @@
-# The Keyman Text Editor
+---
+title: The Keyman Text Editor
+---
 
 The Keyman Text Editor is a basic text editor for testing your Keyman
 keyboards.

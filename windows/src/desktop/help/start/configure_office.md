@@ -1,4 +1,6 @@
-# How To - Set up MS Office for a Keyman Keyboard
+---
+title: How To - Set up MS Office for a Keyman Keyboard
+---
 
 Keyman will automatically set up your Microsoft Office programs for best
 performance with most Keyman keyboards. However, you may need to

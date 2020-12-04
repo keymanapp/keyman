@@ -1,4 +1,6 @@
-# How To - Find the Best Fonts for a Keyman Keyboard
+---
+title: How To - Find the Best Fonts for a Keyman Keyboard
+---
 
 Many Keyman keyboards type out letters that need special fonts. Without
 the right font, these letters may turn into square boxes or become

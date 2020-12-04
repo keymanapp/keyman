@@ -1,1 +1,3 @@
-# The Keyman Menu
+---
+title: The Keyman Menu
+---

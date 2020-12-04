@@ -1,1 +1,3 @@
-# Keyman Toolbox - Character Map
+---
+title: Keyman Toolbox - Character Map
+---

@@ -1,4 +1,6 @@
-# How To - Set up Your Computer for a Keyman Keyboard
+---
+title: How To - Set up Your Computer for a Keyman Keyboard
+---
 
 Keyman will automatically set up your computer for best performance with
 most Keyman keyboards. However, for best performance on some keyboards

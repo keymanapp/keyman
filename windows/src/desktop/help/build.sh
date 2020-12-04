@@ -77,7 +77,7 @@ build_hhc_header() {
   echo '
 <HTML>
   <HEAD>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
   </HEAD>
   <BODY>
     <OBJECT type="text/site properties">
@@ -96,7 +96,7 @@ build_hhc_footer() {
 
 build_hhc_entry() {
   local FILE="$1"
-  local TITLE=$(grep '<title>' < "$FILE" | sed -r 's/.*>(.+)<\/.*/\1/')
+  local TITLE=$(grep '<title>' < "$FILE" | sed -r 's/.*>(.+)<\/.*/\1/' | iconv -f utf-8 -t windows-1252)
   if [ -z "$TITLE" ]; then
     TITLE="$1"
   fi

@@ -1,4 +1,6 @@
-# How To - Resolve Security Software Conflicts with keyman32.dll
+---
+title: How To - Resolve Security Software Conflicts with keyman32.dll
+---
 
 Certain security softwares impair or prevent the use of the Keyman
 library file keyman32.dll. This file is completely safe and is necessary

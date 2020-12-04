@@ -1,4 +1,6 @@
-# System Requirements
+---
+title: System Requirements
+---
 
 **Supported Windows Operating Systems**
 

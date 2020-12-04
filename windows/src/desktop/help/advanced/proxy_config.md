@@ -1,4 +1,6 @@
-# Proxy Configuration
+---
+title: Proxy Configuration
+---
 
 The Proxy Configuration dialog allows you to enter HTTP proxy details
 for Keyman Configuration.

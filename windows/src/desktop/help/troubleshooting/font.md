@@ -1,4 +1,6 @@
-# How To - Fix Font Issues
+---
+title: How To - Fix Font Issues
+---
 
 If you are having font issues, you should first try: [???](#start_font)
 

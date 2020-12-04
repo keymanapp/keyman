@@ -1,1 +1,3 @@
-# Keyman Configuration
+---
+title: Keyman Configuration
+---

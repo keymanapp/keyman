@@ -1,4 +1,6 @@
-# Basic Help
+---
+title: Basic Help
+---
 
 * [newways](newways)
 

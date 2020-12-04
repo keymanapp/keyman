@@ -1,4 +1,6 @@
-# How To - Type in Right-to-Left Languages
+---
+title: How To - Type in Right-to-Left Languages
+---
 
 If you will be typing in a right-to-left language (like Arabic, Farsi,
 Hebrew, or Yiddish) there are three things you should know before you

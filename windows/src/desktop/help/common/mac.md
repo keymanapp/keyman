@@ -1,4 +1,6 @@
-# Does Keyman run on a Mac?
+---
+title: Does Keyman run on a Mac?
+---
 
 Yes. Please visit [Keyman for macOS](https://keyman.com/macos/) for more
 information. Also note that there are two other ways you can use Keyman

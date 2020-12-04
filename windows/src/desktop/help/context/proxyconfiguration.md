@@ -1,1 +1,3 @@
-# Proxy Configuration
+---
+title: Proxy Configuration
+---

@@ -1,4 +1,6 @@
-# What operating systems does Keyman support?
+---
+title: What operating systems does Keyman support?
+---
 
 Keyman fully supports 32-bit *and* 64-bit versions of the following
 Windows operating systems:

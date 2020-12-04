@@ -1,4 +1,6 @@
-# The Keyman Menu
+---
+title: The Keyman Menu
+---
 
 **Opening the Keyman Menu**
 
