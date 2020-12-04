@@ -1313,19 +1313,19 @@ namespace com.keyman.osk {
       // Find minimum distance from any key
       var k, k0=0, dx, dxMax=24, dxMin=100000, x1, x2;
       for(k = 0; k < t.childNodes.length; k++) {
-        let childNode = t.childNodes[k] as HTMLElement; // gets the .kmw-key-square containing a key
-        if(childNode.firstChild) {
-          childNode = childNode.firstChild as HTMLElement; // gets the actual key element.
-        }
+        let keySquare = t.childNodes[k] as HTMLElement; // gets the .kmw-key-square containing a key
+        // Find the actual key element.
+        let childNode = keySquare.firstChild ? keySquare.firstChild as HTMLElement: keySquare;
+
         if(childNode.className !== undefined  && (childNode.className.indexOf('key-hidden') >= 0)
              || (childNode.className.indexOf('key-blank') >= 0)){
           continue;
         }
-        x1 = childNode.offsetLeft;
-        x2 = x1 + childNode.offsetWidth;
+        x1 = keySquare.offsetLeft;
+        x2 = x1 + keySquare.offsetWidth;
         if(x >= x1 && x <= x2) {
           // Within the key square
-          return <KeyElement> childNode.firstChild;
+          return <KeyElement> childNode;
         }
         dx = x1 - x;
         if(dx >= 0 && dx < dxMin) {
