@@ -240,9 +240,13 @@
     function updateKMSelectionRange(start, end) {
       var ta = document.getElementById('ta');
       var kmw = window['keyman'];
+      var resetContext == (ta.selectionStart != pos || ta.selectionEnd != pos + length);
       ta.selectionStart = ta._KeymanWebSelectionStart = start;
       ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
       kmw['setActiveElement'](ta);
+      if(resetContext) {
+        kmw.resetContext();
+      }
     }
 
     function oskCreateKeyPreview(x,y,w,h,t) {

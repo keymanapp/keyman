@@ -262,9 +262,13 @@
             function setCursorRange(pos, length) {
                 var ta = document.getElementById('ta');
                 var kmw = window['keyman'];
+                var resetContext = (ta.selectionStart != pos || ta.selectionEnd != pos + length);
                 ta.selectionStart = ta._KeymanWebSelectionStart = pos;
                 ta.selectionEnd = ta._KeymanWebSelectionEnd = pos + length;
                 kmw['setActiveElement'](ta);
+                if(resetContext) {
+                  kmw.resetContext();
+                }
                 return ta.selectionEnd;
             }
             
