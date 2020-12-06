@@ -19,10 +19,8 @@ display_usage() {
   echo "build.sh [--no-clean] target [...target]"
   echo "Builds help documentation for Keyman for Windows"
   echo "Targets:"
-  echo "  * web: copy documentation to help.keyman.com repository"
-  echo "         If environment variable KEYMAN_SITE_ROOT is set, uses that as"
-  echo "         base, otherwise, this repository's peer folder 'sites' is used"
-  echo "         and the subfolder {base}/help.keyman.com/products/windows/.../"
+  echo "  * web: copy documentation to bin/help/php folder. This can then be"
+  echo "         deployed with help-keyman-com.sh"
   echo "  * chm: convert documentation to html using pandoc and then build .chm"
   echo
   echo " --no-clean: don't clean target folder before building"
@@ -197,33 +195,21 @@ fi
 #
 
 if $DO_WEB; then
-  if [ -v KEYMAN_SITE_ROOT ]; then
-    DESTWEB="$KEYMAN_SITE_ROOT"
-  else
-    DESTWEB="$KEYMAN_ROOT/../sites"
+  DESTWEB="$THIS_DIR/../../../bin/help/md/desktop"
+
+  if $DO_CLEAN; then
+    rm -rf "$DESTWEB" || true
   fi
-  DESTWEB="$DESTWEB/help.keyman.com/products/windows"
 
-  echo "$DESTWEB"
+  mkdir -p "$DESTWEB"
 
-  # Make sure we have a website here with the basic /products/windows/ path
-  if [ -d "$DESTWEB" ]; then
-    DESTWEB="$DESTWEB/$VERSION_RELEASE"
+  for INFILE in $MD; do
+    OUTFILE="$DESTWEB/$INFILE"
+    mkdir -p "$(dirname "$OUTFILE")"
+    cp "$INFILE" "$OUTFILE"
+  done
 
-    if $DO_CLEAN; then
-      rm -rf "$DESTWEB" || true
-    fi
-
-    mkdir -p "$DESTWEB"
-
-    for INFILE in $MD; do
-      OUTFILE="$DESTWEB/$INFILE"
-      mkdir -p "$(dirname "$OUTFILE")"
-      cp "$INFILE" "$OUTFILE"
-    done
-
-    mkdir -p "$DESTWEB/desktop_images"
-    cp "$THIS_DIR"/desktop_images/* "$DESTWEB/desktop_images/"
-  fi
+  mkdir -p "$DESTWEB/desktop_images"
+  cp "$THIS_DIR"/desktop_images/* "$DESTWEB/desktop_images/"
 fi
 
