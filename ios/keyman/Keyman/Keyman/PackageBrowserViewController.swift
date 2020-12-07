@@ -29,6 +29,13 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
       delegate = self
 
       allowsMultipleSelection = false
+
+      self.navigationItem.setLeftBarButton(UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(self.doCancel)), animated: true)
+      self.modalPresentationStyle = .fullScreen
+  }
+
+  @objc func doCancel() {
+    self.dismiss(animated: true, completion: nil)
   }
 
   // MARK: UIDocumentPickerDelegate
