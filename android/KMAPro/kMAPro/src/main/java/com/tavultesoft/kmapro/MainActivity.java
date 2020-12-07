@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private boolean didExecuteParser = false;
 
   DownloadResultReceiver resultReceiver;
-  private ProgressDialog progressDialog;
+  private static ProgressDialog progressDialog;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -522,7 +522,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
           progressDialog.setCancelable(false);
           progressDialog.show();
-          resultReceiver.setProgressDialog(progressDialog);
 
           // Download the KMP to app cache
           Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
@@ -535,10 +534,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           startService(downloadIntent);
         } catch (Exception e) {
           KMLog.LogException(TAG, "", e);
-          if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-          }
-          progressDialog = null;
+          cleanupPackageInstall();
           return;//break;
         }
       } else {
@@ -551,6 +547,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       KMLog.LogException(TAG,  message, e);
       Toast.makeText(getApplicationContext(), message,
         Toast.LENGTH_SHORT).show();
+      cleanupPackageInstall();
     }
   }
 
@@ -764,7 +761,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         useLocalKMP(context, data);
       } else {
         // Permission request denied
-        String message = "Storage permission request was denied. Unable to install keyboard package";
+        String message = getString(R.string.storage_permission_denied);
         Toast.makeText(getApplicationContext(), message,
           Toast.LENGTH_SHORT).show();
       }
@@ -795,7 +792,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
         ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
       // Provide additional rationale to the user if the permission was not granted
-      String message = "To install keyboard packages, allow Keyman permission to read/write storage.";
+      String message = getString(R.string.request_storage_permission);
       Toast.makeText(getApplicationContext(), message ,
         Toast.LENGTH_LONG).show();
       ActivityCompat.requestPermissions(this,
@@ -891,6 +888,16 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     startActivity(settingsIntent);
   }
 
+  /**
+   * Dismiss the download progress dialog
+   */
+  public static void cleanupPackageInstall() {
+    if (progressDialog != null && progressDialog.isShowing()) {
+      progressDialog.dismiss();
+    };
+    progressDialog = null;
+  }
+
   public static Drawable getActionBarDrawable(Context context) {
     Point size = new Point();
     WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -938,6 +945,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    cleanupPackageInstall();
+
     for(int i=0; i < keyboardsInstalled.size(); i++) {
       HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
       String languageID = hashMap.get(KMManager.KMKey_LanguageID);
@@ -995,6 +1004,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+    cleanupPackageInstall();
+
     String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
       KMManager.getCurrentKeyboardInfo(this).getLanguageID() :
       KMManager.KMDefault_LanguageID;
