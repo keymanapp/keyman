@@ -11,7 +11,7 @@
 build:
     @rem
 
-build-release: chm
+build-release: chm web
 
 install: web
 
