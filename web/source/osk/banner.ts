@@ -546,7 +546,7 @@ namespace com.keyman.osk {
       this.revertAcceptancePromise = suggestion.apply();
       if(!this.revertAcceptancePromise) {
         // We get here either if suggestion acceptance fails or if it was a reversion.
-        if(suggestion.suggestion.tag == 'revert') {
+        if(suggestion.suggestion && suggestion.suggestion.tag == 'revert') {
           // Reversion state management
           this.recentAccept = false;
           this.doRevert = false;
