@@ -518,20 +518,22 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
         url = url.toLowerCase();
         try {
-          progressDialog = new ProgressDialog(MainActivity.this);
-          progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
-          progressDialog.setCancelable(false);
-          progressDialog.show();
+          if (progressDialog == null) {
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
+            progressDialog.setCancelable(false);
+            progressDialog.show();
 
-          // Download the KMP to app cache
-          Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
-          downloadIntent.putExtra("url", url);
-          downloadIntent.putExtra("filename", filename);
-          downloadIntent.putExtra("language", languageID);
-          downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
-          downloadIntent.putExtra("receiver", resultReceiver);
+            // Download the KMP to app cache
+            Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
+            downloadIntent.putExtra("url", url);
+            downloadIntent.putExtra("filename", filename);
+            downloadIntent.putExtra("language", languageID);
+            downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
+            downloadIntent.putExtra("receiver", resultReceiver);
 
-          startService(downloadIntent);
+            startService(downloadIntent);
+          }
         } catch (Exception e) {
           KMLog.LogException(TAG, "", e);
           cleanupPackageInstall();
