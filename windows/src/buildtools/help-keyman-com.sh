@@ -37,7 +37,7 @@ if [ -z ${HELP_KEYMAN_COM+x} ]; then
   exit 1
 fi
 
-if [ ! -d "$HELP_KEYMAN_COM/products/desktop/" ]; then
+if [ ! -d "$HELP_KEYMAN_COM/products/" ]; then
   >&2 echo "HELP_KEYMAN_COM path ($HELP_KEYMAN_COM) does not appear to be valid."
   exit 1
 fi
@@ -62,19 +62,7 @@ echo "Uploading Keyman for Windows documentation to help.keyman.com"
 ##
 function upload_keyman_for_windows_help {
 
-  #
-  # Note: release/packages which contain multiple keyboards should also have the keyboards
-  # as separate entries in the release/ folder. This means we may have a combined package
-  # help file as well as a per-keyboard help file. It is acceptable in this situation to
-  # make the combined help file link to the per-keyboard help files.
-  #
-
-  #
-  # Copy all files in that folder, according to the current
-  # version of the keyboard, to help.keyman.com/keyboard/<id>/<version>/
-  #
-
-  local helppath=$KEYMANROOT/../bin/help/php/desktop
+  local helppath=$KEYMANROOT/../bin/help/md/desktop
 
   #
   # Look for help source folder.
@@ -85,7 +73,7 @@ function upload_keyman_for_windows_help {
     return 0
   fi
 
-  local dstpath="$HELP_KEYMAN_COM/products/desktop/$VERSION_RELEASE/docs"
+  local dstpath="$HELP_KEYMAN_COM/products/windows/$VERSION_RELEASE"
 
   mkdir -p "$dstpath"
 
@@ -95,7 +83,9 @@ function upload_keyman_for_windows_help {
 
 #
 # Commit and push to the help.keyman.com repo
-# TODO: turn this into a pull request
+# Creates a pull request with the 'auto' label
+# Which a GitHub action will watch for in order
+# to automatically process and merge it
 #
 
 function commit_and_push {
@@ -104,7 +94,8 @@ function commit_and_push {
   pushd $HELP_KEYMAN_COM
   git config user.name "Keyman Build Server"
   git config user.email "keyman-server@users.noreply.github.com"
-  git add products/desktop/$VERSION_RELEASE/docs || return 1
+  git checkout -b auto/windows-help-$VERSION_WITH_TAG master
+  git add products/windows/$VERSION_RELEASE || return 1
   git diff --cached --no-ext-diff --quiet --exit-code && {
     # if no changes then don't do anything.
     echo "No changes to commit"
@@ -113,9 +104,9 @@ function commit_and_push {
   }
 
   echo "changes added to cache...>>>"
-  git commit -m "Keyman for Windows help deployment (automatic)" || return 1
-  git pull origin master || return 1
-  git push origin master || return 1
+  git commit -m "auto: Keyman for Windows help deployment" || return 1
+  git push origin auto/windows-help-$VERSION_WITH_TAG || return 1
+  hub pull-request -l auto -m "auto: Keyman for Windows help deployment" || return 1
   popd
 
   echo "Push to help.keyman.com complete"
