@@ -457,6 +457,24 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Disables the In-App keyboard picker (like when installing keyboard/lexical-model packages)
+   */
+  public static void disableInAppGlobeKey() {
+    if (InAppKeyboard != null) {
+      InAppKeyboard.keyboardPickerEnabled = false;
+    }
+  }
+
+  /**
+   * Enables the In-App keyboard picker
+   */
+  public static void enableInAppGlobeKey() {
+    if (InAppKeyboard != null) {
+      InAppKeyboard.keyboardPickerEnabled = true;
+    }
+  }
+
   public static String getLanguagePredictionPreferenceKey(String langID) {
     return langID + predictionPrefSuffix;
   }
