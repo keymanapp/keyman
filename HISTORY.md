@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.198 alpha 2020-12-07
+
+* fix(windows): help deployment (#4083)
+
 ## 14.0.197 alpha 2020-12-04
 
 * fix(windows): bootstrap installer not signed (#4067)
