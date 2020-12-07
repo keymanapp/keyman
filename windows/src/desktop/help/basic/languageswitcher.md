@@ -8,7 +8,7 @@ Windows layout.
 
 ![](desktop_images/languageswitcher.png)
 
-**Opening and Using the Language Switcher**
+## Opening and Using the Language Switcher
 
 To open and use the Keyman Language Switcher
 
@@ -16,18 +16,14 @@ To open and use the Keyman Language Switcher
     Switcher. If you are using the default Language Switcher hotkey
     (Left.Alt + Shift) or another hotkey with Alt, you will need to
     press and HOLD the Alt part of the hotkey and press and RELEASE the
-    last key in the hotkey to use the Language Switcher. When you
+    last key in the hotkey (Shift) to use the Language Switcher. When you
     release Alt, the Language Switcher will close.
 
-    <div class="note">
-
-    By default, the Language Switcher hotkey is Left.Alt + Shift. You
+    **Note**: By default, the Language Switcher hotkey is Left.Alt + Shift. You
     can view or change the current Language Switcher hotkey from the
     [Hotkeys tab](#basic_hotkeys_tab) of Keyman Configuration.
 
-    </div>
-
-    ![](desktop_images/languageswitcher-small.png)
+    ![](../desktop_images/languageswitcher-small.png)
 
 2.  Navigate the Language Switcher using the arrow keys or by pressing
     Shift to select your Keyman keyboard.
@@ -37,8 +33,7 @@ To open and use the Keyman Language Switcher
     the Keyman menu icon change to the icon of your Keyman keyboard.
     This means your Keyman keyboard is on.
 
-**Related Topics**
+## Related Topics
 
--   [???](#basic_traymenu)
-
--   [???](#basic_hotkeys_tab)
+-   [The Keyman Menu](traymenu)
+-   [Keyman Configuration - Hotkeys Tab](config_tasks/hotkeys_tab)

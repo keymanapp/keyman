@@ -2,7 +2,9 @@
 title: How To - Use the Keyman Setup Bootstrapper
 ---
 
-**About the Bootstrapper**
+## About the Bootstrapper
+
+TODO: rewrite for 14.0 content
 
 The Keyman installation bootstrapper is a self-extracting executable
 file that contains a Windows Installer technology MSI file, and
@@ -23,7 +25,7 @@ The bootstrapper:
 
 5.  Starts Keyman after the install completes.
 
-**Command Line Options**
+## Command Line Options
 
 The following command line parameters are supported in the bootstrapper:
 
@@ -39,6 +41,6 @@ The following command line parameters are supported in the bootstrapper:
     self-extracting executable to the path extractpath and exit the
     bootstrapper.
 
-**Related Topics**
+## Related Topics
 
--   [???](#start_download-install_keyman)
+-   [How To - Download and Install Keyman](../start/download-install_keyman)

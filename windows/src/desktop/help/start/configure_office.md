@@ -7,7 +7,7 @@ performance with most Keyman keyboards. However, you may need to
 manually adjust your MS Office language settings for some Keyman
 keyboards.
 
-**Benefits to Configuring Language Settings for MS Office**
+## Benefits to Configuring Language Settings for MS Office
 
 The Microsoft Office language settings control spell checking,
 autocorrection, and other language-specific features for the programs in
@@ -17,59 +17,11 @@ any of the MS Office programs with your Keyman keyboard, in order to
 enjoy these features you will need to configure MS Office language
 settings.
 
-**Setting up MS Office 2003**
+## Setting up MS Office 2017 and MS Office 365
 
-To set up Microsoft Office 2003 for your Keyman keyboard:
+TODO: complete this
 
-1.  Open the All Programs menu from the Windows Start menu.
-
-2.  Select Microsoft Office › Microsoft Office Tools › Microsoft Office
-    2003 Language Settings.
-
-3.  Select your language from the Available languages list.
-
-4.  Click Add.
-
-5.  Click OK to confirm.
-
-6.  Restart your Office applications.
-
-**Setting up MS Office 2007**
-
-To set up Microsoft Office 2007 for your Keyman keyboard:
-
-1.  Open the All Programs menu from the Windows Start menu.
-
-2.  Select Microsoft Office › Microsoft Office Tools › Microsoft Office
-    2007 Language Settings.
-
-3.  Select your language from the Available editing languages list.
-
-4.  Click Add.
-
-5.  Click OK to confirm.
-
-6.  Restart your Office applications.
-
-**Setting up MS Office 2010**
-
-To set up Microsoft Office 2010 for your Keyman keyboard:
-
-1.  Open the All Programs menu from the Windows Start menu.
-
-2.  Select Microsoft Office › Microsoft Office 2010 Tools › Microsoft
-    Office 2010 Language Preferences.
-
-3.  Find your language in the dropdown menu '\[Add additional editing
-    languages\]'.
-
-4.  Click Add.
-
-5.  Click OK to confirm.
-
-6.  Restart your Office applications.
-
-**Setting up MS Office 2013**
+## Setting up MS Office 2013
 
 To set up Microsoft Office 2013 for your Keyman keyboard:
 
@@ -87,14 +39,62 @@ To set up Microsoft Office 2013 for your Keyman keyboard:
 
 6.  Restart your Office applications.
 
-**Related Topics**
+## Setting up MS Office 2010
 
--   [???](#start_download-install_keyboard)
+To set up Microsoft Office 2010 for your Keyman keyboard:
 
--   [???](#start_configure_computer)
+1.  Open the All Programs menu from the Windows Start menu.
 
--   [???](#start_font)
+2.  Select Microsoft Office › Microsoft Office 2010 Tools › Microsoft
+    Office 2010 Language Preferences.
 
--   [???](#start_rtl)
+3.  Find your language in the dropdown menu '\[Add additional editing
+    languages\]'.
 
--   [???](#basic_enable_keyboard)
+4.  Click Add.
+
+5.  Click OK to confirm.
+
+6.  Restart your Office applications.
+
+## Setting up MS Office 2007
+
+To set up Microsoft Office 2007 for your Keyman keyboard:
+
+1.  Open the All Programs menu from the Windows Start menu.
+
+2.  Select Microsoft Office › Microsoft Office Tools › Microsoft Office
+    2007 Language Settings.
+
+3.  Select your language from the Available editing languages list.
+
+4.  Click Add.
+
+5.  Click OK to confirm.
+
+6.  Restart your Office applications.
+
+## Setting up MS Office 2003
+
+To set up Microsoft Office 2003 for your Keyman keyboard:
+
+1.  Open the All Programs menu from the Windows Start menu.
+
+2.  Select Microsoft Office › Microsoft Office Tools › Microsoft Office
+    2003 Language Settings.
+
+3.  Select your language from the Available languages list.
+
+4.  Click Add.
+
+5.  Click OK to confirm.
+
+6.  Restart your Office applications.
+
+## Related Topics
+
+-   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Set up Your Computer for a Keyman Keyboard](configure_computer)
+-   [How To - Find the Best Fonts for a Keyman Keyboard](font)
+-   [How To - Type in Right-to-Left Languages](rtl)
+-   [Keyboard Task - Turn on a Keyboard](enable_keyboard)

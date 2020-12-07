@@ -31,8 +31,7 @@ Here are some of the great things we have added to Keyman 14.0.
 -   Breaking change: Keyman Engine no longer supports the keyboard usage
     page (usage.htm)
 
-**Related Topics**
+## Related Topics
 
--   [???](#about_history)
-
--   [???](#basic_newways)
+-   [Version History](history)
+-   [New Ways to Use Keyman](../basic/newways)

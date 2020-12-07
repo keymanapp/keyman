@@ -5,18 +5,10 @@ title: The Keyman Help Menu
 The Keyman Help menu gives you comprehensive help for every aspect of
 Keyman.
 
-<div class="tip">
+**Tip:** All of the help available through the Keyman Help menu is also available online through the Help Documentation section of the [Keyman help site](https://help.keyman.com).
 
-All of the help available through the Keyman Help menu is also available
-online through the
 
-Help Documentation
-
-section of the Keyman help site.
-
-</div>
-
-**Opening Help**
+## Opening Help
 
 To open Keyman Help:
 
@@ -29,7 +21,7 @@ To open Keyman Help:
 
     ![](desktop_images/help-dialog.png)
 
-**Using Help**
+## Using Help
 
 Keyman Help is divided into seven sections:
 
@@ -53,6 +45,6 @@ Keyman Help is divided into seven sections:
 7.  Context Help — Links context-sensitive help (accesible throughout
     Keyman using F1) to the correct help topics.
 
-**Related Topics**
+## Related Topics
 
--   [???](#start_tutorial)
+-   [Getting Started with Keyman](../start/tutorial)

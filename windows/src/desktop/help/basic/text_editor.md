@@ -7,15 +7,9 @@ keyboards.
 
 ![](desktop_images/texteditor.png)
 
-<div class="note">
+**Note**: You do not need to use the Keyman Text Editor to type with Keyman. You can use Keyman in almost any application on your computer that accepts keyboard input.
 
-You do not need to use the Keyman Text Editor to type with Keyman. You
-can use Keyman in almost any application on your computer that accepts
-keyboard input.
-
-</div>
-
-**Opening the Text Editor**
+## Opening the Text Editor
 
 To open the Keyman Text Editor:
 
@@ -24,7 +18,7 @@ To open the Keyman Text Editor:
 
 2.  From the Keyman menu, select Text Editor….
 
-**Using the Text Editor**
+## Using the Text Editor
 
 To use the Keyman Text Editor:
 
@@ -45,8 +39,7 @@ nearly all texts.
 You can select a font from the font dropdown menu or by clicking on the
 link for the font in the font panel.
 
-**Related Topics**
+## Related Topics
 
--   [???](#start_tutorial)
-
--   [???](#basic_enable_keyboard)
+-   [Getting Started with Keyman](../start/tutorial)
+-   [Keyboard Task - Turn on a Keyboard](enable_keyboard)

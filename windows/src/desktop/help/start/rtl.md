@@ -38,14 +38,10 @@ get started.
     -   To toggle between right-to-left and left-to-right, press: Ctrl +
         Shift + X
 
-**Related Topics**
+## Related Topics
 
--   [???](#start_configure_computer)
-
--   [???](#start_download-install_keyboard)
-
--   [???](#start_configure_office)
-
--   [???](#start_font)
-
--   [???](#basic_enable_keyboard)
+-   [How To - Set up Your Computer for a Keyman Keyboard](configure_computer)
+-   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Set up MS Office for a Keyman Keyboard](configure_office)
+-   [How To - Find the Best Fonts for a Keyman Keyboard](font)
+-   [Keyboard Task - Turn on a Keyboard](../basic/enable_keyboard)

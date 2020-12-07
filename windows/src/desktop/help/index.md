@@ -2,16 +2,16 @@
 title: Keyman 14.0 Help
 ---
 
-* About Keyman
+* [About Keyman](about)
 
-* Getting Started
+* [Getting Started][start]
 
-* Basic Help
+* [Basic Help](basic)
 
-* Advanced Help
+* [Advanced Help](advanced)
 
-* Common Questions
+* [Common Questions](common)
 
-* Troubleshooting
+* [Troubleshooting](troubleshooting)
 
-* Contextual Help
+* [Contextual Help](context)

@@ -2,7 +2,7 @@
 title: Text Services Framework
 ---
 
-**What is the Text Services Framework?**
+## What is the Text Services Framework?
 
 The Text Services Framework, or TSF, is a set of components for modern
 applications that support advanced input and text processing. It
@@ -31,6 +31,6 @@ but as soon as an arrow key was pressed, or the mouse clicked, Keyman
 would forget the context. This means that existing text can be edited in
 a much more intuitive manner when using TSF.
 
-**What applications support TSF?**
+## What applications support TSF?
 
 TSF is supported by a wide range of software and Windows components.
