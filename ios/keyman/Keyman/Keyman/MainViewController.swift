@@ -115,6 +115,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         //
         // Thus, "intermediateNVC" serves as a dismissable intermediary.
         let intermediateNVC = UINavigationController()
+        // Pass the 'master' VC to the package browser so that it can properly launch
+        // the installer.
         let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"], in: .import, navVC: navController)
         intermediateNVC.pushViewController(vc, animated: false)
 

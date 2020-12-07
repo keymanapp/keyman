@@ -30,7 +30,13 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
 
       allowsMultipleSelection = false
 
-      self.navigationItem.setLeftBarButton(UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(self.doCancel)), animated: true)
+      if #available(iOS 13.0, *) {
+        // Easily dismissable without the extra button.
+      } else {
+        self.navigationItem.setLeftBarButton(
+          UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(self.doCancel)),
+          animated: true)
+      }
       self.modalPresentationStyle = .fullScreen
   }
 
