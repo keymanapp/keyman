@@ -110,8 +110,16 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // can launch the app-based DocumentViewController.
     if #available(iOS 11.0, *) {
       Manager.shared.fileBrowserLauncher = { navController in
-        let vc = PackageBrowserViewController()
-        navController.pushViewController(vc, animated: true)
+        // Due to iOS design flaws, the UIDocumentPickerViewController auto-dismisses
+        // the PRESENTING VC whenever a file is selected - not even just itself!
+        //
+        // Thus, "intermediateNVC" serves as a dismissable intermediary.
+        let intermediateNVC = UINavigationController()
+        let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"], in: .import, navVC: navController)
+        intermediateNVC.pushViewController(vc, animated: false)
+
+        // The ACTUAL presentation.
+        navController.present(intermediateNVC, animated: true)
       }
     }
   }
