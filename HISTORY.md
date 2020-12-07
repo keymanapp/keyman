@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.200 alpha 2020-12-07
+
+* fix(web/ui): Add check for suggestion.tag (#4085)
+
 ## 14.0.199 alpha 2020-12-07
 
 * chore(windows): also build web help (#4086)
