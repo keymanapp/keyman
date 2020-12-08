@@ -113,6 +113,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         // Due to iOS design flaws, the UIDocumentPickerViewController auto-dismisses
         // the PRESENTING VC whenever a file is selected - not even just itself!
         //
+        // (As noted by https://stackoverflow.com/a/45505488)
+        //
         // Thus, "intermediateNVC" serves as a dismissable intermediary.
         let intermediateNVC = UINavigationController()
         // Pass the 'master' VC to the package browser so that it can properly launch
