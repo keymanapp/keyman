@@ -170,7 +170,7 @@ public class WebViewFragment extends Fragment implements BlockingStep {
 
     File[] files = (FileUtils.isReadmeFile(fileName)) ? tempPackagePath.listFiles(_readmeFilter) :
       tempPackagePath.listFiles(_welcomeFilter);
-    if (files.length > 0 && files[0].exists() && files[0].length() > 0) {
+    if (files != null && files.length > 0 && files[0].exists() && files[0].length() > 0) {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
       // No readme.htm so display minimal package information
@@ -223,6 +223,10 @@ public class WebViewFragment extends Fragment implements BlockingStep {
 
   @Override
   public void onBackClicked(StepperLayout.OnBackClickedCallback callback) {
+    if (callback.getStepperLayout().getCurrentStepPosition() == 0) {
+      // Cleanup after cancelling package installation
+      MainActivity.cleanupPackageInstall();
+    }
     callback.goToPrevStep();
   }
   @Override
