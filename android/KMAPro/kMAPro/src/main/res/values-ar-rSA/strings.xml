@@ -42,6 +42,10 @@
   <string name="more_info" comment="Open the Keyman for Android help page">المزيد من المعلومات</string>
   <!-- Context: Get Started menu -->
   <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">أظهر \"%1$s\" عند البدء</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    To install keyboard packages, allow Keyman permission to read/write storage.</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Storage permission request was denied. May fail to install keyboard package</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">الإعدادات</string>
   <!-- Context: Keyman Settings menu -->
