@@ -1,4 +1,6 @@
-# Getting Started with Keyman
+---
+title: Getting Started with Keyman
+---
 
 Follow these steps for a basic introduction to Keyman:
 

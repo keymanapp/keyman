@@ -1,4 +1,6 @@
-# How To - Download and Install Keyman
+---
+title: How To - Download and Install Keyman
+---
 
 **Downloading Keyman**
 

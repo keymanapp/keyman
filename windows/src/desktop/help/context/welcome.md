@@ -1,1 +1,3 @@
-# Welcome to Keyman
+---
+title: Welcome to Keyman
+---

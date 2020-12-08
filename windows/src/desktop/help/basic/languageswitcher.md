@@ -1,4 +1,6 @@
-# Language Switcher
+---
+title: Language Switcher
+---
 
 The Keyman Language Switcher is a single popup menu to let you rapidly
 switch between any installed Keyman keyboard, Windows language or

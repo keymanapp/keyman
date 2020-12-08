@@ -1,1 +1,3 @@
-# Keyman Configuration - Hotkeys Tab
+---
+title: Keyman Configuration - Hotkeys Tab
+---

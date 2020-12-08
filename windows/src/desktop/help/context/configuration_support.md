@@ -1,1 +1,3 @@
-# Keyman Configuration - Support Tab
+---
+title: Keyman Configuration - Support Tab
+---

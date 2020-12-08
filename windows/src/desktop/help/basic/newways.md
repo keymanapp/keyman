@@ -1,4 +1,6 @@
-# New Ways to Use Keyman
+---
+title: New Ways to Use Keyman
+---
 
 If you are an existing user of Keyman, you will notice that some parts
 of the program have changed. This topic describes some of the new ways

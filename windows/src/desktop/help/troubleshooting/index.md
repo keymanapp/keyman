@@ -1,4 +1,6 @@
-# Troubleshooting
+---
+title: Troubleshooting
+---
 
 * [font](font)
 * [sigma](sigma)

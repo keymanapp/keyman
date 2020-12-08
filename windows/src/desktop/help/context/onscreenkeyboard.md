@@ -1,1 +1,3 @@
-# The Keyman Toolbox
+---
+title: The Keyman Toolbox
+---

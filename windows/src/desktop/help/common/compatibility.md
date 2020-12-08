@@ -1,4 +1,6 @@
-# Does Keyman work with all software?
+---
+title: Does Keyman work with all software?
+---
 
 Keyman works well with nearly all modern applications. Some older
 applications do not allow display of non-European languages, or do not

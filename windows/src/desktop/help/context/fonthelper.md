@@ -1,1 +1,3 @@
-# Keyman Toolbox - Font Helper
+---
+title: Keyman Toolbox - Font Helper
+---

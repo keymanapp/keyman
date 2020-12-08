@@ -1,4 +1,6 @@
-# How To - Use the Keyman Setup Bootstrapper
+---
+title: How To - Use the Keyman Setup Bootstrapper
+---
 
 **About the Bootstrapper**
 

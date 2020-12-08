@@ -1,4 +1,6 @@
-# How To - Set the Language for Keyman Menus
+---
+title: How To - Set the Language for Keyman Menus
+---
 
 **Setting a Language for Keyman Menus**
 

@@ -1,4 +1,6 @@
-# Contextual Help
+---
+title: Contextual Help
+---
 
 * [welcome](welcome)
 * [tutorial](tutorial)

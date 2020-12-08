@@ -1,4 +1,6 @@
-# Getting Started
+---
+title: Getting Started
+---
 
 * [tutorial](tutorial)
 * [download-install_keyman](download-install_keyman)

@@ -1,4 +1,6 @@
-# Common Questions
+---
+title: Common Questions
+---
 
 * [editions](editions)
 * [os](os)

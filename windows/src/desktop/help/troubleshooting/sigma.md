@@ -1,4 +1,6 @@
-# How To - Fix Greek Medial Sigma Changing to Final Sigma Unexpectedly in MS Word
+---
+title: How To - Fix Greek Medial Sigma Changing to Final Sigma Unexpectedly in MS Word
+---
 
 **Symptoms**
 

@@ -1,4 +1,6 @@
-# The Keyman Help Menu
+---
+title: The Keyman Help Menu
+---
 
 The Keyman Help menu gives you comprehensive help for every aspect of
 Keyman.

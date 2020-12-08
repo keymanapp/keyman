@@ -1,4 +1,6 @@
-# How To - Set Hotkeys for Keyman, Keyman Keyboards and Windows Languages
+---
+title: How To - Set Hotkeys for Keyman, Keyman Keyboards and Windows Languages
+---
 
 A hotkey is a keyboard shortcut. In Keyman these are used to turn on and
 off Keyman functions, Keyman keyboards and Windows languages.

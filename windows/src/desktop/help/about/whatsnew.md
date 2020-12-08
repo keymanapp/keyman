@@ -1,4 +1,6 @@
-# What's New
+---
+title: What's New
+---
 
 Here are some of the great things we have added to Keyman 14.0.
 

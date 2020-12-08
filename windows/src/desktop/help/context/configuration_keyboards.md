@@ -1,1 +1,3 @@
-# Keyman Configuration - Keyboard Layouts Tab
+---
+title: Keyman Configuration - Keyboard Layouts Tab
+---

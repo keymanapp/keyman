@@ -1,1 +1,3 @@
-# Manually Activate Keyman
+---
+title: Manually Activate Keyman
+---

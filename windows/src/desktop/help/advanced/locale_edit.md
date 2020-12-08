@@ -1,4 +1,6 @@
-# Translating the Keyman for Windows User Interface
+---
+title: Translating the Keyman for Windows User Interface
+---
 
 **Online User Interface Translation Editor**
 

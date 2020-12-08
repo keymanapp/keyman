@@ -1,4 +1,6 @@
-# Does Keyman include adware or spyware?
+---
+title: Does Keyman include adware or spyware?
+---
 
 No!
 

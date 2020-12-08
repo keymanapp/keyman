@@ -1,4 +1,6 @@
-# What is new in Keyman 10.0?
+---
+title: What is new in Keyman 10.0?
+---
 
 Keyman 10 brings a number of features which are not available in the
 Free edition of the previous Keyman. These features are:

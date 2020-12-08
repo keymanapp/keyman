@@ -1,4 +1,6 @@
-# How To - Fix A Problem with an Active Keyman Keyboard Not Typing
+---
+title: How To - Fix A Problem with an Active Keyman Keyboard Not Typing
+---
 
 **Symptoms**
 

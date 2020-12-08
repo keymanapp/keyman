@@ -1,4 +1,6 @@
-# Text Services Framework
+---
+title: Text Services Framework
+---
 
 **What is the Text Services Framework?**
 

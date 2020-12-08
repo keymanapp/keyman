@@ -1,4 +1,6 @@
-# Welcome to Keyman
+---
+title: Welcome to Keyman
+---
 
 Thank you for installing Keyman. Whether you're a new or returning user,
 we believe you will appreciate the significant enhancements in this

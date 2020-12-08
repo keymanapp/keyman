@@ -1,4 +1,6 @@
-# End User Licence and Services Agreement
+---
+title: End User Licence and Services Agreement
+---
 
 The MIT License
 
