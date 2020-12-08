@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.201 alpha 2020-12-08
+
+* chore(ios): pbxproj file compat for Xcode 12 & Simulator (#4094)
+* refactor(ios/engine): changes "install from file" to better match Apple guidelines (#4089)
+* fix(ios/engine): requests security for imported files (#4095)
+* fix(android/app) Change UX to ensure package installation finishes (#4088)
+* chore(windows): help titles and missing files (#4091)
+
 ## 14.0.200 alpha 2020-12-07
 
 * fix(web/ui): Add check for suggestion.tag (#4085)
