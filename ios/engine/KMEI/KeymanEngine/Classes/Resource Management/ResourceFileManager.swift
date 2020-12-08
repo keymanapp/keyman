@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 /**
  * This class stores common methods used for installing language resources, regardless of source.
@@ -93,7 +94,14 @@ public class ResourceFileManager {
 
     // Throws an error if the destination file already exists, and there's no
     // built-in override parameter.  Hence, the previous if-block.
-    try fileManager.copyItem(at: source, to: destination)
+    if source.startAccessingSecurityScopedResource() {
+      defer { source.stopAccessingSecurityScopedResource() }  // The Swift version of 'finally'.
+      try fileManager.copyItem(at: source, to: destination)
+    } else {
+      // We _could_ get more specific, as it's due to issues with security-scoped resources...
+      // but this ought be fine for now.
+      throw KMPError.copyFiles
+    }
   }
 
   /**
