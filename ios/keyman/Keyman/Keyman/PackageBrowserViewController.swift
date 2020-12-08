@@ -11,93 +11,95 @@ import SwiftUI
 import KeymanEngine
 
 @available(iOS 11.0, *)
-class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate {
+class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPickerDelegate {
+  private weak var navVC: UINavigationController?
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+  init(documentTypes allowedUTIs: [String], in mode: UIDocumentPickerMode, navVC: UINavigationController) {
+    super.init(documentTypes: allowedUTIs, in: mode)
 
-        delegate = self
+    self.navVC = navVC
+  }
 
-        allowsDocumentCreation = false
-        allowsPickingMultipleItems = false
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
-        // Update the style of the UIDocumentBrowserViewController
-        // browserUserInterfaceStyle = .dark
-        // view.tintColor = .white
+  override func viewDidLoad() {
+      super.viewDidLoad()
+      delegate = self
 
-        // Specify the allowed content types of your application via the Info.plist.
+      allowsMultipleSelection = false
 
-        // Do any additional setup after loading the view.
-    }
-
-    // MARK: UIDocumentBrowserViewControllerDelegate
-
-    func documentBrowser(_ controller: UIDocumentBrowserViewController, didPickDocumentsAt documentURLs: [URL]) {
-        guard let sourceURL = documentURLs.first else { return }
-
-        // Present the Document View Controller for the first document that was picked.
-        // If you support picking multiple items, make sure you handle them all.
-        doInstall(of: sourceURL)
-    }
-
-    func documentBrowser(_ controller: UIDocumentBrowserViewController,
-                         didImportDocumentAt sourceURL: URL,
-                         toDestinationURL destinationURL: URL) {
-        // Present the Document View Controller for the new newly created document
-        doInstall(of: destinationURL)
-    }
-
-    func documentBrowser(_ controller: UIDocumentBrowserViewController,
-                         failedToImportDocumentAt documentURL: URL,
-                         error: Error?) {
-        // Make sure to handle the failed import appropriately, e.g., by presenting an error message to the user.
-    }
-
-    // MARK: Document Presentation
-
-    func doInstall(of url: URL) {
-      // Once selected, start the standard install process.
-      let rfm = ResourceFileManager.shared
-
-      guard let destinationUrl = rfm.importFile(url) else {
-        return
+      if #available(iOS 13.0, *) {
+        // Easily dismissable without the extra button.
+      } else {
+        self.navigationItem.setLeftBarButton(
+          UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(self.doCancel)),
+          animated: true)
       }
+      self.modalPresentationStyle = .fullScreen
+  }
 
-      if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: self) {
-        // These type checks are necessary due to generic constraints.
-        if let kbdPackage = package as? KeyboardKeymanPackage {
-          doPrompt(for: kbdPackage, withAssociators: [.lexicalModels])
-        } else if let lmPackage = package as? LexicalModelKeymanPackage {
-          doPrompt(for: lmPackage)
-        }
+  @objc func doCancel() {
+    self.dismiss(animated: true, completion: nil)
+  }
+
+  // MARK: UIDocumentPickerDelegate
+
+  func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt documentURLs: [URL]) {
+      guard let sourceURL = documentURLs.first else { return }
+
+      doInstall(of: sourceURL)
+  }
+
+  // MARK: Package processing
+
+  func doInstall(of url: URL) {
+    // Once selected, start the standard install process.
+    let rfm = ResourceFileManager.shared
+
+    guard let destinationUrl = rfm.importFile(url) else {
+      return
+    }
+
+    if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: self) {
+      // These type checks are necessary due to generic constraints.
+      if let kbdPackage = package as? KeyboardKeymanPackage {
+        doPrompt(for: kbdPackage, withAssociators: [.lexicalModels])
+      } else if let lmPackage = package as? LexicalModelKeymanPackage {
+        doPrompt(for: lmPackage)
       }
     }
+  }
 
-    private func doPrompt<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
-        for package: Package,
-        withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [])
-    where Resource.Package == Package {
-      let activitySpinner = Alerts.constructActivitySpinner()
-      activitySpinner.center = view.center
+  private func doPrompt<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
+      for package: Package,
+      withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [])
+  where Resource.Package == Package {
+    let activitySpinner = Alerts.constructActivitySpinner()
+    activitySpinner.center = view.center
 
-      let packageInstaller = AssociatingPackageInstaller(for: package,
-                                                         withAssociators: associators) { status in
-        if status == .starting {
-          // Start a spinner!
-          activitySpinner.startAnimating()
-          self.view.addSubview(activitySpinner)
+    let packageInstaller = AssociatingPackageInstaller(for: package,
+                                                       withAssociators: associators) { status in
+      if status == .starting {
+        // Start a spinner!
+        activitySpinner.startAnimating()
+        self.view.addSubview(activitySpinner)
 
-          activitySpinner.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-          activitySpinner.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-          self.view.isUserInteractionEnabled = false
-        } else if status == .complete {
-          // Report completion!
-          activitySpinner.stopAnimating()
-          activitySpinner.removeFromSuperview()
-          self.view.isUserInteractionEnabled = true
-          self.dismiss(animated: true, completion: nil)
-        }
+        activitySpinner.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        activitySpinner.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        self.view.isUserInteractionEnabled = false
+      } else if status == .complete {
+        // Report completion!
+        activitySpinner.stopAnimating()
+        activitySpinner.removeFromSuperview()
+        self.view.isUserInteractionEnabled = true
+        self.dismiss(animated: true, completion: nil)
       }
-      packageInstaller.promptForLanguages(inNavigationVC: self.navigationController!)
     }
+
+    if let navVC = self.navVC {
+      packageInstaller.promptForLanguages(inNavigationVC: navVC)
+    }
+  }
 }

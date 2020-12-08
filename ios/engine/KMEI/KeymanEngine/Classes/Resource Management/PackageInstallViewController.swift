@@ -348,10 +348,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       // If it is not the root view of a navigationController, just pop it off the stack.
       if let navVC = self.navigationController {
        if navVC.viewControllers[0] != self {
-        navVC.popViewController(animated: true)
-        } else {
-          self.dismiss(animated: true)
+          self.dismiss(animated: true) // Needs TWO LAYERS of dismissal in this case.
         }
+        self.dismiss(animated: true)
       } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
         self.dismiss(animated: true)
       }
