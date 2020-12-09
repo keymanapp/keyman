@@ -29,6 +29,9 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
       delegate = self
 
       allowsMultipleSelection = false
+      self.title = NSLocalizedString("menu-settings-install-from-file",
+                                     bundle: Bundle(for: Manager.self),
+                                     comment: "")
 
       if #available(iOS 13.0, *) {
         // Easily dismissable without the extra button.
