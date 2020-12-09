@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.202 alpha 2020-12-09
+
+* fix(ios): fixes nav bar issues when using "Install From File" (#4099)
+* fix(web/ui): Fix check on indexOf (#4103)
+* fix(ios): autosets + autodisplays keyboard after a package install (#4101)
+
 ## 14.0.201 alpha 2020-12-08
 
 * chore(ios): pbxproj file compat for Xcode 12 & Simulator (#4094)
