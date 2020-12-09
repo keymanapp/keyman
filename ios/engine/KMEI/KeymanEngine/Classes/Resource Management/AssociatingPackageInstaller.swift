@@ -364,6 +364,10 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
       do {
         try ResourceFileManager.shared.install(resourcesWithIDs: fullIDs, from: self.package)
         result = .complete
+
+        if let kbdID = fullIDs.first(where: { $0.type == .keyboard }) {
+          _ = Manager.shared.setKeyboard(withFullID: kbdID as! FullKeyboardID)
+        }
       } catch {
         result = .error(error)
       }

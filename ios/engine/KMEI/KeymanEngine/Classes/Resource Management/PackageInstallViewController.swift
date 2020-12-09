@@ -391,6 +391,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @objc private func onWelcomeDismissed() {
     self.dismissalBlock?()
     self.dismissalBlock = nil
+
+    // The user will be on the main screen after this, so we should resummon the keyboard.
+    Manager.shared.showKeyboard()
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {
