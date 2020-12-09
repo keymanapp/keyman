@@ -109,21 +109,14 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // We have to gerry-rig this so that the framework-based SettingsViewController
     // can launch the app-based DocumentViewController.
     if #available(iOS 11.0, *) {
-      Manager.shared.fileBrowserLauncher = { navController in
-        // Due to iOS design flaws, the UIDocumentPickerViewController auto-dismisses
-        // the PRESENTING VC whenever a file is selected - not even just itself!
-        //
-        // (As noted by https://stackoverflow.com/a/45505488)
-        //
-        // Thus, "intermediateNVC" serves as a dismissable intermediary.
-        let intermediateNVC = UINavigationController()
-        // Pass the 'master' VC to the package browser so that it can properly launch
-        // the installer.
-        let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"], in: .import, navVC: navController)
-        intermediateNVC.pushViewController(vc, animated: false)
+      Manager.shared.fileBrowserLauncher = { _ in
+        let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"],
+                                              in: .import,
+                                              navVC: self.navigationController!)
 
-        // The ACTUAL presentation.
-        navController.present(intermediateNVC, animated: true)
+        // Auto-dismiss the settings menu, then present the "install from file" browser.
+        self.navigationController!.topViewController!.dismiss(animated: true, completion: nil)
+        self.present(vc, animated: true)
       }
     }
   }
