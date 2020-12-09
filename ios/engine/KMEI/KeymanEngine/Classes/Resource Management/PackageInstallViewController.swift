@@ -345,12 +345,10 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     self.completionHandler(selectedResources.map { $0.typedFullID })
 
     let dismissalBlock = {
-      // If it is not the root view of a navigationController, just pop it off the stack.
-      if let navVC = self.navigationController {
-       if navVC.viewControllers[0] != self {
-          self.dismiss(animated: true) // Needs TWO LAYERS of dismissal in this case.
+      if let nvc = self.navigationController {
+        self.dismiss(animated: true) {
+          nvc.popToRootViewController(animated: true)
         }
-        self.dismiss(animated: true)
       } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
         self.dismiss(animated: true)
       }
