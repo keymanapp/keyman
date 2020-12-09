@@ -1317,8 +1317,9 @@ namespace com.keyman.osk {
         // Find the actual key element.
         let childNode = keySquare.firstChild ? keySquare.firstChild as HTMLElement: keySquare;
 
-        if(childNode.className !== undefined  && (childNode.className.indexOf('key-hidden') >= 0)
-             || (childNode.className.indexOf('key-blank') >= 0)){
+        if(childNode.className !== undefined
+            && (childNode.className.indexOf('key-hidden') >= 0
+             || childNode.className.indexOf('key-blank') >= 0)) {
           continue;
         }
         x1 = keySquare.offsetLeft;
