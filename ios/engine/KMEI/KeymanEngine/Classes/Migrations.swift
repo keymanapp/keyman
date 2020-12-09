@@ -686,7 +686,10 @@ public enum Migrations {
 
     // Each wrapper package contains only a single resource.  .installables[0] returns all
     // LanguageResource pairings for that script resource.
-    let wrappedResources: [Resource] = wrapperPackages.flatMap { $0.installables[0] }
+    let wrappedResources: [Resource] = wrapperPackages.flatMap { package in
+      // Just in case the 'wrapping' process goes wrong, this will prevent a fatal error.
+      package.installables.count > 0 ? package.installables[0] : []
+    }
 
     let mappedResources: [Resource] = wrappedResources.compactMap { resource in
       if resources.contains(where: { $0.typedFullID == resource.typedFullID}) {
