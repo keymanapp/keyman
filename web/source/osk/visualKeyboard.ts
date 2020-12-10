@@ -1211,7 +1211,8 @@ namespace com.keyman.osk {
         let _Box = this.kbdDiv.offsetParent as HTMLElement; // == osk._Box
         let height = (this.kbdDiv.firstChild as HTMLElement).offsetHeight; // firstChild == layer-group, has height info.
         // We need to adjust the offset properties by any offsets related to the active banner.
-        var yMin = Math.max(5, this.kbdDiv.offsetTop + _Box.offsetTop - 0.25*height);
+
+        var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop + _Box.offsetTop - 0.25*height) : 5;
         if(key0 && e.touches[0].pageY < yMin) {
           this.highlightKey(key0,false);
           this.showKeyTip(null,false);
