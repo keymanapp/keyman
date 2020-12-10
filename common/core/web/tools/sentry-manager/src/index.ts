@@ -13,6 +13,7 @@ namespace com.keyman {
 
   export class KeymanSentryManager {
     keymanPlatform: string;
+    silenced: boolean = false;
 
     static STANDARD_ALIASABLE_FILES = {
       'keymanweb.js':     'keymanweb.js',
@@ -141,7 +142,7 @@ namespace com.keyman {
      * @param event
      */
     prepareEventDebugWrapper(event: any) {
-      if(DEBUG) {
+      if(DEBUG || this.silenced) {
         try {
           if(this.prepareEvent(event)) {
             return event;
@@ -173,6 +174,14 @@ namespace com.keyman {
         release: com.keyman.environment.SENTRY_RELEASE,
         environment: com.keyman.environment.ENVIRONMENT
       });
+    }
+
+    get enabled(): boolean {
+      return !this.silenced;
+    }
+
+    set enabled(value: boolean) {
+      this.silenced = value;
     }
   }
 }

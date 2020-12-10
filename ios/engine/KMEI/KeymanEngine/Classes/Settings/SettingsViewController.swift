@@ -72,8 +72,22 @@ open class SettingsViewController: UITableViewController {
       "reuseid" : "showgetstarted"
       ])
 
+    itemsArray.append([
+      "title": NSLocalizedString("menu-settings-error-report", bundle: engineBundle, comment: ""),
+      "subtitle": NSLocalizedString("menu-settings-error-report-description", bundle: engineBundle, comment: ""),
+      "reuseid": "enablecrashreporting"
+      ])
+
     // The iOS Files app is only available with 11.0+.
     if #available(iOS 11.0, *) {
+      if let _ = URL(string: UIApplication.openSettingsURLString) {
+        itemsArray.append([
+          "title": NSLocalizedString("menu-settings-system-keyboard-menu", bundle: engineBundle, comment: ""),
+          "subtitle": "",
+          "reuseid": "systemkeyboardsettings"
+          ])
+      }
+
       itemsArray.append([
         "title": NSLocalizedString("menu-settings-install-from-file", bundle: engineBundle, comment: ""),
         "subtitle": NSLocalizedString("menu-settings-install-from-file-description", bundle: engineBundle, comment: ""),
@@ -125,6 +139,23 @@ open class SettingsViewController: UITableViewController {
     switch(cellIdentifier) {
       case "languages":
         cell.accessoryType = .disclosureIndicator
+      case "enablecrashreporting":
+        cell.accessoryType = .none
+        let enableReportingSwitch = UISwitch()
+        enableReportingSwitch.translatesAutoresizingMaskIntoConstraints = false
+
+        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: enableReportingSwitch.frame.size)
+        enableReportingSwitch.frame = switchFrame
+
+        enableReportingSwitch.isOn = reportErrors
+        enableReportingSwitch.addTarget(self, action: #selector(self.reportingSwitchValueChanged),
+                                      for: .valueChanged)
+        cell.addSubview(enableReportingSwitch)
+
+        if #available(iOSApplicationExtension 9.0, *) {
+          enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+        }
       case "showbanner":
         cell.accessoryType = .none
         let showBannerSwitch = UISwitch()
@@ -168,6 +199,16 @@ open class SettingsViewController: UITableViewController {
     
     return cell
   }
+
+  @objc func reportingSwitchValueChanged(_ sender: Any) {
+    let userData = Storage.active.userDefaults
+    if let toggle = sender as? UISwitch {
+      userData.set(toggle.isOn, forKey: Key.optShouldReportErrors)
+      userData.synchronize()
+    }
+
+    // Forward the thing to KMW; actually USE that value.
+  }
   
   @objc func bannerSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
@@ -190,6 +231,11 @@ open class SettingsViewController: UITableViewController {
     }
   }
 
+  private var reportErrors: Bool {
+    let userData = Storage.active.userDefaults
+    return userData.bool(forKey: Key.optShouldReportErrors)
+  }
+
   private var showBanner: Bool {
     let userData = Storage.active.userDefaults
     return userData.bool(forKey: Key.optShouldShowBanner)
@@ -207,15 +253,17 @@ open class SettingsViewController: UITableViewController {
     cell.tag = indexPath.row
     cell.isUserInteractionEnabled = true
 
-    if indexPath.row == 0 {
-      cell.accessoryType = .disclosureIndicator
-    } else if indexPath.row == 3 {
-      cell.accessoryType = .disclosureIndicator
-    } else {
-      cell.textLabel?.isEnabled = true
-      cell.detailTextLabel?.isEnabled = false
-    }
+    let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
 
+    switch (cellIdentifier) {
+      case "languages", "installfile", "systemkeyboardsettings":
+        cell.accessoryType = .disclosureIndicator
+      case "enablecrashreporting":
+        break
+      default:
+        cell.textLabel?.isEnabled = true
+        cell.detailTextLabel?.isEnabled = false
+    }
   }
   
   // In a xib-based application, navigation from a table can be handled in -tableView:didSelectRowAtIndexPath:
@@ -229,19 +277,27 @@ open class SettingsViewController: UITableViewController {
   }
   
   private func performAction(for indexPath: IndexPath) {
+    let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
+
     switch indexPath.section {
     case 0:
-      switch indexPath.row {
-      case 0:
-        showLanguages()
-      case 3:
-        if let block = Manager.shared.fileBrowserLauncher {
-          block(navigationController!)
-        } else {
-          log.info("Listener for framework signal to launch file browser is missing")
-        }
-      default:
-        break
+      switch cellIdentifier {
+        case "languages":
+          showLanguages()
+        case "systemkeyboardsettings": // TODO: If adding an option to direct-hop to "Full Access".
+          guard let appSettings = URL(string: UIApplication.openSettingsURLString) else {
+            log.error("Could not launch keyboard settings menu")
+            return
+          }
+          UniversalLinks.externalLinkLauncher?(appSettings)
+        case "installfile":
+          if let block = Manager.shared.fileBrowserLauncher {
+            block(navigationController!)
+          } else {
+            log.info("Listener for framework signal to launch file browser is missing")
+          }
+        default:
+          break
       }
     default:
       break

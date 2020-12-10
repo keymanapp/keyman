@@ -180,6 +180,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override var hasFullAccess: Bool {
+    if #available(iOS 11.0, *) {
+      // Nice and straight-forward here!
+      return super.hasFullAccess
+    }
     return Storage.shared != nil
   }
 
