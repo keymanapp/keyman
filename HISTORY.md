@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.203 alpha 2020-12-10
+
+* fix(web/ui): Add null check for calculations when canceling touch (#4098)
+
 ## 14.0.202 alpha 2020-12-09
 
 * fix(ios): fixes nav bar issues when using "Install From File" (#4099)
