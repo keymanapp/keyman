@@ -208,6 +208,7 @@ open class SettingsViewController: UITableViewController {
     }
 
     // Forward the thing to KMW; actually USE that value.
+    Manager.shared.inputViewController.refreshCrashReporting()
   }
   
   @objc func bannerSwitchValueChanged(_ sender: Any) {

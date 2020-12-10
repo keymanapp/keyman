@@ -181,7 +181,7 @@ namespace com.keyman {
     }
 
     set enabled(value: boolean) {
-      this.silenced = value;
+      this.silenced = !value;
     }
   }
 }

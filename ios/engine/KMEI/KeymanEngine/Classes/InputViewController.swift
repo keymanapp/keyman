@@ -550,6 +550,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func resetContext() {
     keymanWeb.resetContext()
   }
+
+  func refreshCrashReporting() {
+    keymanWeb.refreshCrashReporting()
+  }
  
   func setContextState(text: String?, range: NSRange) {
     // Check for any LTR or RTL marks at the context's start; if they exist, we should

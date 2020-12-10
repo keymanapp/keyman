@@ -357,8 +357,14 @@ extension KeymanWebViewController {
   }
   
   func setBannerHeight(to height: Int) {
-    // TODO:
     webView?.evaluateJavaScript("setBannerHeight(\(height));", completionHandler: nil)
+  }
+
+  func refreshCrashReporting() {
+    let userDefaults = Storage.active.userDefaults
+    let reportCrashes = userDefaults.bool(forKey: Key.optShouldReportErrors)
+
+    webView?.evaluateJavaScript("sentryManager.enabled = \(reportCrashes ? "true" : "false")")
   }
 }
 
@@ -565,6 +571,8 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
     isLoading = false
     log.info("Loaded keyboard.")
+
+    self.refreshCrashReporting();
 
     resizeKeyboard()
 
