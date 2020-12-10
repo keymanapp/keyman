@@ -4,7 +4,7 @@ title: Keyman 14.0 Help
 
 * [About Keyman](about)
 
-* [Getting Started][start]
+* [Getting Started](start)
 
 * [Basic Help](basic)
 
