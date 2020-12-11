@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.204 alpha 2020-12-11
+
+* chore(windows): apply eberhard's suggestions to docs (#4105)
+* fix(ios): prevents crash from failed legacy-resource-wrapping attempt (#4100)
+* chore(deps): bump ini from 1.3.5 to 1.3.7 in /web/testing/regression-tests (#4108)
+
 ## 14.0.203 alpha 2020-12-10
 
 * fix(web/ui): Add null check for calculations when canceling touch (#4098)
