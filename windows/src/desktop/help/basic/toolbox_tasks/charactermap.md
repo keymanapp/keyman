@@ -5,13 +5,13 @@ title: Keyman Toolbox - Character Map {#basic_charactermap}
 The Character Map tool in the [Keyman Toolbox](#basic_toolbox) can be
 used to find and insert any standard Unicode character into your text.
 
-![](desktop_images/charmap.png)
+![](../desktop_images/charmap.png)
 
 **Opening the Character Map**
 
 To open the Keyman Character Map:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Character Map.
@@ -47,7 +47,7 @@ multiple characters from the Character Map.
 
 **Character Map Options**
 
-![](desktop_images/charmap-options.png)
+![](../desktop_images/charmap-options.png)
 
 Right click on the Character Map to display a menu with the following
 options:
@@ -80,13 +80,13 @@ options:
 You can search the Character Map by using the Filter by search field at
 the bottom of the Character Map window.
 
-![](desktop_images/charmap-filter.png)
+![](../desktop_images/charmap-filter.png)
 
 When no search filter is applied, the Character Map shows all characters
 from the Unicode standard. If a filter has been applied, the name of the
 filter will appear in the upper left corner of the Character Map window.
 
-![](desktop_images/charmap-big.png)
+![](../desktop_images/charmap-big.png)
 
 The following parameters define how the search filter in the Character
 Map works:
@@ -239,10 +239,10 @@ The following chart provides examples of filtering.
 +-----------------------+-----------------------------------------------+
 
 To help you edit filters, the Filter dialog is available from the
-Character Map by clicking the ![](desktop_images/charmap-button.png)
+Character Map by clicking the ![](../desktop_images/charmap-button.png)
 button.
 
-![](desktop_images/charmap-filterdialog.png)
+![](../desktop_images/charmap-filterdialog.png)
 
 **[]{#goto}Character Map Options - Goto...**
 
@@ -252,7 +252,7 @@ character or value.
 1.  Right click on a character and select Goto. The Enter Unicode
     character value or namedialog box will be displayed:
 
-    ![](desktop_images/charmap-goto.png)
+    ![](../desktop_images/charmap-goto.png)
 
 2.  Enter a Unicode character value (e.g. \"6B\" or \"U+006B\") OR enter
     the start of the character name (e.g. \"Lao letter\", which will go
@@ -266,7 +266,7 @@ character or value.
 You can choose the font for use in the Character Map tool by right
 clicking on the Character Map window and selecting Font.
 
-![](desktop_images/charmap-font.png)
+![](../desktop_images/charmap-font.png)
 
 From the Font dialog, you can select to display the Character Map using
 any of the fonts available on your system. If a character is not
@@ -295,13 +295,13 @@ To change the character insert mode:
 
 2.  Highlight the Insert Mode submenu.
 
-    ![](desktop_images/charmap-insert.png)
+    ![](../desktop_images/charmap-insert.png)
 
 3.  Choose the desired insert mode from the submenu.
 
 **[]{#displayquality}Character Map Options - Display Quality**
 
-![](desktop_images/charmap-quality.png)
+![](../desktop_images/charmap-quality.png)
 
 There are three options for the display quality of characters in the
 Character Map.

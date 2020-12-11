@@ -12,14 +12,14 @@ Keyman.
 
 To open Keyman Help:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Help….
 
 3.  Select Help Contents.
 
-    ![](desktop_images/help-dialog.png)
+    ![](../desktop_images/help-dialog.png)
 
 ## Using Help
 

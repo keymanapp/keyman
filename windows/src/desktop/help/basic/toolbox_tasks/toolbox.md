@@ -5,13 +5,13 @@ title: The Keyman Toolbox {#basic_toolbox}
 The Keyman Toolbox contains a collection of tools for working with
 Keyman.
 
-![](desktop_images/osk_keyboard.png)
+![](../desktop_images/osk_keyboard.png)
 
 **Opening the Keyman Toolbox**
 
 To display the Keyman Toolbox:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select On Screen Keyboard.
@@ -35,7 +35,7 @@ of Keyman Configuration.
 
 Along the top of the Keyman Toolbox is a toolbar.
 
-![](desktop_images/toolbox-toolbar.png)
+![](../desktop_images/toolbox-toolbar.png)
 
 Any of the following buttons may appear in the toolbar:
 
@@ -358,7 +358,7 @@ only resize according to the proportions of the keyboard.
 
 **Toolbox Options**
 
-![](desktop_images/toolbox-options.png)
+![](../desktop_images/toolbox-options.png)
 
 Right click on the Keyman Toolbox to display a menu with the following
 options:
@@ -385,7 +385,7 @@ options:
 
 **Toolbox Hints**
 
-![](desktop_images/toolbox-hints.png)
+![](../desktop_images/toolbox-hints.png)
 
 At the bottom of the Keyman Toolbox, a hint bar shows handy tips on how
 to use Keyman and access some of the more advanced features available.

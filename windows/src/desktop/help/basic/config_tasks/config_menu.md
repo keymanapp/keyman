@@ -8,13 +8,13 @@ Keyman menus, install and uninstall keyboards, change options, set
 hotkeys, disable addins, associate languages, check for updates and run
 support diagnostics.
 
-![](desktop_images/tab-support.png)
+![](../desktop_images/tab-support.png)
 
 **Opening Keyman Configuration**
 
 To open Keyman Configuration:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Configuration....

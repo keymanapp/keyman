@@ -17,7 +17,7 @@ get started.
     To do this, simply associate the keyboard with a right-to-left
     Windows language (like Arabic). For instructions on associating a
     Keyman keyboard with a Windows language, see:
-    [???](#start_configure_computer)
+    [???](#start_configure-computer)
 
 2.  If you will be using MS Office programs like Word, you should
     configure MS Office for your right-to-left language. For
@@ -40,8 +40,8 @@ get started.
 
 ## Related Topics
 
--   [How To - Set up Your Computer for a Keyman Keyboard](configure_computer)
--   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Set up Your Computer for a Keyman Keyboard](configure-computer)
+-   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
 -   [How To - Set up MS Office for a Keyman Keyboard](configure_office)
 -   [How To - Find the Best Fonts for a Keyman Keyboard](font)
 -   [Keyboard Task - Turn on a Keyboard](../basic/enable_keyboard)

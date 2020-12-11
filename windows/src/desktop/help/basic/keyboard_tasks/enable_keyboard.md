@@ -23,10 +23,10 @@ To turn on a keyboard from the Keyman menu:
 
 2.  Start Keyman.
 
-3.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+3.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
-    ![](desktop_images/menu.png)
+    ![](../desktop_images/menu.png)
 
 4.  Select your Keyman keyboard from the list. You will notice the
     Keyman menu icon change to the icon of your Keyman keyboard. This
@@ -40,14 +40,14 @@ To turn on a keyboard from the Keyman Toolbox:
 
 2.  Start Keyman.
 
-3.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+3.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
-    ![](desktop_images/menu.png)
+    ![](../desktop_images/menu.png)
 
 4.  Click to open the On Screen Keyboard view of the Keyman Toolbox.
 
-    ![](desktop_images/osk-tibetan.png)
+    ![](../desktop_images/osk-tibetan.png)
 
 5.  Click to select your Keyman keyboard from the toolbar of the Keyman
     Toolbox. You will notice the Keyman menu icon change to the icon of
@@ -79,7 +79,7 @@ Here\'s how to turn on a keyboard using the Language Switcher:
     [Hotkeys tab](#basic_hotkeys_tab) of Keyman Configuration.
     :::
 
-    ![](desktop_images/languageswitcher-small.png)
+    ![](../desktop_images/languageswitcher-small.png)
 
 4.  Navigate the Language Switcher using the arrow keys or by pressing
     Shift to select your Keyman keyboard.
@@ -106,7 +106,7 @@ To turn on a keyboard from the Keyman menu:
     of Keyman Configuration.
     :::
 
-    ![](desktop_images/menu.png)
+    ![](../desktop_images/menu.png)
 
 4.  You will notice the Keyman menu icon change to the icon of your
     Keyman keyboard. This means your Keyman keyboard is on.
@@ -132,7 +132,7 @@ choose the keyboard you want to use.
 
 -   [???](#basic_keyboards_tab)
 
--   [???](#start_download-install_keyboard)
+-   [???](#start_download-and-install-keyboard)
 
 -   [???](#basic_disable_keyboard)
 

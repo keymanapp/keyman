@@ -2,7 +2,7 @@
 title: The Keyman Splash Screen
 ---
 
-![](desktop_images/setup-click3.png)
+![](../desktop_images/setup-click3.png)
 
 The Splash screen shows information about which keyboards are installed,
 plus the version of Keyman.

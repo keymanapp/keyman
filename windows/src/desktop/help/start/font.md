@@ -21,7 +21,7 @@ to be 100% to work well for your keyboard, but higher percentages are
 better. You will also see a chart in the Font Helper, showing exactly
 which letters and symbols from your keyboard are supported by each font.
 
-![](desktop_images/fonthelper.png)
+![](../desktop_images/fonthelper.png)
 
 **Note:** The Font Helper tool is designed to tell you which fonts support the
 letters and characters in your language. It is not intended to show you
@@ -33,7 +33,7 @@ your text to see which fonts look the best for your entire text.
 ## Related Topics
 
 -   [How To - Fix Font Issues](../troubleshooting/font)
--   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
 -   [Keyman Toolbox - Font Helper](../basic/toolbox_tasks/fonthelper)
 -   [Keyman Configuration - Hotkeys Tab](../basic/config_tasks/hotkeys_tab)
 -   [Keyboard Task - Turn on a Keyboard](../basic/enable_keyboard)

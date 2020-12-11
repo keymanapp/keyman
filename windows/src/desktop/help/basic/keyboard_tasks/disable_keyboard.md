@@ -20,14 +20,14 @@ To disable a Keyman keyboard:
 
 1.  Open Keyman.
 
-2.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+2.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
-    ![](desktop_images/menu.png)
+    ![](../desktop_images/menu.png)
 
 3.  Select Configuration.
 
-    ![](desktop_images/tab-layout.png)
+    ![](../desktop_images/tab-layout.png)
 
 4.  Select the Keyboard Layouts tab.
 
@@ -44,14 +44,14 @@ To enable a Keyman keyboard:
 
 1.  Open Keyman.
 
-2.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+2.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
-    ![](desktop_images/menu.png)
+    ![](../desktop_images/menu.png)
 
 3.  Select Configuration.
 
-    ![](desktop_images/tab-layout.png)
+    ![](../desktop_images/tab-layout.png)
 
 4.  Select the Keyboard Layouts tab.
 

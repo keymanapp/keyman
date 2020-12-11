@@ -6,13 +6,13 @@ The Options tab of Keyman Configuration includes the Keyman application
 options. You can use the Options tab to set general, startup, Keyman
 Toolbox On Screen Keyboard and advanced options.
 
-![](desktop_images/tab-options2.png)
+![](../desktop_images/tab-options2.png)
 
 **Opening the Options Tab**
 
 To open the Options tab of Keyman Configuration:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Configuration....
@@ -25,7 +25,7 @@ To open the Options tab of Keyman Configuration:
 
 **Using General Options**
 
-![](desktop_images/options-general.png)
+![](../desktop_images/options-general.png)
 
 -   Keyboard hotkeys toggle keyboard activation
 
@@ -83,7 +83,7 @@ To open the Options tab of Keyman Configuration:
 
 **Using Startup Options**
 
-![](desktop_images/options-startup.png)
+![](../desktop_images/options-startup.png)
 
 -   Start when Windows starts
 
@@ -121,7 +121,7 @@ To open the Options tab of Keyman Configuration:
 
 **Using On Screen Keyboard Options**
 
-![](desktop_images/options-osk.png)
+![](../desktop_images/options-osk.png)
 
 -   Release Shift/Ctrl/Alt on On Screen Keyboard after clicking a key
 
@@ -152,7 +152,7 @@ To open the Options tab of Keyman Configuration:
 
 **Using Advanced Options**
 
-![](desktop_images/options-advanced.png)
+![](../desktop_images/options-advanced.png)
 
 -   Debugging
 

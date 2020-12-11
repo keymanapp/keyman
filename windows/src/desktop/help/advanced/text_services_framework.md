@@ -16,7 +16,7 @@ keyboard input, handwriting recognition and speech recognition. In
 Windows 8, the Language Bar is no longer used, and the interface is
 tightly integrated into the taskbar.
 
-![](desktop_images/language-bar.png)
+![](../desktop_images/language-bar.png)
 
 With Keyman Desktop 9 and later versions, all keyboards are registered
 through the Windows interfaces, and the key advantage is that Keyman now

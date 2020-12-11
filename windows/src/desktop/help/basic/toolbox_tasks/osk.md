@@ -5,7 +5,7 @@ title: Keyman Toolbox - On Screen Keyboard {#basic_osk}
 The On Screen Keyboard tool of the [Keyman Toolbox](#basic_toolbox)
 shows the currently selected Keyman keyboard or Windows layout.
 
-![](desktop_images/osk-tibetan.png)
+![](../desktop_images/osk-tibetan.png)
 
 ::: {.note}
 Some Keyman keyboards do not contain an On Screen Keyboard view. You can
@@ -20,7 +20,7 @@ of the Keyman Toolbox.
 
 To open the On Screen Keyboard:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select On Screen Keyboard.

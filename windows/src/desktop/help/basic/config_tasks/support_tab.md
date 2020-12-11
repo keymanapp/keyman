@@ -7,13 +7,13 @@ information and support tools. You can use the Support tab to send a
 support request, check Windows language settings, check for updates, and
 view Keyman version information.
 
-![](desktop_images/tab-support.png)
+![](../desktop_images/tab-support.png)
 
 **Opening the Support Tab**
 
 To open the Support tab of Keyman Configuration:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Configuration....
@@ -59,4 +59,4 @@ Configuration. In the Support tab you will see:
 
 -   [???](#basic_config_menu)
 
--   [???](#start_download-install_keyman)
+-   [???](#start_download-and-install-keyman)

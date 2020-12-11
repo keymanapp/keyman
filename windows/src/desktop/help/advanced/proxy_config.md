@@ -5,7 +5,7 @@ title: Proxy Configuration
 The Proxy Configuration dialog allows you to enter HTTP proxy details
 for Keyman Configuration.
 
-![](desktop_images/proxy-config.png)
+![](../desktop_images/proxy-config.png)
 
 Most users do not need to change their proxy configuration. Proxy
 configuration is used only in networked environments, and if a proxy
@@ -18,5 +18,5 @@ Configuration will use the proxy settings from Windows.
 
 ## Related Topics
 
--   [How To - Download and Install a Keyman Keyboard](../start/download-install_keyboard)
+-   [How To - Download and Install a Keyman Keyboard](../start/download-and-install-keyboard)
 -   [Software Task - Update Keyman](../basic/engine_tasks/update)
