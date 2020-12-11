@@ -5,7 +5,7 @@ title: The Keyman Text Editor
 The Keyman Text Editor is a basic text editor for testing your Keyman
 keyboards.
 
-![](desktop_images/texteditor.png)
+![](../desktop_images/texteditor.png)
 
 **Note:** You do not need to use the Keyman Text Editor to type with Keyman. You can use Keyman in almost any application on your computer that accepts keyboard input.
 
@@ -13,7 +13,7 @@ keyboards.
 
 To open the Keyman Text Editor:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Text Editor….

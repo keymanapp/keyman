@@ -5,7 +5,7 @@ title: How To - Download and Install a Keyman Keyboard
 You must have a Keyman keyboard installed to type with Keyman in your
 language. You can download and install a Keyman keyboard at the same
 time you download and install Keyman. For more information, see:
-[How To - Download and Install Keyman](download-install_keyman).
+[How To - Download and Install Keyman](download-and-install-keyman).
 
 You can also add keyboards to Keyman after you have installed Keyman.
 For more information, keep reading.
@@ -19,32 +19,36 @@ Here's how to download and install a Keyman keyboard within Keyman:
 2.  Open Keyman Configuration, from the Keyman menu (on the Windows
     Taskbar near the clock).
 
-    ![](desktop_images/start_tray.png)
+    ![](../desktop_images/start_tray.png)
 
-3.  Select the Keyboard Layouts tab.
+3.  Click Download keyboard… at the bottom of the window.
 
-4.  Click Download keyboard….
+    ![](../desktop_images/download-keyboard-step0.png)
 
-5.  From the dropdown boxes, find a language associated with your
-    keyboard and click Search.
+4.  Type a language name, a country name, a keyboard name or even name of
+    the author of the keyboard into the search box, or click the Popular
+    keyboards link to see some of the most commonly installed keyboards.
 
-6.  Click Install Keyboard for the keyboard you want to install.
+    ![](../desktop_images/download-keyboard-step1.png)
 
-    **Tip:** The icons to the right of each keyboard name show valuable
-    information about what the keyboard includes:
+5.  After a moment, Keyman will present a list of keyboards. Choose the
+    keyboard you wish to install.
 
-TODO: missing images
+    ![](../desktop_images/download-keyboard-step2.png)
 
-    -   – means that the keyboard is a Unicode keyboard.
-    -   – means the keyboard has a virtual On Screen Keyboard.
-    -   – means the keyboard contains help documentation.
-    -   – means the keyboard comes with fonts.
-    -   – means the keyboard has introductory help.
+6.  A page with more details about the keyboard will be presented.
+    Click Install keyboard in this page to continue downloading and
+    installing the keyboard.
 
-    **Note:** You may also download the keyboard without installing it. Tick
-    'Don't install, just download' in the Download Keyboard window.
+    ![](../desktop_images/download-keyboard-step3.png)
 
-7.  Click Install at the Install Keyboard or Package dialog.
+7.  The keyboard will be downloaded to your computer.
+
+    ![](../desktop_images/download-keyboard-step4.png)
+
+8.  Click Install at the Install Keyboard/Package dialog.
+
+    ![](../desktop_images/download-keyboard-step5.png)
 
     **Tip:** The Install Keyboard/Package dialog includes some helpful
     information about the keyboard you are installing. In addition to
@@ -56,20 +60,19 @@ TODO: missing images
 
     -   Specific help and readme information (under the readme tab).
 
-    -   Other details.
-
     **Note:** Install installs the keyboard for anyone who can log on to your
-    computer. You may be prompted by User Account Control to allow
-    Keyman to make changes to your computer -- click 'Yes'.
+    computer.
 
     **Note:** If a keyboard with the same name is already installed, Keyman will
     ask you if you want to replace the old keyboard or cancel the
     installation.
 
-8.  Click OK if asked to configure your computer to work with your new
-    keyboard.
+9.  You may be prompted by User Account Control to allow
+    Keyman to make changes to your computer -- click 'Yes'.
 
-9.  Click OK to save your settings and exit Keyman Configuration.
+    ![](../desktop_images/download-keyboard-step6.png)
+
+10. The keyboard will now be installed; you can close Keyman Configuration.
 
 ## Installing a Keyman Keyboard from a Folder on Your Computer
 
@@ -86,7 +89,7 @@ how:
 2.  Open Keyman Configuration, from the Keyman menu in the Windows
     taskbar.
 
-    ![](desktop_images/start_tray.png)
+    ![](../desktop_images/start_tray.png)
 
 3.  Select the Keyboard Layouts tab.
 
@@ -118,20 +121,13 @@ how:
     ask you if you want to replace the old keyboard or cancel the
     installation.
 
-8.  Click OK if asked to configure your computer to work with your new
-    keyboard.
-
-9.  Click OK to save your settings and exit Keyman Configuration.
+8.  Click OK to save your settings and exit Keyman Configuration.
 
 ## Related Topics
 
--   [How To - Download and Install Keyman](download-install_keyman)
+-   [How To - Download and Install Keyman](download-and-install-keyman)
 -   [Keyboard Task - Turn on a Keyboard](../basic/enable_keyboard)
-
 -   [Keyboard Task - Enable and Disable a Keyboard](../basic/disable_keyboard)
-
 -   [Keyboard Task - Uninstall a Keyboard](../basic/uninstall_keyboard)
-
 -   [Keyman Configuration - Keyboard Layouts Tab](../basic/config_tasks/keyboards_tab)
-
 -   [Keyman Configuration](../basic/config_tasks/config_menu)

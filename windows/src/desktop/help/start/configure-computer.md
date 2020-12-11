@@ -40,34 +40,34 @@ Correctly associating your Keyman keyboard has three main benefits.
 
 **Note:** Keyman allows you to associate multiple Windows languages to a keyboard.
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Configuration….
 
 3.  Select the Keyboard Layouts tab.
 
-    ![](desktop_images/tab-keyboards.png)
+    ![](../desktop_images/tab-keyboards.png)
 
 4.  Click on the down arrow
-    (![](desktop_images/keyboards-downarrow.png)) beside the keyboard
+    (![](../desktop_images/keyboards-downarrow.png)) beside the keyboard
     name.
 
 5.  Click the Add language button on the left side under 'Languages:'
 
-    ![](desktop_images/tab-layout.png)
+    ![](../desktop_images/tab-layout.png)
 
 6.  From the pop up window, search for the Windows langauge you would
     like to use and click OK
 
-    ![](desktop_images/language-association.png)
+    ![](../desktop_images/language-association.png)
 
 7.  To remove an association, hover over the language name, and click
-    the ![](desktop_images/icon-uninstall.png) button that appears.
+    the ![](../desktop_images/icon-uninstall.png) button that appears.
 
 ## Related Topics
 
--   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
 -   [How To - Set up MS Office for a Keyman Keyboard](configure_office)
 -   [How To - Find the Best Fonts for a Keyman Keyboard](font)
 -   [How To - Type in Right-to-Left Languages](rtl)

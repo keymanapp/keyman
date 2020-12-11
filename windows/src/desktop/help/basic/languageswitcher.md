@@ -6,7 +6,7 @@ The Keyman Language Switcher is a single popup menu to let you rapidly
 switch between any installed Keyman keyboard, Windows language or
 Windows layout.
 
-![](desktop_images/languageswitcher.png)
+![](../desktop_images/languageswitcher.png)
 
 ## Opening and Using the Language Switcher
 

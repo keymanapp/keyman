@@ -13,12 +13,12 @@ language:
 
 2.  Select the Hotkeys tab.
 
-    ![](desktop_images/tab-hotkeys.png)
+    ![](../desktop_images/tab-hotkeys.png)
 
 3.  Click the hotkey link beside the function, keyboard or language. The
     Change Hotkey dialog box will be displayed.
 
-    ![](desktop_images/hotkeys-change.png)
+    ![](../desktop_images/hotkeys-change.png)
 
 4.  Select a default hotkey or click Custom and type the hotkey you wish
     to use.

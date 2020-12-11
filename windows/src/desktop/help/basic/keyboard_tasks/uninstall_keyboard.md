@@ -13,18 +13,18 @@ To uninstall a Keyman keyboard:
 
 1.  Open Keyman.
 
-2.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+2.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
-    ![](desktop_images/menu.png)
+    ![](../desktop_images/menu.png)
 
 3.  Select Configuration.
 
 4.  Select the Keyboard Layouts tab.
 
-    ![](desktop_images/tab-layout.png)
+    ![](../desktop_images/tab-layout.png)
 
-5.  Click on the uninstall icon ![](desktop_images/icon-uninstall.png)
+5.  Click on the uninstall icon ![](../desktop_images/icon-uninstall.png)
     for the keyboard you want to uninstall.
 
 6.  A message box is displayed asking you to confirm this is the package
@@ -40,4 +40,4 @@ The Keyman keyboard is now removed from Keyman.
 
 -   [???](#basic_enable_keyboard)
 
--   [???](#start_download-install_keyboard)
+-   [???](#start_download-and-install-keyboard)

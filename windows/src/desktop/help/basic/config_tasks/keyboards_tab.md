@@ -8,13 +8,13 @@ the Keyboard Layouts tab to install and uninstall keyboards, enable and
 disable keyboards, set keyboard hotkeys, show keyboard help and view
 keyboard details.
 
-![](desktop_images/tab-layout.png)
+![](../desktop_images/tab-layout.png)
 
 **Opening the Keyboard Layouts Tab**
 
 To open the Keyboard Layouts tab of Keyman Configuration:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Configuration....
@@ -55,7 +55,7 @@ Keyman Configuration:
 2.  Click on the (no hotkey) or current hotkey link found beside the
     keyboard name. The Change Hotkey dialog box will be displayed.
 
-    ![](desktop_images/hotkeys-change.png)
+    ![](../desktop_images/hotkeys-change.png)
 
 3.  Select a default hotkey or click Custom and type the hotkey you wish
     to use.
@@ -87,7 +87,7 @@ Layouts tab of Keyman Configuration:
 1.  Find a keyboard in the keyboard list.
 
 2.  Click on the question mark icon
-    (![](desktop_images/icon-introductory-help.png)) beside the keyboard
+    (![](../desktop_images/icon-introductory-help.png)) beside the keyboard
     name. The keyboard help documentation will be shown.
 
 **Viewing Keyboard Details**
@@ -98,10 +98,10 @@ Keyman Configuration:
 1.  Find a keyboard in the keyboard list.
 
 2.  Click on the down arrow
-    (![](desktop_images/keyboards-downarrow.png)) beside the keyboard
+    (![](../desktop_images/keyboards-downarrow.png)) beside the keyboard
     name. The keyboard information window will expand.
 
-    ![](desktop_images/keyboards-hotkey.png)
+    ![](../desktop_images/keyboards-hotkey.png)
 
 3.  In the information window you can view keyboard details, including:
 
@@ -136,14 +136,14 @@ Code.
     a mobile phone camera to automatically open a web page with a
     download link to install the keyboard.
 
-    ![](desktop_images/keyboard-share.png)
+    ![](../desktop_images/keyboard-share.png)
 
 **Associating a keyboard with a Windows language**
 
 All Keyman keyboards are associated with a Windows language by default.
 To change the association, or add a new association, see the following:
 
--   [???](#start_configure_computer)
+-   [???](#start_configure-computer)
 
 **Related Topics**
 

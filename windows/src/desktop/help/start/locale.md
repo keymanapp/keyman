@@ -12,7 +12,7 @@ English:
 
 2.  Click English in the 'Display in:' menu on the top right corner.
 
-    ![](desktop_images/config-locale.png)
+    ![](../desktop_images/config-locale.png)
 
 3.  Select your language from the list. If your language is not in the
     list, click Find other display languages online….

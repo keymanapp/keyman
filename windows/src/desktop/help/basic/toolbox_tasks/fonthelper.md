@@ -6,13 +6,13 @@ The Font Helper tool in the [Keyman Toolbox](#basic_toolbox) identifies
 fonts on your system that should work with the currently selected
 keyboard layout.
 
-![](desktop_images/fonthelper.png)
+![](../desktop_images/fonthelper.png)
 
 **Opening the Font Helper**
 
 To open the Font Helper:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Font Helper.

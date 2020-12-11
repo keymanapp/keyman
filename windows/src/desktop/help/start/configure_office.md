@@ -93,8 +93,8 @@ To set up Microsoft Office 2003 for your Keyman keyboard:
 
 ## Related Topics
 
--   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
--   [How To - Set up Your Computer for a Keyman Keyboard](configure_computer)
+-   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
+-   [How To - Set up Your Computer for a Keyman Keyboard](configure-computer)
 -   [How To - Find the Best Fonts for a Keyman Keyboard](font)
 -   [How To - Type in Right-to-Left Languages](rtl)
 -   [Keyboard Task - Turn on a Keyboard](enable_keyboard)

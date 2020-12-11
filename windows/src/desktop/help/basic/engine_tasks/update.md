@@ -11,11 +11,11 @@ Keyman can check for updates automatically once a week. Here\'s how:
 2.  Open Keyman Configuration, from the Keyman menu (on the Windows
     Taskbar near the clock).
 
-    ![](desktop_images/menu.png)
+    ![](../desktop_images/menu.png)
 
 3.  Select the Options tab.
 
-    ![](desktop_images/tab-options.png)
+    ![](../desktop_images/tab-options.png)
 
 4.  Tick \'Automatically check keyman.com weekly for updates.\'
 
@@ -26,7 +26,7 @@ Keyman can check for updates automatically once a week. Here\'s how:
 You can check for updates at any time by clicking \'Check for
 Updates...\' from the Support tab of Keyman Configuration.
 
-![](desktop_images/tab-support.png)
+![](../desktop_images/tab-support.png)
 
 **Updating Manually**
 

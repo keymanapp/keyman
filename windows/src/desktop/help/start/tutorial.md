@@ -5,7 +5,7 @@ title: Getting Started with Keyman
 Follow these steps for a basic introduction to Keyman:
 
 **Note:** Keyman must be installed first. For help on installing
-Keyman, please see: [How To - Download and Install Keyman](../basic/download-install_keyman).
+Keyman, please see: [How To - Download and Install Keyman](../basic/download-and-install-keyman).
 
 ## Step 1
 
@@ -57,7 +57,7 @@ your Keyman keyboard is on.
 
 **Tip:** If there are no Keyman keyboards in the Keyman menu, you can learn how to install one here:
 
--   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
 
 ## Step 7
 
@@ -80,5 +80,5 @@ To return to using your normal keyboard, open the Keyman menu and select your de
 
 ## Related Topics
 
--   [How To - Download and Install Keyman](../basic/download-install_keyman)
--   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Download and Install Keyman](../basic/download-and-install-keyman)
+-   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)

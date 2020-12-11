@@ -5,13 +5,13 @@ title: Keyman Configuration - Hotkeys Tab {#basic_hotkeys_tab}
 The Hotkeys tab of Keyman Configuration lets you set hotkeys for Keyman
 functions, Keyman keyboards and Windows languages.
 
-![](desktop_images/tab-hotkeys.png)
+![](../desktop_images/tab-hotkeys.png)
 
 **Opening the Hotkeys Tab**
 
 To open the Hotkeys tab of Keyman Configuration:
 
-1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
+1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
 2.  From the Keyman menu, select Configuration....
