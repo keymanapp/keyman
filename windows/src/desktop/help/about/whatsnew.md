@@ -2,9 +2,9 @@
 title: What's New
 ---
 
-Here are some of the great things we have added to Keyman 14.0.
+Here are some of the new features we have added to Keyman 14.0 for Windows:
 
--   We renamed the program from Keyman Desktop to Keyman for Windows.
+-   We renamed the program from **Keyman Desktop** to **Keyman for Windows**.
     Now that Keyman runs on so many platforms, it didn't make sense for
     us to use a special, different name for Keyman on Windows.
 -   Keyman keyboards are no longer hidden from the Windows language
