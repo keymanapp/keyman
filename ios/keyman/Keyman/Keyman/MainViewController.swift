@@ -20,6 +20,7 @@ let userTextKey = "UserText"
 let userTextSizeKey = "UserTextSize"
 let dontShowGetStartedKey = "DontShowGetStarted" // older preference setting name, use shouldShowGetStartedKey
 let shouldShowGetStartedKey = "ShouldShowGetStarted"
+let shouldReportErrorsKey = "ShouldReportErrors"
 let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotification")
 let urlKey = "url"
 

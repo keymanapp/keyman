@@ -14,6 +14,8 @@ import Sentry
  * error reporting.
  */
 public class SentryManager {
+  private static var silenced: Bool = false
+
   public static var hasStarted: Bool {
     return Sentry.Client.shared != nil
   }
@@ -55,13 +57,29 @@ public class SentryManager {
     }
   }
 
+  public static var enabled: Bool {
+    get {
+      return !SentryManager.silenced
+    }
+
+    set(flag) {
+      SentryManager.silenced = !flag
+    }
+  }
+
   // Note:  this function is called from a separate thread!
+  // For some reason, does not update when `enabled` is changed unless the app is restarted.
   private static func shouldSendEventHandler(event: Sentry.Event) -> Bool {
     #if NO_SENTRY
       // Prevents Sentry from buffering the event.
       return false
     #else
-      return true
+      return !SentryManager.silenced
     #endif
+  }
+
+  public static func forceError() {
+    Sentry.Client.shared?.breadcrumbs.add(Sentry.Breadcrumb(level: .info, category: "Deliberate testing error"))
+    Sentry.Client.shared?.crash()
   }
 }

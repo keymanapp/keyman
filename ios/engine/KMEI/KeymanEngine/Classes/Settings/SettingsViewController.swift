@@ -93,6 +93,14 @@ open class SettingsViewController: UITableViewController {
         "subtitle": NSLocalizedString("menu-settings-install-from-file-description", bundle: engineBundle, comment: ""),
         "reuseid" : "installfile"
         ])
+
+      #if DEBUG && !NO_SENTRY
+              itemsArray.append([
+        "title": "Force a crash",
+        "subtitle": "Test Sentry error-reporting integration",
+        "reuseid" : "forcederror"
+        ])
+      #endif
     }
 
     _ = view
@@ -192,6 +200,8 @@ open class SettingsViewController: UITableViewController {
         }
       case "installfile":
         cell.accessoryType = .disclosureIndicator
+      case "forcederror":
+        cell.accessoryType = .disclosureIndicator
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
         cell.accessoryType = .none
@@ -204,6 +214,8 @@ open class SettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
       userData.set(toggle.isOn, forKey: Key.optShouldReportErrors)
+      SentryManager.enabled = toggle.isOn
+
       userData.synchronize()
     }
 
@@ -257,7 +269,7 @@ open class SettingsViewController: UITableViewController {
     let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
 
     switch (cellIdentifier) {
-      case "languages", "installfile", "systemkeyboardsettings":
+      case "languages", "installfile", "systemkeyboardsettings", "forcederror":
         cell.accessoryType = .disclosureIndicator
       case "enablecrashreporting":
         break
@@ -297,6 +309,9 @@ open class SettingsViewController: UITableViewController {
           } else {
             log.info("Listener for framework signal to launch file browser is missing")
           }
+        case "forcederror":
+            SentryManager.forceError()
+          break
         default:
           break
       }

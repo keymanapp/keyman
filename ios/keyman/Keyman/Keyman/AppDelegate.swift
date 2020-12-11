@@ -55,6 +55,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
     SentryManager.start()
 
+    let userDefaults = AppDelegate.activeUserDefaults()
+    SentryManager.enabled = userDefaults.bool(forKey: shouldReportErrorsKey)
+
     UniversalLinks.externalLinkLauncher = { url in
       UIApplication.shared.openURL(url)
     }
