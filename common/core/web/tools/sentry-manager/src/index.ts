@@ -128,6 +128,9 @@ namespace com.keyman {
         console.log("DEBUG:  event object for Sentry")
         console.log(event);
         return false; //event
+      } else if(this.silenced) {
+        console.error(event);
+        return false;
       } else {
         return true;
       }
@@ -142,7 +145,7 @@ namespace com.keyman {
      * @param event
      */
     prepareEventDebugWrapper(event: any) {
-      if(DEBUG || this.silenced) {
+      if(DEBUG) {
         try {
           if(this.prepareEvent(event)) {
             return event;
