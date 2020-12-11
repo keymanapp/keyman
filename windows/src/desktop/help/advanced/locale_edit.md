@@ -2,12 +2,12 @@
 title: Translating the Keyman for Windows User Interface
 ---
 
-**Online User Interface Translation Editor**
+## Online User Interface Translation Editor
 
 Localization of the user interface is possible by using the online
 interface at [translate.keyman.com](https://translate.keyman.com/).
 
-**Notes on editing translations**
+## Notes on editing translations
 
 Nearly all strings have identifiers (e.g. SKButtonOK for the OK button).
 We have three different types of strings in the file - plain, HTML and
@@ -39,7 +39,7 @@ The &amp; entity is used to mark hotkeys in menu items, labels and
 buttons. It can be used only with strings identified as formatted
 messages (these mostly start with SK) and with the Menu strings.
 
-**Hints on editing a translation**
+## Hints on editing a translation
 
 First, edit the translation's language information - SKUILanguageName,
 SKUILanguageNameWithEnglish, and SKLanguageCode. The SKLanguageCode
@@ -57,6 +57,6 @@ default file.
 
 </div>
 
-**Related Topics**
+## Related Topics
 
--   [???](#start_locale)
+-   [How To - Set the Language for Keyman Menus](../start/locale)

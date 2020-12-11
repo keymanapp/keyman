@@ -7,7 +7,7 @@ most Keyman keyboards. However, for best performance on some keyboards
 you may need to manually associate your Keyman keyboard with a Windows
 language and layout.
 
-**Benefits of Association**
+## Benefits of Association
 
 Correctly associating your Keyman keyboard has three main benefits.
 
@@ -36,13 +36,9 @@ Correctly associating your Keyman keyboard has three main benefits.
     -   Applications will know which language tools to use when spell
         checking what you type.
 
-**Association instructions**
+## Association instructions
 
-<div class="note">
-
-Keyman allows you to associate multiple Windows languages to a keyboard.
-
-</div>
+**Note**: Keyman allows you to associate multiple Windows languages to a keyboard.
 
 1.  Click on the Keyman icon ![](desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
@@ -69,14 +65,10 @@ Keyman allows you to associate multiple Windows languages to a keyboard.
 7.  To remove an association, hover over the language name, and click
     the ![](desktop_images/icon-uninstall.png) button that appears.
 
-**Related Topics**
+## Related Topics
 
--   [???](#start_download-install_keyboard)
-
--   [???](#start_configure_office)
-
--   [???](#start_font)
-
--   [???](#start_rtl)
-
--   [???](#basic_enable_keyboard)
+-   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Set up MS Office for a Keyman Keyboard](configure_office)
+-   [How To - Find the Best Fonts for a Keyman Keyboard](font)
+-   [How To - Type in Right-to-Left Languages](rtl)
+-   [Keyboard Task - Turn on a Keyboard](enable_keyboard)

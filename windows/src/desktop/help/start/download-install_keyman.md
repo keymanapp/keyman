@@ -2,12 +2,14 @@
 title: How To - Download and Install Keyman
 ---
 
-**Downloading Keyman**
+## Downloading Keyman
 
 You can download Keyman with a keyboard for your language from the
-[Keyman Website](https://keyman.com/desktop/).
+[Keyman Website](https://keyman.com/keyboards/).
 
-**Installing Keyman**
+## Installing Keyman
+
+TODO: rewrite for 14.0 UX
 
 After you download Keyman, to install the program:
 
@@ -21,17 +23,13 @@ After you download Keyman, to install the program:
 
     ![](desktop_images/setup-click1.png)
 
-4.  Once you have read and agree to the license terms, click Install
+4.  Once you have read and agreed to the license terms, click Install
     Keyman to continue.
 
     ![](desktop_images/setup-click2.png)
 
-    <div class="note">
-
-    You can select advanced installation options from the Install
+    **Note:** You can select advanced installation options from the Install
     Options link on the bottom left.
-
-    </div>
 
 5.  At the end of the installation, click Start Keyman to begin using
     Keyman or click Take the tour for the Getting Started tutorial.
@@ -42,8 +40,7 @@ When you finish your installation of Keyman, you can delete or move the
 installation's executable file. It doesn't need to remain on your
 computer for Keyman to work.
 
-**Related Topics**
+## Related Topics
 
--   [???](#start_download-install_keyboard)
-
--   [???](#basic_uninstall)
+-   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [Software Task - Uninstall Keyman](../basic/uninstall)

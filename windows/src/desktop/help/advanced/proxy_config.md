@@ -14,10 +14,9 @@ you with the details required.
 
 Proxy details are used when checking for updates online and when
 downloading a keyboard layout. If no proxy details are entered, Keyman
-Configuration will use the proxy settings from Internet Explorer.
+Configuration will use the proxy settings from Windows.
 
-**Related Topics**
+## Related Topics
 
--   [???](#start_download-install_keyboard)
-
--   [???](#basic_update)
+-   [How To - Download and Install a Keyman Keyboard](../start/download-install_keyboard)
+-   [Software Task - Update Keyman](../basic/engine_tasks/update)

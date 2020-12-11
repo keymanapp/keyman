@@ -2,7 +2,7 @@
 title: The Keyman Menu
 ---
 
-**Opening the Keyman Menu**
+## Opening the Keyman Menu
 
 When you start Keyman, the Keyman icon
 (![](desktop_images/icon-keyman.png)) is displayed on the Windows
@@ -15,15 +15,11 @@ To display the Keyman menu, click on the Keyman icon.
 
 ![](desktop_images/menu.png)
 
-<div class="note">
+**Note**: If you cannot find the Keyman menu or Keyman icon, for more help see:
 
-If you cannot find the Keyman menu or Keyman icon, for more help see:
+[Finding a Missing Keyman Menu](***)
 
-Finding a Missing Keyman Menu
-
-</div>
-
-**Using the Keyman Menu**
+## Using the Keyman Menu
 
 Click the Keyman icon (![](desktop_images/icon-keyman.png)) with either
 mouse button to bring up the Keyman menu.
@@ -34,26 +30,16 @@ The left side of the Keyman menu lists the Keyman keyboards currently
 installed and enabled on your computer. Click on a keyboard to turn it
 on and start using it.
 
-<div class="note">
+**Note**: You can add more Keyman keyboards to the Keyman menu through the Keyboard Layouts tab of Keyman Configuration.
 
-You can add more Keyman keyboards to the Keyman menu through the
+**Note**: To use a Keyman keyboard, the keyboard must be enabled in the Keyboard Layouts tab of Keyman Configuration. For help enabling your keyboard, see:
 
-Keyboard Layouts tab
-
-of Keyman Configuration.
-
-</div>
-
-<div class="note">
-
-To use a Keyman keyboard, the keyboard must be enabled in the Keyboard
-Layouts tab of Keyman Configuration. For help enabling your keyboard,
-see:
-
-</div>
+TODO: missing links
 
 The right side of the Keyman menu contains links to tools and features
 in Keyman:
+
+TODO: missing icons and descriptions
 
 -   – Opens or closes the
     On Screen Keyboard tool
@@ -78,7 +64,7 @@ in Keyman:
     .
 -   – Exits Keyman.
 
-**<span id="findmenu"></span>Finding a Missing Keyman Menu**
+## Finding a Missing Keyman Menu
 
 If you cannot find the Keyman icon for the Keyman menu, it may be in the
 hidden notifications area of the Windows Taskbar. Check for the Keyman
@@ -114,7 +100,7 @@ the icon:
 
         ![](desktop_images/win8-taskbar2.png)
 
-    4.  From the dropdown menu beside SIL International Keyman Engine
+    4.  From the dropdown menu beside Keyman Engine
         x86, select 'Show icon and notifications'.
 
         ![](desktop_images/win8-taskbar3.png)
@@ -130,8 +116,7 @@ If you still cannot locate the Keyman icon and menu, visit the [SIL
 Keyman Community](https://community.software.sil.org/c/keyman) for
 further assistance.
 
-**Related Topics**
+## Related Topics
 
--   [???](#basic_toolbox)
-
--   [???](#basic_enable_keyboard)
+-   [The Keyman Toolbox](toolbox)
+-   [Keyboard Task - Turn on a Keyboard](enable_keyboard)

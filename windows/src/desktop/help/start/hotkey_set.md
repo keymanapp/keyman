@@ -23,27 +23,15 @@ language:
 4.  Select a default hotkey or click Custom and type the hotkey you wish
     to use.
 
-    <div class="note">
-
-    If you press a single letter or Shift plus a single letter, the
+    **Note:** If you press a single letter or Shift plus a single letter, the
     hotkey will default to Ctrl + Alt plus the letter you pressed, in
     order to avoid conflicts with standard keyboard input.
 
-    </div>
-
-    <div class="note">
-
-    To clear a hotkey that has been set previously, click Clear Hotkey
+    **Note:** To clear a hotkey that has been set previously, click Clear Hotkey
     or press Backspace.
 
-    </div>
+    **Note:** Be aware that you can set the hotkey to replace common Windows hotkeys (Ctrl + C, Ctrl + V, etc).
 
-    <div class="note">
-
-    Be aware that you can set the hotkey to replace common Windows
-    hotkeys (Ctrl + C, Ctrl + V, etc).
-
-    </div>
 
 5.  Click OK to save your selection.
 
@@ -51,6 +39,6 @@ language:
 
 The new hotkey will now be available.
 
-**Related Topics**
+## Related Topics
 
--   [???](#basic_hotkeys_tab)
+-   [Keyman Configuration - Hotkeys Tab](../basic/config_tasks/hotkeys_tab)

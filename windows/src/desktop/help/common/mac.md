@@ -10,6 +10,5 @@ keyboards on a Mac:
     Fusion, Parallels or BootCamp) you can use Keyman through Windows.
 
 2.  We offer a web-based typing application, KeymanWeb. It works in all
-    major browsers (Firefox, Safari, Chrome, etc), on any OS that
-    supports those browsers. You can use KeymanWeb at
-    [https://keymanweb.com]().
+    major browsers (Firefox, Safari, Chrome, Edge, etc), on any OS that
+    supports those browsers. You can use KeymanWeb at <https://keymanweb.com>.

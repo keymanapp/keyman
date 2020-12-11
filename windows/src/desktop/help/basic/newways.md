@@ -21,7 +21,7 @@ Windows Text Services, and are always available through Windows language
 interfaces as well as with the [Keyman menu](#basic_traymenu), [language
 switcher](#basic_languageswitcher) and [hotkeys](#basic_hotkeys_tab).
 
-[???](#basic_enable_keyboard)
+[Keyboard Task - Turn on a Keyboard](enable_keyboard)
 
 Most of the following changes were made in Keyman 10.0
 
@@ -46,7 +46,7 @@ European Latin-script keyboard. You can change the base layout in the
 Options tab, which will allow Keyman to automatically generate new
 versions of your keyboards that adapt to your base layout.
 
-**Other Minor Changes**
+## Other Minor Changes
 
 -   In the Support tab, we have reorganised the support and diagnostics
     links.
@@ -63,6 +63,6 @@ versions of your keyboards that adapt to your base layout.
 
 -   The proxy settings dialog is now accessed through the Options tab.
 
-**Related Topics**
+## Related Topics
 
--   [???](#about_whatsnew)
+-   [What's New](../about/whatsnew)
