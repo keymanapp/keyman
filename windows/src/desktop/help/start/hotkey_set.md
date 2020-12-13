@@ -40,4 +40,4 @@ The new hotkey will now be available.
 
 ## Related Topics
 
--   [Keyman Configuration - Hotkeys Tab](../basic/config_tasks/hotkeys_tab)
+-   [Keyman Configuration - Hotkeys Tab](../basic/config/hotkeys)

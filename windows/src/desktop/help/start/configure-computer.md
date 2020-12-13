@@ -71,4 +71,4 @@ Correctly associating your Keyman keyboard has three main benefits.
 -   [How To - Set up MS Office for a Keyman Keyboard](configure_office)
 -   [How To - Find the Best Fonts for a Keyman Keyboard](font)
 -   [How To - Type in Right-to-Left Languages](rtl)
--   [Keyboard Task - Turn on a Keyboard](enable_keyboard)
+-   [Keyboard Task - Turn on a Keyboard](../basic/select-keyboard)

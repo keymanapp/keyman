@@ -26,5 +26,5 @@ English:
 
 ## Related Topics
 
--   [Keyman Configuration](../basic/config_tasks/config_menu)
+-   [Keyman Configuration](../basic/config/)
 -   [Translating the Keyman for Windows User Interface](../advanced/locale_edit)

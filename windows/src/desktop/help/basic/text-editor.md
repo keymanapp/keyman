@@ -30,7 +30,7 @@ To use the Keyman Text Editor:
 
 When you select a Unicode Keyman keyboard, the Text Editor brings up a
 font panel. This font panel behaves like the [Font Helper
-tool](#basic_fonthelper) in the Keyman Toolbox. Each font listed in the
+tool](toolbox/font-helper) in the Keyman Toolbox. Each font listed in the
 panel includes a percentage value. This value indicates how many
 characters in the current Keyman keyboard are available from the font.
 Most of the time, fonts with greater than 90% coverage will work for
@@ -42,4 +42,4 @@ link for the font in the font panel.
 ## Related Topics
 
 -   [Getting Started with Keyman](../start/tutorial)
--   [Keyboard Task - Turn on a Keyboard](enable_keyboard)
+-   [Keyboard Task - Turn on a Keyboard](select-keyboard)

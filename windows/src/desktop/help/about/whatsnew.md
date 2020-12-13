@@ -40,4 +40,4 @@ Here are some of the new features we have added to Keyman 14.0 for Windows:
 ## Related Topics
 
 -   [Version History](history)
--   [New Ways to Use Keyman](../basic/newways)
+-   [New Ways to Use Keyman](../basic/new-ways-to-use-keyman)
