@@ -44,4 +44,4 @@ get started.
 -   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
 -   [How To - Set up MS Office for a Keyman Keyboard](configure_office)
 -   [How To - Find the Best Fonts for a Keyman Keyboard](font)
--   [Keyboard Task - Turn on a Keyboard](../basic/enable_keyboard)
+-   [Keyboard Task - Turn on a Keyboard](../basic/select-keyboard)

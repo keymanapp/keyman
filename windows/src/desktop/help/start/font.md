@@ -34,6 +34,6 @@ your text to see which fonts look the best for your entire text.
 
 -   [How To - Fix Font Issues](../troubleshooting/font)
 -   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
--   [Keyman Toolbox - Font Helper](../basic/toolbox_tasks/fonthelper)
--   [Keyman Configuration - Hotkeys Tab](../basic/config_tasks/hotkeys_tab)
--   [Keyboard Task - Turn on a Keyboard](../basic/enable_keyboard)
+-   [Keyman Toolbox - Font Helper](../basic/toolbox/font-helper)
+-   [Keyman Configuration - Hotkeys Tab](../basic/config/hotkeys)
+-   [Keyboard Task - Turn on a Keyboard](../basic/select-keyboard)

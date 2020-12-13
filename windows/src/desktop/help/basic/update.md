@@ -1,8 +1,8 @@
 ---
-title: Software Task - Update Keyman {#basic_update}
+title: Software Task - Update Keyman
 ---
 
-**Check for Updates Automatically**
+## Check for Updates Automatically
 
 Keyman can check for updates automatically once a week. Here\'s how:
 
@@ -21,18 +21,18 @@ Keyman can check for updates automatically once a week. Here\'s how:
 
 5.  Click OK to apply changes.
 
-**Check for Updates Manually**
+## Check for Updates Manually
 
 You can check for updates at any time by clicking \'Check for
 Updates...\' from the Support tab of Keyman Configuration.
 
 ![](../desktop_images/tab-support.png)
 
-**Updating Manually**
+## Updating Manually
 
 You can manually update Keyman at any time by downloading and installing
-it again from the [Keyman Website](https://keyman.com/).
+Keyman for Windows again from the [Keyman Website](https://keyman.com/windows/download).
 
-**Related Topics**
+## Related Topics
 
--   [???](#advanced_proxy_config)
+-   [Proxy Configuration](../advanced/proxy_config)

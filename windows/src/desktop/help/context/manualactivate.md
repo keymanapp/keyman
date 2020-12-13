@@ -1,3 +1,0 @@
----
-title: Manually Activate Keyman
----

@@ -24,4 +24,4 @@ appears at a smaller size to the 'ha'.
 ## Related Topics
 
 -   [How To - Find the Best Fonts for a Keyman Keyboard](../start/font)
--   [Keyman Toolbox - Font Helper](../basic/toolbox_tasks/fonthelper)
+-   [Keyman Toolbox - Font Helper](../basic/toolbox/font-helper)

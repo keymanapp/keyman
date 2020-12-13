@@ -5,7 +5,7 @@ title: Getting Started with Keyman
 Follow these steps for a basic introduction to Keyman:
 
 **Note:** Keyman must be installed first. For help on installing
-Keyman, please see: [How To - Download and Install Keyman](../basic/download-and-install-keyman).
+Keyman, please see: [How To - Download and Install Keyman](download-and-install-keyman).
 
 ## Step 1
 
@@ -80,5 +80,5 @@ To return to using your normal keyboard, open the Keyman menu and select your de
 
 ## Related Topics
 
--   [How To - Download and Install Keyman](../basic/download-and-install-keyman)
+-   [How To - Download and Install Keyman](download-and-install-keyman)
 -   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)

@@ -126,8 +126,8 @@ how:
 ## Related Topics
 
 -   [How To - Download and Install Keyman](download-and-install-keyman)
--   [Keyboard Task - Turn on a Keyboard](../basic/enable_keyboard)
--   [Keyboard Task - Enable and Disable a Keyboard](../basic/disable_keyboard)
--   [Keyboard Task - Uninstall a Keyboard](../basic/uninstall_keyboard)
--   [Keyman Configuration - Keyboard Layouts Tab](../basic/config_tasks/keyboards_tab)
--   [Keyman Configuration](../basic/config_tasks/config_menu)
+-   [Keyboard Task - Turn on a Keyboard](../basic/select-keyboard)
+-   [Keyboard Task - Enable or Disable a Keyboard](../basic/enable-or-disable-keyboard)
+-   [Keyboard Task - Uninstall a Keyboard](../basic/uninstall-keyboard)
+-   [Keyman Configuration - Keyboard Layouts Tab](../basic/config/keyboards)
+-   [Keyman Configuration](../basic/config/)

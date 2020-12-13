@@ -21,7 +21,7 @@ To open and use the Keyman Language Switcher
 
     **Note:** By default, the Language Switcher hotkey is Left.Alt + Shift. You
     can view or change the current Language Switcher hotkey from the
-    [Hotkeys tab](#basic_hotkeys_tab) of Keyman Configuration.
+    [Hotkeys tab](config/hotkeys) of Keyman Configuration.
 
     ![](../desktop_images/languageswitcher-small.png)
 
@@ -35,5 +35,5 @@ To open and use the Keyman Language Switcher
 
 ## Related Topics
 
--   [The Keyman Menu](traymenu)
--   [Keyman Configuration - Hotkeys Tab](config_tasks/hotkeys_tab)
+-   [The Keyman Menu](tray-menu)
+-   [Keyman Configuration - Hotkeys Tab](config/hotkeys)

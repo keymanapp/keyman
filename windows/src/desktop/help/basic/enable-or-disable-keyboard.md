@@ -1,10 +1,12 @@
 ---
-title: Keyboard Task - Enable and Disable a Keyboard {#basic_disable_keyboard}
+title: Keyboard Task - Enable or Disable a Keyboard
 ---
 
-Keyman keyboards can be enabled and disabled.
+Keyman keyboards can be enabled and disabled. When disabled, they are
+removed from the list of keyboards you can select from, but they are
+not uninstalled.
 
-**Disabling a Keyman keyboard**
+## Disabling a Keyman keyboard
 
 Disabling a Keyman keyboard removes it from the Keyman menu and Keyman
 Toolbox but does not uninstall the keyboard. This is useful if:
@@ -38,7 +40,7 @@ To disable a Keyman keyboard:
 When a keyboard layout is disabled, its name appears in grey and its
 checkbox is unticked.
 
-**Enabling a Keyman keyboard**
+## Enabling a Keyman keyboard
 
 To enable a Keyman keyboard:
 
@@ -59,10 +61,8 @@ To enable a Keyman keyboard:
 
 6.  Click OK.
 
-**Related Topics**
+## Related Topics
 
--   [???](#basic_uninstall_keyboard)
-
--   [???](#basic_enable_keyboard)
-
--   [???](#basic_keyboards_tab)
+-   [Keyboard Task - Uninstall a Keyboard](uninstall-keyboard)
+-   [Keyboard Task - Turn on a Keyboard](select-keyboard)
+-   [Keyman Configuration - Keyboard Layouts Tab](config/keyboards)
