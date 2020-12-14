@@ -14,8 +14,6 @@ import Sentry
  * error reporting.
  */
 public class SentryManager {
-  private static var _enabled: Bool?
-
   public static var hasStarted: Bool {
     return Sentry.Client.shared != nil
   }
@@ -57,18 +55,23 @@ public class SentryManager {
     }
   }
 
+  public static func altEnabled() -> Bool {
+    let userData = Storage.active.userDefaults
+    return userData.bool(forKey: Key.optShouldReportErrors)
+  }
+
   public static var enabled: Bool {
     get {
-      if SentryManager._enabled == nil {
-        let userData = Storage.active.userDefaults
-        SentryManager._enabled = userData.bool(forKey: Key.optShouldReportErrors)
-      }
-
-      return SentryManager._enabled!
+      let userData = Storage.active.userDefaults
+      return userData.bool(forKey: Key.optShouldReportErrors)
     }
 
     set(flag) {
-      SentryManager._enabled = flag
+      let userData = Storage.active.userDefaults
+
+      // Save the preference
+      userData.set(flag, forKey: Key.optShouldReportErrors)
+      userData.synchronize()
 
       // Ensure that the embedded KeymanWeb engine's crash-reporting state is also updated.
       Manager.shared.inputViewController.setSentryState(enabled: flag)

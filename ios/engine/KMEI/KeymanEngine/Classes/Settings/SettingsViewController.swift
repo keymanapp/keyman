@@ -189,7 +189,7 @@ open class SettingsViewController: UITableViewController {
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: enableReportingSwitch.frame.size)
         enableReportingSwitch.frame = switchFrame
 
-        enableReportingSwitch.isOn = reportErrors
+        enableReportingSwitch.isOn = SentryManager.enabled
         enableReportingSwitch.addTarget(self, action: #selector(self.reportingSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(enableReportingSwitch)
@@ -213,12 +213,7 @@ open class SettingsViewController: UITableViewController {
   }
 
   @objc func reportingSwitchValueChanged(_ sender: Any) {
-    let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
-      // Save the preference
-      userData.set(toggle.isOn, forKey: Key.optShouldReportErrors)
-      userData.synchronize()
-
       // Propagate the effects
       SentryManager.enabled = toggle.isOn
     }
@@ -243,11 +238,6 @@ open class SettingsViewController: UITableViewController {
       userData.set(toggle.isOn, forKey: Key.optShouldShowGetStarted)
       userData.synchronize()
     }
-  }
-
-  private var reportErrors: Bool {
-    let userData = Storage.active.userDefaults
-    return userData.bool(forKey: Key.optShouldReportErrors)
   }
 
   private var showBanner: Bool {
