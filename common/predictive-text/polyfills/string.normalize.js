@@ -120,7 +120,7 @@ if(!String.prototype.normalize) {
      * Note that this implementation assumes that all usage of String.normalize
      * is for use in wordform-keying operations common within the LMLayer.
      */
-    String.prototype._normalize = function() {
+    String.prototype.normalize = function() {
       let chars = this.split('');
       return chars.map(function(c) {
         if (c in PARTIAL_NFD_LOOKUP) {
