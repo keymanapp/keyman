@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.206 beta 2020-12-14
+
+* feat(ios/app): adds error reporting toggle (#4106)
+* chore(android): rework versionCode system (#4128)
+
 ## 14.0.205 alpha 2020-12-14
 
 * fix(web): sporadic blank keyboard on Android (#4117)
