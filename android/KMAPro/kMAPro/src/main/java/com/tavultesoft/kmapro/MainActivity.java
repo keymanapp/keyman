@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   DownloadResultReceiver resultReceiver;
   private static ProgressDialog progressDialog;
+  private static boolean storagePermissionDialogShown = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -740,6 +741,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       if (!SystemIMESettings.isDefaultKB(this))
         shouldShowGetStarted = true;
 
+      // Check if system dialog for storage permission must be dealt with first
+      if (storagePermissionDialogShown) {
+        shouldShowGetStarted = false;
+      }
+
       if (shouldShowGetStarted)
         showGetStarted();
     }
@@ -755,6 +761,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
+      storagePermissionDialogShown = false;
+      if (data == null) {
+        checkGetStarted();
+      }
+
       // Request for storage permission
       if (grantResults.length ==2 &&
           grantResults[0] == PackageManager.PERMISSION_GRANTED &&
@@ -778,6 +789,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         useLocalKMP(context, data);
       } else {
         // Permission is missing and must be requested
+        storagePermissionDialogShown = true;
         requestStoragePermission();
       }
     } else {
@@ -812,7 +824,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
   }
 
-  // TODO: Move this to KMEA during Keyman 13.0 refactoring
   public static void useLocalKMP(Context context, Uri data) {
     if (data != null) {
       useLocalKMP(context, data, false);
