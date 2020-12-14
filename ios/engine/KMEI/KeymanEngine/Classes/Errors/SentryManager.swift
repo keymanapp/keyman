@@ -66,7 +66,7 @@ public class SentryManager {
       SentryManager._enabled = flag
 
       // Ensure that the embedded KeymanWeb engine's crash-reporting state is also updated.
-      Manager.shared.inputViewController.refreshCrashReporting()
+      Manager.shared.inputViewController.setSentryState(enabled: flag)
     }
   }
 

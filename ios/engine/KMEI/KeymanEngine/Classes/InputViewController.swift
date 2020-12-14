@@ -551,8 +551,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb.resetContext()
   }
 
-  func refreshCrashReporting() {
-    keymanWeb.refreshCrashReporting()
+  internal func setSentryState(enabled: Bool) {
+    keymanWeb.setSentryState(enabled: enabled)
   }
  
   func setContextState(text: String?, range: NSRange) {
