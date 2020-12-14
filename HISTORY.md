@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.1 alpha 2020-12-14
+
+* chore: prepare 15.0 alpha (#4129)
+
 ## 14.0.209 beta 2020-12-14
 
 * chore: fix trigger for beta branches (#4135)
