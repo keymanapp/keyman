@@ -18,8 +18,8 @@ function triggerBuilds() {
         echo Triggering Jenkins build "$job" "$base" "true"
         triggerJenkinsBuild "$job" "$base" "true"
       else
-        echo Triggering TeamCity build $build $TEAMCITY_VCS_ID
-        triggerTeamCityBuild $build $TEAMCITY_VCS_ID
+        echo Triggering TeamCity build $build $TEAMCITY_VCS_ID $base
+        triggerTeamCityBuild $build $TEAMCITY_VCS_ID $base
       fi
     done
   done
