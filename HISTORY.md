@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.207 beta 2020-12-14
+
+* fix: build trigger definitions (#4131)
+
 ## 14.0.206 beta 2020-12-14
 
 * feat(ios/app): adds error reporting toggle (#4106)
