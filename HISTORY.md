@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 14.0.209 beta 2020-12-14
+
+* chore: fix trigger for beta branches (#4135)
+
+## 14.0.208 beta 2020-12-14
+
+* chore: re-trigger beta (#4133)
+
+## 14.0.207 beta 2020-12-14
+
+* fix: build trigger definitions (#4131)
+
+## 14.0.206 beta 2020-12-14
+
+* feat(ios/app): adds error reporting toggle (#4106)
+* chore(android): rework versionCode system (#4128)
+
 ## 14.0.205 alpha 2020-12-14
 
 * fix(web): sporadic blank keyboard on Android (#4117)
