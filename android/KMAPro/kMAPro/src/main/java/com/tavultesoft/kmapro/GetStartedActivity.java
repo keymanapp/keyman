@@ -82,8 +82,14 @@ public class GetStartedActivity extends AppCompatActivity {
 
     HashMap<String, String> hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, getString(R.string.add_a_keyboard));
+    hashMap.put(textKey, getString(R.string.enable_storage_permission));
     hashMap.put(isEnabledKey, "true");
+    list.add(hashMap);
+
+    hashMap = new HashMap<String, String>();
+    hashMap.put(iconKey, "0");
+    hashMap.put(textKey, getString(R.string.add_a_keyboard));
+    hashMap.put(isEnabledKey, "false");
     list.add(hashMap);
 
     hashMap = new HashMap<String, String>();
@@ -113,15 +119,18 @@ public class GetStartedActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == 0) {
+          // Enable storage permission
+          MainActivity.checkStoragePermission(context);
+        } else if (position == 1) {
           // Keyman Settings install activity
           Intent i = new Intent(context, KeymanSettingsInstallActivity.class);
           context.startActivity(i);
-        } else if (position == 1) {
-          startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
         } else if (position == 2) {
+          startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+        } else if (position == 3) {
           InputMethodManager imManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
           imManager.showInputMethodPicker();
-        } else if (position == 3) {
+        } else if (position == 4) {
           Intent i = new Intent(context, InfoActivity.class);
           i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
           startActivity(i);
@@ -149,31 +158,41 @@ public class GetStartedActivity extends AppCompatActivity {
       String one = String.valueOf(R.drawable.ic_looks_one);
       String two = String.valueOf(R.drawable.ic_looks_two);
       String three = String.valueOf(R.drawable.ic_looks_three);
+      String four = String.valueOf(R.drawable.ic_looks_four);
       String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
       String info = String.valueOf(R.drawable.ic_info_outline);
 
-      List<Keyboard> kbList = KMManager.getKeyboardsList(this);
-      if (kbList != null && kbList.size() > 1) {
+      boolean storagePermissionGranted = MainActivity.storagePermissionGranted(this);
+      if (storagePermissionGranted) {
         list.get(0).put(iconKey, checkbox_on);
+        list.get(1).put(isEnabledKey, "true");
       } else {
         list.get(0).put(iconKey, one);
+        list.get(1).put(isEnabledKey, "false");
+      }
+
+      List<Keyboard> kbList = KMManager.getKeyboardsList(this);
+      if (kbList != null && kbList.size() > 1) {
+        list.get(1).put(iconKey, checkbox_on);
+      } else {
+        list.get(1).put(iconKey, two);
       }
 
       if (SystemIMESettings.isEnabledAsSystemKB(this)) {
-        list.get(1).put(iconKey, checkbox_on);
-        list.get(2).put(isEnabledKey, "true");
+        list.get(2).put(iconKey, checkbox_on);
+        list.get(3).put(isEnabledKey, "true");
       } else {
-        list.get(1).put(iconKey, two);
-        list.get(2).put(isEnabledKey, "false");
+        list.get(2).put(iconKey, three);
+        list.get(3).put(isEnabledKey, "false");
       }
 
       if (SystemIMESettings.isDefaultKB(this)) {
-        list.get(2).put(iconKey, checkbox_on);
+        list.get(3).put(iconKey, checkbox_on);
       } else {
-        list.get(2).put(iconKey, three);
+        list.get(3).put(iconKey, four);
       }
 
-      list.get(3).put(iconKey, info);
+      list.get(4).put(iconKey, info);
 
       String[] from = new String[]{iconKey, textKey};
       int[] to = new int[]{R.id.left_icon, R.id.text};

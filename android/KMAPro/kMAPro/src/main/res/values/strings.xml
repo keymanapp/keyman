@@ -60,6 +60,9 @@
   <string name="get_started" comment="Menu for getting started">Get Started</string>
 
   <!-- Context: Get Started menu -->
+  <string name="enable_storage_permission" comment="Menu item to request storage permission">Enable Keyman to access external storage</string>
+
+  <!-- Context: Get Started menu -->
   <string name="add_a_keyboard" comment="Menu item to add a keyboard">Add a keyboard for your language</string>
 
   <!-- Context: Get Started menu -->

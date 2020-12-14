@@ -37,6 +37,7 @@ import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
@@ -119,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   DownloadResultReceiver resultReceiver;
   private static ProgressDialog progressDialog;
-  private static boolean storagePermissionDialogShown = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       });
     }
 
-    checkStoragePermission(null);
     resultReceiver = new DownloadResultReceiver(new Handler(), context);
 
     if (BuildConfig.DEBUG) {
@@ -275,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         // file:// Chrome downloads and Filebrowsers
         case "content":
         case "file":
-          checkStoragePermission(data);
+          checkToUseKMPData(data);
           break;
         case "http" :
         case "https" :
@@ -741,11 +740,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       if (!SystemIMESettings.isDefaultKB(this))
         shouldShowGetStarted = true;
 
-      // Check if system dialog for storage permission must be dealt with first
-      if (storagePermissionDialogShown) {
-        shouldShowGetStarted = false;
-      }
-
       if (shouldShowGetStarted)
         showGetStarted();
     }
@@ -761,7 +755,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
-      storagePermissionDialogShown = false;
       if (data == null) {
         checkGetStarted();
       }
@@ -781,20 +774,43 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
   }
 
-  private void checkStoragePermission(Uri data) {
-    // Check if the Storage permission has been granted
+  /**
+   * Return boolean of whether storage permissions have been granted.
+   * @param context {Context}
+   * @returns boolean True if WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE permissions are granted.
+   *                  Also true for Android Lollipop.
+   */
+  public static boolean storagePermissionGranted(Context context) {
+    boolean permission = false;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      if ((checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) &&
-          (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-        useLocalKMP(context, data);
-      } else {
-        // Permission is missing and must be requested
-        storagePermissionDialogShown = true;
-        requestStoragePermission();
-      }
+      permission = ((context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) &&
+        (context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED));
     } else {
-      // Permission automatically granted on older Android versions
+      permission = true;
+    }
+    return permission;
+  }
+
+  /**
+   * Check if storage permissions have been granted. If not, then request storage permission.
+   * @param context
+   */
+  public static void checkStoragePermission(Context context) {
+    if (!storagePermissionGranted(context)) {
+      requestStoragePermission(context);
+    }
+  }
+
+  /**
+   * Give a URI to a KMP file, check if storage permissions are granted. If so, process the KMP.
+   * Otherwise, request storage permissions.
+   * @param data {Uri} to the KMP file
+   */
+  private void checkToUseKMPData(Uri data) {
+    if (storagePermissionGranted(context)) {
       useLocalKMP(context, data);
+    } else {
+      requestStoragePermission(context);
     }
   }
 
@@ -802,21 +818,21 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
    * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} and
    *              {@link android.Manifest.permission#WRITE_EXTERNAL_STORAGE} permissions
    */
-  private void requestStoragePermission() {
-    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+  private static void requestStoragePermission(Context context) {
+    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)context, Manifest.permission.READ_EXTERNAL_STORAGE) &&
+        ActivityCompat.shouldShowRequestPermissionRationale((Activity)context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
       // Provide additional rationale to the user if the permission was not granted
-      String message = getString(R.string.request_storage_permission);
-      Toast.makeText(getApplicationContext(), message ,
+      String message = context.getString(R.string.request_storage_permission);
+      Toast.makeText(context.getApplicationContext(), message ,
         Toast.LENGTH_LONG).show();
-      ActivityCompat.requestPermissions(this,
+      ActivityCompat.requestPermissions((Activity)context,
         new String[]{
           Manifest.permission.READ_EXTERNAL_STORAGE,
           Manifest.permission.WRITE_EXTERNAL_STORAGE},
         PERMISSION_REQUEST_STORAGE);
     } else {
       // Request the permission. The result will be received in onRequestPermissionsResult().
-      ActivityCompat.requestPermissions(this,
+      ActivityCompat.requestPermissions((Activity)context,
         new String[]{
           Manifest.permission.READ_EXTERNAL_STORAGE,
           Manifest.permission.WRITE_EXTERNAL_STORAGE},
