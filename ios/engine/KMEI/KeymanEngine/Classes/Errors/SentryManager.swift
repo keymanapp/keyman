@@ -14,7 +14,7 @@ import Sentry
  * error reporting.
  */
 public class SentryManager {
-  private static var silenced: Bool = false
+  private static var _enabled: Bool = true
 
   public static var hasStarted: Bool {
     return Sentry.Client.shared != nil
@@ -59,11 +59,14 @@ public class SentryManager {
 
   public static var enabled: Bool {
     get {
-      return !SentryManager.silenced
+      return SentryManager._enabled
     }
 
     set(flag) {
-      SentryManager.silenced = !flag
+      SentryManager._enabled = flag
+
+      // Ensure that the embedded KeymanWeb engine's crash-reporting state is also updated.
+      Manager.shared.inputViewController.refreshCrashReporting()
     }
   }
 
@@ -74,7 +77,7 @@ public class SentryManager {
       // Prevents Sentry from buffering the event.
       return false
     #else
-      return !SentryManager.silenced
+      return SentryManager.enabled
     #endif
   }
 

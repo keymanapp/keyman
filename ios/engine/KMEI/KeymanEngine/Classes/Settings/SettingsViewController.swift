@@ -147,23 +147,6 @@ open class SettingsViewController: UITableViewController {
     switch(cellIdentifier) {
       case "languages":
         cell.accessoryType = .disclosureIndicator
-      case "enablecrashreporting":
-        cell.accessoryType = .none
-        let enableReportingSwitch = UISwitch()
-        enableReportingSwitch.translatesAutoresizingMaskIntoConstraints = false
-
-        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: enableReportingSwitch.frame.size)
-        enableReportingSwitch.frame = switchFrame
-
-        enableReportingSwitch.isOn = reportErrors
-        enableReportingSwitch.addTarget(self, action: #selector(self.reportingSwitchValueChanged),
-                                      for: .valueChanged)
-        cell.addSubview(enableReportingSwitch)
-
-        if #available(iOSApplicationExtension 9.0, *) {
-          enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-          enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-        }
       case "showbanner":
         cell.accessoryType = .none
         let showBannerSwitch = UISwitch()
@@ -198,6 +181,25 @@ open class SettingsViewController: UITableViewController {
           showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
           showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         }
+      case "enablecrashreporting":
+        cell.accessoryType = .none
+        let enableReportingSwitch = UISwitch()
+        enableReportingSwitch.translatesAutoresizingMaskIntoConstraints = false
+
+        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: enableReportingSwitch.frame.size)
+        enableReportingSwitch.frame = switchFrame
+
+        enableReportingSwitch.isOn = reportErrors
+        enableReportingSwitch.addTarget(self, action: #selector(self.reportingSwitchValueChanged),
+                                      for: .valueChanged)
+        cell.addSubview(enableReportingSwitch)
+
+        if #available(iOSApplicationExtension 9.0, *) {
+          enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+        }
+      case "systemkeyboardsettings":
+        cell.accessoryType = .disclosureIndicator
       case "installfile":
         cell.accessoryType = .disclosureIndicator
       case "forcederror":
@@ -213,14 +215,13 @@ open class SettingsViewController: UITableViewController {
   @objc func reportingSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
+      // Save the preference
       userData.set(toggle.isOn, forKey: Key.optShouldReportErrors)
-      SentryManager.enabled = toggle.isOn
-
       userData.synchronize()
-    }
 
-    // Forward the thing to KMW; actually USE that value.
-    Manager.shared.inputViewController.refreshCrashReporting()
+      // Propagate the effects
+      SentryManager.enabled = toggle.isOn
+    }
   }
   
   @objc func bannerSwitchValueChanged(_ sender: Any) {
@@ -290,14 +291,13 @@ open class SettingsViewController: UITableViewController {
   }
   
   private func performAction(for indexPath: IndexPath) {
-    let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
-
     switch indexPath.section {
     case 0:
+      let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
       switch cellIdentifier {
         case "languages":
           showLanguages()
-        case "systemkeyboardsettings": // TODO: If adding an option to direct-hop to "Full Access".
+        case "systemkeyboardsettings":
           guard let appSettings = URL(string: UIApplication.openSettingsURLString) else {
             log.error("Could not launch keyboard settings menu")
             return

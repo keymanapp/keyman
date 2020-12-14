@@ -361,9 +361,7 @@ extension KeymanWebViewController {
   }
 
   func refreshCrashReporting() {
-    let userDefaults = Storage.active.userDefaults
-    let reportCrashes = userDefaults.bool(forKey: Key.optShouldReportErrors)
-
+    let reportCrashes = SentryManager.enabled
     webView?.evaluateJavaScript("sentryManager.enabled = \(reportCrashes ? "true" : "false")")
   }
 }
@@ -572,7 +570,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     isLoading = false
     log.info("Loaded keyboard.")
 
-    self.refreshCrashReporting();
+    self.refreshCrashReporting()
 
     resizeKeyboard()
 
