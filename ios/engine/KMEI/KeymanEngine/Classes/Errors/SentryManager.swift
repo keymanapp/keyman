@@ -14,7 +14,7 @@ import Sentry
  * error reporting.
  */
 public class SentryManager {
-  private static var _enabled: Bool = true
+  private static var _enabled: Bool?
 
   public static var hasStarted: Bool {
     return Sentry.Client.shared != nil
@@ -59,7 +59,12 @@ public class SentryManager {
 
   public static var enabled: Bool {
     get {
-      return SentryManager._enabled
+      if SentryManager._enabled == nil {
+        let userData = Storage.active.userDefaults
+        SentryManager._enabled = userData.bool(forKey: Key.optShouldReportErrors)
+      }
+
+      return SentryManager._enabled!
     }
 
     set(flag) {
