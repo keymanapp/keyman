@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.205 alpha 2020-12-14
+
+* fix(web): sporadic blank keyboard on Android (#4117)
+* chore(common/models): predictive-text "semi-fill" for iOS 9 use (#4118)
+
 ## 14.0.204 alpha 2020-12-11
 
 * chore(windows): apply eberhard's suggestions to docs (#4105)
