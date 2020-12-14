@@ -157,7 +157,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     case 1:
       if #available(iOS 11.0, *),  // if "Keyboards" is an option in our app's settings menu
          let appSettings = URL(string: UIApplication.openSettingsURLString) {
-        UIApplication.shared.openURL(appSettings)
+        UniversalLinks.externalLinkLauncher?(appSettings)
       } else {
         let setUpVC = SetUpViewController()
         mainViewController.present(setUpVC, animated: true, completion: nil)

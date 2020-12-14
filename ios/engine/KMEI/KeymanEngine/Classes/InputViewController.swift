@@ -180,6 +180,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override var hasFullAccess: Bool {
+    if #available(iOS 11.0, *) {
+      // Nice and straight-forward here!
+      return super.hasFullAccess
+    }
     return Storage.shared != nil
   }
 
@@ -545,6 +549,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   func resetContext() {
     keymanWeb.resetContext()
+  }
+
+  internal func setSentryState(enabled: Bool) {
+    keymanWeb.setSentryState(enabled: enabled)
   }
  
   func setContextState(text: String?, range: NSRange) {

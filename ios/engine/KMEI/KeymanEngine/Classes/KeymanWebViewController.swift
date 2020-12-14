@@ -357,8 +357,16 @@ extension KeymanWebViewController {
   }
   
   func setBannerHeight(to height: Int) {
-    // TODO:
     webView?.evaluateJavaScript("setBannerHeight(\(height));", completionHandler: nil)
+  }
+
+  /**
+   * Ensures that the embedded KMW instance uses the app's current error-report toggle setting.
+   * This is always called during keyboard page initialization and may also be called any time
+   * thereafter for settings updates.
+   */
+  func setSentryState(enabled: Bool = SentryManager.enabled) {
+    webView?.evaluateJavaScript("sentryManager.enabled = \(enabled ? "true" : "false")")
   }
 }
 
@@ -566,6 +574,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     isLoading = false
     log.info("Loaded keyboard.")
 
+    self.setSentryState()
     resizeKeyboard()
 
     // There may have been attempts to set these values before the keyboard loaded!
