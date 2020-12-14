@@ -7,13 +7,22 @@
 //
 
 def getVersionCode = { ->
-    String env_build_counter = System.getenv("build_counter")
-    if(env_build_counter != null) {
-        // This has been assigned by TeamCity, so use it if present
-        println "Using version code $env_build_counter from environment (TeamCity)"
-        return env_build_counter
+    String env_version_major = System.getenv("VERSION_MAJOR")
+    String env_version_minor = System.getenv("VERSION_MINOR")
+    String env_version_patch = System.getenv("VERSION_PATCH")
+    if(env_version_patch != null && env_version_minor != null && env_version_patch != null) {
+        // Version code is, for 14.1.33: 1410033. This supports up to 9999 builds for a
+        // given major.minor version. We only support up to 9 minor versions for a given
+        // major version but at present we are not using minor versions at all.
+        Integer version_code =
+            env_version_major.toInteger() * 100000 +
+            env_version_minor.toInteger() * 10000 +
+            env_version_patch.toInteger()
+        println "Using version code " + version_code
+        return version_code
     }
 
+    // Probably building from IDE
     println "Using fixed version code 100"
     return 100
 }
