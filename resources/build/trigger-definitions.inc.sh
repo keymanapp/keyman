@@ -59,6 +59,6 @@ bc_beta_mac=(KeymanMac_Master)
 bc_beta_windows=(Keyman_Build)
 bc_beta_web=(Keymanweb_Build)
 
-vcs_beta=Keyman_KeymanappKeymanBeta
+vcs_beta=HttpsGithubComKeymanappKeyman
 
 # TODO: Stable Build Configurations
