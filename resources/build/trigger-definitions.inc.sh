@@ -39,7 +39,7 @@ bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests)
 
 vcs_test=HttpsGithubComKeymanappKeymanPRs
 
-# Master (Alpha) Build Configurations
+# Master (Alpha) Build Configurations; these diverge when we need new build configurations for new versions
 
 bc_master_android=(KeymanAndroid_Build)
 bc_master_ios=(Keyman_iOS_Master)
