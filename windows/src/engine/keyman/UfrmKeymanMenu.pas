@@ -341,6 +341,9 @@ begin
     end;
   end;
 
+  if not ScrollableView then
+    Exit;
+
   for i := 0 to 1 do
   begin
     if FSelectedScrollRect = i
@@ -398,6 +401,7 @@ begin
 
   for i := 0 to Fmnu.Items.Count - 1 do
   begin
+    FItemOffsets[i] := 0;
     if Fmnu.Items[i] is TKeymanMenuItem then
     begin
       kmi := Fmnu.Items[i] as TKeymanMenuItem;

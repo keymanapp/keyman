@@ -25,6 +25,7 @@ type
     FRequestInfo: TIdHTTPRequestInfo;
     FResponseInfo: TIdHTTPResponseInfo;
     FXMLRenderers: TXMLRenderers;
+    procedure ProcessPageTextEditorFonts;
     procedure ProcessPageHint(const Params: TStrings);
     procedure ProcessPageSplash;
     procedure ProcessPageHelp(const Params: TStrings);
@@ -63,6 +64,7 @@ uses
   System.SysUtils,
 
   BaseKeyboards,
+  Keyman.Configuration.System.HttpServer.App.TextEditorFonts,
   KeymanVersion,
   MessageIdentifierConsts,
   Keyman.System.LocaleStrings,
@@ -107,6 +109,8 @@ begin
       ProcessPageBaseKeyboard
     else if FRequestInfo.Document = '/page/downloadkeyboard' then
       ProcessPageDownloadKeyboard
+    else if FRequestInfo.Document = '/page/welcome_fonts' then
+      ProcessPageTextEditorFonts
     else
     begin
       // Generic response -- no special parameters needed
@@ -212,6 +216,20 @@ begin
   FXMLRenderers.Clear;
   FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, xml));
   FXMLRenderers.Add(TKeyboardListXMLRenderer.Create(FXMLRenderers));
+  ProcessXMLPage;
+end;
+
+procedure TAppHttpResponder.ProcessPageTextEditorFonts;
+var
+  data: ITextEditorFontsSharedData;
+begin
+  if not GetTaggedData(ITextEditorFontsSharedData, data) then
+  begin
+    Respond404(Context, RequestInfo, ResponseInfo);
+    Exit;
+  end;
+  FXMLRenderers.RenderTemplate := 'welcome_fonts.xsl';
+  FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, data.AdditionalData));
   ProcessXMLPage;
 end;
 

@@ -98,11 +98,12 @@ type
     procedure CheckLogFileForWarnings(const Filename: string; Silent: Boolean);
     function CleanupPaths(var xml: string): string;
     function InstallTipForKeyboard(const BCP47Tag: string): Boolean;
+    procedure SetDefaultBCP47Tag(const Value: string);
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
   public
     procedure InstallKeyboard(const ALogFile, BCP47Tag: string);
-    property DefaultBCP47Tag: string read FDefaultBCP47Tag write FDefaultBCP47Tag;
+    property DefaultBCP47Tag: string read FDefaultBCP47Tag write SetDefaultBCP47Tag;
     property InstallFile: string read FInstallFile write SetInstallFile;
     property Silent: Boolean read FSilent write FSilent;
   end;
@@ -143,6 +144,11 @@ uses
 {-------------------------------------------------------------------------------
  - Property function handlers                                                  -
  ------------------------------------------------------------------------------}
+
+procedure TfrmInstallKeyboard.SetDefaultBCP47Tag(const Value: string);
+begin
+  FDefaultBCP47Tag := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(Value);
+end;
 
 procedure TfrmInstallKeyboard.SetInstallFile(const Value: string);
 var
