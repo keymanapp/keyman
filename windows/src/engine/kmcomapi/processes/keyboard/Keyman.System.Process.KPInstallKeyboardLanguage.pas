@@ -73,6 +73,7 @@ type
     function ConvertBCP47TagToLangID(Locale: string; var LangID: Integer): Boolean;
     function InstallBCP47Language(const FLocaleName: string): Boolean;
     function GetInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+    function AreMaximumTransientLanguagesInstalled: Boolean;
   end;
 
 implementation
@@ -113,6 +114,54 @@ begin
   inherited Destroy;
 end;
 
+function TKPInstallKeyboardLanguage.AreMaximumTransientLanguagesInstalled: Boolean;
+const
+  MAX_TRANSIENT_LANGUAGES = 4;
+var
+  r: TRegistry;
+  keys: TStringList;
+  isInstalled: array[0..MAX_TRANSIENT_LANGUAGES-1] of Boolean;
+  i: Integer;
+  v: Integer;
+  key: string;
+begin
+  for i := 0 to high(isInstalled) do isInstalled[i] := False;
+
+  // We'll use Control Panel/International/User Profile to find the full set of
+  // transient languages
+  r := TRegistry.Create;
+  keys := TStringList.Create;
+  try
+    if r.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) then
+    begin
+      r.GetKeyNames(keys);
+      for key in keys do
+      begin
+        if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + key) then
+        begin
+          if r.ValueExists(SRegValue_CPIUP_TransientLangId) then
+          begin
+            v := r.ReadInteger(SRegValue_CPIUP_TransientLangId);
+            // Transient languages start at $2000 and go up by $400
+            v := (v - $2000) div $400;
+            if (v >= 0) and (v <= High(isInstalled)) then
+              isInstalled[v] := True;
+          end;
+        end;
+      end;
+    end;
+  finally
+    keys.Free;
+    r.Free;
+  end;
+
+  for i := 0 to High(isInstalled) do
+    if not isInstalled[i] then
+      Exit(False);
+
+  Result := True;
+end;
+
 // TODO: change LangID to Winapi.Windows.LANGID
 function TKPInstallKeyboardLanguage.FindInstallationLangID(const BCP47Tag: string; var LangID: Integer; var TemporaryLayoutString: string; Flags: TKPInstallKeyboardLanguageFlags): Boolean;
 var
@@ -149,6 +198,19 @@ begin
     if not FWin8Languages.IsSupported then
     begin
       Warn(KMN_W_ProfileInstall_CustomLocalesNotSupported);
+      Exit(False);
+    end;
+
+    //
+    // Windows only appears to support 4 transient languages: 0x2000, 0x2400,
+    // 0x2800, 0x2C00. While Powershell will add extra languages above those,
+    // it will not install TIPs for any additional languages (e.g. 0x3000+),
+    // so we should stop after 4
+    //
+
+    if AreMaximumTransientLanguagesInstalled then
+    begin
+      Warn(KMN_W_ProfileInstall_CustomLocalesNotSupported); // TODO new code
       Exit(False);
     end;
 

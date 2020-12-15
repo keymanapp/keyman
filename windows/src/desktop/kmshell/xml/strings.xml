@@ -1068,6 +1068,12 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- String Type: FormatString -->
   <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">The keyboard '%0:s' is part of package '%1:s'.  You must uninstall the entire package.  Continue?</string>
 
+  <!-- PArameters: %0:s = BCP 47 code -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 14.0.211 -->
+  <!-- String Type: FormatString -->
+  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">Unable to install keyboard language; Windows has a limit of 4 custom 'transient' languages, and you may have reached this limit.</string>
+
   <!-- Parameters: %0:s = Package Name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
