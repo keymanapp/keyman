@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.210 beta 2020-12-15
+
+* fix(windows): beta uses wrong server (#4142)
+
 ## 14.0.209 beta 2020-12-14
 
 * chore: fix trigger for beta branches (#4135)
