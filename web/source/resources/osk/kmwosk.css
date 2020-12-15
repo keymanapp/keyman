@@ -58,10 +58,10 @@
 .phone.ios .kmw-key.kmw-key-shift,
 .phone.ios .kmw-key.kmw-key-special {color:#fff;background-color:#b2b9c5;}
 .phone.ios .kmw-key.kmw-key-shift-on,
-.phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;} /*Here*/
+.phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
 .phone.ios .kmw-key.kmw-key-touched {background-color:#447;}
 .phone.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
-.phone.ios .kmw-key-deadkey{color:#048204;background-color:#fdfdfe;} /*Added*/
+.phone.ios .kmw-key-deadkey{color:#048204;background-color:#fdfdfe;}
 
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
@@ -70,9 +70,9 @@
   .phone.ios .kmw-key.kmw-key-shift,
   .phone.ios .kmw-key.kmw-key-special {color:#fff;background-color:#595c62;}
   .phone.ios .kmw-key.kmw-key-shift-on,
-  .phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;} /*Here*/
+  .phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
   .phone.ios .kmw-key.kmw-key-touched {background-color:#447;}
-  .phone.ios .kmw-key-deadkey{color:#0d0;background-color:#3d3d3e;} /*Added*/
+  .phone.ios .kmw-key-deadkey{color:#0d0;background-color:#3d3d3e;}
 }
 
 .ios .kmw-banner-bar {
