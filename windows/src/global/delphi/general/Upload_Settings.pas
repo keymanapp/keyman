@@ -137,7 +137,8 @@ end;
 
 function KeymanCom_Protocol_Server: string; // = 'https://keyman.com';
 begin
-  if CKeymanVersionInfo.Tier = TIER_ALPHA
+  if (CKeymanVersionInfo.Tier = TIER_ALPHA) or
+    (CKeymanVersionInfo.Tier = TIER_BETA)
     then Result := S_KeymanCom_Alpha
     else Result := S_KeymanCom;
   Result := GetDebugPath('Debug_KeymanCom', Result, False);
@@ -150,7 +151,8 @@ end;
 
 function API_Server: string; // = 'api.keyman.com';
 begin
-  if CKeymanVersionInfo.Tier = TIER_ALPHA
+  if (CKeymanVersionInfo.Tier = TIER_ALPHA) or
+    (CKeymanVersionInfo.Tier = TIER_BETA)
     then Result := S_APIServer_Alpha
     else Result := S_APIServer;
   Result := GetDebugPath('Debug_APIServer', Result, False);
