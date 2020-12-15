@@ -4,7 +4,7 @@ interface
 
 type
   ITextEditorFontsSharedData = interface
-    ['{7442A323-C1E3-404B-BEEA-5B24A52BBB0E}']
+    ['{A746AE29-AF9C-49AD-9A83-CB1AA3626BFE}']
     function AdditionalData: string;
   end;
 
