@@ -341,6 +341,9 @@ begin
     end;
   end;
 
+  if not ScrollableView then
+    Exit;
+
   for i := 0 to 1 do
   begin
     if FSelectedScrollRect = i
