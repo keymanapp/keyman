@@ -12,10 +12,10 @@ import { readFileSync, writeFileSync } from 'fs';
 import { gt } from 'semver';
 
 const getPullRequestInformation = async (
-  octokit: GitHub,
+  octokit: GitHub, base: string
 ): Promise<string | undefined> => {
   const response = await octokit.graphql(
-    findLastHistoryPR
+    findLastHistoryPR(base)
   );
 
   if (response === null) {
@@ -216,7 +216,7 @@ export const fixupHistory = async (
   // Get the last auto history merge commit ref
   //
 
-  const commit_id = await getPullRequestInformation(octokit);
+  const commit_id = await getPullRequestInformation(octokit, base);
   if (commit_id === undefined) {
     logWarning('Unable to fetch pull request information.');
     return -1;
