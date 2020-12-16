@@ -1,18 +1,18 @@
 (*
   Name:             kmint
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    14 Sep 2006
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Remove Refresh-Keyman function
 *)
@@ -49,7 +49,8 @@ uses
 
 const
   KR_REQUEST_REFRESH = 0;  // Send this to any window, which will make Keyman post a KR_REFRESH to all top-level windows
-  KR_REFRESH = 2;       // Finally this message get sent to all the other top-level windows in the system.
+  KR_REFRESH = 2;          // Finally this message get sent to all the other top-level windows in the system.
+  KR_SETTINGS_CHANGED = 3;
 
 function KeymanCustomisation: IKeymanCustomisation;
 begin

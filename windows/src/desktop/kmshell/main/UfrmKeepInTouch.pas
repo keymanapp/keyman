@@ -112,7 +112,7 @@ end;
 procedure TfrmKeepInTouch.TntFormShow(Sender: TObject);
 begin
   inherited;
-  Do_Content_Render(False);
+  Do_Content_Render;
 end;
 
 end.

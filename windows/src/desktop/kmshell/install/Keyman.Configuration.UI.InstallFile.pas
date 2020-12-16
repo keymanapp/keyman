@@ -120,15 +120,14 @@ begin
   kmcom.Languages.Apply;
   AddDefaultLanguageHotkeys(InstalledKeyboards);
 
+  kmcom.Apply;
+
   if InstalledPackage <> nil then
   begin
     //if not ASilent then SelectLanguage(False);
     if not ASilent and not ANoWelcome then
       DoShowPackageWelcome(InstalledPackage, False);
   end;
-
-  {$MESSAGE HINT 'How do we correlate this with a Cancel in configuration? Do we change that to Close?' }
-  kmcom.Apply;
 end;
 
 /// <summary>

@@ -43,6 +43,8 @@ function LoadKMCOM: Boolean;
 
 const
   KEYMAN_LAYOUT_CUSTOM = $000005FE;
+  KR_REFRESH = 2;
+  KR_SETTINGS_CHANGED = 3;
 
 const
   KMC_REFRESH = 4;

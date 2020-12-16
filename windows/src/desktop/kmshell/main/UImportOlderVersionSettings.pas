@@ -188,9 +188,9 @@ begin
             SameText(kmcom.Keyboards[i].OwnerPackage.ID, p) then
           kmcom.Keyboards[i].Loaded := False;
     end;
-    kmcom.Apply;
   end;
 
+  kmcom.Apply;
   Result := True;
 end;
 

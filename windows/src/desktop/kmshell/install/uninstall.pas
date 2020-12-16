@@ -99,7 +99,7 @@ begin
     pkg := nil;
     if WaitForElevatedConfiguration(Handle, '-up "'+pkgID+'" -s') = 0 then
     begin
-      kmcom.Keyboards.Refresh;
+      kmcom.Refresh;
       kmcom.Keyboards.Apply;
       Result := True;
     end;
@@ -119,8 +119,8 @@ begin
   UninstallPackageTips(pkg);
   pkg.Uninstall(True);
   pkg := nil;
-  kmcom.Keyboards.Refresh;
-  kmcom.Keyboards.Apply;
+  kmcom.Refresh;
+  kmcom.Apply;
   Result := True;
 end;
 
@@ -165,7 +165,7 @@ begin
   kbd.Uninstall;
   kbd := nil;
   kmcom.Keyboards.Refresh;
-  kmcom.Keyboards.Apply;
+  kmcom.Apply;
   Result := True;
 end;
 
@@ -199,6 +199,7 @@ begin
   kbdlang.Uninstall;
   kbdlang := nil;
   kmcom.Keyboards.Refresh;
+  kmcom.Apply;
   Result := True;
 end;
 

@@ -159,6 +159,7 @@ begin
   else
     CheckForMitigationWarningFor_Win10_1803(Silent, '');
 
+  kmcom.Apply;
   Result := True;
 end;
 
@@ -265,7 +266,10 @@ begin
       Result := True;
     end
   ) then
+  begin
+    kmcom.Apply;
     ModalResult := mrOk;
+  end;
 end;
 
 procedure TfrmInstallKeyboardLanguage.editSearchChange(Sender: TObject);

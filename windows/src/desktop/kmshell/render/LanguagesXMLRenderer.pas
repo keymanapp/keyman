@@ -27,7 +27,7 @@ uses
 type
   TLanguagesXMLRenderer = class(TXMLRenderer)
   protected
-    function XMLData(FRefreshKeyman: Boolean): WideString; override;
+    function XMLData: WideString; override;
   end;
 
 implementation
@@ -38,12 +38,10 @@ uses
 
 { TLanguagesXMLRenderer }
 
-function TLanguagesXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
+function TLanguagesXMLRenderer.XMLData: WideString;
 var
   References: OleVariant;
 begin
-  if FRefreshKeyman then
-    kmcom.Languages.Refresh;
   References := Null;   // I2678
   Result := kmcom.Languages.SerializeXML(0, '', References);
 end;

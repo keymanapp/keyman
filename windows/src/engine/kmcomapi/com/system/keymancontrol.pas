@@ -106,6 +106,7 @@ type
     RefreshHandle: THandle;
     FAutoApply: Boolean;
     FKeymanCustomisation: IKeymanCustomisation;
+    FLastRefreshToken: IntPtr;
 
     function RunKeymanConfiguration(const filename: string): Boolean;
     procedure ApplyToRunningKeymanEngine;
@@ -147,6 +148,8 @@ type
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
 
     procedure DiagnosticTestException; safecall;
+
+    function LastRefreshToken: IntPtr; safecall;
 
     { IIntKeymanControl }
     procedure AutoApplyKeyman;
@@ -351,6 +354,11 @@ begin
   ApplyToRunningKeymanEngine;
 end;
 
+function TKeymanControl.LastRefreshToken: IntPtr;
+begin
+  Result := FLastRefreshToken;
+end;
+
 procedure TKeymanControl.ApplyToRunningKeymanEngine;
 begin
   // This convoluted way of refreshing keyman ensures that km is init for the thread.
@@ -359,12 +367,33 @@ begin
     procedure
     const
       KR_REQUEST_REFRESH = 0;
+      KR_SETTINGS_CHANGED = 3;
     var
       msg: TMsg;
       wm_keyman_refresh: UINT;
     begin
       wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
       RefreshHandle := AllocateHWnd(nil);
+
+      // We currently have two announcements because the KR_REQUEST_REFRESH
+      // announcement is actioned only when Keyman Engine is running, while we
+      // still need to tell any apps listening for changes that the settings
+      // have changed. In future, we should probably refactor this to use a
+      // single broadcast.
+
+      // We use a random number here to so that multiple processes can generate
+      // hopefully unique tokens for refresh, and we share this token with our
+      // current consumer so they can ignore notifications that they have
+      // generated
+
+      // First, post out a KR_SETTINGS_CHANGED for the benefit of Keyman
+      // Configuration and other apps that want it
+      FLastRefreshToken := Random(MaxInt);
+      PostMessage(HWND_BROADCAST, wm_keyman_refresh, KR_SETTINGS_CHANGED, FLastRefreshToken);
+
+      // Then, post out a refresh to Keyman Engine and process it in this
+      // thread so that Keyman Engine will grab it and broadcast it, if it is
+      // currently running
       PostMessage(RefreshHandle, wm_keyman_refresh, KR_REQUEST_REFRESH, 0);
       GetMessage(msg, RefreshHandle, wm_keyman_refresh, wm_keyman_refresh);
       DispatchMessage(msg);

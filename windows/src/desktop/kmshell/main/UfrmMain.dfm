@@ -15,4 +15,9 @@ inherited frmMain: TfrmMain
   ExplicitHeight = 533
   PixelsPerInch = 96
   TextHeight = 13
+  object AppEvents: TApplicationEvents
+    OnMessage = AppEventsMessage
+    Left = 416
+    Top = 256
+  end
 end

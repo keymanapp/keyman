@@ -513,8 +513,10 @@ function TfrmInstallKeyboard.InstallTipForKeyboard(const BCP47Tag: string): Bool
 begin
   // Ensure keyboard is recorded in CU registry before we install the TIP, otherwise it will be marked as disabled by default,
   // as installing the TIP adds CU registry settings, potentially confusing the keyboard settings
-  kmcom.Refresh;
-  kmcom.Apply;
+
+  // Only do this for the keyboards, so we don't cause a global refresh
+  kmcom.Keyboards.Refresh;
+  kmcom.Keyboards.Apply;
 
   Result := DoInstallTipForKeyboard(BCP47Tag);
   if not Result then

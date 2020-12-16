@@ -32,6 +32,8 @@ begin
   with TfrmBaseKeyboard.Create(nil) do
   try
     Result := ShowModal = mrOk;
+    if Result then
+      kmcom.Apply;
   finally
     Free;
   end;
