@@ -244,21 +244,21 @@ public class CloudDownloadMgr{
     // From DownloadManager documentation:
     // https://developer.android.com/reference/android/app/DownloadManager.Request#setDestinationUri(android.net.Uri)
     // Must be a file to a path on external storage, and the calling app must have the WRITE_EXTERNAL_STORAGE permission
-    File _file=new File(aContext.getExternalFilesDir(null),"download_"+System.currentTimeMillis()+"_"+aNo);
+    //File _file=new File(aContext.getExternalFilesDir(null),"download_"+System.currentTimeMillis()+"_"+aNo);
        /*
        Create a DownloadManager.Request with all the information necessary to start the download
         */
     DownloadManager.Request _request=new DownloadManager.Request(Uri.parse(aParam.url))
       .setTitle("Cloud Download " + aParam.target)
       .setDescription("Downloading " + aParam.target)
-      .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
-      .setDestinationUri(Uri.fromFile(_file));// Uri of the destination file
+      .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);// Visibility of the download Notification
+      //.setDestinationUri(Uri.fromFile(_file));// Uri of the destination file
       // api level 24
       //.setRequiresCharging(false)// Set if charging is required to begin the download
       //.setAllowedOverMetered(true)// Set if download is allowed on Mobile network
       //.setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
-    return new CloudApiTypes.SingleCloudDownload(_request,_file)
+    return new CloudApiTypes.SingleCloudDownload(_request)
       .setCloudParams(aParam);
   }
 }

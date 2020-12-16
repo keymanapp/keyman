@@ -1,6 +1,9 @@
 package com.tavultesoft.kmea.cloud;
 
 import android.app.DownloadManager;
+import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -114,13 +117,11 @@ public class CloudApiTypes {
     private final DownloadManager.Request request;
     private boolean downloadFinished =false;
     private long downloadId;
-    private final File destinationFile;
     private CloudApiParam cloudParams;
 
-    public SingleCloudDownload(DownloadManager.Request aRequest,File aDestinationFile)
+    public SingleCloudDownload(DownloadManager.Request aRequest)
     {
       request = aRequest;
-      destinationFile = aDestinationFile;
     }
     public SingleCloudDownload setDownloadId(long downloadId) {
       this.downloadId = downloadId;
@@ -140,7 +141,11 @@ public class CloudApiTypes {
       return downloadId;
     }
 
-    public File getDestinationFile() {
+    public File getDestinationFile(Context context) {
+      DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+      Uri uri = downloadManager.getUriForDownloadedFile(downloadId);
+      File destinationFile = (uri != null) ? new File(uri.getPath()) : null;
+      Log.d("CloudApiTypes", "destinationFile: " + destinationFile.toString());
       return destinationFile;
     }
 

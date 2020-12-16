@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       });
     }
 
-    checkStoragePermission(null);
+    //checkStoragePermission(null);
     resultReceiver = new DownloadResultReceiver(new Handler(), context);
 
     if (BuildConfig.DEBUG) {

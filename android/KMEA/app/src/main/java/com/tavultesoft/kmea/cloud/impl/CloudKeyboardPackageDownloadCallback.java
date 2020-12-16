@@ -35,6 +35,7 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
   private File resourceRoot;
   private File cacheDir;
   private String languageID;
+  private Context context;
 
   public void setLanguageID(String languageID) {
     this.languageID = languageID;
@@ -45,6 +46,7 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
   {
     resourceRoot = new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
     cacheDir = context.getCacheDir();
+    this.context = context;
   }
 
   @Override
@@ -57,7 +59,9 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
     int _result = FileUtils.DOWNLOAD_SUCCESS;
     for(CloudApiTypes.SingleCloudDownload _d:aDownload.getSingleDownloads())
     {
-      if (_d.getDestinationFile() != null && _d.getDestinationFile().length() > 0)
+
+      File destinationFile = _d.getDestinationFile(context);
+      if (destinationFile != null && destinationFile.length() > 0)
       {
 
         try {
@@ -75,7 +79,7 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
             // Extract the kmp.
             File kmpFile = new File(cacheDir, kmpFilename);
 
-            FileUtils.copy(_d.getDestinationFile(), kmpFile);
+            FileUtils.copy(destinationFile, kmpFile);
 
             String pkgTarget = kbdKMPProcessor.getPackageTarget(kmpFile);
             if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
