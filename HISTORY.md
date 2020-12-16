@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.2 alpha 2020-12-16
+
+* fix(common): increment version needs to check base 🍒 (#4156)
+
 ## 15.0.1 alpha 2020-12-14
 
 * chore: prepare 15.0 alpha (#4129)
