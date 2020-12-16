@@ -6,7 +6,7 @@
 
 ## 14.0.209 beta 2020-12-14
 
-* chore: fix trigger for beta branches (#4135)
+* chore(common): fix trigger for beta branches (#4135)
 
 ## 14.0.208 beta 2020-12-14
 
