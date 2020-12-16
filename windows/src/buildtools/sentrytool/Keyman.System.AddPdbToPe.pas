@@ -265,6 +265,9 @@ begin
     s.SetSize(SectionOffset + SectionRawSize);
     FillChar((PByte(s.Memory) + SectionOffset)^, SectionRawSize, 0);
 
+    nh32 := PImageNtHeaders(NativeUInt(nh32)-NativeUInt(dh)+NativeUInt(s.Memory));
+    section := PImageSectionHeader(NativeUInt(section)-NativeUInt(dh)+NativeUInt(s.Memory));
+
     // Increment the number of sections
     Inc(nh32.FileHeader.NumberOfSections);
 
@@ -323,6 +326,9 @@ begin
     // Allocate a new section for the debug directory
     s.SetSize(SectionOffset + SectionRawSize);
     FillChar((PByte(s.Memory) + SectionOffset)^, SectionRawSize, 0);
+
+    nh64 := PImageNtHeaders64(NativeUInt(nh64)-NativeUInt(dh)+NativeUInt(s.Memory));
+    section := PImageSectionHeader(NativeUInt(section)-NativeUInt(dh)+NativeUInt(s.Memory));
 
     // Increment the number of sections
     Inc(nh64.FileHeader.NumberOfSections);
