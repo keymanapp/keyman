@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.211 beta 2020-12-16
+
+* chore(windows): remove obsolete importkeyboard app (#4138)
+* fix(windows): glitch in keyboard menu (#4139)
+* fix(windows): menu scroll positions need reset at popup (#4140)
+* fix(windows): remove obsolete option 'Switch to OSK/Help' (#4141)
+* fix(windows): Canonicalize BCP 47 tag on keyboard download (#4144)
+* fix(windows): help window centred on load (#4147)
+* fix(windows): Text editor font bugs (#4149)
+* chore(common): Update history for 14.0 beta release (#4148)
+* fix(common): increment version needs to check base (#4155)
+
 ## 14.0.210 beta 2020-12-15
 
 * fix(windows): beta uses wrong server (#4142)
