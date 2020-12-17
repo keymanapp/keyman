@@ -1,18 +1,18 @@
 (*
   Name:             LangSwitchManager
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      22 Oct 2010
 
   Modified Date:    12 Sep 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          22 Oct 2010 - mcdurdin - I2522 - Initial version of language switch window
                     30 Nov 2010 - mcdurdin - I2543 - Support switching to TSF addins in Language Switch Window
                     17 Dec 2010 - mcdurdin - I2575 - Wrong keyboard layout selected for default language
@@ -182,7 +182,7 @@ type
     destructor Destroy; override;
     procedure UpdateActive(FLangID: Cardinal; FActiveItemType: TLangSwitchItemType; FHKL: HKL); overload;   // I3933
     procedure UpdateActive(FLangID: Cardinal; FActiveItemType: TLangSwitchItemType; FClsid, FProfileGuid: TGUID); overload;   // I3933
-    procedure Refresh;
+    procedure Refresh(ANewWin8Languages: TWindows8LanguageList = nil);
     function FindKeyboard(FHKL: HKL; FProfileGuid: TGUID): TLangSwitchKeyboard; overload;
     function FindKeyboard(id: string): TLangSwitchKeyboard; overload;
     property Languages[Index: Integer]: TLangSwitchLanguage read GetLanguage;
@@ -406,7 +406,7 @@ begin
   TDebugLogClient.Instance.WriteMessage('[EnumTSFKeyboards] EXIT ---------------', []);
 end;
 
-procedure TLangSwitchManager.Refresh;   // I3933
+procedure TLangSwitchManager.Refresh(ANewWin8Languages: TWindows8LanguageList);   // I3933
 var
   i: Integer;
   j: Integer;
@@ -419,7 +419,13 @@ var
 //  templang: array[0..5] of TLangSwitchLanguage;   // I4715
 //  tempkbd: array[0..15] of TLangSwitchKeyboard;   // I4715
 begin
-  FWin8Languages.Refresh;
+  if Assigned(ANewWin8Languages) then
+  begin
+    FWin8Languages.Free;
+    FWin8Languages := ANewWin8Languages;
+  end
+  else
+    FWin8Languages.Refresh;
 
   FActiveItemType := lsitUnknown;
   FActiveLangID := 0;
@@ -992,7 +998,7 @@ begin
 
   FLanguageToggle := '3';
   FLayoutToggle := '3';
-  
+
   FReset := False;
 
   with TRegistryErrorControlled.Create do  // I2890
