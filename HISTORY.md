@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.212 beta 2020-12-17
+
+* fix(windows): uninstall language button z-index (#4145)
+* fix(windows): exit button position on setup (#4150)
+* fix(windows): Online Update dialog layout was messy (#4152)
+
 ## 14.0.211 beta 2020-12-16
 
 * chore(windows): remove obsolete importkeyboard app (#4138)
