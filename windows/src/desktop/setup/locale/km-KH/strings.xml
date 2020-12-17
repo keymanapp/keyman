@@ -18,7 +18,7 @@
   <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
   <string name="ssActionNothingToInstall">There is nothing to install.</string>
   <!-- Parameters: %0:s download size -->
-  <string name="ssActionDownload">(%0:s download)</string>
+  <string name="ssActionDownload" comment="ssActionDownload&#10;Parameters: %0:s download size&#10;For example &quot;(13.5MB download)&quot;&#10;This is used when listing each of the files to be installed.">(%0:s download)</string>
   <string name="ssActionInstall">Setup will install:</string>
   <string name="ssFreeCaption">$APPNAME $VERSION is free and open source</string>
   <string name="ssLicenseLink">&amp;Read the license</string>
@@ -44,7 +44,7 @@ Restart now?</string>
   <string name="ssOptionsTitleSelectModulesToInstall">Modules to install or upgrade</string>
   <string name="ssOptionsTitleAssociatedKeyboardLanguage">Associated Keyboard Language</string>
   <string name="ssOptionsTitleLocation">Version to install</string>
-  <string name="ssOptionsStartWithWindows">Start $APPNAME when Windows starts</string>
+  <string name="ssOptionsStartWithWindows">ចាប់​ផ្ដើម $APPNAME ពេល Windows ចាប់ផ្ដើម</string>
   <string name="ssOptionsStartAfterInstall">Start $APPNAME when installation completes</string>
   <string name="ssOptionsCheckForUpdates">Check for updates online periodically</string>
   <string name="ssOptionsUpgradeKeyboards">Upgrade keyboards installed with older versions to version $VERSION</string>
