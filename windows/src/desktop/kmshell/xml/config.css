@@ -540,6 +540,8 @@ table tr
 }
 .keyboard-language:hover a
 {
+  position: relative;
+  z-index: 10;
   visibility: visible;
 }
 
