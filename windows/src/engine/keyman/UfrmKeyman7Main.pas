@@ -200,11 +200,13 @@ type
     tmrTestKeymanFunctioning: TTimer;
     tmrOnlineUpdateCheck: TTimer;
     tmrCheckInputPane: TTimer;
+    tmrRefresh: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrTestKeymanFunctioningTimer(Sender: TObject);
     procedure tmrOnlineUpdateCheckTimer(Sender: TObject);
     procedure tmrCheckInputPaneTimer(Sender: TObject);
+    procedure tmrRefreshTimer(Sender: TObject);
   private
     InMenuLoop: Integer;  // I1082 - Avoid menu nasty flicker with rapid click
     FClosingApp: Boolean;
@@ -420,7 +422,6 @@ uses
   Vcl.AxCtrls,
   Vcl.Buttons,
   Vcl.ComCtrls,
-  Windows8LanguageList,
   InterfaceHotkeys,
   utilhotkey,
   MessageIdentifiers,
@@ -825,18 +826,21 @@ begin
       end;
     KMC_REFRESH:
       begin
+        if wParam = 1 then
+        begin
+          // We're going to keep checking for changes for
+          // the next few seconds because Windows is in the
+          // process of updating its keyboard list
+          tmrRefresh.Tag := 0;
+          tmrRefresh.Enabled := False;
+          tmrRefresh.Enabled := True;
+        end;
 
         if VisualKeyboardVisible then
           frmVisualKeyboard.PreRefreshKeyman;
         kmcom.Refresh;
-        if wParam = 1 then
-        begin
-          FLangSwitchManager.Refresh(Pointer(lParam));
-        end
-        else
-        begin
-          FLangSwitchManager.Refresh(nil);
-        end;
+        FLangSwitchManager.Refresh;
+
         if VisualKeyboardVisible then
         begin
           frmVisualKeyboard.RefreshKeyman;
@@ -1363,7 +1367,7 @@ begin
       FLangSwitchManager.UpdateActive(FLangID, lsitWinKeyboard, val);   // I3949
       if FLangSwitchManager.ActiveKeyboard = nil then   // I4715
       begin
-        FLangSwitchManager.Refresh(nil);
+        FLangSwitchManager.Refresh;
         FLangSwitchManager.UpdateActive(FLangID, lsitWinKeyboard, val);   // I3949
       end;
       FActiveHKL := val;   // I4359
@@ -1394,7 +1398,7 @@ begin
 
       if FLangSwitchManager.ActiveKeyboard = nil then   // I4715
       begin
-        FLangSwitchManager.Refresh(nil);
+        FLangSwitchManager.Refresh;
         FLangSwitchManager.UpdateActive(FLangID, lsitTIP, FClsid, FProfileGuid);
       end;
     end
@@ -1808,6 +1812,21 @@ begin
   end;
 end;
 
+procedure TfrmKeyman7Main.tmrRefreshTimer(Sender: TObject);
+const
+  SECONDS_TO_CHECK = 5;
+begin
+  if tmrRefresh.Tag > SECONDS_TO_CHECK * (1000 div Integer(tmrRefresh.Interval)) then
+  begin
+    tmrRefresh.Enabled := False;
+    tmrRefresh.Tag := 0;
+  end
+  else
+    tmrRefresh.Tag := tmrRefresh.Tag + 1;
+
+  PostMessage(Handle, wm_keyman_control, KMC_REFRESH, 0);
+end;
+
 procedure TfrmKeyman7Main.tmrTestKeymanFunctioningTimer(Sender: TObject);
 begin
   tmrTestKeymanFunctioning.Enabled := False;
@@ -2053,7 +2072,6 @@ var
   hk: HKEY;
   hEvent: THandle;
   hEvents: array[0..1] of THandle;
-  FWin8Languages: TWindows8LanguageList;
 const
   // We don't really know how long the changes are going to take
   // so we'll wait 500 msec and then ask the main thread to reload
@@ -2079,11 +2097,6 @@ begin
         if WaitForMultipleObjects(2, @hEvents[0], False, INFINITE) <> WAIT_OBJECT_0 then
           Exit;
 
-        // We'll wait a little bit because a bunch of changes are normally
-        // made at once, and we don't want to go crazy with refreshing
-        Sleep(ARBITRARY_WAIT_FOR_CHANGES);
-
-        // Ready to wait again
         ResetEvent(hEvent);
 
         // Start watching for changes again before requesting a refresh, so we
@@ -2092,9 +2105,8 @@ begin
             REG_NOTIFY_CHANGE_LAST_SET, hEvent, True) <> ERROR_SUCCESS then
           Exit;
 
-        // Finally, tell the main form to process the refresh
-        FWin8Languages := TWindows8LanguageList.Create(True);
-        PostMessage(FOwnerHandle, wm_keyman_control, MAKELONG(KMC_REFRESH, 1), LParam(FWin8Languages));
+        // Finally, tell the main form to get ready to process the refresh
+        PostMessage(FOwnerHandle, wm_keyman_control, MAKELONG(KMC_REFRESH, 1), 0);
       until False;
 
     finally

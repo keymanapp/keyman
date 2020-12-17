@@ -182,7 +182,7 @@ type
     destructor Destroy; override;
     procedure UpdateActive(FLangID: Cardinal; FActiveItemType: TLangSwitchItemType; FHKL: HKL); overload;   // I3933
     procedure UpdateActive(FLangID: Cardinal; FActiveItemType: TLangSwitchItemType; FClsid, FProfileGuid: TGUID); overload;   // I3933
-    procedure Refresh(ANewWin8Languages: TWindows8LanguageList = nil);
+    procedure Refresh;
     function FindKeyboard(FHKL: HKL; FProfileGuid: TGUID): TLangSwitchKeyboard; overload;
     function FindKeyboard(id: string): TLangSwitchKeyboard; overload;
     property Languages[Index: Integer]: TLangSwitchLanguage read GetLanguage;
@@ -406,7 +406,7 @@ begin
   TDebugLogClient.Instance.WriteMessage('[EnumTSFKeyboards] EXIT ---------------', []);
 end;
 
-procedure TLangSwitchManager.Refresh(ANewWin8Languages: TWindows8LanguageList);   // I3933
+procedure TLangSwitchManager.Refresh;   // I3933
 var
   i: Integer;
   j: Integer;
@@ -419,13 +419,7 @@ var
 //  templang: array[0..5] of TLangSwitchLanguage;   // I4715
 //  tempkbd: array[0..15] of TLangSwitchKeyboard;   // I4715
 begin
-  if Assigned(ANewWin8Languages) then
-  begin
-    FWin8Languages.Free;
-    FWin8Languages := ANewWin8Languages;
-  end
-  else
-    FWin8Languages.Refresh;
+  FWin8Languages.Refresh;
 
   FActiveItemType := lsitUnknown;
   FActiveLangID := 0;
