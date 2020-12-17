@@ -396,6 +396,7 @@ begin
     if ShowModal <> mrYes then
     begin
       Self.FParams.Result := oucUnknown;
+      Self.FErrorMessage := '';
       Exit;
     end;
 
