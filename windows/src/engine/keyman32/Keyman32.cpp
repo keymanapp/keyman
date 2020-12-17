@@ -689,21 +689,21 @@ BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
 
 void HandleRefresh(int code, LONG tag)
 {
-	switch(code)
-	{
-	case KR_REQUEST_REFRESH:
+  switch (code)
+  {
+  case KR_REQUEST_REFRESH:
     // This is sent by Keyman COM API, ApplyToRunningKeymanEngine
-		SendDebugMessageFormat(0,sdmGlobal,0,"#### Refresh Requested ####");
+    SendDebugMessageFormat(0, sdmGlobal, 0, "#### Refresh Requested ####");
 
     // We ask any controller window to tell all instances of keyman32/keyman64
     // that a refresh is coming through
-		Globals::PostControllers(wm_keyman_refresh, KR_PRE_REFRESH, 0);
+    Globals::PostControllers(wm_keyman_refresh, KR_PRE_REFRESH, 0);
 
     // We need to tell the controller windows to refresh themselves also
-		Globals::PostControllers(wm_keyman_control, KMC_REFRESH, 0);
-		break;
+    Globals::PostControllers(wm_keyman_control, KMC_REFRESH, 0);
+    break;
 
-	case KR_PRE_REFRESH:
+  case KR_PRE_REFRESH:
 #ifndef _WIN64
     // We only need to broadcast the message from Win32; this avoids
     // a double-broadcast which could happen if both keyman32 and keyman64
@@ -721,13 +721,13 @@ void HandleRefresh(int code, LONG tag)
 
     break;
 
-	case KR_REFRESH:
+  case KR_REFRESH:
     // All threads need to have their keyboard list
     // refreshed after an update, but only once per
     // refresh request
-    if(UpdateRefreshTag(tag))
-      RefreshKeyboards(FALSE);
-
+    //if (UpdateRefreshTag(tag)) {
+    ScheduleRefresh();
+    //}
     break;
 	}
 }
@@ -827,6 +827,31 @@ void RefreshKeyboardProfiles(INTKEYBOARDINFO *kp, BOOL isTransient) {
     delete reg2;
   }
 }
+
+void ScheduleRefresh() {
+  if (GetCurrentThreadId() == GetWindowThreadProcessId(GetForegroundWindow(), NULL)) {
+    RefreshKeyboards(FALSE);
+  }
+  else {
+    PKEYMAN64THREADDATA _td = ThreadGlobals();
+    if (!_td) {
+      return;
+    }
+    _td->RefreshRequired = TRUE;
+  }
+}
+
+void CheckScheduledRefresh() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return;
+  }
+  if (_td->RefreshRequired) {
+    RefreshKeyboards(FALSE);
+    _td->RefreshRequired = FALSE;
+  }
+}
+
 void RefreshKeyboards(BOOL Initialising)
 {
   OutputThreadDebugString("RefreshKeyboards");
