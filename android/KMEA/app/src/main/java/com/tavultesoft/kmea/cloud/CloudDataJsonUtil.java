@@ -307,14 +307,14 @@ public class CloudDataJsonUtil {
    * @param aDownload the download
    * @return the result
    */
-  public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload(CloudApiTypes.SingleCloudDownload aDownload)
+  public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload(
+    Context context, CloudApiTypes.SingleCloudDownload aDownload)
   {
       JSONParser jsonParser = new JSONParser();
       JSONArray dataArray = null;
       JSONObject dataObject = null;
 
-      // TODO: get context
-      File destinationFile = aDownload.getDestinationFile();
+      File destinationFile = aDownload.getDestinationFile(context);
       if (destinationFile != null && destinationFile.length() > 0) {
         try {
 

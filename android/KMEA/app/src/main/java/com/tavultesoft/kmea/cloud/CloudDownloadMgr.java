@@ -166,7 +166,7 @@ public class CloudDownloadMgr{
     ICloudDownloadCallback<ModelType,ResultType> _callback = aDownloadSet.getCallback();
 
     ResultType jsonTuple = _callback
-      .extractCloudResultFromDownloadSet(aDownloadSet);
+      .extractCloudResultFromDownloadSet(aContext, aDownloadSet);
 
     _callback.applyCloudDownloadToModel(aContext,aDownloadSet.getTargetModel(),jsonTuple);
   }

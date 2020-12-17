@@ -33,19 +33,17 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
 
   private File resourceRoot;
   private File cacheDir;
-  private Context context;
 
   @Override
   public void initializeContext(Context context)
   {
     resourceRoot = new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
     cacheDir = context.getCacheDir();
-    this.context = context;
   }
 
   @Override
   public CloudKeyboardDownloadReturns extractCloudResultFromDownloadSet(
-    CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
+    Context aContext, CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
   {
     LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
     List<Map<String, String>> installedLexicalModels = null;
@@ -53,7 +51,7 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
     int _result = FileUtils.DOWNLOAD_SUCCESS;
     for(CloudApiTypes.SingleCloudDownload _d:aDownload.getSingleDownloads())
     {
-      File destinationFile = _d.getDestinationFile(context);
+      File destinationFile = _d.getDestinationFile(aContext);
       if (destinationFile != null && destinationFile.length() > 0)
       {
 

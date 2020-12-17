@@ -35,7 +35,6 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
   private File resourceRoot;
   private File cacheDir;
   private String languageID;
-  private Context context;
 
   public void setLanguageID(String languageID) {
     this.languageID = languageID;
@@ -46,12 +45,11 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
   {
     resourceRoot = new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
     cacheDir = context.getCacheDir();
-    this.context = context;
   }
 
   @Override
   public CloudKeyboardDownloadReturns extractCloudResultFromDownloadSet(
-    CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
+    Context aContext, CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
   {
     PackageProcessor kbdKMPProcessor = new PackageProcessor(resourceRoot);
     List<Map<String, String>> installedKeyboards = null;
@@ -60,7 +58,7 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
     for(CloudApiTypes.SingleCloudDownload _d:aDownload.getSingleDownloads())
     {
 
-      File destinationFile = _d.getDestinationFile(context);
+      File destinationFile = _d.getDestinationFile(aContext);
       if (destinationFile != null && destinationFile.length() > 0)
       {
 
