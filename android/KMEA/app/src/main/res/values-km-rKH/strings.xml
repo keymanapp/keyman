@@ -4,62 +4,62 @@
     <!-- Application name (Keyman Engine for Android) -->
     <!-- Context: Title for list -->
     <plurals name="title_keyboards">
-        <item quantity="other">Keyboards</item>
+        <item quantity="other">ក្ដារចុច</item>
     </plurals>
     <!-- Context: Title for list -->
-    <string name="title_add_keyboard" comment="Add a new keyboard">Add New Keyboard</string>
+    <string name="title_add_keyboard" comment="Add a new keyboard">បន្ថែម​ក្ដារចុច​ថ្មី</string>
     <!-- Context: Title for list -->
-    <string name="title_languages_settings" comment="List of installed languages">Installed Languages</string>
+    <string name="title_languages_settings" comment="List of installed languages">ភាសាដែលបានដំឡើង</string>
     <!-- Context: Title for list -->
-    <string name="title_language_settings" comment="Keyman Settings for a language">%1$s Settings</string>
+    <string name="title_language_settings" comment="Keyman Settings for a language">ការកំណត់ %1$s</string>
     <!-- Context: Button label -->
-    <string name="label_add" comment="Button to add an item">Add</string>
+    <string name="label_add" comment="Button to add an item">បន្ថែម</string>
     <!-- Context: Button label -->
-    <string name="label_back" comment="Button to go back">Back</string>
+    <string name="label_back" comment="Button to go back">ត្រឡប់ក្រោយ</string>
     <!-- Context: Button label -->
-    <string name="label_cancel" comment="Button to cancel an action">Cancel</string>
+    <string name="label_cancel" comment="Button to cancel an action">បោះបង់</string>
     <!-- Context: Button label -->
-    <string name="label_close" comment="Close a dialog">Close</string>
+    <string name="label_close" comment="Close a dialog">បិទ</string>
     <!-- Context: Button label -->
-    <string name="label_close_keyman" comment="Close the Keyman application">Close Keyman</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">បិទ​ Keyman</string>
     <!-- Context: Button label -->
-    <string name="label_download" comment="Button to confirm downloading an item">Download</string>
+    <string name="label_download" comment="Button to confirm downloading an item"> ទាញយក</string>
     <!-- Context: Button label -->
-    <string name="label_install" comment="Confirmation to install a package">Install</string>
+    <string name="label_install" comment="Confirmation to install a package">ដំឡើង</string>
     <!-- Context: Button label -->
-    <string name="label_later" comment="Do an action at a later time">Later</string>
+    <string name="label_later" comment="Do an action at a later time">ពេលក្រោយ</string>
     <!-- Context: Button label -->
-    <string name="label_next" comment="Go to the next screen">Next</string>
+    <string name="label_next" comment="Go to the next screen">បន្ទាប់</string>
     <!-- Context: Button label -->
-    <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
+    <string name="label_ok" comment="Button to acknowledge a dialog">យល់ព្រម</string>
     <!-- Context: Button label -->
-    <string name="label_update" comment="Dialog button to update a resource">Update</string>
+    <string name="label_update" comment="Dialog button to update a resource">អាប់ដេត</string>
     <!-- Context: Keyboard Updates -->
-    <string name="cannot_connect" comment="Error message when network connection fails">\nCannot connect to Keyman server!\n</string>
+    <string name="cannot_connect" comment="Error message when network connection fails">\nមិនអាច​ភ្ជាប់​ទៅម៉ាស៊ីនមេ Keyman បានទេ!\n</string>
     <!-- Context: Keyboard Updates -->
-    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">Would you like to delete this keyboard?</string>
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">តើ​អ្នក​ចង់​លុប​ក្ដារចុច​នេះ​ឬ?</string>
     <!-- Context: Keyboard Updates -->
-    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">Would you like to download the latest version of this keyboard?</string>
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">តើ​អ្នក​ចង់​ទាញយក​ជំនាន់​ថ្មី​បំផុត​របស់​ក្ដារចុច​នេះ​ឬ?</string>
     <!-- Context: Keyboard Updates -->
     <string name="confirm_update" comment="Confirmation to update several resources">Would you like to update keyboards and dictionaries now?</string>
     <!-- Context: Keyboard Updates -->
-    <string name="keyboard_updates_channel">Resource Updates</string>
+    <string name="keyboard_updates_channel">ការអាប់ដេត​ធនធាន</string>
     <!-- Context: Keyboard Updates -->
-    <string name="keyboard_updates_available" comment="Notification when resource updates are available">Resource Updates Available</string>
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">មាន​ការអាប់ដេត​ធនធាន</string>
     <!-- Context: Keyboard Updates -->
-    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (Update Available)</string>
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (មាន​ការអាប់ដេត)</string>
     <!-- Context: Keyboard Updates -->
-    <string name="keyboard_update_message" comment="language name: keyboard name">      Updates available for keyboard %1$s: %2$s </string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      មាន​ការអាប់ដេត​សម្រាប់​ក្ដារចុច %1$s: %2$s </string>
     <!-- Context: Keyboard Updates -->
     <string name="dictionary_update_message">Updates available for dictionary %1$s: %2$s </string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
-    <string name="keyboard_version" comment="Label for keyboard version">Keyboard version</string>
+    <string name="keyboard_version" comment="Label for keyboard version">ជំនាន់​ក្ដារចុច</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
-    <string name="help_link" comment="Label for help link">Help link</string>
+    <string name="help_link" comment="Label for help link">តំណ​ជំនួយ</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
-    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">Uninstall keyboard</string>
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">លុប​ក្ដារចុច</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
-    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[ថ្មី] %1$s</string>
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_qr_code" comment="QR Code description">      Scan this code to load this\nkeyboard on another device</string>
     <!-- Context: Query for associated dictionary -->
