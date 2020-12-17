@@ -725,9 +725,10 @@ void HandleRefresh(int code, LONG tag)
     // All threads need to have their keyboard list
     // refreshed after an update, but only once per
     // refresh request
-    //if (UpdateRefreshTag(tag)) {
-    ScheduleRefresh();
-    //}
+    if (UpdateRefreshTag(tag)) {
+      // We'll update when we are called into action
+      ScheduleRefresh();
+    }
     break;
 	}
 }
