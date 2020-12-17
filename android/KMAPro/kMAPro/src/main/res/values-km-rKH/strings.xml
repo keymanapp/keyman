@@ -9,7 +9,7 @@
   <!-- Context: Menu Action -->
   <string name="action_overflow" comment="Show additional menu items">ច្រើន​ទៀត</string>
   <!-- Context: Menu Action -->
-  <string name="action_clear_text" comment="Menu action to erase text">សម្អាត​អក្សរ</string>
+  <string name="action_clear_text" comment="Menu action to erase text">លុប​​អក្សរ​ចេញ</string>
   <!-- Context: Menu Action -->
   <string name="action_info" comment="Menu action to display Keyman help page">ព័ត៌មាន</string>
   <!-- Context: Menu Action -->
@@ -19,7 +19,7 @@
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">ជំនាន់៖ %1$s</string>
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
-  <string name="textview_hint" comment="Prompt to start typing">ចាប់ផ្ដើម​វាយ​ទីនេះ&#8230;</string>
+  <string name="textview_hint" comment="Prompt to start typing">ចាប់ផ្ដើម​វាយអក្សរ​នៅ​ទីនេះ&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Text Size dialog -->
@@ -29,7 +29,7 @@
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">ទំហំ​អក្សរ​កាន់តែ​តូច</string>
   <!-- Context: Clear Text dialog -->
-  <string name="all_text_will_be_cleared" comment="Erase all the text">\nអក្សរ​ទាំង​អស់​នឹង​ត្រូវ​សម្អាត\n</string>
+  <string name="all_text_will_be_cleared" comment="Erase all the text">\nអក្សរ​ទាំង​អស់​នឹង​ត្រូវ​លុបចេញ\n</string>
   <!-- Context: Get Started menu -->
   <string name="get_started" comment="Menu for getting started">ចាប់ផ្ដើម</string>
   <!-- Context: Get Started menu -->
@@ -43,9 +43,9 @@
   <!-- Context: Get Started menu -->
   <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">បង្ហាញ \"%1$s\" ពេល​ចាប់​ផ្ដើម</string>
   <!-- Context: Android Storage Permission -->
-  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    To install keyboard packages, allow Keyman permission to read/write storage.</string>
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">ដើម្បី​ដំឡើងកញ្ចប់​ក្ដារចុច សូម​អនុញ្ញាត​ឱ្យ​ Keyman មាន​សិទ្ធិ​អាន/កែ​នៅលើ​​ឧបករណ៍​ផ្ទុក។</string>
   <!-- Context: Android Storage Permission -->
-  <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Storage permission request was denied. May fail to install keyboard package</string>
+  <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">សំណើ​សុំ​សិទ្ធិ​ចូល​ប្រើ​ឧបករណ៍​ផ្ទុក​ត្រូវ​បាន​បដិសេធ។ អាច​បរាជ័យ​ក្នុង​ការដំឡើង​កញ្ចប់​ក្ដារចុច</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">ការ​កំណត់</string>
   <!-- Context: Keyman Settings menu -->
@@ -55,17 +55,17 @@
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">ដំឡើង​ក្ដារ​ចុចឬ​ការណែនាំ​ពាក្យស្វ័យប្រវត្តិ</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_banner" comment="text suggestions banner">បង្ហាញ​បដា​ជានិច្ច</string>
+  <string name="show_banner" comment="text suggestions banner">Always show banner</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner_on" comment="Description when toggle is on">ត្រូវ​អនុវត្ត</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner_off" comment="Description when toggle is off">បើ​បិទ បដា​នឹង​បង្ហាញ​តែ​នៅ​ពេលបើក​ការណែនាំ​ពាក្យស្វ័យប្រវត្តិប៉ុណ្ណោះ</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report" comment="permission for sending crash reports">Allow sending crash reports over network</string>
+  <string name="show_send_crash_report" comment="permission for sending crash reports">អនុញ្ញាត​ឱ្យ​ផ្ញើ​របាយការណ៍​អំពី​ការគាំង​តាម​បណ្ដាញ</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report_on" comment="Description when toggle is on">When on, crash reports will be sent</string>
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">បើ​បើក របាយការណ៍​អំពី​ការគាំង​នឹង​ត្រូវ​បាន​ផ្ញើ</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report_off" comment="Description when toggle is off">When off, crash reports won\'t be sent</string>
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">បើ​បិទ របាយការណ៍​អំពី​ការគាំង​នឹង​មិន​ត្រូវ​បាន​ផ្ញើ​ទេ</string>
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">ដំឡើង​ពី keyman.com</string>
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
@@ -109,13 +109,13 @@
   <!-- Context: KMP Package strings -->
   <string name="install_predictive_text_package" comment="Title to install dictionary package">ដំឡើង​ការណែនាំពាក្យ​ស្វ័យប្រវត្តិ</string>
   <!-- Context: KMP Package strings -->
-  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Keyboard package has no touch-optimized keyboards to install</string>
+  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">កញ្ចប់​នេះ​គ្មាន​ក្ដារចុច​សម្រាប់​ឧបករណ៍​ចល័ត​ទេ</string>
   <!-- Context: KMP Package strings -->
   <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">គ្មាន​ការណែនាំពាក្យ​ស្វ័យប្រវត្តិថ្មីសម្រាប់​ដំឡើង​ទេ</string>
   <!-- Context: KMP Package strings -->
   <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">គ្មាន​ក្ដារចុច​ឬ​ការណែនាំ​ពាក្យ​ស្វ័យប្រវត្តិ​សម្រាប់​ដំឡើង​ទេ</string>
   <!-- Context: KMP Package strings -->
-  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Keyboard package has no associated languages to install</string>
+  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">កញ្ចប់ក្ដារចុច​នេះ​គ្មាន​ភាសា​ភាសា​ពាក់ព័ន្ធ​សម្រាប់​ដំឡើង​ទេ</string>
   <!-- Context: KMP Package strings -->
-  <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">គ្មានមេតាដាតា​ក្នុង​កញ្ចប់ ឬ​មេតាដាតា​ហ្នឹង​មិន​ត្រឹមត្រូវ</string>
+  <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">គ្មានទិន្នន័យមេតា​ក្នុង​កញ្ចប់ ឬ​ទិន្នន័យមេតា​ហ្នឹង​មិន​ត្រឹមត្រូវ</string>
 </resources>
