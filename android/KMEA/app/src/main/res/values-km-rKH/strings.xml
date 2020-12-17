@@ -59,9 +59,9 @@
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">លុប​ក្ដារចុច</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
-    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[ថ្មី] %1$s</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
-    <string name="keyboard_qr_code" comment="QR Code description">      Scan this code to load this\nkeyboard on another device</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      ស្កេនកូដ​នេះដើម្បី​ផ្ទុក​ក្ដារចុចនេះ\n​នៅ​លើ​ឧបករណ៍​ផ្សេង</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
     <!-- Context: Model Updates -->
@@ -69,19 +69,19 @@
     <!-- Context: No associated dictionary found -->
     <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">No dictionary to download</string>
     <!-- Context: Model Updates -->
-    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">The resource catalog is unavailable</string>
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">គ្មាន​បញ្ជី​ធនធាន​ទេ</string>
     <!-- Context: Background download messages-->
-    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">Catalog update started in background</string>
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">ការអាប់ដេត​បញ្ជី​បាន​ចាប់ផ្ដើម​ក្នុង​ផ្ទៃ​ខាងក្រោយ</string>
     <!-- Context: Background download messages-->
-    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">      The catalog is still downloading; please try again in a moment!</string>
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">      បញ្ជី​នេះ​កំពុង​ទាញយក សូមព្យាយាម​ម្ដងទៀត​ក្នុង​ពេល​ឆាប់ៗ នេះ!</string>
     <!-- Context: Background download messages-->
-    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">Checking for resource</string>
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">កំពុង​ពិនិត្យ​រក​ធនធាន</string>
     <!-- Context: Background download messages-->
-    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">Downloading keyboard started in Background</string>
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">ការទាញយក​ក្ដារចុច​បាន​ចាប់ផ្ដើម​ក្នុង​ផ្ទៃ​ខាងក្រោយ</string>
     <!-- Context: Background download messages-->
-    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">The selected keyboard is already downloading; please try again in a moment!</string>
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">ក្ដារចុច​ដែល​បាន​ជ្រើសរើស​នេះ​កំពុង​ទាញយកហើយ សូម​ព្យាយាម​ម្ដងទៀត​ក្នុង​ពេល​ឆាប់ៗ នេះ!</string>
     <!-- Context: Background download messages-->
-    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">Keyboard download is finished!</string>
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">ការទាញយក​ក្ដារចុចបាន​ចប់​សព្វគ្រប់​ហើយ!</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Downloading dictionary started in Background</string>
     <!-- Context: Background download messages-->
@@ -89,9 +89,9 @@
     <!-- Context: Background download messages-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Dictionary download is finished.</string>
     <!-- Context: General Updates -->
-    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Failed to access server!</string>
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">មិន​អាច​ចូលប្រើ​ម៉ាស៊ីនមេ​បាន​ទេ!</string>
     <!-- Context: General Updates -->
-    <string name="update_check_current" comment="Notification that all resources are up to date">"All resources are up to date!"</string>
+    <string name="update_check_current" comment="Notification that all resources are up to date">"ធនធានទាំង​អស់​គឺ​ថ្មី​បំផុត​ហើយ!"</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">Dictionary version</string>
     <!-- Context: Model Info -->
@@ -99,11 +99,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Would you like to delete this dictionary?</string>
     <!-- Context: Language Settings Keyboard install strings -->
-    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s keyboard installed</string>
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">បានដំឡើង​ក្ដារចុច %1$s</string>
     <!-- Context: Language Settings menu strings -->
-    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Enable corrections</string>
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">បើក​ការកែពាក្យ</string>
     <!-- Context: Language Settings menu strings -->
-    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Enable predictions</string>
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">បើក​ការណែនាំពាក្យ​ស្វ័យប្រវត្តិ</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dictionary</string>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
@@ -122,8 +122,8 @@
     <!-- Context: Content descriptions -->
     <!-- Context: Content descriptions -->
     <!-- Context: Popup menu labels -->
-    <string name="label_delete" comment="Confirmation to delete an item">Delete</string>
+    <string name="label_delete" comment="Confirmation to delete an item">លុប</string>
     <!-- Context: Shared preferences name -->
     <!-- Context: Other strings -->
-    <string name="help_bubble_text">Tap here to change keyboard</string>
+    <string name="help_bubble_text">ចុច​ត្រង់​នេះ​ដើម្បី​ប្ដូរ​ក្ដារចុច</string>
 </resources>
