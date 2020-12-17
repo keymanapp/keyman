@@ -496,6 +496,7 @@ begin
     fmInstallTipsForPackages:
       if TTipMaintenance.InstallTipsForPackages(KeyboardFileNames) then
       begin
+        // TTIPMaintenance never does a kmcom.Apply to notify
         kmcom.Apply;
         ExitCode := 0;
       end

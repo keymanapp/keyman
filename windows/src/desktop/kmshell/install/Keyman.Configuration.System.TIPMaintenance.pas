@@ -155,9 +155,11 @@ begin
       GetCurrentDir, childExitCode) or
     (childExitCode <> 0) then
   begin
+    kmcom.Refresh;
     Exit(False);
   end;
 
+  kmcom.Refresh;
   Result := True;
 end;
 
