@@ -27,43 +27,43 @@
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_OK" comment="Ok button term">OK</string>
+  <string name="S_Button_OK" comment="Ok button term">យល់ព្រម</string>
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_Cancel" comment="Cancel button term">Cancel</string>
+  <string name="S_Button_Cancel" comment="Cancel button term">បោះ​បង់</string>
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_Close" comment="Close button term">Close</string>
+  <string name="S_Button_Close" comment="Close button term">បិទ</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonOK" comment="OK button in message boxes">OK</string>
+  <string name="SKButtonOK" comment="OK button in message boxes">យល់ព្រម</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonCancel" comment="Cancel button in message boxes">Cancel</string>
+  <string name="SKButtonCancel" comment="Cancel button in message boxes">បោះ​បង់</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
-  <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Click this icon to select a keyboard</string>
+  <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">ចុច​អាយខុន​នេះ​ដើម្បី​ជ្រើសរើស​ក្ដារចុច</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
-  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman is still running.  Click this icon to use your language keyboard at any time</string>
+  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman កំពុង​ដំណើរការ​នៅឡើយ។ ចុច​អាយខុន​នេះ​ដើម្បី​ប្រើ​ក្ដារចុច​ភាសា​របស់​អ្នក​គ្រប់​ពេល</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_ConfigurationTitle" comment="Configuration dialog title, which includes the product name">Keyman Configuration</string>
+  <string name="S_ConfigurationTitle" comment="Configuration dialog title, which includes the product name">ការកំណត់​រចនាសម្ព័ន្ធ Keyman</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.239.0 -->
-  <string name="S_Caption_Help" comment="Configuration dialog link to Help">Help</string>
+  <string name="S_Caption_Help" comment="Configuration dialog link to Help">ជំនួយ</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Keyboards" comment="Keyboard Layouts tab name">Keyboard Layouts</string>
+  <string name="S_Keyboards" comment="Keyboard Layouts tab name">ប្លង់​ក្ដារចុច</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -71,7 +71,7 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Options" comment="Options tab name">Options</string>
+  <string name="S_Options" comment="Options tab name">ជម្រើស</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -79,7 +79,7 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkeys" comment="Hotkeys tab name">Hotkeys</string>
+  <string name="S_Hotkeys" comment="Hotkeys tab name">គ្រាប់​ចុច​ផ្លូវកាត់</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -87,7 +87,7 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Support" comment="Support tab name">Support</string>
+  <string name="S_Support" comment="Support tab name">គាំទ្រ</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -95,7 +95,7 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.493.0 -->
-  <string name="S_KeepInTouch" comment="Keep in touch tab name">Keep in Touch</string>
+  <string name="S_KeepInTouch" comment="Keep in touch tab name">ភ្ជាប់​ទំនាក់​ទំនង​ជាមូយ​យើង</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.492.0 -->
@@ -103,51 +103,51 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Filename" comment="Keyboard download window, etc. - term for filename">Filename:</string>
+  <string name="S_Caption_Filename" comment="Keyboard download window, etc. - term for filename">ឈ្មោះឯកសារ៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Version" comment="Keyboard download window, etc. - term for package version">Package version:</string>
+  <string name="S_Caption_Version" comment="Keyboard download window, etc. - term for package version">ជំនាន់​កញ្ចប់៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.442.0 -->
-  <string name="S_Caption_KeyboardVersion" comment="Keyboard download window, etc. - term for keyboard version">Keyboard version:</string>
+  <string name="S_Caption_KeyboardVersion" comment="Keyboard download window, etc. - term for keyboard version">ជំនាន់​ក្ដារចុច៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Author" comment="Keyboard download window, etc. - term for author">Author:</string>
+  <string name="S_Caption_Author" comment="Keyboard download window, etc. - term for author">អ្នកបង្កើត៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Website" comment="Keyboard download window, etc. - term for website">Website:</string>
+  <string name="S_Caption_Website" comment="Keyboard download window, etc. - term for website">គេហទំព័រ៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Package" comment="Keyboard download window, etc. - term for package">Package:</string>
+  <string name="S_Caption_Package" comment="Keyboard download window, etc. - term for package">កញ្ចប់៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Fonts" comment="Keyboard download window, etc. - term for fonts">Fonts:</string>
+  <string name="S_Caption_Fonts" comment="Keyboard download window, etc. - term for fonts">ពុម្ពអក្សរ៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">Keyboard Layouts:</string>
+  <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">ប្លង់​ក្ដារចុច៖</string>
   <!-- Context: Keyboard Install Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
-  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">Keyboard Layout:</string>
+  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">ប្លង់​ក្ដារចុច៖</string>
   <!-- Context: Keyboard Install Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
-  <string name="S_Caption_KeyboardLanguage" comment="Keyboard install dialog - term for caption for language selector a single keyboard layout">Keyboard Language:</string>
+  <string name="S_Caption_KeyboardLanguage" comment="Keyboard install dialog - term for caption for language selector a single keyboard layout">ភាសាក្ដារចុច៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Encodings" comment="Keyboard download window, etc. - term for encodings (encodings include Unicode, ANSI, Non-Unicode, etc).">Encodings:</string>
+  <string name="S_Caption_Encodings" comment="Keyboard download window, etc. - term for encodings (encodings include Unicode, ANSI, Non-Unicode, etc).">ការអ៊ីនកូដ៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_LayoutType" comment="Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic)">Layout Type:</string>
+  <string name="S_Caption_LayoutType" comment="Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic)">ប្រភេទ​ប្លង់៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -159,7 +159,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
-  <string name="S_Caption_Languages" comment="Text preceding linked language profiles">Languages:</string>
+  <string name="S_Caption_Languages" comment="Text preceding linked language profiles">ភាសា៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
@@ -167,23 +167,23 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
-  <string name="S_Languages_Install" comment="Add language profile">Add language</string>
+  <string name="S_Languages_Install" comment="Add language profile">បន្ថែមភាសា</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">On Screen Keyboard:</string>
+  <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">ក្ដារចុច​លើ​អេក្រង់៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_OnScreenKeyboard_Custom" comment="(OSK) Custom term">Custom</string>
+  <string name="S_OnScreenKeyboard_Custom" comment="(OSK) Custom term">តាមចំណូលចិត្ត</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OnScreenKeyboard_Installed" comment="(OSK) Installed term">Installed</string>
+  <string name="S_OnScreenKeyboard_Installed" comment="(OSK) Installed term">បានដំឡើង</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OnScreenKeyboard_NotInstalled" comment="(OSK) Not installed term">Not installed</string>
+  <string name="S_OnScreenKeyboard_NotInstalled" comment="(OSK) Not installed term">មិនបានដំឡើង</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
@@ -288,7 +288,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koStartWithWindows" comment="Startup options - Start Keyman with Windows start">Start when Windows starts</string>
+  <string name="koStartWithWindows" comment="Startup options - Start Keyman with Windows start">ចាប់ផ្ដើមពេល Windows​ ចាប់ផ្ដើម</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
