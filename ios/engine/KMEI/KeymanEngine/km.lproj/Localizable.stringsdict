@@ -27,7 +27,7 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>other</key>
-        <string>%u updates failed</string>
+        <string>មិន​អាច​អាប់ដេត​ %u ភាសា</string>
       </dict>
     </dict>
     <key>notification-update-success</key>
@@ -41,7 +41,7 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>other</key>
-        <string>%u updates successful</string>
+        <string>បាន​អាប់ដេត​ %u ភាសាដោយ​ជោគជ័យ​</string>
       </dict>
     </dict>
     <key>settings-keyboards-installed-count</key>
@@ -55,7 +55,7 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>other</key>
-        <string>%u keyboards installed</string>
+        <string>បាន​ដំឡើង​ក្ដារចុច​ចំនួន %u</string>
       </dict>
     </dict>
     <key>settings-languages-installed-count</key>
@@ -69,7 +69,7 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>other</key>
-        <string>%u languages installed</string>
+        <string>បានដំឡើង​ភាសា​ចំនួន %u</string>
       </dict>
     </dict>
     <key>package-default-found-keyboards</key>
@@ -83,7 +83,7 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>other</key>
-        <string>Found %u keyboards in package:</string>
+        <string>បាន​រក​ឃើញ​ក្ដារចុច​ចំនួន %u ក្នុង​កញ្ចប់៖</string>
       </dict>
     </dict>
     <key>package-default-found-lexical-models</key>
