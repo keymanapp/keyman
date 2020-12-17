@@ -359,6 +359,8 @@ void _OutputThreadDebugString(char *s);
 void HandleRefresh(int code, LONG tag);
 void RefreshKeyboards(BOOL Initialising);
 void ReleaseKeyboards(BOOL Lock);
+void CheckScheduledRefresh();
+void ScheduleRefresh();
 
 /* Glossary conversion functions */
 
