@@ -51,7 +51,7 @@
     <!-- Context: Keyboard Updates -->
     <string name="keyboard_update_message" comment="language name: keyboard name">      មាន​ការអាប់ដេត​សម្រាប់​ក្ដារចុច %1$s: %2$s </string>
     <!-- Context: Keyboard Updates -->
-    <string name="dictionary_update_message">Updates available for dictionary %1$s: %2$s </string>
+    <string name="dictionary_update_message">មាន​ការអាប់ដេត​សម្រាប់បញ្ជី​ពាក្យ %1$s៖ %2$s </string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_version" comment="Label for keyboard version">ជំនាន់​ក្ដារចុច</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
@@ -63,11 +63,11 @@
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_qr_code" comment="QR Code description">      ស្កេនកូដ​នេះដើម្បី​ផ្ទុក​ក្ដារចុចនេះ\n​នៅ​លើ​ឧបករណ៍​ផ្សេង</string>
     <!-- Context: Query for associated dictionary -->
-    <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">កំពុង​ពិនិត្យ​រក​បញ្ជី​ពាក្យ​ពាក់ព័ន្ធ​ដើម្បី​ទាញយក</string>
     <!-- Context: Model Updates -->
-    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Would you like to download the latest version of this dictionary?</string>
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">តើ​អ្នក​ចង់​ទាញយក​ជំនាន់​ថ្មី​បំផុត​របស់​បញ្ជី​ពាក្យនេះ​ឬ?</string>
     <!-- Context: No associated dictionary found -->
-    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">No dictionary to download</string>
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">គ្មាន​បញ្ជី​ពាក្យ​ឱ្យ​ទាញ​យក​ទេ</string>
     <!-- Context: Model Updates -->
     <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">គ្មាន​បញ្ជី​ធនធាន​ទេ</string>
     <!-- Context: Background download messages-->
@@ -83,21 +83,21 @@
     <!-- Context: Background download messages-->
     <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">ការទាញយក​ក្ដារចុចបាន​ចប់​សព្វគ្រប់​ហើយ!</string>
     <!-- Context: Background download messages-->
-    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Downloading dictionary started in Background</string>
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">ការទាញយកបញ្ជី​ពាក្យបាន​ចាប់ផ្ដើម​ក្នុង​ផ្ទៃ​ខាងក្រោយ</string>
     <!-- Context: Background download messages-->
-    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">The selected dictionary is already downloading; please try again in a moment!</string>
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">បញ្ជី​ពាក្យ​ដែល​បាន​ជ្រើសរើស​នេះ​កំពុង​ទាញយកហើយ សូម​ព្យាយាម​ម្ដងទៀត​ក្នុង​ពេល​ឆាប់ៗ នេះ!</string>
     <!-- Context: Background download messages-->
-    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Dictionary download is finished.</string>
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">ការទាញយកបញ្ជី​ពាក្យបាន​ចប់​សព្វគ្រប់​ហើយ!</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">មិន​អាច​ចូលប្រើ​ម៉ាស៊ីនមេ​បាន​ទេ!</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"ធនធានទាំង​អស់​គឺ​ថ្មី​បំផុត​ហើយ!"</string>
     <!-- Context: Model Info -->
-    <string name="model_version" comment="Title for a dictionary version">Dictionary version</string>
+    <string name="model_version" comment="Title for a dictionary version">ជំនាន់​របស់បញ្ជី​ពាក្យ</string>
     <!-- Context: Model Info -->
-    <string name="uninstall_model" comment="Label to uninstall a dictionary">Uninstall dictionary</string>
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">លុប​បញ្ជី​ពាក្យ</string>
     <!-- Context: Model Info -->
-    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Would you like to delete this dictionary?</string>
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">តើ​អ្នក​ចង់​លុប​បញ្ជី​ពាក្យនេះ​ឬ?</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">បានដំឡើង​ក្ដារចុច %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -105,16 +105,16 @@
     <!-- Context: Language Settings menu strings -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">បើក​ការណែនាំពាក្យ​ស្វ័យប្រវត្តិ</string>
     <!-- Context: Language Settings menu strings -->
-    <string name="model_label">Dictionary</string>
+    <string name="model_label">បញ្ជី​ពាក្យ</string>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
-    <string name="check_available_model" comment="Check for available dictionary">Check for available dictionary</string>
+    <string name="check_available_model" comment="Check for available dictionary">ពិនិត្យ​រក​បញ្ជី​ពាក្យ</string>
     <!-- Context: Language Settings menu strings -->
-    <string name="model_info_header" comment="Dictionary name">Dictionary: %1$s</string>
+    <string name="model_info_header" comment="Dictionary name">បញ្ជី​ពាក្យ៖ %1$s</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_picker_header" comment="Dictionaries for a specified language">%1$s dictionaries</string>
     <!-- Context: Language Settings menu strings -->
     <!-- Context: Language Settings menu strings -->
-    <string name="model_install_toast" comment="Notification when a dictionary is installed">Dictionary installed</string>
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">បញ្ជី​ពាក្យដែល​បាន​ដំឡើង</string>
     <!-- Context: Language Settings menu strings -->
     <plurals name="keyboard_count">
         <item quantity="other">(%1$d keyboards)</item>
