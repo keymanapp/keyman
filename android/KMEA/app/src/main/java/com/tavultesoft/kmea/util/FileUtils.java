@@ -3,17 +3,7 @@
  */
 package com.tavultesoft.kmea.util;
 
-import android.app.DownloadManager;
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.OpenableColumns;
-import android.renderscript.ScriptGroup;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.tavultesoft.kmea.util.DownloadManagerFileInfo;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -24,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -60,57 +49,6 @@ public final class FileUtils {
   public static final String KEYMANPACKAGE = ".kmp";
   public static final String WELCOME_HTM = "welcome.htm";
   public static final String README_HTM = "readme.htm";
-
-  /**
-   * Utility to copy a downloaded file from DownloadManager and return info.
-   * Currently, this only handles URI schemes of "content" and "file".
-   * @param context
-   * @param {Uri} data
-   * @return DownloadManagerFileInfo
-   */
-  public static DownloadManagerFileInfo cacheAndGetDownloadInfo(Context context, Uri data) {
-    boolean isKMP = false;
-    String filename = "";
-    File cachedFile = null;
-    InputStream inputFile = null;
-    try {
-      switch (data.getScheme().toLowerCase()) {
-        case "content":
-          // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
-          Cursor cursor = context.getContentResolver().query(data, null, null, null, null);
-          cursor.moveToFirst();
-          int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-          filename = cursor.getString(nameIndex);
-          isKMP = FileUtils.hasKeymanPackageExtension(filename);
-          inputFile = context.getContentResolver().openInputStream(data);
-          break;
-
-        case "file":
-          File kmpFile = new File(data.getPath());
-          filename = kmpFile.getName();
-          isKMP = FileUtils.hasKeymanPackageExtension(data.toString());
-          inputFile = new FileInputStream(kmpFile);
-          break;
-      }
-
-      if (inputFile != null && filename != null) {
-        cachedFile = new File(context.getCacheDir().toString(), filename);
-        if (cachedFile.exists()) {
-          cachedFile.delete();
-        }
-
-        FileUtils.copy(inputFile, new FileOutputStream(cachedFile));
-      }
-    } catch (Exception e) {
-      String message = "Access denied to " + filename +
-        ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
-      KMLog.LogException(TAG, "Unable to copy " + filename + " to app cache ", e);
-      Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-    }
-
-    DownloadManagerFileInfo info = new DownloadManagerFileInfo(isKMP, filename, cachedFile);
-    return info;
-  }
 
   /**
    * Utility to download a file from urlStr and store it at destinationDir/destinationFilename.

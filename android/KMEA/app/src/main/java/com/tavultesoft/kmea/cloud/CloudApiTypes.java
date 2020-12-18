@@ -7,8 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.tavultesoft.kmea.util.DownloadManagerFileInfo;
-import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.DownloadFileUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -147,9 +146,8 @@ public class CloudApiTypes {
     public File getDestinationFile(Context context) {
       DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
       Uri data = downloadManager.getUriForDownloadedFile(downloadId);
-      DownloadManagerFileInfo info = FileUtils.cacheAndGetDownloadInfo(context, data);
+      DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
       File cachedFile = info.getFile();
-      Log.d("CloudApiTypes", "cached file: " + cachedFile.toString());
       return cachedFile;
     }
 

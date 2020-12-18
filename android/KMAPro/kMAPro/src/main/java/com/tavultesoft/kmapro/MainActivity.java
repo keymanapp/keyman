@@ -31,8 +31,8 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.DownloadFileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
-import com.tavultesoft.kmea.util.DownloadManagerFileInfo;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 
@@ -811,7 +811,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
-    DownloadManagerFileInfo info = FileUtils.cacheAndGetDownloadInfo(context, data);
+    DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
     boolean isKMP = info.isKMP();
     String filename = info.getFilename();
     File cacheKMPFile = info.getFile();
