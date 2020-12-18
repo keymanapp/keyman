@@ -314,7 +314,7 @@ type
     frmLanguageSwitch: TfrmLanguageSwitch;
 
     procedure SetLastFocus;
-    procedure ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; NearTray: Boolean; IconRect: TRect);   // I3961   // I3990
+    procedure ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; TriggeredByKeyboard: Boolean);   // I3961   // I3990
     procedure ActivateKeyboard(Keyboard: TLangSwitchKeyboard);   // I4326
 
     function ActiveKeyboard: IKeymanKeyboardInstalled;
@@ -897,7 +897,7 @@ begin
 
   case Target of
     khKeymanOff: SwitchToFirstWindowsKeyboard;  // I1867
-    khKeyboardMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, True, Rect(0,0,0,0)); // I1377 - Show the menu down near the tray when hotkey is pressed   // I3990
+    khKeyboardMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, True); // I1377 - Show the menu down near the tray when hotkey is pressed   // I3990
     khVisualKeyboard: MnuVisualKeyboard(nil);
     khKeymanConfiguration: TKeymanDesktopShell.RunKeymanConfiguration('-c 0');
     khFontHelper: MnuFontHelper(nil);
@@ -983,60 +983,125 @@ begin
     TDebugLogClient.Instance.WriteMessage('LanguageSwitchFormHidden: kbd NOT assigned',[]);
 end;
 
-procedure TfrmKeyman7Main.ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; NearTray: Boolean; IconRect: TRect);   // I3990   // I3991
+procedure TfrmKeyman7Main.ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; TriggeredByKeyboard: Boolean);   // I3990   // I3991
 var
-  pt: TPoint;
-  r: TRect;
+  hwndTray, hwndSysTray: THandle;
+
+  function FindSysTrayLocation: TAlign;
+  var
+    r: TRect;
+    m: TMonitor;
+  begin
+    // Note: we don't use SHAppBarMessage because it is re-entrant
+    // It also does not honour the DPI awareness of the caller
+
+    // If we can't find the tray window, assume it is at the bottom of the
+    // primary screen
+
+    if (hwndTray = 0) or not GetWindowRect(hwndTray, r) then
+      Exit(alBottom);
+
+    m := Screen.MonitorFromPoint(r.CenterPoint, mdNearest);
+    if not Assigned(m) then
+      // Could not find monitor, perhaps a race condition, see I2693, I2820
+      // This may never happen as it may have been a VCL bug, but I'm including
+      // it just for safety given it can return nil.
+      Exit(alBottom);
+
+    if r.Left = m.Left then
+    begin
+      if r.Top = m.Top then
+      begin
+        if r.Right = m.BoundsRect.Right then
+          Exit(alTop);
+        Exit(alLeft);
+      end;
+      Exit(alBottom)
+    end;
+    Exit(alRight);
+  end;
+
+  function GetMenuAnchorPoint(systraylocation: TAlign): TPoint;
+  var
+    pt: TPoint;
+    r: TRect;
+    ident: NOTIFYICONIDENTIFIER;
+    dpi: Cardinal;
+    m: TMonitor;
+  begin
+    // We'll try and get the actual location of our icon
+    ident.cbSize := SizeOf(ident);
+    ident.hWnd := FRunningProduct.FTrayIcon.NotificationWindow;
+    ident.uID := 1;
+    ident.guidItem := GUID_NULL;
+    if TriggeredByKeyboard or (Shell_NotifyIconGetRect(ident, r) <> S_OK) then
+    begin
+      // User has requested the menu with a hotkey, so show it near the
+      // SystemNotificationArea, but not actually where our icon is, because
+      // the icon may be hidden (or if we fail to get the location of our icon,
+      // for any reason)
+      if not GetWindowRect(hwndSysTray, r) then
+        r := TRect.Empty;
+    end
+    else
+    begin
+      // Shell_NotifyIconGetRect does not honour the DPI awareness of the caller
+      // and as we do not yet support per-monitor DPI awareness, we have to
+      // scale the rectangle by its actual DPI to our fixed 96 DPI value to
+      // get the location of the rect in our 96 DPI world. As a monitor may have
+      // a non-zero origin, we have to deal with that too!
+      dpi := GetDpiForWindow(hwndTray);
+      m := Screen.MonitorFromWindow(hwndTray);
+      if Assigned(m) then
+      begin
+        r.Right := MulDiv(r.Right-m.Left, 96, dpi) + m.Left;
+        r.Bottom := MulDiv(r.Bottom-m.Top, 96, dpi) + m.Top;
+        r.Left := MulDiv(r.Left-m.Left, 96, dpi) + m.Left;
+        r.Top := MulDiv(r.Top-m.Top, 96, dpi) + m.Top;
+      end
+      else if not GetWindowRect(hwndSysTray, r) then
+        r := TRect.Empty;
+    end;
+
+    // Align the menu according to the location of the taskbar
+    case systraylocation of
+      alTop:    begin pt.X := (r.Right + r.Left) div 2; pt.Y := r.Bottom; end;
+      alBottom: begin pt.X := (r.Right + r.Left) div 2; pt.Y := r.Top; end;
+      alLeft:   begin pt.X := r.Right; pt.Y := r.Top; end;
+      alRight:  begin pt.X := r.Left; pt.Y := r.Top; end;
+    end;
+
+    Result := pt;
+  end;
+
+var
   systraylocation: TAlign;
-  hwndSysTray, hwndTray, hwnd: THandle;
+  hwnd: THandle;
+  pt: TPoint;
 begin   // I3933
   if not Assigned(Sender) and not Assigned(FRunningProduct) then
     Exit;
 
   if InMenuLoop > 0 then Exit;  // I1082 - Avoid menu nasty flicker with rapid click
 
+  hwndTray := FindWindow('Shell_TrayWnd', nil);
+  hwndSysTray := FindWindowEx(hwndTray, 0, 'TrayNotifyWnd', nil);
+
   BuildCustMenu(kmcom, mnu, Location);   // I3933
 
   GetCursorPos(pt);
 
-  mnu.Alignment := paLeft;
+  mnu.Alignment := paCenter;
 
-  if NearTray then  // I1377
-  begin
-    hwndTray := FindWindow('Shell_TrayWnd', nil);
-    hwndSysTray := FindWindowEx(hwndTray, 0, 'TrayNotifyWnd', nil);
-    if hwndSysTray <> 0 then
-    begin
-      GetWindowRect(hwndTray, r);
-      if r.Left = 0 then
-        if r.Top = 0 then
-          if r.Right = GetSystemMetrics(SM_CXSCREEN) then
-            systraylocation := alTop
-          else
-            systraylocation := alLeft
-        else
-          systraylocation := alBottom
-      else
-        systraylocation := alRight;
-
-      GetWindowRect(hwndSysTray, r);
-
-      case systraylocation of
-        alTop:    begin pt.X := (r.Right + r.Left) div 2; pt.Y := r.Bottom + 8; end;
-        alBottom: begin pt.X := (r.Right + r.Left) div 2; pt.Y := r.Top - 8; end;
-        alLeft:   begin pt.X := r.Right + 8; pt.Y := r.Top + 8; end;
-        alRight:  begin pt.X := r.Left - 8; pt.Y := r.Top + 8; end;
-      end;
-      mnu.Alignment := paCenter;
-    end;
-  end;
+  systraylocation := FindSysTrayLocation;
+  pt := GetMenuAnchorPoint(systraylocation);
 
   case Location of
     milLeft:  mnu.TrackButton := tbLeftButton;
     milRight: mnu.TrackButton := tbRightButton;
   end;
 
-  hwnd := FLastFocus;// kmcom.Control.LastFocusWindow;
+  hwnd := FLastFocus;
 
   if not IsDebuggerPresent then
   begin
@@ -1046,7 +1111,7 @@ begin   // I3933
     AttachThreadInput(GetCurrentThreadId, GetwindowThreadProcessId(hwnd, nil), FALSE);
   end;
 
-  frmKeymanMenu.PopupEx(mnu, pt.x, pt.y, IconRect)   // I3990
+  frmKeymanMenu.PopupEx(mnu, pt.x, pt.y, systraylocation);   // I3990
 end;
 
 procedure TfrmKeyman7Main.PostGlobalKeyboardChange(FActiveKeyboard: TLangSwitchKeyboard);   // I4271
@@ -1104,8 +1169,8 @@ begin
       then begin FTrayButtonDown := []; end // balloon click
       else Exclude(FTrayButtonDown, Button);
     if Button = mbLeft
-      then TestKeymanFunctioning(tkfPopupMenu, True, True)   //ShowMenu(Sender, milLeft)
-      else ShowMenu(Sender, milRight, False, Rect(0,0,0,0));   // I3990
+      then TestKeymanFunctioning(tkfPopupMenu, True, True)
+      else ShowMenu(Sender, milRight, False);   // I3990
   end;
 end;
 
@@ -1711,7 +1776,7 @@ begin
   if FunctionType = tkfPopupMenu then
   begin
     // We are only going to do it on SetActiveKeyboard for now
-    ShowMenu(FRunningProduct.FTrayIcon, milLeft, False, Rect(0,0,0,0));   // I3990
+    ShowMenu(FRunningProduct.FTrayIcon, milLeft, False);   // I3990
     Exit;
   end;
 
@@ -1728,7 +1793,7 @@ begin
 	else if RunOnSuccess then
   begin
     case FunctionType of
-      tkfPopupMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, False, Rect(0,0,0,0));   // I3990
+      tkfPopupMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, False);   // I3990
                       		// we know this is from a mouse click as kbd method tells us we know Keyman is working
     end;
   end;
