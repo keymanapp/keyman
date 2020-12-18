@@ -3,7 +3,6 @@ package com.tavultesoft.kmea.cloud;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
