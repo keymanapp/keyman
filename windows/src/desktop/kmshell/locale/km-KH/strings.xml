@@ -151,11 +151,11 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_LayoutType_Positional" comment="Keyboard download window, etc. - term for the fixed keyboard layout type">Fixed (Positional)</string>
+  <string name="S_LayoutType_Positional" comment="Keyboard download window, etc. - term for the fixed keyboard layout type">ជាប់ (ផ្អែក​លើ​ទីតាំងគ្រាប់ចុច​ស្តង់ដារ)</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_LayoutType_Mnemonic" comment="Keyboard download window, etc. - term for the mnemonic keyboard layout type">Mapped to Windows layout (Mnemonic)</string>
+  <string name="S_LayoutType_Mnemonic" comment="Keyboard download window, etc. - term for the mnemonic keyboard layout type">ភ្ជាប់​ទៅ​ប្លង់​របស់​ Windows (ផ្អែក​លើ​ប្លង់របស់​ក្ដារចុចហាដវែរ)</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
@@ -187,60 +187,60 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_Caption_Documentation" comment="Term for the Documentation">Documentation:</string>
+  <string name="S_Caption_Documentation" comment="Term for the Documentation">ឯកសារ៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_Documentation_Installed" comment="(Documentation) Installed term">Installed</string>
+  <string name="S_Documentation_Installed" comment="(Documentation) Installed term">បានដំឡើង</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_Documentation_NotInstalled" comment="(Documentation) Not installed term">Not installed</string>
+  <string name="S_Documentation_NotInstalled" comment="(Documentation) Not installed term">មិនបានដំឡើង</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Message" comment="Keyboard download window, etc. - term for additional messages">Message:</string>
+  <string name="S_Caption_Message" comment="Keyboard download window, etc. - term for additional messages">សារ៖</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">Copyright:</string>
+  <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">រក្សាសិទ្ធិ៖</string>
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
-  <string name="S_Footer_ChangesImmediate" comment="Short-term (14.0) message explaining why Ok and Cancel buttons are no longer present">Changes are applied immediately</string>
+  <string name="S_Footer_ChangesImmediate" comment="Short-term (14.0) message explaining why Ok and Cancel buttons are no longer present">ការផ្លាស់ប្ដូរ​ត្រូវ​បាន​អនុវត្ត​ភ្លាមៗ</string>
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">Install keyboard...</string>
+  <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">ដំឡើងក្ដារចុច...</string>
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_DownloadKeyboard" comment="Keyboard Layouts - download keyboard button">Download keyboard...</string>
+  <string name="S_Button_DownloadKeyboard" comment="Keyboard Layouts - download keyboard button">ទាញយក​ក្ដារចុច...</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
-  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Keyboard options</string>
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">ជម្រើស​ក្ដារចុច</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">You do not have any keyboards installed.  Click the Download Keyboard button to install a keyboard layout from the Keyman website.</string>
+  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">អ្នក​មិន​ទាន់​បាន​ដំឡើង​ក្ដារចុចណាមួយ​ទេ។ ចុចប៊ូតុង \"ទាញយកក្ដារចុច\" ដើម្បី​ដំឡើងប្លង់​ក្ដារចុច​មួយ​ពី​គេហទំព័រ Keyman។</string>
   <!-- Parameters: %0:s = keyboard layout name -->
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- Introduced: 7.1.251.0 -->
   <!-- String Type: PlainText -->
-  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">You can only uninstall the keyboard \'%0:s\' if you are an Administrator</string>
+  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">អ្នក​អាច​លុប​ក្ដារចុច \'%0:s\' នេះ​បាន ប្រសិន​បើ​អ្នក​ជា​អ្នក​គ្រប់​គ្រង (Administrator)</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
-  <string name="S_Keyboard_Share" comment="Keyboard Layouts - share selected keyboard button">Share keyboard</string>
+  <string name="S_Keyboard_Share" comment="Keyboard Layouts - share selected keyboard button">ចែករំលែក​ក្ដារចុច</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
-  <string name="S_Keyboard_Share_QRCode" comment="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">Scan this code to load this keyboard on another device or </string>
+  <string name="S_Keyboard_Share_QRCode" comment="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">ស្កេនកូដ​នេះដើម្បី​ផ្ទុក​ក្ដារចុចនេះ​នៅ​លើ​ឧបករណ៍​ផ្សេង ឬ </string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
-  <string name="S_Keyboard_Share_Link" comment="Keyboard Layouts - text for link to share">share online</string>
+  <string name="S_Keyboard_Share_Link" comment="Keyboard Layouts - text for link to share">ចែករំលែក​អនឡាញ</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
@@ -248,43 +248,43 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="kogGeneral" comment="Options section - General">General</string>
+  <string name="kogGeneral" comment="Options section - General">ទូទៅ</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="kogStartup" comment="Options section - Startup">Startup</string>
+  <string name="kogStartup" comment="Options section - Startup">ការ​ចាប់​ផ្ដើម</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="kogOSK" comment="Options section - OSK">On Screen Keyboard</string>
+  <string name="kogOSK" comment="Options section - OSK">ក្ដារចុច​លើ​អេក្រង់</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="kogAdvanced" comment="Options section - Advanced">Advanced</string>
+  <string name="kogAdvanced" comment="Options section - Advanced">កម្រិតខ្ពស់</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koKeyboardHotkeysAreToggle" comment="General options - hotkeys toggle on AND off a keyboard layout">Keyboard hotkeys toggle keyboard activation</string>
+  <string name="koKeyboardHotkeysAreToggle" comment="General options - hotkeys toggle on AND off a keyboard layout">គ្រាប់​ចុចផ្លូវកាត់​​បិទ​/បើក​ដំណើរការ​ក្ដារចុច</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Simulate AltGr with Ctrl+Alt</string>
+  <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">ជំនួស AltGr ដោយ Ctrl+Alt</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
-  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Treat hardware deadkeys as plain keys</string>
+  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">ចាត់​ទុក​គ្រាប់​ចុច Deadkey ជា​គ្រាប់ចុច​ទទេ</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="koShowHints" comment="General options - show/hide hint messages (resets hint messages individually disabled)">Show hint messages</string>
+  <string name="koShowHints" comment="General options - show/hide hint messages (resets hint messages individually disabled)">បង្ហាញ​សារ​គន្លឹះ</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0 -->
-  <string name="koAutomaticallyReportErrors" comment="General options - report errors to Keyman team automatically">Automatically report errors to keyman.com</string>
+  <string name="koAutomaticallyReportErrors" comment="General options - report errors to Keyman team automatically">រាយការណ៍​ពី​បញ្ហា​ទៅ keyman.com ដោយ​ស្វ័យប្រវត្តិ</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0 -->
-  <string name="koAutomaticallyReportUsage" comment="General options - report anonymous usage to Keyman team automatically">Share anonymous usage statistics with keyman.com</string>
+  <string name="koAutomaticallyReportUsage" comment="General options - report anonymous usage to Keyman team automatically">ចែករំលែក​ស្ថិតិ​ប្រើប្រាស់​អនាមិក​ជាមួយ keyman.com</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -292,59 +292,59 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koShowStartup" comment="Startup options - show/hide splash screen">Show splash screen</string>
+  <string name="koShowStartup" comment="Startup options - show/hide splash screen">បង្ហាញ​ផ្ទាំង​អេក្រង់​ពេល​កំពុង​ផ្ទុក​ក្ដារចុច</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Show welcome screen</string>
+  <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">បង្ហាញ​អេក្រង់​ស្វាគមន៍</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Automatically check keyman.com weekly for updates</string>
+  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">ពិនិត្យ​រក​អាប់ដេតនៅលើ keyman.com ដោយស្វ័យប្រវត្តិ​រៀងរាល់​សប្ដាហ៍</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
-  <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Test for conflicting applications when Keyman starts</string>
+  <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">តេស្ត​រក​កម្មវិធីដែល​ប្រឆាំងគ្នា ពេល Keyman ចាប់ផ្ដើម</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
-  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">Release Shift/Ctrl/Alt on On Screen Keyboard after clicking a key</string>
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">ដក​ការចុច​ចេញ​ពីគ្រាប់​ចុច Shift/Ctrl/Alt នៅលើ​ \"ក្ដារចុច​លើ​អេក្រង់\" បន្ទាប់​ពី​បាន​ចុច​គ្រាប់​ចុច​ណា​មួយ</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">Always show On Screen Keyboard Window when Keyman keyboard is selected</string>
+  <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">បង្ហាញ \"ក្ដារចុចលើអេក្រង់\" ជា​និច្ច នៅពេល​បាន​ជ្រើសរើស​ក្ដារចុច Keyman</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Switch to appropriate On Screen Keyboard/Help automatically when a keyboard is selected</string>
+  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">ប្ដូរ​ទៅ \"ក្ដារចុច​លើអេក្រង់/ជំនួយ\" ដែល​ពាក់ព័ន្ធ​ដោយ​ស្វ័យប្រវត្តិ នៅពេល​ក្ដារចុច​ណាមួយត្រូវ​បាន​ជ្រើសរើស​</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koTurnOnSurrogates" comment="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">Turn on Unicode supplementary character display (requires restart)</string>
+  <string name="koTurnOnSurrogates" comment="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">បើក​ការបង្ហាញ​តួ​អក្សរ​បន្ថែមរបស់យូនីកូដ (តម្រូវ​ឱ្យ​បិទ​រួច​បើក​ឡើង​វិញ)</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koUnknownLanguage" comment="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">Turn on \'Unknown\' language</string>
+  <string name="koUnknownLanguage" comment="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">បើក​ភាសា \'ដែល​មិន​ស្គាល់\'</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Debugging</string>
+  <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">កំពុង​ប្រមូល​ព័ត៌មានសម្រាប់​ដោះស្រាយ​បញ្ហា</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="koSwitchLanguageWithKeyboard" comment="Advanced options - switch Windows language when keyboard selected">Switch Windows language when a Keyman keyboard is selected</string>
+  <string name="koSwitchLanguageWithKeyboard" comment="Advanced options - switch Windows language when keyboard selected">ប្ដូរ​ភាសារបស់ Windows នៅ​ពេល​ក្ដារចុច Keyman ណាមួយ​ត្រូវ​បាន​ជ្រើសរើស</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.1.274.0 -->
-  <string name="koSwitchLanguageForAllApplications" comment="Advanced options - selected language applies to all applications">Select keyboard layout for all applications</string>
+  <string name="koSwitchLanguageForAllApplications" comment="Advanced options - selected language applies to all applications">ជ្រើសរើស​ប្លង់​ក្ដារចុចសម្រាប់​កម្មវិធី​ទាំង​អស់</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permisable level">Always elevate user permissions when running in Windows Vista</string>
+  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permisable level">បើក​ការអនុញ្ញាត​របស់​អ្នក​ប្រើប្រាស់​ជានិច្ច នៅពេល​កំពុង​ដំណើរការលើ Windows Vista</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_Button_BaseKeyboard" comment="Options tab - base keyboard button">Base Keyboard...</string>
+  <string name="S_Button_BaseKeyboard" comment="Options tab - base keyboard button">ក្ដារចុច​មូលដ្ឋាន</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.241.0 -->
@@ -357,35 +357,35 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set for an option">(none)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set for an option">(គ្មាន)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_TurnKeymanOff" comment="Hotkey - Turn Product Off">Switch Keyman Off</string>
+  <string name="S_Hotkey_TurnKeymanOff" comment="Hotkey - Turn Product Off">បិទ​ដំណើរការ Keyman</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman systemtray menu">Open Keyboard Menu</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman systemtray menu">បើក​ម៉ឺនុយ​ក្ដារចុច</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="Hotkey - show keyboard in OSK">Show On Screen Keyboard Pane</string>
+  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="Hotkey - show keyboard in OSK">បង្ហាញ​ផ្ទាំង \"ក្ដារចុច​លើ​អេក្រង់\"</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_OpenConfiguration" comment="Hotkey - open Keyman Configuration">Open Configuration</string>
+  <string name="S_Hotkey_OpenConfiguration" comment="Hotkey - open Keyman Configuration">បើកការកំណត់​រចនាសម្ព័ន្ធ</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="Hotkey - show keyboard usage in OSK">Show Keyboard Usage Pane</string>
+  <string name="S_Hotkey_ShowKeyboardUsage" comment="Hotkey - show keyboard usage in OSK">បង្ហាញផ្ទាំង \"ការប្រើប្រាស់​ក្ដារចុច\"</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">Show Font Helper Pane</string>
+  <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">បង្ហាញ​ផ្ទាំង \"អង្គ​ជំនួយ​ពុម្ព​អក្សរ\"</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowCharacterMap" comment="Hotkey - show character map in OSK">Show Character Map Pane</string>
+  <string name="S_Hotkey_ShowCharacterMap" comment="Hotkey - show character map in OSK">បង្ហាញ​ផ្ទាំង \"តារាង​តួ​អក្សរ\"</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
@@ -722,7 +722,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewCharacterMap" comment="Toolbar help - View Character Map pop-up text">View Character Map</string>
+  <string name="S_Toolbar_ViewCharacterMap" comment="Toolbar help - View Character Map pop-up text">មើល \"តារាងតួ​អក្សរ\"</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -869,22 +869,22 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">The Character Map has a database of characters that needs to be built before it can be used.  Build it now?</string>
+  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">\"តារាង​តួ​អក្សរ\" មាន​មូលដ្ឋាន​ទិន្នន័យ​នៃ​តួអក្សរ​ដែល​តម្រូវ​ឱ្យ​បង្កើត មុនពេល​អាច​ប្រើ​វា​បាន។ បង្កើត​វា​ឥឡូវ?</string>
   <!-- Parameters: %0:s = Error detail string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">The Unicode Character database could not be deleted for a rebuild.  Error details are: %0:s</string>
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">មិន​អាច​លុបមូលដ្ឋាន​ទិន្នន័យ​នៃ \"តួអក្សរ​យូនីកូដ\" ដើម្បី​បង្កើត​ថ្មី​បាន​ទេ។ ព័ត៌មាន​លម្អិត​នៃ​បញ្ហា​គឺ៖ %0:s</string>
   <!-- Parameters: %0:s = Error details -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">The Unicode Character database could not be created and has been disabled.  Error details are: %0:s</string>
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">មិន​អាច​បង្កើត​មូលដ្ឋាន​ទិន្នន័យ​នៃ \"តួអក្សរ​យូនីកូដ\" បាន​ទេ។ វាត្រូវ​បាន​បិទ​ហើយ។ ព័ត៌មាន​លម្អិត​នៃ​បញ្ហា​គឺ៖ %0:s</string>
   <!-- Parameters: %0:s = Error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">The Unicode character database did not load successfully (%0:s).  Rebuild it now?</string>
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">មូលដ្ឋាន​ទិន្នន័យ​តួអក្សរ​យូនីកូដ​មិន​បាន​ផ្ទុក​ដោយ​ជោគជ័យ​ទេ (%0:s)។ បង្កើត​ថ្មី​ឥឡូវ?</string>
   <!-- Parameters: %0:s: error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.241.0 -->
