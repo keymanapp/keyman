@@ -107,7 +107,7 @@
   <!-- Context: KMP Package welcome.htm title -->
   <string name="welcome_package" comment="Title to welcome.htm page (name and version)">ស្វាគមន៍​មកកាន់ %1$s</string>
   <!-- Context: KMP Package strings -->
-  <string name="install_predictive_text_package" comment="Title to install dictionary package">ដំឡើង​ការណែនាំពាក្យ​ស្វ័យប្រវត្តិ</string>
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">ដំឡើង​បញ្ជី​ពាក្យ</string>
   <!-- Context: KMP Package strings -->
   <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">កញ្ចប់​នេះ​គ្មាន​ក្ដារចុច​សម្រាប់​ឧបករណ៍​ចល័ត​ទេ</string>
   <!-- Context: KMP Package strings -->
