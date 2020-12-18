@@ -1071,9 +1071,7 @@ var
         end
         else if not GetWindowRect(hwndSysTray, r) then
           r := TRect.Empty;
-      end
-      else
-        r := TRect.Empty;
+      end;
     end;
 
     // Align the menu according to the location of the taskbar
