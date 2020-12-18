@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.213 beta 2020-12-18
+
+* fix(windows): sentrytool should fail build on exception and access violation when rewriting executables (#4158)
+
 ## 14.0.212 beta 2020-12-17
 
 * fix(windows): uninstall language button z-index (#4145)
