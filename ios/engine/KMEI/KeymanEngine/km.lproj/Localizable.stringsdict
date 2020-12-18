@@ -13,7 +13,7 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>other</key>
-        <string>%u dictionaries installed</string>
+        <string>បាន​ដំឡើង​បញ្ជីពាក្យចំនួន %u</string>
       </dict>
     </dict>
     <key>notification-update-failed</key>
@@ -97,7 +97,7 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>other</key>
-        <string>Found %u dictionaries in package:</string>
+        <string>បាន​រក​ឃើញ​បញ្ជី​ពាក្យ​ចំនួន %u ក្នុង​កញ្ចប់៖</string>
       </dict>
     </dict>
   </dict>
