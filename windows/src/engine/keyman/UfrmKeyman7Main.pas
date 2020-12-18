@@ -1022,12 +1022,15 @@ var
   end;
 
   function GetMenuAnchorPoint(systraylocation: TAlign): TPoint;
+  type
+    TGetDpiForWindow = function(hwnd: HWND): UINT; stdcall;
   var
     pt: TPoint;
     r: TRect;
     ident: NOTIFYICONIDENTIFIER;
     dpi: Cardinal;
     m: TMonitor;
+    FGetDpiForWindow: TGetDpiForWindow;
   begin
     // We'll try and get the actual location of our icon
     ident.cbSize := SizeOf(ident);
@@ -1050,16 +1053,26 @@ var
       // scale the rectangle by its actual DPI to our fixed 96 DPI value to
       // get the location of the rect in our 96 DPI world. As a monitor may have
       // a non-zero origin, we have to deal with that too!
-      dpi := GetDpiForWindow(hwndTray);
-      m := Screen.MonitorFromWindow(hwndTray);
-      if Assigned(m) then
+
+      // Don't use Delphi's GetDpiForWindow declaration as we have to verify
+      // Windows version first, which cascades into potential updates to the
+      // manifest, which we don't want to do just now.
+      FGetDpiForWindow := GetProcAddress(GetModuleHandle(user32), 'GetDpiForWindow');
+      if Assigned(FGetDpiForWindow) then
       begin
-        r.Right := MulDiv(r.Right-m.Left, 96, dpi) + m.Left;
-        r.Bottom := MulDiv(r.Bottom-m.Top, 96, dpi) + m.Top;
-        r.Left := MulDiv(r.Left-m.Left, 96, dpi) + m.Left;
-        r.Top := MulDiv(r.Top-m.Top, 96, dpi) + m.Top;
+        dpi := FGetDpiForWindow(hwndTray);
+        m := Screen.MonitorFromWindow(hwndTray);
+        if Assigned(m) then
+        begin
+          r.Right := MulDiv(r.Right-m.Left, 96, dpi) + m.Left;
+          r.Bottom := MulDiv(r.Bottom-m.Top, 96, dpi) + m.Top;
+          r.Left := MulDiv(r.Left-m.Left, 96, dpi) + m.Left;
+          r.Top := MulDiv(r.Top-m.Top, 96, dpi) + m.Top;
+        end
+        else if not GetWindowRect(hwndSysTray, r) then
+          r := TRect.Empty;
       end
-      else if not GetWindowRect(hwndSysTray, r) then
+      else
         r := TRect.Empty;
     end;
 
