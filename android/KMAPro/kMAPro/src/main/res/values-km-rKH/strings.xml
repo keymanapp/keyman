@@ -53,7 +53,7 @@
     <item quantity="other">​ភាសាដែល​បាន​ដំឡើង (%1$d)</item>
   </plurals>
   <!-- Context: Keyman Settings menu -->
-  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">ដំឡើង​ក្ដារ​ចុចឬ​ការណែនាំ​ពាក្យស្វ័យប្រវត្តិ</string>
+  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">ដំឡើង​ក្ដារ​ចុចឬ​បញ្ជី​ពាក្យ</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Always show banner</string>
   <!-- Context: Keyman Settings menu -->
