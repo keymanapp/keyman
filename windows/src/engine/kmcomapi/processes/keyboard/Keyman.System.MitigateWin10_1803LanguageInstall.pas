@@ -98,7 +98,10 @@ class function TMitigateWin10_1803.IsMitigationRequired(BCP47Tag: string;
 var
   I: Integer;
 begin
-  if not IsWindows10_1803_OrGreater then
+  if not IsWindows10_OrGreater_Build(WINDOWS_10_BUILDNUMBER_WithFailure) then
+    Exit(False);
+
+  if IsWindows10_OrGreater_Build(WINDOWS_10_BUILDNUMBER_Fixed) then
     Exit(False);
 
   // We only want to look at the primary language tag for comparison
