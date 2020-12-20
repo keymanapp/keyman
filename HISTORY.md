@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.214 beta 2020-12-20
+
+* fix(windows): Text editor font bugs (#4149)
+* fix(windows): Warn if we reach maximum transient languages (#4157)
+
 ## 14.0.213 beta 2020-12-18
 
 * fix(windows): sentrytool should fail build on exception and access violation when rewriting executables (#4158)
