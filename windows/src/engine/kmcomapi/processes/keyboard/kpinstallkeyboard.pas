@@ -1,18 +1,18 @@
 (*
   Name:             kpinstallkeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    30 Apr 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add AutoApplyKeyman call
                     04 Dec 2006 - mcdurdin - Check product licence on install
@@ -82,6 +82,7 @@ uses
   Vcl.Graphics,
 
   Keyman.System.LanguageCodeUtils,
+  Keyman.System.MitigateWin10_1803LanguageInstall,
   Keyman.System.CanonicalLanguageCodeUtils,
 
   bcp47tag,
@@ -290,17 +291,18 @@ end;
 function TKPInstallKeyboard.LegacyRegisterAndInstallLanguageProfile(const BCP47Tag, KeyboardID, KeyboardName, IconFileName, LanguageName: string): Boolean;   // I3581   // I3619   // I3707   // I3768   // I4607
 var
   kpil: TKPInstallKeyboardLanguage;
-  TemporaryKeyboardID: string;
+  tag, TemporaryKeyboardID: string;
   LangID: Integer;
   guid: TGUID;
 begin
   Result := False;
   kpil := TKPInstallKeyboardLanguage.Create(Context);
   try
-    if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, []) then
+    tag := BCP47Tag;
+    if kpil.FindInstallationLangID(tag, LangID, TemporaryKeyboardID, []) then
     begin
-      kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardID, LangID, IconFileName, '');
-      kpil.InstallTip(KeyboardID, BCP47Tag, LangID, guid);
+      kpil.RegisterTip(KeyboardID, tag, KeyboardID, LangID, IconFileName, '');
+      kpil.InstallTip(KeyboardID, tag, LangID, guid);
       Result := True;
     end;
   finally
@@ -326,6 +328,7 @@ var
   BCP47Tag: string;
   i: Integer;
   kpil: TKPInstallKeyboardLanguage;
+  ml: TMitigateWin10_1803.TMitigatedLanguage;
 
 type
   TWSLCallback = reference to procedure(r: TRegistryErrorControlled);
@@ -400,6 +403,11 @@ begin
             BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(PackageLanguageMetadata[i].ID, True);
             if BCP47Tag <> '' then
             begin
+              if TMitigateWin10_1803.IsMitigationRequired(BCP47Tag, ml) then
+              begin
+                BCP47Tag := ml.NewLanguage.BCP47;
+              end;
+
               // Note: this may return a repeated tag, but FindInstallationLangID
               // and RegisterTIP are idempotent, so it doesn't matter.
 
@@ -494,6 +502,11 @@ begin
             BCP47Tag := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(FLanguages[i]);
             if BCP47Tag <> '' then
             begin
+              if TMitigateWin10_1803.IsMitigationRequired(BCP47Tag, ml) then
+              begin
+                BCP47Tag := ml.NewLanguage.BCP47;
+              end;
+
               kpil := TKPInstallKeyboardLanguage.Create(Context);
               try
                 kpil.RegisterTip(kbdname, BCP47Tag, ki.KeyboardName, FLanguages[i], FIconFileName, '');      //TODO: language name

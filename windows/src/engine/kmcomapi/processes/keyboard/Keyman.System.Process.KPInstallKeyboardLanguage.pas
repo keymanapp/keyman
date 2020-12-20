@@ -22,7 +22,8 @@ type
     ///  a temporary keyboard if necessary to establish a transient LangID.
     ///  Current User.</summary>
     ///  <returns>True if a language ID can be found</return>
-    ///  <param name="BCP47Tag">A canonical BCP47 tag to install</param>
+    ///  <param name="BCP47Tag">A canonical BCP47 tag to install. May be updated
+    ///  for compatibility reasons; see #1285.</param>
     ///  <param name="LangID">LangID found that corresponds to BCP47Tag</param>
     ///  <param name="TemporaryLayoutString">If a transient LangID is installed, then
     ///  Windows will have added a default keyboard for the language which should be
@@ -30,7 +31,8 @@ type
     ///  <param name="Flags">If ilkInstallTransientLanguage is included in flags,
     ///  will not install a transient language and will return False if no standard
     ///  Windows LangID can be found that corresponds to the BCP47 tag.</param>
-    function FindInstallationLangID(const BCP47Tag: string;
+    function FindInstallationLangID(
+      var BCP47Tag: string;
       var LangID: Integer;
       var TemporaryLayoutString: string;
       Flags: TKPInstallKeyboardLanguageFlags): Boolean;
@@ -163,92 +165,92 @@ begin
 end;
 
 // TODO: change LangID to Winapi.Windows.LANGID
-function TKPInstallKeyboardLanguage.FindInstallationLangID(const BCP47Tag: string; var LangID: Integer; var TemporaryLayoutString: string; Flags: TKPInstallKeyboardLanguageFlags): Boolean;
+function TKPInstallKeyboardLanguage.FindInstallationLangID(var BCP47Tag: string; var LangID: Integer; var TemporaryLayoutString: string; Flags: TKPInstallKeyboardLanguageFlags): Boolean;
 var
   ml: TMitigateWin10_1803.TMitigatedLanguage;
   Win8Lang: TWindows8Language;
-  tag: string;
 begin
   if BCP47Tag = '' then
     ErrorFmt(KMN_E_ProfileInstall_InvalidBCP47Tag, VarArrayOf([BCP47Tag]));
 
-  tag := BCP47Tag;
   TemporaryLayoutString := '';
 
-  if ConvertBCP47TagToLangID(tag, LangID) then
+  if ConvertBCP47TagToLangID(BCP47Tag, LangID) then
   begin
     if TMitigateWin10_1803.IsMitigationRequired(LangID, ml) then
     begin
       LangID := ml.NewLanguage.Code;
+      BCP47Tag := ml.NewLanguage.BCP47;
       WarnFmt(KMN_W_ProfileInstall_Win10_1803_MitigationApplied, VarArrayOf([ml.OriginalLanguage.Name, ml.NewLanguage.Name]));
     end;
+
+    if LangID <> 0 then
+      Exit(True);
+  end;
+
+  if not (ilkInstallTransientLanguage in Flags) then
+  begin
+    // No warning, because this is to be expected
+    Exit(False);
+  end;
+
+  //
+  // Installing a custom language only supported with Win8 and later
+  //
+
+  if not FWin8Languages.IsSupported then
+  begin
+    Warn(KMN_W_ProfileInstall_CustomLocalesNotSupported);
+    Exit(False);
+  end;
+
+  //
+  // Windows only appears to support 4 transient languages: 0x2000, 0x2400,
+  // 0x2800, 0x2C00. While Powershell will add extra languages above those,
+  // it will not install TIPs for any additional languages (e.g. 0x3000+),
+  // so we should stop after 4
+  //
+
+  if AreMaximumTransientLanguagesInstalled then
+  begin
+    Warn(KMN_W_ProfileInstall_CustomLocalesNotSupported); // TODO new code
+    Exit(False);
+  end;
+
+  //
+  // Install user language with Powershell if it isn't present
+  //
+
+  LangID := 0;
+
+  if (BCP47Tag = '') or not InstallBCP47Language(BCP47Tag) then
+  begin
+    WarnFmt(KMN_W_ProfileInstall_FailedToInstallLanguage, VarArrayOf([BCP47Tag]));
+    Exit(False);
+  end;
+
+  //
+  // Find the new language ID
+  //
+
+  FWin8Languages.Refresh;
+  Win8Lang := FWin8Languages.FindClosestByBCP47Tag(BCP47Tag);
+  if not Assigned(Win8Lang) then
+  begin
+    WarnFmt(KMN_W_ProfileInstall_LanguageInstalledButNotFound, VarArrayOf([BCP47Tag]));
+    Exit(False);
+  end;
+
+  LangID := Win8Lang.LangID;
+
+  if Win8Lang.InputMethods.Count = 1 then
+  begin
+    TemporaryLayoutString := Win8Lang.InputMethods[0];
   end
   else
-  begin
-    if not (ilkInstallTransientLanguage in Flags) then
-    begin
-      // No warning, because this is to be expected
-      Exit(False);
-    end;
-
-    //
-    // Installing a custom language only supported with Win8 and later
-    //
-
-    if not FWin8Languages.IsSupported then
-    begin
-      Warn(KMN_W_ProfileInstall_CustomLocalesNotSupported);
-      Exit(False);
-    end;
-
-    //
-    // Windows only appears to support 4 transient languages: 0x2000, 0x2400,
-    // 0x2800, 0x2C00. While Powershell will add extra languages above those,
-    // it will not install TIPs for any additional languages (e.g. 0x3000+),
-    // so we should stop after 4
-    //
-
-    if AreMaximumTransientLanguagesInstalled then
-    begin
-      Warn(KMN_W_ProfileInstall_CustomLocalesNotSupported); // TODO new code
-      Exit(False);
-    end;
-
-    //
-    // Install user language with Powershell if it isn't present
-    //
-
-    LangID := 0;
-
-    if (tag = '') or not InstallBCP47Language(tag) then
-    begin
-      WarnFmt(KMN_W_ProfileInstall_FailedToInstallLanguage, VarArrayOf([tag]));
-      Exit(False);
-    end;
-
-    //
-    // Find the new language ID
-    //
-
-    FWin8Languages.Refresh;
-    Win8Lang := FWin8Languages.FindClosestByBCP47Tag(tag);
-    if not Assigned(Win8Lang) then
-    begin
-      WarnFmt(KMN_W_ProfileInstall_LanguageInstalledButNotFound, VarArrayOf([tag]));
-      Exit(False);
-    end;
-
-    LangID := Win8Lang.LangID;
-
-    if Win8Lang.InputMethods.Count = 1 then
-    begin
-      TemporaryLayoutString := Win8Lang.InputMethods[0];
-    end
-    else
-      // We'll continue on, but this is unexpected, so we won't try and uninstall the temporary input method. The user
-      // will have more than one input method installed.
-      WarnFmt(KMN_W_ProfileInstall_MoreThanOneInputMethodInstalled, VarArrayOf([Win8Lang.InputMethods.Text]));
-  end;
+    // We'll continue on, but this is unexpected, so we won't try and uninstall the temporary input method. The user
+    // will have more than one input method installed.
+    WarnFmt(KMN_W_ProfileInstall_MoreThanOneInputMethodInstalled, VarArrayOf([Win8Lang.InputMethods.Text]));
 
   Result := True;
 end;

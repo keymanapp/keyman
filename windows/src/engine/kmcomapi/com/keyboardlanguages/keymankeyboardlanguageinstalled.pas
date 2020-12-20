@@ -145,7 +145,7 @@ function TKeymanKeyboardLanguageInstalled.FindInstallationLangID(
   out RegistrationRequired: WordBool; Flags: tagKeymanInstallFlags): WordBool;
 var
   kp: TKPInstallKeyboardLanguage;
-  s: string;
+  BCP47Code, s: string;
   KPFlags: TKPInstallKeyboardLanguageFlags;
 begin
   LangID := Self.Get_LangID;
@@ -160,7 +160,8 @@ begin
     KPFlags := [];
     if (Flags and kifInstallTransientLanguage) <> 0 then
       Include(KPFlags, ilkInstallTransientLanguage);
-    Result := kp.FindInstallationLangID(Self.Get_BCP47Code, LangID, s, KPFlags);
+    BCP47Code := Self.Get_BCP47Code;
+    Result := kp.FindInstallationLangID(BCP47Code, LangID, s, KPFlags);
 
     // We only need to register a TIP for user custom installations of languages:
     // languages that are suggested already have a TIP registered, and the
