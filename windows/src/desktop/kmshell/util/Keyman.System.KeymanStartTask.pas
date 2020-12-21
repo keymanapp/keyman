@@ -61,51 +61,77 @@ var
   pSettings: ITaskSettings;
   pEventTrigger: IEventTrigger;
   pAction: IExecAction;
+  UserName: OleVariant;
+  UserNameBuf: array[0..64] of Char;
+  UserNameBufLen: DWORD;
 begin
   try
     pService := CoTaskScheduler_.Create;
     pService.Connect(EmptyParam, EmptyParam, EmptyParam, EmptyParam);
+  except
+    on E:Exception do
+    begin
+      TKeymanSentryClient.ReportHandledException(E, 'Failed to connect to task scheduler');
+      Exit;
+    end;
+  end;
 
-    // Create or open the Keyman task folder
-    try
-      pTaskFolder := pService.GetFolder('\' + CTaskFolderName);
-    except
-      on E:EOleException do
-      begin
-        // Don't report if the folder doesn't exist, because we need to create it
-        if E.ErrorCode <> HResultFromWin32(ERROR_FILE_NOT_FOUND) then
-          TKeymanSentryClient.ReportHandledException(E, 'Failed to get task folder');
+  // Create or open the Keyman task folder
+  try
+    pTaskFolder := pService.GetFolder('\' + CTaskFolderName);
+  except
+    on E:EOleException do
+    begin
+      // Don't report if the folder doesn't exist, because we need to create it
+      if E.ErrorCode <> HResultFromWin32(ERROR_FILE_NOT_FOUND) then
+        TKeymanSentryClient.ReportHandledException(E, 'Failed to get task folder');
 
-        try
-          pTaskFolder := pService.GetFolder('\').CreateFolder(CTaskFolderName, EmptyParam);
-        except
-          on E:EOleException do
-          begin
-            // Don't report if we might have a race (someone else created it at
-            // the same time we did)
-            if E.ErrorCode <> HResultFromWin32(ERROR_ALREADY_EXISTS) then
-              TKeymanSentryClient.ReportHandledException(E, 'Failed to create task folder');
+      try
+        pTaskFolder := pService.GetFolder('\').CreateFolder(CTaskFolderName, EmptyParam);
+      except
+        on E:EOleException do
+        begin
+          // Don't report if we might have a race (someone else created it at
+          // the same time we did)
+          if E.ErrorCode <> HResultFromWin32(ERROR_ALREADY_EXISTS) then
+            TKeymanSentryClient.ReportHandledException(E, 'Failed to create task folder');
 
-            // well let's try one last time to get the folder
-            try
-              pTaskFolder := pService.GetFolder('\' + CTaskFolderName);
-            except
-              on E:EOleException do
-              begin
-                TKeymanSentryClient.ReportHandledException(E, 'Failed to get task folder, second try');
-                Exit;
-              end;
+          // well let's try one last time to get the folder
+          try
+            pTaskFolder := pService.GetFolder('\' + CTaskFolderName);
+          except
+            on E:EOleException do
+            begin
+              TKeymanSentryClient.ReportHandledException(E, 'Failed to get task folder, second try');
+              Exit;
             end;
           end;
         end;
       end;
     end;
+  end;
 
+  try
     CleanupAlphaTasks(pTaskFolder);
+  except
+    on E:Exception do
+    begin
+      TKeymanSentryClient.ReportHandledException(E, 'Failed to cleanup alpha tasks');
+    end;
+  end;
 
+  try
     // Create a new task
     pTask := pService.NewTask(0);
+  except
+    on E:Exception do
+    begin
+      TKeymanSentryClient.ReportHandledException(E, 'Failed to generate a new task');
+      Exit;
+    end;
+  end;
 
+  try
     pRegInfo := pTask.RegistrationInfo;
     pRegInfo.Author := CTaskAuthor;
     pRegInfo.Description := CTaskDescription;
@@ -127,8 +153,22 @@ begin
     pAction.Path := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
     pAction.Arguments := CKMShellExeStartArguments;
 
+    UserNameBufLen := SizeOf(UserNameBuf) div SizeOf(UserNameBuf[0]);
+    if GetUserName(UserNameBuf, UserNameBufLen)
+      then UserName := string(userNameBuf)
+      else UserName := EmptyParam;
+
+  except
+    on E:Exception do
+    begin
+      TKeymanSentryClient.ReportHandledException(E, 'Failed to prepare task parameters');
+      Exit;
+    end;
+  end;
+
+  try
     pTaskFolder.RegisterTaskDefinition(GetTaskName, pTask, TASK_CREATE_OR_UPDATE or TASK_IGNORE_REGISTRATION_TRIGGERS,
-      EmptyParam, EmptyParam, TASK_LOGON_INTERACTIVE_TOKEN, EmptyParam);
+      UserName, EmptyParam, TASK_LOGON_INTERACTIVE_TOKEN, EmptyParam);
   except
     on E:Exception do
     begin
