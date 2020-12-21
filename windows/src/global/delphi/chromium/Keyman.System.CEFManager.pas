@@ -92,6 +92,7 @@ begin
 
   GlobalCEFApp.CheckCEFFiles := False;
 
+  GlobalCEFApp.LogFile := TKeymanPaths.ErrorLogPath + ExtractFileName(ChangeFileExt(ParamStr(0),''))+'-cef.log';
   GlobalCEFApp.LogSeverity := LOGSEVERITY_ERROR;
 
   // We run in debug mode when TIKE debug mode flag is set, so that we can
