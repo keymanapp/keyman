@@ -313,12 +313,8 @@ end;
 procedure TKPInstallKeyboard.RegisterProfiles(const FileName, PackageID: string;
   FInstallOptions: TKPInstallKeyboardOptions; PackageLanguageMetadata: TPackageKeyboardLanguageList);
 var
-  FAllLanguagesW: WideString;
-  FAllLanguages: string;
-  FLanguage: string;
-  FLanguages: array of Integer;
+  FLanguages: TArray<Integer>;
   FLanguageInstalled: Boolean;
-  FLanguageID: Integer;
   ki: TKeyboardInfo;
   kbdname: string;
   FDestPath: string;
@@ -351,6 +347,7 @@ type
   var
     i: Integer;
   begin
+
     for i := 0 to High(FLanguages) do
       if FLanguages[i] = FLanguageID then
         Exit;
@@ -452,35 +449,19 @@ begin
     end
     else
     begin
-      //
-      // Use keyboard-defined default profile first   // I4607
-      //
-      if ki.KeyboardID <> 0 then
-      begin
-        AddLanguage(ki.KeyboardID);
-      end;
-
-      //
-      // Then enumerate all defined languages to try next   // I4607
-      //
-      GetSystemStore(ki.MemoryDump.Memory, TSS_WINDOWSLANGUAGES, FAllLanguagesW);
-
-      FAllLanguages := FAllLanguagesW;
-      while FAllLanguages <> '' do
-      begin
-        FLanguage := StrToken(FAllLanguages, ' ');
-        Delete(FLanguage, 1, 1); // 'x'
-        if TryStrToInt('$'+FLanguage, FLanguageID) then
-        begin
-          AddLanguage(FLanguageID);
-        end;
-      end;
+      FLanguages := GetLanguageCodesFromKeyboard(ki);
 
       //
       // Final fallback is to install against default language for system   // I4607
       //
       if Length(FLanguages) = 0 then
         AddLanguage(HKLToLanguageID(FDefaultHKL));
+
+      for i := 0 to High(Flanguages) do
+        if TMitigateWin10_1803.IsMitigationRequired(FLanguages[i], ml) then
+        begin
+          FLanguages[i] := ml.NewLanguage.Code;
+        end;
 
       if ikLegacyRegisterAndInstallProfiles in FInstallOptions then
       begin
