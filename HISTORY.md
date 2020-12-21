@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.3 alpha 2020-12-21
+
+* fix(web): Solving kmwosk color inconsistency (#4154)
+
 ## 15.0.2 alpha 2020-12-16
 
 * fix(common): increment version needs to check base 🍒 (#4156)
