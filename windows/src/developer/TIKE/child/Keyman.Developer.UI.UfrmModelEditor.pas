@@ -102,7 +102,6 @@ type
         function IndexOfFilename(const Filename: string): Integer;
       end;
   private
-    model: TStrings;
     parser: TLexicalModelParser;
     wordlists: TWordlists;
     frameSource: TframeTextEditor;
@@ -180,10 +179,33 @@ end;
 { TfrmModelEditor }
 
 function TfrmModelEditor.DoOpenFile: Boolean;
+var
+  model: TStringList;
 begin
   model := TStringList.Create;
-  model.LoadFromFile(FileName);
-  parser := TLexicalModelParser.Create(model.Text);
+  try
+    model.DefaultEncoding := TEncoding.UTF8;
+    try
+      model.LoadFromFile(FileName);
+    except
+      on E:EEncodingError do
+      begin
+        try
+          model.LoadFromFile(FileName, TEncoding.Default);
+        except
+          on E:EEncodingError do
+          begin
+            ShowMessage('Could not load file, does not appear to be a valid encoding.');
+            Exit(False);
+          end;
+        end;
+      end;
+    end;
+    parser := TLexicalModelParser.Create(model.Text);
+  finally
+    model.Free;
+  end;
+
   wordlists := TWordlists.Create;
 
   Inc(FSetup);
@@ -200,6 +222,7 @@ end;
 function TfrmModelEditor.DoSaveFile: Boolean;
 var
   wordlist: TWordlist;
+  stream: TStringStream;
 begin
   if pages.ActivePage = pageSource then
   begin
@@ -211,8 +234,14 @@ begin
     wordlist.Frame.SaveToFile(wordlist.Frame.Filename);
   end;
 
-  model.Text := parser.Text;
-  model.SaveToFile(FileName);
+  // We use TStringStream instead of TStringList so we don't get
+  // a BOM on the saved file
+  stream := TStringStream.Create(parser.Text, TEncoding.UTF8);
+  try
+    stream.SaveToFile(FileName);
+  finally
+    stream.Free;
+  end;
 
   editOutPath.Text := (ProjectFile as TmodelTsProjectFile).TargetFilename;   // I4688
 
@@ -291,7 +320,6 @@ procedure TfrmModelEditor.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(parser);
-  FreeAndNil(model);
   FreeAndNil(wordlists);
 end;
 
