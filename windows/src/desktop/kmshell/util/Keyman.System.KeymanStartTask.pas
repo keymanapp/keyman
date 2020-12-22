@@ -243,6 +243,9 @@ begin
 end;
 
 class procedure TKeymanStartTask.CleanupAlphaTasks(pTaskFolder: ITaskFolder);
+var
+  tasks: IRegisteredTaskCollection;
+  i: Integer;
 begin
   // Cleanup earlier alpha-version tasks: we renamed the task to include the
   // user's login name in build 14.0.194 of Keyman, so that multiple users could
@@ -251,7 +254,14 @@ begin
   // to see or overwrite tasks created by other users; they'd just get a
   // (silent) access denied result.
   try
-    pTaskFolder.DeleteTask(CTaskName, 0);
+    tasks := pTaskFolder.GetTasks(0);
+    for i := 1 to tasks.Count do
+      if SameText(tasks.Item[i].Name, CTaskName) then
+      begin
+        tasks := nil;
+        pTaskFolder.DeleteTask(CTaskName, 0);
+        Exit;
+      end;
   except
     on E:EOleException do
     begin
