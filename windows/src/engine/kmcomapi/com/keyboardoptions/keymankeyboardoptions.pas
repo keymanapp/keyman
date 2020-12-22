@@ -95,7 +95,7 @@ begin
     i := Index;
     if (i < 0) or (i >= Get_Count) then
     begin
-      ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([Index]));
+      ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([VarToStr(Index)]));
       Exit;
     end;
   end;

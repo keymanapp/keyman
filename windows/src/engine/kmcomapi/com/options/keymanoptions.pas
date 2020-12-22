@@ -96,7 +96,7 @@ begin
 
   if (i < Get_Count) and (i >= 0)
     then Result := FKeymanOptions[i] as IKeymanOption
-    else ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([Index]));
+    else ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([VarToStr(Index)]));
 end;
 
 function TKeymanOptions.IndexOf(const ID: WideString): Integer;

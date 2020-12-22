@@ -66,7 +66,7 @@ begin
   if (Index < Get_Count) and (Index >= 0) then
     Result := FHotkeys[Index] as IKeymanHotkey
   else
-    ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([Index]));
+    ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([IntToStr(Index)]));
 end;
 
 procedure TKeymanHotkeys.Apply;
