@@ -2,11 +2,11 @@ inherited frmProxyConfiguration: TfrmProxyConfiguration
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'frmProxyConfiguration'
-  ClientHeight = 288
-  ClientWidth = 428
+  ClientHeight = 176
+  ClientWidth = 240
   Position = poScreenCenter
-  ExplicitWidth = 434
-  ExplicitHeight = 317
+  ExplicitWidth = 246
+  ExplicitHeight = 205
   PixelsPerInch = 96
   TextHeight = 13
 end
