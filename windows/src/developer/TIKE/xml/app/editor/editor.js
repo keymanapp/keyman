@@ -282,7 +282,15 @@ async function loadSettings() {
       document.head.appendChild(fontCss);
     }
 
-    fontCss.innerHTML = ".mtk20, .mtk8 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
+    if(mode == 'keyman') {
+      fontCss.innerHTML = ".mtk20, .mtk8 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
+    } else if(mode == 'xml') {
+      fontCss.innerHTML = ".mtk1 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
+    } else if(mode == 'json') {
+      fontCss.innerHTML = ".mtk5 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
+    } else {
+      fontCss.innerHTML = ".mtk1 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
+    }
 
     // Calculate the appropriate line height based on the maximum from the two fonts set
 
