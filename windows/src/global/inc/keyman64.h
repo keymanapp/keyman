@@ -362,6 +362,8 @@ void RefreshKeyboards(BOOL Initialising);
 void CheckScheduledRefresh();
 void ScheduleRefresh();
 void ReleaseKeyboards(BOOL Lock);
+void CheckScheduledRefresh();
+void ScheduleRefresh();
 
 /* Glossary conversion functions */
 
