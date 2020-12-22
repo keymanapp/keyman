@@ -23,6 +23,7 @@ async function loadSettings() {
   let params = (new URL(location)).searchParams;
   let filename = params.get('filename');
   let mode = params.get('mode');
+  let isWordlistTsv = false;
 
   if(!mode) {
     mode = 'keyman';
@@ -50,7 +51,7 @@ async function loadSettings() {
     // Create editor and load source file
     //
 
-    let isWordlistTsv = (mode == 'wordlisttsv');
+    isWordlistTsv = (mode == 'wordlisttsv');
     if(isWordlistTsv) {
       mode = 'text';
     }
@@ -340,11 +341,10 @@ async function loadSettings() {
 
       monaco.editor.setTheme(themeName);
 
-      editor.updateOptions({
-        useTabStops: _settings.useTabChar
-      });
-
       editor.model.updateOptions({
+        insertSpaces:
+          !_settings.useTabChar && // user pref
+          !isWordlistTsv, // We always use tabs for TSV files
         tabSize: _settings.indentSize
       });
     });
