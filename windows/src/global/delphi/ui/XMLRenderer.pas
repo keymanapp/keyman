@@ -63,13 +63,13 @@ type
     FXMLFileName: WideString;
     function Getkmcom: IKeyman;
   protected
-    function XMLData(FRefreshKeyman: Boolean): WideString; virtual; abstract;
+    function XMLData: WideString; virtual; abstract;
     function Stylesheet: WideString; virtual;
     property kmcom: IKeyman read Getkmcom;
   public
     constructor Create(AOwner: TXMLRenderers);
     function Render: Boolean;
-    function GetXMLData(FRefreshKeyman: Boolean): WideString;
+    function GetXMLData: WideString;
     property Owner: TXMLRenderers read FOwner;
     property XMLFileName: WideString read FXMLFileName;
   end;
@@ -85,7 +85,7 @@ type
     function Getkmcom: IKeyman;
   public
     constructor Create;
-    function RenderToString(FRefreshKeyman: Boolean; const AdditionalData: WideString = ''): string;
+    function RenderToString(const AdditionalData: WideString = ''): string;
     function TemplateExists: Boolean;
     property kmcom: IKeyman read Getkmcom;
     property Items[Index: Integer]: TXMLRenderer read GetItem write SetItem; default;
@@ -128,9 +128,9 @@ begin
   Result := FOwner.kmcom;
 end;
 
-function TXMLRenderer.GetXMLData(FRefreshKeyman: Boolean): WideString;
+function TXMLRenderer.GetXMLData: WideString;
 begin
-  Result := XMLData(FRefreshKeyman);
+  Result := XMLData;
 end;
 
 function TXMLRenderer.Render: Boolean;
@@ -183,7 +183,7 @@ begin
   end;
 end;
 
-function TXMLRenderers.RenderToString(FRefreshKeyman: Boolean; const AdditionalData: WideString): string;
+function TXMLRenderers.RenderToString(const AdditionalData: WideString): string;
 var
   i: Integer;
   FOutput: TStrings;
@@ -218,7 +218,7 @@ begin
         '<localepath>'+XMLEncode(s)+'</localepath>');
 
     for i := 0 to Count - 1 do
-      FOutput.Add(Items[i].GetXMLData(FRefreshKeyman));
+      FOutput.Add(Items[i].GetXMLData);
     FOutput.Add('</Keyman>');
 
     doc := TXMLDocument.Create(nil);

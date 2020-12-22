@@ -1,18 +1,18 @@
 (*
   Name:             uninstall
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Mar 2008
 
   Modified Date:    1 Jan 2013
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Mar 2008 - mcdurdin - Initial version
                     28 Aug 2008 - mcdurdin - I1609 - Uninstall requires administrator if installed by admin
                     12 Mar 2010 - mcdurdin - I2216 - Show currently installed fonts in package details
@@ -99,8 +99,8 @@ begin
     pkg := nil;
     if WaitForElevatedConfiguration(Handle, '-up "'+pkgID+'" -s') = 0 then
     begin
-      kmcom.Keyboards.Refresh;
-      kmcom.Keyboards.Apply;
+      kmcom.Refresh;
+      kmcom.Apply;
       Result := True;
     end;
     Exit;
@@ -119,8 +119,8 @@ begin
   UninstallPackageTips(pkg);
   pkg.Uninstall(True);
   pkg := nil;
-  kmcom.Keyboards.Refresh;
-  kmcom.Keyboards.Apply;
+  kmcom.Refresh;
+  kmcom.Apply;
   Result := True;
 end;
 
@@ -154,8 +154,8 @@ begin
     kbd := nil;
     if WaitForElevatedConfiguration(Handle, '-uk "'+kbdID+'" -s') = 0 then
     begin
-      kmcom.Keyboards.Refresh;
-      kmcom.Keyboards.Apply;
+      kmcom.Refresh;
+      kmcom.Apply;
       Result := True;
     end;
     Exit;
@@ -164,8 +164,8 @@ begin
   kmcom.Keyboards.Apply;
   kbd.Uninstall;
   kbd := nil;
-  kmcom.Keyboards.Refresh;
-  kmcom.Keyboards.Apply;
+  kmcom.Refresh;
+  kmcom.Apply;
   Result := True;
 end;
 
@@ -199,6 +199,7 @@ begin
   kbdlang.Uninstall;
   kbdlang := nil;
   kmcom.Keyboards.Refresh;
+  kmcom.Apply;
   Result := True;
 end;
 

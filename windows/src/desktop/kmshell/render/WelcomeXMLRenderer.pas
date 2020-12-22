@@ -28,7 +28,7 @@ uses
 type
   TWelcomeXMLRenderer = class(TXMLRenderer)
   protected
-    function XMLData(FRefreshKeyman: Boolean): WideString; override;
+    function XMLData: WideString; override;
   end;
 
 implementation
@@ -42,7 +42,7 @@ uses
 
 { TWelcomeXMLRenderer }
 
-function TWelcomeXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
+function TWelcomeXMLRenderer.XMLData: WideString;
 
     function AddPackage(pkg: IKeymanPackageInstalled): WideString;
     var
@@ -63,9 +63,6 @@ function TWelcomeXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
 var
   I: Integer;
 begin
-  if FRefreshKeyman then
-    kmcom.Packages.Refresh;
-
   { Add packaged keyboards }
   for I := 0 to kmcom.Packages.Count - 1 do
   begin

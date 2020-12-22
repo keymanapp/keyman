@@ -33,7 +33,7 @@ uses
 type
   TOptionsXMLRenderer = class(TXMLRenderer)
   protected
-    function XMLData(FRefreshKeyman: Boolean): WideString; override;
+    function XMLData: WideString; override;
   public
     constructor Create(AOwner: TXMLRenderers);
   end;
@@ -54,7 +54,7 @@ begin
   inherited Create(AOwner);
 end;
 
-function TOptionsXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
+function TOptionsXMLRenderer.XMLData: WideString;
 var
   References: OleVariant;
   i: Integer;
@@ -69,8 +69,6 @@ var
     end;
 begin
   References := Null;  // I2678
-  if FRefreshKeyman then
-    kmcom.Options.Refresh;
   Result := kmcom.Options.SerializeXML(0, '', References);
   FGroups := TStringList.Create;
   try

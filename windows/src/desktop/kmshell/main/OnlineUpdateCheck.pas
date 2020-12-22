@@ -347,6 +347,7 @@ begin
   FPackage := nil;
 
   kmcom.Refresh;
+  kmcom.Apply;
   SysUtils.DeleteFile(Package.SavePath);
 end;
 
