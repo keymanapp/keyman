@@ -185,7 +185,16 @@ begin
     end;
 
     if LangID <> 0 then
+    begin
+      // We have found a LangID, so the search is done.
       Exit(True);
+    end;
+
+    // While `ConvertBCP47TagToLangID` only ever returns `True` if the
+    // `LangID` parameter is set to non-zero on exit, TMitigateWin10_1803 may
+    // cause `LangID` to be reset to zero, indicating that we need to install
+    // a transient lang id for the corresponding replacement `BCP47Tag` that
+    // was located, after all.
   end;
 
   if not (ilkInstallTransientLanguage in Flags) then
