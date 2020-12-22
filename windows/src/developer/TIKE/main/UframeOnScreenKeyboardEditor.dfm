@@ -24,6 +24,10 @@ inherited frameOnScreenKeyboardEditor: TframeOnScreenKeyboardEditor
     object pageDesign: TTabSheet
       Caption = 'Design'
       ImageIndex = -1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object panVK: TPanel
         Left = 0
         Top = 0
@@ -366,6 +370,10 @@ inherited frameOnScreenKeyboardEditor: TframeOnScreenKeyboardEditor
     object pageCode: TTabSheet
       Caption = 'Code'
       ImageIndex = -1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
   object dlgVKImportXML: TOpenDialog
