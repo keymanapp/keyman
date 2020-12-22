@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 14.0.215 beta 2020-12-22
+
+* fix(windows): create task fails (#4181)
+* fix(windows): prevent modifier key from navigating in download dialog (#4182)
+* fix(windows): keyboard help missing (#4177)
+* fix(windows): Proxy Configuration window size (#4159)
+* chore(common): update copyright year in various locations (#4197)
+* fix(windows): Settings refresh management (#4164)
+* fix(windows): Improve refresh performance (#4165)
+* fix(windows): exception handling list error (#4166)
+* fix(windows): OSK toolbar sync (#4167)
+* fix(windows): Show full version with tag in Setup (#4169)
+* fix(windows): Improve refresh reliablilty (#4171)
+* fix(developer): debug.log created unexpectedly (#4189)
+* chore(windows): Remove silent exception in task cleanup (#4191)
+* fix(windows/config): keyboard icons missing (#4193)
+* fix(developer): Map symbols for *LTREnter* and *LTRBkSp* (#4190)
+* fix(developer): Encoding for .model.ts files (#4199)
+* feat(common): annotate PRs with build links (#4202)
+
 ## 14.0.214 beta 2020-12-20
 
 * fix(windows): Text editor font bugs (#4149)
