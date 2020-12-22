@@ -301,5 +301,7 @@
     <Property Id="ARPURLUPDATEINFO" Value="http://www.keyman.com/" />
     <Property Id="ARPHELPLINK" Value="http://help.keyman.com/" />
 
+    <Property Id="VersionWithTag" Value="$(var.VERSION_WITH_TAG)" />
+
   </Product>
 </Wix>

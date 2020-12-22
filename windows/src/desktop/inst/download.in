@@ -31,7 +31,7 @@ candle: candle-desktop candle-cef candle-locale
 
 candle-desktop:
   $(WIXHEAT) dir ..\kmshell\xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
-  $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\kmshell\xml keymandesktop.wxs desktopui.wxs
+  $(WIXCANDLE) -dVERSION_WITH_TAG=$VersionWithTag -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\kmshell\xml keymandesktop.wxs desktopui.wxs
 
 #
 # Chromium Embedded Framework
