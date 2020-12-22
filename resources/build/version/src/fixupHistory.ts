@@ -87,7 +87,10 @@ const getAssociatedPRInformation = async (
 // splitPullsIntoHistory
 // ------------------------------------------------------------------------------------
 
-const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> => {
+const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<{count: number, pulls: number[]}> => {
+
+  let currentPulls: number[] = [];
+
   //
   // Get current version and history from VERSION.md and TIER.md
   //
@@ -168,6 +171,7 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
       const entry = `* ${pull.title} (#${pull.number})`;
       console.log(`-- Adding ${entry}`);
       historyChunks.current.splice(2, 0, entry);
+      currentPulls.push(pull.number);
       changed = true;
     }
   }
@@ -197,7 +201,30 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
     writeFileSync('HISTORY.md', newHistory, 'utf8');
   }
 
-  return historyChunks.current.length - 3; // - 3 for header + blanks
+  return {count: historyChunks.current.length - 3, pulls: currentPulls}; // - 3 for header + blanks
+}
+
+/**
+ * Creates a comment on each pull request found to point users to
+ * a relevant build.
+*/
+export const sendCommentToPullRequestAndRelatedIssues = async (
+  octokit: GitHub,
+  pulls: number[]
+): Promise<any> => {
+
+  const tier = readFileSync('./TIER.md', 'utf8').trim();
+  const version = readFileSync('./VERSION.md', 'utf8').trim();
+  const versionTier = version + (tier == 'stable' ? '' : '-'+tier);
+
+  const messagePull = `Changes in this pull request will be available for download in [Keyman version ${versionTier}](https://keyman.com/downloads/releases/${tier}/${version})`;
+
+  return Promise.all(pulls.map( pull => octokit.issues.createComment({
+    owner: 'keymanapp',
+    repo: 'keyman',
+    issue_number: pull,
+    body: messagePull,
+  })));
 }
 
 /**
@@ -257,7 +284,13 @@ export const fixupHistory = async (
   // Splice these into HISTORY.md
   //
 
-  const changeCount = await splicePullsIntoHistory(pulls);
+  const historyResult = await splicePullsIntoHistory(pulls);
 
-  return changeCount;
+  //
+  // Write a comment to GitHub for each of the pulls
+  //
+
+  await sendCommentToPullRequestAndRelatedIssues(octokit, historyResult.pulls);
+
+  return historyResult.count;
 };
