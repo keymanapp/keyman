@@ -1,18 +1,18 @@
 (*
   Name:             LangSwitchManager
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      22 Oct 2010
 
   Modified Date:    12 Sep 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          22 Oct 2010 - mcdurdin - I2522 - Initial version of language switch window
                     30 Nov 2010 - mcdurdin - I2543 - Support switching to TSF addins in Language Switch Window
                     17 Dec 2010 - mcdurdin - I2575 - Wrong keyboard layout selected for default language
@@ -992,7 +992,7 @@ begin
 
   FLanguageToggle := '3';
   FLayoutToggle := '3';
-  
+
   FReset := False;
 
   with TRegistryErrorControlled.Create do  // I2890
