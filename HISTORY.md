@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.4 alpha 2020-12-23
+
+* feat(common/models): naive backspace workaround, naive multi-char Transform mitigation (#4206)
+* fix(web): supplies missing (optional) argument to prevent warnings (#4208)
+* fix(ios): moves Settings notification UI code to main thread (#4210)
+
 ## 15.0.3 alpha 2020-12-21
 
 * fix(web): Solving kmwosk color inconsistency (#4154)
