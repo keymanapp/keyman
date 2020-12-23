@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.216 beta 2020-12-23
+
+* fix(developer): make touch layout editor source view fonts consistent (#4198)
+* fix(developer): Respect tab editor option (#4200)
+* fix(web): Solving kmwosk color inconsistency 🍒 (#4187)
+
 ## 14.0.215 beta 2020-12-22
 
 * fix(windows): create task fails (#4181)
