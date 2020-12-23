@@ -166,7 +166,7 @@ BOOL ProcessHook()
       _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
       fOutputKeystroke = FALSE;
     }
-    else if (!_td->TIPFUpdateable) {
+		else if (!_td->TIPFUpdateable) {
       //
       // #2759: kmtip calls this function twice for each keystroke, first to
       // determine if we are doing processing work (IsUpdateable() == FALSE),
@@ -177,6 +177,17 @@ BOOL ProcessHook()
       //
       fOutputKeystroke = FALSE;
     }
+  }
+
+  if (fOutputKeystroke && _td->app->DebugControlled()) {
+		// The debug memo does not receive default key events because
+		// we capture them all here. So we synthesize the key event for
+		// the debugger.
+    _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
+    _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
+    _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
+    _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
+    fOutputKeystroke = FALSE;
   }
 
 	if(*Globals::hwndIM() == 0 || *Globals::hwndIMAlways())
