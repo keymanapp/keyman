@@ -1,19 +1,19 @@
 ﻿(*
   Name:             UfrmRunDesktop
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      30 Dec 2010
 
   Modified Date:    23 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          30 Dec 2010 - mcdurdin - I2562 - Split Keyman Desktop install dialog into separate unit
+  Bugs:
+  Todo:
+  Notes:
+  History:          30 Dec 2010 - mcdurdin - I2562 - Split Keyman install dialog into separate unit
                     31 Dec 2010 - mcdurdin - I2610 - Show message if not silent and not starting Desktop after successful install
                     31 Dec 2010 - mcdurdin - I2617 - Fix title of Setup
                     31 Dec 2010 - mcdurdin - I2607 - Start with Windows not on by default
@@ -37,7 +37,7 @@
                     19 Oct 2012 - mcdurdin - I3476 - V9.0 - Fixup additional hints and warnings around string conversion
                     15 Jun 2012 - mcdurdin - I3355 - Keyman Developer (and Desktop) sometimes reboot automatically with auto upgrade
                     03 Nov 2012 - mcdurdin - I3500 - V9.0 - Merge of I3355 - Keyman Developer (and Desktop) sometimes reboot automatically with auto upgrade
-                    28 Feb 2014 - mcdurdin - I4099 - V9.0 - Keyman Desktop Setup dialog is still 8.0 style
+                    28 Feb 2014 - mcdurdin - I4099 - V9.0 - Keyman Setup dialog is still 8.0 style
                     24 Jun 2014 - mcdurdin - I4293 - V9.0 - Setup bootstrapper does not check for V8 upgrade
 *)
 unit UfrmRunDesktop;  // I3306   // I4099
@@ -51,6 +51,7 @@ uses
   System.SysUtils,
   System.UITypes,
   System.Variants,
+  Vcl.AppEvnts,
   Vcl.ComCtrls,
   Vcl.Controls,
   Vcl.Dialogs,
@@ -81,6 +82,10 @@ type
     lblActions: TLabel;
     cbLanguage: TComboBox;
     lblGlobe: TLabel;
+    appevents: TApplicationEvents;
+    sbActionText: TScrollBox;
+    panActionText: TPanel;
+    panInnerContent: TPanel;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);
@@ -91,6 +96,7 @@ type
     procedure lblLicenseClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure cbLanguageClick(Sender: TObject);
+    procedure appeventsMessage(var Msg: tagMSG; var Handled: Boolean);
   private
     g_iCurPos, g_iProgress, g_iProgressTotal: Integer;
     g_bCancelInstall, g_bScriptInProgress, g_bForwardProgress, g_bFirstTime, g_bEnableActionData: Boolean;
@@ -592,7 +598,6 @@ procedure TfrmRunDesktop.FillActionText;
 var
   s: string;
   pack: TInstallInfoPackage;
-  FLocationType: TInstallInfoLocationType;
   Found: Boolean;
   langname: string;
   packLocation: TInstallInfoPackageFileLocation;
@@ -602,24 +607,20 @@ begin
   s := '';
   if FInstallInfo.ShouldInstallKeyman then
   begin
-    FLocationType := FInstallInfo.BestMsi.LocationType;
-
-    if FLocationType = iilOnline
-      then downloadSize := '('+FormatFileSize(FInstallInfo.BestMsi.Size)+')'
+    if FInstallInfo.MsiInstallLocation.LocationType = iilOnline
+      then downloadSize := FInstallInfo.Text(ssActionDownload, [FormatFileSize(FInstallInfo.MsiInstallLocation.Size)])
       else downloadSize := '';
 
-    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.BestMsi.Version, downloadSize]) + #13#10;
+    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.MsiInstallLocation.Version, downloadSize]) + #13#10;
 
     Found := True;
-  end
-  else
-    FLocationType := iilLocal;
+  end;
 
   for pack in FInstallInfo.Packages do
   begin
     if pack.ShouldInstall then
     begin
-      packLocation := pack.GetBestLocation;
+      packLocation := pack.InstallLocation;
       if Assigned(packLocation) then
       begin
         if pack.BCP47 <> ''
@@ -627,7 +628,7 @@ begin
           else langname := '';
 
         if packLocation.LocationType = iilOnline
-          then downloadSize := '('+FormatFileSize(packLocation.Size)+')'
+          then downloadSize := FInstallInfo.Text(ssActionDownload, [FormatFileSize(packLocation.Size)])
           else downloadSize := '';
 
         if langname <> ''
@@ -636,8 +637,6 @@ begin
 
         s := s + #13#10;
 
-        if packLocation.LocationType = iilOnline then
-          FLocationType := iilOnline;
         Found := True;
       end;
     end;
@@ -646,13 +645,12 @@ begin
 
   if not Found then
     s := FInstallInfo.Text(ssActionNothingToInstall)
-  else if FLocationType = iilOnline then
-    s := FInstallInfo.Text(ssActionDownloadAndInstall)+#13#10+s
   else
     s := FInstallInfo.Text(ssActionInstall)+#13#10+s;
 
   lblActions.Caption := s.Trim;
-  lblActions.Top := panContent.ClientHeight - lblActions.Height - 4;
+  lblActions.Invalidate;
+  panContent.Invalidate;
 end;
 
 procedure TfrmRunDesktop.FormKeyDown(Sender: TObject; var Key: Word;
@@ -710,6 +708,17 @@ end;
 procedure TfrmRunDesktop.URLLabelMouseEnter(Sender: TObject);
 begin
   (Sender as TLabel).Font.Style := [fsUnderline];
+end;
+
+procedure TfrmRunDesktop.appeventsMessage(var Msg: tagMSG;
+  var Handled: Boolean);
+begin
+  if (Msg.message = WM_SYSCOMMAND) and (Msg.wParam = SC_RESTORE) then
+  begin
+    // Handle the case where Win+M pressed, window never restores
+    // Only really happens with Splash.
+    PostMessage(Handle, WM_SHOWWINDOW, 1, SW_PARENTOPENING);
+  end;
 end;
 
 procedure TfrmRunDesktop.BackupKey(Root: HKEY; Path: WideString); // I2642

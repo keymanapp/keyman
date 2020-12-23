@@ -32,12 +32,11 @@ uses
 const
   // https://api.keyman.com/ - programmatic endpoints
   API_Path_UpdateCheck_Windows = '/windows/14.0/update'; // version will only update when the api changes
+  API_Path_UpdateCheck_Developer = '/developer/14.0/update'; // version will only update when the api changes
 
   // TODO: use /windows/ instead of /desktop/
-  API_Path_UpdateCheck_Desktop = '/desktop/'+SKeymanVersion+'/update';  // TODO: use updatecheck_windows
-  API_Path_UpdateCheck_Developer = '/developer/'+SKeymanVersion+'/update';
-  API_Path_SubmitDiag = '/desktop/'+SKeymanVersion+'/submitdiag';
-  API_Path_IsOnline = '/desktop/'+SKeymanVersion+'/isonline';
+  API_Path_SubmitDiag = '/desktop/13.0/submitdiag'; // version will only update when the api changes
+  API_Path_IsOnline = '/desktop/13.0/isonline'; // version will only update when the api changes
 
   // https://www.keyman.com/ - web pages
   URLPath_CreateTranslation = '/go/windows/'+SKeymanVersion+'/create-locale';
@@ -77,7 +76,7 @@ function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boole
 function API_Protocol: string; // = 'https';
 function API_Server: string; // = 'api.keyman.com';
 
-function API_UserAgent: string; // = 'Keyman Desktop/<ver>...'
+function API_UserAgent: string; // = 'Keyman for Windows/<ver>...'
 function API_UserAgent_Developer: string; // = 'Keyman Developer/<ver>...'
 function API_UserAgent_Diagnostics: string;
 
@@ -98,9 +97,9 @@ uses
   VersionInfo;
 
 const
-  S_UserAgent = 'Keyman Desktop';
+  S_UserAgent = 'Keyman for Windows';
   S_UserAgent_Developer = 'Keyman Developer';
-  S_UserAgent_Diagnostics = 'Keyman Desktop Diagnostics';
+  S_UserAgent_Diagnostics = 'Keyman for Windows Diagnostics';
 
   S_KeymanCom = 'https://keyman.com';
   S_APIProtocol = 'https';

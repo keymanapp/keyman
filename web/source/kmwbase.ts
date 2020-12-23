@@ -479,7 +479,7 @@ namespace com.keyman {
       if(outputTarget) {
         outputTarget.resetContext();
       }
-      this.core.resetContext();
+      this.core.resetContext(outputTarget);
     };
 
     /**

@@ -18,8 +18,8 @@ function triggerBuilds() {
         echo Triggering Jenkins build "$job" "$base" "true"
         triggerJenkinsBuild "$job" "$base" "true"
       else
-        echo Triggering TeamCity build $build $TEAMCITY_VCS_ID
-        triggerTeamCityBuild $build $TEAMCITY_VCS_ID
+        echo Triggering TeamCity build $build $TEAMCITY_VCS_ID $base
+        triggerTeamCityBuild $build $TEAMCITY_VCS_ID $base
       fi
     done
   done
@@ -41,8 +41,7 @@ function triggerTeamCityBuild() {
   local TEAMCITY_SERVER=https://build.palaso.org
 
   local command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID,buildType:(id:$TEAMCITY_BUILDTYPE)'/></lastChanges></build>"
-
-  #debug echo "Call: $command"
+  echo "TeamCity Build Command: $command"
 
   # adjust indentation for output of curl
   echo -n "     "

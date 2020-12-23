@@ -1,33 +1,33 @@
 (*
   Name:             UfrmSplash
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    15 Apr 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Keyman 7 splash
                     14 Sep 2006 - mcdurdin - Use custom splash from pxx
                     12 Dec 2006 - mcdurdin - Rework as XSL
                     04 Jan 2007 - mcdurdin - Add proxy support
                     30 May 2007 - mcdurdin - I825 - Added proxy username and password
-                    07 Nov 2007 - mcdurdin - I922, I1100 - Work around crash when starting Keyman Desktop on Vista with security software blocking it
+                    07 Nov 2007 - mcdurdin - I922, I1100 - Work around crash when starting Keyman D_esktop on Vista with security software blocking it
                     27 Mar 2008 - mcdurdin - Use TfrmKeymanBase
                     14 Jun 2008 - mcdurdin - I1400 - Check language settings on startup
                     16 Jan 2009 - mcdurdin - I1730 - Online update of keyboards
                     30 Jan 2009 - mcdurdin - I1818 - Don't show configuration when starting Keyman when it is already running
-                    05 Nov 2010 - mcdurdin - Fix crash starting Keyman Desktop
+                    05 Nov 2010 - mcdurdin - Fix crash starting Keyman D_esktop
                     30 Dec 2010 - mcdurdin - I2562 - Clean up installation and show splash after upgrade
                     11 Jan 2011 - mcdurdin - I2643 - Use Always-On-Top for Keyman startup until it activates so it is always visible to the user
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman D_esktop splash from showing multiple copies
                     18 Mar 2011 - mcdurdin - I2392 - Activation server integration
                     18 Mar 2011 - mcdurdin - I2786 - Application title
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
@@ -35,7 +35,7 @@
                     28 May 2014 - mcdurdin - I4222 - V9.0 - Deprecate osWin2000, osWinXP, osWin2003Server
                     03 Jul 2014 - mcdurdin - I3730 - V9.0 - I3710 fail - script error dialog appears behind splash dialog
                     03 Aug 2014 - mcdurdin - I4356 - V9.0 - If splash screen is minimized, it cannot be restored
-                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman Desktop Free Edition polish
+                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman D_esktop Free Edition polish
                     01 Sep 2014 - mcdurdin - I4396 - V9.0 - When configuration run from Splash and license key entered, splash doesn't refresh
                     15 Apr 2015 - mcdurdin - I4658 - V9.0 - Add Keep in Touch screen
 *)
@@ -277,10 +277,6 @@ begin
       end;
 
     until False;
-
-    if kmcom.SystemInfo.RebootRequired then
-      RunReboot('Windows must be restarted for changes to complete.  Restart now?',
-        'Windows did not initiate the restart successfully.  You will need to restart manually.');
 
     if kmcom.Options[KeymanOptionName(TUtilKeymanOption.koCheckForUpdates)].Value then
     begin

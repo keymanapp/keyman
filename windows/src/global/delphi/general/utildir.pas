@@ -1,24 +1,24 @@
 (*
   Name:             utildir
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    3 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Refactor util functions into multiple units
                     06 Oct 2006 - mcdurdin - Fix KGetTempFileName not returning correct extension
                     20 Jul 2008 - mcdurdin - Raise excpetion if GetTempFileName fails to avoid possible deletion of wrong files
                     16 Jan 2009 - mcdurdin - Widestring directory functions
-                    16 Jan 2009 - mcdurdin - Fix crash when two copies of Keyman Desktop start simultaneously and try and grab the same temp folder name
+                    16 Jan 2009 - mcdurdin - Fix crash when two copies of Keyman start simultaneously and try and grab the same temp folder name
                     04 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     01 May 2014 - mcdurdin - I4181 - V9.0 - Stop using DeleteFileAlways, MOVEFILE_DELAY_UNTIL_REBOOT
                     03 Feb 2015 - mcdurdin - I4574 - V9.0 - If any files are read-only, they need the read-only flag removed on install

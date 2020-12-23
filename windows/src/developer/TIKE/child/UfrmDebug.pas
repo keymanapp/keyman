@@ -1,18 +1,18 @@
 (*
   Name:             UfrmDebug
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
+  Bugs:
   Todo:             If input is entered into the editor, close the debug form after query -- don't worry about this.
-  Notes:            
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rename FTikeOptiosn to FKeymanDeveloperOptions
                     23 Aug 2006 - mcdurdin - Extracted from TfrmEditor to be a dockable window
@@ -48,7 +48,7 @@
                     24 Jul 2015 - mcdurdin - I4796 - Refresh Keyman Developer look and feel for release
                     03 Aug 2015 - mcdurdin - I4808 - Add character preview to debug window
                     03 Aug 2015 - mcdurdin - I4809 - Track keystrokes in debug status form
-                    
+
 *)
 
 
@@ -777,7 +777,7 @@ begin
       begin
         FLastError := GetLastError;
         FailTidyUp;
-        ShowMessage('Unable to start Keyman Desktop for debugging - please make sure that Keyman Desktop is correctly installed (the error code was '+IntToHex(FLastError, 8)+').');  // I3173   // I3504
+        ShowMessage('Unable to start Keyman for debugging - please make sure that Keyman is correctly installed (the error code was '+IntToHex(FLastError, 8)+').');  // I3173   // I3504
         Exit;
       end;
       if FWasStarted then  // I3283   // I3503
@@ -1171,8 +1171,7 @@ begin
   if FFont = nil then
   begin
     FDefaultFont := True;
-    //TODO:FFont := EditorMemo.AltFont;
-    FFont := Font;  //TODO scrap this
+    FFont := EditorMemo.CharFont;
   end
   else
     FDefaultFont := False;
@@ -1202,7 +1201,7 @@ begin
   if FUIStatus <> Value then
   begin
     if not FCanDebug and (Value <> duiTest) then Exit;
-    
+
     FOldUIStatus := FUIStatus;
     FUIStatus := Value;
 

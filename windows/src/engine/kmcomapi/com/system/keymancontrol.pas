@@ -107,7 +107,6 @@ type
     FAutoApply: Boolean;
     FKeymanCustomisation: IKeymanCustomisation;
 
-    procedure RefreshWndProc(var Message: TMessage);
     function RunKeymanConfiguration(const filename: string): Boolean;
     procedure ApplyToRunningKeymanEngine;
     function FindMasterControllerWindow: THandle;
@@ -182,7 +181,6 @@ uses
   keymanerrorcodes, psapi, Variants, KLog;
 
 var
-  wm_keyman_refresh: Integer = 0;
   wm_keyman: Integer = 0;
 
 {$IFNDEF WIN64}
@@ -354,20 +352,25 @@ begin
 end;
 
 procedure TKeymanControl.ApplyToRunningKeymanEngine;
-const
-  KR_REQUEST_REFRESH = 0;
-var
-  msg: TMsg;
 begin
-  // This convoluted way of refreshing keyman ensures that km is init for the thread.  Other methods would work but this is easiest
-  // Note that this creates a message queue on the thread which means it should be avoided for console apps, etc.
-  if wm_keyman_refresh = 0 then
-    wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
-  RefreshHandle := AllocateHWnd(RefreshWndProc);
-  PostMessage(RefreshHandle, wm_keyman_refresh, KR_REQUEST_REFRESH, 0);
-  GetMessage(msg, RefreshHandle, wm_keyman_refresh, wm_keyman_refresh);
-  DispatchMessage(msg);
-  DeallocateHWnd(RefreshHandle);
+  // This convoluted way of refreshing keyman ensures that km is init for the thread.
+  // Other methods would work but this is easiest
+  TThread.CreateAnonymousThread(
+    procedure
+    const
+      KR_REQUEST_REFRESH = 0;
+    var
+      msg: TMsg;
+      wm_keyman_refresh: UINT;
+    begin
+      wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
+      RefreshHandle := AllocateHWnd(nil);
+      PostMessage(RefreshHandle, wm_keyman_refresh, KR_REQUEST_REFRESH, 0);
+      GetMessage(msg, RefreshHandle, wm_keyman_refresh, wm_keyman_refresh);
+      DispatchMessage(msg);
+      DeallocateHWnd(RefreshHandle);
+    end
+  ).Start;
 end;
 
 constructor TKeymanControl.Create(AContext: TKeymanContext);
@@ -436,12 +439,6 @@ procedure TKeymanControl.Refresh;
 begin
   if Assigned(FKeymanCustomisation) then
     FKeymanCustomisation.Refresh;
-end;
-
-procedure TKeymanControl.RefreshWndProc(var Message: TMessage);
-begin
-  with Message do
-    Result := DefWindowProc(RefreshHandle, Msg, WParam, LParam);
 end;
 
 procedure TKeymanControl.DiagnosticTestException;

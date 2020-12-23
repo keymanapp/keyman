@@ -1,18 +1,18 @@
 (*
   Name:             UfrmWebContainer
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Oct 2006
 
   Modified Date:    15 Sep 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Oct 2006 - mcdurdin - Initial version
                     05 Dec 2006 - mcdurdin - Refactor XMLRenderer into this unit
                     12 Dec 2006 - mcdurdin - Size dialog according to locale.xml <Dialog> entry
@@ -29,7 +29,7 @@
                     25 May 2010 - mcdurdin - I1694 - Select Keyman UI language rework
                     17 Dec 2010 - mcdurdin - I2570 - Use new E-mbeddedWB
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies (focus management for web browser)
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman splash from showing multiple copies (focus management for web browser)
                     18 Mar 2011 - mcdurdin - I2786 - Application title is sometimes incorrect
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
@@ -58,6 +58,8 @@ type
     FDialogName: WideString;
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
+    procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
+
     procedure ContributeUILanguages;
   protected
     cef: TframeCEFHost;
@@ -81,8 +83,10 @@ type
 
     function IsLocalUrl(const url: string): Boolean;
 
-    procedure Content_Render(FRefreshKeyman: Boolean = False; const Query: string = ''); virtual;
+    procedure Content_Render(const Query: string = ''); virtual;
     procedure WndProc(var Message: TMessage); override;  // I2720
+
+    procedure DoOpenHelp;
   public
     constructor Create(AOwner: TComponent); override;
     procedure SetFocus; override;  // I2720
@@ -123,8 +127,7 @@ begin
   Application.CreateForm(InstanceClass, Reference);
 end;
 
-procedure TfrmWebContainer.Content_Render(FRefreshKeyman: Boolean;
-  const Query: string);
+procedure TfrmWebContainer.Content_Render(const Query: string);
 var
   FWidth, FHeight: Integer;
 begin
@@ -147,7 +150,7 @@ end;
 
 procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);
 begin
-  Content_Render(FRefreshKeyman);   // I4088
+  Content_Render;   // I4088
 end;
 
 constructor TfrmWebContainer.Create(AOwner: TComponent);
@@ -168,6 +171,11 @@ end;
 function TfrmWebContainer.IsLocalUrl(const url: string): Boolean;
 begin
   Result := url.StartsWith(modWebHttpServer.Host, True);
+end;
+
+procedure TfrmWebContainer.DoOpenHelp;
+begin
+  Application.HelpJump('context_'+lowercase(FDialogName));
 end;
 
 procedure TfrmWebContainer.OpenLink(params: TStringList);
@@ -215,7 +223,7 @@ end;
 
 procedure TfrmWebContainer.cefHelpTopic(Sender: TObject);
 begin
-  Application.HelpJump('context_'+lowercase(FDialogName));
+  DoOpenHelp;
 end;
 
 procedure TfrmWebContainer.cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData;
@@ -226,7 +234,7 @@ begin
     if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
       PostMessage(Handle, WM_USER_ContentRender, 0, 0)
     else if e.event.windows_key_code = VK_F1 then
-      Application.HelpJump('context_'+lowercase(FDialogName));
+      DoOpenHelp;
   end;
 end;
 
@@ -279,6 +287,16 @@ end;
 function IsLocalURL(URL: WideString): Boolean;
 begin
   Result := (Copy(URL, 1, 5) = 'file:') or (Copy(URL, 1, 1) = '/');
+end;
+
+procedure TfrmWebContainer.WMSysCommand(var Message: TWMSysCommand);
+begin
+  with Message do
+  begin
+    if (CmdType and $FFF0 = SC_CONTEXTHELP)
+      then DoOpenHelp
+      else inherited;
+  end;
 end;
 
 procedure TfrmWebContainer.WMUser_ContentRender(var Message: TMessage);

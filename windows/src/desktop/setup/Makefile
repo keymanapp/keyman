@@ -6,9 +6,13 @@
 
 build: version.res manifest.res icons locale
     $(DCC32) setup.dpr
-    $(TDS2DBG) setup.exe
     $(SENTRYTOOL_DELPHIPREP) setup.exe -dpr setup.dpr
+    $(TDS2DBG) setup.exe
     $(COPY) setup.exe $(PROGRAM)\desktop
+
+    # This version of setup.exe is for redistribution as a
+    # bundled installer and is not signed
+    $(COPY) setup.exe $(PROGRAM)\desktop\setup-redist.exe
 
 locale:
     $(ROOT)\bin\buildtools\devtools.exe -buildsetupstrings locale\ .\
@@ -23,7 +27,11 @@ clean: def-clean
     rem if exist icons\icons.res del icons\icons.res
 
 signcode:
-    rem SIGNCODE /d "Keyman Desktop Setup" $(PROGRAM)\desktop\setup.exe
+    $(SIGNCODE) /d "Keyman Setup" $(PROGRAM)\desktop\setup.exe
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\desktop\setup.exe /t keyman-windows
+    $(SYMSTORE) $(DEBUGPATH)\desktop\setup.dbg /t keyman-windows
 
 backup:
     $(WZZIP) $(BUILD)\desktop\setup.zip  $(BACKUPDEFAULTS) setup.exe

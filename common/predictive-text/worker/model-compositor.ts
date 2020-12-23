@@ -150,6 +150,7 @@ class ModelCompositor {
         if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
           newEmptyToken = true;
           prefixTransform = inputTransform;
+          context = postContext; // Ensure the whitespace token is preapplied!
         }
       }
 
@@ -281,6 +282,7 @@ class ModelCompositor {
         // We still condition on 'p' existing so that test cases aren't broken.
         value.sample['p'] = value.p;
       }
+      //
       return value.sample;
     });
 
@@ -288,25 +290,35 @@ class ModelCompositor {
       suggestions = [ keepOption as Suggestion ].concat(suggestions);
     }
 
-    // Apply 'after word' punctuation and set suggestion IDs.  
+    // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    let currentCasing: CasingForm = null;
+    if(lexicalModel.languageUsesCasing) {
+      currentCasing = this.detectCurrentCasing(postContext);
+    }
+
     let compositor = this;
+    let baseWord = this.wordbreak(context);
     suggestions.forEach(function(suggestion) {
-      if (suggestion.transform.insert.length > 0) {
-        suggestion.transform.insert += punctuation.insertAfterWord;
+      if(currentCasing && currentCasing != 'lower') {
+        compositor.applySuggestionCasing(suggestion, baseWord, currentCasing);
+      }
 
-        // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
-        if(prefixTransform) {
-          let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
-          mergedTransform.id = suggestion.transformId;
+      // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
+      // for such cases.
+      suggestion.transform.insert += punctuation.insertAfterWord;
 
-          // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
-          // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
-          let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
-          
-          // Assignment via by-reference behavior, as suggestion is an object
-          mutableSuggestion.transform = mergedTransform;
-        }
+      // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
+      if(prefixTransform) {
+        let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
+        mergedTransform.id = suggestion.transformId;
+
+        // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
+        // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
+        let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
+        
+        // Assignment via by-reference behavior, as suggestion is an object
+        mutableSuggestion.transform = mergedTransform;
       }
 
       suggestion.id = compositor.SUGGESTION_ID_SEED;
@@ -325,6 +337,21 @@ class ModelCompositor {
     }
 
     return suggestions;
+  }
+
+  // Responsible for applying casing rules to suggestions.
+  private applySuggestionCasing(suggestion: Suggestion, baseWord: USVString, casingForm: CasingForm) {
+    // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
+    let unchangedLength  = baseWord.kmwLength() - suggestion.transform.deleteLeft;
+
+    if(unchangedLength > 0) {
+      suggestion.transform.deleteLeft += unchangedLength;
+      suggestion.transform.insert = baseWord.kmwSubstr(0, unchangedLength) + suggestion.transform.insert;
+    }
+
+    // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
+    suggestion.transform.insert = this.lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
+    suggestion.displayAs = this.lexicalModel.applyCasing(casingForm, suggestion.displayAs);
   }
 
   private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
@@ -505,6 +532,43 @@ class ModelCompositor {
       // Since the model relies on custom wordbreaking behavior, we need to use the
       // old, deprecated wordbreaking pattern.
       return model.wordbreak(context);
+    }
+  }
+
+  public resetContext(context: Context) {
+    if(this.contextTracker) {
+      let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
+      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, this.lexicalModel);
+      this.contextTracker.enqueue(contextState);
+    }
+  }
+
+  private detectCurrentCasing(context: Context): CasingForm {
+    let model = this.lexicalModel;
+
+    let text = this.wordbreak(context);
+
+    if(!model.languageUsesCasing) {
+      throw "Invalid attempt to detect casing: languageUsesCasing is set to false";
+    }
+
+    if(!model.applyCasing) {
+      // The worker should automatically 'sub in' default behavior during the model's load if that
+      // function isn't defined explicitly as part of the model.
+      throw "Invalid LMLayer state:  languageUsesCasing is set to true, but no applyCasing function exists";
+    }
+
+    if(model.applyCasing('lower', text) == text) {
+      return 'lower';
+    } else if(model.applyCasing('upper', text) == text) {
+      // If only a single character has been input, assume we're in 'initial' mode.
+      return text.kmwLength() > 1 ? 'upper' : 'initial';
+    } else if(model.applyCasing('initial', text) == text) {
+      // We check 'initial' last, as upper-case input is indistinguishable.
+      return 'initial';
+    } else {
+      // 'null' is returned when no casing pattern matches the input.
+      return null;
     }
   }
 }

@@ -12,10 +12,10 @@ import { readFileSync, writeFileSync } from 'fs';
 import { gt } from 'semver';
 
 const getPullRequestInformation = async (
-  octokit: GitHub,
+  octokit: GitHub, base: string
 ): Promise<string | undefined> => {
   const response = await octokit.graphql(
-    findLastHistoryPR
+    findLastHistoryPR(base)
   );
 
   if (response === null) {
@@ -120,7 +120,7 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
       if(match) {
         state = gt(match[1], version) ? "newer" : "older";
       }
-    } 
+    }
     historyChunks[state].push(line);
   }
 
@@ -149,7 +149,7 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
     const pullNumberRe = new RegExp(`#${pull.number}\\b`);
 
     if(pull.title.match(/^auto/)) {
-      // We always skip pull requests that are 
+      // We always skip pull requests that are
       // automatically generated. At time this is written,
       // that only includes incrementing version. But in
       // future there may be others.
@@ -201,10 +201,10 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
 }
 
 /**
- * Adds any outstanding pull request titles to HISTORY.md for the current 
+ * Adds any outstanding pull request titles to HISTORY.md for the current
  * version. Retrieves pull request details from GitHub.
- * @returns number of history entries for the current version, 
- *          0 if no pulls associated with the current vesrion, or 
+ * @returns number of history entries for the current version,
+ *          0 if no pulls associated with the current vesrion, or
  *          -1 on error.
  */
 
@@ -216,7 +216,7 @@ export const fixupHistory = async (
   // Get the last auto history merge commit ref
   //
 
-  const commit_id = await getPullRequestInformation(octokit);
+  const commit_id = await getPullRequestInformation(octokit, base);
   if (commit_id === undefined) {
     logWarning('Unable to fetch pull request information.');
     return -1;
@@ -225,8 +225,8 @@ export const fixupHistory = async (
   //
   // Now, use git log to retrieve list of merge commit refs since then
   //
-  
-  const git_result = (await spawnChild('git', ['log', '--merges', '--first-parent', '--format=%H', base, `${commit_id}..`])).trim();
+
+  const git_result = (await spawnChild('git', ['log', '--merges', /*'--first-parent',*/ '--format=%H', base, `${commit_id}..`])).trim();
   if(git_result.length == 0) {
     // We won't throw on this
     logWarning('No pull requests found since previous increment');
@@ -259,5 +259,5 @@ export const fixupHistory = async (
 
   const changeCount = await splicePullsIntoHistory(pulls);
 
-  return changeCount; 
+  return changeCount;
 };

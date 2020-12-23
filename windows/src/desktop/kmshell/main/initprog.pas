@@ -1,18 +1,18 @@
 (*
   Name:             initprog
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    23 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rework for Keyman 7
                     02 Aug 2006 - mcdurdin - Timeout when Beta expires
@@ -42,11 +42,11 @@
                     17 Dec 2010 - mcdurdin - I2548 - Fix bugs with upgrade
                     30 Dec 2010 - mcdurdin - I2562 - Start Keyman install properties
                     30 Dec 2010 - mcdurdin - I2604 - Upgrade to Pro from Character Map is incomplete
-                    31 Dec 2010 - mcdurdin - I2605 - Crash starting Keyman Desktop after upgrade when using non-default locale
+                    31 Dec 2010 - mcdurdin - I2605 - Crash starting Keyman after upgrade when using non-default locale
                     18 Feb 2011 - mcdurdin - I2702 - "Getting Started" link not working
                     21 Feb 2011 - mcdurdin - I2651 - Setup does not set desired default options
                     22 Feb 2011 - mcdurdin - I2753 - Firstrun crashes because start with windows and auto update check options are set in Engine instead of Desktop
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman splash from showing multiple copies
                     18 Mar 2011 - mcdurdin - I2807 - Enable/disable addins
                     18 Mar 2011 - mcdurdin - I2782 - Unminimize configuration when bringing it to foreground
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
@@ -89,6 +89,7 @@ type
                     fmUpgradeMnemonicLayout,    // I4553
                     fmRepair,
                     fmKeepInTouch,
+                    fmSettings,
 
                     // Commands from Keyman Engine
                     fmShowHint,
@@ -111,6 +112,8 @@ uses
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
+  Keyman.Configuration.UI.UfrmSettingsManager,
+  Keyman.System.KeymanStartTask,
   KeymanPaths,
   KLog,
   kmint,
@@ -275,6 +278,7 @@ begin
         FParentWindow := StrToIntDef(ParamStr(i), 0);
       end
       else if s = '-showhelp' then FMode := fmShowHelp
+      else if s = '-settings' then FMode := fmSettings
 
       else Exit;
     end
@@ -369,8 +373,10 @@ begin
   kmcom.AutoApply := True;
 
   FMutex := nil;  // I2720
-  
-  { Locate the appropriate product }
+
+  { Run app reconfiguration tasks }
+
+  TKeymanStartTask.RecreateTask;
 
   UILanguages.CreateUILanguages;
 
@@ -539,6 +545,11 @@ begin
     fmKeepInTouch:
       ShowKeepInTouchForm(True);   // I4658
 
+    fmSettings:
+      if TfrmSettingsManager.Execute
+        then ExitCode := 0
+        else ExitCode := 1;
+
     fmShowHint:
       if ShowKMShellHintQuery(FParentWindow, FirstKeyboardFileName) = mrOk
         then ExitCode := 0
@@ -549,9 +560,6 @@ begin
 
   if FMode <> fmMain then
   begin
-    if kmcom.SystemInfo.RebootRequired then
-      RunReboot('Windows must be restarted for changes to complete.  Restart now?',
-        'Windows did not initiate the restart successfully.  You will need to restart manually.');
     ApplicationRunning := True;
     Application.Run;
     ApplicationRunning := False;

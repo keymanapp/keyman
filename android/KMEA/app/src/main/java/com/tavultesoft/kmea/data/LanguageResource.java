@@ -3,9 +3,11 @@
  */
 package com.tavultesoft.kmea.data;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONException;
@@ -68,7 +70,12 @@ public abstract class LanguageResource implements Serializable {
    * @return boolean true if an updated kmp package is available
    */
   public boolean hasUpdateAvailable() {
-    return (kmp != null && !kmp.isEmpty());
+    boolean updateAvailable = false;
+    if (kmp != null && !kmp.isEmpty()) {
+      updateAvailable = true;
+    }
+
+    return updateAvailable;
   }
 
   public int hashCode() {

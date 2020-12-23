@@ -133,6 +133,8 @@ begin
     with TKPUninstallKeyboardLanguage.Create(Context) do
     try
       UninstallTip(FOwner.ID, Get_LangID, Get_ProfileGUID, False);
+      if IsTransientLanguageID(Get_LangID) then
+        SetLangID(0);
     finally
       Free;
     end;
@@ -189,12 +191,15 @@ procedure TKeymanKeyboardLanguageInstalled.InstallTip(LangID: Integer;
   const TemporaryKeyboardToRemove: WideString);
 var
   kp: TKPInstallKeyboardLanguage;
+  guid: TGUID;
 begin
   kp := TKPInstallKeyboardLanguage.Create(Context);
   try
-    kp.InstallTip(FOwner.ID, Get_BCP47Code, LangID);
+    kp.InstallTip(FOwner.ID, Get_BCP47Code, LangID, guid);
     if TemporaryKeyboardToRemove <> '' then
       kp.UninstallTemporaryLayout(TemporaryKeyboardToRemove);
+    Self.SetLangID(LangID);
+    Self.FProfileGUID := guid;
   finally
     kp.Free;
   end;
@@ -226,11 +231,14 @@ begin
 end;
 
 procedure TKeymanKeyboardLanguageInstalled.Install;
+var
+  guid: TGUID;
 begin
   if not Get_IsInstalled then
     with TKPInstallKeyboardLanguage.Create(Context) do
     try
-      InstallTip(FOwner.ID, Get_BCP47Code, Get_LangID);
+      InstallTip(FOwner.ID, Get_BCP47Code, Get_LangID, guid);
+      Self.FProfileGUID := guid;
     finally
       Free;
     end;

@@ -275,14 +275,15 @@ procedure TKPInstallKeyboard.LegacyRegisterAndInstallLanguageProfile(Langs: arra
 var
   kpil: TKPInstallKeyboardLanguage;
   BCP47Tag: string;
+  guid: TGUID;
 begin
   BCP47Tag := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(Langs[0]);
   kpil := TKPInstallKeyboardLanguage.Create(Context);
   try
     kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardName, Langs[0], IconFileName, '');
-    kpil.InstallTip(KeyboardID, BCP47Tag, Langs[0]);
+    kpil.InstallTip(KeyboardID, BCP47Tag, Langs[0], guid);
   finally
-    Free;
+    kpil.Free;
   end;
 end;
 
@@ -291,6 +292,7 @@ var
   kpil: TKPInstallKeyboardLanguage;
   TemporaryKeyboardID: string;
   LangID: Integer;
+  guid: TGUID;
 begin
   Result := False;
   kpil := TKPInstallKeyboardLanguage.Create(Context);
@@ -298,11 +300,11 @@ begin
     if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, []) then
     begin
       kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardID, LangID, IconFileName, '');
-      kpil.InstallTip(KeyboardID, BCP47Tag, LangID);
+      kpil.InstallTip(KeyboardID, BCP47Tag, LangID, guid);
       Result := True;
     end;
   finally
-    Free;
+    kpil.Free;
   end;
 end;
 

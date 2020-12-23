@@ -34,8 +34,8 @@ type
     procedure AddUnmatchedContext(FormName, ControlName: string);
     procedure DeleteMatchedContext(FormName, ControlName: string);
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
-    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean);
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean);
   protected
     function GetHelpTopic: string; override;
     procedure FormShown; override;
@@ -218,7 +218,7 @@ begin
   Result := SHelpTopic_Context_Help;
 end;
 
-procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
+procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean);
 var
   elems: TArray<string>;
 begin
@@ -247,7 +247,7 @@ begin
   end;
 end;
 
-procedure TfrmHelp.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
+procedure TfrmHelp.cefBeforeBrowseSync(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean);
 begin
   AssertCefThread;
   Handled := Url.StartsWith('help:') or Url.StartsWith('missing:') or Url.StartsWith('found:');

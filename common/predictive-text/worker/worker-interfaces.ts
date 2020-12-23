@@ -38,8 +38,8 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak' | 'accept' | 'revert';
-type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage | AcceptMessage | RevertMessage;
+type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak' | 'accept' | 'revert' | 'reset-context';
+type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage | AcceptMessage | RevertMessage | ResetContextMessage;
 
 /**
  * The structure of a config message.  It should include the platform's supported
@@ -54,6 +54,27 @@ interface ConfigMessage {
   capabilities: Capabilities;
 }
 
+interface ModelFile {
+  type: 'file';
+
+  /**
+   * The model should be loaded from a file via importScripts.
+   */
+  file: string;
+}
+
+interface ModelEval {
+  type: 'raw';
+
+  /**
+   * Rather than loading a file, this specifies the contents that would normally be within
+   * a .model.ts file.  Useful for dynamically-compiled models that occur when testing.
+   */
+  code: string;
+}
+
+type ModelSourceSpec = ModelFile | ModelEval;
+
 /**
  * The structure of an initialization message. It should include the model (either in
  * source code or parameter form), as well as the keyboard's capabilities.
@@ -64,7 +85,7 @@ interface LoadMessage {
   /**
    * The model's compiled JS file.
    */
-  model: string;
+  source: ModelSourceSpec;
 }
 
 /**
@@ -166,6 +187,15 @@ interface RevertMessage {
   /**
    * The Context being reverted, which should be the same context as resulted from applying the
    * corresponding Suggestion.
+   */
+  context: Context;
+}
+
+interface ResetContextMessage {
+  message: 'reset-context';
+
+  /**
+   * The new context to be used as a base for future context mutations and predictions.
    */
   context: Context;
 }

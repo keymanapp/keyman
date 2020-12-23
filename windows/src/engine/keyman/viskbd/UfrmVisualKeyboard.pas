@@ -1,18 +1,18 @@
 (*
   Name:             UfrmVisualKeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    10 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Clean up visual keyboard display
                     23 Aug 2006 - mcdurdin - Initial refactor for new visual keyboard
@@ -76,11 +76,11 @@
                     03 Aug 2014 - mcdurdin - I4359 - V9.0 - OSK shows wrong base keyboard and doesn't refresh
                     12 Aug 2014 - mcdurdin - I4360 - V9.0 - When OSK opens, if Keyman is off then icon shows wrongly
                     28 Aug 2014 - mcdurdin - I4390 - V9.0 - Free vs Pro
-                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman Desktop Free Edition polish
+                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman Free Edition polish
                     11 Feb 2015 - mcdurdin - I4593 - V9.0 - The keyboard usage page can appear outside the OSK in some situations
                     04 Mar 2015 - mcdurdin - I4606 - V9.0 - Support single keyboard buttons on OSK toolbar
                     05 Mar 2015 - mcdurdin - I4606 - V9.0 - Support single keyboard buttons on OSK toolbar
-                    10 Aug 2015 - mcdurdin - I4849 - Keyman Desktop title in OSK has wrong grey background
+                    10 Aug 2015 - mcdurdin - I4849 - Keyman title in OSK has wrong grey background
 *)
 unit UfrmVisualKeyboard;  // I3306   // I3614
 
@@ -876,7 +876,7 @@ begin
     AlphaBlendValue := 255;
   end;
 
-  
+
 {var
   buf: array[0..64] of char;
   pid: DWord;

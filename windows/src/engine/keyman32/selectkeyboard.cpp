@@ -1,18 +1,18 @@
 /*
   Name:             selectkeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Apr 2010
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Apr 2010 - mcdurdin - I2271 - Select Keyboard tidy up
                     19 Apr 2010 - mcdurdin - I2297 - Use global cache to remember last active keyboard for all apps
                     19 Apr 2010 - mcdurdin - I2297 - Rewrite SelectKeyboard to reduce complexity and increase stability
@@ -36,7 +36,7 @@
                     04 Nov 2012 - mcdurdin - I3538 - V9.0 - Merge of I3227 - When switching keyboards and typing rapidly, Windows/Keyman keyboard links can get out of sync
                     28 Nov 2012 - mcdurdin - I3594 - V9.0 - Remove old SelectKeyboard code and related messages
                     07 Nov 2013 - mcdurdin - I3949 - V9.0 - Keyboard selection and notification needs consolidation
-                    21 Feb 2014 - mcdurdin - I4066 - V9.0 - Keyman Desktop needs to run in a lockdown mode when expired so developers can still use it
+                    21 Feb 2014 - mcdurdin - I4066 - V9.0 - Keyman D_esktop needs to run in a lockdown mode when expired so developers can still use it
                     28 May 2014 - mcdurdin - I4220 - V9.0 - Remove references to LoadKeyboardLayout, Preload, Substitutes, etc. and use only TSF
                     16 Jun 2014 - mcdurdin - I4271 - V9.0 - Switch language for all applications is not working
                     23 Jun 2014 - mcdurdin - I4287 - V9.0 - Remove extraneous AppIntegration class type tests
@@ -62,8 +62,8 @@ BOOL SelectKeyboard(DWORD KeymanID)
   if(!_td) return FALSE;
 
 	SendDebugMessageFormat(hwnd,sdmGlobal,0,"ENTER SelectKeyboard-------------------------------------------");
-  SendDebugMessageFormat(hwnd,sdmGlobal,0,"ENTER SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d", 
-    GetKeyboardLayout(0), 
+  SendDebugMessageFormat(hwnd,sdmGlobal,0,"ENTER SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+    GetKeyboardLayout(0),
     _td->ActiveKeymanID,
     _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
     //_td->NextKeyboardLayout,
@@ -100,7 +100,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
 
 				SendDebugMessageFormat(hwnd,sdmGlobal,0,"SelectKeyboard: NewKeymanID: %x", _td->ActiveKeymanID);
 
-				if(_td->app) _td->app->ResetContext(); 
+				if(_td->app) _td->app->ResetContext();
 				ResetCapsLock();
 
         SelectApplicationIntegration();   // I4287
@@ -120,8 +120,8 @@ BOOL SelectKeyboard(DWORD KeymanID)
 	}
 	__finally
 	{
-    SendDebugMessageFormat(hwnd,sdmGlobal,0,"EXIT SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d", 
-      GetKeyboardLayout(0), 
+    SendDebugMessageFormat(hwnd,sdmGlobal,0,"EXIT SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+      GetKeyboardLayout(0),
       _td->ActiveKeymanID,
       _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
       KeymanID);
@@ -131,7 +131,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
 }
 
 
-BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD dwIdentity, BOOL foreground)   // I3933   // I3949   // I4271
+BOOL SelectKeyboardTSF(DWORD dwIdentity, BOOL foreground)   // I3933   // I3949   // I4271
 {
   if (!foreground && IsFocusedThread()) {
     return FALSE;   // I4277
@@ -147,36 +147,43 @@ BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD dwIdentity, BOOL foregroun
     return FALSE;
   }
 
-  if(!OpenTSF(_td)) return FALSE;
+  TSFINTERFACES tsf = { NULL };
+
+  if(!OpenTSF(&tsf)) return FALSE;
 
   BOOL bResult = FALSE;
 
   SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Selecting language identity=%d %x [%d]", dwIdentity, skb.LangID, foreground);
-  HRESULT hr = _td->pInputProcessorProfiles->ChangeCurrentLanguage(skb.LangID);
+  HRESULT hr = tsf.pInputProcessorProfiles->ChangeCurrentLanguage(skb.LangID);
   if(SUCCEEDED(hr)) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Activating profile");
-    hr = _td->pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_INPUTPROCESSOR, skb.LangID, skb.CLSID, skb.GUIDProfile, NULL, TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);   // I4714
+    hr = tsf.pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_INPUTPROCESSOR, skb.LangID, skb.CLSID, skb.GUIDProfile, NULL, TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);   // I4714
     bResult = SUCCEEDED(hr);
   }
+
+  CloseTSF(&tsf);
 
   SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Exiting with %x", hr);
   return bResult;
 }
 
-void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground) {   // I3933   // I3949   // I4271
-    if(!foreground && IsFocusedThread()) {
-      return;   // I4277
+void SelectKeyboardHKL(DWORD hkl, BOOL foreground) {   // I3933   // I3949   // I4271
+  if(!foreground && IsFocusedThread()) {
+    return;   // I4277
+  }
+
+  TSFINTERFACES tsf = { NULL };
+  if(OpenTSF(&tsf)) {
+    LANGID langid = HKLToLanguageID(ForceKeymanIDToHKL(hkl)); // I3191
+    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating language %x [%d]", langid, foreground);
+    HRESULT hr = tsf.pInputProcessorProfiles->ChangeCurrentLanguage(langid);
+    if(SUCCEEDED(hr)) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating keyboard layout %x for %x", hkl, langid);
+      hr = tsf.pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_KEYBOARDLAYOUT, langid, CLSID_NULL, GUID_NULL, ForceKeymanIDToHKL(hkl), TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE); // I3191   // I4714
     }
-    if(OpenTSF(_td)) {
-        LANGID langid = HKLToLanguageID(ForceKeymanIDToHKL(hkl)); // I3191
-        SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating language %x [%d]", langid, foreground);
-        HRESULT hr = _td->pInputProcessorProfiles->ChangeCurrentLanguage(langid);
-        if(SUCCEEDED(hr)) {
-          SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating keyboard layout %x for %x", hkl, langid);
-            hr = _td->pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_KEYBOARDLAYOUT, langid, CLSID_NULL, GUID_NULL, ForceKeymanIDToHKL(hkl), TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE); // I3191   // I4714
-        }
-        SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Exiting with %x", hr);
-    }
+    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Exiting with %x", hr);
+    CloseTSF(&tsf);
+  }
 }
 
 void PrepareLanguageSwitchString(UINT langid, HKL hkl, char *str) {
@@ -190,14 +197,18 @@ void PrepareLanguageSwitchString(UINT langid, GUID clsid, GUID guidProfile, char
   wsprintf(str, "%d|%d|%ls|%ls", (int) GetCurrentThreadId(), langid, clsidstr, profilestr);   // I4285
 }
 
-void ReportActiveKeyboard(PKEYMAN64THREADDATA _td, WORD wCommand) {   // I3933   // I3949
-  //OutputDebugString("ReportActiveKeyboard\n");
-  if(OpenTSF(_td) && IsFocusedThread()) {   // I4277
-    TF_INPUTPROCESSORPROFILE profile;
-    if(SUCCEEDED(_td->pInputProcessorProfileMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile))) {
-      ReportKeyboardChanged(wCommand, profile.dwProfileType, profile.langid, profile.hkl, profile.clsid, profile.guidProfile);
-    }
+void ReportActiveKeyboard(WORD wCommand) {   // I3933   // I3949
+  if (!IsFocusedThread()) return;
+
+  TSFINTERFACES tsf = { NULL };
+
+  if (!OpenTSF(&tsf)) return;
+
+  TF_INPUTPROCESSORPROFILE profile;
+  if(SUCCEEDED(tsf.pInputProcessorProfileMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile))) {
+    ReportKeyboardChanged(wCommand, profile.dwProfileType, profile.langid, profile.hkl, profile.clsid, profile.guidProfile);
   }
+  CloseTSF(&tsf);
 }
 
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile) {

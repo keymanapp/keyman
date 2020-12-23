@@ -268,14 +268,17 @@
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">Copyright:</string>
 
+  <!-- Context: Configuration Dialog - Footer -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Footer_ChangesImmediate" comment="Short-term (14.0) message explaining why Ok and Cancel buttons are no longer present">Changes are applied immediately</string>
   
-
-  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">Install keyboard...</string>
 
-  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Button_DownloadKeyboard" comment="Keyboard Layouts - download keyboard button">Download keyboard...</string>
@@ -565,9 +568,13 @@
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_SettingsManager" comment="Options button - access to the Settings Manager">Keyman System Settings...</string>
+
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">Diagnostics</string>
 
-  
   
 
   <!-- Context: Download Keyboard Dialog -->

@@ -38,9 +38,9 @@ object frmEmail: TfrmEmail
     Top = 124
     Width = 439
     Height = 26
-    Caption = 
+    Caption =
       '&Please enter as many details as you can of any problems you are' +
-      ' experiencing using Keyman Desktop, to assist us in finding a re' +
+      ' experiencing using Keyman, to assist us in finding a re' +
       'solution:'
     FocusControl = memoBody
     WordWrap = True
@@ -94,7 +94,7 @@ object frmEmail: TfrmEmail
     Top = 256
     Width = 361
     Height = 13
-    Caption = 
+    Caption =
       'No personally identifiable information is included in this repor' +
       't.  You can view '
   end
@@ -103,7 +103,7 @@ object frmEmail: TfrmEmail
     Top = 270
     Width = 464
     Height = 26
-    Caption = 
+    Caption =
       'all the information sent in the report by selecting Advanced Vie' +
       'w in the Options menu while viewing the report.  Please see our ' +
       'online'

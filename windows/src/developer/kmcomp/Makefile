@@ -11,8 +11,8 @@ TARGET_GROUP=developer
 build: version.res manifest.res dirs icons
     $(DELPHI_MSBUILD) kmcomp.dproj /p:Platform=Win32
 
-    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmcomp.exe
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmcomp.exe -dpr kmcomp.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmcomp.exe
     $(COPY) $(WIN32_TARGET_PATH)\kmcomp.exe $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN32_TARGET_PATH)\kmcomp.dbg $(DEBUGPATH)\developer
 
@@ -25,7 +25,7 @@ build: version.res manifest.res dirs icons
     if exist $(WIN64_TARGET_PATH)\kmcomp.x64.map del $(WIN64_TARGET_PATH)\kmcomp.x64.map
     ren $(WIN64_TARGET_PATH)\kmcomp.map kmcomp.x64.map
 
-    $(SENTRYTOOL_DELPHIPREP) $(WIN64_TARGET_PATH)\kmcomp.x64.exe -dpr kmcomp.dpr
+    # $(SENTRYTOOL_DELPHIPREP) $(WIN64_TARGET_PATH)\kmcomp.x64.exe -dpr kmcomp.dpr
     $(COPY) $(WIN64_TARGET_PATH)\kmcomp.x64.exe $(PROGRAM)\developer\kmcomp.x64.exe
     if exist $(WIN64_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN64_TARGET_PATH)\kmcomp.dbg $(DEBUGPATH)\developer\kmcomp.x64.dbg
 
@@ -38,6 +38,12 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(PROGRAM)\developer\kmcomp.exe
     $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(PROGRAM)\developer\kmcomp.x64.exe
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\developer\kmcomp.exe /t keyman-developer
+    $(SYMSTORE) $(PROGRAM)\developer\kmcomp.x64.exe /t keyman-developer
+    $(SYMSTORE) $(DEBUGPATH)\developer\kmcomp.dbg /t keyman-developer
+    #TODO: $(SYMSTORE) $(DEBUGPATH)\developer\kmcomp.x64.dbg /t keyman-developer
 
 backup:
     $(WZZIP) $(BUILD)\developer\kmcomp.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmcomp.exe $(PROGRAM)\developer\kmcomp.x64.exe

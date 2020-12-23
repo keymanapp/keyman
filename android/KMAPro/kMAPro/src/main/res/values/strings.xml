@@ -75,6 +75,14 @@
   <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">Show \"%1$s\" on startup</string>
 
 
+  <!-- Context: Android Storage Permission -->
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">
+    To install keyboard packages, allow Keyman permission to read/write storage.</string>
+
+  <!-- Context: Android Storage Permission -->
+  <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">
+    Storage permission request was denied. May fail to install keyboard package</string>
+
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Settings</string>
 
@@ -96,6 +104,14 @@
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
 
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report" comment="permission for sending crash reports">Allow sending crash reports over network</string>
+
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">When on, crash reports will be sent</string>
+
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">When off, crash reports won\'t be sent</string>
 
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">Install from keyman.com</string>
@@ -111,9 +127,6 @@
 
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="add_language_subtext" comment="Additional information for adding another language">(from keyboard package)</string>
-
-  <!-- Context: Keyman Settings "Install from keyman.com" menu -->
-  <string name="switching_keyboard" comment="Switching to another keyboard">Switching to another keyboard</string>
 
   <!-- Context: Select Package and Select Languages menu -->
   <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">Select Keyboard Package</string>
@@ -165,13 +178,16 @@
   <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Dictionary</string>
 
   <!-- Context: KMP Package strings -->
-  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">No new touch-optimized keyboards to install</string>
+  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Keyboard package has no touch-optimized keyboards to install</string>
 
   <!-- Context: KMP Package strings -->
   <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">No new predictive text to install</string>
 
   <!-- Context: KMP Package strings -->
   <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">No keyboards or predictive text to install</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Keyboard package has no associated languages to install</string>
 
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Invalid/Missing metadata in package</string>

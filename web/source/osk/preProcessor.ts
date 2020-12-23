@@ -47,8 +47,14 @@ namespace com.keyman.osk {
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
         outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
-  
-        let Lkc = PreProcessor._GetClickEventProperties(e['key'].spec as keyboards.ActiveKey, Lelem);
+
+        let keySpec = (e['key'] ? e['key'].spec : null) as keyboards.ActiveKey;
+        if(!keySpec) {
+          console.error("OSK key with ID '" + e.id + "', keyID '" + e.keyId + "' missing needed specification");
+          return true;
+        }
+
+        let Lkc = PreProcessor._GetClickEventProperties(keySpec, Lelem);
         if(keyman.core.languageProcessor.isActive) {
           Lkc.source = touch;
           Lkc.keyDistribution = keyDistribution;

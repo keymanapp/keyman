@@ -17,9 +17,15 @@ namespace com.keyman.text.prediction {
     languages: string[];
 
     /**
-     * The path/URL to the file that defines the model.
+     * The path/URL to the file that defines the model.  If both `path` and `raw` are specified,
+     * `path` takes precedence.
      */
     path: string;
+
+    /**
+     * The raw JS script defining the model.  Only used if `path` is not specified.  
+     */
+    code: string;
   }
 
   /**
@@ -127,11 +133,12 @@ namespace com.keyman.text.prediction {
         throw new Error("Null reference not allowed.");
       }
 
-      let file = model.path;
+      let specType: 'file'|'raw' = model.path ? 'file' : 'raw';
+      let source = specType == 'file' ? model.path : model.code;
       let lp = this;
 
       // We should wait until the model is successfully loaded before setting our state values.
-      return this.lmEngine.loadModel(file).then(function(config: Configuration) { 
+      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
         lp.currentModel = model;
         lp.configuration = config;
 
@@ -153,9 +160,13 @@ namespace com.keyman.text.prediction {
       if(!this.currentModel || !this.configuration) {
         return;
       }
-      
+
       if(outputTarget) {
-        this.predict_internal(outputTarget.buildTranscriptionFrom(outputTarget, null));
+        let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
+        this.predict_internal(transcription, true);
+      } else {
+        // Shouldn't be possible, and we'll want to know if and when it is.
+        console.warn("OutputTarget missing during an invalidateContext call");
       }
     }
 
@@ -304,13 +315,17 @@ namespace com.keyman.text.prediction {
      * have been raised.
      * @param transcription The triggering transcription (if it exists)
      */
-    private predict_internal(transcription: Transcription): Promise<Suggestion[]> {
+    private predict_internal(transcription: Transcription, resetContext: boolean = false): Promise<Suggestion[]> {
       if(!transcription) {
         return null;
       }
 
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
       this.recordTranscription(transcription);
+
+      if(resetContext) {
+        this.lmEngine.resetContext(context);
+      }
 
       let transform = transcription.transform;
       var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);
@@ -359,7 +374,7 @@ namespace com.keyman.text.prediction {
         this._mayPredict = false;
         return false;
       }
-      return this.activeModel && this._mayPredict;
+      return (this.activeModel || false) && this._mayPredict;
     }
 
     public canEnable(): boolean {

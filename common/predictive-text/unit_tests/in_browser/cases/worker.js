@@ -30,7 +30,10 @@ describe('LMLayerWorker', function () {
       worker.postMessage({
         message: 'load',
         // Since the worker's based in a blob, it's not on the 'same domain'.  We need to absolute-path the model file.
-        model: document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
+        source: {
+          type: 'file',
+          file: document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
+        }
       });
     });
   });

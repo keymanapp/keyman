@@ -17,7 +17,7 @@
       android:id="@+id/progressbarmessage"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="@string/progress_message_catalog_download_is_running"
+      android:text="@string/progress_message_checking_resource_is_running"
       android:layout_centerInParent="true"
       android:layout_below="@+id/progressbar" />
 

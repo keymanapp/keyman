@@ -546,7 +546,7 @@ namespace com.keyman.osk {
       this.revertAcceptancePromise = suggestion.apply();
       if(!this.revertAcceptancePromise) {
         // We get here either if suggestion acceptance fails or if it was a reversion.
-        if(suggestion.suggestion.tag == 'revert') {
+        if(suggestion.suggestion && suggestion.suggestion.tag == 'revert') {
           // Reversion state management
           this.recentAccept = false;
           this.doRevert = false;
@@ -690,6 +690,7 @@ namespace com.keyman.osk {
 
       // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
       // and prevent it from being hidden after reversion operations.
+      this.keepSuggestion = null;
       for(let s of suggestions) {
         if(s.tag == 'keep') {
           this.keepSuggestion = s as Keep;

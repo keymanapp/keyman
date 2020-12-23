@@ -32,6 +32,9 @@ FETCH_DEPS=true
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
+    -skip-package-install|-S)
+      FETCH_DEPS=false
+      ;;
     -h|-help|-?)
       display_usage
       exit
@@ -39,8 +42,6 @@ while [[ $# -gt 0 ]] ; do
     -CI)
       CI_REPORTING=1
       ;;
-    -skip-package-install)
-      FETCH_DEPS=false
   esac
   shift # past argument
 done
@@ -63,5 +64,6 @@ pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
 popd
 
 # Run headless (browserless) tests.
+echo "${TERM_HEADING}Running Keyboard Processor test suite${NORMAL}"
 test-headless || fail "Keyboard Processor tests failed!"
 

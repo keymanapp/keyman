@@ -60,6 +60,7 @@ public enum Key {
   static let downloadQueueFrame = "queueFrame"
 
   // Settings-related keys
+  static let optShouldReportErrors = "ShouldReportErrors"
   static let optShouldShowBanner = "ShouldShowBanner"
   // This one SHOULD be app-only, but is needed by the currently
   // in-engine Settings menus.  Alas.

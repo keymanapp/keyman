@@ -16,5 +16,14 @@
   History:          30 Nov 2010 - mcdurdin - I2543 - Support switching to TSF TIPs
 */
 
-BOOL OpenTSF(PKEYMAN64THREADDATA _td);
-BOOL CloseTSF();
+struct TSFINTERFACES {
+  HMODULE hMSCTF;
+  ITfInputProcessorProfiles *pInputProcessorProfiles;
+  ITfInputProcessorProfileMgr *pInputProcessorProfileMgr;
+};
+
+typedef TSFINTERFACES *PTSFINTERFACES;
+
+
+BOOL OpenTSF(PTSFINTERFACES pTSF);
+void CloseTSF(PTSFINTERFACES pTSF);

@@ -41,25 +41,16 @@ type
     ssErrorUnableToContactServer,
     ssErrorUnableToContactServerDetailed,
 
-    ssStatusCheckingWindowsInstaller,
-    ssStatusCheckingInternetExplorer,
-    ssStatusCheckingMSXML,
     ssStatusCheckingForUpdates,
     ssStatusInstalling,
     ssStatusComplete,
-
-    ssQueryUpdateWindowsInstaller,
-    ssQueryUpdateInternetExplorer,
-    ssQueryUpdateMSXML,
 
     ssQueryUpdateVersion,
 
     ssQueryRestart,
     ssErrorUnableToAutomaticallyRestart,
 
-    ssRedistIEUpdateRequired,
     ssMustRestart,
-    ssRedistRequired,
     ssCheckForUpdatesError
     );
 
@@ -80,16 +71,9 @@ const
     'Unable to contact server',
     'Unable to contact server, error was: %0:s',
 
-    'Checking Windows Installer version',
-    'Checking Internet Explorer version',
-    'Checking MSXML version',
     'Checking for updates online',
     'Installing Keyman Developer',
     'Installation Complete',
-
-    'An updated version of Windows Installer is required to install Keyman Developer.  Do you want to download and install it now?',
-    'Internet Explorer 5.5 or later is required to install Keyman Developer.  Do you want to download it now?',
-    'MSXML 3.0 is required to install Keyman Developer.  Do you want to download it now?',
 
     'Version %1:s of Keyman Developer has been released and is available for download.  This update is %0:dKB.  '+
       'Do you want to download and install the updated version (recommended)?',
@@ -97,11 +81,7 @@ const
     'You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.  Restart now?',
     'Windows was not able to be automatically restarted.  You should restart Windows before you try and start Keyman Developer.',
 
-    'Internet Explorer 5.5 or later is required to install Keyman Developer.',
-
     'You must restart Windows to complete Setup.  When you restart Windows, Setup will finish.',
-
-    'A redistributable %0:s is required but is not available in the install path.  This redistributable can be downloaded from the Keyman website.',
 
     'The online update check failed with an error: %0:s'
     );

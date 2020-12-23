@@ -121,6 +121,12 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
         self.navigationController?.popViewController(animated: true) // Rewind UI
         finalize(with: parsedLink)
         return
+      } else if UniversalLinks.isExternalLink(link) {
+        decisionHandler(.cancel)
+
+        // Kick this link out to an external Safari process.
+        UniversalLinks.externalLinkLauncher?(link)
+        return
       }
     }
 
@@ -150,7 +156,7 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
 
   public static func defaultDownloadClosure(downloadCompletionBlock: @escaping SearchDownloadHandler<FullKeyboardID>) -> SelectionCompletedHandler<FullKeyboardID> {
     return defaultDownloadClosure(withDownloadManager: ResourceDownloadManager.shared,
-                                              downloadCompletionBlock: downloadCompletionBlock)
+                                  downloadCompletionBlock: downloadCompletionBlock)
   }
 
   // For unit testing.

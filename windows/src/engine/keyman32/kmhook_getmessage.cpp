@@ -1,18 +1,18 @@
 /*
   Name:             kmhook_getmessage
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Visual keyboard updating
                     14 Sep 2006 - mcdurdin - Add wxm_keymanchar message for character map and other tools
                     04 Dec 2006 - mcdurdin - Add support for mosewheel on character map even when not focused
@@ -43,9 +43,9 @@
                     19 Jul 2011 - mcdurdin - I2999 - If switch for all apps is off, Keyman icon does not reflect active keyboard when application switched
                     17 Aug 2012 - mcdurdin - I3432 - V9.0 - Add support for &platform and &baselayout to Keyman Engine
                     21 Feb 2012 - mcdurdin - I3253 - Wrong hook handle passed to CallNextHookEx
-                    03 Jul 2012 - mcdurdin - I3385 - Keyman Engine thinks it is in Keyman Desktop Light mode in parent process when starting
+                    03 Jul 2012 - mcdurdin - I3385 - Keyman Engine thinks it is in Keyman D_esktop Light mode in parent process when starting
                     04 Nov 2012 - mcdurdin - I3532 - V9.0 - Merge of I3253 - Wrong hook handle passed to CallNextHookEx
-                    04 Nov 2012 - mcdurdin - I3533 - V9.0 - Merge of I3385 - Keyman Engine thinks it is in Keyman Desktop Light mode in parent process when starting
+                    04 Nov 2012 - mcdurdin - I3533 - V9.0 - Merge of I3385 - Keyman Engine thinks it is in Keyman D_esktop Light mode in parent process when starting
                     20 Nov 2012 - mcdurdin - I3583 - V9.0 - Remove AITIP::NotifyKeyboardChange as obsolete
                     28 Nov 2012 - mcdurdin - I3594 - V9.0 - Remove old SelectKeyboard code and related messages
                     01 Dec 2012 - mcdurdin - I3617 - V9.0 - Keyboard hook obsolete, strip out code
@@ -118,13 +118,13 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	mp = (LPMSG)lParam;
 
 	// If the message sent should be ignored, just return
-  if(nCode < 0) 
+  if(nCode < 0)
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td)
   {
-    if(!Globals::CheckControllers()) 
+    if(!Globals::CheckControllers())
       return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 
     if(!Globals_InitThread())
@@ -142,7 +142,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
   }
 
   if (((mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST) || mp->message == wm_keymankeydown || mp->message == wm_keymankeyup ||
-    mp->message == wm_keyman_keyevent) 
+    mp->message == wm_keyman_keyevent)
     && ShouldDebug(sdmMessage)) {
     DebugMessage(mp, wParam);
   }
@@ -224,7 +224,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	if(mp->message == wm_keyman_refresh)
 	{
 		SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_refresh %d tag=%d", mp->wParam, mp->lParam);
-		HandleRefresh((int) mp->wParam, (LONG) mp->lParam); 
+		HandleRefresh((int) mp->wParam, (LONG) mp->lParam);
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
 
@@ -248,7 +248,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 	if(mp->message == WM_UNICHAR && Addin_ShouldProcessUnichar(mp->hwnd))
 	{
-		if(Addin_ProcessUnichar(mp->hwnd, (DWORD) mp->wParam)) 
+		if(Addin_ProcessUnichar(mp->hwnd, (DWORD) mp->wParam))
 		{
 			mp->message = 0;
 			return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
@@ -299,7 +299,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 			}
 			return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 		}
-	
+
 		if(!*Globals::hwndIMAlways())
 		{
 			if(mp->message == wm_keymankeydown)
@@ -320,7 +320,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
 
-	if(mp->message > WM_MOUSEFIRST && mp->message <= WM_MOUSELAST && !IsIMWindow(mp->hwnd)) 
+	if(mp->message > WM_MOUSEFIRST && mp->message <= WM_MOUSELAST && !IsIMWindow(mp->hwnd))
 	{
 		// > MOUSEFIRST ignores mouse movement
 		if(_td->app) _td->app->ResetContext();
@@ -358,7 +358,7 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		  if(_td->lpActiveKeyboard) {
 			  _td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
 		  }
-      
+
       SelectApplicationIntegration();
       if(_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
       _td->state.windowunicode = !_td->app || _td->app->IsUnicode();
@@ -380,23 +380,21 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
   UNREFERENCED_PARAMETER(hwnd);
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
 
 	switch(wParam)
 	{
   case KMCI_GETACTIVEKEYBOARD:   // I3933
-    ReportActiveKeyboard(_td, LOWORD(lParam));   // I3949
+    ReportActiveKeyboard(LOWORD(lParam));   // I3949
     break;
 
   case KMCI_SELECTKEYBOARD_BACKGROUND:   // I4271
   case KMCI_SELECTKEYBOARD:   // I3933
-    SelectKeyboardHKL(_td, (DWORD) lParam, wParam == KMCI_SELECTKEYBOARD);
+    SelectKeyboardHKL((DWORD) lParam, wParam == KMCI_SELECTKEYBOARD);
     break;
 
   case KMCI_SELECTKEYBOARD_BACKGROUND_TSF:   // I4271
   case KMCI_SELECTKEYBOARD_TSF:   // I3933
-    SelectKeyboardTSF(_td, (DWORD) lParam, wParam == KMCI_SELECTKEYBOARD_TSF);
+    SelectKeyboardTSF((DWORD) lParam, wParam == KMCI_SELECTKEYBOARD_TSF);
     break;
 
   case KMCI_SETFOREGROUND:   // I3933
@@ -451,7 +449,7 @@ void GetCapsAndNumlockState() {   // I4793
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
   UINT flag = 0;
 
-  switch(key) {  
+  switch(key) {
     case VK_SHIFT:   flag = K_SHIFTFLAG; break;
     case VK_MENU:    flag = isExtended ? RALTFLAG : LALTFLAG; break;
     case VK_CONTROL: flag = isExtended ? RCTRLFLAG : LCTRLFLAG; break;
@@ -462,13 +460,13 @@ void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
   UINT oldShiftState = Globals::get_ShiftState();
 
   if(isUp) {
-    *Globals::ShiftState() &= ~flag; 
+    *Globals::ShiftState() &= ~flag;
   }
-  else { 
+  else {
     *Globals::ShiftState() |= flag;
   }
 
-  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessModifierChange(%x, %d, %d) -> shift state from %x to %x", 
+  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessModifierChange(%x, %d, %d) -> shift state from %x to %x",
     key, isUp, isExtended, oldShiftState, Globals::get_ShiftState());
 }
 

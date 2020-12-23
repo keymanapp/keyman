@@ -49,7 +49,11 @@ describe('LMLayer', function() {
         }
 
         assert.propertyVal(data, 'message', 'load');
-        assert.isString(data.model);
+        assert.property(data, 'source');
+        assert.propertyVal(data.source, 'type', 'file');
+        assert.notProperty(data.source, 'code');
+        assert.property(data.source, 'file');
+        assert.isString(data.source.file);
       
         callAsynchronously(() => fakeWorker.onmessage({
           data: {

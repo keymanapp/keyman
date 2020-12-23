@@ -3,7 +3,6 @@
  */
 package com.tavultesoft.kmapro;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import java.io.File;
 
 public class DownloadResultReceiver extends ResultReceiver {
   private Context context;
-  private ProgressDialog progressDialog;
 
   public DownloadResultReceiver(Handler handler, Context context) {
     super(handler);
@@ -25,20 +23,13 @@ public class DownloadResultReceiver extends ResultReceiver {
     this.context = context;
   }
 
-  public void setProgressDialog(ProgressDialog progressDialog) {
-    this.progressDialog = progressDialog;
-  }
-
   @Override
   protected void onReceiveResult(int resultCode, Bundle resultData) {
-    if (progressDialog != null && progressDialog.isShowing()) {
-      progressDialog.dismiss();
-    };
-    progressDialog = null;
     switch(resultCode) {
       case FileUtils.DOWNLOAD_ERROR :
         Toast.makeText(context, "Download failed",
           Toast.LENGTH_SHORT).show();
+        MainActivity.cleanupPackageInstall();
         break;
       case FileUtils.DOWNLOAD_SUCCESS :
         String downloadedFilename = resultData.getString("filename");

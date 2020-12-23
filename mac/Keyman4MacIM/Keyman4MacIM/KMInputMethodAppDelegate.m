@@ -19,14 +19,16 @@
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
-#import <Fabric/Fabric.h>
-#import <Crashlytics/Crashlytics.h>
+@import Sentry;
 
+/** NSUserDefaults keys */
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kKMSavedStoresKey = @"KMSavedStoresKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
+NSString *const kKMLegacyApps = @"KMLegacyApps";
+
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
 NSString *const kPackage = @"[Package]";
@@ -65,6 +67,7 @@ typedef enum {
 @synthesize alwaysShowOSK = _alwaysShowOSK;
 
 id _lastServerWithOSKShowing = nil;
+NSString* _keymanDataPath = nil;
 
 - (id)init {
     self = [super init];
@@ -111,17 +114,49 @@ id _lastServerWithOSKShowing = nil;
     return self;
 }
 
+- (KeymanVersionInfo)versionInfo {
+    KeymanVersionInfo result;
+    // Get version information from Info.plist, which is filled in 
+    // by build.sh.
+    NSDictionary *keymanInfo =[[[NSBundle mainBundle] infoDictionary] objectForKey:@"Keyman"];
+    result.sentryEnvironment = [keymanInfo objectForKey:@"SentryEnvironment"];
+    result.tier = [keymanInfo objectForKey:@"Tier"];
+    result.versionRelease = [keymanInfo objectForKey:@"VersionRelease"];
+    result.versionWithTag = [keymanInfo objectForKey:@"VersionWithTag"];
+    if([result.tier isEqualToString:@"stable"]) {
+        result.keymanCom = @"keyman.com";
+        result.helpKeymanCom = @"help.keyman.com";
+        result.apiKeymanCom = @"api.keyman.com";
+    } 
+    else {
+        result.keymanCom = @"keyman-staging.com";
+        result.helpKeymanCom = @"help.keyman-staging.com";
+        result.apiKeymanCom = @"api.keyman-staging.com";
+    }
+    return result;
+}
+
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
-    [[Fabric sharedSDK] setDebug: self.debugMode];
-    [Fabric with:@[[Crashlytics class]]];
+
+    KeymanVersionInfo keymanVersionInfo = [self versionInfo];
+    NSString *releaseName = [NSString stringWithFormat:@"release-%@", keymanVersionInfo.versionWithTag];
+    
+    [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
+        options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@sentry.keyman.com/9";
+        options.releaseName = releaseName;
+        options.environment = keymanVersionInfo.sentryEnvironment;
+        // options.debug = @YES; 
+    }];
+    
+    // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
 }
 
 #ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
 - (BOOL)alertShowHelp:(NSAlert *)alert {
-    NSLog(@"Crashlytics - KME: Got call to force crash from engine");
-    [[Crashlytics sharedInstance] crash];
-    NSLog(@"Crashlytics - KME: should not have gotten this far!");
+    NSLog(@"Sentry - KME: Got call to force crash from engine");
+    [SentrySDK crash];
+    NSLog(@"Sentry - KME: should not have gotten this far!");
     return NO;
 }
 #endif
@@ -160,36 +195,6 @@ id _lastServerWithOSKShowing = nil;
                     urlString = [urlString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                 }
                 downloadUrl = [NSURL URLWithString:urlString];
-            }
-        }
-
-        if (downloadUrl && _downloadFilename) {
-            if (_infoWindow.window != nil)
-                [_infoWindow close];
-
-            [self.downloadInfoView setInformativeText:self.downloadFilename];
-            if (self.configWindow.window != nil) {
-                [self.configWindow.window makeKeyAndOrderFront:nil];
-                if (![[self.configWindow.window childWindows] containsObject:self.downloadKBWindow.window]) {
-                    [self.configWindow.window addChildWindow:self.downloadKBWindow.window ordered:NSWindowAbove];
-                }
-                [self.downloadKBWindow.window centerInParent];
-                [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-                [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
-                                                  modalDelegate:self
-                                                 didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                                    contextInfo:nil];
-                [self downloadKeyboardFromURL:downloadUrl];
-            }
-            else {
-                [self.downloadKBWindow.window centerInParent];
-                [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-                [self.downloadKBWindow.window setLevel:NSFloatingWindowLevel];
-                [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
-                                                  modalDelegate:self
-                                                 didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                                    contextInfo:nil];
-                [self downloadKeyboardFromURL:downloadUrl];
             }
         }
     }
@@ -270,6 +275,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
         switch (type) {
             case kCGEventFlagsChanged:
+                if (appDelegate.debugMode)
+                    NSLog(@"System Event: flags changed: %x", (int) sysEvent.modifierFlags);
                 appDelegate.currentModifierFlags = sysEvent.modifierFlags;
                 if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
                     appDelegate.contextChangingEventDetected = YES;
@@ -290,6 +297,51 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 // of events)
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
                     [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
+                }
+
+                switch(sysEvent.keyCode) {
+                    case kVK_Home:
+                    case kVK_PageUp:
+                    case kVK_End:
+                    case kVK_PageDown:
+                        // While these four may not actually move the cursor, this is application-dependent,
+                        // so we'll treat them all as a context change. This means we lose deadkeys if these
+                        // are pressed, but that's actually probably a good thing anyway!
+                    case kVK_LeftArrow:
+                    case kVK_RightArrow:
+                    case kVK_DownArrow:
+                    case kVK_UpArrow:
+                        // Cursor movement means that we need to recheck the context
+                    case kVK_Escape:
+                        // Escape key should be treated as a context reset
+                    case kVK_F1:
+                    case kVK_F2:
+                    case kVK_F3:
+                    case kVK_F4:
+                    case kVK_F5:
+                    case kVK_F6:
+                    case kVK_F7:
+                    case kVK_F8:
+                    case kVK_F9:
+                    case kVK_F10:
+                    case kVK_F11:
+                    case kVK_F12:
+                    case kVK_F13:
+                    case kVK_F14:
+                    case kVK_F15:
+                    case kVK_F16:
+                    case kVK_F17:
+                    case kVK_F18:
+                    case kVK_F19:
+                    case kVK_F20:
+                        // Function keys are command keys, so context is invalid
+                    case kVK_Tab:
+                        // A tab between cells in a Word document, for instance, is a context change
+                    case kVK_ForwardDelete:
+                        // Text modification by the forward delete key should reset context, but
+                        // note that normal Delete (aka Bksp) is already managed by Keyman correctly.
+                        appDelegate.contextChangingEventDetected = YES;
+                        break;
                 }
                 break;
 
@@ -412,14 +464,37 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return [userData boolForKey:kKMUseVerboseLogging];
 }
 
+/**
+ * Locate and create the Keyman data path; currently in ~/Documents/Keyman-Keyboards
+ */
+- (NSString *)keymanDataPath {
+    if(_keymanDataPath == nil) {
+        NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        _keymanDataPath = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
+
+        NSFileManager *fm = [NSFileManager defaultManager];
+        if (![fm fileExistsAtPath:_keymanDataPath]) {
+            [fm createDirectoryAtPath:_keymanDataPath withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+    }
+    return _keymanDataPath;
+}
+
+/**
+ * Returns the list of user-default legacy apps
+ */
+- (NSArray *)legacyAppsUserDefaults { 
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    return [userData arrayForKey:kKMLegacyApps];
+}
+
+/**
+ * Returns the root folder where keyboards are stored; currently the same
+ * as the keymanDataPath, but may diverge in future versions (possibly a sub-folder)
+ */
 - (NSString *)keyboardsPath {
     if (_keyboardsPath == nil) {
-        NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-        _keyboardsPath = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
-        NSFileManager *fm = [NSFileManager defaultManager];
-        if (![fm fileExistsAtPath:_keyboardsPath]) {
-            [fm createDirectoryAtPath:_keyboardsPath withIntermediateDirectories:YES attributes:nil error:nil];
-        }
+        _keyboardsPath = [self keymanDataPath];
     }
 
     return _keyboardsPath;
@@ -1061,16 +1136,55 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return _progressIndicator;
 }
 
+- (void)downloadKeyboardFromKeyboardId:(NSString *)keyboardId {
+    KeymanVersionInfo keymanVersionInfo = [self versionInfo];
+    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/go/package/download/%@?platform=macos&tier=%@",
+        keymanVersionInfo.keymanCom, keyboardId, keymanVersionInfo.tier]];  //&bcp47=%@&update=0
+    _downloadFilename = [NSString stringWithFormat:@"%@.kmp", keyboardId];
+    [self downloadKeyboardFromURL:url];
+}
+
 - (void)downloadKeyboardFromURL:(NSURL *)url {
-    if (_connection == nil) {
-        [_downloadInfoView setMessageText:@"Downloading..."];
-        NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
-        [button setTitle:@"Cancel"];
-        [button setTag:-1];
-        [self.progressIndicator setDoubleValue:0];
-        NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
-        _receivedData = [[NSMutableData alloc] initWithLength:0];
-        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    NSURL* downloadUrl = url;
+
+    if (downloadUrl && _downloadFilename) {
+        if (_infoWindow.window != nil)
+            [_infoWindow close];
+
+        [self.downloadInfoView setInformativeText:self.downloadFilename];
+        if (self.configWindow.window != nil) {
+            [self.configWindow.window makeKeyAndOrderFront:nil];
+            if (![[self.configWindow.window childWindows] containsObject:self.downloadKBWindow.window]) {
+                [self.configWindow.window addChildWindow:self.downloadKBWindow.window ordered:NSWindowAbove];
+            }
+            [self.downloadKBWindow.window centerInParent];
+            [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
+            [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
+                                                modalDelegate:self
+                                                didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                                                contextInfo:nil];
+        }
+        else {
+            [self.downloadKBWindow.window centerInParent];
+            [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
+            [self.downloadKBWindow.window setLevel:NSFloatingWindowLevel];
+            [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
+                                                modalDelegate:self
+                                                didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                                                contextInfo:nil];
+        }
+
+        if (_connection == nil) {
+            [_downloadInfoView setMessageText:@"Downloading..."];
+            NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
+            [button setTitle:@"Cancel"];
+            [button setTag:-1];
+            [self.progressIndicator setDoubleValue:0];
+            NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+            _receivedData = [[NSMutableData alloc] initWithLength:0];
+            _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+        }
+
     }
 }
 
@@ -1090,6 +1204,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _downloadFilename = nil;
     _receivedData = nil;
     _expectedBytes = 0;
+}
+
+- (NSURLRequest *)connection:(NSURLConnection *)connection
+             willSendRequest:(nonnull NSURLRequest *)request
+            redirectResponse:(nullable NSURLResponse *)response {
+    return request;
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {

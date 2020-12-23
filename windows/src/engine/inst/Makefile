@@ -22,6 +22,10 @@ backup:
     cd $(ROOT)\src\engine\inst\insthelper
     $(MAKE) backup
 
+wrap-symbols:
+    cd $(ROOT)\src\engine\inst\insthelper
+    $(MAKE) symbols
+
 msm:
     #
     # Copy files for installation

@@ -146,7 +146,6 @@ uses
   keymankeyboardlanguagefile in 'com\keyboardlanguages\keymankeyboardlanguagefile.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
-  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   utilicon in '..\..\global\delphi\general\utilicon.pas',
   Keyman.System.MitigateWin10_1803LanguageInstall in 'processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas',

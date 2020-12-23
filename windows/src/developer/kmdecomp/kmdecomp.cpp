@@ -57,7 +57,7 @@ int run(int argc, char *argv[])
 
 	if(argc < 2 || !strcmp(argv[1], "--help"))
 	{
-		puts("KMDECOMP: Decompile Keyman Desktop .kmx keyboard");
+		puts("KMDECOMP: Decompile Keyman .kmx keyboard");
 		puts("(C) SIL International");
 		puts("Usage: KMDECOMP <filename>\n");
 		puts("Will create a .kmn and optionally a .bmp/.ico with the same filename and in the same location as the input");

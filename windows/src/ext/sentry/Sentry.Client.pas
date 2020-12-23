@@ -5,7 +5,6 @@ interface
 
 uses
   System.AnsiStrings,
-  System.Math,
   System.SysUtils,
   Winapi.ImageHlp,
   Winapi.Windows,
@@ -176,6 +175,25 @@ begin
 end;
 
 ///
+/// This is a thread-safe version of Set8087CW that avoids the global
+/// variable Default8087CW. We would get occasional situations where
+/// exceptions were raised on 2 threads simultaneously, which could lead to a
+/// race where the first thread set Default8087CW to $1340, and then the second
+/// thread would read that and think that is the default to keep. We want to
+/// avoid touching Default8087CW altogether here.
+///
+/// See also https://stackoverflow.com/a/39684636/1836776 and RSP-13643.
+///
+procedure Set8087CW_Threadsafe(ANewCW: Word);
+var
+  L8087CW: Word;
+asm
+  mov L8087CW, ANewCW
+  fnclex
+  fldcw L8087CW
+end;
+
+///
 /// First chance exception handler. We just want to take a copy of the raw
 /// stack here.
 ///
@@ -189,11 +207,12 @@ const
 {$ENDIF}
 var
   Skip: Integer;
-  LastMask: TArithmeticExceptionMask;
+  LastMask: WORD;
 begin
   // Floating point state may be broken here, so let's mask it out and continue
   // We'll restore state afterwards
-  LastMask := System.Math.SetExceptionMask([]);
+  LastMask := Get8087CW;
+  Set8087CW_Threadsafe($1332);
 
   if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
     then Skip := DELPHI_FRAMES_TO_SKIP
@@ -201,7 +220,7 @@ begin
   CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
 
   // Restore FP state
-  System.Math.SetExceptionMask(LastMask);
+  Set8087CW_Threadsafe(LastMask);
 
   Result := 0; //EXCEPTION_CONTINUE_SEARCH;
 end;
@@ -537,7 +556,7 @@ begin
       Continue;
     end;
 
-    raw_frames[n] := frame.AddrPC.Offset;
+    raw_frames[n] := NativeUInt(frame.AddrPC.Offset);
     Inc(n);
   end;
 

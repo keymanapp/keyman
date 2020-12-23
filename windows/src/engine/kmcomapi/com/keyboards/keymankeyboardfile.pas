@@ -259,7 +259,8 @@ end;
 
 function TKeymanKeyboardFile.Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
 var
-  FBitmap, FEncodings: WideString;
+  FBitmap, FEncodings: string;
+  TempBitmapLockFile: string;
 begin
   FEncodings := '';
   if (Get_Encodings and keymanapi_TLB.keUnicode) = keymanapi_TLB.keUnicode then
@@ -283,7 +284,7 @@ begin
     (Assigned(FKeyboardInfo.Icon) or
     Assigned(FKeyboardInfo.Bitmap)) then
   begin
-    FBitmap := XMLImageTempName(ImagePath, References);
+    FBitmap := XMLImageTempName(ImagePath, TempBitmapLockFile, References);
     with TBitmap.Create do
     try
       Width := 16;
@@ -295,6 +296,7 @@ begin
     finally
       Free;
     end;
+    DeleteFile(TempBitmapLockFile); // delete after bitmap is saved to avoid races
     Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
   end;
 end;

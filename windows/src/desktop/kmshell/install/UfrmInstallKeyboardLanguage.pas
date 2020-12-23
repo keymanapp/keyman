@@ -15,7 +15,7 @@
   Notes:
   History:          28 May 2014 - mcdurdin - I4222 - V9.0 - Deprecate osWin2000, osWinXP, osWin2003Server
                     03 Aug 2014 - mcdurdin - I4322 - V9.0 - Specify custom languages (med-high) ? fixup language association dialog, also in installer.
-                    01 Sep 2014 - mcdurdin - I4394 - V9.0 - Keyman Desktop Free Edition polish
+                    01 Sep 2014 - mcdurdin - I4394 - V9.0 - Keyman  Free Edition polish
                     01 Sep 2014 - mcdurdin - I4395 - V9.0 - Restrict associated languages to 1 for Light Edition
 
 *)

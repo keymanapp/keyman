@@ -137,6 +137,7 @@ type
 
     FKeyStateNull: TKeyboardState;
     FXxxxVk: UINT;
+    FHas102ndKey: Boolean;
     function GetMaxShiftState: TKBDShiftState;
     function ProcessDeadKey(
         iKeyDead: UINT;             // The index into the VirtualKey of the dead key
@@ -148,6 +149,7 @@ type
     procedure ScanKeyboard(hkl: HKL);
     function WriteOutputKMNFile: string;
     function WriteOutputKVKSFile: string;
+    procedure Detect102ndKey(hkl: HKL);
   public
     constructor Create(inputHKL, layoutFile, layoutText: string);
     destructor Destroy; override;
@@ -463,8 +465,13 @@ begin
     else if FRGFDeadKey[ss, False] then
     begin
       // It's a dead key
+      // This does not match the "Fill from layout" result because deadkeys are
+      // left blank in "Fill from layout". However, this is better because it
+      // matches the actual Windows layout. "Fill from layout" cannot deduce the
+      // character to put onto a deadkey currently (unlike Windows deadkeys,
+      // there is no isolated "default" for a Keyman deadkey).
       vkk := TVisualKeyboardKey.Create;
-      vkk.VKey := FVK;
+      vkk.VKey := MapScanCodeToUSVK(FSC);
       vkk.Text := st[1];
       vkk.Flags := [kvkkUnicode];
       vkk.Shift := KBDShiftStateToVisualKeyboardShiftState[ss];
@@ -486,7 +493,7 @@ begin
       begin
         // It's some characters; put 'em in there.
         vkk := TVisualKeyboardKey.Create;
-        vkk.VKey := FVK;
+        vkk.VKey := MapScanCodeToUSVK(FSC);
         vkk.Text := st;
         vkk.Flags := [kvkkUnicode];
         vkk.Shift := KBDShiftStateToVisualKeyboardShiftState[ss];
@@ -788,6 +795,22 @@ begin
       end;
     end;
   end;
+
+  Detect102ndKey(hkl);
+end;
+
+// duplicate of TOnScreenKeyboard.UpdateEuroLayout
+procedure TLoader.Detect102ndKey(hkl: HKL);
+var
+  k102, kbackslash: UINT;
+begin
+  k102 := MapVirtualKeyExW($56, 1, hkl);
+  kbackslash := MapVirtualKeyExW($2b, 1, hkl);
+
+  if k102 <> 0 then k102 := MapVirtualKeyExW(k102, 2, hkl);
+  if kbackslash <> 0 then kbackslash := MapVirtualKeyExW(kbackslash, 2, hkl);
+
+  FHas102ndKey := (kbackslash <> k102) and (k102 <> 0);
 end;
 
 procedure TLoader.Main(var KMN, KVKS: string);
@@ -914,6 +937,9 @@ begin
         rgKey[iKey].AddKeysToVisualKeyboard(vk);
       end;
     end;
+
+    if FHas102ndKey then
+      vk.Header.Flags := vk.Header.Flags + [kvkh102];
 
     vk.SaveToStream(ss, kvksfXML);
 

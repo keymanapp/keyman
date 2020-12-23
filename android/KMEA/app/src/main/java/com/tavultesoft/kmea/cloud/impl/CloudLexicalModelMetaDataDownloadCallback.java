@@ -150,6 +150,9 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
           } catch (JSONException e) {
             KMLog.LogException(TAG, "Error parsing lexical model from api.keyman.com. ", e);
           }
+        } else {
+          String msg = aContext.getString(R.string.no_associated_model);
+          Toast.makeText(aContext, msg, Toast.LENGTH_SHORT).show();
         }
       }
 
@@ -174,5 +177,4 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
   {
     return "metadata_" + aLanguageId;
   }
-
 }

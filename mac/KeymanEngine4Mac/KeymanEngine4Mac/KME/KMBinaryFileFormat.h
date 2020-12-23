@@ -117,6 +117,10 @@ struct COMP_STORE {
 #define K_SHIFTFLAG     0x0010      // Either shift flag
 #define K_CTRLFLAG      0x0020      // Either ctrl flag
 #define K_ALTFLAG       0x0040      // Either alt flag
+//#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
+                                // Used internally (currently, only by KMW) to ensure Meta-key 
+                                // shortcuts safely bypass rules
+                                // Meta key = Command key on macOS, Windows key on Windows
 #define CAPITALFLAG     0x0100      // Caps lock on
 #define NOTCAPITALFLAG  0x0200      // Caps lock NOT on
 #define NUMLOCKFLAG     0x0400      // Num lock on
@@ -178,9 +182,17 @@ struct COMP_KEY {
 
 /* KVK file format definitions */
 
+// KVK header flags
+#define KVKH_102                0x01
+#define KVKH_DISPLAY_UNDERLYING 0x02
+#define KVKH_USE_UNDERLYING     0x04
+#define KVKH_ALTGR              0x08
+
+// KVK key type flags
 #define KVKK_BITMAP             0x01
 #define KVKK_UNICODE            0x02
 
+// KVK shift flags
 #define KVKS_NORMAL             0x00
 #define KVKS_SHIFT              0x01
 #define KVKS_CTRL               0x02
@@ -189,36 +201,5 @@ struct COMP_KEY {
 #define KVKS_RCTRL              0x10
 #define KVKS_LALT               0x20
 #define KVKS_RALT               0x40
-
-
-/*
-PWSTR incxstr(PWSTR p) {
-    if(*p == 0) return p;
-    if(*p != UC_SENTINEL)
-    {
-        if(*p >= 0xD800 && *p <= 0xDBFF && *(p+1) >= 0xDC00 && *(p+1) <= 0xDFFF) return p+2;
-        return p+1;
-    }
-    p+=2;
-    switch(*(p-1))
-    {
-        case CODE_ANY:      return p+1;
-        case CODE_NOTANY:   return p+1;
-        case CODE_INDEX:        return p+2;
-        case CODE_USE:          return p+1;
-        case CODE_DEADKEY:      return p+1;
-        case CODE_EXTENDED:     p += 2; while(*p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
-        case CODE_CLEARCONTEXT: return p+1;
-        case CODE_CALL:         return p+1;
-        case CODE_CONTEXTEX:    return p+1;
-        case CODE_IFOPT:    return p+3;
-        case CODE_IFSYSTEMSTORE: return p+3;
-        case CODE_SETOPT:   return p+2;
-        case CODE_SETSYSTEMSTORE: return p+2;
-        case CODE_RESETOPT: return p+1;
-        case CODE_SAVEOPT:  return p+1;
-        default:                return p;
-    }
-}*/
 
 #endif /* KMBinaryFileFormat_h */

@@ -345,12 +345,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     self.completionHandler(selectedResources.map { $0.typedFullID })
 
     let dismissalBlock = {
-      // If it is not the root view of a navigationController, just pop it off the stack.
-      if let navVC = self.navigationController {
-       if navVC.viewControllers[0] != self {
-        navVC.popViewController(animated: true)
-        } else {
-          self.dismiss(animated: true)
+      if let nvc = self.navigationController {
+        self.dismiss(animated: true) {
+          nvc.popToRootViewController(animated: true)
         }
       } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
         self.dismiss(animated: true)
@@ -394,6 +391,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @objc private func onWelcomeDismissed() {
     self.dismissalBlock?()
     self.dismissalBlock = nil
+
+    // The user will be on the main screen after this, so we should resummon the keyboard.
+    Manager.shared.showKeyboard()
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {

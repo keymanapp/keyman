@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<section id="langsetup_psrtmsofficelanguage">
-  <title>Configure Microsoft Office Language Support</title>
-  <para>If Microsoft Office 2000 or later is installed on your system, Keyman Desktop will automatically configure it to work in the language of your chosen keyboard layout.  This      is required for editing some languages, such as right-to-left languages, or some complex script languages.</para>
-  <para>This will also control autocorrection, spell checking and other language-specific features throughout Microsoft Office.  Depending on the version of Office that you have installed, you may have to restart Office applications before the changes will take effect.</para>
-</section>

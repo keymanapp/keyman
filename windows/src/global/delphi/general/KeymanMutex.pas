@@ -1,19 +1,19 @@
 (*
   Name:             Mutex
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      28 Feb 2011
 
   Modified Date:    28 Feb 2011
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies
+  Bugs:
+  Todo:
+  Notes:
+  History:          28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman splash from showing multiple copies
 *)
 unit KeymanMutex;
 

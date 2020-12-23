@@ -1,18 +1,18 @@
 (*
   Name:             Menu_KeyboardItems
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    23 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Initial version
                     12 Dec 2006 - mcdurdin - Localize menu
                     04 Jan 2007 - mcdurdin - Add OpenKeyboardHelp action
@@ -35,7 +35,7 @@
                     28 Aug 2014 - mcdurdin - I4390 - V9.0 - Free vs Pro
                     28 Aug 2014 - mcdurdin - I4390 - V9.0 - Free vs Pro
                     01 Sep 2014 - mcdurdin - I4398 - V9.0 - Hotkeys don't show on keyboard list
-                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman Desktop Free Edition polish
+                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman D_esktop Free Edition polish
                     23 Oct 2014 - mcdurdin - I4458 - Crash showing keyboard menu when product missing [CrashID:keyman.exe_9.0.472.0_2C5933D2_EAccessViolation]
 *)
 unit Menu_KeyboardItems;  // I3306   // I3614   // I4004
@@ -292,6 +292,9 @@ var
 begin
   FMenu.Items.Clear;
   FNextMenuItemIsBreak := False;
+
+  FKeyman.Refresh;
+  frmKeyman7Main.LangSwitchManager.Refresh;
 
   with kmint.KeymanCustomisation do
     for i := 1 to CustMenuItems.Count do {$MESSAGE HINT 'This indexing needs to be sorted out'}

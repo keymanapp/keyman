@@ -181,8 +181,6 @@ WZZIPPATH="C:\program files\7-zip\7z.exe"
 WZZIP=$(WZZIPPATH) a
 WZUNZIP=$(WZZIPPATH) e
 
-XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
-
 # TDSPACK=error! $(ROOT)\src\buildtools\tdspack\tdspack -e
 # TDSPACKCOMPRESS=error! $(ROOT)\src\buildtools\tdspack\tdspack -o
 
@@ -273,3 +271,40 @@ MKVER_V=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -v $(MKVER_VERSION_TXT) version.in v
 MKVER_M=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -m manifest.in manifest.xml
 # Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out>
 MKVER_U=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -u
+
+#
+# Symstore
+#
+
+# KEYMAN_SYMSTOREPATH defaults to sibling folder "symbols". If it is not present,
+# then we won't attempt to write symbols to the store.
+!IFNDEF KEYMAN_SYMSTOREPATH
+KEYMAN_SYMSTOREPATH=$(KEYMAN_ROOT)\..\symbols
+!ENDIF
+
+# Nearly matches algorithm from resources/build/build-utils.sh
+# For now, we'll use it only for SYMSTORE, where it is for reference
+# only. Thus using the variable name __VERSION_WITH_TAG. Issues:
+# 1. always appends tier, even for stable
+# 2. test builds will append a branch name for master/beta/stable-x.y
+# 3. this is only available for `make symbols` (VERSION_WIN, VERSION_TIER
+#    are defined in Targets.mak only here)
+# Fixing this properly would be possible but take a fair bit more
+# work than I want to do just now. The intent is to make it possible to find
+# symbols in the symstore index which we can purge later on.
+__VERSION_WITH_TAG=$(VERSION_WIN)-$(VERSION_TIER)
+!IFNDEF TEAMCITY_VERSION
+  __VERSION_WITH_TAG=$(__VERSION_WITH_TAG)-local
+!ELSE
+!IFDEF TEAMCITY_PR_NUMBER
+  __VERSION_WITH_TAG=$(__VERSION_WITH_TAG)-test-$(TEAMCITY_PR_NUMBER)
+!ENDIF
+!ENDIF
+
+# This command depends on VERSION_WIN and VERSION_TIER being defined, through
+# `make symbols` (i.e. don't call `make wrap-symbols`)
+SYMSTORE="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe" add \
+    /s "$(KEYMAN_SYMSTOREPATH)" \
+    /v "$(VERSION_WIN)" \
+    /c "Version: $(__VERSION_WITH_TAG)" \
+    /compress /f

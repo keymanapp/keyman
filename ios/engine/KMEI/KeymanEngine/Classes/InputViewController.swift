@@ -130,6 +130,9 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     }
     let topBarDelta = hideBanner ? 0 : InputViewController.topBarHeight
 
+    // Sets height before the constraints, as it's the height constraint that triggers OSK resizing.
+    keymanWeb.setBannerHeight(to: Int(InputViewController.topBarHeight))
+
     portraitConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: true)
     landscapeConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: false)
 
@@ -141,8 +144,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
       portraitConstraint?.isActive = false
       landscapeConstraint?.isActive = true
     }
-
-    keymanWeb.setBannerHeight(to: Int(InputViewController.topBarHeight))
   }
 }
 
@@ -179,6 +180,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override var hasFullAccess: Bool {
+    if #available(iOS 11.0, *) {
+      // Nice and straight-forward here!
+      return super.hasFullAccess
+    }
     return Storage.shared != nil
   }
 
@@ -287,6 +292,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     setOuterConstraints()
     inputView?.setNeedsUpdateConstraints()
+
+    keymanWeb.verifyLoaded()
   }
 
   open override func viewWillDisappear(_ animated: Bool) {
@@ -343,6 +350,16 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     if numCharsToDelete <= 0 {
       textDocumentProxy.insertText(newText)
+
+      // A full-context deletion will report numCharsToDelete == 0 and won't
+      // otherwise delete selected text.
+      if #available(iOSApplicationExtension 11.0, *) {
+        if let selected = textDocumentProxy.selectedText {
+          if selected.count > 0 {
+            textDocumentProxy.deleteBackward()
+          }
+        }
+      }
       return
     }
 
@@ -532,6 +549,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   func resetContext() {
     keymanWeb.resetContext()
+  }
+
+  internal func setSentryState(enabled: Bool) {
+    keymanWeb.setSentryState(enabled: enabled)
   }
  
   func setContextState(text: String?, range: NSRange) {

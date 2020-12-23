@@ -3,7 +3,7 @@ inherited frmOnlineUpdateNewVersion: TfrmOnlineUpdateNewVersion
   Top = 410
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Keyman Desktop'
+  Caption = 'Keyman'
   ClientHeight = 375
   ClientWidth = 469
   Font.Charset = ANSI_CHARSET

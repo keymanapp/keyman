@@ -102,12 +102,12 @@ namespace com.keyman.osk {
             e.stopPropagation();
             return false;
           };
-          
+
           util.attachDOMEvent(this._Box, 'touchstart', function(e) {
-            keymanweb.uiManager.setActivatingUI(true); 
+            keymanweb.uiManager.setActivatingUI(true);
             return cancelEventFunc(e);
           });
-          
+
           util.attachDOMEvent(this._Box, 'touchend', cancelEventFunc);
           util.attachDOMEvent(this._Box, 'touchmove', cancelEventFunc);
           util.attachDOMEvent(this._Box, 'touchcancel', cancelEventFunc);
@@ -182,7 +182,7 @@ namespace com.keyman.osk {
           if(device.OS == 'Android' && 'devicePixelRatio' in window) {
             pixelRatio = window.devicePixelRatio;
           }
-          
+
           if(device.OS == 'Android' && device.formFactor == 'tablet' && this.getHeight() < 300 * pixelRatio) {
             fontScale *= 1.2;
           } else {
@@ -287,7 +287,7 @@ namespace com.keyman.osk {
      * Scope        Private
      * @param       {Object}      PVK         Visual keyboard name
      * @param       {Object}      Lhelp       true if OSK defined for this keyboard
-     * @param       {Object}      layout0 
+     * @param       {Object}      layout0
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
@@ -718,7 +718,7 @@ namespace com.keyman.osk {
       }
 
       this.resizing = true;
-      if (e.pageX) { 
+      if (e.pageX) {
         Lposx = e.pageX;
         Lposy = e.pageY;
       } else if (e.clientX) {
@@ -1242,7 +1242,7 @@ namespace com.keyman.osk {
         /* In case it's still '0' from a hide() operation.
          * Happens when _Show is called before the transitionend events are processed,
          * which can happen in bulk-rendering contexts.
-         * 
+         *
          * (Opacity is only modified when device.touchable = true, though a couple of extra
          * conditions may apply.)
          */
@@ -1293,7 +1293,7 @@ namespace com.keyman.osk {
             // Special case - design mode iframes.  Don't use the active element (inside the design-mode doc);
             // use its containing iframe from the doc itself.
             let ownerDoc = el.ownerDocument;
-            if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) { 
+            if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) {
               el = ownerDoc.defaultView.frameElement as HTMLElement;
             }
             if(this.dfltX) {
@@ -1351,6 +1351,11 @@ namespace com.keyman.osk {
       // The test for CJK languages is necessary to prevent a picklist (displayed in the OSK) from being hidden by the user
       // Once picklist functionality is separated out, this will no longer be needed.
       // Logic is: execute always if hidden on lost focus, but if requested by user, only if not CJK
+
+      if(keymanweb.isEmbedded) {
+        // We never hide the keyboard in embedded mode
+        return;
+      }
 
       // Save current size if visible
       if(this._Box && this._Box.style.display == 'block' && this.vkbd && this.vkbd.kbdDiv) {

@@ -208,7 +208,21 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
                 withAssociators associators: [Associator] = [],
                 progressReceiver: @escaping ProgressReceiver) {
     self.package = package
-    self.defaultLgCode = defaultLanguageCode
+    if let defaultLanguageCode = defaultLanguageCode {
+      if package.languages.contains(where: { $0.id == defaultLanguageCode }) {
+        self.defaultLgCode = defaultLanguageCode
+      } else if let match = package.languages.first(where: { $0.id.hasPrefix(defaultLanguageCode) }) {
+        // The package specifies a more precise ID
+        self.defaultLgCode = match.id
+      } else if let match = package.languages.first(where: { defaultLanguageCode.hasPrefix($0.id) }) {
+        // The provided default language code is more precise than the id found in the package
+        self.defaultLgCode = match.id
+      } else {
+        self.defaultLgCode = nil
+      }
+    } else {
+      self.defaultLgCode = nil
+    }
 
     self.closureShared = ClosureShared(with: associators, downloadManager: downloadManager, receiver: progressReceiver)
   }
@@ -350,6 +364,10 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
       do {
         try ResourceFileManager.shared.install(resourcesWithIDs: fullIDs, from: self.package)
         result = .complete
+
+        if let kbdID = fullIDs.first(where: { $0.type == .keyboard }) {
+          _ = Manager.shared.setKeyboard(withFullID: kbdID as! FullKeyboardID)
+        }
       } catch {
         result = .error(error)
       }

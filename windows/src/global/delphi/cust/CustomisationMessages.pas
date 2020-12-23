@@ -100,65 +100,10 @@ function TCustomisationMessageManager.GetAvailableLanguages: string;
       FLocaleDoc.validateOnParse := False;
       FLocaleDoc.load(path);
       if FLocaleDoc.documentElement <> nil
-        then Result := (FLocaleDoc.documentElement.tagName = 'Locale')
+        then Result := (FLocaleDoc.documentElement.tagName = 'resources')
         else Result := False;
     except
       Result := False;
-    end;
-  end;
-
-  procedure ReadPackageLanguages(IsLM: Boolean);
-  var
-    i: Integer;
-    s, t: string;
-    f: TSearchRec;
-    keys: TStringList;
-    Path: string;
-  begin
-    keys := TStringList.Create;
-    with TRegistryErrorControlled.Create do  // I2890
-    try
-      if IsLM then
-      begin
-        RootKey := HKEY_LOCAL_MACHINE;
-        Path := SRegKey_InstalledPackages_LM;
-      end
-      else
-      begin
-        RootKey := HKEY_CURRENT_USER;
-        Path := SRegKey_InstalledPackages_CU;
-      end;
-      if OpenKeyReadOnly('\'+Path) then
-      begin
-        GetKeyNames(keys);
-        for i := 0 to keys.Count - 1 do
-        begin
-          if OpenKeyReadOnly('\'+Path+'\'+keys[i]) then
-          begin
-            if ValueExists(SRegValue_PackageFile) then
-            begin
-              s := ReadString(SRegValue_PackageFile);
-              if FindFirst(ExtractFilePath(s)+'locale-*.xml', 0, f) = 0 then
-              begin
-                repeat
-                  t := ChangeFileExt(Copy(f.Name, 8, Length(f.Name)), '');
-                  if FLanguages.IndexOfName(t) < 0 then
-                  begin
-                    if IsValidLocaleFile(ExtractFilePath(s)+f.Name) then  // I3192
-                      FLanguages.Add(t+'='+ExtractFilePath(s)+f.Name);
-                    if Result <> '' then Result := Result + #13#10;
-                    Result := Result + t;
-                  end;
-                until FindNext(f) <> 0;
-                FindClose(f);
-              end;
-            end;
-          end;
-        end;
-      end;
-    finally
-      keys.Free;
-      Free;
     end;
   end;
 
@@ -182,11 +127,6 @@ begin
     until FindNext(f) <> 0;
     FindClose(f);
   end;
-
-  { Find all locale*.xml files in the user's installed keyboards }
-
-  ReadPackageLanguages(True);
-  ReadPackageLanguages(False);
 end;
 
 procedure TCustomisationMessageManager.GetDialogParameters(
@@ -247,7 +187,7 @@ begin
   FDefaultLocaleDoc.async := False;
   FDefaultLocaleDoc.validateOnParse := False;
 
-  FPath := GetDebugPath('xmltemplate '+ExtractFileName(FCustStorageFileName), ExtractFilePath(FCustStorageFileName));
+  FPath := GetDebugPath('KeymanConfigStaticHttpFilesPath', ExtractFilePath(FCustStorageFileName));
   if FileExists(FPath + 'strings.xml') then
     FDefaultLocaleDoc.load(FPath + 'strings.xml')
   else if FileExists(ExtractFilePath(FCustStorageFileName) + 'xml\strings.xml') then

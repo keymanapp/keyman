@@ -1,3 +1,0 @@
-version=4
-# Tier set by launchpad.sh script
-https://downloads.keyman.com/linux/$tier/(\d\S+)/kmflcomp-(.+)\.tar\.gz debian uupdate

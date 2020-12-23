@@ -12,13 +12,13 @@
       BLOCK "0C0904E4"
       BEGIN
         VALUE "CompanyName", "SIL International\0"
-        VALUE "FileDescription", "Keyman Desktop Setup\0"
+        VALUE "FileDescription", "Keyman Setup\0"
         VALUE "FileVersion", "$VERSION\0"
         VALUE "InternalName", "SETUP\0"
         VALUE "LegalCopyright", "© SIL International\0"
         VALUE "LegalTrademarks", "\0"
-        VALUE "OriginalFilename", "KMSHELL.EXE\0"
-        VALUE "ProductName", "Keyman Desktop\0"
+        VALUE "OriginalFilename", "SETUP.EXE\0"
+        VALUE "ProductName", "Keyman\0"
         VALUE "ProductVersion", "$VERSION\0"
         VALUE "Comments", "\0"
       END

@@ -102,9 +102,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   void saveDataToCache(CloudCatalogDownloadReturns jsonTuple)
   {
     // First things first - we've successfully downloaded from the Cloud.  Cache that stuff!
-    if (jsonTuple.lexicalModelJSON != null) {
-      CloudDataJsonUtil.saveJSONArrayToCache(CloudDataJsonUtil.getLexicalModelCacheFile(context), jsonTuple.lexicalModelJSON);
-    }
     if (jsonTuple.packagesJSON != null) {
       FileUtils.saveList(CloudDataJsonUtil.getResourcesCacheFile(context), jsonTuple.packagesJSON);
     }
@@ -133,8 +130,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
 
   protected void ensureInitCloudReturn(Context aContext, Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple)
   {
-    jsonTuple.keyboardJSON = ensureInit(aContext,aDataSet,jsonTuple.keyboardJSON);
-    jsonTuple.lexicalModelJSON = ensureInit(aContext,aDataSet, jsonTuple.lexicalModelJSON);
     jsonTuple.packagesJSON = ensureInit(aContext, aDataSet, jsonTuple.packagesJSON);
   }
 
@@ -147,7 +142,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     }
 
     final boolean fromKMP = false;
-    List<LexicalModel> lexicalModelsArrayList = CloudDataJsonUtil.processLexicalModelJSON(jsonTuple.lexicalModelJSON, fromKMP);
 
     Dataset installedData = KeyboardPickerActivity.getInstalledDataset(context);
     final List<Bundle> updateBundles = new ArrayList<>();
@@ -161,31 +155,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     // Only add installed kmp keyboards
     aDataSet.keyboards.clear();
     aDataSet.keyboards.addAll(KeyboardController.getInstance().get());
-
-    // Keep already-installed models and remove duplicate entries in cloud catalog.
-    // Then properly merge the lists. This way, we display installed model info.
-    // Doing reverse order to remove items in lexicalModelsArrayList
-    for (int i = lexicalModelsArrayList.size()-1; i>=0; i--) {
-      LexicalModel model = lexicalModelsArrayList.get(i); // cloud catalog
-      LexicalModel match = aDataSet.lexicalModels.findMatch(model); // installed model
-
-      // Check for model update information before removing duplicate
-      if (match != null) {
-        Bundle bundle = updateCheck(model, match);
-        if (bundle != null) {
-          String kmp = model.getUpdateKMP();
-          if (kmp != null && !kmp.isEmpty()) {
-            match.setUpdateKMP(kmp);
-          }
-          updateBundles.add(bundle);
-        }
-
-        lexicalModelsArrayList.remove(model);
-      } // else no match == no special handling.
-    }
-
-    // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
-    aDataSet.lexicalModels.addAll(lexicalModelsArrayList);
 
     if (updateBundles.size() > 0 && !(DEBUG_SIMULATE_UPDATES && !executeCallbacks)) {
       // Time for updates!

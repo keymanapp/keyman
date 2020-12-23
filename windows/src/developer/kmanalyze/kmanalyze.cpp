@@ -59,7 +59,7 @@ int run(int argc, char *argv[])
 
   if (argc < 2 || !strcmp(argv[1], "--help"))
   {
-    puts("KMANALYZE: Extract rules from a Keyman Desktop .kmx keyboard to use for building automated tests");
+    puts("KMANALYZE: Extract rules from a Keyman .kmx keyboard to use for building automated tests");
     puts("(C) SIL International");
     puts("Usage: KMANALYZE <filename> [outputfilename]\n");
     puts("Will create a keyboard.tests from keyboard.js; if outputfilename is not specified,");

@@ -81,4 +81,6 @@
 #define VK_RIGHT_BRACKET	0xDD
 #define VK_QUOTE            0xDE
 
+#define VK_OEM_102          0xE2
+
 #endif /* WindowsVKCodes_h */

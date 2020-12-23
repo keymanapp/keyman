@@ -235,7 +235,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 546
           Height = 32
           AutoSize = False
-          Caption = 
+          Caption =
             'A typical package will need keyboards, fonts, and documentation.' +
             ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
             'tandard Keyman files (such as keyman.exe) here.'
@@ -1141,7 +1141,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 48
           Width = 551
           Height = 13
-          Caption = 
+          Caption =
             'Compiling the package takes all the files you have selected and ' +
             'compresses them into a single package file.'
         end
@@ -1289,7 +1289,7 @@ inherited frmPackageEditor: TfrmPackageEditor
             Top = 35
             Width = 254
             Height = 13
-            Caption = 'You can install the package into Keyman Desktop:'
+            Caption = 'You can install the package into Keyman:'
           end
           object lblCompileTargetHeader: TLabel
             Left = 9
@@ -1352,7 +1352,7 @@ inherited frmPackageEditor: TfrmPackageEditor
             Top = 69
             Width = 110
             Height = 13
-            Caption = 'Keyman Desktop MSI:'
+            Caption = 'Keyman MSI:'
             FocusControl = editBootstrapMSI
           end
           object lblInstallerOutputFilename: TLabel
@@ -1388,7 +1388,7 @@ inherited frmPackageEditor: TfrmPackageEditor
             Top = 96
             Width = 156
             Height = 25
-            Caption = 'Find Keyman Desktop MSI...'
+            Caption = 'Find Keyman MSI...'
             TabOrder = 2
             OnClick = cmdInstallWithClick
           end

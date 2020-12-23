@@ -23,7 +23,7 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 
 import io.sentry.android.core.SentryAndroid;
-import io.sentry.core.Sentry;
+import io.sentry.Sentry;
 
 public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
 

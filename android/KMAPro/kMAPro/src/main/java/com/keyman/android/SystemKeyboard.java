@@ -29,7 +29,7 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 
 import io.sentry.android.core.SentryAndroid;
-import io.sentry.core.Sentry;
+import io.sentry.Sentry;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 

@@ -61,8 +61,14 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
     getStartedPreference.setTitle(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
-
     getStartedPreference.setDefaultValue(true);
+
+    SwitchPreference sendCrashReportPreference = new SwitchPreference(context);
+    sendCrashReportPreference.setKey(KeymanSettingsActivity.sendCrashReport);
+    sendCrashReportPreference.setTitle(getString(R.string.show_send_crash_report));
+    sendCrashReportPreference.setSummaryOn(getString(R.string.show_send_crash_report_on));
+    sendCrashReportPreference.setSummaryOff(getString(R.string.show_send_crash_report_off));
+    sendCrashReportPreference.setDefaultValue(true);
 
     // Blocks the default checkmark interaction; we want to control the checkmark's state separately
     // from within update() based on if the user has taken the appropriate actions with the OS.
@@ -106,6 +112,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     screen.addPreference(bannerPreference);
     screen.addPreference(getStartedPreference);
+    screen.addPreference(sendCrashReportPreference);
 
     setPreferenceScreen(screen);
   }

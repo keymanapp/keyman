@@ -132,7 +132,7 @@ namespace com.keyman.text {
               
               // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
               // so we expect users to never intend their use.
-              if(alternateBehavior && !alternateBehavior.beep) {
+              if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
                 let transform: Transform = alternateBehavior.transcription.transform;
                 
                 // Ensure that the alternate's token id matches that of the current keystroke, as we only
@@ -145,6 +145,8 @@ namespace com.keyman.text {
 
             // Renormalizes the distribution, as any error (beep) results
             // will result in a distribution that doesn't sum to 1 otherwise.
+            // All `.p` values are strictly positive, so totalMass is
+            // guaranteed to be > 0 if the array has entries.
             alternates.forEach(function(alt) {
               alt.p /= totalMass;
             });
@@ -181,9 +183,20 @@ namespace com.keyman.text {
       return ruleBehavior;
     }
 
-    public resetContext() {
+    public resetContext(outputTarget?: OutputTarget) {
       this.keyboardProcessor.resetContext();
-      this.languageProcessor.invalidateContext();
+      this.languageProcessor.invalidateContext(outputTarget);
     }
   }
 }
+
+(function () {
+  let ns = com.keyman.text;
+
+  // Let the InputProcessor be available both in the browser and in Node.
+  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ns.InputProcessor;
+    //@ts-ignore
+    ns.InputProcessor.com = com; // Export the root namespace so that all InputProcessor classes are accessible by unit tests.
+  }
+}());

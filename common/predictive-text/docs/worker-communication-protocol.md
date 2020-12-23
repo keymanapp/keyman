@@ -113,23 +113,24 @@ An asynchronous message to predict after typing 'D':
 Message types
 -------------
 
-Currently there are four message types:
+Currently there are a whole bunch of message types:
 
-Message       | Direction          | Parameters          | Expected reply      | Uses token
---------------|--------------------|---------------------|---------------------|---------------
-`config`      | LMLayer → worker   | capabilities        | No                  | No
-`load`        | keyboard → LMLayer | model               | Yes — `ready`       | No
-`unload`      | keyboard → LMLayer | none                | No                  | No 
-`ready`       | LMLayer → keyboard | configuration       | No                  | No
-`predict`     | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
-`suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
-`wordbreak`   | LMLayer → worker   | context             | Yes - `currentword` | Yes
-`currentword` | LMLayer → keyboard | string              | No                  | Yes
-`accept`      | keyboard → LMLayer | suggestion,         | Yes - `postaccept`  | Yes
-                                   | context, transform  |                     |
-`postaccept`  | LMLayer → keyboard | reversion           | No                  | Yes
-`revert`      | keyboard → LMLayer | reversion, context  | Yes - `reversion`   | Yes
-`postrevert`  | LMLayer → keyboard | suggestions         | No                  | Yes
+Message         | Direction          | Parameters          | Expected reply      | Uses token
+----------------|--------------------|---------------------|---------------------|---------------
+`config`        | LMLayer → worker   | capabilities        | No                  | No
+`load`          | keyboard → LMLayer | model               | Yes — `ready`       | No
+`unload`        | keyboard → LMLayer | none                | No                  | No 
+`ready`         | LMLayer → keyboard | configuration       | No                  | No
+`predict`       | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
+`suggestions`   | LMLayer → keyboard | suggestions         | No                  | Yes
+`wordbreak`     | LMLayer → worker   | context             | Yes - `currentword` | Yes
+`currentword`   | LMLayer → keyboard | string              | No                  | Yes
+`accept`        | keyboard → LMLayer | suggestion,         | Yes - `postaccept`  | Yes
+                                     | context, transform  |                     |
+`postaccept`    | LMLayer → keyboard | reversion           | No                  | Yes
+`revert`        | keyboard → LMLayer | reversion, context  | Yes - `reversion`   | Yes
+`postrevert`    | LMLayer → keyboard | suggestions         | No                  | Yes
+`reset-context` | keyboard → LMLayer | context             | No                  | No
               
 
 ### Message: `config`
@@ -512,12 +513,38 @@ generated.
 
 ### Message: `postaccept`
 
-The `postaccept` message is sent from the keyboard to the LMLayer.  This
+The `postaccept` message is sent from the LMLayer to the keyboard.  This
 message sends a `reversion` capable of undoing acceptance of the `suggestion`
 just accepted by the triggering `accept` message.
 
 This message **MUST** be in response to a `postaccept` message, and it
 **MUST** respond with the corresponding [token][Tokens].
+
+### Message: `revert`
+
+The `revert` message is sent from the keyboard to the LMLayer.
+
+The keyboard **MUST** send a `reversion` - the one previously returned by a
+`postaccept` message in response to an `accept` message.  This message tells
+the predictive text engine to _revert_ the engine's tracked context to the
+original `context` parameter sent as part of that `accept` message.
+
+The keyboard must also send the _current_ `context` state, as it can be used
+to determine the original context should the predictive engine have lost track
+of the original state in the meantime.
+
+### Message: `postrevert`
+
+The `postrevert` message is sent from the LMLayer to the keyboard.  This
+message sends an array of `suggestions` corresponding to the newly-restored
+`context` requested by the `revert` message.
+
+### Message: `reset-context`
+
+The `reset-context` message is sent from the keyboard to the LMLayer.  This
+message sends information on the new `context` to be used for prediction,
+telling the predictive engine to disregard all previously-tracked information
+that is context-dependent.
 
 #### Examples
 

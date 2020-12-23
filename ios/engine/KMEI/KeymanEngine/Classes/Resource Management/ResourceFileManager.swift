@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 /**
  * This class stores common methods used for installing language resources, regardless of source.
@@ -93,7 +94,14 @@ public class ResourceFileManager {
 
     // Throws an error if the destination file already exists, and there's no
     // built-in override parameter.  Hence, the previous if-block.
-    try fileManager.copyItem(at: source, to: destination)
+    if source.startAccessingSecurityScopedResource() {
+      defer { source.stopAccessingSecurityScopedResource() }  // The Swift version of 'finally'.
+      try fileManager.copyItem(at: source, to: destination)
+    } else {
+      // We _could_ get more specific, as it's due to issues with security-scoped resources...
+      // but this ought be fine for now.
+      throw KMPError.copyFiles
+    }
   }
 
   /**
@@ -204,39 +212,39 @@ public class ResourceFileManager {
         defaultLanguageCode: String? = nil,
         in rootVC: UIViewController,
         withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [],
-        successHandler: ((KeymanPackage) -> Void)? = nil)
-    where Resource.Package == Package {
-      let activitySpinner = Alerts.constructActivitySpinner()
-      activitySpinner.center = rootVC.view.center
+        successHandler: ((KeymanPackage) -> Void)? = nil) where Resource.Package == Package {
+    let activitySpinner = Alerts.constructActivitySpinner()
+    activitySpinner.center = rootVC.view.center
 
-      let packageInstaller = AssociatingPackageInstaller(for: package,
-                                                         withAssociators: associators) { status in
-        if status == .starting {
-          // Start a spinner!
-          activitySpinner.startAnimating()
-          rootVC.view.addSubview(activitySpinner)
+    let packageInstaller = AssociatingPackageInstaller(for: package,
+                                                       defaultLanguageCode: defaultLanguageCode,
+                                                       withAssociators: associators) { status in
+      if status == .starting {
+        // Start a spinner!
+        activitySpinner.startAnimating()
+        rootVC.view.addSubview(activitySpinner)
 
-          activitySpinner.centerXAnchor.constraint(equalTo: rootVC.view.centerXAnchor).isActive = true
-          activitySpinner.centerYAnchor.constraint(equalTo: rootVC.view.centerYAnchor).isActive = true
-          rootVC.view.isUserInteractionEnabled = false
-        } else if status == .complete {
-          // Report completion!
-          activitySpinner.stopAnimating()
-          activitySpinner.removeFromSuperview()
-          rootVC.view.isUserInteractionEnabled = true
-          rootVC.dismiss(animated: true, completion: nil)
-          successHandler?(package)
-        }
-      }
-
-      if let navVC = rootVC as? UINavigationController {
-        packageInstaller.promptForLanguages(inNavigationVC: navVC)
-      } else {
-        let nvc = UINavigationController.init()
-        packageInstaller.promptForLanguages(inNavigationVC: nvc)
-        rootVC.present(nvc, animated: true, completion: nil)
+        activitySpinner.centerXAnchor.constraint(equalTo: rootVC.view.centerXAnchor).isActive = true
+        activitySpinner.centerYAnchor.constraint(equalTo: rootVC.view.centerYAnchor).isActive = true
+        rootVC.view.isUserInteractionEnabled = false
+      } else if status == .complete {
+        // Report completion!
+        activitySpinner.stopAnimating()
+        activitySpinner.removeFromSuperview()
+        rootVC.view.isUserInteractionEnabled = true
+        rootVC.dismiss(animated: true, completion: nil)
+        successHandler?(package)
       }
     }
+
+    if let navVC = rootVC as? UINavigationController {
+      packageInstaller.promptForLanguages(inNavigationVC: navVC)
+    } else {
+      let nvc = UINavigationController.init()
+      packageInstaller.promptForLanguages(inNavigationVC: nvc)
+      rootVC.present(nvc, animated: true, completion: nil)
+    }
+  }
 
   public func promptPackageInstall(of package: KeymanPackage,
                                    in rootVC: UIViewController,

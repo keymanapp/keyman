@@ -1,4 +1,4 @@
-# Keyman Desktop Version History
+# Keyman for Windows Version History
 
 ## 2020-02-04 13.0.67 beta
 * Bug Fix(System): Windows touch keyboard would be dismissed on each keystroke if Keyman was running (#2580)

@@ -47,7 +47,7 @@
                     25 Mar 2011 - mcdurdin - I2678 - Uninitialized variant can crash Keyman Configuration when reading package data
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     01 Dec 2012 - mcdurdin - I3612 - V9.0 - Keyboard install should run as Admin only
-                    26 Dec 2013 - mcdurdin - I4012 - V9.0 - Merge I4007 - Keyman Desktop check language environment blocks install if "remind me later" ticked
+                    26 Dec 2013 - mcdurdin - I4012 - V9.0 - Merge I4007 - Keyman check language environment blocks install if "remind me later" ticked
                     24 Apr 2014 - mcdurdin - I4172 - Pressing Enter in install keyboard dialog gives error about admin req
                     01 May 2014 - mcdurdin - I4181 - V9.0 - Stop using DeleteFileAlways, MOVEFILE_DELAY_UNTIL_REBOOT
 *)
@@ -205,7 +205,7 @@ begin
     Data := TInstallKeyboardSharedData.Create(FXML, FTempPath, FPackagePath, FFiles);
     PageTag := modWebHttpServer.SharedData.Add(Data);
     FRenderPage := 'installkeyboard';
-    Content_Render(False, 'tag='+IntToStr(PageTag));
+    Content_Render('tag='+IntToStr(PageTag));
   finally
     Screen.Cursor := crDefault;
   end;
@@ -222,23 +222,26 @@ begin
   Result := '';
   doc := LoadXMLData(xml);
 
-  node := doc.DocumentElement.ChildNodes.FindNode('readme');
-  if Assigned(node) then
+  if Assigned(doc.DocumentElement) then
   begin
-    Result := node.NodeValue;
-    node.NodeValue := ExtractFileName(Result);
-    Result := ExtractFilePath(Result);
-  end;
+    node := doc.DocumentElement.ChildNodes.FindNode('readme');
+    if Assigned(node) then
+    begin
+      Result := node.NodeValue;
+      node.NodeValue := ExtractFileName(Result);
+      Result := ExtractFilePath(Result);
+    end;
 
-  node := doc.DocumentElement.ChildNodes.FindNode('graphic');
-  if Assigned(node) then
-  begin
-    Result := node.NodeValue;
-    node.NodeValue := ExtractFileName(Result);
-    Result := ExtractFilePath(Result);
-  end;
+    node := doc.DocumentElement.ChildNodes.FindNode('graphic');
+    if Assigned(node) then
+    begin
+      Result := node.NodeValue;
+      node.NodeValue := ExtractFileName(Result);
+      Result := ExtractFilePath(Result);
+    end;
 
-  doc.SaveToXML(xml);
+    doc.SaveToXML(xml);
+  end;
 end;
 
 procedure TfrmInstallKeyboard.TntFormDestroy(Sender: TObject);

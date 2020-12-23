@@ -53,6 +53,16 @@
     searchTermToKey?: (searchTerm: string) => string;
 
     /**
+     * Indicates that the model's written form has 'casing' behavior.
+     */
+    languageUsesCasing?: boolean;
+
+    /**
+     * Specifies a function used to apply the language's casing rules to a word.
+     */
+    applyCasing?: CasingFunction;
+
+    /**
      * Any punctuation to expose to the user.
      */
     punctuation?: LexicalModelPunctuation;
@@ -81,8 +91,14 @@
     private _trie: Trie;
     readonly breakWords: WordBreakingFunction;
     readonly punctuation?: LexicalModelPunctuation;
+    readonly languageUsesCasing?: boolean;
+
+    readonly applyCasing?: CasingFunction;
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
+      this.languageUsesCasing = options.languageUsesCasing;
+      this.applyCasing = options.applyCasing;
+
       this._trie = new Trie(
         trieData['root'],
         trieData['totalWeight'],
@@ -105,7 +121,7 @@
 
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
       // Special-case the empty buffer/transform: return the top suggestions.
-      if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
+      if (!transform.insert && !context.left && !context.right && context.startOfBuffer && context.endOfBuffer) {
         return makeDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
           transform: {
             insert: text,

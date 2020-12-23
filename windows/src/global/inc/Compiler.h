@@ -69,9 +69,10 @@
 #define VERSION_80  0x00000800
 #define VERSION_90  0x00000900
 #define VERSION_100 0x00000A00
+#define VERSION_140 0x00000E00
 
 #define VERSION_MIN	VERSION_50
-#define VERSION_MAX	VERSION_100
+#define VERSION_MAX	VERSION_140
 
 /*
  Special flag for WM_CHAR/WM_KEY???/WM_SYSKEY???: says that key has been
@@ -268,6 +269,10 @@
 #define K_SHIFTFLAG		0x0010		// Either shift flag
 #define K_CTRLFLAG		0x0020		// Either ctrl flag
 #define K_ALTFLAG		0x0040		// Either alt flag
+//#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
+                                // Used internally (currently, only by KMW) to ensure Meta-key 
+                                // shortcuts safely bypass rules
+                                // Meta key = Command key on macOS, Windows key on Windows
 #define CAPITALFLAG		0x0100		// Caps lock on
 #define NOTCAPITALFLAG	0x0200		// Caps lock NOT on
 #define NUMLOCKFLAG		0x0400		// Num lock on

@@ -186,7 +186,7 @@ namespace com.keyman.text {
       Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
-      if(Lkc.kName.substr(0,2) == 'U_') {
+      if(Lkc.kName && Lkc.kName.substr(0,2) == 'U_') {
         Lkc.LisVirtualKey=false;
       }
 
@@ -674,7 +674,7 @@ namespace com.keyman.text {
 (function () {
   let ns = com.keyman.text;
 
-  // Let LMLayer be available both in the browser and in Node.
+  // Let the Keyboard Processor be available both in the browser and in Node.
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = ns.KeyboardProcessor;
     //@ts-ignore

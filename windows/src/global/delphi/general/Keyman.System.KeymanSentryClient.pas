@@ -4,6 +4,7 @@ interface
 
 uses
   System.Classes,
+  System.SysUtils,
   Sentry.Client;
 
 type
@@ -31,6 +32,8 @@ type
 
     class procedure Validate(Force: Boolean = False);
 
+    class procedure ReportHandledException(E: Exception; const Message: string = ''; IncludeStack: Boolean = True);
+
     class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
     class procedure Stop;
     class property Client: TSentryClient read FClient;
@@ -51,7 +54,7 @@ uses
   System.Generics.Collections,
   System.JSON,
   System.StrUtils,
-  System.SysUtils,
+  System.Win.ComObj,
   System.Win.Registry,
 {$IF NOT DEFINED(CONSOLE)}
 {$IF NOT DEFINED(SENTRY_NOVCL)}
@@ -176,6 +179,25 @@ begin
     if kscfTerminate in FFlags then
       EventAction := sceaTerminate;
   end;
+end;
+
+class procedure TKeymanSentryClient.ReportHandledException(E: Exception;
+  const Message: string = ''; IncludeStack: Boolean = True);
+var
+  text: string;
+begin
+  if Message <> ''
+    then text := Message + ': '
+    else text := '';
+
+  if E is EOleException then
+    text := Format('%s(%x): %s%s', [E.ClassName, (E as EOleException).ErrorCode, text, E.Message])
+  else if E is EOSError then
+    text := Format('%s(%d): %s%s', [E.ClassName, (E as EOSError).ErrorCode, text, E.Message])
+  else
+    text := Format('%s: %s%s', [E.ClassName, text, E.Message]);
+
+  Client.MessageEvent(TSentryLevel.SENTRY_LEVEL_WARNING, text, IncludeStack);
 end;
 
 procedure TKeymanSentryClient.ReportRemoteErrors(const childEventID: string);
@@ -311,7 +333,9 @@ begin
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;
-  FClient.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, 'Started '+ALogger);
+  // We used the 'Started' event when testing Sentry integration in 14.0 alpha
+  // but we don't want or need it for stable.
+  // FClient.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, 'Started '+ALogger);
 end;
 
 destructor TKeymanSentryClient.Destroy;

@@ -58,9 +58,9 @@ type
     FDownloadStatusCode: Integer;
     procedure DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
     procedure cefBeforeBrowse(Sender: TObject; const Url: string;
-      wasHandled: Boolean);
+      isPopup, wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
-      out Handled: Boolean);
+      isPopup: Boolean; out Handled: Boolean);
     procedure cefLoadingStateChange(Sender: TObject; isLoading, canGoBack, canGoForward: Boolean);
     procedure DownloadAndInstallPackage(const PackageID, BCP47: string);
     procedure HttpReceiveData(const Sender: TObject; AContentLength,
@@ -116,7 +116,8 @@ begin
   Content_Render;
 end;
 
-procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
+procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseSync(Sender: TObject; const Url: string;
+  isPopup: Boolean; out Handled: Boolean);
 begin
   // This introduces some deeper knowledge of URL paths in Keyman Configuration, which is
   // a bit of a shame, because we try to keep our internal knowledge to /go/ urls on
@@ -124,6 +125,7 @@ begin
   // which allows us to handle internal navigation on the keyboard search and still lets
   // us open other URLs that may be in the search results in an external browser.
   Handled :=
+    IsPopup or
     TRegEx.IsMatch(Url, URLPath_RegEx_MatchKeyboardsInstall) or       // capture https://keyman.com/keyboards/install/*
     (not TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsRoot) and    // don't capture https://keyman.com/keyboards*
     not Url.StartsWith('keyman:') and                                 // don't capture keyman:*
@@ -142,7 +144,8 @@ begin
   end;
 end;
 
-procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
+procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowse(Sender: TObject; const Url: string;
+  isPopup, wasHandled: Boolean);
 var
   m: TMatch;
   uri: TURI;
@@ -166,7 +169,7 @@ begin
 
     DownloadAndInstallPackage(PackageID, BCP47);
   end
-  else if Url.StartsWith('http:') or Url.StartsWith('https:') then
+  else if Url.StartsWith('http:') or Url.StartsWith('https:') or isPopup then
   begin
     if not TUtilExecute.URL(Url) then
       ShowMessage(SysErrorMessage(GetLastError));
@@ -226,10 +229,19 @@ begin
 
     Stream := TFileStream.Create(FTempFilename, fmCreate);
     try
-      Response := Client.Get(FDownloadURL, Stream);
-      Result := Response.StatusCode = 200;
-      FDownloadStatusText := Response.StatusText;
-      FDownloadStatusCode := Response.StatusCode;
+      try
+        Response := Client.Get(FDownloadURL, Stream);
+        Result := Response.StatusCode = 200;
+        FDownloadStatusText := Response.StatusText;
+        FDownloadStatusCode := Response.StatusCode;
+      except
+        on E:ENetHTTPClientException do
+        begin
+          FDownloadStatusText := E.Message;
+          FDownloadStatusCode := 0;
+          Result := False;
+        end;
+      end;
     finally
       Stream.Free;
     end;

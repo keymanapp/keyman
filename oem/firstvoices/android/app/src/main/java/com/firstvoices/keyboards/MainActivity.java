@@ -10,10 +10,10 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.sentry.android.core.SentryAndroid;
-import io.sentry.core.Sentry;
 
 import com.tavultesoft.kmea.*;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SentryAndroid.init(this, options -> {
-          options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
-          options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
+            options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
+            options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
         });
 
         setContentView(R.layout.activity_main);
@@ -121,14 +121,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (didCompleteSelectKeyboard())
-                    view.loadUrl("javascript:setCheckBox1On();");
+                    view.loadUrl("javascript:setCheckBoxOn('checkbox1');");
                 else
-                    view.loadUrl("javascript:setCheckBox1Off();");
+                    view.loadUrl("javascript:setCheckBoxOff('checkbox1');");
 
                 if (didCompleteSetup())
-                    view.loadUrl("javascript:setCheckBox2On();");
+                    view.loadUrl("javascript:setCheckBoxOn('checkbox2');");
                 else
-                    view.loadUrl("javascript:setCheckBox2Off();");
+                    view.loadUrl("javascript:setCheckBoxOff('checkbox2');");
             }
         });
 
@@ -142,14 +142,14 @@ public class MainActivity extends AppCompatActivity {
         WebView webView = findViewById(R.id.webView);
         if (webView != null) {
             if (didCompleteSelectKeyboard())
-                webView.loadUrl("javascript:setCheckBox1On();");
+                webView.loadUrl("javascript:setCheckBoxOn('checkbox1');");
             else
-                webView.loadUrl("javascript:setCheckBox1Off();");
+                webView.loadUrl("javascript:setCheckBoxOff('checkbox1');");
 
             if (didCompleteSetup())
-                webView.loadUrl("javascript:setCheckBox2On();");
+                webView.loadUrl("javascript:setCheckBoxOn('checkbox2');");
             else
-                webView.loadUrl("javascript:setCheckBox2Off();");
+                webView.loadUrl("javascript:setCheckBoxOff('checkbox2');");
         }
     }
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean didCompleteSelectKeyboard() {
+    private static boolean didCompleteSelectKeyboard() {
         return FVShared.getInstance().activeKeyboardCount() > 0;
     }
 
