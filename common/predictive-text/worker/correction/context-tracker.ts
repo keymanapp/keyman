@@ -359,7 +359,8 @@ namespace correction {
           state.pushTail(token);
         } else {
           // Consider backspace entry for this case?
-          let primaryInput = transformDistribution[0].sample;
+          let hasDistribution = transformDistribution && Array.isArray(transformDistribution);
+          let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
           if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0) {
             // It's a backspace transform; time for special handling!
             //
