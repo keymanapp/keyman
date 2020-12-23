@@ -303,26 +303,28 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   private func packageDownloadCompleted(package: KeymanPackage) {
     log.info("lexicalModelDownloadCompleted: InstalledLanguagesViewController")
 
-    var msg: String
+    DispatchQueue.main.async {
+      var msg: String
 
-    switch(package.resourceType()) {
-      case .keyboard:
-        Manager.shared.shouldReloadKeyboard = true
-        msg = NSLocalizedString("notification-download-success-keyboard", bundle: engineBundle, comment: "")
-      case .lexicalModel:
-        msg = NSLocalizedString("notification-download-success-lexical-model", bundle: engineBundle, comment: "")
-    }
+      switch(package.resourceType()) {
+        case .keyboard:
+          Manager.shared.shouldReloadKeyboard = true
+          msg = NSLocalizedString("notification-download-success-keyboard", bundle: engineBundle, comment: "")
+        case .lexicalModel:
+          msg = NSLocalizedString("notification-download-success-lexical-model", bundle: engineBundle, comment: "")
+      }
 
-    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
-      toolbar.displayStatus(msg, withIndicator: false, duration: 3.0)
-    }
+      if let toolbar = self.navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+        toolbar.displayStatus(msg, withIndicator: false, duration: 3.0)
+      }
 
-    restoreNavigation()
+      self.restoreNavigation()
 
-    // Do NOT do this for keyboards; they're not yet installed and have a managed installer
-    // yet to operate.
-    if package.resourceType() == .lexicalModel {
-      navigationController?.popToRootViewController(animated: true)
+      // Do NOT do this for keyboards; they're not yet installed and have a managed installer
+      // yet to operate.
+      if package.resourceType() == .lexicalModel {
+        self.navigationController?.popToRootViewController(animated: true)
+      }
     }
   }
 
@@ -333,21 +335,23 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 
     log.info("keyboardDownloadFailed: InstalledLanguagesViewController")
 
-    var msg: String
-    switch(packageKey.type) {
-      case .keyboard:
-        msg = NSLocalizedString("notification-download-failure-keyboard", bundle: engineBundle, comment: "")
-      case .lexicalModel:
-        msg = NSLocalizedString("notification-download-failure-lexical-model", bundle: engineBundle, comment: "")
+    DispatchQueue.main.sync {
+      var msg: String
+      switch(packageKey.type) {
+        case .keyboard:
+          msg = NSLocalizedString("notification-download-failure-keyboard", bundle: engineBundle, comment: "")
+        case .lexicalModel:
+          msg = NSLocalizedString("notification-download-failure-lexical-model", bundle: engineBundle, comment: "")
+      }
+
+      if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+        toolbar.displayStatus(msg, withIndicator: false, duration: 3.0)
+      }
+
+      self.restoreNavigation()
+
+      self.navigationController?.popToRootViewController(animated: true)
     }
-
-    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
-      toolbar.displayStatus(msg, withIndicator: false, duration: 3.0)
-    }
-
-    restoreNavigation()
-
-    navigationController?.popToRootViewController(animated: true)
   }
   
   private func batchUpdateStarted(_: [AnyLanguageResource]) {
@@ -363,19 +367,21 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   }
 
   private func batchUpdateCompleted(results: BatchUpdateCompletedNotification) {
-    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
-      if results.failures.count == 0 {
-        let formatString = NSLocalizedString("notification-update-success", bundle: engineBundle, comment: "")
-        toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.successes.count), withIndicator: false, duration: 3.0)
-      } else {
-        // Needs to be a short string on iPhones.
-        // Possible TODO:  condition on "is an iPad", provide more info on iPads?
-        let formatString = NSLocalizedString("notification-update-failed", bundle: engineBundle, comment: "")
-        toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.failures.count), withIndicator: false, duration: 3.0)
+    DispatchQueue.main.sync {
+      if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+        if results.failures.count == 0 {
+          let formatString = NSLocalizedString("notification-update-success", bundle: engineBundle, comment: "")
+          toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.successes.count), withIndicator: false, duration: 3.0)
+        } else {
+          // Needs to be a short string on iPhones.
+          // Possible TODO:  condition on "is an iPad", provide more info on iPads?
+          let formatString = NSLocalizedString("notification-update-failed", bundle: engineBundle, comment: "")
+          toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.failures.count), withIndicator: false, duration: 3.0)
+        }
       }
+
+      restoreNavigation()
     }
-    
-    restoreNavigation()
   }
   
   func showActivityView() {
