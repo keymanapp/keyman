@@ -19,11 +19,11 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonYes" comment="Yes button in message boxes">&amp;Yes</string>
+  <string name="SKButtonYes" comment="Yes button in message boxes">បាទ/ចាស</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonNo" comment="No button in message boxes">&amp;No</string>
+  <string name="SKButtonNo" comment="No button in message boxes">ទេ</string>
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -389,76 +389,76 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_OpenTextEditor" comment="Hotkey - open text editor">Open Text Editor</string>
+  <string name="S_Hotkey_OpenTextEditor" comment="Hotkey - open text editor">បើក​កម្មវិធី​កែ​អត្ថបទ</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_Hotkey_SwitchLanguage" comment="Hotkey - switch language window">Open Language Switcher</string>
+  <string name="S_Hotkey_SwitchLanguage" comment="Hotkey - switch language window">បើក \"ផ្ទាំង​ប្ដូរ​ភាសា\"</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.274.0 -->
-  <string name="S_Hotkey_Control_Title" comment="Hotkey - Control Title">General Hotkeys</string>
+  <string name="S_Hotkey_Control_Title" comment="Hotkey - Control Title">គ្រាប់​ចុច​ផ្លូវកាត់​ទូទៅ</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.274.0 -->
-  <string name="S_Hotkey_Keyboard_Title" comment="Hotkey - Keyboard Title">Keyboard Layouts</string>
+  <string name="S_Hotkey_Keyboard_Title" comment="Hotkey - Keyboard Title">ប្លង់ក្ដារចុច</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.465.0 -->
-  <string name="S_Support_ContactInstructions_Free" comment="">If you have any issues using Keyman, just ask a question on the Keyman Community Forum.</string>
+  <string name="S_Support_ContactInstructions_Free" comment="">បើ​​មាន​បញ្ហា​ក្នុង​ការប្រើប្រាស់ Keyman, អ្នកអាច​សួរសំណួរ​នៅ​លើ Keyman Community Forum បាន។</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.465.0 -->
-  <string name="S_Button_CommunitySupport" comment="">Open Keyman Community Forum</string>
+  <string name="S_Button_CommunitySupport" comment="">បើក Keyman Community Forum</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 11.0.1500.0 -->
-  <string name="S_Support_CreatedBySIL" comment="Support - SIL statement">Created by SIL International</string>
+  <string name="S_Support_CreatedBySIL" comment="Support - SIL statement">បង្កើត​ដោយ SIL International</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Support_Copyright" comment="Support - Product Copyright">Copyright © SIL International. All Rights Reserved.</string>
+  <string name="S_Support_Copyright" comment="Support - Product Copyright">រក្សា​សិទ្ធិ © SIL International។ រក្សា​សិទ្ធិ​គ្រប់​យ៉ាង។</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Support_Version" comment="Support - version">Version</string>
+  <string name="S_Support_Version" comment="Support - version">ជំនាន់</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_Support_UsefulLinks" comment="Support - Useful Links heading">Useful Links</string>
+  <string name="S_Support_UsefulLinks" comment="Support - Useful Links heading">តំណ​ភ្ជាប់​ដែល​មានប្រយោជន៍</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_OnlineSupport" comment="Support button - links to online support">Online Help</string>
+  <string name="S_Button_OnlineSupport" comment="Support button - links to online support">ជំនួយ​អនឡាញ</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_CheckForUpdates" comment="Support button - manually checks for product updates">Check for Updates</string>
+  <string name="S_Button_CheckForUpdates" comment="Support button - manually checks for product updates">ពិនិត្យ​រក​ការអាប់ដេត</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_ProxyConfig" comment="Options button - allows manual adjustment of proxy settings">Proxy Settings...</string>
+  <string name="S_Button_ProxyConfig" comment="Options button - allows manual adjustment of proxy settings">ការ​កំណត់​ប្រូកស៊ី...</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_SettingsManager" comment="Options button - access to the Settings Manager">Keyman System Settings...</string>
+  <string name="S_Button_SettingsManager" comment="Options button - access to the Settings Manager">ការកំណត់​ប្រព័ន្ធ Keyman...</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">Diagnostics</string>
+  <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">ការវិភាគ</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Download Keyboard From keyman.com</string>
+  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">ទាញយក​ក្ដារចុច​ពី keyman.com</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="Download only option checkbox">Don\'t install, just download</string>
+  <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="Download only option checkbox">កុំ​ដំឡើង គ្រាប់​តែ​ទាញយក​បាន​ហើយ</string>
   <!-- Parameters: %0:s = Error Message, %1:d Error Code -->
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0 -->
-  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">Unable to download keyboard, error %1:d: %0:s</string>
+  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">មិន​អាច​​ទាញយក​ក្ដារចុច​បាន​ទេ បញ្ហា %1:d: %0:s</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
@@ -466,11 +466,11 @@
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_InstallKeyboard_Title" comment="Install keyboard/package dialog title">Install Keyboard/Package</string>
+  <string name="S_InstallKeyboard_Title" comment="Install keyboard/package dialog title">ដំឡើង​ក្ដារចុច/កញ្ចប់</string>
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_InstallKeyboard_Tab_Details" comment="Install keyboard/package - details">Details</string>
+  <string name="S_InstallKeyboard_Tab_Details" comment="Install keyboard/package - details">ព័ត៌មាន​លម្អិត</string>
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -478,31 +478,31 @@
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_InstallKeyboard_Button_Install" comment="Install keyboard/package - install button">Install</string>
+  <string name="S_InstallKeyboard_Button_Install" comment="Install keyboard/package - install button">ដំឡើង</string>
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_ProxyConfiguration_Title" comment="Proxy configuration dialog title">Proxy Server Configuration</string>
+  <string name="S_ProxyConfiguration_Title" comment="Proxy configuration dialog title">ការកំណត់​រចនាសម្ព័ន្ធ​ Proxy Server</string>
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_ProxyConfiguration_Server" comment="Proxy dialog - fillable-field server">Server: </string>
+  <string name="S_ProxyConfiguration_Server" comment="Proxy dialog - fillable-field server">ម៉ាស៊ីនមេ៖ </string>
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_ProxyConfiguration_Port" comment="Proxy dialog - fillable-field port">Port: </string>
+  <string name="S_ProxyConfiguration_Port" comment="Proxy dialog - fillable-field port">ច្រក៖ </string>
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_ProxyConfiguration_Username" comment="Proxy dialog - fillable-field username">Username: </string>
+  <string name="S_ProxyConfiguration_Username" comment="Proxy dialog - fillable-field username">ឈ្មោះ​អ្នក​ប្រើ៖ </string>
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_ProxyConfiguration_Password" comment="Proxy dialog - fillable-field password">Password: </string>
+  <string name="S_ProxyConfiguration_Password" comment="Proxy dialog - fillable-field password">ពាក្យសម្ងាត់៖ </string>
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_BaseKeyboard_Title" comment="Base keyboard dialog title">Set Base Keyboard</string>
+  <string name="S_BaseKeyboard_Title" comment="Base keyboard dialog title">កំណត់​ក្ដារចុច​មូលដ្ឋាន</string>
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
