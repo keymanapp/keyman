@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: keyman\n"
 "Report-Msgid-Bugs-To: <support@keyman.com>\n"
 "POT-Creation-Date: 2020-08-19 19:17+0200\n"
-"PO-Revision-Date: 2020-12-17 08:07\n"
+"PO-Revision-Date: 2020-12-28 04:02\n"
 "Last-Translator: \n"
 "Language-Team: Khmer\n"
 "Language: km_KH\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: keyman_config/__init__.py:68
 msgid "Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting."
-msgstr ""
+msgstr "គ្មាន sentry-sdk និង raven ទេ។ មិន​បាន​បើក​ការរាយការណ៍​បញ្ហារបស់ Sentry ទេ។"
 
 #: keyman_config/downloadkeyboard.py:23
 msgid "Download Keyman keyboards"
@@ -32,15 +32,15 @@ msgstr ""
 
 #: keyman_config/install_kmp.py:99
 msgid "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman"
-msgstr ""
+msgstr "អ្នក​មិន​ត្រូវ​បាន​អនុញ្ញាត​ឱ្យ​ដំឡើង​ក្ដារចុច​ទៅ​ទីតាំង​រួម​ទេ /usr/local/share/keyman"
 
 #: keyman_config/install_kmp.py:103
 msgid "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman"
-msgstr ""
+msgstr "អ្នក​មិន​ត្រូវ​បាន​អនុញ្ញាត​ឱ្យ​ដំឡើង​ឯកសារ​ទៅ​កាន់​ទីតាំង​ឯកសារ​រួម​ទេ /usr/local/share/doc/keyman"
 
 #: keyman_config/install_kmp.py:107
 msgid "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts"
-msgstr ""
+msgstr "អ្នក​មិន​ត្រូវ​បាន​អនុញ្ញាត​ឱ្យ​ដំឡើង​ពុម្ព​អក្សរ​​ទៅ​ទីតាំងនៃ​ពុម្ព​អក្សរ​​រួម​ទេ /usr/local/share/fonts"
 
 #: keyman_config/install_kmp.py:179
 #, python-brace-format
@@ -55,21 +55,21 @@ msgstr ""
 #: keyman_config/install_window.py:54
 #, python-brace-format
 msgid "Installing keyboard/package {keyboardid}"
-msgstr ""
+msgstr "កំពុង​ដំឡើង​ក្ដារចុច/កញ្ចប់ {keyboardid}"
 
 #: keyman_config/install_window.py:72 keyman_config/install_window.py:93
 msgid "Keyboard is installed already"
-msgstr ""
+msgstr "​ក្ដារចុច​ត្រូវ​បាន​ដំឡើង​ហើយ"
 
 #: keyman_config/install_window.py:74
 #, python-brace-format
 msgid "The {name} keyboard is already installed at version {version}. Do you want to uninstall then reinstall it?"
-msgstr ""
+msgstr "ក្ដារចុច {name} ជំនាន់ {version} ត្រូវ​បាន​ដំឡើង​រួច​​ហើយ។ តើ​អ្នក​ចង់​លុប​វា​ចេញ ហើយ​ដំឡើង​ឡើងវិញ​ឬ?"
 
 #: keyman_config/install_window.py:95
 #, python-brace-format
 msgid "The {name} keyboard is already installed with a newer version {installedversion}. Do you want to uninstall it and install the older version {version}?"
-msgstr ""
+msgstr "ក្ដារចុច {name} ជំនាន់ថ្មី {installedversion} ត្រូវ​បាន​ដំឡើង​រួច​ហើយ។ តើ​អ្នក​ចង់​លុប​វា​ចេញ ហើយ​ដំឡើង​ជំនាន់​ចាស់​ {version} វិញ​ឬ?"
 
 #: keyman_config/install_window.py:128
 msgid "Keyboard layouts:   "
@@ -101,7 +101,7 @@ msgstr "ព័ត៌មាន​លម្អិត"
 
 #: keyman_config/install_window.py:248
 msgid "README"
-msgstr ""
+msgstr "អានខ្ញុំ"
 
 #: keyman_config/install_window.py:256 keyman_config/view_installed.py:200
 msgid "_Install"
