@@ -41,7 +41,7 @@
     <!-- Context: Keyboard Updates -->
     <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">តើ​អ្នក​ចង់​ទាញយក​ជំនាន់​ថ្មី​បំផុត​របស់​ក្ដារចុច​នេះ​ឬ?</string>
     <!-- Context: Keyboard Updates -->
-    <string name="confirm_update" comment="Confirmation to update several resources">Would you like to update keyboards and dictionaries now?</string>
+    <string name="confirm_update" comment="Confirmation to update several resources">តើ​អ្នក​ចង់​អាប់ដេត​ក្ដារចុច និង​បញ្ជីពាក្យ​ឥឡូវ​ឬ?</string>
     <!-- Context: Keyboard Updates -->
     <string name="keyboard_updates_channel">ការអាប់ដេត​ធនធាន</string>
     <!-- Context: Keyboard Updates -->
@@ -111,13 +111,13 @@
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">បញ្ជី​ពាក្យ៖ %1$s</string>
     <!-- Context: Language Settings menu strings -->
-    <string name="model_picker_header" comment="Dictionaries for a specified language">%1$s dictionaries</string>
+    <string name="model_picker_header" comment="Dictionaries for a specified language">បញ្ជី​ពាក្យ %1$s</string>
     <!-- Context: Language Settings menu strings -->
     <!-- Context: Language Settings menu strings -->
     <string name="model_install_toast" comment="Notification when a dictionary is installed">បញ្ជី​ពាក្យដែល​បាន​ដំឡើង</string>
     <!-- Context: Language Settings menu strings -->
     <plurals name="keyboard_count">
-        <item quantity="other">(%1$d keyboards)</item>
+        <item quantity="other">(ក្ដារចុច %1$d)</item>
     </plurals>
     <!-- Context: Content descriptions -->
     <!-- Context: Content descriptions -->
