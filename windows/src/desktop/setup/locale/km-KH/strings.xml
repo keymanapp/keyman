@@ -21,13 +21,13 @@
   <string name="ssActionDownload" comment="ssActionDownload&#10;Parameters: %0:s download size&#10;For example &quot;(13.5MB download)&quot;&#10;This is used when listing each of the files to be installed.">(ទំហំ​ទាញយក %0:s)</string>
   <string name="ssActionInstall">ការរៀបចំ​នឹង​ដំឡើង៖</string>
   <string name="ssFreeCaption">$APPNAME $VERSION ​ជាកម្មវិធី​​កូដ​ចំហឥត​គិត​ថ្លៃ</string>
-  <string name="ssLicenseLink">&amp;Read the license</string>
-  <string name="ssInstallOptionsLink">Install &amp;options</string>
+  <string name="ssLicenseLink">អាន​អាជ្ញា​បណ្ណ</string>
+  <string name="ssInstallOptionsLink">ជម្រើស​នៃ​ការដំឡើង</string>
   <string name="ssMessageBoxTitle">រៀបចំ $APPNAME</string>
   <string name="ssOkButton">យល់ព្រម</string>
-  <string name="ssInstallButton">&amp;Install</string>
+  <string name="ssInstallButton">ដំឡើង</string>
   <string name="ssCancelButton">បោះ​បង់</string>
-  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssExitButton">ចេញ</string>
   <string name="ssStatusInstalling">កំពុង​ដំឡើង $APPNAME</string>
   <string name="ssStatusRemovingOlderVersions">កំពុង​យក​ជំនាន់​ចាស់​ចេញ</string>
   <string name="ssStatusComplete">បាន​ដំឡើង​រួចរាល់</string>
