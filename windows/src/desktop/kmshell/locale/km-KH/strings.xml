@@ -904,21 +904,21 @@
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Please wait while searching for releted fonts for keyboard %0:s</string>
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">សូម​រង់ចាំ ពេល​កំពុង​ស្វែងរក​ពុម្ព​អក្សរ​ពាក់ព័ន្ធ​សម្រាប់​ក្ដារចុច %0:s</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">Keyboard %0:s is not a Unicode keyboard. Fonts cannot be automatically located.  Please check the keyboard documentation for font information.</string>
+  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">ក្ដារចុច %0:s មិន​មែន​ជា​ក្ដារចុច​យូនីកូដ​ទេ។ មិន​អាច​រកឃើញ​ពុម្ព​អក្សរ​ដោយ​ស្វ័យ​ប្រវត្តិ​បាន​ទេ។  សូម​ពិនិត្យ​មើល​ឯកសារ​ក្ដារចុច​អំពី​ព័ត៌មាន​ទាក់ទង​នឹង​ពុម្ព​អក្សរ។</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font helper no keyboards">No keyboard layouts are currently installed or loaded.</string>
+  <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font helper no keyboards">គ្មាន​ប្លង់​ក្ដារចុច​ដែល​បាន​ដំឡើង ឬ​ដែល​បាន​ផ្ទុក​ទេ​នា​ពេល​នេះ។</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">Please select a Keyman keyboard to find related fonts.</string>
+  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">សូម​ជ្រើសរើស​ក្ដារចុច Keyman មួយ​ដើម្បី​រក​ពុម្ព​អក្សរ​ដែល​ពាក់ព័ន្ធ</string>
   <!-- Context: Text Editor -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 10.0.836.0 -->
-  <string name="SKTextEditorCaption" comment="Caption of Text Editor">Text Editor - Keyman</string>
+  <string name="SKTextEditorCaption" comment="Caption of Text Editor">កម្មវិធី​កែ​អត្ថបទ - Keyman</string>
 </resources>
