@@ -38,7 +38,7 @@
   <string name="ssMustRestart">អ្នក​ត្រូវ​តែ​បិទ​រួច​បើក​ Windows ឡើង​វិញ​ដើម្បី​បញ្ចប់​ការរៀបចំ។  ពេល​អ្នក​បិទ​រួច​បើក​ Windows ឡើង​វិញ ការរៀបចំ​នឹង​បញ្ចប់។</string>
   <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION តម្រូវ​ឱ្យ​មានប្រព័ន្ធ​ដំណើរ​ការ Windows 7 ឬ​ថ្មី​ជាង​នេះ​ដើម្បី​ដំឡើង។ ប៉ុន្តែ Keyman Desktop 7, 8 ឬ 9 ត្រូវ​បាន​រកឃើញ។ តើ​អ្នក​ចង់​ដំឡើង​ក្ដារចុចនានា​ដែល​មាន​ក្នុង​អង្គ​ដំឡើង (Installer) នេះ​ ទៅក្នុង​ជំនាន់ Keyman Desktop ឬ?</string>
   <string name="ssOldOsVersionDownload">ជំនាន់​នេះ​នៃ $APPNAME ត្រូវ​ការ Windows 7 ឬ​ថ្មី​ជាង​នេះ​ដើម្បី​ដំឡើង។ តើ​អ្នក​ចង់​ទាញ​យក Keyman Desktop 8 ឬ?</string>
-  <string name="ssOptionsTitle">Install Options</string>
+  <string name="ssOptionsTitle">ជម្រើស​នៃ​ការដំឡើង</string>
   <string name="ssOptionsTitleInstallOptions">ជម្រើស​នៃ​ការដំឡើង</string>
   <string name="ssOptionsTitleDefaultKeymanSettings">ការកំណត់ $APPNAME ​លំនាំដើម</string>
   <string name="ssOptionsTitleSelectModulesToInstall">ម៉ូឌុល​សម្រាប់​ដំឡើង ឬ​អាប់គ្រេដ</string>
