@@ -510,67 +510,67 @@
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKChangeHotkeyTitle" comment="Change Hotkey dialog title">Change Hotkey</string>
+  <string name="SKChangeHotkeyTitle" comment="Change Hotkey dialog title">ប្ដូរ​គ្រាប់​ចុច​ផ្លូវ​កាត់</string>
   <!-- Parameters: %0:s = Name of keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Select a standard hotkey or choose \'Custom\' and hold Ctrl,Shift and/or Alt and type your desired hotkey for language %0:s:</string>
+  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">ជ្រើសរើស​គ្រាប់ចុច​ផ្លូវកាត់​ស្តង់ដារ ឬជ្រើសរើស \"តាម​ចំណូលចិត្ត\" ហើយ​ចុច Ctrl, Shift និង/ឬ Alt ឱ្យ​ជាប់​ បន្ទាប់​មក​ចុច​គ្រាប់​ចុច​ដែល​អ្នក​ចង់​ប្រើ​សម្រាប់​ភាសា %0:s៖</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKSetHotkey_Interface" comment="Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard)">Select a standard hotkey or choose \'Custom\' and hold Ctrl,Shift and/or Alt and type your desired hotkey:</string>
+  <string name="SKSetHotkey_Interface" comment="Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard)">ជ្រើសរើស​គ្រាប់​ចុច​ផ្លូវ​កាត់​ស្តង់ដារ ឬជ្រើសរើស \'តាម​ចំណូលចិត្ត\' ហើយ​ចុច Ctrl, Shift និង/ឬ Alt ឱ្យ​ជាប់ បន្ទាប់​មក​ចុច​គ្រាប់​ចុចដែល​អ្នក​ចង់​ប្រើ៖</string>
   <!-- Parameters: %0:s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">The hotkey %0:s will conflict with normal keyboard use.  You should use at least Ctrl or Alt.  Do you want to change this now?</string>
+  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">គ្រាប់​ចុច​ផ្លូវកាត់ %0:s នឹង​ប្រឆាំង​គ្នា​ជាមួយ​ការប្រើប្រាស់​ក្ដារចុច​ធម្មតា។ យ៉ាង​ហោច​ណាស់ អ្នក​​គួរ​តែ​ប្រើ​ជាមួយ Ctrl ឬ Alt។ តើ​អ្នក​ចង់​ផ្លាស់ប្ដូរ​វា​ឥឡូវ​នេះ​ឬ?</string>
   <!-- Parameters: %0:s = Hotkey, %1:s = Conflicting keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">The hotkey %0:s conflicts with the hotkey selected for keyboard %1:s.  If you continue, the hotkey for keyboard %1:s will be cleared.  Continue?</string>
+  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">គ្រាប់ចុច​ផ្លូវកាត់ %0:s ប្រឆាំង​គ្នា​ជា​មួយ​គ្រាប់ចុច​ផ្លូវកាត់​សម្រាប់​ក្ដារចុច %1:s។ បើ​បន្ត គ្រាប់​ចុច​ផ្លូវ​កាត់​សម្រាប់​ក្ដារចុច %1:s នឹងត្រូវ​លុបចេញ។ បន្ត?</string>
   <!-- Parameters: %0:s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 14.0.117 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">The hotkey %0:s conflicts with another hotkey.  If you continue, the other hotkey will be cleared.  Continue?</string>
+  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">គ្រាប់​ចុច​ផ្លូវ​កាត់ %0:s ប្រឆាំង​គ្នា​ជា​មួយ​គ្រាប់​ចុច​ផ្លូវ​កាត់​មួយ​ផ្សេងទៀត។ បើ​បន្ត គ្រាប់​ចុច​ផ្លូវ​កាត់​មួយ​ផ្សេង​ទៀត​នោះ​នឹង​ត្រូវ​​លុបចោល។ បន្ត?</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">Updated Keyman Components Available</string>
+  <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">មាន​សមាសភាគ Keyman ដែល​បាន​អាប់ដេត</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_NewVersionAvailable" comment="Update dialog - updates available text">Updates for Keyman are now available</string>
+  <string name="S_Update_NewVersionAvailable" comment="Update dialog - updates available text">ឥឡូវ​នេះ មាន​ការអាប់ដេត​សម្រាប់ Keyman</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.255.0 -->
-  <string name="S_Update_NewVersionPrompt" comment="Update dialog - prompt to select updates">Please select the updates you wish to install:</string>
+  <string name="S_Update_NewVersionPrompt" comment="Update dialog - prompt to select updates">សូម​ជ្រើសរើស​ការអាប់ដេត​ដែល​អ្នក​ចង់​ដំឡើង៖</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_DownloadFrom" comment="Update dialog - download information">You can download the new version from:</string>
+  <string name="S_Update_DownloadFrom" comment="Update dialog - download information">អ្នក​អាច​ទាញ​យក​ជំនាន់​ថ្មី​ពី៖</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_Button_InstallNow" comment="Update dialog - install now button">Install Now</string>
+  <string name="S_Update_Button_InstallNow" comment="Update dialog - install now button">ដំឡើង​ឥឡូវ</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_Button_InstallLater" comment="Update dialog - cancel button">Cancel</string>
+  <string name="S_Update_Button_InstallLater" comment="Update dialog - cancel button">បោះ​បង់</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.255.0 -->
-  <string name="S_Update_OldVersionHead" comment="Update dialog - old version">Old Version</string>
+  <string name="S_Update_OldVersionHead" comment="Update dialog - old version">ជំនាន់​ចាស់</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.255.0 -->
-  <string name="S_Update_ComponentHead" comment="Update dialog - update component">Updated Component</string>
+  <string name="S_Update_ComponentHead" comment="Update dialog - update component">សមាសភាគ​ដែល​បាន​អាប់ដេត</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.255.0 -->
-  <string name="S_Update_SizeHead" comment="Update dialog - update size">Size</string>
+  <string name="S_Update_SizeHead" comment="Update dialog - update size">ទំហំ</string>
   <!-- Parameters: %0:s = Current version number -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
@@ -580,32 +580,32 @@
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_PackageText" comment="Update dialog - name and version of updatable keyboard layout package">Keyboard %0:s %1:s</string>
+  <string name="SKUpdate_PackageText" comment="Update dialog - name and version of updatable keyboard layout package">ក្ដារចុច %0:s %1:s</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUpdate_UnableToContact" comment="Update dialog - unable to access keyman.com warning">Unable to contact keyman.com - please make sure you have an active Internet connection and try again.</string>
+  <string name="SKUpdate_UnableToContact" comment="Update dialog - unable to access keyman.com warning">មិន​អាច​ទាក់ទង keyman.com បានទេ - សូម​ប្រាកដ​ថា​អ្នក​មាន​អ៊ីនធើណិត ហើយ​ព្យាយាម​ម្ដងទៀត។</string>
   <!-- Parameters: %0:s = Error message -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">Unable to contact keyman.com - please make sure you have an active Internet connection and try again.  The error received was: %0:s</string>
+  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">មិន​អាច​ទាក់ទង keyman.com បានទេ - សូម​ប្រាកដ​ថា​អ្នក​មាន​អ៊ីនធើណិត ហើយ​ព្យាយាម​ម្ដងទៀត។ បញ្ហា​ដែល​ទទួល​បាន​គឺ៖ %0:s</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconTitle" comment="Update icon - title">Keyman updates are available</string>
+  <string name="SKUpdate_IconTitle" comment="Update icon - title">មាន​ការអាប់ដេត Keyman</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconText" comment="Update icon - text">Click this icon to download and install updates</string>
+  <string name="SKUpdate_IconText" comment="Update icon - text">ចុច​លើ​អាយខុន​នេះដើម្បី​ទាញយក និង​ដំឡើង​ការអាប់ដេត</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconMenuText" comment="Update icon - install menu item">View and &amp;install Keyman updates</string>
+  <string name="SKUpdate_IconMenuText" comment="Update icon - install menu item">មើល និង​ដំឡើង​ការអាប់ដេត Keyman</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">E&amp;xit online update check</string>
+  <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">បិទ​ការ​ពិនិត្យ​រក​ការអាប់ដេត​អនឡាញ</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
@@ -613,43 +613,43 @@
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_Splash_Start" comment="Start Keyman button">Start Keyman</string>
+  <string name="S_Splash_Start" comment="Start Keyman button">ចាប់ផ្ដើម Keyman</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_Splash_Exit" comment="Exit button">Exit</string>
+  <string name="S_Splash_Exit" comment="Exit button">ចាកចេញ</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_Splash_Configuration" comment="Keyman Configuration link">Configuration</string>
+  <string name="S_Splash_Configuration" comment="Keyman Configuration link">ការកំណត់រចនាសម្ព័ន្ធ</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.341.0 -->
-  <string name="S_Splash_ShowAtStartup" comment="Show at Startup toggle">Show this screen at startup</string>
+  <string name="S_Splash_ShowAtStartup" comment="Show at Startup toggle">បង្ហាញ​ផ្ទាំង​អេក្រង់​នេះ​ពេល​ចាប់ផ្ដើម</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.278.0 -->
-  <string name="S_DisplayIn" comment="'Display In' text label for UI language menu">Display in</string>
+  <string name="S_DisplayIn" comment="'Display In' text label for UI language menu">បង្ហាញ​ជាភាសា៖</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.278.0 -->
-  <string name="S_MoreUILanguagesMenu" comment="More UI languages online menu item">Find other display languages online...</string>
+  <string name="S_MoreUILanguagesMenu" comment="More UI languages online menu item">រក​ភាសាផ្សេងទៀត​នៅ​លើ​អ៊ីនធើណិត​សម្រាប់​ការបង្ហាញ​...</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.525.0 -->
-  <string name="S_ContributeUILanguagesMenu" comment="Link to contribute to language UI">Help translate the user interface...</string>
+  <string name="S_ContributeUILanguagesMenu" comment="Link to contribute to language UI">ជួយ​បកប្រែកម្មវិធី Keyman...</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUILanguageName" comment="User interface language name in the UI language">English</string>
+  <string name="SKUILanguageName" comment="User interface language name in the UI language">អង់គ្លេស</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUILanguageNameWithEnglish" comment="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">English</string>
+  <string name="SKUILanguageNameWithEnglish" comment="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">អង់គ្លេស</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKLanguageCode" comment="The language code for the current translation">en</string>
+  <string name="SKLanguageCode" comment="The language code for the current translation">km</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -661,63 +661,63 @@
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="S_Button_ResetHints" comment="Hint - options tab button to reset hints">Reset Hints</string>
+  <string name="S_Button_ResetHints" comment="Hint - options tab button to reset hints">កំណត់​គន្លឹះ​ឡើង​វិញ</string>
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="SKHintsReset" comment="Hint - options tab dialog confirming reset of hints">All hint messages have been reset and will be displayed again.</string>
+  <string name="SKHintsReset" comment="Hint - options tab dialog confirming reset of hints">សារ​គន្លឹះ​ទាំង​អស់​ត្រូវ​បាន​កំណត់​ឡើងវិញ ហើយ​នឹង​​ត្រូវ​បាន​បង្ហាញ​ម្ដង​ទៀត។</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">Exit Keyman?</string>
+  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">បិទ Keyman?</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: Hint -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">Are you sure you want to exit Keyman?  Your Keyman keyboards will still be listed in the Windows languages, but will not be functional until you restart Keyman.</string>
+  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">តើ​អ្នក​ពិត​ជា​ចង់​បិទ Keyman ឬ? ក្ដារចុច Keyman របស់​អ្នក​នឹង​នៅ​តែ​មាន​ក្នុង​បញ្ជី​ភាសា​របស់ Windows ដដែល ប៉ុន្តែនឹង​មិន​ដំណើរការ​ទេ បើ​អ្នក​មិន​បើក Keyman ឡើង​វិញ។</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="HintTitle_KH_CLOSEOSK" comment="Hint - dialog title upon closing the OSK">On Screen Keyboard Closed</string>
+  <string name="HintTitle_KH_CLOSEOSK" comment="Hint - dialog title upon closing the OSK">\"ក្ដារចុច​លើ​អេក្រង់\" ត្រូវ​បាន​បិទ</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: Hint -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="Hint_KH_CLOSEOSK" comment="Hint - explains that Product is still running and informs how to reopen OSK">You have closed the On Screen Keyboard.  Keyman is still running.  You can open the On Screen Keyboard at any time by clicking on the Keyman Icon and selecting \"On Screen Keyboard\"</string>
+  <string name="Hint_KH_CLOSEOSK" comment="Hint - explains that Product is still running and informs how to reopen OSK">អ្នក​បាន​បិទ \"ក្ដារចុច​លើ​អេក្រង់\" ហើយ។ Keyman នៅ​តែ​ដំណើរការ​ដដែល។ អ្នក​អាច​បើក \"ក្ដារចុច​លើ​អេក្រង់\" វិញ​នៅ​ពេល​ណា​ក៏​បាន ដោយ​ចុច​លើ​អាយខុន Keyman ហើយ​ចុច​លើ \"ក្ដារចុច​លើ​អេក្រង់\"</string>
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 10.0.836.0 -->
-  <string name="S_HintDialog_DontShowHintAgain" comment="Hint dialog - caption of checkbox at bottom of dialog">Don\'t show this hint again</string>
+  <string name="S_HintDialog_DontShowHintAgain" comment="Hint dialog - caption of checkbox at bottom of dialog">កុំបង្ហាញគន្លឹះ​នេះ​ទៀត</string>
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_HelpTitle" comment="Help - product name help">Keyman Help</string>
+  <string name="S_HelpTitle" comment="Help - product name help">ជំនួយ Keyman</string>
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Help_Product" comment="Help - help contents link title">Help Contents</string>
+  <string name="S_Help_Product" comment="Help - help contents link title">មាតិកាជំនួយ</string>
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Help_Keyboard_Prefix" comment="Help - text preceding keyboard name">Help on \"</string>
+  <string name="S_Help_Keyboard_Prefix" comment="Help - text preceding keyboard name">ជំនួយអំពីក្ដារចុច \"</string>
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Help_Keyboard_Suffix" comment="Help - text following keyboard name">\" keyboard</string>
+  <string name="S_Help_Keyboard_Suffix" comment="Help - text following keyboard name">\"</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewOnScreenKeyboard" comment="Toolbar help - View OSK pop-up text">View On Screen Keyboard</string>
+  <string name="S_Toolbar_ViewOnScreenKeyboard" comment="Toolbar help - View OSK pop-up text">មើល \"ក្ដារចុចលើ​អេក្រង់\"</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="Toolbar help - View Keyboard Usage pop-up text">View Keyboard Usage</string>
+  <string name="S_Toolbar_ViewKeyboardUsage" comment="Toolbar help - View Keyboard Usage pop-up text">មើល \"ការប្រើប្រាស់​ក្ដារចុច\"</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">View Font Helper</string>
+  <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">មើល​ \"អង្គ​ជំនួយ​ពុម្ព​អក្សរ\"</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -725,67 +725,67 @@
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_OpenConfiguration" comment="Toolbar help - Open Keyman Configuration pop-up text">Open Keyman Configuration</string>
+  <string name="S_Toolbar_OpenConfiguration" comment="Toolbar help - Open Keyman Configuration pop-up text">បើក \"ការកំណត់​រចនាសម្ព័ន្ធ Keyman\"</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_OpenHelp" comment="Toolbar help - Open help pop-up text">Open Help</string>
+  <string name="S_Toolbar_OpenHelp" comment="Toolbar help - Open help pop-up text">បើក​ជំនួយ</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="Toolbar help - Close OSK pop-up text">Close On Screen Keyboard</string>
+  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="Toolbar help - Close OSK pop-up text">បិទ \"ក្ដារចុចលើ​អេក្រង់\"</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">Switch Keyman &amp;Off</string>
+  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">បិទ Keyman</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">On Screen &amp;Keyboard</string>
+  <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">ក្ដារចុច​លើ​អេក្រង់</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_KeyboardUsage" comment="Systray item - Keyboard Usage [&amp; precedes alt + access-character]">Keyboard &amp;Usage</string>
+  <string name="S_Menu_KeyboardUsage" comment="Systray item - Keyboard Usage [&amp; precedes alt + access-character]">ការប្រើបាស់​ក្ដារចុច</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_FontHelper" comment="Systray item - Font Helper [&amp; precedes alt + access-character]">&amp;Font Helper</string>
+  <string name="S_Menu_FontHelper" comment="Systray item - Font Helper [&amp; precedes alt + access-character]">អង្គ​ជំនួយ​ពុម្ព​អក្សរ</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_CharacterMap" comment="Systray item - Character Map [&amp; precedes alt + access-character]">Character &amp;Map</string>
+  <string name="S_Menu_CharacterMap" comment="Systray item - Character Map [&amp; precedes alt + access-character]">តារាង​តួ​អក្សរ</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_TextEditor" comment="Systray item - Text Editor [&amp; precedes alt + access-character]">&amp;Text Editor...</string>
+  <string name="S_Menu_TextEditor" comment="Systray item - Text Editor [&amp; precedes alt + access-character]">កម្មវិធី​កែ​អត្ថបទ...</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Configuration" comment="Systray item - Configuration [&amp; precedes alt + access-character]">&amp;Configuration...</string>
+  <string name="S_Menu_Configuration" comment="Systray item - Configuration [&amp; precedes alt + access-character]">ការកំណត់​រចនាសម្ព័ន្ធ...</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Help" comment="Systray item - Help [&amp; precedes alt + access-character]">&amp;Help...</string>
+  <string name="S_Menu_Help" comment="Systray item - Help [&amp; precedes alt + access-character]">ជំនួយ...</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Exit" comment="Systray item - Exit [&amp; precedes alt + access-character]">E&amp;xit</string>
+  <string name="S_Menu_Exit" comment="Systray item - Exit [&amp; precedes alt + access-character]">ចាកចេញ</string>
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OSKContext_FadeWhenInactive" comment="OSK right-click menu - fade OSK when mouse is elsewhere">Fade When Inactive</string>
+  <string name="S_OSKContext_FadeWhenInactive" comment="OSK right-click menu - fade OSK when mouse is elsewhere">ព្រាល​ពេល​អសកម្ម</string>
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OSKContext_ShowToolbar" comment="OSK right-click menu - show/hide OSK toolbar">Show Toolbar</string>
+  <string name="S_OSKContext_ShowToolbar" comment="OSK right-click menu - show/hide OSK toolbar">បង្ហាញ​របារ​ឧបករណ៍</string>
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OSKContext_SaveAsWebPage" comment="OSK right-click menu - save diagram of active keyboard layout as a web page">Save as Web Page...</string>
+  <string name="S_OSKContext_SaveAsWebPage" comment="OSK right-click menu - save diagram of active keyboard layout as a web page">រក្សាទុក​ជា \"ទំព័រ​បណ្ដាញ\"...</string>
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OSKContext_Print" comment="OSK right-click menu - print diagram of active keyboard layout">Print...</string>
+  <string name="S_OSKContext_Print" comment="OSK right-click menu - print diagram of active keyboard layout">ព្រីន...</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -794,35 +794,35 @@
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSplashVersion" comment="Version number">Version %0:s</string>
+  <string name="SKSplashVersion" comment="Version number">ជំនាន់ %0:s</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.239.0 -->
-  <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">&amp;Print...</string>
+  <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">ព្រីន...</string>
   <!-- Parameters: %0:s = Package to be uninstalled -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">A package with the name %0:s is already installed.  Do you want to uninstall it and install the new one?</string>
+  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">កញ្ចប់​ឈ្មោះ %0:s ត្រូវ​បាន​ដំឡើង​រួច​ហើយ។ តើ​អ្នក​ចង់​លុប​វា ហើយ​ដំឡើងកញ្ចប់​ថ្មី​នេះ​ឬ?</string>
   <!-- Parameters: %0:s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">A keyboard with the name \'%0:s\' is already installed.  If you continue, it will be uninstalled before the new one is installed.  Continue?</string>
+  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">ក្ដារចុច​មួយ​ឈ្មោះ \'%0:s\' ត្រូវ​បាន​ដំឡើង​រួច​ហើយ។ បើ​បន្ត វា​នឹង​ត្រូវ​បាន​លុប មុន​ពេល​ដំឡើង​ក្ដារចុច​ថ្មី​នេះ។ បន្ត?</string>
   <!-- Parameters: %0:s = Keyboard name, %1:s = Package name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">The keyboard \'%0:s\' is part of package \'%1:s\'.  You must uninstall the entire package.  Continue?</string>
+  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">ក្ដារចុច \'%0:s\' មាន​ក្នុង​កញ្ចប់ \'%1:s\'។ អ្នក​ត្រូវ​តែ​លុប​កញ្ចប់​ទាំង​មូល​ចេញ។ បន្ត?</string>
   <!-- Parameters: %0:s = Package Name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">The package or keyboard \'%0:s\' does not include any introductory help.</string>
+  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">កញ្ចប់ ឬ​ក្ដារចុច \'%0:s\' នេះ​គ្មាន​ឯកសារ​ជំនួយ​ទេ។</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKOSNotSupported" comment="Notice of unsupported operating system">This operating system is not supported.</string>
+  <string name="SKOSNotSupported" comment="Notice of unsupported operating system">មិន​អាច​ប្រើ​ក្នុង​ប្រព័ន្ធ​ប្រតិបត្តិការ​នេះ​ទេ។</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -830,41 +830,41 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKCouldNotFindHelp" comment="Notice of help file not found">The help file could not be found.</string>
+  <string name="SKCouldNotFindHelp" comment="Notice of help file not found">រក​មិន​ឃើញ​ឯកសារជំនួយ​ទេ។</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKANSIEncoding" comment="Keyboard with an ANSI or Codepage encoding">Codepage</string>
+  <string name="SKANSIEncoding" comment="Keyboard with an ANSI or Codepage encoding">ទំព័រ​កូដ</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUnicodeEncoding" comment="Keyboard with a Unicode encoding">Unicode</string>
+  <string name="SKUnicodeEncoding" comment="Keyboard with a Unicode encoding">យូនីកូដ</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDownloadProgress_Title" comment="Notice of file downloading">Downloading File</string>
+  <string name="SKDownloadProgress_Title" comment="Notice of file downloading">កំពុងទាញយកឯកសារ</string>
   <!-- Parameters: %0:s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">Are you sure you want to remove the on screen keyboard installed for %0:s?</string>
+  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">តើ​អ្នក​ពិត​ជា​ចង់​លុប \"ក្ដារចុច​លើ​អេក្រង់\" ដែល​បាន​ដំឡើង​សម្រាប់ %0:s ឬ?</string>
   <!-- Parameters: %0:s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.239.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">Are you sure you want to uninstall keyboard %0:s?</string>
+  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">អ្នក​តើ​ពិត​ជា​ចង់​លុប​ក្ដារចុច %0:s ឬ?</string>
   <!-- Parameters: %0:s = Package name, %1:s: Fonts list -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.239.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">Are you sure you want to uninstall package %0:s?
+  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">តើ​អ្នក​ពិត​ជា​ចង់​លុប​កញ្ចប់ %0:s ឬ?
 
 %1:s</string>
   <!-- Parameters: %0:s = Fonts list -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.1.270.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">The following fonts will also be uninstalled: %0:s.</string>
+  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">ពុម្ព​អក្សរ​ទាំង​នេះ​ក៏​នឹង​ត្រូវ​​លុបផងដែរ៖ %0:s។</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -888,19 +888,19 @@
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman failed to start.  Please check your security settings to make sure that the program keyman.exe is allowed to start before continuing.  The error returned was:
+  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">មិន​អាច​បើក Keyman បាន​ទេ។ សូម​ពិនិត្យ​មើល​ការកំណត់​សុវត្ថិភាព​របស់​អ្នក ដើម្បី​ប្រាកដថា​បាន​អនុញ្ញាត​ឱ្យ​កម្មវិធី keyman.exe ចាប់ផ្ដើម មុន​ពេល​បន្ត​ទៅ​ជំហាន​បន្ទាប់។ បញ្ហា​ដែល​បាន​កើតឡើង​គឺ៖
 
 \"%0:s\"
 
-Do you want to try and start Keyman again now?</string>
+តើ​អ្នក​ចង់​ព្យាយាម​ចាប់ផ្ដើម Keyman ម្ដងទៀត​ឬនៅ​ពេល​នេះ?</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information will be stored in a log file called %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). You should exit Keyman before attempting to delete this file.
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា​ Keyman នឹង​ត្រូវ​បាន​រក្សា​ទុក​ក្នុង​ឯកសារ​កំណត់ហេតុ​ដែល​មាន​ឈ្មោះ​ថា %LOCALAPPDATA%\Keyman\Diag\system#.etl (# ជា​តួ​លេខ)។ អ្នក​គួរ​តែ​បិទ Keyman មុន​ពេល​លុប​ឯកសារ​នេះ។
 
-WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.
+ការព្រមាន៖ ឯកសារ​នេះ​អាច​មាន​ទំហំ​ធំទៅៗ យ៉ាង​លឿន។ ការបើក​ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា (debugging) អាច​ធ្វើ​ឱ្យ​កុំព្យូទ័រ​របស់​អ្នក​ដើរ​យឺត ដូច្នេះ​អ្នក​គួរ​តែ​បើក​វា​តែ​នៅ​ពេល​ដែល​អ្នក​ជំនាញ​បច្ចេកទេសប្រាប់​អ្នក​ឱ្យបើក​ប៉ុណ្ណោះ។
 
-PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</string>
+ការព្រមាន​អំពី​ឯកជនភាព៖ សូម​ចំណាំ​ថា​ឯកសារកំណត់ហេតុ​ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា​រក្សា​ទុក​គ្រប់​ការចុចទាំង​អស់​របស់​អ្នក។ អ្នក​គួរ​បើក​វា​តែ​នៅ​ក្នុង​អំឡុង​ពេល​ដែល​អ្នក​កំពុង​ដោះស្រាយ​បញ្ហា ឬ​វិភាគ​បញ្ហា​ប៉ុណ្ណោះ។</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
