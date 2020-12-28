@@ -55,7 +55,7 @@
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">ដំឡើង​ក្ដារ​ចុចឬ​បញ្ជី​ពាក្យ</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_banner" comment="text suggestions banner">Always show banner</string>
+  <string name="show_banner" comment="text suggestions banner">បង្ហាញ​បដា​ជានិច្ច</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner_on" comment="Description when toggle is on">ត្រូវ​អនុវត្ត</string>
   <!-- Context: Keyman Settings menu -->
