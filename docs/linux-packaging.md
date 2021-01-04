@@ -5,8 +5,9 @@
 We use different channels to build and distribute the Linux packages:
 
 - (older version) included in official repos since Ubuntu 19.04 and Debian Buster
-- Launchpad repo for [stable](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman) and
-  [beta](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-daily) versions
+- Launchpad repo for [stable](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman),
+  [beta](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-beta) and
+  [alpha](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-alpha) versions
 - [pso](http://packages.sil.org/) and [llso](http://linux.lsdev.sil.org/ubuntu/)
   for stable, beta, and alpha versions
 - artifacts on [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/view/change-requests/)
