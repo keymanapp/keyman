@@ -125,19 +125,9 @@ Run `ibus restart` after installing any of them
 
 - Use `Win-space` to switch between keyboards.
 
-##### Unity (xenial default)
+##### Cinnamon (wasta default)
 
-- Run `Text Entry`
-- Click `+` to add a keyboard.
-- In `Choose an input source` search for "Other" or the keyboard name, or "Ibus" to find Keyman keyboards.
-
-Check `Show current input source in the menu bar` to see what keyboard you are using and have a menu for keyboards.
-
-Use `Win-space` to switch between keyboards.
-
-##### Cinnamon (wasta xenial default)
-
-- Open `Menu` and find `IBus Preferences`and run it
+- Open `Menu` and find `IBus Keyboards` (`IBus Preferences`) and run it
 - Make sure `Show icon on system tray` is checked
 - Select the tab `Input Method`.
 - Click `Add` to add a keyman keyboard.

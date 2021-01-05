@@ -1,3 +1,35 @@
+kmflcomp (11.0.101-1) unstable; urgency=medium
+
+  * New upstream beta 1 of Keyman for Linux 11.0
+  * d/watch update for beta/stable
+  * d/control multi-arch
+      standards 4.3.0 no changes
+
+ -- Daniel Glassey <wdg@debian.org>  Thu, 03 Jan 2019 16:55:50 +0700
+
+kmflcomp (10.99.33-3) unstable; urgency=medium
+
+  * change to Debian Input Method Team maintainership
+      with me as uploader
+
+ -- Daniel Glassey <wdg@debian.org>  Wed, 24 Oct 2018 21:31:54 +0700
+
+kmflcomp (10.99.33-2) unstable; urgency=medium
+
+  * d/compat 11
+  * change from cdbs to dh
+
+ -- Daniel Glassey <wdg@debian.org>  Mon, 22 Oct 2018 11:20:38 +0700
+
+kmflcomp (10.99.33-1) unstable; urgency=medium
+
+  * transition not required so uploading to unstable
+  * d/control: standards version 4.2.1
+      no changes
+  * New upstream changes linking libX11 which closes: #616572
+
+ -- Daniel Glassey <wdg@debian.org>  Fri, 19 Oct 2018 11:14:12 +0700
+
 kmflcomp (10.99.32-1) experimental; urgency=medium
 
   * Change license to MIT as kmflcomp is being moved into Keyman 11
@@ -18,17 +50,17 @@ kmflcomp (0.9.10-1) unstable; urgency=low
   * new upstream release
   * bring d/compat to level 10 (Closes: #817512)
     - d/control: B-D on debhelper > 10
-  * update d/control: 
+  * update d/control:
     - change short description to be more informative (Closes: #493522)
     - change extended description to be more informative
     - remove redundant Section: util from kmfl binary package
     - add homepage field to source section
     - remove build depend on dh-autoreconfig (not needed for compat 10)
     - remove version constraint on cdbs (fulfilled in oldstable)
-  * include update for newer architectures (using autotools-dev) 
+  * include update for newer architectures (using autotools-dev)
     from Wookey <wookey@debian.org> (Closes: #765228)
   * empty dependency_libs in .la files to bring standards-version to 3.9.1.0
-  * change copyright to machine-readable copyright-format to bring 
+  * change copyright to machine-readable copyright-format to bring
     standards-version to 3.9.3.0
   * bring standards-version to 3.9.8.0 (no other changes required)
   * switch to dpkg-source 3.0 (quilt) format
@@ -46,7 +78,7 @@ kmflcomp (0.9.9-1) UNRELEASED; urgency=low
 kmflcomp (0.9.8-1.1) unstable; urgency=medium
 
   * Non-maintainer upload.
-  * Update for newer architectures (using autotools-dev) (Closes: #765228) 
+  * Update for newer architectures (using autotools-dev) (Closes: #765228)
 
  -- Wookey <wookey@debian.org>  Thu, 15 Oct 2015 20:51:15 +0000
 

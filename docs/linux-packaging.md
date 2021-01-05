@@ -116,7 +116,7 @@ are scattered over several source repos:
   libkmfl, ibus-kmfl, keyman-config, and ibus-keyman). This is done by calling
   [scripts/jenkins.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh).
 - build job creates the binary package for each linux package on each distribution (currently
-  xenial, bionic) and each architecture (amd64, i386)
+  bionic, focal, and groovy) and each architecture (amd64, i386 only for bionic)
 - at the end of the build if it is not a build of a PR, the `.deb` file gets uploaded to llso
   (alpha packages to e.g. `bionic-experimental`, beta packages to `bionic-proposed` and
   packages build from the stable branch to the main section `bionic`)
@@ -142,14 +142,14 @@ with that. [`setup.sh`](https://github.com/sillsdev/ci-builder-scripts/blob/mast
 can setup such chroots:
 
 ```bash
-bash/setup.sh --dists "xenial bionic" --arches "amd64 i386"
+bash/setup.sh --dists "focal bionic" --arches "amd64 i386"
 ```
 
 [`update`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/update) is used to
 later update those chroots:
 
 ```bash
-bash/update --dists "xenial bionic" --arches "amd64 i386"
+bash/update --dists "focal bionic" --arches "amd64 i386"
 ```
 
 Set the `DEBSIGNKEY` environment variable to your public GPG key that will be used to sign
@@ -181,9 +181,9 @@ script creates the binary packages:
 ```bash
 cd linux/${packageName}
 ~/ci-builder-scripts/bash/build-package \
-    --dists "xenial bionic" --arches "amd64 i386" \
+    --dists "focal bionic" --arches "amd64 i386" \
     --main-package-name "My great package" \
-    --supported-distros "xenial bionic focal" \
+    --supported-distros "bionic focal" \
     --debkeyid ${DEBSIGNKEY} --build-in-place --no-upload
 ```
 

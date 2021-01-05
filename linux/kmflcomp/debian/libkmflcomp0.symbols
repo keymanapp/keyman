@@ -1,4 +1,5 @@
 libkmflcomp.so.0 libkmflcomp0 #MINVER#
+* Build-Depends-Package: libkmflcomp-dev
  IConvertUTF16toUTF32@Base 0.9.10
  IConvertUTF16toUTF8@Base 0.9.10
  IConvertUTF32toUTF16@Base 0.9.10

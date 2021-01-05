@@ -5,23 +5,27 @@ set -e
 case "$1" in
 
   configure)
-    # Restart IBus if it is running
-    ! ibuspid=`ps -C ibus-daemon -o pid=|head -n 1`
+    # if don't have sudo and ps then don't attempt to restart ibus
+    if which sudo > /dev/null && which ps > /dev/null; then
 
-    if [ "x$ibuspid" != "x" ]; then
-      # check for gnome-shell as it works differently
-      ! gspid=`ps -C gnome-shell -o pid=|head -n 1`
-      if [ "x$gspid" != "x" ]; then
-        # gnome-shell has multiple ibus-daemon processes and needs exit instead of restart
-        ibususers=`ps -C ibus-daemon -o user=|grep -v gdm|uniq`
-        for ibususer in $ibususers; do
-          sudo -H -u "$ibususer" ibus exit || true
-        done
-      else
-        ibususers=`ps -C ibus-daemon -o user=|uniq`
-        for ibususer in $ibususers; do
-          sudo -H -u "$ibususer" ibus restart || true
-        done
+      # Restart IBus if it is running
+      ! ibuspid=`ps -C ibus-daemon -o pid=|head -n 1`
+
+      if [ "x$ibuspid" != "x" ]; then
+        # check for gnome-shell as it works differently
+        ! gspid=`ps -C gnome-shell -o pid=|head -n 1`
+        if [ "x$gspid" != "x" ]; then
+          # gnome-shell has multiple ibus-daemon processes and needs exit instead of restart
+          ibususers=`ps -C ibus-daemon -o user=|grep -v gdm|uniq`
+          for ibususer in $ibususers; do
+            sudo -H -u "$ibususer" ibus exit || true
+          done
+        else
+          ibususers=`ps -C ibus-daemon -o user=|uniq`
+          for ibususer in $ibususers; do
+            sudo -H -u "$ibususer" ibus restart || true
+          done
+        fi
       fi
     fi
   ;;

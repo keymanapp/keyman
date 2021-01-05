@@ -82,3 +82,4 @@ keyman-config/experiments/*.txt
 keyman-config/keyman_config/version.py
 keyman-config/locale/*/LC_MESSAGES/
 test.sh
+debianpackage/
