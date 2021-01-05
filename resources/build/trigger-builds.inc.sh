@@ -66,6 +66,12 @@ function triggerJenkinsBuild() {
     FORCE=", \"force\": true"
   fi
 
+  local TAG=""
+  # This will only be true if we created and pushed a tag
+  if [ "$action" == "commit" ]; then
+    TAG=", \"tag\": \"$GIT_TAG\""
+  fi
+
   if [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
     JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
   fi
@@ -75,7 +81,7 @@ function triggerJenkinsBuild() {
     --header "token: $JENKINS_TOKEN" \
     --header "Content-Type: application/json" \
     $JENKINS_SERVER/generic-webhook-trigger/invoke \
-    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\", \"tag\": \"$GIT_TAG\" $FORCE }")
+    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $TAG $FORCE }")
 
   if echo "$OUTPUT" | grep -q "\"triggered\":true"; then
     echo -n "     job triggered: "
