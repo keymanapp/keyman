@@ -59,6 +59,7 @@ function triggerJenkinsBuild() {
   local JENKINS_BRANCH="${2:-master}"
 
   local JENKINS_SERVER=https://jenkins.lsdev.sil.org
+  local GIT_TAG="release-$VERSION_WITH_TAG"
 
   local FORCE=""
   if [ "${3:-false}" == "true" ]; then
@@ -74,7 +75,7 @@ function triggerJenkinsBuild() {
     --header "token: $JENKINS_TOKEN" \
     --header "Content-Type: application/json" \
     $JENKINS_SERVER/generic-webhook-trigger/invoke \
-    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $FORCE }")
+    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\", \"tag\": \"$GIT_TAG\" $FORCE }")
 
   if echo "$OUTPUT" | grep -q "\"triggered\":true"; then
     echo -n "     job triggered: "
