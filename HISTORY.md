@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.217 beta 2021-01-05
+
+* chore(linux): Allow to push to the `keyman-beta` ppa (#4214)
+
 ## 14.0.216 beta 2020-12-23
 
 * fix(developer): make touch layout editor source view fonts consistent (#4198)
