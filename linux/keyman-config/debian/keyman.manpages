@@ -1,6 +1,6 @@
-debian/man/km-package-get.1
-debian/man/km-package-install.1
 debian/man/km-config.1
 debian/man/km-kvk2ldml.1
+debian/man/km-package-get.1
+debian/man/km-package-install.1
 debian/man/km-package-list-installed.1
 debian/man/km-package-uninstall.1

@@ -1,5 +1,38 @@
-keyman-keyboardprocessor (0.0.0~2018-1) unstable; urgency=medium
+keyman-keyboardprocessor (11.0.101-3) unstable; urgency=medium
 
-  * Initial release.
+  * Team upload.
+  * debian/control: Bump debhelper compat to v12.
+  * debian/rules: Use "dh_missing --fail-missing".
 
- -- Daniel Glassey <wdg@debian.org>  Tue, 20 Nov 2018 10:01:32 +0700
+  [ Helmut Grohne ]
+  * Fix FTCBFS: Let debhelper (>= 10.3) handle the meson build.
+    (Closes: #928803)
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 29 Sep 2019 13:48:11 -0400
+
+keyman-keyboardprocessor (11.0.101-2) unstable; urgency=medium
+
+  * add 0001-Newer-compilers-are-complaining-about-catching-std-e.patch
+      from upstream master to d/patches
+  * d/patches/0002-generic64bit
+      check for __LP64__ instead of amd64 only
+
+ -- Daniel Glassey <wdg@debian.org>  Mon, 14 Jan 2019 09:52:25 +0700
+
+keyman-keyboardprocessor (11.0.101-1) unstable; urgency=medium
+
+  * New upstream Keyman for Linux beta 1
+  * The library is now released so uploading for unstable
+  * d/watch only check for beta/stable now
+  * d/control standards 4.3.0 no changes
+  * Initial release to Debian, Closes: #915660
+
+ -- Daniel Glassey <wdg@debian.org>  Fri, 04 Jan 2019 01:09:03 +0700
+
+keyman-keyboardprocessor (0.0.0~201812120228-1) experimental; urgency=medium
+
+  * Initial release to Debian, Closes: #915660
+  * Upstream pre-release close to beta so for experimental to
+    start with
+
+ -- Daniel Glassey <wdg@debian.org>  Wed, 12 Dec 2018 22:07:38 +0700

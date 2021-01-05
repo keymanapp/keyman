@@ -1,47 +1,43 @@
 Source: keyman-config
-Maintainer: Keyman team <support@keyman.com>
-Section: python
+Section: utils
 Priority: optional
-Build-Depends: dh-python, debhelper (>= 9), bash-completion,
- help2man, python3-all (>= 3.5), python3-setuptools,
- python3-pip, python3-magic, python3-lxml, python3-numpy,
- python3-pil, python3-requests, python3-requests-cache,
- python3-gi, ibus, gir1.2-webkit2-4.0,
- python3-qrcode <!pkg.keyman-config.xenial>,
+Maintainer: Debian Input Method Team <debian-input-method@lists.debian.org>
+Uploaders:
+ Keyman team <support@keyman.com>,
+Build-Depends:
+ bash-completion,
+ debhelper (>= 11),
+ dh-python,
+ gir1.2-webkit2-4.0,
+ help2man,
+ ibus,
  python-qrcode <pkg.keyman-config.xenial>,
- python3-sentry-sdk <pkg.keyman-config.focal>,
+ python3-all (>= 3.5),
+ python3-gi,
+ python3-lxml,
+ python3-magic,
+ python3-numpy,
+ python3-pil,
+ python3-pip,
+ python3-qrcode <!pkg.keyman-config.xenial>,
  python3-raven <pkg.keyman-config.bionic>,
+ python3-requests,
+ python3-requests-cache,
+ python3-sentry-sdk <pkg.keyman-config.focal>,
+ python3-setuptools,
 Standards-Version: 4.5.0
 Vcs-Git: https://github.com/keymanapp/keyman.git
-Vcs-Browser: https://github.com/keymanapp/keyman
-Homepage: https://keyman.com/
-
-Package: python3-keyman-config
-Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}, python3-gi, gir1.2-webkit2-4.0,
- kmflcomp (>=10.99.1), dconf-cli, ibus-keyman,
- python3-sentry-sdk <pkg.keyman-config.focal>,
- python3-raven <pkg.keyman-config.bionic>,
-Description: Keyman for Linux configuration
- Originally created in 1993 to type Lao on Windows, Keyman is now a free and
- open source keyboarding platform which allows anyone to write a keyboard layout
- for their language. Keyman is available for many platforms, including Windows,
- macOS, iOS, Android, Linux and the web.
- .
- Keyboard layouts are defined with a clear and easy to understand keyboard
- grammar. Keyman's contextual input model means keyboard layouts can be
- intelligent and make it simple to type even the most complex languages.
- Keyboard layouts are distributed through an open catalog to all major desktop
- and mobile platforms.
- .
- Python module to install, uninstall and view information about Keyman keyboard
- packages.
+Vcs-Browser: https://github.com/keymanapp/keyman/tree/master/linux/keyman-config
+Homepage: https://www.keyman.com
 
 Package: keyman
 Section: utils
 Architecture: all
-Depends: ${misc:Depends}, python3-keyman-config
-Recommends: onboard-keyman
+Depends:
+ python3-keyman-config,
+ ${misc:Depends},
+Recommends:
+ onboard-keyman,
 Description: Type in your language with Keyman for Linux
  Keyman makes it possible for you to type in over 1,000 languages on Windows, macOS, Linux,
  iPhone, iPad, Android tablets and phones, and even instantly in your web browser. With the
@@ -64,3 +60,32 @@ Description: Type in your language with Keyman for Linux
  .
  This package depends on all that is needed for using Keyman
  for Linux.
+
+Package: python3-keyman-config
+Section: python
+Architecture: all
+Depends:
+ dconf-cli,
+ gir1.2-webkit2-4.0,
+ ibus-keyman,
+ kmflcomp (>=10.99.33),
+ python3-bs4,
+ python3-gi,
+ python3-raven <pkg.keyman-config.bionic>,
+ python3-sentry-sdk <pkg.keyman-config.focal>,
+ ${misc:Depends},
+ ${python3:Depends},
+Description: Keyman for Linux configuration
+ Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+ open source keyboarding platform which allows anyone to write a keyboard layout
+ for their language. Keyman is available for many platforms, including Windows,
+ macOS, iOS, Android, Linux and the web.
+ .
+ Keyboard layouts are defined with a clear and easy to understand keyboard
+ grammar. Keyman's contextual input model means keyboard layouts can be
+ intelligent and make it simple to type even the most complex languages.
+ Keyboard layouts are distributed through an open catalog to all major desktop
+ and mobile platforms.
+ .
+ Python module to install, uninstall and view information about Keyman keyboard
+ packages.

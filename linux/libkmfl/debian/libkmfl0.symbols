@@ -1,4 +1,5 @@
 libkmfl.so.0 libkmfl0 #MINVER#
+* Build-Depends-Package: libkmfl-dev
  DBGMSG@Base 0.9.12
  ERRMSG@Base 0.9.12
  add_to_history@Base 0.9.12
