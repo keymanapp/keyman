@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.5 alpha 2021-01-05
+
+* chore(linux): pass tag to Jenkins build (#4160) (#4215)
+
 ## 15.0.4 alpha 2020-12-23
 
 * feat(common/models): naive backspace workaround, naive multi-char Transform mitigation (#4206)
