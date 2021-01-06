@@ -816,11 +816,16 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     String filename = info.getFilename();
     File cacheKMPFile = info.getFile();
 
-    if (!isKMP) {
-      String noKeyboardsInstalledMessage = " is not a valid Keyman package file.\n" +
-        "No keyboards/dictionaries were installed.";
-      Toast.makeText(context,
-        filename + noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
+    if (filename == null || filename.isEmpty() || cacheKMPFile == null || !cacheKMPFile.exists()) {
+      // failed to retrieve downloaded file
+      String message = context.getString(R.string.failed_to_retrieve_file);
+      Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+      return;
+    } else if (!isKMP) {
+      String noKeyboardsInstalledMessage = String.format(
+        context.getString(R.string.not_valid_package_file), filename, context.getString(R.string.no_targets_to_install));
+      Toast.makeText(context, noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
+      return;
     }
 
     if (cacheKMPFile != null) {

@@ -26,7 +26,7 @@ public final class DownloadFileUtils {
    */
   public static final class Info {
     private final boolean isKMP;
-    private final String filename;    // Internal filename (may be a document number)
+    private final String filename;   // Usable filename (instead of a document number passed from DownloadManager)
     private final File file;         // File handle to the cached file
 
     public Info(boolean isKMP, String filename, File file) {
@@ -93,7 +93,6 @@ public final class DownloadFileUtils {
       String message = "Access denied to " + filename +
         ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
       KMLog.LogException(TAG, "Unable to copy " + filename + " to app cache ", e);
-      Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
     Info info = new Info(isKMP, filename, cachedFile);

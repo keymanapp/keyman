@@ -222,7 +222,7 @@ public class CloudDownloadMgr{
 
       for(int _i=0;_i<params.length;_i++)
       {
-        CloudApiTypes.SingleCloudDownload _download = createRequest(aContext,_i,params[_i]);
+        CloudApiTypes.SingleCloudDownload _download = createRequest(params[_i]);
         _download.setDownloadId(downloadManager.enqueue(_download.getRequest()));// enqueue puts the download request in the queue.
         internalDownloadIdToDownloadIdentifier.put(_download.getDownloadId(),aDownloadIdentifier);
         _downloadSet.addDownload(_download);
@@ -233,12 +233,10 @@ public class CloudDownloadMgr{
 
   /**
    * create request from api param.
-   * @param aContext the context
-   * @param aNo the number
    * @param aParam the api parameter
    * @return the single download
    */
-  private CloudApiTypes.SingleCloudDownload createRequest(Context aContext, int aNo, CloudApiTypes.CloudApiParam aParam)
+  private CloudApiTypes.SingleCloudDownload createRequest(CloudApiTypes.CloudApiParam aParam)
   {
     /*
      * Create a DownloadManager.Request with all the information necessary to start the download

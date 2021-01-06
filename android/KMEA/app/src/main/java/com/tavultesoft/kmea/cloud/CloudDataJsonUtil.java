@@ -314,7 +314,7 @@ public class CloudDataJsonUtil {
       JSONArray dataArray = null;
       JSONObject dataObject = null;
 
-      File destinationFile = aDownload.getDestinationFile(context);
+      File destinationFile = aDownload.cacheAndOpenDestinationFile(context);
       if (destinationFile != null && destinationFile.length() > 0) {
         try {
 

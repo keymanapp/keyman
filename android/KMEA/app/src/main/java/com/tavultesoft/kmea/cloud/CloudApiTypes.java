@@ -3,9 +3,11 @@ package com.tavultesoft.kmea.cloud;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
 
 import org.json.JSONArray;
@@ -142,11 +144,24 @@ public class CloudApiTypes {
       return downloadId;
     }
 
-    public File getDestinationFile(Context context) {
+    /**
+     * Cache a file from DownloadManager and return the file handle
+     * @param context
+     * @return File - handle to the downloaded file in cache
+     */
+    public File cacheAndOpenDestinationFile(Context context) {
       DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
       Uri data = downloadManager.getUriForDownloadedFile(downloadId);
       DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
+      String filename = info.getFilename();
       File cachedFile = info.getFile();
+
+      if (filename == null || filename.isEmpty() || cachedFile == null || !cachedFile.exists()) {
+        // failed to retrieve downloaded file
+        String message = context.getString(R.string.failed_to_retrieve_file);
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+      }
+
       return cachedFile;
     }
 

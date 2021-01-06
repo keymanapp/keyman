@@ -58,7 +58,7 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
     for(CloudApiTypes.SingleCloudDownload _d:aDownload.getSingleDownloads())
     {
 
-      File destinationFile = _d.getDestinationFile(aContext);
+      File destinationFile = _d.cacheAndOpenDestinationFile(aContext);
       if (destinationFile != null && destinationFile.length() > 0)
       {
 
