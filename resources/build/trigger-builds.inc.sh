@@ -68,7 +68,7 @@ function triggerJenkinsBuild() {
 
   local TAG=""
   # This will only be true if we created and pushed a tag
-  if [ "$action" == "commit" ]; then
+  if [ "${action:-""}" == "commit" ]; then
     TAG=", \"tag\": \"$GIT_TAG\""
   fi
 
