@@ -6,7 +6,7 @@ case "$1" in
 
   configure)
     # if don't have sudo and ps then don't attempt to restart ibus
-    if [ -x /usr/bin/sudo ] && [ -x /bin/ps ]; then
+    if which sudo > /dev/null && which ps > /dev/null; then
 
       # Restart IBus if it is running
       ! ibuspid=`ps -C ibus-daemon -o pid=|head -n 1`

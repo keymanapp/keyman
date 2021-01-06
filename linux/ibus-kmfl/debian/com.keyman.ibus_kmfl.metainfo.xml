@@ -1,6 +1,6 @@
-​<?xml version="1.0" encoding="UTF-8"?>
-​<component type="inputmethod">
-​  <id>com.github.ibus.ibus-kmfl</id>
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="inputmethod">
+​  <id>com.keyman.ibus_kmfl</id>
 ​  <metadata_license>FSFAP</metadata_license>
   <project_license>MIT</project_license>
   <project_group>Keyman</project_group>
@@ -36,6 +36,5 @@
   <url type="bugtracker">https://github.com/keymanapp/keyman/issues</url>
   <url type="help">https://help.keyman.com/</url>
   <url type="faq">https://community.software.sil.org/c/keyman</url>
-  <url type="contact">https://keyman.com/contact/</url>
   <url type="donation">https://donate.keyman.com/</url>
 ​</component>
