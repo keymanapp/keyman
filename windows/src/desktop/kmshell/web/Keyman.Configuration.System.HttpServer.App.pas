@@ -262,7 +262,7 @@ begin
   if PageTag <> '' then
     PageTag := '<PageTag>'+PageTag+'</PageTag>';
 
-  FXML := FXMLRenderers.RenderToString(False, s + PageTag + DefaultServersXMLTags + DefaultVersionXMLTags);
+  FXML := FXMLRenderers.RenderToString(s + PageTag + DefaultServersXMLTags + DefaultVersionXMLTags);
 
   FResponseInfo.ContentStream := TStringStream.Create(FXML, TEncoding.UTF8);
   FResponseInfo.FreeContentStream := True;

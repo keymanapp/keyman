@@ -132,13 +132,13 @@ end;
 procedure TfrmSplash.TntFormShow(Sender: TObject);
 begin
   FRenderPage := 'splash';
-  Do_Content_Render(False);
+  Do_Content_Render;
   inherited;
 end;
 
 procedure TfrmSplash.WMUser(var Message: TMessage);
 begin
-  Do_Content_Render(False);
+  Do_Content_Render;
 end;
 
 procedure TfrmSplash.WMUser_FormShown(var Message: TMessage);
@@ -156,14 +156,14 @@ begin
   if FShowConfigurationOnLoad then
   begin
     Main(Self);
-    Do_Content_Render(True);
+    Do_Content_Render;
   end;
 end;
 
 procedure TfrmSplash.FireCommand(const command: WideString; params: TStringList);
 begin
   if command = 'start' then Command_Start
-  else if command = 'config' then begin Main(Self); Do_Content_Render(True); end   // I4393   // I4396
+  else if command = 'config' then begin Main(Self); Do_Content_Render; end   // I4393   // I4396
   else if command = 'hidesplash' then FShouldDisplay := False
   else if command = 'showsplash' then FShouldDisplay := True
   else if command = 'exit' then Command_Exit

@@ -349,7 +349,13 @@ begin
       kotBool: FBoolValue := reg.ReadBool(FRegistryName);
       kotLong: FIntValue := StrToIntDef('$'+reg.ReadString(FRegistryName), 0);
       kotString: FStringValue := reg.ReadString(FRegistryName);
-    end;
+    end
+  else
+    case FOptionType of
+      kotBool: FBoolValue := FDefaultBoolValue;
+      kotLong: FIntValue := FDefaultIntValue;
+      kotString: FStringValue := FDefaultStringValue;
+    end
 end;
 
 procedure TUtilKeymanOptionEntry.Save(AContext: TKeymanContext; reg: TRegistryErrorControlled);  // I2890

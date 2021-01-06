@@ -163,6 +163,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 		  {
 		  case WM_KILLFOCUS:
         {
+          CheckScheduledRefresh();
           HWND hwnd = IsLanguageSwitchWindowVisible();   // I4326
           if(hwnd != NULL && !Globals::IsControllerProcess()) SendToLanguageSwitchWindow(hwnd, VK_ESCAPE, 0); // I3025
 
@@ -177,6 +178,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
 			  break;
       case WM_SETFOCUS:
+        CheckScheduledRefresh();
         if (IsSysTrayWindow(cp->hwnd))      // I2443 - always do the focus change now? really unsure about this one
           SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_SETFOCUS -- not hooking because IsSysTrayWindow");
         else if (Globals::IsControllerWindow(cp->hwnd))
@@ -193,10 +195,11 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
       case WM_ACTIVATE:
         if(cp->wParam == WA_ACTIVE || cp->wParam == WA_CLICKACTIVE)
         {
-          
+          CheckScheduledRefresh();
         }
         break;
 		  case WM_INPUTLANGCHANGE:
+        CheckScheduledRefresh();
         SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_INPUTLANGCHANGE %x %x Hwnd=%x Parent=%x Focus=%x Active=%x", cp->wParam, cp->lParam, cp->hwnd, GetParent(cp->hwnd), GetFocus(), GetActiveWindow());
           ReportActiveKeyboard(PC_UPDATE);   // I4288
 

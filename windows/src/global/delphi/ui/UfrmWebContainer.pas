@@ -93,7 +93,7 @@ type
     property DialogName: WideString read FDialogName;
 
 
-    procedure Do_Content_Render(FRefreshKeyman: Boolean); virtual;
+    procedure Do_Content_Render; virtual;
   end;
 
 procedure CreateForm(InstanceClass: TComponentClass; var Reference);
@@ -148,7 +148,7 @@ begin
   cef.Navigate(modWebHttpServer.Host + '/page/'+FRenderPage+IfThen(Query='','','?'+Query));
 end;
 
-procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);
+procedure TfrmWebContainer.Do_Content_Render;
 begin
   Content_Render;   // I4088
 end;
@@ -249,7 +249,7 @@ var
 begin
   UILanguageID := params.Values['value'];
   kmint.KeymanCustomisation.CustMessages.LanguageCode := UILanguageID;
-  Do_Content_Render(True);
+  Do_Content_Render;
 end;
 
 procedure TfrmWebContainer.cefLoadEnd(Sender: TObject);
@@ -301,7 +301,7 @@ end;
 
 procedure TfrmWebContainer.WMUser_ContentRender(var Message: TMessage);
 begin
-  Do_Content_Render(True);
+  Do_Content_Render;
 end;
 
 procedure TfrmWebContainer.WMUser_FormShown(var Message: TMessage);

@@ -40,4 +40,11 @@ object frmKeyman7Main: TfrmKeyman7Main
     Left = 96
     Top = 104
   end
+  object tmrRefresh: TTimer
+    Enabled = False
+    Interval = 125
+    OnTimer = tmrRefreshTimer
+    Left = 440
+    Top = 40
+  end
 end

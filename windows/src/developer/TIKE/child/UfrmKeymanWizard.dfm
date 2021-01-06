@@ -177,7 +177,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     Top = 0
     Width = 1043
     Height = 645
-    ActivePage = pageDetails
+    ActivePage = pageTouchLayout
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -698,7 +698,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Top = 22
             Width = 482
             Height = 13
-            Caption =
+            Caption = 
               'In Keyman 10, language metadata should now be managed in the pac' +
               'kage, not the keyboard.'
           end
@@ -721,6 +721,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageLayout: TTabSheet
       Caption = 'Layout'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesLayout: TPageControl
         Left = 0
         Top = 0
@@ -735,6 +738,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object panLayoutSimple: TPanel
             Left = 0
             Top = 0
@@ -1015,9 +1022,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageTouchLayout: TTabSheet
       Caption = 'Touch Layout'
       ImageIndex = 16
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pagesTouchLayout: TPageControl
         Left = 0
         Top = 0
@@ -1032,10 +1036,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
@@ -1078,6 +1078,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -1093,7 +1096,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           Top = 13
           Width = 333
           Height = 13
-          Caption =
+          Caption = 
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
@@ -1142,7 +1145,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           object lblInstallHint: TLabel
             Left = 9
             Top = 39
-            Width = 259
+            Width = 213
             Height = 13
             Caption = 'You can install the keyboard into Keyman:'
           end
@@ -1297,7 +1300,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgBrowseBitmap: TOpenPictureDialog
     DefaultExt = 'ico'
-    Filter =
+    Filter = 
       'All supported files (*.ico, *.bmp)|*.ico;*.bmp|Icon files (*.ico' +
       ')|*.ico|Bitmap files (*.bmp)|*.bmp|All files (*.*)|*.*'
     Options = [ofHideReadOnly, ofCreatePrompt, ofEnableSizing]
@@ -1307,7 +1310,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgSaveExport: TSaveDialog
     DefaultExt = 'kmn'
-    Filter =
+    Filter = 
       'Keyman 5.0 Keyboard Wizard (*.kmn)|*.kmn|Windows NT/2000/XP keyb' +
       'oard (*.dll)|*.dll|Windows 95/98/Me keyboard (*.kbd)|*.kbd'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]

@@ -200,11 +200,13 @@ type
     tmrTestKeymanFunctioning: TTimer;
     tmrOnlineUpdateCheck: TTimer;
     tmrCheckInputPane: TTimer;
+    tmrRefresh: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrTestKeymanFunctioningTimer(Sender: TObject);
     procedure tmrOnlineUpdateCheckTimer(Sender: TObject);
     procedure tmrCheckInputPaneTimer(Sender: TObject);
+    procedure tmrRefreshTimer(Sender: TObject);
   private
     InMenuLoop: Integer;  // I1082 - Avoid menu nasty flicker with rapid click
     FClosingApp: Boolean;
@@ -216,6 +218,7 @@ type
     FInUpdateOSKVisibility: Boolean;
     FOSKManuallyClosedThisSession: Boolean;
 
+    FLangSwitchRefreshWatcher: TThread;
     FLastFocus: THandle;
     FLastActive: THandle;
     //FLastKeymanID: Integer;
@@ -308,6 +311,7 @@ type
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure WndProc(var Message: TMessage); override;
+    procedure CreateWnd; override;
   public
     frmKeymanMenu: TfrmKeymanMenu;
     frmVisualKeyboard: TfrmVisualKeyboard;
@@ -528,19 +532,8 @@ begin
   Application.HookMainWindow(AppMessage);
 //  FRunningProduct := TRunningProduct.Create;
 
-  wm_test_keyman_functioning := RegisterWindowMessage('wm_test_keyman_functioning');
-  wm_keyman_globalswitch := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH');
-  wm_keyman_globalswitch_process := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH_PROCESS');
-  wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
-  wm_keyman_control_internal := RegisterWindowMessage('WM_KEYMAN_CONTROL_INTERNAL');   // I3933
   sMsg_TaskbarRestart := RegisterWindowMessage('TaskbarCreated');
-
-  ChangeWindowMessageFilter(wm_keyman_control, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_globalswitch_process, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_control_internal, MSGFLT_ADD);   // I3933
   ChangeWindowMessageFilter(sMsg_TaskbarRestart, MSGFLT_ADD);
-  ChangeWindowMessageFilter(WM_USER_PlatformComms, MSGFLT_ADD);
 
   FInputPane := TFrameworkInputPane.Create;
 
@@ -554,6 +547,12 @@ end;}
 
 procedure TfrmKeyman7Main.FormDestroy(Sender: TObject);
 begin
+  if Assigned(FLangSwitchRefreshWatcher) then
+  begin
+    FLangSwitchRefreshWatcher.Terminate;
+    FLangSwitchRefreshWatcher := nil;
+  end;
+
   FreeAndNil(FInputPane);
 
   ClosePlatformComms64;
@@ -827,9 +826,21 @@ begin
       end;
     KMC_REFRESH:
       begin
+        if wParam = 1 then
+        begin
+          // We're going to keep checking for changes for
+          // the next few seconds because Windows is in the
+          // process of updating its keyboard list
+          tmrRefresh.Tag := 0;
+          tmrRefresh.Enabled := False;
+          tmrRefresh.Enabled := True;
+        end;
+
         if VisualKeyboardVisible then
           frmVisualKeyboard.PreRefreshKeyman;
         kmcom.Refresh;
+        FLangSwitchManager.Refresh;
+
         if VisualKeyboardVisible then
         begin
           frmVisualKeyboard.RefreshKeyman;
@@ -1801,6 +1812,21 @@ begin
   end;
 end;
 
+procedure TfrmKeyman7Main.tmrRefreshTimer(Sender: TObject);
+const
+  SECONDS_TO_CHECK = 5;
+begin
+  if tmrRefresh.Tag > SECONDS_TO_CHECK * (1000 div Integer(tmrRefresh.Interval)) then
+  begin
+    tmrRefresh.Enabled := False;
+    tmrRefresh.Tag := 0;
+  end
+  else
+    tmrRefresh.Tag := tmrRefresh.Tag + 1;
+
+  PostMessage(Handle, wm_keyman_control, KMC_REFRESH, 0);
+end;
+
 procedure TfrmKeyman7Main.tmrTestKeymanFunctioningTimer(Sender: TObject);
 begin
   tmrTestKeymanFunctioning.Enabled := False;
@@ -1878,6 +1904,31 @@ end;
 procedure TfrmKeyman7Main.ClosePlatformComms64;
 begin
   SendPlatformComms64(PC_CLOSE, 0);
+end;
+
+type
+  TLangSwitchRefreshWatcher = class(TThread)
+  private
+    FOwnerHandle: THandle;
+    hTerminatedEvent: THandle;
+  protected
+    procedure Execute; override;
+    procedure TerminatedSet; override;
+  public
+    constructor Create(AOwnerHandle: THandle); reintroduce;
+    destructor Destroy; override;
+  end;
+
+procedure TfrmKeyman7Main.CreateWnd;
+begin
+  inherited;
+  if Assigned(FLangSwitchRefreshWatcher) then
+  begin
+    FLangSwitchRefreshWatcher.Terminate;
+  end;
+  FLangSwitchRefreshWatcher := TLangSwitchRefreshWatcher.Create(Handle);
+  FLangSwitchRefreshWatcher.FreeOnTerminate := True;
+  FLangSwitchRefreshWatcher.Start;
 end;
 
 procedure TfrmKeyman7Main.StartPlatformComms64;
@@ -2001,4 +2052,88 @@ begin
   FHotkeys.Clear;
 end;
 
+{ TLangSwitchRefreshWatcher }
+
+constructor TLangSwitchRefreshWatcher.Create(AOwnerHandle: THandle);
+begin
+  inherited Create(True);
+  FOwnerHandle := AOwnerHandle;
+  hTerminatedEvent := CreateEvent(nil, True, False, nil);
+end;
+
+destructor TLangSwitchRefreshWatcher.Destroy;
+begin
+  CloseHandle(hTerminatedEvent);
+  inherited Destroy;
+end;
+
+procedure TLangSwitchRefreshWatcher.Execute;
+var
+  hk: HKEY;
+  hEvent: THandle;
+  hEvents: array[0..1] of THandle;
+const
+  // We don't really know how long the changes are going to take
+  // so we'll wait 500 msec and then ask the main thread to reload
+  // the changes from the registry
+  ARBITRARY_WAIT_FOR_CHANGES = 1000;
+begin
+  if RegOpenKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_ControlPanelInternationalUserProfile), 0,
+      KEY_NOTIFY, hk) <> ERROR_SUCCESS then
+    Exit;
+  try
+    hEvent := CreateEvent(nil, True, False, nil);
+    if hEvent = 0 then
+      Exit;
+    try
+      // Watch the registry key for any changes
+      if RegNotifyChangeKeyValue(hk, True, REG_NOTIFY_CHANGE_NAME or
+          REG_NOTIFY_CHANGE_LAST_SET, hEvent, True) <> ERROR_SUCCESS then
+        Exit;
+      repeat
+        // Wait for either the registry to change or for us to be terminated
+        hEvents[0] := hEvent;
+        hEvents[1] := hTerminatedEvent;
+        if WaitForMultipleObjects(2, @hEvents[0], False, INFINITE) <> WAIT_OBJECT_0 then
+          Exit;
+
+        ResetEvent(hEvent);
+
+        // Start watching for changes again before requesting a refresh, so we
+        // don't miss any additional changes that come through
+        if RegNotifyChangeKeyValue(hk, True, REG_NOTIFY_CHANGE_NAME or
+            REG_NOTIFY_CHANGE_LAST_SET, hEvent, True) <> ERROR_SUCCESS then
+          Exit;
+
+        // Finally, tell the main form to get ready to process the refresh
+        PostMessage(FOwnerHandle, wm_keyman_control, MAKELONG(KMC_REFRESH, 1), 0);
+      until False;
+
+    finally
+      CloseHandle(hEvent);
+    end;
+  finally
+    RegCloseKey(hk);
+  end;
+
+end;
+
+procedure TLangSwitchRefreshWatcher.TerminatedSet;
+begin
+  inherited;
+  SetEvent(hTerminatedEvent);
+end;
+
+initialization
+  wm_test_keyman_functioning := RegisterWindowMessage('wm_test_keyman_functioning');
+  wm_keyman_globalswitch := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH');
+  wm_keyman_globalswitch_process := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH_PROCESS');
+  wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
+  wm_keyman_control_internal := RegisterWindowMessage('WM_KEYMAN_CONTROL_INTERNAL');   // I3933
+
+  ChangeWindowMessageFilter(wm_keyman_control, MSGFLT_ADD);
+  ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
+  ChangeWindowMessageFilter(wm_keyman_globalswitch_process, MSGFLT_ADD);
+  ChangeWindowMessageFilter(wm_keyman_control_internal, MSGFLT_ADD);   // I3933
+  ChangeWindowMessageFilter(WM_USER_PlatformComms, MSGFLT_ADD);
 end.

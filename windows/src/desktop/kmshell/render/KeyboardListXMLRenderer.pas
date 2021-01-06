@@ -34,7 +34,7 @@ type
     FFileReferences: TStrings;
     procedure DeleteFileReferences;
   protected
-    function XMLData(FRefreshKeyman: Boolean): WideString; override;
+    function XMLData: WideString; override;
   public
     constructor Create(AOwner: TXMLRenderers);
     destructor Destroy; override;
@@ -76,7 +76,7 @@ begin
   inherited Destroy;
 end;
 
-function TKeyboardListXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
+function TKeyboardListXMLRenderer.XMLData: WideString;
     function AddKeyboard(kbd: IKeymanKeyboardInstalled): WideString;
     var
       References: OleVariant;
@@ -105,12 +105,6 @@ var
   I: Integer;
 begin
   DeleteFileReferences;
-
-  if FRefreshKeyman then
-  begin
-    kmcom.Keyboards.Refresh;
-    kmcom.Packages.Refresh;
-  end;
 
   { Add unpackaged keyboards }
   for I := 0 to kmcom.Keyboards.Count - 1 do

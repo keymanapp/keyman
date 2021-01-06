@@ -460,9 +460,6 @@ begin
   CheckKeyboardFonts(False);
 end;
 
-const
-  KR_REFRESH = 2;
-
 {------------------------------------------------------------------------------------------------}
 
 procedure TfrmTextEditor.editorSelectionChange(Sender: TObject);

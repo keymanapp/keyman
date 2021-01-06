@@ -1,5 +1,62 @@
 # Keyman Version History
 
+## 14.0.217 beta 2021-01-05
+
+* chore(linux): Allow to push to the `keyman-beta` ppa (#4214)
+
+## 14.0.216 beta 2020-12-23
+
+* fix(developer): make touch layout editor source view fonts consistent (#4198)
+* fix(developer): Respect tab editor option (#4200)
+* fix(web): Solving kmwosk color inconsistency 🍒 (#4187)
+
+## 14.0.215 beta 2020-12-22
+
+* fix(windows): create task fails (#4181)
+* fix(windows): prevent modifier key from navigating in download dialog (#4182)
+* fix(windows): keyboard help missing (#4177)
+* fix(windows): Proxy Configuration window size (#4159)
+* chore(common): update copyright year in various locations (#4197)
+* fix(windows): Settings refresh management (#4164)
+* fix(windows): Improve refresh performance (#4165)
+* fix(windows): exception handling list error (#4166)
+* fix(windows): OSK toolbar sync (#4167)
+* fix(windows): Show full version with tag in Setup (#4169)
+* fix(windows): Improve refresh reliablilty (#4171)
+* fix(developer): debug.log created unexpectedly (#4189)
+* chore(windows): Remove silent exception in task cleanup (#4191)
+* fix(windows/config): keyboard icons missing (#4193)
+* fix(developer): Map symbols for *LTREnter* and *LTRBkSp* (#4190)
+* fix(developer): Encoding for .model.ts files (#4199)
+* feat(common): annotate PRs with build links (#4202)
+
+## 14.0.214 beta 2020-12-20
+
+* fix(windows): Text editor font bugs (#4149)
+* fix(windows): Warn if we reach maximum transient languages (#4157)
+
+## 14.0.213 beta 2020-12-18
+
+* fix(windows): sentrytool should fail build on exception and access violation when rewriting executables (#4158)
+
+## 14.0.212 beta 2020-12-17
+
+* fix(windows): uninstall language button z-index (#4145)
+* fix(windows): exit button position on setup (#4150)
+* fix(windows): Online Update dialog layout was messy (#4152)
+
+## 14.0.211 beta 2020-12-16
+
+* chore(windows): remove obsolete importkeyboard app (#4138)
+* fix(windows): glitch in keyboard menu (#4139)
+* fix(windows): menu scroll positions need reset at popup (#4140)
+* fix(windows): remove obsolete option 'Switch to OSK/Help' (#4141)
+* fix(windows): Canonicalize BCP 47 tag on keyboard download (#4144)
+* fix(windows): help window centred on load (#4147)
+* fix(windows): Text editor font bugs (#4149)
+* chore(common): Update history for 14.0 beta release (#4148)
+* fix(common): increment version needs to check base (#4155)
+
 ## 14.0.210 beta 2020-12-15
 
 * fix(windows): beta uses wrong server (#4142)

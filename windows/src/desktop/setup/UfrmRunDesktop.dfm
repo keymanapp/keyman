@@ -453,7 +453,6 @@ object frmRunDesktop: TfrmRunDesktop
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitWidth = 347
       DesignSize = (
         272
         208)
@@ -467,7 +466,6 @@ object frmRunDesktop: TfrmRunDesktop
         BorderStyle = bsNone
         ParentBackground = True
         TabOrder = 0
-        ExplicitWidth = 321
         object lblActions: TLabel
           Left = 0
           Top = 18
@@ -493,7 +491,6 @@ object frmRunDesktop: TfrmRunDesktop
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 352
         object lblFree: TLabel
           Left = 20
           Top = 20
@@ -539,7 +536,6 @@ object frmRunDesktop: TfrmRunDesktop
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitWidth = 352
         object cmdInstall: TButton
           Left = 20
           Top = 6
@@ -597,7 +593,7 @@ object frmRunDesktop: TfrmRunDesktop
       Height = 13
     end
     object lblGlobe: TLabel
-      Left = 433
+      Left = 422
       Top = 17
       Width = 25
       Height = 27
@@ -612,14 +608,14 @@ object frmRunDesktop: TfrmRunDesktop
     end
     object progress: TProgressBar
       Left = 247
-      Top = 28
+      Top = 25
       Width = 226
       Height = 17
       TabOrder = 0
       Visible = False
     end
     object cmdExit: TButton
-      Left = 622
+      Left = 611
       Top = 19
       Width = 69
       Height = 25
@@ -629,7 +625,7 @@ object frmRunDesktop: TfrmRunDesktop
       OnClick = cmdExitClick
     end
     object cbLanguage: TComboBox
-      Left = 464
+      Left = 453
       Top = 19
       Width = 152
       Height = 24

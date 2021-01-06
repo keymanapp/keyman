@@ -370,7 +370,7 @@ var
         else Result := KeyboardFileNames[3];
     end;
 begin
-  kmcom.AutoApply := True;
+  kmcom.AutoApply := False;
 
   FMutex := nil;  // I2720
 
@@ -494,9 +494,14 @@ begin
         else ExitCode := 1;
 
     fmInstallTipsForPackages:
-      if TTipMaintenance.InstallTipsForPackages(KeyboardFileNames)
-        then ExitCode := 0
-        else ExitCode := 1;
+      if TTipMaintenance.InstallTipsForPackages(KeyboardFileNames) then
+      begin
+        // TTIPMaintenance never does a kmcom.Apply to notify
+        kmcom.Apply;
+        ExitCode := 0;
+      end
+      else
+        ExitCode := 1;
 
     fmUninstallKeyboard:            { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
       if UninstallKeyboard(nil, FirstKeyboardFileName, FSilent)

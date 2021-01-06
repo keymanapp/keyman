@@ -38,6 +38,7 @@ type
     FInstallSize: Int64;
     FInstallURL: string;
     FNewVersion: string;
+    FNewVersionWithTag: string;
     FStatus: TUpdateCheckResponseStatus;
     FErrorMessage: string;
     FCurrentVersion: string;
@@ -50,6 +51,7 @@ type
 
     property CurrentVersion: string read FCurrentVersion;
     property NewVersion: string read FNewVersion;
+    property NewVersionWithTag: string read FNewVersionWithTag;
     property FileName: string read FFileName;
     property InstallURL: string read FInstallURL;
     property InstallSize: Int64 read FInstallSize;
@@ -87,6 +89,9 @@ begin
     if CompareVersions(node.Values['version'].Value, FCurrentVersion) < 0 then
     begin
       FNewVersion := node.Values['version'].Value;
+      FNewVersionWithTag := FNewVersion;
+      if (node.Values['stability'] <> nil) and (node.Values['stability'].Value <> '') then
+        FNewVersionWithTag := FNewVersionWithTag + '-' + node.Values['stability'].Value;
       FFileName := node.Values['file'].Value;
       FInstallURL := node.Values['url'].Value;
       if node.Values['size'] is TJSONNumber then

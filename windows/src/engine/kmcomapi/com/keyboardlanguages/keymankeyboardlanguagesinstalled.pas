@@ -260,7 +260,7 @@ begin
   if (Index < Get_Count) and (Index >= 0) then
     Result := FLanguages[Index] as IKeymanKeyboardLanguageInstalled
   else
-    ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([VarToStr(Index)]));
+    ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([IntToStr(Index)]));
 end;
 
 function TKeymanKeyboardLanguagesInstalled.IndexOfBCP47Code(

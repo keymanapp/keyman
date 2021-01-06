@@ -1,7 +1,7 @@
 import { info as logInfo } from '@actions/core';
 import { GitHub } from '@actions/github';
 
-import { fixupHistory } from './fixupHistory';
+import { sendCommentToPullRequestAndRelatedIssues, fixupHistory } from './fixupHistory';
 import { incrementVersion } from './incrementVersion';
 const yargs = require('yargs');
 import { readFileSync } from 'fs';
@@ -37,6 +37,15 @@ const main = async (): Promise<void> => {
   let changeCount = 1;
 
   const version = readFileSync('./VERSION.md', 'utf8').trim();
+
+  //
+  // Test
+  //
+  if(argv._.includes('test-current-pulls')) {
+    logInfo(`# Doing a test run for ${version} against PR #881`);
+    await sendCommentToPullRequestAndRelatedIssues(octokit, [881]);
+    process.exit(0);
+  }
 
   //
   // Add entries to HISTORY.md

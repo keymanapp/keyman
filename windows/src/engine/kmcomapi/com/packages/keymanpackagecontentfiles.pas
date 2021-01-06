@@ -66,7 +66,7 @@ begin
 
   if (i < Get_Count) and (i >= 0)
     then Result := FContentFiles[i] as IKeymanPackageContentFile
-    else ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([Index]));
+    else ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([VarToStr(Index)]));
 end;
 
 function TKeymanPackageContentFiles.IndexOf(const Filename: WideString): Integer;

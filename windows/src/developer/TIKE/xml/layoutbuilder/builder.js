@@ -606,9 +606,11 @@ $(function () {
     '*RTLBkSp*':        0x72,
     '*ShiftLock*':      0x73,
     '*ShiftedLock*':    0x74,
-    '*ZWNJ*':           0x75, // If this one is specified, auto-detection will kick in.
-    '*ZWNJiOS*':        0x75, // The iOS version will be used by default, but the
-    '*ZWNJAndroid*':    0x76, // Android platform has its own default glyph.
+    '*ZWNJ*':           0x75, // * If this one is specified, auto-detection will kick in.
+    '*ZWNJiOS*':        0x75, //   The iOS version will be used by default, but the
+    '*ZWNJAndroid*':    0x76, //   Android platform has its own default glyph.
+    '*LTREnter*':       5,    // * Forces LTR shaping for the Enter/BkSp keys regardless
+    '*LTRBkSp*':        4,    //   of layout's directionality.
   };
 
   this.specialKeyNames = Object.entries(this.specialCharacters).map(ch => ch[0]);

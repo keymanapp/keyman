@@ -24,7 +24,7 @@ body {
  font-size:		11px;
  text-align:	justify;
  margin:	0px;
- width:         482px;
+ width:         469px;
  overflow: hidden;
 }
 
@@ -46,8 +46,8 @@ div {
 
 #border {
   border: none;
-  width: <xsl:value-of select="$dialoginfo_onlineupdate/@Width - 2" />px;
-  height: <xsl:value-of select="$dialoginfo_onlineupdate/@Height - 2" />px;
+  width: 469px;
+  height: 375px;
   }
 
 #header { background: white;  }
@@ -65,7 +65,7 @@ div {
 }
 
 #UpdateContainer {
-	height: 76px;
+	height: 220px;
 	overflow-y: auto;
 	border: solid 1px gray;
 	margin: 12px 8px;

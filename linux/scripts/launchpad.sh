@@ -32,8 +32,10 @@ fi
 
 if [ "${TIER}" == "stable" ]; then
     ppa="ppa:keymanapp/keyman"
+elif [ "${TIER}" == "beta" ]; then
+    ppa="ppa:keymanapp/keyman-beta"
 else
-    ppa="ppa:keymanapp/keyman-daily"
+    ppa="ppa:keymanapp/keyman-alpha"
 fi
 echo "ppa: ${ppa}"
 

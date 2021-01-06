@@ -149,7 +149,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
   if ((mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP)) {   // I4642
     BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
-
+    CheckScheduledRefresh();
     _td->LastScanCode = scan;
     _td->LastKey = mp->wParam;
 

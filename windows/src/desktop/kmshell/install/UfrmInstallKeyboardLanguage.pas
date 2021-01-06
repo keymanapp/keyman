@@ -135,6 +135,8 @@ uses
   Keyman.System.LanguageCodeUtils,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.UI.UfrmProgress,
+  MessageIdentifierConsts,
+  MessageIdentifiers,
 
   BCP47Tag,
   GetOSVersion,
@@ -148,9 +150,16 @@ uses
 function InstallKeyboardLanguage(Owner: TForm; const KeyboardID, ISOCode: string; Silent: Boolean): Boolean;
 begin
   Result := TTIPMaintenance.DoInstall(KeyboardID, ISOCode);
-  if Result then
+  if not Result then
+  begin
+    if not Silent then
+      ShowMessage(MsgFromIdFormat(SKInstallLanguageTransientLimit, [ISOCode]));
+    Exit;
+  end
+  else
     CheckForMitigationWarningFor_Win10_1803(Silent, '');
 
+  kmcom.Apply;
   Result := True;
 end;
 
@@ -233,7 +242,11 @@ begin
         then FCode := FCustomLanguage.Tag // Using a custom code
         else FCode := FLanguageVariant.BCP47Tag;
 
-      TTIPMaintenance.DoInstall(FKeyboard.ID, FCode);
+      if not TTIPMaintenance.DoInstall(FKeyboard.ID, FCode) then
+      begin
+        ShowMessage(MsgFromIdFormat(SKInstallLanguageTransientLimit, [FCode]));
+        Exit(False);
+      end;
 
       FKeyboardID := FKeyboard.ID;
       FKeyboard := nil;
@@ -253,7 +266,10 @@ begin
       Result := True;
     end
   ) then
+  begin
+    kmcom.Apply;
     ModalResult := mrOk;
+  end;
 end;
 
 procedure TfrmInstallKeyboardLanguage.editSearchChange(Sender: TObject);
