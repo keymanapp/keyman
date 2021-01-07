@@ -1,0 +1,63 @@
+version: v1
+
+# This file adds labels based on the scopes in resources/scopes/scopes.json and
+# resources/scopes/commit-types.json
+# Currently it must be manually kept up to date. Not all labels are added, only
+# common ones. The others are commented out. There is still some variance between
+# folder names and labels; consider this documentation of that ;-)
+
+#
+# Add labels based on the PR title using fuxingloh/multi-labeler
+#
+
+labels:
+  - label: 'feat'
+    matcher:
+      title: '^feat(\(|:)'
+  - label: 'fix'
+    matcher:
+      title: '^fix(\(|:)'
+  - label: 'chore'
+    matcher:
+      title: '^chore(\(|:)'
+  # "change",
+  - label: 'docs'
+    matcher:
+      title: '^docs(\(|:)'
+  # "style",
+  - label: 'refactor'
+    matcher:
+      title: '^refactor(\(|:)'
+  # "test",
+  - label: 'auto'
+    matcher:
+      title: '^auto(\(|:)'
+
+  # Below are the scopes that we look for in the PR title
+  - label: 'android/'
+    matcher:
+      title: '\(.*android.*\):'
+  - label: 'common/'
+    matcher:
+      title: '\(.*common.*\):'
+  - label: 'developer/'
+    matcher:
+      title: '\(.*developer.*\):'
+  - label: 'ios/'
+    matcher:
+      title: '\(.*ios.*\):'
+  - label: 'linux/'
+    matcher:
+      title: '\(.*linux.*\):'
+  - label: 'mac/'
+    matcher:
+      title: '\(.*mac.*\):'
+  - label: 'oem/'
+    matcher:
+      title: '\(.*oem.*\):'
+  - label: 'web/'
+    matcher:
+      title: '\(.*web.*\):'
+  - label: 'windows/'
+    matcher:
+      title: '\(.*windows.*\):'
