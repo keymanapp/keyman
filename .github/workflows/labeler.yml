@@ -6,6 +6,12 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/labeler@4b52aec09ba832eb9aecccddbccce644ba9ba69d
+    - name: Update labels based on changed files
+      uses: actions/labeler@4b52aec09ba832eb9aecccddbccce644ba9ba69d
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
+    - name: Update labels based on PR title
+      id: labeler
+      uses: jimschubert/labeler-action@cfce1831f33e0e4604bbc4e6933eb2f56c2fa530
+      with:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

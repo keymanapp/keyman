@@ -1,8 +1,12 @@
 #
-# This file adds labels based on the scopes in resources/scopes/scopes.json.
+# This file adds labels based on the scopes in resources/scopes/scopes.json and
+# resources/scopes/commit-types.json
 # Currently it must be manually kept up to date. Not all labels are added, only
 # common ones. The others are commented out. There is still some variance between
 # folder names and labels; consider this documentation of that ;-)
+
+#
+# The top half of the file adds labels based on changed files
 #
 
 android/: android/**
@@ -85,3 +89,41 @@ windows/config/: windows/src/desktop/**
 windows/engine/: windows/src/engine/**
 # windows/resources/
 # windows/samples/
+
+#
+# The lower part of the file adds labels based on the PR title
+#
+
+labels:
+  feat:
+    - '^feat(\(|:)'
+  fix:
+    - '^fix(\(|:)'
+  chore:
+    - '^chore(\(|:)'
+  #    "change",
+  docs:
+    - '^docs(\(|:)'
+  #    "style",
+  refactor:
+    - '^refactor(\(|:)'
+  #    "test",
+  auto:
+    - '^auto(\(|:)'
+  # Below are the scopes that we look for in the PR title
+  'android/':
+    - '^.*\(android\):'
+  'common/':
+    - '^.*\(common(/|\)):'
+  'developer/':
+    - '^.*\(developer\):'
+  'ios/':
+    - '^.*\(ios\):'
+  'linux/':
+    - '^.*\(linux\):'
+  'mac/':
+    - '^.*\(mac\):'
+  'web/':
+    - '^.*\(web\):'
+  'windows/':
+    - '^.*\(windows\):'
