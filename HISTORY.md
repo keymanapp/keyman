@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.6 alpha 2021-01-07
+
+* fix(linux): only pass tag if we just created one (#4220)
+
 ## 15.0.5 alpha 2021-01-05
 
 * chore(linux): pass tag to Jenkins build (#4160) (#4215)
