@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!-- Context: Menu Action -->
-  <string name="action_share" comment="Menu action to send text content to another app">Share</string>
+  <string name="action_share" comment="Menu action to send text content to another app">Compartir</string>
   <!-- Context: Menu Action -->
-  <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
+  <string name="action_web" comment="Menu action to open Keyman browser">Navegador web</string>
   <!-- Context: Menu Action -->
-  <string name="action_text_size" comment="Menu action to adjust text size">Text Size</string>
+  <string name="action_text_size" comment="Menu action to adjust text size">Tamaño del texto</string>
   <!-- Context: Menu Action -->
-  <string name="action_overflow" comment="Show additional menu items">More</string>
+  <string name="action_overflow" comment="Show additional menu items">Más</string>
   <!-- Context: Menu Action -->
-  <string name="action_clear_text" comment="Menu action to erase text">Clear Text</string>
+  <string name="action_clear_text" comment="Menu action to erase text">Borrar texto</string>
   <!-- Context: Menu Action -->
   <string name="action_info" comment="Menu action to display Keyman help page">Info</string>
   <!-- Context: Menu Action -->
-  <string name="action_settings" comment="Menu action to open Settings menu">Settings</string>
+  <string name="action_settings" comment="Menu action to open Settings menu">Configuración</string>
   <!-- Context: Menu Action -->
-  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Install Updates</string>
+  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Instalar actualizaciones</string>
   <!-- Context: Title -->
-  <string name="title_version" comment="Title of Keyman for Android version">Version: %1$s</string>
+  <string name="title_version" comment="Title of Keyman for Android version">Versión: %1$s</string>
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
-  <string name="textview_hint" comment="Prompt to start typing">Start typing here&#8230;</string>
+  <string name="textview_hint" comment="Prompt to start typing">Escriba aquí&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Text Size dialog -->
-  <string name="text_size" comment="Current text size (number)">Text Size: %1$d</string>
+  <string name="text_size" comment="Current text size (number)">Tamaño del texto: %1$d</string>
   <!-- Context: Text Size dialog -->
-  <string name="ic_text_size_up" comment="Make text bigger">Text size up</string>
+  <string name="ic_text_size_up" comment="Make text bigger">Agrandar texto</string>
   <!-- Context: Text Size dialog -->
-  <string name="ic_text_size_down" comment="Make text smaller">Text size down</string>
+  <string name="ic_text_size_down" comment="Make text smaller">Achicar texto</string>
   <!-- Context: Clear Text dialog -->
-  <string name="all_text_will_be_cleared" comment="Erase all the text">\nAll text will be cleared\n</string>
+  <string name="all_text_will_be_cleared" comment="Erase all the text">\nTodo el texto será borrado\n</string>
   <!-- Context: Get Started menu -->
-  <string name="get_started" comment="Menu for getting started">Get Started</string>
+  <string name="get_started" comment="Menu for getting started">Empezar</string>
   <!-- Context: Get Started menu -->
-  <string name="add_a_keyboard" comment="Menu item to add a keyboard">Add a keyboard for your language</string>
+  <string name="add_a_keyboard" comment="Menu item to add a keyboard">Añadir un teclado para su idioma</string>
   <!-- Context: Get Started menu -->
-  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Enable Keyman as system-wide keyboard</string>
+  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Habilitar Keyman como teclado de sistema</string>
   <!-- Context: Get Started menu -->
-  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Set Keyman as default keyboard</string>
+  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Establecer teclado como teclado predeterminado</string>
   <!-- Context: Get Started menu -->
   <string name="more_info" comment="Open the Keyman for Android help page">More info</string>
   <!-- Context: Get Started menu -->
