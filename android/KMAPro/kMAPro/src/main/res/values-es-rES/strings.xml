@@ -39,15 +39,15 @@
   <!-- Context: Get Started menu -->
   <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Establecer teclado como teclado predeterminado</string>
   <!-- Context: Get Started menu -->
-  <string name="more_info" comment="Open the Keyman for Android help page">More info</string>
+  <string name="more_info" comment="Open the Keyman for Android help page">Más información</string>
   <!-- Context: Get Started menu -->
-  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">Show \"%1$s\" on startup</string>
+  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">Mostrar \"%1$s\" al inicio</string>
   <!-- Context: Android Storage Permission -->
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    To install keyboard packages, allow Keyman permission to read/write storage.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Storage permission request was denied. May fail to install keyboard package</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="keyman_settings" comment="Settings menu title">Settings</string>
+  <string name="keyman_settings" comment="Settings menu title">Configuración</string>
   <!-- Context: Keyman Settings menu -->
   <plurals name="installed_languages">
     <item quantity="one">Installed languages (%1$d)</item>
@@ -78,9 +78,9 @@
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="add_language_subtext" comment="Additional information for adding another language">(from keyboard package)</string>
   <!-- Context: Select Package and Select Languages menu -->
-  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">Select Keyboard Package</string>
+  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">Seleccione módulo de teclado</string>
   <!-- Context: Select Package and Select Languages menu -->
-  <string name="title_select_languages_for_package" comment="Select language names from the keyboard package">Select languages for %1$s</string>
+  <string name="title_select_languages_for_package" comment="Select language names from the keyboard package">Seleccionar idiomas para %1$s</string>
   <!-- Context: Select Package and Select Languages menu -->
   <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">Added language %1$s to %2$s</string>
   <!-- Context: Select Package and Select Languages menu -->
@@ -88,27 +88,27 @@
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Search or type URL</string>
   <!-- Context: Keyman Web Browser -->
-  <string name="title_bookmarks" comment="Title for bookmarks">Bookmarks</string>
+  <string name="title_bookmarks" comment="Title for bookmarks">Favoritos</string>
   <!-- Context: Keyman Web Browser -->
-  <string name="no_bookmarks" comment="Text when bookmark list is empty">No Bookmarks</string>
+  <string name="no_bookmarks" comment="Text when bookmark list is empty">No hay favoritos</string>
   <!-- Context: Keyman Web Browser -->
-  <string name="add_bookmark" comment="Confirmation to add bookmark">Add Bookmark</string>
+  <string name="add_bookmark" comment="Confirmation to add bookmark">Añadir a Favoritos</string>
   <!-- Context: Keyman Web Browser -->
-  <string name="hint_title" comment="Page title for saved bookmark">Title</string>
+  <string name="hint_title" comment="Page title for saved bookmark">Título</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_url" comment="Page URL for saved bookmark">Url</string>
   <!-- Context: KMP Package strings -->
-  <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">Package %1$s failed to install</string>
+  <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">El módulo %1$s no se instaló</string>
   <!-- Context: KMP Package strings -->
-  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">Downloading keyboard package\n%1$s&#8230;</string>
+  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">Descargando el módulo del teclado\n%1$s&#8230;</string>
   <!-- Context: KMP Package strings -->
-  <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Failed to extract</string>
+  <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Error al extraer</string>
   <!-- Context: KMP Package strings -->
-  <string name="install_keyboard_package" comment="Title to install keyboard package">Install Keyboard</string>
+  <string name="install_keyboard_package" comment="Title to install keyboard package">Instalar teclado</string>
   <!-- Context: KMP Package welcome.htm title -->
-  <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Welcome to %1$s</string>
+  <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Bienvenido a %1$s</string>
   <!-- Context: KMP Package strings -->
-  <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Dictionary</string>
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">Instalar diccionario</string>
   <!-- Context: KMP Package strings -->
   <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Keyboard package has no touch-optimized keyboards to install</string>
   <!-- Context: KMP Package strings -->
