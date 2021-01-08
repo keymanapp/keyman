@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.218 beta 2021-01-08
+
+* chore(linux): pass tag to Jenkins build (#4160) (#4224)
+
 ## 14.0.217 beta 2021-01-05
 
 * chore(linux): Allow to push to the `keyman-beta` ppa (#4214)
