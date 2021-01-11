@@ -275,7 +275,12 @@ namespace com.keyman.text {
         } else {
           // Don't let command-type keys (like K_DEL, which will output '.' otherwise!)
           // trigger keyboard rules.
-          delete Lkc.Lcode;
+          //
+          // However, DO make sure modifier keys pass through safely.
+          // (https://github.com/keymanapp/keyman/issues/3744)
+          if(!KeyboardProcessor.isModifier(Lkc)) {
+            delete Lkc.Lcode;
+          }
         }
       }
 
@@ -618,6 +623,20 @@ namespace com.keyman.text {
       }
     }
 
+    static isModifier(Levent: KeyEvent): boolean {
+      switch(Levent.Lcode) {
+        case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
+        case 17: 
+        case 18: 
+        case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
+        case 144:
+        case 145:
+          return true;
+        default:
+          return false;
+      }
+    }
+
     // Returns true if the key event is a modifier press, allowing keyPress to return selectively
     // in those cases.
     doModifierPress(Levent: KeyEvent, isKeyDown: boolean): boolean {
@@ -627,23 +646,17 @@ namespace com.keyman.text {
         return false;
       }
 
-      switch(Levent.Lcode) {
-        case 8: 
-          outputTarget.deadkeys().clear();
-          break; // I3318 (always clear deadkeys after backspace) 
-        case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
-        case 17: 
-        case 18: 
-        case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
-        case 144:
-        case 145:
-          // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
-          if(!Levent.device.touchable) {
-            return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
-          } else {
-            return true;
-          }
+      if(Levent.Lcode == 8) {
+        // I3318 (always clear deadkeys after backspace)
+        outputTarget.deadkeys().clear();
+      } else if(KeyboardProcessor.isModifier(Levent)) {
+        // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
+        this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
+        if(!Levent.device.touchable) {
+          return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
+        } else {
+          return true;
+        }
       }
 
       if(Levent.LmodifierChange) {
