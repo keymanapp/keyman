@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: keyman\n"
 "Report-Msgid-Bugs-To: <support@keyman.com>\n"
 "POT-Creation-Date: 2020-08-19 19:17+0200\n"
-"PO-Revision-Date: 2020-12-28 04:02\n"
+"PO-Revision-Date: 2021-01-11 02:30\n"
 "Last-Translator: \n"
 "Language-Team: Khmer\n"
 "Language: km_KH\n"
@@ -28,7 +28,7 @@ msgstr "ទាញ​យក​ក្ដារចុច Keyman"
 #: keyman_config/downloadkeyboard.py:37 keyman_config/keyboard_details.py:49
 #: keyman_config/keyboard_details.py:340 keyman_config/view_installed.py:205
 msgid "_Close"
-msgstr ""
+msgstr "បិទ"
 
 #: keyman_config/install_kmp.py:99
 msgid "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman"
@@ -45,12 +45,12 @@ msgstr "អ្នក​មិន​ត្រូវ​បាន​អនុញ្
 #: keyman_config/install_kmp.py:179
 #, python-brace-format
 msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {package}"
-msgstr ""
+msgstr "install_kmp.py: error: No kmp.json or kmp.inf found in {package}"
 
 #: keyman_config/install_kmp.py:246
 #, python-brace-format
 msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}"
-msgstr ""
+msgstr "install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}"
 
 #: keyman_config/install_window.py:54
 #, python-brace-format
@@ -105,11 +105,11 @@ msgstr "អានខ្ញុំ"
 
 #: keyman_config/install_window.py:256 keyman_config/view_installed.py:200
 msgid "_Install"
-msgstr ""
+msgstr "ដំឡើង"
 
 #: keyman_config/install_window.py:260
 msgid "_Cancel"
-msgstr ""
+msgstr "បោះបង់"
 
 #: keyman_config/install_window.py:305
 #, python-brace-format
@@ -230,7 +230,7 @@ msgstr "ជំនាន់"
 
 #: keyman_config/view_installed.py:161
 msgid "_Uninstall"
-msgstr ""
+msgstr "លុប"
 
 #: keyman_config/view_installed.py:162 keyman_config/view_installed.py:304
 msgid "Uninstall keyboard"
@@ -238,7 +238,7 @@ msgstr "លុប​ក្ដារចុច"
 
 #: keyman_config/view_installed.py:167
 msgid "_About"
-msgstr ""
+msgstr "អំពី"
 
 #: keyman_config/view_installed.py:168 keyman_config/view_installed.py:306
 msgid "About keyboard"
@@ -246,7 +246,7 @@ msgstr "អំពី​ក្ដារចុច"
 
 #: keyman_config/view_installed.py:173
 msgid "_Help"
-msgstr ""
+msgstr "ជំនួយ"
 
 #: keyman_config/view_installed.py:174 keyman_config/view_installed.py:305
 msgid "Help for keyboard"
@@ -254,7 +254,7 @@ msgstr "ជំនួយ​សម្រាប់​ក្ដារចុច"
 
 #: keyman_config/view_installed.py:179
 msgid "_Options"
-msgstr ""
+msgstr "ជម្រើស"
 
 #: keyman_config/view_installed.py:180 keyman_config/view_installed.py:307
 msgid "Settings for keyboard"
@@ -262,7 +262,7 @@ msgstr "ការកំណត់​សម្រាប់​ក្ដារចុ
 
 #: keyman_config/view_installed.py:190
 msgid "_Refresh"
-msgstr ""
+msgstr "រីហ្វ្រ៊ែស"
 
 #: keyman_config/view_installed.py:191
 msgid "Refresh keyboard list"
@@ -270,7 +270,7 @@ msgstr "រីហ្វ្រ៊ែស​បញ្ជី​ក្ដារចុ
 
 #: keyman_config/view_installed.py:195
 msgid "_Download"
-msgstr ""
+msgstr "ទាញយក"
 
 #: keyman_config/view_installed.py:196
 msgid "Download and install a keyboard from the Keyman website"
@@ -320,7 +320,7 @@ msgstr "បាន​ដំឡើង {name}"
 
 #: keyman_config/welcome.py:40
 msgid "Open in _Web browser"
-msgstr ""
+msgstr "បើកក្នុងកម្មវិធីបើកមើលគេហទំព័រ"
 
 #: keyman_config/welcome.py:42
 msgid "Open in the default web browser to do things like printing"
@@ -328,5 +328,5 @@ msgstr "បើក​ក្នុង​កម្មវិធី​រុករក
 
 #: keyman_config/welcome.py:45
 msgid "_OK"
-msgstr ""
+msgstr "យល់ព្រម"
 
