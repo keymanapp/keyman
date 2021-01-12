@@ -1,10 +1,10 @@
 #!groovy
-// Copyright (c) 2019-2020 SIL International
+// Copyright (c) 2019-2021 SIL International
 // This software is licensed under the MIT license (http://opensource.org/licenses/MIT)
 
 @Library('lsdev-pipeline-library') _
 
 keymanPackaging {
-	distributionsToPackage = 'xenial bionic focal groovy'
+	distributionsToPackage = 'bionic focal groovy'
 	arches = 'amd64 i386'
 }

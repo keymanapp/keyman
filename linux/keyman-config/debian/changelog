@@ -1,6 +1,58 @@
-keyman-config (10.99.1-1) UNRELEASED; urgency=low
+keyman-config (11.0.103-3) unstable; urgency=medium
+
+  * Update maintainer to Debian Input Method Team
+
+ -- Daniel Glassey <wdg@debian.org>  Tue, 15 Jan 2019 17:35:50 +0700
+
+keyman-config (11.0.103-2) unstable; urgency=medium
+
+  * add appstream file com.keyman.config.appdata.xml
+
+ -- Daniel Glassey <wdg@debian.org>  Tue, 15 Jan 2019 17:15:09 +0700
+
+keyman-config (11.0.103-1) unstable; urgency=medium
+
+  * New upstream beta
+  * fix download window problem
+  * d/keyman.install icons for km-config application and .kmp files
+       fixes appstream hints error reported on tracker
+  * add d/keyman.sharedmimeinfo for .kmp files
+
+ -- Daniel Glassey <wdg@debian.org>  Fri, 04 Jan 2019 15:39:51 +0700
+
+keyman-config (11.0.101-1) unstable; urgency=medium
+
+  * New upstream Keyman for Linux 11.0 beta 1
+  * d/control standards 4.3.0 no changes
+  * remove d/p missing_files.patch as files are in next upstream
+  * d/watch update for beta/stable
+
+ -- Daniel Glassey <wdg@debian.org>  Fri, 04 Jan 2019 01:26:45 +0700
+
+keyman-config (10.99.69-2) unstable; urgency=medium
+
+  * d/p/missing_files.patch: files missing from released source
+
+ -- Daniel Glassey <wdg@debian.org>  Sat, 22 Dec 2018 21:56:13 +0700
+
+keyman-config (10.99.69-1) unstable; urgency=medium
+
+  * New upstream pre-release
+  * Linux part of website is active to get keyboards for Linux
+      in download window
+  * uses website search API to find list of keyboards for
+      bash completion in cl tools
+  * installs keyboards into IBus when you install them
+  * d/control change to section utils, Closes: #916350
+  * remove webkit->webkit2 patch merged upstream
+
+ -- Daniel Glassey <wdg@debian.org>  Thu, 20 Dec 2018 09:44:44 +0700
+
+keyman-config (10.99.33-1) unstable; urgency=low
 
   * source package automatically created by stdeb 0.8.5
     * and updated
+  * Initial upload to Debian, Closes: #914781
+  * d/patches patch from upstream git to move to WebKit2
 
- -- Daniel Glassey <wdg@debian.org>  Thu, 30 Aug 2018 14:27:49 +0700
+ -- Daniel Glassey <wdg@debian.org>  Tue, 27 Nov 2018 15:56:13 +0700
