@@ -797,6 +797,8 @@ namespace com.keyman.osk {
         var r=this.getRect();
         this.width=r.width;
         this.height=r.height;
+        this.x = r.left;
+        this.y = r.top;
         e.cancelBubble = true;
         return false;
       }
@@ -907,11 +909,7 @@ namespace com.keyman.osk {
         newHeight=0.5*screen.height;
       }
 
-      if(this.vkbd) {
-        this.vkbd.kbdDiv.style.width=newWidth+'px';
-        this.vkbd.kbdDiv.style.height=newHeight+'px';
-        this.vkbd.kbdDiv.style.fontSize=(newHeight/8)+'px';
-      }
+      this.setSize(newWidth, newHeight);
 
       // and OSK position if user located
       if(this.x == -1 || this.y == -1 || (!this._Box)) {
@@ -932,6 +930,19 @@ namespace com.keyman.osk {
       }
 
       return true;
+    }
+
+    private setSize(width?: number, height?: number) {
+      if(width && height) {
+        this.width = width;
+        this.height = height;
+      }
+
+      if(this.vkbd) {
+        this.vkbd.kbdDiv.style.width=this.width+'px';
+        this.vkbd.kbdDiv.style.height=this.height+'px';
+        this.vkbd.kbdDiv.style.fontSize=(this.height/8)+'px';
+      }
     }
 
     getWidthFromCookie(): number {
@@ -1062,19 +1073,17 @@ namespace com.keyman.osk {
      * Description  Get rectangle containing KMW Virtual Keyboard
      */
     ['getRect'](): OSKRect {		// I2405
-      let util = com.keyman.singleton.util;
       var p: OSKRect = {};
 
+      p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
+      p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
+
       if(this.vkbd) {
-        p['left'] = p.left = dom.Utils.getAbsoluteX(this.vkbd.kbdDiv);
-        p['top']  = p.top  = dom.Utils.getAbsoluteY(this.vkbd.kbdDiv);
         p['width']  = p.width  = dom.Utils.getAbsoluteX(this.vkbd.kbdHelpDiv) -
           dom.Utils.getAbsoluteX(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetWidth;
         p['height'] = p.height = dom.Utils.getAbsoluteY(this.vkbd.kbdHelpDiv) -
           dom.Utils.getAbsoluteY(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetHeight;
       } else {
-        p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
-        p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
         p['width']  = p.width  = dom.Utils.getAbsoluteX(this._Box) + this._Box.offsetWidth;
         p['height'] = p.height = dom.Utils.getAbsoluteY(this._Box) + this._Box.offsetHeight;
       }
@@ -1280,7 +1289,9 @@ namespace com.keyman.osk {
       if(device.formFactor == 'desktop') {
         Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
         Ls.left='0px';
-        this.loadCookie();
+
+        this.setSize();
+
         if(Px >= 0) { //probably never happens, legacy support only
           Ls.left = Px + 'px'; Ls.top = Py + 'px';
         } else {
