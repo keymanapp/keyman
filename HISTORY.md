@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.219 beta 2021-01-12
+
+* chore: bugfix cherrypick (#4208, #4210) (#4230)
+* fix(common/core/web): mnemonic modifier key-up handling (#4231)
+
 ## 14.0.218 beta 2021-01-08
 
 * chore(linux): pass tag to Jenkins build (#4160) (#4224)
