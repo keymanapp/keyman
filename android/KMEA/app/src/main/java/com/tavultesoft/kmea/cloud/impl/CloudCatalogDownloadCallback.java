@@ -191,13 +191,13 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
 
   @Override
   public CloudCatalogDownloadReturns extractCloudResultFromDownloadSet(
-    CloudApiTypes.CloudDownloadSet<Dataset, CloudCatalogDownloadReturns> aDownload)
+    Context aContext, CloudApiTypes.CloudDownloadSet<Dataset, CloudCatalogDownloadReturns> aDownload)
   {
     List<CloudApiTypes.CloudApiReturns> retrievedJSON = new ArrayList<>(aDownload.getSingleDownloads().size());
 
     for (CloudApiTypes.SingleCloudDownload _d : aDownload.getSingleDownloads()) {
 
-      CloudApiTypes.CloudApiReturns _json_result = CloudDataJsonUtil.retrieveJsonFromDownload(_d);
+      CloudApiTypes.CloudApiReturns _json_result = CloudDataJsonUtil.retrieveJsonFromDownload(aContext, _d);
 
       if (_json_result!=null)
         retrievedJSON.add(_json_result);  // Null if offline.

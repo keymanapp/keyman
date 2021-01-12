@@ -43,7 +43,7 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
 
   @Override
   public CloudKeyboardDownloadReturns extractCloudResultFromDownloadSet(
-    CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
+    Context aContext, CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
   {
     LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
     List<Map<String, String>> installedLexicalModels = null;
@@ -51,7 +51,8 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
     int _result = FileUtils.DOWNLOAD_SUCCESS;
     for(CloudApiTypes.SingleCloudDownload _d:aDownload.getSingleDownloads())
     {
-      if (_d.getDestinationFile() != null && _d.getDestinationFile().length() > 0)
+      File destinationFile = _d.cacheAndOpenDestinationFile(aContext);
+      if (destinationFile != null && destinationFile.length() > 0)
       {
 
         try {
@@ -71,7 +72,7 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
             // Extract the kmp. Validate it contains only lexical models, and then process the lexical model package
             File kmpFile = new File(cacheDir, kmpFilename);
 
-            FileUtils.copy(_d.getDestinationFile(), kmpFile);
+            FileUtils.copy(destinationFile, kmpFile);
 
             String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
             if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {

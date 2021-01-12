@@ -20,10 +20,11 @@ public interface ICloudDownloadCallback<ModelType,ResultType> {
 
   /**
    * extract download result object from download set
+   * @param aContext the context
    * @param aDownload the download
    * @return the result
    */
-  ResultType extractCloudResultFromDownloadSet(CloudApiTypes.CloudDownloadSet<ModelType,ResultType> aDownload);
+  ResultType extractCloudResultFromDownloadSet(Context aContext, CloudApiTypes.CloudDownloadSet<ModelType,ResultType> aDownload);
 
   /**
    * Apply download results to target model.

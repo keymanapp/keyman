@@ -57,13 +57,14 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
 
   @Override
   public List<CloudLexicalModelMetaDataDownloadCallback.MetaDataResult> extractCloudResultFromDownloadSet(
+      Context aContext,
       CloudApiTypes.CloudDownloadSet<Void, List<CloudLexicalModelMetaDataDownloadCallback.MetaDataResult>> aDownload) {
 
     List<CloudLexicalModelMetaDataDownloadCallback.MetaDataResult> _result = new ArrayList<>(aDownload.getSingleDownloads().size());
 
     for (CloudApiTypes.SingleCloudDownload _d : aDownload.getSingleDownloads()) {
 
-      CloudApiTypes.CloudApiReturns _json_result = CloudDataJsonUtil.retrieveJsonFromDownload(_d);
+      CloudApiTypes.CloudApiReturns _json_result = CloudDataJsonUtil.retrieveJsonFromDownload(aContext, _d);
 
       if (_json_result != null) {
 

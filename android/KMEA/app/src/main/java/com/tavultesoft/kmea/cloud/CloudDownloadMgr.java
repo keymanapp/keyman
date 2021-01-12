@@ -166,7 +166,7 @@ public class CloudDownloadMgr{
     ICloudDownloadCallback<ModelType,ResultType> _callback = aDownloadSet.getCallback();
 
     ResultType jsonTuple = _callback
-      .extractCloudResultFromDownloadSet(aDownloadSet);
+      .extractCloudResultFromDownloadSet(aContext, aDownloadSet);
 
     _callback.applyCloudDownloadToModel(aContext,aDownloadSet.getTargetModel(),jsonTuple);
   }
@@ -222,7 +222,7 @@ public class CloudDownloadMgr{
 
       for(int _i=0;_i<params.length;_i++)
       {
-        CloudApiTypes.SingleCloudDownload _download = createRequest(aContext,_i,params[_i]);
+        CloudApiTypes.SingleCloudDownload _download = createRequest(params[_i]);
         _download.setDownloadId(downloadManager.enqueue(_download.getRequest()));// enqueue puts the download request in the queue.
         internalDownloadIdToDownloadIdentifier.put(_download.getDownloadId(),aDownloadIdentifier);
         _downloadSet.addDownload(_download);
@@ -233,32 +233,26 @@ public class CloudDownloadMgr{
 
   /**
    * create request from api param.
-   * @param aContext the context
-   * @param aNo the number
    * @param aParam the api parameter
    * @return the single download
    */
-  private CloudApiTypes.SingleCloudDownload createRequest(Context aContext, int aNo, CloudApiTypes.CloudApiParam aParam)
+  private CloudApiTypes.SingleCloudDownload createRequest(CloudApiTypes.CloudApiParam aParam)
   {
-
-    // From DownloadManager documentation:
-    // https://developer.android.com/reference/android/app/DownloadManager.Request#setDestinationUri(android.net.Uri)
-    // Must be a file to a path on external storage, and the calling app must have the WRITE_EXTERNAL_STORAGE permission
-    File _file=new File(aContext.getExternalFilesDir(null),"download_"+System.currentTimeMillis()+"_"+aNo);
-       /*
-       Create a DownloadManager.Request with all the information necessary to start the download
-        */
+    /*
+     * Create a DownloadManager.Request with all the information necessary to start the download
+     * Not using setDestinationUri so we can avoid requesting WRITE_EXTERNAL_STORAGE permission
+     * https://developer.android.com/reference/android/app/DownloadManager.Request#setDestinationUri(android.net.Uri)
+     */
     DownloadManager.Request _request=new DownloadManager.Request(Uri.parse(aParam.url))
       .setTitle("Cloud Download " + aParam.target)
       .setDescription("Downloading " + aParam.target)
-      .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
-      .setDestinationUri(Uri.fromFile(_file));// Uri of the destination file
+      .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); // Visibility of the download Notification
       // api level 24
       //.setRequiresCharging(false)// Set if charging is required to begin the download
       //.setAllowedOverMetered(true)// Set if download is allowed on Mobile network
       //.setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
-    return new CloudApiTypes.SingleCloudDownload(_request,_file)
+    return new CloudApiTypes.SingleCloudDownload(_request)
       .setCloudParams(aParam);
   }
 }
