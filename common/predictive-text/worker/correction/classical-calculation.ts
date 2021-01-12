@@ -52,7 +52,8 @@ namespace correction {
      * Otherwise, this object represents a heuristic that _may_ overestimate the true edit distance.  Note that it will
      * never underestimate.
      */
-    diagonalWidth: number = 1;
+    diagonalWidth: number = 2; // TODO: Ideally, should start at 1... but we'll start at 2 for now
+                               // as a naive workaround for multi-char transform limitations.
 
     // The sequence of characters input so far.
     inputSequence: TInput[] = [];

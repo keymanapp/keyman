@@ -358,7 +358,38 @@ namespace correction {
           token.transformDistributions = [transformDistribution];
           state.pushTail(token);
         } else {
-          state.updateTail(transformDistribution, tokenizedContext[0]);
+          // Consider backspace entry for this case?
+          let hasDistribution = transformDistribution && Array.isArray(transformDistribution);
+          let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
+          if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0) {
+            // It's a backspace transform; time for special handling!
+            //
+            // For now, with 14.0, we simply compress all remaining Transforms for the token into 
+            // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex, 
+            // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
+            //
+            // Note that we cannot just use a single, monolithic transform at this point b/c
+            // of our current edit-distance optimization strategy; diagonalization is currently... 
+            // not very compatible with that.
+            let backspacedTokenContext = tokenizedContext[0].split('').map(function(char) {
+              let transform: Transform = {
+                insert: char,
+                deleteLeft: 0,
+                id: primaryInput.id // Not exactly optimal for every transform to have the same ID,
+                                    // but is actually accurate here.
+              };
+
+              return [{sample: transform, p: 1.0}];
+            });
+            state.tokens.pop();
+
+            let compactedToken = new TrackedContextToken();
+            compactedToken.raw = tokenizedContext[0];
+            compactedToken.transformDistributions = backspacedTokenContext;
+            state.pushTail(compactedToken);
+          } else {
+            state.updateTail(transformDistribution, tokenizedContext[0]);
+          }
         }
       }
       return state;
