@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.7 alpha 2021-01-12
+
+* chore(linux): Update debian metadata (#4223)
+
 ## 15.0.6 alpha 2021-01-07
 
 * fix(linux): only pass tag if we just created one (#4220)
