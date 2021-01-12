@@ -1071,6 +1071,8 @@ namespace com.keyman.osk {
     ['getRect'](): OSKRect {		// I2405
       var p: OSKRect = {};
 
+      // Always return these based upon _Box; using this.vkbd will fail to account for banner and/or
+      // the desktop OSK border.
       p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
       p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
 
@@ -1285,9 +1287,7 @@ namespace com.keyman.osk {
       if(device.formFactor == 'desktop') {
         Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
         Ls.left='0px';
-
         this.loadCookie();
-
         if(Px >= 0) { //probably never happens, legacy support only
           Ls.left = Px + 'px'; Ls.top = Py + 'px';
         } else {
