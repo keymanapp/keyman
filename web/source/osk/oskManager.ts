@@ -686,12 +686,8 @@ namespace com.keyman.osk {
           newWidth=0.5*screen.height;
         }
 
-        // Set OSK width
-        this.vkbd.kbdDiv.style.width=newWidth+'px';
-
-        // Explicitly change OSK height and font size - cannot safely rely on scaling from font
-        this.vkbd.kbdDiv.style.height=newHeight+'px';
-        this.vkbd.kbdDiv.style.fontSize=(newHeight/8)+'px';
+        // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font
+        this.setSize(newWidth, newHeight);
 
         if(e  &&  e.preventDefault) {
           e.preventDefault();
@@ -1290,7 +1286,7 @@ namespace com.keyman.osk {
         Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
         Ls.left='0px';
 
-        this.setSize();
+        this.loadCookie();
 
         if(Px >= 0) { //probably never happens, legacy support only
           Ls.left = Px + 'px'; Ls.top = Py + 'px';
