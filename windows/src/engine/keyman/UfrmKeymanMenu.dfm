@@ -6,6 +6,7 @@ object frmKeymanMenu: TfrmKeymanMenu
   ClientHeight = 632
   ClientWidth = 707
   Color = clBtnFace
+  DefaultMonitor = dmDesktop
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11

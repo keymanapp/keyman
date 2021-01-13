@@ -103,6 +103,7 @@ type
     procedure RefreshIconTimeout;
     procedure StartRefreshIconTimeout;
     procedure SetBalloonIcon(const Value: THandle);
+    function GetNotificationWindow: THandle;
   protected
     procedure SetHint(const Value: WideString);
     function GetAnimateInterval: Cardinal;
@@ -135,6 +136,7 @@ type
     property BalloonTimeout: Integer read GetBalloonTimeout write SetBalloonTimeout default 3000;
     property BalloonFlags: TBalloonFlags read FBalloonFlags write FBalloonFlags default bfNone;
     property BalloonIcon: THandle read FBalloonIcon write SetBalloonIcon;
+    property NotificationWindow: THandle read GetNotificationWindow;
     property Icon: TIcon read FIcon write SetIcon;
     property Icons: TImageList read FIconList write SetIconList;
     property IconIndex: Integer read FIconIndex write SetIconIndex default 0;
@@ -663,6 +665,11 @@ end;
 function TCustomKeymanTrayIcon.GetBalloonTimeout: Integer;
 begin
   Result := FData.uTimeoutVersion;
+end;
+
+function TCustomKeymanTrayIcon.GetNotificationWindow: THandle;
+begin
+  Result := FData.Wnd;
 end;
 
 procedure TCustomKeymanTrayIcon.HideBalloonHint;

@@ -105,7 +105,7 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMKillFocus(var Message: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMChar(var Message: TMessage); message WM_CHAR;
-    procedure FitToDesktop;
+    procedure FitToDesktop(X, Y: Integer);
     procedure DrawLayer;
     procedure StartCanvas;
     procedure EndCanvas;
@@ -116,7 +116,7 @@ type
     { Private declarations }
   public
     { Public declarations }
-    procedure PopupEx(mnu: TPopupMenu; X, Y: Integer; IconRect: TRect);
+    procedure PopupEx(mnu: TPopupMenu; X, Y: Integer; TaskBarLocation: TAlign);
   end;
 
 implementation
@@ -362,7 +362,7 @@ begin
   end;
 end;
 
-procedure TfrmKeymanMenu.PopupEx(mnu: TPopupMenu; X, Y: Integer; IconRect: TRect);   // I3990
+procedure TfrmKeymanMenu.PopupEx(mnu: TPopupMenu; X, Y: Integer; TaskBarLocation: TAlign);   // I3990
 var
   kmi: TKeymanMenuItem;
   i, ItemWidth, ItemHeight, TempItemHeight: Integer;
@@ -475,22 +475,27 @@ begin
     else Width := OuterBorderWidth + MenuPadding.Left + MaxKeyboardWidth + MenuPadding.Right + MenuPadding.Left + MaxItemWidth + MenuPadding.Right + OuterBorderWidth;
   Height := OuterBorderWidth + TitleAndStripeHeight + MenuPadding.Top + Max(TotalKeyboardHeight, TotalItemHeight) + MenuPadding.Bottom + OuterBorderWidth;
 
-  if not IconRect.IsEmpty then
-  begin
-    if IconRect.Top - Height > 0 then
-      Top := IconRect.Top - Height
-    else
-      Top := IconRect.Bottom;
-
-    if IconRect.Right - Width > 0 then
-      Left := IconRect.Right - Width
-    else
-      Left := IconRect.Left;
-  end
-  else
-  begin
-    Left := X - Width;
-    Top := Y - Height;
+  case taskbarlocation of
+    alLeft:
+      begin
+        Left := X;
+        Top := Y - Height div 2;
+      end;
+    alTop:
+      begin
+        Left := X - Width div 2;
+        Top := Y;
+      end;
+    alRight:
+      begin
+        Left := X - Width;
+        Top := Y - Height div 2;
+      end;
+    alBottom:
+      begin
+        Left := X - Width div 2;
+        Top := Y - Height;
+      end;
   end;
 
   v := OuterBorderWidth + TitleAndStripeHeight + MenuPadding.Top;
@@ -553,7 +558,7 @@ begin
     ScrollRects[1] := Rect(-1,-1,-1,-1);
   end;
 
-  FitToDesktop;
+  FitToDesktop(X, Y);
   Show;
 end;
 
@@ -681,13 +686,13 @@ begin
   DoRedraw;
 end;
 
-procedure TfrmKeymanMenu.FitToDesktop;
+procedure TfrmKeymanMenu.FitToDesktop(X, Y: Integer);
 var
   m: TMonitor;
   wr, mr: TRect;
 begin
   wr := Rect(Left,Top,Left+Width,Top+Height);
-  m := Screen.MonitorFromRect(wr, mdNearest);
+  m := Screen.MonitorFromPoint(Point(X, Y), mdNearest);
   if not Assigned(m)  // I2693, I2820
     then mr := Screen.WorkAreaRect
     else mr := m.WorkareaRect;
