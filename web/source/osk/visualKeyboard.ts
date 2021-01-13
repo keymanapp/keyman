@@ -1208,7 +1208,8 @@ namespace com.keyman.osk {
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
         // _Box has (most of) the useful client values.
-        let _Box = this.kbdDiv.offsetParent as HTMLElement; // == osk._Box
+        let keyman = com.keyman.singleton;
+        let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
         let height = (this.kbdDiv.firstChild as HTMLElement).offsetHeight; // firstChild == layer-group, has height info.
         // We need to adjust the offset properties by any offsets related to the active banner.
 
