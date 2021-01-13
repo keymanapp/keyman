@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.220 beta 2021-01-13
+
+* fix(android/engine): Remove usage of WRITE_EXTERNAL_STORAGE permission (#4170)
+* fix(web): osk size & position after focus changes (#4232)
+* chore(linux): Update debian metadata based on Debian repos (#4233)
+
 ## 14.0.219 beta 2021-01-12
 
 * chore: bugfix cherrypick (#4208, #4210) (#4230)
