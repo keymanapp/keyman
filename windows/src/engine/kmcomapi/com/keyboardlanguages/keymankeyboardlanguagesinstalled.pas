@@ -69,6 +69,7 @@ uses
 
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils,
+  Keyman.System.MitigateWin10_1803LanguageInstall,
   Keyman.System.Process.KPInstallKeyboardLanguage,
   BCP47Tag,
   keymankeyboardlanguageinstalled,
@@ -85,15 +86,22 @@ var
   FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
   FCanonicalBCP47Tag: string;
   i: Integer;
+  ml: TMitigateWin10_1803.TMitigatedLanguage;
 begin
   // This adds an in-memory item to the array so that it can be installed
   FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(BCP47Tag, True);
   if FCanonicalBCP47Tag = '' then
     Exit(nil);
 
+  if TMitigateWin10_1803.IsMitigationRequired(FCanonicalBCP47Tag, ml) then
+  begin
+    FCanonicalBCP47Tag := ml.NewLanguage.BCP47;
+    (Context as TKeymanContext).Errors.AddFmt(KMN_W_ProfileInstall_Win10_1803_MitigationApplied, VarArrayOf([ml.OriginalLanguage.Name, ml.NewLanguage.Name]), kesWarning);
+  end;
+
   for i := 0 to FLanguages.Count - 1 do
     if SameText((FLanguages[i] as IKeymanKeyboardLanguageInstalled).BCP47Code, FCanonicalBCP47Tag) then
-      Exit(nil);
+      Exit(FLanguages[i] as IKeymanKeyboardLanguageInstalled);
 
   FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, 0, GUID_NULL, '');
   FLanguages.Add(FKeyboardLanguage);
