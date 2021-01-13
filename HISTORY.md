@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.221 beta 2021-01-13
+
+* fix(windows): fix menu popup position (#4175)
+* fix(windows): Update mitigation for Keyman 14 and Windows 10 19597 (#4180)
+* fix(developer): Allow unhandled keys to go through to debugger memo (#4209)
+
 ## 14.0.220 beta 2021-01-13
 
 * fix(android/engine): Remove usage of WRITE_EXTERNAL_STORAGE permission (#4170)
