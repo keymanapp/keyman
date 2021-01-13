@@ -2365,7 +2365,8 @@ namespace com.keyman.osk {
       canvas.height = 2.3 * xHeight;
 
       kts.top = 'auto';
-      kts.bottom = (y0 + h0 - xTop - xHeight)+'px';
+      // Matches how the subkey positioning is set.
+      kts.bottom = (parseInt(key.style.bottom, 10))+'px';
       kts.textAlign = 'center';   kts.overflow = 'visible';
       kts.fontFamily = util.getStyleValue(kc,'font-family');
       kts.width = canvas.width+'px';
