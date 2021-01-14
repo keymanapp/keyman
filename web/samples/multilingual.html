@@ -32,7 +32,9 @@
       kmw.init({
         attachType:'auto',
         resources:''
-        });
+      }).then(function() {
+        loadKeyboards();
+      });
     </script> 
   <!-- 
     Keyboard specifications, with the keyboard name and language code for each keyboard that is to be available.  
@@ -56,7 +58,7 @@
   </head>
   
   <!-- Sample page HTML -->  
-  <body onload='loadKeyboards();'> 
+  <body> 
     <h2>KeymanWeb Multilingual Page Example</h2>
 
     <div>
