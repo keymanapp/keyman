@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.222 beta 2021-01-14
+
+* chore(common): Check in crowdin files for km (Khmer) (#4228)
+* fix(web): OSK key preview positioning (#4241)
+* fix(web): disables predictive text on Opera mini (#4243)
+
 ## 14.0.221 beta 2021-01-13
 
 * fix(windows): fix menu popup position (#4175)
