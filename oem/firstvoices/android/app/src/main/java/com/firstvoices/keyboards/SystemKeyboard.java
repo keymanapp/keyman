@@ -11,11 +11,13 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
+import android.widget.FrameLayout;
 
 import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
 import com.tavultesoft.kmea.KMManager;
