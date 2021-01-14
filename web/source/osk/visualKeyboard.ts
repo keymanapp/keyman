@@ -380,7 +380,9 @@ namespace com.keyman.osk {
         if(!osk.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
-        ks.height=rowStyle.height;  //must be specified in px for rest of layout to work correctly
+        ks.height=rowStyle.height;  // must be specified in px for rest of layout to work correctly
+        ks.lineHeight=rowStyle.height; // helps ensure that text is vertically-centered, even if overflowing
+                                       // due to use of oversized font scales
 
         // Set distinct phone and tablet button position properties
         btn.style.left=ks.left;
