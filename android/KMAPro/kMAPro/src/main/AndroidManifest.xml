@@ -262,6 +262,12 @@
       android:launchMode="singleTask"
       android:theme="@style/AppTheme.Base" />
     <activity
+      android:name=".KeymanSettingsLocalizeActivity"
+      android:label="@string/app_name"
+      android:parentActivityName=".KeymanSettingsActivity"
+      android:launchMode="singleTask"
+      android:theme="@style/AppTheme.Base" />
+    <activity
       android:name=".LanguagesSettingsActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"

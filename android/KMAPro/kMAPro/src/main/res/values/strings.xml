@@ -96,6 +96,9 @@
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Install Keyboard or Dictionary</string>
 
   <!-- Context: Keyman Settings menu -->
+  <string name="change_display_language" comment="Menu action to change interface language">Change display language</string>
+
+  <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Always show banner</string>
 
   <!-- Context: Keyman Settings menu -->

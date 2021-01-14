@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2020 SIL International. All rights reserved.
+ * Copyright (C) 2018-2021 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -39,6 +40,7 @@ import com.tavultesoft.kmea.util.KMPLink;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -74,6 +76,7 @@ import android.graphics.drawable.Drawable;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import android.text.Html;
 import android.util.Log;
@@ -119,6 +122,23 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   DownloadResultReceiver resultReceiver;
   private static ProgressDialog progressDialog;
+
+  @Override
+  protected void attachBaseContext(Context newBase) {
+    // Override the app locale using the BCP 47 tag from shared preferences
+    // Using PreferenceManager because this is before onCreate()
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(newBase);
+    String languageTag  = prefs.getString(KeymanSettingsActivity.displayLanguageKey, DisplayLanguages.unspecifiedLocale);
+    if (languageTag == null || languageTag.equals(DisplayLanguages.unspecifiedLocale)) {
+      // Use the default locale
+      super.attachBaseContext(newBase);
+      return;
+    }
+
+    Locale localeToSwitchTo = Locale.forLanguageTag(languageTag);
+    ContextWrapper localeUpdatedContext = ContextUtils.updateLocale(newBase, localeToSwitchTo);
+    super.attachBaseContext(localeUpdatedContext);
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
