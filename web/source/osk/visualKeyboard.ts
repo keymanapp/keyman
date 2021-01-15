@@ -69,6 +69,7 @@ namespace com.keyman.osk {
   export abstract class OSKKey {
     spec: OSKKeySpec;
     formFactor: string;
+    cap: HTMLDivElement;
 
     /**
      * The layer of the OSK on which the key is displayed.
@@ -361,6 +362,7 @@ namespace com.keyman.osk {
 
       let kDiv=util._CreateElement('div');
       kDiv.className='kmw-key-square';
+      this.cap = kDiv;
 
       let ks=kDiv.style;
       ks.width=this.objectGeometry(spec['widthpc']);
@@ -464,12 +466,13 @@ namespace com.keyman.osk {
       }
     }
 
-    construct(osk: VisualKeyboard, baseKey: HTMLDivElement, topMargin: boolean): HTMLDivElement {
+    construct(osk: VisualKeyboard, baseKey: KeyElement, topMargin: boolean): HTMLDivElement {
       let spec = this.spec;
 
       let kDiv=document.createElement('div');
       let tKey = osk.getDefaultKeyObject();
       let ks=kDiv.style;
+      this.cap = kDiv;
 
       for(var tp in tKey) {
         if(typeof spec[tp] != 'string') {
@@ -496,8 +499,12 @@ namespace com.keyman.osk {
       btn.id = this.getId(osk);
 
       // Must set button size (in px) dynamically, not from CSS
+      let baseCap = baseKey.key.cap;
       let bs=btn.style;
       bs.height=ks.height;
+      if(baseCap) { // null guard, just to be safe.
+        bs.lineHeight=baseCap.style.lineHeight;
+      }
       bs.width=ks.width;
 
       // Must set position explicitly, at least for Android
@@ -1588,7 +1595,7 @@ namespace com.keyman.osk {
         }
 
         let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer, device.formFactor);
-        let kDiv = keyGenerator.construct(this, <HTMLDivElement> e, needsTopMargin);
+        let kDiv = keyGenerator.construct(this, <KeyElement> e, needsTopMargin);
 
         subKeys.appendChild(kDiv);
       }
@@ -1990,7 +1997,7 @@ namespace com.keyman.osk {
           if(!this.isStatic) {
             rs.bottom=bottom+'px';
           }
-          rs.maxHeight=rs.height=rowHeight+'px';
+          rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
 
           // Calculate the exact vertical coordinate of the row's center.
           this.layout.layer[nLayer].row[nRow].proportionalY = ((oskHeight - bottom) - rowHeight/2) / oskHeight;
