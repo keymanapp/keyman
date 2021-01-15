@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.223 beta 2021-01-15
+
+* fix(windows): typo in font helper string (#4251)
+* chore(android/app): Add Obolo language from crowdin (#4256)
+* fix(web): unexpected errors in OSK / banner position calculations (#4238)
+* chore(linux): Improve version number for debian package (#4258)
+
 ## 14.0.222 beta 2021-01-14
 
 * chore(common): Check in crowdin files for km (Khmer) (#4228)
