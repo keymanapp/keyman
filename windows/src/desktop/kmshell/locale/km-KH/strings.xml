@@ -629,7 +629,7 @@
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.278.0 -->
-  <string name="S_DisplayIn" comment="'Display In' text label for UI language menu">បង្ហាញ​ជាភាសា៖</string>
+  <string name="S_DisplayIn" comment="'Display In' text label for UI language menu">បង្ហាញ​ជាភាសា</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.278.0 -->
