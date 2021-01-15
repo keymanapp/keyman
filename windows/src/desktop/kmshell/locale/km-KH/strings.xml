@@ -328,7 +328,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">កំពុង​ប្រមូល​ព័ត៌មានសម្រាប់​ដោះស្រាយ​បញ្ហា</string>
+  <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">ការប្រមូល​ព័ត៌មានសម្រាប់​ដោះស្រាយ​បញ្ហា</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
