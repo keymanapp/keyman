@@ -29,6 +29,7 @@ for proj in ${projects}; do
     downloadSource debianpackage
 
     cd ${proj}-${version}
+    dch -v ${version}-1 "Re-release to Debian"
     debuild -d -S -sa -Zxz
     cd ${BASEDIR}
 done

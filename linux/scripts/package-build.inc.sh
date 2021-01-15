@@ -39,8 +39,8 @@ function downloadSource() {
         make clean
     fi
 
-    # Update tier in Debian watch files (replacing any previously set tier)
-    sed "s/\$tier\|alpha\|beta\|stable/${TIER}/g" $BASEDIR/scripts/watch.in > debian/watch
+    # Update tier in Debian watch files (replacing any previously set tier) and remove comment
+    sed -e "s/\$tier\|alpha\|beta\|stable/${TIER}/g" -e "s/^# .*$//" $BASEDIR/scripts/watch.in > debian/watch
 
     version=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -)
     dirversion=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6)
