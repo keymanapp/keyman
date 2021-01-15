@@ -1,6 +1,6 @@
 # Localization Maintenance
 
-Localization for Keyman is maintained at https://crowdin.com/project/keyman
+Localization for Keyman is maintained at https://translate.keyman.com
 
 Downloading and updating files between Keyman and Crowdin happens automatically
 on GitHub by way of the Crowdin git integration. The configuration file for all platforms
@@ -68,6 +68,9 @@ To download latest translations for the specific language:
 ```bash
 crowdin download -b master -l {language_code}
 ```
+
+Note: the Crowdin API doesn't handle custom languages so those will need to be manually synced.
+See https://support.crowdin.com/api/language-codes/
 
 To display a list of latest translations from Crowdin:
 
