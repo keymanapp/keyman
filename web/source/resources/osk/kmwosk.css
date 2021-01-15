@@ -241,7 +241,7 @@
 /* Vertical centering of text labels on keys */ 
 .kmw-key {text-align:center; white-space:nowrap;}
 .kmw-key:before {content:'.'; display:inline-block; height:100%; vertical-align:middle; max-width:0px; visibility:hidden;}
-.kmw-key span {display:inline-block; vertical-align:middle;}        
+.kmw-key span {display:inline-block}        
 
         
 .desktop .kmw-osk-frame{position:absolute;width:auto;height:auto;left:0;top:0;display:none;margin:0;padding:0;
