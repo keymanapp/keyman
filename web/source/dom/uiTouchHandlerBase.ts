@@ -425,7 +425,7 @@ namespace com.keyman.dom {
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
         let base = this.baseElement;
-        let parent = this.baseElement.parentElement;
+        let parent = base.parentElement; // parentElement is _Box
         let top = base.offsetTop;
         if(parent) {
           top += parent.offsetTop;
