@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-public class KeymanSettingsActivity extends AppCompatActivity {
+public class KeymanSettingsActivity extends BaseActivity {
   protected static final String installedLanguagesKey = "InstalledLanguages";
   protected static final String installKeyboardOrDictionaryKey = "InstallKeyboardOrDictionary";
   protected static final String displayLanguageKey = "DisplayLanguage";
@@ -21,6 +21,7 @@ public class KeymanSettingsActivity extends AppCompatActivity {
     setContentView(R.layout.keyman_settings_layout);
     Toolbar toolbar = (Toolbar) findViewById(R.id.keyman_settings_toolbar);
     toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
+    toolbar.setTitle(R.string.keyman_settings);
     setSupportActionBar(toolbar);
     if (getSupportActionBar() != null) {
       getSupportActionBar().setDisplayHomeAsUpEnabled(true);

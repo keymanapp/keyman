@@ -105,7 +105,7 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
 
         // Store the BCP-47 language tag in shared preference
-        if (position > 0 && position < DisplayLanguages.DisplayLanguages.length) {
+        if (position >= 0 && position < DisplayLanguages.DisplayLanguages.length) {
 
           DisplayLanguages.DisplayLanguageType l = DisplayLanguages.DisplayLanguages[position];
           String languageTag = l.getLanguageTag();
