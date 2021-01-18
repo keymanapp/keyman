@@ -38,7 +38,6 @@ import com.tavultesoft.kmea.util.KMPLink;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -256,13 +255,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
 
-    // Get calling activity
-    ComponentName component = this.getCallingActivity();
-    String caller = null;
-    if (component != null) {
-      caller = component.getClassName();
-    }
-
     Intent intent = getIntent();
     data = intent.getData();
 
@@ -285,10 +277,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           downloadKMP(scheme);
           break;
         case "keyman" :
-          // Only accept download links from Keyman browser activities
-          if (KMPLink.isKeymanDownloadLink(data.toString()) && caller != null &&
-            (caller.equalsIgnoreCase("com.tavultesoft.kmea.KMPBrowserActivity") ||
-             caller.equalsIgnoreCase("com.tavultesoft.kmapro.WebBrowserActivity"))) {
+          // TODO: Only accept download links from Keyman browser activities when universal links work
+          if (KMPLink.isKeymanDownloadLink(data.toString())) {
 
             // Convert opaque URI to hierarchical URI so the query parameters can be parsed
             Builder builder = new Uri.Builder();
