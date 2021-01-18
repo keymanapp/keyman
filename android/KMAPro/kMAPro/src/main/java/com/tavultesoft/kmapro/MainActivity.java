@@ -40,7 +40,6 @@ import com.tavultesoft.kmea.util.KMPLink;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
-import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -76,7 +75,6 @@ import android.graphics.drawable.Drawable;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.preference.PreferenceManager;
 
 import android.text.Html;
 import android.util.Log;

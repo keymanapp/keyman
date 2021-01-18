@@ -13,7 +13,7 @@ import android.os.LocaleList;
 import java.util.Locale;
 
 /**
- *  Class to programatically change the application locale (#4236)
+ *  Class to programmatically change the application locale (#4236)
  *  References
  *  Tutorial from https://lokalise.com/blog/android-app-localization/#Change_Application_Locale_Programmatically
  *  https://github.com/nirm2009/lokalise/tree/master/android-i18n
