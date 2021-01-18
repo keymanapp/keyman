@@ -38,13 +38,16 @@ namespace com.keyman.osk {
 
     // OSK positioning fields
     userPositioned: boolean = false;
-    width: number;
-    height: number;
     x: number;
     y: number;
     noDrag: boolean = false;
     dfltX: string;
     dfltY: string;
+
+    // Fields used to store target OSK size when no keyboard has been loaded
+    // If a keyboard has been loaded, the VisualKeyboard values override these.
+    _baseWidth: number;
+    _baseHeight: number;
 
     // OSK resizing-event state fields
     resizing: boolean;
@@ -279,6 +282,22 @@ namespace com.keyman.osk {
 
       if(this._Enabled) {
         this._Show();
+      }
+    }
+
+    private get width(): number {
+      if(this.vkbd) {
+        return this.vkbd.width;
+      } else {
+        return this.width;
+      }
+    }
+
+    private get height(): number {
+      if(this.vkbd) {
+        return this.vkbd.height;
+      } else {
+        return this.height;
       }
     }
 
@@ -587,8 +606,7 @@ namespace com.keyman.osk {
       }
 
       var r=this.getRect();
-      this.width = r.width;
-      this.height = r.height;
+      this.setSize(r.width, r.height, true);
       e.cancelBubble = true;
       return false;
     }.bind(this);
@@ -791,8 +809,7 @@ namespace com.keyman.osk {
         }
 
         var r=this.getRect();
-        this.width=r.width;
-        this.height=r.height;
+        this.setSize(r.width, r.height, true);
         this.x = r.left;
         this.y = r.top;
         e.cancelBubble = true;
@@ -928,16 +945,14 @@ namespace com.keyman.osk {
       return true;
     }
 
-    private setSize(width?: number, height?: number) {
+    private setSize(width?: number, height?: number, pending?: boolean) {
       if(width && height) {
-        this.width = width;
-        this.height = height;
+        this._baseWidth = width;
+        this._baseHeight = height;
       }
 
       if(this.vkbd) {
-        this.vkbd.kbdDiv.style.width=this.width+'px';
-        this.vkbd.kbdDiv.style.height=this.height+'px';
-        this.vkbd.kbdDiv.style.fontSize=(this.height/8)+'px';
+        this.vkbd.setSize(width, height, pending);
       }
     }
 
@@ -1125,7 +1140,7 @@ namespace com.keyman.osk {
             w=0.9*screen.width;
           }
           ds.width=w+'px';
-          this.width=w;
+          this.setSize(w, this.height, true);
         }
 
         // Set height, but limit to reasonable value
@@ -1141,7 +1156,7 @@ namespace com.keyman.osk {
             h=0.5*screen.height;
           }
           ds.height=h+'px'; ds.fontSize=(h/8)+'px';
-          this.height=h;
+          this.setSize(this.width, h, true);
         }
 
         // Fix or release user resizing
@@ -1318,9 +1333,8 @@ namespace com.keyman.osk {
         }
         this._Enabled=true;
         this._Visible=true;
-        if(this.vkbd && this.vkbd.kbdDiv) {
-          this.width=this.vkbd.kbdDiv.offsetWidth;
-          this.height=this.vkbd.kbdDiv.offsetHeight;
+        if(this.vkbd) {
+          this.vkbd.refit();
         }
 
         this.saveCookie();
@@ -1365,9 +1379,8 @@ namespace com.keyman.osk {
       }
 
       // Save current size if visible
-      if(this._Box && this._Box.style.display == 'block' && this.vkbd && this.vkbd.kbdDiv) {
-        this.width = this.vkbd.kbdDiv.offsetWidth;
-        this.height = this.vkbd.kbdDiv.offsetHeight;
+      if(this._Box && this._Box.style.display == 'block' && this.vkbd) {
+        this.vkbd.refit();
       }
 
       if(hiddenByUser) {

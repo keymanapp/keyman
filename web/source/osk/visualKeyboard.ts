@@ -578,6 +578,9 @@ namespace com.keyman.osk {
     kbdHelpDiv: HTMLDivElement;
     styleSheet: HTMLStyleElement;
 
+    width: number;
+    height: number;
+
     // Style-related properties
     fontFamily: string;
     fontSize: string;
@@ -677,6 +680,34 @@ namespace com.keyman.osk {
       } else {
         Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
       }
+    }
+
+    /**
+     * Sets & tracks the size of the VisualKeyboard's primary element.
+     * @param width 
+     * @param height 
+     * @param pending Set to `true` if called during a resizing interaction
+     */
+    public setSize(width: number, height: number, pending?: boolean) {
+      //if(width && height) {
+      this.width = width;
+      this.height = height;
+      //}
+
+      if(!pending) {
+        this.kbdDiv.style.width=this.width+'px';
+        this.kbdDiv.style.height=this.height+'px';
+        this.kbdDiv.style.fontSize=(this.height/8)+'px';
+      }
+    }
+
+    /**
+     * Called by OSKManager after resize operations in order to determine the final
+     * size actually used by the visual keyboard.
+     */
+    public refit() {
+      this.width=this.kbdDiv.offsetWidth;
+      this.height=this.kbdDiv.offsetHeight;
     }
 
     /**
