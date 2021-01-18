@@ -956,26 +956,6 @@ namespace com.keyman.osk {
       }
     }
 
-    getWidthFromCookie(): number {
-      let util = com.keyman.singleton.util;
-
-      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      if(typeof(c) == 'undefined' || c == null) {
-        return screen.width * 0.3;
-      }
-
-      // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-      var newWidth=util.toNumber(c['width'], 0.3 * screen.width); // Default - 30% of screen's width.
-
-      if(newWidth < 0.2*screen.width) {
-        newWidth = 0.2*screen.width;
-      } else if(newWidth > 0.9*screen.width) {
-        newWidth=0.9*screen.width;
-      }
-
-      return newWidth;
-    }
-
     /**
      * Get the wanted height of the banner (does not include the keyboard)
      *  @return   {number}    height in pixels

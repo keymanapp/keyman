@@ -125,7 +125,7 @@ namespace com.keyman.osk {
       return metrics.width;
     }
 
-    getKeyWidth(): number {
+    getKeyWidth(osk: VisualKeyboard): number {
       let units = this.objectUnits();
 
       if(units == 'px') {
@@ -134,12 +134,9 @@ namespace com.keyman.osk {
       } else if(units == '%') {
         // For desktop devices, each key is given a %age of the total OSK width.  We'll need to compute an
         // approximation for that.  `this.kbdDiv` is the element controlling the OSK's width, set in px.
-        // ... and since it's null whenever this method would be called during key construction, we simply
-        // grab it from the cookie (or its default values) instead.
-        let oskWidth = com.keyman.singleton.osk.getWidthFromCookie();
 
         // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
-        return Math.floor(oskWidth * this.spec['widthpc'] / 100);
+        return Math.floor(osk.width * this.spec['widthpc'] / 100);
       }
     }
 
@@ -264,7 +261,7 @@ namespace com.keyman.osk {
       }
 
       let fontSpec = util.getFontSizeStyle(ts.fontSize);
-      let keyWidth = this.getKeyWidth();
+      let keyWidth = this.getKeyWidth(osk);
       let maxProportion = 0.90;
       let proportion = (keyWidth * maxProportion) / width; // How much of the key does the text want to take?
 
@@ -578,8 +575,8 @@ namespace com.keyman.osk {
     kbdHelpDiv: HTMLDivElement;
     styleSheet: HTMLStyleElement;
 
-    width: number;
-    height: number;
+    _width: number;
+    _height: number;
 
     // Style-related properties
     fontFamily: string;
@@ -682,6 +679,55 @@ namespace com.keyman.osk {
       }
     }
 
+    get width(): number {
+      if(this._width) {
+        return this._width;
+      } else {
+        return this.setSizeFromCookie().width;
+      }
+    }
+
+    get height(): number {
+      if(this._height) {
+        return this._height;
+      } else {
+        return this.setSizeFromCookie().height;
+      }
+    }
+
+    protected setSizeFromCookie(): {width: number, height: number} {
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+
+      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
+      var newWidth: number, newHeight: number;
+      if(typeof(c) == 'undefined' || c == null) {
+        newWidth = screen.width * 0.3;
+        newHeight = 144; // 16 * 8; 16 is our preferred default font size.
+      } else {
+        // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
+        newWidth=util.toNumber(c['width'], 0.3 * screen.width); // Default - 30% of screen's width.
+
+        if(newWidth < 0.2*screen.width) {
+          newWidth = 0.2*screen.width;
+        } else if(newWidth > 0.9*screen.width) {
+          newWidth=0.9*screen.width;
+        }
+
+        newHeight=util.toNumber(c['height'],0.15*screen.height);
+
+        if(newHeight > 0.5*screen.height) {
+          newHeight=0.5*screen.height;
+        }
+      }
+
+      this.setSize(newWidth, newHeight);
+      return {
+        width: newWidth,
+        height: newHeight
+      }
+    }
+
     /**
      * Sets & tracks the size of the VisualKeyboard's primary element.
      * @param width 
@@ -690,15 +736,19 @@ namespace com.keyman.osk {
      */
     public setSize(width: number, height: number, pending?: boolean) {
       //if(width && height) {
-      this.width = width;
-      this.height = height;
+      this._width = width;
+      this._height = height;
       //}
 
-      if(!pending) {
-        this.kbdDiv.style.width=this.width+'px';
-        this.kbdDiv.style.height=this.height+'px';
-        this.kbdDiv.style.fontSize=(this.height/8)+'px';
+      if(!pending && this.kbdDiv) {
+        this.kbdDiv.style.width=this._width+'px';
+        this.kbdDiv.style.height=this._height+'px';
+        this.kbdDiv.style.fontSize=(this._height/8)+'px';
       }
+    }
+
+    public defaultFontSize(): number {
+      return this.height / 8;
     }
 
     /**
@@ -706,8 +756,8 @@ namespace com.keyman.osk {
      * size actually used by the visual keyboard.
      */
     public refit() {
-      this.width=this.kbdDiv.offsetWidth;
-      this.height=this.kbdDiv.offsetHeight;
+      this._width=this.kbdDiv.offsetWidth;
+      this._height=this.kbdDiv.offsetHeight;
     }
 
     /**
@@ -1830,7 +1880,7 @@ namespace com.keyman.osk {
       let util = keyman.util;
 
       if(this.device.formFactor == 'desktop') {
-        let kbdFontSize = this.getFontSizeFromCookie();
+        let kbdFontSize = this.defaultFontSize();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
         return kbdFontSize * keySquareScale;
       } else {
@@ -1844,23 +1894,6 @@ namespace com.keyman.osk {
         }
         return emSize * emScale;
       }
-    }
-
-    getFontSizeFromCookie(): number {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
-
-      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      if(typeof(c) == 'undefined' || c == null) {
-        return 16;
-      }
-
-      var newHeight=util.toNumber(c['height'],0.15*screen.height);
-      if(newHeight > 0.5*screen.height) {
-        newHeight=0.5*screen.height;
-      }
-
-      return (newHeight/8);
     }
 
         /**
