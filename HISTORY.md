@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.224 beta 2021-01-18
+
+* fix(android): Popup misalignments and compatibility with WeChat, Telegram (#4254)
+* chore(web): sample pages now wait on init's promise for keyboard loading (#4253)
+
 ## 14.0.223 beta 2021-01-15
 
 * fix(windows): typo in font helper string (#4251)
