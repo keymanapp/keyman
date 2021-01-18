@@ -19,7 +19,7 @@
   <string name="ssActionNothingToInstall">There is nothing to install.</string>
   <!-- Parameters: %0:s download size -->
   <string name="ssActionDownload" comment="ssActionDownload&#10;Parameters: %0:s download size&#10;For example &quot;(13.5MB download)&quot;&#10;This is used when listing each of the files to be installed.">(%0:s download)</string>
-  <string name="ssActionInstall">Setup will install:</string>
+  <string name="ssActionInstall">Setup installiert:</string>
   <string name="ssFreeCaption">$APPNAME $VERSION is free and open source</string>
   <string name="ssLicenseLink">&amp;Read the license</string>
   <string name="ssInstallOptionsLink">Install &amp;options</string>
