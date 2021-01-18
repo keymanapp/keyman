@@ -1710,10 +1710,12 @@ namespace com.keyman.osk {
 
       if(usePreview) {
         // Previews are not permitted for keys using any of the following CSS styles.
-        var excludedClasses = ['kmw-key-shift',    // special keys
-                               'kmw-key-shift-on', // active special keys (shift, when in shift layer
-                               'kmw-spacebar',     // space
-                               'kmw-key-blank',    // Keys that are only used for layout control
+        var excludedClasses = ['kmw-key-shift',      // special keys
+                               'kmw-key-shift-on',   // active special keys (shift, when in shift layer
+                               'kmw-key-special',    // special keys that require the keyboard's OSK font
+                               'kmw-key-special-on', // active special keys requiring the keyboard's OSK font
+                               'kmw-spacebar',       // space
+                               'kmw-key-blank',      // Keys that are only used for layout control
                                'kmw-key-hidden'];
 
         for(let c=0; c < excludedClasses.length; c++) {
