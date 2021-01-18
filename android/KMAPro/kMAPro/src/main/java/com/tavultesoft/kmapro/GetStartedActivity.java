@@ -29,7 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.TextView;
 
-public class GetStartedActivity extends AppCompatActivity {
+public class GetStartedActivity extends BaseActivity {
 
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> list = null;

@@ -95,7 +95,7 @@ import android.widget.Toast;
 
 import io.sentry.android.core.SentryAndroid;
 
-public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
+public class MainActivity extends BaseActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
 
@@ -122,23 +122,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   DownloadResultReceiver resultReceiver;
   private static ProgressDialog progressDialog;
-
-  @Override
-  protected void attachBaseContext(Context newBase) {
-    // Override the app locale using the BCP 47 tag from shared preferences
-    // Using PreferenceManager because this is before onCreate()
-    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(newBase);
-    String languageTag  = prefs.getString(KeymanSettingsActivity.displayLanguageKey, DisplayLanguages.unspecifiedLocale);
-    if (languageTag == null || languageTag.equals(DisplayLanguages.unspecifiedLocale)) {
-      // Use the default locale
-      super.attachBaseContext(newBase);
-      return;
-    }
-
-    Locale localeToSwitchTo = Locale.forLanguageTag(languageTag);
-    ContextWrapper localeUpdatedContext = ContextUtils.updateLocale(newBase, localeToSwitchTo);
-    super.attachBaseContext(localeUpdatedContext);
-  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

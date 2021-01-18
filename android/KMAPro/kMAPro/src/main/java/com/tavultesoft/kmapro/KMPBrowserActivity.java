@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 
 import static android.app.Application.getProcessName;
 
-public class KMPBrowserActivity extends AppCompatActivity {
+public class KMPBrowserActivity extends BaseActivity {
   private static final String TAG = "KMPBrowserActivity";
 
   // URL for keyboard search web page presented to user when they add a keyboard in the app.

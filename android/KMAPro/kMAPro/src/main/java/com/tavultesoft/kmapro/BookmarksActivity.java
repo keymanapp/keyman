@@ -39,7 +39,7 @@ import android.content.Intent;
 
 import com.tavultesoft.kmea.util.KMLog;
 
-public class BookmarksActivity extends AppCompatActivity {
+public class BookmarksActivity extends BaseActivity {
   private static final String TAG = "BookmarksActivity";
   private static ListView listView;
   private static ArrayList<HashMap<String, String>> list = null;

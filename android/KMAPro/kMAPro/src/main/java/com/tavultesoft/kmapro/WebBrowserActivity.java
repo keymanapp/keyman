@@ -48,7 +48,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import static android.app.Application.getProcessName;
 
-public class WebBrowserActivity extends AppCompatActivity {
+public class WebBrowserActivity extends BaseActivity {
   private static final String TAG = "WebBrowserActivity";
   private WebView webView;
   private EditText addressField;
