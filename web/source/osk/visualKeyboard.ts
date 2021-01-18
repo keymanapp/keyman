@@ -683,7 +683,7 @@ namespace com.keyman.osk {
       if(this._width) {
         return this._width;
       } else {
-        return this.setSizeFromCookie().width;
+        return this.loadSizeFromCookie().width;
       }
     }
 
@@ -691,11 +691,11 @@ namespace com.keyman.osk {
       if(this._height) {
         return this._height;
       } else {
-        return this.setSizeFromCookie().height;
+        return this.loadSizeFromCookie().height;
       }
     }
 
-    protected setSizeFromCookie(): {width: number, height: number} {
+    protected loadSizeFromCookie(): {width: number, height: number} {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
 
