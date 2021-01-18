@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceManager;
 
+import com.tavultesoft.kmea.DisplayLanguages;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.MapCompat;
@@ -112,7 +113,7 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
 
           SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
           SharedPreferences.Editor editor = prefs.edit();
-          editor.putString(KeymanSettingsActivity.displayLanguageKey, languageTag);
+          editor.putString(DisplayLanguages.displayLanguageKey, languageTag);
           editor.commit();
           finish();
         }

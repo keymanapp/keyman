@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.util.KMLog;
 
 public class BookmarksActivity extends BaseActivity {

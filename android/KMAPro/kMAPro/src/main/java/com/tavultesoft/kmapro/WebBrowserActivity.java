@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.KMPLink;
 

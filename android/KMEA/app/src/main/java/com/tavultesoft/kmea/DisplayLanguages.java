@@ -2,10 +2,11 @@
  * Copyright (C) 2021 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmapro;
+package com.tavultesoft.kmea;
 
 public class DisplayLanguages {
   private static final String TAG = "DisplayLanguages";
+  public static final String displayLanguageKey = "DisplayLanguage";
   public static final String unspecifiedLocale = ""; // empty string for app to use device's default locale
 
   public static class DisplayLanguageType {

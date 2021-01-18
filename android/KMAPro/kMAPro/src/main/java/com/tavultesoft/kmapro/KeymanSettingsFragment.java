@@ -16,6 +16,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
 
+import com.tavultesoft.kmea.DisplayLanguages;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Dataset;
 
@@ -51,7 +52,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     installKeyboardOrDictionary.setIntent(installIntent);
 
     displayLanguagePreference = new Preference(context);
-    displayLanguagePreference.setKey(KeymanSettingsActivity.displayLanguageKey);
+    displayLanguagePreference.setKey(DisplayLanguages.displayLanguageKey);
     displayLanguagePreference.setTitle(getString(R.string.change_display_language));
     displayLanguagePreference.setWidgetLayoutResource(R.layout.preference_translate_icon_layout);
     Intent displayLanguageIntent = new Intent(context, KeymanSettingsLocalizeActivity.class);

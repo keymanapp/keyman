@@ -2,13 +2,14 @@ package com.tavultesoft.kmapro;
 
 import android.os.Bundle;
 
+import com.tavultesoft.kmea.BaseActivity;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 public class KeymanSettingsActivity extends BaseActivity {
   protected static final String installedLanguagesKey = "InstalledLanguages";
   protected static final String installKeyboardOrDictionaryKey = "InstallKeyboardOrDictionary";
-  protected static final String displayLanguageKey = "DisplayLanguage";
   protected static final String showBannerKey = "ShowBanner";
   protected static final String sendCrashReport = "SendCrashReport";
 

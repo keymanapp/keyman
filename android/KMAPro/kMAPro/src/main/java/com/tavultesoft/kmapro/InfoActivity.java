@@ -4,6 +4,7 @@
 
 package com.tavultesoft.kmapro;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.FormFactor;

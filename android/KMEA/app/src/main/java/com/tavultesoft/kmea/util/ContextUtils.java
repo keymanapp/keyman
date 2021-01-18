@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2021 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmapro;
+package com.tavultesoft.kmea.util;
 
 import android.content.Context;
 import android.content.ContextWrapper;

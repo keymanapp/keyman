@@ -19,6 +19,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.KMPLink;
 
