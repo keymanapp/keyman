@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.225 beta 2021-01-19
+
+* fix(android/samples): Fix Sentry dependencies (#4267)
+* fix(web): better font-wait null guards (#4286)
+* fix(web): uses CSS line-height to vertically center oversized OSK keycaps (#4255)
+* fix(developer): disable TSentryClient on WINE (#4274)
+* fix(web): no key previews for special keys reliant on keyboard-specific OSK font (#4282)
+* fix(web): default kbd ui name is now generic (#4293)
+* fix(developer/compilers): fixes dependency versioning on alpha, beta tiers (#4291)
+
 ## 14.0.224 beta 2021-01-18
 
 * fix(android): Popup misalignments and compatibility with WeChat, Telegram (#4254)
