@@ -126,7 +126,7 @@ if(!window['keyman']['ui']['name']) {
       ui.innerDiv.appendChild(ui.KeyboardSelector);  //this may need to be moved up.... 
 
       // Check required interface alignment and default keyboard
-      var opt=util['getOption']('ui'),dfltKeyboard='English';
+      var opt=util['getOption']('ui'),dfltKeyboard='(System keyboard)';
       if(opt && typeof(opt) == 'object')
       {
         if(typeof(opt['position']) == 'string' && opt['position'] == 'right') 
@@ -237,7 +237,7 @@ if(!window['keyman']['ui']['name']) {
      */   
     ui.updateMenu = function(kbd,lg)
     {
-      var i=0,value='English';
+      var i=0;
       
       // This can be called during startup before fully initialized - ignore if so
       if(!ui.initialized) return;  
