@@ -362,16 +362,14 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         break;
       }
       case CODE_CONTEXTEX:
-      {
-        KMX_BOOL ignoreOutputKeystroke;
         p++;
         for (q = m_miniContext, i = m_miniContextIfLen; *q && i < *p - 1; i++, q = incxstr(q));
         if (*q) {
+          KMX_BOOL ignoreOutputKeystroke;
           temp = incxstr(q);
           PostString(q, lpkb, temp, &ignoreOutputKeystroke);
         }
         break;
-      }
       case CODE_RETURN:       // stop processing and start PostAllKeys
         m_state.StopOutput = TRUE;
         return psrPostMessages;
