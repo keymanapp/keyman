@@ -289,7 +289,7 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         return this.vkbd.width;
       } else {
-        return this.width;
+        return this._baseWidth;
       }
     }
 
@@ -297,7 +297,7 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         return this.vkbd.height;
       } else {
-        return this.height;
+        return this._baseHeight;
       }
     }
 
