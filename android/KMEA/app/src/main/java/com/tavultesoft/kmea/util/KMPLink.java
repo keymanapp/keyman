@@ -36,7 +36,7 @@ public final class KMPLink {
   private static final Pattern downloadPattern = Pattern.compile(downloadPatternFormatStr);
 
   private static final String LEGACY_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR = "^keyman://localhost/open\\?(.+)?$";
-  private static final Pattern legacyDownloadPattermPattern = Pattern.compile(LEGACY_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR);
+  private static final Pattern legacyDownloadPattern = Pattern.compile(LEGACY_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR);
 
   // Keyman 14.0+ generated URL for keyboard download links
   private static final String KMP_DOWNLOAD_KEYBOARDS_FORMATSTR = "https://%s/go/package/download/%s";
@@ -87,7 +87,7 @@ public final class KMPLink {
     if (url == null || url.isEmpty()) {
       return status;
     }
-    Matcher legacyMatcher = legacyDownloadPattermPattern.matcher(url);
+    Matcher legacyMatcher = legacyDownloadPattern.matcher(url);
     if (legacyMatcher.matches() && legacyMatcher.group(1) != null) {
       Uri data = Uri.parse(url);
       String keyboard = data.getQueryParameter("keyboard");
@@ -171,7 +171,7 @@ public final class KMPLink {
       return uri;
     }
 
-    Matcher matcher = legacyDownloadPattermPattern.matcher(url);
+    Matcher matcher = legacyDownloadPattern.matcher(url);
     // Validate deep link with package ID and optional bcp47 tag
     if (matcher.matches() && matcher.group(1) != null) {
       Uri installUri = Uri.parse(url);
