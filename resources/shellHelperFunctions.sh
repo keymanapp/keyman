@@ -251,6 +251,10 @@ set_version ( ) {
 #   set_npm_version VERSION_WITH_TIER
 #
 set_npm_version () {
+  if [ $# == 0 ]; then
+    fail "set_npm_version requires a specified version."
+  fi
+  
   local version=$1
   # We use --no-git-tag-version because our CI system controls version numbering and
   # already tags releases. We also want to have the version of this match the
