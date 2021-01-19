@@ -35,6 +35,9 @@ public final class KMPLink {
     KMP_STAGING_HOST);
   private static final Pattern downloadPattern = Pattern.compile(downloadPatternFormatStr);
 
+  private static final String LEGACY_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR = "^keyman://localhost/open\\?(.+)?$";
+  private static final Pattern legacyDownloadPattermPattern = Pattern.compile(LEGACY_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR);
+
   // Keyman 14.0+ generated URL for keyboard download links
   private static final String KMP_DOWNLOAD_KEYBOARDS_FORMATSTR = "https://%s/go/package/download/%s";
 
@@ -69,6 +72,29 @@ public final class KMPLink {
     Matcher matcher = downloadPattern.matcher(url);
     if (matcher.matches()) {
       status = true;
+    }
+
+    return status;
+  }
+
+  /**
+   * Check if a URL is a valid legacy Keyman keyboard download link (uses keyman://)
+   * @param url String of the URL to parse
+   * @return boolean
+   */
+  public static boolean isLegacyKeymanDownloadLink(String url) {
+    boolean status = false;
+    if (url == null || url.isEmpty()) {
+      return status;
+    }
+    Matcher legacyMatcher = legacyDownloadPattermPattern.matcher(url);
+    if (legacyMatcher.matches() && legacyMatcher.group(1) != null) {
+      Uri data = Uri.parse(url);
+      String keyboard = data.getQueryParameter("keyboard");
+      String language = data.getQueryParameter("language");
+      if (keyboard != null && !keyboard.isEmpty()) {
+        status = true;
+      }
     }
 
     return status;
@@ -116,6 +142,47 @@ public final class KMPLink {
       String downloadURL = String.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
         host,
         packageID);
+      uri = Uri.parse(downloadURL)
+        .buildUpon()
+        .appendQueryParameter(KMKeyboardDownloaderActivity.KMKey_Platform, "android")
+        .appendQueryParameter(KMKeyboardDownloaderActivity.KMKey_Tier, tier)
+        .build();
+      if (languageID != null) {
+        uri = uri.buildUpon()
+          .appendQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47, languageID)
+          .build();
+      }
+    }
+
+    return uri;
+  }
+
+  /**
+   * Parses a URL and generates the Keyman keyboard download link. URL contains:
+   * keyboard (required)
+   * language (optional)
+   * @param url String of the URL to parse
+   * @return Uri of the  Keyman keyboard download link
+   */
+  public static Uri getLegacyKeyboardDownloadLink(String url) {
+    Uri uri = null;
+
+    if (url == null || url.isEmpty()) {
+      return uri;
+    }
+
+    Matcher matcher = legacyDownloadPattermPattern.matcher(url);
+    // Validate deep link with package ID and optional bcp47 tag
+    if (matcher.matches() && matcher.group(1) != null) {
+      Uri installUri = Uri.parse(url);
+      String tier = KMManager.getTier(BuildConfig.VERSION_NAME).toString().toLowerCase();
+      String host = (tier.equals("alpha") || tier.equals("beta")) ? KMP_STAGING_HOST : KMP_PRODUCTION_HOST;
+      String keyboardID = installUri.getQueryParameter("keyboard");
+      String languageID = installUri.getQueryParameter("language");
+
+      String downloadURL = String.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
+        host,
+        keyboardID); // Using keyboardID instead of packageID
       uri = Uri.parse(downloadURL)
         .buildUpon()
         .appendQueryParameter(KMKeyboardDownloaderActivity.KMKey_Platform, "android")

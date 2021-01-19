@@ -288,6 +288,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
               .encodedQuery(data.getEncodedQuery());
             data = Uri.parse(builder.build().toString());
             downloadKMP(scheme);
+          } else if (KMPLink.isLegacyKeymanDownloadLink(data.toString())) {
+            link = data.toString();
+            data = KMPLink.getLegacyKeyboardDownloadLink(link);
+            downloadKMP(scheme);
           } else {
             String msg = "Unrecognized scheme: " + scheme;
             KMLog.LogError(TAG, msg);
