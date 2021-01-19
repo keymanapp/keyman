@@ -257,7 +257,10 @@ set_npm_version () {
   # release of Keyman Developer -- these two versions should be in sync. Because this
   # is a large repo with multiple projects and build systems, it's better for us that
   # individual build systems don't take too much ownership of git tagging. :)
-  npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
+  pushd . > /dev/null
+  cd "${KEYMAN_ROOT}"
+  npm run version "$version"  || fail "Could not set package versions to $version."
+  popd > /dev/null
 }
 
 # Initializes use of the npm `lerna` package within the repo.
