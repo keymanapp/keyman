@@ -126,7 +126,7 @@ if(!window['keyman']['ui']['name']) {
       ui.innerDiv.appendChild(ui.KeyboardSelector);  //this may need to be moved up.... 
 
       // Check required interface alignment and default keyboard
-      var opt=util['getOption']('ui'),dfltKeyboard='English';
+      var opt=util['getOption']('ui'),dfltKeyboard='(System keyboard)';
       if(opt && typeof(opt) == 'object')
       {
         if(typeof(opt['position']) == 'string' && opt['position'] == 'right') 

@@ -696,7 +696,7 @@ if(!window['keyman']['ui']['name']) {
       
       var _li=util['createElement']('li');
       var _a=util['createElement']('a');
-      _a.innerHTML='English';
+      _a.innerHTML='(System keyboard)';
       _a.href="#";
       _a.onclick = function() { return ui.selectKbd(-1); };
       _a.id='KMWSel_$';

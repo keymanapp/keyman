@@ -1663,7 +1663,7 @@ namespace com.keyman.osk {
       } else if(keyman.getActiveLanguage(true)) {
         lgName=keyman.getActiveLanguage(true);
       } else {
-        lgName='English';
+        lgName='(System keyboard)';
       }
 
       try {
