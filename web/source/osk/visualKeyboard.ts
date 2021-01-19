@@ -2590,14 +2590,14 @@ namespace com.keyman.osk {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      if(typeof(kfd) == 'undefined' && typeof(ofd) == 'undefined') {
-        return true;
-      }
+      let fontDefined = !!(kfd && kfd['files']);
+      kfd = fontDefined ? kfd : undefined;
 
-      if(typeof(kfd['files']) == 'undefined' && typeof(ofd['files']) == 'undefined') {
-        return true;
-      }
+      let oskFontDefined = !!(ofd && ofd['files']);
+      ofd = oskFontDefined ? ofd : undefined;
 
+      // Automatically 'ready' if the descriptor is explicitly `undefined`.
+      // Thus, also covers the case where both are undefined.
       var kReady=util.checkFontDescriptor(kfd), oReady=util.checkFontDescriptor(ofd);
       if(kReady && oReady) {
         return true;
