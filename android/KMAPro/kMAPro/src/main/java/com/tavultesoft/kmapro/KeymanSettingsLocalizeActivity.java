@@ -17,15 +17,11 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceManager;
 
 import com.tavultesoft.kmea.DisplayLanguages;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.util.MapCompat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +33,6 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
   private static final String titleKey = "title";
   private static final String subtitleKey = "subtitle";
   private static final String iconKey = "icon";
-  private final String isEnabledKey = "isEnabled";
   private static Context context;
 
   @Override
@@ -69,8 +64,7 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
     for(DisplayLanguages.DisplayLanguageType l: DisplayLanguages.DisplayLanguages) {
       HashMap<String, String> hashMap = new HashMap<>();
       hashMap.put(titleKey, l.getLanguageName());
-      String icon = String.valueOf(R.drawable.ic_content_add);
-      hashMap.put(iconKey, icon);
+      hashMap.put(iconKey, noIcon);
       localizeOptionList.add(hashMap);
     }
 
@@ -78,33 +72,12 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
     int[] to = new int[]{com.tavultesoft.kmea.R.id.text1, com.tavultesoft.kmea.R.id.text2, com.tavultesoft.kmea.R.id.image1};
 
     ListAdapter adapter = new SimpleAdapter(context, localizeOptionList, com.tavultesoft.kmea.R.layout.list_row_layout2, from, to) {
-      /*
-      @Override
-      public boolean isEnabled(int position) {
-        HashMap<String, String> hashMap = localizeOptionList.get(position);
-        String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
-        String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
-        if (itemTitle.equals(getString(R.string.install_from_other_device))) {
-          // Scan QR code not implemented yet
-          return false;
-        } else if (itemTitle.equals(getString(R.string.add_languages_to_installed_keyboard))) {
-          if (KeyboardController.getInstance().getInstalledPackagesList() == null) {
-            // Disable if no keyboard packages installed
-            return false;
-          }
-        }
-
-        return super.isEnabled(position);
-      }
-       */
     };
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
-
         // Store the BCP-47 language tag in shared preference
         if (position >= 0 && position < DisplayLanguages.DisplayLanguages.length) {
 
@@ -115,7 +88,11 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
           SharedPreferences.Editor editor = prefs.edit();
           editor.putString(DisplayLanguages.displayLanguageKey, languageTag);
           editor.commit();
-          finish();
+
+          // Restart the app to use selected locale
+          Intent intent = new Intent(context, MainActivity.class);
+          intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+          startActivity(intent);
         }
       }
     });

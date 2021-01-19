@@ -86,6 +86,12 @@ To upload source files to Crowdin:
 crowdin upload sources
 ```
 
+### Updating DisplayLanguages.java in Keyman Engine for Android
+In Keyman for Android, the settings menu for changing display languages is maintained in
+android/KMEA/app/src/main/java/com/tavultesoft/kmea/DisplayLangugages.java
+
+For the BCP-47 language tags to use in that file, don't include script names since the Android locales only handle language ID and region.
+
 ## Tip
 
 Microsoft offers a website that allows to check how terms used in Windows are translated
