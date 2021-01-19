@@ -380,7 +380,7 @@ namespace com.keyman.osk {
         if(!osk.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
-        ks.height=rowStyle.height;  //must be specified in px for rest of layout to work correctly
+        ks.height=rowStyle.height;  // must be specified in px for rest of layout to work correctly
 
         // Set distinct phone and tablet button position properties
         btn.style.left=ks.left;
@@ -462,7 +462,7 @@ namespace com.keyman.osk {
       }
     }
 
-    construct(osk: VisualKeyboard, baseKey: HTMLDivElement, topMargin: boolean): HTMLDivElement {
+    construct(osk: VisualKeyboard, baseKey: KeyElement, topMargin: boolean): HTMLDivElement {
       let spec = this.spec;
 
       let kDiv=document.createElement('div');
@@ -496,6 +496,7 @@ namespace com.keyman.osk {
       // Must set button size (in px) dynamically, not from CSS
       let bs=btn.style;
       bs.height=ks.height;
+      bs.lineHeight=baseKey.style.lineHeight;
       bs.width=ks.width;
 
       // Must set position explicitly, at least for Android
@@ -1587,7 +1588,7 @@ namespace com.keyman.osk {
         }
 
         let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer, device.formFactor);
-        let kDiv = keyGenerator.construct(this, <HTMLDivElement> e, needsTopMargin);
+        let kDiv = keyGenerator.construct(this, <KeyElement> e, needsTopMargin);
 
         subKeys.appendChild(kDiv);
       }
@@ -1989,7 +1990,7 @@ namespace com.keyman.osk {
           if(!this.isStatic) {
             rs.bottom=bottom+'px';
           }
-          rs.maxHeight=rs.height=rowHeight+'px';
+          rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
 
           // Calculate the exact vertical coordinate of the row's center.
           this.layout.layer[nLayer].row[nRow].proportionalY = ((oskHeight - bottom) - rowHeight/2) / oskHeight;
@@ -2032,7 +2033,7 @@ namespace com.keyman.osk {
         if(!this.isStatic) {
           ks.bottom=bottom+'px';
         }
-        ks.height=ks.minHeight=(rowHeight-pad)+'px';
+        ks.height=ks.lineHeight=ks.minHeight=(rowHeight-pad)+'px';
 
         // Rescale keycap labels on iPhone (iOS 7)
         if(resizeLabels && (j > 0)) {
