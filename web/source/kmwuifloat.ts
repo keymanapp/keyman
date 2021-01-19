@@ -237,7 +237,7 @@ if(!window['keyman']['ui']['name']) {
      */   
     ui.updateMenu = function(kbd,lg)
     {
-      var i=0,value='English';
+      var i=0;
       
       // This can be called during startup before fully initialized - ignore if so
       if(!ui.initialized) return;  
