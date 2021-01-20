@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2021 SIL International. All rights reserved.
+ */
+
 package com.tavultesoft.kmea.util;
 
 import java.io.BufferedInputStream;
@@ -9,11 +13,9 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * Created by joshua on 12/11/2017.
- */
-
 public class ZipUtils {
+  private final static String TAG = "ZipUtils";
+
   // Credit to zapi's answer at https://stackoverflow.com/questions/3382996/how-to-unzip-files-programmatically-in-android.
   public static void unzip(File zipFile, File targetDirectory) throws IOException {
     ZipInputStream zis = new ZipInputStream(
@@ -24,6 +26,15 @@ public class ZipUtils {
       byte[] buffer = new byte[8192];
       while ((ze = zis.getNextEntry()) != null) {
         File file = new File(targetDirectory, ze.getName());
+
+        // Check for zip path traversal vulnerability
+        // https://support.google.com/faqs/answer/9294009
+        String canonicalPath = file.getCanonicalPath();
+        if (!canonicalPath.startsWith(targetDirectory.getCanonicalPath())) {
+          // Security exception
+          throw new SecurityException("Zip traversal error");
+        }
+
         File dir = ze.isDirectory() ? file : file.getParentFile();
         if (!dir.isDirectory() && !dir.mkdirs())
           throw new FileNotFoundException("Failed to ensure directory: " +
