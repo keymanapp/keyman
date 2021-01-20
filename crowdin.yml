@@ -50,11 +50,17 @@ files:
     dest: /windows/strings.xml
     translation: /windows/src/desktop/kmshell/locale/%locale%/%original_file_name%
     type: android
+    languages_mapping:
+      locale:
+        de: de
 
   - source: /windows/src/desktop/setup/locale/en/strings.xml
     dest: /windows/setup/strings.xml
     translation: /windows/src/desktop/setup/locale/%locale%/%original_file_name%
     type: android
+    languages_mapping:
+      locale:
+        de: de
 
   # iOS files
 
