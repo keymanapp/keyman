@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 14.0.225 beta 2021-01-19
+
+* fix(android/samples): Fix Sentry dependencies (#4267)
+* fix(web): better font-wait null guards (#4286)
+* fix(web): uses CSS line-height to vertically center oversized OSK keycaps (#4255)
+* fix(developer): disable TSentryClient on WINE (#4274)
+* fix(web): no key previews for special keys reliant on keyboard-specific OSK font (#4282)
+* fix(web): default kbd ui name is now generic (#4293)
+* fix(developer/compilers): fixes dependency versioning on alpha, beta tiers (#4291)
+
+## 14.0.224 beta 2021-01-18
+
+* fix(android): Popup misalignments and compatibility with WeChat, Telegram (#4254)
+* chore(web): sample pages now wait on init's promise for keyboard loading (#4253)
+
+## 14.0.223 beta 2021-01-15
+
+* fix(windows): typo in font helper string (#4251)
+* chore(android/app): Add Obolo language from crowdin (#4256)
+* fix(web): unexpected errors in OSK / banner position calculations (#4238)
+* chore(linux): Improve version number for debian package (#4258)
+
 ## 14.0.222 beta 2021-01-14
 
 * chore(common): Check in crowdin files for km (Khmer) (#4228)

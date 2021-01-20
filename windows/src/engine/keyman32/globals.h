@@ -201,6 +201,7 @@ typedef struct tagKEYMAN64THREADDATA
 
   LPWORD IndexStack;
   LPWSTR miniContext;
+  int miniContextIfLen;
 
   KMSTATE state;
 

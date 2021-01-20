@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Wörterbuch installiert</string>
+        <key>other</key>
+        <string>%u Wörterbücher installiert</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Aktualisierung fehlgeschlagen</string>
+        <key>other</key>
+        <string>%u Aktualisierungen fehlgeschlagen</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Aktualisierung erfolgreich</string>
+        <key>other</key>
+        <string>%u Aktualisierungen erfolgreich</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Tastatur installiert</string>
+        <key>other</key>
+        <string>%u Tastaturen installiert</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Sprache installiert</string>
+        <key>other</key>
+        <string>%u Sprachen installiert</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Tastatur im Paket gefunden:</string>
+        <key>other</key>
+        <string>%u Tastaturen im Paket gefunden:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Wörterbuch im Paket gefunden:</string>
+        <key>other</key>
+        <string>%u Wörterbücher im Paket gefunden:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>

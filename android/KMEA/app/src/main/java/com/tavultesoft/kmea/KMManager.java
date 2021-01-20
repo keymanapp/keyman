@@ -420,21 +420,19 @@ public final class KMManager {
    * @param keyboard KeyboardType
    * @return RelativeLayout.LayoutParams
    */
-  private static RelativeLayout.LayoutParams getKeyboardLayoutParams(KeyboardType keyboard) {
+  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
-    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-    }
+    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
    return params;
   }
 
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
@@ -447,7 +445,7 @@ public final class KMManager {
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
@@ -537,12 +535,12 @@ public final class KMManager {
   public static void onConfigurationChanged(Configuration newConfig) {
     // KMKeyboard
     if (InAppKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.onConfigurationChanged(newConfig);
     }
@@ -723,7 +721,7 @@ public final class KMManager {
    *
    * At some point, we might migrate /cloud/ keyboards into packages
    * 5) For now, delete cloud/sil_euro_latin*.js
-   * 
+   *
    * Assumption: No legacy keyboards exist in /packages/*.js
    * @param context
    */
@@ -1061,12 +1059,12 @@ public final class KMManager {
 
     RelativeLayout.LayoutParams params;
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-      params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
+      params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-      params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
@@ -1278,9 +1276,9 @@ public final class KMManager {
         currentBanner = KMManager.KM_BANNER_STATE_BLANK;
 
       if(result1)
-        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP));
+        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
       if(result2)
-        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM));
+        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
 
     registerAssociatedLexicalModel(languageID);
@@ -2005,7 +2003,7 @@ public final class KMManager {
         }
         currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-        RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
         // URL has actual path to the keyboard.html file as a prefix!  We need to replace
@@ -2273,7 +2271,7 @@ public final class KMManager {
         }
         currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-        RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
         // URL has actual path to the keyboard.html file as a prefix!  We need to replace

@@ -380,7 +380,7 @@ namespace com.keyman.osk {
         if(!osk.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
-        ks.height=rowStyle.height;  //must be specified in px for rest of layout to work correctly
+        ks.height=rowStyle.height;  // must be specified in px for rest of layout to work correctly
 
         // Set distinct phone and tablet button position properties
         btn.style.left=ks.left;
@@ -462,7 +462,7 @@ namespace com.keyman.osk {
       }
     }
 
-    construct(osk: VisualKeyboard, baseKey: HTMLDivElement, topMargin: boolean): HTMLDivElement {
+    construct(osk: VisualKeyboard, baseKey: KeyElement, topMargin: boolean): HTMLDivElement {
       let spec = this.spec;
 
       let kDiv=document.createElement('div');
@@ -496,6 +496,7 @@ namespace com.keyman.osk {
       // Must set button size (in px) dynamically, not from CSS
       let bs=btn.style;
       bs.height=ks.height;
+      bs.lineHeight=baseKey.style.lineHeight;
       bs.width=ks.width;
 
       // Must set position explicitly, at least for Android
@@ -1208,7 +1209,8 @@ namespace com.keyman.osk {
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
         // _Box has (most of) the useful client values.
-        let _Box = this.kbdDiv.offsetParent as HTMLElement; // == osk._Box
+        let keyman = com.keyman.singleton;
+        let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
         let height = (this.kbdDiv.firstChild as HTMLElement).offsetHeight; // firstChild == layer-group, has height info.
         // We need to adjust the offset properties by any offsets related to the active banner.
 
@@ -1586,7 +1588,7 @@ namespace com.keyman.osk {
         }
 
         let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer, device.formFactor);
-        let kDiv = keyGenerator.construct(this, <HTMLDivElement> e, needsTopMargin);
+        let kDiv = keyGenerator.construct(this, <KeyElement> e, needsTopMargin);
 
         subKeys.appendChild(kDiv);
       }
@@ -1661,7 +1663,7 @@ namespace com.keyman.osk {
       } else if(keyman.getActiveLanguage(true)) {
         lgName=keyman.getActiveLanguage(true);
       } else {
-        lgName='English';
+        lgName='(System keyboard)';
       }
 
       try {
@@ -1709,10 +1711,12 @@ namespace com.keyman.osk {
 
       if(usePreview) {
         // Previews are not permitted for keys using any of the following CSS styles.
-        var excludedClasses = ['kmw-key-shift',    // special keys
-                               'kmw-key-shift-on', // active special keys (shift, when in shift layer
-                               'kmw-spacebar',     // space
-                               'kmw-key-blank',    // Keys that are only used for layout control
+        var excludedClasses = ['kmw-key-shift',      // special keys
+                               'kmw-key-shift-on',   // active special keys (shift, when in shift layer
+                               'kmw-key-special',    // special keys that require the keyboard's OSK font
+                               'kmw-key-special-on', // active special keys requiring the keyboard's OSK font
+                               'kmw-spacebar',       // space
+                               'kmw-key-blank',      // Keys that are only used for layout control
                                'kmw-key-hidden'];
 
         for(let c=0; c < excludedClasses.length; c++) {
@@ -1988,7 +1992,7 @@ namespace com.keyman.osk {
           if(!this.isStatic) {
             rs.bottom=bottom+'px';
           }
-          rs.maxHeight=rs.height=rowHeight+'px';
+          rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
 
           // Calculate the exact vertical coordinate of the row's center.
           this.layout.layer[nLayer].row[nRow].proportionalY = ((oskHeight - bottom) - rowHeight/2) / oskHeight;
@@ -2031,7 +2035,7 @@ namespace com.keyman.osk {
         if(!this.isStatic) {
           ks.bottom=bottom+'px';
         }
-        ks.height=ks.minHeight=(rowHeight-pad)+'px';
+        ks.height=ks.lineHeight=ks.minHeight=(rowHeight-pad)+'px';
 
         // Rescale keycap labels on iPhone (iOS 7)
         if(resizeLabels && (j > 0)) {
@@ -2589,14 +2593,14 @@ namespace com.keyman.osk {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      if(typeof(kfd) == 'undefined' && typeof(ofd) == 'undefined') {
-        return true;
-      }
+      let fontDefined = !!(kfd && kfd['files']);
+      kfd = fontDefined ? kfd : undefined;
 
-      if(typeof(kfd['files']) == 'undefined' && typeof(ofd['files']) == 'undefined') {
-        return true;
-      }
+      let oskFontDefined = !!(ofd && ofd['files']);
+      ofd = oskFontDefined ? ofd : undefined;
 
+      // Automatically 'ready' if the descriptor is explicitly `undefined`.
+      // Thus, also covers the case where both are undefined.
       var kReady=util.checkFontDescriptor(kfd), oReady=util.checkFontDescriptor(ofd);
       if(kReady && oReady) {
         return true;

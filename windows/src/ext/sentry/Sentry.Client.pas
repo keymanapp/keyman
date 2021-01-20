@@ -55,6 +55,8 @@ type
   protected
   class var
     FInstance: TSentryClient;
+    FEnabled: Boolean;
+    FEnabledInitialised: Boolean;
   private
     FSentryInit: Boolean;
     options: psentry_options_t;
@@ -73,6 +75,7 @@ type
     procedure DoTerminate;
     function EventIDToString(AGuid: PByte): String;
     function ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
+    class function GetEnabled: Boolean; static;
   public
     constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); virtual;
     destructor Destroy; override;
@@ -85,6 +88,8 @@ type
 
     property ReportExceptions: Boolean read FReportExceptions;
     property ReportMessages: Boolean read FReportMessages;
+  public
+    class property Enabled: Boolean read GetEnabled;
   end;
 
   TSentryClientClass = class of TSentryClient;
@@ -431,6 +436,19 @@ begin
   end;
 end;
 
+class function TSentryClient.GetEnabled: Boolean;
+begin
+  if not FEnabledInitialised then
+  begin
+    // WINE is not coping with some of the Sentry/dbghelp calls so disable
+    // sentry on WINE instances.
+    FEnabled := GetProcAddress(GetModuleHandle('ntdll.dll'), 'wine_get_version') = nil;
+    FEnabledInitialised := True;
+  end;
+
+  Exit(FEnabled);
+end;
+
 function TSentryClient.MessageEvent(Level: TSentryLevel; const Message: string;
   IncludeStack: Boolean): string;
 var
@@ -576,6 +594,7 @@ initialization
   SymGetModuleBase64 := GetProcAddress(hDbgHelp, 'SymGetModuleBase64');
   SymInitialize := GetProcAddress(hDbgHelp, 'SymInitialize');
 
-  if Assigned(SymInitialize) then
-    SymInitialize(GetCurrentProcess, nil, True);
+  if TSentryClient.Enabled then
+    if Assigned(SymInitialize) then
+      SymInitialize(GetCurrentProcess, nil, True);
 end.
