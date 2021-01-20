@@ -69,9 +69,9 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
     }
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
-    int[] to = new int[]{com.tavultesoft.kmea.R.id.text1, com.tavultesoft.kmea.R.id.text2, com.tavultesoft.kmea.R.id.image1};
+    int[] to = new int[]{com.tavultesoft.kmea.R.id.text1, com.tavultesoft.kmea.R.id.image1};
 
-    ListAdapter adapter = new SimpleAdapter(context, localizeOptionList, com.tavultesoft.kmea.R.layout.list_row_layout2, from, to) {
+    ListAdapter adapter = new SimpleAdapter(context, localizeOptionList, com.tavultesoft.kmea.R.layout.list_row_layout1, from, to) {
     };
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
