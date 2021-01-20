@@ -1834,11 +1834,19 @@ namespace com.keyman.osk {
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = util.getFontSizeStyle(emSizeStr).val;
+
         var emScale = 1;
         if(!this.isStatic) {
           // Reading this requires the OSK to be active, so we filter out
           // BuildVisualKeyboard calls here.
-          emScale = util.getFontSizeStyle(keyman.osk._Box).val;
+          let boxFontStyle = util.getFontSizeStyle(keyman.osk._Box);
+
+          // Double-check against the font scaling applied to the _Box element.
+          if(boxFontStyle.absolute) {
+            return boxFontStyle.val;
+          } else {
+            emScale = boxFontStyle.val;
+          }
         }
         return emSize * emScale;
       }
