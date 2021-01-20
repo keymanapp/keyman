@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.226 beta 2021-01-20
+
+* fix(windows, common/core/desktop): context mismatch with if and dk (#4276)
+* chore(common): Check in crowdin files for de (German) (#4295)
+* feat(android/app): Add option to change display language (#4261)
+* fix(developer/compilers): fixes developer build breakage from #4291 (#4299)
+* fix(android/app): Handle keyman protocol from external browser (#4292)
+
 ## 14.0.225 beta 2021-01-19
 
 * fix(android/samples): Fix Sentry dependencies (#4267)
