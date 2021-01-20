@@ -888,14 +888,10 @@ namespace com.keyman.osk {
      *
      *  @return {boolean}
      */
-    loadCookie() {
+    loadCookie(): void {
       let util = com.keyman.singleton.util;
 
       var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      if(typeof(c) == 'undefined' || c == null) {
-        this.userPositioned=false;
-        return false;
-      }
 
       this._Enabled = util.toNumber(c['visible'], 1) == 1;
       this.userPositioned = util.toNumber(c['userSet'], 0) == 1;
@@ -941,8 +937,6 @@ namespace com.keyman.osk {
       if(this.userPositioned && this._Box) {
         this.setPos({'left': this.x, 'top': this.y});
       }
-
-      return true;
     }
 
     private setSize(width?: number, height?: number, pending?: boolean) {

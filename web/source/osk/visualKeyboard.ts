@@ -683,7 +683,8 @@ namespace com.keyman.osk {
       if(this._width) {
         return this._width;
       } else {
-        return this.loadSizeFromCookie().width;
+        this.loadSizeFromCookie();
+        return this.width;
       }
     }
 
@@ -691,41 +692,39 @@ namespace com.keyman.osk {
       if(this._height) {
         return this._height;
       } else {
-        return this.loadSizeFromCookie().height;
+        this.loadSizeFromCookie();
+        return this.height;
       }
     }
 
-    protected loadSizeFromCookie(): {width: number, height: number} {
+    protected loadSizeFromCookie() {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
 
+      // If no prior cookie exists, it merely returns an empty object / cookie.
       var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
       var newWidth: number, newHeight: number;
-      if(typeof(c) == 'undefined' || c == null) {
-        newWidth = screen.width * 0.3;
-        newHeight = 144; // 16 * 8; 16 is our preferred default font size.
-      } else {
-        // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-        newWidth=util.toNumber(c['width'], 0.3 * screen.width); // Default - 30% of screen's width.
 
-        if(newWidth < 0.2*screen.width) {
-          newWidth = 0.2*screen.width;
-        } else if(newWidth > 0.9*screen.width) {
-          newWidth=0.9*screen.width;
-        }
+      // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
+      newWidth=util.toNumber(c['width'], 0.333 * screen.width); // Default - 1/3rd of screen's width.
 
-        newHeight=util.toNumber(c['height'],0.15*screen.height);
+      if(newWidth < 0.2*screen.width) {
+        newWidth = 0.2*screen.width;
+      } else if(newWidth > 0.9*screen.width) {
+        newWidth=0.9*screen.width;
+      }
+  
+      // Default height decision made here: 
+      // https://github.com/keymanapp/keyman/pull/4279#discussion_r560453929
+      newHeight=util.toNumber(c['height'], 0.333 * newWidth);
 
-        if(newHeight > 0.5*screen.height) {
-          newHeight=0.5*screen.height;
-        }
+      if(newHeight < 0.15*screen.height) {
+        newHeight = 0.15 * screen.height;
+      } else if(newHeight > 0.5*screen.height) {
+        newHeight=0.5*screen.height;
       }
 
       this.setSize(newWidth, newHeight);
-      return {
-        width: newWidth,
-        height: newHeight
-      }
     }
 
     /**
@@ -735,10 +734,8 @@ namespace com.keyman.osk {
      * @param pending Set to `true` if called during a resizing interaction
      */
     public setSize(width: number, height: number, pending?: boolean) {
-      //if(width && height) {
       this._width = width;
       this._height = height;
-      //}
 
       if(!pending && this.kbdDiv) {
         this.kbdDiv.style.width=this._width+'px';
