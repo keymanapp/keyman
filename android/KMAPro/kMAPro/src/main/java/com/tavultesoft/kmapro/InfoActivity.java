@@ -4,6 +4,7 @@
 
 package com.tavultesoft.kmapro;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.FormFactor;
@@ -20,7 +21,7 @@ import android.widget.TextView;
 import android.annotation.SuppressLint;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class InfoActivity extends AppCompatActivity {
+public class InfoActivity extends BaseActivity {
   private final static String TAG = "InfoActivity";
   private WebView webView;
   private final String HELP_PRODUCTION_HOST = "help.keyman.com";

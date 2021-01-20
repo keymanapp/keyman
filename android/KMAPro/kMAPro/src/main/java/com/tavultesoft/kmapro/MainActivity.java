@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2020 SIL International. All rights reserved.
+ * Copyright (C) 2018-2021 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -92,7 +93,7 @@ import android.widget.Toast;
 
 import io.sentry.android.core.SentryAndroid;
 
-public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
+public class MainActivity extends BaseActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
 
