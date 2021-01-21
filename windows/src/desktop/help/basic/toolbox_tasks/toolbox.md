@@ -16,20 +16,18 @@ To display the Keyman Toolbox:
 
 2.  From the Keyman menu, select On Screen Keyboard.
 
-::: {.note}
+**Note:**
 The Keyman Toolbox is displayed by default in the last position it was
 used. It will be displayed initially in the bottom right hand corner of
 the screen.
-:::
 
-::: {.note}
+**Note:**
 The Keyman Toolbox opens automatically when you select a Keyman keyboard
 layout. You can change this behaviour in the
 
 Options tab
 
 of Keyman Configuration.
-:::
 
 **Using the Keyman Toolbox**
 
@@ -351,10 +349,9 @@ dragging anywhere on the Keyman Toolbox toolbar not covered by a button.
 You can resize the Keyman Toolbox by clicking and dragging on a corner
 of the Keyman Toolbox.
 
-::: {.note}
+**Note:**
 When the On Screen Keyboard tool is selected, the Keyman Toolbox will
 only resize according to the proportions of the keyboard.
-:::
 
 **Toolbox Options**
 
