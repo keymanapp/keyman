@@ -1715,7 +1715,7 @@ namespace com.keyman.osk {
       subKeys.shim.id = 'kmw-popup-shim';
       keyman.osk._Box.appendChild(subKeys.shim);
 
-      // Highlight the duplicated base key (if a phone)
+      // Highlight the duplicated base key or ideal subkey (if a phone)
       if(device.formFactor == 'phone') {
         this.selectDefaultSubkey(e, subKeySpec, subKeys);
       }
