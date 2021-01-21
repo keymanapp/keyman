@@ -43,4 +43,5 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     api (name:'keyman-engine', ext:'aar')
     implementation 'io.sentry:sentry-android:3.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
 }
