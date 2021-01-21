@@ -19,9 +19,8 @@ To open the Options tab of Keyman Configuration:
 
 3.  Select the Options tab.
 
-    ::: {.tip}
+    **Tip:**
     Keyman Configuration opens in the same tab you last closed it in.
-    :::
 
 **Using General Options**
 
@@ -34,11 +33,10 @@ To open the Options tab of Keyman Configuration:
     keyboard on and off. Untick this option and a Keyman keyboard hotkey
     will only turn the Keyman keyboard on.
 
-    ::: {.tip}
+    **Tip:**
     Set hotkeys in the
     Hotkeys tab
     of Keyman Configuration.
-    :::
 
 -   Simulate AltGr with Ctrl+Alt
 

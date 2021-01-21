@@ -21,9 +21,8 @@ To open the Keyboard Layouts tab of Keyman Configuration:
 
 3.  Select the Keyboard Layouts tab.
 
-    ::: {.tip}
+    **Tip:**
     Keyman Configuration opens in the same tab you last closed it in.
-    :::
 
 **Installing a Keyboard**
 

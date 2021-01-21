@@ -1,4 +1,3 @@
-- search for <div class='tip'>
 - search for TODO
 - search for title: ... {...}
 - search for "(desktop_images"

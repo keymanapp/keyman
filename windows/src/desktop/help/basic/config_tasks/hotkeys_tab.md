@@ -18,9 +18,8 @@ To open the Hotkeys tab of Keyman Configuration:
 
 3.  Select the Hotkeys tab.
 
-    ::: {.tip}
+    **Tip:**
     Keyman Configuration opens in the same tab you last closed it in.
-    :::
 
 **Setting Hotkeys**
 
