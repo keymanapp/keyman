@@ -14,11 +14,13 @@ import java.util.HashMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
+import android.widget.FrameLayout;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
@@ -158,6 +160,16 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   }
 
   @Override
+  public void onConfigureWindow(Window win, boolean isFullscreen, boolean isCandidatesOnly) {
+    super.onConfigureWindow(win, isFullscreen, isCandidatesOnly);
+
+    // We don't currently use isFullscreen or isCandidatesOnly; we always want to MATCH_PARENT,
+    // unlike the default for height which is WRAP_CONTENT. We then adjust the touchable area
+    // in `onCalculateInsets`
+    win.setLayout(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+  }
+
+  @Override
   public void onComputeInsets(InputMethodService.Insets outInsets) {
     super.onComputeInsets(outInsets);
 
@@ -173,6 +185,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);
     outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight;
+    outInsets.visibleTopInsets = outInsets.contentTopInsets;
     outInsets.touchableInsets = InputMethodService.Insets.TOUCHABLE_INSETS_REGION;
     outInsets.touchableRegion.set(0, outInsets.contentTopInsets, size.x, size.y);
   }

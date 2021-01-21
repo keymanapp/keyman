@@ -133,7 +133,7 @@ namespace com.keyman.osk {
       let metrics = OSKKey.getTextMetrics(osk, this.spec.text, style);
 
       let fontSpec = util.getFontSizeStyle(style.fontSize);
-      let keyWidth = this.getKeyWidth();
+      let keyWidth = this.getKeyWidth(osk);
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
       const X_PADDING = 2;
@@ -169,7 +169,7 @@ namespace com.keyman.osk {
       }
     }
 
-    getKeyWidth(): number {
+    getKeyWidth(osk: VisualKeyboard): number {
       let units = this.objectUnits();
 
       if(units == 'px') {
@@ -178,12 +178,9 @@ namespace com.keyman.osk {
       } else if(units == '%') {
         // For desktop devices, each key is given a %age of the total OSK width.  We'll need to compute an
         // approximation for that.  `this.kbdDiv` is the element controlling the OSK's width, set in px.
-        // ... and since it's null whenever this method would be called during key construction, we simply
-        // grab it from the cookie (or its default values) instead.
-        let oskWidth = com.keyman.singleton.osk.getWidthFromCookie();
 
         // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
-        return Math.floor(oskWidth * this.spec['widthpc'] / 100);
+        return Math.floor(osk.width * this.spec['widthpc'] / 100);
       }
     }
 
@@ -608,6 +605,9 @@ namespace com.keyman.osk {
     kbdHelpDiv: HTMLDivElement;
     styleSheet: HTMLStyleElement;
 
+    _width: number;
+    _height: number;
+
     // Style-related properties
     fontFamily: string;
     fontSize: string;
@@ -707,6 +707,84 @@ namespace com.keyman.osk {
       } else {
         Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
       }
+    }
+
+    get width(): number {
+      if(this._width) {
+        return this._width;
+      } else {
+        this.loadSizeFromCookie();
+        return this.width;
+      }
+    }
+
+    get height(): number {
+      if(this._height) {
+        return this._height;
+      } else {
+        this.loadSizeFromCookie();
+        return this.height;
+      }
+    }
+
+    protected loadSizeFromCookie() {
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+
+      // If no prior cookie exists, it merely returns an empty object / cookie.
+      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
+      var newWidth: number, newHeight: number;
+
+      // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
+      newWidth=util.toNumber(c['width'], 0.333 * screen.width); // Default - 1/3rd of screen's width.
+
+      if(newWidth < 0.2*screen.width) {
+        newWidth = 0.2*screen.width;
+      } else if(newWidth > 0.9*screen.width) {
+        newWidth=0.9*screen.width;
+      }
+  
+      // Default height decision made here: 
+      // https://github.com/keymanapp/keyman/pull/4279#discussion_r560453929
+      newHeight=util.toNumber(c['height'], 0.333 * newWidth);
+
+      if(newHeight < 0.15*screen.height) {
+        newHeight = 0.15 * screen.height;
+      } else if(newHeight > 0.5*screen.height) {
+        newHeight=0.5*screen.height;
+      }
+
+      this.setSize(newWidth, newHeight);
+    }
+
+    /**
+     * Sets & tracks the size of the VisualKeyboard's primary element.
+     * @param width 
+     * @param height 
+     * @param pending Set to `true` if called during a resizing interaction
+     */
+    public setSize(width: number, height: number, pending?: boolean) {
+      this._width = width;
+      this._height = height;
+
+      if(!pending && this.kbdDiv) {
+        this.kbdDiv.style.width=this._width+'px';
+        this.kbdDiv.style.height=this._height+'px';
+        this.kbdDiv.style.fontSize=(this._height/8)+'px';
+      }
+    }
+
+    public defaultFontSize(): number {
+      return this.height / 8;
+    }
+
+    /**
+     * Called by OSKManager after resize operations in order to determine the final
+     * size actually used by the visual keyboard.
+     */
+    public refit() {
+      this._width=this.kbdDiv.offsetWidth;
+      this._height=this.kbdDiv.offsetHeight;
     }
 
     /**
@@ -1238,7 +1316,8 @@ namespace com.keyman.osk {
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
         // _Box has (most of) the useful client values.
-        let _Box = this.kbdDiv.offsetParent as HTMLElement; // == osk._Box
+        let keyman = com.keyman.singleton;
+        let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
         let height = (this.kbdDiv.firstChild as HTMLElement).offsetHeight; // firstChild == layer-group, has height info.
         // We need to adjust the offset properties by any offsets related to the active banner.
 
@@ -1691,7 +1770,7 @@ namespace com.keyman.osk {
       } else if(keyman.getActiveLanguage(true)) {
         lgName=keyman.getActiveLanguage(true);
       } else {
-        lgName='English';
+        lgName='(System keyboard)';
       }
 
       try {
@@ -1739,10 +1818,12 @@ namespace com.keyman.osk {
 
       if(usePreview) {
         // Previews are not permitted for keys using any of the following CSS styles.
-        var excludedClasses = ['kmw-key-shift',    // special keys
-                               'kmw-key-shift-on', // active special keys (shift, when in shift layer
-                               'kmw-spacebar',     // space
-                               'kmw-key-blank',    // Keys that are only used for layout control
+        var excludedClasses = ['kmw-key-shift',      // special keys
+                               'kmw-key-shift-on',   // active special keys (shift, when in shift layer
+                               'kmw-key-special',    // special keys that require the keyboard's OSK font
+                               'kmw-key-special-on', // active special keys requiring the keyboard's OSK font
+                               'kmw-spacebar',       // space
+                               'kmw-key-blank',      // Keys that are only used for layout control
                                'kmw-key-hidden'];
 
         for(let c=0; c < excludedClasses.length; c++) {
@@ -1828,7 +1909,7 @@ namespace com.keyman.osk {
       let util = keyman.util;
 
       if(this.device.formFactor == 'desktop') {
-        let kbdFontSize = this.getFontSizeFromCookie();
+        let kbdFontSize = this.defaultFontSize();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
         return kbdFontSize * keySquareScale;
       } else {
@@ -1850,23 +1931,6 @@ namespace com.keyman.osk {
         }
         return emSize * emScale;
       }
-    }
-
-    getFontSizeFromCookie(): number {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
-
-      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      if(typeof(c) == 'undefined' || c == null) {
-        return 16;
-      }
-
-      var newHeight=util.toNumber(c['height'],0.15*screen.height);
-      if(newHeight > 0.5*screen.height) {
-        newHeight=0.5*screen.height;
-      }
-
-      return (newHeight/8);
     }
 
         /**
@@ -2629,14 +2693,14 @@ namespace com.keyman.osk {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      if(typeof(kfd) == 'undefined' && typeof(ofd) == 'undefined') {
-        return true;
-      }
+      let fontDefined = !!(kfd && kfd['files']);
+      kfd = fontDefined ? kfd : undefined;
 
-      if(typeof(kfd['files']) == 'undefined' && typeof(ofd['files']) == 'undefined') {
-        return true;
-      }
+      let oskFontDefined = !!(ofd && ofd['files']);
+      ofd = oskFontDefined ? ofd : undefined;
 
+      // Automatically 'ready' if the descriptor is explicitly `undefined`.
+      // Thus, also covers the case where both are undefined.
       var kReady=util.checkFontDescriptor(kfd), oReady=util.checkFontDescriptor(ofd);
       if(kReady && oReady) {
         return true;

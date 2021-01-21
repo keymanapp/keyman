@@ -45,7 +45,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
-public final class KeyboardPickerActivity extends AppCompatActivity {
+public final class KeyboardPickerActivity extends BaseActivity {
 
   //TODO: view instances should not be static
   private static Toolbar toolbar = null;

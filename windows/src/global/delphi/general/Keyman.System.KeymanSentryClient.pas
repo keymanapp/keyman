@@ -27,6 +27,7 @@ type
     procedure NestedValidateAccessViolation;
     procedure NestedValidateDelphiException;
     procedure NestedValidateFloatingPointException;
+    class function GetEnabled: Boolean; static;
   public
     destructor Destroy; override;
 
@@ -37,6 +38,7 @@ type
     class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
     class procedure Stop;
     class property Client: TSentryClient read FClient;
+    class property Enabled: Boolean read GetEnabled;
     class property Instance: TKeymanSentryClient read FInstance;
     class property OnBeforeShutdown: TNotifyEvent read FOnBeforeShutdown write FOnBeforeShutdown;
   public
@@ -186,6 +188,9 @@ class procedure TKeymanSentryClient.ReportHandledException(E: Exception;
 var
   text: string;
 begin
+  if not Enabled then
+    Exit;
+
   if Message <> ''
     then text := Message + ': '
     else text := '';
@@ -285,6 +290,9 @@ begin
   FProject := AProject;
   FFlags := AFlags;
 
+  if not Enabled then
+    Exit;
+
   sentry_set_library_path(FindSentryDLL);
 
   o.Debug := False;
@@ -346,6 +354,11 @@ begin
   inherited Destroy;
 end;
 
+class function TKeymanSentryClient.GetEnabled: Boolean;
+begin
+  Result := TSentryClient.Enabled;
+end;
+
 class procedure TKeymanSentryClient.Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags);
 begin
   TKeymanSentryClient.Create(SentryClientClass, AProject, ALogger, AFlags);
@@ -367,6 +380,9 @@ end;
 //
 class procedure TKeymanSentryClient.Validate(Force: Boolean);
 begin
+  if not Enabled then
+    Exit;
+
   TKeymanSentryClient.Instance.NestedValidate(Force);
 end;
 

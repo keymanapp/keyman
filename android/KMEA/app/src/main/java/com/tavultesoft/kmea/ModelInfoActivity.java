@@ -38,7 +38,7 @@ import com.tavultesoft.kmea.util.MapCompat;
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_MODEL;
 
 // Public access is necessary to avoid IllegalAccessException
-public final class ModelInfoActivity extends AppCompatActivity {
+public final class ModelInfoActivity extends BaseActivity {
 
   private static ArrayList<HashMap<String, String>> infoList = null;
   private final String titleKey = "title";

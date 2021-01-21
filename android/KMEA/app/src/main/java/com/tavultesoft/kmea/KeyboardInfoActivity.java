@@ -36,7 +36,7 @@ import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
 
 // Public access is necessary to avoid IllegalAccessException
-public final class KeyboardInfoActivity extends AppCompatActivity {
+public final class KeyboardInfoActivity extends BaseActivity {
 
   private static final String TAG = "KeyboardInfoActivity";
   private static Toolbar toolbar = null;

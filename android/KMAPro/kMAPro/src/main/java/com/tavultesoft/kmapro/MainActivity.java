@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2020 SIL International. All rights reserved.
+ * Copyright (C) 2018-2021 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -38,7 +39,6 @@ import com.tavultesoft.kmea.util.KMPLink;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -92,7 +92,7 @@ import android.widget.Toast;
 
 import io.sentry.android.core.SentryAndroid;
 
-public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
+public class MainActivity extends BaseActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
 
@@ -256,13 +256,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
 
-    // Get calling activity
-    ComponentName component = this.getCallingActivity();
-    String caller = null;
-    if (component != null) {
-      caller = component.getClassName();
-    }
-
     Intent intent = getIntent();
     data = intent.getData();
 
@@ -285,10 +278,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           downloadKMP(scheme);
           break;
         case "keyman" :
-          // Only accept download links from Keyman browser activities
-          if (KMPLink.isKeymanDownloadLink(data.toString()) && caller != null &&
-            (caller.equalsIgnoreCase("com.tavultesoft.kmea.KMPBrowserActivity") ||
-             caller.equalsIgnoreCase("com.tavultesoft.kmapro.WebBrowserActivity"))) {
+          // TODO: Only accept download links from Keyman browser activities when universal links work
+          if (KMPLink.isKeymanDownloadLink(data.toString())) {
 
             // Convert opaque URI to hierarchical URI so the query parameters can be parsed
             Builder builder = new Uri.Builder();
@@ -297,6 +288,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
               .appendPath("keyboards")
               .encodedQuery(data.getEncodedQuery());
             data = Uri.parse(builder.build().toString());
+            downloadKMP(scheme);
+          } else if (KMPLink.isLegacyKeymanDownloadLink(data.toString())) {
+            link = data.toString();
+            data = KMPLink.getLegacyKeyboardDownloadLink(link);
             downloadKMP(scheme);
           } else {
             String msg = "Unrecognized scheme: " + scheme;

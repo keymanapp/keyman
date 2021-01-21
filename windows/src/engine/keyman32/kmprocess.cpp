@@ -426,6 +426,8 @@ BOOL ProcessGroup(LPGROUP gp)
 
   assert(kkp != NULL);
 
+  _td->miniContextIfLen = xstrlen(kkp->dpContext) - xstrlen_ignoreifopt(kkp->dpContext);
+
 	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
 	if(*kkp->dpContext == UC_SENTINEL && *(kkp->dpContext+1) == CODE_NUL)
     wcsncpy_s(_td->miniContext, GLOBAL_ContextStackSize, _td->app->ContextBuf(xstrlen_ignoreifopt(kkp->dpContext)-1), GLOBAL_ContextStackSize);  // I3162   // I3536
@@ -549,18 +551,14 @@ int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
 			  _td->app->QueueAction(QIT_BELL, 0);
 			  break;
 		  case CODE_CONTEXT:				// copy the context to the output
-			  for(q = _td->miniContext; *q; q++) {
-			    _td->app->QueueAction(QIT_CHAR, *q);
-        }
-			  break;
+        PostString(_td->miniContext, mp, lpkb, wcschr(_td->miniContext, 0));
+        break;
 			case CODE_CONTEXTEX:
 				p++;
-				for(q = _td->miniContext, i = 0; *q && i < *p-1; i++, q=incxstr(q));
+				for(q = _td->miniContext, i = _td->miniContextIfLen; *q && i < *p-1; i++, q=incxstr(q));
 				if(*q) {
-          _td->app->QueueAction(QIT_CHAR, *q);
-          if(Uni_IsSurrogate1(*q) && Uni_IsSurrogate2(*(q+1))) {
-            _td->app->QueueAction(QIT_CHAR, *(q+1));
-          }
+          temp = incxstr(q);
+          PostString(q, mp, lpkb, temp);
         }
 				break;
 		  case CODE_RETURN:				// stop processing and start PostAllKeys
