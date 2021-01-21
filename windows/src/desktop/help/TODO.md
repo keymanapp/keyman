@@ -6,5 +6,4 @@
 - search for "[???]"
 - search for \n\n- (gaps between bullets)
 - search for ^**...**$
-- search for **Note**: and replace with **Note:**
 - search for keyboard references and use <kbd></kbd>

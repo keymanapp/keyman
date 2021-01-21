@@ -7,7 +7,7 @@ keyboards.
 
 ![](desktop_images/texteditor.png)
 
-**Note**: You do not need to use the Keyman Text Editor to type with Keyman. You can use Keyman in almost any application on your computer that accepts keyboard input.
+**Note:** You do not need to use the Keyman Text Editor to type with Keyman. You can use Keyman in almost any application on your computer that accepts keyboard input.
 
 ## Opening the Text Editor
 
