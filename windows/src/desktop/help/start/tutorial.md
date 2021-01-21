@@ -124,10 +124,7 @@ To learn how to type with your new Keyman keyboard, open the On Screen
 Keyboard tool of the Keyman Toolbox. You can open the On Screen Keyboard
 tool from the On Screen Keyboard link in the Keyman menu.
 
-**Tip:** Some Keyman keyboards do not include an On Screen Keyboard. You can
-usually find help for these keyboards from the Keyboard Usage tool of
-the Keyman Toolbox. You can open the Keyboard Usage tool from the
-Keyboard Usage link in the Keyman menu.
+**Tip:** Some Keyman keyboards do not include an On Screen Keyboard.
 
 ## Step 8
 

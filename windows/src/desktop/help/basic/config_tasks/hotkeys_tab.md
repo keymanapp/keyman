@@ -38,8 +38,6 @@ following hotkeys will toggle with this option enabled:
 
 -   Show On Screen Keyboard Pane
 
--   Show Keyboard Usage Pane
-
 -   Show Font Helper Pane
 
 -   Show Character Map Pane
@@ -61,9 +59,6 @@ functions:
 
 -   Show On Screen Keyboard Pane --- Opens or shows the [On Screen
     Keyboard](#basic_osk) tool of the Keyman Toolbox.
-
--   Show Keyboard Usage Pane --- Opens or shows the [Keyboard
-    Usage](#basic_usage) tool of the Keyman Toolbox.
 
 -   Show Font Helper Pane --- Opens or shows the [Font
     Helper](#basic_fonthelper) tool of the Keyman Toolbox.

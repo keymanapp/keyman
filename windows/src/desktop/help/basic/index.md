@@ -14,7 +14,6 @@ title: Basic Help
 * [traymenu](traymenu)
 * [toolbox](toolbox)
 * [osk](osk)
-* [usage](usage)
 * [fonthelper](fonthelper)
 * [charactermap](charactermap)
 
