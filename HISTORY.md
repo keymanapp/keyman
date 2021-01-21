@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.227 beta 2021-01-21
+
+* fix(web): dynamic font downscaling for OSK keys (#4270)
+* fix(web): toolbar and loading optimisations (#4304)
+* chore(web): updates MTNT for pred-text testing page to 0.1.5 (casing) (#4305)
+* fix(android/samples): Add dependency on androidx.preference (#4310)
+
 ## 14.0.226 beta 2021-01-20
 
 * fix(windows, common/core/desktop): context mismatch with if and dk (#4276)
