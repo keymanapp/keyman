@@ -1717,7 +1717,27 @@ namespace com.keyman.osk {
 
       // Highlight the duplicated base key (if a phone)
       if(device.formFactor == 'phone') {
-        var bk = <KeyElement> subKeys.childNodes[0].firstChild;
+        this.selectDefaultSubkey(e, subKeySpec, subKeys);
+      }
+    }
+
+    selectDefaultSubkey(baseKey: KeyElement, subkeys: OSKKeySpec[], popupBase: HTMLElement) {
+      var bk: KeyElement;
+      for(let i=0; i < subkeys.length; i++) {
+        let skSpec = subkeys[i];
+        let skElement = <KeyElement> popupBase.childNodes[i].firstChild;
+
+        // Preference order:
+        // #1:  subkey has same key ID and layer / modifier spec.
+        // #2:  if no perfect match exists, choose a subkey with the same key ID.
+        if(skSpec.id == baseKey.keyId && skSpec.layer == baseKey.key.layer) {
+          bk = skElement;
+        } else if(!bk && skSpec.id == baseKey.keyId) {
+          bk = skElement;
+        }
+      }
+
+      if(bk) {
         this.keyPending = bk;
         this.highlightKey(bk,true);//bk.className = bk.className+' kmw-key-touched';
       }
