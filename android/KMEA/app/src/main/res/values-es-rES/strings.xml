@@ -18,11 +18,11 @@
     <!-- Context: Button label -->
     <string name="label_back" comment="Button to go back">Back</string>
     <!-- Context: Button label -->
-    <string name="label_cancel" comment="Button to cancel an action">Cancel</string>
+    <string name="label_cancel" comment="Button to cancel an action">Cancelar</string>
     <!-- Context: Button label -->
-    <string name="label_close" comment="Close a dialog">Close</string>
+    <string name="label_close" comment="Close a dialog">Cerrar</string>
     <!-- Context: Button label -->
-    <string name="label_close_keyman" comment="Close the Keyman application">Close Keyman</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Cerrar Keyman</string>
     <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item">Download</string>
     <!-- Context: Button label -->
