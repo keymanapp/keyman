@@ -1,4 +1,3 @@
-- search for <div class='note'>
 - search for <div class='tip'>
 - search for TODO
 - search for title: ... {...}
