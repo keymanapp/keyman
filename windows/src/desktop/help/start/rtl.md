@@ -17,11 +17,11 @@ get started.
     To do this, simply associate the keyboard with a right-to-left
     Windows language (like Arabic). For instructions on associating a
     Keyman keyboard with a Windows language, see:
-    [???](#start_configure_computer)
+    [How To - Set up Your Computer for a Keyman Keyboard](configure_computer)
 
 2.  If you will be using MS Office programs like Word, you should
     configure MS Office for your right-to-left language. For
-    instructions, see: [???](#start_configure_office)
+    instructions, see: [How To - Set up MS Office for a Keyman Keyboard](configure_office)
 
 3.  Each time you start typing with a right-to-left Keyman keyboard, you
     may need to change the typing direction in the program you are

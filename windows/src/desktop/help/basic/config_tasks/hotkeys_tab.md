@@ -24,7 +24,7 @@ To open the Hotkeys tab of Keyman Configuration:
 **Setting Hotkeys**
 
 For help setting hotkeys in the Hotkeys tab of Keyman Configuration,
-see: [???](#start_hotkey_set)
+see: [Set Hotkeys for Keyman, Keyman Keyboards and Windows Languages](../../start/hotkey_set)
 
 **Note:**
 By default, hotkeys only turn on a function or keyboard. If you prefer
@@ -85,8 +85,8 @@ currently installed Windows languages.
 
 **Related Topics**
 
--   [???](#start_hotkey_set)
+- [Set Hotkeys for Keyman, Keyman Keyboards and Windows Languages](../../start/hotkey_set)
 
--   [???](#basic_config_menu)
+- [Keyman Configuration Menu](../config_tasks/config_menu)
 
--   [???](#basic_options_tab)
+- [Keyman Configuration - Options Tab](options_tab)

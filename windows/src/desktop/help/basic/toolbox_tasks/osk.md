@@ -75,8 +75,6 @@ by default. This option can be changed in Keyman Configuration.
 
 **Related Topics**
 
--   [???](#basic_toolbox)
+-   [Toolbox](toolbox)
 
--   [???](#basic_usage)
-
--   [???](#basic_options_tab)
+-   [Options Tab](../config_tasks/options_tab)

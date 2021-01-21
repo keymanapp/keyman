@@ -36,8 +36,8 @@ The Keyman keyboard is now removed from Keyman.
 
 **Related Topics**
 
--   [???](#basic_disable_keyboard)
+-   [Enable and Disable a Keyboard](disable_keyboard)
 
--   [???](#basic_enable_keyboard)
+-   [Turn on a Keyboard](enable_keyboard)
 
--   [???](#start_download-install_keyboard)
+-   [Download and Install a Keyboard](../../start/download-install_keyboard)

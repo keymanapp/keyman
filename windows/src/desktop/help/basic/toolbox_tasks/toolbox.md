@@ -399,10 +399,8 @@ of Keyman Configuration and click Reset Hints.
 
 **Related Topics**
 
--   [???](#basic_osk)
+-   [On Screen Keyboard](osk)
 
--   [???](#basic_usage)
+-   [Font Helper](fonthelper)
 
--   [???](#basic_fonthelper)
-
--   [???](#basic_charactermap)
+-   [Character Map](charactermap)

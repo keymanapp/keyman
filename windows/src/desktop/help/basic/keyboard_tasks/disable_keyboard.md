@@ -61,8 +61,8 @@ To enable a Keyman keyboard:
 
 **Related Topics**
 
--   [???](#basic_uninstall_keyboard)
+-   [Uninstall a Keyboard](uninstall_keyboard)
 
--   [???](#basic_enable_keyboard)
+-   [Turn on a Keyboard](enable_keyboard)
 
--   [???](#basic_keyboards_tab)
+-   [Keyboard Layouts Tab](../config_tasks/keyboards_tab)

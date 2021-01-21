@@ -56,6 +56,6 @@ Configuration. In the Support tab you will see:
 
 **Related Topics**
 
--   [???](#basic_config_menu)
+-   [Keyman Configuration Menu](config_menu)
 
--   [???](#start_download-install_keyman)
+-   [Download and Install Keyman](../../start/download-install_keyman)

@@ -38,12 +38,12 @@ Layouts tab of Keyman Configuration:
 **Uninstalling a Keyboard**
 
 To uninstall a Keyman keyboard from the Keyboard Layouts tab of Keyman
-Configuration, see: [???](#basic_uninstall_keyboard)
+Configuration, see: [Uninstall a Keyboard](../keyboard_tasks/uninstall_keyboard)
 
 **Enabling and Disabling a Keyboard**
 
 To enable or disable a Keyman keyboard from the Keyboard Layouts tab of
-Keyman Configuration, see: [???](#basic_disable_keyboard)
+Keyman Configuration, see: [Disable a Keyboard](../keyboard_tasks/disable_keyboard)
 
 **Setting a Hotkey**
 
@@ -143,8 +143,8 @@ Code.
 All Keyman keyboards are associated with a Windows language by default.
 To change the association, or add a new association, see the following:
 
--   [???](#start_configure_computer)
+-   [Configure Computer](../../start/configure_computer)
 
 **Related Topics**
 
--   [???](#basic_config_menu)
+-   [Keyman Configuration Menu](config_menu)

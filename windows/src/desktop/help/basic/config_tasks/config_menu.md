@@ -23,12 +23,12 @@ To open Keyman Configuration:
 
 For more information on using Keyman Configuration, see:
 
--   [???](#start_locale)
+- [How To - Set the Language for Keyman for Windows Menus](../../start/locale)
 
--   [???](#basic_keyboards_tab)
+- [Keyboards Layout Tab](keyboards_tab)
 
--   [???](#basic_options_tab)
+- [Options Tab](options_tab)
 
--   [???](#basic_hotkeys_tab)
+- [Hotkeys Tab](hotkeys_tab)
 
--   [???](#basic_support_tab)
+- [Support Tab](support_tab)

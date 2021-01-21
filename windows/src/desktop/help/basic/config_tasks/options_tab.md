@@ -188,6 +188,6 @@ To open the Options tab of Keyman Configuration:
 
 **Related Topics**
 
--   [???](#basic_config_menu)
+-   [Keyman Configuration Menu](config_menu)
 
--   [???](#basic_hotkeys_tab)
+-   [Hotkeys Tab](hotkeys_tab)

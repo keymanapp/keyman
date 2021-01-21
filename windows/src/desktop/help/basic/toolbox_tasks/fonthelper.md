@@ -43,6 +43,6 @@ the fonts you need.
 
 **Related Topics**
 
--   [???](#basic_toolbox)
+-   [Toolbox](toolbox)
 
--   [???](#basic_enable_keyboard)
+-   [Turn on a Keyboard](../keyboard_tasks/enable_keyboard)
