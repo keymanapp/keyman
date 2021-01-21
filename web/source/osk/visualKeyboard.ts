@@ -1732,6 +1732,7 @@ namespace com.keyman.osk {
         // #2:  if no perfect match exists, choose a subkey with the same key ID.
         if(skSpec.id == baseKey.keyId && skSpec.layer == baseKey.key.layer) {
           bk = skElement;
+          break; // Best possible match has been found.
         } else if(!bk && skSpec.id == baseKey.keyId) {
           bk = skElement;
         }
