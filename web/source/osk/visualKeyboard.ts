@@ -2136,8 +2136,16 @@ namespace com.keyman.osk {
         }
         ks.height=ks.lineHeight=ks.minHeight=(rowHeight-pad)+'px';
 
-        if(keyElement.key) {
-          ks.fontSize = keyElement.key.getIdealFontSize(this, ks);
+        // Get the kmw-key-text element & style.
+        for(j=0; j<keyElement.childNodes.length; j++) {
+          if(util.hasClass(keyElement.childNodes[j] as HTMLElement,'kmw-key-text')) {
+            break;
+          }
+        }
+
+        let keyTextSpan = keyElement.childNodes[j] as HTMLElement;
+        if(keyElement.key && keyTextSpan) { // space bar may not define the text span!
+          keyTextSpan.style.fontSize = keyElement.key.getIdealFontSize(this, ks);
         }
 
         // Rescale keycap labels on iPhone (iOS 7)
