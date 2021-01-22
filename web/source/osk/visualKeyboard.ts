@@ -603,7 +603,7 @@ namespace com.keyman.osk {
     // Formerly known as osk._DivVKbd
     kbdDiv: HTMLDivElement;
     kbdHelpDiv: HTMLDivElement;
-    styleSheet: HTMLStyleElement;
+    static styleSheet: HTMLStyleElement;
 
     _width: number;
     _height: number;
@@ -743,8 +743,8 @@ namespace com.keyman.osk {
       } else if(newWidth > 0.9*screen.width) {
         newWidth=0.9*screen.width;
       }
-  
-      // Default height decision made here: 
+
+      // Default height decision made here:
       // https://github.com/keymanapp/keyman/pull/4279#discussion_r560453929
       newHeight=util.toNumber(c['height'], 0.333 * newWidth);
 
@@ -759,8 +759,8 @@ namespace com.keyman.osk {
 
     /**
      * Sets & tracks the size of the VisualKeyboard's primary element.
-     * @param width 
-     * @param height 
+     * @param width
+     * @param height
      * @param pending Set to `true` if called during a resizing interaction
      */
     public setSize(width: number, height: number, pending?: boolean) {
@@ -2196,8 +2196,8 @@ namespace com.keyman.osk {
       }
 
       // First remove any existing keyboard style sheet
-      if(this.styleSheet) {
-        util.removeStyleSheet(this.styleSheet);
+      if(VisualKeyboard.styleSheet) {
+        util.removeStyleSheet(VisualKeyboard.styleSheet);
       }
 
       var i, kfd=activeStub['KFont'], ofd=activeStub['KOskFont'];
@@ -2217,7 +2217,7 @@ namespace com.keyman.osk {
       if( activeKeyboard != null && typeof(activeKeyboard.oskStyling) == 'string')  // KMEW-129
         customStyle=customStyle+activeKeyboard.oskStyling;
 
-      this.styleSheet = util.addStyleSheet(customStyle); //Build 360
+      VisualKeyboard.styleSheet = util.addStyleSheet(customStyle); //Build 360
 
       // Wait until font is loaded then align duplicated input elements with page elements
       if(this.waitForFonts(kfd,ofd)) {
