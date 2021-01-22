@@ -92,7 +92,7 @@ namespace com.keyman.osk {
      * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
      * This version has been substantially modified to work for this particular application.
      */
-    static getTextWidth(osk: VisualKeyboard, text: string, style: {fontFamily?: string, fontSize: string}) {
+    static getTextMetrics(osk: VisualKeyboard, text: string, style: {fontFamily?: string, fontSize: string}): TextMetrics {
       // A final fallback - having the right font selected makes a world of difference.
       if(!style.fontFamily) {
         style.fontFamily = getComputedStyle(document.body).fontFamily;
@@ -118,11 +118,55 @@ namespace com.keyman.osk {
       }
 
       // re-use canvas object for better performance
-      var canvas = OSKKey.getTextWidth['canvas'] || (OSKKey.getTextWidth['canvas'] = document.createElement("canvas"));
+      var canvas: HTMLCanvasElement = OSKKey.getTextMetrics['canvas'] || 
+                                     (OSKKey.getTextMetrics['canvas'] = document.createElement("canvas"));
       var context = canvas.getContext("2d");
       context.font = fontSize + " " + fontFamily;
       var metrics = context.measureText(text);
-      return metrics.width;
+
+      return metrics;
+    }
+
+    getIdealFontSize(osk: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
+      // Recompute the new width for use in autoscaling calculations below, just in case.
+      let util = com.keyman.singleton.util;
+      let metrics = OSKKey.getTextMetrics(osk, this.spec.text, style);
+
+      let fontSpec = util.getFontSizeStyle(style.fontSize);
+      let keyWidth = this.getKeyWidth(osk);
+      const MAX_X_PROPORTION = 0.90;
+      const MAX_Y_PROPORTION = 0.90;
+      const X_PADDING = 2;
+      const Y_PADDING = 2;
+
+      var fontHeight: number, keyHeight: number;
+      if(metrics.fontBoundingBoxAscent) {
+        fontHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+      }
+
+      let textHeight = fontHeight ? fontHeight + Y_PADDING : 0;
+      if(style.height && style.height.indexOf('px') != -1) {
+        keyHeight = Number.parseFloat(style.height.substring(0, style.height.indexOf('px')));
+      }
+
+      let xProportion = (keyWidth * MAX_X_PROPORTION) / (metrics.width + X_PADDING); // How much of the key does the text want to take?
+      let yProportion = textHeight && keyHeight ? (keyHeight * MAX_Y_PROPORTION) / textHeight : undefined;
+
+      var proportion: number = xProportion;
+      if(yProportion && yProportion < xProportion) {
+        proportion = yProportion;
+      }
+
+      // Never upscale keys past the default - only downscale them.
+      // Proportion < 1:  ratio of key width to (padded [loosely speaking]) text width
+      //                  maxProportion determines the 'padding' involved.
+      if(proportion < 1) {
+        if(fontSpec.absolute) {
+          return proportion * fontSpec.val + 'px';
+        } else {
+          return proportion * fontSpec.val + 'em';
+        }
+      }
     }
 
     getKeyWidth(osk: VisualKeyboard): number {
@@ -240,7 +284,7 @@ namespace com.keyman.osk {
       }
 
       // Check the key's display width - does the key visualize well?
-      var width: number = OSKKey.getTextWidth(osk, keyText, styleSpec);
+      var width: number = OSKKey.getTextMetrics(osk, keyText, styleSpec).width;
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
 
@@ -255,24 +299,9 @@ namespace com.keyman.osk {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }
-
-        // Recompute the new width for use in autoscaling calculations below, just in case.
-        width = OSKKey.getTextWidth(osk, keyText, styleSpec);
       }
 
-      let fontSpec = util.getFontSizeStyle(ts.fontSize);
-      let keyWidth = this.getKeyWidth(osk);
-      let maxProportion = 0.90;
-      let proportion = (keyWidth * maxProportion) / width; // How much of the key does the text want to take?
-
-      // Never upscale keys past the default - only downscale them.
-      if(proportion < 1) {
-        if(fontSpec.absolute) {
-          ts.fontSize = proportion * fontSpec.val + 'px';
-        } else {
-          ts.fontSize = proportion * fontSpec.val + 'em';
-        }
-      }
+      ts.fontSize = this.getIdealFontSize(osk, styleSpec);
 
       // Finalize the key's text.
       t.innerHTML = keyText;
@@ -1913,11 +1942,19 @@ namespace com.keyman.osk {
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = util.getFontSizeStyle(emSizeStr).val;
+
         var emScale = 1;
         if(!this.isStatic) {
           // Reading this requires the OSK to be active, so we filter out
           // BuildVisualKeyboard calls here.
-          emScale = util.getFontSizeStyle(keyman.osk._Box).val;
+          let boxFontStyle = util.getFontSizeStyle(keyman.osk._Box);
+
+          // Double-check against the font scaling applied to the _Box element.
+          if(boxFontStyle.absolute) {
+            return boxFontStyle.val;
+          } else {
+            emScale = boxFontStyle.val;
+          }
         }
         return emSize * emScale;
       }
@@ -2099,35 +2136,48 @@ namespace com.keyman.osk {
 
       let nKeys=keys.length;
       for(let nKey=0;nKey<nKeys;nKey++) {
-        let key=keys[nKey] as HTMLElement;
+        let keySquare=keys[nKey] as HTMLElement;
         //key.style.marginTop = (device.formFactor == 'phone' ? pad : 4)+'px';
         //**no longer needed if base key label and popup icon are within btn, not container**
 
         // Must set the height of the btn DIV, not the label (if any)
         var j;
-        for(j=0; j<key.childNodes.length; j++) {
-          if(util.hasClass(key.childNodes[j] as HTMLElement,'kmw-key')) {
+        for(j=0; j<keySquare.childNodes.length; j++) {
+          if(util.hasClass(keySquare.childNodes[j] as HTMLElement,'kmw-key')) {
             break;
           }
         }
 
         // Set the kmw-key-square position
-        let ks=key.style;
+        let ks=keySquare.style;
         if(!this.isStatic) {
           ks.bottom=(bottom-pad/2)+'px';
         }
         ks.height=ks.minHeight=(rowHeight)+'px';
 
         // Set the kmw-key position
-        ks=(key.childNodes[j] as HTMLElement).style;
+        let keyElement = keySquare.childNodes[j] as KeyElement;
+        ks=keyElement.style;
         if(!this.isStatic) {
           ks.bottom=bottom+'px';
         }
         ks.height=ks.lineHeight=ks.minHeight=(rowHeight-pad)+'px';
 
+        // Get the kmw-key-text element & style.
+        for(j=0; j<keyElement.childNodes.length; j++) {
+          if(util.hasClass(keyElement.childNodes[j] as HTMLElement,'kmw-key-text')) {
+            break;
+          }
+        }
+
+        let keyTextSpan = keyElement.childNodes[j] as HTMLElement;
+        if(keyElement.key && keyTextSpan) { // space bar may not define the text span!
+          keyTextSpan.style.fontSize = keyElement.key.getIdealFontSize(this, ks);
+        }
+
         // Rescale keycap labels on iPhone (iOS 7)
         if(resizeLabels && (j > 0)) {
-          (key.childNodes[0] as HTMLElement).style.fontSize='6px';
+          (keySquare.childNodes[0] as HTMLElement).style.fontSize='6px';
         }
       }
     }
@@ -2467,16 +2517,13 @@ namespace com.keyman.osk {
       var px=util.getStyleInt(kc, 'font-size');
       if(px != 0) {
         let popupFS = previewFontScale * px;
-        kts.fontSize = popupFS + 'px';
+        let scaleStyle = {
+          fontFamily: kts.fontFamily,
+          fontSize: popupFS + 'px',
+          height: 1.6 * xHeight + 'px' // as opposed to the canvas height of 2.3 * xHeight.
+        };
 
-        let textWidth = com.keyman.osk.OSKKey.getTextWidth(this, ktLabel.textContent, kts);
-        // We use a factor of 0.9 to serve as a buffer in case of mild measurement error.
-        let proportion = canvas.width * 0.9 / (textWidth);
-
-        // Prevent the preview from overrunning its display area.
-        if(proportion < 1) {
-          kts.fontSize = (popupFS * proportion) + 'px';
-        }
+        kts.fontSize = key.key.getIdealFontSize(this, scaleStyle);
       }
 
       ktLabel.textContent = kc.textContent;

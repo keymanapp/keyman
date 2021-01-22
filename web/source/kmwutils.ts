@@ -367,6 +367,9 @@ namespace com.keyman {
         fs = e;
       } else {
         fs = e.style.fontSize;
+        if(!fs) {
+          fs = getComputedStyle(e).fontSize;
+        }
       }
 
       if(fs.indexOf('em') != -1) {
