@@ -193,9 +193,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
     // Handle Keyman keyboard loaded event here if needed
-    // We can set our custom keyboard here
-    int kbIndex = KMManager.getKeyboardIndex(this, "tamil99m", "ta");
-    KMManager.setKeyboard(this, kbIndex);
   }
 
   @Override
