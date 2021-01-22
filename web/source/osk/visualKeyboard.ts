@@ -1066,12 +1066,11 @@ namespace com.keyman.osk {
       this.highlightKey(key,true);
 
       // Special function keys need immediate action
-      let _this = this;
       if(keyName == 'K_LOPT' || keyName == 'K_ROPT')      {
         window.setTimeout(function(this: VisualKeyboard){
           PreProcessor.clickKey(key);
           // Because we immediately process the key, we need to re-highlight it after the click.
-          _this.highlightKey(key, true);
+          this.highlightKey(key, true);
           // Highlighting'll be cleared automatically later.
         }.bind(this),0);
         this.keyPending = null;
