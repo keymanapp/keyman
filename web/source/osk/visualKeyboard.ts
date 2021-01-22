@@ -1715,9 +1715,33 @@ namespace com.keyman.osk {
       subKeys.shim.id = 'kmw-popup-shim';
       keyman.osk._Box.appendChild(subKeys.shim);
 
-      // Highlight the duplicated base key (if a phone)
+      // Highlight the duplicated base key or ideal subkey (if a phone)
       if(device.formFactor == 'phone') {
-        var bk = <KeyElement> subKeys.childNodes[0].firstChild;
+        this.selectDefaultSubkey(e, subKeySpec, subKeys);
+      }
+    }
+
+    selectDefaultSubkey(baseKey: KeyElement, subkeys: OSKKeySpec[], popupBase: HTMLElement) {
+      var bk: KeyElement;
+      for(let i=0; i < subkeys.length; i++) {
+        let skSpec = subkeys[i];
+        let skElement = <KeyElement> popupBase.childNodes[i].firstChild;
+
+        // Preference order:
+        // #1:  if a default subkey has been specified, select it.  (pending, for 15.0+)
+        // #2:  if no default subkey is specified, default to a subkey with the same 
+        //      key ID and layer / modifier spec.
+        //if(skSpec.isDefault) { TODO for 15.0
+        //  bk = skElement;
+        //  break;
+        //} else
+        if(skSpec.id == baseKey.keyId && skSpec.layer == baseKey.key.layer) {
+          bk = skElement;
+          break; // Best possible match has been found.  (Disable 'break' once above block is implemented.)
+        }
+      }
+
+      if(bk) {
         this.keyPending = bk;
         this.highlightKey(bk,true);//bk.className = bk.className+' kmw-key-touched';
       }
