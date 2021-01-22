@@ -1728,13 +1728,16 @@ namespace com.keyman.osk {
         let skElement = <KeyElement> popupBase.childNodes[i].firstChild;
 
         // Preference order:
-        // #1:  subkey has same key ID and layer / modifier spec.
-        // #2:  if no perfect match exists, choose a subkey with the same key ID.
+        // #1:  if a default subkey has been specified, select it.  (pending, for 15.0+)
+        // #2:  if no default subkey is specified, default to a subkey with the same 
+        //      key ID and layer / modifier spec.
+        //if(skSpec.isDefault) { TODO for 15.0
+        //  bk = skElement;
+        //  break;
+        //} else
         if(skSpec.id == baseKey.keyId && skSpec.layer == baseKey.key.layer) {
           bk = skElement;
-          break; // Best possible match has been found.
-        } else if(!bk && skSpec.id == baseKey.keyId) {
-          bk = skElement;
+          break; // Best possible match has been found.  (Disable 'break' once above block is implemented.)
         }
       }
 
