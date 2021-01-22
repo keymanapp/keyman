@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.228 beta 2021-01-22
+
+* fix(web): uses CSS line-height to vertically center oversized OSK keycaps (#4255)
+* fix(web): OSK loading efficiency (#4279)
+* fix(web): default popup key selection, space highlight after popup (#4306)
+* fix(web): language menu key highlighting (#4308)
+* fix(web): dynamic font downscaling for OSK keys (#4270)
+* chore(windows/resources): Cleanup Notes and Tips in help (#4307)
+* fix(developer): Debug character grid performance (#4237)
+* chore(android/samples): Remove old sample keyboard loaded code (#4315)
+
 ## 14.0.227 beta 2021-01-21
 
 * fix(web): dynamic font downscaling for OSK keys (#4270)
