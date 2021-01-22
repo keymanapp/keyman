@@ -1069,6 +1069,9 @@ namespace com.keyman.osk {
       if(keyName == 'K_LOPT' || keyName == 'K_ROPT')      {
         window.setTimeout(function(this: VisualKeyboard){
           PreProcessor.clickKey(key);
+          // Because we immediately process the key, we need to re-highlight it after the click.
+          this.highlightKey(key, true);
+          // Highlighting'll be cleared automatically later.
         }.bind(this),0);
         this.keyPending = null;
         this.touchPending = null;
