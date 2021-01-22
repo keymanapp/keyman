@@ -12,7 +12,7 @@ title: Basic Help
 * [uninstall_keyboard](uninstall_keyboard)
 
 * [traymenu](traymenu)
-* [toolbox](toolbox)
+* [The Keyman Toolbox](toolbox)
 * [osk](osk)
 * [fonthelper](fonthelper)
 * [charactermap](charactermap)

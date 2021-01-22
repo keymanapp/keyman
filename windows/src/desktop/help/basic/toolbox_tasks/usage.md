@@ -55,7 +55,7 @@ Keyman keyboard:
 
 **Related Topics**
 
--   [Toolbox](toolbox)
+-   [The Keyman Toolbox](toolbox)
 
 -   [On Screen Keyboard](osk)
 

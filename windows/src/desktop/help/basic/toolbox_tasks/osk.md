@@ -68,6 +68,6 @@ keyboards designed phonetically, this is because there is not a simple
 
 **Related Topics**
 
--   [Toolbox](toolbox)
+-   [The Keyman Toolbox](toolbox)
 
 -   [Options Tab](../config_tasks/options_tab)

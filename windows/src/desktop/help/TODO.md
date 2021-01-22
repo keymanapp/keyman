@@ -5,3 +5,4 @@
 - search for \n\n- (gaps between bullets)
 - search for ^**...**$
 - search for keyboard references and use <kbd></kbd>
+- implement `troubleshooting_hidden` page (desired by windows/src/desktop/help/basic/keyboard_tasks/enable_keyboard.md)
