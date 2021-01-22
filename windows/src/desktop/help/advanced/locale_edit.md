@@ -50,12 +50,8 @@ product using the Keyman Engine for Windows, you may change your
 product's default language, and this would then entail changing
 SKDefaultLanguageCode.
 
-<div class="note">
-
-Any entries missing from the translation will be retrieved from the
+**Note:** Any entries missing from the translation will be retrieved from the
 default file.
-
-</div>
 
 ## Related Topics
 

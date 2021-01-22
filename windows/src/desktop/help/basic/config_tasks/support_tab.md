@@ -20,9 +20,8 @@ To open the Support tab of Keyman Configuration:
 
 3.  Select the Support tab.
 
-    ::: {.tip}
+    **Tip:**
     Keyman Configuration opens in the same tab you last closed it in.
-    :::
 
 **Collecting Diagnostic Information**
 

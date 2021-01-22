@@ -7,14 +7,13 @@ shows the currently selected Keyman keyboard or Windows layout.
 
 ![](desktop_images/osk-tibetan.png)
 
-::: {.note}
+**Note:**
 Some Keyman keyboards do not contain an On Screen Keyboard view. You can
 find more help for those keyboards from the
 
 Keyboard Usage tool
 
 of the Keyman Toolbox.
-:::
 
 **Opening the On Screen Keyboard**
 
@@ -41,12 +40,11 @@ To use the On Screen Keyboard as a reference help:
 2.  Type on your physical keyboard, using the On Screen Keyboard as a
     guide.
 
-    ::: {.note}
+    **Note:**
     The On Screen Keyboard will match the Shift state of your hardware
     keyboard. This means you can press any combination of Shift, Ctrl,
     Alt and AltGr (or RightAlt) and the On Screen Keyboard will change
     to show you the Shift state of your hardware keyboard.
-    :::
 
 To enter text using the On Screen Keyboard:
 
@@ -67,20 +65,13 @@ keyboard.
 When no Keyman keyboard is on, the blue font on the keycaps shows the
 characters of your active Windows layout.
 
-::: {.note}
+**Note:**
 Some Keyman keyboards do not have an On Screen Keyboard view. For
 keyboards designed phonetically, this is because there is not a simple
 1-1 correspondence between each key and the letter you want to type. The
+Keyboard Usage tool is often helpful for these keyboards and Keyman will switch to this view
+by default. This option can be changed in Keyman Configuration.
 
-Keyboard Usage tool
-
-is often helpful for these keyboards and Keyman will switch to this view
-by default. This option can be changed in
-
-Keyman Configuration
-
-.
-:::
 
 **Related Topics**
 

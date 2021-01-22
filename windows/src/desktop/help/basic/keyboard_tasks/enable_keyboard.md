@@ -4,11 +4,10 @@ title: Keyboard Task - Turn on a Keyboard {#basic_enable_keyboard}
 
 Here are five simple ways to turn on a Keyman keyboard.
 
-::: {.note}
+**Note:**
 To use a Keyman keyboard, the keyboard must be enabled in the Keyboard
 Layouts tab of Keyman Configuration. For help enabling your keyboard,
 see:
-:::
 
 **Turning on a Keyboard from the Keyman Menu**
 
@@ -16,10 +15,9 @@ To turn on a keyboard from the Keyman menu:
 
 1.  Open an application to type in, like MS Word.
 
-    ::: {.note}
+    **Note:**
     You need to have an application open for your Keyman keyboard to
     load correctly.
-    :::
 
 2.  Start Keyman.
 
@@ -59,10 +57,9 @@ Here\'s how to turn on a keyboard using the Language Switcher:
 
 1.  Open an application to type in, like MS Word.
 
-    ::: {.note}
+    **Note:**
     You need to have an application open for your Keyman keyboard to
     load correctly.
-    :::
 
 2.  Start Keyman.
 
@@ -73,11 +70,10 @@ Here\'s how to turn on a keyboard using the Language Switcher:
     last key in the hotkey to use the Language Switcher. When you
     release Alt, the Language Switcher will close.
 
-    ::: {.note}
+    **Note:**
     By default, the Language Switcher hotkey is Left.Alt + Shift. You
     can view or change the current Language Switcher hotkey from the
     [Hotkeys tab](#basic_hotkeys_tab) of Keyman Configuration.
-    :::
 
     ![](desktop_images/languageswitcher-small.png)
 
@@ -99,12 +95,11 @@ To turn on a keyboard from the Keyman menu:
 
 3.  Press and release the hotkey for your Keyman keyboard.
 
-    ::: {.note}
+    **Note:**
     You can find the current hotkey for your keyboard in the Keyman
     menu. You can set or reset a hotkey for your keyboard from the
     Hotkeys tab
     of Keyman Configuration.
-    :::
 
     ![](desktop_images/menu.png)
 

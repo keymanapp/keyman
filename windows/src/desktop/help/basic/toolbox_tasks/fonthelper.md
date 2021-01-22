@@ -36,11 +36,10 @@ The Character Chart will allow you to see exactly which characters your
 font supports. It will also allow you to see how the same characters
 look in different fonts.
 
-::: {.tip}
+**Tip:**
 If no fonts are listed in the Font Helper, check the documentation of
 the keyboard layout to see if it includes information on where to obtain
 the fonts you need.
-:::
 
 **Related Topics**
 

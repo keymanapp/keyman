@@ -5,10 +5,9 @@ title: Keyboard Task - Uninstall a Keyboard {#basic_uninstall_keyboard}
 Uninstalling a Keyman keyboard removes it from Keyman. If you want to
 use the Keyman keyboard again it must be reinstalled.
 
-::: {.note}
+**Note:**
 You can disable a keyboard temporarily, instead of uninstalling it. For
 more help, see:
-:::
 
 To uninstall a Keyman keyboard:
 

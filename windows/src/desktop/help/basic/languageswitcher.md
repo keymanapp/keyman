@@ -19,7 +19,7 @@ To open and use the Keyman Language Switcher
     last key in the hotkey (Shift) to use the Language Switcher. When you
     release Alt, the Language Switcher will close.
 
-    **Note**: By default, the Language Switcher hotkey is Left.Alt + Shift. You
+    **Note:** By default, the Language Switcher hotkey is Left.Alt + Shift. You
     can view or change the current Language Switcher hotkey from the
     [Hotkeys tab](#basic_hotkeys_tab) of Keyman Configuration.
 

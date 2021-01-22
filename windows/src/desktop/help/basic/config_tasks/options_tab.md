@@ -19,9 +19,8 @@ To open the Options tab of Keyman Configuration:
 
 3.  Select the Options tab.
 
-    ::: {.tip}
+    **Tip:**
     Keyman Configuration opens in the same tab you last closed it in.
-    :::
 
 **Using General Options**
 
@@ -34,11 +33,10 @@ To open the Options tab of Keyman Configuration:
     keyboard on and off. Untick this option and a Keyman keyboard hotkey
     will only turn the Keyman keyboard on.
 
-    ::: {.tip}
+    **Tip:**
     Set hotkeys in the
     Hotkeys tab
     of Keyman Configuration.
-    :::
 
 -   Simulate AltGr with Ctrl+Alt
 
@@ -71,10 +69,9 @@ To open the Options tab of Keyman Configuration:
     while using Keyman. Tick this option to show all hint messages.
     Untick this option to hide all hint messages.
 
-    ::: {.note}
+    **Note:**
     You can also hide hint messages on a case-by-case bases by ticking
     at the bottom of each hint.
-    :::
 
 -   Reset Hints
 
@@ -106,10 +103,9 @@ To open the Options tab of Keyman Configuration:
     you have installed. Untick this option to check for updates
     manually.
 
-    ::: {.note}
+    **Note:**
     Keyman can be updated manually through the Support tab in the
     Configuration menu.
-    :::
 
 -   Test for conflicting applications when Keyman starts
 
@@ -177,11 +173,10 @@ To open the Options tab of Keyman Configuration:
     Windows Event Viewer for viewing, or Microsoft Message Analyzer
     (recommended).
 
-    ::: {.note}
+    **Note:**
     It is highly recommended that you switch off this option after
     obtaining the debug log. The log files can grow very large very
     quickly!
-    :::
 
     ::: {.warning}
     Privacy Warning - The debug log records every keystroke you type,

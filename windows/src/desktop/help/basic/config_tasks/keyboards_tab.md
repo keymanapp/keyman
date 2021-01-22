@@ -21,9 +21,8 @@ To open the Keyboard Layouts tab of Keyman Configuration:
 
 3.  Select the Keyboard Layouts tab.
 
-    ::: {.tip}
+    **Tip:**
     Keyman Configuration opens in the same tab you last closed it in.
-    :::
 
 **Installing a Keyboard**
 
@@ -61,21 +60,18 @@ Keyman Configuration:
 3.  Select a default hotkey or click Custom and type the hotkey you wish
     to use.
 
-    ::: {.note}
+    **Note:**
     If you press a single letter or Shift plus a single letter, the
     hotkey will default to Ctrl + Alt plus the letter you pressed, in
     order to avoid conflicts with standard keyboard input.
-    :::
 
-    ::: {.note}
+    **Note:**
     To clear a hotkey that has been set previously, click Clear Hotkey
     or press Backspace.
-    :::
 
-    ::: {.note}
+    **Note:**
     Be aware that you can set the hotkey to replace common Windows
     hotkeys (Ctrl + C, Ctrl + V, etc).
-    :::
 
 4.  Click OK to save your selection.
 

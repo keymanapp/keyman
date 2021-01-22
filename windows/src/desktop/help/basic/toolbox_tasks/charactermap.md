@@ -33,17 +33,15 @@ To insert a character from the Character Map into a document:
 
     -   Right-clicking on the character and selecting Insert Character.
 
-::: {.note}
+**Note:**
 If the Insert Mode is set to Code or Name, pressing Enter or
 double-clicking on a character will insert the Unicode code or Unicode
 name of the character, not the character itself!
-:::
 
-::: {.note}
+**Note:**
 You can also hold Ctrl and then a single click on a character will
 insert it into the document. This allows for smoother insertion of
 multiple characters from the Character Map.
-:::
 
 **Character Map Options**
 

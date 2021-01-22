@@ -18,16 +18,15 @@ To open the Hotkeys tab of Keyman Configuration:
 
 3.  Select the Hotkeys tab.
 
-    ::: {.tip}
+    **Tip:**
     Keyman Configuration opens in the same tab you last closed it in.
-    :::
 
 **Setting Hotkeys**
 
 For help setting hotkeys in the Hotkeys tab of Keyman Configuration,
 see: [???](#start_hotkey_set)
 
-::: {.note}
+**Note:**
 By default, hotkeys only turn on a function or keyboard. If you prefer
 hotkeys to turn on or off a function or keyboard, you can change this
 behaviour in the [Options tab](#basic_options_tab) of Keyman
@@ -46,7 +45,6 @@ following hotkeys will toggle with this option enabled:
 -   Show Character Map Pane
 
 -   Any Keyman Keyboard Hotkey
-:::
 
 **About Hotkeys**
 

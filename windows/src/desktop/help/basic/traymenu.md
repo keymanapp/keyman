@@ -15,7 +15,7 @@ To display the Keyman menu, click on the Keyman icon.
 
 ![](desktop_images/menu.png)
 
-**Note**: If you cannot find the Keyman menu or Keyman icon, for more help see:
+**Note:** If you cannot find the Keyman menu or Keyman icon, for more help see:
 
 [Finding a Missing Keyman Menu](***)
 
@@ -30,9 +30,9 @@ The left side of the Keyman menu lists the Keyman keyboards currently
 installed and enabled on your computer. Click on a keyboard to turn it
 on and start using it.
 
-**Note**: You can add more Keyman keyboards to the Keyman menu through the Keyboard Layouts tab of Keyman Configuration.
+**Note:** You can add more Keyman keyboards to the Keyman menu through the Keyboard Layouts tab of Keyman Configuration.
 
-**Note**: To use a Keyman keyboard, the keyboard must be enabled in the Keyboard Layouts tab of Keyman Configuration. For help enabling your keyboard, see:
+**Note:** To use a Keyman keyboard, the keyboard must be enabled in the Keyboard Layouts tab of Keyman Configuration. For help enabling your keyboard, see:
 
 TODO: missing links
 
