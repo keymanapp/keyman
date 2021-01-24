@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.8 alpha 2021-01-18
+
+* chore(linux): Allow to push to the `keyman-beta` ppa (#4271)
+
 ## 15.0.7 alpha 2021-01-12
 
 * chore(linux): Update debian metadata (#4223)
