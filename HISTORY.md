@@ -1,5 +1,35 @@
 # Keyman Version History
 
+## 15.0.7 alpha 2021-01-12
+
+* chore(linux): Update debian metadata (#4223)
+
+## 15.0.6 alpha 2021-01-07
+
+* fix(linux): only pass tag if we just created one (#4220)
+
+## 15.0.5 alpha 2021-01-05
+
+* chore(linux): pass tag to Jenkins build (#4160) (#4215)
+
+## 15.0.4 alpha 2020-12-23
+
+* feat(common/models): naive backspace workaround, naive multi-char Transform mitigation (#4206)
+* fix(web): supplies missing (optional) argument to prevent warnings (#4208)
+* fix(ios): moves Settings notification UI code to main thread (#4210)
+
+## 15.0.3 alpha 2020-12-21
+
+* fix(web): Solving kmwosk color inconsistency (#4154)
+
+## 15.0.2 alpha 2020-12-16
+
+* fix(common): increment version needs to check base 🍒 (#4156)
+
+## 15.0.1 alpha 2020-12-14
+
+* chore: prepare 15.0 alpha (#4129)
+
 ## 14.0.227 beta 2021-01-21
 
 * fix(web): dynamic font downscaling for OSK keys (#4270)
