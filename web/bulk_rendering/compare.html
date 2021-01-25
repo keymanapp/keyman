@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+  This comparison page requires that you first generate the on screen keyboards using the
+  bulk renderer in index.html, then save the result to either before.html or after.html.
+  Then you can scroll the before results and the after results will scroll in sync.
+-->
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>KeymanWeb - On-Screen Keyboard Renders</title>
+  <style>
+    iframe { display: inline-block; width: 20%; height: 900px }
+  </style>
+  <script>
+    function matchScroll() {
+      document.getElementById('f2').contentWindow.document.documentElement.scrollTop =
+      document.getElementById('f2').contentWindow.pageYOffset = document.getElementById('f1').contentWindow.pageYOffset;
+    }
+
+    function attach() {
+      document.getElementById('f1').contentWindow.document.body.onscroll = matchScroll;
+    }
+  </script>
+</head>
+<body>
+  <iframe id='f1' src="before.html" onload="attach()"></iframe>
+  <iframe id='f2' src="after.html"></iframe>
+</body>
+</html>
