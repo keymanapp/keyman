@@ -91,6 +91,10 @@
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">The selected dictionary is already downloading; please try again in a moment!</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Dictionary download is finished.</string>
+    <!-- Context: Background download messages-->
+    <string name="failed_to_access_downloaded_file" comment="Failed to access downloaded file">Failed to access downloaded file</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Failed to retrieve downloaded file</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Failed to access server!</string>
     <!-- Context: General Updates -->
