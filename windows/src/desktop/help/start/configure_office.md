@@ -19,7 +19,17 @@ settings.
 
 ## Setting up MS Office 2017 and MS Office 365
 
-TODO: complete this
+To set up Microsoft Office 2017 / 365 for your Keyman keyboard:
+
+1.  Click Start, and search for Office Language Preferences.
+
+2.  Find your language by clicking the button \[Add a language\].
+
+3.  Click Add.
+
+4.  Click OK to confirm.
+
+5.  Restart your Office applications.
 
 ## Setting up MS Office 2013
 
@@ -93,8 +103,8 @@ To set up Microsoft Office 2003 for your Keyman keyboard:
 
 ## Related Topics
 
--   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
--   [How To - Set up Your Computer for a Keyman Keyboard](configure_computer)
+-   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
+-   [How To - Set up Your Computer for a Keyman Keyboard](configure-computer)
 -   [How To - Find the Best Fonts for a Keyman Keyboard](font)
 -   [How To - Type in Right-to-Left Languages](rtl)
--   [Keyboard Task - Turn on a Keyboard](enable_keyboard)
+-   [Keyboard Task - Turn on a Keyboard](../basic/select-keyboard)
