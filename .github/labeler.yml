@@ -6,7 +6,7 @@
 # folder names and labels; consider this documentation of that ;-)
 
 #
-# The top half of the file adds labels based on changed files
+# Add labels based on changed files using actions/labeler
 #
 
 android/: android/**
@@ -89,43 +89,3 @@ windows/config/: windows/src/desktop/**
 windows/engine/: windows/src/engine/**
 # windows/resources/
 # windows/samples/
-
-#
-# The lower part of the file adds labels based on the PR title
-#
-
-labels:
-  feat:
-    - '^feat(\(|:)'
-  fix:
-    - '^fix(\(|:)'
-  chore:
-    - '^chore(\(|:)'
-  #    "change",
-  docs:
-    - '^docs(\(|:)'
-  #    "style",
-  refactor:
-    - '^refactor(\(|:)'
-  #    "test",
-  auto:
-    - '^auto(\(|:)'
-  # Below are the scopes that we look for in the PR title
-  'android/':
-    - '\(.*android.*\):'
-  'common/':
-    - '\(.*common.*\):'
-  'developer/':
-    - '\(.*developer.*\):'
-  'ios/':
-    - '\(.*ios.*\):'
-  'linux/':
-    - '\(.*linux.*\):'
-  'mac/':
-    - '\(.*mac.*\):'
-  'oem/':
-    - '\(.*oem.*\):'
-  'web/':
-    - '\(.*web.*\):'
-  'windows/':
-    - '\(.*windows.*\):'

@@ -12,6 +12,7 @@ jobs:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
     - name: Update labels based on PR title
       id: labeler
-      uses: jimschubert/labeler-action@cfce1831f33e0e4604bbc4e6933eb2f56c2fa530
+      uses: fuxingloh/multi-labeler@8afa186ed03230c98fe24ebf9fe35093072ad46e
       with:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        config-path: .github/multi-labeler.yml
