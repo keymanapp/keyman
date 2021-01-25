@@ -108,6 +108,7 @@
         <DCCReference Include="Keyman.System.DevTools.BuildMessageConstants.pas"/>
         <DCCReference Include="Keyman.System.DevTools.BuildSetupStringTranslations.pas"/>
         <DCCReference Include="..\..\desktop\setup\SetupStrings.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
