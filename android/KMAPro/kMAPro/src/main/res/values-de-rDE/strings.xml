@@ -43,7 +43,7 @@
   <!-- Context: Get Started menu -->
   <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">Show \"%1$s\" on startup</string>
   <!-- Context: Android Storage Permission -->
-  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    To install keyboard packages, allow Keyman permission to read/write storage.</string>
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    To install keyboard packages, allow Keyman permission to read external storage.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Storage permission request was denied. May fail to install keyboard package</string>
   <!-- Context: Keyman Settings menu -->
@@ -55,6 +55,8 @@
   </plurals>
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Install Keyboard or Dictionary</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="change_display_language" comment="Menu action to change interface language">Change display language</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Always show banner</string>
   <!-- Context: Keyman Settings menu -->
@@ -109,6 +111,8 @@
   <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Welcome to %1$s</string>
   <!-- Context: KMP Package strings -->
   <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Dictionary</string>
+  <!-- Context: KMP Package strings -->
+  <string name="not_valid_package_file" comment="Notification when invalid package file cannot be installed">%1$s is not a valid Keyman package file.\n%2$s\"</string>
   <!-- Context: KMP Package strings -->
   <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Keyboard package has no touch-optimized keyboards to install</string>
   <!-- Context: KMP Package strings -->
