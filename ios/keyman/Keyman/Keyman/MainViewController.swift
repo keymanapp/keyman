@@ -110,14 +110,14 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // We have to gerry-rig this so that the framework-based SettingsViewController
     // can launch the app-based DocumentViewController.
     if #available(iOS 11.0, *) {
-      Manager.shared.fileBrowserLauncher = { _ in
+      Manager.shared.fileBrowserLauncher = { navVC in
         let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"],
                                               in: .import,
-                                              navVC: self.navigationController!)
+                                              navVC: navVC)
 
-        // Auto-dismiss the settings menu, then present the "install from file" browser.
-        self.navigationController!.topViewController!.dismiss(animated: true, completion: nil)
-        self.present(vc, animated: true)
+        // Present the "install from file" browser within the specified navigation view controller.
+        // (Allows displaying from within the Settings menu)
+        navVC.present(vc, animated: true)
       }
     }
   }

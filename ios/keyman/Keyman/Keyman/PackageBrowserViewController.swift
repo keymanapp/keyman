@@ -97,7 +97,11 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
         activitySpinner.stopAnimating()
         activitySpinner.removeFromSuperview()
         self.view.isUserInteractionEnabled = true
-        self.dismiss(animated: true, completion: nil)
+        if let navVC = self.navVC {
+          navVC.dismiss(animated: true, completion: nil)
+        } else {
+          self.dismiss(animated: true, completion: nil)
+        }
       }
     }
 
