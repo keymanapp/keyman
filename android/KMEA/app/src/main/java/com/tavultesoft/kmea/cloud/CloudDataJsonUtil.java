@@ -307,24 +307,26 @@ public class CloudDataJsonUtil {
    * @param aDownload the download
    * @return the result
    */
-  public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload(CloudApiTypes.SingleCloudDownload aDownload)
+  public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload(
+    Context context, CloudApiTypes.SingleCloudDownload aDownload)
   {
       JSONParser jsonParser = new JSONParser();
       JSONArray dataArray = null;
       JSONObject dataObject = null;
 
-      if (aDownload.getDestinationFile() != null && aDownload.getDestinationFile().length() > 0) {
+      File destinationFile = aDownload.cacheAndOpenDestinationFile(context);
+      if (destinationFile != null && destinationFile.length() > 0) {
         try {
 
           if (aDownload.getCloudParams().type == CloudApiTypes.JSONType.Array) {
-            dataArray = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONArray.class);
+            dataArray = jsonParser.getJSONObjectFromFile(destinationFile,JSONArray.class);
           } else {
-            dataObject = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONObject.class);
+            dataObject = jsonParser.getJSONObjectFromFile(destinationFile,JSONObject.class);
           }
         } catch (Exception e) {
           KMLog.LogException(TAG, "", e);
         } finally {
-          aDownload.getDestinationFile().delete();
+          destinationFile.delete();
         }
       } else {
         // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.

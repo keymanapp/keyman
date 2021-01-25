@@ -72,7 +72,9 @@ type
 
   PCEFTitleChangeEventData = ^TCEFTitleChangeEventData;
 
+  TCEFHostBeforeBrowseExSyncEvent = procedure(Sender: TObject; const Url: string; isMain, isPopup: Boolean; out Handled: Boolean) of object;
   TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean) of object;
+  TCEFHostBeforeBrowseExEvent = procedure(Sender: TObject; const Url: string; isMain, isPopup, wasHandled: Boolean) of object;
   TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean) of object;
   TCEFCommandEvent = procedure(Sender: TObject; const command: string; params: TStringList) of object;
 
@@ -136,6 +138,7 @@ type
     FNextURL: string;
     FOnLoadEnd: TNotifyEvent;
     FOnBeforeBrowseSync: TCEFHostBeforeBrowseSyncEvent;
+    FOnBeforeBrowseExSync: TCEFHostBeforeBrowseExSyncEvent;
     FOnAfterCreated: TNotifyEvent;
     FShutdownCompletionHandler: TShutdownCompletionHandlerEvent;
     FIsClosing: Boolean;
@@ -146,6 +149,7 @@ type
     FOnPreKeySyncEvent: TCEFHostPreKeySyncEvent;
     FOnKeyEvent: TCEFHostKeyEvent;
     FOnBeforeBrowse: TCEFHostBeforeBrowseEvent;
+    FOnBeforeBrowseEx: TCEFHostBeforeBrowseExEvent;
     FOnTitleChange: TCEFHostTitleChangeEvent;
     FOnCommand: TCEFCommandEvent;
     FOnResizeFromDocument: TCEFHostResizeFromDocumentEvent;
@@ -180,7 +184,7 @@ type
 
     procedure CreateBrowser;
     procedure Navigate; overload;
-    procedure DoBeforeBrowse(const url: string; isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
+    procedure DoBeforeBrowse(const url: string; isMain, isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
   public
     procedure DoResizeByContent;
     procedure SetFocus; override;
@@ -190,8 +194,10 @@ type
     property ShouldShowContextMenu: Boolean read FShouldShowContextMenu write FShouldShowContextMenu;
     property ShouldOpenRemoteUrlsInBrowser: Boolean read FShouldOpenRemoteUrlsInBrowser write FShouldOpenRemoteUrlsInBrowser;
     property OnAfterCreated: TNotifyEvent read FOnAfterCreated write FOnAfterCreated;
+    property OnBeforeBrowseExSync: TCEFHostBeforeBrowseExSyncEvent read FOnBeforeBrowseExSync write FOnBeforeBrowseExSync;
     property OnBeforeBrowseSync: TCEFHostBeforeBrowseSyncEvent read FOnBeforeBrowseSync write FOnBeforeBrowseSync;
     property OnCommand: TCEFCommandEvent read FOnCommand write FOnCommand;
+    property OnBeforeBrowseEx: TCEFHostBeforeBrowseExEvent read FOnBeforeBrowseEx write FOnBeforeBrowseEx;
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
     property OnHelpTopic: TNotifyEvent read FOnHelpTopic write FOnHelpTopic;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
@@ -434,7 +440,7 @@ procedure TframeCEFHost.Handle_CEF_BEFOREBROWSE(var message: TMessage);
 var
   params: TStringList;
   url: string;
-  isPopup, wasHandled,
+  isMain, isPopup, wasHandled,
   shouldOpenUrlIfNotHandled: Boolean;
 begin
   AssertVclThread;
@@ -444,10 +450,15 @@ begin
   wasHandled := (message.WParam and 1) = 1;
   shouldOpenUrlIfNotHandled := (message.WParam and 2) = 2;
   isPopup := (message.WParam and 4) = 4;
+  isMain := (message.WParam and 8) = 8;
 
   if wasHandled then
   begin
-    if Assigned(FOnBeforeBrowse) then
+    if Assigned(FOnBeforeBrowseEx) then
+    begin
+      FOnBeforeBrowseEx(Self, url, isMain, isPopup, wasHandled);
+    end
+    else if Assigned(FOnBeforeBrowse) then
     begin
       FOnBeforeBrowse(Self, url, isPopup, wasHandled);
     end;
@@ -491,10 +502,10 @@ procedure TframeCEFHost.cefBeforeBrowse(Sender: TObject;
 begin
   AssertCefThread;
 
-  DoBeforeBrowse(request.Url, False, False, Result);
+  DoBeforeBrowse(request.Url, frame.IsMain, False, False, Result);
 end;
 
-procedure TframeCEFHost.DoBeforeBrowse(const url: string; isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
+procedure TframeCEFHost.DoBeforeBrowse(const url: string; isMain, isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
 var
   params: TStringList;
   wParam: DWORD;
@@ -503,7 +514,11 @@ begin
 
   Handled := False;
 
-  if Assigned(FOnBeforeBrowseSync) then
+  if Assigned(FOnBeforeBrowseExSync) then
+  begin
+    FOnBeforeBrowseExSync(Self, url, isMain, isPopup, Handled);
+  end
+  else if Assigned(FOnBeforeBrowseSync) then
   begin
     FOnBeforeBrowseSync(Self, url, isPopup, Handled);
   end;
@@ -530,6 +545,8 @@ begin
       wParam := wParam or 2;
     if isPopup then
       wParam := wParam or 4;
+    if isMain then
+      wParam := wParam or 8;
     PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, wParam, LPARAM(params));
   end;
 end;
@@ -706,7 +723,7 @@ procedure TframeCEFHost.cefBeforePopup(Sender: TObject;
   var settings: TCefBrowserSettings; var noJavascriptAccess, Result: Boolean);
 begin
   AssertCefThread;
-  DoBeforeBrowse(targetUrl, True, True, Result);
+  DoBeforeBrowse(targetUrl, frame.IsMain, True, True, Result);
 end;
 
 procedure TframeCEFHost.cefRunContextMenu(Sender: TObject;

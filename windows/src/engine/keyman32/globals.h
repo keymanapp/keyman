@@ -201,6 +201,7 @@ typedef struct tagKEYMAN64THREADDATA
 
   LPWORD IndexStack;
   LPWSTR miniContext;
+  int miniContextIfLen;
 
   KMSTATE state;
 
@@ -223,7 +224,8 @@ typedef struct tagKEYMAN64THREADDATA
   BOOL TIPFUpdateable, TIPFPreserved;   // I4290
 
   BOOL FInRefreshKeyboards;
-  LONG RefreshTag_Process;
+  BOOL RefreshRequired;
+  LONG RefreshTag_Process; // TODO: we may be able to eliminate this with our delayed refresh pattern?
 
   /* Addin Globals */
 

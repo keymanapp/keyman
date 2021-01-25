@@ -260,23 +260,10 @@ begin
     if FInstallInfo.IsInstalled
       then Text := FInstallInfo.Text(ssOptionsUpgradeKeyman)
       else Text := FInstallInfo.Text(ssOptionsInstallKeyman);
-
-{
-    if not FInstallInfo.IsInstalled then
-      case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallKeyman, [FInstallInfo.BestMsi.Version]);
-        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadInstallKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
-      end
-    else
-      case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := FInstallInfo.Text(ssOptionsUpgradeKeyman, [FInstallInfo.BestMsi.Version]);
-        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadUpgradeKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
-      end;
-}
   end
   else if FInstallInfo.IsInstalled then
   begin
-    Text := FInstallInfo.Text(ssOptionsKeymanAlreadyInstalled, [FInstallInfo.InstalledVersion.Version]);
+    Text := FInstallInfo.Text(ssOptionsKeymanAlreadyInstalled, [FInstallInfo.InstalledVersion.Version]);//TODO VersionWithTag?
   end
   else
   begin
@@ -289,8 +276,8 @@ begin
   for location in FInstallInfo.MsiLocations do
   begin
     case location.LocationType of
-      iilLocal: Text := FInstallInfo.Text(ssOptionsInstallKeymanVersion, [location.Version]);
-      iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadKeymanVersion, [location.Version, FormatFileSize(location.Size)]);
+      iilLocal: Text := FInstallInfo.Text(ssOptionsInstallKeymanVersion, [location.VersionWithTag]);
+      iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadKeymanVersion, [location.VersionWithTag, FormatFileSize(location.Size)]);
     end;
     cbKeymanLocation.Items.AddObject(Text, location);
   end;

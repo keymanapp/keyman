@@ -57,10 +57,10 @@ type
     FDownloadStatusText: string;
     FDownloadStatusCode: Integer;
     procedure DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string;
-      isPopup, wasHandled: Boolean);
-    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
-      isPopup: Boolean; out Handled: Boolean);
+    procedure cefBeforeBrowseEx(Sender: TObject; const Url: string;
+      isMain, isPopup, wasHandled: Boolean);
+    procedure cefBeforeBrowseExSync(Sender: TObject; const Url: string;
+      isMain, isPopup: Boolean; out Handled: Boolean);
     procedure cefLoadingStateChange(Sender: TObject; isLoading, canGoBack, canGoForward: Boolean);
     procedure DownloadAndInstallPackage(const PackageID, BCP47: string);
     procedure HttpReceiveData(const Sender: TObject; AContentLength,
@@ -107,8 +107,8 @@ begin
   inherited;
   // Ensures keyman.com hosted site opens locally
   cef.ShouldOpenRemoteUrlsInBrowser := False;
-  cef.OnBeforeBrowse := cefBeforeBrowse;
-  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnBeforeBrowseEx := cefBeforeBrowseEx;
+  cef.OnBeforeBrowseExSync := cefBeforeBrowseExSync;
   cef.OnLoadingStateChange := cefLoadingStateChange;
 
   FRenderPage := 'downloadkeyboard';
@@ -116,15 +116,17 @@ begin
   Content_Render;
 end;
 
-procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseSync(Sender: TObject; const Url: string;
-  isPopup: Boolean; out Handled: Boolean);
+procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseExSync(Sender: TObject; const Url: string;
+  isMain, isPopup: Boolean; out Handled: Boolean);
 begin
   // This introduces some deeper knowledge of URL paths in Keyman Configuration, which is
   // a bit of a shame, because we try to keep our internal knowledge to /go/ urls on
   // keyman.com. However, there is not really any great way around this that I've found,
   // which allows us to handle internal navigation on the keyboard search and still lets
   // us open other URLs that may be in the search results in an external browser.
+
   Handled :=
+    (IsMain and not IsLocalUrl(Url) and not Url.StartsWith('keyman:')) or // prevent Ctrl+click on iframe-internal link navigating top
     IsPopup or
     TRegEx.IsMatch(Url, URLPath_RegEx_MatchKeyboardsInstall) or       // capture https://keyman.com/keyboards/install/*
     (not TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsRoot) and    // don't capture https://keyman.com/keyboards*
@@ -144,14 +146,17 @@ begin
   end;
 end;
 
-procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowse(Sender: TObject; const Url: string;
-  isPopup, wasHandled: Boolean);
+procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseEx(Sender: TObject; const Url: string;
+  isMain, isPopup, wasHandled: Boolean);
 var
   m: TMatch;
   uri: TURI;
   BCP47: string;
   PackageID: string;
 begin
+
+  if IsMain and not IsLocalUrl(Url) and not Url.StartsWith('keyman:') then
+    Exit;                              // prevent Ctrl+click on iframe-internal link navigating top
 
   m := TRegEx.Match(Url, UrlPath_RegEx_MatchKeyboardsInstall);
   if m.Success then

@@ -1,6 +1,6 @@
 # Localization Maintenance
 
-Localization for Keyman is maintained at https://crowdin.com/project/keyman
+Localization for Keyman is maintained at https://translate.keyman.com
 
 Downloading and updating files between Keyman and Crowdin happens automatically
 on GitHub by way of the Crowdin git integration. The configuration file for all platforms
@@ -69,6 +69,9 @@ To download latest translations for the specific language:
 crowdin download -b master -l {language_code}
 ```
 
+Note: the Crowdin API doesn't handle custom languages so those will need to be manually synced.
+See https://support.crowdin.com/api/language-codes/
+
 To display a list of latest translations from Crowdin:
 
 ```bash
@@ -82,6 +85,12 @@ To upload source files to Crowdin:
 ```bash
 crowdin upload sources
 ```
+
+### Updating DisplayLanguages.java in Keyman Engine for Android
+In Keyman for Android, the settings menu for changing display languages is maintained in
+android/KMEA/app/src/main/java/com/tavultesoft/kmea/DisplayLangugages.java
+
+For the BCP-47 language tags to use in that file, don't include script names since the Android locales only handle language ID and region.
 
 ## Tip
 

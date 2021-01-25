@@ -34,9 +34,134 @@
 
 * chore: prepare 15.0 alpha (#4129)
 
+## 14.0.227 beta 2021-01-21
+
+* fix(web): dynamic font downscaling for OSK keys (#4270)
+* fix(web): toolbar and loading optimisations (#4304)
+* chore(web): updates MTNT for pred-text testing page to 0.1.5 (casing) (#4305)
+* fix(android/samples): Add dependency on androidx.preference (#4310)
+
+## 14.0.226 beta 2021-01-20
+
+* fix(windows, common/core/desktop): context mismatch with if and dk (#4276)
+* chore(common): Check in crowdin files for de (German) (#4295)
+* feat(android/app): Add option to change display language (#4261)
+* fix(developer/compilers): fixes developer build breakage from #4291 (#4299)
+* fix(android/app): Handle keyman protocol from external browser (#4292)
+
+## 14.0.225 beta 2021-01-19
+
+* fix(android/samples): Fix Sentry dependencies (#4267)
+* fix(web): better font-wait null guards (#4286)
+* fix(web): uses CSS line-height to vertically center oversized OSK keycaps (#4255)
+* fix(developer): disable TSentryClient on WINE (#4274)
+* fix(web): no key previews for special keys reliant on keyboard-specific OSK font (#4282)
+* fix(web): default kbd ui name is now generic (#4293)
+* fix(developer/compilers): fixes dependency versioning on alpha, beta tiers (#4291)
+
+## 14.0.224 beta 2021-01-18
+
+* fix(android): Popup misalignments and compatibility with WeChat, Telegram (#4254)
+* chore(web): sample pages now wait on init's promise for keyboard loading (#4253)
+
+## 14.0.223 beta 2021-01-15
+
+* fix(windows): typo in font helper string (#4251)
+* chore(android/app): Add Obolo language from crowdin (#4256)
+* fix(web): unexpected errors in OSK / banner position calculations (#4238)
+* chore(linux): Improve version number for debian package (#4258)
+
+## 14.0.222 beta 2021-01-14
+
+* chore(common): Check in crowdin files for km (Khmer) (#4228)
+* fix(web): OSK key preview positioning (#4241)
+* fix(web): disables predictive text on Opera mini (#4243)
+
+## 14.0.221 beta 2021-01-13
+
+* fix(windows): fix menu popup position (#4175)
+* fix(windows): Update mitigation for Keyman 14 and Windows 10 19597 (#4180)
+* fix(developer): Allow unhandled keys to go through to debugger memo (#4209)
+
+## 14.0.220 beta 2021-01-13
+
+* fix(android/engine): Remove usage of WRITE_EXTERNAL_STORAGE permission (#4170)
+* fix(web): osk size & position after focus changes (#4232)
+* chore(linux): Update debian metadata based on Debian repos (#4233)
+
+## 14.0.219 beta 2021-01-12
+
+* chore: bugfix cherrypick (#4208, #4210) (#4230)
+* fix(common/core/web): mnemonic modifier key-up handling (#4231)
+
+## 14.0.218 beta 2021-01-08
+
+* chore(linux): pass tag to Jenkins build (#4160) (#4224)
+
+## 14.0.217 beta 2021-01-05
+
+* chore(linux): Allow to push to the `keyman-beta` ppa (#4214)
+
+## 14.0.216 beta 2020-12-23
+
+* fix(developer): make touch layout editor source view fonts consistent (#4198)
+* fix(developer): Respect tab editor option (#4200)
+* fix(web): Solving kmwosk color inconsistency 🍒 (#4187)
+
+## 14.0.215 beta 2020-12-22
+
+* fix(windows): create task fails (#4181)
+* fix(windows): prevent modifier key from navigating in download dialog (#4182)
+* fix(windows): keyboard help missing (#4177)
+* fix(windows): Proxy Configuration window size (#4159)
+* chore(common): update copyright year in various locations (#4197)
+* fix(windows): Settings refresh management (#4164)
+* fix(windows): Improve refresh performance (#4165)
+* fix(windows): exception handling list error (#4166)
+* fix(windows): OSK toolbar sync (#4167)
+* fix(windows): Show full version with tag in Setup (#4169)
+* fix(windows): Improve refresh reliablilty (#4171)
+* fix(developer): debug.log created unexpectedly (#4189)
+* chore(windows): Remove silent exception in task cleanup (#4191)
+* fix(windows/config): keyboard icons missing (#4193)
+* fix(developer): Map symbols for *LTREnter* and *LTRBkSp* (#4190)
+* fix(developer): Encoding for .model.ts files (#4199)
+* feat(common): annotate PRs with build links (#4202)
+
+## 14.0.214 beta 2020-12-20
+
+* fix(windows): Text editor font bugs (#4149)
+* fix(windows): Warn if we reach maximum transient languages (#4157)
+
+## 14.0.213 beta 2020-12-18
+
+* fix(windows): sentrytool should fail build on exception and access violation when rewriting executables (#4158)
+
+## 14.0.212 beta 2020-12-17
+
+* fix(windows): uninstall language button z-index (#4145)
+* fix(windows): exit button position on setup (#4150)
+* fix(windows): Online Update dialog layout was messy (#4152)
+
+## 14.0.211 beta 2020-12-16
+
+* chore(windows): remove obsolete importkeyboard app (#4138)
+* fix(windows): glitch in keyboard menu (#4139)
+* fix(windows): menu scroll positions need reset at popup (#4140)
+* fix(windows): remove obsolete option 'Switch to OSK/Help' (#4141)
+* fix(windows): Canonicalize BCP 47 tag on keyboard download (#4144)
+* fix(windows): help window centred on load (#4147)
+* fix(windows): Text editor font bugs (#4149)
+* chore(common): Update history for 14.0 beta release (#4148)
+* fix(common): increment version needs to check base (#4155)
+
+## 14.0.210 beta 2020-12-15
+
+* fix(windows): beta uses wrong server (#4142)
+
 ## 14.0.209 beta 2020-12-14
 
-* chore: fix trigger for beta branches (#4135)
+* chore(common): fix trigger for beta branches (#4135)
 
 ## 14.0.208 beta 2020-12-14
 

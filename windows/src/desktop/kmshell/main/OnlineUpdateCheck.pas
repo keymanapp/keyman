@@ -347,6 +347,7 @@ begin
   FPackage := nil;
 
   kmcom.Refresh;
+  kmcom.Apply;
   SysUtils.DeleteFile(Package.SavePath);
 end;
 
@@ -396,6 +397,7 @@ begin
     if ShowModal <> mrYes then
     begin
       Self.FParams.Result := oucUnknown;
+      Self.FErrorMessage := '';
       Exit;
     end;
 

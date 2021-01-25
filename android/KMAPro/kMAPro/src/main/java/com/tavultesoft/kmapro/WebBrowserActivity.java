@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.KMPLink;
 
@@ -48,7 +49,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import static android.app.Application.getProcessName;
 
-public class WebBrowserActivity extends AppCompatActivity {
+public class WebBrowserActivity extends BaseActivity {
   private static final String TAG = "WebBrowserActivity";
   private WebView webView;
   private EditText addressField;

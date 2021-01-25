@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 
@@ -29,7 +30,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.TextView;
 
-public class GetStartedActivity extends AppCompatActivity {
+public class GetStartedActivity extends BaseActivity {
 
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> list = null;

@@ -73,6 +73,8 @@ uses
   System.UITypes,
   System.Win.Registry,
 
+  kmint,
+
   Keyman.System.SettingsManager,
   Keyman.System.SettingsManagerFile,
   Keyman.Configuration.UI.UfrmSettingsAddTSFApp,
@@ -193,6 +195,12 @@ begin
   gridDebugOption.Invalidate;
   FWasSaved := True;
   EnableControls;
+
+  // Because we change settings directly in registry, Keyman COM API
+  // will now have invalid values, so let's refresh them before we
+  // apply and broadcast the change
+  kmcom.Refresh;
+  kmcom.Apply;
 end;
 
 procedure TfrmSettingsManager.cmdTSFApplicationSettingsClick(

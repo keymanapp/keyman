@@ -177,7 +177,8 @@ uses
   Keyman.Configuration.UI.UfrmSettingsAddTSFApp in 'settings\Keyman.Configuration.UI.UfrmSettingsAddTSFApp.pas' {frmSettingsAddTSFApp},
   Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas',
   Keyman.System.KeymanStartTask in 'util\Keyman.System.KeymanStartTask.pas',
-  TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas';
+  TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas',
+  Keyman.Configuration.System.HttpServer.App.TextEditorFonts in 'startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

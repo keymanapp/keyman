@@ -128,7 +128,7 @@ var
 begin
   FormStyle := fsStayOnTop;   // I4209
   if FActiveKeyboard <> nil
-    then FQuery := Format('?keyboard=%s', [UrlEncode(FActiveKeyboard.Name)])
+    then FQuery := Format('keyboard=%s', [UrlEncode(FActiveKeyboard.Name)])
     else FQuery := '';
 
   Content_Render(FQuery);

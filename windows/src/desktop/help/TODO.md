@@ -1,0 +1,8 @@
+- search for TODO
+- search for title: ... {...}
+- search for "(desktop_images"
+- search for "](#"
+- search for "[???]"
+- search for \n\n- (gaps between bullets)
+- search for ^**...**$
+- search for keyboard references and use <kbd></kbd>

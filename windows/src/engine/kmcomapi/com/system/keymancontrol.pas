@@ -103,9 +103,9 @@ type
   private
     wm_keyman_control: UINT;
     wm_kmselectlang: UINT;
-    RefreshHandle: THandle;
     FAutoApply: Boolean;
     FKeymanCustomisation: IKeymanCustomisation;
+    FLastRefreshToken: IntPtr;
 
     function RunKeymanConfiguration(const filename: string): Boolean;
     procedure ApplyToRunningKeymanEngine;
@@ -147,6 +147,8 @@ type
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
 
     procedure DiagnosticTestException; safecall;
+
+    function LastRefreshToken: IntPtr; safecall;
 
     { IIntKeymanControl }
     procedure AutoApplyKeyman;
@@ -351,26 +353,25 @@ begin
   ApplyToRunningKeymanEngine;
 end;
 
+function TKeymanControl.LastRefreshToken: IntPtr;
+begin
+  Result := FLastRefreshToken;
+end;
+
+type
+  TRefreshThread = class(TThread)
+  private
+    FLastRefreshToken: Integer;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(ALastRefreshToken: Integer);
+  end;
+
 procedure TKeymanControl.ApplyToRunningKeymanEngine;
 begin
-  // This convoluted way of refreshing keyman ensures that km is init for the thread.
-  // Other methods would work but this is easiest
-  TThread.CreateAnonymousThread(
-    procedure
-    const
-      KR_REQUEST_REFRESH = 0;
-    var
-      msg: TMsg;
-      wm_keyman_refresh: UINT;
-    begin
-      wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
-      RefreshHandle := AllocateHWnd(nil);
-      PostMessage(RefreshHandle, wm_keyman_refresh, KR_REQUEST_REFRESH, 0);
-      GetMessage(msg, RefreshHandle, wm_keyman_refresh, wm_keyman_refresh);
-      DispatchMessage(msg);
-      DeallocateHWnd(RefreshHandle);
-    end
-  ).Start;
+  FLastRefreshToken := Random(MaxInt);
+  TRefreshThread.Create(FLastRefreshToken).Start;
 end;
 
 constructor TKeymanControl.Create(AContext: TKeymanContext);
@@ -730,5 +731,57 @@ begin
   end;
 end;
 {$ENDIF}
+
+{ TRefreshThread}
+
+constructor TRefreshThread.Create(ALastRefreshToken: Integer);
+begin
+  inherited Create(True);
+  FreeOnTerminate := True;
+  FLastRefreshToken := ALastRefreshToken;
+end;
+
+procedure TRefreshThread.Execute;
+const
+  KR_REQUEST_REFRESH = 0;
+  KR_SETTINGS_CHANGED = 3;
+var
+  msg: TMsg;
+  wm_keyman_refresh: UINT;
+  RefreshHandle: THandle;
+begin
+  // This convoluted way of refreshing keyman ensures that km is init for the thread.
+  // Other methods would work but this is easiest
+
+  wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
+  RefreshHandle := AllocateHWnd(nil);
+
+  // We currently have two announcements because the KR_REQUEST_REFRESH
+  // announcement is actioned only when Keyman Engine is running, while we
+  // still need to tell any apps listening for changes that the settings
+  // have changed. In future, we should probably refactor this to use a
+  // single broadcast.
+
+  // We use a random number here to so that multiple processes can generate
+  // hopefully unique tokens for refresh, and we share this token with our
+  // current consumer so they can ignore notifications that they have
+  // generated
+
+  // First, post out a KR_SETTINGS_CHANGED for the benefit of Keyman
+  // Configuration and other apps that want it
+  PostMessage(HWND_BROADCAST, wm_keyman_refresh, KR_SETTINGS_CHANGED, FLastRefreshToken);
+
+  // Then, post out a refresh to Keyman Engine and process it in this
+  // thread so that Keyman Engine will grab it and broadcast it, if it is
+  // currently running
+  PostMessage(RefreshHandle, wm_keyman_refresh, KR_REQUEST_REFRESH, 0);
+
+  // Flush the queue but don't stall the thread
+  while PeekMessage(msg, 0, 0, 0, PM_REMOVE) do
+  begin
+    DispatchMessage(msg);
+  end;
+  DeallocateHWnd(RefreshHandle);
+end;
 
 end.

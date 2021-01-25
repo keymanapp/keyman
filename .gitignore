@@ -83,10 +83,6 @@
 # /buildtools/inst/
 /windows/src/buildtools/inst/srcbackup.mak
 
-# /buildtools/importkeyboard/
-/windows/src/buildtools/importkeyboard/bin
-/windows/src/buildtools/importkeyboard/obj
-
 # /desktop/branding/
 /windows/src/desktop/branding/desktop_pro.pxx
 

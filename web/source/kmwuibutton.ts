@@ -363,7 +363,7 @@ if(!window['keyman']['ui']['name']) {
       var _li1 = util['createElement']('li'); 
       _li1.id = 'KMW_ButtonUI_KbdList'; 
       var _a1 = util['createElement']('a');
-      _a1.appendChild(document.createTextNode('English'));
+      _a1.appendChild(document.createTextNode('(System keyboard)'));
 
       _a1.onclick = ui._SelectKeyboard;
       _a1.href = '#'; 

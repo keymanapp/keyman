@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2020-2021 SIL International. All rights reserved.
+ */
+
 package com.tavultesoft.kmapro;
 
 import android.content.Context;
@@ -12,6 +16,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
 
+import com.tavultesoft.kmea.DisplayLanguages;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Dataset;
 
@@ -19,7 +24,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static final String TAG = "SettingsFragment";
   private static Context context;
 
-  private Preference languagesPreference, installKeyboardOrDictionary;
+  private Preference languagesPreference, installKeyboardOrDictionary, displayLanguagePreference;
   private CheckBoxPreference setSystemKeyboardPreference;
   private CheckBoxPreference setDefaultKeyboardPreference;
 
@@ -45,6 +50,13 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     installKeyboardOrDictionary.setWidgetLayoutResource(R.layout.preference_add_icon_layout);
     Intent installIntent = new Intent(context, KeymanSettingsInstallActivity.class);
     installKeyboardOrDictionary.setIntent(installIntent);
+
+    displayLanguagePreference = new Preference(context);
+    displayLanguagePreference.setKey(DisplayLanguages.displayLanguageKey);
+    displayLanguagePreference.setTitle(getString(R.string.change_display_language));
+    displayLanguagePreference.setWidgetLayoutResource(R.layout.preference_translate_icon_layout);
+    Intent displayLanguageIntent = new Intent(context, KeymanSettingsLocalizeActivity.class);
+    displayLanguagePreference.setIntent(displayLanguageIntent);
 
     /*
       Automatically does the following:
@@ -106,6 +118,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     screen.addPreference(languagesPreference);
     screen.addPreference(installKeyboardOrDictionary);
+    screen.addPreference(displayLanguagePreference);
 
     screen.addPreference(setSystemKeyboardPreference);
     screen.addPreference(setDefaultKeyboardPreference);

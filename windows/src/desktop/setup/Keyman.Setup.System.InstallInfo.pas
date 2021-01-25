@@ -45,6 +45,7 @@ type
     FVersion: string;
     FPath: string;
     FProductCode: string;
+    FVersionWithTag: string;
   public
     constructor Create(ALocationType: TInstallInfoLocationType); virtual;
     procedure UpgradeToLocalPath(const ARootPath: string);
@@ -53,6 +54,7 @@ type
     property Path: string read FPath write FPath;
     property Url: string read FUrl write FUrl;
     property ProductCode: string read FProductCode write FProductCode; // used only by msi
+    property VersionWithTag: string read FVersionWithTag write FVersionWithTag; // used only by msi
     property Version: string read FVersion write FVersion;
   end;
 
@@ -243,6 +245,7 @@ var
   pack: TInstallInfoPackage;
   packLocation: TInstallInfoPackageFileLocation;
   FVersion, FMSIFileName: string;
+  FVersionWithTag: string;
 begin
   FInSetup := False;
   FInPackages := False;
@@ -291,12 +294,13 @@ begin
 
     if System.SysUtils.FileExists(FMSIFileName) then  // I3476
     begin
-      FVersion := GetMsiVersion(FMSIFileName);
+      FVersion := GetMsiVersion(FMSIFileName, FVersionWithTag);
       if FVersion <> '' then
       begin
         location := TInstallInfoFileLocation.Create(iilLocal);
         location.Path := FMSIFileName;
         location.Version := FVersion;
+        location.VersionWithTag := FVersionWithTag;
         FMsiLocations.Add(location);
       end;
     end;

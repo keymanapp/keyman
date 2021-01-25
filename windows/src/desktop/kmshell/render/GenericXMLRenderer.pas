@@ -28,7 +28,7 @@ type
   private
     FXML: WideString;
   protected
-    function XMLData(FRefreshKeyman: Boolean): WideString; override;
+    function XMLData: WideString; override;
   public
     constructor Create(AOwner: TXMLRenderers; const AXML: WideString = '');
   end;
@@ -43,7 +43,7 @@ begin
   FXML := AXML;
 end;
 
-function TGenericXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
+function TGenericXMLRenderer.XMLData: WideString;
 begin
   Result := FXML;
 end;

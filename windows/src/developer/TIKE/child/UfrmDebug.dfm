@@ -12,6 +12,7 @@ inherited frmDebug: TfrmDebug
   Position = poDefault
   OnClose = FormClose
   OnDestroy = FormDestroy
+  OnResize = FormResize
   ExplicitWidth = 771
   ExplicitHeight = 171
   PixelsPerInch = 96

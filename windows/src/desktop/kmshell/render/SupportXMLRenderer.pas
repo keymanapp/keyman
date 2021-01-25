@@ -30,7 +30,7 @@ uses
 type
   TSupportXMLRenderer = class(TXMLRenderer)
   protected
-    function XMLData(FRefreshKeyman: Boolean): WideString; override;
+    function XMLData: WideString; override;
   end;
 
 implementation
@@ -47,7 +47,7 @@ uses
 
 { TSupportXMLRenderer }
 
-function TSupportXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
+function TSupportXMLRenderer.XMLData: WideString;
 begin
   //kmcom.SystemInfo.EngineVersion
   Result := '<support>'+

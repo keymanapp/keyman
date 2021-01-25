@@ -816,6 +816,8 @@ procedure TfrmKeymanWizard.CodeFontChanged;
 begin
   inherited;
   frameSource.CodeFont := CodeFont;
+  frameTouchLayoutSource.CodeFont := CodeFont;
+  frameOSK.CodeFont := CodeFont;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -2819,6 +2821,18 @@ begin
           if pagesTouchLayout.ActivePage = pageTouchLayoutDesign
             then frameTouchLayout.FontInfo[Index] := NewValue   // I4872
             else UpdateTouchLayoutSourceFont;
+
+          if Index = kfontTouchLayoutPhone then
+          begin
+            f := TFont.Create;
+            try
+              f.Name := Value.Name;
+              f.Size := StrToIntDef(Value.Size, 12);
+              frameTouchLayoutSource.CharFont := f;
+            finally
+              f.Free;
+            end;
+          end;
         end;
       end;
   end;

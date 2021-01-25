@@ -3,6 +3,8 @@ unit Keyman.Configuration.System.HttpServer.App.ConfigMain;
 interface
 
 uses
+  System.Classes,
+  System.Generics.Collections,
   System.Types,
 
   IdCustomHttpServer,
@@ -12,24 +14,23 @@ uses
 type
   IConfigMainSharedData = interface
     ['{69D029C0-4537-4CBE-B525-C34B0E809820}']
-    function GetBitmapPath: string;
-    function GetFiles: TStringDynArray;
+    function GetFile(const Index: string): TMemoryStream;
     function GetHTML: string;
     function GetState: string;
     procedure SetState(const Value: string);
 
-    property BitmapPath: string read GetBitmapPath;
-    property Files: TStringDynArray read GetFiles;
     property HTML: string read GetHTML;
     property State: string read GetState write SetState;
   end;
 
   TConfigMainSharedData = class(TInterfacedObject, IConfigMainSharedData)
   private
-    FBitmapPath: string;
     FHTML: string;
-    FFiles: TStringDynArray;
+    FFiles: TObjectDictionary<string,TMemoryStream>;
   public
+    constructor Create;
+    destructor Destroy; override;
+
     procedure Init(const ABitmapPath, AHTML: string; const AFiles: TStringDynArray);
 
     { IConfigMainSharedData }
@@ -37,8 +38,7 @@ type
     procedure SetState(const Value: string);
 
     function GetHTML: string;
-    function GetBitmapPath: string;
-    function GetFiles: TStringDynArray;
+    function GetFile(const Index: string): TMemoryStream;
   end;
 
   TConfigMainHttpResponder = class(TAppHttpResponder)
@@ -53,7 +53,6 @@ type
 implementation
 
 uses
-  System.Classes,
   System.Contnrs,
   System.StrUtils,
   System.SysUtils,
@@ -82,17 +81,15 @@ end;
 
 procedure TConfigMainHttpResponder.ProcessBitmap(data: IConfigMainSharedData; const document: string);
 var
-  name: string;
+  m: TStream;
 begin
   if not IncludesParentFolderReference(document) then
   begin
-    for name in data.Files do
+    m := data.GetFile(document);
+    if Assigned(m) then
     begin
-      if name = document then
-      begin
-        RespondFile(data.BitmapPath + document, Context, RequestInfo, ResponseInfo);
-        Exit;
-      end;
+      RespondStream(m, document, Context, RequestInfo, ResponseInfo);
+      Exit;
     end;
   end;
   Respond404(Context, RequestInfo, ResponseInfo);
@@ -133,14 +130,23 @@ end;
 
 { TConfigMainSharedData }
 
-function TConfigMainSharedData.GetBitmapPath: string;
+constructor TConfigMainSharedData.Create;
 begin
-  Result := FBitmapPath;
+  inherited Create;
+  FFiles := TObjectDictionary<string,TMemoryStream>.Create;
 end;
 
-function TConfigMainSharedData.GetFiles: TStringDynArray;
+destructor TConfigMainSharedData.Destroy;
 begin
-  Result := FFiles;
+  FreeAndNil(FFiles);
+  inherited Destroy;
+end;
+
+function TConfigMainSharedData.GetFile(const Index: string): TMemoryStream;
+begin
+  if not FFiles.TryGetValue(Index, Result)
+    then Result := nil
+    else Result.Position := 0;
 end;
 
 function TConfigMainSharedData.GetHTML: string;
@@ -149,13 +155,25 @@ begin
 end;
 
 procedure TConfigMainSharedData.Init(const ABitmapPath, AHTML: string; const AFiles: TStringDynArray);
+var
+  FFile: string;
+  m: TMemoryStream;
 begin
   // Note: we have a separate Init call because we need to have the object to add to the shared data
   // to inject the shared data tag into the HTML. This is a side-effect of rendering the HTML in the
   // form which will be eliminated in a future refactor
-  FBitmapPath := ABitmapPath;
   FHTML := AHTML;
-  FFiles := AFiles;
+  for FFile in AFiles do
+  begin
+    m := TMemoryStream.Create;
+    try
+      m.LoadFromFile(ABitmapPath + FFile);
+    except
+      m.Free;
+      Continue;
+    end;
+    FFiles.Add(FFile, m);
+  end;
 end;
 
 function TConfigMainSharedData.GetState: string;

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2020 SIL International. All rights reserved.
+ * Copyright (C) 2018-2021 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -9,7 +9,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -32,13 +32,13 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.DownloadFileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -92,7 +92,7 @@ import android.widget.Toast;
 
 import io.sentry.android.core.SentryAndroid;
 
-public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
+public class MainActivity extends BaseActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
 
@@ -134,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       });
     }
 
-    checkStoragePermission(null);
     resultReceiver = new DownloadResultReceiver(new Handler(), context);
 
     if (BuildConfig.DEBUG) {
@@ -257,13 +256,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
 
-    // Get calling activity
-    ComponentName component = this.getCallingActivity();
-    String caller = null;
-    if (component != null) {
-      caller = component.getClassName();
-    }
-
     Intent intent = getIntent();
     data = intent.getData();
 
@@ -286,10 +278,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           downloadKMP(scheme);
           break;
         case "keyman" :
-          // Only accept download links from Keyman browser activities
-          if (KMPLink.isKeymanDownloadLink(data.toString()) && caller != null &&
-            (caller.equalsIgnoreCase("com.tavultesoft.kmea.KMPBrowserActivity") ||
-             caller.equalsIgnoreCase("com.tavultesoft.kmapro.WebBrowserActivity"))) {
+          // TODO: Only accept download links from Keyman browser activities when universal links work
+          if (KMPLink.isKeymanDownloadLink(data.toString())) {
 
             // Convert opaque URI to hierarchical URI so the query parameters can be parsed
             Builder builder = new Uri.Builder();
@@ -298,6 +288,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
               .appendPath("keyboards")
               .encodedQuery(data.getEncodedQuery());
             data = Uri.parse(builder.build().toString());
+            downloadKMP(scheme);
+          } else if (KMPLink.isLegacyKeymanDownloadLink(data.toString())) {
+            link = data.toString();
+            data = KMPLink.getLegacyKeyboardDownloadLink(link);
             downloadKMP(scheme);
           } else {
             String msg = "Unrecognized scheme: " + scheme;
@@ -756,9 +750,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
       // Request for storage permission
-      if (grantResults.length ==2 &&
-          grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-          grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+      if (grantResults.length == 1 &&
+          grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
         useLocalKMP(context, data);
       } else {
@@ -773,8 +766,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void checkStoragePermission(Uri data) {
     // Check if the Storage permission has been granted
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      if ((checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) &&
-          (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+      if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
         useLocalKMP(context, data);
       } else {
         // Permission is missing and must be requested
@@ -787,27 +779,21 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   /**
-   * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} and
-   *              {@link android.Manifest.permission#WRITE_EXTERNAL_STORAGE} permissions
+   * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} permissions
    */
   private void requestStoragePermission() {
-    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
       // Provide additional rationale to the user if the permission was not granted
       String message = getString(R.string.request_storage_permission);
       Toast.makeText(getApplicationContext(), message ,
         Toast.LENGTH_LONG).show();
       ActivityCompat.requestPermissions(this,
-        new String[]{
-          Manifest.permission.READ_EXTERNAL_STORAGE,
-          Manifest.permission.WRITE_EXTERNAL_STORAGE},
+        new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE },
         PERMISSION_REQUEST_STORAGE);
     } else {
       // Request the permission. The result will be received in onRequestPermissionsResult().
       ActivityCompat.requestPermissions(this,
-        new String[]{
-          Manifest.permission.READ_EXTERNAL_STORAGE,
-          Manifest.permission.WRITE_EXTERNAL_STORAGE},
+        new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE },
         PERMISSION_REQUEST_STORAGE);
     }
   }
@@ -820,57 +806,25 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
-    String filename = "";
-    String cacheKMPFilename = "";
-    File cacheKMPFile = null;
-    InputStream inputFile = null;
-    Bundle bundle = new Bundle();
-    try {
-      boolean isKMP = false;
-      switch (data.getScheme().toLowerCase()) {
-        case "content":
-          // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
-          Cursor cursor = context.getContentResolver().query(data, null, null, null, null);
-          cursor.moveToFirst();
-          int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-          filename = cursor.getString(nameIndex);
-          isKMP = FileUtils.hasKeymanPackageExtension(filename);
-          cacheKMPFilename = filename;
-          inputFile = context.getContentResolver().openInputStream(data);
-          break;
+    DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
+    boolean isKMP = info.isKMP();
+    String filename = info.getFilename();
+    File cacheKMPFile = info.getFile();
 
-        case "file":
-          File kmpFile = new File(data.getPath());
-          filename = kmpFile.getName();
-          isKMP = FileUtils.hasKeymanPackageExtension(data.toString());
-          cacheKMPFilename = kmpFile.getName();
-          inputFile = new FileInputStream(kmpFile);
-          break;
-      }
-
-      if (isKMP) {
-        // Copy KMP to app cache
-        cacheKMPFile = new File(context.getCacheDir().toString(), cacheKMPFilename);
-        if (cacheKMPFile.exists()) {
-          cacheKMPFile.delete();
-        }
-
-        FileUtils.copy(inputFile, new FileOutputStream(cacheKMPFile));
-      } else {
-        String noKeyboardsInstalledMessage = " is not a valid Keyman package file.\n" +
-          "No keyboards/dictionaries were installed.";
-        Toast.makeText(context,
-          filename + noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
-      }
-    } catch (Exception e) {
-      String message = "Access denied to " + filename +
-        ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
-      KMLog.LogException(TAG, "Unable to copy " + filename + " to app cache ", e);
+    if (filename == null || filename.isEmpty() || cacheKMPFile == null || !cacheKMPFile.exists()) {
+      // failed to retrieve downloaded file
+      String message = context.getString(R.string.failed_to_retrieve_file);
       Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+      return;
+    } else if (!isKMP) {
+      String noKeyboardsInstalledMessage = String.format(
+        context.getString(R.string.not_valid_package_file), filename, context.getString(R.string.no_targets_to_install));
+      Toast.makeText(context, noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
       return;
     }
 
     if (cacheKMPFile != null) {
+      Bundle bundle = new Bundle();
       bundle.putString("kmpFile", cacheKMPFile.getAbsolutePath());
       bundle.putBoolean("silentInstall", silentInstall);
 

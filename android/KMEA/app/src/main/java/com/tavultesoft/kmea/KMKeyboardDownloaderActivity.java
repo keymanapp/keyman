@@ -22,7 +22,7 @@ import java.util.List;
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_MODEL;
 
-public class KMKeyboardDownloaderActivity extends AppCompatActivity {
+public class KMKeyboardDownloaderActivity extends BaseActivity {
   // Bundle Keys
 
   // Cloud

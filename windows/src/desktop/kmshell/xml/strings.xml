@@ -439,7 +439,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permisable level">Always elevate user permissions when running in Windows Vista</string>
+  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">Always elevate user permissions when running in Windows Vista</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
@@ -471,7 +471,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman systemtray menu">Open Keyboard Menu</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">Open Keyboard Menu</string>
 
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
@@ -1068,6 +1068,12 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- String Type: FormatString -->
   <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">The keyboard '%0:s' is part of package '%1:s'.  You must uninstall the entire package.  Continue?</string>
 
+  <!-- PArameters: %0:s = BCP 47 code -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 14.0.211 -->
+  <!-- String Type: FormatString -->
+  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">Unable to install keyboard language; Windows has a limit of 4 custom 'transient' languages, and you may have reached this limit.</string>
+
   <!-- Parameters: %0:s = Package Name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
@@ -1187,7 +1193,7 @@ PRIVACY WARNING: Please note that the debug logfile records all keystrokes that 
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Please wait while searching for releted fonts for keyboard %0:s</string>
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Please wait while searching for related fonts for keyboard %0:s</string>
 
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->

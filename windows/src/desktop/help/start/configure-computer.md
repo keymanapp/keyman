@@ -38,7 +38,7 @@ Correctly associating your Keyman keyboard has three main benefits.
 
 ## Association instructions
 
-**Note**: Keyman allows you to associate multiple Windows languages to a keyboard.
+**Note:** Keyman allows you to associate multiple Windows languages to a keyboard.
 
 1.  Click on the Keyman icon ![](../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
