@@ -428,8 +428,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       .setContentText(message)
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
       .setAutoCancel(true)
-      .setContentIntent(startUpdateIntent)
-      .setOngoing(true);
+      .setContentIntent(startUpdateIntent);
 
     notificationManager.notify(notification_id,builder.build());
   }
