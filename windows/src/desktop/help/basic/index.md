@@ -2,30 +2,21 @@
 title: Basic Help
 ---
 
-* [newways](newways)
+* [New Ways to Use Keyman](new-ways-to-use-keyman)
 
-* [update](update)
-* [uninstall](uninstall)
+* [Update Keyman](update)
+* [Uninstall Keyman](uninstall)
 
-* [enable_keyboard](enable_keyboard)
-* [disable_keyboard](disable_keyboard)
-* [uninstall_keyboard](uninstall_keyboard)
+* [Keyboard Task - Turn on a Keyboard](select-keyboard)
+* [Keyboard Task - Enable or Disable a Keyboard](enable-or-disable-keyboard)
+* [Keyboard Task - Uninstall a Keyboard](uninstall-keyboard)
 
-* [traymenu](traymenu)
-* [toolbox](toolbox)
-* [osk](osk)
-* [usage](usage)
-* [fonthelper](fonthelper)
-* [charactermap](charactermap)
+* [The Keyman Menu](tray-menu)
+* [The Keyman Toolbox](toolbox/)
+* [Keyman Configuration](config/)
+* [Language Switcher](language-switcher)
+* [Keyman Text Editor](text-editor)
 
-* [languageswitcher](languageswitcher)
+* [How To - Make the Keyman icon visible](make-taskbar-icon-visible)
 
-* [text_editor](text_editor)
-
-* [config_menu](config_menu)
-* [keyboards_tab](keyboards_tab)
-* [options_tab](options_tab)
-* [hotkeys_tab](hotkeys_tab)
-* [support_tab](support_tab)
-
-* [help](help)
+* [About Keyman Help](help)

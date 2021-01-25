@@ -26,7 +26,7 @@ title: Contextual Help
 * [osk_keyboard](osk_keyboard)
 * [osk_usage](osk_usage)
 * [fonthelper](fonthelper)
-* [charactermap](charactermap)
+* [character-map](character-map)
 
 * [psrtwindowslanguage](psrtwindowslanguage)
 * [psrtmsofficelanguage](psrtmsofficelanguage)
