@@ -340,7 +340,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permisable level">បើក​ការអនុញ្ញាត​របស់​អ្នក​ប្រើប្រាស់​ជានិច្ច នៅពេល​កំពុង​ដំណើរការលើ Windows Vista</string>
+  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">បើក​ការអនុញ្ញាត​របស់​អ្នក​ប្រើប្រាស់​ជានិច្ច នៅពេល​កំពុង​ដំណើរការលើ Windows Vista</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
@@ -365,7 +365,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman systemtray menu">បើក​ម៉ឺនុយ​ក្ដារចុច</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">បើក​ម៉ឺនុយ​ក្ដារចុច</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -814,6 +814,11 @@
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
   <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">ក្ដារចុច \'%0:s\' មាន​ក្នុង​កញ្ចប់ \'%1:s\'។ អ្នក​ត្រូវ​តែ​លុប​កញ្ចប់​ទាំង​មូល​ចេញ។ បន្ត?</string>
+  <!-- PArameters: %0:s = BCP 47 code -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 14.0.211 -->
+  <!-- String Type: FormatString -->
+  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">Unable to install keyboard language; Windows has a limit of 4 custom \'transient\' languages, and you may have reached this limit.</string>
   <!-- Parameters: %0:s = Package Name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
@@ -904,7 +909,7 @@
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">សូម​រង់ចាំ ពេល​កំពុង​ស្វែងរក​ពុម្ព​អក្សរ​ពាក់ព័ន្ធ​សម្រាប់​ក្ដារចុច %0:s</string>
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Please wait while searching for related fonts for keyboard %0:s</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
