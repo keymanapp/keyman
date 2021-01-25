@@ -43,7 +43,7 @@
   <!-- Context: Get Started menu -->
   <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">បង្ហាញ \"%1$s\" ពេល​ចាប់​ផ្ដើម</string>
   <!-- Context: Android Storage Permission -->
-  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">ដើម្បី​ដំឡើងកញ្ចប់​ក្ដារចុច សូម​អនុញ្ញាត​ឱ្យ​ Keyman មាន​សិទ្ធិ​អាន/កែ​នៅលើ​​ឧបករណ៍​ផ្ទុក។</string>
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    To install keyboard packages, allow Keyman permission to read external storage.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">សំណើ​សុំ​សិទ្ធិ​ចូល​ប្រើ​ឧបករណ៍​ផ្ទុក​ត្រូវ​បាន​បដិសេធ។ អាច​បរាជ័យ​ក្នុង​ការដំឡើង​កញ្ចប់​ក្ដារចុច</string>
   <!-- Context: Keyman Settings menu -->
@@ -54,6 +54,8 @@
   </plurals>
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">ដំឡើង​ក្ដារ​ចុចឬ​បញ្ជី​ពាក្យ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="change_display_language" comment="Menu action to change interface language">Change display language</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">បង្ហាញ​បដា​ជានិច្ច</string>
   <!-- Context: Keyman Settings menu -->
@@ -108,6 +110,8 @@
   <string name="welcome_package" comment="Title to welcome.htm page (name and version)">ស្វាគមន៍​មកកាន់ %1$s</string>
   <!-- Context: KMP Package strings -->
   <string name="install_predictive_text_package" comment="Title to install dictionary package">ដំឡើង​បញ្ជី​ពាក្យ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="not_valid_package_file" comment="Notification when invalid package file cannot be installed">%1$s is not a valid Keyman package file.\n%2$s\"</string>
   <!-- Context: KMP Package strings -->
   <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">កញ្ចប់​នេះ​គ្មាន​ក្ដារចុច​សម្រាប់​ឧបករណ៍​ចល័ត​ទេ</string>
   <!-- Context: KMP Package strings -->
