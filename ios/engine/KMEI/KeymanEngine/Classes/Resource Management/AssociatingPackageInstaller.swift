@@ -388,7 +388,8 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
    * May only be called once during the lifetime of its instance and is mutually exclusive with `pickLanguages`,
    * the programmatic alternative.
    */
-  public func promptForLanguages(inNavigationVC navVC: UINavigationController) {
+  public func promptForLanguages(inNavigationVC navVC: UINavigationController,
+                                 uiCompletionHandler: @escaping (() -> Void)) {
     guard self.associationQueriers == nil, !closureShared.pickingCompleted else {
       fatalError("Invalid state - language picking has already been triggered.")
     }
@@ -399,7 +400,8 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     let pickerPrompt = PackageInstallViewController<Resource>(for: self.package,
                                                               defaultLanguageCode: defaultLgCode,
                                                               languageAssociators: associationQueriers!,
-                                                              completionHandler: coreInstallationClosure())
+                                                              pickingCompletionHandler: coreInstallationClosure(),
+                                                              uiCompletionHandler: uiCompletionHandler)
 
     navVC.pushViewController(pickerPrompt, animated: true)
   }

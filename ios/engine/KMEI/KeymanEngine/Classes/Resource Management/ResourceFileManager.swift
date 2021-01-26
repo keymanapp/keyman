@@ -239,10 +239,16 @@ public class ResourceFileManager {
     }
 
     if let navVC = rootVC as? UINavigationController {
-      packageInstaller.promptForLanguages(inNavigationVC: navVC)
+      packageInstaller.promptForLanguages(inNavigationVC: navVC) {
+        // The user will be on the main screen after this, so we should resummon the keyboard.
+        Manager.shared.showKeyboard()
+      }
     } else {
       let nvc = UINavigationController.init()
-      packageInstaller.promptForLanguages(inNavigationVC: nvc)
+      packageInstaller.promptForLanguages(inNavigationVC: nvc) {
+        // The user will be on the main screen after this, so we should resummon the keyboard.
+        Manager.shared.showKeyboard()
+      }
       rootVC.present(nvc, animated: true, completion: nil)
     }
   }
