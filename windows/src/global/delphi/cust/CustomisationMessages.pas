@@ -33,11 +33,11 @@ unit CustomisationMessages;  // I3306
 interface
 
 uses
-  Windows,
-  SysUtils,
-  Classes,
-  TypInfo,
-  msxml;
+  System.Classes,
+  System.SysUtils,
+  System.TypInfo,
+  Winapi.msxml,
+  Winapi.Windows;
 
 type
   TCustomisationMessageManager = class(TComponent)
@@ -67,6 +67,7 @@ implementation
 
 uses
   DebugPaths,
+  Keyman.System.AndroidStringToKeymanLocaleString,
   KLog,
   ErrorControlledRegistry,
   RegistryKeys;
@@ -125,7 +126,7 @@ begin
         Result := Result + f.Name;
       end;
     until FindNext(f) <> 0;
-    FindClose(f);
+    System.SysUtils.FindClose(f);
   end;
 end;
 
@@ -200,12 +201,12 @@ var
 begin
   node := Flocaledoc.selectSingleNode('/resources/string[@name="'+ID+'"]');
   if Assigned(node) then
-    Result := node.text
+    Result := TAndroidStringToKeymanLocaleString.Transform(node.text)
   else
   begin
     node := Fdefaultlocaledoc.selectSingleNode('/resources/string[@name="'+ID+'"]');
     if Assigned(node)
-      then Result := node.text
+      then Result := TAndroidStringToKeymanLocaleString.Transform(node.text)
       else Result := ID;
   end;
 end;
