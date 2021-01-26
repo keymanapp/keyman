@@ -159,8 +159,6 @@ To open the Options tab of Keyman Configuration:
 -   Switch to appropriate On Screen Keyboard/Help automatically when a
     keyboard is selected
 
-    This option is deprecated in Keyman 14.0 and has no function.
-
 ## Using Advanced Options
 
 ![](../../desktop_images/options-advanced.png)
