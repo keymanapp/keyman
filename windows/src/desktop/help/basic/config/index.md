@@ -16,7 +16,7 @@ To open Keyman Configuration:
 1.  Click on the Keyman icon ![](../../desktop_images/icon-keyman.png), on the
     Windows Taskbar near the clock.
 
-2.  From the Keyman menu, select Configuration....
+2.  From the Keyman menu, select **Configuration...**.
 
 ## Using Keyman Configuration
 
