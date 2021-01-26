@@ -105,12 +105,11 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
         // Report completion!   Only reached when installation is fully completed.
         activitySpinner.stopAnimating()
         activitySpinner.removeFromSuperview()
-        //self.view.isUserInteractionEnabled = true
 
         // Do not animate the dismissal:  the welcome-page's dismissal
         // already provides enough animation.
         if let navVC = self.navVC {
-          navVC.dismiss(animated: false, completion: nil)
+          navVC.dismiss(animated: true, completion: nil)
         }
       }
     }
