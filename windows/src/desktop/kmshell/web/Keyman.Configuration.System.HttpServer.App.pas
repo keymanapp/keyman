@@ -63,6 +63,7 @@ uses
   System.StrUtils,
   System.SysUtils,
 
+  keymanapi_tlb,
   BaseKeyboards,
   Keyman.Configuration.System.HttpServer.App.TextEditorFonts,
   KeymanVersion,
@@ -195,9 +196,14 @@ end;
 procedure TAppHttpResponder.ProcessPageHelp(const Params: TStrings);
 var
   s: string;
+  kbd: IKeymanKeyboardInstalled;
 begin
   if Params.Values['keyboard'] <> ''
-    then s := Format('<Keyboard Name="%s" />', [XMLEncode(Params.Values['keyboard'])])
+    then kbd := FXMLRenderers.kmcom.Keyboards.Items[Params.Values['keyboard']]
+    else kbd := nil;
+
+  if Assigned(kbd)
+    then s := Format('<Keyboard Name="%s" />', [XMLEncode(kbd.Name)])
     else s := '';
   FXMLRenderers.RenderTemplate := 'Help.xsl';
   ProcessXMLPage(s);
