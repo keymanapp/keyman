@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.10 alpha 2021-01-27
+
+* fix(ios): renew distribution certificate (#4342)
+
 ## 15.0.9 alpha 2021-01-25
 
 * fix(windows): beta uses wrong server (#4142)
