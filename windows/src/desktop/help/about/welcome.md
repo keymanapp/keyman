@@ -14,24 +14,28 @@ Keyman is used by more than a million people to type in over 1000
 languages and counting.
 
 Keyman remaps your hardware keyboard to any one of hundreds of virtual
-keyboards, available for download from the [Keyman
-Website](https://keyman.com/) and around the Web. If you cannot find a
-keyboard for your language, we offer the companion application [Keyman
-Developer](https://keyman.com/developer/). Keyman Developer is a
+keyboards, available for download from the
+[Keyman Website](https://keyman.com/keyboards) and around the Web. If
+you cannot find a suitable keyboard for your language, the companion
+application [Keyman Developer](https://keyman.com/developer/) is a
 powerful software solution for creating the perfect Keyman keyboard to
 suit your needs.
 
-Keyman features seamless integration with your Windows operating system
-and the Windows language bar. You can use Keyman keyboards with Keyman
-in almost any Windows or Web application. Try it in office software like
-Word or Excel; browsers like Firefox or Internet Explorer; design
-programs like Adobe InDesign; and email services like Outlook or Gmail.
+Keyman is completely free and open source. Development of Keyman is
+supported by your donations and volunteers.
+[Please get involved!](https://keyman.com/about/get-involved)
 
-Keyman fully supports [Unicode](https://www.unicode.org/) and legacy
-standards and can be used with all standard hardware keyboards, making
-it the perfect solution for typing in any language on your computer.
+Keyman features seamless integration with your Windows operating system.
+You can use Keyman keyboards with Keyman in almost any Windows or
+Web application. Try it in office software like Word or Excel; browsers
+like Chrome, Firefox, or Edge; design programs like Adobe InDesign; and
+email services like Windows Mail, Outlook, or Gmail.
 
-A list of features in Keyman is available [here](whatsnew).
+Keyman fully supports [Unicode](https://www.unicode.org/) and can be
+used with all standard hardware keyboards, making it the perfect
+solution for typing in any language on your computer.
+
+A list of new features in Keyman is available [here](whatsnew).
 
 ![](../desktop_images/osk_keyboard.png)
 

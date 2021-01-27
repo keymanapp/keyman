@@ -13,32 +13,31 @@ language:
 
 2.  Select the Hotkeys tab.
 
-    ![](desktop_images/tab-hotkeys.png)
+    ![](../desktop_images/tab-hotkeys.png)
 
 3.  Click the hotkey link beside the function, keyboard or language. The
     Change Hotkey dialog box will be displayed.
 
-    ![](desktop_images/hotkeys-change.png)
+    ![](../desktop_images/hotkeys-change.png)
 
 4.  Select a default hotkey or click Custom and type the hotkey you wish
     to use.
 
     **Note:** If you press a single letter or Shift plus a single letter, the
-    hotkey will default to Ctrl + Alt plus the letter you pressed, in
+    hotkey will default to <kbd>Ctrl</kbd> + <kbd>Alt</kbd> plus the letter you pressed, in
     order to avoid conflicts with standard keyboard input.
 
     **Note:** To clear a hotkey that has been set previously, click Clear Hotkey
     or press Backspace.
 
-    **Note:** Be aware that you can set the hotkey to replace common Windows hotkeys (Ctrl + C, Ctrl + V, etc).
-
+    **Note:** Be aware that you can set the hotkey to replace common Windows hotkeys (
+    <kbd>Ctrl</kbd> + <kbd>C</kbd>, <kbd>Ctrl</kbd> + <kbd>V</kbd>, etc). This is not
+    recommended.
 
 5.  Click OK to save your selection.
-
-6.  Click OK again from the Configuration window to apply the changes.
 
 The new hotkey will now be available.
 
 ## Related Topics
 
--   [Keyman Configuration - Hotkeys Tab](../basic/config_tasks/hotkeys_tab)
+-   [Keyman Configuration - Hotkeys Tab](../basic/config/hotkeys)

@@ -119,7 +119,6 @@ uses
   CharMapDropTool,
   ClipBrd,
   CompileKeymanWeb,
-  CustomisationStorage,
   dmActionsMain,
   dmActionsTextEditor,
   keymanstrings,

@@ -106,6 +106,7 @@ uses
   KLog,
   UFixupMissingFile,
   UILanguages,
+  Keyman.Configuration.System.UmodWebHttpServer,
   Unicode,
   utildir,
   utilhttp,
@@ -189,6 +190,7 @@ var
   FOutput: TStrings;
   FTemplatePath: WideString;
   s: WideString;
+  LanguageCode: string;
   doc: IXMLDocument;
   xml: IXMLDocument;
 
@@ -197,12 +199,7 @@ begin
 
   FOutput := TStringList.Create;
   try
-    with (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation.CustMessages do
-    begin
-      s := GetLocalePathForLocale(LanguageCode);
-      if not FileExists(s) then
-        s := FTemplatePath + 'strings.xml';
-    end;
+    LanguageCode := (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation.CustMessages.LanguageCode;
 
     FOutput.Add(
       '<?xml version="1.0" encoding="utf-8"?>'+
@@ -215,7 +212,8 @@ begin
         IfThen(CanElevate, '<canelevate />')+
         IfThen(Assigned(kmcom) and kmcom.SystemInfo.IsAdministrator, '<isadmin />')+   // I3612   // I3626
         '<uilanguages>'+GetUILanguages+'</uilanguages>'+
-        '<localepath>'+XMLEncode(s)+'</localepath>');
+        '<localeserver>'+modWebHttpServer.Host+'/page/locale/</localeserver>'+ // this
+        '<locale>'+LanguageCode+'</locale>');
 
     for i := 0 to Count - 1 do
       FOutput.Add(Items[i].GetXMLData);

@@ -24,7 +24,8 @@ uses
   SourceRootPath in 'SourceRootPath.pas',
   Keyman.System.DevTools.BuildMessageConstants in 'Keyman.System.DevTools.BuildMessageConstants.pas',
   Keyman.System.DevTools.BuildSetupStringTranslations in 'Keyman.System.DevTools.BuildSetupStringTranslations.pas',
-  SetupStrings in '..\..\desktop\setup\SetupStrings.pas';
+  SetupStrings in '..\..\desktop\setup\SetupStrings.pas',
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
 
 begin
   try

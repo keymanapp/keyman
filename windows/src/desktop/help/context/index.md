@@ -2,6 +2,7 @@
 title: Contextual Help
 ---
 
+TODO: Fix titles and bottom 2 links
 * [welcome](welcome)
 * [tutorial](tutorial)
 
@@ -26,7 +27,7 @@ title: Contextual Help
 * [osk_keyboard](osk_keyboard)
 * [osk_usage](osk_usage)
 * [fonthelper](fonthelper)
-* [charactermap](charactermap)
+* [character-map](character-map)
 
 * [psrtwindowslanguage](psrtwindowslanguage)
 * [psrtmsofficelanguage](psrtmsofficelanguage)

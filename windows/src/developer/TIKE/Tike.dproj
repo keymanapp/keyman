@@ -226,10 +226,7 @@
             <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UnitDrawArrow.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\CustomisationStorage.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\CustomisationMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\HeadingCheckListBox.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\BitmapEditor.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\StringGridEditControlled.pas"/>
@@ -241,7 +238,6 @@
         <DCCReference Include="dialogs\UfrmNewFileDetails.pas">
             <Form>frmNewFileDetails</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\cust\CustomisationMenu.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="compile\KeymanWebKeyCodes.pas"/>
