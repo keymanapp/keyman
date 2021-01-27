@@ -752,9 +752,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     // true source of the problems.
     viewController.dismiss(animated: false)
     showKeyboard()
-    if shouldReloadKeyboard {
-      inputViewController.reload()
-    }
+    
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
     
