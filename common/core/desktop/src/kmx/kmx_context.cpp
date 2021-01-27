@@ -34,7 +34,7 @@ KMX_WCHAR *KMX_Context::Buf(int n)
 {
   KMX_WCHAR *p;
 
-  for(p = (KMX_WCHAR *) u16chr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p, CurContext), n--);
+  for(p = (KMX_WCHAR *) u16chr(CurContext, 0); p != NULL && n > 0 && p > CurContext; p = decxstr(p, CurContext), n--);
 
   if(n > 0) return NULL;
   return p;
@@ -90,7 +90,7 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
   // of the string, not the start
   p = u16chr(buf, 0);
   q = (KMX_WCHAR*)p;
-  while(p > buf && (intptr_t)(q-p) < MAXCONTEXT - 1) {
+  while(p != NULL && p > buf && (intptr_t)(q-p) < MAXCONTEXT - 1) {
     p = decxstr((KMX_WCHAR*)p, (KMX_WCHAR*)buf);
   }
 

@@ -138,7 +138,6 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
 {
   if(p <= pStart) {
-    assert("Attempted to move prior to start of string");
     return NULL;
   }
 
