@@ -16,7 +16,7 @@ it is running you will see the Keyman icon:
 ## Step 2
 
 If the Keyman icon is in the Windows Taskbar near the clock, continue on
-to [Step 5](#tutorial_step5).
+to [Step 5](#step-5-).
 
 ![](../desktop_images/start_tray.png)
 
@@ -45,7 +45,7 @@ Keyman may show a startup screen; simply click Start Keyman to
 start the app. Keyman will now be running and the Keyman icon will be on the Windows
 Taskbar near the clock.
 
-## Step 5 <a name="tutorial_step5"></a>
+## Step 5
 
 Open a typing application, like Microsoft Word.
 
