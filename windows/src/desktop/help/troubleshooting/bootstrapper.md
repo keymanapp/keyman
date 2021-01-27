@@ -43,4 +43,4 @@ The following command line parameters are supported in the bootstrapper:
 
 ## Related Topics
 
--   [How To - Download and Install Keyman](../start/download-install_keyman)
+-   [How To - Download and Install Keyman](../start/download-and-install-keyman)

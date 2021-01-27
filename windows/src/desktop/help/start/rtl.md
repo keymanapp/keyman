@@ -17,11 +17,12 @@ get started.
     To do this, simply associate the keyboard with a right-to-left
     Windows language (like Arabic). For instructions on associating a
     Keyman keyboard with a Windows language, see:
-    [???](#start_configure_computer)
+    [How To - Set up Your Computer for a Keyman Keyboard](configure-computer)
 
 2.  If you will be using MS Office programs like Word, you should
     configure MS Office for your right-to-left language. For
-    instructions, see: [???](#start_configure_office)
+    instructions, see:
+    [How To - Set up MS Office for a Keyman Keyboard](configure_office)
 
 3.  Each time you start typing with a right-to-left Keyman keyboard, you
     may need to change the typing direction in the program you are
@@ -29,19 +30,18 @@ get started.
     (including MS Word, Internet Explorer, and Notepad), you can use the
     following shortcuts to switch direction:
 
-    -   For right-to-left, press: Ctrl + Right.Shift
-
-    -   For left-to-right, press: Ctrl + Left.Shift
+    -   For right-to-left, press: <kbd>Ctrl</kbd> + <kbd>Right Shift</kbd>
+    -   For left-to-right, press: <kbd>Ctrl</kbd> + <kbd>Left.Shift</kbd>
 
     In Firefox:
 
-    -   To toggle between right-to-left and left-to-right, press: Ctrl +
-        Shift + X
+    -   To toggle between right-to-left and left-to-right, press:
+        <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd>
 
 ## Related Topics
 
--   [How To - Set up Your Computer for a Keyman Keyboard](configure_computer)
--   [How To - Download and Install a Keyman Keyboard](download-install_keyboard)
+-   [How To - Set up Your Computer for a Keyman Keyboard](configure-computer)
+-   [How To - Download and Install a Keyman Keyboard](download-and-install-keyboard)
 -   [How To - Set up MS Office for a Keyman Keyboard](configure_office)
 -   [How To - Find the Best Fonts for a Keyman Keyboard](font)
--   [Keyboard Task - Turn on a Keyboard](../basic/enable_keyboard)
+-   [Keyboard Task - Turn on a Keyboard](../basic/select-keyboard)
