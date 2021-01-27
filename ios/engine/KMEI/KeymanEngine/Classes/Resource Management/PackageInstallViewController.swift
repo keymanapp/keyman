@@ -348,9 +348,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
     let dismissalBlock = {
       if let nvc = self.navigationController {
-        self.dismiss(animated: true) {
-          nvc.popToRootViewController(animated: true)
-        }
+        self.dismiss(animated: true)
+        nvc.popToRootViewController(animated: false)
       } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
         self.dismiss(animated: true)
       }
