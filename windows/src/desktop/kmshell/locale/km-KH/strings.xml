@@ -909,7 +909,7 @@
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Please wait while searching for related fonts for keyboard %0:s</string>
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">សូម​រង់ចាំ​ ពេល​កំពុង​ស្វែង​រក​ពុម្ព​អក្សរ​ពាក់ព័ន្ធ​សម្រាប់​ក្ដារចុច %0:s</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
