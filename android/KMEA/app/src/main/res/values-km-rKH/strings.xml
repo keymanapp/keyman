@@ -89,9 +89,9 @@
     <!-- Context: Background download messages-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">ការទាញយកបញ្ជី​ពាក្យបាន​ចប់​សព្វគ្រប់​ហើយ!</string>
     <!-- Context: Background download messages-->
-    <string name="failed_to_access_downloaded_file" comment="Failed to access downloaded file">Failed to access downloaded file</string>
+    <string name="failed_to_access_downloaded_file" comment="Failed to access downloaded file">មិន​អាច​ចូល​ប្រើ​ឯកសារដែល​បាន​ទាញ​យក</string>
     <!-- Context: Background download messages -->
-    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Failed to retrieve downloaded file</string>
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">រក​មិន​ឃើញ​ឯកសារដែល​បាន​ទាញ​យក</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">មិន​អាច​ចូលប្រើ​ម៉ាស៊ីនមេ​បាន​ទេ!</string>
     <!-- Context: General Updates -->
