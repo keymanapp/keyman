@@ -485,6 +485,10 @@ if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
     $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
 
+    if [ $? -ne 0 ]; then
+        fail "Typescript compilation of the UI modules failed."
+    fi
+
     CURRENT_PATH=`pwd`
     # Since the batch compiler for the UI modules outputs them within a subdirectory,
     # we need to copy them up to the base /intermediate/ folder.
