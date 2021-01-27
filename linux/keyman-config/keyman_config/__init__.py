@@ -34,7 +34,7 @@ else:
 # There's no staging site for downloads
 KeymanDownloadsUrl = 'https://downloads.keyman.com'
 
-if os.environ['KEYMAN_NOSENTRY'] == '1':
+if 'unittest' in sys.modules.keys():
     print('Not reporting to Sentry')
 else:
     try:
