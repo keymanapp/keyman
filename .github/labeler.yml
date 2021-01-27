@@ -1,8 +1,12 @@
 #
-# This file adds labels based on the scopes in resources/scopes/scopes.json.
+# This file adds labels based on the scopes in resources/scopes/scopes.json and
+# resources/scopes/commit-types.json
 # Currently it must be manually kept up to date. Not all labels are added, only
 # common ones. The others are commented out. There is still some variance between
 # folder names and labels; consider this documentation of that ;-)
+
+#
+# Add labels based on changed files using actions/labeler
 #
 
 android/: android/**
