@@ -103,19 +103,22 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
         pendingRootView.isUserInteractionEnabled = false
       } else if status == .complete {
         // Report completion!   Only reached when installation is fully completed.
+        // May occur after 'ui completion' due to async queries.
         activitySpinner.stopAnimating()
         activitySpinner.removeFromSuperview()
 
-        // Do not animate the dismissal:  the welcome-page's dismissal
-        // already provides enough animation.
         if let navVC = self.navVC {
-          navVC.dismiss(animated: true, completion: nil)
+          navVC.dismiss(animated: true) {
+            Manager.shared.showKeyboard()
+          }
         }
       }
     }
 
     if let navVC = self.navVC {
-      packageInstaller.promptForLanguages(inNavigationVC: navVC)
+      packageInstaller.promptForLanguages(inNavigationVC: navVC) {
+        // do nothing; the Settings menu dismissal will take care of displaying the keyboard
+      }
     }
   }
 }
