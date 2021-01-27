@@ -342,6 +342,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
     let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
 
+    // Always reload after installing or updating resources.
+    Manager.shared.shouldReloadKeyboard = true
     self.completionHandler(selectedResources.map { $0.typedFullID })
 
     let dismissalBlock = {

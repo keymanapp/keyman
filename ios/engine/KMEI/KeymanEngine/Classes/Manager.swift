@@ -277,7 +277,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     //
     // We MUST NOT shortcut this method as a result; doing so may (rarely) result in the infamous
     // blank keyboard bug!
-    if kb.fullID == currentKeyboardID && !self.isSystemKeyboard {
+    if kb.fullID == currentKeyboardID && !self.isSystemKeyboard && !self.shouldReloadKeyboard {
       log.info("Keyboard unchanged: \(kb.fullID)")
       return false
      // throw KeyboardError.unchanged
