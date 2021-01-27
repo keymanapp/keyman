@@ -247,7 +247,8 @@ namespace com.keyman.osk {
         keyText=spec['text'];
 
         // Unique layer-based transformation:  SHIFT-TAB uses a different glyph.
-        if(keyText == '*Tab*' && this.layer == 'shift') {
+        let embedded = com.keyman.singleton.isEmbedded;
+        if(keyText == '*Tab*' && this.layer == 'shift' && !embedded) {
           keyText = '*TabLeft*';
         }
       }

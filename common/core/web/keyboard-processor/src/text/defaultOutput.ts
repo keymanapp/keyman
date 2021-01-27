@@ -194,6 +194,9 @@ namespace com.keyman.text {
           return Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
         } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
           return Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
+        } else if(n == Codes.keyCodes['K_TAB'] || n == Codes.keyCodes['K_TABBACK'] || n == Codes.keyCodes['K_TABFWD']) {
+          // If TAB may be treated as a 'command key', it'll have been filtered out before this point.
+          return '\t';
         }
       } catch (e) {
         if(ruleBehavior) {
