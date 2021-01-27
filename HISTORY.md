@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.11 alpha 2021-01-27
+
+* chore: Enhance PR labeling based on PR title (#4226)
+
 ## 15.0.10 alpha 2021-01-27
 
 * fix(ios): renew distribution certificate (#4342)
