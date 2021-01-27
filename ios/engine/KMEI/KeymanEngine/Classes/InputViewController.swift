@@ -279,8 +279,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func viewWillAppear(_ animated: Bool) {
-    // Just seeing if it's actually called.
     super.viewWillAppear(animated)
+
+    if Manager.shared.shouldReloadKeyboard {
+      self.reload()
+    }
   }
 
   open override func viewDidAppear(_ animated: Bool) {
