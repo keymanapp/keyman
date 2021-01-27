@@ -451,29 +451,30 @@ BOOL ProcessGroup(LPGROUP gp)
 	*/
 
 	p = kkp->dpOutput;
-	if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT)
-	{
-		for(p = _td->miniContext; *p; p = incxstr(p))
-		{
-			if(*p == UC_SENTINEL)
-				switch(*(p+1))
-				{
-			    case CODE_DEADKEY: _td->app->QueueAction(QIT_BACK, BK_DEADKEY); break;
-					case CODE_NUL: break;	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
+	if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT) {
+		for(PWSTR mcp = decxstr(wcschr(_td->miniContext, 0), _td->miniContext); mcp != NULL; mcp = decxstr(mcp, _td->miniContext)) {
+      if (*mcp == UC_SENTINEL) {
+        switch (*(mcp + 1)) {
+          case CODE_DEADKEY: _td->app->QueueAction(QIT_BACK, BK_DEADKEY); break;
+          case CODE_NUL: break;	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
         }
-      else if (Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p+1))) {
+      }
+      else if (Uni_IsSurrogate1(*mcp) && Uni_IsSurrogate2(*(mcp + 1))) {
 				// 2 backspaces to delete both parts of surrogate pair
 				// This only needs to be done for TSF-aware apps as legacy apps
 				// will receive a BKSP WM_KEYDOWN event which results in deleting
 				// both parts in one action
 				_td->app->QueueAction(QIT_BACK, BK_SURROGATE);
-      } else {
+      }
+      else {
 				_td->app->QueueAction(QIT_BACK, 0);
 			}
 		}
-        p = kkp->dpOutput;
 	}
-	else p+=2;				// otherwise, the "context" entry has to be jumped over
+  else {
+    // otherwise, the "context" entry has to be jumped over
+    p += 2;
+  }
 
 	/* Use PostString to post the rest of the output string. */
 
