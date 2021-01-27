@@ -3,6 +3,8 @@
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
 
+set -eu
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -88,13 +90,13 @@ minified_sourcemap_cleaner="../tools/sourcemap-root"
 # $4 - extra path info to add to minified sourcemap "sourceRoot" property.
 # $5 - additional output wrapper
 minify ( ) {
-    if [ "$4" ]; then
+    if [ ${4} ]; then
         cleanerOptions="--suffix $4"
     else
         cleanerOptions=
     fi
 
-    if [ "$5" ]; then
+    if [ ${5} ]; then
         wrapper=$5
     else
         wrapper="%output%"
