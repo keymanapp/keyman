@@ -318,8 +318,6 @@ BOOL ProcessGroup(LPGROUP gp)
       BOOL fIsBackspace = _td->state.vkey == VK_BACK && (Globals::get_ShiftState() & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(/*_td->app->DebugControlled() &&*/ fIsBackspace) {   // I4838   // I4933
-        	//if(_td->state.msg.message == wm_keymankeydown)
-				  //	_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
 				if(_td->state.msg.message == wm_keymankeydown) {   // I4933
           if(!_td->app->IsLegacy()) {   // I4933
             PWCHAR pdeletecontext = _td->app->ContextBuf(1);   // I4933
@@ -330,13 +328,18 @@ BOOL ProcessGroup(LPGROUP gp)
             }
             if (Uni_IsSurrogate1(*pdeletecontext) && Uni_IsSurrogate2(*(pdeletecontext+1))) {
               // 2 backspaces to delete both parts of surrogate pair
-              // This only needs to be done for non-legacy apps as legacy apps
+              // This only needs to be done for TSF-aware apps as legacy apps
               // will receive a BKSP WM_KEYDOWN event which results in deleting
               // both parts in one action
+              _td->app->QueueAction(QIT_BACK, BK_BACKSPACE | BK_SURROGATE);
+            }
+            else {
               _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
             }
           }
-				  _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
+          else {
+            _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
+          }
         }
       } else if( (!_td->app->IsLegacy() || !fIsBackspace) && !_td->TIPFPreserved) {   // I4024   // I4128   // I4287   // I4290
         SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, " ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
@@ -357,9 +360,6 @@ BOOL ProcessGroup(LPGROUP gp)
 				 Must have special handling for VK_BACK: delete a character from the context stack
 				 This only fires if the keyboard has no rule for backspace.
 				*/
-
-//				if(_td->state.msg.message == wm_keymankeydown)    // I4933
-	//				_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
 			}
 			else
 			{
@@ -461,8 +461,13 @@ BOOL ProcessGroup(LPGROUP gp)
 			    case CODE_DEADKEY: _td->app->QueueAction(QIT_BACK, BK_DEADKEY); break;
 					case CODE_NUL: break;	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
         }
-      else
-			{
+      else if (Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p+1))) {
+				// 2 backspaces to delete both parts of surrogate pair
+				// This only needs to be done for TSF-aware apps as legacy apps
+				// will receive a BKSP WM_KEYDOWN event which results in deleting
+				// both parts in one action
+				_td->app->QueueAction(QIT_BACK, BK_SURROGATE);
+      } else {
 				_td->app->QueueAction(QIT_BACK, 0);
 			}
 		}
