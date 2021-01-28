@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.231 beta 2021-01-28
+
+* chore(common): Enhance PR labeling based on PR title (#4357)
+* change(web): set -eu for web scripts (#4353)
+* fix(ios): accidental duplicated line from merge (#4366)
+
 ## 14.0.230 beta 2021-01-28
 
 * fix(android/app): Wrap preference screen titles (#4326)
