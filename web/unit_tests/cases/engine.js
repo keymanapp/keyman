@@ -180,3 +180,34 @@ describe('Engine - Browser Interactions', function() {
     })
   });
 });
+
+describe('Unmatched Final Groups', function() {
+  this.timeout(kmwconfig.timeouts.scriptLoad);
+
+  before(function(done) {
+    fixture.setBase('fixtures');
+    setupKMW(null, done, kmwconfig.timeouts.scriptLoad + kmwconfig.timeouts.eventDelay);
+  });
+
+  beforeEach(function(done) {
+    fixture.load("singleTextArea.html");
+    
+    window.setTimeout(function() {
+      done()
+    }, kmwconfig.timeouts.eventDelay);
+  });
+  
+  after(function() {
+    teardownKMW();
+  });
+
+  afterEach(function() {
+    fixture.cleanup();
+  });
+
+  it.only('matches rule from early group AND performs default behavior', function(done) {
+    // While a TAB-oriented version would be nice, it's much harder to write the test
+    // to detect change in last input element.
+    runKeyboardTestFromJSON('/engine_tests/ghp_enter.json', {usingOSK: true}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
+  });
+});

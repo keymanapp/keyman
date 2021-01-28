@@ -1,0 +1,41 @@
+{
+  "specVersion": "14.0",
+  "keyboard": {
+    "id": "galaxie_hebrew_positional",
+    "name": "Galaxie Hebrew (Positional)",
+    "filename": "resources/keyboards/galaxie_hebrew_positional-2.2.js",
+    "languages": [
+      {
+        "id": "he",
+        "name": "Hebrew",
+        "region": "Asia"
+      }
+    ]
+  },
+  "inputTestSets": [
+    {
+      "constraint": {
+        "target": "desktop",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_M"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_ENTER"
+            }
+          ],
+          "output": "ם\n"
+        }
+      ]
+    }
+  ]
+}
