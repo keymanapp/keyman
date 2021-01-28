@@ -349,8 +349,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     Manager.shared.shouldReloadKeyboard = true
     self.pickingCompletionHandler(selectedResources.map { $0.typedFullID })
 
-    self.completionHandler(selectedResources.map { $0.typedFullID })
-
     let dismissalBlock = {
       if let nvc = self.navigationController {
         self.dismiss(animated: true)
