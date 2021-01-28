@@ -3,6 +3,8 @@
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
 
+set -eu
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -88,13 +90,13 @@ minified_sourcemap_cleaner="../tools/sourcemap-root"
 # $4 - extra path info to add to minified sourcemap "sourceRoot" property.
 # $5 - additional output wrapper
 minify ( ) {
-    if [ "$4" ]; then
+    if [ $# -ge 4 ]; then
         cleanerOptions="--suffix $4"
     else
         cleanerOptions=
     fi
 
-    if [ "$5" ]; then
+    if [ $# -ge 5 ]; then
         wrapper=$5
     else
         wrapper="%output%"
@@ -116,7 +118,7 @@ minify ( ) {
 
     # Now to clean the source map.
     assert "$OUTPUT"
-    assert "$SOURCEMAP"
+    assert "$OUTPUT_SOURCEMAP"
 
     # "Clean" the minified output sourcemaps.
     node $minified_sourcemap_cleaner "$INPUT_SOURCEMAP" "$OUTPUT_SOURCEMAP" $cleanerOptions
@@ -405,7 +407,9 @@ if [ $BUILD_EMBED = true ]; then
             mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
         fi
 
-        rm $EMBED_OUTPUT/keyman.js 2>/dev/null
+        if [ -f "$EMBED_OUTPUT/keyman.js" ]; then
+            rm $EMBED_OUTPUT/keyman.js 2>/dev/null
+        fi
 
         minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS
         assert $EMBED_OUTPUT/keyman.js
@@ -463,7 +467,9 @@ if [ $BUILD_COREWEB = true ]; then
     finish_nominify $WEB $WEB_TARGET
 
     if [ $DO_MINIFY = true ]; then
-        rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
+        if [ -f "$WEB_OUTPUT/keymanweb.js" ]; then
+            rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
+        fi
 
         echo Minifying KeymanWeb...
         minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS
@@ -507,22 +513,30 @@ if [ $BUILD_UI = true ]; then
 
     if [ $DO_MINIFY = true ]; then
         echo Minify ToolBar UI
-        del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
+        if [ -f "$WEB_OUTPUT/kmuitoolbar.js" ]; then
+            rm $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
+        fi
         minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuitoolbar.js
 
         echo Minify Toggle UI
-        del $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
+        if [ -f "$WEB_OUTPUT/kmuitoggle.js" ]; then
+            rm $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
+        fi
         minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuitoggle.js
 
         echo Minify Float UI
-        del $WEB_OUTPUT/kmuifloat.js 2>/dev/null
+        if [ -f "$WEB_OUTPUT/kmuifloat.js" ]; then
+            rm $WEB_OUTPUT/kmuifloat.js 2>/dev/null
+        fi
         minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuifloat.js
 
         echo Minify Button UI
-        del $WEB_OUTPUT/kmuibutton.js 2>/dev/null
+        if [ -f "$WEB_OUTPUT/kmuibutton.js" ]; then
+            rm $WEB_OUTPUT/kmuibutton.js 2>/dev/null
+        fi
         minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuibutton.js
 
