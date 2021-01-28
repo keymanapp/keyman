@@ -13,7 +13,7 @@ Nearly all strings have identifiers (e.g. SKButtonOK for the OK button).
 We have three different types of strings in the file - plain, HTML and
 format strings:
 
--   Format strings often include %\#:s or %\#:d markers that are
+-   Format strings often include `%#:s` or `%#:d` markers that are
     placeholders for parameters, and should be included in a translated
     string. The order of the markers in the translated string is not
     important.
@@ -27,7 +27,7 @@ format strings:
     these entries as they will be stripped before display.
 
     Example:
-    `<String Type="PlainText" Id="S_ShortProductName">Keyman for Windows</String<`
+    `<String Type="PlainText" Id="S_ShortProductName">Keyman for Windows</String>`
 
 -   HTML strings can include tags - there are only a few of these. The
     most obvious of these is in the Welcome screen text.
