@@ -50,7 +50,11 @@ div {
 }
 
 #version {
-  position: absolute; font-size: 0.8em; right: 90px; bottom: 10px; color: #F68924
+  position: absolute;
+  font-size: 0.8em;
+  right: 120px;
+  bottom: 10px;
+  color: #F68924;
 }
 
 #beta {
@@ -66,7 +70,7 @@ div {
   height: 84px;
   max-height: 84px;
   overflow-y: auto;
-  width: 400px;
+  width: 360px;
   padding: 0 16px 0 0;
 }
 
@@ -143,17 +147,27 @@ a.button {
 #tasks div { margin-bottom: 2px; margin-left: 4px }
 
 #startNow {
-  left: 434px;
+  right: 12px;
   top: 332px;
   height: 1.2em;
 }
 
+#startNow .btn,
+#config .btn {
+  width: 180px;
+  text-overflow: ellipsis;
+}
+
 #config {
-  left: 434px;
+  right: 12px;
   top: 372px;
 }
 
 #exit { right: 12px; bottom: 12px; }
+
+#exit .btn-small {
+  width: 90px;
+}
 
 #tasks div#showAtStartupBox { margin-top: 6px; margin-left: 0; }
 #tasks a, #showAtStartupLabel { color: #F68924; text-decoration: none; }
