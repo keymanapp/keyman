@@ -2,7 +2,7 @@
 title: How To - Fix Font Issues
 ---
 
-If you are having font issues, you should first try: [???](#start_font)
+If you are having font issues, you should first try: [How To - Find the Best Fonts for a Keyman Keyboard](../start/font)
 
 ## Fix Characters Appearing Smaller than the Selected Font Size
 
