@@ -10,4 +10,4 @@ title: Troubleshooting
 * [How To - Resolve Security Software Conflicts with keyman32.dll](securitysoftware)
 * [How To - Use the Keyman Setup Bootstrapper](bootstrapper)
 
-* [hidden](hidden)
+* [How To - Fix A Problem with an Active Keyman Keyboard Not Typing](hidden)

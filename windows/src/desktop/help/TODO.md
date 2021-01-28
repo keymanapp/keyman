@@ -5,4 +5,3 @@
 - search for \n\n- (gaps between bullets)
 - search for ^**...**$
 - search for keyboard references and use <kbd></kbd>
-- content for troubleshooting/hidden
