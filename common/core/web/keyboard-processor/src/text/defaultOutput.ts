@@ -194,13 +194,11 @@ namespace com.keyman.text {
           return Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
         } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
           return Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
-          // Filter out unembedded desktop scenarios; we need browser-default behavior to go through then.
-        } else if((Lkc.device.formFactor != utils.FormFactor.Desktop || Lkc.device.embedded) && 
-                  n == Codes.keyCodes['K_TAB'] || n == Codes.keyCodes['K_TABBACK'] || n == Codes.keyCodes['K_TABFWD']) {
+        } else if(n == Codes.keyCodes['K_TAB'] || n == Codes.keyCodes['K_TABBACK'] || n == Codes.keyCodes['K_TABFWD']) {
           // If TAB may be treated as a 'command key', it'll have been filtered out before this point.
           return '\t';
         }
-      } catch (e) {
+       } catch (e) {
         if(ruleBehavior) {
           ruleBehavior.errorLog = "Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default');
         }
