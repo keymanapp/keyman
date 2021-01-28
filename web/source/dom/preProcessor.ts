@@ -232,7 +232,7 @@ namespace com.keyman.dom {
         return true;
       }
 
-      var LeventMatched = (core.processKeyEvent(Levent) != null);
+      var LeventMatched = !!core.processKeyEvent(Levent);
 
       if(LeventMatched) {
         if(e  &&  e.preventDefault) {

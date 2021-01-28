@@ -43,6 +43,21 @@ namespace com.keyman.text {
      */
     predictionPromise?: Promise<Suggestion[]>;
 
+    /**
+     * In reference to https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852:
+     * 
+     * If the final group processed is a context and keystroke group (using keys), 
+     * and there is no nomatch rule, and the keystroke is not matched in the group, 
+     * the keystroke's default behavior should trigger, regardless of whether or not any
+     * rules in prior groups matched.
+     */
+    triggerKeyDefault?: boolean;
+
+    /**
+     * Indicates whether or not default rule behaviors matched a key.
+     */
+    defaultMatch?: boolean;
+
     finalize(processor: KeyboardProcessor) {
       let outputTarget = this.transcription.keystroke.Ltarg;
 
@@ -81,6 +96,33 @@ namespace com.keyman.text {
       } else if(processor.errorLogger && this.errorLog) {
         processor.errorLogger(this.errorLog);
       }
+    }
+
+    /**
+     * Merges default-related behaviors from another RuleBehavior into this one.  Assumes that the current instance
+     * "came first" chronologically.  Both RuleBehaviors must be sourced from the same keystroke.
+     * 
+     * Intended use:  merging rule-based behavior with default key behavior during scenarios like those described
+     * at https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852.
+     * 
+     * This function does not attempt a "complete" merge for two fully-constructed RuleBehaviors!  Things
+     * WILL break for unintended uses.
+     * @param other 
+     */
+    mergeInDefaults(other: RuleBehavior) {
+      let keystroke = this.transcription.keystroke;
+      let keyFromOther = other.transcription.keystroke;
+      if(keystroke.Lcode != keyFromOther.Lcode || keystroke.Lmodifiers != keyFromOther.Lmodifiers) {
+        throw "RuleBehavior default-merge not supported unless keystrokes are identical!";
+      }
+
+      this.triggersDefaultCommand = this.triggersDefaultCommand || other.triggersDefaultCommand;
+      
+      let mergingMock = Mock.from(this.transcription.preInput);
+      mergingMock.apply(this.transcription.transform);
+      mergingMock.apply(other.transcription.transform);
+
+      this.transcription = mergingMock.buildTranscriptionFrom(this.transcription.preInput, keystroke, this.transcription.alternates);
     }
   }
 }

@@ -180,7 +180,10 @@ namespace com.keyman.text {
       //        once THOSE are properly relocated.  (They're too DOM-heavy to remain in web-core.)
 
       // Only return true (for the eventual event handler's return value) if we didn't match a rule.
-      return ruleBehavior;
+
+      // Alas, the above notes are the goal, and will be separately addressed by #3695.  For now, a hacky
+      // workaround in order to not break default behaviors.
+      return ruleBehavior && !ruleBehavior.triggerKeyDefault;  // return `true` if the key is considered fully handled.
     }
 
     public resetContext(outputTarget?: OutputTarget) {

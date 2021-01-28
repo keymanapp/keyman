@@ -984,12 +984,15 @@ namespace com.keyman.text {
       var matched = this.activeKeyboard.process(outputTarget, keystroke);
       this.activeTargetOutput = null;
 
-      if(!matched) {
-        return null;
-      }
-
       // Finalize the rule's results.
       this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke);
+
+      // `matched` refers to whether or not the FINAL rule (from any group) matched, rather than
+      // whether or not ANY rule matched.  If the final rule doesn't match, we trigger the key's
+      // default behavior (if appropriate).
+      //
+      // See https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852
+      this.ruleBehavior.triggerKeyDefault = !matched;
 
       // Clear our result-tracking variable to prevent any possible pollution for future processing.
       let behavior = this.ruleBehavior;
