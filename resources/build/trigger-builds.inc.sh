@@ -69,7 +69,7 @@ function triggerJenkinsBuild() {
   local TAG=""
   # This will only be true if we created and pushed a tag
   if [ "${action:-""}" == "commit" ]; then
-    TAG=", \"tag\": \"$GIT_TAG\""
+    TAG=", \"tag\": \"$GIT_TAG\", \"tag2\": \"$GIT_TAG\""
   fi
 
   if [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
