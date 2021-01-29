@@ -2763,5 +2763,14 @@ namespace com.keyman.osk {
       }, 5000);
       return false;
     };
+
+    shutdown() {
+      let keyman = com.keyman.singleton;
+
+      // Prevents style-sheet pollution from multiple keyboard swaps.
+      if(this.styleSheet) {
+        keyman.util.removeStyleSheet(this.styleSheet);
+      }
+    }
   }
 }

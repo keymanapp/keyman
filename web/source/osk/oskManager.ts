@@ -197,8 +197,10 @@ namespace com.keyman.osk {
         s.fontSize = fontScale + 'em';
       }
 
+      if(this.vkbd) {
+        this.vkbd.shutdown();
+      }
       this.vkbd = null;
-      // TODO:  Consider a 'vkbd.release()' method?
 
       // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
       this._Box.innerHTML = '';
@@ -311,6 +313,9 @@ namespace com.keyman.osk {
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
     private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard) {
+      if(this.vkbd) {
+        this.vkbd.shutdown();
+      }
       this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard);
       let util = com.keyman.singleton.util;
 
