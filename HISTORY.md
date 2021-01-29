@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.12 alpha 2021-01-29
+
+* chore(linux): Improve launchpad.sh script (#4355)
+
 ## 15.0.11 alpha 2021-01-27
 
 * chore: Enhance PR labeling based on PR title (#4226)
