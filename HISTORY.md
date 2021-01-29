@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.232 beta 2021-01-29
+
+* chore(linux): Don't report on Sentry when running unit tests (#4356)
+* fix(windows): Ignore Access Denied error creating task (#4365)
+* chore(windows/resources): Fix more titles and TODOs in help (#4367)
+
 ## 14.0.231 beta 2021-01-28
 
 * chore(common): Enhance PR labeling based on PR title (#4357)
