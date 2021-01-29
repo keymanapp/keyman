@@ -136,14 +136,13 @@ namespace com.keyman.text.prediction {
       let specType: 'file'|'raw' = model.path ? 'file' : 'raw';
       let source = specType == 'file' ? model.path : model.code;
       let lp = this;
-      lp.currentModel = model;
-      
+
       // We pre-emptively emit so that the banner's DOM elements may update synchronously.
       // Prevents an ugly "flash of unstyled content" layout issue during keyboard load
       // on our mobile platforms when embedded.
+      lp.currentModel = model;
       lp.emit('statechange', 'active');
 
-      // We should wait until the model is successfully loaded before setting our state values.
       return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
         lp.configuration = config;
         lp.emit('statechange', 'configured');
