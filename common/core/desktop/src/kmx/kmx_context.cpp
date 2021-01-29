@@ -51,7 +51,7 @@ void KMX_Context::Delete()
 
   if(pos > 0) pos--;
   CurContext[pos] = 0;
-  //DebugLog("KMX_Context::Delete:  EXIT: %s", Debug_UnicodeString(CurContext));
+  //DebugLog("KMX_Context::Delete:  EXIT [%d]: %s", pos, Debug_UnicodeString(CurContext));
 }
 
 void KMX_Context::Reset()
@@ -81,7 +81,7 @@ void KMX_Context::CopyFrom(KMX_Context *source)   // I3575
 
 void KMX_Context::Set(const KMX_WCHAR *buf)
 {
-  DebugLog("KMX_Context::Set(%s): ENTER: %s", Debug_UnicodeString(buf), Debug_UnicodeString(CurContext, 1));
+  DebugLog("KMX_Context::Set(%s): ENTER [%d]: %s", Debug_UnicodeString(buf), pos, Debug_UnicodeString(CurContext, 1));
   const KMX_WCHAR *p;
   KMX_WCHAR *q;
 
@@ -110,7 +110,7 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
   pos = (intptr_t)(q-CurContext);
   CurContext[MAXCONTEXT-1] = 0;
 
-  //DebugLog("KMX_Context::Set(%s):  EXIT: %s", Debug_UnicodeString(buf), Debug_UnicodeString(CurContext, 1));
+  //DebugLog("KMX_Context::Set(%s):  EXIT [%d]: %s", Debug_UnicodeString(buf), pos, Debug_UnicodeString(CurContext, 1));
 }
 
 KMX_BOOL KMX_Context::CharIsDeadkey()

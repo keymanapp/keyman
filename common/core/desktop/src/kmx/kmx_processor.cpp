@@ -422,7 +422,12 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         break;
       }
     else {
-      m_actions.QueueAction(QIT_CHAR, *p);
+      if(Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p+1))) {
+        m_actions.QueueAction(QIT_CHAR, Uni_SurrogateToUTF32(*p, *(p+1)));
+        p++;
+      } else {
+        m_actions.QueueAction(QIT_CHAR, *p);
+      }
     }
   }
   return FoundUse ? psrPostMessages : psrCheckMatches;
