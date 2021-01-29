@@ -85,24 +85,40 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
     let packageInstaller = AssociatingPackageInstaller(for: package,
                                                        withAssociators: associators) { status in
       if status == .starting {
-        // Start a spinner!
+        // Start a spinner!  Installation confirmed, but still in progress;
+        // there may be lexical models to download.
         activitySpinner.startAnimating()
-        self.view.addSubview(activitySpinner)
 
-        activitySpinner.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-        activitySpinner.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-        self.view.isUserInteractionEnabled = false
+        var pendingRootView: UIView
+        if let navVC = self.navVC, navVC.viewControllers.first?.view != nil {
+          pendingRootView = navVC.viewControllers.first!.view!
+        } else {
+          pendingRootView = self.view
+        }
+
+        pendingRootView.addSubview(activitySpinner)
+
+        activitySpinner.centerXAnchor.constraint(equalTo: pendingRootView.centerXAnchor).isActive = true
+        activitySpinner.centerYAnchor.constraint(equalTo: pendingRootView.centerYAnchor).isActive = true
+        pendingRootView.isUserInteractionEnabled = false
       } else if status == .complete {
-        // Report completion!
+        // Report completion!   Only reached when installation is fully completed.
+        // May occur after 'ui completion' due to async queries.
         activitySpinner.stopAnimating()
         activitySpinner.removeFromSuperview()
-        self.view.isUserInteractionEnabled = true
-        self.dismiss(animated: true, completion: nil)
+
+        if let navVC = self.navVC {
+          navVC.dismiss(animated: true) {
+            Manager.shared.showKeyboard()
+          }
+        }
       }
     }
 
     if let navVC = self.navVC {
-      packageInstaller.promptForLanguages(inNavigationVC: navVC)
+      packageInstaller.promptForLanguages(inNavigationVC: navVC) {
+        // do nothing; the Settings menu dismissal will take care of displaying the keyboard
+      }
     }
   }
 }

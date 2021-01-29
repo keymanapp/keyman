@@ -6,7 +6,7 @@
 # must be run from linux dir
 
 # parameters: [PROJECT="<project>"] ./scripts/debian.sh
-# PROJECT="<project>" only upload this project
+# PROJECT="<project>" only process this project
 
 set -e
 

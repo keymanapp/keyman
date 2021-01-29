@@ -2,7 +2,7 @@
 title: How To - Fix Font Issues
 ---
 
-If you are having font issues, you should first try: [???](#start_font)
+If you are having font issues, you should first try: [How To - Find the Best Fonts for a Keyman Keyboard](../start/font)
 
 ## Fix Characters Appearing Smaller than the Selected Font Size
 
@@ -24,4 +24,4 @@ appears at a smaller size to the 'ha'.
 ## Related Topics
 
 -   [How To - Find the Best Fonts for a Keyman Keyboard](../start/font)
--   [Keyman Toolbox - Font Helper](../basic/toolbox_tasks/fonthelper)
+-   [Keyman Toolbox - Font Helper](../basic/toolbox/font-helper)

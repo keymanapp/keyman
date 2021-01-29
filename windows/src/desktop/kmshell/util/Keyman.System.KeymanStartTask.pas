@@ -170,6 +170,19 @@ begin
     pTaskFolder.RegisterTaskDefinition(GetTaskName, pTask, TASK_CREATE_OR_UPDATE or TASK_IGNORE_REGISTRATION_TRIGGERS,
       UserName, EmptyParam, TASK_LOGON_INTERACTIVE_TOKEN, EmptyParam);
   except
+    on E:EOleException do
+    begin
+      if E.ErrorCode <> HResultFromWin32(ERROR_ACCESS_DENIED) then
+      begin
+        // We don't report on ERROR_ACCESS_DENIED. This can arise if the task is
+        // originally created by an elevated instance of kmshell.exe, and then
+        // later an instance with standard privileges attempts to re-create it.
+        // That is not a problem, as the task will still work in either case.
+        // Note that in either case, the uninstall will clean up the tasks
+        // successfully.
+        TKeymanSentryClient.ReportHandledException(E, 'Failed to create task');
+      end;
+    end;
     on E:Exception do
     begin
       TKeymanSentryClient.ReportHandledException(E, 'Failed to create task');

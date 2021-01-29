@@ -47,7 +47,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
   let package: Resource.Package
   var packagePageController: PackageWebViewController?
-  let completionHandler: CompletionHandler
+  let pickingCompletionHandler: CompletionHandler
+  let uiCompletionHandler: (() -> Void)
   let defaultLanguageCode: String
   let associators: [LanguagePickAssociator]
   let languages: [Language]
@@ -62,9 +63,11 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   public init(for package: Resource.Package,
               defaultLanguageCode: String? = nil,
               languageAssociators: [LanguagePickAssociator] = [],
-              completionHandler: @escaping CompletionHandler) {
+              pickingCompletionHandler: @escaping CompletionHandler,
+              uiCompletionHandler: @escaping (() -> Void)) {
     self.package = package
-    self.completionHandler = completionHandler
+    self.pickingCompletionHandler = pickingCompletionHandler
+    self.uiCompletionHandler = uiCompletionHandler
     self.languages = package.languages
 
     self.associators = languageAssociators
@@ -312,7 +315,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
       dismiss(animated: true)
     }
-    self.completionHandler(nil)
+    self.pickingCompletionHandler(nil)
     self.associators.forEach { $0.pickerDismissed() }
   }
 
@@ -342,13 +345,14 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
     let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
 
-    self.completionHandler(selectedResources.map { $0.typedFullID })
+    // Always reload after installing or updating resources.
+    Manager.shared.shouldReloadKeyboard = true
+    self.pickingCompletionHandler(selectedResources.map { $0.typedFullID })
 
     let dismissalBlock = {
       if let nvc = self.navigationController {
-        self.dismiss(animated: true) {
-          nvc.popToRootViewController(animated: true)
-        }
+        self.dismiss(animated: true)
+        nvc.popToRootViewController(animated: false)
       } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
         self.dismiss(animated: true)
       }
@@ -392,8 +396,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     self.dismissalBlock?()
     self.dismissalBlock = nil
 
-    // The user will be on the main screen after this, so we should resummon the keyboard.
-    Manager.shared.showKeyboard()
+    self.uiCompletionHandler()
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {

@@ -1,5 +1,32 @@
 # Keyman Version History
 
+## 14.0.231 beta 2021-01-28
+
+* chore(common): Enhance PR labeling based on PR title (#4357)
+* change(web): set -eu for web scripts (#4353)
+* fix(ios): accidental duplicated line from merge (#4366)
+
+## 14.0.230 beta 2021-01-28
+
+* fix(android/app): Wrap preference screen titles (#4326)
+* fix(ios): better handling of scoped vs non-scoped package URLs (#4327)
+* fix(web): bulk renderer using video stream capture (#4316)
+* change(android/engine): Allow swipe to dismiss update notifications (#4329)
+* fix(windows): improve support for strings.xml (#4323)
+* fix(windows): invalid character in text content opening help (#4330)
+* fix(windows): align title to top in Install Keyboard (#4331)
+* chore(windows/resources): Cherry-pick 14.0 help from #4109 (#4335)
+* fix(ios): renew distribution certificate 🍒 (#4344)
+* fix(ios): reloads keyboard after package updates (#4347)
+* fix(ios): fixes accidental logo / cancel button overlap during package installation (#4332)
+* fix(ios): resolves rough edges with installation view transitions (#4338)
+* fix(web/ui): propagates UI module build failures (#4352)
+* chore(linux): Fix typo (#4341)
+* chore(windows/resources): Address more TODO links for help (#4351)
+* fix(windows): setup strings comment for language (#4362)
+* fix(windows): Splash button sizes (#4348)
+* chore: manual version increment (#4363)
+
 ## 14.0.228 beta 2021-01-22
 
 * fix(web): uses CSS line-height to vertically center oversized OSK keycaps (#4255)
