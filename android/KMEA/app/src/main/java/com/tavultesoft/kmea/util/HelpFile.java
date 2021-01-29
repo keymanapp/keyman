@@ -20,6 +20,7 @@ public final class HelpFile {
   private static final String TAG = "HelpFile";
   private static final String[] ASSET_MIME_TYPES =  {
     ClipDescription.MIMETYPE_TEXT_HTML,
+    "application/pdf",
     "text/css",
     "image/gif",
     "image/jpeg",
@@ -68,11 +69,19 @@ public final class HelpFile {
         for(File assetFile : files) {
           Uri assetUri = FileProvider.getUriForFile(
             context, authority, assetFile);
-          clipData.addItem(new ClipData.Item(assetUri));
+          // Special handling for PDF
+          if (FileUtils.hasPDFExtension(assetUri.toString())) {
+            clipData.addItem(new ClipData.Item(assetUri));
+          } else {
+            clipData.addItem(new ClipData.Item(assetUri));
+          }
         }
 
         // Associate assets in clipData to the intent
         i.setClipData(clipData);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
       } catch (NullPointerException e) {
         String message = "FileProvider undefined in app to load" + customHelp.toString();
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
