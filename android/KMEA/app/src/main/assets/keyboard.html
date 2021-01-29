@@ -113,7 +113,9 @@
       kmw['correctOSKTextSize']();
 
       fragmentToggle = (fragmentToggle + 1) % 100;
-      window.location.hash = 'refreshBannerHeight-'+fragmentToggle+'+change='+change;
+      if(change != 'configured') { // doesn't change the display; only initiates suggestions.
+        window.location.hash = 'refreshBannerHeight-'+fragmentToggle+'+change='+change;
+      }
     }
 
     // Query KMW if a given keyboard uses chiral modifiers.

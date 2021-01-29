@@ -33,7 +33,7 @@ namespace com.keyman.text.prediction {
    */
   export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
 
-  export type StateChangeEnum = 'active'|'inactive';
+  export type StateChangeEnum = 'active'|'configured'|'inactive';
   /**
    * Corresponds to the 'statechange' LanguageProcessor event.
    */
@@ -136,18 +136,31 @@ namespace com.keyman.text.prediction {
       let specType: 'file'|'raw' = model.path ? 'file' : 'raw';
       let source = specType == 'file' ? model.path : model.code;
       let lp = this;
+      lp.currentModel = model;
+      
+      // We pre-emptively emit so that the banner's DOM elements may update synchronously.
+      // Prevents an ugly "flash of unstyled content" layout issue during keyboard load
+      // on our mobile platforms when embedded.
+      lp.emit('statechange', 'active');
 
       // We should wait until the model is successfully loaded before setting our state values.
       return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
-        lp.currentModel = model;
         lp.configuration = config;
-
-        try {
-          lp.emit('statechange', 'active');
-        } catch (err) {
-          // Does this provide enough logging information?
-          console.error("Could not load model '" + model.id + "': " + (err as Error).message);
+        lp.emit('statechange', 'configured');
+      }).catch(function(error) { 
+        // Does this provide enough logging information?
+        let message: string;
+        if(error instanceof Error) {
+          message = error.message;
+        } else {
+          message = String(error);
         }
+        console.error("Could not load model '" + model.id + "': " + message);
+
+        // Since the model couldn't load, immediately deactivate.  Visually, it'll look
+        // like the banner crashed shortly after load.
+        lp.currentModel = null;
+        lp.emit('statechange', 'inactive');
       });
     }
 
