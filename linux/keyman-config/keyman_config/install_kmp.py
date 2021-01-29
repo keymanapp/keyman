@@ -9,6 +9,7 @@ from shutil import rmtree
 from enum import Enum
 
 from keyman_config import _
+from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
 from keyman_config.get_kmp import get_keyboard_data, user_keyboard_dir, user_keyman_font_dir
 from keyman_config.kmpmetadata import get_metadata, KMFileTypes
 from keyman_config.convertico import extractico, checkandsaveico
@@ -254,9 +255,6 @@ def install_kmp_user(inputfile, online=False, language=None):
         raise InstallError(InstallStatus.Abort, message)
 
 
-# The implementation of this method is a hack.
-# TODO: reimplement normalization according to langtags.json. See implementation for Windows once
-# that is in place.
 def _normalize_language(supportedLanguages, language):
     if len(supportedLanguages) <= 0:
         return ''
@@ -264,9 +262,10 @@ def _normalize_language(supportedLanguages, language):
     if not language:
         return language
 
+    language = CanonicalLanguageCodeUtils.findBestTag(language, False)
     for supportedLanguage in supportedLanguages:
-        id = supportedLanguage['id']
-        if id == language or id.startswith(language + '-'):
+        id = CanonicalLanguageCodeUtils.findBestTag(supportedLanguage['id'], False)
+        if id == language:
             return id
     return None
 
