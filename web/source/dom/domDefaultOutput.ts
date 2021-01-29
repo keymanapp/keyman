@@ -47,7 +47,7 @@ namespace com.keyman.dom {
   }
 
   DefaultOutput.forBaseKeys = function(Lkc: KeyEvent, ruleBehavior?: RuleBehavior): string {
-    let n = Lkc.Lcode;
+    let n = DefaultOutput.codeForEvent(Lkc);
     let keyman = com.keyman.singleton;
 
     if(n == Codes.keyCodes['K_TAB'] || n == Codes.keyCodes['K_TABBACK'] || n == Codes.keyCodes['K_TABFWD']) {

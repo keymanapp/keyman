@@ -53,11 +53,6 @@ namespace com.keyman.text {
      */
     triggerKeyDefault?: boolean;
 
-    /**
-     * Indicates whether or not default rule behaviors matched a key.
-     */
-    defaultMatch?: boolean;
-
     finalize(processor: KeyboardProcessor) {
       let outputTarget = this.transcription.keystroke.Ltarg;
 
