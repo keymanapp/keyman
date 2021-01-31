@@ -28,13 +28,24 @@ python3 -m pip install meson
 ```
 
 ## Building
-For Windows, use `build.bat` -- this handles environment and x86/x64
-cross-compiles with Visual Studio 2017+:
 
+### Building on Windows
+For Windows, use `build.bat` -- this handles environment and x86/x64
+cross-compiles with Visual Studio 2017+.
+
+You may need to set `SDKVER` environement variable to the current
+Windows SDK version, if it cannot be automatically detected, e.g.:
+
+```
+set SDKVER=10.0.19041.0
+```
+
+To build:
 ```
 build.bat all
 ```
 
+### Building on Linux, macOS
 For all other platforms, in your source directory do the following:
 ```
 cd desktop
@@ -48,6 +59,8 @@ meson test
 kmcomp is the command-line compiler from Keyman Developer, available from https://keyman.com/ or
 in this repo in /windows/src/developer/kmcomp. The compiler is currently available as a Windows
 PE executable only, but it does run under WINE.
+
+## Additional configuration notes
 
 ### Windows
 The search path can be edited through System settings / Advanced system settings /
