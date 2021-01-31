@@ -332,7 +332,6 @@ Entries not in this file will be sourced from the default locale.xml file in the
   <string name="S_Button_BaseKeyboard" comment="Configuration Dialog - Options tab/PlainText: Options tab - base keyboard button (introduced 9.0.445.0)">Base Keyboard...</string>
   <string name="S_Hotkey_Language_Prefix" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - activation term preceding Windows language name. Note: include a space following. (introduced 7.0.241.0)"/>
   <string name="S_Hotkey_Language_Suffix" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - language term following Windows language name. Note: include an initial space. (introduced 7.0.241.0)"/>
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show keyboard usage in OSK (introduced 7.1.275.0)">Show Keyboard Usage Pane</string>
   <string name="S_Hotkey_ShowFontHelper" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show font helper in OSK (introduced 7.1.275.0)">Show Font Helper Pane</string>
   <string name="S_Hotkey_ShowCharacterMap" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show character map in OSK (introduced 7.1.275.0)">Show Character Map Pane</string>
   <string name="S_Hotkey_OpenTextEditor" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - open text editor (introduced 7.1.275.0)">Open Text Editor</string>
@@ -405,15 +404,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <string name="SKMenu_NoKeyboardsInstalled" comment="System Tray Menu Items/PlainText: Systray - notice of no keyboard layouts installed (introduced 7.0.230.0)">No keyboard layouts are installed.
 Choose "Configuration" to install a 
 keyboard layout for your language.</string>
-  <string name="S_Usage_Welcome" comment="Usage Page/PlainText: Usage page - keyboard help button (introduced 7.0.244.0)">Keyboard Help</string>
-  <string name="S_Usage_OSK" comment="Usage Page/PlainText: Usage page - On Screen Keyboard button (introduced 7.0.244.0)">On Screen Keyboard</string>
-  <string name="S_Usage_Tutorial" comment="Usage Page/PlainText: Usage page - Getting Started button (introduced 7.0.244.0)">Get Started</string>
-  <string name="S_Usage_Help" comment="Usage Page/PlainText: Usage page - Product Help button (introduced 7.0.244.0)">Keyman Help</string>
-  <string name="S_Usage_Config" comment="Usage Page/PlainText: Usage page - Product Configuration button (introduced 7.0.244.0)">Keyman Configuration</string>
-  <string name="S_Usage_KeyboardNoDocumentation" comment="Usage Page/HTML: Usage page - Text shown when keyboard has no documentation (introduced 7.1.261.0)">This keyboard layout has no Getting Started or Usage documentation. Please check the Start Menu or contact the keyboard developer for more information on how to use this keyboard layout.</string>
-  <string name="S_Usage_KeyboardDocumentation" comment="Usage Page/HTML: Usage page - Text shown when keyboard has documentation (introduced 7.1.261.0)">Click the buttons below to view additional documentation and/or On Screen Keyboard.</string>
-  <string name="S_Usage_KeymanOff" comment="Usage Page/HTML: Usage page - Text shown when no Keyman keyboard is active (introduced 7.1.261.0)">No keyboard layout is currently selected in Keyman.  Click on any of the keyboard icons in the toolbar above to choose a keyboard layout.</string>
-  <string name="S_Usage_NoKeyboardsInstalled" comment="Usage Page/HTML: Usage page - Text shown when no Keyman keyboards are installed (introduced 7.1.261.0)">No keyboard layouts are currently installed or loaded.  Use Keyman Configuration to install a keyboard layout.</string>
   <string name="SKButtonPrint" comment="Formatted Messages/FormatString: Print button in Welcome dialog for keyboards (introduced 7.0.239.0)">&amp;Print...</string>
   <string name="SKButtonDownload" comment="Formatted Messages/FormatString: Download button in Locale Selection dialog (introduced 7.0.240.0)">&amp;Download...</string>
   <string name="SKUninstallKeyboard" comment="Formatted Messages/FormatString: Request for confirmation to uninstall keyboard layout [%0:s = Keyboard name] (introduced 7.0.239.0)">Are you sure you want to uninstall keyboard %0:s?</string>
@@ -447,13 +437,4 @@ Do you want to try and start Keyman again now?</string>
   <string name="S_OSK_FontHelper_NoFonts1b" comment="OSK Font Helper/HTML: OSK Font helper no fonts part 2 (introduced 8.0.294.0)">.  Please check the documentation to find fonts for this keyboard.</string>
   <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font Helper/HTML: OSK Font helper no keyboards (introduced 8.0.294.0)">No keyboard layouts are currently installed or loaded.  Use Keyman Configuration to install a keyboard layout.</string>
   <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font Helper/HTML: OSK Font helper choose keyboard (introduced 8.0.294.0)">Please choose a Keyman keyboard to find the fonts that will work with it.</string>
-  <string name="S_OSK_Hint_Title" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar title (introduced 8.0.294.0)">Hint:</string>
-  <string name="S_OSK_Hint1" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Resize the On Screen Keyboard by clicking and dragging on the window border</string>
-  <string name="S_OSK_Hint2" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Move the On Screen Keyboard by clicking and dragging on the "Keyman" title</string>
-  <string name="S_OSK_Hint3a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Insert any Unicode character into your document with the</string>
-  <string name="S_OSK_Hint3b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Character Map Tool</string>
-  <string name="S_OSK_Hint4a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Find out which fonts will work with your language with the</string>
-  <string name="S_OSK_Hint4b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Font Helper Tool</string>
-  <string name="S_OSK_Hint5a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Get more help on the keyboard by clicking the</string>
-  <string name="S_OSK_Hint5b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Keyboard Usage button</string>
 </resources>

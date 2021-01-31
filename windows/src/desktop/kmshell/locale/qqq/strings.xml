@@ -126,7 +126,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <string name="S_Hotkey_OpenKeyboardMenu" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - Open Keyman systemtray menu (introduced 7.0.230.0)">[!!Ōƥȇń Ķęƴɓőäŗď Měƞų!!]</string>
   <string name="S_Hotkey_ShowOnScreenKeyboard" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show keyboard in OSK (introduced 7.0.230.0)">[!!Śħōŵ Ŏƞ Ŝĉřęęƞ ĶėƴƂőäŗď Ƥâņȇ!!]</string>
   <string name="S_Hotkey_OpenConfiguration" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - open Keyman Configuration (introduced 7.0.230.0)">[!!Őƥȅņ Čŏƞƒıġŭřãŧĭőń!!]</string>
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show keyboard usage in OSK (introduced 7.1.275.0)">[!!Šĥōŵ Ƙȅɏƀŏâŗď Ũşāġė Ƥȁņě!!]</string>
   <string name="S_Hotkey_ShowFontHelper" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show font helper in OSK (introduced 7.1.275.0)">[!!Šħŏŵ Ƒơņŧ Ĥēľƿėř Ƥăňě!!]</string>
   <string name="S_Hotkey_ShowCharacterMap" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show character map in OSK (introduced 7.1.275.0)">[!!Šĥőŵ Ćħąŗâćţěŗ Mȁƥ Ƥȃņě!!]</string>
   <string name="S_Hotkey_OpenTextEditor" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - open text editor (introduced 7.1.275.0)">[!!Ơƥĕŉ Ţěxţ Ęđĩţŏŕ!!]</string>
@@ -278,7 +277,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <string name="S_Help_Keyboard_Prefix" comment="Help Dialog/PlainText: Help - text preceding keyboard name (introduced 7.0.230.0)">[!!Ħėŀƥ ōņ "!!]</string>
   <string name="S_Help_Keyboard_Suffix" comment="Help Dialog/PlainText: Help - text following keyboard name (introduced 7.0.230.0)">[!!" ƙęŷƃőáŕď!!]</string>
   <string name="S_Toolbar_ViewOnScreenKeyboard" comment="Toolbar Context Help/PlainText: Toolbar help - View OSK pop-up text (introduced 7.0.230.0)">[!!Vīěŵ Őŋ Şčŗęȇņ Ƙȅƴƅŏȃřď!!]</string>
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="Toolbar Context Help/PlainText: Toolbar help - View Keyboard Usage pop-up text (introduced 7.0.230.0)">[!!Vįĕŵ Ƙȇɏƅơãŗď Ŭśȁĝě!!]</string>
   <string name="S_Toolbar_ViewFontHelper" comment="Toolbar Context Help/PlainText: Toolbar help - View Font Helper pop-up text (introduced 7.0.230.0)">[!!Vĩėŵ Ƒōňţ Ħēĺƥěŗ!!]</string>
   <string name="S_Toolbar_ViewCharacterMap" comment="Toolbar Context Help/PlainText: Toolbar help - View Character Map pop-up text (introduced 7.0.230.0)">[!!Vīěŵ Ċħåřāčŧĕř Máƿ!!]</string>
   <string name="S_Menu_SwitchKeymanOff" comment="Toolbar Context Help/PlainText: Toolbar help - Switch Keyman Desktop Off pop-up text (introduced 7.0.230.0)">[!!Ŝŵĭŧčħ !!]Keyman[!! Ōƒƒ!!]</string>
@@ -290,7 +288,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <!-- - - - - - - - - - - - - - - - - - -->
   <string name="S_Menu_SwitchKeymanOff" comment="System Tray Menu Items/PlainText: Systray item - Switch Keyman Desktop Off [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Şŵıţčħ !!]Keyman[!! &amp;Ōƒƒ!!]</string>
   <string name="S_Menu_OnScreenKeyboard" comment="System Tray Menu Items/PlainText: Systray item - OSK [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Ōń Ŝćŗĕėň &amp;ĶȇȳƂőářď!!]</string>
-  <string name="S_Menu_KeyboardUsage" comment="System Tray Menu Items/PlainText: Systray item - Keyboard Usage [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Ķȇƴƃơăřď &amp;Ůšăĝė!!]</string>
   <string name="S_Menu_FontHelper" comment="System Tray Menu Items/PlainText: Systray item - Font Helper [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!&amp;Ƒōńť Ħȇŀƥěŕ!!]</string>
   <string name="S_Menu_CharacterMap" comment="System Tray Menu Items/PlainText: Systray item - Character Map [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Ĉĥãřāĉťęř &amp;Mâƥ!!]</string>
   <string name="S_Menu_TextEditor" comment="System Tray Menu Items/PlainText: Systray item - Text Editor [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!&amp;Ťēxť Ȇďĩťŏř...!!]</string>
@@ -304,18 +301,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <string name="S_OSKContext_ShowToolbar" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - show/hide OSK toolbar (introduced 7.0.230.0)">[!!Ŝĥŏŵ Ťōōĺƀåř!!]</string>
   <string name="S_OSKContext_SaveAsWebPage" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - save diagram of active keyboard layout as a web page (introduced 7.0.230.0)">[!!Śǻvĕ äš ŴěƄ Ƥąģę...!!]</string>
   <string name="S_OSKContext_Print" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - print diagram of active keyboard layout (introduced 7.0.230.0)">[!!Ƥŕıňŧ...!!]</string>
-  <!-- - - - - - - - - - - - - - - - - - -->
-  <!-- Usage Page                        -->
-  <!-- - - - - - - - - - - - - - - - - - -->
-  <string name="S_Usage_Welcome" comment="Usage Page/PlainText: Usage page - keyboard help button (introduced 7.0.244.0)">[!!Ƙȅŷƅőǻřď Ħēłƥ!!]</string>
-  <string name="S_Usage_OSK" comment="Usage Page/PlainText: Usage page - On Screen Keyboard button (introduced 7.0.244.0)">[!!Őņ Ŝćŗėėń ĶȇɏƄōâŕď!!]</string>
-  <string name="S_Usage_Tutorial" comment="Usage Page/PlainText: Usage page - Getting Started button (introduced 7.0.244.0)">[!!Ģȅŧ Šťàŗťĕď!!]</string>
-  <string name="S_Usage_Help" comment="Usage Page/PlainText: Usage page - Product Help button (introduced 7.0.244.0)">Keyman[!! Ĥėŀƥ!!]</string>
-  <string name="S_Usage_Config" comment="Usage Page/PlainText: Usage page - Product Configuration button (introduced 7.0.244.0)">Keyman[!! Ċơŋƒĩġũřăţıơņ!!]</string>
-  <string name="S_Usage_KeyboardNoDocumentation" comment="Usage Page/HTML: Usage page - Text shown when keyboard has no documentation (introduced 7.1.261.0)">[!!Ťħĩŝ ƙȅŷƄőäŗđ ĺàŷŏũţ ĥáś ŉō Ĝěťťīņģ Śťăŗţęď ơř Ũŝȁģē ďơċũměņťȁţĩŏƞ. Ƥľȅǻšě ĉħėċĸ ŧħē Šťàřţ Měńů őŗ ĉőŋţáĉť ŧħę ƙȇȳƂŏåŗď ďȇvēľőƥȅŗ ƒōŗ mőŗē ıňƒŏŗmȃŧĩőň ōƞ ĥơŵ ťō ųŝę ŧĥĭş ķěȳƅőářđ ŀâŷōųţ.!!]</string>
-  <string name="S_Usage_KeyboardDocumentation" comment="Usage Page/HTML: Usage page - Text shown when keyboard has documentation (introduced 7.1.261.0)">[!!Čļīćƙ ťĥȅ ƅŭťŧŏňś ƃȅłơŵ ťơ vıęŵ åďďįŧĩōņāľ ďŏĉųmȅņŧāŧīơƞ ąŉđ/őř Őń Şčřȇęŉ Ƙȇƴƃŏȁŗď.!!]</string>
-  <string name="S_Usage_KeymanOff" comment="Usage Page/HTML: Usage page - Text shown when no Keyman keyboard is active (introduced 7.1.261.0)">[!!Ňơ ƙęƴƃŏàŕđ ĺȁƴơųŧ ĭś ćũřŗęńţľȳ ŝȇľěćŧĕđ ĩņ !!]Keyman[!!.  Ĉŀĩĉƙ őƞ àŋɏ őƒ ŧĥē ƙěŷƀőăřď ıćőņš ıƞ ŧħĕ ŧŏơŀƀąŗ åƄơvȇ ťơ ćħőŏşȅ ã ĸȅɏƀơáŕď ĺãŷōūţ.!!]</string>
-  <string name="S_Usage_NoKeyboardsInstalled" comment="Usage Page/HTML: Usage page - Text shown when no Keyman keyboards are installed (introduced 7.1.261.0)">[!!Ŋō ķĕŷƄőàřđ ľãƴŏųŧŝ ąřė ċůŕŕěŋťĺŷ įƞšťàļľĕď ơŗ ŀơȃđȅđ.  Ŭşē !!]Keyman[!! Čōŉƒīĝűŗāťĩőň ŧơ ıƞšŧȃľļ à ķȅɏƂơâřď ĺãɏōũť.!!]</string>
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <!-- Formatted messages, assorted                                              -->
   <!-- These messages cannot contain HTML tags and are plain text                -->
@@ -391,16 +376,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <string name="S_OSK_FontHelper_NoFonts1b" comment="OSK Font Helper/HTML: OSK Font helper no fonts part 2 (introduced 8.0.294.0)">[!!.  Ƥľȇāšē !!][!!čħēċƙ ťħė ďŏĉūmęņţǻţīŏņ!!][!! ţơ ƒıńď ƒơňţś ƒōŕ ťĥış ķȇɏƀōãřď.!!]</string>
   <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font Helper/HTML: OSK Font helper no keyboards (introduced 8.0.294.0)">[!!Ńŏ ĸęƴƅơāŗđ ŀåƴōůŧś äŕȅ ćųŗŕęņťĺȳ īņśťâłłēđ ōŕ łőäđĕď.  Ŭŝě !!]Keyman[!! Ĉőŋƒįğűřąŧīŏņ ŧơ ıŉŝťȃĺľ ä ƙĕɏƃōąŗđ łâƴơŭŧ.!!]</string>
   <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font Helper/HTML: OSK Font helper choose keyboard (introduced 8.0.294.0)">[!!Ƥľęǻśĕ ćħōŏšě å !!]Keyman[!! ķēƴƄŏȃřđ ţő ƒīƞď ţħė ƒőƞŧş ŧĥáŧ ŵįĺĺ ŵőŗĸ ŵıŧħ īŧ.!!]</string>
-  <!-- OSK Hints -->
-  <string name="S_OSK_Hint_Title" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar title (introduced 8.0.294.0)">[!!Ħīŉť:!!]</string>
-  <string name="S_OSK_Hint1" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Řěšıżȇ ŧħȅ Őň Şċŕĕĕň Ƙěŷƅơǻřđ ƃŷ ćŀĭćĸīňģ äńď đŕäĝġıńĝ ŏŉ ŧĥę ŵįŉďơŵ ƅơŗďėŕ!!]</string>
-  <string name="S_OSK_Hint2" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Mővȅ ţĥȅ Ơň Şčřėěŋ ƘėŷƄơäřď Ƃɏ čŀīċĸĩŉĝ ąŉđ ďřâģğıŋĝ ōń ťĥȅ "!!]Keyman[!!" ŧīťłē!!]</string>
-  <string name="S_OSK_Hint3a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ĩņśȅřť ąŋƴ Ůńĩćōđē ćħăŗǻċŧěř ĩņťō ƴơũŕ đōčŭměňŧ ŵıŧĥ ŧħȅ!!]</string>
-  <string name="S_OSK_Hint3b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Čĥǻŗąĉŧėř Mäƥ Ťŏŏŀ!!]</string>
-  <string name="S_OSK_Hint4a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ƒĩńď őűť ŵĥıćĥ ƒơņţş ŵĭŀł ŵōřƙ ŵıţħ ŷōŭŕ ŀåņğūȃĝė ŵĭťĥ ťĥȇ!!]</string>
-  <string name="S_OSK_Hint4b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ƒơŉţ Ħęŀƥȅŕ Ťōōļ!!]</string>
-  <string name="S_OSK_Hint5a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ğēţ mơŕē ħěŀƥ ōŋ ţħė ĸȅȳƄơäřđ Ƃȳ ċļįčķįŋğ ţħě!!]</string>
-  <string name="S_OSK_Hint5b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">[!!Ƙěɏƀơåřď Ůśâģȇ Ƅűŧţơņ!!]</string>
   <!-- - - - - - - - - - - - - - - - - - -->
   <!-- Text Editor                       -->
   <!-- - - - - - - - - - - - - - - - - - -->

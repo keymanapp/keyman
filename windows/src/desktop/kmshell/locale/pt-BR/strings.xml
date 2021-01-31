@@ -143,15 +143,6 @@
   <string name="S_Update_OldVersionHead" comment="/PlainText: ">Versão Antiga</string>
   <string name="S_Update_SizeHead" comment="/PlainText: ">Tamanho</string>
   <string name="S_Update_Title" comment="/PlainText: ">Versão Atualizada Disponível</string>
-  <string name="S_Usage_Config" comment="/PlainText: ">Configuração do Keyman Desktop</string>
-  <string name="S_Usage_Help" comment="/PlainText: ">Ajuda para Keyman Desktop</string>
-  <string name="S_Usage_KeyboardDocumentation" comment="/HTML: ">Clique nos botões em baixo para ver documentações adicionais e/ou Teclado Virtual.</string>
-  <string name="S_Usage_KeyboardNoDocumentation" comment="/HTML: ">Este layout de teclado não possui documentação para Iniciar ou Usar. Favor verificar no Menu Iniciar ou contatar o desenvolvedor do teclado para mais informações sobre como usar este layout de teclado.</string>
-  <string name="S_Usage_KeymanOff" comment="/HTML: ">Nenhum layout de teclado está selecionado agora no Keyman Desktop. Clique em qualquer dos ícones na barra de ferramentas em cima para selecionar um layout de teclado.</string>
-  <string name="S_Usage_NoKeyboardsInstalled" comment="/HTML: ">Nenhum layout de teclado está instalado ou carregado agora. Use a Configuração do Keyman Desktop para instalar um layout de teclado.</string>
-  <string name="S_Usage_OSK" comment="/PlainText: ">Teclado Virtual</string>
-  <string name="S_Usage_Tutorial" comment="/PlainText: ">Começar</string>
-  <string name="S_Usage_Welcome" comment="/PlainText: ">Ajuda para Teclado</string>
   <string name="S_Yes" comment="/PlainText: ">Sim</string>
   <string name="S_OSKContext_SaveAsWebPage" comment="/PlainText: ">&amp;Salvar como Página da Web</string>
   <string name="S_OSKContext_ShowToolbar" comment="/PlainText: ">Mostrar Barra de &amp;Ferramentas</string>
@@ -231,7 +222,6 @@ AVISO DE PRIVACIDADE: Este arquivo vai gravar todos os caracteres que você digi
   <string name="S_Menu_SwitchKeymanOff" comment="/PlainText: ">Desativar Keyman</string>
   <string name="S_Toolbar_ViewCharacterMap" comment="/PlainText: ">Ver Mapeamento dos Caracteres</string>
   <string name="S_Toolbar_ViewFontHelper" comment="/PlainText: ">Ver o Assistente de Fonte</string>
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="/PlainText: ">Ver a Usagem de Teclados.</string>
   <string name="S_Toolbar_ViewOnScreenKeyboard" comment="/PlainText: ">Ver o Teclado Virtual</string>
   <string name="S_LocaleAuthors" comment="System/PlainText: Name(s) of people who created this translation - i.e. your name (introduced 7.1.266.0)">Keyman</string>
   <string name="S_Button_Apply" comment="General Strings/PlainText: Apply button term (introduced 8.0.314.0)">Apply</string>
@@ -252,7 +242,6 @@ AVISO DE PRIVACIDADE: Este arquivo vai gravar todos os caracteres que você digi
   <string name="koDeadkeyConversion" comment="Configuration Dialog - Options tab/FormatString: Advanced options - Base keyboard deadkeys are treated as normal keys (introduced 9.0.480.0)">Treat hardware deadkeys as plain keys</string>
   <string name="koSwitchLanguageForAllApplications" comment="Configuration Dialog - Options tab/FormatString: Advanced options - selected language applies to all applications (introduced 7.1.274.0)">Select keyboard layout for all applications</string>
   <string name="S_Button_BaseKeyboard" comment="Configuration Dialog - Options tab/PlainText: Options tab - base keyboard button (introduced 9.0.445.0)">Base Keyboard...</string>
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show keyboard usage in OSK (introduced 7.1.275.0)">Show Keyboard Usage Pane</string>
   <string name="S_Hotkey_ShowFontHelper" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show font helper in OSK (introduced 7.1.275.0)">Show Font Helper Pane</string>
   <string name="S_Hotkey_ShowCharacterMap" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show character map in OSK (introduced 7.1.275.0)">Show Character Map Pane</string>
   <string name="S_Hotkey_OpenTextEditor" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - open text editor (introduced 7.1.275.0)">Open Text Editor</string>
@@ -300,13 +289,4 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <string name="S_OSK_FontHelper_NoFonts1b" comment="OSK Font Helper/HTML: OSK Font helper no fonts part 2 (introduced 8.0.294.0)">.  Please check the documentation to find fonts for this keyboard.</string>
   <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font Helper/HTML: OSK Font helper no keyboards (introduced 8.0.294.0)">No keyboard layouts are currently installed or loaded.  Use Keyman Configuration to install a keyboard layout.</string>
   <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font Helper/HTML: OSK Font helper choose keyboard (introduced 8.0.294.0)">Please choose a Keyman keyboard to find the fonts that will work with it.</string>
-  <string name="S_OSK_Hint_Title" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar title (introduced 8.0.294.0)">Hint:</string>
-  <string name="S_OSK_Hint1" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Resize the On Screen Keyboard by clicking and dragging on the window border</string>
-  <string name="S_OSK_Hint2" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Move the On Screen Keyboard by clicking and dragging on the "Keyman" title</string>
-  <string name="S_OSK_Hint3a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Insert any Unicode character into your document with the</string>
-  <string name="S_OSK_Hint3b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Character Map Tool</string>
-  <string name="S_OSK_Hint4a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Find out which fonts will work with your language with the</string>
-  <string name="S_OSK_Hint4b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Font Helper Tool</string>
-  <string name="S_OSK_Hint5a" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Get more help on the keyboard by clicking the</string>
-  <string name="S_OSK_Hint5b" comment="OSK Hints/Plain Text: On Screen Keyboard Hintbar hint (introduced 8.0.294.0)">Keyboard Usage button</string>
 </resources>

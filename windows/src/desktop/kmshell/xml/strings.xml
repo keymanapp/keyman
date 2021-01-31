@@ -486,11 +486,6 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="Hotkey - show keyboard usage in OSK">Show Keyboard Usage Pane</string>
-
-  <!-- Context: Configuration Dialog - Hotkeys tab -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.1.275.0 -->
   <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">Show Font Helper Pane</string>
 
   <!-- Context: Configuration Dialog - Hotkeys tab -->
@@ -934,11 +929,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="Toolbar help - View Keyboard Usage pop-up text">View Keyboard Usage</string>
-
-  <!-- Context: Toolbar Context Help -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">View Font Helper</string>
 
   <!-- Context: Toolbar Context Help -->
@@ -973,11 +963,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">On Screen &amp;Keyboard</string>
-
-  <!-- Context: System Tray Menu Items -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_KeyboardUsage" comment="Systray item - Keyboard Usage [&amp; precedes alt + access-character]">Keyboard &amp;Usage</string>
 
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
