@@ -726,8 +726,17 @@ void HandleRefresh(int code, LONG tag)
     // refreshed after an update, but only once per
     // refresh request
     if (UpdateRefreshTag(tag)) {
-      // We'll update when we are called into action
-      ScheduleRefresh();
+#ifdef _WIN64
+      if (Globals::get_InitialisingThread() == GetCurrentThreadId()) {
+        // If this is the keymanx64 thread, then we should
+        // go ahead and process the refresh immediately so
+        // that global settings are updated
+        RefreshKeyboards(FALSE);
+      }
+      else
+#endif
+        // We'll update when we are called into action
+        ScheduleRefresh();
     }
     break;
 	}
@@ -755,7 +764,7 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 
     Globals::SetBaseKeyboardFlags(underlyingLayout, reg->ReadInteger(REGSZ_SimulateAltGr), !reg->ValueExists(REGSZ_DeadkeyConversionMode) || reg->ReadInteger(REGSZ_DeadkeyConversionMode));
 	} else {
-    Globals::SetBaseKeyboardFlags("", 0, 0);
+    Globals::SetBaseKeyboardFlags("", 0, 1);
   }
 
 	delete reg;
