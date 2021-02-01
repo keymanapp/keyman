@@ -70,9 +70,11 @@
   <!-- Introduced: 8.0.330.0 -->
   <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman is still running.  Click this icon to use your language keyboard at any time</string>
 
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0.234 -->
+  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman is already running. Click the Keyman icon in the system notification area to use your language keyboard</string>
   
-  
-
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
