@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.233 beta 2021-02-01
+
+* fix(windows): SMP-aware deletion in TSF-aware apps (#4360)
+* fix(common): tweak surrogate pair deletions (#4361)
+* fix(windows): Enter and Spacebar handling in Configuration (#4349)
+* fix(web): removes stylesheets from unloaded keyboards (#4371)
+* fix(android, ios): eliminates OSK layout flashing from predictive text banner display (#4370)
+* fix(windows): crash for Sinhala mitigation (#4380)
+* chore(linux): Pass second tag parameter to Jenkins build (#4388)
+
 ## 14.0.232 beta 2021-01-29
 
 * chore(linux): Don't report on Sentry when running unit tests (#4356)
