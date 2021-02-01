@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.13 alpha 2021-02-01
+
+* chore(linux): Don't report on Sentry when running unit tests (#4374)
+* chore(linux): Pass second tag parameter to Jenkins build (#4376)
+
 ## 15.0.12 alpha 2021-01-29
 
 * chore(linux): Improve launchpad.sh script (#4355)
