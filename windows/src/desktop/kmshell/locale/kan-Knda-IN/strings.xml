@@ -101,7 +101,6 @@
   <string name="S_Hotkey_OpenKeyboardMenu" comment="/PlainText: ">ಕೀಲಿಮಣೆ ಆಯ್ಕೆ ಪಟ್ಟಿಯನ್ನು ತೆರೆಯಲು</string>
   <string name="S_Hotkey_ShowOnScreenKeyboard" comment="/PlainText: ">ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ ಫಲಕ ತೋರಿಸಲು</string>
   <string name="S_Hotkey_OpenConfiguration" comment="/PlainText: ">ಸಂರಚನೆ(ಕಾನ್ಫಿಗರೇಷನ್) ತೆರೆಯಲು</string>
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="/PlainText: ">ಕೀಲಿಮಣೆ ಬಳಕೆ ಫಲಕವನ್ನು ತೋರಿಸಲು</string>
   <string name="S_Hotkey_ShowFontHelper" comment="/PlainText: ">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್) ಸಹಾಯಕ ಫಲಕವನ್ನು ತೋರಿಸಲು</string>
   <string name="S_Hotkey_ShowCharacterMap" comment="/PlainText: ">ಅಕ್ಷರ ನಕ್ಷೆ ಫಲಕವನ್ನು ತೋರಿಸಲು</string>
   <string name="S_Hotkey_OpenTextEditor" comment="/PlainText: ">ಪಠ್ಯ ಸಂಪಾದಕವನ್ನು ತೆರೆಯಲು</string>
@@ -213,7 +212,6 @@
   <string name="S_Help_Keyboard_Prefix" comment="/PlainText: ">"</string>
   <string name="S_Help_Keyboard_Suffix" comment="/PlainText: ">" ಕೀಲಿಮಣೆಗೆ ಸಹಾಯ</string>
   <string name="S_Toolbar_ViewOnScreenKeyboard" comment="/PlainText: ">"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ತೆರೆ</string>
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="/PlainText: ">ಕೀಲಿಮಣೆ ಬಳಕೆ ಫಲಕವನ್ನು ತೆರೆ</string>
   <string name="S_Toolbar_ViewFontHelper" comment="/PlainText: ">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್) ಸಹಾಯಕ ಫಲಕವನ್ನು ತೆರೆ</string>
   <string name="S_Toolbar_ViewCharacterMap" comment="/PlainText: ">ಅಕ್ಷರ ನಕ್ಷೆ ಫಲಕವನ್ನು ತೆರೆ</string>
   <string name="S_Menu_SwitchKeymanOff" comment="/PlainText: ">Keyman ಬೆಳಕನ್ನು ಮುಚ್ಚಿ</string>
@@ -228,15 +226,6 @@
   <string name="S_OSKContext_ShowToolbar" comment="/PlainText: ">ಉಪಕರಣ ಪಟ್ಟಿ(ಟೂಲ್‌ಬಾರ್) ತೋರಿಸು</string>
   <string name="S_OSKContext_SaveAsWebPage" comment="/PlainText: ">ವೆಬ್ ಪುಟದಂತೆ ಉಳಿಸು...</string>
   <string name="S_OSKContext_Print" comment="/PlainText: ">ಪ್ರಿಂಟ್...</string>
-  <string name="S_Usage_Welcome" comment="/PlainText: ">ಕೀಲಿಮಣೆ ಸಹಾಯ</string>
-  <string name="S_Usage_OSK" comment="/PlainText: ">ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ</string>
-  <string name="S_Usage_Tutorial" comment="/PlainText: ">ಪ್ರಾರಂಭಿಸು</string>
-  <string name="S_Usage_Help" comment="/PlainText: ">Keyman ಸಹಾಯ</string>
-  <string name="S_Usage_Config" comment="/PlainText: ">Keyman ಸಂರಚನೆ (ಕಾನ್ಫಿಗರೇಷನ್)</string>
-  <string name="S_Usage_KeyboardNoDocumentation" comment="/HTML: ">ಈ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವು ಪ್ರಾರಂಭಿಸುವಿಕೆ ಅಥವಾ ಬಳಕೆ ದಸ್ತಾವೇಜನ್ನು ಹೊಂದಿಲ್ಲ. ಈ ಕೀಲಿಮಣೆ ಲೇಔಟ್ ಅನ್ನು ಹೇಗೆ ಬಳಸುವುದು ಎಂಬುದರ ಕುರಿತು ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ ಸ್ಟಾರ್ಟ್ ಮೆನುವನ್ನು ಪರಿಶೀಲಿಸಿ ಅಥವಾ ಕೀಲಿಮಣೆ ಅಭಿವೃದ್ಧಿಪಡಿಸಿದವರನ್ನು ಸಂಪರ್ಕಿಸಿ.</string>
-  <string name="S_Usage_KeyboardDocumentation" comment="/HTML: ">ಹೆಚ್ಚುವರಿ ದಸ್ತಾವೇಜನ್ನು ಮತ್ತು/ಅಥವಾ "ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ವೀಕ್ಷಿಸಲು ಕೆಳಗಿನ ಗುಂಡಿಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</string>
-  <string name="S_Usage_KeymanOff" comment="/HTML: ">ಪ್ರಸ್ತುತ Keyman ರಲ್ಲಿ ಯಾವುದೇ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಮೇಲಿನ ಉಪಕರಣ ಪಟ್ಟಿ(ಟೂಲ್‌ಬಾರ್)ನಲ್ಲಿನ ಯಾವುದೇ ಕೀಲಿಮಣೆ ಚಿತ್ರ(ಐಕಾನ್)ಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</string>
-  <string name="S_Usage_NoKeyboardsInstalled" comment="/HTML: ">ಯಾವುದೇ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸಗಳನ್ನು ಪ್ರಸ್ತುತ ಸ್ಥಾಪಿಸಿಲ್ಲ ಅಥವಾ ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಅನುಸ್ಥಾಪಿಸಲು Keyman ಸಂರಚನೆಯನ್ನು(ಕಾನ್ಫಿಗರೇಷನ್) ಬಳಸಿ.</string>
   <string name="SKApplicationTitle" comment="/FormatString: ">Keyman</string>
   <string name="SKSplashVersion" comment="/FormatString: ">ಆವೃತ್ತಿ %0:s</string>
   <string name="SKButtonHelp" comment="/FormatString: ">ಸಹಾಯ</string>
@@ -298,7 +287,6 @@
   <string name="S_OSK_Hint4b" comment="/Plain Text: ">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್) ಸಹಾಯಕ ಉಪಕರಣ</string>
   <string name="S_OSK_Hint5a" comment="/Plain Text: ">ಕೀಲಿಮಣೆಯ ಇನ್ನಷ್ಟು ಸಹಾಯ ಪಡೆಯಲು, ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</string>
   <string name="S_OSK_Hint5b" comment="/Plain Text: ">ಕೀಲಿಮಣೆ ಬಳಕೆ ಗುಂಡಿ</string>
-  <string name="S_Menu_KeyboardUsage" comment="/PlainText: ">ಕೀಲಿ&amp;ಮಣೆ ಬಳಕೆ</string>
   <string name="S_Menu_FontHelper" comment="/PlainText: ">ಅಕ್ಷ&amp;ರ ಶೈಲಿ (ಫಾಂಟ್) ಸಹಾಯಕ</string>
   <string name="S_Menu_CharacterMap" comment="/PlainText: ">&amp;ಅಕ್ಷರ ನಕ್ಷೆ</string>
   <string name="S_Menu_TextEditor" comment="/PlainText: ">&amp;ಪಠ್ಯ ಸಂಪಾದಕ</string>

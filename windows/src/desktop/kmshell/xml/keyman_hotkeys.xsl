@@ -105,7 +105,7 @@
           <xsl:when test="Target='1'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenKeyboardMenu']"/></xsl:when>
           <xsl:when test="Target='2'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowOnScreenKeyboard']"/></xsl:when>
           <xsl:when test="Target='3'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenConfiguration']"/></xsl:when>
-          <xsl:when test="Target='4'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowKeyboardUsage']"/></xsl:when>
+          
           <xsl:when test="Target='5'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowFontHelper']"/></xsl:when>
           <xsl:when test="Target='6'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowCharacterMap']"/></xsl:when>
           <xsl:when test="Target='7'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenTextEditor']"/></xsl:when>

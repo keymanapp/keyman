@@ -97,7 +97,6 @@
   <string name="S_Hotkey_OpenTextEditor" comment="/PlainText: ">စာသားအယ်ဒီတာကိုဖွင့်ပါ</string>
   <string name="S_Hotkey_ShowCharacterMap" comment="/PlainText: ">စာသားမြေပုံကိုပြပါ</string>
   <string name="S_Hotkey_ShowFontHelper" comment="/PlainText: ">ဖောင့်အကူအညီကိုပြပါ</string>
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="/PlainText: ">ကီးဘုတ်အသုံးပြုမှုကိုပြပါ</string>
   <string name="S_Hotkey_ShowOnScreenKeyboard" comment="/PlainText: ">Screenမှာပေါ်တဲ့ကီးဘုတ်ကိုပြပါ</string>
   <string name="S_Hotkey_SwitchLanguage" comment="/PlainText: ">ဘာသာစကားပြောင်းလဲမှုကိုဖွင့်ပါ</string>
   <string name="S_Hotkey_TurnKeymanOff" comment="/PlainText: ">ဖွင့်ပါ၊ အမည်ကို၊ ပိတ်</string>
@@ -204,15 +203,6 @@
   <string name="S_Update_OldVersionHead" comment="/PlainText: ">ဗားရှင်းအဟောင်း</string>
   <string name="S_Update_SizeHead" comment="/PlainText: ">အရွယ်</string>
   <string name="S_Update_Title" comment="/PlainText: ">မွမ်းမံထားသော Keyman အစိတ်အပိုင်းများကို ရရှိနိုင်ပါသည်</string>
-  <string name="S_Usage_Config" comment="/PlainText: ">Keyman စနစ်ပိုင်းဆိုင်ရာ</string>
-  <string name="S_Usage_Help" comment="/PlainText: ">Keyman အကူအညီ</string>
-  <string name="S_Usage_KeyboardDocumentation" comment="/HTML: ">မျက်နှာပြင်ပေါ်သုံးကီးဘုတ်အတွက် အပို မှတ်တမ်းမှတ်ရာများကို ကြည့်ရန် အောက်ပါ ခလုတ်ကိုနှိပ်ပါ</string>
-  <string name="S_Usage_KeyboardNoDocumentation" comment="/HTML: ">ဒီကီးဘုတ် လက်ကွက်မှာ စတင်သုံးစွဲခြင်းနဲ့ မှတ်တမ်းမှတ်ရာများဖတ်ရှုရန်များမပါဝင်ပါ။ Start Menu သို့မဟုတ် ကီးဘုတ် ဖန်တီးသူကိုဆက်သွယ်ပြီး ဒီကီးဘုတ်ကို ဘယ်လိုသုံးရမလဲ မေးမြန်းပါ</string>
-  <string name="S_Usage_KeymanOff" comment="/HTML: "> &amp;Name;မှာမည်သည့်ကီးဘုတ်လက်ကွက်မှမရွေးချယ်ထားပါ။ အပေါ်မှာရှိတဲ့ toolbarထဲက ကီးဘုတ်ပုံတစ်ခုခုကိုရွေးပြီး ကီးဘုတ်လက်ကွက် သတ်မှတ်ပါ</string>
-  <string name="S_Usage_NoKeyboardsInstalled" comment="/HTML: ">မည်သည့်ကီးဘုတ်ကိုမျှမတပ်ဆင်ထားပါ။ &amp;Name;စနစ်ဆိုင်ရာကို သုံးပြီး ကီ:ဘုတ်လက်ကွက်တစ်ခုခုထည့်သွင်းပါ</string>
-  <string name="S_Usage_OSK" comment="/PlainText: "> Screen မှာပေါ်ကီးဘုတ်</string>
-  <string name="S_Usage_Tutorial" comment="/PlainText: ">စတင်အသုံးပြုပါ</string>
-  <string name="S_Usage_Welcome" comment="/PlainText: ">ကီးဘုတ်အကူအညီ</string>
   <string name="S_Yes" comment="/PlainText: ">လုပ်မည်</string>
   <string name="S_OSKContext_SaveAsWebPage" comment="/PlainText: ">ဝက်ဘ်စာမျက်နှာအဖြစ်သိမ်းပါ</string>
   <string name="S_OSKContext_ShowToolbar" comment="/PlainText: ">Toolbar ကိုပြပါ</string>
@@ -299,7 +289,6 @@
   <string name="S_Menu_SwitchKeymanOff" comment="/PlainText: ">Keyman ကိုပိတ်</string>
   <string name="S_Toolbar_ViewCharacterMap" comment="/PlainText: ">အက္ခရာမြေပုံကိုကြည့်ပါ</string>
   <string name="S_Toolbar_ViewFontHelper" comment="/PlainText: ">ဖောင့်အကူအညီကိုကြည့်ပါ</string>
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="/PlainText: ">ကီးဘုတ်အသုံးပြုမှုကိုကြည့်ပါ</string>
   <string name="S_Toolbar_ViewOnScreenKeyboard" comment="/PlainText: ">Screenပေါ်သုံးကီ:ဘုတ်ကိုကြည့်ပါ</string>
   <string name="S_KeepInTouch" comment="Configuration Dialog - Tab names/PlainText: Keep in touch tab name (introduced 9.0.493.0)">Keep in Touch</string>
   <string name="S_KeepInTouch_AccessChar" comment="Configuration Dialog - Tab names/PlainText: Direct access to the Keep in Touch tab using alt+ (introduced 9.0.492.0)">T</string>
