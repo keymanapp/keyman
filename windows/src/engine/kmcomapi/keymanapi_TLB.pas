@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 23/09/2020 5:09:37 PM from Type Library described below.
+// File generated on 1/02/2021 8:52:41 AM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -358,6 +358,7 @@ type
   IKeymanBCP47Canonicalization = interface(IKeymanObject)
     ['{CA3B3B00-EA42-4EED-9043-D1A1F1842D52}']
     function GetCanonicalTag(const Tag: WideString): WideString; safecall;
+    function GetFullTagList(const Tag: WideString): OleVariant; safecall;
   end;
 
 // *********************************************************************//
@@ -368,6 +369,7 @@ type
   IKeymanBCP47CanonicalizationDisp = dispinterface
     ['{CA3B3B00-EA42-4EED-9043-D1A1F1842D52}']
     function GetCanonicalTag(const Tag: WideString): WideString; dispid 301;
+    function GetFullTagList(const Tag: WideString): OleVariant; dispid 302;
     function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
                           out References: OleVariant): WideString; dispid 401;
   end;
