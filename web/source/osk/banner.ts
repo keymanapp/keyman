@@ -398,7 +398,10 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.addListener('suggestionsready', manager.updateSuggestions);
       keyman.core.languageProcessor.addListener('tryaccept', manager.tryAccept);
       keyman.core.languageProcessor.addListener('tryrevert', manager.tryRevert);
+    }
 
+    postConfigure() {
+      let keyman = com.keyman.singleton;
       // Trigger a null-based initial prediction to kick things off.
       keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget());
     }

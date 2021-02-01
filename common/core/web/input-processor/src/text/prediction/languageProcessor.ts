@@ -33,7 +33,7 @@ namespace com.keyman.text.prediction {
    */
   export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
 
-  export type StateChangeEnum = 'active'|'inactive';
+  export type StateChangeEnum = 'active'|'configured'|'inactive';
   /**
    * Corresponds to the 'statechange' LanguageProcessor event.
    */
@@ -137,17 +137,29 @@ namespace com.keyman.text.prediction {
       let source = specType == 'file' ? model.path : model.code;
       let lp = this;
 
-      // We should wait until the model is successfully loaded before setting our state values.
-      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
-        lp.currentModel = model;
-        lp.configuration = config;
+      // We pre-emptively emit so that the banner's DOM elements may update synchronously.
+      // Prevents an ugly "flash of unstyled content" layout issue during keyboard load
+      // on our mobile platforms when embedded.
+      lp.currentModel = model;
+      lp.emit('statechange', 'active');
 
-        try {
-          lp.emit('statechange', 'active');
-        } catch (err) {
-          // Does this provide enough logging information?
-          console.error("Could not load model '" + model.id + "': " + (err as Error).message);
+      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
+        lp.configuration = config;
+        lp.emit('statechange', 'configured');
+      }).catch(function(error) { 
+        // Does this provide enough logging information?
+        let message: string;
+        if(error instanceof Error) {
+          message = error.message;
+        } else {
+          message = String(error);
         }
+        console.error("Could not load model '" + model.id + "': " + message);
+
+        // Since the model couldn't load, immediately deactivate.  Visually, it'll look
+        // like the banner crashed shortly after load.
+        lp.currentModel = null;
+        lp.emit('statechange', 'inactive');
       });
     }
 

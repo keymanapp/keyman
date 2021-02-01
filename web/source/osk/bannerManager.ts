@@ -212,13 +212,21 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
 
       // Only display a SuggestionBanner when LanguageProcessor states it is active.s
-      if(keyman.core.languageProcessor.isActive) {
+      if(state == 'active') {
         this.setBanner('suggestion');
-      } else if(this.alwaysShow) {
-        this.setBanner('image');
-      } else {
-        this.setBanner('blank');
-      }
+      } else if(state == 'inactive') {
+        if(this.alwaysShow) {
+          this.setBanner('image');
+        } else {
+          this.setBanner('blank');
+        }
+      } else if(state == 'configured') {
+        let suggestionBanner = this.activeBanner as SuggestionBanner;
+        if(suggestionBanner.postConfigure) {
+          // Triggers the initially-displayed suggestions.s
+          suggestionBanner.postConfigure();
+        }
+      } 
     }
 
     /**
