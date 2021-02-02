@@ -2,6 +2,12 @@
 title: Keyman for Android 14.0 Help
 ---
 
+## [About Keyman](about/)
+* [Welcome to Keyman](about/welcome)
+* [What's New](about/whatsnew)
+* [System Requirements](about/system-requirements)
+* [Version History](about/history)
+
 ## [Getting Started](start/)
 * [How To - Download and Install a Keyman Keyboard](start/installing-keyboards)
 * [Enabling Keyman as a System-Wide Keyboard](start/enabling-system-keyboard)

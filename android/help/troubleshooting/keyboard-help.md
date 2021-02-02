@@ -19,4 +19,4 @@ Touch the info icon for your keyboard.
 ## Accessing Online Keyboard Help
 Help documentation for Keyman keyboards is also available at
 
-https://help.keyman.com/keyboard/
+[https://help.keyman.com/keyboard/](https://help.keyman.com/keyboard/)

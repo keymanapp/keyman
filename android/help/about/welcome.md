@@ -7,4 +7,4 @@ Thank you for installing Keyman for Android. Whether you're a new or returning u
 ## What is Keyman for Android?
 Keyman for Android lets you type in over 600 languages on Android mobiles and tablets.
 
-[Click here](../start) to get started
+[Click here](../start/) to get started
