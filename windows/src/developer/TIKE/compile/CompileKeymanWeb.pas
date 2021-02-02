@@ -201,7 +201,7 @@ type
   TCompileKeymanWeb = class
   private
     FError: Boolean;  // I1971
-    FCallback: TCompilerCallback;
+    FCallback: TCompilerCallbackW;
     FCallFunctions: TStringList;
     FOutFile, FInFile: string;
     FKeyboardVersion: string;
@@ -252,7 +252,7 @@ type
     function JavaScript_SetupEpilog: string;
     function JavaScript_SetupProlog: string;
   public
-    function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866
+    function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallbackW): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
     destructor Destroy; override;
   end;
@@ -307,7 +307,17 @@ begin
   Result := True;
 end;
 
-function TCompileKeymanWeb.Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866   // I4865
+var
+  GCallbackW: TCompilerCallbackW = nil;
+
+function WebCompilerMessageA(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
+begin
+  if Assigned(GCallbackW)
+    then Result := GCallbackW(line, msgcode, PWideChar(WideString(AnsiString(text))))
+    else Result := 1;
+end;
+
+function TCompileKeymanWeb.Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallbackW): Boolean;   // I3681   // I4140   // I4688   // I4866   // I4865
 var
   WarnDeprecatedCode: Boolean;
   Data: string;
@@ -343,11 +353,12 @@ begin
     WarnDeprecatedCode := True;
   end;
 
+  GCallbackW := Callback;
   FCallFunctions := TStringList.Create;
   try
     if CompileKeyboardFileToBuffer(PChar(InFile), @fk,
       FCompilerWarningsAsErrors, WarnDeprecatedCode,
-      Callback, CKF_KEYMANWEB) > 0 then  // I3482   // I4866   // I4865
+      WebCompilerMessageA, CKF_KEYMANWEB) > 0 then  // I3482   // I4866   // I4865
       // TODO: Free fk
     begin
       if Assigned(AOwnerProject) and
@@ -377,6 +388,7 @@ begin
     end;
   finally
     FreeAndNil(FCallFunctions);
+    GCallbackW := nil;
   end;
 end;
 
@@ -863,7 +875,12 @@ begin
 end;
 
 function TCompileKeymanWeb.JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean): string;   // I3659
+var
+  FChanged: Boolean;
+  p: PWideChar;
 begin
+  FChanged := False;
+  p := pwszName;
   if not Assigned(pwszName) or (pwszName^ = #0) or (not Self.FDebug and not UseNameForRelease) then   // I3659   // I3681
     Result := IntToStr(i) // for uniqueness
   else
@@ -873,10 +890,30 @@ begin
       else Result := '_'; // Ensures we cannot overlap numbered instances
     while pwszName^ <> #0 do
     begin
-      if CharInSet(PChar(pwszName)^, SValidIdentifierCharSet)   // I3681
-        then Result := Result + PChar(pwszName)^
-        else Result := Result + '_';
+      if CharInSet(PChar(pwszName)^, SValidIdentifierCharSet) then  // I3681
+      begin
+        Result := Result + PChar(pwszName)^
+      end
+      else
+      begin
+        Result := Result + '_';
+        FChanged := True;
+      end;
       Inc(pwszName);
+    end;
+    if not UseNameForRelease then
+    begin
+      // Ensure each transformed name is still unique
+      Result := Result + '_' + IntToStr(i);
+      if FChanged then
+        Result := Result + '/*'+string(p).Replace('*/', '*-/')+'*/'
+    end
+    else if FChanged then
+    begin
+      // For named option stores, we are only supporting the valid identifier
+      // character set, which is a breaking change in 14.0.
+      ReportError(0, CWARN_OptionStoreNameInvalid, Format('The option store %s should be named with characters in the range A-Z, a-z, 0-9 and _ only.',
+        [string(p)]));
     end;
   end;
 end;
@@ -1327,7 +1364,7 @@ begin
   if FCompilerWarningsAsErrors then
     flag := flag or CWARN_FLAG;
   if (msgcode and flag) <> 0 then FError := True;
-  FCallback(line, msgcode, PAnsiChar(AnsiString(text)));  // I3310 /// TODO: K9: convert to Unicode
+  FCallback(line, msgcode, PWideChar(text));  // I3310
 end;
 
 function TCompileKeymanWeb.RequotedString(s: WideString): string;
