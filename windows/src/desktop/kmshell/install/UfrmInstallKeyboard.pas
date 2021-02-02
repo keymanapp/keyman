@@ -302,7 +302,7 @@ begin
         Manager.UpdateProgress('Installing Keyboard', 0, 0);
         t := TTempFileManager.Get('.log');
         try
-          if WaitForElevatedConfiguration(Handle, '-log "'+t.Name+'" -s -i "'+FInstallFile+'='+BCP47Tag+'" -nowelcome') = 0 then
+          if WaitForElevatedConfiguration(GetForegroundWindow, '-log "'+t.Name+'" -s -i "'+FInstallFile+'='+BCP47Tag+'" -nowelcome') = 0 then
           begin
             // install the keyboard tip
             if not InstallTipForKeyboard(BCP47Tag) then
