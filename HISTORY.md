@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.234 beta 2021-02-02
+
+* fix(windows): remove Show Keyboard Usage hotkey (#4379)
+* fix(windows): avoid invalid language codes in Add Language dialog (#4381)
+
 ## 14.0.233 beta 2021-02-01
 
 * fix(windows): SMP-aware deletion in TSF-aware apps (#4360)
