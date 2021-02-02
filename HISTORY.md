@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.14 alpha 2021-02-02
+
+* docs(linux): Improve packaging doc (#4389)
+
 ## 15.0.13 alpha 2021-02-01
 
 * chore(linux): Don't report on Sentry when running unit tests (#4374)
