@@ -23,6 +23,7 @@ type
     FVersion: string;
     FBCP47Tags: string;
     FProjectType: TKeymanProjectType;
+    FTargets: TKeymanTargets;
 
   protected
     const
@@ -50,11 +51,13 @@ type
     property BasePath: string read FBasePath;
     property ID: string read FID;
   public
-    constructor Create(const BasePath, ID: string);
+    constructor Create(const BasePath, ID: string; ATargets: TKeymanTargets);
 
     procedure Generate; virtual; abstract;
 
     property ProjectType: TKeymanProjectType read FProjectType;
+
+    property Targets: TKeymanTargets read FTargets;
 
     property Name: string read FName write FName;
     property Copyright: string read FCopyright write FCopyright;
@@ -87,12 +90,13 @@ uses
 
 { TProjectTemplate }
 
-constructor TProjectTemplate.Create(const BasePath, ID: string);
+constructor TProjectTemplate.Create(const BasePath, ID: string; ATargets: TKeymanTargets);
 begin
   inherited Create;
   FBasePath := IncludeTrailingPathDelimiter(ExpandFileName(BasePath));
   FID := ID;
   FVersion := '1.0';
+  FTargets := ATargets;
 end;
 
 function TProjectTemplate.GetFilename(Base: string): string;
@@ -211,7 +215,8 @@ var
     begin
       if kt = ktAny then
         Continue;
-      Result := Result + ' * ' + SKeymanTargetNames[kt] + #13#10;
+      if (kt in FTargets) or (ktAny in FTargets) then
+        Result := Result + ' * ' + SKeymanTargetNames[kt] + #13#10;
     end;
   end;
 
