@@ -365,11 +365,15 @@ namespace correction {
        *   - That is, no "reasonable" keystroke would emit a Transform adding two separate word tokens
        *     - For languages using whitespace to word-break, said keystroke would have to include said whitespace to break the assumption.
        */ 
+
+      // If there is/was more than one context token available...
       if(editPath.length > 1) {
+        // We're removing a context token, but at least one remains.
         if(poppedHead) {
           state.popHead();
         }
 
+        // We're adding an additional context token.
         if(pushedTail) {
           // ASSUMPTION:  any transform that triggers this case is a pure-whitespace Transform, as we
           //              need a word-break before beginning a new word's context.
@@ -382,7 +386,7 @@ namespace correction {
           // for the new word (token), so the input keystrokes do not correspond to the new text token.
           emptyToken.transformDistributions = [];
           state.pushTail(emptyToken);
-        } else {
+        } else { // We're editing the final context token.
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
           //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
           if(isBackspace) {
@@ -391,6 +395,7 @@ namespace correction {
             state.updateTail(transformDistribution, finalToken);
           }
         }
+        // There is only one word in the context.
       } else {
         // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
         //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
@@ -401,7 +406,7 @@ namespace correction {
           token.raw = tokenizedContext[0];
           token.transformDistributions = [transformDistribution];
           state.pushTail(token);
-        } else {
+        } else { // Edit the lone context token.
           // Consider backspace entry for this case?
           if(isBackspace) {
             state.replaceTailForBackspace(finalToken, primaryInput.id);
