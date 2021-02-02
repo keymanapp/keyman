@@ -334,7 +334,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 
     log.info("keyboardDownloadFailed: InstalledLanguagesViewController")
 
-    DispatchQueue.main.sync {
+    DispatchQueue.main.async {
       var msg: String
       switch(packageKey.type) {
         case .keyboard:
@@ -343,7 +343,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
           msg = NSLocalizedString("notification-download-failure-lexical-model", bundle: engineBundle, comment: "")
       }
 
-      if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+      if let toolbar = self.navigationController?.toolbar as? ResourceDownloadStatusToolbar {
         toolbar.displayStatus(msg, withIndicator: false, duration: 3.0)
       }
 
@@ -366,8 +366,8 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   }
 
   private func batchUpdateCompleted(results: BatchUpdateCompletedNotification) {
-    DispatchQueue.main.sync {
-      if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+    DispatchQueue.main.async {
+      if let toolbar = self.navigationController?.toolbar as? ResourceDownloadStatusToolbar {
         if results.failures.count == 0 {
           let formatString = NSLocalizedString("notification-update-success", bundle: engineBundle, comment: "")
           toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.successes.count), withIndicator: false, duration: 3.0)
@@ -379,7 +379,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
         }
       }
 
-      restoreNavigation()
+      self.restoreNavigation()
     }
   }
   
