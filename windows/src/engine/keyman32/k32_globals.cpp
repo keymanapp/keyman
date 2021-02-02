@@ -1,18 +1,18 @@
 /*
   Name:             k32_globals
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    6 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Add hotkeys globals
                     14 Sep 2006 - mcdurdin - Add IsKeymanSystemWindow and UpdateActiveWindows functions
                     04 Dec 2006 - mcdurdin - Add PostProcessControllers and IsControllerProcess functions
@@ -69,7 +69,7 @@
 /*                                                                         */
 /***************************************************************************/
 
-UINT 
+UINT
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
   wm_keyman_keyevent = 0,   // for serialized input
@@ -86,7 +86,7 @@ UINT
 
 	wm_keymanim_close = 0,
 	wm_keymanim_contextchanged = 0,
-	
+
 	wm_test_keyman_functioning = 0;
 
 //HWND hwndIM = 0, hwndIMOldFocus = 0;
@@ -100,7 +100,7 @@ static CRITICAL_SECTION csGlobals;
 PKEYMAN64THREADDATA Globals_InitThread()
 {
   EnterCriticalSection(&csGlobals);
-  
+
   PKEYMAN64THREADDATA lpvData;
 
   if(Globals::get_Keyman_Shutdown())  // I3092
@@ -190,7 +190,7 @@ void Globals_UninitProcess()
 PKEYMAN64THREADDATA ThreadGlobals()
 {
   EnterCriticalSection(&csGlobals);
-  
+
   PKEYMAN64THREADDATA lpvData = NULL;
   if(dwTlsIndex != TLS_OUT_OF_INDEXES)
   {
@@ -220,7 +220,7 @@ BOOL Globals_ProcessInitialised()
 //static INI     // I3158   // I3524
 //    f_Ini = {0};								// KEYMAN.INI options
 
-static HHOOK 
+static HHOOK
     f_hhookGetMessage = NULL,				// GETMESSAGE hook handle
     f_hhookCallWndProc = NULL;			// CALLWNDPROC hook handle
 
@@ -236,7 +236,7 @@ static HWND
 static UINT
   f_WindowsVersion = 0;			// Windows Version
 
-static BOOL 
+static BOOL
     f_Keyman_Initialised = FALSE,
     f_Keyman_Shutdown = FALSE;
 
@@ -280,14 +280,14 @@ __declspec(align(8)) static LONG
   f_RefreshTag = 0;
 #endif
 
-static BOOL 
-  f_debug_KeymanLog = FALSE, 
+static BOOL
+  f_debug_KeymanLog = FALSE,
   f_debug_ToConsole = FALSE;
 
 #pragma data_seg()
 /***************************************************************************/
 
-DWORD	//static 
+DWORD	//static
 	f_ShiftState = 0;
 
 HANDLE f_hLockMutex = 0;
@@ -364,13 +364,15 @@ void Globals::SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboa
 }
 
 void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL mnemonicDeadkeyConversionMode) {   // I4583   // I4552
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::SetBaseKeyboardFlags(baseKeyboard='%s', simulateAltGr=%d, mnemonicDeadkeyConversionMode=%d",
+    baseKeyboard, simulateAltGr, mnemonicDeadkeyConversionMode);
   strcpy_s(f_BaseKeyboard, baseKeyboard);
   f_SimulateAltGr = simulateAltGr;
   f_MnemonicDeadkeyConversionMode = mnemonicDeadkeyConversionMode;
 }
 
 /**
-  Loads settings that are globally applied at application startup. These cannot 
+  Loads settings that are globally applied at application startup. These cannot
   be changed until Keyman is restarted.
 */
 BOOL Globals::InitSettings() {
@@ -392,7 +394,7 @@ BOOL Globals::Lock()
     f_hLockMutex = CreateMutex(NULL, FALSE, "Tavultesoft_KeymanEngine_GlobalLock");
     if(f_hLockMutex == 0) return FALSE;
   }
-    
+
   if(WaitForSingleObject(f_hLockMutex, 1000) == WAIT_OBJECT_0) return TRUE;  // I3183   // I3530
   SetLastError(ERROR_TIMEOUT);  // I3183   // I3530
   return FALSE;  // I3183   // I3530
@@ -400,7 +402,7 @@ BOOL Globals::Lock()
 
 BOOL Globals::InitHandles()  // I3040
 {
-  if(f_hLockMutex == 0) 
+  if(f_hLockMutex == 0)
     f_hLockMutex = CreateMutex(NULL, FALSE, "Tavultesoft_KeymanEngine_GlobalLock");
   if(f_hLockMutex == 0) return FALSE;
   SetObjectToLowIntegrity(f_hLockMutex);
@@ -477,7 +479,7 @@ void Globals::PostProcessControllers(UINT msg, WPARAM wParam, LPARAM lParam)
 	for(int i = 0; i < f_MaxControllers; i++)
   {
     GetWindowThreadProcessId(f_ControllerWindow[i], &pid);
-    if(pid == GetCurrentProcessId()) 
+    if(pid == GetCurrentProcessId())
       PostMessage(f_ControllerWindow[i], msg, wParam, lParam);
   }
   Unlock();
@@ -492,7 +494,7 @@ BOOL Globals::IsControllerProcess()
   {
     GetWindowThreadProcessId(f_ControllerWindow[i], &pid);
     if(pid == GetCurrentProcessId())
-    { 
+    {
       Unlock();
       return TRUE;
     }
@@ -524,7 +526,7 @@ void Globals::PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
     Unlock();
 		return;
 	}
-  
+
   if(ShouldDebug(sdmGlobal))
   {
   	char buf[64];
@@ -552,7 +554,7 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 
   HWND hwnd = f_ControllerWindow[0];
   Unlock();
-  
+
   if(ShouldDebug(sdmGlobal))
   {
   	char buf[64];
@@ -561,7 +563,7 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 	  SendDebugMessageFormat(f_ControllerWindow[0], sdmGlobal, 0, "SendMasterController %s [%x : %x, %x]", buf, msg, wParam, lParam);
   }
 
-  // Window may be taken out of list between Lock and Unlock but let's not worry about this 
+  // Window may be taken out of list between Lock and Unlock but let's not worry about this
 
   SetLastError(ERROR_SUCCESS);
   DWORD_PTR dwResult = 0;
@@ -633,7 +635,7 @@ BOOL IsKeymanSystemWindow(HWND hwnd)
 
 	DWORD pidC, pidHWND;
 	GetWindowThreadProcessId(hwnd, &pidHWND);
-	
+
   if(!Globals::Lock()) return FALSE;
 
   for(int i = 0; i < f_MaxControllers; i++)
@@ -641,7 +643,7 @@ BOOL IsKeymanSystemWindow(HWND hwnd)
 		if(f_ControllerWindow[i] == hwnd)
     {
       Globals::Unlock();
-      return TRUE; 
+      return TRUE;
     }
 		GetWindowThreadProcessId(f_ControllerWindow[i], &pidC);
 		if(pidC == pidHWND)
@@ -666,10 +668,10 @@ void UpdateActiveWindows()
   GUITHREADINFO gti;
   gti.cbSize = sizeof(GUITHREADINFO);
   GetGUIThreadInfo(0, &gti);
-  
+
 	if(IsKeymanSystemWindow(gti.hwndActive) || IsKeymanSystemWindow(gti.hwndFocus)) return;
   if(IsTooltipWindow(gti.hwndActive) || IsTooltipWindow(gti.hwndFocus)) return;
-	
+
 	*Globals::hLastActiveWnd() = gti.hwndActive;
 	*Globals::hLastFocusWnd() = gti.hwndFocus;
 
