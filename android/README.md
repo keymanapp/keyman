@@ -110,10 +110,17 @@ To validate your configuration, from the `android/` folder run `sentry-cli info`
 
 ### Compiling the app's offline help
 Extra prerequisite:
-* `wget`
+* `pandoc` (via chocolaty)
 
-The script `build-help.sh` uses the `wget` tool to construct an offline bundle from the current
-online version of help on help.keyman.com.  When significant changes to help content have been
+Keyman for Android help is maintained in the Markdown files in android/help/.
+The script `help/build-help.sh` uses the `pandoc` tool to convert the Markdown files into html.
+
+```bash
+cd help
+./build-help.sh htm
+```
+
+When significant changes to help content have been
 made, it is advisable to manually re-run this script to update the app's offline content.
 
 ### Sample Projects
