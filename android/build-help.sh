@@ -88,8 +88,6 @@ fi
 
 
 do_offline_mirror() {
-  # $1 - the form-factor specification.
-
   # Create local mirror of the help page subdirectory.
   # We don't need /font/deploy folder resources, so they're excluded here.
   # One of the .css files auto-includes them otherwise.
@@ -104,17 +102,10 @@ do_offline_mirror() {
        --exclude-directories /font/deploy \
        --directory-prefix="$HELP_ROOT" \
        --adjust-extension \
-       "$HOST/$HELP_SITE_SECTION/$VERSION_RELEASE/index.php?embed=$DEVICE&formfactor=$1"
+       "$HOST/$HELP_SITE_SECTION/$VERSION_RELEASE/
 
   # Results in a flat-structured mirror of the specified folder,
   # together with all needed resources within the 'site' folder.
 }
 
-do_offline_mirror "phone"
-
-# Now for some magic... we rename the page's folder and redownload with the other setting.
-mv "$HELP_ROOT/$HELP_SITE_SECTION/$VERSION_RELEASE" "$HELP_ROOT/$HELP_SITE_SECTION/phone"
-
-do_offline_mirror "tablet"
-
-mv "$HELP_ROOT/$HELP_SITE_SECTION/$VERSION_RELEASE" "$HELP_ROOT/$HELP_SITE_SECTION/tablet"
+do_offline_mirror
