@@ -222,9 +222,10 @@ var
 begin
   if kmcom.Control.IsKeymanRunning then   // I1818 - don't show Configuration if Keyman is already running
   begin
-    hKeymanControl := FindWindow('TApplication', 'keyman');
+    hKeymanControl := FindWindow('TfrmKeyman7Main', nil);
     if hKeymanControl <> 0 then
-      PostMessage(hKeymanControl, RegisterWindowMessage('WM_KEYMAN_CONTROL'), MAKELONG(KMC_NOTIFYWELCOME, NW_SENDBALLOON), NWB_IDENTIFYICON);
+      if not PostMessage(hKeymanControl, RegisterWindowMessage('WM_KEYMAN_CONTROL'), MAKELONG(KMC_NOTIFYWELCOME, NW_SENDBALLOON), NWB_KEYMANRUNNING) then
+        RaiseLastOSError;
 
 //      if Value[KeymanDesktopOptions.koShowWelcome] then
 //        Splash(nil, False);
