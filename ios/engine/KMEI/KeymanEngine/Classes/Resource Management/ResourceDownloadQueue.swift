@@ -544,7 +544,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error?) {
     let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
     var batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
-    batch.errors[currentFrame.index] = error
+
+    // Is a single-entry array for `DownloadBatch` and its type erasure.
+    // CompositeBatch maps these errors to their correct index from its perspective.
+    batch.errors[0] = error
 
     var err: Error
     if let error = error {
