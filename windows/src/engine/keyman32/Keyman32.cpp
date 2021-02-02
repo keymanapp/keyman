@@ -679,9 +679,9 @@ BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
-  if(_td->RefreshTag_Process != tag)
+  if(_td->RefreshTag_Thread != tag)
   {
-    _td->RefreshTag_Process = tag;
+    _td->RefreshTag_Thread = tag;
     return TRUE;
   }
   return FALSE;
