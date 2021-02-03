@@ -306,7 +306,12 @@ class ModelCompositor {
 
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
       // for such cases.
-      suggestion.transform.insert += punctuation.insertAfterWord;
+      if(!context.right) {
+        // Only insert wordbreak characters if we're at the end of the context.  
+        suggestion.transform.insert += punctuation.insertAfterWord;
+      } else {
+        // TODO: Replace all characters in the word to the right of the caret.
+      }
 
       // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
       if(prefixTransform) {
