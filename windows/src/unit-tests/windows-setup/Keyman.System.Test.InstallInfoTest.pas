@@ -11,6 +11,9 @@ type
   [TestFixture]
   TInstallInfoTest = class(TObject)
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestLocatePackagesAndTierFromFilename;
 
@@ -25,6 +28,11 @@ uses
   Keyman.Setup.System.InstallInfo;
 
 { TInstallInfoTest }
+
+procedure TInstallInfoTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
+end;
 
 procedure TInstallInfoTest.TestLocatePackagesAndTierFromFilename;
 var

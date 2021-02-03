@@ -42,6 +42,8 @@ uses
 
 procedure TLexicalModelParserTest.Setup;
 begin
+  Assert.IgnoreCaseDefault := False;
+
   // Running from platform/configuration/ folder has
   // assets two levels up.
   if FileExists('..\..\assets\nrc.en.mtnt.model.ts')

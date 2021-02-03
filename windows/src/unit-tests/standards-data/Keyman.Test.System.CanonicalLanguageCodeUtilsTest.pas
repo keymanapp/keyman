@@ -9,6 +9,9 @@ type
   [TestFixture]
   TCanonicalLanguageCodeUtilsTest = class(TObject)
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestSomeTags;
   end;
@@ -19,6 +22,11 @@ uses
   Keyman.System.CanonicalLanguageCodeUtils;
 
 { TCanonicalLanguageCodeUtilsTest }
+
+procedure TCanonicalLanguageCodeUtilsTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
+end;
 
 procedure TCanonicalLanguageCodeUtilsTest.TestSomeTags;
 begin
@@ -54,10 +62,8 @@ begin
   Assert.AreEqual('th-TH', TCanonicalLanguageCodeUtils.FindBestTag('th-th', True));
   Assert.AreEqual('th-TH', TCanonicalLanguageCodeUtils.FindBestTag('th-thai-th', True));
 
-  // note casing shows that the following lang tag was returned unmodified because
-  // it was not found in our canonicalization tables. This is expected behaviour.
-  // (Remember that BCP 47 tags are not case sensitive)
-  Assert.AreEqual('th-latn-de', TCanonicalLanguageCodeUtils.FindBestTag('th-latn-de', True));
+  // A BCP 47 tag that is not in our canonicalization tables
+  Assert.AreEqual('th-Latn-DE', TCanonicalLanguageCodeUtils.FindBestTag('th-latn-de', True));
 
   Assert.AreEqual('fr-FR', TCanonicalLanguageCodeUtils.FindBestTag('fr', True));
   Assert.AreEqual('fr-FR', TCanonicalLanguageCodeUtils.FindBestTag('fr-FR', True));
