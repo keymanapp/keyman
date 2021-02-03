@@ -42,7 +42,7 @@ KMEA/**/assets/resources
 KMEA/**/assets/keymanweb-osk.*
 
 # KMAPRo generated offline help
-KMAPro/**/info
+KMAPro/**/assets/info/
 
 # KMAPRo default packages
 KMAPro/**/assets/*.kmp

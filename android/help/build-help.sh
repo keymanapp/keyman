@@ -22,7 +22,7 @@ display_usage() {
   echo "build.sh [--no-clean] target [...target]"
   echo "Builds help documentation for Keyman for Android"
   echo "Targets:"
-  echo "  * htm: convert documentation to html using pandoc"
+  echo "  * htm or html: convert documentation to html using pandoc"
   echo
   echo " --no-clean: don't clean target folder before building"
 }
@@ -42,7 +42,7 @@ shopt -s nocasematch
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
-    htm)
+    htm | html)
       DO_HTM=true
       ;;
     --no-clean)
@@ -66,7 +66,7 @@ displayInfo "" \
   ""
 
 #
-# Compile all .md to .htm
+# Compile all .md to .html
 #
 
 MDLUA="$THIS_DIR/htmlink.lua"
