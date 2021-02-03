@@ -590,7 +590,7 @@ procedure TfrmModelEditor.cmdAddWordlistClick(Sender: TObject);
 begin
   if dlgAddWordlist.Execute then
   begin
-    parser.Wordlists.Add(ExtractRelativePath(Filename, dlgAddWordlist.FileName));
+    parser.Wordlists.Add(ExtractRelativePath(Filename, dlgAddWordlist.FileName).Replace('\','/'));
     Inc(FSetup);
     try
       FillDetails;
