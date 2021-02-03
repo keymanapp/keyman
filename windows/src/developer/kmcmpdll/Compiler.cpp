@@ -1483,7 +1483,7 @@ DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PWSTR context, PW
         int anyStore = *(q + 2) - 1;
 
         if (xstrlen(fk->dpStoreArray[indexStore].dpString) < xstrlen(fk->dpStoreArray[anyStore].dpString)) {
-          AddWarning(CWARN_IndexStoreShort);
+          AddWarning(CWARN_IndexStoreShort); //TODO: if this fails, then we return FALSE instead of an error
         }
       } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);
@@ -1502,6 +1502,40 @@ DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PWSTR context, PW
     }
   }
   return CERR_None;
+}
+
+/**
+ * Checks that the order of statements in the context matches the specification
+ *   Rule structure: [context] ['+' key] '>' output
+ *   Context structure: [nul] [if()|baselayout()|platform()]+ [char|any|context()|deadkey()|dk()|index()|notany()|outs()]
+ * Test that nul is first, then if(), baselayout(), platform() statements are before any other content
+ */
+BOOL CheckContextStatementPositions(PWSTR context) {
+  BOOL hadContextChar = FALSE;
+  for (PWSTR p = context; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL) {
+      switch (*(p + 1)) {
+      case CODE_NUL:
+        if (p > context) {
+          AddWarning(CWARN_NulNotFirstStatementInContext);
+        }
+        break;
+      case CODE_IFOPT:
+      case CODE_IFSYSTEMSTORE:
+        if (hadContextChar) {
+          AddWarning(CWARN_IfShouldBeAtStartOfContext);
+        }
+        break;
+      default:
+        hadContextChar = TRUE;
+      }
+    }
+    else {
+      hadContextChar = TRUE;
+    }
+  }
+
+  return TRUE;
 }
 
 /**
@@ -1558,6 +1592,8 @@ DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
     if ((msg = GetXString(fk, str, L"c\n", pklOut, GLOBAL_BUFSIZE - 1, (int)(INT_PTR)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
 
     if (pklOut[0] == 0) return CERR_ZeroLengthString;
+
+    CheckContextStatementPositions(pklIn);
 
     // Test index and context offsets in context
     if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
