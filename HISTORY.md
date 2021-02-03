@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 14.0.235 beta 2021-02-03
+
+* fix(windows): Ensure UAC window comes to foreground (#4384)
+* fix(windows): setup should ignore cert revocation (#4392)
+* fix(developer): don't check both setup.exe and setup-redist.exe (#4398)
+* fix(windows): Show balloon when Keyman is already running (#4386)
+* fix(developer): Generate platforms correctly from template (#4399)
+* fix(developer): Import Keyboard support for Targets (#4400)
+* fix(ios): fixes unit test mocking, test init (#4394)
+* fix(ios): fixes app crash on network/install error during resource updates (#4395)
+* fix(ios): fixes package-install/update event concurrency management (#4396)
+* fix(common/models): bksp workaround now works beyond first word (#4401)
+* chore(windows): tests should be case-sensitive (#4405)
+* fix(windows): crash deleting wordlist (#4406)
+* fix(windows): Use forward slashes in wordlist paths (#4407)
+* modify(android/app): Change build-help.sh to generate offline help from Markdown files (#4397)
+* fix(linux): Don't crash if uninstalling last keyboard (#4402)
+
 ## 14.0.234 beta 2021-02-02
 
 * fix(windows): remove Show Keyboard Usage hotkey (#4379)
