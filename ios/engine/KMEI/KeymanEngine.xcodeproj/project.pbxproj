@@ -275,13 +275,6 @@
 			remoteGlobalIDString = C06D372A1F81F4E100F61AE0;
 			remoteInfo = KeymanEngine;
 		};
-		CE4459CB23FBB8DA003151FD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F243887514BBD43000A3E055 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F243887D14BBD43000A3E055;
-			remoteInfo = KeymanEngineDemo;
-		};
 		CE4459EA23FBBB79003151FD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F243887514BBD43000A3E055 /* Project object */;
@@ -1173,7 +1166,6 @@
 			);
 			dependencies = (
 				9A079DD6223194B100581263 /* PBXTargetDependency */,
-				CE4459CC23FBB8DA003151FD /* PBXTargetDependency */,
 				CE4459F923FBBCB3003151FD /* PBXTargetDependency */,
 			);
 			name = KeymanEngineTests;
@@ -1662,11 +1654,6 @@
 			isa = PBXTargetDependency;
 			target = C06D372A1F81F4E100F61AE0 /* KeymanEngine */;
 			targetProxy = C06D37CA1F83204200F61AE0 /* PBXContainerItemProxy */;
-		};
-		CE4459CC23FBB8DA003151FD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F243887D14BBD43000A3E055 /* KeymanEngineDemo */;
-			targetProxy = CE4459CB23FBB8DA003151FD /* PBXContainerItemProxy */;
 		};
 		CE4459EB23FBBB79003151FD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

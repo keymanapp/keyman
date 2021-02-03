@@ -34,6 +34,10 @@ class AssociatingPackageInstallerTests: XCTestCase {
   }
 
   override func setUp() {
+    // Ensure Manager's standard init() occurs before our tests.
+    // Otherwise, if our first Manager reference is DURING a test, we'll see unwanted behavior from it.
+    _ = Manager.shared
+    
     // Resets resource directories for a clean slate.
     // We'll be testing against actually-installed packages.
     TestUtils.standardTearDown()
