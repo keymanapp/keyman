@@ -145,7 +145,7 @@ namespace correction {
       // Note that we cannot just use a single, monolithic transform at this point b/c
       // of our current edit-distance optimization strategy; diagonalization is currently... 
       // not very compatible with that.
-      let backspacedTokenContext = tokenText.split('').map(function(char) {
+      const backspacedTokenContext = tokenText.split('').map(function(char) {
         let transform: Transform = {
           insert: char,
           deleteLeft: 0,
@@ -350,10 +350,10 @@ namespace correction {
         state = matchState;
       }
 
-      let hasDistribution = transformDistribution && Array.isArray(transformDistribution);
-      let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
-      let isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0;
-      let finalToken = tokenizedContext[tokenizedContext.length-1];
+      const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
+      const primaryInput = hasDistribution ? transformDistribution[0].sample : null;
+      const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0;
+      const finalToken = tokenizedContext[tokenizedContext.length-1];
 
       /* Assumption:  This is an adequate check for its two sub-branches.
        *
