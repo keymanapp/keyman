@@ -41,6 +41,9 @@ KMEA/**/assets/resources
 # keymanweb OSK font
 KMEA/**/assets/keymanweb-osk.*
 
+# KMAPRo generated offline help
+KMAPro/**/info
+
 # KMAPRo default packages
 KMAPro/**/assets/*.kmp
 
