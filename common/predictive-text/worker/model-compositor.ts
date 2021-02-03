@@ -128,10 +128,10 @@ class ModelCompositor {
       rawPredictions = this.predictFromCorrections(predictionRoots, context);
     } else {
       contextState = this.contextTracker.analyzeState(this.lexicalModel, 
-                                                      postContext, 
+                                                      postContext,
                                                       !this.isEmpty(inputTransform) ? 
                                                                     transformDistribution: 
-                                                                    [{sample: inputTransform, p: 1.0}]
+                                                                    null
                                                       );
 
       // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
@@ -180,7 +180,7 @@ class ModelCompositor {
             insert: correction,  // insert correction string
             // remove actual token string.  If new token, there should be nothing to delete.
             deleteLeft: newEmptyToken ? 0 : this.wordbreak(context).length, 
-            id: finalInput.id
+            id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
           if(bestCorrectionCost === undefined) {
@@ -536,6 +536,9 @@ class ModelCompositor {
   }
 
   public resetContext(context: Context) {
+    // Force-resets the context, throwing out any previous fat-finger data, etc.
+    // Designed for use when the caret has been directly moved and/or the context sourced from a different control
+    // than before.
     if(this.contextTracker) {
       let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
       let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, this.lexicalModel);

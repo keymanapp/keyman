@@ -351,7 +351,10 @@ namespace correction {
       }
 
       const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
-      const primaryInput = hasDistribution ? transformDistribution[0].sample : null;
+      let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
+      if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && primaryInput.deleteRight == 0) {
+        primaryInput = null;
+      }
       const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0;
       const finalToken = tokenizedContext[tokenizedContext.length-1];
 
@@ -392,7 +395,7 @@ namespace correction {
           if(isBackspace) {
             state.replaceTailForBackspace(finalToken, primaryInput.id);
           } else {
-            state.updateTail(transformDistribution, finalToken);
+            state.updateTail(primaryInput ? transformDistribution : null, finalToken);
           }
         }
         // There is only one word in the context.
@@ -411,7 +414,7 @@ namespace correction {
           if(isBackspace) {
             state.replaceTailForBackspace(finalToken, primaryInput.id);
           } else {
-            state.updateTail(transformDistribution, finalToken);
+            state.updateTail(primaryInput ? transformDistribution : null, finalToken);
           }
         }
       }
@@ -423,17 +426,23 @@ namespace correction {
         let token = new TrackedContextToken();
         token.raw = entry;
         if(token.raw) {
-          let tokenTransform = {
-            insert: entry,
-            deleteLeft: 0
-          };
-          // Build a single-entry prob-distribution array... where the single distribution is 100% for the token's actual form.
-          // Basically, assume the token was the correct input, since we lack any actual probability data about the keystrokes
-          // that generated it.
-          token.transformDistributions = [[{
-            sample: tokenTransform,
-            p: 1.0
-          }]];
+          let chars = token.raw.split('');
+
+          /* Build single-entry prob-distribution arrays, one per char... where the single distribution is 100%
+           * for the token's actual characters.  Needed for 14.0 instead of a single token for the whole word
+           * due to current search-algorithm limitations.
+           * Basically, assume the token was the correct input, since we lack any actual probability data
+           * about the keystrokes that generated it.
+           */
+          token.transformDistributions = chars.map(function(char) {
+            return [{
+              sample: {
+                insert: char,
+                deleteLeft: 0
+              },
+              p: 1.0
+            }];
+          });
         } else {
           // Helps model context-final wordbreaks.
           token.transformDistributions = [];
@@ -474,7 +483,7 @@ namespace correction {
      * @param transformDistribution 
      */
     analyzeState(model: LexicalModel, 
-                 context: Context, 
+                 context: Context,
                  transformDistribution?: Distribution<Transform>): TrackedContextState {
       if(!model.traverseFromRoot) {
         // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)
