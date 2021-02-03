@@ -127,6 +127,41 @@ namespace correction {
       this.tokens.push(whitespaceToken);
     }
 
+    /**
+     * Used for 14.0's backspace workaround, which flattens all previous Distribution<Transform>
+     * entries because of limitations with direct use of backspace transforms.
+     * @param tokenText
+     * @param transformId 
+     */
+    replaceTailForBackspace(tokenText: USVString, transformId: number) {
+      this.tokens.pop();
+
+      // It's a backspace transform; time for special handling!
+      //
+      // For now, with 14.0, we simply compress all remaining Transforms for the token into 
+      // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex, 
+      // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
+      //
+      // Note that we cannot just use a single, monolithic transform at this point b/c
+      // of our current edit-distance optimization strategy; diagonalization is currently... 
+      // not very compatible with that.
+      const backspacedTokenContext = tokenText.split('').map(function(char) {
+        let transform: Transform = {
+          insert: char,
+          deleteLeft: 0,
+          id: transformId // Not exactly optimal for every transform to have the same ID,
+                          // but is actually accurate here.
+        };
+
+        return [{sample: transform, p: 1.0}];
+      });
+
+      let compactedToken = new TrackedContextToken();
+      compactedToken.raw = tokenText;
+      compactedToken.transformDistributions = backspacedTokenContext;
+      this.pushTail(compactedToken);
+    }
+
     updateTail(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
       let editedToken = this.tail;
       
@@ -315,6 +350,11 @@ namespace correction {
         state = matchState;
       }
 
+      const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
+      const primaryInput = hasDistribution ? transformDistribution[0].sample : null;
+      const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0;
+      const finalToken = tokenizedContext[tokenizedContext.length-1];
+
       /* Assumption:  This is an adequate check for its two sub-branches.
        *
        * Basis:
@@ -325,11 +365,15 @@ namespace correction {
        *   - That is, no "reasonable" keystroke would emit a Transform adding two separate word tokens
        *     - For languages using whitespace to word-break, said keystroke would have to include said whitespace to break the assumption.
        */ 
+
+      // If there is/was more than one context token available...
       if(editPath.length > 1) {
+        // We're removing a context token, but at least one remains.
         if(poppedHead) {
           state.popHead();
         }
 
+        // We're adding an additional context token.
         if(pushedTail) {
           // ASSUMPTION:  any transform that triggers this case is a pure-whitespace Transform, as we
           //              need a word-break before beginning a new word's context.
@@ -342,11 +386,16 @@ namespace correction {
           // for the new word (token), so the input keystrokes do not correspond to the new text token.
           emptyToken.transformDistributions = [];
           state.pushTail(emptyToken);
-        } else {
+        } else { // We're editing the final context token.
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
           //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
-          state.updateTail(transformDistribution, tokenizedContext[tokenizedContext.length-1]);
+          if(isBackspace) {
+            state.replaceTailForBackspace(finalToken, primaryInput.id);
+          } else {
+            state.updateTail(transformDistribution, finalToken);
+          }
         }
+        // There is only one word in the context.
       } else {
         // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
         //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
@@ -357,38 +406,12 @@ namespace correction {
           token.raw = tokenizedContext[0];
           token.transformDistributions = [transformDistribution];
           state.pushTail(token);
-        } else {
+        } else { // Edit the lone context token.
           // Consider backspace entry for this case?
-          let hasDistribution = transformDistribution && Array.isArray(transformDistribution);
-          let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
-          if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0) {
-            // It's a backspace transform; time for special handling!
-            //
-            // For now, with 14.0, we simply compress all remaining Transforms for the token into 
-            // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex, 
-            // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
-            //
-            // Note that we cannot just use a single, monolithic transform at this point b/c
-            // of our current edit-distance optimization strategy; diagonalization is currently... 
-            // not very compatible with that.
-            let backspacedTokenContext = tokenizedContext[0].split('').map(function(char) {
-              let transform: Transform = {
-                insert: char,
-                deleteLeft: 0,
-                id: primaryInput.id // Not exactly optimal for every transform to have the same ID,
-                                    // but is actually accurate here.
-              };
-
-              return [{sample: transform, p: 1.0}];
-            });
-            state.tokens.pop();
-
-            let compactedToken = new TrackedContextToken();
-            compactedToken.raw = tokenizedContext[0];
-            compactedToken.transformDistributions = backspacedTokenContext;
-            state.pushTail(compactedToken);
+          if(isBackspace) {
+            state.replaceTailForBackspace(finalToken, primaryInput.id);
           } else {
-            state.updateTail(transformDistribution, tokenizedContext[0]);
+            state.updateTail(transformDistribution, finalToken);
           }
         }
       }
