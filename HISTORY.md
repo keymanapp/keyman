@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.236 beta 2021-02-04
+
+* chore(windows/resources): Fix typo about Community Forum link (#4412)
+* change(android/app): Separate displaying welcome.htm from keyboard installation (#4413)
+* fix(linux): Improve fix for #3399 (#4418)
+
 ## 14.0.235 beta 2021-02-03
 
 * fix(windows): Ensure UAC window comes to foreground (#4384)
