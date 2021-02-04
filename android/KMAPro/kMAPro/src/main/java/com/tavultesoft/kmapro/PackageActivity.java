@@ -52,7 +52,6 @@ public class PackageActivity extends AppCompatActivity implements
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
   private PackageProcessor kmpProcessor;
   private String pkgName;
-  private boolean hasWelcome;
   private StepperLayout mStepperLayout;
   private StepperAdapter mStepperAdapter;
 
@@ -104,7 +103,6 @@ public class PackageActivity extends AppCompatActivity implements
     }
 
     pkgName = kmpProcessor.getPackageName(pkgInfo);
-    hasWelcome = kmpProcessor.hasWelcome(pkgInfo);
     final int keyboardCount = kmpProcessor.getKeyboardCount(pkgInfo);
 
     // Number of languages associated with the first keyboard in a keyboard package.
@@ -129,7 +127,7 @@ public class PackageActivity extends AppCompatActivity implements
     boolean isInstallingPackage = true;
     mStepperLayout = (StepperLayout) findViewById(R.id.stepperLayout);
     mStepperAdapter = new StepperAdapter(getSupportFragmentManager(), this,
-      isInstallingPackage, tempPackagePath, pkgTarget, pkgId, pkgName, null, hasWelcome, languageID, languageCount);
+      isInstallingPackage, tempPackagePath, pkgTarget, pkgId, pkgName, null, languageID, languageCount);
     mStepperLayout.setAdapter(mStepperAdapter);
     mStepperLayout.setListener(this);
   }
