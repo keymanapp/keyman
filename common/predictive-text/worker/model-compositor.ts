@@ -428,14 +428,19 @@ class ModelCompositor {
     // Step 1:  generate and save the reversion's Transform.
     let sourceTransform = suggestion.transform;
     let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    let deletedRightChars = context.right.kmwSubstr(0, sourceTransform.deleteRight || 0);
+    let deletedRightChars = context.right ? context.right.kmwSubstr(0, sourceTransform.deleteRight || 0) : '';
     // right deletion is currently not implemented.
     let insertedLength = sourceTransform.insert.kmwLength();
 
     let reversionTransform: Transform = {
-      insert: deletedLeftChars + deletedRightChars,
+      insert: deletedLeftChars,
       deleteLeft: insertedLength
     };
+
+    let postCaretReversionTransform: Transform = {
+      insert: deletedRightChars,
+      deleteLeft: 0
+    }
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
     let postContext = context;
@@ -443,13 +448,22 @@ class ModelCompositor {
       // The code above restores the state to the context at the time the `Suggestion` was created.
       // `postTransform` handles any missing context that came later.
       reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
+      reversionTransform = models.buildMergedTransform(reversionTransform, postCaretReversionTransform);
 
       // Now that we've built the reversion based upon the Suggestion's original context,
       // we manipulate it in order to get a proper 'displayAs' string.
       postContext = models.applyTransform(postTransform, postContext);
     }
 
-    let revertedPrefix = this.wordbreak(postContext);
+    let revertedPrefix: string;
+    let postContextTokenization = this.tokenize(postContext);
+    if(postContextTokenization) {
+      // Handles display string for reversions triggered by accepting a suggestion mid-token.
+      revertedPrefix = postContextTokenization.left[postContextTokenization.left.length-1];
+      revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0] : '';
+    } else {
+      revertedPrefix = this.wordbreak(postContext);
+    }
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
@@ -533,7 +547,7 @@ class ModelCompositor {
     let suggestions = this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
       return trackedSuggestion.suggestion;
     });
-    
+
     suggestions.forEach(function(suggestion) {
       // A reversion's transform ID is the additive inverse of its original suggestion;
       // we revert to the state of said original suggestion.
