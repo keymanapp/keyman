@@ -459,7 +459,7 @@ class ModelCompositor {
     // set the Reversion's ID directly.
     let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
     if(suggestion.transformId != null) {
-      reversion.transformId = suggestion.transformId;
+      reversion.transformId = -suggestion.transformId;
     }
     if(suggestion.id != null) {
       // Since a reversion inverts its source suggestion, we set its ID to be the 
