@@ -492,7 +492,13 @@ class ModelCompositor {
     let compositor = this;
     let fallbackSuggestions = function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
-      return compositor.predict({ insert: '', deleteLeft: 0}, revertedContext);
+      let suggestions = compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      suggestions.forEach(function(suggestion) {
+        // A reversion's transform ID is the additive inverse of its original suggestion;
+        // we revert to the state of said original suggestion.
+        suggestion.transformId = -reversion.transformId;
+      });
+      return suggestions;
     }
 
     if(!this.contextTracker) {
@@ -524,9 +530,16 @@ class ModelCompositor {
     // Will need to be modified a bit if/when phrase-level suggestions are implemented.
     // Those will be tracked on the first token of the phrase, which won't be the tail
     // if they cover multiple tokens.
-    return this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
+    let suggestions = this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
       return trackedSuggestion.suggestion;
     });
+    
+    suggestions.forEach(function(suggestion) {
+      // A reversion's transform ID is the additive inverse of its original suggestion;
+      // we revert to the state of said original suggestion.
+      suggestion.transformId = -reversion.transformId;
+    });
+    return suggestions;
   }
 
   private wordbreak(context: Context): string {
