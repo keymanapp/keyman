@@ -110,7 +110,7 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_RunParams>-sentry-client-test-exception</Debugger_RunParams>
+        <Debugger_RunParams>-validate-repo-changes C:\Projects\keyman\keyboards compare-bcp47-scripts</Debugger_RunParams>
         <DCC_AssertionsAtRuntime>true</DCC_AssertionsAtRuntime>
         <DCC_DebugInformation>2</DCC_DebugInformation>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -267,7 +267,18 @@
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas"/>
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
         <DCCReference Include="Keyman.Developer.System.Project.ProjectLogConsole.pas">
-            <Form>$R icons.RES</Form>
+            <Form>,
+  Sentry.Client in &apos;..\..\ext\sentry\Sentry.Client.pas&apos;,
+  Sentry.Client.Console in &apos;..\..\ext\sentry\Sentry.Client.Console.pas&apos;,
+  sentry in &apos;..\..\ext\sentry\sentry.pas&apos;,
+  Keyman.System.KeymanSentryClient in &apos;..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas&apos;,
+  KeymanPaths in &apos;..\..\global\delphi\general\KeymanPaths.pas&apos;,
+  Keyman.System.CanonicalLanguageCodeUtils in &apos;..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas&apos;,
+  Keyman.System.Standards.LangTagsRegistry in &apos;..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas&apos;,
+  Keyman.Developer.System.Project.UrlRenderer in &apos;..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas&apos;,
+  Keyman.Developer.System.ValidateRepoChanges in &apos;Keyman.Developer.System.ValidateRepoChanges.pas&apos;;
+
+{$R icons.RES</Form>
         </DCCReference>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Console.pas"/>
@@ -277,6 +288,7 @@
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
+        <DCCReference Include="Keyman.Developer.System.ValidateRepoChanges.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

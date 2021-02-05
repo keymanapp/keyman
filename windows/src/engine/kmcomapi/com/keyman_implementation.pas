@@ -263,7 +263,7 @@ function TKeyman.GetCanonicalTag(const Tag: WideString): WideString;
 begin
   // We implement this here to avoid sharing standards datasets across
   // multiple executables
-  Result := TCanonicalLanguageCodeUtils.FindBestTag(Tag, True);
+  Result := TCanonicalLanguageCodeUtils.FindBestTag(Tag, True, True);
 end;
 
 function TKeyman.Get_AutoApply: WordBool;

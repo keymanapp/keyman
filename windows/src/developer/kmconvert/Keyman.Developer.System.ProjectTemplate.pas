@@ -197,7 +197,7 @@ var
 
       bcp47tag := TBCP47Tag.Create(tag);
       try
-        bcp47tag.Tag := TCanonicalLanguageCodeUtils.FindBestTag(bcp47tag.Tag, False);
+        bcp47tag.Tag := TCanonicalLanguageCodeUtils.FindBestTag(bcp47tag.Tag, False, False);
         Result := Result + '"' + bcp47tag.Tag + '"';
       finally
         bcp47tag.Free;

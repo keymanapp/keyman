@@ -81,6 +81,9 @@ begin
   Assert.AreEqual('se-Latn-NO-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('se-fonipa', True));
   Assert.AreEqual('se-Latn-NO-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('se-no-fonipa', True));
   Assert.AreEqual('fr-FR-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('fr-fonipa', True));
+
+  // az-Cyrl
+  Assert.AreEqual('az-Cyrl-RU', TCanonicalLanguageCodeUtils.FindBestTag('az-Cyrl', True));
 end;
 
 initialization
