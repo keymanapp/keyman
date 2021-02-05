@@ -31,9 +31,11 @@ import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
+import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
+import com.tavultesoft.kmea.util.HelpFile;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 
@@ -903,7 +905,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
     cleanupPackageInstall();
 
-    for(int i=0; i < keyboardsInstalled.size(); i++) {
+    String packageID = null;
+    String customHelpLink = null;
+    for (int i = 0; i < keyboardsInstalled.size(); i++) {
       HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
       String languageID = hashMap.get(KMManager.KMKey_LanguageID);
       Keyboard keyboardInfo = new Keyboard(
@@ -920,6 +924,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         hashMap.get(KMManager.KMKey_OskFont));
 
       if (i == 0) {
+        packageID = keyboardInfo.getPackageID();
+        customHelpLink = keyboardInfo.getHelpLink();
         if (KMManager.addKeyboard(this, keyboardInfo)) {
           KMManager.setKeyboard(keyboardInfo);
         }
@@ -954,6 +960,17 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             context, _downloadid, null, _callback,
             aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
         }
+      }
+    }
+
+    // Display welcome.htm help file
+    if (customHelpLink != null && !customHelpLink.isEmpty() &&
+        packageID != null && !packageID.isEmpty() && FileUtils.isWelcomeFile(customHelpLink)) {
+      // Display local welcome.htm help file, including associated assets
+      Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
+
+      if (FileProviderUtils.exists(context)) {
+        startActivity(i);
       }
     }
   }

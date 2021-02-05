@@ -38,7 +38,7 @@ class GnomeKeyboardsUtil():
 
     def _convert_array_to_variant(self, array):
         if len(array) == 0:
-            return None
+            return Variant('a(ss)', None)
 
         children = []
         for (type, id) in array:

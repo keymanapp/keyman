@@ -62,6 +62,8 @@ for proj in ${extra_projects}; do
         cd keyman_config
         sed -e "s/_VERSION_/${VERSION}/g" -e "s/_VERSIONWITHTAG_/${VERSION_WITH_TAG}/g" -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" \
             -e "s/_RELEASEVERSION_/${VERSION_RELEASE}/g" -e "s/_TIER_/${TIER}/g" version.py.in > version.py
+
+        cd ../buildtools && python3 ./build-langtags.py
     fi
     cd $BASEDIR
 done

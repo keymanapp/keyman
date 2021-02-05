@@ -35,8 +35,6 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
 
   private String languageID;
   private int languageCount;
-  private boolean hasWelcome;
-
 
   /**
    * Constructor where languageID and languageCount are empty
@@ -48,13 +46,11 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
    * @param packageID
    * @param pkgName
    * @param keyboard
-   * @param hasWelcome
    */
   public StepperAdapter(FragmentManager fm, Context context,
                         boolean isInstallingPackage, File tempPackagePath,
                         String pkgTarget, String packageID, String pkgName,
-                        Keyboard keyboard,
-                        boolean hasWelcome) {
+                        Keyboard keyboard) {
     super(fm, context);
     this.isInstallingPackage = isInstallingPackage;
     this.tempPackagePath = tempPackagePath;
@@ -62,7 +58,6 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
     this.packageID = packageID;
     this.pkgName = pkgName;
     this.keyboard = keyboard;
-    this.hasWelcome = hasWelcome;
     this.languageID = null; // not filled
     this.languageCount = 0;
   }
@@ -71,7 +66,6 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
                         boolean isInstallingPackage, File tempPackagePath,
                         String pkgTarget, String packageID, String pkgName,
                         Keyboard keyboard,
-                        boolean hasWelcome,
                         String languageID, int languageCount) {
     super(fm, context);
     this.isInstallingPackage = isInstallingPackage;
@@ -80,7 +74,6 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
     this.packageID = packageID;
     this.pkgName = pkgName;
     this.keyboard = keyboard;
-    this.hasWelcome = hasWelcome;
     this.languageID = languageID;
     this.languageCount = languageCount;
   }
@@ -107,63 +100,43 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
           return step1;
         }
       case 1:
-        if (getCount() > 2) {
-          final SelectLanguageFragment step2 = new SelectLanguageFragment();
-          Bundle b2 = new Bundle();
-          b2.putInt(CURRENT_STEP_POSITION_KEY, position);
-          b2.putBoolean("tempPath", true);
-          b2.putSerializable("packagePath", tempPackagePath);
-          b2.putString("packageID", packageID);
-          b2.putString("languageID", languageID);
-          if (keyboard != null) {
-            b2.putSerializable("keyboard", keyboard);
-          }
-          step2.setArguments(b2);
-          return step2;
-        } else {
-          final WebViewFragment step2 = CreateWebView(position, FileUtils.WELCOME_HTM);
-          return step2;
+        final SelectLanguageFragment step2 = new SelectLanguageFragment();
+        Bundle b2 = new Bundle();
+        b2.putInt(CURRENT_STEP_POSITION_KEY, position);
+        b2.putBoolean("tempPath", true);
+        b2.putSerializable("packagePath", tempPackagePath);
+        b2.putString("packageID", packageID);
+        b2.putString("languageID", languageID);
+        if (keyboard != null) {
+          b2.putSerializable("keyboard", keyboard);
         }
-      case 2:
-        final WebViewFragment step3 = CreateWebView(position, FileUtils.WELCOME_HTM);
-        return step3;
+        step2.setArguments(b2);
+        return step2;
     }
     return null;
   }
 
   /**
    * Determine the number of states for the StepperAdapter
+   * No longer displaying welcome.htm with the Stepper
+   *
    * !isInstallingPackage:
    * 1 dot: keyboard package already installed, so just use SelectLanguageFragment
    *
    * Keyboard package:
-   * 1 dot: package has one language, no welcome.htm.
-   * 2 dots: package has one language, has welcome.htm.
-   * 2 dots: package has multiple languages but no welcome.htm.
-   * 3 dots: package has multiple languages and welcome.htm.
+   * 1 dot: package has one language.
+   * 2 dots: package has multiple languages.
    *
    * Lexical Model package:
-   * 2 dots
+   * 1 dot
    * @return int
    */
   @Override
   public int getCount() {
-    int count = 3;
-    if (pkgTarget != null) {
-      if (pkgTarget.equals(PackageProcessor.PP_LEXICAL_MODELS_KEY)) {
-        count = 2;
-      } else if (pkgTarget.equals(PackageProcessor.PP_KEYBOARDS_KEY)) {
-        if (!isInstallingPackage) {
-          count = 1;
-        }
-        else if (languageCount <= 1) {
-          // One or less language
-          count = (!hasWelcome) ? 1 : 2;
-        } else {
-          // Multiple languages
-          count = (!hasWelcome) ? 2 : 3;
-        }
-      }
+    int count = 1;
+    if ((pkgTarget != null) && pkgTarget.equals(PackageProcessor.PP_KEYBOARDS_KEY) && languageCount > 1) {
+      // More than 1 language
+      count = 2;
     }
     return count;
   }
@@ -176,8 +149,8 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
       case 0:
         // readme.htm EndButton uses "NEXT" button
         String buttonLabel = context.getString(R.string.label_next);
-        if (getCount() <= 2) {
-          // If only 1-2 steps, use "INSTALL"
+        if (getCount() == 1) {
+          // If only 1 step, use "INSTALL"
           buttonLabel = context.getString(R.string.label_install);
         }
         return new StepViewModel.Builder(context)
@@ -187,19 +160,9 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
         // Language picker EndButton uses "INSTALL" button
         buttonLabel = context.getString(R.string.label_install);
         boolean backButtonVisible = true;
-        if (getCount() == 2) {
-          // If only two steps, use "OK" and hide back button
-          buttonLabel = context.getString(R.string.label_ok);
-          backButtonVisible = false;
-        }
         return new StepViewModel.Builder(context)
           .setEndButtonLabel(buttonLabel)
           .setBackButtonVisible(backButtonVisible)
-          .create();
-      case 2:
-        // Adapter style defaults last step EndButton to "OK". Hide back button
-        return new StepViewModel.Builder(context)
-          .setBackButtonVisible(false)
           .create();
     }
     return null;
@@ -208,7 +171,7 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
   /**
    * Utility to create WebViewFragment
    * @param position int position in the adapter
-   * @param fileName FileUtils.README_HTM or FileUtils.WELCOME_HTM
+   * @param fileName FileUtils.README_HTM
    * @return WebViewFragment
    */
   private WebViewFragment CreateWebView(int position, String fileName) {

@@ -180,6 +180,7 @@ class InstallKmpTests(unittest.TestCase):
         languages = [
             {'id': 'de'},
             {'id': 'esi-Latn'},
+            {'id': 'dyo'}
         ]
 
         for data in [
@@ -189,12 +190,16 @@ class InstallKmpTests(unittest.TestCase):
             {'given': 'es', 'expected': None},
             {'given': 'en', 'expected': None},
             {'given': None, 'expected': None},
+            # #3399
+            {'given': 'dyo-latn', 'expected': 'dyo-Latn'},
+            {'given': 'dyo', 'expected': 'dyo-Latn'},
         ]:
-            # Execute
-            result = _normalize_language(languages, data['given'])
+            with self.subTest(data = data):
+                # Execute
+                result = _normalize_language(languages, data['given'])
 
-            # Verify
-            self.assertEqual(result, data['expected'])
+                # Verify
+                self.assertEqual(result, data['expected'])
 
     def test_normalizeLanguage_noLanguages(self):
         # Setup
