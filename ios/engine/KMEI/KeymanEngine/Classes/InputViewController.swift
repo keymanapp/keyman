@@ -338,7 +338,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // We should NOT call .resetContext() here for this reason.
   }
   
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToLeftDelete: Int, newText: String, numCharsToRightDelete: Int) {
     if keymanWeb.isSubKeysMenuVisible {
       return
     }
@@ -351,7 +351,14 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    if numCharsToDelete <= 0 {
+    if numCharsToRightDelete > 0 {
+      for _ in 0..<numCharsToRightDelete {
+        textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
+        textDocumentProxy.deleteBackward()
+      }
+    }
+
+    if numCharsToLeftDelete <= 0 {
       textDocumentProxy.insertText(newText)
 
       // A full-context deletion will report numCharsToDelete == 0 and won't
@@ -366,7 +373,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       return
     }
 
-    for _ in 0..<numCharsToDelete {
+    for _ in 0..<numCharsToLeftDelete {
       let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
       textDocumentProxy.deleteBackward()
       let newContext = textDocumentProxy.documentContextBeforeInput ?? ""

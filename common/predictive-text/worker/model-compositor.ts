@@ -306,11 +306,18 @@ class ModelCompositor {
 
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
       // for such cases.
+
+      // Do we need to manipulate the suggestion's transform based on the current state of the context?
       if(!context.right) {
         // Only insert wordbreak characters if we're at the end of the context.  
         suggestion.transform.insert += punctuation.insertAfterWord;
       } else {
-        // TODO: Replace all characters in the word to the right of the caret.
+        // If we're mid-word, delete its original post-caret text.
+        const tokenization = compositor.tokenize(context);
+        if(tokenization && tokenization.caretSplitsToken) {
+          let righthandSplit = tokenization.right[0];
+          suggestion.transform.deleteRight = (suggestion.transform.deleteRight || 0) + righthandSplit.kmwLength();
+        }
       }
 
       // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
@@ -421,11 +428,12 @@ class ModelCompositor {
     // Step 1:  generate and save the reversion's Transform.
     let sourceTransform = suggestion.transform;
     let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
+    let deletedRightChars = context.right.kmwSubstr(0, sourceTransform.deleteRight || 0);
     // right deletion is currently not implemented.
     let insertedLength = sourceTransform.insert.kmwLength();
 
     let reversionTransform: Transform = {
-      insert: deletedLeftChars,
+      insert: deletedLeftChars + deletedRightChars,
       deleteLeft: insertedLength
     };
 
@@ -537,6 +545,16 @@ class ModelCompositor {
       // Since the model relies on custom wordbreaking behavior, we need to use the
       // old, deprecated wordbreaking pattern.
       return model.wordbreak(context);
+    }
+  }
+
+  private tokenize(context: Context): models.Tokenization {
+    let model = this.lexicalModel;
+
+    if(model.wordbreaker) {
+      return models.tokenize(model.wordbreaker, context);
+    } else {
+      return null;
     }
   }
 
