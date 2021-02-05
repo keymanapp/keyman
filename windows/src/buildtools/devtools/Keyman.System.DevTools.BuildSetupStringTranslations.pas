@@ -45,7 +45,7 @@ begin
   for i := 1 to Length(s) do
   begin
     ch := Ord(s[i]);
-    if (ch < 32) or (ch > 126) then
+    if (ch < 32) or (ch > 126) or (ch = Ord('''')) then
     begin
       if InQuotes then
         Result := Result + '''';
