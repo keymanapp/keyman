@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.237 beta 2021-02-06
+
+* fix(linux): Fix packaging (#4428)
+
 ## 14.0.236 beta 2021-02-04
 
 * chore(windows/resources): Fix typo about Community Forum link (#4412)
