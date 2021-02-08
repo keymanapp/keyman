@@ -32,6 +32,7 @@ public class DisplayLanguages {
   public static final DisplayLanguageType[] DisplayLanguages =
   {
     new DisplayLanguageType(unspecifiedLocale, "Default Locale"),
+    new DisplayLanguageType("fr-FR", "French"),
     new DisplayLanguageType("de-DE", "German"),
     new DisplayLanguageType("km-KH", "Khmer"),
     new DisplayLanguageType("ann", "Obolo")
