@@ -1,0 +1,12 @@
+---
+title: Welcome to Keyman
+---
+
+Thank you for installing Keyman for Linux. Whether you're a new or returning user, we believe you will appreciate the significant enhancements in this latest version of Keyman for Linux.
+
+## What is Keyman for Linux?
+Keyman for Linux makes it possible to type in over 1,000 languages in any Linux application.
+
+Keyman for Linux also supports KMFL keyboards, so your existing KMFL keyboards will continue to work.
+
+[Click here](../start/) to get started.
