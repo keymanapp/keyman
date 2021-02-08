@@ -86,7 +86,7 @@ class ModelCompositor {
 
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.wordbreak(postContext);
-    let keepOption: Keep = null;
+    let keepOption: Outcome<Keep> = null;
 
     let rawPredictions: Distribution<Suggestion> = [];
 
@@ -232,22 +232,26 @@ class ModelCompositor {
 
       if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
         // Preserve the original, pre-keyed version of the text.
-        let baseTransform = prediction.sample.transform;
+        if(!keepOption) {
+          let baseTransform = prediction.sample.transform;
 
-        let keepTransform = {
-          insert: keepOptionText,
-          deleteLeft: baseTransform.deleteLeft,
-          deleteRight: baseTransform.deleteRight,
-          id: baseTransform.id
+          let keepTransform = {
+            insert: keepOptionText,
+            deleteLeft: baseTransform.deleteLeft,
+            deleteRight: baseTransform.deleteRight,
+            id: baseTransform.id
+          }
+
+          let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
+          keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
+          keepOption.matchesModel = true;
+
+          // Since we replaced the original Suggestion with a keep-annotated one,
+          // we must manually preserve the transform ID.
+          keepOption.transformId = prediction.sample.transformId;
+        } else if(keepOption.p && prediction.p) {
+          keepOption.p += prediction.p;
         }
-
-        let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
-        keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
-        keepOption.matchesModel = true;
-
-        // Since we replaced the original Suggestion with a keep-annotated one,
-        // we must manually preserve the transform ID.
-        keepOption.transformId = prediction.sample.transformId;
       } else {
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
