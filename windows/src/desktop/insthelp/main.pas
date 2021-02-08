@@ -52,6 +52,7 @@ uses
 procedure ShutdownKeyman;
 var
   hwnd: THandle;
+  Counter: Integer;
 const
   KMC_StopProduct = 1;  // from UfrmKeyman7Main.pas
 begin
@@ -59,7 +60,12 @@ begin
   if hwnd <> 0 then
   begin
     PostMessage(hwnd, WM_USER_ParameterPass, KMC_StopProduct, 0);
-    Sleep(1000); // We'll wait 1 second to give Keyman Engine time to shut down
+    Counter := 0;
+    while (FindWindow('TfrmKeyman7Main', nil) <> 0) and (Counter < 10) do
+    begin
+      Sleep(1000); // We'll wait up to 10 seconds to give Keyman Engine time to shut down
+      Inc(Counter);
+    end;
   end;
 end;
 
