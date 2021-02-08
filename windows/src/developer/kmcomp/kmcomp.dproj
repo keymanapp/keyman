@@ -266,20 +266,7 @@
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas"/>
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas"/>
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
-        <DCCReference Include="Keyman.Developer.System.Project.ProjectLogConsole.pas">
-            <Form>,
-  Sentry.Client in &apos;..\..\ext\sentry\Sentry.Client.pas&apos;,
-  Sentry.Client.Console in &apos;..\..\ext\sentry\Sentry.Client.Console.pas&apos;,
-  sentry in &apos;..\..\ext\sentry\sentry.pas&apos;,
-  Keyman.System.KeymanSentryClient in &apos;..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas&apos;,
-  KeymanPaths in &apos;..\..\global\delphi\general\KeymanPaths.pas&apos;,
-  Keyman.System.CanonicalLanguageCodeUtils in &apos;..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas&apos;,
-  Keyman.System.Standards.LangTagsRegistry in &apos;..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas&apos;,
-  Keyman.Developer.System.Project.UrlRenderer in &apos;..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas&apos;,
-  Keyman.Developer.System.ValidateRepoChanges in &apos;Keyman.Developer.System.ValidateRepoChanges.pas&apos;;
-
-{$R icons.RES</Form>
-        </DCCReference>
+        <DCCReference Include="Keyman.Developer.System.Project.ProjectLogConsole.pas" />
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Console.pas"/>
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>

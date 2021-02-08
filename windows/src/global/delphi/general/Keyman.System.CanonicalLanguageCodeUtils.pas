@@ -21,8 +21,13 @@ uses
 ///
 ///<summary>Find a language code with appropriate script and region subtags</summary>
 ///<remarks>
-///  This will canonicalize known tags, then apply rules to ensure script subtag
-///  is present if not suppressed, and add a default region if none given.
+///  Canonicalizes the given tag using data in langtags.json. Will add region and
+///  script if appropriate and if the AddRegion or AddScriptIfNotSuppressed flags
+///  are passed. Will never add a script where suppress-script is present for the
+///  language. Will translate ISO639-3 to ISO639-1 as well.
+///
+///  A special case is made for und-fonipa as the canonical version
+///  of that is und-Zyyy-fonipa, but we don't need the Zyyy script.
 ///</remarks>
 class function TCanonicalLanguageCodeUtils.FindBestTag(const Tag: string; AddRegion, AddScriptIfNotSuppressed: Boolean): string;
 var
@@ -61,7 +66,7 @@ begin
     // Then, lookup the lang-script and see if there is a suppress-script
     // Or add the default script in if it is missing and not a suppress-script
     if (t.Script = '') and not LangTag.suppress and AddScriptIfNotSuppressed then
-      // AddScriptIfNotSuppressed will generally be True for Windows scenarios;
+      // AddScriptIfNotSuppressed will be True for Windows scenarios;
       // for other systems and for registry systems it will be False
       t.Script := LangTag.script;
 
