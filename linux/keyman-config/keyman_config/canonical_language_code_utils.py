@@ -5,7 +5,7 @@ from keyman_config.standards.lang_tags_map import LangTagsMap
 
 
 class CanonicalLanguageCodeUtils():
-    def findBestTag(tag, addRegion):
+    def findBestTag(tag, addRegion, addScriptIfNotSuppressed):
         """
         Find a language code with appropriate script and region subtags</summary>
 
@@ -20,6 +20,10 @@ class CanonicalLanguageCodeUtils():
         if not bcp47Tag:
             return None
 
+        # Special case for IPA keyboards otherwise we'd end up with und-Zyyy-fonipa
+        if bcp47Tag.language == 'und' and bcp47Tag.variant[0] == 'fonipa':
+            return 'und-fonipa'
+
         # First, canonicalize any unnecessary ISO639-3 codes
         bcp47Tag.language = LangTagsMap.translateISO6393ToBCP47(bcp47Tag.language)
 
@@ -28,17 +32,15 @@ class CanonicalLanguageCodeUtils():
         if result:
             bcp47Tag.tag = result
 
-        langTag = LangTagsMap.lookupLangTags(bcp47Tag.language)
+        langTag = LangTagsMap.lookupLangTags(bcp47Tag.tag)
         if not langTag:
-            # Not a valid language subtag but perhaps it's a custom language
+            # Not a known tag but perhaps it's a custom language
             # We'll make no further assumptions
             return bcp47Tag.tag
 
         # Then, lookup the lang-script and see if there is a suppress-script
-        if bcp47Tag.script == langTag['script'] and langTag['suppress']:
-            bcp47Tag.script = ''
         # Or add the default script in if it is missing and not a suppress-script
-        elif not bcp47Tag.script and not langTag['suppress']:
+        if not bcp47Tag.script and not langTag['suppress'] and addScriptIfNotSuppressed:
             bcp47Tag.script = langTag['script']
 
         # Add the region if not specified
@@ -46,4 +48,3 @@ class CanonicalLanguageCodeUtils():
             bcp47Tag.region = langTag['region']
 
         return bcp47Tag.tag
-
