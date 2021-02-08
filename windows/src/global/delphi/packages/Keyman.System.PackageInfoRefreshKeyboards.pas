@@ -207,7 +207,7 @@ begin
           DoError(Format(SError_LanguageTagIsNotValid, [kbd.ID, lang.ID, msg]), plsError);
           Result := False;
         end
-        else if not TCanonicalLanguageCodeUtils.IsCanonical(tag, msg, False) then
+        else if not TCanonicalLanguageCodeUtils.IsCanonical(tag, msg, False, False) then
         begin
           DoError(Format(SWarning_LanguageTagIsNotCanonical, [kbd.ID, lang.ID, msg]), plsWarning);
         end;
@@ -277,7 +277,7 @@ begin
       codes := TKMXFileLanguages.GetKMXFileBCP47Codes(f.FileName);
       for i := 0 to High(codes) do
       begin
-        t := TCanonicalLanguageCodeUtils.FindBestTag(codes[i], False);
+        t := TCanonicalLanguageCodeUtils.FindBestTag(codes[i], False, False);
         if t = '' then
           // We won't add codes that are unrecognised
           Continue;
