@@ -196,16 +196,26 @@ class ModelCompositor {
         // Running in bulk over all suggestions, duplicate entries may be possible.
         let predictions = this.predictFromCorrections(predictionRoots, context);
         rawPredictions = rawPredictions.concat(predictions);
-
         // TODO:  We don't currently de-duplicate predictions at this point quite yet, so
         // it's technically possible that we return too few.
 
-        if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
-          break;
-        } else if(matches[0].totalCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+        let correctionCost = matches[0].totalCost;
+        if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
           // Very useful for stopping 'sooner' when words reach a sufficient length.
           break;
-        }
+        } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
+          // Sort the prediction list; we need them in descending order for the next check.
+          rawPredictions.sort(function(a, b) {
+            return b.p - a.p;
+          });
+
+          // If the best suggestion from the search's current tier fails to beat the worst
+          // pending suggestion from previous tiers, assume all further corrections will 
+          // similarly fail to win; terminate the search-loop.
+          if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
+            break;
+          }
+        } 
       }
     }
 
