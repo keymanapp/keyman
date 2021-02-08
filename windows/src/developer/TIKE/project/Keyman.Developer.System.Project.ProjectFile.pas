@@ -312,6 +312,7 @@ const
 
 function GlobalProjectStateWndHandle: THandle;
 function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
+function ProjectCompilerMessageW(line: Integer; msgcode: LongWord; const text: string): Integer;
 procedure ProjectCompilerMessageClear;
 
 function ProjectTypeFromString(s: string): TProjectType;
@@ -1174,6 +1175,11 @@ begin
 end;
 
 function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
+begin
+  Result := ProjectCompilerMessageW(line, msgcode, String_AtoU(text));
+end;
+
+function ProjectCompilerMessageW(line: Integer; msgcode: LongWord; const text: string): Integer;  // I3310   // I4694
 const // from compile.pas
   CERR_FATAL   = $00008000;
   CERR_ERROR   = $00004000;
@@ -1203,7 +1209,7 @@ begin
       Exit(1);
   end;
 
-  TProject.CompilerMessageFile.Log(FLogState, String_AtoU(text), msgcode, line);   // I4706
+  TProject.CompilerMessageFile.Log(FLogState, text, msgcode, line);   // I4706
 
   if (FLogState <> plsInfo) and (MessageCount = MAX_MESSAGES) then
     TProject.CompilerMessageFile.Log(

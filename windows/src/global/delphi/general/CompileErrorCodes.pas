@@ -200,6 +200,8 @@ const
 
   CWARN_TouchLayoutSpecialLabelOnNormalKey          = $20A9;
 
+  CWARN_OptionStoreNameInvalid                      = $20AA;
+
 implementation
 
 end.
