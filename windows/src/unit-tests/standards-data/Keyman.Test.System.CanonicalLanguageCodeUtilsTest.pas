@@ -9,6 +9,9 @@ type
   [TestFixture]
   TCanonicalLanguageCodeUtilsTest = class(TObject)
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestSomeTags;
   end;
@@ -19,6 +22,11 @@ uses
   Keyman.System.CanonicalLanguageCodeUtils;
 
 { TCanonicalLanguageCodeUtilsTest }
+
+procedure TCanonicalLanguageCodeUtilsTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
+end;
 
 procedure TCanonicalLanguageCodeUtilsTest.TestSomeTags;
 begin

@@ -212,6 +212,7 @@ begin
   try
     FillDetails;
     UpdateWordlistTabs;
+    MoveDesignToSource;
   finally
     Dec(FSetup);
   end;
@@ -589,7 +590,7 @@ procedure TfrmModelEditor.cmdAddWordlistClick(Sender: TObject);
 begin
   if dlgAddWordlist.Execute then
   begin
-    parser.Wordlists.Add(ExtractRelativePath(Filename, dlgAddWordlist.FileName));
+    parser.Wordlists.Add(ExtractRelativePath(Filename, dlgAddWordlist.FileName).Replace('\','/'));
     Inc(FSetup);
     try
       FillDetails;
@@ -659,9 +660,16 @@ end;
 { TfrmModelEditor.TWordlist }
 
 destructor TfrmModelEditor.TWordlist.Destroy;
+var
+  pages: TPageControl;
+  NewTab: TTabSheet;
 begin
   Frame.Free;
+  // Workaround for https://quality.embarcadero.com/browse/RSP-32327
+  pages := Tab.PageControl;
+  NewTab := pages.ActivePage;
   Tab.Free;
+  pages.ActivePage := NewTab;
   inherited Destroy;
 end;
 

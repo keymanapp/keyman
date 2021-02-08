@@ -26,6 +26,9 @@ type
   private
     procedure RunBasicRegEx(s,r,x: string; ShouldPassBuiltinTest: Boolean = False);
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestNoSMP;
 
@@ -109,6 +112,11 @@ end;
 procedure TGroupHelperRSP19902Test.TestSinglePrefixSMPAndSingleMatchedSMP;
 begin
   RunBasicRegEx(Chakma1+'bc'+Chakma2+'efg', '(c.e)', 'c'+Chakma2+'e');
+end;
+
+procedure TGroupHelperRSP19902Test.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
 end;
 
 procedure TGroupHelperRSP19902Test.TestDoublePrefixSMPAndSingleMatchedSMP;

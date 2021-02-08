@@ -30,6 +30,7 @@ uses
 
 procedure TKeyboardJSInfoTest.Setup;
 begin
+  Assert.IgnoreCaseDefault := False;
 end;
 
 procedure TKeyboardJSInfoTest.TearDown;

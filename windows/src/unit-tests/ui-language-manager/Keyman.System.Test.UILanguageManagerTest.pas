@@ -11,6 +11,9 @@ type
   [TestFixture]
   TUILanguageManagerTest = class(TObject)
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestFind;
   end;
@@ -21,6 +24,11 @@ uses
   Keyman.System.UILanguageManager;
 
 { TUILanguageManagerTest }
+
+procedure TUILanguageManagerTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
+end;
 
 procedure TUILanguageManagerTest.TestFind;
 var

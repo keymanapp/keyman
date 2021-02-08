@@ -10,6 +10,9 @@ type
   [TestFixture]
   TAndroidStringToKeymanLocaleStringTest = class(TObject)
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestTransform;
   end;
@@ -17,6 +20,11 @@ type
 implementation
 
 { TAndroidStringToKeymanLocaleStringTest }
+
+procedure TAndroidStringToKeymanLocaleStringTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
+end;
 
 procedure TAndroidStringToKeymanLocaleStringTest.TestTransform;
 begin

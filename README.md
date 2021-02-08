@@ -6,6 +6,8 @@ Keyman is an open source project distributed under the MIT license.
 
 # Get Involved
 
+[![Crowdin](https://badges.crowdin.net/keyman/localized.svg)](https://translate.keyman.com/project/keyman)
+
 [Get involved](https://keyman.com/about/get-involved)
 
 [comment]: # (CI Build statuses)

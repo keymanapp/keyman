@@ -13,6 +13,9 @@ type
   TKMXFileLanguagesTest = class(TObject)
   private
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     [TestCase('TestEnglish','eng,en')]
     [TestCase('TestAmharic','amh,am')]
@@ -35,8 +38,8 @@ type
     procedure TestEthnologueCodeListToArray2(code1, code2: string);
 
     [Test]
-    [TestCase('TestLCIDToBCP47-1', '0409,en-us')]
-    [TestCase('TestLCIDToBCP47-2', '0c09,en-au')]
+    [TestCase('TestLCIDToBCP47-1', '0409,en-US')]
+    [TestCase('TestLCIDToBCP47-2', '0c09,en-AU')]
     [TestCase('TestLCIDToBCP47-3', '0454,lo-LA')]
     procedure TestLCIDToBCP47(code1, code2: string);
   end;
@@ -45,6 +48,11 @@ implementation
 
 uses
   System.SysUtils;
+
+procedure TKMXFileLanguagesTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
+end;
 
 procedure TKMXFileLanguagesTest.TestEthnologueCodeListToArray;
 var
