@@ -576,7 +576,6 @@ namespace correction {
       }
 
       let batcher = new BatchingAssistant();
-      let batch: SearchResult[];
 
       // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
       let returnedValues = Object.values(this.returnedValues);
@@ -586,7 +585,7 @@ namespace correction {
         // Build batches of same-cost entries.
         while(preprocessedQueue.count > 0) {
           let entry = preprocessedQueue.dequeue();
-          batch = batcher.checkAndAdd(entry);
+          let batch = batcher.checkAndAdd(entry);
 
           if(batch) {
             yield batch;
@@ -595,7 +594,7 @@ namespace correction {
 
         // As we only return a batch once all entries of the same cost have been processed, we can safely
         // finalize the last preprocessed group without issue.
-        batch = batcher.tryFinalize();
+        let batch = batcher.tryFinalize();
         if(batch) {
           yield batch;
         }
@@ -618,6 +617,7 @@ namespace correction {
         } while(!timedOut && newResult.type == 'intermediate')
         
         // TODO:  check 'cost' on intermediate, running it through batcher to early-detect cost changes.
+        let batch: SearchResult[];
         if(newResult.type == 'none') {
           break;
         } else if(newResult.type == 'complete') {
@@ -630,7 +630,7 @@ namespace correction {
       } while(!timedOut && this.hasNextMatchEntry());
 
       // If we _somehow_ exhaust all search options, make sure to return the final results.
-      batch = batcher.tryFinalize();
+      let batch = batcher.tryFinalize();
       if(batch) {
         yield batch;
       }
