@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.239 beta 2021-02-08
+
+* fix(developer): debug information with unicode identifiers (#4408)
+* fix(developer): Compiler check for if and nul at start of context (#4410)
+* feat(developer): improve BCP 47 canonicalization (#4425)
+* chore(linux): Check in markdown help for Linux (#4414)
+
 ## 14.0.238 beta 2021-02-08
 
 * fix(android/engine): Remove WRITE_EXTERNAL_STORAGE from manifest (#4434)
