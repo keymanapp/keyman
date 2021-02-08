@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2021 SIL International. All rights reserved.
+ */
+
 package com.tavultesoft.kmea.util;
 
 import android.content.ClipData;
@@ -36,7 +40,8 @@ public final class HelpFile {
   public static Intent toActionView(Context context, String helpFile, String packageID) {
     Intent i = new Intent(Intent.ACTION_VIEW);
 
-    if (FileUtils.isWelcomeFile(helpFile) && ! KMManager.isTestMode()) {
+    if ((FileUtils.isWelcomeFile(helpFile) || FileUtils.hasPDFExtension(helpFile))
+        && ! KMManager.isTestMode()) {
       File customHelp = new File(new File(helpFile).getAbsolutePath());
       i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
       // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
@@ -44,7 +49,7 @@ public final class HelpFile {
         final String authority = FileProviderUtils.getAuthority(context);
         Uri contentUri = FileProvider.getUriForFile(
           context, authority, customHelp);
-        i.setDataAndType(contentUri, "text/html");
+        i.setDataAndType(contentUri, "application/pdf");
 
         // Grant read permission to all the files in the package so embedded assets can be viewed
         ClipData clipData = new ClipData(null, ASSET_MIME_TYPES, new ClipData.Item(contentUri));

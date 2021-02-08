@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical">
+
+  <include layout="@layout/titlebar" />
+
+  <WebView
+    android:id="@+id/kmHelpFileWebView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/titlebar"
+    android:layout_above="@+id/buttonBar" />
+
+  <LinearLayout
+    android:id="@+id/buttonBar"
+    style="?android:attr/buttonBarStyle"
+    android:layout_alignParentBottom="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <!-- Spacer to pad buttons to the right -->
+    <View
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:layout_weight="1" />
+
+    <Button
+      android:id="@+id/finishButton"
+      style="@style/Widget.AppCompat.Button.Borderless.Colored"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/label_ok"
+      android:elevation="1dp"
+      android:singleLine="true"
+      android:layout_marginStart="10dp" android:layout_marginEnd="15dp">
+      <requestFocus/>
+    </Button>
+
+  </LinearLayout>
+
+</RelativeLayout>
