@@ -223,7 +223,7 @@ type
     procedure ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971
     function ExpandSentinel(pwsz: PWideChar): TSentinelRecord;
     function CallFunctionName(s: WideString): WideString;
-    function JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean = False): string;   // I3659
+    function JavaScript_Name(i: Integer; pwszName: PWideChar; KeepNameForPersistentStorage: Boolean = False): string;   // I3659
     function JavaScript_Store(line: Integer; pwsz: PWideChar): string;
     function JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
     function JavaScript_ShiftAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;   // I4872
@@ -874,18 +874,18 @@ begin
     else Result := IntToStr(JavaScript_Key(fkp, FMnemonic));
 end;
 
-function TCompileKeymanWeb.JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean): string;   // I3659
+function TCompileKeymanWeb.JavaScript_Name(i: Integer; pwszName: PWideChar; KeepNameForPersistentStorage: Boolean): string;   // I3659
 var
   FChanged: Boolean;
   p: PWideChar;
 begin
   FChanged := False;
   p := pwszName;
-  if not Assigned(pwszName) or (pwszName^ = #0) or (not Self.FDebug and not UseNameForRelease) then   // I3659   // I3681
+  if not Assigned(pwszName) or (pwszName^ = #0) or (not Self.FDebug and not KeepNameForPersistentStorage) then   // I3659   // I3681
     Result := IntToStr(i) // for uniqueness
   else
   begin
-    if UseNameForRelease   // I3659
+    if KeepNameForPersistentStorage // I3659
       then Result := '' // Potential for overlap in theory but in practice we only use this for named option stores so can never overlap
       else Result := '_'; // Ensures we cannot overlap numbered instances
     while pwszName^ <> #0 do
@@ -901,7 +901,7 @@ begin
       end;
       Inc(pwszName);
     end;
-    if not UseNameForRelease then
+    if not KeepNameForPersistentStorage then
     begin
       // Ensure each transformed name is still unique
       Result := Result + '_' + IntToStr(i);
