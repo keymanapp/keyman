@@ -32,6 +32,11 @@ call :should-fail "10.0 .kmn with 14.0-only touch layout codes" test_touchlayout
 call :should-pass "14.0 .kmn with 14.0 touch layout codes" test_touchlayout_14_2.kmn || goto :eof
 call :should-pass "9.0 .kmn with accepted 14.0 touch layout codes" test_touchlayout_14_2.kmn || goto :eof
 
+call :should-fail "#4280: if should be at start of context 1" test_4280_if_start_1.kmn || goto :eof
+call :should-fail "#4280: if should be at start of context 2" test_4280_if_start_2.kmn || goto :eof
+call :should-fail "#4280: nul should be at start of context 1" test_4280_nul_start_1.kmn || goto :eof
+call :should-fail "#4280: nul should be at start of context 2" test_4280_nul_start_2.kmn || goto :eof
+
 goto :eof
 
 :should-pass

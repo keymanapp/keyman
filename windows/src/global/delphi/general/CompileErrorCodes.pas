@@ -202,6 +202,9 @@ const
 
   CWARN_OptionStoreNameInvalid                      = $20AA;
 
+  CWARN_NulNotFirstStatementInContext               = $20AB;
+  CWARN_IfShouldBeAtStartOfContext                  = $20AC;
+
 implementation
 
 end.

@@ -110,5 +110,37 @@
       <FileType>.doc</FileType>
       <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
     </File>
+    <File>
+      <ID>id_4c59db88c3869d699c9df7f46731a97a</ID>
+      <Filename>test_4280_if_start_1.kmn</Filename>
+      <Filepath>test_4280_if_start_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_279f3bc5af5315ab75f67c6a194dbc25</ID>
+      <Filename>test_4280_if_start_2.kmn</Filename>
+      <Filepath>test_4280_if_start_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_f27b4ef329275996bec15a9638f6d440</ID>
+      <Filename>test_4280_nul_start_1.kmn</Filename>
+      <Filepath>test_4280_nul_start_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_c0515825c0484a590391c8d99430303f</ID>
+      <Filename>test_4280_nul_start_2.kmn</Filename>
+      <Filepath>test_4280_nul_start_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
   </Files>
 </KeymanDeveloperProject>
