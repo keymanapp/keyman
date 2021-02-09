@@ -98,6 +98,7 @@ function upload_keyman_help {
       dstpath="$HELP_KEYMAN_COM/products/mac/$VERSION_RELEASE"
       ;;
     windows)
+      # Note: `/windows/src/desktop/help/build.sh web` must be run first
       helppath=$KEYMAN_ROOT/windows/bin/help/md/desktop
       dstpath="$HELP_KEYMAN_COM/products/windows/$VERSION_RELEASE"
       ;;
