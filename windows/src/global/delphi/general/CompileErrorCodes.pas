@@ -200,6 +200,11 @@ const
 
   CWARN_TouchLayoutSpecialLabelOnNormalKey          = $20A9;
 
+  CWARN_OptionStoreNameInvalid                      = $20AA;
+
+  CWARN_NulNotFirstStatementInContext               = $20AB;
+  CWARN_IfShouldBeAtStartOfContext                  = $20AC;
+
 implementation
 
 end.

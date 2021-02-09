@@ -197,6 +197,11 @@
 
 #define CWARN_TouchLayoutSpecialLabelOnNormalKey           0x000020A9
 
+#define CWARN_OptionStoreNameInvalid                       0x000020AA
+
+#define CWARN_NulNotFirstStatementInContext                0x000020AB
+#define CWARN_IfShouldBeAtStartOfContext                   0x000020AC
+
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1
 

@@ -53,6 +53,7 @@ files:
     languages_mapping:
       locale:
         de: de
+        fr: fr
 
   - source: /windows/src/desktop/setup/locale/en/strings.xml
     dest: /windows/setup/strings.xml
@@ -61,6 +62,7 @@ files:
     languages_mapping:
       locale:
         de: de
+        fr: fr
 
   # iOS files
 
