@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.240 beta 2021-02-09
+
+* fix(windows): When uninstalling, exit Keyman (#4383)
+* fix(common/models): predictions after context reset / caret shift (#4411)
+* modify(common): Refactor help-keyman-com.sh script for uploading help files (#4433)
+* fix(linux): improve BCP 47 canonicalization (#4439)
+
 ## 14.0.239 beta 2021-02-08
 
 * fix(developer): debug information with unicode identifiers (#4408)
