@@ -172,6 +172,7 @@ uses
   Hints,
   HotkeyUtils,
   initprog,
+  Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
   KeymanVersion,
@@ -553,10 +554,33 @@ end;
 procedure TfrmMain.Keyboard_ClickCheck(params: TStringList);
 var
   kbd: IKeymanKeyboardInstalled;
+  lang: IKeymanKeyboardLanguageInstalled2;
 begin
   if GetKeyboardFromParams(params, kbd) then
   begin
     kbd.Loaded := StrToBool(params.Values['value']);
+    if (params.Values['install'] <> '') and (kbd.Languages.Count > 0) then
+    begin
+      // For Keyman for FirstVoices, we will install the suggested language
+      // only when the checkbox is ticked, not when the keyboard is installed.
+      lang := kbd.Languages.Items[0] as IKeymanKeyboardLanguageInstalled2;
+      if kbd.Loaded and not lang.IsInstalled then
+      begin
+        if not TTipMaintenance.DoInstall(kbd.ID, lang.WindowsBCP47Code) then
+        begin
+          // We'll need to refresh in this situation as the checkbox state will
+          // not match reality
+          ShowMessage(MsgFromIdFormat(SKInstallLanguageTransientLimit, [lang.WindowsBCP47Code]));
+          kbd.Loaded := False;
+          DoApply;
+          DoRefresh;
+        end;
+      end
+      else if not kbd.Loaded and lang.IsInstalled then
+      begin
+        lang.Uninstall;
+      end;
+    end;
     DoApply; // No need to refresh page (checkbox state will already be correct)
   end;
 end;

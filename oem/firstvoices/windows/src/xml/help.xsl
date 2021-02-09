@@ -11,11 +11,12 @@
 		<html>
 			<head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
         <title><xsl:value-of select="$locale/string[@name='S_HelpTitle']" /></title>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
+        <link rel="stylesheet" type="text/css" href="/app/config.css" />
 				<style type="text/css">
-					* { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />; font-size: 13.3px; }
+					* { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
 
 					body { padding: 0px; margin: 0px; overflow: hidden;
 					width: <xsl:value-of select="$dialoginfo_help/@Width" />px;
@@ -27,7 +28,7 @@
 					width: 100%;
 					height: 100%;
 					}
-					
+
 					#size { position: absolute; left: 0; top: 0;
 						width: <xsl:value-of select="$dialoginfo_help/@Width" />px;
 						height: <xsl:value-of select="$dialoginfo_help/@Height" />px;
@@ -117,7 +118,7 @@
           float: right;
           padding: 10px;
           }
-          
+
           #help {
             margin: 60px 0 0 0;
           }
@@ -148,10 +149,7 @@
 				<div id="container">
           <div id="captionBox"><div id="c1"></div><div id="c2"></div><div id="c3"></div></div>
 					<div id="header">
-						<img id="icon" alt="Help">
-							<xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>48.png</xsl:attribute>
-						</img>
-
+						<img id="icon" alt="Help" src="/app/48.png" />
 						<div id="title">
 							<xsl:value-of select="$locale/string[@name='S_HelpTitle']" />
 						</div>
@@ -173,7 +171,7 @@
 							</a>
 						</div>
 					</div>
-					
+
 					<div id="footer">
 						<div id="buttons">
                 <xsl:call-template name="button">
@@ -182,10 +180,10 @@
                 </xsl:call-template>
 						</div>
 					</div>
-				</div>							 
+				</div>
 			</body>
 
 		</html>
 	</xsl:template>
-	
+
 </xsl:stylesheet>
