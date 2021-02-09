@@ -355,7 +355,7 @@ namespace correction {
       if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && primaryInput.deleteRight == 0) {
         primaryInput = null;
       }
-      const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0;
+      const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0 && primaryInput.deleteRight == 0;
       const finalToken = tokenizedContext[tokenizedContext.length-1];
 
       /* Assumption:  This is an adequate check for its two sub-branches.
