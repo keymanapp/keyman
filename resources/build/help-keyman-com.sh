@@ -28,18 +28,14 @@ shopt -s nullglob
 # These are passed via environment:
 #
 # HELP_KEYMAN_COM = the home of the help.keyman.com repository
-# PLATFORM = platform of the Keyman help to upload
 #
-# That repo must have push to origin configured and logged in
+# That repo must have push to origin configured and logged in.
+# Note: GitHub API only available via HTTPS, and not SSH
+# https://github.com/github/hub/issues/1644#issuecomment-359002547
 #
 
 if [ -z ${HELP_KEYMAN_COM+x} ]; then
   >&2 echo "Not uploading documentation: must set HELP_KEYMAN_COM in environment."
-  exit 1
-fi
-
-if [ -z ${PLATFORM} ]; then
-  >&2 echo "No uploading documentation: must set PLATFORM in environment."
   exit 1
 fi
 
@@ -48,11 +44,28 @@ if [ ! -d "$HELP_KEYMAN_COM/products/" ]; then
   exit 1
 fi
 
+function display_usage {
+  echo "Usage: $0 [platform]"
+  echo "       $0 -help"
+  echo
+  echo "  platform should be one of: android, ios, linux, mac, windows."
+  echo "  -help               displays this screen and exits"
+  exit 1
+}
+
 #
-# Environment
+# Define terminal colours
 #
 
-echo "Uploading Keyman for $PLATFORM documentation to help.keyman.com"
+if [ -t 2 ]; then
+  t_red=$'\e[1;31m'
+  t_grn=$'\e[1;32m'
+  t_yel=$'\e[1;33m'
+  t_blu=$'\e[1;34m'
+  t_mag=$'\e[1;35m'
+  t_cyn=$'\e[1;36m'
+  t_end=$'\e[0m'
+fi
 
 #
 # Uploading Keyman documentation
@@ -60,14 +73,14 @@ echo "Uploading Keyman for $PLATFORM documentation to help.keyman.com"
 
 ##
 ## Upload documentation updates to help.keyman.com
-## Paths depend on $PLATFORM
+## Paths depend on $platform
 ##
 function upload_keyman_help {
 
   local helppath
   local dstpath
 
-  case $PLATFORM in
+  case $platform in
     android)
       helppath=$KEYMAN_ROOT/android/help
       dstpath="$HELP_KEYMAN_COM/products/android/$VERSION_RELEASE"
@@ -89,8 +102,7 @@ function upload_keyman_help {
       dstpath="$HELP_KEYMAN_COM/products/windows/$VERSION_RELEASE"
       ;;
     *)
-      echo "Invalid PLATFORM ${PLATFORM}"
-      exit 1
+      display_usage
     esac
 
   #
@@ -99,7 +111,7 @@ function upload_keyman_help {
 
   if [[ ! -d "$helppath" ]]; then
     echo "${t_yel}Warning: The source path $helppath does not exist${t_end}"
-    return 0
+    exit 1
   fi
 
   mkdir -p "$dstpath"
@@ -116,17 +128,17 @@ function upload_keyman_help {
 #
 
 function commit_and_push {
-  echo "Committing and pushing updated Keyman for Windows documentation"
+  echo "Committing and pushing updated Keyman for $platform documentation"
 
   pushd $HELP_KEYMAN_COM
 
-  if [! -z "${TEAMCITY_VERSION-}" ]; then
+  if [ ! -z "${TEAMCITY_VERSION-}" ]; then
     git config user.name "Keyman Build Server"
     git config user.email "keyman-server@users.noreply.github.com"
   fi
 
-  local branchname="auto/$PLATFORM-help-$VERSION_WITH_TAG"
-  local modifiedfiles="$HELP_KEYMAN_COM/products/$PLATFORM/$VERSION_RELEASE"
+  local branchname="auto/$platform-help-$VERSION_WITH_TAG"
+  local modifiedfiles="$HELP_KEYMAN_COM/products/$platform/$VERSION_RELEASE"
 
   # Base branch depends on the tier
   local basebranch="master"
@@ -144,7 +156,7 @@ function commit_and_push {
   }
 
   echo "changes added to cache...>>>"
-  local commitmessage="auto: Keyman for $PLATFORM help deployment"
+  local commitmessage="auto: Keyman for $platform help deployment"
   git commit -m "$commitmessage" || return 1
   git push origin $branchname || return 1
   hub pull-request -b $basebranch -l auto -m "$commitmessage" || return 1
@@ -158,6 +170,32 @@ function commit_and_push {
 #
 # Main
 #
+
+platform=
+
+# Process command-line arguments
+while [[ $# -gt 0 ]] ; do
+  key="$1"
+  case $key in
+    -help|-h)
+      display_usage
+      exit
+      ;;
+    android | ios | linux | linux | mac | windows)
+      platform=$key
+      ;;
+    *)
+      echo "$0: invalid option: $key"
+      display_usage
+  esac
+  shift # past the processed argument
+done
+
+if [ -z ${platform} ]; then
+  display_usage
+fi
+
+echo "Uploading Keyman for $platform documentation to help.keyman.com"
 
 upload_keyman_help || exit 1
 commit_and_push || exit 1
