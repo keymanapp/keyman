@@ -43,7 +43,7 @@ class CanonicalLanguageCodeUtilsTests(unittest.TestCase):
             { 'expected': 'en-US', 'tags': ['en'] },
 
             # fonipa
-            { 'expected': 'und-fonipa', 'tags': ['und-fonipa']},
+            { 'expected': 'und-fonipa', 'tags': ['und-fonipa', 'und-Latn-fonipa', 'und-Latn-fonipa-x-test']},
             { 'expected': 'en-fonipa', 'tags': ['en-fonipa']},
             { 'expected': 'tpi-Latn-fonipa', 'tags': ['tpi-Latn-fonipa'] },
             { 'expected': 'se-fonipa', 'tags': ['se-fonipa']},
@@ -71,7 +71,7 @@ class CanonicalLanguageCodeUtilsTests(unittest.TestCase):
             {'expected': 'tpi-Latn-fonipa', 'tags': ['tpi-Latn-fonipa']},
             {'expected': 'se-fonipa', 'tags': ['se-fonipa']},
             {'expected': 'se-NO-fonipa', 'tags': ['se-no-fonipa']},
-            {'expected': 'und-fonipa', 'tags': ['und-fonipa']},
+            {'expected': 'und-fonipa', 'tags': ['und-fonipa', 'und-Latn-fonipa', 'und-Latn-fonipa-x-test']},
             {'expected': 'fr-fonipa', 'tags': ['fr-fonipa']}
         ]:
             with self.subTest(testCase=testCase):

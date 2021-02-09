@@ -86,9 +86,9 @@ class Bcp47TagTests(unittest.TestCase):
         # Setup
         sut = Bcp47Tag.create('glr-Latn-LR')
         # Execute
-        sut.tag = 'glr'
+        sut.tag = 'en'
         # Verify
-        self.assertEqual(Bcp47Tag('glr'), sut)
+        self.assertEqual(Bcp47Tag('en'), sut)
 
     def test_SetTag_AdjustCasing(self):
         for testTuple in [
