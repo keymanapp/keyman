@@ -180,20 +180,22 @@ while [[ $# -gt 0 ]] ; do
   case $key in
     -help|-h)
       display_usage
-      exit
+      exit 0
       ;;
-    android | ios | linux | linux | mac | windows)
+    android | ios | linux | mac | windows)
       platform=$key
       ;;
     *)
       echo "$0: invalid option: $key"
       display_usage
+      exit 1
   esac
   shift # past the processed argument
 done
 
 if [ -z ${platform} ]; then
   display_usage
+  exit 1
 fi
 
 echo "Uploading Keyman for $platform documentation to help.keyman.com"
