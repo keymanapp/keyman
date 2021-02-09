@@ -352,7 +352,7 @@ namespace correction {
 
       const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
       let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
-      if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && primaryInput.deleteRight == 0) {
+      if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
         primaryInput = null;
       }
       const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0;
