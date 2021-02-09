@@ -1,6 +1,24 @@
 /// <reference path="distance-modeler.ts" />
 
 namespace correction {
+
+  function textToCharTransforms(text: string, transformId?: number) {
+    let perCharTransforms: Transform[] = [];
+
+    for(let i=0; i < text.kmwLength(); i++) {
+      let char = text.kmwCharAt(i); // is SMP-aware
+
+      let transform: Transform = {
+        insert: char,
+        deleteLeft: 0,
+        id: transformId
+      };
+
+      perCharTransforms.push(transform);
+    }
+
+    return perCharTransforms;
+  }
   export class TrackedContextSuggestion {
     suggestion: Suggestion;
     tokenWidth: number;
@@ -145,14 +163,7 @@ namespace correction {
       // Note that we cannot just use a single, monolithic transform at this point b/c
       // of our current edit-distance optimization strategy; diagonalization is currently... 
       // not very compatible with that.
-      const backspacedTokenContext = tokenText.split('').map(function(char) {
-        let transform: Transform = {
-          insert: char,
-          deleteLeft: 0,
-          id: transformId // Not exactly optimal for every transform to have the same ID,
-                          // but is actually accurate here.
-        };
-
+      let backspacedTokenContext: Distribution<Transform>[] = textToCharTransforms(tokenText, transformId).map(function(transform) {
         return [{sample: transform, p: 1.0}];
       });
 
@@ -426,22 +437,8 @@ namespace correction {
         let token = new TrackedContextToken();
         token.raw = entry;
         if(token.raw) {
-          let chars = token.raw.split('');
-
-          /* Build single-entry prob-distribution arrays, one per char... where the single distribution is 100%
-           * for the token's actual characters.  Needed for 14.0 instead of a single token for the whole word
-           * due to current search-algorithm limitations.
-           * Basically, assume the token was the correct input, since we lack any actual probability data
-           * about the keystrokes that generated it.
-           */
-          token.transformDistributions = chars.map(function(char) {
-            return [{
-              sample: {
-                insert: char,
-                deleteLeft: 0
-              },
-              p: 1.0
-            }];
+          token.transformDistributions = textToCharTransforms(token.raw).map(function(transform) {
+            return [{sample: transform, p: 1.0}];
           });
         } else {
           // Helps model context-final wordbreaks.
