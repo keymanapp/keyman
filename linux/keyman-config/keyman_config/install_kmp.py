@@ -262,9 +262,9 @@ def _normalize_language(supportedLanguages, language):
     if not language:
         return language
 
-    language = CanonicalLanguageCodeUtils.findBestTag(language, False)
+    language = CanonicalLanguageCodeUtils.findBestTag(language, False, True)
     for supportedLanguage in supportedLanguages:
-        id = CanonicalLanguageCodeUtils.findBestTag(supportedLanguage['id'], False)
+        id = CanonicalLanguageCodeUtils.findBestTag(supportedLanguage['id'], False, True)
         if id == language:
             return id
     return None
