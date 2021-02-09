@@ -113,7 +113,7 @@ fi
 
 # Convert markdown to html for offline help
 echo "Converting markdown to html for offline help"
-cd "$KEYMAN_ROOT/android/help"
+cd "$KEYMAN_ROOT/android"
 ./build-help.sh htm
 cd "$KEYMAN_ROOT/android/KMAPro"
 
