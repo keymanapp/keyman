@@ -351,16 +351,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    if numCharsToRightDelete > 0 {
-      for _ in 0..<numCharsToRightDelete {
-        textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
-        textDocumentProxy.deleteBackward()
-      }
-    }
-
     if numCharsToLeftDelete <= 0 {
-      textDocumentProxy.insertText(newText)
-
       // A full-context deletion will report numCharsToDelete == 0 and won't
       // otherwise delete selected text.
       if #available(iOSApplicationExtension 11.0, *) {
@@ -370,42 +361,64 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           }
         }
       }
-      return
-    }
-
-    for _ in 0..<numCharsToLeftDelete {
-      let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
-      textDocumentProxy.deleteBackward()
-      let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
-      let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
-      if unitsDeleted > 1 {
-        if !InputViewController.isSurrogate(oldContext.utf16.last!) {
-          let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
-                                                  offsetBy: newContext.utf16.count)
-          let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
-          textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
+    } else {
+      for _ in 0..<numCharsToLeftDelete {
+        let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
+        textDocumentProxy.deleteBackward()
+        let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
+        let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
+        if unitsDeleted > 1 {
+          if !InputViewController.isSurrogate(oldContext.utf16.last!) {
+            let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
+                                                    offsetBy: newContext.utf16.count)
+            let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
+            let remnant = String(oldContext.utf16[lowerIndex..<upperIndex]) ?? ""
+            textDocumentProxy.insertText(remnant)
+          }
         }
-      }
 
-      // Refer to `func textDidChange()` and https://github.com/keymanapp/keyman/pull/2770 for context.
-      if textDocumentProxy.documentContextBeforeInput == nil ||
-         (textDocumentProxy.documentContextBeforeInput == "\n" && Manager.shared.isSystemKeyboard) {
-        if(self.swallowBackspaceTextChange) {
-          // A single keyboard processing command should never trigger two of these in a row;
-          // only one output function will perform deletions.
-          
-          // This should allow us to debug any failures of this assumption.
-          // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
-          // so all seems good.
-          log.verbose("Failed to swallow a recent textDidChange call!")
+        // Refer to `func textDidChange()` and https://github.com/keymanapp/keyman/pull/2770 for context.
+        if textDocumentProxy.documentContextBeforeInput == nil ||
+           (textDocumentProxy.documentContextBeforeInput == "\n" && Manager.shared.isSystemKeyboard) {
+          if(self.swallowBackspaceTextChange) {
+            // A single keyboard processing command should never trigger two of these in a row;
+            // only one output function will perform deletions.
+
+            // This should allow us to debug any failures of this assumption.
+            // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
+            // so all seems good.
+            log.verbose("Failed to swallow a recent textDidChange call!")
+          }
+          self.swallowBackspaceTextChange = true
+          break
         }
-        self.swallowBackspaceTextChange = true
-        break
       }
     }
 
     if !newText.isEmpty {
       textDocumentProxy.insertText(newText)
+    }
+
+    // TODO: should probably 'swallow' caret position shifts throughout this block.
+    for _ in 0..<numCharsToRightDelete {
+      let oldContext = textDocumentProxy.documentContextAfterInput ?? ""
+      textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
+      textDocumentProxy.deleteBackward()
+      let newContext = textDocumentProxy.documentContextAfterInput ?? ""
+
+      let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
+      if unitsDeleted > 1 {
+        if !InputViewController.isSurrogate(oldContext.utf16.first!) {
+          let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
+                                                  offsetBy: 1)
+          let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
+          let remnant = String(oldContext.utf16[lowerIndex..<upperIndex]) ?? ""
+          textDocumentProxy.insertText(remnant)
+
+          // Must place the caret back in its correct position!
+          textDocumentProxy.adjustTextPosition(byCharacterOffset: -remnant.count)
+        }
+      }
     }
   }
 
