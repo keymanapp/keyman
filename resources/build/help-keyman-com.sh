@@ -46,11 +46,10 @@ fi
 
 function display_usage {
   echo "Usage: $0 [platform]"
-  echo "       $0 -help"
+  echo "       $0 --help"
   echo
   echo "  platform should be one of: android, ios, linux, mac, windows."
-  echo "  -help               displays this screen and exits"
-  exit 1
+  echo "  --help               displays this screen and exits"
 }
 
 #
@@ -178,7 +177,7 @@ platform=
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
-    -help|-h)
+    --help|-h)
       display_usage
       exit 0
       ;;
