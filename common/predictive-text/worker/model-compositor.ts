@@ -443,7 +443,6 @@ class ModelCompositor {
     let sourceTransform = suggestion.transform;
     let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
     let deletedRightChars = context.right ? context.right.kmwSubstr(0, sourceTransform.deleteRight || 0) : '';
-    // right deletion is currently not implemented.
     let insertedLength = sourceTransform.insert.kmwLength();
 
     let reversionTransform: Transform = {
