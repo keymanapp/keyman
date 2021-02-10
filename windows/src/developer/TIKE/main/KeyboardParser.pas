@@ -7,12 +7,12 @@
 
   Modified Date:    23 Feb 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2006 - mcdurdin - Initial version
                     30 Aug 2006 - mcdurdin - Fix bug with parsing shift/ctrl/alt rules
                     28 Sep 2006 - mcdurdin - Move version line to start of file
@@ -332,7 +332,7 @@ const
     // use the defined constants.
     [ktWindows, ktMacosx, ktLinux, ktDesktop], //KMXKeymanTargets
     [ktAny, ktWindows, ktMacosx, ktLinux, ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktDesktop, ktTablet], //AllKeymanTargets
-    [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //TouchKeymanTargets
+    [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //KMWKeymanTargets
     [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //KMWKeymanTargets
     [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //KMWKeymanTargets
     [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //KMWKeymanTargets
@@ -876,7 +876,7 @@ constructor TKeyboardParser_SystemStore.CreateNew(
 begin
   inherited CreateNew;
   FSystemStoreType := ASystemStoreType;
-  Value := AValue; // Also sets Line  
+  Value := AValue; // Also sets Line
 end;
 
 function TKeyboardParser_SystemStore.IsComplexLine: Boolean;
@@ -1530,7 +1530,7 @@ constructor TKeyboardParser_Group.CreateNew(AGroupName: WideString;
 begin
   inherited CreateNew;
   FGroupName := AGroupName;
-  FUsingKeys := AUsingKeys; 
+  FUsingKeys := AUsingKeys;
   UpdateLine;
 end;
 

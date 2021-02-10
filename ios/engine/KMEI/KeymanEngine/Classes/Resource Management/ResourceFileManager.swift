@@ -92,15 +92,16 @@ public class ResourceFileManager {
       try fileManager.removeItem(at: destination)
     }
 
-    // Throws an error if the destination file already exists, and there's no
-    // built-in override parameter.  Hence, the previous if-block.
-    if source.startAccessingSecurityScopedResource() {
-      defer { source.stopAccessingSecurityScopedResource() }  // The Swift version of 'finally'.
+    // If we've been provided a security-scoped resource URL,
+    // it needs special handling.  This function needs to accept
+    // both scoped & non-scoped URLs.
+    if source.startAccessingSecurityScopedResource() { // only succeeds if scoped
+      // The Swift version of 'finally'.
+      defer { source.stopAccessingSecurityScopedResource() }
       try fileManager.copyItem(at: source, to: destination)
     } else {
-      // We _could_ get more specific, as it's due to issues with security-scoped resources...
-      // but this ought be fine for now.
-      throw KMPError.copyFiles
+      // Not scoped?  No problem!
+      try fileManager.copyItem(at: source, to: destination)
     }
   }
 
@@ -238,10 +239,16 @@ public class ResourceFileManager {
     }
 
     if let navVC = rootVC as? UINavigationController {
-      packageInstaller.promptForLanguages(inNavigationVC: navVC)
+      packageInstaller.promptForLanguages(inNavigationVC: navVC) {
+        // The user will be on the main screen after this, so we should resummon the keyboard.
+        Manager.shared.showKeyboard()
+      }
     } else {
       let nvc = UINavigationController.init()
-      packageInstaller.promptForLanguages(inNavigationVC: nvc)
+      packageInstaller.promptForLanguages(inNavigationVC: nvc) {
+        // The user will be on the main screen after this, so we should resummon the keyboard.
+        Manager.shared.showKeyboard()
+      }
       rootVC.present(nvc, animated: true, completion: nil)
     }
   }

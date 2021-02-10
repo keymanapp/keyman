@@ -929,7 +929,13 @@ begin
   case Value of
     NWB_IDENTIFYICON: FMessage := MsgFromId(SKBalloonClickToSelectKeyboard);  // I3010  // I3042
     NWB_TUTORIALFINISHED: FMessage := MsgFromId(SKBalloonOSKClosed);   // I3010  // I3042
-    else FMessage := '';
+    NWB_KEYMANRUNNING:
+      begin
+        FMessage := MsgFromId(SKBalloonKeymanIsRunning);
+        if FMessage = '' then
+          FMessage := MsgFromId(SKBalloonClickToSelectKeyboard);
+      end;
+    else Exit;
   end;
 
   if FMessage <> '' then

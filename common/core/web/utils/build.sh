@@ -1,6 +1,7 @@
 #!/bin/bash
 # 
 # Compiles common TS-based utility functions for use among Keyman's codebase
+set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary

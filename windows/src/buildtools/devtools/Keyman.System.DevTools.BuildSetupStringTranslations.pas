@@ -28,6 +28,8 @@ uses
   System.TypInfo,
   System.Variants,
 
+
+  Keyman.System.AndroidStringToKeymanLocaleString,
   SetupStrings; // From Desktop/Setup
 
 { TBuildSetupStringTranslations }
@@ -96,7 +98,7 @@ begin
       begin
         n := GetEnumValue(TypeInfo(TInstallInfoText), VarToStr(node.Attributes['name']));
         if (n >= Ord(Low(TInstallInfoText))) and (n <= Ord(High(TInstallInfoText))) then
-          strings.Add(TInstallInfoText(n), PascalifyString(VarToStr(node.NodeValue)));
+          strings.Add(TInstallInfoText(n), PascalifyString(TAndroidStringToKeymanLocaleString.Transform(VarToStr(node.NodeValue))));
       end;
       node := node.NextSibling;
     end;

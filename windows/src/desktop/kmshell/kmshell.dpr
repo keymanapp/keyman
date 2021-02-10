@@ -178,7 +178,9 @@ uses
   Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas',
   Keyman.System.KeymanStartTask in 'util\Keyman.System.KeymanStartTask.pas',
   TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas',
-  Keyman.Configuration.System.HttpServer.App.TextEditorFonts in 'startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas';
+  Keyman.Configuration.System.HttpServer.App.TextEditorFonts in 'startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas',
+  Keyman.Configuration.System.HttpServer.App.Locale in 'web\Keyman.Configuration.System.HttpServer.App.Locale.pas',
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

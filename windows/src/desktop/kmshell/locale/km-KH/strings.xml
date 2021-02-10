@@ -377,10 +377,6 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="Hotkey - show keyboard usage in OSK">បង្ហាញផ្ទាំង \"ការប្រើប្រាស់​ក្ដារចុច\"</string>
-  <!-- Context: Configuration Dialog - Hotkeys tab -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.1.275.0 -->
   <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">បង្ហាញ​ផ្ទាំង \"អង្គ​ជំនួយ​ពុម្ព​អក្សរ\"</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
@@ -713,10 +709,6 @@
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="Toolbar help - View Keyboard Usage pop-up text">មើល \"ការប្រើប្រាស់​ក្ដារចុច\"</string>
-  <!-- Context: Toolbar Context Help -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">មើល​ \"អង្គ​ជំនួយ​ពុម្ព​អក្សរ\"</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
@@ -742,10 +734,6 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">ក្ដារចុច​លើ​អេក្រង់</string>
-  <!-- Context: System Tray Menu Items -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_KeyboardUsage" comment="Systray item - Keyboard Usage [&amp; precedes alt + access-character]">ការប្រើបាស់​ក្ដារចុច</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

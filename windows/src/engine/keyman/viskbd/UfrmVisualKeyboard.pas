@@ -661,6 +661,7 @@ begin
     case ActivePage of
       apKeyboard: TKeymanDesktopShell.OpenHelp('context_onscreenkeyboard');
       apCharacterMap: TKeymanDesktopShell.OpenHelp('context_charactermap');
+      apFontHelper: TKeymanDesktopShell.OpenHelp('context_fonthelper');
       apEntryHelper: TKeymanDesktopShell.OpenHelp('context_entryhelper');
     end;
   end;

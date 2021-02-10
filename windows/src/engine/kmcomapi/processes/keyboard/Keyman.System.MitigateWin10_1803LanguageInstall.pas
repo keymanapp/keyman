@@ -37,7 +37,7 @@ const
   MitigatedLanguages: array[0..2] of TMitigateWin10_1803.TMitigatedLanguage = (
     (OriginalLanguage: (Code: $005E; BCP47: 'am'; Name: 'Amharic'); NewLanguage: (BCP47: 'gez-Ethi-ET'; Name: 'Geez')),
     (OriginalLanguage: (Code: $0073; BCP47: 'ti'; Name: 'Tigrinya'); NewLanguage: (BCP47: 'gez-Ethi-ET'; Name: 'Geez')),
-    (OriginalLanguage: (Code: $005B; BCP47: 'si'; Name: 'Sinhala'); NewLanguage: (Code: $0409; Name: 'English (US)'))
+    (OriginalLanguage: (Code: $005B; BCP47: 'si'; Name: 'Sinhala'); NewLanguage: (Code: $0409; BCP47: 'en-US'; Name: 'English (US)'))
   );
 
 { TMitigateWin10_1803 }

@@ -41,7 +41,7 @@ To open the Options tab of Keyman Configuration:
     Some hardware keyboards do not have a designated <kbd>AltGr</kbd> key
     (<kbd>Right Alt</kbd> key). Some Keyman keyboards require
     <kbd>AltGr</kbd>. Tick this option to allow <kbd>Ctrl</kbd> +
-    <kbd>Alt</kbd> to be used for <kbd>AltGr</kbd<>>. Untick this option
+    <kbd>Alt</kbd> to be used for <kbd>AltGr</kbd>. Untick this option
     and <kbd>Ctrl</kbd> + <kbd>Alt</kbd> will not be used for
     <kbd>AltGr</kbd>.
 
@@ -158,8 +158,6 @@ To open the Options tab of Keyman Configuration:
 
 -   Switch to appropriate On Screen Keyboard/Help automatically when a
     keyboard is selected
-
-    This option is deprecated in Keyman 14.0 and has no function.
 
 ## Using Advanced Options
 

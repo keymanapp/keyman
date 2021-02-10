@@ -9,6 +9,9 @@ type
   [TestFixture]
   TLangTagsTest = class(TObject)
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestSomeTags;
   end;
@@ -19,6 +22,11 @@ uses
   Keyman.System.Standards.LangTagsRegistry;
 
 { TLangTagsTest }
+
+procedure TLangTagsTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
+end;
 
 procedure TLangTagsTest.TestSomeTags;
 begin

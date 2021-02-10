@@ -7,6 +7,7 @@ type
     class function FindBestTag(const Tag: string; AddRegion: Boolean): string;
     class function IsCanonical(const Tag: string; AddRegion: Boolean): Boolean; overload;
     class function IsCanonical(const Tag: string; var Msg: string; AddRegion: Boolean): Boolean; overload;
+    class function GetFullTagList(const Tag: string): TArray<string>;
   end;
 
 implementation
@@ -75,6 +76,44 @@ end;
 class function TCanonicalLanguageCodeUtils.IsCanonical(const Tag: string; AddRegion: Boolean): Boolean;
 begin
   Result := SameText(Tag, FindBestTag(Tag, AddRegion));
+end;
+
+///
+///<summary>Iterate through the language dictionary and find all tags that use this base tag</summary>
+///<remarks>
+///  This will canonicalize known tags, then apply rules to ensure script subtag
+///  is present if not suppressed, and add a default region if none given.
+///</remarks>
+class function TCanonicalLanguageCodeUtils.GetFullTagList(
+  const Tag: string): TArray<string>;
+var
+  t: TBCP47Tag;
+  key: string;
+begin
+  SetLength(Result, 0);
+
+  if Tag = '' then
+    Exit;
+
+  t := TBCP47Tag.Create(Tag);
+  try
+    if t.Tag = '' then
+      Exit;
+
+    // First, canonicalize any unnecessary ISO639-3 codes
+    t.Language := TLanguageCodeUtils.TranslateISO6393ToBCP47(t.Language);
+
+    for key in TLangTagsMap.LangTags.Keys do
+    begin
+      if key.StartsWith(t.Language) then
+      begin
+        SetLength(Result, Length(Result) + 1);
+        Result[High(Result)] := key;
+      end;
+    end;
+  finally
+    t.Free;
+  end;
 end;
 
 class function TCanonicalLanguageCodeUtils.IsCanonical(const Tag: string;

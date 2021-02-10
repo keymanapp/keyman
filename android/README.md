@@ -54,6 +54,10 @@ jq 1.6+ is used during the build process to determine the latest versions of the
 On Linux
 `sudo apt install jq`
 
+### Install Pandoc
+Pandoc is used during the build process to generate the app's offline help.
+Install from https://pandoc.org/installing.html
+
 ### Crash Reporting
 Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server https://sentry.keyman.com. The analytics for Debug are associated with an App Bundle ID `com.tavultesoft.kmapro.debug`.
 
@@ -109,12 +113,15 @@ To validate your configuration, from the `android/` folder run `sentry-cli info`
        the device serial number listed in step 2.
 
 ### Compiling the app's offline help
-Extra prerequisite:
-* `wget`
+Keyman for Android help is maintained in the Markdown files in android/help/.
+The script `help/build-help.sh` uses the `pandoc` tool to convert the Markdown files into html.
 
-The script `build-help.sh` uses the `wget` tool to construct an offline bundle from the current
-online version of help on help.keyman.com.  When significant changes to help content have been
-made, it is advisable to manually re-run this script to update the app's offline content.
+```bash
+cd help
+./build-help.sh htm
+```
+
+This script is automatically called when Keyman for Android is built.
 
 ### Sample Projects
 

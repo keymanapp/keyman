@@ -93,6 +93,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     setSystemKeyboardPreference = new CheckBoxPreference(context);
     setSystemKeyboardPreference.setTitle(R.string.enable_system_keyboard);
+    setSystemKeyboardPreference.setSingleLineTitle(false);
     setSystemKeyboardPreference.setDefaultValue(SystemIMESettings.isEnabledAsSystemKB(context));
     setSystemKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override
@@ -105,6 +106,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     setDefaultKeyboardPreference = new CheckBoxPreference(context);
     setDefaultKeyboardPreference.setTitle(R.string.set_keyman_as_default);
+    setDefaultKeyboardPreference.setSingleLineTitle(false);
     setDefaultKeyboardPreference.setDefaultValue(SystemIMESettings.isDefaultKB(context));
     setDefaultKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override

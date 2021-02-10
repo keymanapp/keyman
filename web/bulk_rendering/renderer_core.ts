@@ -1,7 +1,5 @@
 // Includes KeymanWeb's Device class, as it's quite a useful resource for KMW-related projects.
 /// <reference path="../source/kmwdevice.ts" />
-// Needed for OSK rendering to image files.
-/// <reference path="../node_modules/html2canvas/dist/html2canvas.js" />
 // Ensure that Promises are within scope.
 /// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
 
@@ -11,6 +9,40 @@ namespace com.keyman.renderer {
   export class BatchRenderer {
     static divMaster: HTMLDivElement;
     static dummy: HTMLInputElement;
+    static captureStream: any;
+    static video: any;
+    static boundingRect: DOMRect;
+    static allLayers = false;
+    static keyboardMatch: RegExp;
+
+    async startCapture() {
+      let captureStream = null;
+
+      try {
+        captureStream = await (navigator.mediaDevices as any).getDisplayMedia({
+          audio: false,
+          video: {
+            width: screen.width,
+            height: screen.height,
+            frameRate: 60,
+          }
+        });
+      } catch(err) {
+        console.error("Error: " + err);
+      }
+
+      const video = document.createElement("video");
+      video.srcObject = captureStream;
+      video.play();
+
+      const result = await new Promise<void>((resolve, reject) => {
+        video.onloadedmetadata = function () {
+          resolve();
+        }
+      });
+
+      return {captureStream: captureStream, video: video};
+    }
 
     // Filters the keyboard array to ensure only a single entry remains, rather than an entry per language.
     private filterKeyboards(): KeyboardMap {
@@ -22,6 +54,8 @@ namespace com.keyman.renderer {
 
       for(var i = 0; i < kbds.length; i++) {
         let id: string = kbds[i]['InternalName'];
+        if(!id.match(BatchRenderer.keyboardMatch)) continue;
+        if(id.match(/^Keyboard_bod/)) continue; // bod keyboards currently don't load on Chrome and break the test run; they need rebuild.
         if(keyboardMap[id]) {
           continue;
         } else {
@@ -33,26 +67,31 @@ namespace com.keyman.renderer {
     }
 
     private render(ele: HTMLElement, isMobile?: boolean): Promise<HTMLImageElement> {
-      let html2canvas = window['html2canvas'];
+      const capture = async () => {
+        const result = await new Promise<HTMLImageElement>((resolve, reject) => {
+          // from: https://github.com/kasprownik/electron-screencapture/blob/master/index.js
+          const canvas = document.createElement('canvas');
+          canvas.width = BatchRenderer.boundingRect.width;
+          canvas.height = BatchRenderer.boundingRect.height;
+          const context = canvas.getContext('2d');
+          // see: https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement
+          context.drawImage(BatchRenderer.video,
+              BatchRenderer.boundingRect.left,
+              BatchRenderer.boundingRect.top,
+              canvas.width, canvas.height,
+              0, 0, canvas.width, canvas.height);
 
-      let imgOut = document.createElement('img');
+          const frame = canvas.toDataURL("image/png");
+          let imgOut = document.createElement('img');
+          imgOut.src = frame;
 
-      let canvasParams = {
-        'logging': false,
-        'scale': 1,
-        'width': window.innerWidth // Good for mobile, less-so for desktop.
+          resolve(imgOut);
+        });
+
+        return result;
       }
 
-      // So, if it's desktop, we set more reasonable values.
-      if(!isMobile) {
-        canvasParams['width'] = 500;
-        ele.style.width = '500px';
-      }
-
-      return html2canvas(ele, canvasParams).then(function(canvas) {
-        imgOut.src = canvas.toDataURL();
-        return imgOut;
-      });
+      return capture();
     }
 
     createKeyboardHeader(kbd, loaded: boolean): HTMLDivElement {
@@ -73,7 +112,7 @@ namespace com.keyman.renderer {
       } else {
         eleDescription.appendChild(document.createTextNode('Unable to load this keyboard!'));
       }
-      
+
       divHeader.appendChild(eleDescription);
 
       return divHeader;
@@ -88,7 +127,7 @@ namespace com.keyman.renderer {
       let divSummary = document.createElement('div');
       // Establishes a linkable target for this keyboard's data.
       divSummary.id = "summary-" + kbd['InternalName'];
-      
+
       BatchRenderer.divMaster.insertAdjacentElement('afterbegin', divSummary);
 
       // A nice, closure-friendly reference for use in our callbacks.
@@ -97,12 +136,13 @@ namespace com.keyman.renderer {
       // Once the keyboard's loaded, we can really get started.
       return p.then(function() {
         let box: HTMLDivElement = keyman.osk._Box;
-        
+        BatchRenderer.boundingRect = box.getBoundingClientRect();
+
         divSummary.appendChild(renderer.createKeyboardHeader(kbd, true));
 
         let divRenders = document.createElement('div');
         divSummary.appendChild(divRenders);
-  
+
         // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
         var layers;
         if(isMobile) {
@@ -112,6 +152,8 @@ namespace com.keyman.renderer {
           // We instead rely upon the KLS definition to ensure we keep the renders sparse.
           layers = keyman.core.activeKeyboard._legacyLayoutSpec.KLS;
         }
+
+        if(!BatchRenderer.allLayers && layers.length) layers = [layers[0]];
 
         let renderLayer = function(i: number) {
           return new Promise(function(resolve) {
@@ -129,19 +171,23 @@ namespace com.keyman.renderer {
             renderer.setActiveDummy();
             keyman.osk.show(true);
 
-            renderer.render(box, isMobile).then(function(imgEle: HTMLImageElement) {
-              let eleLayer = document.createElement('div');
-              let eleLayerId = document.createElement('p');
-              eleLayerId.textContent = 'Layer ID:  ' + (isMobile ? layers[i].id : Object.keys(layers)[i]);
+            (document as any).fonts.ready.then(function() {
+              window.setTimeout(function() {
+                renderer.render(box, isMobile).then(function(imgEle: HTMLImageElement) {
+                  let eleLayer = document.createElement('div');
+                  let eleLayerId = document.createElement('p');
+                  eleLayerId.textContent = 'Layer ID:  ' + (isMobile ? layers[i].id : Object.keys(layers)[i]);
 
-              eleLayer.appendChild(eleLayerId);
-              eleLayer.appendChild(imgEle);
-              eleLayer.appendChild(document.createElement('br'));
+                  eleLayer.appendChild(eleLayerId);
+                  eleLayer.appendChild(imgEle);
+                  eleLayer.appendChild(document.createElement('br'));
 
-              divRenders.appendChild(eleLayer);          
-              resolve(i);
+                  divRenders.appendChild(eleLayer);
+                  resolve(i);
+                });
+              }, 100);
             });
-          })
+          });
         };
 
         // The resulting Promise will only call it's `.then()` once all of this keyboard's renders have been completed.
@@ -190,11 +236,17 @@ namespace com.keyman.renderer {
       com.keyman['dom']['DOMEventHandlers'].states.activeElement = BatchRenderer.dummy;
     }
 
-    run() {
+    async run(allLayers, filter) {
+      BatchRenderer.allLayers = allLayers;
+      BatchRenderer.keyboardMatch = new RegExp('^Keyboard_('+filter+')', 'i');
       if(window['keyman']) {
         let keyman = window['keyman'];
 
-        // Establish a 'dummy' element to bypass the 'nothing's active' check KMW usualy uses.
+        let cc = await this.startCapture();
+        BatchRenderer.captureStream = cc.captureStream;
+        BatchRenderer.video = cc.video;
+
+        // Establish a 'dummy' element to bypass the 'nothing's active' check KMW usually uses.
         BatchRenderer.dummy = document.createElement('input');
         this.setActiveDummy();
 
@@ -228,7 +280,7 @@ namespace com.keyman.renderer {
 
         this.arrayPromiseIteration(keyboardIterator, Object.keys(kbds).length).then(function() {
           // Once all renders are done, we can now tidy the page up and prep it for final display + potential file-saving.
-          
+
           // This will go at the top of the page when finished, but not when actively rendering.
           // We want to leave as much space visible as possible when actively rendering keyboards
           // so that auto-scrolling isn't an issue.

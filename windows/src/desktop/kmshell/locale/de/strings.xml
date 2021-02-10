@@ -377,10 +377,6 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="Hotkey - show keyboard usage in OSK">Tastatur-Benutzungshilfe anzeigen</string>
-  <!-- Context: Configuration Dialog - Hotkeys tab -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.1.275.0 -->
   <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">Schriftart-Hilfe anzeigen</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
@@ -713,10 +709,6 @@
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="Toolbar help - View Keyboard Usage pop-up text">Tastatur-Nutzung anzeigen</string>
-  <!-- Context: Toolbar Context Help -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">Schriftarten anzeigen</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
@@ -742,10 +734,6 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">&amp;Bildschirmtastatur</string>
-  <!-- Context: System Tray Menu Items -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_KeyboardUsage" comment="Systray item - Keyboard Usage [&amp; precedes alt + access-character]">Tastatur-&amp;Verwendung</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

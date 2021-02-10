@@ -268,7 +268,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   p = kkp->dpOutput;
   if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT)
   {
-    for(p = decxstr((KMX_WCHAR *) u16chr(m_miniContext, 0), m_miniContext); p >= m_miniContext; p = decxstr(p, m_miniContext))
+    for(p = decxstr((KMX_WCHAR *) u16chr(m_miniContext, 0), m_miniContext); p != NULL; p = decxstr(p, m_miniContext))
     {
       if(*p == UC_SENTINEL)
         switch(*(p+1))
@@ -422,7 +422,12 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         break;
       }
     else {
-      m_actions.QueueAction(QIT_CHAR, *p);
+      if(Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p+1))) {
+        m_actions.QueueAction(QIT_CHAR, Uni_SurrogateToUTF32(*p, *(p+1)));
+        p++;
+      } else {
+        m_actions.QueueAction(QIT_CHAR, *p);
+      }
     }
   }
   return FoundUse ? psrPostMessages : psrCheckMatches;

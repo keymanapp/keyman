@@ -1,18 +1,18 @@
 /*
   Name:             Compiler
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Jan 2007
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Jan 2007 - mcdurdin - Add CODE_NOTANY
                     22 Mar 2010 - mcdurdin - Compiler tidyup
                     25 May 2010 - mcdurdin - I1632 - Keyboard Options
@@ -22,7 +22,7 @@
                     31 Dec 2014 - mcdurdin - I4548 - V9.0 - When Alt is down, release of Ctrl, Shift is not detectable within TIP in some languages
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
 */
 
 #ifndef	_COMPILER_H
@@ -30,7 +30,7 @@
 
 
 
-/* WM_UNICHAR */ 
+/* WM_UNICHAR */
 
 #define WM_UNICHAR		0x0109
 #define UNICODE_NOCHAR	0xFFFF
@@ -43,20 +43,20 @@
 #define KEYMANID_IGNORE		  0xFFFFFFFE
 #define KEYMANID_INVALID    0xFFFFFFFD
 
-/* Shift flags for hotkeys (version 1.0) */ 
+/* Shift flags for hotkeys (version 1.0) */
 
 #define SHIFTFLAG 0x2000
 #define CTRLFLAG 0x4000
 #define	ALTFLAG 0x8000
 
-/* Miscellaneous flags and defines */ 
+/* Miscellaneous flags and defines */
 
 #define UM_DRAWICONS	0x01
 #define NUL '\0'
 
 #define MAXGROUPS	128
 
-/* File version identifiers */ 
+/* File version identifiers */
 
 #define VERSION_30	0x00000300
 #define VERSION_31	0x00000301
@@ -107,8 +107,19 @@
 
 #define KDS_CONTROL		0x8000
 
+//
+// Backspace flags
+//
+
+// Delete a deadkey from context, do not pass on to app
 #define BK_DEADKEY		1
+
+// User pressed backspace so clear deadkeys either side of next deleted character
 #define BK_BACKSPACE	2
+
+// Next character to delete is a Unicode surrogate pair
+#define BK_SURROGATE  4
+
 /*
  A blank key (in a group without "using keys") cannot be '0' as that is
  used for error testing and blanking out unused keys and you don't really
@@ -121,7 +132,7 @@
 #define BEGIN_ANSI		0
 #define BEGIN_UNICODE	1
 
-//#define lpuch		(LPBYTE)				
+//#define lpuch		(LPBYTE)
 
 #define TSS_NONE				0
 #define TSS_BITMAP				1
@@ -192,7 +203,7 @@
 
 #define TSS__MAX				38
 
-/* wm_keyman_control_internal message control codes */ 
+/* wm_keyman_control_internal message control codes */
 
 #define KMCI_SELECTKEYBOARD     3   // I3933
 #define KMCI_SELECTKEYBOARD_TSF 4   // I3933
@@ -270,7 +281,7 @@
 #define K_CTRLFLAG		0x0020		// Either ctrl flag
 #define K_ALTFLAG		0x0040		// Either alt flag
 //#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
-                                // Used internally (currently, only by KMW) to ensure Meta-key 
+                                // Used internally (currently, only by KMW) to ensure Meta-key
                                 // shortcuts safely bypass rules
                                 // Meta key = Command key on macOS, Windows key on Windows
 #define CAPITALFLAG		0x0100		// Caps lock on
@@ -304,7 +315,7 @@
 
 struct COMP_STORE {
 	DWORD dwSystemID;
-	DWORD dpName;	
+	DWORD dpName;
 	DWORD dpString;
 	};
 
@@ -323,8 +334,8 @@ static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOA
 struct COMP_GROUP {
 	DWORD dpName;
 	DWORD dpKeyArray;		// [LPKEY] address of first item in key array
-	DWORD dpMatch;			
-	DWORD dpNoMatch;		
+	DWORD dpMatch;
+	DWORD dpNoMatch;
 	DWORD cxKeyArray;		// in array entries
 	BOOL  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 	};
@@ -333,20 +344,20 @@ static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be 
 
 struct COMP_KEYBOARD {
 	DWORD dwIdentifier;		// 0000 Keyman compiled keyboard id
-	
+
 	DWORD dwFileVersion;	// 0004 Version of the file - Keyman 4.0 is 0x0400
-	
+
 	DWORD dwCheckSum;		  // 0008 As stored in keyboard
 	DWORD KeyboardID;    	// 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-	DWORD IsRegistered;		// 0010 
+	DWORD IsRegistered;		// 0010
 	DWORD version;			  // 0014 keyboard version
-	
+
 	DWORD cxStoreArray;		// 0018 in array entries
 	DWORD cxGroupArray;		// 001C in array entries
 
 	DWORD dpStoreArray;		// 0020 [LPSTORE] address of first item in store array
 	DWORD dpGroupArray;		// 0024 [LPGROUP] address of first item in group array
-	
+
 	DWORD StartGroup[2];	// 0028 index of starting groups [2 of them]
 	//DWORD StartGroupIndex;	// StartGroup current index
 

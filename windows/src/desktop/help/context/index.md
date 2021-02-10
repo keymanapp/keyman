@@ -2,31 +2,27 @@
 title: Contextual Help
 ---
 
-* [welcome](welcome)
-* [tutorial](tutorial)
+* [Welcome to Keyman](welcome)
+* [Getting Started](tutorial)
 
-* [splash](splash)
-* [proxyconfiguration](proxyconfiguration)
-* [onlineupdate](onlineupdate)
+* [Splash Screen](splash)
+* [Proxy Configuration](proxyconfiguration)
+* [Update Keyman](onlineupdate)
 
-* [selectlanguage](selectlanguage)
+* [Set Language for Keyman Menus](selectlanguage)
 
-* [installkeyboard](installkeyboard)
-* [downloadkeyboard](downloadkeyboard)
+* [Install a Keyman Keyboard](installkeyboard)
+* [Download a Keyman Keyboard](downloadkeyboard)
 
-* [traymenu](traymenu)
+* [The Keyman Menu](traymenu)
 
-* [keyman](keyman)
-* [configuration_keyboards](configuration_keyboards)
-* [configuration_options](configuration_options)
-* [configuration_hotkeys](configuration_hotkeys)
-* [configuration_support](configuration_support)
+## [Keyman Configuration](keyman)
+* [Keyman Configuration - Keyboard Layouts Tab](configuration_keyboards)
+* [Keyman Configuration - Options Tab](configuration_options)
+* [Keyman Configuration - Hotkeys Tab](configuration_hotkeys)
+* [Keyman Configuration - Support Tab](configuration_support)
 
-* [onscreenkeyboard](onscreenkeyboard)
-* [osk_keyboard](osk_keyboard)
-* [osk_usage](osk_usage)
-* [fonthelper](fonthelper)
-* [character-map](character-map)
-
-* [psrtwindowslanguage](psrtwindowslanguage)
-* [psrtmsofficelanguage](psrtmsofficelanguage)
+## Keyman Toolbox
+* [Keyman Toolbox - On Screen Keyboard](onscreenkeyboard)
+* [Keyman Toolbox - Font Helper](fonthelper)
+* [Keyman Toolbox - Character Map](charactermap)

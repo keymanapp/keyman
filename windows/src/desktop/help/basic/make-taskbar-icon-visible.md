@@ -36,7 +36,7 @@ Here's how to make the change with Windows Settings:
         ![](../desktop_images/win10-taskbar3.png)
     5.  The Keyman icon will now always appear in the Windows
         Taskbar near the clock, if Keyman is on.
-    6.  Continue on to [Step 5](#tutorial_step5) of this guide.
+    6.  Continue on to [Step 5](../start/tutorial#step-5-) of this guide.
 
 -   On Windows 8:
 
@@ -51,7 +51,7 @@ Here's how to make the change with Windows Settings:
     5.  Click OK to apply changes. The Keyman icon will now always
         appear in the Windows Taskbar near the clock, if Keyman is
         on.
-    6.  Continue on to [Step 5](#tutorial_step5) of this guide.
+    6.  Continue on to [Step 5](../start/tutorial#step-5-) of this guide.
 
 -   On Windows 7:
 
@@ -63,4 +63,4 @@ Here's how to make the change with Windows Settings:
     4.  Click OK to apply changes. The Keyman icon will now always
         appear in the Windows Taskbar near the clock, if Keyman is
         on.
-    5.  Continue on to [Step 5](#tutorial_step5) of this guide.
+    5.  Continue on to [Step 5](../start/tutorial#step-5-) of this guide.
