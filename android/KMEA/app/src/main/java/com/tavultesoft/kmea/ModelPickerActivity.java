@@ -198,7 +198,7 @@ public final class ModelPickerActivity extends BaseActivity {
               preInstalledModelMap.get(KMManager.KMKey_LanguageID),
               preInstalledModelMap.get(KMManager.KMKey_LanguageName),
               preInstalledModelMap.get(KMManager.KMKey_LexicalModelVersion),
-              preInstalledModelMap.get(KMManager.KMKey_HelpLink),
+              preInstalledModelMap.get(KMManager.KMKey_CustomHelpLink),
               MapCompat.getOrDefault(preInstalledModelMap, KMManager.KMKey_KMPLink, ""));
             String itemKey = preInstalled.getKey();
             int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(context, itemKey);
