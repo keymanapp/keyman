@@ -201,6 +201,9 @@
     </plurals>
 
 
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">Default Locale</string>
+
     <!-- Context: Content descriptions -->
     <string name="image_button" translatable="false">Image Button</string>
 
