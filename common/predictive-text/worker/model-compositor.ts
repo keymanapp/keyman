@@ -179,7 +179,7 @@ class ModelCompositor {
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
             // remove actual token string.  If new token, there should be nothing to delete.
-            deleteLeft: newEmptyToken ? 0 : this.wordbreak(context).length, 
+            deleteLeft: newEmptyToken ? 0 : this.wordbreak(context).kmwLength(), 
             id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
