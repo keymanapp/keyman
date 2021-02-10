@@ -195,11 +195,7 @@ open class SettingsViewController: UITableViewController {
           enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
           enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         }
-      case "systemkeyboardsettings":
-        fallthrough
-      case "installfile":
-        fallthrough
-      case "forcederror":
+      case "systemkeyboardsettings", "installfile", "forcederror":
         break
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
