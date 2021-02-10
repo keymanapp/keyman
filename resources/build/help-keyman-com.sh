@@ -140,11 +140,7 @@ function commit_and_push {
   local branchname="auto/$platform-help-$VERSION_WITH_TAG"
   local modifiedfiles="$HELP_KEYMAN_COM/products/$platform/$VERSION_RELEASE"
 
-  # Base branch depends on the tier
   local basebranch="master"
-  if [ "$TIER" == "alpha" ] || [ "$TIER" == "beta" ]; then
-      basebranch="staging"
-  fi
 
   git checkout -b $branchname $basebranch
   git add $modifiedfiles || return 1
