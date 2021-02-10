@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.241 beta 2021-02-10
+
+* fix(common/resources): Just use master branch for help.keyman.com (#4459)
+* fix(windows): hotkeys offset in config list (#4454)
+* chore(ios): Settings case-statement cleanup (#4443)
+* fix(linux): Also use staging site for beta versions (#4455)
+
 ## 14.0.240 beta 2021-02-09
 
 * fix(windows): When uninstalling, exit Keyman (#4383)
