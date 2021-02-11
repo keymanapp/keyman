@@ -45,7 +45,7 @@ Keyman may show a startup screen; simply click Start Keyman to
 start the app. Keyman will now be running and the Keyman icon will be on the Windows
 Taskbar near the clock.
 
-## Step 5 <a name="tutorial_step5"></a>
+## Step 5
 
 Open a typing application, like Microsoft Word.
 

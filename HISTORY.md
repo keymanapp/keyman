@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 15.0.14 alpha 2021-02-02
+
+* docs(linux): Improve packaging doc (#4389)
+
+## 15.0.13 alpha 2021-02-01
+
+* chore(linux): Don't report on Sentry when running unit tests (#4374)
+* chore(linux): Pass second tag parameter to Jenkins build (#4376)
+
+## 15.0.12 alpha 2021-01-29
+
+* chore(linux): Improve launchpad.sh script (#4355)
+
 ## 14.0.241 beta 2021-02-10
 
 * fix(common/resources): Just use master branch for help.keyman.com (#4459)
