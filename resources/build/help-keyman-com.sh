@@ -138,7 +138,7 @@ function commit_and_push {
   fi
 
   local branchname="auto/$platform-help-$VERSION_WITH_TAG"
-  local modifiedfiles="$HELP_KEYMAN_COM/products/$platform/$VERSION_RELEASE"
+  local modifiedfiles="products/$platform/$VERSION_RELEASE"
 
   local basebranch="master"
 
