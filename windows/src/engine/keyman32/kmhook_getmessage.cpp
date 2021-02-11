@@ -443,8 +443,12 @@ void GetCapsAndNumlockState() {   // I4793
 
 /*
   Update the Keyman shift state based on the key event. This has to be
-  done from the GetMessage hook because we don't consistently receive
-  modifier events in some applications (e.g. ALT in Firefox) via TSF.
+  done from both the GetMessage hook and the TSF methods, because we don't
+  consistently receive modifier events in some applications (e.g. ALT in Firefox)
+  via TSF, and we don't receive the notifications via the GetMessage hook when
+  in UWP apps (#4369).
+
+  TODO: test whether we still need the GetMessage hook for reading modifier state.       
 */
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
   UINT flag = 0;
