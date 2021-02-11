@@ -9,7 +9,7 @@ set -u
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 QUIET=0
@@ -69,9 +69,11 @@ displayInfo "" \
 # Compile all .md to .html
 #
 
+cd $KEYMAN_ROOT/android/help
+
 MDLUA="$THIS_DIR/htmlink.lua"
 MD=`find -name "*.md"`
-DESTHTM="$THIS_DIR/../KMAPro/kMAPro/src/main/assets/info"
+DESTHTM="$THIS_DIR/KMAPro/kMAPro/src/main/assets/info"
 
 if $DO_HTM; then
   #
@@ -99,7 +101,7 @@ if $DO_HTM; then
   #
   # Copy Images
   #
-
+  cd $KEYMAN_ROOT/android/help/
   mkdir -p "$DESTHTM/android_images"
   cp android_images/* "$DESTHTM/android_images/"
 

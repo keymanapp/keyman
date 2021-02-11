@@ -6,10 +6,10 @@ from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUti
 
 class CanonicalLanguageCodeUtilsTests(unittest.TestCase):
     def test_FindBestTag_EmptyTag(self):
-        self.assertIsNone(CanonicalLanguageCodeUtils.findBestTag('', True))
+        self.assertIsNone(CanonicalLanguageCodeUtils.findBestTag('', True, True))
 
     def test_FindBestTag_InvalidTag(self):
-        self.assertIsNone(CanonicalLanguageCodeUtils.findBestTag('x', True))
+        self.assertIsNone(CanonicalLanguageCodeUtils.findBestTag('x', True, True))
 
     def test_FindBestTag_ValidCases(self):
         for testCase in [
@@ -21,8 +21,8 @@ class CanonicalLanguageCodeUtilsTests(unittest.TestCase):
             { 'expected': 'sqt-Arab-YE', 'tags': ['sqt', 'sqt-YE', 'sqt-Arab'] },
             { 'expected': 'sqt-Latn-YE', 'tags': ['sqt-Latn', 'sqt-Latn-YE'] },
 
-            { 'expected': 'sa-Latn-IN', 'tags': ['sa-Latn'] },
-            { 'expected': 'hi-Latn-IN', 'tags': ['hi-Latn'] },
+            { 'expected': 'sa-Latn', 'tags': ['sa-Latn'] },
+            { 'expected': 'hi-Latn', 'tags': ['hi-Latn'] },
 
             # #1282
             { 'expected': 'raw-Latn-MM', 'tags': ['raw', 'raw-MM', 'raw-Latn'] },
@@ -43,30 +43,35 @@ class CanonicalLanguageCodeUtilsTests(unittest.TestCase):
             { 'expected': 'en-US', 'tags': ['en'] },
 
             # fonipa
-            { 'expected': 'en-US-fonipa', 'tags': ['en-fonipa'] },
-            { 'expected': 'tpi-PG-fonipa', 'tags': ['tpi-Latn-fonipa'] },
-            { 'expected': 'se-Latn-NO-fonipa', 'tags': ['se-fonipa', 'se-no-fonipa'] },
-            { 'expected': 'fr-FR-fonipa', 'tags': ['fr-fonipa'] }
+            { 'expected': 'und-fonipa', 'tags': ['und-fonipa', 'und-Latn-fonipa', 'und-Latn-fonipa-x-test']},
+            { 'expected': 'en-fonipa', 'tags': ['en-fonipa']},
+            { 'expected': 'tpi-Latn-fonipa', 'tags': ['tpi-Latn-fonipa'] },
+            { 'expected': 'se-fonipa', 'tags': ['se-fonipa']},
+            { 'expected': 'se-NO-fonipa', 'tags': ['se-no-fonipa']},
+            { 'expected': 'fr-fonipa', 'tags': ['fr-fonipa'] },
+
+            # az-Cyrl
+            {'expected': 'az-Cyrl-RU', 'tags': ['az-Cyrl']},
         ]:
             with self.subTest(testCase=testCase):
                 expectedTag = testCase['expected']
                 for tag in testCase['tags']:
                     with self.subTest(tag = tag):
                         # Execute
-                        bestTag = CanonicalLanguageCodeUtils.findBestTag(tag, True)
+                        bestTag = CanonicalLanguageCodeUtils.findBestTag(tag, True, True)
 
                         # Verify
-                        msg = "\nExpected: %s\ngot:      %s " % (expectedTag, bestTag)
+                        msg = "\nFor %s:\nExpected: %s\ngot:      %s " % (tag, expectedTag, bestTag)
                         self.assertEqual(expectedTag, bestTag, msg)
 
-    def test_FindBestTag_NoAddingRegion(self):
+    def test_FindBestTag_NotAddingRegion(self):
         for testCase in [
-            {'expected': 'fr', 'tags': ['fr']},
-            {'expected': 'fr-FR', 'tags': ['fr-FR', 'fr-Latn-fr']},
+            {'expected': 'fr', 'tags': ['fr', 'fr-FR', 'fr-Latn-fr']},
             {'expected': 'en-fonipa', 'tags': ['en-fonipa']},
-            {'expected': 'tpi-fonipa', 'tags': ['tpi-Latn-fonipa']},
-            {'expected': 'se-Latn-fonipa', 'tags': ['se-fonipa']},
-            {'expected': 'se-Latn-NO-fonipa', 'tags': ['se-no-fonipa']},
+            {'expected': 'tpi-Latn-fonipa', 'tags': ['tpi-Latn-fonipa']},
+            {'expected': 'se-fonipa', 'tags': ['se-fonipa']},
+            {'expected': 'se-NO-fonipa', 'tags': ['se-no-fonipa']},
+            {'expected': 'und-fonipa', 'tags': ['und-fonipa', 'und-Latn-fonipa', 'und-Latn-fonipa-x-test']},
             {'expected': 'fr-fonipa', 'tags': ['fr-fonipa']}
         ]:
             with self.subTest(testCase=testCase):
@@ -74,8 +79,8 @@ class CanonicalLanguageCodeUtilsTests(unittest.TestCase):
                 for tag in testCase['tags']:
                     with self.subTest(tag=tag):
                         # Execute
-                        bestTag = CanonicalLanguageCodeUtils.findBestTag(tag, False)
+                        bestTag = CanonicalLanguageCodeUtils.findBestTag(tag, False, True)
 
                         # Verify
-                        msg = "\nExpected: %s\ngot:      %s " % (expectedTag, bestTag)
+                        msg = "\nFor %s:\nExpected: %s\ngot:      %s " % (tag, expectedTag, bestTag)
                         self.assertEqual(expectedTag, bestTag, msg)

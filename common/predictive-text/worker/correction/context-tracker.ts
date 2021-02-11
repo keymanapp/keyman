@@ -1,6 +1,24 @@
 /// <reference path="distance-modeler.ts" />
 
 namespace correction {
+
+  function textToCharTransforms(text: string, transformId?: number) {
+    let perCharTransforms: Transform[] = [];
+
+    for(let i=0; i < text.kmwLength(); i++) {
+      let char = text.kmwCharAt(i); // is SMP-aware
+
+      let transform: Transform = {
+        insert: char,
+        deleteLeft: 0,
+        id: transformId
+      };
+
+      perCharTransforms.push(transform);
+    }
+
+    return perCharTransforms;
+  }
   export class TrackedContextSuggestion {
     suggestion: Suggestion;
     tokenWidth: number;
@@ -145,14 +163,7 @@ namespace correction {
       // Note that we cannot just use a single, monolithic transform at this point b/c
       // of our current edit-distance optimization strategy; diagonalization is currently... 
       // not very compatible with that.
-      const backspacedTokenContext = tokenText.split('').map(function(char) {
-        let transform: Transform = {
-          insert: char,
-          deleteLeft: 0,
-          id: transformId // Not exactly optimal for every transform to have the same ID,
-                          // but is actually accurate here.
-        };
-
+      let backspacedTokenContext: Distribution<Transform>[] = textToCharTransforms(tokenText, transformId).map(function(transform) {
         return [{sample: transform, p: 1.0}];
       });
 
@@ -351,8 +362,11 @@ namespace correction {
       }
 
       const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
-      const primaryInput = hasDistribution ? transformDistribution[0].sample : null;
-      const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0;
+      let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
+      if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
+        primaryInput = null;
+      }
+      const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0 && !primaryInput.deleteRight;
       const finalToken = tokenizedContext[tokenizedContext.length-1];
 
       /* Assumption:  This is an adequate check for its two sub-branches.
@@ -392,7 +406,7 @@ namespace correction {
           if(isBackspace) {
             state.replaceTailForBackspace(finalToken, primaryInput.id);
           } else {
-            state.updateTail(transformDistribution, finalToken);
+            state.updateTail(primaryInput ? transformDistribution : null, finalToken);
           }
         }
         // There is only one word in the context.
@@ -411,7 +425,7 @@ namespace correction {
           if(isBackspace) {
             state.replaceTailForBackspace(finalToken, primaryInput.id);
           } else {
-            state.updateTail(transformDistribution, finalToken);
+            state.updateTail(primaryInput ? transformDistribution : null, finalToken);
           }
         }
       }
@@ -423,17 +437,9 @@ namespace correction {
         let token = new TrackedContextToken();
         token.raw = entry;
         if(token.raw) {
-          let tokenTransform = {
-            insert: entry,
-            deleteLeft: 0
-          };
-          // Build a single-entry prob-distribution array... where the single distribution is 100% for the token's actual form.
-          // Basically, assume the token was the correct input, since we lack any actual probability data about the keystrokes
-          // that generated it.
-          token.transformDistributions = [[{
-            sample: tokenTransform,
-            p: 1.0
-          }]];
+          token.transformDistributions = textToCharTransforms(token.raw).map(function(transform) {
+            return [{sample: transform, p: 1.0}];
+          });
         } else {
           // Helps model context-final wordbreaks.
           token.transformDistributions = [];
@@ -474,7 +480,7 @@ namespace correction {
      * @param transformDistribution 
      */
     analyzeState(model: LexicalModel, 
-                 context: Context, 
+                 context: Context,
                  transformDistribution?: Distribution<Transform>): TrackedContextState {
       if(!model.traverseFromRoot) {
         // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)

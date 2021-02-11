@@ -4,6 +4,8 @@
 
 package com.tavultesoft.kmea;
 
+import android.content.Context;
+
 public class DisplayLanguages {
   private static final String TAG = "DisplayLanguages";
   public static final String displayLanguageKey = "DisplayLanguage";
@@ -29,12 +31,15 @@ public class DisplayLanguages {
 
   // Display Language types (as named in translate.keyman.com)
   // Order doesn't matter since we're storing BCP-47 tags in the settings preference
-  public static final DisplayLanguageType[] DisplayLanguages =
-  {
-    new DisplayLanguageType(unspecifiedLocale, "Default Locale"),
-    new DisplayLanguageType("de-DE", "German"),
-    new DisplayLanguageType("km-KH", "Khmer"),
-    new DisplayLanguageType("ann", "Obolo")
-  };
-
+  public static final DisplayLanguageType[] getDisplayLanguages(Context context) {
+    DisplayLanguageType[] languages = {
+      new DisplayLanguageType(unspecifiedLocale, context.getString(R.string.default_locale)),
+      new DisplayLanguageType("en", "English"),
+      new DisplayLanguageType("fr-FR", "French"),
+      new DisplayLanguageType("de-DE", "German"),
+      new DisplayLanguageType("km-KH", "Khmer"),
+      new DisplayLanguageType("ann", "Obolo")
+    };
+    return languages;
+  }
 }

@@ -114,10 +114,9 @@ To validate your configuration, from the `android/` folder run `sentry-cli info`
 
 ### Compiling the app's offline help
 Keyman for Android help is maintained in the Markdown files in android/help/.
-The script `help/build-help.sh` uses the `pandoc` tool to convert the Markdown files into html.
+The script `build-help.sh` uses the `pandoc` tool to convert the Markdown files into html.
 
 ```bash
-cd help
 ./build-help.sh htm
 ```
 

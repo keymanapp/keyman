@@ -146,9 +146,8 @@ open class SettingsViewController: UITableViewController {
     
     switch(cellIdentifier) {
       case "languages":
-        cell.accessoryType = .disclosureIndicator
+        break
       case "showbanner":
-        cell.accessoryType = .none
         let showBannerSwitch = UISwitch()
         showBannerSwitch.translatesAutoresizingMaskIntoConstraints = false
         
@@ -165,7 +164,6 @@ open class SettingsViewController: UITableViewController {
           showBannerSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         }
       case "showgetstarted":
-        cell.accessoryType = .none
         let showAgainSwitch = UISwitch()
         showAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
         
@@ -182,7 +180,6 @@ open class SettingsViewController: UITableViewController {
           showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         }
       case "enablecrashreporting":
-        cell.accessoryType = .none
         let enableReportingSwitch = UISwitch()
         enableReportingSwitch.translatesAutoresizingMaskIntoConstraints = false
 
@@ -198,12 +195,8 @@ open class SettingsViewController: UITableViewController {
           enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
           enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         }
-      case "systemkeyboardsettings":
-        cell.accessoryType = .disclosureIndicator
-      case "installfile":
-        cell.accessoryType = .disclosureIndicator
-      case "forcederror":
-        cell.accessoryType = .disclosureIndicator
+      case "systemkeyboardsettings", "installfile", "forcederror":
+        break
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
         cell.accessoryType = .none
@@ -252,8 +245,12 @@ open class SettingsViewController: UITableViewController {
 
   override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     cell.accessoryType = .none
+
+    // Remember, UITableViewCells may be reused, so we should always reset relevant properties.
     cell.textLabel?.text = itemsArray[indexPath.row]["title"]
     cell.detailTextLabel?.text = itemsArray[indexPath.row]["subtitle"]
+    cell.textLabel?.isEnabled = true
+
     cell.tag = indexPath.row
     cell.isUserInteractionEnabled = true
 
@@ -262,11 +259,14 @@ open class SettingsViewController: UITableViewController {
     switch (cellIdentifier) {
       case "languages", "installfile", "systemkeyboardsettings", "forcederror":
         cell.accessoryType = .disclosureIndicator
+        cell.detailTextLabel?.isEnabled = true
       case "enablecrashreporting":
+        cell.detailTextLabel?.isEnabled = true
         break
-      default:
-        cell.textLabel?.isEnabled = true
+      case "showbanner", "showgetstarted":
         cell.detailTextLabel?.isEnabled = false
+      default:
+        log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
     }
   }
   

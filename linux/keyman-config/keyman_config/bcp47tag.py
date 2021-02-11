@@ -83,14 +83,22 @@ class Bcp47Tag():
 
         self.__originalTag = tag
 
+        self.grandFathered = None
+        self.language = None
+        self.extLang = []
+        self.script = None
+        self.region = None
+        self.variant = []
+        self.extension = []
+        self.langTagPrivateUse = []
+        self.privateUse = []
+
         if match[1]:
             self.grandFathered = match[1]
         elif match[2]:
             self.grandFathered = match[2]
 
         # langtag language
-        self.language = None
-        self.extLang = []
         if match[3]:
             t = match[3].split('-')
             self.language = t.pop(0).lower()
@@ -102,13 +110,11 @@ class Bcp47Tag():
             self.region = match[5].upper()
 
         # langtag variant
-        self.variant = []
         if match[6]:
             self.variant = match[6].split('-')
             self.variant.pop(0)
 
         # langtag extension
-        self.extension = []
         if match[7]:
             t = match[7].split('-')
             t.pop(0)
@@ -132,13 +138,11 @@ class Bcp47Tag():
             self.extension.append("%s-%s" % (singleton, '-'.join(ext)))
 
         # langtag privateuse
-        self.langTagPrivateUse = []
         if match[8]:
             self.langTagPrivateUse = match[8].split('-')
             self.langTagPrivateUse.pop(0)
 
         # privateuse
-        self.privateUse = []
         if match[9]:
             self.privateUse = match[9].split('-')
             self.privateUse.pop(0)

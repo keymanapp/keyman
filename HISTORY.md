@@ -136,7 +136,31 @@
 
 * chore: prepare 15.0 alpha (#4129)
 
+## 14.0.241 beta 2021-02-10
 
+* fix(common/resources): Just use master branch for help.keyman.com (#4459)
+* fix(windows): hotkeys offset in config list (#4454)
+* chore(ios): Settings case-statement cleanup (#4443)
+* fix(linux): Also use staging site for beta versions (#4455)
+
+## 14.0.240 beta 2021-02-09
+
+* fix(windows): When uninstalling, exit Keyman (#4383)
+* fix(common/models): predictions after context reset / caret shift (#4411)
+* modify(common): Refactor help-keyman-com.sh script for uploading help files (#4433)
+* fix(linux): improve BCP 47 canonicalization (#4439)
+
+## 14.0.239 beta 2021-02-08
+
+* fix(developer): debug information with unicode identifiers (#4408)
+* fix(developer): Compiler check for if and nul at start of context (#4410)
+* feat(developer): improve BCP 47 canonicalization (#4425)
+* chore(linux): Check in markdown help for Linux (#4414)
+
+## 14.0.238 beta 2021-02-08
+
+* fix(android/engine): Remove WRITE_EXTERNAL_STORAGE from manifest (#4434)
+* chore(common): Check in crowdin files for French (#4420)
 
 ## 14.0.237 beta 2021-02-06
 

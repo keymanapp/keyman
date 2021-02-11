@@ -133,6 +133,7 @@ type
 
 type
   TCompilerCallback = function( line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310
+  TCompilerCallbackW = function( line: Integer; msgcode: LongWord; const text: string): Integer; // not available to C++ in this form
 
 const
   CKF_KEYMAN = 0;

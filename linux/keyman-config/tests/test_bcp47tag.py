@@ -82,6 +82,14 @@ class Bcp47TagTests(unittest.TestCase):
         # Verify
         self.assertEqual(Bcp47Tag('sr', 'Cyrl'), sut)
 
+    def test_SetTag_Update(self):
+        # Setup
+        sut = Bcp47Tag.create('glr-Latn-LR')
+        # Execute
+        sut.tag = 'en'
+        # Verify
+        self.assertEqual(Bcp47Tag('en'), sut)
+
     def test_SetTag_AdjustCasing(self):
         for testTuple in [
             ('cmn-hans-cn', Bcp47Tag('cmn', 'Hans', 'CN')),

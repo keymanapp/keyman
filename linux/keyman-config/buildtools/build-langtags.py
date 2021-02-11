@@ -46,6 +46,10 @@ class LangTagsMap():
                 allTags.append("'%s': '%s'" % (lang['tag'], lang['tag']))
                 if lang['tag'] != lang['full']:
                     allTags.append("'%s': '%s'" % (lang['full'], lang['tag']))
+                if 'tags' in lang:
+                    for tag in lang['tags']:
+                        if tag != lang['full'] and tag != lang['tag']:
+                            allTags.append("'%s': '%s'" % (tag, lang['tag']))
 
         langTagsString = ',\n        '.join(map(str, langTags))
         allTagsString = ', '.join(allTags)
