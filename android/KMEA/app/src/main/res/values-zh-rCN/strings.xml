@@ -123,6 +123,8 @@
     <plurals name="keyboard_count">
         <item quantity="other">(%1$d keyboards)</item>
     </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">Default Locale</string>
     <!-- Context: Content descriptions -->
     <!-- Context: Content descriptions -->
     <!-- Context: Popup menu labels -->
