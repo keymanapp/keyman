@@ -219,12 +219,18 @@ export const sendCommentToPullRequestAndRelatedIssues = async (
 
   const messagePull = `Changes in this pull request will be available for download in [Keyman version ${versionTier}](https://keyman.com/downloads/releases/${tier}/${version})`;
 
-  return Promise.all(pulls.map( pull => octokit.issues.createComment({
-    owner: 'keymanapp',
-    repo: 'keyman',
-    issue_number: pull,
-    body: messagePull,
-  })));
+  // Create comments serially rather than in parallel
+  let result: Promise<any> = Promise.resolve();
+  pulls.forEach(pull => {
+    result = result.then(() => octokit.issues.createComment({
+      owner: 'keymanapp',
+      repo: 'keyman',
+      issue_number: pull,
+      body: messagePull,
+    }));
+  });
+
+  return result;
 }
 
 /**
