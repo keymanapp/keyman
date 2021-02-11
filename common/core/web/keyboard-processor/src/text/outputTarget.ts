@@ -288,8 +288,8 @@ namespace com.keyman.text {
 
       this.text = text ? text : "";
       var defaultLength = this.text._kmwLength();
-      // An index of 0 should still be considered 'defined', while null and undefined... not so much.
-      this.caretIndex = (caretPos || caretPos === 0) ? caretPos : defaultLength;
+      // Ensures that `caretPos == 0` is handled correctly.
+      this.caretIndex = typeof caretPos == "number" ? caretPos : defaultLength;
     }
 
     // Clones the state of an existing EditableElement, creating a Mock version of its state.
