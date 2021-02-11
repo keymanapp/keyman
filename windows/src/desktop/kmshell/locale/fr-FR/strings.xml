@@ -52,6 +52,10 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
   <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman est toujours en cours d\'exécution. Cliquez sur cette icône pour utiliser votre clavier de langue à tout moment</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0.234 -->
+  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman is already running. Click the Keyman icon in the system notification area to use your language keyboard</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -224,11 +228,11 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">Vous n\'avez pas de claviers installés. Cliquez sur le bouton Télécharger ce clavier pour installer une disposition du clavier à partir du site web de Keyman.</string>
-  <!-- Parameters: %0:s = keyboard layout name -->
+  <!-- Parameters: %1$s = keyboard layout name -->
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- Introduced: 7.1.251.0 -->
   <!-- String Type: PlainText -->
-  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">Vous ne pouvez désinstaller le clavier \'%0:s\' que si vous êtes un administrateur</string>
+  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">You can only uninstall the keyboard \'%1$s\' if you are an Administrator</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
@@ -377,10 +381,6 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.275.0 -->
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="Hotkey - show keyboard usage in OSK">Afficher le panneau d\'utilisation du clavier</string>
-  <!-- Context: Configuration Dialog - Hotkeys tab -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.1.275.0 -->
   <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">Afficher le panneau assistant des polices</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
@@ -454,11 +454,11 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="Download only option checkbox">Ne pas installer, seulement télécharger</string>
-  <!-- Parameters: %0:s = Error Message, %1:d Error Code -->
+  <!-- Parameters: %1$s = Error Message, %2$d Error Code -->
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0 -->
-  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">Impossible de télécharger le clavier, erreur %1:d: %0:s</string>
+  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">Unable to download keyboard, error %2$d: %1$s</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
@@ -511,30 +511,30 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKChangeHotkeyTitle" comment="Change Hotkey dialog title">Changer un raccourci clavier</string>
-  <!-- Parameters: %0:s = Name of keyboard -->
+  <!-- Parameters: %1$s = Name of keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Sélectionnez un raccourci clavier standard ou choisissez \'Personnalisé\' et maintenez Ctrl,Shift et/ou Alt enfoncés et tapez votre raccourci clavier désiré pour la langue %0:s:</string>
+  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Select a standard hotkey or choose \'Custom\' and hold Ctrl,Shift and/or Alt and type your desired hotkey for language %1$s:</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKSetHotkey_Interface" comment="Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard)">Configurer un raccourci clavier pour l\'interface</string>
-  <!-- Parameters: %0:s = Hotkey -->
+  <!-- Parameters: %1$s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">Le raccourci clavier %0:s va provoquer un conflit avec l\'utilisation normale du clavier.  Vous devirez utiliser au moins Ctrl ou Alt.  Voulez-vous effcetuer un changement maintenant ?</string>
-  <!-- Parameters: %0:s = Hotkey, %1:s = Conflicting keyboard -->
+  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">The hotkey %1$s will conflict with normal keyboard use.  You should use at least Ctrl or Alt.  Do you want to change this now\?</string>
+  <!-- Parameters: %1$s = Hotkey, %2$s = Conflicting keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">Le raccourci clavier %0:s est en conflit avec la touche de raccourci sélectionnée pour le clavier %1:s.  Si vous continuez, le raccourci pour le clavier %1:s sera effacé.  Continuer ?</string>
-  <!-- Parameters: %0:s = Hotkey -->
+  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">The hotkey %1$s conflicts with the hotkey selected for keyboard %2$s.  If you continue, the hotkey for keyboard %2$s will be cleared.  Continue\?</string>
+  <!-- Parameters: %1$s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 14.0.117 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">Le raccourci clavier %0:s est en conflit avec un autre raccourci clavier. Si vous continuez, l\'autre raccourci sera effacé. Continuer ?</string>
+  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">The hotkey %1$s conflicts with another hotkey.  If you continue, the other hotkey will be cleared.  Continue\?</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -571,25 +571,25 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.255.0 -->
   <string name="S_Update_SizeHead" comment="Update dialog - update size">Taille</string>
-  <!-- Parameters: %0:s = Current version number -->
+  <!-- Parameters: %1$s = Current version number -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_KeymanText" comment="Update dialog - name and version of updatable product">Keyman %0:s</string>
-  <!-- Parameters: %0:s = Package description, %1:s = Current package version number -->
+  <string name="SKUpdate_KeymanText" comment="Update dialog - name and version of updatable product">Keyman %1$s</string>
+  <!-- Parameters: %1$s = Package description, %2$s = Current package version number -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_PackageText" comment="Update dialog - name and version of updatable keyboard layout package">Clavier %0:s %1:s</string>
+  <string name="SKUpdate_PackageText" comment="Update dialog - name and version of updatable keyboard layout package">Keyboard %1$s %2$s</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKUpdate_UnableToContact" comment="Update dialog - unable to access keyman.com warning">Impossible de se connecter au site web de Tavultesoft- prière de vérifier que votre connection internet fonctionne, puis réessayez.</string>
-  <!-- Parameters: %0:s = Error message -->
+  <!-- Parameters: %1$s = Error message -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">Impossible de se connecter au site web de Tavultesoft- prière de vérifier que votre connection internet fonctionne, puis réessayez.  L\'erreur reçue était : %0:s</string>
+  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">Unable to contact keyman.com - please make sure you have an active Internet connection and try again.  The error received was: %1$s</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
@@ -670,12 +670,12 @@
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">Quitter Keyman ?</string>
+  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">Exit Keyman\?</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: Hint -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">Êtes-vous sûr de vouloir quitter Keyman ? Vos claviers Keyman seront toujours listés dans les langues Windows, mais ne seront pas fonctionnels tant que vous n\'aurez pas redémarré Keyman.</string>
+  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">Are you sure you want to exit Keyman\?  Your Keyman keyboards will still be listed in the Windows languages, but will not be functional until you restart Keyman.</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
@@ -713,10 +713,6 @@
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="Toolbar help - View Keyboard Usage pop-up text">Voir l\'utilisation du clavier</string>
-  <!-- Context: Toolbar Context Help -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">Voir l\'assistant de police</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
@@ -742,10 +738,6 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">Clavier &amp;visuel</string>
-  <!-- Context: System Tray Menu Items -->
-  <!-- String Type: PlainText -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_KeyboardUsage" comment="Systray item - Keyboard Usage [&amp; precedes alt + access-character]">&amp;Utilisation du clavier</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -790,40 +782,40 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">Keyman</string>
-  <!-- Parameters: %0:s = Version number string -->
+  <!-- Parameters: %1$s = Version number string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSplashVersion" comment="Version number">Version %0:s</string>
+  <string name="SKSplashVersion" comment="Version number">Version %1$s</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.239.0 -->
   <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">&amp;Imprimer...</string>
-  <!-- Parameters: %0:s = Package to be uninstalled -->
+  <!-- Parameters: %1$s = Package to be uninstalled -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">Un package portant le nom %0:s est déjà installé. Voulez-vous le désinstaller et en installer un nouveau ?</string>
-  <!-- Parameters: %0:s = Keyboard name -->
+  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">A package with the name %1$s is already installed.  Do you want to uninstall it and install the new one\?</string>
+  <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">Un clavier nommé \'%0:s\' est déjà installé.  Si l\'opération est pousuivie, il sera désinstallé avant que le nouveau soit installé.  Continuer ?</string>
-  <!-- Parameters: %0:s = Keyboard name, %1:s = Package name -->
+  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">A keyboard with the name \'%1$s\' is already installed.  If you continue, it will be uninstalled before the new one is installed.  Continue\?</string>
+  <!-- Parameters: %1$s = Keyboard name, %2$s = Package name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">Le clavier \'%0:s\' fait partie du package \'%1:s\'.  Le paquetage complet doit être désinstallé.  Continuer ?</string>
-  <!-- PArameters: %0:s = BCP 47 code -->
+  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">The keyboard \'%1$s\' is part of package \'%2$s\'.  You must uninstall the entire package.  Continue\?</string>
+  <!-- PArameters: %1$s = BCP 47 code -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 14.0.211 -->
   <!-- String Type: FormatString -->
   <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">Impossible d\'installer la langue du clavier ; Windows a une limite de 4 langues « transitoires » personnalisées, et vous avez peut-être atteint cette limite.</string>
-  <!-- Parameters: %0:s = Package Name -->
+  <!-- Parameters: %1$s = Package Name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">Le packge ou le clavier \'%0: \' n\'inclut aucune aide d\'introduction.</string>
+  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">The package or keyboard \'%1$s\' does not include any introductory help.</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -848,70 +840,62 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKDownloadProgress_Title" comment="Notice of file downloading">Télécharger le fichier</string>
-  <!-- Parameters: %0:s = Keyboard name -->
+  <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">Êtes-vous sûr de vouloir supprimer le clavier visuel installé pour %0:s ?</string>
-  <!-- Parameters: %0:s = Keyboard name -->
+  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">Are you sure you want to remove the on screen keyboard installed for %1$s\?</string>
+  <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.239.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">Etes-vous certain que vous voulez désinstaller le clavier %0:s?</string>
-  <!-- Parameters: %0:s = Package name, %1:s: Fonts list -->
+  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">Are you sure you want to uninstall keyboard %1$s\?</string>
+  <!-- Parameters: %1$s = Package name, %2$s: Fonts list -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.239.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">Etes-vous certain que vous voulez désinstaller le package %0:s ?</string>
-  <!-- Parameters: %0:s = Fonts list -->
+  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">Are you sure you want to uninstall package %1$s\?\n\n%2$s</string>
+  <!-- Parameters: %1$s = Fonts list -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.1.270.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">Les polices suivantes seront également désinstallées : %0:s.</string>
+  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">The following fonts will also be uninstalled: %1$s.</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">La table des caractères a une base de données de caractères qui doit être construite avant de pouvoir être utilisée. La construire maintenant ?</string>
-  <!-- Parameters: %0:s = Error detail string -->
+  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">The Character Map has a database of characters that needs to be built before it can be used.  Build it now\?</string>
+  <!-- Parameters: %1$s = Error detail string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">La base de données de caractères Unicode n\'a pas pu être effacée pour une reconstruction. Détails de l\'erreur : %0:s</string>
-  <!-- Parameters: %0:s = Error details -->
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">The Unicode Character database could not be deleted for a rebuild.  Error details are: %1$s</string>
+  <!-- Parameters: %1$s = Error details -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">La base de données de caractères Unicode n\'a pas pu être créée et a été désactivée. Détails de l\'erreur : %0:s</string>
-  <!-- Parameters: %0:s = Error message -->
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">The Unicode Character database could not be created and has been disabled.  Error details are: %1$s</string>
+  <!-- Parameters: %1$s = Error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">La base de données de caractères Unicode ne s\'est pas chargée correctement (%0:s). La reconstruire maintenant ?</string>
-  <!-- Parameters: %0:s: error message -->
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">The Unicode character database did not load successfully (%1$s).  Rebuild it now\?</string>
+  <!-- Parameters: %1$s: error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman n\'a pas pu démarrer. Veuillez vérifier vos paramètres de sécurité pour vous assurer que le programme keyman.exe est autorisé à démarrer avant de continuer. L\'erreur renvoyée était :
-
-\"%0:s\"
-
-Voulez-vous essayer de relancer Keyman maintenant ?</string>
+  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman failed to start.  Please check your security settings to make sure that the program keyman.exe is allowed to start before continuing.  The error returned was:\n\n\"%1$s\"\n\nDo you want to try and start Keyman again now\?</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">L\'information de débogage de Keyman sera stockée sur le Bureau dans un fichier texte nommé keymanlog\system.log.  Vous devez quitter Keyman avant de lire ou de supprimer ce fichier.
-
-ATTENTION. Ce fichier peut devenir important très rapidement.  Activer le débogage ralentira le sytème et ne doit être fait qu\'à la demande du support Tavultesoft.
-
-CONFIDENTIALITÉ : Veuillez noter que le fichier journal de débogage enregistre toutes les frappes que vous exécutez.  Vous ne devez activer le journal de débogage que pendant la durée de la session de débogage ou de diagnostic, et vous devez effacer le fichier  [Bureau]\keymanlog\system.log file dès que possible.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information will be stored in a log file called %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). You should exit Keyman before attempting to delete this file.\n\n\WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.\n\nPRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Veuillez patienter pendant la recherche des polices associées pour le clavier %0:s</string>
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Please wait while searching for related fonts for keyboard %1$s</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">Le clavier %0:s n\'est pas un clavier Unicode. Les polices ne peuvent pas être automatiquement localisées. Veuillez consulter la documentation du clavier pour les informations sur la police.</string>
+  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">Keyboard %1$s is not a Unicode keyboard. Fonts cannot be automatically located.  Please check the keyboard documentation for font information.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
