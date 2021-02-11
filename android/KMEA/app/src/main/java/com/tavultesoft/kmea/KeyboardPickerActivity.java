@@ -641,7 +641,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
       keyboardInfo.get(KMManager.KMKey_LanguageID),
       keyboardInfo.get(KMManager.KMKey_LanguageName),
       keyboardInfo.get(KMManager.KMKey_KeyboardVersion),
-      keyboardInfo.get(KMManager.KMKey_HelpLink),
+      keyboardInfo.get(KMManager.KMKey_CustomHelpLink),
       keyboardInfo.get(KMManager.KMKey_KMPLink),
       isNewKeyboard,
       keyboardInfo.get(KMManager.KMKey_Font),
