@@ -72,7 +72,7 @@ displayInfo "" \
 cd $KEYMAN_ROOT/ios/help
 
 MDLUA="$KEYMAN_ROOT/resources/build/htmlink.lua"
-MD=`find -name "*.md"`
+MD=`find . -name "*.md"`
 DESTHTM="$THIS_DIR/keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources"
 
 if $DO_HTM; then

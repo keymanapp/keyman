@@ -43,12 +43,15 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   func reloadKeymanHelp() {
-    let networkStatus = networkReachable?.connection
-    switch networkStatus {
-    case Reachability.Connection.none?:
+    if let networkStatus = networkReachable?.connection {
+      switch networkStatus {
+      case Reachability.Connection.none, Reachability.Connection.unavailable:
+        loadFromLocal()
+      default:
+        loadFromServer()
+      }
+    } else {
       loadFromLocal()
-    default:
-      loadFromServer()
     }
   }
 
