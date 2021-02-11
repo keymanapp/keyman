@@ -9,11 +9,11 @@ available_platforms=(android ios linux mac web windows)
 # e.g. android='common/models|common/predictive-text'
 # will expand into android='^(android|(oem/[^/]+/android)|common/models|common/predictive-text)'
 
-watch_android='web|common/models|common/predictive-text|common/lexical-model-types'
-watch_ios='web|common/models|common/predictive-text|common/lexical-model-types'
+watch_android='web|common/models|common/predictive-text|common/lexical-model-types|common/core/web'
+watch_ios='web|common/models|common/predictive-text|common/lexical-model-types|common/core/web'
 watch_linux='common/engine'
 watch_mac='common/engine'
-watch_web='common/models|common/predictive-text|common/lexical-model-types'
+watch_web='common/models|common/predictive-text|common/lexical-model-types|common/core/web'
 
 # Windows currently builds Developer and Desktop, so we need everything from common,developer,web
 watch_windows='common|developer|web'

@@ -1,5 +1,59 @@
 # Keyman Version History
 
+## 14.0.241 beta 2021-02-10
+
+* fix(common/resources): Just use master branch for help.keyman.com (#4459)
+* fix(windows): hotkeys offset in config list (#4454)
+* chore(ios): Settings case-statement cleanup (#4443)
+* fix(linux): Also use staging site for beta versions (#4455)
+
+## 14.0.240 beta 2021-02-09
+
+* fix(windows): When uninstalling, exit Keyman (#4383)
+* fix(common/models): predictions after context reset / caret shift (#4411)
+* modify(common): Refactor help-keyman-com.sh script for uploading help files (#4433)
+* fix(linux): improve BCP 47 canonicalization (#4439)
+
+## 14.0.239 beta 2021-02-08
+
+* fix(developer): debug information with unicode identifiers (#4408)
+* fix(developer): Compiler check for if and nul at start of context (#4410)
+* feat(developer): improve BCP 47 canonicalization (#4425)
+* chore(linux): Check in markdown help for Linux (#4414)
+
+## 14.0.238 beta 2021-02-08
+
+* fix(android/engine): Remove WRITE_EXTERNAL_STORAGE from manifest (#4434)
+* chore(common): Check in crowdin files for French (#4420)
+
+## 14.0.237 beta 2021-02-06
+
+* fix(linux): Fix packaging (#4428)
+
+## 14.0.236 beta 2021-02-04
+
+* chore(windows/resources): Fix typo about Community Forum link (#4412)
+* change(android/app): Separate displaying welcome.htm from keyboard installation (#4413)
+* fix(linux): Improve fix for #3399 (#4418)
+
+## 14.0.235 beta 2021-02-03
+
+* fix(windows): Ensure UAC window comes to foreground (#4384)
+* fix(windows): setup should ignore cert revocation (#4392)
+* fix(developer): don't check both setup.exe and setup-redist.exe (#4398)
+* fix(windows): Show balloon when Keyman is already running (#4386)
+* fix(developer): Generate platforms correctly from template (#4399)
+* fix(developer): Import Keyboard support for Targets (#4400)
+* fix(ios): fixes unit test mocking, test init (#4394)
+* fix(ios): fixes app crash on network/install error during resource updates (#4395)
+* fix(ios): fixes package-install/update event concurrency management (#4396)
+* fix(common/models): bksp workaround now works beyond first word (#4401)
+* chore(windows): tests should be case-sensitive (#4405)
+* fix(windows): crash deleting wordlist (#4406)
+* fix(windows): Use forward slashes in wordlist paths (#4407)
+* modify(android/app): Change build-help.sh to generate offline help from Markdown files (#4397)
+* fix(linux): Don't crash if uninstalling last keyboard (#4402)
+
 ## 14.0.234 beta 2021-02-02
 
 * fix(windows): remove Show Keyboard Usage hotkey (#4379)

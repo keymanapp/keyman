@@ -24,12 +24,13 @@ struct FVConstants {
   static let legacy_kFVKeyboardFilenameKey = "FVKeyboardFilename"
 
   // Keyboard files and paths
-  static let keyboardsPath = "Keyboards/files"
+  static let keyboardsPath = "Keyboards"
+  static let keyboardsPackage = "fv_all"
+  static let keyboardsPackageExt = "kmp"
   static let keyboardsCSVPath = "Keyboards"
   static let keyboardsCSVName = "keyboards"
   static let keyboardsCSVType = "csv"
   static let keyboardInfoType = "keyboard_info"
-  static let keyboardType = "js"
 
   // Instructions web page
   static let instructionsName = "setup"

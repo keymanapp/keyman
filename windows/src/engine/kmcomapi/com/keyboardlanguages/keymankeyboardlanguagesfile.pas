@@ -75,7 +75,7 @@ begin
   begin
     for i := 0 to APackageKeyboardLanguages.Count - 1 do
     begin
-      FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(APackageKeyboardLanguages[i].ID, True);
+      FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(APackageKeyboardLanguages[i].ID, True, True);
       if (FCanonicalBCP47Tag <> '') and (IndexOfBCP47Code(FCanonicalBCP47Tag) < 0) then
         FLanguages.Add(TKeymanKeyboardLanguageFile.Create(AContext, AOwner, FCanonicalBCP47Tag, 0,
           APackageKeyboardLanguages[i].Name));

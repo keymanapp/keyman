@@ -9,6 +9,9 @@ type
   [TestFixture]
   TCanonicalLanguageCodeUtilsTest = class(TObject)
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestSomeTags;
   end;
@@ -20,67 +23,77 @@ uses
 
 { TCanonicalLanguageCodeUtilsTest }
 
+procedure TCanonicalLanguageCodeUtilsTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
+end;
+
 procedure TCanonicalLanguageCodeUtilsTest.TestSomeTags;
 begin
   // #3485 - Gilaki (Latin) script
-  Assert.AreEqual('glk-Arab-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk', True));
-  Assert.AreEqual('glk-Arab-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-Arab', True));
-  Assert.AreEqual('glk-Arab-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-Arab-IR', True));
-  Assert.AreEqual('glk-Arab-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-IR', True));
-  Assert.AreEqual('glk-Latn-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-Latn', True));
-  Assert.AreEqual('glk-Latn-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-Latn-IR', True));
+  Assert.AreEqual('glk-Arab-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk', True, True));
+  Assert.AreEqual('glk-Arab-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-Arab', True, True));
+  Assert.AreEqual('glk-Arab-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-Arab-IR', True, True));
+  Assert.AreEqual('glk-Arab-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-IR', True, True));
+  Assert.AreEqual('glk-Latn-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-Latn', True, True));
+  Assert.AreEqual('glk-Latn-IR', TCanonicalLanguageCodeUtils.FindBestTag('glk-Latn-IR', True, True));
 
   // #1719
-  Assert.AreEqual('sqt-Arab-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt', True));
-  Assert.AreEqual('sqt-Arab-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-YE', True));
-  Assert.AreEqual('sqt-Arab-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-Arab', True));
-  Assert.AreEqual('sqt-Latn-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-Latn', True));
-  Assert.AreEqual('sqt-Latn-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-Latn-YE', True));
+  Assert.AreEqual('sqt-Arab-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt', True, True));
+  Assert.AreEqual('sqt-Arab-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-YE', True, True));
+  Assert.AreEqual('sqt-Arab-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-Arab', True, True));
+  Assert.AreEqual('sqt-Latn-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-Latn', True, True));
+  Assert.AreEqual('sqt-Latn-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-Latn-YE', True, True));
 
-  Assert.AreEqual('sa-Latn-IN', TCanonicalLanguageCodeUtils.FindBestTag('sa-Latn', True));
-  Assert.AreEqual('hi-Latn-IN', TCanonicalLanguageCodeUtils.FindBestTag('hi-Latn', True));
+  Assert.AreEqual('sa-Latn', TCanonicalLanguageCodeUtils.FindBestTag('sa-Latn', True, True));
+  Assert.AreEqual('hi-Latn', TCanonicalLanguageCodeUtils.FindBestTag('hi-Latn', True, True));
 
   // #1282
-  Assert.AreEqual('raw-Latn-MM', TCanonicalLanguageCodeUtils.FindBestTag('raw', True));
-  Assert.AreEqual('raw-Latn-MM', TCanonicalLanguageCodeUtils.FindBestTag('raw-MM', True));
-  Assert.AreEqual('raw-Latn-MM', TCanonicalLanguageCodeUtils.FindBestTag('raw-Latn', True));
+  Assert.AreEqual('raw-Latn-MM', TCanonicalLanguageCodeUtils.FindBestTag('raw', True, True));
+  Assert.AreEqual('raw-Latn-MM', TCanonicalLanguageCodeUtils.FindBestTag('raw-MM', True, True));
+  Assert.AreEqual('raw-Latn-MM', TCanonicalLanguageCodeUtils.FindBestTag('raw-Latn', True, True));
 
   // Various extended tags and tests
-  Assert.AreEqual('km-KH', TCanonicalLanguageCodeUtils.FindBestTag('km', True));
-  Assert.AreEqual('km-KH', TCanonicalLanguageCodeUtils.FindBestTag('km-kh', True));
-  Assert.AreEqual('km-KH', TCanonicalLanguageCodeUtils.FindBestTag('km-khmr', True));
-  Assert.AreEqual('km-KH', TCanonicalLanguageCodeUtils.FindBestTag('km-khmr-kh', True));
-  Assert.AreEqual('th-TH', TCanonicalLanguageCodeUtils.FindBestTag('th', True));
-  Assert.AreEqual('th-TH', TCanonicalLanguageCodeUtils.FindBestTag('th-th', True));
-  Assert.AreEqual('th-TH', TCanonicalLanguageCodeUtils.FindBestTag('th-thai-th', True));
+  Assert.AreEqual('km-KH', TCanonicalLanguageCodeUtils.FindBestTag('km', True, True));
+  Assert.AreEqual('km-KH', TCanonicalLanguageCodeUtils.FindBestTag('km-kh', True, True));
+  Assert.AreEqual('km-KH', TCanonicalLanguageCodeUtils.FindBestTag('km-khmr', True, True));
+  Assert.AreEqual('km-KH', TCanonicalLanguageCodeUtils.FindBestTag('km-khmr-kh', True, True));
+  Assert.AreEqual('th-TH', TCanonicalLanguageCodeUtils.FindBestTag('th', True, True));
+  Assert.AreEqual('th-TH', TCanonicalLanguageCodeUtils.FindBestTag('th-th', True, True));
+  Assert.AreEqual('th-TH', TCanonicalLanguageCodeUtils.FindBestTag('th-thai-th', True, True));
 
   // note casing shows that the following lang tag was returned unmodified because
   // it was not found in our canonicalization tables. This is expected behaviour.
   // (Remember that BCP 47 tags are not case sensitive)
-  Assert.AreEqual('th-latn-de', TCanonicalLanguageCodeUtils.FindBestTag('th-latn-de', True));
+  Assert.AreEqual('th-latn-de', TCanonicalLanguageCodeUtils.FindBestTag('th-latn-de', True, True));
 
-  Assert.AreEqual('fr-FR', TCanonicalLanguageCodeUtils.FindBestTag('fr', True));
-  Assert.AreEqual('fr-FR', TCanonicalLanguageCodeUtils.FindBestTag('fr-FR', True));
-  Assert.AreEqual('fr-FR', TCanonicalLanguageCodeUtils.FindBestTag('fr-Latn-fr', True));
-  Assert.AreEqual('arn-Latn-CL', TCanonicalLanguageCodeUtils.FindBestTag('arn', True));
-  Assert.AreEqual('arn-Latn-CL', TCanonicalLanguageCodeUtils.FindBestTag('arn-cl', True));
-  Assert.AreEqual('se-Latn-NO', TCanonicalLanguageCodeUtils.FindBestTag('se', True));
-  Assert.AreEqual('se-Latn-NO', TCanonicalLanguageCodeUtils.FindBestTag('se-NO', True));
-  Assert.AreEqual('kma-Latn-GH', TCanonicalLanguageCodeUtils.FindBestTag('kma', True));
-  Assert.AreEqual('kma-Latn-GH', TCanonicalLanguageCodeUtils.FindBestTag('kma-latn', True));
-  Assert.AreEqual('kma-Latn-GH', TCanonicalLanguageCodeUtils.FindBestTag('kma-latn-gh', True));
-  Assert.AreEqual('tpi-PG', TCanonicalLanguageCodeUtils.FindBestTag('tpi', True));
-  Assert.AreEqual('tpi-PG', TCanonicalLanguageCodeUtils.FindBestTag('tpi-PG', True));
-  Assert.AreEqual('tpi-PG', TCanonicalLanguageCodeUtils.FindBestTag('tpi-Latn-PG', True));
-  Assert.AreEqual('sv-SE', TCanonicalLanguageCodeUtils.FindBestTag('sv', True));
-  Assert.AreEqual('en-US', TCanonicalLanguageCodeUtils.FindBestTag('en', True));
+  Assert.AreEqual('fr-FR', TCanonicalLanguageCodeUtils.FindBestTag('fr', True, True));
+  Assert.AreEqual('fr-FR', TCanonicalLanguageCodeUtils.FindBestTag('fr-FR', True, True));
+  Assert.AreEqual('fr-FR', TCanonicalLanguageCodeUtils.FindBestTag('fr-Latn-fr', True, True));
+  Assert.AreEqual('arn-Latn-CL', TCanonicalLanguageCodeUtils.FindBestTag('arn', True, True));
+  Assert.AreEqual('arn-Latn-CL', TCanonicalLanguageCodeUtils.FindBestTag('arn-cl', True, True));
+  Assert.AreEqual('se-Latn-NO', TCanonicalLanguageCodeUtils.FindBestTag('se', True, True));
+  Assert.AreEqual('se-Latn-NO', TCanonicalLanguageCodeUtils.FindBestTag('se-NO', True, True));
+  Assert.AreEqual('kma-Latn-GH', TCanonicalLanguageCodeUtils.FindBestTag('kma', True, True));
+  Assert.AreEqual('kma-Latn-GH', TCanonicalLanguageCodeUtils.FindBestTag('kma-latn', True, True));
+  Assert.AreEqual('kma-Latn-GH', TCanonicalLanguageCodeUtils.FindBestTag('kma-latn-gh', True, True));
+  Assert.AreEqual('tpi-PG', TCanonicalLanguageCodeUtils.FindBestTag('tpi', True, True));
+  Assert.AreEqual('tpi-PG', TCanonicalLanguageCodeUtils.FindBestTag('tpi-PG', True, True));
+  Assert.AreEqual('tpi-PG', TCanonicalLanguageCodeUtils.FindBestTag('tpi-Latn-PG', True, True));
+  Assert.AreEqual('sv-SE', TCanonicalLanguageCodeUtils.FindBestTag('sv', True, True));
+  Assert.AreEqual('en-US', TCanonicalLanguageCodeUtils.FindBestTag('en', True, True));
 
   // fonipa
-  Assert.AreEqual('en-US-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('en-fonipa', True));
-  Assert.AreEqual('tpi-PG-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('tpi-Latn-fonipa', True));
-  Assert.AreEqual('se-Latn-NO-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('se-fonipa', True));
-  Assert.AreEqual('se-Latn-NO-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('se-no-fonipa', True));
-  Assert.AreEqual('fr-FR-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('fr-fonipa', True));
+  Assert.AreEqual('en-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('en-fonipa', True, True));
+  Assert.AreEqual('tpi-Latn-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('tpi-Latn-fonipa', True, True));
+  Assert.AreEqual('se-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('se-fonipa', True, True));
+  Assert.AreEqual('se-NO-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('se-no-fonipa', True, True));
+  Assert.AreEqual('fr-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('fr-fonipa', True, True));
+  Assert.AreEqual('und-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('und-Latn-fonipa', True, True));
+  Assert.AreEqual('und-fonipa', TCanonicalLanguageCodeUtils.FindBestTag('und-Latn-fonipa-x-test', True, True));
+
+  // az-Cyrl
+  Assert.AreEqual('az-Cyrl-RU', TCanonicalLanguageCodeUtils.FindBestTag('az-Cyrl', True, True));
 end;
 
 initialization

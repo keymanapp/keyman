@@ -1,0 +1,12 @@
+c test_4280_if_start_1
+
+store(&VERSION) '10.0'
+store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c if() should be before 'a'
+'a' if(&platform = 'windows') + 'b' > '...windows!'
+

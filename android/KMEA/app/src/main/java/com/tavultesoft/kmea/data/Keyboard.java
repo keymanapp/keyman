@@ -23,7 +23,8 @@ import java.io.Serializable;
 
 public class Keyboard extends LanguageResource implements Serializable {
   private static final String TAG = "Keyboard";
-  private static final String HELP_URL_FORMATSTR = "https://help.keyman.com/keyboard/%s/%s";
+  public static final String HELP_URL_HOST = "https://help.keyman.com/";
+  private static final String HELP_URL_FORMATSTR = "%s/keyboard/%s/%s";
 
   private boolean isNewKeyboard;
   private String font;
@@ -71,7 +72,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, null);
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
-        String.format(HELP_URL_FORMATSTR, this.resourceID, this.version));
+        String.format(HELP_URL_FORMATSTR, HELP_URL_HOST, this.resourceID, this.version));
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
@@ -83,7 +84,7 @@ public class Keyboard extends LanguageResource implements Serializable {
                   boolean isNewKeyboard, String font, String oskFont) {
     super(packageID, keyboardID, keyboardName, languageID, languageName, version,
       (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-        String.format(HELP_URL_FORMATSTR, keyboardID, version),
+        String.format(HELP_URL_FORMATSTR, HELP_URL_HOST, keyboardID, version),
       kmp);
 
     this.isNewKeyboard = isNewKeyboard;

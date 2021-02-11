@@ -96,8 +96,10 @@ procedure TmodelTsProjectFile.LoadState(node: IXMLNode);   // I4698
 begin
   inherited LoadState(node);
   try
-    if node.ChildNodes.IndexOf('Debug') >= 0 then FDebug := node.ChildValues['Debug'];
-    if node.ChildNodes.IndexOf('TestKeyboard') >= 0
+    if (node.ChildNodes.IndexOf('Debug') >= 0) and not VarIsNull(node.ChildValues['Debug'])
+      then FDebug := node.ChildValues['Debug']
+      else FDebug := False;
+    if (node.ChildNodes.IndexOf('TestKeyboard') >= 0) and not VarIsNull(node.ChildValues['TestKeyboard'])
       then FTestKeyboard := node.ChildValues['TestKeyboard']
       else FTestKeyboard := '';
   except

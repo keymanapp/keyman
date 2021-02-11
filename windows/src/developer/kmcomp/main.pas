@@ -49,6 +49,7 @@ uses
 
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.ProjectLogConsole,
+  Keyman.Developer.System.ValidateRepoChanges,
   OnlineConstants,
   VersionInfo,
   compile,
@@ -74,7 +75,7 @@ var
   FUpdateInstaller: Boolean;
   FInstallerMSI: string;
   FClean: Boolean;
-  FFullySilent: Boolean;
+  FValidateRepoChanges, FFullySilent: Boolean;
   FWarnAsError: Boolean;
   FCheckFilenameConventions: Boolean;
   FValidating: Boolean;
@@ -98,6 +99,7 @@ begin
   FUpdateInstaller := False;
   FClean := False;
   FNologo := False;
+  FValidateRepoChanges := False;
   FWarnAsError := False;
   FCheckFilenameConventions := False;
   FValidating := False;
@@ -121,6 +123,8 @@ begin
     s := LowerCase(ParamStr(i));
     if s = '-nologo' then   // I4706
       FNologo := True
+    else if s = '-validate-repo-changes' then
+      FValidateRepoChanges := True
     else if s = '-s' then FSilent := True   // I4706
     else if s = '-ss' then   // I4706
     begin
@@ -257,7 +261,9 @@ begin
 
     TProjectLogConsole.Create(FSilent, FFullySilent, hOutfile, FColorMode);
 
-    if FMerging then
+    if FValidateRepoChanges then
+      FError := not TValidateRepoChanges.Execute(FParamInfile, FParamOutfile)
+    else if FMerging then
       FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FParamHelpLink, FMergingValidateIds, FSilent, TProjectLogConsole.Instance.Log)
     else if FValidating then
       FError := not TValidateKeyboardInfo.Execute(FParamInfile, FJsonSchemaPath, FParamDistribution, FSilent, TProjectLogConsole.Instance.Log)

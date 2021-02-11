@@ -61,7 +61,7 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
     localizeOptionList = new ArrayList<>();
 
     final String noIcon = "0";
-    for(DisplayLanguages.DisplayLanguageType l: DisplayLanguages.DisplayLanguages) {
+    for(DisplayLanguages.DisplayLanguageType l: DisplayLanguages.getDisplayLanguages(context)) {
       HashMap<String, String> hashMap = new HashMap<>();
       hashMap.put(titleKey, l.getLanguageName());
       hashMap.put(iconKey, noIcon);
@@ -79,9 +79,9 @@ public class KeymanSettingsLocalizeActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // Store the BCP-47 language tag in shared preference
-        if (position >= 0 && position < DisplayLanguages.DisplayLanguages.length) {
+        if (position >= 0 && position < DisplayLanguages.getDisplayLanguages(context).length) {
 
-          DisplayLanguages.DisplayLanguageType l = DisplayLanguages.DisplayLanguages[position];
+          DisplayLanguages.DisplayLanguageType l = DisplayLanguages.getDisplayLanguages(context)[position];
           String languageTag = l.getLanguageTag();
 
           SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

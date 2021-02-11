@@ -134,6 +134,8 @@ begin
     try
       UninstallTip(FOwner.ID, Get_LangID, Get_ProfileGUID, False);
       if IsTransientLanguageID(Get_LangID) then
+        // TODO: this breaks re-enabling the keyboard because the reg entry is
+        // still referring to the old langid.
         SetLangID(0);
     finally
       Free;

@@ -180,7 +180,6 @@ public final class KMManager {
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";
   public static final String KMKey_KeyboardCount = "kbCount";
-  public static final String KMKey_HelpLink = "helpLink";
   public static final String KMKey_Icon = "icon";
   public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_KeyboardID = "kbId";
@@ -194,12 +193,6 @@ public final class KMManager {
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
 
-  // DEPRECATED
-  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
-
-  // DEPRECATED
-  public static final String KMKey_CustomModel = "CustomModel";
-
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
@@ -209,6 +202,11 @@ public final class KMManager {
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
   public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
+
+  // DEPRECATED keys
+  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
+  public static final String KMKey_CustomModel = "CustomModel";
+  public static final String KMKey_HelpLink = "helpLink";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
