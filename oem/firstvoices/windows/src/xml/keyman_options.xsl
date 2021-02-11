@@ -14,7 +14,7 @@
 					<xsl:sort select="sort" />
           <div class="options_list_header"><xsl:value-of select="$locale/string[@name=current()/name]"/></div>
           <xsl:for-each select="//KeymanOption[group=current()/name]">
-            <xsl:if test="optiontype = 1">
+            <xsl:if test="optiontype = 1 and id != 'koAutoSwitchOSKPages'">
               <xsl:call-template name="option" />
             </xsl:if>
           </xsl:for-each>
@@ -29,7 +29,13 @@
             <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_ProxyConfig']"/></xsl:with-param>
             <xsl:with-param name="command">keyman:support_proxyconfig</xsl:with-param>
           </xsl:call-template>
-      
+
+          <!--<xsl:call-template name="button">
+            <xsl:with-param name="shield">1</xsl:with-param>
+            <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_SettingsManager']"/></xsl:with-param>
+            <xsl:with-param name="command">keyman:options_settingsmanager</xsl:with-param>
+          </xsl:call-template>-->
+
           <xsl:call-template name="button">
             <xsl:with-param name="shield">1</xsl:with-param>
             <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_BaseKeyboard']"/></xsl:with-param>
@@ -73,13 +79,13 @@
         <div >
           <xsl:choose>
             <xsl:when test="not(enabled)">
-              <xsl:attribute name="style">vertical-align: middle; display: inline; margin-left: 3px; color: #808080</xsl:attribute>
+              <xsl:attribute name="style">display: inline; margin-left: 3px; color: #808080</xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:attribute name="style">vertical-align: middle; display: inline; margin-left: 3px;</xsl:attribute>
+              <xsl:attribute name="style">display: inline; margin-left: 3px; </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
-					<xsl:value-of select="$locale/string[@name=current()/id]"/>
+			  <xsl:value-of select="$locale/string[@name=current()/id]"/>
         </div>
       </div>
 
