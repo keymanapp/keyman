@@ -3,6 +3,11 @@
 namespace correction {
 
   function textToCharTransforms(text: string, transformId?: number) {
+    // A basic null guard.
+    if(!text) {
+      return [];
+    }
+
     let perCharTransforms: Transform[] = [];
 
     for(let i=0; i < text.kmwLength(); i++) {

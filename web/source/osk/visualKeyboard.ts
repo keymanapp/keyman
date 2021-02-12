@@ -1836,7 +1836,9 @@ namespace com.keyman.osk {
      **/
     highlightKey(key: KeyElement, on: boolean) {
       // Do not change element class unless a key
-      if(!key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
+      if(!key || !key.className || key.className.indexOf('kmw-key-row') >= 0) {
+        return;
+      }
 
       var classes=key.className, cs = ' kmw-key-touched';
 
