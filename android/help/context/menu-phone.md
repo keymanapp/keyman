@@ -2,7 +2,7 @@
 title: Keyman for Android (Phone Layout)
 ---
 
-|   | Keyboard Keys (Keyboard Present) |
+|   | Keyboard Keys <br/>(Keyboard Present) |
 |---|---|
 | ![](../android_images/globe-ap.png) | Select another language/keyboard |
 | ![](../android_images/hide-keyboard-ap.png) | Hide the keyboard |
@@ -11,6 +11,11 @@ title: Keyman for Android (Phone Layout)
 | ![](../android_images/shift-ap.png) | Shift key. Long press this key to access the <kbd>CTRL</kbd>, <kbd>ALT</kbd> and <kbd>CTRL</kbd><kbd>ALT</kbd> keys (which can access additional key layers) |
 | ![](../android_images/touch-hold-ap.png) | Keys with a small dot in the top right corner indicate a long press key. Access further functionality by long pressing the key |
 | ![](../android_images/share-a.png) | Share your text with other apps like Messages, Gmail, or Twitter. Some versions of Android also let you copy your text to the clipboard. |
+
+----
+
+|   | Toolbar Icons
+|---|---|
 | ![](../android_images/browser-a.png) | Open the Keyman Browser to use the web in your language |
 | ![](../android_images/menu-icon-a.png) | Open the menu for additional options |
 | ![](../android_images/font-size-a.png) | Adjust the font size |

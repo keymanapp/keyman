@@ -42,7 +42,7 @@ This will be displayed at the confirmation to install the keyboard package.
 If "readme.htm" is not included, a generic page with the package ID and package version will be shown. Click the
 **"Install"** button to install the entire keyboard package.
 
-![](../android_images/dist-readme-ap.png)
+![](../android_images/khmer-readme-a.png)
 
 Step 5) All the keyboards in the package are installed as a group. In this example, the package only has the
 "Khmer Angkor" keyboard, so it becomes the active keyboard. For custom dictionary packages, only one dictionary
@@ -51,7 +51,7 @@ will be installed.
 If the keyboard package includes Welcome documentation, it will be displayed after the keyboard package is installed.
 This documentation helps you to get started using the keyboard.
 
-![](../android_images/dist-welcome-ap.png)
+![](../android_images/khmer-welcome-a.png)
 
 Click the **"OK"** button to finish installing the keyboard. You should be able to select it from the Keyman globe
 and start typing with it in any app.
