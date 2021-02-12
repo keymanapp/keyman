@@ -60,6 +60,8 @@
     <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">លុប​ក្ដារចុច</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[ថ្មី] %1$s</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">ស្វាគមន៍​មកកាន់ %1$s</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_qr_code" comment="QR Code description">      ស្កេនកូដ​នេះដើម្បី​ផ្ទុក​ក្ដារចុចនេះ\n​នៅ​លើ​ឧបករណ៍​ផ្សេង</string>
     <!-- Context: Query for associated dictionary -->
