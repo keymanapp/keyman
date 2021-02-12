@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2021-02-12 13.0.116 stable
+* Bug fix(Windows): Add code signature to tsysinfox64.exe (#4884)
+
 ## 2020-10-08 13.0.113 stable
 * Bug fix(Windows): Fix situation where Keyman might not work with Windows Store apps (#3667)
 
@@ -20,7 +23,7 @@
 * Bug Fix(System): Keyman was not working with Skype, Windows Search on some systems (#2316, 12.0:#2324)
 
 ## 2019-12-01 12.0.59 stable
-* Bug Fix: Using supplementary plane characters could cause rules to fail to match (#2400) 
+* Bug Fix: Using supplementary plane characters could cause rules to fail to match (#2400)
 
 ## 2019-11-15 12.0.54 stable
 * Bug Fix: On Screen Keyboard restored to wrong screen and position when reloading (#2341)
