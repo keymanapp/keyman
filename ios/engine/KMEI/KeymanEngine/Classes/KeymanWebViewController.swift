@@ -366,7 +366,9 @@ extension KeymanWebViewController {
    * thereafter for settings updates.
    */
   func setSentryState(enabled: Bool = SentryManager.enabled) {
-    webView?.evaluateJavaScript("sentryManager.enabled = \(enabled ? "true" : "false")")
+    // This may be called before the page - and thus the `sentryManager` variable -
+    // is ready.  It's a known limitation, so why log error reports for it?
+    webView?.evaluateJavaScript("try { sentryManager.enabled = \(enabled ? "true" : "false") } catch(err) { }")
   }
 }
 
