@@ -165,8 +165,8 @@ build-release-wrapper: clean-output global-versions
     cd $(ROOT)\src
     $(MAKE) dirs
     $(MAKE) build-tools
-    $(MAKE) build unit-tests
-    $(MAKE) build-release
+    $(MAKE) -DSIGNCODE_BUILD build unit-tests
+    $(MAKE) -DSIGNCODE_BUILD build-release
     $(MAKE) signcode
     $(MAKE) -DTARGET=test test
     $(MAKE) backup
