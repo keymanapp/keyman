@@ -231,11 +231,12 @@ export const sendCommentToPullRequestAndRelatedIssues = async (
       .then(() => {
         console.log(`Creating comment on Pull Request #${pull}`);
         return octokit.issues.createComment({
-        owner: 'keymanapp',
-        repo: 'keyman',
-        issue_number: pull,
-        body: messagePull,
-      })});
+          owner: 'keymanapp',
+          repo: 'keyman',
+          issue_number: pull,
+          body: messagePull,
+        })
+      });
   });
 
   return result;
