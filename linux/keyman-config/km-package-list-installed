@@ -7,11 +7,11 @@ from keyman_config import __version__
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Show installed Keyman keyboards with name, version, id.')
+    parser = argparse.ArgumentParser(description='Show installed Keyman keyboard packages with name, version, id.')
     parser.add_argument('-l', "--long", help='long format also shows description', action="store_true")
-    parser.add_argument('-s', "--shared", help='show those installed in shared areas', action="store_true")
+    parser.add_argument('-s', "--shared", help='show those installed in shared area', action="store_true")
     parser.add_argument('-o', "--os", help='show those installed by the OS', action="store_true")
-    parser.add_argument('-u', "--user", help='show those installed in user areas', action="store_true")
+    parser.add_argument('-u', "--user", help='show those installed in user area', action="store_true")
     parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
@@ -25,18 +25,28 @@ def main():
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
     all = not args.user and not args.shared and not args.os
-    from keyman_config.list_installed_kmp import get_installed_kmp, InstallArea
+    from keyman_config.list_installed_kmp import get_installed_kmp, get_install_area_path, InstallArea
     if args.user or all:
         installed_kmp = get_installed_kmp(InstallArea.IA_USER)
-        print("--- Installed user keyboards ---")
+        if args.verbose or args.veryverbose:
+            print("--- Installed user Keyman keyboard packages (%s) ---" % (get_install_area_path(InstallArea.IA_USER)))
+        else:
+            print("--- Installed user Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
     if args.shared or all:
         installed_kmp = get_installed_kmp(InstallArea.IA_SHARED)
-        print("--- Installed shared keyboards ---")
+        if args.verbose or args.veryverbose:
+            print("--- Installed shared Keyman keyboard packages (%s) ---" %
+                  (get_install_area_path(InstallArea.IA_SHARED)))
+        else:
+            print("--- Installed shared Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
     if args.os or all:
         installed_kmp = get_installed_kmp(InstallArea.IA_OS)
-        print("--- Installed OS keyboards ---")
+        if args.verbose or args.veryverbose:
+            print("--- Installed OS Keyman keyboard packages (%s) ---" % (get_install_area_path(InstallArea.IA_OS)))
+        else:
+            print("--- Installed OS Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
 
 
@@ -45,10 +55,10 @@ def print_keyboards(installed_kmp, verbose):
         print(installed_kmp[packageID]['name'] + ", version:", installed_kmp[packageID]['version'] + ", id:", packageID)
         if verbose:
             if installed_kmp[packageID]['version'] != installed_kmp[packageID]['kmpversion']:
-                print("Version mismatch. Installed keyboard is %s. Website says it is %s."
+                print("Version mismatch. Installed keyboard package is %s. Website says it is %s."
                       % (installed_kmp[packageID]['kmpversion'], installed_kmp[packageID]['version']))
             if installed_kmp[packageID]['name'] != installed_kmp[packageID]['kmpname']:
-                print("Name mismatch. Installed keyboard is %s. Website says it is %s."
+                print("Name mismatch. Installed keyboard package is %s. Website says it is %s."
                       % (installed_kmp[packageID]['name'], installed_kmp[packageID]['kmpname']))
 
             if installed_kmp[packageID]['description']:
