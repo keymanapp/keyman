@@ -1,7 +1,7 @@
 # Keyman Desktop Version History
 
 ## 2021-02-12 13.0.116 stable
-* Bug fix(Windows): Add code signature to tsysinfox64.exe (#4884)
+* Bug fix(Windows): Add code signature to tsysinfox64.exe (#4887)
 
 ## 2020-10-08 13.0.113 stable
 * Bug fix(Windows): Fix situation where Keyman might not work with Windows Store apps (#3667)
