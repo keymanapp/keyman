@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.243 beta 2021-02-12
+
+* change(ios/app): Generate offline help from markdown (#4470)
+* fix(windows): tsysinfox64 not signed (#4486)
+* chore(android/app): Update help formatting and images (#4485)
+* fix(android/engine): Display welcome.htm help within the app (#4477)
+* fix(ios): tutorial's link to "Add a Keyboard" links directly to keyboard search (#4491)
+* feat(linux): Improve output of km-package-list-installed (#4481)
+
 ## 14.0.242 beta 2021-02-11
 
 * fix(android/engine): Display online keyboard help (#4462)
