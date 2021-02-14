@@ -38,12 +38,4 @@
         <item name="android:textColorSecondary">@android:color/black</item>
     </style>
 
-    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
-        <item name="android:colorAccent">@color/keyman_blue</item>
-    </style>
-
-    <style name="AppTheme.Dialog.Alert" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:colorAccent">@color/keyman_blue</item>
-    </style>
-
 </resources>
