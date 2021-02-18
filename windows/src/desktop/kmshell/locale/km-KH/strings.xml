@@ -589,7 +589,7 @@
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">Unable to contact keyman.com - please make sure you have an active Internet connection and try again.  The error received was: %1$s</string>
+  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">មិន​អាច​ទាក់ទង keyman.com បានទេ - សូម​ប្រាកដ​ថា​អ្នក​មាន​អ៊ីនធើណិត ហើយ​ព្យាយាម​ម្ដងទៀត។ បញ្ហា​ដែល​ទទួល​បាន​គឺ៖ %1$s</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
@@ -670,12 +670,12 @@
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">Exit Keyman\?</string>
+  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">បិទ Keyman?</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: Hint -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">Are you sure you want to exit Keyman\?  Your Keyman keyboards will still be listed in the Windows languages, but will not be functional until you restart Keyman.</string>
+  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">តើ​អ្នក​ពិត​ជា​ចង់​បិទ Keyman ឬ? ក្ដារចុច Keyman របស់​អ្នក​នឹង​នៅ​តែ​មាន​ក្នុង​បញ្ជី​ភាសា​របស់ Windows ដដែល ប៉ុន្តែនឹង​មិន​ដំណើរការ​ទេ បើ​អ្នក​មិន​បើក Keyman ឡើង​វិញ។</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
@@ -786,7 +786,7 @@
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSplashVersion" comment="Version number">Version %1$s</string>
+  <string name="SKSplashVersion" comment="Version number">ជំនាន់ %1$s</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.239.0 -->
