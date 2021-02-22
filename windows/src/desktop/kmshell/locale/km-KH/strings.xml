@@ -863,39 +863,39 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">The Character Map has a database of characters that needs to be built before it can be used.  Build it now\?</string>
+  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">\"តារាង​តួ​អក្សរ\" មាន​មូលដ្ឋាន​ទិន្នន័យ​នៃ​តួអក្សរ​ដែល​តម្រូវ​ឱ្យ​បង្កើត មុនពេល​អាច​ប្រើ​វា​បាន។ បង្កើត​វា​ឥឡូវ?</string>
   <!-- Parameters: %1$s = Error detail string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">The Unicode Character database could not be deleted for a rebuild.  Error details are: %1$s</string>
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">មិន​អាច​លុបមូលដ្ឋាន​ទិន្នន័យ​នៃ \"តួអក្សរ​យូនីកូដ\" សម្រាប់ការ​បង្កើត​ថ្មី​បាន​ទេ។ ព័ត៌មាន​លម្អិត​នៃ​បញ្ហា​គឺ៖ %1$s</string>
   <!-- Parameters: %1$s = Error details -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">The Unicode Character database could not be created and has been disabled.  Error details are: %1$s</string>
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">មិន​អាច​បង្កើត​មូលដ្ឋាន​ទិន្នន័យ​នៃ \"តួអក្សរ​យូនីកូដ\" បាន​ទេ។ វាត្រូវ​បាន​បិទ​ហើយ។ ព័ត៌មាន​លម្អិត​នៃ​បញ្ហា​គឺ៖ %1$s</string>
   <!-- Parameters: %1$s = Error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">The Unicode character database did not load successfully (%1$s).  Rebuild it now\?</string>
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">មូលដ្ឋាន​ទិន្នន័យ​តួអក្សរ​យូនីកូដ​មិន​បាន​ផ្ទុក​ដោយ​ជោគជ័យ​ទេ (%1$s)។ បង្កើត​ថ្មី​ឥឡូវ?</string>
   <!-- Parameters: %1$s: error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman failed to start.  Please check your security settings to make sure that the program keyman.exe is allowed to start before continuing.  The error returned was:\n\n\"%1$s\"\n\nDo you want to try and start Keyman again now\?</string>
+  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">មិន​អាច​បើក Keyman បាន​ទេ។ សូម​ពិនិត្យ​មើល​ការកំណត់​សុវត្ថិភាព​របស់​អ្នក ដើម្បី​ប្រាកដថា​បាន​អនុញ្ញាត​ឱ្យ​កម្មវិធី keyman.exe ចាប់ផ្ដើម មុន​ពេល​បន្ត​ទៅ​ជំហាន​បន្ទាប់។ បញ្ហា​ដែល​បាន​កើតឡើង​គឺ៖\n\n\"%1$s\"\n\nតើ​អ្នក​ចង់​ព្យាយាម​ចាប់ផ្ដើម Keyman ម្ដងទៀត​ឬនៅ​ពេល​នេះ?</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information will be stored in a log file called %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). You should exit Keyman before attempting to delete this file.\n\n\WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.\n\nPRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា​ Keyman នឹង​ត្រូវ​បាន​រក្សា​ទុក​ក្នុង​ឯកសារ​កំណត់ហេតុ​ដែល​មាន​ឈ្មោះ​ថា %LOCALAPPDATA%\Keyman\Diag\system#.etl (# ជា​តួ​លេខ)។ អ្នក​គួរ​តែ​បិទ Keyman មុន​ពេល​លុប​ឯកសារ​នេះ។\n\nការព្រមាន៖ ឯកសារ​នេះ​អាច​មាន​ទំហំ​ធំទៅៗ យ៉ាង​លឿន។ ការបើក​ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា (debugging) អាច​ធ្វើ​ឱ្យ​កុំព្យូទ័រ​របស់​អ្នក​ដើរ​យឺត ដូច្នេះ​អ្នក​គួរ​តែ​បើក​វា​តែ​នៅ​ពេល​ដែល​អ្នក​ជំនាញ​បច្ចេកទេសប្រាប់​អ្នក​ឱ្យបើក​ប៉ុណ្ណោះ។\n\nការព្រមាន​អំពី​ឯកជនភាព៖ សូម​ចំណាំ​ថា​ឯកសារកំណត់ហេតុ​ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា​រក្សា​ទុក​គ្រប់​ការចុចទាំង​អស់​របស់​អ្នក។ អ្នក​គួរ​បើក​វា​តែ​នៅ​ក្នុង​អំឡុង​ពេល​ដែល​អ្នក​កំពុង​ដោះស្រាយ​បញ្ហា ឬ​វិភាគ​បញ្ហា​ប៉ុណ្ណោះ។</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Please wait while searching for related fonts for keyboard %1$s</string>
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">សូម​រង់ចាំ​ ពេល​កំពុង​ស្វែង​រក​ពុម្ព​អក្សរ​ពាក់ព័ន្ធ​សម្រាប់​ក្ដារចុច %1$s</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">Keyboard %1$s is not a Unicode keyboard. Fonts cannot be automatically located.  Please check the keyboard documentation for font information.</string>
+  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">ក្ដារចុច %1$s មិន​មែន​ជា​ក្ដារចុច​យូនីកូដ​ទេ។ មិន​អាច​រកឃើញ​ពុម្ព​អក្សរ​ដោយ​ស្វ័យ​ប្រវត្តិ​បាន​ទេ។  សូម​ពិនិត្យ​មើល​ឯកសារ​ក្ដារចុច​អំពី​ព័ត៌មាន​ទាក់ទង​នឹង​ពុម្ព​អក្សរ។</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
