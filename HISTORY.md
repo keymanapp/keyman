@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.244 beta 2021-02-22
+
+* fix(common/models): merges identical suggestions after casing (#4502)
+* fix(web): macOS 11 agent string parsing (#4497)
+* fix(ios): app logging messages were transient, never stored (#4500)
+* chore(ios): web-side sentry enablement try-catch (#4492)
+
 ## 14.0.243 beta 2021-02-12
 
 * change(ios/app): Generate offline help from markdown (#4470)
