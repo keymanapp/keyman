@@ -10,8 +10,7 @@ import KeymanEngine
 
 class KeyboardViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    KeymanEngine.log.outputLevel = .debug
-    KeymanEngine.log.logAppDetails()
+    _ = log // forces init of the log, which is useful in sys-kbd contexts.
     Manager.applicationGroupIdentifier = "group.KMEI"
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
