@@ -72,8 +72,6 @@
 * fix(windows): Track modifier changes in UWP apps (#4468)
 * fix(common/resources): Fix help.keyman.com path for commit (#4469)
 * fix(common): create GitHub comments serially (#4472)
-* feat(common/models): mid-context suggestions & reversions, fix(common/models): correction-search SMP issues (#4427)
-* fix(linux): Fix dependencies on packages (#4464)
 * chore(linux): Improve launchpad.sh script (#4355)
 * chore: merge B14S5 beta to master (#4432)
 * chore: B14S6 beta to master merge (#4473)
