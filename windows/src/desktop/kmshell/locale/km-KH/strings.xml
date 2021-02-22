@@ -859,7 +859,7 @@
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.1.270.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">The following fonts will also be uninstalled: %1$s.</string>
+  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">ពុម្ព​អក្សរ​ទាំង​នេះ​ក៏​នឹង​ត្រូវ​​លុបផងដែរ៖ %1$s។</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
