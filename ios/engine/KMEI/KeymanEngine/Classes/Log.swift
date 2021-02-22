@@ -8,4 +8,19 @@
 
 import XCGLogger
 
-public let log = XCGLogger(identifier: "KeymanEngine", includeDefaultDestinations: true)
+public let log: XCGLogger = {
+  // Default:  the 'console', which is read by Xcode but doesn't reach the system logs.
+  let mainLog = XCGLogger(identifier: "KeymanEngine", includeDefaultDestinations: true)
+
+  // Ensures our log messages go out to the device's system log.
+  let systemLogDest = AppleSystemLogDestination(identifier: "")
+  systemLogDest.showLogIdentifier = true
+#if DEBUG
+  systemLogDest.outputLevel = .debug
+#else
+  systemLogDest.outputLevel = .warning
+#endif
+  mainLog.add(destination: systemLogDest)
+
+  return mainLog
+}()
