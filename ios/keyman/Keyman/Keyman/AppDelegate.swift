@@ -54,19 +54,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
     SentryManager.start()
+    // Forces the logs to initialize, as their definitions result in lazy init.
+    // These references have been configured to also log app details.
+    _ = log
+    _ = KeymanEngine.log
 
     UniversalLinks.externalLinkLauncher = { url in
       UIApplication.shared.openURL(url)
     }
-
-    #if DEBUG
-      KeymanEngine.log.outputLevel = .debug
-      log.outputLevel = .debug
-      KeymanEngine.log.logAppDetails()
-    #else
-      KeymanEngine.log.outputLevel = .warning
-      log.outputLevel = .warning
-    #endif
 
     Manager.applicationGroupIdentifier = "group.KM4I"
 
