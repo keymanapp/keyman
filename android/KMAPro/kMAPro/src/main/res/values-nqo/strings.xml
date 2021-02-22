@@ -106,8 +106,6 @@
   <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Failed to extract</string>
   <!-- Context: KMP Package strings -->
   <string name="install_keyboard_package" comment="Title to install keyboard package">Install Keyboard</string>
-  <!-- Context: KMP Package welcome.htm title -->
-  <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Welcome to %1$s</string>
   <!-- Context: KMP Package strings -->
   <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Dictionary</string>
   <!-- Context: KMP Package strings -->
