@@ -96,8 +96,9 @@ are scattered over several source repos:
 
 ### Flow of a Linux package build
 
-- [TeamCity job](https://build.palaso.org/buildConfiguration/Keyman_Test?) triggers a build on
-  [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
+- TeamCity jobs [Keyman_Test](https://build.palaso.org/buildConfiguration/Keyman_Test) or
+  [Keyman_TriggerReleaseBuilds*](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsBeta)
+  trigger a build on [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
 - Jenkins verifies the build parameters and starts the matching build configuration for the PR or
   branch
 - The [build job](https://github.com/sillsdev/lsdev-pipeline-library/blob/master/vars/keymanPackaging.groovy) runs several checks:
@@ -126,6 +127,11 @@ The Jenkins build progress is visible in two ways:
 
 - [traditional view](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
 - [blue ocean view](https://jenkins.lsdev.sil.org/blue/organizations/jenkins/pipeline-keyman-packaging/activity)
+
+**Note:** TC release builds pass the git tag to build to the Jenkins job. The same tag
+gets passed twice as parameters `tag` and `tag2`. The first parameter gets persisted between
+builds, allowing to retrigger a tag-build. The second parameter is necessary to distinguish
+if this is a retriggered build of a tag-build.
 
 ### Local package builds
 
