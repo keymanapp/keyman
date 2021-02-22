@@ -67,6 +67,8 @@
     <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_qr_code" comment="QR Code description">      Scan this code to load this\nkeyboard on another device</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Welcome to %1$s</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
     <!-- Context: Model Updates -->
