@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 15.0.17 alpha 2021-02-22
+
+* chore(windows): FirstVoices Keyboards Configuration merge (#4458)
+* chore(mac): Check in markdown help (#4479)
+* fix(common/core/web): mock construction with caret at index 0 (#4474)
+* change(oem/fv/ios): FV keyboards now package-based (#4471)
+* fix(linux): Fix dependencies on packages (#4464)
+* change(ios/app): Generate offline help from markdown (#4470)
+* fix(windows): tsysinfox64 not signed (#4486)
+* chore(android/app): Update help formatting and images (#4485)
+* fix(android/engine): Display welcome.htm help within the app (#4477)
+* fix(ios): tutorial's link to "Add a Keyboard" links directly to keyboard search (#4491)
+* feat(linux): Improve output of km-package-list-installed (#4481)
+* chore: merge B14S6 beta to alpha (#4503)
+
 ## 15.0.16 alpha 2021-02-11
 
 * fix(android/app): Wrap preference screen titles (#4326)
