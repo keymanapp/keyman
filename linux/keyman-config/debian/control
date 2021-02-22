@@ -19,10 +19,9 @@ Build-Depends:
  python3-pil,
  python3-pip,
  python3-qrcode,
- python3-raven <pkg.keyman-config.bionic>,
+ python3-raven | python3-sentry-sdk,
  python3-requests,
  python3-requests-cache,
- python3-sentry-sdk <pkg.keyman-config.focal>,
  python3-setuptools,
 Standards-Version: 4.5.0
 Vcs-Git: https://github.com/keymanapp/keyman.git
@@ -71,8 +70,7 @@ Depends:
  kmflcomp (>=10.99.33),
  python3-bs4,
  python3-gi,
- python3-raven <pkg.keyman-config.bionic>,
- python3-sentry-sdk <pkg.keyman-config.focal>,
+ python3-raven | python3-sentry-sdk,
  ${misc:Depends},
  ${python3:Depends},
 Description: Keyman for Linux configuration

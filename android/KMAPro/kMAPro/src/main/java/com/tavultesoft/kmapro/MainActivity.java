@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.tavultesoft.kmea.BaseActivity;
+import com.tavultesoft.kmea.KMHelpFileActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -35,7 +36,6 @@ import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
-import com.tavultesoft.kmea.util.HelpFile;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 
@@ -967,11 +967,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (customHelpLink != null && !customHelpLink.isEmpty() &&
         packageID != null && !packageID.isEmpty() && FileUtils.isWelcomeFile(customHelpLink)) {
       // Display local welcome.htm help file, including associated assets
-      Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
-
-      if (FileProviderUtils.exists(context)) {
-        startActivity(i);
-      }
+      Intent i = new Intent(this, KMHelpFileActivity.class);
+      // Have to use packageID since we don't store the package name
+      i.putExtra(KMManager.KMKey_PackageID, packageID);
+      i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
+      startActivity(i);
     }
   }
 

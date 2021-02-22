@@ -204,45 +204,52 @@ assertDirExists "$FRAMEWORK_PATH_UNIVERSAL"
 echo "KMEI build complete."
 
 if [ $DO_KEYMANAPP = true ]; then
-    # Provides a needed link for codesigning for our CI.
-    if ! [ -z "${DEVELOPMENT_TEAM}" ]; then
-      DEV_TEAM="DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM}"
+  echo ""
+  echo "Building offline help."
+  ./build-help.sh html
+
+  echo ""
+  echo "Building Keyman app."
+
+  # Provides a needed link for codesigning for our CI.
+  if ! [ -z "${DEVELOPMENT_TEAM}" ]; then
+    DEV_TEAM="DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM}"
+  fi
+
+  if [ $DO_ARCHIVE = false ]; then
+    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+                VERSION=$VERSION \
+                VERSION_WITH_TAG=$VERSION_WITH_TAG \
+                VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+                UPLOAD_SENTRY=$UPLOAD_SENTRY
+
+    if [ $? -ne 0 ]; then
+      fail "Keyman app build failed."
     fi
 
-    if [ $DO_ARCHIVE = false ]; then
-      xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
-                 VERSION=$VERSION \
-                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
-                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
-                 UPLOAD_SENTRY=$UPLOAD_SENTRY
-
-      if [ $? -ne 0 ]; then
-        fail "Keyman app build failed."
-      fi
-
-    else
-      # Time to prepare the deployment archive data.
-      echo ""
-      echo "Preparing .ipa file for deployment."
-      xcodebuild $XCODEFLAGS_EXT -scheme Keyman \
-                 -archivePath $ARCHIVE_PATH \
-                 archive -allowProvisioningUpdates \
-                 VERSION=$VERSION \
-                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
-                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
-                 UPLOAD_SENTRY=$UPLOAD_SENTRY
-
-      assertDirExists "$ARCHIVE_PATH"
-
-      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
-                 -exportOptionsPlist exportAppStore.plist \
-                 -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
-    fi
-
+  else
+    # Time to prepare the deployment archive data.
     echo ""
-    if [ $? = 0 ]; then
-        echo "Build succeeded."
-    else
-        fail "Build failed - please see the log above for details."
-    fi
+    echo "Preparing .ipa file for deployment."
+    xcodebuild $XCODEFLAGS_EXT -scheme Keyman \
+                -archivePath $ARCHIVE_PATH \
+                archive -allowProvisioningUpdates \
+                VERSION=$VERSION \
+                VERSION_WITH_TAG=$VERSION_WITH_TAG \
+                VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+                UPLOAD_SENTRY=$UPLOAD_SENTRY
+
+    assertDirExists "$ARCHIVE_PATH"
+
+    xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
+                -exportOptionsPlist exportAppStore.plist \
+                -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
+  fi
+
+  echo ""
+  if [ $? = 0 ]; then
+      echo "Build succeeded."
+  else
+      fail "Build failed - please see the log above for details."
+  fi
 fi

@@ -1,9 +1,8 @@
 /*
- * Copyright (C) 2019 SIL International. All rights reserved.
+ * Copyright (C) 2019-2021 SIL International. All rights reserved.
  */
 package com.tavultesoft.kmapro;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -11,18 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.DialogFragment;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.core.content.FileProvider;
 
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -31,21 +26,14 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tavultesoft.kmea.ConfirmDialogFragment;
+import com.tavultesoft.kmea.KMHelpFileActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.impl.CloudKeyboardPackageDownloadCallback;
-import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
-import com.tavultesoft.kmea.util.HelpFile;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
@@ -177,11 +165,11 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
         } else if (itemTitle.equals(getString(R.string.help_link))) {
           if (FileUtils.isWelcomeFile(customHelpLink)) {
             // Display local welcome.htm help file, including associated assets
-            Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
-
-            if (FileProviderUtils.exists(context) || KMManager.isTestMode()) {
-              startActivity(i);
-            }
+            Intent i = new Intent(context, KMHelpFileActivity.class);
+            // Have to use package ID since we don't store the package name
+            i.putExtra(KMManager.KMKey_PackageID, packageID);
+            i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
+            startActivity(i);
           } else {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(customHelpLink));

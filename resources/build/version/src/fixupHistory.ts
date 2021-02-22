@@ -223,17 +223,20 @@ export const sendCommentToPullRequestAndRelatedIssues = async (
   // https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-abuse-rate-limits
   let result: Promise<any> = Promise.resolve();
   pulls.forEach(pull => {
-    console.log(`Creating comment on Pull Request #{pull}`);
+
     result = result
       // At least 1 second delay between requests; we'll do 10 seconds
       .then(() => new Promise(resolve => setTimeout(resolve, 10000)))
       // Always serially rather than in parallel
-      .then(() => octokit.issues.createComment({
-        owner: 'keymanapp',
-        repo: 'keyman',
-        issue_number: pull,
-        body: messagePull,
-      }));
+      .then(() => {
+        console.log(`Creating comment on Pull Request #${pull}`);
+        return octokit.issues.createComment({
+          owner: 'keymanapp',
+          repo: 'keyman',
+          issue_number: pull,
+          body: messagePull,
+        })
+      });
   });
 
   return result;

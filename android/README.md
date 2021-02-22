@@ -4,6 +4,7 @@
 * Android Studio 4.1+
 * Java SE Development Kit 8 
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+* [Pandoc](#Install-Pandoc) for generating offline help
 
 ## Install Java
 It is recommended to use openJDK because of oracle license issues.

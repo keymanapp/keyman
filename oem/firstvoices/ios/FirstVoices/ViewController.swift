@@ -22,22 +22,6 @@ class ViewController: UIViewController, UIWebViewDelegate {
     super.viewDidLoad()
 
     //
-    // Install all the .js files into Keyman Engine (doesn't show them in the keyboard list)
-    //
-
-    let kbPaths: [String] = Bundle.main.paths(forResourcesOfType: FVConstants.keyboardType,
-                                              inDirectory: FVConstants.keyboardsPath)
-    for kbPath in kbPaths {
-      let pathUrl = URL(fileURLWithPath: kbPath)
-      let id = pathUrl.deletingPathExtension().lastPathComponent
-      do {
-        try Manager.shared.preloadFiles(forKeyboardID: id, at: [pathUrl], shouldOverwrite: true)
-      } catch {
-        print("Failed to preload "+id+": "+error.localizedDescription)
-      }
-    }
-
-    //
     // Show Instructions page
     //
 

@@ -104,8 +104,6 @@
   <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">មិន​អាច​ស្រង់​ចេញបាន​ទេ</string>
   <!-- Context: KMP Package strings -->
   <string name="install_keyboard_package" comment="Title to install keyboard package">ដំឡើង​ក្ដារចុច</string>
-  <!-- Context: KMP Package welcome.htm title -->
-  <string name="welcome_package" comment="Title to welcome.htm page (name and version)">ស្វាគមន៍​មកកាន់ %1$s</string>
   <!-- Context: KMP Package strings -->
   <string name="install_predictive_text_package" comment="Title to install dictionary package">ដំឡើង​បញ្ជី​ពាក្យ</string>
   <!-- Context: KMP Package strings -->

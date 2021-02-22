@@ -43,27 +43,29 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   func reloadKeymanHelp() {
-    let networkStatus = networkReachable?.connection
-    switch networkStatus {
-    case Reachability.Connection.none?:
+    if let networkStatus = networkReachable?.connection {
+      switch networkStatus {
+      case Reachability.Connection.none, Reachability.Connection.unavailable:
+        loadFromLocal()
+      default:
+        loadFromServer()
+      }
+    } else {
       loadFromLocal()
-    default:
-      loadFromServer()
     }
   }
 
   private func loadFromLocal() {
     let offlineHelpBundle = Bundle(path: Bundle.main.path(forResource: "OfflineHelp", ofType: "bundle")!)!
 
-    // Yes, .php.html.  That's how `wget` is set to retrieve it, since Safari won't recognize the contents
-    // without the .html ending, it seems.
-    let filePath = offlineHelpBundle.path(forResource: "index.php", ofType: "html", inDirectory: nil)
+    // Safari won't recognize the contents without the .html ending.
+    let filePath = offlineHelpBundle.path(forResource: "index", ofType: "html", inDirectory: nil)
     webView.loadRequest(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
 
   private func loadFromServer() {
     let appVersion = Version.current.majorMinor
-    let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.plainString)/?embed=ios"
+    let url =  "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)/"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     log.debug("Info page URL: \(url)")
   }

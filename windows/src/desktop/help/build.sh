@@ -136,7 +136,7 @@ build_hhc() {
 # Compile all .md to .htm
 #
 
-MDLUA="$THIS_DIR/htmlink.lua"
+MDLUA="$KEYMAN_ROOT/resources/build/htmlink.lua"
 MD=`find -name "*.md"`
 DESTCHM="$THIS_DIR/../../../bin/help/desktop"
 

@@ -536,7 +536,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let installedLanguagesVC = InstalledLanguagesViewController()
     nc.pushViewController(installedLanguagesVC, animated: true)
 
-    self.present(nc, animated: true)
+    self.present(nc, animated: true) {
+      // Requires a host NavigationViewController, hence calling it afterward.
+      installedLanguagesVC.launchKeyboardSearch()
+    }
   }
 
   @objc func actionButtonClick(_ sender: Any) {
