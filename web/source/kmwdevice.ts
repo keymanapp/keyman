@@ -91,6 +91,7 @@ namespace com.keyman {
           if(!results) {
             console.warn("KMW could not properly parse the user agent string."
               + "A suboptimal keyboard layout may result.");
+            this.OS='MacOSX';
           } else if(results.length > 1 && results[1]) {
             // Convert version string into a usable form.
             let versionString = results[1].replace('_', '.');
