@@ -56,7 +56,7 @@ namespace com.keyman.text {
      * 
      * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
      */
-    processKeyEvent(keyEvent: KeyEvent) {
+    processKeyEvent(keyEvent: KeyEvent): RuleBehavior {
       let formFactor = keyEvent.device.formFactor;
 
       // Determine the current target for text output and create a "mock" backup
@@ -70,14 +70,14 @@ namespace com.keyman.text {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.keyboardProcessor.selectLayer(keyEvent)) {
-          return true;
+          return new RuleBehavior();
         }
       }
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
       // of state management.
       if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, !fromOSK)) {
-        return true;
+        return new RuleBehavior();
       }
 
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
@@ -88,10 +88,10 @@ namespace com.keyman.text {
 
         // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
         if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
-          return;
+          return new RuleBehavior();
           // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
         } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && this.languageProcessor.tryAcceptSuggestion('space')) {
-          return;
+          return new RuleBehavior();
         }
       }
 
