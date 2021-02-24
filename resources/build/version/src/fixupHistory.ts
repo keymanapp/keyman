@@ -168,7 +168,7 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<{count: n
     }
 
     if(!found) {
-      const entry = `* ${pull.title} (#${pull.number})`;
+      const entry = (pull.number == 0) ? `* ${pull.title}` : `* ${pull.title} (#${pull.number})`;
       console.log(`-- Adding ${entry}`);
       historyChunks.current.splice(2, 0, entry);
       currentPulls.push(pull.number);
@@ -246,12 +246,12 @@ export const sendCommentToPullRequestAndRelatedIssues = async (
  * Adds any outstanding pull request titles to HISTORY.md for the current
  * version. Retrieves pull request details from GitHub.
  * @returns number of history entries for the current version,
- *          0 if no pulls associated with the current vesrion, or
+ *          0 if no pulls associated with the current version, or
  *          -1 on error.
  */
 
 export const fixupHistory = async (
-  octokit: GitHub, base: string
+  octokit: GitHub, base: string, force: boolean
 ): Promise<number> => {
 
   //
@@ -269,7 +269,7 @@ export const fixupHistory = async (
   //
 
   const git_result = (await spawnChild('git', ['log', '--merges', /*'--first-parent',*/ '--format=%H', base, `${commit_id}..`])).trim();
-  if(git_result.length == 0) {
+  if(git_result.length == 0 && !force) {
     // We won't throw on this
     logWarning('No pull requests found since previous increment');
     return 0;
@@ -284,13 +284,21 @@ export const fixupHistory = async (
 
   let pulls: PRInformation[] = [];
 
-  for(const commit of new_commits) {
-    const pr = await getAssociatedPRInformation(octokit, commit);
-    if(pr === undefined) {
-      logWarning(`commit ref ${commit} has no associated pull request.`);
-      continue;
+  if(git_result.length == 0) {
+    pulls.push({
+      title: 'No changes made',
+      number: 0
+    });
+  }
+  else {
+    for(const commit of new_commits) {
+      const pr = await getAssociatedPRInformation(octokit, commit);
+      if(pr === undefined) {
+        logWarning(`commit ref ${commit} has no associated pull request.`);
+        continue;
+      }
+      pulls.push(pr);
     }
-    pulls.push(pr);
   }
 
   //logInfo(JSON.stringify(pulls, null, 2));
@@ -305,7 +313,9 @@ export const fixupHistory = async (
   // Write a comment to GitHub for each of the pulls
   //
 
-  await sendCommentToPullRequestAndRelatedIssues(octokit, historyResult.pulls);
+  if(git_result.length > 0) {
+    await sendCommentToPullRequestAndRelatedIssues(octokit, historyResult.pulls);
+  }
 
   return historyResult.count;
 };
