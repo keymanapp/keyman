@@ -55,6 +55,8 @@ namespace com.keyman.text {
      * Handles default output and keyboard processing for both OSK and physical keystrokes.
      * 
      * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
+     * @returns     {Object}             A RuleBehavior object describing the cumulative effects of
+     *                                   all matched keyboard rules.
      */
     processKeyEvent(keyEvent: KeyEvent): RuleBehavior {
       let formFactor = keyEvent.device.formFactor;
@@ -171,15 +173,6 @@ namespace com.keyman.text {
         }
       }
 
-      /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
-
-      // TODO:  rework the return value to be `ruleBehavior` instead.  Functions that call this one are
-      //        the ones that should worry about event handler returns, etc.  Not this one.
-      //
-      //        They should also be the ones to handle the TODOs seen earlier in this function -
-      //        once THOSE are properly relocated.  (They're too DOM-heavy to remain in web-core.)
-
-      // Only return true (for the eventual event handler's return value) if we didn't match a rule.
       return ruleBehavior;
     }
 
