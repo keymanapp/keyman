@@ -69,6 +69,7 @@ namespace com.keyman.dom.targets {
         this.insertTextBeforeCaret('\n');
       } else if(dom.Utils.instanceof(this.root.base, "HTMLInputElement")) {
         // HTMLInputElements do not permit newlines; they instead have DOM-specific behaviors.
+        this.root.hideCaret();
         Input.newlineHandler(this.root.base as HTMLInputElement);
       } else {
         console.warn("TouchAlias OutputTarget cannot output newlines for unexpected base element types!");
