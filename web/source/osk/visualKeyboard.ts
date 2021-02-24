@@ -1010,10 +1010,8 @@ namespace com.keyman.osk {
         lDiv.appendChild(gDiv);
       }
 
-      if(!this.isStatic) {
-        // Now that we've properly processed the keyboard's layout, mark it as calibrated.
-        keyboard.markLayoutCalibrated(formFactor);
-      }
+      // Now that we've properly processed the keyboard's layout, mark it as calibrated.
+      keyboard.markLayoutCalibrated(formFactor);
       return lDiv;
     }
     //#endregion
