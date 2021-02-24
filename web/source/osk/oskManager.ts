@@ -261,8 +261,14 @@ namespace com.keyman.osk {
       }
 
       // Correct the classname for the (inner) OSK frame (Build 360)
+      var kbdID: string = (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
+      if(keymanweb.isEmbedded && kbdID.indexOf('::') != -1) {
+        // De-namespaces the ID for use with CSS classes.
+        // Assumes that keyboard IDs may not contain the ':' symbol.
+        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
+      }
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
-        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
+        kbdClass = ' kmw-keyboard-' + kbdID;
       if(innerFrame.id == 'keymanweb_title_bar') {
         // Desktop order is title_bar, banner_container, inner-frame
         innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;
