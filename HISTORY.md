@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.246 beta 2021-02-24
+
+* chore(common): allow forced version increment (#4522)
+
 ## 14.0.245 beta 2021-02-24
 
 * fix(common/core/web): core key-processing now always returns RuleBehavior type. (#4508)
