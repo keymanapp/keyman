@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.245 beta 2021-02-24
+
+* fix(common/core/web): core key-processing now always returns RuleBehavior type. (#4508)
+* fix(common/resources): Set help-keyman.com.sh executable (#4510)
+* fix(developer/compilers): fixes error when "constructor" is in wordlist (#4504)
+* fix(web): hides touch-alias caret when keystroke causes focus change (#4514)
+
 ## 14.0.244 beta 2021-02-22
 
 * fix(common/models): merges identical suggestions after casing (#4502)
