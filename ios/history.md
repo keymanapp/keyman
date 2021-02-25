@@ -1,6 +1,9 @@
 
 # Keyman for iPhone and iPad Version History
 
+## 2021-02-25 13.0.117 stable
+* Fixes an issue that sometimes prevented keyboard and dictionary installation (#4524)
+
 ## 2020-07-16 13.0.109 stable
 * Improve performance when typing long documents with predictive text (#3302)
 
