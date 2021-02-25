@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.247 beta 2021-02-25
+
+* fix(web): keyboard documentation patch-up (#4512)
+* fix(web): removes package namespacing from kbd's CSS class (#4516)
+
 ## 14.0.246 beta 2021-02-24
 
 * chore(common): allow forced version increment (#4522)
