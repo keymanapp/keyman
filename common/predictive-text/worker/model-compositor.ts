@@ -335,8 +335,18 @@ class ModelCompositor {
         // If we're mid-word, delete its original post-caret text.
         const tokenization = compositor.tokenize(context);
         if(tokenization && tokenization.caretSplitsToken) {
-          let righthandSplit = tokenization.right[0];
-          suggestion.transform.deleteRight = (suggestion.transform.deleteRight || 0) + righthandSplit.kmwLength();
+          // While we wait on the ability to provide a more 'ideal' solution, let's at least
+          // go with a more stable, if slightly less ideal, solution for now.
+          // 
+          // A predictive text default (on iOS, at least) - immediately wordbreak 
+          // on suggestions accepted mid-word.
+          suggestion.transform.insert += punctuation.insertAfterWord;
+
+          // // Unfortunately, we can't quite enable the next two lines in iOS yet; there's an
+          // // odd issue with its textDocumentProxy that gives us the wrong results.
+          // 
+          // let righthandSplit = tokenization.right[0];
+          // suggestion.transform.deleteRight = (suggestion.transform.deleteRight || 0) + righthandSplit.kmwLength();
         }
       }
 
