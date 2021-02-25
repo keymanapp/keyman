@@ -170,7 +170,7 @@ namespace com.keyman.osk {
     }
 
     getKeyWidth(osk: VisualKeyboard): number {
-      let units = this.objectUnits();
+      let units = this.objectUnits(osk.isStatic);
 
       if(units == 'px') {
         // For mobile devices, we presently specify width directly in pixels.  Just use that!
@@ -184,9 +184,9 @@ namespace com.keyman.osk {
       }
     }
 
-    objectUnits(): string {
+    objectUnits(isStatic: boolean): string {
       // Returns a unit string corresponding to how the width for each key is specified.
-      if(this.formFactor == 'desktop') {
+      if(this.formFactor == 'desktop' || isStatic) {
         return '%';
       } else {
         return 'px';
@@ -389,7 +389,7 @@ namespace com.keyman.osk {
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
-      ks.width=this.objectGeometry(spec['widthpc']);
+      ks.width=this.objectGeometry(spec['widthpc'], osk.isStatic);
 
       let originalPercent = totalPercent;
 
@@ -402,17 +402,19 @@ namespace com.keyman.osk {
       // Set key and button positioning properties.
       if(!isDesktop) {
         // Regularize interkey spacing by rounding key width and padding (Build 390)
-        ks.left=this.objectGeometry(totalPercent+spec['padpc']);
+        ks.left=this.objectGeometry(totalPercent+spec['padpc'], osk.isStatic);
         if(!osk.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
         ks.height=rowStyle.height;  // must be specified in px for rest of layout to work correctly
 
-        // Set distinct phone and tablet button position properties
-        btn.style.left=ks.left;
-        btn.style.width=ks.width;
+        if(!osk.isStatic) {
+          // Set distinct phone and tablet button position properties
+          btn.style.left=ks.left;
+          btn.style.width=ks.width;
+        }
       } else {
-        ks.marginLeft=this.objectGeometry(spec['padpc']);
+        ks.marginLeft=this.objectGeometry(spec['padpc'], osk.isStatic);
       }
 
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
@@ -461,8 +463,8 @@ namespace com.keyman.osk {
       return {element: kDiv, percent: totalPercent - originalPercent};
     }
 
-    objectGeometry(v: number): string {
-      let unit = this.objectUnits();
+    objectGeometry(v: number, isStatic: boolean): string {
+      let unit = this.objectUnits(isStatic);
       if(unit == '%') {
         return v + unit;
       } else { // unit == 'px'
@@ -889,7 +891,7 @@ namespace com.keyman.osk {
 
       // Get the actual available document width and scale factor according to device type
       var objectWidth : number;
-      if(formFactor == 'desktop') {
+      if(formFactor == 'desktop' || this.isStatic) {
         objectWidth = 100;
       } else {
         objectWidth = oskManager.getWidth();
@@ -943,7 +945,7 @@ namespace com.keyman.osk {
           // Apply defaults, setting the width and other undefined properties for each key
           keys=row['key'];
 
-          if(!precalibrated) {
+          if(!precalibrated || this.isStatic) {
             // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
             // adjusting the width of the last key to make the total exactly 100%.
             // Overwrite the previously-computed percent.
@@ -1008,7 +1010,7 @@ namespace com.keyman.osk {
         lDiv.appendChild(gDiv);
       }
 
-      // Now that we've properly processed the keyboard's layout, mark it as calib
+      // Now that we've properly processed the keyboard's layout, mark it as calibrated.
       keyboard.markLayoutCalibrated(formFactor);
       return lDiv;
     }
@@ -2336,7 +2338,9 @@ namespace com.keyman.osk {
 
         for(Ln=0; Ln<keyboardsList.length; Ln++) {
           if(p == keyboardsList[Ln]['KI'].toLowerCase().replace('keyboard_','')) {
-            PKbd=keyboardsList[Ln]; break;
+            // Requires the Keyboard wrapping object now.
+            PKbd = new com.keyman.keyboards.Keyboard(keyboardsList[Ln]);
+            break;
           }
         }
       }
