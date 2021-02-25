@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 2021-02-25 13.0.110 stable
+* Fixes issue with generation of keyboard documentation (#4518)
+
 ## 2020-04-15 13.0.106 stable
 * Fixes issues with matching input against possible predictions (#2957)
 * Adds support for use of web popup keys in embedded mode (#2970)
