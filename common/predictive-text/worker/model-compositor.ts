@@ -220,10 +220,15 @@ class ModelCompositor {
     }
 
     // Section 2 - post-analysis for our generated predictions, managing 'keep'.
-
     // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
     // When true, we can use an 'associative array' to de-duplicate everything.
     let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
+    let currentCasing: CasingForm = null;
+    if(lexicalModel.languageUsesCasing) {
+      currentCasing = this.detectCurrentCasing(postContext);
+    }
+
+    let baseWord = this.wordbreak(context);
 
     // Deduplicator + annotator of 'keep' suggestions.
     for(let prediction of rawPredictions) {
@@ -253,6 +258,16 @@ class ModelCompositor {
           keepOption.p += prediction.p;
         }
       } else {
+        // Apply capitalization rules now; facilitates de-duplication of suggestions
+        // that may be caused as a result.
+        //
+        // Example:  "apple" and "Apple" are separate when 'lower', but identical for 'initial' and 'upper'.
+        if(currentCasing && currentCasing != 'lower') {
+          this.applySuggestionCasing(prediction.sample, baseWord, currentCasing);
+          // update the mapping string, too.
+          displayText = prediction.sample.displayAs;
+        }
+
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
           existingSuggestion.p += prediction.p;
@@ -306,18 +321,9 @@ class ModelCompositor {
 
     // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
-    let currentCasing: CasingForm = null;
-    if(lexicalModel.languageUsesCasing) {
-      currentCasing = this.detectCurrentCasing(postContext);
-    }
 
     let compositor = this;
-    let baseWord = this.wordbreak(context);
     suggestions.forEach(function(suggestion) {
-      if(currentCasing && currentCasing != 'lower') {
-        compositor.applySuggestionCasing(suggestion, baseWord, currentCasing);
-      }
-
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
       // for such cases.
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 SIL International. All rights reserved.
+ * Copyright (C) 2017-2021 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmea;
@@ -31,9 +31,9 @@ import android.widget.Toast;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.HelpFile;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
+import com.tavultesoft.kmea.KMHelpFileActivity;
 
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardInfoActivity extends BaseActivity {
@@ -127,11 +127,11 @@ public final class KeyboardInfoActivity extends BaseActivity {
         if (position == 1) {
           if (FileUtils.isWelcomeFile(customHelpLink)) {
             // Display local welcome.htm help file, including associated assets
-            Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
+            Intent i = new Intent(context, KMHelpFileActivity.class);
+            i.putExtra(KMManager.KMKey_PackageID, packageID);
+            i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
 
-            if (FileProviderUtils.exists(context)|| KMManager.isTestMode()) {
-              startActivity(i);
-            }
+            startActivity(i);
           } else {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(customHelpLink));

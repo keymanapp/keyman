@@ -17,6 +17,9 @@ engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman-sentr
 Keyman 2*
 Carthage
 
+# Generated offline help
+keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
+
 # Explicitly ignores just the SWKeyboard scheme; testing against different
 # targets makes a lot of noise.
 **/SWKeyboard.scheme

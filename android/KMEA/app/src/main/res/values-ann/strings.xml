@@ -63,6 +63,8 @@
     <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[aya] %1$s</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_qr_code" comment="QR Code description">      Gwuku iman̄ yi kè òbọkọ\nuwot-nge yi me ofifi okwukwut</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Onu me %1$s</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Wèek ikpa-usem òje me lek bọkọ tap</string>
     <!-- Context: Model Updates -->

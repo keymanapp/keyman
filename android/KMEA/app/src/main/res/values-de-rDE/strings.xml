@@ -63,6 +63,8 @@
     <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[neu] %1$s</string>
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_qr_code" comment="QR Code description">      Scannen Sie diesen Code, um diese\nTastatur auf einem anderen Gerät zu laden</string>
+    <!-- Context: KMP Package welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Willkommen bei %1$s</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Suche nach zugehörigem Wörterbuch zum Herunterladen</string>
     <!-- Context: Model Updates -->

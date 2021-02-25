@@ -9,6 +9,7 @@ import android.widget.ListView;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMHelpFileActivity;
 import com.tavultesoft.kmea.KeyboardInfoActivity;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
@@ -183,7 +184,7 @@ public class KeyboardPickerTest {
       // check result intent to be a weblink to open
       Intent actual2 = Shadows.shadowOf(_info).getNextStartedActivity();
       Assert.assertNotNull(actual2);
-      Assert.assertEquals(actual2.getAction(),Intent.ACTION_VIEW);
+      Assert.assertEquals("com.tavultesoft.kmea.KMHelpFileActivity", actual2.getComponent().getClassName());
     }
     finally {
       if(_controller2!=null)

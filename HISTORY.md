@@ -1,5 +1,41 @@
 # Keyman Version History
 
+## 14.0.246 beta 2021-02-24
+
+* chore(common): allow forced version increment (#4522)
+
+## 14.0.245 beta 2021-02-24
+
+* fix(common/core/web): core key-processing now always returns RuleBehavior type. (#4508)
+* fix(common/resources): Set help-keyman.com.sh executable (#4510)
+* fix(developer/compilers): fixes error when "constructor" is in wordlist (#4504)
+* fix(web): hides touch-alias caret when keystroke causes focus change (#4514)
+
+## 14.0.244 beta 2021-02-22
+
+* fix(common/models): merges identical suggestions after casing (#4502)
+* fix(web): macOS 11 agent string parsing (#4497)
+* fix(ios): app logging messages were transient, never stored (#4500)
+* chore(ios): web-side sentry enablement try-catch (#4492)
+
+## 14.0.243 beta 2021-02-12
+
+* change(ios/app): Generate offline help from markdown (#4470)
+* fix(windows): tsysinfox64 not signed (#4486)
+* chore(android/app): Update help formatting and images (#4485)
+* fix(android/engine): Display welcome.htm help within the app (#4477)
+* fix(ios): tutorial's link to "Add a Keyboard" links directly to keyboard search (#4491)
+* feat(linux): Improve output of km-package-list-installed (#4481)
+
+## 14.0.242 beta 2021-02-11
+
+* fix(android/engine): Display online keyboard help (#4462)
+* fix(windows): Track modifier changes in UWP apps (#4468)
+* fix(common/resources): Fix help.keyman.com path for commit (#4469)
+* fix(common): create GitHub comments serially (#4472)
+* feat(common/models): mid-context suggestions & reversions, fix(common/models): correction-search SMP issues (#4427)
+* fix(linux): Fix dependencies on packages (#4464)
+
 ## 14.0.241 beta 2021-02-10
 
 * fix(common/resources): Just use master branch for help.keyman.com (#4459)

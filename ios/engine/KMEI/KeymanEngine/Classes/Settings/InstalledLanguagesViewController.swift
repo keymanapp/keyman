@@ -439,8 +439,8 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 }
 
 extension InstalledLanguagesViewController {
-  
-  @objc func addClicked(_ sender: Any) {
+
+  public func launchKeyboardSearch() {
     let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultDownloadClosure() { result in
       switch result {
         case .cancelled:
@@ -458,6 +458,10 @@ extension InstalledLanguagesViewController {
     })
 
     navigationController!.pushViewController(keyboardSearchVC, animated: true)
+  }
+
+  @objc func addClicked(_ sender: Any) {
+    launchKeyboardSearch()
   }
 }
 

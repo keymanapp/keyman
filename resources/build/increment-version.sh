@@ -29,9 +29,11 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 gitbranch=`git branch --show-current`
 
 FORCE=0
+HISTORY_FORCE=
 
 if [[ "$1" == "-f" ]]; then
   FORCE=1
+  HISTORY_FORCE=--force
   shift
 fi
 
@@ -86,7 +88,7 @@ popd > /dev/null
 
 pushd "$KEYMAN_ROOT" > /dev/null
 ABORT=0
-node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" || ABORT=$?
+node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
 
 if [[ $ABORT = 1 ]]; then
   if [[ $FORCE = 0 ]]; then
