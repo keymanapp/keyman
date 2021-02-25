@@ -1,5 +1,9 @@
 # Keyman for Android Version History
 
+## 2021-02-25 13.0.6221 stable
+* Bug fix:
+  * Fixes an issue with the CSS classname name used by keyboards (#4516)
+
 ## 2020-10-07 13.0.6219 stable
 * Bug fix:
   * Fix how layer is separated from key name (updated Keyman Web Engine #3674)
