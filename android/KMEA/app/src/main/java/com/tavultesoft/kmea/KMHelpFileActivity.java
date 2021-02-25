@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.webkit.WebChromeClient;
@@ -42,12 +43,23 @@ public class KMHelpFileActivity extends BaseActivity {
   private WebView webView;
   private Button finishButton;
   private String pkgID;
+  private static boolean didSetDataDirectorySuffix = false;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     final Context context = this;
+
+    // Difference processes in the same application cannot directly share WebView-related data
+    // https://developer.android.com/reference/android/webkit/WebView.html#setDataDirectorySuffix(java.lang.String)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      if (!didSetDataDirectorySuffix) {
+        String processName = getProcessName();
+        WebView.setDataDirectorySuffix(processName);
+        didSetDataDirectorySuffix = true;
+      }
+    }
 
     setContentView(R.layout.activity_help_file_layout);
 
@@ -132,7 +144,7 @@ public class KMHelpFileActivity extends BaseActivity {
         // Inject a meta viewport tag into the head of the file if it doesn't exist
         webView.loadUrl(
           "javascript:(function() {" +
-            "if(!document.querySelectorAll('meta[name=viewport]').length) {"+
+            "if(document.head && !document.querySelectorAll('meta[name=viewport]').length) {"+
             "let meta=document.createElement('meta');"+
             "meta.name='viewport';"+
             "meta.content='width=device-width, initial-scale=1';"+
@@ -162,6 +174,15 @@ public class KMHelpFileActivity extends BaseActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    // Blank the webView and destroy completely
+    if (webView != null) {
+      webView.loadUrl("about:blank");
+      ((ViewGroup) webView.getParent()).removeView(webView);
+      webView.removeAllViews();
+      webView.clearCache(true);
+      webView.destroy();
+      webView = null;
+    }
   }
 
   @Override
@@ -170,6 +191,7 @@ public class KMHelpFileActivity extends BaseActivity {
       webView.goBack();
     } else {
       super.onBackPressed();
+      finish();
     }
   }
 }

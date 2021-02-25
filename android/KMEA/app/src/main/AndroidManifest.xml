@@ -30,12 +30,6 @@
             android:theme="@style/Theme.AppCompat.Light.Dialog">
         </activity>
         <activity
-            android:name="com.tavultesoft.kmea.KMHelpFileActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        </activity>
-        <activity
             android:name="com.tavultesoft.kmea.ModelPickerActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:label="@string/app_name"
@@ -47,6 +41,17 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.Light.Dialog" >
         </activity>
+
+        <!-- Put other WebViewActivities in a separate process so the Keyboard WebView doesn't lag.
+        Ref https://stackoverflow.com/questions/40650643/timed-out-waiting-on-iinputcontextcallback-with-custom-keyboard-on-android -->
+        <activity
+            android:name="com.tavultesoft.kmea.KMHelpFileActivity"
+            android:process=":KMHelpFileActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        </activity>
+
     </application>
 
 </manifest>

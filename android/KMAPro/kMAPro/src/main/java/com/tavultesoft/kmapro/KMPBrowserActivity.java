@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -162,6 +163,15 @@ public class KMPBrowserActivity extends BaseActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    // Blank the webView and destroy completely
+    if (webView != null) {
+      webView.loadUrl("about:blank");
+      ((ViewGroup) webView.getParent()).removeView(webView);
+      webView.removeAllViews();
+      webView.clearCache(true);
+      webView.destroy();
+      webView = null;
+    }
   }
 
   @Override
