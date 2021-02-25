@@ -109,8 +109,6 @@ LRESULT CALLBACK kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	return res;
 }
 
-void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
-
 LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	LPMSG mp;
@@ -448,7 +446,7 @@ void GetCapsAndNumlockState() {   // I4793
   via TSF, and we don't receive the notifications via the GetMessage hook when
   in UWP apps (#4369).
 
-  TODO: test whether we still need the GetMessage hook for reading modifier state.       
+  TODO: test whether we still need the GetMessage hook for reading modifier state.
 */
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
   UINT flag = 0;
@@ -457,8 +455,6 @@ void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
     case VK_SHIFT:   flag = K_SHIFTFLAG; break;
     case VK_MENU:    flag = isExtended ? RALTFLAG : LALTFLAG; break;
     case VK_CONTROL: flag = isExtended ? RCTRLFLAG : LCTRLFLAG; break;
-    case VK_CAPITAL: flag = CAPITALFLAG; break;
-    case VK_NUMLOCK: flag = NUMLOCKFLAG; break;
   }
 
   UINT oldShiftState = Globals::get_ShiftState();
