@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.18 alpha 2021-02-25
+
+* fix(linux): Set help-keyman.com.sh executable (#4530)
+
 ## 15.0.17 alpha 2021-02-22
 
 * chore(windows): FirstVoices Keyboards Configuration merge (#4458)
