@@ -126,8 +126,8 @@ namespace com.keyman.osk {
       return metrics.width;
     }
 
-    getKeyWidth(): number {
-      let units = this.objectUnits();
+    getKeyWidth(osk: VisualKeyboard): number {
+      let units = this.objectUnits(osk.isStatic);
 
       if(units == 'px') {
         // For mobile devices, we presently specify width directly in pixels.  Just use that!
@@ -144,9 +144,9 @@ namespace com.keyman.osk {
       }
     }
 
-    objectUnits(): string {
+    objectUnits(isStatic: boolean): string {
       // Returns a unit string corresponding to how the width for each key is specified.
-      if(this.formFactor == 'desktop') {
+      if(this.formFactor == 'desktop' || isStatic) {
         return '%';
       } else {
         return 'px';
@@ -238,7 +238,7 @@ namespace com.keyman.osk {
       }
 
       let fontSpec = util.getFontSizeStyle(ts.fontSize);
-      let keyWidth = this.getKeyWidth();
+      let keyWidth = this.getKeyWidth(osk);
       let maxProportion = 0.90;
       let proportion = (keyWidth * maxProportion) / width; // How much of the key does the text want to take?
 
@@ -337,7 +337,7 @@ namespace com.keyman.osk {
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
-      ks.width=this.objectGeometry(spec['widthpc']);
+      ks.width=this.objectGeometry(spec['widthpc'], osk.isStatic);
 
       let originalPercent = totalPercent;
 
@@ -350,17 +350,19 @@ namespace com.keyman.osk {
       // Set key and button positioning properties.
       if(!isDesktop) {
         // Regularize interkey spacing by rounding key width and padding (Build 390)
-        ks.left=this.objectGeometry(totalPercent+spec['padpc']);
+        ks.left=this.objectGeometry(totalPercent+spec['padpc'], osk.isStatic);
         if(!osk.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
         ks.height=rowStyle.height;  //must be specified in px for rest of layout to work correctly
 
-        // Set distinct phone and tablet button position properties
-        btn.style.left=ks.left;
-        btn.style.width=ks.width;
+        if(!osk.isStatic) {
+          // Set distinct phone and tablet button position properties
+          btn.style.left=ks.left;
+          btn.style.width=ks.width;
+        }
       } else {
-        ks.marginLeft=this.objectGeometry(spec['padpc']);
+        ks.marginLeft=this.objectGeometry(spec['padpc'], osk.isStatic);
       }
 
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
@@ -409,8 +411,8 @@ namespace com.keyman.osk {
       return {element: kDiv, percent: totalPercent - originalPercent};
     }
 
-    objectGeometry(v: number): string {
-      let unit = this.objectUnits();
+    objectGeometry(v: number, isStatic: boolean): string {
+      let unit = this.objectUnits(isStatic);
       if(unit == '%') {
         return v + unit;
       } else { // unit == 'px'
@@ -744,7 +746,7 @@ namespace com.keyman.osk {
 
       // Get the actual available document width and scale factor according to device type
       var objectWidth : number;
-      if(formFactor == 'desktop') {
+      if(formFactor == 'desktop' || this.isStatic) {
         objectWidth = 100;
       } else {
         objectWidth = oskManager.getWidth();
