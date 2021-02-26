@@ -386,7 +386,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
         if(self.swallowBackspaceTextChange) {
           // A single keyboard processing command should never trigger two of these in a row;
           // only one output function will perform deletions.
-          
+
           // This should allow us to debug any failures of this assumption.
           // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
           // so all seems good.

@@ -179,7 +179,7 @@ class ModelCompositor {
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
             // remove actual token string.  If new token, there should be nothing to delete.
-            deleteLeft: newEmptyToken ? 0 : this.wordbreak(context).length, 
+            deleteLeft: newEmptyToken ? 0 : this.wordbreak(context).kmwLength(), 
             id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
@@ -326,7 +326,23 @@ class ModelCompositor {
     suggestions.forEach(function(suggestion) {
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
       // for such cases.
-      suggestion.transform.insert += punctuation.insertAfterWord;
+
+      // Do we need to manipulate the suggestion's transform based on the current state of the context?
+      if(!context.right) {
+        // Only insert wordbreak characters if we're at the end of the context.  
+        suggestion.transform.insert += punctuation.insertAfterWord;
+      } else {
+        // If we're mid-word, delete its original post-caret text.
+        const tokenization = compositor.tokenize(context);
+        if(tokenization && tokenization.caretSplitsToken) {
+          // While we wait on the ability to provide a more 'ideal' solution, let's at least
+          // go with a more stable, if slightly less ideal, solution for now.
+          // 
+          // A predictive text default (on iOS, at least) - immediately wordbreak 
+          // on suggestions accepted mid-word.
+          suggestion.transform.insert += punctuation.insertAfterWord;
+        }
+      }
 
       // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
       if(prefixTransform) {
@@ -436,7 +452,6 @@ class ModelCompositor {
     // Step 1:  generate and save the reversion's Transform.
     let sourceTransform = suggestion.transform;
     let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    // right deletion is currently not implemented.
     let insertedLength = sourceTransform.insert.kmwLength();
 
     let reversionTransform: Transform = {
@@ -456,7 +471,15 @@ class ModelCompositor {
       postContext = models.applyTransform(postTransform, postContext);
     }
 
-    let revertedPrefix = this.wordbreak(postContext);
+    let revertedPrefix: string;
+    let postContextTokenization = this.tokenize(postContext);
+    if(postContextTokenization) {
+      // Handles display string for reversions triggered by accepting a suggestion mid-token.
+      revertedPrefix = postContextTokenization.left[postContextTokenization.left.length-1];
+      revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0] : '';
+    } else {
+      revertedPrefix = this.wordbreak(postContext);
+    }
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
@@ -466,7 +489,7 @@ class ModelCompositor {
     // set the Reversion's ID directly.
     let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
     if(suggestion.transformId != null) {
-      reversion.transformId = suggestion.transformId;
+      reversion.transformId = -suggestion.transformId;
     }
     if(suggestion.id != null) {
       // Since a reversion inverts its source suggestion, we set its ID to be the 
@@ -499,7 +522,13 @@ class ModelCompositor {
     let compositor = this;
     let fallbackSuggestions = function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
-      return compositor.predict({ insert: '', deleteLeft: 0}, revertedContext);
+      let suggestions = compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      suggestions.forEach(function(suggestion) {
+        // A reversion's transform ID is the additive inverse of its original suggestion;
+        // we revert to the state of said original suggestion.
+        suggestion.transformId = -reversion.transformId;
+      });
+      return suggestions;
     }
 
     if(!this.contextTracker) {
@@ -531,9 +560,16 @@ class ModelCompositor {
     // Will need to be modified a bit if/when phrase-level suggestions are implemented.
     // Those will be tracked on the first token of the phrase, which won't be the tail
     // if they cover multiple tokens.
-    return this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
+    let suggestions = this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
       return trackedSuggestion.suggestion;
     });
+
+    suggestions.forEach(function(suggestion) {
+      // A reversion's transform ID is the additive inverse of its original suggestion;
+      // we revert to the state of said original suggestion.
+      suggestion.transformId = -reversion.transformId;
+    });
+    return suggestions;
   }
 
   private wordbreak(context: Context): string {
@@ -552,6 +588,16 @@ class ModelCompositor {
       // Since the model relies on custom wordbreaking behavior, we need to use the
       // old, deprecated wordbreaking pattern.
       return model.wordbreak(context);
+    }
+  }
+
+  private tokenize(context: Context): models.Tokenization {
+    let model = this.lexicalModel;
+
+    if(model.wordbreaker) {
+      return models.tokenize(model.wordbreaker, context);
+    } else {
+      return null;
     }
   }
 

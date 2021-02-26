@@ -764,7 +764,7 @@ describe('ModelCompositor', function() {
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
@@ -802,7 +802,7 @@ describe('ModelCompositor', function() {
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Accepting the suggestion adds an extra context state.

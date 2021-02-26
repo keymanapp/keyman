@@ -255,7 +255,7 @@ namespace com.keyman.text.prediction {
             // the input will be automatically rewound to the preInput state.
             transform: original.transform,
             // The ID part is critical; the reversion can't be applied without it.
-            transformId: original.token, // reversions use the additive inverse.
+            transformId: -original.token, // reversions use the additive inverse.
             displayAs: reversion.displayAs,  // The real reason we needed to call the LMLayer.
             id: reversion.id,
             tag: reversion.tag
