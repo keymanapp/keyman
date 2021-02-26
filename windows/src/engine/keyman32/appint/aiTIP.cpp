@@ -118,8 +118,6 @@ void ProcessToggleChange(UINT key) {   // I4793
   }
 }
 
-void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);
-
 extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM lParam,   // I3589   // I3588
 	PKEYMANPROCESSOUTPUTFUNC outfunc, PKEYMANGETCONTEXTFUNC ctfunc, BOOL Updateable, BOOL Preserved) {
 
@@ -174,7 +172,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
         // in the first pass (!Updateable).
         KeyCapsLockPress(isUp);   // I4548
       }
-      ProcessModifierChange((UINT) wParam, isUp, extended);
       return FALSE;
     case VK_SHIFT:
       if (!Updateable) {
@@ -190,7 +187,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 
     case VK_NUMLOCK:
       if(!isUp) ProcessToggleChange((UINT) wParam);   // I4793
-      ProcessModifierChange((UINT) wParam, isUp, extended);
       return FALSE;
     }
     if(isUp) {

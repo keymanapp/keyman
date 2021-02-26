@@ -428,6 +428,7 @@ void ReportActiveKeyboard(WORD wCommand);   // I3933   // I3949
 void SelectKeyboardHKL(DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
 BOOL SelectKeyboardTSF(DWORD KeymanID, BOOL foreground);   // I3933   // I3949   // I4271
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
+void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
 #endif
 
