@@ -341,6 +341,12 @@ class ModelCompositor {
           // A predictive text default (on iOS, at least) - immediately wordbreak 
           // on suggestions accepted mid-word.
           suggestion.transform.insert += punctuation.insertAfterWord;
+
+          // // Unfortunately, we can't quite enable the next two lines in iOS yet; there's an
+          // // odd issue with its textDocumentProxy that gives us the wrong results.
+          // 
+          // let righthandSplit = tokenization.right[0];
+          // suggestion.transform.deleteRight = (suggestion.transform.deleteRight || 0) + righthandSplit.kmwLength();
         }
       }
 
@@ -452,6 +458,7 @@ class ModelCompositor {
     // Step 1:  generate and save the reversion's Transform.
     let sourceTransform = suggestion.transform;
     let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
+    let deletedRightChars = context.right ? context.right.kmwSubstr(0, sourceTransform.deleteRight || 0) : '';
     let insertedLength = sourceTransform.insert.kmwLength();
 
     let reversionTransform: Transform = {
@@ -459,12 +466,18 @@ class ModelCompositor {
       deleteLeft: insertedLength
     };
 
+    let postCaretReversionTransform: Transform = {
+      insert: deletedRightChars,
+      deleteLeft: 0
+    }
+
     // Step 2:  building the proper 'displayAs' string for the Reversion
     let postContext = context;
     if(postTransform) {
       // The code above restores the state to the context at the time the `Suggestion` was created.
       // `postTransform` handles any missing context that came later.
       reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
+      reversionTransform = models.buildMergedTransform(reversionTransform, postCaretReversionTransform);
 
       // Now that we've built the reversion based upon the Suggestion's original context,
       // we manipulate it in order to get a proper 'displayAs' string.
