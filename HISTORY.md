@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.248 beta 2021-02-26
+
+* fix(common/models): predictions after context reset / caret shift (#4411)
+* change(oem/fv/ios): FV keyboards now package-based (#4471)
+* fix(windows): Handle Caps Lock event correctly from TIP (#4536)
+* fix(developer): run even if sentry unavailable (#4537)
+* fix(developer): UTF-8 messages in LM compiler (#4539)
+* feat(common/models): mid-context suggestions & reversions, fix(common/models): correction-search SMP issues (#4427)
+* fix(ios): package installer completion requires welcome dismissal (#4543)
+* fix(windows): Refresh settings on 64-bit apps (#4378)
+* fix(windows): prevent re-registration of TIPs on 14.0 upgrade (#4535)
+
 ## 14.0.247 beta 2021-02-25
 
 * fix(web): keyboard documentation patch-up (#4512)
