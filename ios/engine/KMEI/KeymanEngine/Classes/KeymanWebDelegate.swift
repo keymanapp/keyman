@@ -16,7 +16,7 @@ protocol KeymanWebDelegate: class {
   /// - Parameters:
   ///   - numCharsToDelete: The number of UTF-16 code units to delete before inserting the new text.
   ///   - newText: The string to insert.
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToLeftDelete: Int, newText: String, numCharsToRightDelete: Int)
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String)
   
   /// - Parameters:
   func beep(_ keymanWeb: KeymanWebViewController)

@@ -168,7 +168,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   private var keymanWeb: KeymanWebViewController
   
   private var swallowBackspaceTextChange: Bool = false
-  private var swallowContextChangeCount: Int = 0
 
   open class var isPortrait: Bool {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
@@ -322,13 +321,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       self.swallowBackspaceTextChange = false
       return
     }
-
-    // Currently motivated by the need to shift caret position to perform
-    // right-deletions.
-    if self.swallowContextChangeCount > 0 {
-      self.swallowContextChangeCount -= 1
-      return
-    }
     
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
@@ -346,7 +338,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // We should NOT call .resetContext() here for this reason.
   }
   
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToLeftDelete: Int, newText: String, numCharsToRightDelete: Int) {
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if keymanWeb.isSubKeysMenuVisible {
       return
     }
@@ -359,7 +351,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    if numCharsToLeftDelete <= 0 {
+    if numCharsToDelete <= 0 {
+      textDocumentProxy.insertText(newText)
+
       // A full-context deletion will report numCharsToDelete == 0 and won't
       // otherwise delete selected text.
       if #available(iOSApplicationExtension 11.0, *) {
@@ -369,142 +363,42 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           }
         }
       }
-    } else {
-      for _ in 0..<numCharsToLeftDelete {
-        let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
-        textDocumentProxy.deleteBackward()
-        let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
-        let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
-        if unitsDeleted > 1 {
-          if !InputViewController.isSurrogate(oldContext.utf16.last!) {
-            let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
-                                                    offsetBy: newContext.utf16.count)
-            let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
-            let remnant = String(oldContext.utf16[lowerIndex..<upperIndex]) ?? ""
-            textDocumentProxy.insertText(remnant)
-          }
-        }
+      return
+    }
 
-        // Refer to `func textDidChange()` and https://github.com/keymanapp/keyman/pull/2770 for context.
-        if textDocumentProxy.documentContextBeforeInput == nil ||
-           (textDocumentProxy.documentContextBeforeInput == "\n" && Manager.shared.isSystemKeyboard) {
-          if(self.swallowBackspaceTextChange) {
-            // A single keyboard processing command should never trigger two of these in a row;
-            // only one output function will perform deletions.
-
-            // This should allow us to debug any failures of this assumption.
-            // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
-            // so all seems good.
-            log.verbose("Failed to swallow a recent textDidChange call!")
-          }
-          self.swallowBackspaceTextChange = true
-          break
+    for _ in 0..<numCharsToDelete {
+      let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
+      textDocumentProxy.deleteBackward()
+      let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
+      let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
+      if unitsDeleted > 1 {
+        if !InputViewController.isSurrogate(oldContext.utf16.last!) {
+          let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
+                                                  offsetBy: newContext.utf16.count)
+          let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
+          textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
         }
+      }
+
+      // Refer to `func textDidChange()` and https://github.com/keymanapp/keyman/pull/2770 for context.
+      if textDocumentProxy.documentContextBeforeInput == nil ||
+         (textDocumentProxy.documentContextBeforeInput == "\n" && Manager.shared.isSystemKeyboard) {
+        if(self.swallowBackspaceTextChange) {
+          // A single keyboard processing command should never trigger two of these in a row;
+          // only one output function will perform deletions.
+
+          // This should allow us to debug any failures of this assumption.
+          // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
+          // so all seems good.
+          log.verbose("Failed to swallow a recent textDidChange call!")
+        }
+        self.swallowBackspaceTextChange = true
+        break
       }
     }
 
     if !newText.isEmpty {
       textDocumentProxy.insertText(newText)
-    }
-
-    // NOTE:  when a script uses character clusters, the code below fails to
-    // produce the correct effects despite `textDocumentProxy` reporting that
-    // the code correctly manipulates the text.  There's either a bug in Apple's
-    // code or something critical that we're missing here.
-    //
-    // The `textDidChange` call that occurs after this `insertText` will
-    // report the final, 'incorrect' details, rather than what is reported
-    // at the end of this method.
-    if numCharsToRightDelete > 0 {
-      // Should never change throughout the next loop; right-deletions only!
-      let oldLeftContext = textDocumentProxy.documentContextBeforeInput ?? ""
-      var pointsToDelete = numCharsToRightDelete
-      while pointsToDelete > 0 {
-        let oldContext = textDocumentProxy.documentContextAfterInput ?? ""
-        self.swallowContextChangeCount += 1
-        // Asynchronously triggers a context change.
-        textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
-        let newContext = textDocumentProxy.documentContextAfterInput ?? ""
-
-        var failsafeCount = 0
-        while (textDocumentProxy.documentContextBeforeInput ?? "" != oldLeftContext)
-              && failsafeCount < numCharsToRightDelete { // mild breakage > locked kbd
-          // While adjustTextPosition makes cluster-based jumps...
-          // deleteBackward does not.  So, we 'force' it.
-          textDocumentProxy.deleteBackward()
-          failsafeCount += 1
-        }
-
-        // Determine the removed codepoint count.  Also, find the index
-        // of the first character that shouldn't be removed, if possible.
-        let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
-        var pointsDeleted = 0
-
-        // Our current index within the deleted context.
-        var deletedIndex = oldContext.utf16.startIndex
-        // Marks the first index we wish to NOT remove.
-        var remnantIndex: String.Index? = nil
-        // Marks the first index that was NOT removed by deleteBackward.
-        let undeletedStartIndex = oldContext.utf16.index(deletedIndex, offsetBy: unitsDeleted)
-
-        while deletedIndex < undeletedStartIndex {
-          if(InputViewController.isSurrogate(oldContext.utf16[deletedIndex])) {
-            // Check - is it truly a surrogate pair?
-            let pairedIndex = oldContext.utf16.index(after: deletedIndex)
-            if(InputViewController.isSurrogate(oldContext.utf16[pairedIndex])) {
-              // If so, pre-emptively increase the index - the pair will count
-              // as a single character as a result.
-              deletedIndex = pairedIndex
-            }
-          }
-          pointsDeleted += 1
-          deletedIndex = oldContext.utf16.index(after: deletedIndex)
-
-          // Intended end of deletion found!
-          if pointsDeleted == pointsToDelete {
-            remnantIndex = deletedIndex
-            break // There's nothing to be gained by further loop iterations.
-          }
-        }
-
-        if let remnantIndex = remnantIndex, remnantIndex < undeletedStartIndex {
-          // We need to restore some of the deleted text!
-          let remnant = String(oldContext.utf16[remnantIndex..<undeletedStartIndex]) ?? ""
-          textDocumentProxy.insertText(remnant)
-
-          // Must place the caret back in its correct position!
-          // Unfortunately, Apple's adjustTextPosition is definitely cluster-based.
-
-          var leftContext = textDocumentProxy.documentContextBeforeInput ?? ""
-          // Ideally, we want to stop at the exact position, but the lack of
-          // granularity on adjustTextPosition may not cooperate with that goal.
-          while(leftContext.count > oldLeftContext.count) {
-            textDocumentProxy.adjustTextPosition(byCharacterOffset: -remnant.count)
-            leftContext = textDocumentProxy.documentContextBeforeInput ?? ""
-          }
-
-          // FAILSAFE, non-ideal behavior below.
-          //
-          // It's probably (?) better to keep the caret at the end of a cluster that
-          // previously started before the caret, even if right-deletions add new
-          // characters to the cluster.  I think.
-          //
-          // Khmer example:  if right-deletes leave a joeung-S that can attach
-          // to a main consonant to the left of my cursor, it will 'snap' into
-          // a cluster.  It'd be more natural to have that cluster on the left,
-          // so I can add more chars to the cluster if desired.
-          //
-          // It's also easier to immediately backspace the extra chars if needed
-          // this way, rather than forcing a caret reposition.
-          if(leftContext.count < oldLeftContext.count) {
-            log.debug("Could not reposition caret perfectly after a right-delete!")
-            textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
-          }
-        }
-
-        // We've handled a set of code points; make sure we mark our progress!
-        pointsToDelete -= pointsDeleted
-      }
     }
   }
 
@@ -657,9 +551,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
   
   func resetContext() {
-    if self.swallowContextChangeCount <= 0 {
-      keymanWeb.resetContext()
-    }
+    keymanWeb.resetContext()
   }
 
   internal func setSentryState(enabled: Bool) {

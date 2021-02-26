@@ -36,7 +36,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.text.Editable;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -2350,6 +2349,10 @@ public final class KMManager {
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void insertText(final int dn, final String s, final int dr) {
+      if(dr != 0) {
+        Log.d(TAG, "Right deletions requested but are not presently supported by the in-app keyboard.");
+      }
+
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -2379,28 +2382,6 @@ public final class KMManager {
             int temp = end;
             end = start;
             start = temp;
-          }
-
-          // As we depend upon the caret's current position for the in-app implementation,
-          // we need to perform right-deletions BEFORE left-deletions & text insertion.
-          if(dr > 0) {
-            for (int i = 0; i < dr; i++) {
-              Editable context = textView.getText();
-              CharSequence chars = context.subSequence(end, context.length());
-              if (chars != null && chars.length() > 0) {
-                char c = chars.charAt(0);
-                InAppKeyboardShouldIgnoreTextChange = true;
-                InAppKeyboardShouldIgnoreSelectionChange = true;
-                if (Character.isHighSurrogate(c)) {
-                  textView.getText().delete(start, end+2);
-                } else {
-                  textView.getText().delete(start, end+1);
-                }
-
-                start = textView.getSelectionStart();
-                end = textView.getSelectionEnd();
-              }
-            }
           }
 
           if (dn <= 0) {

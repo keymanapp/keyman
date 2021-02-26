@@ -114,6 +114,13 @@ public class TextView: UITextView, KeymanResponder {
     }
   }
 
+  public override var selectedTextRange: UITextRange? {
+    didSet {
+      Manager.shared.setContextState(text: self.text, range: selectedRange)
+      Manager.shared.resetContext()
+    }
+  }
+
   // MARK: - Keyman notifications
   private func keyboardChanged(_ kb: InstallableKeyboard) {
     if !shouldSetCustomFontOnKeyboardChange {

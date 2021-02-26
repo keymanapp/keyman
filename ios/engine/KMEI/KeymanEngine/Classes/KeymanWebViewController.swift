@@ -388,14 +388,16 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
       let s = fragment[sRange.upperBound..<drRange.lowerBound]
       // This computes the number of requested right-deletion characters.
-      let dr = Int(fragment[drRange.upperBound...])!
+      // Use it when we're ready to implement that.
+      // Our .insertText will need to be adjusted accordingly.
+      _ = Int(fragment[drRange.upperBound...])!
 
       // KMW uses dn == -1 to perform special processing of deadkeys.
       // This is handled outside of Swift so we don't delete any characters.
       let numCharsToDelete = max(0, dn)
       let newText = String(s).stringFromUTF16CodeUnits() ?? ""
       insertText(self, numCharsToDelete: numCharsToDelete, newText: newText)
-      delegate?.insertText(self, numCharsToLeftDelete: numCharsToDelete, newText: newText, numCharsToRightDelete: dr)
+      delegate?.insertText(self, numCharsToDelete: numCharsToDelete, newText: newText)
     } else if fragment.hasPrefix("#showKeyPreview-") {
       let xKey = fragment.range(of: "+x=")!
       let yKey = fragment.range(of: "+y=")!
@@ -636,7 +638,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     }
   }
   
-  func insertText(_ view: KeymanWebViewController, numCharsToLeftDelete: Int, newText: String, numCharsToRightDelete: Int) {
+  func insertText(_ view: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     dismissHelpBubble()
     Manager.shared.isKeymanHelpOn = false
   }
