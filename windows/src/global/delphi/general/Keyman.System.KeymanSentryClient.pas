@@ -106,7 +106,13 @@ begin
   // Last gasp, if we are in a development situation
   Result := GetEnvironmentVariable(KEYMAN_ROOT);
   if Result <> '' then
+  begin
     Result := IncludeTrailingPathDelimiter(Result) + DEV_SENTRY_PATH;
+    if (Result <> '') and FileExists(Result) then
+      Exit;
+  end;
+
+  Result := '';
 end;
 
 procedure TKeymanSentryClient.ClientAfterEvent(Sender: TObject;
@@ -282,7 +288,7 @@ var
   reg: TRegistry;
   o: TSentryClientOptions;
   f: TSentryClientFlags;
-  RegKey: string;
+  path, RegKey: string;
 begin
   Assert(not Assigned(FInstance));
 
@@ -293,7 +299,12 @@ begin
   if not Enabled then
     Exit;
 
-  sentry_set_library_path(FindSentryDLL);
+  path := FindSentryDLL;
+  if path = '' then
+    // Cannot find sentry.dll
+    Exit;
+
+  sentry_set_library_path(path);
 
   o.Debug := False;
 
