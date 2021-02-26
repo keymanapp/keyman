@@ -18,6 +18,7 @@ namespace com.keyman {
       //ffie['k107'] = 187; // =    // FF 3.0 // I2062
       this.FF['k61'] = 187;  // =   // FF 2.0
       this.FF['k59'] = 186;  // ;
+      this.FF['k173'] = 189; // -/_
     }
   }
 
