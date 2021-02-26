@@ -397,11 +397,18 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     initializeSynchronizationGroups()
     constructAssociationPickers()
 
+    closureShared.installGroup.enter()
+
+    let wrappedCompletionHandler = {
+      uiCompletionHandler()
+      self.closureShared.installGroup.leave()
+    }
+
     let pickerPrompt = PackageInstallViewController<Resource>(for: self.package,
                                                               defaultLanguageCode: defaultLgCode,
                                                               languageAssociators: associationQueriers!,
                                                               pickingCompletionHandler: coreInstallationClosure(),
-                                                              uiCompletionHandler: uiCompletionHandler)
+                                                              uiCompletionHandler: wrappedCompletionHandler)
 
     navVC.pushViewController(pickerPrompt, animated: true)
   }
