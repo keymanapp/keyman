@@ -14,8 +14,9 @@ namespace com.keyman {
     Opera:  KeyMap = new KeyMap();
 
     constructor() {
-      //ffie['k109'] = 189; // -    // These two number-pad VK rules are *not* correct for more recent FF! JMD 8/11/12
-      //ffie['k107'] = 187; // =    // FF 3.0 // I2062
+      // All three have been around since at least May 2014 / FF 29.
+      // It'd hard to find precise history, but at least that much has been confirmed.
+      // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode, on Feb 26 2021.
       this.FF['k61'] = 187;  // =   // FF 2.0
       this.FF['k59'] = 186;  // ;
       this.FF['k173'] = 189; // -/_

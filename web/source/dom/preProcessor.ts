@@ -160,11 +160,11 @@ namespace com.keyman.dom {
       // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
       s.device = keyman.util.physicalDevice.coreSpec;
 
-      // Check for any browser-based keymapping before proceeding further.
-      // This is needed _now_ for mnenomic keyboards.  (See https://github.com/keymanapp/keyman/issues/1125.)
+      // Perform any browser-specific key remapping before other remaps and mnemonic transforms. 
+      // (See https://github.com/keymanapp/keyman/issues/1125.)
       if(!keyman.isEmbedded && s.device.browser == utils.Browser.Firefox) {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
+      // Browser key identifiers are not completely consistent; Firefox has a few (for US punctuation)
+      // that differ from the norm.  Refer to https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode.
         if(KeyMapping.browserMap.FF['k'+s.Lcode]) {
           s.Lcode = KeyMapping.browserMap.FF['k'+s.Lcode];
         }
