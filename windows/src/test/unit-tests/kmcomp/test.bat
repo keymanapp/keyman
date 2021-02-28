@@ -37,6 +37,8 @@ call :should-fail "#4280: if should be at start of context 2" test_4280_if_start
 call :should-fail "#4280: nul should be at start of context 1" test_4280_nul_start_1.kmn || goto :eof
 call :should-fail "#4280: nul should be at start of context 2" test_4280_nul_start_2.kmn || goto :eof
 
+call :should-pass "#4423: named code constants, various tests" test_namedcodeconstants.kmn || goto :eof
+
 goto :eof
 
 :should-pass

@@ -1051,12 +1051,10 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
     // we don't mix up named character codes which weren't supported in 5.x
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
     // Add a single char store as a defined character constant
-    char *codename = wstrtostr(sp->szName);
     if (Uni_IsSurrogate1(*sp->dpString))
-      CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), codename, fk->cxStoreArray);
+      CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), sp->szName, fk->cxStoreArray);
     else
-      CodeConstants->AddCode(sp->dpString[0], codename, fk->cxStoreArray);
-    delete[] codename;
+      CodeConstants->AddCode(sp->dpString[0], sp->szName, fk->cxStoreArray);
     CodeConstants->reindex(); // has to be done after every character add due to possible use in another store.   // I4982
   }
 
@@ -1908,7 +1906,6 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
   DWORD i;
   BOOL finished = FALSE;
   WCHAR c;
-  PSTR codename;
 
   PWCHAR tstr = NULL;
   int tstrMax = 0;
@@ -2463,10 +2460,8 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         q = p + 1;
         while (iswalnum(*q) || *q == '-' || *q == '_') q++;
         c = *q; *q = 0;
-        codename = wstrtostr(p + 1);
+        n = CodeConstants->GetCode(p + 1, &i);
         *q = c;
-        n = CodeConstants->GetCode(codename, &i);
-        delete[] codename;
         if (n == 0) return CERR_InvalidNamedCode;
         if (i < 0xFFFFFFFFL) CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);   // I2993
         if (n > 0xFFFF)
