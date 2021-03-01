@@ -12,6 +12,7 @@ store(&includecodes) 'test_namedcodeconstants.txt'
 store(főő) '0'
 store(bar) '1'
 store(smp) U+12345
+store(😉) '🤪'
 
 $főő + 'a' > 'b'
 $bar + 'a' > 'c'
@@ -21,3 +22,4 @@ $hangul_syllable_go + 'a' > 'd'
 $mycode + 'a' > 'e'
 
 $smp + 'a' > 'f'
+$😉 + 'a' > '😡'
