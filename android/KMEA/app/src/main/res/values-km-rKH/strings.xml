@@ -126,7 +126,7 @@
         <item quantity="other">(ក្ដារចុច %1$d)</item>
     </plurals>
     <!-- Context: "Change Display Language" menu -->
-    <string name="default_locale" comment="Use the device's current locale">Default Locale</string>
+    <string name="default_locale" comment="Use the device's current locale">ភាសាលំនាំដើម</string>
     <!-- Context: Content descriptions -->
     <!-- Context: Content descriptions -->
     <!-- Context: Popup menu labels -->
