@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.249 beta 2021-03-01
+
+* fix(web): mnemonic keystrokes w FF keymapping (#4540)
+* chore(ios/app): Adjust help titles for installing custom dictionaries (#4550)
+
 ## 14.0.248 beta 2021-02-26
 
 * fix(common/models): predictions after context reset / caret shift (#4411)
