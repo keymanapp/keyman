@@ -51,6 +51,9 @@ public class KMHelpFileActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     final Context context = this;
 
+    // Teardown keyboards to free up webView
+    KMManager.onDestroy();
+
     // Difference processes in the same application cannot directly share WebView-related data
     // https://developer.android.com/reference/android/webkit/WebView.html#setDataDirectorySuffix(java.lang.String)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
