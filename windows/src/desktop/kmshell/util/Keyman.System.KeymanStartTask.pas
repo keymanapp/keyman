@@ -246,7 +246,8 @@ end;
 
 class procedure TKeymanStartTask.RecreateTask;
 begin
-  if not Reg_GetDebugFlag(SRegValue_Flag_UseAutoStartTask, True) then
+  // This has proven to be too troublesome, so we will disable for 14.0.
+  if not Reg_GetDebugFlag(SRegValue_Flag_UseAutoStartTask, False) then
   begin
     DeleteTask;
     Exit;

@@ -290,6 +290,9 @@ void CKMTipTextService::_UninitKeyman() {
 }
 
 void CKMTipTextService::_TryAndStartKeyman() {
+#if 0
+  // This has proven to be too troublesome so we will disable for 14.0.
+
   HANDLE hEventSource = RegisterEventSource(NULL, "Keyman");
   if (!hEventSource) {
     // This is unlikely to occur, but if it does, there's probably
@@ -298,4 +301,5 @@ void CKMTipTextService::_TryAndStartKeyman() {
   }
   ReportEvent(hEventSource, EVENTLOG_INFORMATION_TYPE, SIMPLE_CATEGORY, MSG_START_KEYMAN_ON_DEMAND, NULL, 0, 0, NULL, NULL);
   DeregisterEventSource(hEventSource);
+#endif
 }
