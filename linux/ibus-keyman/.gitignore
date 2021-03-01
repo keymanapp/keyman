@@ -1,0 +1,4 @@
+po/POTFILES
+src/keyman.xml
+src/keyman.xml.in
+src/ibus-engine-keyman
