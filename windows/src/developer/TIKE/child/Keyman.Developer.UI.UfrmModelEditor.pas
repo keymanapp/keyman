@@ -136,7 +136,7 @@ type
     function CheckModifiedWordlistsForRemoval(
       newParser: TLexicalModelParser): Boolean;
     procedure UpdateQRCode;
-    procedure WordlistModifiedChanged(Sender: TObject);
+    procedure WordlistChanged(Sender: TObject);
     { Private declarations }
   protected
     function GetHelpTopic: string; override;
@@ -646,13 +646,12 @@ begin
   Result.Tab.PageControl := pages;
 
   Result.Frame := TframeWordlistEditor.Create(Self);
+  Result.Frame.OnChanged := WordlistChanged;
   Result.Frame.LoadFromFile(ExtractFilePath(Filename) + WordlistFilename);
   Result.Frame.Align := alClient;
 
   Result.Frame.Parent := Result.Tab;
   Result.Frame.Visible := True;
-
-  Result.Frame.OnModifiedChanged := WordlistModifiedChanged;
 end;
 
 function TfrmModelEditor.WordlistFromTab(
@@ -665,7 +664,7 @@ begin
   Result := nil;
 end;
 
-procedure TfrmModelEditor.WordlistModifiedChanged(Sender: TObject);
+procedure TfrmModelEditor.WordlistChanged(Sender: TObject);
 begin
   // We only go from clean to dirty, not vice-versa, on this notification
   if (Sender as TframeWordlistEditor).Modified then
