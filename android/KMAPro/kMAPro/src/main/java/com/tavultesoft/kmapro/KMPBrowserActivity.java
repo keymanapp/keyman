@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2020 SIL International. All rights reserved.
+ * Copyright (C) 2020-2021 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.KMPLink;
+import com.tavultesoft.kmea.util.WebViewUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -163,15 +164,7 @@ public class KMPBrowserActivity extends BaseActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    // Blank the webView and destroy completely
-    if (webView != null) {
-      webView.loadUrl("about:blank");
-      ((ViewGroup) webView.getParent()).removeView(webView);
-      webView.removeAllViews();
-      webView.clearCache(true);
-      webView.destroy();
-      webView = null;
-    }
+    WebViewUtil.cleanup(webView);
   }
 
   @Override

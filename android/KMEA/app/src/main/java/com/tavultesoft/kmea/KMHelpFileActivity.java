@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -79,7 +80,7 @@ public class KMHelpFileActivity extends BaseActivity {
     finishButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        finish();
+        finishAfterTransition();
         overridePendingTransition(0, android.R.anim.fade_out);
       }
     });
@@ -169,24 +170,21 @@ public class KMHelpFileActivity extends BaseActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    // Blank the webView and destroy completely
-    if (webView != null) {
-      webView.loadUrl("about:blank");
-      ((ViewGroup) webView.getParent()).removeView(webView);
-      webView.removeAllViews();
-      webView.clearCache(true);
-      webView.destroy();
-      webView = null;
-    }
   }
 
   @Override
-  public void onBackPressed() {
-    if (webView != null && webView.canGoBack()) {
-      webView.goBack();
-    } else {
-      super.onBackPressed();
-      finish();
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+      switch (keyCode) {
+        case KeyEvent.KEYCODE_BACK:
+          // Dismiss the help file
+          super.onBackPressed();
+          finishAndRemoveTask();
+        break;
+      }
     }
+
+    return true;
   }
+
 }
