@@ -72,7 +72,11 @@ int km::kbp::kmx::DebugLog_1(const char *file, int line, const char *function, c
   if (g_debug_ToConsole) { // I3951
     std::cout << windowinfo << std::endl; // OutputDebugStringA(windowinfo);
   } else {
+#ifdef _USE_WINDOWS
+    std::cout << windowinfo << std::endl; // OutputDebugStringA(windowinfo);
+#else
     syslog(LOG_DEBUG, "%s", windowinfo);
+#endif
   }
 
   return 0;
