@@ -204,6 +204,15 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   func webView(_ webView: UIWebView,
                shouldStartLoadWith request: URLRequest,
                navigationType: UIWebView.NavigationType) -> Bool {
+    if request.url?.lastPathComponent.hasSuffix(".kmp") ?? false {
+      // The user is trying to download a .kmp, but the standard
+      // UIWebView can't handle it properly.
+      //
+      // Instead, we can just forward that URL back into Safari.
+      UIApplication.shared.openURL(request.url!)
+
+      return false
+    }
     updateAddress(request)
     return true
   }
@@ -222,13 +231,25 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
-    let alertController = UIAlertController(title: "Cannot Open Page",
-                                            message: error.localizedDescription,
-                                            preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertAction.Style.default,
-                                            handler: nil))
-    self.present(alertController, animated: true, completion: nil)
+
+    var signalError: Bool = true
+
+    // An error will likely result if the user attempts to download a KMP,
+    // despite the fact that we tell it not to attempt a load.
+    let nsError = error as NSError
+    if let url = nsError.userInfo["NSErrorFailingURLKey"] as? NSURL {
+      signalError = !(url.path?.hasSuffix(".kmp") ?? false)
+    }
+
+    if signalError {
+      let alertController = UIAlertController(title: "Cannot Open Page",
+                                              message: error.localizedDescription,
+                                              preferredStyle: UIAlertController.Style.alert)
+      alertController.addAction(UIAlertAction(title: "OK",
+                                              style: UIAlertAction.Style.default,
+                                              handler: nil))
+      self.present(alertController, animated: true, completion: nil)
+    }
   }
 
   private func updateButtons() {
