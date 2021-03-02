@@ -10,3 +10,5 @@ BOOL AddCompileMessage(DWORD msg);
 
 extern BOOL FWarnDeprecatedCode;
 extern int currentLine;
+
+PWSTR strtowstr(PSTR in);

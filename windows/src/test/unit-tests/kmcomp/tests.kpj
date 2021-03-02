@@ -87,30 +87,6 @@
       <Details/>
     </File>
     <File>
-      <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
-      <Filename>test_valid.kmx</Filename>
-      <Filepath>test_valid.kmx</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.kmx</FileType>
-      <ParentFileID>id_03dbd77eff6b6b923de6983fab2bd9d0</ParentFileID>
-    </File>
-    <File>
-      <ID>id_416e28ba6ecd3550e599b16a2c37e864</ID>
-      <Filename>test_invalid_kmx.kmx</Filename>
-      <Filepath>test_invalid_kmx.kmx</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.kmx</FileType>
-      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
-    </File>
-    <File>
-      <ID>id_ee200303f52275647138898037a80e0e</ID>
-      <Filename>test.doc</Filename>
-      <Filepath>test.doc</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.doc</FileType>
-      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
-    </File>
-    <File>
       <ID>id_4c59db88c3869d699c9df7f46731a97a</ID>
       <Filename>test_4280_if_start_1.kmn</Filename>
       <Filepath>test_4280_if_start_1.kmn</Filepath>
@@ -138,6 +114,38 @@
       <ID>id_c0515825c0484a590391c8d99430303f</ID>
       <Filename>test_4280_nul_start_2.kmn</Filename>
       <Filepath>test_4280_nul_start_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
+      <Filename>test_valid.kmx</Filename>
+      <Filepath>test_valid.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_03dbd77eff6b6b923de6983fab2bd9d0</ParentFileID>
+    </File>
+    <File>
+      <ID>id_416e28ba6ecd3550e599b16a2c37e864</ID>
+      <Filename>test_invalid_kmx.kmx</Filename>
+      <Filepath>test_invalid_kmx.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+    <File>
+      <ID>id_ee200303f52275647138898037a80e0e</ID>
+      <Filename>test.doc</Filename>
+      <Filepath>test.doc</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.doc</FileType>
+      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+    <File>
+      <ID>id_068020cc7b6376ed155d5b9fc0215cc6</ID>
+      <Filename>test_namedcodeconstants.kmn</Filename>
+      <Filepath>test_namedcodeconstants.kmn</Filepath>
       <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
       <Details/>
