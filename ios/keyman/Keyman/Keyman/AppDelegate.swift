@@ -36,6 +36,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       vc.dismiss(animated: true, completion: nil)
 
       if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: vc) {
+        // First, explicitly hide the keyboard.  Otherwise, the app may try to
+        // redisplay it before package installation is fully complete.
+        Manager.shared.hideKeyboard()
+
         // We choose to prompt the user for confirmation, rather
         // than automatically installing the package.
         //
