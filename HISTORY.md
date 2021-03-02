@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.250 beta 2021-03-02
+
+* fix(common/resources): Fix help.keyman.com path for CI (#4565)
+
 ## 14.0.249 beta 2021-03-01
 
 * fix(web): mnemonic keystrokes w FF keymapping (#4540)
