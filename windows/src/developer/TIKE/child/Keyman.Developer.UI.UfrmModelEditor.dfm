@@ -83,7 +83,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 200
             Width = 415
             Height = 13
-            Caption = 
+            Caption =
               'The editor was unable to parse the source file. Details shown he' +
               're are read-only.'
           end
@@ -219,7 +219,7 @@ inherited frmModelEditor: TfrmModelEditor
             Width = 26
             Height = 13
             Caption = 'close'
-            FocusControl = cbOpenQuote
+            FocusControl = cbCloseQuote
           end
           object cbFormat: TComboBox
             Left = 106
@@ -265,11 +265,6 @@ inherited frmModelEditor: TfrmModelEditor
             OnChange = cbInsertAfterWordClick
             OnClick = cbInsertAfterWordClick
             OnKeyUp = cbInsertAfterWordKeyUp
-            Items.Strings = (
-              '(space U+0020)'
-              '(no word break)'
-              '(Tibetan tsheg U+0F0B)'
-              '(Ethiopian wordspace U+1361)')
           end
           object cbOpenQuote: TComboBox
             Left = 139
@@ -280,10 +275,6 @@ inherited frmModelEditor: TfrmModelEditor
             OnChange = cbOpenQuoteClick
             OnClick = cbOpenQuoteClick
             OnKeyUp = cbOpenQuoteKeyUp
-            Items.Strings = (
-              'default'
-              'ascii'
-              'custom')
           end
           object chkIsRTL: TCheckBox
             Left = 106
@@ -303,10 +294,6 @@ inherited frmModelEditor: TfrmModelEditor
             OnChange = cbCloseQuoteClick
             OnClick = cbCloseQuoteClick
             OnKeyUp = cbCloseQuoteKeyUp
-            Items.Strings = (
-              'default'
-              'ascii'
-              'custom')
           end
         end
       end
@@ -333,7 +320,7 @@ inherited frmModelEditor: TfrmModelEditor
           Top = 13
           Width = 333
           Height = 13
-          Caption = 
+          Caption =
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
@@ -410,7 +397,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 72
             Width = 389
             Height = 26
-            Caption = 
+            Caption =
               'Optionally, select a compiled keyboard with which to test this l' +
               'exical model. Any keyboards already loaded in the web debugger w' +
               'ill also be available.'
