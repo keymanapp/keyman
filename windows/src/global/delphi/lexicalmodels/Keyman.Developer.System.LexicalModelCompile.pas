@@ -28,7 +28,7 @@ begin
   cmdline := Format('"%skmlmc.cmd" "%s" -o "%s"', [ExtractFilePath(ParamStr(0)), infile, outfile]);
   Result := TUtilExecute.Console(cmdline, ExtractFileDir(infile), logtext, ec);
 
-  logtext := UTF8Decode(AnsiString(logtext));
+  logtext := UTF8ToString(AnsiString(logtext));
 
   if not Result then
   begin
