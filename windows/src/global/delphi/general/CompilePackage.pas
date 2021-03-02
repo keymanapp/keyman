@@ -41,7 +41,6 @@ uses
   System.IniFiles,
   System.Zip,
 
-  BCP47Tag,
   OnlineConstants,
   VisualKeyboard,
   utilfiletypes,
@@ -452,41 +451,17 @@ begin
 end;
 
 const
-  SKKeyboardPackageLanguageNonCanonical = 'The keyboard %0:s has a non-canonical language ID "%1:s" (%2:s), should be "%3:s".';
+  SKKeyboardPackageLanguageNonCanonical = 'The keyboard %0:s has a non-canonical language tag "%1:s" (%2:s), should be "%3:s".';
+  SKKeyboardShouldHaveAtLeastOneLanguage = 'The keyboard %0:s has no language tags. It should have at least one language tag.';
 
 procedure TCompilePackage.CheckKeyboardLanguages;
 var
   k: TPackageKeyboard;
-  l: TPackageKeyboardLanguage;
-  NewID: string;
-  Tag, NewTag: TBCP47Tag;
 begin
   for k in pack.Keyboards do
   begin
-    for l in k.Languages do
-    begin
-      Tag := TBCP47Tag.Create(l.ID);
-      NewID := TCanonicalLanguageCodeUtils.FindBestTag(l.ID, False, False);
-      if NewID = '' then
-      begin
-        // We don't have enough data to validate this tag
-        Continue;
-      end;
-
-      NewTag := TBCP47Tag.Create(NewID);
-      try
-        if (Tag.Script = '') and (NewTag.Script <> '') then
-        begin
-          // Only give non-canonical warning if the script tag is missing but should
-          // be present.
-          NewTag.Region := Tag.Region; // We don't care about region, don't give unhelpful info to developer
-          WriteMessage(plsWarning, Format(SKKeyboardPackageLanguageNonCanonical, [k.ID, l.ID, l.Name, NewTag.Tag]));
-        end;
-      finally
-        NewTag.Free;
-        Tag.Free;
-      end;
-    end;
+    if k.Languages.Count = 0 then
+      WriteMessage(plsWarning, Format(SKKeyboardShouldHaveAtLeastOneLanguage, [k.ID]));
   end;
 end;
 
