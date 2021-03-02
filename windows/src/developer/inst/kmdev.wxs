@@ -167,7 +167,7 @@
       </Component>
 
       <Component>
-        <File Name="kmbrowserhost" KeyPath="yes" Source="..\desktop\kmbrowserhost.exe" />
+        <File Name="kmbrowserhost" KeyPath="yes" Source="..\..\..\bin\desktop\kmbrowserhost.exe" />
       </Component>
 
       <Component>
