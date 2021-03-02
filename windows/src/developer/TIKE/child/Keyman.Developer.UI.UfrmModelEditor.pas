@@ -207,9 +207,9 @@ type
 
 const
   CInsertAfterWordOptions: array[0..4] of TComboStringOption = (
-    (value: ' '; name: '(space U+0020)'),
-    (value: ''; name: '(no word break)'),
-    (value: Char($200B); name: '(Zero Width Space U+200B)'),
+    (value: ' '; name: '(Space U+0020)'),
+    (value: ''; name: '(No word break)'),
+    (value: Char($200B); name: '(Zero width space U+200B)'),
     (value: Char($0F0B); name: '(Tibetan tsheg U+0F0B)'),
     (value: Char($1361); name: '(Ethiopian wordspace U+1361)')
   );
