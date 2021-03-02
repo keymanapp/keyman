@@ -27,11 +27,12 @@ display_usage ( ) {
   echo "Usage: $0 [-test] [-publish-to-npm]"
   echo "       $0 -help"
   echo
-  echo "  -help               displays this screen and exits"
-  echo "  -test               runs unit tests after building"
-  echo "  -tdd                runs unit tests WITHOUT building"
-  echo "  -publish-to-npm     publishes the current version to the npm package index"
-  echo "  -dry-run            do build, etc, but don't actually publish"
+  echo "  -help                       displays this screen and exits"
+  echo "  -test                       runs unit tests after building"
+  echo "  -tdd                        runs unit tests WITHOUT building"
+  echo "  -skip-package-install, -S   skip package installation"
+  echo "  -publish-to-npm             publishes the current version to the npm package index"
+  echo "  -dry-run                    do build, etc, but don't actually publish"
 }
 
 ################################ Main script ################################
