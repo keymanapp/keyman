@@ -1,4 +1,4 @@
-unit Keyman.Developer.UI.UfrmModelEditor;
+﻿unit Keyman.Developer.UI.UfrmModelEditor;
 
 interface
 
@@ -74,6 +74,14 @@ type
     Label5: TLabel;
     editOutPath: TEdit;
     imgQRCode: TImage;
+    lblInsertAfterWord: TLabel;
+    cbInsertAfterWord: TComboBox;
+    lblQuotationMarks: TLabel;
+    cbOpenQuote: TComboBox;
+    chkIsRTL: TCheckBox;
+    cbCloseQuote: TComboBox;
+    lblOpenQuote: TLabel;
+    lblCloseQuote: TLabel;
     procedure FormDestroy(Sender: TObject);
     procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
@@ -89,6 +97,16 @@ type
     procedure cmdBrowseTestKeyboardClick(Sender: TObject);
     procedure editTestKeyboardChange(Sender: TObject);
     procedure lbDebugHostsClick(Sender: TObject);
+    procedure cbInsertAfterWordClick(Sender: TObject);
+    procedure cbInsertAfterWordKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure cbOpenQuoteClick(Sender: TObject);
+    procedure cbOpenQuoteKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure cbCloseQuoteClick(Sender: TObject);
+    procedure cbCloseQuoteKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure chkIsRTLClick(Sender: TObject);
   private
     type
       TWordlist = class
@@ -161,19 +179,108 @@ begin
   Result := Ord(format) - 1;  // unknown = -1
 end;
 
+function FormatFromIndex(index: Integer): TLexicalModelFormat;
+begin
+  Result := TLexicalModelFormat(index+1);  // unknown = -1
+end;
+
 function WordBreakerToIndex(wordBreaker: TLexicalModelWordBreaker): Integer;
 begin
   Result := Ord(wordBreaker) - 1;  // unknown = -1
 end;
 
-function FormatFromIndex(format: Integer): TLexicalModelFormat;
+function WordBreakerFromIndex(index: Integer): TLexicalModelWordBreaker;
 begin
-  Result := TLexicalModelFormat(format+1);  // unknown = -1
+  Result := TLexicalModelWordBreaker(index+1);  // unknown = -1
 end;
 
-function WordBreakerFromIndex(wordBreaker: Integer): TLexicalModelWordBreaker;
+type
+  TComboStringOption = record
+    value, name: string;
+    class procedure FillCombo(const opts: array of TComboStringOption;
+      combo: TComboBox); static;
+    class function GetValue(const opts: array of TComboStringOption;
+      combo: TComboBox): string; static;
+    class procedure SetValue(const opts: array of TComboStringOption;
+      const text: string; combo: TComboBox); static;
+  end;
+
+const
+  CInsertAfterWordOptions: array[0..4] of TComboStringOption = (
+    (value: ' '; name: '(Space U+0020)'),
+    (value: ''; name: '(No word break)'),
+    (value: Char($200B); name: '(Zero width space U+200B)'),
+    (value: Char($0F0B); name: '(Tibetan tsheg U+0F0B)'),
+    (value: Char($1361); name: '(Ethiopian wordspace U+1361)')
+  );
+
+  COpenQuoteOptions: array[0..11] of TComboStringOption = (
+    (value: TLexicalModelParser.CDefaultOpenQuote),
+    (value: '«'),
+    (value: '„'),
+    (value: '»'),
+    (value: '"'),
+    (value: ''''),
+    (value: '‹'),
+    (value: '‘'),
+    (value: '‚'),
+    (value: '›'),
+    (value: '「'),
+    (value: '『')
+  );
+
+  CCloseQuoteOptions: array[0..10] of TComboStringOption = (
+    (value: TLexicalModelParser.CDefaultCloseQuote),
+    (value: '»'),
+    (value: '“'),
+    (value: '«'),
+    (value: '"'),
+    (value: ''''),
+    (value: '›'),
+    (value: '’'),
+    (value: '‹'),
+    (value: '」'),
+    (value: '』')
+  );
+
+class procedure TComboStringOption.SetValue(const opts: array of TComboStringOption; const text: string;
+  combo: TComboBox);
+var
+  index: Integer;
 begin
-  Result := TLexicalModelWordBreaker(wordBreaker+1);  // unknown = -1
+  for index := 0 to High(opts) do
+    if opts[index].value = text then
+    begin
+      combo.ItemIndex := index;
+      Exit;
+    end;
+  combo.Text := text;
+end;
+
+class function TComboStringOption.GetValue(const opts: array of TComboStringOption;
+  combo: TComboBox): string;
+begin
+  if (combo.ItemIndex >= 0) and (combo.ItemIndex <= High(opts))
+    then Result := opts[combo.ItemIndex].value
+    else Result := combo.Text;
+end;
+
+class procedure TComboStringOption.FillCombo(const opts: array of TComboStringOption; combo: TComboBox);
+var
+  opt: TComboStringOption;
+begin
+  combo.Items.BeginUpdate;
+  try
+    combo.Items.Clear;
+    for opt in opts do
+    begin
+      if opt.name = ''
+        then combo.Items.Add(opt.value)
+        else combo.Items.Add(opt.name);
+    end;
+  finally
+    combo.Items.EndUpdate;
+  end;
 end;
 
 { TfrmModelEditor }
@@ -269,6 +376,16 @@ begin
   lblWordBreaker.Enabled := e;
   cbWordBreaker.Enabled := e;
   lblComments.Enabled := e;
+
+  lblInsertAfterWord.Enabled := e;
+  cbInsertAfterWord.Enabled := e;
+  lblQuotationMarks.Enabled := e;
+  lblOpenQuote.Enabled := e;
+  cbOpenQuote.Enabled := e;
+  lblCloseQuote.Enabled := e;
+  cbCloseQuote.Enabled := e;
+  chkIsRTL.Enabled := e;
+
   memoComments.Enabled := e;
   cmdAddWordlist.Enabled := e;
   gridWordlists.Enabled := e and (parser.Wordlists.Count > 0);
@@ -310,6 +427,10 @@ begin
     frameSource.Visible := True;
     frameSource.OnChanged := SourceChanged;
     frameSource.TextFileFormat := tffUTF8;
+
+    TComboStringOption.FillCombo(CInsertAfterWordOptions, cbInsertAfterWord);
+    TComboStringOption.FillCombo(COpenQuoteOptions, cbOpenQuote);
+    TComboStringOption.FillCombo(CCloseQuoteOptions, cbCloseQuote);
 
     pages.ActivePage := pageDetails;
   finally
@@ -459,6 +580,11 @@ var
 begin
   cbFormat.ItemIndex := FormatToIndex(parser.Format);
   cbWordBreaker.ItemIndex := WordBreakerToIndex(parser.WordBreaker);
+  TComboStringOption.SetValue(CInsertAfterWordOptions, parser.InsertAfterWord, cbInsertAfterWord);
+  TComboStringOption.SetValue(COpenQuoteOptions, parser.OpenQuote, cbOpenQuote);
+  TComboStringOption.SetValue(CCloseQuoteOptions, parser.CloseQuote, cbCloseQuote);
+  chkIsRTL.Checked := parser.IsRTL;
+
   memoComments.Text := parser.Comment;
 
   if parser.Wordlists.Count = 0 then
@@ -570,6 +696,20 @@ begin
   Result := WordlistFromTab(pages.ActivePage) <> nil;
 end;
 
+procedure TfrmModelEditor.cbCloseQuoteClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.CloseQuote := TComboStringOption.GetValue(CCloseQuoteOptions, cbCloseQuote);
+  Modified := True;
+end;
+
+procedure TfrmModelEditor.cbCloseQuoteKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  cbCloseQuoteClick(Sender);
+end;
+
 procedure TfrmModelEditor.cbFormatClick(Sender: TObject);
 begin
   if FSetup > 0 then
@@ -578,11 +718,47 @@ begin
   Modified := True;
 end;
 
+procedure TfrmModelEditor.cbInsertAfterWordClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.InsertAfterWord := TComboStringOption.GetValue(CInsertAfterWordOptions, cbInsertAfterWord);
+  Modified := True;
+end;
+
+procedure TfrmModelEditor.cbInsertAfterWordKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  cbInsertAfterWordClick(Sender);
+end;
+
+procedure TfrmModelEditor.cbOpenQuoteClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.OpenQuote := TComboStringOption.GetValue(COpenQuoteOptions, cbOpenQuote);
+  Modified := True;
+end;
+
+procedure TfrmModelEditor.cbOpenQuoteKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  cbOpenQuoteClick(cbOpenQuote);
+end;
+
 procedure TfrmModelEditor.cbWordBreakerClick(Sender: TObject);
 begin
   if FSetup > 0 then
     Exit;
   parser.WordBreaker := WordBreakerFromIndex(cbWordBreaker.ItemIndex);
+  Modified := True;
+end;
+
+procedure TfrmModelEditor.chkIsRTLClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.IsRTL := chkIsRTL.Checked;
   Modified := True;
 end;
 

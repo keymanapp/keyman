@@ -5,6 +5,8 @@ inherited frmModelEditor: TfrmModelEditor
   ClientHeight = 708
   ClientWidth = 712
   Font.Name = 'Tahoma'
+  Position = poDesigned
+  ExplicitTop = -18
   ExplicitWidth = 712
   ExplicitHeight = 708
   PixelsPerInch = 96
@@ -14,7 +16,7 @@ inherited frmModelEditor: TfrmModelEditor
     Top = 0
     Width = 712
     Height = 708
-    ActivePage = pageCompile
+    ActivePage = pageDetails
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -48,7 +50,7 @@ inherited frmModelEditor: TfrmModelEditor
         object panWordlists: TPanel
           AlignWithMargins = True
           Left = 4
-          Top = 181
+          Top = 261
           Width = 611
           Height = 232
           Margins.Left = 4
@@ -58,6 +60,7 @@ inherited frmModelEditor: TfrmModelEditor
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
+          ExplicitTop = 181
           DesignSize = (
             611
             232)
@@ -80,7 +83,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 200
             Width = 415
             Height = 13
-            Caption = 
+            Caption =
               'The editor was unable to parse the source file. Details shown he' +
               're are read-only.'
           end
@@ -131,7 +134,7 @@ inherited frmModelEditor: TfrmModelEditor
           Left = 4
           Top = 6
           Width = 611
-          Height = 167
+          Height = 247
           Margins.Left = 4
           Margins.Top = 6
           Margins.Right = 4
@@ -143,13 +146,14 @@ inherited frmModelEditor: TfrmModelEditor
           TabOrder = 0
           DesignSize = (
             611
-            167)
+            247)
           object lblFormat: TLabel
             Left = 12
             Top = 30
             Width = 36
             Height = 13
             Caption = '&Format'
+            FocusControl = cbFormat
           end
           object lblBasicInformation: TLabel
             AlignWithMargins = True
@@ -174,7 +178,7 @@ inherited frmModelEditor: TfrmModelEditor
           end
           object lblComments: TLabel
             Left = 12
-            Top = 83
+            Top = 163
             Width = 50
             Height = 13
             Caption = 'Comme&nts'
@@ -185,8 +189,40 @@ inherited frmModelEditor: TfrmModelEditor
             Font.Style = []
             ParentFont = False
           end
+          object lblInsertAfterWord: TLabel
+            Left = 12
+            Top = 83
+            Width = 86
+            Height = 13
+            Caption = '&Insert after word'
+            FocusControl = cbInsertAfterWord
+          end
+          object lblQuotationMarks: TLabel
+            Left = 12
+            Top = 110
+            Width = 86
+            Height = 13
+            Caption = '&Quotation marks'
+            FocusControl = cbOpenQuote
+          end
+          object lblOpenQuote: TLabel
+            Left = 106
+            Top = 110
+            Width = 27
+            Height = 13
+            Caption = 'open'
+            FocusControl = cbOpenQuote
+          end
+          object lblCloseQuote: TLabel
+            Left = 220
+            Top = 110
+            Width = 26
+            Height = 13
+            Caption = 'close'
+            FocusControl = cbCloseQuote
+          end
           object cbFormat: TComboBox
-            Left = 98
+            Left = 106
             Top = 26
             Width = 145
             Height = 21
@@ -198,7 +234,7 @@ inherited frmModelEditor: TfrmModelEditor
               'Custom (custom-1.0)')
           end
           object cbWordBreaker: TComboBox
-            Left = 98
+            Left = 106
             Top = 53
             Width = 145
             Height = 21
@@ -211,14 +247,53 @@ inherited frmModelEditor: TfrmModelEditor
               'custom')
           end
           object memoComments: TMemo
-            Left = 98
-            Top = 80
-            Width = 506
+            Left = 106
+            Top = 160
+            Width = 498
             Height = 87
             Anchors = [akLeft, akTop, akRight]
             BevelOuter = bvNone
-            TabOrder = 2
+            TabOrder = 6
             OnChange = memoCommentsChange
+          end
+          object cbInsertAfterWord: TComboBox
+            Left = 106
+            Top = 80
+            Width = 145
+            Height = 21
+            TabOrder = 2
+            OnChange = cbInsertAfterWordClick
+            OnClick = cbInsertAfterWordClick
+            OnKeyUp = cbInsertAfterWordKeyUp
+          end
+          object cbOpenQuote: TComboBox
+            Left = 139
+            Top = 107
+            Width = 63
+            Height = 21
+            TabOrder = 3
+            OnChange = cbOpenQuoteClick
+            OnClick = cbOpenQuoteClick
+            OnKeyUp = cbOpenQuoteKeyUp
+          end
+          object chkIsRTL: TCheckBox
+            Left = 106
+            Top = 134
+            Width = 111
+            Height = 17
+            Caption = 'Right-to-left script'
+            TabOrder = 5
+            OnClick = chkIsRTLClick
+          end
+          object cbCloseQuote: TComboBox
+            Left = 252
+            Top = 107
+            Width = 63
+            Height = 21
+            TabOrder = 4
+            OnChange = cbCloseQuoteClick
+            OnClick = cbCloseQuoteClick
+            OnKeyUp = cbCloseQuoteKeyUp
           end
         end
       end
@@ -245,7 +320,7 @@ inherited frmModelEditor: TfrmModelEditor
           Top = 13
           Width = 333
           Height = 13
-          Caption = 
+          Caption =
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
@@ -322,7 +397,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 72
             Width = 389
             Height = 26
-            Caption = 
+            Caption =
               'Optionally, select a compiled keyboard with which to test this l' +
               'exical model. Any keyboards already loaded in the web debugger w' +
               'ill also be available.'
