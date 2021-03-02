@@ -205,11 +205,32 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
                shouldStartLoadWith request: URLRequest,
                navigationType: UIWebView.NavigationType) -> Bool {
     if request.url?.lastPathComponent.hasSuffix(".kmp") ?? false {
+      // Can't have the browser auto-download with no way to select a different page.
+      // Can't just ignore it, either, as the .kmp may result from a redirect from
+      // the previous URL.  (Like if using the keyman.com keyboard search!)
+      let userData = UserDefaults.standard
+      userData.set(nil as String?, forKey: webBrowserLastURLKey)
+      userData.synchronize()
+
       // The user is trying to download a .kmp, but the standard
       // UIWebView can't handle it properly.
-      //
-      // Instead, we can just forward that URL back into Safari.
-      UIApplication.shared.openURL(request.url!)
+
+      ResourceDownloadManager.shared.downloadRawKMP(from: request.url!) { file, error in
+        // do something!
+        if let error = error {
+          let alert = ResourceFileManager.shared.buildSimpleAlert(title: "Error", message: error.localizedDescription)
+          self.present(alert, animated: true, completion: nil)
+          return
+        }
+
+        // Re-use the standard 'open random file' code as when launching the
+        // app from a file.  This will also auto-dismiss the browser, returning
+        // to the app's main screen.
+        if let file = file {
+          let appDelegate = UIApplication.shared.delegate as! AppDelegate
+          _ = appDelegate.application(UIApplication.shared, open: file)
+        }
+      }
 
       return false
     }

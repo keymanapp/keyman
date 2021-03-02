@@ -36,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       vc.dismiss(animated: true, completion: nil)
 
       if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: vc) {
-        // We choose to prompt the user for comfirmation, rather
+        // We choose to prompt the user for confirmation, rather
         // than automatically installing the package.
         //
         // Since we're operating at the root, we want to present in a separate UINavigationController.
