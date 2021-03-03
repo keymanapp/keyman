@@ -218,7 +218,9 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       ResourceDownloadManager.shared.downloadRawKMP(from: request.url!) { file, error in
         // do something!
         if let error = error {
-          let alert = ResourceFileManager.shared.buildSimpleAlert(title: "Error", message: error.localizedDescription)
+          let alertTitle = NSLocalizedString("alert-error-title", bundle: Bundle(for: Manager.self), comment: "")
+          let alert = ResourceFileManager.shared.buildSimpleAlert(title: alertTitle,
+                                                                  message: error.localizedDescription)
           self.present(alert, animated: true, completion: nil)
           return
         }
@@ -263,10 +265,12 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     }
 
     if signalError {
-      let alertController = UIAlertController(title: "Cannot Open Page",
+      let alertController = UIAlertController(title: NSLocalizedString("error-opening-page", comment: ""),
                                               message: error.localizedDescription,
                                               preferredStyle: UIAlertController.Style.alert)
-      alertController.addAction(UIAlertAction(title: "OK",
+      alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok",
+                                                                       bundle: Bundle(for: Manager.self),
+                                                                       comment: ""),
                                               style: UIAlertAction.Style.default,
                                               handler: nil))
       self.present(alertController, animated: true, completion: nil)

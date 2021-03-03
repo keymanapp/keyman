@@ -253,7 +253,7 @@ class LanguageSettingsViewController: UITableViewController {
           }
 
         default:
-          cell.textLabel?.text = "error"
+          cell.textLabel?.text = NSLocalizedString("alert-error-title", bundle: engineBundle, comment: "")
       }
     }
   }
