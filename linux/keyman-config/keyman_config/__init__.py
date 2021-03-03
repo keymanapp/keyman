@@ -36,6 +36,8 @@ KeymanDownloadsUrl = 'https://downloads.keyman.com'
 
 if 'unittest' in sys.modules.keys():
     print('Not reporting to Sentry')
+elif os.environ.get('KEYMAN_NOSENTRY'):
+    print('Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set')
 else:
     try:
         # Try new sentry-sdk first
