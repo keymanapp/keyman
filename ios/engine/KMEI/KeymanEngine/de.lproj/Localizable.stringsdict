@@ -13,9 +13,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>%u dictionary installed</string>
+        <string>%u Wörterbuch installiert</string>
         <key>other</key>
-        <string>%u dictionaries installed</string>
+        <string>%u Wörterbücher installiert</string>
       </dict>
     </dict>
     <key>notification-update-failed</key>
@@ -29,9 +29,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>%u update failed</string>
+        <string>%u Aktualisierung fehlgeschlagen</string>
         <key>other</key>
-        <string>%u updates failed</string>
+        <string>%u Aktualisierungen fehlgeschlagen</string>
       </dict>
     </dict>
     <key>notification-update-success</key>
@@ -45,9 +45,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>%u update successful</string>
+        <string>%u Aktualisierung erfolgreich</string>
         <key>other</key>
-        <string>%u updates successful</string>
+        <string>%u Aktualisierungen erfolgreich</string>
       </dict>
     </dict>
     <key>settings-keyboards-installed-count</key>
@@ -61,9 +61,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>%u keyboard installed</string>
+        <string>%u Tastatur installiert</string>
         <key>other</key>
-        <string>%u keyboards installed</string>
+        <string>%u Tastaturen installiert</string>
       </dict>
     </dict>
     <key>settings-languages-installed-count</key>
@@ -77,9 +77,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>%u language installed</string>
+        <string>%u Sprache installiert</string>
         <key>other</key>
-        <string>%u languages installed</string>
+        <string>%u Sprachen installiert</string>
       </dict>
     </dict>
     <key>package-default-found-keyboards</key>
@@ -93,9 +93,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>Found %u keyboard in package:</string>
+        <string>%u Tastatur im Paket gefunden:</string>
         <key>other</key>
-        <string>Found %u keyboards in package:</string>
+        <string>%u Tastaturen im Paket gefunden:</string>
       </dict>
     </dict>
     <key>package-default-found-lexical-models</key>
@@ -109,9 +109,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>Found %u dictionary in package:</string>
+        <string>%u Wörterbuch im Paket gefunden:</string>
         <key>other</key>
-        <string>Found %u dictionaries in package:</string>
+        <string>%u Wörterbücher im Paket gefunden:</string>
       </dict>
     </dict>
   </dict>
