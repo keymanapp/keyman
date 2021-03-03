@@ -60,6 +60,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
   private var dismissalBlock: (() -> Void)? = nil
   private weak var welcomeView: UIView?
+  private var mayPick: Bool = true
 
   public init(for package: Resource.Package,
               defaultLanguageCode: String? = nil,
@@ -268,9 +269,11 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     }
 
     set(mode) {
-      leftNavMode = mode
+      if mayPick {
+        leftNavMode = mode
 
-      navigationItem.leftBarButtonItem = navMapping[mode]
+        navigationItem.leftBarButtonItem = navMapping[mode]
+      }
     }
   }
 
@@ -280,9 +283,11 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     }
 
     set(mode) {
-      rightNavMode = mode
+      if mayPick {
+        rightNavMode = mode
 
-      navigationItem.rightBarButtonItem = navMapping[mode]
+        navigationItem.rightBarButtonItem = navMapping[mode]
+      }
     }
   }
 
@@ -358,8 +363,10 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     // No more selection-manipulation allowed.
     // This matters when there's no welcome page available.
     languageTable.isUserInteractionEnabled = false
-    // Prevent extra 'install' commands.
+    // Prevent extra 'install' commands and nav-bar related manipulation.
+    self.navigationItem.leftBarButtonItem?.isEnabled = false
     self.rightNavigationMode = .none
+    self.mayPick = false
 
     let dismissalBlock = {
       self.associators.forEach { $0.pickerFinalized() }
@@ -399,7 +406,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
         dismissalBlock()
       }
     } else {
-      dismissalBlock()
+      self.dismissalBlock = dismissalBlock
+      onWelcomeDismissed()
     }
   }
 
