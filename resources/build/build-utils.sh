@@ -73,12 +73,12 @@ function findVersion() {
         VERSION_TAG=
     fi
 
-    if [ -z "${TEAMCITY_VERSION-}" ]; then
+    if [ -z "${TEAMCITY_VERSION-}" -a -z "${JENKINS_HOME-}" ]; then
         # Local dev machine, not TeamCity
         VERSION_TAG="$VERSION_TAG-local"
         VERSION_ENVIRONMENT=local
     else
-        # On TeamCity; are we running a pull request build or a master/beta/stable build?
+        # On TeamCity: are we running a pull request build or a master/beta/stable build?
         if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
             VERSION_ENVIRONMENT=test
             # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'

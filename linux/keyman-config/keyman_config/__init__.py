@@ -9,6 +9,7 @@ from .version import __versionwithtag__
 from .version import __majorversion__
 from .version import __releaseversion__
 from .version import __tier__
+from .version import __pkgversion__
 
 
 def _(txt):

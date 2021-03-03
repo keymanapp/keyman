@@ -61,7 +61,6 @@ for proj in ${projects}; do
     cd ${proj}-${version}
     echo $(pwd)
     cp debian/changelog ../${proj}-changelog
-    #TODO separate source builds and dputs for each of $dists?
     for dist in ${distributions}; do
         cp ../${proj}-changelog debian/changelog
         dch -v ${version}-${packageversion}~${dist} "source package for PPA"
