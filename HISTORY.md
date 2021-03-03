@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 14.0.251 beta 2021-03-03
+
+* fix(developer): Improve stability of named code constants (#4547)
+* fix(developer): schema conformance for model package compiler (#4548)
+* fix(developer): touch layout osk import handling of multiple modifiers (#4552)
+* fix(developer): require language tag when compiling keyboard package (#4563)
+* fix(developer): Avoid blank keys when importing KMX to KVKS (#4564)
+* feat(developer): isRTL support for lexical model editor (#4559)
+* fix(developer): track modified state in wordlist editor better (#4562)
+* chore(ios): better visual feedback for keyboard search during poor internet connectivity (#4573)
+* chore(common): Update crowdin files for `de` (#4578)
+* chore(common/core/desktop): write debug output to console (#4569)
+
 ## 14.0.250 beta 2021-03-02
 
 * fix(common/resources): Fix help.keyman.com path for CI (#4565)
