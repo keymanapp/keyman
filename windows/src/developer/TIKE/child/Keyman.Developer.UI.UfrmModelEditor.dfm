@@ -6,7 +6,6 @@ inherited frmModelEditor: TfrmModelEditor
   ClientWidth = 712
   Font.Name = 'Tahoma'
   Position = poDesigned
-  ExplicitTop = -18
   ExplicitWidth = 712
   ExplicitHeight = 708
   PixelsPerInch = 96
@@ -60,7 +59,6 @@ inherited frmModelEditor: TfrmModelEditor
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
-          ExplicitTop = 181
           DesignSize = (
             611
             232)
@@ -324,47 +322,15 @@ inherited frmModelEditor: TfrmModelEditor
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
-        object Label5: TLabel
-          Left = 10
-          Top = 79
-          Width = 82
-          Height = 13
-          Caption = 'Target filename:'
-        end
-        object cmdCompile: TButton
-          Left = 10
-          Top = 40
-          Width = 137
-          Height = 25
-          Action = modActionsModelEditor.actModelCompile
-          TabOrder = 0
-        end
-        object cmdAddToProject: TButton
-          Left = 297
-          Top = 40
-          Width = 137
-          Height = 25
-          Action = modActionsMain.actProjectAddCurrentEditorFile
-          TabOrder = 1
-        end
-        object cmdOpenContainingFolder2: TButton
-          Left = 153
-          Top = 40
-          Width = 138
-          Height = 25
-          Caption = '&Open Containing Folder'
-          TabOrder = 2
-          OnClick = cmdOpenContainingFolder2Click
-        end
         object panBuildLexicalModel: TPanel
           Left = 10
-          Top = 112
+          Top = 235
           Width = 471
           Height = 353
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 3
+          TabOrder = 2
           object lblDebugHostCaption: TLabel
             Left = 12
             Top = 158
@@ -464,15 +430,111 @@ inherited frmModelEditor: TfrmModelEditor
             OnClick = cmdBrowseTestKeyboardClick
           end
         end
-        object editOutPath: TEdit
-          Left = 98
-          Top = 76
-          Width = 383
-          Height = 21
-          TabStop = False
-          ParentColor = True
-          ReadOnly = True
-          TabOrder = 4
+        object panOpenInExplorer: TPanel
+          Left = 10
+          Top = 148
+          Width = 471
+          Height = 67
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 1
+          object lblOpenInExplorer: TLabel
+            Left = 9
+            Top = 6
+            Width = 115
+            Height = 17
+            Caption = 'Open in Explorer'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object cmdOpenSourceFolder: TButton
+            Left = 9
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = '&Open source folder'
+            TabOrder = 0
+            OnClick = cmdOpenSourceFolderClick
+          end
+          object cmdOpenBuildFolder: TButton
+            Left = 153
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = 'Open &build folder'
+            TabOrder = 1
+            OnClick = cmdOpenBuildFolderClick
+          end
+          object cmdOpenProjectFolder: TButton
+            Left = 297
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = 'Open pro&ject folder'
+            TabOrder = 2
+            OnClick = cmdOpenProjectFolderClick
+          end
+        end
+        object panFileActions: TPanel
+          Left = 10
+          Top = 32
+          Width = 471
+          Height = 97
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 0
+          object lblFileActions: TLabel
+            Left = 9
+            Top = 6
+            Width = 75
+            Height = 17
+            Caption = 'File actions'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object Label5: TLabel
+            Left = 10
+            Top = 71
+            Width = 82
+            Height = 13
+            Caption = 'Target filename:'
+          end
+          object cmdAddToProject: TButton
+            Left = 153
+            Top = 32
+            Width = 137
+            Height = 25
+            Action = modActionsMain.actProjectAddCurrentEditorFile
+            TabOrder = 1
+          end
+          object cmdCompile: TButton
+            Left = 10
+            Top = 32
+            Width = 137
+            Height = 25
+            Action = modActionsModelEditor.actModelCompile
+            TabOrder = 0
+          end
+          object editOutPath: TEdit
+            Left = 98
+            Top = 68
+            Width = 359
+            Height = 21
+            TabStop = False
+            ParentColor = True
+            ReadOnly = True
+            TabOrder = 2
+          end
         end
       end
     end

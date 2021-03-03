@@ -49,9 +49,6 @@ type
     pageCompile: TTabSheet;
     Panel1: TPanel;
     lblCongrats: TLabel;
-    cmdCompile: TButton;
-    cmdAddToProject: TButton;
-    cmdOpenContainingFolder2: TButton;
     panBuildLexicalModel: TPanel;
     cbFormat: TComboBox;
     cbWordBreaker: TComboBox;
@@ -71,8 +68,6 @@ type
     lblReadOnly: TLabel;
     dlgAddWordlist: TOpenDialog;
     dlgBrowseTestKeyboard: TOpenDialog;
-    Label5: TLabel;
-    editOutPath: TEdit;
     imgQRCode: TImage;
     lblInsertAfterWord: TLabel;
     cbInsertAfterWord: TComboBox;
@@ -82,6 +77,17 @@ type
     cbCloseQuote: TComboBox;
     lblOpenQuote: TLabel;
     lblCloseQuote: TLabel;
+    panOpenInExplorer: TPanel;
+    lblOpenInExplorer: TLabel;
+    cmdOpenSourceFolder: TButton;
+    cmdOpenBuildFolder: TButton;
+    cmdOpenProjectFolder: TButton;
+    panFileActions: TPanel;
+    lblFileActions: TLabel;
+    cmdAddToProject: TButton;
+    cmdCompile: TButton;
+    Label5: TLabel;
+    editOutPath: TEdit;
     procedure FormDestroy(Sender: TObject);
     procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
@@ -91,7 +97,6 @@ type
     procedure cbFormatClick(Sender: TObject);
     procedure cbWordBreakerClick(Sender: TObject);
     procedure memoCommentsChange(Sender: TObject);
-    procedure cmdOpenContainingFolder2Click(Sender: TObject);
     procedure cmdOpenDebugHostClick(Sender: TObject);
     procedure cmdSendURLsToEmailClick(Sender: TObject);
     procedure cmdBrowseTestKeyboardClick(Sender: TObject);
@@ -107,6 +112,9 @@ type
     procedure cbCloseQuoteKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure chkIsRTLClick(Sender: TObject);
+    procedure cmdOpenSourceFolderClick(Sender: TObject);
+    procedure cmdOpenBuildFolderClick(Sender: TObject);
+    procedure cmdOpenProjectFolderClick(Sender: TObject);
   private
     type
       TWordlist = class
@@ -395,6 +403,12 @@ begin
   { Build tab }
   cmdOpenDebugHost.Enabled := lbDebugHosts.ItemIndex >= 0;
   cmdSendURLsToEmail.Enabled := lbDebugHosts.Items.Count > 0;   // I4506
+
+  // We use FProjectFile because we don't want to accidentally create a standalone
+  // project file as GetProjectFile is side-effecty. EnableControls is called early
+  // in construction before FProjectFile is assigned. It is called again later so
+  // enabled state will be correct.
+  cmdOpenProjectFolder.Enabled := Assigned(FProjectFile) and Assigned(FProjectFile.Project);
 end;
 
 procedure TfrmModelEditor.NotifyStartedWebDebug;
@@ -783,14 +797,25 @@ begin
     editTestKeyboard.Text := dlgBrowseTestKeyboard.FileName;
 end;
 
-procedure TfrmModelEditor.cmdOpenContainingFolder2Click(Sender: TObject);
+procedure TfrmModelEditor.cmdOpenDebugHostClick(Sender: TObject);
+begin
+  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex]);
+end;
+
+procedure TfrmModelEditor.cmdOpenSourceFolderClick(Sender: TObject);
 begin
   OpenContainingFolder(FileName);
 end;
 
-procedure TfrmModelEditor.cmdOpenDebugHostClick(Sender: TObject);
+procedure TfrmModelEditor.cmdOpenBuildFolderClick(Sender: TObject);
 begin
-  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex]);
+  OpenContainingFolder((ProjectFile as TmodeltsProjectFile).TargetFilename);
+end;
+
+procedure TfrmModelEditor.cmdOpenProjectFolderClick(Sender: TObject);
+begin
+  if Assigned(ProjectFile.Project) then
+    OpenContainingFolder(ProjectFile.Project.FileName);
 end;
 
 procedure TfrmModelEditor.cmdRemoveWordlistClick(Sender: TObject);
