@@ -228,3 +228,12 @@ BEGIN
     CWARN_NulNotFirstStatementInContext       "nul must be the first statement in the context"
     CWARN_IfShouldBeAtStartOfContext          "if, platform and baselayout should be at start of context (after nul, if present])"
 END
+
+STRINGTABLE
+BEGIN
+    CERR_ExpansionMustFollowCharacterOrVKey            "An expansion must follow a character or a virtual key"
+    CERR_VKeyExpansionMustBeFollowedByVKey             "A virtual key expansion must be terminated by a virtual key"
+    CERR_CharacterExpansionMustBeFollowedByCharacter   "A character expansion must be terminated by a character key"
+    CERR_VKeyExpansionMustUseConsistentShift           "A virtual key expansion must use the same shift state for both terminators"
+    CERR_ExpansionMustBePositive                       "An expansion must have positive difference (i.e. A-Z, not Z-A)"
+END

@@ -1,0 +1,14 @@
+c This file is the baseline for test_expansion; the two files should compile to be identical
+store(&NAME) 'Test Expansions'
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(char_range) 'abcdefghijklmnopqrstuvwxyz'
+store(key_range) [K_A] [K_B] [K_C] [K_D] [K_E]
+
+store(schar_range) U+10001 U+10002 U+10003 U+10004 U+10005 U+10006
+store(schar_range2) U+1000 U+1001 U+1002 U+1003 U+1004 U+1005 U+1006
+
+store(char_range_silly) 'cd'
+store(key_range_silly) [K_C] [K_D]

@@ -1,0 +1,34 @@
+c This file tests that invalid expansions are caught
+store(&NAME) 'Test Invalid Expansions'
+begin Unicode > use(main)
+
+group(main) using keys
+
+c Backward ranges
+
+store(char_range_backward) 'c' .. 'a'
+store(key_range_backward) [K_E] .. [K_A]
+
+store(char_range_empty) 'c' .. 'c'
+store(key_range_empty) [K_E] .. [K_E]
+
+c Incomplete ranges
+
+store(range_open) ..
+store(char_range_open_end) 'a' ..
+store(char_range_open_start) .. 'z'
+
+store(key_range_open_end) [K_A] ..
+store(key_range_open_start) .. [K_Z]
+
+c Inconsistent ranges
+
+store(char_range_to_key) 'a' .. [K_Z]
+store(key_range_to_char) [K_A] .. 'z'
+
+store(char_range_to_statement) 'a' .. nul
+store(key_range_to_statement) [K_A] .. nul
+store(char_range_from_statement) nul .. 'a'
+store(key_range_from_statement) nul .. [K_A]
+
+store(key_range_shift_inconsistent) [SHIFT K_A] .. [K_Z]

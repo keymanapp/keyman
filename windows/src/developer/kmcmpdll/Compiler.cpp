@@ -135,6 +135,7 @@ DWORD process_save(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx);
 DWORD process_platform(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx);  // I3430
 DWORD process_baselayout(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx);  // I3430
 DWORD process_set_synonym(DWORD dwSystemID, PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx);  // I3437
+DWORD process_expansion(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx, int max);
 
 BOOL IsValidKeyboardVersion(WCHAR *dpString);   // I4140
 
@@ -1957,6 +1958,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
       case '$':  type = 16; break;	// named code constants
       case 'P':  type = 17; break;  // platform (synonym for if(&platform))  // I3430
       case 'L':  type = 18; break;  // layer (synonym for set(&layer))  // I3437
+      case '.':  type = 19; break;  // .. allows us to specify ranges -- either vkeys or characters
       default:
         if (iswdigit(*p)) type = 0;	// octal number
         else type = 99;				// error!
@@ -2494,6 +2496,13 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         err = process_set_synonym(TSS_LAYER, fk, q, tstr, &mx);
         if (err != CERR_None) return err;
         continue;
+      case 19:  // #2241
+        if (*(p + 1) != '.') return CERR_InvalidToken;
+        if (sFlag) return CERR_InvalidInVirtualKeySection;
+        p += 2;
+        err = process_expansion(fk, p, tstr, &mx, max);
+        if (err != CERR_None) return err;
+        continue;
       default:
         return CERR_InvalidToken;
       }
@@ -2659,6 +2668,104 @@ DWORD process_reset(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)
   tstr[(*mx)++] = CODE_RESETOPT;
   tstr[(*mx)++] = (WCHAR)(i + 1);
   tstr[(*mx)] = 0;
+
+  return CERR_None;
+}
+
+DWORD process_expansion(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx, int max) {
+  BOOL isVKey = FALSE;
+
+  WORD BaseKey=0, BaseShiftFlags=0;
+  DWORD BaseChar=0;
+
+  if (*mx == 0) {
+    return CERR_ExpansionMustFollowCharacterOrVKey;
+  }
+  LPWSTR p = &tstr[*mx];
+  p = decxstr(p, tstr);
+  if (*p == UC_SENTINEL) {
+    if (*(p + 1) != CODE_EXTENDED) {
+      return CERR_ExpansionMustFollowCharacterOrVKey;
+    }
+    isVKey = TRUE;
+    BaseKey = *(p + 3);
+    BaseShiftFlags = *(p + 2);
+  }
+  else {
+    BaseChar = Uni_UTF16ToUTF32(p);
+  }
+
+  // Look ahead at next element
+  WCHAR temp[64];
+  PWCHAR r = NULL;
+
+  DWORD msg;
+
+  if ((msg = GetXString(fk, q, L"", temp, _countof(temp) - 1, 0, &r, FALSE, TRUE)) != CERR_None)
+  {
+    return msg;
+  }
+
+  WORD HighKey, HighShiftFlags;
+  DWORD HighChar;
+
+  switch(temp[0]) {
+  case 0:
+    return isVKey ? CERR_VKeyExpansionMustBeFollowedByVKey : CERR_CharacterExpansionMustBeFollowedByCharacter;
+  case UC_SENTINEL:
+    // Verify that range is valid virtual key range
+    if(!isVKey) {
+      return CERR_CharacterExpansionMustBeFollowedByCharacter;
+    }
+    if (temp[1] != CODE_EXTENDED) {
+      return CERR_VKeyExpansionMustBeFollowedByVKey;
+    }
+    HighKey = temp[3], HighShiftFlags = temp[2];
+    if (HighShiftFlags != BaseShiftFlags) {
+      return CERR_VKeyExpansionMustUseConsistentShift;
+    }
+    if (HighKey <= BaseKey) {
+      return CERR_ExpansionMustBePositive;
+    }
+    // Verify space in buffer
+    if (*mx + (HighKey - BaseKey) * 5 + 1 >= max) return CERR_BufferOverflow;
+    // Inject an expansion.
+    for (BaseKey++; BaseKey < HighKey; BaseKey++) {
+      // < HighKey because caller will add HighKey to output
+      tstr[(*mx)++] = UC_SENTINEL;
+      tstr[(*mx)++] = CODE_EXTENDED;
+      tstr[(*mx)++] = BaseShiftFlags;
+      tstr[(*mx)++] = BaseKey;
+      tstr[(*mx)++] = UC_SENTINEL_EXTENDEDEND;
+    }
+    tstr[*mx] = 0;
+    break;
+  default:
+    // Verify that range is a valid character range
+    if (isVKey) {
+      return CERR_VKeyExpansionMustBeFollowedByVKey;
+    }
+
+    HighChar = Uni_UTF16ToUTF32(temp);
+    if (HighChar <= BaseChar) {
+      return CERR_ExpansionMustBePositive;
+    }
+    // Inject an expansion.
+    for (BaseChar++; BaseChar < HighChar; BaseChar++) {
+      // < HighChar because caller will add HighChar to output
+      if (Uni_IsSMP(BaseChar)) {
+        // We'll test on each char to avoid complex calculations crossing SMP boundary
+        if (*mx + 3 >= max) return CERR_BufferOverflow;
+        tstr[(*mx)++] = (WCHAR) Uni_UTF32ToSurrogate1(BaseChar);
+        tstr[(*mx)++] = (WCHAR) Uni_UTF32ToSurrogate2(BaseChar);
+      }
+      else {
+        if (*mx + 2 >= max) return CERR_BufferOverflow;
+        tstr[(*mx)++] = (WCHAR) BaseChar;
+      }
+    }
+    tstr[*mx] = 0;
+  }
 
   return CERR_None;
 }
