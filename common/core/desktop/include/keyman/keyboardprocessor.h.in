@@ -41,23 +41,23 @@ The application that has the focus and receives text events from the Platform
 layer.
 - __Context:__ Text preceding the insertion point
 - __Marker:__ Positional state that can be placed in the Context.
-- __Keyboard:__ A set of rules for execution my an Engine
+- __Keyboard:__ A set of rules for execution by an Engine
 - __Option:__ A variable in a dynamic or static key value store.
 - __Processor:__
 The component that implements this API and can parse and execute a particular
 keyboard.
-- __State:__ An object that hold internal state of the Processor for a given
+- __State:__ An object that holds internal state of the Processor for a given
 insertion point
 - __Action:__
 A directive output by the processor detailing how the Platform layer should
 transform the Client Application's text buffer. There may be several items
 produced by a single keyboard event.
 - __Keyboard Event:__
-A virtual key event and modifier map received from the platform to be
+A virtual key event and modifier map received from the Platform layer to be
 processed with the state object for this Client application.
 - __Virtual Key:__
 A code based on the US English layout, with values matching the Windows
-virtual key codes. See keyboardprocessor_vkeys.h for definitions.
+virtual key codes. See `keyboardprocessor_vkeys.h` for definitions.
 - __Modifier Key:__
 The set of Control, Shift, Alt, Caps Lock keys. On some platforms these may
 have other names (e.g. Alt is called Option on macOS); other platform-specific

@@ -10,7 +10,8 @@ using namespace kmx;
 
 /* Globals */
 
-KMX_BOOL km::kbp::kmx::g_debug_ToConsole = TRUE, km::kbp::kmx::g_debug_KeymanLog = TRUE;
+KMX_BOOL km::kbp::kmx::g_debug_ToConsole = FALSE;
+KMX_BOOL km::kbp::kmx::g_debug_KeymanLog = TRUE;
 KMX_BOOL km::kbp::kmx::g_silent = FALSE;
 
 /*
@@ -120,7 +121,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   PKMX_WCHAR p;
   int sdmfI;
 
-    /*
+  /*
    If the number of nested groups goes higher than 50, then break out - this is
    a limitation of stack size.  This is basically a catch-all for freaky apps that
    cause message loopbacks and nasty things like that.  Okay, it's really a catch all

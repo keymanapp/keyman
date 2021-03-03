@@ -510,5 +510,6 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  km::kbp::kmx::g_debug_ToConsole = TRUE;
   return run_test(argv[1], argv[2]);
 }
