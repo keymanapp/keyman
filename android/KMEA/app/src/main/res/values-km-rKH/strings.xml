@@ -63,7 +63,7 @@
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_qr_code" comment="QR Code description">      ស្កេនកូដ​នេះដើម្បី​ផ្ទុក​ក្ដារចុចនេះ\n​នៅ​លើ​ឧបករណ៍​ផ្សេង</string>
     <!-- Context: Keyboard Help welcome.htm title -->
-    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Welcome to %1$s</string>
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">ស្វាគមន៍​មកកាន់ %1$s</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">កំពុង​ពិនិត្យ​រក​បញ្ជី​ពាក្យ​ពាក់ព័ន្ធ​ដើម្បី​ទាញយក</string>
     <!-- Context: Model Updates -->
