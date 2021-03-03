@@ -116,9 +116,7 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
     }
 
     if let navVC = self.navVC {
-      packageInstaller.promptForLanguages(inNavigationVC: navVC) {
-        // do nothing; the Settings menu dismissal will take care of displaying the keyboard
-      }
+      packageInstaller.promptForLanguages(inNavigationVC: navVC)
     }
   }
 }
