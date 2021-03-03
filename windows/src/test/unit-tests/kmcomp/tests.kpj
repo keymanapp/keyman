@@ -127,30 +127,6 @@
       <Details/>
     </File>
     <File>
-      <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
-      <Filename>test_valid.kmx</Filename>
-      <Filepath>test_valid.kmx</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.kmx</FileType>
-      <ParentFileID>id_03dbd77eff6b6b923de6983fab2bd9d0</ParentFileID>
-    </File>
-    <File>
-      <ID>id_416e28ba6ecd3550e599b16a2c37e864</ID>
-      <Filename>test_invalid_kmx.kmx</Filename>
-      <Filepath>test_invalid_kmx.kmx</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.kmx</FileType>
-      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
-    </File>
-    <File>
-      <ID>id_ee200303f52275647138898037a80e0e</ID>
-      <Filename>test.doc</Filename>
-      <Filepath>test.doc</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.doc</FileType>
-      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
-    </File>
-    <File>
       <ID>id_a45739f276db90d247a6b60b0faa281c</ID>
       <Filename>test_expansion.kmn</Filename>
       <Filepath>test_expansion.kmn</Filepath>
@@ -179,6 +155,30 @@
       <Details>
         <Name>Test Invalid Expansions</Name>
       </Details>
+    </File>
+    <File>
+      <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
+      <Filename>test_valid.kmx</Filename>
+      <Filepath>test_valid.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_03dbd77eff6b6b923de6983fab2bd9d0</ParentFileID>
+    </File>
+    <File>
+      <ID>id_416e28ba6ecd3550e599b16a2c37e864</ID>
+      <Filename>test_invalid_kmx.kmx</Filename>
+      <Filepath>test_invalid_kmx.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+    <File>
+      <ID>id_ee200303f52275647138898037a80e0e</ID>
+      <Filename>test.doc</Filename>
+      <Filepath>test.doc</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.doc</FileType>
+      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
     </File>
   </Files>
 </KeymanDeveloperProject>
