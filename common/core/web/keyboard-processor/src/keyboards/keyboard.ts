@@ -71,11 +71,6 @@ namespace com.keyman.keyboards {
       return this.scriptObject['KN'];
     }
 
-    get displaysUnderlyingKeys(): boolean {
-      // Returns false if undefined or false-like (including 0), true otherwise.
-      return !!this.scriptObject['KDU'];
-    }
-
     // TODO:  Better typing.
     private get _legacyLayoutSpec(): any {
       return this.scriptObject['KV'];  // used with buildDefaultLayout; layout must be constructed at runtime.

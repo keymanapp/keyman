@@ -419,8 +419,8 @@ namespace com.keyman.osk {
 
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
 
-      // Add the (US English) keycap label for desktop OSK or if KDU flag is non-zero
-      if(layout.keyLabels || isDesktop) {
+      // Add the (US English) keycap label for layouts requesting display of underlying keys
+      if(layout["displayUnderlying"]) {
         let keyCap = this.generateKeyCapLabel();
 
         if(keyCap) {
@@ -688,9 +688,6 @@ namespace com.keyman.osk {
       } else {
         this.fontFamily='';
       }
-
-      // Set flag to add default (US English) key label if specified by keyboard
-      layout.keyLabels = keyboard && keyboard.displaysUnderlyingKeys;
 
       let divLayerContainer = this.deviceDependentLayout(keyboard, device.formFactor as utils.FormFactor);
 

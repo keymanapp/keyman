@@ -37,15 +37,15 @@ namespace com.keyman.keyboards {
     shiftKey?: LayoutKey,
     capsKey?: LayoutKey,
     numKey?: LayoutKey,
-    scrollKey?: LayoutKey
+    scrollKey?: LayoutKey,
     aligned?: boolean
   }
 
   export type LayoutFormFactor = {
+    "displayUnderlying"?: boolean,
     "font": string,
     "layer": LayoutLayer[],
-    keyLabels?: boolean,
-    isDefault?: boolean;
+    isDefault?: boolean
   }
 
   export type LayoutSpec = {
@@ -175,6 +175,11 @@ namespace com.keyman.keyboards {
       // For desktop devices, we must create all layers, even if invalid.
       if(formFactor == 'desktop') {
         invalidIdList = Layouts.generateLayerIds(chiral);
+
+        // Only display these by default for the desktop layout.
+        // Mobile form-factors must have a pre-defined layout in order 
+        // to display underlying keys.
+        layout["displayUnderlying"] = !!keyboard.scriptObject['KDU'];
 
         // Filter out all ids considered valid.  (We also don't want duplicates in the following list...)
         for(n=0; n<invalidIdList.length; n++) {
