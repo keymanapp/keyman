@@ -5,6 +5,7 @@ begin Unicode > use(main)
 group(main) using keys
 
 store(char_range) 'abcdefghijklmnopqrstuvwxyz'
+store(alpha_not_bq) 'acdefghijklmnoprstuvwxyz'
 store(key_range) [K_A] [K_B] [K_C] [K_D] [K_E]
 
 store(schar_range) U+10001 U+10002 U+10003 U+10004 U+10005 U+10006
