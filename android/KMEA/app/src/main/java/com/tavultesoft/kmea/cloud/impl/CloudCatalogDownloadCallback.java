@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
@@ -110,7 +111,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
 
     private JSONArray ensureInit(Context aContext,Dataset aDataSet, JSONArray json) {
     if (json == null && aDataSet.isEmpty()) {
-      Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
+      BaseActivity.makeToast(context, R.string.cannot_connect, Toast.LENGTH_SHORT);
       handleDownloadError();
       return null;
     }
@@ -120,7 +121,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
 
    private JSONObject ensureInit(Context aContext,Dataset aDataSet, JSONObject json) {
     if (json == null && aDataSet.isEmpty()) {
-      Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
+      BaseActivity.makeToast(context, R.string.cannot_connect, Toast.LENGTH_SHORT);
       handleDownloadError();
       return null;
     }

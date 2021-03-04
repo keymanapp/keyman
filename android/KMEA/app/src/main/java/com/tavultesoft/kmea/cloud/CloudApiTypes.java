@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
 
@@ -158,8 +159,7 @@ public class CloudApiTypes {
 
       if (filename == null || filename.isEmpty() || cachedFile == null || !cachedFile.exists()) {
         // failed to retrieve downloaded file
-        String message = context.getString(R.string.failed_to_retrieve_file);
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        BaseActivity.makeToast(context, R.string.failed_to_retrieve_file, Toast.LENGTH_LONG);
       }
 
       return cachedFile;

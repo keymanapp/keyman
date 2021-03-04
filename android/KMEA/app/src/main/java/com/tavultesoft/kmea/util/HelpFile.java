@@ -13,7 +13,9 @@ import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 
@@ -47,8 +49,8 @@ public final class HelpFile {
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
       } catch (NullPointerException e) {
-        String message = "FileProvider undefined in app to load" + customHelp.toString();
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        BaseActivity.makeToast(context, R.string.fileprovider_undefined, Toast.LENGTH_LONG);
+        String message = context.getString(R.string.fileprovider_undefined) + customHelp.toString();
         KMLog.LogException(TAG, message, e);
       }
     } else {
