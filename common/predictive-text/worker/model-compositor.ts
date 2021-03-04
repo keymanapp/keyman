@@ -176,6 +176,7 @@ class ModelCompositor {
           }
 
           let deleteLeft = 0;
+          // remove actual token string.  If new token, there should be nothing to delete.
           if(!newEmptyToken) {
             // If this is triggered from a backspace, make sure to use its results
             // and also include its left-deletions!  It's the one post-input context case.
@@ -190,8 +191,7 @@ class ModelCompositor {
           // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
-            // remove actual token string.  If new token, there should be nothing to delete.
-            deleteLeft: newEmptyToken ? 0 : deleteLeft, 
+            deleteLeft: deleteLeft, 
             id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
