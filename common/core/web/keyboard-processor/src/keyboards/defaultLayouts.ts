@@ -172,14 +172,14 @@ namespace com.keyman.keyboards {
         }
       }
 
+      // If there is no predefined layout, even touch layouts will follow the desktop's
+      // setting for the displayUnderlying flag.  As the desktop layout uses a different
+      // format for its layout spec, that's found at the field referenced below.
+      layout["displayUnderlying"] = !!keyboard.scriptObject['KDU'];
+
       // For desktop devices, we must create all layers, even if invalid.
       if(formFactor == 'desktop') {
         invalidIdList = Layouts.generateLayerIds(chiral);
-
-        // Only display these by default for the desktop layout.
-        // Mobile form-factors must have a pre-defined layout in order 
-        // to display underlying keys.
-        layout["displayUnderlying"] = !!keyboard.scriptObject['KDU'];
 
         // Filter out all ids considered valid.  (We also don't want duplicates in the following list...)
         for(n=0; n<invalidIdList.length; n++) {
