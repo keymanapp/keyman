@@ -11,8 +11,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.webkit.WebChromeClient;
@@ -29,6 +31,7 @@ import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.HelpFile;
+import com.tavultesoft.kmea.util.WebViewUtil;
 
 import java.io.File;
 
@@ -42,12 +45,23 @@ public class KMHelpFileActivity extends BaseActivity {
   private WebView webView;
   private Button finishButton;
   private String pkgID;
+  private static boolean didSetDataDirectorySuffix = false;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     final Context context = this;
+
+    // Different processes in the same application cannot directly share WebView-related data
+    // https://developer.android.com/reference/android/webkit/WebView.html#setDataDirectorySuffix(java.lang.String)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      if (!didSetDataDirectorySuffix) {
+        String processName = getProcessName();
+        WebView.setDataDirectorySuffix(processName);
+        didSetDataDirectorySuffix = true;
+      }
+    }
 
     setContentView(R.layout.activity_help_file_layout);
 
@@ -63,7 +77,7 @@ public class KMHelpFileActivity extends BaseActivity {
     finishButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        finish();
+        finishAfterTransition();
         overridePendingTransition(0, android.R.anim.fade_out);
       }
     });
@@ -130,16 +144,7 @@ public class KMHelpFileActivity extends BaseActivity {
       @Override
       public void onPageFinished(WebView view, String url) {
         // Inject a meta viewport tag into the head of the file if it doesn't exist
-        webView.loadUrl(
-          "javascript:(function() {" +
-            "if(!document.querySelectorAll('meta[name=viewport]').length) {"+
-            "let meta=document.createElement('meta');"+
-            "meta.name='viewport';"+
-            "meta.content='width=device-width, initial-scale=1';"+
-            "document.head.appendChild(meta);"+
-            "}"+
-            "})()"
-        );
+        WebViewUtil.injectViewport(view);
       }
     });
 
@@ -162,14 +167,22 @@ public class KMHelpFileActivity extends BaseActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    WebViewUtil.cleanup(webView);
   }
 
   @Override
-  public void onBackPressed() {
-    if (webView != null && webView.canGoBack()) {
-      webView.goBack();
-    } else {
-      super.onBackPressed();
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+      switch (keyCode) {
+        case KeyEvent.KEYCODE_BACK:
+          // Dismiss the help file
+          super.onBackPressed();
+          finishAndRemoveTask();
+        break;
+      }
     }
+
+    return true;
   }
+
 }
