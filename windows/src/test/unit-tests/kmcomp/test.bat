@@ -39,6 +39,13 @@ call :should-fail "#4280: nul should be at start of context 2" test_4280_nul_sta
 
 call :should-pass "#4423: named code constants, various tests" test_namedcodeconstants.kmn || goto :eof
 
+call :should-pass "#2241: expansions" test_expansion.kmn || goto :eof
+call :should-pass "#2241: expansions" test_expansion_1.kmn || goto :eof
+:: the two files should be identical.
+fc /b test_expansion.kmx test_expansion_1.kmx || goto :eof
+
+call :should-fail "#2241: invalid expansions" test_expansion_invalid.kmn || goto :eof
+
 goto :eof
 
 :should-pass

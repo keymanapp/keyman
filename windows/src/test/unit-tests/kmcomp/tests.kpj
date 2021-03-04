@@ -119,6 +119,44 @@
       <Details/>
     </File>
     <File>
+      <ID>id_068020cc7b6376ed155d5b9fc0215cc6</ID>
+      <Filename>test_namedcodeconstants.kmn</Filename>
+      <Filepath>test_namedcodeconstants.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_a45739f276db90d247a6b60b0faa281c</ID>
+      <Filename>test_expansion.kmn</Filename>
+      <Filepath>test_expansion.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Expansions</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_103775d19d3ec8272e57e2e103960589</ID>
+      <Filename>test_expansion_1.kmn</Filename>
+      <Filepath>test_expansion_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Expansions</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_bb17cc25a8735482bba0fc34223c9fe8</ID>
+      <Filename>test_expansion_invalid.kmn</Filename>
+      <Filepath>test_expansion_invalid.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Invalid Expansions</Name>
+      </Details>
+    </File>
+    <File>
       <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
       <Filename>test_valid.kmx</Filename>
       <Filepath>test_valid.kmx</Filepath>
@@ -141,14 +179,6 @@
       <FileVersion></FileVersion>
       <FileType>.doc</FileType>
       <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
-    </File>
-    <File>
-      <ID>id_068020cc7b6376ed155d5b9fc0215cc6</ID>
-      <Filename>test_namedcodeconstants.kmn</Filename>
-      <Filepath>test_namedcodeconstants.kmn</Filepath>
-      <FileVersion>1.0</FileVersion>
-      <FileType>.kmn</FileType>
-      <Details/>
     </File>
   </Files>
 </KeymanDeveloperProject>
