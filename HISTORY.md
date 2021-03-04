@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.252 beta 2021-03-04
+
+* feat(ios): enables de, fr, and km localizations (#4585)
+* fix(developer): improve CEF location search stability (#4571)
+* fix(developer): Support all fonts in Keyboard Fonts dialog (#4574)
+* feat(developer): Add different Open Containing Folder buttons (#4576)
+* feat(developer): Range expansions (#4584)
+* fix(web): fixes lack of respect for underlying-key display settings (#4572)
+* fix(common/models): fixes application of suggestions immediately after a backspace (#4587)
+* fix(linux): Improve version number (#4582)
+* chore(linux): Don't report to Sentry in dev environment (#4581)
+
 ## 14.0.251 beta 2021-03-03
 
 * fix(developer): Improve stability of named code constants (#4547)
