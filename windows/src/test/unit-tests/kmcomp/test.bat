@@ -46,6 +46,14 @@ fc /b test_expansion.kmx test_expansion_1.kmx || goto :eof
 
 call :should-fail "#2241: invalid expansions" test_expansion_invalid.kmn || goto :eof
 
+call :should-pass "#2241: &CasedKeys" test_casedkeys.kmn || goto :eof
+call :should-pass "#2241: &CasedKeys (chars)" test_casedkeys_chars.kmn || goto :eof
+
+call :should-fail "#2241: &CasedKeys (mnemonic 1)" test_casedkeys_mnemonic_1.kmn || goto :eof
+call :should-fail "#2241: &CasedKeys (mnemonic 2)" test_casedkeys_mnemonic_2.kmn || goto :eof
+call :should-fail "#2241: &CasedKeys (invalid chars 1)" test_casedkeys_invalid_1.kmn || goto :eof
+call :should-fail "#2241: &CasedKeys (invalid chars 2)" test_casedkeys_invalid_2.kmn || goto :eof
+
 goto :eof
 
 :should-pass

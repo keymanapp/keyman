@@ -157,6 +157,66 @@
       </Details>
     </File>
     <File>
+      <ID>id_c35b5f806c85252da940a60449e089e0</ID>
+      <Filename>test_casedkeys.kmn</Filename>
+      <Filepath>test_casedkeys.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_3a9d89cd15f05037ef2d5a71fd78ed35</ID>
+      <Filename>test_casedkeys_chars.kmn</Filename>
+      <Filepath>test_casedkeys_chars.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_70997591a064ca387dac08622a04c392</ID>
+      <Filename>test_casedkeys_invalid_1.kmn</Filename>
+      <Filepath>test_casedkeys_invalid_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_8551121eb12d38673567587b753908f7</ID>
+      <Filename>test_casedkeys_invalid_2.kmn</Filename>
+      <Filepath>test_casedkeys_invalid_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_2e7200332135cd7d8ce6109a31be82fe</ID>
+      <Filename>test_casedkeys_mnemonic_1.kmn</Filename>
+      <Filepath>test_casedkeys_mnemonic_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_7d86f03f3e1c308ab03429ac05556e5a</ID>
+      <Filename>test_casedkeys_mnemonic_2.kmn</Filename>
+      <Filepath>test_casedkeys_mnemonic_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
       <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
       <Filename>test_valid.kmx</Filename>
       <Filepath>test_valid.kmx</Filepath>

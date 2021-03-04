@@ -70,6 +70,12 @@
     <ClInclude Include="pch.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="CharToKeyConversion.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="CasedKeys.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
@@ -89,6 +95,8 @@
     <ClCompile Include="versioning.cpp" />
     <ClCompile Include="DeprecationChecks.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="CasedKeys.cpp" />
+    <ClCompile Include="CharToKeyConversion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Compiler.rc" />
