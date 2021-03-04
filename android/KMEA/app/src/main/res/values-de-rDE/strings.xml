@@ -91,8 +91,6 @@
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">Das ausgewählte Wörterbuch wird bereits heruntergeladen. Bitte versuchen Sie es gleich nochmal!</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Download des Wörterbuchs ist abgeschlossen.</string>
-    <!-- Context: Background download messages-->
-    <string name="failed_to_access_downloaded_file" comment="Failed to access downloaded file">Fehler beim Zugriff auf die heruntergeladene Datei</string>
     <!-- Context: Background download messages -->
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Laden der heruntergeladenen Datei fehlgeschlagen</string>
     <!-- Context: General Updates -->

@@ -148,8 +148,8 @@
     <!-- Context: Background download messages-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Dictionary download is finished.</string>
 
-    <!-- Context: Background download messages-->
-    <string name="failed_to_access_downloaded_file" comment="Failed to access downloaded file">Failed to access downloaded file</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">Download failed</string>
 
     <!-- Context: Background download messages -->
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Failed to retrieve downloaded file</string>
