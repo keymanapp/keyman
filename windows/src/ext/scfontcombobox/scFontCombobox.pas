@@ -60,6 +60,18 @@ type
   TscFontType = (ftTrueTypeAnsi, ftTrueTypeSymbol, ftRaster);
   TscFontTypes = set of TscFontType;
 
+  TscFontRefreshHandler = class
+  private
+    FFontNames: TStrings;
+    FRefreshWnd: THandle;
+    procedure RefreshWndProc(var Message: TMessage);
+    procedure ReadFontNames;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property FontNames: TStrings read FFontNames;
+  end;
+
   TscFontComboBox = class(TCustomComboBox)
   private
     BitmapTrueTypeAnsi : TBitmap;
@@ -81,6 +93,8 @@ type
     FBlnShowImagesFontType: Boolean;
     FBlnShowPreviewFontName: Boolean;
     FBlnShowPreviewInEdit: Boolean;
+
+    class var FontRefreshHandler: TscFontRefreshHandler;
 
     procedure SetPopupHeight(const Value: Integer);
     procedure SetPopupWidth(const Value: Integer);
@@ -183,6 +197,11 @@ implementation
 var
   FormExample : TFormExampleFont = nil;
 
+const
+  FTV_UNKNOWN = 0;
+  FTV_ANSI = 1;
+  FTV_SYMBOL = 2;
+  FTV_RASTER = 3;
 
 procedure Register;
 begin
@@ -234,6 +253,8 @@ begin
   IntCountUsed := 0;
   BlnDown := False;
 
+  Sorted := True;
+
   Style := csOwnerDrawFixed;
   ItemHeight := 18;
   DropDownCount := 12;
@@ -270,7 +291,7 @@ begin
   with Canvas do
   begin
     StrFont := Items.Names[Index];
-    StrFontType := Items.Values[StrFont];
+    StrFontType := Items.ValueFromIndex[Index];
 
     FillRect(Rect);
 
@@ -458,58 +479,26 @@ begin
 end;
 
 procedure TscFontComboBox.GetFontNames;
-type
-  TFontRec = record 
-    FontTypes : TscFontTypes;
-    FontItems : TStrings;
-  end;
 var
-  DC: HDC;
-  FontRec : TFontRec;
-
-  function EnumFontsProc(var LogFont: TLogFont; var TextMetric: TTextMetric;
-    FontType: Integer; Data: Pointer): Integer; stdcall;
-  var
-    StrType : String;
-  begin
-    StrType :='';
-    if FontType = TRUETYPE_FONTTYPE then
-      case LogFont.lfCharset of
-        ANSI_CHARSET : StrType := 'TA';
-        SYMBOL_CHARSET : StrType := 'TS';
-      end
-    else
-      if FontType = RASTER_FONTTYPE then
-        StrType := 'R';
-
-    // Check which fonts have to be added to listbox
-    if (LogFont.lfFaceName[0] <> '@')
-      and
-        (((StrType = 'TA') and (ftTrueTypeAnsi in TFontRec(Data^).FontTypes)) or
-         ((StrType = 'TS') and (ftTrueTypeSymbol in TFontRec(Data^).FontTypes)) or
-         ((StrType = 'R') and (ftRaster in TFontRec(Data^).FontTypes))) then
-    begin
-      TStrings(TFontRec(Data^).FontItems).Add(string(LogFont.lfFaceName)+'='+StrType);
-    end;
-
-    Result := 1;
-  end;
+  i: Integer;
 begin
-  IntCountUsed := 0;
-  Items.Clear;
-
-  // Make record to provide a pointer to the items
-  // of the listbox and the property fonttypes
-  FontRec.FontItems := Pointer(Items);
-  FontRec.FontTypes := FFontTypes;
-
-  DC := GetDC(0);
+  Items.BeginUpdate;
   try
-    EnumFonts(DC, nil, @EnumFontsProc, @FontRec);
+    Items.Clear;
+    if not Assigned(FontRefreshHandler) then
+      FontRefreshHandler := TscFontRefreshHandler.Create;
+    for i := 0 to FontRefreshHandler.FontNames.Count - 1 do
+    begin
+      case Integer(FontRefreshHandler.FontNames.Objects[i]) of
+        FTV_UNKNOWN, //#2789 support all charsets
+        FTV_ANSI: Items.Add(FontRefreshHandler.FontNames[i]+'=TA');
+        FTV_SYMBOL: Items.Add(FontRefreshHandler.FontNames[i]+'=TS');
+        FTV_RASTER: Items.Add(FontRefreshHandler.FontNames[i]+'=R');
+      end;
+    end;
   finally
-    ReleaseDC(0, DC);
+    Items.EndUpdate;
   end;
-  Sorted := True;
 end;
 
 //------------------------------------------------------------------------------
@@ -556,8 +545,76 @@ begin
     FormExample.PanelFontName.Visible := FBlnShowPreviewFontName;
 end;
 
+{ TscFontRefreshHandler }
+
+constructor TscFontRefreshHandler.Create;
+begin
+  inherited Create;
+  FFontNames := TStringList.Create(dupIgnore, True, False);
+  FRefreshWnd := AllocateHWnd(RefreshWndProc);
+  ReadFontNames;
+end;
+
+destructor TscFontRefreshHandler.Destroy;
+begin
+  FFontNames.Free;
+  DeallocateHWnd(FRefreshWnd);
+  inherited Destroy;
+end;
+
+function EnumFontFamExProc(var LogFont: TLogFont; var TextMetric: TTextMetric;
+  FontType: DWORD; Data: LPARAM): Integer; stdcall;
+var
+  FontTypeValue : Integer;
+begin
+  FontTypeValue := FTV_UNKNOWN;
+  if FontType = TRUETYPE_FONTTYPE then
+    case LogFont.lfCharset of
+      ANSI_CHARSET : FontTypeValue := FTV_ANSI; //'TA'
+      SYMBOL_CHARSET : FontTypeValue := FTV_SYMBOL; //'TS'
+      else FontTypeValue := FTV_ANSI; //'TA'; #2789 support all charsets
+    end
+  else if FontType = RASTER_FONTTYPE then
+    FontTypeValue := FTV_RASTER; //'R'
+
+  TscFontRefreshHandler(Data).FFontNames.AddObject(LogFont.lfFaceName, Pointer(FontTypeValue));
+  Result := 1;
+end;
+
+procedure TscFontRefreshHandler.ReadFontNames;
+var
+  DC: HDC;
+  lf: TLogFont;
+begin
+  FFontNames.Clear;
+
+  FillChar(lf, sizeof(TLogFont), 0);
+  lf.lfCharSet := DEFAULT_CHARSET;
+
+  DC := GetDC(0);
+  try
+    EnumFontFamiliesEx(DC, lf, @EnumFontFamExProc, NativeInt(Self), 0);
+  finally
+    ReleaseDC(0, DC);
+  end;
+end;
+
+procedure TscFontRefreshHandler.RefreshWndProc(var Message: TMessage);
+begin
+  try
+    if Message.Msg = WM_FONTCHANGE then
+    begin
+      ReadFontNames;
+    end;
+    Message.Result := DefWindowProc(FRefreshWnd, Message.Msg, Message.WParam, Message.LParam);
+  except
+    on E:Exception do Application.HandleException(E);
+  end;
+end;
+
 initialization
 finalization
   FreeAndNil(FormExample);
+  FreeAndNil(TscFontComboBox.FontRefreshHandler);
 end.
 
