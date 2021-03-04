@@ -240,5 +240,15 @@
       <FileType>.doc</FileType>
       <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
     </File>
+    <File>
+      <ID>id_9d5ea0b72f9733e0e70e04d5b3c790af</ID>
+      <Filename>test_expansion_absurd.kmn</Filename>
+      <Filepath>test_expansion_absurd.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Expansions</Name>
+      </Details>
+    </File>
   </Files>
 </KeymanDeveloperProject>
