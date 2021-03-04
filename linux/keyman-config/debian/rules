@@ -9,6 +9,7 @@ export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
 
 override_dh_auto_build:
 	make man
+	sed -i -e "s/^__pkgversion__ = \"\"/__pkgversion__ = \"$(shell dpkg-parsechangelog --show-field Version)\"/g" keyman_config/version.py
 	make compile-po
 	dh_auto_build $@
 

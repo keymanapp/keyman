@@ -90,3 +90,10 @@ keyman-config/keyman_config/version.py
 keyman-config/locale/*/LC_MESSAGES/
 test.sh
 debianpackage/
+*.deb
+*.build
+*.buildinfo
+*.changes
+*.tar.xz
+*.tar.gz
+*.dsc
