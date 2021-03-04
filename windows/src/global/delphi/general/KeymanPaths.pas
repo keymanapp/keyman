@@ -13,6 +13,7 @@ type
     const S_CEF_DebugPath = 'Debug_CEFPath';
     const S_CEF_EnvVar = 'KEYMAN_CEF4DELPHI_ROOT';
     const S_CEF_SubFolder = 'cef\';
+    const S_CEF_LibCef = 'libcef.dll';
     const S_CEF_SubProcess = 'kmbrowserhost.exe';
   public
     const S_KMShell = 'kmshell.exe';
@@ -212,36 +213,89 @@ begin
 end;
 
 class function TKeymanPaths.CEFPath: string;
-begin
-  Result := GetDebugPath(S_CEF_DebugPath, '');
-  if Result = '' then
+
+  function AppendSlash(const path: string): string;
   begin
-    Result := GetEnvironmentVariable(S_CEF_EnvVar);
-    if Result = ''
-      then Result := KeymanDesktopInstallPath+S_CEF_SubFolder
-      else Result := IncludeTrailingPathDelimiter(Result);
+    Result := path;
+    if Result <> '' then
+      Result := IncludeTrailingPathDelimiter(path);
   end;
+
+  function IsValidPath(const path: string): Boolean;
+  begin
+    Result := (path <> '') and FileExists(path + S_CEF_LibCef);
+  end;
+
+begin
+  // cef\ subfolder of executable path
+  Result := ExtractFilePath(ParamStr(0)) + S_CEF_SubFolder;
+  if IsValidPath(Result) then
+    Exit;
+
+  // Debug_CEFPath registry setting
+  Result := AppendSlash(GetDebugPath(S_CEF_DebugPath, ''));
+  if IsValidPath(Result) then
+    Exit;
+
+  // KEYMAN_CEF4DELPHI_ROOT environment variable
+  Result := AppendSlash(GetEnvironmentVariable(S_CEF_EnvVar));
+  if IsValidPath(Result) then
+    Exit;
+
+  // Same folder as executable
+  Result := ExtractFilePath(ParamStr(0));
+  if IsValidPath(Result) then
+    Exit;
+
+  // Keyman Desktop installation folder + cef\
+  try
+    Result := KeymanDesktopInstallPath+S_CEF_SubFolder
+  except
+    on E:EKeymanPath do
+      Result := '';
+  end;
+  if IsValidPath(Result) then
+    Exit;
+
+  // Failed, could not find libcef.dll
+  Result := '';
 end;
 
 class function TKeymanPaths.CEFSubprocessPath: string;
+var
+  keyman_root: string;
 begin
-  // Normal install location - in Keyman install folder
-  Result := KeymanDesktopInstallPath(S_CEF_SubProcess);
-  if FileExists(Result) then Exit;
-
   // Same folder as executable
   Result := ExtractFilePath(ParamStr(0)) + S_CEF_SubProcess;
   if FileExists(Result) then Exit;
 
-  // Source repo, bin folder
-  Result := ExtractFilePath(ParamStr(0)) + '..\desktop\' + S_CEF_SubProcess;
-  if FileExists(Result) then Exit;
+  // On developer machines, if we are running within the source repo, then use
+  // those paths
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
+  begin
+    // Source repo, bin folder
+    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\bin\desktop\' + S_CEF_SubProcess;
+    if FileExists(Result) then Exit;
 
-  // Source repo, source folder
-  Result := ExtractFilePath(ParamStr(0)) + '..\..\desktop\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
-  if FileExists(Result) then Exit;
+    // Source repo, source folder
+    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\bin\desktop\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
+    if FileExists(Result) then Exit;
 
-  Result := ExtractFilePath(ParamStr(0)) + '..\..\desktop\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
+    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\bin\desktop\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
+    if FileExists(Result) then Exit;
+  end;
+
+  // Check final install location - in Keyman for Windows install folder
+  try
+    Result := KeymanDesktopInstallPath(S_CEF_SubProcess);
+  except
+    on E:EKeymanPath do
+      Result := '';
+  end;
+  if (Result <> '') and FileExists(Result) then Exit;
+
+  Result := '';
 end;
 
 class function TKeymanPaths.CEFDataPath(const mode: string): string;
