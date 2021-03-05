@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 14.0.253 beta 2021-03-05
+
+* fix(android/app): Fix welcome.htm responsiveness (#4531)
+* feat(developer): &CasedKeys system store (#4586)
+* fix(android): Localize Toast notifications (#4588)
+* fix(windows): PreservedKeyMap::MapUSCharToVK line order bug (#4595)
+* fix(developer): tidy up expansions tests (#4592)
+* fix(ios): adds i18n for some error alerts (#4577)
+* fix(windows): incxstr could run over buffer with malformed data (#4596)
+* chore(android/app): Update whatsnew with available display languages (#4610)
+* chore(linux): Improve Sentry environment setting (#4589)
+* fix(developer): Expand filenames before load (#4606)
+
 ## 14.0.252 beta 2021-03-04
 
 * feat(ios): enables de, fr, and km localizations (#4585)
