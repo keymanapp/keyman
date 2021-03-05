@@ -49,8 +49,11 @@ public final class HelpFile {
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
       } catch (NullPointerException e) {
+        // Localize Toast error
         BaseActivity.makeToast(context, R.string.fileprovider_undefined, Toast.LENGTH_LONG);
-        String message = context.getString(R.string.fileprovider_undefined) + customHelp.toString();
+
+        // Don't localize message to Sentry
+        String message = String.format(context.getString(R.string.fileprovider_undefined), customHelp.toString());
         KMLog.LogException(TAG, message, e);
       }
     } else {

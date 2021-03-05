@@ -28,11 +28,12 @@ public class BaseActivity extends AppCompatActivity {
    * @param defaultContext - the context to fallback if localeUpdatedContext is null
    * @param resID - resource ID of the string
    * @param duration - length of the Toast notification (Toast.LENGTH_LONG or Toast.LENGTH_SHORT)
+   * @param args - optional format parameters for the string
    */
-  public static void makeToast(Context defaultContext, int resID, int duration) {
+  public static void makeToast(Context defaultContext, int resID, int duration, Object... args) {
     Context context = (localeUpdatedContext != null) ? localeUpdatedContext : defaultContext;
     String msg = context.getString(resID);
-    Toast.makeText(context, msg, duration).show();
+    Toast.makeText(context, String.format(msg, args), duration).show();
   }
 
   @Override

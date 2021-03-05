@@ -588,11 +588,13 @@ final class KMKeyboard extends WebView {
 
   }
 
-  // Display Toast notification that keyboard selection failed, so loading default keyboard.
-  // Also sends a message to Sentry
+  // Display localized Toast notification that keyboard selection failed, so loading default keyboard.
+  // Also sends a message to Sentry (not localized)
   private void sendError(String packageID, String keyboardID, String languageID) {
-    BaseActivity.makeToast(context, R.string.fatal_keyboard_error, Toast.LENGTH_LONG);
-    String msg = String.format("Can't set %s::%s for %s language. Loading default keyboard", packageID, keyboardID, languageID);
+    BaseActivity.makeToast(context, R.string.fatal_keyboard_error, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
+
+    // Don't localize msg for Sentry
+    String msg = String.format(context.getString(R.string.fatal_keyboard_error), packageID, keyboardID, languageID);
     Sentry.captureMessage(msg);
   }
 

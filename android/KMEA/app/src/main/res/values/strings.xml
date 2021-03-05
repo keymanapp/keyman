@@ -108,10 +108,11 @@
 
     <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">
-      FileProvider library needed to view help file:</string>
+      FileProvider library needed to view help file: %1$s</string>
 
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
-    <string name="fatal_keyboard_error" comment="Fatal keyboard error. Will load default keyboard">Fatal keyboard error. Loading default keyboard.</string>
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">
+      Fatal keyboard error with %1$s:%2$s for %3$s language. Loading default keyboard.</string>
 
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
