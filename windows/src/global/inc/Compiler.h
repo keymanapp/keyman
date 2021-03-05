@@ -199,9 +199,11 @@
 #define TSS_KEYBOARDVERSION  36      // &keyboardversion system store   // I4140
 #define TSS_KMW_EMBEDCSS     37
 
-#define TSS_TARGETS         38
+#define TSS_TARGETS          38
 
-#define TSS__MAX				38
+#define TSS_CASEDKEYS        39
+
+#define TSS__MAX				     39
 
 /* wm_keyman_control_internal message control codes */
 

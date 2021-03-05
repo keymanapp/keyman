@@ -85,6 +85,8 @@
 #include "edition.h"
 
 #include "onlineconstants.h"
+#include "CharToKeyConversion.h"
+#include "CasedKeys.h"
 
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
@@ -108,7 +110,7 @@ DWORD ProcessGroupFinish(PFILE_KEYBOARD fk);
 DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p);
 DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p);
 DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str);
-DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, int IsUnicode);
+DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode);
 DWORD ProcessEthnologueStore(PWSTR p); // I2646
 DWORD ProcessHotKey(PWSTR p, DWORD *hk);
 DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PWSTR szName, PDWORD FileSize, PBYTE *Buf);
@@ -190,6 +192,7 @@ const PWCHAR StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX L"KEYBOARDVERSION",   // I4140
   SSN__PREFIX L"KMW_EMBEDCSS",
   SSN__PREFIX L"TARGETS",   // I4504
+  SSN__PREFIX L"CASEDKEYS", // #2241
   NULL
 };
 
@@ -869,83 +872,6 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
   return CERR_None;
 }
 
-/* Following code lifted from syskbd.cpp and tweaked for compiler use. Todo: consolidate */
-
-#define VK_COLON	0xBA
-#define VK_EQUAL	0xBB
-#define VK_COMMA	0xBC
-#define VK_HYPHEN	0xBD
-#define VK_PERIOD	0xBE
-#define	VK_SLASH	0xBF
-#define VK_ACCENT	0xC0
-#define VK_LBRKT	0xDB
-#define VK_BKSLASH	0xDC
-#define VK_RBRKT	0xDD
-#define VK_QUOTE	0xDE
-#define VK_xDF		0xDF
-
-WCHAR VKToChar(WORD keyCode, UINT shiftFlags)
-{
-  char shiftedDigit[] = ")!@#$%^&*(";
-  int n, Shift;
-
-  if (!(shiftFlags & ISVIRTUALKEY)) return keyCode;
-
-  if (shiftFlags & (LCTRLFLAG | RCTRLFLAG | LALTFLAG | RALTFLAG)) return 0;
-
-  if (keyCode >= '0' && keyCode <= '9')
-  {
-    n = keyCode - '0';
-    return ((shiftFlags & K_SHIFTFLAG) ? shiftedDigit[n] : keyCode);
-  }
-
-  if (keyCode >= 'A' && keyCode <= 'Z')
-  {
-    Shift = (shiftFlags & K_SHIFTFLAG);
-    if (shiftFlags & (CAPITALFLAG)) Shift = !Shift;
-    return (Shift ? keyCode : keyCode + 32);
-  }
-
-  if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9)
-  {
-    if (!(shiftFlags & NUMLOCKFLAG)) return 0;
-    return keyCode - (VK_NUMPAD0 - '0');
-  }
-
-  Shift = (shiftFlags & K_SHIFTFLAG);
-
-  switch (keyCode)
-  {
-  case VK_ACCENT:
-    return Shift ? '~' : '`';
-  case VK_HYPHEN:
-    return Shift ? '_' : '-';
-  case VK_EQUAL:
-    return Shift ? '+' : '=';
-  case VK_BKSLASH:
-    return Shift ? '|' : 92;
-  case VK_LBRKT:
-    return Shift ? '{' : '[';
-  case VK_RBRKT:
-    return Shift ? '}' : ']';
-  case VK_COLON:
-    return Shift ? ':' : ';';
-  case VK_QUOTE:
-    return Shift ? '"' : 39;
-  case VK_COMMA:
-    return Shift ? '<' : ',';
-  case VK_PERIOD:
-    return Shift ? '>' : '.';
-  case VK_SLASH:
-    return Shift ? '?' : '/';
-  case VK_SPACE:
-    return ' ';
-  }
-  return 0;
-  //keyCode;
-}
-
-
 int cmpkeys(const void *key, const void *elem)
 {
   PFILE_KEY akey, aelem;
@@ -973,6 +899,7 @@ int cmpkeys(const void *key, const void *elem)
 DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 {
   PFILE_GROUP gp;
+  DWORD msg;
 
   if (fk->currentGroup == 0xFFFFFFFF) return CERR_None;
   // Just got to first group - so nothing to finish yet
@@ -980,6 +907,7 @@ DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
   gp = &fk->dpGroupArray[fk->currentGroup];
 
   // Finish off the previous group stuff!
+  if ((msg = ExpandCapsRulesForGroup(fk, gp)) != CERR_None) return msg;
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), cmpkeys);
 
   return CERR_None;
@@ -1254,6 +1182,11 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
   case TSS_MNEMONIC:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_MnemonicLayout);
     FMnemonicLayout = atoiW(sp->dpString) == 1;
+    if (FMnemonicLayout) {
+      // The &CasedKeys system store is not supported for
+      // mnemonic layouts
+      return CERR_CasedKeysNotSupportedWithMnemonicLayout;
+    }
     break;
 
   case TSS_NAME:
@@ -1384,6 +1317,13 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     }
 
     break;
+
+  case TSS_CASEDKEYS:
+    if ((msg = VerifyCasedKeys(sp)) != CERR_None) {
+      return msg;
+    }
+    break;
+
   default:
     return CERR_InvalidSystemStore;
   }
