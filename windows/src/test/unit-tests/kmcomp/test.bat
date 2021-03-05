@@ -45,6 +45,7 @@ call :should-pass "#2241: expansions" test_expansion_1.kmn || goto :eof
 fc /b test_expansion.kmx test_expansion_1.kmx || goto :eof
 
 call :should-fail "#2241: invalid expansions" test_expansion_invalid.kmn || goto :eof
+call :should-fail "#2241: expansion absurdly long" test_expansion_absurd.kmn || goto :eof
 
 call :should-pass "#2241: &CasedKeys" test_casedkeys.kmn || goto :eof
 call :should-pass "#2241: &CasedKeys (chars)" test_casedkeys_chars.kmn || goto :eof

@@ -1,0 +1,7 @@
+c This file tests absurdly long expansions
+store(&NAME) 'Test Expansions'
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(schar_range) U+0020 .. U+10FFFF
