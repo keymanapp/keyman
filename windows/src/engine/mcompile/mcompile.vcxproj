@@ -60,6 +60,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>..\..\ext\sentry;..\..\global\inc</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -77,6 +78,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>..\..\ext\sentry;..\..\global\inc</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -93,7 +95,7 @@
     <ClInclude Include="..\..\..\..\engine\keyman32\KBD.H" />
     <ClInclude Include="mc_kmxfile.h" />
     <ClInclude Include="mcompile.h" />
-    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="mc_syskbd.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -103,15 +105,18 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\global\vc\VKScanCodes.cpp" />
+    <ClCompile Include="..\..\global\vc\xstring.cpp" />
     <ClCompile Include="mc_crc32.cpp" />
     <ClCompile Include="mc_import_rules.cpp" />
     <ClCompile Include="mc_kmxfile.cpp" />
     <ClCompile Include="mcompile.cpp" />
     <ClCompile Include="mc_savekeyboard.cpp" />
     <ClCompile Include="mc_unicode.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="mc_syskbd.cpp" />
     <ClCompile Include="mc_syskbdnt32.cpp" />

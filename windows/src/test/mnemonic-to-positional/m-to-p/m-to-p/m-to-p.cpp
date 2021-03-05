@@ -17,7 +17,7 @@ int wmain(int argc, wchar_t * argv[])
          "  layout file given by kbdfile.dll\n\n"
 
          "  kbid should be a hexadecimal number e.g. 409 for US English\n");
-    */  
+    */
     return 1;
   }
 
@@ -25,7 +25,7 @@ int wmain(int argc, wchar_t * argv[])
 
   // 1. Load the keyman keyboard file
 
-  // 2. For each key on the system layout, determine its output character and perform a 
+  // 2. For each key on the system layout, determine its output character and perform a
   //    1-1 replacement on the keyman keyboard of that character with the base VK + shift
   //    state.  This fixup will transform the char to a vk, which will avoid any issues
   //    with the key.
@@ -36,8 +36,8 @@ int wmain(int argc, wchar_t * argv[])
   //  rule for that deadkey, e.g. [K_LBRKT] > dk(c101)
   //
   //  Next, update each rule that references the output from that deadkey to add an extra
-  //  context deadkey at the end of the context match, e.g. 'a' dk(c101) + [K_SPACE] > 'b'.  
-  //  This will require a memory layout change for the .kmx file, plus fixups on the 
+  //  context deadkey at the end of the context match, e.g. 'a' dk(c101) + [K_SPACE] > 'b'.
+  //  This will require a memory layout change for the .kmx file, plus fixups on the
   //  context+output index offsets
   //
   //  --> virtual character keys
@@ -46,7 +46,7 @@ int wmain(int argc, wchar_t * argv[])
   //  switch the shift state from the VIRTUALCHARKEY to VIRTUALKEY, without changing any
   //  other properties of the key.
   //
-  
+
   // 3. Write the new keyman keyboard file
 
   if(!LoadNewLibrary(indll)) {
@@ -283,7 +283,7 @@ void ConvertDeadkey(LPKEYBOARD kbd, WORD vk, UINT shift, WCHAR deadkey) {
 
   GetDeadkeys(deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs
   while(*pdk) {
-    // Look up the ch 
+    // Look up the ch
     UINT vkUnderlying = VKUnderlyingLayoutToVKUS(*pdk);
     TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
@@ -321,7 +321,7 @@ BOOL DoConvert(LPKEYBOARD kbd, LPWSTR kbid) {
     UINT vkUnderlying = VKUSToVKUnderlyingLayout(VKMap[i]);
     // Go through each of the shift states - base, shift, ctrl+alt, ctrl+alt+shift, [caps vs ncaps?]
     for(int j = 0; VKShiftState[j] != 0xFFFF; j++) {
-      
+
       WCHAR ch = CharFromVK(vkUnderlying, VKShiftState[j], &DeadKey);
 
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
@@ -362,7 +362,7 @@ PWSTR incxstr(PWSTR p)
 		case CODE_INDEX:		return p+2;
 		case CODE_USE:			return p+1;
 		case CODE_DEADKEY:		return p+1;
-		case CODE_EXTENDED:		p += 2; while(*p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
+		case CODE_EXTENDED:		p += 2; while(*p && *p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
 		case CODE_CLEARCONTEXT: return p+1;
 		case CODE_CALL:			return p+1;
 		case CODE_CONTEXTEX:	return p+1;

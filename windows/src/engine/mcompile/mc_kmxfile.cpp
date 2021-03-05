@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 
 
 static BOOL LoadKeyboardFile(LPSTR fileName, LPKEYBOARD *lpKeyboard);
