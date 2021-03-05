@@ -682,4 +682,66 @@ public class ResourceDownloadManager {
                                       value: PackageDownloadFailedNotification(packageKey: packageKey, error: error))
     }
   }
+
+  /**
+   * Designed for downloading KMP files when no metadata is available in advance.
+   */
+  public func downloadRawKMP(from url: URL, handler: @escaping (URL?, Error?) -> Void) {
+
+    // First, we need something to handle the download.
+    class NoMetadataDelegate: HTTPDownloadDelegate {
+      private let closure: (URL?, Error?) -> Void
+
+      init(withHandler handler: @escaping (URL?, Error?) -> Void) {
+        self.closure = handler;
+      }
+
+      func downloadRequestStarted(_ request: HTTPDownloadRequest) {
+        // Not relevant
+      }
+
+      func downloadRequestFinished(_ request: HTTPDownloadRequest) {
+        if request.responseStatusCode != 200 {
+          // Possible request error (400 Bad Request, 404 Not Found, etc.)
+          let error = DownloadError.failed(.responseCode(request.responseStatusCode ?? 400,
+                                                         request.responseStatusMessage ?? "",
+                                                         request.url))
+
+          // Now that we've synthesized an appropriate error instance, use the same handler
+          // as for HTTPDownloader's 'failed' condition.
+          downloadRequestFailed(request, with: error)
+        } else {
+          self.closure(URL(fileURLWithPath: request.destinationFile!), nil)
+        }
+      }
+
+      func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error?) {
+        self.closure(nil, error)
+      }
+
+      func downloadQueueFinished(_ queue: HTTPDownloader) {
+        // Not relevant
+      }
+
+      func downloadQueueCancelled(_ queue: HTTPDownloader) {
+        // Not relevant, but to be safe...
+        self.closure(nil, nil)
+      }
+    }
+
+    let delegate = NoMetadataDelegate(withHandler: handler)
+    let downloader = HTTPDownloader(delegate, session: self.session)
+    let request = HTTPDownloadRequest(url: url, downloadType: .downloadFile)
+
+    // Since we don't know the package key in advance, we'll download it to
+    // the app's cache directory, then figure everything out once we open it.
+    let cachesDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    let tempFilename = url.lastPathComponent
+    let cachedDest = cachesDir.appendingPathComponent(tempFilename)
+
+    request.destinationFile = cachedDest.path
+
+    downloader.addRequest(request)
+    downloader.run()
+  }
 }

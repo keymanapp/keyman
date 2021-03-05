@@ -19,7 +19,8 @@ protocol HTTPDownloadDelegate: class {
 class HTTPDownloader: NSObject {
   var queue: [HTTPDownloadRequest] = []
   // TODO: Make unowned
-  weak var handler: HTTPDownloadDelegate?
+  /*weak*/ var handler: HTTPDownloadDelegate?  // 'weak' interferes with installs
+                                               // from the app's browser.
   var currentRequest: HTTPDownloadRequest?
   var downloadSession: URLSession!
   public var userInfo: [String: Any] = [:]
