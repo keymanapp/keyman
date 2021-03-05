@@ -1,5 +1,5 @@
 
-#include "stdafx.h"
+#include "pch.h"
 
 DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug);
 

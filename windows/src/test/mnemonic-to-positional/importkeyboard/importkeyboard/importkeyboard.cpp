@@ -28,7 +28,7 @@ const int ShiftStateMap[] = {
   ISVIRTUALKEY | RALTFLAG | K_SHIFTFLAG,
   0,
   0};
-    
+
 class DeadKey {
 private:
   WCHAR m_deadchar;
@@ -100,11 +100,11 @@ public:
   UINT SC() {
     return this->m_sc;
   }
-  
+
   std::wstring GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
   }
-  
+
   void SetShiftState(ShiftState shiftState, std::wstring value, bool isDeadKey, bool capsLock) {
     this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
@@ -167,13 +167,13 @@ public:
     }
     return true;
   }
-    
+
   bool IsKeymanUsedKey() {
     return (this->m_vk >= 0x20 && this->m_vk <= 0x5F) || (this->m_vk >= 0x88);
   }
 
   UINT GetShiftStateValue(int capslock, int caps, ShiftState ss) {
-    return 
+    return
       ShiftStateMap[(int)ss] |
       (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
   }
@@ -217,7 +217,7 @@ public:
           //TODO: Do we need to put this rule out?
         } else if (this->m_rgfDeadKey[(int)ss, caps]) {
           // It's a dead key, append an @ sign.
-          key->dpContext = new WCHAR[1]; 
+          key->dpContext = new WCHAR[1];
           *key->dpContext = 0;
           key->ShiftFlags = this->GetShiftStateValue(capslock, caps, (ShiftState) ss);
           key->Key = this->VK();
@@ -228,7 +228,7 @@ public:
           *p++ = CODE_DEADKEY;
           *p++ = DeadKeyMap(st[0], deadkeys, deadkeyBase);
           *p = 0;
-          //sbRow.Append(string.Format("+ [{0}{1}] > dk({2:x4})\r\n", this.GetShiftStateName(capslock, caps, ss, IsKMW), 
+          //sbRow.Append(string.Format("+ [{0}{1}] > dk({2:x4})\r\n", this.GetShiftStateName(capslock, caps, ss, IsKMW),
           //    this.GetVKeyName((int)this.VK), (ushort)st[0]));
           //sbRow.Append(string.Format("\t{0:x4}@", ((ushort)st[0])));
           return true;
@@ -237,7 +237,7 @@ public:
           for (size_t ich = 0; ich < st.size(); ich++) {
             if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
           }
-            
+
           if(isvalid) {
             key->Key = this->VK();
             key->ShiftFlags = this->GetShiftStateValue(capslock, caps, (ShiftState) ss);
@@ -322,7 +322,7 @@ public:
             while (rc >= 0) {
               // We know that this is a dead key coming up, otherwise
               // this function would never have been called. If we do
-              // *not* get a dead key then that means the state is 
+              // *not* get a dead key then that means the state is
               // messed up so we run again and again to clear it up.
               // Risk is technically an infinite loop but per Hiroyama
               // that should be impossible here.
@@ -336,7 +336,7 @@ public:
             if (rc == 1) {
               // That was indeed a base character for our dead key.
               // And we now have a composite character. Let's run
-              // through one more time to get the actual base 
+              // through one more time to get the actual base
               // character that made it all possible?
               WCHAR combchar = sbBuffer[0];
               rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
@@ -352,9 +352,9 @@ public:
               if ((((ss == Ctrl) || (ss == ShftCtrl)) &&
                   (IsControlChar(basechar))) ||
                   (basechar == combchar)) {
-                // ToUnicodeEx has an internal knowledge about those 
-                // VK_A ~ VK_Z keys to produce the control characters, 
-                // when the conversion rule is not provided in keyboard 
+                // ToUnicodeEx has an internal knowledge about those
+                // VK_A ~ VK_Z keys to produce the control characters,
+                // when the conversion rule is not provided in keyboard
                 // layout files
 
                 // Additionally, dead key state is lost for some of these
@@ -433,13 +433,13 @@ int wmain(int argc, WCHAR* argv[]) {
 
   int cKeyboards = GetKeyboardLayoutList(0, NULL);
   HKL *rghkl = new HKL[cKeyboards];
-  GetKeyboardLayoutList(cKeyboards, rghkl);            
+  GetKeyboardLayoutList(cKeyboards, rghkl);
   HKL hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
   if(hkl == NULL) {
       puts("Sorry, that keyboard does not seem to be valid.");
       return 1;
   }
-            
+
   BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
@@ -447,7 +447,7 @@ int wmain(int argc, WCHAR* argv[]) {
   rgKey.resize(256);
 
   // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
-  // values in it. Then, store the SC in each valid VK so it can act as both a 
+  // values in it. Then, store the SC in each valid VK so it can act as both a
   // flag that the VK is valid, and it can store the SC value.
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
     VirtualKey *key = new VirtualKey(sc, hkl);
@@ -471,7 +471,7 @@ int wmain(int argc, WCHAR* argv[]) {
       UINT sc = MapVirtualKeyEx(vk, 0, hkl);
       UINT vkL = MapVirtualKeyEx(sc, 1, hkl);
       UINT vkR = MapVirtualKeyEx(sc, 3, hkl);
-      if((vkL != vkR) && 
+      if((vkL != vkR) &&
           (vk != vkL)) {
           switch(vk) {
               case VK_LCONTROL:
@@ -515,9 +515,9 @@ int wmain(int argc, WCHAR* argv[]) {
                           if((rc == 1) &&
                               (ss == Ctrl || ss == ShftCtrl) &&
                               (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
-                              // ToUnicodeEx has an internal knowledge about those 
-                              // VK_A ~ VK_Z keys to produce the control characters, 
-                              // when the conversion rule is not provided in keyboard 
+                              // ToUnicodeEx has an internal knowledge about those
+                              // VK_A ~ VK_Z keys to produce the control characters,
+                              // when the conversion rule is not provided in keyboard
                               // layout files
                               continue;
                           }
@@ -586,7 +586,7 @@ int wmain(int argc, WCHAR* argv[]) {
   }
 
 
-    
+
   LPKEYBOARD kp = new KEYBOARD;
   memset(kp, 0, sizeof(KEYBOARD));
   int nDeadkey = 0;
@@ -631,7 +631,7 @@ int wmain(int argc, WCHAR* argv[]) {
 
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->IsKeymanUsedKey() && (!rgKey[iKey]->IsEmpty())) {
-      // for each item, 
+      // for each item,
       if(rgKey[iKey]->LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey)) {
         nKeys++;
       }
@@ -671,14 +671,14 @@ int wmain(int argc, WCHAR* argv[]) {
       sp->dpName = NULL;
       sp->dwSystemID = 0;
       sp->dpString = new WCHAR[dk->Count() + 1];
-      for(int j = 0; j < dk->Count(); j++) 
+      for(int j = 0; j < dk->Count(); j++)
         sp->dpString[j] = dk->GetBaseCharacter(j);
       sp++;
 
       sp->dpName = NULL;
       sp->dwSystemID = 0;
       sp->dpString = new WCHAR[dk->Count() + 1];
-      for(int j = 0; j < dk->Count(); j++) 
+      for(int j = 0; j < dk->Count(); j++)
         sp->dpString[j] = dk->GetCombinedCharacter(j);
       sp++;
 
@@ -704,7 +704,7 @@ int wmain(int argc, WCHAR* argv[]) {
       kkp++;
     }
   }
-  
+
 }
 
 PWSTR incxstr(PWSTR p)
@@ -724,7 +724,7 @@ PWSTR incxstr(PWSTR p)
 		case CODE_INDEX:		return p+2;
 		case CODE_USE:			return p+1;
 		case CODE_DEADKEY:		return p+1;
-		case CODE_EXTENDED:		p += 2; while(*p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
+		case CODE_EXTENDED:		p += 2; while(*p && *p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
 		case CODE_CLEARCONTEXT: return p+1;
 		case CODE_CALL:			return p+1;
 		case CODE_CONTEXTEX:	return p+1;
