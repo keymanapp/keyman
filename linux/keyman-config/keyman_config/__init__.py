@@ -10,6 +10,7 @@ from .version import __majorversion__
 from .version import __releaseversion__
 from .version import __tier__
 from .version import __pkgversion__
+from .version import __environment__
 
 
 def _(txt):
@@ -49,13 +50,15 @@ else:
         SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357@sentry.keyman.com/12"
         sentry_sdk.init(
             dsn=SentryUrl,
-            environment=__tier__,
+            environment=__environment__,
             release=__version__,
         )
         with configure_scope() as scope:
             scope.set_tag("app", os.path.basename(sys.argv[0]))
+            scope.set_tag("pkgversion", __pkgversion__)
             scope.set_tag("platform", platform.platform())
             scope.set_tag("system", platform.system())
+            scope.set_tag("tier", __tier__)
     except ImportError:
         try:
             # sentry-sdk is not available, so use older raven
@@ -64,11 +67,13 @@ else:
             HaveSentryNewSdk = False
 
             SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357:e6d5a81ee6944fc79bd9f0cbb1f2c2a4@sentry.keyman.com/12"
-            client = Client(SentryUrl, environment=__tier__, release=__version__)
+            client = Client(SentryUrl, environment=__environment__, release=__version__)
             client.tags_context({
                 'app': os.path.basename(sys.argv[0]),
+                'pkgversion': __pkgversion__,
                 'platform': platform.platform(),
                 'system': platform.system(),
+                'tier': __tier__,
             })
         except ImportError:
             # even raven is not available. This is the case on Ubuntu 16.04. Just ignore.
