@@ -1,18 +1,18 @@
 /*
   Name:             tmgrsink
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Nov 2012
 
   Modified Date:    28 Mar 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Nov 2012 - mcdurdin - I3581 - V9.0 - KMTip needs to pass activated profile guid through to Keyman32 to switch keyboards
                     16 Jun 2014 - mcdurdin - I4274 - V9.0 - kmtip does not work if already active before KM starts
                     13 Aug 2014 - mcdurdin - I4375 - V9.0 - Add registry flag deep integration to allow us to disable TIP context
@@ -68,6 +68,13 @@ STDAPI CKMTipTextService::OnUninitDocumentMgr(ITfDocumentMgr *pDocMgr)
 
 STDAPI CKMTipTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pDocMgrPrevFocus)
 {
+  // If settings change, e.g. Simulate AltGr, we need to
+  // reinitialise our preserved keys and a focus change may
+  // be the first change we get to do something about it
+  if (!_InitPreservedKeys()) {
+    SendDebugMessage(L"OnSetFocus: _InitPreservedKeys failed");
+    return S_OK;
+  }
 
 /* http://blogs.msdn.com/b/tsfaware/archive/2007/05/21/transitory-extensions.aspx
 bool isTransitory = false;
