@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+include /usr/share/dpkg/pkg-info.mk
+
 #export DH_VERBOSE=1
 export PYBUILD_NAME=keyman-config
 export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
@@ -9,7 +11,7 @@ export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
 
 override_dh_auto_build:
 	make man
-	sed -i -e "s/^__pkgversion__ = \"\"/__pkgversion__ = \"$(shell dpkg-parsechangelog --show-field Version)\"/g" keyman_config/version.py
+	sed -i -e "s/^__pkgversion__ = \"\"/__pkgversion__ = \"$(DEB_VERSION)\"/g" keyman_config/version.py
 	make compile-po
 	dh_auto_build $@
 

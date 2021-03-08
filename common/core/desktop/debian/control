@@ -5,11 +5,12 @@ Maintainer: Debian Input Method Team <debian-input-method@lists.debian.org>
 Uploaders:
  Daniel Glassey <wdg@debian.org>,
  Keyman team <support@keyman.com>,
+ Eberhard Beilharz <eb1@sil.org>,
 Build-Depends:
  debhelper (>= 11),
  meson (>= 0.45),
  ninja-build,
-Standards-Version: 4.5.0
+Standards-Version: 4.5.1
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman/tree/master/common/core/desktop
 Homepage: https://www.keyman.com
