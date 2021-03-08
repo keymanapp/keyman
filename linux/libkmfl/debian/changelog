@@ -44,7 +44,7 @@ libkmfl (0.9.12-1) unstable; urgency=low
 
 libkmfl (0.9.11-1) UNRELEASED; urgency=low
 
-  * fix bug when nomatch is used with "use" keyword 
+  * fix bug when nomatch is used with "use" keyword
 
  -- Doug Rintoul <doug_rintoul@sil.org>  Wed, 17 Nov 2010 13:27:33 -0800
 
