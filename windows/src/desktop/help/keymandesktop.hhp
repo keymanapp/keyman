@@ -8,10 +8,10 @@ Default topic=index.htm
 Display compile progress=Yes
 Full-text search=Yes
 Language=0x409 English (United States)
-Title=Keyman Desktop User Guide
+Title=Keyman for Windows User Guide
 
 [WINDOWS]
-Main="Keyman Desktop User Guide","toc.hhc",,"index.htm","index.htm",,,,,0x2520,,0x603006,,,,,,,,0
+Main="Keyman for Windows User Guide","toc.hhc",,"index.htm","index.htm",,,,,0x2520,,0x603006,,,,,,,,0
 
 
 [INFOTYPES]
