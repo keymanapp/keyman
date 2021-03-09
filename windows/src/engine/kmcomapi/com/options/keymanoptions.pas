@@ -26,10 +26,11 @@ unit keymanoptions;
 interface
 
 uses
-  ComObj,
-  ActiveX,
+  System.Win.ComObj,
+  System.Win.StdVCL,
+  Winapi.ActiveX,
+
   keymanapi_TLB,
-  StdVcl,
   keymanautoobject,
   KeymanContext,
   keymanoption,
@@ -59,16 +60,16 @@ type
 implementation
 
 uses
-  Windows,
-  ComServ,
+  Winapi.Windows,
+  System.SysUtils,
+  System.Variants,
+
   ErrorControlledRegistry,
   RegistryKeys,
-  SysUtils,
   Glossary,
+  Keyman.System.BaseKeyboard,
   KeymanOptionNames,
-  keymanerrorcodes,
-  Variants,
-  utilkeyman;
+  keymanerrorcodes;
 
 constructor TKeymanOptions.Create(AContext: TKeymanContext);
 begin
@@ -119,10 +120,10 @@ begin
     begin
       if ValueExists(SRegValue_UnderlyingLayout)
         then FOldBaseLayout := StrToIntDef('$'+ReadString(SRegValue_UnderlyingLayout),0)   // I3759
-        else FOldBaseLayout := GetDefaultKeyboardID;
+        else FOldBaseLayout := TBaseKeyboard.GetDefaultKeyboardID;
     end
     else
-      FOldBaseLayout := GetDefaultKeyboardID;
+      FOldBaseLayout := TBaseKeyboard.GetDefaultKeyboardID;
   finally
     Free;
   end;
@@ -149,7 +150,7 @@ begin
 
   v := Get_Items('koBaseLayout');
   if v.Value = v.DefaultValue then
-    v.Value := GetDefaultKeyboardID;
+    v.Value := TBaseKeyboard.GetDefaultKeyboardID;
 end;
 
 end.
