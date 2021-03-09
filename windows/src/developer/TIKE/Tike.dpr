@@ -302,27 +302,32 @@ const
 begin
   TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE);
   try
-    CoInitFlags := COINIT_APARTMENTTHREADED;
-
-    FInitializeCEF := TCEFManager.Create;
     try
-      if FInitializeCEF.Start then
-      begin
-        InitThemeLibrary;
-        SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
-        Application.MainFormOnTaskBar := True;
-        Application.Initialize;
-      //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
-        Application.Title := 'Keyman Developer';
-        //TBX.TBXSetTheme('OfficeXP2');
-        if TikeActive then Exit;
-        InitClasses;
-        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  Application.Run;
+      CoInitFlags := COINIT_APARTMENTTHREADED;
+
+      FInitializeCEF := TCEFManager.Create;
+      try
+        if FInitializeCEF.Start then
+        begin
+          InitThemeLibrary;
+          SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+          Application.MainFormOnTaskBar := True;
+          Application.Initialize;
+        //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
+          Application.Title := 'Keyman Developer';
+          //TBX.TBXSetTheme('OfficeXP2');
+          if TikeActive then Exit;
+          InitClasses;
+          Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+          Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+          Application.Run;
+        end;
+      finally
+        FInitializeCEF.Free;
       end;
-    finally
-      FInitializeCEF.Free;
+    except
+      on E:Exception do
+        SentryHandleException(E);
     end;
   finally
     TKeymanSentryClient.Stop;

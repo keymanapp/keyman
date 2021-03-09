@@ -55,8 +55,10 @@ namespace com.keyman.text {
      * Handles default output and keyboard processing for both OSK and physical keystrokes.
      * 
      * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
+     * @returns     {Object}             A RuleBehavior object describing the cumulative effects of
+     *                                   all matched keyboard rules.
      */
-    processKeyEvent(keyEvent: KeyEvent) {
+    processKeyEvent(keyEvent: KeyEvent): RuleBehavior {
       let formFactor = keyEvent.device.formFactor;
 
       // Determine the current target for text output and create a "mock" backup
@@ -70,14 +72,14 @@ namespace com.keyman.text {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.keyboardProcessor.selectLayer(keyEvent)) {
-          return true;
+          return new RuleBehavior();
         }
       }
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
       // of state management.
       if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, !fromOSK)) {
-        return true;
+        return new RuleBehavior();
       }
 
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
@@ -88,10 +90,10 @@ namespace com.keyman.text {
 
         // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
         if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
-          return;
+          return new RuleBehavior();
           // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
         } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && this.languageProcessor.tryAcceptSuggestion('space')) {
-          return;
+          return new RuleBehavior();
         }
       }
 
@@ -171,15 +173,6 @@ namespace com.keyman.text {
         }
       }
 
-      /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
-
-      // TODO:  rework the return value to be `ruleBehavior` instead.  Functions that call this one are
-      //        the ones that should worry about event handler returns, etc.  Not this one.
-      //
-      //        They should also be the ones to handle the TODOs seen earlier in this function -
-      //        once THOSE are properly relocated.  (They're too DOM-heavy to remain in web-core.)
-
-      // Only return true (for the eventual event handler's return value) if we didn't match a rule.
       return ruleBehavior;
     }
 

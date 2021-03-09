@@ -147,6 +147,16 @@ const
   CERR_ContextAndIndexInvalidInMatchNomatch        = $4062;
   CERR_140FeatureOnlyContextAndNotAnyWeb           = $4063;
 
+  CERR_ExpansionMustFollowCharacterOrVKey          = $4064;
+  CERR_VKeyExpansionMustBeFollowedByVKey           = $4065;
+  CERR_CharacterExpansionMustBeFollowedByCharacter = $4066;
+  CERR_VKeyExpansionMustUseConsistentShift         = $4067;
+  CERR_ExpansionMustBePositive                     = $4068;
+
+  CERR_CasedKeysMustContainOnlyVirtualKeys         = $4069;
+  CERR_CasedKeysMustNotIncludeShiftStates          = $406A;
+  CERR_CasedKeysNotSupportedWithMnemonicLayout     = $406B;
+
   CWARN_TooManyWarnings                            = $2080;
   CWARN_OldVersion                                 = $2081;
   CWARN_BitmapNotUsed                              = $2082;

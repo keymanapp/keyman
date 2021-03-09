@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="ssLanguageName">Englisch</string>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Deutsch</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
   <string name="ssTitle">Installiere $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION wurde erfolgreich installiert.</string>
   <string name="ssCancelQuery">Sind Sie sicher, dass Sie die Installation von $APPNAME abbrechen möchten?</string>
   <string name="ssBootstrapExtractingBundle">Entpacke Dateien...</string>
-  <string name="ssBootstrapCheckingPackages" comment="ssBootstrapCheckingPackages: this message is shown when the installer is loading each package that is in the local folder and determining if it should be installed. It is a status message which appears only briefly and requires no user interaction.">Pakete werden überprüft...</string>
+  <string name="ssBootstrapCheckingPackages">Pakete werden überprüft...</string>
   <string name="ssBootstrapCheckingForUpdates">Prüfe online auf Updates...</string>
   <string name="ssBootstrapCheckingInstalledVersions">Installierte Versionen werden überprüft...</string>
   <string name="ssBootstrapReady">Fertigstellen...</string>
@@ -18,7 +18,7 @@
   <string name="ssActionInstallPackageLanguage">• %0:s %1:s für %2:s %3:s</string>
   <string name="ssActionNothingToInstall">Es gibt nichts zu installieren.</string>
   <!-- Parameters: %0:s download size -->
-  <string name="ssActionDownload" comment="ssActionDownload&#10;Parameters: %0:s download size&#10;For example &quot;(13.5MB download)&quot;&#10;This is used when listing each of the files to be installed.">(%0:s herunterladen)</string>
+  <string name="ssActionDownload">(%0:s herunterladen)</string>
   <string name="ssActionInstall">Setup installiert:</string>
   <string name="ssFreeCaption">$APPNAME $VERSION ist kostenlos und Open Source</string>
   <string name="ssLicenseLink">&amp;Lizenzbedingungen</string>
@@ -56,7 +56,7 @@ Jetzt neu starten?</string>
   <!-- Parameters: %0:s: installed version -->
   <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s ist bereits installiert.</string>
   <!-- Parameters: %0:s: version, %1:s: size -->
-  <string name="ssOptionsDownloadKeymanVersion" comment="ssOptionsDownloadKeymanVersion&#10;Parameters: %0:s: version, %1:s: size&#10;&#10;Download is a verb in this case. This is shown in the Options dialog box.">Version %0:s herunterladen (%1:s)</string>
+  <string name="ssOptionsDownloadKeymanVersion">Version %0:s herunterladen (%1:s)</string>
   <!-- Parameters: %0:s: version -->
   <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
   <!-- Parameters: %0:s: package name %1:s -->

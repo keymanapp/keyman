@@ -209,7 +209,7 @@ begin
         end
         else if not TCanonicalLanguageCodeUtils.IsCanonical(tag, msg, False, False) then
         begin
-          DoError(Format(SWarning_LanguageTagIsNotCanonical, [kbd.ID, lang.ID, msg]), plsWarning);
+          DoError(Format(SWarning_LanguageTagIsNotCanonical, [kbd.ID, lang.ID, msg]), plsInfo);
         end;
       finally
         Free;

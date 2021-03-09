@@ -52,6 +52,10 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
   <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman läuft noch. Klicken Sie auf dieses Symbol, um die Tastatur für Ihre Sprache jederzeit zu verwenden</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0.234 -->
+  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman läuft bereits. Klicken Sie auf das Keyman-Symbol im Benachrichtigungsbereich um Ihre Sprachtastatur zu verwenden</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -224,11 +228,11 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">Es sind keine Tastaturen installiert. Klicken Sie auf \'Tastatur herunterladen\', um eine Tastatur von der Keyman-Website zu installieren.</string>
-  <!-- Parameters: %0:s = keyboard layout name -->
+  <!-- Parameters: %1$s = keyboard layout name -->
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- Introduced: 7.1.251.0 -->
   <!-- String Type: PlainText -->
-  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">Sie können die \'%0:s\'-Tastatur nur deinstallieren, wenn Sie ein Administrator sind</string>
+  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">Sie können die \'%1$s\' -Tastatur nur deinstallieren, wenn Sie ein Administrator sind</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
@@ -340,7 +344,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permisable level">Benutzer Berechtigungen werden immer in Windows Vista erhöht</string>
+  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">Benutzer Berechtigungen werden immer in Windows Vista erhöht</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
@@ -365,7 +369,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman systemtray menu">Keyman Menü öffnen</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">Keyman Menü öffnen</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -450,11 +454,11 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="Download only option checkbox">Nicht installieren, nur herunterladen</string>
-  <!-- Parameters: %0:s = Error Message, %1:d Error Code -->
+  <!-- Parameters: %1$s = Error Message, %2$d Error Code -->
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0 -->
-  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">Kann Tastatur nicht herunterladen. Fehler %1:d: %0:s</string>
+  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">Kann Tastatur nicht herunterladen. Fehler %2$d: %1$s</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
@@ -507,30 +511,30 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKChangeHotkeyTitle" comment="Change Hotkey dialog title">Tastenkürzel ändern</string>
-  <!-- Parameters: %0:s = Name of keyboard -->
+  <!-- Parameters: %1$s = Name of keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Standard-Tastenkürzel selektieren, oder \'Benutzerdefiniert\' auswählen und Strg, Umschalt- und/oder Alt- sowie gewünschte Taste für die Sprache %0:s drücken:</string>
+  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Standard-Tastenkürzel selektieren, oder \'Benutzerdefiniert\' auswählen und Strg, Umschalt- und/oder Alt- sowie Taste für das gewünschte Tastaturkürzel für die Sprache %1$s drücken:</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKSetHotkey_Interface" comment="Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard)">Standard-Tastenkürzel selektieren, oder \'Benutzerdefiniert\' auswählen und Strg, Umschalt- und/oder Alt- sowie Taste für das gewünschte Tastaturkürzel drücken:</string>
-  <!-- Parameters: %0:s = Hotkey -->
+  <!-- Parameters: %1$s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">Das Tastenkürzel %0:s steht im Konflikt mit der normalen Tastatur. Sie sollten mindestens Strg oder Alt verwenden. Möchten Sie dies jetzt ändern?</string>
-  <!-- Parameters: %0:s = Hotkey, %1:s = Conflicting keyboard -->
+  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">Das Tastenkürzel %1$s steht im Konflikt mit der normalen Tastatur. Sie sollten mindestens Strg oder Alt verwenden. Möchten Sie dies jetzt ändern\?</string>
+  <!-- Parameters: %1$s = Hotkey, %2$s = Conflicting keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">Das Tastenkürzel %0:s steht im Konflikt zu dem ausgewählten Tastenkürzel für die %1:s-Tastatur. Wenn Sie fortfahren wird das Tastenkürzel für %1:s gelöscht. Fortfahren?</string>
-  <!-- Parameters: %0:s = Hotkey -->
+  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">Das Tastenkürzel %1$s steht im Konflikt zu dem ausgewählten Tastenkürzel für die %2$s-Tastatur. Wenn Sie fortfahren wird das Tastenkürzel für %2$s gelöscht. Fortfahren\?</string>
+  <!-- Parameters: %1$s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 14.0.117 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">Das Tastenkürzel %0:s steht in Konflikt mit einem anderen Tastenkürzel. Wenn Sie fortfahren, wird das andere Tastenkürzel gelöscht. Fortfahren?</string>
+  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">Das Tastenkürzel %1$s steht in Konflikt mit einem anderen Tastenkürzel. Wenn Sie fortfahren, wird das andere Tastenkürzel gelöscht. Fortfahren?</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -567,25 +571,25 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.255.0 -->
   <string name="S_Update_SizeHead" comment="Update dialog - update size">Größe</string>
-  <!-- Parameters: %0:s = Current version number -->
+  <!-- Parameters: %1$s = Current version number -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_KeymanText" comment="Update dialog - name and version of updatable product">Keyman %0:s</string>
-  <!-- Parameters: %0:s = Package description, %1:s = Current package version number -->
+  <string name="SKUpdate_KeymanText" comment="Update dialog - name and version of updatable product">Keyman %1$s</string>
+  <!-- Parameters: %1$s = Package description, %2$s = Current package version number -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_PackageText" comment="Update dialog - name and version of updatable keyboard layout package">%0:s-Tastatur %1:s</string>
+  <string name="SKUpdate_PackageText" comment="Update dialog - name and version of updatable keyboard layout package">Keyboard %1$s %2$s</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKUpdate_UnableToContact" comment="Update dialog - unable to access keyman.com warning">Die keyman.com-Webseite ist nicht erreichbar - bitte testen Sie Ihre Internet-Verbindung, und versuchen Sie es erneut.</string>
-  <!-- Parameters: %0:s = Error message -->
+  <!-- Parameters: %1$s = Error message -->
   <!-- Context: Online Update Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">Die keyman.com-Webseite ist nicht erreichbar - bitte testen Sie Ihre Internet-Verbindung, und versuchen Sie es erneut. Der Fehler war: %0:s</string>
+  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">Die keyman.com-Webseite ist nicht erreichbar - bitte testen Sie Ihre Internet-Verbindung, und versuchen Sie es erneut. Der Fehler war: %1$s</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
@@ -666,12 +670,12 @@
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">Keyman verlassen?</string>
+  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">Keyman beenden\?</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: Hint -->
   <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
-  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">Sind Sie sicher, dass Sie Keyman verlassen möchten? Ihre Keyman-Tastaturen werden weiterhin in den Windows-Sprachen aufgelistet, werden aber erst dann funktionieren, wenn Sie Keyman neu starten.</string>
+  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">Sind Sie sicher, dass Sie Keyman verlassen möchten\? Ihre Keyman-Tastaturen werden weiterhin in den Windows-Sprachen aufgelistet, werden aber erst dann funktionieren, wenn Sie Keyman neu starten.</string>
   <!-- Context: Hints -->
   <!-- Introduced: 7.0.244.0 -->
   <!-- String Type: HintTitle -->
@@ -778,35 +782,40 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">Keyman</string>
-  <!-- Parameters: %0:s = Version number string -->
+  <!-- Parameters: %1$s = Version number string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSplashVersion" comment="Version number">Version %0:s</string>
+  <string name="SKSplashVersion" comment="Version number">Version %1$s</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.239.0 -->
   <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">&amp;Drucken...</string>
-  <!-- Parameters: %0:s = Package to be uninstalled -->
+  <!-- Parameters: %1$s = Package to be uninstalled -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">Ein Paket mit dem Namen %0:s ist bereits installiert. Möchten Sie es deinstallieren und das neue installieren?</string>
-  <!-- Parameters: %0:s = Keyboard name -->
+  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">Ein Paket mit dem Namen %1$s ist bereits installiert. Möchten Sie es deinstallieren und das neue installieren\?</string>
+  <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">Eine Tastatur mit dem Name \'%0:s\' ist bereits installiert. Wenn Sie fortfahren, wird sie deinstalliert bevor die neue Tastatur installiert wird. Fortfahren?</string>
-  <!-- Parameters: %0:s = Keyboard name, %1:s = Package name -->
+  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">Eine Tastatur mit dem Namen \'%1$s\' ist bereits installiert. Wenn Sie fortfahren, wird sie deinstalliert, bevor die neue Tastatur installiert wird. Fortfahren\?</string>
+  <!-- Parameters: %1$s = Keyboard name, %2$s = Package name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">Die Tastatur \'%0:s\' ist Teil des Pakets \'%1:s\'. Sie müssen das gesamte Paket deinstallieren. Fortfahren?</string>
-  <!-- Parameters: %0:s = Package Name -->
+  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">Die Tastatur \'%1$s\' ist Teil des Pakets \'%2$s\'. Sie müssen das gesamte Paket deinstallieren. Fortfahren\?</string>
+  <!-- PArameters: %1$s = BCP 47 code -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 14.0.211 -->
+  <!-- String Type: FormatString -->
+  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">Die Tastatursprache kann nicht installiert werden; Windows hat ein Limit von 4 benutzerdefinierten \'transienten\' Sprachen, und Sie haben möglicherweise dieses Limit erreicht.</string>
+  <!-- Parameters: %1$s = Package Name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">Das Paket oder die Tastatur \'%0:s\' enthält keine Einführungshilfe.</string>
+  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">Das Paket oder die Tastatur \'%1$s\' enthält keine Einführungshilfe.</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -831,72 +840,62 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKDownloadProgress_Title" comment="Notice of file downloading">Datei wird heruntergeladen</string>
-  <!-- Parameters: %0:s = Keyboard name -->
+  <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">Sind Sie sicher, dass Sie die Bildschirmtastatur für %0:s entfernen möchten?</string>
-  <!-- Parameters: %0:s = Keyboard name -->
+  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">Sind Sie sicher, dass Sie die Bildschirmtastatur für %1$s entfernen möchten\?</string>
+  <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.239.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">Sind Sie sicher, dass Sie die Tastatur %0:s deinstallieren wollen?</string>
-  <!-- Parameters: %0:s = Package name, %1:s: Fonts list -->
+  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">Sind Sie sicher, dass Sie die Tastatur %1$s deinstallieren wollen\?</string>
+  <!-- Parameters: %1$s = Package name, %2$s: Fonts list -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.239.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">Sind Sie sicher, dass Sie das Tastaturbelegungspaket %0:s deinstallieren wollen?
-
-%1:s</string>
-  <!-- Parameters: %0:s = Fonts list -->
+  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">Sind Sie sicher, dass Sie das Paket %1$s deinstallieren möchten\?\n\n%2$s</string>
+  <!-- Parameters: %1$s = Fonts list -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.1.270.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">Die folgenden Schriftarten werden ebenfalls deinstalliert: %0:s.</string>
+  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">Die folgenden Schriftarten werden ebenfalls deinstalliert: %1$s.</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">Die Zeichentabelle enthält eine Datenbank von Zeichen, die erstellt werden muss, bevor sie verwendet werden kann. Jetzt erstellen?</string>
-  <!-- Parameters: %0:s = Error detail string -->
+  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">Die Zeichentabelle enthält eine Datenbank von Zeichen, die erstellt werden muss, bevor sie verwendet werden kann. Jetzt erstellen\?</string>
+  <!-- Parameters: %1$s = Error detail string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">Die Unicode Zeichen-Datenbank konnte nicht gelöscht werden für einen Wiederaufbau. Der Fehler ist: %0:s</string>
-  <!-- Parameters: %0:s = Error details -->
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">Die Unicode Zeichen-Datenbank konnte nicht gelöscht werden für einen Wiederaufbau. Der Fehler ist: %1$s</string>
+  <!-- Parameters: %1$s = Error details -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">Die Unicode Zeichen-Datenbank konnte nicht erstellt werden und wurde deaktiviert. Der Fehler ist: %0:s</string>
-  <!-- Parameters: %0:s = Error message -->
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">Die Unicode-Zeichen-Datenbank konnte nicht erstellt werden und wurde deaktiviert. Fehlerdetails: %1$s</string>
+  <!-- Parameters: %1$s = Error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">Die Unicode Zeichen-Datenbank konnte nicht geladen werden (%0:s). Jetzt neu erstellen?</string>
-  <!-- Parameters: %0:s: error message -->
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">Die Unicode Zeichen-Datenbank konnte nicht geladen werden (%1$s). Jetzt neu erstellen\?</string>
+  <!-- Parameters: %1$s: error message -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman konnte nicht gestartet werden. Bevor Sie fortfahren überprüfen Sie bitte Ihre Sicherheitseinstellungen, um sicherzustellen, dass das Programm keyman.exe gestartet werden darf. Der gemeldete Fehler ist:
-
-\"%0:s\"
-
-Möchten Sie Keyman erneut starten?</string>
+  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman konnte nicht gestartet werden. Bevor Sie fortfahren überprüfen Sie bitte Ihre Sicherheitseinstellungen, um sicherzustellen, dass das Programm keyman.exe gestartet werden darf. Der gemeldete Fehler ist:\n\n\"%1$s\"\n\nMöchten Sie Keyman erneut starten\?</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman Debug-Informationen werden in einer Protokolldatei mit dem Namen %LOCALAPPDATA%\Keyman\Diag\system#.etl gespeichert (wobei # eine Nummer ist). Sie sollten Keyman beenden, bevor Sie diese Datei löschen.
-
-WARNUNG: Diese Datei kann sehr schnell groß werden. Das Aktivieren der Debug-Protokollierung kann Ihr System verlangsamen und sollte nur auf Anweisung durch den technischen Support erfolgen.
-
-DATENSCHUTZ-HINWEIS: Bitte beachten Sie, dass die Debug-Logdatei alle von Ihnen eingegebenen Tastenanschläge aufzeichnet. Sie sollten das Debug-Log nur für die Dauer einer Debugging- oder Diagnosesitzung aktivieren.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman Debug-Informationen werden in einer Protokolldatei mit dem Namen %LOCALAPPDATA%\Keyman\Diag\system#.etl gespeichert (wobei # eine Nummer ist). Sie sollten Keyman beenden, bevor Sie diese Datei löschen.\n\nWARNUNG: Diese Datei kann sehr schnell groß werden. Das Aktivieren der Debug-Protokollierung kann Ihr System verlangsamen und sollte nur auf Anweisung durch den technischen Support erfolgen.\n\nDATENSCHUTZ-HINWEIS: Bitte beachten Sie, dass die Debug-Logdatei alle von Ihnen eingegebenen Tastenanschläge aufzeichnet. Sie sollten das Debug-Log nur für die Dauer einer Debugging- oder Diagnosesitzung aktivieren.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Bitte warten Sie, während nach Schriftarten für Tastatur %0:s gesucht wird</string>
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">Bitte warten Sie, während nach verwandten Schriftarten für Tastatur %1$s gesucht wird</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">Tastatur %0:s ist keine Unicode-Tastatur. Schriftarten können nicht automatisch gefunden werden. Bitte überprüfen Sie die Tastaturdokumentation für Schriftarten.</string>
+  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">Tastatur %1$s ist keine Unicode-Tastatur. Schriftarten können nicht automatisch gefunden werden. Bitte überprüfen Sie die Tastaturdokumentation für Schriftarten.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

@@ -45,4 +45,4 @@ Selecting the notification seen at the top will lead you to the following page:
 
 Select the big **Install on iPhone** (or
 **Install on iPad**) option will then download
-the file for easy installation.  (Refer to [Installing custom keyboards](installing-custom-keyboards) as necessary.)
+the file for easy installation.  (Refer to [Installing custom keyboards/dictionaries](installing-custom-keyboards-dictionaries) as necessary.)

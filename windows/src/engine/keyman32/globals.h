@@ -1,18 +1,18 @@
 /*
   Name:             globals
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Add hotkeys
                     14 Sep 2006 - mcdurdin - Add UpdateActiveWindows function
                     16 May 2007 - mcdurdin - I819 - Test if Keyman is functioning
@@ -83,7 +83,7 @@ public:
 
 	static DWORD *FSingleThread();
   static DWORD *InitialisingThread();   // I4326
-	
+
   //static DWORD *ActiveKeymanID();
   //static HKL *ActiveKeyboardLayout();
 
@@ -98,7 +98,7 @@ public:
 
 	static HHOOK get_hhookGetMessage();
 	static HHOOK get_hhookCallWndProc();
-  
+
 #ifndef _WIN64
   static HHOOK get_hhookLowLevelKeyboardProc();   // I4124
 #endif
@@ -134,7 +134,7 @@ public:
 
 	static LRESULT SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam);
 	static void PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam);
-  
+
   static BOOL ResetControllers();
 
 	static void PostControllers(UINT msg, WPARAM wParam, LPARAM lParam);
@@ -220,12 +220,12 @@ typedef struct tagKEYMAN64THREADDATA
 
   PKEYMANPROCESSOUTPUTFUNC TIPProcessOutput;
   PKEYMANGETCONTEXTFUNC TIPGetContext;
- 
+
   BOOL TIPFUpdateable, TIPFPreserved;   // I4290
 
   BOOL FInRefreshKeyboards;
   BOOL RefreshRequired;
-  LONG RefreshTag_Process; // TODO: we may be able to eliminate this with our delayed refresh pattern?
+  LONG RefreshTag_Thread; // TODO: we may be able to eliminate this with our delayed refresh pattern?
 
   /* Addin Globals */
 
@@ -254,7 +254,7 @@ typedef struct tagKEYMAN64THREADDATA
 
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
-extern UINT 
+extern UINT
   wm_keyman,						// user message - ignore msg
   wm_kmdebug,						//  " "  "  "   - debugging
   wm_keyman_control,				// messages to main Keyman window - replaces WM_USER+*
@@ -269,7 +269,7 @@ extern UINT
   wm_keymanim_close,
   wm_keymanim_contextchanged,
   wm_test_keyman_functioning,
-  wm_keyman_keyevent;   // for serialized input 
+  wm_keyman_keyevent;   // for serialized input
 
 extern BOOL
   flag_ShouldSerializeInput;

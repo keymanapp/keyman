@@ -1,10 +1,10 @@
 ---
-title: Installing Custom Keyboards - Keyman for iPhone and iPad Help
+title: Installing Custom Keyboards/Dictionaries - Keyman for iPhone and iPad Help
 ---
 
-The following steps can also be used to install a dictionary package.
+The following steps can be used to install either a keyboard package or a dictionary package.
 
-###Download the File
+### Download the File
 If downloading a custom keyboard from the internet, click the link to your custom keyboard package file.
 
 For this example, we'll install a custom keyboard from a link in Safari.  Our example keyboard is for the GFF Amharic 7 keyboard.

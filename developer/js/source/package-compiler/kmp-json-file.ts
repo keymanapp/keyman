@@ -15,7 +15,6 @@ interface KmpJsonFileSystem {
 }
 
 interface KmpJsonFileOptions {
-  followKeyboardVersion: boolean;
   readmeFile?: string;
   graphicFile?: string;
   executeProgram?: string;

@@ -228,3 +228,19 @@ BEGIN
     CWARN_NulNotFirstStatementInContext       "nul must be the first statement in the context"
     CWARN_IfShouldBeAtStartOfContext          "if, platform and baselayout should be at start of context (after nul, if present])"
 END
+
+STRINGTABLE
+BEGIN
+    CERR_ExpansionMustFollowCharacterOrVKey            "An expansion must follow a character or a virtual key"
+    CERR_VKeyExpansionMustBeFollowedByVKey             "A virtual key expansion must be terminated by a virtual key"
+    CERR_CharacterExpansionMustBeFollowedByCharacter   "A character expansion must be terminated by a character key"
+    CERR_VKeyExpansionMustUseConsistentShift           "A virtual key expansion must use the same shift state for both terminators"
+    CERR_ExpansionMustBePositive                       "An expansion must have positive difference (i.e. A-Z, not Z-A)"
+END
+
+STRINGTABLE
+BEGIN
+    CERR_CasedKeysMustContainOnlyVirtualKeys           "The &CasedKeys system store must contain only virtual keys or characters found on a US English keyboard"
+    CERR_CasedKeysMustNotIncludeShiftStates            "The &CasedKeys system store must not include shift states"
+    CERR_CasedKeysNotSupportedWithMnemonicLayout       "The &CasedKeys system store is not supported with mnemonic layouts"
+END

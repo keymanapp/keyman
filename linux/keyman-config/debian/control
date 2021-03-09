@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Debian Input Method Team <debian-input-method@lists.debian.org>
 Uploaders:
  Keyman team <support@keyman.com>,
+ Eberhard Beilharz <eb1@sil.org>,
 Build-Depends:
  bash-completion,
  debhelper (>= 11),
@@ -23,13 +24,12 @@ Build-Depends:
  python3-requests,
  python3-requests-cache,
  python3-setuptools,
-Standards-Version: 4.5.0
+Standards-Version: 4.5.1
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman/tree/master/linux/keyman-config
 Homepage: https://www.keyman.com
 
 Package: keyman
-Section: utils
 Architecture: all
 Depends:
  python3-keyman-config,

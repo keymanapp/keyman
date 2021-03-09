@@ -87,30 +87,6 @@
       <Details/>
     </File>
     <File>
-      <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
-      <Filename>test_valid.kmx</Filename>
-      <Filepath>test_valid.kmx</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.kmx</FileType>
-      <ParentFileID>id_03dbd77eff6b6b923de6983fab2bd9d0</ParentFileID>
-    </File>
-    <File>
-      <ID>id_416e28ba6ecd3550e599b16a2c37e864</ID>
-      <Filename>test_invalid_kmx.kmx</Filename>
-      <Filepath>test_invalid_kmx.kmx</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.kmx</FileType>
-      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
-    </File>
-    <File>
-      <ID>id_ee200303f52275647138898037a80e0e</ID>
-      <Filename>test.doc</Filename>
-      <Filepath>test.doc</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.doc</FileType>
-      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
-    </File>
-    <File>
       <ID>id_4c59db88c3869d699c9df7f46731a97a</ID>
       <Filename>test_4280_if_start_1.kmn</Filename>
       <Filepath>test_4280_if_start_1.kmn</Filepath>
@@ -141,6 +117,138 @@
       <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
       <Details/>
+    </File>
+    <File>
+      <ID>id_068020cc7b6376ed155d5b9fc0215cc6</ID>
+      <Filename>test_namedcodeconstants.kmn</Filename>
+      <Filepath>test_namedcodeconstants.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_a45739f276db90d247a6b60b0faa281c</ID>
+      <Filename>test_expansion.kmn</Filename>
+      <Filepath>test_expansion.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Expansions</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_103775d19d3ec8272e57e2e103960589</ID>
+      <Filename>test_expansion_1.kmn</Filename>
+      <Filepath>test_expansion_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Expansions</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_bb17cc25a8735482bba0fc34223c9fe8</ID>
+      <Filename>test_expansion_invalid.kmn</Filename>
+      <Filepath>test_expansion_invalid.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Invalid Expansions</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_c35b5f806c85252da940a60449e089e0</ID>
+      <Filename>test_casedkeys.kmn</Filename>
+      <Filepath>test_casedkeys.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_3a9d89cd15f05037ef2d5a71fd78ed35</ID>
+      <Filename>test_casedkeys_chars.kmn</Filename>
+      <Filepath>test_casedkeys_chars.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_70997591a064ca387dac08622a04c392</ID>
+      <Filename>test_casedkeys_invalid_1.kmn</Filename>
+      <Filepath>test_casedkeys_invalid_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_8551121eb12d38673567587b753908f7</ID>
+      <Filename>test_casedkeys_invalid_2.kmn</Filename>
+      <Filepath>test_casedkeys_invalid_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_2e7200332135cd7d8ce6109a31be82fe</ID>
+      <Filename>test_casedkeys_mnemonic_1.kmn</Filename>
+      <Filepath>test_casedkeys_mnemonic_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_7d86f03f3e1c308ab03429ac05556e5a</ID>
+      <Filename>test_casedkeys_mnemonic_2.kmn</Filename>
+      <Filepath>test_casedkeys_mnemonic_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test &amp;CasedKeys</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
+      <Filename>test_valid.kmx</Filename>
+      <Filepath>test_valid.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_03dbd77eff6b6b923de6983fab2bd9d0</ParentFileID>
+    </File>
+    <File>
+      <ID>id_416e28ba6ecd3550e599b16a2c37e864</ID>
+      <Filename>test_invalid_kmx.kmx</Filename>
+      <Filepath>test_invalid_kmx.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+    <File>
+      <ID>id_ee200303f52275647138898037a80e0e</ID>
+      <Filename>test.doc</Filename>
+      <Filepath>test.doc</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.doc</FileType>
+      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+    <File>
+      <ID>id_9d5ea0b72f9733e0e70e04d5b3c790af</ID>
+      <Filename>test_expansion_absurd.kmn</Filename>
+      <Filepath>test_expansion_absurd.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Expansions</Name>
+      </Details>
     </File>
   </Files>
 </KeymanDeveloperProject>

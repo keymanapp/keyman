@@ -143,6 +143,16 @@
 #define CERR_ContextAndIndexInvalidInMatchNomatch          0x00004062
 #define CERR_140FeatureOnlyContextAndNotAnyWeb             0x00004063
 
+#define CERR_ExpansionMustFollowCharacterOrVKey            0x00004064
+#define CERR_VKeyExpansionMustBeFollowedByVKey             0x00004065
+#define CERR_CharacterExpansionMustBeFollowedByCharacter   0x00004066
+#define CERR_VKeyExpansionMustUseConsistentShift           0x00004067
+#define CERR_ExpansionMustBePositive                       0x00004068
+
+#define CERR_CasedKeysMustContainOnlyVirtualKeys           0x00004069
+#define CERR_CasedKeysMustNotIncludeShiftStates            0x0000406A
+#define CERR_CasedKeysNotSupportedWithMnemonicLayout       0x0000406B
+
 #define CWARN_TooManyWarnings                              0x00002080
 #define CWARN_OldVersion                                   0x00002081
 #define CWARN_BitmapNotUsed                                0x00002082

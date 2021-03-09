@@ -232,6 +232,88 @@
 
 * chore: prepare 15.0 alpha (#4129)
 
+## 14.0.253 beta 2021-03-05
+
+* fix(android/app): Fix welcome.htm responsiveness (#4531)
+* feat(developer): &CasedKeys system store (#4586)
+* fix(android): Localize Toast notifications (#4588)
+* fix(windows): PreservedKeyMap::MapUSCharToVK line order bug (#4595)
+* fix(developer): tidy up expansions tests (#4592)
+* fix(ios): adds i18n for some error alerts (#4577)
+* fix(windows): incxstr could run over buffer with malformed data (#4596)
+* chore(android/app): Update whatsnew with available display languages (#4610)
+* chore(linux): Improve Sentry environment setting (#4589)
+* fix(developer): Expand filenames before load (#4606)
+
+## 14.0.252 beta 2021-03-04
+
+* feat(ios): enables de, fr, and km localizations (#4585)
+* fix(developer): improve CEF location search stability (#4571)
+* fix(developer): Support all fonts in Keyboard Fonts dialog (#4574)
+* feat(developer): Add different Open Containing Folder buttons (#4576)
+* feat(developer): Range expansions (#4584)
+* fix(web): fixes lack of respect for underlying-key display settings (#4572)
+* fix(common/models): fixes application of suggestions immediately after a backspace (#4587)
+* fix(linux): Improve version number (#4582)
+* chore(linux): Don't report to Sentry in dev environment (#4581)
+
+## 14.0.251 beta 2021-03-03
+
+* fix(developer): Improve stability of named code constants (#4547)
+* fix(developer): schema conformance for model package compiler (#4548)
+* fix(developer): touch layout osk import handling of multiple modifiers (#4552)
+* fix(developer): require language tag when compiling keyboard package (#4563)
+* fix(developer): Avoid blank keys when importing KMX to KVKS (#4564)
+* feat(developer): isRTL support for lexical model editor (#4559)
+* fix(developer): track modified state in wordlist editor better (#4562)
+* chore(ios): better visual feedback for keyboard search during poor internet connectivity (#4573)
+* chore(common): Update crowdin files for `de` (#4578)
+* chore(common/core/desktop): write debug output to console (#4569)
+
+## 14.0.250 beta 2021-03-02
+
+* fix(common/resources): Fix help.keyman.com path for CI (#4565)
+
+## 14.0.249 beta 2021-03-01
+
+* fix(web): mnemonic keystrokes w FF keymapping (#4540)
+* chore(ios/app): Adjust help titles for installing custom dictionaries (#4550)
+
+## 14.0.248 beta 2021-02-26
+
+* fix(common/models): predictions after context reset / caret shift (#4411)
+* change(oem/fv/ios): FV keyboards now package-based (#4471)
+* fix(windows): Handle Caps Lock event correctly from TIP (#4536)
+* fix(developer): run even if sentry unavailable (#4537)
+* fix(developer): UTF-8 messages in LM compiler (#4539)
+* feat(common/models): mid-context suggestions & reversions, fix(common/models): correction-search SMP issues (#4427)
+* fix(ios): package installer completion requires welcome dismissal (#4543)
+* fix(windows): Refresh settings on 64-bit apps (#4378)
+* fix(windows): prevent re-registration of TIPs on 14.0 upgrade (#4535)
+
+## 14.0.247 beta 2021-02-25
+
+* fix(web): keyboard documentation patch-up (#4512)
+* fix(web): removes package namespacing from kbd's CSS class (#4516)
+
+## 14.0.246 beta 2021-02-24
+
+* chore(common): allow forced version increment (#4522)
+
+## 14.0.245 beta 2021-02-24
+
+* fix(common/core/web): core key-processing now always returns RuleBehavior type. (#4508)
+* fix(common/resources): Set help-keyman.com.sh executable (#4510)
+* fix(developer/compilers): fixes error when "constructor" is in wordlist (#4504)
+* fix(web): hides touch-alias caret when keystroke causes focus change (#4514)
+
+## 14.0.244 beta 2021-02-22
+
+* fix(common/models): merges identical suggestions after casing (#4502)
+* fix(web): macOS 11 agent string parsing (#4497)
+* fix(ios): app logging messages were transient, never stored (#4500)
+* chore(ios): web-side sentry enablement try-catch (#4492)
+
 ## 14.0.243 beta 2021-02-12
 
 * change(ios/app): Generate offline help from markdown (#4470)

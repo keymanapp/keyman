@@ -531,7 +531,7 @@ if(!window['keyman']['ui']['name']) {
             var itemNode = ui.createNode('li');
             kbdText = lang.keyboards[n]['Name'].replace(/\s?keyboard/i,'');
             // We append the full BCP-47 code here for disambiguation when regional and/or script variants exist.
-            kbdText = kbdText + " [" + lang.keyboards[n].LanguageCode + "]";
+            kbdText = kbdText + " [" + lang.keyboards[n]['LanguageCode'] + "]";
             aNode = ui.createNode('a', null, null, kbdText);
             aNode.href = '#';
             aNode.title = '';

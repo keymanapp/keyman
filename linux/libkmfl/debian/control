@@ -4,10 +4,11 @@ Section: libs
 Maintainer: Debian Input Method Team <debian-input-method@lists.debian.org>
 Uploaders:
  Keyman team <support@keyman.com>,
+ Eberhard Beilharz <eb1@sil.org>,
 Build-Depends:
  debhelper (>= 11),
  libkmflcomp-dev (>=10.99.30),
-Standards-Version: 4.5.0
+Standards-Version: 4.5.1
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman/tree/master/linux/libkmfl
 Homepage: https://www.keyman.com

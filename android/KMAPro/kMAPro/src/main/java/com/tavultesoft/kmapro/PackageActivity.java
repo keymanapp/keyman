@@ -1,7 +1,9 @@
+/**
+ * Copyright (C) SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmapro;
 
 import android.annotation.SuppressLint;
-import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -9,17 +11,8 @@ import androidx.fragment.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.TextView;
 
 import android.widget.Toast;
 
@@ -36,9 +29,7 @@ import com.tavultesoft.kmea.util.KMLog;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -254,9 +245,6 @@ public class PackageActivity extends AppCompatActivity implements
           languageList = new ArrayList<String>();
         }
 
-        //Dataset kmpDataset = new Dataset(context);
-        //kmpDataset.keyboards.addAll(kbdsList);
-
         List<Map<String, String>> installedPackageKeyboards =
           kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY, languageList);
         // Do the notifications!
@@ -270,8 +258,6 @@ public class PackageActivity extends AppCompatActivity implements
               Toast.LENGTH_SHORT).show();
           }
           _cleanup = true;
-          notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
-            installedPackageKeyboards, 1);
           if (installedPackageKeyboards != null) {
             notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
               installedPackageKeyboards, 1);
@@ -294,8 +280,6 @@ public class PackageActivity extends AppCompatActivity implements
               Toast.LENGTH_SHORT).show();
 
             _cleanup = true;
-          notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
-            installedLexicalModels, 1);
           if (installedLexicalModels != null) {
             notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
               installedLexicalModels, 1);

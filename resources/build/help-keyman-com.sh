@@ -70,6 +70,15 @@ fi
 # Uploading Keyman documentation
 #
 
+## Determine the help.keyman.com product path based on $platform
+function help_product_path {
+  if [ $platform == 'ios' ]; then
+    echo "products/iphone-and-ipad/$VERSION_RELEASE"
+  else
+    echo "products/$platform/$VERSION_RELEASE"
+  fi
+}
+
 ##
 ## Upload documentation updates to help.keyman.com
 ## Paths depend on $platform
@@ -82,28 +91,25 @@ function upload_keyman_help {
   case $platform in
     android)
       helppath=$KEYMAN_ROOT/android/help
-      dstpath="$HELP_KEYMAN_COM/products/android/$VERSION_RELEASE"
       ;;
     ios)
       helppath=$KEYMAN_ROOT/ios/help
-      dstpath="$HELP_KEYMAN_COM/products/iphone-and-ipad/$VERSION_RELEASE"
       ;;
     linux)
       helppath=$KEYMAN_ROOT/linux/help
-      dstpath="$HELP_KEYMAN_COM/products/linux/$VERSION_RELEASE"
       ;;
     mac)
       helppath=$KEYMAN_ROOT/mac/help
-      dstpath="$HELP_KEYMAN_COM/products/mac/$VERSION_RELEASE"
       ;;
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
       helppath=$KEYMAN_ROOT/windows/bin/help/md/desktop
-      dstpath="$HELP_KEYMAN_COM/products/windows/$VERSION_RELEASE"
       ;;
     *)
       display_usage
     esac
+
+    dstpath="$HELP_KEYMAN_COM/$(help_product_path)"
 
   #
   # Look for help source folder.
@@ -138,7 +144,7 @@ function commit_and_push {
   fi
 
   local branchname="auto/$platform-help-$VERSION_WITH_TAG"
-  local modifiedfiles="products/$platform/$VERSION_RELEASE"
+  local modifiedfiles=$(help_product_path)
 
   local basebranch="master"
 

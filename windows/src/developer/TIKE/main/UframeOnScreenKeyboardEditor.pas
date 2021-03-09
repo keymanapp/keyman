@@ -674,7 +674,7 @@ procedure TframeOnScreenKeyboardEditor.cmdVKImportKMXClick(Sender: TObject);
           if ValidExtShiftStates[j] = [essAlt] then Continue;
           if ValidExtShiftStates[j] = [essShift, essAlt] then Continue;  // I1471:9011
 
-          if (kbdOnScreen.Keys[i].KeyCaps[j] <> '') and
+          if (Trim(kbdOnScreen.Keys[i].KeyCaps[j]) <> '') and
             (kbdOnScreen.Keys[i].KeyCaps[j][1] >= #32) then
           begin
             k := TVisualKeyboardKey.Create;

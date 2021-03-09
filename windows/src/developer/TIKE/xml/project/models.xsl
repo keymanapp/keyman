@@ -149,8 +149,13 @@
         </xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Open Containing Folder</xsl:with-param>
+        <xsl:with-param name="caption">Open Source Folder</xsl:with-param>
         <xsl:with-param name="command">keyman:opencontainingfolder?id=<xsl:value-of select="ID" />
+        </xsl:with-param>
+      </xsl:call-template>
+      <xsl:call-template name="menuitem">
+        <xsl:with-param name="caption">Open Build Folder</xsl:with-param>
+        <xsl:with-param name="command">keyman:openbuildfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">

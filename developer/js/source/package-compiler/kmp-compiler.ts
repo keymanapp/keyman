@@ -32,8 +32,9 @@ export default class KmpCompiler {
     //   1. Unwrap arrays (and convert to array where single object)
     //   2. Fix casing on `iD`
     //   3. Rewrap info, keyboard.languages, lexicalModel.languages, startMenu.items elements
-    //   4. Convert options.followKeyboardVersion to a bool
-    //   5. Filenames need to be basenames (but this comes after processing)
+    //   4. Remove options.followKeyboardVersion, file.fileType
+    //   5. Convert file.copyLocation to a Number
+    //   6. Filenames need to be basenames (but this comes after processing)
     //
 
     // Helper functions
@@ -66,9 +67,7 @@ export default class KmpCompiler {
 
     let kmp: KmpJsonFile = {
       system: kps.system,
-      options: {
-        followKeyboardVersion: kps.options.followKeyboardVersion === ''
-      }
+      options: {}
     };
 
     // Fill in additional fields
@@ -76,10 +75,7 @@ export default class KmpCompiler {
     let keys: (keyof KpsFileOptions & keyof KmpJsonFileOptions)[] = ['executeProgram', 'graphicFile', 'msiFilename', 'msiOptions', 'readmeFile'];
     for (let element of keys) {
       if (kps.options[element]) {
-        // TypeScript thinks it's possible to assign to followKeyboardVersion (a
-        // boolean), but in reality, all of the other keys are strings.
-        // Politely inform TypeScript that it's okay to do this assignment:
-        (<string> kmp.options[element]) = kps.options[element];
+        kmp.options[element] = kps.options[element];
       }
     }
 
@@ -88,7 +84,14 @@ export default class KmpCompiler {
     }
 
     if(kps.files && kps.files.file) {
-      kmp.files = arrayWrap(kps.files.file);
+      kmp.files = arrayWrap(kps.files.file).map((file: KpsFileContentFile) => {
+        return {
+          name: file.name,
+          description: file.description,
+          copyLocation: parseInt(file.copyLocation, 10)
+          // note: we don't emit fileType as that is not permitted in kmp.json
+        }
+      });
     }
 
     if(kps.keyboards && kps.keyboards.keyboard) {

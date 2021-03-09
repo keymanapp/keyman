@@ -228,27 +228,23 @@ public class ResourceFileManager {
         activitySpinner.centerXAnchor.constraint(equalTo: rootVC.view.centerXAnchor).isActive = true
         activitySpinner.centerYAnchor.constraint(equalTo: rootVC.view.centerYAnchor).isActive = true
         rootVC.view.isUserInteractionEnabled = false
-      } else if status == .complete {
+      } else if status == .complete || status == .cancelled {
         // Report completion!
         activitySpinner.stopAnimating()
         activitySpinner.removeFromSuperview()
         rootVC.view.isUserInteractionEnabled = true
-        rootVC.dismiss(animated: true, completion: nil)
+        rootVC.dismiss(animated: true) {
+          Manager.shared.showKeyboard()
+        }
         successHandler?(package)
       }
     }
 
     if let navVC = rootVC as? UINavigationController {
-      packageInstaller.promptForLanguages(inNavigationVC: navVC) {
-        // The user will be on the main screen after this, so we should resummon the keyboard.
-        Manager.shared.showKeyboard()
-      }
+      packageInstaller.promptForLanguages(inNavigationVC: navVC)
     } else {
       let nvc = UINavigationController.init()
-      packageInstaller.promptForLanguages(inNavigationVC: nvc) {
-        // The user will be on the main screen after this, so we should resummon the keyboard.
-        Manager.shared.showKeyboard()
-      }
+      packageInstaller.promptForLanguages(inNavigationVC: nvc)
       rootVC.present(nvc, animated: true, completion: nil)
     }
   }
@@ -265,13 +261,14 @@ public class ResourceFileManager {
   }
 
   public func buildKMPError(_ error: KMPError) -> UIAlertController {
-    return buildSimpleAlert(title: "Error", message: error.localizedDescription)
+    return buildSimpleAlert(title: NSLocalizedString("alert-error-title", bundle: engineBundle, comment: ""),
+                            message: error.localizedDescription)
   }
 
   public func buildSimpleAlert(title: String, message: String, completionHandler: (() -> Void)? = nil ) -> UIAlertController {
     let alertController = UIAlertController(title: title, message: message,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: { _ in
                                               completionHandler?()

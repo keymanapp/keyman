@@ -679,9 +679,9 @@ BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
-  if(_td->RefreshTag_Process < tag)
+  if(_td->RefreshTag_Thread != tag)
   {
-    _td->RefreshTag_Process = tag;
+    _td->RefreshTag_Thread = tag;
     return TRUE;
   }
   return FALSE;
@@ -695,9 +695,9 @@ void HandleRefresh(int code, LONG tag)
     // This is sent by Keyman COM API, ApplyToRunningKeymanEngine
     SendDebugMessageFormat(0, sdmGlobal, 0, "#### Refresh Requested ####");
 
-    // We ask any controller window to tell all instances of keyman32/keyman64
-    // that a refresh is coming through
-    Globals::PostControllers(wm_keyman_refresh, KR_PRE_REFRESH, 0);
+    // We ask the master controller window to tell all instances
+    // of keyman32/keyman64 that a refresh is coming through
+    Globals::PostMasterController(wm_keyman_refresh, KR_PRE_REFRESH, 0);
 
     // We need to tell the controller windows to refresh themselves also
     Globals::PostControllers(wm_keyman_control, KMC_REFRESH, 0);
@@ -709,8 +709,9 @@ void HandleRefresh(int code, LONG tag)
     // a double-broadcast which could happen if both keyman32 and keyman64
     // receive the message, as they have independently managed RefreshTags
 
-    // All controllers will receive this message; only one need act on it
-    tag = InterlockedIncrement(Globals::RefreshTag());
+    // This RefreshTag is only ever incremented here by the master controller
+    // so this is a thread safe operation
+    tag = ++(*Globals::RefreshTag());
 
     if (UpdateRefreshTag(tag)) {
       // The Keyman process gets the update first
@@ -726,8 +727,17 @@ void HandleRefresh(int code, LONG tag)
     // refreshed after an update, but only once per
     // refresh request
     if (UpdateRefreshTag(tag)) {
-      // We'll update when we are called into action
-      ScheduleRefresh();
+#ifdef _WIN64
+      if (Globals::get_InitialisingThread() == GetCurrentThreadId()) {
+        // If this is the keymanx64 thread, then we should
+        // go ahead and process the refresh immediately so
+        // that global settings are updated
+        RefreshKeyboards(FALSE);
+      }
+      else
+#endif
+        // We'll update when we are called into action
+        ScheduleRefresh();
     }
     break;
 	}
@@ -755,7 +765,7 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 
     Globals::SetBaseKeyboardFlags(underlyingLayout, reg->ReadInteger(REGSZ_SimulateAltGr), !reg->ValueExists(REGSZ_DeadkeyConversionMode) || reg->ReadInteger(REGSZ_DeadkeyConversionMode));
 	} else {
-    Globals::SetBaseKeyboardFlags("", 0, 0);
+    Globals::SetBaseKeyboardFlags("", 0, 1);
   }
 
 	delete reg;

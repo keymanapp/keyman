@@ -59,6 +59,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   private var navMapping: [NavigationMode : UIBarButtonItem] = [:]
 
   private var dismissalBlock: (() -> Void)? = nil
+  private weak var welcomeView: UIView?
+  private var mayPick: Bool = true
 
   public init(for package: Resource.Package,
               defaultLanguageCode: String? = nil,
@@ -267,9 +269,11 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     }
 
     set(mode) {
-      leftNavMode = mode
+      if mayPick {
+        leftNavMode = mode
 
-      navigationItem.leftBarButtonItem = navMapping[mode]
+        navigationItem.leftBarButtonItem = navMapping[mode]
+      }
     }
   }
 
@@ -279,9 +283,11 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     }
 
     set(mode) {
-      rightNavMode = mode
+      if mayPick {
+        rightNavMode = mode
 
-      navigationItem.rightBarButtonItem = navMapping[mode]
+        navigationItem.rightBarButtonItem = navMapping[mode]
+      }
     }
   }
 
@@ -349,20 +355,29 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     Manager.shared.shouldReloadKeyboard = true
     self.pickingCompletionHandler(selectedResources.map { $0.typedFullID })
 
-    let dismissalBlock = {
-      if let nvc = self.navigationController {
-        self.dismiss(animated: true)
-        nvc.popToRootViewController(animated: false)
-      } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
-        self.dismiss(animated: true)
-      }
+    // Prevent swipe dismissal.
+    if #available(iOSApplicationExtension 13.0, *) {
+      self.isModalInPresentation = true
+    }
 
+    // No more selection-manipulation allowed.
+    // This matters when there's no welcome page available.
+    languageTable.isUserInteractionEnabled = false
+    // Prevent extra 'install' commands and nav-bar related manipulation.
+    self.navigationItem.leftBarButtonItem?.isEnabled = false
+    self.rightNavigationMode = .none
+    self.mayPick = false
+
+    let dismissalBlock = {
       self.associators.forEach { $0.pickerFinalized() }
     }
 
     // First, show the package's welcome - if it exists.
     if let welcomeVC = PackageWebViewController(for: package, page: .welcome) {
-      self.dismissalBlock = dismissalBlock
+      // Prevent swipe dismissal.
+      if #available(iOSApplicationExtension 13.0, *) {
+        welcomeVC.isModalInPresentation = true
+      }
 
       let subNavVC = UINavigationController(rootViewController: welcomeVC)
       _ = subNavVC.view
@@ -383,8 +398,16 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       subNavVC.presentationController?.delegate = self
 
       self.present(subNavVC, animated: true, completion: nil)
+      self.welcomeView = welcomeVC.view
+
+      self.dismissalBlock = {
+        // Tells the user that we've received the 'done' command.
+        doneItem.isEnabled = false
+        dismissalBlock()
+      }
     } else {
-      dismissalBlock()
+      self.dismissalBlock = dismissalBlock
+      onWelcomeDismissed()
     }
   }
 
@@ -393,10 +416,33 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   @objc private func onWelcomeDismissed() {
-    self.dismissalBlock?()
-    self.dismissalBlock = nil
+    if let dismissalBlock = self.dismissalBlock {
+      dismissalBlock()
+      self.dismissalBlock = nil
 
-    self.uiCompletionHandler()
+      // Tell our owner (the AssociatingPackageInstaller) that all UI interactions are done.
+      // Triggers synchronization code, so make sure it only runs once!
+      self.uiCompletionHandler()
+    }
+
+    // Show a spinner forever.
+    // When installation is complete, this controller's view will be dismissed,
+    // removing said spinner.
+    let activitySpinner = Alerts.constructActivitySpinner()
+
+    // Determine the top-most view.  If we're presenting the welcome page, THAT.
+    // If we aren't, our directly-owned view should be the top-most.
+    let activeView: UIView = self.welcomeView ?? view
+
+    activitySpinner.center = activeView.center
+    activitySpinner.startAnimating()
+    activeView.addSubview(activitySpinner)
+    
+    activitySpinner.centerXAnchor.constraint(equalTo: activeView.centerXAnchor).isActive = true
+    activitySpinner.centerYAnchor.constraint(equalTo: activeView.centerYAnchor).isActive = true
+
+    // Note:  we do NOT block user interaction; we merely bind them to the active view.
+    // Why prevent them from reading more on the welcome page while they wait?
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {
@@ -514,5 +560,21 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     setCellStyle(cell, style: wasPreinstalled ? .preinstalled : .none)
 
     associators.forEach { $0.deselectLanguages( Set([languages[indexPath.row].id]) ) }
+  }
+
+  internal func progressUpdate<Package: TypedKeymanPackage<Resource>>(_ status: AssociatingPackageInstaller<Resource, Package>.Progress) where Resource.Package == Package {
+    switch(status) {
+        case .starting, .inProgress:
+          // nothing worth note
+          break
+        // All UI interactions have been completed AND installation is fully complete.
+        case .complete, .cancelled:
+          if let nvc = self.navigationController {
+          self.dismiss(animated: true)
+            nvc.popToRootViewController(animated: false)
+          } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
+            self.dismiss(animated: true)
+          }
+      }
   }
 }

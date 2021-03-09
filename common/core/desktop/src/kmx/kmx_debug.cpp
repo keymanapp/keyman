@@ -54,25 +54,29 @@ int km::kbp::kmx::DebugLog_1(const char *file, int line, const char *function, c
   fmtbuf[255] = 0;
   va_end(vars);
 
-  if(g_debug_KeymanLog) {
-    if(g_debug_ToConsole) {   // I3951
-      char windowinfo[1024];
-      sprintf(windowinfo,
-        "%ld" TAB     //"TickCount" TAB
-        "%s:%d" TAB  //"SourceFile" TAB
-        "%s" TAB     //"Function"
-        "%s" NL,     //"Message"
+  if (!g_debug_KeymanLog)
+    return 0;
 
-        GetTickCount(),   //"TickCount" TAB
-        file, line,       //"SourceFile" TAB
-        function,         //"Function" TAB
-        fmtbuf);          //"Message"
+  char windowinfo[1024];
+  sprintf(windowinfo,
+          "%ld" TAB   //"TickCount" TAB
+          "%s:%d" TAB //"SourceFile" TAB
+          "%s" TAB    //"Function"
+          "%s" NL,    //"Message"
+
+          GetTickCount(), //"TickCount" TAB
+          file, line,     //"SourceFile" TAB
+          function,       //"Function" TAB
+          fmtbuf);        //"Message"
+
+  if (g_debug_ToConsole) { // I3951
+    std::cout << windowinfo << std::endl; // OutputDebugStringA(windowinfo);
+  } else {
 #ifdef _USE_WINDOWS
-      std::cout << windowinfo << std::endl; // OutputDebugStringA(windowinfo);
+    std::cout << windowinfo << std::endl; // OutputDebugStringA(windowinfo);
 #else
-      syslog(LOG_DEBUG, "%s", windowinfo);
+    syslog(LOG_DEBUG, "%s", windowinfo);
 #endif
-    }
   }
 
   return 0;
@@ -125,7 +129,8 @@ const char *km::kbp::kmx::Debug_UnicodeString(PKMX_WCHAR s, int x) {
   bufout[x][0] = 0;
   for (p = s, q = bufout[x]; *p && (p - s < 128); p++)
   {
-    sprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
+    sprintf(q, "U+%4.4X ", *p);
+    q = strchr(q, 0);
   }
   //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
   return bufout[x];

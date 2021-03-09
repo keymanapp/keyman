@@ -17,7 +17,7 @@
                     17 Dec 2013 - mcdurdin - I4006 - V9.0 - Remove old aiDefault code
 */
 
-#include "stdafx.h"   // I4006
+#include "pch.h"   // I4006
 
 const UINT USVirtualKeyToScanCode[256] = 
 {

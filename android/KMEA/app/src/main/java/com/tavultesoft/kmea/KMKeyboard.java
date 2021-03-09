@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -154,10 +155,7 @@ final class KMKeyboard extends WebView {
         // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
 
         if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
-          Toast.makeText(context, "Fatal Error with " + currentKeyboard +
-            ". Loading default keyboard", Toast.LENGTH_LONG).show();
-
-          // Still send log about falling back to default keyboard (ignore language ID)
+          // Make Toast notification of error and send log about falling back to default keyboard (ignore language ID)
           sendError(packageID, keyboardID, "");
           Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
           if (firstKeyboard != null) {
@@ -590,11 +588,13 @@ final class KMKeyboard extends WebView {
 
   }
 
-  // Display Toast notification that keyboard selection failed, so loading default keyboard.
-  // Also sends a message to Sentry
+  // Display localized Toast notification that keyboard selection failed, so loading default keyboard.
+  // Also sends a message to Sentry (not localized)
   private void sendError(String packageID, String keyboardID, String languageID) {
-    String msg = String.format("Can't set %s::%s for %s language. Loading default keyboard", packageID, keyboardID, languageID);
-    Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+    BaseActivity.makeToast(context, R.string.fatal_keyboard_error, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
+
+    // Don't localize msg for Sentry
+    String msg = String.format(context.getString(R.string.fatal_keyboard_error), packageID, keyboardID, languageID);
     Sentry.captureMessage(msg);
   }
 

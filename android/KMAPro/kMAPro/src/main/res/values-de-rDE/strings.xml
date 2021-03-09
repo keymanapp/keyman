@@ -43,7 +43,7 @@
   <!-- Context: Get Started menu -->
   <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">Zeige \"%1$s\" beim Start</string>
   <!-- Context: Android Storage Permission -->
-  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    Um Tastaturpakete zu installieren, braucht Keyman die Berechtigung zum Lesen/Schreiben.</string>
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    Um Tastaturpakete zu installieren, braucht Keyman die Berechtigung zum Lesen von externem Speicher.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Zugriff auf den Speicher wurde abgelehnt. Möglicherweise funktioniert die Installation des Tastaturpakets nicht korrekt</string>
   <!-- Context: Keyman Settings menu -->
@@ -55,6 +55,8 @@
   </plurals>
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Tastatur oder Wörterbuch installieren</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="change_display_language" comment="Menu action to change interface language">Anzeigesprache ändern</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Banner immer anzeigen</string>
   <!-- Context: Keyman Settings menu -->
@@ -107,6 +109,8 @@
   <string name="install_keyboard_package" comment="Title to install keyboard package">Tastatur installieren</string>
   <!-- Context: KMP Package strings -->
   <string name="install_predictive_text_package" comment="Title to install dictionary package">Wörterbuch installieren</string>
+  <!-- Context: KMP Package strings -->
+  <string name="not_valid_package_file" comment="Notification when invalid package file cannot be installed">%1$s ist keine gültige Keyman Paketdatei.\n%2$s\"</string>
   <!-- Context: KMP Package strings -->
   <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Tastaturpaket enthält keine berührungsoptimierte Tastatur, die installiert werden könnte</string>
   <!-- Context: KMP Package strings -->

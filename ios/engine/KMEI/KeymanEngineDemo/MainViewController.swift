@@ -227,10 +227,11 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
   }
 
   @objc func showAlert(_ message: String) {
-    let alertController = UIAlertController(title: "Keyboard Download Error",
+    let engineBundle = Bundle(for: Manager.self)
+    let alertController = UIAlertController(title: NSLocalizedString("alert-download-error-title", bundle: engineBundle, comment: ""),
                                             message: message,
                                             preferredStyle: UIAlertControllerStyle.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertActionStyle.default,
                                             handler: nil))
     self.present(alertController, animated: true, completion: nil)

@@ -135,11 +135,6 @@ type
     Panel4: TPanel;
     Label13: TLabel;
     lblCompilePackage: TLabel;
-    cmdBuildPackage: TButton;
-    editOutPath: TEdit;
-    cmdOpenContainingFolder2: TButton;
-    cmdAddToProject: TButton;
-    cmdCompileInstaller: TButton;
     pageKeyboards: TTabSheet;
     Panel5: TPanel;
     Label2: TLabel;
@@ -174,7 +169,6 @@ type
     lblCompileTargetHeader: TLabel;
     cmdInstall: TButton;
     cmdUninstall: TButton;
-    Label5: TLabel;
     panBuildWindowsInstaller: TPanel;
     Label9: TLabel;
     lblBootstrapMSI: TLabel;
@@ -198,6 +192,18 @@ type
     chkLexicalModelRTL: TCheckBox;
     editLexicalModelFilename: TEdit;
     imgQRCode: TImage;
+    panOpenInExplorer: TPanel;
+    lblOpenInExplorer: TLabel;
+    cmdOpenSourceFolder: TButton;
+    cmdOpenBuildFolder: TButton;
+    cmdOpenProjectFolder: TButton;
+    panFileActions: TPanel;
+    lblFileActions: TLabel;
+    editOutPath: TEdit;
+    cmdCompileInstaller: TButton;
+    cmdAddToProject: TButton;
+    cmdBuildPackage: TButton;
+    Label5: TLabel;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -226,7 +232,6 @@ type
     procedure editStartMenuPathChange(Sender: TObject);
     procedure cbKMPImageFileClick(Sender: TObject);
     procedure cmdUninstallClick(Sender: TObject);
-    procedure cmdOpenContainingFolder2Click(Sender: TObject);
     procedure cmdOpenContainingFolderClick(Sender: TObject);
     procedure cmdOpenFileClick(Sender: TObject);
     procedure cmdCompileInstallerClick(Sender: TObject);
@@ -256,6 +261,9 @@ type
     procedure chkLexicalModelRTLClick(Sender: TObject);
     procedure editLexicalModelDescriptionChange(Sender: TObject);
     procedure lbDebugHostsClick(Sender: TObject);
+    procedure cmdOpenSourceFolderClick(Sender: TObject);
+    procedure cmdOpenBuildFolderClick(Sender: TObject);
+    procedure cmdOpenProjectFolderClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -1043,16 +1051,6 @@ begin
   lbStartMenuEntriesClick(lbStartMenuEntries);
 end;
 
-procedure TfrmPackageEditor.cmdOpenContainingFolder2Click(Sender: TObject);
-begin
-  OpenContainingFolder(FileName);
-end;
-
-procedure TfrmPackageEditor.cmdOpenContainingFolderClick(Sender: TObject);
-begin
-  OpenContainingFolder((lbFiles.Items.Objects[lbFiles.ItemIndex] as TPackageContentFile).FileName);
-end;
-
 procedure TfrmPackageEditor.cmdOpenDebugHostClick(Sender: TObject);
 begin
   TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex] + '/packages.html');
@@ -1081,6 +1079,27 @@ begin
       f.Free;
     end;
   end;
+end;
+
+procedure TfrmPackageEditor.cmdOpenSourceFolderClick(Sender: TObject);
+begin
+  OpenContainingFolder(FileName);
+end;
+
+procedure TfrmPackageEditor.cmdOpenBuildFolderClick(Sender: TObject);
+begin
+  OpenContainingFolder((ProjectFile as TkpsProjectFile).TargetFilename);
+end;
+
+procedure TfrmPackageEditor.cmdOpenProjectFolderClick(Sender: TObject);
+begin
+  if Assigned(ProjectFile.Project) then
+    OpenContainingFolder(ProjectFile.Project.FileName);
+end;
+
+procedure TfrmPackageEditor.cmdOpenContainingFolderClick(Sender: TObject);
+begin
+  OpenContainingFolder((lbFiles.Items.Objects[lbFiles.ItemIndex] as TPackageContentFile).FileName);
 end;
 
 procedure TfrmPackageEditor.cmdDeleteStartMenuEntryClick(Sender: TObject);
@@ -1195,17 +1214,15 @@ begin
     for i := 0 to pack.Info.Count - 1 do
       UpdateInfo(pack.Info[i].Name, pack.Info[i].Description, pack.Info[i].URL);
     chkFollowKeyboardVersion.Checked := pack.KPSOptions.FollowKeyboardVersion;
-    EnableDetailsTabControls;
 
     lbStartMenuEntries.Clear;
-    
+
     for i := 0 to pack.StartMenu.Entries.Count - 1 do
       lbStartMenuEntries.Items.AddObject(pack.StartMenu.Entries[i].Name, pack.StartMenu.Entries[i]);
 
     chkCreateStartMenu.Checked := pack.StartMenu.DoCreate;
     chkStartMenuUninstall.Checked := pack.StartMenu.AddUninstallEntry;
     editStartMenuPath.Text := pack.StartMenu.Path;
-    EnableStartMenuControls;
 
     editOutPath.Text := (ProjectFile as TkpsProjectFile).TargetFilename;   // I4688
     editBootstrapMSI.Text := pack.KPSOptions.MSIFileName;
@@ -1220,6 +1237,8 @@ begin
 
     RefreshKeyboardList;
     RefreshLexicalModelList;
+
+    EnableControls;
   finally
     Dec(FSetup);
   end;
@@ -1547,6 +1566,12 @@ end;
 procedure TfrmPackageEditor.EnableCompileTabControls;
 begin
   cmdOpenDebugHost.Enabled := lbDebugHosts.ItemIndex >= 0;
+
+  // We use FProjectFile because we don't want to accidentally create a standalone
+  // project file as GetProjectFile is side-effecty. EnableControls is called early
+  // in construction before FProjectFile is assigned. It is called again later so
+  // enabled state will be correct.
+  cmdOpenProjectFolder.Enabled := Assigned(FProjectFile) and Assigned(FProjectFile.Project);
 end;
 
 procedure TfrmPackageEditor.EnableDetailsTabControls;

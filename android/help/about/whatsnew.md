@@ -17,4 +17,8 @@ Here are some of the new features we have added to Keyman for Android 14.0:
 * Match user input capital letters when offering suggestions (#3845)
 * Update minimum Android SDK to 21 (Android 5.0 Lollipop) (#2993)
 * Keyman now works more reliably with WeChat and Telegram (#4254)
-* Added new menu to change the display language (#4261)
+* Added new Settings menu to [Change Display Language](../basic/config/index#Change-Display-Language): (#4261)
+    * French
+    * German
+    * Khmer
+    * Obolo

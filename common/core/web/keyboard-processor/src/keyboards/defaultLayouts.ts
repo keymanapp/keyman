@@ -37,15 +37,15 @@ namespace com.keyman.keyboards {
     shiftKey?: LayoutKey,
     capsKey?: LayoutKey,
     numKey?: LayoutKey,
-    scrollKey?: LayoutKey
+    scrollKey?: LayoutKey,
     aligned?: boolean
   }
 
   export type LayoutFormFactor = {
+    "displayUnderlying"?: boolean,
     "font": string,
     "layer": LayoutLayer[],
-    keyLabels?: boolean,
-    isDefault?: boolean;
+    isDefault?: boolean
   }
 
   export type LayoutSpec = {
@@ -171,6 +171,11 @@ namespace com.keyman.keyboards {
           keyLabels['leftctrl-leftalt-shift'] = keyLabels['rightalt-shift'];
         }
       }
+
+      // If there is no predefined layout, even touch layouts will follow the desktop's
+      // setting for the displayUnderlying flag.  As the desktop layout uses a different
+      // format for its layout spec, that's found at the field referenced below.
+      layout["displayUnderlying"] = !!keyboard.scriptObject['KDU'];
 
       // For desktop devices, we must create all layers, even if invalid.
       if(formFactor == 'desktop') {

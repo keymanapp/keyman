@@ -2,7 +2,7 @@
 <!-- Copyright (c) 2019 Daniel Glassey <wdg@debian.org> -->
 <component type="desktop-application">
   <id>com.keyman.config</id>
-  <metadata_license>FSFAP</metadata_license>
+  <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
   <project_group>Keyman</project_group>
   <developer_name>SIL International</developer_name>

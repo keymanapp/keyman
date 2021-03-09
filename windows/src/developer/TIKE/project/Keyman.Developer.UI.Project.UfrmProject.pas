@@ -460,6 +460,20 @@ begin
     else if SelectedMRUFileName <> '' then
       OpenContainingFolder(SelectedMRUFileName);
   end
+  else if Command = 'openbuildfolder' then
+  begin
+    pf := SelectedProjectFile;
+    if Assigned(pf) and (pf is TkmnProjectFile) then
+      OpenContainingFolder((pf as TkmnProjectFile).TargetFileName)
+    else if Assigned(pf) and (pf is TkpsProjectFile) then
+      OpenContainingFolder((pf as TkpsProjectFile).TargetFileName)
+    else if Assigned(pf) and (pf is TmodelTsProjectFile) then
+      OpenContainingFolder((pf as TmodelTsProjectFile).TargetFileName);
+  end
+  else if Command = 'openprojectfolder' then
+  begin
+    OpenContainingFolder(FGlobalProject.FileName);
+  end
   else if Command = 'removefile' then
   begin
     pf := SelectedProjectFile;

@@ -1,0 +1,41 @@
+c Tests cased keys rule expansions - character-based rules
+store(&NAME) 'Test &CasedKeys'
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(&CasedKeys) 'a'..'z1/'
+
++ 'a' > 'aaah'
++ 'A' > 'AAAH'
+
++ 'e' > 'eh'
++ 'E' > 'EH'
+
++ 'o' > 'oh'
++ 'O' > 'OH'
+
++ '1' > 'small one'
++ '!' > 'big one'
+
++ '/' > 'little slash'
++ '?' > 'big slash'
+
+c These ones should not be expanded, because they are unreferenced
+
++ '5' > 'small five'
++ '%' > 'big five'
+
+
+
+c These should not be expanded either, because they are capsified already
+
++ [CAPS K_B] > 'Caps B'
++ [NCAPS K_B] > 'NCaps B'
++ [CAPS SHIFT K_B] > 'Caps Shift B'
++ [NCAPS SHIFT K_B] > 'NCaps Shift B'
+
++ [CAPS K_I] > 'Caps I'
++ [NCAPS K_I] > 'NCaps I'
++ [CAPS SHIFT K_I] > 'Caps Shift I'
++ [NCAPS SHIFT K_I] > 'NCaps Shift I'
