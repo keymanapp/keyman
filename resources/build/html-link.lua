@@ -1,3 +1,5 @@
+local redirect
+
 function Link(elem)
   if isLocalLink(elem) then
     if isFolderLink(elem) then
