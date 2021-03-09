@@ -71,7 +71,7 @@ displayInfo "" \
 
 cd $KEYMAN_ROOT/ios/help
 
-MDLUA="$KEYMAN_ROOT/resources/build/htmlink.lua"
+MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
 MD=`find . -name "*.md"`
 DESTHTM="$THIS_DIR/keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources"
 

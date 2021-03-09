@@ -350,7 +350,7 @@ begin
 
   else if command = 'opensite' then OpenSite(params)
 
-  else if command = 'help' then Application.HelpJump('context_'+lowercase(DialogName))
+  else if command = 'help' then DoOpenHelp
 
   else inherited;
 end;

@@ -254,6 +254,7 @@ begin
   wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
   wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
 
+  HelpTopic := 'context/text-editor';
   Caption := MsgFromId(SKTextEditorCaption);
 
   FCheckFontKeyboards := TCheckFontKeyboards.Create;
@@ -512,7 +513,7 @@ end;
 
 procedure TfrmTextEditor.Help2Click(Sender: TObject);
 begin
-  Application.HelpJump('context_tutorial');
+  Application.HelpJump(HelpTopic);
 end;
 
 procedure TfrmTextEditor.HideFontsBox;
