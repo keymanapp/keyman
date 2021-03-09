@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.254 beta 2021-03-09
+
+* fix(web): use language code correctly in toolbar (#4620)
+* chore(linux): Fix some lintian warnings for Debian package (#4621)
+* docs(ios): adds supported l10ns to help/about/whatsnew (#4625)
+* fix(windows): represerve keys on setfocus (#4622)
+* fix(windows): show version selector for Keyman in installer (#4623)
+* fix(windows): ensure valid base layout on install (#4627)
+
 ## 14.0.253 beta 2021-03-05
 
 * fix(android/app): Fix welcome.htm responsiveness (#4531)
