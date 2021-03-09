@@ -152,7 +152,8 @@ uses
   Keyman.System.Process.KPInstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas',
   Keyman.System.Process.KPUninstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
-  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
+  Keyman.System.BaseKeyboard in 'util\Keyman.System.BaseKeyboard.pas';
 
 {$R *.TLB}
 {$R *.RES}
