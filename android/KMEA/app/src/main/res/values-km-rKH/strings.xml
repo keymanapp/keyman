@@ -35,7 +35,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">អាប់ដេត</string>
     <!-- Context: Keyboard Updates -->
-    <string name="cannot_connect" comment="Error message when network connection fails">\nមិនអាច​ភ្ជាប់​ទៅម៉ាស៊ីនមេ Keyman បានទេ!\n</string>
+    <string name="cannot_connect" comment="Error message when network connection fails">Cannot connect to Keyman server!</string>
     <!-- Context: Keyboard Updates -->
     <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">តើ​អ្នក​ចង់​លុប​ក្ដារចុច​នេះ​ឬ?</string>
     <!-- Context: Keyboard Updates -->
@@ -64,6 +64,10 @@
     <string name="keyboard_qr_code" comment="QR Code description">      ស្កេនកូដ​នេះដើម្បី​ផ្ទុក​ក្ដារចុចនេះ\n​នៅ​លើ​ឧបករណ៍​ផ្សេង</string>
     <!-- Context: Keyboard Help welcome.htm title -->
     <string name="welcome_package" comment="Title to welcome.htm page (name and version)">ស្វាគមន៍​មកកាន់ %1$s</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      FileProvider library needed to view help file: %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Fatal keyboard error with %1$s:%2$s for %3$s language. Loading default keyboard.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">កំពុង​ពិនិត្យ​រក​បញ្ជី​ពាក្យ​ពាក់ព័ន្ធ​ដើម្បី​ទាញយក</string>
     <!-- Context: Model Updates -->
@@ -90,14 +94,18 @@
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">បញ្ជី​ពាក្យ​ដែល​បាន​ជ្រើសរើស​នេះ​កំពុង​ទាញយកហើយ សូម​ព្យាយាម​ម្ដងទៀត​ក្នុង​ពេល​ឆាប់ៗ នេះ!</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">ការទាញយកបញ្ជី​ពាក្យបាន​ចប់​សព្វគ្រប់​ហើយ!</string>
-    <!-- Context: Background download messages-->
-    <string name="failed_to_access_downloaded_file" comment="Failed to access downloaded file">មិន​អាច​ចូល​ប្រើ​ឯកសារដែល​បាន​ទាញ​យក</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">Download failed</string>
     <!-- Context: Background download messages -->
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">រក​មិន​ឃើញ​ឯកសារដែល​បាន​ទាញ​យក</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">មិន​អាច​ចូលប្រើ​ម៉ាស៊ីនមេ​បាន​ទេ!</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"ធនធានទាំង​អស់​គឺ​ថ្មី​បំផុត​ហើយ!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">One or more resources failed to update!</string>
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">Resources successfully updated!</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">ជំនាន់​របស់បញ្ជី​ពាក្យ</string>
     <!-- Context: Model Info -->
