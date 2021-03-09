@@ -10,7 +10,7 @@ type
   private
     class function IsLatinScriptLayout(Layout: DWORD): Boolean; static;
   public
-    class function GetDefaultKeyboardID: DWORD; static;
+    class function GetDefaultBaseLayoutID: DWORD; static;
   end;
 
 implementation
@@ -169,7 +169,7 @@ end;
 //
 // Return only a valid Latin script base layout keyboard id
 //
-class function TBaseKeyboard.GetDefaultKeyboardID: DWORD;   // I4169
+class function TBaseKeyboard.GetDefaultBaseLayoutID: DWORD;   // I4169
 begin
   Result := GetDefaultHKL;
 

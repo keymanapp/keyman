@@ -120,10 +120,10 @@ begin
     begin
       if ValueExists(SRegValue_UnderlyingLayout)
         then FOldBaseLayout := StrToIntDef('$'+ReadString(SRegValue_UnderlyingLayout),0)   // I3759
-        else FOldBaseLayout := TBaseKeyboard.GetDefaultKeyboardID;
+        else FOldBaseLayout := TBaseKeyboard.GetDefaultBaseLayoutID;
     end
     else
-      FOldBaseLayout := TBaseKeyboard.GetDefaultKeyboardID;
+      FOldBaseLayout := TBaseKeyboard.GetDefaultBaseLayoutID;
   finally
     Free;
   end;
@@ -150,7 +150,7 @@ begin
 
   v := Get_Items('koBaseLayout');
   if v.Value = v.DefaultValue then
-    v.Value := TBaseKeyboard.GetDefaultKeyboardID;
+    v.Value := TBaseKeyboard.GetDefaultBaseLayoutID;
 end;
 
 end.
