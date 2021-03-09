@@ -8,7 +8,7 @@
 "alert-download-error-title" = "Fehler beim Herunterladen";
 
 /* Title for a general alert about errors */
-"alert-error-title" = "Error";
+"alert-error-title" = "Fehler";
 
 /* A descriptive message used when no internet connection is detected */
 "alert-no-connection-detail" = "Der Keyman-Server kann nicht erreicht werden. Bitte versuchen Sie es später erneut.";
