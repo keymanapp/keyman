@@ -252,12 +252,47 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
     end;
   end;
 
+  // Adds custom transient profiles for a disabled
+  // keyboard which will not be found by enumerating
+  // LM values.
+  procedure RefreshDisabledProfiles;
+  var
+    reg: TRegistryErrorControlled;
+    RootPath: string;
+    ids: TStringList;
+    id: string;
+  begin
+    if FOwner.Loaded then
+      Exit;
+
+    ids := TStringList.Create;
+    reg := TRegistryErrorControlled.Create(KEY_READ);
+    try
+      RootPath := GetRegistryKeyboardActiveKey_CU(FOwner.ID) + '\' + SRegSubKey_KeyboardLanguages;
+      if reg.OpenKeyReadOnly(RootPath) then
+      begin
+        reg.GetValueNames(ids);
+        for id in ids do
+        begin
+          if not HasLanguage(id) then
+          begin
+            FLanguages.Add(TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, id, 0, GUID_NULL, ''));
+          end;
+        end;
+      end;
+    finally
+      reg.Free;
+      ids.Free;
+    end;
+  end;
+
 begin
   KL.MethodEnter(Self, 'DoRefresh', []);
   try
     RefreshProfiles;
     RefreshTransientProfiles;
     RefreshSuggestedLanguages;
+    RefreshDisabledProfiles;
   finally
     KL.MethodExit(Self, 'DoRefresh');
   end;
