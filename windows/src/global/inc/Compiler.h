@@ -275,6 +275,10 @@
 #define HK_CTRL			0x00020000
 #define HK_SHIFT		0x00040000
 
+#define HK_RALT_INVALID			0x00100000
+#define HK_RCTRL_INVALID		0x00200000
+#define HK_RSHIFT_INVALID		0x00400000
+
 #define LCTRLFLAG		0x0001		// Left Control flag
 #define RCTRLFLAG		0x0002		// Right Control flag
 #define LALTFLAG		0x0004		// Left Alt flag
