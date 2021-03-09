@@ -4,7 +4,8 @@
 
 - [keyman-config](./keyman-config) - km-config and some other tools to install, uninstall
   and view information about Keyman keyboard packages.
-- [ibus-keyman](./ibus-keyman) - IBUS integration to use .kmx Keyman keyboards
+- [ibus-keyman](./ibus-keyman) - IBUS integration to use .kmp Keyman keyboards
+- [core](../common/core/desktop) - common keyboardprocessor library
 - [kmflcomp](./kmflcomp) - KMFL keyboard compiler
 - [libkmfl](./libkmfl) - older KMFL core library
 - [ibus-kmfl](./ibus-kmfl) - IBUS integration to use KMFL
@@ -19,11 +20,11 @@ See [license information](./LICENSE.md) about licensing.
 - Install packages required for building and developing KMFL and Keyman for Linux
 `sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson libjson-glib-dev libgtk-3-dev libxml2-utils help2man python3-lxml python3-magic python3-numpy python3-pil python3-pip python3-qrcode python3-requests python3-requests-cache python3 python3-gi dconf-cli dconf-editor`
 
-### Compiling from Command Line
+## Compiling from Command Line
 
-#### Build script
+### Build script
 
-##### Installing for ibus to use ibus-kmfl or ibus-keyman
+#### Installing for ibus to use ibus-kmfl or ibus-keyman
 
 - The process to build and install everything is:
 
@@ -44,7 +45,7 @@ See [license information](./LICENSE.md) about licensing.
 
 - run `sudo make uninstall` to uninstall everything and put it back again
 
-##### Tmp install
+#### Tmp install
 
 Used by TC for validating PRs
 
@@ -52,7 +53,7 @@ Run `make tmpinstall` to build and install **keyboardprocessor**, **kmflcomp**, 
 
 This is only for testing the build, not for running **ibus-kmfl** or **ibus-keyman** in ibus
 
-#### Manually
+### Manually
 
 - **libkmfl** requires `kmfl.h` header from **kmflcomp**
 - **ibus-kfml** requires `kmfl.h` and headers and lib from **libkmfl**
@@ -79,18 +80,20 @@ make install
 The install of **ibus-kmfl** doesn't install everything to the correct location for it to be
 used - to be fixed
 
-### Continuous integration
+## Continuous integration
 
 Teamcity PR builds will run `make tmpinstall`
-Master builds run `make tmpinstall` and create source packages
-Nightly builds upload the most recent new master build to https://downloads.keyman.com
 
-### Building packages
+Master builds run `make tmpinstall` and create source packages
+
+Nightly and release builds upload the most recent new master build to <https://downloads.keyman.com>
+
+## Building packages
 
 See [Linux packaging doc](https://github.com/keymanapp/keyman/blob/master/docs/linux-packaging.md)
 for details on building Linux packages for Keyman.
 
-### Testing
+## Testing
 
 The unit tests can be running with the following command:
 
@@ -99,9 +102,9 @@ cd linux/keyman-config
 ./run-tests.sh
 ```
 
-### Running Keyman for Linux
+## Running Keyman for Linux
 
-#### Setting up Ibus
+### Setting up Ibus
 
 Ibus should be running on a default install of Ubuntu
 
@@ -109,13 +112,18 @@ You may want to install extra packages to get other ibus input methods e.g **ibu
 
 Run `ibus restart` after installing any of them
 
-#### Getting a Keyman keyboard
+### Getting a Keyman keyboard
 
-- After installing a Keyman keyboard you need to run `ibus restart` so that ibus will look for it. (TODO: double check this)
+- After installing a Keyman keyboard usually ibus will be restarted automatically so that ibus will
+  look for the new keyboard. If for whatever reason the keyboard doesn't show up in the system
+  keyboard list, you can manually run `ibus restart`.
 
-#### Activating a Keyman keyboard
+### Activating a Keyman keyboard
 
-##### GNOME3 (focal and bionic default)
+Keyman tries to activate the keyboard automatically. If you want to activate it for a different
+language, you can do so by following the steps below.
+
+#### GNOME3 (focal and bionic default, also newer Ubuntu versions)
 
 - Click the connection/sound/shutdown section in the top right. Then the tools icon for Settings.
 
@@ -125,7 +133,7 @@ Run `ibus restart` after installing any of them
 
 - Use `Win-space` to switch between keyboards.
 
-##### Cinnamon (wasta default)
+#### Cinnamon (wasta default)
 
 - Open `Menu` and find `IBus Keyboards` (`IBus Preferences`) and run it
 - Make sure `Show icon on system tray` is checked
@@ -134,7 +142,7 @@ Run `ibus restart` after installing any of them
 - Click the 3 dots expander then search for "Other" and click it
 - The Keyman keyboards should be listed here to choose
 
-##### MATE (alternative)
+#### MATE (alternative)
 
 - Open `System-> Preferences -> Other -> IBus Preferences`.
 - Make sure `Show icon on system tray` is checked
