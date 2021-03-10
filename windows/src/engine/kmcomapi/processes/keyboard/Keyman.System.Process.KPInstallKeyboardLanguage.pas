@@ -326,6 +326,17 @@ begin
     Exit(False);
   end;
 
+  if PRIMARYLANGID(LangID) = 0 then
+  begin
+    // LocaleNameToLCID can return a recently uninstalled transient LangID, but
+    // attempts to use that LangID result in an 'unknown locale' being
+    // installed, or a default locale being associated with the keyboard. Given
+    // an installed transient language will always be found in the
+    // Win8LanguageList, we should then assume that LocaleNameToLCID is lying to
+    // us and look for a new transient language id to be applied instead.
+    Exit(False);
+  end;
+
 
   case LangID of
     LOCALE_CUSTOM_DEFAULT,
