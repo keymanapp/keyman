@@ -204,6 +204,10 @@ namespace com.keyman.dom {
         Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
       }
 
+      // Makes sure we properly detect the TouchAliasElement root, 
+      // rather than one of its constituent children.
+      Ltarg = findTouchAliasTarget(Ltarg) || Ltarg;
+
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
         // Prevent triggering other blur-handling events (as possible)
         e.cancelBubble = true;
@@ -531,9 +535,15 @@ namespace com.keyman.dom {
         tEvent=(e as TouchEvent).touches[0];
       } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
         tEvent={clientX:0, clientY:0}
+
         // Will usually be called from setActiveElement, which should define DOMEventHandlers.states.lastActiveElement
         if(DOMEventHandlers.states.lastActiveElement) {
-          tEvent.target = DOMEventHandlers.states.lastActiveElement['kmw_ip'];
+          tEvent.target = DOMEventHandlers.states.lastActiveElement;
+          // Shouldn't happen, but... just in case.  Implemented late in 14.0 beta, so
+          // this detail was kept, though it's likely safe to eliminate.
+          if(tEvent.target['kmw_ip']) {
+            tEvent.target = tEvent.target['kmw_ip'];
+          }
         // but will default to first input or text area on page if DOMEventHandlers.states.lastActiveElement is null
         } else {
           tEvent.target = this.keyman.domManager.sortedInputs[0]['kmw_ip'];
@@ -547,28 +557,33 @@ namespace com.keyman.dom {
       var osk = this.keyman.osk;
 
       var touchX=tEvent.clientX,touchY=tEvent.clientY;
-      var tTarg=tEvent.target as HTMLElement;
-      var scroller: HTMLElement;
 
-      // Identify the scroller element
-      if(tTarg && dom.Utils.instanceof(tTarg, "HTMLSpanElement")) {
-        scroller=tTarg.parentNode as HTMLElement;
-      } else if(tTarg && (tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0)) {
-        scroller=tTarg.firstChild as HTMLElement;
-      } else {
-        scroller=tTarg;
-      }
+      // Some specifics rely upon which child of the TouchAliasElement received the actual event.
+      let tTarg=tEvent.target as HTMLElement;
 
-      // And the actual target element        
-      var target=scroller.parentNode as TouchAliasElement;
+      // Determines the actual TouchAliasElement - the part tied to an OutputTarget.
+      // Ideally, we shouldn't need the second part as a fallback; it's there to preserve existing
+      // behavior from 13.0, as this was refactored made LATE in the 14.0 beta process.
+      let target = findTouchAliasTarget(tTarg) || (tTarg as TouchAliasElement);
+      // Some parts rely upon the scroller element.
+      let scroller = target.firstChild as HTMLElement;
 
       // Move the caret and refocus if necessary     
       if(DOMEventHandlers.states.activeElement != target) {
         // Hide the KMW caret
         let prevTarget = <TouchAliasElement> DOMEventHandlers.states.activeElement;
-        if(prevTarget) {
+
+        // We're not 100% sure whether or not the next line can occur,
+        // but it's a decent failsafe regardless.
+        if(prevTarget && prevTarget['kmw_ip']) {
+          prevTarget = prevTarget['kmw_ip'] as TouchAliasElement;
+        }
+
+        // Make sure that we have the right type so that the expected method exists.
+        if(prevTarget && dom.Utils.instanceof(prevTarget, "TouchAliasElement")) {
           prevTarget.hideCaret();
         }
+
         DOMEventHandlers.states.activeElement=target;
         // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
         // We must explicitly set the focus in order to remove focus from any non-KMW input
@@ -587,8 +602,8 @@ namespace com.keyman.dom {
         osk._Show();
       }
       
-      // If clicked on DIV, set caret to end of text
-      if(tTarg && dom.Utils.instanceof(tTarg, "TouchAliasElement")) {
+      // If clicked on DIV on the main element or on the scroller element, set caret to end of text
+      if(tTarg && tTarg == target || tTarg == scroller) {
         var x,cp;
         x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);        
         if(target.dir == 'rtl') { 

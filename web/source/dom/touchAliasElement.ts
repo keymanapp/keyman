@@ -27,6 +27,41 @@ namespace com.keyman.dom {
     return e;
   }
 
+  // If the specified HTMLElement is either a TouchAliasElement or one of its children elements,
+  // this method will return the root TouchAliasElement.
+  export function findTouchAliasTarget(target: HTMLElement): TouchAliasElement {
+    let scroller: HTMLElement;
+
+    // Identify the scroller element
+    if(target && dom.Utils.instanceof(target, "HTMLSpanElement")) {
+      scroller=target.parentNode as HTMLElement;
+    } else if(target && (target.className != null && target.className.indexOf('keymanweb-input') >= 0)) {
+      scroller=target.firstChild as HTMLElement;
+    } else if(target && dom.Utils.instanceof(target, "HTMLDivElement")) {
+      // Two possibilities:  the scroller & the blinking DIV of the caret.
+      // A direct click CAN trigger events on the blinking element itself if well-timed.
+      scroller=target;
+
+      // Ensures we land on the scroller, not the caret.
+      if(scroller.parentElement && scroller.parentElement.className.indexOf('keymanweb-input') < 0) {
+        scroller = scroller.parentElement;
+      }
+    } else if(target['kmw_ip']) { // In case it's called on a TouchAliasElement's base (aliased) element.
+      return target['kmw_ip'] as TouchAliasElement;
+    } else {
+      // If it's not in any way related to a TouchAliasElement, simply return null.
+      return null;
+    }
+
+    // And the actual target element        
+    let root = scroller.parentNode;
+    if(root['base'] !== undefined) {
+      return root as TouchAliasElement;
+    } else {
+      return null;
+    }
+  }
+
   export function constructTouchAlias(base?: HTMLElement): TouchAliasElement {
     let div = document.createElement("div");
     let ele = link(div, new TouchAliasData());
