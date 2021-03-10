@@ -175,7 +175,9 @@ end;
 
 procedure TfrmWebContainer.DoOpenHelp;
 begin
-  Application.HelpJump('context_'+lowercase(FDialogName));
+  if HelpTopic = ''
+    then Application.HelpJump('context/'+lowercase(FDialogName))
+    else Application.HelpJump(HelpTopic);
 end;
 
 procedure TfrmWebContainer.OpenLink(params: TStringList);

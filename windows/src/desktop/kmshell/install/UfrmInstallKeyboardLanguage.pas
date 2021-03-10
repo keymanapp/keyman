@@ -637,6 +637,7 @@ end;
 procedure TfrmInstallKeyboardLanguage.TntFormCreate(Sender: TObject);
 begin
   inherited;
+  HelpTopic := 'context/install-keyboard-language';
   FLanguages := TInstLanguageList.Create;
 
   gridLanguages.Cells[0,0] := 'Language Name';

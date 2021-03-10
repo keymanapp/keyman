@@ -26,6 +26,7 @@ type
     const S__Package = '_Package\';
     const S_MCompileExe = 'mcompile.exe';
     class function ErrorLogPath(const app: string = ''): string; static;
+    class function KeymanHelpPath(const HelpFile: string): string; static;
     class function KeymanDesktopInstallPath(const filename: string = ''): string; static;
     class function KeymanEngineInstallPath(const filename: string = ''): string; static;
     class function KeymanDesktopInstallDir: string; static;
@@ -370,6 +371,30 @@ begin
   end;
 
   Result := Result + filename;
+end;
+
+class function TKeymanPaths.KeymanHelpPath(const HelpFile: string): string;
+var
+  keyman_root: string;
+begin
+  // Same folder as executable
+  Result := ExtractFilePath(ParamStr(0)) + HelpFile;
+  if FileExists(Result) then Exit;
+
+  // On developer machines, if we are running within the source repo, then use
+  // those paths
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
+  begin
+    // Source repo, bin folder
+    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\bin\desktop\' + HelpFile;
+    if FileExists(Result) then Exit;
+  end;
+
+  Result := TKeymanPaths.KeymanDesktopInstallPath(HelpFile);
+  if FileExists(Result) then Exit;
+
+  Result := '';
 end;
 
 end.
