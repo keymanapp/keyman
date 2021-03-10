@@ -65,7 +65,9 @@ public final class KMTextView extends AppCompatEditText {
     int selStart = textView.getSelectionStart();
     int selEnd = textView.getSelectionEnd();
     KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
-    KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
+    if (KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd)) {
+      KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
+    }
   }
 
   private void init(final Context context) {
