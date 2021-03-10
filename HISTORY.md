@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.257 beta 2021-03-10
+
+* fix(common/core/web): Add keyboard check for scriptObject (#4640)
+* docs(common): Update readme (#4642)
+
 ## 14.0.256 beta 2021-03-10
 
 * chore(linux): Update readme (#4633)
