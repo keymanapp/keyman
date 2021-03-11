@@ -487,7 +487,11 @@ class ModelCompositor {
     let postContextTokenization = this.tokenize(postContext);
     if(postContextTokenization) {
       // Handles display string for reversions triggered by accepting a suggestion mid-token.
-      revertedPrefix = postContextTokenization.left[postContextTokenization.left.length-1];
+      if(postContextTokenization.left.length > 0) {
+        revertedPrefix = postContextTokenization.left[postContextTokenization.left.length-1];
+      } else {
+        revertedPrefix = '';
+      }
       revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0] : '';
     } else {
       revertedPrefix = this.wordbreak(postContext);
