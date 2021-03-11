@@ -1,0 +1,4 @@
+# localizable strings for crowdin
+*.strings diff=localizablestrings
+[diff "localizablestrings"]
+    textconv = "iconv -f utf-16 -t utf-8"
