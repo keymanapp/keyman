@@ -81,10 +81,10 @@ extension TestUtils {
       }
     }
 
-    static func getVersionHistory(for version: Version) -> [AnyLanguageResource] {
+    static func getVersionHistory(for version: Version) -> [AnyLanguageResourceFullID] {
       let resourceHistory = KeymanEngine.Migrations.resourceHistory
 
-      let match: [[AnyLanguageResource]] = resourceHistory.compactMap() { entry in
+      let match: [[AnyLanguageResourceFullID]] = resourceHistory.compactMap() { entry in
         if entry.version == version {
           return entry.resources
         } else {

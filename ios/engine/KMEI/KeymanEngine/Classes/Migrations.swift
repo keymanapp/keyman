@@ -16,10 +16,10 @@ private enum MigrationLevel {
 
 struct VersionResourceSet {
   var version: Version
-  var resources: [AnyLanguageResource]
+  var resources: [AnyLanguageResourceFullID]
   // but how to handle deprecation?
 
-  init(version: Version, resources: [AnyLanguageResource]) {
+  init(version: Version, resources: [AnyLanguageResourceFullID]) {
     self.version = version
     self.resources = resources
   }
@@ -29,54 +29,14 @@ public enum Migrations {
   static let resourceHistory: [VersionResourceSet] = {
     let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
 
-    let european =  InstallableKeyboard(id: "european",
-                                         name: "EuroLatin Keyboard",
-                                         languageID: "en",
-                                         languageName: "English",
-                                         version: "1.7",
-                                         isRTL: false,
-                                         font: font,
-                                         oskFont: nil,
-                                         isCustom: false)
+    let european = FullKeyboardID(keyboardID: "european", languageID: "en")
 
     // Default keyboard in version 10.0 (and likely before)
-    let european2 = InstallableKeyboard(id: "european2",
-                                         name: "EuroLatin2 Keyboard",
-                                         languageID: "en",
-                                         languageName: "English",
-                                         version: "1.6",
-                                         isRTL: false,
-                                         font: font,
-                                         oskFont: nil,
-                                         isCustom: false)
+    let european2 = FullKeyboardID(keyboardID: "european2", languageID: "en")
 
-    let sil_euro_latin_1_8_1 = InstallableKeyboard(id: "sil_euro_latin",
-                                                   name: "EuroLatin (SIL)",
-                                                   languageID: "en",
-                                                   languageName: "English",
-                                                   version: "1.8.1",
-                                                   isRTL: false,
-                                                   font: font,
-                                                   oskFont: nil,
-                                                   isCustom: false)
+    let sil_euro_latin = FullKeyboardID(keyboardID: "sil_euro_latin", languageID: "en")
 
-    let sil_euro_latin_1_9_1 = InstallableKeyboard(id: "sil_euro_latin",
-                                                   name: "EuroLatin (SIL)",
-                                                   languageID: "en",
-                                                   languageName: "English",
-                                                   version: "1.9.1",
-                                                   isRTL: false,
-                                                   font: font,
-                                                   oskFont: nil,
-                                                   isCustom: false)
-
-    let nrc_en_mtnt_0_1_2 = InstallableLexicalModel(id: "nrc.en.mtnt",
-                                                    name: "English dictionary (MTNT)",
-                                                    languageID: "en",
-                                                    version: "0.1.2",
-                                                    isCustom: false)
-
-    let nrc_en_mtnt = Defaults.lexicalModel
+    let nrc_en_mtnt = FullLexicalModelID(lexicalModelID: "nrc.en.mtnt", languageID: "en")
 
     // Unknown transition point:  european
     // Before v11:  european2
@@ -86,17 +46,13 @@ public enum Migrations {
 
     let legacy_resources = VersionResourceSet(version: Version.fallback, resources: [european])
     let v10_resources = VersionResourceSet(version: Version("10.0")!, resources: [european2])
-    let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin_1_8_1])
-    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin_1_8_1, nrc_en_mtnt_0_1_2])
-    let v13_resources = VersionResourceSet(version: Version("13.0.65")!, resources: [sil_euro_latin_1_8_1, nrc_en_mtnt])
-    let v14_resources = VersionResourceSet(version: Version("14.0.0")!, resources: [sil_euro_latin_1_9_1, nrc_en_mtnt])
+    let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin])
+    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin, nrc_en_mtnt])
 
     timeline.append(legacy_resources)
     timeline.append(v10_resources)
     timeline.append(v11_resources)
     timeline.append(v12_resources)
-    timeline.append(v13_resources)
-    timeline.append(v14_resources)
 
     return timeline
   }()
@@ -237,20 +193,20 @@ public enum Migrations {
       let resources = possibleHistories[possibleHistories.count-1].resources
 
       resources.forEach { res in
-        if let kbd = res as? InstallableKeyboard {
+        if let kbd = res as? FullKeyboardID {
           let userKeyboards = Storage.active.userDefaults.userKeyboards
 
           // Does not remove the deprecated keyboard's files - just the registration.
           hasVersionDefaults = hasVersionDefaults && userKeyboards?.contains(where: { kbd2 in
-            return kbd.id == kbd2.id && kbd.languageID == kbd2.languageID
+            return kbd2.fullID == kbd
           }) ?? false
           Storage.active.userDefaults.userKeyboards = userKeyboards
-        } else if let lex = res as? InstallableLexicalModel {
+        } else if let lex = res as? FullLexicalModelID {
           let userModels = Storage.active.userDefaults.userLexicalModels
 
           // Parallels the issue with deprecated files for keyboards.
           hasVersionDefaults = hasVersionDefaults && userModels?.contains(where: { lex2 in
-            return lex.id == lex2.id && lex.languageID == lex2.languageID
+            return lex2.fullID == lex
           }) ?? false
           Storage.active.userDefaults.userLexicalModels = userModels
         } // else Not yet implemented
@@ -258,20 +214,20 @@ public enum Migrations {
 
       if hasVersionDefaults {
         resources.forEach { res in
-          if let kbd = res as? InstallableKeyboard {
+          if let kbd = res as? FullKeyboardID {
             var userKeyboards = Storage.active.userDefaults.userKeyboards
 
             // Does not remove the deprecated keyboard's files - just the registration.
             userKeyboards?.removeAll(where: { kbd2 in
-              return kbd.id == kbd2.id && kbd.languageID == kbd2.languageID
+              return kbd2.fullID == kbd
             })
             Storage.active.userDefaults.userKeyboards = userKeyboards
-          } else if let lex = res as? InstallableLexicalModel {
+          } else if let lex = res as? FullLexicalModelID {
             var userModels = Storage.active.userDefaults.userLexicalModels
 
             // Parallels the issue with deprecated files for keyboards.
             userModels?.removeAll(where: { lex2 in
-              return lex.id == lex2.id && lex.languageID == lex2.languageID
+              return lex2.fullID == lex
             })
             Storage.active.userDefaults.userLexicalModels = userModels
           } // else Not yet implemented
