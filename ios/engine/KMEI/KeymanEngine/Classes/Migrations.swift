@@ -175,9 +175,21 @@ public enum Migrations {
       }
     }
 
+    var userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
+    var userModels = Storage.active.userDefaults.userLexicalModels ?? []
+
     var hasVersionDefaults = true
+    var oldDefaultKbd: InstallableKeyboard? = nil
+    var oldDefaultLex: InstallableLexicalModel? = nil
+    
+    // Only assigned a non-nil value if the old default's ID matches the current default's.
+    // Used for version comparisons to ensure we don't unnecessarily downgrade.
+    var currentDefaultKbdVersion: Version? = nil
+    var currentDefaultLexVersion: Version? = nil
+
     if lastVersion != nil && lastVersion != Version.freshInstall {
-      // Time to deinstall the old version's resources.
+      // Time to check on the old version's default resources.
+      // The user may have updated them, and possibly even beyond the currently-packaged version.
       // First, find the most recent version with a listed history.
       let possibleHistories: [VersionResourceSet] = resourceHistory.compactMap { set in
         if set.version <= lastVersion! {
@@ -194,59 +206,45 @@ public enum Migrations {
 
       resources.forEach { res in
         if let kbd = res as? FullKeyboardID {
-          let userKeyboards = Storage.active.userDefaults.userKeyboards
-
           // Does not remove the deprecated keyboard's files - just the registration.
-          hasVersionDefaults = hasVersionDefaults && userKeyboards?.contains(where: { kbd2 in
-            return kbd2.fullID == kbd
-          }) ?? false
-          Storage.active.userDefaults.userKeyboards = userKeyboards
+          if let match = userKeyboards.first(where: { $0.fullID == kbd }) {
+            if match.fullID == Defaults.keyboard.fullID {
+              currentDefaultKbdVersion = Version(match.version)
+            }
+            oldDefaultKbd = match
+          } else {
+            hasVersionDefaults = false
+          }
         } else if let lex = res as? FullLexicalModelID {
-          let userModels = Storage.active.userDefaults.userLexicalModels
-
           // Parallels the issue with deprecated files for keyboards.
-          hasVersionDefaults = hasVersionDefaults && userModels?.contains(where: { lex2 in
-            return lex2.fullID == lex
-          }) ?? false
-          Storage.active.userDefaults.userLexicalModels = userModels
+          if let match = userModels.first(where: { $0.fullID == lex }) {
+            if match.fullID == Defaults.lexicalModel.fullID {
+              currentDefaultLexVersion = Version(match.version)
+            }
+            oldDefaultLex = match
+          } else {
+            hasVersionDefaults = false
+          }
         } // else Not yet implemented
       }
 
-      if hasVersionDefaults {
-        resources.forEach { res in
-          if let kbd = res as? FullKeyboardID {
-            var userKeyboards = Storage.active.userDefaults.userKeyboards
-
-            // Does not remove the deprecated keyboard's files - just the registration.
-            userKeyboards?.removeAll(where: { kbd2 in
-              return kbd2.fullID == kbd
-            })
-            Storage.active.userDefaults.userKeyboards = userKeyboards
-          } else if let lex = res as? FullLexicalModelID {
-            var userModels = Storage.active.userDefaults.userLexicalModels
-
-            // Parallels the issue with deprecated files for keyboards.
-            userModels?.removeAll(where: { lex2 in
-              return lex2.fullID == lex
-            })
-            Storage.active.userDefaults.userLexicalModels = userModels
-          } // else Not yet implemented
-        }
+      // The user has customized their default resources; Keyman will refrain from
+      // changing the user's customizations.
+      if !hasVersionDefaults {
+        return
       }
     }
 
     // Now to install the new version's resources.
-    var userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
-    var userModels = Storage.active.userDefaults.userLexicalModels ?? []
     let defaultsNeedBackup = (lastVersion ?? Version.fallback) < Version.defaultsNeedBackup
 
-    // Don't add the keyboard a second time if it's already installed and backed up.  Can happen
-    // if multiple Keyman versions match.
-    if hasVersionDefaults {
+    // First the keyboard.  If it needs an update:
+    if currentDefaultKbdVersion ?? Version("0.0")! <= Version(Defaults.keyboard.version)! || defaultsNeedBackup {
+      // Remove old installation.
+      userKeyboards.removeAll(where: { $0.fullID == oldDefaultKbd?.fullID })
       userKeyboards = [Defaults.keyboard] + userKeyboards  // Make sure the default goes in the first slot!
       Storage.active.userDefaults.userKeyboards = userKeyboards
-    }
-    if(defaultsNeedBackup || hasVersionDefaults) {
+
       do {
         try Storage.active.installDefaultKeyboard(from: Resources.bundle)
       } catch {
@@ -254,11 +252,12 @@ public enum Migrations {
       }
     }
 
-    if hasVersionDefaults {
+    if currentDefaultLexVersion ?? Version("0.0")! < Version(Defaults.lexicalModel.version)! || defaultsNeedBackup {
+      // Remove old installation
+      userModels.removeAll(where: { $0.fullID == oldDefaultLex?.fullID} )
       userModels = [Defaults.lexicalModel] + userModels
       Storage.active.userDefaults.userLexicalModels = userModels
-    }
-    if(defaultsNeedBackup || hasVersionDefaults) {
+
       do {
         try Storage.active.installDefaultLexicalModel(from: Resources.bundle)
       } catch {
