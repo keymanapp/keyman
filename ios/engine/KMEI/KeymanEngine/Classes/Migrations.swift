@@ -219,6 +219,7 @@ public enum Migrations {
       }
     }
 
+    var hasVersionDefaults = true
     if lastVersion != nil && lastVersion != Version.freshInstall {
       // Time to deinstall the old version's resources.
       // First, find the most recent version with a listed history.
@@ -237,22 +238,44 @@ public enum Migrations {
 
       resources.forEach { res in
         if let kbd = res as? InstallableKeyboard {
-          var userKeyboards = Storage.active.userDefaults.userKeyboards
+          let userKeyboards = Storage.active.userDefaults.userKeyboards
 
           // Does not remove the deprecated keyboard's files - just the registration.
-          userKeyboards?.removeAll(where: { kbd2 in
+          hasVersionDefaults = hasVersionDefaults && userKeyboards?.contains(where: { kbd2 in
             return kbd.id == kbd2.id && kbd.languageID == kbd2.languageID
-          })
+          }) ?? false
           Storage.active.userDefaults.userKeyboards = userKeyboards
         } else if let lex = res as? InstallableLexicalModel {
-          var userModels = Storage.active.userDefaults.userLexicalModels
+          let userModels = Storage.active.userDefaults.userLexicalModels
 
           // Parallels the issue with deprecated files for keyboards.
-          userModels?.removeAll(where: { lex2 in
+          hasVersionDefaults = hasVersionDefaults && userModels?.contains(where: { lex2 in
             return lex.id == lex2.id && lex.languageID == lex2.languageID
-          })
+          }) ?? false
           Storage.active.userDefaults.userLexicalModels = userModels
         } // else Not yet implemented
+      }
+
+      if hasVersionDefaults {
+        resources.forEach { res in
+          if let kbd = res as? InstallableKeyboard {
+            var userKeyboards = Storage.active.userDefaults.userKeyboards
+
+            // Does not remove the deprecated keyboard's files - just the registration.
+            userKeyboards?.removeAll(where: { kbd2 in
+              return kbd.id == kbd2.id && kbd.languageID == kbd2.languageID
+            })
+            Storage.active.userDefaults.userKeyboards = userKeyboards
+          } else if let lex = res as? InstallableLexicalModel {
+            var userModels = Storage.active.userDefaults.userLexicalModels
+
+            // Parallels the issue with deprecated files for keyboards.
+            userModels?.removeAll(where: { lex2 in
+              return lex.id == lex2.id && lex.languageID == lex2.languageID
+            })
+            Storage.active.userDefaults.userLexicalModels = userModels
+          } // else Not yet implemented
+        }
       }
     }
 
@@ -260,20 +283,14 @@ public enum Migrations {
     var userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
     var userModels = Storage.active.userDefaults.userLexicalModels ?? []
     let defaultsNeedBackup = (lastVersion ?? Version.fallback) < Version.defaultsNeedBackup
-    var installKbd = false
-    var installLex = false
 
     // Don't add the keyboard a second time if it's already installed and backed up.  Can happen
     // if multiple Keyman versions match.
-    if !userKeyboards.contains(where: { kbd in
-      kbd.id == Defaults.keyboard.id && kbd.languageID == Defaults.keyboard.languageID
-    }) {
+    if hasVersionDefaults {
       userKeyboards = [Defaults.keyboard] + userKeyboards  // Make sure the default goes in the first slot!
       Storage.active.userDefaults.userKeyboards = userKeyboards
-
-      installKbd = true
     }
-    if(defaultsNeedBackup || installKbd) {
+    if(defaultsNeedBackup || hasVersionDefaults) {
       do {
         try Storage.active.installDefaultKeyboard(from: Resources.bundle)
       } catch {
@@ -281,15 +298,11 @@ public enum Migrations {
       }
     }
 
-    if !userModels.contains(where: { lex in
-      lex.id == Defaults.lexicalModel.id && lex.languageID == Defaults.lexicalModel.languageID
-    }) {
+    if hasVersionDefaults {
       userModels = [Defaults.lexicalModel] + userModels
       Storage.active.userDefaults.userLexicalModels = userModels
-
-      installLex = true
     }
-    if(defaultsNeedBackup || installLex) {
+    if(defaultsNeedBackup || hasVersionDefaults) {
       do {
         try Storage.active.installDefaultLexicalModel(from: Resources.bundle)
       } catch {
