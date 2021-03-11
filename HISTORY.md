@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.258 beta 2021-03-11
+
+* fix(windows): context help links (#4626)
+* fix(windows): hotkeys correctly ignore right modifier keys (#4628)
+* fix(windows): Handle disabled profiles and invalid language ids (#4635)
+* fix(web): event handling for TouchAliasElement's blinking caret (#4638)
+* fix(common/models): prevents "undefined" reversion display string (#4648)
+* docs(common): Update npm-packages readme (#4644)
+
 ## 14.0.257 beta 2021-03-10
 
 * fix(common/core/web): Add keyboard check for scriptObject (#4640)
