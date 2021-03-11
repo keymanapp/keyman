@@ -810,7 +810,7 @@
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 14.0.211 -->
   <!-- String Type: FormatString -->
-  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">Unable to install keyboard language; Windows has a limit of 4 custom \'transient\' languages, and you may have reached this limit.</string>
+  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">មិន​អាច​ដំឡើង​ភាសា​នេះ​បាន​ទេ ព្រោះ​ថា​ Windows បាន​កំណត់ត្រឹមភាសា \'transient\' ចំនួន 4 ប៉ុណ្ណោះ ហើយ​អ្នក​ប្រហែល​ជា​បាន​ដំឡើង​លើស​ចំនួន​កំណត់​ហើយ។</string>
   <!-- Parameters: %1$s = Package Name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
