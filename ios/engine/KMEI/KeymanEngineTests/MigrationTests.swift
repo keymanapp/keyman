@@ -15,52 +15,52 @@ class MigrationTests: XCTestCase {
     TestUtils.standardTearDown()
   }
 
-  // Uncomment this and set up whatever resources are needed for your test bundle in order to build one!
-  func testForMigrationBundleConstruction() {
-    do {
-      if let sil_euro_latin = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as? KeyboardKeymanPackage {
-      try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.sil_euro_latin.fullID, from: sil_euro_latin)
-      } else {
-          XCTFail()
-      }
-
-      if let sencoten_kbd_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.fvSencotenKMP) as? KeyboardKeymanPackage {
-        try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.fv_sencoten.fullID, from: sencoten_kbd_kmp)
-      } else {
-          XCTFail()
-      }
-
-      if let mtntKMP = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) as? LexicalModelKeymanPackage {
-        try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.mtnt.fullID,
-          from: mtntKMP)
-      } else {
-          XCTFail()
-      }
-
-      if let sencoten_lm_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.sencotenKMP) as? LexicalModelKeymanPackage {
-        try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.sencoten.fullID,
-          from: sencoten_lm_kmp)
-      } else {
-          XCTFail()
-      }
-
-    } catch {
-      XCTFail("File system commands failed.")
-    }
-
-    // Set the desired version entry for your format, if different from the actual local version.
-    // Only use if you're sure the specified version has a matching file format.
-    Storage.active.userDefaults.lastEngineVersion = Version.packageBasedFileReorg
-    Storage.active.userDefaults.migrationLevel = 20 // migratedForKMP
-
-    // Note:  you may need to manually pause at a certain (marked) point within this method
-    // for everything to successfully write out!
-    if let saveState = try? TestUtils.EngineStateBundler.createBundle(withName: "Early 14.0 with defaults") {
-      self.add(saveState)
-    } else {
-      XCTFail()
-    }
-  }
+//  // Uncomment this and set up whatever resources are needed for your test bundle in order to build one!
+//  func testForMigrationBundleConstruction() {
+//    do {
+//      if let sil_euro_latin = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as? KeyboardKeymanPackage {
+//      try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.sil_euro_latin.fullID, from: sil_euro_latin)
+//      } else {
+//          XCTFail()
+//      }
+//
+//      if let sencoten_kbd_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.fvSencotenKMP) as? KeyboardKeymanPackage {
+//        try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.fv_sencoten.fullID, from: sencoten_kbd_kmp)
+//      } else {
+//          XCTFail()
+//      }
+//
+//      if let mtntKMP = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) as? LexicalModelKeymanPackage {
+//        try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.mtnt.fullID,
+//          from: mtntKMP)
+//      } else {
+//          XCTFail()
+//      }
+//
+//      if let sencoten_lm_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.sencotenKMP) as? LexicalModelKeymanPackage {
+//        try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.sencoten.fullID,
+//          from: sencoten_lm_kmp)
+//      } else {
+//          XCTFail()
+//      }
+//
+//    } catch {
+//      XCTFail("File system commands failed.")
+//    }
+//
+//    // Set the desired version entry for your format, if different from the actual local version.
+//    // Only use if you're sure the specified version has a matching file format.
+//    Storage.active.userDefaults.lastEngineVersion = Version.packageBasedFileReorg
+//    Storage.active.userDefaults.migrationLevel = 20 // migratedForKMP
+//
+//    // Note:  you may need to manually pause at a certain (marked) point within this method
+//    // for everything to successfully write out!
+//    if let saveState = try? TestUtils.EngineStateBundler.createBundle(withName: "Early 14.0 with defaults") {
+//      self.add(saveState)
+//    } else {
+//      XCTFail()
+//    }
+//  }
 
   func testSimpleEarly14Migration() {
     // A case where the user only has SENCOTEN installed for both keyboard & lexical model.
@@ -74,12 +74,15 @@ class MigrationTests: XCTestCase {
     let userLexicalModels = userDefaults.userLexicalModels ?? []
 
     XCTAssertEqual(userKeyboards.count, 2)
-    XCTAssertEqual(userLexicalModels.count, 2)
+    // Because there's a lexical model update, it installs the whole package.
+    // Not exactly ideal, but correct for pre-existing behavior.
+    XCTAssertEqual(userLexicalModels.count, 4)
 
     let kbdSEU = userKeyboards.first(where: { $0.fullID == TestUtils.Keyboards.sil_euro_latin.fullID })
     XCTAssertNotNil(kbdSEU)
-    // Enable once auto-updating
-    //XCTAssertGreaterThan(Version(kbdSEU!.version)!, Version(TestUtils.Keyboards.sil_euro_latin.version)!)
+    // Because there's a keyboard update (1.9.3 vs 1.9.1, at the time of writing).
+    // we expect a more recent version than the testing version.
+    XCTAssertGreaterThan(Version(kbdSEU!.version)!, Version(TestUtils.Keyboards.sil_euro_latin.version)!)
     XCTAssertTrue(userLexicalModels.contains(where: { $0.fullID == TestUtils.LexicalModels.mtnt.fullID }))
 
     XCTAssertTrue(userKeyboards.contains(where: { $0.fullID == TestUtils.Keyboards.fv_sencoten.fullID }))
