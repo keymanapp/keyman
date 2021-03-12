@@ -17,5 +17,13 @@ extension TestUtils {
                                               languageID: "en",
                                               version: "0.1.4",
                                               isCustom: false)
+
+    static let sencotenKMP = TestUtils.lexicalModelsBundle.url(forResource: "nrc.str.sencoten.model",
+        withExtension: "kmp")!
+    static let sencoten = InstallableLexicalModel(id: "nrc.str.sencoten",
+                                                  name: "SENĆOŦEN (Saanich Dialect) Lexical Model",
+                                                  languageID: "str",
+                                                  version: "1.0.5",
+                                                  isCustom: false)
   }
 }

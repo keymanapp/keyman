@@ -15,6 +15,64 @@ class MigrationTests: XCTestCase {
     TestUtils.standardTearDown()
   }
 
+//  // Uncomment this and set up whatever resources are needed for your test bundle in order to build one!
+//  func testForMigrationBundleConstruction() {
+//    do {
+//      let sencoten_kbd_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.fvSencotenKMP) as? KeyboardKeymanPackage
+//
+//      if sencoten_kbd_kmp == nil {
+//          XCTFail()
+//      }
+//
+//      try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.fv_sencoten.fullID, from: sencoten_kbd_kmp!)
+//
+//      let sencoten_lm_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.sencotenKMP) as? LexicalModelKeymanPackage
+//
+//      if sencoten_lm_kmp == nil {
+//          XCTFail()
+//      }
+//
+//      try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.sencoten.fullID,
+//          from: sencoten_lm_kmp!)
+//    } catch {
+//      XCTFail("File system commands failed.")
+//    }
+//
+//    // Set the desired version entry for your format, if different from the actual local version.
+//    // Only use if you're sure the specified version has a matching file format.
+//    Storage.active.userDefaults.lastEngineVersion = Version.packageBasedFileReorg
+//    Storage.active.userDefaults.migrationLevel = 20 // migratedForKMP
+//
+//    // Note:  you may need to manually pause at a certain (marked) point within this method
+//    // for everything to successfully write out!
+//    if let saveState = try? TestUtils.EngineStateBundler.createBundle(withName: "No-defaults early 14.0") {
+//      self.add(saveState)
+//    } else {
+//      XCTFail()
+//    }
+//  }
+
+  func testNoDefaultsEarly14Migration() {
+    // A case where the user only has SENCOTEN installed for both keyboard & lexical model.
+    // sil_euro_latin was explicitly removed by the user.
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.noDefault_14)
+    Migrations.migrate(storage: Storage.active)
+    Migrations.updateResources(storage: Storage.active)
+
+    let userDefaults = Storage.active.userDefaults
+    let userKeyboards = userDefaults.userKeyboards ?? []
+    let userLexicalModels = userDefaults.userLexicalModels ?? []
+
+    XCTAssertEqual(userKeyboards.count, 1)
+    XCTAssertEqual(userLexicalModels.count, 1)
+
+    XCTAssertFalse(userKeyboards.contains(where: { $0.fullID == TestUtils.Keyboards.sil_euro_latin.fullID }))
+    XCTAssertFalse(userLexicalModels.contains(where: { $0.fullID == TestUtils.LexicalModels.mtnt.fullID }))
+
+    XCTAssertTrue(userKeyboards.contains(where: { $0.fullID == TestUtils.Keyboards.fv_sencoten.fullID }))
+    XCTAssertTrue(userLexicalModels.contains(where: { $0.fullID == TestUtils.LexicalModels.sencoten.fullID }))
+  }
+
   func testComplexVersion13Migration() {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.cloud_to_kmp_13)
     Migrations.migrate(storage: Storage.active)
