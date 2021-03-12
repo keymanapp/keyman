@@ -146,9 +146,16 @@ public enum Migrations {
 
   static func updateResources(storage: Storage) {
     var lastVersion = engineVersion
-    if (lastVersion ?? Version.fallback) >= Version.latestFeature {
-      // We're either current or have just been downgraded; no need to do modify resources.
-      // If it's a downgrade, it's near-certainly a testing environment.
+
+    // Will always seek to update default resources on version upgrades,
+    // even if only due to the build component of the version.
+    //
+    // This may make intentional downgrading of our default resources tedious,
+    // as there's (currently) no way to detect if a user intentionally did so before
+    // the app upgrade.
+    if lastVersion != nil, lastVersion! > Version.currentTagged {
+      // We've just been downgraded; no need to modify resources.
+      // If it's a downgrade, it's near-certainly a testing environment
       return
     }
 
@@ -266,7 +273,7 @@ public enum Migrations {
     }
 
     // Store the version we just upgraded to.
-    storage.userDefaults.lastEngineVersion = Version.latestFeature
+    storage.userDefaults.lastEngineVersion = Version.currentTagged
   }
 
   static func migrateUserDefaultsToStructs(storage: Storage) {
