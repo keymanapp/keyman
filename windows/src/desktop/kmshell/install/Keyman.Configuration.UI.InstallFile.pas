@@ -126,7 +126,7 @@ begin
   begin
     //if not ASilent then SelectLanguage(False);
     if not ASilent and not ANoWelcome then
-      DoShowPackageWelcome(InstalledPackage, False);
+      DoShowPackageWelcome(Owner, InstalledPackage, False);
   end;
 end;
 

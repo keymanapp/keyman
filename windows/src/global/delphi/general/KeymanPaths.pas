@@ -15,6 +15,7 @@ type
     const S_CEF_SubFolder = 'cef\';
     const S_CEF_LibCef = 'libcef.dll';
     const S_CEF_SubProcess = 'kmbrowserhost.exe';
+    const S_CustomisationFilename = 'desktop_pro.pxx';
   public
     const S_KMShell = 'kmshell.exe';
     const S_TSysInfoExe = 'tsysinfo.exe';
@@ -34,6 +35,7 @@ type
     class function KeyboardsInstallPath(const filename: string = ''): string; static;
     class function KeyboardsInstallDir: string; static;
     class function KeymanConfigStaticHttpFilesPath(const filename: string = ''): string; static;
+    class function KeymanCustomisationPath: string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
     class function CEFSubprocessPath: string; static;
@@ -371,6 +373,24 @@ begin
   end;
 
   Result := Result + filename;
+end;
+
+class function TKeymanPaths.KeymanCustomisationPath: string;
+var
+  keyman_root: string;
+begin
+  // On developer machines, if we are running within the source repo, then use
+  // those paths
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
+  begin
+    // Source repo, bin folder
+    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\src\desktop\branding';
+    if DirectoryExists(Result) then
+      Exit(Result + '\' + S_CustomisationFilename);
+  end;
+
+  Result := TKeymanPaths.KeymanDesktopInstallPath(S_CustomisationFilename);
 end;
 
 class function TKeymanPaths.KeymanHelpPath(const HelpFile: string): string;

@@ -61,7 +61,7 @@ type
     property URL: string write SetURL;
   end;
 
-procedure DoShowPackageWelcome(pkg: IKeymanPackage; ShowMessageIfNoWelcome: Boolean);
+procedure DoShowPackageWelcome(AOwner: TComponent; pkg: IKeymanPackage; ShowMessageIfNoWelcome: Boolean);
 //procedure DoShowWelcome(const Title, FileName: WideString);
 
 implementation
@@ -170,9 +170,9 @@ begin
   if Assigned(cef) then cef.Navigate(Value);
 end;
 
-procedure DoShowWelcome(const Title, FileName: WideString);
+procedure DoShowWelcome(AOwner: TComponent; const Title, FileName: WideString);
 begin
-  with TfrmHTML.Create(Screen.ActiveForm) do
+  with TfrmHTML.Create(AOwner) do
   try
     Width := Screen.Width * 6 div 10;
     Height := Screen.Height * 6 div 10;
@@ -186,13 +186,13 @@ begin
   end;
 end;
 
-procedure DoShowPackageWelcome(pkg: IKeymanPackage; ShowMessageIfNoWelcome: Boolean);
+procedure DoShowPackageWelcome(AOwner: TComponent; pkg: IKeymanPackage; ShowMessageIfNoWelcome: Boolean);
 var
   FWelcomeFile: IKeymanPackageContentFile;
 begin
   FWelcomeFile := pkg.WelcomeFile;
   if Assigned(FWelcomeFile) then
-    DoShowWelcome(pkg.Name, FWelcomeFile.FullFilename)
+    DoShowWelcome(AOwner, pkg.Name, FWelcomeFile.FullFilename)
   else if ShowMessageIfNoWelcome then
     ShowMessage(MsgFromIdFormat(SKPackageDoesNotIncludeWelcome, [pkg.Name]));
 end;
