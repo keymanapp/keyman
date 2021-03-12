@@ -15,42 +15,40 @@ class MigrationTests: XCTestCase {
     TestUtils.standardTearDown()
   }
 
-//  // Uncomment this and set up whatever resources are needed for your test bundle in order to build one!
-//  func testForMigrationBundleConstruction() {
-//    do {
-//      let sencoten_kbd_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.fvSencotenKMP) as? KeyboardKeymanPackage
-//
-//      if sencoten_kbd_kmp == nil {
-//          XCTFail()
-//      }
-//
-//      try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.fv_sencoten.fullID, from: sencoten_kbd_kmp!)
-//
-//      let sencoten_lm_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.sencotenKMP) as? LexicalModelKeymanPackage
-//
-//      if sencoten_lm_kmp == nil {
-//          XCTFail()
-//      }
-//
-//      try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.sencoten.fullID,
-//          from: sencoten_lm_kmp!)
-//    } catch {
-//      XCTFail("File system commands failed.")
-//    }
-//
-//    // Set the desired version entry for your format, if different from the actual local version.
-//    // Only use if you're sure the specified version has a matching file format.
-//    Storage.active.userDefaults.lastEngineVersion = Version.packageBasedFileReorg
-//    Storage.active.userDefaults.migrationLevel = 20 // migratedForKMP
-//
-//    // Note:  you may need to manually pause at a certain (marked) point within this method
-//    // for everything to successfully write out!
-//    if let saveState = try? TestUtils.EngineStateBundler.createBundle(withName: "No-defaults early 14.0") {
-//      self.add(saveState)
-//    } else {
-//      XCTFail()
-//    }
-//  }
+  // Uncomment this and set up whatever resources are needed for your test bundle in order to build one!
+  func testForMigrationBundleConstruction() {
+    do {
+      if let sencoten_kbd_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.fvSencotenKMP) as? KeyboardKeymanPackage {
+        try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.fv_sencoten.fullID, from: sencoten_kbd_kmp)
+      } else {
+          XCTFail()
+      }
+
+      if let sencoten_lm_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.sencotenKMP) as? LexicalModelKeymanPackage {
+        try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.sencoten.fullID,
+          from: sencoten_lm_kmp)
+      } else {
+          XCTFail()
+      }
+
+
+    } catch {
+      XCTFail("File system commands failed.")
+    }
+
+    // Set the desired version entry for your format, if different from the actual local version.
+    // Only use if you're sure the specified version has a matching file format.
+    Storage.active.userDefaults.lastEngineVersion = Version.packageBasedFileReorg
+    Storage.active.userDefaults.migrationLevel = 20 // migratedForKMP
+
+    // Note:  you may need to manually pause at a certain (marked) point within this method
+    // for everything to successfully write out!
+    if let saveState = try? TestUtils.EngineStateBundler.createBundle(withName: "No-defaults early 14.0") {
+      self.add(saveState)
+    } else {
+      XCTFail()
+    }
+  }
 
   func testNoDefaultsEarly14Migration() {
     // A case where the user only has SENCOTEN installed for both keyboard & lexical model.
