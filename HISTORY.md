@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.259 beta 2021-03-12
+
+* chore(developer): add B11 ISO code for ABNT2 keyboard (#4654)
+* fix(web): better check for missing MutationObserver type (#4646)
+* fix(android/engine): Reset in-app context when selection changes (#4636)
+* chore(linux): Move signature files as well (#4653)
+
 ## 14.0.258 beta 2021-03-11
 
 * fix(windows): context help links (#4626)
