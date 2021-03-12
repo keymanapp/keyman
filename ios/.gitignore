@@ -17,6 +17,9 @@ engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman-sentr
 Keyman 2*
 Carthage
 
+# Default resource packages (which may be downloaded automatically via build-script
+engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/*.kmp
+
 # Generated offline help
 keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
 
