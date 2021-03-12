@@ -30,7 +30,7 @@ class MigrationTests: XCTestCase {
 
     sil_euro_latin_kbds.forEach {
       XCTAssertEqual($0.packageID, "sil_euro_latin")
-      XCTAssertEqual($0.version, TestUtils.Keyboards.sil_euro_latin.version)
+      XCTAssertEqual($0.version, Defaults.keyboard.version)
     }
 
     let sil_euro_latin_package = ResourceFileManager.shared.installedPackages.first(where: { $0.id == "sil_euro_latin" }) as! KeyboardKeymanPackage
@@ -52,7 +52,7 @@ class MigrationTests: XCTestCase {
 
     let userDefaults = Storage.active.userDefaults
 
-    // SIL EuroLatin should be updated to 1.9.1.  The lexical model version should be unchanged.
+    // SIL EuroLatin should be updated to the currently-bundled version.  The lexical model version should be unchanged.
 
     let defaultKbd = userDefaults.userKeyboards![0]
     XCTAssertEqual(defaultKbd.id, Defaults.keyboard.id)
