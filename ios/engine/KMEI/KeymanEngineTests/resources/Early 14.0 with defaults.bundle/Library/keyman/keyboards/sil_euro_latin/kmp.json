@@ -1,0 +1,1635 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "13.0.100.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "readme.htm"
+  },
+  "info": {
+    "version": {
+      "description": "1.9.1"
+    },
+    "name": {
+      "description": "EuroLatin (SIL)"
+    },
+    "copyright": {
+      "description": "Copyright (C) 1994-2020 SIL International"
+    }
+  },
+  "files": [
+    {
+      "name": "sil_euro_latin.js",
+      "description": "File sil_euro_latin.js"
+    },
+    {
+      "name": "sil_euro_latin.kmx",
+      "description": "Keyboard EuroLatin (SIL)"
+    },
+    {
+      "name": "readme.htm",
+      "description": "File readme.htm"
+    },
+    {
+      "name": "usage.htm",
+      "description": "File usage.htm"
+    },
+    {
+      "name": "lowercase.png",
+      "description": "File lowercase.png"
+    },
+    {
+      "name": "numbers.png",
+      "description": "File numbers.png"
+    },
+    {
+      "name": "prefix.png",
+      "description": "File prefix.png"
+    },
+    {
+      "name": "symbols.png",
+      "description": "File symbols.png"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "digraphs.png",
+      "description": "File digraphs.png"
+    },
+    {
+      "name": "currency.png",
+      "description": "File currency.png"
+    },
+    {
+      "name": "uppercase.png",
+      "description": "File uppercase.png"
+    },
+    {
+      "name": "options.htm",
+      "description": "File options.htm"
+    },
+    {
+      "name": "touch-currency.png",
+      "description": "File touch-currency.png"
+    },
+    {
+      "name": "touch-default.png",
+      "description": "File touch-default.png"
+    },
+    {
+      "name": "touch-numeric.png",
+      "description": "File touch-numeric.png"
+    },
+    {
+      "name": "touch-shift.png",
+      "description": "File touch-shift.png"
+    },
+    {
+      "name": "touch-symbol.png",
+      "description": "File touch-symbol.png"
+    },
+    {
+      "name": "DejaVuSans.ttf",
+      "description": "Font DejaVu Sans"
+    },
+    {
+      "name": "LICENSE.txt",
+      "description": "File LICENSE.txt"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "EuroLatin (SIL)",
+      "id": "sil_euro_latin",
+      "version": "1.9.1",
+      "languages": [
+        {
+          "name": "Arb\u00EBresh\u00EB Albanian",
+          "id": "aae-Latn"
+        },
+        {
+          "name": "Saint Lucian Creole French",
+          "id": "acf-Latn"
+        },
+        {
+          "name": "Achterhoeks",
+          "id": "act-Latn"
+        },
+        {
+          "name": "Afrikaans",
+          "id": "af"
+        },
+        {
+          "name": "Antigua and Barbuda Creole English",
+          "id": "aig-Latn"
+        },
+        {
+          "name": "Aleut",
+          "id": "ale-Latn"
+        },
+        {
+          "name": "Gheg Albanian",
+          "id": "aln-Latn"
+        },
+        {
+          "name": "Tosk Albanian",
+          "id": "als-Latn"
+        },
+        {
+          "name": "Aragonese",
+          "id": "an-Latn"
+        },
+        {
+          "name": "Asturian",
+          "id": "ast-Latn"
+        },
+        {
+          "name": "Bahamas Creole English",
+          "id": "bah-Latn"
+        },
+        {
+          "name": "Bavarian",
+          "id": "bar-Latn"
+        },
+        {
+          "name": "Bariai",
+          "id": "bch-Latn"
+        },
+        {
+          "name": "Bayot",
+          "id": "bda-Latn"
+        },
+        {
+          "name": "Balkan Gagauz Turkish",
+          "id": "bgx-Latn"
+        },
+        {
+          "name": "Bislama",
+          "id": "bi-Latn"
+        },
+        {
+          "name": "Balanta-Ganja",
+          "id": "bjt-Latn"
+        },
+        {
+          "name": "Balanta-Kentohe",
+          "id": "ble-Latn"
+        },
+        {
+          "name": "Bosnian",
+          "id": "bs"
+        },
+        {
+          "name": "Breton",
+          "id": "br-Latn"
+        },
+        {
+          "name": "Bassari",
+          "id": "bsc-Latn"
+        },
+        {
+          "name": "Belize Kriol English",
+          "id": "bzj-Latn"
+        },
+        {
+          "name": "Nicaragua Creole English",
+          "id": "bzk-Latn"
+        },
+        {
+          "name": "Lehar",
+          "id": "cae-Latn"
+        },
+        {
+          "name": "Catalan",
+          "id": "ca"
+        },
+        {
+          "name": "Czech",
+          "id": "cs"
+        },
+        {
+          "name": "Cimbrian",
+          "id": "cim-Latn"
+        },
+        {
+          "name": "Tayo",
+          "id": "cks-Latn"
+        },
+        {
+          "name": "Cornish",
+          "id": "kw-Latn"
+        },
+        {
+          "name": "Corsican",
+          "id": "co-Latn"
+        },
+        {
+          "name": "Wamey",
+          "id": "cou-Latn"
+        },
+        {
+          "name": "Crimean Tatar",
+          "id": "crh-Latn"
+        },
+        {
+          "name": "Seselwa Creole French",
+          "id": "crs-Latn"
+        },
+        {
+          "name": "Kashubian",
+          "id": "csb-Latn"
+        },
+        {
+          "name": "Jola-Kasa",
+          "id": "csk-Latn"
+        },
+        {
+          "name": "Kuwaataay",
+          "id": "cwt-Latn"
+        },
+        {
+          "name": "Welsh",
+          "id": "cy"
+        },
+        {
+          "name": "Danish",
+          "id": "da"
+        },
+        {
+          "name": "German",
+          "id": "de"
+        },
+        {
+          "name": "Drents",
+          "id": "drt-Latn"
+        },
+        {
+          "name": "Lower Sorbian",
+          "id": "dsb"
+        },
+        {
+          "name": "Jola-Fonyi",
+          "id": "dyo-Latn"
+        },
+        {
+          "name": "Ejamat",
+          "id": "eja-Latn"
+        },
+        {
+          "name": "Pacific Gulf Yupik",
+          "id": "ems-Latn"
+        },
+        {
+          "name": "English",
+          "id": "en"
+        },
+        {
+          "name": "Esperanto",
+          "id": "eo"
+        },
+        {
+          "name": "North Alaskan Inupiatun",
+          "id": "esi-Latn"
+        },
+        {
+          "name": "Central Siberian Yupik",
+          "id": "ess-Latn"
+        },
+        {
+          "name": "Estonian",
+          "id": "et"
+        },
+        {
+          "name": "Central Yupik",
+          "id": "esu-Latn"
+        },
+        {
+          "name": "Basque",
+          "id": "eu"
+        },
+        {
+          "name": "Extremaduran",
+          "id": "ext-Latn"
+        },
+        {
+          "name": "Faroese",
+          "id": "fo"
+        },
+        {
+          "name": "Palor",
+          "id": "fap-Latn"
+        },
+        {
+          "name": "Fala",
+          "id": "fax-Latn"
+        },
+        {
+          "name": "Maasina Fulfulde",
+          "id": "ffm-Latn"
+        },
+        {
+          "name": "Filipino",
+          "id": "fil-Latn"
+        },
+        {
+          "name": "Finnish",
+          "id": "fi"
+        },
+        {
+          "name": "Tornedalen Finnish",
+          "id": "fit-Latn"
+        },
+        {
+          "name": "Kven Finnish",
+          "id": "fkv-Latn"
+        },
+        {
+          "name": "Flaaitaal",
+          "id": "fly-Latn"
+        },
+        {
+          "name": "French",
+          "id": "fr"
+        },
+        {
+          "name": "Cajun French",
+          "id": "frc-Latn"
+        },
+        {
+          "name": "Frankish",
+          "id": "frk-Latn"
+        },
+        {
+          "name": "Arpitan",
+          "id": "frp-Latn"
+        },
+        {
+          "name": "Northern Frisian",
+          "id": "frr"
+        },
+        {
+          "name": "Eastern Frisian",
+          "id": "frs"
+        },
+        {
+          "name": "Western Frisian",
+          "id": "fy"
+        },
+        {
+          "name": "Adamawa Fulfulde",
+          "id": "fub-Latn"
+        },
+        {
+          "name": "Borgu Fulfulde",
+          "id": "fue-Latn"
+        },
+        {
+          "name": "Pular",
+          "id": "fuf-Latn"
+        },
+        {
+          "name": "Western Niger Fulfulde",
+          "id": "fuh-Latn"
+        },
+        {
+          "name": "Fulah",
+          "id": "ff-Latn"
+        },
+        {
+          "name": "Central-Eastern Niger Fulfulde",
+          "id": "fuq-Latn"
+        },
+        {
+          "name": "Friulian",
+          "id": "fur-Latn"
+        },
+        {
+          "name": "Nigerian Fulfulde",
+          "id": "fuv-Latn"
+        },
+        {
+          "name": "Gagauz",
+          "id": "gag-Latn"
+        },
+        {
+          "name": "Guadeloupean Creole French",
+          "id": "gcf-Latn"
+        },
+        {
+          "name": "Guianese Creole French",
+          "id": "gcr-Latn"
+        },
+        {
+          "name": "Colonia Tovar German",
+          "id": "gct-Latn"
+        },
+        {
+          "name": "Hutterite German",
+          "id": "geh-Latn"
+        },
+        {
+          "name": "Hiberno-Scottish Gaelic",
+          "id": "ghc-Latn"
+        },
+        {
+          "name": "Scottish Gaelic",
+          "id": "gd-Latn"
+        },
+        {
+          "name": "Irish",
+          "id": "ga"
+        },
+        {
+          "name": "Galician",
+          "id": "gl"
+        },
+        {
+          "name": "Manx",
+          "id": "gv"
+        },
+        {
+          "name": "Gronings",
+          "id": "gos-Latn"
+        },
+        {
+          "name": "Gusilay",
+          "id": "gsl-Latn"
+        },
+        {
+          "name": "Swiss German",
+          "id": "gsw"
+        },
+        {
+          "name": "Sea Island Creole English",
+          "id": "gul-Latn"
+        },
+        {
+          "name": "Guyanese Creole English",
+          "id": "gyn-Latn"
+        },
+        {
+          "name": "Haitian",
+          "id": "ht"
+        },
+        {
+          "name": "Serbo-Croatian",
+          "id": "sh-Latn"
+        },
+        {
+          "name": "Croatian",
+          "id": "hr"
+        },
+        {
+          "name": "Upper Sorbian",
+          "id": "hsb"
+        },
+        {
+          "name": "Hungarian",
+          "id": "hu"
+        },
+        {
+          "name": "Hawai'i Creole English",
+          "id": "hwc-Latn"
+        },
+        {
+          "name": "Islander Creole English",
+          "id": "icr-Latn"
+        },
+        {
+          "name": "Inuinnaqtun",
+          "id": "ikt-Latn"
+        },
+        {
+          "name": "Northwest Alaska Inupiatun",
+          "id": "esk-Latn"
+        },
+        {
+          "name": "Icelandic",
+          "id": "is"
+        },
+        {
+          "name": "Italian",
+          "id": "it"
+        },
+        {
+          "name": "Jamaican Creole English",
+          "id": "jam-Latn"
+        },
+        {
+          "name": "Jutish",
+          "id": "jut-Latn"
+        },
+        {
+          "name": "Kalaallisut",
+          "id": "kl"
+        },
+        {
+          "name": "Kabuverdianu",
+          "id": "kea-Latn"
+        },
+        {
+          "name": "Karip\u00FAna Creole French",
+          "id": "kmv-Latn"
+        },
+        {
+          "name": "Mankanya",
+          "id": "knf-Latn"
+        },
+        {
+          "name": "Kalagan",
+          "id": "kqe-Latn"
+        },
+        {
+          "name": "Karelian",
+          "id": "krl-Latn"
+        },
+        {
+          "name": "Karon",
+          "id": "krx-Latn"
+        },
+        {
+          "name": "K\u00F6lsch",
+          "id": "ksh-Latn"
+        },
+        {
+          "name": "Kituba (Democratic Republic of Congo)",
+          "id": "ktu-Latn"
+        },
+        {
+          "name": "Ladino",
+          "id": "lad-Latn"
+        },
+        {
+          "name": "Latin",
+          "id": "la"
+        },
+        {
+          "name": "Latvian",
+          "id": "lv"
+        },
+        {
+          "name": "Ligurian",
+          "id": "lij-Latn"
+        },
+        {
+          "name": "Limburgan",
+          "id": "li-Latn"
+        },
+        {
+          "name": "Lithuanian",
+          "id": "lt"
+        },
+        {
+          "name": "Liv",
+          "id": "liv-Latn"
+        },
+        {
+          "name": "Ladin",
+          "id": "lld-Latn"
+        },
+        {
+          "name": "Lombard",
+          "id": "lmo-Latn"
+        },
+        {
+          "name": "Louisiana Creole",
+          "id": "lou-Latn"
+        },
+        {
+          "name": "Luxembourgish",
+          "id": "lb"
+        },
+        {
+          "name": "Ludian",
+          "id": "lud-Latn"
+        },
+        {
+          "name": "Hassaniyya",
+          "id": "mey-Latn"
+        },
+        {
+          "name": "Morisyen",
+          "id": "mfe-Latn"
+        },
+        {
+          "name": "Mandjak",
+          "id": "mfv-Latn"
+        },
+        {
+          "name": "Kituba (Congo)",
+          "id": "mkw-Latn"
+        },
+        {
+          "name": "Maltese",
+          "id": "mt"
+        },
+        {
+          "name": "Mirandese",
+          "id": "mwl-Latn"
+        },
+        {
+          "name": "Neapolitan",
+          "id": "nap-Latn"
+        },
+        {
+          "name": "North Ndebele",
+          "id": "nd"
+        },
+        {
+          "name": "Low German",
+          "id": "nds"
+        },
+        {
+          "name": "Ndut",
+          "id": "ndv-Latn"
+        },
+        {
+          "name": "Dutch",
+          "id": "nl"
+        },
+        {
+          "name": "Norwegian",
+          "id": "no"
+        },
+        {
+          "name": "Occitan (post 1500)",
+          "id": "oc-Latn"
+        },
+        {
+          "name": "Livvi",
+          "id": "olo-Latn"
+        },
+        {
+          "name": "Oorlams",
+          "id": "oor-Latn"
+        },
+        {
+          "name": "Papiamento",
+          "id": "pap-Latn"
+        },
+        {
+          "name": "Papel",
+          "id": "pbo-Latn"
+        },
+        {
+          "name": "Badyara",
+          "id": "pbp-Latn"
+        },
+        {
+          "name": "Picard",
+          "id": "pcd-Latn"
+        },
+        {
+          "name": "Pennsylvania German",
+          "id": "pdc-Latn"
+        },
+        {
+          "name": "Plautdietsch",
+          "id": "pdt-Latn"
+        },
+        {
+          "name": "Pfaelzisch",
+          "id": "pfl-Latn"
+        },
+        {
+          "name": "Pijin",
+          "id": "pis-Latn"
+        },
+        {
+          "name": "Piemontese",
+          "id": "pms-Latn"
+        },
+        {
+          "name": "Polish",
+          "id": "pl"
+        },
+        {
+          "name": "Portuguese",
+          "id": "pt"
+        },
+        {
+          "name": "Prussian",
+          "id": "prg-Latn"
+        },
+        {
+          "name": "Huallaga Hu\u00E1nuco Quechua",
+          "id": "qub-Latn"
+        },
+        {
+          "name": "Calder\u00F3n Highland Quichua",
+          "id": "qud-Latn"
+        },
+        {
+          "name": "Quechua",
+          "id": "qu"
+        },
+        {
+          "name": "Lambayeque Quechua",
+          "id": "quf-Latn"
+        },
+        {
+          "name": "Chimborazo Highland Quichua",
+          "id": "qug-Latn"
+        },
+        {
+          "name": "South Bolivian Quechua",
+          "id": "quh-Latn"
+        },
+        {
+          "name": "Chachapoyas Quechua",
+          "id": "quk-Latn"
+        },
+        {
+          "name": "North Bolivian Quechua",
+          "id": "qul-Latn"
+        },
+        {
+          "name": "Southern Pastaza Quechua",
+          "id": "qup-Latn"
+        },
+        {
+          "name": "Yanahuanca Pasco Quechua",
+          "id": "qur-Latn"
+        },
+        {
+          "name": "Santiago del Estero Quichua",
+          "id": "qus-Latn"
+        },
+        {
+          "name": "Tena Lowland Quichua",
+          "id": "quw-Latn"
+        },
+        {
+          "name": "Yauyos Quechua",
+          "id": "qux-Latn"
+        },
+        {
+          "name": "Ayacucho Quechua",
+          "id": "quy-Latn"
+        },
+        {
+          "name": "Ambo-Pasco Quechua",
+          "id": "qva-Latn"
+        },
+        {
+          "name": "Cajamarca Quechua",
+          "id": "qvc-Latn"
+        },
+        {
+          "name": "Eastern Apur\u00EDmac Quechua",
+          "id": "qve-Latn"
+        },
+        {
+          "name": "Huamal\u00EDes-Dos de Mayo Hu\u00E1nuco Quechua",
+          "id": "qvh-Latn"
+        },
+        {
+          "name": "Imbabura Highland Quichua",
+          "id": "qvi-Latn"
+        },
+        {
+          "name": "Loja Highland Quichua",
+          "id": "qvj-Latn"
+        },
+        {
+          "name": "Cajatambo North Lima Quechua",
+          "id": "qvl-Latn"
+        },
+        {
+          "name": "Margos-Yarowilca-Lauricocha Quechua",
+          "id": "qvm-Latn"
+        },
+        {
+          "name": "North Jun\u00EDn Quechua",
+          "id": "qvn-Latn"
+        },
+        {
+          "name": "Napo Lowland Quechua",
+          "id": "qvo-Latn"
+        },
+        {
+          "name": "Pacaraos Quechua",
+          "id": "qvp-Latn"
+        },
+        {
+          "name": "San Mart\u00EDn Quechua",
+          "id": "qvs-Latn"
+        },
+        {
+          "name": "Huaylla Wanca Quechua",
+          "id": "qvw-Latn"
+        },
+        {
+          "name": "Northern Pastaza Quichua",
+          "id": "qvz-Latn"
+        },
+        {
+          "name": "Corongo Ancash Quechua",
+          "id": "qwa-Latn"
+        },
+        {
+          "name": "Classical Quechua",
+          "id": "qwc-Latn"
+        },
+        {
+          "name": "Huaylas Ancash Quechua",
+          "id": "qwh-Latn"
+        },
+        {
+          "name": "Sihuas Ancash Quechua",
+          "id": "qws-Latn"
+        },
+        {
+          "name": "Chiqui\u00E1n Ancash Quechua",
+          "id": "qxa-Latn"
+        },
+        {
+          "name": "Chincha Quechua",
+          "id": "qxc-Latn"
+        },
+        {
+          "name": "Panao Hu\u00E1nuco Quechua",
+          "id": "qxh-Latn"
+        },
+        {
+          "name": "Salasaca Highland Quichua",
+          "id": "qxl-Latn"
+        },
+        {
+          "name": "Northern Conchucos Ancash Quechua",
+          "id": "qxn-Latn"
+        },
+        {
+          "name": "Southern Conchucos Ancash Quechua",
+          "id": "qxo-Latn"
+        },
+        {
+          "name": "Puno Quechua",
+          "id": "qxp-Latn"
+        },
+        {
+          "name": "Ca\u00F1ar Highland Quichua",
+          "id": "qxr-Latn"
+        },
+        {
+          "name": "Santa Ana de Tusi Pasco Quechua",
+          "id": "qxt-Latn"
+        },
+        {
+          "name": "Arequipa-La Uni\u00F3n Quechua",
+          "id": "qxu-Latn"
+        },
+        {
+          "name": "Jauja Wanca Quechua",
+          "id": "qxw-Latn"
+        },
+        {
+          "name": "R\u00E9union Creole French",
+          "id": "rcf-Latn"
+        },
+        {
+          "name": "Carpathian Romani",
+          "id": "rmc-Latn"
+        },
+        {
+          "name": "Kalo Finnish Romani",
+          "id": "rmf-Latn"
+        },
+        {
+          "name": "Balkan Romani",
+          "id": "rmn-Latn"
+        },
+        {
+          "name": "Sinte Romani",
+          "id": "rmo-Latn"
+        },
+        {
+          "name": "Welsh Romani",
+          "id": "rmw-Latn"
+        },
+        {
+          "name": "Romansh",
+          "id": "rm"
+        },
+        {
+          "name": "Vlax Romani",
+          "id": "rmy-Latn"
+        },
+        {
+          "name": "Romanian",
+          "id": "ro"
+        },
+        {
+          "name": "Kriol",
+          "id": "rop-Latn"
+        },
+        {
+          "name": "Macedo-Romanian",
+          "id": "rup-Latn"
+        },
+        {
+          "name": "Megleno Romanian",
+          "id": "ruq-Latn"
+        },
+        {
+          "name": "Sango",
+          "id": "sg"
+        },
+        {
+          "name": "Saafi-Saafi",
+          "id": "sav-Latn"
+        },
+        {
+          "name": "Sicilian",
+          "id": "scn-Latn"
+        },
+        {
+          "name": "Scots",
+          "id": "sco-Latn"
+        },
+        {
+          "name": "Sassarese Sardinian",
+          "id": "sdc-Latn"
+        },
+        {
+          "name": "Gallurese Sardinian",
+          "id": "sdn-Latn"
+        },
+        {
+          "name": "Ume Sami",
+          "id": "sju-Latn"
+        },
+        {
+          "name": "Lower Silesian",
+          "id": "sli-Latn"
+        },
+        {
+          "name": "Slovak",
+          "id": "sk"
+        },
+        {
+          "name": "Slovenian",
+          "id": "sl"
+        },
+        {
+          "name": "Southern Sami",
+          "id": "sma-Latn"
+        },
+        {
+          "name": "Northern Sami",
+          "id": "se-Latn"
+        },
+        {
+          "name": "Lule Sami",
+          "id": "smj-Latn"
+        },
+        {
+          "name": "Inari Sami",
+          "id": "smn-Latn"
+        },
+        {
+          "name": "Skolt Sami",
+          "id": "sms-Latn"
+        },
+        {
+          "name": "Noon",
+          "id": "snf-Latn"
+        },
+        {
+          "name": "Spanish",
+          "id": "es"
+        },
+        {
+          "name": "Loreto-Ucayali Spanish",
+          "id": "spq-Latn"
+        },
+        {
+          "name": "Albanian",
+          "id": "sq"
+        },
+        {
+          "name": "Saramaccan",
+          "id": "srm-Latn"
+        },
+        {
+          "name": "Sranan Tongo",
+          "id": "srn-Latn"
+        },
+        {
+          "name": "Campidanese Sardinian",
+          "id": "sro-Latn"
+        },
+        {
+          "name": "Serbian",
+          "id": "sr-Latn"
+        },
+        {
+          "name": "Serer",
+          "id": "srr-Latn"
+        },
+        {
+          "name": "Swati",
+          "id": "ss"
+        },
+        {
+          "name": "Saterfriesisch",
+          "id": "stq-Latn"
+        },
+        {
+          "name": "Vincentian Creole English",
+          "id": "svc-Latn"
+        },
+        {
+          "name": "Swedish",
+          "id": "sv"
+        },
+        {
+          "name": "Swabian",
+          "id": "swg-Latn"
+        },
+        {
+          "name": "Swahili (individual language)",
+          "id": "swh-Latn"
+        },
+        {
+          "name": "Upper Saxon",
+          "id": "sxu-Latn"
+        },
+        {
+          "name": "Silesian",
+          "id": "szl-Latn"
+        },
+        {
+          "name": "Torres Strait Creole",
+          "id": "tcs-Latn"
+        },
+        {
+          "name": "Tagalog",
+          "id": "tl"
+        },
+        {
+          "name": "Tok Pisin",
+          "id": "tpi"
+        },
+        {
+          "name": "Turkmen",
+          "id": "tk-Latn"
+        },
+        {
+          "name": "Turkish",
+          "id": "tr"
+        },
+        {
+          "name": "Twents",
+          "id": "twd-Latn"
+        },
+        {
+          "name": "Venetian",
+          "id": "vec-Latn"
+        },
+        {
+          "name": "Veps",
+          "id": "vep-Latn"
+        },
+        {
+          "name": "Virgin Islands Creole English",
+          "id": "vic-Latn"
+        },
+        {
+          "name": "Vlaams",
+          "id": "vls-Latn"
+        },
+        {
+          "name": "Mainfr\u00E4nkisch",
+          "id": "vmf-Latn"
+        },
+        {
+          "name": "Votic",
+          "id": "vot-Latn"
+        },
+        {
+          "name": "Walser",
+          "id": "wae-Latn"
+        },
+        {
+          "name": "Westphalien",
+          "id": "wep-Latn"
+        },
+        {
+          "name": "Walloon",
+          "id": "wa-Latn"
+        },
+        {
+          "name": "Gambian Wolof",
+          "id": "wof-Latn"
+        },
+        {
+          "name": "Wolof",
+          "id": "wo-Latn"
+        },
+        {
+          "name": "Wymysorys",
+          "id": "wym-Latn"
+        },
+        {
+          "name": "Xav\u00E1nte",
+          "id": "xav-Latn"
+        },
+        {
+          "name": "Xhosa",
+          "id": "xh"
+        },
+        {
+          "name": "Yoruba",
+          "id": "yo-Latn"
+        },
+        {
+          "name": "Sierra de Ju\u00E1rez Zapotec",
+          "id": "zaa-Latn"
+        },
+        {
+          "name": "Western Tlacolula Valley Zapotec",
+          "id": "zab-Latn"
+        },
+        {
+          "name": "Ocotl\u00E1n Zapotec",
+          "id": "zac-Latn"
+        },
+        {
+          "name": "Cajonos Zapotec",
+          "id": "zad-Latn"
+        },
+        {
+          "name": "Yareni Zapotec",
+          "id": "zae-Latn"
+        },
+        {
+          "name": "Ayoquesco Zapotec",
+          "id": "zaf-Latn"
+        },
+        {
+          "name": "Miahuatl\u00E1n Zapotec",
+          "id": "zam-Latn"
+        },
+        {
+          "name": "Ozolotepec Zapotec",
+          "id": "zao-Latn"
+        },
+        {
+          "name": "Isthmus Zapotec",
+          "id": "zai-Latn"
+        },
+        {
+          "name": "Alo\u00E1pam Zapotec",
+          "id": "zaq-Latn"
+        },
+        {
+          "name": "Rinc\u00F3n Zapotec",
+          "id": "zar-Latn"
+        },
+        {
+          "name": "Santo Domingo Albarradas Zapotec",
+          "id": "zas-Latn"
+        },
+        {
+          "name": "Tabaa Zapotec",
+          "id": "zat-Latn"
+        },
+        {
+          "name": "Yatzachi Zapotec",
+          "id": "zav-Latn"
+        },
+        {
+          "name": "Mitla Zapotec",
+          "id": "zaw-Latn"
+        },
+        {
+          "name": "Xadani Zapotec",
+          "id": "zax-Latn"
+        },
+        {
+          "name": "Coatecas Altas Zapotec",
+          "id": "zca-Latn"
+        },
+        {
+          "name": "Central Hongshuihe Zhuang",
+          "id": "zch-Hani"
+        },
+        {
+          "name": "Zeeuws",
+          "id": "zea-Latn"
+        },
+        {
+          "name": "Eastern Hongshuihe Zhuang",
+          "id": "zeh-Hani"
+        },
+        {
+          "name": "Guibei Zhuang",
+          "id": "zgb-Hani"
+        },
+        {
+          "name": "Minz Zhuang",
+          "id": "zgm-Hani"
+        },
+        {
+          "name": "Guibian Zhuang",
+          "id": "zgn-Hani"
+        },
+        {
+          "name": "Yongbei Zhuang",
+          "id": "zyb-Latn"
+        },
+        {
+          "name": "Dai Zhuang",
+          "id": "zhd-Latn"
+        },
+        {
+          "name": "Nong Zhuang",
+          "id": "zhn-Latn"
+        },
+        {
+          "name": "Liujiang Zhuang",
+          "id": "zlj-Latn"
+        },
+        {
+          "name": "Lianshan Zhuang",
+          "id": "zln-Hani"
+        },
+        {
+          "name": "Liuqian Zhuang",
+          "id": "zlq-Hani"
+        },
+        {
+          "name": "Asunci\u00F3n Mixtepec Zapotec",
+          "id": "zoo-Latn"
+        },
+        {
+          "name": "Lachiguiri Zapotec",
+          "id": "zpa-Latn"
+        },
+        {
+          "name": "Yautepec Zapotec",
+          "id": "zpb-Latn"
+        },
+        {
+          "name": "Choapan Zapotec",
+          "id": "zpc-Latn"
+        },
+        {
+          "name": "Southeastern Ixtl\u00E1n Zapotec",
+          "id": "zpd-Latn"
+        },
+        {
+          "name": "Petapa Zapotec",
+          "id": "zpe-Latn"
+        },
+        {
+          "name": "San Pedro Quiatoni Zapotec",
+          "id": "zpf-Latn"
+        },
+        {
+          "name": "Guevea De Humboldt Zapotec",
+          "id": "zpg-Latn"
+        },
+        {
+          "name": "Totomachapan Zapotec",
+          "id": "zph-Latn"
+        },
+        {
+          "name": "Santa Mar\u00EDa Quiegolani Zapotec",
+          "id": "zpi-Latn"
+        },
+        {
+          "name": "Quiavicuzas Zapotec",
+          "id": "zpj-Latn"
+        },
+        {
+          "name": "Tlacolulita Zapotec",
+          "id": "zpk-Latn"
+        },
+        {
+          "name": "Lachix\u00EDo Zapotec",
+          "id": "zpl-Latn"
+        },
+        {
+          "name": "Mixtepec Zapotec",
+          "id": "zpm-Latn"
+        },
+        {
+          "name": "Santa In\u00E9s Yatzechi Zapotec",
+          "id": "zpn-Latn"
+        },
+        {
+          "name": "Amatl\u00E1n Zapotec",
+          "id": "zpo-Latn"
+        },
+        {
+          "name": "El Alto Zapotec",
+          "id": "zpp-Latn"
+        },
+        {
+          "name": "Zoogocho Zapotec",
+          "id": "zpq-Latn"
+        },
+        {
+          "name": "Santiago Xanica Zapotec",
+          "id": "zpr-Latn"
+        },
+        {
+          "name": "Coatl\u00E1n Zapotec",
+          "id": "zps-Latn"
+        },
+        {
+          "name": "San Vicente Coatl\u00E1n Zapotec",
+          "id": "zpt-Latn"
+        },
+        {
+          "name": "Yal\u00E1lag Zapotec",
+          "id": "zpu-Latn"
+        },
+        {
+          "name": "Chichicapan Zapotec",
+          "id": "zpv-Latn"
+        },
+        {
+          "name": "Zaniza Zapotec",
+          "id": "zpw-Latn"
+        },
+        {
+          "name": "San Baltazar Loxicha Zapotec",
+          "id": "zpx-Latn"
+        },
+        {
+          "name": "Mazaltepec Zapotec",
+          "id": "zpy-Latn"
+        },
+        {
+          "name": "Texmelucan Zapotec",
+          "id": "zpz-Latn"
+        },
+        {
+          "name": "Qiubei Zhuang",
+          "id": "zqe-Latn"
+        },
+        {
+          "name": "Southern Rincon Zapotec",
+          "id": "zsr-Latn"
+        },
+        {
+          "name": "Elotepec Zapotec",
+          "id": "zte-Latn"
+        },
+        {
+          "name": "Xanagu\u00EDa Zapotec",
+          "id": "ztg-Latn"
+        },
+        {
+          "name": "Lapagu\u00EDa-Guivini Zapotec",
+          "id": "ztl-Latn"
+        },
+        {
+          "name": "San Agust\u00EDn Mixtepec Zapotec",
+          "id": "ztm-Latn"
+        },
+        {
+          "name": "Santa Catarina Albarradas Zapotec",
+          "id": "ztn-Latn"
+        },
+        {
+          "name": "Loxicha Zapotec",
+          "id": "ztp-Latn"
+        },
+        {
+          "name": "Quioquitani-Quier\u00ED Zapotec",
+          "id": "ztq-Latn"
+        },
+        {
+          "name": "Tilquiapan Zapotec",
+          "id": "zts-Latn"
+        },
+        {
+          "name": "Tejalapan Zapotec",
+          "id": "ztt-Latn"
+        },
+        {
+          "name": "G\u00FCil\u00E1 Zapotec",
+          "id": "ztu-Latn"
+        },
+        {
+          "name": "Zaachila Zapotec",
+          "id": "ztx-Latn"
+        },
+        {
+          "name": "Yatee Zapotec",
+          "id": "zty-Latn"
+        },
+        {
+          "name": "Zulu",
+          "id": "zu"
+        },
+        {
+          "name": "Yang Zhuang",
+          "id": "zyg-Nshu"
+        },
+        {
+          "name": "Youjiang Zhuang",
+          "id": "zyj-Latn"
+        },
+        {
+          "name": "Yongnan Zhuang",
+          "id": "zyn-Hani"
+        },
+        {
+          "name": "Guarani",
+          "id": "gn"
+        },
+        {
+          "name": "Chirip\u00E1",
+          "id": "nhd-Latn"
+        },
+        {
+          "name": "Eastern Bolivian Guaran\u00ED",
+          "id": "gui-Latn"
+        },
+        {
+          "name": "Mby\u00E1 Guaran\u00ED",
+          "id": "gun-Latn"
+        },
+        {
+          "name": "Western Bolivian Guaran\u00ED",
+          "id": "gnw-Latn"
+        },
+        {
+          "name": "Central Nahuatl",
+          "id": "nhn-Latn"
+        },
+        {
+          "name": "Central Huasteca Nahuatl",
+          "id": "nch-Latn"
+        },
+        {
+          "name": "Central Puebla Nahuatl",
+          "id": "ncx-Latn"
+        },
+        {
+          "name": "Classical Nahuatl",
+          "id": "nci-Latn"
+        },
+        {
+          "name": "Coatepec Nahuatl",
+          "id": "naz-Latn"
+        },
+        {
+          "name": "Eastern Huasteca Nahuatl",
+          "id": "nhe-Latn"
+        },
+        {
+          "name": "Guerrero Nahuatl",
+          "id": "ngu-Latn"
+        },
+        {
+          "name": "Highland Puebla Nahuatl",
+          "id": "azz-Latn"
+        },
+        {
+          "name": "Huaxcaleca Nahuatl",
+          "id": "nhq-Latn"
+        },
+        {
+          "name": "Isthmus-Cosoleacaque Nahuatl",
+          "id": "nhk-Latn"
+        },
+        {
+          "name": "Isthmus-Mecayapan Nahuatl",
+          "id": "nhx-Latn"
+        },
+        {
+          "name": "Isthmus-Pajapan Nahuatl",
+          "id": "nhp-Latn"
+        },
+        {
+          "name": "Michoac\u00E1n Nahuatl",
+          "id": "ncl-Latn"
+        },
+        {
+          "name": "Morelos Nahuatl",
+          "id": "nhm-Latn"
+        },
+        {
+          "name": "Northern Oaxaca Nahuatl",
+          "id": "nhy-Latn"
+        },
+        {
+          "name": "Northern Puebla Nahuatl",
+          "id": "ncj-Latn"
+        },
+        {
+          "name": "Ometepec Nahuatl",
+          "id": "nht-Latn"
+        },
+        {
+          "name": "Orizaba Nahuatl",
+          "id": "nlv-Latn"
+        },
+        {
+          "name": "Santa Mar\u00EDa La Alta Nahuatl",
+          "id": "nhz-Latn"
+        },
+        {
+          "name": "Sierra Negra Nahuatl",
+          "id": "nsu-Latn"
+        },
+        {
+          "name": "Southeastern Puebla Nahuatl",
+          "id": "npl-Latn"
+        },
+        {
+          "name": "Temascaltepec Nahuatl",
+          "id": "nhv-Latn"
+        },
+        {
+          "name": "Tetelcingo Nahuatl",
+          "id": "nhg-Latn"
+        },
+        {
+          "name": "Tlamacazapa Nahuatl",
+          "id": "nuz-Latn"
+        },
+        {
+          "name": "Western Huasteca Nahuatl",
+          "id": "nhw-Latn"
+        },
+        {
+          "name": "Zacatl\u00E1n-Ahuacatl\u00E1n-Tepetzintla Nahuatl",
+          "id": "nhi-Latn"
+        },
+        {
+          "name": "Cheyenne (Latin)",
+          "id": "chy-Latn"
+        },
+        {
+          "name": "Eastern Durango Nahuatl (Latin)",
+          "id": "azd-Latn"
+        },
+        {
+          "name": "Western Durango Nahuatl (Latin)",
+          "id": "azn-Latn"
+        },
+        {
+          "name": "Emilian (Latin)",
+          "id": "egl-Latn"
+        },
+        {
+          "name": "Pulaar (Latin)",
+          "id": "fuc-Latn"
+        },
+        {
+          "name": "West Central Oromo (Latin)",
+          "id": "gaz-Latn"
+        },
+        {
+          "name": "Paraguayan Guaran\u00ED (Latin)",
+          "id": "gug-Latn"
+        },
+        {
+          "name": "Inupiaq (Latin)",
+          "id": "ik-Latn"
+        },
+        {
+          "name": "Cusco Quechua (Latin)",
+          "id": "quz-Latn"
+        },
+        {
+          "name": "Romagnol (Latin)",
+          "id": "rgn-Latn"
+        },
+        {
+          "name": "Romany (Latin)",
+          "id": "rom-Latn"
+        },
+        {
+          "name": "Stellingwerfs (Latin)",
+          "id": "stl-Latn"
+        },
+        {
+          "name": "Zhuang (Latin)",
+          "id": "za-Latn"
+        },
+        {
+          "name": "Zapotec (Latin)",
+          "id": "zap-Latn"
+        }
+      ]
+    }
+  ]
+}

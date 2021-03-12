@@ -29,6 +29,8 @@ extension TestUtils {
     static let adhoc_12 = TestUtils.findSubBundle(forResource: "12.0 Ad-hoc Migration", ofType: ".bundle")
     static let simple_10 = TestUtils.findSubBundle(forResource: "Simple 10.0 Migration", ofType: ".bundle")
     static let noDefault_10 = TestUtils.findSubBundle(forResource: "No-defaults 10.0 Migration", ofType: ".bundle")
+    static let noDefault_14 = TestUtils.findSubBundle(forResource: "No-defaults early 14.0", ofType: "bundle")
+    static let simple_14 = TestUtils.findSubBundle(forResource: "Early 14.0 with defaults", ofType: "bundle")
 
     // The default keyboard in version 10.0.
     static let european2_font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
