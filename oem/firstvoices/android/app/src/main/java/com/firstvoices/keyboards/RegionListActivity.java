@@ -1,41 +1,38 @@
 package com.firstvoices.keyboards;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 public final class RegionListActivity extends AppCompatActivity {
 
-	@Override
+    @Override
     public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-		final Context context = this;
-        final FVShared.FVRegionList regionList = FVShared.getInstance().getRegionList();
+        super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        final Context context = this;
 
-		// Setup layout
-
-		//requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		setContentView(R.layout.activity_list_layout);
+        // Setup layout
+        setContentView(R.layout.activity_list_layout);
         final Toolbar toolbar = findViewById(R.id.list_toolbar);
-        toolbar.setTitle(R.string.regions);
+        final TextView textView = findViewById(R.id.bar_title);
+        textView.setText(R.string.regions);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        final FVShared.FVRegionList regionList = FVShared.getInstance().getRegionList();
         FVRegionListAdapter listAdapter = new FVRegionListAdapter(context, regionList);
         listAdapter.listFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf");
         final ListView listView = findViewById(R.id.listView);
@@ -60,7 +57,7 @@ public final class RegionListActivity extends AppCompatActivity {
             }
         });
         listView.setSelectionFromTop(getIntent().getIntExtra("listPosition", 0), getIntent().getIntExtra("offsetY", 0));
-	}
+    }
 
     @Override
     public boolean onSupportNavigateUp() {
