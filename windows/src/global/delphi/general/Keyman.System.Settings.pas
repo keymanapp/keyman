@@ -415,11 +415,11 @@ const
       Name: SRegValue_Flag_UseAutoStartTask;
       RootKey: HKCU;
       Key: SRegKey_KeymanEngineDebug_CU;
-      Description: 'Set to 0 to disable the autostart task that starts '+
+      Description: 'Set to 1 to enable the autostart task that starts '+
                    'Keyman when a Keyman TIP is selected. After making this '+
                    'change, you will need to open Keyman Configuration once '+
                    'for it to take effect.';
-      DefaultInt: 1;
+      DefaultInt: 0;
       ValueType: kstInteger
     ),
 

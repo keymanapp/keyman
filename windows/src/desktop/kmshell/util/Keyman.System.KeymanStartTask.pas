@@ -246,7 +246,7 @@ end;
 
 class procedure TKeymanStartTask.RecreateTask;
 begin
-  if not Reg_GetDebugFlag(SRegValue_Flag_UseAutoStartTask, True) then
+  if not Reg_GetDebugFlag(SRegValue_Flag_UseAutoStartTask, False) then
     Exit;
 
   CreateTask;
