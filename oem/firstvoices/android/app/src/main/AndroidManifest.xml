@@ -60,7 +60,7 @@
             android:name="com.firstvoices.keyboards.SetupActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat.Light.Dialog" >
+            android:theme="@style/AppTheme.Light.Dialog" >
         </activity>
     </application>
 </manifest>
