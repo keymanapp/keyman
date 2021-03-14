@@ -156,6 +156,14 @@
         />
       </Component>
 
+      <Component Guid="*">
+        <File Id="kmrefresh.x86.exe" KeyPath="yes" />
+      </Component>
+
+      <Component Guid="*">
+        <File Id="kmrefresh.x64.exe" KeyPath="yes" />
+      </Component>
+
       <Component Guid="{FA89BC70-11F3-4DAF-A0B4-6EBA64FC6C5C}" Id="tsysinfo.xslts">
         <File Id="base.xslt" Name='base.xslt'                 Source='..\..\engine\tsysinfo\base.xslt' />
         <File Id="si_browsers.xslt" Name='si_browsers.xslt'   Source='..\..\engine\tsysinfo\si_browsers.xslt' />
