@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/list_item" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/list_item">
     
     <LinearLayout
         android:background="@android:color/transparent"
@@ -41,6 +42,7 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
         android:src="@drawable/ic_action_next"
+        app:tint="@android:color/black"
         android:contentDescription="@string/image_view" />
     
 </RelativeLayout>
