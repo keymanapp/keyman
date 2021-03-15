@@ -1,0 +1,52 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "12.0.1500.0",
+    "fileVersion": "12.0"
+  },
+  "options": {
+    "followKeyboardVersion": false
+  },
+  "info": {
+    "author": {
+      "description": "Eddie Antonio Santos",
+      "url": "mailto:easantos@ualberta.ca"
+    },
+    "copyright": {
+      "description": "© 2019 National Research Council Canada"
+    },
+    "name": {
+      "description": "English language model mined from MTNT"
+    },
+    "version": {
+      "description": "0.1.4"
+    }
+  },
+  "files": [
+    {
+      "name": "nrc.en.mtnt.model.js",
+      "description": "Lexical model nrc.en.mtnt.model.js",
+      "copyLocation": "0",
+      "fileType": ".model.js"
+    }
+  ],
+  "lexicalModels": [
+    {
+      "name": "English dictionary (MTNT)",
+      "id": "nrc.en.mtnt",
+      "languages": [
+        {
+          "name": "English",
+          "id": "en"
+        },
+        {
+          "name": "English (US)",
+          "id": "en-us"
+        },
+        {
+          "name": "English (Canada)",
+          "id": "en-ca"
+        }
+      ]
+    }
+  ]
+}
