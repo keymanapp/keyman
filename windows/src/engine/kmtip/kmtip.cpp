@@ -31,6 +31,7 @@
 
 #include "pch.h"
 #include "kmtip.h"
+#include "registryw.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -85,6 +86,9 @@ CKMTipTextService::CKMTipTextService()
     _PreservedKeys = NULL;
     _cPreservedKeyCount = 0;
     _dwDeepIntegration = 0;
+
+    RegistryReadOnlyW reg(HKEY_CURRENT_USER);
+    _tryAndStartKeyman = reg.OpenKeyReadOnly(REGSZ_KeymanEngineDebug_CU) && reg.ValueExists(REGSZ_Flag_UseAutoStartTask) && reg.ReadInteger(REGSZ_Flag_UseAutoStartTask) != 0;
 
     _cRef = 1;
     ThreadThis = this;

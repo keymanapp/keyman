@@ -133,6 +133,8 @@ private:
 
     DWORD _dwDeepIntegration;   // I4375
 
+    BOOL _tryAndStartKeyman;
+
     LONG _cRef;     // COM ref count
 };
 
