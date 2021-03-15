@@ -11,11 +11,6 @@ import io.sentry.SentryLevel;
 public final class KMLog {
   private static final String TAG = "KMLog";
 
-  // Since we don't have access to KMManager.isTestMode()
-  private static boolean isTestMode() {
-    return Boolean.parseBoolean(System.getProperty("kmeaTestMode"));
-  }
-
   /**
    * Utility to log error and send to Sentry
    * @param tag String of the caller
@@ -25,7 +20,7 @@ public final class KMLog {
     if (msg != null && !msg.isEmpty()) {
       Log.e(tag, msg);
 
-      if (Sentry.isEnabled() && !isTestMode()) {
+      if (Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.ERROR);
       }
     }
@@ -44,7 +39,7 @@ public final class KMLog {
       Log.e(tag, e.getMessage(), e);
     }
 
-    if (Sentry.isEnabled() && !isTestMode()) {
+    if (Sentry.isEnabled()) {
       if (msg != null && !msg.isEmpty()) {
         Sentry.addBreadcrumb(msg);
       }
@@ -62,7 +57,7 @@ public final class KMLog {
    */
   public static void LogExceptionWithData(String tag, String msg,
                                           String objName, Object obj, Throwable e) {
-    if (obj != null && Sentry.isEnabled() && !isTestMode()) {
+    if (obj != null && Sentry.isEnabled()) {
       String objStr = null;
       try {
         objStr = obj.toString();

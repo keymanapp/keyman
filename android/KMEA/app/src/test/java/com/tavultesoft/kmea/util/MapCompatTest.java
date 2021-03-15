@@ -1,20 +1,16 @@
 package com.tavultesoft.kmea.util;
 
-import org.checkerframework.common.value.qual.StaticallyExecutable;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowLog;
 
-import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
-import com.tavultesoft.kmea.util.MapCompat;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.N;
@@ -30,15 +26,15 @@ public class MapCompatTest {
     pets.put("cat", "Mittens");
   }
 
-  @Test
-  public void test_getOrDefault_nullMapReturnsDefault() {
-    Assert.assertEquals("Peanut", MapCompat.getOrDefault(null, "elephant", "Peanut"));
+  @Rule
+  public ExpectedException exceptionRule = ExpectedException.none();
 
-    // Check shadow log error msg
-    List<ShadowLog.LogItem> logs = ShadowLog.getLogsForTag("MapCompat");
-    Assert.assertEquals(1, logs.size());
-    Assert.assertEquals("MapCompat", logs.get(0).tag);
-    Assert.assertEquals("HashMap is null. Returning Peanut", logs.get(0).msg);
+  @Test
+  public void test_getOrDefault_nullMapThrows() throws NullPointerException {
+    exceptionRule.expect(NullPointerException.class);
+    exceptionRule.expectMessage("MapCompat is null");
+
+    Assert.assertEquals("Peanut", MapCompat.getOrDefault(null, "elephant", "Peanut"));
   }
 
   @Config(sdk=LOLLIPOP)
