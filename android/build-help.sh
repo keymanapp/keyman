@@ -72,11 +72,7 @@ displayInfo "" \
 cd $KEYMAN_ROOT/android/help
 
 MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
-if [[ "${OSTYPE}" == "darwin"* ]]; then
-  MD=`find . -name "*.md"`
-else
-  MD=`find -name "*.md"`
-fi
+MD=`find . -name "*.md"`
 DESTHTM="$THIS_DIR/KMAPro/kMAPro/src/main/assets/info"
 
 if $DO_HTM; then
