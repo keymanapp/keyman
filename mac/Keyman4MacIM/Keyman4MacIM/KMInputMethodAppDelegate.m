@@ -1106,14 +1106,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (void)windowWillClose:(NSNotification *)notification {
     NSWindow* window = notification.object;
-    if (_downloadKBWindow != nil && window == _downloadKBWindow.window) {
-        _downloadKBWindow = nil;
-    } else if(_kbHelpWindow != nil && window == _kbHelpWindow.window) {
-        _kbHelpWindow = nil;
-    } else if(_infoWindow != nil && window == _infoWindow.window) {
-        _infoWindow = nil;
-    } else if(_configWindow != nil && window == _configWindow.window) {
-        _configWindow = nil;
+    if (window == _downloadKBWindow.window) {
+        _downloadKBWindow.window = nil;
+    } else if(window == _kbHelpWindow.window) {
+        _kbHelpWindow.window = nil;
+    } else if(window == _infoWindow.window) {
+        _infoWindow.window = nil;
+    } else if(window == _configWindow.window) {
+        _configWindow.window = nil;
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:window];
 }
