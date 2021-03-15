@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=keymanmc keyman32 kmcomapi keyman tsysinfox64 tsysinfo keyman64 keymanx64 mcompile inst kmtip
+TARGETS=keymanmc keyman32 kmcomapi keyman tsysinfox64 tsysinfo keyman64 keymanx64 mcompile inst kmtip kmrefresh
 MANIFESTS=keyman tsysinfo tsysinfox64 keymanx64 mcompile
 CLEANS=clean-engine
 
@@ -23,18 +23,6 @@ kmcomapi:
 keymanmc:
     cd $(ROOT)\src\engine\keymanmc
     $(MAKE) $(TARGET)
-
-keyman32-build:
-    cd $(ROOT)\src\engine\keyman32
-    $(MAKE) build
-
-keyman32-signcode:
-    cd $(ROOT)\src\engine\keyman32
-    $(MAKE) signcode
-
-keyman32-install:
-    cd $(ROOT)\src\engine\keyman32
-    $(MAKE) install
 
 keyman32:
     cd $(ROOT)\src\engine\keyman32
@@ -56,6 +44,34 @@ keyman64:
     cd $(ROOT)\src\engine\keyman64
     $(MAKE) $(TARGET)
 
+kmrefresh:
+    cd $(ROOT)\src\engine\kmrefresh
+    $(MAKE) $(TARGET)
+
+mcompile:
+    cd $(ROOT)\src\engine\mcompile
+    $(MAKE) $(TARGET)
+
+kmtip:
+    cd $(ROOT)\src\engine\kmtip
+    $(MAKE) $(TARGET)
+
+# ----------------------------------------------------------------------
+# Shorthand targets for debug builds
+# ----------------------------------------------------------------------
+
+keyman32-build:
+    cd $(ROOT)\src\engine\keyman32
+    $(MAKE) build
+
+keyman32-signcode:
+    cd $(ROOT)\src\engine\keyman32
+    $(MAKE) signcode
+
+keyman32-install:
+    cd $(ROOT)\src\engine\keyman32
+    $(MAKE) install
+
 keyman64-build:
     cd $(ROOT)\src\engine\keyman64
     $(MAKE) build
@@ -67,14 +83,6 @@ keyman64-signcode:
 keyman64-install:
     cd $(ROOT)\src\engine\keyman64
     $(MAKE) install
-
-mcompile:
-    cd $(ROOT)\src\engine\mcompile
-    $(MAKE) $(TARGET)
-
-kmtip:
-    cd $(ROOT)\src\engine\kmtip
-    $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
 

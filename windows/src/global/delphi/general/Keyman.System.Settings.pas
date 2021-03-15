@@ -95,7 +95,7 @@ const
       ValueType: kstInteger
   );
 
-  BaseKeymanSettings: array[0..32] of TKeymanSettingBase = (
+  BaseKeymanSettings: array[0..33] of TKeymanSettingBase = (
 
     // TIKE:UTikeDebugMode.TikeDebugMode
     (
@@ -420,6 +420,20 @@ const
                    'change, you will need to open Keyman Configuration once '+
                    'for it to take effect.';
       DefaultInt: 0;
+      ValueType: kstInteger
+    ),
+
+    // kmcomapi::TKeymanKeyboardsInstalled.TriggerWindowsLanguageSync
+    (
+      ID: 'engine.compatibility.sync_languages_to_cloud';
+      Name: SRegValue_Flag_SyncLanguagesToCloud;
+      RootKey: HKCU;
+      Key: SRegKey_KeymanEngineDebug_CU;
+      Description: 'Set to 0 to prevent Keyman from calling the experimental '+
+                   'kmrefresh program that triggers Windows language '+
+                   'synchronisation in Windows 10. This program ensures that '+
+                   'language settings are not lost when you restart Windows.';
+      DefaultInt: 1;
       ValueType: kstInteger
     ),
 
