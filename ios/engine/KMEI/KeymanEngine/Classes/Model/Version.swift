@@ -14,6 +14,11 @@ public class Version: NSObject, Comparable {
     case alpha
     case beta
     case stable
+
+    // In case we wish to do any tier-based comparisons.
+    public static func < (lhs: Version.Tier, rhs: Version.Tier) -> Bool {
+      return lhs.rawValue < rhs.rawValue
+    }
   }
 
   public static let fallback = Version("1.0")!

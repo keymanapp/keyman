@@ -63,8 +63,10 @@ class MigrationTests: XCTestCase {
 //  }
 
   func testSimpleEarly14Migration() {
-    // A case where the user only has SENCOTEN installed for both keyboard & lexical model.
-    // sil_euro_latin was explicitly removed by the user.
+    // A case where the user has both SENCOTEN installed for both keyboard & lexical model.
+    // Mirrors `testNoDefaultsEarly14Migration`, but where sil_euro_latin
+    // was not removed by the user; in contrast, the base resources
+    // should be auto-updated.
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.simple_14)
     Migrations.migrate(storage: Storage.active)
     Migrations.updateResources(storage: Storage.active)
@@ -74,12 +76,17 @@ class MigrationTests: XCTestCase {
     let userLexicalModels = userDefaults.userLexicalModels ?? []
 
     XCTAssertEqual(userKeyboards.count, 2)
-    XCTAssertEqual(userLexicalModels.count, 2)
+    // Because there's a lexical model update, it installs the whole package.
+    // Not exactly ideal, but correct for pre-existing behavior, which
+    // installs the whole default package instead of a single language-code pairing.
+    XCTAssertEqual(userLexicalModels.count, 4)
 
-    let kbdSEU = userKeyboards.first(where: { $0.fullID == TestUtils.Keyboards.sil_euro_latin.fullID })
-    XCTAssertNotNil(kbdSEU)
-    // Enable once auto-updating
-    //XCTAssertGreaterThan(Version(kbdSEU!.version)!, Version(TestUtils.Keyboards.sil_euro_latin.version)!)
+    //[s]il_[e]uro_[l]atin
+    let kbdSEL = userKeyboards.first(where: { $0.fullID == TestUtils.Keyboards.sil_euro_latin.fullID })
+    XCTAssertNotNil(kbdSEL)
+    // Because there's a keyboard update (1.9.3 vs 1.9.1, at the time of writing).
+    // we expect a more recent version than the testing version.
+    XCTAssertGreaterThan(Version(kbdSEL!.version)!, Version(TestUtils.Keyboards.sil_euro_latin.version)!)
     XCTAssertTrue(userLexicalModels.contains(where: { $0.fullID == TestUtils.LexicalModels.mtnt.fullID }))
 
     XCTAssertTrue(userKeyboards.contains(where: { $0.fullID == TestUtils.Keyboards.fv_sencoten.fullID }))
@@ -122,7 +129,7 @@ class MigrationTests: XCTestCase {
 
     sil_euro_latin_kbds.forEach {
       XCTAssertEqual($0.packageID, "sil_euro_latin")
-      XCTAssertEqual($0.version, TestUtils.Keyboards.sil_euro_latin.version)
+      XCTAssertEqual($0.version, Defaults.keyboard.version)
     }
 
     let sil_euro_latin_package = ResourceFileManager.shared.installedPackages.first(where: { $0.id == "sil_euro_latin" }) as! KeyboardKeymanPackage
@@ -144,7 +151,7 @@ class MigrationTests: XCTestCase {
 
     let userDefaults = Storage.active.userDefaults
 
-    // SIL EuroLatin should be updated to 1.9.1.  The lexical model version should be unchanged.
+    // SIL EuroLatin should be updated to the currently-bundled version.  The lexical model version should be unchanged.
 
     let defaultKbd = userDefaults.userKeyboards![0]
     XCTAssertEqual(defaultKbd.id, Defaults.keyboard.id)
