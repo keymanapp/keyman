@@ -1049,6 +1049,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSWindowController *)aboutWindow {
     if (_aboutWindow.window == nil) {
         _aboutWindow = [[KMAboutWindowController alloc] initWithWindowNibName:@"KMAboutWindowController"];
+        [self observeCloseFor:_aboutWindow.window];
     }
 
     return _aboutWindow;
