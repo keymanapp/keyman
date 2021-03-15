@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.261 beta 2021-03-15
+
+* fix(windows): Trigger language sync after changes (#4663)
+* chore(linux): Ignore buildtools in keyman-config tarball (#4675)
+
 ## 14.0.260 beta 2021-03-15
 
 * chore(windows): fully disable auto start task (#4658)
