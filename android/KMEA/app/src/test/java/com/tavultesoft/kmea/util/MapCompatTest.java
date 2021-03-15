@@ -32,7 +32,6 @@ public class MapCompatTest {
   @Test
   public void test_getOrDefault_nullMapThrows() throws NullPointerException {
     exceptionRule.expect(NullPointerException.class);
-    exceptionRule.expectMessage("MapCompat is null");
 
     Assert.assertEquals("Peanut", MapCompat.getOrDefault(null, "elephant", "Peanut"));
   }

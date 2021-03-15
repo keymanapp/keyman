@@ -22,9 +22,6 @@ public final class MapCompat {
    * @throws NullPointerException
    */
   public static <K, V> V getOrDefault(HashMap<K, V> map, K key, V defaultValue) throws NullPointerException {
-    if (map == null) {
-      throw new NullPointerException("MapCompat is null");
-    }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       return map.getOrDefault(key, defaultValue);
     }
