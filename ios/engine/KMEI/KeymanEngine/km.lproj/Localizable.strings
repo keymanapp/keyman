@@ -7,6 +7,9 @@
 /* Title for a "download failed" alert */
 "alert-download-error-title" = "មាន​បញ្ហា​ក្នុង​ការទាញយក";
 
+/* Title for a general alert about errors */
+"alert-error-title" = "បញ្ហា";
+
 /* A descriptive message used when no internet connection is detected */
 "alert-no-connection-detail" = "មិន​អាច​ទាក់​ទង​ម៉ាស៊ីនមេ​របស់ Keyman បាន​ទេ។ សូម​ព្យាយាម​ម្ដង​ទៀត​នៅ​ពេល​ក្រោយ។";
 
