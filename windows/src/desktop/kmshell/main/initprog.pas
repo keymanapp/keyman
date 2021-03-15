@@ -429,10 +429,10 @@ begin
         else ExitCode := 2;
 
     fmOnlineUpdateAdmin:
-      OnlineUpdateAdmin(FirstKeyboardFileName);
+      OnlineUpdateAdmin(nil, FirstKeyboardFileName);
 
     fmOnlineUpdateCheck:
-      with TOnlineUpdateCheck.Create(FForce, FSilent) do
+      with TOnlineUpdateCheck.Create(nil, FForce, FSilent) do
       try
         Run;
       finally
