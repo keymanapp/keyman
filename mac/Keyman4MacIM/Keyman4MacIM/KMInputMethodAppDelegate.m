@@ -1025,23 +1025,31 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self.aboutWindow.window setLevel:NSFloatingWindowLevel];
 }
 
-- (NSWindowController *)aboutWindow_ {
-    return _aboutWindow;
-}
+/*
+ * Wrappers for creating and destroying windows
+ * TODO: the side-effect of creating the window and its controller should
+ *       probably be managed better.
+ */
 
 - (NSWindowController *)configWindow {
     if (_configWindow.window == nil) {
         if (self.debugMode)
             NSLog(@"Creating config window...");
         _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
+        [self observeCloseFor:_configWindow.window];
     }
 
     return _configWindow;
 }
 
+- (NSWindowController *)aboutWindow_ {
+    return _aboutWindow;
+}
+
 - (NSWindowController *)aboutWindow {
     if (_aboutWindow.window == nil) {
         _aboutWindow = [[KMAboutWindowController alloc] initWithWindowNibName:@"KMAboutWindowController"];
+        [self observeCloseFor:_aboutWindow.window];
     }
 
     return _aboutWindow;
@@ -1054,6 +1062,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSWindowController *)infoWindow {
     if (_infoWindow.window == nil) {
         _infoWindow = [[KMInfoWindowController alloc] initWithWindowNibName:@"KMInfoWindowController"];
+        [self observeCloseFor:_infoWindow.window];
     }
 
     return _infoWindow;
@@ -1066,6 +1075,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSWindowController *)kbHelpWindow {
     if (_kbHelpWindow.window == nil) {
         _kbHelpWindow = [[KMKeyboardHelpWindowController alloc] initWithWindowNibName:@"KMKeyboardHelpWindowController"];
+        [self observeCloseFor:_kbHelpWindow.window];
     }
 
     return _kbHelpWindow;
@@ -1078,10 +1088,41 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSWindowController *)downloadKBWindow {
     if (_downloadKBWindow.window == nil) {
         _downloadKBWindow = [[KMDownloadKBWindowController alloc] initWithWindowNibName:@"KMDownloadKBWindowController"];
+        [self observeCloseFor:_downloadKBWindow.window];
     }
 
     return _downloadKBWindow;
 }
+
+/* 
+ * Release windows after closing -- no need to keep them hanging about
+ */
+
+- (void)observeCloseFor:(NSWindow *)window {
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+                                          selector:@selector(windowWillClose:)
+                                          name:NSWindowWillCloseNotification
+                                          object:window];
+}
+
+- (void)windowWillClose:(NSNotification *)notification {
+    NSWindow* window = notification.object;
+    if (window == _downloadKBWindow.window) {
+        _downloadKBWindow.window = nil;
+    } else if(window == _kbHelpWindow.window) {
+        _kbHelpWindow.window = nil;
+    } else if(window == _infoWindow.window) {
+        _infoWindow.window = nil;
+    } else if(window == _configWindow.window) {
+        _configWindow.window = nil;
+    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:window];
+}
+
+/*
+ * Endpoints for download process
+ * TODO: this should really be refactored
+ */
 
 - (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
     NSButton *button = (NSButton *)[alert.buttons objectAtIndex:0];
