@@ -63,6 +63,7 @@ type
   TRunTools = class
   private
     FSilent: Boolean;
+    FMustReboot: Boolean;
     FPromptForReboot: Boolean;  // I3355   // I3500
     FErrorLog: TFileStream;
     StatusMax: Integer;
@@ -106,6 +107,7 @@ type
 
     class procedure CheckInstalledVersion(msiLocation: TInstallInfoFileLocation);
 
+    property MustReboot: Boolean read FMustReboot;
     property Silent: Boolean read FSilent write FSilent;
     property PromptForReboot: Boolean read FPromptForReboot write FPromptForReboot;  // I3355   // I3500
     property Online: Boolean read FOnline;
@@ -147,6 +149,7 @@ uses
   SFX,
   TntDialogHelp,
   ErrorControlledRegistry,
+  utildir,
   utilsystem,
   utilexecute,
   VersionInfo;
@@ -720,11 +723,19 @@ begin
 end;
 
 procedure TRunTools.PrepareForReboot(res: Cardinal);
+var
+  FTempFilename: string;
 begin
+  FMustReboot := True;
+
   with CreateHKCURegistry do  // I2749
   try
     if OpenKey(SRegKey_WindowsRunOnce_CU, True) then
-      WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c');
+    begin
+      FTempFilename := KGetTempFilename;
+      FInstallInfo.SaveToJSONFile(FTempFilename);
+      WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c "'+FTempFilename+'"');
+    end;
   finally
     Free;
   end;
