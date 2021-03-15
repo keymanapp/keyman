@@ -1009,6 +1009,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self.configWindow.window setLevel:NSFloatingWindowLevel];
 }
 
+- (void)registerConfigurationWindow:(NSWindowController *)window {
+    _configWindow = window;
+}
+
 - (void)showOSK {
     [[self.oskWindow window] makeKeyAndOrderFront:nil];
     [[self.oskWindow window] setLevel:NSStatusWindowLevel];

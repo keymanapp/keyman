@@ -52,6 +52,7 @@
 }
 
 - (void)windowDidLoad {
+    [self.AppDelegate registerConfigurationWindow:self];
     [super windowDidLoad];
     [self.window center];
     [_tableView registerForDraggedTypes:@[NSFilenamesPboardType]];
