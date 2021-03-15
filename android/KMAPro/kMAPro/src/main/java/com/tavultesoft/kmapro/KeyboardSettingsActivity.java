@@ -149,7 +149,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         if (hashMap == null) {
-          KMLog.LogError(TAG, "map is null, position is " + position);
+          // Ignore null HashMap when clicking on QR code
+          return;
         }
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
