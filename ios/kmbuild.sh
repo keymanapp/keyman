@@ -59,6 +59,7 @@ DO_CARTHAGE=true
 CLEAN_ONLY=false
 CONFIG=Release
 DO_KMP_DOWNLOADS=false
+CODE_SIGN=
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -178,7 +179,7 @@ update_bundle ( ) {
         fi
 
         cd ../../node_modules/@keymanapp/web-sentry-manager/dist/
-        
+
         cp index.js                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
         cd "$base_dir"
