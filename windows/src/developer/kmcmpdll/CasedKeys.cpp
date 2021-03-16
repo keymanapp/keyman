@@ -13,19 +13,6 @@ extern BOOL FMnemonicLayout; // TODO: these globals should be consolidated one d
 
 DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);
 
-PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, DWORD dwSystemID) {
-  assert(fk != NULL);
-  assert(dwSystemID != 0);
-
-  PFILE_STORE sp = fk->dpStoreArray;
-  for (DWORD i = 0; i < fk->cxStoreArray; i++, sp++) {
-    if (sp->dwSystemID == dwSystemID) {
-      return sp;
-    }
-  }
-  return NULL;
-}
-
 DWORD VerifyCasedKeys(PFILE_STORE sp) {
   assert(sp != NULL);
 
