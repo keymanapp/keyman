@@ -467,6 +467,18 @@ public final class KMManager {
     }
   }
 
+  public static boolean isKeyboardLoaded(KeyboardType type) {
+    if (type == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return InAppKeyboardLoaded;
+    } else if (type == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return SystemKeyboardLoaded;
+    } else {
+      String msg = "Keyboard type undefined";
+      KMLog.LogError(TAG, msg);
+      return false;
+    }
+  }
+
   @SuppressLint("InflateParams")
   public static View createInputView(InputMethodService inputMethodService) {
     //final Context context = appContext;
