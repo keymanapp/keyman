@@ -151,13 +151,17 @@ public class CloudApiTypes {
      * @return File - handle to the downloaded file in cache
      */
     public File cacheAndOpenDestinationFile(Context context) {
+      File cachedFile = null;
       DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
       Uri data = downloadManager.getUriForDownloadedFile(downloadId);
-      DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
-      String filename = info.getFilename();
-      File cachedFile = info.getFile();
 
-      if (filename == null || filename.isEmpty() || cachedFile == null || !cachedFile.exists()) {
+      if (data != null) {
+        DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
+        String filename = info.getFilename();
+        cachedFile = info.getFile();
+      }
+
+      if (cachedFile == null) {
         // failed to retrieve downloaded file
         BaseActivity.makeToast(context, R.string.failed_to_retrieve_file, Toast.LENGTH_LONG);
       }
