@@ -35,6 +35,8 @@ type
 
     class procedure ReportHandledException(E: Exception; const Message: string = ''; IncludeStack: Boolean = True);
 
+    class procedure Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
+
     class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
     class procedure Stop;
     class property Client: TSentryClient read FClient;
@@ -113,6 +115,13 @@ begin
   end;
 
   Result := '';
+end;
+
+class procedure TKeymanSentryClient.Breadcrumb(const BreadcrumbType, Message,
+  Category, Level: string);
+begin
+  if Enabled then
+    Client.Breadcrumb(BreadcrumbType, Message, Category, Level);
 end;
 
 procedure TKeymanSentryClient.ClientAfterEvent(Sender: TObject;
