@@ -835,14 +835,33 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)resetActiveKeyboards {
+    // Remove entries with missing files
     NSMutableArray *pathsToRemove = [[NSMutableArray alloc] initWithCapacity:0];
     for (NSString *path in self.activeKeyboards) {
         if (![[NSFileManager defaultManager] fileExistsAtPath:path])
             [pathsToRemove addObject:path];
     }
 
+    BOOL found = FALSE;
     if (pathsToRemove.count > 0) {
         [self.activeKeyboards removeObjectsInArray:pathsToRemove];
+        found = TRUE;
+    }
+
+    // Remove duplicate entries
+    NSUInteger i = 0;
+    while(i < [self.activeKeyboards count]) {
+        NSString *item = self.activeKeyboards[i];
+        NSUInteger n = [self.activeKeyboards indexOfObject:item inRange: NSMakeRange(i+1, [self.activeKeyboards count]-i-1)];
+        if(n != NSNotFound) {
+            [self.activeKeyboards removeObjectAtIndex:n];
+            found = TRUE;
+        } else {
+            i++;            
+        }
+    }
+
+    if (found) {
         NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
         [userData setObject:_activeKeyboards forKey:kKMActiveKeyboardsKey];
         [userData synchronize];
@@ -1328,7 +1347,8 @@ extern const CGKeyCode kProcessPendingBuffer;
         for (NSString *kmxFile in [self KMXFilesAtPath:keyboardFolderPath]) {
             if (self.debugMode)
                 NSLog(@"Adding keyboard to list of active keyboards: %@", kmxFile);
-            [self.activeKeyboards addObject:kmxFile];
+            if (![self.activeKeyboards containsObject:kmxFile])
+                [self.activeKeyboards addObject:kmxFile];
         }
         [self saveActiveKeyboards];
     }
