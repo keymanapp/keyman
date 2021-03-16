@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.262 beta 2021-03-16
+
+* fix(android): Update styling and set text to black (#4662)
+* fix(mac): prevent duplicate keyboards in list (#4674)
+
 ## 14.0.261 beta 2021-03-15
 
 * fix(windows): Trigger language sync after changes (#4663)
