@@ -792,7 +792,7 @@ end;
 
 procedure TfrmMain.Support_UpdateCheck;
 begin
-  with TOnlineUpdateCheck.Create(True, False) do
+  with TOnlineUpdateCheck.Create(Self, True, False) do
   try
     case Run of
       oucShutDown:

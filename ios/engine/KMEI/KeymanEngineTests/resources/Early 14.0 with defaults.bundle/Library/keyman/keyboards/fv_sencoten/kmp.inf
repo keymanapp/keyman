@@ -1,0 +1,39 @@
+[Package]
+Version=7.0
+ExecuteProgram=
+ReadMeFile=readme.htm
+[StartMenu]
+Path=
+Create=0
+AddUninstallEntry=0
+[Info]
+Name="SENCOTEN",""
+Copyright="(c) 2008-2018 FirstVoices, SIL International. Portions (c) 2006 Chris Harvey",""
+Version="9.1",""
+Author="",""
+WebSite="https://www.firstvoices.com","https://www.firstvoices.com"
+[Files]
+0="Font Aboriginal Sans Bold","AboriginalSansBOLD.ttf",0
+1="Font Aboriginal Sans Bold Italic","AboriginalSansBOLDITALIC.ttf",0
+2="Font Aboriginal Sans Italic","AboriginalSansITALIC.ttf",0
+3="Font Aboriginal Sans","AboriginalSansREGULAR.ttf",0
+4="Font Aboriginal Serif Bold","AboriginalSerifBOLD.ttf",0
+5="Font Aboriginal Serif Bold Italic","AboriginalSerifBOLDITALIC.ttf",0
+6="Font Aboriginal Serif Italic","AboriginalSerifITALIC.ttf",0
+7="Font Aboriginal Serif","AboriginalSerifREGULAR.ttf",0
+8="File readme.htm","readme.htm",0
+9="File FVLogo.gif","FVLogo.gif",0
+10="File keyman.png","keyman.png",0
+11="File lgBlue162x31.png","lgBlue162x31.png",0
+12="File Sencoten.png","Sencoten.png",0
+13="File welcome.htm","welcome.htm",0
+14="File fv_sencoten.js","fv_sencoten.js",0
+15="File fv_sencoten.kvk","fv_sencoten.kvk",0
+16="Keyboard SENCOTEN","fv_sencoten.kmx",0
+17="Package information","kmp.inf",0
+18="Package information (JSON)","kmp.json",0
+[Keyboard0]
+Name=SENCOTEN
+ID=fv_sencoten
+Version=9.1
+Language0=str-Latn,Straits Salish (Latin)

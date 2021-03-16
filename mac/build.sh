@@ -124,6 +124,7 @@ DO_KEYMANIM=true
 DO_KEYMANTESTAPP=false
 DO_CODESIGN=true
 DO_PODS=true
+DO_HELP=true
 CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
 BUILD_OPTIONS=""
 BUILD_ACTIONS="build"
@@ -199,6 +200,9 @@ while [[ $# -gt 0 ]] ; do
         -no-codesign)
             DO_CODESIGN=false
             ;;
+        -no-help)
+            DO_HELP=false
+            ;;
         -quiet)
             QUIET_FLAG=$1
             BUILD_OPTIONS="$BUILD_OPTIONS $QUIET_FLAG"
@@ -233,6 +237,7 @@ if $SKIP_BUILD ; then
     DO_KEYMANENGINE=false
     DO_KEYMANIM=false
     DO_KEYMANTESTAPP=false
+    DO_HELP=false
     BUILD_ACTIONS=""
     TEST_ACTION=""
     BUILD_OPTIONS=""
@@ -251,6 +256,7 @@ displayInfo "" \
     "DO_KEYMANTESTAPP: $DO_KEYMANTESTAPP" \
     "DO_CODESIGN: $DO_CODESIGN" \
     "DO_PODS: $DO_PODS" \
+    "DO_HELP: $DO_HELP" \
     "BUILD_OPTIONS: $BUILD_OPTIONS" \
     "BUILD_ACTIONS: $BUILD_ACTIONS" \
     "TEST_ACTION: $TEST_ACTION" \
@@ -354,12 +360,18 @@ fi
 ### Build Keyman.app (Input Method and Configuration app) ###
 
 if $DO_KEYMANIM ; then
+    if $DO_HELP ; then
+        echo "Building help"
+        $(dirname "$THIS_SCRIPT")/build-help.sh html
+    fi
+    
     echo_heading "Building Keyman.app"
     cd "$KM4MIM_BASE_PATH"
     if $DO_PODS ; then
         pod update
         pod install
     fi
+
     cd "$KEYMAN_MAC_BASE_PATH"
     execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     if [ "$TEST_ACTION" == "test" ]; then

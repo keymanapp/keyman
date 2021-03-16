@@ -12,10 +12,10 @@ type
   private
     class function GetTaskName: string;
     class procedure CleanupAlphaTasks(pTaskFolder: ITaskFolder); static;
-  public
-    class procedure RecreateTask;
     class procedure DeleteTask;
     class procedure CreateTask;
+  public
+    class procedure RecreateTask;
   end;
 
 implementation
@@ -246,11 +246,8 @@ end;
 
 class procedure TKeymanStartTask.RecreateTask;
 begin
-  if not Reg_GetDebugFlag(SRegValue_Flag_UseAutoStartTask, True) then
-  begin
-    DeleteTask;
+  if not Reg_GetDebugFlag(SRegValue_Flag_UseAutoStartTask, False) then
     Exit;
-  end;
 
   CreateTask;
 end;

@@ -137,7 +137,7 @@ public class ResourceFileManager {
    */
   public func prepareKMPInstall(from url: URL) throws -> KeymanPackage {
     // Once selected, start the standard install process.
-    log.info("Installing KMP from \(url)")
+    log.info("Opening KMP from \(url)")
 
     // Step 1: Copy it to a temporary location, making it a .zip in the process
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]

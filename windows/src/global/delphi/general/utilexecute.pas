@@ -40,6 +40,8 @@ type
 
     class function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean): Boolean; overload;
     class function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean; var AExitCode: Cardinal): Boolean; overload;
+
+    class function Execute(const cmdline, curdir: string; ShowWindow: Integer): Boolean; static;
   end;
 
 implementation
@@ -253,6 +255,39 @@ begin
     end;
   finally
     FreeMem(buf);   // I4983
+  end;
+end;
+
+class function TUtilExecute.Execute(const cmdline, curdir: string; ShowWindow: Integer): Boolean;
+var
+  si: TStartupInfoW;
+  pi: TProcessInformation;
+  buf: PChar;
+begin
+  Result := False;
+
+  si.cb := SizeOf(TStartupInfo);
+  si.lpReserved := nil;
+  si.lpDesktop := nil;
+  si.lpTitle := nil;
+  si.dwFlags := STARTF_USESHOWWINDOW;
+  si.wShowWindow := ShowWindow;
+  si.cbReserved2 := 0;
+  si.lpReserved2 := nil;
+
+  buf := AllocMem((Length(cmdline)+1)*sizeof(Char));
+  try
+    StrPCopy(buf, cmdline);
+    if CreateProcess(nil, buf,
+      nil, nil, True, NORMAL_PRIORITY_CLASS, nil, PWideChar(curdir),
+      si, pi) then
+    begin
+      CloseHandle(pi.hProcess);
+      CloseHandle(pi.hThread);
+      Result := True;
+    end;
+  finally
+    FreeMem(buf);
   end;
 end;
 

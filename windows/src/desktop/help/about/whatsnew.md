@@ -8,8 +8,8 @@ Here are some of the new features we have added to Keyman 14.0 for Windows:
     Now that Keyman runs on so many platforms, it didn't make sense for
     us to use a special, different name for Keyman on Windows.
 -   Keyman keyboards are no longer hidden from the Windows language
-    picker when you exit Keyman. Rather, if you select a Keyman
-    keyboard, Keyman will be restarted for you automatically.
+    picker when you exit Keyman. (This helps maintain input method language 
+    tag stability.)
 -   Simpler and Smoother Keyboard Search (\#3326)
 -   Localizable user interface through
     [translate.keyman.com](https://translate.keyman.com)

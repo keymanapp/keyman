@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 14.0.261 beta 2021-03-15
+
+* fix(windows): Trigger language sync after changes (#4663)
+* chore(linux): Ignore buildtools in keyman-config tarball (#4675)
+
+## 14.0.260 beta 2021-03-15
+
+* chore(windows): fully disable auto start task (#4658)
+* fix(windows): keep online update in focus (#4661)
+* fix(windows): setup must save install state for restarts (#4649)
+* fix(ios): removal of default keyboard respected when updating app (#4651)
+* feat(ios): auto-bundles the most recent version of default resources (#4656)
+* fix(mac): register configuration window on load (#4667)
+* chore(ios): Set Localizable.strings to UTF-8 (#4670)
+* fix(android/app): Fix crash when clicking QR code (#4664)
+* fix(android): fixes errors within lists used for UI (#4666)
+* chore(common): Update crowdin for km (#4671)
+* chore(android/app,ios/app): Update crowdin for de (#4672)
+* fix(mac): release window resources on close (#4669)
+* fix(mac): show local help in app (#4673)
+* chore(windows): Update whatsnew.md (#4665)
+
 ## 14.0.259 beta 2021-03-12
 
 * chore(developer): add B11 ISO code for ABNT2 keyboard (#4654)

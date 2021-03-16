@@ -110,9 +110,9 @@ uses
   custinterfaces,
   ErrorControlledRegistry,
   Keyman.Configuration.System.UmodWebHttpServer,
+  Keyman.System.KeymanSentryClient,
   kmint,
   UILanguages,
-  UfrmScriptError,
   Upload_Settings,
   utilexecute,
   utilsystem,
@@ -220,6 +220,7 @@ end;
 
 procedure TfrmWebContainer.cefCommand(Sender: TObject; const command: string; params: TStringList);
 begin
+  TKeymanSentryClient.Breadcrumb('user', 'Clicked '+command+' in '+ClassName, 'click');
   FireCommand(command, params);
 end;
 
