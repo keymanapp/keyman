@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.263 beta 2021-03-16
+
+* fix(ios): keyboard search did not alert for lack of net (#4693)
+* chore(android/engine): Send KMW console errors to Sentry (#4692)
+* fix(windows): start Keyman after setup only if not running (#4681)
+* fix(developer): &CasedKeys and &MnemonicLayout are not compatible together (#4690)
+* fix(android/engine): Fix crash when download file fails to copy to cache (#4697)
+* fix(developer): validate keyboard_info should give info on non-canonical bcp47 (#4689)
+* chore(developer): upgrade bcp 47 canonicalisation to warning (#4699)
+* fix(developer): support named character codes at end of line (#4691)
+
 ## 14.0.262 beta 2021-03-16
 
 * fix(android): Update styling and set text to black (#4662)
