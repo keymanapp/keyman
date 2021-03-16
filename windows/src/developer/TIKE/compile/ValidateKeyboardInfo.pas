@@ -16,6 +16,7 @@ type
     function LoadJsonFile: Boolean;
     constructor Create(AJsonFile: string; ASilent: Boolean);
     function Failed(message: string): Boolean;
+    procedure Warning(message: string);
     procedure Info(message: string);
   public
     class function Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;
@@ -93,7 +94,7 @@ begin
           Result := Failed(msg);
 
         if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False, False) then
-          Info(msg);
+          Warning(msg);
       finally
         Free;
       end;
@@ -108,7 +109,7 @@ begin
           Result := Failed(msg);
 
         if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False, False) then
-          Info(msg);
+          Warning(msg);
       finally
         Free;
       end;
@@ -142,6 +143,11 @@ begin
   end;
 
   Result := Assigned(json);
+end;
+
+procedure TValidateKeyboardInfo.Warning(message: string);
+begin
+  GCallback(plsWarning, FJsonFile, Message, 0, 0);
 end;
 
 class function TValidateKeyboardInfo.Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;
