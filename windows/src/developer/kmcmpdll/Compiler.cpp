@@ -2400,7 +2400,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
       case 16:
         VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
         q = p + 1;
-        while (*q && !iswblank(*q)) q++;
+        while (*q && !iswspace(*q)) q++;
         c = *q; *q = 0;
         n = CodeConstants->GetCode(p + 1, &i);
         *q = c;
