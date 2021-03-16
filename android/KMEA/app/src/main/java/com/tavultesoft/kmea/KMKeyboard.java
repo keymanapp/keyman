@@ -149,13 +149,14 @@ final class KMKeyboard extends WebView {
           }
         }
 
-        // Not sending console errors to Sentry anymore since they should be handled by KMW sentryManager
+        // Send console errors to Sentry in case they're missed by KMW sentryManager
         // (Ignoring spurious message "No keyboard stubs exist = ...")
         // TODO: Analyze if this error warrants reverting to default keyboard
         // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
 
         if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
           // Make Toast notification of error and send log about falling back to default keyboard (ignore language ID)
+          sendKMWError(cm.lineNumber(), cm.sourceId(), cm.message());
           sendError(packageID, keyboardID, "");
           Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
           if (firstKeyboard != null) {
@@ -621,6 +622,43 @@ final class KMKeyboard extends WebView {
       keyboardPath = getKeyboardRoot() + keyboardID + ".js";
     }
     return keyboardPath;
+  }
+
+  private void sendKMWError(int lineNumber, String sourceId, String message) {
+    if (Sentry.isEnabled()) {
+      Breadcrumb breadcrumb = new Breadcrumb();
+      breadcrumb.setMessage("KMKeyboard.sendKMWError");
+      breadcrumb.setCategory("KMWError");
+      breadcrumb.setLevel(SentryLevel.ERROR);
+      // Error info
+      breadcrumb.setData("cm_lineNumber", lineNumber);
+      breadcrumb.setData("cm_sourceID", sourceId);
+      breadcrumb.setData("cm_message", message);
+
+      // Keyboard info
+      if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+        breadcrumb.setData("keyboardType", "INAPP");
+      } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+        breadcrumb.setData("keyboardType", "SYSTEM");
+      } else {
+        breadcrumb.setData("keyboardType", "UNDEFINED");
+      }
+
+      if (this.packageID != null) {
+        breadcrumb.setData("packageID", this.packageID);
+      }
+      if (this.keyboardID != null) {
+        breadcrumb.setData("keyboardID", this.keyboardID);
+      }
+      if (this.keyboardName != null) {
+        breadcrumb.setData("keyboardName", this.keyboardName);
+      }
+      if (this.keyboardVersion != null) {
+        breadcrumb.setData("keyboardVersion", this.keyboardVersion);
+      }
+      Sentry.addBreadcrumb(breadcrumb);
+      Sentry.captureMessage("sendKMWError", SentryLevel.ERROR);
+    }
   }
 
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.
