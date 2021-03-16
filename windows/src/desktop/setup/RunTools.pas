@@ -649,6 +649,11 @@ var
       TUtilExecute.CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode);
     end;
   end;
+
+  function IsKeymanRunning: Boolean;
+  begin
+    Result := FindWindow('TfrmKeyman7Main', nil) <> 0;
+  end;
 begin
   FKMShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
   if System.SysUtils.FileExists(FKMShellPath) then
@@ -711,11 +716,14 @@ begin
   begin
     if System.SysUtils.FileExists(FKMShellPath) then
     begin
-      s := '"'+FKMShellPath+'"';
-      if StartWithConfiguration then
-        s := s + ' -startWithConfiguration';
-      if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
-        LogError('Failed to start Keyman: '+SysErrorMessage(GetLastError), False); // I2756
+      if StartWithConfiguration or not IsKeymanRunning then
+      begin
+        s := '"'+FKMShellPath+'"';
+        if StartWithConfiguration then
+          s := s + ' -startWithConfiguration';
+        if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
+          LogError('Failed to start Keyman: '+SysErrorMessage(GetLastError), False); // I2756
+      end;
     end;
   end;
 
