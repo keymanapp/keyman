@@ -217,6 +217,16 @@
       </Details>
     </File>
     <File>
+      <ID>id_9d5ea0b72f9733e0e70e04d5b3c790af</ID>
+      <Filename>test_expansion_absurd.kmn</Filename>
+      <Filepath>test_expansion_absurd.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Expansions</Name>
+      </Details>
+    </File>
+    <File>
       <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
       <Filename>test_valid.kmx</Filename>
       <Filepath>test_valid.kmx</Filepath>
@@ -241,13 +251,13 @@
       <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
     </File>
     <File>
-      <ID>id_9d5ea0b72f9733e0e70e04d5b3c790af</ID>
-      <Filename>test_expansion_absurd.kmn</Filename>
-      <Filepath>test_expansion_absurd.kmn</Filepath>
+      <ID>id_c8f8bfc9e4fd77bdd6db910b6a18eb0b</ID>
+      <Filename>test_casedkeys_mnemonic_3.kmn</Filename>
+      <Filepath>test_casedkeys_mnemonic_3.kmn</Filepath>
       <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
       <Details>
-        <Name>Test Expansions</Name>
+        <Name>Test mnemonic layout but no cased keys</Name>
       </Details>
     </File>
   </Files>
