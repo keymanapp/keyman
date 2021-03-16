@@ -53,6 +53,7 @@ public final class KeyboardListActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+        showRegionList();
         super.onBackPressed();
         return true;
     }

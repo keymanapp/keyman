@@ -39,11 +39,11 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <style name="Divider">
-        <item name="android:background">@android:color/holo_red_dark</item>
+    <style name="AppTheme.Divider">
+      <item name="android:background">?attr/colorAccent</item>
     </style>
 
-    <style name="Divider.horizontal" parent="Divider">
+    <style name="AppTheme.Divider.horizontal" parent="AppTheme.Divider">
       <item name="android:layout_width">match_parent</item>
       <item name="android:layout_height">1dp</item>
     </style>

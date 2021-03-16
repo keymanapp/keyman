@@ -23,4 +23,8 @@
         <item name="android:textColorSecondary">@android:color/black</item>
     </style>
 
+    <style name="AppTheme.Divider">
+        <item name="android:background">@color/firstvoices_red</item>
+    </style>
+
 </resources>
