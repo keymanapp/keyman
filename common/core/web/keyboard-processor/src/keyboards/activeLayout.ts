@@ -62,6 +62,16 @@ namespace com.keyman.keyboards {
      * 
      * Allows diambiguation of scenarios where the same key ID is used twice within a layer, but
      * with different innate modifiers.  (Refer to https://github.com/keymanapp/keyman/issues/4617)
+     * The 'desktop layer' may be omitted if it matches the key's display layer.
+     * 
+     * Examples, given a 'default' display layer, matching keys to Keyman keyboard language:
+     * 
+     * ```
+     * "K_Q" 
+     * + [K_Q]
+     * "K_Q+shift"
+     * + [K_Q SHIFT]
+     * ```
      * 
      * Useful when the active layer of an input-event is already known.
      */
@@ -85,6 +95,15 @@ namespace com.keyman.keyboards {
      * 
      * Distinguishes between otherwise-identical keys on different layers of an OSK.
      * Includes identifying information about the key's display layer.
+     * 
+     * Examples, given a 'default' display layer, matching keys to Keyman keyboard language:
+     * 
+     * ```
+     * "default-K_Q" 
+     * + [K_Q]
+     * "default-K_Q+shift"
+     * + [K_Q SHIFT]
+     * ```
      * 
      * Useful when only the active keyboard is known about an input event.
      */
