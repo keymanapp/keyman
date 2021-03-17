@@ -48,7 +48,7 @@ namespace com.keyman.osk {
     id: string;
 
     // Only set (within @keymanapp/keyboard-processor) for keys actually specified in a loaded layout
-    baseKeyIdentifier?: string;
+    baseKeyID?: string;
     coreID?: string;
     elementID?: string;
 
@@ -329,7 +329,7 @@ namespace com.keyman.osk {
     // Produces a small reference label for the corresponding physical key on a US keyboard.
     private generateKeyCapLabel(): HTMLDivElement {
       // Create the default key cap labels (letter keys, etc.)
-      var x = Codes.keyCodes[this.spec.baseKeyIdentifier];
+      var x = Codes.keyCodes[this.spec.baseKeyID];
       switch(x) {
         // Converts the keyman key id code for common symbol keys into its representative ASCII code.
         // K_COLON -> K_BKQUOTE

@@ -38,7 +38,18 @@ namespace com.keyman.keyboards {
     // - isUnicode
     // - isHardwareKey
     // - etc.
-    public get baseKeyIdentifier(): string {
+
+    // Reference for the terminology in the comments below:
+    // https://help.keyman.com/developer/current-version/guides/develop/creating-a-touch-keyboard-layout-for-amharic-the-nitty-gritty
+
+    /**
+     * Matches the key code as set within Keyman Developer for the layout.
+     * For example, K_R or U_0020.  Denotes either physical keys or virtual keys with custom output,
+     * with no additional metadata like layer or active modifiers.
+     * 
+     * Is used to determine the keycode for input events, rule-matching, and keystroke processing.
+     */
+    public get baseKeyID(): string {
       if(typeof this.id === 'undefined') {
         return undefined;
       }
@@ -46,6 +57,14 @@ namespace com.keyman.keyboards {
       return this.id;
     }
 
+    /**
+     * A unique identifier based on both the key ID & the 'desktop layer' to be used for the key.
+     * 
+     * Allows diambiguation of scenarios where the same key ID is used twice within a layer, but
+     * with different innate modifiers.  (Refer to https://github.com/keymanapp/keyman/issues/4617)
+     * 
+     * Useful when the active layer of an input-event is already known.
+     */
     public get coreID(): string {
       if(typeof this.id === 'undefined') {
         return undefined;
@@ -60,6 +79,15 @@ namespace com.keyman.keyboards {
       return baseID;
     }
 
+    /**
+     * A keyboard-unique identifier to be used for any display elements representing this key
+     * in user interfaces and/or on-screen keyboards.
+     * 
+     * Distinguishes between otherwise-identical keys on different layers of an OSK.
+     * Includes identifying information about the key's display layer.
+     * 
+     * Useful when only the active keyboard is known about an input event.
+     */
     public get elementID(): string {
       if(typeof this.id === 'undefined') {
         return undefined;
@@ -448,12 +476,12 @@ namespace com.keyman.keyboards {
       this.row.forEach(function(row: ActiveRow): void {
         row.key.forEach(function(key: ActiveKey): void {
           // If the key lacks an ID, just skip it.  Sometimes used for padding.
-          if(!key.baseKeyIdentifier) {
+          if(!key.baseKeyID) {
             return;
           } else {
             // Attempt to filter out known non-output keys.
             // Results in a more optimized distribution.
-            switch(key.baseKeyIdentifier) {
+            switch(key.baseKeyID) {
               case 'K_SHIFT':
               case 'K_LOPT':
               case 'K_ROPT':
@@ -465,7 +493,7 @@ namespace com.keyman.keyboards {
                 // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
                 // layer shifting keys.  To be safe, we currently let K_TABBACK and 
                 // K_TABFWD through, though we might be able to drop them too.
-                let code = com.keyman.text.Codes[key.baseKeyIdentifier];
+                let code = com.keyman.text.Codes[key.baseKeyID];
                 if(code > 50000 && code < 50011) {
                   return;
                 }
