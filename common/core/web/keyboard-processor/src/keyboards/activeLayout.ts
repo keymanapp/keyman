@@ -16,7 +16,10 @@ namespace com.keyman.keyboards {
       pad: ActiveKey.DEFAULT_PAD.toString()
     };
 
+    /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
     id?: string;
+
+    // These are fine.
     width?: string;
     pad?: string;
     layer: string;
@@ -29,12 +32,56 @@ namespace com.keyman.keyboards {
     proportionalX: number;
     proportionalWidth: number;
 
+    // Keeping things simple here, as this was added LATE in 14.0 beta.
+    // Could definitely extend in the future to instead return an object
+    // that denotes the 'nature' of the key.
+    // - isUnicode
+    // - isHardwareKey
+    // - etc.
+    public get baseKeyIdentifier(): string {
+      if(typeof this.id === 'undefined') {
+        return undefined;
+      }
+
+      return this.id;
+    }
+
+    public get coreID(): string {
+      if(typeof this.id === 'undefined') {
+        return undefined;
+      }
+
+      let baseID = this.id || '';
+      
+      if(this.displayLayer != this.layer) {
+        baseID = baseID + '+' + this.layer;
+      }
+
+      return baseID;
+    }
+
+    public get elementID(): string {
+      if(typeof this.id === 'undefined') {
+        return undefined;
+      }
+
+      return this.displayLayer + '-' + this.coreID;
+    }
+
     static polyfill(key: LayoutKey, layout: ActiveLayout, displayLayer: string) {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveKey();
+      let proto = Object.getPrototypeOf(dummy);
+
       for(let prop in dummy) {
         if(!key.hasOwnProperty(prop)) {
-          key[prop] = dummy[prop];
+          let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
+          if(descriptor) {
+            // It's a computed property!  Copy the descriptor onto the key's object.
+            Object.defineProperty(key, prop, descriptor);
+          } else {
+            key[prop] = dummy[prop];
+          }
         }
       }
 
@@ -237,8 +284,8 @@ namespace com.keyman.keyboards {
 
     populateKeyMap(map: {[keyId: string]: ActiveKey}) {
       this.key.forEach(function(key: ActiveKey) {
-        if(key.id) {
-          map[key.id] = key;
+        if(key.coreID) {
+          map[key.coreID] = key;
         }
       });
     }
@@ -401,12 +448,12 @@ namespace com.keyman.keyboards {
       this.row.forEach(function(row: ActiveRow): void {
         row.key.forEach(function(key: ActiveKey): void {
           // If the key lacks an ID, just skip it.  Sometimes used for padding.
-          if(!key.id) {
+          if(!key.baseKeyIdentifier) {
             return;
           } else {
             // Attempt to filter out known non-output keys.
             // Results in a more optimized distribution.
-            switch(key.id) {
+            switch(key.baseKeyIdentifier) {
               case 'K_SHIFT':
               case 'K_LOPT':
               case 'K_ROPT':
@@ -418,7 +465,7 @@ namespace com.keyman.keyboards {
                 // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
                 // layer shifting keys.  To be safe, we currently let K_TABBACK and 
                 // K_TABFWD through, though we might be able to drop them too.
-                let code = com.keyman.text.Codes[key.id];
+                let code = com.keyman.text.Codes[key.baseKeyIdentifier];
                 if(code > 50000 && code < 50011) {
                   return;
                 }
@@ -463,7 +510,7 @@ namespace com.keyman.keyboards {
           distY += dy * layer.rowProportionalHeight;
 
           let distance = distX * distX + distY * distY;
-          keyDists[key.id] = distance;
+          keyDists[key.coreID] = distance;
         });
       });
 
