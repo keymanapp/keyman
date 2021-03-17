@@ -28,9 +28,9 @@
     <!-- optional accent -->
     <View
         android:id="@+id/bar_accent"
+        style="@style/AppTheme.Divider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_alignParentBottom="true"
-        android:background="?attr/colorAccent"/>
+        android:layout_alignParentBottom="true"/>
 
 </com.google.android.material.appbar.AppBarLayout>
