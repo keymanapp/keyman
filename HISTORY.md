@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.264 beta 2021-03-17
+
+* fix(mac): prevent duplicate keyboards in list (#4674)
+* fix(android/app): Load system keyboard before checking overrides (#4696)
+* fix(android): Update styling and set text to black (#4662)
+
 ## 14.0.263 beta 2021-03-16
 
 * fix(ios): keyboard search did not alert for lack of net (#4693)
