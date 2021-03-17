@@ -46,6 +46,12 @@ namespace com.keyman.osk {
   //#region OSK key objects and construction
   export class OSKKeySpec implements keyboards.LayoutKey {
     id: string;
+
+    // Only set (within @keymanapp/keyboard-processor) for keys actually specified in a loaded layout
+    baseKeyIdentifier?: string;
+    coreID?: string;
+    elementID?: string;
+
     text?: string;
     sp?: number | keyboards.ButtonClass;
     width: string;
@@ -317,13 +323,13 @@ namespace com.keyman.osk {
 
     getId(osk: VisualKeyboard): string {
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
-      return this.layer+'-'+this.spec.id;
+      return this.spec.elementID;
     }
 
     // Produces a small reference label for the corresponding physical key on a US keyboard.
     private generateKeyCapLabel(): HTMLDivElement {
       // Create the default key cap labels (letter keys, etc.)
-      var x = Codes.keyCodes[this.spec.id];
+      var x = Codes.keyCodes[this.spec.baseKeyIdentifier];
       switch(x) {
         // Converts the keyman key id code for common symbol keys into its representative ASCII code.
         // K_COLON -> K_BKQUOTE
@@ -1766,7 +1772,11 @@ namespace com.keyman.osk {
         //  bk = skElement;
         //  break;
         //} else
-        if(skSpec.id == baseKey.keyId && skSpec.layer == baseKey.key.layer) {
+        if(!baseKey.key || !baseKey.key.spec) {
+          continue;
+        }
+
+        if(skSpec.elementID == baseKey.key.spec.elementID) {
           bk = skElement;
           break; // Best possible match has been found.  (Disable 'break' once above block is implemented.)
         }

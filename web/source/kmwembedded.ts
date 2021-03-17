@@ -402,14 +402,14 @@ namespace com.keyman.text {
         var baseKey: com.keyman.osk.OSKKeySpec = osk.vkbd.popupBaseKey['key'].spec;
         var found = false;
 
-        if(baseKey.id == keyName) {
+        if(baseKey.coreID == keyName) {
           nextLayer = baseKey.nextlayer;
           found = true;
         } else {
           // Search for the specified subkey so we can retrieve its useful properties.
           // It should be within the popupBaseKey's subkey list.
           for(let subKey of baseKey.sk) {
-            if(subKey.id == keyName) {
+            if(subKey.coreID == keyName) {
               // ... to consider:  why are we not just taking the keyspec wholesale right here?
               nextLayer = subKey.nextlayer;
               found = true;
@@ -419,7 +419,7 @@ namespace com.keyman.text {
         }
 
         if(!found) {
-          console.warn("Could not find subkey '" + origArg + "' under the current base key '" + baseKey.id + "'!");
+          console.warn("Could not find subkey '" + origArg + "' under the current base key '" + baseKey.coreID + "'!");
         }
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
