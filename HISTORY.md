@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.265 beta 2021-03-18
+
+* fix(common/core/web): disambiguation of keys sharing same base key ID (#4703)
+* fix(windows): Download keyboard dialog TLS protocol support (#4714)
+* fix(web): first-pass workaround for popup-key corrections (#4704)
+* fix(developer): use var not let in definitions (#4718)
+* chore(windows): finalize help (#4717)
+
 ## 14.0.264 beta 2021-03-17
 
 * fix(mac): prevent duplicate keyboards in list (#4674)
