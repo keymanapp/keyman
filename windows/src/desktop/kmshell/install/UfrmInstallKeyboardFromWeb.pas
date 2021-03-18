@@ -231,6 +231,7 @@ begin
   FTempFilename := FDownloadFilename + '.download';
   Client := THTTPClient.Create;
   try
+    Client.SecureProtocols := [THTTPSecureProtocol.TLS1, THTTPSecureProtocol.TLS11, THTTPSecureProtocol.TLS12];
     Client.OnReceiveData := HttpReceiveData;
 
     Stream := TFileStream.Create(FTempFilename, fmCreate);
