@@ -173,7 +173,11 @@ namespace com.keyman.text.prediction {
         return;
       }
 
-      if(outputTarget) {
+      // Don't attempt predictions when disabled!
+      // invalidateContext otherwise bypasses .predict()'s check against this.
+      if(!this.isActive) {
+        return;
+      } else if(outputTarget) {
         let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
         this.predict_internal(transcription, true);
       } else {
