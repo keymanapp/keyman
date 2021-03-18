@@ -220,7 +220,7 @@ static void reset_context(IBusEngine *engine)
         g_message("new context is:%u:%s: cursor:%d anchor:%d", context_pos - context_start, surrounding_text, cursor_pos, anchor_pos);
 
         g_message(":%s:%s:", surrounding_text, current_context_utf8);
-        if (g_strcmp0(surrounding_text, current_context_utf8) != 0)
+        if (!g_str_has_suffix(surrounding_text, current_context_utf8))
         {
             g_message("setting context because it has changed from expected");
             if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
