@@ -712,6 +712,15 @@ begin
 
   DeleteBackupPath;  // I2747
 
+  // Delete the Keyman autostart backup
+  with CreateHKCURegistry do
+  try
+    if OpenKey('\' + SRegKey_KeymanDesktop_CU, True) and ValueExists(SRegValue_UpgradeRunKeyman) then
+      DeleteValue(SRegValue_UpgradeRunKeyman);
+  finally
+    Free;
+  end;
+
   if StartKeyman then  // I2738
   begin
     if System.SysUtils.FileExists(FKMShellPath) then
@@ -754,7 +763,11 @@ begin
   with CreateHKCURegistry do
   try
     if OpenKey(SRegKey_WindowsRun_CU, False) and ValueExists(SRegValue_WindowsRun_Keyman) then
+    begin
       DeleteValue(SRegValue_WindowsRun_Keyman);
+      if OpenKey('\' + SRegKey_KeymanDesktop_CU, True) then
+        WriteBool(SRegValue_UpgradeRunKeyman, True);
+    end;
   finally
     Free;
   end;
