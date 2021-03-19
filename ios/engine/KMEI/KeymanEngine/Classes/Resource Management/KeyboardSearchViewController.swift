@@ -254,6 +254,15 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
             // Illegal state - we already checked this.
             fatalError()
         }
+
+        // We've likely installed the package, and we already know
+        // the package's current publishing state - we literally just
+        // downloaded it from the cloud as part of the keyboard search.
+        //
+        // Why query later when we know the query's answer NOW?
+        let publishState = KeymanPackage.DistributionStateMetadata(downloadURL: packageURL, version: package.version)
+
+        Storage.active.userDefaults.cachedPackageQueryMetadata[package.key] = publishState
       }
 
       downloadManager.downloadPackage(withKey: packageKey, from: packageURL, withNotifications: true, completionBlock: downloadClosure)
