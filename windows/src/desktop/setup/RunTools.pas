@@ -748,6 +748,18 @@ begin
     Free;
   end;
 
+  // Delete the Keyman autostart; it will be reinstated when setup finishes
+  // but this avoids conflict of Keyman starting while the setup is still
+  // running
+  with CreateHKCURegistry do
+  try
+    if OpenKey(SRegKey_WindowsRun_CU, False) and ValueExists(SRegValue_WindowsRun_Keyman) then
+      DeleteValue(SRegValue_WindowsRun_Keyman);
+  finally
+    Free;
+  end;
+
+
   if res = ERROR_SUCCESS_REBOOT_REQUIRED then
   begin
     if GetRunTools.PromptForReboot and
