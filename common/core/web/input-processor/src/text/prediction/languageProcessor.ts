@@ -141,7 +141,9 @@ namespace com.keyman.text.prediction {
       // Prevents an ugly "flash of unstyled content" layout issue during keyboard load
       // on our mobile platforms when embedded.
       lp.currentModel = model;
-      lp.emit('statechange', 'active');
+      if(this.mayPredict) {
+        lp.emit('statechange', 'active');
+      }
 
       return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
         lp.configuration = config;
@@ -173,7 +175,11 @@ namespace com.keyman.text.prediction {
         return;
       }
 
-      if(outputTarget) {
+      // Don't attempt predictions when disabled!
+      // invalidateContext otherwise bypasses .predict()'s check against this.
+      if(!this.isActive) {
+        return;
+      } else if(outputTarget) {
         let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
         this.predict_internal(transcription, true);
       } else {
@@ -407,7 +413,13 @@ namespace com.keyman.text.prediction {
       this._mayPredict = flag;
 
       if(oldVal != flag) {
-        this.emit('statechange', flag ? 'active' : 'inactive');
+        // If there's no model to be activated and we've reached this point,
+        // the banner should remain inactive, as it already was.
+        // If it there was one and we've reached this point, we're globally
+        // deactivating, so we're fine.
+        if(this.activeModel) {
+          this.emit('statechange', flag ? 'active' : 'inactive');
+        }
       }
     }
 
