@@ -190,6 +190,16 @@ public class KeymanPackage {
       distributionMethod = downloadURL != nil ? .cloud : .unknown
       self.downloadURL = downloadURL
     }
+
+    // Used to store metadata for newly-downloaded results from the keyboard search.
+    // To save a version, we require also having a known URL.
+    internal init(downloadURL: URL, version: Version) {
+      self.timestampForLastQuery = NSDate().timeIntervalSince1970
+      self.latestVersion = version.fullString
+      self.downloadURL = downloadURL
+
+      distributionMethod = .cloud
+    }
   }
 
   static private let kmpFile = "kmp.json"
