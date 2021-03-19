@@ -364,8 +364,6 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
 }
 
 std::string string_to_hex(const std::u16string& input) {
-    static const char hex_digits[] = "0123456789ABCDEF";
-
     std::ostringstream result;
     result << std::setfill('0') << std::hex << std::uppercase;
 
