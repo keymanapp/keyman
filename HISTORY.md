@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.266 beta 2021-03-19
+
+* chore(android/app): Migrate launcher icon to adaptive (#4720)
+* fix(common/core/web): predictive banner activation logic (#4713)
+* fix(web): allows refresh of currently-loaded model (#4728)
+* fix(ios): kbd search now caches publishing data for result (#4729)
+* fix(linux): Fix switching to keyboard in middle of line (#4678) (#4721)
+* fix(windows): ensure profiles are reinstalled during setup (#4727)
+* fix(windows): Avoid double start during setup (#4726)
+
 ## 14.0.265 beta 2021-03-18
 
 * fix(common/core/web): disambiguation of keys sharing same base key ID (#4703)
