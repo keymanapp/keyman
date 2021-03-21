@@ -11,9 +11,8 @@
   <application
     android:allowBackup="true"
     android:hardwareAccelerated="true"
-    android:icon="@drawable/ic_launcher"
+    android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
-    android:roundIcon="@drawable/ic_launcher_round"
     android:usesCleartextTraffic="true"
     android:theme="@style/AppTheme"
     android:supportsRtl="true">
@@ -234,21 +233,21 @@
     <activity
       android:name=".InfoActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-      android:label="@string/app_name"></activity>
+      android:label="@string/app_name"/>
     <activity
       android:name=".BookmarksActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-      android:label="@string/app_name"></activity>
+      android:label="@string/app_name"/>
     <activity
       android:name=".PackageActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-      android:label="@string/app_name"></activity>
+      android:label="@string/app_name"/>
     <activity
       android:name=".GetStartedActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"
       android:launchMode="singleTask"
-      android:theme="@style/Theme.AppCompat.Light.Dialog"></activity>
+      android:theme="@style/AppTheme.Light.Dialog"/>
     <activity
       android:name=".KeymanSettingsActivity"
       android:label="@string/keyman_settings"
@@ -282,7 +281,7 @@
       android:name=".KeyboardSettingsActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"
-      android:theme="@style/Theme.AppCompat.Light.Dialog" />
+      android:theme="@style/AppTheme.Light.Dialog" />
     <activity
       android:name=".SelectPackageActivity"
       android:label="@string/app_name"
@@ -302,12 +301,12 @@
       android:name=".WebBrowserActivity"
       android:process=":WebBrowserActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-      android:label="@string/app_name"></activity>
+      android:label="@string/app_name"/>
     <activity
       android:name=".KMPBrowserActivity"
       android:process=":KMPBrowserActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-      android:label="@string/app_name"></activity>
+      android:label="@string/app_name"/>
 
 
     <provider

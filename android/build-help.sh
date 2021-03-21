@@ -71,8 +71,8 @@ displayInfo "" \
 
 cd $KEYMAN_ROOT/android/help
 
-MDLUA="$KEYMAN_ROOT/resources/build/htmlink.lua"
-MD=`find -name "*.md"`
+MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
+MD=`find . -name "*.md"`
 DESTHTM="$THIS_DIR/KMAPro/kMAPro/src/main/assets/info"
 
 if $DO_HTM; then

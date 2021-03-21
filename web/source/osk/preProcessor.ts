@@ -48,7 +48,13 @@ namespace com.keyman.osk {
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
         outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
-        let keySpec = (e['key'] ? e['key'].spec : null) as keyboards.ActiveKey;
+        // Future note:  we need to refactor osk.OSKKeySpec to instead be a 'tag field' for
+        // keyboards.ActiveKey.  (Prob with generics, allowing the Web-only parts to
+        // be fully specified within the tag.)  
+        //
+        // Would avoid the type shenanigans needed here because of our current type-abuse setup 
+        // for key spec tracking.
+        let keySpec = (e['key'] ? e['key'].spec : null) as unknown as keyboards.ActiveKey;
         if(!keySpec) {
           console.error("OSK key with ID '" + e.id + "', keyID '" + e.keyId + "' missing needed specification");
           return true;

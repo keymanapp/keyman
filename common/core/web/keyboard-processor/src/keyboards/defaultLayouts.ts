@@ -23,7 +23,7 @@ namespace com.keyman.keyboards {
     "pad"?: string,
     "sk"?: LayoutKey[]
   }
-  
+
   export type LayoutRow = {
     "id": string, // represents a number, though...
     "key": LayoutKey[]
@@ -53,7 +53,7 @@ namespace com.keyman.keyboards {
     "phone"?: LayoutFormFactor,
     "tablet"?: LayoutFormFactor
   }
-  
+
   // This class manages default layout construction for consumption by OSKs without a specified layout.
   export class Layouts {
     static dfltCodes=[
@@ -104,15 +104,14 @@ namespace com.keyman.keyboards {
       'leftctrl-shift': '*LCtrlShift*',
       'rightctrl-shift': '*RCtrlShift*'
     };
-    
+
     /**
     * Build a default layout for keyboards with no explicit layout
     *
-    * @param   {Object}  PVK             keyboard object (as loaded)
-    * @param   {Object}  kbdDevVersion   object representing the version of Developer that compiled the keyboard
-    * @param   {number}  kbdBitmask      keyboard modifier bitmask
-    * @param   {string}  formFactor
-    * @return  {Object}
+    * @param   {Object}  PVK         raw specifications
+    * @param   {Keyboard} keyboard   keyboard object (as loaded)
+    * @param   {string} formFactor   (really utils.FormFactor)
+    * @return  {LayoutFormFactor}
     */
     static buildDefaultLayout(PVK, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
       // Build a layout using the default for the device
@@ -175,7 +174,7 @@ namespace com.keyman.keyboards {
       // If there is no predefined layout, even touch layouts will follow the desktop's
       // setting for the displayUnderlying flag.  As the desktop layout uses a different
       // format for its layout spec, that's found at the field referenced below.
-      layout["displayUnderlying"] = !!keyboard.scriptObject['KDU'];
+      layout["displayUnderlying"] = keyboard ? !!keyboard.scriptObject['KDU'] : false;
 
       // For desktop devices, we must create all layers, even if invalid.
       if(formFactor == 'desktop') {
@@ -212,14 +211,14 @@ namespace com.keyman.keyboards {
           // Erase the legacy shifted subkey array.
           shiftKey['sk'] = [];
 
-          for(var layerID in keyLabels) {            
+          for(var layerID in keyLabels) {
             if(layerID == 'default' || layerID == 'shift') {
               // These two are accessible from the layer without subkeys.
               continue;
             }
 
             // Create a new subkey for the specified layer so that it will be accessible via OSK.
-            var specialChar = Layouts.modifierSpecials[layerID]; 
+            var specialChar = Layouts.modifierSpecials[layerID];
             let subkey: LayoutKey = {
               id: "K_" + specialChar,
               text: specialChar,
@@ -376,7 +375,7 @@ namespace com.keyman.keyboards {
 
     /**
      * Generates a list of potential layer ids for the specified chirality mode.
-     * 
+     *
      * @param   {boolean}   chiral    // Does the keyboard use chiral modifiers or not?
      */
     static generateLayerIds(chiral: boolean): string[] {
@@ -401,7 +400,7 @@ namespace com.keyman.keyboards {
 
     /**
      * Sets a formatting property for the modifier keys when constructing a default layout for a keyboard.
-     * 
+     *
      * @param   {Object}    layer   // One layer specification
      * @param   {boolean}   chiral  // Whether or not the keyboard uses chiral modifier information.
      * @param   {string}    formFactor  // The form factor of the device the layout is being constructed for.
@@ -423,7 +422,7 @@ namespace com.keyman.keyboards {
             case 'K_RSHIFT':
               if(layerId.indexOf('shift') != -1) {
                 key['sp'] = buttonClasses['SHIFT-ON'];
-              } 
+              }
               if(formFactor != 'desktop') {
                 if(layerId != 'default') {
                   key['nextlayer']='default';
@@ -439,7 +438,7 @@ namespace com.keyman.keyboards {
                   key['sp'] = buttonClasses['SHIFT-ON'];
                 }
                 break;
-              } 
+              }
             case 'K_RCTRL':
             case 'K_RCONTROL':
               if(chiral) {
@@ -451,7 +450,7 @@ namespace com.keyman.keyboards {
             case 'K_CONTROL':
               if(layerId.indexOf('ctrl') != -1) {
                 if(!chiral || (layerId.indexOf('leftctrl') != -1 && layerId.indexOf('rightctrl') != -1)) {
-                  key['sp'] = buttonClasses['SHIFT-ON'];              
+                  key['sp'] = buttonClasses['SHIFT-ON'];
                 }
               }
               break;
@@ -461,18 +460,18 @@ namespace com.keyman.keyboards {
                   key['sp'] = buttonClasses['SHIFT-ON'];
                 }
                 break;
-              } 
+              }
             case 'K_RALT':
               if(chiral) {
                 if(layerId.indexOf('rightalt') != -1) {
                   key['sp'] = buttonClasses['SHIFT-ON'];
                 }
                 break;
-              } 
+              }
             case 'K_ALT':
               if(layerId.indexOf('alt') != -1) {
                 if(!chiral || (layerId.indexOf('leftalt') != -1 && layerId.indexOf('rightalt') != -1)) {
-                  key['sp'] = buttonClasses['SHIFT-ON'];              
+                  key['sp'] = buttonClasses['SHIFT-ON'];
                 }
               }
               break;
@@ -494,7 +493,7 @@ namespace com.keyman.keyboards {
     /**
      * Converts the legacy BK property from pre 10.0 into the KLS keyboard layer spec format,
      * sparsifying it as possible to pre-emptively check invalid layers.
-     * 
+     *
      * @param   {Array}   BK      keyboard object (as loaded)
      * @return  {Object}
      */
@@ -525,7 +524,7 @@ namespace com.keyman.keyboards {
         }
       }
 
-      // There must always be at least a plain 'default' layer.  Array(65).fill('') would be preferable but isn't supported on IE, 
+      // There must always be at least a plain 'default' layer.  Array(65).fill('') would be preferable but isn't supported on IE,
       // but buildDefaultLayer will set the defaults for these layers if no entry exists for them in the array due to length.
       if(typeof KLS['default'] == 'undefined' || ! KLS['default']) {
         KLS['default'] = [''];

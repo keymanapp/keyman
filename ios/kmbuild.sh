@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# set -e: Terminate script if a command returns an error
+set -e
+# set -u: Terminate script if an unset variable is used
+set -u
+# set -x: Debugging use, print each statement
+# set -x
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -7,13 +13,12 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
+# This script runs from its own folder
+cd "$(dirname "$THIS_SCRIPT")"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -31,6 +36,7 @@ display_usage ( ) {
     echo "  -no-build               Cancels the build entirely.  Useful with 'build.sh -clean -no-build'."
     echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
     echo "  -debug                  Sets the configuration to debug mode instead of release."
+    echo "  -download-resources     Download up-to-date versions of the engine's default resources from downloads.keyman.com."
 exit 1
 }
 
@@ -52,6 +58,8 @@ DO_ARCHIVE=true
 DO_CARTHAGE=true
 CLEAN_ONLY=false
 CONFIG=Release
+DO_KMP_DOWNLOADS=false
+CODE_SIGN=
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -68,7 +76,7 @@ while [[ $# -gt 0 ]] ; do
             DO_KEYMANAPP=false
             ;;
         -no-codesign)
-            CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO $DEV_TEAM CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
+            CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO ${DEV_TEAM:-} CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
             DO_ARCHIVE=false
             ;;
         -no-archive)
@@ -92,6 +100,9 @@ while [[ $# -gt 0 ]] ; do
         -debug)
             CONFIG=Debug
             ;;
+        -download-resources)
+            DO_KMP_DOWNLOADS=true
+            ;;
     esac
     shift # past argument
 done
@@ -100,6 +111,9 @@ done
 KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
 BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
 KMW_SOURCE=../web/source
+
+DEFAULT_KBD_ID="sil_euro_latin"
+DEFAULT_LM_ID="nrc.en.mtnt"
 
 # Build product paths
 APP_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
@@ -118,6 +132,7 @@ fi
 echo
 echo "KMW_SOURCE: $KMW_SOURCE"
 echo "DO_KMW_BUILD: $DO_KMW_BUILD"
+echo "DO_KMP_DOWNLOADS: $DO_KMP_DOWNLOADS"
 echo "CONFIGURATION: $CONFIG"
 echo
 
@@ -126,9 +141,10 @@ update_bundle ( ) {
         mkdir -p "$BUNDLE_PATH"
     fi
 
+    base_dir="$(pwd)"
+
     if [ $DO_KMW_BUILD = true ]; then
         echo Building KeymanWeb from $KMW_SOURCE
-        base_dir="$(pwd)"
 
         cd $KMW_SOURCE
 
@@ -163,10 +179,28 @@ update_bundle ( ) {
         fi
 
         cd ../../node_modules/@keymanapp/web-sentry-manager/dist/
-        
+
         cp index.js                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
         cd "$base_dir"
+    fi
+
+    # Our default resources are part of the bundle, so let's check on them.
+    if [ $DO_KMP_DOWNLOADS = true ]; then
+      echo_heading "Downloading up-to-date packages for default resources"
+
+      downloadKeyboardPackage "$DEFAULT_KBD_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp"
+      downloadModelPackage "$DEFAULT_LM_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp"
+
+      echo "${SUCCESS_GREEN}Packages successfully updated${NORMAL}"
+
+      # If we aren't downloading resources, make sure copies of them already exist!
+    elif [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp" ]; then
+      fail "No run with -download-resources has been performed yet; the keyboard package is missing!"
+    elif [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp" ]; then
+      fail "No run with -download-resources has been performed yet; the lexical model package is missing!"
+    else
+      warn "Reusing previously-downloaded packages for default resources"
     fi
 }
 
@@ -188,7 +222,10 @@ echo "  * UPLOAD_SENTRY=$UPLOAD_SENTRY"
 echo
 echo "Building KMEI..."
 
-rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
+if [ -d "$BUILD_PATH/$CONFIG-universal" ]; then
+  rm -r $BUILD_PATH/$CONFIG-universal
+fi
+
 xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
            VERSION=$VERSION \
            VERSION_WITH_TAG=$VERSION_WITH_TAG \
@@ -212,8 +249,10 @@ if [ $DO_KEYMANAPP = true ]; then
   echo "Building Keyman app."
 
   # Provides a needed link for codesigning for our CI.
-  if ! [ -z "${DEVELOPMENT_TEAM}" ]; then
+  if ! [ -z "${DEVELOPMENT_TEAM+x}" ]; then
     DEV_TEAM="DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM}"
+  else
+    DEV_TEAM=
   fi
 
   if [ $DO_ARCHIVE = false ]; then

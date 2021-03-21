@@ -350,7 +350,7 @@ begin
 
   else if command = 'opensite' then OpenSite(params)
 
-  else if command = 'help' then Application.HelpJump('context_'+lowercase(DialogName))
+  else if command = 'help' then DoOpenHelp
 
   else inherited;
 end;
@@ -792,7 +792,7 @@ end;
 
 procedure TfrmMain.Support_UpdateCheck;
 begin
-  with TOnlineUpdateCheck.Create(True, False) do
+  with TOnlineUpdateCheck.Create(Self, True, False) do
   try
     case Run of
       oucShutDown:

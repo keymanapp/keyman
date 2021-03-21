@@ -1,0 +1,9 @@
+c Tests mnemonic layout without any casedkeys
+store(&NAME) 'Test mnemonic layout but no cased keys'
+store(&mnemoniclayout) '1'
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'aaah'
++ [SHIFT K_A] > 'AAAH'

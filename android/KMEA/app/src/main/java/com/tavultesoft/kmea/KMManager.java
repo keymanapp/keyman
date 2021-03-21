@@ -467,6 +467,18 @@ public final class KMManager {
     }
   }
 
+  public static boolean isKeyboardLoaded(KeyboardType type) {
+    if (type == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return InAppKeyboardLoaded;
+    } else if (type == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return SystemKeyboardLoaded;
+    } else {
+      String msg = "Keyboard type undefined";
+      KMLog.LogError(TAG, msg);
+      return false;
+    }
+  }
+
   @SuppressLint("InflateParams")
   public static View createInputView(InputMethodService inputMethodService) {
     //final Context context = appContext;
@@ -2386,22 +2398,24 @@ public final class KMManager {
 
           if (dn <= 0) {
             if (start == end) {
-              if (!s.isEmpty() && s.charAt(0) == '\n') {
+              if (s.length() > 0 && s.charAt(0) == '\n') {
                 textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
               } else {
                 // *** TO DO: Try to find a solution to the bug on API < 17, insert overwrites on next line
-                InAppKeyboardShouldIgnoreTextChange = true;
-                InAppKeyboardShouldIgnoreSelectionChange = true;
-                textView.getText().insert(start, s);
+                if (s.length() > 0) {
+                  InAppKeyboardShouldIgnoreTextChange = true;
+                  InAppKeyboardShouldIgnoreSelectionChange = true;
+                  textView.getText().insert(start, s);
+                }
               }
             } else {
-              if (!s.isEmpty() && s.charAt(0) == '\n') {
+              if (s.length() > 0 && s.charAt(0) == '\n') {
                 InAppKeyboardShouldIgnoreTextChange = true;
                 InAppKeyboardShouldIgnoreSelectionChange = true;
                 textView.getText().replace(start, end, "");
                 textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
               } else {
-                if (s.isEmpty()) {
+                if (s.length() == 0) {
                   textView.getText().delete(start, end);
                 } else {
                   InAppKeyboardShouldIgnoreTextChange = true;

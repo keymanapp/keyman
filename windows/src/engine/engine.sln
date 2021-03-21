@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmtip", "kmtip\kmtip.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mcompile", "mcompile\mcompile.vcxproj", "{5C22DDDA-CEAD-45F1-96B0-1473111156AA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmrefresh", "kmrefresh\kmrefresh.vcxproj", "{A3B8F75F-E63E-434E-8A2A-034AD9B66571}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -53,6 +55,14 @@ Global
 		{5C22DDDA-CEAD-45F1-96B0-1473111156AA}.Release|x64.ActiveCfg = Release|Win32
 		{5C22DDDA-CEAD-45F1-96B0-1473111156AA}.Release|x86.ActiveCfg = Release|Win32
 		{5C22DDDA-CEAD-45F1-96B0-1473111156AA}.Release|x86.Build.0 = Release|Win32
+		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Debug|x64.ActiveCfg = Debug|x64
+		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Debug|x64.Build.0 = Debug|x64
+		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Debug|x86.ActiveCfg = Debug|Win32
+		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Debug|x86.Build.0 = Debug|Win32
+		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Release|x64.ActiveCfg = Release|x64
+		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Release|x64.Build.0 = Release|x64
+		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Release|x86.ActiveCfg = Release|Win32
+		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

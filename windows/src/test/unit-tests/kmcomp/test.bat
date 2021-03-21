@@ -52,6 +52,7 @@ call :should-pass "#2241: &CasedKeys (chars)" test_casedkeys_chars.kmn || goto :
 
 call :should-fail "#2241: &CasedKeys (mnemonic 1)" test_casedkeys_mnemonic_1.kmn || goto :eof
 call :should-fail "#2241: &CasedKeys (mnemonic 2)" test_casedkeys_mnemonic_2.kmn || goto :eof
+call :should-pass "#2241: &CasedKeys (mnemonic 3)" test_casedkeys_mnemonic_3.kmn || goto :eof
 call :should-fail "#2241: &CasedKeys (invalid chars 1)" test_casedkeys_invalid_1.kmn || goto :eof
 call :should-fail "#2241: &CasedKeys (invalid chars 2)" test_casedkeys_invalid_2.kmn || goto :eof
 

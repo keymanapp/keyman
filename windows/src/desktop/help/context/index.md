@@ -2,27 +2,26 @@
 title: Contextual Help
 ---
 
-* [Welcome to Keyman](welcome)
-* [Getting Started](tutorial)
-
-* [Splash Screen](splash)
-* [Proxy Configuration](proxyconfiguration)
-* [Update Keyman](onlineupdate)
-
-* [Set Language for Keyman Menus](selectlanguage)
-
-* [Install a Keyman Keyboard](installkeyboard)
-* [Download a Keyman Keyboard](downloadkeyboard)
-
-* [The Keyman Menu](traymenu)
-
-## [Keyman Configuration](keyman)
-* [Keyman Configuration - Keyboard Layouts Tab](configuration_keyboards)
-* [Keyman Configuration - Options Tab](configuration_options)
-* [Keyman Configuration - Hotkeys Tab](configuration_hotkeys)
-* [Keyman Configuration - Support Tab](configuration_support)
+## General topics
+* [The Keyman Menu](tray-menu)
+* [Keyman Text Editor](text-editor)
+* [Startup Screen](splash)
 
 ## Keyman Toolbox
 * [Keyman Toolbox - On Screen Keyboard](onscreenkeyboard)
 * [Keyman Toolbox - Font Helper](fonthelper)
 * [Keyman Toolbox - Character Map](charactermap)
+
+## [Keyman Configuration](keyman)
+* [Keyman Configuration - Keyboard Layouts Tab](configuration-keyboards)
+* [Keyman Configuration - Options Tab](configuration-options)
+* [Keyman Configuration - Hotkeys Tab](configuration-hotkeys)
+* [Keyman Configuration - Support Tab](configuration-support)
+* [Keyman Configuration - Keep in Touch Tab](configuration-keepintouch)
+* [Base Keyboard dialog](base-keyboard)
+* [Change Hotkey dialog](change-hotkey)
+* [Proxy Configuration dialog](proxy-configuration)
+* [Update Keyman dialog](online-update)
+* [Install Keyboard dialog](install-keyboard)
+* [Download Keyboard dialog](download-keyboard)
+* [Add language dialog](install-keyboard-language)

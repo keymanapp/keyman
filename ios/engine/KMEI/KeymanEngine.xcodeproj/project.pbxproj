@@ -213,6 +213,8 @@
 		CEA1486C2407808F00C6ECD2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
 		CEA1486D2407808F00C6ECD2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
 		CEA14870240780E100C6ECD2 /* ResourceInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEA14872240780E100C6ECD2 /* ResourceInfoView.xib */; };
+		CEA31E5825FB51D500534484 /* No-defaults early 14.0.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA31E5725FB51D400534484 /* No-defaults early 14.0.bundle */; };
+		CEA31E6025FB5BC200534484 /* Early 14.0 with defaults.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA31E5F25FB5BC200534484 /* Early 14.0 with defaults.bundle */; };
 		CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */; };
 		CEA70CCF24CAC3AE001C12E6 /* Obsoletions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */; };
 		CEA9670924BEC4030035AACF /* ResourceUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */; };
@@ -514,6 +516,8 @@
 		CEA14871240780E100C6ECD2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ResourceInfoView.xib; sourceTree = "<group>"; };
 		CEA14874240780EF00C6ECD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		CEA148772407869200C6ECD2 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CEA31E5725FB51D400534484 /* No-defaults early 14.0.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "No-defaults early 14.0.bundle"; sourceTree = "<group>"; };
+		CEA31E5F25FB5BC200534484 /* Early 14.0 with defaults.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Early 14.0 with defaults.bundle"; sourceTree = "<group>"; };
 		CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 13.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Obsoletions.swift; sourceTree = "<group>"; };
 		CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceUpdateTests.swift; sourceTree = "<group>"; };
@@ -887,6 +891,8 @@
 		CE37C38923FCC9AF007031C6 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				CEA31E5F25FB5BC200534484 /* Early 14.0 with defaults.bundle */,
+				CEA31E5725FB51D400534484 /* No-defaults early 14.0.bundle */,
 				CEA9670C24BEEFF80035AACF /* khmer_angkor update-base.bundle */,
 				CE02EE0B24A5863100D58F92 /* Queries.bundle */,
 				CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */,
@@ -1338,6 +1344,7 @@
 				9ADC45A022E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */,
 				CE973D832484A5DC00F66045 /* PackageJSON.bundle in Resources */,
 				CEF888D223FE6ADF00667693 /* No-defaults 10.0 Migration.bundle in Resources */,
+				CEA31E5825FB51D500534484 /* No-defaults early 14.0.bundle in Resources */,
 				CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */,
 				CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */,
 				9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */,
@@ -1345,6 +1352,7 @@
 				CE02EE0C24A5863100D58F92 /* Queries.bundle in Resources */,
 				CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */,
 				CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */,
+				CEA31E6025FB5BC200534484 /* Early 14.0 with defaults.bundle in Resources */,
 				CE37C38F23FCD52F007031C6 /* Lexical Models.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -229,9 +229,6 @@ var
   RegistrationRequired: WordBool;
   i: Integer;
 begin
-  if not ShouldRun then
-    Exit;
-
   r := TRegistry.Create;
   strings := TStringList.Create;
   try

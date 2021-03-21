@@ -9,16 +9,16 @@
        	android:layout_width="wrap_content"
        	android:layout_height="wrap_content"
        	android:layout_alignParentLeft="true"
-       	android:layout_centerVertical="true"
-       	android:contentDescription="@string/image_view" />
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/image_view" />
     
     <TextView
-		android:id="@+id/text"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_toRightOf="@+id/left_icon"
-		android:layout_centerVertical="true"
-		android:textSize="14sp"
-		android:textStyle="normal" />
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/left_icon"
+        android:layout_centerVertical="true"
+        android:textSize="14sp"
+        android:textStyle="normal" />
     
 </RelativeLayout>

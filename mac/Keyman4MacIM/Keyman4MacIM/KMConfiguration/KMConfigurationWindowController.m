@@ -15,6 +15,9 @@
 @property (nonatomic, weak) IBOutlet NSButton *alwaysShowOSKCheckBox;
 @property (nonatomic, weak) IBOutlet NSButton *useVerboseLoggingCheckBox;
 @property (nonatomic, weak) IBOutlet NSTextField *verboseLoggingInfo;
+@property (nonatomic, weak) IBOutlet NSButton *supportBack;
+@property (nonatomic, weak) IBOutlet NSButton *supportForward;
+@property (nonatomic, weak) IBOutlet NSButton *supportHome;
 @property (nonatomic, strong) NSMutableArray *tableContents;
 @property (nonatomic, strong) NSTimer *reloadTimer;
 @property (nonatomic, strong) NSDate *lastReloadDate;
@@ -52,20 +55,58 @@
 }
 
 - (void)windowDidLoad {
+    [self.AppDelegate registerConfigurationWindow:self];
     [super windowDidLoad];
     [self.window center];
     [_tableView registerForDraggedTypes:@[NSFilenamesPboardType]];
     _lastReloadDate = [NSDate date];
     [self startTimer];
-
-    KeymanVersionInfo versionInfo = [[self AppDelegate] versionInfo];
-    NSString *versionUrl = [NSString stringWithFormat:@"https://%@/products/mac/%@", versionInfo.helpKeymanCom, versionInfo.versionRelease];
     
     [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: versionUrl]]];
+    [self.webView setPolicyDelegate:(id<WebPolicyDelegate>)self];
+
+    NSURL *homeUrl = [[NSBundle mainBundle] URLForResource:@"index" withExtension:@"html" subdirectory:@"Help"];
+    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:homeUrl]];
 
     [self.alwaysShowOSKCheckBox setState:(self.AppDelegate.alwaysShowOSK ? NSOnState : NSOffState)];
     [self.useVerboseLoggingCheckBox setState:(self.AppDelegate.useVerboseLogging ? NSOnState : NSOffState)];
+}
+
+- (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
+    [[NSWorkspace sharedWorkspace] openURL:[actionInformation objectForKey:WebActionOriginalURLKey]];
+    [listener ignore];
+}
+
+- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
+    NSString* url = [[request URL] absoluteString];
+    if (self.AppDelegate.debugMode)
+        NSLog(@"decidePolicyForNavigationAction, navigating to %@", url);
+
+    if([url hasPrefix: @"file:"]) {
+        [listener use];
+    } else {
+        [listener ignore];
+        [[NSWorkspace sharedWorkspace] openURL: [request URL]];
+    }
+}
+
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame; {
+    self.supportBack.enabled = [self.webView canGoBack];
+    self.supportForward.enabled = [self.webView canGoForward];
+}
+
+- (IBAction)supportBackAction:(id)sender {
+    [self.webView goBack];
+}
+
+- (IBAction)supportForwardAction:(id)sender {
+    [self.webView goForward];
+}
+
+- (IBAction)supportHomeAction:(id)sender {
+    NSURL *homeUrl = [[NSBundle mainBundle] URLForResource:@"index" withExtension:@"html" subdirectory:@"Help"];
+    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:homeUrl]];
+
 }
 
 - (void)setTableView:(NSTableView *)tableView {

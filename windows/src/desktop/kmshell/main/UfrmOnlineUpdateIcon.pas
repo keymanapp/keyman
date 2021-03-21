@@ -123,7 +123,7 @@ procedure TfrmOnlineUpdateIcon.trayClick(Sender: TObject);
 begin
   tmrShowBalloon.Enabled := False;
   tray.Visible := False;
-  with TOnlineUpdateCheck.Create(True, False) do
+  with TOnlineUpdateCheck.Create(nil, True, False) do
   try
     if Run = oucUnknown {Cancel clicked} then
     begin

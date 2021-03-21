@@ -37,12 +37,14 @@ unit OnlineUpdateCheck;  // I3306
 interface
 
 uses
+  System.Classes,
+  System.SysUtils,
   System.UITypes,
-  Classes,
+  Vcl.Forms,
+
   httpuploader,
-  SysUtils,
-  UfrmDownloadProgress,
-  Keyman.System.UpdateCheckResponse;
+  Keyman.System.UpdateCheckResponse,
+  UfrmDownloadProgress;
 
 type
   EOnlineUpdateCheck = class(Exception);
@@ -85,6 +87,7 @@ type
 
   TOnlineUpdateCheck = class
   private
+    FOwner: TCustomForm;
     FSilent: Boolean;
     FForce: Boolean;
     FParams: TOnlineUpdateCheckParams;
@@ -109,7 +112,7 @@ type
   public
 
   public
-    constructor Create(AForce, ASilent: Boolean);
+    constructor Create(AOwner: TCustomForm; AForce, ASilent: Boolean);
     destructor Destroy; override;
     function Run: TOnlineUpdateCheckResult;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
@@ -128,13 +131,16 @@ type
     function Params: TOnlineUpdateCheckParams;
   end;
 
-procedure OnlineUpdateAdmin(Path: string);
+procedure OnlineUpdateAdmin(OwnerForm: TCustomForm; Path: string);
 
 implementation
 
 uses
+  System.WideStrUtils,
   Vcl.Dialogs,
-  Vcl.Forms,
+  Winapi.ShellApi,
+  Winapi.Windows,
+  Winapi.WinINet,
 
   GlobalProxySettings,
   KLog,
@@ -144,7 +150,6 @@ uses
   OnlineConstants,
   ErrorControlledRegistry,
   RegistryKeys,
-  ShellApi,
   Upload_Settings,
   utildir,
   utilexecute,
@@ -154,19 +159,18 @@ uses
   utilkmshell,
   utilsystem,
   utiluac,
-  versioninfo,
-  WideStrUtils,
-  Windows,
-  WinINet;
+  versioninfo;
 
 const
   SPackageUpgradeFilename = 'upgrade_packages.inf';
 
 { TOnlineUpdateCheck }
 
-constructor TOnlineUpdateCheck.Create(AForce, ASilent: Boolean);
+constructor TOnlineUpdateCheck.Create(AOwner: TCustomForm; AForce, ASilent: Boolean);
 begin
   inherited Create;
+
+  FOwner := AOwner;
 
   FShowErrors := True;
   FParams.Result := oucUnknown;
@@ -324,12 +328,12 @@ begin
     if FParams.Packages[i].Install and FileExists(FParams.Packages[i].SavePath) then
       if Result
         then DeleteFileOnReboot(FParams.Packages[i].SavePath)
-        else SysUtils.DeleteFile(FParams.Packages[i].SavePath);
+        else System.SysUtils.DeleteFile(FParams.Packages[i].SavePath);
 
   if FParams.Keyman.Install and FileExists(FParams.Keyman.SavePath) then
     if Result
       then DeleteFileOnReboot(FParams.Keyman.SavePath)
-      else SysUtils.DeleteFile(FParams.Keyman.SavePath);
+      else System.SysUtils.DeleteFile(FParams.Keyman.SavePath);
 
   if not Result
     then RemoveDir(ExcludeTrailingPathDelimiter(DownloadTempPath))
@@ -348,7 +352,7 @@ begin
 
   kmcom.Refresh;
   kmcom.Apply;
-  SysUtils.DeleteFile(Package.SavePath);
+  System.SysUtils.DeleteFile(Package.SavePath);
 end;
 
 procedure TOnlineUpdateCheck.DoInstallKeyman;
@@ -389,9 +393,14 @@ procedure TOnlineUpdateCheck.ShowUpdateForm;
 var
   i: Integer;
   FRequiresAdmin: Boolean;
+  FOwnerHandle: THandle;
 begin
+  if Assigned(FOwner)
+    then FOwnerHandle := FOwner.Handle
+    else FOwnerHandle := Application.Handle;
+
   { We have an update available }
-  with OnlineUpdateNewVersion(nil) do
+  with OnlineUpdateNewVersion(FOwner) do
   try
     Params := Self.FParams;
     if ShowModal <> mrYes then
@@ -431,7 +440,7 @@ begin
       if CanElevate then
       begin
         SavePackageUpgradesToDownloadTempPath;
-        if WaitForElevatedConfiguration(Application.Handle, '-ou "'+DownloadTempPath+'"', not FParams.Keyman.Install) <> 0 then  // I2513
+        if WaitForElevatedConfiguration(FOwnerHandle, '-ou "'+DownloadTempPath+'"', not FParams.Keyman.Install) <> 0 then  // I2513
           FParams.Result := oucFailure
         else if FParams.Keyman.Install then
           FParams.Result := oucShutDown
@@ -638,7 +647,7 @@ begin
   end;
 end;
 
-procedure OnlineUpdateAdmin(Path: string);
+procedure OnlineUpdateAdmin(OwnerForm: TCustomForm; Path: string);
 var
   Package: TOnlineUpdateCheckParamsPackage;
   f: TSearchRec;
@@ -647,7 +656,7 @@ var
 begin
   Path := IncludeTrailingPathDelimiter(Path);
   FPackageUpgradeList := TStringList.Create;
-  with TOnlineUpdateCheck.Create(False,True) do
+  with TOnlineUpdateCheck.Create(OwnerForm,False,True) do
   try
     if FileExists(Path + SPackageUpgradeFileName) then
       FPackageUpgradeList.LoadFromFile(Path + SPackageUpgradeFilename);
@@ -665,14 +674,14 @@ begin
         end;
       until FindNext(f) <> 0;
 
-      SysUtils.FindClose(f);
+      System.SysUtils.FindClose(f);
     end;
 
     if FindFirst(Path + '*.exe', 0, f) = 0 then
     begin
       FParams.Keyman.SavePath := Path + f.Name;
       DoInstallKeyman;
-      SysUtils.FindClose(f);
+      System.SysUtils.FindClose(f);
     end;
   finally
     Free;

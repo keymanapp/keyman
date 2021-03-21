@@ -69,20 +69,28 @@ public enum Key {
 
 public enum Defaults {
   private static let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
-  public static let keyboard = InstallableKeyboard(id: "sil_euro_latin",
-                                                   name: "EuroLatin (SIL)",
-                                                   languageID: "en",
-                                                   languageName: "English",
-                                                   version: "1.9.1",
-                                                   isRTL: false,
-                                                   font: font,
-                                                   oskFont: nil,
-                                                   isCustom: false)
-  public static let lexicalModel = InstallableLexicalModel(id: "nrc.en.mtnt",
-                                                   name: "English dictionary (MTNT)",
-                                                   languageID: "en",
-                                                   version: "0.1.4",
-                                                   isCustom: false)
+
+  public static let keyboardID = FullKeyboardID(keyboardID: "sil_euro_latin", languageID: "en")
+  public static let lexicalModelID = FullLexicalModelID(lexicalModelID: "nrc.en.mtnt", languageID: "en")
+
+  public static var keyboardPackage: KeyboardKeymanPackage = {
+    let bundledKMP = Resources.bundle.url(forResource: keyboardID.keyboardID, withExtension: ".kmp")!
+    return try! ResourceFileManager.shared.prepareKMPInstall(from: bundledKMP) as! KeyboardKeymanPackage
+  }()
+
+  public static let lexicalModelPackage: LexicalModelKeymanPackage = {
+    let bundledKMP = Resources.bundle.url(forResource: lexicalModelID.lexicalModelID, withExtension: ".model.kmp")!
+    return try! ResourceFileManager.shared.prepareKMPInstall(from: bundledKMP) as! LexicalModelKeymanPackage
+  }()
+
+  // Must be retrieved from their packages!
+  public static let keyboard: InstallableKeyboard = {
+    return keyboardPackage.findResource(withID: keyboardID)!
+  }()
+
+  public static let lexicalModel: InstallableLexicalModel = {
+    return lexicalModelPackage.findResource(withID: lexicalModelID)!
+  }()
 }
 
 public enum Resources {

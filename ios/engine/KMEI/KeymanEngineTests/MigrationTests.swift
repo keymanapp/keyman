@@ -15,6 +15,105 @@ class MigrationTests: XCTestCase {
     TestUtils.standardTearDown()
   }
 
+//  // Uncomment this and set up whatever resources are needed for your test bundle in order to build one!
+//  func testForMigrationBundleConstruction() {
+//    do {
+//      if let sil_euro_latin = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as? KeyboardKeymanPackage {
+//      try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.sil_euro_latin.fullID, from: sil_euro_latin)
+//      } else {
+//          XCTFail()
+//      }
+//
+//      if let sencoten_kbd_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.fvSencotenKMP) as? KeyboardKeymanPackage {
+//        try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.fv_sencoten.fullID, from: sencoten_kbd_kmp)
+//      } else {
+//          XCTFail()
+//      }
+//
+//      if let mtntKMP = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) as? LexicalModelKeymanPackage {
+//        try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.mtnt.fullID,
+//          from: mtntKMP)
+//      } else {
+//          XCTFail()
+//      }
+//
+//      if let sencoten_lm_kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.sencotenKMP) as? LexicalModelKeymanPackage {
+//        try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.sencoten.fullID,
+//          from: sencoten_lm_kmp)
+//      } else {
+//          XCTFail()
+//      }
+//
+//    } catch {
+//      XCTFail("File system commands failed.")
+//    }
+//
+//    // Set the desired version entry for your format, if different from the actual local version.
+//    // Only use if you're sure the specified version has a matching file format.
+//    Storage.active.userDefaults.lastEngineVersion = Version.packageBasedFileReorg
+//    Storage.active.userDefaults.migrationLevel = 20 // migratedForKMP
+//
+//    // Note:  you may need to manually pause at a certain (marked) point within this method
+//    // for everything to successfully write out!
+//    if let saveState = try? TestUtils.EngineStateBundler.createBundle(withName: "Early 14.0 with defaults") {
+//      self.add(saveState)
+//    } else {
+//      XCTFail()
+//    }
+//  }
+
+  func testSimpleEarly14Migration() {
+    // A case where the user has both SENCOTEN installed for both keyboard & lexical model.
+    // Mirrors `testNoDefaultsEarly14Migration`, but where sil_euro_latin
+    // was not removed by the user; in contrast, the base resources
+    // should be auto-updated.
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.simple_14)
+    Migrations.migrate(storage: Storage.active)
+    Migrations.updateResources(storage: Storage.active)
+
+    let userDefaults = Storage.active.userDefaults
+    let userKeyboards = userDefaults.userKeyboards ?? []
+    let userLexicalModels = userDefaults.userLexicalModels ?? []
+
+    XCTAssertEqual(userKeyboards.count, 2)
+    // Because there's a lexical model update, it installs the whole package.
+    // Not exactly ideal, but correct for pre-existing behavior, which
+    // installs the whole default package instead of a single language-code pairing.
+    XCTAssertEqual(userLexicalModels.count, 4)
+
+    //[s]il_[e]uro_[l]atin
+    let kbdSEL = userKeyboards.first(where: { $0.fullID == TestUtils.Keyboards.sil_euro_latin.fullID })
+    XCTAssertNotNil(kbdSEL)
+    // Because there's a keyboard update (1.9.3 vs 1.9.1, at the time of writing).
+    // we expect a more recent version than the testing version.
+    XCTAssertGreaterThan(Version(kbdSEL!.version)!, Version(TestUtils.Keyboards.sil_euro_latin.version)!)
+    XCTAssertTrue(userLexicalModels.contains(where: { $0.fullID == TestUtils.LexicalModels.mtnt.fullID }))
+
+    XCTAssertTrue(userKeyboards.contains(where: { $0.fullID == TestUtils.Keyboards.fv_sencoten.fullID }))
+    XCTAssertTrue(userLexicalModels.contains(where: { $0.fullID == TestUtils.LexicalModels.sencoten.fullID }))
+  }
+
+  func testNoDefaultsEarly14Migration() {
+    // A case where the user only has SENCOTEN installed for both keyboard & lexical model.
+    // sil_euro_latin was explicitly removed by the user.
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.noDefault_14)
+    Migrations.migrate(storage: Storage.active)
+    Migrations.updateResources(storage: Storage.active)
+
+    let userDefaults = Storage.active.userDefaults
+    let userKeyboards = userDefaults.userKeyboards ?? []
+    let userLexicalModels = userDefaults.userLexicalModels ?? []
+
+    XCTAssertEqual(userKeyboards.count, 1)
+    XCTAssertEqual(userLexicalModels.count, 1)
+
+    XCTAssertFalse(userKeyboards.contains(where: { $0.fullID == TestUtils.Keyboards.sil_euro_latin.fullID }))
+    XCTAssertFalse(userLexicalModels.contains(where: { $0.fullID == TestUtils.LexicalModels.mtnt.fullID }))
+
+    XCTAssertTrue(userKeyboards.contains(where: { $0.fullID == TestUtils.Keyboards.fv_sencoten.fullID }))
+    XCTAssertTrue(userLexicalModels.contains(where: { $0.fullID == TestUtils.LexicalModels.sencoten.fullID }))
+  }
+
   func testComplexVersion13Migration() {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.cloud_to_kmp_13)
     Migrations.migrate(storage: Storage.active)
@@ -30,7 +129,7 @@ class MigrationTests: XCTestCase {
 
     sil_euro_latin_kbds.forEach {
       XCTAssertEqual($0.packageID, "sil_euro_latin")
-      XCTAssertEqual($0.version, TestUtils.Keyboards.sil_euro_latin.version)
+      XCTAssertEqual($0.version, Defaults.keyboard.version)
     }
 
     let sil_euro_latin_package = ResourceFileManager.shared.installedPackages.first(where: { $0.id == "sil_euro_latin" }) as! KeyboardKeymanPackage
@@ -52,7 +151,7 @@ class MigrationTests: XCTestCase {
 
     let userDefaults = Storage.active.userDefaults
 
-    // SIL EuroLatin should be updated to 1.9.1.  The lexical model version should be unchanged.
+    // SIL EuroLatin should be updated to the currently-bundled version.  The lexical model version should be unchanged.
 
     let defaultKbd = userDefaults.userKeyboards![0]
     XCTAssertEqual(defaultKbd.id, Defaults.keyboard.id)

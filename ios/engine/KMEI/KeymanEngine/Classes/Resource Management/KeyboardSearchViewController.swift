@@ -157,6 +157,28 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     progressView?.isHidden = false
   }
 
+  private func failWithAlert(for error: Error) {
+    let errorTitle = NSLocalizedString("alert-no-connection-title", bundle: engineBundle, comment: "")
+    let alert = ResourceFileManager.shared.buildSimpleAlert(title: errorTitle, message: error.localizedDescription) {
+      // If we are in a UINavigationViewController and are not its root view...
+      if let navVC = self.navigationController, navVC.viewControllers.first != self {
+        navVC.popViewController(animated: true)
+      } else {
+        self.dismiss(animated: true)
+      }
+    }
+
+    self.present(alert, animated: true)
+  }
+
+  public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    failWithAlert(for: error)
+  }
+
+  public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    failWithAlert(for: error)
+  }
+
 
   override public func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
@@ -232,6 +254,15 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
             // Illegal state - we already checked this.
             fatalError()
         }
+
+        // We've likely installed the package, and we already know
+        // the package's current publishing state - we literally just
+        // downloaded it from the cloud as part of the keyboard search.
+        //
+        // Why query later when we know the query's answer NOW?
+        let publishState = KeymanPackage.DistributionStateMetadata(downloadURL: packageURL, version: package.version)
+
+        Storage.active.userDefaults.cachedPackageQueryMetadata[package.key] = publishState
       }
 
       downloadManager.downloadPackage(withKey: packageKey, from: packageURL, withNotifications: true, completionBlock: downloadClosure)

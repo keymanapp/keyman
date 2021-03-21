@@ -63,6 +63,7 @@ type
   TRunTools = class
   private
     FSilent: Boolean;
+    FMustReboot: Boolean;
     FPromptForReboot: Boolean;  // I3355   // I3500
     FErrorLog: TFileStream;
     StatusMax: Integer;
@@ -106,6 +107,7 @@ type
 
     class procedure CheckInstalledVersion(msiLocation: TInstallInfoFileLocation);
 
+    property MustReboot: Boolean read FMustReboot;
     property Silent: Boolean read FSilent write FSilent;
     property PromptForReboot: Boolean read FPromptForReboot write FPromptForReboot;  // I3355   // I3500
     property Online: Boolean read FOnline;
@@ -147,6 +149,7 @@ uses
   SFX,
   TntDialogHelp,
   ErrorControlledRegistry,
+  utildir,
   utilsystem,
   utilexecute,
   VersionInfo;
@@ -646,6 +649,11 @@ var
       TUtilExecute.CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode);
     end;
   end;
+
+  function IsKeymanRunning: Boolean;
+  begin
+    Result := FindWindow('TfrmKeyman7Main', nil) <> 0;
+  end;
 begin
   FKMShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
   if System.SysUtils.FileExists(FKMShellPath) then
@@ -704,15 +712,27 @@ begin
 
   DeleteBackupPath;  // I2747
 
+  // Delete the Keyman autostart backup
+  with CreateHKCURegistry do
+  try
+    if OpenKey('\' + SRegKey_KeymanDesktop_CU, True) and ValueExists(SRegValue_UpgradeRunKeyman) then
+      DeleteValue(SRegValue_UpgradeRunKeyman);
+  finally
+    Free;
+  end;
+
   if StartKeyman then  // I2738
   begin
     if System.SysUtils.FileExists(FKMShellPath) then
     begin
-      s := '"'+FKMShellPath+'"';
-      if StartWithConfiguration then
-        s := s + ' -startWithConfiguration';
-      if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
-        LogError('Failed to start Keyman: '+SysErrorMessage(GetLastError), False); // I2756
+      if StartWithConfiguration or not IsKeymanRunning then
+      begin
+        s := '"'+FKMShellPath+'"';
+        if StartWithConfiguration then
+          s := s + ' -startWithConfiguration';
+        if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
+          LogError('Failed to start Keyman: '+SysErrorMessage(GetLastError), False); // I2756
+      end;
     end;
   end;
 
@@ -720,14 +740,38 @@ begin
 end;
 
 procedure TRunTools.PrepareForReboot(res: Cardinal);
+var
+  FTempFilename: string;
 begin
+  FMustReboot := True;
+
   with CreateHKCURegistry do  // I2749
   try
     if OpenKey(SRegKey_WindowsRunOnce_CU, True) then
-      WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c');
+    begin
+      FTempFilename := KGetTempFilename;
+      FInstallInfo.SaveToJSONFile(FTempFilename);
+      WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c "'+FTempFilename+'"');
+    end;
   finally
     Free;
   end;
+
+  // Delete the Keyman autostart; it will be reinstated when setup finishes
+  // but this avoids conflict of Keyman starting while the setup is still
+  // running
+  with CreateHKCURegistry do
+  try
+    if OpenKey(SRegKey_WindowsRun_CU, False) and ValueExists(SRegValue_WindowsRun_Keyman) then
+    begin
+      DeleteValue(SRegValue_WindowsRun_Keyman);
+      if OpenKey('\' + SRegKey_KeymanDesktop_CU, True) then
+        WriteBool(SRegValue_UpgradeRunKeyman, True);
+    end;
+  finally
+    Free;
+  end;
+
 
   if res = ERROR_SUCCESS_REBOOT_REQUIRED then
   begin

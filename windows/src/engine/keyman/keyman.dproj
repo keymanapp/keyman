@@ -171,10 +171,6 @@
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\hints\HintConsts.pas"/>
         <DCCReference Include="KeymanHints.pas"/>
-        <DCCReference Include="..\..\global\delphi\ui\UfrmKeymanBase.pas">
-            <Form>frmKeymanBase</Form>
-            <DesignClass>TTntForm</DesignClass>
-        </DCCReference>
         <DCCReference Include="..\..\global\delphi\hints\Hints.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilcheckfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
@@ -297,9 +293,9 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>keyman.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -309,9 +305,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>keyman.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

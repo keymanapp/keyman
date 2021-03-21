@@ -1182,7 +1182,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
   case TSS_MNEMONIC:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_MnemonicLayout);
     FMnemonicLayout = atoiW(sp->dpString) == 1;
-    if (FMnemonicLayout) {
+    if (FMnemonicLayout && FindSystemStore(fk, TSS_CASEDKEYS) != NULL) {
       // The &CasedKeys system store is not supported for
       // mnemonic layouts
       return CERR_CasedKeysNotSupportedWithMnemonicLayout;
@@ -2400,7 +2400,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
       case 16:
         VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
         q = p + 1;
-        while (*q && !iswblank(*q)) q++;
+        while (*q && !iswspace(*q)) q++;
         c = *q; *q = 0;
         n = CodeConstants->GetCode(p + 1, &i);
         *q = c;
@@ -3607,4 +3607,17 @@ extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
   if (mode == 0) {
     RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }
+}
+
+PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, DWORD dwSystemID) {
+  assert(fk != NULL);
+  assert(dwSystemID != 0);
+
+  PFILE_STORE sp = fk->dpStoreArray;
+  for (DWORD i = 0; i < fk->cxStoreArray; i++, sp++) {
+    if (sp->dwSystemID == dwSystemID) {
+      return sp;
+    }
+  }
+  return NULL;
 }

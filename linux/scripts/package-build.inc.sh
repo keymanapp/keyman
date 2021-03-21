@@ -50,6 +50,7 @@ function downloadSource() {
     mv ${proj}-${version} ${BASEDIR}/${packageDir}
     mv ${proj}_${version}.orig.tar.gz ${BASEDIR}/${packageDir}
     mv ${proj}-${version}.tar.gz ${BASEDIR}/${packageDir}
+    mv ${proj}*.asc ${BASEDIR}/${packageDir}
     rm ${proj}*.debian.tar.xz
     cd ${BASEDIR}/${packageDir}
     wget -N https://downloads.keyman.com/linux/${TIER}/${dirversion}/SHA256SUMS

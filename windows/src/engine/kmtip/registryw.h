@@ -58,14 +58,6 @@
 #define REGSZ_KeymanActiveLanguagesW REGSZ_KeymanCUW L"\\active languages"
 #define REGSZ_KeymanLanguageHotkeysW REGSZ_KeymanCUW L"\\language hotkeys"
 
-#ifdef _WIN64
-#define REGSZ_KeymanAddinsCUW         		REGSZ_KeymanCUW L"\\add-ins (x64)"
-#define REGSZ_KeymanAddinsLMW         		REGSZ_KeymanLMW L"\\add-ins (x64)"
-#else
-#define REGSZ_KeymanAddinsCUW         		REGSZ_KeymanCUW L"\\add-ins"
-#define REGSZ_KeymanAddinsLMW         		REGSZ_KeymanLMW L"\\add-ins"
-#endif
-
 #define REGSZ_KeymanHotkeysW				REGSZ_KeymanCUW L"\\hotkeys"
 
 #define REGSZ_EvaluationW		L"evaluation"
@@ -112,11 +104,8 @@
 #define REGSZ_ShouldShowStartupW		L"show keyman startup"
 #define REGSZ_ShouldStartInternatW	L"should start internat"
 
-/* Addins */ 
-
-#define REGSZ_AddinNameW			 L"addin name"
-#define REGSZ_AddinFileNameW	 L"addin file name"
-#define REGSZ_AddinEnabledW    L"addin enabled"
+#define REGSZ_KeymanEngineDebug_CU  L"software\\keyman\\keyman engine\\Debug"
+#define REGSZ_Flag_UseAutoStartTask L"Flag_UseAutoStartTask"
 
 /* Registry keys for upgrade purposes only */ 
 

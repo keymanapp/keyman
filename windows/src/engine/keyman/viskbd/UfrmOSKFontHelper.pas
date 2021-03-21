@@ -54,7 +54,6 @@ uses
 
   ClearTypeDrawCharacter,
   keymanapi_TLB,
-  UfrmKeymanBase,
   UfrmOSKPlugInBase,
   UserMessages,
   utilcheckfonts;

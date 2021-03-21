@@ -211,6 +211,7 @@ begin
     Data := TInstallKeyboardSharedData.Create(FXML, FTempPath, FPackagePath, FFiles);
     PageTag := modWebHttpServer.SharedData.Add(Data);
     FRenderPage := 'installkeyboard';
+    HelpTopic := 'context/install-keyboard';
     Content_Render('tag='+IntToStr(PageTag));
   finally
     Screen.Cursor := crDefault;

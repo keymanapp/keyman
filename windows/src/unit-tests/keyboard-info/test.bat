@@ -25,7 +25,10 @@ call :should-pass "Valid keyboard info file" test-valid.keyboard_info || exit /b
 
 call :should-fail "Keyboard info file with invalid BCP-47 code" test-invalid-language-code.keyboard_info || exit /b 1
 
-call :should-fail "Keyboard info file with non-canonical BCP-47 code" test-non-canonical-language-code.keyboard_info || exit /b 1
+:: in 13.0, this test was a should-fail
+:: in 14.0, we made non-canonical bcp 47 codes a hint instead of an error
+:: see #4689.
+call :should-pass "Keyboard info file with non-canonical BCP-47 code" test-non-canonical-language-code.keyboard_info || exit /b 1
 
 goto :eof
 

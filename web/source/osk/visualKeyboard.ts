@@ -46,6 +46,12 @@ namespace com.keyman.osk {
   //#region OSK key objects and construction
   export class OSKKeySpec implements keyboards.LayoutKey {
     id: string;
+
+    // Only set (within @keymanapp/keyboard-processor) for keys actually specified in a loaded layout
+    baseKeyID?: string;
+    coreID?: string;
+    elementID?: string;
+
     text?: string;
     sp?: number | keyboards.ButtonClass;
     width: string;
@@ -317,13 +323,13 @@ namespace com.keyman.osk {
 
     getId(osk: VisualKeyboard): string {
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
-      return this.layer+'-'+this.spec.id;
+      return this.spec.elementID;
     }
 
     // Produces a small reference label for the corresponding physical key on a US keyboard.
     private generateKeyCapLabel(): HTMLDivElement {
       // Create the default key cap labels (letter keys, etc.)
-      var x = Codes.keyCodes[this.spec.id];
+      var x = Codes.keyCodes[this.spec.baseKeyID];
       switch(x) {
         // Converts the keyman key id code for common symbol keys into its representative ASCII code.
         // K_COLON -> K_BKQUOTE
@@ -1044,9 +1050,74 @@ namespace com.keyman.osk {
         return null;
       }
 
+      // Note:  if subkeys are active, they will still be displayed at this time.
+      // TODO:  In such cases, we should build an ActiveLayout (of sorts) for subkey displays,
+      //        update their geometries to the actual display values, and use the results here.
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
-      return this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
+      let baseKeyProbabilities = this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
+
+      if(!this.popupBaseKey || !this.popupBaseKey.key) {
+        return baseKeyProbabilities;
+      } else {
+        // A temp-hack, as this was noted just before 14.0's release.
+        // Since a more... comprehensive solution would be way too complex this late in the game,
+        // this provides a half-decent stopgap measure.
+        //
+        // Will not correct to nearby subkeys; only includes the selected subkey and its base keys.
+        // Still, better than ignoring them both for whatever base key is beneath the final cursor location.
+        let baseMass = 1.0;
+
+        let baseKeyMass = 1.0;
+        let baseKeyID = this.popupBaseKey.key.spec.coreID;
+
+        let popupKeyMass = 0.0;
+        let popupKeyID: string = null;
+
+        // Note:  when embedded on Android (as of 14.0, at least), we don't get access to this.
+        // Just the base key.
+        if(this.keyPending && this.keyPending.key) {
+          popupKeyMass = 3.0;
+          popupKeyID = this.keyPending.key.spec.coreID;
+        }
+
+        // If the base key appears in the subkey array and was selected, merge the probability masses.
+        if(popupKeyID == baseKeyID) {
+          baseKeyMass += popupKeyMass;
+          popupKeyMass = 0;
+        }
+
+        // Compute the normalization factor
+        let totalMass = baseMass + baseKeyMass + popupKeyMass;
+        let scalar = 1.0 / totalMass;
+
+        // Prevent duplicate entries in the final map & normalize the remaining entries!
+        for(let i=0; i < baseKeyProbabilities.length; i++) {
+          let entry = baseKeyProbabilities[i];
+          if(entry.keyId == baseKeyID) {
+            baseKeyMass += entry.p * scalar;
+            baseKeyProbabilities.splice(i, 1);
+            i--;
+          } else if(entry.keyId == popupKeyID) {
+            popupKeyMass =+ entry.p * scalar;
+            baseKeyProbabilities.splice(i, 1);
+            i--;
+          } else {
+            entry.p *= scalar;
+          }
+        }
+
+        let finalArray: {keyId: string, p: number}[] = [];
+
+        if(popupKeyMass > 0) {
+          finalArray.push({keyId: popupKeyID, p: popupKeyMass * scalar});
+        }
+
+        finalArray.push({keyId: baseKeyID, p: baseKeyMass * scalar});
+
+        finalArray = finalArray.concat(baseKeyProbabilities);
+        return finalArray;
+      }
     }
 
     /**
@@ -1766,7 +1837,11 @@ namespace com.keyman.osk {
         //  bk = skElement;
         //  break;
         //} else
-        if(skSpec.id == baseKey.keyId && skSpec.layer == baseKey.key.layer) {
+        if(!baseKey.key || !baseKey.key.spec) {
+          continue;
+        }
+
+        if(skSpec.elementID == baseKey.key.spec.elementID) {
           bk = skElement;
           break; // Best possible match has been found.  (Disable 'break' once above block is implemented.)
         }

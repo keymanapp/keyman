@@ -1,18 +1,18 @@
 (*
   Name:             UfrmInstallKeyboardFromWeb
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Oct 2006
 
   Modified Date:    2 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Oct 2006 - mcdurdin - Initial version
                     05 Dec 2006 - mcdurdin - Refactor using XML-Renderer
                     12 Dec 2006 - mcdurdin - Capitalize form name
@@ -112,6 +112,7 @@ begin
   cef.OnLoadingStateChange := cefLoadingStateChange;
 
   FRenderPage := 'downloadkeyboard';
+  HelpTopic := 'context/download-keyboard';
 
   Content_Render;
 end;
@@ -230,6 +231,7 @@ begin
   FTempFilename := FDownloadFilename + '.download';
   Client := THTTPClient.Create;
   try
+    Client.SecureProtocols := [THTTPSecureProtocol.TLS1, THTTPSecureProtocol.TLS11, THTTPSecureProtocol.TLS12];
     Client.OnReceiveData := HttpReceiveData;
 
     Stream := TFileStream.Create(FTempFilename, fmCreate);

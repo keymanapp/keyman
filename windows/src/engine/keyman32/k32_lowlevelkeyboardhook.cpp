@@ -146,6 +146,7 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   DWORD Flag = 0;
   if (UseRegisterHotkey()) {
+    // The old RegisterHotkey pattern does not support chiral modifier keys
     switch (hs->vkCode) {
       case VK_LCONTROL:
       case VK_RCONTROL:
@@ -159,16 +160,20 @@ LRESULT _kmnLowLevelKeyboardProc(
     }
   }
   else {
+    // #4619: We differentiate between Left and Right Ctrl/Shift/Alt. The right modifiers are
+    // not used for hotkeys, leaving them available for use as keystroke modifiers within a
+    // Keyman keyboard. But we need to track them anyway, so that a user doesn't press them
+    // and receive a hotkey event when they shouldn't (e.g. RALT+F4 if the hotkey is F4).
     switch (hs->vkCode) {
       case VK_LCONTROL: Flag = HK_CTRL; break;
-      case VK_RCONTROL: Flag = 0; break;
-      case VK_CONTROL:  Flag = extended ? HK_CTRL : 0; break;
+      case VK_RCONTROL: Flag = HK_RCTRL_INVALID; break;
+      case VK_CONTROL:  Flag = extended ? HK_RCTRL_INVALID : HK_CTRL; break;
       case VK_LMENU:    Flag = HK_ALT; break;
-      case VK_RMENU:    Flag = 0; break;
-      case VK_MENU:     Flag = extended ? HK_ALT : 0; break;
+      case VK_RMENU:    Flag = HK_RALT_INVALID; break;
+      case VK_MENU:     Flag = extended ? HK_RALT_INVALID : HK_ALT; break;
       case VK_LSHIFT:   Flag = HK_SHIFT; break;
-      case VK_RSHIFT:   Flag = 0; break;
-      case VK_SHIFT:    Flag = hs->scanCode == SCANCODE_RSHIFT ? 0 : HK_SHIFT; break;
+      case VK_RSHIFT:   Flag = HK_RSHIFT_INVALID; break;
+      case VK_SHIFT:    Flag = hs->scanCode == SCANCODE_RSHIFT ? HK_RSHIFT_INVALID : HK_SHIFT; break;
     }
   }
 
