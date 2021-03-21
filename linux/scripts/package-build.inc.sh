@@ -45,7 +45,7 @@ function downloadSource() {
     version=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -)
     dirversion=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6)
     echo "${proj} version is ${version}"
-    uscan
+    uscan || (echo "ERROR: No new version available for ${proj}" >&2 && exit 1)
     cd ..
     mv ${proj}-${version} ${BASEDIR}/${packageDir}
     mv ${proj}_${version}.orig.tar.gz ${BASEDIR}/${packageDir}
