@@ -291,11 +291,21 @@ class ModelCompositor {
 
     // Generate a default 'keep' option if one was not otherwise produced.
     if(!keepOption && keepOptionText != '') {
-      let keepTransform = models.transformToSuggestion(inputTransform, 1);  // 1 is a filler value; goes unused b/c is for a 'keep'.
-      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
-      keepTransform.displayAs = keepOptionText;
+      // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
+      // for context-tracking otherwise!
+      let keepTransform: Transform = {
+        insert: inputTransform.insert,
+        deleteLeft: inputTransform.deleteLeft,
+        deleteRight: inputTransform.deleteRight,
+        id: inputTransform.id
+      };
 
-      keepOption = this.toAnnotatedSuggestion(keepTransform, 'keep');
+      // 1 is a filler value; goes unused b/c is for a 'keep'.
+      let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
+      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
+      keepSuggestion.displayAs = keepOptionText;
+
+      keepOption = this.toAnnotatedSuggestion(keepSuggestion, 'keep');
       keepOption.matchesModel = false;
     }
 
@@ -341,7 +351,6 @@ class ModelCompositor {
 
       // Do we need to manipulate the suggestion's transform based on the current state of the context?
       if(!context.right) {
-        // Only insert wordbreak characters if we're at the end of the context.  
         suggestion.transform.insert += punctuation.insertAfterWord;
       } else {
         // If we're mid-word, delete its original post-caret text.
