@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/web-utils",
-  "version": "15.0.20",
+  "version": "15.0.21",
   "description": "Common utility functions used throughout other Keyman packages",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@keymanapp/resources-gosh": "^15.0.20",
-    "@keymanapp/web-environment": "^15.0.20",
+    "@keymanapp/resources-gosh": "^15.0.21",
+    "@keymanapp/web-environment": "^15.0.21",
     "@types/node": "^14.0.5",
     "typescript": "^3.8.3"
   }
