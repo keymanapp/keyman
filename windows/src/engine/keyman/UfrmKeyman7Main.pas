@@ -550,7 +550,7 @@ begin
   if Assigned(FLangSwitchRefreshWatcher) then
   begin
     FLangSwitchRefreshWatcher.Terminate;
-    FLangSwitchRefreshWatcher := nil;
+    FreeAndNil(FLangSwitchRefreshWatcher);
   end;
 
   FreeAndNil(FInputPane);
@@ -2007,9 +2007,9 @@ begin
   if Assigned(FLangSwitchRefreshWatcher) then
   begin
     FLangSwitchRefreshWatcher.Terminate;
+    FreeAndNil(FLangSwitchRefreshWatcher);
   end;
   FLangSwitchRefreshWatcher := TLangSwitchRefreshWatcher.Create(Handle);
-  FLangSwitchRefreshWatcher.FreeOnTerminate := True;
   FLangSwitchRefreshWatcher.Start;
 end;
 
