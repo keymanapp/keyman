@@ -9,7 +9,8 @@ title: Keyman for iPhone and iPad 14.0 Help
 * [Version History](about/history)
 
 ## [Getting Started](start/)
-* [How To - Adding a Keyboard](start/installing-keyboards)
+* [How To - Adding a Keyboard](start/searching-for-keyboards)
+* [How To - Keyboard and Dictionary Installation](start/installing-packages)
 * [How To - Installing Keyman as a System Keyboard](start/installing-system-keyboard)
 
 ## [Using the Menu](context/)
@@ -25,7 +26,7 @@ title: Keyman for iPhone and iPad 14.0 Help
 ### [Using Keyman for iPhone and iPad](basic/)
 * [Switching Between Keyboards](basic/switching-between-keyboards)
 * [Installing Custom Keyboards/Dictionaries](basic/installing-custom-keyboards-dictionaries)
-* [Sharing Keyboards](basic/sharing-keyboards)
+* [Sharing Keyboards and Dictionaries](basic/sharing-keyboards)
 * [Using the Keyman Browser](basic/using-keyman-browser)
 * [Removing Keyboards](basic/uninstalling-keyboards)
 

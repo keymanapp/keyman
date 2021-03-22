@@ -49,8 +49,8 @@ if [[ $# -gt 0 ]]; then
   fi
 
   if [[ $action == commit ]]; then
-    if [ "$base" != "master" ] && [ "$base" != "beta" ]; then
-      echo "Invalid branch $base specified: must be master or beta."
+    if [ "$base" != "master" ] && [ "$base" != "beta" ] && [[ ! "$base" =~ ^stable-[0-9]+\.[0-9]+$ ]]; then
+      echo "Invalid branch $base specified: must be master, beta, or stable-x.y."
       exit 1
     fi
 
@@ -67,7 +67,7 @@ fi
 if [[ $action == help ]]; then
   echo "Usage: increment-version.sh [-f] [commit base]"
   echo "  -f  forces a build even with no changes"
-  echo "  base must be either master or beta."
+  echo "  base must be either master, beta or stable-x.y."
   echo "  base must be equal to currently checked-out"
   echo "  branch (this may not be required in future)"
   exit 1
