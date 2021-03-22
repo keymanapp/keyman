@@ -35,21 +35,7 @@ option at the bottom-right.  Once you select it, you should then be greeted with
 the section below.
 
 ### Installing the Package
-Either approach seen above will start the installation process.  From there, Keyman
-for iPhone and iPad will parse the metadata in the package. Some packages include
-documentation that will be displayed at this time.
 
-![](../ios_images/dist-welcome-i.png)
+Whichever option you take, the app will launch and prompt you with the keyboard's installer.
 
-Click the **"Install"** button at the top right.
-
-The keyboard from the keyboard package will then be successfully installed!
-
-![](../ios_images/dist-kmp-success-i.png)
-
-All the keyboards in the package are installed as a group. In this example, the package only has the "GFF Amharic 7"
-keyboard, so it becomes the active keyboard.
-
-![](../ios_images/dist-install1-i.png)
-
-To learn how to create a custom installable keyboard, [click here](http://help.keyman.com/developer/current-version/guides/distribute/).
+[Follow this link to continue.](../start/installing-packages)
