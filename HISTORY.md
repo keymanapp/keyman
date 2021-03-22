@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.267 beta 2021-03-22
+
+* docs(ios): Help for 14.0 features (#4741)
+* chore: increment-version.sh for stable (#4742)
+
 ## 14.0.266 beta 2021-03-19
 
 * chore(android/app): Migrate launcher icon to adaptive (#4720)
