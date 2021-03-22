@@ -22,6 +22,12 @@ watch_windows='common|developer|web'
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due
 # to legacy updates and changes.
 #
+# These bc_x_y variables ARE used in trigger-builds.inc.sh by pattern so the names are important,
+# and you won't find them directly in a grep search.
+#
+# _Jenkins should be appended to any build configuration (pipeline) name that is from Jenkins,
+# not TeamCity.
+#
 
 # Test Build Configurations
 
@@ -61,4 +67,13 @@ bc_beta_web=(Keymanweb_Build)
 
 vcs_beta=HttpsGithubComKeymanappKeyman
 
-# TODO: Stable Build Configurations
+# Stable 14.0 Build Configurations
+
+bc_stable_14_0_android=(KeymanAndroid_Build)
+bc_stable_14_0_ios=(Keyman_iOS_Master)
+bc_stable_14_0_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
+bc_stable_14_0_mac=(KeymanMac_Master)
+bc_stable_14_0_windows=(Keyman_Build)
+bc_stable_14_0_web=(Keymanweb_Build)
+
+vcs_stable_14_0=HttpsGithubComKeymanappKeyman
