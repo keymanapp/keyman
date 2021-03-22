@@ -1,10 +1,16 @@
 ---
-title: Sharing Keyboards - Keyman for iPhone and iPad Help
+title: Sharing Keyboards and Dictionaries - Keyman for iPhone and iPad Help
 ---
+### Sharing Options
+There are two supported ways to share keyboards and dictionaries:
 
-### Sharing the File
-If you have installed a custom keyboard or dictionary from a file, Keyman keeps a copy
-of that file on your device.  You can find these copies in the iOS Files app.
+1. By file
+    - You may copy and send the `.kmp` package containing the keyboard or dictionary to someone else.
+2. By QR code
+    - You may show someone else a QR code that links directly to the package's download page.
+
+### Sharing via File
+Whenever you install a keyboard or dictionary from a file, Keyman makes a packaged copy of it on your device.  You can find these copies in the iOS Files app.
 
 ![](../ios_images/file-share-1i.png)
 
