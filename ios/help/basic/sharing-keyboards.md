@@ -21,6 +21,8 @@ Simply select the "Keyman" folder to view these files.
 From here, longpress the file for the keyboard or dictionary you wish to share, then
 click **Share** to view sharing options.
 
+For installing this file on another device, you may wish to read [Installing custom keyboards/dictionaries](installing-custom-keyboards-dictionaries).
+
 ### Sharing via QR code
 For keyboards and dictionaries downloaded directly through the app,
 you can provide friends with a scannable QR code.  First, find the resource
@@ -36,8 +38,8 @@ When you select the keyboard, a page like the following should appear:
 
 ![](../ios_images/qr-code-share-2i.png)
 
-Note that QR codes are only provided for certain keyboards and dictionaries
-at this time.
+Note that QR codes are only provided for keyboards and dictionaries
+that are distributed by Keyman.
 
 ### Installing from QR code
 To install from QR code, simply launch your device's Camera app and point
@@ -49,6 +51,5 @@ Selecting the notification seen at the top will lead you to the following page:
 
 ![](../ios_images/qr-code-share-4i.png)
 
-Select the big **Install on iPhone** (or
-**Install on iPad**) option will then download
-the file for easy installation.  (Refer to [Installing custom keyboards/dictionaries](installing-custom-keyboards-dictionaries) as necessary.)
+Selecting the big **Install on iPhone** (or **Install on iPad**) option will then download
+the file for easy installation.  (Refer to [Keyboard and Dictionary Installation](../start/installing-packages) for more information about installation.)
