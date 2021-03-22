@@ -10,7 +10,7 @@ title: Keyman for iPhone and iPad 14.0 Help
 
 ## [Getting Started](start/)
 * [How To - Adding a Keyboard](start/searching-for-keyboards)
-* [How To - Keyboard and Dictionary Installation](installing-packages)
+* [How To - Keyboard and Dictionary Installation](start/installing-packages)
 * [How To - Installing Keyman as a System Keyboard](start/installing-system-keyboard)
 
 ## [Using the Menu](context/)
