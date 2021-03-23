@@ -300,12 +300,7 @@ class ModelCompositor {
     if(!keepOption && keepOptionText != '') {
       // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
       // for context-tracking otherwise!
-      let keepTransform: Transform = {
-        insert: inputTransform.insert,
-        deleteLeft: inputTransform.deleteLeft,
-        deleteRight: inputTransform.deleteRight,
-        id: inputTransform.id
-      };
+      let keepTransform: Transform = { ...inputTransform };
 
       // 1 is a filler value; goes unused b/c is for a 'keep'.
       let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
