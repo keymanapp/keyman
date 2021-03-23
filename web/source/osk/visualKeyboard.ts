@@ -1055,6 +1055,11 @@ namespace com.keyman.osk {
       //        update their geometries to the actual display values, and use the results here.
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
+      let width = layerGroup.offsetWidth, height = layerGroup.offsetHeight;
+      // Prevent NaN breakages.
+      if(!width || !height) {
+        return null;
+      }
       let baseKeyProbabilities = this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
 
       if(!this.popupBaseKey || !this.popupBaseKey.key) {
