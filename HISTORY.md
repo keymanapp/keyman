@@ -1,5 +1,295 @@
 # Keyman Version History
 
+## 15.0.19 alpha 2021-03-09
+
+* fix(common/models): predictions after context reset / caret shift (#4411)
+* change(oem/fv/ios): FV keyboards now package-based (#4471)
+* fix(common/models): merges identical suggestions after casing (#4502)
+* fix(web): macOS 11 agent string parsing (#4497)
+* fix(ios): app logging messages were transient, never stored (#4500)
+* chore(ios): web-side sentry enablement try-catch (#4492)
+* fix(common/core/web): core key-processing now always returns RuleBehavior type. (#4508)
+* fix(common/resources): Set help-keyman.com.sh executable (#4510)
+* fix(developer/compilers): fixes error when "constructor" is in wordlist (#4504)
+* fix(web): hides touch-alias caret when keystroke causes focus change (#4514)
+* chore(common): allow forced version increment (#4522)
+* fix(web): keyboard documentation patch-up (#4512)
+* fix(web): removes package namespacing from kbd's CSS class (#4516)
+* fix(windows): Handle Caps Lock event correctly from TIP (#4536)
+* fix(developer): run even if sentry unavailable (#4537)
+* fix(developer): UTF-8 messages in LM compiler (#4539)
+* feat(common/models): mid-context suggestions & reversions, fix(common/models): correction-search SMP issues (#4427)
+* fix(ios): package installer completion requires welcome dismissal (#4543)
+* fix(windows): Refresh settings on 64-bit apps (#4378)
+* fix(windows): prevent re-registration of TIPs on 14.0 upgrade (#4535)
+* fix(web): mnemonic keystrokes w FF keymapping (#4540)
+* chore(ios/app): Adjust help titles for installing custom dictionaries (#4550)
+* fix(common/resources): Fix help.keyman.com path for CI (#4565)
+* fix(developer): Improve stability of named code constants (#4547)
+* fix(developer): schema conformance for model package compiler (#4548)
+* fix(developer): touch layout osk import handling of multiple modifiers (#4552)
+* fix(developer): require language tag when compiling keyboard package (#4563)
+* fix(developer): Avoid blank keys when importing KMX to KVKS (#4564)
+* feat(developer): isRTL support for lexical model editor (#4559)
+* fix(developer): track modified state in wordlist editor better (#4562)
+* chore(ios): better visual feedback for keyboard search during poor internet connectivity (#4573)
+* chore(common): Update crowdin files for `de` (#4578)
+* chore(common/core/desktop): write debug output to console (#4569)
+* feat(ios): enables de, fr, and km localizations (#4585)
+* fix(developer): improve CEF location search stability (#4571)
+* fix(developer): Support all fonts in Keyboard Fonts dialog (#4574)
+* feat(developer): Add different Open Containing Folder buttons (#4576)
+* feat(developer): Range expansions (#4584)
+* fix(web): fixes lack of respect for underlying-key display settings (#4572)
+* fix(common/models): fixes application of suggestions immediately after a backspace (#4587)
+* fix(linux): Improve version number (#4582)
+* chore(linux): Don't report to Sentry in dev environment (#4581)
+* fix(android/app): Fix welcome.htm responsiveness (#4531)
+* feat(developer): &CasedKeys system store (#4586)
+* fix(android): Localize Toast notifications (#4588)
+* fix(windows): PreservedKeyMap::MapUSCharToVK line order bug (#4595)
+* fix(developer): tidy up expansions tests (#4592)
+* fix(ios): adds i18n for some error alerts (#4577)
+* fix(windows): incxstr could run over buffer with malformed data (#4596)
+* chore(android/app): Update whatsnew with available display languages (#4610)
+* chore(linux): Improve Sentry environment setting (#4589)
+* fix(developer): Expand filenames before load (#4606)
+* fix(web): use language code correctly in toolbar (#4620)
+* chore(linux): Fix some lintian warnings for Debian package (#4621)
+* chore: beta to alpha merge, B14S7 (#4624)
+
+## 15.0.18 alpha 2021-02-25
+
+* fix(linux): Set help-keyman.com.sh executable (#4530)
+
+## 15.0.17 alpha 2021-02-22
+
+* chore(windows): FirstVoices Keyboards Configuration merge (#4458)
+* chore(mac): Check in markdown help (#4479)
+* fix(common/core/web): mock construction with caret at index 0 (#4474)
+* change(oem/fv/ios): FV keyboards now package-based (#4471)
+* fix(linux): Fix dependencies on packages (#4464)
+* change(ios/app): Generate offline help from markdown (#4470)
+* fix(windows): tsysinfox64 not signed (#4486)
+* chore(android/app): Update help formatting and images (#4485)
+* fix(android/engine): Display welcome.htm help within the app (#4477)
+* fix(ios): tutorial's link to "Add a Keyboard" links directly to keyboard search (#4491)
+* feat(linux): Improve output of km-package-list-installed (#4481)
+* chore: merge B14S6 beta to alpha (#4503)
+
+## 15.0.16 alpha 2021-02-11
+
+* fix(android/app): Wrap preference screen titles (#4326)
+* fix(ios): better handling of scoped vs non-scoped package URLs (#4327)
+* fix(web): bulk renderer using video stream capture (#4316)
+* change(android/engine): Allow swipe to dismiss update notifications (#4329)
+* fix(windows): improve support for strings.xml (#4323)
+* fix(windows): invalid character in text content opening help (#4330)
+* fix(windows): align title to top in Install Keyboard (#4331)
+* chore(windows/resources): Cherry-pick 14.0 help from #4109 (#4335)
+* fix(ios): renew distribution certificate 🍒 (#4344)
+* fix(ios): reloads keyboard after package updates (#4347)
+* fix(ios): fixes accidental logo / cancel button overlap during package installation (#4332)
+* fix(ios): resolves rough edges with installation view transitions (#4338)
+* fix(web/ui): propagates UI module build failures (#4352)
+* chore(linux): Fix typo (#4341)
+* chore(windows/resources): Address more TODO links for help (#4351)
+* fix(windows): setup strings comment for language (#4362)
+* fix(windows): Splash button sizes (#4348)
+* chore: manual version increment (#4363)
+* chore(common): Enhance PR labeling based on PR title (#4357)
+* change(web): set -eu for web scripts (#4353)
+* fix(ios): accidental duplicated line from merge (#4366)
+* chore(linux): Don't report on Sentry when running unit tests (#4356)
+* fix(windows): Ignore Access Denied error creating task (#4365)
+* chore(windows/resources): Fix more titles and TODOs in help (#4367)
+* fix(windows): SMP-aware deletion in TSF-aware apps (#4360)
+* fix(common): tweak surrogate pair deletions (#4361)
+* fix(windows): Enter and Spacebar handling in Configuration (#4349)
+* fix(web): removes stylesheets from unloaded keyboards (#4371)
+* fix(android, ios): eliminates OSK layout flashing from predictive text banner display (#4370)
+* fix(windows): crash for Sinhala mitigation (#4380)
+* chore(linux): Pass second tag parameter to Jenkins build (#4388)
+* fix(windows): remove Show Keyboard Usage hotkey (#4379)
+* fix(windows): avoid invalid language codes in Add Language dialog (#4381)
+* fix(windows): Ensure UAC window comes to foreground (#4384)
+* fix(windows): setup should ignore cert revocation (#4392)
+* fix(developer): don't check both setup.exe and setup-redist.exe (#4398)
+* fix(windows): Show balloon when Keyman is already running (#4386)
+* fix(developer): Generate platforms correctly from template (#4399)
+* fix(developer): Import Keyboard support for Targets (#4400)
+* fix(ios): fixes unit test mocking, test init (#4394)
+* fix(ios): fixes app crash on network/install error during resource updates (#4395)
+* fix(ios): fixes package-install/update event concurrency management (#4396)
+* fix(common/models): bksp workaround now works beyond first word (#4401)
+* chore(windows): tests should be case-sensitive (#4405)
+* fix(developer): crash deleting wordlist (#4406)
+* fix(developer): Use forward slashes in wordlist paths (#4407)
+* modify(android/app): Change build-help.sh to generate offline help from Markdown files (#4397)
+* fix(linux): Don't crash if uninstalling last keyboard (#4402)
+* chore(windows/resources): Fix typo about Community Forum link (#4412)
+* change(android/app): Separate displaying welcome.htm from keyboard installation (#4413)
+* fix(linux): Improve fix for #3399 (#4418)
+* fix(linux): Fix packaging (#4428)
+* fix(android/engine): Remove WRITE_EXTERNAL_STORAGE from manifest (#4434)
+* chore(common): Check in crowdin files for French (#4420)
+* fix(developer): debug information with unicode identifiers (#4408)
+* fix(developer): Compiler check for if and nul at start of context (#4410)
+* feat(developer): improve BCP 47 canonicalization (#4425)
+* chore(linux): Check in markdown help for Linux (#4414)
+* fix(windows): When uninstalling, exit Keyman (#4383)
+* fix(common/models): predictions after context reset / caret shift (#4411)
+* modify(common): Refactor help-keyman-com.sh script for uploading help files (#4433)
+* fix(linux): improve BCP 47 canonicalization (#4439)
+* fix(common/resources): Just use master branch for help.keyman.com (#4459)
+* fix(windows): hotkeys offset in config list (#4454)
+* chore(ios): Settings case-statement cleanup (#4443)
+* fix(linux): Also use staging site for beta versions (#4455)
+* fix(android/engine): Display online keyboard help (#4462)
+* fix(windows): Track modifier changes in UWP apps (#4468)
+* fix(common/resources): Fix help.keyman.com path for commit (#4469)
+* fix(common): create GitHub comments serially (#4472)
+* chore(linux): Improve launchpad.sh script (#4355)
+* chore: merge B14S5 beta to master (#4432)
+* chore: B14S6 beta to master merge (#4473)
+* chore: manual version increment (#4478)
+
+## 15.0.14 alpha 2021-02-02
+
+* docs(linux): Improve packaging doc (#4389)
+
+## 15.0.13 alpha 2021-02-01
+
+* chore(linux): Don't report on Sentry when running unit tests (#4374)
+* chore(linux): Pass second tag parameter to Jenkins build (#4376)
+
+## 15.0.12 alpha 2021-01-29
+
+* chore(linux): Improve launchpad.sh script (#4355)
+
+## 15.0.11 alpha 2021-01-27
+
+* chore: Enhance PR labeling based on PR title (#4226)
+
+## 15.0.10 alpha 2021-01-27
+
+* fix(ios): renew distribution certificate (#4342)
+
+## 15.0.9 alpha 2021-01-25
+
+* fix(windows): beta uses wrong server (#4142)
+* chore(windows): remove obsolete importkeyboard app (#4138)
+* fix(windows): glitch in keyboard menu (#4139)
+* fix(windows): menu scroll positions need reset at popup (#4140)
+* fix(windows): remove obsolete option 'Switch to OSK/Help' (#4141)
+* fix(windows): Canonicalize BCP 47 tag on keyboard download (#4144)
+* fix(windows): help window centred on load (#4147)
+* fix(windows): Text editor font bugs (#4149)
+* chore(common): Update history for 14.0 beta release (#4148)
+* fix(common): increment version needs to check base (#4155)
+* fix(windows): uninstall language button z-index (#4145)
+* fix(windows): exit button position on setup (#4150)
+* fix(windows): Online Update dialog layout was messy (#4152)
+* fix(windows): sentrytool should fail build on exception and access violation when rewriting executables (#4158)
+* fix(windows): Warn if we reach maximum transient languages (#4157)
+* fix(windows): create task fails (#4181)
+* fix(windows): prevent modifier key from navigating in download dialog (#4182)
+* fix(windows): keyboard help missing (#4177)
+* fix(windows): Proxy Configuration window size (#4159)
+* chore(common): update copyright year in various locations (#4197)
+* fix(windows): Settings refresh management (#4164)
+* fix(windows): Improve refresh performance (#4165)
+* fix(windows): exception handling list error (#4166)
+* fix(windows): OSK toolbar sync (#4167)
+* fix(windows): Show full version with tag in Setup (#4169)
+* fix(windows): Improve refresh reliablilty (#4171)
+* fix(developer): debug.log created unexpectedly (#4189)
+* chore(windows): Remove silent exception in task cleanup (#4191)
+* fix(windows/config): keyboard icons missing (#4193)
+* fix(developer): Map symbols for *LTREnter* and *LTRBkSp* (#4190)
+* fix(developer): Encoding for .model.ts files (#4199)
+* feat(common): annotate PRs with build links (#4202)
+* fix(developer): make touch layout editor source view fonts consistent (#4198)
+* fix(developer): Respect tab editor option (#4200)
+* fix(web): Solving kmwosk color inconsistency 🍒 (#4187)
+* chore(linux): Allow to push to the `keyman-beta` ppa (#4214)
+* chore(linux): pass tag to Jenkins build (#4160) (#4224)
+* chore: bugfix cherrypick (#4208, #4210) (#4230)
+* fix(common/core/web): mnemonic modifier key-up handling (#4231)
+* fix(android/engine): Remove usage of WRITE_EXTERNAL_STORAGE permission (#4170)
+* fix(web): osk size & position after focus changes (#4232)
+* chore(linux): Update debian metadata based on Debian repos (#4233)
+* fix(windows): fix menu popup position (#4175)
+* fix(windows): Update mitigation for Keyman 14 and Windows 10 19597 (#4180)
+* fix(developer): Allow unhandled keys to go through to debugger memo (#4209)
+* chore(common): Check in crowdin files for km (Khmer) (#4228)
+* fix(web): OSK key preview positioning (#4241)
+* fix(web): disables predictive text on Opera mini (#4243)
+* fix(windows): typo in font helper string (#4251)
+* chore(android/app): Add Obolo language from crowdin (#4256)
+* fix(web): unexpected errors in OSK / banner position calculations (#4238)
+* chore(linux): Improve version number for debian package (#4258)
+* fix(android): Popup misalignments and compatibility with WeChat, Telegram (#4254)
+* chore(web): sample pages now wait on init's promise for keyboard loading (#4253)
+* fix(android/samples): Fix Sentry dependencies (#4267)
+* fix(web): better font-wait null guards (#4286)
+* fix(web): uses CSS line-height to vertically center oversized OSK keycaps (#4255)
+* fix(developer): disable TSentryClient on WINE (#4274)
+* fix(web): no key previews for special keys reliant on keyboard-specific OSK font (#4282)
+* fix(web): default kbd ui name is now generic (#4293)
+* fix(windows, common/core/desktop): context mismatch with if and dk (#4276)
+* chore(common): Check in crowdin files for de (German) (#4295)
+* feat(android/app): Add option to change display language (#4261)
+* fix(developer/compilers): fixes developer build breakage from #4291 (#4299)
+* fix(android/app): Handle keyman protocol from external browser (#4292)
+* fix(android/engine): Fix zip slip vulnerability (#4300)
+* fix(web): toolbar and loading optimisations (#4304)
+* fix(web): OSK loading efficiency (#4279)
+* chore(web): updates MTNT for pred-text testing page to 0.1.5 (casing) (#4305)
+* fix(android/samples): Add dependency on androidx.preference (#4310)
+* fix(web): default popup key selection, space highlight after popup (#4306)
+* fix(web): language menu key highlighting (#4308)
+* fix(web): dynamic font downscaling for OSK keys (#4270)
+* chore(windows/resources): Cleanup Notes and Tips in help (#4307)
+* fix(developer): Debug character grid performance (#4237)
+* chore(android/samples): Remove old sample keyboard loaded code (#4315)
+* chore(windows): help for 14.0, part 1 (#4109)
+* chore: merge B14S4 beta to master (#4320)
+
+## 15.0.8 alpha 2021-01-18
+
+* chore(linux): Allow to push to the `keyman-beta` ppa (#4271)
+
+## 15.0.7 alpha 2021-01-12
+
+* chore(linux): Update debian metadata (#4223)
+
+## 15.0.6 alpha 2021-01-07
+
+* fix(linux): only pass tag if we just created one (#4220)
+
+## 15.0.5 alpha 2021-01-05
+
+* chore(linux): pass tag to Jenkins build (#4160) (#4215)
+
+## 15.0.4 alpha 2020-12-23
+
+* feat(common/models): naive backspace workaround, naive multi-char Transform mitigation (#4206)
+* fix(web): supplies missing (optional) argument to prevent warnings (#4208)
+* fix(ios): moves Settings notification UI code to main thread (#4210)
+
+## 15.0.3 alpha 2020-12-21
+
+* fix(web): Solving kmwosk color inconsistency (#4154)
+
+## 15.0.2 alpha 2020-12-16
+
+* fix(common): increment version needs to check base 🍒 (#4156)
+
+## 15.0.1 alpha 2020-12-14
+
+* chore: prepare 15.0 alpha (#4129)
+
 ## 14.0.268 beta 2021-03-23
 
 * fix(windows): Change TLangSwitchRefreshWatcher ownership from thread to form (#4752)
@@ -207,7 +497,6 @@
 * fix(windows): Track modifier changes in UWP apps (#4468)
 * fix(common/resources): Fix help.keyman.com path for commit (#4469)
 * fix(common): create GitHub comments serially (#4472)
-* feat(common/models): mid-context suggestions & reversions, fix(common/models): correction-search SMP issues (#4427)
 * fix(linux): Fix dependencies on packages (#4464)
 
 ## 14.0.241 beta 2021-02-10
