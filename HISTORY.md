@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.269 stable 2021-03-23
+
+* chore: release 14.0 stable
+
 ## 14.0.268 beta 2021-03-23
 
 * fix(windows): Change TLangSwitchRefreshWatcher ownership from thread to form (#4752)
