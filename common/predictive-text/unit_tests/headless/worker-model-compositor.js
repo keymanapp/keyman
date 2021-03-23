@@ -798,7 +798,9 @@ describe('ModelCompositor', function() {
 
       let expectedTransform = {
         insert: ' ',  // Keeps current context the same, though it adds a wordbreak.
-        deleteLeft: 0
+        deleteLeft: 0,
+        deleteRight: undefined,
+        id: undefined
       }
       assert.deepEqual(suggestions[0].transform, expectedTransform);
     });
