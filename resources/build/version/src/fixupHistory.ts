@@ -18,7 +18,7 @@ const getPullRequestInformation = async (
     findLastHistoryPR(base)
   );
 
-  if (response === null) {
+  if (response === null || response.search.nodes.length == 0) {
     return undefined;
   }
 
@@ -259,7 +259,7 @@ export const fixupHistory = async (
   //
 
   const commit_id = await getPullRequestInformation(octokit, base);
-  if (commit_id === undefined) {
+  if (commit_id === undefined && !force) {
     logWarning('Unable to fetch pull request information.');
     return -1;
   }
@@ -268,7 +268,7 @@ export const fixupHistory = async (
   // Now, use git log to retrieve list of merge commit refs since then
   //
 
-  const git_result = (await spawnChild('git', ['log', '--merges', /*'--first-parent',*/ '--format=%H', base, `${commit_id}..`])).trim();
+  const git_result = commit_id === undefined ? '' : (await spawnChild('git', ['log', '--merges', /*'--first-parent',*/ '--format=%H', base, `${commit_id}..`])).trim();
   if(git_result.length == 0 && !force) {
     // We won't throw on this
     logWarning('No pull requests found since previous increment');
