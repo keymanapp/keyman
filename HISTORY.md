@@ -355,6 +355,16 @@
 
 * chore: prepare 15.0 alpha (#4129)
 
+## 14.0.268 beta 2021-03-23
+
+* fix(windows): Change TLangSwitchRefreshWatcher ownership from thread to form (#4752)
+* fix(common/models): prediction threshold when count is low, unintentional aliasing (#4754)
+
+## 14.0.267 beta 2021-03-22
+
+* docs(ios): Help for 14.0 features (#4741)
+* chore: increment-version.sh for stable (#4742)
+
 ## 14.0.266 beta 2021-03-19
 
 * chore(android/app): Migrate launcher icon to adaptive (#4720)
