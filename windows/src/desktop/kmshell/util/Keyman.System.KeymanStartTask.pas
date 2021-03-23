@@ -12,7 +12,11 @@ type
   private
     class function GetTaskName: string;
     class procedure CleanupAlphaTasks(pTaskFolder: ITaskFolder); static;
+  {$IF FALSE}
+    //Disabled to avoid hint during build; re-enable if wanting to
+    //re-establish the task model
     class procedure DeleteTask;
+  {$ENDIF}
     class procedure CreateTask;
   public
     class procedure RecreateTask;
@@ -190,6 +194,9 @@ begin
   end;
 end;
 
+{$IF FALSE}
+// Disabled to avoid hint during build; re-enable if wanting to re-establish
+// the task model
 class procedure TKeymanStartTask.DeleteTask;
 var
   pService: ITaskService;
@@ -238,6 +245,7 @@ begin
       TKeymanSentryClient.ReportHandledException(E, 'Failed to delete task');
   end;
 end;
+{$ENDIF}
 
 class function TKeymanStartTask.GetTaskName: string;
 begin
