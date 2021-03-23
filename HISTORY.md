@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.21 alpha 2021-03-23
+
+* fix(windows): Change TLangSwitchRefreshWatcher ownership from thread to form (#4752)
+* fix(common/models): prediction threshold when count is low, unintentional aliasing (#4754)
+* chore: merge beta to master (A15S1) (#4745)
+* chore: beta to alpha A15S1 (#4759)
+
 ## 15.0.20 alpha 2021-03-22
 
 * docs(ios): adds supported l10ns to help/about/whatsnew (#4625)
