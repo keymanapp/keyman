@@ -75,7 +75,6 @@ class ModelCompositor {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
     }
 
-    // Find the transform for the actual keypress.
     let inputTransform = transformDistribution.sort(function(a, b) {
       return b.p - a.p;
     })[0].sample;
@@ -195,10 +194,6 @@ class ModelCompositor {
             id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
-          if(bestCorrectionCost === undefined) {
-            bestCorrectionCost = match.totalCost;
-          }
-
           return {
             sample: correctionTransform,
             p: Math.exp(-match.totalCost)
@@ -207,27 +202,39 @@ class ModelCompositor {
 
         // Running in bulk over all suggestions, duplicate entries may be possible.
         let predictions = this.predictFromCorrections(predictionRoots, context);
+
+        // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
+        if(predictions.length > 0 && bestCorrectionCost === undefined) {
+          bestCorrectionCost = -Math.log(predictionRoots[0].p);
+        }
+
         rawPredictions = rawPredictions.concat(predictions);
         // TODO:  We don't currently de-duplicate predictions at this point quite yet, so
         // it's technically possible that we return too few.
 
         let correctionCost = matches[0].totalCost;
-        if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
-          // Very useful for stopping 'sooner' when words reach a sufficient length.
+        // Searching a bit longer is permitted when no predictions have been found.
+        if(correctionCost >= bestCorrectionCost + 8) {
           break;
+          // If enough have been found, we're safe to terminate earlier.
         } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
-          // Sort the prediction list; we need them in descending order for the next check.
-          rawPredictions.sort(function(a, b) {
-            return b.p - a.p;
-          });
-
-          // If the best suggestion from the search's current tier fails to beat the worst
-          // pending suggestion from previous tiers, assume all further corrections will 
-          // similarly fail to win; terminate the search-loop.
-          if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
+            if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+            // Very useful for stopping 'sooner' when words reach a sufficient length.
             break;
-          }
-        } 
+          } else {
+            // Sort the prediction list; we need them in descending order for the next check.
+            rawPredictions.sort(function(a, b) {
+              return b.p - a.p;
+            });
+
+            // If the best suggestion from the search's current tier fails to beat the worst
+            // pending suggestion from previous tiers, assume all further corrections will 
+            // similarly fail to win; terminate the search-loop.
+            if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
+              break;
+            }
+          } 
+        }
       }
     }
 
