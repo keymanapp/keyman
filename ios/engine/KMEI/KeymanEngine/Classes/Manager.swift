@@ -141,7 +141,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
   }
 
-  var shouldReloadKeyboard = false
+  // Set to true on init - this allows other engine consumers to set the
+  // keyboard before it displays.
+  var shouldReloadKeyboard = true
   var shouldReloadLexicalModel = false
 
   var _inputViewController: InputViewController?

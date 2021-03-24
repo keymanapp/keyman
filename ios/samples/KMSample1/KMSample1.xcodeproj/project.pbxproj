@@ -10,8 +10,6 @@
 		98ABFCEC1AD39165005534F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEA1AD39165005534F0 /* Main.storyboard */; };
 		98ABFCEE1AD39165005534F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCED1AD39165005534F0 /* Images.xcassets */; };
 		98ABFCF11AD39165005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEF1AD39165005534F0 /* LaunchScreen.xib */; };
-		98ABFD2C1AD393AD005534F0 /* aava1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD2A1AD393AD005534F0 /* aava1.ttf */; };
-		98ABFD2D1AD393AD005534F0 /* tamil99m-1.1.js in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD2B1AD393AD005534F0 /* tamil99m-1.1.js */; };
 		C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; };
 		C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C0324B801F87170600AF3785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B7F1F87170600AF3785 /* AppDelegate.swift */; };
@@ -24,6 +22,11 @@
 		C05B14251FD8F2B10082A316 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E41FD8F21500D2F3C7 /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBEFB9C231FB94200F8F67C /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB89231F9CC600F8F67C /* Reachability.framework */; };
 		CEBEFB9D231FB96400F8F67C /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB89231F9CC600F8F67C /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CED2AC7F260AF8E400A408D2 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC7E260AF8E400A408D2 /* Sentry.framework */; };
+		CED2AC80260AF8ED00A408D2 /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC7E260AF8E400A408D2 /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CED2AC82260AF92400A408D2 /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC81260AF92400A408D2 /* DeviceKit.framework */; };
+		CED2AC83260AF92D00A408D2 /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC81260AF92400A408D2 /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CED2AC85260AFADC00A408D2 /* ekwtamil99uni.kmp in Resources */ = {isa = PBXBuildFile; fileRef = CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,6 +36,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				CED2AC83260AF92D00A408D2 /* DeviceKit.framework in Embed Frameworks */,
+				CED2AC80260AF8ED00A408D2 /* Sentry.framework in Embed Frameworks */,
 				CEBEFB9D231FB96400F8F67C /* Reachability.framework in Embed Frameworks */,
 				C05B14251FD8F2B10082A316 /* Zip.framework in Embed Frameworks */,
 				C05B14211FD8F2B10082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */,
@@ -50,8 +55,6 @@
 		98ABFCEB1AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		98ABFCED1AD39165005534F0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98ABFCF01AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		98ABFD2A1AD393AD005534F0 /* aava1.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = aava1.ttf; sourceTree = "<group>"; };
-		98ABFD2B1AD393AD005534F0 /* tamil99m-1.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "tamil99m-1.1.js"; sourceTree = "<group>"; };
 		C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 		C0324B7F1F87170600AF3785 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C0324B831F87172900AF3785 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -59,6 +62,9 @@
 		C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 		CEBEFB89231F9CC600F8F67C /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
+		CED2AC7E260AF8E400A408D2 /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
+		CED2AC81260AF92400A408D2 /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
+		CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */ = {isa = PBXFileReference; lastKnownFileType = file; path = ekwtamil99uni.kmp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +72,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CED2AC82260AF92400A408D2 /* DeviceKit.framework in Frameworks */,
+				CED2AC7F260AF8E400A408D2 /* Sentry.framework in Frameworks */,
 				C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */,
 				C05B14201FD8F2B10082A316 /* ObjcExceptionBridging.framework in Frameworks */,
 				CEBEFB9C231FB94200F8F67C /* Reachability.framework in Frameworks */,
@@ -119,6 +127,8 @@
 		98ABFD171AD391B0005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CED2AC81260AF92400A408D2 /* DeviceKit.framework */,
+				CED2AC7E260AF8E400A408D2 /* Sentry.framework */,
 				CEBEFB89231F9CC600F8F67C /* Reachability.framework */,
 				C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */,
 				C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */,
@@ -131,18 +141,9 @@
 		98ABFD281AD393AD005534F0 /* Keyboards */ = {
 			isa = PBXGroup;
 			children = (
-				98ABFD291AD393AD005534F0 /* tamil99m */,
+				CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */,
 			);
 			path = Keyboards;
-			sourceTree = "<group>";
-		};
-		98ABFD291AD393AD005534F0 /* tamil99m */ = {
-			isa = PBXGroup;
-			children = (
-				98ABFD2A1AD393AD005534F0 /* aava1.ttf */,
-				98ABFD2B1AD393AD005534F0 /* tamil99m-1.1.js */,
-			);
-			path = tamil99m;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -206,11 +207,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98ABFD2C1AD393AD005534F0 /* aava1.ttf in Resources */,
 				98ABFCEC1AD39165005534F0 /* Main.storyboard in Resources */,
 				98ABFCF11AD39165005534F0 /* LaunchScreen.xib in Resources */,
 				98ABFCEE1AD39165005534F0 /* Images.xcassets in Resources */,
-				98ABFD2D1AD393AD005534F0 /* tamil99m-1.1.js in Resources */,
+				CED2AC85260AFADC00A408D2 /* ekwtamil99uni.kmp in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

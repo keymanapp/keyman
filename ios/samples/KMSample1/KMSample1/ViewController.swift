@@ -13,31 +13,22 @@ class ViewController: UIViewController, TextViewDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    Manager.shared.openURL = UIApplication.shared.openURL
     Manager.shared.isKeymanHelpOn = false
 
-    let kb = InstallableKeyboard(id: "tamil99m",
-                                 name: "Tamil 99M",
-                                 languageID: "ta",
-                                 languageName: "Tamil",
-                                 version: "1.1",
-                                 isRTL: false,
-                                 font: Font(filename: "aava1.ttf"),
-                                 oskFont: nil,
-                                 isCustom: true)
-    let urls = [
-      Bundle.main.url(forResource: "tamil99m-1.1", withExtension: "js")!,
-      Bundle.main.url(forResource: "aava1", withExtension: "ttf")!
-    ]
+    textView.inputView = Manager.shared.inputViewController.inputView
+    textView.becomeFirstResponder()
+
+    let kmpFileURL = Bundle.main.url(forResource: "ekwtamil99uni", withExtension: "kmp")!
+    let keyboardID = FullKeyboardID(keyboardID: "ekwtamil99uni", languageID: "ta")
+
     do {
-      try Manager.shared.preloadFiles(forKeyboardID: kb.id, at: urls, shouldOverwrite: true)
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: kmpFileURL) as! KeyboardKeymanPackage
+      try ResourceFileManager.shared.install(resourceWithID: keyboardID, from: package)
+
+      _ = Manager.shared.setKeyboard(withFullID: keyboardID)
     } catch {
       print("Error preloading: \(error)")
     }
-    FontManager.shared.registerCustomFonts()
-
-    Manager.shared.addKeyboard(Defaults.keyboard)
-    Manager.shared.addKeyboard(kb)
 
     textView.setKeymanDelegate(self)
     textView.viewController = self
