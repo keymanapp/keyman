@@ -15,9 +15,6 @@ class ViewController: UIViewController, TextViewDelegate {
     super.viewDidLoad()
     Manager.shared.isKeymanHelpOn = false
 
-    textView.inputView = Manager.shared.inputViewController.inputView
-    textView.becomeFirstResponder()
-
     let kmpFileURL = Bundle.main.url(forResource: "ekwtamil99uni", withExtension: "kmp")!
     let keyboardID = FullKeyboardID(keyboardID: "ekwtamil99uni", languageID: "ta")
 
@@ -30,6 +27,7 @@ class ViewController: UIViewController, TextViewDelegate {
       print("Error preloading: \(error)")
     }
 
+    textView.becomeFirstResponder()
     textView.setKeymanDelegate(self)
     textView.viewController = self
   }
