@@ -44,12 +44,15 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
   }
 
   func reloadKeymanHelp() {
-    let networkStatus = networkReachable?.connection
-    switch networkStatus {
-    case Reachability.Connection.none?:
+    if let networkStatus = networkReachable?.connection {
+      switch networkStatus {
+      case Reachability.Connection.none, Reachability.Connection.unavailable:
+        loadFromLocal()
+      default:
+        loadFromServer()
+      }
+    } else {
       loadFromLocal()
-    default:
-      loadFromServer()
     }
   }
 
@@ -62,16 +65,16 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
 
     // Yes, .php.html.  That's how `wget` is set to retrieve it, since Safari won't recognize the contents
     // without the .html ending, it seems.
-    let filePath = offlineHelpBundle.path(forResource: "installing-system-keyboard.php",
+    let filePath = offlineHelpBundle.path(forResource: "installing-system-keyboard",
                                           ofType: "html",
-                                          inDirectory: nil)
+                                          inDirectory: "start")
     webView.loadRequest(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
 
   private func loadFromServer() {
     let appVersion = Version.current.majorMinor
     let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.plainString)"
-      + "/installing-system-keyboard.php?embed=ios"
+      + "/start/installing-system-keyboard"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     log.debug("Set up page URL: \(url)")
   }
