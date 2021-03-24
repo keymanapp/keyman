@@ -331,7 +331,7 @@ var
 begin
   if not FileExists(FileName)
     then s := '"'+ExtractFilePath(FileName)+'"'
-    else s := '"/select,'+FileName+'"';
+    else s := '/select,"'+FileName+'"';
   FillChar(sei, SizeOf(sei), 0);
   sei.cbSize := SizeOf(TShellExecuteInfo);
   sei.lpVerb := 'open';
