@@ -63,8 +63,6 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
   private func loadFromLocal() {
     let offlineHelpBundle = Bundle(path: Bundle.main.path(forResource: "OfflineHelp", ofType: "bundle")!)!
 
-    // Yes, .php.html.  That's how `wget` is set to retrieve it, since Safari won't recognize the contents
-    // without the .html ending, it seems.
     let filePath = offlineHelpBundle.path(forResource: "installing-system-keyboard",
                                           ofType: "html",
                                           inDirectory: "start")
@@ -74,7 +72,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
   private func loadFromServer() {
     let appVersion = Version.current.majorMinor
     let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.plainString)"
-      + "/start/installing-system-keyboard"
+      + "/start/installing-system-keyboard?embed=ios"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     log.debug("Set up page URL: \(url)")
   }
