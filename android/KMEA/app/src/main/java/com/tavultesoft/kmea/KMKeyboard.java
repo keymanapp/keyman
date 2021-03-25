@@ -156,7 +156,10 @@ final class KMKeyboard extends WebView {
 
         if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
           // Make Toast notification of error and send log about falling back to default keyboard (ignore language ID)
-          sendKMWError(cm.lineNumber(), cm.sourceId(), cm.message());
+          // Sanitize sourceId info
+          String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
+          String sourceID = cm.sourceId().replaceAll(NAVIGATION_PATTERN, "$1$2");
+          sendKMWError(cm.lineNumber(), sourceID, cm.message());
           sendError(packageID, keyboardID, "");
           Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
           if (firstKeyboard != null) {
