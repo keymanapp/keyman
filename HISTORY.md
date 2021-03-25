@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.22 alpha 2021-03-25
+
+* fix(ios/samples): samples should use package-oriented API (#4771)
+* fix(android/engine): Sanitize embedded KMW Sentry error (#4782)
+
 ## 15.0.21 alpha 2021-03-23
 
 * fix(windows): Change TLangSwitchRefreshWatcher ownership from thread to form (#4752)
