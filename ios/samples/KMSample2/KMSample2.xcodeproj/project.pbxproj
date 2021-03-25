@@ -10,8 +10,6 @@
 		98ABFD461AD3A047005534F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD441AD3A047005534F0 /* Main.storyboard */; };
 		98ABFD481AD3A047005534F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD471AD3A047005534F0 /* Images.xcassets */; };
 		98ABFD4B1AD3A047005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD491AD3A047005534F0 /* LaunchScreen.xib */; };
-		98ABFD741AD3A09E005534F0 /* aava1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD631AD3A09E005534F0 /* aava1.ttf */; };
-		98ABFD751AD3A09E005534F0 /* tamil99m-1.1.js in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD641AD3A09E005534F0 /* tamil99m-1.1.js */; };
 		98ABFD951AD3A232005534F0 /* SWKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98ABFD8C1AD3A232005534F0 /* SWKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
 		C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
@@ -36,6 +34,9 @@
 		CEBEFB98231FB6BD00F8F67C /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */; };
 		CEBEFB99231FB6BE00F8F67C /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */; };
 		CEBEFB9B231FB7DE00F8F67C /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CED2AC88260B070900A408D2 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC87260B070900A408D2 /* Sentry.framework */; };
+		CED2AC89260B070A00A408D2 /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC87260B070900A408D2 /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CED2AC8D260B07CF00A408D2 /* ekwtamil99uni.kmp in Resources */ = {isa = PBXBuildFile; fileRef = CED2AC8C260B07CF00A408D2 /* ekwtamil99uni.kmp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CEBEFB9B231FB7DE00F8F67C /* Reachability.framework in Embed Frameworks */,
+				CED2AC89260B070A00A408D2 /* Sentry.framework in Embed Frameworks */,
 				C05B14311FD8F45E0082A316 /* Zip.framework in Embed Frameworks */,
 				C05B142D1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				CE6ECBBD23F25B6B00277E50 /* DeviceKit.framework in Embed Frameworks */,
@@ -84,8 +86,6 @@
 		98ABFD451AD3A047005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		98ABFD471AD3A047005534F0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98ABFD4A1AD3A047005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		98ABFD631AD3A09E005534F0 /* aava1.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = aava1.ttf; sourceTree = "<group>"; };
-		98ABFD641AD3A09E005534F0 /* tamil99m-1.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "tamil99m-1.1.js"; sourceTree = "<group>"; };
 		98ABFD8C1AD3A232005534F0 /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98ABFD8F1AD3A232005534F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98ABFDA41AD3A363005534F0 /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
@@ -101,6 +101,8 @@
 		CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		CEBEFB92231FB4DF00F8F67C /* banner-portrait-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-portrait-text.png"; sourceTree = "<group>"; };
 		CEBEFB93231FB4DF00F8F67C /* banner-landscape-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-landscape-text.png"; sourceTree = "<group>"; };
+		CED2AC87260B070900A408D2 /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
+		CED2AC8C260B07CF00A408D2 /* ekwtamil99uni.kmp */ = {isa = PBXFileReference; lastKnownFileType = file; path = ekwtamil99uni.kmp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */,
+				CED2AC88260B070900A408D2 /* Sentry.framework in Frameworks */,
 				C05B142C1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Frameworks */,
 				CEBEFB98231FB6BD00F8F67C /* Reachability.framework in Frameworks */,
 				CE6ECBBC23F25B6B00277E50 /* DeviceKit.framework in Frameworks */,
@@ -178,6 +181,7 @@
 		98ABFD601AD3A087005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CED2AC87260B070900A408D2 /* Sentry.framework */,
 				CE6ECBBB23F25B6B00277E50 /* DeviceKit.framework */,
 				CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */,
 				C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */,
@@ -191,18 +195,9 @@
 		98ABFD611AD3A09E005534F0 /* Keyboards */ = {
 			isa = PBXGroup;
 			children = (
-				98ABFD621AD3A09E005534F0 /* tamil99m */,
+				CED2AC8C260B07CF00A408D2 /* ekwtamil99uni.kmp */,
 			);
 			path = Keyboards;
-			sourceTree = "<group>";
-		};
-		98ABFD621AD3A09E005534F0 /* tamil99m */ = {
-			isa = PBXGroup;
-			children = (
-				98ABFD631AD3A09E005534F0 /* aava1.ttf */,
-				98ABFD641AD3A09E005534F0 /* tamil99m-1.1.js */,
-			);
-			path = tamil99m;
 			sourceTree = "<group>";
 		};
 		98ABFD8D1AD3A232005534F0 /* SWKeyboard */ = {
@@ -330,10 +325,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				98ABFD461AD3A047005534F0 /* Main.storyboard in Resources */,
-				98ABFD751AD3A09E005534F0 /* tamil99m-1.1.js in Resources */,
 				98ABFD4B1AD3A047005534F0 /* LaunchScreen.xib in Resources */,
 				98ABFD481AD3A047005534F0 /* Images.xcassets in Resources */,
-				98ABFD741AD3A09E005534F0 /* aava1.ttf in Resources */,
+				CED2AC8D260B07CF00A408D2 /* ekwtamil99uni.kmp in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
