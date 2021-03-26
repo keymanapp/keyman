@@ -517,7 +517,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           if (progressDialog == null) {
             progressDialog = new ProgressDialog(MainActivity.this);
             progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
-            progressDialog.setCancelable(false);
+            progressDialog.setCancelable(true); // Cancelable in case there's exceptions
             progressDialog.show();
 
             // Download the KMP to app cache
