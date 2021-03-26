@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.23 alpha 2021-03-26
+
+* fix(ios): fixes sys-kbd setup help link for iOS 9 and 10 (#4774)
+* fix(android): Fix NullPointerException in package installation (#4790)
+
 ## 15.0.22 alpha 2021-03-25
 
 * fix(ios/samples): samples should use package-oriented API (#4771)
