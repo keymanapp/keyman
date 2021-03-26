@@ -71,7 +71,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
 
   private func loadFromServer() {
     let appVersion = Version.current.majorMinor
-    let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.plainString)"
+    let url = "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)"
       + "/start/installing-system-keyboard?embed=ios"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     log.debug("Set up page URL: \(url)")
