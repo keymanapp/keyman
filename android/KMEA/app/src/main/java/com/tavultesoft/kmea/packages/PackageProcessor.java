@@ -734,7 +734,7 @@ public class PackageProcessor {
    *                   only used for the first keyboard in a package.
    * @return A list of data maps of the newly installed and/or newly upgraded entries found in the package.
    * May be empty if the package file is actually an old version.
-   * <br/><br/>
+   *
    * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
    * as closely as practical.
    * @throws IOException
@@ -745,6 +745,9 @@ public class PackageProcessor {
     // TODO:  Consider throwing an exception instead?
     ArrayList<Map<String, String>> specs = new ArrayList<>();
     if (KMManager.isReservedNamespace(getPackageID(path))) {
+      return specs;
+    }
+    if (path == null || tempPath == null) {
       return specs;
     }
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
