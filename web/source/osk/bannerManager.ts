@@ -222,7 +222,7 @@ namespace com.keyman.osk {
         }
       } else if(state == 'configured') {
         let suggestionBanner = this.activeBanner as SuggestionBanner;
-        if(suggestionBanner && suggestionBanner.postConfigure) {
+        if(suggestionBanner.postConfigure) {
           // Triggers the initially-displayed suggestions.s
           suggestionBanner.postConfigure();
         }
