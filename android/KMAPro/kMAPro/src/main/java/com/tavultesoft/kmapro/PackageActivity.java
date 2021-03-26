@@ -265,7 +265,8 @@ public class PackageActivity extends AppCompatActivity implements
           if(_cleanup)
             cleanup();
         } else {
-          showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
+          // Use Toast so it will linger when PackageActivity finishes
+          showErrorToast(context, getString(R.string.no_new_touch_keyboards_to_install));
         }
       } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         List<Map<String, String>> installedLexicalModels =
@@ -287,12 +288,14 @@ public class PackageActivity extends AppCompatActivity implements
           if(_cleanup)
             cleanup();
         } else {
-          showErrorDialog(context, pkgId, getString(R.string.no_new_predictive_text_to_install));
+          // Use Toast so it will linger when PackageActivity finishes
+          showErrorToast(context, getString(R.string.no_new_predictive_text_to_install));
         }
       }
     } catch (Exception e) {
       KMLog.LogException(TAG, "", e);
-      showErrorDialog(context, pkgId, getString(R.string.no_targets_to_install));
+      // Use Toast so it will linger when PackageActivity finishes
+      showErrorToast(context, getString(R.string.no_targets_to_install));
     }
   }
 
