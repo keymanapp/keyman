@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="addon">
+  <id>org.fcitx.Fcitx5.Addon.Keyman</id>
+  <extends>org.fcitx.Fcitx5</extends>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LGPL-2.1+</project_license>
+  <name>Keyman support for Fcitx 5</name>
+  <summary>Type in your language with Keyman for Linux</summary>
+  <url type="homepage">https://keyman.com</url>
+  <url type="bugtracker">https://github.com/keymanapp/keyman/issues</url>
+  <project_group>Fcitx</project_group>
+  <releases>
+    <release version="1.0.0" date="2021-03-22"/>
+  </releases>
+</component>
+

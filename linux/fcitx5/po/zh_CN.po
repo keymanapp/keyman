@@ -1,0 +1,38 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the fcitx5-keyman package.
+#
+# Weng Xuetian <wengxt@gmail.com>, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: fcitx5-keyman\n"
+"Report-Msgid-Bugs-To: fcitx-dev@googlegroups.com\n"
+"POT-Creation-Date: 2021-03-26 18:53-0700\n"
+"PO-Revision-Date: 2021-03-26 18:53-0700\n"
+"Last-Translator: Weng Xuetian <wengxt@gmail.com>\n"
+"Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Lokalize 20.12.3\n"
+
+#: src/engine.h:50
+msgid "Configuration"
+msgstr "配置"
+
+#: src/keyman.conf.in.in:3
+msgid "Keyman"
+msgstr "Keyman"
+
+#: src/keyman.conf.in.in:4 org.fcitx.Fcitx5.Addon.Keyman.metainfo.xml.in:7
+msgid "Keyman support for Fcitx 5"
+msgstr "Fcitx 5 的 Keyman 支持"
+
+#: src/engine.cpp:618
+msgid "Not available"
+msgstr "不可用"
+
+#: org.fcitx.Fcitx5.Addon.Keyman.metainfo.xml.in:8
+msgid "Type in your language with Keyman for Linux"
+msgstr "使用 Keyman 在 Linux 下输入您的语言"
