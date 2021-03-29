@@ -12,6 +12,7 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -101,7 +102,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
 
   @Override
   public String getKey() {
-    return String.format("%s_%s_%s", packageID, languageID, resourceID);
+    return KMString.format("%s_%s_%s", packageID, languageID, resourceID);
   }
 
   public String getLexicalModelID() { return getResourceID(); }
