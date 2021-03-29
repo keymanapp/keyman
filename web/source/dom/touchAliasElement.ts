@@ -30,6 +30,8 @@ namespace com.keyman.dom {
   // If the specified HTMLElement is either a TouchAliasElement or one of its children elements,
   // this method will return the root TouchAliasElement.
   export function findTouchAliasTarget(target: HTMLElement): TouchAliasElement {
+    // The scrollable container element for the before & after text spans & the caret.
+    // Not to be confused with the simulated scrollbar.
     let scroller: HTMLElement;
 
     // Identify the scroller element
@@ -38,7 +40,7 @@ namespace com.keyman.dom {
     } else if(target && (target.className != null && target.className.indexOf('keymanweb-input') >= 0)) {
       scroller=target.firstChild as HTMLElement;
     } else if(target && dom.Utils.instanceof(target, "HTMLDivElement")) {
-      // Two possibilities:  the scroller & the blinking DIV of the caret.
+      // Three possibilities:  the scroller, the scrollbar, & the blinking DIV of the caret.
       // A direct click CAN trigger events on the blinking element itself if well-timed.
       scroller=target;
 
@@ -46,6 +48,9 @@ namespace com.keyman.dom {
       if(scroller.parentElement && scroller.parentElement.className.indexOf('keymanweb-input') < 0) {
         scroller = scroller.parentElement;
       }
+
+      // scroller is now either the actual scroller or the scrollbar element.
+      // We don't return either of these, and they both have the same parent element.
     } else if(target['kmw_ip']) { // In case it's called on a TouchAliasElement's base (aliased) element.
       return target['kmw_ip'] as TouchAliasElement;
     } else {
@@ -661,7 +666,7 @@ namespace com.keyman.dom {
     setScrollBar() {
       let e = <TouchAliasElement> (<any> this);
 
-      // Display the scrollbar if necessary.  Added TEXTAREA condition to correct rotation issue KMW-5.  Fixed for 310 beta.
+      // Display the scrollbar if necessary.  Added isMultiline condition to correct rotation issue KMW-5.  Fixed for 310 beta.
       var scroller=this.__scrollDiv, sbs=this.__scrollBar.style;
       if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && !e.isMultiline()) {
         sbs.height='4px';
