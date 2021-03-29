@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.24 alpha 2021-03-29
+
+* fix(ios): ensures JS keyboard set after page load (#4808)
+* fix(developer): open containing folder was not opening correct folder (#4776)
+* fix(linux): Fix crash if query doesn't contain bcp47 tag 🍒 (#4800) (#4811)
+
 ## 15.0.23 alpha 2021-03-26
 
 * fix(ios): fixes sys-kbd setup help link for iOS 9 and 10 (#4774)
