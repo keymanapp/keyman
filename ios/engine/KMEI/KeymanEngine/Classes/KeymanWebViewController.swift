@@ -605,6 +605,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
         }
       }
       log.info("Setting initial keyboard.")
+
+      // Compare against resetKeyboard & Manager.setKeyboard;
+      // setting this to `nil` allows us to force keyboard reloads when needed.
+      Manager.shared.currentKeyboardID = nil
       _ = Manager.shared.setKeyboard(newKb!)
     }
 
