@@ -47,9 +47,10 @@ def download_and_install_package(url):
 def _extract_bcp47(query):
     if query:
         queryStrings = parse_qs(query)
-        values = queryStrings['bcp47']
-        if len(values) > 0:
-            return values[0]
+        if 'bcp47' in queryStrings:
+            values = queryStrings['bcp47']
+            if len(values) > 0:
+                return values[0]
     return ''
 
 
