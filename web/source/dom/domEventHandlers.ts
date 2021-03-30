@@ -206,7 +206,9 @@ namespace com.keyman.dom {
 
       // Makes sure we properly detect the TouchAliasElement root, 
       // rather than one of its constituent children.
-      Ltarg = findTouchAliasTarget(Ltarg);
+      if(this.keyman.util.device.touchable) {
+        Ltarg = findTouchAliasTarget(Ltarg);
+      }
 
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
         // Prevent triggering other blur-handling events (as possible)
