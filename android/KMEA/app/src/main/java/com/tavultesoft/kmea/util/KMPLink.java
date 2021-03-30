@@ -10,6 +10,7 @@ import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.Tier;
+import com.tavultesoft.kmea.util.KMString;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,14 +24,14 @@ public final class KMPLink {
   public static final String KMP_STAGING_HOST = "keyman-staging.com";
 
   private static final String KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR = "^http(s)?://(%s|%s)/keyboards/install/([^\\?/]+)(\\?(.+))?$";
-  private static final String installPatternFormatStr = String.format(KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR,
+  private static final String installPatternFormatStr = KMString.format(KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR,
     KMP_PRODUCTION_HOST,
     KMP_STAGING_HOST);
   private static final Pattern installPattern = Pattern.compile(installPatternFormatStr);
 
   // Keyman 14.0+ keyboard download links from Keyman server
   private static final String KMP_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR = "^https://(%s|%s)(/go/package/download/)(\\w+)(\\?platform=android&tier=(alpha|beta|stable))(&bcp47=)?(.+)?";
-  private static final String downloadPatternFormatStr = String.format(KMP_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR,
+  private static final String downloadPatternFormatStr = KMString.format(KMP_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR,
     KMP_PRODUCTION_HOST,
     KMP_STAGING_HOST);
   private static final Pattern downloadPattern = Pattern.compile(downloadPatternFormatStr);
@@ -139,7 +140,7 @@ public final class KMPLink {
       Uri installUri = Uri.parse(url);
       String languageID = installUri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
 
-      String downloadURL = String.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
+      String downloadURL = KMString.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
         host,
         packageID);
       uri = Uri.parse(downloadURL)
@@ -180,7 +181,7 @@ public final class KMPLink {
       String keyboardID = installUri.getQueryParameter("keyboard");
       String languageID = installUri.getQueryParameter("language");
 
-      String downloadURL = String.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
+      String downloadURL = KMString.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
         host,
         keyboardID); // Using keyboardID instead of packageID
       uri = Uri.parse(downloadURL)

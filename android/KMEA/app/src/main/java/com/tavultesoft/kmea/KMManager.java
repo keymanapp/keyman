@@ -73,6 +73,7 @@ import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
@@ -948,7 +949,7 @@ public final class KMManager {
       public boolean accept(File pathname) {
         String name = pathname.getName();
 
-        String patternStr = String.format("^([A-Za-z0-9-_]+)-([0-9.]+)(\\.js)$");
+        String patternStr = KMString.format("^([A-Za-z0-9-_]+)-([0-9.]+)(\\.js)$");
         Pattern pattern = Pattern.compile(patternStr);
         Matcher matcher = pattern.matcher(name);
         if (matcher.matches() && (matcher.groupCount() == 3) &&
@@ -1071,12 +1072,12 @@ public final class KMManager {
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
       params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
   }
@@ -1087,7 +1088,7 @@ public final class KMManager {
       currentLexicalModel = null;
     }
 
-    String url = String.format("deregisterModel('%s')", modelID);
+    String url = KMString.format("deregisterModel('%s')", modelID);
     if (InAppKeyboard != null) { // && InAppKeyboardLoaded) {
       InAppKeyboard.loadJavascript(url);
     }
@@ -1099,7 +1100,7 @@ public final class KMManager {
   }
 
   public static boolean setBannerOptions(boolean mayPredict) {
-    String url = String.format("setBannerOptions(%s)", mayPredict);
+    String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
     }
@@ -1468,7 +1469,7 @@ public final class KMManager {
 
       for (File file : files) {
         String filename = file.getName();
-        String base = String.format("%s-", keyboardID);
+        String base = KMString.format("%s-", keyboardID);
         int index = filename.indexOf(base);
         if (index == 0) {
           int firstIndex = base.length();
@@ -1631,14 +1632,14 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-        InAppKeyboard.loadJavascript(String.format("updateKMText('%s')", kmText));
+        InAppKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
       InAppKeyboardShouldIgnoreTextChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-        SystemKeyboard.loadJavascript(String.format("updateKMText('%s')", kmText));
+        SystemKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
@@ -1652,7 +1653,7 @@ public final class KMManager {
     boolean result = false;
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreSelectionChange) {
-        InAppKeyboard.loadJavascript(String.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
@@ -1667,7 +1668,7 @@ public final class KMManager {
           }
         }
 
-        SystemKeyboard.loadJavascript(String.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        SystemKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
@@ -1703,7 +1704,7 @@ public final class KMManager {
     int index = KeyboardController.INDEX_NOT_FOUND;
 
     if (keyboardID != null & languageID != null) {
-      String kbKey = String.format("%s_%s", languageID, keyboardID);
+      String kbKey = KMString.format("%s_%s", languageID, keyboardID);
       index = KeyboardController.getInstance().getKeyboardIndex(kbKey);
     }
 
@@ -1722,7 +1723,7 @@ public final class KMManager {
     boolean result = false;
 
     if (packageID != null && keyboardID != null && languageID != null) {
-      File keyboardFile = new File(getPackagesDir(), packageID + File.separator + String.format("%s.js", keyboardID));
+      File keyboardFile = new File(getPackagesDir(), packageID + File.separator + KMString.format("%s.js", keyboardID));
       result = KeyboardController.getInstance().keyboardExists(packageID, keyboardID, languageID) &&
         keyboardFile.exists();
     }
@@ -1734,7 +1735,7 @@ public final class KMManager {
     boolean result = false;
 
     if (packageID != null && languageID != null &&  modelID != null) {
-      String lmKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+      String lmKey = KMString.format("%s_%s_%s", packageID, languageID, modelID);
       result = KeyboardPickerActivity.containsLexicalModel(context, lmKey);
     }
 

@@ -38,6 +38,7 @@ import com.tavultesoft.kmea.util.DownloadFileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
+import com.tavultesoft.kmea.util.KMString;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -622,7 +623,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           text = text.replace(" ", "&nbsp;");
           text = text.replace('\n', ' ');
           text = text.replace(" ", "<br>");
-          shareIntent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(String.format(htmlMailFormat, text, extraMailText)));
+          shareIntent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(KMString.format(htmlMailFormat, text, extraMailText)));
         } else {
           // Text for all others
           shareIntent.putExtra(Intent.EXTRA_TEXT, text);
