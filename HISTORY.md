@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.25 alpha 2021-03-30
+
+* fix(developer): requote font names (#4814)
+
 ## 15.0.24 alpha 2021-03-29
 
 * fix(ios): ensures JS keyboard set after page load (#4808)
