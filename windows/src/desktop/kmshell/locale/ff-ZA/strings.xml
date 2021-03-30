@@ -515,7 +515,7 @@
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Suɓo sodorde woodnde walla suɓo \'Peŋtoro\' kisa ñoƴƴaa Ctrl,Shift kam e/walla Alt kisa tappaa sodorde ɗemngal %0:s ngal njiɗ-ɗaa:</string>
+  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Suɓo sodorde woodnde walla suɓo \'Peŋtoro\' kisa ñoƴƴaa Ctrl,Shift kam e/walla Alt kisa tappaa sodorde ɗemngal %1$s: ngal njiɗ-ɗaa:</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -524,7 +524,7 @@
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">Le raccourci clavier %0:s va provoquer un conflit avec l\'utilisation normale du clavier.  Vous devirez utiliser au moins Ctrl ou Alt.  Voulez-vous effcetuer un changement maintenant ?</string>
+  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">Le raccourci clavier %1$s va provoquer un conflit avec l\'utilisation normale du clavier.  Vous devirez utiliser au moins Ctrl ou Alt.  Voulez-vous effcetuer un changement maintenant?</string>
   <!-- Parameters: %1$s = Hotkey, %2$s = Conflicting keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
@@ -787,7 +787,7 @@ Jokku\?</string>
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSplashVersion" comment="Version number">Yamre %0:s</string>
+  <string name="SKSplashVersion" comment="Version number">Yamre %1$s</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.239.0 -->
@@ -884,11 +884,7 @@ Jokku\?</string>
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman horiima hurmude.  Tiiɗno ƴeewto teelte maa ngam ƴeewtaade so jaaɓnirgal keyman.exe ngal ena yammiraa hurmude hade maa jokkude.  Huumre artiraande ndee ko:
-  
-  \"%1$s\"
-  
-  Aɗa yiɗi etaade hurminde Keyman goɗngol jooni?</string>
+  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">Keyman horiima hurmude.  Tiiɗno ƴeewto teelte maa ngam ƴeewtaade so jaaɓnirgal keyman.exe ngal ena yammiraa hurmude hade maa jokkude.  Huumre artiraande ndee ko:\n\n\"%1$s\"\n\nAɗa yiɗi etaade hurminde Keyman goɗngol jooni?</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
