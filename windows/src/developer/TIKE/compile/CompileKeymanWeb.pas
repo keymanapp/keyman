@@ -237,7 +237,7 @@ type
     function JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function RuleIsExcludedByPlatform(fkp: PFILE_KEY): Boolean;
-    function RequotedString(s: WideString): string;
+    function RequotedString(s: WideString; RequoteSingleQuotes: Boolean = False): string;
     function VisualKeyboardFromFile(
       const FVisualKeyboardFileName: string; var fDisplayUnderlying: Boolean): WideString;
     function WriteCompiledKeyboard: string;
@@ -1367,7 +1367,7 @@ begin
   FCallback(line, msgcode, PWideChar(text));  // I3310
 end;
 
-function TCompileKeymanWeb.RequotedString(s: WideString): string;
+function TCompileKeymanWeb.RequotedString(s: WideString; RequoteSingleQuotes: Boolean = False): string;
 var
   i: Integer;
 begin
@@ -1375,6 +1375,7 @@ begin
   while i <= Length(s) do
   begin
     if (s[i] = '"') or (s[i] = '\') then begin s := Copy(s, 1, i-1)+'\'+Copy(s, i, Length(s)); Inc(i); end   // I4368
+    else if (s[i] = '''') and RequoteSingleQuotes then begin s := Copy(s, 1, i-1)+'\'+Copy(s, i, Length(s)); Inc(i); end
     else if (s[i] = #13) then   // I4368
     begin
       s := Copy(s, 1, i-1) + '\n' + Copy(s,i+1, Length(s));
@@ -1559,7 +1560,7 @@ begin
     if kvkh102 in FVK.Header.Flags then f102 := '1' else f102 := '0';
     fDisplayUnderlying := kvkhDisplayUnderlying in FVK.Header.Flags;
 
-    Result := Format('{F:''%s%s 1em "%s"'',K102:%s}', [fitalic, fbold, FVK.Header.UnicodeFont.Name, f102]);   // I3886   // I3956
+    Result := Format('{F:''%s%s 1em "%s"'',K102:%s}', [fitalic, fbold, RequotedString(FVK.Header.UnicodeFont.Name, True), f102]);   // I3886   // I3956
     Result := Result + ';'+VisualKeyboardToKLS(FVK);
     Result := Result + ';'+BuildBKFromKLS;
   finally
