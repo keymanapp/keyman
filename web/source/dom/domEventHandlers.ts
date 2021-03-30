@@ -206,7 +206,7 @@ namespace com.keyman.dom {
 
       // Makes sure we properly detect the TouchAliasElement root, 
       // rather than one of its constituent children.
-      Ltarg = findTouchAliasTarget(Ltarg) || Ltarg;
+      Ltarg = findTouchAliasTarget(Ltarg);
 
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
         // Prevent triggering other blur-handling events (as possible)
@@ -552,7 +552,8 @@ namespace com.keyman.dom {
 
       this.setFocusWithTouch(tEvent);
     }.bind(this);
-      
+
+    // Also handles initial touch responses.
     setFocusWithTouch(tEvent: {clientX: number, clientY: number, target?: EventTarget}) {
       var osk = this.keyman.osk;
 
@@ -563,8 +564,9 @@ namespace com.keyman.dom {
 
       // Determines the actual TouchAliasElement - the part tied to an OutputTarget.
       // Ideally, we shouldn't need the second part as a fallback; it's there to preserve existing
-      // behavior from 13.0, as this was refactored made LATE in the 14.0 beta process.
-      let target = findTouchAliasTarget(tTarg) || (tTarg as TouchAliasElement);
+      // behavior from 13.0, as this was refactored LATE in the 14.0 beta process.
+      let target = findTouchAliasTarget(tTarg);
+
       // Some parts rely upon the scroller element.
       let scroller = target.firstChild as HTMLElement;
 
@@ -602,8 +604,9 @@ namespace com.keyman.dom {
         osk._Show();
       }
       
-      // If clicked on DIV on the main element or on the scroller element, set caret to end of text
-      if(tTarg && tTarg == target || tTarg == scroller) {
+      // If clicked on DIV on the main element, rather than any part of the text representation,
+      // set caret to end of text
+      if(tTarg && tTarg == target) {
         var x,cp;
         x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);        
         if(target.dir == 'rtl') { 
@@ -614,8 +617,9 @@ namespace com.keyman.dom {
         }
     
         target.setTextCaret(cp);
-        target.scrollInput();        
-      } else { // Otherwise, if clicked on text in SPAN, set at touch position
+        target.scrollInput();
+        // nextSibling - the scrollbar element.  
+      } else if(tTarg != scroller.nextSibling) { // Otherwise, if clicked on text in SPAN, set at touch position
         var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
         caret=scroller.childNodes[1]; //caret span
         cpMin=0;
@@ -774,8 +778,12 @@ namespace com.keyman.dom {
      * Handle the touch move event for an input element
      */         
     dragInput: (e: TouchEvent|MouseEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent|MouseEvent) {
-      // Prevent dragging window 
-      e.preventDefault();
+      // Prevent dragging window
+      if(e.cancelable) {
+        // If a touch-alias element is scrolling, this may be false.
+        // Tends to result in a spam of console errors when e.cancelable == false.
+        e.preventDefault();
+      }
       e.stopPropagation();      
 
       // Identify the target from the touch list or the event argument (IE 10 only)
@@ -791,10 +799,8 @@ namespace com.keyman.dom {
       }
       
       // Identify the input element from the touch event target (touched element may be contained by input)
-      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) target=<HTMLElement> target.parentNode;
-      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) target=<HTMLElement> target.parentNode;
-      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) return;
-      
+      target = findTouchAliasTarget(target);
+
       var x, y;
 
       if(dom.Utils.instanceof(e, "TouchEvent")) {
@@ -837,6 +843,7 @@ namespace com.keyman.dom {
           }    
         }
       }
+      // Should refactor to use TouchAliasElement's version; target is an instance of the class.
       this.setScrollBar(target);
     }.bind(this);
 

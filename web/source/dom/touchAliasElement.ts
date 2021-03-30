@@ -34,6 +34,52 @@ namespace com.keyman.dom {
     // Not to be confused with the simulated scrollbar.
     let scroller: HTMLElement;
 
+    // Designed to 'breadcrumb' elements to assist in diagnosis of an evasive known issue.
+    let elementLogger = function() {
+      let elementDescriber = function(element: HTMLElement) {
+        if(element) {
+          let childIndex = undefined;
+          let parent = element.parentElement;
+          if(parent) {
+            for(let child = parent.firstChild, i = 0; child; child = child.nextSibling, i++) {
+              if(child == element) {
+                childIndex = i;
+                break;
+              }
+            }
+          }
+
+          // ID:  should never be specified for TouchAliasElement components
+          // Class:  specified for the root TouchAliasElement and for its text spans
+          // index:  useful for identifying elements with no class info
+          return `tag type ${element.tagName}, class '${element.classList}', index under parent: '${childIndex}', id '${element.id}'`;
+        } else {
+          return `null`;
+        }
+      };
+
+      // Very rough breadcrumbs for use with any Sentry logs.
+
+      // We'd expect to see the telltale 'keymanweb-input' appear as the class for one of the
+      // three elements logged here... at least, normally.
+      console.info(`(For diagnosing https://github.com/keymanapp/keyman/issues/4797)`);
+      // We don't use .innerHTML because that would tell us what the user's been typing.
+      // No keylogging!
+      console.info(`Original target: ${elementDescriber(target)}`);
+      if(target.previousSibling && target.previousSibling instanceof HTMLElement) {
+        console.info(`Previous sibling: ${elementDescriber(target.previousSibling)}`);
+      }
+      if(target.nextSibling && target.nextSibling instanceof HTMLElement) {
+        console.info(`Next sibling: ${elementDescriber(target.nextSibling)}`);
+      }
+      console.info(`Target's parent: ${elementDescriber(target.parentElement)}`);
+      if(target.parentElement instanceof HTMLElement) {
+        console.info(`Target's grandparent: ${elementDescriber(target.parentElement.parentElement)}`);
+      }
+      // Triggers the actual Sentry log (on pages that include Sentry logging)
+      throw new Error(`Unexpected touch-start event target.`);
+    };
+
     // Identify the scroller element
     if(target && dom.Utils.instanceof(target, "HTMLSpanElement")) {
       scroller=target.parentNode as HTMLElement;
@@ -55,6 +101,12 @@ namespace com.keyman.dom {
       return target['kmw_ip'] as TouchAliasElement;
     } else {
       // If it's not in any way related to a TouchAliasElement, simply return null.
+      // NOTE:  At present, this method should only be called in places that actually EXPECT a TouchAliasElement...
+      // So if we fail to find one, something's gone wrong, and we'd like more details.
+
+      // There's an evasive error related to this at present so we'll temporarily console-log info 
+      // that may help us determine why we couldn't find the expected element.
+      elementLogger();
       return null;
     }
 
@@ -63,6 +115,7 @@ namespace com.keyman.dom {
     if(root['base'] !== undefined) {
       return root as TouchAliasElement;
     } else {
+      elementLogger();
       return null;
     }
   }
