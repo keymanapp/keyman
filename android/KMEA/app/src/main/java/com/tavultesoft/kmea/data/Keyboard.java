@@ -14,6 +14,7 @@ import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,7 +73,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, null);
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
-        String.format(HELP_URL_FORMATSTR, HELP_URL_HOST, this.resourceID, this.version));
+        KMString.format(HELP_URL_FORMATSTR, HELP_URL_HOST, this.resourceID, this.version));
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
@@ -84,7 +85,7 @@ public class Keyboard extends LanguageResource implements Serializable {
                   boolean isNewKeyboard, String font, String oskFont) {
     super(packageID, keyboardID, keyboardName, languageID, languageName, version,
       (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-        String.format(HELP_URL_FORMATSTR, HELP_URL_HOST, keyboardID, version),
+        KMString.format(HELP_URL_FORMATSTR, HELP_URL_HOST, keyboardID, version),
       kmp);
 
     this.isNewKeyboard = isNewKeyboard;
