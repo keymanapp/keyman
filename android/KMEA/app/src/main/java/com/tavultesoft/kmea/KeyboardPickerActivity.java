@@ -21,6 +21,7 @@ import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -341,7 +342,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
       String langID = lexicalModelInfo.get(KMManager.KMKey_LanguageID);
 
       if (pkgID != null && modelID != null && langID != null) {
-        String lmKey = String.format("%s_%s_%s", pkgID, langID, modelID);
+        String lmKey = KMString.format("%s_%s_%s", pkgID, langID, modelID);
         if (lmKey.length() >= 5) {
           int x = getLexicalModelIndex(context, lmKey);
           if (x >= 0) {
@@ -569,7 +570,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     }
 
     for(HashMap<String, String> lmInfo : lexicalModelsList) {
-      String key = String.format("%s_%s_%s", lmInfo.get(KMManager.KMKey_PackageID),
+      String key = KMString.format("%s_%s_%s", lmInfo.get(KMManager.KMKey_PackageID),
         lmInfo.get(KMManager.KMKey_LanguageID), lmInfo.get(KMManager.KMKey_LexicalModelID));
       if (lexicalModelKey.equalsIgnoreCase(key)) {
         return true;
@@ -599,7 +600,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
         String pkgId = lmInfo.get(KMManager.KMKey_PackageID);
         String langId = lmInfo.get(KMManager.KMKey_LanguageID);
         String lmId = lmInfo.get(KMManager.KMKey_LexicalModelID);
-        String lmKey = String.format("%s_%s_%s", pkgId, langId, lmId);
+        String lmKey = KMString.format("%s_%s_%s", pkgId, langId, lmId);
         if (lmKey.equals(lexicalModelKey)) {
           index = i;
           break;
