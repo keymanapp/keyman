@@ -29,7 +29,7 @@ This will bring up two confirmation dialogs.
 Select 'OK' on both. Now when the on-screen keyboard appears for apps other than Keyman,
 you'll see a keyboard icon at the bottom right.
 
-![](../android_images/settings6-ap.png)
+![Screen Shot 2021-03-30 at 8 47 51 PM](https://user-images.githubusercontent.com/19643078/113205635-5d31fd80-9223-11eb-9782-24579a0883bc.png)
 
 Click the keyboard icon whenever you want to change the current system keyboard.
 
