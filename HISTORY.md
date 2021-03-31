@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.26 alpha 2021-03-31
+
+* fix(android/engine): Add KMString wrapper for formatting Strings (#4813)
+
 ## 15.0.25 alpha 2021-03-30
 
 * fix(developer): requote font names (#4814)
