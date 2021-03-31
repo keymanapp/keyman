@@ -110,7 +110,7 @@ class KeyboardDetailsView(Gtk.Dialog):
             grid.attach_next_to(lbl_pkg_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_desc
             label = Gtk.Label()
-            label.set_text(kbdata['description'])
+            label.set_text(kbdata.get('description'))
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             label.set_line_wrap(80)
