@@ -1830,36 +1830,36 @@ public final class KMManager {
         KMLog.LogError(TAG, "pageLoaded and InAppKeyboard null");
         return;
       }
+      InAppKeyboard.keyboardSet = false;
+      currentLexicalModel = null;
 
-      if (url.startsWith("file")) { //endsWith(KMFilename_KeyboardHtml)) {
+      if (url.startsWith("file")) { // TODO: is this test necessary?
         InAppKeyboardLoaded = true;
 
-        if (!InAppKeyboard.keyboardSet) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-          if (index < 0) {
-            index = 0;
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+        if (index < 0) {
+          index = 0;
+        }
+        Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
+        String langId = null;
+        if (keyboardInfo != null) {
+          langId = keyboardInfo.getLanguageID();
+          InAppKeyboard.setKeyboard(keyboardInfo);
+        } else {
+          // Revert to default (index 0) or fallback keyboard
+          keyboardInfo = KMManager.getKeyboardInfo(context, 0);
+          if (keyboardInfo == null) {
+            // Not logging to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
+            keyboardInfo = KMManager.getDefaultKeyboard(context);
           }
-          Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-          String langId = null;
           if (keyboardInfo != null) {
             langId = keyboardInfo.getLanguageID();
             InAppKeyboard.setKeyboard(keyboardInfo);
-          } else {
-            // Revert to default (index 0) or fallback keyboard
-            keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-            if (keyboardInfo == null) {
-              // Not logging to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
-              keyboardInfo = KMManager.getDefaultKeyboard(context);
-            }
-            if (keyboardInfo != null) {
-              langId = keyboardInfo.getLanguageID();
-              InAppKeyboard.setKeyboard(keyboardInfo);
-            }
           }
-
-          registerAssociatedLexicalModel(langId);
         }
+
+        registerAssociatedLexicalModel(langId);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -2076,34 +2076,36 @@ public final class KMManager {
         return;
       }
 
-      if (url.startsWith("file:")) {
-        SystemKeyboardLoaded = true;
-        if (!SystemKeyboard.keyboardSet) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-          if (index < 0) {
-            index = 0;
-          }
-          Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-          String langId = null;
-          if (keyboardInfo != null) {
-            langId  = keyboardInfo.getLanguageID();
-            SystemKeyboard.setKeyboard(keyboardInfo);
-          } else {
-            // Revert to default (index 0) or fallback keyboard
-            keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-            if (keyboardInfo == null) {
-              KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-              keyboardInfo = KMManager.getDefaultKeyboard(context);
-            }
-            if (keyboardInfo != null) {
-              langId = keyboardInfo.getLanguageID();
-              SystemKeyboard.setKeyboard(keyboardInfo);
-            }
-          }
+      SystemKeyboard.keyboardSet = false;
+      currentLexicalModel = null;
 
-          registerAssociatedLexicalModel(langId);
+      if (url.startsWith("file:")) { // TODO: is this test necessary?
+        SystemKeyboardLoaded = true;
+
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+        if (index < 0) {
+          index = 0;
         }
+        Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
+        String langId = null;
+        if (keyboardInfo != null) {
+          langId  = keyboardInfo.getLanguageID();
+          SystemKeyboard.setKeyboard(keyboardInfo);
+        } else {
+          // Revert to default (index 0) or fallback keyboard
+          keyboardInfo = KMManager.getKeyboardInfo(context, 0);
+          if (keyboardInfo == null) {
+            KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
+            keyboardInfo = KMManager.getDefaultKeyboard(context);
+          }
+          if (keyboardInfo != null) {
+            langId = keyboardInfo.getLanguageID();
+            SystemKeyboard.setKeyboard(keyboardInfo);
+          }
+        }
+
+        registerAssociatedLexicalModel(langId);
 
 
         Handler handler = new Handler();
