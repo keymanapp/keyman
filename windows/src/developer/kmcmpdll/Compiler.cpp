@@ -2636,7 +2636,7 @@ DWORD process_expansion(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx, int m
   }
 
   // Look ahead at next element
-  WCHAR temp[64];
+  WCHAR temp[GLOBAL_BUFSIZE];
   PWCHAR r = NULL;
 
   DWORD msg;
