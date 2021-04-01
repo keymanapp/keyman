@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 14.0.271 stable 2021-04-01
+
+* fix(android/engine): Sanitize embedded KMW Sentry error (#4786)
+* fix(ios/samples): samples should use package-oriented API 🍒  (#4772)
+* fix(ios): fixes sys-kbd setup help link for iOS 9 and 10 🍒 (#4775)
+* fix(android): Fix NullPointerException in package installation (#4796)
+* fix(ios): ensures JS keyboard set after page load 🍒  (#4809)
+* fix(developer): open containing folder was not opening correct folder (#4777)
+* fix(linux): Fix crash if query doesn't contain bcp47 tag (#4800) (#4801)
+* fix(android/engine): Add KMString wrapper for formatting Strings (#4820)
+* fix(developer): requote font names 🍒 (#4815)
+* fix(android): ensure keyboard is always set after pageLoaded 🍒 (#4841)
+* fix(linux): Fix crash if `<kbd>.json` doesn't contain description (#4835)
+* fix(developer): buffer size for range expansions 🍒 (#4832)
+* chore(common): Check in crowdin strings for Fulah (#4822)
+* docs(android): Update installing-keyboards and enabling-system-keyboards (#4842)
+
 ## 14.0.270 stable 2021-03-23
 
 * chore: stable tier (#4763)
