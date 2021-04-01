@@ -279,10 +279,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   open override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
-    if Manager.shared.shouldReloadKeyboard {
-      self.reload()
-    }
+    self.reloadIfNeeded()
   }
 
   open override func viewDidAppear(_ animated: Bool) {
@@ -534,8 +531,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb.setKeyboard(kb)
   }
 
-  func setShouldReload() {
+  public func setShouldReload() {
     keymanWeb.shouldReload = true
+  }
+
+  internal var shouldReload: Bool {
+    return keymanWeb.shouldReload
   }
     
   func registerLexicalModel(_ lm: InstallableLexicalModel) {

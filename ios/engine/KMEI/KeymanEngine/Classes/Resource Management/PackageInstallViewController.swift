@@ -352,7 +352,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
 
     // Always reload after installing or updating resources.
-    Manager.shared.shouldReloadKeyboard = true
+    Manager.shared.inputViewController.setShouldReload()
     self.pickingCompletionHandler(selectedResources.map { $0.typedFullID })
 
     // Prevent swipe dismissal.

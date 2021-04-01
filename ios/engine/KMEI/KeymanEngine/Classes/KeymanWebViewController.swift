@@ -59,8 +59,7 @@ class KeymanWebViewController: UIViewController {
   /// when predictive text is not active
   private var bannerImgPath: String = ""
 
-  var shouldReload: Bool = false
-  
+  var shouldReload: Bool = true
   var isLoading: Bool = false
 
   private var currentText: String = ""
@@ -613,7 +612,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
       _ = Manager.shared.setKeyboard(newKb!)
     }
 
-    // in case `shouldReloadKeyboard == true`.  Is set otherwise above.
+    // in case `shouldReload == true`.  Is set otherwise above.
     if(newKb == nil) {
       newKb = Defaults.keyboard
     }
