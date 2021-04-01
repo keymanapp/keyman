@@ -19,7 +19,7 @@ describe('Model definition pseudoclosures', function () {
         // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
         // which would have made for a fairly yucky test.
         ['Istanbul', 'istanbul', 'istanbul'],
-    
+
         // The DEFAULT function is NOT responsible for understanding the Turkish
         // case regarding the lowercasing of:
         // 'I' U+0048 LATIN CAPITAL LETTER I to 'ı' U+0131 LATIN SMALL LETTER DOTLESS I
@@ -29,14 +29,14 @@ describe('Model definition pseudoclosures', function () {
 
         // full-width romaji has corresponding lowercased versions:
         ['ＡＥＳＴＨＥＴＩＣ', 'ａｅｓｔｈｅｔｉｃ', 'aesthetic'],
-    
+
         // "skýlos" is Greek for dog 🇬🇷🐶
         // starts with an 's' and ends with an 's'
         // which are DIFFERENT CHARACTERS in lowercased Greek!
         ['σκύλος', 'σκύλος', 'σκυλος'],
-        ['ΣΚΥΛΟΣ', 'σκυλος', 'σκυλοσ'],  // the keyed version after lowercasing doesn't know how 
+        ['ΣΚΥΛΟΣ', 'σκυλος', 'σκυλοσ'],  // the keyed version after lowercasing doesn't know how
                                          // to make the distinction.  Both 'Σ's have the same char-code.
-    
+
         // Uncased syntax and numbers should pass through unscathed:
         ['1234.?!', '1234.?!', '1234.?!']
       ];
@@ -67,19 +67,19 @@ describe('Model definition pseudoclosures', function () {
         // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
         // which would have made for a fairly yucky test.
         ['Istanbul', 'Istanbul'],
-    
+
         ['DİYARBAKIR', 'DIYARBAKIR'],
 
         // full-width romaji has corresponding capitalized versions:
         ['ＡＥＳＴＨＥＴＩＣ', 'AESTHETIC'],
-    
+
         // "skýlos" is Greek for dog 🇬🇷🐶
         // starts with an 's' and ends with an 's'
         // which are DIFFERENT CHARACTERS in lowercased Greek!
         ['σκύλος', 'σκυλος'],
-        ['ΣΚΥΛΟΣ', 'ΣΚΥΛΟΣ'],  // the keyed version after lowercasing doesn't know how 
+        ['ΣΚΥΛΟΣ', 'ΣΚΥΛΟΣ'],  // the keyed version after lowercasing doesn't know how
                                // to make the distinction.  Both 'Σ's have the same char-code.
-    
+
         // Uncased syntax and numbers should pass through unscathed:
         ['1234.?!', '1234.?!']
       ];
@@ -105,19 +105,19 @@ describe('Model definition pseudoclosures', function () {
       // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
       // which would have made for a fairly yucky test.
       ['Istanbul', 'istanbul'],
-  
+
       ['DİYARBAKIR', 'diyarbakir'],
 
       // full-width romaji has corresponding capitalized versions:
       ['ＡＥＳＴＨＥＴＩＣ', 'aesthetic'],
-  
+
       // "skýlos" is Greek for dog 🇬🇷🐶
       // starts with an 's' and ends with an 's'
       // which are DIFFERENT CHARACTERS in lowercased Greek!
       ['σκύλος', 'σκυλος'],
-      ['ΣΚΥΛΟΣ', 'σκυλοσ'],  // the keyed version after lowercasing doesn't know how 
+      ['ΣΚΥΛΟΣ', 'σκυλοσ'],  // the keyed version after lowercasing doesn't know how
                              // to make the distinction.  Both 'Σ's have the same char-code.
-  
+
       // Uncased syntax and numbers should pass through unscathed:
       ['1234.?!', '1234.?!']
     ];
@@ -143,7 +143,7 @@ describe('Model definition pseudoclosures', function () {
             .replace(/ı/g, 'I')
             .replace(/i/g, 'İ'));
       case 'initial':
-        return turkishCasing('upper', text.charAt(0), defaultApplyCasing) + text.substr(1); 
+        return turkishCasing('upper', text.charAt(0), defaultApplyCasing) + text.substr(1);
       default:
         return text;
       }
@@ -156,7 +156,7 @@ describe('Model definition pseudoclosures', function () {
         return Array.from(wordform
           .normalize('NFC')  // Mostly to avoid decomposing 'İ'
         ) // end of `Array.from`
-        .map(c => applyCasing('lower', c))  // Will use custom `applyCasing` definition!
+        .map(function(c) { return applyCasing('lower', c)})  // Will use custom `applyCasing` definition!
         .join('');
       },
       sources: [],
@@ -167,14 +167,14 @@ describe('Model definition pseudoclosures', function () {
 
     const testCases: [string, string, string][] = [
       ['İstanbul', 'istanbul', 'istanbul'],
-  
+
       // The DEFAULT function is NOT responsible for understanding the Turkish
       // case regarding the lowercasing of:
       // 'I' U+0048 LATIN CAPITAL LETTER I to 'ı' U+0131 LATIN SMALL LETTER DOTLESS I
       // For Turkic languages, the recommendation is to make a
       // custom applyCasing function:
       ['DİYARBAKIR', 'diyarbakır', 'diyarbakır'],
-  
+
       // Uncased syntax and numbers should pass through unscathed:
       ['1234.?!', '1234.?!', '1234.?!']
     ];

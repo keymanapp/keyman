@@ -1,0 +1,60 @@
+﻿c Tests context(n) together with if() and BKSP, as reported by 
+c Andrew Cunningham.
+
+c
+c Tests:
+c
+c 1. [x][BKSP] should result in "a" U+0308
+c    -> 14.0.223 gives U+0308 "e"
+c 2. [y][z] should result in '<' dk(1) 'a' dk(2) 'b' dk(3) '>'
+c    -> 14.0.223 gives 'ab>' (note the missing initial '<'!)
+c 3. [y][M] should result in '<' dk(1) '>'
+c    -> 14.0.223 gives '<' U+FFFF '>'
+c    (to test on web, type [y][M][?], which should result in 'correct', as it is
+c     difficult to observe deadkeys)
+c
+c Note: all these tests pass on web.
+c
+
+
+store(&VERSION) '10.0'
+store(&NAME) 'context_mismatch_with_if'
+store(&COPYRIGHT) '© 2021 Andrew Cunningham / Marc Durdin'
+store(&TARGETS) 'any'
+
+begin Unicode > use(constraints)
+
+store(nfc) '0'    c 1 (default) = Normalisation Form C, 0 = Normalisation Form D
+store(diaeresisBase) U+0061 U+0041 U+0065 U+0045 U+0069 U+0049 U+006F U+004F                   c a A e E i I o O
+
+group(constraints) using keys
+
+c ########################
+c character position tests
+c ########################
+
+c Setup
+
++ 'x' > 'a' U+0308 'e' U+0308
+
+c Test #1 for if() with context(n)
+
+if(nfc = "0") any(diaeresisBase) U+0308 any(diaeresisBase) U+0308 + [K_BKSP] > context(2) context(3)
+
+c ##########################
+c deadkeys and context tests
+c ##########################
+
+c Setup
+
++ 'y' > dk(1) 'a' dk(2) 'b' dk(3)
+
+c Test #2 for dk(d) and context
+
+dk(1) 'a' dk(2) 'b' dk(3) + 'z' > '<' context '>'
+'<' dk(1) 'a' dk(2) 'b' dk(3) '>' + '?' > 'correct'
+
+c Test #3 for dk(d) and context(n)
+
+dk(1) 'a' dk(2) 'b' dk(3) + 'M' > '<' context(1) '>'
+'<' dk(1) '>' + '?' > 'correct'

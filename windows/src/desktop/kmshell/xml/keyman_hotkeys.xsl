@@ -95,9 +95,9 @@
 
   <xsl:template name="hotkey_control">
     <div class="list_item" tabindex="1" tagType="listitem">
-      <xsl:attribute name="id">list_hotkey_<xsl:value-of select="index"/></xsl:attribute>
-      <xsl:attribute name="onkeydown">return list_keydown(event,'hotkey_<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onmousedown">document.getElementById('list_hotkey_<xsl:value-of select="index"/>').focus(); return true;</xsl:attribute>
+      <xsl:attribute name="id">list_hotkey_<xsl:value-of select="Target"/></xsl:attribute>
+      <xsl:attribute name="onkeydown">return list_keydown(event,'hotkey_<xsl:value-of select="Target"/>');</xsl:attribute>
+      <xsl:attribute name="onmousedown">document.getElementById('list_hotkey_<xsl:value-of select="Target"/>').focus(); return true;</xsl:attribute>
 
       <div style="float:left; padding: 1px 0px 1px 3px;">
         <xsl:choose>
@@ -105,7 +105,7 @@
           <xsl:when test="Target='1'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenKeyboardMenu']"/></xsl:when>
           <xsl:when test="Target='2'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowOnScreenKeyboard']"/></xsl:when>
           <xsl:when test="Target='3'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenConfiguration']"/></xsl:when>
-          <xsl:when test="Target='4'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowKeyboardUsage']"/></xsl:when>
+          
           <xsl:when test="Target='5'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowFontHelper']"/></xsl:when>
           <xsl:when test="Target='6'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowCharacterMap']"/></xsl:when>
           <xsl:when test="Target='7'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenTextEditor']"/></xsl:when>
@@ -115,7 +115,7 @@
       <div style="float:right">
         <div style="float: left; padding: 1px 3px 1px 0px; color: blue;">
           <a class="hotkey" tabindex="-1">
-            <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_<xsl:value-of select="index"/></xsl:attribute>
+            <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_<xsl:value-of select="Target"/></xsl:attribute>
             <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
             <xsl:choose>
               <xsl:when test="string-length(Value) > 0"><xsl:value-of select="Value"/></xsl:when>

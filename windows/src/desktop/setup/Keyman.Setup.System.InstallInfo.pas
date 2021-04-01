@@ -10,6 +10,7 @@ interface
 uses
   System.Classes,
   System.Generics.Collections,
+  System.JSON,
   System.SysUtils,
 
   PackageInfo,
@@ -45,6 +46,10 @@ type
     FVersion: string;
     FPath: string;
     FProductCode: string;
+    FVersionWithTag: string;
+  protected
+    procedure LoadFromJSON(o: TJSONObject); virtual;
+    procedure SaveToJSON(o: TJSONObject); virtual;
   public
     constructor Create(ALocationType: TInstallInfoLocationType); virtual;
     procedure UpgradeToLocalPath(const ARootPath: string);
@@ -53,10 +58,14 @@ type
     property Path: string read FPath write FPath;
     property Url: string read FUrl write FUrl;
     property ProductCode: string read FProductCode write FProductCode; // used only by msi
+    property VersionWithTag: string read FVersionWithTag write FVersionWithTag; // used only by msi
     property Version: string read FVersion write FVersion;
   end;
 
   TInstallInfoFileLocations = class(TObjectList<TInstallInfoFileLocation>)
+  private
+    procedure LoadFromJSON(a: TJSONArray);
+    procedure SaveToJSON(a: TJSONArray);
   public
     function LatestVersion(const default: string = '0'): string;
   end;
@@ -66,6 +75,9 @@ type
     FName: string;
     FLanguages: TInstallInfoPackageLanguages;
     FLocalPackage: TPackage;
+  protected
+    procedure LoadFromJSON(o: TJSONObject); override;
+    procedure SaveToJSON(o: TJSONObject); override;
   public
     constructor Create(ALocationType: TInstallInfoLocationType); override;
     destructor Destroy; override;
@@ -77,6 +89,9 @@ type
   end;
 
   TInstallInfoPackageFileLocations = class(TObjectList<TInstallInfoPackageFileLocation>)
+  private
+    procedure LoadFromJSON(a: TJSONArray);
+    procedure SaveToJSON(a: TJSONArray);
   public
     function LatestVersion(const default: string = '0'): string;
   end;
@@ -92,6 +107,8 @@ type
   public
     constructor Create(const AID: string; const ABCP47: string = '');
     destructor Destroy; override;
+    procedure SaveToJSON(o: TJSONObject);
+    procedure LoadFromJSON(o: TJSONObject);
     property ID: string read FID;
     property BCP47: string read FBCP47 write FBCP47;
     property ShouldInstall: Boolean read FShouldInstall write FShouldInstall;
@@ -100,6 +117,10 @@ type
   end;
 
   TInstallInfoPackages = class(TObjectList<TInstallInfoPackage>)
+  private
+    procedure LoadFromJSON(a: TJSONArray);
+    procedure SaveToJSON(a: TJSONArray);
+  public
     function FindById(const id: string; createIfNotFound: Boolean): TInstallInfoPackage;
   end;
 
@@ -122,9 +143,16 @@ type
     FMsiInstallLocation: TInstallInfoFileLocation;
     function GetBestMsi: TInstallInfoFileLocation;
     function GetPackageMetadata(const KmpFilename: string; p: TPackage): Boolean;
+
   public
     constructor Create(const ATempPath: string);
     destructor Destroy; override;
+
+    procedure SaveToJSONFile(const Filename: string);
+    procedure LoadFromJSONFile(const Filename: string);
+    procedure SaveToJSON(o: TJSONObject);
+    procedure LoadFromJSON(o: TJSONObject);
+
     procedure LoadSetupInf(const SetupInfPath: string);
 
     procedure LocatePackagesAndTierFromFilename(Filename: string);
@@ -139,7 +167,7 @@ type
 
     property TempPath: string read FTempPath;
 
-    property EditionTitle: WideString read FAppName;
+    property EditionTitle: WideString read FAppName write FAppName;
 
     property MsiLocations: TInstallInfoFileLocations read FMsiLocations;
     property MsiInstallLocation: TInstallInfoFileLocation read FMsiInstallLocation write FMsiInstallLocation;
@@ -150,11 +178,13 @@ type
     property IsNewerAvailable: Boolean read FIsNewerAvailable;
 
     property Packages: TInstallInfoPackages read FPackages;
-    property TitleImageFilename: string read FTitleImageFilename;
-    property StartDisabled: Boolean read FStartDisabled;
-    property StartWithConfiguration: Boolean read FStartWithConfiguration;
+    property TitleImageFilename: string read FTitleImageFilename write FTitleImageFilename; // write used only for tests
+    property StartDisabled: Boolean read FStartDisabled write FStartDisabled; // write used only for tests
+    property StartWithConfiguration: Boolean read FStartWithConfiguration write FStartWithConfiguration; // write used only for tests
 
     property Tier: string read FTier write FTier;
+
+    property Strings: TStrings read FStrings; // Note: use .Text(), not .Strings to read localized strings
 
     property ShouldInstallKeyman: Boolean read FShouldInstallKeyman write FShouldInstallKeyman;
   end;
@@ -168,6 +198,7 @@ uses
   System.Zip,
   Winapi.Windows,
 
+  JsonUtil,
   Keyman.Setup.System.MsiUtils,
   Keyman.Setup.System.SetupUILanguageManager,
   KeymanVersion,
@@ -243,6 +274,7 @@ var
   pack: TInstallInfoPackage;
   packLocation: TInstallInfoPackageFileLocation;
   FVersion, FMSIFileName: string;
+  FVersionWithTag: string;
 begin
   FInSetup := False;
   FInPackages := False;
@@ -291,12 +323,13 @@ begin
 
     if System.SysUtils.FileExists(FMSIFileName) then  // I3476
     begin
-      FVersion := GetMsiVersion(FMSIFileName);
+      FVersion := GetMsiVersion(FMSIFileName, FVersionWithTag);
       if FVersion <> '' then
       begin
         location := TInstallInfoFileLocation.Create(iilLocal);
         location.Path := FMSIFileName;
         location.Version := FVersion;
+        location.VersionWithTag := FVersionWithTag;
         FMsiLocations.Add(location);
       end;
     end;
@@ -366,6 +399,128 @@ begin
     Inc(n);
 
     FPackages.Add(TInstallInfoPackage.Create(id, FBCP47));
+  end;
+end;
+
+procedure TInstallInfo.LoadFromJSON(o: TJSONObject);
+var
+  a: TJSONArray;
+  item: TJSONValue;
+  n: Integer;
+begin
+  FTempPath := o.GetValue<string>('TempPath', '');
+  FAppName := o.GetValue<string>('AppName', '');
+  FStartDisabled := o.GetValue<Boolean>('StartDisabled', False);
+  FStartWithConfiguration := o.GetValue<Boolean>('StartWithConfiguration', False);
+  FShouldInstallKeyman := o.GetValue<Boolean>('ShouldInstallKeyman', True);
+  FTier := o.GetValue<string>('Tier', KeymanVersion.CKeymanVersionInfo.Tier);
+
+  FPackages.Clear;
+  a := o.GetValue<TJSONArray>('Packages', nil);
+  if Assigned(a) then
+    FPackages.LoadFromJSON(a);
+
+  FStrings.Clear;
+  a := o.GetValue<TJSONArray>('Strings', nil);
+  if Assigned(a) then
+    for item in a do
+      FStrings.Add(item.AsType<string>);
+
+  FMsiLocations.Clear;
+  a := o.GetValue<TJSONArray>('MsiLocations', nil);
+  if Assigned(a) then
+    FMsiLocations.LoadFromJSON(a);
+
+  n := o.GetValue<Integer>('BestMsi', -1);
+  if (n >= 0) and (n < FMsiLocations.Count)
+    then FBestMsi := FMsiLocations[n]
+    else FBestMsi := nil;
+
+  n := o.GetValue<Integer>('MsiInstallLocation', -1);
+  if (n >= 0) and (n < FMsiLocations.Count)
+    then FMsiInstallLocation := FMsiLocations[n]
+    else FMsiInstallLocation := nil;
+
+  FTitleImageFilename := o.GetValue<string>('TitleImageFilename', '');
+  if (FTitleImageFilename <> '') and not FileExists(FTitleImageFilename) then
+    FTitleImageFilename := '';
+
+//>> always calculate this  FInstalledVersion.Version := : TMSIInfo;
+//>> always calculate this  FIsInstalled: Boolean;
+//>> always calculate this  FIsNewerAvailable: Boolean;
+end;
+
+procedure TInstallInfo.SaveToJSON(o: TJSONObject);
+var
+  a: TJSONArray;
+  s: string;
+begin
+  o.AddPair('TempPath', FTempPath);
+  o.AddPair('AppName', FAppName);
+  o.AddPair('StartDisabled', TJSONBool.Create(FStartDisabled));
+  o.AddPair('StartWithConfiguration', TJSONBool.Create(FStartWithConfiguration));
+  o.AddPair('ShouldInstallKeyman', TJSONBool.Create(FShouldInstallKeyman));
+  o.AddPair('Tier', FTier);
+
+  a := TJSONArray.Create;
+  o.AddPair('Packages', a);
+  FPackages.SaveToJSON(a);
+
+  a := TJSONArray.Create;
+  o.AddPair('Strings', a);
+  for s in FStrings do
+    a.Add(s);
+
+  a := TJSONArray.Create;
+  o.AddPair('MsiLocations', a);
+  FMsiLocations.SaveToJSON(a);
+
+  o.AddPair('BestMsi', TJSONNumber.Create(FMsiLocations.IndexOf(FBestMsi)));
+  o.AddPair('MsiInstallLocation', TJSONNumber.Create(FMsiLocations.IndexOf(FMsiInstallLocation)));
+  o.AddPair('TitleImageFilename', FTitleImageFilename);
+end;
+
+procedure TInstallInfo.LoadFromJSONFile(const Filename: string);
+var
+  o: TJSONObject;
+  s: TStringStream;
+begin
+  s := TStringStream.Create('', TEncoding.UTF8);
+  try
+    s.LoadFromFile(Filename);
+    o := TJSONObject.ParseJSONValue(s.DataString) as TJSONObject;
+    if Assigned(o) then
+    try
+      LoadFromJSON(o);
+    finally
+      o.Free;
+    end;
+  finally
+    s.Free;
+  end;
+end;
+
+procedure TInstallInfo.SaveToJSONFile(const Filename: string);
+var
+  o: TJSONObject;
+  ss: TStringStream;
+  s: TStringList;
+begin
+  o := TJSONObject.Create;
+  SaveToJSON(o);
+  s := TStringList.Create;
+  try
+    // We use this instead of o.Format because o.Format inserts
+    // \ in front of / which is ugly and unnecessary
+    PrettyPrintJSON(o, s);
+    ss := TStringStream.Create(s.Text, TEncoding.UTF8);
+    try
+      ss.SaveToFile(Filename);
+    finally
+      ss.Free;
+    end;
+  finally
+    s.Free;
   end;
 end;
 
@@ -536,6 +691,41 @@ begin
     end;
 end;
 
+procedure TInstallInfoPackage.LoadFromJSON(o: TJSONObject);
+var
+  a: TJSONArray;
+  n: Integer;
+begin
+//    FID: string;
+  FBCP47 := o.GetValue<string>('bcp47', '');
+
+  FLocations.Clear;
+  a := o.GetValue<TJSONArray>('locations', nil);
+  if Assigned(a) then
+    FLocations.LoadFromJSON(a);
+
+  FShouldInstall := o.GetValue<Boolean>('shouldInstall', True);
+  n := o.GetValue<Integer>('installLocation', -1);
+  if (n >= 0) and (n < FLocations.Count)
+    then FInstallLocation := FLocations[n]
+    else FInstallLocation := nil;
+end;
+
+procedure TInstallInfoPackage.SaveToJSON(o: TJSONObject);
+var
+  a: TJSONArray;
+begin
+  o.AddPair('id', FID);
+  o.AddPair('bcp47', FBCP47);
+
+  a := TJSONArray.Create;
+  o.AddPair('locations', a);
+  FLocations.SaveToJSON(a);
+
+  o.AddPair('shouldInstall', TJSONBool.Create(FShouldInstall));
+  o.AddPair('installLocation', TJSONNumber.Create(FLocations.IndexOf(FInstallLocation)));
+end;
+
 { TInstallInfoPackageLanguage }
 
 constructor TInstallInfoPackageLanguage.Create(const ABCP47, AName: string);
@@ -558,6 +748,37 @@ begin
       Result := location.Version;
 end;
 
+procedure TInstallInfoPackageFileLocations.LoadFromJSON(a: TJSONArray);
+var
+  item: TJSONValue;
+  fileLocationItem: TJSONObject;
+  fileLocation: TInstallInfoPackageFileLocation;
+begin
+  for item in a do
+  begin
+    if item is TJSONObject then
+    begin
+      fileLocationItem := item as TJSONObject;
+      fileLocation := TInstallInfoPackageFileLocation.Create(fileLocationItem.GetValue<TInstallInfoLocationType>('locationType', iilLocal));
+      fileLocation.LoadFromJSON(fileLocationItem);
+      Self.Add(fileLocation);
+    end;
+  end;
+end;
+
+procedure TInstallInfoPackageFileLocations.SaveToJSON(a: TJSONArray);
+var
+  item: TInstallInfoPackageFileLocation;
+  o: TJSONObject;
+begin
+  for item in Self do
+  begin
+    o := TJSONObject.Create;
+    item.SaveToJSON(o);
+    a.Add(o);
+  end;
+end;
+
 { TInstallInfoFileLocations }
 
 function TInstallInfoFileLocations.LatestVersion(const default: string): string;
@@ -568,6 +789,37 @@ begin
   for location in Self do
     if CompareVersions(Result, location.Version) > 0 then
       Result := location.Version;
+end;
+
+procedure TInstallInfoFileLocations.LoadFromJSON(a: TJSONArray);
+var
+  item: TJSONValue;
+  fileLocationItem: TJSONObject;
+  fileLocation: TInstallInfoFileLocation;
+begin
+  for item in a do
+  begin
+    if item is TJSONObject then
+    begin
+      fileLocationItem := item as TJSONObject;
+      fileLocation := TInstallInfoFileLocation.Create(fileLocationItem.GetValue<TInstallInfoLocationType>('locationType', iilLocal));
+      fileLocation.LoadFromJSON(fileLocationItem);
+      Self.Add(fileLocation);
+    end;
+  end;
+end;
+
+procedure TInstallInfoFileLocations.SaveToJSON(a: TJSONArray);
+var
+  item: TInstallInfoFileLocation;
+  o: TJSONObject;
+begin
+  for item in Self do
+  begin
+    o := TJSONObject.Create;
+    item.SaveToJSON(o);
+    a.Add(o);
+  end;
 end;
 
 { TInstallInfoPackages }
@@ -584,6 +836,37 @@ begin
   end
   else
     Result := nil;
+end;
+
+procedure TInstallInfoPackages.LoadFromJSON(a: TJSONArray);
+var
+  item: TJSONValue;
+  packageItem: TJSONObject;
+  package: TInstallInfoPackage;
+begin
+  for item in a do
+  begin
+    if item is TJSONObject then
+    begin
+      packageItem := item as TJSONObject;
+      package := TInstallInfoPackage.Create(packageItem.GetValue<string>('id', ''));
+      package.LoadFromJSON(packageItem);
+      Self.Add(package);
+    end;
+  end;
+end;
+
+procedure TInstallInfoPackages.SaveToJSON(a: TJSONArray);
+var
+  item: TInstallInfoPackage;
+  o: TJSONObject;
+begin
+  for item in Self do
+  begin
+    o := TJSONObject.Create;
+    item.SaveToJSON(o);
+    a.Add(o);
+  end;
 end;
 
 { TInstallInfoPackageFileLocation }
@@ -621,6 +904,53 @@ begin
     Result := FName;
 end;
 
+procedure TInstallInfoPackageFileLocation.LoadFromJSON(o: TJSONObject);
+var
+  a: TJSONArray;
+  item: TJSONValue;
+begin
+  inherited LoadFromJSON(o);
+  FName := o.GetValue<string>('name', '');
+
+  FLanguages.Clear;
+  a := o.GetValue<TJSONArray>('languages', nil);
+  if Assigned(a) then
+    for item in a do
+    begin
+      if item is TJSONObject then
+      begin
+        FLanguages.Add(TInstallInfoPackageLanguage.Create(
+          item.GetValue<string>('bcp47', ''),
+          item.GetValue<string>('name', '')
+        ));
+      end;
+    end;
+
+//  TODO: FLocalPackage: TPackage;
+end;
+
+procedure TInstallInfoPackageFileLocation.SaveToJSON(o: TJSONObject);
+var
+  a: TJSONArray;
+  ol: TJSONObject;
+  item: TInstallInfoPackageLanguage;
+begin
+  inherited SaveToJSON(o);
+  o.AddPair('name', FName);
+
+  a := TJSONArray.Create;
+  o.AddPair('languages', a);
+  for item in FLanguages do
+  begin
+    ol := TJSONObject.Create;
+    ol.AddPair('bcp47', item.BCP47);
+    ol.AddPair('name', item.Name);
+    a.Add(ol);
+  end;
+
+// TODO: FLocalPackage: TPackage;
+end;
+
 { TInstallInfoFileLocation }
 
 constructor TInstallInfoFileLocation.Create(
@@ -628,6 +958,27 @@ constructor TInstallInfoFileLocation.Create(
 begin
   inherited Create;
   FLocationType := ALocationType;
+end;
+
+procedure TInstallInfoFileLocation.LoadFromJSON(o: TJSONObject);
+begin
+  FUrl := o.GetValue<string>('url', '');
+  FSize := o.GetValue<Integer>('size', 0);
+  FVersion := o.GetValue<string>('version', '');
+  FPath := o.GetValue<string>('path', '');
+  FProductCode := o.GetValue<string>('productCode', '');
+  FVersionWithTag := o.GetValue<string>('versionWithTag', '');
+end;
+
+procedure TInstallInfoFileLocation.SaveToJSON(o: TJSONObject);
+begin
+  o.AddPair('locationType', TJSONNumber.Create(Ord(FLocationType)));
+  o.AddPair('url', FUrl);
+  o.AddPair('size', TJSONNumber.Create(FSize));
+  o.AddPair('version', FVersion);
+  o.AddPair('path', FPath);
+  o.AddPair('productCode', FProductCode);
+  o.AddPair('versionWithTag', FVersionWithTag);
 end;
 
 procedure TInstallInfoFileLocation.UpgradeToLocalPath(const ARootPath: string);

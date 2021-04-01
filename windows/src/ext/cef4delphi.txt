@@ -17,8 +17,8 @@ Include Paths:     ext/cef4delphi/source
 Installation notes
 ------------------
 
-Copy the source/ and packages/ folders from the CEF4Delphi repository 
-into the windows/src/ext/cef4delphi folder. Ensure that the 
+Copy the source/ and packages/ folders from the CEF4Delphi repository
+into the windows/src/ext/cef4delphi folder. Ensure that the
 CEF4Delphi_binary repository is kept in sync with the cef4delphi source
 version.
 
@@ -26,12 +26,12 @@ Build and notes
 -----------
 
 Cef4Delphi also requires the CEF binary distribution from
-http://opensource.spotify.com/cefbuilds/index.html, cloned at 
+http://opensource.spotify.com/cefbuilds/index.html, cloned at
 https://github.com/keymanapp/CEF4Delphi_binary. Build agents will
 source this repository in order to build the installer for
-of Keyman Developer. On a development machine, clone the 
-CEF4Delphi_binary repository and set the registry value 
-[HKEY_CURRENT_USER\Software\Keyman\Debug] Debug_CEFPath [REG_SZ] to 
+of Keyman Developer. On a development machine, clone the
+CEF4Delphi_binary repository and set the registry value
+[HKEY_CURRENT_USER\Software\Keyman\Debug] Debug_CEFPath [REG_SZ] to
 the root of the cloned repo in order to run Keyman Developer.
 
 License - MPL 1.1
@@ -40,16 +40,16 @@ License - MPL 1.1
 Current uses
 ------------
 
-This information was compiled during the transition of Keyman Engine and 
-Keyman Desktop from TEmbeddedWB to TCEF4Delphi. It may not be up to date.
+This information was compiled during the transition of Keyman Engine and
+Keyman from TEmbeddedWB to TCEF4Delphi. It may not be up to date.
 
 cef / cefwp:
   UframeCEFHost (TframeCEFHost)
     {Kmshell, Developer, Keyman, Tsysinfo}
-    
+
 Kmshell
     UfrmHTML ()
-    UfrmTextEditor 
+    UfrmTextEditor
     UfrmWebContainer [*from global]
       UfrmBaseKeyboard
       UfrmInstallKeyboard

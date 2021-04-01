@@ -1,18 +1,18 @@
 /*
   Name:             Keyman32
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Clean up SelectKeyboard and Visual Keyboard updating
                     14 Sep 2006 - mcdurdin - Fix bugs with multiple InitialiseProcess calls causing Keyman to fail to start up correctly
                     14 Sep 2006 - mcdurdin - Fix buffer overflow with Keyman_ForceKeyboard causing shift states to be flushed in Keyman Developer debugger
@@ -24,7 +24,7 @@
                     30 May 2007 - mcdurdin - I863 - Fixed some systems unable to restart Keyman while system is starting up (userinit)
                     04 Jun 2007 - mcdurdin - I819 - Use a timeout to ensure Keyman can shutdown in a timely fashion if another application is not responding
                     19 Jun 2007 - mcdurdin - I819 - Improve Keyman stability
-                    13 Jul 2007 - mcdurdin - I910 - Log errors starting Keyman Desktop
+                    13 Jul 2007 - mcdurdin - I910 - Log errors starting Keyman
                     05 Nov 2007 - mcdurdin - I1087 - Add language switching hotkeys for Desktop Pro
                     27 Mar 2008 - mcdurdin - I1287 - Switch keyboard and language togher
                     20 Jul 2008 - mcdurdin - I1546 - Language switch not working with some keyboard IDs
@@ -106,13 +106,13 @@
 
 HINSTANCE g_hInstance;
 
-/*******************************************************************************************/ 
-/*                                                                                         */ 
-/* Keyman Initialisation                                                                   */ 
-/*                                                                                         */ 
-/*******************************************************************************************/ 
+/*******************************************************************************************/
+/*                                                                                         */
+/* Keyman Initialisation                                                                   */
+/*                                                                                         */
+/*******************************************************************************************/
 
-BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved) 
+BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 {
   UNREFERENCED_PARAMETER(reserved);
   g_hInstance = hinstDll;
@@ -154,7 +154,7 @@ void UninitDebuggingEx();
  *
  * @param Lock    If FALSE, does not attempt to release other DLLs (e.g. call()ed DLLs)
  */
-BOOL UninitialiseProcess(BOOL Lock) 
+BOOL UninitialiseProcess(BOOL Lock)
 {
   if(!Globals_ProcessInitialised()) return TRUE;
 
@@ -232,10 +232,10 @@ BOOL InitThread(HWND hwnd)
     return FALSE;
   }
 
-  if(_td->FInitialising) 
+  if(_td->FInitialising)
   {
     SetLastError(ERROR_KEYMAN_CANNOT_REINITIALISE_THREAD);  // I3143   // I3523
-    return FALSE;  
+    return FALSE;
     // I2435 - Shutdown of Keyman Engine re-initialising and causing a deadlock; moved up above LoadProducts
     // I2448 - Removed "|| _td->FInitialised" -- this should not be included because sometimes it can be re-initialised.
   }
@@ -243,7 +243,7 @@ BOOL InitThread(HWND hwnd)
   // TODO: Check if we are initialising again and don't reallocate memory.  This can happen if Keyman is restarted
 
   _td->FInitialising = TRUE;  // Control re-entrancy, this is thread safe because the variable is per-thread
-  
+
 	_td->IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
 	if(!_td->IndexStack)
 	{
@@ -267,7 +267,7 @@ BOOL InitThread(HWND hwnd)
     SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
 	  return FALSE;
   }
-  
+
 	RefreshKeyboards(TRUE);
 
 	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "--InitialiseProcess LEAVE--");
@@ -285,7 +285,7 @@ void Initialise_Flag_ShouldSerializeInput() {
   flag_ShouldSerializeInput = Reg_GetDebugFlag(REGSZ_Flag_ShouldSerializeInput, TRUE);
 }
 
-BOOL InitialiseProcess(HWND hwnd) 
+BOOL InitialiseProcess(HWND hwnd)
 {
 	if(InterlockedExchange(&FStartedInitialise, TRUE))
 	{
@@ -309,10 +309,10 @@ BOOL InitialiseProcess(HWND hwnd)
 	wm_keymanim_close = RegisterWindowMessage("WM_KEYMANIM_CLOSE");
 	wm_keymanim_contextchanged = RegisterWindowMessage("WM_KEYMANIM_CONTEXTCHANGED");
 	wm_keymanshift = RegisterWindowMessage("WM_KEYMANSHIFT");
-	
+
 	wm_keyman_control = RegisterWindowMessage(RWM_KEYMAN_CONTROL);
 	wm_keyman_control_internal = RegisterWindowMessage("WM_KEYMAN_CONTROL_INTERNAL");
-	
+
 	wm_test_keyman_functioning = RegisterWindowMessage("wm_test_keyman_functioning");
 
 	DoChangeWindowMessageFilter();
@@ -358,9 +358,9 @@ BOOL UninitHooks()
   else
       *Globals::hhookGetMessage() = NULL;
 
-	if(Globals::get_hhookCallWndProc() && !UnhookWindowsHookEx(Globals::get_hhookCallWndProc())) 
-    RetVal = FALSE; 
-  else 
+	if(Globals::get_hhookCallWndProc() && !UnhookWindowsHookEx(Globals::get_hhookCallWndProc()))
+    RetVal = FALSE;
+  else
     *Globals::hhookCallWndProc() = NULL;
 
 #ifndef _WIN64
@@ -393,7 +393,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
  	{
  	  SendDebugMessage(Handle, sdmGlobal, 0, "Keyman_Initialise: Failed because " LIBRARY_NAME " is already initialised");
     SetLastError(ERROR_ALREADY_INITIALIZED);  // I3143   // I3523
-		return FALSE; 
+		return FALSE;
 	}
 
   if(Globals::get_Keyman_Shutdown() || !ThreadGlobals())  // I3108   // I3127
@@ -434,7 +434,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
  	{
  	  SendDebugMessage(Handle, sdmGlobal, 0, "Keyman_Initialise: Failed to initialise for current process");
     // SetLastError: InitialiseProcess will return an error code  // I3143   // I3523
-		return FALSE;	/* Failed to verify certificate */ 
+		return FALSE;	/* Failed to verify certificate */
 	}
 
 #ifndef _WIN64
@@ -475,7 +475,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StartExit(void)  // I3092
   return TRUE;
 }
 
-extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void) 
+extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
 {
   if(Globals::get_InitialisingThread() != GetCurrentThreadId()) {   // I4326
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_Exit called from thread %d that did not initialise (which was %d)", GetCurrentThreadId(), Globals::get_InitialisingThread());
@@ -495,16 +495,16 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
   ReleaseKeyboards(TRUE);
   Addin_Release();
 
-  if(!Globals::get_Keyman_Initialised()) 
+  if(!Globals::get_Keyman_Initialised())
   {
 	  return TRUE;
   }
-  
+
   *Globals::Keyman_Initialised() = FALSE;
 
   DWORD_PTR ret;
 	SendMessageTimeout(HWND_BROADCAST, wm_keyman_grabwindowproc, 0, 0, SMTO_ABORTIFHUNG | SMTO_NORMAL, 1000, &ret);
-  
+
   RetVal = RetVal && UninitHooks();
 
 	UninitDebugging();
@@ -526,7 +526,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_RestartEngine()
     InitHooks();
     UpdateActiveWindows(); // I1798
   }
-  
+
   return TRUE;
 }
 
@@ -566,7 +566,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
   _td->lpActiveKeyboard->KeyboardOptions = NULL;*/
   _splitpath_s(FileName, NULL, 0, NULL, 0, _td->lpActiveKeyboard->Name, sizeof(_td->lpActiveKeyboard->Name), NULL, 0);
 
-	if(LoadKeyboard(_td->ForceFileName, &_td->lpActiveKeyboard->Keyboard)) 
+	if(LoadKeyboard(_td->ForceFileName, &_td->lpActiveKeyboard->Keyboard))
 	{
 		SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_ForceKeyboard: %s OK", FileName);
 		ResetCapsLock();
@@ -625,15 +625,15 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard()
 /*
 #define MENU_CLASS "#32768"				// Windows Desktop Menu Class
 
-BOOL IsDesktopMenuVisible() 
+BOOL IsDesktopMenuVisible()
 {
     static char str[128];
 	static HWND hWndDesktopMenu = NULL;		// Windows Desktop Menu Window
 
-	if(!IsWindow(hWndDesktopMenu)) 
+	if(!IsWindow(hWndDesktopMenu))
     {
 		hWndDesktopMenu = GetWindow(GetDesktopWindow(), GW_CHILD);
-		while(hWndDesktopMenu) 
+		while(hWndDesktopMenu)
         {
 	        GetClassName(hWndDesktopMenu, (LPSTR) str, sizeof(str));
 	        if(strcmp((LPSTR) str, MENU_CLASS) == 0)
@@ -641,12 +641,12 @@ BOOL IsDesktopMenuVisible()
 			hWndDesktopMenu = GetWindow(hWndDesktopMenu, GW_HWNDNEXT);
         }
 	}
-	
+
 	return(IsWindowVisible(hWndDesktopMenu));
 }
 */
 
-BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd) 
+BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd)
 {
 	if(!kbd) return TRUE;
 	delete kbd;
@@ -679,9 +679,9 @@ BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
-  if(_td->RefreshTag_Process < tag)
+  if(_td->RefreshTag_Thread != tag)
   {
-    _td->RefreshTag_Process = tag;
+    _td->RefreshTag_Thread = tag;
     return TRUE;
   }
   return FALSE;
@@ -689,45 +689,56 @@ BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
 
 void HandleRefresh(int code, LONG tag)
 {
-	switch(code)
-	{
-	case KR_REQUEST_REFRESH:
+  switch (code)
+  {
+  case KR_REQUEST_REFRESH:
     // This is sent by Keyman COM API, ApplyToRunningKeymanEngine
-		SendDebugMessageFormat(0,sdmGlobal,0,"#### Refresh Requested ####");
+    SendDebugMessageFormat(0, sdmGlobal, 0, "#### Refresh Requested ####");
 
-    // We ask any controller window to tell all instances of keyman32/keyman64
-    // that a refresh is coming through
-		Globals::PostControllers(wm_keyman_refresh, KR_PRE_REFRESH, 0);
+    // We ask the master controller window to tell all instances
+    // of keyman32/keyman64 that a refresh is coming through
+    Globals::PostMasterController(wm_keyman_refresh, KR_PRE_REFRESH, 0);
 
     // We need to tell the controller windows to refresh themselves also
-		Globals::PostControllers(wm_keyman_control, KMC_REFRESH, 0);
-		break;
+    Globals::PostControllers(wm_keyman_control, KMC_REFRESH, 0);
+    break;
 
-	case KR_PRE_REFRESH:
+  case KR_PRE_REFRESH:
 #ifndef _WIN64
     // We only need to broadcast the message from Win32; this avoids
     // a double-broadcast which could happen if both keyman32 and keyman64
     // receive the message, as they have independently managed RefreshTags
 
-    // All controllers will receive this message; only one need act on it
-    tag = InterlockedIncrement(Globals::RefreshTag());
-    
+    // This RefreshTag is only ever incremented here by the master controller
+    // so this is a thread safe operation
+    tag = ++(*Globals::RefreshTag());
+
     if (UpdateRefreshTag(tag)) {
       // The Keyman process gets the update first
-      RefreshKeyboards(FALSE); 
+      RefreshKeyboards(FALSE);
       PostMessage(HWND_BROADCAST, wm_keyman_refresh, KR_REFRESH, tag);
     }
 #endif
 
     break;
 
-	case KR_REFRESH:
+  case KR_REFRESH:
     // All threads need to have their keyboard list
     // refreshed after an update, but only once per
     // refresh request
-    if(UpdateRefreshTag(tag))
-      RefreshKeyboards(FALSE);
-
+    if (UpdateRefreshTag(tag)) {
+#ifdef _WIN64
+      if (Globals::get_InitialisingThread() == GetCurrentThreadId()) {
+        // If this is the keymanx64 thread, then we should
+        // go ahead and process the refresh immediately so
+        // that global settings are updated
+        RefreshKeyboards(FALSE);
+      }
+      else
+#endif
+        // We'll update when we are called into action
+        ScheduleRefresh();
+    }
     break;
 	}
 }
@@ -754,15 +765,15 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 
     Globals::SetBaseKeyboardFlags(underlyingLayout, reg->ReadInteger(REGSZ_SimulateAltGr), !reg->ValueExists(REGSZ_DeadkeyConversionMode) || reg->ReadInteger(REGSZ_DeadkeyConversionMode));
 	} else {
-    Globals::SetBaseKeyboardFlags("", 0, 0);
+    Globals::SetBaseKeyboardFlags("", 0, 1);
   }
 
 	delete reg;
 
   reg = new RegistryReadOnly(HKEY_LOCAL_MACHINE);
   if(underlyingLayout[0] &&   // I4660
-      reg->OpenKeyReadOnly(REGSZ_SystemKeyboardLayouts) && 
-      reg->OpenKeyReadOnly(underlyingLayout) && 
+      reg->OpenKeyReadOnly(REGSZ_SystemKeyboardLayouts) &&
+      reg->OpenKeyReadOnly(underlyingLayout) &&
       reg->ReadString(L"layout file", baseLayout, MAX_PATH)) {
     wchar_t langName[16], countryName[16], baseLayoutAlt[34];
 
@@ -827,6 +838,31 @@ void RefreshKeyboardProfiles(INTKEYBOARDINFO *kp, BOOL isTransient) {
     delete reg2;
   }
 }
+
+void ScheduleRefresh() {
+  if (GetCurrentThreadId() == GetWindowThreadProcessId(GetForegroundWindow(), NULL)) {
+    RefreshKeyboards(FALSE);
+  }
+  else {
+    PKEYMAN64THREADDATA _td = ThreadGlobals();
+    if (!_td) {
+      return;
+    }
+    _td->RefreshRequired = TRUE;
+  }
+}
+
+void CheckScheduledRefresh() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return;
+  }
+  if (_td->RefreshRequired) {
+    RefreshKeyboards(FALSE);
+    _td->RefreshRequired = FALSE;
+  }
+}
+
 void RefreshKeyboards(BOOL Initialising)
 {
   OutputThreadDebugString("RefreshKeyboards");
@@ -858,7 +894,7 @@ void RefreshKeyboards(BOOL Initialising)
 
   ReleaseKeyboards(TRUE);
 
-	/* Read the "keyboard off hotkey", simulate Alt+Gr, Hotkeys-Toggle flags */ 
+	/* Read the "keyboard off hotkey", simulate Alt+Gr, Hotkeys-Toggle flags */
 
 #ifndef _WIN64
   Hotkeys::Reload();   // I4326   // I4390
@@ -870,8 +906,8 @@ void RefreshKeyboards(BOOL Initialising)
     LoadBaseLayoutSettings();   // I4583
   }
 
-	/* Read the keyboards */ 
-		
+	/* Read the keyboards */
+
 	RegistryReadOnly *reg = new RegistryReadOnly(HKEY_CURRENT_USER);
 	if(reg->OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards))
 	{
@@ -882,8 +918,8 @@ void RefreshKeyboards(BOOL Initialising)
 
 		while(reg->GetValueNames(sz, _MAX_FNAME, i))
 		{
-			/* Read the active keyboards */ 
-			
+			/* Read the active keyboards */
+
 			nk = atoi(sz);
 			if(nk >= _td->nKeyboards)
 			{
@@ -911,7 +947,7 @@ void RefreshKeyboards(BOOL Initialising)
 
 			kp->Keyboard = NULL;
 
-			SendDebugMessageFormat(0,sdmGlobal,0,"RefreshKeyboards: Added keyboard %s, %d", 
+			SendDebugMessageFormat(0,sdmGlobal,0,"RefreshKeyboards: Added keyboard %s, %d",
 				kp->Name, kp->KeymanID);
 			i++;
 		}
@@ -925,7 +961,7 @@ void RefreshKeyboards(BOOL Initialising)
 			  SelectKeyboard(_td->lpKeyboards[i].KeymanID);   // I3594
 			  break;
 		  }
-		
+
 	SendDebugMessageFormat(0,sdmGlobal,0,"---LEAVE RefreshKeyboards---");
 
   _td->FInRefreshKeyboards = FALSE;
@@ -940,7 +976,7 @@ void ReleaseKeyboards(BOOL Lock)
 
   if(Lock) if(_td->lpActiveKeyboard && !_td->ForceFileName[0]) DeactivateDLLs(_td->lpActiveKeyboard);
 
-	for(int i = 0; i < _td->nKeyboards; i++) 
+	for(int i = 0; i < _td->nKeyboards; i++)
 	{
 		if(Lock) UnloadDLLs(&_td->lpKeyboards[i]);
     FreeKeyboardOptions(&_td->lpKeyboards[i]);

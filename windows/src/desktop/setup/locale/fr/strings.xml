@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName">Français</string>
+  <string name="ssApplicationTitle">Configuration de $APPNAME $VERSION</string>
+  <string name="ssTitle">Installer $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION a été installé avec succès.</string>
+  <string name="ssCancelQuery">Êtes-vous sûr de vouloir annuler l\'installation de $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Extraction de l\'ensemble...</string>
+  <string name="ssBootstrapCheckingPackages" comment="ssBootstrapCheckingPackages: this message is shown when the installer is loading each package that is in the local folder and determining if it should be installed. It is a status message which appears only briefly and requires no user interaction.">Vérification des packages...</string>
+  <string name="ssBootstrapCheckingForUpdates">Vérification des mises à jour en ligne...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Vérification des versions installées...</string>
+  <string name="ssBootstrapReady">Finalisation...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s pour %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Il n\'y a rien à installer.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload" comment="ssActionDownload&#10;Parameters: %0:s download size&#10;For example &quot;(13.5MB download)&quot;&#10;This is used when listing each of the files to be installed.">(%0:s téléchargement)</string>
+  <string name="ssActionInstall">L\'installation va ajouter :</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION est gratuit et source ouverte</string>
+  <string name="ssLicenseLink">&amp;Lire la licence</string>
+  <string name="ssInstallOptionsLink">&amp;Options d\'installation</string>
+  <string name="ssMessageBoxTitle">Configuration de $APPNAME</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Installer</string>
+  <string name="ssCancelButton">Annuler</string>
+  <string name="ssExitButton">&amp;Quitter</string>
+  <string name="ssStatusInstalling">Installation de $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Suppression des anciennes versions</string>
+  <string name="ssStatusComplete">Installation terminée</string>
+  <string name="ssQueryRestart">Vous devez redémarrer Windows avant de pouvoir terminer l\'installation. Lorsque vous redémarrez Windows, l\'installation va continuer.
+
+Redémarrer maintenant ?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows n\'a pas pu être redémarré automatiquement. Vous devriez redémarrer Windows avant d\'essayer de démarrer $APPNAME.</string>
+  <string name="ssMustRestart">Vous devez redémarrer Windows pour terminer l\'installation. Lorsque vous redémarrez Windows, l\'installation se terminera.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION nécessite l\'installation de Windows 7 ou supérieur. Cependant, Keyman Desktop 7, 8 ou 9 a été détecté. Voulez-vous installer les claviers inclus dans cet installateur dans la version de Keyman Desktop installée ?</string>
+  <string name="ssOldOsVersionDownload">Cette version de $APPNAME nécessite l\'installation de Windows 7 ou supérieur. Voulez-vous télécharger Keyman Desktop 8 ?</string>
+  <string name="ssOptionsTitle">Options d\'installation</string>
+  <string name="ssOptionsTitleInstallOptions">Options d\'installation</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Paramètres par défaut de $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modules à installer ou à mettre à jour</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Langue de clavier associée</string>
+  <string name="ssOptionsTitleLocation">Version à installer</string>
+  <string name="ssOptionsStartWithWindows">Lancer $APPNAME au démarrage de Windows</string>
+  <string name="ssOptionsStartAfterInstall">Démarrer $APPNAME à la fin de l\'installation</string>
+  <string name="ssOptionsCheckForUpdates">Vérifier les mises à jour en ligne périodiquement</string>
+  <string name="ssOptionsUpgradeKeyboards">Mettre à jour les claviers installés vers la version $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Partager des statistiques d\'utilisation anonymes avec keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Version d\'installation : %0:s</string>
+  <string name="ssOptionsInstallKeyman">Installer $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Mettre à jour $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s est déjà installé.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion" comment="ssOptionsDownloadKeymanVersion&#10;Parameters: %0:s: version, %1:s: size&#10;&#10;Download is a verb in this case. This is shown in the Options dialog box.">Télécharger la version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Installer %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Télécharger la version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Version %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Sélectionnez la langue que vous souhaitez associer avec le clavier %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Langue par défaut</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Téléchargement de %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Téléchargement de %0:s</string>
+  <string name="ssOffline">$APPNAME L\'installation n\'a pas pu se connecter à keyman.com pour télécharger des ressources supplémentaires.
+
+Veuillez vérifier que vous êtes en ligne et donner à l\'installateur $APPNAME la permission pour accéder à Internet dans les paramètres de votre pare-feu.
+
+Cliquez sur Annuler pour quitter l\'installation, Réessayer pour télécharger à nouveau les ressources ou Ignorer pour continuer hors ligne.</string>
+</resources>

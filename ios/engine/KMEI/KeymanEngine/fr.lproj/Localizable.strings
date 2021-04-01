@@ -1,0 +1,209 @@
+/* A descriptive message used for errors when the app is already busy downloading */
+"alert-download-error-busy" = "Téléchargement déjà en cours.";
+
+/* A descriptive message used when a download fails */
+"alert-download-error-detail" = "Une erreur s'est produite lors du téléchargement ou de l'installation.";
+
+/* Title for a "download failed" alert */
+"alert-download-error-title" = "Erreur de téléchargement";
+
+/* A descriptive message used when no internet connection is detected */
+"alert-no-connection-detail" = "Impossible d'atteindre le serveur Keyman. Veuillez réessayer plus tard.";
+
+/* Title for a "no connection" alert */
+"alert-no-connection-title" = "Problème de connexion";
+
+/* Short text for a 'back' navigational command.  Used to return to the previous screen */
+"command-back" = "Précédent";
+
+/* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
+"command-cancel" = "Annuler";
+
+/* Short text for a 'done' command.  Used to back out of settings menus after changes have been made */
+"command-done" = "Terminé";
+
+/* Short text for an 'install' command.  Used to confirm installation of a package. */
+"command-install" = "Installer";
+
+/* Short text for a 'next' navigational command.  Used to advance to the next screen */
+"command-next" = "Suivant";
+
+/* Short text for an 'OK' command.  Used for some error alerts */
+"command-ok" = "OK";
+
+/* Short text for confirmining 'uninstall' commands. */
+"command-uninstall" = "Désinstaller";
+
+/* Text for the command to uninstall a keyboard */
+"command-uninstall-keyboard" = "Désinstaller ce clavier";
+
+/* Confirmation text to display before uninstalling a keyboard */
+"command-uninstall-keyboard-confirm" = "Voulez-vous désinstaller ce clavier?";
+
+/* Text for the command to uninstall a lexical model */
+"command-uninstall-lexical-model" = "Désinstaller ce dictionnaire";
+
+/* Confirmation text to display before uninstalling a lexical model */
+"command-uninstall-lexical-model-confirm" = "Voulez-vous désinstaller ce dictionnaire ?";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file" = "Un fichier requis est introuvable.";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file-critical" = "Impossible de trouver un fichier critique. Veuillez réinstaller l'application.";
+
+/* Text for errors in data received from search queries */
+"error-query-decoding" = "Le serveur rencontre actuellement des difficultés techniques";
+
+/* A descriptive message used when a download fails */
+"error-query-general" = "Erreur de communication avec le serveur";
+
+/* Text for error when a search query is unexpectedly empty */
+"error-query-no-data" = "Le serveur n'a pas répondu";
+
+/* Text for general errors where not much information is known */
+"error-unknown" = "Une erreur inattendue s’est produite";
+
+/* Text for error when updating a resource:  cannot download because no source is available */
+"error-update-no-link" = "Aucune source de mise à jour n'est disponible pour ce package";
+
+/* Text for error when updating a resource:  Keyman does not know how to update the resource */
+"error-update-not-managed" = "Impossible de mettre à jour une ressource non gérée par le moteur Keyman";
+
+/* Text for the command to open the help page of a keyboard, as shown on resource information views */
+"info-command-help-keyboard" = "Aide du clavier";
+
+/* Text for the command to open the help page of a lexical model, as shown on resource information views */
+"info-command-help-lexical-model" = "Aide du dictionnaire";
+
+/* Text label for displaying a keyboard's version, as shown on resource information views */
+"info-label-version-keyboard" = "Version du clavier";
+
+/* Text label for displaying a lexical model's version, as shown on resource information views */
+"info-label-version-lexical-model" = "Version du dictionnaire";
+
+/* Label used for the "package info" / readme tab with the package installation prompt on phones. */
+"installer-label-package-info" = "Informations sur le package";
+
+/* Label used for the language-selection tab with the package installation prompt on phones. */
+"installer-label-select-languages" = "Sélectionnez les langues";
+
+/* Label used with a package's version, as seen within the package installation prompt.  Example:  "Version: 14.0.0" */
+"installer-label-version" = "Version : %@";
+
+/* Section header for languages supported by a package, as seen within the package installation prompt */
+"installer-section-available-languages" = "Langues disponibles";
+
+/* Text for the help popup for changing keyboards with the globe key */
+"keyboard-help-change" = "Appuyez ici pour changer de clavier";
+
+/* Text for the command to exit the Keyman keyboard in favor of other keyboards installed on the system */
+"keyboard-menu-exit" = "Fermer %@";
+
+/* Error installing a Keyman package - could not allocate a location to install it */
+"kmp-error-file-system" = "Erreur lors de l'installation du package - erreur système de fichiers";
+
+/* Error installing a Keyman package - could not copy package files */
+"kmp-error-file-copying" = "Erreur lors de l'installation du paquet - impossible de copier les fichiers requis";
+
+/* Error opening a Keyman package - package is not valid */
+"kmp-error-invalid" = "Le fichier du package est corrompu.";
+
+/* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
+"kmp-error-missing-resource" = "Ce paquet ne contient pas le clavier ou le dictionnaire demandé.";
+
+/* Error opening a Keyman package - cannot parse contents */
+"kmp-error-no-metadata" = "Ce package n'a pas été correctement construit - contenu inconnu.";
+
+/* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
+"kmp-error-wrong-type" = "Ce paquet ne contient pas le type de ressource attendu.";
+
+/* Title for the Installed Languages menu */
+"menu-installed-languages-title" = "Langues installées";
+
+/* Section header for lexical models within a language-specific settings menu */
+"menu-langsettings-label-lexical-models" = "Dictionnaires";
+
+/* Section header for keyboards within a language-specific settings menu */
+"menu-langsettings-section-keyboards" = "Claviers";
+
+/* Section header for the settings toggles within a language-specific settings menu */
+"menu-langsettings-section-settings" = "Paramètres de langue";
+
+/* Title for the language-specific settings menus */
+"menu-langsettings-title" = "Paramètres de %@";
+
+/* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-correct" = "Activer les corrections";
+
+/* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-predict" = "Activer les prédictions";
+
+/* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-message" = "Voulez-vous installer ce dictionnaire ?";
+
+/* Title for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-title" = "%1$@: %2$@";
+
+/* Text for an info alert indicating that no lexical models are available */
+"menu-lexical-model-none-message" = "Aucun dictionnaire disponible";
+
+/* Title for the lexical model menu, a submenu of the language-specific settings menus */
+"menu-lexical-model-title" = "Dictionnaires %@";
+
+/* Title for the keyboard picker */
+"menu-picker-title" = "Claviers";
+
+/* Primary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report" = "Autoriser les rapports d'erreurs";
+
+/* Secondary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report-description" = "Peut nécessiter un \"accès complet\"";
+
+/* Primary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file" = "Installer depuis un fichier";
+
+/* Secondary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file-description" = "Parcourir pour des fichiers .kmp";
+
+/* Primary text for the Settings menu option that displays the iOS system menu options for the app's keyboard */
+"menu-settings-system-keyboard-menu" = "Paramètres du clavier système";
+
+/* Label for the "Show Banner" toggle on the main settings screen */
+"menu-settings-show-banner" = "Afficher la bannière";
+
+/* Label for the "Get Started" automatic display toggle seen in the Settings menu */
+"menu-settings-startup-get-started" = "Toujours afficher « Démarrer» au démarrage";
+
+/* Title for the main Settings menu */
+"menu-settings-title" = "Paramètres Keyman";
+
+/* Short text for notification:  download failure for keyboard */
+"notification-download-failure-keyboard" = "Le téléchargement du clavier a échoué";
+
+/* Short text for notification:  download failure for lexical model */
+"notification-download-failure-lexical-model" = "Le téléchargement du dictionnaire a échoué";
+
+/* Short text for notification:  download success for keyboard */
+"notification-download-success-keyboard" = "Le clavier a été téléchargé avec succès";
+
+/* Short text for notification:  download success for lexical model */
+"notification-download-success-lexical-model" = "Le modèle lexical a été téléchargé avec succès";
+
+/* Short text for notification:  downloading a keyboard */
+"notification-downloading-keyboard" = "Téléchargement du clavier\U2026";
+
+/* Short text for notification:  downloading a lexical model */
+"notification-downloading-lexical-model" = "Téléchargement du dictionnaire en cours\U2026";
+
+/* Short text for notification:  an update is available */
+"notification-update-available" = "Mise à jour disponible";
+
+/* Short text for notification:  currently updating */
+"notification-update-processing" = "Mise à jour en cours\U2026";
+
+/* Text indicating success at installing new keyboards or dictionaries */
+"success-install" = "Installé avec succès.";
+
+/* A title to use in alerts indicating 'success' at whatever task the user requested */
+"success-title" = "Succès";

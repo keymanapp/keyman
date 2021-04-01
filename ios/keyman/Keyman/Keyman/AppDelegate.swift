@@ -36,7 +36,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       vc.dismiss(animated: true, completion: nil)
 
       if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: vc) {
-        // We choose to prompt the user for comfirmation, rather
+        // First, explicitly hide the keyboard.  Otherwise, the app may try to
+        // redisplay it before package installation is fully complete.
+        Manager.shared.hideKeyboard()
+
+        // We choose to prompt the user for confirmation, rather
         // than automatically installing the package.
         //
         // Since we're operating at the root, we want to present in a separate UINavigationController.
@@ -54,19 +58,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
     SentryManager.start()
+    // Forces the logs to initialize, as their definitions result in lazy init.
+    // These references have been configured to also log app details.
+    _ = log
+    _ = KeymanEngine.log
 
     UniversalLinks.externalLinkLauncher = { url in
       UIApplication.shared.openURL(url)
     }
-
-    #if DEBUG
-      KeymanEngine.log.outputLevel = .debug
-      log.outputLevel = .debug
-      KeymanEngine.log.logAppDetails()
-    #else
-      KeymanEngine.log.outputLevel = .warning
-      log.outputLevel = .warning
-    #endif
 
     Manager.applicationGroupIdentifier = "group.KM4I"
 

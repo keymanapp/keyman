@@ -20,6 +20,7 @@ let userTextKey = "UserText"
 let userTextSizeKey = "UserTextSize"
 let dontShowGetStartedKey = "DontShowGetStarted" // older preference setting name, use shouldShowGetStartedKey
 let shouldShowGetStartedKey = "ShouldShowGetStarted"
+let shouldReportErrorsKey = "ShouldReportErrors"
 let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotification")
 let urlKey = "url"
 
@@ -109,9 +110,14 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // We have to gerry-rig this so that the framework-based SettingsViewController
     // can launch the app-based DocumentViewController.
     if #available(iOS 11.0, *) {
-      Manager.shared.fileBrowserLauncher = { navController in
-        let vc = PackageBrowserViewController()
-        navController.pushViewController(vc, animated: true)
+      Manager.shared.fileBrowserLauncher = { navVC in
+        let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"],
+                                              in: .import,
+                                              navVC: navVC)
+
+        // Present the "install from file" browser within the specified navigation view controller.
+        // (Allows displaying from within the Settings menu)
+        navVC.present(vc, animated: true)
       }
     }
   }
@@ -530,7 +536,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let installedLanguagesVC = InstalledLanguagesViewController()
     nc.pushViewController(installedLanguagesVC, animated: true)
 
-    self.present(nc, animated: true)
+    self.present(nc, animated: true) {
+      // Requires a host NavigationViewController, hence calling it afterward.
+      installedLanguagesVC.launchKeyboardSearch()
+    }
   }
 
   @objc func actionButtonClick(_ sender: Any) {

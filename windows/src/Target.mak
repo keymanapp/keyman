@@ -50,9 +50,8 @@ dirs:
     @-mkdir $(ROOT)\bin\help 2>nul
     @-mkdir $(ROOT)\bin\help\desktop 2>nul
     @-mkdir $(ROOT)\bin\help\developer 2>nul
-    @-mkdir $(ROOT)\bin\help\php 2>nul
-    @-mkdir $(ROOT)\bin\help\php\desktop 2>nul
-    @-mkdir $(ROOT)\bin\help\php\developer 2>nul
+    @-mkdir $(ROOT)\bin\help\md 2>nul
+    @-mkdir $(ROOT)\bin\help\md\desktop 2>nul
     @-mkdir $(ROOT)\lib 2>nul
     @-mkdir $(ROOT)\release 2>nul
 

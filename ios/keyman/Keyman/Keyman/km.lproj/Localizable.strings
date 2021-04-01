@@ -1,0 +1,81 @@
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-add-title" = "បន្ថែម​ប៊ុកម៉ាក";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-none" = "គ្មានប៊ុកម៉ាក";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-title" = "ប៊ុកម៉ាក";
+
+/* Used to confirm a user's desire to install a package */
+"confirm-install" = "ដំឡើង";
+
+/* The label for the toggle to stop automatically showing the "Get Started" tutorial popup. */
+"disable-get-started" = "កុំបង្ហាញ​ទៀត";
+
+/* Indicates an error opening a web page requested by a user */
+"error-opening-page" = "មិន​អាច​បើក​ទំព័របានទេ";
+
+/* Long-form used when installing a font in order to display a language properly. */
+"font-install-description" = "ចុច \"ដំឡើង\" ដើម្បីធ្វើឱ្យ %@ បង្ហាញ​បាន​ត្រឹមត្រូវ​ក្នុង​កម្មវិធី​ទាំង​អស់របស់​អ្នក";
+
+/* The name of the iOS Settings menu option for keyboards */
+"ios-settings-keyboards" = "ក្ដារចុច";
+
+/* The name of the iOS Settings menu option for giving the keyboard full access.  (The menu entry
+underneath the app's name within the app-specific keyboard menu.) */
+"ios-settings-allow-full-access" = "អនុញ្ញាត​ឱ្យ​ចូលប្រើ​ពេញ​លេញ";
+
+/* Short-form used when installing a font in order to display a language properly. */
+"language-for-font" = "ពុម្ព​អក្សរ %@";
+
+/* Used for 'add' options within menus */
+"menu-add" = "បន្ថែម";
+
+/* Used to indicate a sequence of menu options that a user needs to copy.  May be chained.  Example:  "Keyboards (1) > Enable Keyman (2)" */
+"menu-breadcrumbing" = "%1$@ > %2$@";
+
+/* Used to exit a menu without choosing an option */
+"menu-cancel" = "បោះ​បង់";
+
+/* Menu option that erases all previously-typed text. */
+"menu-clear-text" = "លុប​​អក្សរ​ចេញ";
+
+/* Menu option that displays a list designed to help users start using the app */
+"menu-get-started" = "ចាប់ផ្ដើម";
+
+/* Menu option that displays help for the app */
+"menu-help" = "ព័ត៌មាន";
+
+/* Menu option that displays the main screen's drop-down menu */
+"menu-more" = "ច្រើន​ទៀត";
+
+/* Menu option used to edit keyboard and dictionary settings */
+"menu-settings" = "ការ​កំណត់";
+
+/* Menu option that displays the iOS Share menu */
+"menu-share" = "ចែក​រំលែក";
+
+/* Menu option that displays an embedded web browser. */
+"menu-show-browser" = "កម្មវិធីរុករក";
+
+/* Menu option used to control in-app font size. */
+"menu-text-size" = "ទំហំ​អក្សរ";
+
+/* Used to describe the current font size */
+"text-size-label" = "ទំហំអក្សរ៖ %i";
+
+/* Text to indicate that a user should set a toggle within iOS Settings to 'active'. */
+"toggle-to-enable" = "បើក %@";
+
+/* First option on the Get Started tutorial - Add a keyboard for your language */
+"tutorial-add-keyboard" = "បន្ថែម​ក្ដារ​ចុច​មួយ​សម្រាប់​ភាសា​របស់​អ្នក";
+
+/* Third option on the Get Started tutorial - Displays app help. */
+"tutorial-show-help" = "ព័ត៌មានបន្ថែម";
+
+/* Second option on the Get Started tutorial - Set up Keyman as system-wide keyboard */
+"tutorial-system-keyboard" = "រៀបចំ Keyman ជា​ក្ដារចុចសម្រាប់​ប្រព័ន្ធទាំង​មូល";
+
+/* Used to display app version (as in \"Version: 1.0.2\" */
+"version-label" = "ជំនាន់៖ %@";

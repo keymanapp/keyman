@@ -83,23 +83,8 @@
 # /buildtools/inst/
 /windows/src/buildtools/inst/srcbackup.mak
 
-# /buildtools/importkeyboard/
-/windows/src/buildtools/importkeyboard/bin
-/windows/src/buildtools/importkeyboard/obj
-
 # /desktop/branding/
 /windows/src/desktop/branding/desktop_pro.pxx
-
-# /desktop/help/
-/windows/src/desktop/help/temp
-/windows/src/desktop/help/*.htm
-/windows/src/desktop/help/keymandesktop.chm
-/windows/src/desktop/help/keymandesktop.hhp
-/windows/src/desktop/help/toc.hhc
-
-# /desktop/help/desktop_images/
-/windows/src/desktop/help/desktop_images/Old Getting Started Images
-/windows/src/desktop/help/desktop_images/old
 
 # /desktop/inst/
 /windows/src/desktop/inst/*.wixpdb

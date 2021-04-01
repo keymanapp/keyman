@@ -1,18 +1,18 @@
 Format: http://anonscm.debian.org/viewvc/dep/web/deps/dep5.mdwn?view=markup&pathrev=174
 Upstream-Name: ibus-kmfl
-Upstream-Contact: Doug Rintoul <doug_rintoul@sil.org>
+Upstream-Contact: Keyman team <support@keyman.com>
 
 Files: *
-Copyright: 2004-2018 SIL International
+Copyright: 2004-2021 SIL International
 License: GPL-2+
 
 Files: src/kmflutil.c
        src/kmflutil.h
-Copyright: 2009-2018 SIL International
+Copyright: 2009-2021 SIL International
 License: GPL-2+ or MIT
 
 Files: debian/*
-Copyright: 2004-2018 SIL International
+Copyright: 2004-2021 SIL International
 License: GPL-2+
 
 License: GPL-2+
@@ -53,4 +53,3 @@ License: MIT
  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-

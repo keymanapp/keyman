@@ -9,11 +9,11 @@ available_platforms=(android ios linux mac web windows)
 # e.g. android='common/models|common/predictive-text'
 # will expand into android='^(android|(oem/[^/]+/android)|common/models|common/predictive-text)'
 
-watch_android='web|common/models|common/predictive-text|common/lexical-model-types'
-watch_ios='web|common/models|common/predictive-text|common/lexical-model-types'
+watch_android='web|common/models|common/predictive-text|common/lexical-model-types|common/core/web'
+watch_ios='web|common/models|common/predictive-text|common/lexical-model-types|common/core/web'
 watch_linux='common/engine'
 watch_mac='common/engine'
-watch_web='common/models|common/predictive-text|common/lexical-model-types'
+watch_web='common/models|common/predictive-text|common/lexical-model-types|common/core/web'
 
 # Windows currently builds Developer and Desktop, so we need everything from common,developer,web
 watch_windows='common|developer|web'
@@ -21,6 +21,12 @@ watch_windows='common|developer|web'
 #
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due
 # to legacy updates and changes.
+#
+# These bc_x_y variables ARE used in trigger-builds.inc.sh by pattern so the names are important,
+# and you won't find them directly in a grep search.
+#
+# _Jenkins should be appended to any build configuration (pipeline) name that is from Jenkins,
+# not TeamCity.
 #
 
 # Test Build Configurations
@@ -39,7 +45,7 @@ bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests)
 
 vcs_test=HttpsGithubComKeymanappKeymanPRs
 
-# Master (Alpha) Build Configurations
+# Master (Alpha) Build Configurations; these diverge when we need new build configurations for new versions
 
 bc_master_android=(KeymanAndroid_Build)
 bc_master_ios=(Keyman_iOS_Master)
@@ -52,13 +58,22 @@ vcs_master=HttpsGithubComKeymanappKeyman
 
 # Beta Build Configurations
 
-bc_beta_android=(KeymanAndroid_Beta)
-bc_beta_ios=(Keyman_iOS_Beta)
-bc_beta_linux=(KeymanLinux_Beta pipeline-keyman-packaging_Jenkins)
-bc_beta_mac=(KeymanMac_Beta)
-bc_beta_windows=(KeymanDesktop_Beta)
-bc_beta_web=(Keymanweb_Beta)
+bc_beta_android=(KeymanAndroid_Build)
+bc_beta_ios=(Keyman_iOS_Master)
+bc_beta_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
+bc_beta_mac=(KeymanMac_Master)
+bc_beta_windows=(Keyman_Build)
+bc_beta_web=(Keymanweb_Build)
 
-vcs_beta=Keyman_KeymanappKeymanBeta
+vcs_beta=HttpsGithubComKeymanappKeyman
 
-# TODO: Stable Build Configurations
+# Stable 14.0 Build Configurations
+
+bc_stable_14_0_android=(KeymanAndroid_Build)
+bc_stable_14_0_ios=(Keyman_iOS_Master)
+bc_stable_14_0_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
+bc_stable_14_0_mac=(KeymanMac_Master)
+bc_stable_14_0_windows=(Keyman_Build)
+bc_stable_14_0_web=(Keymanweb_Build)
+
+vcs_stable_14_0=HttpsGithubComKeymanappKeyman

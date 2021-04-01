@@ -201,7 +201,7 @@ type
   TCompileKeymanWeb = class
   private
     FError: Boolean;  // I1971
-    FCallback: TCompilerCallback;
+    FCallback: TCompilerCallbackW;
     FCallFunctions: TStringList;
     FOutFile, FInFile: string;
     FKeyboardVersion: string;
@@ -223,7 +223,7 @@ type
     procedure ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971
     function ExpandSentinel(pwsz: PWideChar): TSentinelRecord;
     function CallFunctionName(s: WideString): WideString;
-    function JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean = False): string;   // I3659
+    function JavaScript_Name(i: Integer; pwszName: PWideChar; KeepNameForPersistentStorage: Boolean = False): string;   // I3659
     function JavaScript_Store(line: Integer; pwsz: PWideChar): string;
     function JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
     function JavaScript_ShiftAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;   // I4872
@@ -237,7 +237,7 @@ type
     function JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function RuleIsExcludedByPlatform(fkp: PFILE_KEY): Boolean;
-    function RequotedString(s: WideString): string;
+    function RequotedString(s: WideString; RequoteSingleQuotes: Boolean = False): string;
     function VisualKeyboardFromFile(
       const FVisualKeyboardFileName: string; var fDisplayUnderlying: Boolean): WideString;
     function WriteCompiledKeyboard: string;
@@ -252,7 +252,7 @@ type
     function JavaScript_SetupEpilog: string;
     function JavaScript_SetupProlog: string;
   public
-    function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866
+    function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallbackW): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
     destructor Destroy; override;
   end;
@@ -307,7 +307,17 @@ begin
   Result := True;
 end;
 
-function TCompileKeymanWeb.Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866   // I4865
+var
+  GCallbackW: TCompilerCallbackW = nil;
+
+function WebCompilerMessageA(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
+begin
+  if Assigned(GCallbackW)
+    then Result := GCallbackW(line, msgcode, PWideChar(WideString(AnsiString(text))))
+    else Result := 1;
+end;
+
+function TCompileKeymanWeb.Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallbackW): Boolean;   // I3681   // I4140   // I4688   // I4866   // I4865
 var
   WarnDeprecatedCode: Boolean;
   Data: string;
@@ -343,11 +353,12 @@ begin
     WarnDeprecatedCode := True;
   end;
 
+  GCallbackW := Callback;
   FCallFunctions := TStringList.Create;
   try
     if CompileKeyboardFileToBuffer(PChar(InFile), @fk,
       FCompilerWarningsAsErrors, WarnDeprecatedCode,
-      Callback, CKF_KEYMANWEB) > 0 then  // I3482   // I4866   // I4865
+      WebCompilerMessageA, CKF_KEYMANWEB) > 0 then  // I3482   // I4866   // I4865
       // TODO: Free fk
     begin
       if Assigned(AOwnerProject) and
@@ -377,6 +388,7 @@ begin
     end;
   finally
     FreeAndNil(FCallFunctions);
+    GCallbackW := nil;
   end;
 end;
 
@@ -862,21 +874,46 @@ begin
     else Result := IntToStr(JavaScript_Key(fkp, FMnemonic));
 end;
 
-function TCompileKeymanWeb.JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean): string;   // I3659
+function TCompileKeymanWeb.JavaScript_Name(i: Integer; pwszName: PWideChar; KeepNameForPersistentStorage: Boolean): string;   // I3659
+var
+  FChanged: Boolean;
+  p: PWideChar;
 begin
-  if not Assigned(pwszName) or (pwszName^ = #0) or (not Self.FDebug and not UseNameForRelease) then   // I3659   // I3681
+  FChanged := False;
+  p := pwszName;
+  if not Assigned(pwszName) or (pwszName^ = #0) or (not Self.FDebug and not KeepNameForPersistentStorage) then   // I3659   // I3681
     Result := IntToStr(i) // for uniqueness
   else
   begin
-    if UseNameForRelease   // I3659
+    if KeepNameForPersistentStorage // I3659
       then Result := '' // Potential for overlap in theory but in practice we only use this for named option stores so can never overlap
       else Result := '_'; // Ensures we cannot overlap numbered instances
     while pwszName^ <> #0 do
     begin
-      if CharInSet(PChar(pwszName)^, SValidIdentifierCharSet)   // I3681
-        then Result := Result + PChar(pwszName)^
-        else Result := Result + '_';
+      if CharInSet(PChar(pwszName)^, SValidIdentifierCharSet) then  // I3681
+      begin
+        Result := Result + PChar(pwszName)^
+      end
+      else
+      begin
+        Result := Result + '_';
+        FChanged := True;
+      end;
       Inc(pwszName);
+    end;
+    if not KeepNameForPersistentStorage then
+    begin
+      // Ensure each transformed name is still unique
+      Result := Result + '_' + IntToStr(i);
+      if FChanged then
+        Result := Result + '/*'+string(p).Replace('*/', '*-/')+'*/'
+    end
+    else if FChanged then
+    begin
+      // For named option stores, we are only supporting the valid identifier
+      // character set, which is a breaking change in 14.0.
+      ReportError(0, CWARN_OptionStoreNameInvalid, Format('The option store %s should be named with characters in the range A-Z, a-z, 0-9 and _ only.',
+        [string(p)]));
     end;
   end;
 end;
@@ -1327,10 +1364,10 @@ begin
   if FCompilerWarningsAsErrors then
     flag := flag or CWARN_FLAG;
   if (msgcode and flag) <> 0 then FError := True;
-  FCallback(line, msgcode, PAnsiChar(AnsiString(text)));  // I3310 /// TODO: K9: convert to Unicode
+  FCallback(line, msgcode, PWideChar(text));  // I3310
 end;
 
-function TCompileKeymanWeb.RequotedString(s: WideString): string;
+function TCompileKeymanWeb.RequotedString(s: WideString; RequoteSingleQuotes: Boolean = False): string;
 var
   i: Integer;
 begin
@@ -1338,6 +1375,7 @@ begin
   while i <= Length(s) do
   begin
     if (s[i] = '"') or (s[i] = '\') then begin s := Copy(s, 1, i-1)+'\'+Copy(s, i, Length(s)); Inc(i); end   // I4368
+    else if (s[i] = '''') and RequoteSingleQuotes then begin s := Copy(s, 1, i-1)+'\'+Copy(s, i, Length(s)); Inc(i); end
     else if (s[i] = #13) then   // I4368
     begin
       s := Copy(s, 1, i-1) + '\n' + Copy(s,i+1, Length(s));
@@ -1522,7 +1560,7 @@ begin
     if kvkh102 in FVK.Header.Flags then f102 := '1' else f102 := '0';
     fDisplayUnderlying := kvkhDisplayUnderlying in FVK.Header.Flags;
 
-    Result := Format('{F:''%s%s 1em "%s"'',K102:%s}', [fitalic, fbold, FVK.Header.UnicodeFont.Name, f102]);   // I3886   // I3956
+    Result := Format('{F:''%s%s 1em "%s"'',K102:%s}', [fitalic, fbold, RequotedString(FVK.Header.UnicodeFont.Name, True), f102]);   // I3886   // I3956
     Result := Result + ';'+VisualKeyboardToKLS(FVK);
     Result := Result + ';'+BuildBKFromKLS;
   finally

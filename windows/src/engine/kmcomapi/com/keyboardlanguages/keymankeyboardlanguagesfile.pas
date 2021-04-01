@@ -3,10 +3,18 @@ unit keymankeyboardlanguagesfile;
 interface
 
 uses
-  Windows, ActiveX, ComObj, keymanapi_TLB, StdVcl, keymanautoobject, KeymanContext,
+  System.Win.ComObj,
+  System.Win.StdVCL,
+  Winapi.ActiveX,
+  Winapi.Windows,
+
+  internalinterfaces,
+  keymanapi_TLB,
+  keymanautoobject,
+  KeymanContext,
   keymanerrorcodes,
-  PackageInfo,
-  internalinterfaces;
+  kmxfile,
+  PackageInfo;
 
 type
   TKeymanKeyboardLanguageFileList = TAutoObjectList;
@@ -22,7 +30,8 @@ type
     function Get_Items(Index: Integer): IKeymanKeyboardLanguage; safecall;
     function IndexOfBCP47Code(const BCP47Code: string): Integer;
   public
-    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardFile; APackageKeyboardLanguages: TPackageKeyboardLanguageList);
+    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardFile; APackageKeyboardLanguages: TPackageKeyboardLanguageList;
+      AKeyboardInfo: PKeyboardInfo);
     destructor Destroy; override;
   end;
 
@@ -37,31 +46,62 @@ uses
 
   BCP47Tag,
   keymankeyboardlanguagefile,
+  Keyman.System.MitigateWin10_1803LanguageInstall,
   Keyman.System.CanonicalLanguageCodeUtils,
+  Keyman.System.LanguageCodeUtils,
   KLog,
   RegistryKeys,
   utilkeyman;
 
 { TKeymanKeyboardLanguagesFile }
 
-constructor TKeymanKeyboardLanguagesFile.Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardFile; APackageKeyboardLanguages: TPackageKeyboardLanguageList);
+constructor TKeymanKeyboardLanguagesFile.Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardFile; APackageKeyboardLanguages: TPackageKeyboardLanguageList;
+  AKeyboardInfo: PKeyboardInfo);
 var
   i: Integer;
   FCanonicalBCP47Tag: string;
+  langs: TArray<Integer>;
+  lang: Integer;
+  ml: TMitigateWin10_1803.TMitigatedLanguage;
+  FCanonicalBCP4Tag: string;
+  FLangID: Integer;
 begin
   _SetContext(AContext);
   FOwner := AOwner;
   FLanguages := TKeymanKeyboardLanguageFileList.Create;
   inherited Create(AContext, IKeymanKeyboardLanguagesInstalled, FLanguages);
   // Just fill the list here because we never need to refresh static data anyway
-  if not Assigned(APackageKeyboardLanguages) then
-    Exit;
-  for i := 0 to APackageKeyboardLanguages.Count - 1 do
+  if Assigned(APackageKeyboardLanguages) then
   begin
-    FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(APackageKeyboardLanguages[i].ID, True);
-    if (FCanonicalBCP47Tag <> '') and (IndexOfBCP47Code(FCanonicalBCP47Tag) < 0) then
-      FLanguages.Add(TKeymanKeyboardLanguageFile.Create(AContext, AOwner, FCanonicalBCP47Tag, 0,
-        APackageKeyboardLanguages[i].Name));
+    for i := 0 to APackageKeyboardLanguages.Count - 1 do
+    begin
+      FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(APackageKeyboardLanguages[i].ID, True, True);
+      if (FCanonicalBCP47Tag <> '') and (IndexOfBCP47Code(FCanonicalBCP47Tag) < 0) then
+        FLanguages.Add(TKeymanKeyboardLanguageFile.Create(AContext, AOwner, FCanonicalBCP47Tag, 0,
+          APackageKeyboardLanguages[i].Name));
+    end;
+  end
+  else if Assigned(AKeyboardInfo) then
+  begin
+    langs := GetLanguageCodesFromKeyboard(AKeyboardInfo^);
+    for lang in langs do
+    begin
+      if TMitigateWin10_1803.IsMitigationRequired(lang, ml) then
+      begin
+        FCanonicalBCP4Tag := ml.NewLanguage.BCP47;
+        FLangID := ml.NewLanguage.Code;
+      end
+      else
+      begin
+        FCanonicalBCP47Tag := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(lang);
+        FLangID := lang;
+      end;
+
+      if FCanonicalBCP47Tag <> '' then
+      begin
+        FLanguages.Add(TKeymanKeyboardLanguageFile.Create(AContext, AOwner, FCanonicalBCP47Tag, FLangID, ''));
+      end;
+    end;
   end;
   Refresh;
 end;

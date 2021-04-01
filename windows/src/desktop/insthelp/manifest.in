@@ -2,10 +2,10 @@
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
   <assemblyIdentity
     type="win32"
-    name="tavultesoft.keymandeveloper.insthelp"
+    name="com.keyman.windows.insthelp"
     version="$VersionWin"
     processorArchitecture="x86"/>
-  <description>Keyman Engine Installation Assistant</description>
+  <description>Keyman Installation Assistant</description>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security>
       <requestedPrivileges>

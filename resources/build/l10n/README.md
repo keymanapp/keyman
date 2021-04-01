@@ -1,15 +1,15 @@
 # Localization Maintenance
 
-Localization for Keyman is maintained at https://crowdin.com/project/keyman
+Localization for Keyman is maintained at https://translate.keyman.com
 
 Downloading and updating files between Keyman and Crowdin happens automatically
 on GitHub by way of the Crowdin git integration. The configuration file for all platforms
-is a YAML file named `/crowdin.yml`.
+is a YAML file named `/crowdin.yml`. Currently, the git integration tracks the `master` branch.
 
-The only thing that needs to be done manually is to update `crowdin.yml` if new files get added
+For most of our platforms, the only thing that needs to be done manually is to update `crowdin.yml` if new files get added
 (and of course translating the strings on the [Crowdin website](https://crowdin.com/project/keyman)).
 
-## Manual up- and download with Crowdin CLI
+## Manual upload and download with Crowdin CLI
 
 The following describes how alternatively the Crowdin CLI (v3) tool could be used to
 automate downloading and updating files between Keyman and Crowdin.
@@ -54,24 +54,28 @@ You should see the CLI fetching project info and generating a list of files asso
 project.
 
 ### Downloading from Crowdin
+Since Crowdin is tracking the `master` branch, download translations will be zipped into a `master` folder.
 
 To download the latest translations from Crowdin (all platforms), open a command line at the repo
 root folder and run:
 
 ```bash
-crowdin download
+crowdin download -b master
 ```
 
 To download latest translations for the specific language:
 
 ```bash
-crowdin download -l {language_code}
+crowdin download -b master -l {language_code}
 ```
+
+Note: the Crowdin API doesn't handle custom languages so those will need to be manually synced.
+See https://support.crowdin.com/api/language-codes/
 
 To display a list of latest translations from Crowdin:
 
 ```bash
-crowdin download --dryrun
+crowdin download -b master --dryrun
 ```
 
 ### Uploading to crowdin
@@ -81,6 +85,29 @@ To upload source files to Crowdin:
 ```bash
 crowdin upload sources
 ```
+
+### Updating DisplayLanguages.java in Keyman Engine for Android
+In Keyman for Android, the settings menu for changing display languages is maintained in
+android/KMEA/app/src/main/java/com/tavultesoft/kmea/DisplayLangugages.java
+
+For the BCP-47 language tags to use in that file, don't include script names since the Android locales only handle language ID and region.
+
+### Updating Localization Targets in Keyman Engine / the Keyman App for iPhone and iPad
+
+When a language receives its first localization for our iOS platform, a few settings must be
+tweaked within Xcode in order to enable it.
+
+1. For both the KeymanEngine and Keyman subprojects, go to the project page's info tab and inform Xcode of the appropriate language code.
+
+![Refer to [this image](imgs/updating-ios-l10ns-1.png) for guidance.](./imgs/updating-ios-l10ns-1.png)
+
+Note that Xcode will usually fail to actually _include_ the newly downloaded resources.
+
+2. So, to include those resources, search the workspace for each localized file and select them one at a time.  When you do so, the right-hand side bar should a set of checkboxes for each localized language, with the new language unchecked.
+
+![[This image](imgs/updating-ios-l10ns-2.png) should provide a helpful reference.](./imgs/updating-ios-l10ns-2.png)
+
+Clicking the checkbox will summon a dialog that will allow the existing file to be utilized.
 
 ## Tip
 

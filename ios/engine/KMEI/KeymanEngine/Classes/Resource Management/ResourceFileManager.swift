@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 /**
  * This class stores common methods used for installing language resources, regardless of source.
@@ -91,9 +92,17 @@ public class ResourceFileManager {
       try fileManager.removeItem(at: destination)
     }
 
-    // Throws an error if the destination file already exists, and there's no
-    // built-in override parameter.  Hence, the previous if-block.
-    try fileManager.copyItem(at: source, to: destination)
+    // If we've been provided a security-scoped resource URL,
+    // it needs special handling.  This function needs to accept
+    // both scoped & non-scoped URLs.
+    if source.startAccessingSecurityScopedResource() { // only succeeds if scoped
+      // The Swift version of 'finally'.
+      defer { source.stopAccessingSecurityScopedResource() }
+      try fileManager.copyItem(at: source, to: destination)
+    } else {
+      // Not scoped?  No problem!
+      try fileManager.copyItem(at: source, to: destination)
+    }
   }
 
   /**
@@ -128,7 +137,7 @@ public class ResourceFileManager {
    */
   public func prepareKMPInstall(from url: URL) throws -> KeymanPackage {
     // Once selected, start the standard install process.
-    log.info("Installing KMP from \(url)")
+    log.info("Opening KMP from \(url)")
 
     // Step 1: Copy it to a temporary location, making it a .zip in the process
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
@@ -219,12 +228,14 @@ public class ResourceFileManager {
         activitySpinner.centerXAnchor.constraint(equalTo: rootVC.view.centerXAnchor).isActive = true
         activitySpinner.centerYAnchor.constraint(equalTo: rootVC.view.centerYAnchor).isActive = true
         rootVC.view.isUserInteractionEnabled = false
-      } else if status == .complete {
+      } else if status == .complete || status == .cancelled {
         // Report completion!
         activitySpinner.stopAnimating()
         activitySpinner.removeFromSuperview()
         rootVC.view.isUserInteractionEnabled = true
-        rootVC.dismiss(animated: true, completion: nil)
+        rootVC.dismiss(animated: true) {
+          Manager.shared.showKeyboard()
+        }
         successHandler?(package)
       }
     }
@@ -250,13 +261,14 @@ public class ResourceFileManager {
   }
 
   public func buildKMPError(_ error: KMPError) -> UIAlertController {
-    return buildSimpleAlert(title: "Error", message: error.localizedDescription)
+    return buildSimpleAlert(title: NSLocalizedString("alert-error-title", bundle: engineBundle, comment: ""),
+                            message: error.localizedDescription)
   }
 
   public func buildSimpleAlert(title: String, message: String, completionHandler: (() -> Void)? = nil ) -> UIAlertController {
     let alertController = UIAlertController(title: title, message: message,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: { _ in
                                               completionHandler?()

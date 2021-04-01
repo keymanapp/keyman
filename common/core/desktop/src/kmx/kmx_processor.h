@@ -28,6 +28,7 @@ class KMX_Processor {
 private:
   PKMX_WORD m_indexStack;
   PKMX_WCHAR m_miniContext;
+  int m_miniContextIfLen; // number of if() statements excluded from start of m_miniContext
   KMSTATE m_state;
   km_kbp_state *m_kbp_state;
 
@@ -127,10 +128,8 @@ const char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
 const char *Debug_UnicodeString(std::u16string s, int x = 0);
 const char *Debug_ModifierName(KMX_UINT modifiers);
 
-  //inline KMX_BOOL ShouldDebug();
-
 inline KMX_BOOL ShouldDebug() {
-  return TRUE; // g_debug_KeymanLog;
+  return g_debug_KeymanLog;
 }
 
 

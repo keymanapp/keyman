@@ -116,7 +116,8 @@ namespace com.keyman.text {
       let toCaret = this.getDeadkeyCaret();
 
       // Step 1:  Determine the number of left-deletions.
-      for(var newCaret=0; newCaret < fromCaret; newCaret++) {
+      let maxLeftMatch = fromCaret < toCaret ? fromCaret : toCaret;
+      for(var newCaret=0; newCaret < maxLeftMatch; newCaret++) {
         if(from._kmwCharAt(newCaret) != to._kmwCharAt(newCaret)) {
           break;
         }
@@ -132,8 +133,16 @@ namespace com.keyman.text {
 
       let undeletedRight = to._kmwLength() - toCaret;
       let originalRight = from._kmwLength() - fromCaret;
+      let deletedRight = originalRight - undeletedRight;
 
-      return new TextTransform(delta, deletedLeft, originalRight - undeletedRight);
+      // May occur when reverting a suggestion that had been applied mid-word.
+      if(deletedRight < 0) {
+        // Restores deleteRight characters.
+        delta = delta + to._kmwSubstr(toCaret, -deletedRight);
+        deletedRight = 0;
+      }
+
+      return new TextTransform(delta, deletedLeft, deletedRight);
     }
 
     buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, alternates?: Alternate[]): Transcription {
@@ -288,7 +297,8 @@ namespace com.keyman.text {
 
       this.text = text ? text : "";
       var defaultLength = this.text._kmwLength();
-      this.caretIndex = caretPos ? caretPos : defaultLength;
+      // Ensures that `caretPos == 0` is handled correctly.
+      this.caretIndex = typeof caretPos == "number" ? caretPos : defaultLength;
     }
 
     // Clones the state of an existing EditableElement, creating a Mock version of its state.

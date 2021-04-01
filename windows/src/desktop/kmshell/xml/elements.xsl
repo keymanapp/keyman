@@ -5,8 +5,8 @@
   <xsl:output method="html" version="1.0" encoding="utf-8" omit-xml-declaration="yes" standalone="yes" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 
   <!-- I978 - locale was not reliably selected due to undefined order of document() loading and | processing -->
-  <xsl:variable name="prilocale" select="document(/Keyman/localepath)/resources" />
-  <xsl:variable name="altlocale" select="document('strings.xml')/resources/*[not(@name = $prilocale//@name)]" />
+  <xsl:variable name="prilocale" select="document(concat(/Keyman/localeserver,/Keyman/locale))/resources" />
+  <xsl:variable name="altlocale" select="document(concat(/Keyman/localeserver,'en'))/resources/*[not(@name = $prilocale//@name)]" />
   <xsl:variable name="comlocale">
       <xsl:copy-of select="$prilocale/*" />
       <xsl:copy-of select="$altlocale" />

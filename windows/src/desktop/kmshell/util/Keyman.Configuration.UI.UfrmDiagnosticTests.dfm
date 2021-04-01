@@ -1,4 +1,4 @@
-object frmDiagnosticTests: TfrmDiagnosticTests
+inherited frmDiagnosticTests: TfrmDiagnosticTests
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu]
@@ -6,13 +6,9 @@ object frmDiagnosticTests: TfrmDiagnosticTests
   Caption = 'Diagnostic Tests'
   ClientHeight = 166
   ClientWidth = 362
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
   Font.Name = 'Tahoma'
-  Font.Style = []
-  OldCreateOrder = False
+  ExplicitWidth = 368
+  ExplicitHeight = 195
   PixelsPerInch = 96
   TextHeight = 13
   object cmdSendTestException: TButton

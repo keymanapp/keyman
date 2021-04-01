@@ -34,6 +34,8 @@ type
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
 
     procedure DiagnosticTestException; safecall;
+
+    function LastRefreshToken: IntPtr; safecall;
   end;
 
 implementation

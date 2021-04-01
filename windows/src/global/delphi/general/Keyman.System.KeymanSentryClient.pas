@@ -27,6 +27,7 @@ type
     procedure NestedValidateAccessViolation;
     procedure NestedValidateDelphiException;
     procedure NestedValidateFloatingPointException;
+    class function GetEnabled: Boolean; static;
   public
     destructor Destroy; override;
 
@@ -34,9 +35,12 @@ type
 
     class procedure ReportHandledException(E: Exception; const Message: string = ''; IncludeStack: Boolean = True);
 
+    class procedure Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
+
     class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
     class procedure Stop;
     class property Client: TSentryClient read FClient;
+    class property Enabled: Boolean read GetEnabled;
     class property Instance: TKeymanSentryClient read FInstance;
     class property OnBeforeShutdown: TNotifyEvent read FOnBeforeShutdown write FOnBeforeShutdown;
   public
@@ -104,7 +108,20 @@ begin
   // Last gasp, if we are in a development situation
   Result := GetEnvironmentVariable(KEYMAN_ROOT);
   if Result <> '' then
+  begin
     Result := IncludeTrailingPathDelimiter(Result) + DEV_SENTRY_PATH;
+    if (Result <> '') and FileExists(Result) then
+      Exit;
+  end;
+
+  Result := '';
+end;
+
+class procedure TKeymanSentryClient.Breadcrumb(const BreadcrumbType, Message,
+  Category, Level: string);
+begin
+  if Enabled then
+    Client.Breadcrumb(BreadcrumbType, Message, Category, Level);
 end;
 
 procedure TKeymanSentryClient.ClientAfterEvent(Sender: TObject;
@@ -186,6 +203,9 @@ class procedure TKeymanSentryClient.ReportHandledException(E: Exception;
 var
   text: string;
 begin
+  if not Enabled then
+    Exit;
+
   if Message <> ''
     then text := Message + ': '
     else text := '';
@@ -277,7 +297,7 @@ var
   reg: TRegistry;
   o: TSentryClientOptions;
   f: TSentryClientFlags;
-  RegKey: string;
+  path, RegKey: string;
 begin
   Assert(not Assigned(FInstance));
 
@@ -285,7 +305,15 @@ begin
   FProject := AProject;
   FFlags := AFlags;
 
-  sentry_set_library_path(FindSentryDLL);
+  if not Enabled then
+    Exit;
+
+  path := FindSentryDLL;
+  if path = '' then
+    // Cannot find sentry.dll
+    Exit;
+
+  sentry_set_library_path(path);
 
   o.Debug := False;
 
@@ -333,7 +361,9 @@ begin
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;
-  FClient.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, 'Started '+ALogger);
+  // We used the 'Started' event when testing Sentry integration in 14.0 alpha
+  // but we don't want or need it for stable.
+  // FClient.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, 'Started '+ALogger);
 end;
 
 destructor TKeymanSentryClient.Destroy;
@@ -342,6 +372,11 @@ begin
     FInstance := nil;
   FreeAndNil(FClient);
   inherited Destroy;
+end;
+
+class function TKeymanSentryClient.GetEnabled: Boolean;
+begin
+  Result := TSentryClient.Enabled;
 end;
 
 class procedure TKeymanSentryClient.Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags);
@@ -365,6 +400,9 @@ end;
 //
 class procedure TKeymanSentryClient.Validate(Force: Boolean);
 begin
+  if not Enabled then
+    Exit;
+
   TKeymanSentryClient.Instance.NestedValidate(Force);
 end;
 

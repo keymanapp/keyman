@@ -60,6 +60,11 @@ class KeymanWebViewController: UIViewController {
   private var bannerImgPath: String = ""
 
   var shouldReload: Bool = false
+  
+  var isLoading: Bool = false
+
+  private var currentText: String = ""
+  private var currentCursorRange: NSRange? = nil
 
   init(storage: Storage) {
     self.storage = storage
@@ -205,6 +210,7 @@ extension KeymanWebViewController {
   func setCursorRange(_ range: NSRange) {
     if range.location != NSNotFound {
       webView!.evaluateJavaScript("setCursorRange(\(range.location),\(range.length));", completionHandler: nil)
+      self.currentCursorRange = range
     }
   }
 
@@ -219,11 +225,13 @@ extension KeymanWebViewController {
     text = text.replacingOccurrences(of: "\\", with: "\\\\")
     text = text.replacingOccurrences(of: "'", with: "\\'")
     text = text.replacingOccurrences(of: "\n", with: "\\n")
+
+    self.currentText = text
     webView!.evaluateJavaScript("setKeymanVal('\(text)');", completionHandler: nil)
   }
   
   func resetContext() {
-    webView!.evaluateJavaScript("keyman.interface.resetContext();", completionHandler: nil)
+    webView!.evaluateJavaScript("keyman.core.resetContext();", completionHandler: nil)
   }
 
   func setDeviceType(_ idiom: UIUserInterfaceIdiom) {
@@ -351,8 +359,18 @@ extension KeymanWebViewController {
   }
   
   func setBannerHeight(to height: Int) {
-    // TODO:
     webView?.evaluateJavaScript("setBannerHeight(\(height));", completionHandler: nil)
+  }
+
+  /**
+   * Ensures that the embedded KMW instance uses the app's current error-report toggle setting.
+   * This is always called during keyboard page initialization and may also be called any time
+   * thereafter for settings updates.
+   */
+  func setSentryState(enabled: Bool = SentryManager.enabled) {
+    // This may be called before the page - and thus the `sentryManager` variable -
+    // is ready.  It's a known limitation, so why log error reports for it?
+    webView?.evaluateJavaScript("try { sentryManager.enabled = \(enabled ? "true" : "false") } catch(err) { }")
   }
 }
 
@@ -557,9 +575,18 @@ extension KeymanWebViewController: KeymanWebDelegate {
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
     delegate?.keyboardLoaded(keymanWeb)
 
+    isLoading = false
     log.info("Loaded keyboard.")
 
+    self.setSentryState()
     resizeKeyboard()
+
+    // There may have been attempts to set these values before the keyboard loaded!
+    self.setText(self.currentText)
+    if let cursorRange = self.currentCursorRange {
+      self.setCursorRange(cursorRange)
+    }
+
     setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Manager.shared.currentKeyboard
@@ -579,6 +606,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
         }
       }
       log.info("Setting initial keyboard.")
+
+      // Compare against resetKeyboard & Manager.setKeyboard;
+      // setting this to `nil` allows us to force keyboard reloads when needed.
+      Manager.shared.currentKeyboardID = nil
       _ = Manager.shared.setKeyboard(newKb!)
     }
 
@@ -964,9 +995,23 @@ extension KeymanWebViewController {
   // MARK: - Show/hide views
   func reloadKeyboard() {
     webView!.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
+    isLoading = true
 
     // Check for a change of "always show banner" state
     updateShowBannerSetting()
+  }
+
+  /*
+   * Implemented as a workaround for a weird bug (likely within iOS) in which the
+   * InputViewController and KeymanWebViewController constructors (and thus, `loadView`)
+   * are sometimes completely bypassed during system-keyboard use.
+   * See https://github.com/keymanapp/keyman/issues/3985
+   */
+  func verifyLoaded() {
+    // Test: are we currently loading?  If so, don't worry 'bout a thing.
+    if !isLoading {
+      webView!.evaluateJavaScript("verifyLoaded()", completionHandler: nil)
+    }
   }
 
   @objc func showHelpBubble() {
@@ -1089,6 +1134,7 @@ extension KeymanWebViewController {
         self.keyboardMenuView = KeyboardMenuView(keyFrame: keyFrame, inputViewController: ic,
                                                  closeButtonTitle: closeButtonTitle)
         parentView?.addSubview(self.keyboardMenuView!)
+        self.keyboardMenuView!.flashScrollIndicators()
       }
     }
   }

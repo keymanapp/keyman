@@ -31,6 +31,9 @@ type
     /// <summary>Helper function to get default BCP47 tag for an installed keyboard</summary>
     class function GetFirstLanguage(Keyboard: IKeymanKeyboardInstalled): string; overload;
     class function GetFirstLanguage(Keyboard: IKeymanKeyboardFile): string; overload;
+
+    /// <summary>Get the BCP47 tag for the user's default language</summary>
+    class function GetUserDefaultLanguage: string; static;
   private
     class function GetKeyboardLanguage(const KeyboardID,
       BCP47Tag: string): IKeymanKeyboardLanguageInstalled; static;
@@ -93,6 +96,7 @@ begin
   if lang = nil then
     Exit(False);
 
+  // TODO: can this fail?
   (lang as IKeymanKeyboardLanguageInstalled2).InstallTip(LangID, KeyboardToRemove);
   Result := True;
 end;
@@ -106,6 +110,7 @@ begin
   if lang = nil then
     Exit(False);
 
+  // TODO: can this fail?
   (lang as IKeymanKeyboardLanguageInstalled2).RegisterTip(LangID);
   Result := True;
 end;
@@ -117,6 +122,7 @@ var
   RegistrationRequired: WordBool;
   TemporaryKeyboardID: WideString;
   LangID: Integer;
+  childExitCode: Cardinal;
 begin
   lang := GetKeyboardLanguage(KeyboardID, (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Tag));
   if lang = nil then
@@ -131,15 +137,29 @@ begin
   LangID := 0;
   RegistrationRequired := False;
 
-  if (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
+  if not (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
   begin
-    if RegistrationRequired then
-    begin
-      WaitForElevatedConfiguration(0, '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'"');
-    end;
-    TUtilExecute.WaitForProcess('"'+ParamStr(0)+'" -install-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" "'+TemporaryKeyboardID+'"', GetCurrentDir);
+    // We were not able to find a TIP, perhaps all transient TIPs have been used
+    Exit(False);
   end;
 
+  if RegistrationRequired then
+  begin
+    // This calls back into TTIPMaintenance.RegisterTip
+    if WaitForElevatedConfiguration(0, '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'"') <> 0 then
+      Exit(False);
+  end;
+
+  // This calls back into TTIPMaintenance.InstallTip
+  if not TUtilExecute.WaitForProcess('"'+ParamStr(0)+'" -install-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" "'+TemporaryKeyboardID+'"',
+      GetCurrentDir, childExitCode) or
+    (childExitCode <> 0) then
+  begin
+    kmcom.Refresh;
+    Exit(False);
+  end;
+
+  kmcom.Refresh;
   Result := True;
 end;
 
@@ -178,18 +198,23 @@ begin
     Result := False;
 end;
 
+class function TTIPMaintenance.GetUserDefaultLanguage: string;
+begin
+  Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL))
+end;
+
 class function TTIPMaintenance.GetFirstLanguage(Keyboard: IKeymanKeyboardFile): string;
 begin
   if Keyboard.Languages.Count > 0
     then Result := Keyboard.Languages[0].BCP47Code
-    else Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL));
+    else Result := GetUserDefaultLanguage;
 end;
 
 class function TTIPMaintenance.GetFirstLanguage(Keyboard: IKeymanKeyboardInstalled): string;
 begin
   if Keyboard.Languages.Count > 0
     then Result := Keyboard.Languages[0].BCP47Code
-    else Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL));
+    else Result := GetUserDefaultLanguage;
 end;
 
 class function TTIPMaintenance.GetKeyboardLanguage(const KeyboardID,

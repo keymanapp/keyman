@@ -1,18 +1,18 @@
 (*
   Name:             CompilePackageInstaller
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Jun 2007
 
   Modified Date:    6 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Jun 2007 - mcdurdin - Initial version
                     05 Jun 2007 - mcdurdin - I817 - Fix Unicode .inf file (not available on 9x)
                     19 Jun 2007 - mcdurdin - I817 - Use Unicode .inf file again
@@ -241,7 +241,7 @@ var
   s: WideString;
   i: Integer;
   FMSIOptions: WideString;
-  FPackageOutputFileName: string;  // I3126
+  FRedistSetupFile, FPackageOutputFileName: string;  // I3126
 begin
   { Check that the .msi is setup for the package }
 
@@ -294,9 +294,10 @@ begin
         WriteMessage('Redist path not specified, loading default ('+FRedistSetupPath+')');
       end;
 
-      if not FileExists(FRedistSetupPath + 'setup.exe') then
+      if not FileExists(FRedistSetupPath + 'setup.exe') and
+         not FileExists(FRedistSetupPath + 'setup-redist.exe') then
       begin
-        FatalMessage('setup.exe is missing from redist ('+FRedistSetupPath+').');
+        FatalMessage('Neither setup.exe nor setup-redist.exe are present in redist ('+FRedistSetupPath+').');
         Exit;
       end;
 
@@ -408,7 +409,12 @@ begin
 
       with TFileStream.Create(FOutputFileName, fmCreate) do
       try
-        fs := TFileStream.Create(FRedistSetupPath + 'setup.exe', fmOpenRead or fmShareDenyWrite);
+        // A separate version of setup.exe which doesn't include a digital signature
+        // is included here, so that it can be bundled with a zip and the result signed.
+        if FileExists(FRedistSetupPath + 'setup-redist.exe')
+          then FRedistSetupFile := FRedistSetupPath + 'setup-redist.exe'
+          else FRedistSetupFile := FRedistSetupPath + 'setup.exe';
+        fs := TFileStream.Create(FRedistSetupFile, fmOpenRead or fmShareDenyWrite);
         try
           CopyFrom(fs, 0);
         finally

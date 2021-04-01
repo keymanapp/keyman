@@ -21,7 +21,8 @@ The Keyman team is working with the Chrome and Firefox teams to resolve this com
 
 ## Applies To
 
-* Keyman Desktop for Windows 11.0 and later versions
+* Keyman Desktop for Windows 11.0-13.0
+* Keyman for Windows 14.0 and later versions
 
 ## Background
 

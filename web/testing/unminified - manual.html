@@ -38,8 +38,10 @@
     <script>
       var kmw=window.keyman;
       kmw.init({
-		attachType:'manual'
-        });
+		    attachType:'manual'
+      }).then(function() {
+        loadKeyboards();
+      });
     </script> 
     
     <!-- Add keyboard management script for local selection of keyboards to use -->

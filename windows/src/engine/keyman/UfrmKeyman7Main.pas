@@ -200,11 +200,13 @@ type
     tmrTestKeymanFunctioning: TTimer;
     tmrOnlineUpdateCheck: TTimer;
     tmrCheckInputPane: TTimer;
+    tmrRefresh: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrTestKeymanFunctioningTimer(Sender: TObject);
     procedure tmrOnlineUpdateCheckTimer(Sender: TObject);
     procedure tmrCheckInputPaneTimer(Sender: TObject);
+    procedure tmrRefreshTimer(Sender: TObject);
   private
     InMenuLoop: Integer;  // I1082 - Avoid menu nasty flicker with rapid click
     FClosingApp: Boolean;
@@ -216,6 +218,7 @@ type
     FInUpdateOSKVisibility: Boolean;
     FOSKManuallyClosedThisSession: Boolean;
 
+    FLangSwitchRefreshWatcher: TThread;
     FLastFocus: THandle;
     FLastActive: THandle;
     //FLastKeymanID: Integer;
@@ -308,13 +311,14 @@ type
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure WndProc(var Message: TMessage); override;
+    procedure CreateWnd; override;
   public
     frmKeymanMenu: TfrmKeymanMenu;
     frmVisualKeyboard: TfrmVisualKeyboard;
     frmLanguageSwitch: TfrmLanguageSwitch;
 
     procedure SetLastFocus;
-    procedure ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; NearTray: Boolean; IconRect: TRect);   // I3961   // I3990
+    procedure ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; TriggeredByKeyboard: Boolean);   // I3961   // I3990
     procedure ActivateKeyboard(Keyboard: TLangSwitchKeyboard);   // I4326
 
     function ActiveKeyboard: IKeymanKeyboardInstalled;
@@ -528,19 +532,8 @@ begin
   Application.HookMainWindow(AppMessage);
 //  FRunningProduct := TRunningProduct.Create;
 
-  wm_test_keyman_functioning := RegisterWindowMessage('wm_test_keyman_functioning');
-  wm_keyman_globalswitch := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH');
-  wm_keyman_globalswitch_process := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH_PROCESS');
-  wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
-  wm_keyman_control_internal := RegisterWindowMessage('WM_KEYMAN_CONTROL_INTERNAL');   // I3933
   sMsg_TaskbarRestart := RegisterWindowMessage('TaskbarCreated');
-
-  ChangeWindowMessageFilter(wm_keyman_control, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_globalswitch_process, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_control_internal, MSGFLT_ADD);   // I3933
   ChangeWindowMessageFilter(sMsg_TaskbarRestart, MSGFLT_ADD);
-  ChangeWindowMessageFilter(WM_USER_PlatformComms, MSGFLT_ADD);
 
   FInputPane := TFrameworkInputPane.Create;
 
@@ -554,6 +547,12 @@ end;}
 
 procedure TfrmKeyman7Main.FormDestroy(Sender: TObject);
 begin
+  if Assigned(FLangSwitchRefreshWatcher) then
+  begin
+    FLangSwitchRefreshWatcher.Terminate;
+    FreeAndNil(FLangSwitchRefreshWatcher);
+  end;
+
   FreeAndNil(FInputPane);
 
   ClosePlatformComms64;
@@ -567,7 +566,7 @@ begin
   finally
     Free;
   end;
-  if Assigned(frmVisualKeyboard) then // I1096 - silent exception when Keyman Desktop closes
+  if Assigned(frmVisualKeyboard) then // I1096 - silent exception when Keyman closes
   begin
     frmVisualKeyboard.Unregister;   // I2444 - Keyman tries to re-init because OSK was not unregistering until after Keyman_Exit
     //frmVisualKeyboard.Hide;
@@ -827,9 +826,21 @@ begin
       end;
     KMC_REFRESH:
       begin
+        if wParam = 1 then
+        begin
+          // We're going to keep checking for changes for
+          // the next few seconds because Windows is in the
+          // process of updating its keyboard list
+          tmrRefresh.Tag := 0;
+          tmrRefresh.Enabled := False;
+          tmrRefresh.Enabled := True;
+        end;
+
         if VisualKeyboardVisible then
           frmVisualKeyboard.PreRefreshKeyman;
         kmcom.Refresh;
+        FLangSwitchManager.Refresh;
+
         if VisualKeyboardVisible then
         begin
           frmVisualKeyboard.RefreshKeyman;
@@ -897,7 +908,7 @@ begin
 
   case Target of
     khKeymanOff: SwitchToFirstWindowsKeyboard;  // I1867
-    khKeyboardMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, True, Rect(0,0,0,0)); // I1377 - Show the menu down near the tray when hotkey is pressed   // I3990
+    khKeyboardMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, True); // I1377 - Show the menu down near the tray when hotkey is pressed   // I3990
     khVisualKeyboard: MnuVisualKeyboard(nil);
     khKeymanConfiguration: TKeymanDesktopShell.RunKeymanConfiguration('-c 0');
     khFontHelper: MnuFontHelper(nil);
@@ -918,7 +929,13 @@ begin
   case Value of
     NWB_IDENTIFYICON: FMessage := MsgFromId(SKBalloonClickToSelectKeyboard);  // I3010  // I3042
     NWB_TUTORIALFINISHED: FMessage := MsgFromId(SKBalloonOSKClosed);   // I3010  // I3042
-    else FMessage := '';
+    NWB_KEYMANRUNNING:
+      begin
+        FMessage := MsgFromId(SKBalloonKeymanIsRunning);
+        if FMessage = '' then
+          FMessage := MsgFromId(SKBalloonClickToSelectKeyboard);
+      end;
+    else Exit;
   end;
 
   if FMessage <> '' then
@@ -983,60 +1000,136 @@ begin
     TDebugLogClient.Instance.WriteMessage('LanguageSwitchFormHidden: kbd NOT assigned',[]);
 end;
 
-procedure TfrmKeyman7Main.ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; NearTray: Boolean; IconRect: TRect);   // I3990   // I3991
+procedure TfrmKeyman7Main.ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; TriggeredByKeyboard: Boolean);   // I3990   // I3991
 var
-  pt: TPoint;
-  r: TRect;
+  hwndTray, hwndSysTray: THandle;
+
+  function FindSysTrayLocation: TAlign;
+  var
+    r: TRect;
+    m: TMonitor;
+  begin
+    // Note: we don't use SHAppBarMessage because it is re-entrant
+    // It also does not honour the DPI awareness of the caller
+
+    // If we can't find the tray window, assume it is at the bottom of the
+    // primary screen
+
+    if (hwndTray = 0) or not GetWindowRect(hwndTray, r) then
+      Exit(alBottom);
+
+    m := Screen.MonitorFromPoint(r.CenterPoint, mdNearest);
+    if not Assigned(m) then
+      // Could not find monitor, perhaps a race condition, see I2693, I2820
+      // This may never happen as it may have been a VCL bug, but I'm including
+      // it just for safety given it can return nil.
+      Exit(alBottom);
+
+    if r.Left = m.Left then
+    begin
+      if r.Top = m.Top then
+      begin
+        if r.Right = m.BoundsRect.Right then
+          Exit(alTop);
+        Exit(alLeft);
+      end;
+      Exit(alBottom)
+    end;
+    Exit(alRight);
+  end;
+
+  function GetMenuAnchorPoint(systraylocation: TAlign): TPoint;
+  type
+    TGetDpiForWindow = function(hwnd: HWND): UINT; stdcall;
+  var
+    pt: TPoint;
+    r: TRect;
+    ident: NOTIFYICONIDENTIFIER;
+    dpi: Cardinal;
+    m: TMonitor;
+    FGetDpiForWindow: TGetDpiForWindow;
+  begin
+    // We'll try and get the actual location of our icon
+    ident.cbSize := SizeOf(ident);
+    ident.hWnd := FRunningProduct.FTrayIcon.NotificationWindow;
+    ident.uID := 1;
+    ident.guidItem := GUID_NULL;
+    if TriggeredByKeyboard or (Shell_NotifyIconGetRect(ident, r) <> S_OK) then
+    begin
+      // User has requested the menu with a hotkey, so show it near the
+      // SystemNotificationArea, but not actually where our icon is, because
+      // the icon may be hidden (or if we fail to get the location of our icon,
+      // for any reason)
+      if not GetWindowRect(hwndSysTray, r) then
+        r := TRect.Empty;
+    end
+    else
+    begin
+      // Shell_NotifyIconGetRect does not honour the DPI awareness of the caller
+      // and as we do not yet support per-monitor DPI awareness, we have to
+      // scale the rectangle by its actual DPI to our fixed 96 DPI value to
+      // get the location of the rect in our 96 DPI world. As a monitor may have
+      // a non-zero origin, we have to deal with that too!
+
+      // Don't use Delphi's GetDpiForWindow declaration as we have to verify
+      // Windows version first, which cascades into potential updates to the
+      // manifest, which we don't want to do just now.
+      FGetDpiForWindow := GetProcAddress(GetModuleHandle(user32), 'GetDpiForWindow');
+      if Assigned(FGetDpiForWindow) then
+      begin
+        dpi := FGetDpiForWindow(hwndTray);
+        m := Screen.MonitorFromWindow(hwndTray);
+        if Assigned(m) then
+        begin
+          r.Right := MulDiv(r.Right-m.Left, 96, dpi) + m.Left;
+          r.Bottom := MulDiv(r.Bottom-m.Top, 96, dpi) + m.Top;
+          r.Left := MulDiv(r.Left-m.Left, 96, dpi) + m.Left;
+          r.Top := MulDiv(r.Top-m.Top, 96, dpi) + m.Top;
+        end
+        else if not GetWindowRect(hwndSysTray, r) then
+          r := TRect.Empty;
+      end;
+    end;
+
+    // Align the menu according to the location of the taskbar
+    case systraylocation of
+      alTop:    begin pt.X := (r.Right + r.Left) div 2; pt.Y := r.Bottom; end;
+      alBottom: begin pt.X := (r.Right + r.Left) div 2; pt.Y := r.Top; end;
+      alLeft:   begin pt.X := r.Right; pt.Y := r.Top; end;
+      alRight:  begin pt.X := r.Left; pt.Y := r.Top; end;
+    end;
+
+    Result := pt;
+  end;
+
+var
   systraylocation: TAlign;
-  hwndSysTray, hwndTray, hwnd: THandle;
+  hwnd: THandle;
+  pt: TPoint;
 begin   // I3933
   if not Assigned(Sender) and not Assigned(FRunningProduct) then
     Exit;
 
   if InMenuLoop > 0 then Exit;  // I1082 - Avoid menu nasty flicker with rapid click
 
+  hwndTray := FindWindow('Shell_TrayWnd', nil);
+  hwndSysTray := FindWindowEx(hwndTray, 0, 'TrayNotifyWnd', nil);
+
   BuildCustMenu(kmcom, mnu, Location);   // I3933
 
   GetCursorPos(pt);
 
-  mnu.Alignment := paLeft;
+  mnu.Alignment := paCenter;
 
-  if NearTray then  // I1377
-  begin
-    hwndTray := FindWindow('Shell_TrayWnd', nil);
-    hwndSysTray := FindWindowEx(hwndTray, 0, 'TrayNotifyWnd', nil);
-    if hwndSysTray <> 0 then
-    begin
-      GetWindowRect(hwndTray, r);
-      if r.Left = 0 then
-        if r.Top = 0 then
-          if r.Right = GetSystemMetrics(SM_CXSCREEN) then
-            systraylocation := alTop
-          else
-            systraylocation := alLeft
-        else
-          systraylocation := alBottom
-      else
-        systraylocation := alRight;
-
-      GetWindowRect(hwndSysTray, r);
-
-      case systraylocation of
-        alTop:    begin pt.X := (r.Right + r.Left) div 2; pt.Y := r.Bottom + 8; end;
-        alBottom: begin pt.X := (r.Right + r.Left) div 2; pt.Y := r.Top - 8; end;
-        alLeft:   begin pt.X := r.Right + 8; pt.Y := r.Top + 8; end;
-        alRight:  begin pt.X := r.Left - 8; pt.Y := r.Top + 8; end;
-      end;
-      mnu.Alignment := paCenter;
-    end;
-  end;
+  systraylocation := FindSysTrayLocation;
+  pt := GetMenuAnchorPoint(systraylocation);
 
   case Location of
     milLeft:  mnu.TrackButton := tbLeftButton;
     milRight: mnu.TrackButton := tbRightButton;
   end;
 
-  hwnd := FLastFocus;// kmcom.Control.LastFocusWindow;
+  hwnd := FLastFocus;
 
   if not IsDebuggerPresent then
   begin
@@ -1046,7 +1139,7 @@ begin   // I3933
     AttachThreadInput(GetCurrentThreadId, GetwindowThreadProcessId(hwnd, nil), FALSE);
   end;
 
-  frmKeymanMenu.PopupEx(mnu, pt.x, pt.y, IconRect)   // I3990
+  frmKeymanMenu.PopupEx(mnu, pt.x, pt.y, systraylocation);   // I3990
 end;
 
 procedure TfrmKeyman7Main.PostGlobalKeyboardChange(FActiveKeyboard: TLangSwitchKeyboard);   // I4271
@@ -1104,8 +1197,8 @@ begin
       then begin FTrayButtonDown := []; end // balloon click
       else Exclude(FTrayButtonDown, Button);
     if Button = mbLeft
-      then TestKeymanFunctioning(tkfPopupMenu, True, True)   //ShowMenu(Sender, milLeft)
-      else ShowMenu(Sender, milRight, False, Rect(0,0,0,0));   // I3990
+      then TestKeymanFunctioning(tkfPopupMenu, True, True)
+      else ShowMenu(Sender, milRight, False);   // I3990
   end;
 end;
 
@@ -1711,7 +1804,7 @@ begin
   if FunctionType = tkfPopupMenu then
   begin
     // We are only going to do it on SetActiveKeyboard for now
-    ShowMenu(FRunningProduct.FTrayIcon, milLeft, False, Rect(0,0,0,0));   // I3990
+    ShowMenu(FRunningProduct.FTrayIcon, milLeft, False);   // I3990
     Exit;
   end;
 
@@ -1728,7 +1821,7 @@ begin
 	else if RunOnSuccess then
   begin
     case FunctionType of
-      tkfPopupMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, False, Rect(0,0,0,0));   // I3990
+      tkfPopupMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, False);   // I3990
                       		// we know this is from a mouse click as kbd method tells us we know Keyman is working
     end;
   end;
@@ -1799,6 +1892,21 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure TfrmKeyman7Main.tmrRefreshTimer(Sender: TObject);
+const
+  SECONDS_TO_CHECK = 5;
+begin
+  if tmrRefresh.Tag > SECONDS_TO_CHECK * (1000 div Integer(tmrRefresh.Interval)) then
+  begin
+    tmrRefresh.Enabled := False;
+    tmrRefresh.Tag := 0;
+  end
+  else
+    tmrRefresh.Tag := tmrRefresh.Tag + 1;
+
+  PostMessage(Handle, wm_keyman_control, KMC_REFRESH, 0);
 end;
 
 procedure TfrmKeyman7Main.tmrTestKeymanFunctioningTimer(Sender: TObject);
@@ -1878,6 +1986,31 @@ end;
 procedure TfrmKeyman7Main.ClosePlatformComms64;
 begin
   SendPlatformComms64(PC_CLOSE, 0);
+end;
+
+type
+  TLangSwitchRefreshWatcher = class(TThread)
+  private
+    FOwnerHandle: THandle;
+    hTerminatedEvent: THandle;
+  protected
+    procedure Execute; override;
+    procedure TerminatedSet; override;
+  public
+    constructor Create(AOwnerHandle: THandle); reintroduce;
+    destructor Destroy; override;
+  end;
+
+procedure TfrmKeyman7Main.CreateWnd;
+begin
+  inherited;
+  if Assigned(FLangSwitchRefreshWatcher) then
+  begin
+    FLangSwitchRefreshWatcher.Terminate;
+    FreeAndNil(FLangSwitchRefreshWatcher);
+  end;
+  FLangSwitchRefreshWatcher := TLangSwitchRefreshWatcher.Create(Handle);
+  FLangSwitchRefreshWatcher.Start;
 end;
 
 procedure TfrmKeyman7Main.StartPlatformComms64;
@@ -2001,4 +2134,88 @@ begin
   FHotkeys.Clear;
 end;
 
+{ TLangSwitchRefreshWatcher }
+
+constructor TLangSwitchRefreshWatcher.Create(AOwnerHandle: THandle);
+begin
+  inherited Create(True);
+  FOwnerHandle := AOwnerHandle;
+  hTerminatedEvent := CreateEvent(nil, True, False, nil);
+end;
+
+destructor TLangSwitchRefreshWatcher.Destroy;
+begin
+  CloseHandle(hTerminatedEvent);
+  inherited Destroy;
+end;
+
+procedure TLangSwitchRefreshWatcher.Execute;
+var
+  hk: HKEY;
+  hEvent: THandle;
+  hEvents: array[0..1] of THandle;
+const
+  // We don't really know how long the changes are going to take
+  // so we'll wait 500 msec and then ask the main thread to reload
+  // the changes from the registry
+  ARBITRARY_WAIT_FOR_CHANGES = 1000;
+begin
+  if RegOpenKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_ControlPanelInternationalUserProfile), 0,
+      KEY_NOTIFY, hk) <> ERROR_SUCCESS then
+    Exit;
+  try
+    hEvent := CreateEvent(nil, True, False, nil);
+    if hEvent = 0 then
+      Exit;
+    try
+      // Watch the registry key for any changes
+      if RegNotifyChangeKeyValue(hk, True, REG_NOTIFY_CHANGE_NAME or
+          REG_NOTIFY_CHANGE_LAST_SET, hEvent, True) <> ERROR_SUCCESS then
+        Exit;
+      repeat
+        // Wait for either the registry to change or for us to be terminated
+        hEvents[0] := hEvent;
+        hEvents[1] := hTerminatedEvent;
+        if WaitForMultipleObjects(2, @hEvents[0], False, INFINITE) <> WAIT_OBJECT_0 then
+          Exit;
+
+        ResetEvent(hEvent);
+
+        // Start watching for changes again before requesting a refresh, so we
+        // don't miss any additional changes that come through
+        if RegNotifyChangeKeyValue(hk, True, REG_NOTIFY_CHANGE_NAME or
+            REG_NOTIFY_CHANGE_LAST_SET, hEvent, True) <> ERROR_SUCCESS then
+          Exit;
+
+        // Finally, tell the main form to get ready to process the refresh
+        PostMessage(FOwnerHandle, wm_keyman_control, MAKELONG(KMC_REFRESH, 1), 0);
+      until False;
+
+    finally
+      CloseHandle(hEvent);
+    end;
+  finally
+    RegCloseKey(hk);
+  end;
+
+end;
+
+procedure TLangSwitchRefreshWatcher.TerminatedSet;
+begin
+  inherited;
+  SetEvent(hTerminatedEvent);
+end;
+
+initialization
+  wm_test_keyman_functioning := RegisterWindowMessage('wm_test_keyman_functioning');
+  wm_keyman_globalswitch := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH');
+  wm_keyman_globalswitch_process := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH_PROCESS');
+  wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
+  wm_keyman_control_internal := RegisterWindowMessage('WM_KEYMAN_CONTROL_INTERNAL');   // I3933
+
+  ChangeWindowMessageFilter(wm_keyman_control, MSGFLT_ADD);
+  ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
+  ChangeWindowMessageFilter(wm_keyman_globalswitch_process, MSGFLT_ADD);
+  ChangeWindowMessageFilter(wm_keyman_control_internal, MSGFLT_ADD);   // I3933
+  ChangeWindowMessageFilter(WM_USER_PlatformComms, MSGFLT_ADD);
 end.

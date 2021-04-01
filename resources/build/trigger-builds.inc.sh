@@ -6,11 +6,15 @@
 
 function triggerBuilds() {
   local base=`git branch --show-current`
-  eval TEAMCITY_VCS_ID='${'vcs_$base'}'
+  # convert stable-14.0 to stable_14_0 to fit in with the definitions
+  # in trigger-definitions.inc.sh
+  local bcbase=${base//[-.]/_}
+  eval TEAMCITY_VCS_ID='${'vcs_$bcbase'}'
   echo "base=$base, TEAMCITY_VCS_ID=${TEAMCITY_VCS_ID}"
 
+
   for platform in ${available_platforms[@]}; do
-    eval builds='(${'bc_${base}_${platform}'[@]})'
+    eval builds='(${'bc_${bcbase}_${platform}'[@]})'
     for build in "${builds[@]}"; do
       if [[ $build == "" ]]; then continue; fi
       if [ "${build:(-8)}" == "_Jenkins" ]; then
@@ -18,8 +22,8 @@ function triggerBuilds() {
         echo Triggering Jenkins build "$job" "$base" "true"
         triggerJenkinsBuild "$job" "$base" "true"
       else
-        echo Triggering TeamCity build $build $TEAMCITY_VCS_ID
-        triggerTeamCityBuild $build $TEAMCITY_VCS_ID
+        echo Triggering TeamCity build $build $TEAMCITY_VCS_ID $base
+        triggerTeamCityBuild $build $TEAMCITY_VCS_ID $base
       fi
     done
   done
@@ -41,8 +45,7 @@ function triggerTeamCityBuild() {
   local TEAMCITY_SERVER=https://build.palaso.org
 
   local command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID,buildType:(id:$TEAMCITY_BUILDTYPE)'/></lastChanges></build>"
-
-  #debug echo "Call: $command"
+  echo "TeamCity Build Command: $command"
 
   # adjust indentation for output of curl
   echo -n "     "
@@ -60,10 +63,17 @@ function triggerJenkinsBuild() {
   local JENKINS_BRANCH="${2:-master}"
 
   local JENKINS_SERVER=https://jenkins.lsdev.sil.org
+  local GIT_TAG="release-$VERSION_WITH_TAG"
 
   local FORCE=""
   if [ "${3:-false}" == "true" ]; then
     FORCE=", \"force\": true"
+  fi
+
+  local TAG=""
+  # This will only be true if we created and pushed a tag
+  if [ "${action:-""}" == "commit" ]; then
+    TAG=", \"tag\": \"$GIT_TAG\", \"tag2\": \"$GIT_TAG\""
   fi
 
   if [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
@@ -75,7 +85,7 @@ function triggerJenkinsBuild() {
     --header "token: $JENKINS_TOKEN" \
     --header "Content-Type: application/json" \
     $JENKINS_SERVER/generic-webhook-trigger/invoke \
-    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $FORCE }")
+    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $TAG $FORCE }")
 
   if echo "$OUTPUT" | grep -q "\"triggered\":true"; then
     echo -n "     job triggered: "

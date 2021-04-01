@@ -1,6 +1,24 @@
 /// <reference path="distance-modeler.ts" />
 
 namespace correction {
+
+  function textToCharTransforms(text: string, transformId?: number) {
+    let perCharTransforms: Transform[] = [];
+
+    for(let i=0; i < text.kmwLength(); i++) {
+      let char = text.kmwCharAt(i); // is SMP-aware
+
+      let transform: Transform = {
+        insert: char,
+        deleteLeft: 0,
+        id: transformId
+      };
+
+      perCharTransforms.push(transform);
+    }
+
+    return perCharTransforms;
+  }
   export class TrackedContextSuggestion {
     suggestion: Suggestion;
     tokenWidth: number;
@@ -125,6 +143,34 @@ namespace correction {
       
       whitespaceToken.raw = null;
       this.tokens.push(whitespaceToken);
+    }
+
+    /**
+     * Used for 14.0's backspace workaround, which flattens all previous Distribution<Transform>
+     * entries because of limitations with direct use of backspace transforms.
+     * @param tokenText
+     * @param transformId 
+     */
+    replaceTailForBackspace(tokenText: USVString, transformId: number) {
+      this.tokens.pop();
+
+      // It's a backspace transform; time for special handling!
+      //
+      // For now, with 14.0, we simply compress all remaining Transforms for the token into 
+      // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex, 
+      // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
+      //
+      // Note that we cannot just use a single, monolithic transform at this point b/c
+      // of our current edit-distance optimization strategy; diagonalization is currently... 
+      // not very compatible with that.
+      let backspacedTokenContext: Distribution<Transform>[] = textToCharTransforms(tokenText, transformId).map(function(transform) {
+        return [{sample: transform, p: 1.0}];
+      });
+
+      let compactedToken = new TrackedContextToken();
+      compactedToken.raw = tokenText;
+      compactedToken.transformDistributions = backspacedTokenContext;
+      this.pushTail(compactedToken);
     }
 
     updateTail(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
@@ -315,6 +361,14 @@ namespace correction {
         state = matchState;
       }
 
+      const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
+      let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
+      if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
+        primaryInput = null;
+      }
+      const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0 && !primaryInput.deleteRight;
+      const finalToken = tokenizedContext[tokenizedContext.length-1];
+
       /* Assumption:  This is an adequate check for its two sub-branches.
        *
        * Basis:
@@ -325,11 +379,15 @@ namespace correction {
        *   - That is, no "reasonable" keystroke would emit a Transform adding two separate word tokens
        *     - For languages using whitespace to word-break, said keystroke would have to include said whitespace to break the assumption.
        */ 
+
+      // If there is/was more than one context token available...
       if(editPath.length > 1) {
+        // We're removing a context token, but at least one remains.
         if(poppedHead) {
           state.popHead();
         }
 
+        // We're adding an additional context token.
         if(pushedTail) {
           // ASSUMPTION:  any transform that triggers this case is a pure-whitespace Transform, as we
           //              need a word-break before beginning a new word's context.
@@ -342,11 +400,16 @@ namespace correction {
           // for the new word (token), so the input keystrokes do not correspond to the new text token.
           emptyToken.transformDistributions = [];
           state.pushTail(emptyToken);
-        } else {
+        } else { // We're editing the final context token.
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
           //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
-          state.updateTail(transformDistribution, tokenizedContext[tokenizedContext.length-1]);
+          if(isBackspace) {
+            state.replaceTailForBackspace(finalToken, primaryInput.id);
+          } else {
+            state.updateTail(primaryInput ? transformDistribution : null, finalToken);
+          }
         }
+        // There is only one word in the context.
       } else {
         // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
         //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
@@ -357,8 +420,13 @@ namespace correction {
           token.raw = tokenizedContext[0];
           token.transformDistributions = [transformDistribution];
           state.pushTail(token);
-        } else {
-          state.updateTail(transformDistribution, tokenizedContext[0]);
+        } else { // Edit the lone context token.
+          // Consider backspace entry for this case?
+          if(isBackspace) {
+            state.replaceTailForBackspace(finalToken, primaryInput.id);
+          } else {
+            state.updateTail(primaryInput ? transformDistribution : null, finalToken);
+          }
         }
       }
       return state;
@@ -369,17 +437,9 @@ namespace correction {
         let token = new TrackedContextToken();
         token.raw = entry;
         if(token.raw) {
-          let tokenTransform = {
-            insert: entry,
-            deleteLeft: 0
-          };
-          // Build a single-entry prob-distribution array... where the single distribution is 100% for the token's actual form.
-          // Basically, assume the token was the correct input, since we lack any actual probability data about the keystrokes
-          // that generated it.
-          token.transformDistributions = [[{
-            sample: tokenTransform,
-            p: 1.0
-          }]];
+          token.transformDistributions = textToCharTransforms(token.raw).map(function(transform) {
+            return [{sample: transform, p: 1.0}];
+          });
         } else {
           // Helps model context-final wordbreaks.
           token.transformDistributions = [];
@@ -420,7 +480,7 @@ namespace correction {
      * @param transformDistribution 
      */
     analyzeState(model: LexicalModel, 
-                 context: Context, 
+                 context: Context,
                  transformDistribution?: Distribution<Transform>): TrackedContextState {
       if(!model.traverseFromRoot) {
         // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)

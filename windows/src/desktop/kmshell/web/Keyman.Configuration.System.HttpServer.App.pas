@@ -25,6 +25,7 @@ type
     FRequestInfo: TIdHTTPRequestInfo;
     FResponseInfo: TIdHTTPResponseInfo;
     FXMLRenderers: TXMLRenderers;
+    procedure ProcessPageTextEditorFonts;
     procedure ProcessPageHint(const Params: TStrings);
     procedure ProcessPageSplash;
     procedure ProcessPageHelp(const Params: TStrings);
@@ -62,7 +63,9 @@ uses
   System.StrUtils,
   System.SysUtils,
 
+  keymanapi_tlb,
   BaseKeyboards,
+  Keyman.Configuration.System.HttpServer.App.TextEditorFonts,
   KeymanVersion,
   MessageIdentifierConsts,
   Keyman.System.LocaleStrings,
@@ -107,6 +110,8 @@ begin
       ProcessPageBaseKeyboard
     else if FRequestInfo.Document = '/page/downloadkeyboard' then
       ProcessPageDownloadKeyboard
+    else if FRequestInfo.Document = '/page/welcome_fonts' then
+      ProcessPageTextEditorFonts
     else
     begin
       // Generic response -- no special parameters needed
@@ -191,9 +196,14 @@ end;
 procedure TAppHttpResponder.ProcessPageHelp(const Params: TStrings);
 var
   s: string;
+  kbd: IKeymanKeyboardInstalled;
 begin
   if Params.Values['keyboard'] <> ''
-    then s := Format('<Keyboard Name="%s" />', [XMLEncode(Params.Values['keyboard'])])
+    then kbd := FXMLRenderers.kmcom.Keyboards.Items[Params.Values['keyboard']]
+    else kbd := nil;
+
+  if Assigned(kbd)
+    then s := Format('<Keyboard Name="%s" />', [XMLEncode(kbd.Name)])
     else s := '';
   FXMLRenderers.RenderTemplate := 'Help.xsl';
   ProcessXMLPage(s);
@@ -212,6 +222,20 @@ begin
   FXMLRenderers.Clear;
   FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, xml));
   FXMLRenderers.Add(TKeyboardListXMLRenderer.Create(FXMLRenderers));
+  ProcessXMLPage;
+end;
+
+procedure TAppHttpResponder.ProcessPageTextEditorFonts;
+var
+  data: ITextEditorFontsSharedData;
+begin
+  if not GetTaggedData(ITextEditorFontsSharedData, data) then
+  begin
+    Respond404(Context, RequestInfo, ResponseInfo);
+    Exit;
+  end;
+  FXMLRenderers.RenderTemplate := 'welcome_fonts.xsl';
+  FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, data.AdditionalData));
   ProcessXMLPage;
 end;
 
@@ -244,7 +268,7 @@ begin
   if PageTag <> '' then
     PageTag := '<PageTag>'+PageTag+'</PageTag>';
 
-  FXML := FXMLRenderers.RenderToString(False, s + PageTag + DefaultServersXMLTags + DefaultVersionXMLTags);
+  FXML := FXMLRenderers.RenderToString(s + PageTag + DefaultServersXMLTags + DefaultVersionXMLTags);
 
   FResponseInfo.ContentStream := TStringStream.Create(FXML, TEncoding.UTF8);
   FResponseInfo.FreeContentStream := True;

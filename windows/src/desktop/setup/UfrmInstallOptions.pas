@@ -260,23 +260,10 @@ begin
     if FInstallInfo.IsInstalled
       then Text := FInstallInfo.Text(ssOptionsUpgradeKeyman)
       else Text := FInstallInfo.Text(ssOptionsInstallKeyman);
-
-{
-    if not FInstallInfo.IsInstalled then
-      case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallKeyman, [FInstallInfo.BestMsi.Version]);
-        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadInstallKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
-      end
-    else
-      case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := FInstallInfo.Text(ssOptionsUpgradeKeyman, [FInstallInfo.BestMsi.Version]);
-        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadUpgradeKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
-      end;
-}
   end
   else if FInstallInfo.IsInstalled then
   begin
-    Text := FInstallInfo.Text(ssOptionsKeymanAlreadyInstalled, [FInstallInfo.InstalledVersion.Version]);
+    Text := FInstallInfo.Text(ssOptionsKeymanAlreadyInstalled, [FInstallInfo.InstalledVersion.Version]);//TODO VersionWithTag?
   end
   else
   begin
@@ -289,8 +276,8 @@ begin
   for location in FInstallInfo.MsiLocations do
   begin
     case location.LocationType of
-      iilLocal: Text := FInstallInfo.Text(ssOptionsInstallKeymanVersion, [location.Version]);
-      iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadKeymanVersion, [location.Version, FormatFileSize(location.Size)]);
+      iilLocal: Text := FInstallInfo.Text(ssOptionsInstallKeymanVersion, [location.VersionWithTag]);
+      iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadKeymanVersion, [location.VersionWithTag, FormatFileSize(location.Size)]);
     end;
     cbKeymanLocation.Items.AddObject(Text, location);
   end;
@@ -299,7 +286,7 @@ begin
   chkInstallKeyman.Checked := FInstallInfo.ShouldInstallKeyman;
   chkInstallKeyman.OnClick := chkInstallKeymanClick;
   chkInstallKeyman.Enabled := FInstallInfo.IsNewerAvailable and FInstallInfo.IsInstalled;
-  cbKeymanLocation.Enabled := chkInstallKeyman.Enabled and (cbKeymanLocation.Items.Count > 1);
+  cbKeymanLocation.Enabled := chkInstallKeyman.Checked and (cbKeymanLocation.Items.Count > 1);
 
   lblTitleLocation.Left := cbKeymanLocation.Left + sbTargets.Left;
 
@@ -360,7 +347,8 @@ begin
   lblAssociatedKeyboardLanguage.Visible := FInstallInfo.Packages.Count > 0;
 
   // Special case: if there are no options to change, don't present them
-  if (FInstallInfo.Packages.Count = 0) and not chkInstallKeyman.Enabled then
+  if (FInstallInfo.Packages.Count = 0) and not chkInstallKeyman.Enabled and
+    (cbKeymanLocation.Items.Count < 2) then
   begin
     sbTargets.Visible := False;
     lblSelectModulesToInstall.Visible := False;

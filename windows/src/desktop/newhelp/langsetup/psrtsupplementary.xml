@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<section id="langsetup_psrtsupplementary">
-  <title>Configure Supplementary Plane Support</title>
-  <para>
-    Keyman Desktop will detect if you need to install support for Unicode Supplementary Planes on your computer.
-  </para>
-  <para>
-    You may need to restart your computer to complete this process.  More information on Unicode Supplementary Planes is available on the <ulink url="https://secure.tavultesoft.com">Tavultesoft website</ulink>.</para>
-</section>

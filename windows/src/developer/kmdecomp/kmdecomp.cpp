@@ -57,16 +57,22 @@ int run(int argc, char *argv[])
 
 	if(argc < 2 || !strcmp(argv[1], "--help"))
 	{
-		puts("KMDECOMP: Decompile Keyman Desktop .kmx keyboard");
+		puts("KMDECOMP: Decompile Keyman .kmx keyboard");
 		puts("(C) SIL International");
-		puts("Usage: KMDECOMP <filename>\n");
+		puts("Usage: KMDECOMP <filename> [output]\n");
 		puts("Will create a .kmn and optionally a .bmp/.ico with the same filename and in the same location as the input");
 		return 1;
 	}
 
 	if(!LoadKeyboard(argv[1], &kbd, &lpBitmap, &cbBitmap)) return 2;
 
-	_splitpath_s(argv[1], drive, _MAX_DRIVE, dir, _MAX_DIR, filename, _MAX_FNAME, NULL, 0);
+  if (argc < 3) {
+    _splitpath_s(argv[1], drive, _MAX_DRIVE, dir, _MAX_DIR, filename, _MAX_FNAME, NULL, 0);
+  }
+  else {
+    _splitpath_s(argv[2], drive, _MAX_DRIVE, dir, _MAX_DIR, filename, _MAX_FNAME, NULL, 0);
+  }
+
 	_makepath_s(buf, _MAX_PATH, drive, dir, filename, ".kmn");
 	_makepath_s(buf2, _MAX_PATH, drive, dir, filename, ".bmp");
 

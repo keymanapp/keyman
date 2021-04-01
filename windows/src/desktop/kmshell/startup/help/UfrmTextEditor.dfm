@@ -1,7 +1,7 @@
 inherited frmTextEditor: TfrmTextEditor
   Left = 0
   Top = 0
-  Caption = 'Keyman Desktop - Text Editor'
+  Caption = 'Keyman - Text Editor'
   ClientHeight = 644
   ClientWidth = 812
   Font.Name = 'Tahoma'
@@ -107,7 +107,7 @@ inherited frmTextEditor: TfrmTextEditor
       Left = 285
       Top = 0
       Width = 42
-      Height = 22
+      Height = 21
       Hint = 'Font Size|Select font size'
       TabOrder = 1
       Text = '0'

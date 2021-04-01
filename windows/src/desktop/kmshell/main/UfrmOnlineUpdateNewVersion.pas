@@ -1,18 +1,18 @@
 (*
   Name:             UfrmOnlineUpdateNewVersion
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      5 Dec 2006
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          05 Dec 2006 - mcdurdin - Initial version
                     12 Dec 2006 - mcdurdin - Make 'installnow' work
                     12 Dec 2006 - mcdurdin - Fix CurrentVersion tag, capitalize form name
@@ -107,6 +107,7 @@ begin
   PageTag := modWebHttpServer.SharedData.Add(Data);
 
   FRenderPage := 'onlineupdate';
+  HelpTopic := 'context/online-update';
   Content_Render('tag='+IntToStr(PageTag));
 end;
 

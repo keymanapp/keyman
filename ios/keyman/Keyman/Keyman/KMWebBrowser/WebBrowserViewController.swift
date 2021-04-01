@@ -204,6 +204,38 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   func webView(_ webView: UIWebView,
                shouldStartLoadWith request: URLRequest,
                navigationType: UIWebView.NavigationType) -> Bool {
+    if request.url?.lastPathComponent.hasSuffix(".kmp") ?? false {
+      // Can't have the browser auto-download with no way to select a different page.
+      // Can't just ignore it, either, as the .kmp may result from a redirect from
+      // the previous URL.  (Like if using the keyman.com keyboard search!)
+      let userData = UserDefaults.standard
+      userData.set(nil as String?, forKey: webBrowserLastURLKey)
+      userData.synchronize()
+
+      // The user is trying to download a .kmp, but the standard
+      // UIWebView can't handle it properly.
+
+      ResourceDownloadManager.shared.downloadRawKMP(from: request.url!) { file, error in
+        // do something!
+        if let error = error {
+          let alertTitle = NSLocalizedString("alert-error-title", bundle: Bundle(for: Manager.self), comment: "")
+          let alert = ResourceFileManager.shared.buildSimpleAlert(title: alertTitle,
+                                                                  message: error.localizedDescription)
+          self.present(alert, animated: true, completion: nil)
+          return
+        }
+
+        // Re-use the standard 'open random file' code as when launching the
+        // app from a file.  This will also auto-dismiss the browser, returning
+        // to the app's main screen.
+        if let file = file {
+          let appDelegate = UIApplication.shared.delegate as! AppDelegate
+          _ = appDelegate.application(UIApplication.shared, open: file)
+        }
+      }
+
+      return false
+    }
     updateAddress(request)
     return true
   }
@@ -222,13 +254,27 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
-    let alertController = UIAlertController(title: "Cannot Open Page",
-                                            message: error.localizedDescription,
-                                            preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertAction.Style.default,
-                                            handler: nil))
-    self.present(alertController, animated: true, completion: nil)
+
+    var signalError: Bool = true
+
+    // An error will likely result if the user attempts to download a KMP,
+    // despite the fact that we tell it not to attempt a load.
+    let nsError = error as NSError
+    if let url = nsError.userInfo["NSErrorFailingURLKey"] as? NSURL {
+      signalError = !(url.path?.hasSuffix(".kmp") ?? false)
+    }
+
+    if signalError {
+      let alertController = UIAlertController(title: NSLocalizedString("error-opening-page", comment: ""),
+                                              message: error.localizedDescription,
+                                              preferredStyle: UIAlertController.Style.alert)
+      alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok",
+                                                                       bundle: Bundle(for: Manager.self),
+                                                                       comment: ""),
+                                              style: UIAlertAction.Style.default,
+                                              handler: nil))
+      self.present(alertController, animated: true, completion: nil)
+    }
   }
 
   private func updateButtons() {

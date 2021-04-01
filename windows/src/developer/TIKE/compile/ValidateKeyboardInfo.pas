@@ -16,6 +16,8 @@ type
     function LoadJsonFile: Boolean;
     constructor Create(AJsonFile: string; ASilent: Boolean);
     function Failed(message: string): Boolean;
+    procedure Warning(message: string);
+    procedure Info(message: string);
   public
     class function Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;
   end;
@@ -91,8 +93,8 @@ begin
         if not IsValid(False, msg) then
           Result := Failed(msg);
 
-        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False) then
-          Result := Failed(msg);
+        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False, False) then
+          Warning(msg);
       finally
         Free;
       end;
@@ -106,8 +108,8 @@ begin
         if not IsValid(False, msg) then
           Result := Failed(msg);
 
-        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False) then
-          Result := Failed(msg);
+        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False, False) then
+          Warning(msg);
       finally
         Free;
       end;
@@ -118,6 +120,11 @@ function TValidateKeyboardInfo.Failed(message: string): Boolean;
 begin
   GCallback(plsError, FJsonFile, Message, 0, 0);
   Result := False;
+end;
+
+procedure TValidateKeyboardInfo.Info(message: string);
+begin
+  GCallback(plsInfo, FJsonFile, Message, 0, 0);
 end;
 
 function TValidateKeyboardInfo.LoadJsonFile: Boolean;
@@ -136,6 +143,11 @@ begin
   end;
 
   Result := Assigned(json);
+end;
+
+procedure TValidateKeyboardInfo.Warning(message: string);
+begin
+  GCallback(plsWarning, FJsonFile, Message, 0, 0);
 end;
 
 class function TValidateKeyboardInfo.Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;

@@ -103,7 +103,7 @@ div {
   <div id='content'>
     <div class='form' id="ProxyServerLabel"><xsl:value-of select="$locale/string[@name='S_ProxyConfiguration_Server']" /></div>
     <div class='form' id="ProxyServer">
-      <input type="text" id="Form_ProxyServer">
+      <input autofocus="autofocus" type="text" id="Form_ProxyServer">
         <xsl:attribute name="value"><xsl:value-of select="/Keyman/Proxy/Server"/></xsl:attribute>
       </input>
     </div>

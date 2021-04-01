@@ -95,6 +95,7 @@ begin
       location.URL := ucr.InstallURL;
       location.Path := ucr.FileName;
       location.Version := ucr.NewVersion;
+      location.VersionWithTag := ucr.NewVersionWithTag;
       location.Size := ucr.InstallSize;
       AInstallInfo.MsiLocations.Add(location);
     end;

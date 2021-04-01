@@ -166,7 +166,7 @@ BOOL ProcessHook()
       _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
       fOutputKeystroke = FALSE;
     }
-    else if (!_td->TIPFUpdateable) {
+		else if (!_td->TIPFUpdateable) {
       //
       // #2759: kmtip calls this function twice for each keystroke, first to
       // determine if we are doing processing work (IsUpdateable() == FALSE),
@@ -177,6 +177,17 @@ BOOL ProcessHook()
       //
       fOutputKeystroke = FALSE;
     }
+  }
+
+  if (fOutputKeystroke && _td->app->DebugControlled()) {
+		// The debug memo does not receive default key events because
+		// we capture them all here. So we synthesize the key event for
+		// the debugger.
+    _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
+    _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
+    _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
+    _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
+    fOutputKeystroke = FALSE;
   }
 
 	if(*Globals::hwndIM() == 0 || *Globals::hwndIMAlways())
@@ -307,8 +318,6 @@ BOOL ProcessGroup(LPGROUP gp)
       BOOL fIsBackspace = _td->state.vkey == VK_BACK && (Globals::get_ShiftState() & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(/*_td->app->DebugControlled() &&*/ fIsBackspace) {   // I4838   // I4933
-        	//if(_td->state.msg.message == wm_keymankeydown)
-				  //	_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
 				if(_td->state.msg.message == wm_keymankeydown) {   // I4933
           if(!_td->app->IsLegacy()) {   // I4933
             PWCHAR pdeletecontext = _td->app->ContextBuf(1);   // I4933
@@ -319,13 +328,18 @@ BOOL ProcessGroup(LPGROUP gp)
             }
             if (Uni_IsSurrogate1(*pdeletecontext) && Uni_IsSurrogate2(*(pdeletecontext+1))) {
               // 2 backspaces to delete both parts of surrogate pair
-              // This only needs to be done for non-legacy apps as legacy apps
+              // This only needs to be done for TSF-aware apps as legacy apps
               // will receive a BKSP WM_KEYDOWN event which results in deleting
               // both parts in one action
+              _td->app->QueueAction(QIT_BACK, BK_BACKSPACE | BK_SURROGATE);
+            }
+            else {
               _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
             }
           }
-				  _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
+          else {
+            _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
+          }
         }
       } else if( (!_td->app->IsLegacy() || !fIsBackspace) && !_td->TIPFPreserved) {   // I4024   // I4128   // I4287   // I4290
         SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, " ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
@@ -346,9 +360,6 @@ BOOL ProcessGroup(LPGROUP gp)
 				 Must have special handling for VK_BACK: delete a character from the context stack
 				 This only fires if the keyboard has no rule for backspace.
 				*/
-
-//				if(_td->state.msg.message == wm_keymankeydown)    // I4933
-	//				_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
 			}
 			else
 			{
@@ -415,6 +426,8 @@ BOOL ProcessGroup(LPGROUP gp)
 
   assert(kkp != NULL);
 
+  _td->miniContextIfLen = xstrlen(kkp->dpContext) - xstrlen_ignoreifopt(kkp->dpContext);
+
 	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
 	if(*kkp->dpContext == UC_SENTINEL && *(kkp->dpContext+1) == CODE_NUL)
     wcsncpy_s(_td->miniContext, GLOBAL_ContextStackSize, _td->app->ContextBuf(xstrlen_ignoreifopt(kkp->dpContext)-1), GLOBAL_ContextStackSize);  // I3162   // I3536
@@ -438,24 +451,30 @@ BOOL ProcessGroup(LPGROUP gp)
 	*/
 
 	p = kkp->dpOutput;
-	if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT)
-	{
-		for(p = _td->miniContext; *p; p = incxstr(p))
-		{
-			if(*p == UC_SENTINEL)
-				switch(*(p+1))
-				{
-			    case CODE_DEADKEY: _td->app->QueueAction(QIT_BACK, BK_DEADKEY); break;
-					case CODE_NUL: break;	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
+	if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT) {
+		for(PWSTR mcp = decxstr(wcschr(_td->miniContext, 0), _td->miniContext); mcp != NULL; mcp = decxstr(mcp, _td->miniContext)) {
+      if (*mcp == UC_SENTINEL) {
+        switch (*(mcp + 1)) {
+          case CODE_DEADKEY: _td->app->QueueAction(QIT_BACK, BK_DEADKEY); break;
+          case CODE_NUL: break;	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
         }
-      else
-			{
+      }
+      else if (Uni_IsSurrogate1(*mcp) && Uni_IsSurrogate2(*(mcp + 1))) {
+				// 2 backspaces to delete both parts of surrogate pair
+				// This only needs to be done for TSF-aware apps as legacy apps
+				// will receive a BKSP WM_KEYDOWN event which results in deleting
+				// both parts in one action
+				_td->app->QueueAction(QIT_BACK, BK_SURROGATE);
+      }
+      else {
 				_td->app->QueueAction(QIT_BACK, 0);
 			}
 		}
-        p = kkp->dpOutput;
 	}
-	else p+=2;				// otherwise, the "context" entry has to be jumped over
+  else {
+    // otherwise, the "context" entry has to be jumped over
+    p += 2;
+  }
 
 	/* Use PostString to post the rest of the output string. */
 
@@ -538,18 +557,14 @@ int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
 			  _td->app->QueueAction(QIT_BELL, 0);
 			  break;
 		  case CODE_CONTEXT:				// copy the context to the output
-			  for(q = _td->miniContext; *q; q++) {
-			    _td->app->QueueAction(QIT_CHAR, *q);
-        }
-			  break;
+        PostString(_td->miniContext, mp, lpkb, wcschr(_td->miniContext, 0));
+        break;
 			case CODE_CONTEXTEX:
 				p++;
-				for(q = _td->miniContext, i = 0; *q && i < *p-1; i++, q=incxstr(q));
+				for(q = _td->miniContext, i = _td->miniContextIfLen; *q && i < *p-1; i++, q=incxstr(q));
 				if(*q) {
-          _td->app->QueueAction(QIT_CHAR, *q);
-          if(Uni_IsSurrogate1(*q) && Uni_IsSurrogate2(*(q+1))) {
-            _td->app->QueueAction(QIT_CHAR, *(q+1));
-          }
+          temp = incxstr(q);
+          PostString(q, mp, lpkb, temp);
         }
 				break;
 		  case CODE_RETURN:				// stop processing and start PostAllKeys

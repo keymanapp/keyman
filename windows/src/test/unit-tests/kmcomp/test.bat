@@ -32,6 +32,30 @@ call :should-fail "10.0 .kmn with 14.0-only touch layout codes" test_touchlayout
 call :should-pass "14.0 .kmn with 14.0 touch layout codes" test_touchlayout_14_2.kmn || goto :eof
 call :should-pass "9.0 .kmn with accepted 14.0 touch layout codes" test_touchlayout_14_2.kmn || goto :eof
 
+call :should-fail "#4280: if should be at start of context 1" test_4280_if_start_1.kmn || goto :eof
+call :should-fail "#4280: if should be at start of context 2" test_4280_if_start_2.kmn || goto :eof
+call :should-fail "#4280: nul should be at start of context 1" test_4280_nul_start_1.kmn || goto :eof
+call :should-fail "#4280: nul should be at start of context 2" test_4280_nul_start_2.kmn || goto :eof
+
+call :should-pass "#4423: named code constants, various tests" test_namedcodeconstants.kmn || goto :eof
+
+call :should-pass "#2241: expansions" test_expansion.kmn || goto :eof
+call :should-pass "#2241: expansions" test_expansion_1.kmn || goto :eof
+:: the two files should be identical.
+fc /b test_expansion.kmx test_expansion_1.kmx || goto :eof
+
+call :should-fail "#2241: invalid expansions" test_expansion_invalid.kmn || goto :eof
+call :should-fail "#2241: expansion absurdly long" test_expansion_absurd.kmn || goto :eof
+
+call :should-pass "#2241: &CasedKeys" test_casedkeys.kmn || goto :eof
+call :should-pass "#2241: &CasedKeys (chars)" test_casedkeys_chars.kmn || goto :eof
+
+call :should-fail "#2241: &CasedKeys (mnemonic 1)" test_casedkeys_mnemonic_1.kmn || goto :eof
+call :should-fail "#2241: &CasedKeys (mnemonic 2)" test_casedkeys_mnemonic_2.kmn || goto :eof
+call :should-pass "#2241: &CasedKeys (mnemonic 3)" test_casedkeys_mnemonic_3.kmn || goto :eof
+call :should-fail "#2241: &CasedKeys (invalid chars 1)" test_casedkeys_invalid_1.kmn || goto :eof
+call :should-fail "#2241: &CasedKeys (invalid chars 2)" test_casedkeys_invalid_2.kmn || goto :eof
+
 goto :eof
 
 :should-pass

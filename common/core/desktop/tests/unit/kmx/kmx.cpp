@@ -10,6 +10,8 @@
 #include <cctype>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
+#include <iterator>
 #include <list>
 #include <sstream>
 #include <string>
@@ -53,6 +55,7 @@ using kmx_options = std::vector<kmx_option>;
 
 int load_source(const km::kbp::path &, std::string &, std::u16string &,
                 std::u16string &, kmx_options &, bool &);
+std::string string_to_hex(const std::u16string& input);
 
 km_kbp_option_item test_env_opts[] =
 {
@@ -168,8 +171,8 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
     break;
   case KM_KBP_IT_CHAR:
     if (Uni_IsSMP(act.character)) {
-      text_store.push_back(Uni_IsSurrogate1(act.character));
-      text_store.push_back(Uni_IsSurrogate2(act.character));
+      text_store.push_back(Uni_UTF32ToSurrogate1(act.character));
+      text_store.push_back(Uni_UTF32ToSurrogate2(act.character));
     }
     else {
       text_store.push_back(act.character);
@@ -187,7 +190,16 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
     // in a table. Or, if Keyman has a cached context, then there may be
     // additional text in the text store that Keyman can't see.
     if (text_store.length() > 0) {
+      auto ch = text_store.back();
       text_store.pop_back();
+      if(text_store.length() > 0 && Uni_IsSurrogate2(ch)) {
+        ch = text_store.back();
+        if(Uni_IsSurrogate1(ch)) {
+          // We'll only pop the next character off it is actually a
+          // surrogate pair
+          text_store.pop_back();
+        }
+      }
     }
     break;
   case KM_KBP_IT_PERSIST_OPT:
@@ -319,9 +331,9 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
 
-  std::cout << "expected  : " << expected << std::endl;
-  std::cout << "text store: " << text_store << std::endl;
-  std::cout << "context   : " << buf << std::endl;
+  std::cout << "expected  : " << string_to_hex(expected) << " [" << expected << "]" << std::endl;
+  std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+  std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
 
   // Compare internal context with expected result
   if (buf != expected) return __LINE__;
@@ -349,6 +361,22 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   km_kbp_keyboard_dispose(test_kb);
 
   return 0;
+}
+
+std::string string_to_hex(const std::u16string& input) {
+    std::ostringstream result;
+    result << std::setfill('0') << std::hex << std::uppercase;
+
+    for (size_t i = 0; i < input.length(); i++) {
+      unsigned int ch = input[i];
+      if(i < input.length() - 1 && Uni_IsSurrogate1(input[i]) && Uni_IsSurrogate2(input[i+1])) {
+        ch = Uni_SurrogateToUTF32(input[i], input[i+1]);
+        i++;
+      }
+
+      result << "U+" << std::setw(4) << ch << " ";
+    }
+    return result.str();
 }
 
 std::u16string parse_source_string(std::string const & s) {
@@ -480,5 +508,6 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  km::kbp::kmx::g_debug_ToConsole = TRUE;
   return run_test(argv[1], argv[2]);
 }

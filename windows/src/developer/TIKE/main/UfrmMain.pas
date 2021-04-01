@@ -1141,6 +1141,8 @@ begin
       end
       else
       begin
+        FFileName := ExpandUNCFileName(FFileName);
+
         if FCloseNewFile then
           if Assigned(ActiveEditor) then
             if not ActiveEditor.Modified and ActiveEditor.Untitled then
@@ -1154,11 +1156,11 @@ begin
         else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
         else if FileHasModelTsExt(FFileName) then Result := OpenModelEditor(FFileName)
         else                       Result := OpenEditor(FFileName, TfrmEditor);
+
+        if Assigned(Result) then
+          AddMRU(FFileName);
       end;
 
-      if Assigned(Result) then
-        AddMRU(FFileName);
-      
     except
       on E:EFOpenError do
         ShowMessage('Unable to open the file '''+FFileName+'''.');

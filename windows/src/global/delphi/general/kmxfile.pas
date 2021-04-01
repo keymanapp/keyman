@@ -92,6 +92,8 @@ function SystemStoreFromName(Name: WideString): TSystemStore;
 function GetSystemStore(Memory: PByte; SystemID: DWord; var Buffer: WideString): Boolean;  // I3310
 procedure GetKeyboardInfo(const FileName: string; FReturnDump: Boolean; var ki: TKeyboardInfo; FReturnBitmap: Boolean = False);
 
+function GetLanguageCodesFromKeyboard(ki: TKeyboardInfo): TArray<Integer>;
+
 function PRIMARYLANGID(n: DWORD): WORD;
 function SUBLANGID(n: DWORD): WORD;
 
@@ -421,6 +423,50 @@ begin
         Exit;
       end;
   Result := ssNone;
+end;
+
+
+function GetLanguageCodesFromKeyboard(ki: TKeyboardInfo): TArray<Integer>;
+  procedure AddLanguage(FLanguageID: Integer);
+  var
+    i: Integer;
+  begin
+    for i := 0 to High(Result) do
+      if Result[i] = FLanguageID then
+        Exit;
+
+    SetLength(Result, Length(Result)+1);
+    Result[High(Result)] := FLanguageID;
+  end;
+
+var
+  FAllLanguagesW: WideString;
+  FAllLanguages: TArray<string>;
+  FLanguage: string;
+  FLanguageID: Integer;
+begin
+  //
+  // Use keyboard-defined default profile first   // I4607
+  //
+  if ki.KeyboardID <> 0 then
+  begin
+    AddLanguage(ki.KeyboardID);
+  end;
+
+  //
+  // Then enumerate all defined languages to try next   // I4607
+  //
+  GetSystemStore(ki.MemoryDump.Memory, TSS_WINDOWSLANGUAGES, FAllLanguagesW);
+
+  FAllLanguages := string(FAllLanguagesW).Split([' ']);
+  for FLanguage in FAllLanguages do
+  begin
+    // Each language code starts with `x` so ignore that
+    if TryStrToInt('$'+FLanguage.Substring(1), FLanguageID) then
+    begin
+      AddLanguage(FLanguageID);
+    end;
+  end;
 end;
 
 end.

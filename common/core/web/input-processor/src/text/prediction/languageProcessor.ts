@@ -33,7 +33,7 @@ namespace com.keyman.text.prediction {
    */
   export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
 
-  export type StateChangeEnum = 'active'|'inactive';
+  export type StateChangeEnum = 'active'|'configured'|'inactive';
   /**
    * Corresponds to the 'statechange' LanguageProcessor event.
    */
@@ -137,17 +137,31 @@ namespace com.keyman.text.prediction {
       let source = specType == 'file' ? model.path : model.code;
       let lp = this;
 
-      // We should wait until the model is successfully loaded before setting our state values.
-      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
-        lp.currentModel = model;
-        lp.configuration = config;
+      // We pre-emptively emit so that the banner's DOM elements may update synchronously.
+      // Prevents an ugly "flash of unstyled content" layout issue during keyboard load
+      // on our mobile platforms when embedded.
+      lp.currentModel = model;
+      if(this.mayPredict) {
+        lp.emit('statechange', 'active');
+      }
 
-        try {
-          lp.emit('statechange', 'active');
-        } catch (err) {
-          // Does this provide enough logging information?
-          console.error("Could not load model '" + model.id + "': " + (err as Error).message);
+      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
+        lp.configuration = config;
+        lp.emit('statechange', 'configured');
+      }).catch(function(error) { 
+        // Does this provide enough logging information?
+        let message: string;
+        if(error instanceof Error) {
+          message = error.message;
+        } else {
+          message = String(error);
         }
+        console.error("Could not load model '" + model.id + "': " + message);
+
+        // Since the model couldn't load, immediately deactivate.  Visually, it'll look
+        // like the banner crashed shortly after load.
+        lp.currentModel = null;
+        lp.emit('statechange', 'inactive');
       });
     }
 
@@ -160,9 +174,17 @@ namespace com.keyman.text.prediction {
       if(!this.currentModel || !this.configuration) {
         return;
       }
-      
-      if(outputTarget) {
-        this.predict_internal(outputTarget.buildTranscriptionFrom(outputTarget, null));
+
+      // Don't attempt predictions when disabled!
+      // invalidateContext otherwise bypasses .predict()'s check against this.
+      if(!this.isActive) {
+        return;
+      } else if(outputTarget) {
+        let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
+        this.predict_internal(transcription, true);
+      } else {
+        // Shouldn't be possible, and we'll want to know if and when it is.
+        console.warn("OutputTarget missing during an invalidateContext call");
       }
     }
 
@@ -239,7 +261,7 @@ namespace com.keyman.text.prediction {
             // the input will be automatically rewound to the preInput state.
             transform: original.transform,
             // The ID part is critical; the reversion can't be applied without it.
-            transformId: original.token, // reversions use the additive inverse.
+            transformId: -original.token, // reversions use the additive inverse.
             displayAs: reversion.displayAs,  // The real reason we needed to call the LMLayer.
             id: reversion.id,
             tag: reversion.tag
@@ -311,13 +333,17 @@ namespace com.keyman.text.prediction {
      * have been raised.
      * @param transcription The triggering transcription (if it exists)
      */
-    private predict_internal(transcription: Transcription): Promise<Suggestion[]> {
+    private predict_internal(transcription: Transcription, resetContext: boolean = false): Promise<Suggestion[]> {
       if(!transcription) {
         return null;
       }
 
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
       this.recordTranscription(transcription);
+
+      if(resetContext) {
+        this.lmEngine.resetContext(context);
+      }
 
       let transform = transcription.transform;
       var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);
@@ -387,7 +413,13 @@ namespace com.keyman.text.prediction {
       this._mayPredict = flag;
 
       if(oldVal != flag) {
-        this.emit('statechange', flag ? 'active' : 'inactive');
+        // If there's no model to be activated and we've reached this point,
+        // the banner should remain inactive, as it already was.
+        // If it there was one and we've reached this point, we're globally
+        // deactivating, so we're fine.
+        if(this.activeModel) {
+          this.emit('statechange', flag ? 'active' : 'inactive');
+        }
       }
     }
 

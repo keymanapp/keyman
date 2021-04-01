@@ -29,7 +29,7 @@
 // for the subcomponents of the compiled keyboard is an unnecessary optimisation. Just so you know.
 //
 
-#include "stdafx.h"
+#include "pch.h"
 #include <vector>
 
 #include <stdio.h>
@@ -464,38 +464,6 @@ BOOL DoConvert(LPKEYBOARD kbd, LPWSTR kbid, BOOL bDeadkeyConversion) {   // I455
 
   return TRUE;
 }
-
-PWSTR incxstr(PWSTR p)
-{
-	if(*p == 0) return p;
-	if(*p != UC_SENTINEL)
-	{
-		if(*p >= 0xD800 && *p <= 0xDBFF && *(p+1) >= 0xDC00 && *(p+1) <= 0xDFFF) return p+2;
-		return p+1;
-	}
-
-	p+=2;
-	switch(*(p-1))
-	{
-		case CODE_ANY:			return p+1;
-		case CODE_NOTANY:   return p+1;
-		case CODE_INDEX:		return p+2;
-		case CODE_USE:			return p+1;
-		case CODE_DEADKEY:		return p+1;
-		case CODE_EXTENDED:		p += 2; while(*p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
-		case CODE_CLEARCONTEXT: return p+1;
-		case CODE_CALL:			return p+1;
-		case CODE_CONTEXTEX:	return p+1;
-    case CODE_IFOPT:    return p+3;
-    case CODE_IFSYSTEMSTORE: return p+3;
-    case CODE_SETOPT:   return p+2;
-    case CODE_SETSYSTEMSTORE: return p+2;
-    case CODE_RESETOPT: return p+1;
-    case CODE_SAVEOPT:  return p+1;
-		default:				return p;
-	}
-}
-
 
 void LogError(PWSTR fmt, ...) {
 	WCHAR fmtbuf[256];

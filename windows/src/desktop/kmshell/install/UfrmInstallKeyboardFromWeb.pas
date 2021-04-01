@@ -1,18 +1,18 @@
 (*
   Name:             UfrmInstallKeyboardFromWeb
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Oct 2006
 
   Modified Date:    2 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Oct 2006 - mcdurdin - Initial version
                     05 Dec 2006 - mcdurdin - Refactor using XML-Renderer
                     12 Dec 2006 - mcdurdin - Capitalize form name
@@ -57,10 +57,10 @@ type
     FDownloadStatusText: string;
     FDownloadStatusCode: Integer;
     procedure DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string;
-      isPopup, wasHandled: Boolean);
-    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
-      isPopup: Boolean; out Handled: Boolean);
+    procedure cefBeforeBrowseEx(Sender: TObject; const Url: string;
+      isMain, isPopup, wasHandled: Boolean);
+    procedure cefBeforeBrowseExSync(Sender: TObject; const Url: string;
+      isMain, isPopup: Boolean; out Handled: Boolean);
     procedure cefLoadingStateChange(Sender: TObject; isLoading, canGoBack, canGoForward: Boolean);
     procedure DownloadAndInstallPackage(const PackageID, BCP47: string);
     procedure HttpReceiveData(const Sender: TObject; AContentLength,
@@ -107,24 +107,27 @@ begin
   inherited;
   // Ensures keyman.com hosted site opens locally
   cef.ShouldOpenRemoteUrlsInBrowser := False;
-  cef.OnBeforeBrowse := cefBeforeBrowse;
-  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnBeforeBrowseEx := cefBeforeBrowseEx;
+  cef.OnBeforeBrowseExSync := cefBeforeBrowseExSync;
   cef.OnLoadingStateChange := cefLoadingStateChange;
 
   FRenderPage := 'downloadkeyboard';
+  HelpTopic := 'context/download-keyboard';
 
   Content_Render;
 end;
 
-procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseSync(Sender: TObject; const Url: string;
-  isPopup: Boolean; out Handled: Boolean);
+procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseExSync(Sender: TObject; const Url: string;
+  isMain, isPopup: Boolean; out Handled: Boolean);
 begin
   // This introduces some deeper knowledge of URL paths in Keyman Configuration, which is
   // a bit of a shame, because we try to keep our internal knowledge to /go/ urls on
   // keyman.com. However, there is not really any great way around this that I've found,
   // which allows us to handle internal navigation on the keyboard search and still lets
   // us open other URLs that may be in the search results in an external browser.
+
   Handled :=
+    (IsMain and not IsLocalUrl(Url) and not Url.StartsWith('keyman:')) or // prevent Ctrl+click on iframe-internal link navigating top
     IsPopup or
     TRegEx.IsMatch(Url, URLPath_RegEx_MatchKeyboardsInstall) or       // capture https://keyman.com/keyboards/install/*
     (not TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsRoot) and    // don't capture https://keyman.com/keyboards*
@@ -144,14 +147,17 @@ begin
   end;
 end;
 
-procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowse(Sender: TObject; const Url: string;
-  isPopup, wasHandled: Boolean);
+procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseEx(Sender: TObject; const Url: string;
+  isMain, isPopup, wasHandled: Boolean);
 var
   m: TMatch;
   uri: TURI;
   BCP47: string;
   PackageID: string;
 begin
+
+  if IsMain and not IsLocalUrl(Url) and not Url.StartsWith('keyman:') then
+    Exit;                              // prevent Ctrl+click on iframe-internal link navigating top
 
   m := TRegEx.Match(Url, UrlPath_RegEx_MatchKeyboardsInstall);
   if m.Success then
@@ -225,14 +231,24 @@ begin
   FTempFilename := FDownloadFilename + '.download';
   Client := THTTPClient.Create;
   try
+    Client.SecureProtocols := [THTTPSecureProtocol.TLS1, THTTPSecureProtocol.TLS11, THTTPSecureProtocol.TLS12];
     Client.OnReceiveData := HttpReceiveData;
 
     Stream := TFileStream.Create(FTempFilename, fmCreate);
     try
-      Response := Client.Get(FDownloadURL, Stream);
-      Result := Response.StatusCode = 200;
-      FDownloadStatusText := Response.StatusText;
-      FDownloadStatusCode := Response.StatusCode;
+      try
+        Response := Client.Get(FDownloadURL, Stream);
+        Result := Response.StatusCode = 200;
+        FDownloadStatusText := Response.StatusText;
+        FDownloadStatusCode := Response.StatusCode;
+      except
+        on E:ENetHTTPClientException do
+        begin
+          FDownloadStatusText := E.Message;
+          FDownloadStatusCode := 0;
+          Result := False;
+        end;
+      end;
     finally
       Stream.Free;
     end;

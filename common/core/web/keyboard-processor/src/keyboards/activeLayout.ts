@@ -16,7 +16,10 @@ namespace com.keyman.keyboards {
       pad: ActiveKey.DEFAULT_PAD.toString()
     };
 
+    /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
     id?: string;
+
+    // These are fine.
     width?: string;
     pad?: string;
     layer: string;
@@ -29,12 +32,103 @@ namespace com.keyman.keyboards {
     proportionalX: number;
     proportionalWidth: number;
 
+    // Keeping things simple here, as this was added LATE in 14.0 beta.
+    // Could definitely extend in the future to instead return an object
+    // that denotes the 'nature' of the key.
+    // - isUnicode
+    // - isHardwareKey
+    // - etc.
+
+    // Reference for the terminology in the comments below:
+    // https://help.keyman.com/developer/current-version/guides/develop/creating-a-touch-keyboard-layout-for-amharic-the-nitty-gritty
+
+    /**
+     * Matches the key code as set within Keyman Developer for the layout.
+     * For example, K_R or U_0020.  Denotes either physical keys or virtual keys with custom output,
+     * with no additional metadata like layer or active modifiers.
+     * 
+     * Is used to determine the keycode for input events, rule-matching, and keystroke processing.
+     */
+    public get baseKeyID(): string {
+      if(typeof this.id === 'undefined') {
+        return undefined;
+      }
+
+      return this.id;
+    }
+
+    /**
+     * A unique identifier based on both the key ID & the 'desktop layer' to be used for the key.
+     * 
+     * Allows diambiguation of scenarios where the same key ID is used twice within a layer, but
+     * with different innate modifiers.  (Refer to https://github.com/keymanapp/keyman/issues/4617)
+     * The 'desktop layer' may be omitted if it matches the key's display layer.
+     * 
+     * Examples, given a 'default' display layer, matching keys to Keyman keyboard language:
+     * 
+     * ```
+     * "K_Q" 
+     * + [K_Q]
+     * "K_Q+shift"
+     * + [K_Q SHIFT]
+     * ```
+     * 
+     * Useful when the active layer of an input-event is already known.
+     */
+    public get coreID(): string {
+      if(typeof this.id === 'undefined') {
+        return undefined;
+      }
+
+      let baseID = this.id || '';
+      
+      if(this.displayLayer != this.layer) {
+        baseID = baseID + '+' + this.layer;
+      }
+
+      return baseID;
+    }
+
+    /**
+     * A keyboard-unique identifier to be used for any display elements representing this key
+     * in user interfaces and/or on-screen keyboards.
+     * 
+     * Distinguishes between otherwise-identical keys on different layers of an OSK.
+     * Includes identifying information about the key's display layer.
+     * 
+     * Examples, given a 'default' display layer, matching keys to Keyman keyboard language:
+     * 
+     * ```
+     * "default-K_Q" 
+     * + [K_Q]
+     * "default-K_Q+shift"
+     * + [K_Q SHIFT]
+     * ```
+     * 
+     * Useful when only the active keyboard is known about an input event.
+     */
+    public get elementID(): string {
+      if(typeof this.id === 'undefined') {
+        return undefined;
+      }
+
+      return this.displayLayer + '-' + this.coreID;
+    }
+
     static polyfill(key: LayoutKey, layout: ActiveLayout, displayLayer: string) {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveKey();
+      let proto = Object.getPrototypeOf(dummy);
+
       for(let prop in dummy) {
         if(!key.hasOwnProperty(prop)) {
-          key[prop] = dummy[prop];
+          let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
+          if(descriptor) {
+            // It's a computed property!  Copy the descriptor onto the key's object.
+            Object.defineProperty(key, prop, descriptor);
+          } else {
+            key[prop] = dummy[prop];
+          }
         }
       }
 
@@ -237,8 +331,8 @@ namespace com.keyman.keyboards {
 
     populateKeyMap(map: {[keyId: string]: ActiveKey}) {
       this.key.forEach(function(key: ActiveKey) {
-        if(key.id) {
-          map[key.id] = key;
+        if(key.coreID) {
+          map[key.coreID] = key;
         }
       });
     }
@@ -401,12 +495,12 @@ namespace com.keyman.keyboards {
       this.row.forEach(function(row: ActiveRow): void {
         row.key.forEach(function(key: ActiveKey): void {
           // If the key lacks an ID, just skip it.  Sometimes used for padding.
-          if(!key.id) {
+          if(!key.baseKeyID) {
             return;
           } else {
             // Attempt to filter out known non-output keys.
             // Results in a more optimized distribution.
-            switch(key.id) {
+            switch(key.baseKeyID) {
               case 'K_SHIFT':
               case 'K_LOPT':
               case 'K_ROPT':
@@ -418,7 +512,7 @@ namespace com.keyman.keyboards {
                 // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
                 // layer shifting keys.  To be safe, we currently let K_TABBACK and 
                 // K_TABFWD through, though we might be able to drop them too.
-                let code = com.keyman.text.Codes[key.id];
+                let code = com.keyman.text.Codes[key.baseKeyID];
                 if(code > 50000 && code < 50011) {
                   return;
                 }
@@ -463,7 +557,7 @@ namespace com.keyman.keyboards {
           distY += dy * layer.rowProportionalHeight;
 
           let distance = distX * distX + distY * distY;
-          keyDists[key.id] = distance;
+          keyDists[key.coreID] = distance;
         });
       });
 

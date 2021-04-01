@@ -123,12 +123,12 @@ const
     'rightalt',
     'rightctrl-rightalt',
     //'shift',
-    'shift-lctrl',
-    'shift-rctrl',
-    'shift-lalt',
-    'shift-ralt',
-    'shift-lctrl-lalt',
-    'shift-rctrl-ralt'
+    'leftctrl-shift',
+    'rightctrl-shift',
+    'leftalt-shift',
+    'rightalt-shift',
+    'leftctrl-leftalt-shift',
+    'rightctrl-rightalt-shift'
   );
 
 implementation

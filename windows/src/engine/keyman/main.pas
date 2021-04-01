@@ -16,7 +16,7 @@
   History:          01 Aug 2006 - mcdurdin - Initial version
                     02 Aug 2006 - mcdurdin - Timeout when Beta expires
                     04 Dec 2006 - mcdurdin - Block Keyman loading if KM5/6 running
-                    23 Aug 2007 - mcdurdin - I910 - Fix crash when Keyman 6.0 is running and Keyman Desktop starts
+                    23 Aug 2007 - mcdurdin - I910 - Fix crash when Keyman 6.0 is running and Keyman starts
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     26 Jun 2012 - mcdurdin - I3377 - KM9 - Update code references from 8.0 to 9.0
                     01 Jan 2013 - mcdurdin - I3677 - V9.0 - OSK and Keyman menu show an entry in taskbar

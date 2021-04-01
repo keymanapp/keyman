@@ -47,7 +47,7 @@ PWSTR incxstr(PWSTR p)
 		case CODE_INDEX:		return p+2;
 		case CODE_USE:			return p+1;
 		case CODE_DEADKEY:		return p+1;
-		case CODE_EXTENDED:		p += 2; while(*p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
+		case CODE_EXTENDED:		p += 2; while(*p && *p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
 		case CODE_CLEARCONTEXT: return p+1;
 		case CODE_CALL:			return p+1;
 		case CODE_CONTEXTEX:	return p+1;
@@ -64,7 +64,9 @@ PWSTR incxstr(PWSTR p)
 PWSTR decxstr(PWSTR p, PWSTR pStart)
 {
   if (p <= pStart) {
-    assert("Attempted to move prior to start of string");
+    // At start of string so return NULL
+		// incxstr returns pointer to NULL at end of str so
+		// be aware of this difference.
     return NULL;
   }
 
@@ -72,7 +74,7 @@ PWSTR decxstr(PWSTR p, PWSTR pStart)
 	if(*p == UC_SENTINEL_EXTENDEDEND)
 	{
 		int n = 0;
-		while(*p != UC_SENTINEL && n < 10) { p--; n++; }
+		while(p >= pStart && *p != UC_SENTINEL && n < 10) { p--; n++; }
 
     if (p < pStart) {
       // May be a malformed virtual key

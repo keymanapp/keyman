@@ -182,7 +182,9 @@ type
     procedure SetKeyFont(const Value: TFont);
     function DoesKeyboardSupportXMLVisualKeyboard: Boolean;
     function TransferDesignToSource: Boolean;
-    function TransferSourceToDesign(ASilent: Boolean): Boolean;   // I4057
+    function TransferSourceToDesign(ASilent: Boolean): Boolean;
+    function GetCodeFont: TFont;
+    procedure SetCodeFont(const Value: TFont);   // I4057
   protected
     function GetHelpTopic: string; override;
   public
@@ -192,6 +194,7 @@ type
     procedure UpdateControls;
     procedure SetFocus; override;
     property UnderlyingLayout: HKL read GetUnderlyingLayout write SetUnderlyingLayout;
+    property CodeFont: TFont read GetCodeFont write SetCodeFont;
     property KeyFont: TFont read GetKeyFont write SetKeyFont;   // I4057
     property VKModified: Boolean read FVKModified write SetVKModified;
     property VKUnicode: Boolean read FVKUnicode write SetVKUnicode;
@@ -255,6 +258,11 @@ procedure TframeOnScreenKeyboardEditor.TntFormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(FVK);  // I2794
+end;
+
+procedure TframeOnScreenKeyboardEditor.SetCodeFont(const Value: TFont);
+begin
+  frameSource.CodeFont := Value;
 end;
 
 procedure TframeOnScreenKeyboardEditor.SetFocus;
@@ -666,7 +674,7 @@ procedure TframeOnScreenKeyboardEditor.cmdVKImportKMXClick(Sender: TObject);
           if ValidExtShiftStates[j] = [essAlt] then Continue;
           if ValidExtShiftStates[j] = [essShift, essAlt] then Continue;  // I1471:9011
 
-          if (kbdOnScreen.Keys[i].KeyCaps[j] <> '') and
+          if (Trim(kbdOnScreen.Keys[i].KeyCaps[j]) <> '') and
             (kbdOnScreen.Keys[i].KeyCaps[j][1] >= #32) then
           begin
             k := TVisualKeyboardKey.Create;
@@ -985,6 +993,8 @@ begin
   VKkeySample.DataFont := FFont;
   VKkeySample.DataFont.Color := clBlack;
   VKkeySample.Repaint;
+
+  frameSource.CharFont := FFont;
 end;
 
 function TframeOnScreenKeyboardEditor.VK_GetCurrentKey: TVisualKeyboardKey;
@@ -1263,6 +1273,11 @@ begin
   finally
     Free;
   end;
+end;
+
+function TframeOnScreenKeyboardEditor.GetCodeFont: TFont;
+begin
+  Result := frameSource.CodeFont;
 end;
 
 function TframeOnScreenKeyboardEditor.GetHelpTopic: string;

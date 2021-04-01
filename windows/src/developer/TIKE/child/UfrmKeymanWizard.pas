@@ -236,10 +236,6 @@ type
     cmdISOLang_Lookup: TButton;
     Panel1: TPanel;
     lblCongrats: TLabel;
-    cmdCompile: TButton;
-    cmdStartDebugging: TButton;
-    cmdAddToProject: TButton;
-    cmdOpenContainingFolder2: TButton;
     panBuildWindows: TPanel;
     lblInstallHint: TLabel;
     lblCompileTargetHeader: TLabel;
@@ -267,6 +263,16 @@ type
     lblLanguageKeyman10Note: TLabel;
     lblLanguageKeyman10Title: TLabel;
     imgQRCode: TImage;
+    panOpenInExplorer: TPanel;
+    lblOpenInExplorer: TLabel;
+    cmdOpenSourceFolder: TButton;
+    cmdOpenBuildFolder: TButton;
+    cmdOpenProjectFolder: TButton;
+    panFileActions: TPanel;
+    lblFileActions: TLabel;
+    cmdAddToProject: TButton;
+    cmdStartDebugging: TButton;
+    cmdCompile: TButton;
     procedure FormCreate(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
@@ -294,7 +300,7 @@ type
       Shift: TShiftState);
     procedure chkLayoutDisplay102KeyClick(Sender: TObject);
     procedure cmdInsertCopyrightClick(Sender: TObject);
-    procedure cmdOpenContainingFolder2Click(Sender: TObject);
+    procedure cmdOpenSourceFolderClick(Sender: TObject);
     procedure editKeyOutputCodeClick(Sender: TObject);
     procedure editKeyOutputTextClick(Sender: TObject);
     procedure tmrUpdateCharacterMapTimer(Sender: TObject);
@@ -332,6 +338,8 @@ type
     procedure pagesTouchLayoutChanging(Sender: TObject;
       var AllowChange: Boolean);
     procedure lbDebugHostsClick(Sender: TObject);
+    procedure cmdOpenBuildFolderClick(Sender: TObject);
+    procedure cmdOpenProjectFolderClick(Sender: TObject);
   private
     frameSource: TframeTextEditor;
 
@@ -738,6 +746,8 @@ begin
   gridFeatures.Enabled := gridFeatures.RowCount > 1;   // I4587   // I4427
   cmdEditFeature.Enabled := gridFeatures.RowCount > 1;   // I4587   // I4427
   cmdRemoveFeature.Enabled := gridFeatures.RowCount > 1;   // I4587   // I4427
+
+  cmdOpenProjectFolder.Enabled := Assigned(ProjectFile.Project);
 end;
 
 procedure TfrmKeymanWizard.FocusTab;
@@ -816,6 +826,8 @@ procedure TfrmKeymanWizard.CodeFontChanged;
 begin
   inherited;
   frameSource.CodeFont := CodeFont;
+  frameTouchLayoutSource.CodeFont := CodeFont;
+  frameOSK.CodeFont := CodeFont;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -2752,9 +2764,20 @@ begin
   editCopyright.SetFocus;
 end;
 
-procedure TfrmKeymanWizard.cmdOpenContainingFolder2Click(Sender: TObject);
+procedure TfrmKeymanWizard.cmdOpenSourceFolderClick(Sender: TObject);
 begin
   OpenContainingFolder(FileName);
+end;
+
+procedure TfrmKeymanWizard.cmdOpenBuildFolderClick(Sender: TObject);
+begin
+  OpenContainingFolder((ProjectFile as TkmnProjectFile).TargetFilename);
+end;
+
+procedure TfrmKeymanWizard.cmdOpenProjectFolderClick(Sender: TObject);
+begin
+  if Assigned(ProjectFile.Project) then
+    OpenContainingFolder(ProjectFile.Project.FileName);
 end;
 
 procedure TfrmKeymanWizard.cmdOpenDebugHostClick(Sender: TObject);
@@ -2819,6 +2842,18 @@ begin
           if pagesTouchLayout.ActivePage = pageTouchLayoutDesign
             then frameTouchLayout.FontInfo[Index] := NewValue   // I4872
             else UpdateTouchLayoutSourceFont;
+
+          if Index = kfontTouchLayoutPhone then
+          begin
+            f := TFont.Create;
+            try
+              f.Name := Value.Name;
+              f.Size := StrToIntDef(Value.Size, 12);
+              frameTouchLayoutSource.CharFont := f;
+            finally
+              f.Free;
+            end;
+          end;
         end;
       end;
   end;

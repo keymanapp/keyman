@@ -58,8 +58,10 @@
 .phone.ios .kmw-key.kmw-key-shift,
 .phone.ios .kmw-key.kmw-key-special {color:#fff;background-color:#b2b9c5;}
 .phone.ios .kmw-key.kmw-key-shift-on,
-.phone.ios .kmw-key.kmw-key-special-on {color:#000;background-color:#fdfdfe;}
-.phone.ios .kmw-key.kmw-key-touched {background-color:#88f;}
+.phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
+.phone.ios .kmw-key.kmw-key-touched {background-color:#447;}
+.phone.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
+.phone.ios .kmw-key-deadkey{color:#048204;background-color:#fdfdfe;}
 
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
@@ -68,8 +70,9 @@
   .phone.ios .kmw-key.kmw-key-shift,
   .phone.ios .kmw-key.kmw-key-special {color:#fff;background-color:#595c62;}
   .phone.ios .kmw-key.kmw-key-shift-on,
-  .phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#3d3d3e;}
+  .phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
   .phone.ios .kmw-key.kmw-key-touched {background-color:#447;}
+  .phone.ios .kmw-key-deadkey{color:#0d0;background-color:#3d3d3e;}
 }
 
 .ios .kmw-banner-bar {
@@ -132,11 +135,13 @@
 .phone.android .kmw-key.kmw-key-shift,
 .phone.android .kmw-key.kmw-key-special {color:#fff;background-color:#555;}
 .phone.android .kmw-key.kmw-key-shift-on,
-.phone.android .kmw-key.kmw-key-special-on {color:#000;background-color:#ddd;}
-.phone.android .kmw-key.kmw-key-touched {background-color:#bbb;}
-.phone.android .kmw-key.kmw-spacebar {background-color: #555;}
-.phone.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #bbb;}
+.phone.android .kmw-key.kmw-key-special-on {color:#fff;background-color:#77f;}
+.phone.android .kmw-key.kmw-key-touched {background-color:#447;}
+.phone.android .kmw-key.kmw-spacebar {background-color: #777;}
+.phone.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #447;}
 .phone.android .kmw-spacebar-caption {color: #aaa;}
+.phone.android .kmw-key-deadkey{color:#0d0;background-color:#777;}
+
 
 .phone.android.kmw-osk-frame { background-color: #222;}
 
@@ -182,10 +187,10 @@
 .tablet.ios .kmw-key.kmw-key-shift,
 .tablet.ios .kmw-key.kmw-key-special {color:#fff;background-color:#b2b9c5;}
 .tablet.ios .kmw-key.kmw-key-shift-on,
-.tablet.ios .kmw-key.kmw-key-special-on {color:#000;background-color:#fdfdfe;}
-.tablet.ios .kmw-key.kmw-key-touched {background-color:#88f;}
-
+.tablet.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
+.tablet.ios .kmw-key.kmw-key-touched {background-color:#447;}
 .tablet.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
+.tablet.ios .kmw-key-deadkey{color:#048204;background-color:#fdfdfe;} 
 
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
@@ -194,23 +199,25 @@
   .tablet.ios .kmw-key.kmw-key-shift,
   .tablet.ios .kmw-key.kmw-key-special {color:#fff;background-color:#595c62;}
   .tablet.ios .kmw-key.kmw-key-shift-on,
-  .tablet.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#3d3d3e;}
-  .tablet.ios .kmw-key.kmw-key-touched {background-color:#447;}
+  .tablet.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
+  .tablet.ios .kmw-key.kmw-key-touched {background-color:#447}
+  .tablet.ios .kmw-key-deadkey {color:#0d0;background-color:#3d3d3e;}
 }
 
 .tablet .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 
-.tablet.android .kmw-key-layer-group {background-color: #b4b4b8; border-top: 1px solid #666;}
-.tablet.android .kmw-key {border: none; border: solid 1px #111; box-shadow:0px 2px 5px #888; border-radius: 3px;}
-.tablet.android .kmw-key.kmw-key-default {color:#000;background-color:#ddd;} 
+.tablet.android .kmw-key-layer-group {background-color: #333;}  
+.tablet.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
+.tablet.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;}
 .tablet.android .kmw-key.kmw-key-shift,
-.tablet.android .kmw-key.kmw-key-special {color:#77f;background-color:#a8a8a8;}
+.tablet.android .kmw-key.kmw-key-special {color:#fff;background-color:#555;}
 .tablet.android .kmw-key.kmw-key-shift-on,
-.tablet.android .kmw-key.kmw-key-special-on {color:#000;background-color:#77f;}
-.tablet.android .kmw-key.kmw-key-touched {background-color:#777;}
-.tablet.android .kmw-key.kmw-spacebar {background-color: #d8d8d8;}
-.tablet.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #777;}
-.tablet.android .kmw-spacebar-caption {color: #888;}         
+.tablet.android .kmw-key.kmw-key-special-on {color:#fff;background-color:#77f;}
+.tablet.android .kmw-key.kmw-key-touched {background-color:#447;}
+.tablet.android .kmw-key.kmw-spacebar {background-color: #777;}
+.tablet.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #447;}
+.tablet.android .kmw-spacebar-caption {color: #aaa;}
+.tablet.android .kmw-key-deadkey{color:#0d0;background-color:#777;}      
 
 .tablet.android .kmw-banner-bar {
   background-color: #b4b4b8; 
@@ -229,12 +236,12 @@
 .tablet.android .kmw-suggestion-text {
   color:#77f;
 }
-.tablet.android .kmw-suggest-option.kmw-suggest-touched {background-color:#777;}
+.tablet.android .kmw-suggest-option.kmw-suggest-touched {background-color:#447;}
 
 /* Vertical centering of text labels on keys */ 
 .kmw-key {text-align:center; white-space:nowrap;}
 .kmw-key:before {content:'.'; display:inline-block; height:100%; vertical-align:middle; max-width:0px; visibility:hidden;}
-.kmw-key span {display:inline-block; vertical-align:middle;}        
+.kmw-key span {display:inline-block}        
 
         
 .desktop .kmw-osk-frame{position:absolute;width:auto;height:auto;left:0;top:0;display:none;margin:0;padding:0;
@@ -291,11 +298,12 @@
 /* Common key appearance styles (can override with form-factor styles if necessary) */
 .kmw-key-default{color:#000;background-color:#eee;}
 .kmw-key-shift{color:#aaa;background-color:#ddd;}     /*color was #88f (blue) */
-.kmw-key-shift-on{color:#88f;background-color:#ccf;}
+.kmw-key-shift-on,
+.kmw-key-special-on{color:#88f;background-color:#ccf;}
 .kmw-key-deadkey{color:#0d0;background-color:#eee;}
 .kmw-key-blank{color:#000;background-color:rgba(100,100,100,0.5);}
 .kmw-key-hidden{visibility:hidden;}
-.kmw-key-touched{background-color:#88f;}
+.kmw-key-touched{background-color:#447;}
 
 /* Adjust font (image) size on special keys */
 .tablet .kmw-key-shift, .tablet .kmw-key-shift-on{font-size:0.8em !important;}
@@ -416,11 +424,11 @@ div.android #keytip {background-color:#f00;}
 .kmw-wait-graphic{width:100%;height:75%;background:url('ajax-loader.gif') no-repeat;background-position:center top;} 
 .kmw-alert-text{margin:10px;white-space:default;font-family:Arial,sans-serif;}
 
-.kmw-spacebar-caption{font:0.6em Arial !important;color:rgba(0,0,0,0.15);}
+.kmw-spacebar-caption{font:0.6em Arial !important;color:rgba(0,0,0,0.25);}
 
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
-  .kmw-spacebar-caption{color:rgba(255, 255, 255, 0.15);}
+  .kmw-spacebar-caption{color:rgba(255, 255, 255, 0.35);}
 }
 
 /* Static styles */

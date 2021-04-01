@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +38,7 @@ public final class FileUtils {
   // File extensions and file types
   public static final String JAVASCRIPT = ".js";
   public static final String LEXICALMODEL = ".model.js";
+  public static final String PDF = ".pdf";
   public static final String TRUETYPEFONT = ".ttf";
   public static final String OPENTYPEFONT = ".otf";
 
@@ -438,6 +438,11 @@ public final class FileUtils {
   public static boolean hasKeymanPackageExtension(String filename) {
     String f = filename.toLowerCase();
     return f.endsWith(KEYMANPACKAGE);
+  }
+
+  public static boolean hasPDFExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(PDF);
   }
 
   public static boolean isTTFFont(String filename) {

@@ -52,6 +52,15 @@
                     
                 //});
             }
+
+            function verifyLoaded() {
+              // During proper loads of KMW, a keyboard will be set very early on.
+              // There's a chance that the keyboard is still loading, so we double-check
+              // against the stub count.
+              if(!keyman.core.activeKeyboard && keyman.keyboardManager.keyboardStubs.length == 0) {
+                location.reload();
+              }
+            }
         
             function showBanner(flag) {
               console.log("Setting banner display for dictionaryless keyboards to " + flag);
@@ -253,9 +262,13 @@
             function setCursorRange(pos, length) {
                 var ta = document.getElementById('ta');
                 var kmw = window['keyman'];
+                var resetContext = (ta.selectionStart != pos || ta.selectionEnd != pos + length);
                 ta.selectionStart = ta._KeymanWebSelectionStart = pos;
                 ta.selectionEnd = ta._KeymanWebSelectionEnd = pos + length;
                 kmw['setActiveElement'](ta);
+                if(resetContext) {
+                  kmw.resetContext();
+                }
                 return ta.selectionEnd;
             }
             
@@ -263,8 +276,13 @@
                 if(undefined == text) text = '';
                 var ta = document.getElementById('ta');
                 var kmw = window['keyman'];
+
+                var resetContext = ta.value != text;
                 ta.value = text;
                 kmw['setActiveElement'](ta);
+                if(resetContext) {
+                  kmw.resetContext();
+                }
                 return ta.value;
             }
             

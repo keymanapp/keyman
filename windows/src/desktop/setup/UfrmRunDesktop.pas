@@ -1,19 +1,19 @@
 ﻿(*
   Name:             UfrmRunDesktop
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      30 Dec 2010
 
   Modified Date:    23 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          30 Dec 2010 - mcdurdin - I2562 - Split Keyman Desktop install dialog into separate unit
+  Bugs:
+  Todo:
+  Notes:
+  History:          30 Dec 2010 - mcdurdin - I2562 - Split Keyman install dialog into separate unit
                     31 Dec 2010 - mcdurdin - I2610 - Show message if not silent and not starting Desktop after successful install
                     31 Dec 2010 - mcdurdin - I2617 - Fix title of Setup
                     31 Dec 2010 - mcdurdin - I2607 - Start with Windows not on by default
@@ -37,7 +37,7 @@
                     19 Oct 2012 - mcdurdin - I3476 - V9.0 - Fixup additional hints and warnings around string conversion
                     15 Jun 2012 - mcdurdin - I3355 - Keyman Developer (and Desktop) sometimes reboot automatically with auto upgrade
                     03 Nov 2012 - mcdurdin - I3500 - V9.0 - Merge of I3355 - Keyman Developer (and Desktop) sometimes reboot automatically with auto upgrade
-                    28 Feb 2014 - mcdurdin - I4099 - V9.0 - Keyman Desktop Setup dialog is still 8.0 style
+                    28 Feb 2014 - mcdurdin - I4099 - V9.0 - Keyman Setup dialog is still 8.0 style
                     24 Jun 2014 - mcdurdin - I4293 - V9.0 - Setup bootstrapper does not check for V8 upgrade
 *)
 unit UfrmRunDesktop;  // I3306   // I4099
@@ -611,7 +611,7 @@ begin
       then downloadSize := FInstallInfo.Text(ssActionDownload, [FormatFileSize(FInstallInfo.MsiInstallLocation.Size)])
       else downloadSize := '';
 
-    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.MsiInstallLocation.Version, downloadSize]) + #13#10;
+    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.MsiInstallLocation.VersionWithTag, downloadSize]) + #13#10;
 
     Found := True;
   end;
@@ -1037,7 +1037,8 @@ begin
       if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
-        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman);
+        FStartWithWindows := ValueExists(SRegValue_UpgradeRunKeyman) or
+          (OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman));
       end
       else if FCanUpgrade10 and OpenKeyReadOnly(SRegKey_KeymanEngine100_ProductOptions_Desktop_CU) then   // I4293
       begin

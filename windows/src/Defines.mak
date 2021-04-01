@@ -181,8 +181,6 @@ WZZIPPATH="C:\program files\7-zip\7z.exe"
 WZZIP=$(WZZIPPATH) a
 WZUNZIP=$(WZZIPPATH) e
 
-XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
-
 # TDSPACK=error! $(ROOT)\src\buildtools\tdspack\tdspack -e
 # TDSPACKCOMPRESS=error! $(ROOT)\src\buildtools\tdspack\tdspack -o
 

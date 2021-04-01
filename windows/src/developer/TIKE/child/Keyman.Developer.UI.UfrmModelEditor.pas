@@ -1,4 +1,4 @@
-unit Keyman.Developer.UI.UfrmModelEditor;
+﻿unit Keyman.Developer.UI.UfrmModelEditor;
 
 interface
 
@@ -49,9 +49,6 @@ type
     pageCompile: TTabSheet;
     Panel1: TPanel;
     lblCongrats: TLabel;
-    cmdCompile: TButton;
-    cmdAddToProject: TButton;
-    cmdOpenContainingFolder2: TButton;
     panBuildLexicalModel: TPanel;
     cbFormat: TComboBox;
     cbWordBreaker: TComboBox;
@@ -71,9 +68,26 @@ type
     lblReadOnly: TLabel;
     dlgAddWordlist: TOpenDialog;
     dlgBrowseTestKeyboard: TOpenDialog;
+    imgQRCode: TImage;
+    lblInsertAfterWord: TLabel;
+    cbInsertAfterWord: TComboBox;
+    lblQuotationMarks: TLabel;
+    cbOpenQuote: TComboBox;
+    chkIsRTL: TCheckBox;
+    cbCloseQuote: TComboBox;
+    lblOpenQuote: TLabel;
+    lblCloseQuote: TLabel;
+    panOpenInExplorer: TPanel;
+    lblOpenInExplorer: TLabel;
+    cmdOpenSourceFolder: TButton;
+    cmdOpenBuildFolder: TButton;
+    cmdOpenProjectFolder: TButton;
+    panFileActions: TPanel;
+    lblFileActions: TLabel;
+    cmdAddToProject: TButton;
+    cmdCompile: TButton;
     Label5: TLabel;
     editOutPath: TEdit;
-    imgQRCode: TImage;
     procedure FormDestroy(Sender: TObject);
     procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
@@ -83,12 +97,24 @@ type
     procedure cbFormatClick(Sender: TObject);
     procedure cbWordBreakerClick(Sender: TObject);
     procedure memoCommentsChange(Sender: TObject);
-    procedure cmdOpenContainingFolder2Click(Sender: TObject);
     procedure cmdOpenDebugHostClick(Sender: TObject);
     procedure cmdSendURLsToEmailClick(Sender: TObject);
     procedure cmdBrowseTestKeyboardClick(Sender: TObject);
     procedure editTestKeyboardChange(Sender: TObject);
     procedure lbDebugHostsClick(Sender: TObject);
+    procedure cbInsertAfterWordClick(Sender: TObject);
+    procedure cbInsertAfterWordKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure cbOpenQuoteClick(Sender: TObject);
+    procedure cbOpenQuoteKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure cbCloseQuoteClick(Sender: TObject);
+    procedure cbCloseQuoteKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure chkIsRTLClick(Sender: TObject);
+    procedure cmdOpenSourceFolderClick(Sender: TObject);
+    procedure cmdOpenBuildFolderClick(Sender: TObject);
+    procedure cmdOpenProjectFolderClick(Sender: TObject);
   private
     type
       TWordlist = class
@@ -102,7 +128,6 @@ type
         function IndexOfFilename(const Filename: string): Integer;
       end;
   private
-    model: TStrings;
     parser: TLexicalModelParser;
     wordlists: TWordlists;
     frameSource: TframeTextEditor;
@@ -119,7 +144,7 @@ type
     function CheckModifiedWordlistsForRemoval(
       newParser: TLexicalModelParser): Boolean;
     procedure UpdateQRCode;
-    procedure WordlistModifiedChanged(Sender: TObject);
+    procedure WordlistChanged(Sender: TObject);
     { Private declarations }
   protected
     function GetHelpTopic: string; override;
@@ -162,34 +187,147 @@ begin
   Result := Ord(format) - 1;  // unknown = -1
 end;
 
+function FormatFromIndex(index: Integer): TLexicalModelFormat;
+begin
+  Result := TLexicalModelFormat(index+1);  // unknown = -1
+end;
+
 function WordBreakerToIndex(wordBreaker: TLexicalModelWordBreaker): Integer;
 begin
   Result := Ord(wordBreaker) - 1;  // unknown = -1
 end;
 
-function FormatFromIndex(format: Integer): TLexicalModelFormat;
+function WordBreakerFromIndex(index: Integer): TLexicalModelWordBreaker;
 begin
-  Result := TLexicalModelFormat(format+1);  // unknown = -1
+  Result := TLexicalModelWordBreaker(index+1);  // unknown = -1
 end;
 
-function WordBreakerFromIndex(wordBreaker: Integer): TLexicalModelWordBreaker;
+type
+  TComboStringOption = record
+    value, name: string;
+    class procedure FillCombo(const opts: array of TComboStringOption;
+      combo: TComboBox); static;
+    class function GetValue(const opts: array of TComboStringOption;
+      combo: TComboBox): string; static;
+    class procedure SetValue(const opts: array of TComboStringOption;
+      const text: string; combo: TComboBox); static;
+  end;
+
+const
+  CInsertAfterWordOptions: array[0..4] of TComboStringOption = (
+    (value: ' '; name: '(Space U+0020)'),
+    (value: ''; name: '(No word break)'),
+    (value: Char($200B); name: '(Zero width space U+200B)'),
+    (value: Char($0F0B); name: '(Tibetan tsheg U+0F0B)'),
+    (value: Char($1361); name: '(Ethiopian wordspace U+1361)')
+  );
+
+  COpenQuoteOptions: array[0..11] of TComboStringOption = (
+    (value: TLexicalModelParser.CDefaultOpenQuote),
+    (value: '«'),
+    (value: '„'),
+    (value: '»'),
+    (value: '"'),
+    (value: ''''),
+    (value: '‹'),
+    (value: '‘'),
+    (value: '‚'),
+    (value: '›'),
+    (value: '「'),
+    (value: '『')
+  );
+
+  CCloseQuoteOptions: array[0..10] of TComboStringOption = (
+    (value: TLexicalModelParser.CDefaultCloseQuote),
+    (value: '»'),
+    (value: '“'),
+    (value: '«'),
+    (value: '"'),
+    (value: ''''),
+    (value: '›'),
+    (value: '’'),
+    (value: '‹'),
+    (value: '」'),
+    (value: '』')
+  );
+
+class procedure TComboStringOption.SetValue(const opts: array of TComboStringOption; const text: string;
+  combo: TComboBox);
+var
+  index: Integer;
 begin
-  Result := TLexicalModelWordBreaker(wordBreaker+1);  // unknown = -1
+  for index := 0 to High(opts) do
+    if opts[index].value = text then
+    begin
+      combo.ItemIndex := index;
+      Exit;
+    end;
+  combo.Text := text;
+end;
+
+class function TComboStringOption.GetValue(const opts: array of TComboStringOption;
+  combo: TComboBox): string;
+begin
+  if (combo.ItemIndex >= 0) and (combo.ItemIndex <= High(opts))
+    then Result := opts[combo.ItemIndex].value
+    else Result := combo.Text;
+end;
+
+class procedure TComboStringOption.FillCombo(const opts: array of TComboStringOption; combo: TComboBox);
+var
+  opt: TComboStringOption;
+begin
+  combo.Items.BeginUpdate;
+  try
+    combo.Items.Clear;
+    for opt in opts do
+    begin
+      if opt.name = ''
+        then combo.Items.Add(opt.value)
+        else combo.Items.Add(opt.name);
+    end;
+  finally
+    combo.Items.EndUpdate;
+  end;
 end;
 
 { TfrmModelEditor }
 
 function TfrmModelEditor.DoOpenFile: Boolean;
+var
+  model: TStringList;
 begin
   model := TStringList.Create;
-  model.LoadFromFile(FileName);
-  parser := TLexicalModelParser.Create(model.Text);
+  try
+    model.DefaultEncoding := TEncoding.UTF8;
+    try
+      model.LoadFromFile(FileName);
+    except
+      on E:EEncodingError do
+      begin
+        try
+          model.LoadFromFile(FileName, TEncoding.Default);
+        except
+          on E:EEncodingError do
+          begin
+            ShowMessage('Could not load file, does not appear to be a valid encoding.');
+            Exit(False);
+          end;
+        end;
+      end;
+    end;
+    parser := TLexicalModelParser.Create(model.Text);
+  finally
+    model.Free;
+  end;
+
   wordlists := TWordlists.Create;
 
   Inc(FSetup);
   try
     FillDetails;
     UpdateWordlistTabs;
+    MoveDesignToSource;
   finally
     Dec(FSetup);
   end;
@@ -200,6 +338,7 @@ end;
 function TfrmModelEditor.DoSaveFile: Boolean;
 var
   wordlist: TWordlist;
+  stream: TStringStream;
 begin
   if pages.ActivePage = pageSource then
   begin
@@ -211,8 +350,14 @@ begin
     wordlist.Frame.SaveToFile(wordlist.Frame.Filename);
   end;
 
-  model.Text := parser.Text;
-  model.SaveToFile(FileName);
+  // We use TStringStream instead of TStringList so we don't get
+  // a BOM on the saved file
+  stream := TStringStream.Create(parser.Text, TEncoding.UTF8);
+  try
+    stream.SaveToFile(FileName);
+  finally
+    stream.Free;
+  end;
 
   editOutPath.Text := (ProjectFile as TmodelTsProjectFile).TargetFilename;   // I4688
 
@@ -239,6 +384,16 @@ begin
   lblWordBreaker.Enabled := e;
   cbWordBreaker.Enabled := e;
   lblComments.Enabled := e;
+
+  lblInsertAfterWord.Enabled := e;
+  cbInsertAfterWord.Enabled := e;
+  lblQuotationMarks.Enabled := e;
+  lblOpenQuote.Enabled := e;
+  cbOpenQuote.Enabled := e;
+  lblCloseQuote.Enabled := e;
+  cbCloseQuote.Enabled := e;
+  chkIsRTL.Enabled := e;
+
   memoComments.Enabled := e;
   cmdAddWordlist.Enabled := e;
   gridWordlists.Enabled := e and (parser.Wordlists.Count > 0);
@@ -248,6 +403,12 @@ begin
   { Build tab }
   cmdOpenDebugHost.Enabled := lbDebugHosts.ItemIndex >= 0;
   cmdSendURLsToEmail.Enabled := lbDebugHosts.Items.Count > 0;   // I4506
+
+  // We use FProjectFile because we don't want to accidentally create a standalone
+  // project file as GetProjectFile is side-effecty. EnableControls is called early
+  // in construction before FProjectFile is assigned. It is called again later so
+  // enabled state will be correct.
+  cmdOpenProjectFolder.Enabled := Assigned(FProjectFile) and Assigned(FProjectFile.Project);
 end;
 
 procedure TfrmModelEditor.NotifyStartedWebDebug;
@@ -281,6 +442,10 @@ begin
     frameSource.OnChanged := SourceChanged;
     frameSource.TextFileFormat := tffUTF8;
 
+    TComboStringOption.FillCombo(CInsertAfterWordOptions, cbInsertAfterWord);
+    TComboStringOption.FillCombo(COpenQuoteOptions, cbOpenQuote);
+    TComboStringOption.FillCombo(CCloseQuoteOptions, cbCloseQuote);
+
     pages.ActivePage := pageDetails;
   finally
     Dec(FSetup);
@@ -291,7 +456,6 @@ procedure TfrmModelEditor.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(parser);
-  FreeAndNil(model);
   FreeAndNil(wordlists);
 end;
 
@@ -430,6 +594,11 @@ var
 begin
   cbFormat.ItemIndex := FormatToIndex(parser.Format);
   cbWordBreaker.ItemIndex := WordBreakerToIndex(parser.WordBreaker);
+  TComboStringOption.SetValue(CInsertAfterWordOptions, parser.InsertAfterWord, cbInsertAfterWord);
+  TComboStringOption.SetValue(COpenQuoteOptions, parser.OpenQuote, cbOpenQuote);
+  TComboStringOption.SetValue(CCloseQuoteOptions, parser.CloseQuote, cbCloseQuote);
+  chkIsRTL.Checked := parser.IsRTL;
+
   memoComments.Text := parser.Comment;
 
   if parser.Wordlists.Count = 0 then
@@ -492,13 +661,12 @@ begin
   Result.Tab.PageControl := pages;
 
   Result.Frame := TframeWordlistEditor.Create(Self);
+  Result.Frame.OnChanged := WordlistChanged;
   Result.Frame.LoadFromFile(ExtractFilePath(Filename) + WordlistFilename);
   Result.Frame.Align := alClient;
 
   Result.Frame.Parent := Result.Tab;
   Result.Frame.Visible := True;
-
-  Result.Frame.OnModifiedChanged := WordlistModifiedChanged;
 end;
 
 function TfrmModelEditor.WordlistFromTab(
@@ -511,7 +679,7 @@ begin
   Result := nil;
 end;
 
-procedure TfrmModelEditor.WordlistModifiedChanged(Sender: TObject);
+procedure TfrmModelEditor.WordlistChanged(Sender: TObject);
 begin
   // We only go from clean to dirty, not vice-versa, on this notification
   if (Sender as TframeWordlistEditor).Modified then
@@ -541,12 +709,54 @@ begin
   Result := WordlistFromTab(pages.ActivePage) <> nil;
 end;
 
+procedure TfrmModelEditor.cbCloseQuoteClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.CloseQuote := TComboStringOption.GetValue(CCloseQuoteOptions, cbCloseQuote);
+  Modified := True;
+end;
+
+procedure TfrmModelEditor.cbCloseQuoteKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  cbCloseQuoteClick(Sender);
+end;
+
 procedure TfrmModelEditor.cbFormatClick(Sender: TObject);
 begin
   if FSetup > 0 then
     Exit;
   parser.Format := FormatFromIndex(cbFormat.ItemIndex);
   Modified := True;
+end;
+
+procedure TfrmModelEditor.cbInsertAfterWordClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.InsertAfterWord := TComboStringOption.GetValue(CInsertAfterWordOptions, cbInsertAfterWord);
+  Modified := True;
+end;
+
+procedure TfrmModelEditor.cbInsertAfterWordKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  cbInsertAfterWordClick(Sender);
+end;
+
+procedure TfrmModelEditor.cbOpenQuoteClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.OpenQuote := TComboStringOption.GetValue(COpenQuoteOptions, cbOpenQuote);
+  Modified := True;
+end;
+
+procedure TfrmModelEditor.cbOpenQuoteKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  cbOpenQuoteClick(cbOpenQuote);
 end;
 
 procedure TfrmModelEditor.cbWordBreakerClick(Sender: TObject);
@@ -557,11 +767,19 @@ begin
   Modified := True;
 end;
 
+procedure TfrmModelEditor.chkIsRTLClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.IsRTL := chkIsRTL.Checked;
+  Modified := True;
+end;
+
 procedure TfrmModelEditor.cmdAddWordlistClick(Sender: TObject);
 begin
   if dlgAddWordlist.Execute then
   begin
-    parser.Wordlists.Add(ExtractRelativePath(Filename, dlgAddWordlist.FileName));
+    parser.Wordlists.Add(ExtractRelativePath(Filename, dlgAddWordlist.FileName).Replace('\','/'));
     Inc(FSetup);
     try
       FillDetails;
@@ -579,14 +797,25 @@ begin
     editTestKeyboard.Text := dlgBrowseTestKeyboard.FileName;
 end;
 
-procedure TfrmModelEditor.cmdOpenContainingFolder2Click(Sender: TObject);
+procedure TfrmModelEditor.cmdOpenDebugHostClick(Sender: TObject);
+begin
+  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex]);
+end;
+
+procedure TfrmModelEditor.cmdOpenSourceFolderClick(Sender: TObject);
 begin
   OpenContainingFolder(FileName);
 end;
 
-procedure TfrmModelEditor.cmdOpenDebugHostClick(Sender: TObject);
+procedure TfrmModelEditor.cmdOpenBuildFolderClick(Sender: TObject);
 begin
-  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex]);
+  OpenContainingFolder((ProjectFile as TmodeltsProjectFile).TargetFilename);
+end;
+
+procedure TfrmModelEditor.cmdOpenProjectFolderClick(Sender: TObject);
+begin
+  if Assigned(ProjectFile.Project) then
+    OpenContainingFolder(ProjectFile.Project.FileName);
 end;
 
 procedure TfrmModelEditor.cmdRemoveWordlistClick(Sender: TObject);
@@ -631,9 +860,16 @@ end;
 { TfrmModelEditor.TWordlist }
 
 destructor TfrmModelEditor.TWordlist.Destroy;
+var
+  pages: TPageControl;
+  NewTab: TTabSheet;
 begin
   Frame.Free;
+  // Workaround for https://quality.embarcadero.com/browse/RSP-32327
+  pages := Tab.PageControl;
+  NewTab := pages.ActivePage;
   Tab.Free;
+  pages.ActivePage := NewTab;
   inherited Destroy;
 end;
 

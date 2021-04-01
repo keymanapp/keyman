@@ -573,6 +573,7 @@ end;
 
 procedure TmodActionsMain.OpenProject(FileName: WideString);
 begin
+  FileName := ExpandUNCFileName(FileName);
   if (FileName <> '') and not FileExists(FileName) then
   begin
     ShowMessage('The project '+FileName+' does not exist.');

@@ -235,7 +235,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 546
           Height = 32
           AutoSize = False
-          Caption = 
+          Caption =
             'A typical package will need keyboards, fonts, and documentation.' +
             ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
             'tandard Keyman files (such as keyman.exe) here.'
@@ -1119,9 +1119,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'
@@ -1141,7 +1138,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 48
           Width = 551
           Height = 13
-          Caption = 
+          Caption =
             'Compiling the package takes all the files you have selected and ' +
             'compresses them into a single package file.'
         end
@@ -1158,67 +1155,15 @@ inherited frmPackageEditor: TfrmPackageEditor
           Font.Style = [fsBold]
           ParentFont = False
         end
-        object Label5: TLabel
-          Left = 24
-          Top = 121
-          Width = 82
-          Height = 13
-          Caption = 'Target filename:'
-        end
-        object cmdBuildPackage: TButton
-          Left = 15
-          Top = 80
-          Width = 133
-          Height = 25
-          Caption = 'Compile &Package'
-          TabOrder = 0
-          OnClick = cmdBuildPackageClick
-        end
-        object editOutPath: TEdit
-          Left = 111
-          Top = 118
-          Width = 383
-          Height = 21
-          TabStop = False
-          ParentColor = True
-          ReadOnly = True
-          TabOrder = 4
-        end
-        object cmdOpenContainingFolder2: TButton
-          Left = 293
-          Top = 80
-          Width = 133
-          Height = 25
-          Caption = '&Open Containing Folder'
-          TabOrder = 2
-          OnClick = cmdOpenContainingFolder2Click
-        end
-        object cmdAddToProject: TButton
-          Left = 432
-          Top = 80
-          Width = 133
-          Height = 25
-          Action = modActionsMain.actProjectAddCurrentEditorFile
-          TabOrder = 3
-        end
-        object cmdCompileInstaller: TButton
-          Left = 154
-          Top = 80
-          Width = 133
-          Height = 25
-          Caption = 'Compile I&nstaller'
-          TabOrder = 1
-          OnClick = cmdCompileInstallerClick
-        end
         object panBuildMobile: TPanel
           Left = 328
-          Top = 162
+          Top = 274
           Width = 457
-          Height = 265
+          Height = 276
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 5
+          TabOrder = 4
           object lblDebugHostCaption: TLabel
             Left = 12
             Top = 70
@@ -1241,7 +1186,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           end
           object imgQRCode: TImage
             Left = 315
-            Top = 64
+            Top = 96
             Width = 128
             Height = 128
             Proportional = True
@@ -1258,7 +1203,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           end
           object cmdOpenDebugHost: TButton
             Left = 12
-            Top = 198
+            Top = 240
             Width = 221
             Height = 25
             Caption = 'Open packages page in local &browser'
@@ -1267,9 +1212,9 @@ inherited frmPackageEditor: TfrmPackageEditor
           end
           object lbDebugHosts: TListBox
             Left = 12
-            Top = 95
+            Top = 89
             Width = 289
-            Height = 97
+            Height = 142
             ItemHeight = 13
             TabOrder = 1
             OnClick = lbDebugHostsClick
@@ -1277,26 +1222,26 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object panBuildDesktop: TPanel
           Left = 15
-          Top = 162
+          Top = 274
           Width = 295
           Height = 124
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 6
+          TabOrder = 2
           object Label4: TLabel
             Left = 9
             Top = 35
-            Width = 254
+            Width = 236
             Height = 13
-            Caption = 'You can install the package into Keyman Desktop:'
+            Caption = 'Install the package into Keyman for Windows:'
           end
           object lblCompileTargetHeader: TLabel
             Left = 9
             Top = 6
-            Width = 202
+            Width = 247
             Height = 17
-            Caption = 'Windows and macOS Targets'
+            Caption = 'Windows, Linux and macOS Targets'
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -14
@@ -1327,13 +1272,13 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object panBuildWindowsInstaller: TPanel
           Left = 15
-          Top = 295
+          Top = 418
           Width = 295
           Height = 132
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 7
+          TabOrder = 3
           object Label9: TLabel
             Left = 9
             Top = 6
@@ -1350,9 +1295,9 @@ inherited frmPackageEditor: TfrmPackageEditor
           object lblBootstrapMSI: TLabel
             Left = 9
             Top = 69
-            Width = 110
+            Width = 64
             Height = 13
-            Caption = 'Keyman Desktop MSI:'
+            Caption = 'Keyman MSI:'
             FocusControl = editBootstrapMSI
           end
           object lblInstallerOutputFilename: TLabel
@@ -1388,9 +1333,125 @@ inherited frmPackageEditor: TfrmPackageEditor
             Top = 96
             Width = 156
             Height = 25
-            Caption = 'Find Keyman Desktop MSI...'
+            Caption = 'Find Keyman MSI...'
             TabOrder = 2
             OnClick = cmdInstallWithClick
+          end
+        end
+        object panOpenInExplorer: TPanel
+          Left = 15
+          Top = 187
+          Width = 767
+          Height = 67
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 1
+          object lblOpenInExplorer: TLabel
+            Left = 9
+            Top = 6
+            Width = 115
+            Height = 17
+            Caption = 'Open in Explorer'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object cmdOpenSourceFolder: TButton
+            Left = 9
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = '&Open source folder'
+            TabOrder = 0
+            OnClick = cmdOpenSourceFolderClick
+          end
+          object cmdOpenBuildFolder: TButton
+            Left = 153
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = 'Open &build folder'
+            TabOrder = 1
+            OnClick = cmdOpenBuildFolderClick
+          end
+          object cmdOpenProjectFolder: TButton
+            Left = 297
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = 'Open pro&ject folder'
+            TabOrder = 2
+            OnClick = cmdOpenProjectFolderClick
+          end
+        end
+        object panFileActions: TPanel
+          Left = 15
+          Top = 67
+          Width = 767
+          Height = 102
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 0
+          object lblFileActions: TLabel
+            Left = 9
+            Top = 6
+            Width = 75
+            Height = 17
+            Caption = 'File actions'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object Label5: TLabel
+            Left = 9
+            Top = 73
+            Width = 82
+            Height = 13
+            Caption = 'Target filename:'
+          end
+          object editOutPath: TEdit
+            Left = 96
+            Top = 70
+            Width = 383
+            Height = 21
+            TabStop = False
+            ParentColor = True
+            ReadOnly = True
+            TabOrder = 0
+          end
+          object cmdCompileInstaller: TButton
+            Left = 148
+            Top = 32
+            Width = 133
+            Height = 25
+            Caption = 'Compile I&nstaller'
+            TabOrder = 1
+            OnClick = cmdCompileInstallerClick
+          end
+          object cmdAddToProject: TButton
+            Left = 287
+            Top = 32
+            Width = 133
+            Height = 25
+            Action = modActionsMain.actProjectAddCurrentEditorFile
+            TabOrder = 2
+          end
+          object cmdBuildPackage: TButton
+            Left = 9
+            Top = 32
+            Width = 133
+            Height = 25
+            Caption = 'Compile &Package'
+            TabOrder = 3
+            OnClick = cmdBuildPackageClick
           end
         end
       end

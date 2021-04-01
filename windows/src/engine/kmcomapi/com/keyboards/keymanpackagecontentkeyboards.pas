@@ -87,7 +87,7 @@ begin
   if (i < Get_Count) and (i >= 0) then
     Result := FKeyboards[i] as IKeymanKeyboard
   else
-    ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([Index]));
+    ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([VarToStr(Index)]));
 end;
 
 function TKeymanPackageContentKeyboards.IndexOf(const ID: WideString): Integer;

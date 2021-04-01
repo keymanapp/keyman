@@ -1,18 +1,18 @@
 (*
   Name:             UfrmVisualKeyboardImportKMX
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Mar 2007
 
   Modified Date:    27 Mar 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Mar 2007 - mcdurdin - I683 - Fixed import of kmx to on screen keyboard
                     30 May 2007 - mcdurdin - I726 - Fixed 102 key not displaying when it should
                     10 Sep 2008 - mcdurdin - I1471 - Add key caps to all non-matched keys (option)
@@ -162,10 +162,10 @@ begin
     Exit;
   end;
 
-  SetStatus('Starting Keyman Desktop');
+  SetStatus('Starting Keyman');
   if not StartKeymanDesktopPro(FWasStarted) then
   begin
-    DoFail('Unable to start Keyman Desktop for debugging - please make sure that Keyman Desktop is correctly installed (the error code was '+IntToHex(GetLastError, 8)+').');  // I3173   // I3504
+    DoFail('Unable to start Keyman for debugging - please make sure that Keyman is correctly installed (the error code was '+IntToHex(GetLastError, 8)+').');  // I3173   // I3504
     Exit;
   end;
 
@@ -355,19 +355,14 @@ var
   vk: TVKKey;
   n: Integer;
 begin
-//  lb.items.Add('AddKey: ENTER');
-
   if nkey >= keys.count then
   begin
-//    lb.items.Add('AddKey: EXIT: bug!');
-    exit;
+    Exit;
   end;
 
-//  lb.items.Add(Format('AddKey: nkey: %d data: "%s" vk: %s ', [nkey, data, VKeyNames[TVKKey(keys[nkey]).vkey]]));
-  if (data <> '') then //and (nkey < keys.Count) then
+  if Trim(data) <> '' then
   begin
     vk := TVKKey(keys[nkey]);
-//    ShowMessage(Format('key: %d shift: %d text: "%s"', [vk.vkey, vk.shift, data]));
     n := FVK.Keys.IndexOf(vk.vkey, vk.shift);
     if n < 0
       then k := TVisualKeyboardKey.Create
@@ -379,11 +374,9 @@ begin
     if n < 0 then FVK.Keys.Add(k);
   end;
 
-//  data := '';
   Inc(nkey);
 
   PostMessage(Handle, WM_User_SendNextKey, 0, 0);   // I4156
-//  lb.items.Add('AddKey: Exit (nkey now='+IntToStr(nkey));
 end;
 
 {-------------------------------------------------------------------------------
@@ -537,7 +530,7 @@ var
   i: Integer;
 begin
   FShow102Key := False;
-  
+
   for i := 0 to keys.Count - 1 do
     if TVKKey(keys[i]).vkey = $E2 then
     begin

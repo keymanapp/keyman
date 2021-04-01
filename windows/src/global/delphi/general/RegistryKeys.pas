@@ -1,18 +1,18 @@
 (*
   Name:             RegistryKeys
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add KeymanHotkeys, ProductInstallDir, Tike->IDE
                     14 Sep 2006 - mcdurdin - Add SRegKey_KeymanOSK, SRegKey_KeymanOSK_CharMap, SRegValue_OSK_*, SRegKey_CRM_*
@@ -37,7 +37,7 @@
                     25 May 2010 - mcdurdin - I2392 - Activation Client integration
                     22 Oct 2010 - mcdurdin - I2522 - Language Switch Hotkey window
                     10 Dec 2010 - mcdurdin - I2555 - transparency bugs in Remote Desktop
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman splash from showing multiple copies
                     28 Feb 2011 - mcdurdin - I1729 - Keyboards in uninstall feedback
                     18 Mar 2011 - mcdurdin - I2807 - Support for disabling addins
                     26 Jun 2012 - mcdurdin - I3379 - KM9 - Remove old Winapi references now in Delphi libraries
@@ -69,7 +69,7 @@ const
 // DO NOT LOCALISE ANYTHING IN THIS FILE
 
 {-------------------------------------------------------------------------------
- - Keyman Desktop keys and values                                              -
+ - Keyman keys and values                                                      -
  ------------------------------------------------------------------------------}
 
   { Keyman keys }
@@ -159,10 +159,10 @@ const
   SRegValue_EnableHints = 'enable hints';
   SRegSubKey_Hints = 'hints';
 
-  { Keyman Desktop }
+  { Keyman for Windows }
 
-  SRegKey_KeymanDesktopRoot_CU = SRegKey_KeymanRoot_CU + '\Keyman Desktop';
-  SRegKey_KeymanDesktopRoot_LM = SRegKey_KeymanRoot_LM + '\Keyman Desktop';
+  SRegKey_KeymanDesktopRoot_CU = SRegKey_KeymanRoot_CU + '\Keyman Desktop'; // leaving as Keyman Desktop for compatibility
+  SRegKey_KeymanDesktopRoot_LM = SRegKey_KeymanRoot_LM + '\Keyman Desktop'; // leaving as Keyman Desktop for compatibility
   SRegKey_KeymanDesktop_CU     = SRegKey_KeymanDesktopRoot_CU;
   SRegKey_KeymanDesktop_LM     = SRegKey_KeymanDesktopRoot_LM;
 
@@ -348,7 +348,7 @@ const
 
   { SRegKey_KeymanDeveloper values }
 
-  //SRegValue_ShowStartup             = 'show startup';                           // CU -- see Keyman Desktop option of same name
+  //SRegValue_ShowStartup             = 'show startup';                           // CU -- see Keyman option of same name
   SRegValue_Evaluation              = 'evaluation';                                 // CU
   SRegValue_ActiveProject           = 'active project';                             // CU
 
@@ -448,6 +448,7 @@ const
   SRegValue_Flag_UseRegisterHotkey = 'Flag_UseRegisterHotkey';
   SRegValue_Flag_ShouldSerializeInput = 'Flag_ShouldSerializeInput';
   SRegValue_Flag_UseAutoStartTask = 'Flag_UseAutoStartTask';
+  SRegValue_Flag_SyncLanguagesToCloud = 'Flag_SyncLanguagesToCloud';
 
 // Fixed path names
 const

@@ -4,7 +4,8 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler kmcomp-x64-structures
+TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler kmcomp-x64-structures \
+        androidstringtokeymanlocalestring
 
 test:
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -12,6 +13,10 @@ test:
 !include ..\..\Header.mak
 
 # ----------------------------------------------------------------------
+
+androidstringtokeymanlocalestring:
+    cd $(ROOT)\src\test\unit-tests\androidstringtokeymanlocalestring
+    $(MAKE) $(TARGET)
 
 group-helper-rsp19902:
     cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902
@@ -33,12 +38,6 @@ lexical-model-compiler:
 !else
     start /wait ./build.sh -test
 !endif
-
-# Revert any local changes to the original source; these changes can break
-# later sub-builds.
-    cd $(KEYMAN_ROOT)\developer\js
-		git restore package.json
-		git restore package-lock.json
 
 kmcomp-x64-structures:
 	cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902

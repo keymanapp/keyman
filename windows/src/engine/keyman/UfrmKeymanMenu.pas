@@ -1,25 +1,25 @@
 ﻿(*
   Name:             UfrmKeymanMenu
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      25 May 2010
 
   Modified Date:    23 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 May 2010 - mcdurdin - I2226 - Improve Keyman menu
                     25 May 2010 - mcdurdin - I2377 - Keyman menu pops up and off-screen when taskbar is at top of screen
                     30 Nov 2010 - mcdurdin - I2542 - Rework menu styling as per Paul's design
                     10 Dec 2010 - mcdurdin - I2551, I2554 - Keyman crashes when closing menu
                     10 Dec 2010 - mcdurdin - I2555 - Transparency issues in Remote Desktop
                     17 Dec 2010 - mcdurdin - I2542 - Fix horizontal line
-                    11 Jan 2011 - mcdurdin - I2582 - Keyman Desktop menu should pop over OSK
+                    11 Jan 2011 - mcdurdin - I2582 - Keyman menu should pop over OSK
                     31 Jan 2011 - mcdurdin - I2639 - Fix handle and memory leak in Keyman menu
                     31 Jan 2011 - mcdurdin - I2582 - Re-fix for popping over OSK
                     17 Mar 2011 - mcdurdin - I2693 - Crash in Keyman menu with multiple screens and no 'nearest' screen returned
@@ -105,7 +105,7 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMKillFocus(var Message: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMChar(var Message: TMessage); message WM_CHAR;
-    procedure FitToDesktop;
+    procedure FitToDesktop(X, Y: Integer);
     procedure DrawLayer;
     procedure StartCanvas;
     procedure EndCanvas;
@@ -116,7 +116,7 @@ type
     { Private declarations }
   public
     { Public declarations }
-    procedure PopupEx(mnu: TPopupMenu; X, Y: Integer; IconRect: TRect);
+    procedure PopupEx(mnu: TPopupMenu; X, Y: Integer; TaskBarLocation: TAlign);
   end;
 
 implementation
@@ -131,7 +131,7 @@ uses
 
 const
   // +-------------------------------+  H   // I3960
-  // | [] Keyman Desktop             |  I
+  // | [] Keyman                     |  I
   // |===============================|  J
   // |                               |  K
   // |---[] keyboard---|---[] menu---|
@@ -341,6 +341,9 @@ begin
     end;
   end;
 
+  if not ScrollableView then
+    Exit;
+
   for i := 0 to 1 do
   begin
     if FSelectedScrollRect = i
@@ -359,7 +362,7 @@ begin
   end;
 end;
 
-procedure TfrmKeymanMenu.PopupEx(mnu: TPopupMenu; X, Y: Integer; IconRect: TRect);   // I3990
+procedure TfrmKeymanMenu.PopupEx(mnu: TPopupMenu; X, Y: Integer; TaskBarLocation: TAlign);   // I3990
 var
   kmi: TKeymanMenuItem;
   i, ItemWidth, ItemHeight, TempItemHeight: Integer;
@@ -398,6 +401,7 @@ begin
 
   for i := 0 to Fmnu.Items.Count - 1 do
   begin
+    FItemOffsets[i] := 0;
     if Fmnu.Items[i] is TKeymanMenuItem then
     begin
       kmi := Fmnu.Items[i] as TKeymanMenuItem;
@@ -471,22 +475,27 @@ begin
     else Width := OuterBorderWidth + MenuPadding.Left + MaxKeyboardWidth + MenuPadding.Right + MenuPadding.Left + MaxItemWidth + MenuPadding.Right + OuterBorderWidth;
   Height := OuterBorderWidth + TitleAndStripeHeight + MenuPadding.Top + Max(TotalKeyboardHeight, TotalItemHeight) + MenuPadding.Bottom + OuterBorderWidth;
 
-  if not IconRect.IsEmpty then
-  begin
-    if IconRect.Top - Height > 0 then
-      Top := IconRect.Top - Height
-    else
-      Top := IconRect.Bottom;
-
-    if IconRect.Right - Width > 0 then
-      Left := IconRect.Right - Width
-    else
-      Left := IconRect.Left;
-  end
-  else
-  begin
-    Left := X - Width;
-    Top := Y - Height;
+  case taskbarlocation of
+    alLeft:
+      begin
+        Left := X;
+        Top := Y - Height div 2;
+      end;
+    alTop:
+      begin
+        Left := X - Width div 2;
+        Top := Y;
+      end;
+    alRight:
+      begin
+        Left := X - Width;
+        Top := Y - Height div 2;
+      end;
+    alBottom:
+      begin
+        Left := X - Width div 2;
+        Top := Y - Height;
+      end;
   end;
 
   v := OuterBorderWidth + TitleAndStripeHeight + MenuPadding.Top;
@@ -549,7 +558,7 @@ begin
     ScrollRects[1] := Rect(-1,-1,-1,-1);
   end;
 
-  FitToDesktop;
+  FitToDesktop(X, Y);
   Show;
 end;
 
@@ -677,13 +686,13 @@ begin
   DoRedraw;
 end;
 
-procedure TfrmKeymanMenu.FitToDesktop;
+procedure TfrmKeymanMenu.FitToDesktop(X, Y: Integer);
 var
   m: TMonitor;
   wr, mr: TRect;
 begin
   wr := Rect(Left,Top,Left+Width,Top+Height);
-  m := Screen.MonitorFromRect(wr, mdNearest);
+  m := Screen.MonitorFromPoint(Point(X, Y), mdNearest);
   if not Assigned(m)  // I2693, I2820
     then mr := Screen.WorkAreaRect
     else mr := m.WorkareaRect;

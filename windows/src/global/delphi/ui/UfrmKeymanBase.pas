@@ -1,23 +1,23 @@
 (*
   Name:             UfrmKeymanBase
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    2 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Base forms on TTntForm
                     04 Jan 2007 - mcdurdin - Add help support
                     27 Mar 2008 - mcdurdin - Relocated
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman splash from showing multiple copies
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     02 Jun 2015 - mcdurdin - I4565 - CrashID:kmshell.exe_9.0.476.0_2C469740_ERegistryException
@@ -63,19 +63,22 @@ implementation
 uses
   System.Win.Registry,
 
-  ErrorControlledRegistry, 
+  ErrorControlledRegistry,
+  Keyman.System.KeymanSentryClient,
   RegistryKeys;
 
 {$R *.DFM}
 
 procedure TfrmKeymanBase.TntFormCreate(Sender: TObject);
 begin
+  TKeymanSentryClient.Breadcrumb('user', 'Created form '+ClassName, 'form-create');
   RegisterWindow;  // I2720
 end;
 
 procedure TfrmKeymanBase.TntFormDestroy(Sender: TObject);
 begin
   DeregisterWindow;  // I2720
+  TKeymanSentryClient.Breadcrumb('user', 'Destroyed form '+ClassName, 'form-destroy');
 end;
 
 function TfrmKeymanBase.TntFormHelp(Command: Word; Data: NativeInt; var CallHelp: Boolean): Boolean;

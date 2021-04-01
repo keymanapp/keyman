@@ -1,19 +1,19 @@
 (*
   Name:             RunTools
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      30 Dec 2010
 
   Modified Date:    24 Jun 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          30 Dec 2010 - mcdurdin - I2562 - Have a common install utils unit after splitting Keyman Desktop and OEM setup dialogs
+  Bugs:
+  Todo:
+  Notes:
+  History:          30 Dec 2010 - mcdurdin - I2562 - Have a common install utils unit after splitting Keyman D_esktop and OEM setup dialogs
                     31 Dec 2010 - mcdurdin - I2605 - Fixup crash starting Desktop when downloaded locale is selected post-upgrade
                     14 Jan 2011 - mcdurdin - I2645 - Refactor install process steps - move SetupMSI to individual forms
                     17 Jan 2011 - mcdurdin - I1917 - Fix references to patchurl, patchsize; show correct file size and save to correct filename
@@ -28,8 +28,8 @@
                     22 Feb 2011 - mcdurdin - I2755 - Setup.log should be stored in Diag folder
                     22 Feb 2011 - mcdurdin - I2754 - Auto update is too silent and reboots unexpectedly for user
                     22 Feb 2011 - mcdurdin - I2757 - Installer does not wait for kmshell actions to complete before continuing
-                    22 Feb 2011 - mcdurdin - I2756 - Keyman Desktop is not starting after update
-                    28 Feb 2011 - mcdurdin - I2768 - Keyman Desktop setup fails on a new computer (regression)
+                    22 Feb 2011 - mcdurdin - I2756 - Keyman D_esktop is not starting after update
+                    28 Feb 2011 - mcdurdin - I2768 - Keyman D_esktop setup fails on a new computer (regression)
                     18 Mar 2011 - mcdurdin - I2792 - Fix crash logging import of older keyboards
                     03 May 2011 - mcdurdin - I2896 - Check root certificate availability
                     04 Jul 2011 - mcdurdin - I2970 - Keyman installer should not set defaults for OEM products
@@ -63,6 +63,7 @@ type
   TRunTools = class
   private
     FSilent: Boolean;
+    FMustReboot: Boolean;
     FPromptForReboot: Boolean;  // I3355   // I3500
     FErrorLog: TFileStream;
     StatusMax: Integer;
@@ -106,6 +107,7 @@ type
 
     class procedure CheckInstalledVersion(msiLocation: TInstallInfoFileLocation);
 
+    property MustReboot: Boolean read FMustReboot;
     property Silent: Boolean read FSilent write FSilent;
     property PromptForReboot: Boolean read FPromptForReboot write FPromptForReboot;  // I3355   // I3500
     property Online: Boolean read FOnline;
@@ -147,6 +149,7 @@ uses
   SFX,
   TntDialogHelp,
   ErrorControlledRegistry,
+  utildir,
   utilsystem,
   utilexecute,
   VersionInfo;
@@ -646,6 +649,11 @@ var
       TUtilExecute.CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode);
     end;
   end;
+
+  function IsKeymanRunning: Boolean;
+  begin
+    Result := FindWindow('TfrmKeyman7Main', nil) <> 0;
+  end;
 begin
   FKMShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
   if System.SysUtils.FileExists(FKMShellPath) then
@@ -664,7 +672,7 @@ begin
     if FInstallInfo.Packages.Count > 0 then
       DoInstallPackages;
 
-    // Configure Keyman Desktop for initial install, both local-machine,
+    // Configure Keyman for initial install, both local-machine,
     // and current-user
     s := '-firstrun=';
 
@@ -695,24 +703,36 @@ begin
 
     FExitCode := 0;
     if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode) then // I2757
-      LogError('Failed to setup default options for Keyman Desktop: '+SysErrorMessage(GetLastError))
+      LogError('Failed to setup default options for Keyman: '+SysErrorMessage(GetLastError))
     else if FExitCode = 2 then
     begin
-      LogError('Failed to setup Keyman Desktop to start with Windows; this action may have been blocked by security software.');
+      LogError('Failed to setup Keyman to start with Windows; this action may have been blocked by security software.');
     end;
   end;
 
   DeleteBackupPath;  // I2747
 
+  // Delete the Keyman autostart backup
+  with CreateHKCURegistry do
+  try
+    if OpenKey('\' + SRegKey_KeymanDesktop_CU, True) and ValueExists(SRegValue_UpgradeRunKeyman) then
+      DeleteValue(SRegValue_UpgradeRunKeyman);
+  finally
+    Free;
+  end;
+
   if StartKeyman then  // I2738
   begin
     if System.SysUtils.FileExists(FKMShellPath) then
     begin
-      s := '"'+FKMShellPath+'"';
-      if StartWithConfiguration then
-        s := s + ' -startWithConfiguration';
-      if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
-        LogError('Failed to start Keyman Desktop: '+SysErrorMessage(GetLastError), False); // I2756
+      if StartWithConfiguration or not IsKeymanRunning then
+      begin
+        s := '"'+FKMShellPath+'"';
+        if StartWithConfiguration then
+          s := s + ' -startWithConfiguration';
+        if not TUtilExecute.CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
+          LogError('Failed to start Keyman: '+SysErrorMessage(GetLastError), False); // I2756
+      end;
     end;
   end;
 
@@ -720,14 +740,38 @@ begin
 end;
 
 procedure TRunTools.PrepareForReboot(res: Cardinal);
+var
+  FTempFilename: string;
 begin
+  FMustReboot := True;
+
   with CreateHKCURegistry do  // I2749
   try
     if OpenKey(SRegKey_WindowsRunOnce_CU, True) then
-      WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c');
+    begin
+      FTempFilename := KGetTempFilename;
+      FInstallInfo.SaveToJSONFile(FTempFilename);
+      WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c "'+FTempFilename+'"');
+    end;
   finally
     Free;
   end;
+
+  // Delete the Keyman autostart; it will be reinstated when setup finishes
+  // but this avoids conflict of Keyman starting while the setup is still
+  // running
+  with CreateHKCURegistry do
+  try
+    if OpenKey(SRegKey_WindowsRun_CU, False) and ValueExists(SRegValue_WindowsRun_Keyman) then
+    begin
+      DeleteValue(SRegValue_WindowsRun_Keyman);
+      if OpenKey('\' + SRegKey_KeymanDesktop_CU, True) then
+        WriteBool(SRegValue_UpgradeRunKeyman, True);
+    end;
+  finally
+    Free;
+  end;
+
 
   if res = ERROR_SUCCESS_REBOOT_REQUIRED then
   begin

@@ -1,6 +1,7 @@
-export const findLastHistoryPR = `
+export function findLastHistoryPR(base: string) {
+  return `
   query FindLastPR {
-    search(query: "is:pr is:merged sort:created-desc repo:keymanapp/keyman author:keyman-server label:auto \\"auto: increment\\"", last: 1, type: ISSUE) {
+    search(query: "is:pr is:merged sort:created-desc repo:keymanapp/keyman author:keyman-server label:auto \\"auto: increment\\" base:${base}", last: 1, type: ISSUE) {
       nodes {
         ... on PullRequest {
           number
@@ -12,6 +13,7 @@ export const findLastHistoryPR = `
     }
   }
 `;
+};
 
 export const getAssociatedPR = `
   query associatedPRs($sha: String!) {

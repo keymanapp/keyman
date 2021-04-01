@@ -38,13 +38,16 @@ namespace com.keyman.osk {
 
     // OSK positioning fields
     userPositioned: boolean = false;
-    width: number;
-    height: number;
     x: number;
     y: number;
     noDrag: boolean = false;
     dfltX: string;
     dfltY: string;
+
+    // Fields used to store target OSK size when no keyboard has been loaded
+    // If a keyboard has been loaded, the VisualKeyboard values override these.
+    _baseWidth: number;
+    _baseHeight: number;
 
     // OSK resizing-event state fields
     resizing: boolean;
@@ -102,12 +105,12 @@ namespace com.keyman.osk {
             e.stopPropagation();
             return false;
           };
-          
+
           util.attachDOMEvent(this._Box, 'touchstart', function(e) {
-            keymanweb.uiManager.setActivatingUI(true); 
+            keymanweb.uiManager.setActivatingUI(true);
             return cancelEventFunc(e);
           });
-          
+
           util.attachDOMEvent(this._Box, 'touchend', cancelEventFunc);
           util.attachDOMEvent(this._Box, 'touchmove', cancelEventFunc);
           util.attachDOMEvent(this._Box, 'touchcancel', cancelEventFunc);
@@ -182,7 +185,7 @@ namespace com.keyman.osk {
           if(device.OS == 'Android' && 'devicePixelRatio' in window) {
             pixelRatio = window.devicePixelRatio;
           }
-          
+
           if(device.OS == 'Android' && device.formFactor == 'tablet' && this.getHeight() < 300 * pixelRatio) {
             fontScale *= 1.2;
           } else {
@@ -194,8 +197,10 @@ namespace com.keyman.osk {
         s.fontSize = fontScale + 'em';
       }
 
+      if(this.vkbd) {
+        this.vkbd.shutdown();
+      }
       this.vkbd = null;
-      // TODO:  Consider a 'vkbd.release()' method?
 
       // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
       this._Box.innerHTML = '';
@@ -256,8 +261,14 @@ namespace com.keyman.osk {
       }
 
       // Correct the classname for the (inner) OSK frame (Build 360)
+      var kbdID: string = (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
+      if(keymanweb.isEmbedded && kbdID.indexOf('::') != -1) {
+        // De-namespaces the ID for use with CSS classes.
+        // Assumes that keyboard IDs may not contain the ':' symbol.
+        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
+      }
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
-        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
+        kbdClass = ' kmw-keyboard-' + kbdID;
       if(innerFrame.id == 'keymanweb_title_bar') {
         // Desktop order is title_bar, banner_container, inner-frame
         innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;
@@ -282,16 +293,35 @@ namespace com.keyman.osk {
       }
     }
 
+    private get width(): number {
+      if(this.vkbd) {
+        return this.vkbd.width;
+      } else {
+        return this._baseWidth;
+      }
+    }
+
+    private get height(): number {
+      if(this.vkbd) {
+        return this.vkbd.height;
+      } else {
+        return this._baseHeight;
+      }
+    }
+
     /**
      * Function     _GenerateVisualKeyboard
      * Scope        Private
      * @param       {Object}      PVK         Visual keyboard name
      * @param       {Object}      Lhelp       true if OSK defined for this keyboard
-     * @param       {Object}      layout0 
+     * @param       {Object}      layout0
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
     private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard) {
+      if(this.vkbd) {
+        this.vkbd.shutdown();
+      }
       this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard);
       let util = com.keyman.singleton.util;
 
@@ -587,8 +617,7 @@ namespace com.keyman.osk {
       }
 
       var r=this.getRect();
-      this.width = r.width;
-      this.height = r.height;
+      this.setSize(r.width, r.height, true);
       e.cancelBubble = true;
       return false;
     }.bind(this);
@@ -686,12 +715,8 @@ namespace com.keyman.osk {
           newWidth=0.5*screen.height;
         }
 
-        // Set OSK width
-        this.vkbd.kbdDiv.style.width=newWidth+'px';
-
-        // Explicitly change OSK height and font size - cannot safely rely on scaling from font
-        this.vkbd.kbdDiv.style.height=newHeight+'px';
-        this.vkbd.kbdDiv.style.fontSize=(newHeight/8)+'px';
+        // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font
+        this.setSize(newWidth, newHeight);
 
         if(e  &&  e.preventDefault) {
           e.preventDefault();
@@ -718,7 +743,7 @@ namespace com.keyman.osk {
       }
 
       this.resizing = true;
-      if (e.pageX) { 
+      if (e.pageX) {
         Lposx = e.pageX;
         Lposy = e.pageY;
       } else if (e.clientX) {
@@ -795,8 +820,9 @@ namespace com.keyman.osk {
         }
 
         var r=this.getRect();
-        this.width=r.width;
-        this.height=r.height;
+        this.setSize(r.width, r.height, true);
+        this.x = r.left;
+        this.y = r.top;
         e.cancelBubble = true;
         return false;
       }
@@ -873,14 +899,10 @@ namespace com.keyman.osk {
      *
      *  @return {boolean}
      */
-    loadCookie() {
+    loadCookie(): void {
       let util = com.keyman.singleton.util;
 
       var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      if(typeof(c) == 'undefined' || c == null) {
-        this.userPositioned=false;
-        return false;
-      }
 
       this._Enabled = util.toNumber(c['visible'], 1) == 1;
       this.userPositioned = util.toNumber(c['userSet'], 0) == 1;
@@ -907,11 +929,7 @@ namespace com.keyman.osk {
         newHeight=0.5*screen.height;
       }
 
-      if(this.vkbd) {
-        this.vkbd.kbdDiv.style.width=newWidth+'px';
-        this.vkbd.kbdDiv.style.height=newHeight+'px';
-        this.vkbd.kbdDiv.style.fontSize=(newHeight/8)+'px';
-      }
+      this.setSize(newWidth, newHeight);
 
       // and OSK position if user located
       if(this.x == -1 || this.y == -1 || (!this._Box)) {
@@ -930,28 +948,17 @@ namespace com.keyman.osk {
       if(this.userPositioned && this._Box) {
         this.setPos({'left': this.x, 'top': this.y});
       }
-
-      return true;
     }
 
-    getWidthFromCookie(): number {
-      let util = com.keyman.singleton.util;
-
-      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      if(typeof(c) == 'undefined' || c == null) {
-        return screen.width * 0.3;
+    private setSize(width?: number, height?: number, pending?: boolean) {
+      if(width && height) {
+        this._baseWidth = width;
+        this._baseHeight = height;
       }
 
-      // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-      var newWidth=util.toNumber(c['width'], 0.3 * screen.width); // Default - 30% of screen's width.
-
-      if(newWidth < 0.2*screen.width) {
-        newWidth = 0.2*screen.width;
-      } else if(newWidth > 0.9*screen.width) {
-        newWidth=0.9*screen.width;
+      if(this.vkbd) {
+        this.vkbd.setSize(width, height, pending);
       }
-
-      return newWidth;
     }
 
     /**
@@ -1062,19 +1069,19 @@ namespace com.keyman.osk {
      * Description  Get rectangle containing KMW Virtual Keyboard
      */
     ['getRect'](): OSKRect {		// I2405
-      let util = com.keyman.singleton.util;
       var p: OSKRect = {};
 
+      // Always return these based upon _Box; using this.vkbd will fail to account for banner and/or
+      // the desktop OSK border.
+      p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
+      p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
+
       if(this.vkbd) {
-        p['left'] = p.left = dom.Utils.getAbsoluteX(this.vkbd.kbdDiv);
-        p['top']  = p.top  = dom.Utils.getAbsoluteY(this.vkbd.kbdDiv);
         p['width']  = p.width  = dom.Utils.getAbsoluteX(this.vkbd.kbdHelpDiv) -
           dom.Utils.getAbsoluteX(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetWidth;
         p['height'] = p.height = dom.Utils.getAbsoluteY(this.vkbd.kbdHelpDiv) -
           dom.Utils.getAbsoluteY(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetHeight;
       } else {
-        p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
-        p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
         p['width']  = p.width  = dom.Utils.getAbsoluteX(this._Box) + this._Box.offsetWidth;
         p['height'] = p.height = dom.Utils.getAbsoluteY(this._Box) + this._Box.offsetHeight;
       }
@@ -1118,7 +1125,7 @@ namespace com.keyman.osk {
             w=0.9*screen.width;
           }
           ds.width=w+'px';
-          this.width=w;
+          this.setSize(w, this.height, true);
         }
 
         // Set height, but limit to reasonable value
@@ -1134,7 +1141,7 @@ namespace com.keyman.osk {
             h=0.5*screen.height;
           }
           ds.height=h+'px'; ds.fontSize=(h/8)+'px';
-          this.height=h;
+          this.setSize(this.width, h, true);
         }
 
         // Fix or release user resizing
@@ -1242,7 +1249,7 @@ namespace com.keyman.osk {
         /* In case it's still '0' from a hide() operation.
          * Happens when _Show is called before the transitionend events are processed,
          * which can happen in bulk-rendering contexts.
-         * 
+         *
          * (Opacity is only modified when device.touchable = true, though a couple of extra
          * conditions may apply.)
          */
@@ -1293,7 +1300,7 @@ namespace com.keyman.osk {
             // Special case - design mode iframes.  Don't use the active element (inside the design-mode doc);
             // use its containing iframe from the doc itself.
             let ownerDoc = el.ownerDocument;
-            if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) { 
+            if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) {
               el = ownerDoc.defaultView.frameElement as HTMLElement;
             }
             if(this.dfltX) {
@@ -1311,9 +1318,8 @@ namespace com.keyman.osk {
         }
         this._Enabled=true;
         this._Visible=true;
-        if(this.vkbd && this.vkbd.kbdDiv) {
-          this.width=this.vkbd.kbdDiv.offsetWidth;
-          this.height=this.vkbd.kbdDiv.offsetHeight;
+        if(this.vkbd) {
+          this.vkbd.refit();
         }
 
         this.saveCookie();
@@ -1352,10 +1358,14 @@ namespace com.keyman.osk {
       // Once picklist functionality is separated out, this will no longer be needed.
       // Logic is: execute always if hidden on lost focus, but if requested by user, only if not CJK
 
+      if(keymanweb.isEmbedded) {
+        // We never hide the keyboard in embedded mode
+        return;
+      }
+
       // Save current size if visible
-      if(this._Box && this._Box.style.display == 'block' && this.vkbd && this.vkbd.kbdDiv) {
-        this.width = this.vkbd.kbdDiv.offsetWidth;
-        this.height = this.vkbd.kbdDiv.offsetHeight;
+      if(this._Box && this._Box.style.display == 'block' && this.vkbd) {
+        this.vkbd.refit();
       }
 
       if(hiddenByUser) {

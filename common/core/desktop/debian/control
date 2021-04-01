@@ -1,42 +1,26 @@
 Source: keyman-keyboardprocessor
-Build-Depends: debhelper (>=9~),
-               meson (>= 0.40),
-               ninja-build
 Section: text
 Priority: optional
 Maintainer: Debian Input Method Team <debian-input-method@lists.debian.org>
-Uploaders: Daniel Glassey <wdg@debian.org>, Keyman team <support@keyman.com>
-Standards-Version: 3.9.8
+Uploaders:
+ Daniel Glassey <wdg@debian.org>,
+ Keyman team <support@keyman.com>,
+ Eberhard Beilharz <eb1@sil.org>,
+Build-Depends:
+ debhelper (>= 11),
+ meson (>= 0.45),
+ ninja-build,
+Standards-Version: 4.5.1
+Vcs-Git: https://github.com/keymanapp/keyman.git
+Vcs-Browser: https://github.com/keymanapp/keyman/tree/master/common/core/desktop
 Homepage: https://www.keyman.com
-Vcs-Browser: https://salsa.debian.org/input-method-team/keyman-keyboardprocessor
-Vcs-Git: https://salsa.debian.org/input-method-team/keyman-keyboardprocessor.git
-
-Package: libkmnkbp0-0
-Architecture: any
-Section: libs
-Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Suggests: keyman
-Multi-Arch: same
-Description: Keyman keyboard processing library
- Originally created in 1993 to type Lao on Windows, Keyman is now a free and
- open source keyboarding platform which allows anyone to write a keyboard layout
- for their language. Keyman is available for many platforms, including Windows,
- macOS, iOS, Android, Linux and the web.
- .
- Keyboard layouts are defined with a clear and easy to understand keyboard
- grammar. Keyman's contextual input model means keyboard layouts can be
- intelligent and make it simple to type even the most complex languages.
- Keyboard layouts are distributed through an open catalog to all major desktop
- and mobile platforms.
- .
- The Keyman keyboardprocessor library processes input from input method engines
- and applies rules from compiled Keyman 11 or earlier kmx keyboard files.
 
 Package: libkmnkbp-dev
 Architecture: any
 Section: libdevel
-Depends: libkmnkbp0-0 (= ${binary:Version}), ${misc:Depends}
+Depends:
+ libkmnkbp0-0 (= ${binary:Version}),
+ ${misc:Depends},
 Multi-Arch: same
 Description: Development files for Keyman keyboard processing library
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
@@ -54,3 +38,29 @@ Description: Development files for Keyman keyboard processing library
  and applies rules from compiled Keyman 11 or earlier kmx keyboard files.
  .
  This package contains development headers and libraries.
+
+Package: libkmnkbp0-0
+Architecture: any
+Section: libs
+Pre-Depends:
+ ${misc:Pre-Depends},
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Suggests:
+ keyman,
+Multi-Arch: same
+Description: Keyman keyboard processing library
+ Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+ open source keyboarding platform which allows anyone to write a keyboard layout
+ for their language. Keyman is available for many platforms, including Windows,
+ macOS, iOS, Android, Linux and the web.
+ .
+ Keyboard layouts are defined with a clear and easy to understand keyboard
+ grammar. Keyman's contextual input model means keyboard layouts can be
+ intelligent and make it simple to type even the most complex languages.
+ Keyboard layouts are distributed through an open catalog to all major desktop
+ and mobile platforms.
+ .
+ The Keyman keyboardprocessor library processes input from input method engines
+ and applies rules from compiled Keyman 11 or earlier kmx keyboard files.

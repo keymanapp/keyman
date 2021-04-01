@@ -1,18 +1,18 @@
-html, body { 
+html, body {
   padding: 0px;
-  margin: 0px; 
-  overflow: hidden; 
+  margin: 0px;
+  overflow: hidden;
   font-size: 15px;
   background: white;
 }
 
-div { 
-  position: static; 
+div {
+  position: static;
 }
 
 #size {
-  position: absolute; 
-  left: 0; 
+  position: absolute;
+  left: 0;
   top: 0;
   border: solid 1px #444444;
   background: white;
@@ -23,12 +23,17 @@ div {
 #displaylanguage { top: 40px; right: 12px; position: absolute; color: white; }
 #displaylanguage a { color: white; }
 
-#titleBox { 
-  position: absolute; left: 20px; top: 24px; background: url("keyman-desktop-486x50-black.png"); width: 486px; height: 50px; 
+#titleBox {
+  position: absolute;
+  left: 20px;
+  top: 26px;
+  background: url("keyman-desktop-486x50-black.png") no-repeat;
+  width: 486px;
+  height: 50px;
 }
 
 #silLogo {
-  position: absolute; right: 20px; top: 24px; background: url("sil-logo-blue.png"); width: 48px; height: 50px; 
+  position: absolute; right: 20px; top: 24px; background: url("sil-logo-blue.png"); width: 48px; height: 50px;
 }
 
 #family {
@@ -40,15 +45,19 @@ div {
   left: 0;
   bottom: 0;
   position: absolute;
-  width: 700px; 
+  width: 700px;
   padding: 8px;
 }
 
-#version { 
-  position: absolute; font-size: 0.8em; right: 90px; bottom: 10px; color: #F68924 
+#version {
+  position: absolute;
+  font-size: 0.8em;
+  right: 120px;
+  bottom: 10px;
+  color: #F68924;
 }
 
-#beta { 
+#beta {
   color: red; font-weight: bold;
 }
 
@@ -61,7 +70,7 @@ div {
   height: 84px;
   max-height: 84px;
   overflow-y: auto;
-  width: 400px;
+  width: 360px;
   padding: 0 16px 0 0;
 }
 
@@ -74,22 +83,22 @@ a.button {
 }
 
 .btn {
-  float: left; 
-  width: 160px; 
-  height: 26px; 
+  float: left;
+  width: 160px;
+  height: 26px;
   font-weight: bold;
   font-size: 18px;
   padding: 4px 12px 4px 12px;
-  text-align: center; 
+  text-align: center;
   border-radius: 4px;
-  color: #33333f; 
+  color: #33333f;
 }
 
-.btn-orange { 
-  background: #F68924; 
+.btn-orange {
+  background: #F68924;
 }
 
-.btn-blue { 
+.btn-blue {
   background: #79C3DA;
 }
 
@@ -98,22 +107,22 @@ a.button {
   color: #fcf8f8;
 }
 
-.btn-small { 
-  width: 61px; 
-  height: 20px; 
-  font-size: 15px; 
-  padding: 1px 6px 1px 6px; 
+.btn-small {
+  width: 61px;
+  height: 20px;
+  font-size: 15px;
+  padding: 1px 6px 1px 6px;
   background: #F68924;
-  border-radius: 3px; 
+  border-radius: 3px;
 }
 
-#ribbon { 
-  position: absolute; 
-  left: 0; 
-  top: 100px; 
-  width: 100%; 
-  height: 8px; 
-  background: #79C3DA; 
+#ribbon {
+  position: absolute;
+  left: 0;
+  top: 100px;
+  width: 100%;
+  height: 8px;
+  background: #79C3DA;
 }
 
 #ribbon div {
@@ -132,23 +141,33 @@ a.button {
   background: #CC3846;
 }
 
-#tasks { 
-  position: absolute; 
+#tasks {
+  position: absolute;
   left: 0; bottom: 0; margin-left: 8px; margin-bottom: 8px; font-size: 13px }
 #tasks div { margin-bottom: 2px; margin-left: 4px }
 
-#startNow { 
-  left: 434px;
-  top: 332px; 
+#startNow {
+  right: 12px;
+  top: 332px;
   height: 1.2em;
 }
 
+#startNow .btn,
+#config .btn {
+  width: 180px;
+  text-overflow: ellipsis;
+}
+
 #config {
-  left: 434px;
+  right: 12px;
   top: 372px;
 }
 
 #exit { right: 12px; bottom: 12px; }
+
+#exit .btn-small {
+  width: 90px;
+}
 
 #tasks div#showAtStartupBox { margin-top: 6px; margin-left: 0; }
 #tasks a, #showAtStartupLabel { color: #F68924; text-decoration: none; }

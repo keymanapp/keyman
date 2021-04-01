@@ -4,6 +4,7 @@
 
 package com.tavultesoft.kmapro;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.FormFactor;
@@ -20,15 +21,15 @@ import android.widget.TextView;
 import android.annotation.SuppressLint;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class InfoActivity extends AppCompatActivity {
+public class InfoActivity extends BaseActivity {
   private final static String TAG = "InfoActivity";
   private WebView webView;
   private final String HELP_PRODUCTION_HOST = "help.keyman.com";
   private final String HELP_STAGING_HOST = "help.keyman-staging.com";
-  private final String HELP_BASE_FORMAT_STR = "https://%s/products/android/%s/%s?embed=android&formfactor=%s";
+  private final String HELP_BASE_FORMAT_STR = "https://%s/products/android/%s";
   private String kmUrl = "";
-  private final String htmlPath = "file:///android_asset/info/products/android";
-  private final String htmlPage = "index.php";
+  private final String htmlPath = "file:///android_asset/info";
+  private final String htmlPage = "index.html";
   private String kmOfflineUrl = "";
 
   @SuppressLint("SetJavaScriptEnabled")
@@ -71,9 +72,9 @@ public class InfoActivity extends AppCompatActivity {
         helpHost = HELP_PRODUCTION_HOST;
     }
 
-    kmUrl = String.format(HELP_BASE_FORMAT_STR, helpHost, majorMinorVersion, htmlPage, formFactor);
+    kmUrl = String.format(HELP_BASE_FORMAT_STR, helpHost, majorMinorVersion);
     // The offline mirroring process (currently) adds .html to the end of the whole string.
-    kmOfflineUrl = String.format("%s/%s/%s.html", htmlPath, formFactor, htmlPage);
+    kmOfflineUrl = String.format("%s/%s", htmlPath, htmlPage);
     webView = (WebView) findViewById(R.id.infoWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
     webView.getSettings().setJavaScriptEnabled(true);

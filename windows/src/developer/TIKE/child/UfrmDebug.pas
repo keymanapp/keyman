@@ -1,18 +1,18 @@
 (*
   Name:             UfrmDebug
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
+  Bugs:
   Todo:             If input is entered into the editor, close the debug form after query -- don't worry about this.
-  Notes:            
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rename FTikeOptiosn to FKeymanDeveloperOptions
                     23 Aug 2006 - mcdurdin - Extracted from TfrmEditor to be a dockable window
@@ -48,7 +48,7 @@
                     24 Jul 2015 - mcdurdin - I4796 - Refresh Keyman Developer look and feel for release
                     03 Aug 2015 - mcdurdin - I4808 - Add character preview to debug window
                     03 Aug 2015 - mcdurdin - I4809 - Track keystrokes in debug status form
-                    
+
 *)
 
 
@@ -134,6 +134,7 @@ type
       Rect: TRect; State: TGridDrawState);   // I4808
     procedure memoClick(Sender: TObject);   // I4808
     procedure memoKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormResize(Sender: TObject);
   private
 
     FDebugVisible: Boolean;
@@ -366,6 +367,12 @@ begin
   //UninitControlCaptions;
   //UninitSystemKeyboard;
   UninitDeadkeys;
+end;
+
+procedure TfrmDebug.FormResize(Sender: TObject);
+begin
+  inherited;
+  UpdateCharacterGrid;
 end;
 
 function TfrmDebug.frmDebugStatus: TForm;
@@ -777,7 +784,7 @@ begin
       begin
         FLastError := GetLastError;
         FailTidyUp;
-        ShowMessage('Unable to start Keyman Desktop for debugging - please make sure that Keyman Desktop is correctly installed (the error code was '+IntToHex(FLastError, 8)+').');  // I3173   // I3504
+        ShowMessage('Unable to start Keyman for debugging - please make sure that Keyman is correctly installed (the error code was '+IntToHex(FLastError, 8)+').');  // I3173   // I3504
         Exit;
       end;
       if FWasStarted then  // I3283   // I3503
@@ -1201,7 +1208,7 @@ begin
   if FUIStatus <> Value then
   begin
     if not FCanDebug and (Value <> duiTest) then Exit;
-    
+
     FOldUIStatus := FUIStatus;
     FUIStatus := Value;
 
@@ -1599,53 +1606,53 @@ end;
 
 procedure TfrmDebug.UpdateCharacterGrid;   // I4808
 var
-  SelStart, MaxCols, I: Integer;
-  s: WideString;
+  SelStart, SelLength, MaxCols, I: Integer;
+  s: string;
   J: Integer;
   K: Integer;
 begin
-  MaxCols := (sgChars.ClientWidth div (sgChars.DefaultColWidth + 1) - 1) * 2; // Handle surrogate pairs easily
+  MaxCols := sgChars.ClientWidth div (sgChars.DefaultColWidth + 1);
 
-  if memo.SelLength <> 0 then
+  if memo.SelLength < 0 then
   begin
-    SelStart := memo.SelStart + 1;
-    if memo.SelLength < 0 then Inc(SelStart, memo.SelLength);
-    s := memo.SelText;
+    SelStart := memo.SelStart + memo.SelLength;
+    SelLength := -memo.SelLength;
+  end
+  else if memo.SelLength > 0 then
+  begin
+    SelStart := memo.SelStart;
+    SelLength := memo.SelLength;
   end
   else
   begin
-    I := memo.SelStart - MaxCols;
-    if I < 1 then I := 1;
-    SelStart := I;
-    s := Copy(memo.Text, I, memo.SelStart - I + 1);
+    SelStart := 0;
+    SelLength := memo.SelStart;
   end;
 
-  if Length(s) > MaxCols then
+  s := Copy(memo.Text, 1, SelStart+SelLength);
+
+  J := 0; I := SelStart + SelLength; // I is 1-based Delphi string index
+  while (J < MaxCols) and (I > SelStart) do
   begin
-    Inc(SelStart, Length(s) - MaxCols - 1);
-    Delete(s, 1, Length(s) - MaxCols - 1);
+    if (I > 1) and Uni_IsSurrogate2(s[I]) and Uni_IsSurrogate1(s[I-1]) then
+      Dec(I);
+    Inc(J); Dec(I);
   end;
 
-  if (s<>'') and Uni_IsSurrogate2(s[1]) then
-  begin
-    Inc(SelStart);
-    Delete(s,1,1);
-  end;
-
-  if Length(s) = 0 then
+  if J = 0 then
   begin
     sgChars.ColCount := 1;
     sgChars.Objects[0,0] := Pointer(0);
     sgChars.Cells[0,0] := '';
     sgChars.Cells[0,1] := '';
+    Exit;
   end
   else
-    sgChars.ColCount := Length(s);
+    sgChars.ColCount := J;
 
-  MaxCols := MaxCols div 2; // Handle surrogate pairs easily
-
-  I := 1; J := 0;
-  while I <= Length(s) do
+  Inc(I);
+  J := 0;
+  while J < sgChars.ColCount do
   begin
     if Ord(S[I]) = $FFFC then
     begin
@@ -1654,7 +1661,7 @@ begin
       for K := 0 to deadkeys.Count-1 do
         if TDeadKeyInfo(deadkeys[K]).Position = I+SelStart-2 then
         begin
-          sgChars.Cells[J, 0] := TDeadKeyInfo(deadkeys[K]).Deadkey.Name;// IntToStr(K);//deadkeys '???';
+          sgChars.Cells[J, 0] := TDeadKeyInfo(deadkeys[K]).Deadkey.Name;
           break;
         end;
       sgChars.Cells[J, 1] := 'Deadkey';
@@ -1673,11 +1680,7 @@ begin
       sgChars.Cells[J, 1] := 'U+'+IntToHex(Ord(s[i]), 4);
     end;
     Inc(J); Inc(I);
-    if J >= MaxCols then
-      Break;
   end;
-
-  sgChars.ColCount := J;
 
   with sgChars.Canvas do
   begin

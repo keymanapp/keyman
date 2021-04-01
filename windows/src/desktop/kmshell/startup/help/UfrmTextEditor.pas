@@ -1,18 +1,18 @@
 (*  r
   Name:             UfrmTextEditor
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Mar 2008
 
   Modified Date:    1 Sep 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Mar 2008 - mcdurdin - I1248 - Initial version
                     14 Jun 2008 - mcdurdin - I1356 - Refresh fonts when they change
                     14 Jun 2008 - mcdurdin - I1449 - Resize hint bar to size of hint content
@@ -29,7 +29,7 @@
                     03 Feb 2011 - mcdurdin - I2697 - Fix potential race condition on termination of check fonts thread
                     03 Feb 2011 - mcdurdin - I2698 - Font styling shortcuts for text editor
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman D_esktop splash from showing multiple copies
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     08 Jun 2012 - mcdurdin - I3349 - V9.0 - Consolidate all process creation into TUtilExecute
@@ -39,7 +39,7 @@
                     01 May 2014 - mcdurdin - I4181 - V9.0 - Stop using DeleteFileAlways, MOVEFILE_DELAY_UNTIL_REBOOT
                     03 Jul 2014 - mcdurdin - I3674 - V9.0 - Getting Started window gives instructions that are not valid for KM9
                     01 Sep 2014 - mcdurdin - I4397 - V9.0 - Get Started gets impatient and shows nag too quickly on start
-                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman Desktop Free Edition polish
+                    01 Sep 2014 - mcdurdin - I4393 - V9.0 - Keyman D_esktop Free Edition polish
 
 *)
 unit UfrmTextEditor;  // I3306
@@ -168,7 +168,7 @@ type
 
     procedure CheckKeyboardFonts(FSetFont: Boolean);
     procedure CheckFontsThreadComplete(Sender: TObject);
-    procedure LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = '');   // I4181
+    procedure LoadWebBox(web: TframeCEFHost; const AdditionalData: WideString = '');   // I4181
 
     procedure HideFontsBox;
     procedure FireCommand(const command: WideString; params: TStringList);
@@ -197,6 +197,8 @@ uses
   KeymanControlMessages,
   KLog,
   keymanapi_TLB,
+  Keyman.Configuration.System.UmodWebHttpServer,
+  Keyman.Configuration.System.HttpServer.App.TextEditorFonts,
   kmint,
   KMShellHints,
   ErrorControlledRegistry,
@@ -208,7 +210,8 @@ uses
   utilhttp,
   utilsystem,
   UtilExecute,
-  utilxml, UfrmWebContainer;
+  utilxml,
+  UfrmWebContainer;
 
 resourcestring
   sSaveChanges = 'Save changes to %s?';
@@ -241,6 +244,7 @@ end;
 procedure TfrmTextEditor.TntFormClose(Sender: TObject; var Action: TCloseAction);
 begin
   inherited;
+  cefFonts.Free;
   Action := caFree;  // I2482
 end;
 
@@ -250,6 +254,7 @@ begin
   wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
   wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
 
+  HelpTopic := 'context/text-editor';
   Caption := MsgFromId(SKTextEditorCaption);
 
   FCheckFontKeyboards := TCheckFontKeyboards.Create;
@@ -258,7 +263,7 @@ begin
   HideFontsBox;
 
   cefFonts := TframeCEFHost.Create(Self);
-  cefFonts.Parent := Self;
+  cefFonts.Parent := panFonts;
   cefFonts.Visible := True;
   cefFonts.ShouldOpenRemoteUrlsInBrowser := True;
   cefFonts.OnCommand := cefCommand;
@@ -360,10 +365,14 @@ begin
 end;}
 
 
-procedure TfrmTextEditor.LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = '');   // I4181
+procedure TfrmTextEditor.LoadWebBox(web: TframeCEFHost; const AdditionalData: WideString = '');   // I4181
+var
+  Data: ITextEditorFontsSharedData;
+  PageTag: Integer;
 begin
-  // TODO: deal with AdditionalData (query params?)
-  web.Navigate('/page/'+name); //FXMLFileName.Name);   // I4181
+  Data := TTextEditorFontsSharedData.Create(AdditionalData);
+  PageTag := modWebHttpServer.SharedData.Add(Data);
+  web.Navigate(modWebHttpServer.Host + '/page/welcome_fonts?tag='+IntToStr(PageTag));
 end;
 
 procedure TfrmTextEditor.mnuViewFontHelperClick(Sender: TObject);
@@ -452,9 +461,6 @@ begin
   CheckKeyboardFonts(False);
 end;
 
-const
-  KR_REFRESH = 2;
-
 {------------------------------------------------------------------------------------------------}
 
 procedure TfrmTextEditor.editorSelectionChange(Sender: TObject);
@@ -507,7 +513,7 @@ end;
 
 procedure TfrmTextEditor.Help2Click(Sender: TObject);
 begin
-  Application.HelpJump('context_tutorial');
+  Application.HelpJump(HelpTopic);
 end;
 
 procedure TfrmTextEditor.HideFontsBox;
@@ -560,7 +566,7 @@ begin
   lang := kmcom.Control.ActiveLanguage;
   if (lang = nil) or (lang.KeymanKeyboardLanguage = nil) then
   begin
-    LoadWebBox(cefFonts, 'welcome_fonts', '<not_keyman />');   // I4181
+    LoadWebBox(cefFonts, '<not_keyman />');   // I4181
     //HideFontsBox;
     Exit;
   end;
@@ -570,7 +576,7 @@ begin
     FKeyboard := FCheckFontKeyboards.Keyboards[lang.KeymanKeyboardLanguage.OwnerKeyboard.ID];
     if not Assigned(FKeyboard) then
     begin
-      LoadWebBox(cefFonts, 'welcome_fonts', ''); // I1534 - show hint for non-Unicode keyboards   // I4181
+      LoadWebBox(cefFonts); // I1534 - show hint for non-Unicode keyboards   // I4181
       Exit;
     end;
 
@@ -592,7 +598,7 @@ begin
       FFontsData := FFontsData + '<Font Name="'+XmlEncode(FKeyboard.Fonts[I].FontName)+'" Coverage="'+IntToStr(FKeyboard.Fonts[i].Coverage)+'" />';
     FFontsData := FFontsData + '</Fonts>';
 
-    LoadWebBox(cefFonts, 'welcome_fonts', FFontsData);   // I4181
+    LoadWebBox(cefFonts, FFontsData);   // I4181
 
     if (FKeyboard.Fonts.Count > 0) and FSetFont then
       CurrText.Name := FKeyboard.Fonts[0].FontName;

@@ -232,12 +232,12 @@ build-release-wrapper: clean-output global-versions
     $(MAKE) dirs
     $(MAKE) build-tools
 !ifdef QUICK_BUILD_KEYMAN
-    $(MAKE) build
-    $(MAKE) build-release
+    $(MAKE) -DSIGNCODE_BUILD build
+    $(MAKE) -DSIGNCODE_BUILD build-release
     $(MAKE) signcode
 !else
-    $(MAKE) build unit-tests
-    $(MAKE) build-release
+    $(MAKE) -DSIGNCODE_BUILD build unit-tests
+    $(MAKE) -DSIGNCODE_BUILD build-release
     $(MAKE) signcode
     $(MAKE) -DTARGET=test test
     $(MAKE) backup

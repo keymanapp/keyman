@@ -94,10 +94,19 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
   }
 
   public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A, FilterArg> filter, FilterArg filterArg) {
-    this(context, resource, adapter, filter, filterArg, filter.selectFrom(adapter, filterArg));
+    // Ensure that the list we pass through is writeable.  Errors may result otherwise.
+    this(context, resource, adapter, filter, filterArg, new ArrayList<>(filter.selectFrom(adapter, filterArg)));
   }
 
-  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A, FilterArg> filter, FilterArg filterArg, List<Element> filteredList) {
+  // In order for the instance to be properly constructed, the `filteredList`
+  // parameter must be mutable.  Unfortunately, there's no way to robustly
+  // check for that, and it illegal to construct a modifiable version
+  // before the super's constructor call b/c Java limitations.
+  // So... we'll keep it locked behind 'protected' for now.
+  //
+  // Could probably throw an extra parameter on for an 'internal' version
+  // and use the current signature as a 'helper' like with the constructor above?
+  protected NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A, FilterArg> filter, FilterArg filterArg, List<Element> filteredList) {
     super(context, resource, filteredList);
 
     this.wrappedAdapter = adapter;

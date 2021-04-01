@@ -40,7 +40,7 @@ import java.util.Map;
  * Gets the list of installable lexical models from Keyman cloud and allows user to download a model.
  * Displays a list of available models for a language ID.
  */
-public final class ModelPickerActivity extends AppCompatActivity {
+public final class ModelPickerActivity extends BaseActivity {
 
   private Context context;
   private static Toolbar toolbar = null;
@@ -198,7 +198,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
               preInstalledModelMap.get(KMManager.KMKey_LanguageID),
               preInstalledModelMap.get(KMManager.KMKey_LanguageName),
               preInstalledModelMap.get(KMManager.KMKey_LexicalModelVersion),
-              preInstalledModelMap.get(KMManager.KMKey_HelpLink),
+              preInstalledModelMap.get(KMManager.KMKey_CustomHelpLink),
               MapCompat.getOrDefault(preInstalledModelMap, KMManager.KMKey_KMPLink, ""));
             String itemKey = preInstalled.getKey();
             int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(context, itemKey);

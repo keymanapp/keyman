@@ -121,7 +121,9 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     var associationQueryProgress: [Int: LanguagePickAssociator.Progress] = [:]
     var installProgressMap: [KeymanPackage.Key: PackageInstallResult?] = [:]
 
-    let progressCallback: ProgressReceiver
+    let externalProgressCallback: ProgressReceiver
+    var promptProgressCallback: ProgressReceiver?
+
     let downloadManager: ResourceDownloadManager
 
     var isCancelled = false
@@ -129,7 +131,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     init(with associationSpecs: [Associator], downloadManager: ResourceDownloadManager, receiver: @escaping ProgressReceiver) {
       self.associationSpecs = associationSpecs
       self.downloadManager = downloadManager
-      self.progressCallback = receiver
+      self.externalProgressCallback = receiver
     }
 
     // Since progress info is stored here, it makes the most sense to track progress-related
@@ -139,12 +141,19 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
       return !isCancelled && pickingCompleted
     }
 
+    internal func notifyProgress(_ status: Progress) {
+      // Prompt gets first dibs - that way, if a prompt exists, its UI code
+      // executes before control transfers back to other modules.
+      self.promptProgressCallback?(status)
+      self.externalProgressCallback(status)
+    }
+
     /**
      * Computes the initial level of progress made toward the overall installation at the time that language selections were
      * finalized.
      */
     internal func initializeProgress() {
-      self.progressCallback(.starting)
+      notifyProgress(.starting)
     }
 
     /**
@@ -153,7 +162,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     internal func reportProgress(complete: Bool = false) {
       if reportsProgress {
         if complete {
-          progressCallback(.complete)
+          notifyProgress(.complete)
         } else {
           //progressCallback(.inProgress)
         }
@@ -161,7 +170,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     }
 
     internal func reportCancelled() {
-      progressCallback(.cancelled)
+      notifyProgress(.cancelled)
     }
   }
 
@@ -364,6 +373,10 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
       do {
         try ResourceFileManager.shared.install(resourcesWithIDs: fullIDs, from: self.package)
         result = .complete
+
+        if let kbdID = fullIDs.first(where: { $0.type == .keyboard }) {
+          _ = Manager.shared.setKeyboard(withFullID: kbdID as! FullKeyboardID)
+        }
       } catch {
         result = .error(error)
       }
@@ -392,11 +405,21 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     initializeSynchronizationGroups()
     constructAssociationPickers()
 
+    closureShared.installGroup.enter()
+
+    let wrappedCompletionHandler = {
+      self.closureShared.installGroup.leave()
+    }
+
     let pickerPrompt = PackageInstallViewController<Resource>(for: self.package,
                                                               defaultLanguageCode: defaultLgCode,
                                                               languageAssociators: associationQueriers!,
-                                                              completionHandler: coreInstallationClosure())
+                                                              pickingCompletionHandler: coreInstallationClosure(),
+                                                              uiCompletionHandler: wrappedCompletionHandler)
 
+    closureShared.promptProgressCallback = { progress in
+      pickerPrompt.progressUpdate(progress)
+    }
     navVC.pushViewController(pickerPrompt, animated: true)
   }
 

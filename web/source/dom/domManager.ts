@@ -1709,7 +1709,7 @@ namespace com.keyman.dom {
         * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
         */
       
-      if(MutationObserver) {
+      if(typeof MutationObserver == 'function') {
         var observationTarget = document.querySelector('body'), observationConfig: MutationObserverInit;
         if(this.keyman.options['attachType'] != 'manual') { //I1961
           observationConfig = { childList: true, subtree: true};

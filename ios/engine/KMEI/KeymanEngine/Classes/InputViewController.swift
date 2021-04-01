@@ -179,6 +179,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override var hasFullAccess: Bool {
+    if #available(iOS 11.0, *) {
+      // Nice and straight-forward here!
+      return super.hasFullAccess
+    }
     return Storage.shared != nil
   }
 
@@ -274,8 +278,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func viewWillAppear(_ animated: Bool) {
-    // Just seeing if it's actually called.
     super.viewWillAppear(animated)
+
+    if Manager.shared.shouldReloadKeyboard {
+      self.reload()
+    }
   }
 
   open override func viewDidAppear(_ animated: Bool) {
@@ -287,6 +294,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     setOuterConstraints()
     inputView?.setNeedsUpdateConstraints()
+
+    keymanWeb.verifyLoaded()
   }
 
   open override func viewWillDisappear(_ animated: Bool) {
@@ -343,6 +352,16 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     if numCharsToDelete <= 0 {
       textDocumentProxy.insertText(newText)
+
+      // A full-context deletion will report numCharsToDelete == 0 and won't
+      // otherwise delete selected text.
+      if #available(iOSApplicationExtension 11.0, *) {
+        if let selected = textDocumentProxy.selectedText {
+          if selected.count > 0 {
+            textDocumentProxy.deleteBackward()
+          }
+        }
+      }
       return
     }
 
@@ -366,7 +385,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
         if(self.swallowBackspaceTextChange) {
           // A single keyboard processing command should never trigger two of these in a row;
           // only one output function will perform deletions.
-          
+
           // This should allow us to debug any failures of this assumption.
           // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
           // so all seems good.
@@ -543,6 +562,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   func resetContext() {
     keymanWeb.resetContext()
+  }
+
+  internal func setSentryState(enabled: Bool) {
+    keymanWeb.setSentryState(enabled: enabled)
   }
  
   func setContextState(text: String?, range: NSRange) {

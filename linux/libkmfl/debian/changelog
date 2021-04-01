@@ -1,9 +1,36 @@
-libkmfl (10.99.1-1) UNRELEASED; urgency=medium
+libkmfl (11.0.101-1) unstable; urgency=medium
+
+  * New upstream - Keyman for Linux 11.0 beta 1
+  * d/control multi-arch
+      standards 4.3.0 no changes
+  * d/watch update for beta/stable
+
+ -- Daniel Glassey <wdg@debian.org>  Thu, 03 Jan 2019 17:14:50 +0700
+
+libkmfl (10.99.33-3) unstable; urgency=medium
+
+  * source only upload to fix amd64 dependency
+
+ -- Daniel Glassey <wdg@debian.org>  Wed, 31 Oct 2018 10:49:37 +0700
+
+libkmfl (10.99.33-2) unstable; urgency=medium
+
+  * change to Debian Input Method team maintainership
+
+ -- Daniel Glassey <wdg@debian.org>  Wed, 24 Oct 2018 23:07:50 +0700
+
+libkmfl (10.99.33-1) unstable; urgency=medium
 
   * Change license to MIT as libkmfl is being moved into Keyman 11
   * Keyman is now owned by SIL
+  * New upstream pre-release
+  * d/control standards 4.2.1, no changes
+  * d/compat 11
+  * I am now the maintainer as I am the one working
+      on Keyman for Linux upstream
+  * change from cdbs to dh
 
- -- Daniel Glassey <wdg@debian.org>  Thu, 17 May 2018 11:39:04 +0700
+ -- Daniel Glassey <wdg@debian.org>  Mon, 22 Oct 2018 10:18:16 +0700
 
 libkmfl (0.9.12-1) unstable; urgency=low
 
@@ -17,7 +44,7 @@ libkmfl (0.9.12-1) unstable; urgency=low
 
 libkmfl (0.9.11-1) UNRELEASED; urgency=low
 
-  * fix bug when nomatch is used with "use" keyword 
+  * fix bug when nomatch is used with "use" keyword
 
  -- Doug Rintoul <doug_rintoul@sil.org>  Wed, 17 Nov 2010 13:27:33 -0800
 

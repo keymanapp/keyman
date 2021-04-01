@@ -82,7 +82,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
   LPKEYBOARD kbp;
   PKMX_BYTE filebase;
 
-  DebugLog("Loading file %ws", fileName);
+  DebugLog("Loading file '%s'", fileName);
   if(!fileName || !lpKeyboard)
   {
     DebugLog("Bad Filename");

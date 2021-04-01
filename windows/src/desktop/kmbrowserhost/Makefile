@@ -18,7 +18,7 @@ clean: def-clean
     -rd /s/q Win64
 
 signcode:
-    $(SIGNCODE) /d "Keyman Desktop" $(PROGRAM)\desktop\kmbrowserhost.exe
+    $(SIGNCODE) /d "Keyman" $(PROGRAM)\desktop\kmbrowserhost.exe
 
 install:
     $(COPY) $(PROGRAM)\desktop\kmbrowserhost.exe "$(INSTALLPATH_KEYMANDESKTOP)"

@@ -75,7 +75,6 @@ class ModelCompositor {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
     }
 
-    // Find the transform for the actual keypress.
     let inputTransform = transformDistribution.sort(function(a, b) {
       return b.p - a.p;
     })[0].sample;
@@ -86,7 +85,7 @@ class ModelCompositor {
 
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.wordbreak(postContext);
-    let keepOption: Keep = null;
+    let keepOption: Outcome<Keep> = null;
 
     let rawPredictions: Distribution<Suggestion> = [];
 
@@ -128,10 +127,10 @@ class ModelCompositor {
       rawPredictions = this.predictFromCorrections(predictionRoots, context);
     } else {
       contextState = this.contextTracker.analyzeState(this.lexicalModel, 
-                                                      postContext, 
+                                                      postContext,
                                                       !this.isEmpty(inputTransform) ? 
                                                                     transformDistribution: 
-                                                                    [{sample: inputTransform, p: 1.0}]
+                                                                    null
                                                       );
 
       // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
@@ -150,6 +149,7 @@ class ModelCompositor {
         if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
           newEmptyToken = true;
           prefixTransform = inputTransform;
+          context = postContext; // Ensure the whitespace token is preapplied!
         }
       }
 
@@ -174,16 +174,24 @@ class ModelCompositor {
             finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
           }
 
+          let deleteLeft = 0;
+          // remove actual token string.  If new token, there should be nothing to delete.
+          if(!newEmptyToken) {
+            // If this is triggered from a backspace, make sure to use its results
+            // and also include its left-deletions!  It's the one post-input context case.
+            if(allowBksp) {
+              deleteLeft = this.wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
+            } else {
+              // Normal case - use the pre-input context.
+              deleteLeft = this.wordbreak(context).kmwLength();
+            }
+          }
+
           // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
-            // remove actual token string.  If new token, there should be nothing to delete.
-            deleteLeft: newEmptyToken ? 0 : this.wordbreak(context).length, 
-            id: finalInput.id
-          }
-
-          if(bestCorrectionCost === undefined) {
-            bestCorrectionCost = match.totalCost;
+            deleteLeft: deleteLeft, 
+            id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
           return {
@@ -194,25 +202,52 @@ class ModelCompositor {
 
         // Running in bulk over all suggestions, duplicate entries may be possible.
         let predictions = this.predictFromCorrections(predictionRoots, context);
-        rawPredictions = rawPredictions.concat(predictions);
 
+        // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
+        if(predictions.length > 0 && bestCorrectionCost === undefined) {
+          bestCorrectionCost = -Math.log(predictionRoots[0].p);
+        }
+
+        rawPredictions = rawPredictions.concat(predictions);
         // TODO:  We don't currently de-duplicate predictions at this point quite yet, so
         // it's technically possible that we return too few.
 
-        if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
+        let correctionCost = matches[0].totalCost;
+        // Searching a bit longer is permitted when no predictions have been found.
+        if(correctionCost >= bestCorrectionCost + 8) {
           break;
-        } else if(matches[0].totalCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
-          // Very useful for stopping 'sooner' when words reach a sufficient length.
-          break;
+          // If enough have been found, we're safe to terminate earlier.
+        } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
+            if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+            // Very useful for stopping 'sooner' when words reach a sufficient length.
+            break;
+          } else {
+            // Sort the prediction list; we need them in descending order for the next check.
+            rawPredictions.sort(function(a, b) {
+              return b.p - a.p;
+            });
+
+            // If the best suggestion from the search's current tier fails to beat the worst
+            // pending suggestion from previous tiers, assume all further corrections will 
+            // similarly fail to win; terminate the search-loop.
+            if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
+              break;
+            }
+          } 
         }
       }
     }
 
     // Section 2 - post-analysis for our generated predictions, managing 'keep'.
-
     // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
     // When true, we can use an 'associative array' to de-duplicate everything.
     let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
+    let currentCasing: CasingForm = null;
+    if(lexicalModel.languageUsesCasing) {
+      currentCasing = this.detectCurrentCasing(postContext);
+    }
+
+    let baseWord = this.wordbreak(context);
 
     // Deduplicator + annotator of 'keep' suggestions.
     for(let prediction of rawPredictions) {
@@ -221,23 +256,37 @@ class ModelCompositor {
 
       if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
         // Preserve the original, pre-keyed version of the text.
-        let baseTransform = prediction.sample.transform;
+        if(!keepOption) {
+          let baseTransform = prediction.sample.transform;
 
-        let keepTransform = {
-          insert: keepOptionText,
-          deleteLeft: baseTransform.deleteLeft,
-          deleteRight: baseTransform.deleteRight,
-          id: baseTransform.id
+          let keepTransform = {
+            insert: keepOptionText,
+            deleteLeft: baseTransform.deleteLeft,
+            deleteRight: baseTransform.deleteRight,
+            id: baseTransform.id
+          }
+
+          let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
+          keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
+          keepOption.matchesModel = true;
+
+          // Since we replaced the original Suggestion with a keep-annotated one,
+          // we must manually preserve the transform ID.
+          keepOption.transformId = prediction.sample.transformId;
+        } else if(keepOption.p && prediction.p) {
+          keepOption.p += prediction.p;
+        }
+      } else {
+        // Apply capitalization rules now; facilitates de-duplication of suggestions
+        // that may be caused as a result.
+        //
+        // Example:  "apple" and "Apple" are separate when 'lower', but identical for 'initial' and 'upper'.
+        if(currentCasing && currentCasing != 'lower') {
+          this.applySuggestionCasing(prediction.sample, baseWord, currentCasing);
+          // update the mapping string, too.
+          displayText = prediction.sample.displayAs;
         }
 
-        let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
-        keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
-        keepOption.matchesModel = true;
-
-        // Since we replaced the original Suggestion with a keep-annotated one,
-        // we must manually preserve the transform ID.
-        keepOption.transformId = prediction.sample.transformId;
-      } else {
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
           existingSuggestion.p += prediction.p;
@@ -249,11 +298,16 @@ class ModelCompositor {
 
     // Generate a default 'keep' option if one was not otherwise produced.
     if(!keepOption && keepOptionText != '') {
-      let keepTransform = models.transformToSuggestion(inputTransform, 1);  // 1 is a filler value; goes unused b/c is for a 'keep'.
-      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
-      keepTransform.displayAs = keepOptionText;
+      // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
+      // for context-tracking otherwise!
+      let keepTransform: Transform = { ...inputTransform };
 
-      keepOption = this.toAnnotatedSuggestion(keepTransform, 'keep');
+      // 1 is a filler value; goes unused b/c is for a 'keep'.
+      let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
+      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
+      keepSuggestion.displayAs = keepOptionText;
+
+      keepOption = this.toAnnotatedSuggestion(keepSuggestion, 'keep');
       keepOption.matchesModel = false;
     }
 
@@ -291,21 +345,27 @@ class ModelCompositor {
 
     // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
-    let currentCasing: CasingForm = null;
-    if(lexicalModel.languageUsesCasing) {
-      currentCasing = this.detectCurrentCasing(postContext);
-    }
 
     let compositor = this;
-    let baseWord = this.wordbreak(context);
     suggestions.forEach(function(suggestion) {
-      if(currentCasing && currentCasing != 'lower') {
-        compositor.applySuggestionCasing(suggestion, baseWord, currentCasing);
-      }
-
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
       // for such cases.
-      suggestion.transform.insert += punctuation.insertAfterWord;
+
+      // Do we need to manipulate the suggestion's transform based on the current state of the context?
+      if(!context.right) {
+        suggestion.transform.insert += punctuation.insertAfterWord;
+      } else {
+        // If we're mid-word, delete its original post-caret text.
+        const tokenization = compositor.tokenize(context);
+        if(tokenization && tokenization.caretSplitsToken) {
+          // While we wait on the ability to provide a more 'ideal' solution, let's at least
+          // go with a more stable, if slightly less ideal, solution for now.
+          // 
+          // A predictive text default (on iOS, at least) - immediately wordbreak 
+          // on suggestions accepted mid-word.
+          suggestion.transform.insert += punctuation.insertAfterWord;
+        }
+      }
 
       // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
       if(prefixTransform) {
@@ -415,7 +475,6 @@ class ModelCompositor {
     // Step 1:  generate and save the reversion's Transform.
     let sourceTransform = suggestion.transform;
     let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    // right deletion is currently not implemented.
     let insertedLength = sourceTransform.insert.kmwLength();
 
     let reversionTransform: Transform = {
@@ -435,7 +494,19 @@ class ModelCompositor {
       postContext = models.applyTransform(postTransform, postContext);
     }
 
-    let revertedPrefix = this.wordbreak(postContext);
+    let revertedPrefix: string;
+    let postContextTokenization = this.tokenize(postContext);
+    if(postContextTokenization) {
+      // Handles display string for reversions triggered by accepting a suggestion mid-token.
+      if(postContextTokenization.left.length > 0) {
+        revertedPrefix = postContextTokenization.left[postContextTokenization.left.length-1];
+      } else {
+        revertedPrefix = '';
+      }
+      revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0] : '';
+    } else {
+      revertedPrefix = this.wordbreak(postContext);
+    }
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
@@ -445,7 +516,7 @@ class ModelCompositor {
     // set the Reversion's ID directly.
     let reversion = this.toAnnotatedSuggestion(firstConversion, 'revert');
     if(suggestion.transformId != null) {
-      reversion.transformId = suggestion.transformId;
+      reversion.transformId = -suggestion.transformId;
     }
     if(suggestion.id != null) {
       // Since a reversion inverts its source suggestion, we set its ID to be the 
@@ -478,7 +549,13 @@ class ModelCompositor {
     let compositor = this;
     let fallbackSuggestions = function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
-      return compositor.predict({ insert: '', deleteLeft: 0}, revertedContext);
+      let suggestions = compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      suggestions.forEach(function(suggestion) {
+        // A reversion's transform ID is the additive inverse of its original suggestion;
+        // we revert to the state of said original suggestion.
+        suggestion.transformId = -reversion.transformId;
+      });
+      return suggestions;
     }
 
     if(!this.contextTracker) {
@@ -510,9 +587,16 @@ class ModelCompositor {
     // Will need to be modified a bit if/when phrase-level suggestions are implemented.
     // Those will be tracked on the first token of the phrase, which won't be the tail
     // if they cover multiple tokens.
-    return this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
+    let suggestions = this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
       return trackedSuggestion.suggestion;
     });
+
+    suggestions.forEach(function(suggestion) {
+      // A reversion's transform ID is the additive inverse of its original suggestion;
+      // we revert to the state of said original suggestion.
+      suggestion.transformId = -reversion.transformId;
+    });
+    return suggestions;
   }
 
   private wordbreak(context: Context): string {
@@ -531,6 +615,27 @@ class ModelCompositor {
       // Since the model relies on custom wordbreaking behavior, we need to use the
       // old, deprecated wordbreaking pattern.
       return model.wordbreak(context);
+    }
+  }
+
+  private tokenize(context: Context): models.Tokenization {
+    let model = this.lexicalModel;
+
+    if(model.wordbreaker) {
+      return models.tokenize(model.wordbreaker, context);
+    } else {
+      return null;
+    }
+  }
+
+  public resetContext(context: Context) {
+    // Force-resets the context, throwing out any previous fat-finger data, etc.
+    // Designed for use when the caret has been directly moved and/or the context sourced from a different control
+    // than before.
+    if(this.contextTracker) {
+      let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
+      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, this.lexicalModel);
+      this.contextTracker.enqueue(contextState);
     }
   }
 

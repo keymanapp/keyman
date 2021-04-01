@@ -58,15 +58,17 @@ end;
 class function TUILanguageManager.Find(KeymanLanguages, UserLanguages: TStrings): string;
 var
   ktag, ktag2, utag, utag2: string;
+  n: Integer;
 begin
 
   for utag in UserLanguages do
   begin
     utag2 := utag;
 
-    // Try and look for an exact match first
-    if KeymanLanguages.IndexOf(utag2) >= 0 then
-      Exit(utag2);
+    // Try and look for an exact (case-insensitive) match first
+    n := KeymanLanguages.IndexOf(utag2);
+    if n >= 0 then
+      Exit(KeymanLanguages[n]);
 
     // Then try and set the region-neutral language
     if Pos('-', utag2) > 0 then

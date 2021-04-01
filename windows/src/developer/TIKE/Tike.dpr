@@ -87,10 +87,7 @@ uses
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
   Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\global\delphi\general\UnitDrawArrow.pas',
-  CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
   klog in '..\..\global\delphi\general\klog.pas',
-  custinterfaces in '..\..\global\delphi\cust\custinterfaces.pas',
-  CustomisationMessages in '..\..\global\delphi\cust\CustomisationMessages.pas',
   HeadingCheckListBox in '..\..\global\delphi\comp\HeadingCheckListBox.pas',
   BitmapEditor in '..\..\global\delphi\comp\BitmapEditor.pas',
   StringGridEditControlled in '..\..\global\delphi\comp\StringGridEditControlled.pas',
@@ -100,7 +97,6 @@ uses
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
   UfrmNewFileDetails in 'dialogs\UfrmNewFileDetails.pas' {frmNewFileDetails},
-  CustomisationMenu in '..\..\global\delphi\cust\CustomisationMenu.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
   CompileKeymanWeb in 'compile\CompileKeymanWeb.pas',
   KeymanWebKeyCodes in 'compile\KeymanWebKeyCodes.pas',
@@ -188,8 +184,7 @@ uses
   CaptionPanel in '..\..\global\delphi\comp\CaptionPanel.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
   UframeTouchLayoutBuilder in 'oskbuilder\UframeTouchLayoutBuilder.pas' {frameTouchLayoutBuilder},
-  TouchLayoutUtils in 'oskbuilder\TouchLayoutUtils.pas' {,
-  UfrmSelectTouchLayoutTemplate in 'oskbuilder\UfrmSelectTouchLayoutTemplate.pas' {frmSelectTouchLayoutTemplate},
+  TouchLayoutUtils in 'oskbuilder\TouchLayoutUtils.pas',
   UfrmSelectTouchLayoutTemplate in 'oskbuilder\UfrmSelectTouchLayoutTemplate.pas' {frmSelectTouchLayoutTemplate},
   OnScreenKeyboardData in '..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   TouchLayout in 'oskbuilder\TouchLayout.pas',
@@ -307,27 +302,32 @@ const
 begin
   TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE);
   try
-    CoInitFlags := COINIT_APARTMENTTHREADED;
-
-    FInitializeCEF := TCEFManager.Create;
     try
-      if FInitializeCEF.Start then
-      begin
-        InitThemeLibrary;
-        SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
-        Application.MainFormOnTaskBar := True;
-        Application.Initialize;
-      //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
-        Application.Title := 'Keyman Developer';
-        //TBX.TBXSetTheme('OfficeXP2');
-        if TikeActive then Exit;
-        InitClasses;
-        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  Application.Run;
+      CoInitFlags := COINIT_APARTMENTTHREADED;
+
+      FInitializeCEF := TCEFManager.Create;
+      try
+        if FInitializeCEF.Start then
+        begin
+          InitThemeLibrary;
+          SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+          Application.MainFormOnTaskBar := True;
+          Application.Initialize;
+        //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
+          Application.Title := 'Keyman Developer';
+          //TBX.TBXSetTheme('OfficeXP2');
+          if TikeActive then Exit;
+          InitClasses;
+          Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+          Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+          Application.Run;
+        end;
+      finally
+        FInitializeCEF.Free;
       end;
-    finally
-      FInitializeCEF.Free;
+    except
+      on E:Exception do
+        SentryHandleException(E);
     end;
   finally
     TKeymanSentryClient.Stop;

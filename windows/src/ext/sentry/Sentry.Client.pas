@@ -55,6 +55,8 @@ type
   protected
   class var
     FInstance: TSentryClient;
+    FEnabled: Boolean;
+    FEnabledInitialised: Boolean;
   private
     FSentryInit: Boolean;
     options: psentry_options_t;
@@ -73,6 +75,7 @@ type
     procedure DoTerminate;
     function EventIDToString(AGuid: PByte): String;
     function ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
+    class function GetEnabled: Boolean; static;
   public
     constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); virtual;
     destructor Destroy; override;
@@ -80,11 +83,15 @@ type
     function MessageEvent(Level: TSentryLevel; const Message: string; IncludeStack: Boolean = False): string;
     function ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): string;
 
+    procedure Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
+
     property OnBeforeEvent: TSentryClientBeforeEvent read FOnBeforeEvent write FOnBeforeEvent;
     property OnAfterEvent: TSentryClientAfterEvent read FOnAfterEvent write FOnAfterEvent;
 
     property ReportExceptions: Boolean read FReportExceptions;
     property ReportMessages: Boolean read FReportMessages;
+  public
+    class property Enabled: Boolean read GetEnabled;
   end;
 
   TSentryClientClass = class of TSentryClient;
@@ -351,6 +358,18 @@ begin
   end;
 end;
 
+procedure TSentryClient.Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
+var
+  crumb: sentry_value_t;
+begin
+  crumb := sentry_value_new_breadcrumb(PAnsiChar(UTF8Encode(BreadcrumbType)), PAnsiChar(UTF8Encode(Message)));
+  if Category <> '' then
+    sentry_value_set_by_key(crumb, 'category', sentry_value_new_string(PAnsiChar(UTF8Encode(Category))));
+  if Level <> '' then
+    sentry_value_set_by_key(crumb, 'level', sentry_value_new_string(PAnsiChar(UTF8Encode(Level))));
+  sentry_add_breadcrumb(crumb);
+end;
+
 function TSentryClient.ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
 var
   frames, s_frame, stacktrace, thread, threads: sentry_value_t;
@@ -429,6 +448,19 @@ begin
     DoBeforeEvent(0, ExceptionClassName, Message, scetException);
     DoAfterEvent('', ExceptionClassName, Message, scetException);
   end;
+end;
+
+class function TSentryClient.GetEnabled: Boolean;
+begin
+  if not FEnabledInitialised then
+  begin
+    // WINE is not coping with some of the Sentry/dbghelp calls so disable
+    // sentry on WINE instances.
+    FEnabled := GetProcAddress(GetModuleHandle('ntdll.dll'), 'wine_get_version') = nil;
+    FEnabledInitialised := True;
+  end;
+
+  Exit(FEnabled);
 end;
 
 function TSentryClient.MessageEvent(Level: TSentryLevel; const Message: string;
@@ -576,6 +608,7 @@ initialization
   SymGetModuleBase64 := GetProcAddress(hDbgHelp, 'SymGetModuleBase64');
   SymInitialize := GetProcAddress(hDbgHelp, 'SymInitialize');
 
-  if Assigned(SymInitialize) then
-    SymInitialize(GetCurrentProcess, nil, True);
+  if TSentryClient.Enabled then
+    if Assigned(SymInitialize) then
+      SymInitialize(GetCurrentProcess, nil, True);
 end.

@@ -66,7 +66,7 @@ uses
 
 constructor TModelProjectTemplate.Create(const BasePath, ModelID: string);
 begin
-  inherited Create(BasePath, ModelID);
+  inherited Create(BasePath, ModelID, TouchKeymanTargets);
 end;
 
 procedure TModelProjectTemplate.Generate;

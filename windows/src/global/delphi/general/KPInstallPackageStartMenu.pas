@@ -114,7 +114,7 @@ begin
         Add('n = kmcom.Packages.IndexOf("'+PackageName+'")');
         Add('if n >= 0 then');
         Add('  Set package = kmcom.Packages(n)');
-        Add('  if msgbox("Uninstall package "+package.Name+"?", vbOKCancel, "Keyman Desktop") = vbOK then');
+        Add('  if msgbox("Uninstall package "+package.Name+"?", vbOKCancel, "Keyman") = vbOK then');
         Add('    package.Uninstall(True)');
         Add('  end if');
         Add('else');

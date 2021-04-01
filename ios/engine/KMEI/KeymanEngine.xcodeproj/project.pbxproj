@@ -213,6 +213,8 @@
 		CEA1486C2407808F00C6ECD2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
 		CEA1486D2407808F00C6ECD2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
 		CEA14870240780E100C6ECD2 /* ResourceInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEA14872240780E100C6ECD2 /* ResourceInfoView.xib */; };
+		CEA31E5825FB51D500534484 /* No-defaults early 14.0.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA31E5725FB51D400534484 /* No-defaults early 14.0.bundle */; };
+		CEA31E6025FB5BC200534484 /* Early 14.0 with defaults.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA31E5F25FB5BC200534484 /* Early 14.0 with defaults.bundle */; };
 		CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */; };
 		CEA70CCF24CAC3AE001C12E6 /* Obsoletions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */; };
 		CEA9670924BEC4030035AACF /* ResourceUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */; };
@@ -274,13 +276,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C06D372A1F81F4E100F61AE0;
 			remoteInfo = KeymanEngine;
-		};
-		CE4459CB23FBB8DA003151FD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F243887514BBD43000A3E055 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F243887D14BBD43000A3E055;
-			remoteInfo = KeymanEngineDemo;
 		};
 		CE4459EA23FBBB79003151FD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -517,16 +512,26 @@
 		CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalLinks.swift; sourceTree = "<group>"; };
 		CE9E95CE24CE7A2C00F6DD78 /* UniversalLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalLinkTests.swift; sourceTree = "<group>"; };
 		CE9ECB1D24D3A8CC007C5718 /* PackageInstallView_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PackageInstallView_iPad.xib; sourceTree = "<group>"; };
-		CEA1486E2407808F00C6ECD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEA1486E2407808F00C6ECD2 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEA14871240780E100C6ECD2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ResourceInfoView.xib; sourceTree = "<group>"; };
 		CEA14874240780EF00C6ECD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		CEA148772407869200C6ECD2 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CEA31E5725FB51D400534484 /* No-defaults early 14.0.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "No-defaults early 14.0.bundle"; sourceTree = "<group>"; };
+		CEA31E5F25FB5BC200534484 /* Early 14.0 with defaults.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Early 14.0 with defaults.bundle"; sourceTree = "<group>"; };
 		CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 13.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Obsoletions.swift; sourceTree = "<group>"; };
 		CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceUpdateTests.swift; sourceTree = "<group>"; };
 		CEA9670A24BEC8030035AACF /* EngineStateBundler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineStateBundler.swift; sourceTree = "<group>"; };
 		CEA9670C24BEEFF80035AACF /* khmer_angkor update-base.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "khmer_angkor update-base.bundle"; sourceTree = "<group>"; };
 		CEA9670E24BEF05A0035AACF /* Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updates.swift; sourceTree = "<group>"; };
+		CEACC90125F07C81006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CEACC90325F07CAF006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEACC90425F07CB6006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEACC90525F07CBA006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = de.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		CEACC90625F07CBC006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = km; path = km.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		CEACC90725F07CDA006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CEACC90825F07CE9006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEACC90925F07CED006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = fr; path = fr.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		CEB8276624C6811800F3D39C /* KeymanHostTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanHostTests.swift; sourceTree = "<group>"; };
 		CEC0C66B2410AC9A003E1BCD /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		CEC0C6762410E049003E1BCD /* SentryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryManager.swift; sourceTree = "<group>"; };
@@ -886,6 +891,8 @@
 		CE37C38923FCC9AF007031C6 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				CEA31E5F25FB5BC200534484 /* Early 14.0 with defaults.bundle */,
+				CEA31E5725FB51D400534484 /* No-defaults early 14.0.bundle */,
 				CEA9670C24BEEFF80035AACF /* khmer_angkor update-base.bundle */,
 				CE02EE0B24A5863100D58F92 /* Queries.bundle */,
 				CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */,
@@ -1173,7 +1180,6 @@
 			);
 			dependencies = (
 				9A079DD6223194B100581263 /* PBXTargetDependency */,
-				CE4459CC23FBB8DA003151FD /* PBXTargetDependency */,
 				CE4459F923FBBCB3003151FD /* PBXTargetDependency */,
 			);
 			name = KeymanEngineTests;
@@ -1301,6 +1307,8 @@
 				en,
 				Base,
 				km,
+				de,
+				fr,
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1336,6 +1344,7 @@
 				9ADC45A022E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */,
 				CE973D832484A5DC00F66045 /* PackageJSON.bundle in Resources */,
 				CEF888D223FE6ADF00667693 /* No-defaults 10.0 Migration.bundle in Resources */,
+				CEA31E5825FB51D500534484 /* No-defaults early 14.0.bundle in Resources */,
 				CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */,
 				CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */,
 				9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */,
@@ -1343,6 +1352,7 @@
 				CE02EE0C24A5863100D58F92 /* Queries.bundle in Resources */,
 				CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */,
 				CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */,
+				CEA31E6025FB5BC200534484 /* Early 14.0 with defaults.bundle in Resources */,
 				CE37C38F23FCD52F007031C6 /* Lexical Models.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1663,11 +1673,6 @@
 			target = C06D372A1F81F4E100F61AE0 /* KeymanEngine */;
 			targetProxy = C06D37CA1F83204200F61AE0 /* PBXContainerItemProxy */;
 		};
-		CE4459CC23FBB8DA003151FD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F243887D14BBD43000A3E055 /* KeymanEngineDemo */;
-			targetProxy = CE4459CB23FBB8DA003151FD /* PBXContainerItemProxy */;
-		};
 		CE4459EB23FBBB79003151FD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C06D372A1F81F4E100F61AE0 /* KeymanEngine */;
@@ -1685,6 +1690,9 @@
 			isa = PBXVariantGroup;
 			children = (
 				CE96E42C24D1229A005B8E5A /* en */,
+				CEACC90525F07CBA006EAB45 /* de */,
+				CEACC90625F07CBC006EAB45 /* km */,
+				CEACC90925F07CED006EAB45 /* fr */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1693,6 +1701,9 @@
 			isa = PBXVariantGroup;
 			children = (
 				CEA1486E2407808F00C6ECD2 /* en */,
+				CEACC90325F07CAF006EAB45 /* de */,
+				CEACC90425F07CB6006EAB45 /* km */,
+				CEACC90825F07CE9006EAB45 /* fr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1703,6 +1714,8 @@
 				CEA14871240780E100C6ECD2 /* Base */,
 				CEA14874240780EF00C6ECD2 /* en */,
 				CEA148772407869200C6ECD2 /* km */,
+				CEACC90125F07C81006EAB45 /* de */,
+				CEACC90725F07CDA006EAB45 /* fr */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";
@@ -2100,6 +2113,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/iOS/";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -2359,6 +2373,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/iOS/";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -2403,6 +2418,7 @@
 				DEFINES_MODULE = YES;
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/iOS/";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

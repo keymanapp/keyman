@@ -12,10 +12,10 @@ import { readFileSync, writeFileSync } from 'fs';
 import { gt } from 'semver';
 
 const getPullRequestInformation = async (
-  octokit: GitHub,
+  octokit: GitHub, base: string
 ): Promise<string | undefined> => {
   const response = await octokit.graphql(
-    findLastHistoryPR
+    findLastHistoryPR(base)
   );
 
   if (response === null) {
@@ -87,7 +87,10 @@ const getAssociatedPRInformation = async (
 // splitPullsIntoHistory
 // ------------------------------------------------------------------------------------
 
-const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> => {
+const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<{count: number, pulls: number[]}> => {
+
+  let currentPulls: number[] = [];
+
   //
   // Get current version and history from VERSION.md and TIER.md
   //
@@ -165,9 +168,10 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
     }
 
     if(!found) {
-      const entry = `* ${pull.title} (#${pull.number})`;
+      const entry = (pull.number == 0) ? `* ${pull.title}` : `* ${pull.title} (#${pull.number})`;
       console.log(`-- Adding ${entry}`);
       historyChunks.current.splice(2, 0, entry);
+      currentPulls.push(pull.number);
       changed = true;
     }
   }
@@ -197,26 +201,64 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
     writeFileSync('HISTORY.md', newHistory, 'utf8');
   }
 
-  return historyChunks.current.length - 3; // - 3 for header + blanks
+  return {count: historyChunks.current.length - 3, pulls: currentPulls}; // - 3 for header + blanks
+}
+
+/**
+ * Creates a comment on each pull request found to point users to
+ * a relevant build.
+*/
+export const sendCommentToPullRequestAndRelatedIssues = async (
+  octokit: GitHub,
+  pulls: number[]
+): Promise<any> => {
+
+  const tier = readFileSync('./TIER.md', 'utf8').trim();
+  const version = readFileSync('./VERSION.md', 'utf8').trim();
+  const versionTier = version + (tier == 'stable' ? '' : '-'+tier);
+
+  const messagePull = `Changes in this pull request will be available for download in [Keyman version ${versionTier}](https://keyman.com/downloads/releases/${tier}/${version})`;
+
+  // Potentially creating many comments, we need to respect GitHub rate limits
+  // https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-abuse-rate-limits
+  let result: Promise<any> = Promise.resolve();
+  pulls.forEach(pull => {
+
+    result = result
+      // At least 1 second delay between requests; we'll do 10 seconds
+      .then(() => new Promise(resolve => setTimeout(resolve, 10000)))
+      // Always serially rather than in parallel
+      .then(() => {
+        console.log(`Creating comment on Pull Request #${pull}`);
+        return octokit.issues.createComment({
+          owner: 'keymanapp',
+          repo: 'keyman',
+          issue_number: pull,
+          body: messagePull,
+        })
+      });
+  });
+
+  return result;
 }
 
 /**
  * Adds any outstanding pull request titles to HISTORY.md for the current
  * version. Retrieves pull request details from GitHub.
  * @returns number of history entries for the current version,
- *          0 if no pulls associated with the current vesrion, or
+ *          0 if no pulls associated with the current version, or
  *          -1 on error.
  */
 
 export const fixupHistory = async (
-  octokit: GitHub, base: string
+  octokit: GitHub, base: string, force: boolean
 ): Promise<number> => {
 
   //
   // Get the last auto history merge commit ref
   //
 
-  const commit_id = await getPullRequestInformation(octokit);
+  const commit_id = await getPullRequestInformation(octokit, base);
   if (commit_id === undefined) {
     logWarning('Unable to fetch pull request information.');
     return -1;
@@ -227,7 +269,7 @@ export const fixupHistory = async (
   //
 
   const git_result = (await spawnChild('git', ['log', '--merges', /*'--first-parent',*/ '--format=%H', base, `${commit_id}..`])).trim();
-  if(git_result.length == 0) {
+  if(git_result.length == 0 && !force) {
     // We won't throw on this
     logWarning('No pull requests found since previous increment');
     return 0;
@@ -242,13 +284,21 @@ export const fixupHistory = async (
 
   let pulls: PRInformation[] = [];
 
-  for(const commit of new_commits) {
-    const pr = await getAssociatedPRInformation(octokit, commit);
-    if(pr === undefined) {
-      logWarning(`commit ref ${commit} has no associated pull request.`);
-      continue;
+  if(git_result.length == 0) {
+    pulls.push({
+      title: 'No changes made',
+      number: 0
+    });
+  }
+  else {
+    for(const commit of new_commits) {
+      const pr = await getAssociatedPRInformation(octokit, commit);
+      if(pr === undefined) {
+        logWarning(`commit ref ${commit} has no associated pull request.`);
+        continue;
+      }
+      pulls.push(pr);
     }
-    pulls.push(pr);
   }
 
   //logInfo(JSON.stringify(pulls, null, 2));
@@ -257,7 +307,15 @@ export const fixupHistory = async (
   // Splice these into HISTORY.md
   //
 
-  const changeCount = await splicePullsIntoHistory(pulls);
+  const historyResult = await splicePullsIntoHistory(pulls);
 
-  return changeCount;
+  //
+  // Write a comment to GitHub for each of the pulls
+  //
+
+  if(git_result.length > 0) {
+    await sendCommentToPullRequestAndRelatedIssues(octokit, historyResult.pulls);
+  }
+
+  return historyResult.count;
 };

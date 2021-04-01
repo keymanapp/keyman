@@ -8,6 +8,9 @@ namespace com.keyman.dom {
     } else if(keyman.util.getIEVersion() < 10) {
       console.warn("WebWorkers are not supported in this version of IE.");
       return false;
+    } else if(typeof Worker != 'function') {
+      console.warn("WebWorkers are not supported by this browser.");
+      return false;
     }
 
     return true;

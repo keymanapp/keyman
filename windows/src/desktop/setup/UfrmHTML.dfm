@@ -2,7 +2,7 @@ object frmHTML: TfrmHTML
   Left = 192
   Top = 107
   BorderIcons = [biSystemMenu, biMaximize]
-  Caption = 'Keyman Desktop'
+  Caption = 'Keyman'
   ClientHeight = 313
   ClientWidth = 666
   Color = clBtnFace

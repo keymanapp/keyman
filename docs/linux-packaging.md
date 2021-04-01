@@ -5,8 +5,9 @@
 We use different channels to build and distribute the Linux packages:
 
 - (older version) included in official repos since Ubuntu 19.04 and Debian Buster
-- Launchpad repo for [stable](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman) and
-  [beta](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-daily) versions
+- Launchpad repo for [stable](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman),
+  [beta](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-beta) and
+  [alpha](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-alpha) versions
 - [pso](http://packages.sil.org/) and [llso](http://linux.lsdev.sil.org/ubuntu/)
   for stable, beta, and alpha versions
 - artifacts on [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/view/change-requests/)
@@ -95,8 +96,9 @@ are scattered over several source repos:
 
 ### Flow of a Linux package build
 
-- [TeamCity job](https://build.palaso.org/buildConfiguration/Keyman_Test?) triggers a build on
-  [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
+- TeamCity jobs [Keyman_Test](https://build.palaso.org/buildConfiguration/Keyman_Test) or
+  [Keyman_TriggerReleaseBuilds*](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsBeta)
+  trigger a build on [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
 - Jenkins verifies the build parameters and starts the matching build configuration for the PR or
   branch
 - The [build job](https://github.com/sillsdev/lsdev-pipeline-library/blob/master/vars/keymanPackaging.groovy) runs several checks:
@@ -115,7 +117,7 @@ are scattered over several source repos:
   libkmfl, ibus-kmfl, keyman-config, and ibus-keyman). This is done by calling
   [scripts/jenkins.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh).
 - build job creates the binary package for each linux package on each distribution (currently
-  xenial, bionic) and each architecture (amd64, i386)
+  bionic, focal, and groovy) and each architecture (amd64, i386 only for bionic)
 - at the end of the build if it is not a build of a PR, the `.deb` file gets uploaded to llso
   (alpha packages to e.g. `bionic-experimental`, beta packages to `bionic-proposed` and
   packages build from the stable branch to the main section `bionic`)
@@ -125,6 +127,11 @@ The Jenkins build progress is visible in two ways:
 
 - [traditional view](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
 - [blue ocean view](https://jenkins.lsdev.sil.org/blue/organizations/jenkins/pipeline-keyman-packaging/activity)
+
+**Note:** TC release builds pass the git tag to build to the Jenkins job. The same tag
+gets passed twice as parameters `tag` and `tag2`. The first parameter gets persisted between
+builds, allowing to retrigger a tag-build. The second parameter is necessary to distinguish
+if this is a retriggered build of a tag-build.
 
 ### Local package builds
 
@@ -141,14 +148,14 @@ with that. [`setup.sh`](https://github.com/sillsdev/ci-builder-scripts/blob/mast
 can setup such chroots:
 
 ```bash
-bash/setup.sh --dists "xenial bionic" --arches "amd64 i386"
+bash/setup.sh --dists "focal bionic" --arches "amd64 i386"
 ```
 
 [`update`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/update) is used to
 later update those chroots:
 
 ```bash
-bash/update --dists "xenial bionic" --arches "amd64 i386"
+bash/update --dists "focal bionic" --arches "amd64 i386"
 ```
 
 Set the `DEBSIGNKEY` environment variable to your public GPG key that will be used to sign
@@ -180,9 +187,9 @@ script creates the binary packages:
 ```bash
 cd linux/${packageName}
 ~/ci-builder-scripts/bash/build-package \
-    --dists "xenial bionic" --arches "amd64 i386" \
+    --dists "focal bionic" --arches "amd64 i386" \
     --main-package-name "My great package" \
-    --supported-distros "xenial bionic focal" \
+    --supported-distros "bionic focal" \
     --debkeyid ${DEBSIGNKEY} --build-in-place --no-upload
 ```
 

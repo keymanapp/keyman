@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
@@ -347,8 +348,7 @@ public class CloudRepository {
     preCacheDataSet(context,null,null,null);
 
     if(CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
-      String msg = context.getString(R.string.catalog_download_is_running_in_background);
-      Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+      BaseActivity.makeToast(context, R.string.catalog_download_is_running_in_background, Toast.LENGTH_SHORT);
     }
 
     return memCachedDataset;
@@ -394,12 +394,10 @@ public class CloudRepository {
       cloudQueries.toArray(params);
 
       if (CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
-        String msg = context.getString(R.string.catalog_download_is_running_in_background);
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        BaseActivity.makeToast(context, R.string.catalog_download_is_running_in_background, Toast.LENGTH_SHORT);
       } else {
         updateIsRunning = true;
-        String msg = context.getString(R.string.catalog_download_start_in_background);
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        BaseActivity.makeToast(context, R.string.catalog_download_start_in_background, Toast.LENGTH_SHORT);
         CloudDownloadMgr.getInstance().executeAsDownload(
           context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
       }

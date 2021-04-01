@@ -20,6 +20,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationCompat.Builder;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.KMManager;
@@ -105,7 +106,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
           return;
         }
 
-        Toast.makeText(currentContext, currentContext.getString(R.string.update_check_current), Toast.LENGTH_SHORT).show();
+        BaseActivity.makeToast(currentContext, R.string.update_check_current, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -121,7 +122,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
           return;
         }
 
-        Toast.makeText(currentContext, currentContext.getString(R.string.update_check_unavailable), Toast.LENGTH_SHORT).show();
+        BaseActivity.makeToast(currentContext, R.string.update_check_unavailable, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         updateCheckFailed = true;
         checkingUpdates = false;
@@ -193,7 +194,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
               currentContext.startActivity(intent);
             }
           } else {
-            Toast.makeText(currentContext, "No internet connection", Toast.LENGTH_SHORT).show();
+            BaseActivity.makeToast(currentContext, R.string.cannot_connect, Toast.LENGTH_SHORT);
             checkingUpdates = false;
           }
         }
@@ -428,8 +429,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       .setContentText(message)
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
       .setAutoCancel(true)
-      .setContentIntent(startUpdateIntent)
-      .setOngoing(true);
+      .setContentIntent(startUpdateIntent);
 
     notificationManager.notify(notification_id,builder.build());
   }
@@ -555,12 +555,12 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
 
       if (failedUpdateCount > 0) {
-        Toast.makeText(currentContext, "One or more resources failed to update!", Toast.LENGTH_SHORT).show();
+        BaseActivity.makeToast(currentContext, R.string.update_failed, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         updateFailed = true;
         checkingUpdates = false;
       } else {
-        Toast.makeText(currentContext, "Resources successfully updated!", Toast.LENGTH_SHORT).show();
+        BaseActivity.makeToast(currentContext, R.string.update_success, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

@@ -265,8 +265,7 @@ HRESULT CKMTipTextService::_PreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)   //
 {
   LogEnter();
 
-  _PreservedKeys = NULL;
-  _cPreservedKeyCount = 0;
+  _UnpreserveAltKeys(pKeystrokeMgr);
 
   if(!Keyman32Interface::GetKeyboardPreservedKeys(NULL, &_cPreservedKeyCount))
   {

@@ -73,6 +73,7 @@ import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
@@ -179,7 +180,6 @@ public final class KMManager {
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";
   public static final String KMKey_KeyboardCount = "kbCount";
-  public static final String KMKey_HelpLink = "helpLink";
   public static final String KMKey_Icon = "icon";
   public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_KeyboardID = "kbId";
@@ -193,12 +193,6 @@ public final class KMManager {
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
 
-  // DEPRECATED
-  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
-
-  // DEPRECATED
-  public static final String KMKey_CustomModel = "CustomModel";
-
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
@@ -208,6 +202,11 @@ public final class KMManager {
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
   public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
+
+  // DEPRECATED keys
+  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
+  public static final String KMKey_CustomModel = "CustomModel";
+  public static final String KMKey_HelpLink = "helpLink";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -420,21 +419,19 @@ public final class KMManager {
    * @param keyboard KeyboardType
    * @return RelativeLayout.LayoutParams
    */
-  private static RelativeLayout.LayoutParams getKeyboardLayoutParams(KeyboardType keyboard) {
+  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
-    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-    }
+    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
    return params;
   }
 
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
@@ -447,7 +444,7 @@ public final class KMManager {
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
@@ -468,6 +465,18 @@ public final class KMManager {
   public static void hideSystemKeyboard() {
     if (SystemKeyboard != null) {
       SystemKeyboard.hideKeyboard();
+    }
+  }
+
+  public static boolean isKeyboardLoaded(KeyboardType type) {
+    if (type == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return InAppKeyboardLoaded;
+    } else if (type == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return SystemKeyboardLoaded;
+    } else {
+      String msg = "Keyboard type undefined";
+      KMLog.LogError(TAG, msg);
+      return false;
     }
   }
 
@@ -537,12 +546,12 @@ public final class KMManager {
   public static void onConfigurationChanged(Configuration newConfig) {
     // KMKeyboard
     if (InAppKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.onConfigurationChanged(newConfig);
     }
@@ -723,7 +732,7 @@ public final class KMManager {
    *
    * At some point, we might migrate /cloud/ keyboards into packages
    * 5) For now, delete cloud/sil_euro_latin*.js
-   * 
+   *
    * Assumption: No legacy keyboards exist in /packages/*.js
    * @param context
    */
@@ -940,7 +949,7 @@ public final class KMManager {
       public boolean accept(File pathname) {
         String name = pathname.getName();
 
-        String patternStr = String.format("^([A-Za-z0-9-_]+)-([0-9.]+)(\\.js)$");
+        String patternStr = KMString.format("^([A-Za-z0-9-_]+)-([0-9.]+)(\\.js)$");
         Pattern pattern = Pattern.compile(patternStr);
         Matcher matcher = pattern.matcher(name);
         if (matcher.matches() && (matcher.groupCount() == 3) &&
@@ -1061,14 +1070,14 @@ public final class KMManager {
 
     RelativeLayout.LayoutParams params;
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-      params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
+      params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-      params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
   }
@@ -1079,7 +1088,7 @@ public final class KMManager {
       currentLexicalModel = null;
     }
 
-    String url = String.format("deregisterModel('%s')", modelID);
+    String url = KMString.format("deregisterModel('%s')", modelID);
     if (InAppKeyboard != null) { // && InAppKeyboardLoaded) {
       InAppKeyboard.loadJavascript(url);
     }
@@ -1091,7 +1100,7 @@ public final class KMManager {
   }
 
   public static boolean setBannerOptions(boolean mayPredict) {
-    String url = String.format("setBannerOptions(%s)", mayPredict);
+    String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
     }
@@ -1278,9 +1287,9 @@ public final class KMManager {
         currentBanner = KMManager.KM_BANNER_STATE_BLANK;
 
       if(result1)
-        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP));
+        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
       if(result2)
-        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM));
+        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
 
     registerAssociatedLexicalModel(languageID);
@@ -1460,7 +1469,7 @@ public final class KMManager {
 
       for (File file : files) {
         String filename = file.getName();
-        String base = String.format("%s-", keyboardID);
+        String base = KMString.format("%s-", keyboardID);
         int index = filename.indexOf(base);
         if (index == 0) {
           int firstIndex = base.length();
@@ -1623,14 +1632,14 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-        InAppKeyboard.loadJavascript(String.format("updateKMText('%s')", kmText));
+        InAppKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
       InAppKeyboardShouldIgnoreTextChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-        SystemKeyboard.loadJavascript(String.format("updateKMText('%s')", kmText));
+        SystemKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
@@ -1644,7 +1653,7 @@ public final class KMManager {
     boolean result = false;
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreSelectionChange) {
-        InAppKeyboard.loadJavascript(String.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
@@ -1659,7 +1668,7 @@ public final class KMManager {
           }
         }
 
-        SystemKeyboard.loadJavascript(String.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        SystemKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
@@ -1695,7 +1704,7 @@ public final class KMManager {
     int index = KeyboardController.INDEX_NOT_FOUND;
 
     if (keyboardID != null & languageID != null) {
-      String kbKey = String.format("%s_%s", languageID, keyboardID);
+      String kbKey = KMString.format("%s_%s", languageID, keyboardID);
       index = KeyboardController.getInstance().getKeyboardIndex(kbKey);
     }
 
@@ -1714,7 +1723,7 @@ public final class KMManager {
     boolean result = false;
 
     if (packageID != null && keyboardID != null && languageID != null) {
-      File keyboardFile = new File(getPackagesDir(), packageID + File.separator + String.format("%s.js", keyboardID));
+      File keyboardFile = new File(getPackagesDir(), packageID + File.separator + KMString.format("%s.js", keyboardID));
       result = KeyboardController.getInstance().keyboardExists(packageID, keyboardID, languageID) &&
         keyboardFile.exists();
     }
@@ -1726,7 +1735,7 @@ public final class KMManager {
     boolean result = false;
 
     if (packageID != null && languageID != null &&  modelID != null) {
-      String lmKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+      String lmKey = KMString.format("%s_%s_%s", packageID, languageID, modelID);
       result = KeyboardPickerActivity.containsLexicalModel(context, lmKey);
     }
 
@@ -1821,36 +1830,36 @@ public final class KMManager {
         KMLog.LogError(TAG, "pageLoaded and InAppKeyboard null");
         return;
       }
+      InAppKeyboard.keyboardSet = false;
+      currentLexicalModel = null;
 
-      if (url.startsWith("file")) { //endsWith(KMFilename_KeyboardHtml)) {
+      if (url.startsWith("file")) { // TODO: is this test necessary?
         InAppKeyboardLoaded = true;
 
-        if (!InAppKeyboard.keyboardSet) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-          if (index < 0) {
-            index = 0;
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+        if (index < 0) {
+          index = 0;
+        }
+        Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
+        String langId = null;
+        if (keyboardInfo != null) {
+          langId = keyboardInfo.getLanguageID();
+          InAppKeyboard.setKeyboard(keyboardInfo);
+        } else {
+          // Revert to default (index 0) or fallback keyboard
+          keyboardInfo = KMManager.getKeyboardInfo(context, 0);
+          if (keyboardInfo == null) {
+            // Not logging to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
+            keyboardInfo = KMManager.getDefaultKeyboard(context);
           }
-          Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-          String langId = null;
           if (keyboardInfo != null) {
             langId = keyboardInfo.getLanguageID();
             InAppKeyboard.setKeyboard(keyboardInfo);
-          } else {
-            // Revert to default (index 0) or fallback keyboard
-            keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-            if (keyboardInfo == null) {
-              KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-              keyboardInfo = KMManager.getDefaultKeyboard(context);
-            }
-            if (keyboardInfo != null) {
-              langId = keyboardInfo.getLanguageID();
-              InAppKeyboard.setKeyboard(keyboardInfo);
-            }
           }
-
-          registerAssociatedLexicalModel(langId);
         }
+
+        registerAssociatedLexicalModel(langId);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -2005,7 +2014,7 @@ public final class KMManager {
         }
         currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-        RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
         // URL has actual path to the keyboard.html file as a prefix!  We need to replace
@@ -2067,34 +2076,36 @@ public final class KMManager {
         return;
       }
 
-      if (url.startsWith("file:")) {
-        SystemKeyboardLoaded = true;
-        if (!SystemKeyboard.keyboardSet) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-          if (index < 0) {
-            index = 0;
-          }
-          Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-          String langId = null;
-          if (keyboardInfo != null) {
-            langId  = keyboardInfo.getLanguageID();
-            SystemKeyboard.setKeyboard(keyboardInfo);
-          } else {
-            // Revert to default (index 0) or fallback keyboard
-            keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-            if (keyboardInfo == null) {
-              KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-              keyboardInfo = KMManager.getDefaultKeyboard(context);
-            }
-            if (keyboardInfo != null) {
-              langId = keyboardInfo.getLanguageID();
-              SystemKeyboard.setKeyboard(keyboardInfo);
-            }
-          }
+      SystemKeyboard.keyboardSet = false;
+      currentLexicalModel = null;
 
-          registerAssociatedLexicalModel(langId);
+      if (url.startsWith("file:")) { // TODO: is this test necessary?
+        SystemKeyboardLoaded = true;
+
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+        if (index < 0) {
+          index = 0;
         }
+        Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
+        String langId = null;
+        if (keyboardInfo != null) {
+          langId  = keyboardInfo.getLanguageID();
+          SystemKeyboard.setKeyboard(keyboardInfo);
+        } else {
+          // Revert to default (index 0) or fallback keyboard
+          keyboardInfo = KMManager.getKeyboardInfo(context, 0);
+          if (keyboardInfo == null) {
+            KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
+            keyboardInfo = KMManager.getDefaultKeyboard(context);
+          }
+          if (keyboardInfo != null) {
+            langId = keyboardInfo.getLanguageID();
+            SystemKeyboard.setKeyboard(keyboardInfo);
+          }
+        }
+
+        registerAssociatedLexicalModel(langId);
 
 
         Handler handler = new Handler();
@@ -2273,7 +2284,7 @@ public final class KMManager {
         }
         currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-        RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
         // URL has actual path to the keyboard.html file as a prefix!  We need to replace
@@ -2390,22 +2401,24 @@ public final class KMManager {
 
           if (dn <= 0) {
             if (start == end) {
-              if (!s.isEmpty() && s.charAt(0) == '\n') {
+              if (s.length() > 0 && s.charAt(0) == '\n') {
                 textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
               } else {
                 // *** TO DO: Try to find a solution to the bug on API < 17, insert overwrites on next line
-                InAppKeyboardShouldIgnoreTextChange = true;
-                InAppKeyboardShouldIgnoreSelectionChange = true;
-                textView.getText().insert(start, s);
+                if (s.length() > 0) {
+                  InAppKeyboardShouldIgnoreTextChange = true;
+                  InAppKeyboardShouldIgnoreSelectionChange = true;
+                  textView.getText().insert(start, s);
+                }
               }
             } else {
-              if (!s.isEmpty() && s.charAt(0) == '\n') {
+              if (s.length() > 0 && s.charAt(0) == '\n') {
                 InAppKeyboardShouldIgnoreTextChange = true;
                 InAppKeyboardShouldIgnoreSelectionChange = true;
                 textView.getText().replace(start, end, "");
                 textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
               } else {
-                if (s.isEmpty()) {
+                if (s.length() == 0) {
                   textView.getText().delete(start, end);
                 } else {
                   InAppKeyboardShouldIgnoreTextChange = true;

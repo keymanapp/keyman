@@ -10,7 +10,8 @@ using namespace kmx;
 
 /* Globals */
 
-KMX_BOOL km::kbp::kmx::g_debug_ToConsole = TRUE, km::kbp::kmx::g_debug_KeymanLog = TRUE;
+KMX_BOOL km::kbp::kmx::g_debug_ToConsole = FALSE;
+KMX_BOOL km::kbp::kmx::g_debug_KeymanLog = TRUE;
 KMX_BOOL km::kbp::kmx::g_silent = FALSE;
 
 /*
@@ -20,6 +21,7 @@ KMX_BOOL km::kbp::kmx::g_silent = FALSE;
 KMX_Processor::KMX_Processor() : m_actions(&m_context), m_options(&m_keyboard) {
   m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];
   m_miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
+  m_miniContextIfLen = 0;
 }
 
 KMX_Processor::~KMX_Processor() {
@@ -119,7 +121,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   PKMX_WCHAR p;
   int sdmfI;
 
-    /*
+  /*
    If the number of nested groups goes higher than 50, then break out - this is
    a limitation of stack size.  This is basically a catch-all for freaky apps that
    cause message loopbacks and nasty things like that.  Okay, it's really a catch all
@@ -242,6 +244,8 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 
   assert(kkp != NULL);
 
+  m_miniContextIfLen = xstrlen(kkp->dpContext) - xstrlen_ignoreifopt(kkp->dpContext);
+
   // 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
   if(*kkp->dpContext == UC_SENTINEL && *(kkp->dpContext+1) == CODE_NUL)
     u16cpy(m_miniContext, /*GLOBAL_ContextStackSize,*/ m_context.Buf(xstrlen_ignoreifopt(kkp->dpContext)-1) /*, GLOBAL_ContextStackSize*/);  // I3162   // I3536
@@ -265,7 +269,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   p = kkp->dpOutput;
   if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT)
   {
-    for(p = decxstr((KMX_WCHAR *) u16chr(m_miniContext, 0), m_miniContext); p >= m_miniContext; p = decxstr(p, m_miniContext))
+    for(p = decxstr((KMX_WCHAR *) u16chr(m_miniContext, 0), m_miniContext); p != NULL; p = decxstr(p, m_miniContext))
     {
       if(*p == UC_SENTINEL)
         switch(*(p+1))
@@ -353,18 +357,18 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         m_actions.QueueAction(QIT_BELL, 0);
         break;
       case CODE_CONTEXT:        // copy the context to the output
-        for(q = m_miniContext; *q; q++) {
-          m_actions.QueueAction(QIT_CHAR, *q);
-        }
+      {
+        KMX_BOOL ignoreOutputKeystroke;
+        PostString(m_miniContext, lpkb, (PKMX_WCHAR) u16chr(m_miniContext, 0), &ignoreOutputKeystroke);
         break;
+      }
       case CODE_CONTEXTEX:
         p++;
-        for(q = m_miniContext, i = 0; *q && i < *p-1; i++, q=incxstr(q));
-        if(*q) {
-          m_actions.QueueAction(QIT_CHAR, *q);
-          if(Uni_IsSurrogate1(*q) && Uni_IsSurrogate2(*(q+1))) {
-            m_actions.QueueAction(QIT_CHAR, *(q+1));
-          }
+        for (q = m_miniContext, i = m_miniContextIfLen; *q && i < *p - 1; i++, q = incxstr(q));
+        if (*q) {
+          KMX_BOOL ignoreOutputKeystroke;
+          temp = incxstr(q);
+          PostString(q, lpkb, temp, &ignoreOutputKeystroke);
         }
         break;
       case CODE_RETURN:       // stop processing and start PostAllKeys
@@ -419,7 +423,12 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         break;
       }
     else {
-      m_actions.QueueAction(QIT_CHAR, *p);
+      if(Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p+1))) {
+        m_actions.QueueAction(QIT_CHAR, Uni_SurrogateToUTF32(*p, *(p+1)));
+        p++;
+      } else {
+        m_actions.QueueAction(QIT_CHAR, *p);
+      }
     }
   }
   return FoundUse ? psrPostMessages : psrCheckMatches;

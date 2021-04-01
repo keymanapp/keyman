@@ -3,6 +3,7 @@ inherited frmHelp: TfrmHelp
   BorderStyle = bsDialog
   ClientHeight = 288
   ClientWidth = 428
+  Position = poScreenCenter
   ExplicitWidth = 434
   ExplicitHeight = 317
   PixelsPerInch = 96

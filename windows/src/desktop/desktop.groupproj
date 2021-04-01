@@ -15,6 +15,9 @@
         <Projects Include="kmconfig\kmconfig.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="insthelp\insthelp.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -59,14 +62,23 @@
     <Target Name="kmconfig:Make">
         <MSBuild Projects="kmconfig\kmconfig.dproj" Targets="Make"/>
     </Target>
+    <Target Name="insthelp">
+        <MSBuild Projects="insthelp\insthelp.dproj"/>
+    </Target>
+    <Target Name="insthelp:Clean">
+        <MSBuild Projects="insthelp\insthelp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="insthelp:Make">
+        <MSBuild Projects="insthelp\insthelp.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="kmshell;kmbrowserhost;setup;kmconfig"/>
+        <CallTarget Targets="kmshell;kmbrowserhost;setup;kmconfig;insthelp"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="kmshell:Clean;kmbrowserhost:Clean;setup:Clean;kmconfig:Clean"/>
+        <CallTarget Targets="kmshell:Clean;kmbrowserhost:Clean;setup:Clean;kmconfig:Clean;insthelp:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="kmshell:Make;kmbrowserhost:Make;setup:Make;kmconfig:Make"/>
+        <CallTarget Targets="kmshell:Make;kmbrowserhost:Make;setup:Make;kmconfig:Make;insthelp:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

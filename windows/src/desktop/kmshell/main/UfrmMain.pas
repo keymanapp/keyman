@@ -31,7 +31,7 @@
                     30 May 2007 - mcdurdin - Refactored install keyboard dialog out of UfrmMain
                     30 May 2007 - mcdurdin - I825 - Added proxy username and password
                     30 May 2007 - mcdurdin - I858 - Added Help and Getting Started links
-                    13 Jul 2007 - mcdurdin - I926 - Close down Keyman Desktop when doing an update patch.
+                    13 Jul 2007 - mcdurdin - I926 - Close down Keyman when doing an update patch.
                     23 Aug 2007 - mcdurdin - I956 - Refresh locales after package installation
                     14 Sep 2007 - mcdurdin - I956 - Ensure select language dialog appears after installing locale
                     14 Sep 2007 - mcdurdin - I1061 - "Uninstall keyboard xxx" was not translated (when click Menu/Uninstall keyboard)
@@ -55,7 +55,7 @@
                     18 Mar 2011 - mcdurdin - I2807 - Enable/disable addins
                     18 Mar 2011 - mcdurdin - I2392 - Improve integration of activation server client
                     18 Mar 2011 - mcdurdin - I2789 - Lang Config tasks needs to refresh configuration
-                    18 Mar 2011 - mcdurdin - I2786 - Keyman Configuration app title is "Keyman Desktop" not "Keyman Desktop Configuration"
+                    18 Mar 2011 - mcdurdin - I2786 - Keyman Configuration app title is "Keyman D_esktop" not "Keyman D_esktop Configuration"
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     08 Jun 2012 - mcdurdin - I3349 - V9.0 - Consolidate all process creation into TUtilExecute
@@ -71,9 +71,19 @@ unit UfrmMain;  // I3306   // I4248
 interface
 
 uses
+  System.Classes,
   System.Contnrs,
+  System.SysUtils,
+  System.Types,
   System.UITypes,
-  Windows, Messages, SysUtils, Classes, Types, Graphics, Controls, Forms, Dialogs,
+  Vcl.AppEvnts,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Winapi.Messages,
+  Winapi.Windows,
+
   keymanapi_TLB,
   XMLRenderer,
   KeyboardListXMLRenderer,
@@ -82,14 +92,18 @@ uses
 
 type
   TfrmMain = class(TfrmWebContainer)
+    AppEvents: TApplicationEvents;
     procedure TntFormCreate(Sender: TObject);
     procedure TntFormDestroy(Sender: TObject);
     procedure TntFormClose(Sender: TObject; var Action: TCloseAction);
     procedure TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure AppEventsMessage(var Msg: tagMSG; var Handled: Boolean);
 
   private
     FPageTag: Integer;
     FClosing: Boolean;
+    wm_keyman_refresh: Cardinal;
+    LastRefreshToken: System.IntPtr;
 
     procedure cefBeforeBrowse(Sender: TObject; const Url: string;
       isPopup, wasHandled: Boolean);
@@ -132,14 +146,15 @@ type
     procedure Support_ContactSupport(params: TStringList);   // I4390
 
     procedure OpenSite(params: TStringList);
-    procedure RefreshKeymanConfiguration;
+    procedure DoApply;
+    procedure DoRefresh;
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
     class function ShouldRegisterWindow: Boolean; override;  // I2720
     function ShouldSetAppTitle: Boolean; override;   // I2786
   public
-    procedure Do_Content_Render(FRefreshKeyman: Boolean); override;
+    procedure Do_Content_Render; override;
   end;
 
 implementation
@@ -147,34 +162,37 @@ implementation
 {$R *.DFM}
 
 uses
+  System.StrUtils,
+  System.Variants,
+  Winapi.ShellApi,
+
   BaseKeyboards,
-  ComObj,
+  ErrorControlledRegistry,
   GetOSVersion,
   Hints,
   HotkeyUtils,
-  Imm,
   initprog,
+  Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
   KeymanVersion,
   KeyNames,
   custinterfaces,
+  HotkeysXMLRenderer,
   KLog,
   kmint,
+  LanguagesXMLRenderer,
   MessageIdentifierConsts,
   MessageIdentifiers,
   onlineconstants,
   OnlineUpdateCheck,
-  //GlobalProxySettings,
-  //Registration,
-  ErrorControlledRegistry,
+  OptionsXMLRenderer,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.UI.UfrmSettingsManager,
   RegistryKeys,
-  ShellApi,
-  StrUtils,
+  SupportXMLRenderer,
   UfrmChangeHotkey,
   UfrmHTML,
   UfrmInstallKeyboardFromWeb,
@@ -190,12 +208,7 @@ uses
   utilkmshell,
   utilhttp,
   utiluac,
-  utilxml,
-  HotkeysXMLRenderer,
-  OptionsXMLRenderer,
-  LanguagesXMLRenderer,
-  SupportXMLRenderer,
-  Variants;
+  utilxml;
 
 type
   PHKL = ^HKL;
@@ -207,6 +220,11 @@ type
 procedure TfrmMain.TntFormCreate(Sender: TObject);
 begin
   inherited;
+
+  // Yes, there is a disconnect between the registered name and the variable
+  // name. Everywhere else we use this we do the same thing -- probably should
+  // update the variable name one day.
+  wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
 
   // Prevents keep-in-touch opening in browser
   cef.ShouldOpenRemoteUrlsInBrowser := False;
@@ -221,7 +239,7 @@ begin
 
   FRenderPage := 'keyman'; // TODO: rename to 'configmain'
 
-  Do_Content_Render(False);
+  Do_Content_Render;
 end;
 
 procedure TfrmMain.TntFormClose(Sender: TObject; var Action: TCloseAction);
@@ -243,7 +261,7 @@ end;
  - Form-level functions                                                        -
  ------------------------------------------------------------------------------}
 
-procedure TfrmMain.Do_Content_Render(FRefreshKeyman: Boolean);
+procedure TfrmMain.Do_Content_Render;
 var
   sharedDataIntf: IConfigMainSharedData;
   sharedData: TConfigMainSharedData;
@@ -285,7 +303,7 @@ begin
     FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
     FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
 
-    xml := FXMLRenderers.RenderToString(FRefreshKeyman, s);
+    xml := FXMLRenderers.RenderToString(s);
     sharedData.Init(
       FXMLRenderers.TempPath,
       xml,
@@ -332,7 +350,7 @@ begin
 
   else if command = 'opensite' then OpenSite(params)
 
-  else if command = 'help' then Application.HelpJump('context_'+lowercase(DialogName))
+  else if command = 'help' then DoOpenHelp
 
   else inherited;
 end;
@@ -434,8 +452,7 @@ begin
   try
     if ShowModal = mrOk then
     begin
-      //SelectLanguage(False);
-      RefreshKeymanConfiguration;
+      DoRefresh;
     end;
   finally
     Free;
@@ -446,7 +463,7 @@ procedure TfrmMain.Keyboard_Install;
 begin
   if TInstallFile.BrowseAndInstallKeyboardFromFile(Self) then
   begin
-    RefreshKeymanConfiguration;
+    DoRefresh;
   end;
 end;
 
@@ -462,7 +479,7 @@ begin
     kbd := nil;
     if UninstallKeyboard(Self, kbdID, False) then
     begin
-      RefreshKeymanConfiguration;
+      DoRefresh;
     end;
   end;
 end;
@@ -477,7 +494,7 @@ begin
     // TODO: refactor this away?
     if UninstallKeyboardLanguage(GUIDToString(kbdlang.ProfileGUID), False) then
     begin
-      RefreshKeymanConfiguration;
+      DoRefresh;
     end;
   end;
 end;
@@ -493,7 +510,7 @@ begin
     try
       Keyboard := kbd;
       if ShowModal = mrOk then
-        RefreshKeymanConfiguration;
+        DoRefresh;
     finally
       Free;
     end;
@@ -513,7 +530,7 @@ begin
     pkg := nil;
     if UninstallPackage(Self, pkgID, False) then
     begin
-      RefreshKeymanConfiguration;
+      DoRefresh;
     end;
   end;
 end;
@@ -537,11 +554,39 @@ end;
 procedure TfrmMain.Keyboard_ClickCheck(params: TStringList);
 var
   kbd: IKeymanKeyboardInstalled;
+  lang: IKeymanKeyboardLanguageInstalled2;
+  loaded: Boolean;
 begin
   if GetKeyboardFromParams(params, kbd) then
   begin
-    kbd.Loaded := StrToBool(params.Values['value']); //, 'true');
-    kmcom.Keyboards.Apply;
+    loaded := StrToBool(params.Values['value']);
+    if (params.Values['install'] <> '') and (kbd.Languages.Count > 0) then
+    begin
+      // For Keyman for FirstVoices, we will install the suggested language
+      // only when the checkbox is ticked, not when the keyboard is installed.
+      kbd.Loaded := True;
+      lang := kbd.Languages.Items[0] as IKeymanKeyboardLanguageInstalled2;
+      if loaded and not lang.IsInstalled then
+      begin
+        if not TTipMaintenance.DoInstall(kbd.ID, lang.WindowsBCP47Code) then
+        begin
+          // We'll need to refresh in this situation as the checkbox state will
+          // not match reality
+          ShowMessage(MsgFromIdFormat(SKInstallLanguageTransientLimit, [lang.WindowsBCP47Code]));
+          kbd.Loaded := False;
+          DoApply;
+          DoRefresh;
+        end;
+      end
+      else if not loaded and lang.IsInstalled then
+      begin
+        lang.Uninstall;
+        kbd.Loaded := False;
+      end;
+    end
+    else
+      kbd.Loaded := loaded;
+    DoApply; // No need to refresh page (checkbox state will already be correct)
   end;
 end;
 
@@ -561,6 +606,29 @@ begin
     kbdID := kbd.ID;
     kbd := nil;
     ShowKeyboardOptions(Self, kbdID);
+  end;
+end;
+
+procedure TfrmMain.AppEventsMessage(var Msg: tagMSG;
+  var Handled: Boolean);
+begin
+  inherited;
+  if (Msg.message = wm_keyman_refresh) and (Msg.WParam = KR_SETTINGS_CHANGED) then
+  begin
+    // If we generated this refresh ourselves, ignore it
+    if (kmcom <> nil) and (Msg.lParam <> KeymanEngineControl.LastRefreshToken) then
+    begin
+      // The refresh event was generated by another process or thread
+      //
+      // We may receive the notification multiple times because it is broadcast
+      // to all top-level windows and we probably have a bunch of them.
+      // So, if we've already processed it, don't do so again.
+      if Msg.lParam <> LastRefreshToken then
+      begin
+        LastRefreshToken := Msg.lParam;
+        DoRefresh;
+      end;
+    end;
   end;
 end;
 
@@ -585,8 +653,7 @@ end;
 procedure TfrmMain.Options_BaseKeyboard;   // I4169
 begin
   WaitForElevatedConfiguration(Handle, '-basekeyboard');
-  kmcom.Options.Refresh;
-  Do_Content_Render(True);
+  // Refresh will be triggered by elevated process
 end;
 
 procedure TfrmMain.Options_SettingsManager;
@@ -595,12 +662,15 @@ begin
   begin
     if not TfrmSettingsManager.Execute then
       Exit;
+    // Settings manager tells everyone to refresh but we ignore it because
+    // it is same thread, so do it ourselves
+    DoRefresh;
   end
   else
+  begin
     WaitForElevatedConfiguration(Handle, '-settings');
-
-  kmcom.Options.Refresh;
-  Do_Content_Render(True);
+    // Refresh will be triggered by elevated process
+  end;
 end;
 
 procedure TfrmMain.Options_ClickCheck(params: TStringList);
@@ -615,9 +685,15 @@ begin
       ShowMessage(MsgFromId(SKDebuggingWarning));
 
     kmcom.Errors.Clear;
-    kmcom.Options.Apply;
+    DoApply;
     if kmcom.Errors.Count > 0 then
+    begin
+      // We may not have permission or ability to set an option. In this case,
+      // we'll need to reload the page because the checkbox state may now
+      // be invalid
       ShowMessage(kmcom.Errors[0].Description);
+      DoRefresh;
+    end;
   end
   else
     ShowMessage(params.Text);
@@ -646,21 +722,21 @@ begin
   begin
     if not ChangeHotkey(Self, MsgFromIdFormat(SKSetHotkey_Language, [lang2.LocaleName + ' ('+lang2.LayoutName+')']), lang2.Hotkey) then
       Exit;
-    kmcom.Languages.Apply;
+    DoApply; // ChangeHotkey does not currently do an Apply
+    DoRefresh;
   end
   else if GetHotkeyFromParams(params, hotkey) then
   begin
     if not ChangeHotkey(Self, MsgFromId(SKSetHotkey_Interface), hotkey) then
       Exit;
-    kmcom.Hotkeys.Apply;
+    DoApply; // ChangeHotkey does not currently do an Apply
+    DoRefresh;
   end
   else
   begin
     ShowMessage(params.Text);
     Exit;
   end;
-
-  Do_Content_Render(False);
 end;
 
 procedure TfrmMain.Hotkey_Clear(params: TStringList);
@@ -671,17 +747,16 @@ begin
   if GetHotkeyLanguageFromParams(params, lang2) then
   begin
     lang2.Hotkey.Clear;
-    kmcom.Languages.Apply;
   end
   else if GetHotkeyFromParams(params, hotkey) then
   begin
     hotkey.Clear;
-    kmcom.Hotkeys.Apply;
   end
   else
     Exit;
 
-  Do_Content_Render(False);
+  DoApply;
+  DoRefresh;
 end;
 
 {-------------------------------------------------------------------------------
@@ -717,7 +792,7 @@ end;
 
 procedure TfrmMain.Support_UpdateCheck;
 begin
-  with TOnlineUpdateCheck.Create(True, False) do
+  with TOnlineUpdateCheck.Create(Self, True, False) do
   try
     case Run of
       oucShutDown:
@@ -734,7 +809,7 @@ begin
           end;
         end;
       oucSuccess:
-        RefreshKeymanConfiguration;
+        DoRefresh;
     end
   finally
     Free;
@@ -752,11 +827,6 @@ begin
   TUtilExecute.URL(params.Values['site']);  // I3349
 end;
 
-procedure TfrmMain.RefreshKeymanConfiguration;
-begin
-  Do_Content_Render(True);
-end;
-
 class function TfrmMain.ShouldRegisterWindow: Boolean; // I2720
 begin
   Result := True;
@@ -765,6 +835,17 @@ end;
 function TfrmMain.ShouldSetAppTitle: Boolean;  // I2786
 begin
   Result := True;
+end;
+
+procedure TfrmMain.DoApply;
+begin
+  kmcom.Apply;
+end;
+
+procedure TfrmMain.DoRefresh;
+begin
+  kmcom.Refresh;
+  Do_Content_Render;
 end;
 
 end.

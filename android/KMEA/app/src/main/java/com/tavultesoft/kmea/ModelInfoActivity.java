@@ -1,22 +1,16 @@
 /*
- * Copyright (C) 2017 SIL International. All rights reserved.
+ * Copyright (C) 2017-2021 SIL International. All rights reserved.
  */
 package com.tavultesoft.kmea;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
-import androidx.core.content.FileProvider;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -24,21 +18,17 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
-import com.tavultesoft.kmea.util.HelpFile;
+import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.KMHelpFileActivity;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_MODEL;
 
 // Public access is necessary to avoid IllegalAccessException
-public final class ModelInfoActivity extends AppCompatActivity {
+public final class ModelInfoActivity extends BaseActivity {
 
   private static ArrayList<HashMap<String, String>> infoList = null;
   private final String titleKey = "title";
@@ -150,11 +140,11 @@ public final class ModelInfoActivity extends AppCompatActivity {
         } else if (itemTitle.equals(getString(R.string.help_link))) {
           if (!customHelpLink.equals("")) {
             // Display local welcome.htm help file, including associated assets
-            Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
-
-            if (FileProviderUtils.exists(context) || KMManager.isTestMode()) {
-              startActivity(i);
-            }
+            Intent i = new Intent(context, KMHelpFileActivity.class);
+            // Have to use packageID since we don't store the package name
+            i.putExtra(KMManager.KMKey_PackageID, packageID);
+            i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
+            startActivity(i);
           } else {
             // We should always have a help file packaged with models.
           }
@@ -162,7 +152,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
         // "Uninstall Model" clicked
         } else if (itemTitle.equals(getString(R.string.uninstall_model))) {
           // Uninstall selected model
-          String lexicalModelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+          String lexicalModelKey = KMString.format("%s_%s_%s", packageID, languageID, modelID);
           DialogFragment dialog = ConfirmDialogFragment.newInstanceForItemKeyBasedAction(
             DIALOG_TYPE_DELETE_MODEL, modelName, getString(R.string.confirm_delete_model), lexicalModelKey);
           dialog.show(getFragmentManager(), "dialog");

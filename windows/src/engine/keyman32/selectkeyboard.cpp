@@ -1,18 +1,18 @@
 /*
   Name:             selectkeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Apr 2010
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Apr 2010 - mcdurdin - I2271 - Select Keyboard tidy up
                     19 Apr 2010 - mcdurdin - I2297 - Use global cache to remember last active keyboard for all apps
                     19 Apr 2010 - mcdurdin - I2297 - Rewrite SelectKeyboard to reduce complexity and increase stability
@@ -36,7 +36,7 @@
                     04 Nov 2012 - mcdurdin - I3538 - V9.0 - Merge of I3227 - When switching keyboards and typing rapidly, Windows/Keyman keyboard links can get out of sync
                     28 Nov 2012 - mcdurdin - I3594 - V9.0 - Remove old SelectKeyboard code and related messages
                     07 Nov 2013 - mcdurdin - I3949 - V9.0 - Keyboard selection and notification needs consolidation
-                    21 Feb 2014 - mcdurdin - I4066 - V9.0 - Keyman Desktop needs to run in a lockdown mode when expired so developers can still use it
+                    21 Feb 2014 - mcdurdin - I4066 - V9.0 - Keyman D_esktop needs to run in a lockdown mode when expired so developers can still use it
                     28 May 2014 - mcdurdin - I4220 - V9.0 - Remove references to LoadKeyboardLayout, Preload, Substitutes, etc. and use only TSF
                     16 Jun 2014 - mcdurdin - I4271 - V9.0 - Switch language for all applications is not working
                     23 Jun 2014 - mcdurdin - I4287 - V9.0 - Remove extraneous AppIntegration class type tests
@@ -62,8 +62,8 @@ BOOL SelectKeyboard(DWORD KeymanID)
   if(!_td) return FALSE;
 
 	SendDebugMessageFormat(hwnd,sdmGlobal,0,"ENTER SelectKeyboard-------------------------------------------");
-  SendDebugMessageFormat(hwnd,sdmGlobal,0,"ENTER SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d", 
-    GetKeyboardLayout(0), 
+  SendDebugMessageFormat(hwnd,sdmGlobal,0,"ENTER SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+    GetKeyboardLayout(0),
     _td->ActiveKeymanID,
     _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
     //_td->NextKeyboardLayout,
@@ -100,7 +100,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
 
 				SendDebugMessageFormat(hwnd,sdmGlobal,0,"SelectKeyboard: NewKeymanID: %x", _td->ActiveKeymanID);
 
-				if(_td->app) _td->app->ResetContext(); 
+				if(_td->app) _td->app->ResetContext();
 				ResetCapsLock();
 
         SelectApplicationIntegration();   // I4287
@@ -120,8 +120,8 @@ BOOL SelectKeyboard(DWORD KeymanID)
 	}
 	__finally
 	{
-    SendDebugMessageFormat(hwnd,sdmGlobal,0,"EXIT SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d", 
-      GetKeyboardLayout(0), 
+    SendDebugMessageFormat(hwnd,sdmGlobal,0,"EXIT SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+      GetKeyboardLayout(0),
       _td->ActiveKeymanID,
       _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
       KeymanID);

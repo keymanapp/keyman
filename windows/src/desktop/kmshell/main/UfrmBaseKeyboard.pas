@@ -32,6 +32,8 @@ begin
   with TfrmBaseKeyboard.Create(nil) do
   try
     Result := ShowModal = mrOk;
+    if Result then
+      kmcom.Apply;
   finally
     Free;
   end;
@@ -41,6 +43,7 @@ procedure TfrmBaseKeyboard.TntFormCreate(Sender: TObject);
 begin
   inherited;
   FRenderPage := 'basekeyboard';
+  HelpTopic := 'context/base-keyboard';
   Content_Render;
 end;
 

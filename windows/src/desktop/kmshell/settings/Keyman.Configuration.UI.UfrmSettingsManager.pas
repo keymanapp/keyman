@@ -15,10 +15,12 @@ uses
   Winapi.Messages,
   Winapi.Windows,
 
-  Keyman.System.Settings, Vcl.Imaging.pngimage, Vcl.ExtCtrls;
+  Keyman.System.Settings, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+
+  UfrmKeymanBase;
 
 type
-  TfrmSettingsManager = class(TForm)
+  TfrmSettingsManager = class(TfrmKeymanBase)
     gridDebugOption: TStringGrid;
     memoDescription: TMemo;
     cmdApply: TButton;
@@ -73,6 +75,8 @@ uses
   System.UITypes,
   System.Win.Registry,
 
+  kmint,
+
   Keyman.System.SettingsManager,
   Keyman.System.SettingsManagerFile,
   Keyman.Configuration.UI.UfrmSettingsAddTSFApp,
@@ -82,6 +86,7 @@ procedure TfrmSettingsManager.FormCreate(Sender: TObject);
 var
   r: TRegistry;
 begin
+  inherited;
   r := TRegistry.Create;
   try
     r.RootKey := HKEY_LOCAL_MACHINE;
@@ -100,12 +105,14 @@ end;
 
 procedure TfrmSettingsManager.FormResize(Sender: TObject);
 begin
+  inherited;
   gridDebugOption.ColWidths[1] := gridDebugOption.ClientWidth - gridDebugOption.ColWidths[0] - 1;
 end;
 
 procedure TfrmSettingsManager.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 begin
+  inherited;
   CanClose := True;
   if settings.Modified then
   begin
@@ -193,6 +200,12 @@ begin
   gridDebugOption.Invalidate;
   FWasSaved := True;
   EnableControls;
+
+  // Because we change settings directly in registry, Keyman COM API
+  // will now have invalid values, so let's refresh them before we
+  // apply and broadcast the change
+  kmcom.Refresh;
+  kmcom.Apply;
 end;
 
 procedure TfrmSettingsManager.cmdTSFApplicationSettingsClick(

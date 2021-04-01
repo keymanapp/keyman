@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
@@ -49,7 +50,7 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
 
   @Override
   public CloudKeyboardDownloadReturns extractCloudResultFromDownloadSet(
-    CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
+    Context aContext, CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
   {
     PackageProcessor kbdKMPProcessor = new PackageProcessor(resourceRoot);
     List<Map<String, String>> installedKeyboards = null;
@@ -57,7 +58,9 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
     int _result = FileUtils.DOWNLOAD_SUCCESS;
     for(CloudApiTypes.SingleCloudDownload _d:aDownload.getSingleDownloads())
     {
-      if (_d.getDestinationFile() != null && _d.getDestinationFile().length() > 0)
+
+      File destinationFile = _d.cacheAndOpenDestinationFile(aContext);
+      if (destinationFile != null && destinationFile.length() > 0)
       {
 
         try {
@@ -75,7 +78,7 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
             // Extract the kmp.
             File kmpFile = new File(cacheDir, kmpFilename);
 
-            FileUtils.copy(_d.getDestinationFile(), kmpFile);
+            FileUtils.copy(destinationFile, kmpFile);
 
             String pkgTarget = kbdKMPProcessor.getPackageTarget(kmpFile);
             if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
@@ -105,9 +108,7 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
   @Override
   public void applyCloudDownloadToModel(Context aContext, Void aModel, CloudKeyboardDownloadReturns aCloudResult)
   {
-    Toast.makeText(aContext,
-      aContext.getString(R.string.keyboard_download_finished),
-      Toast.LENGTH_SHORT).show();
+    BaseActivity.makeToast(aContext, R.string.keyboard_download_finished, Toast.LENGTH_SHORT);
 
     if(aCloudResult.installedResource != null)
     {

@@ -1,18 +1,18 @@
 (*
   Name:             initprog
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    23 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rework for Keyman 7
                     02 Aug 2006 - mcdurdin - Timeout when Beta expires
@@ -42,11 +42,11 @@
                     17 Dec 2010 - mcdurdin - I2548 - Fix bugs with upgrade
                     30 Dec 2010 - mcdurdin - I2562 - Start Keyman install properties
                     30 Dec 2010 - mcdurdin - I2604 - Upgrade to Pro from Character Map is incomplete
-                    31 Dec 2010 - mcdurdin - I2605 - Crash starting Keyman Desktop after upgrade when using non-default locale
+                    31 Dec 2010 - mcdurdin - I2605 - Crash starting Keyman after upgrade when using non-default locale
                     18 Feb 2011 - mcdurdin - I2702 - "Getting Started" link not working
                     21 Feb 2011 - mcdurdin - I2651 - Setup does not set desired default options
                     22 Feb 2011 - mcdurdin - I2753 - Firstrun crashes because start with windows and auto update check options are set in Engine instead of Desktop
-                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies
+                    28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman splash from showing multiple copies
                     18 Mar 2011 - mcdurdin - I2807 - Enable/disable addins
                     18 Mar 2011 - mcdurdin - I2782 - Unminimize configuration when bringing it to foreground
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
@@ -370,10 +370,10 @@ var
         else Result := KeyboardFileNames[3];
     end;
 begin
-  kmcom.AutoApply := True;
+  kmcom.AutoApply := False;
 
   FMutex := nil;  // I2720
-  
+
   { Run app reconfiguration tasks }
 
   TKeymanStartTask.RecreateTask;
@@ -429,10 +429,10 @@ begin
         else ExitCode := 2;
 
     fmOnlineUpdateAdmin:
-      OnlineUpdateAdmin(FirstKeyboardFileName);
+      OnlineUpdateAdmin(nil, FirstKeyboardFileName);
 
     fmOnlineUpdateCheck:
-      with TOnlineUpdateCheck.Create(FForce, FSilent) do
+      with TOnlineUpdateCheck.Create(nil, FForce, FSilent) do
       try
         Run;
       finally
@@ -494,9 +494,14 @@ begin
         else ExitCode := 1;
 
     fmInstallTipsForPackages:
-      if TTipMaintenance.InstallTipsForPackages(KeyboardFileNames)
-        then ExitCode := 0
-        else ExitCode := 1;
+      if TTipMaintenance.InstallTipsForPackages(KeyboardFileNames) then
+      begin
+        // TTIPMaintenance never does a kmcom.Apply to notify
+        kmcom.Apply;
+        ExitCode := 0;
+      end
+      else
+        ExitCode := 1;
 
     fmUninstallKeyboard:            { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
       if UninstallKeyboard(nil, FirstKeyboardFileName, FSilent)

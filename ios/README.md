@@ -3,12 +3,19 @@
 ## Prerequisites
 * Xcode 9.1
 * iOS 8+
+* [Node.js](https://nodejs.org/) 8.9+ (for building the embedded KeymanWeb engine)
 * SwiftLint (`brew install swiftlint`)
 * Carthage (`brew install carthage`)
-* [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+  - If using Xcode 12 or later, note that you may need to use the instructions found at https://github.com/Carthage/Carthage/blob/master/Documentation/Xcode12Workaround.md
+  - We plan to update to use of Carthage 0.37's .xcframeworks solution early in the 15.0 development cycle once 14.0 has successfully released, which will negate the need for the workaround mentioned above.
+* Pandoc (`brew install pandoc`)
+  - Used solely to generate offline help.
 * Coreutils (`brew install coreutils`)
 * sentry-cli (`brew install getsentry/tools/sentry-cli`) to utilize Sentry-based error reporting
 * jq (`brew install jq`)
+
+Note that the `brew` command mentioned above is Homebrew, which may be found at https://brew.sh/.
+While not strictly necessary, it certainly simplifies installing the prerequisites above.
 
 ## Keyman App
 

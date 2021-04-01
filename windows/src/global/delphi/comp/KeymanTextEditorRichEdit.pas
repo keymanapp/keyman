@@ -28,13 +28,10 @@ uses
 type
   TKeymanTextEditorRichEdit = class(TRichEdit)
   private
-    wm_kmselectlang: UINT;
     FOnKeymanSelectLang: TNotifyEvent;
     procedure KeymanSelectLang;
   protected
     procedure WndProc(var Message: TMessage); override;
-  public
-    constructor Create(AOwner: TComponent); override;
   published
     property OnKeymanSelectLang: TNotifyEvent read FOnKeymanSelectLang write FOnKeymanSelectLang;
   end;
@@ -50,12 +47,6 @@ end;
 
 { TKeymanTextEditorRichEdit }
 
-constructor TKeymanTextEditorRichEdit.Create(AOwner: TComponent);
-begin
-  wm_kmselectlang := RegisterWindowMessage('WM_KMSELECTLANG');
-  inherited Create(AOwner);
-end;
-
 procedure TKeymanTextEditorRichEdit.KeymanSelectLang;
 begin
   if Assigned(FOnKeymanSelectLang) then
@@ -64,7 +55,7 @@ end;
 
 procedure TKeymanTextEditorRichEdit.WndProc(var Message: TMessage);
 begin
-  if Message.Msg = wm_kmselectlang then
+  if Message.Msg = WM_INPUTLANGCHANGE then
     KeymanSelectLang;
   inherited;
 end;

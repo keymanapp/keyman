@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
-<section id="common_linux">
-  <title>Does Keyman Desktop run on Linux?</title>
-  <para>While Keyman Desktop is a Windows product, we have an input method manager for Linux called <ulink url="https://help.keyman.com/kb/58">KMFL</ulink>.</para>
-</section>

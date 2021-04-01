@@ -58,7 +58,7 @@
 
 
     <!-- Context: Keyboard Updates -->
-    <string name="cannot_connect" comment="Error message when network connection fails">\nCannot connect to Keyman server!\n</string>
+    <string name="cannot_connect" comment="Error message when network connection fails">Cannot connect to Keyman server!</string>
 
     <!-- Context: Keyboard Updates -->
     <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">Would you like to delete this keyboard?</string>
@@ -102,6 +102,18 @@
     <string name="keyboard_qr_code" comment="QR Code description">
       Scan this code to load this\nkeyboard on another device</string>
 
+
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Welcome to %1$s</string>
+
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">
+      FileProvider library needed to view help file: %1$s</string>
+
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">
+      Fatal keyboard error with %1$s:%2$s for %3$s language. Loading default keyboard.</string>
+
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
 
@@ -143,6 +155,11 @@
     <!-- Context: Background download messages-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Dictionary download is finished.</string>
 
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">Download failed</string>
+
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Failed to retrieve downloaded file</string>
 
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Failed to access server!</string>
@@ -150,6 +167,11 @@
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"All resources are up to date!"</string>
 
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">One or more resources failed to update!</string>
+
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">Resources successfully updated!</string>
 
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">Dictionary version</string>
@@ -195,6 +217,9 @@
       <item quantity="other">(%1$d keyboards)</item>
     </plurals>
 
+
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">Default Locale</string>
 
     <!-- Context: Content descriptions -->
     <string name="image_button" translatable="false">Image Button</string>

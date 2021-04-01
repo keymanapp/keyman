@@ -19,7 +19,7 @@
                     05 Dec 2006 - mcdurdin - Refactor rendering process into TXMLRenderers
                     12 Dec 2006 - mcdurdin - Clean up locale references
                     04 Jan 2007 - mcdurdin - Encode entities in XML render
-                    19 Jun 2007 - mcdurdin - I899 - Translate XSLT within Keyman Desktop rather than relying on IE
+                    19 Jun 2007 - mcdurdin - I899 - Translate XSLT within Keyman rather than relying on IE
                     13 Jul 2007 - mcdurdin - I902 - Resolve externals when loading XML files
                     23 Aug 2007 - mcdurdin - I956 - support locale install from packages
                     27 Mar 2008 - mcdurdin - Relocated
@@ -35,7 +35,7 @@
                     23 Mar 2012 - mcdurdin - I3269 - Add Debug_XMLRenderer DebugPath to allow writing temp .xml file
                     04 Nov 2012 - mcdurdin - I3545 - V9.0 - Merge of I3269 - Add Debug_XMLRenderer DebugPath to allow writing temp .xml file
                     01 Dec 2012 - mcdurdin - I3612 - V9.0 - Keyboard install should run as Admin only
-                    02 Dec 2012 - mcdurdin - I3626 - V9.0 - Keyman Desktop Help window crashes
+                    02 Dec 2012 - mcdurdin - I3626 - V9.0 - Keyman Help window crashes
                     01 May 2014 - mcdurdin - I4181 - V9.0 - Stop using DeleteFileAlways, MOVEFILE_DELAY_UNTIL_REBOOT
 *)
 unit XMLRenderer;  // I3306
@@ -63,13 +63,13 @@ type
     FXMLFileName: WideString;
     function Getkmcom: IKeyman;
   protected
-    function XMLData(FRefreshKeyman: Boolean): WideString; virtual; abstract;
+    function XMLData: WideString; virtual; abstract;
     function Stylesheet: WideString; virtual;
     property kmcom: IKeyman read Getkmcom;
   public
     constructor Create(AOwner: TXMLRenderers);
     function Render: Boolean;
-    function GetXMLData(FRefreshKeyman: Boolean): WideString;
+    function GetXMLData: WideString;
     property Owner: TXMLRenderers read FOwner;
     property XMLFileName: WideString read FXMLFileName;
   end;
@@ -85,7 +85,7 @@ type
     function Getkmcom: IKeyman;
   public
     constructor Create;
-    function RenderToString(FRefreshKeyman: Boolean; const AdditionalData: WideString = ''): string;
+    function RenderToString(const AdditionalData: WideString = ''): string;
     function TemplateExists: Boolean;
     property kmcom: IKeyman read Getkmcom;
     property Items[Index: Integer]: TXMLRenderer read GetItem write SetItem; default;
@@ -106,6 +106,7 @@ uses
   KLog,
   UFixupMissingFile,
   UILanguages,
+  Keyman.Configuration.System.UmodWebHttpServer,
   Unicode,
   utildir,
   utilhttp,
@@ -128,9 +129,9 @@ begin
   Result := FOwner.kmcom;
 end;
 
-function TXMLRenderer.GetXMLData(FRefreshKeyman: Boolean): WideString;
+function TXMLRenderer.GetXMLData: WideString;
 begin
-  Result := XMLData(FRefreshKeyman);
+  Result := XMLData;
 end;
 
 function TXMLRenderer.Render: Boolean;
@@ -183,12 +184,13 @@ begin
   end;
 end;
 
-function TXMLRenderers.RenderToString(FRefreshKeyman: Boolean; const AdditionalData: WideString): string;
+function TXMLRenderers.RenderToString(const AdditionalData: WideString): string;
 var
   i: Integer;
   FOutput: TStrings;
   FTemplatePath: WideString;
   s: WideString;
+  LanguageCode: string;
   doc: IXMLDocument;
   xml: IXMLDocument;
 
@@ -197,12 +199,7 @@ begin
 
   FOutput := TStringList.Create;
   try
-    with (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation.CustMessages do
-    begin
-      s := GetLocalePathForLocale(LanguageCode);
-      if not FileExists(s) then
-        s := FTemplatePath + 'strings.xml';
-    end;
+    LanguageCode := (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation.CustMessages.LanguageCode;
 
     FOutput.Add(
       '<?xml version="1.0" encoding="utf-8"?>'+
@@ -215,10 +212,11 @@ begin
         IfThen(CanElevate, '<canelevate />')+
         IfThen(Assigned(kmcom) and kmcom.SystemInfo.IsAdministrator, '<isadmin />')+   // I3612   // I3626
         '<uilanguages>'+GetUILanguages+'</uilanguages>'+
-        '<localepath>'+XMLEncode(s)+'</localepath>');
+        '<localeserver>'+modWebHttpServer.Host+'/page/locale/</localeserver>'+ // this
+        '<locale>'+LanguageCode+'</locale>');
 
     for i := 0 to Count - 1 do
-      FOutput.Add(Items[i].GetXMLData(FRefreshKeyman));
+      FOutput.Add(Items[i].GetXMLData);
     FOutput.Add('</Keyman>');
 
     doc := TXMLDocument.Create(nil);

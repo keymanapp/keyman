@@ -117,12 +117,18 @@ begin
     FTempFilename := FDownloadFilename + '.download';
     Client := THTTPClient.Create;
     try
+      Client.SecureProtocols := [THTTPSecureProtocol.TLS1, THTTPSecureProtocol.TLS11, THTTPSecureProtocol.TLS12];
       Client.OnReceiveData := HttpReceiveData;
 
       Stream := TFileStream.Create(FTempFilename, fmCreate);
       try
-        Response := Client.Get(FDownloadURL, Stream);
-        Result := Response.StatusCode = 200;
+        try
+          Response := Client.Get(FDownloadURL, Stream);
+          Result := Response.StatusCode = 200;
+        except
+          on E:ENetHTTPClientException do
+            Result := False;
+        end;
       finally
         Stream.Free;
       end;

@@ -149,11 +149,11 @@ BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
 		break;
 
 	case QIT_BACK:
-		if(dwData == BK_BACKSPACE)
+		if(dwData & BK_BACKSPACE)
 			while(context->CharIsDeadkey()) context->Delete();
 		//if(dwData == CODE_DEADKEY) break;
 		context->Delete();
-		if(dwData == BK_BACKSPACE)
+		if(dwData & BK_BACKSPACE)
 			while(context->CharIsDeadkey()) context->Delete();
 		break;
 	}
@@ -266,7 +266,7 @@ BOOL AIWin2000Unicode::PostKeys()
 		  MessageBeep(MB_ICONASTERISK); //(UINT) -1);
 		  break;
 	  case QIT_BACK:
-		  if(Queue[n].dwData == BK_DEADKEY) break;
+		  if(Queue[n].dwData & BK_DEADKEY) break;
 		  if(Addin_ProcessBackspace(hwnd)) break;
 
       pInputs[i].type = INPUT_KEYBOARD;

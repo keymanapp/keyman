@@ -182,6 +182,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
       // Fall through
     case VK_MENU:
     case VK_CONTROL:
+      ProcessModifierChange((UINT) wParam, isUp, extended);
       return FALSE;
 
     case VK_NUMLOCK:
@@ -474,10 +475,10 @@ BOOL AITIP::QueueAction(int ItemType, DWORD dwData) {
 		  break;
 
 	  case QIT_BACK:
-		  if(dwData == BK_BACKSPACE)
+		  if(dwData & BK_BACKSPACE)
 			  while(context->CharIsDeadkey()) context->Delete();   // I4370
 		  context->Delete();   // I4370
-		  if(dwData == BK_BACKSPACE)
+		  if(dwData & BK_BACKSPACE)
 			  while(context->CharIsDeadkey()) context->Delete();   // I4370
 		  break;
 	  }
@@ -538,13 +539,21 @@ BOOL AITIP::PostKeys() {
 			MessageBeep(MB_ICONASTERISK);
 			break;
 		case QIT_BACK:
-			if(Queue[n].dwData == BK_DEADKEY) break;
+			if(Queue[n].dwData & BK_DEADKEY) break;
 			if(p > OutBuf) {
 				*(--p) = 0;
 			} else {
 			  bk++;
       }
-			break;
+      if (Queue[n].dwData & BK_SURROGATE) {
+        if (p > OutBuf) {
+          *(--p) = 0;
+        }
+        else {
+          bk++;
+        }
+      }
+      break;
 		}
 	}
 

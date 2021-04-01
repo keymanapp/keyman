@@ -12,9 +12,9 @@
     },
     "license": "mit",
     "languages": [
-        "bal-Arab",
-        "bgn-Arab",
-        "bgp-Arab"
+        "bal",
+        "bgn",
+        "bgp"
     ],
     "lastModifiedDate": "2017-09-06"
 }

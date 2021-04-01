@@ -2,6 +2,14 @@
 
 setlocal enabledelayedexpansion
 
+if "!SDKVER!"=="" (
+  if "!WindowsSDKVersion!"=="" (
+    set SDKVER=8.1
+  ) else (
+    set SDKVER=!WindowsSDKVersion:~0,-1!
+  )
+)
+
 if "%1"=="" goto help
 if "%1"=="all" goto all
 if "%1"=="x86" goto build
@@ -60,7 +68,7 @@ if not exist "!VCVARSALL!" (
 )
 
 echo === Configuring VC++ ===
-call !VCVARSALL! !ARCH! 8.1
+call !VCVARSALL! !ARCH! !SDKVER!
 if errorlevel 1 exit /b !errorlevel!
 
 echo === Calling meson setup ===

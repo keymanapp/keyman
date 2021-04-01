@@ -13,6 +13,9 @@ type
   private
     function DateTimeString(d: TDateTime): string;
   public
+    [Setup]
+    procedure Setup;
+
     [Test]
     procedure TestJsonDateToDateTime;
 
@@ -59,6 +62,11 @@ begin
   except
     Result := '';
   end;
+end;
+
+procedure TJsonUtilTest.Setup;
+begin
+  Assert.IgnoreCaseDefault := False;
 end;
 
 procedure TJsonUtilTest.TestDateTimeToJsonDate;

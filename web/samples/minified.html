@@ -40,7 +40,9 @@
       kmw.init({
         attachType:'auto',
         resources:''
-        });
+      }).then(function() {
+        loadKeyboards();
+      });
     </script> 
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
@@ -49,7 +51,7 @@
   </head>
 
   <!-- Sample page HTML -->  
-  <body onload='loadKeyboards();'> 
+  <body> 
     <h2>KeymanWeb Sample Page - Fully Compiled/Minified Source</h2>
 
     <div>

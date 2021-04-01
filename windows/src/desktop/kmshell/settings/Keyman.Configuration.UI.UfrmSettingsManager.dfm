@@ -1,23 +1,19 @@
-object frmSettingsManager: TfrmSettingsManager
+inherited frmSettingsManager: TfrmSettingsManager
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Keyman Settings Manager'
   ClientHeight = 447
   ClientWidth = 704
-  Color = clBtnFace
   Constraints.MinHeight = 360
   Constraints.MinWidth = 720
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
   Font.Name = 'Tahoma'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnResize = FormResize
+  ExplicitWidth = 720
+  ExplicitHeight = 486
   DesignSize = (
     704
     447)

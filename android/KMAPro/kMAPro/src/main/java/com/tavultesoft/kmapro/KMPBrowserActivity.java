@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2020 SIL International. All rights reserved.
+ * Copyright (C) 2020-2021 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -13,21 +13,25 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.KMPLink;
+import com.tavultesoft.kmea.util.KMString;
+import com.tavultesoft.kmea.util.WebViewUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.app.Application.getProcessName;
 
-public class KMPBrowserActivity extends AppCompatActivity {
+public class KMPBrowserActivity extends BaseActivity {
   private static final String TAG = "KMPBrowserActivity";
 
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
@@ -38,7 +42,7 @@ public class KMPBrowserActivity extends AppCompatActivity {
   // 1. Host isn't keyman.com (production/staging)
   // 2. Host is keyman.com but not /keyboards/
   private static final String INTERNAL_KEYBOARDS_LINK_FORMATSTR = "^http(s)?://(%s|%s)/keyboards([/?].*)?$";
-  private static final String keyboardPatternFormatStr = String.format(INTERNAL_KEYBOARDS_LINK_FORMATSTR,
+  private static final String keyboardPatternFormatStr = KMString.format(INTERNAL_KEYBOARDS_LINK_FORMATSTR,
     KMPLink.KMP_PRODUCTION_HOST,
     KMPLink.KMP_STAGING_HOST);
   private static final Pattern keyboardPattern = Pattern.compile(keyboardPatternFormatStr);
@@ -138,9 +142,9 @@ public class KMPBrowserActivity extends AppCompatActivity {
     String host = KMPLink.getHost();
     // If language ID is provided, include it in the keyboard search
     String languageID = getIntent().getStringExtra("languageCode");
-    String languageStr = (languageID != null) ? String.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
+    String languageStr = (languageID != null) ? KMString.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
     String appMajorVersion = KMManager.getMajorVersion();
-    String kmpSearchUrl = String.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr);
+    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr);
     webView.loadUrl(kmpSearchUrl);
   }
 
@@ -161,6 +165,7 @@ public class KMPBrowserActivity extends AppCompatActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    WebViewUtil.cleanup(webView);
   }
 
   @Override

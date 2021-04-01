@@ -33,7 +33,7 @@ const
   // https://api.keyman.com/ - programmatic endpoints
   API_Path_UpdateCheck_Windows = '/windows/14.0/update'; // version will only update when the api changes
   API_Path_UpdateCheck_Developer = '/developer/14.0/update'; // version will only update when the api changes
-  
+
   // TODO: use /windows/ instead of /desktop/
   API_Path_SubmitDiag = '/desktop/13.0/submitdiag'; // version will only update when the api changes
   API_Path_IsOnline = '/desktop/13.0/isonline'; // version will only update when the api changes
@@ -76,7 +76,7 @@ function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boole
 function API_Protocol: string; // = 'https';
 function API_Server: string; // = 'api.keyman.com';
 
-function API_UserAgent: string; // = 'Keyman Desktop/<ver>...'
+function API_UserAgent: string; // = 'Keyman for Windows/<ver>...'
 function API_UserAgent_Developer: string; // = 'Keyman Developer/<ver>...'
 function API_UserAgent_Diagnostics: string;
 
@@ -97,9 +97,9 @@ uses
   VersionInfo;
 
 const
-  S_UserAgent = 'Keyman Desktop';
+  S_UserAgent = 'Keyman for Windows';
   S_UserAgent_Developer = 'Keyman Developer';
-  S_UserAgent_Diagnostics = 'Keyman Desktop Diagnostics';
+  S_UserAgent_Diagnostics = 'Keyman for Windows Diagnostics';
 
   S_KeymanCom = 'https://keyman.com';
   S_APIProtocol = 'https';
@@ -108,8 +108,8 @@ const
   // Alpha versions will work against the staging server so that they
   // can access new APIs etc that will only be available there. The staging
   // servers have resource constraints but should be okay for limited use.
-  S_KeymanCom_Alpha = 'https://keyman-staging.com';
-  S_APIServer_Alpha = 'api.keyman-staging.com';
+  S_KeymanCom_Staging = 'https://keyman-staging.com';
+  S_APIServer_Staging = 'api.keyman-staging.com';
 
 const
   URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
@@ -137,8 +137,9 @@ end;
 
 function KeymanCom_Protocol_Server: string; // = 'https://keyman.com';
 begin
-  if CKeymanVersionInfo.Tier = TIER_ALPHA
-    then Result := S_KeymanCom_Alpha
+  if (CKeymanVersionInfo.Tier = TIER_ALPHA) or
+    (CKeymanVersionInfo.Tier = TIER_BETA)
+    then Result := S_KeymanCom_Staging
     else Result := S_KeymanCom;
   Result := GetDebugPath('Debug_KeymanCom', Result, False);
 end;
@@ -150,8 +151,9 @@ end;
 
 function API_Server: string; // = 'api.keyman.com';
 begin
-  if CKeymanVersionInfo.Tier = TIER_ALPHA
-    then Result := S_APIServer_Alpha
+  if (CKeymanVersionInfo.Tier = TIER_ALPHA) or
+    (CKeymanVersionInfo.Tier = TIER_BETA)
+    then Result := S_APIServer_Staging
     else Result := S_APIServer;
   Result := GetDebugPath('Debug_APIServer', Result, False);
 end;

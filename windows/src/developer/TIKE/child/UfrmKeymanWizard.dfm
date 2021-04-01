@@ -698,7 +698,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Top = 22
             Width = 482
             Height = 13
-            Caption = 
+            Caption =
               'In Keyman 10, language metadata should now be managed in the pac' +
               'kage, not the keyboard.'
           end
@@ -958,10 +958,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
         end
       end
     end
@@ -1008,16 +1004,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageOnScreenKeyboard: TTabSheet
       Caption = 'On-Screen'
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageTouchLayout: TTabSheet
       Caption = 'Touch Layout'
       ImageIndex = 16
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pagesTouchLayout: TPageControl
         Left = 0
         Top = 0
@@ -1032,48 +1022,28 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
         end
       end
     end
     object pageIncludeCodes: TTabSheet
       Caption = 'Char Codes'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageKMWEmbedJS: TTabSheet
       Caption = 'Embedded JS'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageKMWEmbedCSS: TTabSheet
       Caption = 'Embedded CSS'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageKMWHelp: TTabSheet
       Caption = 'Embedded Help'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
@@ -1093,58 +1063,25 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           Top = 13
           Width = 333
           Height = 13
-          Caption = 
+          Caption =
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
-        object cmdCompile: TButton
-          Left = 10
-          Top = 40
-          Width = 137
-          Height = 25
-          Action = modActionsKeyboardEditor.actKeyboardCompile
-          TabOrder = 0
-        end
-        object cmdStartDebugging: TButton
-          Left = 153
-          Top = 40
-          Width = 137
-          Height = 25
-          Action = modActionsKeyboardEditor.actDebugStartDebugger
-          TabOrder = 1
-        end
-        object cmdAddToProject: TButton
-          Left = 442
-          Top = 40
-          Width = 137
-          Height = 25
-          Action = modActionsMain.actProjectAddCurrentEditorFile
-          TabOrder = 2
-        end
-        object cmdOpenContainingFolder2: TButton
-          Left = 298
-          Top = 40
-          Width = 138
-          Height = 25
-          Caption = '&Open Containing Folder'
-          TabOrder = 3
-          OnClick = cmdOpenContainingFolder2Click
-        end
         object panBuildWindows: TPanel
           Left = 10
-          Top = 96
+          Top = 202
           Width = 295
           Height = 265
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 4
+          TabOrder = 2
           object lblInstallHint: TLabel
             Left = 9
             Top = 39
-            Width = 259
+            Width = 213
             Height = 13
-            Caption = 'You can install the keyboard into Keyman Desktop:'
+            Caption = 'You can install the keyboard into Keyman:'
           end
           object lblCompileTargetHeader: TLabel
             Left = 9
@@ -1186,13 +1123,13 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         object panBuildKMW: TPanel
           Left = 323
-          Top = 96
+          Top = 202
           Width = 454
           Height = 265
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 5
+          TabOrder = 3
           object lblDebugHostCaption: TLabel
             Left = 12
             Top = 70
@@ -1257,6 +1194,103 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             OnClick = cmdSendURLsToEmailClick
           end
         end
+        object panOpenInExplorer: TPanel
+          Left = 10
+          Top = 117
+          Width = 767
+          Height = 67
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 1
+          object lblOpenInExplorer: TLabel
+            Left = 9
+            Top = 6
+            Width = 115
+            Height = 17
+            Caption = 'Open in Explorer'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object cmdOpenSourceFolder: TButton
+            Left = 9
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = '&Open source folder'
+            TabOrder = 0
+            OnClick = cmdOpenSourceFolderClick
+          end
+          object cmdOpenBuildFolder: TButton
+            Left = 153
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = 'Open &build folder'
+            TabOrder = 1
+            OnClick = cmdOpenBuildFolderClick
+          end
+          object cmdOpenProjectFolder: TButton
+            Left = 297
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = 'Open pro&ject folder'
+            TabOrder = 2
+            OnClick = cmdOpenProjectFolderClick
+          end
+        end
+        object panFileActions: TPanel
+          Left = 10
+          Top = 32
+          Width = 767
+          Height = 67
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 0
+          object lblFileActions: TLabel
+            Left = 9
+            Top = 6
+            Width = 75
+            Height = 17
+            Caption = 'File actions'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object cmdAddToProject: TButton
+            Left = 295
+            Top = 33
+            Width = 137
+            Height = 25
+            Action = modActionsMain.actProjectAddCurrentEditorFile
+            TabOrder = 2
+          end
+          object cmdStartDebugging: TButton
+            Left = 152
+            Top = 33
+            Width = 137
+            Height = 25
+            Action = modActionsKeyboardEditor.actDebugStartDebugger
+            TabOrder = 1
+          end
+          object cmdCompile: TButton
+            Left = 9
+            Top = 33
+            Width = 137
+            Height = 25
+            Action = modActionsKeyboardEditor.actKeyboardCompile
+            TabOrder = 0
+          end
+        end
       end
     end
   end
@@ -1297,7 +1331,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgBrowseBitmap: TOpenPictureDialog
     DefaultExt = 'ico'
-    Filter = 
+    Filter =
       'All supported files (*.ico, *.bmp)|*.ico;*.bmp|Icon files (*.ico' +
       ')|*.ico|Bitmap files (*.bmp)|*.bmp|All files (*.*)|*.*'
     Options = [ofHideReadOnly, ofCreatePrompt, ofEnableSizing]
@@ -1307,7 +1341,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgSaveExport: TSaveDialog
     DefaultExt = 'kmn'
-    Filter = 
+    Filter =
       'Keyman 5.0 Keyboard Wizard (*.kmn)|*.kmn|Windows NT/2000/XP keyb' +
       'oard (*.dll)|*.dll|Windows 95/98/Me keyboard (*.kbd)|*.kbd'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]

@@ -101,7 +101,9 @@ begin
 
   FFileName := Filename;
   try
-    GetKeyboardInfo(FileName, False, FKeyboardInfo, True);
+    // Only read the keyboard from disk for legacy keyboards which have
+    // metadata internally
+    GetKeyboardInfo(FileName, not Assigned(pk), FKeyboardInfo, True);
   except
     on E:Exception do
     begin
@@ -109,9 +111,22 @@ begin
       AContext.Errors.AddFmt(KMN_E_Install_InvalidFile, VarArrayOf([Filename, E.Message]), kesError);
     end;
   end;
-  if Assigned(pk)
-    then FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, pk.Languages)
-    else FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, nil);
+  if Assigned(pk) then
+  begin
+    FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, pk.Languages, nil);
+  end
+  else if FError then
+  begin
+    FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, nil, nil);
+  end
+  else
+  begin
+    // We have to read the language information from the keyboard, because the package
+    // did not provide it. This is true only for legacy keyboards which have language
+    // metadata in the .kmx instead of the .kmp.
+    FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, nil, @FKeyboardInfo);
+    FreeAndNil(FKeyboardInfo.MemoryDump);
+  end;
 end;
 
 procedure TKeymanKeyboardFile.CreateDefaultHotkey;

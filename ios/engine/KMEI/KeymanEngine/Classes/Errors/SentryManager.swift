@@ -55,13 +55,42 @@ public class SentryManager {
     }
   }
 
+  public static func altEnabled() -> Bool {
+    let userData = Storage.active.userDefaults
+    return userData.bool(forKey: Key.optShouldReportErrors)
+  }
+
+  public static var enabled: Bool {
+    get {
+      let userData = Storage.active.userDefaults
+      return userData.bool(forKey: Key.optShouldReportErrors)
+    }
+
+    set(flag) {
+      let userData = Storage.active.userDefaults
+
+      // Save the preference
+      userData.set(flag, forKey: Key.optShouldReportErrors)
+      userData.synchronize()
+
+      // Ensure that the embedded KeymanWeb engine's crash-reporting state is also updated.
+      Manager.shared.inputViewController.setSentryState(enabled: flag)
+    }
+  }
+
   // Note:  this function is called from a separate thread!
+  // For some reason, does not update when `enabled` is changed unless the app is restarted.
   private static func shouldSendEventHandler(event: Sentry.Event) -> Bool {
     #if NO_SENTRY
       // Prevents Sentry from buffering the event.
       return false
     #else
-      return true
+      return SentryManager.enabled
     #endif
+  }
+
+  public static func forceError() {
+    Sentry.Client.shared?.breadcrumbs.add(Sentry.Breadcrumb(level: .info, category: "Deliberate testing error"))
+    Sentry.Client.shared?.crash()
   }
 }

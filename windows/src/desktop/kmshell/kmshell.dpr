@@ -97,7 +97,6 @@ uses
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
-  UfrmScriptError in '..\..\global\delphi\general\UfrmScriptError.pas' {frmScriptError},
   BaseKeyboards in '..\..\global\delphi\general\BaseKeyboards.pas',
   LoadIndirectStringUnit in '..\..\engine\keyman\langswitch\LoadIndirectStringUnit.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
@@ -177,7 +176,10 @@ uses
   Keyman.Configuration.UI.UfrmSettingsAddTSFApp in 'settings\Keyman.Configuration.UI.UfrmSettingsAddTSFApp.pas' {frmSettingsAddTSFApp},
   Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas',
   Keyman.System.KeymanStartTask in 'util\Keyman.System.KeymanStartTask.pas',
-  TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas';
+  TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas',
+  Keyman.Configuration.System.HttpServer.App.TextEditorFonts in 'startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas',
+  Keyman.Configuration.System.HttpServer.App.Locale in 'web\Keyman.Configuration.System.HttpServer.App.Locale.pas',
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

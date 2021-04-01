@@ -1,25 +1,25 @@
 (*
   Name:             main
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    10 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Added rootdir to product install
                     28 Sep 2006 - mcdurdin - Added Check for Updates and Start With Windows
                     06 Oct 2006 - mcdurdin - Always install keyboards and packages for all users
                     04 Dec 2006 - mcdurdin - Cleanup keyboard and package installation
                     15 Jan 2007 - mcdurdin - Don't reinstall an existing product.pxx (otherwise keyboards are uninstalled!)
-                    16 May 2007 - mcdurdin - I810 - Open uninstall feedback webpage at the end of the Keyman Desktop uninstaller
+                    16 May 2007 - mcdurdin - I810 - Open uninstall feedback webpage at the end of the Keyman uninstaller
                     23 Aug 2007 - mcdurdin - I985 - Fix desktop_xxx.pxx not removed from registry at uninstall
                     14 Sep 2007 - mcdurdin - I985 - desktop_xxx.pxx removal must be done under CU not LM
                     01 Jun 2009 - mcdurdin - Vista TC23 - delete hotkeys key on rollback
@@ -41,21 +41,47 @@ procedure Run;
 
 implementation
 
-uses SysUtils, Windows, wininet, klog, utilfiletypes, RegistryKeys, versioninfo,
-  KeymanPaths,
-  utilexecute;
+uses
+  System.SysUtils,
+  Winapi.Windows,
+  Keyman.System.InstHelp.KeymanStartTaskUninstall,
+  klog,
+  RegistryKeys,
+  UserMessages;
+
+procedure ShutdownKeyman;
+var
+  hwnd: THandle;
+  Counter: Integer;
+const
+  KMC_StopProduct = 1;  // from UfrmKeyman7Main.pas
+begin
+  hwnd := FindWindow('TfrmKeyman7Main', nil);
+  if hwnd <> 0 then
+  begin
+    PostMessage(hwnd, WM_USER_ParameterPass, KMC_StopProduct, 0);
+    Counter := 0;
+    while (FindWindow('TfrmKeyman7Main', nil) <> 0) and (Counter < 10) do
+    begin
+      Sleep(1000); // We'll wait up to 10 seconds to give Keyman Engine time to shut down
+      Inc(Counter);
+    end;
+  end;
+end;
 
 procedure UninstallUser;
 var
-  hk: Windows.HKEY;
-  hkeyBackup: Windows.HKEY;
+  hk: Winapi.Windows.HKEY;
+  hkeyBackup: Winapi.Windows.HKEY;
   n: Integer;
   szValueName, szData: array[0..127] of char;
   cValueName, cbData, dwType: Cardinal;
-  hkey: Windows.HKEY;
+  hkey: Winapi.Windows.HKEY;
 begin
   KL.MethodEnter(nil, 'Uninstall', []);
   try
+    ShutdownKeyman;
+
     { I985: desktop_xxx.pxx not removed from registry at uninstall }
     if RegOpenKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_WindowsRun_CU), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
     begin
@@ -84,6 +110,8 @@ begin
       end;
       RegCloseKey(hkey);
     end;
+
+    TKeymanStartTaskUninstall.DeleteAllTasks;
   finally
     KL.MethodExit(nil, 'Uninstall');
   end;
@@ -127,7 +155,7 @@ begin
       else
       begin
         KL.LogError('Invalid parameters: '+CmdLine);
-        Windows.MessageBox(0, 'Usage: insthelp -uu|-rcu|-rlm', 'insthelp', MB_ICONERROR or MB_OK);
+        Winapi.Windows.MessageBox(0, 'Usage: insthelp -uu|-rcu|-rlm', 'insthelp', MB_ICONERROR or MB_OK);
         Exit;
       end;
     finally
@@ -137,7 +165,7 @@ begin
     on E:Exception do
     begin
       KL.LogError('Exception %s: %s', [E.ClassName, E.Message]);
-      Windows.MessageBox(0, PChar('Exception '+E.ClassName+': '+E.Message), 'insthelp', MB_ICONERROR or MB_OK);
+      Winapi.Windows.MessageBox(0, PChar('Exception '+E.ClassName+': '+E.Message), 'insthelp', MB_ICONERROR or MB_OK);
     end;
   end;
 end;

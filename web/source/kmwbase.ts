@@ -79,15 +79,16 @@ namespace com.keyman {
       'keyboards':'',
       'fonts':'',
       'attachType':'',
-      'ui':null
+      'ui':null,
+      'setActiveOnRegister':'true'
     };
 
 
     // Stub functions (defined later in code only if required)
-    setDefaultDeviceOptions(opt){}     
+    setDefaultDeviceOptions(opt){}
     getStyleSheetPath(s){return s;}
     getKeyboardPath(f, p?){return f;}
-    KC_(n, ln, Pelem){return '';} 
+    KC_(n, ln, Pelem){return '';}
     handleRotationEvents(){}
     // Will serve as an API function for a workaround, in case of future touch-alignment issues.
     ['alignInputs'](eleList?: HTMLElement[]){}
@@ -120,7 +121,7 @@ namespace com.keyman {
       } else {
         baseLayout = 'us';
       }
-      this._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      
+      this._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1
 
       this.core = new text.InputProcessor({
         baseLayout: baseLayout,
@@ -129,7 +130,7 @@ namespace com.keyman {
 
       // Used by the embedded apps.
       this['interface'] = this.core.keyboardInterface;
-      
+
       this.modelManager = new text.prediction.ModelManager();
       this.osk = this['osk'] = new com.keyman.osk.OSKManager();
 
@@ -197,10 +198,10 @@ namespace com.keyman {
     /**
      * Expose font testing to allow checking that SpecialOSK or custom font has
      * been correctly loaded by browser
-     * 
+     *
      *  @param  {string}  fName   font-family name
      *  @return {boolean}         true if available
-     **/         
+     **/
     ['isFontAvailable'](fName: string): boolean {
       return this.util.checkFont({'family':fName});
     }
@@ -212,19 +213,19 @@ namespace com.keyman {
      * @param       {function(Event)}   func      event handler function
      * @return      {boolean}                     value returned by util.addEventListener
      * Description  Wrapper function to add and identify KeymanWeb-specific event handlers
-     */       
+     */
     ['addEventListener'](event: string, func): boolean {
       return this.util.addEventListener('kmw.'+event, func);
     }
 
       /**
      * Function     _GetEventObject
-     * Scope        Private   
+     * Scope        Private
      * @param       {Event=}     e     Event object if passed by browser
-     * @return      {Event|null}       Event object              
+     * @return      {Event|null}       Event object
      * Description Gets the event object from the window when using Internet Explorer
-     *             and handles getting the event correctly in frames 
-     */     
+     *             and handles getting the event correctly in frames
+     */
     _GetEventObject<E extends Event>(e: E) {  // I2404 - Attach to controls in IFRAMEs
       if (!e) {
         e = window.event as E;
@@ -239,23 +240,23 @@ namespace com.keyman {
             if(!win) {
               return null;
             }
-            
+
             e = win.event as E;
           }
         }
       }
-      
-      return e;    
+
+      return e;
     }
 
     /**
      * Function     _push
-     * Scope        Private   
-     * @param       {Array}     Parray    Array   
-     * @param       {*}         Pval      Value to be pushed or appended to array   
+     * Scope        Private
+     * @param       {Array}     Parray    Array
+     * @param       {*}         Pval      Value to be pushed or appended to array
      * @return      {Array}               Returns extended array
-     * Description  Push (if possible) or append a value to an array 
-     */  
+     * Description  Push (if possible) or append a value to an array
+     */
     _push<T>(Parray: T[], Pval: T) {
       if(Parray.push) {
         Parray.push(Pval);
@@ -271,8 +272,8 @@ namespace com.keyman {
      * Function     attachToControl
      * Scope        Public
      * @param       {Element}    Pelem       Element to which KMW will be attached
-     * Description  Attaches KMW to control (or IFrame) 
-     */  
+     * Description  Attaches KMW to control (or IFrame)
+     */
     ['attachToControl'](Pelem: HTMLElement) {
       this.domManager.attachToControl(Pelem);
     }
@@ -281,18 +282,18 @@ namespace com.keyman {
      * Function     detachFromControl
      * Scope        Public
      * @param       {Element}    Pelem       Element from which KMW will detach
-     * Description  Detaches KMW from a control (or IFrame) 
-     */  
+     * Description  Detaches KMW from a control (or IFrame)
+     */
     ['detachFromControl'](Pelem: HTMLElement) {
       this.domManager.detachFromControl(Pelem);
     }
 
     /**
      * Exposed function to load keyboards by name. One or more arguments may be used
-     * 
+     *
      * @param {string|Object} x keyboard name string or keyboard metadata JSON object
-     * 
-     */  
+     *
+     */
     ['addKeyboards'](x) {
       if(arguments.length == 0) {
         this.keyboardManager.keymanCloudRequest('',false);
@@ -300,52 +301,52 @@ namespace com.keyman {
         this.keyboardManager.addKeyboardArray(arguments);
       }
     }
-    
+
     /**
      *  Add default or all keyboards for a given language
-     *  
+     *
      *  @param  {string}   arg    Language name (multiple arguments allowed)
-     **/           
+     **/
     ['addKeyboardsForLanguage'](arg) {
       this.keyboardManager.addLanguageKeyboards(arguments);
     }
-    
+
     /**
      * Call back from cloud for adding keyboard metadata
-     * 
+     *
      * @param {Object}    x   metadata object
-     **/                  
-    ['register'](x) {                     
+     **/
+    ['register'](x) {
       this.keyboardManager.register(x);
     }
 
     /**
      * Build 362: removeKeyboards() remove keyboard from list of available keyboards
-     * 
+     *
      * @param {string}  x      keyboard name string
      * @param {boolean} force  When true, also drops the cached keyboard object
-     * 
-     */  
+     *
+     */
     ['removeKeyboards'](x, force?) {
       return this.keyboardManager.removeKeyboards(x);
     }
 
     /**
      * Allow to change active keyboard by (internal) keyboard name
-     * 
+     *
      * @param       {string}    PInternalName   Internal name
      * @param       {string}    PLgCode         Language code
-     */    
+     */
     ['setActiveKeyboard'](PInternalName: string, PLgCode: string): Promise<void> {
       return this.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
     }
-    
+
     /**
      * Function     getActiveKeyboard
      * Scope        Public
      * @return      {string}      Name of active keyboard
      * Description  Return internal name of currently active keyboard
-     */    
+     */
     ['getActiveKeyboard'](): string {
       return this.keyboardManager.getActiveKeyboardName();
     }
@@ -356,7 +357,7 @@ namespace com.keyman {
      * @param      {boolean=}        true to retrieve full language name, false/undefined to retrieve code.
      * @return     {string}         language code
      * Description Return language code for currently selected language
-     */    
+     */
     ['getActiveLanguage'](fullName?: boolean): string {
       return this.keyboardManager.getActiveLanguage(fullName);
     }
@@ -368,13 +369,13 @@ namespace com.keyman {
     /**
      * Function    isCJK
      * Scope       Public
-     * @param      {Object=}  k0 
+     * @param      {Object=}  k0
      * @return     {boolean}
-     * Description Tests if active keyboard (or specified keyboard script object, as optional argument) 
+     * Description Tests if active keyboard (or specified keyboard script object, as optional argument)
      *             uses a pick list (Chinese, Japanese, Korean, etc.)
-     *             (This function accepts either keyboard structure.)   
-     */    
-    ['isCJK'](k0?) { 
+     *             (This function accepts either keyboard structure.)
+     */
+    ['isCJK'](k0?) {
       var kbd: keyboards.Keyboard;
       if(k0) {
         kbd = new keyboards.Keyboard(k0);
@@ -404,12 +405,12 @@ namespace com.keyman {
 
     /**
      * Get keyboard meta data for the selected keyboard and language
-     * 
+     *
      * @param       {string}    PInternalName     Internal name of keyboard
      * @param       {string=}   PlgCode           language code
-     * @return      {Object}                      Details of named keyboard 
-     *                                            
-     **/    
+     * @return      {Object}                      Details of named keyboard
+     *
+     **/
     ['getKeyboard'](PInternalName: string, PlgCode?: string) {
       var Ln, Lrn;
 
@@ -418,7 +419,7 @@ namespace com.keyman {
       for(Ln=0; Ln < kbdList.length; Ln++) {
         Lrn = kbdList[Ln];
 
-        if(Lrn['InternalName'] == PInternalName || Lrn['InternalName'] == "Keyboard_" + PInternalName) { 
+        if(Lrn['InternalName'] == PInternalName || Lrn['InternalName'] == "Keyboard_" + PInternalName) {
           if(arguments.length < 2) {
             return Lrn;
           }
@@ -426,39 +427,39 @@ namespace com.keyman {
           if(Lrn['LanguageCode'] == PlgCode) {
             return Lrn;
           }
-        } 
+        }
       }
 
       return null;
     }
-    
+
     /**
-     * Get array of available keyboard stubs 
-     * 
+     * Get array of available keyboard stubs
+     *
      * @return   {Array}     Array of available keyboards
-     * 
-     */    
+     *
+     */
     ['getKeyboards']() {
       return this.keyboardManager.getDetailedKeyboards();
     }
 
     /**
      * Gets the cookie for the name and language code of the most recently active keyboard
-     * 
-     *  Defaults to US English, but this needs to be user-set in later revision (TODO)      
-     * 
-     * @return      {string}          InternalName:LanguageCode 
-     */    
+     *
+     *  Defaults to US English, but this needs to be user-set in later revision (TODO)
+     *
+     * @return      {string}          InternalName:LanguageCode
+     */
     ['getSavedKeyboard']() {
-      return this.keyboardManager.getSavedKeyboard();  
+      return this.keyboardManager.getSavedKeyboard();
     }
 
     /**
      * Function     Initialization
      * Scope        Public
      * @param       {Object}  arg     object array of user-defined properties
-     * Description  KMW window initialization  
-     */    
+     * Description  KMW window initialization
+     */
     ['init'](arg): Promise<any> {
       return this.domManager.init(arg);
     }
@@ -467,7 +468,7 @@ namespace com.keyman {
      * Function     resetContext
      * Scope        Public
      * @param       {Object} e      The element whose context should be cleared.  If null, the currently-active element will be chosen.
-     * Description  Reverts the OSK to the default layer, clears any processing caches and modifier states, 
+     * Description  Reverts the OSK to the default layer, clears any processing caches and modifier states,
      *              and clears deadkeys and prediction-processing states on the active element (if it exists)
      */
     ['resetContext'](e?: HTMLElement) {
@@ -479,7 +480,7 @@ namespace com.keyman {
       if(outputTarget) {
         outputTarget.resetContext();
       }
-      this.core.resetContext();
+      this.core.resetContext(outputTarget);
     };
 
     /**
@@ -495,8 +496,8 @@ namespace com.keyman {
      * Function     disableControl
      * Scope        Public
      * @param       {Element}      Pelem       Element to be disabled
-     * Description  Disables a KMW control element 
-     */    
+     * Description  Disables a KMW control element
+     */
     ['disableControl'](Pelem: HTMLElement) {
       this.domManager.disableControl(Pelem);
     }
@@ -505,28 +506,28 @@ namespace com.keyman {
      * Function     enableControl
      * Scope        Public
      * @param       {Element}      Pelem       Element to be disabled
-     * Description  Disables a KMW control element 
-     */    
+     * Description  Disables a KMW control element
+     */
     ['enableControl'](Pelem: HTMLMapElement) {
       this.domManager.enableControl(Pelem);
     }
-    
+
     /**
      * Function     setKeyboardForControl
-     * Scope        Public   
-     * @param       {Element}    Pelem    Control element 
-     * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
+     * Scope        Public
+     * @param       {Element}    Pelem    Control element
+     * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)
      * @param       {string|null=}     Plc      Language Code
-     * Description  Set default keyboard for the control 
-     */    
+     * Description  Set default keyboard for the control
+     */
     ['setKeyboardForControl'](Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
       this.domManager.setKeyboardForControl(Pelem, Pkbd, Plc);
     }
 
     /**
      * Function     getKeyboardForControl
-     * Scope        Public   
-     * @param       {Element}    Pelem    Control element 
+     * Scope        Public
+     * @param       {Element}    Pelem    Control element
      * @return      {string|null}         The independently-managed keyboard for the control.
      * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
      *              If it is currently following the global keyboard setting, returns null instead.
@@ -537,8 +538,8 @@ namespace com.keyman {
 
     /**
      * Function     getLanguageForControl
-     * Scope        Public   
-     * @param       {Element}    Pelem    Control element 
+     * Scope        Public
+     * @param       {Element}    Pelem    Control element
      * @return      {string|null}         The independently-managed keyboard for the control.
      * Description  Returns the language code used with the current independently-managed keyboard for this control.
      *              If it is currently following the global keyboard setting, returns null instead.
@@ -549,25 +550,25 @@ namespace com.keyman {
 
     /**
      * Set focus to last active target element (browser-dependent)
-     */    
+     */
     ['focusLastActiveElement']() {
       this.domManager.focusLastActiveElement();
     }
-    
+
     /**
      * Get the last active target element *before* KMW activated (I1297)
-     * 
-     * @return      {Object}        
-     */    
+     *
+     * @return      {Object}
+     */
     ['getLastActiveElement']() {
       return this.domManager.getLastActiveElement();
     }
 
     /**
-     *  Set the active input element directly optionally setting focus 
-     * 
+     *  Set the active input element directly optionally setting focus
+     *
      *  @param  {Object|string} e         element id or element
-     *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
+     *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
      **/
     ['setActiveElement'](e: string|HTMLElement, setFocus: boolean) {
       return this.domManager.setActiveElement(e, setFocus);
@@ -575,9 +576,9 @@ namespace com.keyman {
 
     /**
      * Move focus to user-specified element
-     * 
+     *
      *  @param  {string|Object}   e   element or element id
-     *           
+     *
      **/
     ['moveToElement'](e: string|HTMLElement) {
       this.domManager.moveToElement(e);
@@ -608,24 +609,24 @@ namespace com.keyman {
 
     /**
      * Function     getUIState
-     * Scope        Public   
+     * Scope        Public
      * @return      {Object.<string,(boolean|number)>}
      * Description  Return object with activation state of UI:
      *                activationPending (bool):   KMW being activated
-     *                activated         (bool):   KMW active    
-     */    
+     *                activated         (bool):   KMW active
+     */
     ['getUIState'](): UIState {
       return this.uiManager.getUIState();
     }
 
     /**
      * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
-     * 
+     *
      * @param       {(boolean|number)}  state  Activate (true,false)
      */
     ['activatingUI'](state: boolean) {
       this.uiManager.setActivatingUI(state);
-    } 
+    }
 
     // Functions that might be added later
     ['beepKeyboard']: () => void;
@@ -655,8 +656,8 @@ namespace com.keyman {
 /**
  * Determine path and protocol of executing script, setting them as
  * construction defaults.
- *    
- * This can only be done during load when the active script will be the  
+ *
+ * This can only be done during load when the active script will be the
  * last script loaded.  Otherwise the script must be identified by name.
 */
 var scripts = document.getElementsByTagName('script');
@@ -669,9 +670,9 @@ KeymanBase._srcPath = sPath;
 KeymanBase._rootPath = sPath.replace(/(https?:\/\/)([^\/]*)(.*)/,'$1$2/');
 KeymanBase._protocol = sPath.replace(/(.{3,5}:)(.*)/,'$1');
 
-/**  
- * Base code: Declare major component namespaces, instances, and utility functions 
- */  
+/**
+ * Base code: Declare major component namespaces, instances, and utility functions
+ */
 
 // If a copy of the script is already loaded, detect this and prevent re-initialization / data reset.
 if(!window['keyman'] || !window['keyman']['loaded']) {
@@ -680,7 +681,7 @@ if(!window['keyman'] || !window['keyman']['loaded']) {
     /* The base object call may need to be moved into a separate, later file eventually.
      * It will be necessary to override methods with kmwnative.ts and kmwembedded.ts before the
      * affected objects are initialized.
-     * 
+     *
      * We only recreate the 'keyman' object if it's not been loaded.
      * As this is the base object, not creating it prevents a KMW system reset.
      */

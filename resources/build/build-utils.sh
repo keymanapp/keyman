@@ -73,12 +73,12 @@ function findVersion() {
         VERSION_TAG=
     fi
 
-    if [ -z "${TEAMCITY_VERSION-}" ]; then
+    if [ -z "${TEAMCITY_VERSION-}" -a -z "${JENKINS_HOME-}" ]; then
         # Local dev machine, not TeamCity
         VERSION_TAG="$VERSION_TAG-local"
         VERSION_ENVIRONMENT=local
     else
-        # On TeamCity; are we running a pull request build or a master/beta/stable build?
+        # On TeamCity: are we running a pull request build or a master/beta/stable build?
         if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
             VERSION_ENVIRONMENT=test
             # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
@@ -141,16 +141,17 @@ function printBuildNumberForTeamCity() {
 }
 
 function printVersionUtilsDebug() {
-    echo "KEYMAN_ROOT:      $KEYMAN_ROOT"
-    echo "VERSION:          $VERSION"
-    echo "VERSION_WIN:      $VERSION_WIN"
-    echo "VERSION_RELEASE:  $VERSION_RELEASE"
-    echo "VERSION_MAJOR:    $VERSION_MAJOR"
-    echo "VERSION_MINOR:    $VERSION_MINOR"
-    echo "VERSION_PATCH:    $VERSION_PATCH"
-    echo "TIER:             $TIER"
-    echo "VERSION_TAG:      $VERSION_TAG"
-    echo "VERSION_WITH_TAG: $VERSION_WITH_TAG"
+    echo "KEYMAN_ROOT:         $KEYMAN_ROOT"
+    echo "VERSION:             $VERSION"
+    echo "VERSION_WIN:         $VERSION_WIN"
+    echo "VERSION_RELEASE:     $VERSION_RELEASE"
+    echo "VERSION_MAJOR:       $VERSION_MAJOR"
+    echo "VERSION_MINOR:       $VERSION_MINOR"
+    echo "VERSION_PATCH:       $VERSION_PATCH"
+    echo "TIER:                $TIER"
+    echo "VERSION_TAG:         $VERSION_TAG"
+    echo "VERSION_WITH_TAG:    $VERSION_WITH_TAG"
+    echo "VERSION_ENVIRONMENT: $VERSION_ENVIRONMENT"
 }
 
 function findShouldSentryRelease() {

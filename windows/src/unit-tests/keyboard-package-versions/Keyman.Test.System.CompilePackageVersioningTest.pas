@@ -60,6 +60,8 @@ var
   p: TProjectConsole;
   i: Integer;
 begin
+  Assert.IgnoreCaseDefault := False;
+
   FRoot := ExtractFileDir(ExtractFileDir(ExtractFileDir(ParamStr(0))));
 
   //

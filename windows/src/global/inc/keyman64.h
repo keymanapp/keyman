@@ -1,18 +1,18 @@
 /*
   Name:             Keyman64
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    9 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Remove HWND parameter from SelectKeyboard
                     23 Aug 2006 - mcdurdin - Add version 7.0 system stores - VISUALKEYBOARD, KMW_RTL, KMW_HELPFILE, KMW_HELPTEXT, KMW_EMBEDJS
                     14 Sep 2006 - mcdurdin - Add IsSysTrayWindow function
@@ -60,7 +60,7 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 #endif
 
-#ifndef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 
+#ifndef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
 #endif
 
@@ -98,11 +98,12 @@
 #define ERROR_KEYMAN_KEYBOARD_NOT_ACTIVE (ERROR_APP_MASK | 0x00000009L)
 #define ERROR_KEYMAN_TOO_MANY_CONTROLLERS (ERROR_APP_MASK | 0x0000000AL)
 
-/* RefreshKeyboards message parameters */ 
+/* RefreshKeyboards message parameters */
 
-#define KR_REQUEST_REFRESH	0
-#define KR_PRE_REFRESH	1
-#define KR_REFRESH		2
+#define KR_REQUEST_REFRESH  0
+#define KR_PRE_REFRESH      1
+#define KR_REFRESH          2
+#define KR_SETTINGS_CHANGED 3   // Broadcast when Keyman Configuration settings change
 
 /* WM_KEY* message analysis */
 
@@ -132,17 +133,17 @@
 //#define KM_GETUISTATE	3
 #define KM_FOCUSCHANGED	5		// Never use this flag: internal to Keyman
 #define KM_ACTIVECHANGED 6  // Never use this flag: internal to Keyman
-#define KM_EXITFLUSH  8 // Disconnects GetMessage hook 
+#define KM_EXITFLUSH  8 // Disconnects GetMessage hook
 
 #define KMF_WINDOWCHANGED 1
 
-/***************************************************************************/ 
+/***************************************************************************/
 
 typedef struct tagSTORE
 {
 	DWORD dwSystemID;
 	PWSTR dpName;
-	PWSTR dpString;		
+	PWSTR dpString;
 } STORE, *LPSTORE;
 
 
@@ -151,8 +152,8 @@ typedef struct tagKEY
 	WCHAR Key;
 	DWORD Line;
 	DWORD ShiftFlags;
-	PWSTR dpOutput;		
-	PWSTR dpContext;	
+	PWSTR dpOutput;
+	PWSTR dpContext;
 } KEY, *LPKEY;
 
 
@@ -160,8 +161,8 @@ typedef struct tagGROUP
 {
 	PWSTR dpName;
 	LPKEY dpKeyArray;		// [LPKEY] address of first item in key array
-	PWSTR dpMatch;		
-	PWSTR dpNoMatch;		
+	PWSTR dpMatch;
+	PWSTR dpNoMatch;
 	DWORD cxKeyArray;		// in array entries
 	BOOL  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 } GROUP, *LPGROUP;
@@ -172,7 +173,7 @@ typedef struct tagKEYBOARD
 	DWORD dwIdentifier;		// Keyman compiled keyboard id
 
 	DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
-	
+
 	DWORD dwCheckSum;		// As stored in keyboard
 	DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
 	DWORD IsRegistered;		// layout id, from same registry key
@@ -183,7 +184,7 @@ typedef struct tagKEYBOARD
 
 	LPSTORE dpStoreArray;	// [LPSTORE] address of first item in store array, from start of file
 	LPGROUP dpGroupArray;	// [LPGROUP] address of first item in group array, from start of file
-	
+
 	DWORD StartGroup[2];	// index of starting groups [2 of them]
 							// Ansi=0, Unicode=1
 
@@ -207,7 +208,7 @@ typedef struct tagIMDLLHOOK
 	DWORD storeno;
 	IMDLLHOOKProc function;
 } IMDLLHOOK, *LPIMDLLHOOK;
-	
+
 typedef struct tagIMDLL
 {
 	char        Filename[256];
@@ -351,14 +352,18 @@ BOOL ShouldDebug_1(); // TSDMState state);
 #define OutputThreadDebugString(s) _OutputThreadDebugString(s)
 void _OutputThreadDebugString(char *s);
 #else
-#define OutputThreadDebugString(s) 
+#define OutputThreadDebugString(s)
 #endif
 
-/* Keyboard selection functions */ 
+/* Keyboard selection functions */
 
 void HandleRefresh(int code, LONG tag);
 void RefreshKeyboards(BOOL Initialising);
+void CheckScheduledRefresh();
+void ScheduleRefresh();
 void ReleaseKeyboards(BOOL Lock);
+void CheckScheduledRefresh();
+void ScheduleRefresh();
 
 /* Glossary conversion functions */
 
@@ -423,6 +428,7 @@ void ReportActiveKeyboard(WORD wCommand);   // I3933   // I3949
 void SelectKeyboardHKL(DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
 BOOL SelectKeyboardTSF(DWORD KeymanID, BOOL foreground);   // I3933   // I3949   // I4271
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
+void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
 #endif
 
