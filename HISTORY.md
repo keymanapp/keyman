@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 15.0.27 alpha 2021-04-01
+
+* docs(android): Update installing-keyboards.md (#4837)
+* chore(deps): bump y18n from 4.0.0 to 4.0.1 in /web/testing/regression-tests (#4817)
+* fix(android): ensure keyboard is always set after pageLoaded (#4840)
+* chore(deps): bump y18n from 4.0.0 to 4.0.1 in /resources/build/version (#4818)
+* fix(developer): buffer size for range expansions (#4831)
+* chore(common): Check in crowdin for Fulah 🍒  (#4846)
+* docs(android): Update image for enabling-system-keyboards (#4844)
+* chore: history from 14.0.271 (#4849)
+
 ## 15.0.26 alpha 2021-03-31
 
 * fix(android/engine): Add KMString wrapper for formatting Strings (#4813)
