@@ -37,16 +37,16 @@ A notification will appear when the keyboard package is downloading in the backg
 ![](../android_images/khmer-downloading-a.png)
 
 Step 5)
-Once the download is complete, you'll see 2 or 3 step process to install the new keyboard package.
+Once the download is complete, an installation wizard will start the new keyboard package installation process.
 
-a) Display the readme.htm documentation (if the keyboard includes it).
+a) The keyboard readme.htm documentation will appear (if available) before proceeding to the next step.
 
 ![](../android_images/khmer-readme-a.png)
 
 b) If the keyboard supports multiple languages, select languages to install. When a keyboard package only lists one language (`khmer_angkor` only lists **km: Central Khmer**),
 the installer proceeds to the next step.
 
-c) Display the welcome.htm documentation.
+c) The installer will bring you to the welcome.htm documentation that provides additional information before getting started.
 
 ![](../android_images/khmer-welcome-a.png)
 
