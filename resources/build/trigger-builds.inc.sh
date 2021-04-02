@@ -80,6 +80,8 @@ function triggerJenkinsBuild() {
     JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
   fi
 
+  echo "DEBUG: Triggering with data: { \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $TAG $FORCE }"
+
   local OUTPUT=$(curl --silent --write-out '\n' \
     -X POST \
     --header "token: $JENKINS_TOKEN" \
@@ -104,4 +106,5 @@ function triggerJenkinsBuild() {
       echo "$line"
     fi
   done
+  echo ""
 }
