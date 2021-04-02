@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.28 alpha 2021-04-02
+
+* fix(linux): Fix crash if `<kbd>.json` doesn't contain description 🍒 (#4851)
+
 ## 15.0.27 alpha 2021-04-01
 
 * docs(android): Update installing-keyboards.md (#4837)
