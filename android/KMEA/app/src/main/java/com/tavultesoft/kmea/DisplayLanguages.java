@@ -40,7 +40,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("km-KH", "Khmer"),
       new DisplayLanguageType("ann", "Obolo"),
-      new DisplayLanguageType("ff-ZA", "Pulaar") // or Fulah
+      new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde") // or Fulah
     };
     return languages;
   }
