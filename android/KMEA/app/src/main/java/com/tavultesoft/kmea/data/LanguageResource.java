@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -88,7 +89,7 @@ public abstract class LanguageResource implements Serializable {
   }
 
   public String getKey() {
-    return String.format("%s_%s", languageID, resourceID);
+    return KMString.format("%s_%s", languageID, resourceID);
   }
 
   public abstract Bundle buildDownloadBundle();

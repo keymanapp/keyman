@@ -21,6 +21,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -142,7 +143,7 @@ final class KMKeyboard extends WebView {
 
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
-        String msg = String.format("KMW JS Log: Line %d, %s:%s", cm.lineNumber(), cm.sourceId(), cm.message());
+        String msg = KMString.format("KMW JS Log: Line %d, %s:%s", cm.lineNumber(), cm.sourceId(), cm.message());
         if (KMManager.isDebugMode()) {
           if (cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
             Log.d(TAG, msg);
@@ -256,7 +257,7 @@ final class KMKeyboard extends WebView {
 
   public void executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
     String jsFormat = "executeHardwareKeystroke(%d,%d, %d, %d)";
-    String jsString = String.format(jsFormat, code, shift, lstates, eventModifiers);
+    String jsString = KMString.format(jsFormat, code, shift, lstates, eventModifiers);
     loadJavascript(jsString);
   }
 
@@ -287,7 +288,7 @@ final class KMKeyboard extends WebView {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
     int kbWidth = (int) (dms.widthPixels / dms.density);
     // Ensure window is loaded for javascript functions
-    loadJavascript(String.format(
+    loadJavascript(KMString.format(
       "window.onload = function(){ setOskWidth(\"%d\");"+
       "setOskHeight(\"0\"); };", kbWidth));
     if (ShouldShowHelpBubble) {
@@ -319,8 +320,8 @@ final class KMKeyboard extends WebView {
     dismissKeyPreview(0);
     dismissSubKeysWindow();
     int bannerHeight = KMManager.getBannerHeight(context);
-    loadJavascript(String.format("setBannerHeight(%d)", bannerHeight));
-    loadJavascript(String.format("setOskWidth(%d)", newConfig.screenWidthDp));
+    loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
+    loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
     loadJavascript("setOskHeight(0)");
     if (dismissHelpBubble()) {
       Handler handler = new Handler();
@@ -458,7 +459,7 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
 
     }
-    String kbKey = String.format("%s_%s", languageID, keyboardID);
+    String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
     setKeyboardRoot(packageID);
 
@@ -504,7 +505,7 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
-    String kbKey = String.format("%s_%s", languageID, keyboardID);
+    String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
     setKeyboardRoot(packageID);
     String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
@@ -516,7 +517,7 @@ final class KMKeyboard extends WebView {
     } else {
       if (FileUtils.hasFontExtension(kFont)) {
         txtFont = kFont;
-        tFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kFont.substring(0, kFont.length() - 4), keyboardRoot, kFont);
+        tFont = KMString.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kFont.substring(0, kFont.length() - 4), keyboardRoot, kFont);
       } else {
         txtFont = getFontFilename(kFont);
         if (!txtFont.isEmpty()) {
@@ -530,7 +531,7 @@ final class KMKeyboard extends WebView {
     } else {
       if (FileUtils.hasFontExtension(kOskFont)) {
         oskFont = kOskFont;
-        oFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kOskFont.substring(0, kOskFont.length() - 4), keyboardRoot, kOskFont);
+        oFont = KMString.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kOskFont.substring(0, kOskFont.length() - 4), keyboardRoot, kOskFont);
       } else {
         oskFont = getFontFilename(kOskFont);
         if (!oskFont.isEmpty()) {
@@ -557,7 +558,7 @@ final class KMKeyboard extends WebView {
     languageName = languageName.replaceAll("\'", "\\\\'");
 
     String jsFormat = "setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
-    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
+    String jsString = KMString.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
     loadJavascript(jsString);
 
     this.packageID = packageID;
@@ -598,7 +599,7 @@ final class KMKeyboard extends WebView {
     BaseActivity.makeToast(context, R.string.fatal_keyboard_error, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
 
     // Don't localize msg for Sentry
-    String msg = String.format(context.getString(R.string.fatal_keyboard_error), packageID, keyboardID, languageID);
+    String msg = KMString.format(context.getString(R.string.fatal_keyboard_error), packageID, keyboardID, languageID);
     Sentry.captureMessage(msg);
   }
 
@@ -921,7 +922,7 @@ final class KMKeyboard extends WebView {
           String keyId = subkeyList.get(index).get("keyId");
           String keyText = getSubkeyText(keyId, subkeyList.get(index).get("keyText"));
           String jsFormat = "executePopupKey('%s','%s')";
-          String jsString = String.format(jsFormat, keyId, keyText);
+          String jsString = KMString.format(jsFormat, keyId, keyText);
           loadJavascript(jsString);
         }
       });

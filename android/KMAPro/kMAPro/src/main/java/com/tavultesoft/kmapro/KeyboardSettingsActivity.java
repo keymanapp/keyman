@@ -35,6 +35,7 @@ import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
 
@@ -181,7 +182,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
         } else if (itemTitle.equals(getString(R.string.uninstall_keyboard))) {
           // Uninstall selected keyboard
           String title = String.format("%s: %s", languageName, kbName);
-          String keyboardKey = String.format("%s_%s", languageID, kbID);
+          String keyboardKey = KMString.format("%s_%s", languageID, kbID);
           DialogFragment dialog = ConfirmDialogFragment.newInstanceForItemKeyBasedAction(
             DIALOG_TYPE_DELETE_KEYBOARD, title, getString(R.string.confirm_delete_keyboard), keyboardKey);
           dialog.show(getFragmentManager(), "dialog");
@@ -196,7 +197,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 
-      String url = String.format(QRCodeUtil.QR_CODE_URL_FORMATSTR, kbID);
+      String url = KMString.format(QRCodeUtil.QR_CODE_URL_FORMATSTR, kbID);
       Bitmap myBitmap = QRCodeUtil.toBitmap(url);
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);

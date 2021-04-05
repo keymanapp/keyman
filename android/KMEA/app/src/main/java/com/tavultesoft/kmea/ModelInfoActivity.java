@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileProviderUtils;
+import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.KMHelpFileActivity;
 
@@ -151,7 +152,7 @@ public final class ModelInfoActivity extends BaseActivity {
         // "Uninstall Model" clicked
         } else if (itemTitle.equals(getString(R.string.uninstall_model))) {
           // Uninstall selected model
-          String lexicalModelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+          String lexicalModelKey = KMString.format("%s_%s_%s", packageID, languageID, modelID);
           DialogFragment dialog = ConfirmDialogFragment.newInstanceForItemKeyBasedAction(
             DIALOG_TYPE_DELETE_MODEL, modelName, getString(R.string.confirm_delete_model), lexicalModelKey);
           dialog.show(getFragmentManager(), "dialog");

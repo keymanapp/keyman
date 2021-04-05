@@ -1,5 +1,39 @@
 # Keyman Version History
 
+## 15.0.28 alpha 2021-04-02
+
+* fix(linux): Fix crash if `<kbd>.json` doesn't contain description 🍒 (#4851)
+
+## 15.0.27 alpha 2021-04-01
+
+* docs(android): Update installing-keyboards.md (#4837)
+* chore(deps): bump y18n from 4.0.0 to 4.0.1 in /web/testing/regression-tests (#4817)
+* fix(android): ensure keyboard is always set after pageLoaded (#4840)
+* chore(deps): bump y18n from 4.0.0 to 4.0.1 in /resources/build/version (#4818)
+* fix(developer): buffer size for range expansions (#4831)
+* chore(common): Check in crowdin for Fulah 🍒  (#4846)
+* docs(android): Update image for enabling-system-keyboards (#4844)
+* chore: history from 14.0.271 (#4849)
+
+## 15.0.26 alpha 2021-03-31
+
+* fix(android/engine): Add KMString wrapper for formatting Strings (#4813)
+
+## 15.0.25 alpha 2021-03-30
+
+* fix(developer): requote font names (#4814)
+
+## 15.0.24 alpha 2021-03-29
+
+* fix(ios): ensures JS keyboard set after page load (#4808)
+* fix(developer): open containing folder was not opening correct folder (#4776)
+* fix(linux): Fix crash if query doesn't contain bcp47 tag 🍒 (#4800) (#4811)
+
+## 15.0.23 alpha 2021-03-26
+
+* fix(ios): fixes sys-kbd setup help link for iOS 9 and 10 (#4774)
+* fix(android): Fix NullPointerException in package installation (#4790)
+
 ## 15.0.22 alpha 2021-03-25
 
 * fix(ios/samples): samples should use package-oriented API (#4771)
@@ -366,6 +400,31 @@
 ## 15.0.1 alpha 2020-12-14
 
 * chore: prepare 15.0 alpha (#4129)
+
+## 14.0.271 stable 2021-04-01
+
+* fix(android/engine): Sanitize embedded KMW Sentry error (#4786)
+* fix(ios/samples): samples should use package-oriented API 🍒  (#4772)
+* fix(ios): fixes sys-kbd setup help link for iOS 9 and 10 🍒 (#4775)
+* fix(android): Fix NullPointerException in package installation (#4796)
+* fix(ios): ensures JS keyboard set after page load 🍒  (#4809)
+* fix(developer): open containing folder was not opening correct folder (#4777)
+* fix(linux): Fix crash if query doesn't contain bcp47 tag (#4800) (#4801)
+* fix(android/engine): Add KMString wrapper for formatting Strings (#4820)
+* fix(developer): requote font names 🍒 (#4815)
+* fix(android): ensure keyboard is always set after pageLoaded 🍒 (#4841)
+* fix(linux): Fix crash if `<kbd>.json` doesn't contain description (#4835)
+* fix(developer): buffer size for range expansions 🍒 (#4832)
+* chore(common): Check in crowdin strings for Fulah (#4822)
+* docs(android): Update installing-keyboards and enabling-system-keyboards (#4842)
+
+## 14.0.270 stable 2021-03-23
+
+* chore: stable tier (#4763)
+
+## 14.0.269 beta 2021-03-23
+
+* No changes made
 
 ## 14.0.268 beta 2021-03-23
 

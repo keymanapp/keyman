@@ -5,6 +5,7 @@
 package com.tavultesoft.kmea;
 
 import android.content.Context;
+import android.view.Display;
 
 public class DisplayLanguages {
   private static final String TAG = "DisplayLanguages";
@@ -38,7 +39,8 @@ public class DisplayLanguages {
       new DisplayLanguageType("fr-FR", "French"),
       new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("km-KH", "Khmer"),
-      new DisplayLanguageType("ann", "Obolo")
+      new DisplayLanguageType("ann", "Obolo"),
+      new DisplayLanguageType("ff-ZA", "Pulaar") // or Fulah
     };
     return languages;
   }
