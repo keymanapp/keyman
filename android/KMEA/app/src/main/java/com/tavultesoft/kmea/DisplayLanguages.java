@@ -38,11 +38,11 @@ public class DisplayLanguages {
       new DisplayLanguageType(unspecifiedLocale, context.getString(R.string.default_locale)),
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("fr-FR", "French"),
-      new DisplayLanguageType("ff-ZA", "Fula"),
       new DisplayLanguageType("in-ID", "Indonesian"),
       new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("km-KH", "Khmer"),
-      new DisplayLanguageType("ann", "Obolo")
+      new DisplayLanguageType("ann", "Obolo"),
+      new DisplayLanguageType("ff-ZA", "Pulaar") // or Fulah
     };
     return languages;
   }
