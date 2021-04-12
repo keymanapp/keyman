@@ -228,26 +228,34 @@ class InstallKmpWindow(Gtk.Dialog):
             readme_file = os.path.join(tmpdirname, self.readme)
 
             if os.path.isfile(readme_file):
-                with open(readme_file, "r") as read_file:
-                    readme_data = read_file.read()
-                    readme_uri = pathlib.Path(readme_file).as_uri()
-                    logging.debug(readme_data)
-                    webview.load_html(readme_data, readme_uri)
-                s = Gtk.ScrolledWindow()
-                s.add(webview)
-                self.page2.pack_start(s, True, True, 0)
+                try:
+                    with open(readme_file, "r") as read_file:
+                        readme_data = read_file.read()
+                        readme_added = True
+                        readme_uri = pathlib.Path(readme_file).as_uri()
+                        logging.debug(readme_data)
+                        webview.load_html(readme_data, readme_uri)
+                        s = Gtk.ScrolledWindow()
+                        s.add(webview)
+                        self.page2.pack_start(s, True, True, 0)
 
-                self.notebook = Gtk.Notebook()
-                self.notebook.set_tab_pos(Gtk.PositionType.BOTTOM)
-                mainhbox.pack_start(self.notebook, True, True, 0)
-                self.notebook.append_page(
-                    self.page1,
-                    Gtk.Label(_('Details')))
-                self.notebook.append_page(
-                    self.page2,
-                    Gtk.Label(_('README')))
+                        self.notebook = Gtk.Notebook()
+                        self.notebook.set_tab_pos(Gtk.PositionType.BOTTOM)
+                        mainhbox.pack_start(self.notebook, True, True, 0)
+                        self.notebook.append_page(
+                            self.page1,
+                            Gtk.Label(_('Details')))
+                        self.notebook.append_page(
+                            self.page2,
+                            Gtk.Label(_('README')))
+                except UnicodeDecodeError:
+                    readme_added = False
             else:
+                readme_added = False
+
+            if not readme_added:
                 mainhbox.pack_start(self.page1, True, True, 0)
+
         self.get_content_area().pack_start(mainhbox, True, True, 0)
 
         hbox = Gtk.Box(spacing=6)
