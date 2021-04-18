@@ -68,6 +68,7 @@ end;
 class function TTIPMaintenance.InstallTipForPackage(const PackageFilename, BCP47Tag: string): Boolean;
 var
   PackageID: string;
+  n: Integer;
   pack: IKeymanPackageInstalled;
 begin
   // This function has a known limitation: if a package contains more than one keyboard,
@@ -75,9 +76,11 @@ begin
   // considered an acceptable limitation at this time
 
   PackageID := ChangeFileExt(ExtractFileName(PackageFilename), '');
-  pack := kmcom.Packages[PackageID];
-  if not Assigned(pack) then
+  n := kmcom.Packages.IndexOf(PackageID);
+  if n < 0 then
     Exit(False);
+
+  pack := kmcom.Packages[n];
 
   if pack.Keyboards.Count = 0 then
     Exit(False);
