@@ -545,7 +545,12 @@ begin
       for i := 0 to kmcom.Packages.Count - 1 do
       begin
         pkg := kmcom.Packages[i];
-        Fields.Add(ansistring('package_'+pkg.ID), ansistring(pkg.Version));
+
+        // Due to limitations in PHP parsing of query string parameters names with
+        // space or period, we need to split the parameters up. The legacy pattern
+        // is still supported on the server side. Relates to #4886.
+        Fields.Add(AnsiString('packageid_'+IntToStr(i)), AnsiString(pkg.ID));
+        Fields.Add(AnsiString('packageversion_'+IntToStr(i)), AnsiString(pkg.Version));
         pkg := nil;
       end;
         
