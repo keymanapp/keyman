@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Bahasa Indonesia</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
+  <string name="ssTitle">Pasang $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION kini telah terpasang.</string>
+  <string name="ssCancelQuery">Apakah Anda yakin ingin membatalkan pemasangan $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Mengekstrak bundel...</string>
+  <string name="ssBootstrapCheckingPackages">Mengecek paket...</string>
+  <string name="ssBootstrapCheckingForUpdates">Memeriksa pembaruan melalui internet...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Memeriksa versi yang terpasang...</string>
+  <string name="ssBootstrapReady">Penyelesaian akhir...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Tidak ada yang dapat dipasang.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(mengunduh %0:s)</string>
+  <string name="ssActionInstall">Setup akan memasang:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION gratis dan bersumber terbuka</string>
+  <string name="ssLicenseLink">&amp;Baca lisensinya</string>
+  <string name="ssInstallOptionsLink">Pasang &amp;pilihan</string>
+  <string name="ssMessageBoxTitle">$APPNAME Setup</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Pasang</string>
+  <string name="ssCancelButton">Batalkan</string>
+  <string name="ssExitButton">K&amp;eluar</string>
+  <string name="ssStatusInstalling">Memasang $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Menghapus versi yang lama</string>
+  <string name="ssStatusComplete">Instalasi selesai</string>
+  <string name="ssQueryRestart">Anda perlu memulai ulang Windows sebelum Setup dapat selesai. Setelah Anda memulai ulang Windows, Setup akan melanjutkan.
+
+Mulai ulang sekarang? (Semua program yang masih terbuka akan ditutup paksa. Simpan semua data Anda terlebih dahulu)</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows tidak dapat dimulai ulang secara otomatis. Anda harus memulai ulang Windows sebelum mulai menggunakan $APPNAME.</string>
+  <string name="ssMustRestart">Anda harus memulai ulang Windows untuk menyelesaikan Setup. Setelah Anda memulai ulang Windows, Setup akan selesai.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION membutuhkan Windows 7 atau yang lebih baru. Tapi, Keyman Desktop 7, 8 atau 9 telah terdeteksi. 
+
+Apakah Anda mau memasang papan tombol yang ada di installer ini ke Keyman Dekstop Anda?</string>
+  <string name="ssOldOsVersionDownload">Versi $APPNAME ini membutuhkan Windows 7 atau yang lebih baru. Apakakh Anda ingin mencoba mengunduh Keyman Desktop 8 untuk sistem operasi Anda?</string>
+  <string name="ssOptionsTitle">Opsi pemasangan</string>
+  <string name="ssOptionsTitleInstallOptions">Opsi pemasangan</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Pengaturan $APPNAME baku</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modul untuk dipasang atau diperbarui</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Bahasa papan tombol terasosiasi</string>
+  <string name="ssOptionsTitleLocation">Versi untuk dipasang</string>
+  <string name="ssOptionsStartWithWindows">Mulai $APPNAME ketika Windows nyala</string>
+  <string name="ssOptionsStartAfterInstall">Mulai $APPNAME ketika pemasangan selesai</string>
+  <string name="ssOptionsCheckForUpdates">Periksa pembaruan di internet secara rutin</string>
+  <string name="ssOptionsUpgradeKeyboards">Perbarui papan tombol yang terpasang dari versi lama ke versi $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Bagikan statistik penggunaan anonim ke keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup versi: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Pasang $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Perbarui $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s sudah terpasang.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Unduh versi %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Versi %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Pasang %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Unduh versi %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Versi %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Pilih bahasa untuk papan tombol %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Bahasa baku</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Mengunduh %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Mengunduh %0:s</string>
+  <string name="ssOffline">$APPNAME Setup tidak dapat menghubungi keyman.com untuk mengunduh bahan-bahan tambahan.
+
+Silakan cek koneksi Anda, dan berikan $APPNAME Setup izin untuk mengakses internet melalui pengaturan firewall Anda.
+
+Klik \"Batalkan\" untuk keluar dari Setup, Klik \"Coba lagi\" untuk mencoba mengunduh lagi, atau \"Abaikan\" untuk melanjutkan secara luring.</string>
+</resources>
