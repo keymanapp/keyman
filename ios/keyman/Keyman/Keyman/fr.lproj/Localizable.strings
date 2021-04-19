@@ -13,6 +13,9 @@
 /* The label for the toggle to stop automatically showing the "Get Started" tutorial popup. */
 "disable-get-started" = "Ne plus afficher";
 
+/* Indicates an error opening a web page requested by a user */
+"error-opening-page" = "Impossible d'ouvrir la page";
+
 /* Long-form used when installing a font in order to display a language properly. */
 "font-install-description" = "Appuyez sur Installer pour afficher %@ correctement dans toutes vos applications";
 
