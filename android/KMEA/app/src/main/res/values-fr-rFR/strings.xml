@@ -36,7 +36,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Mise à jour</string>
     <!-- Context: Keyboard Updates -->
-    <string name="cannot_connect" comment="Error message when network connection fails">\nImpossible de se connecter au serveur Keyman !\n</string>
+    <string name="cannot_connect" comment="Error message when network connection fails">Impossible de se connecter au serveur Keyman !</string>
     <!-- Context: Keyboard Updates -->
     <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">Voulez-vous supprimer ce clavier?</string>
     <!-- Context: Keyboard Updates -->
@@ -65,6 +65,10 @@
     <string name="keyboard_qr_code" comment="QR Code description">      Scannez ce code pour charger ce clavier\nsur un autre appareil</string>
     <!-- Context: Keyboard Help welcome.htm title -->
     <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Bienvenue à %1$s</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      Librairie FileProvider nécessaire pour afficher le fichier d\'aide : %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Erreur fatale de clavier avec %1$s:%2$s pour %3$s langue. Chargement du clavier par défaut.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Vérification du dictionnaire associé à télécharger</string>
     <!-- Context: Model Updates -->
@@ -92,11 +96,17 @@
     <!-- Context: Background download messages-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Téléchargement du dictionnaire terminé.</string>
     <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">Échec du téléchargement</string>
+    <!-- Context: Background download messages -->
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Impossible de récupérer le fichier téléchargé</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Échec de l\'accès au serveur !</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"Toutes les ressources sont à jour !"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">Une ou plusieurs ressources n\'ont pas pu être mises à jour !</string>
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">Ressources mises à jour avec succès !</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">Version du dictionnaire</string>
     <!-- Context: Model Info -->
@@ -125,6 +135,8 @@
         <item quantity="one">(clavier %1$d)</item>
         <item quantity="other">(claviers %1$d)</item>
     </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">Langue par défaut</string>
     <!-- Context: Content descriptions -->
     <!-- Context: Content descriptions -->
     <!-- Context: Popup menu labels -->

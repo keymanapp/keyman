@@ -7,6 +7,9 @@
 /* Title for a "download failed" alert */
 "alert-download-error-title" = "Erreur de téléchargement";
 
+/* Title for a general alert about errors */
+"alert-error-title" = "Erreur";
+
 /* A descriptive message used when no internet connection is detected */
 "alert-no-connection-detail" = "Impossible d'atteindre le serveur Keyman. Veuillez réessayer plus tard.";
 
