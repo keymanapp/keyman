@@ -1,5 +1,7 @@
+import getpass
 import gettext
 import importlib
+import logging
 import os.path
 import platform
 import sys
@@ -44,15 +46,22 @@ else:
     try:
         # Try new sentry-sdk first
         sentry_sdk = importlib.import_module('sentry_sdk')
-        from sentry_sdk import configure_scope
+        from sentry_sdk import configure_scope, set_user
+        from sentry_sdk.integrations.logging import LoggingIntegration
         HaveSentryNewSdk = True
 
+        sentry_logging = LoggingIntegration(
+            level=logging.INFO,          # Capture info and above as breadcrumbs
+            event_level=logging.CRITICAL # Send critical errors as events
+        )
         SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357@sentry.keyman.com/12"
         sentry_sdk.init(
             dsn=SentryUrl,
             environment=__environment__,
             release=__version__,
+            integrations=[sentry_logging],
         )
+        set_user({'username': getpass.getuser()})
         with configure_scope() as scope:
             scope.set_tag("app", os.path.basename(sys.argv[0]))
             scope.set_tag("pkgversion", __pkgversion__)
@@ -68,6 +77,7 @@ else:
 
             SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357:e6d5a81ee6944fc79bd9f0cbb1f2c2a4@sentry.keyman.com/12"
             client = Client(SentryUrl, environment=__environment__, release=__version__)
+            client.user_context({'username': getpass.getuser()})
             client.tags_context({
                 'app': os.path.basename(sys.argv[0]),
                 'pkgversion': __pkgversion__,
