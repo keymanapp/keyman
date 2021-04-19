@@ -5,7 +5,6 @@
 package com.tavultesoft.kmea;
 
 import android.content.Context;
-import android.view.Display;
 
 public class DisplayLanguages {
   private static final String TAG = "DisplayLanguages";
@@ -32,11 +31,14 @@ public class DisplayLanguages {
 
   // Display Language types (as named in translate.keyman.com)
   // Order doesn't matter since we're storing BCP-47 tags in the settings preference
+  // Additional notes:
+  // Java uses deprecated two-letter code "in" for Indonesian
   public static final DisplayLanguageType[] getDisplayLanguages(Context context) {
     DisplayLanguageType[] languages = {
       new DisplayLanguageType(unspecifiedLocale, context.getString(R.string.default_locale)),
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("fr-FR", "French"),
+      new DisplayLanguageType("in-ID", "Indonesian"),
       new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("km-KH", "Khmer"),
       new DisplayLanguageType("ann", "Obolo"),
