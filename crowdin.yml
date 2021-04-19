@@ -31,7 +31,7 @@ files:
     dest: /android/engine/strings.xml
     translation: /android/KMEA/app/src/main/res/values-%android_code%/strings.xml
     languages_mapping:
-      # Prevent invalid region pap-rPAP
+      # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
       android_code:
         pap: pap
 
