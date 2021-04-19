@@ -1,20 +1,20 @@
 (*
   Name:             KeyboardTIPCheck
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Jun 2015
 
   Modified Date:    23 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Jun 2015 - mcdurdin - I4773 - Keyman needs to rebuild its language profiles if they are inadvertently deleted
-                    
+
 *)
 unit KeyboardTIPCheck;   // I4773
 
@@ -82,6 +82,7 @@ begin
       begin
         if kmcom.SystemInfo.IsAdministrator then
         begin
+          //TTIPMaintenance.DoRegister(k.ID, k.Languages[j].BCP47Code);
           (k.Languages[j] as IKeymanKeyboardLanguageInstalled2).RegisterTip(k.Languages[j].LangID);
         end
         else
