@@ -1015,6 +1015,13 @@ public final class KMManager {
 
     try {
       if ((fontFilename != null) && FileUtils.hasFontExtension(fontFilename)) {
+        // Ignore .woff files if Android 7.0 / 7.1 (Issue #4896)
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) &&
+            (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) &&
+            fontFilename.toLowerCase().endsWith(FileUtils.WOFFFONT)) {
+          return font;
+        }
+
         File file = new File(fontFilename);
         if (file.exists()) {
           font = Typeface.createFromFile(file);
