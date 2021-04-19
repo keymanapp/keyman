@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.30 alpha 2021-04-19
+
+* chore(android/engine): Rename "Pulaar" to "Pulaar-Fulfulde" (#4865)
+* fix(developer): Reduce non-canonical BCP 47 tag warning in PackageInfo to "Info" (#4863)
+* chore(common): Update crowdin for French (#4895)
+* chore(android,windows): Check in crowdin for Indonesian (#4829)
+
 ## 15.0.29 alpha 2021-04-05
 
 * chore(android/engine): Rename "Fula" to "Pulaar" (#4859)
