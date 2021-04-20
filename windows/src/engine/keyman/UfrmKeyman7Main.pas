@@ -1648,7 +1648,7 @@ begin
   if FEnableCrashTest and (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0) then
     TKeymanSentryClient.Validate(True);
 
-  TKeymanDesktopShell.OpenHelpJump('context_traymenu', Self.ActiveKeyboard);
+  TKeymanDesktopShell.OpenHelpJump('index', Self.ActiveKeyboard);
 end;
 
 procedure TfrmKeyman7Main.MnuRunProgram(Sender: TObject);   // I4606
