@@ -478,7 +478,6 @@ public final class KeyboardPickerActivity extends BaseActivity {
         inputStream.close();
       } catch (Exception e) {
         KMLog.LogException(TAG, "Failed to read " + filename + ". Error: ", e);
-        list = null;
       }
     }
 
