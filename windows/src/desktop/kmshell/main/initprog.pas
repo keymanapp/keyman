@@ -480,7 +480,7 @@ begin
     fmTextEditor:
       begin  // I2720
         FMutex := TKeymanMutex.Create('KeymanTextEditor');
-        if FMutex.MutexOwned then OpenTextEditor(nil) else FocusTextEditor;
+        if FMutex.MutexOwned then OpenTextEditor else FocusTextEditor;
       end;
 
     fmBaseKeyboard:   // I4169

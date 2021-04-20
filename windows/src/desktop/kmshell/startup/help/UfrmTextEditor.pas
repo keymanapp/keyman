@@ -181,7 +181,7 @@ type
   public
   end;
 
-procedure OpenTextEditor(Owner: TComponent = nil);  // I2260
+procedure OpenTextEditor;  // I2260
 
 implementation
 
@@ -223,20 +223,16 @@ resourcestring
 const
   GutterWid = 6;
 
-procedure OpenTextEditor(Owner: TComponent = nil);  // I2260
+procedure OpenTextEditor;  // I2260
 var
   frmTextEditor: TfrmTextEditor;
 begin
-  if ApplicationRunning then
-  begin
-    frmTextEditor := TfrmTextEditor.Create(nil);
-    frmTextEditor.Show;
-  end
-  else
-  begin
-    UfrmWebContainer.CreateForm(TfrmTextEditor, frmTextEditor);
-    frmTextEditor.Visible := True;
-  end;
+  UfrmWebContainer.CreateForm(TfrmTextEditor, frmTextEditor);
+  frmTextEditor.Visible := True;
+  ApplicationRunning := True;
+  Application.Run;
+  ApplicationRunning := False;
+  FreeAndNil(frmTextEditor);
 end;
 
 { TfrmTextEditor }
