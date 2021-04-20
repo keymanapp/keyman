@@ -159,7 +159,11 @@ def download_kmp_file(url, kmpfile, cache=False):
         requests_cache.install_cache(cache_name='keyman_kmp_cache', backend='sqlite', expire_after=expire_after)
         now = time.ctime(int(time.time()))
 
-    response = requests.get(url)  # , stream=True)
+    try:
+        response = requests.get(url)  # , stream=True)
+    except requests.exceptions.ConnectionError:
+        logging.error("Connection error downloading %s", url)
+        return downloadfile
 
     if cache:
         logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
