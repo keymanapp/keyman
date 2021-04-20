@@ -469,7 +469,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
   // Gets a raw list of installed lexical models.
   @SuppressWarnings("unchecked")
   private static ArrayList<HashMap<String, String>> getList(Context context, String filename) {
-    ArrayList<HashMap<String, String>> list = null;
+    ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
     File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), filename);
     if (file.exists()) {
       try {
