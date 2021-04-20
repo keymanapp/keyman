@@ -40,7 +40,7 @@ def download_and_install_package(url):
         logging.critical("Invalid URL: " + url)
         return
 
-    if not _install_package(packageFile, bcp47):
+    if packageFile and not _install_package(packageFile, bcp47):
         logging.critical("Can't find file " + url)
 
 
