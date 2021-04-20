@@ -358,7 +358,7 @@ begin
     if MessageDlg('Some keyboard profiles have been damaged. Correct these now?', mtConfirmation, mbOkCancel, 0) = mrOk then
     begin
       WaitForElevatedConfiguration(0, '-repair', True);
-      TKeyboardTIPCheck.ReEnablePostRepair;
+      // TKeyboardTIPCheck.ReEnablePostRepair; //possible future mitigation idea, see #4893.
     end;
   end;
 *)
