@@ -1008,29 +1008,29 @@ public final class KMManager {
    * Get the font typeface from a fully pathed font name
    * @param context
    * @param fontFilename String - full path to the font file
-   * @return Typeface
+   * @return Typeface - null if font file doesn't exist or is Woff on Android 7.0 / 7.1
    */
   public static Typeface getFontTypeface(Context context, String fontFilename) {
-    Typeface font = null;
-
     try {
       if ((fontFilename != null) && FileUtils.hasFontExtension(fontFilename)) {
         // Ignore .woff files if Android 7.0 / 7.1 (Issue #4896)
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) &&
             (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) &&
             fontFilename.toLowerCase().endsWith(FileUtils.WOFFFONT)) {
-          return font;
+          return null;
         }
 
         File file = new File(fontFilename);
         if (file.exists()) {
-          font = Typeface.createFromFile(file);
+          return Typeface.createFromFile(file);
         }
       }
     } catch (Exception e) {
       KMLog.LogException(TAG, "Failed to create Typeface: " + fontFilename, e);
     }
-    return font;
+
+    // No valid font to load
+    return null;
   }
 
   public static List<Keyboard> getKeyboardsList(Context context) {
