@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.31 alpha 2021-04-20
+
+* fix(android/engine): Don't load woff fonts on Android N (#4905)
+* fix(android/engine): Change getList() to return an empty list instead of null (#4926)
+* fix(android/engine): Don't set lexical model list to null (#4927)
+* fix(linux): don't crash on legacy non-Unicode files 🍒 (#4906)
+* fix(linux): Don't crash on network problem (fixes #4911) (#4912)
+* chore(linux): Remove experimental scripts (#4913)
+
 ## 15.0.30 alpha 2021-04-19
 
 * chore(android/engine): Rename "Pulaar" to "Pulaar-Fulfulde" (#4865)
