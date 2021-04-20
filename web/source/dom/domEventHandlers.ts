@@ -565,8 +565,6 @@ namespace com.keyman.dom {
       let tTarg=tEvent.target as HTMLElement;
 
       // Determines the actual TouchAliasElement - the part tied to an OutputTarget.
-      // Ideally, we shouldn't need the second part as a fallback; it's there to preserve existing
-      // behavior from 13.0, as this was refactored LATE in the 14.0 beta process.
       let target = findTouchAliasTarget(tTarg);
 
       // Some parts rely upon the scroller element.
