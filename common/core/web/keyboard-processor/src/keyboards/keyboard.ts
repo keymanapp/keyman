@@ -246,6 +246,12 @@ namespace com.keyman.keyboards {
       return true;
     }
 
+    get usesSupplementaryPlaneChars(): boolean {
+      let kbd = this.scriptObject;
+      // I3319 - SMP extension, I3363 (Build 301)
+      return kbd && ((kbd['KS'] && kbd['KS'] == 1) || kbd['KN'] == 'Hieroglyphic');
+    }
+
     usesDesktopLayoutOnDevice(device: utils.DeviceSpec) {
       if(this.scriptObject['KVKL']) {
         // A custom mobile layout is defined... but are we using it?

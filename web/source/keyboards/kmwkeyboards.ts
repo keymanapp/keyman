@@ -589,9 +589,11 @@ namespace com.keyman.keyboards {
       }
 
       var Pk=keyman.core.activeKeyboard;  // I3319
-      if(Pk !== null)  // I3363 (Build 301)
-        Pk = Pk.scriptObject;
-        String.kmwEnableSupplementaryPlane(Pk && ((Pk['KS'] && (Pk['KS'] == 1)) || (Pk['KN'] == 'Hieroglyphic'))); // I3319
+      if(Pk !== null) { // I3363 (Build 301)
+        // For embedded devices, we should consider that the user may keyboard-swap.
+        // See https://github.com/keymanapp/keyman/issues/4868 for one example issue.
+        String.kmwEnableSupplementaryPlane(keyman.isEmbedded || Pk.usesSupplementaryPlaneChars); // I3319
+      }
 
       // Initialize the OSK (provided that the base code has been loaded)
       osk._Load();
@@ -664,7 +666,11 @@ namespace com.keyman.keyboards {
               manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
             }
 
-            String.kmwEnableSupplementaryPlane(kbd && ((kbd['KS'] && kbd['KS'] == 1) || kbd['KN'] == 'Hieroglyphic')); // I3319 - SMP extension, I3363 (Build 301)
+            // For embedded devices, we should consider that the user may keyboard-swap.
+            // See https://github.com/keymanapp/keyman/issues/4868 for one example issue.
+            let keyman = com.keyman.singleton;
+            String.kmwEnableSupplementaryPlane(keyman.isEmbedded || core.activeKeyboard.usesSupplementaryPlaneChars);
+            
             manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);
 
             // Prepare and show the OSK for this keyboard
