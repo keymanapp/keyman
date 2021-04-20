@@ -445,7 +445,7 @@ def parsemetadata(jsonfile, verbose=False):
             try:
                 data = json.load(read_file)
             except JSONDecodeError as e:
-                logging.error("parsemetadata: " + jsonfile + " invalid")
+                logging.critical("parsemetadata: " + jsonfile + " invalid")
                 # Use empty details
                 data = {"nonexistent": "none"}
                 keyboards = []

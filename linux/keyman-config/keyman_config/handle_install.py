@@ -23,12 +23,12 @@ def download_and_install_package(url):
     if parsedUrl.scheme == 'keyman':
         logging.info("downloading " + url)
         if not url.startswith('keyman://download/keyboard/'):
-            logging.error("Don't know what to do with URL " + url)
+            logging.critical("Don't know what to do with URL " + url)
             return
 
         packageId = parsedUrl.path[len('/keyboard/'):]
         if not packageId:
-            logging.error("Missing package id")
+            logging.critical("Missing package id")
             return
 
         downloadFile = os.path.join(get_download_folder(), packageId)
@@ -37,11 +37,11 @@ def download_and_install_package(url):
     elif parsedUrl.scheme == '' or parsedUrl.scheme == 'file':
         packageFile = parsedUrl.path
     else:
-        logging.error("Invalid URL: " + url)
+        logging.critical("Invalid URL: " + url)
         return
 
     if not _install_package(packageFile, bcp47):
-        logging.error("Can't find file " + url)
+        logging.critical("Can't find file " + url)
 
 
 def _extract_bcp47(query):
