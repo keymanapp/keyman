@@ -373,8 +373,9 @@ begin
   // Get just the base filename
   Filename := ExtractFileName(ChangeFileExt(Filename, ''));
 
-  // Strip " (1)" appended for multiple downloads of same file by most browsers
-  m := TRegEx.Match(Filename, '^('+SKeymanSetupPrefix+'.+) \(\d+\)$');
+  // Strip " (1)", "(1)" or "[1]" appended for multiple downloads of same file
+  // by common browsers. Another pattern "_1" is dealt with later. See also #4886.
+  m := TRegEx.Match(Filename, '^('+SKeymanSetupPrefix+'.+)((( ?)\(\d+\))|(\[\d+\]))$');
   if m.Success then
     Filename := m.Groups[1].Value;
 
@@ -389,6 +390,32 @@ begin
   if p.Equals(SKeymanSetup_Stable) then FTier := TIER_STABLE
   else if p.Equals(SKeymanSetup_Beta) then FTier := TIER_BETA
   else if p.Equals(SKeymanSetup_Alpha) then FTier := TIER_ALPHA;
+
+  // There is at least one browser that appends `_n` to a filename for
+  // duplicate downloads. This is a little tricky to handle because `_n`
+  // is a valid pattern for package filenames, although not for our BCP 47
+  // tags. If the last component is a BCP 47 tag, then we strip it, otherwise
+  // we are going to search for both the package id with `_n` and the package id
+  // without it -- hopefully, there should be only one match -- and worst case
+  // we end up with two packages installed which is better than none. Ref #4886.
+  m := TRegEx.Match(res[High(res)], '^(.+)_\d+$');
+  if m.Success then
+  begin
+    if Length(res) mod 2 = 1 then
+    begin
+      // If this is for a BCP-47 code, we'll strip it and ignore
+      // Array length will be odd if we have a final BCP 47:
+      // [0]:keyman-setup [1]:package-name [2]:bcp-47
+      res[High(res)] := m.Groups[1].Value;
+    end
+    else
+    begin
+      // Let's add another result!
+      SetLength(res, Length(res)+2);
+      res[High(res)-1] := ''; // empty BCP 47 for previous package
+      res[High(res)] := m.Groups[1].Value; // and our stripped package id
+    end;
+  end;
 
   n := 1;
   while n < Length(res) do

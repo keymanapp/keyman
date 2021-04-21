@@ -642,7 +642,7 @@ var
       s := '-s -install-tips-for-packages ';
       for pack in FInstallInfo.Packages do
       begin
-        if pack.ShouldInstall then
+        if pack.ShouldInstall and Assigned(pack.InstallLocation) then
           s := s + '"'+pack.ID+'='+pack.BCP47+'" ';
       end;
 
