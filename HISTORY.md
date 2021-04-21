@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 15.0.32 alpha 2021-04-21
+
+* fix(windows): handle invalid package names during install (#4887)
+* fix(windows): crash when installing TIP in some rare situations (#4890)
+* chore(windows): disable profile repair (#4899)
+* fix(windows): access violation closing text editor (#4920)
+* fix(windows): help contents broken from tray menu (#4922)
+* fix(developer): avoid crash if .kpj.user file is malformed (#4918)
+* fix(developer): chiral mismatch warning is disruptive (#4934)
+* fix(windows): avoid error if keyman32.dll renamed (#4940)
+* change(web): adds error + console logs usable for Sentry reporting targeting #4797 (#4821)
+
 ## 15.0.31 alpha 2021-04-20
 
 * fix(android/engine): Don't load woff fonts on Android N (#4905)
