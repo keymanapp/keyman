@@ -554,9 +554,10 @@ begin
 {$IFDEF WIN64}
   Error(Cardinal(E_NOTIMPL));
 {$ELSE}
-  LoadKeyman32;
-  if not FKeyman_UnregisterControllerWindow(Value) then
-    Error(KMN_E_KeymanControl_CannotUnregisterControllerWindow);
+  if hlibKeyman32 = 0 then
+    KL.LogError('UnregisterControllerWindow: keyman32.dll is not loaded')
+  else if not FKeyman_UnregisterControllerWindow(Value) then
+    KL.LogError('UnregisterControllerWindow: Could not unregister controller window %x', [Value]);
 {$ENDIF}
 end;
 
