@@ -208,6 +208,10 @@ namespace com.keyman.dom {
       // rather than one of its constituent children.
       if(this.keyman.util.device.touchable) {
         Ltarg = findTouchAliasTarget(Ltarg);
+
+        if(!Ltarg) {
+          return true;
+        }
       }
 
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
@@ -567,6 +571,10 @@ namespace com.keyman.dom {
       // Determines the actual TouchAliasElement - the part tied to an OutputTarget.
       let target = findTouchAliasTarget(tTarg);
 
+      if(!target) {
+        return;
+      }
+
       // Some parts rely upon the scroller element.
       let scroller = target.firstChild as HTMLElement;
 
@@ -800,6 +808,10 @@ namespace com.keyman.dom {
       
       // Identify the input element from the touch event target (touched element may be contained by input)
       target = findTouchAliasTarget(target);
+
+      if(!target) {
+        return;
+      }
 
       var x, y;
 
