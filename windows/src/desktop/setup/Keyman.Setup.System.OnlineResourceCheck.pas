@@ -39,6 +39,7 @@ var
   lang: TUpdateCheckResponseLanguage;
   iipl: TInstallInfoPackageLanguage;
   u: AnsiString;
+  i: Integer;
 begin
   currentVersion := AInstallInfo.MsiLocations.LatestVersion(SKeymanVersion_Min_Evergreen);
 
@@ -50,8 +51,15 @@ begin
     http.Fields.Add('tier', AnsiString(AInstallInfo.Tier));
     http.Fields.Add('update', '0'); // This is probably a fresh install of a package, not an update
     http.Fields.Add('manual', '1'); // Treat this as a manual update so the staggered rollout doesn't apply
-    for pack in AInstallInfo.Packages do
-      http.Fields.Add(AnsiString('package_'+pack.ID), AnsiString(pack.Locations.LatestVersion));
+    for i := 0 to AInstallInfo.Packages.Count - 1 do
+    begin
+      pack := AInstallInfo.Packages[i];
+      // Due to limitations in PHP parsing of query string parameters names with
+      // space or period, we need to split the parameters up. The legacy pattern
+      // is still supported on the server side. Relates to #4886.
+      http.Fields.Add(AnsiString('packageid_'+IntToStr(i)), AnsiString(pack.ID));
+      http.Fields.Add(AnsiString('packageversion_'+IntToStr(i)), AnsiString(pack.Locations.LatestVersion));
+    end;
 
     http.Upload;
     if http.Response.StatusCode <> 200 then
