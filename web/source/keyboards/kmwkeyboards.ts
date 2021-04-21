@@ -589,11 +589,7 @@ namespace com.keyman.keyboards {
       }
 
       var Pk=keyman.core.activeKeyboard;  // I3319
-      if(Pk !== null) { // I3363 (Build 301)
-        // For embedded devices, we should consider that the user may keyboard-swap.
-        // See https://github.com/keymanapp/keyman/issues/4868 for one example issue.
-        String.kmwEnableSupplementaryPlane(keyman.isEmbedded || Pk.usesSupplementaryPlaneChars); // I3319
-      }
+      String.kmwEnableSupplementaryPlane(true);
 
       // Initialize the OSK (provided that the base code has been loaded)
       osk._Load();
@@ -666,10 +662,7 @@ namespace com.keyman.keyboards {
               manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
             }
 
-            // For embedded devices, we should consider that the user may keyboard-swap.
-            // See https://github.com/keymanapp/keyman/issues/4868 for one example issue.
-            let keyman = com.keyman.singleton;
-            String.kmwEnableSupplementaryPlane(keyman.isEmbedded || core.activeKeyboard.usesSupplementaryPlaneChars);
+            String.kmwEnableSupplementaryPlane(true);
             
             manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);
 
