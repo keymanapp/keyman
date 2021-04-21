@@ -270,6 +270,7 @@ const
   SRegValue_CPIUP_Languages = 'Languages';
   SRegValue_CPIUP_TransientLangId = 'TransientLangId';
   SRegValue_CPIUP_CachedLanguageName = 'CachedLanguageName';
+  SRegValue_CPIUP_InputMethodOverride = 'InputMethodOverride';
 
   { User profile keys }
 
