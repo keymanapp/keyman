@@ -198,6 +198,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sbDetails: TScrollBox
         Left = 0
         Top = 0
@@ -698,7 +701,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Top = 22
             Width = 482
             Height = 13
-            Caption =
+            Caption = 
               'In Keyman 10, language metadata should now be managed in the pac' +
               'kage, not the keyboard.'
           end
@@ -721,6 +724,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageLayout: TTabSheet
       Caption = 'Layout'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesLayout: TPageControl
         Left = 0
         Top = 0
@@ -735,6 +741,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object panLayoutSimple: TPanel
             Left = 0
             Top = 0
@@ -953,11 +963,45 @@ inherited frmKeymanWizard: TfrmKeymanWizard
               TabOrder = 2
               OnClick = chkLayoutDisplay102KeyClick
             end
+            object panWarnMixedShiftStates: TPanel
+              Left = 492
+              Top = 59
+              Width = 317
+              Height = 54
+              BevelOuter = bvLowered
+              Color = clCream
+              ParentBackground = False
+              TabOrder = 5
+              Visible = False
+              object lblWarnMixedShiftStates: TLabel
+                Left = 8
+                Top = 8
+                Width = 183
+                Height = 39
+                Caption = 
+                  'Warning: mixing left/right and non-specific modifiers means some' +
+                  ' rules are not visible here'
+                WordWrap = True
+              end
+              object cmdFixupShiftStates: TButton
+                Left = 200
+                Top = 16
+                Width = 107
+                Height = 25
+                Caption = 'Fixup Shift States'
+                TabOrder = 0
+                OnClick = cmdFixupShiftStatesClick
+              end
+            end
           end
         end
         object pageLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
@@ -1004,10 +1048,16 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageOnScreenKeyboard: TTabSheet
       Caption = 'On-Screen'
       ImageIndex = 7
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageTouchLayout: TTabSheet
       Caption = 'Touch Layout'
       ImageIndex = 16
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesTouchLayout: TPageControl
         Left = 0
         Top = 0
@@ -1022,32 +1072,55 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
     object pageIncludeCodes: TTabSheet
       Caption = 'Char Codes'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedJS: TTabSheet
       Caption = 'Embedded JS'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedCSS: TTabSheet
       Caption = 'Embedded CSS'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWHelp: TTabSheet
       Caption = 'Embedded Help'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -1063,7 +1136,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           Top = 13
           Width = 333
           Height = 13
-          Caption =
+          Caption = 
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
@@ -1331,7 +1404,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgBrowseBitmap: TOpenPictureDialog
     DefaultExt = 'ico'
-    Filter =
+    Filter = 
       'All supported files (*.ico, *.bmp)|*.ico;*.bmp|Icon files (*.ico' +
       ')|*.ico|Bitmap files (*.bmp)|*.bmp|All files (*.*)|*.*'
     Options = [ofHideReadOnly, ofCreatePrompt, ofEnableSizing]
@@ -1341,7 +1414,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgSaveExport: TSaveDialog
     DefaultExt = 'kmn'
-    Filter =
+    Filter = 
       'Keyman 5.0 Keyboard Wizard (*.kmn)|*.kmn|Windows NT/2000/XP keyb' +
       'oard (*.dll)|*.dll|Windows 95/98/Me keyboard (*.kbd)|*.kbd'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
