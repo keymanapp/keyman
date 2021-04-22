@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.33 alpha 2021-04-22
+
+* chore(linux): Remove experimental scripts (#4913)
+* fix(oem/fv/android): Migrate keyboard list from 12.0 to 14.0 (#4951)
+* fix(web): publish restorePosition() function (#4946)
+* fix(web): fixes subkey lookup for fat-finger processing (#4954)
+* feat(linux): Improve Sentry crash reporting (#4914)
+* fix(web, ios): better SMP, emoji handling with frequent keyboard swaps (#4938)
+
 ## 15.0.32 alpha 2021-04-21
 
 * fix(windows): handle invalid package names during install (#4887)
