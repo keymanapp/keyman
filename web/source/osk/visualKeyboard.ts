@@ -1090,6 +1090,9 @@ namespace com.keyman.osk {
         if(popupKeyID == baseKeyID) {
           baseKeyMass += popupKeyMass;
           popupKeyMass = 0;
+        } else {
+          // We namespace it so that lookup operations know to find it via its base key.
+          popupKeyID = `${baseKeyID}::${popupKeyID}`;
         }
 
         // Compute the normalization factor

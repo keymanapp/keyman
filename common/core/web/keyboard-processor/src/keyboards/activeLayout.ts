@@ -32,6 +32,8 @@ namespace com.keyman.keyboards {
     proportionalX: number;
     proportionalWidth: number;
 
+    sk?: ActiveKey[];
+
     // Keeping things simple here, as this was added LATE in 14.0 beta.
     // Could definitely extend in the future to instead return an object
     // that denotes the 'nature' of the key.
@@ -218,6 +220,18 @@ namespace com.keyman.keyboards {
       }
 
       return Lkc;
+    }
+
+    public getSubkey(id: string): ActiveKey {
+      if(this.sk) {
+        for(let key of this.sk) {
+          if(key.id == id) {
+            return key;
+          }
+        }
+      }
+
+      return null;
     }
   }
 
@@ -570,7 +584,13 @@ namespace com.keyman.keyboards {
         keyId = keyId.replace(this.id + '-', '');
       }
 
-      return this.keyMap[keyId];
+      let idComponents = keyId.split('::');
+      if(idComponents.length > 1) {
+        let baseKey = this.keyMap[idComponents[0]];
+        return baseKey.getSubkey(idComponents[1]);
+      } else {
+        return this.keyMap[keyId];
+      }
     }
   }
 
