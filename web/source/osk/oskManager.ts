@@ -474,7 +474,7 @@ namespace com.keyman.osk {
      * Scope        Public
      * Description  Move OSK back to default position, floating under active input element
      */
-    restorePosition: () => void = function(this: OSKManager) {
+    ['restorePosition']: () => void = function(this: OSKManager) {
       let isVisible = this._Visible;
       if(isVisible) {
         com.keyman.singleton.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
