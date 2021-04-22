@@ -10,6 +10,7 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -193,6 +194,20 @@ final class FVShared {
         }
 
         updateActiveKeyboardsList();
+    }
+
+    // Saves the migrated keyboard list for upgradeTo14()
+    private void saveUpdateTo14List(ArrayList<HashMap<String, String>>list) {
+        try {
+            File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+            outputStream.writeObject(list);
+            outputStream.flush();
+            outputStream.close();
+        }
+        catch (Exception e) {
+            KMLog.LogException("saveUpdateTo14List", "Error saving migrated keyboard list", e);
+        }
     }
 
     FVRegionList getRegionList() {
@@ -411,5 +426,52 @@ final class FVShared {
         }
 
         saveLoadedKeyboardList();
+    }
+
+    /// Upgrades the keyboard list Keyman Engine for Android uses from an earlier version to 14.0
+    // because the FirstVoices keyboard packageIDs changed to "fv_all".
+    // Note: KMManager.initialize will eventually migrate KMFilename_KeyboardsList to a JSON file
+    @SuppressWarnings("unchecked")
+    void upgradeTo14() {
+        String TAG = "upgradeTo14";
+        File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+        if(!file.exists()) {
+            // New install, or already upgraded to 14.0
+            return;
+        }
+
+        ArrayList<HashMap<String, String>> keyboardList;
+
+        try {
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
+            keyboardList = (ArrayList<HashMap<String, String>>) inputStream.readObject();
+            inputStream.close();
+
+            // Migrate the package IDs and include OSK font
+            if (keyboardList != null) {
+                for(int i=0; i<keyboardList.size(); i++) {
+                    HashMap<String, String> kbdMap = keyboardList.get(i);
+                    kbdMap.put(KMManager.KMKey_PackageID, FVDefault_PackageID);
+                    if (kbdMap.containsKey(KMManager.KMKey_Font)) {
+                        kbdMap.put(KMManager.KMKey_OskFont, kbdMap.get(KMManager.KMKey_Font));
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            // Unable to load and migrate the data from earlier version. Log the issue, then we will
+            // just delete the file and give up on it. The user will have to reconfigure
+            // their keyboards but that's not the end of the world.
+            KMLog.LogException(TAG, "Unable to migrate keyboard list", e);
+            if(!file.delete()) {
+                Log.w(TAG, "Could not remove legacy data file "+ KMManager.KMFilename_KeyboardsList);
+            }
+            return;
+        }
+
+        // We've migrated the data so overwrite the legacy file
+        if (keyboardList != null) {
+            saveUpdateTo14List(keyboardList);
+        }
     }
 }
