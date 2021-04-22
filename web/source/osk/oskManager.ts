@@ -414,7 +414,7 @@ namespace com.keyman.osk {
       Limg.id='kmw-pin-image';
       Limg.className='kmw-title-bar-image';
       Limg.title='Pin the On Screen Keyboard to its default location on the active text box';
-      Limg.onclick=this.restorePosition;
+      Limg.onclick=this.handlePinClick;
       Limg.onmousedown=util._CancelMouse;
       bar.appendChild(Limg);
 
@@ -469,12 +469,21 @@ namespace com.keyman.osk {
         +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
     }
 
+    private handlePinClick: (event: Event) => void = function(this: OSKManager, event: Event) {
+      this.restorePosition(true);
+      if(event) {
+        event.returnValue = false;
+      }
+    }.bind(this);
+
     /**
      * Function     restorePosition
      * Scope        Public
+     * @param       {boolean?}      keepDefaultPosition  If true, does not reset the default x,y set by `setRect`.
+     *                                                   If false or omitted, resets the default x,y as well.
      * Description  Move OSK back to default position, floating under active input element
      */
-    ['restorePosition']: () => void = function(this: OSKManager) {
+    ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: OSKManager, keepDefaultPosition?: boolean) {
       let isVisible = this._Visible;
       if(isVisible) {
         com.keyman.singleton.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
@@ -482,6 +491,10 @@ namespace com.keyman.osk {
 
       this.loadCookie();
       this.userPositioned=false;
+      if(!keepDefaultPosition) {
+        delete this.dfltX;
+        delete this.dfltY;
+      }
       this.saveCookie();
 
       if(isVisible) {
@@ -491,9 +504,6 @@ namespace com.keyman.osk {
       this.doResizeMove(); //allow the UI to respond to OSK movements
       if(this.pinImg) {
         this.pinImg.style.display='none';
-      }
-      if(window.event) {
-        window.event.returnValue=false;
       }
     }.bind(this);
 
@@ -532,7 +542,7 @@ namespace com.keyman.osk {
       Limg = this.pinImg = util._CreateElement('div');  //I2186
       Limg.className='kmw-pin-image';
       Limg.title='Pin the On Screen Keyboard to its default location on the active text box';
-      Limg.onclick=this.restorePosition;
+      Limg.onclick=this.handlePinClick;
       Limg.onmousedown=util._CancelMouse;
       Limg.style.display='none';
 
