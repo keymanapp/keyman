@@ -133,7 +133,7 @@ if(!window['keyman']['initialized']) {
     util.attachDOMEvent(window, 'blur', keymanweb['pageFocusHandler'], false);   // I775
     
     // Initialize supplementary plane string extensions
-    String.kmwEnableSupplementaryPlane(false);    
+    String.kmwEnableSupplementaryPlane(true);    
 
   })();
 }
