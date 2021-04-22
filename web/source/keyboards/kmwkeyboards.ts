@@ -588,9 +588,6 @@ namespace com.keyman.keyboards {
         this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
       }
 
-      var Pk=keyman.core.activeKeyboard;  // I3319
-      String.kmwEnableSupplementaryPlane(true);
-
       // Initialize the OSK (provided that the base code has been loaded)
       osk._Load();
       return Promise.resolve();
@@ -661,8 +658,6 @@ namespace com.keyman.keyboards {
               manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
               manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
             }
-
-            String.kmwEnableSupplementaryPlane(true);
             
             manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);
 
