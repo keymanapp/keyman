@@ -469,13 +469,6 @@ namespace com.keyman.osk {
         +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
     }
 
-    private handlePinClick: (event: Event) => void = function(this: OSKManager, event: Event) {
-      this.restorePosition(true);
-      if(event) {
-        event.returnValue = false;
-      }
-    }.bind(this);
-
     /**
      * Function     restorePosition
      * Scope        Public
@@ -504,6 +497,13 @@ namespace com.keyman.osk {
       this.doResizeMove(); //allow the UI to respond to OSK movements
       if(this.pinImg) {
         this.pinImg.style.display='none';
+      }
+    }.bind(this);
+
+    private handlePinClick: (event: Event) => void = function(this: OSKManager, event: Event) {
+      this.restorePosition(true);
+      if(event) {
+        event.returnValue = false;
       }
     }.bind(this);
 
