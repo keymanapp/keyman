@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         new FVShared(this);
 
         FVShared.getInstance().upgradeTo12();
+        FVShared.getInstance().upgradeTo14();
         FVShared.getInstance().preloadPackages();
 
         if (BuildConfig.DEBUG) {
