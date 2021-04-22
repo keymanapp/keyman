@@ -1,5 +1,32 @@
 # Keyman Version History
 
+## 14.0.272 stable 2021-04-22
+
+* chore(linux): Debug triggering Jenkins build (#4852)
+* chore(android/engine): Rename "Fula" to "Pulaar" 🍒  (#4860)
+* chore(android/engine): Rename "Pulaar" to "Pulaar-Fulfulde" 🍒  (#4891)
+* fix(developer): Reduce non-canonical BCP 47 tag warning in PackageInfo to Info 🍒  (#4892)
+* chore(common): Update crowdin for French 🍒  (#4903)
+* chore(android,windows): Check in crowdin for Indonesian 🍒  (#4904)
+* fix(linux): don't crash on legacy non-Unicode files (#4878)
+* fix(android/engine): Don't load woff fonts on Android N 🍒  (#4924)
+* fix(linux): Don't crash on network problem (fixes #4911) 🍒 (#4931)
+* fix(android/engine): Change getList() to return an empty list instead of null 🍒  (#4928)
+* fix(windows): handle invalid package names during install 🍒 (#4888)
+* fix(windows): crash when installing TIP in some rare situations 🍒 (#4901)
+* fix(windows): access violation closing text editor 🍒 (#4921)
+* fix(windows): help contents broken from tray menu 🍒 (#4923)
+* fix(developer): avoid crash if .kpj.user file is malformed 🍒 (#4919)
+* fix(developer): chiral mismatch warning is disruptive 🍒 (#4935)
+* chore(windows): disable profile repair 🍒 (#4900)
+* fix(windows): avoid error if keyman32.dll renamed 🍒 (#4941)
+* change(web): adds error + console logs usable for Sentry reporting targeting 🍒 (#4929)
+* fix(web): fixes subkey lookup for fat-finger processing 🍒 (#4955)
+* fix(oem/fv/android): Migrate keyboard list from 12.0 to 14.0 🍒  (#4952)
+* fix(web): publish restorePosition() function 🍒 (#4957)
+* fix(web, ios): better SMP, emoji handling with frequent keyboard swaps 🍒 (#4958)
+* feat(linux): Improve Sentry crash reporting 🍒 (#4960)
+
 ## 14.0.271 stable 2021-04-01
 
 * fix(android/engine): Sanitize embedded KMW Sentry error (#4786)
