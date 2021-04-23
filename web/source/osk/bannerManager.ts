@@ -158,6 +158,11 @@ namespace com.keyman.osk {
             // Invalid option specified!
         }
         this._options[key] = optionSpec[key];
+
+        // If no banner instance exists yet, go with a safe, blank initialization.
+        if(!this.activeBanner) {
+          this.selectBanner('inactive');
+        }
       }
     }
 
