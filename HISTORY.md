@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.35 alpha 2021-04-23
+
+* chore(ios): prep for CI transition to Xcode 12, build script tweak (#4967)
+* chore(linux): Fix triggering of Jenkins builds for stable branch 🍒 (#4969)
+* fix(linux): Don't crash if kmp file vanishes (fixes #4907) (#4970)
+
 ## 15.0.34 alpha 2021-04-22
 
 * No changes made
