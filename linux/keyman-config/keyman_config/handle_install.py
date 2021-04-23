@@ -19,6 +19,7 @@ def download_and_install_package(url):
     """
     parsedUrl = urlparse(url)
     bcp47 = _extract_bcp47(parsedUrl.query)
+    severity = logging.CRITICAL
 
     if parsedUrl.scheme == 'keyman':
         logging.info("downloading " + url)
@@ -36,12 +37,13 @@ def download_and_install_package(url):
         packageFile = download_kmp_file(downloadUrl, downloadFile)
     elif parsedUrl.scheme == '' or parsedUrl.scheme == 'file':
         packageFile = parsedUrl.path
+        severity = logging.ERROR
     else:
         logging.critical("Invalid URL: " + url)
         return
 
     if packageFile and not _install_package(packageFile, bcp47):
-        logging.critical("Can't find file " + url)
+        logging.log(severity, "Can't find file " + url)
 
 
 def _extract_bcp47(query):
