@@ -210,7 +210,9 @@ update_bundle
 if [ $DO_CARTHAGE = true ]; then
     echo
     echo "Load dependencies with Carthage"
-    carthage bootstrap --platform iOS || fail "carthage boostrap failed"
+    # TODO: Replace the workaround-script with the base `carthage` command once
+    # we've properly updated to 0.37's better approach.
+    $KEYMAN_ROOT/resources/build/carthage-workaround.sh bootstrap --platform iOS || fail "carthage boostrap failed"
 fi
 
 echo
