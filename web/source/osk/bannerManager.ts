@@ -143,6 +143,8 @@ namespace com.keyman.osk {
             this.alwaysShow = optionSpec[key];
             break;
           case 'mayPredict':
+            // If this toggles our internal flag, it will generate events
+            // that reconfigures the banner (and internal engine state) appropriately.
             keyman.core.languageProcessor.mayPredict = optionSpec[key]
             break;
           case 'mayCorrect':
@@ -157,8 +159,6 @@ namespace com.keyman.osk {
         }
         this._options[key] = optionSpec[key];
       }
-
-      this.selectBanner();
     }
 
     /**
@@ -208,11 +208,11 @@ namespace com.keyman.osk {
      * allowing logic to automatically hot-swap `Banner`s as needed.
      * @param state 
      */
-    private selectBanner(state?: text.prediction.StateChangeEnum) {
+    private selectBanner(state: text.prediction.StateChangeEnum) {
       // Only display a SuggestionBanner when LanguageProcessor states it is active.s
       if(state == 'active') {
         this.setBanner('suggestion');
-      } else if(state == 'inactive' || state == undefined) {
+      } else if(state == 'inactive') {
         if(this.alwaysShow) {
           this.setBanner('image');
         } else {
