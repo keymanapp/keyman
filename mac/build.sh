@@ -291,7 +291,9 @@ if $CLEAN ; then
 fi
 
 if [ "$TEST_ACTION" == "test" ]; then
-    carthage bootstrap
+    # TODO: Replace the workaround-script with the base `carthage` command once
+    # we've properly updated to 0.37's better approach.
+    $KEYMAN_ROOT/resources/build/carthage-workaround.sh bootstrap
 fi
 
 execBuildCommand() {
