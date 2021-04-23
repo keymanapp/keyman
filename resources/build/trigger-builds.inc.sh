@@ -76,7 +76,7 @@ function triggerJenkinsBuild() {
     TAG=", \"tag\": \"$GIT_TAG\", \"tag2\": \"$GIT_TAG\""
   fi
 
-  if [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
+  if [[ $JENKINS_BRANCH != stable-* ]] && [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
     JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
   fi
 
