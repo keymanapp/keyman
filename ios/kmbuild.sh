@@ -186,6 +186,14 @@ update_bundle ( ) {
     fi
 
     # Our default resources are part of the bundle, so let's check on them.
+    if [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp" ]; then
+      DO_KMP_DOWNLOADS=true
+      warn "OVERRIDE:  Performing -download-resources run, as the keyboard package is missing!"
+    elif [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp" ]; then
+      DO_KMP_DOWNLOADS=true
+      warn "OVERRIDE:  Performing -download-resources run, as the lexical model package is missing!"
+    fi
+
     if [ $DO_KMP_DOWNLOADS = true ]; then
       echo_heading "Downloading up-to-date packages for default resources"
 
@@ -195,12 +203,6 @@ update_bundle ( ) {
       echo "${SUCCESS_GREEN}Packages successfully updated${NORMAL}"
 
       # If we aren't downloading resources, make sure copies of them already exist!
-    elif [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp" ]; then
-      fail "No run with -download-resources has been performed yet; the keyboard package is missing!"
-    elif [ ! -f "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp" ]; then
-      fail "No run with -download-resources has been performed yet; the lexical model package is missing!"
-    else
-      warn "Reusing previously-downloaded packages for default resources"
     fi
 }
 
@@ -210,7 +212,9 @@ update_bundle
 if [ $DO_CARTHAGE = true ]; then
     echo
     echo "Load dependencies with Carthage"
-    carthage bootstrap --platform iOS || fail "carthage boostrap failed"
+    # TODO: Replace the workaround-script with the base `carthage` command once
+    # we've properly updated to 0.37's better approach.
+    $KEYMAN_ROOT/resources/build/carthage-workaround.sh bootstrap --platform iOS || fail "carthage boostrap failed"
 fi
 
 echo
