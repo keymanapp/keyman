@@ -1,8 +1,8 @@
 # Keyman for iOS
 
 ## Prerequisites
-* Xcode 9.1
-* iOS 8+
+* Xcode 11
+* iOS 9+
 * [Node.js](https://nodejs.org/) 8.9+ (for building the embedded KeymanWeb engine)
 * SwiftLint (`brew install swiftlint`)
 * Carthage (`brew install carthage`)
