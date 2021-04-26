@@ -9,14 +9,14 @@ namespace com.keyman.dom {
   /**
    * As our touch-alias elements have historically been based on <div>s, this
    * defines the root element of touch-aliases as a merger type with HTMLDivElements.
-   * 
+   *
    */
   export type TouchAliasElement = HTMLDivElement & TouchAliasData;
 
   // Many thanks to https://www.typescriptlang.org/docs/handbook/advanced-types.html for this.
   function link(elem: HTMLDivElement, data: TouchAliasData): TouchAliasElement {
     let e = <TouchAliasElement> elem;
-    
+
     // Merges all properties and methods of KeyData onto the underlying HTMLDivElement, creating a merged class.
     for(let id in data) {
       if(!e.hasOwnProperty(id)) {
@@ -77,7 +77,7 @@ namespace com.keyman.dom {
         console.info(`Target's grandparent: ${elementDescriber(target.parentElement.parentElement)}`);
       }
       // Triggers the actual Sentry log (on pages that include Sentry logging)
-      throw new Error(`Unexpected touch-start event target.`);
+      //throw new Error(`Unexpected touch-start event target.`);
     };
 
     // Identify the scroller element
@@ -104,13 +104,13 @@ namespace com.keyman.dom {
       // NOTE:  At present, this method should only be called in places that actually EXPECT a TouchAliasElement...
       // So if we fail to find one, something's gone wrong, and we'd like more details.
 
-      // There's an evasive error related to this at present so we'll temporarily console-log info 
+      // There's an evasive error related to this at present so we'll temporarily console-log info
       // that may help us determine why we couldn't find the expected element.
       elementLogger();
       return null;
     }
 
-    // And the actual target element        
+    // And the actual target element
     let root = scroller.parentNode;
     if(root['base'] !== undefined) {
       return root as TouchAliasElement;
@@ -174,11 +174,11 @@ namespace com.keyman.dom {
 
     initCaret(): void {
       /**
-       * Create a caret to be appended to the scroller of the focussed input field. 
-       * The caret is appended to the scroller so that it will automatically be clipped 
-       * when the user manually scrolls it outside the element boundaries.          
+       * Create a caret to be appended to the scroller of the focussed input field.
+       * The caret is appended to the scroller so that it will automatically be clipped
+       * when the user manually scrolls it outside the element boundaries.
        * It is positioned exactly over the hidden span (__caretSpan) that is inserted
-       * between the text spans before and after the insertion point.          
+       * between the text spans before and after the insertion point.
        */
       this.__caretDiv = <HTMLDivElement> document.createElement('DIV');
       var cs=this.__caretDiv.style;
@@ -188,7 +188,7 @@ namespace com.keyman.dom {
       cs.backgroundColor='blue';
       cs.border='none';
       cs.left=cs.top='0px';           // actual position set relative to parent when displayed
-      cs.display='block';         
+      cs.display='block';
       cs.visibility='hidden';
       cs.zIndex='9998';           // immediately below the OSK
 
@@ -202,7 +202,7 @@ namespace com.keyman.dom {
       let divThis = <TouchAliasElement> (<any> this);
       divThis.className='keymanweb-input';
 
-      // Add a scrollable interior div 
+      // Add a scrollable interior div
       let d = this.__scrollDiv = document.createElement<'div'>('div');
       let xs = divThis.style;
       xs.overflow='hidden';
@@ -243,26 +243,26 @@ namespace com.keyman.dom {
       let styleCaret = this.__caretSpan.style;
       preCaretStyle.border=postCaretStyle.border='none';
       //preCaretStyle.backgroundColor='rgb(220,220,255)';
-      //postCaretStyle.backgroundColor='rgb(220,255,220)'; //only for testing 
+      //postCaretStyle.backgroundColor='rgb(220,255,220)'; //only for testing
       preCaretStyle.height=postCaretStyle.height='100%';
 
-      // The invisible caret-positioning span must have a border to ensure that 
+      // The invisible caret-positioning span must have a border to ensure that
       // it remains in the layout, but colour doesn't matter, as it is never visible.
-      // Span margins are adjusted to compensate for the border and maintain text positioning.  
-      styleCaret.border='1px solid red';  
-      styleCaret.visibility='hidden';       
+      // Span margins are adjusted to compensate for the border and maintain text positioning.
+      styleCaret.border='1px solid red';
+      styleCaret.visibility='hidden';
       styleCaret.marginLeft=styleCaret.marginRight='-1px';
-      
-      // Set the outer element padding *after* appending the element, 
+
+      // Set the outer element padding *after* appending the element,
       // otherwise Firefox misaligns the two elements
       xs.padding='8px';
-      
+
       // Set internal padding to match the TEXTAREA and INPUT elements
       ds.padding='0px 2px'; // OK for iPad, possibly device-dependent
 
-      // Set the tabindex to 0 to allow a DIV to accept focus and keyboard input 
+      // Set the tabindex to 0 to allow a DIV to accept focus and keyboard input
       // c.f. http://www.w3.org/WAI/GL/WCAG20/WD-WCAG20-TECHS/SCR29.html
-      divThis.tabIndex=0; 
+      divThis.tabIndex=0;
 
       // Disable (internal) pan and zoom on KMW input elements for IE10
       divThis.style.msTouchAction='none';
@@ -295,7 +295,7 @@ namespace com.keyman.dom {
       // Set vertical centering for input elements
       if(base.nodeName.toLowerCase() == 'input') {
         if(!isNaN(parseInt(baseStyle.height,10))) {
-          preCaretStyle.lineHeight = postCaretStyle.lineHeight = baseStyle.height;      
+          preCaretStyle.lineHeight = postCaretStyle.lineHeight = baseStyle.height;
         }
       }
 
@@ -310,19 +310,19 @@ namespace com.keyman.dom {
       } else {
         preCaretStyle.whiteSpace=postCaretStyle.whiteSpace='pre';      //scroll horizontally
       }
-      
+
       divThis.base.parentNode.appendChild(divThis);
       divThis.updateInput();
 
-      let style = divThis.style; 
+      let style = divThis.style;
       style.color=baseStyle.color;
-      //style.backgroundColor=bs.backgroundColor; 
+      //style.backgroundColor=bs.backgroundColor;
       style.fontFamily=baseStyle.fontFamily;
       style.fontSize=baseStyle.fontSize;
       style.fontWeight=baseStyle.fontWeight;
       style.textDecoration=baseStyle.textDecoration;
       style.padding=baseStyle.padding;
-      style.margin=baseStyle.margin; 
+      style.margin=baseStyle.margin;
       style.border=baseStyle.border;
       style.borderRadius=baseStyle.borderRadius;
 
@@ -352,15 +352,15 @@ namespace com.keyman.dom {
       }
       base.style.visibility='hidden'; // hide by default: KMW-3
 
-      // Add an explicit event listener to allow the duplicated input element 
+      // Add an explicit event listener to allow the duplicated input element
       // to be adjusted for any changes in base element location or size
       // This will be called for each element after any rotation, as well as after user-initiated changes
       // It has to be wrapped in an anonymous function to preserve scope and be applied to each element.
       (function(xx: TouchAliasElement){
         xx.__resizeHandler = function(){
-          /* A timeout is needed to let the base element complete its resizing before our 
+          /* A timeout is needed to let the base element complete its resizing before our
           * simulated element can properly resize itself.
-          * 
+          *
           * Not doing this causes errors if the input elements are resized for whatever reason, such as
           * changing languages to a text with greater height.
           */
@@ -375,26 +375,26 @@ namespace com.keyman.dom {
 
       var textValue: string;
 
-      if(base instanceof base.ownerDocument.defaultView.HTMLTextAreaElement 
+      if(base instanceof base.ownerDocument.defaultView.HTMLTextAreaElement
         || base instanceof base.ownerDocument.defaultView.HTMLInputElement) {
         textValue = base.value;
       } else {
         textValue = base.textContent;
       }
-        
+
       // And copy the text content
-      this.setText(textValue, null); 
+      this.setText(textValue, null);
     }
 
     setText(t?: string, cp?: number): void {
       var tLen=0;
       var t1: string, t2: string;
-      
+
       // Read current text if null passed (for caret positioning)
       if(t === null) {
         t1 = this.__preCaret.textContent;
         t2 = this.__postCaret.textContent;
-        t  = t1 + t2;        
+        t  = t1 + t2;
       }
 
       if(cp < 0) {
@@ -402,13 +402,13 @@ namespace com.keyman.dom {
       }
 
       tLen=t._kmwLength();
-      
+
       if(cp === null || cp === undefined || cp > tLen) {
         cp=tLen;
       }
       t1=t._kmwSubstr(0,cp);
       t2=t._kmwSubstr(cp);
-                          
+
       this.__preCaret.textContent=t1;
       this.__postCaret.textContent=t2;
 
@@ -418,14 +418,14 @@ namespace com.keyman.dom {
     getTextBeforeCaret() {
       return this.__preCaret.textContent;
     }
-    
+
     getTextAfterCaret() {
       return this.__postCaret.textContent;
     }
 
     setTextBeforeCaret(t: string): void {
       var tLen=0;
-      
+
       // Collapse (trailing) whitespace to a single space for INPUT fields (also prevents wrapping)
       if(!this.isMultiline()) {
         t=t.replace(/\s+$/,' ');
@@ -434,24 +434,24 @@ namespace com.keyman.dom {
       // Test total length in order to control base element visibility
       tLen=t.length;
       tLen=tLen+this.__postCaret.textContent.length;
-  
-      // Update the base element then scroll into view if necessary      
-      this.updateBaseElement(); //KMW-3, KMW-29      
-      this.scrollInput(); 
+
+      // Update the base element then scroll into view if necessary
+      this.updateBaseElement(); //KMW-3, KMW-29
+      this.scrollInput();
     }
 
     getTextCaret(): number {
       return this.getTextBeforeCaret()._kmwLength();
     }
-    
+
     setTextCaret(cp: number): void {
       this.setText(null,cp);
       this.showCaret();
     }
 
     /**
-     * Set content, visibility, background and borders of input and base elements (KMW-3,KMW-29) 
-     */                      
+     * Set content, visibility, background and borders of input and base elements (KMW-3,KMW-29)
+     */
     updateBaseElement() {
       let e = <TouchAliasElement> (<any> this);
 
@@ -489,23 +489,23 @@ namespace com.keyman.dom {
     /**
      * Position the caret at the start of the second span within the scroller
      */
-    showCaret() {                          
+    showCaret() {
       var scroller=this.__scrollDiv, cs=this.__caretDiv.style, sp2=this.__caretSpan;
-      
+
       // Attach the caret to this scroller and position it over the caret span
       if(this.__caretDiv.parentNode != <Node>scroller) {
         scroller.appendChild(this.__caretDiv);
       }
 
-      cs.left=sp2.offsetLeft+'px'; 
+      cs.left=sp2.offsetLeft+'px';
       cs.top=sp2.offsetTop+'px';
       cs.height=(sp2.offsetHeight-1)+'px';
       cs.visibility='hidden';   // best to wait for timer to display caret
       this.__activeCaret = true;
-      
+
       // Scroll into view if required
       this.scrollBody();
-    
+
       // Display and position the scrollbar if necessary
       this.setScrollBar();
     }
@@ -518,14 +518,14 @@ namespace com.keyman.dom {
           || e.base instanceof e.base.ownerDocument.defaultView.HTMLInputElement) {
         e.base.value = this.getText();
       }
-      
+
       // And set the scroller caret to the end of the element content (null preserves text)
       this.setText(null, 100000);
-      
+
       // Set the element scroll to zero (or max for RTL INPUT)
       var ss=this.__scrollDiv.style;
       if(e.isMultiline()) {
-        ss.top='0'; 
+        ss.top='0';
       } else {
         if(e.base.dir == 'rtl') {
           ss.left=(e.offsetWidth - this.__scrollDiv.offsetWidth-8)+'px';
@@ -533,9 +533,9 @@ namespace com.keyman.dom {
           ss.left='0';
         }
       }
-      
-      
-      // And hide the caret and scrollbar       
+
+
+      // And hide the caret and scrollbar
       if(this.__caretDiv.parentNode) {
         this.__caretDiv.parentNode.removeChild(this.__caretDiv);
       }
@@ -565,14 +565,14 @@ namespace com.keyman.dom {
           x1=x1-Utils.getAbsoluteX(p);
           y1=y1-Utils.getAbsoluteY(p);
         }
-        
+
         if(isNaN(mLeft)) {
           mLeft=0;
         }
         if(isNaN(mTop)) {
           mTop=0;
         }
-        
+
         xs.left=(x1-mLeft)+'px';
         xs.top=(y1-mTop)+'px';
 
@@ -580,15 +580,15 @@ namespace com.keyman.dom {
         if(typeof(s.MozBoxSizing) != 'undefined') {
           xs.left=x1+'px';
           xs.top=y1+'px';
-        }     
+        }
 
         var w=b.offsetWidth, h=b.offsetHeight,
-            pLeft=parseInt(s.paddingLeft,10), pRight=parseInt(s.paddingRight,10),      
+            pLeft=parseInt(s.paddingLeft,10), pRight=parseInt(s.paddingRight,10),
             pTop=parseInt(s.paddingTop,10), pBottom=parseInt(s.paddingBottom,10),
-            bLeft=parseInt(s.borderLeft,10), bRight=parseInt(s.borderRight,10),    
+            bLeft=parseInt(s.borderLeft,10), bRight=parseInt(s.borderRight,10),
             bTop=parseInt(s.borderTop,10), bBottom=parseInt(s.borderBottom,10);
-      
-        // If using content-box model, must subtract the padding and border, 
+
+        // If using content-box model, must subtract the padding and border,
         // but *not* for border-box (as for WordPress PlugIn)
         var boxSizing='undefined';
         if(typeof(s.boxSizing) != 'undefined') {
@@ -602,19 +602,19 @@ namespace com.keyman.dom {
           if(!isNaN(pRight)) w -= pRight;
           if(!isNaN(bLeft)) w -= bLeft;
           if(!isNaN(bRight)) w -= bRight;
-          
+
           if(!isNaN(pTop)) h -= pTop;
           if(!isNaN(pBottom)) h -= pBottom;
           if(!isNaN(bTop)) h -= bTop;
           if(!isNaN(bBottom)) h -= bBottom;
         }
-      
+
         if(TouchAliasData.getOS() == 'Android') {
-          // FireFox - adjust padding to match input and text area defaults 
+          // FireFox - adjust padding to match input and text area defaults
           if(typeof(s.MozBoxSizing) != 'undefined') {
             xs.paddingTop=(pTop+1)+'px';
             xs.paddingLeft=pLeft+'px';
-            
+
             if(this.isMultiline()) {
               xs.marginTop='1px';
             } else {
@@ -631,31 +631,31 @@ namespace com.keyman.dom {
 
         xs.width=w+'px';
         xs.height=h+'px';
-      } 
+      }
     }
 
     /**
-     * Scroll the input field horizontally (INPUT base element) or 
+     * Scroll the input field horizontally (INPUT base element) or
      * vertically (TEXTAREA base element) to bring the caret into view
      * as text is entered or deleted form an element
-     */         
+     */
     scrollInput() {
       var scroller=this.__scrollDiv;
       let divThis = <TouchAliasElement> (<any> this);
 
-      // Get the actual absolute position of the caret and the element 
+      // Get the actual absolute position of the caret and the element
       var s2=this.__caretSpan,
         cx=dom.Utils.getAbsoluteX(s2),cy=dom.Utils.getAbsoluteY(s2),
         ex=dom.Utils.getAbsoluteX(divThis),ey=dom.Utils.getAbsoluteY(divThis),
         x=parseInt(scroller.style.left,10),
         y=parseInt(scroller.style.top,10),
-        dx=0,dy=0; 
-      
+        dx=0,dy=0;
+
       // Scroller offsets must default to zero
       if(isNaN(x)) x=0; if(isNaN(y)) y=0;
 
       // Scroll input field vertically if necessary
-      if(divThis.isMultiline()) { 
+      if(divThis.isMultiline()) {
         var rowHeight=Math.round(divThis.offsetHeight/(<HTMLTextAreaElement> divThis.base).rows);
         if(cy < ey) {
           dy=cy-ey;
@@ -676,7 +676,7 @@ namespace com.keyman.dom {
         if(dx != 0) {
           scroller.style.left=(x<dx?x-dx:0)+'px';
         }
-      }    
+      }
 
       // Display the caret (and scroll into view if necessary)
       this.showCaret();
@@ -684,7 +684,7 @@ namespace com.keyman.dom {
 
     /**
      * Scroll the document body vertically to bring the active input into view
-     */         
+     */
     scrollBody(): void {
       // Note the deliberate lack of typing; we don't want to include KMW's core in isolated
       // element interface testing, so we can't use it here.
@@ -706,7 +706,7 @@ namespace com.keyman.dom {
         if(dy < 0) {
           dy=0;
         }
-      }    
+      }
       // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
       if(dy != 0) {
         window.scrollTo(0,dy+window.pageYOffset);
@@ -726,13 +726,13 @@ namespace com.keyman.dom {
         sbs.width=100*(e.offsetWidth/scroller.offsetWidth)+'%';
         sbs.left=100*(-scroller.offsetLeft/scroller.offsetWidth)+'%';
         sbs.top='0';
-        sbs.visibility='visible';  
+        sbs.visibility='visible';
       } else if(scroller.offsetHeight > e.offsetHeight || scroller.offsetTop < 0) {
         sbs.width='4px';
         sbs.height=100*(e.offsetHeight/scroller.offsetHeight)+'%';
         sbs.top=100*(-scroller.offsetTop/scroller.offsetHeight)+'%';
-        sbs.left='0';    
-        sbs.visibility='visible';        
+        sbs.left='0';
+        sbs.visibility='visible';
       } else {
         sbs.visibility='hidden';
       }
