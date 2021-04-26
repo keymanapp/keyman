@@ -30,6 +30,8 @@ class KMFileTypes(Enum):
 def print_info(info):
     try:
         print("---- Info ----")
+        if not info:
+            return
         print("Name: ", info['name']['description'])
         print("Copyright: ", info['copyright']['description'])
         if 'version' in info:
@@ -52,6 +54,8 @@ def print_info(info):
 def print_system(system):
     try:
         print("---- System ----")
+        if not system:
+            return
         if 'fileVersion' in system:
             print("File Version: ", system['fileVersion'])
         if 'keymanDeveloperVersion' in system:
@@ -66,6 +70,8 @@ def print_system(system):
 def print_options(options):
     try:
         print("---- Options ----")
+        if not options:
+            return
         if 'readmeFile' in options:
             print("Readme File: ", options['readmeFile'])
         if 'graphicFile' in options:
@@ -80,6 +86,8 @@ def print_options(options):
 def print_keyboards(keyboards):
     try:
         print("---- Keyboards ----")
+        if not keyboards:
+            return
         for kb in keyboards:
             print("Keyboard Name: ", kb['name'])
             print("Keyboard Id: ", kb['id'])
@@ -125,7 +133,9 @@ def determine_filetype(kblist, filename):
             KM_UNKNOWN: Unknown
     """
     name, ext = os.path.splitext(filename)
-    if ext.lower() == ".ico":
+    if not ext:
+        return KMFileTypes.KM_UNKNOWN
+    elif ext.lower() == ".ico":
         return KMFileTypes.KM_ICON
     elif ext.lower() == ".kmn":
         return KMFileTypes.KM_SOURCE
@@ -173,6 +183,8 @@ def determine_filetype(kblist, filename):
 def print_files(files, extracted_dir):
     try:
         print("---- Files ----")
+        if not files:
+            return
         for kbfile in files:
             print("* File name: ", kbfile['name'])
             print("    Description: ", kbfile['description'])
@@ -196,6 +208,8 @@ def print_files(files, extracted_dir):
 
 def get_fonts(files):
     fonts = []
+    if not files:
+        return fonts
     for kbfile in files:
         if kbfile['type'] == KMFileTypes.KM_FONT:
             fonts.append(kbfile)
@@ -445,11 +459,10 @@ def parsemetadata(jsonfile, verbose=False):
             try:
                 data = json.load(read_file)
             except JSONDecodeError as e:
-                logging.critical("parsemetadata: " + jsonfile + " invalid")
+                logging.critical("parsemetadata: %s invalid: %s (line %d, col %d)",
+                                 jsonfile, e.msg, e.lineno, e.colno)
                 # Use empty details
                 data = {"nonexistent": "none"}
-                keyboards = []
-                files = []
 
             for x in data:
                 if x == 'info':
@@ -465,10 +478,12 @@ def parsemetadata(jsonfile, verbose=False):
                 elif x == 'nonexistent':
                     nonexistent = data[x]
             kblist = []
-            for k in keyboards:
-                kblist.append(k['id'])
-            for kbfile in files:
-                kbfile['type'] = determine_filetype(kblist, kbfile['name'])
+            if keyboards:
+                for k in keyboards:
+                    kblist.append(k['id'])
+            if files:
+                for kbfile in files:
+                    kbfile['type'] = determine_filetype(kblist, kbfile['name'])
             if nonexistent is not None:
                 logging.warning("This should not happen")
             if verbose:
@@ -528,8 +543,9 @@ def get_and_convert_infdata(tmpdirname):
 
 def infmetadata_to_json(info, system, options, keyboards, files):
     jsonfiles = []
-    for entry in files:
-        jsonfiles.append({"name": entry["name"], "description": entry["description"]})
+    if files:
+        for entry in files:
+            jsonfiles.append({"name": entry["name"], "description": entry["description"]})
     d = {"system": system, "options": options,
          "info": info, "keyboards": keyboards, "files": jsonfiles}
     return json.dumps(d, indent=2)
