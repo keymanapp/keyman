@@ -598,8 +598,9 @@ final class KMKeyboard extends WebView {
   private void sendError(String packageID, String keyboardID, String languageID) {
     BaseActivity.makeToast(context, R.string.fatal_keyboard_error, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
 
-    // Don't localize msg for Sentry
-    String msg = KMString.format(context.getString(R.string.fatal_keyboard_error), packageID, keyboardID, languageID);
+    // Don't use localized string R.string.fatal_keyboard_error msg for Sentry
+    String msg = KMString.format("Fatal keyboard error with %1$s:%2$s for %3$s language. Loading default keyboard.",
+      packageID, keyboardID, languageID);
     Sentry.captureMessage(msg);
   }
 
