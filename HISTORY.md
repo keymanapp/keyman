@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.36 alpha 2021-04-26
+
+* docs(ios): tweaks prereqs in readme (#4977)
+* fix(linux): Fix crash with incomplete metadata (#4908) (#4971)
+* chore(android/engine): Don't use localized string for Sentry errors (#4978)
+* change(web): tightens call signature for banner selection (#4966)
+* chore: disable findTouchAliasElement logging (#4981)
+* chore(common): update stable history for 14.0.272 (#4975)
+* chore: Add cherry-pick label for cherry-pick PRs (#4973)
+
 ## 15.0.35 alpha 2021-04-23
 
 * chore(ios): prep for CI transition to Xcode 12, build script tweak (#4967)
