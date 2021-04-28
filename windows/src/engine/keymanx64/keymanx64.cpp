@@ -331,7 +331,7 @@ BOOL SendPlatformComms32(WPARAM wParam, LPARAM lParam)
   {
     // TODO: Perhaps we should trigger a shutdown here, because
     // keyman.exe was not found. Right now, there is some confusion
-    // in regards to responsibility.
+    // in regards to responsibility. See #4976  
     MessageBox(0, szError_Keymanx86NotFound_Comms, szTitle, MB_OK);
     return FALSE;
   }
