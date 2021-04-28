@@ -117,7 +117,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	MSG msg;
 
   if (!UniqueInstance()) {
-    Fail(0, szError_CannotRunMultipleInstances);
+    // If keymanx64 is already running, let's not
+    // report an error. This can happen if keyman.exe
+    // fails unexpectedly, and is then restarted.
+    //Fail(0, szError_CannotRunMultipleInstances);
     keyman_sentry_shutdown();
     return 1;
   }
@@ -129,7 +132,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
   }
 
   if (!InitInstance(hInstance, nCmdShow)) {
-    Fail(0, szError_FailedToInitInstance);
+    if (GetLastError() != ERROR_SUCCESS) {
+      // If WM_CREATE returns -1, then CreateWindow fails but
+      // GetLastError returns ERROR_SUCCESS. In this situation,
+      // we know that the error has already been reported via
+      // StartKeyman() so we don't want to re-report it. If
+      // CreateWindow fails for another reason, then we should
+      // be reporting it.
+      Fail(0, szError_FailedToInitInstance);
+    }
     keyman_sentry_shutdown();
     return 1;
   }
@@ -201,9 +212,13 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL Fail(HWND hwnd, PWSTR msg)
 {
+#ifndef _DEBUG
+  UNREFERENCED_PARAMETER(hwnd);
+#endif
+
   WCHAR buf[512], outbuf[1024];
   DWORD err = GetLastError();
-  if(err != 0)
+  if(err != ERROR_SUCCESS)
   {
     if(!FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, _countof(buf), NULL))  // I3093   // I3547
     {
@@ -227,7 +242,9 @@ BOOL Fail(HWND hwnd, PWSTR msg)
 
   free(buffer);
 
+#ifdef _DEBUG
   MessageBox(hwnd, outbuf, szTitle, MB_OK | MB_ICONERROR);
+#endif
 
   return FALSE;
 }
@@ -266,8 +283,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //   COMMENTS:
 //
-//        Shows an error message box if it fails.  Tries to find
-//        the Keyman Engine x86 windows for communications
+//        Shows an error message box if it fails, in debug mode.
+//        Sends a Sentry error report on failure.  Tries to find
+//        the Keyman Engine x86 windows for communications.
 //
 BOOL StartKeyman(HWND hWnd)
 {
@@ -311,6 +329,9 @@ BOOL SendPlatformComms32(WPARAM wParam, LPARAM lParam)
   HWND hwndLocalController = FindWindow(szWindowClass_x86_Wnd, NULL);
   if(hwndLocalController == NULL)
   {
+    // TODO: Perhaps we should trigger a shutdown here, because
+    // keyman.exe was not found. Right now, there is some confusion
+    // in regards to responsibility. See #4976  
     MessageBox(0, szError_Keymanx86NotFound_Comms, szTitle, MB_OK);
     return FALSE;
   }
