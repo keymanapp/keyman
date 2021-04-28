@@ -346,13 +346,15 @@
 
     function toHex(theString) {
       var hexString = '';
-      for (var i=0; i < theString.length; i++) {
-        var theHex = theString.charCodeAt(i).toString(16).toUpperCase();
-        while (theHex.length < 4) {
-          theHex = '0' + theHex;
+      if (theString != null) {
+        for (var i=0; i < theString.length; i++) {
+          var theHex = theString.charCodeAt(i).toString(16).toUpperCase();
+          while (theHex.length < 4) {
+            theHex = '0' + theHex;
+          }
+          theHex = '\\u' + theHex;
+          hexString += theHex;
         }
-        theHex = '\\u' + theHex;
-        hexString += theHex;
       }
       return hexString;
     }
