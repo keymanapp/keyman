@@ -50,8 +50,8 @@
   <string name="keyman_settings" comment="Settings menu title">Parametrlər</string>
   <!-- Context: Keyman Settings menu -->
   <plurals name="installed_languages">
-    <item quantity="one">Installed languages (%1$d)</item>
-    <item quantity="other">Installed languages (%1$d)</item>
+    <item quantity="one">Quraşdırılmış dillər (%1$d)</item>
+    <item quantity="other">Quraşdırılmış dillər (%1$d)</item>
   </plurals>
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Klaviatura və ya sözlügü quraşdırmaq</string>
