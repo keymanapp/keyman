@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.37 alpha 2021-04-28
+
+* fix(windows): handle errors starting keymanx64 (#4989)
+
 ## 15.0.36 alpha 2021-04-26
 
 * docs(ios): tweaks prereqs in readme (#4977)
