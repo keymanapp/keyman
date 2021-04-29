@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.38 alpha 2021-04-29
+
+* fix(android/engine): Fix toHex() for null string (#4991)
+
 ## 15.0.37 alpha 2021-04-28
 
 * fix(windows): handle errors starting keymanx64 (#4989)
