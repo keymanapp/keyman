@@ -345,7 +345,7 @@
     }
 
     function toHex(theString) {
-      if (theString == null) {
+      if (typeof theString != 'string') {
         return '';
       }
       var hexString = '';
