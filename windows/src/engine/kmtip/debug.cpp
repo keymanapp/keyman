@@ -120,3 +120,11 @@ void WINAPI Keyman_Diagnostic(int mode) {
     RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }
 }
+
+BOOL _LogSUCCEEDED(char *file, int line, PWSTR caller, PSTR callee, HRESULT hr) {
+  BOOL result = SUCCEEDED(hr);
+  if (!result) {
+    SendDebugMessageFormat_1(file, line, L"CKMTipTextService::Log: call in %s to %hs failed with %x", caller, callee, hr);
+  }
+  return result;
+}
