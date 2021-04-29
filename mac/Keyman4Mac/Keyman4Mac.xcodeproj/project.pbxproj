@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -227,6 +227,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		E28239111F3CF59400C3F560 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -236,7 +237,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SRC_DIR=\"${PROJECT_DIR}/../KeymanEngine4Mac/build/${CONFIGURATION}\"\nDEST_DIR=\"${PROJECT_DIR}/Keyman4Mac/Frameworks\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nSRC_FRAMEWORK_PATH=\"${SRC_DIR}/KeymanEngine4Mac.framework\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Source: ${SRC_FRAMEWORK_PATH}\"\necho \"Dest: ${DEST_FRAMEWORK_PATH}\"\n\nif [ ! -d \"${SRC_FRAMEWORK_PATH}\" ]; then\n    if [ ! -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n        echo \"Keyman engine framework must be built first!\"\n        exit 1\n    fi\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${SRC_FRAMEWORK_PATH}\" \"${DEST_FRAMEWORK_PATH}\"\n";
+			shellScript = "SRC_DIR=\"${PROJECT_DIR}/../KeymanEngine4Mac/build/${CONFIGURATION}\"\nDEST_DIR=\"${PROJECT_DIR}/Keyman4Mac/Frameworks\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nSRC_FRAMEWORK_PATH=\"${SRC_DIR}/KeymanEngine4Mac.framework\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Source: ${SRC_FRAMEWORK_PATH}\"\necho \"Dest: ${DEST_FRAMEWORK_PATH}\"\n\nif [ ! -d \"${SRC_FRAMEWORK_PATH}\" ]; then\n    if [ ! -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n        echo \"Keyman engine framework must be built first!\"\n        exit 1\n    fi\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${SRC_FRAMEWORK_PATH}\" \"${DEST_FRAMEWORK_PATH}\"\nif [ -e \"${SRC_FRAMEWORK_PATH}.dSYM\" ]; then\n    cp -Rf \"${SRC_FRAMEWORK_PATH}.dSYM\" \"${DEST_DIR}\"\nfi\n\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -327,7 +328,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -374,7 +375,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -394,7 +395,12 @@
 				);
 				GET_INFO_VERSION = "Keyman $(PRODUCT_VERSION) for macOS";
 				INFOPLIST_FILE = Keyman4Mac/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PRODUCT_VERSION = 0.0.1;
@@ -415,7 +421,11 @@
 				);
 				GET_INFO_VERSION = "Keyman $(PRODUCT_VERSION) for macOS";
 				INFOPLIST_FILE = Keyman4Mac/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PRODUCT_VERSION = 0.0.1;
@@ -436,7 +446,11 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Keyman4MacTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keyman4Mac.app/Contents/MacOS/Keyman4Mac";
 			};
@@ -452,7 +466,11 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Keyman4MacTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keyman4Mac.app/Contents/MacOS/Keyman4Mac";
 			};
