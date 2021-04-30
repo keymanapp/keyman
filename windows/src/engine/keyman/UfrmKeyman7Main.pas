@@ -305,6 +305,10 @@ type
     procedure HotkeyWndProc(var Message: TMessage);
 
     procedure DoLanguageHotkey(Index: Integer);
+
+    // #5004 Investigation Start
+    procedure CMRecreateWnd(var Message: TMessage); message CM_RECREATEWND;
+    // #5004 Investigation End
   protected
     procedure DoInterfaceHotkey(Target: Integer);
 
@@ -415,6 +419,7 @@ uses
   Winapi.ActiveX,
   ErrorControlledRegistry,
   RegistryKeys,
+  Sentry.Client,
   klog,
   GetOsVersion,
   System.Win.ComObj, {tlhelp32,}
@@ -1987,6 +1992,27 @@ procedure TfrmKeyman7Main.ClosePlatformComms64;
 begin
   SendPlatformComms64(PC_CLOSE, 0);
 end;
+
+// #5004 Investigation Start
+procedure TfrmKeyman7Main.CMRecreateWnd(var Message: TMessage);
+var
+  FOldHandle: THandle;
+begin
+  FOldHandle := WindowHandle;
+  inherited;
+  // By default, Delphi does not recreate the window automatically;
+  // it is created when it is first needed. But that's broken from
+  // the perspective of what we need it for.
+  HandleNeeded;
+  if TKeymanSentryClient.Enabled then
+    TKeymanSentryClient.Client.MessageEvent(
+      TSentryLevel.SENTRY_LEVEL_INFO,
+      Format('TfrmKeyman7Main.CM_RECREATEWND called, handle was %x and is now %x',
+        [FOldHandle, WindowHandle]),
+      True
+    );
+end;
+// #5004 Investigation End
 
 type
   TLangSwitchRefreshWatcher = class(TThread)
