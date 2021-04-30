@@ -515,7 +515,7 @@
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.241.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Standart bir qısayol düyməsini seçin və ya \'Xüsusi\' seçin və Ctrl, Shift və / və ya Alt düyməsini basıb% 1 $ s dili üçün istədiyiniz qısayol düyməni yazın:</string>
+  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">Standart bir qısayol düyməsini seçin və ya \'Xüsusi\' seçin və Ctrl, Shift və / və ya Alt düyməsini basıb%1$s dili üçün istədiyiniz qısayol düyməni yazın:</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -524,12 +524,12 @@
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">% 1 $ s qısayol düyməsi normal klaviatura istifadəsi ilə ziddiyyət təşkil edəcəkdir. Ən azı Ctrl və ya Alt istifadə etməlisiniz. Bunu indi dəyişdirmək istəyirsiniz \?</string>
+  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">%1$s qısayol düyməsi normal klaviatura istifadəsi ilə ziddiyyət təşkil edəcəkdir. Ən azı Ctrl və ya Alt istifadə etməlisiniz. Bunu indi dəyişdirmək istəyirsiniz\?</string>
   <!-- Parameters: %1$s = Hotkey, %2$s = Conflicting keyboard -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">% 1 $ s qısayol düyməsi% 2 $ s klaviatura üçün seçilmiş qısa düymə ilə ziddiyyət təşkil edir. Davam etsəniz,% 2 $ s klaviaturası üçün qısayol düyməsini silinəcəkdir. Davam edim?</string>
+  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">%1$s qısayol düyməsi %2$s klaviatura üçün seçilmiş qısa düymə ilə ziddiyyət təşkil edir. Davam etsəniz,%2$s klaviaturası üçün qısayol düyməsini silinəcəkdir. Davam edim\?</string>
   <!-- Parameters: %1$s = Hotkey -->
   <!-- Context: Hotkey Dialog -->
   <!-- Introduced: 14.0.117 -->
