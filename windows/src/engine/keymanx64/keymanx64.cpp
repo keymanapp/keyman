@@ -25,20 +25,13 @@
 #include "keymansentry.h"
 
 // Forward declarations of functions included in this code module
+
 ATOM             MyRegisterClass(HINSTANCE hInstance);
 BOOL             InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL             Fail(HWND, PWSTR);
-BOOL             UniqueInstance();
-
-// Global constants
-
-//#define KMC_GETLOADED 3
-
-#define WM_USER_PlatformComm (WM_USER+103)
-#define PC_CLOSE     2
-#define PC_GETLOADED 3
-#define PC_GETAPPLICATION 4   // I3758
+BOOL             ParseCmdLine(LPTSTR lpCmdLine);
+BOOL             CreateWatcherThread(HWND hWnd);
 
 // External functions in Keyman64.dll
 
@@ -54,8 +47,13 @@ extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_UnregisterControllerWindow
 
 // Global variables
 
-HINSTANCE hInst;								// current instance
-HWND hwndController = NULL, hwndControllerOwner = NULL;  // keyman x86 controller window handles   // I3758
+HINSTANCE hInst;                            // Current instance
+HWND hwndController = NULL;                 // Keyman x86 Main Form window handle
+HWND hwndControllerOwner = NULL;            // Keyman x86 Application  window handles
+HANDLE hParentProcessHandle = NULL;         // Keyman x86 process handle
+
+HANDLE hWatcherThread = NULL;
+HANDLE hWatcherThreadTerminateEvent = NULL;
 
 // Global strings
 
@@ -75,11 +73,12 @@ const PWSTR
   szError_FailedToRegister = L"Failed to register window class",
   szError_FailedToInitInstance = L"Failed to initialise application",
 
+  szError_InvalidCommandline = L"Incorrect command line for Keyman Engine x64; should be passed handle of Keyman Engine x86",
+  szError_WatcherThreadFailed = L"Failed to create watcher thread",
+
   szFail_UnknownError = L"Unknown error %d",
   szFail_ErrorFormat = L"%s: %s (%d)",
   szFail_ErrorFormat_OtherUnknown = L"%s: An unknown error occurred",
-
-  szKeymanX64Mutex = L"KeymanEXEx6470",
 
   szWindowClass_x86_Wnd = L"TfrmKeyman7Main"; // Do not localize
 
@@ -116,11 +115,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	MSG msg;
 
-  if (!UniqueInstance()) {
-    // If keymanx64 is already running, let's not
-    // report an error. This can happen if keyman.exe
-    // fails unexpectedly, and is then restarted.
-    //Fail(0, szError_CannotRunMultipleInstances);
+  if (!ParseCmdLine(lpCmdLine)) {
+    Fail(0, szError_InvalidCommandline);
     keyman_sentry_shutdown();
     return 1;
   }
@@ -157,21 +153,34 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	return (int) msg.wParam;
 }
 
-BOOL UniqueInstance()
-{
-  HANDLE hMutex = CreateMutex(NULL, FALSE, szKeymanX64Mutex);
-  if(!hMutex) return FALSE;
+//
+//   FUNCTION: ParseCmdLine(LPSTSTR)
+//
+//   PURPOSE: Parses command line and finds input parameters
+//
+//   COMMENTS:
+//
+//        Reads parent process handle, parent process main window and
+//        parent process application window handle from the command
+//        line and validates them.
+//
+BOOL ParseCmdLine(LPTSTR lpCmdLine) {
+  while (iswspace(*lpCmdLine)) lpCmdLine++;
+  if (!*lpCmdLine) return FALSE;
+  hParentProcessHandle = (HANDLE)wcstoull(lpCmdLine, &lpCmdLine, 10);
+  if (hParentProcessHandle == 0 || hParentProcessHandle == (HANDLE) ULLONG_MAX) return FALSE;
 
-  switch(WaitForSingleObject(hMutex, 0))
-  {
-    case WAIT_ABANDONED:
-    case WAIT_OBJECT_0:
-      return TRUE;
-    case WAIT_FAILED:
-    case WAIT_TIMEOUT:
-      return FALSE;
-  }
-  return FALSE;
+  while (iswspace(*lpCmdLine)) lpCmdLine++;
+  if (!*lpCmdLine) return FALSE;
+  hwndController = (HWND) wcstoull(lpCmdLine, &lpCmdLine, 10);
+  if (hwndController == 0 || hwndController == (HWND) ULLONG_MAX) return FALSE;
+
+  while (iswspace(*lpCmdLine)) lpCmdLine++;
+  if (!*lpCmdLine) return FALSE;
+  hwndControllerOwner = (HWND) wcstoull(lpCmdLine, &lpCmdLine, 10);
+  if (hwndControllerOwner == 0 || hwndControllerOwner == (HWND) ULLONG_MAX) return FALSE;
+
+  return TRUE;
 }
 
 //
@@ -289,24 +298,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 BOOL StartKeyman(HWND hWnd)
 {
-  if(!ChangeWindowMessageFilter(WM_USER_PlatformComm, MSGFLT_ADD))
-    return Fail(hWnd, szError_ChangeWindowMessageFilter);
-
   if(!Keyman_ResetInitialisation())  // I3092
     return Fail(hWnd, szError_FailedToInitialise);
 
-  hwndController = FindWindow(szWindowClass_x86_Wnd, NULL);   // I3758
-  if(hwndController == NULL)
-    return Fail(hWnd, szError_Keymanx86NotFound);
-
-  DWORD_PTR dwResult;
-
-  if(SendMessageTimeout(hwndController, WM_USER_PlatformComm, PC_GETAPPLICATION, 0, SMTO_BLOCK, 5000, &dwResult) == 0)   // I3758
-    return Fail(hWnd, szError_Keymanx86NotFound);
-
-  hwndControllerOwner = (HWND) dwResult;   // I3758
-  if(hwndControllerOwner == NULL)
-    return Fail(hWnd, szError_Keymanx86NotFound);
+  if (!CreateWatcherThread(hWnd))
+    return Fail(hWnd, szError_WatcherThreadFailed);
 
   if(!Keyman_RegisterControllerWindow(hwndControllerOwner) || !Keyman_RegisterControllerWindow(hwndController))   // I3758
     return Fail(hWnd, szError_FailedToRegisterController);
@@ -318,24 +314,47 @@ BOOL StartKeyman(HWND hWnd)
 }
 
 //
-//  FUNCTION: SendPlatformComms32(WPARAM, LPARAM)
+//   FUNCTION: WatcherThreadProc(LPVOID)
 //
-//  PURPOSE:  Post a command to Keyman Engine x86
+//   PURPOSE:  Watches for parent process termination
 //
-BOOL SendPlatformComms32(WPARAM wParam, LPARAM lParam)
-{
-  // Search again; lets us reconnect if
-  // Keyman.exe crashes and is retarted
-  HWND hwndLocalController = FindWindow(szWindowClass_x86_Wnd, NULL);
-  if(hwndLocalController == NULL)
-  {
-    // TODO: Perhaps we should trigger a shutdown here, because
-    // keyman.exe was not found. Right now, there is some confusion
-    // in regards to responsibility. See #4976  
-    MessageBox(0, szError_Keymanx86NotFound_Comms, szTitle, MB_OK);
-    return FALSE;
+//   COMMENTS:
+//
+//        The watcher thread triggers destruction of this process
+//        as soon as the parent process is terminated.
+//
+DWORD WINAPI WatcherThreadProc(LPVOID lpParameter) {
+  HWND hwnd = (HWND)lpParameter;
+  HANDLE handles[2] = { hWatcherThreadTerminateEvent, hParentProcessHandle };
+
+  if (WaitForMultipleObjects(2, handles, FALSE, INFINITE) == WAIT_OBJECT_0 + 1) {
+    // We'll post a message to our window if the parent process terminated,
+    // but not during a shutdown in other circumstances, because that would
+    // have been triggered by a shutdown of the process anyway.
+    PostMessage(hwnd, WM_CLOSE, 0, 0);
   }
-  PostMessage(hwndLocalController, WM_USER_PlatformComm, wParam, lParam);
+  return 0;
+}
+
+//
+//   FUNCTION: CreateWatcherThread(HWND)
+//
+//   PURPOSE:  Creates the Watcher Thread
+//
+//   COMMENTS:
+//
+//        Creates the watcher thread which watches for
+//        termination of the parent process.
+//
+BOOL CreateWatcherThread(HWND hWnd) {
+  hWatcherThreadTerminateEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+  if (hWatcherThreadTerminateEvent == NULL)
+    return FALSE;
+
+  hWatcherThread = CreateThread(NULL, 0, WatcherThreadProc, hWnd, 0, NULL);
+  if (hWatcherThread == NULL)
+    return FALSE;
+
   return TRUE;
 }
 
@@ -353,18 +372,27 @@ void Shutdown()
   Keyman_StartExit();  // I3092
 
   /* Tell all threads that it is time to exit.  This is important to do before we shutdown
-    because we have got a per-thread keyboard hook that needs to be detached before we
-    lose our message hooks. */
+     because we want to try and detach from as many processes as possible so we don't
+     remain locked in memory. */
 
   SendMessageTimeout(HWND_BROADCAST, wm_keyman, KM_EXIT, 0, SMTO_NORMAL, 1000, &dwResult);  // I3092
 
   Keyman_Exit();
 
   /* Unregister those windows that we registered earlier - don't fail on error though */
+
   if(hwndController != NULL) Keyman_UnregisterControllerWindow(hwndController);   // I3758
   if(hwndControllerOwner != NULL) Keyman_UnregisterControllerWindow(hwndControllerOwner);   // I3758
 
   PostQuitMessage(0);
+
+  /* Cleanup */
+
+  SetEvent(hWatcherThreadTerminateEvent);
+  WaitForSingleObject(hWatcherThread, INFINITE);
+  CloseHandle(hWatcherThread);
+  CloseHandle(hWatcherThreadTerminateEvent);
+  CloseHandle(hParentProcessHandle);
 }
 
 //
@@ -374,7 +402,6 @@ void Shutdown()
 //
 //  WM_CREATE 	- initialise
 //  WM_DESTROY	- post a quit message and return
-//  WM_USER_PlatformComm - process commands from Keyman Engine x86
 //
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -388,12 +415,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   case WM_DESTROY:
     Shutdown();
 		break;
-
-  case WM_USER_PlatformComm:
-    switch(wParam)
-    {
-      case PC_CLOSE: PostMessage(hWnd, WM_CLOSE, 0, 0); break;
-    }
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
