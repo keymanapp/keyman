@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.39 alpha 2021-04-30
+
+* chore: support for xcode 12 (#4995)
+
 ## 15.0.38 alpha 2021-04-29
 
 * fix(android/engine): Fix toHex() for null string (#4991)
