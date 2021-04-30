@@ -134,7 +134,7 @@
 "menu-langsettings-section-settings" = "Dil parametrləri";
 
 /* Title for the language-specific settings menus */
-"menu-langsettings-title" = "% @ Parametrlər";
+"menu-langsettings-title" = "%@ Parametrlər";
 
 /* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
 "menu-langsettings-toggle-correct" = "Düzəlişləri aktivləşdirmək";
@@ -197,13 +197,13 @@
 "notification-downloading-keyboard" = "Klaviatura yüklənir \\ U2026";
 
 /* Short text for notification:  downloading a lexical model */
-"notification-downloading-lexical-model" = "Lüğət yüklənir \\ U2026";
+"notification-downloading-lexical-model" = "Lüğət yüklənir \U2026";
 
 /* Short text for notification:  an update is available */
 "notification-update-available" = "Yeniləmə mümkündür";
 
 /* Short text for notification:  currently updating */
-"notification-update-processing" = "Yenilənir";
+"notification-update-processing" = "Yenilənir\U2026";
 
 /* Text indicating success at installing new keyboards or dictionaries */
 "success-install" = "Uğurla quraşdırıldı.";

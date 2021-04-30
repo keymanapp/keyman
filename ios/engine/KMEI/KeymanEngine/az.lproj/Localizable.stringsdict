@@ -109,9 +109,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>Paketdə% u lüğəti tapıldı:</string>
+        <string>Paketdə %u lüğəti tapıldı:</string>
         <key>other</key>
-        <string>Paketdə% u lüğətləri tapıldı:</string>
+        <string>Paketdə %u lüğətləri tapıldı:</string>
       </dict>
     </dict>
   </dict>

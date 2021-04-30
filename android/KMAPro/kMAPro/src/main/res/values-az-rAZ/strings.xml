@@ -102,7 +102,7 @@
   <!-- Context: KMP Package strings -->
   <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">%1$s paketi quraşdırıla bilmədi</string>
   <!-- Context: KMP Package strings -->
-  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">\n%1$s&amp;#8230 klaviatura paketi endirilir;</string>
+  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">\n%1$s&#8230; klaviatura paketi endirilir</string>
   <!-- Context: KMP Package strings -->
   <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Çıxarıla bilmədi</string>
   <!-- Context: KMP Package strings -->

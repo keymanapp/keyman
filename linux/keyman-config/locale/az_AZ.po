@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: keyman\n"
 "Report-Msgid-Bugs-To: <support@keyman.com>\n"
 "POT-Creation-Date: 2020-08-19 19:17+0200\n"
-"PO-Revision-Date: 2021-04-28 14:55\n"
+"PO-Revision-Date: 2021-04-30 02:05\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -32,20 +32,20 @@ msgstr "_Bağla"
 
 #: keyman_config/install_kmp.py:99
 msgid "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman"
-msgstr "Klaviatura fayllarını paylaşılan əraziyə / usr / local / share / keyman-a yükləmək üçün icazələriniz yoxdur"
+msgstr "Klaviatura fayllarını paylaşılan əraziyə /usr/local/share/keyman-a yükləmək üçün icazələriniz yoxdur"
 
 #: keyman_config/install_kmp.py:103
 msgid "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman"
-msgstr "Sənədləri paylaşılan sənədləşmə sahəsinə / usr / local / share / doc / keyman-a yükləmək üçün icazələriniz yoxdur"
+msgstr "Sənədləri paylaşılan sənədləşmə sahəsinə /usr/local/share/doc/keyman-a yükləmək üçün icazələriniz yoxdur"
 
 #: keyman_config/install_kmp.py:107
 msgid "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts"
-msgstr "Şrift fayllarını paylaşılan şrift sahəsinə / usr / local / share / fonts-a yükləmək üçün icazəniz yoxdur"
+msgstr "Şrift fayllarını paylaşılan şrift sahəsinə /usr/local/share/fonts-a yükləmək üçün icazəniz yoxdur"
 
 #: keyman_config/install_kmp.py:179
 #, python-brace-format
 msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {package}"
-msgstr "install_kmp.py: səhv: {paketi} içərisində kmp.json və ya kmp.inf tapılmadı"
+msgstr "install_kmp.py: səhv: {package} içərisində kmp.json və ya kmp.inf tapılmadı"
 
 #: keyman_config/install_kmp.py:246
 #, python-brace-format
@@ -64,12 +64,12 @@ msgstr "Klaviatura artıq quraşdırılıb"
 #: keyman_config/install_window.py:74
 #, python-brace-format
 msgid "The {name} keyboard is already installed at version {version}. Do you want to uninstall then reinstall it?"
-msgstr "{Name} klaviatura artıq {version} versiyasında quraşdırılmışdır. Sökməkdən sonra yenidən qurmaq istəyirsiniz?"
+msgstr "{name} klaviatura artıq {version} versiyasında quraşdırılmışdır. Sökməkdən sonra yenidən qurmaq istəyirsiniz?"
 
 #: keyman_config/install_window.py:95
 #, python-brace-format
 msgid "The {name} keyboard is already installed with a newer version {installedversion}. Do you want to uninstall it and install the older version {version}?"
-msgstr "{Name} klaviatura onsuz da daha yeni bir versiyası ilə quraşdırılmışdır {installversion}. Silmək və köhnə versiyanı {version} yükləmək istəyirsiniz?"
+msgstr "{name} klaviatura onsuz da daha yeni bir versiyası ilə quraşdırılmışdır {installedversion}. Silmək və köhnə versiyanı {version} yükləmək istəyirsiniz?"
 
 #: keyman_config/install_window.py:128
 msgid "Keyboard layouts:   "
@@ -285,22 +285,22 @@ msgstr "Pəncərəni bağlamaq"
 #: keyman_config/view_installed.py:278
 #, python-brace-format
 msgid "Uninstall keyboard {package}"
-msgstr "Klaviaturanı sil {paketi}"
+msgstr "Klaviaturanı sil {package}"
 
 #: keyman_config/view_installed.py:280
 #, python-brace-format
 msgid "Help for keyboard {package}"
-msgstr "Klaviatura üçün kömək {paketi}"
+msgstr "Klaviatura üçün kömək {package}"
 
 #: keyman_config/view_installed.py:282
 #, python-brace-format
 msgid "About keyboard {package}"
-msgstr "Klaviatura haqqında {paketi}"
+msgstr "Klaviatura haqqında {package}"
 
 #: keyman_config/view_installed.py:284
 #, python-brace-format
 msgid "Settings for keyboard {package}"
-msgstr "Klaviatura üçün parametrlər {paketi}"
+msgstr "Klaviatura üçün parametrlər {package}"
 
 #: keyman_config/view_installed.py:349
 msgid "Uninstall keyboard package?"
