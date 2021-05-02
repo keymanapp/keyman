@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.40 alpha 2021-05-02
+
+* chore(common): update stable history for 14.0.273 (#5003)
+
 ## 15.0.39 alpha 2021-04-30
 
 * chore: support for xcode 12 (#4995)
