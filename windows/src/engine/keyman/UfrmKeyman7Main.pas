@@ -308,6 +308,12 @@ type
 
     // #5004 Investigation Start
     procedure CMRecreateWnd(var Message: TMessage); message CM_RECREATEWND;
+  private
+    FRecreateWndCalled: Boolean;
+  protected
+    procedure CreateWindowHandle(const Params: TCreateParams); override;
+    procedure DestroyWindowHandle; override;
+
     // #5004 Investigation End
   protected
     procedure DoInterfaceHotkey(Target: Integer);
@@ -904,6 +910,14 @@ begin
 
     ActivateKeyboard(FKeyboard);
   end;
+end;
+
+procedure TfrmKeyman7Main.DestroyWindowHandle;
+begin
+  if FRecreateWndCalled and TKeymanSentryClient.Enabled then
+    TKeymanSentryClient.Client.MessageEvent(TSentryLevel.SENTRY_LEVEL_INFO,
+      '(CM_RECREATEWND) DestroyWindowHandle called', True);
+  inherited;
 end;
 
 procedure TfrmKeyman7Main.DoInterfaceHotkey(Target: Integer);
@@ -1995,22 +2009,12 @@ end;
 
 // #5004 Investigation Start
 procedure TfrmKeyman7Main.CMRecreateWnd(var Message: TMessage);
-var
-  FOldHandle: THandle;
 begin
-  FOldHandle := WindowHandle;
-  inherited;
-  // By default, Delphi does not recreate the window automatically;
-  // it is created when it is first needed. But that's broken from
-  // the perspective of what we need it for.
-  HandleNeeded;
+  FRecreateWndCalled := True;
   if TKeymanSentryClient.Enabled then
-    TKeymanSentryClient.Client.MessageEvent(
-      TSentryLevel.SENTRY_LEVEL_INFO,
-      Format('TfrmKeyman7Main.CM_RECREATEWND called, handle was %x and is now %x',
-        [FOldHandle, WindowHandle]),
-      True
-    );
+    TKeymanSentryClient.Client.MessageEvent(TSentryLevel.SENTRY_LEVEL_INFO,
+      'CM_RECREATEWND called', True);
+  inherited;
 end;
 // #5004 Investigation End
 
@@ -2026,6 +2030,18 @@ type
     constructor Create(AOwnerHandle: THandle); reintroduce;
     destructor Destroy; override;
   end;
+
+procedure TfrmKeyman7Main.CreateWindowHandle(const Params: TCreateParams);
+begin
+  inherited;
+  if FRecreateWndCalled then
+  begin
+    FRecreateWndCalled := False;
+    if TKeymanSentryClient.Enabled then
+      TKeymanSentryClient.Client.MessageEvent(TSentryLevel.SENTRY_LEVEL_INFO,
+        '(CM_RECREATEWND) CreateWindowHandle called', True);
+  end;
+end;
 
 procedure TfrmKeyman7Main.CreateWnd;
 begin
