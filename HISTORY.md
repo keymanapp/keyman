@@ -474,6 +474,16 @@
 
 * chore: prepare 15.0 alpha (#4129)
 
+## 14.0.273 stable 2021-04-26
+
+* chore(linux): Fix triggering of Jenkins builds for stable branch (#4968)
+* fix(linux): Don't crash if kmp file vanishes (fixes #4907) 🍒 (#4972)
+* fix(linux): Fix crash with incomplete metadata (#4908) 🍒 (#4979)
+* chore(android/engine): Don't use localized string for Sentry errors 🍒  (#4980)
+* chore: disable findTouchAliasElement logging 🍒 (#4982)
+* fix(web): Make banner initialization more robust 🍒  (#4983)
+* chore: Add cherry-pick label for cherry-pick PRs 🍒 (#4984)
+
 ## 14.0.272 stable 2021-04-22
 
 * chore(linux): Debug triggering Jenkins build (#4852)
