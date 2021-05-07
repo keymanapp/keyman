@@ -361,11 +361,10 @@ BOOL Globals::get_debug_ToConsole() { return f_debug_ToConsole; }
 void Globals::SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboardNameAlt) {   // I4583
   wcscpy_s(f_BaseKeyboardName, baseKeyboardName);
   wcscpy_s(f_BaseKeyboardNameAlt, baseKeyboardNameAlt);
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::SetBaseKeyboardName(name='%ws', nameAlt='%ws')", baseKeyboardName, baseKeyboardNameAlt);
 }
 
 void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL mnemonicDeadkeyConversionMode) {   // I4583   // I4552
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::SetBaseKeyboardFlags(baseKeyboard='%s', simulateAltGr=%d, mnemonicDeadkeyConversionMode=%d)",
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::SetBaseKeyboardFlags(baseKeyboard='%s', simulateAltGr=%d, mnemonicDeadkeyConversionMode=%d",
     baseKeyboard, simulateAltGr, mnemonicDeadkeyConversionMode);
   strcpy_s(f_BaseKeyboard, baseKeyboard);
   f_SimulateAltGr = simulateAltGr;
