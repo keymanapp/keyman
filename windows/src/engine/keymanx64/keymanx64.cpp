@@ -55,6 +55,8 @@ HANDLE hParentProcessHandle = NULL;         // Keyman x86 process handle
 HANDLE hWatcherThread = NULL;
 HANDLE hWatcherThreadTerminateEvent = NULL;
 
+BOOL KeymanStarted = FALSE;
+
 // Global strings
 
 const PWSTR
@@ -310,6 +312,8 @@ BOOL StartKeyman(HWND hWnd)
   if(!Keyman_Initialise(hWnd, FALSE))
     return Fail(hWnd, szError_FailedToInitialise);
 
+  KeymanStarted = TRUE;
+
   return TRUE;
 }
 
@@ -352,8 +356,11 @@ BOOL CreateWatcherThread(HWND hWnd) {
     return FALSE;
 
   hWatcherThread = CreateThread(NULL, 0, WatcherThreadProc, hWnd, 0, NULL);
-  if (hWatcherThread == NULL)
+  if (hWatcherThread == NULL) {
+    CloseHandle(hWatcherThreadTerminateEvent);
+    hWatcherThreadTerminateEvent = NULL;
     return FALSE;
+  }
 
   return TRUE;
 }
@@ -366,18 +373,20 @@ BOOL CreateWatcherThread(HWND hWnd) {
 //
 void Shutdown()
 {
-  int wm_keyman = RegisterWindowMessage(L"wm_keyman");
-  DWORD_PTR dwResult;
+  if (KeymanStarted) {
+    int wm_keyman = RegisterWindowMessage(L"wm_keyman");
+    DWORD_PTR dwResult;
 
-  Keyman_StartExit();  // I3092
+    Keyman_StartExit();  // I3092
 
-  /* Tell all threads that it is time to exit.  This is important to do before we shutdown
-     because we want to try and detach from as many processes as possible so we don't
-     remain locked in memory. */
+    /* Tell all threads that it is time to exit.  This is important to do before we shutdown
+       because we want to try and detach from as many processes as possible so we don't
+       remain locked in memory. */
 
-  SendMessageTimeout(HWND_BROADCAST, wm_keyman, KM_EXIT, 0, SMTO_NORMAL, 1000, &dwResult);  // I3092
+    SendMessageTimeout(HWND_BROADCAST, wm_keyman, KM_EXIT, 0, SMTO_NORMAL, 1000, &dwResult);  // I3092
 
-  Keyman_Exit();
+    Keyman_Exit();
+  }
 
   /* Unregister those windows that we registered earlier - don't fail on error though */
 
@@ -388,11 +397,16 @@ void Shutdown()
 
   /* Cleanup */
 
-  SetEvent(hWatcherThreadTerminateEvent);
-  WaitForSingleObject(hWatcherThread, INFINITE);
-  CloseHandle(hWatcherThread);
-  CloseHandle(hWatcherThreadTerminateEvent);
-  CloseHandle(hParentProcessHandle);
+  if (hWatcherThreadTerminateEvent != NULL) {
+    // Both of these handles will be valid if one of them is, per CreateWatcherThread
+    SetEvent(hWatcherThreadTerminateEvent);
+    WaitForSingleObject(hWatcherThread, INFINITE);
+    CloseHandle(hWatcherThread);
+    CloseHandle(hWatcherThreadTerminateEvent);
+  }
+  if (hParentProcessHandle != NULL) {
+    CloseHandle(hParentProcessHandle);
+  }
 }
 
 //
