@@ -36,7 +36,6 @@ public class DisplayLanguages {
   public static final DisplayLanguageType[] getDisplayLanguages(Context context) {
     DisplayLanguageType[] languages = {
       new DisplayLanguageType(unspecifiedLocale, context.getString(R.string.default_locale)),
-      new DisplayLanguageType("az-AZ", "Azərbaycanca (Azəricə)"),
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("fr-FR", "French"),
       new DisplayLanguageType("in-ID", "Indonesian"),
