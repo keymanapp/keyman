@@ -270,9 +270,9 @@ ibus_keyman_engine_constructor (GType                   type,
     gchar *surrounding_text, *p, *abs_kmx_path;
     guint cursor_pos, anchor_pos;
     km_kbp_context_item *context_items;
-    
+
     g_debug("DAR: ibus_keyman_engine_constructor");
-    
+
     keyman = (IBusKeymanEngine *) G_OBJECT_CLASS (parent_class)->constructor (type,
                                                        n_construct_params,
                                                        construct_params);
@@ -419,7 +419,7 @@ static void
 ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
 {
     const gchar *engine_name;
-    
+
     g_debug("DAR: ibus_keyman_engine_destroy");
     engine_name = ibus_engine_get_name ((IBusEngine *) keyman);
     g_assert (engine_name);
@@ -454,7 +454,7 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
 
     g_free(keyman->kb_name);
     g_free(keyman->ldmlfile);
-     
+
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
 
@@ -677,6 +677,10 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
             g_message("modstate KM_KBP_MODIFIER_LCTRL from lctrl_pressed");
         }
     }
+    if(state & IBUS_LOCK_MASK)
+    {
+        km_mod_state |= (1<<8); // KM_KBP_MODIFIER_CAPS;
+    }
     g_message("before process key event");
     km_kbp_context *context = km_kbp_state_context(keyman->state);
     g_free(get_current_context_text(context));
@@ -822,7 +826,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     g_free(keyboard_opts);
 
                     // Put the keyboard option into DConf
-                    if (action_items[i].option != NULL && action_items[i].option->key != NULL && 
+                    if (action_items[i].option != NULL && action_items[i].option->key != NULL &&
                         action_items[i].option->value != NULL)
                     {
                         g_message("Saving keyboard option to DConf");
