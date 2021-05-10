@@ -253,7 +253,6 @@ type
     procedure WMUserStart(var Message: TMessage); message WM_USER_Start;
     procedure WMUserParameterPass(var Message: TMessage); message WM_USER_ParameterPass;
     procedure WMUserSendFontChange(var Message: TMessage); message WM_USER_SendFontChange;
-    procedure WMUserPlatformComms(var Message: TMessage); message WM_USER_PlatformComms;
     procedure WMUserVisualKeyboardClosed(var Message: TMessage); message WM_USER_VisualKeyboardClosed;   // I4243
     procedure SetTrayIcon(rp: TRunningProduct; kbd: IKeymanKeyboardInstalled);
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton;
@@ -272,9 +271,7 @@ type
     //procedure SnapToolHelp;
     procedure RecreateTaskbarIcons;
     function StartKeymanEngine: Boolean;
-    procedure SendPlatformComms64(msg, value: DWORD);
-    procedure ClosePlatformComms64;
-    procedure StartPlatformComms64;
+    procedure StartKeymanX64;
     procedure OpenTextEditor;
     //function GetCachedKeymanID(hkl: DWORD): DWORD;
     procedure ShowLanguageSwitchForm;
@@ -378,10 +375,6 @@ const
 
 const
   MSGFLT_ADD = 1;
-
-const
-  PC_CLOSE = 2;
-  PC_GETAPPLICATION = 4;
 
 const
   KEYMANID_NONKEYMAN = -1;
@@ -554,8 +547,6 @@ begin
   end;
 
   FreeAndNil(FInputPane);
-
-  ClosePlatformComms64;
 
   UnregisterHotkeys;
 
@@ -1289,14 +1280,6 @@ begin
   end;
 end;
 
-procedure TfrmKeyman7Main.WMUserPlatformComms(var Message: TMessage);
-begin
-  case Message.wParam of
-    PC_GETAPPLICATION:
-      Message.Result := Application.Handle;   // I3758
-  end;
-end;
-
 procedure TfrmKeyman7Main.WMUserSendFontChange(var Message: TMessage);
 begin
   PostMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
@@ -1368,7 +1351,7 @@ begin
 
   kmint.KeymanEngineControl.RestartEngine; // I1486
 
-  StartPlatformComms64;
+  StartKeymanX64;
 
   RegisterHotkeys;
 end;
@@ -1969,25 +1952,6 @@ begin
   FInUpdateOSKVisibility := False;
 end;
 
-procedure TfrmKeyman7Main.SendPlatformComms64(msg, value: DWORD);
-var
-  hwnd: THandle;
-begin
-  // TODO: Test Wow64
-  KL.Log('SendPlatformComms64 ENTER: %d %d', [msg, value]);
-
-  hwnd := FindWindow('Keymanx64', nil);
-  if hwnd <> 0 then
-    PostMessage(hwnd, WM_USER_PlatformComms, msg, value);
-
-  KL.Log('SendPlatformComms64 EXIT');
-end;
-
-procedure TfrmKeyman7Main.ClosePlatformComms64;
-begin
-  SendPlatformComms64(PC_CLOSE, 0);
-end;
-
 type
   TLangSwitchRefreshWatcher = class(TThread)
   private
@@ -2013,28 +1977,46 @@ begin
   FLangSwitchRefreshWatcher.Start;
 end;
 
-procedure TfrmKeyman7Main.StartPlatformComms64;
+procedure TfrmKeyman7Main.StartKeymanX64;
 var
-  dir, s: WideString;
-  sei: TShellExecuteInfoW;
+  cmd: string;
+  si: TStartupInfoW;
+  pi: TProcessInformation;
+  v: PWideChar;
+  processHandle: THandle;
 begin
   if not IsWow64 then Exit;   // I4374
 
-  dir := ExtractFilePath(ParamStr(0));
-  s := dir + 'keymanx64.exe';
+  try
+    FillChar(si, sizeof(TStartupInfoW), 0);
+    FillChar(pi, sizeof(TProcessInformation), 0);
+    si.cb := sizeof(TStartupInfo);
+    si.dwFlags := STARTF_USESHOWWINDOW;
+    si.wShowWindow := SW_HIDE;
 
-  if not FileExists(s) then Exit; // Keyman x64 is not installed
-
-  FillChar(sei, SizeOf(sei), 0);
-  sei.cbSize := SizeOf(sei);
-  sei.Wnd := Handle;
-  sei.lpVerb := 'open';
-  sei.lpFile := PWideChar(s);
-  sei.lpParameters := '';
-  sei.lpDirectory := PWideChar(dir);
-  sei.nShow := SW_SHOW;
-
-  if not ShellExecuteExW(@sei) then Exit; // log
+    if not DuplicateHandle(GetCurrentProcess, GetCurrentProcess,
+        GetCurrentProcess, @processHandle, 0, True, DUPLICATE_SAME_ACCESS) then
+      RaiseLastOSError;
+    cmd := Format('%s%s %d %d %d', [ExtractFilePath(ParamStr(0)), 'keymanx64.exe', processHandle, Handle, Application.Handle]);
+    // Duplicate the string because CreateProcess requires a mutable buffer, so
+    // this guarantees it
+    v := StrNew(PWideChar(cmd));
+    try
+      if not CreateProcessW(nil, v, nil, nil, True, NORMAL_PRIORITY_CLASS, nil, nil, si, pi) then
+        RaiseLastOSError;
+      CloseHandle(pi.hProcess);
+      CloseHandle(pi.hThread);
+    finally
+      StrDispose(v);
+    end;
+  except
+    on E:Exception do
+    begin
+      // We're going to handle any exceptions here but we'd like to know that
+      // they happened
+      TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanx64', True);
+    end;
+  end;
 end;
 
 procedure TfrmKeyman7Main.HotkeyWndProc(var Message: TMessage);
@@ -2217,5 +2199,4 @@ initialization
   ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
   ChangeWindowMessageFilter(wm_keyman_globalswitch_process, MSGFLT_ADD);
   ChangeWindowMessageFilter(wm_keyman_control_internal, MSGFLT_ADD);   // I3933
-  ChangeWindowMessageFilter(WM_USER_PlatformComms, MSGFLT_ADD);
 end.
