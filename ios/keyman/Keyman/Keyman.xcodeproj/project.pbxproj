@@ -320,7 +320,6 @@
 		CE4C654524D0020900070856 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		CE72B3D62643ABB7006821CE /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
 		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -780,7 +779,6 @@
 				fr,
 				de,
 				ff,
-				az,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -1103,7 +1101,6 @@
 				CEACC90F25F07D5A006EAB45 /* km */,
 				CEACC91225F07D77006EAB45 /* de */,
 				CE98E6BD2615593300F3F2C0 /* ff */,
-				CE72B3D62643ABB7006821CE /* az */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
