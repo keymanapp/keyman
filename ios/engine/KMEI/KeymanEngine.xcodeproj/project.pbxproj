@@ -472,6 +472,9 @@
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
 		CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFileManager.swift; sourceTree = "<group>"; };
 		CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInstallViewController.swift; sourceTree = "<group>"; };
+		CE72B3D12643AA9D006821CE /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CE72B3D22643AB60006821CE /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = az; path = az.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		CE72B3D32643AB65006821CE /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE754A0323D162E90030CB79 /* ResourceInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceInfoViewController.swift; sourceTree = "<group>"; };
 		CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardScaleMap.swift; sourceTree = "<group>"; };
 		CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Keyboard Colors.xcassets"; sourceTree = "<group>"; };
@@ -1313,6 +1316,7 @@
 				de,
 				fr,
 				ff,
+				az,
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1698,6 +1702,7 @@
 				CEACC90625F07CBC006EAB45 /* km */,
 				CEACC90925F07CED006EAB45 /* fr */,
 				CE98E6BB2615589300F3F2C0 /* ff */,
+				CE72B3D22643AB60006821CE /* az */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1710,6 +1715,7 @@
 				CEACC90425F07CB6006EAB45 /* km */,
 				CEACC90825F07CE9006EAB45 /* fr */,
 				CE98E6BC2615589800F3F2C0 /* ff */,
+				CE72B3D32643AB65006821CE /* az */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1723,6 +1729,7 @@
 				CEACC90125F07C81006EAB45 /* de */,
 				CEACC90725F07CDA006EAB45 /* fr */,
 				CE98E6BA2615588600F3F2C0 /* ff */,
+				CE72B3D12643AA9D006821CE /* az */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";
