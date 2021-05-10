@@ -161,6 +161,7 @@ type
 
     // IKeymanCEFHost
     procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
+    function GetDebugInfo: string;
 
     procedure Handle_CEF_DESTROY(var Message: TMessage);
     procedure Handle_CEF_AFTERDESTROY(var Message: TMessage);
@@ -296,6 +297,12 @@ begin
   AssertVclThread;
   inherited;
   PostMessage(FCallbackWnd, CEF_SHOW, 0, 0);
+end;
+
+function TframeCEFHost.GetDebugInfo: string;
+begin
+  Result := FNextURL;
+  if Assigned(Owner) then Result := Owner.ClassName+':'+Result;
 end;
 
 function TframeCEFHost.HasFocus: Boolean;
