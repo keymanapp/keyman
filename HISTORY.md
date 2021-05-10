@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.43 alpha 2021-05-10
+
+* chore(mac): update requirements to include Big Sur (#5030)
+* feat(android/app): Add telemetry for launching WebBrowserActivity (#5046)
+* chore(android/app): Always use offline help (#5047)
+* fix(windows): avoid disabling Keyman when speech recognition starts (#5000)
+* chore(windows): add telemetry to trace crash on exit (#5007)
+* fix(windows): make keymanx64 responsible for its own lifecycle (#5002)
+
 ## 15.0.42 alpha 2021-05-07
 
 * chore(common): Check in crowdin files for Azerbaijani (#4992)
