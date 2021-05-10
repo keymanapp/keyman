@@ -583,6 +583,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void showWebBrowser() {
+    // Telemetry for in-app browser usage.
+    // Logging here because WebBrowserActivity is launched in a separate process.
+    KMLog.LogInfo(TAG, "WebBrowserActivity launched");
+
     Intent i = new Intent(this, WebBrowserActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     startActivity(i);
