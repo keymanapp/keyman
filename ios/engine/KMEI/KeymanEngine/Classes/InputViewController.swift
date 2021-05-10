@@ -371,13 +371,18 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       textDocumentProxy.deleteBackward()
       let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
       let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
-      if unitsDeleted > 1 {
-        if !InputViewController.isSurrogate(oldContext.utf16.last!) {
-          let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
-                                                  offsetBy: newContext.utf16.count)
-          let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
-          textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
-        }
+      let unitsInPoint = InputViewController.isSurrogate(oldContext.utf16.last!) ? 2 : 1
+
+      // This CAN happen when a surrogate pair is deleted.
+      // For example, the emoji 👍🏻 is made of TWO surrogate pairs.
+      // Apple's .deleteBackward() implementation will delete both simultaneously,
+      // but our internal KMW engine can't do that b/c it's not emoji-aware.
+      if unitsDeleted > unitsInPoint {
+        // Delete only that many units.
+        let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
+                                                offsetBy: newContext.utf16.count)
+        let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - unitsInPoint)
+        textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
       }
 
       // Refer to `func textDidChange()` and https://github.com/keymanapp/keyman/pull/2770 for context.

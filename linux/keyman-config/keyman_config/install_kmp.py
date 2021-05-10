@@ -191,6 +191,11 @@ def install_kmp_user(inputfile, online=False, language=None):
     if not os.path.isdir(packageDir):
         os.makedirs(packageDir)
 
+    if not os.path.isfile(inputfile):
+        message = _("File {kmpfile} doesn't exist").format(kmpfile=inputfile)
+        logging.error("install_kmp.py: %s", message)
+        raise InstallError(InstallStatus.Abort, message)
+
     extract_kmp(inputfile, packageDir)
     restart_ibus()
 
@@ -250,7 +255,7 @@ def install_kmp_user(inputfile, online=False, language=None):
         for o in os.listdir(packageDir):
             logging.info(o)
         rmtree(packageDir)
-        message = _("install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}").format(
+        message = _("No kmp.json or kmp.inf found in {packageFile}").format(
             packageFile=inputfile)
         raise InstallError(InstallStatus.Abort, message)
 
