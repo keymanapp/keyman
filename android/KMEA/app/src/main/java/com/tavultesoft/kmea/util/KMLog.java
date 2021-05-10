@@ -12,6 +12,21 @@ public final class KMLog {
   private static final String TAG = "KMLog";
 
   /**
+   * Utility to log info and send to Sentry
+   * @param tag String of the caller
+   * @param msg String of the info message
+   */
+  public static void LogInfo(String tag, String msg) {
+    if (msg != null && !msg.isEmpty()) {
+      Log.i(tag, msg);
+
+      if (Sentry.isEnabled()) {
+        Sentry.captureMessage(msg, SentryLevel.INFO);
+      }
+    }
+  }
+
+  /**
    * Utility to log error and send to Sentry
    * @param tag String of the caller
    * @param msg String of the error message
