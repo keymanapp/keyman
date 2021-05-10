@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.42 alpha 2021-05-07
+
+* chore(common): Check in crowdin files for Azerbaijani (#4992)
+
+## 15.0.41 alpha 2021-05-06
+
+* chore(linux): Add support for Ubuntu 21.04 (hirsute) (#5033)
+
 ## 15.0.40 alpha 2021-05-02
 
 * chore(common): update stable history for 14.0.273 (#5003)
