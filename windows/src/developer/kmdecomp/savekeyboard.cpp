@@ -184,7 +184,7 @@ PWCHAR KeyString(LPKEY key)
 
 PWCHAR ifvalue(WCHAR ch)
 {
-  if(ch == L'1') return L"!=";
+  if(ch == 1) return L"!=";
   return L"=";
 }
 
