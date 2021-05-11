@@ -1966,7 +1966,7 @@ begin
     if not DuplicateHandle(GetCurrentProcess, GetCurrentProcess,
         GetCurrentProcess, @processHandle, 0, True, DUPLICATE_SAME_ACCESS) then
       RaiseLastOSError;
-    cmd := Format('%s%s %d %d %d', [ExtractFilePath(ParamStr(0)), 'keymanx64.exe', processHandle, Handle, Application.Handle]);
+    cmd := Format('%s%s %d %d', [ExtractFilePath(ParamStr(0)), 'keymanx64.exe', processHandle, Application.Handle]);
     // Duplicate the string because CreateProcess requires a mutable buffer, so
     // this guarantees it
     v := StrNew(PWideChar(cmd));
