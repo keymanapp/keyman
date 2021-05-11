@@ -1,18 +1,18 @@
 (*
   Name:             KeymanControlMessages
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Mar 2008
 
   Modified Date:    13 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Mar 2008 - mcdurdin - Initial version
                     20 Jul 2008 - mcdurdin - I1412 - Improve performance of tutorial
                     11 Dec 2009 - mcdurdin - I934 - x64 - platform comms - focus info
@@ -28,7 +28,7 @@ interface
 
 const
   //KMC_KEYBOARDCHANGED = 1;   // I3949
-  KMC_CHANGEUISTATE = 2;
+  //KMC_CHANGEUISTATE = 2;
   KMC_GETLOADED = 3;
   KMC_REFRESH = 4;
   KMC_INTERFACEHOTKEY = 5;

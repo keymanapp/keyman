@@ -279,9 +279,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
 
-	if(mp->message == WM_ACTIVATEAPP && mp->wParam)
-		UpdateKeymanUI();
-
 	if(*Globals::hwndIM() != 0)
 	{
 		if(mp->message == wm_keymanim_close)
@@ -342,11 +339,9 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	{
 	case KM_DISABLEUI:
 		_td->KeymanUIDisabled = TRUE;
-		UpdateKeymanUI();
 		break;
 	case KM_ENABLEUI:
 		_td->KeymanUIDisabled = FALSE;
-		UpdateKeymanUI();
 		break;
 	case KM_FOCUSCHANGED:
     if(lParam & KMF_WINDOWCHANGED)
@@ -399,12 +394,6 @@ void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
     SetForegroundWindow(hwnd);
     break;
 	}
-}
-
-void UpdateKeymanUI()
-{
-  //TODO: this does not appear to be used; remove as separate patch
-	Globals::PostMasterController(wm_keyman_control, KMC_CHANGEUISTATE, 2);
 }
 
 /*
