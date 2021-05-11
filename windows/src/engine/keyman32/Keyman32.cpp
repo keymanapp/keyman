@@ -699,8 +699,9 @@ void HandleRefresh(int code, LONG tag)
     // of keyman32/keyman64 that a refresh is coming through
     Globals::PostMasterController(wm_keyman_refresh, KR_PRE_REFRESH, 0);
 
-    // We need to tell the controller windows to refresh themselves also
-    Globals::PostControllers(wm_keyman_control, KMC_REFRESH, 0);
+    // We need to tell the controller window to refresh itself also
+    // TODO: eliminate this message (we can hop onto the above message)
+    Globals::PostMasterController(wm_keyman_control, KMC_REFRESH, 0);
     break;
 
   case KR_PRE_REFRESH:

@@ -1,7 +1,7 @@
 (*
   Name:             KeymanControl
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
+  Documentation:
   Description:      Manages the connection with keyman32.dll.  All Keyman 7 compliant
                     applications should be using this unit to control Keyman, not connecting
                     directly to keyman32.dll.
@@ -12,12 +12,12 @@
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add AutoApply functionality
                     14 Sep 2006 - mcdurdin - Store wm_keyman_refresh value
@@ -68,8 +68,10 @@ type
   TKeyman32GetActiveKeymanIDFunction = function: DWORD; stdcall;
   TKeyman32GetLastFocusWindowFunction = function: HWND; stdcall;
   TKeyman32GetLastActiveWindowFunction = function: HWND; stdcall;
-  TKeyman32RegisterControllerWindowFunction = function(Value: HWND): BOOL; stdcall;
-  TKeyman32UnregisterControllerWindowFunction = function(Value: HWND): BOOL; stdcall;
+  TKeyman32RegisterMasterControllerFunction = function(Value: HWND): BOOL; stdcall;
+  TKeyman32UnregisterMasterControllerFunction = function: BOOL; stdcall;
+  TKeyman32RegisterControllerThreadFunction = function(Value: DWORD): BOOL; stdcall;
+  TKeyman32UnregisterControllerThreadFunction = function(Value: DWORD): BOOL; stdcall;
   TKeyman32GetInitialisedFunction = function(var FSingleApp: BOOL): BOOL; stdcall;
   TKeyman32ControllerSendMessageFunction = function(msg: UINT; wParam: WPARAM; lParam: LPARAM): LRESULT; stdcall;
   TKeyman32ControllerPostMessageFunction = procedure(msg: UINT; wParam: WPARAM; lParam: LPARAM); stdcall;
@@ -86,12 +88,13 @@ type
     FKeyman_GetActiveKeymanID: TKeyman32GetActiveKeymanIDFunction;
     FKeyman_GetLastFocusWindow: TKeyman32GetLastFocusWindowFunction;
     FKeyman_GetLastActiveWindow: TKeyman32GetLastActiveWindowFunction;
-    FKeyman_RegisterControllerWindow: TKeyman32RegisterControllerWindowFunction;
-    FKeyman_UnregisterControllerWindow: TKeyman32UnregisterControllerWindowFunction;
+    FKeyman_RegisterMasterController: TKeyman32RegisterMasterControllerFunction;
+    FKeyman_UnregisterMasterController: TKeyman32UnregisterMasterControllerFunction;
+    FKeyman_RegisterControllerThread: TKeyman32RegisterControllerThreadFunction;
+    FKeyman_UnregisterControllerThread: TKeyman32UnregisterControllerThreadFunction;
     FKeyman_GetInitialised: TKeyman32GetInitialisedFunction;
     FKeyman_SendMasterController: TKeyman32ControllerSendMessageFunction;
     FKeyman_PostMasterController: TKeyman32ControllerPostMessageFunction;
-    FKeyman_PostControllers: TKeyman32ControllerPostMessageFunction;
     FKeyman_StartExit: TKeyman32ExitFunction;  // I3092
     FKeyman_UpdateTouchPanelVisibility: TKeyman32UpdateTouchPanelVisibilityFunction;
     procedure LoadKeyman32;
@@ -140,8 +143,10 @@ type
     procedure StartKeyman32Engine; safecall;    // 32 bit only
     procedure StopKeyman32Engine; safecall;    // 32 bit only
     procedure ResetKeyman32Engine; safecall;    // 32 bit only
-    procedure RegisterControllerWindow(Value: LongWord); safecall;     // 32 bit only
-    procedure UnregisterControllerWindow(Value: LongWord); safecall;    // 32 bit only
+    procedure RegisterMasterController(Value: LongWord); safecall;     // 32 bit only
+    procedure UnregisterMasterController(Value: LongWord); safecall;    // 32 bit only
+    procedure RegisterControllerThread(Value: LongWord); safecall;     // 32 bit only
+    procedure UnregisterControllerThread(Value: LongWord); safecall;    // 32 bit only
     procedure DisableUserInterface; safecall;
     procedure EnableUserInterface; safecall;
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
@@ -517,13 +522,24 @@ begin
 {$ENDIF}
 end;
 
-procedure TKeymanControl.RegisterControllerWindow(Value: LongWord);
+procedure TKeymanControl.RegisterControllerThread(Value: LongWord);
 begin
 {$IFDEF WIN64}
   Error(Cardinal(E_NOTIMPL));
 {$ELSE}
   LoadKeyman32;
-  if not FKeyman_RegisterControllerWindow(Value) then
+  if not FKeyman_RegisterControllerThread(Value) then
+    Error(KMN_E_KeymanControl_CannotRegisterControllerWindow);
+{$ENDIF}
+end;
+
+procedure TKeymanControl.RegisterMasterController(Value: LongWord);
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+  if not FKeyman_RegisterMasterController(Value) then
     Error(KMN_E_KeymanControl_CannotRegisterControllerWindow);
 {$ENDIF}
 end;
@@ -549,15 +565,27 @@ begin
 {$ENDIF}
 end;
 
-procedure TKeymanControl.UnregisterControllerWindow(Value: LongWord);
+procedure TKeymanControl.UnregisterControllerThread(Value: LongWord);
 begin
 {$IFDEF WIN64}
   Error(Cardinal(E_NOTIMPL));
 {$ELSE}
   if hlibKeyman32 = 0 then
-    KL.LogError('UnregisterControllerWindow: keyman32.dll is not loaded')
-  else if not FKeyman_UnregisterControllerWindow(Value) then
-    KL.LogError('UnregisterControllerWindow: Could not unregister controller window %x', [Value]);
+    KL.LogError('UnregisterControllerThread: keyman32.dll is not loaded')
+  else if not FKeyman_UnregisterControllerThread(Value) then
+    KL.LogError('UnregisterControllerThread: Could not unregister controller thread %x', [Value]);
+{$ENDIF}
+end;
+
+procedure TKeymanControl.UnregisterMasterController(Value: LongWord);
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  if hlibKeyman32 = 0 then
+    KL.LogError('UnregisterMasterController: keyman32.dll is not loaded')
+  else if not FKeyman_UnregisterMasterController then
+    KL.LogError('UnregisterMasterController: Could not unregister controller window %x', [Value]);
 {$ENDIF}
 end;
 
@@ -703,11 +731,12 @@ begin
     @FKeyman_GetActiveKeymanID   := ProcAddr('GetActiveKeymanID');
     @FKeyman_GetLastFocusWindow  := ProcAddr('Keyman_GetLastFocusWindow');
     @FKeyman_GetLastActiveWindow := ProcAddr('Keyman_GetLastActiveWindow');
-    @FKeyman_RegisterControllerWindow := ProcAddr('Keyman_RegisterControllerWindow');
-    @FKeyman_UnregisterControllerWindow := ProcAddr('Keyman_UnregisterControllerWindow');
+    @FKeyman_RegisterMasterController := ProcAddr('Keyman_RegisterMasterController');
+    @FKeyman_UnregisterMasterController := ProcAddr('Keyman_UnregisterMasterController');
+    @FKeyman_RegisterControllerThread := ProcAddr('Keyman_RegisterControllerThread');
+    @FKeyman_UnregisterControllerThread := ProcAddr('Keyman_UnregisterControllerThread');
     @FKeyman_SendMasterController := ProcAddr('Keyman_SendMasterController');
     @FKeyman_PostMasterController := ProcAddr('Keyman_PostMasterController');
-    @FKeyman_PostControllers := ProcAddr('Keyman_PostControllers');
     @FKeyman_UpdateTouchPanelVisibility := ProcAddr('Keyman_UpdateTouchPanelVisibility');
   end;
 end;
