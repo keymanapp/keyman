@@ -43,7 +43,7 @@ uses
 
 procedure FixupMissingFile(const path: WideString);
 const
-  componentcode = '{507AB33B-FE7D-4B2F-B573-E6B857970115}';
+  componentcode = '{58D31506-F964-47AF-B4A0-51107A74C2FE}';
 var
   err: DWord;
   productcode: array[0..39] of char;
@@ -53,16 +53,7 @@ begin
   err := MsiEnumClients(componentcode, i, productcode);
   while err = ERROR_SUCCESS do
   begin
-{  err := MsiGetProductCode(componentcode, productcode);
-  if err <> ERROR_SUCCESS then
-  begin
-    raise EFixupMissingFile.Create('Keyman could not be repaired.  Please reinstall this product.'#13#10#13#10+
-      'Error message was: MsiGetProductCode: '+SysErrorMessage(err));
-  end;}
-
     err := MsiReinstallProduct(productcode, REINSTALLMODE_FILEMISSING);
-
-//  err := MsiInstallMissingFile(productcode, PChar(WideCharToString(PWideChar(path))));
     if err <> ERROR_SUCCESS then
     begin
       raise EFixupMissingFile.Create('Keyman could not be repaired.  Please reinstall this product.'#13#10#13#10+
