@@ -21,7 +21,10 @@ enum km_kbp_modifier_state {
   KM_KBP_MODIFIER_CTRL        = 1 << 5,
   KM_KBP_MODIFIER_ALT         = 1 << 6,
   /*
-    KM_KBP_MODIFIER_META        = 1 << 7,
+    KM_KBP_MODIFIER_META        = 1 << 7,    // Either Meta-key flag (tentative).  Not usable by keyboards currently
+                                             // Used internally (currently, only by KMW) to ensure Meta-key 
+                                             // shortcuts safely bypass rules
+                                             // Meta key = Command key on macOS, Windows key on Windows    
   */
   KM_KBP_MODIFIER_CAPS        = 1 << 8,
   KM_KBP_MODIFIER_NOCAPS      = 1 << 9,
