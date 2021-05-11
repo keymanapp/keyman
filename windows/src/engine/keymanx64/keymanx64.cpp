@@ -39,8 +39,10 @@ extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_Initialise(HWND Handle, BO
 extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_ResetInitialisation(void);  // I3092
 extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_StartExit(void);  // I3092
 extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_Exit(void);
-extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_RegisterControllerWindow(HWND hwnd);
-extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_UnregisterControllerWindow(HWND hwnd);
+extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_RegisterControllerThread(DWORD tid);
+extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_RegisterMasterController(HWND hwnd);
+extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_UnregisterControllerThread(DWORD tid);
+extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_UnregisterMasterController();
 
 #define KM_EXIT 4
 #define KM_EXITFLUSH 5
@@ -48,8 +50,8 @@ extern "C" BOOL __declspec( dllimport ) WINAPI Keyman_UnregisterControllerWindow
 // Global variables
 
 HINSTANCE hInst;                            // Current instance
-HWND hwndController = NULL;                 // Keyman x86 Main Form window handle
-HWND hwndControllerOwner = NULL;            // Keyman x86 Application  window handles
+HWND hwndController = NULL;                 // Keyman x86 Application window handle
+DWORD dwControllerThreadId = NULL;
 HANDLE hParentProcessHandle = NULL;         // Keyman x86 process handle
 
 HANDLE hWatcherThread = NULL;
@@ -172,15 +174,18 @@ BOOL ParseCmdLine(LPTSTR lpCmdLine) {
   hParentProcessHandle = (HANDLE)wcstoull(lpCmdLine, &lpCmdLine, 10);
   if (hParentProcessHandle == 0 || hParentProcessHandle == (HANDLE) ULLONG_MAX) return FALSE;
 
+  // TODO: remove this now-unused parameter as separate patch
+  while (iswspace(*lpCmdLine)) lpCmdLine++;
+  if (!*lpCmdLine) return FALSE;
+  HWND __ = (HWND) wcstoull(lpCmdLine, &lpCmdLine, 10);
+  if (__ == 0 || __ == (HWND) ULLONG_MAX) return FALSE;
+
   while (iswspace(*lpCmdLine)) lpCmdLine++;
   if (!*lpCmdLine) return FALSE;
   hwndController = (HWND) wcstoull(lpCmdLine, &lpCmdLine, 10);
   if (hwndController == 0 || hwndController == (HWND) ULLONG_MAX) return FALSE;
-
-  while (iswspace(*lpCmdLine)) lpCmdLine++;
-  if (!*lpCmdLine) return FALSE;
-  hwndControllerOwner = (HWND) wcstoull(lpCmdLine, &lpCmdLine, 10);
-  if (hwndControllerOwner == 0 || hwndControllerOwner == (HWND) ULLONG_MAX) return FALSE;
+  dwControllerThreadId = GetWindowThreadProcessId(hwndController, NULL);
+  if (dwControllerThreadId == NULL) return FALSE;
 
   return TRUE;
 }
@@ -306,7 +311,9 @@ BOOL StartKeyman(HWND hWnd)
   if (!CreateWatcherThread(hWnd))
     return Fail(hWnd, szError_WatcherThreadFailed);
 
-  if(!Keyman_RegisterControllerWindow(hwndControllerOwner) || !Keyman_RegisterControllerWindow(hwndController))   // I3758
+  if(!Keyman_RegisterMasterController(hwndController) ||
+      !Keyman_RegisterControllerThread(dwControllerThreadId) ||
+      !Keyman_RegisterControllerThread(GetCurrentThreadId()))   // I3758
     return Fail(hWnd, szError_FailedToRegisterController);
 
   if(!Keyman_Initialise(hWnd, FALSE))
@@ -390,8 +397,9 @@ void Shutdown()
 
   /* Unregister those windows that we registered earlier - don't fail on error though */
 
-  if(hwndController != NULL) Keyman_UnregisterControllerWindow(hwndController);   // I3758
-  if(hwndControllerOwner != NULL) Keyman_UnregisterControllerWindow(hwndControllerOwner);   // I3758
+  if(hwndController != NULL) Keyman_UnregisterMasterController();   // I3758
+  if(dwControllerThreadId != NULL) Keyman_UnregisterControllerThread(dwControllerThreadId);   // I3758
+  Keyman_UnregisterControllerThread(GetCurrentThreadId());   // I3758
 
   PostQuitMessage(0);
 

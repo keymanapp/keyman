@@ -15,7 +15,7 @@ EXPORTS
 			KMHideIM
 			KMGetActiveKeyboard
 			KMGetKeyboardPath
-			
+
       TIPActivateEx
       TIPActivateKeyboard
 			TIPProcessKey
@@ -23,17 +23,18 @@ EXPORTS
       GetKeyboardPreservedKeys
 
 			GetActiveKeymanID
-			Keyman_RegisterControllerWindow
-			Keyman_UnregisterControllerWindow
+			Keyman_RegisterControllerThread
+			Keyman_UnregisterControllerThread
+      Keyman_RegisterMasterController
+      Keyman_UnregisterMasterController
 			Keyman_RestartEngine
-			
+
       Keyman_SendMasterController
-      Keyman_PostControllers
       Keyman_PostMasterController
-      
+
       Keyman_StartExit
       Keyman_ResetInitialisation
-      
+
   	  Keyman_WriteDebugEvent
 
       Keyman_UpdateTouchPanelVisibility

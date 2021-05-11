@@ -403,7 +403,8 @@ void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 void UpdateKeymanUI()
 {
-	Globals::PostControllers(wm_keyman_control, KMC_CHANGEUISTATE, 2);  // TODO: Fixup constant
+  //TODO: this does not appear to be used; remove as separate patch
+	Globals::PostMasterController(wm_keyman_control, KMC_CHANGEUISTATE, 2);
 }
 
 /*

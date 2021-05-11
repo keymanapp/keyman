@@ -27,8 +27,10 @@ type
     procedure StartKeyman32Engine; safecall;   // I5133
     procedure StopKeyman32Engine; safecall;   // I5133
     procedure ResetKeyman32Engine; safecall;   // I5133
-    procedure RegisterControllerWindow(Value: LongWord); safecall;
-    procedure UnregisterControllerWindow(Value: LongWord); safecall;
+    procedure RegisterMasterController(Value: LongWord); safecall;
+    procedure UnregisterMasterController(Value: LongWord); safecall;
+    procedure RegisterControllerThread(Value: LongWord); safecall;
+    procedure UnregisterControllerThread(Value: LongWord); safecall;
     procedure DisableUserInterface; safecall;
     procedure EnableUserInterface; safecall;
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
