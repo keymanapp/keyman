@@ -20,7 +20,7 @@ Build-Depends:
  python3-pil,
  python3-pip,
  python3-qrcode,
- python3-raven | python3-sentry-sdk,
+ python3-sentry-sdk | python3-raven,
  python3-requests,
  python3-requests-cache,
  python3-setuptools,
