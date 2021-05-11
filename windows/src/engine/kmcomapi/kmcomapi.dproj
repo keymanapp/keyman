@@ -255,7 +255,6 @@
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="util\utilrun.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
