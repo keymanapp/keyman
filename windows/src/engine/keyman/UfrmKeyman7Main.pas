@@ -291,7 +291,6 @@ type
 
     procedure PostGlobalKeyboardChange(FActiveKeyboard: TLangSwitchKeyboard);   // I4271
     function IsControllerWindow(AHandle: THandle): Boolean;   // I4731
-    function GetControllerWindows: THandleArray;   // I4731
     procedure UpdateFocusInfo;   // I4731
     procedure UnregisterControllerWindows;   // I4731
     function IsSysTrayWindow(AHandle: THandle): Boolean;
@@ -559,7 +558,6 @@ begin
   end;
   if Assigned(frmVisualKeyboard) then // I1096 - silent exception when Keyman closes
   begin
-    frmVisualKeyboard.Unregister;   // I2444 - Keyman tries to re-init because OSK was not unregistering until after Keyman_Exit
     //frmVisualKeyboard.Hide;
     //frmVisualKeyboard.Release;
     FreeAndNil(frmVisualKeyboard);  // I2692
@@ -595,15 +593,8 @@ begin
 end;
 
 function TfrmKeyman7Main.IsControllerWindow(AHandle: THandle): Boolean;   // I4731
-var
-  AHandles: THandleArray;
-  i: Integer;
 begin
-  AHandles := GetControllerWindows;
-  for i := Low(AHandles) to High(AHandles) do
-    if AHandles[i] = AHandle then
-      Exit(True);
-  Result := False;
+  Result := GetWindowThreadProcessId(AHandle, nil) = GetCurrentThreadId;
 end;
 
 function TfrmKeyman7Main.IsSysTrayWindow(AHandle: THandle): Boolean;   // I4731
@@ -617,39 +608,16 @@ begin
     SameText(buf, 'NotifyIconOverflowWindow');
 end;
 
-function TfrmKeyman7Main.GetControllerWindows: THandleArray;   // I4731
-var
-  LS, VK: Integer;
-begin
-  if Assigned(frmLanguageSwitch) then LS := 1 else LS := 0;
-  if Assigned(frmVisualKeyboard) then VK := 1 else VK := 0;
-
-  SetLength(Result, 3 + LS + VK);
-  Result[0] := Application.Handle;
-  Result[1] := Handle;
-  Result[2] := frmKeymanMenu.Handle;
-  if LS > 0 then Result[3] := frmLanguageSwitch.Handle;
-  if VK > 0 then Result[3+LS] := frmVisualKeyboard.Handle;
-end;
-
 procedure TfrmKeyman7Main.RegisterControllerWindows;  // I3092
-var
-  AHandles: THandleArray;
-  i: Integer;
 begin
-  AHandles := GetControllerWindows;
-  for i := Low(AHandles) to High(AHandles) do
-    kmint.KeymanEngineControl.RegisterControllerWindow(AHandles[i]);   // I4731
+  kmint.KeymanEngineControl.RegisterMasterController(Application.Handle);
+  kmint.KeymanEngineControl.RegisterControllerThread(GetCurrentThreadId);
 end;
 
 procedure TfrmKeyman7Main.UnregisterControllerWindows;   // I4731
-var
-  AHandles: THandleArray;
-  i: Integer;
 begin
-  AHandles := GetControllerWindows;
-  for i := Low(AHandles) to High(AHandles) do
-    kmint.KeymanEngineControl.UnregisterControllerWindow(AHandles[i]);
+  kmint.KeymanEngineControl.UnregisterMasterController(Application.Handle);
+  kmint.KeymanEngineControl.UnregisterControllerThread(GetCurrentThreadId);
 end;
 
 function TfrmKeyman7Main.LoadProduct: Boolean;
@@ -954,7 +922,6 @@ begin
   begin
     frmLanguageSwitch := TfrmLanguageSwitch.Create(Self);
     frmLanguageSwitch.OnHidden := LanguageSwitchFormHidden;
-    kmint.KeymanEngineControl.RegisterControllerWindow(frmLanguageSwitch.Handle);
   end;
 
   Keyboard := FLangSwitchManager.ActiveKeyboard;   // I3949
@@ -1367,6 +1334,8 @@ begin
   inherited;
   if Message.Msg = wm_keyman_control then
   begin
+    // While keyman32 will never send messages to this window,
+    // kmcomapi currently can.
     Message.Result := ProcessWMKeymanControl(LoWord(Message.WParam), HiWord(Message.WParam), Message.LParam);   // I3961
   end
   else if Message.Msg = wm_test_keyman_functioning then
@@ -1889,7 +1858,7 @@ begin
   else
     tmrRefresh.Tag := tmrRefresh.Tag + 1;
 
-  PostMessage(Handle, wm_keyman_control, KMC_REFRESH, 0);
+  PostMessage(Application.Handle, wm_keyman_control, KMC_REFRESH, 0);
 end;
 
 procedure TfrmKeyman7Main.tmrTestKeymanFunctioningTimer(Sender: TObject);
@@ -1973,7 +1942,7 @@ begin
     FLangSwitchRefreshWatcher.Terminate;
     FreeAndNil(FLangSwitchRefreshWatcher);
   end;
-  FLangSwitchRefreshWatcher := TLangSwitchRefreshWatcher.Create(Handle);
+  FLangSwitchRefreshWatcher := TLangSwitchRefreshWatcher.Create(Application.Handle);
   FLangSwitchRefreshWatcher.Start;
 end;
 
@@ -2169,7 +2138,7 @@ begin
             REG_NOTIFY_CHANGE_LAST_SET, hEvent, True) <> ERROR_SUCCESS then
           Exit;
 
-        // Finally, tell the main form to get ready to process the refresh
+        // Finally, tell the master controller to get ready to process the refresh
         PostMessage(FOwnerHandle, wm_keyman_control, MAKELONG(KMC_REFRESH, 1), 0);
       until False;
 
