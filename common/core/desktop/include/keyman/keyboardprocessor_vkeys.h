@@ -19,27 +19,32 @@ enum km_kbp_modifier_state {
   KM_KBP_MODIFIER_RALT        = 1 << 3,
   KM_KBP_MODIFIER_SHIFT       = 1 << 4,
   KM_KBP_MODIFIER_CTRL        = 1 << 5,
-  KM_KBP_MODIFIER_ALT         = 1 << 6
+  KM_KBP_MODIFIER_ALT         = 1 << 6,
   /*
-    KM_KBP_MODIFIER_CAPS        = 1 << 7,
-    KM_KBP_MODIFIER_NOCAPS      = 1 << 8,
-    KM_KBP_MODIFIER_NUMLOCK     = 1 << 9,
-    KM_KBP_MODIFIER_NONUMLOCK   = 1 << 10,
-    KM_KBP_MODIFIER_SCROLLOCK   = 1 << 11,
-    KM_KBP_MODIFIER_NOSCROLLOCK = 1 << 12,
-    KM_KBP_MODIFIER_VIRTUALKEY  = 1 << 13,
+    KM_KBP_MODIFIER_META        = 1 << 7,    // Either Meta-key flag (tentative).  Not usable by keyboards currently
+                                             // Used internally (currently, only by KMW) to ensure Meta-key 
+                                             // shortcuts safely bypass rules
+                                             // Meta key = Command key on macOS, Windows key on Windows    
+  */
+  KM_KBP_MODIFIER_CAPS        = 1 << 8,
+  KM_KBP_MODIFIER_NOCAPS      = 1 << 9,
+  /*
+    KM_KBP_MODIFIER_NUMLOCK     = 1 << 10,
+    KM_KBP_MODIFIER_NONUMLOCK   = 1 << 11,
+    KM_KBP_MODIFIER_SCROLLOCK   = 1 << 12,
+    KM_KBP_MODIFIER_NOSCROLLOCK = 1 << 13,
+    KM_KBP_MODIFIER_VIRTUALKEY  = 1 << 14,
   */
 };
-
 
 enum km_kbp_modifier_mask {
   KM_KBP_MODIFIER_MASK_ALL         = 0x7f,
   KM_KBP_MODIFIER_MASK_ALT_GR_SIM  = KM_KBP_MODIFIER_LCTRL|KM_KBP_MODIFIER_LALT,
   KM_KBP_MODIFIER_MASK_CHIRAL      = 0x1f,
   KM_KBP_MODIFIER_MASK_IS_CHIRAL   = 0x0f,
-  KM_KBP_MODIFIER_MASK_NON_CHIRAL  = 0x7f
-/*  KM_KBP_MODIFIER_MASK_CAPS        = 0x0300,
-  KM_KBP_MODIFIER_MASK_NUMLOCK     = 0x0C00,
+  KM_KBP_MODIFIER_MASK_NON_CHIRAL  = 0x7f,
+  KM_KBP_MODIFIER_MASK_CAPS        = 0x0300,
+/*KM_KBP_MODIFIER_MASK_NUMLOCK     = 0x0C00,
   KM_KBP_MODIFIER_MASK_SCROLLLOCK  = 0x3000,*/
 };
 
