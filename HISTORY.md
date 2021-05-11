@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.44 alpha 2021-05-11
+
+* chore(windows): FixupMissingFile needed current component code (#5057)
+* chore(windows): remove unused utilrun unit (#5056)
+* fix(developer): two small issues in kmdecomp (#5031)
+* fix(common/core): Add values for Caps and Nocaps modifiers (#5053)
+
 ## 15.0.43 alpha 2021-05-10
 
 * chore(mac): update requirements to include Big Sur (#5030)
