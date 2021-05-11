@@ -286,10 +286,7 @@ BOOL ProcessMessage( LPMSG mp );
 BOOL ProcessGroup(LPGROUP gp);
 BOOL ContextMatch(LPKEY kkp);
 int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr);
-//void PostKey( int keystroke, int msgflags, LPMSG msg );
-//void GetINIAdvanced( void );
 BOOL LoadAllKeymanKeyboards(DWORD layout);
-void UpdateKeymanUI();
 
 BOOL IsSysTrayWindow(HWND hwnd);
 

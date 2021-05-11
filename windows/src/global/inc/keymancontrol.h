@@ -1,18 +1,18 @@
 /*
   Name:             keymancontrol
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    13 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Add KMC_REFRESH and KMC_INTERFACEHOTKEY wm_keyman_control messages
                     11 Dec 2009 - mcdurdin - I934 - x64 platfrom comms add KMC_SETFOCUSINFO
                     06 Apr 2010 - mcdurdin - I2271 - Select Keyboard tidy up
@@ -23,7 +23,7 @@
 */
 
 //#define KMC_KEYBOARDCHANGED	1   // I3949
-#define KMC_CHANGEUISTATE  	2
+//#define KMC_CHANGEUISTATE  	2
 //#define KMC_GETLOADED	    	3
 #define KMC_REFRESH			    4
 #define KMC_INTERFACEHOTKEY	5
