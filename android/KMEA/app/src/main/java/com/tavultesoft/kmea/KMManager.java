@@ -1053,8 +1053,10 @@ public final class KMManager {
     File modelFile = new File(getLexicalModelsDir(), pkgID + File.separator + modelID + ".model.js");
     String path = "file://" + modelFile.getAbsolutePath();
 
+    // Disable sugestions if lexical-model file doesn't exist
     if (!modelFile.exists()) {
       modelFileExists = false;
+      setBannerOptions(false);
       KMLog.LogError(TAG, modelFile.getAbsolutePath() + " does not exist");
     }
 
