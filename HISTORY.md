@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.45 alpha 2021-05-12
+
+* fix(windows): refactor controller windows (#5060)
+* chore(windows): remove KMC_CHANGEUISTATE (#5061)
+* fix(linux): Swap order of dependencies for Debian package (#5064)
+* fix(linux): Fix Caps Lock (#5054)
+
 ## 15.0.44 alpha 2021-05-11
 
 * chore(windows): FixupMissingFile needed current component code (#5057)
