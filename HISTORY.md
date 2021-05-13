@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.46 alpha 2021-05-13
+
+* chore(windows): remove unused keymanx64 parameter (#5062)
+* fix(android/engine): Check lexical-model file exists before using (#5071)
+* chore(web/resources): bump lodash from 4.17.19 to 4.17.21 in /web/testing/regression-tests (#5037)
+
 ## 15.0.45 alpha 2021-05-12
 
 * fix(windows): refactor controller windows (#5060)
