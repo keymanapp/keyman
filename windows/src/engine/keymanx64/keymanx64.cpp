@@ -164,21 +164,14 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 //
 //   COMMENTS:
 //
-//        Reads parent process handle, parent process main window and
-//        parent process application window handle from the command
-//        line and validates them.
+//        Reads parent process handle and master controller window
+//        handle from the command line and validates them.
 //
 BOOL ParseCmdLine(LPTSTR lpCmdLine) {
   while (iswspace(*lpCmdLine)) lpCmdLine++;
   if (!*lpCmdLine) return FALSE;
   hParentProcessHandle = (HANDLE)wcstoull(lpCmdLine, &lpCmdLine, 10);
   if (hParentProcessHandle == 0 || hParentProcessHandle == (HANDLE) ULLONG_MAX) return FALSE;
-
-  // TODO: remove this now-unused parameter as separate patch
-  while (iswspace(*lpCmdLine)) lpCmdLine++;
-  if (!*lpCmdLine) return FALSE;
-  HWND __ = (HWND) wcstoull(lpCmdLine, &lpCmdLine, 10);
-  if (__ == 0 || __ == (HWND) ULLONG_MAX) return FALSE;
 
   while (iswspace(*lpCmdLine)) lpCmdLine++;
   if (!*lpCmdLine) return FALSE;
