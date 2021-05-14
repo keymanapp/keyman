@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.47 alpha 2021-05-14
+
+* fix(developer): kmconvert commandline and deploy (#5082)
+
 ## 15.0.46 alpha 2021-05-13
 
 * chore(windows): remove unused keymanx64 parameter (#5062)
