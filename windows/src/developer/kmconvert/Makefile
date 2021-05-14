@@ -12,6 +12,11 @@ build: version.res manifest.res dirs icons
     $(COPY) $(WIN32_TARGET_PATH)\kmconvert.exe $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\kmconvert.dbg $(COPY) $(WIN32_TARGET_PATH)\kmconvert.dbg $(DEBUGPATH)\developer
 
+    # Copy template files to project
+    -rd /s/q $(ROOT)\bin\developer\projects\templates
+    -mkdir $(ROOT)\bin\developer\projects\templates
+    xcopy /s /y data\* $(ROOT)\bin\developer\projects\templates
+
 icons:
     rc icons.rc
 
