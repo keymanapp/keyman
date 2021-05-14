@@ -49,6 +49,8 @@ type
     lblKeyboardLanguages: TLabel;
     lblProjectFilename: TLabel;
     editProjectFilename: TEdit;
+    Label1: TLabel;
+    editFullCopyright: TEdit;
     procedure cmdOKClick(Sender: TObject);
     procedure editKeyboardNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -65,6 +67,7 @@ type
     procedure editPathChange(Sender: TObject);
     procedure editKeyboardIDChange(Sender: TObject);
     procedure cmdBrowseClick(Sender: TObject);
+    procedure editFullCopyrightChange(Sender: TObject);
   private
     dlgBrowse: TBrowse4Folder;
     pack: TKPSFile; // Used temporarily for storing language list
@@ -86,10 +89,12 @@ type
     procedure SetKeyboardID(const Value: string);
     procedure SetKeyboardName(const Value: string);
     procedure UpdateProjectFilename;
+    function GetFullCopyright: string;
   protected
     function GetHelpTopic: string; override;
   public
     property Copyright: string read GetCopyright;
+    property FullCopyright: string read GetFullCopyright;
     property Version: string read GetVersion;
     property Author: string read GetAuthor;
     property Targets: TKeymanTargets read GetTargets;
@@ -145,6 +150,7 @@ begin
     try
       pt.Name := f.KeyboardName;
       pt.Copyright := f.Copyright;
+      pt.FullCopyright := f.FullCopyright;
       pt.Author := f.Author;
       pt.Version := f.Version;
       pt.BCP47Tags := f.BCP47Tags;
@@ -178,6 +184,7 @@ var
 begin
   inherited;
   editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
+  editFullCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' ';
 
   dlgBrowse := TBrowse4Folder.Create(Self);
   dlgBrowse.InitialDir := editPath.Text;
@@ -298,9 +305,18 @@ end;
 procedure TfrmNewProjectParameters.editAuthorChange(Sender: TObject);
 begin
   EnableControls;
+  if not editCopyright.Modified then
+    editCopyright.Text := Char($00A9 {copyright})+' '+Author;
+  if not editFullCopyright.Modified then
+    editFullCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
 end;
 
 procedure TfrmNewProjectParameters.editCopyrightChange(Sender: TObject);
+begin
+  EnableControls;
+end;
+
+procedure TfrmNewProjectParameters.editFullCopyrightChange(Sender: TObject);
 begin
   EnableControls;
 end;
@@ -361,6 +377,11 @@ end;
 function TfrmNewProjectParameters.GetCopyright: string;
 begin
   Result := Trim(editCopyright.Text);
+end;
+
+function TfrmNewProjectParameters.GetFullCopyright: string;
+begin
+  Result := Trim(editFullCopyright.Text);
 end;
 
 function TfrmNewProjectParameters.GetHelpTopic: string;
