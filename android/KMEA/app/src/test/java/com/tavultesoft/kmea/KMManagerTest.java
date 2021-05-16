@@ -96,7 +96,7 @@ public class KMManagerTest {
     tier = KMManager.getTier(versionName);
     Assert.assertEquals(KMManager.Tier.STABLE, tier);
 
-    // If versionName is null or blank, tier based on com.tavultesoft.kmea.BuildConfig.VERSION_NAME
+    // If versionName is null or blank, tier based on com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME
     // But we can't test for it.
 
     // If regex fails, tier is stable
