@@ -1789,8 +1789,8 @@ namespace com.keyman.osk {
 
       // And correct its position with respect to that element
       ss=subKeys.style;
-      var x=dom.Utils.getAbsoluteX(e)+0.5*(e.offsetWidth-subKeys.offsetWidth), y,
-        xMax=(util.landscapeView()?screen.height:screen.width)-subKeys.offsetWidth;
+      var x = dom.Utils.getAbsoluteX(e)+0.5*(e.offsetWidth-subKeys.offsetWidth);
+      var xMax = keyman.osk.getWidth() - subKeys.offsetWidth;
 
       if(x > xMax) {
         x=xMax;
