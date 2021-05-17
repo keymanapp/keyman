@@ -16,6 +16,7 @@
     "chai",
     "lerna",
     "mocha",
+    "mocha-teamcity-reporter",
     "ts-node",
     "typescript"
   ],
