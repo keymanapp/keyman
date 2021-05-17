@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.48 alpha 2021-05-17
+
+* chore(common): Update stable history for 14.0.274 (#5087)
+* fix(web): position popups correctly in landscape mode on Android and during Chrome emulation (#5075)
+
 ## 15.0.47 alpha 2021-05-14
 
 * fix(developer): kmconvert commandline and deploy (#5082)
