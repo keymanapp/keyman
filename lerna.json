@@ -16,6 +16,7 @@
     "chai",
     "lerna",
     "mocha",
+    "ts-node",
     "typescript"
   ],
   "version": "15.0.48"

@@ -22,7 +22,8 @@
     "chai": "^4.3.4",
     "mocha": "^8.4.0",
     "mocha-teamcity-reporter": "^3.0.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "ts-node": "^9.1.1"
   },
   "scripts": {
     "lerna": "cd ../ && npm run lerna --",
@@ -34,7 +35,6 @@
     "@keymanapp/models-types": "^15.0.48",
     "@keymanapp/web-environment": "^15.0.48",
     "@keymanapp/web-utils": "^15.0.48",
-    "@types/node": "^11.9.4",
-    "ts-node": "^8.0.2"
+    "@types/node": "^11.9.4"
   }
 }
