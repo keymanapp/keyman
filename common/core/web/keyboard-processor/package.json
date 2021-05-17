@@ -19,8 +19,8 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@keymanapp/resources-gosh": "^15.0.48",
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0",
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0",
     "mocha-teamcity-reporter": "^3.0.0",
     "typescript": "^3.8.3"
   },

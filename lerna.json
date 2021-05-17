@@ -13,7 +13,9 @@
     "web"
   ],
   "hoist": [
+    "chai",
     "lerna",
+    "mocha",
     "typescript"
   ],
   "version": "15.0.48"

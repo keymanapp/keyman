@@ -43,8 +43,8 @@
     "@keymanapp/models-types": "^15.0.48",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0",
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0",
     "ts-node": "^8.10.1",
     "typescript": "^3.8.3"
   },
