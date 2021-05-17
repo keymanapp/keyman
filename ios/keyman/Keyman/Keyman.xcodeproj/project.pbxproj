@@ -14,8 +14,6 @@
 		162E2C9F2092D36800F40769 /* UIDevice+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */; };
 		165EB39A2097165B00040A69 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3992097165B00040A69 /* UIColor+Extensions.swift */; };
 		165EB39C2097181D00040A69 /* KMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB39B2097181D00040A69 /* KMView.swift */; };
-		1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; };
-		1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
 		981AFA9819EF44DE006706BF /* 724-info.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725418E4F0930014DF0C /* 724-info.png */; };
@@ -129,9 +127,7 @@
 		C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943FD1F61377900E7D98C /* MainViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
-		CE002CB52408B4A5002026CE /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE002CB42408B4A5002026CE /* Sentry.framework */; };
 		CE1F5ECE23331DA400141F3E /* OfflineHelp.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */; };
-		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
 		CE4C654624D0020900070856 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE4C654424D0020900070856 /* Localizable.strings */; };
 		CE4E73D024170C9A00EBD1A5 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE002CB42408B4A5002026CE /* Sentry.framework */; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
@@ -299,7 +295,6 @@
 		98D55ED718480B6800104956 /* textsize_down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_down@2x.png"; path = "Keyman Icons/textsize_down@2x.png"; sourceTree = "<group>"; };
 		98D55EDC18480B6800104956 /* textsize_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_up.png; path = "Keyman Icons/textsize_up.png"; sourceTree = "<group>"; };
 		98D55EDD18480B6800104956 /* textsize_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@2x.png"; path = "Keyman Icons/textsize_up@2x.png"; sourceTree = "<group>"; };
-		9A0FC9FF22D7C21F00D33F86 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		C055F0B01F60E8D400140735 /* GetStartedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B21F60F7A400140735 /* DropDownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B41F610FB200140735 /* DropDownListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownListView.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -316,9 +311,7 @@
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
 		CE002CB42408B4A5002026CE /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = OfflineHelp.bundle; sourceTree = "<group>"; };
-		CE2B1E4B21B6112B007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE4C654524D0020900070856 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE72B3D62643ABB7006821CE /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
@@ -339,11 +332,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */,
-				CE002CB52408B4A5002026CE /* Sentry.framework in Frameworks */,
-				1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */,
 				CE80AD33257F2B4A008D2150 /* KeymanEngine.framework in Frameworks */,
-				1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -510,9 +499,6 @@
 			isa = PBXGroup;
 			children = (
 				CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */,
-				9A0FC9FF22D7C21F00D33F86 /* Reachability.framework */,
-				CE2B1E4B21B6112B007D092E /* DeviceKit.framework */,
-				CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */,
 				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				CE1F5ECC23331C1C00141F3E /* resources */,
 				98ABADB2176935E400B62590 /* Frameworks */,
@@ -703,7 +689,6 @@
 			buildConfigurationList = 981AFADE19EF44DE006706BF /* Build configuration list for PBXNativeTarget "Keyman" */;
 			buildPhases = (
 				981AFA7A19EF44DE006706BF /* Sources */,
-				1687ACCB1FD826D000926D69 /* Run Script */,
 				981AFA8319EF44DE006706BF /* Frameworks */,
 				981AFA8E19EF44DE006706BF /* Resources */,
 				981AFADC19EF44DE006706BF /* Embed App Extensions */,
@@ -926,33 +911,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1687ACCB1FD826D000926D69 /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/../../Carthage/Build/iOS/Zip.framework",
-				"$(SRCROOT)/../../Carthage/Build/iOS/ObjcExceptionBridging.framework",
-				"$(SRCROOT)/../../Carthage/Build/iOS/XCGLogger.framework",
-				"$(SRCROOT)/../../Carthage/Build/iOS/DeviceKit.framework",
-				"$(SRCROOT)/../../Carthage/Build/iOS/Reachability.framework",
-				"$(SRCROOT)/../../Carthage/Build/iOS/Sentry.framework",
-			);
-			name = "Run Script";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Zip.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/ObjcExceptionBridging.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/XCGLogger.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/DeviceKit.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Reachability.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Sentry.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo \"-- Copying Frameworks --\"\n/usr/local/bin/carthage copy-frameworks\n\n\n";
-			showEnvVarsInLog = 0;
-		};
 		989E4DB91B1EB5C200A345FB /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
