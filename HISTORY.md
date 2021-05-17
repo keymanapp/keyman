@@ -519,6 +519,19 @@
 
 * chore: prepare 15.0 alpha (#4129)
 
+## 14.0.274 stable 2021-05-11
+
+* fix(android/engine): Fix toHex() for null string 🍒  (#4997)
+* chore: support for xcode 12 🍒 (#4996)
+* chore(linux): Add support for Ubuntu 21.04 (hirsute) 🍒 (#5035)
+* chore(ios): prep for CI transition to Xcode 12, build script tweak 🍒 (#5048)
+* chore(windows): add telemetry to trace crash on exit 🍒 (#5008)
+* fix(windows): avoid disabling Keyman when speech recognition starts 🍒 (#5038)
+* chore(android/app): Always use offline help 🍒  (#5051)
+* chore(common): Check in crowdin files for Azerbaijani 🍒  (#5039)
+* feat(android/app): Add telemetry for launching WebBrowserActivity 🍒  (#5050)
+* fix(linux): Enable caps lock support 🍒 (#5058)
+
 ## 14.0.273 stable 2021-04-26
 
 * chore(linux): Fix triggering of Jenkins builds for stable branch (#4968)
