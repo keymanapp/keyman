@@ -76,9 +76,6 @@ dependencies {
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
         transitive = true
     }
-
-    // Assign the annotation processor for tests.
-    testAnnotationProcessor 'com.google.auto.service:auto-service:1.0-rc4'
 }
 //Show deprecation compiler warnings
 /*
