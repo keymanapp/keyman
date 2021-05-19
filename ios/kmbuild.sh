@@ -119,8 +119,9 @@ DEFAULT_LM_ID="nrc.en.mtnt"
 APP_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
 KEYBOARD_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
 ARCHIVE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
-FRAMEWORK_PATH_UNIVERSAL=$BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
-FRAMEWORK_PATH_IOS=$BUILD_PATH/$CONFIG-iphoneos/KeymanEngine.framework
+
+# Engine library build path
+KEYMAN_XCFRAMEWORK=$BUILD_PATH/$CONFIG/KeymanEngine.xcframework
 
 XCODEFLAGS="-quiet -configuration $CONFIG"
 XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath $DERIVED_DATA -workspace keymanios.xcworkspace"
@@ -247,7 +248,7 @@ if [ $? -ne 0 ]; then
   fail "KMEI build failed."
 fi
 
-assertDirExists "$FRAMEWORK_PATH_UNIVERSAL"
+assertDirExists "$KEYMAN_XCFRAMEWORK"
 
 echo "KMEI build complete."
 
