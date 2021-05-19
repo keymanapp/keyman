@@ -93,7 +93,7 @@ if (env_keys_json_file != null) {
         serviceAccountCredentials = file(String.valueOf(env_keys_json_file))
 
         // Deactivate lower conflicting version APKs
-        resolutionStrategy.set(ResolutionStrategy.IGNORE)
+        resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
         switch (System.env.TIER) {
             case 'beta':
                 track.set("beta")
