@@ -16,9 +16,6 @@ FRAMEWORK_NAME="KeymanEngine"
 #                - is auto-set by Xcode, is also managed by initial build script
 XCFRAMEWORK="${BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}.xcframework"
 
-IPHONE_ARCHIVE="${BUILD_DIR}/${CONFIGURATION}-iphoneos/${FRAMEWORK_NAME}.xcarchive"
-SIMULATOR_ARCHIVE="${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${FRAMEWORK_NAME}.xcarchive"
-
 IPHONE_FRAMEWORK="${BUILD_DIR}/${CONFIGURATION}-iphoneos/${FRAMEWORK_NAME}.framework"
 SIMULATOR_FRAMEWORK="${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${FRAMEWORK_NAME}.framework"
 
@@ -29,6 +26,11 @@ echo ""
 # Used to build the appropriate archive files needed to construct the XCFramework.
 # $1 - defines the target device type (`-destination` parameter for `xcodebuild`).
 build_archive ( ) {
+  # Note:  while official docs say we should use `xcodebuild archive ...`, that
+  #        is not only markedly slower, it also adds undesired side-effects to
+  #        our build processes.  
+  #        (It nukes the base .framework file used to build the archive with a
+  #        broken alias that subsequent builds [like the main app's!] can't process.)
   xcodebuild build \
              -scheme "${SCHEME_NAME}" \
              -configuration ${CONFIGURATION} \
@@ -63,7 +65,11 @@ echo "Compiling ${FRAMEWORK_NAME}.xcframework"
 echo ""
 
 # Build the final XCFramework file.
+# -allow-internal-distribution:  preserves the .swiftmodule files, greatly
+#                                simplifying integration in consuming apps.
+#                                - Carthage uses this for its XCFramework support.
 xcodebuild -create-xcframework \
+  -allow-internal-distribution \
   -framework ${IPHONE_FRAMEWORK} \
   -framework ${SIMULATOR_FRAMEWORK} \
   -output ${XCFRAMEWORK}
