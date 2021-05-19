@@ -441,7 +441,7 @@
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../Carthage/Build/iOS/",
+					"$(SRCROOT)/../../Carthage/Build/",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -499,7 +499,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../Carthage/Build/iOS/",
+					"$(SRCROOT)/../../Carthage/Build/",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
