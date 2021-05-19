@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -114,9 +114,6 @@
 		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
 		C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B41F610FB200140735 /* DropDownListView.swift */; };
-		C059FCB91FD925AF00BD1A64 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; };
-		C059FCBA1FD925AF00BD1A64 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; };
-		C059FCBB1FD925AF00BD1A64 /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8F1FD8221800D4A78D /* Zip.framework */; };
 		C059FCC01FD927EF00BD1A64 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = C059FCBF1FD927EF00BD1A64 /* Log.swift */; };
 		C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */; };
 		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
@@ -129,8 +126,6 @@
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
 		CE1F5ECE23331DA400141F3E /* OfflineHelp.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */; };
 		CE4C654624D0020900070856 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE4C654424D0020900070856 /* Localizable.strings */; };
-		CE4E73D024170C9A00EBD1A5 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE002CB42408B4A5002026CE /* Sentry.framework */; };
-		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
 		CE76FF8023EBB5CB005648A8 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98C893F119F0811A000B9AC8 /* Images.xcassets */; };
 		CE79B23C23C6E8E6007E72AE /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		CE79B23D23C6ECB2007E72AE /* banner-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */; };
@@ -149,6 +144,20 @@
 		CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */; };
 		CE80AD33257F2B4A008D2150 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; };
 		CE80AD34257F2B4B008D2150 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD34322654FE3500EB2EA8 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; };
+		CEBD34332654FE3500EB2EA8 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CEBD343B2654FEB400EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; };
+		CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD343D2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */; };
+		CEBD343E2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD343F2654FEB400EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */; };
+		CEBD34402654FEB400EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD34412654FEB400EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */; };
+		CEBD34422654FEB400EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD34432654FEB400EB2EA8 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */; };
+		CEBD34442654FEB400EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD34452654FEB400EB2EA8 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */; };
+		CEBD34462654FEB400EB2EA8 /* Zip.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEF4E55623E95B7B0065B9C7 /* ImageBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */; };
 		CEF4E55723E95B7B0065B9C7 /* ImageBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */; };
 		CEF4E55923E967140065B9C7 /* ImageBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */; };
@@ -173,7 +182,24 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				CEBD34402654FEB400EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
+				CEBD343E2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */,
+				CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
+				CEBD34422654FEB400EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
+				CEBD34442654FEB400EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */,
 				CE80AD34257F2B4B008D2150 /* KeymanEngine.framework in Embed Frameworks */,
+				CEBD34462654FEB400EB2EA8 /* Zip.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEBD34342654FE3500EB2EA8 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CEBD34332654FE3500EB2EA8 /* KeymanEngine.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -186,11 +212,8 @@
 		162E2C9A20926C9B00F40769 /* KMNavigationBarBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMNavigationBarBackgroundView.swift; sourceTree = "<group>"; };
 		162E2C9C2092BFE400F40769 /* KMUnderscoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMUnderscoreView.swift; sourceTree = "<group>"; };
 		162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extensions.swift"; sourceTree = "<group>"; };
-		165C8B8F1FD8221800D4A78D /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
 		165EB3992097165B00040A69 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		165EB39B2097181D00040A69 /* KMView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMView.swift; sourceTree = "<group>"; };
-		1687ACD01FD8DE7600926D69 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
-		1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		16A9229D20325253003CC98E /* Keyman-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Keyman-Info.plist"; sourceTree = SOURCE_ROOT; };
 		37378F4222C9AA610043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPad.xib; sourceTree = "<group>"; };
 		37378F4322C9AA630043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPhone.xib; sourceTree = "<group>"; };
@@ -309,10 +332,8 @@
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
-		CE002CB42408B4A5002026CE /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = OfflineHelp.bundle; sourceTree = "<group>"; };
 		CE4C654524D0020900070856 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE72B3D62643ABB7006821CE /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
 		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
@@ -323,6 +344,12 @@
 		CEACC90E25F07D58006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90F25F07D5A006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC91225F07D77006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<absolute>"; };
+		CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<absolute>"; };
+		CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/Reachability.xcframework; sourceTree = "<absolute>"; };
+		CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/Sentry.xcframework; sourceTree = "<absolute>"; };
+		CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<absolute>"; };
+		CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/Zip.xcframework; sourceTree = "<absolute>"; };
 		CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageBanner.xib; sourceTree = "<group>"; };
 		CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBannerViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -332,7 +359,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEBD343F2654FEB400EB2EA8 /* Reachability.xcframework in Frameworks */,
+				CEBD343D2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */,
+				CEBD343B2654FEB400EB2EA8 /* DeviceKit.xcframework in Frameworks */,
+				CEBD34412654FEB400EB2EA8 /* Sentry.xcframework in Frameworks */,
+				CEBD34432654FEB400EB2EA8 /* XCGLogger.xcframework in Frameworks */,
 				CE80AD33257F2B4A008D2150 /* KeymanEngine.framework in Frameworks */,
+				CEBD34452654FEB400EB2EA8 /* Zip.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,11 +373,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */,
-				C059FCB91FD925AF00BD1A64 /* ObjcExceptionBridging.framework in Frameworks */,
-				C059FCBA1FD925AF00BD1A64 /* XCGLogger.framework in Frameworks */,
-				CE4E73D024170C9A00EBD1A5 /* Sentry.framework in Frameworks */,
-				C059FCBB1FD925AF00BD1A64 /* Zip.framework in Frameworks */,
+				CEBD34322654FE3500EB2EA8 /* KeymanEngine.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,12 +549,13 @@
 		98ABADB2176935E400B62590 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */,
+				CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */,
+				CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */,
+				CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */,
+				CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */,
+				CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */,
 				CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */,
-				CE002CB42408B4A5002026CE /* Sentry.framework */,
-				1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */,
-				1687ACD01FD8DE7600926D69 /* XCGLogger.framework */,
-				165C8B8F1FD8221800D4A78D /* Zip.framework */,
-				CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -717,6 +747,7 @@
 				98CD125A19CA85710089385F /* Resources */,
 				CED3CFDA240E49DF001540A1 /* ShellScript */,
 				37BC8FFD1DE83BBD006AEBFF /* Headers */,
+				CEBD34342654FE3500EB2EA8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1085,7 +1116,10 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
@@ -1117,7 +1151,10 @@
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
@@ -1240,7 +1277,8 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1270,7 +1308,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1310,7 +1352,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1401,7 +1447,10 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
@@ -1443,7 +1492,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
