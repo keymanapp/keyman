@@ -1607,6 +1607,7 @@
 		};
 		C06D37CB1F83204200F61AE0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = C06D372A1F81F4E100F61AE0 /* KeymanEngine */;
 			targetProxy = C06D37CA1F83204200F61AE0 /* PBXContainerItemProxy */;
 		};
@@ -1971,6 +1972,7 @@
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = all;
 				STRIP_SWIFT_SYMBOLS = NO;
+				SUPPORTS_MACCATALYST = NO;
 			};
 			name = Debug;
 		};
@@ -1980,6 +1982,7 @@
 			buildSettings = {
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
 			};
 			name = Release;
 		};
@@ -2162,6 +2165,7 @@
 			buildSettings = {
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
 			};
 			name = "Debug + Sentry";
 		};

@@ -1,8 +1,6 @@
 #!/bin/sh
 
-# Enabling the following option will cause build failures due to issues
-# with difficult-to-resolve XIB errors in compilation.
-#set -e
+set -e
 set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -14,6 +12,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 SCHEME_NAME="KeymanEngine"
 FRAMEWORK_NAME="KeymanEngine"
 
+# CONFIGURATION: one of [Debug, Debug + Sentry, Release]
+#                - is auto-set by Xcode, is also managed by initial build script
 XCFRAMEWORK="${BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}.xcframework"
 
 IPHONE_ARCHIVE="${BUILD_DIR}/${CONFIGURATION}-iphoneos/${FRAMEWORK_NAME}.xcarchive"
