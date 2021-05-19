@@ -1,7 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'io.sentry.android.gradle'
-    id 'com.github.triplet.play' version '3.4.0' apply false
+    // https://github.com/Triple-T/gradle-play-publisher/issues/947#issuecomment-843634852
+    id 'com.github.triplet.play' version '3.4.0-agp4.2' apply false
     id 'name.remal.default-plugins'
 }
 
