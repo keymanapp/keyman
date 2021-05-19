@@ -93,20 +93,22 @@ if (env_keys_json_file != null) {
         serviceAccountCredentials = file(String.valueOf(env_keys_json_file))
 
         // Deactivate lower conflicting version APKs
-        resolutionStrategy = "ignore"
+        resolutionStrategy.set(ResolutionStrategy.IGNORE)
         switch (System.env.TIER) {
             case 'beta':
-                track = 'beta'
+                track.set("beta")
+                println "TIER set to beta"
                 break
 
             case 'stable':
-                track = 'production'
+                track.set("production")
+                println "TIER set to production"
                 break
 
             default:
-                track = 'alpha'
+                track.set("alpha")
+                println "TIER set to alpha"
         }
-        println "TIER set to $track"
     }
 }
 
