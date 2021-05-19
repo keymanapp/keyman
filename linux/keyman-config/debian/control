@@ -67,7 +67,6 @@ Depends:
  dconf-cli,
  gir1.2-webkit2-4.0,
  ibus-keyman,
- kmflcomp (>=10.99.33),
  python3-bs4,
  python3-gi,
  python3-raven | python3-sentry-sdk,

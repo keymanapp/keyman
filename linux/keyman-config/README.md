@@ -24,8 +24,6 @@ sudo apt install python3-sentry-sdk
 
 (It's also possible to install it with pip: `pip3 install sentry-sdk`)
 
-You will also need `kmflcomp` either from a package or built and installed locally.
-
 Run the script `./createkeymandirs.sh` to create the directories for these programs to
 install the packages to.
 
