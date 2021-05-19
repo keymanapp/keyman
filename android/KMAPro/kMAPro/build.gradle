@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'io.sentry.android.gradle'
-    id 'com.github.triplet.play' version '2.5.0' apply false
+    id 'com.github.triplet.play' version '3.4.0' apply false
     id 'name.remal.default-plugins'
 }
 
