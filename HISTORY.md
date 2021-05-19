@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.49 alpha 2021-05-19
+
+* refactor(linux): Remove obsolete SCIM kmfl imengine (#5093)
+* fix(common/core/desktop): Fix warnings when compiling for armhf (#5099)
+* fix(common/core/desktop): Don't segfault on invalid .kmx file (#5101)
+
 ## 15.0.48 alpha 2021-05-17
 
 * chore(common): Update stable history for 14.0.274 (#5087)
