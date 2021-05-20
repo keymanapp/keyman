@@ -1143,31 +1143,61 @@ namespace com.keyman.keyboards {
      *  @param  {string}   cmd        command string
      *  @param  {boolean?} byLanguage if true, context=languages, else context=keyboards
      **/
-    keymanCloudRequest(cmd: string, byLanguage?: boolean) {
-      var URL='https://api.keyman.com/cloud/4.0/', tFlag,
-        Lscript = this.keymanweb.util._CreateElement('script');
-
-      URL = URL + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
-        +'?jsonp=keyman.register&languageidtype=bcp47&version='+this.keymanweb['version'];
-
+    keymanCloudRequest(cmd: string, byLanguage?: boolean) {    
       var kbdManager = this;
+      var keymanweb = this.keymanweb;
 
-      // Set callback timer
-      tFlag='&timerid='+window.setTimeout(
-        function(){
+      var TIMEOUT_KEY = "cloud request timed out";
+
+      // Some basic support toward #5044, but definitely not a full solution toward it.
+      // We'd want to define an 'associative array' for registration promises, using
+      // the timer ID as the 'key' that would help us retrieve the matching Promise.
+      let promise = new Promise<void>(function(resolve, reject) {
+        var URL='https://api.keyman.com/cloud/4.0/';
+        var tFlag: string;
+        let Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
+
+        URL = URL + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
+          +'?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
+  
+        // Set callback timer
+        let timeoutID = window.setTimeout(function() {
+          reject(TIMEOUT_KEY);
+        } ,10000);
+
+        tFlag='&timerid='+ timeoutID;
+  
+        Lscript.charset="UTF-8";
+        Lscript.src = URL+cmd+tFlag;
+        Lscript.type = 'text/javascript';
+
+        Lscript.onload = function(event: Event) {
+          window.clearTimeout(timeoutID);
+          resolve();
+        };
+
+        Lscript.onerror = function(event: string | Event, source?: string, 
+                                  lineno?: number, colno?: number, error?: Error) {
+          window.clearTimeout(timeoutID);
+          reject(error);
+        }
+  
+        try {
+          document.body.appendChild(Lscript);
+        } catch(ex) {
+          document.getElementsByTagName('head')[0].appendChild(Lscript);
+        }
+      });
+
+      promise.catch(function(error) {
+        if(error == TIMEOUT_KEY) {
           kbdManager.serverUnavailable(cmd);
-        }
-        ,10000);
 
-      Lscript.charset="UTF-8";
-      Lscript.src = URL+cmd+tFlag;
-      Lscript.type = 'text/javascript';
-      try {
-        document.body.appendChild(Lscript);
+          throw TIMEOUT_KEY;
+        } else {
+          throw "The cloud API returned a malformed object."
         }
-      catch(ex) {
-        document.getElementsByTagName('head')[0].appendChild(Lscript);
-        }
+      });
     }
 
     /**
