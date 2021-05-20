@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.50 alpha 2021-05-20
+
+* chore(common): Check in crowdin strings for Amharic (#5102)
+* chore(common): resolve audit issues in Web-related repo NPM packages (#5092)
+* refactor(linux): Refactor `install_kmp.py` (#4932)
+* chore(linux): Swap order of dependency (#5113)
+* chore(linux): Remove unnecessary dependency on kmflcomp (#5115)
+
 ## 15.0.49 alpha 2021-05-19
 
 * refactor(linux): Remove obsolete SCIM kmfl imengine (#5093)
