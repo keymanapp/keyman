@@ -1152,6 +1152,10 @@ namespace com.keyman.keyboards {
       // Some basic support toward #5044, but definitely not a full solution toward it.
       // We'd want to define an 'associative array' for registration promises, using
       // the timer ID as the 'key' that would help us retrieve the matching Promise.
+      //
+      // Given that, if the Promise were wrapped and `resolve` and `reject` captured,
+      // the `register` function could then forward the succesfully-retrieved stubs to
+      // the `resolve` method upon success.
       let promise = new Promise<void>(function(resolve, reject) {
         var URL='https://api.keyman.com/cloud/4.0/';
         var tFlag: string;
