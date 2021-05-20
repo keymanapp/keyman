@@ -156,7 +156,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
 #ifdef KMX_64BIT
   kbp = CopyKeyboard(buf, filebase);
 #else
-  kbp = FixupKeyboard(buf, filebase, sz);
+  kbp = FixupKeyboard(buf, filebase);
 #endif
 
   if(!kbp) return FALSE;
@@ -261,7 +261,7 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 
 #else
 
-LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize)
+LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
   KMX_DWORD i, j;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
@@ -286,8 +286,8 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWOR
   {
     gp->dpName = StringOffset(base, cgp->dpName);
     gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
-    if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
-    if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
+    if(cgp->dpMatch != 0) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
+    if(cgp->dpNoMatch != 0) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
 
     for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++)
     {
