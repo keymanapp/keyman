@@ -222,7 +222,9 @@ if [ $DO_CARTHAGE = true ]; then
   # Deleted workspace - a test for proper deployment to CocoaPods.  Doesn't matter here.
   rm -r ./Carthage/Checkouts/DeviceKit/CocoaPodsVerification/ || fail "Carthage dependency loading failed"
 
-  carthage build --use-xcframeworks --platform iOS || fail "Carthage dependency loading failed"
+  # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
+  # which affects the sentry-cocoa dependency.
+  carthage build --use-xcframeworks --no-use-binaries --platform iOS || fail "Carthage dependency loading failed"
 fi
 
 echo
