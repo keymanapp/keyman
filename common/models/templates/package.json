@@ -47,8 +47,8 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "@types/node": "^14.0.4",
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0",
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0",
     "typescript": "^3.8.3"
   },
   "dependencies": {

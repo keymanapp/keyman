@@ -2,7 +2,11 @@
   "name": "root",
   "private": true,
   "devDependencies": {
+    "chai": "^4.3.4",
     "lerna": "^3.20.2",
+    "mocha": "^8.4.0",
+    "mocha-teamcity-reporter": "^4.0.0",
+    "ts-node": "^9.1.1",
     "typescript": "^3.8.3"
   },
   "scripts": {
