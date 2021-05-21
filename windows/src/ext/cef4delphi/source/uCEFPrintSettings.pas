@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFPrintSettings;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -58,7 +56,6 @@ type
   protected
     function  IsValid: Boolean;
     function  IsReadOnly: Boolean;
-    function  Copy: ICefPrintSettings;
     procedure SetOrientation(landscape: Boolean);
     function  IsLandscape: Boolean;
     procedure SetPrinterPrintableArea(const physicalSizeDeviceUnits: PCefSize; const printableAreaDeviceUnits: PCefRect; landscapeNeedsFlip: Boolean);
@@ -89,11 +86,6 @@ implementation
 uses
   uCEFMiscFunctions, uCEFLibFunctions;
 
-
-function TCefPrintSettingsRef.Copy: ICefPrintSettings;
-begin
-  Result := UnWrap(PCefPrintSettings(FData)^.copy(FData))
-end;
 
 function TCefPrintSettingsRef.GetColorModel: TCefColorModel;
 begin

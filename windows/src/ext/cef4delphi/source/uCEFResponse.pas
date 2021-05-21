@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFResponse;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -65,7 +63,10 @@ type
       procedure SetStatusText(const StatusText: ustring);
       function  GetMimeType: ustring;
       procedure SetMimeType(const mimetype: ustring);
-      function  GetHeader(const name: ustring): ustring;
+      function  GetCharset: ustring;
+      procedure SetCharset(const charset: ustring);
+      function  GetHeaderByName(const name: ustring): ustring;
+      procedure SetHeaderByName(const name, value: ustring; overwrite: boolean);
       procedure GetHeaderMap(const headerMap: ICefStringMultimap);
       procedure SetHeaderMap(const headerMap: ICefStringMultimap);
       function  GetURL: ustring;
@@ -92,12 +93,21 @@ begin
   Result := PCefResponse(FData)^.get_error(FData);
 end;
 
-function TCefResponseRef.GetHeader(const name: ustring): ustring;
+function TCefResponseRef.GetHeaderByName(const name: ustring): ustring;
 var
   TempName : TCefString;
 begin
   TempName := CefString(name);
-  Result   := CefStringFreeAndGet(PCefResponse(FData)^.get_header(PCefResponse(FData), @TempName));
+  Result   := CefStringFreeAndGet(PCefResponse(FData)^.get_header_by_name(PCefResponse(FData), @TempName));
+end;
+
+procedure TCefResponseRef.SetHeaderByName(const name, value: ustring; overwrite: boolean);
+var
+  TempName, TempValue : TCefString;
+begin
+  TempName  := CefString(name);
+  TempValue := CefString(value);
+  PCefResponse(FData)^.set_header_by_name(PCefResponse(FData), @TempName, @TempValue, ord(overwrite));
 end;
 
 procedure TCefResponseRef.GetHeaderMap(const headerMap: ICefStringMultimap);
@@ -141,6 +151,19 @@ var
 begin
   TempType := CefString(mimetype);
   PCefResponse(FData)^.set_mime_type(PCefResponse(FData), @TempType);
+end;
+
+function TCefResponseRef.GetCharset: ustring;
+begin
+  Result := CefStringFreeAndGet(PCefResponse(FData)^.get_charset(PCefResponse(FData)));
+end;
+
+procedure TCefResponseRef.SetCharset(const charset: ustring);
+var
+  TempCharset : TCefString;
+begin
+  TempCharset := CefString(charset);
+  PCefResponse(FData)^.set_charset(PCefResponse(FData), @TempCharset);
 end;
 
 procedure TCefResponseRef.SetStatus(status: Integer);
