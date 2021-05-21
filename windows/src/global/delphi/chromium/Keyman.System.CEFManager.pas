@@ -67,6 +67,7 @@ uses
   uCEFTypes;
 
 procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
+                                              const frame         : ICefFrame;
                                                     sourceProcess : TCefProcessId;
                                               const message       : ICefProcessMessage;
                                               var   aHandled      : boolean); forward;
@@ -110,9 +111,9 @@ begin
   GlobalCEFApp.LocalesDirPath       := GlobalCEFApp.FrameworkDirPath + '\locales';
   GlobalCEFApp.EnableGPU            := True;      // Enable hardware acceleration
   GlobalCEFApp.cache                := TKeymanPaths.CEFDataPath('cache');
-  GlobalCEFApp.cookies              := TKeymanPaths.CEFDataPath('cookies');
+//  GlobalCEFApp.cookies              := TKeymanPaths.CEFDataPath('cookies');
   GlobalCEFApp.UserDataPath         := TKeymanPaths.CEFDataPath('userdata');
-  GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36 (TIKE/'+SKeymanVersion+')';
+  GlobalCEFApp.UserAgent            := GlobalCEFApp.UserAgent + ' (Keyman/'+SKeymanVersion+')';
 
   GlobalCEFApp.OnProcessMessageReceived := GlobalCEFApp_ProcessMessageReceived;
 
@@ -245,7 +246,7 @@ begin
   FWindows.Remove(cef);
 end;
 
-procedure DOMVisitor_GetWindowSize(const browser: ICefBrowser; const document: ICefDomDocument);
+procedure DOMVisitor_GetWindowSize(const browser : ICefBrowser; const frame: ICefFrame; const document: ICefDomDocument);
 const
   NODE_ID = 'size';
 var
@@ -265,12 +266,13 @@ begin
       msg.ArgumentList.SetInt(0, node.ElementBounds.width);
       msg.ArgumentList.SetInt(1, node.ElementBounds.height);
       CefLog('CEFManager', 1, CEF_LOG_SEVERITY_ERROR, 'Sending message '+msg.Name+', '+IntToStr(node.ElementBounds.width)+', '+IntToStr(node.ElementBounds.height));
-      browser.SendProcessMessage(PID_BROWSER, msg);
+      browser.MainFrame.SendProcessMessage(PID_BROWSER, msg);
     end;
   end;
 end;
 
 procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
+                                              const frame         : ICefFrame;
                                                     sourceProcess : TCefProcessId;
                                               const message       : ICefProcessMessage;
                                               var   aHandled      : boolean);
@@ -290,7 +292,7 @@ begin
 
       if (TempFrame <> nil) then
       begin
-        TempVisitor := TCefFastDomVisitor2.Create(browser, DOMVisitor_GetWindowSize);
+        TempVisitor := TCefFastDomVisitor2.Create(browser, browser.MainFrame, DOMVisitor_GetWindowSize);
         TempFrame.VisitDom(TempVisitor);
       end;
 
