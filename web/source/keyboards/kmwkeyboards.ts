@@ -1147,33 +1147,33 @@ namespace com.keyman.keyboards {
       var kbdManager = this;
       var keymanweb = this.keymanweb;
 
-      var TIMEOUT_KEY = "cloud request timed out";
+      const TIMEOUT_KEY = "The Cloud API request timed out.";
+      const MALFORMED_OBJECT_KEY = "The Cloud API returned a malformed object.";
 
       // Some basic support toward #5044, but definitely not a full solution toward it.
-      // We'd want to define an 'associative array' for registration promises, using
-      // the timer ID as the 'key' that would help us retrieve the matching Promise.
-      //
-      // Given that, if the Promise were wrapped and `resolve` and `reject` captured,
-      // the `register` function could then forward the succesfully-retrieved stubs to
-      // the `resolve` method upon success.
-      let promise = new Promise<void>(function(resolve, reject) {
-        var URL='https://api.keyman.com/cloud/4.0/';
-        var tFlag: string;
-        let Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
+      // Wraps the cloud API keyboard-stub request in a Promise, allowing response on network
+      // and/or parser errors.
+      // 
+      // TODO (#5044):  We likely want to define an 'associative array' for these 
+      // Promises, using the timer ID provided within the `register` call as the 'key' 
+      // needed to retrieve the matching Promise.  Given that, if the Promise were wrapped 
+      // and `resolve` and `reject` captured, the `register` function could then forward 
+      // the succesfully-retrieved stubs to the `resolve` method upon success.
 
-        URL = URL + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
-          +'?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
+      const URL='https://api.keyman.com/cloud/4.0/'
+                + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards');
+
+      let promise = new Promise<void>(function(resolve, reject) {
+        const Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
+
+        const queryConfig = '?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
   
         // Set callback timer
-        let timeoutID = window.setTimeout(function() {
+        const timeoutID = window.setTimeout(function() {
           reject(TIMEOUT_KEY);
         } ,10000);
 
-        tFlag='&timerid='+ timeoutID;
-  
-        Lscript.charset="UTF-8";
-        Lscript.src = URL+cmd+tFlag;
-        Lscript.type = 'text/javascript';
+        const tFlag='&timerid='+ timeoutID;
 
         Lscript.onload = function(event: Event) {
           window.clearTimeout(timeoutID);
@@ -1185,6 +1185,8 @@ namespace com.keyman.keyboards {
           window.clearTimeout(timeoutID);
           reject(error);
         }
+
+        Lscript.src = URL + cmd + tFlag + queryConfig;
   
         try {
           document.body.appendChild(Lscript);
@@ -1195,11 +1197,13 @@ namespace com.keyman.keyboards {
 
       promise.catch(function(error) {
         if(error == TIMEOUT_KEY) {
-          kbdManager.serverUnavailable(cmd);
+          // Use the default "cannot connect" message, which is conditioned on empty string.
+          kbdManager.serverUnavailable('');
 
           throw TIMEOUT_KEY;
         } else {
-          throw "The cloud API returned a malformed object."
+          kbdManager.serverUnavailable(MALFORMED_OBJECT_KEY);
+          throw MALFORMED_OBJECT_KEY;
         }
       });
     }
