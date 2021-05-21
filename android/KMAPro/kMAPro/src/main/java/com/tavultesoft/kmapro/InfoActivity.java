@@ -5,7 +5,6 @@
 package com.tavultesoft.kmapro;
 
 import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.BuildConfig;
 
 import android.content.Context;
 import android.graphics.Bitmap;

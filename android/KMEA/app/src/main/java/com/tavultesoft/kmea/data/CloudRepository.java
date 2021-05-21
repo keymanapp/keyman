@@ -70,7 +70,7 @@ public class CloudRepository {
    * @return String of api.keyman.com host
    */
   public static String getHost() {
-    switch (KMManager.getTier(BuildConfig.VERSION_NAME)) {
+    switch (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME)) {
       case ALPHA:
       case BETA:
         return API_STAGING_HOST;
