@@ -111,9 +111,8 @@ begin
   GlobalCEFApp.LocalesDirPath       := GlobalCEFApp.FrameworkDirPath + '\locales';
   GlobalCEFApp.EnableGPU            := True;      // Enable hardware acceleration
   GlobalCEFApp.cache                := TKeymanPaths.CEFDataPath('cache');
-//  GlobalCEFApp.cookies              := TKeymanPaths.CEFDataPath('cookies');
   GlobalCEFApp.UserDataPath         := TKeymanPaths.CEFDataPath('userdata');
-  GlobalCEFApp.UserAgent            := GlobalCEFApp.UserAgent + ' (Keyman/'+SKeymanVersion+')';
+  GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 (Keyman/'+SKeymanVersion+')';
 
   GlobalCEFApp.OnProcessMessageReceived := GlobalCEFApp_ProcessMessageReceived;
 
