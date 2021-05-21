@@ -66,6 +66,7 @@ begin
       iwk.KeyboardIDTemplate := f.KeyboardID;
       iwk.NameTemplate := f.KeyboardName;
       iwk.Copyright := f.Copyright;
+      iwk.FullCopyright := f.FullCopyright;
       iwk.Version := f.Version;
       iwk.BCP47Tags := f.BCP47Tags;
       iwk.Author := f.Author;

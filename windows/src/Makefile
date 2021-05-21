@@ -93,7 +93,7 @@ test:
     cd $(ROOT)\src
 
 unit-tests:
-    cd $(ROOT)\src\unit-tests
+    cd $(ROOT)\src\test\unit-tests
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
