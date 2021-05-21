@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 15.0.51 alpha 2021-05-21
+
+* chore(windows): reorganise tests (#5084)
+* feat(developer): Add 'full copyright' field to templates (#5085)
+* fix(developer): TframeTextEditor.SetText was not synchronous (#5096)
+* chore(android): Update Gradle and other dependencies (#5098)
+* chore(web): add test page for playing with CKEditor (#5089)
+* chore(ios): update fv cert ref (#5123)
+* chore(mac): Add help links for installing Keyman and keyboards (#5108)
+* chore(android): Update targetSDKVersion to 30 (#5126)
+
 ## 15.0.50 alpha 2021-05-20
 
 * chore(common): Check in crowdin strings for Amharic (#5102)
