@@ -5,6 +5,8 @@ title: Install Keyman for macOS
 *Keyman for macOS* is available for [download](https://keyman.com/mac/download) as a standard
 Apple Disk Image (.dmg) file. It should be installed according to the following instructions.
 
+[![Play](../mac_images/video.png) Watch Video](https://youtu.be/7Ax71QeUNfo)
+
 1. Double click the DMG file to open it in Finder.
 2. Double click the **Install Keyman** icon to open the Keyman installer.
 3. You will be prompted to install Keyman. Follow the prompts to complete installation.
