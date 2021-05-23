@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFInterfaces;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -96,6 +94,8 @@ type
   ICefSelectClientCertificateCallback = interface;
   ICefCommandLine = interface;
   ICefRequestHandler = interface;
+  ICefResourceRequestHandler = interface;
+  ICefCookieAccessFilter = interface;
   ICefResourceBundleHandler = interface;
   ICefBrowserProcessHandler = interface;
   ICefRenderProcessHandler = interface;
@@ -116,6 +116,8 @@ type
   ICefJsDialogCallback = interface;
   ICefDownloadItemCallback = interface;
   ICefRequestCallback = interface;
+  ICefResourceSkipCallback = interface;
+  ICefResourceReadCallback = interface;
   ICefResourceHandler = interface;
   ICefResponse = interface;
   ICefResponseFilter = interface;
@@ -139,38 +141,91 @@ type
   ICefWindow = interface;
   ICefLabelButton = interface;
   ICefMenuButton = interface;
+  ICefUrlRequest = interface;
+  ICefPostDataElement = interface;
+  ICefRegistration = interface;
+  ICefMediaRouter = interface;
+  ICefMediaObserver = interface;
+  ICefMediaRoute = interface;
+  ICefMediaRouteCreateCallback = interface;
+  ICefMediaSink = interface;
+  ICefMediaSinkDeviceInfoCallback = interface;
+  ICefMediaSource = interface;
+  ICefAudioHandler = interface;
+  ICefDevToolsMessageObserver = interface;
+  ICefValue = interface;
+  ICefPrintSettings = interface;
 
   TCefv8ValueArray         = array of ICefv8Value;
   TCefX509CertificateArray = array of ICefX509Certificate;
   TCefBinaryValueArray     = array of ICefBinaryValue;
   TCefFrameIdentifierArray = array of int64;
+  TCefPostDataElementArray = array of ICefPostDataElement;
+  TCefMediaRouteArray      = array of ICefMediaRoute;
+  TCefMediaSinkArray       = array of ICefMediaSink;
+  TCefDisplayArray         = array of ICefDisplay;
 
+  TCefMediaSinkInfo = record
+    ID          : ustring;
+    Name        : ustring;
+    Description : ustring;
+    IconType    : TCefMediaSinkIconType;
+    SinkType    : TCefMediaType;
+    SinkIntf    : ICefMediaSink;
+  end;
+  TCefMediaSinkInfoArray = array of TCefMediaSinkInfo;
 
+  TCefMediaRouteInfo = record
+    ID        : ustring;
+    SourceID  : ustring;
+    SinkID    : ustring;
+    RouteIntf : ICefMediaRoute;
+  end;
+  TCefMediaRouteInfoArray = array of TCefMediaRouteInfo;
+
+  TCefMediaSourceInfo = record
+    ID         : ustring;
+    Valid      : boolean;
+    SourceType : TCefMediaType;
+    SourceIntf : ICefMediaSource;
+  end;
+  TCefMediaSourceInfoArray = array of TCefMediaSourceInfo;
 
   // *******************************************
   // ***************** Events ******************
   // *******************************************
 
 
-  TOnRegisterCustomSchemesEvent      = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const registrar: TCefSchemeRegistrarRef) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnRenderThreadCreatedEvent        = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const extraInfo: ICefListValue) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnWebKitInitializedEvent          = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure() {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnBrowserCreatedEvent             = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnBrowserDestroyedEvent           = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnContextCreatedEvent             = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnContextReleasedEvent            = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnUncaughtExceptionEvent          = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context; const exception: ICefV8Exception; const stackTrace: ICefV8StackTrace) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnFocusedNodeChangedEvent         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; const node: ICefDomNode) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnProcessMessageReceivedEvent     = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; sourceProcess: TCefProcessId; const message: ICefProcessMessage; var aHandled : boolean) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnContextInitializedEvent         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure() {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnBeforeChildProcessLaunchEvent   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const commandLine: ICefCommandLine) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnRenderProcessThreadCreatedEvent = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const extraInfo: ICefListValue) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnScheduleMessagePumpWorkEvent    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const delayMs: Int64) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnGetDataResourceEvent            = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(resourceId: Integer; out data: Pointer; out dataSize: NativeUInt; var aResult : Boolean) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnGetLocalizedStringEvent         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(stringId: Integer; out stringVal: ustring; var aResult : Boolean) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnGetDataResourceForScaleEvent    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(resourceId: Integer; scaleFactor: TCefScaleFactor; out data: Pointer; out dataSize: NativeUInt; var aResult : Boolean) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-  TOnCDMRegistrationCompleteEvent    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(result : TCefCDMRegistrationError; const error_message : ustring) {$IFNDEF DELPHI12_UP}of object{$ENDIF};
-
+  TOnRegisterCustomSchemesEvent      = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const registrar: TCefSchemeRegistrarRef) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnRenderThreadCreatedEvent        = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const extraInfo: ICefListValue) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnWebKitInitializedEvent          = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure() {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnBrowserCreatedEvent             = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const extra_info: ICefDictionaryValue) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnBrowserDestroyedEvent           = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnContextCreatedEvent             = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnContextReleasedEvent            = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnUncaughtExceptionEvent          = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context; const exception: ICefV8Exception; const stackTrace: ICefV8StackTrace) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnFocusedNodeChangedEvent         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; const node: ICefDomNode) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnProcessMessageReceivedEvent     = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; sourceProcess: TCefProcessId; const message: ICefProcessMessage; var aHandled : boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF LCL} of object {$ENDIF} {$ENDIF};
+  TOnGetCookieableSchemesEvent       = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(var schemes: TStringList; var include_defaults : boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF LCL} of object {$ENDIF} {$ENDIF};
+  TOnContextInitializedEvent         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure() {$IFNDEF DELPHI12_UP}{$IFNDEF FPC} of object{$ENDIF}{$ENDIF};
+  TOnBeforeChildProcessLaunchEvent   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const commandLine: ICefCommandLine) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnRenderProcessThreadCreatedEvent = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const extraInfo: ICefListValue) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnScheduleMessagePumpWorkEvent    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const delayMs: Int64) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC} of object{$ENDIF}{$ENDIF};
+  TOnGetDefaultClientEvent           = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(var aClient : ICefClient) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC} of object{$ENDIF}{$ENDIF};
+  TOnGetDataResourceEvent            = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(resourceId: Integer; out data: Pointer; out dataSize: NativeUInt; var aResult : Boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnGetLocalizedStringEvent         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(stringId: Integer; out stringVal: ustring; var aResult : Boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnGetDataResourceForScaleEvent    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(resourceId: Integer; scaleFactor: TCefScaleFactor; out data: Pointer; out dataSize: NativeUInt; var aResult : Boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnCDMRegistrationCompleteEvent    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(result : TCefCDMRegistrationError; const error_message : ustring) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnRenderLoadStart                 = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; transitionType: TCefTransitionType) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnRenderLoadEnd                   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; httpStatusCode: Integer) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnRenderLoadError                 = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const frame: ICefFrame; errorCode: TCefErrorCode; const errorText, failedUrl: ustring) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnRenderLoadingStateChange        = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnPrintStartEvent                 = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnPrintSettingsEvent              = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const settings: ICefPrintSettings; getDefaults: boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnPrintDialogEvent                = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; hasSelection: boolean; const callback: ICefPrintDialogCallback; var aResult : boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnPrintJobEvent                   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser; const documentName, PDFFilePath: ustring; const callback: ICefPrintJobCallback; var aResult : boolean) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnPrintResetEvent                 = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser: ICefBrowser) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
+  TOnGetPDFPaperSizeEvent            = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(deviceUnitsPerInch: Integer; var aResult : TCefSize) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC}of object{$ENDIF}{$ENDIF};
 
   // *******************************************
   // **** Callback procedures and functions ****
@@ -179,20 +234,20 @@ type
 
   TCefEndTracingCallbackProc           = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const tracingFile: ustring);
   TCefRegisterCDMProc                  = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(result: TCefCDMRegistrationError; const error_message: ustring);
-  TCefRequestContextHandlerProc        = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function: ICefCookieManager;
   TCefFastTaskProc                     = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure();
   TCefv8ArrayBufferReleaseCallbackProc = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(buffer : Pointer);
   TCefWebPluginInfoVisitorProc         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const info: ICefWebPluginInfo; count, total: Integer): Boolean;
   TCefWebPluginIsUnstableProc          = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const path: ustring; unstable: Boolean);
-  TCefV8AccessorGetterProc             = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name: ustring; const obj: ICefv8Value; out value: ICefv8Value; const exception: ustring): Boolean;
-  TCefV8AccessorSetterProc             = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name: ustring; const obj, value: ICefv8Value; const exception: ustring): Boolean;
-  TCefV8InterceptorGetterByNameProc    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name: ustring; const obj: ICefv8Value; out value: ICefv8Value; const exception: ustring): Boolean;
-  TCefV8InterceptorSetterByNameProc    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name: ustring; const obj, value: ICefv8Value; const exception: ustring): Boolean;
-  TCefV8InterceptorGetterByIndexProc   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(index: integer; const obj: ICefv8Value; out value: ICefv8Value; const exception: ustring): Boolean;
-  TCefV8InterceptorSetterByIndexProc   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(index: integer; const obj, value: ICefv8Value; const exception: ustring): Boolean;
+  TCefV8AccessorGetterProc             = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name: ustring; const object_: ICefv8Value; var value: ICefv8Value; var exception: ustring): Boolean;
+  TCefV8AccessorSetterProc             = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name: ustring; const object_, value: ICefv8Value; var exception: ustring): Boolean;
+  TCefV8InterceptorGetterByNameProc    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name: ustring; const object_: ICefv8Value; var value: ICefv8Value; var exception: ustring): Boolean;
+  TCefV8InterceptorSetterByNameProc    = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name: ustring; const object_, value: ICefv8Value; var exception: ustring): Boolean;
+  TCefV8InterceptorGetterByIndexProc   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(index: integer; const object_: ICefv8Value; var value: ICefv8Value; var exception: ustring): Boolean;
+  TCefV8InterceptorSetterByIndexProc   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(index: integer; const object_, value: ICefv8Value; var exception: ustring): Boolean;
   TOnPdfPrintFinishedProc              = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const path: ustring; ok: Boolean);
   TCefDomVisitorProc                   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const document: ICefDomDocument);
-  TCefDomVisitorProc2                  = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser : ICefBrowser; const document: ICefDomDocument);
+  TCefDomVisitorProc2                  = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser : ICefBrowser; const frame: ICefFrame; const document: ICefDomDocument);
+  TCefDomVisitorProc3                  = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const browser : ICefBrowser; const frame: ICefFrame; const document: ICefDomDocument; const aValue : ustring);
   TCefStringVisitorProc                = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const str: ustring);
   TCefRunFileDialogCallbackProc        = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(selectedAcceptFilter: Integer; const filePaths: TStrings);
   TCefCompletionCallbackProc           = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure();
@@ -200,9 +255,9 @@ type
   TCefDeleteCookiesCallbackProc        = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(numDeleted: Integer);
   TCefNavigationEntryVisitorProc       = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const entry: ICefNavigationEntry; current: Boolean; index, total: Integer): Boolean;
   TOnDownloadImageFinishedProc         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const imageUrl: ustring; httpStatusCode: Integer; const image: ICefImage);
-  TCefCookieVisitorProc                = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; count, total: Integer; out deleteCookie: Boolean): Boolean;
-
-
+  TCefCookieVisitorProc                = {$IFDEF DELPHI12_UP}reference to{$ENDIF} function(const name, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; count, total: Integer; same_site : TCefCookieSameSite; priority : TCefCookiePriority; out deleteCookie: Boolean): Boolean;
+  TCefMediaRouteCreateCallbackProc     = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(result: TCefMediaRouterCreateResult; const error: ustring; const route: ICefMediaRoute);
+  TCefMediaSinkDeviceInfoCallbackProc  = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(const ip_address: ustring; port: integer; const model_name: ustring);
 
   // *******************************************
   // ************ Custom interfaces ************
@@ -264,7 +319,7 @@ type
     procedure GetSettings(var settings: TCefBrowserSettings);
 
     // ICefClient
-    function  doOnProcessMessageReceived(const browser: ICefBrowser; sourceProcess: TCefProcessId; const message: ICefProcessMessage): Boolean;
+    function  doOnProcessMessageReceived(const browser: ICefBrowser; const frame: ICefFrame; sourceProcess: TCefProcessId; const message: ICefProcessMessage): Boolean;
 
     // ICefLoadHandler
     procedure doOnLoadingStateChange(const browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean);
@@ -297,6 +352,7 @@ type
     function  doOnConsoleMessage(const browser: ICefBrowser; level: TCefLogSeverity; const message, source: ustring; line: Integer): Boolean;
     function  doOnAutoResize(const browser: ICefBrowser; const new_size: PCefSize): Boolean;
     procedure doOnLoadingProgressChange(const browser: ICefBrowser; const progress: double);
+    procedure doOnCursorChange(const browser: ICefBrowser; cursor_: TCefCursorHandle; cursorType: TCefCursorType; const customCursorInfo: PCefCursorInfo; var aResult : boolean);
 
     // ICefDownloadHandler
     procedure doOnBeforeDownload(const browser: ICefBrowser; const downloadItem: ICefDownloadItem; const suggestedName: ustring; const callback: ICefBeforeDownloadCallback);
@@ -309,7 +365,7 @@ type
     procedure doOnDialogClosed(const browser: ICefBrowser);
 
     // ICefLifeSpanHandler
-    function  doOnBeforePopup(const browser: ICefBrowser; const frame: ICefFrame; const targetUrl, targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean; const popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo; var client: ICefClient; var settings: TCefBrowserSettings; var noJavascriptAccess: Boolean): Boolean;
+    function  doOnBeforePopup(const browser: ICefBrowser; const frame: ICefFrame; const targetUrl, targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean; const popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo; var client: ICefClient; var settings: TCefBrowserSettings; var extra_info: ICefDictionaryValue; var noJavascriptAccess: Boolean): Boolean;
     procedure doOnAfterCreated(const browser: ICefBrowser);
     procedure doOnBeforeClose(const browser: ICefBrowser);
     function  doOnClose(const browser: ICefBrowser): Boolean;
@@ -317,22 +373,28 @@ type
     // ICefRequestHandler
     function  doOnBeforeBrowse(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; user_gesture, isRedirect: Boolean): Boolean;
     function  doOnOpenUrlFromTab(const browser: ICefBrowser; const frame: ICefFrame; const targetUrl: ustring; targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean): Boolean;
-    function  doOnBeforeResourceLoad(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const callback: ICefRequestCallback): TCefReturnValue;
-    function  doOnGetResourceHandler(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest): ICefResourceHandler;
-    procedure doOnResourceRedirect(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; var newUrl: ustring);
-    function  doOnResourceResponse(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse): Boolean;
-    function  doOnGetResourceResponseFilter(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse): ICefResponseFilter;
-    procedure doOnResourceLoadComplete(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; status: TCefUrlRequestStatus; receivedContentLength: Int64);
-    function  doOnGetAuthCredentials(const browser: ICefBrowser; const frame: ICefFrame; isProxy: Boolean; const host: ustring; port: Integer; const realm, scheme: ustring; const callback: ICefAuthCallback): Boolean;
-    function  doCanGetCookies(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest): boolean;
-    function  doCanSetCookie(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const cookie : PCefCookie): boolean;
+    procedure doGetResourceRequestHandler_ReqHdlr(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; is_navigation, is_download: boolean; const request_initiator: ustring; var disable_default_handling: boolean; var aResourceRequestHandler : ICefResourceRequestHandler);
+    function  doOnGetAuthCredentials(const browser: ICefBrowser; const originUrl: ustring; isProxy: Boolean; const host: ustring; port: Integer; const realm, scheme: ustring; const callback: ICefAuthCallback): Boolean;
     function  doOnQuotaRequest(const browser: ICefBrowser; const originUrl: ustring; newSize: Int64; const callback: ICefRequestCallback): Boolean;
-    procedure doOnProtocolExecution(const browser: ICefBrowser; const url: ustring; out allowOsExecution: Boolean);
     function  doOnCertificateError(const browser: ICefBrowser; certError: TCefErrorcode; const requestUrl: ustring; const sslInfo: ICefSslInfo; const callback: ICefRequestCallback): Boolean;
     function  doOnSelectClientCertificate(const browser: ICefBrowser; isProxy: boolean; const host: ustring; port: integer; certificatesCount: NativeUInt; const certificates: TCefX509CertificateArray; const callback: ICefSelectClientCertificateCallback): boolean;
     procedure doOnPluginCrashed(const browser: ICefBrowser; const pluginPath: ustring);
     procedure doOnRenderViewReady(const browser: ICefBrowser);
     procedure doOnRenderProcessTerminated(const browser: ICefBrowser; status: TCefTerminationStatus);
+    procedure doOnDocumentAvailableInMainFrame(const browser: ICefBrowser);
+
+    // ICefResourceRequestHandler
+    function  doOnBeforeResourceLoad(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const callback: ICefRequestCallback): TCefReturnValue;
+    procedure doOnGetResourceHandler(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; var aResourceHandler: ICefResourceHandler);
+    procedure doOnResourceRedirect(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; var newUrl: ustring);
+    function  doOnResourceResponse(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse): Boolean;
+    procedure doOnGetResourceResponseFilter(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; var aResponseFilter: ICefResponseFilter);
+    procedure doOnResourceLoadComplete(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; status: TCefUrlRequestStatus; receivedContentLength: Int64);
+    procedure doOnProtocolExecution(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; var allowOsExecution: Boolean);
+
+    // ICefCookieAccessFilter
+    function  doCanSendCookie(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const cookie: PCefCookie): boolean;
+    function  doCanSaveCookie(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; const cookie: PCefCookie): boolean;
 
     // ICefDialogHandler
     function  doOnFileDialog(const browser: ICefBrowser; mode: TCefFileDialogMode; const title, defaultFilePath: ustring; const acceptFilters: TStrings; selectedAcceptFilter: Integer; const callback: ICefFileDialogCallback): Boolean;
@@ -340,25 +402,61 @@ type
     // ICefRenderHandler
     procedure doOnGetAccessibilityHandler(var aAccessibilityHandler : ICefAccessibilityHandler);
     function  doOnGetRootScreenRect(const browser: ICefBrowser; var rect: TCefRect): Boolean;
-    function  doOnGetViewRect(const browser: ICefBrowser; var rect: TCefRect): Boolean;
+    procedure doOnGetViewRect(const browser: ICefBrowser; var rect: TCefRect);
     function  doOnGetScreenPoint(const browser: ICefBrowser; viewX, viewY: Integer; var screenX, screenY: Integer): Boolean;
     function  doOnGetScreenInfo(const browser: ICefBrowser; var screenInfo: TCefScreenInfo): Boolean;
     procedure doOnPopupShow(const browser: ICefBrowser; show: Boolean);
     procedure doOnPopupSize(const browser: ICefBrowser; const rect: PCefRect);
-    procedure doOnPaint(const browser: ICefBrowser; kind: TCefPaintElementType; dirtyRectsCount: NativeUInt; const dirtyRects: PCefRectArray; const buffer: Pointer; width, height: Integer);
-    procedure doOnCursorChange(const browser: ICefBrowser; cursor: TCefCursorHandle; cursorType: TCefCursorType; const customCursorInfo: PCefCursorInfo);
+    procedure doOnPaint(const browser: ICefBrowser; type_: TCefPaintElementType; dirtyRectsCount: NativeUInt; const dirtyRects: PCefRectArray; const buffer: Pointer; width, height: Integer);
+    procedure doOnAcceleratedPaint(const browser: ICefBrowser; type_: TCefPaintElementType; dirtyRectsCount: NativeUInt; const dirtyRects: PCefRectArray; shared_handle: Pointer);
     function  doOnStartDragging(const browser: ICefBrowser; const dragData: ICefDragData; allowedOps: TCefDragOperations; x, y: Integer): Boolean;
     procedure doOnUpdateDragCursor(const browser: ICefBrowser; operation: TCefDragOperation);
     procedure doOnScrollOffsetChanged(const browser: ICefBrowser; x, y: Double);
     procedure doOnIMECompositionRangeChanged(const browser: ICefBrowser; const selected_range: PCefRange; character_boundsCount: NativeUInt; const character_bounds: PCefRect);
     procedure doOnTextSelectionChanged(const browser: ICefBrowser; const selected_text: ustring; const selected_range: PCefRange);
+    procedure doOnVirtualKeyboardRequested(const browser: ICefBrowser; input_mode: TCefTextInpuMode);
 
     // ICefDragHandler
     function  doOnDragEnter(const browser: ICefBrowser; const dragData: ICefDragData; mask: TCefDragOperations): Boolean;
-    procedure doOnDraggableRegionsChanged(const browser: ICefBrowser; regionsCount: NativeUInt; regions: PCefDraggableRegionArray);
+    procedure doOnDraggableRegionsChanged(const browser: ICefBrowser; const frame: ICefFrame; regionsCount: NativeUInt; const regions: PCefDraggableRegionArray);
 
     // ICefFindHandler
     procedure doOnFindResult(const browser: ICefBrowser; identifier, count: Integer; const selectionRect: PCefRect; activeMatchOrdinal: Integer; finalUpdate: Boolean);
+
+    // ICefRequestContextHandler
+    procedure doOnRequestContextInitialized(const request_context: ICefRequestContext);
+    function  doOnBeforePluginLoad(const mimeType, pluginUrl:ustring; isMainFrame : boolean; const topOriginUrl: ustring; const pluginInfo: ICefWebPluginInfo; var pluginPolicy: TCefPluginPolicy): Boolean;
+    procedure doGetResourceRequestHandler_ReqCtxHdlr(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; is_navigation, is_download: boolean; const request_initiator: ustring; var disable_default_handling: boolean; var aResourceRequestHandler : ICefResourceRequestHandler);
+
+    // ICefMediaObserver
+    procedure doOnSinks(const sinks: TCefMediaSinkArray);
+    procedure doOnRoutes(const routes: TCefMediaRouteArray);
+    procedure doOnRouteStateChanged(const route: ICefMediaRoute; state: TCefMediaRouteConnectionState);
+    procedure doOnRouteMessageReceived(const route: ICefMediaRoute; const message_: ustring);
+
+    // ICefAudioHandler
+    procedure doOnGetAudioParameters(const browser: ICefBrowser; var params: TCefAudioParameters; var aResult: boolean);
+    procedure doOnAudioStreamStarted(const browser: ICefBrowser; const params: TCefAudioParameters; channels: integer);
+    procedure doOnAudioStreamPacket(const browser: ICefBrowser; const data : PPSingle; frames: integer; pts: int64);
+    procedure doOnAudioStreamStopped(const browser: ICefBrowser);
+    procedure doOnAudioStreamError(const browser: ICefBrowser; const message_: ustring);
+
+    // ICefDevToolsMessageObserver
+    procedure doOnDevToolsMessage(const browser: ICefBrowser; const message_: Pointer; message_size: NativeUInt; var aHandled: boolean);
+    procedure doOnDevToolsMethodResult(const browser: ICefBrowser; message_id: integer; success: boolean; const result: Pointer; result_size: NativeUInt);
+    procedure doOnDevToolsEvent(const browser: ICefBrowser; const method: ustring; const params: Pointer; params_size: NativeUInt);
+    procedure doOnDevToolsAgentAttached(const browser: ICefBrowser);
+    procedure doOnDevToolsAgentDetached(const browser: ICefBrowser);
+
+    // ICefExtensionHandler
+    procedure doOnExtensionLoadFailed(result: TCefErrorcode);
+    procedure doOnExtensionLoaded(const extension: ICefExtension);
+    procedure doOnExtensionUnloaded(const extension: ICefExtension);
+    function  doOnExtensionBeforeBackgroundBrowser(const extension: ICefExtension; const url: ustring; var client: ICefClient; var settings: TCefBrowserSettings) : boolean;
+    function  doOnExtensionBeforeBrowser(const extension: ICefExtension; const browser, active_browser: ICefBrowser; index: Integer; const url: ustring; active: boolean; var windowInfo: TCefWindowInfo; var client: ICefClient; var settings: TCefBrowserSettings) : boolean;
+    procedure doOnExtensionGetActiveBrowser(const extension: ICefExtension; const browser: ICefBrowser; include_incognito: boolean; var aRsltBrowser: ICefBrowser);
+    function  doOnExtensionCanAccessBrowser(const extension: ICefExtension; const browser: ICefBrowser; include_incognito: boolean; const target_browser: ICefBrowser): boolean;
+    function  doOnExtensionGetExtensionResource(const extension: ICefExtension; const browser: ICefBrowser; const file_: ustring; const callback: ICefGetExtensionResourceCallback): boolean;
 
     // Custom
     procedure doCookiesDeleted(numDeleted : integer);
@@ -368,6 +466,43 @@ type
     procedure doUpdateOwnPreferences;
     function  doSavePreferences : boolean;
     procedure doResolvedHostAvailable(result: TCefErrorCode; const resolvedIps: TStrings);
+    function  doNavigationVisitorResultAvailable(const entry: ICefNavigationEntry; current: Boolean; index, total: Integer) : boolean;
+    procedure doDownloadImageFinished(const imageUrl: ustring; httpStatusCode: Integer; const image: ICefImage);
+    procedure doOnCookiesStoreFlushed;
+    procedure doCertificateExceptionsCleared;
+    procedure doHttpAuthCredentialsCleared;
+    procedure doAllConnectionsClosed;
+    procedure doOnExecuteTaskOnCefThread(aTaskID : cardinal);
+    procedure doOnCookiesVisited(const name_, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; count, total, aID : Integer; same_site : TCefCookieSameSite; priority : TCefCookiePriority; var aDeleteCookie, aResult : Boolean);
+    procedure doOnCookieVisitorDestroyed(aID : integer);
+    procedure doOnCookieSet(aSuccess : boolean; aID : integer);
+    procedure doUpdateZoomStep(aInc : boolean);
+    procedure doUpdateZoomPct(aInc : boolean);
+    procedure doSetZoomLevel(const aValue : double);
+    procedure doSetZoomPct(const aValue : double);
+    procedure doSetZoomStep(aValue : byte);
+    procedure doReadZoom;
+    procedure doMediaRouteCreateFinished(result: TCefMediaRouterCreateResult; const error: ustring; const route: ICefMediaRoute);
+    procedure doOnMediaSinkDeviceInfo(const ip_address: ustring; port: integer; const model_name: ustring);
+    procedure doBrowserNavigation(aTask : TCefBrowserNavigation);
+    function  MustCreateAudioHandler : boolean;
+    function  MustCreateLoadHandler : boolean;
+    function  MustCreateFocusHandler : boolean;
+    function  MustCreateContextMenuHandler : boolean;
+    function  MustCreateDialogHandler : boolean;
+    function  MustCreateKeyboardHandler : boolean;
+    function  MustCreateDisplayHandler : boolean;
+    function  MustCreateDownloadHandler : boolean;
+    function  MustCreateJsDialogHandler : boolean;
+    function  MustCreateLifeSpanHandler : boolean;
+    function  MustCreateRenderHandler : boolean;
+    function  MustCreateRequestHandler : boolean;
+    function  MustCreateDragHandler : boolean;
+    function  MustCreateFindHandler : boolean;
+    function  MustCreateResourceRequestHandler : boolean;
+    function  MustCreateCookieAccessFilter : boolean;
+    function  MustCreateRequestContextHandler : boolean;
+    function  MustCreateMediaObserver : boolean;
   end;
 
   IServerEvents = interface
@@ -382,6 +517,18 @@ type
     procedure doOnWebSocketMessage(const server: ICefServer; connection_id: Integer; const data: Pointer; data_size: NativeUInt);
   end;
 
+  ICEFUrlRequestClientEvents = interface
+    ['{1AA800A7-56A1-43CA-A224-49368F18BDD8}']
+    // ICefUrlrequestClient
+    procedure doOnRequestComplete(const request: ICefUrlRequest);
+    procedure doOnUploadProgress(const request: ICefUrlRequest; current, total: Int64);
+    procedure doOnDownloadProgress(const request: ICefUrlRequest; current, total: Int64);
+    procedure doOnDownloadData(const request: ICefUrlRequest; data: Pointer; dataLength: NativeUInt);
+    function  doOnGetAuthCredentials(isProxy: Boolean; const host: ustring; port: Integer; const realm, scheme: ustring; const callback: ICefAuthCallback): Boolean;
+
+    // Custom
+    procedure doOnCreateURLRequest;
+  end;
 
 
   // *******************************************
@@ -394,7 +541,11 @@ type
   ICefBaseRefCounted = interface
     ['{1F9A7B44-DCDC-4477-9180-3ADD44BDEB7B}']
     function Wrap: Pointer;
-    function SameAs(aData : Pointer) : boolean;
+    function SameAs(aData : Pointer) : boolean; overload;
+    function SameAs(const aBaseRefCounted : ICefBaseRefCounted) : boolean; overload;
+    function HasOneRef : boolean;
+    function HasAtLeastOneRef : boolean;
+    procedure DestroyOtherRefs;
   end;
 
   // TCefRunFileDialogCallback
@@ -446,15 +597,16 @@ type
     procedure Print;
     procedure PrintToPdf(const path: ustring; settings: PCefPdfPrintSettings; const callback: ICefPdfPrintCallback);
     procedure PrintToPdfProc(const path: ustring; settings: PCefPdfPrintSettings; const callback: TOnPdfPrintFinishedProc);
-    procedure Find(identifier: Integer; const searchText: ustring; forward, matchCase, findNext: Boolean);
+    procedure Find(identifier: Integer; const searchText: ustring; forward_, matchCase, findNext: Boolean);
     procedure StopFinding(clearSelection: Boolean);
     procedure ShowDevTools(const windowInfo: PCefWindowInfo; const client: ICefClient; const settings: PCefBrowserSettings; inspectElementAt: PCefPoint);
     procedure CloseDevTools;
     function  HasDevTools: Boolean;
+    function  SendDevToolsMessage(const message_: ustring): boolean;
+    function  ExecuteDevToolsMethod(message_id: integer; const method: ustring; const params: ICefDictionaryValue): Integer;
+    function  AddDevToolsMessageObserver(const observer: ICefDevToolsMessageObserver): ICefRegistration;
     procedure GetNavigationEntries(const visitor: ICefNavigationEntryVisitor; currentOnly: Boolean);
     procedure GetNavigationEntriesProc(const proc: TCefNavigationEntryVisitorProc; currentOnly: Boolean);
-    procedure SetMouseCursorChangeDisabled(disabled: Boolean);
-    function  IsMouseCursorChangeDisabled: Boolean;
     procedure ReplaceMisspelling(const word: ustring);
     procedure AddWordToDictionary(const word: ustring);
     function  IsWindowRenderingDisabled: Boolean;
@@ -462,23 +614,25 @@ type
     procedure WasHidden(hidden: Boolean);
     procedure NotifyScreenInfoChanged;
     procedure Invalidate(kind: TCefPaintElementType);
+    procedure SendExternalBeginFrame;
     procedure SendKeyEvent(const event: PCefKeyEvent);
-    procedure SendMouseClickEvent(const event: PCefMouseEvent; kind: TCefMouseButtonType; mouseUp: Boolean; clickCount: Integer);
+    procedure SendMouseClickEvent(const event: PCefMouseEvent; type_: TCefMouseButtonType; mouseUp: Boolean; clickCount: Integer);
     procedure SendMouseMoveEvent(const event: PCefMouseEvent; mouseLeave: Boolean);
     procedure SendMouseWheelEvent(const event: PCefMouseEvent; deltaX, deltaY: Integer);
+    procedure SendTouchEvent(const event: PCefTouchEvent);
     procedure SendFocusEvent(aSetFocus: Boolean);
     procedure SendCaptureLostEvent;
     procedure NotifyMoveOrResizeStarted;
     function  GetWindowlessFrameRate : Integer;
     procedure SetWindowlessFrameRate(frameRate: Integer);
-    procedure IMESetComposition(const text: ustring; underlinesCount : NativeUInt; const underlines : PCefCompositionUnderline; const replacement_range, selection_range : PCefRange);
+    procedure IMESetComposition(const text: ustring; const underlines : TCefCompositionUnderlineDynArray; const replacement_range, selection_range : PCefRange);
     procedure IMECommitText(const text: ustring; const replacement_range : PCefRange; relative_cursor_pos : integer);
     procedure IMEFinishComposingText(keep_selection : boolean);
     procedure IMECancelComposition;
     procedure DragTargetDragEnter(const dragData: ICefDragData; const event: PCefMouseEvent; allowedOps: TCefDragOperations);
     procedure DragTargetDragOver(const event: PCefMouseEvent; allowedOps: TCefDragOperations);
     procedure DragTargetDragLeave;
-    procedure DragTargetDrop(event: PCefMouseEvent);
+    procedure DragTargetDrop(const event: PCefMouseEvent);
     procedure DragSourceEndedAt(x, y: Integer; op: TCefDragOperation);
     procedure DragSourceSystemDragEnded;
     function  GetVisibleNavigationEntry : ICefNavigationEntry;
@@ -486,13 +640,15 @@ type
     procedure SetAutoResizeEnabled(enabled: boolean; const min_size, max_size: PCefSize);
     function  GetExtension : ICefExtension;
     function  IsBackgroundHost : boolean;
+    procedure SetAudioMuted(mute: boolean);
+    function  IsAudioMuted : boolean;
 
-    property Browser                : ICefBrowser              read GetBrowser;
-    property WindowHandle           : TCefWindowHandle         read GetWindowHandle;
-    property OpenerWindowHandle     : TCefWindowHandle         read GetOpenerWindowHandle;
-    property ZoomLevel              : Double                   read GetZoomLevel               write SetZoomLevel;
-    property RequestContext         : ICefRequestContext       read GetRequestContext;
-    property VisibleNavigationEntry : ICefNavigationEntry      read GetVisibleNavigationEntry;
+    property Browser                    : ICefBrowser              read GetBrowser;
+    property WindowHandle               : TCefWindowHandle         read GetWindowHandle;
+    property OpenerWindowHandle         : TCefWindowHandle         read GetOpenerWindowHandle;
+    property ZoomLevel                  : Double                   read GetZoomLevel                 write SetZoomLevel;
+    property RequestContext             : ICefRequestContext       read GetRequestContext;
+    property VisibleNavigationEntry     : ICefNavigationEntry      read GetVisibleNavigationEntry;
   end;
 
   // TCefProcessMessage
@@ -532,7 +688,6 @@ type
     function  GetFrameCount: NativeUInt;
     function  GetFrameIdentifiers(var aFrameCount : NativeUInt; var aFrameIdentifierArray : TCefFrameIdentifierArray) : boolean;
     function  GetFrameNames(var aFrameNames : TStrings) : boolean;
-    function  SendProcessMessage(targetProcess: TCefProcessId; const ProcMessage: ICefProcessMessage): Boolean;
 
     property MainFrame    : ICefFrame       read GetMainFrame;
     property FocusedFrame : ICefFrame       read GetFocusedFrame;
@@ -561,10 +716,10 @@ type
     ['{1E677630-9339-4732-BB99-D6FE4DE4AEC0}']
     function  IsReadOnly: Boolean;
     function  HasExcludedElements: Boolean;
-    function  GetCount: NativeUInt;
-    function  GetElements(Count: NativeUInt): IInterfaceList; // list of ICefPostDataElement
-    function  RemoveElement(const element: ICefPostDataElement): Integer;
-    function  AddElement(const element: ICefPostDataElement): Integer;
+    function  GetElementCount: NativeUInt;
+    procedure GetElements(elementsCount: NativeUInt; var elements: TCefPostDataElementArray);
+    function  RemoveElement(const element: ICefPostDataElement): Boolean;
+    function  AddElement(const element: ICefPostDataElement): Boolean;
     procedure RemoveElements;
   end;
 
@@ -584,6 +739,8 @@ type
     function  GetReferrerPolicy: TCefReferrerPolicy;
     procedure SetPostData(const value: ICefPostData);
     procedure SetHeaderMap(const HeaderMap: ICefStringMultimap);
+    function  GetHeaderByName(const name: ustring): ustring;
+    procedure SetHeaderByName(const name, value: ustring; overwrite: boolean);
     function  GetFlags: TCefUrlRequestFlags;
     procedure SetFlags(flags: TCefUrlRequestFlags);
     function  GetFirstPartyForCookies: ustring;
@@ -631,7 +788,6 @@ type
     procedure GetTextProc(const proc: TCefStringVisitorProc);
     procedure LoadRequest(const request: ICefRequest);
     procedure LoadUrl(const url: ustring);
-    procedure LoadString(const str, url: ustring);
     procedure ExecuteJavaScript(const code, scriptUrl: ustring; startLine: Integer);
     function  IsMain: Boolean;
     function  IsFocused: Boolean;
@@ -643,6 +799,8 @@ type
     function  GetV8Context: ICefv8Context;
     procedure VisitDom(const visitor: ICefDomVisitor);
     procedure VisitDomProc(const proc: TCefDomVisitorProc);
+    function  CreateUrlRequest(const request: ICefRequest; const client: ICefUrlrequestClient): ICefUrlRequest;
+    procedure SendProcessMessage(targetProcess: TCefProcessId; const message_: ICefProcessMessage);
 
     property Name       : ustring     read GetName;
     property Url        : ustring     read GetUrl;
@@ -708,7 +866,10 @@ type
     procedure SetStatusText(const StatusText: ustring);
     function  GetMimeType: ustring;
     procedure SetMimeType(const mimetype: ustring);
-    function  GetHeader(const name: ustring): ustring;
+    function  GetCharset: ustring;
+    procedure SetCharset(const charset: ustring);
+    function  GetHeaderByName(const name: ustring): ustring;
+    procedure SetHeaderByName(const name, value: ustring; overwrite: boolean);
     procedure GetHeaderMap(const headerMap: ICefStringMultimap);
     procedure SetHeaderMap(const headerMap: ICefStringMultimap);
     function  GetURL: ustring;
@@ -717,6 +878,7 @@ type
     property Status     : Integer       read GetStatus      write SetStatus;
     property StatusText : ustring       read GetStatusText  write SetStatusText;
     property MimeType   : ustring       read GetMimeType    write SetMimeType;
+    property Charset    : ustring       read GetCharset     write SetCharset;
     property Error      : TCefErrorCode read GetError       write SetError;
     property URL        : ustring       read GetURL         write SetURL;
   end;
@@ -837,25 +999,25 @@ type
   // /include/capi/cef_v8_capi.h (cef_v8handler_t)
   ICefv8Handler = interface(ICefBaseRefCounted)
     ['{F94CDC60-FDCB-422D-96D5-D2A775BD5D73}']
-    function Execute(const name: ustring; const obj: ICefv8Value; const arguments: TCefv8ValueArray; var retval: ICefv8Value; var exception: ustring): Boolean;
+    function Execute(const name: ustring; const object_: ICefv8Value; const arguments: TCefv8ValueArray; var retval: ICefv8Value; var exception: ustring): Boolean;
   end;
 
   // TCefV8Interceptor
   // /include/capi/cef_v8_capi.h (cef_v8interceptor_t)
   ICefV8Interceptor = interface(ICefBaseRefCounted)
     ['{B3B8FD7C-A916-4B25-93A2-2892AC324F21}']
-    function GetByName(const name: ustring; const obj: ICefv8Value; out retval: ICefv8Value; const exception: ustring): boolean;
-    function GetByIndex(index: integer; const obj: ICefv8Value; out retval: ICefv8Value; const exception: ustring): boolean;
-    function SetByName(const name: ustring; const obj, value: ICefv8Value; const exception: ustring): boolean;
-    function SetByIndex(index: integer; const obj, value: ICefv8Value; const exception: ustring): boolean;
+    function GetByName(const name: ustring; const object_: ICefv8Value; var retval: ICefv8Value; var exception: ustring): boolean;
+    function GetByIndex(index: integer; const object_: ICefv8Value; var retval: ICefv8Value; var exception: ustring): boolean;
+    function SetByName(const name: ustring; const object_, value: ICefv8Value; var exception: ustring): boolean;
+    function SetByIndex(index: integer; const object_, value: ICefv8Value; var exception: ustring): boolean;
   end;
 
   // TCefV8Accessor
   // /include/capi/cef_v8_capi.h (cef_v8accessor_t)
   ICefV8Accessor = interface(ICefBaseRefCounted)
     ['{DCA6D4A2-726A-4E24-AA64-5E8C731D868A}']
-    function Get(const name: ustring; const obj: ICefv8Value; out retval: ICefv8Value; var exception: ustring): Boolean;
-    function Put(const name: ustring; const obj, value: ICefv8Value; var exception: ustring): Boolean;
+    function Get(const name: ustring; const object_: ICefv8Value; var retval: ICefv8Value; var exception: ustring): Boolean;
+    function Set_(const name: ustring; const object_, value: ICefv8Value; var exception: ustring): Boolean;
   end;
 
   // TCefTask
@@ -1124,7 +1286,7 @@ type
   // /include/capi/cef_cookie_capi.h (cef_cookie_visitor_t)
   ICefCookieVisitor = interface(ICefBaseRefCounted)
     ['{8378CF1B-84AB-4FDB-9B86-34DDABCCC402}']
-    function visit(const name, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; count, total: Integer; out deleteCookie: Boolean): Boolean;
+    function visit(const name, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; count, total: Integer; same_site : TCefCookieSameSite; priority : TCefCookiePriority; out deleteCookie: Boolean): Boolean;
   end;
 
   // TCefCommandLine
@@ -1144,7 +1306,8 @@ type
     function  HasSwitches: Boolean;
     function  HasSwitch(const name: ustring): Boolean;
     function  GetSwitchValue(const name: ustring): ustring;
-    procedure GetSwitches(var switches: TStrings);
+    function  GetSwitches(var switches: TStrings): boolean; overload;
+    function  GetSwitches(var SwitchKeys, SwitchValues: TStringList): boolean; overload;
     procedure AppendSwitch(const name: ustring);
     procedure AppendSwitchWithValue(const name, value: ustring);
     function  HasArguments: Boolean;
@@ -1155,6 +1318,111 @@ type
     property  CommandLineString  : ustring   read GetCommandLineString;
   end;
 
+  // TCefRegistration
+  // /include/capi/cef_registration_capi.h (cef_registration_t)
+  ICefRegistration = interface(ICefBaseRefCounted)
+    ['{9226018F-7A56-4F2E-AF01-43268E33EE6B}']
+  end;
+
+  // TCefDevToolsMessageObserver
+  // /include/capi/cef_devtools_message_observer_capi.h (cef_dev_tools_message_observer_t)
+  ICefDevToolsMessageObserver = interface(ICefBaseRefCounted)
+    ['{76E5BB2B-7F69-4BC9-94C7-B55C61CE630F}']
+    procedure OnDevToolsMessage(const browser: ICefBrowser; const message_: Pointer; message_size: NativeUInt; var aHandled: boolean);
+    procedure OnDevToolsMethodResult(const browser: ICefBrowser; message_id: integer; success: boolean; const result: Pointer; result_size: NativeUInt);
+    procedure OnDevToolsEvent(const browser: ICefBrowser; const method: ustring; const params: Pointer; params_size: NativeUInt);
+    procedure OnDevToolsAgentAttached(const browser: ICefBrowser);
+    procedure OnDevToolsAgentDetached(const browser: ICefBrowser);
+  end;
+
+  // TCefMediaRouter
+  // /include/capi/cef_media_router_capi.h (cef_media_router_t)
+  ICefMediaRouter = interface(ICefBaseRefCounted)
+    ['{F18C3880-CB8D-48F9-9D74-DCFF4B9E88DF}']
+    function  AddObserver(const observer: ICefMediaObserver): ICefRegistration;
+    function  GetSource(const urn: ustring): ICefMediaSource;
+    procedure NotifyCurrentSinks;
+    procedure CreateRoute(const source: ICefMediaSource; const sink: ICefMediaSink; const callback: ICefMediaRouteCreateCallback);
+    procedure NotifyCurrentRoutes;
+  end;
+
+  // TCefMediaObserver
+  // /include/capi/cef_media_router_capi.h (cef_media_observer_t)
+  ICefMediaObserver = interface(ICefBaseRefCounted)
+    ['{0B27C8D1-63E3-4F69-939F-DCAD518654A3}']
+    procedure OnSinks(const sinks: TCefMediaSinkArray);
+    procedure OnRoutes(const routes: TCefMediaRouteArray);
+    procedure OnRouteStateChanged(const route: ICefMediaRoute; state: TCefMediaRouteConnectionState);
+    procedure OnRouteMessageReceived(const route: ICefMediaRoute; const message_: ustring);
+  end;
+
+  ICefMediaObserverEvents = interface
+    ['{267D5287-08DB-49D6-AF6E-B27C66C6E5D4}']
+    procedure doOnSinks(const sinks: TCefMediaSinkArray);
+    procedure doOnRoutes(const routes: TCefMediaRouteArray);
+    procedure doOnRouteStateChanged(const route: ICefMediaRoute; state: TCefMediaRouteConnectionState);
+    procedure doOnRouteMessageReceived(const route: ICefMediaRoute; const message_: ustring);
+  end;
+
+  // TCefMediaRoute
+  // /include/capi/cef_media_router_capi.h (cef_media_observer_t)
+  ICefMediaRoute = interface(ICefBaseRefCounted)
+    ['{D8959122-DD19-4933-B4D9-DF829062A0D3}']
+    function  GetId: ustring;
+    function  GetSource: ICefMediaSource;
+    function  GetSink: ICefMediaSink;
+    procedure SendRouteMessage(const message_: ustring);
+    procedure Terminate;
+
+    property ID     : ustring         read GetId;
+    property Source : ICefMediaSource read GetSource;
+    property Sink   : ICefMediaSink   read GetSink;
+  end;
+
+  // TCefMediaRouteCreateCallback
+  // /include/capi/cef_media_router_capi.h (cef_media_route_create_callback_t)
+  ICefMediaRouteCreateCallback = interface(ICefBaseRefCounted)
+    ['{8848CBFE-36AC-4AC8-BC10-386B69FB27BE}']
+    procedure OnMediaRouteCreateFinished(result: TCefMediaRouterCreateResult; const error: ustring; const route: ICefMediaRoute);
+  end;
+
+  //
+  ICefMediaSinkDeviceInfoCallback = interface(ICefBaseRefCounted)
+    ['{633898DD-4169-45D0-ADDD-6E68B3686E0D}']
+    procedure OnMediaSinkDeviceInfo(const ip_address: ustring; port: integer; const model_name: ustring);
+  end;
+
+  // TCefMediaSink
+  // /include/capi/cef_media_router_capi.h (cef_media_sink_t)
+  ICefMediaSink = interface(ICefBaseRefCounted)
+    ['{EDA1A4B2-2A4C-42DD-A7DF-901BF93D908D}']
+    function  GetId: ustring;
+    function  GetName: ustring;
+    function  GetDescription: ustring;
+    function  GetIconType: TCefMediaSinkIconType;
+    procedure GetDeviceInfo(const callback: ICefMediaSinkDeviceInfoCallback);
+    function  IsCastSink: boolean;
+    function  IsDialSink: boolean;
+    function  IsCompatibleWith(const source: ICefMediaSource): boolean;
+
+    property ID          : ustring               read GetId;
+    property Name        : ustring               read GetName;
+    property Description : ustring               read GetDescription;
+    property IconType    : TCefMediaSinkIconType read GetIconType;
+  end;
+
+  // TCefMediaSource
+  // /include/capi/cef_media_router_capi.h (cef_media_source_t)
+  ICefMediaSource = interface(ICefBaseRefCounted)
+    ['{734ED6E4-6498-43ED-AAA4-6B993EDC30BE}']
+    function GetId : ustring;
+    function IsCastSource : boolean;
+    function IsDialSource : boolean;
+
+    property ID : ustring read GetId;
+  end;
+
+
   // TCefResourceBundleHandler
   // /include/capi/cef_resource_bundle_handler_capi.h (cef_resource_bundle_handler_t)
   ICefResourceBundleHandler = interface(ICefBaseRefCounted)
@@ -1162,33 +1430,39 @@ type
     function GetLocalizedString(stringId: Integer; var stringVal: ustring): Boolean;
     function GetDataResource(resourceId: Integer; var data: Pointer; var dataSize: NativeUInt): Boolean;
     function GetDataResourceForScale(resourceId: Integer; scaleFactor: TCefScaleFactor; var data: Pointer; var dataSize: NativeUInt): Boolean;
+
+    procedure RemoveReferences; // custom procedure to clear all references
   end;
 
   // TCefBrowserProcessHandler
   // /include/capi/cef_browser_process_handler_capi.h (cef_browser_process_handler_t)
   ICefBrowserProcessHandler = interface(ICefBaseRefCounted)
     ['{27291B7A-C0AE-4EE0-9115-15C810E22F6C}']
+    procedure GetCookieableSchemes(var schemes: TStringList; var include_defaults : boolean);
     procedure OnContextInitialized;
     procedure OnBeforeChildProcessLaunch(const commandLine: ICefCommandLine);
-    procedure OnRenderProcessThreadCreated(const extraInfo: ICefListValue);
     procedure GetPrintHandler(var aHandler : ICefPrintHandler);
     procedure OnScheduleMessagePumpWork(const delayMs: Int64);
+    procedure GetDefaultClient(var aClient : ICefClient);
+
+    procedure RemoveReferences; // custom procedure to clear all references
   end;
 
   // TCefRenderProcessHandler
   // /include/capi/cef_render_process_handler_capi.h (cef_render_process_handler_t)
   ICefRenderProcessHandler = interface(ICefBaseRefCounted)
     ['{FADEE3BC-BF66-430A-BA5D-1EE3782ECC58}']
-    procedure OnRenderThreadCreated(const extraInfo: ICefListValue);
     procedure OnWebKitInitialized;
-    procedure OnBrowserCreated(const browser: ICefBrowser);
+    procedure OnBrowserCreated(const browser: ICefBrowser; const extra_info: ICefDictionaryValue);
     procedure OnBrowserDestroyed(const browser: ICefBrowser);
     function  GetLoadHandler : ICefLoadHandler;
     procedure OnContextCreated(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context);
     procedure OnContextReleased(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context);
     procedure OnUncaughtException(const browser: ICefBrowser; const frame: ICefFrame; const context: ICefv8Context; const V8Exception: ICefV8Exception; const stackTrace: ICefV8StackTrace);
     procedure OnFocusedNodeChanged(const browser: ICefBrowser; const frame: ICefFrame; const node: ICefDomNode);
-    function  OnProcessMessageReceived(const browser: ICefBrowser; sourceProcess: TCefProcessId; const aMessage: ICefProcessMessage): Boolean;
+    function  OnProcessMessageReceived(const browser: ICefBrowser; const frame: ICefFrame; sourceProcess: TCefProcessId; const aMessage: ICefProcessMessage): Boolean;
+
+    procedure RemoveReferences; // custom procedure to clear all references
   end;
 
   // TCefApp
@@ -1200,6 +1474,8 @@ type
     procedure GetResourceBundleHandler(var aHandler : ICefResourceBundleHandler);
     procedure GetBrowserProcessHandler(var aHandler : ICefBrowserProcessHandler);
     procedure GetRenderProcessHandler(var aHandler : ICefRenderProcessHandler);
+
+    procedure RemoveReferences; // custom procedure to clear all references
   end;
 
   // TCefCompletionCallback
@@ -1227,19 +1503,17 @@ type
   // /include/capi/cef_cookie_capi.h (cef_cookie_manager_t)
   ICefCookieManager = Interface(ICefBaseRefCounted)
     ['{CC1749E6-9AD3-4283-8430-AF6CBF3E8785}']
-    procedure SetSupportedSchemes(const schemes: TStrings; const callback: ICefCompletionCallback);
-    procedure SetSupportedSchemesProc(const schemes: TStrings; const callback: TCefCompletionCallbackProc);
+    procedure SetSupportedSchemes(const schemes: TStrings; include_defaults: boolean; const callback: ICefCompletionCallback);
+    procedure SetSupportedSchemesProc(const schemes: TStrings; include_defaults: boolean; const callback: TCefCompletionCallbackProc);
     function  VisitAllCookies(const visitor: ICefCookieVisitor): Boolean;
     function  VisitAllCookiesProc(const visitor: TCefCookieVisitorProc): Boolean;
     function  VisitUrlCookies(const url: ustring; includeHttpOnly: Boolean; const visitor: ICefCookieVisitor): Boolean;
     function  VisitUrlCookiesProc(const url: ustring; includeHttpOnly: Boolean; const visitor: TCefCookieVisitorProc): Boolean;
-    function  SetCookie(const url: ustring; const name, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; const callback: ICefSetCookieCallback): Boolean;
-    function  SetCookieProc(const url: ustring; const name, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; const callback: TCefSetCookieCallbackProc): Boolean;
+    function  SetCookie(const url, name, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; same_site : TCefCookieSameSite; priority : TCefCookiePriority; const callback: ICefSetCookieCallback): Boolean;
+    function  SetCookieProc(const url: ustring; const name, value, domain, path: ustring; secure, httponly, hasExpires: Boolean; const creation, lastAccess, expires: TDateTime; same_site : TCefCookieSameSite; priority : TCefCookiePriority; const callback: TCefSetCookieCallbackProc): Boolean;
     function  DeleteCookies(const url, cookieName: ustring; const callback: ICefDeleteCookiesCallback): Boolean;
     function  DeleteCookiesProc(const url, cookieName: ustring; const callback: TCefDeleteCookiesCallbackProc): Boolean;
-    function  SetStoragePath(const path: ustring; persistSessionCookies: Boolean; const callback: ICefCompletionCallback): Boolean;
-    function  SetStoragePathProc(const path: ustring; persistSessionCookies: Boolean; const callback: TCefCompletionCallbackProc): Boolean;
-    function  FlushStore(const handler: ICefCompletionCallback): Boolean;
+    function  FlushStore(const callback: ICefCompletionCallback): Boolean;
     function  FlushStoreProc(const proc: TCefCompletionCallbackProc): Boolean;
   end;
 
@@ -1266,15 +1540,30 @@ type
     procedure Cancel;
   end;
 
+  // TCefResourceSkipCallback
+  // /include/capi/cef_resource_handler_capi.h (cef_resource_skip_callback_t)
+  ICefResourceSkipCallback = interface(ICefBaseRefCounted)
+    ['{5ADDE93E-5858-41FD-81E8-ED8BF710D92A}']
+    procedure Cont(bytes_skipped: int64);
+  end;
+
+  // TCefResourceReadCallback
+  // /include/capi/cef_resource_handler_capi.h (cef_resource_read_callback_t)
+  ICefResourceReadCallback = interface(ICefBaseRefCounted)
+    ['{7669335F-7A4B-4657-86CA-C02B12369602}']
+    procedure Cont(bytes_read: int64);
+  end;
+
   // TCefResourceHandler
   // /include/capi/cef_resource_handler_capi.h (cef_resource_handler_t)
   ICefResourceHandler = interface(ICefBaseRefCounted)
-  ['{BD3EA208-AAAD-488C-BFF2-76993022F2B5}']
-    function  ProcessRequest(const request: ICefRequest; const callback: ICefCallback): Boolean;
+    ['{BD3EA208-AAAD-488C-BFF2-76993022F2B5}']
+    function  open(const request: ICefRequest; var handle_request: boolean; const callback: ICefCallback): boolean;
+    function  ProcessRequest(const request: ICefRequest; const callback: ICefCallback): boolean; // deprecated
     procedure GetResponseHeaders(const response: ICefResponse; out responseLength: Int64; out redirectUrl: ustring);
-    function  ReadResponse(const dataOut: Pointer; bytesToRead: Integer; var bytesRead: Integer; const callback: ICefCallback): Boolean;
-    function  CanGetCookie(const cookie: PCefCookie): Boolean;
-    function  CanSetCookie(const cookie: PCefCookie): Boolean;
+    function  skip(bytes_to_skip: int64; var bytes_skipped: Int64; const callback: ICefResourceSkipCallback): boolean;
+    function  read(const data_out: Pointer; bytes_to_read: Integer; var bytes_read: Integer; const callback: ICefResourceReadCallback): boolean;
+    function  ReadResponse(const dataOut: Pointer; bytesToRead: Integer; var bytesRead: Integer; const callback: ICefCallback): boolean; // deprecated
     procedure Cancel;
   end;
 
@@ -1423,7 +1712,7 @@ type
     function GetDictionary: ICefDictionaryValue;
     function GetList: ICefListValue;
     function SetNull: Boolean;
-    function SetBool(value: Integer): Boolean;
+    function SetBool(value: boolean): Boolean;
     function SetInt(value: Integer): Boolean;
     function SetDouble(value: Double): Boolean;
     function SetString(const value: ustring): Boolean;
@@ -1520,7 +1809,7 @@ type
   // /include/capi/cef_life_span_handler_capi.h (cef_life_span_handler_t)
   ICefLifeSpanHandler = interface(ICefBaseRefCounted)
     ['{0A3EB782-A319-4C35-9B46-09B2834D7169}']
-    function  OnBeforePopup(const browser: ICefBrowser; const frame: ICefFrame; const targetUrl, targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean; const popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo; var client: ICefClient; var settings: TCefBrowserSettings; var noJavascriptAccess: Boolean): Boolean;
+    function  OnBeforePopup(const browser: ICefBrowser; const frame: ICefFrame; const targetUrl, targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean; const popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo; var client: ICefClient; var settings: TCefBrowserSettings; var extra_info: ICefDictionaryValue; var noJavascriptAccess: Boolean): Boolean;
     procedure OnAfterCreated(const browser: ICefBrowser);
     function  DoClose(const browser: ICefBrowser): Boolean;
     procedure OnBeforeClose(const browser: ICefBrowser);
@@ -1545,9 +1834,11 @@ type
     procedure OnExtensionUnloaded(const extension: ICefExtension);
     function  OnBeforeBackgroundBrowser(const extension: ICefExtension; const url: ustring; var client: ICefClient; var settings: TCefBrowserSettings) : boolean;
     function  OnBeforeBrowser(const extension: ICefExtension; const browser, active_browser: ICefBrowser; index: Integer; const url: ustring; active: boolean; var windowInfo: TCefWindowInfo; var client: ICefClient; var settings: TCefBrowserSettings) : boolean;
-    function  GetActiveBrowser(const extension: ICefExtension; const browser: ICefBrowser; include_incognito: boolean): ICefBrowser;
+    procedure GetActiveBrowser(const extension: ICefExtension; const browser: ICefBrowser; include_incognito: boolean; var aRsltBrowser: ICefBrowser);
     function  CanAccessBrowser(const extension: ICefExtension; const browser: ICefBrowser; include_incognito: boolean; const target_browser: ICefBrowser): boolean;
     function  GetExtensionResource(const extension: ICefExtension; const browser: ICefBrowser; const file_: ustring; const callback: ICefGetExtensionResourceCallback): boolean;
+
+    procedure RemoveReferences; // custom procedure to clear all references
   end;
 
   // TCefExtension
@@ -1562,12 +1853,28 @@ type
     function  GetLoaderContext : ICefRequestContext;
     function  IsLoaded : boolean;
     procedure unload;
+    function  GetBrowserActionPopup : ustring;
+    function  GetBrowserActionIcon : ustring;
+    function  GetPageActionPopup : ustring;
+    function  GetPageActionIcon : ustring;
+    function  GetOptionsPage : ustring;
+    function  GetOptionsUIPage : ustring;
+    function  GetBackgroundPage : ustring;
+    function  GetURL : ustring;
 
-    property  Identifier    : ustring              read GetIdentifier;
-    property  Path          : ustring              read GetPath;
-    property  Manifest      : ICefDictionaryValue  read GetManifest;
-    property  Handler       : ICefExtensionHandler read GetHandler;
-    property  LoaderContext : ICefRequestContext   read GetLoaderContext;
+    property  Identifier          : ustring               read GetIdentifier;
+    property  Path                : ustring               read GetPath;
+    property  Manifest            : ICefDictionaryValue   read GetManifest;
+    property  Handler             : ICefExtensionHandler  read GetHandler;
+    property  LoaderContext       : ICefRequestContext    read GetLoaderContext;
+    property  BrowserActionPopup  : ustring               read GetBrowserActionPopup;
+    property  BrowserActionIcon   : ustring               read GetBrowserActionIcon;
+    property  PageActionPopup     : ustring               read GetPageActionPopup;
+    property  PageActionIcon      : ustring               read GetPageActionIcon;
+    property  OptionsPage         : ustring               read GetOptionsPage;
+    property  OptionsUIPage       : ustring               read GetOptionsUIPage;
+    property  BackgroundPage      : ustring               read GetBackgroundPage;
+    property  URL                 : ustring               read GetURL;
   end;
 
   // TCefLoadHandler
@@ -1583,7 +1890,7 @@ type
   end;
 
   // TCefRequestCallback
-  // /include/capi/cef_request_handler_capi.h (cef_request_callback_t)
+  // /include/capi/cef_request_callback_capi.h (cef_request_callback_t)
   ICefRequestCallback = interface(ICefBaseRefCounted)
     ['{A35B8FD5-226B-41A8-A763-1940787D321C}']
     procedure Cont(allow: Boolean);
@@ -1604,25 +1911,45 @@ type
     ['{050877A9-D1F8-4EB3-B58E-50DC3E3D39FD}']
     function  OnBeforeBrowse(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; user_gesture, isRedirect: Boolean): Boolean;
     function  OnOpenUrlFromTab(const browser: ICefBrowser; const frame: ICefFrame; const targetUrl: ustring; targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean): Boolean;
-    function  OnBeforeResourceLoad(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const callback: ICefRequestCallback): TCefReturnValue;
-    function  GetResourceHandler(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest): ICefResourceHandler;
-    procedure OnResourceRedirect(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; var newUrl: ustring);
-    function  OnResourceResponse(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse): Boolean;
-    function  GetResourceResponseFilter(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse): ICefResponseFilter;
-    procedure OnResourceLoadComplete(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; status: TCefUrlRequestStatus; receivedContentLength: Int64);
-    function  GetAuthCredentials(const browser: ICefBrowser; const frame: ICefFrame; isProxy: Boolean; const host: ustring; port: Integer; const realm, scheme: ustring; const callback: ICefAuthCallback): Boolean;
-    function  CanGetCookies(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest): boolean;
-    function  CanSetCookie(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const cookie : PCefCookie): boolean;
+    procedure GetResourceRequestHandler(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; is_navigation, is_download: boolean; const request_initiator: ustring; var disable_default_handling: boolean; var aResourceRequestHandler : ICefResourceRequestHandler);
+    function  GetAuthCredentials(const browser: ICefBrowser; const originUrl: ustring; isProxy: Boolean; const host: ustring; port: Integer; const realm, scheme: ustring; const callback: ICefAuthCallback): Boolean;
     function  OnQuotaRequest(const browser: ICefBrowser; const originUrl: ustring; newSize: Int64; const callback: ICefRequestCallback): Boolean;
-    procedure OnProtocolExecution(const browser: ICefBrowser; const url: ustring; out allowOsExecution: Boolean);
     function  OnCertificateError(const browser: ICefBrowser; certError: TCefErrorcode; const requestUrl: ustring; const sslInfo: ICefSslInfo; const callback: ICefRequestCallback): Boolean;
     function  OnSelectClientCertificate(const browser: ICefBrowser; isProxy: boolean; const host: ustring; port: integer; certificatesCount: NativeUInt; const certificates: TCefX509CertificateArray; const callback: ICefSelectClientCertificateCallback): boolean;
     procedure OnPluginCrashed(const browser: ICefBrowser; const pluginPath: ustring);
     procedure OnRenderViewReady(const browser: ICefBrowser);
     procedure OnRenderProcessTerminated(const browser: ICefBrowser; status: TCefTerminationStatus);
+    procedure OnDocumentAvailableInMainFrame(const browser: ICefBrowser);
 
     procedure RemoveReferences; // custom procedure to clear all references
   end;
+
+  // TCefResourceRequestHandler
+  // /include/capi/cef_resource_request_handler_capi.h (cef_resource_request_handler_t)
+  ICefResourceRequestHandler = interface(ICefBaseRefCounted)
+    ['{CFA42A38-EA91-4A95-95CE-178BCD412411}']
+    procedure GetCookieAccessFilter(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; var aFilter: ICefCookieAccessFilter);
+    function  OnBeforeResourceLoad(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const callback: ICefRequestCallback): TCefReturnValue;
+    procedure GetResourceHandler(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; var aResourceHandler : ICefResourceHandler);
+    procedure OnResourceRedirect(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; var newUrl: ustring);
+    function  OnResourceResponse(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse): Boolean;
+    procedure GetResourceResponseFilter(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; var aResourceFilter: ICefResponseFilter);
+    procedure OnResourceLoadComplete(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; status: TCefUrlRequestStatus; receivedContentLength: Int64);
+    procedure OnProtocolExecution(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; var allowOsExecution: Boolean);
+
+    procedure RemoveReferences; // custom procedure to clear all references
+  end;
+
+  // TCefCookieAccessFilter
+  // /include/capi/cef_resource_request_handler_capi.h (cef_cookie_access_filter_t)
+  ICefCookieAccessFilter = interface(ICefBaseRefCounted)
+    ['{65ECD862-F55F-46E4-8AC3-2AE90DCC86F5}']
+    function CanSendCookie(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const cookie: PCefCookie): boolean;
+    function CanSaveCookie(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse; const cookie: PCefCookie): boolean;
+
+    procedure RemoveReferences; // custom procedure to clear all references
+  end;
+
 
   // TCefDisplayHandler
   // /include/capi/cef_display_handler_capi.h (cef_display_handler_t)
@@ -1637,6 +1964,7 @@ type
     function  OnConsoleMessage(const browser: ICefBrowser; level: TCefLogSeverity; const message_, source: ustring; line: Integer): Boolean;
     function  OnAutoResize(const browser: ICefBrowser; const new_size: PCefSize): Boolean;
     procedure OnLoadingProgressChange(const browser: ICefBrowser; const progress: double);
+    procedure OnCursorChange(const browser: ICefBrowser; cursor_: TCefCursorHandle; CursorType: TCefCursorType; const customCursorInfo: PCefCursorInfo; var aResult : boolean);
 
     procedure RemoveReferences; // custom procedure to clear all references
   end;
@@ -1670,6 +1998,19 @@ type
     function  OnBeforeUnloadDialog(const browser: ICefBrowser; const messageText: ustring; isReload: Boolean; const callback: ICefJsDialogCallback): Boolean;
     procedure OnResetDialogState(const browser: ICefBrowser);
     procedure OnDialogClosed(const browser: ICefBrowser);
+
+    procedure RemoveReferences; // custom procedure to clear all references
+  end;
+
+  // TCefAudioHandler
+  // /include/capi/cef_audio_handler_capi.h (cef_audio_handler_t)
+  ICefAudioHandler = interface(ICefBaseRefCounted)
+    ['{8963271A-0B94-4279-82C8-FB2EA7B3CDEC}']
+    procedure OnGetAudioParameters(const browser: ICefBrowser; var params: TCefAudioParameters; var aResult: boolean);
+    procedure OnAudioStreamStarted(const browser: ICefBrowser; const params: TCefAudioParameters; channels: integer);
+    procedure OnAudioStreamPacket(const browser: ICefBrowser; const data : PPSingle; frames: integer; pts: int64);
+    procedure OnAudioStreamStopped(const browser: ICefBrowser);
+    procedure OnAudioStreamError(const browser: ICefBrowser; const message_: ustring);
 
     procedure RemoveReferences; // custom procedure to clear all references
   end;
@@ -1717,18 +2058,19 @@ type
     ['{1FC1C22B-085A-4741-9366-5249B88EC410}']
     procedure GetAccessibilityHandler(var aAccessibilityHandler : ICefAccessibilityHandler);
     function  GetRootScreenRect(const browser: ICefBrowser; var rect: TCefRect): Boolean;
-    function  GetViewRect(const browser: ICefBrowser; var rect: TCefRect): Boolean;
+    procedure GetViewRect(const browser: ICefBrowser; var rect: TCefRect);
     function  GetScreenPoint(const browser: ICefBrowser; viewX, viewY: Integer; var screenX, screenY: Integer): Boolean;
     function  GetScreenInfo(const browser: ICefBrowser; var screenInfo: TCefScreenInfo): Boolean;
     procedure OnPopupShow(const browser: ICefBrowser; show: Boolean);
     procedure OnPopupSize(const browser: ICefBrowser; const rect: PCefRect);
     procedure OnPaint(const browser: ICefBrowser; kind: TCefPaintElementType; dirtyRectsCount: NativeUInt; const dirtyRects: PCefRectArray; const buffer: Pointer; width, height: Integer);
-    procedure OnCursorChange(const browser: ICefBrowser; cursor: TCefCursorHandle; CursorType: TCefCursorType; const customCursorInfo: PCefCursorInfo);
+    procedure OnAcceleratedPaint(const browser: ICefBrowser; kind: TCefPaintElementType; dirtyRectsCount: NativeUInt; const dirtyRects: PCefRectArray; shared_handle: Pointer);
     function  OnStartDragging(const browser: ICefBrowser; const dragData: ICefDragData; allowedOps: TCefDragOperations; x, y: Integer): Boolean;
     procedure OnUpdateDragCursor(const browser: ICefBrowser; operation: TCefDragOperation);
     procedure OnScrollOffsetChanged(const browser: ICefBrowser; x, y: Double);
     procedure OnIMECompositionRangeChanged(const browser: ICefBrowser; const selected_range: PCefRange; character_boundsCount: NativeUInt; const character_bounds: PCefRect);
     procedure OnTextSelectionChanged(const browser: ICefBrowser; const selected_text: ustring; const selected_range: PCefRange);
+    procedure OnVirtualKeyboardRequested(const browser: ICefBrowser; input_mode: TCefTextInpuMode);
 
     procedure RemoveReferences; // custom procedure to clear all references
   end;
@@ -1737,6 +2079,7 @@ type
   // /include/capi/cef_client_capi.h (cef_client_t)
   ICefClient = interface(ICefBaseRefCounted)
     ['{1D502075-2FF0-4E13-A112-9E541CD811F4}']
+    procedure GetAudioHandler(var aHandler : ICefAudioHandler);
     procedure GetContextMenuHandler(var aHandler : ICefContextMenuHandler);
     procedure GetDialogHandler(var aHandler : ICefDialogHandler);
     procedure GetDisplayHandler(var aHandler : ICefDisplayHandler);
@@ -1750,7 +2093,7 @@ type
     procedure GetLoadHandler(var aHandler : ICefLoadHandler);
     procedure GetRenderHandler(var aHandler : ICefRenderHandler);
     procedure GetRequestHandler(var aHandler : ICefRequestHandler);
-    function  OnProcessMessageReceived(const browser: ICefBrowser; sourceProcess: TCefProcessId; const message_ : ICefProcessMessage): Boolean;
+    function  OnProcessMessageReceived(const browser: ICefBrowser; const frame: ICefFrame; sourceProcess: TCefProcessId; const message_ : ICefProcessMessage): Boolean;
 
     procedure RemoveReferences; // custom procedure to clear all references
   end;
@@ -1782,6 +2125,8 @@ type
     procedure OnDownloadProgress(const request: ICefUrlRequest; current, total: Int64);
     procedure OnDownloadData(const request: ICefUrlRequest; data: Pointer; dataLength: NativeUInt);
     function  OnGetAuthCredentials(isProxy: Boolean; const host: ustring; port: Integer; const realm, scheme: ustring; const callback: ICefAuthCallback): Boolean;
+
+    procedure RemoveReferences; // custom procedure to clear all references
   end;
 
   // TCefWebPluginInfoVisitor
@@ -1856,7 +2201,7 @@ type
   ICefDragHandler = interface(ICefBaseRefCounted)
     ['{59A89579-5B18-489F-A25C-5CC25FF831FC}']
     function  OnDragEnter(const browser: ICefBrowser; const dragData: ICefDragData; mask: TCefDragOperations): Boolean;
-    procedure OnDraggableRegionsChanged(const browser: ICefBrowser; regionsCount: NativeUInt; regions: PCefDraggableRegionArray);
+    procedure OnDraggableRegionsChanged(const browser: ICefBrowser; const frame: ICefFrame; regionsCount: NativeUInt; const regions: PCefDraggableRegionArray);
 
     procedure RemoveReferences; // custom procedure to clear all references
   end;
@@ -1875,8 +2220,10 @@ type
   ICefRequestContextHandler = interface(ICefBaseRefCounted)
     ['{76EB1FA7-78DF-4FD5-ABB3-1CDD3E73A140}']
     procedure OnRequestContextInitialized(const request_context: ICefRequestContext);
-    function  GetCookieManager: ICefCookieManager;
-    function  OnBeforePluginLoad(const mimeType, pluginUrl:ustring; isMainFrame : boolean; const topOriginUrl: ustring; const pluginInfo: ICefWebPluginInfo; pluginPolicy: PCefPluginPolicy): Boolean;
+    function  OnBeforePluginLoad(const mimeType, pluginUrl:ustring; isMainFrame : boolean; const topOriginUrl: ustring; const pluginInfo: ICefWebPluginInfo; var pluginPolicy: TCefPluginPolicy): Boolean;
+    procedure GetResourceRequestHandler(const browser: ICefBrowser; const frame: ICefFrame; const request: ICefRequest; is_navigation, is_download: boolean; const request_initiator: ustring; var disable_default_handling: boolean; var aResourceRequestHandler : ICefResourceRequestHandler);
+
+    procedure RemoveReferences; // custom procedure to clear all references
   end;
 
   // TCefResolveCallback
@@ -1895,8 +2242,8 @@ type
     function  IsGlobal: Boolean;
     function  GetHandler: ICefRequestContextHandler;
     function  GetCachePath: ustring;
-    function  GetDefaultCookieManager(const callback: ICefCompletionCallback): ICefCookieManager;
-    function  GetDefaultCookieManagerProc(const callback: TCefCompletionCallbackProc): ICefCookieManager;
+    function  GetCookieManager(const callback: ICefCompletionCallback): ICefCookieManager;
+    function  GetCookieManagerProc(const callback: TCefCompletionCallbackProc): ICefCookieManager;
     function  RegisterSchemeHandlerFactory(const schemeName, domainName: ustring; const factory: ICefSchemeHandlerFactory): Boolean;
     function  ClearSchemeHandlerFactories: Boolean;
     procedure PurgePluginListCache(reloadPages: Boolean);
@@ -1906,17 +2253,19 @@ type
     function  CanSetPreference(const name: ustring): Boolean;
     function  SetPreference(const name: ustring; const value: ICefValue; out error: ustring): Boolean;
     procedure ClearCertificateExceptions(const callback: ICefCompletionCallback);
+    procedure ClearHttpAuthCredentials(const callback: ICefCompletionCallback);
     procedure CloseAllConnections(const callback: ICefCompletionCallback);
     procedure ResolveHost(const origin: ustring; const callback: ICefResolveCallback);
-    function  ResolveHostCached(const origin: ustring; const resolvedIps: TStrings): TCefErrorCode;
     procedure LoadExtension(const root_directory: ustring; const manifest: ICefDictionaryValue; const handler: ICefExtensionHandler);
     function  DidLoadExtension(const extension_id: ustring): boolean;
     function  HasExtension(const extension_id: ustring): boolean;
     function  GetExtensions(const extension_ids: TStringList): boolean;
     function  GetExtension(const extension_id: ustring): ICefExtension;
+    function  GetMediaRouter: ICefMediaRouter;
 
-    property  CachePath        : ustring  read GetCachePath;
-    property  IsGlobalContext  : boolean  read IsGlobal;
+    property  CachePath        : ustring         read GetCachePath;
+    property  IsGlobalContext  : boolean         read IsGlobal;
+    property  MediaRouter      : ICefMediaRouter read GetMediaRouter;
   end;
 
   // TCefPrintSettings
@@ -1925,7 +2274,6 @@ type
     ['{ACBD2395-E9C1-49E5-B7F3-344DAA4A0F12}']
     function  IsValid: Boolean;
     function  IsReadOnly: Boolean;
-    function  Copy: ICefPrintSettings;
     procedure SetOrientation(landscape: Boolean);
     function  IsLandscape: Boolean;
     procedure SetPrinterPrintableArea(const physicalSizeDeviceUnits: PCefSize; const printableAreaDeviceUnits: PCefRect; landscapeNeedsFlip: Boolean);
@@ -1978,10 +2326,12 @@ type
     ['{2831D5C9-6E2B-4A30-A65A-0F4435371EFC}']
     procedure OnPrintStart(const browser: ICefBrowser);
     procedure OnPrintSettings(const browser: ICefBrowser; const settings: ICefPrintSettings; getDefaults: boolean);
-    function  OnPrintDialog(const browser: ICefBrowser; hasSelection: boolean; const callback: ICefPrintDialogCallback): boolean;
-    function  OnPrintJob(const browser: ICefBrowser; const documentName, PDFFilePath: ustring; const callback: ICefPrintJobCallback): boolean;
+    procedure OnPrintDialog(const browser: ICefBrowser; hasSelection: boolean; const callback: ICefPrintDialogCallback; var aResult: boolean);
+    procedure OnPrintJob(const browser: ICefBrowser; const documentName, PDFFilePath: ustring; const callback: ICefPrintJobCallback; var aResult: boolean);
     procedure OnPrintReset(const browser: ICefBrowser);
-    function  GetPDFPaperSize(deviceUnitsPerInch: Integer): TCefSize;
+    procedure GetPDFPaperSize(deviceUnitsPerInch: integer; var aResult: TCefSize);
+
+    procedure RemoveReferences; // custom procedure to clear all references
   end;
 
   // TCefNavigationEntry
@@ -2071,8 +2421,8 @@ type
   ICefResourceBundle = interface(ICefBaseRefCounted)
     ['{3213CF97-C854-452B-B615-39192F8D07DC}']
     function GetLocalizedString(stringId: Integer): ustring;
-    function GetDataResource(resourceId: Integer; var data: Pointer; var dataSize: NativeUInt): Boolean;
-    function GetDataResourceForScale(resourceId: Integer; scaleFactor: TCefScaleFactor; var data: Pointer; var dataSize: NativeUInt): Boolean;
+    function GetDataResource(resourceId: Integer): ICefBinaryValue;
+    function GetDataResourceForScale(resourceId: Integer; scaleFactor: TCefScaleFactor): ICefBinaryValue;
   end;
 
   // TCefImage
@@ -2088,10 +2438,10 @@ type
     function GetHeight: NativeUInt;
     function HasRepresentation(scaleFactor: Single): Boolean;
     function RemoveRepresentation(scaleFactor: Single): Boolean;
-    function GetRepresentationInfo(scaleFactor: Single; actualScaleFactor: PSingle; pixelWidth, pixelHeight: PInteger): Boolean;
-    function GetAsBitmap(scaleFactor: Single; colorType: TCefColorType; alphaType: TCefAlphaType; pixelWidth, pixelHeight: PInteger): ICefBinaryValue;
-    function GetAsPng(scaleFactor: Single; withTransparency: Boolean; pixelWidth, pixelHeight: PInteger): ICefBinaryValue;
-    function GetAsJpeg(scaleFactor: Single; quality: Integer; pixelWidth, pixelHeight: PInteger): ICefBinaryValue;
+    function GetRepresentationInfo(scaleFactor: Single; var actualScaleFactor: Single; var pixelWidth, pixelHeight: Integer): Boolean;
+    function GetAsBitmap(scaleFactor: Single; colorType: TCefColorType; alphaType: TCefAlphaType; var pixelWidth, pixelHeight: Integer): ICefBinaryValue;
+    function GetAsPng(scaleFactor: Single; withTransparency: Boolean; var pixelWidth, pixelHeight: Integer): ICefBinaryValue;
+    function GetAsJpeg(scaleFactor: Single; quality: Integer; var pixelWidth, pixelHeight: Integer): ICefBinaryValue;
 
     property Width  : NativeUInt read GetWidth;
     property Height : NativeUInt read GetHeight;
@@ -2107,7 +2457,7 @@ type
     procedure UnhandledCloseSubmenu(const menuModel: ICefMenuModel; isRTL: boolean);
     procedure MenuWillShow(const menuModel: ICefMenuModel);
     procedure MenuClosed(const menuModel: ICefMenuModel);
-    function  FormatLabel(const menuModel: ICefMenuModel; const label_ : ustring) : boolean;
+    function  FormatLabel(const menuModel: ICefMenuModel; var label_ : ustring) : boolean;
   end;
 
   // TCefServer
@@ -2144,6 +2494,8 @@ type
   end;
 
 
+
+
   // *********************************
   // ************* Views *************
   // *********************************
@@ -2160,6 +2512,12 @@ type
     function  GetBounds : TCefRect;
     function  GetWorkArea : TCefRect;
     function  GetRotation : Integer;
+
+    property  ID                : int64      read GetID;
+    property  DeviceScaleFactor : Single     read GetDeviceScaleFactor;
+    property  Bounds            : TCefRect   read GetBounds;
+    property  WorkArea          : TCefRect   read GetWorkArea;
+    property  Rotation          : Integer    read GetRotation;
   end;
 
   // TCefLayout
@@ -2169,6 +2527,8 @@ type
     function AsBoxLayout : ICefBoxLayout;
     function AsFillLayout : ICefFillLayout;
     function IsValid : boolean;
+
+    property Valid              : boolean    read IsValid;
   end;
 
   // TCefBoxLayout
@@ -2195,24 +2555,24 @@ type
     function  AsScrollView : ICefScrollView;
     function  AsTextfield : ICefTextfield;
     function  GetTypeString : ustring;
-    function  ToString(include_children: boolean): ustring;
+    function  ToStringEx(include_children: boolean): ustring;
     function  IsValid : boolean;
     function  IsAttached : boolean;
     function  IsSame(const that: ICefView): boolean;
     function  GetDelegate : ICefViewDelegate;
     function  GetWindow : ICefWindow;
     function  GetID : Integer;
-    procedure SetID(id: Integer);
+    procedure SetID(id_: Integer);
     function  GetGroupID : Integer;
     procedure SetGroupID(group_id: Integer);
     function  GetParentView : ICefView;
-    function  GetViewForID(id: Integer): ICefView;
-    procedure SetBounds(const bounds: PCefRect);
+    function  GetViewForID(id_: Integer): ICefView;
+    procedure SetBounds(const bounds_: TCefRect);
     function  GetBounds : TCefRect;
     function  GetBoundsInScreen : TCefRect;
-    procedure SetSize(const size: PCefSize);
+    procedure SetSize(const size_: TCefSize);
     function  GetSize : TCefSize;
-    procedure SetPosition(const position: PCefPoint);
+    procedure SetPosition(const position_: TCefPoint);
     function  GetPosition : TCefPoint;
     function  GetPreferredSize : TCefSize;
     procedure SizeToPreferredSize;
@@ -2220,37 +2580,75 @@ type
     function  GetMaximumSize : TCefSize;
     function  GetHeightForWidth(width: Integer): Integer;
     procedure InvalidateLayout;
-    procedure SetVisible(visible: boolean);
+    procedure SetVisible(visible_: boolean);
     function  IsVisible : boolean;
     function  IsDrawn : boolean;
-    procedure SetEnabled(enabled: boolean);
+    procedure SetEnabled(enabled_: boolean);
     function  IsEnabled : boolean;
-    procedure SetFocusable(focusable: boolean);
+    procedure SetFocusable(focusable_: boolean);
     function  IsFocusable : boolean;
     function  IsAccessibilityFocusable : boolean;
     procedure RequestFocus;
     procedure SetBackgroundColor(color: TCefColor);
     function  GetBackgroundColor : TCefColor;
-    function  ConvertPointToScreen(point: PCefPoint): boolean;
-    function  ConvertPointFromScreen(point: PCefPoint): boolean;
-    function  ConvertPointToWindow(point: PCefPoint): boolean;
-    function  ConvertPointFromWindow(point: PCefPoint): boolean;
-    function  ConvertPointToView(const view : ICefView; point: PCefPoint): boolean;
-    function  ConvertPointFromView(const view : ICefView; point: PCefPoint): boolean;
+    function  ConvertPointToScreen(var point: TCefPoint): boolean;
+    function  ConvertPointFromScreen(var point: TCefPoint): boolean;
+    function  ConvertPointToWindow(var point: TCefPoint): boolean;
+    function  ConvertPointFromWindow(var point: TCefPoint): boolean;
+    function  ConvertPointToView(const view : ICefView; var point: TCefPoint): boolean;
+    function  ConvertPointFromView(const view : ICefView; var point: TCefPoint): boolean;
+
+    property Valid                  : boolean          read IsValid;
+    property Attached               : boolean          read IsAttached;
+    property Delegate               : ICefViewDelegate read GetDelegate;
+    property Window                 : ICefWindow       read GetWindow;
+    property ParentView             : ICefView         read GetParentView;
+    property BoundsInScreen         : TCefRect         read GetBoundsInScreen;
+    property PreferredSize          : TCefSize         read GetPreferredSize;
+    property MinimumSize            : TCefSize         read GetMinimumSize;
+    property MaximumSize            : TCefSize         read GetMaximumSize;
+    property Visible                : boolean          read IsVisible                  write SetVisible;
+    property Drawn                  : boolean          read IsDrawn;
+    property Enabled                : boolean          read IsEnabled                  write SetEnabled;
+    property Focusable              : boolean          read IsFocusable                write SetFocusable;
+    property AccessibilityFocusable : boolean          read IsAccessibilityFocusable;
+    property BackgroundColor        : TCefColor        read GetBackgroundColor         write SetBackgroundColor;
+    property ID                     : integer          read GetID                      write SetID;
+    property GroupID                : integer          read GetGroupID                 write SetGroupID;
+    property Bounds                 : TCefRect         read GetBounds                  write SetBounds;
+    property Size                   : TCefSize         read GetSize                    write SetSize;
+    property Position               : TCefPoint        read GetPosition                write SetPosition;
+    property TypeString             : ustring          read GetTypeString;
   end;
 
   // TCefViewDelegate
   // /include/capi/views/cef_view_delegate_capi.h (cef_view_delegate_t)
   ICefViewDelegate = interface(ICefBaseRefCounted)
     ['{5F900206-B969-4E51-B56C-0FF38D749C72}']
-    function  GetPreferredSize(const view: ICefView): TCefSize;
-    function  GetMinimumSize(const view: ICefView): TCefSize;
-    function  GetMaximumSize(const view: ICefView): TCefSize;
-    function  GetHeightForWidth(const view: ICefView; width: Integer): Integer;
+    procedure OnGetPreferredSize(const view: ICefView; var aResult : TCefSize);
+    procedure OnGetMinimumSize(const view: ICefView; var aResult : TCefSize);
+    procedure OnGetMaximumSize(const view: ICefView; var aResult : TCefSize);
+    procedure OnGetHeightForWidth(const view: ICefView; width: Integer; var aResult: Integer);
     procedure OnParentViewChanged(const view: ICefView; added: boolean; const parent: ICefView);
     procedure OnChildViewChanged(const view: ICefView; added: boolean; const child: ICefView);
     procedure OnFocus(const view: ICefView);
     procedure OnBlur(const view: ICefView);
+  end;
+
+  ICefViewDelegateEvents = interface
+    ['{74DDDB37-8F08-4672-BDB6-55CA2CD374ED}']
+    // ICefViewDelegate
+    procedure doOnGetPreferredSize(const view: ICefView; var aResult : TCefSize);
+    procedure doOnGetMinimumSize(const view: ICefView; var aResult : TCefSize);
+    procedure doOnGetMaximumSize(const view: ICefView; var aResult : TCefSize);
+    procedure doOnGetHeightForWidth(const view: ICefView; width: Integer; var aResult: Integer);
+    procedure doOnParentViewChanged(const view: ICefView; added: boolean; const parent: ICefView);
+    procedure doOnChildViewChanged(const view: ICefView; added: boolean; const child: ICefView);
+    procedure doOnFocus(const view: ICefView);
+    procedure doOnBlur(const view: ICefView);
+
+    // Custom
+    procedure doCreateCustomView;
   end;
 
   // TCefTextfield
@@ -2262,15 +2660,15 @@ type
     procedure SetReadOnly(read_only: boolean);
     function  IsReadOnly : boolean;
     function  GetText : ustring;
-    procedure SetText(const text: ustring);
-    procedure AppendText(const text: ustring);
-    procedure InsertOrReplaceText(const text: ustring);
+    procedure SetText(const text_: ustring);
+    procedure AppendText(const text_: ustring);
+    procedure InsertOrReplaceText(const text_: ustring);
     function  HasSelection : boolean;
     function  GetSelectedText : ustring;
     procedure SelectAll(reversed: boolean);
     procedure ClearSelection;
     function  GetSelectedRange : TCefRange;
-    procedure SelectRange(const range: PCefRange);
+    procedure SelectRange(const range: TCefRange);
     function  GetCursorPosition : NativeUInt;
     procedure SetTextColor(color: TCefColor);
     function  GetTextColor : TCefColor;
@@ -2279,23 +2677,38 @@ type
     procedure SetSelectionBackgroundColor(color: TCefColor);
     function  GetSelectionBackgroundColor : TCefColor;
     procedure SetFontList(const font_list: ustring);
-    procedure ApplyTextColor(color: TCefColor; const range: PCefRange);
-    procedure ApplyTextStyle(style: TCefTextStyle; add: boolean; const range: PCefRange);
-    function  IsCommandEnabled(command_id: Integer): boolean;
-    procedure ExecuteCommand(command_id: Integer);
+    procedure ApplyTextColor(color: TCefColor; const range: TCefRange);
+    procedure ApplyTextStyle(style: TCefTextStyle; add: boolean; const range: TCefRange);
+    function  IsCommandEnabled(command_id: TCefTextFieldCommands): boolean;
+    procedure ExecuteCommand(command_id: TCefTextFieldCommands);
     procedure ClearEditHistory;
-    procedure SetPlaceholderText(const text: ustring);
-    function  GgetPlaceholderText : ustring;
+    procedure SetPlaceholderText(const text_: ustring);
+    function  GetPlaceholderText : ustring;
     procedure SetPlaceholderTextColor(color: TCefColor);
     procedure SetAccessibleName(const name: ustring);
+
+    property  PasswordInput            : boolean       read IsPasswordInput               write SetPasswordInput;
+    property  ReadOnly                 : boolean       read IsReadOnly                    write SetReadOnly;
+    property  Text                     : ustring       read GetText                       write SetText;
+    property  SelectedText             : ustring       read GetSelectedText;
+    property  TextColor                : TCefColor     read GetTextColor                  write SetTextColor;
+    property  SelectionTextColor       : TCefColor     read GetSelectionTextColor         write SetSelectionTextColor;
+    property  SelectionBackgroundColor : TCefColor     read GetSelectionBackgroundColor   write SetSelectionBackgroundColor;
+    property  PlaceholderText          : ustring       read GetPlaceholderText            write SetPlaceholderText;
   end;
 
   // TCefTextfieldDelegate
   // /include/capi/views/cef_textfield_delegate_capi.h (cef_textfield_delegate_t)
   ICefTextfieldDelegate = interface(ICefViewDelegate)
     ['{72612994-92BB-4DE9-BB38-6F49FB45F94B}']
-    function  OnKeyEvent(const textfield: ICefTextfield; const event: PCefKeyEvent): boolean;
+    procedure OnKeyEvent(const textfield: ICefTextfield; const event: TCefKeyEvent; var aResult : boolean);
     procedure OnAfterUserAction(const textfield: ICefTextfield);
+  end;
+
+  ICefTextfieldDelegateEvents = interface(ICefViewDelegateEvents)
+    ['{682480E0-C786-4E65-B950-4FF2B13B97B9}']
+    procedure doOnKeyEvent(const textfield: ICefTextfield; const event: TCefKeyEvent; var aResult : boolean);
+    procedure doOnAfterUserAction(const textfield: ICefTextfield);
   end;
 
   // TCefScrollView
@@ -2309,15 +2722,20 @@ type
     function  GetHorizontalScrollbarHeight : Integer;
     function  HasVerticalScrollbar : boolean;
     function  GetVerticalScrollbarWidth : Integer;
+
+    property  ContentView               : ICefView      read GetContentView                write SetContentView;
+    property  VisibleContentRect        : TCefRect      read GetVisibleContentRect;
+    property  HorizontalScrollbarHeight : Integer       read GetHorizontalScrollbarHeight;
+    property  VerticalScrollbarWidth    : Integer       read GetVerticalScrollbarWidth;
   end;
 
   // TCefPanel
   // /include/capi/views/cef_panel_capi.h (cef_panel_t)
   ICefPanel = interface(ICefView)
     ['{6F2F680A-3637-4438-81B8-79AD6C02252D}']
-    function  AsWindow : ICefWindow;
+    function  GetAsWindow : ICefWindow;
     function  SetToFillLayout : ICefFillLayout;
-    function  SetToBoxLayout(const settings: PCefBoxLayoutSettings): ICefBoxLayout;
+    function  SetToBoxLayout(const settings: TCefBoxLayoutSettings): ICefBoxLayout;
     function  GetLayout : ICefLayout;
     procedure Layout;
     procedure AddChildView(const view: ICefView);
@@ -2327,12 +2745,18 @@ type
     procedure RemoveAllChildViews;
     function  GetChildViewCount : NativeUInt;
     function  GetChildViewAt(index: Integer): ICefView;
+
+    property AsWindow : ICefWindow    read GetAsWindow;
   end;
 
   // TCefPanelDelegate
   // /include/capi/views/cef_panel_delegate_capi.h (cef_panel_delegate_t)
   ICefPanelDelegate = interface(ICefViewDelegate)
     ['{305D453F-FEBA-48ED-AE33-5D978823EA96}']
+  end;
+
+  ICefPanelDelegateEvents = interface(ICefViewDelegateEvents)
+    ['{F1F2963F-82C3-48F0-9B9C-7C213BACB96B}']
   end;
 
   // TCefBrowserView
@@ -2349,8 +2773,16 @@ type
     ['{578A0DD4-2E7D-4061-B4DB-7C3CDC7A90C0}']
     procedure OnBrowserCreated(const browser_view: ICefBrowserView; const browser: ICefBrowser);
     procedure OnBrowserDestroyed(const browser_view: ICefBrowserView; const browser: ICefBrowser);
-    function  GetDelegateForPopupBrowserView(const browser_view: ICefBrowserView; const settings: PCefBrowserSettings; const client: ICefClient; is_devtools: boolean): ICefBrowserViewDelegate;
-    function  OnPopupBrowserViewCreated(const browser_view, popup_browser_view: ICefBrowserView; is_devtools: boolean): boolean;
+    procedure OnGetDelegateForPopupBrowserView(const browser_view: ICefBrowserView; const settings: TCefBrowserSettings; const client: ICefClient; is_devtools: boolean; var aResult : ICefBrowserViewDelegate);
+    procedure OnPopupBrowserViewCreated(const browser_view, popup_browser_view: ICefBrowserView; is_devtools: boolean; var aResult : boolean);
+  end;
+
+  ICefBrowserViewDelegateEvents = interface(ICefViewDelegateEvents)
+    ['{AB94B875-63C6-4FEF-BB30-0816402ABA1C}']
+    procedure doOnBrowserCreated(const browser_view: ICefBrowserView; const browser: ICefBrowser);
+    procedure doOnBrowserDestroyed(const browser_view: ICefBrowserView; const browser: ICefBrowser);
+    procedure doOnGetDelegateForPopupBrowserView(const browser_view: ICefBrowserView; const settings: TCefBrowserSettings; const client: ICefClient; is_devtools: boolean; var aResult : ICefBrowserViewDelegate);
+    procedure doOnPopupBrowserViewCreated(const browser_view, popup_browser_view: ICefBrowserView; is_devtools: boolean; var aResult : boolean);
   end;
 
   // TCefButton
@@ -2358,11 +2790,13 @@ type
   ICefButton = interface(ICefView)
     ['{D3D2E8A0-9F9C-4BD8-B495-655976534281}']
     function  AsLabelButton : ICefLabelButton;
-    procedure SetState(state: TCefButtonState);
+    procedure SetState(state_: TCefButtonState);
     function  GetState : TCefButtonState;
-    procedure SetInkDropEnabled(enabled: boolean);
+    procedure SetInkDropEnabled(enabled_: boolean);
     procedure SetTooltipText(const tooltip_text: ustring);
     procedure SetAccessibleName(const name: ustring);
+
+    property  State : TCefButtonState read GetState write SetState;
   end;
 
   // TCefButtonDelegate
@@ -2373,12 +2807,18 @@ type
     procedure OnButtonStateChanged(const button: ICefButton);
   end;
 
+  ICefButtonDelegateEvents = interface(ICefViewDelegateEvents)
+    ['{E8DF70BE-5DEB-42CF-AF86-B0FF1040498E}']
+    procedure doOnButtonPressed(const button: ICefButton);
+    procedure doOnButtonStateChanged(const button: ICefButton);
+  end;
+
   // TCefLabelButton
   // /include/capi/views/cef_label_button_capi.h (cef_label_button_t)
   ICefLabelButton = interface(ICefButton)
     ['{A99FD4F3-7EE6-4796-8BF6-EC367D51EED8}']
-    function  GetState : ICefMenuButton;
-    procedure SetText(const text: ustring);
+    function  AsMenuButton : ICefMenuButton;
+    procedure SetText(const text_: ustring);
     function  GetText : ustring;
     procedure SetImage(button_state: TCefButtonState; const image: ICefImage);
     function  GetImage(button_state: TCefButtonState): ICefImage;
@@ -2386,15 +2826,17 @@ type
     procedure SetEnabledTextColors(color: TCefColor);
     procedure SetFontList(const font_list: ustring);
     procedure SetHorizontalAlignment(alignment: TCefHorizontalAlignment);
-    procedure SetMinimumSize(const size: PCefSize);
-    procedure SetMaximumSize(const size: PCefSize);
+    procedure SetMinimumSize(const size_: TCefSize);
+    procedure SetMaximumSize(const size_: TCefSize);
+
+    property  Text  : ustring       read GetText write SetText;
   end;
 
   // TCefMenuButton
   // /include/capi/views/cef_menu_button_capi.h (cef_menu_button_t)
   ICefMenuButton = interface(ICefLabelButton)
     ['{62BFE81A-7810-400B-83C6-76D1DF133710}']
-    procedure ShowMenu(const menu_model: ICefMenuModel; const screen_point: PCefPoint; anchor_position: TCefMenuAnchorPosition);
+    procedure ShowMenu(const menu_model: ICefMenuModel; const screen_point: TCefPoint; anchor_position: TCefMenuAnchorPosition);
     procedure TriggerMenu;
   end;
 
@@ -2408,7 +2850,12 @@ type
   // /include/capi/views/cef_menu_button_delegate_capi.h (cef_menu_button_delegate_t)
   ICefMenuButtonDelegate = interface(ICefButtonDelegate)
     ['{D0E89A75-463A-4766-8701-BD8D24B11E9F}']
-    procedure OnMenuButtonPressed(const menu_button: ICefMenuButton; const screen_point: PCefPoint; const button_pressed_lock: ICefMenuButtonPressedLock);
+    procedure OnMenuButtonPressed(const menu_button: ICefMenuButton; const screen_point: TCefPoint; const button_pressed_lock: ICefMenuButtonPressedLock);
+  end;
+
+  ICefMenuButtonDelegateEvents = interface(ICefButtonDelegateEvents)
+    ['{DA36DD60-7609-4576-BB8E-6A55FD48C680}']
+    procedure doOnMenuButtonPressed(const menu_button: ICefMenuButton; const screen_point: TCefPoint; const button_pressed_lock: ICefMenuButtonPressedLock);
   end;
 
   // TCefWindow
@@ -2417,11 +2864,11 @@ type
     ['{C450C974-BF0A-4968-A6BE-153CEAD10DA6}']
     procedure Show;
     procedure Hide;
-    procedure CenterWindow(const size: PCefSize);
+    procedure CenterWindow(const size_: TCefSize);
     procedure Close;
     function  IsClosed : boolean;
     procedure Activate;
-    procedure deactivate;
+    procedure Deactivate;
     function  IsActive : boolean;
     procedure BringToTop;
     procedure SetAlwaysOnTop(on_top: boolean);
@@ -2433,24 +2880,31 @@ type
     function  IsMaximized : boolean;
     function  IsMinimized : boolean;
     function  IsFullscreen : boolean;
-    procedure SetTitle(const title: ustring);
+    procedure SetTitle(const title_: ustring);
     function  GetTitle : ustring;
     procedure SetWindowIcon(const image: ICefImage);
     function  GetWindowIcon : ICefImage;
     procedure SetWindowAppIcon(const image: ICefImage);
     function  GetWindowAppIcon : ICefImage;
-    procedure ShowMenu(const menu_model: ICefMenuModel; const screen_point: PCefPoint; anchor_position : TCefMenuAnchorPosition);
+    procedure ShowMenu(const menu_model: ICefMenuModel; const screen_point: TCefPoint; anchor_position : TCefMenuAnchorPosition);
     procedure CancelMenu;
     function  GetDisplay : ICefDisplay;
     function  GetClientAreaBoundsInScreen : TCefRect;
-    procedure SetDraggableRegions(regionsCount: NativeUInt; regions: PCefDraggableRegionArray);
+    procedure SetDraggableRegions(regionsCount: NativeUInt; const regions: PCefDraggableRegionArray);
     function  GetWindowHandle : TCefWindowHandle;
     procedure SendKeyPress(key_code: Integer; event_flags: cardinal);
     procedure SendMouseMove(screen_x, screen_y: Integer);
-    procedure SendMouseEvents(button: TCefMouseButtonType; mouse_down, mouse_up: Integer);
+    procedure SendMouseEvents(button: TCefMouseButtonType; mouse_down, mouse_up: boolean);
     procedure SetAccelerator(command_id, key_code : Integer; shift_pressed, ctrl_pressed, alt_pressed: boolean);
     procedure RemoveAccelerator(command_id: Integer);
     procedure RemoveAllAccelerators;
+
+    property Title                    : ustring            read GetTitle                     write SetTitle;
+    property WindowIcon               : ICefImage          read GetWindowIcon                write SetWindowIcon;
+    property WindowAppIcon            : ICefImage          read GetWindowAppIcon             write SetWindowAppIcon;
+    property Display                  : ICefDisplay        read GetDisplay;
+    property ClientAreaBoundsInScreen : TCefRect           read GetClientAreaBoundsInScreen;
+    property WindowHandle             : TCefWindowHandle   read GetWindowHandle;
   end;
 
   // TCefWindowDelegate
@@ -2459,14 +2913,30 @@ type
     ['{52D4EE2C-303B-42B6-A35F-30D03834A23F}']
     procedure OnWindowCreated(const window: ICefWindow);
     procedure OnWindowDestroyed(const window: ICefWindow);
-    function  GetParentWindow(const window: ICefWindow; var is_menu, can_activate_menu: boolean): ICefWindow;
-    function  IsFrameless(const window: ICefWindow): boolean;
-    function  CanResize(const window: ICefWindow): boolean;
-    function  CanMaximize(const window: ICefWindow): boolean;
-    function  CanMinimize(const window: ICefWindow): boolean;
-    function  CanClose(const window: ICefWindow): boolean;
-    function  OnAccelerator(const window: ICefWindow; command_id: Integer): boolean;
-    function  OnKeyEvent(const window: ICefWindow; const event: PCefKeyEvent): boolean;
+    procedure OnGetParentWindow(const window: ICefWindow; var is_menu, can_activate_menu: boolean; var aResult : ICefWindow);
+    procedure OnGetInitialBounds(const window: ICefWindow; var aResult : TCefRect);
+    procedure OnIsFrameless(const window: ICefWindow; var aResult : boolean);
+    procedure OnCanResize(const window: ICefWindow; var aResult : boolean);
+    procedure OnCanMaximize(const window: ICefWindow; var aResult : boolean);
+    procedure OnCanMinimize(const window: ICefWindow; var aResult : boolean);
+    procedure OnCanClose(const window: ICefWindow; var aResult : boolean);
+    procedure OnAccelerator(const window: ICefWindow; command_id: Integer; var aResult : boolean);
+    procedure OnKeyEvent(const window: ICefWindow; const event: TCefKeyEvent; var aResult : boolean);
+  end;
+
+  ICefWindowDelegateEvents = interface(ICefPanelDelegateEvents)
+    ['{05C19A41-E75D-459E-AD4D-C8A0CA4A49D3}']
+    procedure doOnWindowCreated(const window: ICefWindow);
+    procedure doOnWindowDestroyed(const window: ICefWindow);
+    procedure doOnGetParentWindow(const window: ICefWindow; var is_menu, can_activate_menu: boolean; var aResult : ICefWindow);
+    procedure doOnGetInitialBounds(const window: ICefWindow; var aResult : TCefRect);
+    procedure doOnIsFrameless(const window: ICefWindow; var aResult : boolean);
+    procedure doOnCanResize(const window: ICefWindow; var aResult : boolean);
+    procedure doOnCanMaximize(const window: ICefWindow; var aResult : boolean);
+    procedure doOnCanMinimize(const window: ICefWindow; var aResult : boolean);
+    procedure doOnCanClose(const window: ICefWindow; var aResult : boolean);
+    procedure doOnAccelerator(const window: ICefWindow; command_id: Integer; var aResult : boolean);
+    procedure doOnKeyEvent(const window: ICefWindow; const event: TCefKeyEvent; var aResult : boolean);
   end;
 
 implementation

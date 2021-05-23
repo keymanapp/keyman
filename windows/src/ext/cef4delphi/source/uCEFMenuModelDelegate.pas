@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFMenuModelDelegate;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -62,7 +60,7 @@ type
     procedure UnhandledCloseSubmenu(const menuModel: ICefMenuModel; isRTL: boolean); virtual;
     procedure MenuWillShow(const menuModel: ICefMenuModel); virtual;
     procedure MenuClosed(const menuModel: ICefMenuModel); virtual;
-    function  FormatLabel(const menuModel: ICefMenuModel; const label_ : uString) : boolean; virtual;
+    function  FormatLabel(const menuModel: ICefMenuModel; var label_ : ustring) : boolean; virtual;
   public
     constructor Create; virtual;
   end;
@@ -152,13 +150,17 @@ function cef_menu_model_delegate_format_label(self       : PCefMenuModelDelegate
                                               label_     : PCefString) : integer; stdcall;
 var
   TempObject : TObject;
+  TempLabel  : ustring;
 begin
   Result     := Ord(False);
   TempObject := CefGetObject(self);
 
   if (TempObject <> nil) and (TempObject is TCefMenuModelDelegateOwn) then
-    Result := Ord(TCefMenuModelDelegateOwn(TempObject).FormatLabel(TCefMenuModelRef.UnWrap(menu_model),
-                                                                   CefString(label_)));
+    begin
+      TempLabel := CefStringClearAndGet(label_);
+      Result    := Ord(TCefMenuModelDelegateOwn(TempObject).FormatLabel(TCefMenuModelRef.UnWrap(menu_model), TempLabel));
+      if (label_ <> nil) then label_^ := CefStringAlloc(TempLabel);
+    end;
 end;
 
 constructor TCefMenuModelDelegateOwn.Create;
@@ -209,7 +211,7 @@ begin
   //
 end;
 
-function TCefMenuModelDelegateOwn.FormatLabel(const menuModel: ICefMenuModel; const label_ : uString) : boolean;
+function TCefMenuModelDelegateOwn.FormatLabel(const menuModel: ICefMenuModel; var label_ : ustring) : boolean;
 begin
   Result := False;
 end;

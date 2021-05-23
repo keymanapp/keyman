@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFDragHandler;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -57,7 +55,7 @@ type
   TCefDragHandlerOwn = class(TCefBaseRefCountedOwn, ICefDragHandler)
     protected
       function  OnDragEnter(const browser: ICefBrowser; const dragData: ICefDragData; mask: TCefDragOperations): Boolean; virtual;
-      procedure OnDraggableRegionsChanged(const browser: ICefBrowser; regionsCount: NativeUInt; regions: PCefDraggableRegionArray); virtual;
+      procedure OnDraggableRegionsChanged(const browser: ICefBrowser; const frame: ICefFrame; regionsCount: NativeUInt; const regions: PCefDraggableRegionArray); virtual;
 
       procedure RemoveReferences; virtual;
 
@@ -70,12 +68,12 @@ type
       FEvents : Pointer;
 
       function  OnDragEnter(const browser: ICefBrowser;  const dragData: ICefDragData; mask: TCefDragOperations): Boolean; override;
-      procedure OnDraggableRegionsChanged(const browser: ICefBrowser; regionsCount: NativeUInt; regions: PCefDraggableRegionArray); override;
+      procedure OnDraggableRegionsChanged(const browser: ICefBrowser; const frame: ICefFrame; regionsCount: NativeUInt; const regions: PCefDraggableRegionArray); override;
 
       procedure RemoveReferences; override;
 
     public
-      constructor Create(const events: Pointer); reintroduce; virtual;
+      constructor Create(const events : IChromiumEvents); reintroduce; virtual;
       destructor  Destroy; override;
   end;
 
@@ -87,7 +85,7 @@ uses
   {$ELSE}
   SysUtils,
   {$ENDIF}
-  uCEFMiscFunctions, uCEFLibFunctions, uCEFBrowser, uCEFDragData;
+  uCEFMiscFunctions, uCEFLibFunctions, uCEFBrowser, uCEFDragData, uCEFFrame;
 
 function cef_drag_handler_on_drag_enter(self     : PCefDragHandler;
                                         browser  : PCefBrowser;
@@ -105,10 +103,11 @@ begin
                                                              mask));
 end;
 
-procedure cef_drag_handler_on_draggable_regions_changed(self         : PCefDragHandler;
-                                                        browser      : PCefBrowser;
-                                                        regionsCount : NativeUInt;
-                                                        regions      : PCefDraggableRegionArray); stdcall;
+procedure cef_drag_handler_on_draggable_regions_changed(      self         : PCefDragHandler;
+                                                              browser      : PCefBrowser;
+                                                              frame        : PCefFrame;
+                                                              regionsCount : NativeUInt;
+                                                        const regions      : PCefDraggableRegionArray); stdcall;
 var
   TempObject : TObject;
 begin
@@ -116,6 +115,7 @@ begin
 
   if (TempObject <> nil) and (TempObject is TCefDragHandlerOwn) then
     TCefDragHandlerOwn(TempObject).OnDraggableRegionsChanged(TCefBrowserRef.UnWrap(browser),
+                                                             TCefFrameRef.UnWrap(frame),
                                                              regionsCount,
                                                              regions);
 end;
@@ -139,8 +139,9 @@ begin
 end;
 
 procedure TCefDragHandlerOwn.OnDraggableRegionsChanged(const browser      : ICefBrowser;
+                                                       const frame        : ICefFrame;
                                                              regionsCount : NativeUInt;
-                                                             regions      : PCefDraggableRegionArray);
+                                                       const regions      : PCefDraggableRegionArray);
 begin
   //
 end;
@@ -152,11 +153,11 @@ end;
 
 // TCustomDragHandler
 
-constructor TCustomDragHandler.Create(const events: Pointer);
+constructor TCustomDragHandler.Create(const events : IChromiumEvents);
 begin
   inherited Create;
 
-  FEvents := events;
+  FEvents := Pointer(events);
 end;
 
 destructor TCustomDragHandler.Destroy;
@@ -182,10 +183,11 @@ begin
 end;
 
 procedure TCustomDragHandler.OnDraggableRegionsChanged(const browser      : ICefBrowser;
+                                                       const frame        : ICefFrame;
                                                              regionsCount : NativeUInt;
-                                                             regions      : PCefDraggableRegionArray);
+                                                       const regions      : PCefDraggableRegionArray);
 begin
-  if (FEvents <> nil) then IChromiumEvents(FEvents).doOnDraggableRegionsChanged(browser, regionsCount, regions);
+  if (FEvents <> nil) then IChromiumEvents(FEvents).doOnDraggableRegionsChanged(browser, frame, regionsCount, regions);
 end;
 
 end.

@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -35,7 +35,7 @@
  *
  *)
 
-unit uFMXBufferPanel;
+unit uCEFFMXBufferPanel;
 
 {$I cef.inc}
 
@@ -43,7 +43,7 @@ interface
 
 uses
   {$IFDEF MSWINDOWS}
-  Winapi.Windows,
+  Winapi.Windows, FMX.Platform.Win,
   {$ELSE}
   System.SyncObjs,
   {$ENDIF}
@@ -51,32 +51,38 @@ uses
   {$IFDEF DELPHI17_UP}
   FMX.Graphics,
   {$ENDIF}
-  FMX.Types, FMX.Controls;
+  FMX.Types, FMX.Controls, FMX.Forms,
+  uCEFTypes;
 
 type
   TDialogKeyEvent = procedure(Sender: TObject; var Key: Word; Shift: TShiftState) of object;
 
+  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
   TFMXBufferPanel = class(TControl)
     protected
       {$IFDEF MSWINDOWS}
-      FMutex            : THandle;
+      FMutex                   : THandle;
       {$ELSE}
-      FBufferCS         : TCriticalSection;
+      FBufferCS                : TCriticalSection;
       {$ENDIF}
-      FBuffer           : TBitmap;
-      FScanlineSize     : integer;
-      FColor            : TAlphaColor;
-      FHighSpeedDrawing : boolean;
-      FOnDialogKey      : TDialogKeyEvent;
+      FBuffer                  : TBitmap;
+      FScanlineSize            : integer;
+      FColor                   : TAlphaColor;
+      FHighSpeedDrawing        : boolean;
+      FOnDialogKey             : TDialogKeyEvent;
+      FForcedDeviceScaleFactor : single;
 
       procedure CreateSyncObj;
 
       procedure DestroySyncObj;
       procedure DestroyBuffer;
 
-      function  GetScreenScale : Single;
+      function  GetScreenScale : single; virtual;
       function  GetBufferWidth : integer;
       function  GetBufferHeight : integer;
+      function  GetParentForm : TCustomForm;
+      function  GetParentFormHandle : TCefWindowHandle;
+      function  GetRealScreenScale(var aResultScale : single) : boolean; virtual;
 
       function  CopyBuffer : boolean;
       function  SaveBufferToFile(const aFilename : string) : boolean;
@@ -92,17 +98,20 @@ type
       procedure   InvalidatePanel;
       function    BeginBufferDraw : boolean;
       procedure   EndBufferDraw;
-      procedure   BufferDraw(x, y : integer; const aBitmap : TBitmap);
+      procedure   BufferDraw(const aBitmap : TBitmap; const aSrcRect, aDstRect : TRectF);
       function    UpdateBufferDimensions(aWidth, aHeight : integer) : boolean;
       function    BufferIsResized(aUseMutex : boolean = True) : boolean;
-      function    ScreenToClient(aPoint : TPoint) : TPoint;
-      function    ClientToScreen(aPoint : TPoint) : TPoint;
+      function    ScreenToClient(aPoint : TPoint) : TPoint; overload;
+      function    ScreenToClient(aPoint : TPointF) : TPointF; overload;
+      function    ClientToScreen(aPoint : TPoint) : TPoint; overload;
+      function    ClientToScreen(aPoint : TPointF) : TPointF; overload;
 
-      property Buffer         : TBitmap            read FBuffer;
-      property ScanlineSize   : integer            read FScanlineSize;
-      property BufferWidth    : integer            read GetBufferWidth;
-      property BufferHeight   : integer            read GetBufferHeight;
-      property ScreenScale    : single             read GetScreenScale;
+      property Buffer                    : TBitmap                   read FBuffer;
+      property ScanlineSize              : integer                   read FScanlineSize;
+      property BufferWidth               : integer                   read GetBufferWidth;
+      property BufferHeight              : integer                   read GetBufferHeight;
+      property ScreenScale               : single                    read GetScreenScale;
+      property ForcedDeviceScaleFactor   : single                    read FForcedDeviceScaleFactor   write FForcedDeviceScaleFactor;
 
     published
       property Align;
@@ -128,6 +137,10 @@ type
       property Scale;
       property Size;
       {$ENDIF}
+      {$IFNDEF DELPHI23_UP}
+      property Hint;
+      property ShowHint;
+      {$ENDIF}
 
       property OnEnter;
       property OnExit;
@@ -148,7 +161,8 @@ implementation
 
 uses
   System.SysUtils, System.Math,
-  FMX.Platform, uCEFMiscFunctions, uCEFApplication;
+  {$IFDEF MSWINDOWS}FMX.Helpers.Win,{$ENDIF}
+  FMX.Platform, uCEFMiscFunctions, uCEFApplicationCore;
 
 constructor TFMXBufferPanel.Create(AOwner: TComponent);
 begin
@@ -164,6 +178,11 @@ begin
   FColor            := claWhite;
   FOnDialogKey      := nil;
   FHighSpeedDrawing := True;
+
+  if (GlobalCEFApp <> nil) and (GlobalCEFApp.ForcedDeviceScaleFactor <> 0) then
+    FForcedDeviceScaleFactor := GlobalCEFApp.ForcedDeviceScaleFactor
+   else
+    FForcedDeviceScaleFactor := 0;
 end;
 
 destructor TFMXBufferPanel.Destroy;
@@ -270,24 +289,33 @@ end;
 
 function TFMXBufferPanel.CopyBuffer : boolean;
 var
-  TempSrc, TempDst : TRectF;
+  TempSrc, TempDst, TempClip : TRectF;
+  TempState : TCanvasSaveState;
+  TempScale : single;
 begin
   Result := False;
 
   if Canvas.BeginScene then
     try
       if BeginBufferDraw then
-        begin
+        try
           if (FBuffer <> nil) then
             begin
-              TempSrc := TRectF.Create(0, 0, FBuffer.Width, FBuffer.Height);
-              TempDst := TRectF.Create(0, 0, FBuffer.Width / ScreenScale, FBuffer.Height / ScreenScale);
+              TempScale := ScreenScale;
+              TempSrc   := TRectF.Create(0, 0, FBuffer.Width, FBuffer.Height);
+              TempDst   := TRectF.Create(0, 0, FBuffer.Width / TempScale, FBuffer.Height / TempScale);
+              TempClip  := TRectF.Create(0, 0, Width, Height);
 
-              Canvas.DrawBitmap(FBuffer, TempSrc, TempDst, 1, FHighSpeedDrawing);
-
-              Result := True;
+              TempState := Canvas.SaveState;
+              try
+                Canvas.IntersectClipRect(TempClip);
+                Canvas.DrawBitmap(FBuffer, TempSrc, TempDst, 1, FHighSpeedDrawing);
+                Result := True;
+              finally
+                Canvas.RestoreState(TempState);
+              end;
             end;
-
+        finally
           EndBufferDraw;
         end;
     finally
@@ -319,12 +347,77 @@ begin
     end;
 end;
 
-function TFMXBufferPanel.GetScreenScale : Single;
+function TFMXBufferPanel.GetParentForm : TCustomForm;
+var
+  TempComp : TComponent;
 begin
-  if (GlobalCEFApp <> nil) then
-    Result := GlobalCEFApp.DeviceScaleFactor
+  Result   := nil;
+  TempComp := Owner;
+
+  while (TempComp <> nil) do
+    if (TempComp is TCustomForm) then
+      begin
+        Result := TCustomForm(TempComp);
+        exit;
+      end
+     else
+      TempComp := TempComp.owner;
+end;
+
+function TFMXBufferPanel.GetParentFormHandle : TCefWindowHandle;
+{$IFDEF MSWINDOWS}
+var
+  TempForm : TCustomForm;
+{$ENDIF}
+begin
+  InitializeWindowHandle(Result);
+
+  {$IFDEF MSWINDOWS}
+  TempForm := GetParentForm;
+
+  if (TempForm <> nil)  then
+    Result := FmxHandleToHWND(TempForm.Handle)
    else
-    Result := 1;
+    if (Application          <> nil) and
+       (Application.MainForm <> nil) then
+      Result := FmxHandleToHWND(Application.MainForm.Handle);
+  {$ENDIF}
+end;
+
+function TFMXBufferPanel.GetRealScreenScale(var aResultScale : single) : boolean;
+{$IFDEF DELPHI24_UP}{$IFDEF MSWINDOWS}
+var
+  TempHandle : TCefWindowHandle;
+{$ENDIF}{$ENDIF}
+begin
+  Result       := False;
+  aResultScale := 1;
+
+  {$IFDEF DELPHI24_UP}{$IFDEF MSWINDOWS}
+  TempHandle := GetParentFormHandle;
+
+  if (TempHandle <> 0) then
+    begin
+      Result       := True;
+      aResultScale := GetWndScale(TempHandle);
+    end;
+  {$ENDIF}{$ENDIF}
+end;
+
+function TFMXBufferPanel.GetScreenScale : single;
+var
+  TempScale : single;
+begin
+  if (FForcedDeviceScaleFactor <> 0) then
+    Result := FForcedDeviceScaleFactor
+   else
+    if GetRealScreenScale(TempScale) then
+      Result := TempScale
+     else
+      if (GlobalCEFApp <> nil) then
+        Result := GlobalCEFApp.DeviceScaleFactor
+       else
+        Result := 1;
 end;
 
 function TFMXBufferPanel.GetBufferWidth : integer;
@@ -343,37 +436,34 @@ begin
     Result := 0;
 end;
 
-procedure TFMXBufferPanel.BufferDraw(x, y : integer; const aBitmap : TBitmap);
-var
-  TempSrc, TempDst : TRectF;
+procedure TFMXBufferPanel.BufferDraw(const aBitmap : TBitmap; const aSrcRect, aDstRect : TRectF);
 begin
   if (FBuffer <> nil) then
-    begin
-      TempSrc := TRectF.Create(0, 0, aBitmap.Width, aBitmap.Height);
-      TempDst := TRectF.Create(x, y, x + (aBitmap.Width / ScreenScale), y + (aBitmap.Height / ScreenScale));
-
-      if FBuffer.Canvas.BeginScene then
-        try
-          FBuffer.Canvas.DrawBitmap(aBitmap, TempSrc, TempDst, 1, FHighSpeedDrawing);
-        finally
-          FBuffer.Canvas.EndScene;
-        end;
-    end;
+    if FBuffer.Canvas.BeginScene then
+      try
+        FBuffer.Canvas.DrawBitmap(aBitmap, aSrcRect, aDstRect, 1, FHighSpeedDrawing);
+      finally
+        FBuffer.Canvas.EndScene;
+      end;
 end;
 
 function TFMXBufferPanel.UpdateBufferDimensions(aWidth, aHeight : integer) : boolean;
+var
+  TempScale : single;
 begin
-  Result := False;
+  Result    := False;
+  TempScale := ScreenScale;
 
-  if ((FBuffer        =  nil)      or
-      (FBuffer.Width  <> aWidth)   or
-      (FBuffer.Height <> aHeight)) then
+  if ((FBuffer             =  nil)       or
+      (FBuffer.BitmapScale <> TempScale) or
+      (FBuffer.Width       <> aWidth)    or
+      (FBuffer.Height      <> aHeight))  then
     begin
       if (FBuffer <> nil) then FreeAndNil(FBuffer);
 
       FBuffer             := TBitmap.Create(aWidth, aHeight);
       {$IFDEF DELPHI17_UP}
-      FBuffer.BitmapScale := ScreenScale;
+      FBuffer.BitmapScale := TempScale;
       FScanlineSize       := FBuffer.BytesPerLine;
       {$ELSE}
       FScanlineSize       := aWidth * SizeOf(TRGBQuad);
@@ -385,18 +475,20 @@ end;
 function TFMXBufferPanel.BufferIsResized(aUseMutex : boolean) : boolean;
 var
   TempWidth, TempHeight : integer;
+  TempScale : single;
 begin
   Result := False;
-  if (GlobalCEFApp = nil) then exit;
 
   if not(aUseMutex) or BeginBufferDraw then
     begin
-      TempWidth  := round(Width  * GlobalCEFApp.DeviceScaleFactor);
-      TempHeight := round(Height * GlobalCEFApp.DeviceScaleFactor);
+      TempScale  := ScreenScale;
+      TempWidth  := round(Width  * TempScale);
+      TempHeight := round(Height * TempScale);
 
       Result := (FBuffer <> nil) and
-                (FBuffer.Width  = TempWidth) and
-                (FBuffer.Height = TempHeight);
+                (FBuffer.BitmapScale = TempScale) and
+                (FBuffer.Width       = TempWidth) and
+                (FBuffer.Height      = TempHeight);
 
       if aUseMutex then EndBufferDraw;
     end;
@@ -413,6 +505,11 @@ begin
   Result.y    := round(TempPoint.y);
 end;
 
+function TFMXBufferPanel.ScreenToClient(aPoint : TPointF) : TPointF;
+begin
+  Result := ScreenToLocal(aPoint);
+end;
+
 function TFMXBufferPanel.ClientToScreen(aPoint : TPoint) : TPoint;
 var
   TempPoint : TPointF;
@@ -422,6 +519,11 @@ begin
   TempPoint   := LocalToScreen(TempPoint);
   Result.x    := round(TempPoint.x);
   Result.y    := round(TempPoint.y);
+end;
+
+function TFMXBufferPanel.ClientToScreen(aPoint : TPointF) : TPointF;
+begin
+  Result := LocalToScreen(aPoint);
 end;
 
 end.

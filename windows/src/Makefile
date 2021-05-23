@@ -114,10 +114,14 @@ clean-pathdefines: test-releasebuildcheck
 
 #
 # Test that the CEF file path is accessible from env var KEYMAN_CEF4DELPHI_ROOT
+# and checkout the appropriate version of CEF as determined by CEF_VERSION.md
 #
 test-release-cef-path:
-    @if not exist $(KEYMAN_CEF4DELPHI_ROOT)\libcef.dll echo The environment variable KEYMAN_CEF4DELPHI_ROOT is invalid. File libcef.dll could not be found.
-    @if not exist $(KEYMAN_CEF4DELPHI_ROOT)\libcef.dll exit 1
+!ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\cef-checkout.sh
+!else
+    start /wait $(ROOT)\src\buildtools\cef-checkout.sh
+!endif
 
 #
 # Test that certificate checking is enabled and that certificate is accessible
