@@ -212,9 +212,18 @@ update_bundle
 if [ $DO_CARTHAGE = true ]; then
     echo
     echo "Load dependencies with Carthage"
-    # TODO: Replace the workaround-script with the base `carthage` command once
-    # we've properly updated to 0.37's better approach.
-    $KEYMAN_ROOT/resources/build/carthage-workaround.sh bootstrap --platform iOS || fail "carthage boostrap failed"
+
+    carthage checkout || fail "Carthage dependency loading failed"
+
+    # Carthage sometimes picks the wrong .xcworkspace if two are available in a dependency's repo.
+    # Easiest way to override it - delete the wrong one (or just its scheme)
+
+    # Deleted workspace - a test for proper deployment to CocoaPods.  Doesn't matter here.
+    rm -r ./Carthage/Checkouts/DeviceKit/CocoaPodsVerification/ || fail "Carthage dependency loading failed"
+
+    # stable-14.0 will continue to use the old fat-framework approach.
+    # In 15.0, this will be replaced with an XCFramework approach instead.
+    carthage build --platform iOS || fail "Carthage dependency loading failed"
 fi
 
 echo
