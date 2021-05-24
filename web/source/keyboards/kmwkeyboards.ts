@@ -87,6 +87,10 @@ namespace com.keyman.keyboards {
   // Represents custom, specified KMW errors that occur when registering the results of a successful API call.
   const CLOUD_REGISTRATION_ERROR = "Error occurred while registering keyboards: ";
 
+  const MISSING_KEYBOARD = function(kbdid: string) {
+    return kbdid + ' keyboard not found.';
+  }
+
   interface RegistrationPromiseTuple {
     // TODO (#5044): the parameter for `resolve` should match the type of the Promise in keymanCloudRequest.
     resolve: () => void;
@@ -1096,12 +1100,13 @@ namespace com.keyman.keyboards {
 
       // Indicate if unable to register keyboard
       if(typeof(x['error']) == 'string') {
+        // Currently unreachable (24 May 2021 - API returns a 404; returned 'script' does not call register)
         var badName='';
         if(typeof(x['keyboardid']) == 'string') {
           badName = x['keyboardid'].substr(0,1).toUpperCase()+x['keyboardid'].substr(1);
         }
 
-        return new Error(badName+' keyboard not found.');
+        return new Error(MISSING_KEYBOARD(badName));
       }
 
       // Ignore callback unless the context is defined
@@ -1134,7 +1139,7 @@ namespace com.keyman.keyboards {
     }
 
     /**
-     *  Add default or all keyboards for a given language
+     *  Internal handler for processing keyboard registration, used only by `register`
      *
      *  @param  {Object}   languages    Array of language names
      **/
@@ -1224,8 +1229,9 @@ namespace com.keyman.keyboards {
 
         Lscript.onload = function(event: Event) {
           window.clearTimeout(timeoutID);
-          // This case shouldn't happen, as `register` should handle all related
-          // Promise resolution / rejection... but just in case.
+          // This case should only happen if a returned, otherwise-valid keyboard 
+          // script does not ever call `register`.  Also provides default handling
+          // should `register` fail to report results/failure correctly.
           if(kbdManager.registrationResolvers[timeoutID]) {
             try {
               reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
@@ -1235,7 +1241,7 @@ namespace com.keyman.keyboards {
           }
         };
 
-        // Note:  at this time (May 24 2021), this is also happens for "successful" 
+        // Note:  at this time (24 May 2021), this is also happens for "successful" 
         //        API calls where there is no matching keyboard ID.
         //        
         //        The returned 'error' JSON object is sent with an HTML error code (404)
