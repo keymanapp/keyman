@@ -78,14 +78,19 @@ namespace com.keyman.keyboards {
     ['indirect']: boolean;
   }
 
+  // For when the API call straight-up times out.
   const CLOUD_TIMEOUT_ERR = "The Cloud API request timed out.";
-  const CLOUD_MALFORMED_OBJECT_ERR = "The Cloud API returned a malformed object.";
+  // Currently cannot distinguish between "no matching keyboard" and other script-load errors.
+  const CLOUD_MALFORMED_OBJECT_ERR = "Could not find a keyboard with that ID.";
+  // Represents unspecified errors that occur when registering the results of a successful API call.
   const CLOUD_STUB_REGISTRATION_ERR = "The Cloud API failed to find an appropriate keyboard.";
+  // Represents custom, specified KMW errors that occur when registering the results of a successful API call.
+  const CLOUD_REGISTRATION_ERROR = "Error occurred while registering keyboards: ";
 
   interface RegistrationPromiseTuple {
-    // TODO (#5044): the parameter should match the type of the Promise in keymanCloudRequest.
+    // TODO (#5044): the parameter for `resolve` should match the type of the Promise in keymanCloudRequest.
     resolve: () => void;
-    reject: (err: string|Error) => void;
+    reject: (err: Error) => void;
   }
 
   export class KeyboardManager {
@@ -1056,38 +1061,38 @@ namespace com.keyman.keyboards {
      * @param {Object}    x   metadata object
      **/
     register(x) {
-      var options=x['options'];
-      // Represents the `resolve` function for the corresponding Promise built in `keymanCloudRequest`.
-      var sourcePromise: () => void;
       const promiseid = x['timerid'];
 
-      let signalSuccess = function() {};
-      let signalFailure = function(err: string|Error) {};
-      const _this = this;
+      let result: Error;
+      try {
+        result = this._registerCore(x);
+      } catch(err) {
+        result = new Error(CLOUD_REGISTRATION_ERROR + err);
+      }
       
       if(promiseid) {
-        const promiseFuncs =  this.registrationResolvers[promiseid];
+        const promiseFuncs = this.registrationResolvers[promiseid];
+        window.clearTimeout(promiseid);
 
-        // In this function, we (currently) only signal _successes_.
-        // If not signaled, the handling code in keymanCloudRequest will manage failure cases.
-        signalSuccess = function() {
-          window.clearTimeout[promiseid];
-          try {
+        try {
+          if(result instanceof Error) {
+            promiseFuncs.reject(result as Error);
+          } else { // TODO (#5044): pass `result` to the `resolve` function.
             promiseFuncs.resolve();
-          } finally {
-            delete _this.registrationResolvers[promiseid];
           }
-        }
-
-        signalFailure = function(err: string | Error) {
-          window.clearTimeout[promiseid];
-          try {
-            promiseFuncs.reject(err);
-          } finally {
-            delete _this.registrationResolvers[promiseid];
-          }
+        } finally {
+          delete this.registrationResolvers[promiseid];
         }
       }
+    }
+
+    /**
+     * Call back from cloud for adding keyboard metadata
+     *
+     * @param {Object}    x   metadata object
+     **/
+    private _registerCore(x): Error { // TODO (#5044): should return heterogenous type; allow array of stubs.
+      var options=x['options'];
 
       // Indicate if unable to register keyboard
       if(typeof(x['error']) == 'string') {
@@ -1096,14 +1101,12 @@ namespace com.keyman.keyboards {
           badName = x['keyboardid'].substr(0,1).toUpperCase()+x['keyboardid'].substr(1);
         }
 
-        signalFailure(badName+' keyboard not found.');
-        return;
+        return new Error(badName+' keyboard not found.');
       }
 
       // Ignore callback unless the context is defined
       if(typeof(options) == 'undefined' || typeof(options['context']) == 'undefined') {
-        signalFailure(CLOUD_MALFORMED_OBJECT_ERR);
-        return;
+        return new Error(CLOUD_MALFORMED_OBJECT_ERR);
       }
 
       // Register each keyboard for the specified language codes
@@ -1112,6 +1115,8 @@ namespace com.keyman.keyboards {
         // Process array of keyboard definitions
         if(typeof(kp.length) == 'number') {
           for(i=0; i<kp.length; i++) {
+            // Note:  if an invalid language code is specified, the elements here may be
+            //        empty arrays.  Will not report an error if so.
             this.registerLanguagesForKeyboard(kp[i],options,i);
           }
         } else { // Process a single keyboard definition
@@ -1125,8 +1130,7 @@ namespace com.keyman.keyboards {
         this.languagesPending = [];
       }
 
-      // TODO (#5044): track the newly-registered stubs & provide them to the Promise's resolve().
-      signalSuccess();
+      return null; // TODO (#5044): return the list of newly-registered stubs here.
     }
 
     /**
@@ -1199,7 +1203,7 @@ namespace com.keyman.keyboards {
       const URL='https://api.keyman.com/cloud/4.0/'
                 + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards');
 
-      let promise = new Promise<void>(function(resolve, reject) {
+      let promise = new Promise<void>(function(resolve: () => void, reject: (Error?) => void) {
         const Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
 
         const queryConfig = '?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
@@ -1219,21 +1223,33 @@ namespace com.keyman.keyboards {
         const tFlag='&timerid='+ timeoutID;
 
         Lscript.onload = function(event: Event) {
+          window.clearTimeout(timeoutID);
           // This case shouldn't happen, as `register` should handle all related
           // Promise resolution / rejection... but just in case.
           if(kbdManager.registrationResolvers[timeoutID]) {
-            delete kbdManager.registrationResolvers[timeoutID];
-            reject(CLOUD_STUB_REGISTRATION_ERR);
+            try {
+              reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
+            } finally {
+              delete kbdManager.registrationResolvers[timeoutID];
+            }
           }
-
-          window.clearTimeout(timeoutID);
         };
 
+        // Note:  at this time (May 24 2021), this is also happens for "successful" 
+        //        API calls where there is no matching keyboard ID.
+        //        
+        //        The returned 'error' JSON object is sent with an HTML error code (404)
+        //        and does not call `keyman.register`.  Even if it did the latter, the
+        //        404 code would likely prevent the returned script's call.
         Lscript.onerror = function(event: string | Event, source?: string, 
                                   lineno?: number, colno?: number, error?: Error) {
           window.clearTimeout(timeoutID);
           try {
-            reject(error);
+            let msg = CLOUD_MALFORMED_OBJECT_ERR;
+            if(error) {
+              msg = msg + ": " + error.message;
+            }
+            reject(new Error(msg));
           } finally {
             delete kbdManager.registrationResolvers[timeoutID];
           }
@@ -1250,16 +1266,9 @@ namespace com.keyman.keyboards {
 
       // TODO:  Allow the site developer to handle error messaging via this catch.
       //        This current version simply maintains pre-existing behavior.
-      promise.catch(function(error: string | Error) {
-        if(typeof error == 'string') {
-          // Use the default "cannot connect" message, which is conditioned on empty string.
-          kbdManager.serverUnavailable(error);
-
-          throw error;
-        } else {
-          kbdManager.serverUnavailable(CLOUD_MALFORMED_OBJECT_ERR);
-          throw CLOUD_MALFORMED_OBJECT_ERR;
-        }
+      promise.catch(function(error: Error) {
+        kbdManager.serverUnavailable(error);
+        throw error;
       });
     }
 
