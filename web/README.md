@@ -1,6 +1,8 @@
 # Keyman Web
 The Original Code is (C) 2017-2018 SIL International
 
+Do not merge. Trivial change for triggering PR build...
+
 ## Minimum Web Compilation Requirements
 
 * Java 7+ (required by the Google Closure Compiler)
