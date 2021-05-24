@@ -213,7 +213,7 @@ if [ $DO_CARTHAGE = true ]; then
     echo
     echo "Load dependencies with Carthage"
 
-    carthage checkout || fail "Carthage dependency loading failed"
+    $KEYMAN_ROOT/resources/build/carthage-workaround.sh checkout || fail "Carthage dependency loading failed"
 
     # Carthage sometimes picks the wrong .xcworkspace if two are available in a dependency's repo.
     # Easiest way to override it - delete the wrong one (or just its scheme)
@@ -223,7 +223,7 @@ if [ $DO_CARTHAGE = true ]; then
 
     # stable-14.0 will continue to use the old fat-framework approach.
     # In 15.0, this will be replaced with an XCFramework approach instead.
-    carthage build --platform iOS || fail "Carthage dependency loading failed"
+    $KEYMAN_ROOT/resources/build/carthage-workaround.sh build --platform iOS || fail "Carthage dependency loading failed"
 fi
 
 echo
