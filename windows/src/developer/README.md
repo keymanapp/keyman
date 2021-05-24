@@ -42,7 +42,7 @@ Contains sample keyboards and sample developer projects. See readme.txt for deta
 
 Installation program for Keyman Developer.
 
-# TIKE - Tavultesoft Integrated Keyboard Editor
+## TIKE - Tavultesoft Integrated Keyboard Editor
 
 This is the designer side of the Developer. Used for designing, developing, testing and packing keyboards for distribution.
 
