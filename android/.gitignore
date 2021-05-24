@@ -47,6 +47,9 @@ KMAPro/**/assets/info/
 # KMAPRo default packages
 KMAPro/**/assets/*.kmp
 
+# Play Store release notes (copied from whatsnew.md)
+KMAPro/kMAPro/src/main/play/release-notes/**/*.txt
+
 # Eclipse files
 .project
 .settings/
