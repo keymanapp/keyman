@@ -114,7 +114,7 @@ namespace com.keyman.keyboards {
     keyboards: any[] = [];
 
     /**
-     * Holds the 'resolve' function for Promises build by keymanCloudRequest.
+     * Holds the 'resolve' function for Promises built by keymanCloudRequest.
      * These should be cleared when the Promise is fulfilled.
      */
     registrationResolvers: {[timeoutID: number] : RegistrationPromiseTuple} = {};
