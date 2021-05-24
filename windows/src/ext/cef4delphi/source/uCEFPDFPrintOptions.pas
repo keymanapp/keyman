@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFPDFPrintOptions;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -64,15 +62,15 @@ type
       Fpage_width            : integer;
       Fpage_height           : Integer;
       Fscale_factor          : integer;
-      Fmargin_top            : double;
-      Fmargin_right          : double;
-      Fmargin_bottom         : double;
-      Fmargin_left           : double;
+      Fmargin_top            : integer;
+      Fmargin_right          : integer;
+      Fmargin_bottom         : integer;
+      Fmargin_left           : integer;
       Fmargin_type           : TCefPdfPrintMarginType;
-      Fheader_footer_enabled : integer;
-      Fselection_only        : integer;
-      Flandscape             : integer;
-      Fbackgrounds_enabled   : integer;
+      Fheader_footer_enabled : boolean;
+      Fselection_only        : boolean;
+      Flandscape             : boolean;
+      Fbackgrounds_enabled   : boolean;
 
     public
       constructor Create; virtual;
@@ -81,15 +79,15 @@ type
       property page_width            : integer                 read Fpage_width               write Fpage_width            default 0;
       property page_height           : integer                 read Fpage_height              write Fpage_height           default 0;
       property scale_factor          : integer                 read Fscale_factor             write Fscale_factor          default 0;
-      property margin_top            : double                  read Fmargin_top               write Fmargin_top;
-      property margin_right          : double                  read Fmargin_right             write Fmargin_right;
-      property margin_bottom         : double                  read Fmargin_bottom            write Fmargin_bottom;
-      property margin_left           : double                  read Fmargin_left              write Fmargin_left;
+      property margin_top            : integer                 read Fmargin_top               write Fmargin_top;
+      property margin_right          : integer                 read Fmargin_right             write Fmargin_right;
+      property margin_bottom         : integer                 read Fmargin_bottom            write Fmargin_bottom;
+      property margin_left           : integer                 read Fmargin_left              write Fmargin_left;
       property margin_type           : TCefPdfPrintMarginType  read Fmargin_type              write Fmargin_type           default PDF_PRINT_MARGIN_DEFAULT;
-      property header_footer_enabled : integer                 read Fheader_footer_enabled    write Fheader_footer_enabled default 0;
-      property selection_only        : integer                 read Fselection_only           write Fselection_only        default 0;
-      property landscape             : integer                 read Flandscape                write Flandscape             default 0;
-      property backgrounds_enabled   : integer                 read Fbackgrounds_enabled      write Fbackgrounds_enabled   default 0;
+      property header_footer_enabled : boolean                 read Fheader_footer_enabled    write Fheader_footer_enabled default False;
+      property selection_only        : boolean                 read Fselection_only           write Fselection_only        default False;
+      property landscape             : boolean                 read Flandscape                write Flandscape             default False;
+      property backgrounds_enabled   : boolean                 read Fbackgrounds_enabled      write Fbackgrounds_enabled   default False;
   end;
 
 implementation
@@ -104,10 +102,10 @@ begin
   Fmargin_bottom         := 0;
   Fmargin_left           := 0;
   Fmargin_type           := PDF_PRINT_MARGIN_DEFAULT;
-  Fheader_footer_enabled := 0;
-  Fselection_only        := 0;
-  Flandscape             := 0;
-  Fbackgrounds_enabled   := 0;
+  Fheader_footer_enabled := False;
+  Fselection_only        := False;
+  Flandscape             := False;
+  Fbackgrounds_enabled   := False;
 end;
 
 end.

@@ -41,13 +41,14 @@ private:
   KMX_DWORD m_modifiers = 0;
 
   /* File loading */
-  LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
   KMX_BOOL LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
   PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 #ifdef KMX_64BIT
   LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
+#else
+  LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
 #endif
 
   KMX_BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);

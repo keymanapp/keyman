@@ -36,7 +36,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblCoypright: TLabel
     Left = 12
-    Top = 38
+    Top = 65
     Width = 51
     Height = 13
     Caption = '&Copyright:'
@@ -44,7 +44,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblVersion: TLabel
     Left = 12
-    Top = 65
+    Top = 118
     Width = 39
     Height = 13
     Caption = '&Version:'
@@ -52,7 +52,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblAuthor: TLabel
     Left = 12
-    Top = 92
+    Top = 38
     Width = 37
     Height = 13
     Caption = 'A&uthor:'
@@ -60,7 +60,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblTargets: TLabel
     Left = 12
-    Top = 119
+    Top = 145
     Width = 41
     Height = 13
     Caption = '&Targets:'
@@ -82,12 +82,20 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Caption = 'Project &filename'
     FocusControl = editProjectFilename
   end
+  object Label1: TLabel
+    Left = 12
+    Top = 91
+    Width = 68
+    Height = 13
+    Caption = 'Fu&ll copyright:'
+    FocusControl = editFullCopyright
+  end
   object editKeyboardID: TEdit
     Left = 120
     Top = 272
     Width = 205
     Height = 21
-    TabOrder = 11
+    TabOrder = 12
     OnChange = editKeyboardIDChange
   end
   object cmdBrowse: TButton
@@ -96,7 +104,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Width = 73
     Height = 21
     Caption = '&Browse...'
-    TabOrder = 10
+    TabOrder = 11
     OnClick = cmdBrowseClick
   end
   object editPath: TEdit
@@ -104,7 +112,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Top = 245
     Width = 205
     Height = 21
-    TabOrder = 9
+    TabOrder = 10
     OnChange = editPathChange
   end
   object editKeyboardName: TEdit
@@ -117,28 +125,28 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object editCopyright: TEdit
     Left = 120
-    Top = 35
+    Top = 62
     Width = 205
     Height = 21
-    TabOrder = 1
+    TabOrder = 2
     Text = #169
     OnChange = editCopyrightChange
   end
   object editVersion: TEdit
     Left = 120
-    Top = 62
+    Top = 115
     Width = 205
     Height = 21
-    TabOrder = 2
+    TabOrder = 4
     Text = '1.0'
     OnChange = editVersionChange
   end
   object editAuthor: TEdit
     Left = 120
-    Top = 89
+    Top = 35
     Width = 205
     Height = 21
-    TabOrder = 3
+    TabOrder = 1
     OnChange = editAuthorChange
   end
   object cmdOK: TButton
@@ -148,7 +156,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 13
+    TabOrder = 14
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
@@ -159,16 +167,16 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 14
+    TabOrder = 15
   end
   object clbTargets: TCheckListBox
     Left = 120
-    Top = 116
+    Top = 142
     Width = 205
     Height = 97
     OnClickCheck = clbTargetsClickCheck
     ItemHeight = 13
-    TabOrder = 4
+    TabOrder = 5
   end
   object gridKeyboardLanguages: TStringGrid
     Left = 339
@@ -180,7 +188,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     FixedCols = 0
     RowCount = 9
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-    TabOrder = 5
+    TabOrder = 6
     OnClick = gridKeyboardLanguagesClick
     OnDblClick = gridKeyboardLanguagesDblClick
     ColWidths = (
@@ -193,7 +201,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Width = 73
     Height = 25
     Caption = '&Add...'
-    TabOrder = 6
+    TabOrder = 7
     OnClick = cmdKeyboardAddLanguageClick
   end
   object cmdKeyboardEditLanguage: TButton
@@ -202,7 +210,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Width = 73
     Height = 25
     Caption = 'Ed&it...'
-    TabOrder = 7
+    TabOrder = 8
     OnClick = cmdKeyboardEditLanguageClick
   end
   object cmdKeyboardRemoveLanguage: TButton
@@ -211,7 +219,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Width = 72
     Height = 25
     Caption = '&Remove'
-    TabOrder = 8
+    TabOrder = 9
     OnClick = cmdKeyboardRemoveLanguageClick
   end
   object editProjectFilename: TEdit
@@ -222,7 +230,16 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     TabStop = False
     ParentColor = True
     ReadOnly = True
-    TabOrder = 12
+    TabOrder = 13
     OnChange = editKeyboardIDChange
+  end
+  object editFullCopyright: TEdit
+    Left = 120
+    Top = 88
+    Width = 205
+    Height = 21
+    TabOrder = 3
+    Text = #169' YYYY'
+    OnChange = editFullCopyrightChange
   end
 end

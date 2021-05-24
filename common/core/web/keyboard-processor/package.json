@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/keyboard-processor",
-  "version": "15.0.48",
+  "version": "15.0.52",
   "description": "Core module for Keyman keyboard support in KeymanWeb.",
   "repository": {
     "type": "git",
@@ -18,10 +18,11 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@keymanapp/resources-gosh": "^15.0.48",
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "mocha-teamcity-reporter": "^3.0.0",
+    "@keymanapp/resources-gosh": "^15.0.52",
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0",
+    "mocha-teamcity-reporter": "^4.0.0",
+    "ts-node": "^9.1.1",
     "typescript": "^3.8.3"
   },
   "scripts": {
@@ -31,10 +32,9 @@
     "mocha": "mocha"
   },
   "dependencies": {
-    "@keymanapp/models-types": "^15.0.48",
-    "@keymanapp/web-environment": "^15.0.48",
-    "@keymanapp/web-utils": "^15.0.48",
-    "@types/node": "^11.9.4",
-    "ts-node": "^8.0.2"
+    "@keymanapp/models-types": "^15.0.52",
+    "@keymanapp/web-environment": "^15.0.52",
+    "@keymanapp/web-utils": "^15.0.52",
+    "@types/node": "^11.9.4"
   }
 }

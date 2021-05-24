@@ -344,6 +344,7 @@
 		CEACC90E25F07D58006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90F25F07D5A006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC91225F07D77006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEBD3458265511B700EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<absolute>"; };
 		CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<absolute>"; };
 		CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = /Users/jahorton/keymanapp/keyman/ios/engine/KMEI/../../Carthage/Build/Reachability.xcframework; sourceTree = "<absolute>"; };
@@ -797,6 +798,7 @@
 				de,
 				ff,
 				az,
+				am,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -1093,6 +1095,7 @@
 				CEACC91225F07D77006EAB45 /* de */,
 				CE98E6BD2615593300F3F2C0 /* ff */,
 				CE72B3D62643ABB7006821CE /* az */,
+				CEBD3458265511B700EB2EA8 /* am */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

@@ -160,6 +160,11 @@ source the binary files from the https://github.com/keymanapp/CEF4Delphi_binary 
 The `KEYMAN_CEF4DELPHI_ROOT` environment variable should be set to the root of this
 repo on your local machine.
 
+The version of CEF in use is determined by CEF_VERSION.md. This maps to a branch
+prefixed with `v` e.g. `v89.0.18` in the CEF4Delphi_binary repository. During a
+release build, the buildtools/cef-checkout.sh script will checkout the correct
+branch of the repository automatically and extract any compressed files found in it.
+
 ### Crash Reporting
 
 Crash report dialogs as shown by tsysinfo have a few special secret hotkeys

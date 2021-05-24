@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">አማርኛ</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION አዘገጃጀት</string>
+  <string name="ssTitle">ጫን $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION በጥሩ ሁኔታ ተጭኗል።</string>
+  <string name="ssCancelQuery">እርግጠኛ ነዎት የሚጫነውን ማቋረጥ ይፈልጋሉ $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">ጥቅል ማውጣት...</string>
+  <string name="ssBootstrapCheckingPackages">ፓኬጆችን በመፈተሽ ላይ...</string>
+  <string name="ssBootstrapCheckingForUpdates">ለማዘመን በኢንተርኔት አዲስ ነበር መኖሩን አረጋግጥልኝ...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">የተጫኑ ስሪቶችን ፈጥሽልኝ...</string>
+  <string name="ssBootstrapReady">አጠናቅቅ...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">ምንም የሚጫን አዲስ ነገር የለም።</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s የወረደ)</string>
+  <string name="ssActionInstall">የሚጫኑ ዝርዝሮች ፦</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION ይህ ነፃና ክፍት ምንጭ</string>
+  <string name="ssLicenseLink">&amp;ፈቃዱን ያንብቡ</string>
+  <string name="ssInstallOptionsLink">የሚጫኑ &amp;አማራጭ ዝርዝሮች</string>
+  <string name="ssMessageBoxTitle">$APPNAME የሚጫኑ ዝርዝሮች</string>
+  <string name="ssOkButton">ይሁን</string>
+  <string name="ssInstallButton">&amp;ጫን</string>
+  <string name="ssCancelButton">ይቅር</string>
+  <string name="ssExitButton">ዝጋ</string>
+  <string name="ssStatusInstalling">እይተጫነ ያለ $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">የድሮውን ስሪት ማጥፋት</string>
+  <string name="ssStatusComplete">የመጫን ሂደቱን ጨርሷል</string>
+  <string name="ssQueryRestart">ማዋቀር ከመጠናቀቁ በፊት ዊንዶውስን እንደገና ማስጀመር አለብዎት፤ ዊንዶውስን እንደገና ሲያስጀምሩ ማዋቀር ይቀጥላል።
+
+አሁን እንደገና ዊንዶውሱን ላብራ?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">ዊንዶውስ ወዲያውኑ እንደገና መጀመር አልቻለም፤ ከመሞከርዎ እና ከመጀመርዎ በፊት ዊንዶውስ እንደገና ማስጀመር አለብዎት $APPNAME.</string>
+  <string name="ssMustRestart">የመጫን ሂደቱን ለማጠናቀቅ ዊንዶውስን እንደገና ማስጀመር አለብዎት፤ ዊንዶውስን እንደገና ሲያስጀምሩ ማዋቀር ይጠናቀቃል።</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION ዊንዶውስ 7 ወይም ከዚያ በኋላ እንዲጭኑ ይፈልጋል፤ ሆኖም ኬይማን ዴስክቶፕ 7 ፣ 8 ወይም 9 ተጭኖ ተገኝቷል፤ በዚህ በተጫነው ውስጥ የተካተቱትን የፊደል ገበታ ሰሌዳዎች የኪይማን ዴስክቶፕ ስሪት ውስጥ መጫን ይፈልጋሉ?</string>
+  <string name="ssOldOsVersionDownload">ይህ የ $APPNAME ስሪት ዊንዶውስ 7 ወይም ከዚያ በኋላ እንዲጭን ይፈልጋል፤ ኪይማን ዴስክቶፕ 8 ማውረድ ይፈልጋሉ?</string>
+  <string name="ssOptionsTitle">የሚጫኑ አማራጭ ዝርዝሮች</string>
+  <string name="ssOptionsTitleInstallOptions">የሚጫኑ አማራጭ ዝርዝሮች</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">መደበኛ ስርአት $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">የሚጫኑ ወይም የሚሻሻሉ ሞጁሎች</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">ተያያዥነት ያለው የፊደል ገበታ ቋንቋ</string>
+  <string name="ssOptionsTitleLocation">የሚጫነው ስሪት</string>
+  <string name="ssOptionsStartWithWindows">ዊንዶው ሲነሳ $APPNAME አብሮ ይነሳ</string>
+  <string name="ssOptionsStartAfterInstall">የተጫነው ሲጨርስ $APPNAME ይጀምር</string>
+  <string name="ssOptionsCheckForUpdates">በየጊዜው በኢንተርኔት መረብ ላይ ማሻሻያዎቹን ይፈትሹ</string>
+  <string name="ssOptionsUpgradeKeyboards">ከቀድሞዎቹ ስሪቶች ጋር የተጫኑ የፊደል ገበታ ሰሌዳ ስሪትቶችን $VERSION ያሻሽሉ</string>
+  <string name="ssOptionsAutomaticallyReportUsage">ስም ያልተጠቀሰ የአጠቃቀም ስታቲስቲክስ ለ keyman.com ያጋሩ</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">የሚጫነው ስሪት፦ %0:s</string>
+  <string name="ssOptionsInstallKeyman">እይተጫነ ያለ $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">የተሻሻለ $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s ቀድሞ የተጫነ።</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">የወረደ ስሪት %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">ስሪት %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">የተጫነ %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">የወረደ ስሪት %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">ስሪት %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">ከ%0:s የፊደል ገበታ ሰሌዳ ጋር ለማያያዝ የሚፈልጉትን ቋንቋ ይምረጡ</string>
+  <string name="ssOptionsDefaultLanguage">ነባር ቋንቋ</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">%0:s በማውረድ ላይ</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">%0:s በማውረድ ላይ</string>
+  <string name="ssOffline">$APPNAME ማዋቀር ተጨማሪ አጋዥ ሪሶርሶችን ለማውረድ ከkeyman.com ጋር መገናኘት አልቻለም።
+
+እባክዎን የኢንተርኔት ኮኔክሽን መኖሩን ያረጋግጡ እና በፋየርዎልዎ ቅንብሮች ውስጥ በይነመረብን ለመድረስ ለ $APPNAME ማዋቀር ፈቃድ ይስጡ።
+
+ከቅንብር ለመውጣት (Abort)ን ይምረጡ፣ እንደገና ሪሶርሶቹን ለማውረድ እንደገና ይሞክሩ፣ ወይም ከኢንተርኔት ውጭ ለመቀጠል ችላ ይበሉት።</string>
+</resources>

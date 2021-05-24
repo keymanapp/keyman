@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFWaitableEvent;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -64,7 +62,7 @@ type
 
     public
       class function UnWrap(data: Pointer): ICefWaitableEvent;
-      class function New(automatic_reset, initially_signaled : integer): ICefWaitableEvent;
+      class function New(automatic_reset, initially_signaled : boolean): ICefWaitableEvent;
   end;
 
 implementation
@@ -105,9 +103,9 @@ begin
     Result := nil;
 end;
 
-class function TCefWaitableEventRef.New(automatic_reset, initially_signaled : integer): ICefWaitableEvent;
+class function TCefWaitableEventRef.New(automatic_reset, initially_signaled : boolean): ICefWaitableEvent;
 begin
-  Result := UnWrap(cef_waitable_event_create(automatic_reset, initially_signaled));
+  Result := UnWrap(cef_waitable_event_create(Ord(automatic_reset), Ord(initially_signaled)));
 end;
 
 end.

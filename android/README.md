@@ -3,7 +3,7 @@
 ## Prerequisites
 * Android Studio 4.1+
 * Java SE Development Kit 8 
-* [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+* [Node.js](https://nodejs.org/) 14.17+ (for building KeymanWeb)
 * [Pandoc](#Install-Pandoc) for generating offline help
 
 ## Install Java
@@ -170,7 +170,7 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
 4. Check that the `android{}` object, includes the following:
 ```gradle
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
@@ -192,10 +192,11 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
-    implementation 'com.google.android.material:material:1.2.1'
-    api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:2.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0-rc01'
+    implementation 'com.google.android.material:material:1.3.0'
+    api (name:'keyman-engine', ext:'aar')
+    implementation 'io.sentry:sentry-android:4.3.0'
+    implementation 'androidx.preference:preference:1.1.1'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {

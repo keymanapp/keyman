@@ -118,6 +118,7 @@ final class KMKeyboard extends WebView {
     setFocusable(false);
     clearCache(true);
     getSettings().setJavaScriptEnabled(true);
+    getSettings().setAllowFileAccess(true);
 
     // Normally, this would be true to prevent the WebView from accessing the network.
     // But this needs to false for sending embedded KMW crash reports to Sentry (keymanapp/keyman#3825)
