@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.52 alpha 2021-05-24
+
+* chore(android): Update targetSDKVersion to 30 (#5126)
+* chore(windows): Chromium 89.0.18 (#5128)
+* chore(android/samples,oem/fv/android) Update dependencies (#5127)
+* feat(web): basic promise wrapper on cloud api call (#5121)
+
 ## 15.0.51 alpha 2021-05-21
 
 * chore(windows): reorganise tests (#5084)
