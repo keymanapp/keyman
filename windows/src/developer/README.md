@@ -15,7 +15,7 @@ A keyboard source analysis and automated regression test tool. Testing for logic
 
 ## kcmpdll - kmcmpdll.dll & kmcmpdll.x64.dll
 
-This is the main source code for the keyboard complier it is packaged as dynamic linked library. The consumers will call 'CompileKeyboardFile'
+This is the main source code for the keyboard compiler, packaged as dynamic linked library. The consumers will call 'CompileKeyboardFile'
 
 ## kcframe.exe & kcframe.x64.exe
 
@@ -23,7 +23,7 @@ Located under kmcomp folder this is used for debugging in Visual Studio.  A comm
 
 ## kmcomp - kmcomp.exe & kmcomp.x64.exe
 
-The main command line compiler for a keyboard. It compiles keyboards in either kmn or .kps format.
+The main command line compiler for a keyboard. It compiles keyboards (.kmn), packages (.kps), and projects (.kpj).
 
 ## kmconvert - kmconvert.exe & kmconvert.x64.exe
 
@@ -45,5 +45,4 @@ Installation program for Keyman Developer.
 ## TIKE - Tavultesoft Integrated Keyboard Editor
 
 This is the designer side of the Developer. Used for designing, developing, testing and packing keyboards for distribution.
-
 
