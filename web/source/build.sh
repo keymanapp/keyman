@@ -14,6 +14,9 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 WORKING_DIRECTORY=`pwd`
 
+# Trivial change
+echo "This is a test"
+
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
