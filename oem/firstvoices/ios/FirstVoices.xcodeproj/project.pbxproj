@@ -56,6 +56,12 @@
 		CEBD34282654D76E00EB2EA8 /* Zip.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
 		CEBD34482654FF3300EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
+		CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; };
+		CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
+		CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
+		CEDB3283265C9C58000A2009 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; };
+		CEDB3284265C9C58000A2009 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -166,6 +172,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */,
+				CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */,
+				CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */,
+				CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */,
+				CEDB3283265C9C58000A2009 /* XCGLogger.xcframework in Frameworks */,
+				CEDB3284265C9C58000A2009 /* Zip.xcframework in Frameworks */,
 				CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
