@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 15.0.53 alpha 2021-05-25
+
+* fix(developer): buffer size for range expansions (#4831)
+* feat(web): basic promise wrapper on cloud api call (#5121)
+* feat(android/app): Auto-generate Play Store release notes (#5132)
+* fix(web): active element selection in multi-touch scenarios (#5134)
+* chore(windows): cleanup old .dof, .bdsproj and .cfg files (#5131)
+* chore(ios): shift to use of XCFrameworks (#5107)
+* chore(ios): imports iOS artifact-upload script for CI use (#5140)
+* refactor(ios/engine): "should reload keyboard" now a property of the keyboard (#4847)
+* docs(windows): Initial commit - README.md (#5119)
+* chore(windows): move to vc++ 2019 (#5143)
+
 ## 15.0.52 alpha 2021-05-24
 
 * chore(android): Update targetSDKVersion to 30 (#5126)
