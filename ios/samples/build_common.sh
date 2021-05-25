@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # set -e: Terminate script if a command returns an error
 set -e
