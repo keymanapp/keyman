@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/models-templates",
-  "version": "15.0.52",
+  "version": "15.0.53",
   "description": "Backing model implementations (templates) for Keyman's modelling layer",
   "keywords": [
     "lm",
@@ -42,8 +42,8 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "@keymanapp/models-types": "^15.0.52",
-    "@keymanapp/web-utils": "^15.0.52",
+    "@keymanapp/models-types": "^15.0.53",
+    "@keymanapp/web-utils": "^15.0.53",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "@types/node": "^14.0.4",
@@ -52,6 +52,6 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@keymanapp/models-wordbreakers": "^15.0.52"
+    "@keymanapp/models-wordbreakers": "^15.0.53"
   }
 }
