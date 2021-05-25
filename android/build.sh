@@ -32,6 +32,7 @@ clean ( ) {
   if [ -d "$KEYMAN_ROOT/android/upload" ]; then
     echo "Cleaning upload directory"
     rm -rf "$KEYMAN_ROOT/android/upload"
+  fi
 }
 
 echo Build KMEA and KMAPro:
