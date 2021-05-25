@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import XCGLogger
 import Sentry
 
 /**
@@ -50,6 +51,7 @@ public class SentryManager {
         return nil
       }
     }
+    //
 
     SentrySDK.start(options: options)
     _started = true
@@ -87,6 +89,53 @@ public class SentryManager {
     #else
       return SentryManager.enabled
     #endif
+  }
+
+  private static func mapLoggingLevel(_ level: Sentry.SentryLevel) -> XCGLogger.Level {
+    switch(level) {
+        case .none:
+          return XCGLogger.Level.none
+        case .debug:
+          return .debug
+        case .info:
+          return .info
+        case .warning:
+          return .warning
+        case .error:
+          return .error
+        case .fatal:
+          return .severe
+        default:
+          return .info
+      }
+  }
+
+  /**
+   * Captures a Sentry event and copies its message to the engine's logging mechanism.
+   * If the logging level is not specified, the Sentry event's log-level will be used as a default.
+   */
+  public static func captureAndLog(event: Sentry.Event, logLevel: XCGLogger.Level? = nil) {
+    // Guarded in case a library consumer decides against initializing Sentry.
+    if _started {
+      SentrySDK.capture(event: event)
+    }
+
+    let level = logLevel ?? mapLoggingLevel(event.level)
+    log.logln(event.message?.formatted, level: level)
+  }
+
+  /**
+   * Adds a Sentry breadcrumb and copies its message to the engine's logging mechanism.
+   * If the logging level is not specified, the Sentry event's log-level will be used as a default.
+   */
+  public static func breadcrumbAndLog(crumb: Sentry.Breadcrumb, logLevel: XCGLogger.Level? = nil) {
+    // Guarded in case a library consumer decides against initializing Sentry.
+    if _started {
+      SentrySDK.addBreadcrumb(crumb: crumb)
+    }
+
+    let level = logLevel ?? mapLoggingLevel(crumb.level)
+    log.logln(crumb.message, level: level)
   }
 
   public static func forceError() {
