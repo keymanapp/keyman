@@ -28,10 +28,17 @@
 		CEBD33E72654CB8800EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33DE2654CB8700EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD33E82654CB8800EB2EA8 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33DF2654CB8700EB2EA8 /* XCGLogger.xcframework */; };
 		CEBD33E92654CB8800EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33DF2654CB8700EB2EA8 /* XCGLogger.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD33ED2654CBD800EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33D22654CB6A00EB2EA8 /* KeymanEngine.xcframework */; };
 		CEBEFB94231FB4E000F8F67C /* banner-portrait-text.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBEFB92231FB4DF00F8F67C /* banner-portrait-text.png */; };
 		CEBEFB95231FB4E000F8F67C /* banner-landscape-text.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBEFB93231FB4DF00F8F67C /* banner-landscape-text.png */; };
 		CED2AC8D260B07CF00A408D2 /* ekwtamil99uni.kmp in Resources */ = {isa = PBXBuildFile; fileRef = CED2AC8C260B07CF00A408D2 /* ekwtamil99uni.kmp */; };
+		CEDB3276265C953A000A2009 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33D22654CB6A00EB2EA8 /* KeymanEngine.xcframework */; };
+		CEDB3277265C953A000A2009 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33D22654CB6A00EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CEDB3279265C9B15000A2009 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33D72654CB7800EB2EA8 /* DeviceKit.xcframework */; };
+		CEDB327A265C9B33000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33DD2654CB8700EB2EA8 /* ObjcExceptionBridging.xcframework */; };
+		CEDB327B265C9B33000A2009 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33DC2654CB8700EB2EA8 /* Reachability.xcframework */; };
+		CEDB327C265C9B33000A2009 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33DE2654CB8700EB2EA8 /* Sentry.xcframework */; };
+		CEDB327D265C9B33000A2009 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33DF2654CB8700EB2EA8 /* XCGLogger.xcframework */; };
+		CEDB327E265C9B33000A2009 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33DB2654CB8700EB2EA8 /* Zip.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +80,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CEDB3278265C953B000A2009 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CEDB3277265C953A000A2009 /* KeymanEngine.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -110,8 +128,8 @@
 				CEBD33E62654CB8800EB2EA8 /* Sentry.xcframework in Frameworks */,
 				CEBD33D82654CB7800EB2EA8 /* DeviceKit.xcframework in Frameworks */,
 				CEBD33E02654CB8700EB2EA8 /* Zip.xcframework in Frameworks */,
-				CEBD33D32654CB6A00EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 				CEBD33E82654CB8800EB2EA8 /* XCGLogger.xcframework in Frameworks */,
+				CEBD33D32654CB6A00EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,7 +137,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEBD33ED2654CBD800EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
+				CEDB327A265C9B33000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */,
+				CEDB327B265C9B33000A2009 /* Reachability.xcframework in Frameworks */,
+				CEDB327C265C9B33000A2009 /* Sentry.xcframework in Frameworks */,
+				CEDB327D265C9B33000A2009 /* XCGLogger.xcframework in Frameworks */,
+				CEDB327E265C9B33000A2009 /* Zip.xcframework in Frameworks */,
+				CEDB3279265C9B15000A2009 /* DeviceKit.xcframework in Frameworks */,
+				CEDB3276265C953A000A2009 /* KeymanEngine.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +274,7 @@
 				98ABFD891AD3A232005534F0 /* Frameworks */,
 				98ABFD8A1AD3A232005534F0 /* Resources */,
 				C0324B8B1F8726E500AF3785 /* ShellScript */,
+				CEDB3278265C953B000A2009 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -357,7 +382,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -436,9 +461,12 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../Carthage/Build/",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -490,9 +518,12 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../Carthage/Build/",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
