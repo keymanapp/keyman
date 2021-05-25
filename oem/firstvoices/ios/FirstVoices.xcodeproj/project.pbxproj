@@ -3,24 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		37150F72231637EA00C73C6A /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6D231637E900C73C6A /* DeviceKit.framework */; };
-		37150F73231637EA00C73C6A /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */; };
-		37150F74231637EA00C73C6A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6F231637EA00C73C6A /* Reachability.framework */; };
-		37150F75231637EA00C73C6A /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F70231637EA00C73C6A /* Zip.framework */; };
-		37150F76231637EA00C73C6A /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F71231637EA00C73C6A /* XCGLogger.framework */; };
-		3729344024613C9900C5428C /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */; };
-		3729344124613CA700C5428C /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F71231637EA00C73C6A /* XCGLogger.framework */; };
-		3729344224613CB600C5428C /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 372A4B9C245E904A001C1F80 /* Sentry.framework */; };
-		3729344324613CC200C5428C /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F70231637EA00C73C6A /* Zip.framework */; };
-		372A4B9D245E904A001C1F80 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 372A4B9C245E904A001C1F80 /* Sentry.framework */; };
 		37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C183B822932AD2009F9EFD /* FVKeyboardList.swift */; };
 		37C183BD2293321C009F9EFD /* Instructions in Resources */ = {isa = PBXBuildFile; fileRef = 37C183BC2293321C009F9EFD /* Instructions */; };
-		37EA1F1F228A1823003E710C /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; };
 		37EA1F23228A1F57003E710C /* FVInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F22228A1F57003E710C /* FVInputViewController.swift */; };
 		37EA1F26228B5D6E003E710C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F25228B5D6E003E710C /* AppDelegate.swift */; };
 		37EA1F28228B5E2B003E710C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F27228B5E2B003E710C /* ViewController.swift */; };
@@ -52,7 +40,28 @@
 		98C9A8F01BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E51BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png */; };
 		98C9A8F11BFBF6C1009E9A4F /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E61BFBF6C1009E9A4F /* banner-Portrait@3x.png */; };
 		98C9A8F21BFBF6C1009E9A4F /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */; };
-		CECB62572463E9FA006E47B5 /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6D231637E900C73C6A /* DeviceKit.framework */; };
+		CEBD34022654D41200EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
+		CEBD34032654D41200EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD341A2654D76600EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
+		CEBD341B2654D76600EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD341D2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; };
+		CEBD341E2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD341F2654D76900EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
+		CEBD34202654D76900EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD34222654D76B00EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
+		CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD34252654D76C00EB2EA8 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; };
+		CEBD34262654D76C00EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD34272654D76E00EB2EA8 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; };
+		CEBD34282654D76E00EB2EA8 /* Zip.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
+		CEBD34482654FF3300EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
+		CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; };
+		CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
+		CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
+		CEDB3283265C9C58000A2009 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; };
+		CEDB3284265C9C58000A2009 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -62,7 +71,13 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				37EA1F1F228A1823003E710C /* KeymanEngine.framework in Embed Frameworks */,
+				CEBD34202654D76900EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
+				CEBD341E2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */,
+				CEBD341B2654D76600EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
+				CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
+				CEBD34262654D76C00EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */,
+				CEBD34032654D41200EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
+				CEBD34282654D76E00EB2EA8 /* Zip.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -78,19 +93,22 @@
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CEBD34492654FF3300EB2EA8 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CEBD34482654FF3300EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		37150F6D231637E900C73C6A /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
-		37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
-		37150F6F231637EA00C73C6A /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
-		37150F70231637EA00C73C6A /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
-		37150F71231637EA00C73C6A /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
-		372A4B9C245E904A001C1F80 /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
-		37B1C771245CD88B00A95075 /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../../ios/Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		37C183B822932AD2009F9EFD /* FVKeyboardList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVKeyboardList.swift; sourceTree = "<group>"; };
 		37C183BC2293321C009F9EFD /* Instructions */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Instructions; path = FirstVoices/Instructions; sourceTree = "<group>"; };
-		37EA1F1D228A1809003E710C /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 		37EA1F22228A1F57003E710C /* FVInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVInputViewController.swift; sourceTree = "<group>"; };
 		37EA1F25228B5D6E003E710C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		37EA1F27228B5E2B003E710C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -126,6 +144,13 @@
 		98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait~ipad.png"; sourceTree = "<group>"; };
 		98C9A9F91BFC10D2009E9A4F /* FirstVoices.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = FirstVoices.entitlements; sourceTree = "<group>"; };
 		98C9A9FA1BFC1111009E9A4F /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
+		CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = KeymanEngine.xcframework; sourceTree = "<group>"; };
+		CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
+		CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<group>"; };
+		CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
+		CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = Carthage/Build/XCGLogger.xcframework; sourceTree = "<group>"; };
+		CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = Carthage/Build/Zip.xcframework; sourceTree = "<group>"; };
+		CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,12 +158,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37150F72231637EA00C73C6A /* DeviceKit.framework in Frameworks */,
-				372A4B9D245E904A001C1F80 /* Sentry.framework in Frameworks */,
-				37150F73231637EA00C73C6A /* ObjcExceptionBridging.framework in Frameworks */,
-				37150F74231637EA00C73C6A /* Reachability.framework in Frameworks */,
-				37150F75231637EA00C73C6A /* Zip.framework in Frameworks */,
-				37150F76231637EA00C73C6A /* XCGLogger.framework in Frameworks */,
+				CEBD341D2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */,
+				CEBD341F2654D76900EB2EA8 /* Reachability.xcframework in Frameworks */,
+				CEBD34222654D76B00EB2EA8 /* Sentry.xcframework in Frameworks */,
+				CEBD341A2654D76600EB2EA8 /* DeviceKit.xcframework in Frameworks */,
+				CEBD34022654D41200EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
+				CEBD34252654D76C00EB2EA8 /* XCGLogger.xcframework in Frameworks */,
+				CEBD34272654D76E00EB2EA8 /* Zip.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,10 +172,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */,
-				CECB62572463E9FA006E47B5 /* DeviceKit.framework in Frameworks */,
-				3729344224613CB600C5428C /* Sentry.framework in Frameworks */,
-				3729344324613CC200C5428C /* Zip.framework in Frameworks */,
+				CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */,
+				CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */,
+				CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */,
+				CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */,
+				CEDB3283265C9C58000A2009 /* XCGLogger.xcframework in Frameworks */,
+				CEDB3284265C9C58000A2009 /* Zip.xcframework in Frameworks */,
+				CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,14 +288,13 @@
 		98C9A9FB1BFC19ED009E9A4F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				37B1C771245CD88B00A95075 /* Sentry.framework */,
-				372A4B9C245E904A001C1F80 /* Sentry.framework */,
-				37150F6D231637E900C73C6A /* DeviceKit.framework */,
-				37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */,
-				37150F6F231637EA00C73C6A /* Reachability.framework */,
-				37150F71231637EA00C73C6A /* XCGLogger.framework */,
-				37150F70231637EA00C73C6A /* Zip.framework */,
-				37EA1F1D228A1809003E710C /* KeymanEngine.framework */,
+				CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */,
+				CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */,
+				CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */,
+				CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */,
+				CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */,
+				CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */,
+				CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -285,7 +313,6 @@
 				37DF007C24595F6F00C73128 /* ShellScript */,
 				9800EC5D1C029FCD00BF0FB5 /* ShellScript */,
 				371C855D2288F3A50076612A /* Embed Frameworks */,
-				37150F6C2315E4BF00C73C6A /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -304,6 +331,7 @@
 				98C9A8B91BFBF23C009E9A4F /* Frameworks */,
 				98C9A8BA1BFBF23C009E9A4F /* Resources */,
 				37B453EF245C09CE008877E5 /* ShellScript */,
+				CEBD34492654FF3300EB2EA8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -407,36 +435,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		37150F6C2315E4BF00C73C6A /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/Zip.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/ObjcExceptionBridging.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/XCGLogger.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/DeviceKit.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Reachability.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Sentry.framework",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Zip.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/ObjcExceptionBridging.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/XCGLogger.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/DeviceKit.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Reachability.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Sentry.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo \"-- Copying Frameworks --\"\n/usr/local/bin/carthage copy-frameworks\n\n\n";
-			showEnvVarsInLog = 0;
-		};
 		37B453EF245C09CE008877E5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -572,7 +570,7 @@
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../../ios/Carthage/Build/iOS/",
+					"$(SRCROOT)/../../../ios/Carthage/Build/",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -634,7 +632,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../../ios/Carthage/Build/iOS/",
+					"$(SRCROOT)/../../../ios/Carthage/Build/",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -664,14 +662,13 @@
 				CODE_SIGN_STYLE = Manual;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = D7TR486TEH;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
 				INFOPLIST_FILE = FirstVoices/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards;
@@ -694,14 +691,13 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = D7TR486TEH;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
 				INFOPLIST_FILE = FirstVoices/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -729,7 +725,11 @@
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
@@ -760,7 +760,11 @@
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards.swkeyboard;

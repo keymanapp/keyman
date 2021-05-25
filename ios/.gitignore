@@ -6,8 +6,10 @@ xcuserdata
 build
 keyman/Keyman/KeymanEngine.framework
 samples/KMSample1/KeymanEngine.framework
+samples/KMSample1/KeymanEngine.xcframework
 samples/KMSample1/build
 samples/KMSample2/KeymanEngine.framework
+samples/KMSample2/KeymanEngine.xcframework
 samples/KMSample2/build
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanios.js
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanweb-osk.ttf

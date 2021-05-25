@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # set -e: Terminate script if a command returns an error
 set -e
@@ -119,8 +119,9 @@ DEFAULT_LM_ID="nrc.en.mtnt"
 APP_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
 KEYBOARD_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
 ARCHIVE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
-FRAMEWORK_PATH_UNIVERSAL=$BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
-FRAMEWORK_PATH_IOS=$BUILD_PATH/$CONFIG-iphoneos/KeymanEngine.framework
+
+# Engine library build path
+KEYMAN_XCFRAMEWORK=$BUILD_PATH/$CONFIG/KeymanEngine.xcframework
 
 XCODEFLAGS="-quiet -configuration $CONFIG"
 XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath $DERIVED_DATA -workspace keymanios.xcworkspace"
@@ -210,11 +211,18 @@ update_bundle ( ) {
 update_bundle
 
 if [ $DO_CARTHAGE = true ]; then
-    echo
-    echo "Load dependencies with Carthage"
-    # TODO: Replace the workaround-script with the base `carthage` command once
-    # we've properly updated to 0.37's better approach.
-    $KEYMAN_ROOT/resources/build/carthage-workaround.sh bootstrap --platform iOS || fail "carthage boostrap failed"
+  echo
+  echo "Load dependencies with Carthage"
+
+  carthage checkout || fail "Carthage dependency loading failed"
+
+  # Carthage sometimes picks the wrong .xcworkspace if two are available in a dependency's repo.
+  # Easiest way to override it - delete the wrong one (or just its scheme)
+
+  # Deleted workspace - a test for proper deployment to CocoaPods.  Doesn't matter here.
+  rm -r ./Carthage/Checkouts/DeviceKit/CocoaPodsVerification/ || fail "Carthage dependency loading failed"
+
+  carthage build --use-xcframeworks --platform iOS || fail "Carthage dependency loading failed"
 fi
 
 echo
@@ -240,7 +248,7 @@ if [ $? -ne 0 ]; then
   fail "KMEI build failed."
 fi
 
-assertDirExists "$FRAMEWORK_PATH_UNIVERSAL"
+assertDirExists "$KEYMAN_XCFRAMEWORK"
 
 echo "KMEI build complete."
 
