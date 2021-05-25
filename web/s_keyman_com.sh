@@ -111,8 +111,8 @@ function remap_sourcemap_paths {
 
 function commit_and_push {
   echo "Committing and pushing KeymanWeb"
-
-  pushd $S_KEYMAN_COM
+  cd "$KEYMAN_ROOT/web/"
+  pushd "$S_KEYMAN_COM"
 
   if [ ! -z "${TEAMCITY_VERSION-}" ]; then
     git config user.name "Keyman Build Server"
@@ -120,7 +120,7 @@ function commit_and_push {
   fi
 
   local branchname="auto/kmw-release-$VERSION"
-  local modifiedfiles="$S_KEYMAN_COM/kmw/engine/$VERSION"
+  local modifiedfiles="kmw/engine/$VERSION"
 
   local basebranch="master"
 
