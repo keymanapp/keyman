@@ -11,6 +11,9 @@
 **/obj
 **/x64
 
+# Temporary build files for VC++
+**/*.FileListAbsolute.txt
+
 # KeymanWeb is copied from /web/src during Developer build
 developer/TIKE/xml/kmw/resource
 
