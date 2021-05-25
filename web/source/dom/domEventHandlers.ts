@@ -525,12 +525,19 @@ namespace com.keyman.dom {
     }
 
     private static selectTouch(e: TouchEvent): Touch {
+      /**
+       * During multi-touch event's, it's possible for one or more touches of said multi-touch
+       * to be against irrelevant parts of the page.  We only want to consider touches against
+       * valid OutputTargets - against elements of the page that KMW can attach to.
+       * With touch active... that's a TouchAliasElement.
+       */
       let isValidTouch = function(touch: Touch, target: EventTarget): boolean {
         return e.target == target && !!(findTouchAliasTarget(touch.target as HTMLElement));
       }
 
       // The event at least tells us the event's target, which can be used to help check
-      // whether or not individual `Touch`es may be related to this event.
+      // whether or not individual `Touch`es may be related to this specific event for
+      // an ongoing multitouch scenario.
       let target = e.target;
       
       // Find the first touch affected by this event that matches the current target.
