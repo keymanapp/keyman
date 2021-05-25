@@ -20,7 +20,33 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 #
 SHLVL=0
 
+clean ( ) {
+  if [ -f "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar" ]; then
+    echo "Cleaning keyman-engine.aar"
+    rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar"
+  fi
+  if [ -d "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs" ]; then
+    echo "Cleaning KMAPro build outputs"
+    rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs"
+  fi
+  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
+    echo "Cleaning upload directory"
+    rm -rf "$KEYMAN_ROOT/android/upload"
+}
+
 echo Build KMEA and KMAPro:
+
+# Parse args
+while [[ $# -gt 0 ]] ; do
+    key="$1"
+    case $key in
+        -clean)
+            clean
+            ;;
+    esac
+    shift # past argument
+done
+
 
 # Building Keyman Engine for Android
 
