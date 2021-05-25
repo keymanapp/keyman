@@ -487,6 +487,9 @@
 		CEACC90825F07CE9006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90925F07CED006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = fr; path = fr.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		CEB8276624C6811800F3D39C /* KeymanHostTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanHostTests.swift; sourceTree = "<group>"; };
+		CEBD34532655115800EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CEBD34542655117400EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEBD34552655117800EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = am; path = am.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		CEC0C6762410E049003E1BCD /* SentryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryManager.swift; sourceTree = "<group>"; };
 		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
 		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
@@ -1247,6 +1250,7 @@
 				fr,
 				ff,
 				az,
+				am,
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1633,6 +1637,7 @@
 				CEACC90925F07CED006EAB45 /* fr */,
 				CE98E6BB2615589300F3F2C0 /* ff */,
 				CE72B3D22643AB60006821CE /* az */,
+				CEBD34552655117800EB2EA8 /* am */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1646,6 +1651,7 @@
 				CEACC90825F07CE9006EAB45 /* fr */,
 				CE98E6BC2615589800F3F2C0 /* ff */,
 				CE72B3D32643AB65006821CE /* az */,
+				CEBD34542655117400EB2EA8 /* am */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1660,6 +1666,7 @@
 				CEACC90725F07CDA006EAB45 /* fr */,
 				CE98E6BA2615588600F3F2C0 /* ff */,
 				CE72B3D12643AA9D006821CE /* az */,
+				CEBD34532655115800EB2EA8 /* am */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";
@@ -2089,7 +2096,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/iOS/";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2364,7 +2371,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/iOS/";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2406,7 +2413,7 @@
 				DEFINES_MODULE = YES;
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/iOS/";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;

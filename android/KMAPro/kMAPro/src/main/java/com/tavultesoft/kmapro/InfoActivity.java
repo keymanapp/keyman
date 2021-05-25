@@ -5,7 +5,6 @@
 package com.tavultesoft.kmapro;
 
 import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.BuildConfig;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -46,6 +45,7 @@ public class InfoActivity extends BaseActivity {
     webView = (WebView) findViewById(R.id.infoWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
     webView.getSettings().setJavaScriptEnabled(true);
+    webView.getSettings().setAllowFileAccess(true);
     webView.getSettings().setUseWideViewPort(true);
     webView.getSettings().setLoadWithOverviewMode(true);
     webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);

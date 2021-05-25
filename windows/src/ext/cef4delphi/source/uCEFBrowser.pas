@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFBrowser;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -81,7 +79,6 @@ type
       function  GetFrameCount: NativeUInt;
       function  GetFrameIdentifiers(var aFrameCount : NativeUInt; var aFrameIdentifierArray : TCefFrameIdentifierArray) : boolean;
       function  GetFrameNames(var aFrameNames : TStrings) : boolean;
-      function  SendProcessMessage(targetProcess: TCefProcessId; const ProcMessage: ICefProcessMessage): Boolean;
 
     public
       class function UnWrap(data: Pointer): ICefBrowser;
@@ -107,39 +104,42 @@ type
       procedure Print;
       procedure PrintToPdf(const path: ustring; settings: PCefPdfPrintSettings; const callback: ICefPdfPrintCallback);
       procedure PrintToPdfProc(const path: ustring; settings: PCefPdfPrintSettings; const callback: TOnPdfPrintFinishedProc);
-      procedure Find(identifier: Integer; const searchText: ustring; forward, matchCase, findNext: Boolean);
+      procedure Find(identifier: Integer; const searchText: ustring; forward_, matchCase, findNext: Boolean);
       procedure StopFinding(clearSelection: Boolean);
       procedure ShowDevTools(const windowInfo: PCefWindowInfo; const client: ICefClient; const settings: PCefBrowserSettings; inspectElementAt: PCefPoint);
       procedure CloseDevTools;
       function  HasDevTools: Boolean;
+      function  SendDevToolsMessage(const message_: ustring): boolean;
+      function  ExecuteDevToolsMethod(message_id: integer; const method: ustring; const params: ICefDictionaryValue): Integer;
+      function  AddDevToolsMessageObserver(const observer: ICefDevToolsMessageObserver): ICefRegistration;
       procedure GetNavigationEntries(const visitor: ICefNavigationEntryVisitor; currentOnly: Boolean);
       procedure GetNavigationEntriesProc(const proc: TCefNavigationEntryVisitorProc; currentOnly: Boolean);
-      procedure SetMouseCursorChangeDisabled(disabled: Boolean);
-      function  IsMouseCursorChangeDisabled: Boolean;
       procedure ReplaceMisspelling(const word: ustring);
       procedure AddWordToDictionary(const word: ustring);
       function  IsWindowRenderingDisabled: Boolean;
       procedure WasResized;
       procedure NotifyScreenInfoChanged;
       procedure WasHidden(hidden: Boolean);
-      procedure Invalidate(kind: TCefPaintElementType);
+      procedure Invalidate(type_: TCefPaintElementType);
+      procedure SendExternalBeginFrame;
       procedure SendKeyEvent(const event: PCefKeyEvent);
-      procedure SendMouseClickEvent(const event: PCefMouseEvent; kind: TCefMouseButtonType; mouseUp: Boolean; clickCount: Integer);
+      procedure SendMouseClickEvent(const event: PCefMouseEvent; type_: TCefMouseButtonType; mouseUp: Boolean; clickCount: Integer);
       procedure SendMouseMoveEvent(const event: PCefMouseEvent; mouseLeave: Boolean);
       procedure SendMouseWheelEvent(const event: PCefMouseEvent; deltaX, deltaY: Integer);
+      procedure SendTouchEvent(const event: PCefTouchEvent);
       procedure SendFocusEvent(aSetFocus: Boolean);
       procedure SendCaptureLostEvent;
       procedure NotifyMoveOrResizeStarted;
       function  GetWindowlessFrameRate : Integer;
       procedure SetWindowlessFrameRate(frameRate: Integer);
-      procedure IMESetComposition(const text: ustring; underlinesCount : NativeUInt; const underlines : PCefCompositionUnderline; const replacement_range, selection_range : PCefRange);
+      procedure IMESetComposition(const text: ustring; const underlines : TCefCompositionUnderlineDynArray; const replacement_range, selection_range : PCefRange);
       procedure IMECommitText(const text: ustring; const replacement_range : PCefRange; relative_cursor_pos : integer);
       procedure IMEFinishComposingText(keep_selection : boolean);
       procedure IMECancelComposition;
       procedure DragTargetDragEnter(const dragData: ICefDragData; const event: PCefMouseEvent; allowedOps: TCefDragOperations);
       procedure DragTargetDragOver(const event: PCefMouseEvent; allowedOps: TCefDragOperations);
       procedure DragTargetDragLeave;
-      procedure DragTargetDrop(event: PCefMouseEvent);
+      procedure DragTargetDrop(const event: PCefMouseEvent);
       procedure DragSourceEndedAt(x, y: Integer; op: TCefDragOperation);
       procedure DragSourceSystemDragEnded;
       function  GetVisibleNavigationEntry : ICefNavigationEntry;
@@ -147,6 +147,8 @@ type
       procedure SetAutoResizeEnabled(enabled: boolean; const min_size, max_size: PCefSize);
       function  GetExtension : ICefExtension;
       function  IsBackgroundHost : boolean;
+      procedure SetAudioMuted(mute: boolean);
+      function  IsAudioMuted : boolean;
 
     public
       class function UnWrap(data: Pointer): ICefBrowserHost;
@@ -157,7 +159,10 @@ implementation
 uses
   uCEFMiscFunctions, uCEFLibFunctions, uCEFDownloadImageCallBack, uCEFFrame, uCEFPDFPrintCallback,
   uCEFRunFileDialogCallback, uCEFRequestContext, uCEFNavigationEntryVisitor, uCEFNavigationEntry,
-  uCEFExtension, uCEFStringList;
+  uCEFExtension, uCEFStringList, uCEFRegistration;
+
+
+// TCefBrowserRef
 
 function TCefBrowserRef.GetHost: ICefBrowserHost;
 begin
@@ -239,11 +244,6 @@ begin
     end;
 end;
 
-function TCefBrowserRef.SendProcessMessage(targetProcess: TCefProcessId; const ProcMessage: ICefProcessMessage): Boolean;
-begin
-  Result := PCefBrowser(FData)^.send_process_message(PCefBrowser(FData), targetProcess, CefGetData(ProcMessage)) <> 0;
-end;
-
 function TCefBrowserRef.GetMainFrame: ICefFrame;
 begin
   Result := TCefFrameRef.UnWrap(PCefBrowser(FData)^.get_main_frame(PCefBrowser(FData)))
@@ -307,11 +307,12 @@ begin
     Result := nil;
 end;
 
+
 // TCefBrowserHostRef
 
 procedure TCefBrowserHostRef.CloseDevTools;
 begin
-  PCefBrowserHost(FData)^.close_dev_tools(FData);
+  PCefBrowserHost(FData)^.close_dev_tools(PCefBrowserHost(FData));
 end;
 
 procedure TCefBrowserHostRef.DownloadImage(const imageUrl     : ustring;
@@ -323,7 +324,12 @@ var
   url: TCefString;
 begin
   url := CefString(imageUrl);
-  PCefBrowserHost(FData)^.download_image(FData, @url, Ord(isFavicon), maxImageSize, Ord(bypassCache), CefGetData(callback));
+  PCefBrowserHost(FData)^.download_image(PCefBrowserHost(FData),
+                                         @url,
+                                         Ord(isFavicon),
+                                         maxImageSize,
+                                         Ord(bypassCache),
+                                         CefGetData(callback));
 end;
 
 procedure TCefBrowserHostRef.DownloadImageProc(const imageUrl     : ustring;
@@ -337,12 +343,12 @@ end;
 
 procedure TCefBrowserHostRef.DragSourceEndedAt(x, y: Integer; op: TCefDragOperation);
 begin
-  PCefBrowserHost(FData)^.drag_source_ended_at(FData, x, y, op);
+  PCefBrowserHost(FData)^.drag_source_ended_at(PCefBrowserHost(FData), x, y, op);
 end;
 
 procedure TCefBrowserHostRef.DragSourceSystemDragEnded;
 begin
-  PCefBrowserHost(FData)^.drag_source_system_drag_ended(FData);
+  PCefBrowserHost(FData)^.drag_source_system_drag_ended(PCefBrowserHost(FData));
 end;
 
 function TCefBrowserHostRef.GetVisibleNavigationEntry : ICefNavigationEntry;
@@ -352,50 +358,60 @@ end;
 
 procedure TCefBrowserHostRef.SetAccessibilityState(accessibilityState: TCefState);
 begin
-  PCefBrowserHost(FData)^.set_accessibility_state(FData, accessibilityState);
+  PCefBrowserHost(FData)^.set_accessibility_state(PCefBrowserHost(FData), accessibilityState);
 end;
 
 procedure TCefBrowserHostRef.SetAutoResizeEnabled(enabled: boolean; const min_size, max_size: PCefSize);
 begin
-  PCefBrowserHost(FData)^.set_auto_resize_enabled(FData, Ord(enabled), min_size, max_size);
+  PCefBrowserHost(FData)^.set_auto_resize_enabled(PCefBrowserHost(FData), Ord(enabled), min_size, max_size);
 end;
 
 function TCefBrowserHostRef.GetExtension : ICefExtension;
 begin
-  Result := TCefExtensionRef.UnWrap(PCefBrowserHost(FData)^.get_extension(FData));
+  Result := TCefExtensionRef.UnWrap(PCefBrowserHost(FData)^.get_extension(PCefBrowserHost(FData)));
 end;
 
 function TCefBrowserHostRef.IsBackgroundHost : boolean;
 begin
-  Result := PCefBrowserHost(FData)^.is_background_host(FData) <> 0;
+  Result := PCefBrowserHost(FData)^.is_background_host(PCefBrowserHost(FData)) <> 0;
+end;
+
+procedure TCefBrowserHostRef.SetAudioMuted(mute: boolean);
+begin
+  PCefBrowserHost(FData)^.set_audio_muted(PCefBrowserHost(FData), Ord(mute));
+end;
+
+function TCefBrowserHostRef.IsAudioMuted : boolean;
+begin
+  Result := PCefBrowserHost(FData)^.is_audio_muted(PCefBrowserHost(FData)) <> 0;
 end;
 
 procedure TCefBrowserHostRef.DragTargetDragEnter(const dragData: ICefDragData; const event: PCefMouseEvent; allowedOps: TCefDragOperations);
 begin
-  PCefBrowserHost(FData)^.drag_target_drag_enter(FData, CefGetData(dragData), event, allowedOps);
+  PCefBrowserHost(FData)^.drag_target_drag_enter(PCefBrowserHost(FData), CefGetData(dragData), event, allowedOps);
 end;
 
 procedure TCefBrowserHostRef.DragTargetDragLeave;
 begin
-  PCefBrowserHost(FData)^.drag_target_drag_leave(FData);
+  PCefBrowserHost(FData)^.drag_target_drag_leave(PCefBrowserHost(FData));
 end;
 
 procedure TCefBrowserHostRef.DragTargetDragOver(const event: PCefMouseEvent; allowedOps: TCefDragOperations);
 begin
-  PCefBrowserHost(FData)^.drag_target_drag_over(FData, event, allowedOps);
+  PCefBrowserHost(FData)^.drag_target_drag_over(PCefBrowserHost(FData), event, allowedOps);
 end;
 
-procedure TCefBrowserHostRef.DragTargetDrop(event: PCefMouseEvent);
+procedure TCefBrowserHostRef.DragTargetDrop(const event: PCefMouseEvent);
 begin
-  PCefBrowserHost(FData)^.drag_target_drop(FData, event);
+  PCefBrowserHost(FData)^.drag_target_drop(PCefBrowserHost(FData), event);
 end;
 
-procedure TCefBrowserHostRef.Find(identifier: Integer; const searchText: ustring; forward, matchCase, findNext: Boolean);
+procedure TCefBrowserHostRef.Find(identifier: Integer; const searchText: ustring; forward_, matchCase, findNext: Boolean);
 var
   TempText : TCefString;
 begin
   TempText := CefString(searchText);
-  PCefBrowserHost(FData)^.find(FData, identifier, @TempText, Ord(forward), Ord(matchCase), Ord(findNext));
+  PCefBrowserHost(FData)^.find(PCefBrowserHost(FData), identifier, @TempText, Ord(forward_), Ord(matchCase), Ord(findNext));
 end;
 
 function TCefBrowserHostRef.GetBrowser: ICefBrowser;
@@ -415,7 +431,7 @@ var
   str: TCefString;
 begin
   str := CefString(path);
-  PCefBrowserHost(FData)^.print_to_pdf(FData, @str, settings, CefGetData(callback));
+  PCefBrowserHost(FData)^.print_to_pdf(PCefBrowserHost(FData), @str, settings, CefGetData(callback));
 end;
 
 procedure TCefBrowserHostRef.PrintToPdfProc(const path     : ustring;
@@ -430,7 +446,7 @@ var
   str: TCefString;
 begin
   str := CefString(word);
-  PCefBrowserHost(FData)^.replace_misspelling(FData, @str);
+  PCefBrowserHost(FData)^.replace_misspelling(PCefBrowserHost(FData), @str);
 end;
 
 procedure TCefBrowserHostRef.RunFileDialog(      mode                 : TCefFileDialogMode;
@@ -477,7 +493,7 @@ var
   str: TCefString;
 begin
   str := CefString(word);
-  PCefBrowserHost(FData)^.add_word_to_dictionary(FData, @str);
+  PCefBrowserHost(FData)^.add_word_to_dictionary(PCefBrowserHost(FData), @str);
 end;
 
 procedure TCefBrowserHostRef.CloseBrowser(forceClose: Boolean);
@@ -487,45 +503,45 @@ end;
 
 procedure TCefBrowserHostRef.SendCaptureLostEvent;
 begin
-  PCefBrowserHost(FData)^.send_capture_lost_event(FData);
+  PCefBrowserHost(FData)^.send_capture_lost_event(PCefBrowserHost(FData));
 end;
 
 procedure TCefBrowserHostRef.SendFocusEvent(aSetFocus: Boolean);
 begin
-  PCefBrowserHost(FData)^.send_focus_event(FData, Ord(aSetFocus));
+  PCefBrowserHost(FData)^.send_focus_event(PCefBrowserHost(FData), Ord(aSetFocus));
 end;
 
 procedure TCefBrowserHostRef.SendKeyEvent(const event: PCefKeyEvent);
 begin
-  PCefBrowserHost(FData)^.send_key_event(FData, event);
+  PCefBrowserHost(FData)^.send_key_event(PCefBrowserHost(FData), event);
 end;
 
 procedure TCefBrowserHostRef.SendMouseClickEvent(const event      : PCefMouseEvent;
-                                                       kind       : TCefMouseButtonType;
+                                                       type_      : TCefMouseButtonType;
                                                        mouseUp    : Boolean;
                                                        clickCount : Integer);
 begin
-  PCefBrowserHost(FData)^.send_mouse_click_event(FData, event, kind, Ord(mouseUp), clickCount);
+  PCefBrowserHost(FData)^.send_mouse_click_event(PCefBrowserHost(FData), event, type_, Ord(mouseUp), clickCount);
 end;
 
 procedure TCefBrowserHostRef.SendMouseMoveEvent(const event: PCefMouseEvent; mouseLeave: Boolean);
 begin
-  PCefBrowserHost(FData)^.send_mouse_move_event(FData, event, Ord(mouseLeave));
+  PCefBrowserHost(FData)^.send_mouse_move_event(PCefBrowserHost(FData), event, Ord(mouseLeave));
 end;
 
 procedure TCefBrowserHostRef.SendMouseWheelEvent(const event: PCefMouseEvent; deltaX, deltaY: Integer);
 begin
-  PCefBrowserHost(FData)^.send_mouse_wheel_event(FData, event, deltaX, deltaY);
+  PCefBrowserHost(FData)^.send_mouse_wheel_event(PCefBrowserHost(FData), event, deltaX, deltaY);
+end;
+
+procedure TCefBrowserHostRef.SendTouchEvent(const event: PCefTouchEvent);
+begin
+  PCefBrowserHost(FData)^.send_touch_event(PCefBrowserHost(FData), event);
 end;
 
 procedure TCefBrowserHostRef.SetFocus(focus: Boolean);
 begin
   PCefBrowserHost(FData)^.set_focus(PCefBrowserHost(FData), Ord(focus));
-end;
-
-procedure TCefBrowserHostRef.SetMouseCursorChangeDisabled(disabled: Boolean);
-begin
-  PCefBrowserHost(FData)^.set_mouse_cursor_change_disabled(PCefBrowserHost(FData), Ord(disabled));
 end;
 
 procedure TCefBrowserHostRef.SetWindowlessFrameRate(frameRate: Integer);
@@ -550,12 +566,12 @@ end;
 
 function TCefBrowserHostRef.GetRequestContext: ICefRequestContext;
 begin
-  Result := TCefRequestContextRef.UnWrap(PCefBrowserHost(FData)^.get_request_context(FData));
+  Result := TCefRequestContextRef.UnWrap(PCefBrowserHost(FData)^.get_request_context(PCefBrowserHost(FData)));
 end;
 
 procedure TCefBrowserHostRef.GetNavigationEntries(const visitor: ICefNavigationEntryVisitor; currentOnly: Boolean);
 begin
-  PCefBrowserHost(FData)^.get_navigation_entries(FData, CefGetData(visitor), Ord(currentOnly));
+  PCefBrowserHost(FData)^.get_navigation_entries(PCefBrowserHost(FData), CefGetData(visitor), Ord(currentOnly));
 end;
 
 procedure TCefBrowserHostRef.GetNavigationEntriesProc(const proc: TCefNavigationEntryVisitorProc; currentOnly: Boolean);
@@ -569,15 +585,51 @@ begin
 end;
 
 procedure TCefBrowserHostRef.IMESetComposition(const text              : ustring;
-                                                     underlinesCount   : NativeUInt;
-                                               const underlines        : PCefCompositionUnderline;
+                                               const underlines        : TCefCompositionUnderlineDynArray;
                                                const replacement_range : PCefRange;
                                                const selection_range   : PCefRange);
 var
-  TempString : TCefString;
+  TempString     : TCefString;
+  TempCount, i   : NativeUInt;
+  TempUnderlines : PCefCompositionUnderline;
+  TempItem       : PCefCompositionUnderline;
 begin
-  TempString := CefString(text);
-  PCefBrowserHost(FData)^.ime_set_composition(PCefBrowserHost(FData), @TempString, underlinesCount, underlines, replacement_range, selection_range);
+  TempCount      := 0;
+  TempUnderlines := nil;
+
+  try
+    TempString := CefString(text);
+
+    if (underlines <> nil) then
+      begin
+        TempCount := length(underlines);
+        GetMem(TempUnderlines, TempCount * SizeOf(TCefCompositionUnderline));
+
+        TempItem := TempUnderlines;
+        i        := 0;
+
+        while (i < TempCount) do
+          begin
+            TempItem^.range            := underlines[i].range;
+            TempItem^.color            := underlines[i].color;
+            TempItem^.background_color := underlines[i].background_color;
+            TempItem^.thick            := underlines[i].thick;
+            TempItem^.style            := underlines[i].style;
+
+            inc(i);
+            inc(TempItem);
+          end;
+      end;
+
+    PCefBrowserHost(FData)^.ime_set_composition(PCefBrowserHost(FData),
+                                                @TempString,
+                                                TempCount,
+                                                TempUnderlines,
+                                                replacement_range,
+                                                selection_range);
+  finally
+    if (TempUnderlines <> nil) then FreeMem(TempUnderlines);
+  end;
 end;
 
 procedure TCefBrowserHostRef.IMECommitText(const text: ustring; const replacement_range : PCefRange; relative_cursor_pos : integer);
@@ -600,27 +652,56 @@ end;
 
 function TCefBrowserHostRef.HasDevTools: Boolean;
 begin
-  Result := PCefBrowserHost(FData)^.has_dev_tools(FData) <> 0;
+  Result := PCefBrowserHost(FData)^.has_dev_tools(PCefBrowserHost(FData)) <> 0;
+end;
+
+function TCefBrowserHostRef.SendDevToolsMessage(const message_: ustring): boolean;
+var
+  TempMsg : TCefStringUtf8;
+  TempLen : integer;
+begin
+  TempMsg.str    := nil;
+  TempMsg.length := 0;
+  TempMsg.dtor   := nil;
+
+  TempLen := length(message_);
+  Result  := (TempLen > 0) and
+             (cef_string_wide_to_utf8(PWideChar(@message_[1]), TempLen, @TempMsg) <> 0) and
+             (PCefBrowserHost(FData)^.send_dev_tools_message(PCefBrowserHost(FData), TempMsg.str, TempMsg.length) <> 0);
+end;
+
+function TCefBrowserHostRef.ExecuteDevToolsMethod(message_id: integer; const method: ustring; const params: ICefDictionaryValue): Integer;
+var
+  TempMethod : TCefString;
+begin
+  TempMethod := CefString(method);
+  Result     := PCefBrowserHost(FData)^.execute_dev_tools_method(PCefBrowserHost(FData), message_id, @TempMethod, CefGetData(params));
+end;
+
+function TCefBrowserHostRef.AddDevToolsMessageObserver(const observer: ICefDevToolsMessageObserver): ICefRegistration;
+begin
+  Result := TCefRegistrationRef.UnWrap(PCefBrowserHost(FData)^.add_dev_tools_message_observer(PCefBrowserHost(FData),
+                                                                                              CefGetData(observer)));
 end;
 
 function TCefBrowserHostRef.HasView: Boolean;
 begin
-  Result := PCefBrowserHost(FData)^.has_view(FData) <> 0;
+  Result := PCefBrowserHost(FData)^.has_view(PCefBrowserHost(FData)) <> 0;
 end;
 
-procedure TCefBrowserHostRef.Invalidate(kind: TCefPaintElementType);
+procedure TCefBrowserHostRef.Invalidate(type_: TCefPaintElementType);
 begin
-  PCefBrowserHost(FData)^.invalidate(FData, kind);
+  PCefBrowserHost(FData)^.invalidate(PCefBrowserHost(FData), type_);
 end;
 
-function TCefBrowserHostRef.IsMouseCursorChangeDisabled: Boolean;
+procedure TCefBrowserHostRef.SendExternalBeginFrame;
 begin
-  Result := PCefBrowserHost(FData)^.is_mouse_cursor_change_disabled(FData) <> 0
+  PCefBrowserHost(FData)^.send_external_begin_frame(PCefBrowserHost(FData));
 end;
 
 function TCefBrowserHostRef.IsWindowRenderingDisabled: Boolean;
 begin
-  Result := PCefBrowserHost(FData)^.is_window_rendering_disabled(FData) <> 0
+  Result := PCefBrowserHost(FData)^.is_window_rendering_disabled(PCefBrowserHost(FData)) <> 0;
 end;
 
 procedure TCefBrowserHostRef.NotifyMoveOrResizeStarted;
@@ -643,7 +724,11 @@ procedure TCefBrowserHostRef.ShowDevTools(const windowInfo       : PCefWindowInf
                                           const settings         : PCefBrowserSettings;
                                                 inspectElementAt : PCefPoint);
 begin
-  PCefBrowserHost(FData)^.show_dev_tools(FData, windowInfo, CefGetData(client), settings, inspectElementAt);
+  PCefBrowserHost(FData)^.show_dev_tools(PCefBrowserHost(FData),
+                                         windowInfo,
+                                         CefGetData(client),
+                                         settings,
+                                         inspectElementAt);
 end;
 
 procedure TCefBrowserHostRef.StartDownload(const url: ustring);
@@ -656,12 +741,12 @@ end;
 
 procedure TCefBrowserHostRef.StopFinding(clearSelection: Boolean);
 begin
-  PCefBrowserHost(FData)^.stop_finding(FData, Ord(clearSelection));
+  PCefBrowserHost(FData)^.stop_finding(PCefBrowserHost(FData), Ord(clearSelection));
 end;
 
 function TCefBrowserHostRef.TryCloseBrowser: Boolean;
 begin
-  Result := PCefBrowserHost(FData)^.try_close_browser(FData) <> 0;
+  Result := PCefBrowserHost(FData)^.try_close_browser(PCefBrowserHost(FData)) <> 0;
 end;
 
 class function TCefBrowserHostRef.UnWrap(data: Pointer): ICefBrowserHost;
@@ -674,12 +759,12 @@ end;
 
 procedure TCefBrowserHostRef.WasHidden(hidden: Boolean);
 begin
-  PCefBrowserHost(FData)^.was_hidden(FData, Ord(hidden));
+  PCefBrowserHost(FData)^.was_hidden(PCefBrowserHost(FData), Ord(hidden));
 end;
 
 procedure TCefBrowserHostRef.WasResized;
 begin
-  PCefBrowserHost(FData)^.was_resized(FData);
+  PCefBrowserHost(FData)^.was_resized(PCefBrowserHost(FData));
 end;
 
 

@@ -1,5 +1,42 @@
 # Keyman Version History
 
+## 15.0.52 alpha 2021-05-24
+
+* chore(android): Update targetSDKVersion to 30 (#5126)
+* chore(windows): Chromium 89.0.18 (#5128)
+* chore(android/samples,oem/fv/android) Update dependencies (#5127)
+* feat(web): basic promise wrapper on cloud api call (#5121)
+
+## 15.0.51 alpha 2021-05-21
+
+* chore(windows): reorganise tests (#5084)
+* feat(developer): Add 'full copyright' field to templates (#5085)
+* fix(developer): TframeTextEditor.SetText was not synchronous (#5096)
+* chore(android): Update Gradle and other dependencies (#5098)
+* chore(web): add test page for playing with CKEditor (#5089)
+* chore(ios): update fv cert ref (#5123)
+* chore(mac): Add help links for installing Keyman and keyboards (#5108)
+* chore(android): Update targetSDKVersion to 30 (#5126)
+
+## 15.0.50 alpha 2021-05-20
+
+* chore(common): Check in crowdin strings for Amharic (#5102)
+* chore(common): resolve audit issues in Web-related repo NPM packages (#5092)
+* refactor(linux): Refactor `install_kmp.py` (#4932)
+* chore(linux): Swap order of dependency (#5113)
+* chore(linux): Remove unnecessary dependency on kmflcomp (#5115)
+
+## 15.0.49 alpha 2021-05-19
+
+* refactor(linux): Remove obsolete SCIM kmfl imengine (#5093)
+* fix(common/core/desktop): Fix warnings when compiling for armhf (#5099)
+* fix(common/core/desktop): Don't segfault on invalid .kmx file (#5101)
+
+## 15.0.48 alpha 2021-05-17
+
+* chore(common): Update stable history for 14.0.274 (#5087)
+* fix(web): position popups correctly in landscape mode on Android and during Chrome emulation (#5075)
+
 ## 15.0.47 alpha 2021-05-14
 
 * fix(developer): kmconvert commandline and deploy (#5082)

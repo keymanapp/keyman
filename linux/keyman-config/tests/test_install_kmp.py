@@ -2,8 +2,7 @@
 import unittest
 from unittest.mock import patch, ANY
 
-from keyman_config.install_kmp import install_keyboards_to_ibus, install_keyboards_to_gnome, \
-    _normalize_language
+from keyman_config.install_kmp import InstallKmp
 
 
 class InstallKmpTests(unittest.TestCase):
@@ -26,7 +25,7 @@ class InstallKmpTests(unittest.TestCase):
         # Setup
         self.mockGetIbusBus.return_value = None
         # Execute
-        install_keyboards_to_ibus([], None)
+        InstallKmp()._install_keyboards_to_ibus([], None)
         # Verify
         self.mockRestartIbus.assert_not_called()
 
@@ -35,7 +34,7 @@ class InstallKmpTests(unittest.TestCase):
         bus = self.mockGetIbusBus.return_value
         keyboards = [{'id': 'foo1'}]
         # Execute
-        install_keyboards_to_ibus(keyboards, 'fooDir')
+        InstallKmp()._install_keyboards_to_ibus(keyboards, 'fooDir')
         # Verify
         self.mockInstallToIbus.assert_called_once_with(ANY, 'fooDir/foo1.kmx')
         self.mockRestartIbus.assert_called_once()
@@ -46,7 +45,7 @@ class InstallKmpTests(unittest.TestCase):
         bus = self.mockGetIbusBus.return_value
         keyboards = [{'id': 'foo1'}, {'id': 'foo2'}]
         # Execute
-        install_keyboards_to_ibus(keyboards, 'fooDir')
+        InstallKmp()._install_keyboards_to_ibus(keyboards, 'fooDir')
         # Verify
         self.mockInstallToIbus.assert_any_call(ANY, 'fooDir/foo1.kmx')
         self.mockInstallToIbus.assert_any_call(ANY, 'fooDir/foo2.kmx')
@@ -58,7 +57,7 @@ class InstallKmpTests(unittest.TestCase):
         bus = self.mockGetIbusBus.return_value
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}]}]
         # Execute
-        install_keyboards_to_ibus(keyboards, 'fooDir')
+        InstallKmp()._install_keyboards_to_ibus(keyboards, 'fooDir')
         # Verify
         self.mockInstallToIbus.assert_called_once_with(ANY, 'en:fooDir/foo1.kmx')
         self.mockRestartIbus.assert_called_once()
@@ -69,7 +68,7 @@ class InstallKmpTests(unittest.TestCase):
         bus = self.mockGetIbusBus.return_value
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
         # Execute
-        install_keyboards_to_ibus(keyboards, 'fooDir')
+        InstallKmp()._install_keyboards_to_ibus(keyboards, 'fooDir')
         # Verify
         self.mockInstallToIbus.assert_called_once()
         self.mockInstallToIbus.assert_called_with(ANY, 'en:fooDir/foo1.kmx')
@@ -82,7 +81,7 @@ class InstallKmpTests(unittest.TestCase):
         bus = self.mockGetIbusBus.return_value
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
         # Execute
-        install_keyboards_to_ibus(keyboards, 'fooDir', 'fr')
+        InstallKmp()._install_keyboards_to_ibus(keyboards, 'fooDir', 'fr')
         # Verify
         self.mockInstallToIbus.assert_called_once()
         self.mockInstallToIbus.assert_called_with(ANY, 'fr:fooDir/foo1.kmx')
@@ -95,7 +94,7 @@ class InstallKmpTests(unittest.TestCase):
         bus = self.mockGetIbusBus.return_value
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
         # Execute
-        install_keyboards_to_ibus(keyboards, 'fooDir', 'de')
+        InstallKmp()._install_keyboards_to_ibus(keyboards, 'fooDir', 'de')
         # Verify
         self.mockInstallToIbus.assert_called_once()
         self.mockInstallToIbus.assert_called_with(ANY, 'de:fooDir/foo1.kmx')
@@ -109,7 +108,7 @@ class InstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
         keyboards = [{'id': 'foo1'}]
         # Execute
-        install_keyboards_to_gnome(keyboards, 'fooDir')
+        InstallKmp()._install_keyboards_to_gnome(keyboards, 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
             [('xkb', 'en'), ('ibus', 'fooDir/foo1.kmx')])
@@ -121,7 +120,7 @@ class InstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
         keyboards = [{'id': 'foo1'}, {'id': 'foo2'}]
         # Execute
-        install_keyboards_to_gnome(keyboards, 'fooDir')
+        InstallKmp()._install_keyboards_to_gnome(keyboards, 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
             [('xkb', 'en'), ('ibus', 'fooDir/foo1.kmx'), ('ibus', 'fooDir/foo2.kmx')])
@@ -133,7 +132,7 @@ class InstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}]}]
         # Execute
-        install_keyboards_to_gnome(keyboards, 'fooDir')
+        InstallKmp()._install_keyboards_to_gnome(keyboards, 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
             [('xkb', 'en'), ('ibus', 'en:fooDir/foo1.kmx')])
@@ -145,7 +144,7 @@ class InstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
         # Execute
-        install_keyboards_to_gnome(keyboards, 'fooDir')
+        InstallKmp()._install_keyboards_to_gnome(keyboards, 'fooDir')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
             [('xkb', 'en'), ('ibus', 'en:fooDir/foo1.kmx')])
@@ -157,7 +156,7 @@ class InstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
         # Execute
-        install_keyboards_to_gnome(keyboards, 'fooDir', 'fr')
+        InstallKmp()._install_keyboards_to_gnome(keyboards, 'fooDir', 'fr')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
             [('xkb', 'en'), ('ibus', 'fr:fooDir/foo1.kmx')])
@@ -169,7 +168,7 @@ class InstallKmpTests(unittest.TestCase):
         mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
         # Execute
-        install_keyboards_to_gnome(keyboards, 'fooDir', 'de')
+        InstallKmp()._install_keyboards_to_gnome(keyboards, 'fooDir', 'de')
         # Verify
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
             [('xkb', 'en'), ('ibus', 'de:fooDir/foo1.kmx')])
@@ -196,7 +195,7 @@ class InstallKmpTests(unittest.TestCase):
         ]:
             with self.subTest(data = data):
                 # Execute
-                result = _normalize_language(languages, data['given'])
+                result = InstallKmp()._normalize_language(languages, data['given'])
 
                 # Verify
                 self.assertEqual(result, data['expected'])
@@ -206,7 +205,7 @@ class InstallKmpTests(unittest.TestCase):
         languages = []
 
         # Execute
-        result = _normalize_language(languages, 'en')
+        result = InstallKmp()._normalize_language(languages, 'en')
 
         # Verify
         self.assertEqual(result, '')

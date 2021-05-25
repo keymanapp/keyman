@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFStringMap;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -126,11 +124,12 @@ begin
 
   if (FHandle <> nil) then
     begin
-      FillChar(TempValue, SizeOf(TempValue), 0);
+      CefStringInitialize(@TempValue);
+
       TempKey := CefString(key);
 
-      if (cef_string_map_find(FHandle, @TempKey, TempValue) <> 0) then
-        Result := CefString(@TempValue);
+      if (cef_string_map_find(FHandle, @TempKey, @TempValue) <> 0) then
+        Result := CefStringClearAndGet(@TempValue);
     end;
 end;
 
@@ -147,10 +146,10 @@ begin
 
   if (FHandle <> nil) then
     begin
-      FillChar(TempKey, SizeOf(TempKey), 0);
+      CefStringInitialize(@TempKey);
 
-      if (cef_string_map_key(FHandle, index, TempKey) <> 0) then
-        Result := CefString(@TempKey);
+      if (cef_string_map_key(FHandle, index, @TempKey) <> 0) then
+        Result := CefStringClearAndGet(@TempKey);
     end;
 end;
 
@@ -170,10 +169,10 @@ begin
 
   if (FHandle <> nil) then
     begin
-      FillChar(TempValue, SizeOf(TempValue), 0);
+      CefStringInitialize(@TempValue);
 
-      if (cef_string_map_value(FHandle, index, TempValue) <> 0) then
-        Result := CefString(@TempValue);
+      if (cef_string_map_value(FHandle, index, @TempValue) <> 0) then
+        Result := CefStringClearAndGet(@TempValue);
     end;
 end;
 

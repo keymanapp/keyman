@@ -5,7 +5,10 @@
 # ----------------------------------------------------------------------
 
 TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler kmcomp-x64-structures \
-        androidstringtokeymanlocalestring
+        androidstringtokeymanlocalestring \
+        keyboard-info keyboard-js-info keyboard-package-versions \
+        kmx-file-languages package-info jsonutil windows-setup \
+        ui-language-manager standards-data compile-supplementary-support
 
 test:
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -42,6 +45,46 @@ lexical-model-compiler:
 kmcomp-x64-structures:
 	cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902
 	$(MAKE) $(TARGET)
+
+keyboard-info:
+    cd $(ROOT)\src\test\unit-tests\keyboard-info
+    $(MAKE) $(TARGET)
+
+keyboard-package-versions:
+    cd $(ROOT)\src\test\unit-tests\keyboard-package-versions
+    $(MAKE) $(TARGET)
+
+keyboard-js-info:
+    cd $(ROOT)\src\test\unit-tests\keyboard-js-info
+    $(MAKE) $(TARGET)
+
+kmx-file-languages:
+    cd $(ROOT)\src\test\unit-tests\kmx-file-languages
+    $(MAKE) $(TARGET)
+
+package-info:
+    cd $(ROOT)\src\test\unit-tests\package-info
+    $(MAKE) $(TARGET)
+
+jsonutil:
+    cd $(ROOT)\src\test\unit-tests\jsonutil
+    $(MAKE) $(TARGET)
+
+windows-setup:
+    cd $(ROOT)\src\test\unit-tests\windows-setup
+    $(MAKE) $(TARGET)
+
+ui-language-manager:
+    cd $(ROOT)\src\test\unit-tests\ui-language-manager
+    $(MAKE) $(TARGET)
+
+standards-data:
+    cd $(ROOT)\src\test\unit-tests\standards-data
+    $(MAKE) $(TARGET)
+
+compile-supplementary-support:
+    cd $(ROOT)\src\test\unit-tests\compile-supplementary-support
+    $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
 
