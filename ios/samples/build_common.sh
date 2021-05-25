@@ -1,4 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+# set -e: Terminate script if a command returns an error
+set -e
+# set -u: Terminate script if an unset variable is used
+set -u
+# set -x: Debugging use, print each statement
+# set -x
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" == *"darwin" ]]; then
@@ -14,7 +21,7 @@ display_usage ( ) {
     echo "build.sh [-no-update] | [-lib-build] | [-lib-ignore] | [-clean]"
     echo
     echo "  -clean          Removes all previously-existing build products for this project before building."
-    echo "  -no-update      If an in-place copy of KeymanEngine.framework exists, does not seek out an updated copy."
+    echo "  -no-update      If an in-place copy of KeymanEngine.xcframework exists, does not seek out an updated copy."
     echo "  -lib-build      Actively rebuilds KMEI before copying its build products to project resources."
     echo "  -lib-nobuild    Prevents the build script from building KeymanEngine under any circumstances."
     echo "  -no-codesign    Performs the build without code signing."
@@ -87,7 +94,7 @@ while [[ $# -gt 0 ]] ; do
     shift
 done
 
-KEYMAN_ENGINE_FRAMEWORK_SRC="../../build/Build/Products/$CONFIG-universal/KeymanEngine.framework"
+KEYMAN_ENGINE_FRAMEWORK_SRC="../../build/Build/Products/$CONFIG/KeymanEngine.xcframework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 if [ $DO_UPDATE = true ]; then

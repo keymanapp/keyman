@@ -3,29 +3,29 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		98ABFCEC1AD39165005534F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEA1AD39165005534F0 /* Main.storyboard */; };
 		98ABFCEE1AD39165005534F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCED1AD39165005534F0 /* Images.xcassets */; };
 		98ABFCF11AD39165005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEF1AD39165005534F0 /* LaunchScreen.xib */; };
-		C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; };
-		C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C0324B801F87170600AF3785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B7F1F87170600AF3785 /* AppDelegate.swift */; };
 		C0324B841F87172900AF3785 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B831F87172900AF3785 /* ViewController.swift */; };
-		C059FCB61FD9245300BD1A64 /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E41FD8F21500D2F3C7 /* Zip.framework */; };
-		C05B14201FD8F2B10082A316 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */; };
-		C05B14211FD8F2B10082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C05B14221FD8F2B10082A316 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */; };
-		C05B14231FD8F2B10082A316 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C05B14251FD8F2B10082A316 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E41FD8F21500D2F3C7 /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBEFB9C231FB94200F8F67C /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB89231F9CC600F8F67C /* Reachability.framework */; };
-		CEBEFB9D231FB96400F8F67C /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB89231F9CC600F8F67C /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CED2AC7F260AF8E400A408D2 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC7E260AF8E400A408D2 /* Sentry.framework */; };
-		CED2AC80260AF8ED00A408D2 /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC7E260AF8E400A408D2 /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CED2AC82260AF92400A408D2 /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC81260AF92400A408D2 /* DeviceKit.framework */; };
-		CED2AC83260AF92D00A408D2 /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CED2AC81260AF92400A408D2 /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD337D26549EC100EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */; };
+		CEBD337E26549EC100EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD33C62654CB0E00EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */; };
+		CEBD33C72654CB0F00EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD33C82654CB1000EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BC2654CA5900EB2EA8 /* ObjcExceptionBridging.xcframework */; };
+		CEBD33C92654CB1100EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BC2654CA5900EB2EA8 /* ObjcExceptionBridging.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD33CA2654CB1300EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */; };
+		CEBD33CB2654CB1300EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD33CC2654CB1400EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */; };
+		CEBD33CD2654CB1500EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD33CE2654CB1600EB2EA8 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BD2654CA5900EB2EA8 /* XCGLogger.xcframework */; };
+		CEBD33CF2654CB1700EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BD2654CA5900EB2EA8 /* XCGLogger.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBD33D02654CB1900EB2EA8 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BB2654CA5900EB2EA8 /* Zip.xcframework */; };
+		CEBD33D12654CB1900EB2EA8 /* Zip.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BB2654CA5900EB2EA8 /* Zip.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CED2AC85260AFADC00A408D2 /* ekwtamil99uni.kmp in Resources */ = {isa = PBXBuildFile; fileRef = CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */; };
 /* End PBXBuildFile section */
 
@@ -36,13 +36,13 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				CED2AC83260AF92D00A408D2 /* DeviceKit.framework in Embed Frameworks */,
-				CED2AC80260AF8ED00A408D2 /* Sentry.framework in Embed Frameworks */,
-				CEBEFB9D231FB96400F8F67C /* Reachability.framework in Embed Frameworks */,
-				C05B14251FD8F2B10082A316 /* Zip.framework in Embed Frameworks */,
-				C05B14211FD8F2B10082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */,
-				C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
-				C05B14231FD8F2B10082A316 /* XCGLogger.framework in Embed Frameworks */,
+				CEBD33CB2654CB1300EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
+				CEBD33C92654CB1100EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */,
+				CEBD33C72654CB0F00EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
+				CEBD33CD2654CB1500EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
+				CEBD33CF2654CB1700EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */,
+				CEBD337E26549EC100EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
+				CEBD33D12654CB1900EB2EA8 /* Zip.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -55,15 +55,15 @@
 		98ABFCEB1AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		98ABFCED1AD39165005534F0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98ABFCF01AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 		C0324B7F1F87170600AF3785 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C0324B831F87172900AF3785 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		C07705E41FD8F21500D2F3C7 /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
-		C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
-		C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
-		CEBEFB89231F9CC600F8F67C /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
-		CED2AC7E260AF8E400A408D2 /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
-		CED2AC81260AF92400A408D2 /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
+		CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = KeymanEngine.xcframework; sourceTree = "<group>"; };
+		CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
+		CEBD33BB2654CA5900EB2EA8 /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = ../../Carthage/Build/Zip.xcframework; sourceTree = "<group>"; };
+		CEBD33BC2654CA5900EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = ../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<group>"; };
+		CEBD33BD2654CA5900EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = ../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<group>"; };
+		CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
+		CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 		CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */ = {isa = PBXFileReference; lastKnownFileType = file; path = ekwtamil99uni.kmp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -72,13 +72,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CED2AC82260AF92400A408D2 /* DeviceKit.framework in Frameworks */,
-				CED2AC7F260AF8E400A408D2 /* Sentry.framework in Frameworks */,
-				C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */,
-				C05B14201FD8F2B10082A316 /* ObjcExceptionBridging.framework in Frameworks */,
-				CEBEFB9C231FB94200F8F67C /* Reachability.framework in Frameworks */,
-				C05B14221FD8F2B10082A316 /* XCGLogger.framework in Frameworks */,
-				C059FCB61FD9245300BD1A64 /* Zip.framework in Frameworks */,
+				CEBD33C82654CB1000EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */,
+				CEBD33CA2654CB1300EB2EA8 /* Reachability.xcframework in Frameworks */,
+				CEBD33CC2654CB1400EB2EA8 /* Sentry.xcframework in Frameworks */,
+				CEBD33C62654CB0E00EB2EA8 /* DeviceKit.xcframework in Frameworks */,
+				CEBD337D26549EC100EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
+				CEBD33CE2654CB1600EB2EA8 /* XCGLogger.xcframework in Frameworks */,
+				CEBD33D02654CB1900EB2EA8 /* Zip.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,13 +127,13 @@
 		98ABFD171AD391B0005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				CED2AC81260AF92400A408D2 /* DeviceKit.framework */,
-				CED2AC7E260AF8E400A408D2 /* Sentry.framework */,
-				CEBEFB89231F9CC600F8F67C /* Reachability.framework */,
-				C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */,
-				C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */,
-				C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */,
-				C07705E41FD8F21500D2F3C7 /* Zip.framework */,
+				CEBD33BC2654CA5900EB2EA8 /* ObjcExceptionBridging.xcframework */,
+				CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */,
+				CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */,
+				CEBD33BD2654CA5900EB2EA8 /* XCGLogger.xcframework */,
+				CEBD33BB2654CA5900EB2EA8 /* Zip.xcframework */,
+				CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */,
+				CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -358,7 +358,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -367,18 +368,20 @@
 		98ABFD011AD39165005534F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../Carthage/Build/iOS/",
+					"$(SRCROOT)/../../Carthage/Build/",
 				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -390,18 +393,20 @@
 		98ABFD021AD39165005534F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../Carthage/Build/iOS/",
+					"$(SRCROOT)/../../Carthage/Build/",
 				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
