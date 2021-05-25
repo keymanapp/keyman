@@ -308,6 +308,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 
       switch(package.resourceType()) {
         case .keyboard:
+          Manager.shared.inputViewController.setShouldReload()
           msg = NSLocalizedString("notification-download-success-keyboard", bundle: engineBundle, comment: "")
         case .lexicalModel:
           msg = NSLocalizedString("notification-download-success-lexical-model", bundle: engineBundle, comment: "")

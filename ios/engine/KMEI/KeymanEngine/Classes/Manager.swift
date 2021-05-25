@@ -141,9 +141,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
   }
 
-  // Set to true on init - this allows other engine consumers to set the
-  // keyboard before it displays.
-  var shouldReloadKeyboard = true
   var shouldReloadLexicalModel = false
 
   var _inputViewController: InputViewController?
@@ -279,7 +276,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     //
     // We MUST NOT shortcut this method as a result; doing so may (rarely) result in the infamous
     // blank keyboard bug!
-    if kb.fullID == currentKeyboardID && !self.isSystemKeyboard && !self.shouldReloadKeyboard {
+    if kb.fullID == currentKeyboardID && !self.isSystemKeyboard && !inputViewController.shouldReload {
       log.info("Keyboard unchanged: \(kb.fullID)")
       return false
      // throw KeyboardError.unchanged
@@ -754,6 +751,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     // true source of the problems.
     viewController.dismiss(animated: false)
     showKeyboard()
+    inputViewController.reloadIfNeeded()
     
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
