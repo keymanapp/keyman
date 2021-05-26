@@ -18,7 +18,7 @@ public extension UserDefaults {
     do {
       return try array.map { try decoder.decode(InstallableKeyboard.self, from: $0) }
     } catch {
-      log.error("Error decoding keyboards: \(error)")
+      SentryManager.captureAndLog(error, message: "Error decoding keyboards: \(error)")
       return nil
     }
   }
@@ -31,14 +31,14 @@ public extension UserDefaults {
     do {
       return try array.map { try decoder.decode(InstallableLexicalModel.self, from: $0) }
     } catch {
-      log.error("Error decoding lexical models: \(error)")
+      SentryManager.captureAndLog(error, message: "Error decoding lexical models: \(error)")
       return nil
     }
   }
 
   internal func cachedPackageQueryMetadata(forKey key: String) -> [KeymanPackage.Key: KeymanPackage.DistributionStateMetadata]? {
     guard let data = self.data(forKey: key) else {
-      log.error("Error decoding cached package query results")
+      // May not have been initialized.  Also, it IS just cache data.
       return nil
     }
 
@@ -61,7 +61,7 @@ public extension UserDefaults {
       let array = try keyboards.map { try encoder.encode($0) }
       set(array, forKey: key)
     } catch {
-      log.error("Error encoding keyboards: \(error)")
+      SentryManager.captureAndLog(error, message: "Error encoding keyboards: \(error)")
     }
   }
     
@@ -75,7 +75,7 @@ public extension UserDefaults {
       let array = try lexicalModels.map { try encoder.encode($0) }
       set(array, forKey: key)
     } catch {
-      log.error("Error encoding lexicalModels: \(error)")
+      SentryManager.captureAndLog(error, message: "Error encoding lexicalModels: \(error)")
     }
   }
 
@@ -86,7 +86,7 @@ public extension UserDefaults {
     do {
       return try PropertyListDecoder().decode(FullKeyboardID.self, from: data)
     } catch {
-      log.error("Error decoding FullKeyboardID: \(error)")
+      SentryManager.captureAndLog(error, message: "Error decoding FullKeyboardID: \(error)")
       return nil
     }
   }
@@ -100,7 +100,7 @@ public extension UserDefaults {
       let data = try PropertyListEncoder().encode(id)
       set(data, forKey: key)
     } catch {
-      log.error("Error encoding FullKeyboardID: \(error)")
+      SentryManager.captureAndLog(error, message: "Error encoding FullKeyboardID: \(error)")
     }
   }
     
@@ -111,7 +111,7 @@ public extension UserDefaults {
     do {
       return try PropertyListDecoder().decode(FullLexicalModelID.self, from: data)
     } catch {
-      log.error("Error decoding FullLexicalModelID: \(error)")
+      SentryManager.captureAndLog(error, message: "Error decoding FullLexicalModelID: \(error)")
       return nil
     }
   }
@@ -125,7 +125,7 @@ public extension UserDefaults {
       let data = try PropertyListEncoder().encode(id)
       set(data, forKey: key)
     } catch {
-      log.error("Error encoding FullLexicalModelID: \(error)")
+      SentryManager.captureAndLog(error, message: "Error encoding FullLexicalModelID: \(error)")
     }
   }
 

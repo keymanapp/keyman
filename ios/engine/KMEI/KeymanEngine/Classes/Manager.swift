@@ -185,7 +185,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       do {
         try Storage.active.installDefaultKeyboard(from: Resources.bundle)
       } catch {
-        log.error("Failed to copy default keyboard from bundle: \(error)")
+        SentryManager.captureAndLog(error, message: "Failed to copy default keyboard from bundle: \(error)")
       }
     }
     Migrations.engineVersion = Version.latestFeature
@@ -197,7 +197,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     do {
       try Storage.active.copyKMWFiles(from: Resources.bundle)
     } catch {
-      log.error("Failed to copy KMW files from bundle: \(error)")
+      SentryManager.captureAndLog(error, message: "Failed to copy KMW files from bundle: \(error)")
     }
 
     updateUserKeyboards(with: Defaults.keyboard)
@@ -205,7 +205,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     do {
       try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
-      log.error("Could not start Reachability object: \(error)")
+      SentryManager.captureAndLog(error, message: "Could not start Reachability object: \(error)")
     }
 
     if(!Util.isSystemKeyboard) {
@@ -214,7 +214,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       do {
         try reachability.startNotifier()
       } catch {
-        log.error("failed to start Reachability notifier: \(error)")
+        SentryManager.captureAndLog(error, message: "failed to start Reachability notifier: \(error)")
       }
     }
 
@@ -714,7 +714,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         try shared.copyFiles(to: nonShared)
         FontManager.shared.registerCustomFonts()
       } catch {
-        log.error("Failed to copy from shared container: \(error)")
+        SentryManager.captureAndLog(error, message: "Failed to copy from shared container: \(error)")
       }
     }
   }

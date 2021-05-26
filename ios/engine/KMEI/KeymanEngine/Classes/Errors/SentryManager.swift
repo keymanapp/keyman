@@ -113,8 +113,11 @@ public class SentryManager {
   /**
    * Captures a Sentry event and copies its message to the engine's logging mechanism.
    * If the logging level is not specified, the Sentry event's log-level will be used as a default.
+   *
+   * Will safely bypass the Sentry component if not activated by the app, only logging the
+   * message in such scenarios.
    */
-  public static func captureAndLog(event: Sentry.Event, logLevel: XCGLogger.Level? = nil) {
+  public static func captureAndLog(_ event: Sentry.Event, logLevel: XCGLogger.Level? = nil) {
     // Guarded in case a library consumer decides against initializing Sentry.
     if _started {
       SentrySDK.capture(event: event)
@@ -125,8 +128,42 @@ public class SentryManager {
   }
 
   /**
+   * Captures a Sentry event and copies its message to the engine's logging mechanism.
+   * If the logging level is not specified, the Sentry event's log-level will be used as a default.
+   *
+   * Will safely bypass the Sentry component if not activated by the app, only logging the
+   * message in such scenarios.
+   */
+  public static func captureAndLog(_ error: Error, message: String? = nil, sentryLevel: Sentry.SentryLevel = .error, logLevel: XCGLogger.Level? = nil) {
+    let event = Sentry.Event(error: error)
+    event.level = sentryLevel
+    if let message = message {
+      event.message = SentryMessage(formatted: message)
+    }
+
+    self.captureAndLog(event, logLevel: logLevel)
+  }
+
+  /**
+   * Constructs a SentryEvent around a message and also passes it to the engine's logging mechanism.
+   * If the logging level is not specified, it will default to .error.
+   *
+   * Will safely bypass the Sentry component if not activated by the app, only logging the
+   * message in such scenarios.
+   */
+  public static func captureAndLog(_ message: String, sentryLevel: Sentry.SentryLevel = .error, logLevel: XCGLogger.Level? = nil) {
+    let event = Sentry.Event(level: sentryLevel)
+    event.message = SentryMessage(formatted: message)
+
+    self.captureAndLog(event, logLevel: logLevel)
+  }
+
+  /**
    * Adds a Sentry breadcrumb and copies its message to the engine's logging mechanism.
    * If the logging level is not specified, the Sentry event's log-level will be used as a default.
+   *
+   * Will safely bypass the Sentry component if not activated by the app, only logging the
+   * message in such scenarios.
    */
   public static func breadcrumbAndLog(crumb: Sentry.Breadcrumb, logLevel: XCGLogger.Level? = nil) {
     // Guarded in case a library consumer decides against initializing Sentry.
@@ -136,6 +173,23 @@ public class SentryManager {
 
     let level = logLevel ?? mapLoggingLevel(crumb.level)
     log.logln(crumb.message, level: level)
+  }
+
+  /**
+   * Adds a Sentry breadcrumb and copies its message to the engine's logging mechanism.
+   * If the logging level is not specified, the Sentry event's log-level will be used as a default.
+   *
+   * Will safely bypass the Sentry component if not activated by the app, only logging the
+   * message in such scenarios.
+   */
+  public static func breadcrumbAndLog(_ message: String, category: String? = nil, sentryLevel: Sentry.SentryLevel = .info, logLevel: XCGLogger.Level? = nil) {
+    let crumb = Sentry.Breadcrumb()
+    crumb.level = sentryLevel
+    if let category = category {
+      crumb.category = category
+    }
+
+    self.breadcrumbAndLog(crumb: crumb, logLevel: logLevel)
   }
 
   public static func forceError() {

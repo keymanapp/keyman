@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Sentry
 
 private enum MigrationLevel {
   static let initial = 0
@@ -62,13 +63,13 @@ public enum Migrations {
       migrateUserDefaultsToStructs(storage: storage)
       storage.userDefaults.migrationLevel = MigrationLevel.migratedUserDefaultsToStructs
     } else {
-      log.info("UserDefaults migration to structs already performed. Skipping.")
+      SentryManager.breadcrumbAndLog("UserDefaults migration to structs already performed. Skipping.", category: "migration")
     }
     if storage.userDefaults.migrationLevel < MigrationLevel.migratedForKMP {
       migrateForKMP(storage: storage)
       storage.userDefaults.migrationLevel = MigrationLevel.migratedForKMP
     } else {
-      log.info("KMP directory migration already performed. Skipping.")
+      SentryManager.breadcrumbAndLog("KMP directory migration already performed. Skipping.", category: "migration")
     }
 
     // Version-based migrations
@@ -77,7 +78,7 @@ public enum Migrations {
         do {
           try migrateDocumentsFromPreBrowser()
         } catch {
-          log.error("Could not migrate Documents directory contents: \(error)")
+          SentryManager.captureAndLog(error, message: "Could not migrate Documents directory contents: \(error)")
         }
       } else {
         log.info("Documents directory structure compatible with \(Version.fileBrowserImplemented)")
@@ -87,10 +88,13 @@ public enum Migrations {
         do {
           try migrateCloudResourcesToKMPFormat()
         } catch {
-          log.error("Could not migrate pre-existing resources to KMP-style file organization")
+          let event = Sentry.Event(level: .error)
+          event.message = SentryMessage(formatted: "Could not migrate pre-existing resources to KMP-style file organization")
+          event.extra = [ "priorVersion": version ]
+          SentryManager.captureAndLog(event)
         }
       } else {
-        log.info("Resource directories already migrated to package-based format; kmp.jsons already exist.")
+        SentryManager.breadcrumbAndLog("Resource directories already migrated to package-based format; kmp.jsons already exist.", category: "migration")
       }
     }
 
@@ -99,7 +103,7 @@ public enum Migrations {
 
   static func detectLegacyKeymanVersion() -> [Version] {
     // While the 'key' used to track version info existed before v12, it was unused until then.
-    log.info("Prior engine version unknown; attepting to auto-detect.")
+    SentryManager.breadcrumbAndLog("Prior engine version unknown; attepting to auto-detect.", category: "migration")
 
     // Detect possible version matches.
     let userResources = Storage.active.userDefaults.userResources ?? []
@@ -255,7 +259,7 @@ public enum Migrations {
       do {
         try Storage.active.installDefaultKeyboard(from: Resources.bundle)
       } catch {
-        log.error("Failed to copy default keyboard from bundle: \(error)")
+        SentryManager.captureAndLog(error, message: "Failed to copy default keyboard from bundle: \(error)")
       }
     }
 
@@ -268,7 +272,7 @@ public enum Migrations {
       do {
         try Storage.active.installDefaultLexicalModel(from: Resources.bundle)
       } catch {
-        log.error("Failed to copy default lexical model from bundle: \(error)")
+        SentryManager.captureAndLog(error, message: "Failed to copy default lexical model from bundle: \(error)")
       }
     }
 
@@ -280,13 +284,13 @@ public enum Migrations {
     guard let userKeyboardObject = storage.userDefaults.object(forKey: Key.userKeyboardsList),
       let currentKeyboardObject = storage.userDefaults.object(forKey: Key.userCurrentKeyboard)
     else {
-      log.info("User keyboard list or current keyboard missing. Skipping migration.")
+      SentryManager.breadcrumbAndLog("User keyboard list or current keyboard missing. Skipping migration.", category: "migration")
       return
     }
     guard let oldUserKeyboards = userKeyboardObject as? [[String: String]],
       let oldCurrentKeyboard = currentKeyboardObject as? [String: String]
     else {
-      log.error("User keyboard list or current keyboard has an unexpected type")
+      SentryManager.captureAndLog("User keyboard list or current keyboard has an unexpected type")
       return
     }
 
@@ -302,14 +306,14 @@ public enum Migrations {
   }
 
   private static func installableKeyboard(from kbDict: [String: String]) -> InstallableKeyboard? {
-    log.debug("Migrating keyboard dictionary: \(kbDict)")
+    SentryManager.breadcrumbAndLog("Migrating keyboard dictionary for '\(String(describing: kbDict["kbId"]))", category: "migration", sentryLevel: .debug)
     guard let id = kbDict["kbId"],
       let name = kbDict["kbName"],
       let languageID = kbDict["langId"],
       let languageName = kbDict["langName"],
       let version = kbDict["version"]
     else {
-      log.error("Missing required fields in keyboard dictionary: \(kbDict)")
+      SentryManager.captureAndLog("Missing required fields in keyboard dictionary: \(kbDict)")
       return nil
     }
     let rtl = kbDict["rtl"] == "Y"
@@ -325,20 +329,23 @@ public enum Migrations {
                                  font: displayFont,
                                  oskFont: oskFont,
                                  isCustom: isCustom)
-    log.debug("Migrated keyboard dictionary to keyboard \(kb)")
+    SentryManager.breadcrumbAndLog("Migrated keyboard dictionary to keyboard \(kb.id)")
+    log.debug(kb)
     return kb
   }
 
   private static func fullKeyboardID(from kbDict: [String: String]) -> FullKeyboardID? {
-    log.debug("Migrating keyboard dictionary to FullKeyboardID: \(kbDict)")
     guard let keyboardID = kbDict["kbId"],
       let languageID = kbDict["langId"]
     else {
-      log.error("Missing required fields in keyboard dictionary for FullKeyboardID: \(kbDict)")
+      let event = Sentry.Event(level: .error)
+      event.message = SentryMessage(formatted: "Missing required fields in keyboard dictionary for FullKeyboardID")
+      event.extra = ["kbId": kbDict["kbId"] ?? "nil", "langId": kbDict["langId"] ?? "nil"]
+      SentryManager.captureAndLog(event)
       return nil
     }
     let id = FullKeyboardID(keyboardID: keyboardID, languageID: languageID)
-    log.debug("Migrated keyboard dictionary to \(id)")
+    SentryManager.breadcrumbAndLog("Migrated keyboard dictionary to \(id)", category: "migration")
     return id
   }
 
@@ -469,7 +476,7 @@ public enum Migrations {
   }
 
   static func migrateDocumentsFromPreBrowser() throws {
-    log.info("Cleaning Documents folder due to 12.0 installation artifacts")
+    SentryManager.breadcrumbAndLog("Cleaning Documents folder due to 12.0 installation artifacts", category: "migration")
 
     // Actually DO it.
     let documentFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -484,16 +491,16 @@ public enum Migrations {
         let destFile = fileURL.lastPathComponent.replacingOccurrences(of: ".kmp.zip", with: ".kmp")
         let destURL = fileURL.deletingLastPathComponent().appendingPathComponent(destFile)
 
-        log.debug("\(fileURL) -> \(destURL)")
+        SentryManager.breadcrumbAndLog("\(fileURL) -> \(destURL)", category: "migration", sentryLevel: .debug)
         try FileManager.default.moveItem(at: fileURL, to: destURL)
       } else if fileURL.lastPathComponent == "temp" {
         // Removes the 'temp' installation directory; that shouldn't be visible to users.
-        log.debug("Deleting directory: \(fileURL)")
+        SentryManager.breadcrumbAndLog("Deleting directory: \(fileURL)", category: "migration", sentryLevel: .debug)
         try FileManager.default.removeItem(at: fileURL)
       } else if fileURL.lastPathComponent.hasSuffix(".kmp") {
         // Do nothing; this file is fine.
       } else {
-        log.info("Unexpected file found in documents folder during upgrade: \(fileURL)")
+        SentryManager.breadcrumbAndLog("Unexpected file found in documents folder during upgrade: \(fileURL)", category: "migration")
       }
     }
   }
@@ -526,8 +533,11 @@ public enum Migrations {
           try FileManager.default.moveItem(at: srcLocation, to: dstLocation)
         }
       } catch {
-        log.error("Could not remove version number from filename for resource \(resource.packageID ?? "<no package>").\(resource.id)")
-        log.error("Source: \(srcLocation)")
+        let event = Sentry.Event(level: .error)
+        event.message = SentryMessage(formatted: "Could not remove version number from filename")
+        event.extra = ["package" : resource.packageID ?? "<no package>", "id": resource.id, "location": srcLocation ]
+
+        SentryManager.captureAndLog(event)
       }
     }
 
@@ -544,12 +554,12 @@ public enum Migrations {
           let tuple = try (ResourceFileManager.shared.prepareKMPInstall(from: filePath), filePath)
           return tuple
         } catch {
-          log.error("Could not load kmp.info for \(filePath)")
+          SentryManager.captureAndLog("Could not load kmp.info for local package during migration: \(file)")
           return nil
         }
       }
     } catch {
-      log.error("Could not check contents of Documents directory for resource-migration assist")
+      SentryManager.captureAndLog("Could not check contents of Documents directory for resource-migration assist")
     }
 
     // Filters out Packages that don't contain the matching resource type.
@@ -586,7 +596,7 @@ public enum Migrations {
           matched.append(package.findResource(withID: resource.typedFullID)!)
         }
       } catch {
-        log.error("Could not install resource from locally-cached package: \(String(describing: error))")
+        SentryManager.captureAndLog(error, message: "Could not install resource from locally-cached package: \(String(describing: error))")
       }
     }
 
@@ -653,7 +663,10 @@ public enum Migrations {
         FileManager.default.createFile(atPath: metadataFile.path, contents: metadataJSON, attributes: .none)
         // write to location.
       } catch {
-        log.error("Could not generate kmp.json for legacy resource!")
+        let event = Sentry.Event(level: .error)
+        event.message = SentryMessage(formatted: "Could not generate kmp.json for legacy resource!")
+        event.extra = [ "resourceId": package.id, "type": package.resourceType()]
+        SentryManager.captureAndLog(event)
       }
     }
 

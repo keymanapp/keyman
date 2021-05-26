@@ -170,7 +170,11 @@ class KeyboardScaleMap {
   private static func getUnknownDeviceMapping(screenSize _screenSize: CGSize = UIScreen.main.bounds.size, asPhone: Bool? = nil) -> Device {
     // Shouldn't happen, but just in case.
     if _screenSize == CGSize.zero {
-      log.error("Cannot detect device dimensions; defaulting to smallest device for form factor.")
+//      // This would notify us whenever new devices are out that we haven't build a mapping for.
+//      SentryManager.captureAndLog("Cannot detect device dimensions; defaulting to smallest device for form factor.", sentryLevel: .info)
+
+      // We haven't actually updated things here in a while, so we'll just breadcrumb for now.
+      SentryManager.breadcrumbAndLog("Cannot detect device dimensions; defaulting to smallest device for form factor.", sentryLevel: .error)
     }
 
     // Convert to CGSize in portrait orientation.

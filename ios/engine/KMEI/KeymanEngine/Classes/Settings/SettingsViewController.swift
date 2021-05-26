@@ -198,7 +198,7 @@ open class SettingsViewController: UITableViewController {
       case "systemkeyboardsettings", "installfile", "forcederror":
         break
       default:
-        log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
+        SentryManager.captureAndLog("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
         cell.accessoryType = .none
     }
     
@@ -266,7 +266,7 @@ open class SettingsViewController: UITableViewController {
       case "showbanner", "showgetstarted":
         cell.detailTextLabel?.isEnabled = false
       default:
-        log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
+        SentryManager.captureAndLog("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
     }
   }
   
@@ -289,7 +289,8 @@ open class SettingsViewController: UITableViewController {
           showLanguages()
         case "systemkeyboardsettings":
           guard let appSettings = URL(string: UIApplication.openSettingsURLString) else {
-            log.error("Could not launch keyboard settings menu")
+            // It is an error if the option is displayed but unusable.  That's bad UI.
+            SentryManager.captureAndLog("Could not launch keyboard settings menu")
             return
           }
           UniversalLinks.externalLinkLauncher?(appSettings)
@@ -297,7 +298,7 @@ open class SettingsViewController: UITableViewController {
           if let block = Manager.shared.fileBrowserLauncher {
             block(navigationController!)
           } else {
-            log.info("Listener for framework signal to launch file browser is missing")
+            SentryManager.captureAndLog("Listener for framework signal to launch file browser is missing")
           }
         case "forcederror":
             SentryManager.forceError()
@@ -399,7 +400,9 @@ open class SettingsViewController: UITableViewController {
       if let langName = keyboardLanguages[l]?.name {
         log.info("keyboard language \(l) \(langName) has lexical model")
       } else {
-        log.error("lexical model language \(l) has no keyboard installed!")
+        // Legacy behavior:  we automatically install all MTNT language codes, even without
+        // a matching keyboard for the more specific variant(s).
+        SentryManager.breadcrumbAndLog("lexical model language \(l) has no keyboard installed!")
       }
     }
 
@@ -428,7 +431,7 @@ open class SettingsViewController: UITableViewController {
       nc.pushViewController(vc, animated: true)
       setIsDoneButtonEnabled(nc, true)
     } else {
-      log.error("no navigation controller for showing languages???")
+      SentryManager.captureAndLog("no navigation controller for showing languages???")
     }
   }
   
