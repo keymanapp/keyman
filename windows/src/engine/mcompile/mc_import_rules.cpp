@@ -21,6 +21,7 @@
 
 #include "pch.h"
 #include <vector>
+#include <string>
 
 enum ShiftState {
     Base = 0,                    // 0

@@ -2,7 +2,7 @@
 
 ## Build Prerequisites
 
-1. Install [VS2017 Community Edition](#visual-studio-2017-community-edition-setup-requirements).
+1. Install [VS2019 Community Edition](#visual-studio-2019-community-edition-setup-requirements).
 2. Install [Delphi 10.3](#delphi-setup-requirements).
 3. Install [git](https://git-scm.com/download/win).
 4. Install [nodejs](https://nodejs.org/en/download/).
@@ -29,7 +29,7 @@ For local development you do not need to perform a release build so these are op
 
 ## Building Keyman for Windows and Keyman Developer
 
-1. Start 'x64_x86 Cross Tools Command Prompt for VS 2017'.
+1. Start 'Developer Command Prompt for VS 2019'.
 2. Run `make build` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/bin** folder.
 
@@ -50,7 +50,7 @@ To perform a release build, you will need to obtain valid certificates. A releas
 unnecessary for local development. Release builds are currently run from a TeamCity CI
 environment.
 
-1. Start 'x64_x86 Cross Tools Command Prompt for VS 2017'.
+1. Start 'Developer Command Prompt for VS 2019'.
 2. Run `make release` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/release** folder.
 4. **buildtools/help-keyman-com.sh** will push updated documentation to help.keyman.com.
@@ -76,22 +76,22 @@ These steps are only required the first time you install Keyman:
     'Trusted Root Certification Authorities'. Click Next and finish the wizard.
 
 To deploy a development build of Keyman and Keyman Developer,
-1. Start 'x64_x86 Cross Tools Command Prompt for VS 2017'.
+1. Start 'Developer Command Prompt for VS 2019'.
 2. Run `make signcode` from the **windows/src** folder.
 3. Ensure that Keyman and Keyman Developer are not running.
 4. Run `make install` in **windows/src/engine**, **windows/src/desktop** and **windows/src/developer**.
 
 ## Detailed Prerequisite Notes
 
-### Visual Studio 2017 Community Edition setup requirements
+### Visual Studio 2019 Community Edition setup requirements
 
-In Visual Studio 2017, you need to have the following installed:
+In Visual Studio 2019, you need to have the following installed:
 #### Workloads
 * Desktop development with C++
 * Universal Windows Platform development
 
 #### Individual components
-* Windows Universal CRT SDK
+--* Windows Universal CRT SDK
 * Windows 10.0.17763.0 SDK
 
 Configure Visual Studio to use two-space tab stops:

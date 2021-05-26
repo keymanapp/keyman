@@ -3,8 +3,8 @@
 ## Prerequisites
 
 - Python 3
-- Meson build system.
-- C++14 or later compiler (VC++ 2017 or later for Windows).
+- Meson build system 0.50 or later.
+- C++14 or later compiler (VC++ 2019 or later for Windows).
 - lib std::fs
 - kmcomp (for tests) -- must be added to path
 
