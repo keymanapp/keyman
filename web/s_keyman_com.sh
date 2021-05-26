@@ -64,12 +64,11 @@ fi
 
 ##
 ## Upload KeymanWeb release s.keyman.com
-## Also remap sourcemap paths
 ##
 function upload_keyman_web {
 
   local kmwpath="$KEYMAN_ROOT/web/release/web"
-  local dstpath="$S_KEYMAN_COM/kmw/engine/$VERSION/src"
+  local dstpath="$S_KEYMAN_COM/kmw/engine/$VERSION/"
 
   #
   # Look for KeymanWeb release folder.
@@ -91,11 +90,11 @@ function upload_keyman_web {
 ## Remap sourcemap paths
 ##
 function remap_sourcemap_paths {
-  local dstpath="$S_KEYMAN_COM/kmw/engine/$VERSION/src"
+  local dstpath="$S_KEYMAN_COM/kmw/engine/$VERSION/"
 
   cd $dstpath
   for mapfile in *.map; do
-    echo "Remapping sourcempath paths for: $mapfile"
+    echo "Remapping sourcemap paths for: $mapfile"
     sourceRoot="https://s.keyman.com/kmw/engine/$VERSION/src/"
     jqi ". + {sourceRoot: \"$sourceRoot\"}" $mapfile
   done
