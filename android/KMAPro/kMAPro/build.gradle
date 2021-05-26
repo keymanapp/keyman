@@ -62,7 +62,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            if (env_release_store_file != null) {
+            if (env_release_store_file != null && file(env_release_store_file).exists()) {
                 signingConfig signingConfigs.release
             }
         }
