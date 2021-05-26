@@ -119,7 +119,13 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
   }
 
 #ifdef KMX_64BIT
-  buf = new KMX_BYTE[sz*3];
+  // allocate enough memory for expanded data structure + original data.
+  // Expanded data structure is double the size of data on disk (8-byte
+  // pointers) - on disk the "pointers" are relative to the beginning of
+  // the file.
+  // We save the original data at the end of buf; we don't copy strings, so
+  // those will remain in the location at the end of the buffer.
+  buf = new KMX_BYTE[sz * 3];
 #else
   buf = new KMX_BYTE[sz];
 #endif
@@ -175,11 +181,12 @@ PKMX_WCHAR KMX_Processor::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
 }
 
 #ifdef KMX_64BIT
-
 /**
-  CopyKeyboard will copy the data read into bufp from x86-sized structures into x64-sized structures starting at base
-  * We know the base is dwFileSize * 3
-  * After this function finishes, we still need to keep the original data
+  CopyKeyboard will copy the data read into bufp from x86-sized structures into
+  x64-sized structures starting at `base`
+  * After this function finishes, we still need to keep the original data because
+    we don't copy the strings
+  This method is used on 64-bit architectures.
 */
 LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
@@ -260,7 +267,10 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 }
 
 #else
-
+/**
+ Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
+ beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
+*/
 LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
   KMX_DWORD i, j;
@@ -285,7 +295,7 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
   for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)
   {
     gp->dpName = StringOffset(base, cgp->dpName);
-    gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
+    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKEY) (base + cgp->dpKeyArray) : NULL;
     gp->dpMatch = StringOffset(base, cgp->dpMatch);
     gp->dpNoMatch = StringOffset(base, cgp->dpNoMatch);
 
