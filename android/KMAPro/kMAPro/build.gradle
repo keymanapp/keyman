@@ -41,7 +41,7 @@ android {
     String env_release_store_password = System.getenv("release_store_password")
     String env_release_key_alias = System.getenv("release_key_alias")
     String env_release_key_password = System.getenv("release_key_password")
-    if (env_release_store_file != null) {
+    if (env_release_store_file != null && file(env_release_store_file).exists()) {
         signingConfigs {
             release {
                 println "Using signing from environment"
@@ -86,7 +86,7 @@ sentry {
 }
 
 String env_keys_json_file = System.getenv("keys_json_file")
-if (env_keys_json_file != null) {
+if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
     apply plugin: 'com.github.triplet.play'
 
     play {
