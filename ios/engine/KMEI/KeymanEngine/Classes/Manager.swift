@@ -280,12 +280,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     // We MUST NOT shortcut this method as a result; doing so may (rarely) result in the infamous
     // blank keyboard bug!
     if kb.fullID == currentKeyboardID && !self.isSystemKeyboard && !self.shouldReloadKeyboard {
-      log.info("Keyboard unchanged: \(kb.fullID)")
+      SentryManager.breadcrumbAndLog("Keyboard unchanged: \(kb.fullID)")
       return false
      // throw KeyboardError.unchanged
     }
 
-    log.info("Setting language: \(kb.fullID)")
+    SentryManager.breadcrumbAndLog("Setting language: \(kb.fullID)")
 
     currentKeyboardID = kb.fullID
 
@@ -371,7 +371,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   
   /// Registers a lexical model with KMW.
   public func registerLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
-    log.info("Setting lexical model: \(lm.fullID)")
+    SentryManager.breadcrumbAndLog("Setting lexical model: \(lm.fullID)")
     
     currentLexicalModelID = lm.fullID
     
@@ -447,7 +447,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userData.synchronize()
 
-    log.info("Removing keyboard with ID \(kb.id) and languageID \(kb.languageID)")
+    SentryManager.breadcrumbAndLog("Removing keyboard with ID \(kb.id) and languageID \(kb.languageID)")
 
     // Set a new keyboard if deleting the current one
     if kb.fullID == currentKeyboardID {
@@ -502,7 +502,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     
     let lm = userLexicalModels[index]
-    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from user list of all models")
+    SentryManager.breadcrumbAndLog("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from user list of all models")
     userLexicalModels.remove(at: index)
     ud.userLexicalModels = userLexicalModels
     ud.set([Date()], forKey: Key.synchronizeSWLexicalModel)
@@ -512,7 +512,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   
   /// Removes the lexical model at index from the lexical models list if it exists.
   public func removeLexicalModelFromLanguagePreference(userDefs ud: UserDefaults, _ lm: InstallableLexicalModel) {
-    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from per-language prefs")
+    SentryManager.breadcrumbAndLog("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from per-language prefs")
     ud.set(preferredLexicalModelID: nil, forKey: lm.languageID)
   }
 
@@ -533,7 +533,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       if let first_lm = userLexicalModels.first(where: {$0.languageID == lm.languageID}) {
         _ = registerLexicalModel(first_lm)
       } else {
-        log.info("no more lexical models available for language \(lm.fullID)")
+        SentryManager.breadcrumbAndLog("no more lexical models available for language \(lm.fullID)")
         currentLexicalModelID = nil
       }
     }

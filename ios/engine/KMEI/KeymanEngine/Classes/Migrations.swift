@@ -81,7 +81,7 @@ public enum Migrations {
           SentryManager.captureAndLog(error, message: "Could not migrate Documents directory contents: \(error)")
         }
       } else {
-        log.info("Documents directory structure compatible with \(Version.fileBrowserImplemented)")
+        SentryManager.breadcrumbAndLog("Documents directory structure compatible with \(Version.fileBrowserImplemented)")
       }
 
       if version < Version.packageBasedFileReorg {
@@ -382,10 +382,10 @@ public enum Migrations {
     let languageDir = storage.baseDir.appendingPathComponent("languages")
     let fontDir = storage.baseDir.appendingPathComponent("fonts")
 
-    log.info("Migrating from base directory: \(storage.baseDir)")
+    SentryManager.breadcrumbAndLog("Migrating from base directory: \(storage.baseDir)", category: "migration")
 
     guard var userKeyboards = storage.userDefaults.userKeyboards else {
-      log.info("No user keyboards to migrate")
+      SentryManager.breadcrumbAndLog("No user keyboards to migrate", category: "migration")
       return
     }
 

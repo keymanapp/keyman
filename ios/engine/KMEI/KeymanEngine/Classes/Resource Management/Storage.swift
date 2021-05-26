@@ -17,7 +17,7 @@ extension Storage {
     if paths.isEmpty {
       return nil
     }
-    log.info("\(paths[0])")
+    SentryManager.breadcrumbAndLog("Storage.nonShared:  using path \(paths[0])")
     return Storage(baseURL: paths[0], userDefaults: UserDefaults.standard)
   }()
 
@@ -292,7 +292,7 @@ extension Storage {
 
   func copyFiles(to dst: Storage) throws {
     if FileManager.default.fileExists(atPath: dst.baseDir.path) {
-      log.info("Deleting \(dst.baseDir) for copy from \(baseDir) to \(dst.baseDir)")
+      SentryManager.breadcrumbAndLog("Deleting \(dst.baseDir) for copy from \(baseDir) to \(dst.baseDir)")
       try FileManager.default.removeItem(at: dst.baseDir)
     }
     try FileManager.default.copyItem(at: baseDir, to: dst.baseDir)

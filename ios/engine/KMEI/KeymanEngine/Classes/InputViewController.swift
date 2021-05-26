@@ -552,7 +552,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func clearText() {
     setContextState(text: nil, range: NSRange(location: 0, length: 0))
     keymanWeb.resetContext()
-    log.info("Cleared text.")
+    SentryManager.breadcrumbAndLog("Cleared text.")
   }
   
   func resetContext() {
