@@ -37,17 +37,11 @@ clean ( ) {
 
 echo Build KMEA and KMAPro:
 
-# Parse args
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    case $key in
-        -clean)
-            clean
-            ;;
-    esac
-    shift # past argument
-done
-
+# Check about cleaning artifact paths
+if [[ "$1" == "-clean" ]] ; then
+  clean
+  shift
+fi
 
 # Building Keyman Engine for Android
 
