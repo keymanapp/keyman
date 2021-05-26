@@ -24,7 +24,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 #
 # These are passed via environment:
 #
-# HELP_KEYMAN_COM = the home of the help.keyman.com repository
+# S_KEYMAN_COM = the home of the s.keyman.com repository
 #
 # That repo must have push to origin configured and logged in.
 # Note: GitHub API only available via HTTPS, and not SSH
@@ -103,7 +103,7 @@ function remap_sourcemap_paths {
 
 
 #
-# Commit and push to the help.keyman.com repo
+# Commit and push to the s.keyman.com repo
 # Creates a pull request with the 'auto' label
 # Which a GitHub action will watch for in order
 # to automatically process and merge it
@@ -151,4 +151,4 @@ function commit_and_push {
 
 upload_keyman_web
 remap_sourcemap_paths
-#commit_and_push
+commit_and_push
