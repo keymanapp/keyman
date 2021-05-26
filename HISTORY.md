@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.54 alpha 2021-05-26
+
+* docs(windows): Initial commit - README.md (#5119)
+* chore(windows): Update Sentry to 0.4.9 (#5144)
+* chore(web): Add CI script to kill BrowserStack tunnel (#5136)
+* docs(linux): Update readme (#5147)
+* chore(linux): Update changelogs 🍒 (#5146)
+* fix(ios): re-enable SKIP_INSTALL (#5155)
+
 ## 15.0.53 alpha 2021-05-25
 
 * fix(developer): buffer size for range expansions (#4831)
