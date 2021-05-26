@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 # 
 # CI script to kill BrowserStack testing tunnel (Windows only)
 #
