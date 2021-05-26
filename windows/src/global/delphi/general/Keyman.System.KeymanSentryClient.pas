@@ -101,11 +101,10 @@ begin
   Result := ExtractFilePath(ParamStr(0)) + sentry_dll;
   if FileExists(Result) then Exit;
 
-  // Keyman Engine install dir or registry override next (for Engine, Desktop)
-  Result := TKeymanPaths.KeymanEngineInstallPath(sentry_dll);
-  if (Result <> '') and FileExists(Result) then Exit;
-
-  // Last gasp, if we are in a development situation
+  // If we are in a development situation, use the dev version
+  // of the DLL. Beware mixing and matching which can happen
+  // when testing DLLs that are registered and loaded from
+  // Program Files if Keyman is installed.
   Result := GetEnvironmentVariable(KEYMAN_ROOT);
   if Result <> '' then
   begin
@@ -113,6 +112,10 @@ begin
     if (Result <> '') and FileExists(Result) then
       Exit;
   end;
+
+  // Keyman Engine install dir or registry override finally (for Engine, Desktop)
+  Result := TKeymanPaths.KeymanEngineInstallPath(sentry_dll);
+  if (Result <> '') and FileExists(Result) then Exit;
 
   Result := '';
 end;

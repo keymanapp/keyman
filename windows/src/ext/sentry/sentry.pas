@@ -1,8 +1,19 @@
 {$D-} // Don't include debug information
 // Delphi translation of sentry.h
-// Sentry Native API 0.2.3
+// Sentry Native API 0.4.9
 // https://github.com/getsentry/sentry-native
 unit sentry;
+
+{
+ * NOTE on encodings:
+ *
+ * Sentry will assume an encoding of UTF-8 for all string data that is captured
+ * and being sent to sentry as an Event.
+ * All the functions that are dealing with *paths* will assume an OS-specific
+ * encoding, typically ANSI on Windows, UTF-8 macOS, and the locale encoding on
+ * Linux; and they provide wchar-compatible alternatives on Windows which are
+ * preferred.
+}
 
 interface
 
@@ -42,7 +53,7 @@ const
 
 const
   SENTRY_SDK_NAME = 'sentry.native';
-  SENTRY_SDK_VERSION = '0.2.3';
+  SENTRY_SDK_VERSION = '0.4.9';
   SENTRY_SDK_USER_AGENT = SENTRY_SDK_NAME + '/' + SENTRY_SDK_VERSION;
 
 {$IF DEFINED(MSWINDOWS)}
@@ -365,12 +376,18 @@ type sentry_level_e = (
 sentry_level_t = sentry_level_e;
 
 //
-// Creates a new empty event value.
+// Creates a new empty Event value.
+//
+// See https://docs.sentry.io/platforms/native/enriching-events/ for how to
+// further work with events, and https://develop.sentry.dev/sdk/event-payloads/
+// for a detailed overview of the possible properties of an Event.
 //
 function sentry_value_new_event: sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
-// Creates a new message event value.
+// Creates a new Message Event value.
+//
+// See https://develop.sentry.dev/sdk/event-payloads/message/
 //
 // `logger` can be NULL to omit the logger value.
 //
@@ -381,14 +398,82 @@ function sentry_value_new_message_event(
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
-// Creates a new breadcrumb with a specific type and message.
+// Creates a new Breadcrumb with a specific type and message.
 //
-// Either parameter can be NULL in which case no such attributes is created.
+// See https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
 //
 function sentry_value_new_breadcrumb(
   const _type: PAnsiChar;
   const message: PAnsiChar
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+//
+// Creates a new Exception value.
+//
+// This is intended for capturing language-level exception, such as from a
+// try-catch block. `type` and `value` here refer to the exception class and
+// a possible description.
+//
+// See https://develop.sentry.dev/sdk/event-payloads/exception/
+//
+// The returned value needs to be attached to an event via
+// `sentry_event_add_exception`.
+//
+function {SENTRY_EXPERIMENTAL_API} sentry_value_new_exception(
+    const _type: PAnsiChar;
+    const value: PAnsiChar
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+//
+// Creates a new Thread value.
+//
+// See https://develop.sentry.dev/sdk/event-payloads/threads/
+//
+// The returned value needs to be attached to an event via
+// `sentry_event_add_thread`.
+//
+// `name` can be NULL.
+//
+function {SENTRY_EXPERIMENTAL_API} sentry_value_new_thread(
+    id: UInt64;
+    const name: PAnsiChar
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+//
+// Creates a new Stack Trace conforming to the Stack Trace Interface.
+//
+// See https://develop.sentry.dev/sdk/event-payloads/stacktrace/
+//
+// The returned object needs to be attached to either an exception
+// event, or a thread object.
+//
+// If `ips` is NULL the current stack trace is captured, otherwise `len`
+// stack trace instruction pointers are attached to the event.
+//
+function {SENTRY_EXPERIMENTAL_API} sentry_value_new_stacktrace(
+  ips: PPVoid;
+  len: NativeUInt
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+//
+// Adds an Exception to an Event value.
+//
+// This takes ownership of the `exception`.
+//
+procedure {SENTRY_EXPERIMENTAL_API} sentry_event_add_exception(
+    event: sentry_value_t;
+    exception: sentry_value_t
+); cdecl; external sentry_dll  delayed;
+
+//
+// Adds a Thread to an Event value.
+//
+// This takes ownership of the `thread`.
+//
+procedure {SENTRY_EXPERIMENTAL_API} sentry_event_add_thread(
+    event: sentry_value_t;
+    thread: sentry_value_t
+); cdecl; external sentry_dll  delayed;
 
 // -- Experimental APIs --
 
@@ -405,10 +490,15 @@ function sentry_value_to_msgpack(
 ): PAnsiChar; cdecl; external sentry_dll  delayed;
 
 //
-// Adds a stacktrace to an event.
+// Adds a stack trace to an event.
 //
-// If `ips` is NULL the current stacktrace is captured, otherwise `len`
-// stacktrace instruction pointers are attached to the event.
+// The stack trace is added as part of a new thread object.
+// This function is **deprecated** in favor of using
+// `sentry_value_new_stacktrace` in combination with `sentry_value_new_thread`
+// and `sentry_event_add_thread`.
+//
+// If `ips` is NULL the current stack trace is captured, otherwise `len`
+// stack trace instruction pointers are attached to the event.
 //
 procedure sentry_event_value_add_stacktrace(
   event: sentry_value_t;
@@ -440,7 +530,7 @@ type
 //
 // If the address is given in `addr` the stack is unwound form there.  Otherwise
 // (NULL is passed) the current instruction pointer is used as start address.
-// The stacktrace is written to `stacktrace_out` with upt o `max_len` frames
+// The stack trace is written to `stacktrace_out` with up to `max_len` frames
 // being written.  The actual number of unwound stackframes is returned.
 //
 function sentry_unwind_stack(
@@ -452,7 +542,7 @@ function sentry_unwind_stack(
 //
 // Unwinds the stack from the given context.
 //
-// The stacktrace is written to `stacktrace_out` with upt o `max_len` frames
+// The stack trace is written to `stacktrace_out` with up to `max_len` frames
 // being written.  The actual number of unwound stackframes is returned.
 //
 function sentry_unwind_stack_from_ucontext(
@@ -522,10 +612,13 @@ procedure sentry_uuid_as_string(
 ); cdecl; external sentry_dll  delayed;
 
 type
-  sentry_options_s = record end;
-  sentry_options_t = sentry_options_s;
-  psentry_options_t = ^sentry_options_t;
-
+//
+// A Sentry Envelope.
+//
+// The Envelope is an abstract type which represents a payload being sent to
+// sentry. It can contain one or more items, typically an Event.
+// See https://develop.sentry.dev/sdk/envelopes/
+//
   sentry_envelope_s = record end;
   sentry_envelope_t = sentry_envelope_s;
   psentry_envelope_t = Pointer;
@@ -557,9 +650,11 @@ function sentry_envelope_serialize(
 ): PAnsiChar; cdecl; external sentry_dll  delayed;
 
 //
-// serializes the envelope into a file.
+// Serializes the envelope into a file.
 //
-// returns 0 on success.
+// `path` is assumed to be in platform-specific filesystem path encoding.
+//
+// Returns 0 on success.
 //
 function sentry_envelope_write_to_file(
   const envelope: psentry_envelope_t;
@@ -567,79 +662,129 @@ function sentry_envelope_write_to_file(
 ): Integer; cdecl; external sentry_dll  delayed;
 
 //
-// Type of the callback for transports.
+// The Sentry Client Options.
+//
+// See https://docs.sentry.io/error-reporting/configuration/
 //
 type
-  sentry_transport_function_t = procedure(
-    const envelope: psentry_envelope_t;
-    data: Pointer
-  ); cdecl;
+  sentry_options_s = record end;
+  sentry_options_t = sentry_options_s;
+  psentry_options_t = ^sentry_options_t;
 
 //
 // This represents an interface for user-defined transports.
 //
-// This type is *deprecated*, and will be replaced by an opaque pointer type and
-// builder methods in a future version.
+// Transports are responsible for sending envelopes to sentry and are the last
+// step in the event pipeline.
+//
+// Envelopes will be submitted to the transport in a _fire and forget_ fashion,
+// and the transport must send those envelopes _in order_.
+//
+// A transport has the following hooks, all of which
+// take the user provided `state` as last parameter. The transport state needs
+// to be set with `sentry_transport_set_state` and typically holds handles and
+// other information that can be reused across requests.
+//
+// * `send_func`: This function will take ownership of an envelope, and is
+//   responsible for freeing it via `sentry_envelope_free`.
+// * `startup_func`: This hook will be called by sentry inside of `sentry_init`
+//   and instructs the transport to initialize itself. Failures will bubble up
+//   to `sentry_init`.
+// * `shutdown_func`: Instructs the transport to flush its queue and shut down.
+//   This hook receives a millisecond-resolution `timeout` parameter and should
+//   return `true` when the transport was flushed and shut down successfully.
+//   In case of `false`, sentry will log an error, but continue with freeing the
+//   transport.
+// * `free_func`: Frees the transports `state`. This hook might be called even
+//   though `shutdown_func` returned `false` previously.
+//
+// The transport interface might be extended in the future with hooks to flush
+// its internal queue without shutting down, and to dump its internal queue to
+// disk in case of a hard crash.
 //
 type
+  sentry_transport_s = record end;
   psentry_transport_s = ^sentry_transport_s;
-
-  _sentry_transport_send_envelope_func = procedure(t: psentry_transport_s; e: psentry_envelope_t); cdecl;
-  _sentry_transport_func = procedure(s: psentry_transport_s); cdecl;
-
-  sentry_transport_s = record
-    send_envelope_func: _sentry_transport_send_envelope_func;
-    startup_func: _sentry_transport_func;
-    shutdown_func: _sentry_transport_func;
-    free_func: _sentry_transport_func;
-    data: Pointer;
-  end;
-
   sentry_transport_t = sentry_transport_s;
   psentry_transport_t = ^sentry_transport_t;
 
-  _sentry_transport_new_func = procedure(e: psentry_envelope_t; data: Pointer); cdecl;
+  _sentry_transport_new_func = procedure(e: psentry_envelope_t; state: Pointer); cdecl;
+  _sentry_transport_free_func = procedure(state: Pointer); cdecl;
+  _sentry_transport_startup_func = function(const options: psentry_options_t; state: Pointer): Integer; cdecl;
+  _sentry_transport_shutdown_func = function(timeout: UInt64; state: Pointer): Integer; cdecl;
 
-function sentry_new_function_transport(
-  func: _sentry_transport_new_func;
-  data: Pointer
+//
+// Creates a new transport with an initial `send_func`.
+//
+function sentry_transport_new(
+    send_func: _sentry_transport_new_func
 ): psentry_transport_t; cdecl; external sentry_dll  delayed;
+
+//
+// Sets the transport `state`.
+//
+// If the state is owned by the transport and needs to be freed, use
+// `sentry_transport_set_free_func` to set an appropriate hook.
+//
+procedure sentry_transport_set_state(
+    transport: psentry_transport_t;
+    state: Pointer
+); cdecl; external sentry_dll  delayed;
+
+//
+// Sets the transport hook to free the transport `state`.
+//
+procedure sentry_transport_set_free_func(
+    transport: psentry_transport_t;
+    free_func: _sentry_transport_free_func
+); cdecl; external sentry_dll  delayed;
+
+//
+// Sets the transport startup hook.
+//
+// This hook is called from within `sentry_init` and will get a reference to the
+// options which can be used to initialize a transports internal state.
+// It should return `0` on success. A failure will bubble up to `sentry_init`.
+//
+procedure sentry_transport_set_startup_func(
+    transport: psentry_transport_t;
+    startup_func: _sentry_transport_startup_func
+); cdecl; external sentry_dll  delayed;
+
+//
+// Sets the transport shutdown hook.
+//
+// This hook will receive a millisecond-resolution timeout.
+// It should return `0` on success in case all the pending envelopes have been
+// sent within the timeout, or `1` if the timeout was hit.
+//
+procedure sentry_transport_set_shutdown_func(
+    transport: psentry_transport_t;
+    shutdown_func: _sentry_transport_shutdown_func
+); cdecl; external sentry_dll  delayed;
 
 //
 // Generic way to free a transport.
 //
 procedure sentry_transport_free(
-  transport: psentry_transport_t
+    transport: psentry_transport_t
 ); cdecl; external sentry_dll  delayed;
 
 //
-// This represents an opaque backend.
+// Create a new function transport.
 //
-// This declaration is *deprecated* and will be removed in a future version.
-//
-type
-  sentry_backend_s = record end;
-  sentry_backend_t = sentry_backend_s;
-  psentry_backend_t = ^sentry_backend_t;
-
-//
-// Generic way to free a backend.
+// It is a convenience function which works with a borrowed `data`, and will
+// automatically free the envelope, so the user provided function does not need
+// to do that.
 //
 // This function is *deprecated* and will be removed in a future version.
+// It is here for backwards compatibility. Users should migrate to the
+// `sentry_transport_new` API.
 //
-procedure sentry_backend_free(
-  backend: psentry_backend_t
-); cdecl; external sentry_dll  delayed;
-
-//
-// Type of the callback for modifying events.
-//
-type
-  sentry_event_function_t = function(
-    event: sentry_value_t;
-    hint: Pointer;
-    closure: Pointer
-  ): sentry_value_t; cdecl;
+function sentry_new_function_transport(
+    func: _sentry_transport_new_func;
+    data: Pointer
+): psentry_transport_t; cdecl; external sentry_dll  delayed;
 
 // -- Options APIs --
 
@@ -670,11 +815,34 @@ procedure sentry_options_free(
 //
 procedure sentry_options_set_transport(
   opts: psentry_options_t;
-  func: sentry_transport_function_t
+  transport: psentry_transport_t
 ); cdecl; external sentry_dll  delayed;
 
 //
-// Sets the before send callback.
+// Type of the `before_send` callback.
+//
+// The callback takes ownership of the `event`, and should usually return that
+// same event. In case the event should be discarded, the callback needs to
+// call `sentry_value_decref` on the provided event, and return a
+// `sentry_value_new_null()` instead.
+//
+// This function may be invoked inside of a signal handler and must be safe for
+// that purpose, see https://man7.org/linux/man-pages/man7/signal-safety.7.html.
+// On Windows, it may be called from inside of a `UnhandledExceptionFilter`, see
+// the documentation on SEH (structured exception handling) for more information
+// https://docs.microsoft.com/en-us/windows/win32/debug/structured-exception-handling
+//
+type
+  sentry_event_function_t = function(
+    event: sentry_value_t;
+    hint: Pointer;
+    closure: Pointer
+  ): sentry_value_t; cdecl;
+
+//
+// Sets the `before_send` callback.
+//
+// See the `sentry_event_function_t` typedef above for more information.
 //
 procedure sentry_options_set_before_send(
   opts: psentry_options_t;
@@ -762,6 +930,8 @@ function sentry_options_get_dist(
 //
 // Configures the http proxy.
 //
+// The given proxy has to include the full scheme, eg. `http://some.proxy/`.
+//
 procedure sentry_options_set_http_proxy(
   opts: psentry_options_t;
   const proxy: PAnsiChar
@@ -791,6 +961,21 @@ function sentry_options_get_ca_certs(
 ): PAnsiChar; cdecl; external sentry_dll  delayed;
 
 //
+// Configures the name of the http transport thread.
+//
+procedure sentry_options_set_transport_thread_name(
+    opts: psentry_options_t;
+    const name: PAnsiChar
+); cdecl; external sentry_dll  delayed;
+
+//
+// Returns the configured http transport thread name.
+//
+function sentry_options_get_transport_thread_name(
+    const opts: psentry_options_t
+): PAnsiChar; cdecl; external sentry_dll  delayed;
+
+//
 // Enables or disables debug printing mode.
 //
 procedure sentry_options_set_debug(
@@ -803,6 +988,66 @@ procedure sentry_options_set_debug(
 //
 function sentry_options_get_debug(
   const opts: psentry_options_t
+): Integer; cdecl; external sentry_dll  delayed;
+
+//
+// Sets the number of breadcrumbs being tracked and attached to events.
+//
+// Defaults to 100.
+//
+procedure sentry_options_set_max_breadcrumbs(
+    opts: psentry_options_t;
+    max_breadcrumbs: NativeUInt
+); cdecl; external sentry_dll  delayed;
+
+//
+// Gets the number of breadcrumbs being tracked and attached to events.
+//
+function sentry_options_get_max_breadcrumbs(
+    const opts: psentry_options_t
+): NativeUInt; cdecl; external sentry_dll  delayed;
+
+//
+// Type of the callback for logger function.
+//
+type
+  sentry_logger_function_t = procedure(
+    level: sentry_level_t;
+    const message: PAnsiChar;
+    args: va_list;
+    userdata: Pointer
+  ); cdecl;
+
+//
+// Sets the sentry-native logger function.
+//
+// Used for logging debug events when the `debug` option is set to true.
+//
+procedure sentry_options_set_logger(
+    opts: psentry_options_t;
+    func: sentry_logger_function_t;
+    userdata: Pointer
+); cdecl; external sentry_dll  delayed;
+
+//
+// Enables or disables automatic session tracking.
+//
+// Automatic session tracking is enabled by default and is equivalent to calling
+// `sentry_start_session` after startup.
+// There can only be one running session, and the current session will always be
+// closed implicitly by `sentry_close`, when starting a new session with
+// `sentry_start_session`, or manually by calling `sentry_end_session`.
+//
+procedure sentry_options_set_auto_session_tracking(
+    opts: psentry_options_t;
+    val: Integer
+); cdecl; external sentry_dll  delayed;
+
+//
+// Returns true if automatic session tracking is enabled.
+//
+function sentry_options_get_auto_session_tracking(
+    const opts: psentry_options_t
 ): Integer; cdecl; external sentry_dll  delayed;
 
 //
@@ -823,13 +1068,36 @@ function sentry_options_get_require_user_consent(
     const opts: psentry_options_t
 ): Integer; cdecl; external sentry_dll  delayed;
 
+//
+// Enables or disables on-device symbolication of stack traces.
+//
+// This feature can have a performance impact, and is enabled by default on
+// Android. It is usually only needed when it is not possible to provide debug
+// information files for system libraries which are needed for serverside
+// symbolication.
+//
+procedure sentry_options_set_symbolize_stacktraces(
+    opts: psentry_options_t;
+    val: Integer
+); cdecl; external sentry_dll  delayed;
+
+//
+// Returns true if on-device symbolication of stack traces is enabled.
+//
+function sentry_options_get_symbolize_stacktraces(
+    const opts: psentry_options_t
+): Integer; cdecl; external sentry_dll  delayed;
+
 
 //
 // Adds a new attachment to be sent along.
 //
+// `path` is assumed to be in platform-specific filesystem path encoding.
+// API Users on windows are encouraged to use `sentry_options_add_attachmentw`
+// instead.
+//
 procedure sentry_options_add_attachment(
   opts: psentry_options_t;
-  const name: PAnsiChar;
   const path: PAnsiChar
 ); cdecl; external sentry_dll  delayed;
 
@@ -843,6 +1111,10 @@ procedure sentry_options_add_attachment(
 // It is recommended that library users set an explicit handler path, depending
 // on the directory/executable structure of their app.
 //
+// `path` is assumed to be in platform-specific filesystem path encoding.
+// API Users on windows are encouraged to use `sentry_options_set_handler_pathw`
+// instead.
+//
 procedure sentry_options_set_handler_path(
   opts: psentry_options_t;
   const path: PAnsiChar
@@ -855,12 +1127,27 @@ procedure sentry_options_set_handler_path(
 // artifacts in case of a crash. This will also be used by the crashpad backend
 // if it is configured.
 //
-// The path defaults to `.sentry-native` in the current working directory, will
-// be created if it does not exist, and will be resolved to an absolute path
-// inside of `sentry_init`.
+// The directory is used for "cached" data, which needs to persist across
+// application restarts to ensure proper flagging of release-health sessions,
+// but might otherwise be safely purged regularly.
 //
-// It is recommended that library users set an explicit absolute path, depending
-// on their own apps directory.
+// It is roughly equivalent to the type of `AppData/Local` on Windows and
+// `XDG_CACHE_HOME` on Linux, and equivalent runtime directories on other
+// platforms.
+//
+// It is recommended that users set an explicit absolute path, depending
+// on their apps runtime directory. The path will be created if it does not
+// exist, and will be resolved to an absolute path inside of `sentry_init`. The
+// directory should not be shared with other application data/configuration, as
+// sentry-native will enumerate and possibly delete files in that directory. An
+// example might be `$XDG_CACHE_HOME/your-app/sentry`
+//
+// If no explicit path it set, sentry-native will default to `.sentry-native` in
+// the current working directory, with no specific platform-specific handling.
+//
+// `path` is assumed to be in platform-specific filesystem path encoding.
+// API Users on windows are encouraged to use
+// `sentry_options_set_database_pathw` instead.
 //
 procedure sentry_options_set_database_path(
   opts: psentry_options_t;
@@ -873,7 +1160,6 @@ procedure sentry_options_set_database_path(
 //
 procedure sentry_options_add_attachmentw(
   opts: psentry_options_t;
-  const name: PAnsiChar;
   const path: PWideChar
 ); cdecl; external sentry_dll  delayed;
 
@@ -914,6 +1200,9 @@ procedure sentry_options_set_system_crash_reporter_enabled(
 //
 // This takes ownership of the options.  After the options have been set they
 // cannot be modified any more.
+// Depending on the configured transport and backend, this function might not be
+// fully thread-safe.
+// Returns 0 on success.
 //
 function sentry_init(
   options: psentry_options_t
@@ -922,7 +1211,26 @@ function sentry_init(
 //
 // Shuts down the sentry client and forces transports to flush out.
 //
-procedure sentry_shutdown; cdecl; external sentry_dll  delayed;
+// Returns 0 on success.
+//
+function sentry_close: Integer; cdecl; external sentry_dll  delayed;
+
+//
+// Shuts down the sentry client and forces transports to flush out.
+//
+// This is a **deprecated** alias for `sentry_close`.
+//
+// Returns 0 on success.
+//
+function sentry_shutdown: Integer; cdecl; external sentry_dll  delayed;
+
+//
+// This will lazily load and cache a list of all the loaded libraries.
+//
+// Returns a new reference to an immutable, frozen list.
+// The reference must be released with `sentry_value_decref`.
+//
+function sentry_get_modules_list: sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
 // Clears the internal module cache.
@@ -936,11 +1244,15 @@ procedure sentry_shutdown; cdecl; external sentry_dll  delayed;
 procedure sentry_clear_modulecache; cdecl; external sentry_dll  delayed;
 
 //
-// Returns the client options.
+// Re-initializes the Sentry backend.
 //
-// This might return NULL if sentry is not yet initialized.
+// This is needed if a third-party library overrides the previously installed
+// signal handler. Calling this function can be potentially dangerous and should
+// only be done when necessary.
 //
-function sentry_get_options: psentry_options_t; cdecl; external sentry_dll  delayed;
+// Returns 0 on success.
+//
+function sentry_reinstall_backend: Integer; cdecl; external sentry_dll  delayed;
 
 //
 // Gives user consent.
@@ -975,7 +1287,7 @@ function sentry_capture_event(
 // This is safe to be called from a crashing thread and may not return.
 //
 procedure sentry_handle_exception(
-  uctx: psentry_ucontext_t
+  const uctx: psentry_ucontext_t
 ); cdecl; external sentry_dll  delayed;
 
 //
@@ -1044,6 +1356,9 @@ procedure sentry_remove_context(
 
 //
 // Sets the event fingerprint.
+//
+// This accepts a variable number of arguments, and needs to be terminated by a
+// trailing `NULL`.
 //
 procedure sentry_set_fingerprint(
   const fingerprint: PAnsiChar
