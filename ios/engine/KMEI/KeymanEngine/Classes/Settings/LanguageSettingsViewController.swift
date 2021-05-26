@@ -358,6 +358,7 @@ class LanguageSettingsViewController: UITableViewController {
     } else {
       let event = Sentry.Event(level: .debug)
       event.message = SentryMessage(formatted: "Keyboard index requested for uninstalled keyboard")
+      event.extra = ["id": matchingFullID]
       SentrySDK.capture(event: event)
 
       log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
@@ -388,6 +389,7 @@ class LanguageSettingsViewController: UITableViewController {
     } else {
       let event = Sentry.Event(level: .debug)
       event.message = SentryMessage(formatted: "Keyboard index requested for uninstalled keyboard")
+      event.extra = ["id": matchingFullID]
       SentrySDK.capture(event: event)
 
       log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")

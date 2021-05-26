@@ -343,7 +343,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if !Migrations.resourceHasPackageMetadata(keyboard) {
       let wrappedKbds = Migrations.migrateToKMPFormat([keyboard])
       guard wrappedKbds.count == 1 else {
-        log.error("Could not properly import keyboard")
+        SentryManager.captureAndLog("Could not properly import keyboard")
         return
       }
       kbdToInstall = wrappedKbds[0]
@@ -407,7 +407,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if !Migrations.resourceHasPackageMetadata(lexicalModel) {
       let wrappedModels = Migrations.migrateToKMPFormat([lexicalModel])
       guard wrappedModels.count == 1 else {
-        log.error("Could not properly import lexical model")
+        SentryManager.captureAndLog("Could not properly import lexical model")
         return
       }
       modelToInstall = wrappedModels[0]
@@ -459,12 +459,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       //        rather than just 'no matching keyboards'.
       let keyboardDir = Storage.active.resourceDir(for: kb)!
       FontManager.shared.unregisterFonts(in: keyboardDir, fromSystemOnly: false)
-      log.info("Deleting directory \(keyboardDir)")
+      SentryManager.breadcrumbAndLog("Deleting directory \(keyboardDir)")
       if (try? FileManager.default.removeItem(at: keyboardDir)) == nil {
-        log.error("Failed to delete \(keyboardDir)")
+        SentryManager.captureAndLog("Failed to delete \(keyboardDir) when removing keyboard")
       }
     } else {
-      log.info("User has another language installed. Skipping delete of keyboard files.")
+      SentryManager.breadcrumbAndLog("User has another language installed. Skipping delete of keyboard files.")
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
@@ -541,12 +541,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if !userLexicalModels.contains(where: { $0.id == lm.id }) {
       let lexicalModelDir = Storage.active.resourceDir(for: lm)!
       FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
-      log.info("Deleting directory \(lexicalModelDir)")
+      SentryManager.breadcrumbAndLog("Deleting directory \(lexicalModelDir)")
       if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
-        log.error("Failed to delete \(lexicalModelDir)")
+        SentryManager.captureAndLog("Failed to delete \(lexicalModelDir) when removing lexical model")
       }
     } else {
-      log.info("User has another language installed. Skipping delete of lexical model files.")
+      SentryManager.breadcrumbAndLog("User has another language installed. Skipping delete of lexical model files.")
     }
     
     NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: lm)

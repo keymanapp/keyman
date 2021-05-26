@@ -279,7 +279,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     do {
       try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
-      log.error("Could not start Reachability object: \(error)")
+      SentryManager.captureAndLog("Could not start Reachability object: \(error)")
     }
 
     self.session = session

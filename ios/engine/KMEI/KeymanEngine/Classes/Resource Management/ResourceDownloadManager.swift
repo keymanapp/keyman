@@ -531,11 +531,11 @@ public class ResourceDownloadManager {
         // The reason we're deprecating it; only returns the first model, even if more language pairings are installed.
         return package.installables[0][0]
       } else {
-        log.error("Specified package (at \(packageURL)) does not contain lexical models: \(KMPError.invalidPackage)")
+        SentryManager.captureAndLog("Specified package (at \(packageURL)) does not contain lexical models: \(KMPError.invalidPackage)")
         return nil
       }
     } catch {
-      log.error("Error occurred while attempting to install package from \(packageURL): \(String(describing: error))")
+      SentryManager.captureAndLog(error, message: "Error occurred while attempting to install package from \(packageURL): \(String(describing: error))")
       return nil
     }
   }
@@ -560,7 +560,7 @@ public class ResourceDownloadManager {
         try handler?(package, error)
         self.resourceDownloadCompleted(with: package)
       } catch {
-        log.error("Unhandled error occurred after resource successfully downloaded: \(String(describing: error))")
+        SentryManager.captureAndLog(error, message: "Unhandled error occurred after resource successfully downloaded: \(String(describing: error))")
         self.resourceDownloadFailed(withKey: packageKey, with: error)
       }
 
@@ -615,7 +615,7 @@ public class ResourceDownloadManager {
       if let package = package {
         do {
           try ResourceFileManager.shared.install(resourceWithID: fullID, from: package)
-          log.info("succesfully parsed the keyboard in: \(package.sourceFolder)")
+          SentryManager.breadcrumbAndLog("successfully parsed the keyboard in: \(package.sourceFolder)")
 
           // Maintains legacy behavior; automatically sets the newly-downloaded keyboard as active.
           if let keyboard = package.findResource(withID: fullID) {
@@ -626,12 +626,13 @@ public class ResourceDownloadManager {
             self.downloadLexicalModelsForLanguageIfExists(languageID: fullID.languageID)
           }
         } catch {
-          log.error("Keyboard installation error: \(String(describing: error))")
+          SentryManager.captureAndLog(error, message: "Keyboard installation error: \(String(describing: error))")
         }
       } else if let error = error {
+        // Often a download error.
         log.error("Installation failed: \(String(describing: error))")
       } else {
-        log.error("Unknown error when attempting to install \(fullID.description))")
+        SentryManager.captureAndLog("Unknown error when attempting to install \(fullID.description))")
       }
     }
   }
@@ -642,18 +643,18 @@ public class ResourceDownloadManager {
         do {
           // A raw port of the queue's old installation method for lexical models.
           try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
-          log.info("successfully parsed the lexical model in: \(package.sourceFolder)")
+          SentryManager.breadcrumbAndLog("successfully parsed the lexical model in: \(package.sourceFolder)")
 
           if let installedLexicalModel = package.findResource(withID: fullID) {
             _ = Manager.shared.registerLexicalModel(installedLexicalModel)
           }
         } catch {
-          log.error("Error installing the lexical model: \(String(describing: error))")
+          SentryManager.captureAndLog(error, message: "Error installing the lexical model: \(String(describing: error))")
         }
       } else if let error = error {
         log.error("Error downloading the lexical model \(String(describing: error))")
       } else {
-        log.error("Unknown error when attempting to install \(fullID.description)")
+        SentryManager.captureAndLog("Unknown error when attempting to install \(fullID.description)")
       }
     }
   }
