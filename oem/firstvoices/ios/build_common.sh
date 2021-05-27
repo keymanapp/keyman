@@ -89,7 +89,7 @@ while [[ $# -gt 0 ]] ; do
         -no-archive)
             DO_ARCHIVE=false
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
         -clean)
@@ -198,7 +198,7 @@ if [ $CODE_SIGN = true ]; then
   else
     xcodebuild $XCODEFLAGS -scheme "$TARGET" \
                VERSION=$VERSION \
-               VERSION_WITH_TAG=$VERSION_WITH_TAG    
+               VERSION_WITH_TAG=$VERSION_WITH_TAG
   fi
 else
   xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \

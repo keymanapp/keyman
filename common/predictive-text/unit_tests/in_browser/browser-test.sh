@@ -67,7 +67,7 @@ while [[ $# -gt 0 ]] ; do
         -help)
             display_usage
             ;;
-        -?)
+        -\?)
             display_usage
             ;;
     esac

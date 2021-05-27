@@ -69,7 +69,7 @@ while [[ $# -gt 0 ]] ; do
         -no-kmw)
             DO_KMW_BUILD=false
             ;;
-        -h|-?|-help)
+        -h|-\?|-help)
             display_usage
             exit 0
             ;;

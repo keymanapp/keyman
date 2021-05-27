@@ -99,7 +99,7 @@ while [[ $# -gt 0 ]] ; do
         -debug)
             VERBOSITY="-debug"
             ;;
-        -h|-?|-help|--help)
+        -h|-\?|-help|--help)
             display_usage
             ;;
         -*)
@@ -171,7 +171,7 @@ echo "---- End Listing ----"
 
 # Step 3 - Replace existing application files with new version
 displayInfo "Copying files from \"$SOURCE_KM_APP\"..."
-find "$DEST_KM_APP" -mindepth 1 -maxdepth 1 
+find "$DEST_KM_APP" -mindepth 1 -maxdepth 1
 echo "---------"
 find "$DEST_KM_APP" -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf
 cp -fR "$SOURCE_KM_APP/" "$DEST_KM_APP"

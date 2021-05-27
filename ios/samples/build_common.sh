@@ -78,7 +78,7 @@ while [[ $# -gt 0 ]] ; do
             CODE_SIGN=false
             KMEI_FLAGS="$KMEI_FLAGS -no-codesign"
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
         -clean)

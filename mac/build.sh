@@ -211,7 +211,7 @@ while [[ $# -gt 0 ]] ; do
         -upload-sentry)
             UPLOAD_SENTRY=true
             ;;
-        -h|-?|-help|--help)
+        -h|-\?|-help|--help)
             display_usage
             ;;
         engine)
@@ -364,7 +364,7 @@ if $DO_KEYMANIM ; then
         echo "Building help"
         $(dirname "$THIS_SCRIPT")/build-help.sh html
     fi
-    
+
     echo_heading "Building Keyman.app"
     cd "$KM4MIM_BASE_PATH"
     if $DO_PODS ; then
@@ -387,7 +387,7 @@ if $DO_KEYMANIM ; then
         ENTITLEMENTS_FILE=Keyman.entitlements
     fi
 
-    if [ -z "$DEVELOPMENT_TEAM" ]; then 
+    if [ -z "$DEVELOPMENT_TEAM" ]; then
         DEVELOPMENT_TEAM=3YE4W86L3G
     fi
 
