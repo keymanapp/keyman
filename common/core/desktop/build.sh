@@ -15,8 +15,10 @@ display_usage() {
   echo
   echo "Build options:"
   echo "  --debug, -d       Debug build"
+  echo "  --target, -t      Target path (linux,macos only, default build/)"
   echo
   echo "Targets (all if not specified):"
+  echo "  configure         Configure libraries (linux,macos only)"
   echo "  build             Build all libraries"
   echo "    build-rust        Build rust libraries"
   echo "    build-cpp         Build c++ libraries"
@@ -24,8 +26,8 @@ display_usage() {
   echo "    tests-rust        Run rust tests"
   echo "    tests-cpp         Run c++ and c++/rust integration tests"
   echo
-  echo "Rust libraries will be in:  build/rust/<arch>/<buildtype>"
-  echo "C++ libraries will be in:   build/<arch>/<buildtype>/src"
+  echo "Rust libraries will be in:  TARGETPATH/rust/<arch>/<buildtype>"
+  echo "C++ libraries will be in:   TARGETPATH/<arch>/<buildtype>/src"
   echo "On Windows, <arch> will be 'x86' or 'x64'; elsewhere it is 'arch'"
   exit 0
 }
@@ -36,15 +38,16 @@ THIS_DIR="$(dirname "$THIS_SCRIPT")"
 CARGO_TARGET=--release
 MESON_TARGET=release
 HAS_TARGET=false
+CONFIGURE=false
 BUILD_RUST=false
 BUILD_CPP=false
 TESTS_RUST=false
 TESTS_CPP=false
 QUIET=false
+TARGET_PATH="$THIS_DIR/build"
 
 # Parse args
 shopt -s nocasematch
-
 
 while [[ $# -gt 0 ]] ; do
   key="$1"
@@ -53,9 +56,20 @@ while [[ $# -gt 0 ]] ; do
       CARGO_TARGET=
       MESON_TARGET=debug
       ;;
-    --help|-?)
-        display_usage
-        ;;
+    --help|-\?)
+      display_usage
+      ;;
+    --target|-t)
+      TARGET_PATH=$(readlink -f "$2")
+      shift
+      ;;
+    configure)
+      HAS_TARGET=true
+      CONFIGURE=true
+      # meson depends on the rust build in order 
+      # to do its configure step, for now anyway
+      BUILD_RUST=true
+      ;;
     build)
       HAS_TARGET=true
       BUILD_RUST=true
@@ -89,23 +103,26 @@ while [[ $# -gt 0 ]] ; do
 done
 
 if ! $HAS_TARGET; then
+  CONFIGURE=true
   BUILD_RUST=true
   BUILD_CPP=true
   TESTS_RUST=true
   TESTS_CPP=true
 fi
 
-    # "CLEAN: $CLEAN" \
+MESON_PATH="$TARGET_PATH/arch/$MESON_TARGET"
 
 displayInfo "" \
     "VERSION: $VERSION" \
     "TIER: $TIER" \
+    "CONFIGURE: $CONFIGURE" \
     "BUILD_RUST: $BUILD_RUST" \
     "BUILD_CPP: $BUILD_CPP" \
     "TESTS_RUST: $TESTS_RUST" \
     "TESTS_CPP: $TESTS_CPP" \
     "CARGO_TARGET: $CARGO_TARGET" \
     "MESON_TARGET: $MESON_TARGET" \
+    "TARGET_PATH: $TARGET_PATH" \
     ""
 
 
@@ -125,9 +142,10 @@ build_test_rust() {
 
     # Built library path for multi-arch (Windows) vs single (*nix)
 
-    cargo build --target-dir="$THIS_DIR/build/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
+    cargo build --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
 
-    # Final output path is ./build/rust/<arch>/debug|release/<libraryname>
+    # On Windows, final output path is ./build/rust/<arch>/<arch_rust>/debug|release/<libraryname>
+    # On other platforms, the final file is already in the right place (TARGET=="")
     if [ ! -z $TARGET ]; then
       local LIB="rust_mock_processor"
 
@@ -136,15 +154,15 @@ build_test_rust() {
         local LIBNAME=$LIB.lib || \
         local LIBNAME=lib$LIB.a
 
-      local BUILT_PATH="$THIS_DIR/build/rust/$TARGETBASE/$TARGET/$MESON_TARGET"
-      local TARGET_PATH="$THIS_DIR/build/rust/$TARGETBASE/$MESON_TARGET"
-      cp "$BUILT_PATH/$LIBNAME" "$TARGET_PATH/$LIBNAME"
+      local BUILT_PATH="$TARGET_PATH/rust/$TARGETBASE/$TARGET/$MESON_TARGET"
+      local RUST_TARGET_PATH="$TARGET_PATH/rust/$TARGETBASE/$MESON_TARGET"
+      cp "$BUILT_PATH/$LIBNAME" "$RUST_TARGET_PATH/$LIBNAME"
     fi
   fi
 
   if $TESTS_RUST; then
     echo_heading "======= Testing rust library for $TARGETBASE $TARGET ======="
-    cargo test --target-dir="$THIS_DIR/build/rust/$TARGETBASE" $TARGET $CARGO_TARGET
+    cargo test --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET $CARGO_TARGET
   fi
   popd >/dev/null
 }
@@ -175,23 +193,30 @@ build_windows() {
 }
 
 build_linux_macos() {
+
   # Build rust targets
   build_test_rust arch
 
   # Build meson targets
+  if $CONFIGURE; then
+    echo_heading "======= Configuring C++ library for $os_id ======="
+    pushd $THIS_DIR > /dev/null
+    meson $MESON_PATH --werror --buildtype $MESON_TARGET
+    popd > /dev/null
+  fi
+
   if $BUILD_CPP; then
     echo_heading "======= Building C++ library for $os_id ======="
-    meson build/arch/$MESON_TARGET --werror --buildtype $MESON_TARGET
-    cd build/arch/$MESON_TARGET
+    pushd $MESON_PATH > /dev/null
     ninja
-    cd ../../..
+    popd > /dev/null
   fi
 
   if $TESTS_CPP; then
     echo_heading "======= Testing C++ library for $os_id ======="
-    cd build/arch/$MESON_TARGET
+    pushd $MESON_PATH > /dev/null
     meson test --print-errorlogs
-    cd ../../..
+    popd > /dev/null
   fi
 }
 
