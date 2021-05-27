@@ -9,6 +9,7 @@ kmx = executable('kmx', 'kmx.cpp',
     cpp_args: defns,
     include_directories: [inc, libsrc],
     link_args: links,
+    dependencies: [rust_mock_processor],
     objects: lib.extract_all_objects())
 
 copyfile = ['-c', 'import sys, shutil', 'shutil.copyfile(*sys.argv[1:])']

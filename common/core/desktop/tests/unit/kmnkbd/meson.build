@@ -18,6 +18,7 @@ foreach t : tests
     cpp_args: defns,
     include_directories: [inc, libsrc],
     link_args: links,
+    dependencies: [rust_mock_processor],
     objects: lib.extract_all_objects())
 
   test(t[0], bin)
