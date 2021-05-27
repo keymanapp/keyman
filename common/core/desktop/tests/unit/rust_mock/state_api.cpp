@@ -164,6 +164,11 @@ int main(int, char * [])
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,
                                   KM_KBP_MODIFIER_SHIFT));
+
+  //TEMP
+  action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}});
+  auto doc1 = get_json_doc(*test_state);
+  std::cout << doc1 << std::endl;
 #if 0
   // TODO: enable these tests once we have the data propagating to Rust
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}}));
