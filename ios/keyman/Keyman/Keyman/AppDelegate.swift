@@ -64,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ = KeymanEngine.log
 
     UniversalLinks.externalLinkLauncher = { url in
-      UIApplication.shared.openURL(url)
+      UIApplication.shared.open(url)
     }
 
     Manager.applicationGroupIdentifier = "group.KM4I"
@@ -170,11 +170,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     // Workaround to display overlay window above keyboard
-    if #available(iOS 9.0, *) {
-      let windows = UIApplication.shared.windows
-      if let lastWindow = windows.last {
-        _overlayWindow!.windowLevel = lastWindow.windowLevel + 1
-      }
+    let windows = UIApplication.shared.windows
+    if let lastWindow = windows.last {
+      _overlayWindow!.windowLevel = lastWindow.windowLevel + 1
     }
     return _overlayWindow!
   }

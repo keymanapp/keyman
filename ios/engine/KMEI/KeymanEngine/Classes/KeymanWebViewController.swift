@@ -540,17 +540,12 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       // Not usable by older iPhone models.
       AudioServicesPlaySystemSound(kSystemSoundID_MediumVibrate)
     } else { // if vibrationSupport == .taptic
-      if #available(iOSApplicationExtension 10.0, *) {
-        // Available with iPhone 7 and beyond, we can now produce nicely customized haptic feedback.
-        // We use this style b/c it's short, and in essence it is a minor UI element collision -
-        // a single key with blocked (erroneous) output.
-        // Oddly, is a closer match to SystemSoundID 1520 than 1521.
-        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle.heavy)
-        vibrator.impactOccurred()
-      } else {
-        // Fallback on earlier feedback style
-        AudioServicesPlaySystemSound(kSystemSoundID_MediumVibrate)
-      }
+      // Available with iPhone 7 and beyond, we can now produce nicely customized haptic feedback.
+      // We use this style b/c it's short, and in essence it is a minor UI element collision -
+      // a single key with blocked (erroneous) output.
+      // Oddly, is a closer match to SystemSoundID 1520 than 1521.
+      let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle.heavy)
+      vibrator.impactOccurred()
     }
   }
 }

@@ -32,103 +32,50 @@ public class Colors {
 
   public static var popupKey: UIColor {
     get {
-      if #available(iOSApplicationExtension 11.0, *) {
-        return UIColor(named: "KeyPrimary", in: engineBundle, compatibleWith: nil)!
-      } else {
-        return UIColor(red: 244.0 / 255.0,
-                       green: 244.0 / 255.0,
-                       blue: 244.0 / 255.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "KeyPrimary", in: engineBundle, compatibleWith: nil)!
     }
   }
 
   public static var keyText: UIColor {
     get {
-      if #available(iOSApplicationExtension 11.0, *) {
-        return UIColor(named: "KeyText", in: engineBundle, compatibleWith: nil)!
-      } else {
-        return UIColor.black
-      }
+      return UIColor(named: "KeyText", in: engineBundle, compatibleWith: nil)!
     }
   }
 
   public static var popupKeyHighlighted: UIColor {
     get {
-      if #available(iOSApplicationExtension 11.0, *) {
-        return UIColor(named: "SelectedKey", in: engineBundle, compatibleWith: nil)!
-      } else {
-        return UIColor(red: 136.0 / 255.0,
-                       green: 136.0 / 255.0,
-                       blue: 1.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "SelectedKey", in: engineBundle, compatibleWith: nil)!
     }
   }
 
   // I'm not 100% on the distinction, but this should be fine for now.
   public static var popupKeyTint: UIColor {
     get {
-      if #available(iOSApplicationExtension 11.0, *) {
-        return UIColor(named: "SelectedKey", in: engineBundle, compatibleWith: nil)!
-      } else {
-        return UIColor(red: 181.0 / 255.0,
-                       green: 181.0 / 255.0,
-                       blue: 181.0 / 255.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "SelectedKey", in: engineBundle, compatibleWith: nil)!
     }
   }
 
   public static var keyboardBackground: UIColor {
     get {
-      if #available(iOSApplicationExtension 11.0, *) {
-        return UIColor(named: "KeyboardBackground", in: engineBundle, compatibleWith: nil)!
-      } else {
-        return UIColor(red: 210.0 / 255.0,
-                       green: 214.0 / 255.0,
-                       blue: 220.0 / 255.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "KeyboardBackground", in: engineBundle, compatibleWith: nil)!
     }
   }
 
   public static var keyboardSelectionPrimary: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "KeyboardSelectionPrimary", in: engineBundle, compatibleWith: nil)!
-      } else {
-        return UIColor(red: 204.0 / 255.0,
-                       green: 136.0 / 255.0,
-                       blue: 34.0 / 255.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "KeyboardSelectionPrimary", in: engineBundle, compatibleWith: nil)!
     }
   }
 
   public static var helpBubbleGradient1: UIColor {
     get {
-      if #available(iOSApplicationExtension 11.0, *) {
-        return UIColor(named: "HelpBubbleGradient1", in: engineBundle, compatibleWith: nil)!
-      } else {
-        return UIColor(red: 253.0 / 255.0,
-                       green: 244.0 / 255.0,
-                       blue: 196.0 / 255.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "HelpBubbleGradient1", in: engineBundle, compatibleWith: nil)!
     }
   }
 
   public static var helpBubbleGradient2: UIColor {
     get {
-      if #available(iOSApplicationExtension 11.0, *) {
-        return UIColor(named: "HelpBubbleGradient2", in: engineBundle, compatibleWith: nil)!
-      } else {
-        return UIColor(red: 233.0 / 255.0,
-                       green: 224.0 / 255.0,
-                       blue: 176.0 / 255.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "HelpBubbleGradient2", in: engineBundle, compatibleWith: nil)!
     }
   }
 }
