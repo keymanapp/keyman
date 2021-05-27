@@ -286,13 +286,13 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
   {
     gp->dpName = StringOffset(base, cgp->dpName);
     gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
-    if(cgp->dpMatch != 0) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
-    if(cgp->dpNoMatch != 0) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
+    gp->dpMatch = StringOffset(base, cgp->dpMatch);
+    gp->dpNoMatch = StringOffset(base, cgp->dpNoMatch);
 
     for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++)
     {
-      kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
-      kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
+      kp->dpOutput = StringOffset(base, ckp->dpOutput);
+      kp->dpContext = StringOffset(base, ckp->dpContext);
     }
   }
 
