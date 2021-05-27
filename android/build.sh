@@ -1,5 +1,6 @@
 #!/bin/bash
-# Build Keyman Engine Android and KMAPro
+# Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app
+# Use '-clean' flag to clean build artifacts
 
 # Set sensible script defaults:
 # set -e: Terminate script if a command returns an error
@@ -28,6 +29,10 @@ clean ( ) {
     echo "Cleaning $fname"
     rm $fname
   done
+  if [ -f "$KEYMAN_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar" ]; then
+    echo "Cleaning OEM FirstVoices keyman-engine.aar"
+    rm "$KEYMAN_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar"
+  fi
 
   if [ -d "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs" ]; then
     echo "Cleaning KMAPro build outputs directory"
@@ -38,6 +43,8 @@ clean ( ) {
     echo "Cleaning upload directory"
     rm -rf "$KEYMAN_ROOT/android/upload"
   fi
+
+  exit
 }
 
 echo Build KMEA and KMAPro:
