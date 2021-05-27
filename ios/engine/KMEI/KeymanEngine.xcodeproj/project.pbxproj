@@ -491,8 +491,6 @@
 		CEBD34542655117400EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEBD34552655117800EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = am; path = am.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		CEC0C6762410E049003E1BCD /* SentryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryManager.swift; sourceTree = "<group>"; };
-		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
-		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
 		CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManagerTests.swift; sourceTree = "<group>"; };
 		CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationTests.swift; sourceTree = "<group>"; };
 		CEE0321024C56735005BFC73 /* Packages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packages.swift; sourceTree = "<group>"; };
@@ -802,7 +800,6 @@
 				CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */,
 				C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */,
 				C06D372E1F81F4E100F61AE0 /* Info.plist */,
-				F2606FC4158F8B8600F37184 /* lib */,
 				F273AB9615641D9300A47CEE /* Classes */,
 			);
 			path = KeymanEngine;
@@ -989,23 +986,6 @@
 			);
 			name = "Supporting Files";
 			path = KeymanEngine;
-			sourceTree = "<group>";
-		};
-		F2606FC4158F8B8600F37184 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				F26071F5158F8BE600F37184 /* Reachability */,
-			);
-			path = lib;
-			sourceTree = "<group>";
-		};
-		F26071F5158F8BE600F37184 /* Reachability */ = {
-			isa = PBXGroup;
-			children = (
-				CECB38931F2199BC0098882F /* Reachability.h */,
-				CECB38941F2199BC0098882F /* Reachability.m */,
-			);
-			path = Reachability;
 			sourceTree = "<group>";
 		};
 		F2607212158FBCB500F37184 /* KeyboardPicker */ = {
