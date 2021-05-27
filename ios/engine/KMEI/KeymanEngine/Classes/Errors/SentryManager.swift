@@ -14,45 +14,45 @@ import Sentry
  * error reporting.
  */
 public class SentryManager {
+  private static var _started: Bool = false
+
   public static var hasStarted: Bool {
-    return Sentry.Client.shared != nil
+    return _started
   }
 
   public static func start(sendingEnabled: Bool = true) {
     // First things first:  enable Sentry for crash reporting.
-    do {
-      #if NO_SENTRY
-        // If doing development debugging (and NOT for Sentry code), silence Sentry reporting.
-        let allowEnabled = false
-        log.debug("Sentry error logging disabled for development mode.")
-      #else
-        let allowEnabled = true
-        log.debug("Sentry error logging enabled.")
-      #endif
+    #if NO_SENTRY
+      // If doing development debugging (and NOT for Sentry code), silence Sentry reporting.
+      let allowEnabled = false
+      log.debug("Sentry error logging disabled for development mode.")
+    #else
+      let allowEnabled = true
+      log.debug("Sentry error logging enabled.")
+    #endif
 
-      let infoDict = Bundle.main.infoDictionary
-      let versionWithTag = infoDict?["KeymanVersionWithTag"] as? String ?? ""
-      let environment = infoDict?["KeymanVersionEnvironment"] as? String ?? ""
-      let release = "release-\(versionWithTag)"
+    let infoDict = Bundle.main.infoDictionary
+    let versionWithTag = infoDict?["KeymanVersionWithTag"] as? String ?? ""
+    let environment = infoDict?["KeymanVersionEnvironment"] as? String ?? ""
+    let release = "release-\(versionWithTag)"
 
-      let options: [String: Any] = [
-        "dsn": "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8",
-        "enabled": allowEnabled && sendingEnabled,
-        "environment": environment,
-        "release": release
-      ]
-      Sentry.Client.shared = try Sentry.Client(options: options)
-      try Sentry.Client.shared?.startCrashHandler()
-    } catch let error {
-      // Does not throw error if 'net is unavailable.  It's for some sort of error within the Sentry system.
-      print("\(error)")
+    let options = Sentry.Options()
+    options.dsn = "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8"
+    options.enabled = allowEnabled && sendingEnabled
+    options.environment = environment
+    options.releaseName = release
+    options.beforeSend = { event in
+      // This function is called on _every_ event and crash that may occur, giving us a place to
+      // capture and filter them.
+      if SentryManager.shouldSendEventHandler(event: event) {
+        return event
+      } else {
+        return nil
+      }
     }
 
-    // This function is called on _every_ event and crash that may occur, giving us a place to
-    // capture and filter them.
-    Sentry.Client.shared?.shouldSendEvent = { event in
-      return SentryManager.shouldSendEventHandler(event: event)
-    }
+    SentrySDK.start(options: options)
+    _started = true
   }
 
   public static func altEnabled() -> Bool {
@@ -90,7 +90,7 @@ public class SentryManager {
   }
 
   public static func forceError() {
-    Sentry.Client.shared?.breadcrumbs.add(Sentry.Breadcrumb(level: .info, category: "Deliberate testing error"))
-    Sentry.Client.shared?.crash()
+    SentrySDK.addBreadcrumb(crumb: Sentry.Breadcrumb(level: .info, category: "Deliberate testing error"))
+    SentrySDK.crash()
   }
 }
