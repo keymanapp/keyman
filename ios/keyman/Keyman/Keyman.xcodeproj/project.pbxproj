@@ -530,6 +530,7 @@
 				CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */,
 				98ABADB9176935E400B62590 /* Keyman */,
 				98CD125D19CA85710089385F /* SWKeyboard */,
+				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				98ABADB2176935E400B62590 /* Frameworks */,
 				98ABADB1176935E400B62590 /* Products */,
 			);
@@ -566,7 +567,6 @@
 				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
 				CE79CDB42370111200010C06 /* Themes+Colors.xcassets */,
-				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				162E2C9420926C8600F40769 /* Classes */,
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
 				9845A7C21A439A9200544E2E /* InfoViewController */,
