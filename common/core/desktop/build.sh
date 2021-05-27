@@ -112,7 +112,6 @@ displayInfo "" \
 build_test_rust() {
   local TARGETBASE="$1"
   if [ -z ${2+x} ]; then local TARGET=""; else local TARGET="$2"; fi
-  local LIB="rust_mock_processor"
 
   if [ ! -z $TARGET ]; then
     local TARGET_FLAG=--target=$TARGET
@@ -124,22 +123,23 @@ build_test_rust() {
   if $BUILD_RUST; then
     echo_heading "======= Building rust library for $TARGETBASE $TARGET ======="
 
-    # Library name on Windows vs *nix
-    [ $os_id == "win" ] && \
-      local LIBN=$LIB.lib || \
-      local LIBN=lib$LIB.a
-
     # Built library path for multi-arch (Windows) vs single (*nix)
-    [ -z $TARGET ] && \
-      local TARGET_PATH="$THIS_DIR/build/rust/$TARGETBASE/$MESON_TARGET" || \
-      local TARGET_PATH="$THIS_DIR/build/rust/$TARGETBASE/$TARGET/$MESON_TARGET"
 
     cargo build --target-dir="$THIS_DIR/build/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
 
-    local LIBS="$TARGET_PATH/$LIBN" # $(find "$TARGET_PATH" -name $LIBN)
-    if [ ! -f "$LIBS" ]; then die "could not find $LIBS after build"; fi
     # Final output path is ./build/rust/<arch>/debug|release/<libraryname>
-    cp "$LIBS" "$THIS_DIR/build/rust/$TARGETBASE/$MESON_TARGET/$LIBN"
+    if [ ! -z $TARGET ]; then
+      local LIB="rust_mock_processor"
+
+      # Library name on Windows vs *nix
+      [ $os_id == "win" ] && \
+        local LIBNAME=$LIB.lib || \
+        local LIBNAME=lib$LIB.a
+
+      local BUILT_PATH="$THIS_DIR/build/rust/$TARGETBASE/$TARGET/$MESON_TARGET"
+      local TARGET_PATH="$THIS_DIR/build/rust/$TARGETBASE/$MESON_TARGET"
+      cp "$BUILT_PATH/$LIBNAME" "$TARGET_PATH/$LIBNAME"
+    fi
   fi
 
   if $TESTS_RUST; then
@@ -184,14 +184,14 @@ build_linux_macos() {
     meson build/arch/$MESON_TARGET --werror --buildtype $MESON_TARGET
     cd build/arch/$MESON_TARGET
     ninja
-    cd ..
+    cd ../../..
   fi
 
   if $TESTS_CPP; then
     echo_heading "======= Testing C++ library for $os_id ======="
     cd build/arch/$MESON_TARGET
     meson test --print-errorlogs
-    cd ..
+    cd ../../..
   fi
 }
 
