@@ -381,6 +381,20 @@
 			isa = PBXGroup;
 			children = (
 				162E2C9620926C8600F40769 /* Extensions */,
+				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
+				9845A7C21A439A9200544E2E /* InfoViewController */,
+				9845A7B71A4398B200544E2E /* DropDownList */,
+				9845A79A1A43983300544E2E /* KMWebBrowser */,
+				9822CB671A3A77D200D73CAA /* MainViewController_.xib */,
+				98ABADD1176935E500B62590 /* MainViewController_iPad.xib */,
+				98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */,
+				9845A7C71A439A9200544E2E /* SetUpViewController */,
+				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
+				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
+				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
+				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
+				C0E943FD1F61377900E7D98C /* MainViewController.swift */,
+				C059FCBF1FD927EF00BD1A64 /* Log.swift */,
 				162E2C9820926C8600F40769 /* View */,
 			);
 			path = Classes;
@@ -559,20 +573,6 @@
 				98ABADBA176935E400B62590 /* Supporting Files */,
 				16A9229D20325253003CC98E /* Info.plist */,
 				162E2C9420926C8600F40769 /* Classes */,
-				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
-				9845A7C21A439A9200544E2E /* InfoViewController */,
-				9845A7B71A4398B200544E2E /* DropDownList */,
-				9845A79A1A43983300544E2E /* KMWebBrowser */,
-				9822CB671A3A77D200D73CAA /* MainViewController_.xib */,
-				98ABADD1176935E500B62590 /* MainViewController_iPad.xib */,
-				98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */,
-				9845A7C71A439A9200544E2E /* SetUpViewController */,
-				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
-				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
-				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
-				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
-				C0E943FD1F61377900E7D98C /* MainViewController.swift */,
-				C059FCBF1FD927EF00BD1A64 /* Log.swift */,
 			);
 			path = Keyman;
 			sourceTree = "<group>";
