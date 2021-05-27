@@ -9,13 +9,22 @@ set -e
 # Exit if unset variable used
 ## set -u (causes history-utils.sh to fail)
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+# This script runs from its parent's folder
+cd "$(dirname "$THIS_SCRIPT")/.."
+
 # Only allow one upload artifact set to exist.
 if [ -d "upload" ]; then
   rm -rf upload
 fi
 
 #Include script dependency
-. ../resources/build/history/history-utils.sh         #includes the following
+. $KEYMAN_ROOT/resources/build/history/history-utils.sh         #includes the following
 #. ../resources/shellHelperFunctions.sh
 
 BUILD_NUMBER=`cat ../VERSION.md`
@@ -37,7 +46,7 @@ mkdir -p "${UPLOAD_DIR}"
 # First, we prep the files for publication: write changelog
 
 echo "Writing changelog to $CHANGELOG_PATH"
-get_version_notes "ios" "%build.number%" "$TIER" > $CHANGELOG_PATH
+get_version_notes "ios" "${BUILD_NUMBER}" "$TIER" > $CHANGELOG_PATH
 echo "* Minor fixes and performance improvements" >> $CHANGELOG_PATH
 assertFileExists "${CHANGELOG_PATH}"
 
