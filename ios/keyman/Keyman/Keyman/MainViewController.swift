@@ -128,7 +128,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     super.viewDidLoad()
 
     extendedLayoutIncludesOpaqueBars = true
-    automaticallyAdjustsScrollViewInsets = false
 
     let systemFonts = Set<String>(UIFont.familyNames)
 
@@ -846,7 +845,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       userData.synchronize()
 
       if action.style == .default {
-        UIApplication.shared.openURL(URL(string: "\(baseUri)\(profileName)")!)
+        UIApplication.shared.open(URL(string: "\(baseUri)\(profileName)")!)
       }
       self.profileName = nil
     }

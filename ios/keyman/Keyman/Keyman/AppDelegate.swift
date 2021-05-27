@@ -64,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ = KeymanEngine.log
 
     UniversalLinks.externalLinkLauncher = { url in
-      UIApplication.shared.openURL(url)
+      UIApplication.shared.open(url)
     }
 
     Manager.applicationGroupIdentifier = "group.KM4I"
