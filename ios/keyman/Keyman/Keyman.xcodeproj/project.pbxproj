@@ -214,7 +214,7 @@
 		162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extensions.swift"; sourceTree = "<group>"; };
 		165EB3992097165B00040A69 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		165EB39B2097181D00040A69 /* KMView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMView.swift; sourceTree = "<group>"; };
-		16A9229D20325253003CC98E /* Keyman-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Keyman-Info.plist"; sourceTree = SOURCE_ROOT; };
+		16A9229D20325253003CC98E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Keyman/Info.plist; sourceTree = SOURCE_ROOT; };
 		37378F4222C9AA610043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPad.xib; sourceTree = "<group>"; };
 		37378F4322C9AA630043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPhone.xib; sourceTree = "<group>"; };
 		9815725018E4F0930014DF0C /* 702-share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share.png"; path = "Keyman Icons/702-share.png"; sourceTree = "<group>"; };
@@ -306,8 +306,6 @@
 		987F3E9B19417F3D00209D4F /* textsize_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_selected.png; path = "Keyman Icons/textsize_selected.png"; sourceTree = "<group>"; };
 		987F3E9C19417F3D00209D4F /* textsize_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_selected@2x.png"; path = "Keyman Icons/textsize_selected@2x.png"; sourceTree = "<group>"; };
 		989E4DBA1B1EB85200A345FB /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Keyman-Free-Info.plist"; sourceTree = "<group>"; };
-		98ABADC1176935E400B62590 /* Keyman-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Prefix.pch"; sourceTree = "<group>"; };
 		98AD861219B56AAE00D25C26 /* 887-notepad-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected.png"; path = "Keyman Icons/887-notepad-selected.png"; sourceTree = "<group>"; };
 		98AD861319B56AAE00D25C26 /* 887-notepad-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected@2x.png"; path = "Keyman Icons/887-notepad-selected@2x.png"; sourceTree = "<group>"; };
 		98C893F119F0811A000B9AC8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -383,18 +381,10 @@
 		162E2C9420926C8600F40769 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				162E2C9520926C8600F40769 /* Controller */,
 				162E2C9620926C8600F40769 /* Extensions */,
 				162E2C9820926C8600F40769 /* View */,
 			);
 			path = Classes;
-			sourceTree = "<group>";
-		};
-		162E2C9520926C8600F40769 /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Controller;
 			sourceTree = "<group>";
 		};
 		162E2C9620926C8600F40769 /* Extensions */ = {
@@ -530,7 +520,6 @@
 				CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */,
 				98ABADB9176935E400B62590 /* Keyman */,
 				98CD125D19CA85710089385F /* SWKeyboard */,
-				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				98ABADB2176935E400B62590 /* Frameworks */,
 				98ABADB1176935E400B62590 /* Products */,
 			);
@@ -563,10 +552,12 @@
 			isa = PBXGroup;
 			children = (
 				CE1F5ECC23331C1C00141F3E /* resources */,
+				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				CE4C654424D0020900070856 /* Localizable.strings */,
 				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
 				CE79CDB42370111200010C06 /* Themes+Colors.xcassets */,
+				16A9229D20325253003CC98E /* Info.plist */,
 				162E2C9420926C8600F40769 /* Classes */,
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
 				9845A7C21A439A9200544E2E /* InfoViewController */,
@@ -591,11 +582,8 @@
 		98ABADBA176935E400B62590 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				16A9229D20325253003CC98E /* Keyman-Info.plist */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
 				98AFAEDC17FE2B6A00178C0A /* Keyman Navbar */,
-				98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */,
-				98ABADC1176935E400B62590 /* Keyman-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1115,7 +1103,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				INFOPLIST_FILE = "Keyman-Info.plist";
+				INFOPLIST_FILE = Keyman/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1150,7 +1138,7 @@
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
-				INFOPLIST_FILE = "Keyman-Info.plist";
+				INFOPLIST_FILE = Keyman/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1446,7 +1434,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				INFOPLIST_FILE = "Keyman-Info.plist";
+				INFOPLIST_FILE = Keyman/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

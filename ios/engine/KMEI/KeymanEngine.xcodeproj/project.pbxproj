@@ -314,7 +314,7 @@
 		6CD5DFA8150F6DC8007A5DDE /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
 		984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Tavultesoft.KMEI.SystemKeyboard.entitlements; sourceTree = "<group>"; };
-		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMEI.entitlements; sourceTree = "<group>"; };
+		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KMEI.entitlements; sourceTree = "<group>"; };
 		988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_pirurvik-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_pirurvik-1.0.js"; sourceTree = SOURCE_ROOT; };
 		988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_latin-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_latin-1.0.js"; sourceTree = SOURCE_ROOT; };
 		988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_naqittaut-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_naqittaut-1.0.js"; sourceTree = SOURCE_ROOT; };
@@ -500,12 +500,10 @@
 		CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardScaleTests.swift; sourceTree = "<group>"; };
 		CEF9367724D3B0B20031C70D /* PackageInstallView_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PackageInstallView_iPhone.xib; sourceTree = "<group>"; };
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KeymanEngine-Prefix.pch"; sourceTree = "<group>"; };
 		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
 		F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphonesimulator.xcconfig"; sourceTree = "<group>"; };
 		F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; lineEnding = 0; path = "Keyman-lib.xcconfig"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
 		F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Keyman.bundle; sourceTree = "<group>"; };
-		F27FCB65157FF34800FBBA20 /* INSTRUCTIONS */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTRUCTIONS; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -610,6 +608,7 @@
 		98196DE4187BB0D200F001C3 /* KeymanEngineDemo */ = {
 			isa = PBXGroup;
 			children = (
+				984FA1F61974C0EF0037EE5D /* KMEI.entitlements */,
 				C040E5111F86107E00901EE4 /* AppDelegate.swift */,
 				C040E5131F86108900901EE4 /* MainViewController.swift */,
 				6C0A13F9151EA151007FA4AD /* Resources */,
@@ -944,7 +943,6 @@
 				C06D372C1F81F4E100F61AE0 /* KeymanEngine */,
 				9A079DD0223194B100581263 /* KeymanEngineTests */,
 				CE1679B8265F315C008D6FCE /* Demos */,
-				984FA1F61974C0EF0037EE5D /* KMEI.entitlements */,
 				F243888114BBD43000A3E055 /* Frameworks */,
 				F243887F14BBD43000A3E055 /* Products */,
 				F243888914BBD43100A3E055 /* Supporting Files */,
@@ -981,8 +979,6 @@
 			isa = PBXGroup;
 			children = (
 				6C0A13FE151EA3CF007FA4AD /* Config */,
-				F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */,
-				F27FCB65157FF34800FBBA20 /* INSTRUCTIONS */,
 			);
 			name = "Supporting Files";
 			path = KeymanEngine;
@@ -1672,7 +1668,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -1723,7 +1719,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -2169,7 +2165,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = KMEI.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/KeymanEngineDemo/KMEI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
@@ -2205,7 +2201,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -2424,7 +2420,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = KMEI.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/KeymanEngineDemo/KMEI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
@@ -2457,7 +2453,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = KMEI.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/KeymanEngineDemo/KMEI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Summer Institute of Linguistics, Inc (SIL) (3YE4W86L3G)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
