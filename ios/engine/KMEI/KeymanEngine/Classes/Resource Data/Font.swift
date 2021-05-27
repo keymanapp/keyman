@@ -13,7 +13,7 @@ public struct Font: Codable {
   /// Font family that KeymanWeb will provide.
   public let family: String
 
-  /// Downloaded filenames for this font which should be appended to `Options.fontBaseURI`.
+  /// Local filenames for this font.
   public let source: [String]
 
   /// Font size (in CSS dimensions).
