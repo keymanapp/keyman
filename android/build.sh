@@ -20,15 +20,20 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 #
 SHLVL=0
 
+# Clean build artifacts: keyman-engine.aar libaries, output and upload directories
 clean ( ) {
-  if [ -f "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar" ]; then
-    echo "Cleaning keyman-engine.aar"
-    rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar"
-  fi
+  cd "$KEYMAN_ROOT/android"
+
+  find . -name "keyman-engine.aar" | while read fname; do
+    echo "Cleaning $fname"
+    rm $fname
+  done
+
   if [ -d "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs" ]; then
-    echo "Cleaning KMAPro build outputs"
+    echo "Cleaning KMAPro build outputs directory"
     rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs"
   fi
+
   if [ -d "$KEYMAN_ROOT/android/upload" ]; then
     echo "Cleaning upload directory"
     rm -rf "$KEYMAN_ROOT/android/upload"
