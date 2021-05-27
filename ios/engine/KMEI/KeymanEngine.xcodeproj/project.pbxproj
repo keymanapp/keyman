@@ -704,13 +704,13 @@
 		C055E6E81F99EA320035C2DD /* Extension */ = {
 			isa = PBXGroup;
 			children = (
-				C075EB051F8EFF870041F4BD /* String+Helpers.swift */,
 				C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */,
+				9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */,
+				C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */,
+				CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */,
+				C075EB051F8EFF870041F4BD /* String+Helpers.swift */,
 				C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */,
 				C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */,
-				C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */,
-				9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */,
-				CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -848,9 +848,9 @@
 			isa = PBXGroup;
 			children = (
 				CE1679DF265F690A008D6FCE /* Installation */,
+				CE867FF22485F38300B2EAED /* kmp.json */,
 				9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */,
 				1645D5942036C6FF0076C51B /* KeymanPackage.swift */,
-				CE867FF22485F38300B2EAED /* kmp.json */,
 				9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */,
 				CE969BE7251AD8B500376D6A /* PackageWebViewController.swift */,
 				CEA14872240780E100C6ECD2 /* ResourceInfoView.xib */,
@@ -938,28 +938,28 @@
 		F273AB9615641D9300A47CEE /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */,
-				CE7A26DA23CEEF640005955C /* Colors.swift */,
-				CE7A26D723CEEC630005955C /* Colors+Extension.swift */,
-				C0959CD31F99C44E00B616BC /* Constants.swift */,
 				165EB39F2098992D00040A69 /* Errors */,
 				C055E6E81F99EA320035C2DD /* Extension */,
 				CE25CCBB1F1DA72A005AA2BC /* Downloads */,
 				F2607212158FBCB500F37184 /* In-App Picker UI */,
 				CE1679D7265F5FE8008D6FCE /* Keyboard */,
-				CEE0321224C58C90005BFC73 /* KeymanHosts.swift */,
-				C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */,
 				CE973D7F2484A07300F66045 /* KMP Packaging */,
-				C0A93A531F8B21240079948B /* Manager.swift */,
-				C05B14321FD914870082A316 /* Log.swift */,
 				C024C9921FA6EB340060583B /* Notification */,
-				CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */,
 				CE89641B24A4665700D5EB8E /* Queries */,
 				C0452BA91F9F1CAF0064431A /* Resource Data */,
 				CE71705923A9C7D300A924A1 /* Resource Management */,
 				9A60763E22892495003BCFBA /* Settings */,
 				F273AB9E156440CD00A47CEE /* UITextField */,
 				F273AB9D156440BA00A47CEE /* UITextView */,
+				CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */,
+				CE7A26DA23CEEF640005955C /* Colors.swift */,
+				CE7A26D723CEEC630005955C /* Colors+Extension.swift */,
+				C0959CD31F99C44E00B616BC /* Constants.swift */,
+				CEE0321224C58C90005BFC73 /* KeymanHosts.swift */,
+				C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */,
+				C0A93A531F8B21240079948B /* Manager.swift */,
+				C05B14321FD914870082A316 /* Log.swift */,
+				CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */,
 				CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */,
 			);
 			path = Classes;

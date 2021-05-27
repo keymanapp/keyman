@@ -380,16 +380,13 @@
 		162E2C9420926C8600F40769 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
 				9845A7B71A4398B200544E2E /* DropDownList */,
 				162E2C9620926C8600F40769 /* Extensions */,
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
 				9845A7C21A439A9200544E2E /* InfoViewController */,
 				9845A79A1A43983300544E2E /* KMWebBrowser */,
-				C059FCBF1FD927EF00BD1A64 /* Log.swift */,
 				162E2C9820926C8600F40769 /* LogoBackgroundView */,
 				CE1679C5265F3E92008D6FCE /* MainViewController */,
-				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
 				9845A7C71A439A9200544E2E /* SetUpViewController */,
 			);
 			path = Classes;
@@ -419,12 +416,12 @@
 		9845A79A1A43983300544E2E /* KMWebBrowser */ = {
 			isa = PBXGroup;
 			children = (
+				9845A8BD1A439F1000544E2E /* Icons */,
+				9845A79E1A43983300544E2E /* NavBar */,
 				C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */,
 				9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */,
 				C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */,
 				9845A79D1A43983300544E2E /* WebBrowserViewController.xib */,
-				9845A8BD1A439F1000544E2E /* Icons */,
-				9845A79E1A43983300544E2E /* NavBar */,
 			);
 			path = KMWebBrowser;
 			sourceTree = "<group>";
@@ -569,6 +566,9 @@
 				98ABADBA176935E400B62590 /* Supporting Files */,
 				16A9229D20325253003CC98E /* Info.plist */,
 				162E2C9420926C8600F40769 /* Classes */,
+				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
+				C059FCBF1FD927EF00BD1A64 /* Log.swift */,
+				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
 			);
 			path = Keyman;
 			sourceTree = "<group>";
