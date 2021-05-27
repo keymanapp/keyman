@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 /**
  * Given a `KeymanPackage` that KeymanEngine knows how to install, this class facilitates language selection as part of the

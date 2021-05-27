@@ -328,7 +328,6 @@
 		C0E943F91F6124E100E7D98C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0E943FD1F61377900E7D98C /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
-		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
 		CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = OfflineHelp.bundle; sourceTree = "<group>"; };
 		CE4C654524D0020900070856 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -557,6 +556,7 @@
 				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
 				CE79CDB42370111200010C06 /* Themes+Colors.xcassets */,
+				98ABADBA176935E400B62590 /* Supporting Files */,
 				16A9229D20325253003CC98E /* Info.plist */,
 				162E2C9420926C8600F40769 /* Classes */,
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
@@ -567,10 +567,8 @@
 				98ABADD1176935E500B62590 /* MainViewController_iPad.xib */,
 				98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */,
 				9845A7C71A439A9200544E2E /* SetUpViewController */,
-				98ABADBA176935E400B62590 /* Supporting Files */,
 				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
 				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
-				C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */,
 				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
 				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
 				C0E943FD1F61377900E7D98C /* MainViewController.swift */,
