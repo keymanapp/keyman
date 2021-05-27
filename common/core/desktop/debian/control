@@ -16,7 +16,7 @@ Vcs-Browser: https://github.com/keymanapp/keyman/tree/master/common/core/desktop
 Homepage: https://www.keyman.com
 
 Package: libkmnkbp-dev
-Architecture: any
+Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el
 Section: libdevel
 Depends:
  libkmnkbp0-0 (= ${binary:Version}),
@@ -40,7 +40,7 @@ Description: Development files for Keyman keyboard processing library
  This package contains development headers and libraries.
 
 Package: libkmnkbp0-0
-Architecture: any
+Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el
 Section: libs
 Pre-Depends:
  ${misc:Pre-Depends},
