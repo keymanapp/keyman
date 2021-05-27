@@ -25,6 +25,8 @@ See [license information](./LICENSE.md) about licensing.
     python3-magic python3-numpy python3-pil python3-pip python3-qrcode \
     python3-requests python3-requests-cache python3 python3-gi dconf-cli \
     dconf-editor
+  # install rust
+  curl https://sh.rustup.rs -sSf | sh
   ```
 
 ## Compiling from Command Line
