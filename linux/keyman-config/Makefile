@@ -1,7 +1,10 @@
 #!/usr/bin/make
 
-default: clean version man
+default: clean version man langtags
 	python3 setup.py build
+
+langtags:
+	cd buildtools && python3 ./build-langtags.py
 
 install: # run as sudo
 	pip3 install qrcode sentry-sdk

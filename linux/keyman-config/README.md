@@ -35,6 +35,12 @@ sudo cp com.keyman.gschema.xml /usr/share/glib-2.0/schemas
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 ```
 
+### Standards data file
+
+Running `km-config` requires a language tag mapping file
+`keyman_config/standards/lang_tags_map.py`. This file gets generated during a package
+build, and also when running `make`.
+
 ### Installing manually from the repo
 
 `make && sudo make install` will install locally to `/usr/local`
