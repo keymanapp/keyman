@@ -170,11 +170,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     // Workaround to display overlay window above keyboard
-    if #available(iOS 9.0, *) {
-      let windows = UIApplication.shared.windows
-      if let lastWindow = windows.last {
-        _overlayWindow!.windowLevel = lastWindow.windowLevel + 1
-      }
+    let windows = UIApplication.shared.windows
+    if let lastWindow = windows.last {
+      _overlayWindow!.windowLevel = lastWindow.windowLevel + 1
     }
     return _overlayWindow!
   }

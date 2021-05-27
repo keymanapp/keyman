@@ -78,30 +78,27 @@ open class SettingsViewController: UITableViewController {
       "reuseid": "enablecrashreporting"
       ])
 
-    // The iOS Files app is only available with 11.0+.
-    if #available(iOS 11.0, *) {
-      if let _ = URL(string: UIApplication.openSettingsURLString) {
-        itemsArray.append([
-          "title": NSLocalizedString("menu-settings-system-keyboard-menu", bundle: engineBundle, comment: ""),
-          "subtitle": "",
-          "reuseid": "systemkeyboardsettings"
-          ])
-      }
-
+    if let _ = URL(string: UIApplication.openSettingsURLString) {
       itemsArray.append([
-        "title": NSLocalizedString("menu-settings-install-from-file", bundle: engineBundle, comment: ""),
-        "subtitle": NSLocalizedString("menu-settings-install-from-file-description", bundle: engineBundle, comment: ""),
-        "reuseid" : "installfile"
+        "title": NSLocalizedString("menu-settings-system-keyboard-menu", bundle: engineBundle, comment: ""),
+        "subtitle": "",
+        "reuseid": "systemkeyboardsettings"
         ])
-
-      #if DEBUG && !NO_SENTRY
-              itemsArray.append([
-        "title": "Force a crash",
-        "subtitle": "Test Sentry error-reporting integration",
-        "reuseid" : "forcederror"
-        ])
-      #endif
     }
+
+    itemsArray.append([
+      "title": NSLocalizedString("menu-settings-install-from-file", bundle: engineBundle, comment: ""),
+      "subtitle": NSLocalizedString("menu-settings-install-from-file-description", bundle: engineBundle, comment: ""),
+      "reuseid" : "installfile"
+      ])
+
+    #if DEBUG && !NO_SENTRY
+            itemsArray.append([
+      "title": "Force a crash",
+      "subtitle": "Test Sentry error-reporting integration",
+      "reuseid" : "forcederror"
+      ])
+    #endif
 
     _ = view
   }
@@ -158,11 +155,9 @@ open class SettingsViewController: UITableViewController {
         showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showBannerSwitch)
-        
-        if #available(iOSApplicationExtension 9.0, *) {
-          showBannerSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-          showBannerSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-        }
+
+        showBannerSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+        showBannerSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
       case "showgetstarted":
         let showAgainSwitch = UISwitch()
         showAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
@@ -174,11 +169,9 @@ open class SettingsViewController: UITableViewController {
         showAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showAgainSwitch)
-        
-        if #available(iOSApplicationExtension 9.0, *) {
-          showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-          showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-        }
+
+        showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+        showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
       case "enablecrashreporting":
         let enableReportingSwitch = UISwitch()
         enableReportingSwitch.translatesAutoresizingMaskIntoConstraints = false
@@ -191,10 +184,9 @@ open class SettingsViewController: UITableViewController {
                                       for: .valueChanged)
         cell.addSubview(enableReportingSwitch)
 
-        if #available(iOSApplicationExtension 9.0, *) {
-          enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-          enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-        }
+        enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+        enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+        
       case "systemkeyboardsettings", "installfile", "forcederror":
         break
       default:

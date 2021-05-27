@@ -109,16 +109,14 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // Unfortunately, it's the main app with the file definitions.
     // We have to gerry-rig this so that the framework-based SettingsViewController
     // can launch the app-based DocumentViewController.
-    if #available(iOS 11.0, *) {
-      Manager.shared.fileBrowserLauncher = { navVC in
-        let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"],
-                                              in: .import,
-                                              navVC: navVC)
+    Manager.shared.fileBrowserLauncher = { navVC in
+      let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"],
+                                            in: .import,
+                                            navVC: navVC)
 
-        // Present the "install from file" browser within the specified navigation view controller.
-        // (Allows displaying from within the Settings menu)
-        navVC.present(vc, animated: true)
-      }
+      // Present the "install from file" browser within the specified navigation view controller.
+      // (Allows displaying from within the Settings menu)
+      navVC.present(vc, animated: true)
     }
   }
 
@@ -144,13 +142,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       ResourceDownloadManager.shared.queryKeysForUpdatablePackages { _, _ in }
     }
 
-    // Implement a default color...
-    var bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
-    // And if the iOS version is current enough, override it from the palette.
-    if #available(iOS 11.0, *) {
-      bgColor = UIColor(named: "InputBackground")!
-    }
-    view?.backgroundColor = bgColor
+    view?.backgroundColor = UIColor(named: "InputBackground")!
 
     // Check for configuration profiles/fonts to install
     FontManager.shared.registerCustomFonts()
@@ -192,7 +184,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView = TextView(frame: view.frame)
     textView.setKeymanDelegate(self)
     textView.viewController = self
-    textView.backgroundColor = bgColor
+    textView.backgroundColor = UIColor(named: "InputBackground")!
     textView.isScrollEnabled = true
     textView.isUserInteractionEnabled = true
     textView.font = textView.font?.withSize(textSize)
@@ -206,7 +198,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     infoView.view?.isHidden = true
-    infoView.view?.backgroundColor = bgColor
+    infoView.view?.backgroundColor = UIColor(named: "InputBackground")!
     view?.addSubview(infoView!.view)
 
     resizeViews(withKeyboardVisible: textView.isFirstResponder)
@@ -403,11 +395,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   @objc func keyboardDidShow(_ notification: Notification) {
     // Workaround to display overlay window above keyboard
-    if #available(iOS 9.0, *) {
-      let windows = UIApplication.shared.windows
-      let lastWindow = windows.last
-      overlayWindow.windowLevel = lastWindow!.windowLevel + 1
-    }
+    let windows = UIApplication.shared.windows
+    let lastWindow = windows.last
+    overlayWindow.windowLevel = lastWindow!.windowLevel + 1
   }
 
   @objc func keyboardWillHide(_ notification: Notification) {

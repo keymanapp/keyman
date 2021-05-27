@@ -46,10 +46,8 @@ public class TextField: UITextField, KeymanResponder {
     delegateProxy = TextFieldDelegateProxy(self)
     delegate = delegateProxy
 
-    if #available(iOS 9.0, *) {
-      inputAssistantItem.leadingBarButtonGroups = []
-      inputAssistantItem.trailingBarButtonGroups = []
-    }
+    inputAssistantItem.leadingBarButtonGroups = []
+    inputAssistantItem.trailingBarButtonGroups = []
 
     self.inputView = Manager.shared.inputViewController.view
 
