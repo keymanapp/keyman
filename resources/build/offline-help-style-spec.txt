@@ -255,4 +255,34 @@ article dl dd span.optional {
 	padding: 1px 6px 3px;
 	border-radius: 6px;
 }
+
+/* Font styling limited to Ascii characters */
+kbd {
+    background: none repeat scroll 0 0 #CCCCD0;
+		border: 1px solid #808080;
+		border-right: 2px solid #606060;
+    border-bottom: 2px solid #606060;
+    border-radius: 4px;
+    color: #000000;
+    font-family: "NotoSans-Regular-Ascii";
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    padding: 1px 4px;
+    min-width: 1.5em;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Make the <kbd> element look like an iOS key. */
+kbd.ios {
+    background-color: #fafafa; /* faaa fa fa fa fa faaaa far better... */
+    border: 0;
+    box-shadow: /* Hard shadow */     0 1px rgba(0,0,0,0.4),
+                /* Diffuse shadow */  0 1px 4px rgba(0,0,0,0.2),
+                /* Highlight */ inset 0 1px white;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
 </style>
