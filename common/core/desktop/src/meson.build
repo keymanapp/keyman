@@ -33,7 +33,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
   endif
 
   if host_machine.system() == 'darwin'
-    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor ']
+    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor']
   endif
 endif
 
@@ -59,6 +59,7 @@ lib = library('kmnkbp0',
 	'km_kbp_processevent_api.cpp',
     'json.cpp',
 	'mock/mock_processor.cpp',
+  'rust/rust_mock_processor.cpp',
 	'kmx/kmx_consts.cpp',
 	'kmx/kmx_processevent.cpp',
 	'kmx/kmx_actions.cpp',
@@ -74,6 +75,7 @@ lib = library('kmnkbp0',
     'utfcodec.cpp',
     cpp_args: defns + warns + flags,
     link_args: links,
+    dependencies: [rust_mock_processor],
     version: lib_version,
     include_directories: inc,
     install: true)
