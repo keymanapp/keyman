@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.55 alpha 2021-05-27
+
+* fix(ios): artifact upload preparation (#5160)
+
 ## 15.0.54 alpha 2021-05-26
 
 * docs(windows): Initial commit - README.md (#5119)
