@@ -283,7 +283,7 @@ if [ $DO_KEYMANAPP = true ]; then
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .xcarchive."
-    xcodebuild $XCODEFLAGS_EXT -scheme Keyman \
+    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -archivePath $ARCHIVE_PATH \
                 archive -allowProvisioningUpdates \
                 VERSION=$VERSION \
