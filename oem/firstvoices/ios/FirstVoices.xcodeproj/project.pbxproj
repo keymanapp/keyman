@@ -55,7 +55,6 @@
 		CEBD34272654D76E00EB2EA8 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; };
 		CEBD34282654D76E00EB2EA8 /* Zip.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340B2654D5AA00EB2EA8 /* Zip.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
-		CEBD34482654FF3300EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
 		CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; };
 		CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
@@ -91,17 +90,6 @@
 				98C9A8C41BFBF23C009E9A4F /* SWKeyboard.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		CEBD34492654FF3300EB2EA8 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				CEBD34482654FF3300EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -331,7 +319,6 @@
 				98C9A8B91BFBF23C009E9A4F /* Frameworks */,
 				98C9A8BA1BFBF23C009E9A4F /* Resources */,
 				37B453EF245C09CE008877E5 /* ShellScript */,
-				CEBD34492654FF3300EB2EA8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
