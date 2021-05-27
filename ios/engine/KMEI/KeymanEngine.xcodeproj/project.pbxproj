@@ -796,13 +796,13 @@
 		C06D372C1F81F4E100F61AE0 /* KeymanEngine */ = {
 			isa = PBXGroup;
 			children = (
+				6C0A13FA151EA16F007FA4AD /* resources */,
 				CEA1486F2407808F00C6ECD2 /* Localizable.strings */,
 				CE96E42D24D1229A005B8E5A /* Localizable.stringsdict */,
 				CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */,
 				C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */,
 				C06D372E1F81F4E100F61AE0 /* Info.plist */,
 				F2606FC4158F8B8600F37184 /* lib */,
-				6C0A13FA151EA16F007FA4AD /* resources */,
 				F273AB9615641D9300A47CEE /* Classes */,
 			);
 			path = KeymanEngine;
@@ -936,12 +936,12 @@
 			isa = PBXGroup;
 			children = (
 				C06D372C1F81F4E100F61AE0 /* KeymanEngine */,
-				9A079DD0223194B100581263 /* KeymanEngineTests */,
-				F243888114BBD43000A3E055 /* Frameworks */,
 				984FA1F61974C0EF0037EE5D /* KMEI.entitlements */,
+				F243888114BBD43000A3E055 /* Frameworks */,
 				F243887F14BBD43000A3E055 /* Products */,
 				F243888914BBD43100A3E055 /* Supporting Files */,
 				98F9D6981954112F0087AA43 /* SystemKeyboard */,
+				9A079DD0223194B100581263 /* KeymanEngineTests */,
 				98196DE4187BB0D200F001C3 /* KeymanEngineDemo */,
 			);
 			sourceTree = "<group>";

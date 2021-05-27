@@ -23,6 +23,9 @@ Carthage
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/*.kmp
 
 # Generated offline help
+keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
+
+# older location of offline help
 keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
 
 # Explicitly ignores just the SWKeyboard scheme; testing against different

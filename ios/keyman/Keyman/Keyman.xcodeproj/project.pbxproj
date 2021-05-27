@@ -289,7 +289,7 @@
 		9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarRefresh@2x.png"; sourceTree = "<group>"; };
 		9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarStop@2x.png"; sourceTree = "<group>"; };
 		9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksViewController.xib; sourceTree = "<group>"; };
-		984FA1E21974B06C0037EE5D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Keyman.entitlements; sourceTree = "<group>"; };
+		984FA1E21974B06C0037EE5D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keyman.entitlements; sourceTree = "<group>"; };
 		985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@2x.png"; sourceTree = "<group>"; };
 		985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@3x.png"; sourceTree = "<group>"; };
 		985EA9D619E64A580006C017 /* banner-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape.png"; sourceTree = "<group>"; };
@@ -336,7 +336,6 @@
 		CE4C654524D0020900070856 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE72B3D62643ABB7006821CE /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
-		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
 		CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -344,13 +343,13 @@
 		CEACC90E25F07D58006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90F25F07D5A006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC91225F07D77006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CEBD3458265511B700EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<absolute>"; };
 		CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = ../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<absolute>"; };
 		CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<absolute>"; };
 		CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<absolute>"; };
 		CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = ../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<absolute>"; };
 		CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = ../../Carthage/Build/Zip.xcframework; sourceTree = "<absolute>"; };
+		CEBD3458265511B700EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageBanner.xib; sourceTree = "<group>"; };
 		CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBannerViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -529,12 +528,10 @@
 			isa = PBXGroup;
 			children = (
 				CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */,
-				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
-				CE1F5ECC23331C1C00141F3E /* resources */,
-				98ABADB2176935E400B62590 /* Frameworks */,
 				98ABADB9176935E400B62590 /* Keyman */,
-				98ABADB1176935E400B62590 /* Products */,
 				98CD125D19CA85710089385F /* SWKeyboard */,
+				98ABADB2176935E400B62590 /* Frameworks */,
+				98ABADB1176935E400B62590 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -564,14 +561,15 @@
 		98ABADB9176935E400B62590 /* Keyman */ = {
 			isa = PBXGroup;
 			children = (
+				CE1F5ECC23331C1C00141F3E /* resources */,
 				CE4C654424D0020900070856 /* Localizable.strings */,
-				162E2C9420926C8600F40769 /* Classes */,
-				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
+				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
 				CE79CDB42370111200010C06 /* Themes+Colors.xcassets */,
-				CE7A26D523CEEB8D0005955C /* UIColors.swift */,
-				9845A7C21A439A9200544E2E /* InfoViewController */,
 				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
+				162E2C9420926C8600F40769 /* Classes */,
+				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
+				9845A7C21A439A9200544E2E /* InfoViewController */,
 				9845A7B71A4398B200544E2E /* DropDownList */,
 				9845A79A1A43983300544E2E /* KMWebBrowser */,
 				9822CB671A3A77D200D73CAA /* MainViewController_.xib */,
