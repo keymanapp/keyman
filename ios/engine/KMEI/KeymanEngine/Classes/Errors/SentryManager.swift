@@ -188,6 +188,7 @@ public class SentryManager {
     if let category = category {
       crumb.category = category
     }
+    crumb.message = message
 
     self.breadcrumbAndLog(crumb: crumb, logLevel: logLevel)
   }
