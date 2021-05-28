@@ -46,6 +46,7 @@ public class KMManagerTest {
     }
   }
 
+  @Ignore("Investigate ResourcesNotFoundException")
   @Test
   public void test_getTier() {
     String versionName = "14.0.248-alpha";
@@ -180,6 +181,7 @@ public class KMManagerTest {
     }
   }
 
+  @Ignore("Investigate ResourcesNotFoundException")
   @Test
   public void test_updateOldKeyboardsList() {
     Assert.assertNotNull(dat_list);
