@@ -202,7 +202,7 @@
 		162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extensions.swift"; sourceTree = "<group>"; };
 		165EB3992097165B00040A69 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		165EB39B2097181D00040A69 /* KMView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMView.swift; sourceTree = "<group>"; };
-		16A9229D20325253003CC98E /* Keyman-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Keyman-Info.plist"; sourceTree = SOURCE_ROOT; };
+		16A9229D20325253003CC98E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Keyman/Info.plist; sourceTree = SOURCE_ROOT; };
 		37378F4222C9AA610043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPad.xib; sourceTree = "<group>"; };
 		37378F4322C9AA630043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPhone.xib; sourceTree = "<group>"; };
 		9815725018E4F0930014DF0C /* 702-share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share.png"; path = "Keyman Icons/702-share.png"; sourceTree = "<group>"; };
@@ -277,7 +277,7 @@
 		9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarRefresh@2x.png"; sourceTree = "<group>"; };
 		9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarStop@2x.png"; sourceTree = "<group>"; };
 		9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksViewController.xib; sourceTree = "<group>"; };
-		984FA1E21974B06C0037EE5D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Keyman.entitlements; sourceTree = "<group>"; };
+		984FA1E21974B06C0037EE5D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keyman.entitlements; sourceTree = "<group>"; };
 		985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@2x.png"; sourceTree = "<group>"; };
 		985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@3x.png"; sourceTree = "<group>"; };
 		985EA9D619E64A580006C017 /* banner-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape.png"; sourceTree = "<group>"; };
@@ -294,8 +294,6 @@
 		987F3E9B19417F3D00209D4F /* textsize_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_selected.png; path = "Keyman Icons/textsize_selected.png"; sourceTree = "<group>"; };
 		987F3E9C19417F3D00209D4F /* textsize_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_selected@2x.png"; path = "Keyman Icons/textsize_selected@2x.png"; sourceTree = "<group>"; };
 		989E4DBA1B1EB85200A345FB /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Keyman-Free-Info.plist"; sourceTree = "<group>"; };
-		98ABADC1176935E400B62590 /* Keyman-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Prefix.pch"; sourceTree = "<group>"; };
 		98AD861219B56AAE00D25C26 /* 887-notepad-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected.png"; path = "Keyman Icons/887-notepad-selected.png"; sourceTree = "<group>"; };
 		98AD861319B56AAE00D25C26 /* 887-notepad-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected@2x.png"; path = "Keyman Icons/887-notepad-selected@2x.png"; sourceTree = "<group>"; };
 		98C893F119F0811A000B9AC8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -318,13 +316,11 @@
 		C0E943F91F6124E100E7D98C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0E943FD1F61377900E7D98C /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
-		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
 		CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = OfflineHelp.bundle; sourceTree = "<group>"; };
 		CE4C654524D0020900070856 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE72B3D62643ABB7006821CE /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
-		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
 		CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -372,49 +368,48 @@
 		162E2C9420926C8600F40769 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				162E2C9520926C8600F40769 /* Controller */,
+				9845A7B71A4398B200544E2E /* DropDownList */,
 				162E2C9620926C8600F40769 /* Extensions */,
-				162E2C9820926C8600F40769 /* View */,
+				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
+				9845A7C21A439A9200544E2E /* InfoViewController */,
+				9845A79A1A43983300544E2E /* KMWebBrowser */,
+				162E2C9820926C8600F40769 /* LogoBackgroundView */,
+				CE1679C5265F3E92008D6FCE /* MainViewController */,
+				9845A7C71A439A9200544E2E /* SetUpViewController */,
 			);
 			path = Classes;
-			sourceTree = "<group>";
-		};
-		162E2C9520926C8600F40769 /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Controller;
 			sourceTree = "<group>";
 		};
 		162E2C9620926C8600F40769 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				162E2C9720926C8600F40769 /* UIView+Extensions.swift */,
-				162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */,
 				165EB3992097165B00040A69 /* UIColor+Extensions.swift */,
+				162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */,
+				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
+				162E2C9720926C8600F40769 /* UIView+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		162E2C9820926C8600F40769 /* View */ = {
+		162E2C9820926C8600F40769 /* LogoBackgroundView */ = {
 			isa = PBXGroup;
 			children = (
 				162E2C9A20926C9B00F40769 /* KMNavigationBarBackgroundView.swift */,
 				162E2C9C2092BFE400F40769 /* KMUnderscoreView.swift */,
 				165EB39B2097181D00040A69 /* KMView.swift */,
 			);
-			path = View;
+			path = LogoBackgroundView;
 			sourceTree = "<group>";
 		};
 		9845A79A1A43983300544E2E /* KMWebBrowser */ = {
 			isa = PBXGroup;
 			children = (
-				9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */,
-				9845A79D1A43983300544E2E /* WebBrowserViewController.xib */,
-				C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */,
-				C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */,
 				9845A8BD1A439F1000544E2E /* Icons */,
 				9845A79E1A43983300544E2E /* NavBar */,
+				C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */,
+				9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */,
+				C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */,
+				9845A79D1A43983300544E2E /* WebBrowserViewController.xib */,
 			);
 			path = KMWebBrowser;
 			sourceTree = "<group>";
@@ -449,8 +444,8 @@
 		9845A7BE1A439A9200544E2E /* GetStartedViewController */ = {
 			isa = PBXGroup;
 			children = (
-				9845A7C11A439A9200544E2E /* GetStartedViewController.xib */,
 				C055F0B01F60E8D400140735 /* GetStartedViewController.swift */,
+				9845A7C11A439A9200544E2E /* GetStartedViewController.xib */,
 			);
 			path = GetStartedViewController;
 			sourceTree = "<group>";
@@ -468,8 +463,8 @@
 		9845A7C71A439A9200544E2E /* SetUpViewController */ = {
 			isa = PBXGroup;
 			children = (
-				9845A7CA1A439A9200544E2E /* SetUpViewController.xib */,
 				C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */,
+				9845A7CA1A439A9200544E2E /* SetUpViewController.xib */,
 			);
 			path = SetUpViewController;
 			sourceTree = "<group>";
@@ -517,12 +512,10 @@
 			isa = PBXGroup;
 			children = (
 				CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */,
-				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
-				CE1F5ECC23331C1C00141F3E /* resources */,
-				98ABADB2176935E400B62590 /* Frameworks */,
 				98ABADB9176935E400B62590 /* Keyman */,
-				98ABADB1176935E400B62590 /* Products */,
 				98CD125D19CA85710089385F /* SWKeyboard */,
+				98ABADB2176935E400B62590 /* Frameworks */,
+				98ABADB1176935E400B62590 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -552,28 +545,18 @@
 		98ABADB9176935E400B62590 /* Keyman */ = {
 			isa = PBXGroup;
 			children = (
+				CE1F5ECC23331C1C00141F3E /* resources */,
+				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				CE4C654424D0020900070856 /* Localizable.strings */,
-				162E2C9420926C8600F40769 /* Classes */,
-				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
+				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
 				CE79CDB42370111200010C06 /* Themes+Colors.xcassets */,
-				CE7A26D523CEEB8D0005955C /* UIColors.swift */,
-				9845A7C21A439A9200544E2E /* InfoViewController */,
-				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
-				9845A7B71A4398B200544E2E /* DropDownList */,
-				9845A79A1A43983300544E2E /* KMWebBrowser */,
-				9822CB671A3A77D200D73CAA /* MainViewController_.xib */,
-				98ABADD1176935E500B62590 /* MainViewController_iPad.xib */,
-				98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */,
-				9845A7C71A439A9200544E2E /* SetUpViewController */,
 				98ABADBA176935E400B62590 /* Supporting Files */,
-				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
-				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
-				C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */,
-				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
+				16A9229D20325253003CC98E /* Info.plist */,
+				162E2C9420926C8600F40769 /* Classes */,
 				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
-				C0E943FD1F61377900E7D98C /* MainViewController.swift */,
 				C059FCBF1FD927EF00BD1A64 /* Log.swift */,
+				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
 			);
 			path = Keyman;
 			sourceTree = "<group>";
@@ -581,11 +564,8 @@
 		98ABADBA176935E400B62590 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				16A9229D20325253003CC98E /* Keyman-Info.plist */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
 				98AFAEDC17FE2B6A00178C0A /* Keyman Navbar */,
-				98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */,
-				98ABADC1176935E400B62590 /* Keyman-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -673,6 +653,18 @@
 				98CD125F19CA85710089385F /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CE1679C5265F3E92008D6FCE /* MainViewController */ = {
+			isa = PBXGroup;
+			children = (
+				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
+				9822CB671A3A77D200D73CAA /* MainViewController_.xib */,
+				98ABADD1176935E500B62590 /* MainViewController_iPad.xib */,
+				98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */,
+				C0E943FD1F61377900E7D98C /* MainViewController.swift */,
+			);
+			path = MainViewController;
 			sourceTree = "<group>";
 		};
 		CE1F5ECC23331C1C00141F3E /* resources */ = {
@@ -1104,7 +1096,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				INFOPLIST_FILE = "Keyman-Info.plist";
+				INFOPLIST_FILE = Keyman/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1139,7 +1131,7 @@
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
-				INFOPLIST_FILE = "Keyman-Info.plist";
+				INFOPLIST_FILE = Keyman/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1435,7 +1427,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				INFOPLIST_FILE = "Keyman-Info.plist";
+				INFOPLIST_FILE = Keyman/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
