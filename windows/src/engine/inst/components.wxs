@@ -109,15 +109,18 @@
       </Component>
 
       <Component Guid="{A7115FEE-A904-4C68-B093-AA5F1EF027B7}">
-        <File Id="sentry.dll" KeyPath="yes" />
+        <!-- #5166: This should *always* be version 2.3 of sentry.dll -->
+        <File Id="sentry.2.3.dll" KeyPath="yes" Source="..\..\ext\sentry\2.3\sentry.dll" />
       </Component>
 
       <Component Guid="{909DABBB-914F-4ADF-8391-BB293778D70E}">
-        <File Id="sentry.x64.dll" KeyPath="yes" />
+        <!-- #5166: This should *always* be version 2.3 of sentry.x64.dll -->
+        <File Id="sentry.x64.2.3.dll" KeyPath="yes" Source="..\..\ext\sentry\2.3\sentry.x64.dll" />
       </Component>
 
       <Component Guid="{AF7C9288-7085-4C02-AA79-9DA4F152BDBB}">
-        <File Name="crashpad_handler.exe" KeyPath="yes" />
+        <!-- #5166: This should *always* be version 2.3 of crashpad_handler.exe -->
+        <File Id="crashpad_handler.2.3.exe" KeyPath="yes" Source="..\..\ext\sentry\2.3\crashpad_handler.exe" />
       </Component>
 
       <Component Guid="{B8867245-9570-4B63-B631-00F1474F71D4}">
@@ -144,11 +147,11 @@
 
       <Component Guid="{7D3374DC-7B4E-4593-819E-B212E876BDAF}">
         <File Id="keymanmc.dll" Name="keymanmc.dll" KeyPath="yes" Source="..\..\..\bin\engine\keymanmc.dll" />
-        <util:EventSource 
-          CategoryCount="1" 
-          CategoryMessageFile="[#keymanmc.dll]" 
-          EventMessageFile="[#keymanmc.dll]" 
-          Log="Application" 
+        <util:EventSource
+          CategoryCount="1"
+          CategoryMessageFile="[#keymanmc.dll]"
+          EventMessageFile="[#keymanmc.dll]"
+          Log="Application"
           Name="Keyman"
           SupportsInformationals="yes"
           SupportsErrors="yes"
@@ -238,6 +241,18 @@
         </File>
       </Component>
 
+    </ComponentGroup>
+
+    <ComponentGroup Id="KeymanEngineSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\ext\sentry">
+      <Component Guid="{95AB1B5C-2556-4282-B327-E2E417B26926}">
+        <File Id="sentry.dll" KeyPath="yes" />
+      </Component>
+      <Component Guid="{3E5DACB3-055A-41EC-8890-15A30A40548B}">
+        <File Id="sentry.x64.dll" KeyPath="yes" />
+      </Component>
+      <Component Guid="{AA5AF288-4D67-49F4-A10B-E5725A42599B}">
+        <File Name="crashpad_handler.exe" KeyPath="yes" />
+      </Component>
     </ComponentGroup>
   </Fragment>
 </Wix>

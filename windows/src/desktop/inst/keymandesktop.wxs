@@ -202,6 +202,7 @@
 
               <Directory Id="dir_locale" Name="locale" />
 
+              <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
             </Directory>
           </Directory>
         </Directory>
@@ -221,6 +222,18 @@
       <Directory Id="DesktopFolder" Name="Desktop" />
 
     </Directory>
+
+    <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\ext\sentry">
+      <Component>
+        <File Id="sentry.dll" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Id="sentry.x64.dll" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Id="crashpad_handler.exe" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
 
     <Feature Id="AlwaysInstall" Title="Keyman Application Files" Description="Required program files for Keyman"
              Level="1" ConfigurableDirectory="INSTALLDIR" Absent="disallow" AllowAdvertise="no">
@@ -242,6 +255,7 @@
       <ComponentGroupRef Id="DesktopUI" />
       <ComponentGroupRef Id="CEF" />
       <ComponentGroupRef Id="Locale" />
+      <ComponentGroupRef Id="KeymanSentryComponents" />
 
       <MergeRef Id='keymanengine' />
     </Feature>

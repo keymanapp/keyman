@@ -6,6 +6,7 @@
 #include <registry.h>
 #include <stdio.h>
 #include <shlobj.h>
+#include <string.h>
 #include <KnownFolders.h>
 
 #define SENTRY_DSN_DESKTOP   "https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5"
@@ -258,3 +259,120 @@ void keyman_sentry_test_crash() {
   fputs("Testing exception reporting:\n", stderr);
   RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
 }
+
+/* Delay load sentry.dll from our subdirectory: #5166 */
+#include <delayimp.h>
+
+#define SENTRY_BASE_DLL "sentry.dll"
+#ifdef _WIN64
+#define SENTRY_DLL "sentry.x64.dll"
+#else
+#define SENTRY_DLL SENTRY_BASE_DLL
+#endif
+#define SENTRY_INSTALL_PATH "sentry-0.4.9\\" SENTRY_DLL
+#define SENTRY_DEV_PATH "windows\\src\\ext\\sentry\\" SENTRY_DLL
+#define ENV_KEYMAN_ROOT "KEYMAN_ROOT"
+
+HMODULE LoadSentryLibrary() {
+  //MAX_PATH + 64 chars leaves space for "\sentry-0.4.9\sentry.x64.dll"
+  char buf[MAX_PATH + 64], keyman_root[MAX_PATH + 64];
+
+  int nsize = GetModuleFileNameA(0, buf, MAX_PATH);
+  if (nsize == 0 || nsize == MAX_PATH)
+    return NULL;
+
+  char drive[_MAX_DRIVE], dir[_MAX_DIR + 64], name[_MAX_FNAME], ext[_MAX_EXT];
+  _splitpath_s(buf, drive, dir, name, ext);
+
+  nsize = GetEnvironmentVariableA(ENV_KEYMAN_ROOT, keyman_root, MAX_PATH);
+  if (nsize > 0 && nsize < MAX_PATH) {
+    // We are potentially running in keyman source tree
+    _makepath_s(buf, drive, dir, NULL, NULL);
+    if (_strnicmp(buf, keyman_root, strlen(keyman_root)) == 0) {
+      if (*(strchr(keyman_root, 0) - 1) != '\\') strcat_s(keyman_root, "\\");
+      strcat_s(keyman_root, SENTRY_DEV_PATH);
+      HMODULE result = LoadLibraryA(keyman_root);
+      if (result) return result;
+    }
+  }
+
+  _makepath_s(buf, drive, dir, NULL, NULL);
+  strcat_s(buf, SENTRY_INSTALL_PATH);
+  return LoadLibraryA(buf);
+}
+
+FARPROC WINAPI delayHook(unsigned dliNotify, PDelayLoadInfo pdli)
+{
+  switch (dliNotify) {
+  case dliStartProcessing:
+
+    // If you want to return control to the helper, return 0.
+    // Otherwise, return a pointer to a FARPROC helper function
+    // that will be used instead, thereby bypassing the rest
+    // of the helper.
+
+    break;
+
+  case dliNotePreLoadLibrary:
+
+    // If you want to return control to the helper, return 0.
+    // Otherwise, return your own HMODULE to be used by the
+    // helper instead of having it call LoadLibrary itself.
+    if (_stricmp(pdli->szDll, SENTRY_BASE_DLL) == 0) {
+      return reinterpret_cast<FARPROC>(LoadSentryLibrary());
+    }
+
+    break;
+
+  case dliNotePreGetProcAddress:
+
+    // If you want to return control to the helper, return 0.
+    // If you choose you may supply your own FARPROC function
+    // address and bypass the helper's call to GetProcAddress.
+
+    break;
+
+  case dliFailLoadLib:
+
+    // LoadLibrary failed.
+    // If you don't want to handle this failure yourself, return 0.
+    // In this case the helper will raise an exception
+    // (ERROR_MOD_NOT_FOUND) and exit.
+    // If you want to handle the failure by loading an alternate
+    // DLL (for example), then return the HMODULE for
+    // the alternate DLL. The helper will continue execution with
+    // this alternate DLL and attempt to find the
+    // requested entrypoint via GetProcAddress.
+
+    break;
+
+  case dliFailGetProc:
+
+    // GetProcAddress failed.
+    // If you don't want to handle this failure yourself, return 0.
+    // In this case the helper will raise an exception
+    // (ERROR_PROC_NOT_FOUND) and exit.
+    // If you choose, you may handle the failure by returning
+    // an alternate FARPROC function address.
+
+    break;
+
+  case dliNoteEndProcessing:
+
+    // This notification is called after all processing is done.
+    // There is no opportunity for modifying the helper's behavior
+    // at this point except by longjmp()/throw()/RaiseException.
+    // No return value is processed.
+
+    break;
+
+  default:
+
+    return NULL;
+  }
+
+  return NULL;
+}
+
+ExternC const PfnDliHook __pfnDliNotifyHook2 = delayHook;
+ExternC const PfnDliHook __pfnDliFailureHook2 = delayHook;

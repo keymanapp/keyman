@@ -26,6 +26,8 @@ CEF_VERSION=`cat $CEF_VERSION_MD | tr -d "[:space:]"`
 # Note that 14.0 and earlier versions rely on the `master`
 # branch, so that is the default branch checked out in the
 # build configurations
+git reset --hard
+git clean -fd
 git fetch origin "v$CEF_VERSION"
 git switch "v$CEF_VERSION"
 
