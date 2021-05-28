@@ -63,7 +63,7 @@ class InstallKmp():
                 raise InstallError(InstallStatus.Abort, error_message)
             os.mkdir(keyman_dir)
 
-    def _extract_package_id(inputfile):
+    def _extract_package_id(self, inputfile):
         packageID, ext = os.path.splitext(os.path.basename(inputfile))
         return packageID.lower()
 
@@ -107,7 +107,7 @@ class InstallKmp():
             logging.error("install_kmp.py: %s", message)
             raise InstallError(InstallStatus.Abort, message)
 
-        self.extract_kmp(inputfile, self.packageDir)
+        extract_kmp(inputfile, self.packageDir)
         restart_ibus()
 
         info, system, options, keyboards, files = get_metadata(self.packageDir)
