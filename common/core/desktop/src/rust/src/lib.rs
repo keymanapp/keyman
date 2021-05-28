@@ -108,7 +108,7 @@
   */
 
 #[no_mangle]
-pub extern "C" fn rust_mock_process_event(vk: u16, modifier: u16) -> u32 {
+pub extern "C" fn rust_mock_process_event(_vk: u16, _modifier: u16) -> u32 {
   return 0; //KM_KBP_STATUS_OK
 }
 
