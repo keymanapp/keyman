@@ -72,6 +72,7 @@ displayInfo "" \
 cd $KEYMAN_ROOT/ios/help
 
 MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
+CSS="../../resources/build/offline-help-style-spec.txt"
 MD=`find . -name "*.md"`
 DESTHTM="$THIS_DIR/keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources"
 
@@ -94,7 +95,7 @@ if $DO_HTM; then
       OUTFILE="$DESTHTM/${INFILE%.md}.html"
       echo "Processing $INFILE to $(basename "$OUTFILE")"
       mkdir -p "$(dirname "$OUTFILE")"
-      pandoc -s --lua-filter="$MDLUA" -t html -o "$OUTFILE" $INFILE
+      pandoc -s -H "$CSS" --lua-filter="$MDLUA" -t html -o "$OUTFILE" $INFILE
     done
   fi
 

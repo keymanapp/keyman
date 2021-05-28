@@ -45,10 +45,8 @@ public class TextView: UITextView, KeymanResponder {
     delegateProxy = TextViewDelegateProxy(self)
     delegate = delegateProxy
 
-    if #available(iOS 9.0, *) {
-      inputAssistantItem.leadingBarButtonGroups = []
-      inputAssistantItem.trailingBarButtonGroups = []
-    }
+    inputAssistantItem.leadingBarButtonGroups = []
+    inputAssistantItem.trailingBarButtonGroups = []
     
     self.inputView = Manager.shared.inputViewController.view
 

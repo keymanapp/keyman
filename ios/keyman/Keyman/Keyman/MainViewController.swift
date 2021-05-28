@@ -83,11 +83,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
     // Setup Notifications
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
+    NotificationCenter.default.addObserver(self, selector: #selector(self.onKeyboardWillShow),
         name: UIResponder.keyboardWillShowNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidShow),
+    // `keyboardDidShow` apparently matches an internal Apple API and will fail an app submission.
+    // So, cheap workaround:  just prefix the thing.
+    NotificationCenter.default.addObserver(self, selector: #selector(self.onKeyboardDidShow),
         name: UIResponder.keyboardDidShowNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
+    NotificationCenter.default.addObserver(self, selector: #selector(self.onKeyboardWillHide),
         name: UIResponder.keyboardWillHideNotification, object: nil)
     keyboardLoadedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardLoaded,
@@ -109,16 +111,14 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // Unfortunately, it's the main app with the file definitions.
     // We have to gerry-rig this so that the framework-based SettingsViewController
     // can launch the app-based DocumentViewController.
-    if #available(iOS 11.0, *) {
-      Manager.shared.fileBrowserLauncher = { navVC in
-        let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"],
-                                              in: .import,
-                                              navVC: navVC)
+    Manager.shared.fileBrowserLauncher = { navVC in
+      let vc = PackageBrowserViewController(documentTypes: ["com.keyman.kmp"],
+                                            in: .import,
+                                            navVC: navVC)
 
-        // Present the "install from file" browser within the specified navigation view controller.
-        // (Allows displaying from within the Settings menu)
-        navVC.present(vc, animated: true)
-      }
+      // Present the "install from file" browser within the specified navigation view controller.
+      // (Allows displaying from within the Settings menu)
+      navVC.present(vc, animated: true)
     }
   }
 
@@ -130,7 +130,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     super.viewDidLoad()
 
     extendedLayoutIncludesOpaqueBars = true
-    automaticallyAdjustsScrollViewInsets = false
 
     let systemFonts = Set<String>(UIFont.familyNames)
 
@@ -144,13 +143,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       ResourceDownloadManager.shared.queryKeysForUpdatablePackages { _, _ in }
     }
 
-    // Implement a default color...
-    var bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
-    // And if the iOS version is current enough, override it from the palette.
-    if #available(iOS 11.0, *) {
-      bgColor = UIColor(named: "InputBackground")!
-    }
-    view?.backgroundColor = bgColor
+    view?.backgroundColor = UIColor(named: "InputBackground")!
 
     // Check for configuration profiles/fonts to install
     FontManager.shared.registerCustomFonts()
@@ -192,7 +185,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView = TextView(frame: view.frame)
     textView.setKeymanDelegate(self)
     textView.viewController = self
-    textView.backgroundColor = bgColor
+    textView.backgroundColor = UIColor(named: "InputBackground")!
     textView.isScrollEnabled = true
     textView.isUserInteractionEnabled = true
     textView.font = textView.font?.withSize(textSize)
@@ -206,7 +199,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     infoView.view?.isHidden = true
-    infoView.view?.backgroundColor = bgColor
+    infoView.view?.backgroundColor = UIColor(named: "InputBackground")!
     view?.addSubview(infoView!.view)
 
     resizeViews(withKeyboardVisible: textView.isFirstResponder)
@@ -396,21 +389,19 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     return navigationController!.navigationBar.frame.height
   }
 
-  @objc func keyboardWillShow(_ notification: Notification) {
+  @objc func onKeyboardWillShow(_ notification: Notification) {
     _ = dismissDropDownMenu()
     resizeViews(withKeyboardVisible: true)
   }
 
-  @objc func keyboardDidShow(_ notification: Notification) {
+  @objc func onKeyboardDidShow(_ notification: Notification) {
     // Workaround to display overlay window above keyboard
-    if #available(iOS 9.0, *) {
-      let windows = UIApplication.shared.windows
-      let lastWindow = windows.last
-      overlayWindow.windowLevel = lastWindow!.windowLevel + 1
-    }
+    let windows = UIApplication.shared.windows
+    let lastWindow = windows.last
+    overlayWindow.windowLevel = lastWindow!.windowLevel + 1
   }
 
-  @objc func keyboardWillHide(_ notification: Notification) {
+  @objc func onKeyboardWillHide(_ notification: Notification) {
     resizeViews(withKeyboardVisible: false)
   }
 
@@ -474,7 +465,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navigationItem.rightBarButtonItem = nil
       setNavBarButtons()
       if wasKeyboardVisible {
-        perform(#selector(self.showKeyboard), with: nil, afterDelay: 0.75)
+        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
       }
       if shouldShowGetStarted {
         perform(#selector(self.showGetStartedView), with: nil, afterDelay: 0.75)
@@ -827,7 +818,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
   }
 
-  @objc func showKeyboard() {
+  // showKeyboard matches an internal Apple API, so it's not available for use as a selector.
+  @objc func displayKeyboard() {
     textView.becomeFirstResponder()
   }
 
@@ -856,7 +848,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       userData.synchronize()
 
       if action.style == .default {
-        UIApplication.shared.openURL(URL(string: "\(baseUri)\(profileName)")!)
+        UIApplication.shared.open(URL(string: "\(baseUri)\(profileName)")!)
       }
       self.profileName = nil
     }

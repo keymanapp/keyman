@@ -73,34 +73,18 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
   func setConstraints() {
     let innerView = keymanWeb.view!
 
-    var guide: UILayoutGuide
-    var conditionalGuide: Bool = false
-
-    if #available(iOSApplicationExtension 11.0, *) {
-      guide = self.safeAreaLayoutGuide
-      conditionalGuide = true
-    } else {
-      guide = self.layoutMarginsGuide
-    }
+    let guide = self.safeAreaLayoutGuide
 
     // Fallback on earlier versions
     innerView.topAnchor.constraint(equalTo:    guide.topAnchor).isActive = true
     innerView.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
-    if conditionalGuide {
-      innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
-      innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
-    } else {
-      innerView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
-      innerView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
-    }
+
+    innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
+    innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
 
     // Allow these to be broken if/as necessary to resolve layout issues.
-    var kbdWidthConstraint: NSLayoutConstraint
-    if conditionalGuide {
-      kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
-    } else {
-      kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: self.widthAnchor)
-    }
+    let kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+
     kbdWidthConstraint.priority = .defaultHigh
     kbdWidthConstraint.isActive = true
 
@@ -176,14 +160,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     let scaling = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: self.isPortrait)
 
     return scaling?.bannerHeight ?? 38 // default for iPhone SE, older/smaller devices
-  }
-
-  open override var hasFullAccess: Bool {
-    if #available(iOS 11.0, *) {
-      // Nice and straight-forward here!
-      return super.hasFullAccess
-    }
-    return Storage.shared != nil
   }
 
   private var keyboardListCount: Int {
@@ -352,11 +328,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
       // A full-context deletion will report numCharsToDelete == 0 and won't
       // otherwise delete selected text.
-      if #available(iOSApplicationExtension 11.0, *) {
-        if let selected = textDocumentProxy.selectedText {
-          if selected.count > 0 {
-            textDocumentProxy.deleteBackward()
-          }
+      if let selected = textDocumentProxy.selectedText {
+        if selected.count > 0 {
+          textDocumentProxy.deleteBackward()
         }
       }
       return
@@ -451,12 +425,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   // These require the view to appear - parent and our relationship with it must exist!
   private func setOuterConstraints() {
     var baseWidthConstraint: NSLayoutConstraint
-    if #available(iOSApplicationExtension 11.0, *) {
-      baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
-    } else {
-      //baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.layoutMarginsGuide.widthAnchor)
-      baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.widthAnchor)
-    }
+    baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
     baseWidthConstraint.priority = UILayoutPriority(rawValue: 999)
     baseWidthConstraint.isActive = true
   }

@@ -1,3 +1,9 @@
+keyman-keyboardprocessor (14.0.273-1) unstable; urgency=medium
+
+  * Keyman 14
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 26 Apr 2021 18:24:41 +0200
+
 keyman-keyboardprocessor (11.0.101-3) unstable; urgency=medium
 
   * Team upload.

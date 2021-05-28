@@ -24,95 +24,50 @@ extension Colors {
   // The primary color used for selected UI elements in the settings menu.
   public static var selectionPrimary: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "SelectionPrimary")!
-      } else {
-        return UIColor(red: 204.0 / 255.0,
-                       green: 136.0 / 255.0,
-                       blue: 34.0 / 255.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "SelectionPrimary")!
     }
   }
 
   // The primary color used for selected UI elements in Get Started menu.
   public static var selectionSecondary: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "SelectionSecondary")!
-      } else {
-        return UIColor(red: 95.0 / 255.0,
-                       green: 196.0 / 255.0,
-                       blue: 217.0 / 255.0,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "SelectionSecondary")!
     }
   }
 
   public static var statusToolbar: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "StatusToolbar")!
-      } else {
-        return UIColor(red: 0.5,
-                       green: 0.75,
-                       blue: 0.25,
-                       alpha: 0.9)
-      }
+      return UIColor(named: "StatusToolbar")!
     }
   }
 
   public static var statusResourceUpdateButton: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "StatusResourceUpdateButton")!
-      } else {
-        return UIColor(red: 0.75,
-                       green: 1.0,
-                       blue: 0.5,
-                       alpha: 1.0)
-      }
+      return UIColor(named: "StatusResourceUpdateButton")!
     }
   }
 
   public static var spinnerBackground: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "SpinnerBackground")!
-      } else {
-        return UIColor(white: 0.5,
-                       alpha: 0.8)
-      }
+      return UIColor(named: "SpinnerBackground")!
     }
   }
 
   public static var labelNormal: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "LabelNormal")!
-      } else {
-        return UIColor.lightGray
-      }
+      return UIColor(named: "LabelNormal")!
     }
   }
 
   public static var labelHighlighted: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "LabelHighlighted")!
-      } else {
-        return UIColor.darkGray
-      }
+      return UIColor(named: "LabelHighlighted")!
     }
   }
 
   public static var listSeparator: UIColor {
     get {
-      if #available(iOS 11.0, *) {
-        return UIColor(named: "ListSeparator")!
-      } else {
-        return UIColor.lightGray
-      }
+      return UIColor(named: "ListSeparator")!
     }
   }
 }

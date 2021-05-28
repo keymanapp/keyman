@@ -137,6 +137,7 @@ build_hhc() {
 #
 
 MDLUA="$KEYMAN_ROOT/resources/build/htm-link.lua"
+CSS="../../../../resources/build/offline-help-style-spec.txt"
 MD=`find -name "*.md"`
 DESTCHM="$THIS_DIR/../../../bin/help/desktop"
 
@@ -159,7 +160,7 @@ if $DO_CHM; then
       OUTFILE="$DESTCHM/${INFILE%.md}.htm"
       echo "Processing $INFILE to $(basename "$OUTFILE")"
       mkdir -p "$(dirname "$OUTFILE")"
-      pandoc -s --lua-filter="$MDLUA" -t html -o "$OUTFILE" $INFILE
+      pandoc -s -H "$CSS" --lua-filter="$MDLUA" -t html -o "$OUTFILE" $INFILE
     done
   fi
 
