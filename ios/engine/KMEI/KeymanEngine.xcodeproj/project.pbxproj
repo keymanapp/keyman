@@ -44,14 +44,12 @@
 		9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */; };
 		9A3B14D2229370B20052A11F /* InstalledLanguagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3B14D1229370B20052A11F /* InstalledLanguagesViewController.swift */; };
 		9A3E832522EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3E832422EAC14A00D22D2A /* KeyboardSwitcherViewController.swift */; };
-		9A4609992242047400B0BFD1 /* LexicalModelAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4609982242047400B0BFD1 /* LexicalModelAPICall.swift */; };
 		9A60764422893A4E003BCFBA /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A60764322893A4E003BCFBA /* SettingsViewController.swift */; };
 		9A9CB08022416E5400231FB9 /* LexicalModelPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */; };
 		9AD4F53C229F85AC007992D3 /* LanguageSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD4F53A229F85AC007992D3 /* LanguageSettingsViewController.swift */; };
 		9AD4F53D229F85AC007992D3 /* LanguageSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AD4F53B229F85AC007992D3 /* LanguageSettingsViewController.xib */; };
 		9ADC459D22E1895D004C78C6 /* LanguageLMDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC459B22E1895D004C78C6 /* LanguageLMDetailViewController.swift */; };
 		9ADC459F22E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ADC459C22E1895D004C78C6 /* LanguageLMDetailViewController.xib */; };
-		C007C4651F9F52D8006461B9 /* LanguagesAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = C007C4641F9F52D8006461B9 /* LanguagesAPICall.swift */; };
 		C024C9941FA6EB470060583B /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C024C9931FA6EB470060583B /* NotificationName.swift */; };
 		C024C9961FA6EC650060583B /* NotificationCenter+Typed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C024C9951FA6EC650060583B /* NotificationCenter+Typed.swift */; };
 		C024C9981FA6F2340060583B /* NotificationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = C024C9971FA6F2330060583B /* NotificationObserver.swift */; };
@@ -73,13 +71,10 @@
 		C05B14331FD914870082A316 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05B14321FD914870082A316 /* Log.swift */; };
 		C05F43311FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */; };
 		C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */; };
-		C06D372F1F81F4E100F61AE0 /* KeymanEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */; };
 		C06D37351F81F5C300F61AE0 /* HTTPDownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */; };
 		C06D37361F81F5C300F61AE0 /* KeyboardMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */; };
 		C06D37381F81F5C400F61AE0 /* SubKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */; };
-		C06D37401F81F5C400F61AE0 /* LanguageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */; };
-		C06D37411F81F5C400F61AE0 /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */; };
 		C06D37421F81F5C400F61AE0 /* KeyboardPickerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */; };
 		C06D37431F81F5C400F61AE0 /* KeyboardPickerBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */; };
 		C06D37441F81F5C400F61AE0 /* KeyboardNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */; };
@@ -98,7 +93,6 @@
 		C0B901AA1FA1AFC200764EB8 /* UserDefaults+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */; };
 		C0C16A891FA8146300F090BA /* KeymanWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */; };
 		C0CB633C1FA6F61500617CDB /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CB633B1FA6F61500617CDB /* Notifications.swift */; };
-		C0D3F35E1F9F33490055C7CF /* Options.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F35D1F9F33490055C7CF /* Options.swift */; };
 		C0D3F3601F9F3AD80055C7CF /* InstallableKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */; };
 		C0E30C8C1FC40D0400C80416 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E30C8B1FC40D0400C80416 /* Storage.swift */; };
 		C0EF3E7B1F95B65300CE9BD4 /* KeymanWebDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */; };
@@ -314,7 +308,7 @@
 		6CD5DFA8150F6DC8007A5DDE /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
 		984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Tavultesoft.KMEI.SystemKeyboard.entitlements; sourceTree = "<group>"; };
-		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMEI.entitlements; sourceTree = "<group>"; };
+		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KMEI.entitlements; sourceTree = "<group>"; };
 		988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_pirurvik-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_pirurvik-1.0.js"; sourceTree = SOURCE_ROOT; };
 		988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_latin-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_latin-1.0.js"; sourceTree = SOURCE_ROOT; };
 		988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_naqittaut-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_naqittaut-1.0.js"; sourceTree = SOURCE_ROOT; };
@@ -334,15 +328,13 @@
 		9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Formatter+ISODateExtension.swift"; sourceTree = "<group>"; };
 		9A3B14D1229370B20052A11F /* InstalledLanguagesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstalledLanguagesViewController.swift; path = Settings/InstalledLanguagesViewController.swift; sourceTree = "<group>"; };
 		9A3E832422EAC14A00D22D2A /* KeyboardSwitcherViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSwitcherViewController.swift; sourceTree = "<group>"; };
-		9A4609982242047400B0BFD1 /* LexicalModelAPICall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelAPICall.swift; sourceTree = "<group>"; };
-		9A60763C22892485003BCFBA /* Settings.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Settings.storyboard; path = Settings/Settings.storyboard; sourceTree = "<group>"; };
-		9A60764322893A4E003BCFBA /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SettingsViewController.swift; path = Settings/SettingsViewController.swift; sourceTree = "<group>"; };
+		9A60763C22892485003BCFBA /* Settings.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Settings.storyboard; sourceTree = "<group>"; };
+		9A60764322893A4E003BCFBA /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelPickerViewController.swift; sourceTree = "<group>"; };
 		9AD4F53A229F85AC007992D3 /* LanguageSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LanguageSettingsViewController.swift; path = Settings/LanguageSettingsViewController.swift; sourceTree = "<group>"; };
 		9AD4F53B229F85AC007992D3 /* LanguageSettingsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = LanguageSettingsViewController.xib; path = Settings/LanguageSettingsViewController.xib; sourceTree = "<group>"; };
 		9ADC459B22E1895D004C78C6 /* LanguageLMDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageLMDetailViewController.swift; sourceTree = "<group>"; };
 		9ADC459C22E1895D004C78C6 /* LanguageLMDetailViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LanguageLMDetailViewController.xib; sourceTree = "<group>"; };
-		C007C4641F9F52D8006461B9 /* LanguagesAPICall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagesAPICall.swift; sourceTree = "<group>"; };
 		C024C9931FA6EB470060583B /* NotificationName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationName.swift; sourceTree = "<group>"; };
 		C024C9951FA6EC650060583B /* NotificationCenter+Typed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationCenter+Typed.swift"; sourceTree = "<group>"; };
 		C024C9971FA6F2330060583B /* NotificationObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationObserver.swift; sourceTree = "<group>"; };
@@ -362,13 +354,11 @@
 		C0452BAA1F9F1FE10064431A /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		C0452BAC1F9F21270064431A /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 		C0452BAE1F9F22A80064431A /* Font.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
-		C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
 		C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisteredFont.swift; sourceTree = "<group>"; };
 		C05B14321FD914870082A316 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift"; sourceTree = "<group>"; };
 		C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Helpers.swift"; sourceTree = "<group>"; };
 		C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngine.h; sourceTree = "<group>"; };
 		C06D372E1F81F4E100F61AE0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C075EB051F8EFF870041F4BD /* String+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Helpers.swift"; sourceTree = "<group>"; };
 		C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubKeysView.swift; sourceTree = "<group>"; };
@@ -378,7 +368,6 @@
 		C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardNameTableViewCell.swift; sourceTree = "<group>"; };
 		C08E698C1FDA392D0026056B /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		C08E69901FDA6F6F0026056B /* FullKeyboardID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullKeyboardID.swift; sourceTree = "<group>"; };
-		C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageDetailViewController.swift; sourceTree = "<group>"; };
 		C0959CD31F99C44E00B616BC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C0A5FF361F6682EB00BE740C /* PopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		C0A93A531F8B21240079948B /* Manager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Manager.swift; sourceTree = "<group>"; };
@@ -386,7 +375,6 @@
 		C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Types.swift"; sourceTree = "<group>"; };
 		C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanWebViewController.swift; sourceTree = "<group>"; };
 		C0CB633B1FA6F61500617CDB /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
-		C0D3F35D1F9F33490055C7CF /* Options.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Options.swift; sourceTree = "<group>"; };
 		C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallableKeyboard.swift; sourceTree = "<group>"; };
 		C0E30C8B1FC40D0400C80416 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPDownloadRequest.swift; sourceTree = "<group>"; };
@@ -491,8 +479,6 @@
 		CEBD34542655117400EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEBD34552655117800EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = am; path = am.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		CEC0C6762410E049003E1BCD /* SentryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryManager.swift; sourceTree = "<group>"; };
-		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
-		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
 		CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManagerTests.swift; sourceTree = "<group>"; };
 		CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationTests.swift; sourceTree = "<group>"; };
 		CEE0321024C56735005BFC73 /* Packages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packages.swift; sourceTree = "<group>"; };
@@ -502,12 +488,10 @@
 		CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardScaleTests.swift; sourceTree = "<group>"; };
 		CEF9367724D3B0B20031C70D /* PackageInstallView_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PackageInstallView_iPhone.xib; sourceTree = "<group>"; };
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KeymanEngine-Prefix.pch"; sourceTree = "<group>"; };
 		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
 		F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphonesimulator.xcconfig"; sourceTree = "<group>"; };
 		F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; lineEnding = 0; path = "Keyman-lib.xcconfig"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
 		F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Keyman.bundle; sourceTree = "<group>"; };
-		F27FCB65157FF34800FBBA20 /* INSTRUCTIONS */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTRUCTIONS; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -601,39 +585,16 @@
 			path = Config;
 			sourceTree = "<group>";
 		};
-		980CC8E119D51EF00089BB57 /* URLProtocol */ = {
-			isa = PBXGroup;
-			children = (
-				C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */,
-			);
-			name = URLProtocol;
-			sourceTree = "<group>";
-		};
 		98196DE4187BB0D200F001C3 /* KeymanEngineDemo */ = {
 			isa = PBXGroup;
 			children = (
+				984FA1F61974C0EF0037EE5D /* KMEI.entitlements */,
 				C040E5111F86107E00901EE4 /* AppDelegate.swift */,
 				C040E5131F86108900901EE4 /* MainViewController.swift */,
 				6C0A13F9151EA151007FA4AD /* Resources */,
 				988B36B41ADF67180008752C /* Keyboards */,
 			);
 			path = KeymanEngineDemo;
-			sourceTree = "<group>";
-		};
-		98411308199D9ACD005BD609 /* SubKeysView */ = {
-			isa = PBXGroup;
-			children = (
-				C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */,
-			);
-			name = SubKeysView;
-			sourceTree = "<group>";
-		};
-		987F00041AB8FCB700998116 /* KeyboardMenuView */ = {
-			isa = PBXGroup;
-			children = (
-				C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */,
-			);
-			name = KeyboardMenuView;
 			sourceTree = "<group>";
 		};
 		988B36B41ADF67180008752C /* Keyboards */ = {
@@ -644,39 +605,6 @@
 				988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */,
 			);
 			path = Keyboards;
-			sourceTree = "<group>";
-		};
-		989FDF8C193C1B0C00EECAF9 /* KeyPreviewView */ = {
-			isa = PBXGroup;
-			children = (
-				C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */,
-			);
-			name = KeyPreviewView;
-			sourceTree = "<group>";
-		};
-		98A880EF177BF82600601A9E /* PopoverView */ = {
-			isa = PBXGroup;
-			children = (
-				C0A5FF361F6682EB00BE740C /* PopoverView.swift */,
-			);
-			name = PopoverView;
-			sourceTree = "<group>";
-		};
-		98C0B11817A22DB5007ECAFC /* PickerButtons */ = {
-			isa = PBXGroup;
-			children = (
-				C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */,
-				C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */,
-			);
-			name = PickerButtons;
-			sourceTree = "<group>";
-		};
-		98C0B11C17A2302E007ECAFC /* TableViewCells */ = {
-			isa = PBXGroup;
-			children = (
-				C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */,
-			);
-			name = TableViewCells;
 			sourceTree = "<group>";
 		};
 		98F9D6981954112F0087AA43 /* SystemKeyboard */ = {
@@ -696,14 +624,6 @@
 				98F9D69A1954112F0087AA43 /* Info.plist */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		98F9D6ED19545A620087AA43 /* InputViewController */ = {
-			isa = PBXGroup;
-			children = (
-				C04514891F85DF9000D88416 /* InputViewController.swift */,
-			);
-			name = InputViewController;
 			sourceTree = "<group>";
 		};
 		9A079DD0223194B100581263 /* KeymanEngineTests */ = {
@@ -737,12 +657,16 @@
 		9A60763E22892495003BCFBA /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				9A60763C22892485003BCFBA /* Settings.storyboard */,
-				9A60764322893A4E003BCFBA /* SettingsViewController.swift */,
 				9A3B14D1229370B20052A11F /* InstalledLanguagesViewController.swift */,
+				C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */,
+				9ADC459B22E1895D004C78C6 /* LanguageLMDetailViewController.swift */,
+				9ADC459C22E1895D004C78C6 /* LanguageLMDetailViewController.xib */,
 				9AD4F53A229F85AC007992D3 /* LanguageSettingsViewController.swift */,
 				9AD4F53B229F85AC007992D3 /* LanguageSettingsViewController.xib */,
+				9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */,
 				CE1E1EC02303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift */,
+				9A60763C22892485003BCFBA /* Settings.storyboard */,
+				9A60764322893A4E003BCFBA /* SettingsViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -758,37 +682,35 @@
 			path = Notification;
 			sourceTree = "<group>";
 		};
-		C0452BA91F9F1CAF0064431A /* Model */ = {
+		C0452BA91F9F1CAF0064431A /* Resource Data */ = {
 			isa = PBXGroup;
 			children = (
-				C0452BAA1F9F1FE10064431A /* Language.swift */,
-				CE17ABDD23069E76005FBB14 /* LanguageResource.swift */,
-				C0452BAC1F9F21270064431A /* Keyboard.swift */,
-				9A079E3F223B602B00581263 /* LexicalModel.swift */,
 				C0452BAE1F9F22A80064431A /* Font.swift */,
-				C0D3F35D1F9F33490055C7CF /* Options.swift */,
-				C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */,
-				9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */,
-				C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */,
-				C007C4641F9F52D8006461B9 /* LanguagesAPICall.swift */,
-				9A4609982242047400B0BFD1 /* LexicalModelAPICall.swift */,
-				C042ED5C1FC6A65A001D82F4 /* Version.swift */,
+				C0B09EAD1FCFD10F002F39AF /* FontManager.swift */,
 				C08E69901FDA6F6F0026056B /* FullKeyboardID.swift */,
 				9A079E42223B61AE00581263 /* FullLexicalModelID.swift */,
+				C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */,
+				9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */,
+				C0452BAC1F9F21270064431A /* Keyboard.swift */,
+				C0452BAA1F9F1FE10064431A /* Language.swift */,
+				CE17ABDD23069E76005FBB14 /* LanguageResource.swift */,
+				9A079E3F223B602B00581263 /* LexicalModel.swift */,
+				C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */,
+				C042ED5C1FC6A65A001D82F4 /* Version.swift */,
 			);
-			path = Model;
+			path = "Resource Data";
 			sourceTree = "<group>";
 		};
 		C055E6E81F99EA320035C2DD /* Extension */ = {
 			isa = PBXGroup;
 			children = (
-				C075EB051F8EFF870041F4BD /* String+Helpers.swift */,
 				C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */,
+				9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */,
+				C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */,
+				CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */,
+				C075EB051F8EFF870041F4BD /* String+Helpers.swift */,
 				C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */,
 				C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */,
-				C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */,
-				9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */,
-				CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -796,13 +718,11 @@
 		C06D372C1F81F4E100F61AE0 /* KeymanEngine */ = {
 			isa = PBXGroup;
 			children = (
+				6C0A13FA151EA16F007FA4AD /* resources */,
 				CEA1486F2407808F00C6ECD2 /* Localizable.strings */,
 				CE96E42D24D1229A005B8E5A /* Localizable.stringsdict */,
 				CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */,
-				C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */,
 				C06D372E1F81F4E100F61AE0 /* Info.plist */,
-				F2606FC4158F8B8600F37184 /* lib */,
-				6C0A13FA151EA16F007FA4AD /* resources */,
 				F273AB9615641D9300A47CEE /* Classes */,
 			);
 			path = KeymanEngine;
@@ -819,13 +739,50 @@
 			path = Downloading;
 			sourceTree = "<group>";
 		};
-		CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */ = {
+		CE1679B8265F315C008D6FCE /* Demos */ = {
+			isa = PBXGroup;
+			children = (
+				98196DE4187BB0D200F001C3 /* KeymanEngineDemo */,
+				98F9D6981954112F0087AA43 /* SystemKeyboard */,
+			);
+			path = Demos;
+			sourceTree = "<group>";
+		};
+		CE1679D7265F5FE8008D6FCE /* Keyboard */ = {
+			isa = PBXGroup;
+			children = (
+				C04514891F85DF9000D88416 /* InputViewController.swift */,
+				CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */,
+				C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */,
+				CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */,
+				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
+				C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */,
+				C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */,
+				C0A5FF361F6682EB00BE740C /* PopoverView.swift */,
+				C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */,
+			);
+			path = Keyboard;
+			sourceTree = "<group>";
+		};
+		CE1679DF265F690A008D6FCE /* Installation */ = {
+			isa = PBXGroup;
+			children = (
+				CE9A7A7824DA55D5007CCB5F /* AssociatingPackageInstaller.swift */,
+				CE99350D24D7CCFC00202DA3 /* LanguagePickAssociator.swift */,
+				CEF9367724D3B0B20031C70D /* PackageInstallView_iPhone.xib */,
+				CE9ECB1D24D3A8CC007C5718 /* PackageInstallView_iPad.xib */,
+				CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */,
+			);
+			path = Installation;
+			sourceTree = "<group>";
+		};
+		CE25CCBB1F1DA72A005AA2BC /* Downloads */ = {
 			isa = PBXGroup;
 			children = (
 				C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */,
 				C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */,
 			);
-			name = HTTPRequest;
+			name = Downloads;
 			sourceTree = "<group>";
 		};
 		CE37C38923FCC9AF007031C6 /* resources */ = {
@@ -848,28 +805,15 @@
 			path = resources;
 			sourceTree = "<group>";
 		};
-		CE67D95F228A6ECF0029F2B5 /* KeymanWebView */ = {
-			isa = PBXGroup;
-			children = (
-				C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */,
-				CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */,
-			);
-			name = KeymanWebView;
-			sourceTree = "<group>";
-		};
 		CE71705923A9C7D300A924A1 /* Resource Management */ = {
 			isa = PBXGroup;
 			children = (
-				CE1F67A22304EB3800FF6972 /* ResourceDownloadManager.swift */,
 				CE87751D24C68DA500B1475A /* KeyboardSearchViewController.swift */,
-				CEF9367724D3B0B20031C70D /* PackageInstallView_iPhone.xib */,
-				CE9ECB1D24D3A8CC007C5718 /* PackageInstallView_iPad.xib */,
+				C08E698C1FDA392D0026056B /* Migrations.swift */,
+				CE1F67A22304EB3800FF6972 /* ResourceDownloadManager.swift */,
 				CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */,
 				CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */,
-				CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */,
-				CE99350D24D7CCFC00202DA3 /* LanguagePickAssociator.swift */,
 				C0E30C8B1FC40D0400C80416 /* Storage.swift */,
-				CE9A7A7824DA55D5007CCB5F /* AssociatingPackageInstaller.swift */,
 			);
 			path = "Resource Management";
 			sourceTree = "<group>";
@@ -894,8 +838,8 @@
 			isa = PBXGroup;
 			children = (
 				CE89641E24A4686000D5EB8E /* Queries.swift */,
-				CE89642024A468B200D5EB8E /* Queries+PackageVersion.swift */,
 				CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */,
+				CE89642024A468B200D5EB8E /* Queries+PackageVersion.swift */,
 			);
 			path = Queries;
 			sourceTree = "<group>";
@@ -903,13 +847,14 @@
 		CE973D7F2484A07300F66045 /* KMP Packaging */ = {
 			isa = PBXGroup;
 			children = (
-				CE754A0323D162E90030CB79 /* ResourceInfoViewController.swift */,
-				CEA14872240780E100C6ECD2 /* ResourceInfoView.xib */,
-				1645D5942036C6FF0076C51B /* KeymanPackage.swift */,
-				CE969BE7251AD8B500376D6A /* PackageWebViewController.swift */,
-				9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */,
-				9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */,
+				CE1679DF265F690A008D6FCE /* Installation */,
 				CE867FF22485F38300B2EAED /* kmp.json */,
+				9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */,
+				1645D5942036C6FF0076C51B /* KeymanPackage.swift */,
+				9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */,
+				CE969BE7251AD8B500376D6A /* PackageWebViewController.swift */,
+				CEA14872240780E100C6ECD2 /* ResourceInfoView.xib */,
+				CE754A0323D162E90030CB79 /* ResourceInfoViewController.swift */,
 			);
 			name = "KMP Packaging";
 			sourceTree = "<group>";
@@ -937,12 +882,10 @@
 			children = (
 				C06D372C1F81F4E100F61AE0 /* KeymanEngine */,
 				9A079DD0223194B100581263 /* KeymanEngineTests */,
+				CE1679B8265F315C008D6FCE /* Demos */,
 				F243888114BBD43000A3E055 /* Frameworks */,
-				984FA1F61974C0EF0037EE5D /* KMEI.entitlements */,
 				F243887F14BBD43000A3E055 /* Products */,
 				F243888914BBD43100A3E055 /* Supporting Files */,
-				98F9D6981954112F0087AA43 /* SystemKeyboard */,
-				98196DE4187BB0D200F001C3 /* KeymanEngineDemo */,
 			);
 			sourceTree = "<group>";
 		};
@@ -976,79 +919,46 @@
 			isa = PBXGroup;
 			children = (
 				6C0A13FE151EA3CF007FA4AD /* Config */,
-				F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */,
-				F27FCB65157FF34800FBBA20 /* INSTRUCTIONS */,
 			);
 			name = "Supporting Files";
 			path = KeymanEngine;
 			sourceTree = "<group>";
 		};
-		F2606FC4158F8B8600F37184 /* lib */ = {
+		F2607212158FBCB500F37184 /* In-App Picker UI */ = {
 			isa = PBXGroup;
 			children = (
-				F26071F5158F8BE600F37184 /* Reachability */,
-			);
-			path = lib;
-			sourceTree = "<group>";
-		};
-		F26071F5158F8BE600F37184 /* Reachability */ = {
-			isa = PBXGroup;
-			children = (
-				CECB38931F2199BC0098882F /* Reachability.h */,
-				CECB38941F2199BC0098882F /* Reachability.m */,
-			);
-			path = Reachability;
-			sourceTree = "<group>";
-		};
-		F2607212158FBCB500F37184 /* KeyboardPicker */ = {
-			isa = PBXGroup;
-			children = (
+				C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */,
+				C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */,
 				9A3E832422EAC14A00D22D2A /* KeyboardSwitcherViewController.swift */,
-				9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */,
-				C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */,
-				9ADC459B22E1895D004C78C6 /* LanguageLMDetailViewController.swift */,
-				9ADC459C22E1895D004C78C6 /* LanguageLMDetailViewController.xib */,
-				C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */,
-				98C0B11817A22DB5007ECAFC /* PickerButtons */,
-				98C0B11C17A2302E007ECAFC /* TableViewCells */,
 			);
-			name = KeyboardPicker;
+			name = "In-App Picker UI";
 			path = LanguagePicker;
 			sourceTree = "<group>";
 		};
 		F273AB9615641D9300A47CEE /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				CE973D7F2484A07300F66045 /* KMP Packaging */,
-				CE71705923A9C7D300A924A1 /* Resource Management */,
 				165EB39F2098992D00040A69 /* Errors */,
 				C055E6E81F99EA320035C2DD /* Extension */,
-				C0452BA91F9F1CAF0064431A /* Model */,
+				CE25CCBB1F1DA72A005AA2BC /* Downloads */,
+				F2607212158FBCB500F37184 /* In-App Picker UI */,
+				CE1679D7265F5FE8008D6FCE /* Keyboard */,
+				CE973D7F2484A07300F66045 /* KMP Packaging */,
 				C024C9921FA6EB340060583B /* Notification */,
 				CE89641B24A4665700D5EB8E /* Queries */,
+				C0452BA91F9F1CAF0064431A /* Resource Data */,
+				CE71705923A9C7D300A924A1 /* Resource Management */,
 				9A60763E22892495003BCFBA /* Settings */,
-				CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */,
-				987F00041AB8FCB700998116 /* KeyboardMenuView */,
-				980CC8E119D51EF00089BB57 /* URLProtocol */,
-				98411308199D9ACD005BD609 /* SubKeysView */,
-				CE67D95F228A6ECF0029F2B5 /* KeymanWebView */,
-				98F9D6ED19545A620087AA43 /* InputViewController */,
-				989FDF8C193C1B0C00EECAF9 /* KeyPreviewView */,
-				F2607212158FBCB500F37184 /* KeyboardPicker */,
-				98A880EF177BF82600601A9E /* PopoverView */,
 				F273AB9E156440CD00A47CEE /* UITextField */,
 				F273AB9D156440BA00A47CEE /* UITextView */,
-				C0959CD31F99C44E00B616BC /* Constants.swift */,
-				C0A93A531F8B21240079948B /* Manager.swift */,
-				CE7A26D723CEEC630005955C /* Colors+Extension.swift */,
-				CE7A26DA23CEEF640005955C /* Colors.swift */,
-				C0B09EAD1FCFD10F002F39AF /* FontManager.swift */,
-				CEE0321224C58C90005BFC73 /* KeymanHosts.swift */,
-				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
-				C05B14321FD914870082A316 /* Log.swift */,
-				C08E698C1FDA392D0026056B /* Migrations.swift */,
-				CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */,
 				CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */,
+				CE7A26DA23CEEF640005955C /* Colors.swift */,
+				CE7A26D723CEEC630005955C /* Colors+Extension.swift */,
+				C0959CD31F99C44E00B616BC /* Constants.swift */,
+				CEE0321224C58C90005BFC73 /* KeymanHosts.swift */,
+				C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */,
+				C0A93A531F8B21240079948B /* Manager.swift */,
+				C05B14321FD914870082A316 /* Log.swift */,
 				CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */,
 				CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */,
 			);
@@ -1080,7 +990,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C06D372F1F81F4E100F61AE0 /* KeymanEngine.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1478,7 +1387,6 @@
 				CE7A26D923CEEC640005955C /* Colors+Extension.swift in Sources */,
 				CE1E1EC12303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift in Sources */,
 				C042ED5D1FC6A65A001D82F4 /* Version.swift in Sources */,
-				C0D3F35E1F9F33490055C7CF /* Options.swift in Sources */,
 				C06D37351F81F5C300F61AE0 /* HTTPDownloadRequest.swift in Sources */,
 				CE24ECF021B763740052D291 /* KeymanResponder+Types.swift in Sources */,
 				C0324B8F1F8750B700AF3785 /* TextView.swift in Sources */,
@@ -1511,11 +1419,9 @@
 				C040E50E1F85FF8A00901EE4 /* KeyPreviewView.swift in Sources */,
 				CEC0C6772410E049003E1BCD /* SentryManager.swift in Sources */,
 				9A079E3A223AFF3C00581263 /* KeyboardKeymanPackage.swift in Sources */,
-				C06D37401F81F5C400F61AE0 /* LanguageDetailViewController.swift in Sources */,
 				C0CB633C1FA6F61500617CDB /* Notifications.swift in Sources */,
 				CE867FF12485EE1500B2EAED /* KMPInfo.swift in Sources */,
 				C0EF3E7B1F95B65300CE9BD4 /* KeymanWebDelegate.swift in Sources */,
-				C06D37411F81F5C400F61AE0 /* LanguageViewController.swift in Sources */,
 				C06D37421F81F5C400F61AE0 /* KeyboardPickerButton.swift in Sources */,
 				165EB3A12098993900040A69 /* KeyboardError.swift in Sources */,
 				CE7ADD6623DE89FC00BC9A00 /* Alerts.swift in Sources */,
@@ -1549,8 +1455,6 @@
 				CE973D872484BBC200F66045 /* KMPLanguage.swift in Sources */,
 				CE89642124A468B200D5EB8E /* Queries+PackageVersion.swift in Sources */,
 				C06D37461F81F5C400F61AE0 /* PopoverView.swift in Sources */,
-				9A4609992242047400B0BFD1 /* LexicalModelAPICall.swift in Sources */,
-				C007C4651F9F52D8006461B9 /* LanguagesAPICall.swift in Sources */,
 				C024C9941FA6EB470060583B /* NotificationName.swift in Sources */,
 				C0C16A891FA8146300F090BA /* KeymanWebViewController.swift in Sources */,
 				CE973D8D2484DD1900F66045 /* KMPFile.swift in Sources */,
@@ -1684,7 +1588,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -1735,7 +1639,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -2181,7 +2085,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = KMEI.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/KeymanEngineDemo/KMEI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
@@ -2217,7 +2121,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -2436,7 +2340,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = KMEI.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/KeymanEngineDemo/KMEI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
@@ -2469,7 +2373,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = KMEI.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Demos/KeymanEngineDemo/KMEI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Summer Institute of Linguistics, Inc (SIL) (3YE4W86L3G)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;

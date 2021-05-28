@@ -51,7 +51,6 @@ public class SentryManager {
         return nil
       }
     }
-    //
 
     SentrySDK.start(options: options)
     _started = true

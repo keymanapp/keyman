@@ -16,7 +16,7 @@ public struct Keyboard: Codable {
   /// ID of the keyboard. Always matches the filename of the keyboard.
   public var id: String
 
-  /// Name of the keyboard `.js` file which should be appended to `Options.keyboardBaseURI`.
+  /// Name of the keyboard `.js` file.
   public var filename: String
 
   /// The keyboard is the recommended default for the language.
