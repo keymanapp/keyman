@@ -340,7 +340,7 @@ extension KeymanWebViewController {
 
     guard FileManager.default.fileExists(atPath: fileURL.path) else {
       let event = Sentry.Event(level: .error)
-      event.message = SentryMessage(formatted: "File missing for keyboard")
+      event.message = SentryMessage(formatted: "File missing for lexical model")
       event.extra = [ "id": lexicalModel.id, "file": fileURL ]
       if let packageID = lexicalModel.packageID {
         event.extra?["package"] = packageID
