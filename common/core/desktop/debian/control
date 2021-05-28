@@ -8,7 +8,7 @@ Uploaders:
  Eberhard Beilharz <eb1@sil.org>,
 Build-Depends:
  debhelper (>= 11),
- meson (>= 0.50),
+ meson (>= 0.45),
  ninja-build,
  cargo,
 Standards-Version: 4.5.1
