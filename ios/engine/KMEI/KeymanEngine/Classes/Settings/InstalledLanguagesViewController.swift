@@ -197,11 +197,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     } else {
       let selectionColor = UIView()
 
-      if #available(iOSApplicationExtension 11.0, *) {
-        selectionColor.backgroundColor = UIColor(named: "SelectionPrimary")
-      } else {
-        selectionColor.backgroundColor = Colors.selectionPrimary
-      }
+      selectionColor.backgroundColor = Colors.selectionPrimary
 
       if keyboards.count < 2 {
         cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
@@ -310,6 +306,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 
       switch(package.resourceType()) {
         case .keyboard:
+          Manager.shared.inputViewController.setShouldReload()
           msg = NSLocalizedString("notification-download-success-keyboard", bundle: engineBundle, comment: "")
         case .lexicalModel:
           msg = NSLocalizedString("notification-download-success-lexical-model", bundle: engineBundle, comment: "")

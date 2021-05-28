@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # set -e: Terminate script if a command returns an error
 set -e
@@ -60,6 +60,7 @@ CLEAN_ONLY=false
 CONFIG=Release
 DO_KMP_DOWNLOADS=false
 CODE_SIGN=
+DO_CODE_SIGN=true
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -77,7 +78,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-codesign)
             CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO ${DEV_TEAM:-} CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
-            DO_ARCHIVE=false
+            DO_CODE_SIGN=false
             ;;
         -no-archive)
             DO_ARCHIVE=false
@@ -283,8 +284,8 @@ if [ $DO_KEYMANAPP = true ]; then
   else
     # Time to prepare the deployment archive data.
     echo ""
-    echo "Preparing .ipa file for deployment."
-    xcodebuild $XCODEFLAGS_EXT -scheme Keyman \
+    echo "Preparing .xcarchive."
+    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -archivePath $ARCHIVE_PATH \
                 archive -allowProvisioningUpdates \
                 VERSION=$VERSION \
@@ -294,9 +295,12 @@ if [ $DO_KEYMANAPP = true ]; then
 
     assertDirExists "$ARCHIVE_PATH"
 
-    xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
-                -exportOptionsPlist exportAppStore.plist \
-                -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
+    if [ $DO_CODE_SIGN == true ]; then
+      echo "Preparing .ipa file for deployment"
+      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
+                  -exportOptionsPlist exportAppStore.plist \
+                  -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
+    fi
   fi
 
   echo ""

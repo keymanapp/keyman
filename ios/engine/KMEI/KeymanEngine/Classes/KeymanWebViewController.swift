@@ -61,6 +61,7 @@ class KeymanWebViewController: UIViewController {
   /// when predictive text is not active
   private var bannerImgPath: String = ""
 
+  var shouldReload: Bool = true
   var isLoading: Bool = false
 
   private var currentText: String = ""
@@ -569,17 +570,12 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       // Not usable by older iPhone models.
       AudioServicesPlaySystemSound(kSystemSoundID_MediumVibrate)
     } else { // if vibrationSupport == .taptic
-      if #available(iOSApplicationExtension 10.0, *) {
-        // Available with iPhone 7 and beyond, we can now produce nicely customized haptic feedback.
-        // We use this style b/c it's short, and in essence it is a minor UI element collision -
-        // a single key with blocked (erroneous) output.
-        // Oddly, is a closer match to SystemSoundID 1520 than 1521.
-        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle.heavy)
-        vibrator.impactOccurred()
-      } else {
-        // Fallback on earlier feedback style
-        AudioServicesPlaySystemSound(kSystemSoundID_MediumVibrate)
-      }
+      // Available with iPhone 7 and beyond, we can now produce nicely customized haptic feedback.
+      // We use this style b/c it's short, and in essence it is a minor UI element collision -
+      // a single key with blocked (erroneous) output.
+      // Oddly, is a closer match to SystemSoundID 1520 than 1521.
+      let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle.heavy)
+      vibrator.impactOccurred()
     }
   }
 }
@@ -616,11 +612,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     }
 
     setDeviceType(UIDevice.current.userInterfaceIdiom)
-    
-    let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
+
     var newKb = Manager.shared.currentKeyboard
 
-    if !shouldReloadKeyboard { // otherwise, we automatically reload anyway.
+    if !shouldReload { // otherwise, we automatically reload anyway.
       let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
       if newKb == nil {
         if let id = userData.currentKeyboardID {
@@ -642,7 +637,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
       _ = Manager.shared.setKeyboard(newKb!)
     }
 
-    // in case `shouldReloadKeyboard == true`.  Is set otherwise above.
+    // in case `shouldReload == true`.  Is set otherwise above.
     if(newKb == nil) {
       newKb = Defaults.keyboard
     }
@@ -655,10 +650,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     fixLayout()
 
     NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb!)
-    if shouldReloadKeyboard {
+    if shouldReload {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
-      Manager.shared.shouldReloadKeyboard = false
+      shouldReload = false
     }
   }
 

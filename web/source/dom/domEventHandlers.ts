@@ -524,6 +524,34 @@ namespace com.keyman.dom {
       super(keyman);
     }
 
+    private static selectTouch(e: TouchEvent): Touch {
+      /**
+       * During multi-touch event's, it's possible for one or more touches of said multi-touch
+       * to be against irrelevant parts of the page.  We only want to consider touches against
+       * valid OutputTargets - against elements of the page that KMW can attach to.
+       * With touch active... that's a TouchAliasElement.
+       */
+      let isValidTouch = function(touch: Touch, target: EventTarget): boolean {
+        return e.target == target && !!(findTouchAliasTarget(touch.target as HTMLElement));
+      }
+
+      // The event at least tells us the event's target, which can be used to help check
+      // whether or not individual `Touch`es may be related to this specific event for
+      // an ongoing multitouch scenario.
+      let target = e.target;
+      
+      // Find the first touch affected by this event that matches the current target.
+      for(let i=0; i < e.changedTouches.length; i++) {
+        if(isValidTouch(e.changedTouches[i], target)) {
+          return e.changedTouches[i];
+        }
+      }
+
+      // Shouldn't be possible.  Just in case, we'd prefer a silent failure that allows
+      // callers to silently abort.
+      throw new Error("Could not select valid Touch for event.");
+    }
+
     /**
      * Handle receiving focus by simulated input field 
      *      
@@ -538,7 +566,12 @@ namespace com.keyman.dom {
       };
 
       if(e && dom.Utils.instanceof(e, "TouchEvent")) {
-        tEvent=(e as TouchEvent).touches[0];
+        try {
+          tEvent=DOMTouchHandlers.selectTouch(e as TouchEvent);
+        } catch(err) {
+          console.warn(err);
+          return;
+        }
       } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
         tEvent={clientX:0, clientY:0}
 
@@ -796,9 +829,16 @@ namespace com.keyman.dom {
 
       // Identify the target from the touch list or the event argument (IE 10 only)
       var target: HTMLElement;
+      let touch: Touch;
       
       if(dom.Utils.instanceof(e, "TouchEvent")) {
-        target = (e as TouchEvent).targetTouches[0].target as HTMLElement;
+        try {
+          touch=DOMTouchHandlers.selectTouch(e as TouchEvent);
+        } catch(err) {
+          console.warn(err);
+          return;
+        }
+        target = touch.target as HTMLElement;
       } else {
         target = e.target as HTMLElement;
       }
@@ -816,8 +856,8 @@ namespace com.keyman.dom {
       var x, y;
 
       if(dom.Utils.instanceof(e, "TouchEvent")) {
-        x = (e as TouchEvent).touches[0].screenX;
-        y = (e as TouchEvent).touches[0].screenY;
+        x = touch.screenX;
+        y = touch.screenY;
       } else {
         x = (e as MouseEvent).screenX;
         y = (e as MouseEvent).screenY;

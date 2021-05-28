@@ -11,6 +11,7 @@
 * Coreutils (`brew install coreutils`)
 * sentry-cli (`brew install getsentry/tools/sentry-cli`) to utilize Sentry-based error reporting
 * jq (`brew install jq`)
+* `bash` (`brew install bash`)
 
 Note that the `brew` command mentioned above is Homebrew, which may be found at https://brew.sh/.
 While not strictly necessary, it certainly simplifies installing the prerequisites above.

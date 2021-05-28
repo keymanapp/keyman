@@ -43,16 +43,7 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   func reloadKeymanHelp() {
-    if let networkStatus = networkReachable?.connection {
-      switch networkStatus {
-      case Reachability.Connection.none, Reachability.Connection.unavailable:
-        loadFromLocal()
-      default:
-        loadFromServer()
-      }
-    } else {
-      loadFromLocal()
-    }
+    loadFromLocal()
   }
 
   private func loadFromLocal() {
@@ -63,6 +54,8 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     webView.loadRequest(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
 
+  // Currently unused, as we haven't yet added a toggle to allow users to choose online
+  // over the default of offline.
   private func loadFromServer() {
     let appVersion = Version.current.majorMinor
     let url =  "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)/"

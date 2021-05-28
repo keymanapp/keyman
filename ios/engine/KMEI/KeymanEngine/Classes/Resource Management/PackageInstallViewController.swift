@@ -352,11 +352,11 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
 
     // Always reload after installing or updating resources.
-    Manager.shared.shouldReloadKeyboard = true
+    Manager.shared.inputViewController.setShouldReload()
     self.pickingCompletionHandler(selectedResources.map { $0.typedFullID })
 
     // Prevent swipe dismissal.
-    if #available(iOSApplicationExtension 13.0, *) {
+    if #available(iOS 13.0, *) {
       self.isModalInPresentation = true
     }
 
@@ -375,7 +375,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     // First, show the package's welcome - if it exists.
     if let welcomeVC = PackageWebViewController(for: package, page: .welcome) {
       // Prevent swipe dismissal.
-      if #available(iOSApplicationExtension 13.0, *) {
+      if #available(iOS 13.0, *) {
         welcomeVC.isModalInPresentation = true
       }
 
@@ -467,11 +467,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     } else {
       let selectionColor = UIView()
 
-      if #available(iOSApplicationExtension 11.0, *) {
-        selectionColor.backgroundColor = UIColor(named: "SelectionPrimary")
-      } else {
-        selectionColor.backgroundColor = Colors.selectionPrimary
-      }
+      selectionColor.backgroundColor = Colors.selectionPrimary
 
       cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
       cell.selectedBackgroundView = selectionColor

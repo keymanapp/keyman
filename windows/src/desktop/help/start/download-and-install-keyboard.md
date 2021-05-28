@@ -64,8 +64,7 @@ Here's how to download and install a Keyman keyboard within Keyman:
     computer.
 
     **Note:** If a keyboard with the same name is already installed, Keyman will
-    ask you if you want to replace the old keyboard or cancel the
-    installation.
+    automatically replace it.
 
 9.  You may be prompted by User Account Control to allow
     Keyman to make changes to your computer -- click 'Yes'.
@@ -118,8 +117,7 @@ how:
     **Note:** Install installs the keyboard for anyone who can log on to your computer.
 
     **Note:** If a keyboard with the same name is already installed, Keyman will
-    ask you if you want to replace the old keyboard or cancel the
-    installation.
+    automatically replace it.
 
 8.  Click OK to save your settings and exit Keyman Configuration.
 

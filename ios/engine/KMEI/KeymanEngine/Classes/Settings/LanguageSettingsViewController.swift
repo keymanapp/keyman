@@ -151,10 +151,9 @@ class LanguageSettingsViewController: UITableViewController {
           doPredictionsSwitch!.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
           doPredictionsSwitch!.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doPredictionsSwitch!)
-          if #available(iOSApplicationExtension 9.0, *) {
-            doPredictionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-            doPredictionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-          }
+
+          doPredictionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          doPredictionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         } else if 1 == indexPath.row {
           correctionsCell = cell
           cell.accessoryType = .none
@@ -167,10 +166,9 @@ class LanguageSettingsViewController: UITableViewController {
           doCorrectionsSwitch!.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
           doCorrectionsSwitch!.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doCorrectionsSwitch!)
-          if #available(iOSApplicationExtension 9.0, *) {
-            doCorrectionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-            doCorrectionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-          }
+
+          doCorrectionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          doCorrectionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
 
           // Disable interactivity if the prediction toggle is set to 'off'.
           doCorrectionsSwitch!.isHidden = !userDefaults.predictSettingForLanguage(languageID: self.language.id)
