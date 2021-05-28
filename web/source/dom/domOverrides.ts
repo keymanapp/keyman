@@ -17,9 +17,7 @@ namespace com.keyman.dom {
   }
 
   let headlessRuleBehaviorFinalize = text.RuleBehavior.prototype.finalize;
-  text.RuleBehavior.prototype.finalize = function(this: text.RuleBehavior, processor: text.KeyboardProcessor) {
-    let outputTarget = this.transcription.keystroke.Ltarg;
-
+  text.RuleBehavior.prototype.finalize = function(this: text.RuleBehavior, processor: text.KeyboardProcessor, outputTarget: text.OutputTarget) {
     // Execute the standard baseline stuff first.
     headlessRuleBehaviorFinalize.call(this, processor);
 

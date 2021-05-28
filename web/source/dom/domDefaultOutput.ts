@@ -24,14 +24,14 @@ namespace com.keyman.dom {
   /**
    * applyCommand - used when a RuleBehavior represents a non-text "command" within the Engine.
    */
-  DefaultOutput.applyCommand = function(Lkc: KeyEvent): void {
+  DefaultOutput.applyCommand = function(Lkc: KeyEvent, outputTarget: text.OutputTarget): void {
     let code = DefaultOutput.codeForEvent(Lkc);
     let domManager = com.keyman.singleton.domManager;
 
     let hideCaret: () => void;
-    if(Lkc.Ltarg instanceof com.keyman.dom.targets.TouchAlias) {
+    if(outputTarget instanceof com.keyman.dom.targets.TouchAlias) {
       hideCaret = function() {
-        let target = Lkc.Ltarg as com.keyman.dom.targets.TouchAlias;
+        let target = outputTarget as com.keyman.dom.targets.TouchAlias;
         target.root.hideCaret();
       }
     } else {
@@ -53,6 +53,6 @@ namespace com.keyman.dom {
         break;
     }
 
-    coreApplyCommand(Lkc);
+    coreApplyCommand(Lkc, outputTarget);
   }
 }

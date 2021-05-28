@@ -76,7 +76,7 @@ namespace com.keyman.text {
 
       if(this.triggersDefaultCommand) {
         let keyEvent = this.transcription.keystroke;
-        DefaultOutput.applyCommand(keyEvent);
+        DefaultOutput.applyCommand(keyEvent, outputTarget);
       }
 
       if(processor.warningLogger && this.warningLog) {

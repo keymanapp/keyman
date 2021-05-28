@@ -24,17 +24,17 @@ namespace com.keyman.text {
      * Serves as a default keycode lookup table.  This may be referenced safely by mnemonic handling without fear of side-effects.
      * Also used by Processor.defaultRuleBehavior to generate output after filtering for special cases.
      */
-    public static forAny(Lkc: KeyEvent, isMnemonic: boolean) {
+    public static forAny(Lkc: KeyEvent, isMnemonic: boolean, ruleBehavior?: RuleBehavior) {
       var char = '';
 
       // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
-      if((char = DefaultOutput.forSpecialEmulation(Lkc)) != null) {
+      if((char = DefaultOutput.forSpecialEmulation(Lkc, ruleBehavior)) != null) {
         return char;
-      } else if(!isMnemonic && ((char = DefaultOutput.forNumpadKeys(Lkc)) != null)) {
+      } else if(!isMnemonic && ((char = DefaultOutput.forNumpadKeys(Lkc, ruleBehavior)) != null)) {
         return char;
-      } else if((char = DefaultOutput.forUnicodeKeynames(Lkc)) != null) {
+      } else if((char = DefaultOutput.forUnicodeKeynames(Lkc, ruleBehavior)) != null) {
         return char;
-      } else if((char = DefaultOutput.forBaseKeys(Lkc)) != null) {
+      } else if((char = DefaultOutput.forBaseKeys(Lkc, ruleBehavior)) != null) {
         return char;
       } else {
         // // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
@@ -76,7 +76,7 @@ namespace com.keyman.text {
      * 
      * Note:  is extended by DOM-aware KeymanWeb code.
      */
-    public static applyCommand(Lkc: KeyEvent): void {
+    public static applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
       // Notes for potential default-handling extensions:
       // 
       // switch(code) {
@@ -107,7 +107,7 @@ namespace com.keyman.text {
      * Codes matched here generally have default implementations when in a browser but require emulation
      * for 'synthetic' `OutputTarget`s like `Mock`s, which have no default text handling.
      */
-    public static forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
+    public static forSpecialEmulation(Lkc: KeyEvent, ruleBehavior?: RuleBehavior): EmulationKeystrokes {
       let code = DefaultOutput.codeForEvent(Lkc);
 
       switch(code) {
@@ -123,7 +123,7 @@ namespace com.keyman.text {
     }
 
     // Should not be used for mnenomic keyboards.  forAny()'s use of this method checks first.
-    public static forNumpadKeys(Lkc: KeyEvent) {
+    public static forNumpadKeys(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
       // Translate numpad keystrokes into their non-numpad equivalents
       if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"]) {
         // Number pad, numlock on
