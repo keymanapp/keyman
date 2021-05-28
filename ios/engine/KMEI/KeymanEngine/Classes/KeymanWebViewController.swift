@@ -273,6 +273,17 @@ extension KeymanWebViewController {
       stub["KP"] = packageID
     }
 
+    guard !FileManager.default.fileExists(atPath: stub["KF"]! as! String) else {
+      let event = Sentry.Event(level: .error)
+      event.message = SentryMessage(formatted: "File missing for keyboard")
+      event.extra = [ "id": keyboard.id, "file": stub["KF"] as! String ]
+      if let packageID = keyboard.packageID {
+        event.extra?["package"] = packageID
+      }
+      SentryManager.captureAndLog(event)
+      return
+    }
+
     let displayFont = fontObject(from: keyboard.font, keyboard: keyboard, isOsk: false)
     let oskFont = fontObject(from: keyboard.oskFont, keyboard: keyboard, isOsk: true) ?? displayFont
     if let displayFont = displayFont {
@@ -321,6 +332,17 @@ extension KeymanWebViewController {
       "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
       "path": storage.lexicalModelURL(for: lexicalModel).absoluteString
     ]
+
+    guard !FileManager.default.fileExists(atPath: stub["path"]! as! String) else {
+      let event = Sentry.Event(level: .error)
+      event.message = SentryMessage(formatted: "File missing for keyboard")
+      event.extra = [ "id": lexicalModel.id, "file": stub["path"] as! String ]
+      if let packageID = lexicalModel.packageID {
+        event.extra?["package"] = packageID
+      }
+      SentryManager.captureAndLog(event)
+      return
+    }
   
     let data: Data
     do {
