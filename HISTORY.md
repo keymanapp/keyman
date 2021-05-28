@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.57 alpha 2021-05-28
+
+* chore(ios): shift to use of XCFrameworks (#5107)
+* chore(ios): dependencies - update sentry-cocoa to 6.2.1 (#5120)
+* change(ios): minimum iOS version -> 12.1 (#5168)
+* chore(ios): renames problematic app selectors (#5173)
+
 ## 15.0.56 alpha 2021-05-27
 
 * fix(ios): link, but NOT embed KeymanEngine.xcframework in app exs (#5164)

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Sentry
 
 private let toolbarButtonTag = 100
 
@@ -305,6 +306,7 @@ class LanguageSettingsViewController: UITableViewController {
           break
         case .error(let error):
           if let error = error {
+            // Note: Errors may result from network issues.
             log.error(String(describing: error))
           }
         case .success(let package, let fullID):
@@ -342,7 +344,7 @@ class LanguageSettingsViewController: UITableViewController {
 
     // If user defaults for keyboards list does not exist, do nothing.
     guard let globalUserKeyboards = userData.userKeyboards else {
-      log.error("no keyboards in the global keyboards list!")
+      SentryManager.captureAndLog("no keyboards in the global keyboards list!")
       return nil
     }
 
@@ -352,6 +354,11 @@ class LanguageSettingsViewController: UITableViewController {
       }
       return index
     } else {
+      let event = Sentry.Event(level: .debug)
+      event.message = SentryMessage(formatted: "Keyboard index requested for uninstalled keyboard")
+      event.extra = ["id": matchingFullID]
+      SentrySDK.capture(event: event)
+
       log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
       return nil
     }
@@ -364,7 +371,7 @@ class LanguageSettingsViewController: UITableViewController {
 
     // If user defaults for keyboards list does not exist, do nothing.
     guard let globalUserKeyboards = userData.userKeyboards else {
-      log.error("no keyboards in the global keyboards list!")
+      SentryManager.captureAndLog("no keyboards in the global keyboards list!")
       return
     }
 
@@ -378,6 +385,11 @@ class LanguageSettingsViewController: UITableViewController {
       let infoView = ResourceInfoViewController(for: thisKb, mayDelete: mayDelete)
       navigationController?.pushViewController(infoView, animated: true)
     } else {
+      let event = Sentry.Event(level: .debug)
+      event.message = SentryMessage(formatted: "Keyboard index requested for uninstalled keyboard")
+      event.extra = ["id": matchingFullID]
+      SentrySDK.capture(event: event)
+
       log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
       return
     }

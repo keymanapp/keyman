@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Sentry
 
 private let userInfoKey = "value"
 
@@ -41,7 +42,7 @@ public extension NotificationCenter {
       if let value = notification.userInfo?[userInfoKey] as? T {
         block(value)
       } else {
-        log.error("Unexpected userInfo in notification: \(String(describing: notification))")
+        SentryManager.captureAndLog("Unexpected userInfo in notification: \(String(describing: notification))")
       }
     }
     return NotificationObserver(observer: observer, center: self)

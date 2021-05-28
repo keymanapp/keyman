@@ -406,7 +406,9 @@ public class KeymanPackage {
         }
       }
     } catch {
-      log.error("error parsing keyman package: \(error)")
+      // It's not an app or engine error when the package itself is invalid.
+      // Definitely worth noting, though.
+      SentryManager.breadcrumbAndLog("error parsing keyman package: \(error)", sentryLevel: .error)
     }
     
     return nil
