@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.56 alpha 2021-05-27
+
+* fix(ios): link, but NOT embed KeymanEngine.xcframework in app exs (#5164)
+* feat(common): offline help css (#5157)
+* change(ios): help always offline (#5158)
+
+## 15.0.55 alpha 2021-05-27
+
+* fix(ios): artifact upload preparation (#5160)
+
 ## 15.0.54 alpha 2021-05-26
 
 * docs(windows): Initial commit - README.md (#5119)

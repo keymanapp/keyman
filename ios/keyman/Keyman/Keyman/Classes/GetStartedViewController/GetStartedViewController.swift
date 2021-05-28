@@ -114,17 +114,14 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       }
     case 1:
       cell.textLabel?.text = NSLocalizedString("tutorial-system-keyboard", comment: "")
-      if #available(iOS 11.0, *) {
-        // We can expedite this via near-direct settings link.
-        // So, let's add the one extra needed detail to our detail text.
-        let keyboardsMenuText = NSLocalizedString("ios-settings-keyboards", comment: "")
-        let enableText = String.init(format: NSLocalizedString("toggle-to-enable", comment: ""), "Keyman")
-        // Probably needs to be i18n-adjusted too.
-        let menuBreadcrumbing = NSLocalizedString("menu-breadcrumbing", comment: "")
-        cell.detailTextLabel?.text = String.init(format: menuBreadcrumbing, keyboardsMenuText, enableText)
-      } else {
-        cell.detailTextLabel?.text = ""
-      }
+      // We can expedite this via near-direct settings link.
+      // So, let's add the one extra needed detail to our detail text.
+      let keyboardsMenuText = NSLocalizedString("ios-settings-keyboards", comment: "")
+      let enableText = String.init(format: NSLocalizedString("toggle-to-enable", comment: ""), "Keyman")
+      // Probably needs to be i18n-adjusted too.
+      let menuBreadcrumbing = NSLocalizedString("menu-breadcrumbing", comment: "")
+      cell.detailTextLabel?.text = String.init(format: menuBreadcrumbing, keyboardsMenuText, enableText)
+
       if !AppDelegate.isKeymanEnabledSystemWide() {
         cell.accessoryType = .none
       } else {
@@ -155,8 +152,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       mainViewController.dismissGetStartedView(nil)
       mainViewController.showInstalledLanguages()
     case 1:
-      if #available(iOS 11.0, *),  // if "Keyboards" is an option in our app's settings menu
-         let appSettings = URL(string: UIApplication.openSettingsURLString) {
+      if let appSettings = URL(string: UIApplication.openSettingsURLString) {
         UniversalLinks.externalLinkLauncher?(appSettings)
       } else {
         let setUpVC = SetUpViewController()
