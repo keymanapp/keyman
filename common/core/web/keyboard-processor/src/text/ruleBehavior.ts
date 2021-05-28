@@ -44,12 +44,10 @@ namespace com.keyman.text {
      */
     predictionPromise?: Promise<Suggestion[]>;
 
-    finalize(processor: KeyboardProcessor) {
+    finalize(processor: KeyboardProcessor, outputTarget: OutputTarget) {
       if(!this.transcription) {
         throw "Cannot finalize a RuleBehavior with no transcription.";
       }
-
-      let outputTarget = this.transcription.keystroke.Ltarg;
 
       if(processor.beepHandler && this.beep) {
         processor.beepHandler(outputTarget);

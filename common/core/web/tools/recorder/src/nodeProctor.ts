@@ -55,7 +55,6 @@ namespace KMWRecorder {
             // Use the keystroke's stored data to reconstruct the KeyEvent.
             keyEvent = {
               Lcode: keystroke.keyCode,
-              Ltarg: target,
               Lmodifiers: keystroke.modifiers,
               LmodifierChange: keystroke.modifierChanged,
               vkCode: keystroke.vkCode,
@@ -67,11 +66,10 @@ namespace KMWRecorder {
             }
           } else if(keystroke instanceof RecordedSyntheticKeystroke) {
             let key = this.keyboard.layout(this.device.formFactor).getLayer(keystroke.layer).getKey(keystroke.keyName);
-            keyEvent = key.constructKeyEvent(processor, target, this.device);
+            keyEvent = key.constructKeyEvent(processor, this.device);
           }
 
           // Fill in the final details of the KeyEvent...
-          keyEvent.Ltarg = target;
           keyEvent.device = this.device;
 
           // And now, execute the keystroke!

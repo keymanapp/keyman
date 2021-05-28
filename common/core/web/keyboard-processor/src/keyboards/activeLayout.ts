@@ -162,7 +162,6 @@ namespace com.keyman.keyboards {
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: text.KeyEvent = {
-        Ltarg: null, // set later, in constructKeyEvent.
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: keyName ? text.Codes.keyCodes[keyName] : 0,
@@ -195,7 +194,7 @@ namespace com.keyman.keyboards {
         if(!keyboard.definesPositionalOrMnemonic) {
           // Not the best pattern, but currently safe - we don't look up any properties of any of the
           // arguments in this use case, and the object's scope is extremely limited.
-          Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(this.constructKeyEvent(null, null, null));
+          Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(this.constructKeyEvent(null, null));
           Lkc.LisVirtualKey=false;
         }
       }
@@ -203,10 +202,9 @@ namespace com.keyman.keyboards {
       this.baseKeyEvent = Lkc;
     }
 
-    constructKeyEvent(keyboardProcessor: text.KeyboardProcessor, target: text.OutputTarget, device: utils.DeviceSpec): text.KeyEvent {
+    constructKeyEvent(keyboardProcessor: text.KeyboardProcessor, device: utils.DeviceSpec): text.KeyEvent {
       // Make a deep copy of our preconstructed key event, filling it out from there.
       let Lkc = utils.deepCopy(this.baseKeyEvent);
-      Lkc.Ltarg = target;
       Lkc.device = device;
 
       if(this.isMnemonic) {

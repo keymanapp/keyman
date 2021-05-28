@@ -108,8 +108,7 @@ namespace com.keyman.text {
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultRuleBehavior(Lkc: KeyEvent): RuleBehavior {
-      let outputTarget = Lkc.Ltarg;
+    defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       let preInput = Mock.from(outputTarget);
       let ruleBehavior = new RuleBehavior();
 
@@ -154,7 +153,7 @@ namespace com.keyman.text {
           special = DefaultOutput.forSpecialEmulation(Lkc)
           if(special == EmulationKeystrokes.Backspace) {
             // A browser's default backspace may fail to delete both parts of an SMP character.
-            this.keyboardInterface.defaultBackspace(Lkc.Ltarg);
+            this.keyboardInterface.defaultBackspace(outputTarget);
           } else if(special || DefaultOutput.isCommand(Lkc)) { // Filters out 'commands' like TAB.
             // We only do the "for special emulation" cases under the condition above... aside from backspace
             // Let the browser handle those.
@@ -236,7 +235,7 @@ namespace com.keyman.text {
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
-        matchBehavior = this.defaultRuleBehavior(keyEvent);
+        matchBehavior = this.defaultRuleBehavior(keyEvent, outputTarget);
 
         this.keyboardInterface.activeTargetOutput = null;
       }
@@ -259,7 +258,6 @@ namespace com.keyman.text {
         // To facilitate storing relevant commands, we should probably reverse-lookup
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
-        mappingEvent.Ltarg = new Mock(); // helps prevent breakage for mnemonics.
         mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
         var mappedChar: string = DefaultOutput.forAny(mappingEvent, true);
         
@@ -639,9 +637,7 @@ namespace com.keyman.text {
 
     // Returns true if the key event is a modifier press, allowing keyPress to return selectively
     // in those cases.
-    doModifierPress(Levent: KeyEvent, isKeyDown: boolean): boolean {
-      let outputTarget = Levent.Ltarg;
-
+    doModifierPress(Levent: KeyEvent, outputTarget: OutputTarget, isKeyDown: boolean): boolean {
       if(!this.activeKeyboard) {
         return false;
       }
