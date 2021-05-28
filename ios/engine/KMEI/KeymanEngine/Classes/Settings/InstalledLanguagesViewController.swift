@@ -173,7 +173,9 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       if let langName = keyboardLanguages[l]?.name {
         log.info("keyboard language \(l) \(langName) has lexical model")
       } else {
-        log.error("lexical model language \(l) has no keyboard installed!")
+        // Legacy behavior:  we automatically install all MTNT language codes, even without
+        // a matching keyboard for the more specific variant(s).
+        SentryManager.breadcrumbAndLog("lexical model language \(l) has no keyboard installed!")
       }
     }
 
@@ -443,6 +445,7 @@ extension InstalledLanguagesViewController {
         case .cancelled:
           break
         case .error(let error):
+          // Note: Errors may result from network issues.
           if let error = error {
             log.error(String(describing: error))
           }

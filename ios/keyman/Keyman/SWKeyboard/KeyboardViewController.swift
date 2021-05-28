@@ -63,7 +63,7 @@ class KeyboardViewController: InputViewController {
   func setupTopBarImage(size: CGSize) {
     let imgPath = getTopBarImage(size: size)
     guard let path = imgPath else {
-      log.error("No image specified for the image banner!")
+      SentryManager.captureAndLog("No image specified for the image banner!")
       return
     }
 
