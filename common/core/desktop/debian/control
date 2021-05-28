@@ -8,8 +8,9 @@ Uploaders:
  Eberhard Beilharz <eb1@sil.org>,
 Build-Depends:
  debhelper (>= 11),
- meson (>= 0.45),
+ meson (>= 0.50),
  ninja-build,
+ cargo,
 Standards-Version: 4.5.1
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman/tree/master/common/core/desktop
