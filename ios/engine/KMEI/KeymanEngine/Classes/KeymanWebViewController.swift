@@ -261,12 +261,13 @@ extension KeymanWebViewController {
   }
 
   func setKeyboard(_ keyboard: InstallableKeyboard) throws  {
+    let fileURL = storage.keyboardURL(for: keyboard)
     var stub: [String: Any] = [
       "KI": "Keyboard_\(keyboard.id)",
       "KN": keyboard.name,
       "KLC": keyboard.languageID,
       "KL": keyboard.languageName,
-      "KF": storage.keyboardURL(for: keyboard).absoluteString
+      "KF": fileURL.absoluteString
     ]
 
     if let packageID = keyboard.packageID {
@@ -276,10 +277,10 @@ extension KeymanWebViewController {
     // Warning:  without special handling, any `guard` that fails here can trigger an
     // infinite keyboard reload, as the keyboard page itself will note that the keyboard
     // failed to initialize properly.
-    guard !FileManager.default.fileExists(atPath: stub["KF"]! as! String) else {
+    guard FileManager.default.fileExists(atPath: fileURL.path) else {
       let event = Sentry.Event(level: .error)
       event.message = SentryMessage(formatted: "File missing for keyboard")
-      event.extra = [ "id": keyboard.id, "file": stub["KF"] as! String ]
+      event.extra = [ "id": keyboard.id, "file": fileURL ]
       if let packageID = keyboard.packageID {
         event.extra?["package"] = packageID
       }
@@ -330,16 +331,17 @@ extension KeymanWebViewController {
   }
 
   func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) throws {
+    let fileURL = storage.lexicalModelURL(for: lexicalModel)
     let stub: [String: Any] = [
       "id": lexicalModel.id,
       "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
-      "path": storage.lexicalModelURL(for: lexicalModel).absoluteString
+      "path": fileURL.absoluteString
     ]
 
-    guard !FileManager.default.fileExists(atPath: stub["path"]! as! String) else {
+    guard FileManager.default.fileExists(atPath: fileURL.path) else {
       let event = Sentry.Event(level: .error)
       event.message = SentryMessage(formatted: "File missing for keyboard")
-      event.extra = [ "id": lexicalModel.id, "file": stub["path"] as! String ]
+      event.extra = [ "id": lexicalModel.id, "file": fileURL ]
       if let packageID = lexicalModel.packageID {
         event.extra?["package"] = packageID
       }
@@ -666,13 +668,16 @@ extension KeymanWebViewController: KeymanWebDelegate {
         do {
           var defaultWasMissing = false
           // Ensure the default keyboard is installed in this case.
-          if !(Storage.active.userDefaults.userKeyboards?.contains(where: {$0.fullID == Defaults.keyboardID }) ?? true) {
+          if !(Storage.active.userDefaults.userKeyboards?.contains(where: {$0.fullID == Defaults.keyboardID }) ?? true) ||
+            !FileManager.default.fileExists(atPath: Storage.active.keyboardURL(for: Defaults.keyboard).path) {
             defaultWasMissing = true
             try Storage.active.installDefaultKeyboard(from: Resources.bundle)
           }
 
           // Ensures we don't infinitely try to reload the keyboard.
           if(defaultWasMissing || newKb!.fullID != Defaults.keyboard.fullID) {
+            // Be sure to force a reset again.
+            Manager.shared.currentKeyboardID = nil
             _ = Manager.shared.setKeyboard(Defaults.keyboard)
           }
         } catch {
