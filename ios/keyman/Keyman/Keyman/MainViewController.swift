@@ -83,11 +83,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
     // Setup Notifications
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
+    NotificationCenter.default.addObserver(self, selector: #selector(self.onKeyboardWillShow),
         name: UIResponder.keyboardWillShowNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidShow),
+    // `keyboardDidShow` apparently matches an internal Apple API and will fail an app submission.
+    // So, cheap workaround:  just prefix the thing.
+    NotificationCenter.default.addObserver(self, selector: #selector(self.onKeyboardDidShow),
         name: UIResponder.keyboardDidShowNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
+    NotificationCenter.default.addObserver(self, selector: #selector(self.onKeyboardWillHide),
         name: UIResponder.keyboardWillHideNotification, object: nil)
     keyboardLoadedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardLoaded,
@@ -387,19 +389,19 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     return navigationController!.navigationBar.frame.height
   }
 
-  @objc func keyboardWillShow(_ notification: Notification) {
+  @objc func onKeyboardWillShow(_ notification: Notification) {
     _ = dismissDropDownMenu()
     resizeViews(withKeyboardVisible: true)
   }
 
-  @objc func keyboardDidShow(_ notification: Notification) {
+  @objc func onKeyboardDidShow(_ notification: Notification) {
     // Workaround to display overlay window above keyboard
     let windows = UIApplication.shared.windows
     let lastWindow = windows.last
     overlayWindow.windowLevel = lastWindow!.windowLevel + 1
   }
 
-  @objc func keyboardWillHide(_ notification: Notification) {
+  @objc func onKeyboardWillHide(_ notification: Notification) {
     resizeViews(withKeyboardVisible: false)
   }
 
@@ -463,7 +465,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navigationItem.rightBarButtonItem = nil
       setNavBarButtons()
       if wasKeyboardVisible {
-        perform(#selector(self.showKeyboard), with: nil, afterDelay: 0.75)
+        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
       }
       if shouldShowGetStarted {
         perform(#selector(self.showGetStartedView), with: nil, afterDelay: 0.75)
@@ -816,7 +818,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
   }
 
-  @objc func showKeyboard() {
+  // showKeyboard matches an internal Apple API, so it's not available for use as a selector.
+  @objc func displayKeyboard() {
     textView.becomeFirstResponder()
   }
 
