@@ -269,7 +269,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   /// Set the current keyboard.
   ///
-  /// - Throws: error if the keyboard was unchanged
+  /// - Returns: `false` if the requested keyboard could not be set
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
     // KeymanWebViewController relies upon this method to activate the keyboard after a page reload,
     // and as a system keyboard, the controller is rebuilt each time the keyboard is loaded.
@@ -279,7 +279,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if kb.fullID == currentKeyboardID && !self.isSystemKeyboard && !inputViewController.shouldReload {
       SentryManager.breadcrumbAndLog("Keyboard unchanged: \(kb.fullID)")
       return false
-     // throw KeyboardError.unchanged
     }
 
     SentryManager.breadcrumbAndLog("Setting language: \(kb.fullID)")
@@ -293,7 +292,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: oskFontFilename)!)
     }
 
-    inputViewController.setKeyboard(kb)
+    do {
+      try inputViewController.setKeyboard(kb)
+    } catch {
+      // Here, errors are logged by the error's thrower.
+      return false
+    }
 
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
     userData.currentKeyboardID = kb.fullID
@@ -372,7 +376,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     
     currentLexicalModelID = lm.fullID
     
-    inputViewController.registerLexicalModel(lm)
+    do {
+      try inputViewController.registerLexicalModel(lm)
+    } catch {
+      // Here, errors are logged by the error's thrower.
+      return false
+    }
     
     if isKeymanHelpOn {
       inputViewController.showHelpBubble(afterDelay: 1.5)

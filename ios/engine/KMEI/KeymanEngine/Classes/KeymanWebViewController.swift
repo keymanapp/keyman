@@ -260,7 +260,7 @@ extension KeymanWebViewController {
     ]
   }
 
-  func setKeyboard(_ keyboard: InstallableKeyboard) {
+  func setKeyboard(_ keyboard: InstallableKeyboard) throws  {
     var stub: [String: Any] = [
       "KI": "Keyboard_\(keyboard.id)",
       "KN": keyboard.name,
@@ -273,6 +273,9 @@ extension KeymanWebViewController {
       stub["KP"] = packageID
     }
 
+    // Warning:  without special handling, any `guard` that fails here can trigger an
+    // infinite keyboard reload, as the keyboard page itself will note that the keyboard
+    // failed to initialize properly.
     guard !FileManager.default.fileExists(atPath: stub["KF"]! as! String) else {
       let event = Sentry.Event(level: .error)
       event.message = SentryMessage(formatted: "File missing for keyboard")
@@ -281,7 +284,7 @@ extension KeymanWebViewController {
         event.extra?["package"] = packageID
       }
       SentryManager.captureAndLog(event)
-      return
+      throw KeyboardError.fileMissing
     }
 
     let displayFont = fontObject(from: keyboard.font, keyboard: keyboard, isOsk: false)
@@ -304,7 +307,7 @@ extension KeymanWebViewController {
       event.extra!["package"] = stub["KP"]
 
       SentryManager.captureAndLog(event)
-      return
+      throw KeyboardError.keyboardLoadingError
     }
     guard let stubString = String(data: data, encoding: .utf8) else {
       let event = Sentry.Event(level: .error)
@@ -314,7 +317,7 @@ extension KeymanWebViewController {
       event.extra!["package"] = stub["KP"]
 
       SentryManager.captureAndLog(event)
-      return
+      throw KeyboardError.keyboardLoadingError
     }
 
     SentryManager.breadcrumbAndLog("Keyboard stub built for \(keyboard.id)", logLevel: XCGLogger.Level.none)
@@ -326,7 +329,7 @@ extension KeymanWebViewController {
     webView!.evaluateJavaScript("keyman.modelManager.deregister(\"\(lexicalModel.id)\")")
   }
 
-  func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+  func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) throws {
     let stub: [String: Any] = [
       "id": lexicalModel.id,
       "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
@@ -341,7 +344,7 @@ extension KeymanWebViewController {
         event.extra?["package"] = packageID
       }
       SentryManager.captureAndLog(event)
-      return
+      throw KeyboardError.fileMissing
     }
   
     let data: Data
@@ -354,7 +357,7 @@ extension KeymanWebViewController {
       event.extra!["id"] = stub["id"]
 
       SentryManager.captureAndLog(event)
-      return
+      throw KeyboardError.lexicalModelLoadingError
     }
     guard let stubString = String(data: data, encoding: .utf8) else {
       let event = Sentry.Event(level: .error)
@@ -363,7 +366,7 @@ extension KeymanWebViewController {
       event.extra!["id"] = stub["id"]
 
       SentryManager.captureAndLog(event)
-      return
+      throw KeyboardError.lexicalModelLoadingError
     }
 
     SentryManager.breadcrumbAndLog("LexicalModel stub built for \(lexicalModel.id)", logLevel: XCGLogger.Level.none)
@@ -656,7 +659,27 @@ extension KeymanWebViewController: KeymanWebDelegate {
       // Compare against resetKeyboard & Manager.setKeyboard;
       // setting this to `nil` allows us to force keyboard reloads when needed.
       Manager.shared.currentKeyboardID = nil
-      _ = Manager.shared.setKeyboard(newKb!)
+
+      if !Manager.shared.setKeyboard(newKb!) {
+        // The keyboard couldn't load for... whatever reason.
+        // Default-keyboard fallback time.  We _know_ that one should work.
+        do {
+          var defaultWasMissing = false
+          // Ensure the default keyboard is installed in this case.
+          if !(Storage.active.userDefaults.userKeyboards?.contains(where: {$0.fullID == Defaults.keyboardID }) ?? true) {
+            defaultWasMissing = true
+            try Storage.active.installDefaultKeyboard(from: Resources.bundle)
+          }
+
+          // Ensures we don't infinitely try to reload the keyboard.
+          if(defaultWasMissing || newKb!.fullID != Defaults.keyboard.fullID) {
+            _ = Manager.shared.setKeyboard(Defaults.keyboard)
+          }
+        } catch {
+          SentryManager.captureAndLog("Could not load default keyboard as a fallback for keyboard loading failure", sentryLevel: .fatal)
+        }
+        newKb = Defaults.keyboard
+      }
     }
 
     // in case `shouldReload == true`.  Is set otherwise above.
