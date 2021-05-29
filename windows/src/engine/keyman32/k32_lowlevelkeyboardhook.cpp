@@ -126,6 +126,16 @@ BOOL UseRegisterHotkey() {
   return flag_UseRegisterHotkey;
 }
 
+BOOL UseCachedHotkeyModifierState() {
+  static BOOL flag_UseCachedHotkeyModifierState = TRUE;
+  static BOOL loaded = FALSE;
+  if (!loaded) {
+    loaded = TRUE;
+    flag_UseCachedHotkeyModifierState = Reg_GetDebugFlag(REGSZ_Flag_UseCachedHotkeyModifierState, FALSE);
+  }
+  return flag_UseCachedHotkeyModifierState;
+}
+
 LRESULT _kmnLowLevelKeyboardProc(
   _In_  int nCode, 
   _In_  WPARAM wParam, 
@@ -145,7 +155,16 @@ LRESULT _kmnLowLevelKeyboardProc(
   SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
 
   DWORD Flag = 0;
-  if (UseRegisterHotkey()) {
+  if (!UseCachedHotkeyModifierState()) {
+    FHotkeyShiftState = 0;
+    if (GetKeyState(VK_LCONTROL) < 0) FHotkeyShiftState |= HK_CTRL;
+    if (GetKeyState(VK_RCONTROL) < 0) FHotkeyShiftState |= HK_RCTRL_INVALID;
+    if (GetKeyState(VK_LMENU) < 0) FHotkeyShiftState |= HK_CTRL;
+    if (GetKeyState(VK_RMENU) < 0) FHotkeyShiftState |= HK_RALT_INVALID;
+    if (GetKeyState(VK_LSHIFT) < 0) FHotkeyShiftState |= HK_SHIFT;
+    if (GetKeyState(VK_RSHIFT) < 0) FHotkeyShiftState |= HK_RSHIFT_INVALID;
+  }
+  else if (UseRegisterHotkey()) {
     // The old RegisterHotkey pattern does not support chiral modifier keys
     switch (hs->vkCode) {
       case VK_LCONTROL:
