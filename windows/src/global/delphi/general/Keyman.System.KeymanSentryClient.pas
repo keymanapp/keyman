@@ -357,7 +357,7 @@ begin
   end;
 
   o.HandlerPath := ExtractFilePath(path) + 'crashpad_handler.exe';
-  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-db';
+  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-0.4.9-db';
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;

@@ -32,7 +32,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
 
   // Set the sentry-db-directory to a writeable location
 
-  char szPath[MAX_PATH + 17]; // length(keyman-sentry-db)+1
+  char szPath[MAX_PATH + 64]; // sufficient length for sentry-0.4.9-db etc
 
   LPITEMIDLIST pidl;
   if (SUCCEEDED(SHGetFolderLocation(0, CSIDL_LOCAL_APPDATA, NULL, 0, &pidl))) {
@@ -43,7 +43,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
         *p = 0;
       }
 
-      strcat_s(szPath, "sentry-db");
+      strcat_s(szPath, "sentry-0.4.9-db");
       sentry_options_set_database_path(options, szPath);
     }
     ILFree(pidl);
