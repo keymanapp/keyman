@@ -35,7 +35,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
       try networkReachable = Reachability(hostname: "keyman.com")
       try networkReachable?.startNotifier()
     } catch {
-      log.error("error thrown starting Reachability notifier:  \(error)")
+      SentryManager.captureAndLog(error, message: "error thrown starting Reachability notifier:  \(error)")
     }
   }
 

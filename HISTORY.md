@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 15.0.58 alpha 2021-05-28
+
+* docs(windows): Initial commit - README.md (#5119)
+* chore(web): Add CI script to kill BrowserStack tunnel (#5136)
+* chore(ios): renames problematic app selectors (#5173)
+* chore(android): Add -clean flag to build script (#5145)
+* feat(web): Add script to deploy KeymanWeb release to s.keyman.com (#5150)
+* feat(ios): partial conversion of internal logs to use of Sentry (#5153)
+* change(ios): workspace reorganization + cleanup (#5167)
+* fix(linux): Fix Makefile and instructions for building (#5170)
+
+## 15.0.57 alpha 2021-05-28
+
+* chore(ios): shift to use of XCFrameworks (#5107)
+* chore(ios): dependencies - update sentry-cocoa to 6.2.1 (#5120)
+* change(ios): minimum iOS version -> 12.1 (#5168)
+* chore(ios): renames problematic app selectors (#5173)
+
 ## 15.0.56 alpha 2021-05-27
 
 * fix(ios): link, but NOT embed KeymanEngine.xcframework in app exs (#5164)

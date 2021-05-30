@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 public class ResourceDownloadStatusToolbar: UIToolbar {
   private var statusLabel: UILabel?

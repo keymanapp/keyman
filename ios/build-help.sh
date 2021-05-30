@@ -74,7 +74,7 @@ cd $KEYMAN_ROOT/ios/help
 MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
 CSS="../../resources/build/offline-help-style-spec.txt"
 MD=`find . -name "*.md"`
-DESTHTM="$THIS_DIR/keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources"
+DESTHTM="$THIS_DIR/keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources"
 
 if $DO_HTM; then
   #

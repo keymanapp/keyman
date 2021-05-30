@@ -9,6 +9,8 @@
 import UIKit
 import WebKit
 import AudioToolbox
+import Sentry
+import XCGLogger
 
 private let keyboardChangeHelpText = NSLocalizedString("keyboard-help-change", bundle: engineBundle, comment: "")
 
@@ -189,7 +191,7 @@ extension KeymanWebViewController {
       let cmd = "executePopupKey(\"\(id)\",\"\(escapedText)\");"
       webView!.evaluateJavaScript(cmd, completionHandler: nil)
     } catch {
-      log.error(error)
+      SentryManager.captureAndLog(error)
       return
     }
   }
@@ -241,7 +243,7 @@ extension KeymanWebViewController {
     case .pad:
       type = "AppleTablet"
     default:
-      log.error("Unexpected interface idiom: \(idiom)")
+      SentryManager.captureAndLog("Unexpected interface idiom: \(idiom)", logLevel: .severe)
       return
     }
     webView!.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
@@ -284,15 +286,28 @@ extension KeymanWebViewController {
     do {
       data = try JSONSerialization.data(withJSONObject: stub, options: [])
     } catch {
-      log.error("Failed to serialize keyboard stub: \(error)")
+      let event = Sentry.Event(error: error)
+      event.message = SentryMessage(formatted: "Failed to serialize keyboard stub: \(error)")
+      event.extra = [:]
+      event.extra!["id"] = stub["KI"]
+      event.extra!["package"] = stub["KP"]
+
+      SentryManager.captureAndLog(event)
       return
     }
     guard let stubString = String(data: data, encoding: .utf8) else {
-      log.error("Failed to create stub string")
+      let event = Sentry.Event(level: .error)
+      event.message = SentryMessage(formatted: "Failed to create keyboard stub string for embedded KMW")
+      event.extra = [:]
+      event.extra!["id"] = stub["KI"]
+      event.extra!["package"] = stub["KP"]
+
+      SentryManager.captureAndLog(event)
       return
     }
 
-    log.debug("Keyboard stub: \(stubString)")
+    SentryManager.breadcrumbAndLog("Keyboard stub built for \(keyboard.id)", logLevel: XCGLogger.Level.none)
+    log.info("Keyboard stub: \(stubString)")
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
   
@@ -311,15 +326,27 @@ extension KeymanWebViewController {
     do {
       data = try JSONSerialization.data(withJSONObject: stub, options: [])
     } catch {
-      log.error("Failed to serialize lexical model stub: \(error)")
+      let event = Sentry.Event(error: error)
+      event.message = SentryMessage(formatted: "Failed to serialize lexical model stub: \(error)")
+      event.extra = [:]
+      event.extra!["id"] = stub["id"]
+
+      SentryManager.captureAndLog(event)
       return
     }
     guard let stubString = String(data: data, encoding: .utf8) else {
-      log.error("Failed to create stub string")
+      let event = Sentry.Event(level: .error)
+      event.message = SentryMessage(formatted: "Failed to create lexical model stub string for embedded KMW")
+      event.extra = [:]
+      event.extra!["id"] = stub["id"]
+
+      SentryManager.captureAndLog(event)
       return
     }
-  
-    log.debug("LexicalModel stub: \(stubString)")
+
+    SentryManager.breadcrumbAndLog("LexicalModel stub built for \(lexicalModel.id)", logLevel: XCGLogger.Level.none)
+    log.info("LexicalModel stub: \(stubString)")
+
     if lexicalModel.languageID == Manager.shared.currentKeyboardID?.languageID {
       // We're registering a lexical model for the now-current keyboard.
       // Enact any appropriate language-modeling settings!
@@ -341,7 +368,7 @@ extension KeymanWebViewController {
   }
   
   func showBanner(_ display: Bool) {
-    log.debug("Changing banner's alwaysShow property to \(display).")
+    SentryManager.breadcrumbAndLog("Changing banner's alwaysShow property to \(display).", category: "engine", sentryLevel: .debug)
     webView?.evaluateJavaScript("showBanner(\(display ? "true" : "false"))", completionHandler: nil)
   }
   
@@ -486,7 +513,10 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       Manager.shared.hideKeyboard()
     } else if fragment.hasPrefix("ios-log:#iOS#") {
       let message = fragment.dropFirst(13)
-      log.info("KMW Log: \(message)")
+      // This may need filtering for proper use with Sentry?
+      // Then again, if KMW is logging it... we already have to worry
+      // about it showing up in Web-oriented Sentry logs.
+      SentryManager.breadcrumbAndLog("KMW Log: \(message)", category: "engine")
     } else if fragment.hasPrefix("#beep-") {
       beep(self)
       delegate?.beep(self)
@@ -501,7 +531,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
         let cmd = try decoder.decode(SuggestionPopup.self, from: cmdData!)
         log.verbose("Longpress detected on suggestion: \"\(cmd.suggestion.displayAs)\".")
       } catch {
-        log.error("Unexpected JSON parse error: \(error).")
+        SentryManager.captureAndLog(error, message: "Unexpected JSON parse error: \(error).")
       }
       
       // Will need processing upon extraction from the resulting object.
@@ -513,7 +543,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
 //      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
       
     } else {
-      log.error("Unexpected KMW event: \(fragment)")
+      SentryManager.captureAndLog("Unexpected KMW event: \(fragment)")
     }
   }
 
@@ -570,7 +600,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     delegate?.keyboardLoaded(keymanWeb)
 
     isLoading = false
-    log.info("Loaded keyboard.")
+    SentryManager.breadcrumbAndLog("Loaded keyboard.", sentryLevel: .debug, logLevel: .info)
 
     self.setSentryState()
     resizeKeyboard()
@@ -599,7 +629,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
           newKb = userKbs[0]
         }
       }
-      log.info("Setting initial keyboard.")
+      SentryManager.breadcrumbAndLog("Setting initial keyboard.", category: "engine")
 
       // Compare against resetKeyboard & Manager.setKeyboard;
       // setting this to `nil` allows us to force keyboard reloads when needed.
@@ -975,13 +1005,13 @@ extension KeymanWebViewController {
     Manager.shared.currentKeyboardID = nil
 
     if let keyboard = keyboard {
-      log.info("Current keyboard is set.")
+      SentryManager.breadcrumbAndLog("Current keyboard is set.", category: "engine")
       _ = Manager.shared.setKeyboard(keyboard)
     } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
-      log.info("Using user's default keyboard.")
+      SentryManager.breadcrumbAndLog("Using user's default keyboard.", category: "engine")
       _ = Manager.shared.setKeyboard(keyboard)
     } else {
-      log.info("Using app-default keyboard.")
+      SentryManager.breadcrumbAndLog("Using app-default keyboard.", category: "engine")
       _ = Manager.shared.setKeyboard(Defaults.keyboard)
     }
   }

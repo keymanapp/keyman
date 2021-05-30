@@ -49,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         vc.present(nvc, animated: true, completion: nil)
       }
     } else {
-      log.error("Cannot find app's root UIViewController")
+      SentryManager.captureAndLog("Cannot find app's root UIViewController")
     }
 
     return true
@@ -133,7 +133,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ResourceFileManager.shared.promptPackageInstall(of: package, in: nvc, isCustom: true)
             vc.present(nvc, animated: true, completion: nil)
           } else {
-            log.error("Cannot find app's root UIViewController")
+            SentryManager.captureAndLog("Cannot find app's root UIViewController")
           }
         }
         return true

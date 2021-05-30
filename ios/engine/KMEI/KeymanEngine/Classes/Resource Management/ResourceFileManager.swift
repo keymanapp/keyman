@@ -125,7 +125,7 @@ public class ResourceFileManager {
       try copyWithOverwrite(from: url, to: destinationUrl)
       return destinationUrl
     } catch {
-      log.error(error)
+      SentryManager.captureAndLog(error)
       return nil
     }
   }
@@ -137,7 +137,7 @@ public class ResourceFileManager {
    */
   public func prepareKMPInstall(from url: URL) throws -> KeymanPackage {
     // Once selected, start the standard install process.
-    log.info("Opening KMP from \(url)")
+    SentryManager.breadcrumbAndLog("Opening KMP from \(url)")
 
     // Step 1: Copy it to a temporary location, making it a .zip in the process
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
@@ -367,7 +367,9 @@ public class ResourceFileManager {
   internal func addResource<Resource: LanguageResource>(_ resource: Resource) {
     let path = Storage.active.resourceURL(for: resource)!.path
     if !FileManager.default.fileExists(atPath: path) {
-      log.error("Could not add resource of type: \(resource.fullID.type) with ID: \(resource.id) because the resource file does not exist")
+      // Is 'internal' and only called after packages have been installed,
+      // thus when the files should already be in-place.
+      SentryManager.captureAndLog("Could not add resource of type: \(resource.fullID.type) with ID: \(resource.id) because the resource file does not exist")
       return
     }
 
@@ -399,6 +401,6 @@ public class ResourceFileManager {
 
     userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userDefaults.synchronize()
-    log.info("Added \(resource.fullID.type) with ID: \(resource.id) and language code: \(resource.languageID)")
+    SentryManager.breadcrumbAndLog("Added \(resource.fullID.type) with ID: \(resource.id) and language code: \(resource.languageID)")
   }
 }

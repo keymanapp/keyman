@@ -34,3 +34,11 @@ public class APILexicalModelRepository { }
 @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "APILexicalModelRepository and associated types have been obsoleted by `Queries.LexicalModel` and its `fetch` variants.")
 public protocol LexicalModelRepositoryDelegate: class { }
 
+@available(swift, deprecated: 0.1, obsoleted: 0.1, message: "This type is no longer utilized by KeymanEngine, as the related API methods have all been obsoleted.")
+public struct Options: Codable { }
+
+@available(swift, deprecated: 0.1, obsoleted: 0.1, message: "The old list-based keyboard search is no longer supported.  Please use `KeyboardSearchViewController` instead.")
+class LanguageDetailViewController { }
+
+@available(swift, deprecated: 0.1, obsoleted: 0.1, message: "The old list-based keyboard search is no longer supported.  Please use `KeyboardSearchViewController` instead.")
+class LanguageViewController { }
