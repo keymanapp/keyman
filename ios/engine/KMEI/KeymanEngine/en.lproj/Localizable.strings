@@ -49,6 +49,12 @@
 /* Confirmation text to display before uninstalling a lexical model */
 "command-uninstall-lexical-model-confirm" = "Would you like to uninstall this dictionary?";
 
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Unable to load the requested keyboard";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Unable to load the requested dictionary";
+
 /* Text for error when an installed file is unexpectedly missing */
 "error-missing-file" = "A required file could not be found.";
 

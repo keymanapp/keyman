@@ -501,8 +501,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
   }
   
-  func setKeyboard(_ kb: InstallableKeyboard) {
-    keymanWeb.setKeyboard(kb)
+  func setKeyboard(_ kb: InstallableKeyboard) throws {
+    try keymanWeb.setKeyboard(kb)
   }
 
   public func setShouldReload() {
@@ -513,8 +513,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return keymanWeb.shouldReload
   }
     
-  func registerLexicalModel(_ lm: InstallableLexicalModel) {
-    keymanWeb.registerLexicalModel(lm)
+  func registerLexicalModel(_ lm: InstallableLexicalModel) throws {
+    try keymanWeb.registerLexicalModel(lm)
   }
   
   func deregisterLexicalModel(_ lm: InstallableLexicalModel) {

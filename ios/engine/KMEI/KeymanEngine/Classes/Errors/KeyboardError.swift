@@ -8,6 +8,8 @@
 
 import Foundation
 
-enum KeyboardError: Error {
-  case unchanged
+enum KeyboardError: String, Error {
+  case fileMissing = "error-missing-file"
+  case keyboardLoadingError = "error-loading-keyboard"
+  case lexicalModelLoadingError = "error-loading-lexical-model"
 }
