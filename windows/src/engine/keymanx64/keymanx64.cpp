@@ -26,6 +26,7 @@
 
 // Forward declarations of functions included in this code module
 
+BOOL             Run(HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow);
 ATOM             MyRegisterClass(HINSTANCE hInstance);
 BOOL             InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -53,6 +54,7 @@ HINSTANCE hInst;                            // Current instance
 HWND hwndController = NULL;                 // Keyman x86 Application window handle
 DWORD dwControllerThreadId = NULL;
 HANDLE hParentProcessHandle = NULL;         // Keyman x86 process handle
+DWORD dwParentProcessID = 0;
 
 HANDLE hWatcherThread = NULL;
 HANDLE hWatcherThreadTerminateEvent = NULL;
@@ -70,6 +72,7 @@ const PWSTR
   szError_Keymanx86NotFound_Comms = L"Keyman Engine x86 has closed unexpectedly.  Closing down Keyman Engine x64",
   szError_FailedToRegisterController = L"Failed to register controller window",
   szError_FailedToInitialise = L"Failed to initialise Keyman Engine x64",
+  szError_FailedToFindParentProcess = L"Unable to open parent process; it may have disappeared",
 
   szError_ChangeWindowMessageFilter = L"Failed to prepare message filters",
 
@@ -117,18 +120,38 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     keyman_sentry_test_crash();
   }
 
+  BOOL result = Run(hInstance, lpCmdLine, nCmdShow);
+
+  keyman_sentry_shutdown();
+
+  return result ? 0 : 1;
+}
+
+BOOL Run(HINSTANCE hInstance,
+         LPTSTR    lpCmdLine,
+         int       nCmdShow) {
 	MSG msg;
 
   if (!ParseCmdLine(lpCmdLine)) {
-    Fail(0, szError_InvalidCommandline);
-    keyman_sentry_shutdown();
-    return 1;
+    return Fail(0, szError_InvalidCommandline);
+  }
+
+  // We pass the parent process ID rather than a handle because it is much
+  // easier to instantiate a UIAccess=true process with ShellExecuteEx than
+  // with CreateProcess. However, ShellExecuteEx does not allow us to
+  // inherit handles, so we'll just open the parent process as soon as we
+  // can after loading. There is a small chance of the parent process
+  // disappearing before the handle can be opened, in which case it is in
+  // theory possible that this could be waiting on the wrong process. We have
+  // reduced this chance of this happening by comparing the hwndController
+  // PID with the parent PID (see ParseCmdLine).
+  hParentProcessHandle = OpenProcess(SYNCHRONIZE, FALSE, dwParentProcessID);
+  if (hParentProcessHandle == NULL) {
+    return Fail(0, szError_FailedToFindParentProcess);
   }
 
   if (!MyRegisterClass(hInstance)) {
-    Fail(0, szError_FailedToRegister);
-    keyman_sentry_shutdown();
-    return 1;
+    return Fail(0, szError_FailedToRegister);
   }
 
   if (!InitInstance(hInstance, nCmdShow)) {
@@ -141,8 +164,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
       // be reporting it.
       Fail(0, szError_FailedToInitInstance);
     }
-    keyman_sentry_shutdown();
-    return 1;
+    return FALSE;
   }
 
 	// Main message loop:
@@ -152,9 +174,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		DispatchMessage(&msg);
 	}
 
-  keyman_sentry_shutdown();
-
-	return (int) msg.wParam;
+  // If msg.wParam is non-zero, there was a
+  // failure returned from the main window
+	return msg.wParam ? FALSE : TRUE;
 }
 
 //
@@ -170,15 +192,17 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 BOOL ParseCmdLine(LPTSTR lpCmdLine) {
   while (iswspace(*lpCmdLine)) lpCmdLine++;
   if (!*lpCmdLine) return FALSE;
-  hParentProcessHandle = (HANDLE)wcstoull(lpCmdLine, &lpCmdLine, 10);
-  if (hParentProcessHandle == 0 || hParentProcessHandle == (HANDLE) ULLONG_MAX) return FALSE;
+  dwParentProcessID = (DWORD) wcstoul(lpCmdLine, &lpCmdLine, 10);
+  if (dwParentProcessID == 0 || dwParentProcessID == ULONG_MAX) return FALSE;
 
   while (iswspace(*lpCmdLine)) lpCmdLine++;
   if (!*lpCmdLine) return FALSE;
   hwndController = (HWND) wcstoull(lpCmdLine, &lpCmdLine, 10);
   if (hwndController == 0 || hwndController == (HWND) ULLONG_MAX) return FALSE;
-  dwControllerThreadId = GetWindowThreadProcessId(hwndController, NULL);
-  if (dwControllerThreadId == NULL) return FALSE;
+
+  DWORD dwControllerProcessID;
+  dwControllerThreadId = GetWindowThreadProcessId(hwndController, &dwControllerProcessID);
+  if (dwControllerThreadId == NULL || dwControllerProcessID != dwParentProcessID) return FALSE;
 
   return TRUE;
 }
