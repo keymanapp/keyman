@@ -92,7 +92,7 @@ while [[ $# -gt 0 ]] ; do
             KMWFLAGS=-debug_embedded
             KMW_PATH=unminified
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
         -no-test)

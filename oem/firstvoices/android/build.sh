@@ -54,7 +54,7 @@ while [[ $# -gt 0 ]] ; do
       DO_KEYBOARDS_DOWNLOAD=true
       DO_MODELS_DOWNLOAD=true
       ;;
-    -h|-?)
+    -h|-\?)
       display_usage
       ;;
     -debug)
