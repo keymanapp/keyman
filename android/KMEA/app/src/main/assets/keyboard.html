@@ -64,29 +64,32 @@
     // Update the KMW banner height
     function setBannerHeight(h) {
       var kmw=com.keyman.singleton;
+      var osk = kmw.osk;
       if (h > 0) {
-        var osk = kmw.osk;
-        osk.banner.height = Math.ceil(h / window.devicePixelRatio);
+        // The banner itself may not be loaded yet.  This will preemptively help set
+        // its eventual display height.
+        com.keyman.osk.Banner.DEFAULT_HEIGHT = h;
+        if(osk.banner.activeType != 'blank') {
+          osk.banner.height = h; //Math.ceil(h / window.devicePixelRatio);
+        }
       }
-      // Refresh KMW OSK
+
+      // Refresh KMW's OSK
       kmw.correctOSKTextSize();
     }
 
-    function setOskHeight(h) {
-      if(h > 0) {
-        oskHeight = h;
-      }
-      var kmw=window['keyman'];
+    function setOskHeight(height) {
+      var kmw=com.keyman.singleton;
+      oskHeight = height;
       if(kmw && kmw.core && kmw.core.activeKeyboard) {
         kmw.core.activeKeyboard.refreshLayouts();
       }
-      kmw['correctOSKTextSize']();
+      kmw.osk.show(true);
+      kmw.correctOSKTextSize();
     }
 
     function setOskWidth(w) {
-      if(w > 0) {
-        oskWidth = w;
-      }
+      oskWidth = w;
     }
 
     function getOskHeight() {
@@ -94,9 +97,8 @@
     }
 
     function getOskWidth() {
-      if(oskWidth <= 0) {
-        oskWidth = window.jsInterface.getKeyboardWidth();
-      }
+      oskWidth = window.jsInterface.getKeyboardWidth();
+
       //window.console.log('Keyboard width = '+oskWidth);
       return oskWidth;
     }
