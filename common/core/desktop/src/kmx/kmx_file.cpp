@@ -238,8 +238,8 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
     i < kbp->cxGroupArray;
     i++, gp++, cgp++)
   {
-    gp->dpName = (PKMX_WCHAR)(base + cgp->dpName);
-    gp->dpKeyArray = (LPKEY) bufp;
+    gp->dpName = StringOffset(base, cgp->dpName);
+    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKEY) bufp : NULL;
     gp->cxKeyArray = cgp->cxKeyArray;
     bufp += sizeof(KEY) * gp->cxKeyArray;
     gp->dpMatch = StringOffset(base, cgp->dpMatch);
