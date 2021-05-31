@@ -1,18 +1,18 @@
 /*
   Name:             K32_load
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Support unencrypted keyboards for any internal Keyman product
                     19 Jun 2007 - mcdurdin - Load ICO files and convert to BMP (for TIP)
                     11 Mar 2009 - mcdurdin - I1894 - Fix threading bugs introduced in I1888
@@ -45,54 +45,54 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
-	if(_td->ForceFileName[0])
-	{
-		strncpy_s(buf, nbuf, _td->ForceFileName, nbuf - 1);
-		buf[nbuf-1] = 0;
-		return TRUE;
-	}
+  if(_td->ForceFileName[0])
+  {
+    strncpy_s(buf, nbuf, _td->ForceFileName, nbuf - 1);
+    buf[nbuf-1] = 0;
+    return TRUE;
+  }
 
-	int n = 0;
-	RegistryReadOnly *reg = Reg_GetKeymanInstalledKeyboard(kbname);
-	if(!reg) return FALSE;
+  int n = 0;
+  RegistryReadOnly *reg = Reg_GetKeymanInstalledKeyboard(kbname);
+  if(!reg) return FALSE;
 
-	__try
-	{
+  __try
+  {
     // We need to test if the user is in deadkey conversion mode    // I4552
     if(Globals::get_MnemonicDeadkeyConversionMode() && reg->ValueExists(REGSZ_KeymanFile_MnemonicOverride_Deadkey)) {
       n = reg->ReadString(REGSZ_KeymanFile_MnemonicOverride_Deadkey, buf, nbuf);
     }
     else if(reg->ValueExists(REGSZ_KeymanFile_MnemonicOverride)) {   // I4169
-  		n = reg->ReadString(REGSZ_KeymanFile_MnemonicOverride, buf, nbuf);
+      n = reg->ReadString(REGSZ_KeymanFile_MnemonicOverride, buf, nbuf);
     } else {
-		  n = reg->ReadString(REGSZ_KeymanFile, buf, nbuf);
+      n = reg->ReadString(REGSZ_KeymanFile, buf, nbuf);
     }
-	}
-	__finally
-	{
-		delete reg;
-	}
-	return n;
+  }
+  __finally
+  {
+    delete reg;
+  }
+  return n;
 }
 
 BOOL LoadlpKeyboard(int i)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
-	if(_td->lpKeyboards[i].Keyboard) return TRUE;
+  if(_td->lpKeyboards[i].Keyboard) return TRUE;
 
-	if(_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
+  if(_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
-	char buf[256];
-	if(!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
+  char buf[256];
+  if(!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
 
-	if(!LoadKeyboard(buf, &_td->lpKeyboards[i].Keyboard)) return FALSE;   // I5136
+  if(!LoadKeyboard(buf, &_td->lpKeyboards[i].Keyboard)) return FALSE;   // I5136
 
-	LoadDLLs(&_td->lpKeyboards[i]);
+  LoadDLLs(&_td->lpKeyboards[i]);
 
   LoadKeyboardOptions(&_td->lpKeyboards[i]);
-	
-	return TRUE;
+
+  return TRUE;
 }
 
 /*
@@ -109,23 +109,23 @@ unsigned long CRCTable[256];
 
 void BuildCRCTable(void)
 {
-	static BOOL TableBuilt = FALSE;
+  static BOOL TableBuilt = FALSE;
     int i;
     int j;
     unsigned long crc;
 
-	if(!TableBuilt)
-	{
-		for(i = 0; i <= 255; i++)
-		{
-			crc = i;
-			
-			for(j = 8; j > 0; j--)
-				if(crc & 1) crc = (crc >> 1) ^ CRC32_POLYNOMIAL; else crc >>= 1;
-        
-			CRCTable[i] = crc;
-		}
-	}
+  if(!TableBuilt)
+  {
+    for(i = 0; i <= 255; i++)
+    {
+      crc = i;
+
+      for(j = 8; j > 0; j--)
+        if(crc & 1) crc = (crc >> 1) ^ CRC32_POLYNOMIAL; else crc >>= 1;
+
+      CRCTable[i] = crc;
+    }
+  }
 }
 
 
@@ -139,70 +139,76 @@ unsigned long CalculateBufferCRC(unsigned long count, BYTE *p)
 {
     unsigned long temp1;
     unsigned long temp2;
-	unsigned long crc = 0xFFFFFFFFL;
+  unsigned long crc = 0xFFFFFFFFL;
 
-	BuildCRCTable();
+  BuildCRCTable();
 
-	while (count-- != 0)
-	{
+  while (count-- != 0)
+  {
         temp1 = ( crc >> 8 ) & 0x00FFFFFFL;
         temp2 = CRCTable[((int) crc ^ *p++) & 0xff];
         crc = temp1 ^ temp2;
     }
-    
-	return crc;
+
+  return crc;
 }
 
 //#define Err(s)
 
 void Err(char *s)
 {
-	SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: %s", s);
+  SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: %s", s);
 }
 
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 {
-	DWORD sz;
-	LPBYTE buf;
-	HANDLE hFile;
-	LPKEYBOARD kbp;
+  DWORD sz;
+  LPBYTE buf;
+  HANDLE hFile;
+  LPKEYBOARD kbp;
   PBYTE filebase;
 
-	if(!fileName || !lpKeyboard)
-	{
-		Err("Bad Filename");
-		return FALSE;
-	}
+  if(!fileName || !lpKeyboard)
+  {
+    Err("Bad Filename");
+    return FALSE;
+  }
 
-	hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-	if(hFile == INVALID_HANDLE_VALUE)
-	{
-		Err("Could not open file");
-		return FALSE;
-	}
+  hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+  if(hFile == INVALID_HANDLE_VALUE)
+  {
+    Err("Could not open file");
+    return FALSE;
+  }
 
-	sz = GetFileSize(hFile, NULL);
+  sz = GetFileSize(hFile, NULL);
 
 #ifdef _WIN64
-	buf = new BYTE[sz*3];
+  // allocate enough memory for expanded data structure + original data.
+  // Expanded data structure is double the size of data on disk (8-byte
+  // pointers) - on disk the "pointers" are relative to the beginning of
+  // the file.
+  // We save the original data at the end of buf; we don't copy strings, so
+  // those will remain in the location at the end of the buffer.
+  buf = new BYTE[sz * 3];
 #else
-	buf = new BYTE[sz];
+  buf = new BYTE[sz];
 #endif
 
-	if(!buf)
-	{
-		CloseHandle(hFile);
-		Err("Not allocmem");
-		return FALSE;
-	}
+  if(!buf)
+  {
+    CloseHandle(hFile);
+    Err("Not allocmem");
+    return FALSE;
+  }
 #ifdef _WIN64
-	filebase = buf + sz*2;
+  filebase = buf + sz*2;
 #else
-	filebase = buf;
+  filebase = buf;
 #endif
 
-	ReadFile(hFile, filebase, sz, &sz, NULL);
-	CloseHandle(hFile);
+  ReadFile(hFile, filebase, sz, &sz, NULL);
+  CloseHandle(hFile);
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) {
@@ -210,30 +216,30 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
     return FALSE;
   }
 
-	if(*LPDWORD(filebase) != FILEID_COMPILED)
-	{
-		delete[] buf; 
+  if(*LPDWORD(filebase) != FILEID_COMPILED)
+  {
+    delete[] buf;
     Err("Invalid file");
     return FALSE;
-	}
+  }
 
-	if(!VerifyKeyboard(filebase, sz)) return FALSE;
+  if(!VerifyKeyboard(filebase, sz)) return FALSE;
 
 #ifdef _WIN64
-	kbp = CopyKeyboard(buf, filebase, sz);
+  kbp = CopyKeyboard(buf, filebase, sz);
 #else
-	kbp = FixupKeyboard(buf, filebase, sz);
+  kbp = FixupKeyboard(buf, filebase, sz);
 #endif
 
   if(!kbp) return FALSE;
 
-	if(kbp->dwIdentifier != FILEID_COMPILED) { delete buf; Err("errNotFileID"); return FALSE; }
+  if(kbp->dwIdentifier != FILEID_COMPILED) { delete buf; Err("errNotFileID"); return FALSE; }
 
   kbp->hBitmap = LoadBitmapFileEx(filebase);
 
-	*lpKeyboard = kbp;
+  *lpKeyboard = kbp;
 
-	return TRUE;
+  return TRUE;
 }
 
 
@@ -242,21 +248,21 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 // in an ICO file.
 typedef struct
 {
-	BYTE	bWidth;               // Width of the image
-	BYTE	bHeight;              // Height of the image (times 2)
-	BYTE	bColorCount;          // Number of colors in image (0 if >=8bpp)
-	BYTE	bReserved;            // Reserved
-	WORD	wPlanes;              // Color Planes
-	WORD	wBitCount;            // Bits per pixel
-	DWORD	dwBytesInRes;         // how many bytes in this resource?
-	DWORD	dwImageOffset;        // where in the file is this image
+  BYTE	bWidth;               // Width of the image
+  BYTE	bHeight;              // Height of the image (times 2)
+  BYTE	bColorCount;          // Number of colors in image (0 if >=8bpp)
+  BYTE	bReserved;            // Reserved
+  WORD	wPlanes;              // Color Planes
+  WORD	wBitCount;            // Bits per pixel
+  DWORD	dwBytesInRes;         // how many bytes in this resource?
+  DWORD	dwImageOffset;        // where in the file is this image
 } ICONDIRENTRY, *LPICONDIRENTRY;
-typedef struct 
+typedef struct
 {
-	WORD			idReserved;   // Reserved
-	WORD			idType;       // resource type (1 for icons)
-	WORD			idCount;      // how many images?
-	ICONDIRENTRY	idEntries[1]; // the entries for each image
+  WORD			idReserved;   // Reserved
+  WORD			idType;       // resource type (1 for icons)
+  WORD			idCount;      // how many images?
+  ICONDIRENTRY	idEntries[1]; // the entries for each image
 } ICONDIR, *LPICONDIR;
 
 // The following two structs are for the use of this program in
@@ -266,17 +272,17 @@ typedef struct
 // information of the masks.
 typedef struct
 {
-	UINT			Width, Height, Colors; // Width, Height and bpp
-	LPBYTE			lpBits;                // ptr to DIB bits
-	DWORD			dwNumBytes;            // how many bytes?
-	LPBITMAPINFO	lpbi;                  // ptr to header
-	LPBYTE			lpXOR;                 // ptr to XOR image bits
-	LPBYTE			lpAND;                 // ptr to AND image bits
+  UINT			Width, Height, Colors; // Width, Height and bpp
+  LPBYTE			lpBits;                // ptr to DIB bits
+  DWORD			dwNumBytes;            // how many bytes?
+  LPBITMAPINFO	lpbi;                  // ptr to header
+  LPBYTE			lpXOR;                 // ptr to XOR image bits
+  LPBYTE			lpAND;                 // ptr to AND image bits
 } ICONIMAGE, *LPICONIMAGE;
 typedef struct
 {
-	UINT		nNumImages;                      // How many images?
-	ICONIMAGE	IconImages[1];                   // Image entries
+  UINT		nNumImages;                      // How many images?
+  ICONIMAGE	IconImages[1];                   // Image entries
 } ICONRESOURCE, *LPICONRESOURCE;
 /****************************************************************************/
 LPICONRESOURCE ReadIconFromICOFile( PBYTE buf, int sz );
@@ -285,58 +291,58 @@ HICON MakeIconFromResource( LPICONIMAGE lpIcon );
 
 HBITMAP LoadBitmapFile(LPBYTE data, DWORD sz)
 {
-	BITMAPFILEHEADER *bmfh;
-	BITMAPINFO *bmi;
-	HBITMAP hBitmap, hBitmap2, hOldBmp1, hOldBmp2;
-	HDC hDC, hSrcDC, hSrcDC2;
-	LPICONRESOURCE lpir = NULL;
+  BITMAPFILEHEADER *bmfh;
+  BITMAPINFO *bmi;
+  HBITMAP hBitmap, hBitmap2, hOldBmp1, hOldBmp2;
+  HDC hDC, hSrcDC, hSrcDC2;
+  LPICONRESOURCE lpir = NULL;
 
-	bmfh = (BITMAPFILEHEADER *) data;
-	
-	if(bmfh->bfType == 0x4D42)
-	{
-		SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: Bitmap found");
-  	bmi = (BITMAPINFO *) (data + sizeof(BITMAPFILEHEADER));
+  bmfh = (BITMAPFILEHEADER *) data;
+
+  if(bmfh->bfType == 0x4D42)
+  {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: Bitmap found");
+    bmi = (BITMAPINFO *) (data + sizeof(BITMAPFILEHEADER));
 
     hDC = GetDC(GetDesktopWindow());
-	  hSrcDC = CreateCompatibleDC(hDC);
-	  hSrcDC2 = CreateCompatibleDC(hDC);
-	  hBitmap = CreateDIBitmap(hDC, &bmi->bmiHeader, CBM_INIT, data + bmfh->bfOffBits, bmi, DIB_RGB_COLORS);
-	  hBitmap2 = CreateCompatibleBitmap(hDC, 16, 16);
-	  ReleaseDC(GetDesktopWindow(), hDC);
+    hSrcDC = CreateCompatibleDC(hDC);
+    hSrcDC2 = CreateCompatibleDC(hDC);
+    hBitmap = CreateDIBitmap(hDC, &bmi->bmiHeader, CBM_INIT, data + bmfh->bfOffBits, bmi, DIB_RGB_COLORS);
+    hBitmap2 = CreateCompatibleBitmap(hDC, 16, 16);
+    ReleaseDC(GetDesktopWindow(), hDC);
 
-	  hOldBmp1 = (HBITMAP) SelectObject(hSrcDC, hBitmap);
-	  hOldBmp2 = (HBITMAP) SelectObject(hSrcDC2, hBitmap2);
-	  BitBlt(hSrcDC2, 0, 0, 16, 16, hSrcDC, 0, 0, SRCCOPY);
-	  SelectObject(hSrcDC, hOldBmp1);
-	  SelectObject(hSrcDC2, hOldBmp2);
-	  DeleteDC(hSrcDC);
-	  DeleteDC(hSrcDC2);
-	  DeleteObject(hBitmap);
+    hOldBmp1 = (HBITMAP) SelectObject(hSrcDC, hBitmap);
+    hOldBmp2 = (HBITMAP) SelectObject(hSrcDC2, hBitmap2);
+    BitBlt(hSrcDC2, 0, 0, 16, 16, hSrcDC, 0, 0, SRCCOPY);
+    SelectObject(hSrcDC, hOldBmp1);
+    SelectObject(hSrcDC2, hOldBmp2);
+    DeleteDC(hSrcDC);
+    DeleteDC(hSrcDC2);
+    DeleteObject(hBitmap);
   }
   else
   {
-		SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: Icon found");
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: Icon found");
 
     lpir = ReadIconFromICOFile(data, sz);
     if(!lpir)
     {
-  		SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: icon not loaded");
+      SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: icon not loaded");
       return 0;
     }
-    
+
     if(lpir->nNumImages == 0)
     {
       FreeIconResource(lpir);
       return 0;
     }
-    
+
     HICON hIcon = MakeIconFromResource(&lpir->IconImages[0]);
     //HICON hIcon = CreateIcon(GetModuleHandle(LIBRARY_NAME), lpir->IconImages[0].Width, lpir->IconImages[0].Height,
     //  1, lpir->IconImages[0].Colors, lpir->IconImages[0].lpAND, lpir->IconImages[0].lpXOR);
-	  FreeIconResource(lpir);
-    
-    
+    FreeIconResource(lpir);
+
+
     if(hIcon == 0)
     {
       DebugLastError("MakeIconFromResource");
@@ -352,11 +358,11 @@ HBITMAP LoadBitmapFile(LPBYTE data, DWORD sz)
     DrawIconEx(hSrcDC, 0, 0, hIcon, 16, 16, 0, NULL, DI_NORMAL);
     SelectObject(hSrcDC, hOldBmp2);
     DeleteDC(hSrcDC);
-    
+
     DestroyIcon(hIcon);
-   
+
   }
-	return hBitmap2;
+  return hBitmap2;
 }
 
 
@@ -556,7 +562,7 @@ LPICONRESOURCE ReadIconFromICOFile( PBYTE buf, int sz )
         SendDebugMessageFormat(0, sdmLoad, 0, "Error Allocating Memory");
         return NULL;
     }
-    
+
     // Read in the header
     if( (lpIR->nNumImages = ReadICOHeader(buf)) == (UINT)-1 )
     {
@@ -583,7 +589,7 @@ LPICONRESOURCE ReadIconFromICOFile( PBYTE buf, int sz )
         return NULL;
     }
     memcpy(lpIDE, buf + 6, lpIR->nNumImages * sizeof( ICONDIRENTRY ));
-    
+
     // Loop through and read in each image
     for( i = 0; i < lpIR->nNumImages; i++ )
     {
@@ -608,7 +614,7 @@ LPICONRESOURCE ReadIconFromICOFile( PBYTE buf, int sz )
             return NULL;
         }
     }
-    // Clean up	
+    // Clean up
     free( lpIDE );
     //free( lpRPI );
     return lpIR;
@@ -647,15 +653,15 @@ HICON MakeIconFromResource( LPICONIMAGE lpIcon )
     if( lpIcon->lpBits == NULL )
         return NULL;
     // Let the OS do the real work :)
-    hIcon = CreateIconFromResourceEx( lpIcon->lpBits, lpIcon->dwNumBytes, TRUE, 0x00030000, 
+    hIcon = CreateIconFromResourceEx( lpIcon->lpBits, lpIcon->dwNumBytes, TRUE, 0x00030000,
             (*(LPBITMAPINFOHEADER)(lpIcon->lpBits)).biWidth, (*(LPBITMAPINFOHEADER)(lpIcon->lpBits)).biHeight/2, 0 );
-    
+
     // It failed, odds are good we're on NT so try the non-Ex way
     if( hIcon == NULL )
     {
         // We would break on NT if we try with a 16bpp image
         if(lpIcon->lpbi->bmiHeader.biBitCount != 16)
-        {	
+        {
             hIcon = CreateIconFromResource( lpIcon->lpBits, lpIcon->dwNumBytes, TRUE, 0x00030000 );
         }
     }
@@ -672,9 +678,11 @@ PWCHAR StringOffset(PBYTE base, DWORD offset)
 #ifdef _WIN64
 
 /**
-  CopyKeyboard will copy the data read into bufp from x86-sized structures into x64-sized structures starting at base
-  * We know the base is dwFileSize * 3
-  * After this function finishes, we still need to keep the original data
+  CopyKeyboard will copy the data read into bufp from x86-sized structures into
+  x64-sized structures starting at `base`
+  * After this function finishes, we still need to keep the original data because
+    we don't copy the strings
+  This method is used on 64-bit architectures.
 */
 LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 {
@@ -706,14 +714,14 @@ LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 
   kbp->dpGroupArray = (LPGROUP) bufp;
   bufp += sizeof(GROUP) * kbp->cxGroupArray;
-  
+
   PCOMP_STORE csp;
   LPSTORE sp;
   DWORD i;
 
   for(
-    csp = (PCOMP_STORE)(base + ckbp->dpStoreArray), sp = kbp->dpStoreArray, i = 0; 
-    i < kbp->cxStoreArray; 
+    csp = (PCOMP_STORE)(base + ckbp->dpStoreArray), sp = kbp->dpStoreArray, i = 0;
+    i < kbp->cxStoreArray;
     i++, sp++, csp++)
   {
     sp->dwSystemID = csp->dwSystemID;
@@ -729,8 +737,8 @@ LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
     i < kbp->cxGroupArray;
     i++, gp++, cgp++)
   {
-    gp->dpName = (PWCHAR)(base + cgp->dpName);
-    gp->dpKeyArray = (LPKEY) bufp;
+    gp->dpName = StringOffset(base, cgp->dpName);
+    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKEY) bufp : NULL;
     gp->cxKeyArray = cgp->cxKeyArray;
     bufp += sizeof(KEY) * gp->cxKeyArray;
     gp->dpMatch = StringOffset(base, cgp->dpMatch);
@@ -759,6 +767,10 @@ LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 
 #else
 
+/**
+ Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
+ beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
+*/
 LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 {
   UNREFERENCED_PARAMETER(dwFileSize);
@@ -773,34 +785,34 @@ LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
   LPGROUP gp;
   LPKEY kp;
 
-	kbp->dpStoreArray = (LPSTORE) (base + ckbp->dpStoreArray);
-	kbp->dpGroupArray = (LPGROUP) (base + ckbp->dpGroupArray);
+  kbp->dpStoreArray = (LPSTORE) (base + ckbp->dpStoreArray);
+  kbp->dpGroupArray = (LPGROUP) (base + ckbp->dpGroupArray);
 
 /*if( ckbp->dwBitmapSize > 0 )
-		kbp->hBitmap = LoadBitmapFile((buf + ckbp->dpBitmapOffset), ckbp->dwBitmapSize);
-	else
-		kbp->hBitmap = NULL;
+    kbp->hBitmap = LoadBitmapFile((buf + ckbp->dpBitmapOffset), ckbp->dwBitmapSize);
+  else
+    kbp->hBitmap = NULL;
 */
 
-	for(sp = kbp->dpStoreArray, csp = (PCOMP_STORE) sp, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++)
-	{
+  for(sp = kbp->dpStoreArray, csp = (PCOMP_STORE) sp, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++)
+  {
     sp->dpName = StringOffset(base, csp->dpName);
-		sp->dpString = StringOffset(base, csp->dpString);
-	}
+    sp->dpString = StringOffset(base, csp->dpString);
+  }
 
-	for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)
-	{
-    gp->dpName = StringOffset(base, cgp->dpName); 
-		gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
-		if(cgp->dpMatch != NULL) gp->dpMatch = (PWSTR) (base + cgp->dpMatch);
-		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PWSTR) (base + cgp->dpNoMatch);
+  for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)
+  {
+    gp->dpName = StringOffset(base, cgp->dpName);
+    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKEY) (base + cgp->dpKeyArray) : NULL;
+    gp->dpMatch = StringOffset(base, cgp->dpMatch);
+    gp->dpNoMatch = StringOffset(base, cgp->dpNoMatch);
 
-		for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++)
-		{
-			kp->dpOutput = (PWSTR) (base + ckp->dpOutput);
-			kp->dpContext = (PWSTR) (base + ckp->dpContext);
-		}
-	}
+    for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++)
+    {
+      kp->dpOutput = StringOffset(base, ckp->dpOutput);
+      kp->dpContext = StringOffset(base, ckp->dpContext);
+    }
+  }
 
   return kbp;
 }
@@ -810,24 +822,24 @@ LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 HBITMAP LoadBitmapFileEx(PBYTE filebase)
 {
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
-  
+
   if( ckbp->dwBitmapSize > 0 )
-		return LoadBitmapFile(filebase + ckbp->dpBitmapOffset, ckbp->dwBitmapSize);
-	else
-		return NULL;
+    return LoadBitmapFile(filebase + ckbp->dpBitmapOffset, ckbp->dwBitmapSize);
+  else
+    return NULL;
 }
 
 BOOL VerifyChecksum(LPBYTE buf, DWORD sz)
 {
-	DWORD tempcs;
+  DWORD tempcs;
   PCOMP_KEYBOARD ckbp;
 
   ckbp = (PCOMP_KEYBOARD) buf;
 
-	tempcs = ckbp->dwCheckSum;
+  tempcs = ckbp->dwCheckSum;
   ckbp->dwCheckSum = 0;
 
-	return tempcs == CalculateBufferCRC(sz, buf);
+  return tempcs == CalculateBufferCRC(sz, buf);
 }
 
 BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz)
@@ -836,31 +848,31 @@ BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz)
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
   PCOMP_STORE csp;
 
-	/* Check file version */ 
+  /* Check file version */
 
-	if(ckbp->dwFileVersion < VERSION_MIN || 
-	   ckbp->dwFileVersion > VERSION_MAX) 
-	{ 
-		/* Old or new version -- identify the desired program version */ 
-		if(VerifyChecksum(filebase, sz)) 
-		{ 
-			for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++)
-				if(csp->dwSystemID == TSS_COMPILEDVERSION)
-				{
-					char buf2[256];
+  if(ckbp->dwFileVersion < VERSION_MIN ||
+     ckbp->dwFileVersion > VERSION_MAX)
+  {
+    /* Old or new version -- identify the desired program version */
+    if(VerifyChecksum(filebase, sz))
+    {
+      for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++)
+        if(csp->dwSystemID == TSS_COMPILEDVERSION)
+        {
+          char buf2[256];
           if(csp->dpString == 0)
-  					wsprintf(buf2, "errWrongFileVersion:NULL");
+            wsprintf(buf2, "errWrongFileVersion:NULL");
           else
-					  wsprintf(buf2, "errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
-					Err(buf2);
-					return FALSE;
-				}
-		}
-		Err("errWrongFileVersion");
-		return FALSE; 
-	}
-	
-	if(!VerifyChecksum(filebase, sz)) { Err("errBadChecksum"); return FALSE; }
+            wsprintf(buf2, "errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
+          Err(buf2);
+          return FALSE;
+        }
+    }
+    Err("errWrongFileVersion");
+    return FALSE;
+  }
+
+  if(!VerifyChecksum(filebase, sz)) { Err("errBadChecksum"); return FALSE; }
 
   return TRUE;
 }
