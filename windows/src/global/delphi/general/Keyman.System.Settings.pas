@@ -404,7 +404,7 @@ const
       RootKey: HKCU;
       Key: SRegKey_KeymanEngineDebug_CU;
       Description: 'Set to 1 to use a cached modifer state when checking hotkeys; if '+
-                   'set to0 then engine.compatibility.old_hotkey_registration may not '+
+                   'set to 0 then engine.compatibility.old_hotkey_registration may not '+
                    'work';
       ValueType: kstInteger
     ),
