@@ -125,6 +125,10 @@
 
 #define REGSZ_Flag_UseRegisterHotkey  "Flag_UseRegisterHotkey"
 
+/* REGSZ_Flag_UseCachedHotkeyModifierState DWORD: Use old cached modifier state when checking hotkeys; ignores UseRegisterHotkey if FALSE */
+
+#define REGSZ_Flag_UseCachedHotkeyModifierState "Flag_UseCachedHotkeyModifierState"
+
 /* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 
 #define REGSZ_DeepTSFIntegration  "deep tsf integration"
