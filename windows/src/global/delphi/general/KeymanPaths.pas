@@ -37,6 +37,8 @@ type
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
     class function CEFSubprocessPath: string; static;
+
+    class function RunningFromSource(var keyman_root: string): Boolean; static;
   end;
 
 function GetFolderPath(csidl: Integer): string;
@@ -272,18 +274,17 @@ begin
 
   // On developer machines, if we are running within the source repo, then use
   // those paths
-  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
-  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
+  if TKeymanPaths.RunningFromSource(keyman_root) then
   begin
     // Source repo, bin folder
-    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\bin\desktop\' + S_CEF_SubProcess;
+    Result := keyman_root + 'windows\bin\desktop\' + S_CEF_SubProcess;
     if FileExists(Result) then Exit;
 
     // Source repo, source folder
-    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\bin\desktop\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
+    Result := keyman_root + 'windows\bin\desktop\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
     if FileExists(Result) then Exit;
 
-    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\bin\desktop\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
+    Result := keyman_root + 'windows\bin\desktop\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
     if FileExists(Result) then Exit;
   end;
 
@@ -353,10 +354,9 @@ var
 begin
   // Look up KEYMAN_ROOT development variable -- if found and executable
   // within that path then use that as source path
-  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
-  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
+  if TKeymanPaths.RunningFromSource(keyman_root) then
   begin
-    Exit(IncludeTrailingPathDelimiter(keyman_root) + 'windows\src\desktop\kmshell\xml\' + filename);
+    Exit(keyman_root + 'windows\src\desktop\kmshell\xml\' + filename);
   end;
 
   Result := GetDebugPath('KeymanConfigStaticHttpFilesPath', '');
@@ -377,24 +377,33 @@ class function TKeymanPaths.KeymanHelpPath(const HelpFile: string): string;
 var
   keyman_root: string;
 begin
+  // On developer machines, if we are running within the source repo, then use
+  // those paths
+  if TKeymanPaths.RunningFromSource(keyman_root) then
+  begin
+    // Source repo, bin folder
+    Result := keyman_root + 'windows\bin\desktop\' + HelpFile;
+    if FileExists(Result) then Exit;
+  end;
+
   // Same folder as executable
   Result := ExtractFilePath(ParamStr(0)) + HelpFile;
   if FileExists(Result) then Exit;
-
-  // On developer machines, if we are running within the source repo, then use
-  // those paths
-  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
-  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
-  begin
-    // Source repo, bin folder
-    Result := IncludeTrailingPathDelimiter(keyman_root) + 'windows\bin\desktop\' + HelpFile;
-    if FileExists(Result) then Exit;
-  end;
 
   Result := TKeymanPaths.KeymanDesktopInstallPath(HelpFile);
   if FileExists(Result) then Exit;
 
   Result := '';
+end;
+
+class function TKeymanPaths.RunningFromSource(var keyman_root: string): Boolean;
+begin
+  // On developer machines, if we are running within the source repo, then use
+  // those paths
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  if keyman_root <> '' then
+    keyman_root := IncludeTrailingPathDelimiter(keyman_root);
+  Result := (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length));
 end;
 
 end.

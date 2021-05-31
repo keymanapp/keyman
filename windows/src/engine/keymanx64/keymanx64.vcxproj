@@ -113,6 +113,7 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <DelayLoadDLLs>sentry.dll</DelayLoadDLLs>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>
@@ -153,6 +154,7 @@
       <TargetMachine>MachineX64</TargetMachine>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <DelayLoadDLLs>sentry.dll</DelayLoadDLLs>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>

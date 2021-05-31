@@ -96,26 +96,23 @@ const
 { TKeymanSentryClient }
 
 function FindSentryDLL: string;
+var
+  keyman_root: string;
 begin
-  // It might be in same folder as executable (probably true for Developer)
-  Result := ExtractFilePath(ParamStr(0)) + sentry_dll;
-  if FileExists(Result) then Exit;
-
   // If we are in a development situation, use the dev version
   // of the DLL. Beware mixing and matching which can happen
   // when testing DLLs that are registered and loaded from
   // Program Files if Keyman is installed.
-  Result := GetEnvironmentVariable(KEYMAN_ROOT);
-  if Result <> '' then
+  if TKeymanPaths.RunningFromSource(keyman_root) then
   begin
-    Result := IncludeTrailingPathDelimiter(Result) + DEV_SENTRY_PATH;
-    if (Result <> '') and FileExists(Result) then
+    Result := keyman_root + DEV_SENTRY_PATH;
+    if FileExists(Result) then
       Exit;
   end;
 
-  // Keyman Engine install dir or registry override finally (for Engine, Desktop)
-  Result := TKeymanPaths.KeymanEngineInstallPath(sentry_dll);
-  if (Result <> '') and FileExists(Result) then Exit;
+  // When installed, it should be in the sentry-x.y.z folder for the executable
+  Result := ExtractFilePath(ParamStr(0)) + '\sentry-'+SENTRY_SDK_VERSION+'\' + sentry_dll;
+  if FileExists(Result) then Exit;
 
   Result := '';
 end;
@@ -359,8 +356,8 @@ begin
     reg.Free;
   end;
 
-  o.HandlerPath := ExtractFilePath(FindSentryDLL) + 'crashpad_handler.exe';
-  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-db';
+  o.HandlerPath := ExtractFilePath(path) + 'crashpad_handler.exe';
+  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-0.4.9-db';
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;

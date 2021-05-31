@@ -58,6 +58,7 @@
         <Directory Id="KeymanRoot" Name="Keyman">
           <Directory Id="KEYMANDEV" Name="Keyman Developer">
             <Directory Id="INSTALLDIR" Name="." FileSource="..\..\..\bin\developer\">
+              <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
               <Directory Id="dirRedist" Name="Redist">
                 <Directory Id="dirRedistSetup" Name="Setup" />
               </Directory>
@@ -183,18 +184,6 @@
       </Component>
 
       <Component>
-        <File Name="sentry.dll" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="sentry.x64.dll" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="crashpad_handler.exe" KeyPath="yes" />
-      </Component>
-
-      <Component>
         <File Name="kmconvert.exe" KeyPath="yes" />
       </Component>
 
@@ -234,6 +223,19 @@
 
       <Component>
         <File Name="blocks.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Sentry -->
+    <ComponentGroup Id="KeymanDevSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\ext\sentry">
+      <Component>
+        <File Id="sentry.dll" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Id="sentry.x64.dll" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Id="crashpad_handler.exe" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 
@@ -369,6 +371,7 @@
       <ComponentGroupRef Id="Templates" />
       <ComponentGroupRef Id="ModelCompiler" />
       <ComponentGroupRef Id="Node" />
+      <ComponentGroupRef Id="KeymanDevSentryComponents" />
 
       <MergeRef Id='keymanengine' />
     </Feature>
