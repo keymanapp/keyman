@@ -84,6 +84,9 @@ for proj in ${extra_projects}; do
         kbpvers="keyman-keyboardprocessor-$VERSION"
         cp -a desktop $kbpvers
         cp ../../VERSION.md $kbpvers
+        cp ../../TIER.md $kbpvers
+        mkdir -p $kbpvers/scripts
+        cp ../../resources/shellHelperFunctions.sh $kbpvers/scripts
         tar cvzf $kbpvers.tar.gz --exclude=debian --exclude=build --exclude=.gitignore $kbpvers
         rm -rf $kbpvers
         cp $kbpvers.tar.gz ../../linux/dist
