@@ -6,18 +6,27 @@ set -u
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/shellHelperFunctions.sh"
+# when building packages we pass in SCRIPTS_DIR because we can't access anything outside of
+# the `desktop` directory
+SCRIPTS_DIR=${SCRIPTS_DIR:-$(dirname "$THIS_SCRIPT")/../../../resources}
+. "${SCRIPTS_DIR}/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+THIS_DIR="$(dirname "$THIS_SCRIPT")"
+
+pushd $THIS_DIR > /dev/null
+VERSION=$(./getversion.sh)
+TIER=$(./gettier.sh)
+popd > /dev/null
+
 display_usage() {
-  echo "usage: build.sh [build options] [targets]"
+  echo "usage: build.sh [build options] [targets] [-- options to pass to c++ configure]"
   echo
   echo "Build options:"
   echo "  --debug, -d       Debug build"
   echo "  --target, -t      Target path (linux,macos only, default build/)"
   echo
-  echo "Targets (all if not specified):"
+  echo "Targets (all except install if not specified):"
   echo "  configure         Configure libraries (linux,macos only)"
   echo "  build             Build all libraries"
   echo "    build-rust        Build rust libraries"
@@ -25,6 +34,9 @@ display_usage() {
   echo "  tests             Run all tests"
   echo "    tests-rust        Run rust tests"
   echo "    tests-cpp         Run c++ and c++/rust integration tests"
+  echo "  install           Install all libraries"
+  echo "    install-rust      Install rust libraries"
+  echo "    install-cpp       Install c++ libraries"
   echo
   echo "Rust libraries will be in:  TARGETPATH/rust/<arch>/<buildtype>"
   echo "C++ libraries will be in:   TARGETPATH/<arch>/<buildtype>/src"
@@ -34,7 +46,6 @@ display_usage() {
 
 get_builder_OS
 
-THIS_DIR="$(dirname "$THIS_SCRIPT")"
 CARGO_TARGET=--release
 MESON_TARGET=release
 HAS_TARGET=false
@@ -43,8 +54,11 @@ BUILD_RUST=false
 BUILD_CPP=false
 TESTS_RUST=false
 TESTS_CPP=false
+INSTALL_RUST=false
+INSTALL_CPP=false
 QUIET=false
 TARGET_PATH="$THIS_DIR/build"
+ADDITIONAL_ARGS=
 
 # Parse args
 shopt -s nocasematch
@@ -66,7 +80,7 @@ while [[ $# -gt 0 ]] ; do
     configure)
       HAS_TARGET=true
       CONFIGURE=true
-      # meson depends on the rust build in order 
+      # meson depends on the rust build in order
       # to do its configure step, for now anyway
       BUILD_RUST=true
       ;;
@@ -96,6 +110,24 @@ while [[ $# -gt 0 ]] ; do
       HAS_TARGET=true
       TESTS_CPP=true
       ;;
+    install)
+      HAS_TARGET=true
+      INSTALL_RUST=true
+      INSTALL_CPP=true
+      ;;
+    install-rust)
+      HAS_TARGET=true
+      INSTALL_RUST=true
+      ;;
+    install-cpp)
+      HAS_TARGET=true
+      INSTALL_CPP=true
+      ;;
+    --)
+      shift
+      ADDITIONAL_ARGS=$@
+      break
+      ;;
     *)
       fail "Invalid parameters. Use --help for help"
   esac
@@ -120,6 +152,8 @@ displayInfo "" \
     "BUILD_CPP: $BUILD_CPP" \
     "TESTS_RUST: $TESTS_RUST" \
     "TESTS_CPP: $TESTS_CPP" \
+    "INSTALL_RUST: $INSTALL_RUST" \
+    "INSTALL_CPP: $INSTALL_CPP" \
     "CARGO_TARGET: $CARGO_TARGET" \
     "MESON_TARGET: $MESON_TARGET" \
     "TARGET_PATH: $TARGET_PATH" \
@@ -201,7 +235,7 @@ build_linux_macos() {
   if $CONFIGURE; then
     echo_heading "======= Configuring C++ library for $os_id ======="
     pushd $THIS_DIR > /dev/null
-    meson $MESON_PATH --werror --buildtype $MESON_TARGET
+    meson $MESON_PATH --werror --buildtype $MESON_TARGET $ADDITIONAL_ARGS
     popd > /dev/null
   fi
 
@@ -216,6 +250,18 @@ build_linux_macos() {
     echo_heading "======= Testing C++ library for $os_id ======="
     pushd $MESON_PATH > /dev/null
     meson test --print-errorlogs
+    popd > /dev/null
+  fi
+
+  if $INSTALL_RUST; then
+    echo_heading "======= Installing Rust libraries for $os_id ======="
+    # TODO
+  fi
+
+  if $INSTALL_CPP; then
+    echo_heading "======= Installing C++ libraries for $os_id ======="
+    pushd $MESON_PATH > /dev/null
+    ninja install
     popd > /dev/null
   fi
 }

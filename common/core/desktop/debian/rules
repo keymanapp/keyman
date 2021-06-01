@@ -1,13 +1,28 @@
 #!/usr/bin/make -f
 
 export DH_VERBOSE=1
+#export DH_OPTIONS=-v
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export SCRIPTS_DIR = $(shell pwd)/scripts
 
 # xenial needs this to be explicit
 export LC_ALL=C.UTF-8
 
 %:
 	dh $@
+
+override_dh_auto_configure:
+	./build.sh configure -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=lib/$(DEB_TARGET_GNU_TYPE) --libexecdir=lib/$(DEB_TARGET_GNU_TYPE)
+
+override_dh_auto_build:
+	./build.sh build
+
+override_dh_auto_test:
+	./build.sh tests
+
+override_dh_auto_install:
+	install -d $(shell pwd)/debian/tmp
+	DESTDIR=$(shell pwd)/debian/tmp ./build.sh install
 
 override_dh_missing:
 	dh_missing --fail-missing
