@@ -70,10 +70,19 @@ cd %KEYMAN_ROOT%\common\core\desktop
 
 set BUILDTYPE=%2
 
+if "%3" == "--static" (
+  set STATIC_LIBRARY=--default-library static
+  shift
+) else (
+  set STATIC_LIBRARY=
+)
+
+echo "Is static build = !STATIC_LIBRARY! (%3)"
+
 if "%3" == "build" (
   echo === Calling meson build for Windows !ARCH! !BUILDTYPE! ===
   if exist build\!ARCH!\!BUILDTYPE! rd /s/q build\!ARCH!\!BUILDTYPE!
-  meson build\!ARCH!\!BUILDTYPE! --buildtype !BUILDTYPE! --werror || exit !errorlevel!
+  meson build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror || exit !errorlevel!
 
   echo === Building Keyman Core for Windows !ARCH! !BUILDTYPE! ===
   cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
