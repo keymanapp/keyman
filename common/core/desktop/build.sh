@@ -6,11 +6,19 @@ set -u
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-# when building packages we pass in SCRIPTS_DIR because we can't access anything outside of
-# the `desktop` directory
+# NOTE: this is slightly non-standard; see longer discussion below
+## END STANDARD BUILD SCRIPT INCLUDE
+
+# This script does not use our normal shared build-utils.sh because Linux package builds
+# cannot access anything outside of the `common/core/desktop` directory. This means that:
+# 1. `shellHelperFunctions.sh`, `VERSION.md` and `TIER.md` are copied here by the script
+#    `linux/scripts/dist.sh` for inclusion locally in Linux package builds.
+# 2. `getversion.sh` and `gettier.sh` will use current folder if we can't access the
+#    root level `VERSION.md` and `TIER.md`.
+# 3. `$SCRIPTS_DIR` is set to this folder by the package build Makefile
+#    `common/core/desktop/debian/rules`
 SCRIPTS_DIR=${SCRIPTS_DIR:-$(dirname "$THIS_SCRIPT")/../../../resources}
 . "${SCRIPTS_DIR}/shellHelperFunctions.sh"
-## END STANDARD BUILD SCRIPT INCLUDE
 
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 

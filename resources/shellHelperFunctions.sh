@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#
+# WARNING: this file is copied into other locations during package builds; do not
+#          include other files or make path assumptions when changing this file.
+#          See `common/core/desktop/build.sh` for more details.
+#
+
 _shf_base_dir=$(dirname "$BASH_SOURCE")/..
 
 # Designed to determine which set of browsers should be available for local testing,
@@ -254,7 +260,7 @@ set_npm_version () {
   if [ $# == 0 ]; then
     fail "set_npm_version requires a specified version."
   fi
-  
+
   local version=$1
   # We use --no-git-tag-version because our CI system controls version numbering and
   # already tags releases. We also want to have the version of this match the
@@ -303,7 +309,7 @@ verify_npm_setup () {
     # Ensure the repo's base resources are installed.  (This ensures the local `lerna` install is available.)
     npm install --no-optional
 
-    # Use lerna to ensure repo-internal dependencies are all properly linked 
+    # Use lerna to ensure repo-internal dependencies are all properly linked
     # while also installing external dependencies.  Also propagates lerna into
     # each project that can use it (once added as a dev-dependency there)
     #
@@ -328,7 +334,7 @@ verify_npm_setup () {
     #   npx lerna bootstrap -- --no-optional             # ONLY SAFE AT REPO'S BASE (otherwise, temporarily re-downloads `lerna`!)
     #   - or -
     #   npm run lerna -- bootstrap -- -- --no-optional   # Possible to use within sub-packages with proper setup.  (See below.)
-    
+
     # Note:  calling the above WITHOUT changing directories to $KEYMAN_ROOT will re-download lerna.
     #
     # Instead, configuring each package like this:
