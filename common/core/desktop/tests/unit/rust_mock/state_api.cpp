@@ -33,6 +33,7 @@ namespace
     KM_KBP_OPTIONS_END
   };
 
+#if 0
 constexpr char const *doc1_expected = u8"\
 {\n\
     \"$schema\" : \"keyman/keyboardprocessor/doc/introspection.schema\",\n\
@@ -78,6 +79,7 @@ constexpr km_kbp_option_item const expected_persist_opt = {
   u"F2 pressed test save.",
   KM_KBP_OPT_KEYBOARD
 };
+#endif
 
 inline
 bool operator==(km_kbp_option_item const & lhs, km_kbp_option_item const & rhs)
