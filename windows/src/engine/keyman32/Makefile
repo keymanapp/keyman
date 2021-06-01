@@ -44,5 +44,6 @@ pull-core:
     cd $(ROOT)\..\common\core\desktop
     build_cargo.bat $(CORE_DEBUG)
     build.bat all $(MESON_TARGET) --static build tests
+    cd $(ROOT)\src\engine\keyman32
 
 !include ..\..\Target.mak
