@@ -40,7 +40,6 @@ object frameCEFHost: TframeCEFHost
   end
   object cef: TChromium
     OnWidgetCompMsg = cefWidgetCompMsg
-    OnProcessMessageReceived = cefProcessMessageReceived
     OnLoadEnd = cefLoadEnd
     OnLoadingStateChange = cefLoadingStateChange
     OnSetFocus = cefSetFocus

@@ -31,8 +31,6 @@ type
     procedure Cleanup(Sender: TObject);
     procedure LaunchWatchdog;
   public
-    const ProcessMessage_GetWindowSize = 'ProcessMessage_ResizeByContent';
-  public
     constructor Create;
     destructor Destroy; override;
     function Start: Boolean;
@@ -66,11 +64,6 @@ uses
   uCEFProcessMessage,
   uCEFTypes;
 
-procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
-                                              const frame         : ICefFrame;
-                                                    sourceProcess : TCefProcessId;
-                                              const message       : ICefProcessMessage;
-                                              var   aHandled      : boolean); forward;
 { TInitializeCEF }
 
 procedure TCEFManager.CompletionHandler(Sender: IKeymanCEFHost);
@@ -113,8 +106,6 @@ begin
   GlobalCEFApp.cache                := TKeymanPaths.CEFDataPath('cache');
   GlobalCEFApp.UserDataPath         := TKeymanPaths.CEFDataPath('userdata');
   GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 (Keyman/'+SKeymanVersion+')';
-
-  GlobalCEFApp.OnProcessMessageReceived := GlobalCEFApp_ProcessMessageReceived;
 
   // We no longer attempt to cleanup before shutdown, and rely on the child cef
   // processes to do the cleanup, which is more reliable.
@@ -243,61 +234,6 @@ procedure TCEFManager.UnregisterWindow(cef: IKeymanCEFHost);
 begin
 //  OutputDebugString(PChar('TCEFManager.UnregisterWindow'));
   FWindows.Remove(cef);
-end;
-
-procedure DOMVisitor_GetWindowSize(const browser : ICefBrowser; const frame: ICefFrame; const document: ICefDomDocument);
-const
-  NODE_ID = 'size';
-var
-  msg: ICefProcessMessage;
-  node : ICefDomNode;
-begin
-  // This function is called from a CEF thread
-  // document is only valid inside this function.
-
-  if document <> nil then
-  begin
-    node := document.GetElementById(NODE_ID);
-    if node <> nil then
-    begin
-      // Send back node dimensions to the browser process
-      msg := TCefProcessMessageRef.New(TCEFManager.ProcessMessage_GetWindowSize);
-      msg.ArgumentList.SetInt(0, node.ElementBounds.width);
-      msg.ArgumentList.SetInt(1, node.ElementBounds.height);
-      CefLog('CEFManager', 1, CEF_LOG_SEVERITY_ERROR, 'Sending message '+msg.Name+', '+IntToStr(node.ElementBounds.width)+', '+IntToStr(node.ElementBounds.height));
-      browser.MainFrame.SendProcessMessage(PID_BROWSER, msg);
-    end;
-  end;
-end;
-
-procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
-                                              const frame         : ICefFrame;
-                                                    sourceProcess : TCefProcessId;
-                                              const message       : ICefProcessMessage;
-                                              var   aHandled      : boolean);
-var
-  TempFrame   : ICefFrame;
-  TempVisitor : TCefFastDomVisitor2;
-begin
-  aHandled := False;
-
-  CefLog('CEFManager', 1, CEF_LOG_SEVERITY_ERROR, 'message received '+message.Name);
-
-  if browser <> nil then
-  begin
-    if message.name = TCEFManager.ProcessMessage_GetWindowSize then
-    begin
-      TempFrame := browser.MainFrame;
-
-      if (TempFrame <> nil) then
-      begin
-        TempVisitor := TCefFastDomVisitor2.Create(browser, browser.MainFrame, DOMVisitor_GetWindowSize);
-        TempFrame.VisitDom(TempVisitor);
-      end;
-
-      aHandled := True;
-    end;
-  end;
 end;
 
 end.
