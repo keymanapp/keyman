@@ -4,7 +4,7 @@
 
 !include ..\..\Defines.mak
 
-build: version.res dirs
+build: version.res dirs pull-core
     $(MSBUILD) keyman32.vcxproj $(MSBUILD_BUILD)
     $(COPY) keyman32.dll $(PROGRAM)\engine
     $(COPY) keyman32.pdb $(DEBUGPATH)\engine
@@ -32,5 +32,17 @@ install:
     $(COPY) $(PROGRAM)\engine\keyman32.dll "$(INSTALLPATH_KEYMANENGINE)\keyman32.dll"
     echo You may want to manually tweak keyman-debug-etw.man and fill in $(INSTALLPATH_KEYMANENGINE)\keyman32.dll
     echo and then run wevtutil im keyman-debug-etw.man to get the latest event tracing
+
+!ifdef DEBUG
+CORE_DEBUG=--debug
+MESON_TARGET=debug
+!else
+MESON_TARGET=release
+!endif
+
+pull-core:
+    cd $(ROOT)\..\common\core\desktop
+    build_cargo.bat $(CORE_DEBUG)
+    build.bat all $(MESON_TARGET) --static build tests
 
 !include ..\..\Target.mak
