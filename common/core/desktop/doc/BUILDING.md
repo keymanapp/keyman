@@ -102,9 +102,9 @@ Place this in the same folder as you extracted kmcomp.exe, and
 
 ## Building
 
-### Building on Windows
+### Prerequisite on Windows
 
-On Windows you may need to set `SDKVER` environement variable to the current
+On Windows you may need to set `SDKVER` environment variable to the current
 Windows SDK version, if it cannot be automatically detected, e.g.:
 
 ```DOS
@@ -113,7 +113,7 @@ set SDKVER=10.0.19041.0
 
 ### Building on all platforms
 
-On all other platforms, use `build.sh`.
+On all platforms, use `build.sh`.
 
 ```bash
 ./build.sh --debug
@@ -125,4 +125,3 @@ kmcomp is the command-line compiler from Keyman Developer, available from
 <https://keyman.com/developer/download> or in this repo in
 `/windows/src/developer/kmcomp`. The compiler is currently available as a
 Windows PE executable only, but it does run under WINE.
-
