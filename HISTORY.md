@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.60 alpha 2021-06-01
+
+* chore(windows): minor maintenance (#5192)
+* fix(windows): sentry.dll version handling (#5187)
+* fix(windows): start keymanx64 with ShellExecute (#5202)
+* fix(windows): fix size of splash (#5203)
+
 ## 15.0.59 alpha 2021-05-31
 
 * change(ios): workspace reorganization + cleanup (#5167)
