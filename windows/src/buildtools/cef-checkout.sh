@@ -26,18 +26,26 @@ CEF_VERSION=`cat $CEF_VERSION_MD | tr -d "[:space:]"`
 # Note that 14.0 and earlier versions rely on the `master`
 # branch, so that is the default branch checked out in the
 # build configurations
+
+# Warning: this WILL clean the CEF binary repository, so don't
+# do a release build with uncommitted changes on the CEF binary
+# repo!
+git reset --hard
+git clean -fd
 git fetch origin "v$CEF_VERSION"
 git switch "v$CEF_VERSION"
 
-# Some files are larger than GitHub's limit of 100MB. For now,
-# we can work around this by zipping in the repo and unzipping
-# at build time
-for zip in *.zip; do
-  unzip "$zip"
-  rm "$zip"
-done
+if [ ! -f ./libcef.dll ]; then
+  # Some files are larger than GitHub's limit of 100MB. For now,
+  # we can work around this by zipping in the repo and unzipping
+  # at build time
+  for zip in *.zip; do
+    unzip -o "$zip"
+    rm "$zip"
+  done
 
-[ -f ./libcef.dll ] || die "File libcef.dll could not be found. Path $KEYMAN_CEF4DELPHI_ROOT may not be valid."
+  [ -f ./libcef.dll ] || die "File libcef.dll could not be found. Path $KEYMAN_CEF4DELPHI_ROOT may not be valid."
+fi
 
 popd > /dev/null
 

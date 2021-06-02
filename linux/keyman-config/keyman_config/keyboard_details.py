@@ -76,7 +76,8 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.add(lbl_pkg_name)
         prevlabel = lbl_pkg_name
         label = Gtk.Label()
-        label.set_text(info['name']['description'])
+        if info['name']['description']:
+            label.set_text(info['name']['description'])
         label.set_halign(Gtk.Align.START)
         label.set_selectable(True)
         grid.attach_next_to(label, lbl_pkg_name, Gtk.PositionType.RIGHT, 1, 1)
@@ -87,7 +88,8 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.attach_next_to(lbl_pkg_id, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         prevlabel = lbl_pkg_id
         label = Gtk.Label()
-        label.set_text(kmp['packageID'])
+        if kmp['packageID']:
+            label.set_text(kmp['packageID'])
         label.set_halign(Gtk.Align.START)
         label.set_selectable(True)
         grid.attach_next_to(label, lbl_pkg_id, Gtk.PositionType.RIGHT, 1, 1)
@@ -98,7 +100,8 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.attach_next_to(lbl_pkg_vrs, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         prevlabel = lbl_pkg_vrs
         label = Gtk.Label()
-        label.set_text(info['version']['description'])
+        if info['version']['description']:
+            label.set_text(info['version']['description'])
         label.set_halign(Gtk.Align.START)
         label.set_selectable(True)
         grid.attach_next_to(label, lbl_pkg_vrs, Gtk.PositionType.RIGHT, 1, 1)
@@ -110,7 +113,8 @@ class KeyboardDetailsView(Gtk.Dialog):
             grid.attach_next_to(lbl_pkg_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_desc
             label = Gtk.Label()
-            label.set_text(kbdata.get('description'))
+            if kbdata.get('description'):
+                label.set_text(kbdata.get('description'))
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             label.set_line_wrap(80)
@@ -123,7 +127,8 @@ class KeyboardDetailsView(Gtk.Dialog):
             grid.attach_next_to(lbl_pkg_auth, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_auth
             label = Gtk.Label()
-            label.set_text(info['author']['description'])
+            if info['author']['description']:
+                label.set_text(info['author']['description'])
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, lbl_pkg_auth, Gtk.PositionType.RIGHT, 1, 1)
@@ -135,7 +140,8 @@ class KeyboardDetailsView(Gtk.Dialog):
             grid.attach_next_to(lbl_pkg_cpy, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_cpy
             label = Gtk.Label()
-            label.set_text(info['copyright']['description'])
+            if info['copyright']['description']:
+                label.set_text(info['copyright']['description'])
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, lbl_pkg_cpy, Gtk.PositionType.RIGHT, 1, 1)
@@ -189,7 +195,8 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(lbl_kbd_name, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_name
                         label = Gtk.Label()
-                        label.set_text(kbdata['name'])
+                        if kbdata['name']:
+                            label.set_text(kbdata['name'])
                         label.set_halign(Gtk.Align.START)
                         label.set_selectable(True)
                         grid.attach_next_to(label, lbl_kbd_name, Gtk.PositionType.RIGHT, 1, 1)
@@ -200,7 +207,8 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(lbl_kbd_id, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_id
                         label = Gtk.Label()
-                        label.set_text(kbdata['id'])
+                        if kbdata['id']:
+                            label.set_text(kbdata['id'])
                         label.set_halign(Gtk.Align.START)
                         label.set_selectable(True)
                         grid.attach_next_to(label, lbl_kbd_id, Gtk.PositionType.RIGHT, 1, 1)
@@ -211,7 +219,8 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(lbl_kbd_vrs, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_vrs
                         label = Gtk.Label()
-                        label.set_text(kbdata['version'])
+                        if kbdata['version']:
+                            label.set_text(kbdata['version'])
                         label.set_halign(Gtk.Align.START)
                         label.set_selectable(True)
                         grid.attach_next_to(label, lbl_kbd_vrs, Gtk.PositionType.RIGHT, 1, 1)
@@ -223,7 +232,8 @@ class KeyboardDetailsView(Gtk.Dialog):
                             grid.attach_next_to(lbl_kbd_auth, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                             prevlabel = lbl_kbd_auth
                             label = Gtk.Label()
-                            label.set_text(kbdata['authorName'])
+                            if kbdata['authorName']:
+                                label.set_text(kbdata['authorName'])
                             label.set_halign(Gtk.Align.START)
                             label.set_selectable(True)
                             grid.attach_next_to(label, lbl_kbd_auth, Gtk.PositionType.RIGHT, 1, 1)
@@ -234,7 +244,8 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(lbl_kbd_lic, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_lic
                         label = Gtk.Label()
-                        label.set_text(kbdata['license'])
+                        if kbdata['license']:
+                            label.set_text(kbdata['license'])
                         label.set_halign(Gtk.Align.START)
                         label.set_selectable(True)
                         grid.attach_next_to(label, lbl_kbd_lic, Gtk.PositionType.RIGHT, 1, 1)
@@ -245,7 +256,8 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(lbl_kbd_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_desc
                         label = Gtk.Label()
-                        label.set_text(kbdata['description'])
+                        if kbdata['description']:
+                            label.set_text(kbdata['description'])
                         label.set_halign(Gtk.Align.START)
                         label.set_selectable(True)
                         label.set_line_wrap(80)

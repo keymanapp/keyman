@@ -71,7 +71,6 @@ type
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean); virtual;
     procedure cefCommand(Sender: TObject; const command: string;
       params: TStringList); virtual;
-    procedure cefResizeFromDocument(Sender: TObject; awidth, aheight: Integer); virtual;
     procedure cefHelpTopic(Sender: TObject); virtual;
 
     procedure FireCommand(const command: WideString; params: TStringList); virtual;
@@ -163,7 +162,6 @@ begin
   if command = 'link' then OpenLink(params)
   else if command = 'uilanguage' then UILanguage(params)
   else if command = 'contributeuilanguages' then ContributeUILanguages   // I4989
-  else if command = 'resize' then cef.DoResizeByContent
   else ShowMessage(command + '?' + params.Text);
 end;
 
@@ -213,7 +211,6 @@ begin
   cef.OnLoadEnd := cefLoadEnd;
   cef.OnKeyEvent := cefKeyEvent;
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
-  cef.OnResizeFromDocument := cefResizeFromDocument;
   cef.OnHelpTopic := cefHelpTopic;
   cef.OnTitleChange := cefTitleChange;
 end;
@@ -258,7 +255,6 @@ end;
 procedure TfrmWebContainer.cefLoadEnd(Sender: TObject);
 begin
   AssertVclThread;
-  cef.DoResizeByContent;
   Screen.Cursor := crDefault;
 end;
 
@@ -270,15 +266,6 @@ begin
       Handled := True
     else if e.event.windows_key_code = VK_F1 then
       Handled := True;
-end;
-
-procedure TfrmWebContainer.cefResizeFromDocument(Sender: TObject; awidth,
-  aheight: Integer);
-begin
-  ClientWidth := awidth;
-  ClientHeight := aheight;
-  Left := (Screen.Width - Width) div 2;
-  Top := (Screen.Height - Height) div 2;
 end;
 
 procedure TfrmWebContainer.cefTitleChange(Sender: TObject; const title: string);

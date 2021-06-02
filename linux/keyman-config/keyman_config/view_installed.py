@@ -363,7 +363,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
 
     def on_about_clicked(self, button):
         model, treeiter = self.tree.get_selection().get_selected()
-        if treeiter is not None:
+        if treeiter is not None and model[treeiter] is not None:
             logging.info("Show keyboard details of " + model[treeiter][1])
             areapath = get_install_area_path(model[treeiter][4])
             kmp = {

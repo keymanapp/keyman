@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 15.0.60 alpha 2021-06-01
+
+* chore(windows): minor maintenance (#5192)
+* fix(windows): sentry.dll version handling (#5187)
+* fix(windows): start keymanx64 with ShellExecute (#5202)
+* fix(windows): fix size of splash (#5203)
+
+## 15.0.59 alpha 2021-05-31
+
+* change(ios): workspace reorganization + cleanup (#5167)
+* fix(common): build script help param (#5175)
+* feat(ios): resource file validation before use (#5178)
+* fix(linux): Migrate from /usr/lib/ibus to /usr/libexec (#5183)
+* fix(linux): Don't crash on invalid metadata (#5185)
+* fix(android/samples): Set gradlew executable for Tests (#5198)
+* fix(windows): avoid cached hotkey state (#5190)
+* chore(windows): minor maintenance (#5192)
+* fix(windows): cleanup edge cases in k32_load (#5197)
+
 ## 15.0.58 alpha 2021-05-28
 
 * docs(windows): Initial commit - README.md (#5119)
