@@ -9,6 +9,7 @@ from enum import Enum
 
 from keyman_config import _
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
+from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
 from keyman_config.get_kmp import get_keyboard_data, user_keyboard_dir, user_keyman_font_dir
 from keyman_config.kmpmetadata import get_metadata, KMFileTypes
 from keyman_config.convertico import extractico, checkandsaveico
@@ -88,7 +89,7 @@ class InstallKmp():
             _("You do not have permissions to install the font files to the shared font area "
               "/usr/local/share/fonts"))
 
-        self._install_kmp(inputfile, online, language)
+        return self._install_kmp(inputfile, online, language)
 
     def install_kmp_user(self, inputfile, online=False, language=None):
         self.packageID = self._extract_package_id(inputfile)
@@ -96,7 +97,7 @@ class InstallKmp():
         self.kmpdocdir = self.packageDir
         self.kmpfontdir = os.path.join(user_keyman_font_dir(), self.packageID)
 
-        self._install_kmp(inputfile, online, language)
+        return self._install_kmp(inputfile, online, language)
 
     def _install_kmp(self, inputfile, online, language):
         if not os.path.isdir(self.packageDir):
@@ -108,9 +109,13 @@ class InstallKmp():
             raise InstallError(InstallStatus.Abort, message)
 
         extract_kmp(inputfile, self.packageDir)
-        restart_ibus()
 
-        info, system, options, keyboards, files = get_metadata(self.packageDir)
+        if is_fcitx_running():
+            restart_fcitx()
+        else:
+            restart_ibus()
+
+        info, _, _, keyboards, files = get_metadata(self.packageDir)
 
         if keyboards:
             logging.info("Installing %s", info['name']['description'])
@@ -166,7 +171,7 @@ class InstallKmp():
                             fpath = os.path.join(self.packageDir, kb['id'] + '.kmx')
                     extractico(fpath)
 
-            self.install_keyboards(keyboards, self.packageDir, language)
+            return self.install_keyboards(keyboards, self.packageDir, language)
         else:
             logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
             logging.info("Contents of %s:", inputfile)
@@ -194,12 +199,14 @@ class InstallKmp():
     def install_keyboards(self, keyboards, packageDir, language=None):
         firstKeyboard = keyboards[0]
         if firstKeyboard and 'languages' in firstKeyboard and len(firstKeyboard['languages']) > 0:
-                language = self._normalize_language(firstKeyboard['languages'], language)
+            language = self._normalize_language(firstKeyboard['languages'], language)
 
-        if is_gnome_shell():
-                self._install_keyboards_to_gnome(keyboards, packageDir, language)
+        if is_fcitx_running():
+            return self._install_keyboards_to_fcitx()
+        elif is_gnome_shell():
+            return self._install_keyboards_to_gnome(keyboards, packageDir, language)
         else:
-                self._install_keyboards_to_ibus(keyboards, packageDir, language)
+            return self._install_keyboards_to_ibus(keyboards, packageDir, language)
 
     def _install_keyboards_to_ibus(self, keyboards, packageDir, language=None):
         bus = get_ibus_bus()
@@ -212,6 +219,7 @@ class InstallKmp():
             bus.destroy()
         else:
             logging.debug("could not install keyboards to IBus")
+        return ''
 
     def _install_keyboards_to_gnome(self, keyboards, packageDir, language=None):
         gnomeKeyboardsUtil = GnomeKeyboardsUtil()
@@ -223,6 +231,10 @@ class InstallKmp():
             sources.append(('ibus', ibus_keyboard_id))
 
         gnomeKeyboardsUtil.write_input_sources(sources)
+        return ''
+
+    def _install_keyboards_to_fcitx(self):
+        return _('Please use fcitx5-configtool to add the keyboard to the desired group')
 
 
 def extract_kmp(kmpfile, directory):
@@ -255,6 +267,6 @@ def install_kmp(inputfile, online=False, sharedarea=False, language=None):
         sharedarea(bool, default=False): whether install kmp to shared area or user directory
     """
     if sharedarea:
-        InstallKmp().install_kmp_shared(inputfile, online, language)
+        return InstallKmp().install_kmp_shared(inputfile, online, language)
     else:
-        InstallKmp().install_kmp_user(inputfile, online, language)
+        return InstallKmp().install_kmp_user(inputfile, online, language)
