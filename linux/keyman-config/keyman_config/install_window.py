@@ -301,6 +301,9 @@ class InstallKmpWindow(Gtk.Dialog):
         try:
             result = install_kmp(self.kmpfile, self.online, language=self.language)
             if result:
+                # If install_kmp returns a string, it is an instruction for the end user,
+                # because for fcitx they will need to take extra steps to complete 
+                # installation themselves.
                 dialog = Gtk.MessageDialog(
                     self, 0, Gtk.MessageType.INFO,
                     Gtk.ButtonsType.OK, result)
