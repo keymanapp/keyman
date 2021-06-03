@@ -111,6 +111,12 @@ Windows SDK version, if it cannot be automatically detected, e.g.:
 set SDKVER=10.0.19041.0
 ```
 
+You'll also need to install x86 support for Rust:
+
+```DOS
+rustup target add i686-pc-windows-msvc
+```
+
 ### Building on all platforms
 
 On all platforms, use `build.sh`.
