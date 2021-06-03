@@ -141,7 +141,15 @@ BOOL ProcessHook()
 			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
 
+  //  TODO: 5011  km_kbp_process_event(_td->activeKbState, state.vkey, "modifier_state")
 	ProcessGroup(gp);
+
+  //  TODO: 5011 process all the actions and data munge them into here.
+
+    for (auto act = km_kbp_state_action_items(_td->activeKbState, nullptr); act->type != KM_KBP_IT_END; act++) {
+      apply_action(test_state, *act, text_store, options);
+    }
+
 
   if (fOutputKeystroke && !_td->app->IsQueueEmpty()) {
     //

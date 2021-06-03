@@ -191,6 +191,10 @@ typedef struct tagKEYMAN64THREADDATA
 {
   LPINTKEYBOARDINFO lpKeyboards;			// keyboard definitions
   LPINTKEYBOARDINFO lpActiveKeyboard;
+
+  // km_kbp_keyboard* lpKeyboards;			// keyboard definitions
+  // km_kbp_keyboard* lpActiveKeyboard;
+ //  km_kbp_keyboard activeKBState
    // I3616
   LPMSG msgbuf;						// Message buffer (alloc at runtime)
 
