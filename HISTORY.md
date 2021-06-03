@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.61 alpha 2021-06-03
+
+* fix(linux): Exclude s390x from package builds for ibus-keyman (#5213)
+* feat(linux): Integrate with fcitx5 (#5215)
+
 ## 15.0.60 alpha 2021-06-01
 
 * chore(windows): minor maintenance (#5192)
