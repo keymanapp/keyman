@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.62 alpha 2021-06-04
+
+* fix(developer): support spaces in regression tests (#5217)
+
 ## 15.0.61 alpha 2021-06-03
 
 * fix(linux): Exclude s390x from package builds for ibus-keyman (#5213)
