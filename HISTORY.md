@@ -1,5 +1,30 @@
 # Keyman Version History
 
+## 14.0.275 stable 2021-06-04
+
+* fix(linux): Swap order of dependencies for Debian package 🍒 (#5070)
+* fix(android/engine): Check lexical-model file exists before using 🍒  (#5080)
+* fix(developer): kmconvert commandline and deploy 🍒 (#5083)
+* fix(web): position popups correctly in landscape mode on Android and during Chrome emulation 🍒 (#5090)
+* fix(common/core/desktop): Fix warnings when compiling for armhf 🍒 (#5109)
+* fix(common/core/desktop): Don't segfault on invalid .kmx file 🍒 (#5110)
+* chore(common): Check in crowdin strings for Amharic 🍒  (#5117)
+* chore(linux): Swap order of dependency 🍒 (#5114)
+* fix(developer): TframeTextEditor.SetText was not synchronous 🍒 (#5097)
+* chore(ios): update fv cert ref 🍒 (#5124)
+* chore(ios): works around wrong-workspace Carthage 0.38 lookup issue (#5135)
+* fix(web): multi touch handling 🍒 (#5142)
+* chore(ios): artifact prep script now in-repo (#5141)
+* chore(web): Add CI script to kill BrowserStack tunnel 🍒  (#5152)
+* fix(ios): artifact upload preparation 🍒 (#5161)
+* chore(android): Add -clean flag to build script 🍒  (#5177)
+* fix(windows): avoid cached hotkey state 🍒 (#5189)
+* fix(android/samples): Set gradlew executable for Tests 🍒  (#5199)
+* fix(common/core/desktop): Fix failing tests on armhf 🍒 (#5204)
+* feat(web): Add script to deploy KeymanWeb release to s.keyman.com 🍒  (#5179)
+* chore(ios): renames problematic app selectors 🍒 (#5174)
+* fix(developer): support spaces in regression tests 🍒 (#5218)
+
 ## 14.0.274 stable 2021-05-11
 
 * fix(android/engine): Fix toHex() for null string 🍒  (#4997)
