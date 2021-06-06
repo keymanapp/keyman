@@ -55,7 +55,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            // applicationIdSuffix ".debug"
             pseudoLocalesEnabled true
             debuggable true
         }
@@ -128,6 +128,7 @@ dependencies {
     api(name: 'keyman-engine', ext: 'aar')
     implementation 'io.sentry:sentry-android:4.3.0'
     implementation 'androidx.preference:preference:1.1.1'
+    implementation "com.android.installreferrer:installreferrer:2.2"
 
     // Add dependency for generating QR Codes
     // (Even though it's embedded in KMEA, because we're manually copying keyman-engine.aar,
