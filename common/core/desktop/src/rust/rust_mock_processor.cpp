@@ -1,7 +1,7 @@
 /*
   Copyright:    © 2021 SIL International.
   Description:  This is an interface to a rust mock implementation.
-                TODO: Add a mecahnism to trigger output of PERSIST_OPT &
+                TODO: Add a mechanism to trigger output of PERSIST_OPT &
                 RESET_OPT actions items, options support and context matching.
   Authors:      Marc Durdin
 */

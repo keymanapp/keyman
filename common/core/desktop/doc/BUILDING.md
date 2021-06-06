@@ -30,6 +30,16 @@ The search path can be edited through System settings / Advanced system settings
 If you have Keyman Developer installed, add `%KeymanDeveloperPath%` to your
 path. Otherwise, add the path where you extracted the kmcomp archive.
 
+#### Installing Rust
+
+After downloading and running the executable from:
+<https://www.rust-lang.org/tools/install>
+
+Run the command:
+```bash
+rustup target add i686-pc-windows-msvc
+```
+
 ### Linux
 
 #### Ubuntu and Debian
@@ -39,6 +49,7 @@ You can install `meson` and Rust through the package manager:
 ```bash
 sudo apt update
 sudo apt install meson cargo
+rustup target add i686-pc-windows-msvc
 ```
 
 You'll also need the `kmcomp` wrapper - see below.
@@ -55,7 +66,11 @@ sudo apt install python3 python3-pip
 python3 -m pip install meson
 ```
 
-Install Rust from <https://www.rust-lang.org/tools/install>.
+Install Rust from <https://www.rust-lang.org/tools/install>, then:
+
+```bash
+rustup target add i686-pc-windows-msvc
+```
 
 You'll also need the `kmcomp` wrapper - see below.
 
@@ -75,11 +90,15 @@ Place this in the same folder as you extracted kmcomp.exe, and
 
 ### macOS
 
-You can get the official installer from the official Python site:
+You can get the official Python installer from the official Python site:
 <https://www.python.org/downloads/mac-osx/>
+
+Install meson and rust:
 
 ```bash
 brew install meson    # if you haven't already installed via pip
+curl https://sh.rustup.rs -sSf | sh
+rustup target add i686-pc-windows-msvc
 ```
 
 If you want to rebuild keyboards for tests, you'll also need WINE:

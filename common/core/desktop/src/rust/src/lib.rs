@@ -47,7 +47,7 @@
 
   try
   {
-    // At the start of every process_event allways clear the action_items
+    // At the start of every process_event always clear the action_items
     state->actions().clear();
 
     switch (vk)
