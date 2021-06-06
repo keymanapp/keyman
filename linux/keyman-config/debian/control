@@ -13,6 +13,7 @@ Build-Depends:
  help2man,
  ibus,
  python3-all (>= 3.5),
+ python3-dbus,
  python3-gi,
  python3-lxml,
  python3-magic,

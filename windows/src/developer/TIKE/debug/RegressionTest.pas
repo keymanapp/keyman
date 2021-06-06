@@ -24,7 +24,13 @@ unit RegressionTest;  // I3324 TO DO
 
 interface
 
-uses Windows, SysUtils, Classes, Contnrs, debugging,
+uses
+  System.Classes,
+  System.Contnrs,
+  System.SysUtils,
+  Winapi.Windows,
+
+  debugging,
   debugkeyboard;
 
 type
@@ -115,16 +121,18 @@ type
 implementation
 
 uses
-  Controls,
-  Dialogs,
-  Forms,
+  System.Variants,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Xml.xmlintf,
+  Xml.xmldoc,
+
   KeymanVersion,
-  xmlintf,
-  xmldoc,
-  VKeys,
   kmxfileconsts,
   utilstr,
-  Unicode;
+  Unicode,
+  VKeys;
 
 const
   RegressionTestBeginModeText: array[TRegressionTestBeginMode] of WideString = ('ANSI', 'Unicode');
@@ -280,7 +288,8 @@ const
     '  <!ELEMENT postcontext ((text | deadkey)+)>'+nl+
     '  <!-- data in text and deadkey must not have extraneous space formatting as it will be read exactly as is -->'+nl+
     '  <!ELEMENT deadkey (#PCDATA)>'+nl+
-    '  <!ELEMENT text (#PCDATA)>'+nl;
+    '  <!ELEMENT text (#PCDATA)>'+nl+
+    '  <!ATTLIST text xml:space CDATA #IMPLIED>'+nl;
 
 procedure TRegressionTest.Load(FileName: string);  // I3324
 var
@@ -339,7 +348,7 @@ begin
     FEvents.Add(ev);
     key := FindNode('key', ch);
     c1 := FindNode('vkey', key);
-    ev.FVKey := FindVKeyName(Trim(c1.NodeValue));
+    ev.FVKey := FindVKeyName(Trim(VarToStr(c1.NodeValue)));
     if ev.FVKey = $FFFF then
       raise ERegressionTestFile.Create('Invalid xml file: vkey not valid: '+Trim(c1.NodeValue));
 
@@ -365,10 +374,10 @@ begin
       while Assigned(c1) do
       begin
         if c1.nodeName = 'text' then
-          ev.FPostContext := ev.FPostContext + c1.NodeValue
+          ev.FPostContext := ev.FPostContext + VarToStr(c1.NodeValue)
         else if c1.nodeName = 'deadkey' then
           ev.FPostContext := ev.FPostContext + WChr(UC_SENTINEL) + WChr(CODE_DEADKEY) +
-            WChr(GetDeadkeyCode(Trim(c1.NodeValue)));
+            WChr(GetDeadkeyCode(Trim(VarToStr(c1.NodeValue))));
         c1 := c1.nextSibling;
       end;
     end;
@@ -387,7 +396,7 @@ var
   s, ws: WideString;
 begin
   ws := '<?xml version="1.0" encoding="UTF-8"?>'#13#10 +
-        '<!DOCTYPE regressiontest SYSTEM "http://www.tavultesoft.com/keymandev/regtest.dtd">'#13#10+
+        '<!DOCTYPE regressiontest SYSTEM "https://api.keyman.com/schemas/regtest/regtest.dtd">'#13#10+
         '<regressiontest>'#13#10 +
         '  <info>'#13#10 +
         '    <version>'+SKeymanVersion60+'</version>'#13#10 +
@@ -469,7 +478,7 @@ begin
     end
     else
     begin
-      if not FInText then ws := ws + '<text>';
+      if not FInText then ws := ws + '<text xml:space="preserve">';
       FInText := True;
       ws := ws + FPostContext[i];
     end;
