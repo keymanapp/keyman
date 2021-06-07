@@ -19,10 +19,9 @@ if [[ "${CONFIGUREONLY}" != "no" && "${BUILDONLY}" != "no" ]]; then
 fi
 
 if [[ "${BUILDONLY}" == "no" ]]; then
-	if [ ! -d keyboardprocessor ]; then
-		meson ../common/core/desktop keyboardprocessor
-	fi
-	cd keyboardprocessor
+	../common/core/desktop/build.sh -t keyboardprocessor configure
+
+	cd keyboardprocessor/arch/release
 	echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"
 	meson configure -Dprefix=${INSTALLDIR} && ninja reconfigure
 	cd $BASEDIR
@@ -30,9 +29,10 @@ fi
 
 if [[ "${CONFIGUREONLY}" == "no" ]]; then
 	echo "building keyboardprocessor"
-	cd keyboardprocessor
-	ninja
-	cd $BASEDIR
+	# May 2021: For now, running tests here as well. We could move this elsewhere
+	# in the future if we want to split out the tests, but they run in a couple of seconds
+	# at present.
+	../common/core/desktop/build.sh -t keyboardprocessor build tests
 fi
 
 for proj in kmflcomp libkmfl ibus-kmfl ibus-keyman; do
@@ -48,15 +48,15 @@ for proj in kmflcomp libkmfl ibus-kmfl ibus-keyman; do
 	if [[ "${BUILDONLY}" == "no" ]]; then
 		echo "Configuring $proj"
 		if [[ "${INSTALLDIR}" == "/tmp/kmfl" ]]; then # don't install ibus-kmfl or ibus-keyman into ibus
-			../$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/include -I\$(top_builddir)/../../common/core/desktop/include" \
+			../$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/arch/release/include -I\$(top_builddir)/../../common/core/desktop/include" \
 				CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" \
-				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/src -lkmnkbp0" \
+				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/arch/release/src -lkmnkbp0" \
 				LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
 		else	# install ibus-kmfl and ibus-keyman into ibus
-			../$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/include -I\$(top_builddir)/../../common/core/desktop/include" \
+			../$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/arch/release/include -I\$(top_builddir)/../../common/core/desktop/include" \
 				CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" \
 				LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" \
-				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/src -lkmnkbp0" \
+				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/arch/release/src -lkmnkbp0" \
 				--prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus --datadir=/usr/share
 		fi
 		if [ -d ../$proj/include ]; then

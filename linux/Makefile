@@ -32,7 +32,7 @@ sources:
 	./scripts/dist.sh
 
 tmpsources:
-	PKG_CONFIG_PATH="../keyboardprocessor/meson-private" ./scripts/dist.sh
+	PKG_CONFIG_PATH="../keyboardprocessor/arch/release/meson-private" ./scripts/dist.sh
 
 origdist:
 	./scripts/dist.sh origdist
