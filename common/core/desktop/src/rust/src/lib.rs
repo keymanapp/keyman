@@ -1,3 +1,6 @@
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
 /*
 // An table of VKEY to character sequence mappings, one per shift state.
   // An empty string inidicates no mapping.
@@ -107,6 +110,7 @@
   return KM_KBP_STATUS_OK;
   */
 
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 #[no_mangle]
 pub extern "C" fn rust_mock_process_event(_vk: u16, _modifier: u16) -> u32 {
   return 0; //KM_KBP_STATUS_OK

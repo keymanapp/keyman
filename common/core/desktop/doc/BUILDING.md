@@ -2,79 +2,153 @@
 
 ## Prerequisites
 
+- Bash (for Windows, included with Git for Windows)
 - Python 3
-- Meson build system 0.50 or later.
+- Meson build system 0.56+
+- ninja 1.10+
 - C++14 or later compiler (VC++ 2019 or later for Windows).
-- Rust from <https://www.rust-lang.org/tools/install> (or `cargo` package on Linux)
 - lib std::fs
 - kmcomp (for tests) -- must be added to path
+- Rust 1.51.0+ from <https://www.rust-lang.org/tools/install> (or `cargo` package on Linux)
+- emscripten 2.0.23+
+- WasmPack 0.9.1+
 
 ### Windows
 
-You can get the official Python installer from the official Python site:
-<https://www.python.org/downloads/windows/>
+* Install Git for Windows: <https://gitforwindows.org/>
 
-Ensure you have Python3 correctly installed and can run the command `pip`.
+* Install Python 3:
 
-Then install meson:
+  You can get the official Python installer from the official Python site:
+  <https://www.python.org/downloads/windows/>
+
+  Ensure you have Python3 correctly installed and can run the command `pip`.
+
+  Ensure that Python 3 is on the path ahead of Python 2 (if installed).
+
+* Install meson:
+
+  ```bash
+  python -m pip install meson
+  ```
+
+* Install [ninja](https://ninja-build.org/) 1.10+:
+
+  ```bash
+  choco install ninja
+  ```
+
+* Install Rust:
+
+  After downloading and running the executable from:
+  <https://www.rust-lang.org/tools/install>
+
+  Run the command:
+
+  ```bash
+  rustup target add i686-pc-windows-msvc
+  ```
+
+* Install wasm-pack:
+  <https://github.com/rustwasm/wasm-pack/releases/download/v0.9.1/wasm-pack-init.exe>
+
+* Install Emscripten:
+  <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
+
+* Add emcc to PATH (probably upstream\enscripten)
+
+#### Windows environment
+
+On Windows you may need to set `SDKVER` environment variable to the current
+Windows SDK version, if it cannot be automatically detected.
 
 ```bash
-python3 -m pip install meson
+export SDKVER=10.0.19041.0
 ```
+
+#### kmcomp
 
 Note on paths for kmcomp:
 
 The search path can be edited through System settings / Advanced system settings
 / Environment Variables / User environment variables.
 
-If you have Keyman Developer installed, add `%KeymanDeveloperPath%` to your
-path. Otherwise, add the path where you extracted the kmcomp archive.
+If you have Keyman Developer installed, kmcomp should be on the path already;
+otherwise add `%KeymanDeveloperPath%` to your path.
 
-#### Installing Rust
-
-After downloading and running the executable from:
-<https://www.rust-lang.org/tools/install>
-
-Run the command:
-```bash
-rustup target add i686-pc-windows-msvc
-```
+If you do not have Keyman Developer installed, add the path where you extracted
+the kmcomp archive.
 
 ### Linux
 
 #### Ubuntu and Debian
 
-You can install `meson` and Rust through the package manager:
+* Install Python
 
-```bash
-sudo apt update
-sudo apt install meson cargo
-rustup target add i686-pc-windows-msvc
-```
+  ```bash
+  sudo apt install python3
+  ```
 
-You'll also need the `kmcomp` wrapper - see below.
+* Install Meson:
+
+  ```bash
+  sudo apt install meson
+  ```
+
+* Install Rust:
+
+  ```bash
+  sudo apt install cargo
+  rustup target add i686-pc-windows-msvc
+  ```
+
+* Install wasm-pack:
+
+  ```bash
+  curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+  ```
+
+* Install Enscripten:
+  <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
+
+* Add emcc to PATH (probably upstream\enscripten)
+
+You may also need the `kmcomp` wrapper - see below.
 
 #### Other Linux distributions
 
-You will be able to install a python3 package in any reputable recent version of
-linux using its package manager if it's not already installed.
+* Install Python 3 and pip
 
-Then install meson:
+  You will be able to install a python3 package in any reputable recent version of
+  linux using its package manager if it's not already installed. Ensure that `pip`
+  is also installed.
 
-```bash
-sudo apt install python3 python3-pip
-python3 -m pip install meson
-```
+* Install meson:
 
-Install Rust from <https://www.rust-lang.org/tools/install>, then:
+  ```bash
+  python3 -m pip install meson
+  ```
 
-```bash
-rustup target add i686-pc-windows-msvc
-```
+* Install Rust from <https://www.rust-lang.org/tools/install>, then:
 
-You'll also need the `kmcomp` wrapper - see below.
+  ```bash
+  rustup target add i686-pc-windows-msvc
+  ```
 
-#### All Linux platforms
+* Install wasm-pack:
+
+  ```bash
+  curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+  ```
+
+* Install Enscripten:
+  <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
+
+* Add emcc to PATH (probably upstream/enscripten)
+
+You may also need the `kmcomp` wrapper - see below.
+
+#### kmcomp - All Linux platforms
 
 If you want to rebuild keyboards for tests, you need a wrapper `kmcomp` shell
 script:
@@ -90,16 +164,36 @@ Place this in the same folder as you extracted kmcomp.exe, and
 
 ### macOS
 
-You can get the official Python installer from the official Python site:
-<https://www.python.org/downloads/mac-osx/>
+* Install Python 3
 
-Install meson and rust:
+  You can get the official Python installer from the official Python site:
+  <https://www.python.org/downloads/mac-osx/>
 
-```bash
-brew install meson    # if you haven't already installed via pip
-curl https://sh.rustup.rs -sSf | sh
-rustup target add i686-pc-windows-msvc
-```
+* Install meson:
+
+  ```bash
+  brew install meson    # if you haven't already installed via pip
+  ```
+
+* Install Rust:
+
+  ```bash
+  curl https://sh.rustup.rs -sSf | sh
+  rustup target add i686-pc-windows-msvc
+  ```
+
+* Install wasm-pack:
+
+  ```bash
+  curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+  ```
+
+* Install Enscripten:
+  <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
+
+* Add emcc to PATH (probably upstream/enscripten)
+
+#### kmcomp
 
 If you want to rebuild keyboards for tests, you'll also need WINE:
 
@@ -119,30 +213,23 @@ Place this in the same folder as you extracted kmcomp.exe, and
 `chmod +x kmcomp`. Add the folder to the path (e.g.
 `export PATH=/path/to/kmcomp:$PATH`, which you can add to `.bashrc`).
 
-## Building
-
-### Prerequisite on Windows
-
-On Windows you may need to set `SDKVER` environment variable to the current
-Windows SDK version, if it cannot be automatically detected, e.g.:
-
-```DOS
-set SDKVER=10.0.19041.0
-```
-
-You'll also need to install x86 support for Rust:
-
-```DOS
-rustup target add i686-pc-windows-msvc
-```
-
-### Building on all platforms
+## Building -- all platforms
 
 On all platforms, use `build.sh`.
 
-```bash
-./build.sh --debug
-```
+* To build native libraries and tests:
+
+  ```bash
+  ./build.sh --debug
+  ```
+
+* To build WASM libraries and tests:
+
+  ```bash
+  ./build.sh --platform wasm
+  ```
+
+* See `./build.sh --help` for more details
 
 ## Note on kmcomp
 

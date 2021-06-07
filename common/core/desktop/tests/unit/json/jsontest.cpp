@@ -16,12 +16,31 @@
 #include <fstream>
 #include <json.hpp>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 int main(int argc, char * argv[])
 {
   std::ofstream log;
-  if (argc > 1)
+
+  if (argc > 1) {
+#ifdef __EMSCRIPTEN__
+  // For WASM we need to mount a virtual folder because we can't
+  // write to /; this assumes the input argv[1] is a relative
+  // path, which is okay for our unit tests.
+  EM_ASM(
+    FS.mkdir('/working');
+    FS.mount(NODEFS, { root: '.' }, '/working');
+  );
+
+    std::string path("working/");
+    path.append(argv[1]);
+    log.open(path);
+#else
     log.open(argv[1]);
+#endif
+  }
 
   json	jo(argc == 1 ? std::cout : log);
 
