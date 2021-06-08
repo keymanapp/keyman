@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.63 alpha 2021-06-08
+
+* feat(common): Rust infrastructure (#5162)
+* fix(web): Always pass kill_browserstack (#5234)
+* chore(common): iis setup script for dev boxes (#5206)
+* fix(windows): support Esc key in Download Keyboard dialog (#5207)
+* fix(android/engine): Adjust default OSK landscape size (#5201)
+
 ## 15.0.62 alpha 2021-06-04
 
 * fix(developer): support spaces in regression tests (#5217)
