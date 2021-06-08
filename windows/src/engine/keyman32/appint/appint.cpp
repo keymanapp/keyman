@@ -1,5 +1,5 @@
 /*
-  Name:             appint
+  Name:             appintO
   Copyright:        Copyright (C) SIL International.
   Documentation:
   Description:
@@ -114,7 +114,7 @@ void AppContext::Get(WCHAR *buf, int bufsize)
   for (WCHAR *p = this->BufMax(bufsize); *p && bufsize > 0; p++, bufsize--)
   {
     *buf = *p;
-    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) { 
+    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) {
       buf++; p++;
       *buf = *p;
       bufsize--;
