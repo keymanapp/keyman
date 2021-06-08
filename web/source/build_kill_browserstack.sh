@@ -15,5 +15,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 get_builder_OS
 
 if [ ${os_id} == 'win' ]; then
-  taskkill //f //im BrowserStackLocal.exe
+  # BrowserStackLocal may not exist, so always pass
+  taskkill //f //im BrowserStackLocal.exe || true
 fi
+
+exit 0
