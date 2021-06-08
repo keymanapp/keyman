@@ -18,6 +18,7 @@ public class DownloadIntentService extends IntentService {
     String filename = intent.getStringExtra("filename");
     String destination = intent.getStringExtra("destination");
     String languageID = intent.getStringExtra("language");
+    boolean silentInstall = intent.getBooleanExtra("silentInstall", false);
     final ResultReceiver receiver = intent.getParcelableExtra("receiver");
     Bundle bundle = new Bundle();
 
@@ -27,6 +28,7 @@ public class DownloadIntentService extends IntentService {
         bundle.putString("destination", destination);
         bundle.putString("filename", filename);
         bundle.putString("language", languageID);
+        bundle.putBoolean("silentInstall", silentInstall);
         receiver.send(FileUtils.DOWNLOAD_SUCCESS, bundle);
       } else {
         receiver.send(FileUtils.DOWNLOAD_ERROR, bundle);

@@ -35,10 +35,12 @@ public class DownloadResultReceiver extends ResultReceiver {
         String downloadedFilename = resultData.getString("filename");
         String languageID = resultData.getString("language");
         String kmpFilename = resultData.getString("destination") + File.separator + downloadedFilename;
+        boolean silentInstall = resultData.getBoolean("silentInstall");
 
         Bundle bundle = new Bundle();
         bundle.putString("kmpFile", kmpFilename);
         bundle.putString("language", languageID);
+        bundle.putBoolean("silentInstall", silentInstall);
         Intent packageIntent = new Intent(context, PackageActivity.class);
         packageIntent.putExtras(bundle);
         context.startActivity(packageIntent);
