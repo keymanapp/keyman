@@ -47,6 +47,7 @@
 
   ```bash
   rustup target add i686-pc-windows-msvc
+  rustup target add wasm32-unknown-unknown
   ```
 
 * Install wasm-pack:
@@ -99,7 +100,7 @@ the kmcomp archive.
 
   ```bash
   sudo apt install cargo
-  rustup target add i686-pc-windows-msvc
+  rustup target add wasm32-unknown-unknown
   ```
 
 * Install wasm-pack:
@@ -128,11 +129,9 @@ You may also need the `kmcomp` wrapper - see below.
   ```bash
   python3 -m pip install meson
   ```
-
-* Install Rust from <https://www.rust-lang.org/tools/install>, then:
-
+  * Install Rust from <https://www.rust-lang.org/tools/install>, then:
   ```bash
-  rustup target add i686-pc-windows-msvc
+  rustup target add wasm32-unknown-unknown
   ```
 
 * Install wasm-pack:
@@ -179,7 +178,7 @@ Place this in the same folder as you extracted kmcomp.exe, and
 
   ```bash
   curl https://sh.rustup.rs -sSf | sh
-  rustup target add i686-pc-windows-msvc
+  rustup target add wasm32-unknown-unknown
   ```
 
 * Install wasm-pack:
