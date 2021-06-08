@@ -275,7 +275,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           if (KMPLink.isKeymanInstallLink(link)) {
             loadingIntentUri = KMPLink.getKeyboardDownloadLink(link);
           }
-          downloadKMP(loadingIntentUri);
+          downloadKMP(loadingIntentUri, false);
           break;
         case "keyman" :
           // TODO: Only accept download links from Keyman browser activities when universal links work
@@ -288,11 +288,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
               .appendPath("keyboards")
               .encodedQuery(loadingIntentUri.getEncodedQuery());
             loadingIntentUri = Uri.parse(builder.build().toString());
-            downloadKMP(loadingIntentUri);
+            downloadKMP(loadingIntentUri, false);
           } else if (KMPLink.isLegacyKeymanDownloadLink(loadingIntentUri.toString())) {
             link = loadingIntentUri.toString();
             loadingIntentUri = KMPLink.getLegacyKeyboardDownloadLink(link);
-            downloadKMP(loadingIntentUri);
+            downloadKMP(loadingIntentUri, false);
           } else {
             String msg = "Unrecognized scheme: " + scheme;
             KMLog.LogError(TAG, msg);
@@ -473,11 +473,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     resizeTextView(false);
   }
 
-  public void downloadKMP(String packageId, String bcp47) {
+  public void downloadKMP(String packageId, String bcp47, boolean silentInstall) {
     Uri downloadUri = bcp47 == null ?
       Uri.parse(KMString.format("https://keyman.com/go/package/download/%s", new Object[]{packageId})) :
       Uri.parse(KMString.format("https://keyman.com/go/package/download/%s?bcp47=%s", new Object[]{packageId, bcp47}));
-    downloadKMP(downloadUri);
+    downloadKMP(downloadUri, silentInstall);
   }
 
   /**
@@ -487,7 +487,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
    * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
    *       URL parsing, not this function.
    */
-  public void downloadKMP(Uri packageUri) {
+  public void downloadKMP(Uri packageUri, boolean silentInstall) {
     if (packageUri == null) {
       KMLog.LogError(TAG,"null uri passed to downloadKmp");
       String message = "Download failed. Invalid URL.";
@@ -535,6 +535,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             downloadIntent.putExtra("language", languageID);
             downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
             downloadIntent.putExtra("receiver", resultReceiver);
+            downloadIntent.putExtra("silentInstall", silentInstall);
 
             startService(downloadIntent);
           }
