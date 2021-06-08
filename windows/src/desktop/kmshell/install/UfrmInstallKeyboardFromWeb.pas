@@ -42,6 +42,8 @@ uses
   Vcl.Graphics,
   Winapi.Messages,
   Winapi.Windows,
+
+  Keyman.UI.UframeCEFHost,
   UfrmWebContainer,
   UfrmDownloadProgress,
   UfrmKeymanBase;
@@ -68,6 +70,8 @@ type
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
+    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean); override;
+    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean); override;
   end;
 
 implementation
@@ -76,6 +80,7 @@ uses
   System.Net.HttpClient,
   System.Net.URLClient,
   System.RegularExpressions,
+  uCEFTypes,
 
   httpuploader,
   GlobalProxySettings,
@@ -136,6 +141,18 @@ begin
     not TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsGo));         // don't capture the launch url https://keyman.com/go/windows/download-keyboards
 end;
 
+procedure TfrmInstallKeyboardFromWeb.cefKeyEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
+begin
+  if (e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN]) and
+      (e.event.windows_key_code = VK_ESCAPE) then
+  begin
+    ModalResult := mrCancel
+  end
+  else
+    inherited;
+end;
+
 procedure TfrmInstallKeyboardFromWeb.cefLoadingStateChange(Sender: TObject;
   isLoading, canGoBack, canGoForward: Boolean);
 begin
@@ -145,6 +162,16 @@ begin
       then cef.cef.ExecuteJavaScript('updateBackButtonState(true)', cef.cef.Browser.MainFrame.Url)
       else cef.cef.ExecuteJavaScript('updateBackButtonState(false)', cef.cef.Browser.MainFrame.Url);
   end;
+end;
+
+procedure TfrmInstallKeyboardFromWeb.cefPreKeySyncEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
+begin
+  if (e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN]) and
+      (e.event.windows_key_code = VK_ESCAPE) then
+    Handled := True
+  else
+    inherited;
 end;
 
 procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseEx(Sender: TObject; const Url: string;
