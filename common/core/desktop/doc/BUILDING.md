@@ -98,7 +98,11 @@ the kmcomp archive.
 
 * Install Rust:
 
+  # TODO
   ```bash
+  sudo apt install libssl-dev
+  sudo snap install rustup --classic
+  # sudo apt install curl
   sudo apt install cargo
   rustup target add wasm32-unknown-unknown
   ```
@@ -109,10 +113,8 @@ the kmcomp archive.
   curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
   ```
 
-* Install Enscripten:
+* Install Enscripten (including adding to path with `emsdk_env.sh`):
   <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
-
-* Add emcc to PATH (probably upstream\enscripten)
 
 You may also need the `kmcomp` wrapper - see below.
 
@@ -187,10 +189,8 @@ Place this in the same folder as you extracted kmcomp.exe, and
   curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
   ```
 
-* Install Enscripten:
+* Install Enscripten (including environment update):
   <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
-
-* Add emcc to PATH (probably upstream/enscripten)
 
 #### kmcomp
 
