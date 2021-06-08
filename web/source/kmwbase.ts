@@ -307,8 +307,8 @@ namespace com.keyman {
      *
      *  @param  {string}   arg    Language name (multiple arguments allowed)
      **/
-    ['addKeyboardsForLanguage'](arg) {
-      this.keyboardManager.addLanguageKeyboards(arguments);
+    ['addKeyboardsForLanguage'](arg) : Promise<com.keyman.keyboards.KeyboardStub[]|Error> {
+      return this.keyboardManager.addLanguageKeyboards(arguments);
     }
 
     /**
@@ -316,8 +316,8 @@ namespace com.keyman {
      *
      * @param {Object}    x   metadata object
      **/
-    ['register'](x) {
-      this.keyboardManager.register(x);
+    ['register'](x) : com.keyman.keyboards.KeyboardStub[] {
+      return this.keyboardManager.register(x);
     }
 
     /**
