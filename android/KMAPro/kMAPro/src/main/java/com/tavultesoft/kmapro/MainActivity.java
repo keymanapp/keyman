@@ -473,13 +473,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     resizeTextView(false);
   }
 
-  /**
-   * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
-   * If URL is valid, download the kmp.
-   * @param packageUri URI to download the package.
-   * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
-   *       URL parsing, not this function.
-   */
   public void downloadKMP(String packageId, String bcp47) {
     Uri downloadUri = bcp47 == null ?
       Uri.parse(KMString.format("https://keyman.com/go/package/download/%s", new Object[]{packageId})) :
@@ -487,6 +480,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     downloadKMP(downloadUri);
   }
 
+  /**
+   * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
+   * If URL is valid, download the kmp.
+   * @param packageUri URI to download the package.
+   * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
+   *       URL parsing, not this function.
+   */
   public void downloadKMP(Uri packageUri) {
     if (packageUri == null) {
       KMLog.LogError(TAG,"null uri passed to downloadKmp");
