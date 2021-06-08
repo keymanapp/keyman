@@ -76,15 +76,15 @@
       if(h > 0) {
         oskHeight = h;
       }
-      var kmw=com.keyman.singleton;  
+      var kmw=window['keyman'];
       if(kmw && kmw.core && kmw.core.activeKeyboard) {
         kmw.core.activeKeyboard.refreshLayouts();
       }
-      kmw.correctOSKTextSize();
+      kmw['correctOSKTextSize'];
     }
 
     function setOskWidth(w) {
-      if(w>0) {
+      if(w > 0) {
         oskWidth = w;
       }
     }
@@ -94,7 +94,7 @@
     }
 
     function getOskWidth() {
-      if(oskWidth <=0) {
+      if(oskWidth <= 0) {
         oskWidth = window.jsInterface.getKeyboardWidth();
       }
       //window.console.log('Keyboard width = '+oskWidth);
