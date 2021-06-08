@@ -265,9 +265,13 @@ build_windows() {
 build_standard() {
   local BUILD_PLATFORM="$1"
   local ARCH="$2"
-  local RUSTARCH="$3"
-  shift 3
-  local STANDARD_MESON_ARGS="$*"
+  local RUSTARCH=${3:-}
+  if [ $# -gt 3 ]; then
+    shift 3
+    local STANDARD_MESON_ARGS="$*"
+  else
+    local STANDARD_MESON_ARGS=
+  fi
 
   # Build rust targets
   build_test_rust "$ARCH" "$RUSTARCH"
@@ -302,8 +306,9 @@ build_standard() {
 }
 
 locate_emscripten() {
-  EMSCRIPTEN_BASE="$(dirname $(which emcc))"
-  [ -d "$EMSCRIPTEN_BASE" ] || fail "Could not locate emscripten (emcc)"
+  local EMCC=`which emcc`
+  [ -z "$EMCC" ] && fail "Could not locate emscripten (emcc)"
+  EMSCRIPTEN_BASE="$(dirname "$EMCC")"
 }
 
 build_meson_cross_file_for_wasm() {
