@@ -16,6 +16,7 @@ import android.view.View;
 
 import android.widget.Toast;
 
+import com.keyman.android.KmpInstallMode;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 import com.tavultesoft.kmea.KMManager;
@@ -46,13 +47,17 @@ public class PackageActivity extends AppCompatActivity implements
   private StepperLayout mStepperLayout;
   private StepperAdapter mStepperAdapter;
 
+  // Due to the disconnection between the package install and the welcome
+  // display, this flag currently has to be globally accessible.
+  public static KmpInstallMode lastInstallMode = KmpInstallMode.Full;
+
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_package_installer);
 
-    boolean silentInstall = false;
+    KmpInstallMode installMode = KmpInstallMode.Full;
     String languageID = null;
     ArrayList<String> languageList = new ArrayList<String>();
 
@@ -60,7 +65,9 @@ public class PackageActivity extends AppCompatActivity implements
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
       kmpFile = new File(bundle.getString("kmpFile"));
-      silentInstall = bundle.getBoolean("silentInstall", false);
+      installMode = (KmpInstallMode) bundle.getSerializable("installMode");
+      if(installMode == null) installMode = KmpInstallMode.Full;
+      lastInstallMode = installMode;
       languageID = bundle.getString("language", null);
       if (languageID != null && !languageID.isEmpty()) {
         languageList.add(languageID);
@@ -109,9 +116,9 @@ public class PackageActivity extends AppCompatActivity implements
       }
     }
 
-    // Silent installation (skip displaying welcome.htm and user confirmation)
-    if (silentInstall) {
-      installPackage(context, pkgTarget, pkgId, languageList, true);
+    // For Silent or WelcomeOnly installation, skip Readme and language selection
+    if (installMode != KmpInstallMode.Full) {
+      installPackage(context, pkgTarget, pkgId, languageList, installMode);
       return;
     }
 
@@ -131,7 +138,7 @@ public class PackageActivity extends AppCompatActivity implements
       String pkgTarget = data.getStringExtra("pkgTarget");
       String pkgId = data.getStringExtra("packageID");
       ArrayList<String> languageList = (ArrayList)data.getSerializableExtra("languageList");
-      installPackage(this, pkgTarget, pkgId, languageList, false);
+      installPackage(this, pkgTarget, pkgId, languageList, KmpInstallMode.Full);
     }
   }
 
@@ -204,13 +211,13 @@ public class PackageActivity extends AppCompatActivity implements
   @Override
   public void onInstallClicked(String pkgTarget, String packageID) {
     // Ignore language list and install the package
-    installPackage(this, pkgTarget, packageID, null, false);
+    installPackage(this, pkgTarget, packageID, null, KmpInstallMode.Full);
   }
 
   @Override
   public void onLanguagesSelected(String pkgTarget, String packageID, ArrayList<String>  languageList) {
     // Use the result of SelectLanguageActivity and install the package
-    installPackage(this, pkgTarget, packageID, languageList, false);
+    installPackage(this, pkgTarget, packageID, languageList, KmpInstallMode.Full);
   }
 
   @Override
@@ -231,10 +238,10 @@ public class PackageActivity extends AppCompatActivity implements
    * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    * @param pkgId String      The Keyman package ID
    * @param preferredLanguages ArrayList<String>  The optional array of language ID's to use
-   * @param anSilentInstall boolean If true, don't display readme.htm/welcome.htm content during installation
+   * @param installMode       How much of the install UI to show
    */
   private void installPackage(Context context, String pkgTarget, String pkgId,
-                              ArrayList<String> preferredLanguages, boolean anSilentInstall) {
+                              ArrayList<String> preferredLanguages, KmpInstallMode installMode) {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         // processKMP will remove currently installed package and install
@@ -251,7 +258,7 @@ public class PackageActivity extends AppCompatActivity implements
         boolean success = installedPackageKeyboards.size() != 0;
         boolean _cleanup = true;
         if (success) {
-          if(!anSilentInstall) {
+          if(installMode != KmpInstallMode.Silent) {
             String keyboardName = installedPackageKeyboards.get(0).get(KMManager.KMKey_KeyboardName);
             Toast.makeText(context,
               String.format(context.getString(R.string.keyboard_install_toast), keyboardName),
@@ -275,12 +282,12 @@ public class PackageActivity extends AppCompatActivity implements
         boolean success = installedLexicalModels.size() != 0;
         boolean _cleanup = true;
         if (success) {
-          if(!anSilentInstall)
+          if(installMode != KmpInstallMode.Silent)
             Toast.makeText(context,
               context.getString(R.string.model_install_toast),
               Toast.LENGTH_SHORT).show();
 
-            _cleanup = true;
+          _cleanup = true;
           if (installedLexicalModels != null) {
             notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
               installedLexicalModels, 1);
@@ -291,6 +298,10 @@ public class PackageActivity extends AppCompatActivity implements
           // Use Toast so it will linger when PackageActivity finishes
           showErrorToast(context, getString(R.string.no_new_predictive_text_to_install));
         }
+      }
+
+      if(installMode != KmpInstallMode.Full) {
+        finish();
       }
     } catch (Exception e) {
       KMLog.LogException(TAG, "", e);
