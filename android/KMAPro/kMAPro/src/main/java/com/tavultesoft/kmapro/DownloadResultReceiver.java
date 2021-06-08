@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.widget.Toast;
 
+import com.keyman.android.KmpInstallMode;
 import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.util.FileUtils;
 
@@ -35,12 +36,13 @@ public class DownloadResultReceiver extends ResultReceiver {
         String downloadedFilename = resultData.getString("filename");
         String languageID = resultData.getString("language");
         String kmpFilename = resultData.getString("destination") + File.separator + downloadedFilename;
-        boolean silentInstall = resultData.getBoolean("silentInstall");
+        KmpInstallMode installMode = (KmpInstallMode) resultData.getSerializable("installMode");
+        if(installMode == null) installMode = KmpInstallMode.Full;
 
         Bundle bundle = new Bundle();
         bundle.putString("kmpFile", kmpFilename);
         bundle.putString("language", languageID);
-        bundle.putBoolean("silentInstall", silentInstall);
+        bundle.putSerializable("installMode", installMode);
         Intent packageIntent = new Intent(context, PackageActivity.class);
         packageIntent.putExtras(bundle);
         context.startActivity(packageIntent);
