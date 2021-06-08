@@ -136,7 +136,8 @@ public class CheckInstallReferrer {
     String packageId = referrerUri.getQueryParameter("package");
     String bcp47 = referrerUri.getQueryParameter("bcp47");
 
-    Log.i(TAG, KMString.format("source=%s package=%s bcp47=%s", new Object[]{source, packageId, bcp47}));
+    KMLog.LogInfo(TAG, KMString.format("Install referrer details from Google Play: %s source=%s package=%s bcp47=%s",
+      new Object[]{urlReferrer, source, packageId, bcp47}));
 
     // We use the 'source' parameter as a basic sanity check as anything could be passed in referrer
     if(source == null || !source.equals("keyman")) return;
