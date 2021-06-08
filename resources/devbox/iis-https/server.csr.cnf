@@ -5,9 +5,4 @@ default_md = sha256
 distinguished_name = dn
 
 [dn]
-C=AU
-ST=Tasmania
-L=Hobart
-O=SIL International
-emailAddress=marc_durdin@sil.org
 CN = keyman.com.local
