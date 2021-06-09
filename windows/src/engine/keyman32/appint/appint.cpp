@@ -1,5 +1,5 @@
 /*
-  Name:             appintO
+  Name:             appint
   Copyright:        Copyright (C) SIL International.
   Documentation:
   Description:

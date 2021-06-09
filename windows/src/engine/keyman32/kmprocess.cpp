@@ -109,7 +109,7 @@ BOOL ProcessHook()
 
 	LPGROUP gp = _td->state.startgroup;
 
-	fOutputKeystroke = FALSE;
+	fOutputKeystroke = FALSE;  // TODO: 5011 no longer needs to be global
 
   //
   // If we are running in the debugger, don't do a second run through
@@ -143,8 +143,9 @@ BOOL ProcessHook()
 		else
 			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
+
   ///  TODO: 5011 Need to make sure the context is set correctly before processing event
-          WCHAR buf[MAXCONTEXT];
+  //        WCHAR buf[MAXCONTEXT];
   //        _td->app->GetWindowContext(buf, MAXCONTEXT);
   //     km_kbp_context_item *citems = nullptr;
   //     km_kbp_context_items_from_utf16(buf, &citems);
@@ -205,7 +206,7 @@ BOOL ProcessHook()
 
     }
 
- /// Do we want to process this when we find the action in the list from the core engine or
+ /// TODO: 5011 process this in action items iterations. Do we want to process this when we find the action in the list from the core engine or
  // do we process the emit key stroke with whatever we have queued up to this point.
   if (fOutputKeystroke && !_td->app->IsQueueEmpty()) {
     //
