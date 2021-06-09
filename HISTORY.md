@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.64 alpha 2021-06-09
+
+* feat(android): Automatically install keyboard through Play Store (#5230)
+* fix(oem/fv/ios): app encryption flag for app store uploads (15.0) (#5244)
+* refactor(common/core/web, web): target-agnostic key events (#5181)
+* fix(linux): Fix packaging on ppa (#5249)
+
 ## 15.0.63 alpha 2021-06-08
 
 * feat(common): Rust infrastructure (#5162)
