@@ -85,6 +85,36 @@ describe("Transcriptions and Transforms", function() {
       assert.equal(transcription.transform.deleteRight, 11, "Incorrect count for right-of-caret deletions");
     });
 
+    it("handles operations with long text", function() {
+      var Mock = com.keyman.text.Mock;
+
+      // Eh... had to pick SOMETHING.
+      let text = `Did you ever hear the Tragedy of Darth Plagueis the wise? I thought not.
+It's not a story the Jedi would tell you. It's a Sith legend. Darth Plagueis was a
+Dark Lord of the Sith, so powerful and so wise he could use the Force to influence
+the midichlorians to create life... He had such a knowledge of the dark side that
+he could even keep the ones he cared about from dying. The dark side of the Force
+is a pathway to many abilities some consider to be unnatural. He became so powerful...
+the only thing he was afraid of was losing his power, which eventually, of course,
+he did. Unfortunately, he taught his apprentice everything he knew, then his
+apprentice killed him in his sleep. It's ironic he could save others from death,
+but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
+
+      var target = new Mock(text, text.length);
+      var original = Mock.from(target);
+      target.deleteCharsBeforeCaret(1);
+      target.insertTextBeforeCaret("!");
+
+      /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
+      * Other modules coming later will need it, though.
+      */
+      var transcription = target.buildTranscriptionFrom(original, null);
+
+      assert.equal(transcription.transform.insert, "!", "Reported inserted text when only deletions exist");
+      assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
+      assert.equal(transcription.transform.deleteRight, 0, "Incorrect count for right-of-caret deletions");
+    });
+
     it("handles deletions around the caret without text insertion", function() {
       var Mock = com.keyman.text.Mock;
 
