@@ -104,8 +104,8 @@ namespace com.keyman.text {
      * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults 
      * where and when appropriate.
      *
-     * @param   {object}  Lkc  The pre-analyzed key event object
-     * @param   {boolean} usingOSK
+     * @param   {object}  Lkc           The pre-analyzed KeyEvent object
+     * @param   {boolean} outputTarget  The OutputTarget receiving the KeyEvent
      * @return  {string}
      */
     defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTarget): RuleBehavior {

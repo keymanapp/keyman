@@ -54,9 +54,10 @@ namespace com.keyman.text {
      *
      * Handles default output and keyboard processing for both OSK and physical keystrokes.
      * 
-     * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
-     * @returns     {Object}             A RuleBehavior object describing the cumulative effects of
-     *                                   all matched keyboard rules.
+     * @param       {Object}      keyEvent      The abstracted KeyEvent to use for keystroke processing
+     * @param       {Object}      outputTarget  The OutputTarget receiving the KeyEvent
+     * @returns     {Object}                    A RuleBehavior object describing the cumulative effects of
+     *                                          all matched keyboard rules.
      */
     processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       let formFactor = keyEvent.device.formFactor;
