@@ -6,8 +6,9 @@ If you are running from the repo or installing keyman-config manually rather tha
 then you will need to:
 
 ```bash
-sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil python3-requests \
-    python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli python3-setuptools python3-pip ibus
+sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil \
+    python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli \
+    python3-setuptools python3-pip python3-dbus ibus
 ```
 
 Either `python3-raven` or `python3-sentry-sdk` is required as well. To install it on Ubuntu 18.04 and earlier run:

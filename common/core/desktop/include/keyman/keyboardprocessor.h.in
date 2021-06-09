@@ -889,7 +889,8 @@ enum km_kbp_tech_value {
   KM_KBP_TECH_UNSPECIFIED = 0,
   KM_KBP_TECH_MOCK        = 1 << 0,
   KM_KBP_TECH_KMX         = 1 << 1,
-  KM_KBP_TECH_LDML        = 1 << 2
+  KM_KBP_TECH_LDML        = 1 << 2,
+  KM_KBP_TECH_RUST_MOCK   = 1 << 3
 };
 
 

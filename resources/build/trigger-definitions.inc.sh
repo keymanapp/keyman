@@ -11,8 +11,8 @@ available_platforms=(android ios linux mac web windows)
 
 watch_android='web|common/models|common/predictive-text|common/lexical-model-types|common/core/web'
 watch_ios='web|common/models|common/predictive-text|common/lexical-model-types|common/core/web'
-watch_linux='common/engine'
-watch_mac='common/engine'
+watch_linux='common/core/desktop'
+watch_mac='common/core/desktop'
 watch_web='common/models|common/predictive-text|common/lexical-model-types|common/core/web'
 
 # Windows currently builds Developer and Desktop, so we need everything from common,developer,web

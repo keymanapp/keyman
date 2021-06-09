@@ -107,7 +107,7 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
   }
 
   *q = 0;
-  pos = (intptr_t)(q-CurContext);
+  pos = (int)(intptr_t)(q-CurContext);
   CurContext[MAXCONTEXT-1] = 0;
 
   //DebugLog("KMX_Context::Set(%s):  EXIT [%d]: %s", Debug_UnicodeString(buf), pos, Debug_UnicodeString(CurContext, 1));

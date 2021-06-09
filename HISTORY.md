@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 15.0.64 alpha 2021-06-09
+
+* feat(android): Automatically install keyboard through Play Store (#5230)
+* fix(oem/fv/ios): app encryption flag for app store uploads (15.0) (#5244)
+* refactor(common/core/web, web): target-agnostic key events (#5181)
+* fix(linux): Fix packaging on ppa (#5249)
+
+## 15.0.63 alpha 2021-06-08
+
+* feat(common): Rust infrastructure (#5162)
+* fix(web): Always pass kill_browserstack (#5234)
+* chore(common): iis setup script for dev boxes (#5206)
+* fix(windows): support Esc key in Download Keyboard dialog (#5207)
+* fix(android/engine): Adjust default OSK landscape size (#5201)
+
+## 15.0.62 alpha 2021-06-04
+
+* fix(developer): support spaces in regression tests (#5217)
+
+## 15.0.61 alpha 2021-06-03
+
+* fix(linux): Exclude s390x from package builds for ibus-keyman (#5213)
+* feat(linux): Integrate with fcitx5 (#5215)
+
+## 15.0.60 alpha 2021-06-01
+
+* chore(windows): minor maintenance (#5192)
+* fix(windows): sentry.dll version handling (#5187)
+* fix(windows): start keymanx64 with ShellExecute (#5202)
+* fix(windows): fix size of splash (#5203)
+
 ## 15.0.59 alpha 2021-05-31
 
 * change(ios): workspace reorganization + cleanup (#5167)

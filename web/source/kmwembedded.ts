@@ -429,7 +429,6 @@ namespace com.keyman.text {
       
       // Check the virtual key 
       let Lkc: com.keyman.text.KeyEvent = {
-        Ltarg: com.keyman.dom.Utils.getOutputTarget(Lelem),
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
@@ -464,7 +463,7 @@ namespace com.keyman.text {
 
       // Now that we have a valid key event, hand it off to the Processor for execution.
       // This allows the Processor to also handle any predictive-text tasks necessary.
-      let retVal = com.keyman.osk.PreProcessor.handleClick(Lkc, null);
+      let retVal = com.keyman.osk.PreProcessor.handleClick(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem), null);
 
       // Special case for embedded to pass K_TAB back to device to process
       if(Lkc.Lcode == Codes.keyCodes["K_TAB"] || Lkc.Lcode == Codes.keyCodes["K_TABBACK"] 
@@ -501,7 +500,6 @@ namespace com.keyman.text {
 
     // Check the virtual key 
     var Lkc: com.keyman.text.KeyEvent = {
-      Ltarg: com.keyman.dom.Utils.getOutputTarget(keyman.domManager.getActiveElement()),
       Lmodifiers: shift,
       vkCode: code,
       Lcode: code,
@@ -517,7 +515,7 @@ namespace com.keyman.text {
       // off to the processor for its actual execution.
 
       // Should return 'false' when KMW _has_ fully handled the event and 'true' when not.
-      return !keyman.core.processKeyEvent(Lkc);
+      return !keyman.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
     } catch (err) {
       console.error(err.message, err);
       return false;

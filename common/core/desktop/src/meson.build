@@ -33,7 +33,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
   endif
 
   if host_machine.system() == 'darwin'
-    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor ']
+    warns += ['-Wno-ctor-dtor-privacy', '-Wno-non-virtual-dtor']
   endif
 endif
 
@@ -49,34 +49,36 @@ if compiler.get_id() == 'msvc'
 endif
 
 lib = library('kmnkbp0',
-    'option.cpp',
-    'keyboard.cpp',
-	'state.cpp',
-    'km_kbp_context_api.cpp',
-    'km_kbp_keyboard_api.cpp',
-    'km_kbp_options_api.cpp',
-    'km_kbp_state_api.cpp',
-	'km_kbp_processevent_api.cpp',
-    'json.cpp',
-	'mock/mock_processor.cpp',
-	'kmx/kmx_consts.cpp',
-	'kmx/kmx_processevent.cpp',
-	'kmx/kmx_actions.cpp',
-	'kmx/kmx_capslock.cpp',
-	'kmx/kmx_context.cpp',
-	'kmx/kmx_debug.cpp',
-    'kmx/kmx_environment.cpp',
-	'kmx/kmx_file.cpp',
-	'kmx/kmx_modifiers.cpp',
-	'kmx/kmx_options.cpp',
-	'kmx/kmx_processor.cpp',
-	'kmx/kmx_xstring.cpp',
-    'utfcodec.cpp',
-    cpp_args: defns + warns + flags,
-    link_args: links,
-    version: lib_version,
-    include_directories: inc,
-    install: true)
+  'option.cpp',
+  'keyboard.cpp',
+  'state.cpp',
+  'km_kbp_context_api.cpp',
+  'km_kbp_keyboard_api.cpp',
+  'km_kbp_options_api.cpp',
+  'km_kbp_state_api.cpp',
+  'km_kbp_processevent_api.cpp',
+  'json.cpp',
+  'mock/mock_processor.cpp',
+  'rust/rust_mock_processor.cpp',
+  'kmx/kmx_consts.cpp',
+  'kmx/kmx_processevent.cpp',
+  'kmx/kmx_actions.cpp',
+  'kmx/kmx_capslock.cpp',
+  'kmx/kmx_context.cpp',
+  'kmx/kmx_debug.cpp',
+  'kmx/kmx_environment.cpp',
+  'kmx/kmx_file.cpp',
+  'kmx/kmx_modifiers.cpp',
+  'kmx/kmx_options.cpp',
+  'kmx/kmx_processor.cpp',
+  'kmx/kmx_xstring.cpp',
+  'utfcodec.cpp',
+  cpp_args: defns + warns + flags,
+  link_args: links,
+  dependencies: [rust_mock_processor],
+  version: lib_version,
+  include_directories: inc,
+  install: true)
 
 kmnkbp = declare_dependency(link_with: lib, include_directories: inc)
 

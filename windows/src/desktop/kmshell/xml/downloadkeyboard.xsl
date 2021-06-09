@@ -52,13 +52,6 @@
             }
         </style>
 <script type="text/javascript"><![CDATA[
-	document.onkeydown = function()
-	{
-	  if(event.keyCode == 27) location.href='keyman:footer_cancel';
-		else return;
-		event.cancelBubble = true; event.returnValue = false;
-  }
-
   // This function is called by the Delphi code when browse events
   // happen, because we cannot determine the state of history adequately
   // from within the browser context.

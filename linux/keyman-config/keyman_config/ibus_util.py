@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import time
 import gi
 import logging
 import subprocess
@@ -10,11 +11,12 @@ from gi.repository import IBus, Gio
 
 def get_ibus_bus():
     try:
-        for i in range(10000):
+        for i in range(5):
             bus = IBus.Bus()
             if bus.is_connected() and bus.is_global_engine_enabled():
                 return bus
             bus.destroy()
+            time.sleep(1)
     except Exception as e:
         logging.warning("Failed get bus")
         logging.warning(e)

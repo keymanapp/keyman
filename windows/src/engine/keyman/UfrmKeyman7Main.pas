@@ -1948,36 +1948,33 @@ end;
 
 procedure TfrmKeyman7Main.StartKeymanX64;
 var
-  cmd: string;
-  si: TStartupInfoW;
-  pi: TProcessInformation;
-  v: PWideChar;
-  processHandle: THandle;
+  cmd, dir, params: string;
+  sei: TShellExecuteInfoW;
 begin
   if not IsWow64 then Exit;   // I4374
 
   try
-    FillChar(si, sizeof(TStartupInfoW), 0);
-    FillChar(pi, sizeof(TProcessInformation), 0);
-    si.cb := sizeof(TStartupInfo);
-    si.dwFlags := STARTF_USESHOWWINDOW;
-    si.wShowWindow := SW_HIDE;
+    // TODO: use TKeymanPaths to find keymanx64?
+    dir := ExtractFilePath(ParamStr(0));
+    cmd := dir + 'keymanx64.exe';
+    params := Format('%d %d', [GetCurrentProcessId, Application.Handle]);
 
-    if not DuplicateHandle(GetCurrentProcess, GetCurrentProcess,
-        GetCurrentProcess, @processHandle, 0, True, DUPLICATE_SAME_ACCESS) then
+    if not FileExists(cmd) then
+      // We'll get notification of the issue but it won't
+      // crash the process
+      raise Exception.Create(cmd+' could not be found');
+
+    FillChar(sei, SizeOf(sei), 0);
+    sei.cbSize := SizeOf(sei);
+    sei.Wnd := Handle;
+    sei.lpVerb := 'open';
+    sei.lpFile := PWideChar(cmd);
+    sei.lpParameters := PChar(params);
+    sei.lpDirectory := PWideChar(dir);
+    sei.nShow := SW_SHOW;
+
+    if not ShellExecuteExW(@sei) then
       RaiseLastOSError;
-    cmd := Format('%s%s %d %d', [ExtractFilePath(ParamStr(0)), 'keymanx64.exe', processHandle, Application.Handle]);
-    // Duplicate the string because CreateProcess requires a mutable buffer, so
-    // this guarantees it
-    v := StrNew(PWideChar(cmd));
-    try
-      if not CreateProcessW(nil, v, nil, nil, True, NORMAL_PRIORITY_CLASS, nil, nil, si, pi) then
-        RaiseLastOSError;
-      CloseHandle(pi.hProcess);
-      CloseHandle(pi.hThread);
-    finally
-      StrDispose(v);
-    end;
   except
     on E:Exception do
     begin

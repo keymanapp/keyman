@@ -5,10 +5,13 @@
 import logging
 import os.path
 import pathlib
+import subprocess
 import sys
 import webbrowser
 import tempfile
 import gi
+
+from keyman_config.fcitx_util import is_fcitx_running
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 
@@ -296,7 +299,19 @@ class InstallKmpWindow(Gtk.Dialog):
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
         try:
-            install_kmp(self.kmpfile, self.online, language=self.language)
+            result = install_kmp(self.kmpfile, self.online, language=self.language)
+            if result:
+                # If install_kmp returns a string, it is an instruction for the end user,
+                # because for fcitx they will need to take extra steps to complete 
+                # installation themselves.
+                dialog = Gtk.MessageDialog(
+                    self, 0, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK, result)
+                dialog.run()
+                dialog.destroy()
+                if is_fcitx_running():
+                    subprocess.run(['fcitx5-configtool'])
+
             if self.viewwindow:
                 self.viewwindow.refresh_installed_kmp()
             keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])

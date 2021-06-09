@@ -1,0 +1,13 @@
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+DNS.2 = keyman.com.local
+DNS.3 = *.keyman.com.local
+DNS.4 = keymanweb.com.local
+DNS.5 = keymankeyboards.com.local
+DNS.6 = keyman.dev.local
+DNS.7 = *.keymanweb.com.local
