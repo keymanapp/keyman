@@ -84,7 +84,7 @@ get_platform_folder() {
 
 # The following allows coloring of warning and error lines, but only works if there's a
 # terminal attached, so not on the build machine.
-if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]]; then
+if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
     ERROR_RED=$(tput setaf 1)
     SUCCESS_GREEN=$(tput setaf 2)
     WARNING_YELLOW=$(tput setaf 3)
