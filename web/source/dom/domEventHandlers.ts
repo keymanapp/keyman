@@ -477,13 +477,14 @@ namespace com.keyman.dom {
       if(Levent == null || !osk.ready) {
         return true;
       }
-      var inputEle = (Levent.Ltarg as targets.OutputTarget).getElement();
+      let outputTarget = PreProcessor.getEventOutputTarget(e) as dom.targets.OutputTarget;
+      var inputEle = outputTarget.getElement();
 
       // Since this part concerns DOM element + browser interaction management, we preprocess it for
       // browser form commands before passing control to the Processor module.
       if(Levent.Lcode == 13) {
         var ignore = false;
-        if(Levent.Ltarg instanceof inputEle.ownerDocument.defaultView.HTMLTextAreaElement) {
+        if(outputTarget instanceof inputEle.ownerDocument.defaultView.HTMLTextAreaElement) {
           ignore = true;
         }
       

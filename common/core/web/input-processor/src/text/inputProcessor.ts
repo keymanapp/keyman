@@ -54,16 +54,13 @@ namespace com.keyman.text {
      *
      * Handles default output and keyboard processing for both OSK and physical keystrokes.
      * 
-     * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
-     * @returns     {Object}             A RuleBehavior object describing the cumulative effects of
-     *                                   all matched keyboard rules.
+     * @param       {Object}      keyEvent      The abstracted KeyEvent to use for keystroke processing
+     * @param       {Object}      outputTarget  The OutputTarget receiving the KeyEvent
+     * @returns     {Object}                    A RuleBehavior object describing the cumulative effects of
+     *                                          all matched keyboard rules.
      */
-    processKeyEvent(keyEvent: KeyEvent): RuleBehavior {
+    processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       let formFactor = keyEvent.device.formFactor;
-
-      // Determine the current target for text output and create a "mock" backup
-      // of its current, pre-input state.  Current, long-existing assumption - it's DOM-backed.
-      let outputTarget = keyEvent.Ltarg;
       let fromOSK = keyEvent.isSynthetic;
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
@@ -78,7 +75,7 @@ namespace com.keyman.text {
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
       // of state management.
-      if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, !fromOSK)) {
+      if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, outputTarget, !fromOSK)) {
         return new RuleBehavior();
       }
 
@@ -99,6 +96,8 @@ namespace com.keyman.text {
 
       // // ...end I3363 (Build 301)
 
+      // Create a "mock" backup of the current outputTarget in its pre-input state.
+      // Current, long-existing assumption - it's DOM-backed.
       let preInputMock = Mock.from(outputTarget);
       let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget);
 
@@ -129,7 +128,7 @@ namespace com.keyman.text {
                 continue;
               }
 
-              let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, mock, keyEvent.device);
+              let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, keyEvent.device);
               let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
               
               // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
@@ -157,7 +156,7 @@ namespace com.keyman.text {
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
-        ruleBehavior.finalize(this.keyboardProcessor);
+        ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
 
         // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
         

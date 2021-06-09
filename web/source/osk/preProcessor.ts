@@ -7,7 +7,7 @@ namespace com.keyman.osk {
       // Start:  mirrors _GetKeyEventProperties
 
       // First check the virtual key, and process shift, control, alt or function keys
-      let Lkc = e.constructKeyEvent(core.keyboardProcessor, dom.Utils.getOutputTarget(Lelem), keyman.util.device.coreSpec);
+      let Lkc = e.constructKeyEvent(core.keyboardProcessor, keyman.util.device.coreSpec);
 
       // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
       switch(Lkc.kName) {
@@ -73,7 +73,7 @@ namespace com.keyman.osk {
           com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         }
 
-        let retVal = PreProcessor.handleClick(Lkc, e);
+        let retVal = PreProcessor.handleClick(Lkc, outputTarget, e);
 
         // Now that processing is done, we can do a bit of post-processing, too.
         keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
@@ -87,7 +87,7 @@ namespace com.keyman.osk {
     // after the KeyEvent object has been properly instantiated.  This should help catch any 
     // mutual last-minute DOM-side interactions before passing control to the processor... such as
     // the UI-control command keys as seen below.
-    static handleClick(Lkc: text.KeyEvent, e: KeyElement) {
+    static handleClick(Lkc: text.KeyEvent, outputTarget: text.OutputTarget, e: KeyElement) {
       let keyman = com.keyman.singleton;
         // Exclude menu and OSK hide keys from normal click processing
       if(Lkc.kName == 'K_LOPT' || Lkc.kName == 'K_ROPT') {
@@ -95,7 +95,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      let retVal = (keyman.core.processKeyEvent(Lkc) != null);
+      let retVal = (keyman.core.processKeyEvent(Lkc, outputTarget) != null);
 
       return retVal;
     }

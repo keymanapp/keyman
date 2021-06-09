@@ -10,7 +10,6 @@ namespace com.keyman.text {
    * having to actually load the entirety of KMW.
    */
   export class KeyEvent {
-    Ltarg: OutputTarget;
     Lcode: number;
     Lstates: number;
     LmodifierChange?: boolean;
