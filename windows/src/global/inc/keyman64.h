@@ -234,7 +234,7 @@ typedef struct tagINTKEYBOARDINFO
   DWORD __filler_Hotkey;
   DWORD __filler; // makes same as KEYBOARDINFO   // I4462
   char Name[256];
-  LPKEYBOARD Keyboard;
+  LPKEYBOARD Keyboard; // TODO: 5011 update this with km_keyboard
   DWORD nIMDLLs;
   LPIMDLL IMDLLs;
   int __filler2; // makes same as KEYBOARDINFO
@@ -253,14 +253,12 @@ typedef struct tagINI
 typedef struct tagKMSTATE
 {
   BOOL NoMatches;
-  BOOL StopOutput;
-  int LoopTimes;
   MSG msg;
   WORD vkey;          // I934
   WCHAR charCode;     // I4582
   BOOL windowunicode; // I4287
-  LPKEYBOARD lpkb;
-  LPGROUP startgroup;
+  km_kbp_keyboard* lpkb;//km_kbp_keyboard
+  km_kbp_state*    lpActiveKBState;
 } KMSTATE;
 // I3616
 enum ProcessStringReturn

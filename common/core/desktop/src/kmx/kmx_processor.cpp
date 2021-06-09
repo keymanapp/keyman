@@ -299,7 +299,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 
   return TRUE;
 }
-
+/// TODO: 5011 this Comment block needs to be updated - re-written to match core engine.
 /*
 * int PostString( PKMX_CHAR str, KMX_BOOL *useMode, LPMSG mp,
 * LPKEYBOARD lpkb );
