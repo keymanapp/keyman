@@ -3,7 +3,7 @@ The Original Code is (C) 2017-2018 SIL International
 
 ## Minimum Web Compilation Requirements
 
-* Java 7+ (required by the Google Closure Compiler)
+* [Java 7+](https://adoptopenjdk.net/releases.html) (required by the Google Closure Compiler)
     * This can be ignored for Keyman Developer builds.
 * A local installation of [Node.js](https://nodejs.org/) v8.9+.
 	* Builds will call `npm install` to automatically install further necessary build dependencies.
