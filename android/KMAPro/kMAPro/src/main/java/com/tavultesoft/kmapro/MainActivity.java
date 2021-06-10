@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.keyman.android.CheckInstallReferrer;
+import com.keyman.android.KmpInstallMode;
 import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMHelpFileActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -35,7 +36,7 @@ import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
-import com.tavultesoft.kmea.util.DownloadIntentService;
+import com.keyman.android.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 import com.tavultesoft.kmea.util.KMString;
@@ -275,7 +276,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           if (KMPLink.isKeymanInstallLink(link)) {
             loadingIntentUri = KMPLink.getKeyboardDownloadLink(link);
           }
-          downloadKMP(loadingIntentUri);
+          downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           break;
         case "keyman" :
           // TODO: Only accept download links from Keyman browser activities when universal links work
@@ -288,11 +289,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
               .appendPath("keyboards")
               .encodedQuery(loadingIntentUri.getEncodedQuery());
             loadingIntentUri = Uri.parse(builder.build().toString());
-            downloadKMP(loadingIntentUri);
+            downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           } else if (KMPLink.isLegacyKeymanDownloadLink(loadingIntentUri.toString())) {
             link = loadingIntentUri.toString();
             loadingIntentUri = KMPLink.getLegacyKeyboardDownloadLink(link);
-            downloadKMP(loadingIntentUri);
+            downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           } else {
             String msg = "Unrecognized scheme: " + scheme;
             KMLog.LogError(TAG, msg);
@@ -473,11 +474,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     resizeTextView(false);
   }
 
-  public void downloadKMP(String packageId, String bcp47) {
+  public void downloadKMP(String packageId, String bcp47, KmpInstallMode installMode) {
     Uri downloadUri = bcp47 == null ?
       Uri.parse(KMString.format("https://keyman.com/go/package/download/%s", new Object[]{packageId})) :
       Uri.parse(KMString.format("https://keyman.com/go/package/download/%s?bcp47=%s", new Object[]{packageId, bcp47}));
-    downloadKMP(downloadUri);
+    downloadKMP(downloadUri, installMode);
   }
 
   /**
@@ -487,7 +488,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
    * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
    *       URL parsing, not this function.
    */
-  public void downloadKMP(Uri packageUri) {
+  public void downloadKMP(Uri packageUri, KmpInstallMode installMode) {
     if (packageUri == null) {
       KMLog.LogError(TAG,"null uri passed to downloadKmp");
       String message = "Download failed. Invalid URL.";
@@ -535,6 +536,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             downloadIntent.putExtra("language", languageID);
             downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
             downloadIntent.putExtra("receiver", resultReceiver);
+            downloadIntent.putExtra("installMode", installMode);
 
             startService(downloadIntent);
           }
@@ -978,8 +980,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       }
     }
 
-    // Display welcome.htm help file
-    if (customHelpLink != null && !customHelpLink.isEmpty() &&
+    // Display welcome.htm help file -- if we are not doing a silent install
+    if (PackageActivity.lastInstallMode != KmpInstallMode.Silent &&
+        customHelpLink != null && !customHelpLink.isEmpty() &&
         packageID != null && !packageID.isEmpty() && FileUtils.isWelcomeFile(customHelpLink)) {
       // Display local welcome.htm help file, including associated assets
       Intent i = new Intent(this, KMHelpFileActivity.class);
@@ -988,6 +991,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
       startActivity(i);
     }
+
+    // We'll reset the global installMode flag now so that future package
+    // installs that don't go through PackageActivity are not affected.
+    PackageActivity.lastInstallMode  = KmpInstallMode.Full;
   }
 
   @Override
