@@ -1,4 +1,5 @@
 /// <reference path="preProcessor.ts" />
+/// <reference path="utils.ts" />
 
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
@@ -130,7 +131,7 @@ namespace com.keyman.osk {
      * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
      * This version has been substantially modified to work for this particular application.
      */
-    static getTextMetrics(osk: VisualKeyboard, text: string, style: {fontFamily?: string, fontSize: string}): TextMetrics {
+    static getTextMetrics(text: string, emScale: number, style: {fontFamily?: string, fontSize: string}): TextMetrics {
       // A final fallback - having the right font selected makes a world of difference.
       if(!style.fontFamily) {
         style.fontFamily = getComputedStyle(document.body).fontFamily;
@@ -141,11 +142,7 @@ namespace com.keyman.osk {
       }
 
       let fontFamily = style.fontFamily;
-
-      // Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
-      // The following allows us to calculate the font size in those situations.
-      let emScale = osk.getKeyEmFontSize();
-      let fontSpec = (<KeymanBase> window['keyman']).util.getFontSizeStyle(style.fontSize);
+      let fontSpec = getFontSizeStyle(style.fontSize);
 
       var fontSize: string;
       if(fontSpec.absolute) {
@@ -167,10 +164,10 @@ namespace com.keyman.osk {
 
     getIdealFontSize(osk: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
       // Recompute the new width for use in autoscaling calculations below, just in case.
-      let util = com.keyman.singleton.util;
-      let metrics = OSKKey.getTextMetrics(osk, this.spec.text, style);
+      let emScale = osk.getKeyEmFontSize();
+      let metrics = OSKKey.getTextMetrics(this.spec.text, emScale, style);
 
-      let fontSpec = util.getFontSizeStyle(style.fontSize);
+      let fontSpec = getFontSizeStyle(style.fontSize);
       let keyWidth = this.getKeyWidth(osk);
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
@@ -266,12 +263,11 @@ namespace com.keyman.osk {
 
     // Produces a HTMLSpanElement with the key's actual text.
     protected generateKeyText(osk: VisualKeyboard): HTMLSpanElement {
-      let util = (<KeymanBase>window['keyman']).util;
       let spec = this.spec;
 
       // Add OSK key labels
       var keyText;
-      var t=util._CreateElement('span'), ts=t.style;
+      var t = document.createElement('span'), ts=t.style;
       if(spec['text'] == null || spec['text'] == '') {
         keyText='\xa0';  // default:  nbsp.
         if(typeof spec['id'] == 'string') {
@@ -321,7 +317,8 @@ namespace com.keyman.osk {
       }
 
       // Check the key's display width - does the key visualize well?
-      var width: number = OSKKey.getTextMetrics(osk, keyText, styleSpec).width;
+      let emScale = osk.getKeyEmFontSize();
+      var width: number = OSKKey.getTextMetrics(keyText, emScale, styleSpec).width;
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
 
@@ -384,7 +381,7 @@ namespace com.keyman.osk {
       }
 
       if(x > 0) {
-        let q = (<KeymanBase>window['keyman']).util._CreateElement('div');
+        let q = document.createElement('div');
         q.className='kmw-key-label';
         q.innerHTML=String.fromCharCode(x);
         return q;
@@ -411,18 +408,17 @@ namespace com.keyman.osk {
       }
 
       // If a subkey array is defined, add an icon
-      var skIcon=(<KeymanBase>window['keyman']).util._CreateElement('div');
+      var skIcon = document.createElement('div');
       skIcon.className='kmw-key-popup-icon';
       //kDiv.appendChild(skIcon);
       btn.appendChild(skIcon);
     }
 
     construct(osk: VisualKeyboard, layout: keyboards.LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
-      let util = com.keyman.singleton.util;
       let spec = this.spec;
       let isDesktop = this.formFactor == "desktop"
 
-      let kDiv=util._CreateElement('div');
+      let kDiv = document.createElement('div');
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
@@ -430,7 +426,7 @@ namespace com.keyman.osk {
 
       let originalPercent = totalPercent;
 
-      let btnEle=util._CreateElement('div');
+      let btnEle = document.createElement('div');
       let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
       // Set button class
@@ -2013,9 +2009,12 @@ namespace com.keyman.osk {
     }.bind(this);
     //#endregion
 
+    /**
+     * Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
+     * This function allows us to calculate the font size in those situations.
+     */
     getKeyEmFontSize() {
       let keyman = com.keyman.singleton;
-      let util = keyman.util;
 
       if(this.device.formFactor == 'desktop') {
         let kbdFontSize = this.defaultFontSize();
@@ -2023,13 +2022,13 @@ namespace com.keyman.osk {
         return kbdFontSize * keySquareScale;
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
-        let emSize = util.getFontSizeStyle(emSizeStr).val;
+        let emSize = getFontSizeStyle(emSizeStr).val;
 
         var emScale = 1;
         if(!this.isStatic) {
           // Reading this requires the OSK to be active, so we filter out
           // BuildVisualKeyboard calls here.
-          let boxFontStyle = util.getFontSizeStyle(keyman.osk._Box);
+          let boxFontStyle = getFontSizeStyle(keyman.osk._Box);
 
           // Double-check against the font scaling applied to the _Box element.
           if(boxFontStyle.absolute) {
