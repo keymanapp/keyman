@@ -4,14 +4,18 @@
 
 - Bash (for Windows, included with Git for Windows)
 - Python 3
-- Meson build system 0.56+
-- ninja 1.10+
+- Meson build system 0.45+ (0.56+ for WASM)
+- ninja 1.8+
 - C++14 or later compiler (VC++ 2019 or later for Windows).
 - lib std::fs
 - kmcomp (for tests) -- must be added to path
-- Rust 1.51.0+ from <https://www.rust-lang.org/tools/install> (or `cargo` package on Linux)
+- Rust 1.50+ from <https://www.rust-lang.org/tools/install> (or `cargo` package on Linux)
+
+For WASM builds:
+- Meson build system 0.56+
 - emscripten 2.0.23+
 - WasmPack 0.9.1+
+- ninja 1.10+ for WASM
 
 ### Windows
 
@@ -90,7 +94,7 @@ the kmcomp archive.
   sudo apt install python3
   ```
 
-* Install Meson:
+* Upgrade Meson from version included with Python (WASM builds):
 
   ```bash
   sudo apt install meson
@@ -100,20 +104,21 @@ the kmcomp archive.
 
   # TODO
   ```bash
+  sudo apt install cargo
+  # Additional for WASM builds:
   sudo apt install libssl-dev
   sudo snap install rustup --classic
-  # sudo apt install curl
-  sudo apt install cargo
+  rustup toolchain add stable
   rustup target add wasm32-unknown-unknown
   ```
 
-* Install wasm-pack:
+* Install wasm-pack (WASM builds):
 
   ```bash
   curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
   ```
 
-* Install Enscripten (including adding to path with `emsdk_env.sh`):
+* Install Enscripten (including adding to path with `emsdk_env.sh`)  (WASM builds):
   <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
 
 You may also need the `kmcomp` wrapper - see below.
@@ -131,18 +136,20 @@ You may also need the `kmcomp` wrapper - see below.
   ```bash
   python3 -m pip install meson
   ```
-  * Install Rust from <https://www.rust-lang.org/tools/install>, then:
+
+* Install Rust from <https://www.rust-lang.org/tools/install>, then:
+
   ```bash
   rustup target add wasm32-unknown-unknown
   ```
 
-* Install wasm-pack:
+* Install wasm-pack (WASM builds):
 
   ```bash
   curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
   ```
 
-* Install Enscripten:
+* Install Enscripten (WASM builds):
   <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
 
 * Add emcc to PATH (probably upstream/enscripten)

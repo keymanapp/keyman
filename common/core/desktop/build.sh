@@ -286,12 +286,16 @@ build_standard() {
 
   if $BUILD_CPP; then
     echo_heading "======= Building C++ library for $BUILD_PLATFORM ======="
-    meson compile -C "$MESON_PATH"
+    pushd "$MESON_PATH" > /dev/null
+    meson compile
+    popd > /dev/null
   fi
 
   if $TESTS_CPP; then
     echo_heading "======= Testing C++ library for $BUILD_PLATFORM ======="
-    meson test -C "$MESON_PATH" --print-errorlogs
+    pushd "$MESON_PATH" > /dev/null
+    meson test --print-errorlogs
+    popd > /dev/null
   fi
 
   if $INSTALL_RUST; then
@@ -301,7 +305,9 @@ build_standard() {
 
   if $INSTALL_CPP; then
     echo_heading "======= Installing C++ libraries for $BUILD_PLATFORM ======="
-    meson install -C "$MESON_PATH"
+    pushd "$MESON_PATH" > /dev/null
+    meson install
+    popd > /dev/null
   fi
 }
 
