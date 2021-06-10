@@ -681,19 +681,18 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
-    constructor(keyboard: keyboards.Keyboard, device?: Device, isStatic?: boolean) {
+    constructor(keyboard: keyboards.Keyboard, device: Device, isStatic?: boolean) {
       let keyman = com.keyman.singleton;
       // Ensure the OSK's current layer is kept up to date.
       keyman.core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
 
-      let util = keyman.util;
-      this.device = device = device || util.device;
+      this.device = device;
       if(isStatic) {
         this.isStatic = isStatic;
       }
 
       // Create the collection of HTML elements from the device-dependent layout object
-      var Lkbd=util._CreateElement('div');
+      var Lkbd=document.createElement('div');
       let layout: keyboards.ActiveLayout;
       if(keyboard) {
         layout = this.layout = keyboard.layout(device.formFactor as utils.FormFactor);
@@ -839,11 +838,10 @@ namespace com.keyman.osk {
         keyboard = new keyboards.Keyboard(null);
       }
       let layout = keyboard.layout(formFactor);
-      let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;
       let rowsPercent = 100;
 
-      var lDiv=util._CreateElement('div'), ls=lDiv.style, totalHeight=0;
+      var lDiv=document.createElement('div'), ls=lDiv.style, totalHeight=0;
 
       // Set OSK box default style
       lDiv.className='kmw-key-layer-group';
@@ -935,7 +933,7 @@ namespace com.keyman.osk {
 
       for(n=0; n<layers.length; n++) {
         let layer=layers[n] as keyboards.ActiveLayer;
-        gDiv=util._CreateElement('div'), gs=gDiv.style;
+        gDiv=document.createElement('div'), gs=gDiv.style;
         gDiv.className='kmw-key-layer';
 
         // Always make the first layer visible
@@ -952,13 +950,16 @@ namespace com.keyman.osk {
         let rows=layer['row'];
 
         for(i=0; i<rows.length; i++) {
-          rDiv=util._CreateElement('div');
+          rDiv=document.createElement('div');
           rDiv.className='kmw-key-row';
           // The following event trap is needed to prevent loss of focus in IE9 when clicking on a key gap.
           // Unclear why normal _CreateElement prevention of loss of focus does not seem to work here.
           // Appending handler to event handler chain does not work (other event handling remains active).
-          rDiv.onmousedown=util.mouseDownPreventDefaultHandler; // Build 360
-          //util.attachDOMEvent(rDiv,'mousedown',function(e){if(e)e.preventDefault();
+          rDiv.onmousedown = function(e: MouseEvent) {
+            if(e) {
+              e.preventDefault();
+            }
+          }
 
           let row=rows[i];
           rs=rDiv.style;
@@ -1318,7 +1319,7 @@ namespace com.keyman.osk {
      *
      **/
     moveOver: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
-      let util = com.keyman.singleton.util;
+      let keyman = com.keyman.singleton;
       e.preventDefault();
       e.cancelBubble=true;
 
@@ -1339,8 +1340,8 @@ namespace com.keyman.osk {
           y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
 
       // Move target key and highlighting
-      var t = this.touchPending = e.changedTouches[0],
-          t1 = <HTMLElement> document.elementFromPoint(x,y),
+      this.touchPending = e.changedTouches[0];
+      var t1 = <HTMLElement> document.elementFromPoint(x,y),
           key0 = this.keyPending,
           key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
 
@@ -1371,7 +1372,7 @@ namespace com.keyman.osk {
           this.touchPending=null;
         } else {
           if(key1 == this.popupBaseKey) {
-            if(!util.hasClass(key1,'kmw-key-touched')) {
+            if(!key1.classList.contains('kmw-key-touched')) {
               this.highlightKey(key1,true);
             }
             this.keyPending = key1;
@@ -1419,7 +1420,6 @@ namespace com.keyman.osk {
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
         // _Box has (most of) the useful client values.
-        let keyman = com.keyman.singleton;
         let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
         let height = (this.kbdDiv.firstChild as HTMLElement).offsetHeight; // firstChild == layer-group, has height info.
         // We need to adjust the offset properties by any offsets related to the active banner.
@@ -1477,19 +1477,17 @@ namespace com.keyman.osk {
      * @return  {Object}      the key element (or null)
      **/
     keyTarget(target: HTMLElement | EventTarget): KeyElement {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
       let t = <HTMLElement> target;
 
       try {
         if(t) {
-          if(util.hasClass(t,'kmw-key')) {
+          if(t.classList.contains('kmw-key')) {
             return getKeyFrom(t);
           }
-          if(t.parentNode && util.hasClass(<HTMLElement> t.parentNode,'kmw-key')) {
+          if(t.parentNode && (t.parentNode as HTMLElement).classList.contains('kmw-key')) {
             return getKeyFrom(t.parentNode);
           }
-          if(t.firstChild && util.hasClass(<HTMLElement> t.firstChild,'kmw-key')) {
+          if(t.firstChild && (t.firstChild as HTMLElement).classList.contains('kmw-key')) {
             return getKeyFrom(t.firstChild);
           }
         }
@@ -1716,7 +1714,6 @@ namespace com.keyman.osk {
       }
 
       let keyman = com.keyman.singleton;
-      let util = keyman.util;
       let device = this.device;
 
       // A tag we directly set on a key element during its construction.
@@ -2222,7 +2219,7 @@ namespace com.keyman.osk {
         // Must set the height of the btn DIV, not the label (if any)
         var j;
         for(j=0; j<keySquare.childNodes.length; j++) {
-          if(util.hasClass(keySquare.childNodes[j] as HTMLElement,'kmw-key')) {
+          if((keySquare.childNodes[j] as HTMLElement).classList.contains('kmw-key')) {
             break;
           }
         }
@@ -2244,7 +2241,7 @@ namespace com.keyman.osk {
 
         // Get the kmw-key-text element & style.
         for(j=0; j<keyElement.childNodes.length; j++) {
-          if(util.hasClass(keyElement.childNodes[j] as HTMLElement,'kmw-key-text')) {
+          if((keyElement.childNodes[j] as HTMLElement).classList.contains('kmw-key-text')) {
             break;
           }
         }
@@ -2494,8 +2491,6 @@ namespace com.keyman.osk {
 
   // Manage popup key highlighting
   highlightSubKeys(k: KeyElement, x: number, y: number) {
-    let util = com.keyman.singleton.util;
-
     // Test for subkey array, return if none
     // (JH 2/4/19) So, if a subkey is passed in, we return immediately?
     if(k == null || k['subKeys'] == null) {
@@ -2578,7 +2573,7 @@ namespace com.keyman.osk {
       // Find key text element
       for(var i=0; i<key.childNodes.length; i++) {
         kc = <HTMLElement> key.childNodes[i];
-        if(util.hasClass(kc,'kmw-key-text')) {
+        if(kc.classList.contains('kmw-key-text')) {
           break;
         }
       }
@@ -2661,8 +2656,7 @@ namespace com.keyman.osk {
    *  @param  {number}  edge  -1 left edge, 1 right edge, else 0
    */
   drawPreview(canvas: HTMLCanvasElement, w: number, h: number, edge: number, delta?: number) {
-    let util = com.keyman.singleton.util;
-    let device = util.device;
+    let device = this.device;
 
     delta = delta || 0;
 
@@ -2734,15 +2728,14 @@ namespace com.keyman.osk {
      */
     createKeyTip() {
       let keyman = com.keyman.singleton;
-      let util = keyman.util;
 
-      if(keyman.util.device.formFactor == 'phone') {
+      if(this.device.formFactor == 'phone') {
         if(this.keytip == null) {
           this.keytip = {
             key: null,
             state: false
           }
-          let tipElement = this.keytip.element=util._CreateElement('div');
+          let tipElement = this.keytip.element=document.createElement('div');
           tipElement.className='kmw-keytip';
           tipElement.id = 'kmw-keytip';
 
@@ -2750,8 +2743,8 @@ namespace com.keyman.osk {
           tipElement.style.pointerEvents='none';
 
           // Add CANVAS element for outline and SPAN for key label
-          tipElement.appendChild(util._CreateElement('canvas'));
-          tipElement.appendChild(util._CreateElement('span'));
+          tipElement.appendChild(document.createElement('canvas'));
+          tipElement.appendChild(document.createElement('span'));
         }
 
         // Always append to _Box (since cleared during OSK Load)
@@ -2767,9 +2760,8 @@ namespace com.keyman.osk {
      */
     addCallout(key: KeyElement, delta?: number): HTMLDivElement {
       let keyman = com.keyman.singleton;
-      let util = keyman.util;
 
-      if(util.device.formFactor != 'phone' || util.device.OS != 'iOS') {
+      if(this.device.formFactor != 'phone' || this.device.OS != 'iOS') {
         return null;
       }
 
@@ -2778,7 +2770,7 @@ namespace com.keyman.osk {
       let calloutHeight = key.offsetHeight - delta;
 
       if(calloutHeight > 0) {
-        var cc = util._CreateElement('div'), ccs = cc.style;
+        var cc = document.createElement('div'), ccs = cc.style;
         cc.id = 'kmw-popup-callout';
         keyman.osk._Box.appendChild(cc);
 

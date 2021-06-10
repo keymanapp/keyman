@@ -322,8 +322,9 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         this.vkbd.shutdown();
       }
-      this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard);
+
       let util = com.keyman.singleton.util;
+      this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard, util.device);
 
       // Set box class - OS and keyboard added for Build 360
       this._Box.className=util.device.formFactor+' '+ util.device.OS.toLowerCase() + ' kmw-osk-frame';
