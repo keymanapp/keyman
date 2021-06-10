@@ -360,7 +360,7 @@ namespace com.keyman.osk {
         this._Box.appendChild(this.resizeBar());
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {
-        this.vkbd.adjustHeights();
+        this.vkbd.adjustHeights(this);
       }
     }
 
@@ -1280,7 +1280,7 @@ namespace com.keyman.osk {
       // The following code will always be executed except for externally created OSK such as EuroLatin
       if(this.vkbd && this.vkbd.ddOSK) {
         // Enable the currently active keyboard layer and update the default nextLayer member
-        this.vkbd.show();
+        this.vkbd.show(this);
 
         // Extra style changes and overrides for touch-mode.
         if(device.touchable) {

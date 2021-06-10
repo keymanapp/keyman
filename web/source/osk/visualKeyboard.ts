@@ -2050,7 +2050,7 @@ namespace com.keyman.osk {
       return null;
     }
 
-    show() {
+    show(host: OSKManager) {
       let device = this.device;
       var n,nLayer=-1, b = this.kbdDiv.childNodes[0].childNodes;
 
@@ -2082,7 +2082,7 @@ namespace com.keyman.osk {
         // Do NOT condition upon form-factor; this line prevents a bug with displaying
         // the predictive-text banner on the initial keyboard load.  (Issue #2907)
         if(device.OS == 'iOS') {
-          this.adjustHeights();
+          this.adjustHeights(host);
         }
       }
 
@@ -2094,9 +2094,9 @@ namespace com.keyman.osk {
      * Adjust the absolute height of each keyboard element after a rotation
      *
      **/
-    adjustHeights() {
+    adjustHeights(host: OSKManager) {
       let keyman = com.keyman.singleton;
-      let _Box = keyman.osk._Box;
+      let _Box = host._Box;
       let device = this.device;
 
       if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
@@ -2109,34 +2109,32 @@ namespace com.keyman.osk {
         fs=fs/keyman.util.getViewportScale();
       }
 
-      let oskHeight = this.computedAdjustedOskHeight();
+      let paddedHeight = this.computedAdjustedOskHeight(host.getKeyboardHeight());
 
       var b: HTMLElement = _Box, bs=b.style;
-      bs.height=bs.maxHeight=oskHeight+'px';
+      bs.height=bs.maxHeight=paddedHeight+'px';
 
       b = this.kbdDiv.firstChild as HTMLElement;
       bs=b.style;
       // Sets the layer group to the correct height.
-      bs.height=bs.maxHeight=oskHeight+'px';
+      bs.height=bs.maxHeight=paddedHeight+'px';
       bs.fontSize=fs+'em';
 
-      this.adjustLayerHeights(oskHeight);
+      this.adjustLayerHeights(paddedHeight, host.getKeyboardHeight());
 
       return true;
     }
 
-    private computedAdjustedOskHeight(): number {
-      let oskManager = com.keyman.singleton.osk;
+    private computedAdjustedOskHeight(allottedHeight: number): number {
       let device = this.device;
 
       var layers=this.kbdDiv.firstChild.childNodes;
-      let kbdHeight = oskManager.getKeyboardHeight();
       let oskHeight = 0;
 
       // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
       for(let i = 0; i < layers.length; i++) {
         let nRows = layers[i].childNodes.length;
-        let rowHeight = Math.floor(kbdHeight/(nRows == 0 ? 1 : nRows));
+        let rowHeight = Math.floor(allottedHeight/(nRows == 0 ? 1 : nRows));
         let layerHeight = nRows * rowHeight;
 
         if(layerHeight > oskHeight) {
@@ -2155,8 +2153,7 @@ namespace com.keyman.osk {
       return oskPaddedHeight;
     }
 
-    private adjustLayerHeights(oskHeight: number) {
-      let oskManager = com.keyman.singleton.osk;
+    private adjustLayerHeights(paddedHeight: number, trueHeight: number) {
       let device = this.device;
       let layers = this.kbdDiv.firstChild.childNodes;
 
@@ -2164,12 +2161,12 @@ namespace com.keyman.osk {
         // Check the heights of each row, in case different layers have different row counts.
         let layer = layers[nLayer] as HTMLElement;
         let nRows=layers[nLayer].childNodes.length;
-        (<HTMLElement> layers[nLayer]).style.height=(oskHeight)+'px';
+        (<HTMLElement> layers[nLayer]).style.height=(paddedHeight)+'px';
 
-        let rowHeight = Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows));
+        let rowHeight = Math.floor(trueHeight/(nRows == 0 ? 1 : nRows));
 
         if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-          layer.style.height = layer.style.maxHeight = oskHeight + 'px';
+          layer.style.height = layer.style.maxHeight = paddedHeight + 'px';
           rowHeight /= window.devicePixelRatio;
         }
 
@@ -2185,7 +2182,7 @@ namespace com.keyman.osk {
           rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
 
           // Calculate the exact vertical coordinate of the row's center.
-          this.layout.layer[nLayer].row[nRow].proportionalY = ((oskHeight - bottom) - rowHeight/2) / oskHeight;
+          this.layout.layer[nLayer].row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
 
           let keys=layers[nLayer].childNodes[nRow].childNodes as NodeListOf<HTMLElement>;
           this.adjustRowHeights(keys, rowHeight, bottom, rowPad);
@@ -2381,7 +2378,7 @@ namespace com.keyman.osk {
      *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
      *  @return {Object}                          DIV object with filled keyboard layer content
      */
-    static buildDocumentationKeyboard(PInternalName,Pstatic,argFormFactor,argLayerId): HTMLElement { // I777
+    static buildDocumentationKeyboard(PInternalName,argFormFactor,argLayerId, host: OSKManager): HTMLElement { // I777
       let keymanweb = com.keyman.singleton;
       var PKbd=keymanweb.core.activeKeyboard,Ln,
           formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
@@ -2420,8 +2417,10 @@ namespace com.keyman.osk {
       // Select the layer to display, and adjust sizes
       if(layout != null) {
         kbdObj.layerId = layerId;
-        kbdObj.show();
-        kbdObj.adjustHeights(); // Necessary for the row heights to be properly set!
+        // This feels _really_ hacky.  There are plans to address this through some
+        // of the later aspects of the Web OSK-Core design.
+        kbdObj.show(host);
+        kbdObj.adjustHeights(host); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
         kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
       } else {
