@@ -13,8 +13,8 @@
 
 For WASM builds:
 - Meson build system 0.56+
-- emscripten 2.0.23+
-- WasmPack 0.9.1+
+- emscripten 2.0.23+ <https://emscripten.org/docs/getting_started/downloads.html>
+- WasmPack 0.9.1+ <https://github.com/rustwasm/wasm-pack>
 - ninja 1.10+ for WASM
 
 ### Windows
