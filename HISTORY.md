@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.65 alpha 2021-06-10
+
+* docs(ios): minor readme tweak regarding prerequisites (#5253)
+* fix(common/core/web): optimizes transform construction (#5248)
+
 ## 15.0.64 alpha 2021-06-09
 
 * feat(android): Automatically install keyboard through Play Store (#5230)
