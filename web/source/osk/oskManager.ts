@@ -309,6 +309,15 @@ namespace com.keyman.osk {
       }
     }
 
+    private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKManager,
+      source: text.MutableSystemStore,
+      newValue: string) {
+      if(source.value != newValue) {
+        this.vkbd.layerId = newValue;
+        this._Show();
+      }
+    }.bind(this);
+
     /**
      * Function     _GenerateVisualKeyboard
      * Scope        Private
@@ -324,7 +333,11 @@ namespace com.keyman.osk {
       }
 
       let util = com.keyman.singleton.util;
-      this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard, util.device);
+      this.vkbd = new VisualKeyboard(keyboard, util.device);
+
+      // Ensure the OSK's current layer is kept up to date.
+      let core = com.keyman.singleton.core; // Note:  will eventually be a class field.
+      core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
 
       // Set box class - OS and keyboard added for Build 360
       this._Box.className=util.device.formFactor+' '+ util.device.OS.toLowerCase() + ' kmw-osk-frame';

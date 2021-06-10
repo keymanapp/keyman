@@ -622,7 +622,7 @@ namespace com.keyman.osk {
      */
     layout: keyboards.ActiveLayout;
     layers: keyboards.LayoutLayer[];
-    private layerId: string = "default";
+    private _layerId: string = "default";
     readonly isRTL: boolean;
     layerIndex: number;
 
@@ -672,6 +672,14 @@ namespace com.keyman.osk {
     keytip: {key: KeyElement, state: boolean, element?: HTMLDivElement};
     popupCallout: HTMLDivElement;
 
+    get layerId(): string {
+      return this._layerId;
+    }
+
+    set layerId(value: string) {
+      this._layerId = value;
+    }
+
     //#region OSK constructor and helpers
 
     /**
@@ -682,10 +690,6 @@ namespace com.keyman.osk {
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
     constructor(keyboard: keyboards.Keyboard, device: Device, isStatic?: boolean) {
-      let keyman = com.keyman.singleton;
-      // Ensure the OSK's current layer is kept up to date.
-      keyman.core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
-
       this.device = device;
       if(isStatic) {
         this.isStatic = isStatic;
@@ -1041,16 +1045,6 @@ namespace com.keyman.osk {
       return lDiv;
     }
     //#endregion
-
-    layerChangeHandler: text.SystemStoreMutationHandler = function(this: VisualKeyboard,
-                                                                   source: text.MutableSystemStore,
-                                                                   newValue: string) {
-      if(source.value != newValue) {
-        this.layerId = newValue;
-        let keyman = com.keyman.singleton;
-        keyman.osk._Show();
-      }
-    }.bind(this);
 
     //#region OSK touch handlers
     getTouchCoordinatesOnKeyboard(touch: Touch) {
