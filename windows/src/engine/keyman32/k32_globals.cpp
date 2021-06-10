@@ -554,7 +554,6 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 extern "C" void  _declspec(dllexport) WINAPI Keyman_PostControllers(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   // no-op (removed as part of #5060)
-  return 0;
 }
 
 extern "C" void  _declspec(dllexport) WINAPI Keyman_PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
