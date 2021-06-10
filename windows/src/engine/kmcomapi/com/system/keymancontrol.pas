@@ -143,10 +143,8 @@ type
     procedure StartKeyman32Engine; safecall;    // 32 bit only
     procedure StopKeyman32Engine; safecall;    // 32 bit only
     procedure ResetKeyman32Engine; safecall;    // 32 bit only
-    procedure RegisterMasterController(Value: LongWord); safecall;     // 32 bit only
-    procedure UnregisterMasterController(Value: LongWord); safecall;    // 32 bit only
-    procedure RegisterControllerThread(Value: LongWord); safecall;     // 32 bit only
-    procedure UnregisterControllerThread(Value: LongWord); safecall;    // 32 bit only
+    procedure RegisterControllerWindow(Value: LongWord); safecall;     // deprecated in #5060
+    procedure UnregisterControllerWindow(Value: LongWord); safecall;    // deprecated in #5060
     procedure DisableUserInterface; safecall;
     procedure EnableUserInterface; safecall;
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
@@ -154,6 +152,12 @@ type
     procedure DiagnosticTestException; safecall;
 
     function LastRefreshToken: IntPtr; safecall;
+
+    // #5060:
+    procedure RegisterMasterController(Value: LongWord); safecall;     // 32 bit only
+    procedure UnregisterMasterController(Value: LongWord); safecall;    // 32 bit only
+    procedure RegisterControllerThread(Value: LongWord); safecall;     // 32 bit only
+    procedure UnregisterControllerThread(Value: LongWord); safecall;    // 32 bit only
 
     { IIntKeymanControl }
     procedure AutoApplyKeyman;
@@ -533,6 +537,11 @@ begin
 {$ENDIF}
 end;
 
+procedure TKeymanControl.RegisterControllerWindow(Value: LongWord);
+begin
+  // no-op (removed as part of #5060)
+end;
+
 procedure TKeymanControl.RegisterMasterController(Value: LongWord);
 begin
 {$IFDEF WIN64}
@@ -575,6 +584,11 @@ begin
   else if not FKeyman_UnregisterControllerThread(Value) then
     KL.LogError('UnregisterControllerThread: Could not unregister controller thread %x', [Value]);
 {$ENDIF}
+end;
+
+procedure TKeymanControl.UnregisterControllerWindow(Value: LongWord);
+begin
+  // no-op (removed as part of #5060)
 end;
 
 procedure TKeymanControl.UnregisterMasterController(Value: LongWord);
