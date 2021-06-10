@@ -25,8 +25,6 @@ EXPORTS
 			GetActiveKeymanID
 			Keyman_RegisterControllerWindow
 			Keyman_UnregisterControllerWindow
-      Keyman_RegisterMasterController
-      Keyman_UnregisterMasterController
 			Keyman_RestartEngine
 
       Keyman_SendMasterController
@@ -42,5 +40,7 @@ EXPORTS
 
       Keyman_Diagnostic
 
+      Keyman_RegisterMasterController
+      Keyman_UnregisterMasterController
 			Keyman_RegisterControllerThread
 			Keyman_UnregisterControllerThread
