@@ -87,7 +87,7 @@ namespace com.keyman.osk {
       this.formFactor = formFactor;
     }
 
-    abstract getId(osk: VisualKeyboard): string;
+    abstract getId(): string;
 
     /**
      * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
@@ -321,7 +321,7 @@ namespace com.keyman.osk {
       super(spec, layer, formFactor);
     }
 
-    getId(osk: VisualKeyboard): string {
+    getId(): string {
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       return this.spec.elementID;
     }
@@ -435,7 +435,7 @@ namespace com.keyman.osk {
       }
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
-      btn.id=this.getId(osk);
+      btn.id=this.getId();
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
       // TODO: replace inline function calls??
@@ -481,19 +481,16 @@ namespace com.keyman.osk {
 
   export class OSKSubKey extends OSKKey {
     constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
+      if(typeof(layer) != 'string' || layer == '') {
+        throw "The 'layer' parameter for subkey construction must be properly defined.";
+      }
+
       super(spec, layer, formFactor);
     }
 
-    getId(osk: VisualKeyboard): string {
-      let spec = this.spec;
-      let core = com.keyman.singleton.core;
+    getId(): string {
       // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
-      if(typeof(this.layer) == 'string' && this.layer != '') {
-        return 'popup-'+this.layer+'-'+spec['id'];
-      } else {
-        // We only create subkeys when they're needed - the currently-active layer should be fine.
-        return 'popup-' + core.keyboardProcessor.layerId + '-'+spec['id'];
-      }
+      return 'popup-'+this.layer+'-'+this.spec['id'];
     }
 
     construct(osk: VisualKeyboard, baseKey: KeyElement, topMargin: boolean): HTMLDivElement {
@@ -525,7 +522,7 @@ namespace com.keyman.osk {
       let btn = link(btnEle, new KeyData(this, spec['id']));
 
       osk.setButtonClass(spec,btn);
-      btn.id = this.getId(osk);
+      btn.id = this.getId();
 
       // Must set button size (in px) dynamically, not from CSS
       let bs=btn.style;
@@ -1775,7 +1772,12 @@ namespace com.keyman.osk {
           needsTopMargin = true;
         }
 
-        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer, device.formFactor);
+        let layer = e['key'].layer;
+        if(typeof(layer) != 'string' || layer == '') {
+          // Use the currently-active layer.
+          layer = keyman.core.keyboardProcessor.layerId;
+        }
+        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], layer, device.formFactor);
         let kDiv = keyGenerator.construct(this, <KeyElement> e, needsTopMargin);
 
         subKeys.appendChild(kDiv);
