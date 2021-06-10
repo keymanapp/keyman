@@ -209,7 +209,7 @@ build_test_rust() {
 
     # Built library path for multi-arch (Windows) vs single (*nix)
 
-    cargo build --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
+    cargo build --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET --features=$PLATFORM
 
     # On Windows, final output path is ./build/rust/<arch>/<arch_rust>/debug|release/<libraryname>
     # WASM is similar: ./build/rust/wasm/wasm_unknown_unknown/debug|release/<libraryname>
