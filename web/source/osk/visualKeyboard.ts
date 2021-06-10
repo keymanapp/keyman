@@ -887,9 +887,6 @@ namespace com.keyman.osk {
       var tKey=this.getDefaultKeyObject();
       tKey['fontsize']=ls.fontSize;
 
-      // Identify key labels (e.g. *Shift*) that require the special OSK font
-      var specialLabel=/\*\w+\*/;
-
       // ***Delete any empty rows at the end added by compiler bug...
       for(n=0; n<layers.length; n++) {
         let layer=layers[n];
@@ -1627,7 +1624,7 @@ namespace com.keyman.osk {
      * Description  Updates the OSK's visual style for any toggled state keys
      */
     _UpdateVKShiftStyle(layerId?: string) {
-      var i, n, layer=null, layerElement=null;
+      var i, n, layer=null;
       let core = com.keyman.singleton.core;
 
       if(layerId) {
@@ -1721,8 +1718,6 @@ namespace com.keyman.osk {
       // position:static and display:inline-block
       var subKeys=document.createElement('DIV'),i;
 
-      var tKey = this.getDefaultKeyObject();
-
       subKeys.id='kmw-popup-keys';
       this.popupBaseKey = e;
 
@@ -1758,7 +1753,7 @@ namespace com.keyman.osk {
         let layer = e['key'].layer;
         if(typeof(layer) != 'string' || layer == '') {
           // Use the currently-active layer.
-          layer = keyman.core.keyboardProcessor.layerId;
+          layer = this.layerId;
         }
         let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], layer);
         let kDiv = keyGenerator.construct(this, <KeyElement> e, needsTopMargin);
@@ -2535,7 +2530,6 @@ namespace com.keyman.osk {
   showKeyTip(key: KeyElement, on: boolean) {
     let keyman = com.keyman.singleton;
     let util = keyman.util;
-    let oskManager = keyman.osk;
 
     var tip=this.keytip;
 
@@ -2549,14 +2543,10 @@ namespace com.keyman.osk {
 
     // Create and display the preview
     if(on && !popup) {
-      var y0 = dom.Utils.getAbsoluteY(oskManager._Box),
-          h0 = oskManager._Box.offsetHeight,
-          xLeft = dom.Utils.getAbsoluteX(key),
-          xTop = dom.Utils.getAbsoluteY(key),
+      var xLeft = dom.Utils.getAbsoluteX(key),
           xWidth = key.offsetWidth,
           xHeight = key.offsetHeight,
           kc = <HTMLElement> key.firstChild,
-          kcs = kc.style,
           kts = tip.element.style,
           ktLabel = <HTMLElement> tip.element.childNodes[1],
           ktls = ktLabel.style,
