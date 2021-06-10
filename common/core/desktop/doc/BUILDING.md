@@ -104,11 +104,7 @@ the kmcomp archive.
 
   # TODO
   ```bash
-  sudo apt install cargo
-  # Additional for WASM builds:
-  sudo apt install libssl-dev
-  sudo snap install rustup --classic
-  rustup toolchain add stable
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
   rustup target add wasm32-unknown-unknown
   ```
 

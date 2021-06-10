@@ -287,7 +287,7 @@ build_standard() {
   if $BUILD_CPP; then
     echo_heading "======= Building C++ library for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
-    meson compile
+    ninja
     popd > /dev/null
   fi
 
