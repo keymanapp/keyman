@@ -74,6 +74,7 @@ namespace com.keyman.osk {
 
   export abstract class OSKKey {
     spec: OSKKeySpec;
+    btn: KeyElement;
     formFactor: string;
 
     /**
@@ -88,6 +89,37 @@ namespace com.keyman.osk {
     }
 
     abstract getId(): string;
+
+    /**
+     * Attach appropriate class to each key button, according to the layout
+     *
+     * @param       {Object=}   layout  source layout description (optional, sometimes)
+     */
+    public setButtonClass(vkbd: VisualKeyboard) {
+      let key = this.spec;
+      let btn = this.btn;
+
+      var n=0, keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
+      if(typeof key['dk'] == 'string' && key['dk'] == '1') {
+        n=8;
+      }
+
+      if(typeof key['sp'] == 'string') {
+        n=parseInt(key['sp'],10);
+      }
+
+      if(n < 0 || n > 10) {
+        n=0;
+      }
+
+      // Apply an overriding class for 5-row layouts
+      var nRows=vkbd.layout['layer'][0]['row'].length;
+      if(nRows > 4 && vkbd.device.formFactor == 'phone') {
+        btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
+      } else {
+        btn.className='kmw-key kmw-key-'+keyTypes[n];
+      }
+    }
 
     /**
      * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
@@ -206,13 +238,12 @@ namespace com.keyman.osk {
      *  @return {string}
      **/
     protected renameSpecialKey(oldText: string, osk: VisualKeyboard): string {
-      let keyman = (<KeymanBase>window['keyman'])
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
       switch(oldText) {
         case '*ZWNJ*':
           // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
           // possible / available though, and there's a different standard symbol on Android.
-          oldText = keyman.util.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+          oldText = osk.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
             '*ZWNJAndroid*' :
             '*ZWNJiOS*';
           break;
@@ -400,10 +431,10 @@ namespace com.keyman.osk {
       let originalPercent = totalPercent;
 
       let btnEle=util._CreateElement('div');
-      let btn = link(btnEle, new KeyData(this, spec['id']));
+      let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
       // Set button class
-      osk.setButtonClass(spec,btn,layout);
+      this.setButtonClass(osk);
 
       // Set key and button positioning properties.
       if(!isDesktop) {
@@ -519,9 +550,9 @@ namespace com.keyman.osk {
       ks.height=baseKey.offsetHeight+'px';
 
       let btnEle=document.createElement('div');
-      let btn = link(btnEle, new KeyData(this, spec['id']));
+      let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
-      osk.setButtonClass(spec,btn);
+      this.setButtonClass(osk);
       btn.id = this.getId();
 
       // Must set button size (in px) dynamically, not from CSS
@@ -1640,7 +1671,7 @@ namespace com.keyman.osk {
 
         keys[i]['sp'] = core.keyboardProcessor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
         let keyId = layerId+'-'+states[i]
-        var btn = document.getElementById(keyId);
+        var btn = document.getElementById(keyId) as KeyElement;
 
         if(btn == null) {
           //This can happen when using BuildDocumentationKeyboard, as the OSK isn't yet in the
@@ -1649,43 +1680,10 @@ namespace com.keyman.osk {
         }
 
         if(btn != null) {
-          this.setButtonClass(keys[i], btn, this.layout);
+          btn.key.setButtonClass(this);
         } else {
           console.warn("Could not find key to apply style: \"" + keyId + "\"");
         }
-      }
-    }
-
-    /**
-     * Attach appropriate class to each key button, according to the layout
-     *
-     * @param       {Object}    key     key object
-     * @param       {Object}    btn     button object
-     * @param       {Object=}   layout  source layout description (optional, sometimes)
-     */
-    setButtonClass(key, btn, layout?) {
-      let keyman = com.keyman.singleton;
-      var n=0, keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
-      if(typeof key['dk'] == 'string' && key['dk'] == '1') {
-        n=8;
-      }
-
-      if(typeof key['sp'] == 'string') {
-        n=parseInt(key['sp'],10);
-      }
-
-      if(n < 0 || n > 10) {
-        n=0;
-      }
-
-      layout = layout || this.layout;
-
-      // Apply an overriding class for 5-row layouts
-      var nRows=layout['layer'][0]['row'].length;
-      if(nRows > 4 && this.device.formFactor == 'phone') {
-        btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
-      } else {
-        btn.className='kmw-key kmw-key-'+keyTypes[n];
       }
     }
 
