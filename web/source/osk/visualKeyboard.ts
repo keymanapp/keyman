@@ -2378,10 +2378,12 @@ namespace com.keyman.osk {
      *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
      *  @return {Object}                          DIV object with filled keyboard layer content
      */
-    static buildDocumentationKeyboard(PInternalName,argFormFactor,argLayerId, host: OSKManager): HTMLElement { // I777
-      let keymanweb = com.keyman.singleton;
-      var PKbd=keymanweb.core.activeKeyboard,Ln,
-          formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
+    static buildDocumentationKeyboard(PKbd: com.keyman.keyboards.Keyboard, argFormFactor,argLayerId, host: OSKManager): HTMLElement { // I777
+      if(!PKbd) {
+        return null;
+      }
+
+      var formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
           layerId=(typeof(argLayerId) == 'undefined' ? 'default' : argLayerId),
           device = new Device();
 
@@ -2389,24 +2391,6 @@ namespace com.keyman.osk {
       device.formFactor = formFactor;
       if(formFactor != 'desktop') {
         device.OS = 'iOS';
-      }
-
-      var keyboardsList = keymanweb.keyboardManager.keyboards;
-
-      if(PInternalName != null) {
-        var p=PInternalName.toLowerCase().replace('keyboard_','');
-
-        for(Ln=0; Ln<keyboardsList.length; Ln++) {
-          if(p == keyboardsList[Ln]['KI'].toLowerCase().replace('keyboard_','')) {
-            // Requires the Keyboard wrapping object now.
-            PKbd = new com.keyman.keyboards.Keyboard(keyboardsList[Ln]);
-            break;
-          }
-        }
-      }
-
-      if(!PKbd) {
-        return null;
       }
 
       let layout = PKbd.layout(formFactor);
