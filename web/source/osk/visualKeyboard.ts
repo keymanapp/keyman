@@ -76,17 +76,15 @@ namespace com.keyman.osk {
   export abstract class OSKKey {
     spec: OSKKeySpec;
     btn: KeyElement;
-    formFactor: string;
 
     /**
      * The layer of the OSK on which the key is displayed.
      */
     readonly layer: string;
 
-    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
+    constructor(spec: OSKKeySpec, layer: string) {
       this.spec = spec;
       this.layer = layer;
-      this.formFactor = formFactor;
     }
 
     abstract getId(): string;
@@ -204,8 +202,8 @@ namespace com.keyman.osk {
       }
     }
 
-    getKeyWidth(osk: VisualKeyboard): number {
-      let units = this.objectUnits(osk.isStatic);
+    getKeyWidth(vkbd: VisualKeyboard): number {
+      let units = this.objectUnits(vkbd);
 
       if(units == 'px') {
         // For mobile devices, we presently specify width directly in pixels.  Just use that!
@@ -215,13 +213,13 @@ namespace com.keyman.osk {
         // approximation for that.  `this.kbdDiv` is the element controlling the OSK's width, set in px.
 
         // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
-        return Math.floor(osk.width * this.spec['widthpc'] / 100);
+        return Math.floor(vkbd.width * this.spec['widthpc'] / 100);
       }
     }
 
-    objectUnits(isStatic: boolean): string {
+    objectUnits(vkbd: VisualKeyboard): string {
       // Returns a unit string corresponding to how the width for each key is specified.
-      if(this.formFactor == 'desktop' || isStatic) {
+      if(vkbd.device.formFactor == 'desktop' || vkbd.isStatic) {
         return '%';
       } else {
         return 'px';
@@ -345,8 +343,8 @@ namespace com.keyman.osk {
   }
 
   export class OSKBaseKey extends OSKKey {
-    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
-      super(spec, layer, formFactor);
+    constructor(spec: OSKKeySpec, layer: string) {
+      super(spec, layer);
     }
 
     getId(): string {
@@ -416,13 +414,13 @@ namespace com.keyman.osk {
 
     construct(osk: VisualKeyboard, layout: keyboards.LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let spec = this.spec;
-      let isDesktop = this.formFactor == "desktop"
+      let isDesktop = osk.device.formFactor == "desktop"
 
       let kDiv = document.createElement('div');
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
-      ks.width=this.objectGeometry(spec['widthpc'], osk.isStatic);
+      ks.width=this.objectGeometry(osk, spec['widthpc']);
 
       let originalPercent = totalPercent;
 
@@ -435,7 +433,7 @@ namespace com.keyman.osk {
       // Set key and button positioning properties.
       if(!isDesktop) {
         // Regularize interkey spacing by rounding key width and padding (Build 390)
-        ks.left=this.objectGeometry(totalPercent+spec['padpc'], osk.isStatic);
+        ks.left=this.objectGeometry(osk, totalPercent+spec['padpc']);
         if(!osk.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
@@ -447,7 +445,7 @@ namespace com.keyman.osk {
           btn.style.width=ks.width;
         }
       } else {
-        ks.marginLeft=this.objectGeometry(spec['padpc'], osk.isStatic);
+        ks.marginLeft=this.objectGeometry(osk, spec['padpc']);
       }
 
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
@@ -496,8 +494,8 @@ namespace com.keyman.osk {
       return {element: kDiv, percent: totalPercent - originalPercent};
     }
 
-    objectGeometry(v: number, isStatic: boolean): string {
-      let unit = this.objectUnits(isStatic);
+    objectGeometry(vkbd: VisualKeyboard, v: number): string {
+      let unit = this.objectUnits(vkbd);
       if(unit == '%') {
         return v + unit;
       } else { // unit == 'px'
@@ -507,12 +505,12 @@ namespace com.keyman.osk {
   }
 
   export class OSKSubKey extends OSKKey {
-    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
+    constructor(spec: OSKKeySpec, layer: string) {
       if(typeof(layer) != 'string' || layer == '') {
         throw "The 'layer' parameter for subkey construction must be properly defined.";
       }
 
-      super(spec, layer, formFactor);
+      super(spec, layer);
     }
 
     getId(): string {
@@ -1024,7 +1022,7 @@ namespace com.keyman.osk {
           for(j=0; j<keys.length; j++) {
             key=keys[j];
 
-            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id'], formFactor);
+            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id']);
             var keyTuple = keyGenerator.construct(this, layout, rs, totalPercent);
 
             rDiv.appendChild(keyTuple.element);
@@ -1771,7 +1769,7 @@ namespace com.keyman.osk {
           // Use the currently-active layer.
           layer = keyman.core.keyboardProcessor.layerId;
         }
-        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], layer, device.formFactor);
+        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], layer);
         let kDiv = keyGenerator.construct(this, <KeyElement> e, needsTopMargin);
 
         subKeys.appendChild(kDiv);
