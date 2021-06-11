@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.276 stable 2021-06-11
+
+* fix(linux): Exclude s390x from package builds for ibus-keyman 🍒 (#5220)
+* fix(web): Always pass kill_browserstack 🍒  (#5235)
+* feat(android): Automatically install keyboard through Play Store 🍒 (#5231)
+* fix(oem/fv/ios): app encryption flag for app store uploads (14.0) (#5243)
+* fix(common/core/web): optimizes transform construction 🍒 (#5255)
+* fix(android): rotation is not updating keyboard 🍒 (#5262)
+* feat(android): silent install for referred kbd 🍒 (#5266)
+* fix(windows): disable new hotkey modifier check (#5270)
+
 ## 14.0.275 stable 2021-06-04
 
 * fix(linux): Swap order of dependencies for Debian package 🍒 (#5070)
