@@ -843,9 +843,8 @@ namespace com.keyman.osk {
       }
       let layout = keyboard.layout(formFactor);
       let oskManager = com.keyman.singleton.osk;
-      let rowsPercent = 100;
 
-      var lDiv=document.createElement('div'), ls=lDiv.style, totalHeight=0;
+      var lDiv=document.createElement('div'), ls=lDiv.style;
 
       // Set OSK box default style
       lDiv.className='kmw-key-layer-group';
@@ -854,9 +853,7 @@ namespace com.keyman.osk {
       switch(formFactor) {
         case 'phone':
         case 'tablet':
-          totalHeight=oskManager.getHeight();
-          ls.height=totalHeight+'px';
-          rowsPercent = Math.round(100*oskManager.getKeyboardHeight()/totalHeight );
+          ls.height=oskManager.getKeyboardHeight()+'px';
           break;
       }
 
@@ -906,12 +903,7 @@ namespace com.keyman.osk {
       // Set the OSK row height, **assuming all layers have the same number of rows**
 
       // Calculate default row height
-      rowHeight = rowsPercent/layers[0].row.length;
-
-      // For desktop OSK, use a percentage of the OSK height
-      if(formFactor == 'desktop') {
-        rowHeight = rowsPercent/layers[0].row.length;
-      }
+      rowHeight = 100/layers[0].row.length;
 
       // Get the actual available document width and scale factor according to device type
       var objectWidth : number;
