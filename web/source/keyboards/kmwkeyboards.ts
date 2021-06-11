@@ -1065,7 +1065,7 @@ namespace com.keyman.keyboards {
      *
      * @param {Object}    x   metadata object
      **/
-    register(x): KeyboardStub[] {
+    register(x) {
       const promiseid = x['timerid'];
 
       let result: KeyboardStub[] | Error;
@@ -1089,8 +1089,6 @@ namespace com.keyman.keyboards {
           delete this.registrationResolvers[promiseid];
         }
       }
-
-      return result as KeyboardStub[];
     }
 
     /**
@@ -1134,7 +1132,9 @@ namespace com.keyman.keyboards {
       } else if(options['context'] == 'language') { // Download the full list of supported keyboard languages
         this.languageList = x['languages'];
         if(this.languagesPending) {
-          this.addLanguageKeyboards(this.languagesPending);
+          this.addLanguageKeyboards(this.languagesPending).then(result => {
+            return result
+          });
         }
         this.languagesPending = [];
       }
@@ -1147,9 +1147,9 @@ namespace com.keyman.keyboards {
     /**
      *  Internal handler for processing keyboard registration, used only by `register`
      *
-     *  @param  {Object}   languages    Array of language names
+     *  @param  {string[]}   languages    Array of language names
      **/
-    addLanguageKeyboards(languages: any): Promise<KeyboardStub[]|Error> {
+    addLanguageKeyboards(languages: string[]): Promise<KeyboardStub[]|Error> {
       var i, j, lgName, cmd, first, addAll;
 
       // Defer registering keyboards by language until the language list has been loaded
@@ -1161,7 +1161,7 @@ namespace com.keyman.keyboards {
         }
 
         if(first) {
-          this.keymanCloudRequest('',true);
+          return this.keymanCloudRequest('',true); // then?
         }
       } else { // Identify and register each keyboard by language name
         cmd = '';

@@ -305,10 +305,15 @@ namespace com.keyman {
     /**
      *  Add default or all keyboards for a given language
      *
-     *  @param  {string}   arg    Language name (multiple arguments allowed)
+     *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
      **/
-    ['addKeyboardsForLanguage'](arg) : Promise<com.keyman.keyboards.KeyboardStub[]|Error> {
-      return this.keyboardManager.addLanguageKeyboards(arguments);
+    ['addKeyboardsForLanguage'](arg: string[]|string) : Promise<com.keyman.keyboards.KeyboardStub[]|Error> {
+      console.log('type: ' + typeof arg);
+      if (typeof arg === 'string') {
+        return this.keyboardManager.addLanguageKeyboards(arg.split(','));
+      } else {
+        return this.keyboardManager.addLanguageKeyboards(arg);
+      }
     }
 
     /**
@@ -316,8 +321,8 @@ namespace com.keyman {
      *
      * @param {Object}    x   metadata object
      **/
-    ['register'](x) : com.keyman.keyboards.KeyboardStub[] {
-      return this.keyboardManager.register(x);
+    ['register'](x) {
+      this.keyboardManager.register(x);
     }
 
     /**

@@ -69,7 +69,13 @@
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
     // usually easier.)
-    kmw.addKeyboardsForLanguage('Dzongkha');
+    kmw.addKeyboardsForLanguage(['Dzongkha', 'Khmer']);
+    /*
+    kmw.addKeyboardsForLanguage('Khmer').then(result => {
+      console.log('Adding Spanish and Khmer:', result);
+    }).catch(error => {
+      alert(error)
+    });*/
 
     // Add a fully-specified, locally-sourced, keyboard with custom font
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
@@ -106,14 +112,11 @@
         break;
       case 3:
         sKbd=document.getElementById('kbd_id3').value;
-        kmw.addKeyboardsForLanguage(sKbd).then(
-          function(result) {
-            console.log('adding' + result)
-          },
-          function(error) {
+        kmw.addKeyboardsForLanguage(sKbd).then(result => {
+            console.log('adding', result);
+        }).catch(error => {
             alert(error)
-          }
-        );
+        });
         break;
     }
   }
