@@ -20,7 +20,7 @@ Build-Depends:
  python3-pil,
  python3-pip,
  python3-qrcode,
- python3-raven | python3-sentry-sdk,
+ python3-sentry-sdk | python3-raven,
  python3-requests,
  python3-requests-cache,
  python3-setuptools,
@@ -70,7 +70,7 @@ Depends:
  kmflcomp (>=10.99.33),
  python3-bs4,
  python3-gi,
- python3-raven | python3-sentry-sdk,
+ python3-sentry-sdk | python3-raven,
  ${misc:Depends},
  ${python3:Depends},
 Description: Keyman for Linux configuration

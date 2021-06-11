@@ -165,6 +165,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onStartInputView(EditorInfo attribute, boolean restarting) {
     super.onStartInputView(attribute, restarting);
+    setInputView(onCreateInputView());
   }
 
   @Override

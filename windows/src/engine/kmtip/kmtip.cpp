@@ -80,7 +80,6 @@ CKMTipTextService::CKMTipTextService()
    // I3582
     _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
 
-    memset(&guidActiveProfile, 0, sizeof(GUID));
     _keystrokeSinkInitialized = FALSE;
     _dwActiveLanguageProfileNotifySinkCookie = 0;
     _PreservedKeys = NULL;

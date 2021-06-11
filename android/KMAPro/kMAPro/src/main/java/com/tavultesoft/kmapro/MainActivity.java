@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.keyman.android.CheckInstallReferrer;
+import com.keyman.android.KmpInstallMode;
 import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMHelpFileActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -32,10 +34,9 @@ import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
-import com.tavultesoft.kmea.util.DownloadIntentService;
+import com.keyman.android.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 import com.tavultesoft.kmea.util.KMString;
@@ -43,7 +44,6 @@ import com.tavultesoft.kmea.util.KMString;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Build;
@@ -53,9 +53,6 @@ import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
 import android.content.ClipData;
@@ -74,7 +71,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
@@ -115,7 +111,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private static final String userTextSizeKey = "UserTextSize";
   private Toolbar toolbar;
   private Menu menu;
-  private Uri data;
 
   private static Dataset repo;
   private boolean didExecuteParser = false;
@@ -199,6 +194,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
+    CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
     checkGetStarted();
   }
 
@@ -259,43 +255,45 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
 
-    Intent intent = getIntent();
-    data = intent.getData();
+    CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
 
-    if (data != null) {
-      String scheme = data.getScheme().toLowerCase();
+    Intent intent = getIntent();
+    Uri loadingIntentUri = intent.getData();
+
+    if (loadingIntentUri != null) {
+      String scheme = loadingIntentUri.getScheme().toLowerCase();
       switch (scheme) {
         // content:// Android DownloadManager
         // file:// Chrome downloads and Filebrowsers
         case "content":
         case "file":
-          checkStoragePermission(data);
+          checkStoragePermission(loadingIntentUri);
           break;
         case "http" :
         case "https" :
           // Might need to modify link like KMPBrowserActivity
-          String link = data.toString();
+          String link = loadingIntentUri.toString();
           if (KMPLink.isKeymanInstallLink(link)) {
-            data = KMPLink.getKeyboardDownloadLink(link);
+            loadingIntentUri = KMPLink.getKeyboardDownloadLink(link);
           }
-          downloadKMP(scheme);
+          downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           break;
         case "keyman" :
           // TODO: Only accept download links from Keyman browser activities when universal links work
-          if (KMPLink.isKeymanDownloadLink(data.toString())) {
+          if (KMPLink.isKeymanDownloadLink(loadingIntentUri.toString())) {
 
             // Convert opaque URI to hierarchical URI so the query parameters can be parsed
             Builder builder = new Uri.Builder();
             builder.scheme("https")
               .authority("keyman.com")
               .appendPath("keyboards")
-              .encodedQuery(data.getEncodedQuery());
-            data = Uri.parse(builder.build().toString());
-            downloadKMP(scheme);
-          } else if (KMPLink.isLegacyKeymanDownloadLink(data.toString())) {
-            link = data.toString();
-            data = KMPLink.getLegacyKeyboardDownloadLink(link);
-            downloadKMP(scheme);
+              .encodedQuery(loadingIntentUri.getEncodedQuery());
+            loadingIntentUri = Uri.parse(builder.build().toString());
+            downloadKMP(loadingIntentUri, KmpInstallMode.Full);
+          } else if (KMPLink.isLegacyKeymanDownloadLink(loadingIntentUri.toString())) {
+            link = loadingIntentUri.toString();
+            loadingIntentUri = KMPLink.getLegacyKeyboardDownloadLink(link);
+            downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           } else {
             String msg = "Unrecognized scheme: " + scheme;
             KMLog.LogError(TAG, msg);
@@ -476,30 +474,40 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     resizeTextView(false);
   }
 
+  public void downloadKMP(String packageId, String bcp47, KmpInstallMode installMode) {
+    Uri downloadUri = bcp47 == null ?
+      Uri.parse(KMString.format("https://keyman.com/go/package/download/%s", new Object[]{packageId})) :
+      Uri.parse(KMString.format("https://keyman.com/go/package/download/%s?bcp47=%s", new Object[]{packageId, bcp47}));
+    downloadKMP(downloadUri, installMode);
+  }
+
   /**
    * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
    * If URL is valid, download the kmp.
-   * @param scheme String of the URI's scheme.
-   *
+   * @param packageUri URI to download the package.
+   * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
+   *       URL parsing, not this function.
    */
-  private void downloadKMP(String scheme) {
-    if (data == null) {
+  public void downloadKMP(Uri packageUri, KmpInstallMode installMode) {
+    if (packageUri == null) {
+      KMLog.LogError(TAG,"null uri passed to downloadKmp");
       String message = "Download failed. Invalid URL.";
       Toast.makeText(getApplicationContext(), message,
         Toast.LENGTH_SHORT).show();
       return;
     }
     try {
-      // Initial try with Keyman 13.0 download link
-      String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
+      // Initial try with Keyman 13.0 download link, format keyman://localhost/install?url=...
+      String url = packageUri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
       if (url == null) {
-        url = data.toString();
+        // Otherwise, Keyman 14+ download link is format https://keyman.com/go/package/download/<package>[?bcp47=<code>][&...]
+        url = packageUri.toString();
       }
       if (url != null) {
         // Create filename by extracting packageID from query or urlNoQuery
-        String filename = data.getQueryParameter("id");
+        String filename = packageUri.getQueryParameter("id");
         if (filename == null) {
-          String urlNoQuery = data.getPath();
+          String urlNoQuery = packageUri.getPath();
           filename = FileUtils.getFilename(urlNoQuery);
         }
         if (!filename.endsWith(FileUtils.KEYMANPACKAGE)) {
@@ -507,10 +515,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         }
 
         // Parse query for the BCP 47 language ID
-        String languageID = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
+        String languageID = packageUri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
         // TODO: Using "tag" for now, but production will be KMKeyboardDownloaderActivity.KMKey_BCP47
         if (languageID == null) {
-          languageID = data.getQueryParameter("tag");
+          languageID = packageUri.getQueryParameter("tag");
         }
 
         url = url.toLowerCase();
@@ -528,6 +536,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             downloadIntent.putExtra("language", languageID);
             downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
             downloadIntent.putExtra("receiver", resultReceiver);
+            downloadIntent.putExtra("installMode", installMode);
 
             startService(downloadIntent);
           }
@@ -583,6 +592,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void showWebBrowser() {
+    // Telemetry for in-app browser usage.
+    // Logging here because WebBrowserActivity is launched in a separate process.
+    KMLog.LogInfo(TAG, "WebBrowserActivity launched");
+
     Intent i = new Intent(this, WebBrowserActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     startActivity(i);
@@ -748,6 +761,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMManager.setMaySendCrashReport(maySendCrashReport);
   }
 
+  private Uri requestPermissionIntentUri;
+
   @Override
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -756,7 +771,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       if (grantResults.length == 1 &&
           grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
-        useLocalKMP(context, data);
+        useLocalKMP(context, requestPermissionIntentUri);
       } else {
         // Permission request denied
         String message = getString(R.string.storage_permission_denied);
@@ -773,6 +788,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         useLocalKMP(context, data);
       } else {
         // Permission is missing and must be requested
+        requestPermissionIntentUri = data;
         requestStoragePermission();
       }
     } else {
@@ -964,8 +980,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       }
     }
 
-    // Display welcome.htm help file
-    if (customHelpLink != null && !customHelpLink.isEmpty() &&
+    // Display welcome.htm help file -- if we are not doing a silent install
+    if (PackageActivity.lastInstallMode != KmpInstallMode.Silent &&
+        customHelpLink != null && !customHelpLink.isEmpty() &&
         packageID != null && !packageID.isEmpty() && FileUtils.isWelcomeFile(customHelpLink)) {
       // Display local welcome.htm help file, including associated assets
       Intent i = new Intent(this, KMHelpFileActivity.class);
@@ -974,6 +991,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
       startActivity(i);
     }
+
+    // We'll reset the global installMode flag now so that future package
+    // installs that don't go through PackageActivity are not affected.
+    PackageActivity.lastInstallMode  = KmpInstallMode.Full;
   }
 
   @Override

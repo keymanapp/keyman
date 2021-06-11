@@ -274,7 +274,7 @@
         {
           s=s+obj[i].layer+'-'+obj[i].id;
           if(obj[i].sp == 1 || obj[i].sp == 2) shift = true;
-          if(typeof(obj[i].text) != 'undefined' && obj[i].text != '') s=s+':'+toHex(obj[i].text);
+          if(typeof(obj[i].text) != 'undefined' && obj[i].text != null && obj[i].text != '') s=s+':'+toHex(obj[i].text);
           if(i < (obj.length -1)) s=s+';'
         }
         fragmentToggle=(fragmentToggle+1) % 100;
@@ -345,6 +345,9 @@
     }
 
     function toHex(theString) {
+      if (typeof theString != 'string') {
+        return '';
+      }
       var hexString = '';
       for (var i=0; i < theString.length; i++) {
         var theHex = theString.charCodeAt(i).toString(16).toUpperCase();

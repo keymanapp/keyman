@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Azərbaycanca (Azəricə)</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Quraşdırma</string>
+  <string name="ssTitle">$APPNAME $VERSION quraşdırmaq</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION uğurla quraşdırıldı.</string>
+  <string name="ssCancelQuery">$APPNAME quraşdırılmasını ləğv etmək istədiyinizə əminsiniz?</string>
+  <string name="ssBootstrapExtractingBundle">Paket çıxarılır ...</string>
+  <string name="ssBootstrapCheckingPackages">Paketlər yoxlanılır ...</string>
+  <string name="ssBootstrapCheckingForUpdates">Yeniləmələr üçün onlayn yoxlanılır ...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Quraşdırılmış versiyalar yoxlanılır ...</string>
+  <string name="ssBootstrapReady">Bitir ...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s %2:s %3:s üçün</string>
+  <string name="ssActionNothingToInstall">Quracaq bir şey yoxdur.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s endirmə)</string>
+  <string name="ssActionInstall">Quraşdırma quraşdıracaq:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION pulsuz və açıq mənbəlidir</string>
+  <string name="ssLicenseLink">&amp; Lisenziyanı oxuyun</string>
+  <string name="ssInstallOptionsLink">Quraşdırma &amp; seçimlər</string>
+  <string name="ssMessageBoxTitle">$APPNAME Quraşdırma</string>
+  <string name="ssOkButton">Oldu</string>
+  <string name="ssInstallButton">&amp;Quraşdırmaql</string>
+  <string name="ssCancelButton">Ləğv etmək</string>
+  <string name="ssExitButton">Çıx&amp;maq</string>
+  <string name="ssStatusInstalling">$APPNAME quraşdırılır</string>
+  <string name="ssStatusRemovingOlderVersions">Köhnə versiyalar silinir</string>
+  <string name="ssStatusComplete">Quraşdırma tamamlandı</string>
+  <string name="ssQueryRestart">Quraşdırma başa çatmadan əvvəl Windows-u yenidən başlamalısınız. Windows\'u yenidən başlatdığınızda, Quraşdırma davam edəcəkdir. İndi yenidən başlasın?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows avtomatik olaraq yenidən başlatıla bilmədi. $APPNAME başlatmağa cəhd etməzdən əvvəl Windows-u yenidən başlamalısınız.</string>
+  <string name="ssMustRestart">Quraşdırmanı tamamlamaq üçün Windows-u yenidən başlatmalısınız. Windows\'u yenidən başlatdığınızda, Quraşdırma başa çatacaq.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION-un yüklənməsi üçün Windows 7 və ya daha yenisini tələb edir. Halbuki, Keyman Desktop 7, 8 və ya 9 aşkar edildi. Bu quraşdırıcıya daxil olan klaviaturaları quraşdırılmış Keyman Desktop versiyasına yükləmək istəyirsiniz?</string>
+  <string name="ssOldOsVersionDownload">$APPNAME-in bu versiyasının yüklənməsi üçün Windows 7 və ya daha yenisini tələb edir. Keyman Desktop 8-i yükləmək istəyirsiniz?</string>
+  <string name="ssOptionsTitle">Quraşdırma Seçimləri</string>
+  <string name="ssOptionsTitleInstallOptions">Quraşdırma Seçimləri</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Varsayılan $APPNAME parametrləri</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Qurmaq və ya təkmilləşdirmək üçün modullar</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Əlaqəli klaviatura dili</string>
+  <string name="ssOptionsTitleLocation">Quraşdırılacaq versiya</string>
+  <string name="ssOptionsStartWithWindows">Windows başlayanda $APPNAME başlayın</string>
+  <string name="ssOptionsStartAfterInstall">Quraşdırma başa çatdıqda $APPNAME başlatmaq</string>
+  <string name="ssOptionsCheckForUpdates">Yeniləmələri onlayn olaraq vaxtaşırı yoxlamaq</string>
+  <string name="ssOptionsUpgradeKeyboards">Köhnə versiyalarla quraşdırılmış klaviaturaları $VERSION versiyasına yüksəltmək</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Anonim istifadə statistikasını keyman.com ilə paylaşın</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Quraşdırma versiyası: %0:s</string>
+  <string name="ssOptionsInstallKeyman">$APPNAME quraşdırmaq</string>
+  <string name="ssOptionsUpgradeKeyman">$APPNAME təkmilləşdirmək</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s artıq quraşdırılıb.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Versiyanı%0:s yükləyin (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Versiya %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">%0:s quraşdırmaq</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Versiyanı%0:s yükləyin (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Versiya %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">%0:s klaviaturası ilə əlaqələndirmək istədiyiniz dili seçin</string>
+  <string name="ssOptionsDefaultLanguage">Standart dil</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">%0:s yüklənir</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">%0:s yüklənir</string>
+  <string name="ssOffline">$APPNAME Quraşdırma əlavə mənbələr yükləmək üçün keyman.com-a qoşula bilmədi. Zəhmət olmasa onlayn olduğunuzu yoxlayın və $APPNAME Quraşdırma üçün firewall parametrlərinizdə İnternetə giriş icazəsi verin. Quraşdırmadan çıxmaq üçün Abort düyməsini vurun, mənbələri yenidən sınamaq və yükləmək üçün yenidən cəhd edin və ya oflayn davam etmək üçün Mən vermə.</string>
+</resources>

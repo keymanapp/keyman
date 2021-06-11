@@ -1049,7 +1049,16 @@ public final class KMManager {
     String pkgID = lexicalModelInfo.get(KMKey_PackageID);
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
     String languageID = lexicalModelInfo.get(KMKey_LanguageID);
-    String path = "file://" + getLexicalModelsDir() + pkgID + File.separator + modelID + ".model.js";
+    boolean modelFileExists = true;
+    File modelFile = new File(getLexicalModelsDir(), pkgID + File.separator + modelID + ".model.js");
+    String path = "file://" + modelFile.getAbsolutePath();
+
+    // Disable sugestions if lexical-model file doesn't exist
+    if (!modelFile.exists()) {
+      modelFileExists = false;
+      setBannerOptions(false);
+      KMLog.LogError(TAG, modelFile.getAbsolutePath() + " does not exist");
+    }
 
     JSONObject modelObj = new JSONObject();
     JSONArray languageJSONArray = new JSONArray();
@@ -1076,12 +1085,12 @@ public final class KMManager {
     boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params;
-    if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+    if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange && modelFileExists) {
       params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
-    if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+    if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange && modelFileExists) {
       params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));

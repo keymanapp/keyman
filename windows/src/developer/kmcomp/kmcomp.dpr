@@ -145,7 +145,11 @@ begin
       Run;
     except
       on E: Exception do
-        SentryHandleException(E);
+        if not SentryHandleException(E) then
+        begin
+          writeln(E.Message);
+          ExitCode := 99;
+        end;
     end;
   finally
     TKeymanSentryClient.Stop;

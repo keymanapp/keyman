@@ -42,6 +42,7 @@ begin
   Destination := '.';
   Copyright := 'Copyright (C)';
   Version := '1.0';
+  Targets := [ktAny];
 
   if ParamCount < 2 then
     Exit(False);
@@ -120,7 +121,7 @@ begin
   else if name = '-version' then Version := value
   else if name = '-languages' then BCP47Tags := value
   else if name = '-author' then Author := value
-
+  else if name = '-targets' then Targets := StringToKeymanTargets(value)
   else if name = '-id-author' then ModelIdAuthor := value
   else if name = '-id-language' then ModelIdLanguage := value
   else if name = '-id-uniq' then ModelIdUniq := value

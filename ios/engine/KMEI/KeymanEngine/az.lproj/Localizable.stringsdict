@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u lüğət quraşdırılıb</string>
+        <key>other</key>
+        <string>%u lüğətlər quraşdırıldı</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u yeniləmə alınmadı</string>
+        <key>other</key>
+        <string>%u yeniləmələri uğursuz oldu</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u yeniləməsi uğurlu oldu</string>
+        <key>other</key>
+        <string>%u yeniləmələri uğurlu oldu</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u klaviatura quraşdırıldı</string>
+        <key>other</key>
+        <string>%u klaviaturalar quraşdırıldı</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u dili quraşdırıldı</string>
+        <key>other</key>
+        <string>%u dili quraşdırıldı</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Paketdə%u klaviatura tapıldı:</string>
+        <key>other</key>
+        <string>Paketdə%u klaviaturalar tapıldı:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Paketdə %u lüğəti tapıldı:</string>
+        <key>other</key>
+        <string>Paketdə %u lüğətləri tapıldı:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>

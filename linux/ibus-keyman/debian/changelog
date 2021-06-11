@@ -1,3 +1,9 @@
+ibus-keyman (14.0.273-1) unstable; urgency=medium
+
+  * Keyman 14
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 26 Apr 2021 18:24:41 +0200
+
 ibus-keyman (11.0.103-4) unstable; urgency=medium
 
   * don't attempt to restart ibus without sudo and ps

@@ -151,21 +151,51 @@ STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL 
 {
   LogEnter();
 
-  guidActiveProfile = GUID_NULL;   // I4274
+  WCHAR bufClsid[40] = L"", bufProfile[40] = L"";
+  if (StringFromGUID2(clsid, bufClsid, 40) == 0) bufClsid[0] = 0;
+  if (StringFromGUID2(guidProfile, bufProfile, 40) == 0) bufProfile[0] = 0;
+  
+  if(IsEqualGUID(clsid, c_clsidKMTipTextService)) {
+    SendDebugMessageFormat(L"CKMTipTextService::OnActivated(c_clsidKMTipTextService, %s, %d)", bufProfile, fActivated);
+    TIPNotifyActivate(fActivated ? (GUID *)&guidProfile : NULL);
+  } else {
+    SendDebugMessageFormat(L"CKMTipTextService::OnActivated(%s, %s, %d)", bufClsid, bufProfile, fActivated);
 
-  if(IsEqualGUID(clsid, c_clsidKMTipTextService))
-  {
-    SendDebugMessageFormat(L"CKMTipTextService::OnActivated(c_clsidKMTipTextService, <GUID>, %d)", fActivated);
-    if(fActivated) {
-      guidActiveProfile = guidProfile;
-      TIPNotifyActivate((GUID *)&guidProfile);
+    if (fActivated) {
+      BOOL bIsDeactivating = TRUE;
+      ITfInputProcessorProfiles *pInputProcessorProfiles = NULL;
+
+      /* Look up the profile which is being activated, and only deactivate ourselves if it is a
+         Keyboard type TIP.
+      */
+      if (LogSUCCEEDED(CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER,
+        IID_ITfInputProcessorProfiles, (void**)&pInputProcessorProfiles))) {
+        ITfInputProcessorProfileMgr *pInputProcessorProfileMgr = NULL;
+        if (LogSUCCEEDED(pInputProcessorProfiles->QueryInterface(&pInputProcessorProfileMgr))) {
+          IEnumTfInputProcessorProfiles *pEnumTfInputProcessorProfiles = NULL;
+          if (LogSUCCEEDED(pInputProcessorProfileMgr->EnumProfiles(0, &pEnumTfInputProcessorProfiles))) {
+            TF_INPUTPROCESSORPROFILE profile;
+            ULONG cFetch;
+            while (SUCCEEDED(pEnumTfInputProcessorProfiles->Next(1, &profile, &cFetch)) && cFetch == 1) {
+              if (guidProfile == profile.guidProfile) {
+                bIsDeactivating = profile.catid == GUID_TFCAT_TIP_KEYBOARD;
+                SendDebugMessageFormat(L"CKMTipTextService::OnActivated is it GUID_TFCAT_TIP_KEYBOARD? %d", bIsDeactivating);
+                break;
+              }
+            }
+            pEnumTfInputProcessorProfiles->Release();
+            pEnumTfInputProcessorProfiles = NULL;
+          }
+          pInputProcessorProfileMgr->Release();
+          pInputProcessorProfileMgr = NULL;
+        }
+        pInputProcessorProfiles->Release();
+        pInputProcessorProfiles = NULL;
+      }
+      if (bIsDeactivating) {
+        TIPNotifyActivate(NULL);
+      }
     }
-    else TIPNotifyActivate(NULL);
-    // --> go it!
-  }
-  else {
-    SendDebugMessageFormat(L"CKMTipTextService::OnActivated(<other-GUID>, <GUID>, %d)", fActivated);
-    TIPNotifyActivate(NULL);
   }
 
   return S_OK;

@@ -15,9 +15,11 @@ namespace km {
       p.replace_extension(".kmx");
       _valid = bool(_kmx.Load(p.c_str()));
 
+      if (!_valid)
+        return;
+
       keyboard_attributes::options_store defaults;
-      if (_valid)
-        _kmx.GetOptions()->Init(defaults);
+      _kmx.GetOptions()->Init(defaults);
 
       for (auto const & opt: defaults)
       {

@@ -75,7 +75,9 @@ var
 begin
   kpt := TKeyboardProjectTemplate.Create(FParameters.Destination, FParameters.KeyboardID, FParameters.Targets);
   try
-    kpt.Name := FParameters.Name;
+    if FParameters.Name = ''
+      then kpt.Name := FParameters.KeyboardID
+      else kpt.Name := FParameters.Name;
     kpt.Copyright := FParameters.Copyright;
     kpt.Version := FParameters.Version;
     kpt.BCP47Tags := FParameters.BCP47Tags;

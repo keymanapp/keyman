@@ -64,6 +64,9 @@ void DebugLastError_1(char *file, int line, char *func, PWCHAR msg, DWORD err);
 #define DebugLastError(msg) (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,(msg),GetLastError()))
 #define DebugLastError0(msg,err) (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,(msg),(err)))
 
+#define LogSUCCEEDED(hr) _LogSUCCEEDED(__FILE__, __LINE__, __FUNCTIONW__, (#hr), (hr))
+BOOL _LogSUCCEEDED(char *file, int line, PWSTR caller, PSTR callee, HRESULT hr);
+
 //#define LogEnter() (SendDebugMessageFormat_1(__FILE__, __LINE__, L"%hs ENTER", __FUNCTION__))
 //#define LogExit() (SendDebugMessageFormat_1(__FILE__, __LINE__, L"%hs EXIT", __FUNCTION__))
 #define LogEnter()

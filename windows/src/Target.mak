@@ -40,6 +40,8 @@ dirs:
 
     @-mkdir $(ROOT)\bin\developer\samples 2>nul
     @-mkdir $(ROOT)\bin\developer\xml 2>nul
+    @-mkdir $(ROOT)\bin\developer\projects 2>nul
+    @-mkdir $(ROOT)\bin\developer\projects\templates 2>nul
     @-mkdir $(ROOT)\bin\buildtools 2>nul
     @-mkdir $(ROOT)\bin\engine 2>nul
     @-mkdir $(ROOT)\bin\desktop 2>nul

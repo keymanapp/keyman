@@ -117,8 +117,6 @@ private:
     // state
     //
 
-    GUID guidActiveProfile;   // I4274
-
     BOOL _keystrokeSinkInitialized;
     BOOL fEatenBuf[256];
 

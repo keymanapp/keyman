@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Context: Title for list -->
+    <plurals name="title_keyboards">
+        <item quantity="one">የፊደል ገበታ</item>
+        <item quantity="other">የፊደል ገበታዎች</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <string name="title_add_keyboard" comment="Add a new keyboard">አዲስ ኪቦርድ ጨምር</string>
+    <!-- Context: Title for list -->
+    <string name="title_languages_settings" comment="List of installed languages">የተጫኑ ቋንዎች</string>
+    <!-- Context: Title for list -->
+    <string name="title_language_settings" comment="Keyman Settings for a language">%1$s ስሪቶች</string>
+    <!-- Context: Button label -->
+    <string name="label_add" comment="Button to add an item">አክል</string>
+    <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">ተመለስ</string>
+    <!-- Context: Button label -->
+    <string name="label_cancel" comment="Button to cancel an action">ይቅር</string>
+    <!-- Context: Button label -->
+    <string name="label_close" comment="Close a dialog">ዝጋ</string>
+    <!-- Context: Button label -->
+    <string name="label_close_keyman" comment="Close the Keyman application">ኪይማኑን ዝጋ</string>
+    <!-- Context: Button label -->
+    <string name="label_download" comment="Button to confirm downloading an item">ወርዷል</string>
+    <!-- Context: Button label -->
+    <string name="label_install" comment="Confirmation to install a package">ጫን</string>
+    <!-- Context: Button label -->
+    <string name="label_later" comment="Do an action at a later time">በኋላ</string>
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">ቀጥሎ</string>
+    <!-- Context: Button label -->
+    <string name="label_ok" comment="Button to acknowledge a dialog">ይሁን</string>
+    <!-- Context: Button label -->
+    <string name="label_update" comment="Dialog button to update a resource">አዘምን</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="cannot_connect" comment="Error message when network connection fails">ከኪይማን ሰርቨር ጋር መገናኘት አልቻለም!</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">ይህንን የፊደል ገበታ ልታጠፋው ትፈልጋለህ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">የዚህን የፊደል ገበታ አዲሱን ስሪት ማውረድ ትፈልጋለህ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_update" comment="Confirmation to update several resources">የፊደል ገበታ ሰሌዳዎችን እና መዝገበ-ቃላትን አሁን ማዘመን ይፈልጋሉ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_channel">ሪሶርስ ተሻሽሏል</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">የሚሻሻሉ ሪሶርሶች ይገኛሉ</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (ማሻሻያዎች አሉ)</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_update_message" comment="language name: keyboard name">የፊደል ገበታውን ማሻሻያ ይገኛል %1$s: %2$s </string>
+    <!-- Context: Keyboard Updates -->
+    <string name="dictionary_update_message">ለመዝገበ ቃላት ማሻሻያዎች ይገኛሉ %1$s: %2$s </string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version" comment="Label for keyboard version">የፊደል ሰሌዳ የህትመት ቁጥር</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="help_link" comment="Label for help link">የእርዳታ የድረገጽ ሊንክ</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">የፊደል ሰሌዳን ማጥፋት</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[አዲስ] %1$s</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_qr_code" comment="QR Code description">በሌላ መገልገያ መሳሪያ ላይ ይህን የቁልፍ ሰሌዳ ለመጫን ከፈለጉ \nይህንን ኮድ ስካን ያድርጉ</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">እንኳን ደህና ወደ %1$s መጡ</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">የእገዛ ፋይልን ለማየት ፋይል ፕሮቫይደሩ ቤተ መጽሐፍት ያስፈልገዋል %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">የገበታ ሰሌዳ ፋታል ችግር ዝርዝር %1$s:%2$s ለ %3$s ቋንቋ፤ መደበኛ ቋንቋ ጭኗል።</string>
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">ተያያዥነት ያለውን መዝገበ ቃላት ለመጫን እየፈተሸ ነው።</string>
+    <!-- Context: Model Updates -->
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">የዚህን የፊደል ገበታ አዲሱን መዝገበ ቃላት ማውረድ ትፈልጋለህ?</string>
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">የሚወርድ ምንም መዝገበ ቃላት የለም</string>
+    <!-- Context: Model Updates -->
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">የመረጃው ማውጫ አይገኝም</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">ካታሎግ ማሻሻያው ከበስተጀርባው ጀምሯል</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">ማውጫው አሁንም እየወረደ ነው፤ እባክዎን ከአፍታ በኋላ እንደገና ይሞክሩ!</string>
+    <!-- Context: Background download messages-->
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">የሚያስፈልጉ ፋይሎችን እየፈለገ ነው</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">የፊደል ገበታውን ከበስተኋላ በማውረድ ላይ ነው</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">የመረጡት የፊደል ገበታ ሰሌዳ ቀድሞውን አውርደውታል፤ እባክዎን ከአፍታ በኋላ እንደገና ይሞክሩ!</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">የፊደል ገበታ ሰሌዳ ወርዶ አልቋል!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">መዘገበ ቃላቱን ከበስተኋላ በማውረድ ላይ ነው</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">የመረጡት መዝገበ ቃላት ቀድሞውን አውርደውታል፤ እባክዎን ከአፍታ በኋላ እንደገና ይሞክሩ!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">መዝገበ ቃላቱ ወርዶ አልቋል።</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">ማውረድ አልቻለም</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">የወረደውን ፋይል ማንበብ አልተቻለም</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">ሰርቨሩን ማግኘት አልተቻለም!</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_current" comment="Notification that all resources are up to date">"ሁሉም ሪሶርሶችህ ዘምነዋል!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">አንድና ከዛ በላይ የሆኑ ሪሶርሶችህ ማዘመን አልተቻለም!</string>
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">ያሉህ ሪሶርሶች በጥሩ ሁኔታ ዘምነዋል!</string>
+    <!-- Context: Model Info -->
+    <string name="model_version" comment="Title for a dictionary version">የመዝገበ ቃላት ስሪት</string>
+    <!-- Context: Model Info -->
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">መዝገበ ቃላቱን ማስወገድ</string>
+    <!-- Context: Model Info -->
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">ይህንን መዝገበ ቃላት ልታጠፋው ትፈልጋለህ?</string>
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s ይህ የፊደል ገበታ ሰሌዳ ተጭኗል</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">እርማቱን ያብሩ</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">ትንበያውን ያብሩ</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_label">መዝገበ ቃላት</string>
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">መዝገበ ቃላት መኖሩን ይፈትሹ</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_info_header" comment="Dictionary name">መዝገበ ቃላት፦ %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_picker_header" comment="Dictionaries for a specified language">%1$s መዝገበ ቃላቶች</string>
+    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">መዝገበ ቃላት ተጭኗል</string>
+    <!-- Context: Language Settings menu strings -->
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d የፊደል ገበታ ሰሌዳ)</item>
+        <item quantity="other">(%1$d የፊደል ገበታ ሰሌዳዎች)</item>
+    </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">ይህንን መደበኛ ቋንቋ አድርገው</string>
+    <!-- Context: Content descriptions -->
+    <!-- Context: Content descriptions -->
+    <!-- Context: Popup menu labels -->
+    <string name="label_delete" comment="Confirmation to delete an item">ሰርዝ</string>
+    <!-- Context: Shared preferences name -->
+    <!-- Context: Other strings -->
+    <string name="help_bubble_text">የፊደል ገበታውን ለመቀየር እዚህ ጋር ንካ</string>
+</resources>

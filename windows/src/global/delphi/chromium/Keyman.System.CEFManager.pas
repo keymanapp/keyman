@@ -20,6 +20,7 @@ type
   IKeymanCEFHost = interface
     ['{DFABC8BF-803E-45E6-B7DC-522C7FEB08EB}']
     procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
+    function GetDebugInfo: string;
   end;
 
   TCEFManager = class
@@ -53,6 +54,7 @@ uses
   Winapi.Tlhelp32,
   Winapi.Windows,
 
+  Keyman.System.KeymanSentryClient,
   KeymanPaths,
   KeymanVersion,
   RegistryKeys,
@@ -128,7 +130,14 @@ begin
 end;
 
 destructor TCEFManager.Destroy;
+var
+  i: Integer;
 begin
+  if FWindows.Count > 0 then
+  begin
+    for i := 0 to FWindows.Count - 1 do
+      TKeymanSentryClient.Breadcrumb('trace', 'TCEFManager.Destroy:Window['+IntToStr(i)+']='+FWindows[i].GetDebugInfo);
+  end;
   Assert(FWindows.Count = 0);
   Cleanup(nil);
   inherited Destroy;

@@ -3,7 +3,7 @@
 ## Mac Tools Requirements/Setup
 
 * Install [Homebrew] *technically optional, but highly recommended*
-* Install Xcode 11.3.1 or later *it might also work to use an older version*
+* Install Xcode 12.0+
 * Accept the Xcode license `sudo xcodebuild -license accept`
 * Install [Carthage] (`brew install carthage`) *see Homebrew note below*
 * Install [cocoapods] (`brew install cocoapods`)
@@ -30,21 +30,21 @@ keyboard input. You have two options for local builds:
 
 ### Signing and notarizing builds
 
-Keyman must be signed then notarized by Apple, even for local test builds. This requires additional 
+Keyman must be signed then notarized by Apple, even for local test builds. This requires additional
 configuration for your build environment.
 
 1. First, open XCode, Preferences, Accounts, and select Manage Certificates for the identity
    you wish to use for signing. Click **+** and select **Developer ID Application**. A
-   certificate will then be generated and listed in your Keychain. 
-   
+   certificate will then be generated and listed in your Keychain.
+
 2. Find the SHA-1 hash. To find the certificate in terminal:
 
    `security find-certificate -Z -c "<your-apple-id>" -a`
-   
+
    (If you have more than one, you may need to use Keychain Access to differentiate).
    Copy the SHA-1 hash from this command's output.
-   
-   Take note also of the Development Team ID, found in parentheses at the end of the 
+
+   Take note also of the Development Team ID, found in parentheses at the end of the
    `labl` blob line.
 
 2. Determine the Apple ID details in order to run a build. You may wish to create an
@@ -72,7 +72,7 @@ To build Keyman for macOS, do the following:
 1. Open a Terminal window.
 2. cd to **keyman/mac**. **build.sh** must be run in the directory containing the script.
 3. Build using `./build.sh -no-codesign`. Run `./build.sh -help` to see all options.
-    * If you have signing credentials from the core development team, you can build a signed 
+    * If you have signing credentials from the core development team, you can build a signed
       version by omitting `-no-codesign`. Somewhat misleadingly, `-no-codesign` only stops
       automatic signing using the certificate maintained by the core development team!
     * If you want to deploy, you will need to also add `-config Release`, as a Debug build cannot be notarized.

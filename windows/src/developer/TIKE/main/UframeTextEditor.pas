@@ -705,6 +705,11 @@ begin
 
   if FHasBeenLoaded then
   begin
+    // #5095 Update the backing store so we have the data available immediately
+    if modWebHttpServer.AppSource.IsSourceRegistered(FFileName) then
+      modWebHttpServer.AppSource.SetSource(FFilename, Value);
+
+    // Then update the text editor as well
     v := TJSONString.Create(Value);
     try
       ExecuteCommand('setText', v);
