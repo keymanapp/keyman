@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # Determine if we need to do a build based on rules in
 # trigger-definitions.inc.sh, rather than calculating changes in
@@ -18,9 +18,7 @@ else
 fi
 
 function debug_echo() {
-  if [ ! -z ${DEBUG:-} ]; then
-    echo "DEBUG: $1"
-  fi
+  #echo "DEBUG: $1"
   true
 }
 
