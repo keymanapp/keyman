@@ -1211,7 +1211,6 @@ namespace com.keyman.keyboards {
     keymanCloudRequest(cmd: string, byLanguage?: boolean): Promise<KeyboardStub[]|Error> {
       var kbdManager = this;
       var keymanweb = this.keymanweb;
-      let currentKeyboardStubsCount = this.keyboardStubs.length;
 
       // Some basic support toward #5044, but definitely not a full solution toward it.
       // Wraps the cloud API keyboard-stub request in a Promise, allowing response on network
@@ -1280,11 +1279,6 @@ namespace com.keyman.keyboards {
         } catch(ex) {
           document.getElementsByTagName('head')[0].appendChild(Lscript);
         }
-        // resolve?
-        //console.log(Lscript);
-
-        // why is this empty
-        //resolve(kbdManager.keyboardStubs.slice(currentKeyboardStubsCount));
       });
       // TODO:  Allow the site developer to handle error messaging via this catch.
       //        This current version simply maintains pre-existing behavior.
@@ -1293,8 +1287,7 @@ namespace com.keyman.keyboards {
         return Promise.reject(error);
       });
 
-      // Return new keyboard stubs. If out of bounds (no new stubs), returns []
-      return Promise.resolve(this.keyboardStubs.slice(currentKeyboardStubsCount));
+      return promise;
     }
 
     /**
