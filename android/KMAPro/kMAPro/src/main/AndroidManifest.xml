@@ -45,7 +45,7 @@
         android:resource="@xml/method" />
     </service>
     <service
-      android:name="com.tavultesoft.kmea.util.DownloadIntentService"
+      android:name="com.keyman.android.DownloadIntentService"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:exported="true" />
 

@@ -143,6 +143,6 @@ public class CheckInstallReferrer {
     if(source == null || !source.equals("keyman")) return;
     if(packageId == null) return;
 
-    mainActivity.downloadKMP(packageId, bcp47);
+    mainActivity.downloadKMP(packageId, bcp47, KmpInstallMode.WelcomeOnly);
   }
 }
