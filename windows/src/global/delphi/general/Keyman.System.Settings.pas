@@ -401,12 +401,12 @@ const
     (
       ID: 'engine.compatibility.old_cached_hotkey_modifier_state';
       Name: SRegValue_Flag_UseCachedHotkeyModifierState;
-      DefaultInt: 1; // 14.0.276: disabling new hotkey modifier check by default
       RootKey: HKCU;
       Key: SRegKey_KeymanEngineDebug_CU;
       Description: 'Set to 1 to use a cached modifier state when checking hotkeys; if '+
                    'set to 0 then engine.compatibility.old_hotkey_registration may not '+
                    'work';
+      DefaultInt: 1; // 14.0.276: disabling new hotkey modifier check by default
       ValueType: kstInteger
     ),
 
