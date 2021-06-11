@@ -127,11 +127,11 @@ BOOL UseRegisterHotkey() {
 }
 
 BOOL UseCachedHotkeyModifierState() {
-  static BOOL flag_UseCachedHotkeyModifierState = FALSE;
+  static BOOL flag_UseCachedHotkeyModifierState = TRUE; // 14.0.276: disabling new hotkey modifier check by default
   static BOOL loaded = FALSE;
   if (!loaded) {
     loaded = TRUE;
-    flag_UseCachedHotkeyModifierState = Reg_GetDebugFlag(REGSZ_Flag_UseCachedHotkeyModifierState, FALSE);
+    flag_UseCachedHotkeyModifierState = Reg_GetDebugFlag(REGSZ_Flag_UseCachedHotkeyModifierState, TRUE);
   }
   return flag_UseCachedHotkeyModifierState;
 }
