@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.67 alpha 2021-06-12
+
+* feat(linux): Fix Linux packaging on i386 (#5250)
+
 ## 15.0.66 alpha 2021-06-11
 
 * feat(android): silent install for referred kbd (#5240)
