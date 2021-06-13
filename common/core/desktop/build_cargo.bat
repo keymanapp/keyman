@@ -30,7 +30,7 @@ cargo build --target-dir="%TARGET_PATH%\rust\%TARGETBASE%" %TARGET_FLAG% %CARGO_
 :: On Windows, final output path is ./build/rust/<arch>/<arch_rust>/debug|release/<libraryname>
 :: On other platforms, the final file is already in the right place (TARGET=="")
 
-set LIB=rust_mock_processor
+set LIB=rust_mock_processor_native
 set LIBNAME=%LIB%.lib
 set BUILT_PATH=%TARGET_PATH%\rust\%TARGETBASE%\%TARGET%\%MESON_TARGET%
 set RUST_TARGET_PATH=%TARGET_PATH%\rust\%TARGETBASE%\%MESON_TARGET%

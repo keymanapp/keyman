@@ -127,7 +127,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>rust_mock_processor.lib;libkmnkbp0.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>rust_mock_processor_native.lib;libkmnkbp0.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>./Keyman64.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -189,7 +189,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>rust_mock_processor.lib;libkmnkbp0.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>rust_mock_processor_native.lib;libkmnkbp0.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>./Keyman64.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

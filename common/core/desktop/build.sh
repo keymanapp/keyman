@@ -215,7 +215,7 @@ build_test_rust() {
     # WASM is similar: ./build/rust/wasm/wasm_unknown_unknown/debug|release/<libraryname>
     # On Linux, macOS, the final file is already in the right place (TARGET=="")
     if [ ! -z $TARGET ]; then
-      local LIB="rust_mock_processor"
+      local LIB="rust_mock_processor_$PLATFORM"
 
       # Library name on Windows vs *nix / WASM pref
       [[ $os_id == "win" && $TARGETBASE != "wasm" ]] && \

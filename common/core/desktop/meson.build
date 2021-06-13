@@ -47,11 +47,17 @@ else
   endif
 endif
 
+if rust_platform = 'arch'
+  platform_suffix='native'
+else
+  platform_suffix='wasm'
+endif
+
 rust_path = join_paths(meson.current_build_dir(), '..', '..', 'rust', rust_platform, get_option('buildtype'))
 message('rust library path is: '+rust_path)
 
 cc = meson.get_compiler('c')
-rust_mock_processor = cc.find_library('rust_mock_processor', dirs: rust_path)
+rust_mock_processor = cc.find_library('rust_mock_processor_'+platform_suffix, dirs: rust_path)
 
 subdir('doc')
 subdir('include')
