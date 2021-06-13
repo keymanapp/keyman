@@ -1134,6 +1134,9 @@ namespace com.keyman.keyboards {
         if(this.languagesPending) {
           this.addLanguageKeyboards(this.languagesPending).then(result => {
             return result
+          }).catch(error => {
+            console.log('swallow Error' + error);
+            //throw error
           });
         }
         this.languagesPending = [];
