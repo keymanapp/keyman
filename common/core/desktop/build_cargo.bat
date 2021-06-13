@@ -24,7 +24,7 @@ set TARGET=%2
 set TARGET_FLAG=--target=%TARGET%
 set TARGET_PATH=%~dp0build
 
-cd "%TARGET_PATH%\..\src\rust" || exit !errorlevel!
+cd "%TARGET_PATH%\..\src\rust\native" || exit !errorlevel!
 cargo build --target-dir="%TARGET_PATH%\rust\%TARGETBASE%" %TARGET_FLAG% %CARGO_TARGET% || exit !errorlevel!
 
 :: On Windows, final output path is ./build/rust/<arch>/<arch_rust>/debug|release/<libraryname>

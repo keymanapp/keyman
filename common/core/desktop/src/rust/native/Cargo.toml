@@ -1,0 +1,10 @@
+[package]
+name = "keyman_keyboard_processor_native"
+version = "0.1.0"
+
+[lib]
+name = "keyman_keyboard_processor_native"
+crate-type = ["staticlib"]
+
+[dependencies]
+keyman_keyboard_processor = { path = "../keyman_keyboard_processor" }

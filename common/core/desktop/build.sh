@@ -203,7 +203,7 @@ build_test_rust() {
     local TARGET_FLAG=
   fi
 
-  pushd "$THIS_DIR/src/rust" >/dev/null
+  pushd "$THIS_DIR/src/rust/$PLATFORM" >/dev/null
   if $BUILD_RUST; then
     echo_heading "======= Building rust library for $TARGETBASE, $TARGET ======="
 
