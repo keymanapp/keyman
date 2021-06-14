@@ -47,10 +47,10 @@ else
   endif
 endif
 
-if rust_platform = 'arch'
-  platform_suffix='native'
+if rust_platform = ='arch'
+  platform_suffix = 'native'
 else
-  platform_suffix='wasm'
+  platform_suffix = 'wasm'
 endif
 
 rust_path = join_paths(meson.current_build_dir(), '..', '..', 'rust', rust_platform, get_option('buildtype'))
