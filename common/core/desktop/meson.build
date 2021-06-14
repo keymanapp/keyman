@@ -47,17 +47,17 @@ else
   endif
 endif
 
-if rust_platform == 'arch'
-  platform_suffix = 'native'
-else
+if rust_platform == 'wasm'
   platform_suffix = 'wasm'
+else
+  platform_suffix = 'native'
 endif
 
 rust_path = join_paths(meson.current_build_dir(), '..', '..', 'rust', rust_platform, get_option('buildtype'))
 message('rust library path is: '+rust_path)
 
 cc = meson.get_compiler('c')
-rust_mock_processor = cc.find_library('rust_mock_processor_'+platform_suffix, dirs: rust_path)
+rust_mock_processor = cc.find_library('keyman_keyboard_processor_'+platform_suffix, dirs: rust_path)
 
 subdir('doc')
 subdir('include')
