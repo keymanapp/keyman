@@ -1,26 +1,5 @@
 namespace com.keyman.osk {
   export class PreProcessor {
-    static _GetClickEventProperties(e: keyboards.ActiveKey, Lelem: HTMLElement): text.KeyEvent {
-      let keyman = com.keyman.singleton;
-      let core = keyman.core;
-
-      // Start:  mirrors _GetKeyEventProperties
-
-      // First check the virtual key, and process shift, control, alt or function keys
-      let Lkc = e.constructKeyEvent(core.keyboardProcessor, keyman.util.device.coreSpec);
-
-      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
-      switch(Lkc.kName) {
-        case 'K_CAPS':
-        case 'K_NUMLOCK':
-        case 'K_SCROLL':
-          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
-      }
-
-      // End - mirrors _GetKeyEventProperties
-      return Lkc;
-    }
-
     /**
      * Simulate a keystroke according to the touched keyboard button element
      *
@@ -48,19 +27,11 @@ namespace com.keyman.osk {
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
         outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
-        // Future note:  we need to refactor osk.OSKKeySpec to instead be a 'tag field' for
-        // keyboards.ActiveKey.  (Prob with generics, allowing the Web-only parts to
-        // be fully specified within the tag.)  
-        //
-        // Would avoid the type shenanigans needed here because of our current type-abuse setup 
-        // for key spec tracking.
-        let keySpec = (e['key'] ? e['key'].spec : null) as unknown as keyboards.ActiveKey;
-        if(!keySpec) {
-          console.error("OSK key with ID '" + e.id + "', keyID '" + e.keyId + "' missing needed specification");
+        let Lkc = keyman['osk'].vkbd.initKeyEvent(e, touch, keyDistribution);
+        if(!Lkc) {
           return true;
         }
 
-        let Lkc = PreProcessor._GetClickEventProperties(keySpec, Lelem);
         if(keyman.core.languageProcessor.isActive) {
           Lkc.source = touch;
           Lkc.keyDistribution = keyDistribution;
