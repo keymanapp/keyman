@@ -10,7 +10,7 @@ Build-Depends:
  libgtk-3-dev,
  libibus-1.0-dev (>= 1.2),
  libjson-glib-dev (>= 1.4.0),
- libkmnkbp-dev (>=11.0.100),
+ libkmnkbp-dev (>= 15.0.44),
  pkg-config,
 Standards-Version: 4.5.1
 Vcs-Git: https://github.com/keymanapp/keyman.git

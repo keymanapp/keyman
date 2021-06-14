@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.67 alpha 2021-06-12
+
+* feat(linux): Fix Linux packaging on i386 (#5250)
+
+## 15.0.66 alpha 2021-06-11
+
+* feat(android): silent install for referred kbd (#5240)
+* fix(android): rotation is not updating keyboard (#5247)
+
 ## 15.0.65 alpha 2021-06-10
 
 * docs(ios): minor readme tweak regarding prerequisites (#5253)
