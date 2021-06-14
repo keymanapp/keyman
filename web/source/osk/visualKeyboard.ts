@@ -1152,10 +1152,9 @@ namespace com.keyman.osk {
 
         // Also backspace, to allow delete to repeat while key held
       } else if(keyName == 'K_BKSP') {
-        let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]);
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
-        PreProcessor.clickKey(key, e.changedTouches[0], this.layerId, touchProbabilities);
+        PreProcessor.clickKey(key, e.changedTouches[0]);
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
@@ -1163,8 +1162,7 @@ namespace com.keyman.osk {
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
-          let touchProbabilities = this.getTouchProbabilities(this.touchPending);
-          PreProcessor.clickKey(this.keyPending, this.touchPending, this.layerId, touchProbabilities);
+          PreProcessor.clickKey(this.keyPending, this.touchPending);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
@@ -1237,8 +1235,7 @@ namespace com.keyman.osk {
 
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]);
-          PreProcessor.clickKey(this.keyPending, e.changedTouches[0], this.layerId, touchProbabilities);
+          PreProcessor.clickKey(this.keyPending, e.changedTouches[0]);
         }
         this.clearPopup();
         this.keyPending = null;
@@ -1535,7 +1532,7 @@ namespace com.keyman.osk {
     }
     //#endregion
 
-    initKeyEvent(e: osk.KeyElement, touch?: Touch, keyDistribution?: text.KeyDistribution) {
+    initKeyEvent(e: osk.KeyElement, touch?: Touch) {
       // Turn off key highlighting (or preview)
       this.highlightKey(e,false);
 
@@ -1569,10 +1566,10 @@ namespace com.keyman.osk {
 
       // End - mirrors _GetKeyEventProperties
 
-      // if(keyman.core.languageProcessor.isActive) {
-      //   Lkc.source = touch;
-      //   Lkc.keyDistribution = keyDistribution;
-      // }
+      if(core.languageProcessor.isActive && touch) {
+        Lkc.source = touch;
+        Lkc.keyDistribution = this.getTouchProbabilities(touch);;
+      }
       
       // Send the event.
       return Lkc;

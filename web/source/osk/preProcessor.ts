@@ -9,33 +9,25 @@ namespace com.keyman.osk {
      * 
      * @param       {Object}      e      element touched (or clicked)
      */
-    static clickKey(e: osk.KeyElement, touch?: Touch, layerId?: string, keyDistribution?: text.KeyDistribution) {
+    static clickKey(e: osk.KeyElement, touch?: Touch) {
       let keyman = com.keyman.singleton;
+      let Lkc = keyman['osk'].vkbd.initKeyEvent(e, touch);
+      if(!Lkc) {
+        return true;
+      }
+
       var Lelem = keyman.domManager.getLastActiveElement();
 
       if(Lelem != null) {
         // Handle any DOM state management related to click inputs.
         let outputTarget = dom.Utils.getOutputTarget(Lelem);
         keyman.domManager.initActiveElement(Lelem);
-  
-        // Turn off key highlighting (or preview)
-        keyman['osk'].vkbd.highlightKey(e,false);
         
         // Clear any cached codepoint data; we can rebuild it if it's unchanged.
         outputTarget.invalidateSelection();
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
         outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
-
-        let Lkc = keyman['osk'].vkbd.initKeyEvent(e, touch, keyDistribution);
-        if(!Lkc) {
-          return true;
-        }
-
-        if(keyman.core.languageProcessor.isActive) {
-          Lkc.source = touch;
-          Lkc.keyDistribution = keyDistribution;
-        }
 
         if(!keyman.isEmbedded) {
           keyman.uiManager.setActivatingUI(true);
