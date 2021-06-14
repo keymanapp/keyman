@@ -16,6 +16,11 @@ namespace com.keyman.osk {
         return true;
       }
 
+      return this.raiseKeyEvent(Lkc);
+    }
+
+    static raiseKeyEvent(keyEvent: text.KeyEvent) {
+      let keyman = com.keyman.singleton;
       var Lelem = keyman.domManager.getLastActiveElement();
 
       if(Lelem != null) {
@@ -36,7 +41,7 @@ namespace com.keyman.osk {
           com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         }
 
-        let retVal = PreProcessor.handleClick(Lkc, outputTarget, e);
+        let retVal = PreProcessor.handleClick(keyEvent, outputTarget, null);
 
         // Now that processing is done, we can do a bit of post-processing, too.
         keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
@@ -50,7 +55,7 @@ namespace com.keyman.osk {
     // after the KeyEvent object has been properly instantiated.  This should help catch any 
     // mutual last-minute DOM-side interactions before passing control to the processor... such as
     // the UI-control command keys as seen below.
-    static handleClick(Lkc: text.KeyEvent, outputTarget: text.OutputTarget, e: KeyElement) {
+    static handleClick(Lkc: text.KeyEvent, outputTarget: text.OutputTarget, e: osk.KeyElement) {
       let keyman = com.keyman.singleton;
         // Exclude menu and OSK hide keys from normal click processing
       if(Lkc.kName == 'K_LOPT' || Lkc.kName == 'K_ROPT') {

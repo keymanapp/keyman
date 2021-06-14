@@ -1142,7 +1142,7 @@ namespace com.keyman.osk {
       // Special function keys need immediate action
       if(keyName == 'K_LOPT' || keyName == 'K_ROPT')      {
         window.setTimeout(function(this: VisualKeyboard){
-          PreProcessor.clickKey(key);
+          this.modelKeyClick(key);
           // Because we immediately process the key, we need to re-highlight it after the click.
           this.highlightKey(key, true);
           // Highlighting'll be cleared automatically later.
@@ -1154,7 +1154,7 @@ namespace com.keyman.osk {
       } else if(keyName == 'K_BKSP') {
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
-        PreProcessor.clickKey(key, e.changedTouches[0]);
+        this.modelKeyClick(key, e.changedTouches[0]);
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
@@ -1162,7 +1162,7 @@ namespace com.keyman.osk {
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
-          PreProcessor.clickKey(this.keyPending, this.touchPending);
+          this.modelKeyClick(this.keyPending, this.touchPending);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
@@ -1235,7 +1235,7 @@ namespace com.keyman.osk {
 
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          PreProcessor.clickKey(this.keyPending, e.changedTouches[0]);
+          this.modelKeyClick(this.keyPending, e.changedTouches[0]);
         }
         this.clearPopup();
         this.keyPending = null;
@@ -1514,7 +1514,7 @@ namespace com.keyman.osk {
      **/
     repeatDelete: () => void = function(this: VisualKeyboard) {
       if(this.deleting) {
-        PreProcessor.clickKey(this.deleteKey);
+        this.modelKeyClick(this.deleteKey);
         this.deleting = window.setTimeout(this.repeatDelete,100);
       }
     }.bind(this);
@@ -1531,6 +1531,14 @@ namespace com.keyman.osk {
       this.deleting = 0;
     }
     //#endregion
+
+    modelKeyClick(e: osk.KeyElement, touch?: Touch) {
+      let keyEvent = this.initKeyEvent(e, touch);
+
+      // TODO:  convert into an actual event, raised by the VisualKeyboard.
+      //        Its code is intended to lie outside of the OSK-Core library/module.
+      PreProcessor.raiseKeyEvent(keyEvent);
+    }
 
     initKeyEvent(e: osk.KeyElement, touch?: Touch) {
       // Turn off key highlighting (or preview)
@@ -1571,7 +1579,7 @@ namespace com.keyman.osk {
         Lkc.keyDistribution = this.getTouchProbabilities(touch);;
       }
       
-      // Send the event.
+      // Return the event object.
       return Lkc;
     }
 
@@ -1979,7 +1987,7 @@ namespace com.keyman.osk {
       // Process as click if mouse button released anywhere over key
       if(util.eventType(e) == 'mouseup') {
         if(key.id == this.currentKey) {
-          PreProcessor.clickKey(key);
+          this.modelKeyClick(key);
         }
         this.currentKey='';
       }
