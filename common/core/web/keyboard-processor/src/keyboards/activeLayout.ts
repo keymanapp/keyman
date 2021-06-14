@@ -29,6 +29,7 @@ namespace com.keyman.keyboards {
     private baseKeyEvent: text.KeyEvent;
     isMnemonic: boolean = false;
 
+    proportionalPad: number;
     proportionalX: number;
     proportionalWidth: number;
 
@@ -286,6 +287,12 @@ namespace com.keyman.keyboards {
        * and are intended for use with layout testing (while headless) in the future.
        */
 
+      let setProportions = function(key: ActiveKey, padPc: number, keyPc: number, totalPc: number) {
+        key.proportionalPad   = padPc;
+        key.proportionalWidth = keyPc;
+        key.proportionalX     = (totalPc + padPc + (keyPc/2));
+      }
+
       // Calculate percentage-based scalings by summing defined widths and scaling each key to %.
       // Save each percentage key width as a separate member (do *not* overwrite layout specified width!)
       var keyPercent: number, padPercent: number, totalPercent=0;
@@ -296,9 +303,7 @@ namespace com.keyman.keyboards {
         keys[j]['padpc']=padPercent;
 
         // compute center's default x-coord (used in headless modes)
-        (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2));
-        (<ActiveKey> keys[j]).proportionalWidth = keyPercent;
-
+        setProportions(keys[j] as ActiveKey, padPercent, keyPercent, totalPercent);
         totalPercent += padPercent+keyPercent;
       }
 
@@ -314,9 +319,7 @@ namespace com.keyman.keyboards {
         keys[0]['padpc']=1-totalPercent;
 
         // compute center's default x-coord (used in headless modes)
-        (<ActiveKey> keys[0]).proportionalX = ((totalPercent - rightMargin) -  keyPercent/2);
-        (<ActiveKey> keys[0]).proportionalWidth = keyPercent;
-
+        setProportions(keys[0] as ActiveKey, padPercent, keyPercent, totalPercent);
       } else if(keys.length > 0) {
         let j=keys.length-1;
         padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
@@ -325,8 +328,7 @@ namespace com.keyman.keyboards {
         keys[j]['widthpc'] = keyPercent = 1-totalPercent;
 
         // compute center's default x-coord (used in headless modes)
-        (<ActiveKey> keys[j]).proportionalX = (1 - rightMargin) - keyPercent/2;
-        (<ActiveKey> keys[j]).proportionalWidth = keyPercent;
+        setProportions(keys[j] as ActiveKey, padPercent, keyPercent, totalPercent);
       }
 
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
