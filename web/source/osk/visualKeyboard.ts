@@ -969,10 +969,6 @@ namespace com.keyman.osk {
               padPercent = keys[j]['padpc'] * objectWidth;
               keys[j]['padpc']=padPercent;
 
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
-              (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
-
               totalPercent += padPercent+keyPercent;
             }
 
@@ -986,20 +982,12 @@ namespace com.keyman.osk {
               keys[0]['widthpc']=keyPercent;
               totalPercent += keyPercent;
               keys[0]['padpc']=(objectWidth-totalPercent);
-
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
-              (<keyboards.ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
             } else if(keys.length > 0) {
               j=keys.length-1;
               padPercent = keys[j]['padpc'] * objectWidth;
               keys[j]['padpc']=padPercent;
               totalPercent += padPercent;
               keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
-
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
-              (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
             }
           }
 
