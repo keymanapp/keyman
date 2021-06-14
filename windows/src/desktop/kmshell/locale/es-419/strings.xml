@@ -179,7 +179,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_OnScreenKeyboard_Custom" comment="(OSK) Custom term">Custom</string>
+  <string name="S_OnScreenKeyboard_Custom" comment="(OSK) Custom term">Personalizado</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
