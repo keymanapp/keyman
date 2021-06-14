@@ -124,6 +124,8 @@ namespace com.keyman.keyboards {
      */
     registrationResolvers: {[timeoutID: number] : RegistrationPromiseTuple} = {};
 
+    languageListPromise: Promise<KeyboardStub[]|Error> = null;
+
     languageList: any[] = null; // List of keyboard languages available for KeymanCloud
     languagesPending: any[] = [];     // Array of languages waiting to be registered
 
@@ -1132,12 +1134,9 @@ namespace com.keyman.keyboards {
       } else if(options['context'] == 'language') { // Download the full list of supported keyboard languages
         this.languageList = x['languages'];
         if(this.languagesPending) {
-          this.addLanguageKeyboards(this.languagesPending).then(result => {
-            return result
-          }).catch(error => {
-            console.log('swallow Error' + error);
-            //throw error
-          });
+          // Shouldn't be here because it's handled in addLanguageKeyboards promise
+          //return new Error('languagesPending should have been handled by addLanguageKeyboards promise');
+          console.log('languagesPending (unexpected)', this.languagesPending);
         }
         this.languagesPending = [];
       }
@@ -1156,16 +1155,39 @@ namespace com.keyman.keyboards {
       var i, j, lgName, cmd, first, addAll;
 
       // Defer registering keyboards by language until the language list has been loaded
-      if(this.languageList == null) {
+      if (this.languageList == null) {
         first = (this.languagesPending.length == 0);
 
         for(i=0; i<languages.length; i++) {
           this.languagesPending.push(languages[i]);
         }
 
-        if(first) {
-          return this.keymanCloudRequest('',true); // then?
+        if (first) {
+          let promise = this.keymanCloudRequest('',true);
+          // If promise is not error, then... (needs an error guard)
+          promise.catch(function(error) {
+            console.log('first error', error);
+            return Promise.reject(error);
+          });
+          this.languageListPromise = promise;
         }
+
+        let _this = this;
+        let retPromise = new Promise(function(resolve, reject) {
+          // 1: wait for the language list to be loaded properly
+          _this.languageListPromise.then(function() {
+            // 2: perform the actual query, now that we can find the language code
+            let innerPromise = _this.addLanguageKeyboards(languages);
+
+            // 3: intercept the Promise resolve/reject and pass them to the
+            // returned Promise.
+            innerPromise.then(function(stubs) {
+              resolve(stubs);
+            }).catch(function(error) {
+              reject(error);
+            });
+          });
+        });
       } else { // Identify and register each keyboard by language name
         cmd = '';
         for(i=0; i<languages.length; i++) {
@@ -1203,6 +1225,7 @@ namespace com.keyman.keyboards {
       }
 
       // Can we get here? What do we return?
+      console.log('Should return something here');
     }
 
     /**

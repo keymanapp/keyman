@@ -69,7 +69,7 @@
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
     // usually easier.)
-    kmw.addKeyboardsForLanguage(['Dzongkha', 'Khmer']);
+    kmw.addKeyboardsForLanguage('Dzongkha');
     /*
     kmw.addKeyboardsForLanguage('Khmer').then(result => {
       console.log('Adding Spanish and Khmer:', result);
@@ -112,7 +112,7 @@
         break;
       case 3:
         sKbd=document.getElementById('kbd_id3').value;
-        kmw.addKeyboardsForLanguage(sKbd).then(result => {
+        kmw.addKeyboardsForLanguage(['Khmer', 'Spanish']).then(result => {
             console.log('adding', result);
         }).catch(error => {
             alert(error)
