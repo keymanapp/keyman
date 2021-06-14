@@ -47,7 +47,7 @@ else
   endif
 endif
 
-if rust_platform = ='arch'
+if rust_platform == 'arch'
   platform_suffix = 'native'
 else
   platform_suffix = 'wasm'
