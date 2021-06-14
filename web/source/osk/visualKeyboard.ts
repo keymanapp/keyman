@@ -2372,11 +2372,12 @@ namespace com.keyman.osk {
      * Create copy of the OSK that can be used for embedding in documentation or help
      * The currently active keyboard will be returned if PInternalName is null
      *
-     *  @param  {string}          PInternalName   internal name of keyboard, with or without Keyboard_ prefix
-     *  @param  {number}          Pstatic         static keyboard flag  (unselectable elements)
-     *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
-     *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
-     *  @return {Object}                          DIV object with filled keyboard layer content
+     *  @param  {Object}            PKbd            the keyboard object to be displayed
+     *  @param  {string=}           argFormFactor   layout form factor, defaulting to 'desktop'
+     *  @param  {(string|number)=}  argLayerId      name or index of layer to show, defaulting to 'default'
+     *  @param  {Object}            host            KeymanWeb's active OSKManager instance 
+     *                                              (currently required for legacy reasons)
+     *  @return {Object}                            DIV object with filled keyboard layer content
      */
     static buildDocumentationKeyboard(PKbd: com.keyman.keyboards.Keyboard, argFormFactor,argLayerId, host: OSKManager): HTMLElement { // I777
       if(!PKbd) {
