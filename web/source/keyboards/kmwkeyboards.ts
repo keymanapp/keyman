@@ -1084,7 +1084,7 @@ namespace com.keyman.keyboards {
         try {
           if(result instanceof Error) {
             promiseFuncs.reject(result as Error);
-          } else if (promiseFuncs) {
+          } else {
             promiseFuncs.resolve(result as KeyboardStub[]);
           }
         } finally {
@@ -1177,8 +1177,8 @@ namespace com.keyman.keyboards {
           this.languagesPending = [];
           return this.addLanguageKeyboards(languageList);
         } else {
+          // Is this the correct to return an empty stub? Can't return Pending
           let emptyStub: KeyboardStub[] = [];
-          console.log('return empty stub, initialResult: ', initialResult);
           return Promise.resolve(emptyStub);
         }
       } else { // Identify and register each keyboard by language name

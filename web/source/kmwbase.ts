@@ -303,9 +303,10 @@ namespace com.keyman {
     }
 
     /**
-     *  Add default or all keyboards for a given language
+     *  Add default keyboard for given language(s)
      *
-     *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
+     *  @param  {string|string[]}   arg    Language name(s) (multiple arguments allowed)
+     *  @returns {Promise<KeyboardStub[]|Error>} Promise of added keyboard stubs
      **/
     ['addKeyboardsForLanguage'](arg: string[]|string) : Promise<com.keyman.keyboards.KeyboardStub[]|Error> {
       if (typeof arg === 'string') {
