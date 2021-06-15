@@ -27,7 +27,7 @@ namespace com.keyman.osk.browser {
     }
 
     show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
-      //let keyman = com.keyman.singleton;
+      let keyman = com.keyman.singleton;
       let util = keyman.util;
 
       // Create and display the preview
