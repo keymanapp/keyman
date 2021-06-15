@@ -93,7 +93,7 @@ namespace com.keyman.keyboards {
     return kbdid + ' keyboard not found.';
   }
 
-  export interface RegistrationPromiseTuple {
+  interface RegistrationPromiseTuple {
     resolve: (stubs: KeyboardStub[]) => void;
     reject: (err: Error) => void;
   }
@@ -1134,15 +1134,12 @@ namespace com.keyman.keyboards {
       } else if(options['context'] == 'language') { // Download the full list of supported keyboard languages
         this.languageList = x['languages'];
         if(this.languagesPending) {
-          // Shouldn't be here because it's handled in addLanguageKeyboards promise
-          //return new Error('languagesPending should have been handled by addLanguageKeyboards promise');
-          console.log('languagesPending (unexpected)', this.languagesPending);
+          // There are still pending languages to add:
+          //console.info('languagesPending remain: ', this.languagesPending);
         }
-        this.languagesPending = [];
+        // addLanguageKeyboards will handle clearing languagesPending. 
       }
 
-      //console.log(currentKeyboardStubsCount);
-      //console.log(this.keyboardStubs.slice(currentKeyboardStubsCount));
       return this.keyboardStubs.slice(currentKeyboardStubsCount);
     }
 
@@ -1150,44 +1147,40 @@ namespace com.keyman.keyboards {
      *  Internal handler for processing keyboard registration, used only by `register`
      *
      *  @param  {string[]}   languages    Array of language names
+     *  @returns {Promise<KeyboardStub[]|Error} Promise of added keyboard stubs
      **/
-    addLanguageKeyboards(languages: string[]): Promise<KeyboardStub[]|Error> {
+    async addLanguageKeyboards(languages: string[]): Promise<KeyboardStub[]|Error> {
       var i, j, lgName, cmd, first, addAll;
+
+      first = (this.languageList == null && this.languagesPending.length == 0);
 
       // Defer registering keyboards by language until the language list has been loaded
       if (this.languageList == null) {
-        first = (this.languagesPending.length == 0);
-
         for(i=0; i<languages.length; i++) {
           this.languagesPending.push(languages[i]);
         }
 
+        // initial result while waiting for language list catalog
+        let initialResult: KeyboardStub[]|Error = null;
         if (first) {
-          let promise = this.keymanCloudRequest('',true);
-          // If promise is not error, then... (needs an error guard)
-          promise.catch(function(error) {
-            console.log('first error', error);
-            return Promise.reject(error);
-          });
-          this.languageListPromise = promise;
+          initialResult = await this.keymanCloudRequest('',true);
+          // If initialResult is not error, then... (needs an error guard)
+          if (initialResult instanceof Error) {
+            return Promise.reject(initialResult);
+          }
+          
+          // Drop through to see if there's pending languages to add
         }
 
-        let _this = this;
-        let retPromise = new Promise(function(resolve, reject) {
-          // 1: wait for the language list to be loaded properly
-          _this.languageListPromise.then(function() {
-            // 2: perform the actual query, now that we can find the language code
-            let innerPromise = _this.addLanguageKeyboards(languages);
-
-            // 3: intercept the Promise resolve/reject and pass them to the
-            // returned Promise.
-            innerPromise.then(function(stubs) {
-              resolve(stubs);
-            }).catch(function(error) {
-              reject(error);
-            });
-          });
-        });
+        if (initialResult && this.languageList != null && this.languagesPending.length > 0) {
+          let languageList = this.languagesPending;
+          this.languagesPending = [];
+          return this.addLanguageKeyboards(languageList);
+        } else {
+          let emptyStub: KeyboardStub[] = [];
+          console.log('return empty stub, initialResult: ', initialResult);
+          return Promise.resolve(emptyStub);
+        }
       } else { // Identify and register each keyboard by language name
         cmd = '';
         for(i=0; i<languages.length; i++) {
@@ -1223,9 +1216,6 @@ namespace com.keyman.keyboards {
           return this.keymanCloudRequest('&keyboardid='+cmd, false);
         }
       }
-
-      // Can we get here? What do we return?
-      console.log('Should return something here');
     }
 
     /**

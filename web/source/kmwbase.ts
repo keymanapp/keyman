@@ -308,7 +308,6 @@ namespace com.keyman {
      *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
      **/
     ['addKeyboardsForLanguage'](arg: string[]|string) : Promise<com.keyman.keyboards.KeyboardStub[]|Error> {
-      console.log('type: ' + typeof arg);
       if (typeof arg === 'string') {
         return this.keyboardManager.addLanguageKeyboards(arg.split(','));
       } else {
