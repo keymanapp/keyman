@@ -1,4 +1,5 @@
 /// <reference path="preProcessor.ts" />
+/// <reference path="utils.ts" />
 
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
@@ -74,20 +75,50 @@ namespace com.keyman.osk {
 
   export abstract class OSKKey {
     spec: OSKKeySpec;
-    formFactor: string;
+    btn: KeyElement;
 
     /**
      * The layer of the OSK on which the key is displayed.
      */
     readonly layer: string;
 
-    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
+    constructor(spec: OSKKeySpec, layer: string) {
       this.spec = spec;
       this.layer = layer;
-      this.formFactor = formFactor;
     }
 
-    abstract getId(osk: VisualKeyboard): string;
+    abstract getId(): string;
+
+    /**
+     * Attach appropriate class to each key button, according to the layout
+     *
+     * @param       {Object=}   layout  source layout description (optional, sometimes)
+     */
+    public setButtonClass(vkbd: VisualKeyboard) {
+      let key = this.spec;
+      let btn = this.btn;
+
+      var n=0, keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
+      if(typeof key['dk'] == 'string' && key['dk'] == '1') {
+        n=8;
+      }
+
+      if(typeof key['sp'] == 'string') {
+        n=parseInt(key['sp'],10);
+      }
+
+      if(n < 0 || n > 10) {
+        n=0;
+      }
+
+      // Apply an overriding class for 5-row layouts
+      var nRows=vkbd.layout['layer'][0]['row'].length;
+      if(nRows > 4 && vkbd.device.formFactor == 'phone') {
+        btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
+      } else {
+        btn.className='kmw-key kmw-key-'+keyTypes[n];
+      }
+    }
 
     /**
      * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
@@ -98,7 +129,7 @@ namespace com.keyman.osk {
      * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
      * This version has been substantially modified to work for this particular application.
      */
-    static getTextMetrics(osk: VisualKeyboard, text: string, style: {fontFamily?: string, fontSize: string}): TextMetrics {
+    static getTextMetrics(text: string, emScale: number, style: {fontFamily?: string, fontSize: string}): TextMetrics {
       // A final fallback - having the right font selected makes a world of difference.
       if(!style.fontFamily) {
         style.fontFamily = getComputedStyle(document.body).fontFamily;
@@ -109,11 +140,7 @@ namespace com.keyman.osk {
       }
 
       let fontFamily = style.fontFamily;
-
-      // Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
-      // The following allows us to calculate the font size in those situations.
-      let emScale = osk.getKeyEmFontSize();
-      let fontSpec = (<KeymanBase> window['keyman']).util.getFontSizeStyle(style.fontSize);
+      let fontSpec = getFontSizeStyle(style.fontSize);
 
       var fontSize: string;
       if(fontSpec.absolute) {
@@ -135,10 +162,10 @@ namespace com.keyman.osk {
 
     getIdealFontSize(osk: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
       // Recompute the new width for use in autoscaling calculations below, just in case.
-      let util = com.keyman.singleton.util;
-      let metrics = OSKKey.getTextMetrics(osk, this.spec.text, style);
+      let emScale = osk.getKeyEmFontSize();
+      let metrics = OSKKey.getTextMetrics(this.spec.text, emScale, style);
 
-      let fontSpec = util.getFontSizeStyle(style.fontSize);
+      let fontSpec = getFontSizeStyle(style.fontSize);
       let keyWidth = this.getKeyWidth(osk);
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
@@ -175,8 +202,8 @@ namespace com.keyman.osk {
       }
     }
 
-    getKeyWidth(osk: VisualKeyboard): number {
-      let units = this.objectUnits(osk.isStatic);
+    getKeyWidth(vkbd: VisualKeyboard): number {
+      let units = this.objectUnits(vkbd);
 
       if(units == 'px') {
         // For mobile devices, we presently specify width directly in pixels.  Just use that!
@@ -186,13 +213,13 @@ namespace com.keyman.osk {
         // approximation for that.  `this.kbdDiv` is the element controlling the OSK's width, set in px.
 
         // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
-        return Math.floor(osk.width * this.spec['widthpc'] / 100);
+        return Math.floor(vkbd.width * this.spec['widthpc'] / 100);
       }
     }
 
-    objectUnits(isStatic: boolean): string {
+    objectUnits(vkbd: VisualKeyboard): string {
       // Returns a unit string corresponding to how the width for each key is specified.
-      if(this.formFactor == 'desktop' || isStatic) {
+      if(vkbd.device.formFactor == 'desktop' || vkbd.isStatic) {
         return '%';
       } else {
         return 'px';
@@ -206,13 +233,12 @@ namespace com.keyman.osk {
      *  @return {string}
      **/
     protected renameSpecialKey(oldText: string, osk: VisualKeyboard): string {
-      let keyman = (<KeymanBase>window['keyman'])
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
       switch(oldText) {
         case '*ZWNJ*':
           // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
           // possible / available though, and there's a different standard symbol on Android.
-          oldText = keyman.util.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+          oldText = osk.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
             '*ZWNJAndroid*' :
             '*ZWNJiOS*';
           break;
@@ -235,12 +261,11 @@ namespace com.keyman.osk {
 
     // Produces a HTMLSpanElement with the key's actual text.
     protected generateKeyText(osk: VisualKeyboard): HTMLSpanElement {
-      let util = (<KeymanBase>window['keyman']).util;
       let spec = this.spec;
 
       // Add OSK key labels
       var keyText;
-      var t=util._CreateElement('span'), ts=t.style;
+      var t = document.createElement('span'), ts=t.style;
       if(spec['text'] == null || spec['text'] == '') {
         keyText='\xa0';  // default:  nbsp.
         if(typeof spec['id'] == 'string') {
@@ -290,7 +315,8 @@ namespace com.keyman.osk {
       }
 
       // Check the key's display width - does the key visualize well?
-      var width: number = OSKKey.getTextMetrics(osk, keyText, styleSpec).width;
+      let emScale = osk.getKeyEmFontSize();
+      var width: number = OSKKey.getTextMetrics(keyText, emScale, styleSpec).width;
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
 
@@ -317,11 +343,11 @@ namespace com.keyman.osk {
   }
 
   export class OSKBaseKey extends OSKKey {
-    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
-      super(spec, layer, formFactor);
+    constructor(spec: OSKKeySpec, layer: string) {
+      super(spec, layer);
     }
 
-    getId(osk: VisualKeyboard): string {
+    getId(): string {
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       return this.spec.elementID;
     }
@@ -353,7 +379,7 @@ namespace com.keyman.osk {
       }
 
       if(x > 0) {
-        let q = (<KeymanBase>window['keyman']).util._CreateElement('div');
+        let q = document.createElement('div');
         q.className='kmw-key-label';
         q.innerHTML=String.fromCharCode(x);
         return q;
@@ -380,35 +406,34 @@ namespace com.keyman.osk {
       }
 
       // If a subkey array is defined, add an icon
-      var skIcon=(<KeymanBase>window['keyman']).util._CreateElement('div');
+      var skIcon = document.createElement('div');
       skIcon.className='kmw-key-popup-icon';
       //kDiv.appendChild(skIcon);
       btn.appendChild(skIcon);
     }
 
     construct(osk: VisualKeyboard, layout: keyboards.LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
-      let util = com.keyman.singleton.util;
       let spec = this.spec;
-      let isDesktop = this.formFactor == "desktop"
+      let isDesktop = osk.device.formFactor == "desktop"
 
-      let kDiv=util._CreateElement('div');
+      let kDiv = document.createElement('div');
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
-      ks.width=this.objectGeometry(spec['widthpc'], osk.isStatic);
+      ks.width=this.objectGeometry(osk, spec['widthpc']);
 
       let originalPercent = totalPercent;
 
-      let btnEle=util._CreateElement('div');
-      let btn = link(btnEle, new KeyData(this, spec['id']));
+      let btnEle = document.createElement('div');
+      let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
       // Set button class
-      osk.setButtonClass(spec,btn,layout);
+      this.setButtonClass(osk);
 
       // Set key and button positioning properties.
       if(!isDesktop) {
         // Regularize interkey spacing by rounding key width and padding (Build 390)
-        ks.left=this.objectGeometry(totalPercent+spec['padpc'], osk.isStatic);
+        ks.left=this.objectGeometry(osk, totalPercent+spec['padpc']);
         if(!osk.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
@@ -420,7 +445,7 @@ namespace com.keyman.osk {
           btn.style.width=ks.width;
         }
       } else {
-        ks.marginLeft=this.objectGeometry(spec['padpc'], osk.isStatic);
+        ks.marginLeft=this.objectGeometry(osk, spec['padpc']);
       }
 
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
@@ -435,7 +460,7 @@ namespace com.keyman.osk {
       }
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
-      btn.id=this.getId(osk);
+      btn.id=this.getId();
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
       // TODO: replace inline function calls??
@@ -469,8 +494,8 @@ namespace com.keyman.osk {
       return {element: kDiv, percent: totalPercent - originalPercent};
     }
 
-    objectGeometry(v: number, isStatic: boolean): string {
-      let unit = this.objectUnits(isStatic);
+    objectGeometry(vkbd: VisualKeyboard, v: number): string {
+      let unit = this.objectUnits(vkbd);
       if(unit == '%') {
         return v + unit;
       } else { // unit == 'px'
@@ -480,20 +505,17 @@ namespace com.keyman.osk {
   }
 
   export class OSKSubKey extends OSKKey {
-    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
-      super(spec, layer, formFactor);
+    constructor(spec: OSKKeySpec, layer: string) {
+      if(typeof(layer) != 'string' || layer == '') {
+        throw "The 'layer' parameter for subkey construction must be properly defined.";
+      }
+
+      super(spec, layer);
     }
 
-    getId(osk: VisualKeyboard): string {
-      let spec = this.spec;
-      let core = com.keyman.singleton.core;
+    getId(): string {
       // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
-      if(typeof(this.layer) == 'string' && this.layer != '') {
-        return 'popup-'+this.layer+'-'+spec['id'];
-      } else {
-        // We only create subkeys when they're needed - the currently-active layer should be fine.
-        return 'popup-' + core.keyboardProcessor.layerId + '-'+spec['id'];
-      }
+      return 'popup-'+this.layer+'-'+this.spec['id'];
     }
 
     construct(osk: VisualKeyboard, baseKey: KeyElement, topMargin: boolean): HTMLDivElement {
@@ -522,10 +544,10 @@ namespace com.keyman.osk {
       ks.height=baseKey.offsetHeight+'px';
 
       let btnEle=document.createElement('div');
-      let btn = link(btnEle, new KeyData(this, spec['id']));
+      let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
-      osk.setButtonClass(spec,btn);
-      btn.id = this.getId(osk);
+      this.setButtonClass(osk);
+      btn.id = this.getId();
 
       // Must set button size (in px) dynamically, not from CSS
       let bs=btn.style;
@@ -1000,7 +1022,7 @@ namespace com.keyman.osk {
           for(j=0; j<keys.length; j++) {
             key=keys[j];
 
-            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id'], formFactor);
+            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id']);
             var keyTuple = keyGenerator.construct(this, layout, rs, totalPercent);
 
             rDiv.appendChild(keyTuple.element);
@@ -1643,7 +1665,7 @@ namespace com.keyman.osk {
 
         keys[i]['sp'] = core.keyboardProcessor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
         let keyId = layerId+'-'+states[i]
-        var btn = document.getElementById(keyId);
+        var btn = document.getElementById(keyId) as KeyElement;
 
         if(btn == null) {
           //This can happen when using BuildDocumentationKeyboard, as the OSK isn't yet in the
@@ -1652,43 +1674,10 @@ namespace com.keyman.osk {
         }
 
         if(btn != null) {
-          this.setButtonClass(keys[i], btn, this.layout);
+          btn.key.setButtonClass(this);
         } else {
           console.warn("Could not find key to apply style: \"" + keyId + "\"");
         }
-      }
-    }
-
-    /**
-     * Attach appropriate class to each key button, according to the layout
-     *
-     * @param       {Object}    key     key object
-     * @param       {Object}    btn     button object
-     * @param       {Object=}   layout  source layout description (optional, sometimes)
-     */
-    setButtonClass(key, btn, layout?) {
-      let keyman = com.keyman.singleton;
-      var n=0, keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
-      if(typeof key['dk'] == 'string' && key['dk'] == '1') {
-        n=8;
-      }
-
-      if(typeof key['sp'] == 'string') {
-        n=parseInt(key['sp'],10);
-      }
-
-      if(n < 0 || n > 10) {
-        n=0;
-      }
-
-      layout = layout || this.layout;
-
-      // Apply an overriding class for 5-row layouts
-      var nRows=layout['layer'][0]['row'].length;
-      if(nRows > 4 && this.device.formFactor == 'phone') {
-        btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
-      } else {
-        btn.className='kmw-key kmw-key-'+keyTypes[n];
       }
     }
 
@@ -1775,7 +1764,12 @@ namespace com.keyman.osk {
           needsTopMargin = true;
         }
 
-        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer, device.formFactor);
+        let layer = e['key'].layer;
+        if(typeof(layer) != 'string' || layer == '') {
+          // Use the currently-active layer.
+          layer = keyman.core.keyboardProcessor.layerId;
+        }
+        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], layer);
         let kDiv = keyGenerator.construct(this, <KeyElement> e, needsTopMargin);
 
         subKeys.appendChild(kDiv);
@@ -2013,9 +2007,12 @@ namespace com.keyman.osk {
     }.bind(this);
     //#endregion
 
+    /**
+     * Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
+     * This function allows us to calculate the font size in those situations.
+     */
     getKeyEmFontSize() {
       let keyman = com.keyman.singleton;
-      let util = keyman.util;
 
       if(this.device.formFactor == 'desktop') {
         let kbdFontSize = this.defaultFontSize();
@@ -2023,13 +2020,13 @@ namespace com.keyman.osk {
         return kbdFontSize * keySquareScale;
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
-        let emSize = util.getFontSizeStyle(emSizeStr).val;
+        let emSize = getFontSizeStyle(emSizeStr).val;
 
         var emScale = 1;
         if(!this.isStatic) {
           // Reading this requires the OSK to be active, so we filter out
           // BuildVisualKeyboard calls here.
-          let boxFontStyle = util.getFontSizeStyle(keyman.osk._Box);
+          let boxFontStyle = getFontSizeStyle(keyman.osk._Box);
 
           // Double-check against the font scaling applied to the _Box element.
           if(boxFontStyle.absolute) {
