@@ -8,7 +8,7 @@ Here are some of the new features we have added to Keyman 14.0 for Windows:
     Now that Keyman runs on so many platforms, it didn't make sense for
     us to use a special, different name for Keyman on Windows.
 -   Keyman keyboards are no longer hidden from the Windows language
-    picker when you exit Keyman. (This helps maintain input method language 
+    picker when you exit Keyman. (This helps maintain input method language
     tag stability.)
 -   Simpler and Smoother Keyboard Search (\#3326)
 -   Localizable user interface through
@@ -29,6 +29,9 @@ Here are some of the new features we have added to Keyman 14.0 for Windows:
     \#3627)
 -   Improved error reporting with Sentry.io, so we can learn about
     and fix bugs more quickly
+
+[![](../desktop_images/video.png) Watch a video](https://youtu.be/bu7pBcrS0u8)
+that highlights some of these new features.
 
 ## Breaking Changes
 -   Keyman Engine no longer supports the keyboard usage page

@@ -24,3 +24,6 @@ Here are some of the new features we have added to Keyman for Android 14.0:
     * Khmer
     * Obolo
     * Pulaar-fulfulde
+
+[![](../android_images/video.png) Watch a video](https://youtu.be/ehk0Bts28JE)
+that highlights some of these new features.
