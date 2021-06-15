@@ -832,7 +832,8 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                         g_message("Saving keyboard option to DConf");
                         // Load the current keyboard options from DConf
                         keyman_put_options_todconf(keyman->kb_name, keyman->kb_name,
-                                action_items[i].option->key, action_items[i].option->value);
+                                (gchar *)action_items[i].option->key,
+                                (gchar *)action_items[i].option->value);
                     }
                 }
                 break;
