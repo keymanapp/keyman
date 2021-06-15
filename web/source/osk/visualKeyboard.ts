@@ -843,22 +843,11 @@ namespace com.keyman.osk {
       }
       let layout = keyboard.layout(formFactor);
       let oskManager = com.keyman.singleton.osk;
-      let rowsPercent = 100;
 
-      var lDiv=document.createElement('div'), ls=lDiv.style, totalHeight=0;
+      var lDiv=document.createElement('div'), ls=lDiv.style;
 
       // Set OSK box default style
       lDiv.className='kmw-key-layer-group';
-
-      // Adjust OSK height for mobile and tablet devices TODO move outside this function???
-      switch(formFactor) {
-        case 'phone':
-        case 'tablet':
-          totalHeight=oskManager.getHeight();
-          ls.height=totalHeight+'px';
-          rowsPercent = Math.round(100*oskManager.getKeyboardHeight()/totalHeight );
-          break;
-      }
 
       // Return empty DIV if no layout defined
       if(layout == null) {
@@ -906,12 +895,7 @@ namespace com.keyman.osk {
       // Set the OSK row height, **assuming all layers have the same number of rows**
 
       // Calculate default row height
-      rowHeight = rowsPercent/layers[0].row.length;
-
-      // For desktop OSK, use a percentage of the OSK height
-      if(formFactor == 'desktop') {
-        rowHeight = rowsPercent/layers[0].row.length;
-      }
+      rowHeight = 100/layers[0].row.length;
 
       // Get the actual available document width and scale factor according to device type
       var objectWidth : number;
@@ -1048,12 +1032,12 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
 
       // We need to compute the 'local', keyboard-based coordinates for the touch.
-      let kbdCoords = keyman.util.getAbsolute(this.kbdDiv.firstChild as HTMLElement);
+      let kbdCoords = keyman.util.getAbsolute(this.kbdDiv as HTMLElement);
       let offsetCoords = {x: touch.pageX - kbdCoords.x, y: touch.pageY - kbdCoords.y};
 
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
       offsetCoords.x /= layerGroup.offsetWidth;
-      offsetCoords.y /= layerGroup.offsetHeight;
+      offsetCoords.y /= this.kbdDiv.offsetHeight;
 
       return offsetCoords;
     }
@@ -1069,12 +1053,14 @@ namespace com.keyman.osk {
       //        update their geometries to the actual display values, and use the results here.
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
-      let width = layerGroup.offsetWidth, height = layerGroup.offsetHeight;
+      let width = layerGroup.offsetWidth, height = this.kbdDiv.offsetHeight;
       // Prevent NaN breakages.
       if(!width || !height) {
         return null;
       }
-      let baseKeyProbabilities = this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
+
+      let kbdAspectRatio = layerGroup.offsetWidth / this.kbdDiv.offsetHeight;
+      let baseKeyProbabilities = this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
 
       if(!this.popupBaseKey || !this.popupBaseKey.key) {
         return baseKeyProbabilities;
@@ -1412,7 +1398,7 @@ namespace com.keyman.osk {
       } else {
         // _Box has (most of) the useful client values.
         let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
-        let height = (this.kbdDiv.firstChild as HTMLElement).offsetHeight; // firstChild == layer-group, has height info.
+        let height = this.kbdDiv.offsetHeight;
         // We need to adjust the offset properties by any offsets related to the active banner.
 
         var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop + _Box.offsetTop - 0.25*height) : 5;
@@ -2115,9 +2101,10 @@ namespace com.keyman.osk {
       bs.height=bs.maxHeight=paddedHeight+'px';
 
       b = this.kbdDiv.firstChild as HTMLElement;
+      let gs = this.kbdDiv.style;
       bs=b.style;
       // Sets the layer group to the correct height.
-      bs.height=bs.maxHeight=paddedHeight+'px';
+      gs.height=gs.maxHeight=paddedHeight+'px';
       bs.fontSize=fs+'em';
 
       this.adjustLayerHeights(paddedHeight, host.getKeyboardHeight());

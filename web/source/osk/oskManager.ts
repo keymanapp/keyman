@@ -1284,9 +1284,10 @@ namespace com.keyman.osk {
 
         // Extra style changes and overrides for touch-mode.
         if(device.touchable) {
-          Ls.position='fixed';
-          Ls.left=Ls.bottom='0px';
-          let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
+          let ks = this.vkbd.kbdDiv.style;
+          ks.position = Ls.position='fixed';
+          ks.bottom = Ls.left=Ls.bottom='0px';
+          let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv).style.height;
           vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
           Ls.height=Ls.maxHeight= (this.getBannerHeight() + parseInt(vkbdHeight, 10) + 5 /* kmw-banner-bar top in css */) + 'px';
           Ls.border='none';
