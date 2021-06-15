@@ -3,6 +3,8 @@ output/
 build/
 embedded/
 
+!source/**/embedded
+
 # Current build folders.
 intermediate/
 release/

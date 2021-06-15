@@ -1,6 +1,7 @@
 // Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
+/// <reference path="osk/embedded/keytip.ts" />
 
 // KeymanWeb 11.0
 // Copyright 2019 SIL International
@@ -67,46 +68,19 @@ namespace com.keyman.osk {
 
     // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
     VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
-      let util = com.keyman.singleton.util;
-      var tip = this.keytip,
-          showPreview = window['oskCreateKeyPreview'],
-          clearPreview = window['oskClearKeyPreview'];
+      var tip = this.keytip as com.keyman.osk.embedded.KeyTip;
 
       if(tip == null || (key == tip.key && on == tip.state)) {
         return;
       }
 
-      if(on && (typeof showPreview == 'function')) {
-        let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
-        var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-            yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
-            kc;
-
-        // Find key text element
-        for(var i=0; i<key.childNodes.length; i++) {
-          kc = key.childNodes[i];
-          if(util.hasClass(kc,'kmw-key-text')) {
-            break;
-          }
-        }
-          
-        if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
-          showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
-        }
-      } else if(!on && (typeof clearPreview == 'function')) {
-        if(this.touchCount == 0 || key == null) {
-          clearPreview();
-        }
-      }
-
-      tip.key = key;
-      tip.state = on;
+      tip.show(key, on, this);
     };
 
     // Create a keytip (dummy call - actual keytip handled by native code)
     VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
       if(com.keyman.singleton.util.device.formFactor == 'phone') {
-        this.keytip = {key:null, state:false};
+        this.keytip = new osk.embedded.KeyTip(window['oskCreateKeyPreview'], window['oskClearKeyPreview']);
       }
     };
 

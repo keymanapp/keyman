@@ -1,6 +1,6 @@
 /// <reference path="preProcessor.ts" />
 /// <reference path="utils.ts" />
-/// <reference path="keytip.ts" />
+/// <reference path="browser/keytip.ts" />
 
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
@@ -2503,7 +2503,7 @@ namespace com.keyman.osk {
   showKeyTip(key: KeyElement, on: boolean) {
     // This version of the method is only called by 'native' (not-embedded)
     // instances of KMW.
-    var tip=this.keytip as KeyTip;
+    var tip=this.keytip as browser.KeyTip;
 
     // Do not change the key preview unless key or state has changed
     if(tip == null || (key == tip.key && on == tip.state)) {
@@ -2527,7 +2527,7 @@ namespace com.keyman.osk {
 
       if(this.device.formFactor == 'phone') {
         if(this.keytip == null) {
-          this.keytip = new KeyTip();
+          this.keytip = new browser.KeyTip();
         }
 
         // Always append to _Box (since cleared during OSK Load)

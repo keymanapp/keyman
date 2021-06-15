@@ -1,4 +1,4 @@
-namespace com.keyman.osk {
+namespace com.keyman.osk.browser {
   export class KeyTip {
     public readonly element: HTMLDivElement;
     public key: KeyElement;
