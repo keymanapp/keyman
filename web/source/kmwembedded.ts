@@ -66,17 +66,6 @@ namespace com.keyman.osk {
       }
     };
 
-    // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
-    VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
-      var tip = this.keytip as com.keyman.osk.embedded.KeyTip;
-
-      if(tip == null || (key == tip.key && on == tip.state)) {
-        return;
-      }
-
-      tip.show(key, on, this);
-    };
-
     // Create a keytip (dummy call - actual keytip handled by native code)
     VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
       if(com.keyman.singleton.util.device.formFactor == 'phone') {

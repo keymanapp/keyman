@@ -1,5 +1,6 @@
 /// <reference path="preProcessor.ts" />
 /// <reference path="utils.ts" />
+/// <reference path="abstractions.ts" />
 /// <reference path="browser/keytip.ts" />
 
 namespace com.keyman.osk {
@@ -671,7 +672,7 @@ namespace com.keyman.osk {
     subkeyDelayTimer: number;
     popupDelay: number = 500;
     menuEvent: KeyElement; // Used by embedded-mode.
-    keytip: {key: KeyElement, state: boolean, element?: HTMLDivElement};
+    keytip: KeyTip;
     popupCallout: HTMLDivElement;
 
     get layerId(): string {
@@ -2494,30 +2495,28 @@ namespace com.keyman.osk {
     }
   };
 
-  /**
-   * Add (or remove) the keytip preview (if KeymanWeb on a phone device)
-   *
-   * @param   {Object}  key   HTML key element
-   * @param   {boolean} on    show or hide
-   */
-  showKeyTip(key: KeyElement, on: boolean) {
-    // This version of the method is only called by 'native' (not-embedded)
-    // instances of KMW.
-    var tip=this.keytip as browser.KeyTip;
+    /**
+     * Add (or remove) the keytip preview (if KeymanWeb on a phone device)
+     *
+     * @param   {Object}  key   HTML key element
+     * @param   {boolean} on    show or hide
+     */
+    showKeyTip(key: KeyElement, on: boolean) {
+      var tip=this.keytip;
 
-    // Do not change the key preview unless key or state has changed
-    if(tip == null || (key == tip.key && on == tip.state)) {
-      return;
-    }
+      // Do not change the key preview unless key or state has changed
+      if(tip == null || (key == tip.key && on == tip.state)) {
+        return;
+      }
 
-    var sk=document.getElementById('kmw-popup-keys'),
-        popup = (sk && sk.style.visibility == 'visible')
+      var sk=document.getElementById('kmw-popup-keys'),
+          popup = (sk && sk.style.visibility == 'visible')
 
-    // If popup keys are active, do not show the key tip.
-    on = popup ? false : on;
+      // If popup keys are active, do not show the key tip.
+      on = popup ? false : on;
 
-    tip.show(key, on, this);
-  };
+      tip.show(key, on, this);
+    };
 
     /**
      *  Create a key preview element for phone devices
@@ -2531,7 +2530,9 @@ namespace com.keyman.osk {
         }
 
         // Always append to _Box (since cleared during OSK Load)
-        keyman.osk._Box.appendChild(this.keytip.element);
+        if(this.keytip && this.keytip.element) {
+          keyman.osk._Box.appendChild(this.keytip.element);
+        }
       }
     };
 

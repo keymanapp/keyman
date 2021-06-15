@@ -1,5 +1,5 @@
 namespace com.keyman.osk.embedded {
-  export class KeyTip {
+  export class KeyTip implements com.keyman.osk.KeyTip {
     public key: KeyElement;
     public state: boolean = false;
 
@@ -21,7 +21,6 @@ namespace com.keyman.osk.embedded {
       let util = com.keyman.singleton.util;
 
       if(on && this.showPreview) {
-        let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
         var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(vkbd.kbdDiv) + key.offsetWidth/2,
             yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
             kc;
