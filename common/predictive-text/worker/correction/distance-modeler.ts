@@ -150,7 +150,12 @@ namespace correction {
             char = char + transform.insert[i];
           }
 
-          edgeCalc = edgeCalc.addInputChar({key: this.toKey(char)});
+          // In case of NFD input, filter out any empty-strings that may arise
+          // when 'keying' raw diacritics.
+          let keyedChar = this.toKey(char);
+          if(keyedChar) {
+            edgeCalc = edgeCalc.addInputChar({key: keyedChar});
+          }
         }
 
         let childEdge = new SearchNode(this);
