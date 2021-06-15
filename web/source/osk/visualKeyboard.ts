@@ -1144,6 +1144,8 @@ namespace com.keyman.osk {
 
       // Save the touch point
       this.touchX = e.changedTouches[0].pageX;
+      // Used for quick-display of popup keys (defined in highlightSubKeys)
+      this.touchY = e.changedTouches[0].pageY;
 
       // Set the key for the new touch point to be current target, if defined
       this.currentTarget = key;
@@ -2282,7 +2284,7 @@ namespace com.keyman.osk {
       }
     }
 
-    /**
+  /**
    * Touch hold key display management
    *
    * @param   {Object}  key   base key object
@@ -2324,13 +2326,15 @@ namespace com.keyman.osk {
   // Manage popup key highlighting
   highlightSubKeys(k: KeyElement, x: number, y: number) {
     // Test for subkey array, return if none
-    // (JH 2/4/19) So, if a subkey is passed in, we return immediately?
+
+    // Issue:  if `k` is itself a subkey, this won't do subkey highlighting correctly.
+    // That "common case" is actually handled through _standard_ key highlighting.
     if(k == null || k['subKeys'] == null) {
       return;
     }
 
     // Highlight key at touch position (and clear other highlighting)
-    var i,sk,x0,y0,x1,y1,onKey,skBox=document.getElementById('kmw-popup-keys');
+    var skBox=document.getElementById('kmw-popup-keys');
 
     //#region This section fills a different role than the method name would suggest.
     // Might correspond better to a 'checkInstantSubkeys' or something.
@@ -2341,27 +2345,8 @@ namespace com.keyman.osk {
         window.clearTimeout(this.subkeyDelayTimer);
       }
       this.showSubKeys(k);
-      skBox=document.getElementById('kmw-popup-keys');
     }
     //#endregion
-
-    /* (JH 2/4/19) Because of that earlier note, in KMW 12 alpha (and probably 11),
-     * the following code is effectively impotent and could be deleted with no effect.
-     * Note that this probably results from VisualKeyboard.keyTarget finding the
-     * subkey first... which is necessary anyway to support subkey output.
-     */
-    for(i=0; i < k['subKeys'].length; i++) {
-      try {
-        sk=<HTMLElement> skBox.childNodes[i].firstChild;
-        x0=dom.Utils.getAbsoluteX(sk); y0=dom.Utils.getAbsoluteY(sk);//-document.body.scrollTop;
-        x1=x0+sk.offsetWidth; y1=y0+sk.offsetHeight;
-        onKey=(x > x0 && x < x1 && y > y0 && y < y1);
-        this.highlightKey(sk, onKey);
-        if(onKey) {
-          this.highlightKey(k, false);
-        }
-      } catch(ex){}
-    }
   };
 
     /**
@@ -2378,8 +2363,8 @@ namespace com.keyman.osk {
         return;
       }
 
-      var sk=document.getElementById('kmw-popup-keys'),
-          popup = (sk && sk.style.visibility == 'visible')
+      var sk=this.subkeyPopup,
+          popup = (sk && sk.element.style.visibility == 'visible')
 
       // If popup keys are active, do not show the key tip.
       on = popup ? false : on;
