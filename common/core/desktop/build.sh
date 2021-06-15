@@ -193,6 +193,26 @@ clean() {
   rm -rf "$TARGET_PATH/"
 }
 
+path_remove() {
+  # Delete path by parts so we can never accidentally remove sub paths
+  PATH=${PATH//":$1:"/":"} # delete any instances in the middle
+  PATH=${PATH/#"$1:"/} # delete any instance at the beginning
+  PATH=${PATH/%":$1"/} # delete any instance in the at the end
+}
+
+run_cargo() {
+  if [ $os_id == "win" ]; then
+    # Remove /usr/bin/link from path because it confuses cargo
+    local PATH_BACKUP="$PATH"
+    path_remove /usr/bin
+    path_remove /bin
+  fi
+  cargo "$@"
+  if [ $os_id == "win" ]; then
+    PATH="$PATH_BACKUP"
+  fi
+}
+
 build_test_rust() {
   local TARGETBASE="$1"
   if [ -z ${2+x} ]; then local TARGET=""; else local TARGET="$2"; fi
@@ -203,24 +223,37 @@ build_test_rust() {
     local TARGET_FLAG=
   fi
 
+  # Cargo struggles with paths if Windows SDK environment does not
+  # match; this overrides the library paths for this build
+  if [ $os_id == "win" ]; then
+    if [ ! -z ${LIB+x} ]; then
+      LIB=${LIB//\\x86/\\$TARGETBASE}
+      LIB=${LIB//\\x64/\\$TARGETBASE}
+    fi
+    if [ ! -z ${LIBPATH+x} ]; then
+      LIBPATH=${LIBPATH//\\x86/\\$TARGETBASE}
+      LIBPATH=${LIBPATH//\\x64/\\$TARGETBASE}
+    fi
+  fi
+
   pushd "$THIS_DIR/src/rust/$PLATFORM" >/dev/null
   if $BUILD_RUST; then
     echo_heading "======= Building rust library for $TARGETBASE, $TARGET ======="
 
     # Built library path for multi-arch (Windows) vs single (*nix)
 
-    cargo build --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
+    run_cargo build --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
 
     # On Windows, final output path is ./build/rust/<arch>/<arch_rust>/debug|release/<libraryname>
     # WASM is similar: ./build/rust/wasm/wasm_unknown_unknown/debug|release/<libraryname>
     # On Linux, macOS, the final file is already in the right place (TARGET=="")
     if [ ! -z $TARGET ]; then
-      local LIB="keyman_keyboard_processor_$PLATFORM"
+      local LIB_MAP="keyman_keyboard_processor_$PLATFORM"
 
       # Library name on Windows vs *nix / WASM pref
       [[ $os_id == "win" && $TARGETBASE != "wasm" ]] && \
-        local LIBNAME=$LIB.lib || \
-        local LIBNAME=lib$LIB.a
+        local LIBNAME=$LIB_MAP.lib || \
+        local LIBNAME=lib$LIB_MAP.a
 
       local BUILT_PATH="$TARGET_PATH/rust/$TARGETBASE/$TARGET/$MESON_TARGET"
       local RUST_TARGET_PATH="$TARGET_PATH/rust/$TARGETBASE/$MESON_TARGET"
@@ -230,7 +263,7 @@ build_test_rust() {
 
   if $TESTS_RUST; then
     echo_heading "======= Testing rust library for $TARGETBASE $TARGET ======="
-    cargo test --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET $CARGO_TARGET
+    run_cargo test --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
   fi
   popd >/dev/null
 }
@@ -306,7 +339,7 @@ build_standard() {
   if $INSTALL_CPP; then
     echo_heading "======= Installing C++ libraries for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
-    meson install
+    ninja install
     popd > /dev/null
   fi
 }

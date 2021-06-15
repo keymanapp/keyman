@@ -42,8 +42,15 @@ MESON_TARGET=release
 
 pull-core:
     cd $(ROOT)\..\common\core\desktop
-    build_cargo.bat $(CORE_DEBUG)
-    build.bat all $(MESON_TARGET) --static build tests
+
+!ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) build.sh -p native
+!else
+    start /wait ./build.sh -p native
+!endif
+
+    #build_cargo.bat $(CORE_DEBUG)
+    #build.bat all $(MESON_TARGET) --static build tests
     cd $(ROOT)\src\engine\keyman32
 
 !include ..\..\Target.mak
