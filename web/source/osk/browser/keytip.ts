@@ -7,7 +7,11 @@ namespace com.keyman.osk.browser {
     private canvas: HTMLCanvasElement;
     private label: HTMLSpanElement;
 
-    constructor() {
+    private constrain: boolean;
+
+    // constrain:  keep the keytip within the bounds of the overall OSK.
+    // Will probably be handled via function in a later pass.
+    constructor(constrain: boolean) {
       let tipElement = this.element=document.createElement('div');
       tipElement.className='kmw-keytip';
       tipElement.id = 'kmw-keytip';
@@ -18,10 +22,12 @@ namespace com.keyman.osk.browser {
       // Add CANVAS element for outline and SPAN for key label
       tipElement.appendChild(this.canvas = document.createElement('canvas'));
       tipElement.appendChild(this.label = document.createElement('span'));
+
+      this.constrain = constrain;
     }
 
     show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
-      let keyman = com.keyman.singleton;
+      //let keyman = com.keyman.singleton;
       let util = keyman.util;
 
       // Create and display the preview
@@ -87,16 +93,13 @@ namespace com.keyman.osk.browser {
           xLeft -= xOverflow;
         }
 
-        // For now, should only be true (in production) when keyman.isEmbedded == true.
-        let constrainPopup = keyman.isEmbedded;
-
         let cs = getComputedStyle(this.element);
         let oskHeight = keyman.osk.getHeight();
         let bottomY = parseInt(cs.bottom, 10);
         let tipHeight = parseInt(cs.height, 10);
 
         let delta = 0;
-        if(tipHeight + bottomY > oskHeight && constrainPopup) {
+        if(this.constrain && tipHeight + bottomY > oskHeight) {
           delta = tipHeight + bottomY - oskHeight;
           this.canvas.height = this.canvas.height - delta;
           kts.height = this.canvas.height + 'px';

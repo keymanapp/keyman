@@ -2526,7 +2526,9 @@ namespace com.keyman.osk {
 
       if(this.device.formFactor == 'phone') {
         if(this.keytip == null) {
-          this.keytip = new browser.KeyTip();
+          // For now, should only be true (in production) when keyman.isEmbedded == true.
+          let constrainPopup = keyman.isEmbedded;
+          this.keytip = new browser.KeyTip(constrainPopup);
         }
 
         // Always append to _Box (since cleared during OSK Load)
