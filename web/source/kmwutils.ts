@@ -302,15 +302,6 @@ namespace com.keyman {
       return false;
     }
 
-    /**
-     * Default mouse down event handler (to replace multiple inline handlers) (Build 360)
-     */
-    mouseDownPreventDefaultHandler(e: MouseEvent) {
-      if(e) {
-        e.preventDefault();
-      }
-    }
-
     // Found a bit of magic formatting that allows dynamic return typing for a specified element tag!
     _CreateElement<E extends "p"|"style"|"script"|"div"|"canvas"|"span">(nodeName:E) {
       var e = document.createElement<E>(nodeName);

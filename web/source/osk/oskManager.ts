@@ -309,6 +309,15 @@ namespace com.keyman.osk {
       }
     }
 
+    private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKManager,
+      source: text.MutableSystemStore,
+      newValue: string) {
+      if(source.value != newValue) {
+        this.vkbd.layerId = newValue;
+        this._Show();
+      }
+    }.bind(this);
+
     /**
      * Function     _GenerateVisualKeyboard
      * Scope        Private
@@ -322,8 +331,13 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         this.vkbd.shutdown();
       }
-      this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard);
+
       let util = com.keyman.singleton.util;
+      this.vkbd = new VisualKeyboard(keyboard, util.device);
+
+      // Ensure the OSK's current layer is kept up to date.
+      let core = com.keyman.singleton.core; // Note:  will eventually be a class field.
+      core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
 
       // Set box class - OS and keyboard added for Build 360
       this._Box.className=util.device.formFactor+' '+ util.device.OS.toLowerCase() + ' kmw-osk-frame';
@@ -346,7 +360,7 @@ namespace com.keyman.osk {
         this._Box.appendChild(this.resizeBar());
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {
-        this.vkbd.adjustHeights();
+        this.vkbd.adjustHeights(this);
       }
     }
 
@@ -1266,7 +1280,7 @@ namespace com.keyman.osk {
       // The following code will always be executed except for externally created OSK such as EuroLatin
       if(this.vkbd && this.vkbd.ddOSK) {
         // Enable the currently active keyboard layer and update the default nextLayer member
-        this.vkbd.show();
+        this.vkbd.show(this);
 
         // Extra style changes and overrides for touch-mode.
         if(device.touchable) {
