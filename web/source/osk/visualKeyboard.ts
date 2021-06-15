@@ -1,5 +1,6 @@
 /// <reference path="preProcessor.ts" />
 /// <reference path="utils.ts" />
+/// <reference path="keytip.ts" />
 
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
@@ -76,6 +77,7 @@ namespace com.keyman.osk {
   export abstract class OSKKey {
     spec: OSKKeySpec;
     btn: KeyElement;
+    label: HTMLSpanElement;
 
     /**
      * The layer of the OSK on which the key is displayed.
@@ -475,7 +477,7 @@ namespace com.keyman.osk {
       // Make sure the key text is the element's first child - processSubkeys()
       // will add an extra element if subkeys exist, which can interfere with
       // keyboard/language name display on the space bar!
-      btn.appendChild(this.generateKeyText(osk));
+      btn.appendChild(this.label = this.generateKeyText(osk));
 
       // Handle subkey-related tasks.
       if(typeof(spec['sk']) != 'undefined' && spec['sk'] != null) {
@@ -558,7 +560,7 @@ namespace com.keyman.osk {
       // Must set position explicitly, at least for Android
       bs.position='absolute';
 
-      btn.appendChild(this.generateKeyText(osk));
+      btn.appendChild(this.label = this.generateKeyText(osk));
       kDiv.appendChild(btn);
 
       return kDiv;
@@ -2499,10 +2501,9 @@ namespace com.keyman.osk {
    * @param   {boolean} on    show or hide
    */
   showKeyTip(key: KeyElement, on: boolean) {
-    let keyman = com.keyman.singleton;
-    let util = keyman.util;
-
-    var tip=this.keytip;
+    // This version of the method is only called by 'native' (not-embedded)
+    // instances of KMW.
+    var tip=this.keytip as KeyTip;
 
     // Do not change the key preview unless key or state has changed
     if(tip == null || (key == tip.key && on == tip.state)) {
@@ -2512,170 +2513,10 @@ namespace com.keyman.osk {
     var sk=document.getElementById('kmw-popup-keys'),
         popup = (sk && sk.style.visibility == 'visible')
 
-    // Create and display the preview
-    if(on && !popup) {
-      var xLeft = dom.Utils.getAbsoluteX(key),
-          xWidth = key.offsetWidth,
-          xHeight = key.offsetHeight,
-          kc = <HTMLElement> key.firstChild,
-          kts = tip.element.style,
-          ktLabel = <HTMLElement> tip.element.childNodes[1],
-          ktls = ktLabel.style,
-          edge = 0,
-          canvas = <HTMLCanvasElement> tip.element.firstChild,
-          previewFontScale = 1.8;
+    // If popup keys are active, do not show the key tip.
+    on = popup ? false : on;
 
-      // Find key text element
-      for(var i=0; i<key.childNodes.length; i++) {
-        kc = <HTMLElement> key.childNodes[i];
-        if(kc.classList.contains('kmw-key-text')) {
-          break;
-        }
-      }
-
-      // Canvas dimensions must be set explicitly to prevent clipping
-      canvas.width = 1.6 * xWidth;
-      canvas.height = 2.3 * xHeight;
-
-      kts.top = 'auto';
-      // Matches how the subkey positioning is set.
-      kts.bottom = (parseInt(key.style.bottom, 10))+'px';
-      kts.textAlign = 'center';   kts.overflow = 'visible';
-      kts.fontFamily = util.getStyleValue(kc,'font-family');
-      kts.width = canvas.width+'px';
-      kts.height = canvas.height+'px';
-
-      var px=util.getStyleInt(kc, 'font-size');
-      if(px != 0) {
-        let popupFS = previewFontScale * px;
-        let scaleStyle = {
-          fontFamily: kts.fontFamily,
-          fontSize: popupFS + 'px',
-          height: 1.6 * xHeight + 'px' // as opposed to the canvas height of 2.3 * xHeight.
-        };
-
-        kts.fontSize = key.key.getIdealFontSize(this, scaleStyle);
-      }
-
-      ktLabel.textContent = kc.textContent;
-      ktls.display = 'block';
-      ktls.position = 'absolute';
-      ktls.textAlign = 'center';
-      ktls.width='100%';
-      ktls.top = '2%';
-      ktls.bottom = 'auto';
-
-      // Adjust canvas shape if at edges
-      var xOverflow = (canvas.width - xWidth) / 2;
-      if(xLeft < xOverflow) {
-        edge = -1;
-        xLeft += xOverflow;
-      } else if(xLeft > window.innerWidth - xWidth - xOverflow) {
-        edge = 1;
-        xLeft -= xOverflow;
-      }
-
-      // For now, should only be true (in production) when keyman.isEmbedded == true.
-      let constrainPopup = keyman.isEmbedded;
-
-      let cs = getComputedStyle(tip.element);
-      let oskHeight = keyman.osk.getHeight();
-      let bottomY = parseInt(cs.bottom, 10);
-      let tipHeight = parseInt(cs.height, 10);
-
-      let delta = 0;
-      if(tipHeight + bottomY > oskHeight && constrainPopup) {
-        delta = tipHeight + bottomY - oskHeight;
-        canvas.height = canvas.height - delta;
-        kts.height = canvas.height + 'px';
-      }
-
-      this.drawPreview(canvas, xWidth, xHeight, edge, delta);
-
-      kts.left=(xLeft - xOverflow) + 'px';
-      kts.display = 'block';
-    } else { // Hide the key preview
-      tip.element.style.display = 'none';
-    }
-
-    // Save the key preview state
-    tip.key = key;
-    tip.state = on;
-  };
-
-  /**
-   * Draw key preview in element using CANVAS
-   *  @param  {Object}  canvas CANVAS element
-   *  @param  {number}  w width of touched key, px
-   *  @param  {number}  h height of touched key, px
-   *  @param  {number}  edge  -1 left edge, 1 right edge, else 0
-   */
-  drawPreview(canvas: HTMLCanvasElement, w: number, h: number, edge: number, delta?: number) {
-    let device = this.device;
-
-    delta = delta || 0;
-
-    var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height + delta,
-        w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx,
-        h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8;
-
-    let hBoundedMax = canvas.height;
-
-    h2 = h2 > hBoundedMax ? hBoundedMax : h2;
-    h3 = hMax > hBoundedMax ? hBoundedMax : h3;
-
-    if(device.OS == 'Android') {
-      r = 3;
-    }
-
-    // Adjust the preview shape at the edge of the keyboard
-    switch(edge) {
-      case -1:
-        w1 -= dx;
-        w2 -= dx;
-        break;
-      case 1:
-        w1 += dx;
-        w2 += dx;
-        break;
-    }
-
-    // Clear the canvas
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    // Define appearance of preview (cannot be done directly in CSS)
-    if(device.OS == 'Android') {
-      var wx=(w1+w2)/2;
-      w1 = w2 = wx;
-    }
-    ctx.fillStyle = device.styles.popupCanvasBackgroundColor;
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = '#cccccc';
-
-    // Draw outline
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(w0+r,0);
-    ctx.arcTo(w3,0,w3,r,r);
-    if(device.OS == 'Android') {
-      ctx.arcTo(w3,h1,w2,h2,r);
-      ctx.arcTo(w2,h2,w1,h2,r);
-    } else {
-      let lowerR = 0;
-      if(h3 > h2) {
-        lowerR = h3-h2 > r ? r : h3-h2;
-      }
-      ctx.arcTo(w3,h1,w2,h2,r);
-      ctx.arcTo(w2,h2,w2-lowerR,h3,lowerR);
-      ctx.arcTo(w2,h3,w1,h3,lowerR);
-      ctx.arcTo(w1,h3,w1,h2-lowerR,lowerR);
-    }
-    ctx.arcTo(w1,h2,w0,h1-r,r);
-    ctx.arcTo(w0,h1,w0,r,r);
-    ctx.arcTo(w0,0,w0+r,0,r);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
+    tip.show(key, on, this);
   };
 
     /**
@@ -2686,20 +2527,7 @@ namespace com.keyman.osk {
 
       if(this.device.formFactor == 'phone') {
         if(this.keytip == null) {
-          this.keytip = {
-            key: null,
-            state: false
-          }
-          let tipElement = this.keytip.element=document.createElement('div');
-          tipElement.className='kmw-keytip';
-          tipElement.id = 'kmw-keytip';
-
-          // The following style is critical, so do not rely on external CSS
-          tipElement.style.pointerEvents='none';
-
-          // Add CANVAS element for outline and SPAN for key label
-          tipElement.appendChild(document.createElement('canvas'));
-          tipElement.appendChild(document.createElement('span'));
+          this.keytip = new KeyTip();
         }
 
         // Always append to _Box (since cleared during OSK Load)
