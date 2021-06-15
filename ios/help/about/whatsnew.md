@@ -12,3 +12,6 @@ Here are some of the new features we have added to Keyman for iPhone and iPad 14
 * Improved batching of keyboard and dictionary downloads (#3458)
 * Improved corrections and predictions (#3555)
 * Match user input capital letters when offering suggestions (#3845)
+
+[![](../ios_images/video.png) Watch a video](https://youtu.be/Tm-7Rvs-6Ig)
+that highlights some of these new features.
