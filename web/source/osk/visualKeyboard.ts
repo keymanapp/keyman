@@ -868,7 +868,7 @@ namespace com.keyman.osk {
       var n: number, i: number, j: number;
       var layers: keyboards.LayoutLayer[], gDiv: HTMLDivElement;
       var rowHeight: number, rDiv: HTMLDivElement;
-      var keys: keyboards.LayoutKey[], key: keyboards.LayoutKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
+      var keys: keyboards.ActiveKey[], key: keyboards.ActiveKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
 
       layers=layout['layer'];
 
@@ -962,49 +962,16 @@ namespace com.keyman.osk {
             // Overwrite the previously-computed percent.
             // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
             // All key widths and paddings are rounded for uniformity
-            var keyPercent: number, padPercent: number, totalPercent=0;
-            for(j=0; j<keys.length-1; j++) {
-              keyPercent = keys[j]['widthpc'] * objectWidth;
-              keys[j]['widthpc']=keyPercent;
-              padPercent = keys[j]['padpc'] * objectWidth;
-              keys[j]['padpc']=padPercent;
-
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
-              (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
-
-              totalPercent += padPercent+keyPercent;
-            }
-
-            // Allow for right OSK margin (15 layout units)
-            let rightMargin = keyboards.ActiveKey.DEFAULT_RIGHT_MARGIN*objectWidth/layer.totalWidth;
-            totalPercent += rightMargin;
-
-            // If a single key, and padding is negative, add padding to right align the key
-            if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
-              keyPercent = keys[0]['widthpc'] * objectWidth;
-              keys[0]['widthpc']=keyPercent;
-              totalPercent += keyPercent;
-              keys[0]['padpc']=(objectWidth-totalPercent);
-
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
-              (<keyboards.ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
-            } else if(keys.length > 0) {
-              j=keys.length-1;
-              padPercent = keys[j]['padpc'] * objectWidth;
-              keys[j]['padpc']=padPercent;
-              totalPercent += padPercent;
-              keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
-
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
-              (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
+            for(j=0; j<keys.length; j++) {
+              key = keys[j];
+              // TODO:  reinstate rounding?
+              key['widthpc'] = key.proportionalWidth * objectWidth;
+              key['padpc'] = key.proportionalPad * objectWidth;
             }
           }
 
           //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
-          totalPercent=0;
+          var totalPercent=0;
           for(j=0; j<keys.length; j++) {
             key=keys[j];
 
