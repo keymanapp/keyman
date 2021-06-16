@@ -1364,7 +1364,7 @@ namespace com.keyman.osk {
         let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
         let height = this.kbdDiv.offsetHeight;
 
-        // We need to adjust the offset properties by any offsets related to the active banner.
+        // Determine the y-threshold at which touch-cancellation should automatically occur.
         let rowCount = this.layers[this.layerIndex].row.length;
         let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
         var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold) : 5;
