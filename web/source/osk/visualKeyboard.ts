@@ -1,6 +1,6 @@
 /// <reference path="preProcessor.ts" />
 /// <reference path="utils.ts" />
-/// <reference path="abstractions.ts" />
+/// <reference path="keytip.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/subkeyPopup.ts" />
 
@@ -872,7 +872,7 @@ namespace com.keyman.osk {
       var n: number, i: number, j: number;
       var layers: keyboards.LayoutLayer[], gDiv: HTMLDivElement;
       var rowHeight: number, rDiv: HTMLDivElement;
-      var keys: keyboards.LayoutKey[], key: keyboards.LayoutKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
+      var keys: keyboards.ActiveKey[], key: keyboards.ActiveKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
 
       layers=layout['layer'];
 
@@ -966,49 +966,16 @@ namespace com.keyman.osk {
             // Overwrite the previously-computed percent.
             // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
             // All key widths and paddings are rounded for uniformity
-            var keyPercent: number, padPercent: number, totalPercent=0;
-            for(j=0; j<keys.length-1; j++) {
-              keyPercent = keys[j]['widthpc'] * objectWidth;
-              keys[j]['widthpc']=keyPercent;
-              padPercent = keys[j]['padpc'] * objectWidth;
-              keys[j]['padpc']=padPercent;
-
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
-              (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
-
-              totalPercent += padPercent+keyPercent;
-            }
-
-            // Allow for right OSK margin (15 layout units)
-            let rightMargin = keyboards.ActiveKey.DEFAULT_RIGHT_MARGIN*objectWidth/layer.totalWidth;
-            totalPercent += rightMargin;
-
-            // If a single key, and padding is negative, add padding to right align the key
-            if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
-              keyPercent = keys[0]['widthpc'] * objectWidth;
-              keys[0]['widthpc']=keyPercent;
-              totalPercent += keyPercent;
-              keys[0]['padpc']=(objectWidth-totalPercent);
-
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
-              (<keyboards.ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
-            } else if(keys.length > 0) {
-              j=keys.length-1;
-              padPercent = keys[j]['padpc'] * objectWidth;
-              keys[j]['padpc']=padPercent;
-              totalPercent += padPercent;
-              keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
-
-              // Recompute center's x-coord with exact, in-browser values.
-              (<keyboards.ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
-              (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
+            for(j=0; j<keys.length; j++) {
+              key = keys[j];
+              // TODO:  reinstate rounding?
+              key['widthpc'] = key.proportionalWidth * objectWidth;
+              key['padpc'] = key.proportionalPad * objectWidth;
             }
           }
 
           //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
-          totalPercent=0;
+          var totalPercent=0;
           for(j=0; j<keys.length; j++) {
             key=keys[j];
 
@@ -1181,7 +1148,7 @@ namespace com.keyman.osk {
       // Special function keys need immediate action
       if(keyName == 'K_LOPT' || keyName == 'K_ROPT')      {
         window.setTimeout(function(this: VisualKeyboard){
-          PreProcessor.clickKey(key);
+          this.modelKeyClick(key);
           // Because we immediately process the key, we need to re-highlight it after the click.
           this.highlightKey(key, true);
           // Highlighting'll be cleared automatically later.
@@ -1191,10 +1158,9 @@ namespace com.keyman.osk {
 
         // Also backspace, to allow delete to repeat while key held
       } else if(keyName == 'K_BKSP') {
-        let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]);
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
-        PreProcessor.clickKey(key, e.changedTouches[0], this.layerId, touchProbabilities);
+        this.modelKeyClick(key, e.changedTouches[0]);
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
@@ -1202,8 +1168,7 @@ namespace com.keyman.osk {
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
-          let touchProbabilities = this.getTouchProbabilities(this.touchPending);
-          PreProcessor.clickKey(this.keyPending, this.touchPending, this.layerId, touchProbabilities);
+          this.modelKeyClick(this.keyPending, this.touchPending);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
@@ -1276,8 +1241,7 @@ namespace com.keyman.osk {
 
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]);
-          PreProcessor.clickKey(this.keyPending, e.changedTouches[0], this.layerId, touchProbabilities);
+          this.modelKeyClick(this.keyPending, e.changedTouches[0]);
         }
         this.clearPopup();
         this.keyPending = null;
@@ -1556,7 +1520,7 @@ namespace com.keyman.osk {
      **/
     repeatDelete: () => void = function(this: VisualKeyboard) {
       if(this.deleting) {
-        PreProcessor.clickKey(this.deleteKey);
+        this.modelKeyClick(this.deleteKey);
         this.deleting = window.setTimeout(this.repeatDelete,100);
       }
     }.bind(this);
@@ -1573,6 +1537,57 @@ namespace com.keyman.osk {
       this.deleting = 0;
     }
     //#endregion
+
+    modelKeyClick(e: osk.KeyElement, touch?: Touch) {
+      let keyEvent = this.initKeyEvent(e, touch);
+
+      // TODO:  convert into an actual event, raised by the VisualKeyboard.
+      //        Its code is intended to lie outside of the OSK-Core library/module.
+      PreProcessor.raiseKeyEvent(keyEvent);
+    }
+
+    initKeyEvent(e: osk.KeyElement, touch?: Touch) {
+      // Turn off key highlighting (or preview)
+      this.highlightKey(e,false);
+
+      let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
+
+      // Future note:  we need to refactor osk.OSKKeySpec to instead be a 'tag field' for
+      // keyboards.ActiveKey.  (Prob with generics, allowing the Web-only parts to
+      // be fully specified within the tag.)  
+      //
+      // Would avoid the type shenanigans needed here because of our current type-abuse setup 
+      // for key spec tracking.
+      let keySpec = (e['key'] ? e['key'].spec : null) as unknown as keyboards.ActiveKey;
+      if(!keySpec) {
+        console.error("OSK key with ID '" + e.id + "', keyID '" + e.keyId + "' missing needed specification");
+        return null;
+      }
+
+
+      // Start:  mirrors _GetKeyEventProperties
+
+      // First check the virtual key, and process shift, control, alt or function keys
+      let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device.coreSpec);
+
+      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
+      switch(Lkc.kName) {
+        case 'K_CAPS':
+        case 'K_NUMLOCK':
+        case 'K_SCROLL':
+          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
+      }
+
+      // End - mirrors _GetKeyEventProperties
+
+      if(core.languageProcessor.isActive && touch) {
+        Lkc.source = touch;
+        Lkc.keyDistribution = this.getTouchProbabilities(touch);;
+      }
+      
+      // Return the event object.
+      return Lkc;
+    }
 
     // cancel = function(e) {} //cancel event is never generated by iOS
 
@@ -1846,7 +1861,7 @@ namespace com.keyman.osk {
       // Process as click if mouse button released anywhere over key
       if(util.eventType(e) == 'mouseup') {
         if(key.id == this.currentKey) {
-          PreProcessor.clickKey(key);
+          this.modelKeyClick(key);
         }
         this.currentKey='';
       }
