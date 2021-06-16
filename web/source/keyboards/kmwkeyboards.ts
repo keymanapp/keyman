@@ -108,6 +108,8 @@ namespace com.keyman.keyboards {
     activeStub: KeyboardStub = null;
     keyboardStubs: KeyboardStub[] = [];
 
+    firstCall: boolean = true; // First time to call keymanCloudRequest()
+
     deferredStubs: any[] = []; // The list of user-provided keyboard stub registration objects.
     deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register after initialization
     deferredKR = [];           // Array of pending keyboards, to be installed at end of initialization
@@ -124,8 +126,9 @@ namespace com.keyman.keyboards {
      */
     registrationResolvers: {[timeoutID: number] : RegistrationPromiseTuple} = {};
 
+    languageListPromise: Promise<KeyboardStub[]> = null;
+
     languageList: any[] = null; // List of keyboard languages available for KeymanCloud
-    languagesPending: any[] = [];     // Array of languages waiting to be registered
 
     linkedScripts: HTMLScriptElement[] = [];
 
@@ -1131,11 +1134,6 @@ namespace com.keyman.keyboards {
         }
       } else if(options['context'] == 'language') { // Download the full list of supported keyboard languages
         this.languageList = x['languages'];
-        if(this.languagesPending) {
-          // There are still pending languages to add:
-          //console.info('languagesPending remain: ', this.languagesPending);
-        }
-        // addLanguageKeyboards will handle clearing languagesPending. 
       }
 
       return this.keyboardStubs.slice(currentKeyboardStubsCount);
@@ -1145,40 +1143,54 @@ namespace com.keyman.keyboards {
      *  Internal handler for processing keyboard registration, used only by `register`
      *
      *  @param  {string[]}   languages    Array of language names
-     *  @returns {Promise<KeyboardStub[]} Promise of added keyboard stubs
+     *  @returns {Promise<KeyboardStub[]>} Promise of added keyboard stubs
      **/
-    async addLanguageKeyboards(languages: string[]): Promise<KeyboardStub[]> {
-      var i, j, lgName, cmd, first, addAll;
-
-      first = (this.languageList == null && this.languagesPending.length == 0);
+    addLanguageKeyboards(languages: string[]): Promise<KeyboardStub[]> {
+      var i, j, lgName, cmd, addAll, retPromise;
 
       // Defer registering keyboards by language until the language list has been loaded
       if (this.languageList == null) {
-        for(i=0; i<languages.length; i++) {
-          this.languagesPending.push(languages[i]);
+        if (this.firstCall) {
+          this.firstCall = false;
+          let promise = this.keymanCloudRequest('',true);
+          // If promise is not error, then... (needs an error guard)
+          promise.catch(function(error) {
+            console.log('first error', error);
+            return Promise.reject(error);
+          });
+          this.languageListPromise = promise;
         }
 
-        // initial result while waiting for language list catalog
-        let initialResult: KeyboardStub[]|Error = null;
-        if (first) {
-          initialResult = await this.keymanCloudRequest('',true);
-          // If initialResult is not error, then... (needs an error guard)
-          if (initialResult instanceof Error) {
-            return Promise.reject(initialResult);
+        let _this = this;
+        retPromise = new Promise(function(resolve, reject) {
+          if (_this.languageListPromise) {
+            // 1: wait for the language list to be loaded properly
+            _this.languageListPromise.then(function() {
+              // 2: perform the actual query, now that we can find the language code
+              let innerPromise = _this.addLanguageKeyboards(languages);
+
+              // 3: intercept the Promise resolve/reject and pass them to the
+              // returned Promise.
+              innerPromise.then(function(stubs) {
+                resolve(stubs);
+              }).catch(function(error) {
+                reject(error);
+              });
+            }).catch(function(error) {
+              return Promise.reject(error);
+            });
+          } else {
+            return _this.addLanguageKeyboards(languages);
           }
-          
-          // Drop through to see if there's pending languages to add
-        }
-
-        if (initialResult && this.languageList != null && this.languagesPending.length > 0) {
-          let languageList = this.languagesPending;
-          this.languagesPending = [];
-          return this.addLanguageKeyboards(languageList);
-        } else {
-          // Is this the correct to return an empty stub? Can't return Pending
-          let emptyStub: KeyboardStub[] = [];
-          return Promise.resolve(emptyStub);
-        }
+        }).then(function(result) {
+          if (result instanceof Error) {
+            return Promise.reject(result);
+          }
+          return Promise.resolve(result);
+        }).catch(function(error) {
+          return Promise.reject(error);
+        });
+      
       } else { // Identify and register each keyboard by language name
         cmd = '';
         for(i=0; i<languages.length; i++) {
@@ -1188,6 +1200,7 @@ namespace com.keyman.keyboards {
             lgName = lgName.substr(0,lgName.length-1);
           }
 
+          let languageFound: boolean = false;
           for(j=0; j<this.languageList.length; j++) {
             if(lgName == this.languageList[j]['name'].toLowerCase()) {
               if(cmd != '') {
@@ -1199,8 +1212,14 @@ namespace com.keyman.keyboards {
                 cmd = cmd + '$';
               }
 
+              languageFound = true;
               break;
             }
+          }
+          if (!languageFound) {
+            // TODO: Add error msg that no keyboards are available for lgName
+            console.error('No keyboards are available for '+lgName+'. '+
+              'Does it have another language name?');
           }
         }
 
@@ -1213,6 +1232,13 @@ namespace com.keyman.keyboards {
         } else {
           return this.keymanCloudRequest('&keyboardid='+cmd, false);
         }
+      }
+
+      if (retPromise) {
+        return retPromise;
+      } else {
+        console.log('Should have something here');
+        return Promise.resolve([]);
       }
     }
 

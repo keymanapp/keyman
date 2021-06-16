@@ -303,14 +303,14 @@ namespace com.keyman {
     }
 
     /**
-     *  Add default keyboard for given language(s)
+     *  Add default or all keyboards for a given language
      *
-     *  @param  {string|string[]}   arg    Language name(s) (multiple arguments allowed)
-     *  @returns {Promise<KeyboardStub[]} Promise of added keyboard stubs
+     *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
+     *  @returns {Promise<KeyboardStub[]>} Promise of added keyboard stubs
      **/
     ['addKeyboardsForLanguage'](arg: string[]|string) : Promise<com.keyman.keyboards.KeyboardStub[]> {
       if (typeof arg === 'string') {
-        return this.keyboardManager.addLanguageKeyboards(arg.split(','));
+        return this.keyboardManager.addLanguageKeyboards(arg.split(',').map(item => item.trim()));
       } else {
         return this.keyboardManager.addLanguageKeyboards(arg);
       }
