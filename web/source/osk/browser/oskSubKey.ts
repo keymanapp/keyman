@@ -60,5 +60,9 @@ namespace com.keyman.osk.browser {
 
       return kDiv;
     }
+
+    public allowsKeyTip(): boolean {
+      return false;
+    }
   }
 }
