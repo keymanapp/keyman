@@ -303,7 +303,7 @@ namespace com.keyman {
     }
 
     /**
-     *  Add default or all keyboards for a given language
+     *  Add default keyboards for given language(s)
      *
      *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
      *  @returns {Promise<KeyboardStub[]>} Promise of added keyboard stubs
