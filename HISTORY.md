@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.69 alpha 2021-06-16
+
+* refactor(web): OSK layout calculations - simplification (#5279)
+* refactor(web): VisualKeyboard - key event model (#5280)
+* refactor(web): OSK keytip abstraction (#5287)
+* refactor(web): encapsulation of browser-based subkey array popup (#5288)
+* chore(common): bash version for run-required-test-builds.sh (#5267)
+* fix(linux): Adjust version of dependency for ibus-keyman (#5281)
+
 ## 15.0.68 alpha 2021-06-15
 
 * chore(common): Add YouTube links to Keyman 14 features (#5276)
