@@ -77,11 +77,6 @@ namespace com.keyman.osk {
       // a dummy function; it's only really used for 'native' KMW.
     }
 
-    VisualKeyboard.prototype.addCallout = function(this: VisualKeyboard, key) {
-      // a dummy function; it's only really used for 'native' KMW.
-      return null;
-    }
-
     VisualKeyboard.prototype.waitForFonts = function(this: VisualKeyboard, kfd, ofd) {
       // a dummy function; it's only really used for 'native' KMW.
       return true;
