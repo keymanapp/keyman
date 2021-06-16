@@ -360,8 +360,8 @@ namespace com.keyman.text {
       
       keymanweb.domManager.initActiveElement(Lelem);
 
-      var nextLayer: string;
       var delegator: com.keyman.osk.embedded.SubkeyDelegator = null;
+      let selectedKey: com.keyman.osk.OSKKeySpec = null;
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
       if(osk.vkbd.subkeyDelegator) {
         delegator = osk.vkbd.subkeyDelegator as com.keyman.osk.embedded.SubkeyDelegator;
@@ -371,15 +371,14 @@ namespace com.keyman.text {
         var found = false;
 
         if(baseKey.coreID == keyName) {
-          nextLayer = baseKey.nextlayer;
+          selectedKey = baseKey;
           found = true;
         } else {
           // Search for the specified subkey so we can retrieve its useful properties.
           // It should be within the popupBaseKey's subkey list.
           for(let subKey of baseKey.sk) {
             if(subKey.coreID == keyName) {
-              // ... to consider:  why are we not just taking the keyspec wholesale right here?
-              nextLayer = subKey.nextlayer;
+              selectedKey = subKey;
               found = true;
               break;
             }
@@ -395,41 +394,11 @@ namespace com.keyman.text {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }
 
-      let Codes = com.keyman.text.Codes;
-      
-      // Check the virtual key 
-      let Lkc: com.keyman.text.KeyEvent = {
-        Lmodifiers: keyShiftState,
-        Lstates: 0,
-        Lcode: Codes.keyCodes[keyName],
-        LisVirtualKey: true,
-        kName: keyName,
-        kNextLayer: nextLayer,
-        vkCode: null, // was originally undefined
-        isSynthetic: true,
-        device: keymanweb.util.device.coreSpec
-      };
-
-      // Process modifier key action
-      if(core.keyboardProcessor.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
-        return true;      
+      let Lkc: com.keyman.text.KeyEvent = null;
+      if(selectedKey) {
+        Lkc = osk.vkbd.keyEventFromSpec(selectedKey as com.keyman.keyboards.ActiveKey, null);
+        Lkc.vkCode=Lkc.Lcode;
       }
-
-      // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
-      // we can handle many other pre-processing steps the same way with this common method.
-      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
-
-      //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
-      //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
-      if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
-        // Addresses modifier SHIFT keys.
-        if(nextLayer) {
-          core.keyboardProcessor.selectLayer(Lkc);
-        }
-        return false;
-      }
-
-      Lkc.vkCode=Lkc.Lcode;
 
       if(delegator) {
         delegator.resolve(Lkc);

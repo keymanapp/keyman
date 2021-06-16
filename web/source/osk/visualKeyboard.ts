@@ -960,8 +960,6 @@ namespace com.keyman.osk {
       // Turn off key highlighting (or preview)
       this.highlightKey(e,false);
 
-      let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
-
       // Future note:  we need to refactor osk.OSKKeySpec to instead be a 'tag field' for
       // keyboards.ActiveKey.  (Prob with generics, allowing the Web-only parts to
       // be fully specified within the tag.)  
@@ -973,7 +971,13 @@ namespace com.keyman.osk {
         console.error("OSK key with ID '" + e.id + "', keyID '" + e.keyId + "' missing needed specification");
         return null;
       }
+      
+      // Return the event object.
+      return this.keyEventFromSpec(keySpec, touch);
+    }
 
+    keyEventFromSpec(keySpec: keyboards.ActiveKey, touch?: Touch) {
+      let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
 
       // Start:  mirrors _GetKeyEventProperties
 
@@ -994,8 +998,7 @@ namespace com.keyman.osk {
         Lkc.source = touch;
         Lkc.keyDistribution = this.getTouchProbabilities(touch);;
       }
-      
-      // Return the event object.
+
       return Lkc;
     }
 
