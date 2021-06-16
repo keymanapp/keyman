@@ -102,7 +102,7 @@ begin
   writeln('  -copyright <data>      Copyright string for the keyboard/model, defaults to "Copyright (C)"');
   writeln('  -version <data>        Version number of the keyboard/model, defaults to "1.0"');
   writeln('  -languages <data>      Space-separated list of BCP 47 tags, e.g. "en-US tpi-PG"');
-  writeln('  -targets <data>        Space-separate list of targets, e.g. "linux windows phone"');
+  writeln('  -targets <data>        Space-separate list of targets, e.g. "linux windows mobile"');
   writeln;
   // Model parameters
   writeln('Note: model identifiers are constructed from params: <id-author>.<id-language>.<id-uniq>');
