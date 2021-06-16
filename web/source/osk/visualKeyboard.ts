@@ -6,6 +6,11 @@
 /// <reference path="browser/subkeyPopup.ts" />
 
 namespace com.keyman.osk {
+  interface SubkeyDeferment {
+    timerId: number;
+    resolve: (KeyEvent) => void;
+  }
+
   export class VisualKeyboard {
     // Legacy alias, maintaining a reference for code built against older
     // versions of KMW.
@@ -60,10 +65,10 @@ namespace com.keyman.osk {
     currentTarget: KeyElement;
 
     // Popup key management
-    popupBaseKey: KeyElement;
     popupPending: boolean = false;
-    subkeyDelayTimer: number;
+    //subkeyDelayTimer: number;
     popupDelay: number = 500;
+    subkeyDeferment: SubkeyDeferment
     menuEvent: KeyElement; // Used by embedded-mode.
     keytip: KeyTip;
     subkeyPopup: browser.SubkeyPopup;
@@ -425,7 +430,7 @@ namespace com.keyman.osk {
       let kbdAspectRatio = layerGroup.offsetWidth / this.kbdDiv.offsetHeight;
       let baseKeyProbabilities = this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
 
-      if(!this.popupBaseKey || !this.popupBaseKey.key) {
+      if(!this.subkeyPopup || !this.subkeyPopup.baseKey.key) {
         return baseKeyProbabilities;
       } else {
         // A temp-hack, as this was noted just before 14.0's release.
@@ -437,7 +442,7 @@ namespace com.keyman.osk {
         let baseMass = 1.0;
 
         let baseKeyMass = 1.0;
-        let baseKeyID = this.popupBaseKey.key.spec.coreID;
+        let baseKeyID = this.subkeyPopup.baseKey.key.spec.coreID;
 
         let popupKeyMass = 0.0;
         let popupKeyID: string = null;
@@ -560,7 +565,13 @@ namespace com.keyman.osk {
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
-          this.modelKeyClick(this.keyPending, this.touchPending);
+
+          if(this.subkeyPopup) {
+            let keyEvent = this.initKeyEvent(this.keyPending, this.touchPending);
+            this.subkeyPopup.resolve(keyEvent);
+          } else {
+            this.modelKeyClick(this.keyPending, this.touchPending);
+          }
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
@@ -594,7 +605,7 @@ namespace com.keyman.osk {
         }
 
         // Cancel (but do not execute) pending key if neither a popup key or the base key
-        if((t == null) || ((t.id.indexOf('popup') < 0) && (t.id != this.popupBaseKey.id))) {
+        if((t == null) || (!(t.key instanceof browser.OSKSubKey) && (t.id != this.subkeyPopup.baseKey.id))) {
           this.highlightKey(this.keyPending,false);
           this.clearPopup();
           this.keyPending = null;
@@ -630,10 +641,15 @@ namespace com.keyman.osk {
       // Process and clear highlighting of pending target
       if(this.keyPending) {
         this.highlightKey(this.keyPending,false);
-
+        
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          this.modelKeyClick(this.keyPending, e.changedTouches[0]);
+          if(this.subkeyPopup) {
+            let keyEvent = this.initKeyEvent(this.keyPending, e.changedTouches[0]);
+            this.subkeyPopup.resolve(keyEvent);
+          } else {
+            this.modelKeyClick(this.keyPending, e.changedTouches[0]);
+          }
         }
         this.clearPopup();
         this.keyPending = null;
@@ -710,7 +726,7 @@ namespace com.keyman.osk {
           this.keyPending=null;
           this.touchPending=null;
         } else {
-          if(key1 == this.popupBaseKey) {
+          if(this.subkeyPopup && key1 == this.subkeyPopup.baseKey) {
             if(!key1.classList.contains('kmw-key-touched')) {
               this.highlightKey(key1,true);
             }
@@ -727,11 +743,11 @@ namespace com.keyman.osk {
         return;
       }
 
-      var sk=document.getElementById('kmw-popup-keys');
+      var sk=this.subkeyPopup
 
       // Use the popup duplicate of the base key if a phone with a visible popup array
-      if(sk && sk.style.visibility == 'visible' && this.device.formFactor == 'phone' && key1 == this.popupBaseKey) {
-        key1 = <KeyElement> sk.childNodes[0].firstChild;
+      if(sk && sk.element.style.visibility == 'visible' && this.device.formFactor == 'phone' && key1 == sk.baseKey) {
+        key1 = <KeyElement> sk.element.childNodes[0].firstChild;
       }
 
       // Identify current touch position (to manage off-key release)
@@ -745,15 +761,15 @@ namespace com.keyman.osk {
       // If popup is visible, need to move over popup, not over main keyboard
       this.highlightSubKeys(key1,x,y);
 
-      if(sk && sk.style.visibility == 'visible') {
+      if(sk && sk.element.style.visibility == 'visible') {
         // Once a subkey array is displayed, do not allow changing the base key.
         // Keep that array visible and accept no other options until the touch ends.
-        if(key1 && key1.id.indexOf('popup') < 0 && key1 != this.popupBaseKey) {
+        if(key1 && key1.id.indexOf('popup') < 0 && key1 != this.subkeyPopup.baseKey) {
           return;
         }
 
         // Highlight the base key on devices that do not append it to the subkey array.
-        if(key1 && key1 == this.popupBaseKey && key1.className.indexOf('kmw-key-touched') < 0) {
+        if(key1 && key1 == this.subkeyPopup.baseKey) {
           this.highlightKey(key1,true);
         }
         // Cancel touch if moved up and off keyboard, unless popup keys visible
@@ -1072,15 +1088,16 @@ namespace com.keyman.osk {
     clearPopup() {
       // Remove the displayed subkey array, if any, and cancel popup request
       if(this.subkeyPopup) {
+        this.subkeyPopup.resolve(null);
         this.subkeyPopup.clear();
         this.subkeyPopup = null;
       }
 
-      if(this.subkeyDelayTimer) {
-          window.clearTimeout(this.subkeyDelayTimer);
-          this.subkeyDelayTimer = null;
+      if(this.subkeyDeferment) {
+          window.clearTimeout(this.subkeyDeferment.timerId);
+          this.subkeyDeferment.resolve(null);
+          this.subkeyDeferment = null;
       }
-      this.popupBaseKey = null;
     }
 
     //#region 'native'-mode subkey handling
@@ -1088,7 +1105,7 @@ namespace com.keyman.osk {
      * Display touch-hold array of 'sub-keys' above the currently touched key
      * @param       {Object}    e      primary key element
      */
-    showSubKeys(e: KeyElement) {
+    showSubKeys(e: KeyElement, resolve: (KeyElement) => void) {
       // Do not show subkeys if key already released
       if(this.keyPending == null) {
         return;
@@ -1096,9 +1113,8 @@ namespace com.keyman.osk {
 
       // Clear key preview if any
       this.showKeyTip(null,false);
-      this.popupBaseKey = e;
 
-      let subKeys = this.subkeyPopup = new browser.SubkeyPopup(this, e);
+      let subKeys = this.subkeyPopup = new browser.SubkeyPopup(this, e, resolve);
 
       // Otherwise append the touch-hold (subkey) array to the OSK
       let keyman = com.keyman.singleton;
@@ -1678,19 +1694,39 @@ namespace com.keyman.osk {
    *
    * @param   {Object}  key   base key object
    */
-  touchHold(key: KeyElement) {
+  touchHold(key: KeyElement, force?: boolean) {
     // Clear and restart the popup timer
-    if(this.subkeyDelayTimer) {
-      window.clearTimeout(this.subkeyDelayTimer);
-      this.subkeyDelayTimer = null;
+    if(this.subkeyDeferment) {
+      window.clearTimeout(this.subkeyDeferment.timerId);
+      // Cancel the potential subkey event.
+      this.subkeyDeferment.resolve(null);
+      this.subkeyDeferment = null;
     }
 
     if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
-      this.subkeyDelayTimer = window.setTimeout(
-        function(this: VisualKeyboard) {
-          this.clearPopup();
-          this.showSubKeys(key);
-        }.bind(this), this.popupDelay);
+      let _this = this;
+
+      let promise = new Promise<text.KeyEvent>(function(resolve, reject) {
+        let timerId = window.setTimeout(
+          function() {
+            // It's no longer deferred; it's being fulfilled.
+            // Even if the actual subkey itself is still async.
+            _this.subkeyDeferment = null;
+            _this.clearPopup();
+            _this.showSubKeys(key, resolve);
+          }, force ? 0 : _this.popupDelay);
+
+          _this.subkeyDeferment = {
+            timerId: timerId,
+            resolve: resolve
+          };
+      }).then(function(keyEvent: text.KeyEvent) {
+        if(keyEvent) {
+          // Do something.
+          console.log("Promise fulfilled for " + keyEvent.kName);
+          PreProcessor.raiseKeyEvent(keyEvent);
+        }
+      });
     }
   };
 
@@ -1730,10 +1766,7 @@ namespace com.keyman.osk {
 
     // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
     if((this.touchY-y > 5) && skBox == null) {
-      if(this.subkeyDelayTimer) {
-        window.clearTimeout(this.subkeyDelayTimer);
-      }
-      this.showSubKeys(k);
+      this.touchHold(k, true);
     }
     //#endregion
   };

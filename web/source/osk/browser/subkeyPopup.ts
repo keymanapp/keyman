@@ -4,12 +4,16 @@ namespace com.keyman.osk.browser {
   export class SubkeyPopup {
     public readonly element: HTMLDivElement;
     public readonly shim: HTMLDivElement;
+    public readonly baseKey: KeyElement;
     
-    private baseKey: KeyElement;
     private callout: HTMLDivElement;
 
-    constructor(vkbd: VisualKeyboard, e: KeyElement) {
+    // Resolves the promise that generated this SubkeyPopup.
+    private resolver: (keyEvent: text.KeyEvent) => void;
+
+    constructor(vkbd: VisualKeyboard, e: KeyElement, resolve: (keyEvent: text.KeyEvent) => void) {
       let keyman = com.keyman.singleton;
+      this.resolver = resolve;
       
       // A tag we directly set on a key element during its construction.
       let subKeySpec: OSKKeySpec[] = e['subKeys'];
@@ -70,6 +74,13 @@ namespace com.keyman.osk.browser {
       if(vkbd.device.formFactor == 'phone') {
         this.selectDefaultSubkey(vkbd, e, subKeys /* == this.element */);
       }
+    }
+
+    resolve(keyEvent: text.KeyEvent) {
+      if(this.resolver) {
+        this.resolver(keyEvent);
+      }
+      this.resolver = null;
     }
 
     reposition(vkbd: VisualKeyboard) {
@@ -182,6 +193,9 @@ namespace com.keyman.osk.browser {
     }
 
     clear() {
+      // If not yet resolved, resolve the corresponding Promise.
+      this.resolve(null);
+
       // Remove the displayed subkey array, if any
       if(this.element.parentNode) {
         this.element.parentNode.removeChild(this.element);
