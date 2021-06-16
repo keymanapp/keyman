@@ -1363,9 +1363,11 @@ namespace com.keyman.osk {
         // _Box has (most of) the useful client values.
         let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
         let height = this.kbdDiv.offsetHeight;
-        // We need to adjust the offset properties by any offsets related to the active banner.
 
-        var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop + _Box.offsetTop - 0.25*height) : 5;
+        // We need to adjust the offset properties by any offsets related to the active banner.
+        let rowCount = this.layers[this.layerIndex].row.length;
+        let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
+        var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold) : 5;
         if(key0 && e.touches[0].pageY < yMin) {
           this.highlightKey(key0,false);
           this.showKeyTip(null,false);
