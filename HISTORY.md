@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.68 alpha 2021-06-15
+
+* chore(common): Add YouTube links to Keyman 14 features (#5276)
+* chore(common): Check in crowdin strings for Spanish (Latin America) (#5269)
+* refactor(web): polishes management of OSK keys (#5257)
+* refactor(web): Visual Keyboard disentanglement - pass 1 (#5259)
+* refactor(web): VisualKeyboard height styling consistency (#5278)
+* fix(common/models): predictive-text engine use of NFD input (#5273)
+* chore(linux): Fix warnings (#5282)
+
 ## 15.0.67 alpha 2021-06-12
 
 * feat(linux): Fix Linux packaging on i386 (#5250)

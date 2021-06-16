@@ -29,6 +29,7 @@ namespace com.keyman {
 
   export namespace osk {
     export declare var PreProcessor: any;
+    export declare var VisualKeyboard: any;
   }
 }
 
@@ -199,15 +200,15 @@ namespace KMWRecorder {
         return retVal;
       }
 
-      var _originalClickKey = com.keyman.osk.PreProcessor.clickKey; //.bind(keyman.osk);
-      com.keyman.osk.PreProcessor.clickKey = function(e) {
+      var _originalModelKeyClick = com.keyman.osk.VisualKeyboard.prototype.modelKeyClick; //.bind(keyman.osk);
+      com.keyman.osk.VisualKeyboard.prototype.modelKeyClick = function(e, touch) {
         let in_output = com.keyman.dom.Utils.getOutputTarget(recordingElement);
         if(!in_output || com.keyman.dom.DOMEventHandlers.states.activeElement != in_output.getElement()) {
-          return _originalClickKey(e);
+          return _originalModelKeyClick.call(this, e, touch);
         }
 
         let event = KMWRecorder.Scribe.recordOSKEvent(e);
-        var retVal = _originalClickKey(e);
+        var retVal = _originalModelKeyClick.call(this, e, touch);
 
         let recording = Scribe.recordKeystroke(recorderScribe._currentKeyEvent, event);
 
@@ -254,9 +255,9 @@ namespace KMWRecorder {
       }
 
       var _originalProcessKeyEvent = keyman.core.processKeyEvent.bind(keyman.core);
-      keyman.core.processKeyEvent = function(keyEvent /* com.keyman.text.KeyEvent */) {
+      keyman.core.processKeyEvent = function(keyEvent /* com.keyman.text.KeyEvent */, target /* com.keyman.text.OutputTarget */) {
         recorderScribe._currentKeyEvent = keyEvent;
-        return _originalProcessKeyEvent(keyEvent);
+        return _originalProcessKeyEvent(keyEvent, target);
       }
     }
   }
