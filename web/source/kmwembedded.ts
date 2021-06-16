@@ -71,7 +71,9 @@ namespace com.keyman.osk {
           let delegator = new embedded.SubkeyDelegator(key, resolve);
           _this.subkeyDelegator = delegator;
         }).then(function(keyEvent) {
-          PreProcessor.raiseKeyEvent(keyEvent);
+          if(keyEvent) {
+            PreProcessor.raiseKeyEvent(keyEvent);
+          }
         });
         
         window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
