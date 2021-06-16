@@ -65,13 +65,12 @@ namespace com.keyman.osk {
     currentTarget: KeyElement;
 
     // Popup key management
-    popupPending: boolean = false;
-    //subkeyDelayTimer: number;
     popupDelay: number = 500;
     subkeyDeferment: SubkeyDeferment
     menuEvent: KeyElement; // Used by embedded-mode.
     keytip: KeyTip;
     subkeyPopup: browser.SubkeyPopup;
+    subkeyDelegator: any; // a temp, intermediate property during subkey abstraction work
 
     get layerId(): string {
       return this._layerId;

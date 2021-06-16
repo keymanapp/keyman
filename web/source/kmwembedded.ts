@@ -2,6 +2,7 @@
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 /// <reference path="osk/embedded/keytip.ts" />
+/// <reference path="osk/embedded/subkeyDelegator.ts" />
 
 // KeymanWeb 11.0
 // Copyright 2019 SIL International
@@ -60,8 +61,19 @@ namespace com.keyman.osk {
 
         // #3718: No longer prepend base key to subkey array
 
-        this.popupBaseKey = key;
-        this.popupPending=true;
+        let _this = this;
+        let promise = new Promise<text.KeyEvent>(function(resolve, reject) {
+          _this.subkeyDeferment = {
+            timerId: 0,
+            resolve: resolve
+          };
+
+          let delegator = new embedded.SubkeyDelegator(key, resolve);
+          _this.subkeyDelegator = delegator;
+        }).then(function(keyEvent) {
+          PreProcessor.raiseKeyEvent(keyEvent);
+        });
+        
         window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
       }
     };
@@ -349,11 +361,13 @@ namespace com.keyman.text {
       keymanweb.domManager.initActiveElement(Lelem);
 
       var nextLayer: string;
-
+      var delegator: com.keyman.osk.embedded.SubkeyDelegator = null;
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
-      if(osk.vkbd.popupBaseKey && osk.vkbd.popupBaseKey['key']) {
+      if(osk.vkbd.subkeyDelegator) {
+        delegator = osk.vkbd.subkeyDelegator as com.keyman.osk.embedded.SubkeyDelegator;
+
         // This is set with the base key of our current subkey elsewhere within the engine.
-        var baseKey: com.keyman.osk.OSKKeySpec = osk.vkbd.popupBaseKey['key'].spec;
+        var baseKey: com.keyman.osk.OSKKeySpec = delegator.baseKey.key.spec;
         var found = false;
 
         if(baseKey.coreID == keyName) {
@@ -375,6 +389,8 @@ namespace com.keyman.text {
         if(!found) {
           console.warn("Could not find subkey '" + origArg + "' under the current base key '" + baseKey.coreID + "'!");
         }
+
+        osk.vkbd.subkeyDelegator = null;
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }
@@ -415,17 +431,9 @@ namespace com.keyman.text {
 
       Lkc.vkCode=Lkc.Lcode;
 
-      // Now that we have a valid key event, hand it off to the Processor for execution.
-      // This allows the Processor to also handle any predictive-text tasks necessary.
-      let retVal = com.keyman.osk.PreProcessor.handleClick(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem), null);
-
-      // Special case for embedded to pass K_TAB back to device to process
-      if(Lkc.Lcode == Codes.keyCodes["K_TAB"] || Lkc.Lcode == Codes.keyCodes["K_TABBACK"] 
-          || Lkc.Lcode == Codes.keyCodes["K_TABFWD"]) {
-        return false;
+      if(delegator) {
+        delegator.resolve(Lkc);
       }
-
-      return retVal;
   };
 
   /**
