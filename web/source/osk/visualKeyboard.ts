@@ -1,6 +1,6 @@
 /// <reference path="preProcessor.ts" />
 /// <reference path="utils.ts" />
-/// <reference path="abstractions.ts" />
+/// <reference path="keytip.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 
 namespace com.keyman.osk {

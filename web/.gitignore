@@ -1,9 +1,6 @@
 # Legacy build folders.
 output/
 build/
-embedded/
-
-!source/**/embedded
 
 # Current build folders.
 intermediate/
