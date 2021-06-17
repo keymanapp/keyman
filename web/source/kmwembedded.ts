@@ -66,6 +66,7 @@ namespace com.keyman.osk {
           let delegator = new embedded.SubkeyDelegator(key, resolve);
           _this.subkeyDelegator = delegator;
         }).then(function(keyEvent) {
+          _this.subkeyDelegator = null;
           // Allow active cancellation, even if the source should allow passive.
           // It's an easy and cheap null guard.
           if(keyEvent) {

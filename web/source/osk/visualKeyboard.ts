@@ -725,7 +725,8 @@ namespace com.keyman.osk {
           this.keyPending=null;
           this.touchPending=null;
         } else {
-          if(this.subkeyPopup && key1 == this.subkeyPopup.baseKey) {
+          // Re-apply highlighting to the key if it's the current popup's base key.
+          if(this.subkeyDelegator && key1 == this.subkeyDelegator.baseKey) {
             if(!key1.classList.contains('kmw-key-touched')) {
               this.highlightKey(key1,true);
             }
