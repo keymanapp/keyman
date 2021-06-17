@@ -1155,7 +1155,7 @@ namespace com.keyman.keyboards {
           let promise = this.keymanCloudRequest('',true);
           // If promise is not error, then... (needs an error guard)
           promise.catch(function(error) {
-            console.log('first error', error);
+            console.error("Unable to retrieve the master language list.")
             return Promise.reject(error);
           });
           this.languageListPromise = promise;
@@ -1167,15 +1167,7 @@ namespace com.keyman.keyboards {
             // 1: wait for the language list to be loaded properly
             _this.languageListPromise.then(function() {
               // 2: perform the actual query, now that we can find the language code
-              let innerPromise = _this.addLanguageKeyboards(languages);
-
-              // 3: intercept the Promise resolve/reject and pass them to the
-              // returned Promise.
-              innerPromise.then(function(stubs) {
-                resolve(stubs);
-              }).catch(function(error) {
-                reject(error);
-              });
+              resolve(_this.addLanguageKeyboards(languages));
             }).catch(function(error) {
               return Promise.reject(error);
             });
