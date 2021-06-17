@@ -1655,13 +1655,13 @@ namespace com.keyman.osk {
             _this.clearPopup();
           });
 
-           // Otherwise append the touch-hold (subkey) array to the OSK
-           let keyman = com.keyman.singleton;
-           keyman.osk._Box.appendChild(subkeyPopup.element);
-           keyman.osk._Box.appendChild(subkeyPopup.shim);
+          // Otherwise append the touch-hold (subkey) array to the OSK
+          let keyman = com.keyman.singleton;
+          keyman.osk._Box.appendChild(subkeyPopup.element);
+          keyman.osk._Box.appendChild(subkeyPopup.shim);
 
-           // Must be placed after its `.element` has been inserted into the DOM.
-           subkeyPopup.reposition(_this);
+          // Must be placed after its `.element` has been inserted into the DOM.
+          subkeyPopup.reposition(_this);
         }
       });
 
