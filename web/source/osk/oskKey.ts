@@ -201,8 +201,10 @@ namespace com.keyman.osk {
     public highlight(on: boolean) {
       var classes=this.btn.classList;
 
-      if(on && !classes.contains(OSKKey.HIGHLIGHT_CLASS)) {
-        classes.add(OSKKey.HIGHLIGHT_CLASS);
+      if(on) {
+        if(!classes.contains(OSKKey.HIGHLIGHT_CLASS)) {
+          classes.add(OSKKey.HIGHLIGHT_CLASS);
+        }
       } else {
         classes.remove(OSKKey.HIGHLIGHT_CLASS);
       }
