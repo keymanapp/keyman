@@ -40,6 +40,21 @@
     and is called when the page loads.
 */
 
+  /**
+   * Add a keyboard by language name.  Note that the name must be spelled
+     correctly, or the keyboard will not be found.  (Using BCP-47 codes is
+     usually easier.)
+   * @param {string} languages. Could be comma-separated languages
+   */
+  function addKeyboardsForLanguage(languages) {
+    kmw.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(result => {
+      console.log('Adding ' + languages + ': ', result);
+    }).catch(error => {
+      // Consumer decides how to handle errors
+      alert(error);
+    });
+  }
+
   function loadKeyboards(nestLevel)
   {
     var kmw=keyman;
@@ -69,11 +84,7 @@
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
     // usually easier.)
-    kmw.addKeyboardsForLanguage('Dzongkha').then(result => {
-      console.log('Adding Dzonkha: ', result);
-    }).catch(error => {
-      alert(error);
-    });
+    addKeyboardsForLanguage('Dzongkha');
 
     // Add a fully-specified, locally-sourced, keyboard with custom font
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
@@ -111,11 +122,7 @@
       case 3:
         // Add keyboard for comma-separated language name(s)
         sKbd=document.getElementById('kbd_id3').value;
-        kmw.addKeyboardsForLanguage(sKbd.split(',').map(item => item.trim())).then(result => {
-            console.log('adding ', sKbd, ': ', result);
-        }).catch(error => {
-            alert(error)
-        });
+        addKeyboardsForLanguage(sKbd);
         break;
     }
   }

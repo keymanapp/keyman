@@ -1209,7 +1209,8 @@ namespace com.keyman.keyboards {
             }
           }
           if (!languageFound) {
-            // TODO: Add error msg that no keyboards are available for lgName
+            // TODO: Construct response array of errors (failed-query keyboards)
+            // that will be merged with stubs (successfully-queried keyboards)
             console.error('No keyboards are available for '+lgName+'. '+
               'Does it have another language name?');
           }
@@ -1229,7 +1230,7 @@ namespace com.keyman.keyboards {
       if (retPromise) {
         return retPromise;
       } else {
-        console.log('Should have something here');
+        // No keyboards added so return empty stub
         return Promise.resolve([]);
       }
     }
