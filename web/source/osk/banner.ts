@@ -493,7 +493,7 @@ namespace com.keyman.osk {
       // Utilized by the mobile apps; allows them to 'take over' touch handling,
       // blocking it within KMW when the apps are already managing an ongoing touch-hold.
       let keyman = com.keyman.singleton;
-      return keyman['osk'].vkbd.popupVisible;
+      return keyman['osk'].vkbd.subkeyDelegator;
     }
 
     protected dealiasSubTarget(target: HTMLDivElement): HTMLDivElement {

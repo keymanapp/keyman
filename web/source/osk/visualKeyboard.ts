@@ -45,7 +45,6 @@ namespace com.keyman.osk {
 
     // State-related properties
     ddOSK: boolean = false;
-    popupVisible: boolean;
     keyPending: KeyElement;
     touchPending: Touch;
     deleteKey: KeyElement;
@@ -70,6 +69,7 @@ namespace com.keyman.osk {
     menuEvent: KeyElement; // Used by embedded-mode.
     keytip: KeyTip;
     subkeyPopup: browser.SubkeyPopup;
+    embeddedPendingLongpress: any; // a temp, intermediate property during subkey abstraction work
     subkeyDelegator: any; // a temp, intermediate property during subkey abstraction work
 
     get layerId(): string {
@@ -518,7 +518,7 @@ namespace com.keyman.osk {
 
       // Prevent multi-touch if popup displayed
       var sk = document.getElementById('kmw-popup-keys');
-      if((sk && sk.style.visibility == 'visible') || this.popupVisible) {
+      if((sk && sk.style.visibility == 'visible') || this.subkeyDelegator) {
         return;
       }
 
@@ -615,7 +615,7 @@ namespace com.keyman.osk {
       //
       // Note that on iOS (at least), this.release() will trigger before kmwembedded.ts's
       // executePopupKey() function.
-      if(this.popupVisible) {
+      if(this.subkeyDelegator) {
         return;
       }
 
@@ -715,7 +715,7 @@ namespace com.keyman.osk {
       }
 
       // Do not move over keys if device popup visible
-      if(this.popupVisible) {
+      if(this.subkeyDelegator) {
         if(key1 == null) {
           if(key0) {
             this.highlightKey(key0,false);

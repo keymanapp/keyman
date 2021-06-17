@@ -3,9 +3,14 @@ namespace com.keyman.osk.embedded {
     private resolver: (keyEvent: text.KeyEvent) => void;
 
     public readonly baseKey: KeyElement;
+    public readonly promise: Promise<text.KeyEvent>;
 
-    constructor(e: KeyElement, resolve: (keyEvent: text.KeyEvent) => void) {
-      this.resolver = resolve;
+    constructor(e: KeyElement) {
+      let _this = this;
+      this.promise = new Promise<text.KeyEvent>(function(resolve) {
+        _this.resolver = resolve;
+      });
+
       this.baseKey = e;
     }
 

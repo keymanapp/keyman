@@ -2,7 +2,7 @@
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 /// <reference path="osk/embedded/keytip.ts" />
-/// <reference path="osk/embedded/subkeyDelegator.ts" />
+/// <reference path="osk/embedded/pendingLongpress.ts" />
 
 // KeymanWeb 11.0
 // Copyright 2019 SIL International
@@ -62,17 +62,21 @@ namespace com.keyman.osk {
         // #3718: No longer prepend base key to subkey array
 
         let _this = this;
-        let promise = new Promise<text.KeyEvent>(function(resolve, reject) {
-          let delegator = new embedded.SubkeyDelegator(key, resolve);
+        let pendingLongpress = new embedded.PendingLongpress(key);
+        pendingLongpress.promise.then(function(delegator) {
           _this.subkeyDelegator = delegator;
-        }).then(function(keyEvent) {
-          _this.subkeyDelegator = null;
-          // Allow active cancellation, even if the source should allow passive.
-          // It's an easy and cheap null guard.
-          if(keyEvent) {
-            PreProcessor.raiseKeyEvent(keyEvent);
+          if(delegator) {
+            delegator.promise.then(function(keyEvent) {
+              _this.subkeyDelegator = null;
+              // Allow active cancellation, even if the source should allow passive.
+              // It's an easy and cheap null guard.
+              if(keyEvent) {
+                PreProcessor.raiseKeyEvent(keyEvent);
+              }
+            });
           }
         });
+        this.embeddedPendingLongpress = pendingLongpress;
         
         window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
       }
@@ -287,9 +291,21 @@ namespace com.keyman.text {
    *  @param  {boolean}  isVisible
    *     
    **/
-  keymanweb['popupVisible'] = function(isVisible)
-  {
-    osk.vkbd.popupVisible = isVisible;
+  keymanweb['popupVisible'] = function(isVisible) {
+    let delegator = osk.vkbd.subkeyDelegator as com.keyman.osk.embedded.SubkeyDelegator;
+    let pendingLongpress = osk.vkbd.embeddedPendingLongpress as com.keyman.osk.embedded.PendingLongpress;
+
+    if(!isVisible) {
+      if(delegator) {
+        delegator.resolve(null);
+        osk.vkbd.subkeyDelegator = null;
+      }
+    }
+
+    if(isVisible && osk.vkbd.embeddedPendingLongpress) {
+      // Fulfills the first-stage promise.
+      pendingLongpress.markActiveSubkeys();
+    }
   };
 
   /**
