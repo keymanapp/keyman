@@ -63,14 +63,11 @@ namespace com.keyman.osk {
 
         let _this = this;
         let promise = new Promise<text.KeyEvent>(function(resolve, reject) {
-          _this.subkeyDeferment = {
-            timerId: 0,
-            resolve: resolve
-          };
-
           let delegator = new embedded.SubkeyDelegator(key, resolve);
           _this.subkeyDelegator = delegator;
         }).then(function(keyEvent) {
+          // Allow active cancellation, even if the source should allow passive.
+          // It's an easy and cheap null guard.
           if(keyEvent) {
             PreProcessor.raiseKeyEvent(keyEvent);
           }

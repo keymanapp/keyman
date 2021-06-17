@@ -66,7 +66,7 @@ namespace com.keyman.osk {
 
     // Popup key management
     popupDelay: number = 500;
-    subkeyDeferment: SubkeyDeferment
+    subkeyDelayTimer: number;
     menuEvent: KeyElement; // Used by embedded-mode.
     keytip: KeyTip;
     subkeyPopup: browser.SubkeyPopup;
@@ -1087,15 +1087,13 @@ namespace com.keyman.osk {
     clearPopup() {
       // Remove the displayed subkey array, if any, and cancel popup request
       if(this.subkeyPopup) {
-        this.subkeyPopup.resolve(null);
         this.subkeyPopup.clear();
         this.subkeyPopup = null;
       }
 
-      if(this.subkeyDeferment) {
-          window.clearTimeout(this.subkeyDeferment.timerId);
-          this.subkeyDeferment.resolve(null);
-          this.subkeyDeferment = null;
+      if(this.subkeyDelayTimer) {
+          window.clearTimeout(this.subkeyDelayTimer);
+          this.subkeyDelayTimer = null;
       }
     }
 
@@ -1695,34 +1693,33 @@ namespace com.keyman.osk {
    */
   touchHold(key: KeyElement, force?: boolean) {
     // Clear and restart the popup timer
-    if(this.subkeyDeferment) {
-      window.clearTimeout(this.subkeyDeferment.timerId);
+    if(this.subkeyDelayTimer) {
+      window.clearTimeout(this.subkeyDelayTimer);
       // Cancel the potential subkey event.
-      this.subkeyDeferment.resolve(null);
-      this.subkeyDeferment = null;
+      this.subkeyDelayTimer = null;
     }
 
     if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
       let _this = this;
 
+      // This Promise receives the user's selected subkey, should it exist.
+      // Note:  the OSK's use of this Promise will allow for passive cancellation.
+      //        If cancelled (so, `null`), the Promise ought remain unresolved.
       let promise = new Promise<text.KeyEvent>(function(resolve, reject) {
         let timerId = window.setTimeout(
           function() {
             // It's no longer deferred; it's being fulfilled.
             // Even if the actual subkey itself is still async.
-            _this.subkeyDeferment = null;
+            _this.subkeyDelayTimer = null;
             _this.clearPopup();
             _this.showSubKeys(key, resolve);
           }, force ? 0 : _this.popupDelay);
 
-          _this.subkeyDeferment = {
-            timerId: timerId,
-            resolve: resolve
-          };
+          _this.subkeyDelayTimer = timerId;
       }).then(function(keyEvent: text.KeyEvent) {
+        // Allow active cancellation, even if the source should allow passive.
+        // It's an easy and cheap null guard.
         if(keyEvent) {
-          // Do something.
-          console.log("Promise fulfilled for " + keyEvent.kName);
           PreProcessor.raiseKeyEvent(keyEvent);
         }
       });

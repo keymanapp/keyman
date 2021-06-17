@@ -193,8 +193,10 @@ namespace com.keyman.osk.browser {
     }
 
     clear() {
-      // If not yet resolved, resolve the corresponding Promise.
-      this.resolve(null);
+      // Discard the reference to the Promise's resolve method, allowing
+      // GC to clean it up.  The corresponding Promise's contract allows
+      // passive cancellation.
+      this.resolver = null;
 
       // Remove the displayed subkey array, if any
       if(this.element.parentNode) {
