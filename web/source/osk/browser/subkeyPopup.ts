@@ -4,7 +4,10 @@ namespace com.keyman.osk.browser {
   export class SubkeyPopup {
     public readonly element: HTMLDivElement;
     public readonly shim: HTMLDivElement;
+
+    private vkbd: VisualKeyboard;
     public readonly baseKey: KeyElement;
+    private currentSelection: KeyElement;
     
     private callout: HTMLDivElement;
 
@@ -15,6 +18,10 @@ namespace com.keyman.osk.browser {
       let keyman = com.keyman.singleton;
       this.resolver = resolve;
       
+      this.vkbd = vkbd;
+      this.baseKey = e;
+      this.currentSelection = null;
+
       // A tag we directly set on a key element during its construction.
       let subKeySpec: OSKKeySpec[] = e['subKeys'];
 
@@ -22,7 +29,7 @@ namespace com.keyman.osk.browser {
       // is possible while the array is visible.  So it is simplest to let the keys have
       // position:static and display:inline-block
       var subKeys = this.element = document.createElement('div');
-      this.baseKey = e;
+
       var i;
       subKeys.id='kmw-popup-keys';
 
@@ -76,8 +83,12 @@ namespace com.keyman.osk.browser {
       }
     }
 
-    resolve(keyEvent: text.KeyEvent) {
+    finalize(touch: Touch) {
       if(this.resolver) {
+        let keyEvent: text.KeyEvent = null;
+        if(this.currentSelection) {
+          keyEvent = this.vkbd.initKeyEvent(this.currentSelection, touch);
+        }
         this.resolver(keyEvent);
       }
       this.resolver = null;
@@ -209,6 +220,31 @@ namespace com.keyman.osk.browser {
 
       if(this.callout && this.callout.parentNode) {
         this.callout.parentNode.removeChild(this.callout);
+      }
+    }
+
+    updateTouch(touch: Touch) {
+      let x = touch.clientX;
+      let y = touch.clientY;
+
+      this.currentSelection = null;
+
+      for(let i=0; i < this.baseKey['subKeys'].length; i++) {
+        try {
+          let sk= this.element.childNodes[i].firstChild as KeyElement;
+          let x0 = dom.Utils.getAbsoluteX(sk); 
+          let y0 = dom.Utils.getAbsoluteY(sk);//-document.body.scrollTop;
+          
+          let x1=x0+sk.offsetWidth;
+          let y1=y0+sk.offsetHeight;
+
+          let onKey=(x > x0 && x < x1 && y > y0 && y < y1);
+          if(onKey) {
+            this.baseKey.key.highlight(false);
+            this.currentSelection = sk;
+          }
+          sk.key.highlight(onKey);
+        } catch(ex){}
       }
     }
   }

@@ -566,12 +566,11 @@ namespace com.keyman.osk {
           this.highlightKey(this.keyPending, false);
 
           if(this.subkeyPopup) {
-            let keyEvent = this.initKeyEvent(this.keyPending, this.touchPending);
-            this.subkeyPopup.resolve(keyEvent);
+            this.subkeyPopup.updateTouch(e.changedTouches[0]);
+            this.subkeyPopup.finalize(e.changedTouches[0]);
           } else {
             this.modelKeyClick(this.keyPending, this.touchPending);
           }
-          this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
           this.touchCount--;
@@ -597,19 +596,18 @@ namespace com.keyman.osk {
       // Clear repeated backspace if active, preventing 'sticky' behavior.
       this.cancelDelete();
 
-      if((sk && sk.style.visibility == 'visible')) {
+      if((this.subkeyPopup && this.subkeyPopup.element.style.visibility == 'visible')) {
         // Ignore release if a multiple touch
         if(e.touches.length > 0) {
           return;
         }
 
-        // Cancel (but do not execute) pending key if neither a popup key or the base key
-        if((t == null) || (!(t.key instanceof browser.OSKSubKey) && (t.id != this.subkeyPopup.baseKey.id))) {
-          this.highlightKey(this.keyPending,false);
-          this.clearPopup();
-          this.keyPending = null;
-          this.touchPending = null;
-        }
+        this.subkeyPopup.finalize(e.changedTouches[0]);
+        this.highlightKey(this.keyPending,false);
+        this.keyPending = null;
+        this.touchPending = null;
+
+        return;
       }
 
       // Only set when embedded in our Android/iOS app.  Signals that the device is handling
@@ -643,12 +641,7 @@ namespace com.keyman.osk {
         
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          if(this.subkeyPopup) {
-            let keyEvent = this.initKeyEvent(this.keyPending, e.changedTouches[0]);
-            this.subkeyPopup.resolve(keyEvent);
-          } else {
-            this.modelKeyClick(this.keyPending, e.changedTouches[0]);
-          }
+          this.modelKeyClick(this.keyPending, e.changedTouches[0]);
         }
         this.clearPopup();
         this.keyPending = null;
@@ -716,6 +709,11 @@ namespace com.keyman.osk {
         return;
       }
 
+      // Clear previous key highlighting
+      if(!this.subkeyPopup && key0 && key1 && key1 !== key0) {
+        this.highlightKey(key0,false);
+      }
+
       // Do not move over keys if device popup visible
       if(this.popupVisible) {
         if(key1 == null) {
@@ -743,51 +741,33 @@ namespace com.keyman.osk {
         return;
       }
 
-      var sk=this.subkeyPopup
+      this.currentTarget = null;
 
-      // Use the popup duplicate of the base key if a phone with a visible popup array
-      if(sk && sk.element.style.visibility == 'visible' && this.device.formFactor == 'phone' && key1 == sk.baseKey) {
-        key1 = <KeyElement> sk.element.childNodes[0].firstChild;
+      // If popup is visible, need to move over popup, not over main keyboard
+      this.highlightSubKeys(key1,x,y);
+
+      if(this.subkeyPopup) {
+        this.subkeyPopup.updateTouch(e.touches[0]);
+        return;
       }
 
       // Identify current touch position (to manage off-key release)
       this.currentTarget = key1;
 
-      // Clear previous key highlighting
-      if(key0 && key1 && key1 !== key0) {
+      // _Box has (most of) the useful client values.
+      let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
+      let height = this.kbdDiv.offsetHeight;
+      // We need to adjust the offset properties by any offsets related to the active banner.
+
+      // Determine the y-threshold at which touch-cancellation should automatically occur.
+      let rowCount = this.layers[this.layerIndex].row.length;
+      let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
+      var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold) : 5;
+      if(key0 && e.touches[0].pageY < yMin) {
         this.highlightKey(key0,false);
-      }
-
-      // If popup is visible, need to move over popup, not over main keyboard
-      this.highlightSubKeys(key1,x,y);
-
-      if(sk && sk.element.style.visibility == 'visible') {
-        // Once a subkey array is displayed, do not allow changing the base key.
-        // Keep that array visible and accept no other options until the touch ends.
-        if(key1 && key1.id.indexOf('popup') < 0 && key1 != this.subkeyPopup.baseKey) {
-          return;
-        }
-
-        // Highlight the base key on devices that do not append it to the subkey array.
-        if(key1 && key1 == this.subkeyPopup.baseKey) {
-          this.highlightKey(key1,true);
-        }
-        // Cancel touch if moved up and off keyboard, unless popup keys visible
-      } else {
-        // _Box has (most of) the useful client values.
-        let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
-        let height = this.kbdDiv.offsetHeight;
-
-        // Determine the y-threshold at which touch-cancellation should automatically occur.
-        let rowCount = this.layers[this.layerIndex].row.length;
-        let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
-        var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold) : 5;
-        if(key0 && e.touches[0].pageY < yMin) {
-          this.highlightKey(key0,false);
-          this.showKeyTip(null,false);
-          this.keyPending = null;
-          this.touchPending = null;
-        }
+        this.showKeyTip(null,false);
+        this.keyPending = null;
+        this.touchPending = null;
       }
 
       // Replace the target key, if any, by the new target key
@@ -806,24 +786,6 @@ namespace com.keyman.osk {
       if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
         //  Display the touch-hold keys (after a pause)
         this.touchHold(key1);
-        /*
-        // Clear and restart the popup timer
-        if(this.subkeyDelayTimer)
-        {
-          window.clearTimeout(this.subkeyDelayTimer);
-          this.subkeyDelayTimer = null;
-        }
-        if(key1.subKeys != null)
-        {
-          this.subkeyDelayTimer = window.setTimeout(
-            function()
-            {
-              this.clearPopup();
-              this.showSubKeys(key1);
-            }.bind(this),
-            this.popupDelay);
-        }
-        */
       }
     }.bind(this);
 
@@ -1728,6 +1690,7 @@ namespace com.keyman.osk {
         if(keyEvent) {
           PreProcessor.raiseKeyEvent(keyEvent);
         }
+        _this.clearPopup();
       });
     }
   };
