@@ -3,14 +3,9 @@
 /// <reference path="oskBaseKey.ts" />
 /// <reference path="keytip.interface.ts" />
 /// <reference path="browser/keytip.ts" />
-/// <reference path="browser/subkeyPopup.ts" />
+/// <reference path="browser/pendingLongpress.ts" />
 
 namespace com.keyman.osk {
-  interface SubkeyDeferment {
-    timerId: number;
-    resolve: (KeyEvent) => void;
-  }
-
   export class VisualKeyboard {
     // Legacy alias, maintaining a reference for code built against older
     // versions of KMW.
@@ -64,11 +59,10 @@ namespace com.keyman.osk {
     currentTarget: KeyElement;
 
     // Popup key management
-    popupDelay: number = 500;
-    subkeyDelayTimer: number;
     menuEvent: KeyElement; // Used by embedded-mode.
     keytip: KeyTip;
     subkeyPopup: browser.SubkeyPopup;
+    browserPendingLongpress: browser.PendingLongpress;
     embeddedPendingLongpress: any; // a temp, intermediate property during subkey abstraction work
     subkeyDelegator: any; // a temp, intermediate property during subkey abstraction work
 
@@ -1059,35 +1053,9 @@ namespace com.keyman.osk {
         this.subkeyPopup = null;
       }
 
-      if(this.subkeyDelayTimer) {
-          window.clearTimeout(this.subkeyDelayTimer);
-          this.subkeyDelayTimer = null;
+      if(this.browserPendingLongpress) {
+        this.browserPendingLongpress.cancel();
       }
-    }
-
-    //#region 'native'-mode subkey handling
-    /**
-     * Display touch-hold array of 'sub-keys' above the currently touched key
-     * @param       {Object}    e      primary key element
-     */
-    showSubKeys(e: KeyElement, resolve: (KeyElement) => void) {
-      // Do not show subkeys if key already released
-      if(this.keyPending == null) {
-        return;
-      }
-
-      // Clear key preview if any
-      this.showKeyTip(null,false);
-
-      let subKeys = this.subkeyPopup = new browser.SubkeyPopup(this, e, resolve);
-
-      // Otherwise append the touch-hold (subkey) array to the OSK
-      let keyman = com.keyman.singleton;
-      keyman.osk._Box.appendChild(subKeys.element);
-      keyman.osk._Box.appendChild(subKeys.shim);
-
-      // Must be placed after its `.element` has been inserted into the DOM.
-      subKeys.reposition(this);
     }
 
     //#endregion
@@ -1661,37 +1629,46 @@ namespace com.keyman.osk {
    */
   touchHold(key: KeyElement, force?: boolean) {
     // Clear and restart the popup timer
-    if(this.subkeyDelayTimer) {
-      window.clearTimeout(this.subkeyDelayTimer);
-      // Cancel the potential subkey event.
-      this.subkeyDelayTimer = null;
+    if(this.browserPendingLongpress) {
+      this.browserPendingLongpress.cancel();
     }
 
     if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
       let _this = this;
 
-      // This Promise receives the user's selected subkey, should it exist.
-      // Note:  the OSK's use of this Promise will allow for passive cancellation.
-      //        If cancelled (so, `null`), the Promise ought remain unresolved.
-      let promise = new Promise<text.KeyEvent>(function(resolve, reject) {
-        let timerId = window.setTimeout(
-          function() {
-            // It's no longer deferred; it's being fulfilled.
-            // Even if the actual subkey itself is still async.
-            _this.subkeyDelayTimer = null;
-            _this.clearPopup();
-            _this.showSubKeys(key, resolve);
-          }, force ? 0 : _this.popupDelay);
+      // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
+      // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
+      this.browserPendingLongpress = new browser.PendingLongpress(this, key);
+      this.browserPendingLongpress.promise.then(function(subkeyPopup) {
+        _this.browserPendingLongpress = null;
+        if(subkeyPopup) {
+          // Clear key preview if any
+          _this.showKeyTip(null,false);
 
-          _this.subkeyDelayTimer = timerId;
-      }).then(function(keyEvent: text.KeyEvent) {
-        // Allow active cancellation, even if the source should allow passive.
-        // It's an easy and cheap null guard.
-        if(keyEvent) {
-          PreProcessor.raiseKeyEvent(keyEvent);
+          _this.subkeyPopup = subkeyPopup;
+          subkeyPopup.promise.then(function(keyEvent: text.KeyEvent) {
+            // Allow active cancellation, even if the source should allow passive.
+            // It's an easy and cheap null guard.
+            if(keyEvent) {
+              PreProcessor.raiseKeyEvent(keyEvent);
+            }
+            _this.clearPopup();
+          });
+
+           // Otherwise append the touch-hold (subkey) array to the OSK
+           let keyman = com.keyman.singleton;
+           keyman.osk._Box.appendChild(subkeyPopup.element);
+           keyman.osk._Box.appendChild(subkeyPopup.shim);
+
+           // Must be placed after its `.element` has been inserted into the DOM.
+           subkeyPopup.reposition(_this);
         }
-        _this.clearPopup();
       });
+
+      if(force) {
+        // Instantly resolves the first-level promise.
+        this.browserPendingLongpress.showSubkeys();
+      }
     }
   };
 

@@ -11,12 +11,18 @@ namespace com.keyman.osk.browser {
     
     private callout: HTMLDivElement;
 
+    public promise: Promise<text.KeyEvent>;
+
     // Resolves the promise that generated this SubkeyPopup.
     private resolver: (keyEvent: text.KeyEvent) => void;
 
-    constructor(vkbd: VisualKeyboard, e: KeyElement, resolve: (keyEvent: text.KeyEvent) => void) {
+    constructor(vkbd: VisualKeyboard, e: KeyElement) {
       let keyman = com.keyman.singleton;
-      this.resolver = resolve;
+      let _this = this;
+
+      this.promise = new Promise<text.KeyEvent>(function(resolve) {
+        _this.resolver = resolve;
+      })
       
       this.vkbd = vkbd;
       this.baseKey = e;

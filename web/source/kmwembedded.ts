@@ -150,8 +150,6 @@ namespace com.keyman.text {
   // Skip full page initialization - skips native-mode only code
   keymanweb.isEmbedded = true;
 
-  com.keyman.osk.VisualKeyboard.prototype.popupDelay = 400;  // Delay must be less than native touch-hold delay 
-  
   // Set default device options
   keymanweb.setDefaultDeviceOptions = function(opt) {
     opt['attachType'] = 'manual';
