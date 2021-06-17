@@ -1,4 +1,11 @@
-kmflcomp (14.0.273-1) unstable; urgency=medium
+kmflcomp (14.0.276-1) experimental; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 11 Jun 2021 14:43:20 +0200
+
+kmflcomp (14.0.273-1) experimental; urgency=medium
 
   * Keyman 14
 
