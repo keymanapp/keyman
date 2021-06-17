@@ -1329,9 +1329,7 @@ namespace com.keyman.keyboards {
     private languageUnavailable(languageName: string): string {
       let msg = 'No keyboards are available for '+ languageName + '. '
         +'Does it have another language name?';
-      if (this.keymanweb.options['useAlerts']=='true') {
-        this.keymanweb.util.alert(msg);
-      }
+      this.keymanweb.util.alert(msg);
       return msg;
     }
 
