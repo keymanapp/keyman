@@ -1211,16 +1211,13 @@ namespace com.keyman.keyboards {
           if (!languageFound) {
             // TODO: Construct response array of errors (failed-query keyboards)
             // that will be merged with stubs (successfully-queried keyboards)
-            console.error('No keyboards are available for '+lgName+'. '+
-              'Does it have another language name?');
+            let msg = this.languageUnavailable(lgName);
+            console.error(msg);
           }
         }
 
         if(cmd == '') {
-          // TODO: Check useAlert flag to determine whether or not KeymanWeb should display its own alert messages
-          let msg = 'No keyboards are available for '+languages[0]+'. '
-              +'Does it have another language name?';
-          this.keymanweb.util.alert(msg);
+          let msg = this.languageUnavailable(languages[0]);
           return Promise.reject(new Error(msg));
         } else {
           return this.keymanCloudRequest('&keyboardid='+cmd, false);
@@ -1322,6 +1319,20 @@ namespace com.keyman.keyboards {
       });
 
       return promise;
+    }
+
+    /**
+     * Display warning if language name unavailable to add keyboard
+     * @param {string} languageName
+     * @returns string of Error message
+     */
+    private languageUnavailable(languageName: string): string {
+      let msg = 'No keyboards are available for '+ languageName + '. '
+        +'Does it have another language name?';
+      if (this.keymanweb.options['useAlerts']=='true') {
+        this.keymanweb.util.alert(msg);
+      }
+      return msg;
     }
 
     /**

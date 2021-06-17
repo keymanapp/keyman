@@ -715,7 +715,7 @@ namespace com.keyman {
       }
 
       if(eot != '' && (eot.indexOf('/') < 0)) {
-      eot = this.keyman.options['fonts']+eot;
+        eot = this.keyman.options['fonts']+eot;
       }
 
       if(svg != '' && (svg.indexOf('/') < 0)) {
@@ -951,22 +951,24 @@ namespace com.keyman {
     }
 
     /**
-     * Customized alert
+     * Customized alert. This is enabled/disabled by the option flag 'useAlerts'
      *
      * @param     {string}        s       alert text
      * @param     {function()=}   fn      function to call when alert dismissed
      */
     alert(s: string, fn?: () => void): void {
-      var bg = this.waiting, nn=bg.firstChild.childNodes;
-      (nn[0] as HTMLElement).style.display='block';
-      (nn[1] as HTMLElement).className='kmw-alert-text';
-      (nn[1] as HTMLElement).innerHTML=s;
-      (nn[2] as HTMLElement).style.display='none';
-      bg.style.display='block';
-      if(arguments.length > 1) {
-        bg.dismiss=fn;
-      } else {
-        bg.dismiss=null;
+      if (this.keyman.options['useAlerts']=='true') {
+        var bg = this.waiting, nn=bg.firstChild.childNodes;
+        (nn[0] as HTMLElement).style.display='block';
+        (nn[1] as HTMLElement).className='kmw-alert-text';
+        (nn[1] as HTMLElement).innerHTML=s;
+        (nn[2] as HTMLElement).style.display='none';
+        bg.style.display='block';
+        if(arguments.length > 1) {
+          bg.dismiss=fn;
+        } else {
+          bg.dismiss=null;
+        }
       }
     }
 

@@ -36,9 +36,24 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
+      // Thank you to https://stackoverflow.com/questions/22607150/getting-the-url-parameters-inside-the-html-page.
+      var GetURLParameter = function(sParam) {
+        var sPageURL = window.location.search.substring(1);
+        var sURLVariables = sPageURL.split('&');
+        for (var i = 0; i < sURLVariables.length; i++) {
+          var sParameterName = sURLVariables[i].split('=');
+          if (sParameterName[0] == sParam) {
+            return sParameterName[1];
+          }
+        }
+      };
+
+      var alertType = GetURLParameter("mode");
+      var alertText = alertType ? alertType : 'enabled (default)';
+
       var kmw=window.keyman;
       kmw.init({
-		    attachType:'auto'
+        useAlerts: alertType == "disabled" ? 'false' : 'true'
       }).then(function() {
         loadKeyboards();
       });
@@ -53,8 +68,18 @@
   <body>
     <h2>KeymanWeb Sample Page - Promise API</h2>
     <p>This page is for testing the Promises returned from adding keyboards.
-	  See <a href="https://github.com/keymanapp/keyman/issues/5044">Specification #5044</a>
+      See <a href="https://github.com/keymanapp/keyman/issues/5044">Specification #5044</a>
     </p>
+
+    <p id="modeSelect">You are currently testing under the alerts <em id="mode"> </em> mode.
+    Two alert modes are available:
+    <a id="alert_disabled" href="./index.html?mode=disabled">Disabled</a> or
+    <a id="alert_default" href="./index.html">Enabled (Default)</a><p>
+
+    <script>
+      document.getElementById("mode").textContent = alertText;
+    </script>
+
     <div>
     <!--
       The following DIV is used to position the Button or Toolbar User Interfaces on the page.

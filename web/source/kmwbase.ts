@@ -80,7 +80,10 @@ namespace com.keyman {
       'fonts':'',
       'attachType':'',
       'ui':null,
-      'setActiveOnRegister':'true'
+      'setActiveOnRegister':'true',
+
+      // Determines whether or not KeymanWeb should display its own alert messages
+      'useAlerts':'true' 
     };
 
 
