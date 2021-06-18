@@ -1211,13 +1211,12 @@ namespace com.keyman.keyboards {
           if (!languageFound) {
             // TODO: Construct response array of errors (failed-query keyboards)
             // that will be merged with stubs (successfully-queried keyboards)
-            console.error(this.languageUnavailable(lgName));
+            console.error(this.alertLanguageUnavailable(lgName));
           }
         }
 
         if(cmd == '') {
-          let msg = this.languageUnavailable(languages[0]);
-          return Promise.reject(new Error(msg));
+          return Promise.reject(new Error(this.alertLanguageUnavailable(languages[0])));
         } else {
           return this.keymanCloudRequest('&keyboardid='+cmd, false);
         }

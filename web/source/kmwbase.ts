@@ -28,6 +28,20 @@
    Copyright 2017-2019 SIL International
 ***/
 namespace com.keyman {
+
+  export interface OptionType {
+    root: string;
+    resources: string;
+    keyboards: string;
+    fonts: string;
+    attachType: string; // 'auto', 'manual', 'default'
+    ui: string;
+    setActiveOnRegister: string; // TODO: Convert to boolean
+
+    // Determines whether or not KeymanWeb should display its own alert messages
+    useAlerts: boolean;
+  }
+
   export class KeymanBase {
     _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
     _IE = 0;                   // browser version identification
@@ -73,19 +87,18 @@ namespace com.keyman {
     touchAliasing: dom.DOMEventHandlers;
 
     // Defines option-tracking object as a string map.
-    options: { [name: string]: string; } = {
-      'root':'',
-      'resources':'',
-      'keyboards':'',
-      'fonts':'',
-      'attachType':'',
-      'ui':null,
-      'setActiveOnRegister':'true',
+    options: OptionType = {
+      root: '',
+      resources: '',
+      keyboards: '',
+      fonts: '',
+      attachType: '',
+      ui: null,
+      setActiveOnRegister: 'true', // TODO: convert to boolean
 
       // Determines whether or not KeymanWeb should display its own alert messages
-      'useAlerts':'true' 
+      useAlerts: true
     };
-
 
     // Stub functions (defined later in code only if required)
     setDefaultDeviceOptions(opt){}
