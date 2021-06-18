@@ -37,23 +37,23 @@
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       // Thank you to https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
-      var getUrlParameter = function(sParam) {
-        var paramsString = "&mode="
-        var searchParams = new URLSearchParams(paramString);
+      var getUrlParameter = function() {
+        var paramsString = "?useAlerts="
+        var searchParams = new URLSearchParams(window.location.search);
 
-        if (searchParams.has("mode") === true) {
-          return searchParams.get("mode");
+        if (searchParams.has("useAlerts") === true) {
+          return searchParams.get("useAlerts");
         }
 
-        return false;
+        return true;
       };
 
-      var alertType = getUrlParameter("mode");
-      var alertText = alertType ? alertType : 'enabled (default)';
+      var alertType = getUrlParameter();
+      var alertText = alertType == "false" ? 'disabled': 'enabled(default)';
 
       var kmw=window.keyman;
       kmw.init({
-        useAlerts: alertType == "disabled" ? false : true
+        useAlerts: alertType
       }).then(function() {
         loadKeyboards();
       });
@@ -73,7 +73,7 @@
 
     <p id="modeSelect">You are currently testing under the alerts <em id="mode"> </em> mode.
     Two alert modes are available:
-    <a id="alert_disabled" href="./index.html?mode=disabled">Disabled</a> or
+    <a id="alert_disabled" href="./index.html?useAlerts=false">Disabled</a> or
     <a id="alert_default" href="./index.html">Enabled (Default)</a></p>
 
     <script>
