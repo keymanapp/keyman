@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.71 alpha 2021-06-18
+
+* feat(common): keyboard_processor wasm build (#5233)
+* chore(linux): Update changelogs to match Debian 🍒 (#5304)
+
 ## 15.0.70 alpha 2021-06-17
 
 * fix(web): touch-move cancellation (#5290)
