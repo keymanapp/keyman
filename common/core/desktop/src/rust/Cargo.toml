@@ -1,7 +1,0 @@
-[package]
-name = "rust_mock_processor"
-version = "0.1.0"
-
-[lib]
-name = "rust_mock_processor"
-crate-type = ["staticlib"]

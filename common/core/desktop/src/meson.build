@@ -48,6 +48,13 @@ if compiler.get_id() == 'msvc'
   links = []
 endif
 
+if compiler.get_id() == 'emscripten'
+  warns = []
+  flags = []
+  defns = []
+  links = []
+endif
+
 lib = library('kmnkbp0',
   'option.cpp',
   'keyboard.cpp',
