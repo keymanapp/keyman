@@ -100,19 +100,6 @@ namespace com.keyman.text {
       this._dks = dks.clone();
     }
 
-    private preventSurrogatePairSplit(text, pos) {
-      if(pos == 0 || pos >= text.length()) {
-        return pos;
-      }
-      let potentialHigh = text.charCodeAt(pos-1);
-      let potentialLow  = text.charCodeAt(pos);
-      if(potentialHigh >= 0xD800 && potentialHigh <= 0xDBFF &&
-          potentialLow >= 0xDC00 && potentialLow <= 0xDFFF) {
-        return pos - 1;
-      }
-      return pos;
-    }
-
     /**
      * Determines the basic operations needed to reconstruct the current OutputTarget's text from the prior state specified
      * by another OutputTarget based on their text and caret positions.
@@ -137,7 +124,6 @@ namespace com.keyman.text {
 
       // 1.1:  use a non-SMP-aware binary search to determine the divergence point.
       let start = Math.max(0, maxLeftMatch-128);
-      //start = this.preventSurrogatePairSplit(from, start);
       let end = maxLeftMatch;  // the index AFTER the last possible matching char.
 
       // This search is O(maxLeftMatch).  1/2 + 1/4 + 1/8 + ... converges to = 1.
