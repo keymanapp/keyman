@@ -53,7 +53,7 @@ namespace com.keyman.text {
      * Simulate a keystroke according to the touched keyboard button element
      *
      * Handles default output and keyboard processing for both OSK and physical keystrokes.
-     * 
+     *
      * @param       {Object}      keyEvent      The abstracted KeyEvent to use for keystroke processing
      * @param       {Object}      outputTarget  The OutputTarget receiving the KeyEvent
      * @returns     {Object}                    A RuleBehavior object describing the cumulative effects of
@@ -105,9 +105,10 @@ namespace com.keyman.text {
       if(keyEvent.kNextLayer) {
         this.keyboardProcessor.selectLayer(keyEvent);
       }
-      
+
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(ruleBehavior != null) {
+/* #5258: Disable 'fat finger algorithm for performance reasons
         let alternates: Alternate[];
 
         // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
@@ -117,11 +118,11 @@ namespace com.keyman.text {
           if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
             let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
-    
+
             let totalMass = 0; // Tracks sum of non-error probabilities.
             for(let pair of keyEvent.keyDistribution) {
               let mock = Mock.from(preInputMock);
-              
+
               let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
               if(!altKey) {
                 console.warn("Potential fat-finger key could not be found in layer!");
@@ -130,12 +131,12 @@ namespace com.keyman.text {
 
               let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, keyEvent.device);
               let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
-              
+
               // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
               // so we expect users to never intend their use.
               if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
                 let transform: Transform = alternateBehavior.transcription.transform;
-                
+
                 // Ensure that the alternate's token id matches that of the current keystroke, as we only
                 // record the matched rule's context (since they match)
                 transform.id = ruleBehavior.transcription.token;
@@ -153,15 +154,17 @@ namespace com.keyman.text {
             });
           }
         }
-
+*/
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
         ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
 
         // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
-        
+
         // Notify the ModelManager of new input - it's predictive text time!
+/* #5258: disable fat finger algorithm for performance reasons
         ruleBehavior.transcription.alternates = alternates;
+*/
         // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
         ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription);
 
