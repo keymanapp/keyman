@@ -41,15 +41,11 @@
         var paramsString = "?useAlerts="
         var searchParams = new URLSearchParams(window.location.search);
 
-        if (searchParams.has("useAlerts") === true) {
-          return searchParams.get("useAlerts");
-        }
-
-        return true;
+        return searchParams.get("useAlerts") == "false" ? false : true;
       };
 
       var alertType = getUrlParameter();
-      var alertText = alertType == "false" ? 'disabled': 'enabled(default)';
+      var alertText = alertType == false ? 'disabled': 'enabled(default)';
 
       var kmw=window.keyman;
       kmw.init({
