@@ -964,11 +964,7 @@ namespace com.keyman {
         (nn[1] as HTMLElement).innerHTML=s;
         (nn[2] as HTMLElement).style.display='none';
         bg.style.display='block';
-        if(arguments.length > 1) {
-          bg.dismiss=fn;
-        } else {
-          bg.dismiss=null;
-        }
+        bg.dismiss = arguments.length > 1 ? fn : null;
       }
     }
 

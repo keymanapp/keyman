@@ -1211,8 +1211,7 @@ namespace com.keyman.keyboards {
           if (!languageFound) {
             // TODO: Construct response array of errors (failed-query keyboards)
             // that will be merged with stubs (successfully-queried keyboards)
-            let msg = this.languageUnavailable(lgName);
-            console.error(msg);
+            console.error(this.languageUnavailable(lgName));
           }
         }
 
@@ -1326,7 +1325,7 @@ namespace com.keyman.keyboards {
      * @param {string} languageName
      * @returns string of Error message
      */
-    private languageUnavailable(languageName: string): string {
+    private alertLanguageUnavailable(languageName: string): string {
       let msg = 'No keyboards are available for '+ languageName + '. '
         +'Does it have another language name?';
       this.keymanweb.util.alert(msg);
