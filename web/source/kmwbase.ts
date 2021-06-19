@@ -34,7 +34,7 @@ namespace com.keyman {
     resources: string;
     keyboards: string;
     fonts: string;
-    attachType: string; // 'auto', 'manual', 'default'
+    attachType: undefined | 'auto' | 'manual';
     ui: string;
     setActiveOnRegister: string; // TODO: Convert to boolean
 
