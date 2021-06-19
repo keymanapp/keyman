@@ -957,7 +957,7 @@ namespace com.keyman {
      * @param     {function()=}   fn      function to call when alert dismissed
      */
     alert(s: string, fn?: () => void): void {
-      if (this.keyman.options.useAlerts == true) {
+      if (this.keyman.options.useAlerts) {
         var bg = this.waiting, nn=bg.firstChild.childNodes;
         (nn[0] as HTMLElement).style.display='block';
         (nn[1] as HTMLElement).className='kmw-alert-text';
