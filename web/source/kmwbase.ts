@@ -30,16 +30,16 @@
 namespace com.keyman {
 
   export interface OptionType {
-    root: string;
-    resources: string;
-    keyboards: string;
-    fonts: string;
-    attachType: undefined | 'auto' | 'manual';
-    ui: string;
-    setActiveOnRegister: string; // TODO: Convert to boolean
+    root?: string;
+    resources?: string;
+    keyboards?: string;
+    fonts?: string;
+    attachType?: 'auto' | 'manual';
+    ui?: string;
+    setActiveOnRegister?: string; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
 
     // Determines whether or not KeymanWeb should display its own alert messages
-    useAlerts: boolean;
+    useAlerts?: boolean;
   }
 
   export class KeymanBase {
@@ -92,7 +92,6 @@ namespace com.keyman {
       resources: '',
       keyboards: '',
       fonts: '',
-      attachType: undefined,
       ui: null,
       setActiveOnRegister: 'true', // TODO: convert to boolean
 
