@@ -114,13 +114,41 @@ namespace com.keyman.text {
         // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
         // Also, don't do fat-finger stuff if predictive text isn't enabled.
         if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
+          let keyDistribution = keyEvent.keyDistribution;
+
           // Note - we don't yet do fat-fingering with longpress keys.
-          if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
+          if(keyDistribution && keyEvent.kbdLayer) {
+            // Tracks a 'deadline' for fat-finger ops, just in case both context is long enough
+            // and device is slow enough that the calculation takes too long.
+            //
+            // Consider use of https://developer.mozilla.org/en-US/docs/Web/API/Performance/now instead?
+            // Would allow finer-tuned control.
+            let TIMEOUT_THRESHOLD = Date.now() + 16; // + 16ms.
+
+            // Tracks a minimum probability for keystroke probability.  Anything less will not be
+            // included in alternate calculations. 
+            //
+            // Seek to match SearchSpace.EDIT_DISTANCE_COST_SCALE from the predictive-text engine.
+            // Reasoning for the selected value may be seen there.  Short version - keystrokes 
+            // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
+            let KEYSTROKE_EPSILON = Math.exp(-5);
+
+            // Sort the distribution into probability-descending order.
+            keyDistribution.sort(function(a, b) {
+              return b.p - a.p;
+            });
+
             let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
     
             let totalMass = 0; // Tracks sum of non-error probabilities.
-            for(let pair of keyEvent.keyDistribution) {
+            for(let pair of keyDistribution) {
+              if(pair.p < KEYSTROKE_EPSILON) {
+                break;
+              } else if(Date.now() >= TIMEOUT_THRESHOLD) {
+                break;
+              }
+
               let mock = Mock.from(preInputMock);
               
               let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
