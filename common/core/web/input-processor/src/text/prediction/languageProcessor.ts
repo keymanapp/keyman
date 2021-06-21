@@ -51,29 +51,6 @@ namespace com.keyman.text.prediction {
    */
   export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
 
-  export class TranscriptionContext implements Context {
-    left: string;
-    right?: string;
-
-    startOfBuffer: boolean;
-    endOfBuffer: boolean;
-
-    constructor(mock: Mock, config: Configuration) {
-      this.left = mock.getTextBeforeCaret();
-      this.startOfBuffer = this.left._kmwLength() <= config.leftContextCodePoints;
-      if(!this.startOfBuffer) {
-        // Our custom substring version will return the last n characters if param #1 is given -n.
-        this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
-      }
-
-      this.right = mock.getTextAfterCaret();
-      this.endOfBuffer = this.right._kmwLength() <= config.rightContextCodePoints;
-      if(!this.endOfBuffer) {
-        this.right = this.right._kmwSubstr(0, config.rightContextCodePoints);
-      }
-    }
-  }
-
   export class ReadySuggestions {
     suggestions: Suggestion[];
     transcriptionID: number;
@@ -193,7 +170,7 @@ namespace com.keyman.text.prediction {
         return null;
       }
 
-      let context = new TranscriptionContext(Mock.from(target), this.configuration);
+      let context = new ContextWindow(Mock.from(target), this.configuration);
       return this.lmEngine.wordbreak(context);
     }
 
@@ -247,7 +224,7 @@ namespace com.keyman.text.prediction {
 
         // Builds the reversion option according to the loaded lexical model's known
         // syntactic properties.
-        let suggestionContext = new TranscriptionContext(original.preInput, this.configuration);
+        let suggestionContext = new ContextWindow(original.preInput, this.configuration);
 
         // We must accept the Suggestion from its original context, which was before
         // `original.transform` was applied.
@@ -307,7 +284,7 @@ namespace com.keyman.text.prediction {
       outputTarget.apply(transform);
 
       // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-      let promise = this.lmEngine.revertSuggestion(reversion, new TranscriptionContext(original.preInput, this.configuration))
+      let promise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration))
 
       let lp = this;
       return promise.then(function(suggestions: Suggestion[]) {
@@ -338,7 +315,7 @@ namespace com.keyman.text.prediction {
         return null;
       }
 
-      let context = new TranscriptionContext(transcription.preInput, this.configuration);
+      let context = new ContextWindow(transcription.preInput, this.configuration);
       this.recordTranscription(transcription);
 
       if(resetContext) {
