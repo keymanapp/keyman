@@ -217,18 +217,24 @@ extension KeymanWebViewController {
 
   func setText(_ text: String?) {
     var text = text ?? ""
+
     // Remove any system-added LTR/RTL marks.
     text = text.replacingOccurrences(of: "\u{200e}", with: "") // Unicode's LTR codepoint
     text = text.replacingOccurrences(of: "\u{200f}", with: "") // Unicode's RTL codepoint (v1)
     text = text.replacingOccurrences(of: "\u{202e}", with: "") // Unicode's RTL codepoint (v2)
 
-    // JavaScript escape-sequence encodings.
-    text = text.replacingOccurrences(of: "\\", with: "\\\\")
-    text = text.replacingOccurrences(of: "'", with: "\\'")
-    text = text.replacingOccurrences(of: "\n", with: "\\n")
+    do {
+      let encodingArray = [ text ];
+      let jsonString = try String(data: JSONSerialization.data(withJSONObject: encodingArray), encoding: .utf8)!
+      let start = jsonString.index(jsonString.startIndex, offsetBy: 2)
+      let end = jsonString.index(jsonString.endIndex, offsetBy: -2)
+      let jsonText = jsonString[start..<end]
 
-    self.currentText = text
-    webView!.evaluateJavaScript("setKeymanVal('\(text)');", completionHandler: nil)
+      self.currentText = String(jsonText)
+      webView!.evaluateJavaScript("setKeymanVal(\"\(jsonText)\");", completionHandler: nil)
+    } catch {
+      SentryManager.captureAndLog(error.localizedDescription)
+    }
   }
   
   func resetContext() {
