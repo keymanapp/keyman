@@ -1,0 +1,77 @@
+#!/bin/bash
+
+set -e
+set -u
+
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+THIS_DIR=$(dirname $THIS_SCRIPT)
+
+function display_usage {
+  echo "Usage: $0 [--man] [--md]"
+  echo "       $0 --help"
+  echo
+  echo "  --help     displays this screen and exits"
+  echo "  --man      generate man pages from python files"
+  echo "  --md       generate markdown help pages from python files"
+  echo
+  echo "If neither --man nor --md is specified, both man and help pages are generated."
+}
+
+generate_man=
+generate_help=
+
+if [[ $# -eq 0 ]]; then
+    generate_man=1
+    generate_help=1
+fi
+
+while [[ $# -gt 0 ]] ; do
+  key="$1"
+  case $key in
+    --help|-h)
+      display_usage
+      exit 0
+      ;;
+    --man)
+      generate_man=1
+      ;;
+    --md)
+      generate_help=1
+      ;;
+    *)
+      echo "$0: invalid option: $key"
+      display_usage
+      exit 1
+  esac
+  shift # past the processed argument
+done
+
+pushd $THIS_DIR/.. > /dev/null
+./scripts/reconf.sh keyman-config
+popd > /dev/null
+
+if [ -n "$generate_man" ]; then
+    echo "Generating man pages..."
+    mkdir -p debian/man
+    buildtools/help2man -N ./km-package-get -o debian/man/km-package-get.1 -n "Download a Keyman keyboard package" -I maninc/km-package-get.inc
+    buildtools/help2man -N ./km-package-install -o debian/man/km-package-install.1 -n "Install a Keyman keyboard package" -I maninc/km-package-install.inc
+    buildtools/help2man -N ./km-config -o debian/man/km-config.1 -n "Launches Keyman Configuration for installing and showing information about Keyman keyboards" -I maninc/km-config.inc
+    buildtools/help2man -N ./km-kvk2ldml -o debian/man/km-kvk2ldml.1 -n "Convert a Keyman on-screen keyboard file to LDML" -I maninc/km-kvk2ldml.inc
+    buildtools/help2man -N ./km-package-list-installed -o debian/man/km-package-list-installed.1 -n "List installed Keyman keyboard packages" -I maninc/km-package-list-installed.inc
+    buildtools/help2man -N ./km-package-uninstall -o debian/man/km-package-uninstall.1 -n "Uninstall a Keyman keyboard package" -I maninc/km-package-uninstall.inc
+fi
+
+if [ -n "$generate_help" ]; then
+    echo "Generating markdown help pages..."
+    mkdir -p ../help/reference
+    buildtools/help2md ./km-package-get -o ../help/reference/km-package-get.md -n "Download a Keyman keyboard package" -I maninc/km-package-get.inc
+    buildtools/help2md ./km-package-install -o ../help/reference/km-package-install.md -n "Install a Keyman keyboard package" -I maninc/km-package-install.inc
+    buildtools/help2md ./km-config -o ../help/reference/km-config.md -n "Launches Keyman Configuration for installing and showing information about Keyman keyboards" -I maninc/km-config.inc
+    buildtools/help2md ./km-kvk2ldml -o ../help/reference/km-kvk2ldml.md -n "Convert a Keyman on-screen keyboard file to LDML" -I maninc/km-kvk2ldml.inc
+    buildtools/help2md ./km-package-list-installed -o ../help/reference/km-package-list-installed.md -n "List installed Keyman keyboard packages" -I maninc/km-package-list-installed.inc
+    buildtools/help2md ./km-package-uninstall -o ../help/reference/km-package-uninstall.md -n "Uninstall a Keyman keyboard package" -I maninc/km-package-uninstall.inc
+fi
