@@ -1,6 +1,7 @@
 // Defines a 'polyfill' of sorts for NPM's events module
 /// <reference path="../includes/events.ts" />
 /// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/keyboardProcessor.ts" />
+/// <reference path="contextWindow.ts" />
 /// <reference path="prediction/languageProcessor.ts" />
 
 namespace com.keyman.text {
@@ -100,6 +101,9 @@ namespace com.keyman.text {
       // // ...end I3363 (Build 301)
 
       let preInputMock = Mock.from(outputTarget);
+
+      // We presently need the true keystroke to run on the FULL context.  That index is still
+      // needed for some indexing operations when comparing two different output targets.
       let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget);
 
       // Swap layer as appropriate.
@@ -115,6 +119,13 @@ namespace com.keyman.text {
         // Also, don't do fat-finger stuff if predictive text isn't enabled.
         if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
           let keyDistribution = keyEvent.keyDistribution;
+
+          // We don't need to track absolute indexing during alternate-generation; 
+          // only position-relative, so it's better to use a sliding window for context
+          // when making alternates.  (Slightly worse for short text, matters greatly
+          // for long text.)
+          let contextWindow = new ContextWindow(preInputMock, ContextWindow.ENGINE_RULE_WINDOW);
+          let windowedMock = contextWindow.toMock();
 
           // Note - we don't yet do fat-fingering with longpress keys.
           if(keyDistribution && keyEvent.kbdLayer) {
@@ -149,7 +160,7 @@ namespace com.keyman.text {
                 break;
               }
 
-              let mock = Mock.from(preInputMock);
+              let mock = Mock.from(windowedMock);
               
               let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
               if(!altKey) {
