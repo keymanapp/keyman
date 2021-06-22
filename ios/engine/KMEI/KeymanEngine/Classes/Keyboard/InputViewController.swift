@@ -8,6 +8,7 @@
 
 import AudioToolbox
 import UIKit
+import Sentry
 
 public enum GlobeKeyTapBehaviour {
   case switchToNextKeyboard
@@ -333,13 +334,31 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       return
     }
 
-    for _ in 0..<numCharsToDelete {
+    for i in 0..<numCharsToDelete {
       let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
       textDocumentProxy.deleteBackward()
       let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
       let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
-      let unitsInPoint = InputViewController.isSurrogate(oldContext.utf16.last!) ? 2 : 1
+      var unitsInPoint: Int
 
+      if(oldContext.utf16.last == nil) {
+        // Prevent a fatal crash
+        unitsInPoint = unitsDeleted
+
+        // Gather sanitized diagnostic data to facilitate addressing the issue
+        let event = Event(level: .error)
+        event.message = SentryMessage(formatted: "Unexpected state:  insertText missing context for left-deletions")
+        event.extra = [:]
+        event.extra!["keyboard"] = Manager.shared.currentKeyboard?.id
+        event.extra!["language"] = Manager.shared.currentKeyboard?.languageID
+        event.extra!["deletion index"] = i
+        event.extra!["deletion total"] = numCharsToDelete
+
+        SentryManager.captureAndLog(event)
+      } else {
+        unitsInPoint = InputViewController.isSurrogate(oldContext.utf16.last!) ? 2 : 1
+      }
+      
       // This CAN happen when a surrogate pair is deleted.
       // For example, the emoji 👍🏻 is made of TWO surrogate pairs.
       // Apple's .deleteBackward() implementation will delete both simultaneously,
