@@ -1,4 +1,18 @@
-keyman-keyboardprocessor (14.0.273-1) unstable; urgency=medium
+keyman-keyboardprocessor (14.0.276-2) experimental; urgency=medium
+
+  * Team upload
+  * Build also on riscv64 to facilitate migration on Ubuntu
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Fri, 18 Jun 2021 11:15:38 +0200
+
+keyman-keyboardprocessor (14.0.276-1) experimental; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 11 Jun 2021 14:43:10 +0200
+
+keyman-keyboardprocessor (14.0.273-1) experimental; urgency=medium
 
   * Keyman 14
 

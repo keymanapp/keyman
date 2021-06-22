@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 15.0.71 alpha 2021-06-18
+
+* feat(common): keyboard_processor wasm build (#5233)
+* chore(linux): Update changelogs to match Debian 🍒 (#5304)
+
+## 15.0.70 alpha 2021-06-17
+
+* fix(web): touch-move cancellation (#5290)
+* fix(developer): kmconvert help match reality (#5298)
+
+## 15.0.69 alpha 2021-06-16
+
+* refactor(web): OSK layout calculations - simplification (#5279)
+* refactor(web): VisualKeyboard - key event model (#5280)
+* refactor(web): OSK keytip abstraction (#5287)
+* refactor(web): encapsulation of browser-based subkey array popup (#5288)
+* chore(common): bash version for run-required-test-builds.sh (#5267)
+* fix(linux): Adjust version of dependency for ibus-keyman (#5281)
+
 ## 15.0.68 alpha 2021-06-15
 
 * chore(common): Add YouTube links to Keyman 14 features (#5276)

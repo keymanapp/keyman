@@ -777,9 +777,11 @@ namespace com.keyman.osk {
         // _Box has (most of) the useful client values.
         let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
         let height = this.kbdDiv.offsetHeight;
-        // We need to adjust the offset properties by any offsets related to the active banner.
 
-        var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop + _Box.offsetTop - 0.25*height) : 5;
+        // Determine the y-threshold at which touch-cancellation should automatically occur.
+        let rowCount = this.layers[this.layerIndex].row.length;
+        let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
+        var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold) : 5;
         if(key0 && e.touches[0].pageY < yMin) {
           this.highlightKey(key0,false);
           this.showKeyTip(null,false);
@@ -1182,7 +1184,7 @@ namespace com.keyman.osk {
       if(!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
 
       // For phones, use key preview rather than highlighting the key,
-      var usePreview = ((this.keytip != null)) && key.key.allowsKeyTip();
+      var usePreview = (this.keytip != null) && key.key.allowsKeyTip();
 
       if(usePreview) {
         this.showKeyTip(key,on);

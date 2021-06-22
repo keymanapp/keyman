@@ -605,7 +605,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSString *)packageNameFromFolder:(NSString *)packageFolder {
     NSString *packageName = nil;
     NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
-    NSString *fileContents = [NSString stringWithContentsOfFile:[path stringByAppendingPathComponent:@"kmp.inf"] encoding:NSUTF8StringEncoding error:NULL];
+    NSString *fileContents = [NSString stringWithContentsOfFile:[path stringByAppendingPathComponent:@"kmp.inf"] encoding:NSWindowsCP1252StringEncoding error:NULL];
     NSArray *lines = [fileContents componentsSeparatedByString:@"\n"];
     BOOL hasInfo = NO;
     for (NSString *line in lines) {
@@ -650,7 +650,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSMutableArray *kbs = [NSMutableArray arrayWithCapacity:0];
 
     @try {
-        NSString *fileContents = [[NSString stringWithContentsOfFile:infoFile encoding:NSUTF8StringEncoding error:NULL] stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+        NSString *fileContents = [[NSString stringWithContentsOfFile:infoFile encoding:NSWindowsCP1252StringEncoding error:NULL] stringByReplacingOccurrencesOfString:@"\r" withString:@""];
         NSArray *lines = [fileContents componentsSeparatedByString:@"\n"];
         ContentType contentType = ctUnknown;
         for (NSString *line in lines) {
