@@ -1,3 +1,5 @@
+/// <reference path="oskSubKey.ts" />
+
 namespace com.keyman.osk.browser {
   export class SubkeyPopup {
     public readonly element: HTMLDivElement;
@@ -54,7 +56,7 @@ namespace com.keyman.osk.browser {
           // Use the currently-active layer.
           layer = vkbd.layerId;
         }
-        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], layer);
+        let keyGenerator = new OSKSubKey(subKeySpec[i], layer);
         let kDiv = keyGenerator.construct(vkbd, <KeyElement> e, needsTopMargin);
 
         subKeys.appendChild(kDiv);
