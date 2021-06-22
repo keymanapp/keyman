@@ -1,3 +1,10 @@
+ibus-keyman (14.0.276-2) experimental; urgency=medium
+
+  * Team upload
+  * Build also on riscv64 to facilitate migration on Ubuntu
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Fri, 18 Jun 2021 11:14:59 +0200
+
 ibus-keyman (14.0.276-1) experimental; urgency=medium
 
   * New upstream release
