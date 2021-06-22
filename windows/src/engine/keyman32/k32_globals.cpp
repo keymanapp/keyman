@@ -551,6 +551,14 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
   return dwResult;
 }
 
+extern "C" void  _declspec(dllexport) WINAPI Keyman_PostControllers(UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  // no-op (removed as part of #5060)
+  UNREFERENCED_PARAMETER(msg);
+  UNREFERENCED_PARAMETER(wParam);
+  UNREFERENCED_PARAMETER(lParam);
+}
+
 extern "C" void  _declspec(dllexport) WINAPI Keyman_PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   Globals::PostMasterController(msg, wParam, lParam);
@@ -559,6 +567,13 @@ extern "C" void  _declspec(dllexport) WINAPI Keyman_PostMasterController(UINT ms
 extern "C" LRESULT  _declspec(dllexport) WINAPI Keyman_SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   return Globals::SendMasterController(msg, wParam, lParam);
+}
+
+extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_RegisterControllerWindow(HWND hwnd)
+{
+  // no-op (removed as part of #5060)
+  UNREFERENCED_PARAMETER(hwnd);
+  return TRUE;
 }
 
 extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_RegisterControllerThread(DWORD tid)
@@ -596,6 +611,13 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_RegisterMasterController(HWN
   f_MasterController = hwnd;
 
   Globals::Unlock();
+  return TRUE;
+}
+
+extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_UnregisterControllerWindow(HWND hwnd)
+{
+  // no-op (removed as part of #5060)
+  UNREFERENCED_PARAMETER(hwnd);
   return TRUE;
 }
 
