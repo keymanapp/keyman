@@ -1,5 +1,7 @@
 # Keyman for iOS configuration notes
 
+WARNING: these are old configuration notes. See [macos.md](../macos.md) for current steps.
+
 ## Prerequisites
 * Xcode 11
 * iOS 9+

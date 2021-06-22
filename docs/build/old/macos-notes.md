@@ -1,5 +1,7 @@
 # Keyman for macOS configuration notes
 
+WARNING: these are old configuration notes. See [macos.md](../macos.md) for current steps.
+
 ## Mac Tools Requirements/Setup
 
 * Install [Homebrew] *technically optional, but highly recommended*

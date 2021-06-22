@@ -1,5 +1,7 @@
 # KeymanWeb configuration notes
 
+WARNING: these are old configuration notes. See [index.md](../index.md) for current steps.
+
 ## Minimum Web Compilation Requirements
 
 * [Java 7+](https://adoptopenjdk.net/releases.html) (required by the Google Closure Compiler)

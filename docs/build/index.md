@@ -12,14 +12,14 @@ Keyman has a wide range of dependencies. We are working to reduce the complexity
 
 Additional notes are available in the following documents:
 
-* [sentry-cli notes](sentry-cli-notes.md)
+* [sentry-cli configuration](sentry-cli.md)
 
 Older notes:
 
-* [Keyman for Android notes](android-notes.md)
-* [Keyman for iOS notes](ios-notes.md)
-* [Keyman for macOS notes](macos-notes.md)
-* [KeymanWeb notes](web-notes.md)
-* [Keyman Core Desktop notes](core-desktop-notes.md)
+* [Keyman for Android notes](old/android-notes.md)
+* [Keyman for iOS notes](old/ios-notes.md)
+* [Keyman for macOS notes](old/macos-notes.md)
+* [KeymanWeb notes](old/web-notes.md)
+* [Keyman Core Desktop notes](old/core-desktop-notes.md)
 
 Many folders may also contain other build instructions in README.md files.

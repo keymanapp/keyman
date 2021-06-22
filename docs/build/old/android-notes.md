@@ -1,7 +1,9 @@
 # Keyman for Android configuration notes
 
+WARNING: these are old configuration notes. See [index.md](../index.md) for current steps.
+
 * Android Studio 4.1+
-* Java SE Development Kit 8 
+* Java SE Development Kit 8
 * [Node.js](https://nodejs.org/) 14.17+ (for building KeymanWeb)
 * [Pandoc](#Install-Pandoc) for generating offline help
 

@@ -22,54 +22,81 @@ REQUIRE_SENTRYCLI=false
 # Parse args
 shopt -s nocasematch
 
+PARAMFOUND=false
+
+function print_help() {
+    echo "Usage: macos.sh targets"
+    echo "  targets: one or more of: "
+    echo "             android ios macos web all"
+    echo "  optional targets:"
+    echo "             kmcomp pandoc sentry-cli"
+    echo "Targets will automatically include dependency targets."
+}
+
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
         --help)
-            echo "Usage: macos.sh targets"
-            echo "  targets: one or more of: "
-            echo "             android ios macos web all"
-            echo "  optional targets:"
-            echo "             kmcomp pandoc sentry-cli"
+            print_help
+            exit 0
             ;;
         android)
-            $REQUIRE_ANDROID=true
+            REQUIRE_ANDROID=true
+            PARAMFOUND=true
             ;;
         ios)
-            $REQUIRE_IOS=true
+            REQUIRE_IOS=true
+            PARAMFOUND=true
             ;;
         macos)
-            $REQUIRE_MACOS=true
+            REQUIRE_MACOS=true
+            PARAMFOUND=true
             ;;
         web)
-            $REQUIRE_WEB=true
+            REQUIRE_WEB=true
+            PARAMFOUND=true
             ;;
         kmcomp)
-            $REQUIRE_KMCOMP=true
+            REQUIRE_KMCOMP=true
+            PARAMFOUND=true
             ;;
         pandoc)
-            $REQUIRE_PANDOC=true
+            REQUIRE_PANDOC=true
+            PARAMFOUND=true
             ;;
         sentry-cli)
-            $REQUIRE_SENTRYCLI=true
+            REQUIRE_SENTRYCLI=true
+            PARAMFOUND=true
             ;;
         all)
             REQUIRE_ANDROID=true
             REQUIRE_IOS=true
             REQUIRE_MACOS=true
             REQUIRE_WEB=true
+            PARAMFOUND=true
             ;;
         *)
-            echo "Error: unrecognised parameter. Use --help for help"
+            echo "Error: unrecognised parameter."
+            echo
+            print_help
+            exit 1
             ;;
     esac
     shift
 done
 
+if ! $PARAMFOUND; then
+    echo "Error: must have a target parameter"
+    echo
+    print_help
+    exit 1
+fi
+
 # This script will configure your development environment from a bare metal mac install. It should be idempotent.
 
 echo "This script will configure your macOS computer to build Keyman, installing build tools and prerequisites."
 echo "You can also do this yourself following the notes in building.md."
+echo
 read -p "Press ENTER to start install"
 
 if $REQUIRE_IOS || $REQUIRE_ANDROID; then
@@ -95,7 +122,7 @@ which brew || (
 ## Install devchain components
 
 BREW_ALL="bash jq python3 meson ninja rustup-init coreutils"
-BREW_WEB="node emscripten wasm-pack"
+BREW_WEB="node emscripten wasm-pack openjdk@8"
 BREW_IOS="swiftlint carthage"
 BREW_MACOS="carthage cocoapods"
 BREW_ANDROID="openjdk@8 android-sdk android-studio ant gradle maven"
@@ -134,16 +161,40 @@ $REQUIRE_ANDROID && (
     sdkmanager --licenses
 )
 
-($REQUIRE_IOS || $REQUIRE_MACOS) && (
-    # Assumes that xcode is installed into normal path
-    # as otherwise we get only the command line tools which
-    # won't build with xcode
-    sudo xcode-select -s /Applications/Xcode.app
-)
+# For now, we won't run this step automatically
+# as it may interfere with other dev environments
+#($REQUIRE_IOS || $REQUIRE_MACOS) && (
+#    # Assumes that xcode is installed into normal path
+#    # as otherwise we get only the command line tools which
+#    # won't build with xcode
+#    echo "Selecting default xcodebuild command line tools from /Applications/Xcode.app"
+#    sudo xcode-select -s /Applications/Xcode.app
+#)
 
-# Add macos.env.sh to ~/.bashrc
+# Add keyman.macos.env.sh to ~/.bashrc
 
+echo "Adding environment variables to ~/.bashrc..."
 if [ ! -f ~/.bashrc ] || `grep "keyman.macos.env.sh" ~/.bashrc 2>/dev/null`; then
     echo "source $THIS_DIR/keyman.macos.env.sh" >> ~/.bashrc
 fi
 
+echo "Configuration has completed successfully."
+echo
+
+if $REQUIRE_MACOS || $REQUIRE_IOS; then
+    echo "The following components must be installed manually:"
+    echo " * XCode"
+    echo
+fi
+
+if $REQUIRE_MACOS || $REQUIRE_IOS || $REQUIRE_ANDROID; then
+    echo "The following components should be started manually after this script completes, in order to install"
+    echo "additional components:"
+    if $REQUIRE_MACOS || $REQUIRE_IOS; then
+        echo " * XCode"
+    fi
+    if $REQUIRE_ANDROID; then
+        echo " * Android Studio"
+    fi
+    echo
+fi

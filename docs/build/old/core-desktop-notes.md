@@ -1,5 +1,7 @@
 # Common/Core/Desktop configuration notes
 
+WARNING: these are old configuration notes. See [index.md](../index.md) for current steps.
+
 - Bash (for Windows, included with Git for Windows)
 - Python 3
 - Meson build system 0.45+ (0.56+ for WASM)
