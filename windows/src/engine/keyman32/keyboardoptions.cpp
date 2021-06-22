@@ -1,18 +1,18 @@
 /*
   Name:             keyboardoptions
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      25 May 2010
 
   Modified Date:    28 Nov 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          25 May 2010 - mcdurdin - I1632 - Keyboard Options
                     31 May 2010 - mcdurdin - I2397 - Assertion failure - keyboard options loading twice
                     28 Nov 2012 - mcdurdin - I3594 - V9.0 - Remove old SelectKeyboard code and related messages
@@ -75,7 +75,7 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
   {
     kp->KeyboardOptions[nStoreToSet].OriginalStore = kp->Keyboard->dpStoreArray[nStoreToSet].dpString;
   }
-   
+
   kp->KeyboardOptions[nStoreToSet].Value = new WCHAR[wcslen(sp->dpString)+1];
   wcscpy_s(kp->KeyboardOptions[nStoreToSet].Value, wcslen(sp->dpString)+1, sp->dpString);
   kp->Keyboard->dpStoreArray[nStoreToSet].dpString = kp->KeyboardOptions[nStoreToSet].Value;
@@ -129,7 +129,7 @@ BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
   assert(kp->KeyboardOptions == NULL);
-  
+
   kp->KeyboardOptions = new INTKEYBOARDOPTIONS[kp->Keyboard->cxStoreArray];
   memset(kp->KeyboardOptions, 0, sizeof(INTKEYBOARDOPTIONS) * kp->Keyboard->cxStoreArray);
   RegistryReadOnly r(HKEY_CURRENT_USER);
@@ -156,7 +156,7 @@ BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
 
             break;
           }
-        }      
+        }
       }
       n++;
     }

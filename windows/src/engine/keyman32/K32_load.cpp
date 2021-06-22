@@ -88,13 +88,13 @@ BOOL LoadlpKeyboard(int i)
   if(!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
 
   if(!LoadKeyboard(buf, &_td->lpKeyboards[i].Keyboard)) return FALSE;   // I5136
-//  if  (KM_KBP_STATUS_OK != km_kbp_keyboard_load(buf, &_td->lpKeyboards[i])) return FALSE;
+//  if  (KM_KBP_STATUS_OK != km_kbp_keyboard_load(buf, &_td->lpKeyboards[i].coreKeyboard)) return FALSE;
 
   //LoadDLLs(&_td->lpKeyboards[i]);
 
    // TODO: 5011 The activeKBState needs to maintian the state fror the context and options for
    // the current active keypoard
-
+    // km_kbp_option_item test_env_opts
    //(km_kbp_state_create(&_td->lpKeyboards[i], env_opts, &activeKBState));
 
 // (km_kbp_state_options_update(activeKBState, keyboard_opts))
