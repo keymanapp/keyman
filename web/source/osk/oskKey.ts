@@ -120,7 +120,7 @@ namespace com.keyman.osk {
       'shift-on',
       'special',
       'special-on',
-      '',
+      '', // Key classes 5 through 7 are reserved for future use.
       '',
       '',
       'deadkey',

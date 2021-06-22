@@ -1168,7 +1168,7 @@ namespace com.keyman.osk {
       if(!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
 
       // For phones, use key preview rather than highlighting the key,
-      var usePreview = ((this.keytip != null)) && key.key.allowsKeyTip();
+      var usePreview = (this.keytip != null) && key.key.allowsKeyTip();
 
       if(usePreview) {
         this.showKeyTip(key,on);
