@@ -1,7 +1,8 @@
 /// <reference path="subkeyPopup.ts" />
+/// <reference path="../pendingGesture.interface.ts" />
 
 namespace com.keyman.osk.browser {
-  export class PendingLongpress {
+  export class PendingLongpress implements PendingGesture {
     public readonly baseKey: KeyElement;
     public readonly promise: Promise<SubkeyPopup>;
     //public readonly initialTouch: Touch;
@@ -26,7 +27,7 @@ namespace com.keyman.osk.browser {
           function() {
             // It's no longer deferred; it's being fulfilled.
             // Even if the actual subkey itself is still async.
-            _this.showSubkeys();
+            _this.resolve();
           }, _this.popupDelay);
       });
     }
@@ -43,7 +44,7 @@ namespace com.keyman.osk.browser {
       }
     }
 
-    public showSubkeys() {
+    public resolve() {
       if(this.resolver) {
         this.resolver(new SubkeyPopup(this.vkbd, this.baseKey));
       }

@@ -58,11 +58,12 @@ namespace com.keyman.osk {
     touchCount: number;
     currentTarget: KeyElement;
 
-    // Popup key management
+    // Used by embedded-mode's globe key
     menuEvent: KeyElement; // Used by embedded-mode.
+
+    // Popup key management
     keytip: KeyTip;
-    browserPendingLongpress: browser.PendingLongpress;
-    embeddedPendingLongpress: any;  // a temp, intermediate property during subkey abstraction work
+    pendingSubkey: PendingGesture;
     subkeyGesture: RealizedGesture;
 
     get layerId(): string {
@@ -714,9 +715,15 @@ namespace com.keyman.osk {
 
       // If popup is visible, need to move over popup, not over main keyboard
       // TODO:  responsible for the shortcutting gesture for early subkey display.
-      this.highlightSubKeys(key1,x,y);
 
-      // As the previous line can trigger the start of the subkey gesture...
+      if(key1 && key1['subKeys'] != null) {
+        // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
+        if((this.touchY - e.touches[0].pageY > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
+          this.pendingSubkey.resolve();
+        }
+      }
+
+      // As the previous block can trigger the start of the subkey gesture...
       if(this.subkeyGesture) {
         return;
       }
@@ -1029,9 +1036,9 @@ namespace com.keyman.osk {
         this.subkeyGesture = null;
       }
 
-      if(this.browserPendingLongpress) {
-        this.browserPendingLongpress.cancel();
-        this.browserPendingLongpress = null;
+      if(this.pendingSubkey) {
+        this.pendingSubkey.cancel();
+        this.pendingSubkey = null;
       }
     }
 
@@ -1606,9 +1613,9 @@ namespace com.keyman.osk {
    */
   touchHold(key: KeyElement, force?: boolean) {
     // Clear and restart the popup timer
-    if(this.browserPendingLongpress) {
-      this.browserPendingLongpress.cancel();
-      this.browserPendingLongpress = null;
+    if(this.pendingSubkey) {
+      this.pendingSubkey.cancel();
+      this.pendingSubkey = null;
     }
 
     if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
@@ -1616,13 +1623,12 @@ namespace com.keyman.osk {
 
       // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
       // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
-      let pl = this.browserPendingLongpress = new browser.PendingLongpress(this, key);
-      this.browserPendingLongpress.promise.then(function(subkeyPopup) {
-        // Clear the longpress field upon any sort of fulfillment if it is still the current one.
-        if(_this.browserPendingLongpress == pl) {
-          _this.browserPendingLongpress = null;
+      let pendingLongpress = this.pendingSubkey = new browser.PendingLongpress(this, key);
+      pendingLongpress.promise.then(function(subkeyPopup) {
+        if(_this.pendingSubkey == pendingLongpress) {
+          _this.pendingSubkey = null;
         }
-
+        
         if(subkeyPopup) {
           // Clear key preview if any
           _this.showKeyTip(null,false);
@@ -1648,9 +1654,9 @@ namespace com.keyman.osk {
         _this.clearPopup();
       });
 
-      if(force) {
+      if(force && this.pendingSubkey instanceof browser.PendingLongpress) {
         // Instantly resolves the first-level promise.
-        this.browserPendingLongpress.showSubkeys();
+        this.pendingSubkey.resolve();
       }
     }
   };
@@ -1671,29 +1677,6 @@ namespace com.keyman.osk {
         keyman.domManager.clearLastActiveElement();
       }
     }
-  };
-
-  // Manage popup key highlighting
-  highlightSubKeys(k: KeyElement, x: number, y: number) {
-    // Test for subkey array, return if none
-
-    // Issue:  if `k` is itself a subkey, this won't do subkey highlighting correctly.
-    // That "common case" is actually handled through _standard_ key highlighting.
-    if(k == null || k['subKeys'] == null) {
-      return;
-    }
-
-    // Highlight key at touch position (and clear other highlighting)
-    var skBox=document.getElementById('kmw-popup-keys');
-
-    //#region This section fills a different role than the method name would suggest.
-    // Might correspond better to a 'checkInstantSubkeys' or something.
-
-    // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-    if((this.touchY-y > 5) && skBox == null) {
-      this.touchHold(k, true);
-    }
-    //#endregion
   };
 
     /**

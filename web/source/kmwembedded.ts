@@ -54,7 +54,6 @@ namespace com.keyman.osk {
      * @param {Object}  key   base key element
      */            
     VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
-      let util = com.keyman.singleton.util;
       if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
         var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
             yBase = dom.Utils.getAbsoluteY(key);
@@ -62,6 +61,8 @@ namespace com.keyman.osk {
         // #3718: No longer prepend base key to subkey array
 
         let _this = this;
+        window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
+
         let pendingLongpress = new embedded.PendingLongpress(this, key);
         pendingLongpress.promise.then(function(gesture) {
           _this.subkeyGesture = gesture;
@@ -76,9 +77,7 @@ namespace com.keyman.osk {
             });
           }
         });
-        this.embeddedPendingLongpress = pendingLongpress;
-        
-        window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
+        this.pendingSubkey = pendingLongpress;
       }
     };
 
@@ -88,10 +87,6 @@ namespace com.keyman.osk {
         this.keytip = new osk.embedded.KeyTip(window['oskCreateKeyPreview'], window['oskClearKeyPreview']);
       }
     };
-
-    VisualKeyboard.prototype.highlightSubKeys = function(this: VisualKeyboard, k, x, y) {
-      // a dummy function; it's only really used for 'native' KMW.
-    }
 
     VisualKeyboard.prototype.waitForFonts = function(this: VisualKeyboard, kfd, ofd) {
       // a dummy function; it's only really used for 'native' KMW.
@@ -290,19 +285,21 @@ namespace com.keyman.text {
    *     
    **/
   keymanweb['popupVisible'] = function(isVisible) {
-    let delegator = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
-    let pendingLongpress = osk.vkbd.embeddedPendingLongpress as com.keyman.osk.embedded.PendingLongpress;
+    let gesture = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
+    let pendingLongpress = osk.vkbd.pendingSubkey;
 
     if(!isVisible) {
-      if(delegator) {
-        delegator.resolve(null);
+      if(gesture) {
+        gesture.resolve(null);
         osk.vkbd.subkeyGesture = null;
+      } else if(pendingLongpress) {
+        pendingLongpress.cancel();
       }
     }
 
-    if(isVisible && osk.vkbd.embeddedPendingLongpress) {
+    if(isVisible && pendingLongpress) {
       // Fulfills the first-stage promise.
-      pendingLongpress.markActiveSubkeys();
+      pendingLongpress.resolve();
     }
   };
 
