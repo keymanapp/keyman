@@ -1,4 +1,4 @@
-#### Setting up sentry-cli
+# Setting up sentry-cli
 
 Contact the Keyman team if you need access to sentry.keyman.com for development. 
 You will also need to install [sentry-cli](https://docs.sentry.io/cli/installation/) for uploading Debug symbols. 

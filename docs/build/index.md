@@ -4,9 +4,9 @@ Keyman has a wide range of dependencies. We are working to reduce the complexity
 
 ## Development Platforms
 
-* [Linux - Ubuntu](building-linux-ubuntu.md)
-* [macOS](building-macos.md)
-* [Windows](building-windows.md)
+* [Linux - Ubuntu](linux-ubuntu.md)
+* [macOS](macos.md)
+* [Windows](windows.md)
 
 ## Additional Configuration Documentation
 
@@ -20,6 +20,6 @@ Older notes:
 * [Keyman for iOS notes](ios-notes.md)
 * [Keyman for macOS notes](macos-notes.md)
 * [KeymanWeb notes](web-notes.md)
-* [Keyman Core Desktop notes](core-desktop.md)
+* [Keyman Core Desktop notes](core-desktop-notes.md)
 
 Many folders may also contain other build instructions in README.md files.
