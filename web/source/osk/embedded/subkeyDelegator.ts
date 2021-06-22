@@ -62,5 +62,9 @@ namespace com.keyman.osk.embedded {
     public clear() {
       // no-op; it's fully controlled on the app side.
     }
+
+    updateTouch(touch: Touch) {
+      this.baseKey.key.highlight(this.baseKey.key.isUnderTouch(touch));
+    }
   }
 }

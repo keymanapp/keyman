@@ -430,5 +430,19 @@ namespace com.keyman.osk {
 
       return t;
     }
+
+    public isUnderTouch(touch: Touch): boolean {
+      let x = touch.clientX;
+      let y = touch.clientY;
+
+      let btn = this.btn;
+      let x0 = dom.Utils.getAbsoluteX(btn); 
+      let y0 = dom.Utils.getAbsoluteY(btn);//-document.body.scrollTop;
+      
+      let x1=x0 + btn.offsetWidth;
+      let y1=y0 + btn.offsetHeight;
+
+      return (x > x0 && x < x1 && y > y0 && y < y1);
+    }
   }
 }

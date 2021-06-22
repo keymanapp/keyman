@@ -510,8 +510,7 @@ namespace com.keyman.osk {
       this.cancelDelete();
 
       // Prevent multi-touch if popup displayed
-      var sk = document.getElementById('kmw-popup-keys');
-      if((sk && sk.style.visibility == 'visible') || this.subkeyGesture) {
+      if(this.subkeyGesture && this.subkeyGesture.isVisible()) {
         return;
       }
 
@@ -697,45 +696,28 @@ namespace com.keyman.osk {
         return;
       }
 
-      // Clear previous key highlighting
-      if(!this.subkeyPopup && key0 && key1 && key1 !== key0) {
-        this.highlightKey(key0,false);
-      }
-
-      // Do not move over keys if device popup visible
-      if(this.subkeyDelegator) {
-        if(key1 == null) {
-          if(key0) {
-            this.highlightKey(key0,false);
-          }
-          this.keyPending=null;
-          this.touchPending=null;
-        } else {
-          // Re-apply highlighting to the key if it's the current popup's base key.
-          if(this.subkeyDelegator && key1 == this.subkeyDelegator.baseKey) {
-            if(!key1.classList.contains('kmw-key-touched')) {
-              this.highlightKey(key1,true);
-            }
-            this.keyPending = key1;
-            this.touchPending = e.touches[0];
-          } else {
-            if(key0) {
-              this.highlightKey(key0,false);
-            }
-            this.keyPending = null;
-            this.touchPending = null;
-          }
+      // Clear previous key highlighting, allow subkey controller to
+      // highlight as appropriate.
+      if(this.subkeyGesture) {
+        if(key0) {
+          key0.key.highlight(false);
         }
+        this.subkeyGesture.updateTouch(e.touches[0]);
+
+        this.keyPending = null;
+        this.touchPending = null;
+
         return;
       }
 
       this.currentTarget = null;
 
       // If popup is visible, need to move over popup, not over main keyboard
+      // TODO:  responsible for the shortcutting gesture for early subkey display.
       this.highlightSubKeys(key1,x,y);
 
-      if(this.subkeyPopup) {
-        this.subkeyPopup.updateTouch(e.touches[0]);
+      // As the previous line can trigger the start of the subkey gesture...
+      if(this.subkeyGesture) {
         return;
       }
 

@@ -235,21 +235,13 @@ namespace com.keyman.osk.browser {
     }
 
     updateTouch(touch: Touch) {
-      let x = touch.clientX;
-      let y = touch.clientY;
-
       this.currentSelection = null;
 
       for(let i=0; i < this.baseKey['subKeys'].length; i++) {
         try {
           let sk= this.element.childNodes[i].firstChild as KeyElement;
-          let x0 = dom.Utils.getAbsoluteX(sk); 
-          let y0 = dom.Utils.getAbsoluteY(sk);//-document.body.scrollTop;
-          
-          let x1=x0+sk.offsetWidth;
-          let y1=y0+sk.offsetHeight;
 
-          let onKey=(x > x0 && x < x1 && y > y0 && y < y1);
+          let onKey = sk.key.isUnderTouch(touch)
           if(onKey) {
             this.baseKey.key.highlight(false);
             this.currentSelection = sk;
