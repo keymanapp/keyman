@@ -1,17 +1,18 @@
 /// <reference path="oskSubKey.ts" />
+/// <reference path="../realizedGesture.interface.ts" />
 
 namespace com.keyman.osk.browser {
-  export class SubkeyPopup {
+  export class SubkeyPopup implements RealizedGesture {
     public readonly element: HTMLDivElement;
     public readonly shim: HTMLDivElement;
 
     private vkbd: VisualKeyboard;
-    public readonly baseKey: KeyElement;
     private currentSelection: KeyElement;
-    
+
     private callout: HTMLDivElement;
 
-    public promise: Promise<text.KeyEvent>;
+    public readonly baseKey: KeyElement;
+    public readonly promise: Promise<text.KeyEvent>;
 
     // Resolves the promise that generated this SubkeyPopup.
     private resolver: (keyEvent: text.KeyEvent) => void;
@@ -207,6 +208,10 @@ namespace com.keyman.osk.browser {
         // Subkeys never get key previews, so we can directly highlight the subkey.
         bk.key.highlight(true);
       }
+    }
+
+    isVisible(): boolean {
+      return this.element.style.visibility == 'visible';
     }
 
     clear() {

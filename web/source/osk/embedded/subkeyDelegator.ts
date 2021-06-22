@@ -1,5 +1,7 @@
+/// <reference path="../realizedGesture.interface.ts" />
+
 namespace com.keyman.osk.embedded {
-  export class SubkeyDelegator {
+  export class SubkeyDelegator implements RealizedGesture {
     private resolver: (keyEvent: text.KeyEvent) => void;
     private readonly vkbd: VisualKeyboard;
 
@@ -51,6 +53,14 @@ namespace com.keyman.osk.embedded {
         this.resolver(keyEvent);
       }
       this.resolver = null;
+    }
+
+    public isVisible(): boolean {
+      return true;
+    }
+
+    public clear() {
+      // no-op; it's fully controlled on the app side.
     }
   }
 }

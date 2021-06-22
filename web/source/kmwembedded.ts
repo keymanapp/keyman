@@ -63,11 +63,11 @@ namespace com.keyman.osk {
 
         let _this = this;
         let pendingLongpress = new embedded.PendingLongpress(this, key);
-        pendingLongpress.promise.then(function(delegator) {
-          _this.subkeyDelegator = delegator;
-          if(delegator) {
-            delegator.promise.then(function(keyEvent) {
-              _this.subkeyDelegator = null;
+        pendingLongpress.promise.then(function(gesture) {
+          _this.subkeyGesture = gesture;
+          if(gesture) {
+            gesture.promise.then(function(keyEvent) {
+              _this.subkeyGesture = null;
               // Allow active cancellation, even if the source should allow passive.
               // It's an easy and cheap null guard.
               if(keyEvent) {
@@ -290,13 +290,13 @@ namespace com.keyman.text {
    *     
    **/
   keymanweb['popupVisible'] = function(isVisible) {
-    let delegator = osk.vkbd.subkeyDelegator as com.keyman.osk.embedded.SubkeyDelegator;
+    let delegator = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
     let pendingLongpress = osk.vkbd.embeddedPendingLongpress as com.keyman.osk.embedded.PendingLongpress;
 
     if(!isVisible) {
       if(delegator) {
         delegator.resolve(null);
-        osk.vkbd.subkeyDelegator = null;
+        osk.vkbd.subkeyGesture = null;
       }
     }
 
@@ -374,19 +374,18 @@ namespace com.keyman.text {
       
       keymanweb.domManager.initActiveElement(Lelem);
 
-      var delegator: com.keyman.osk.embedded.SubkeyDelegator = null;
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
-      if(osk.vkbd.subkeyDelegator) {
-        delegator = osk.vkbd.subkeyDelegator as com.keyman.osk.embedded.SubkeyDelegator;
+      if(osk.vkbd.subkeyGesture) {
+        let gesture = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
 
         try {
-          delegator.resolve(keyName);
+          gesture.resolve(keyName);
         } catch (e) {
           let err = e as Error;
           console.warn(err.message);
         }
 
-        osk.vkbd.subkeyDelegator = null;
+        osk.vkbd.subkeyGesture = null;
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }

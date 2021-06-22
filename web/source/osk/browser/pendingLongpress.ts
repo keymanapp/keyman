@@ -3,11 +3,10 @@
 namespace com.keyman.osk.browser {
   export class PendingLongpress {
     public readonly baseKey: KeyElement;
+    public readonly promise: Promise<SubkeyPopup>;
     //public readonly initialTouch: Touch;
 
     public readonly subkeyUI: SubkeyPopup;
-
-    public readonly promise: Promise<SubkeyPopup>;
 
     private readonly vkbd: VisualKeyboard;
     private resolver: (subkeyPopup: SubkeyPopup) => void;
@@ -30,10 +29,6 @@ namespace com.keyman.osk.browser {
             _this.showSubkeys();
           }, _this.popupDelay);
       });
-    }
-
-    updateTouch(touch: Touch) {
-      this.subkeyUI.updateTouch(touch);
     }
 
     public cancel() {

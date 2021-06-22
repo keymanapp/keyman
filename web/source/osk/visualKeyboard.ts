@@ -61,10 +61,9 @@ namespace com.keyman.osk {
     // Popup key management
     menuEvent: KeyElement; // Used by embedded-mode.
     keytip: KeyTip;
-    subkeyPopup: browser.SubkeyPopup;
     browserPendingLongpress: browser.PendingLongpress;
-    embeddedPendingLongpress: any; // a temp, intermediate property during subkey abstraction work
-    subkeyDelegator: any; // a temp, intermediate property during subkey abstraction work
+    embeddedPendingLongpress: any;  // a temp, intermediate property during subkey abstraction work
+    subkeyGesture: RealizedGesture;
 
     get layerId(): string {
       return this._layerId;
@@ -423,7 +422,7 @@ namespace com.keyman.osk {
       let kbdAspectRatio = layerGroup.offsetWidth / this.kbdDiv.offsetHeight;
       let baseKeyProbabilities = this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
 
-      if(!this.subkeyPopup || !this.subkeyPopup.baseKey.key) {
+      if(!this.subkeyGesture || !this.subkeyGesture.baseKey.key) {
         return baseKeyProbabilities;
       } else {
         // A temp-hack, as this was noted just before 14.0's release.
@@ -435,7 +434,7 @@ namespace com.keyman.osk {
         let baseMass = 1.0;
 
         let baseKeyMass = 1.0;
-        let baseKeyID = this.subkeyPopup.baseKey.key.spec.coreID;
+        let baseKeyID = this.subkeyGesture.baseKey.key.spec.coreID;
 
         let popupKeyMass = 0.0;
         let popupKeyID: string = null;
@@ -512,7 +511,7 @@ namespace com.keyman.osk {
 
       // Prevent multi-touch if popup displayed
       var sk = document.getElementById('kmw-popup-keys');
-      if((sk && sk.style.visibility == 'visible') || this.subkeyDelegator) {
+      if((sk && sk.style.visibility == 'visible') || this.subkeyGesture) {
         return;
       }
 
@@ -559,9 +558,10 @@ namespace com.keyman.osk {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
 
-          if(this.subkeyPopup) {
-            this.subkeyPopup.updateTouch(e.changedTouches[0]);
-            this.subkeyPopup.finalize(e.changedTouches[0]);
+          if(this.subkeyGesture && this.subkeyGesture instanceof browser.SubkeyPopup) {
+            let subkeyPopup = this.subkeyGesture as browser.SubkeyPopup;
+            subkeyPopup.updateTouch(e.changedTouches[0]);
+            subkeyPopup.finalize(e.changedTouches[0]);
           } else {
             this.modelKeyClick(this.keyPending, this.touchPending);
           }
@@ -585,31 +585,25 @@ namespace com.keyman.osk {
      **/
     release: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
       // Prevent incorrect multi-touch behaviour if native or device popup visible
-      var sk = document.getElementById('kmw-popup-keys'), t = this.currentTarget;
+      var t = this.currentTarget;
 
       // Clear repeated backspace if active, preventing 'sticky' behavior.
       this.cancelDelete();
 
-      if((this.subkeyPopup && this.subkeyPopup.element.style.visibility == 'visible')) {
+      if((this.subkeyGesture && this.subkeyGesture.isVisible())) {
         // Ignore release if a multiple touch
         if(e.touches.length > 0) {
           return;
         }
 
-        this.subkeyPopup.finalize(e.changedTouches[0]);
+        if(this.subkeyGesture instanceof browser.SubkeyPopup) {
+          let subkeyPopup = this.subkeyGesture as browser.SubkeyPopup;
+          subkeyPopup.finalize(e.changedTouches[0]);
+        }
         this.highlightKey(this.keyPending,false);
         this.keyPending = null;
         this.touchPending = null;
 
-        return;
-      }
-
-      // Only set when embedded in our Android/iOS app.  Signals that the device is handling
-      // subkeys, so we shouldn't allow output for the base key.
-      //
-      // Note that on iOS (at least), this.release() will trigger before kmwembedded.ts's
-      // executePopupKey() function.
-      if(this.subkeyDelegator) {
         return;
       }
 
@@ -1048,9 +1042,9 @@ namespace com.keyman.osk {
 
     clearPopup() {
       // Remove the displayed subkey array, if any, and cancel popup request
-      if(this.subkeyPopup) {
-        this.subkeyPopup.clear();
-        this.subkeyPopup = null;
+      if(this.subkeyGesture) {
+        this.subkeyGesture.clear();
+        this.subkeyGesture = null;
       }
 
       if(this.browserPendingLongpress) {
@@ -1651,7 +1645,7 @@ namespace com.keyman.osk {
           // Clear key preview if any
           _this.showKeyTip(null,false);
 
-          _this.subkeyPopup = subkeyPopup;
+          _this.subkeyGesture = subkeyPopup;
           subkeyPopup.promise.then(function(keyEvent: text.KeyEvent) {
             // Allow active cancellation, even if the source should allow passive.
             // It's an easy and cheap null guard.
@@ -1734,8 +1728,8 @@ namespace com.keyman.osk {
         return;
       }
 
-      var sk=this.subkeyPopup,
-          popup = (sk && sk.element.style.visibility == 'visible')
+      let sk = this.subkeyGesture;
+      let popup = (sk && sk.isVisible());
 
       // If popup keys are active, do not show the key tip.
       on = popup ? false : on;
