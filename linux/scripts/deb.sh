@@ -11,7 +11,7 @@
 
 set -e
 
-all_distributions="bionic"
+all_distributions="focal"
 distributions=""
 all_projects="kmflcomp libkmfl keyman-keyboardprocessor ibus-kmfl keyman-config ibus-keyman"
 projects=""
