@@ -1167,37 +1167,19 @@ namespace com.keyman.osk {
      **/
     highlightKey(key: KeyElement, on: boolean) {
       // Do not change element class unless a key
-      if(!key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
-
-      var classes=key.className, cs = ' kmw-key-touched';
+      if(!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
 
       // For phones, use key preview rather than highlighting the key,
-      var usePreview = ((this.keytip != null) && (key.id.indexOf('popup') < 0 ));
-
-      if(usePreview) {
-        // Previews are not permitted for keys using any of the following CSS styles.
-        var excludedClasses = ['kmw-key-shift',      // special keys
-                               'kmw-key-shift-on',   // active special keys (shift, when in shift layer
-                               'kmw-key-special',    // special keys that require the keyboard's OSK font
-                               'kmw-key-special-on', // active special keys requiring the keyboard's OSK font
-                               'kmw-spacebar',       // space
-                               'kmw-key-blank',      // Keys that are only used for layout control
-                               'kmw-key-hidden'];
-
-        for(let c=0; c < excludedClasses.length; c++) {
-          usePreview = usePreview && (classes.indexOf(excludedClasses[c]) < 0);
-        }
-      }
+      var usePreview = (this.keytip != null) && key.key.allowsKeyTip();
 
       if(usePreview) {
         this.showKeyTip(key,on);
       } else {
-        if(on && classes.indexOf(cs) < 0) {
-          key.className=classes+cs;
-          this.showKeyTip(null,false);     // Moved here by Serkan
-        } else {
-          key.className=classes.replace(cs,'');
+        if(on) {
+          // May be called on already-unhighlighted keys, so we don't remove the tip here.
+          this.showKeyTip(null,false);
         }
+        key.key.highlight(on);
       }
     }
 

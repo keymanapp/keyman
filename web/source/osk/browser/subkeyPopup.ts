@@ -176,7 +176,8 @@ namespace com.keyman.osk.browser {
 
       if(bk) {
         vkbd.keyPending = bk;
-        vkbd.highlightKey(bk,true);//bk.className = bk.className+' kmw-key-touched';
+        // Subkeys never get key previews, so we can directly highlight the subkey.
+        bk.key.highlight(true);
       }
     }
 

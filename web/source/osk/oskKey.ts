@@ -69,7 +69,7 @@ namespace com.keyman.osk {
   export abstract class OSKKey {
     // Defines the PUA code mapping for the various 'special' modifier/control keys on keyboards.
     // `specialCharacters` must be kept in sync with the same variable in builder.js. See also CompileKeymanWeb.pas: CSpecialText10
-    static specialCharacters = {
+    static readonly specialCharacters = {
       '*Shift*':    8,
       '*Enter*':    5,
       '*Tab*':      6,
@@ -113,7 +113,23 @@ namespace com.keyman.osk {
       '*ZWNJiOS*':        0x75, // The iOS version will be used by default, but the
       '*ZWNJAndroid*':    0x76, // Android platform has its own default glyph.
     };
-    
+
+    static readonly BUTTON_CLASSES = [
+      'default',
+      'shift',
+      'shift-on',
+      'special',
+      'special-on',
+      '', // Key classes 5 through 7 are reserved for future use.
+      '',
+      '',
+      'deadkey',
+      'blank',
+      'hidden'
+    ];
+
+    static readonly HIGHLIGHT_CLASS = 'kmw-key-touched';
+
     spec: OSKKeySpec;
     btn: KeyElement;
     label: HTMLSpanElement;
@@ -139,7 +155,7 @@ namespace com.keyman.osk {
       let key = this.spec;
       let btn = this.btn;
 
-      var n=0, keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
+      var n=0;
       if(typeof key['dk'] == 'string' && key['dk'] == '1') {
         n=8;
       }
@@ -155,9 +171,42 @@ namespace com.keyman.osk {
       // Apply an overriding class for 5-row layouts
       var nRows=vkbd.layout['layer'][0]['row'].length;
       if(nRows > 4 && vkbd.device.formFactor == 'phone') {
-        btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
+        btn.className='kmw-key kmw-5rows kmw-key-'+OSKKey.BUTTON_CLASSES[n];
       } else {
-        btn.className='kmw-key kmw-key-'+keyTypes[n];
+        btn.className='kmw-key kmw-key-'+OSKKey.BUTTON_CLASSES[n];
+      }
+    }
+
+    // "Frame key" - generally refers to non-linguistic keys on the keyboard
+    public isFrameKey(): boolean {
+      let classIndex = this.spec['sp'] || 0;
+      switch(OSKKey.BUTTON_CLASSES[classIndex]) {
+        case 'default':
+        case 'deadkey':
+          // Note:  will (generally) include the spacebar.
+          return false;
+        default:
+          return true;
+      }
+    }
+
+    public allowsKeyTip(): boolean {
+      if(this.isFrameKey()) {
+        return false;
+      } else {
+        return !this.btn.classList.contains('kmw-spacebar');
+      }
+    }
+
+    public highlight(on: boolean) {
+      var classes=this.btn.classList;
+
+      if(on) {
+        if(!classes.contains(OSKKey.HIGHLIGHT_CLASS)) {
+          classes.add(OSKKey.HIGHLIGHT_CLASS);
+        }
+      } else {
+        classes.remove(OSKKey.HIGHLIGHT_CLASS);
       }
     }
 
