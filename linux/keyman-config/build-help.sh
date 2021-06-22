@@ -11,48 +11,55 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 THIS_DIR=$(dirname $THIS_SCRIPT)
 
 function display_usage {
-  echo "Usage: $0 [--man] [--md]"
-  echo "       $0 --help"
-  echo
-  echo "  --help     displays this screen and exits"
-  echo "  --man      generate man pages from python files"
-  echo "  --md       generate markdown help pages from python files"
-  echo
-  echo "If neither --man nor --md is specified, both man and help pages are generated."
+    echo "Usage: $0 [--man] [--md] [--no-reconf]"
+    echo "       $0 --help"
+    echo
+    echo "  --help       displays this screen and exits"
+    echo "  --man        generate man pages from python files"
+    echo "  --md         generate markdown help pages from python files"
+    echo "  --no-reconf  don't run reconf.sh first"
+    echo
+    echo "If neither --man nor --md is specified, both man and help pages are generated."
 }
 
 generate_man=
 generate_help=
+reconfigure=1
 
-if [[ $# -eq 0 ]]; then
+while [[ $# -gt 0 ]] ; do
+    key="$1"
+    case $key in
+        --help|-h)
+            display_usage
+            exit 0
+            ;;
+        --man)
+            generate_man=1
+            ;;
+        --md)
+            generate_help=1
+            ;;
+        --no-reconf)
+            reconfigure=
+            ;;
+        *)
+            echo "$0: invalid option: $key"
+            display_usage
+            exit 1
+    esac
+    shift # past the processed argument
+done
+
+if [ -z "$generate_man" -a -z "$generate_help" ]; then
     generate_man=1
     generate_help=1
 fi
 
-while [[ $# -gt 0 ]] ; do
-  key="$1"
-  case $key in
-    --help|-h)
-      display_usage
-      exit 0
-      ;;
-    --man)
-      generate_man=1
-      ;;
-    --md)
-      generate_help=1
-      ;;
-    *)
-      echo "$0: invalid option: $key"
-      display_usage
-      exit 1
-  esac
-  shift # past the processed argument
-done
-
-pushd $THIS_DIR/.. > /dev/null
-./scripts/reconf.sh keyman-config
-popd > /dev/null
+if [ -n "$reconfigure" ]; then
+    pushd $THIS_DIR/.. > /dev/null
+    ./scripts/reconf.sh keyman-config
+    popd > /dev/null
+fi
 
 if [ -n "$generate_man" ]; then
     echo "Generating man pages..."

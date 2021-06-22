@@ -53,7 +53,7 @@ deb: dist
 	rm /tmp/keyman_version
 
 man:
-	./build-help.sh --man
+	./build-help.sh --man --no-reconf
 
 version:
 	cd .. && ./scripts/reconf.sh keyman-config
