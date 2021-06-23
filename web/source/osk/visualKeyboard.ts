@@ -570,7 +570,7 @@ namespace com.keyman.osk {
           this.touchCount--;
         } else {
           // If this key has subkey, start timer to display subkeys after delay, set up release
-          this.touchHold(key);
+          this.initGestures(key, e.changedTouches[0]);
         }
         this.keyPending = key;
         this.touchPending = e.changedTouches[0];
@@ -697,34 +697,9 @@ namespace com.keyman.osk {
         return;
       }
 
-      // Clear previous key highlighting, allow subkey controller to
-      // highlight as appropriate.
-      if(this.subkeyGesture) {
-        if(key0) {
-          key0.key.highlight(false);
-        }
-        this.subkeyGesture.updateTouch(e.touches[0]);
-
-        this.keyPending = null;
-        this.touchPending = null;
-
-        return;
-      }
-
-      this.currentTarget = null;
-
-      // If popup is visible, need to move over popup, not over main keyboard
-      // TODO:  responsible for the shortcutting gesture for early subkey display.
-
-      if(key1 && key1['subKeys'] != null) {
-        // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-        if((this.touchY - e.touches[0].pageY > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
-          this.pendingSubkey.resolve();
-        }
-      }
-
-      // As the previous block can trigger the start of the subkey gesture...
-      if(this.subkeyGesture) {
+      // Update all gesture tracking.  The function returns true if further input processing
+      // should be blocked.
+      if(this.updateGestures(key1, key0, e.changedTouches[0])) {
         return;
       }
 
@@ -758,11 +733,6 @@ namespace com.keyman.osk {
         if(key0 != key1 || key1.className.indexOf('kmw-key-touched') < 0) {
           this.highlightKey(key1,true);
         }
-      }
-
-      if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
-        //  Display the touch-hold keys (after a pause)
-        this.touchHold(key1);
       }
     }.bind(this);
 
@@ -1606,44 +1576,22 @@ namespace com.keyman.osk {
       }
     }
 
-  /**
-   * Touch hold key display management
-   *
-   * @param   {Object}  key   base key object
-   */
-  touchHold(key: KeyElement, force?: boolean) {
-    // Clear and restart the popup timer
-    if(this.pendingSubkey) {
-      this.pendingSubkey.cancel();
-      this.pendingSubkey = null;
-    }
-
-    if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
+    /**
+     * Starts an implementation-specific longpress gesture.  Separately implemented for
+     * in-browser and embedded modes.
+     * @param key The base key of the longpress.
+     * @returns 
+     */
+    startLongpress(key: KeyElement): PendingGesture {
       let _this = this;
 
       // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
       // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
-      let pendingLongpress = this.pendingSubkey = new browser.PendingLongpress(this, key);
+      let pendingLongpress = new browser.PendingLongpress(this, key);
       pendingLongpress.promise.then(function(subkeyPopup) {
-        if(_this.pendingSubkey == pendingLongpress) {
-          _this.pendingSubkey = null;
-        }
-        
+        // In-browser-specific handling.
         if(subkeyPopup) {
-          // Clear key preview if any
-          _this.showKeyTip(null,false);
-
-          _this.subkeyGesture = subkeyPopup;
-          subkeyPopup.promise.then(function(keyEvent: text.KeyEvent) {
-            // Allow active cancellation, even if the source should allow passive.
-            // It's an easy and cheap null guard.
-            if(keyEvent) {
-              PreProcessor.raiseKeyEvent(keyEvent);
-            }
-            _this.clearPopup();
-          });
-
-          // Otherwise append the touch-hold (subkey) array to the OSK
+          // Append the touch-hold (subkey) array to the OSK
           let keyman = com.keyman.singleton;
           keyman.osk._Box.appendChild(subkeyPopup.element);
           keyman.osk._Box.appendChild(subkeyPopup.shim);
@@ -1653,12 +1601,99 @@ namespace com.keyman.osk {
         }
       });
 
-      if(force && this.pendingSubkey instanceof browser.PendingLongpress) {
-        // Instantly resolves the first-level promise.
-        this.pendingSubkey.resolve();
+      return pendingLongpress;
+    }
+
+    /**
+     * Initializes all supported gestures given a base key and the triggering touch coordinates.
+     * @param key     The gesture's base key
+     * @param touch   The starting touch coordinates for the gesture
+     * @returns 
+     */
+    initGestures(key: KeyElement, touch: Touch) {
+      if(key['subKeys']) {
+        let _this = this;
+
+        let pendingLongpress = this.startLongpress(key);
+        if(pendingLongpress == null) {
+          return;
+        }
+        this.pendingSubkey = pendingLongpress;
+
+        pendingLongpress.promise.then(function(subkeyPopup) {
+          if(_this.pendingSubkey == pendingLongpress) {
+            _this.pendingSubkey = null;
+          }
+
+          if(subkeyPopup) {
+            // Clear key preview if any
+            _this.showKeyTip(null,false);
+  
+            _this.subkeyGesture = subkeyPopup;
+            subkeyPopup.promise.then(function(keyEvent: text.KeyEvent) {
+              // Allow active cancellation, even if the source should allow passive.
+              // It's an easy and cheap null guard.
+              if(keyEvent) {
+                PreProcessor.raiseKeyEvent(keyEvent);
+              }
+              _this.clearPopup();
+            });
+          }
+        });
       }
     }
-  };
+
+    /**
+     * Updates all currently-pending and activated gestures.
+     * 
+     * @param currentKey    The key currently underneath the most recent touch coordinate
+     * @param previousKey   The previously-selected key
+     * @param touch         The current touch-coordinate for the gesture
+     * @returns true if should fully capture input, false if input should 'fall through'.
+     */
+    updateGestures(currentKey: KeyElement, previousKey: KeyElement, touch: Touch): boolean {
+      let key0 = previousKey;
+      let key1 = currentKey;
+
+      // Clear previous key highlighting, allow subkey controller to
+      // highlight as appropriate.
+      if(this.subkeyGesture) {
+        if(key0) {
+          key0.key.highlight(false);
+        }
+        this.subkeyGesture.updateTouch(touch);
+
+        this.keyPending = null;
+        this.touchPending = null;
+
+        return true;
+      }
+
+      this.currentTarget = null;
+
+      // If popup is visible, need to move over popup, not over main keyboard
+      // TODO:  responsible for the shortcutting gesture for early subkey display.
+
+      // TODO: Could be made part of the browser-specific implementation's update func?
+      if(key1 && key1['subKeys'] != null) {
+        // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
+        if((this.touchY - touch.pageY > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
+          this.pendingSubkey.resolve();
+        }
+      }
+
+      // As the previous block can trigger the start of the subkey gesture...
+      if(this.subkeyGesture) {
+        return true;
+      }
+
+      if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
+        //  Display the touch-hold keys (after a pause)
+        this.clearPopup();
+        this.initGestures(key1, touch);
+      }
+      return false;
+    }
 
   optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
     let keyman = com.keyman.singleton;

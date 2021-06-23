@@ -53,31 +53,17 @@ namespace com.keyman.osk {
      * 
      * @param {Object}  key   base key element
      */            
-    VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
-      if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
+    VisualKeyboard.prototype.startLongpress = function(this: VisualKeyboard, key: KeyElement): PendingGesture {
+      if(typeof(window['oskCreatePopup']) == 'function') {
         var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
             yBase = dom.Utils.getAbsoluteY(key);
 
         // #3718: No longer prepend base key to subkey array
-
-        let _this = this;
         window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
 
-        let pendingLongpress = new embedded.PendingLongpress(this, key);
-        pendingLongpress.promise.then(function(gesture) {
-          _this.subkeyGesture = gesture;
-          if(gesture) {
-            gesture.promise.then(function(keyEvent) {
-              _this.subkeyGesture = null;
-              // Allow active cancellation, even if the source should allow passive.
-              // It's an easy and cheap null guard.
-              if(keyEvent) {
-                PreProcessor.raiseKeyEvent(keyEvent);
-              }
-            });
-          }
-        });
-        this.pendingSubkey = pendingLongpress;
+        return new embedded.PendingLongpress(this, key);
+      } else {
+        return null;
       }
     };
 
