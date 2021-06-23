@@ -91,7 +91,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateEx(BOOL FActivate) {  //
   if(!FActivate)
     SelectKeyboard(KEYMANID_NONKEYMAN);   // I3594
   Globals::PostMasterController(wm_keyman_control, KMC_SETFOCUSINFO, 0);   // I3961
-	UpdateKeymanUI();
 	return TRUE;
 }
 

@@ -137,9 +137,7 @@ public:
 
   static BOOL ResetControllers();
 
-	static void PostControllers(UINT msg, WPARAM wParam, LPARAM lParam);
-  static void PostProcessControllers(UINT msg, WPARAM wParam, LPARAM lParam);
-  static BOOL IsControllerProcess();
+  static BOOL IsControllerThread(DWORD tid);
 
   static BOOL InitHandles();
   static BOOL InitSettings();

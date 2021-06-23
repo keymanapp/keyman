@@ -31,7 +31,6 @@ const
   WM_USER_Start = WM_USER+101;
   WM_USER_ParameterPass = WM_USER+100;
   WM_USER_SendFontChange = WM_USER+102;
-  WM_USER_PlatformComms = WM_USER+103;
   WM_USER_VisualKeyboardClosed = WM_USER+105;   // I4242
 
 const

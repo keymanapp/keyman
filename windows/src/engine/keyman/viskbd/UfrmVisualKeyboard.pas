@@ -176,7 +176,6 @@ type
     FToolbarHintWindow: THintWindow;
     FUpdatingToolbar: Boolean;
     FActivePageSet: Boolean;
-    FRegistered: Boolean;
     FLastTotalKeyboards: Integer;   // I4606
 
     FKeyboardButtons: TArray<TKeymanToolButton>;
@@ -232,9 +231,6 @@ type
     procedure PreRefreshKeyman;
     procedure UpdateToolbar;
     procedure RefreshSelectedKeyboard;  // I2398
-
-    procedure Unregister;
-    procedure Register;
 
     function GetToolbarPositionXML: WideString;
 
@@ -325,7 +321,6 @@ begin
   SnapBuffer := 8;
 
   cmi := TKeymanCustomisationMenuItem_Clone.Create;
-  Register;  // I2444 - Keyman tries to re-init because OSK was not unregistering until after Keyman_Exit
 
   FUnicode := True;
 
@@ -623,8 +618,6 @@ end;
 
 procedure TfrmVisualKeyboard.FormDestroy(Sender: TObject);
 begin
-  Unregister; // I2444 - Keyman tries to re-init because OSK was not unregistering until after Keyman_Exit
-
   SaveSettings;
 
   FreeAndNil(FOnScreenKeyboard);
@@ -635,20 +628,6 @@ begin
   cmi := nil;
 
   Application.OnMessage := nil;
-end;
-
-procedure TfrmVisualKeyboard.Register; // I2444 - Keyman tries to re-init because OSK was not unregistering until after Keyman_Exit
-begin
-  if not FRegistered then // I2692
-    kmint.KeymanEngineControl.RegisterControllerWindow(Handle);
-  FRegistered := True;
-end;
-
-procedure TfrmVisualKeyboard.Unregister; // I2444 - Keyman tries to re-init because OSK was not unregistering until after Keyman_Exit
-begin
-  if FRegistered then // I2692
-    kmint.KeymanEngineControl.UnregisterControllerWindow(Handle);
-  FRegistered := False;
 end;
 
 function TfrmVisualKeyboard.FormHelp(Command: Word; Data: NativeInt; var CallHelp: Boolean): Boolean;

@@ -1,18 +1,18 @@
 /*
   Name:             kmhook_keyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Hotkeys testing
                     14 Sep 2006 - mcdurdin - Initialise process when no messages have been passed
                     30 May 2007 - mcdurdin - I864 - Log exceptions in hook procedures
@@ -72,7 +72,7 @@ BOOL ForegroundWindowIsRDP();   // I4197
 
 BOOL InLanguageSwitchKeySequence = FALSE;
 HWND hwndLanguageSwitch = 0;
-		
+
 BOOL ForegroundWindowIsRDP() {   // I4197
   //TODO: Cache result
   DWORD dwProcessId;
@@ -139,12 +139,12 @@ BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD Shift
       {
         InLanguageSwitchKeySequence = FALSE;
         //ReportActiveKeyboard(_td, PC_UPDATE);
-        Globals::PostControllers(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
+        Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
         PostDummyKeyEvent();   // I4124   // I4844
         keybd_event(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);    // I4203
         return TRUE;
       }
-      
+
       return FALSE;
     }
     else
@@ -176,15 +176,15 @@ int ProcessLanguageSwitchShiftKey(WPARAM wParam, BOOL isUp)
   {
     case VK_LSHIFT:
     case VK_RSHIFT:
-    case VK_SHIFT:   
-    case VK_CONTROL: 
+    case VK_SHIFT:
+    case VK_CONTROL:
     case VK_LCONTROL:   // I4124
     case VK_RCONTROL:   // I4124
-    case VK_MENU:    
+    case VK_MENU:
     case VK_LMENU:   // I4124
     case VK_RMENU:   // I4124
       break;
-    default:         
+    default:
       return 1;
   }
 
