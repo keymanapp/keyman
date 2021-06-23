@@ -8,6 +8,9 @@ namespace com.keyman.osk.embedded {
     public readonly baseKey: KeyElement;
     public readonly promise: Promise<text.KeyEvent>;
 
+    private movedFromBaseKey: boolean = false;
+    private baseKeySelected: boolean = false;
+
     constructor(vkbd: VisualKeyboard, e: KeyElement) {
       this.vkbd = vkbd;
 
@@ -23,7 +26,10 @@ namespace com.keyman.osk.embedded {
       if(this.resolver) {
         let keyEvent: text.KeyEvent = null;
 
-        if(keyCoreID != null) {
+        if(keyCoreID == null && this.baseKeySelected) {
+          keyEvent = this.vkbd.keyEventFromSpec(this.baseKey.key.spec as keyboards.ActiveKey, null);
+          this.baseKey.key.highlight(false);
+        } else {
           // This is set with the base key of our current subkey elsewhere within the engine.
           var baseKey: OSKKeySpec = this.baseKey.key.spec;
           var found = false;
@@ -64,7 +70,15 @@ namespace com.keyman.osk.embedded {
     }
 
     updateTouch(touch: Touch) {
-      this.baseKey.key.highlight(this.baseKey.key.isUnderTouch(touch));
+      let baseKeyTouched = this.baseKey.key.isUnderTouch(touch);
+      this.baseKeySelected = this.baseKey.key.isUnderTouch(touch)
+
+      // Prevent highlighting & selection before the touch has moved from the base key.
+      if(this.movedFromBaseKey) {
+        this.baseKey.key.highlight(this.baseKeySelected);
+      } else {
+        this.movedFromBaseKey = !baseKeyTouched;
+      }
     }
   }
 }
