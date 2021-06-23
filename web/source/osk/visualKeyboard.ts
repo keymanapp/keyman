@@ -1651,7 +1651,6 @@ namespace com.keyman.osk {
           // Must be placed after its `.element` has been inserted into the DOM.
           subkeyPopup.reposition(_this);
         }
-        _this.clearPopup();
       });
 
       if(force && this.pendingSubkey instanceof browser.PendingLongpress) {
