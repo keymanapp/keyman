@@ -161,9 +161,7 @@ namespace com.keyman.text {
             let KEYSTROKE_EPSILON = Math.exp(-5);
 
             // Sort the distribution into probability-descending order.
-            keyDistribution.sort(function(a, b) {
-              return b.p - a.p;
-            });
+            keyDistribution.sort((a, b) => b.p - a.p);
 
             let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
