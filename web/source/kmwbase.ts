@@ -34,7 +34,7 @@ namespace com.keyman {
     resources?: string;
     keyboards?: string;
     fonts?: string;
-    attachType?: 'auto' | 'manual';
+    attachType?: 'auto' | 'manual' | ''; // If blank or undefined, attachType will be assigned to "auto" or "manual"
     ui?: string;
     setActiveOnRegister?: string; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
 
