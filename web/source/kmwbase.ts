@@ -24,10 +24,18 @@
 /// <reference path="text/prediction/modelManager.ts" />
 
 /***
-   KeymanWeb 11.0
-   Copyright 2017-2019 SIL International
+   KeymanWeb 14.0
+   Copyright 2017-2021 SIL International
 ***/
 namespace com.keyman {
+
+  export enum SpacebarText {
+    KEYBOARD = 'keyboard',
+    LANGUAGE = 'language',
+    LANGUAGE_KEYBOARD = 'languageKeyboard',
+    BLANK = 'blank'
+  };
+
   export class KeymanBase {
     _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
     _IE = 0;                   // browser version identification
@@ -80,7 +88,8 @@ namespace com.keyman {
       'fonts':'',
       'attachType':'',
       'ui':null,
-      'setActiveOnRegister':'true'
+      'setActiveOnRegister':'true',
+      'spacebarText':SpacebarText.LANGUAGE_KEYBOARD
     };
 
 
