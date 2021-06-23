@@ -230,7 +230,7 @@ extension KeymanWebViewController {
       self.currentText = String(jsonText)
       webView!.evaluateJavaScript("setKeymanVal(\"\(jsonText)\");", completionHandler: nil)
     } catch {
-      SentryManager.captureAndLog(error.localizedDescription)
+      log.error(error.localizedDescription)
     }
   }
   
