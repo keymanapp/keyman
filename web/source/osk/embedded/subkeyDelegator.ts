@@ -27,6 +27,7 @@ namespace com.keyman.osk.embedded {
         let keyEvent: text.KeyEvent = null;
 
         if(keyCoreID == null && this.baseKeySelected) {
+          // Handle selection of base key underneath the subkey array.
           keyEvent = this.vkbd.keyEventFromSpec(this.baseKey.key.spec as keyboards.ActiveKey, null);
           this.baseKey.key.highlight(false);
         } else {
