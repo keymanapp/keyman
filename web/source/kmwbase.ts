@@ -92,6 +92,7 @@ namespace com.keyman {
       resources: '',
       keyboards: '',
       fonts: '',
+      attachType: '',
       ui: null,
       setActiveOnRegister: 'true', // TODO: convert to boolean
 
