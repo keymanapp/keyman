@@ -70,18 +70,14 @@ namespace com.keyman.keyboards {
     }
   }
 
-  export type ErrorDescriptionEnum = 'languageName' | 'cmd';
-
-  export class ErrorStub {
-    descriptionEnum: ErrorDescriptionEnum;
-    description: string;
-    error: Error;
-
-    constructor(descriptionEnum: ErrorDescriptionEnum, description: string, error: Error) {
-      this.descriptionEnum = descriptionEnum;
-      this.description = description;
-      this.error = error;
+  // Information about a keyboard that fails to get added
+  export interface ErrorStub {
+    language?: {
+      id?: string;
+      name?: string;
     }
+
+    error: Error;
   }
   export class KeyboardTag {
     stores: {[text: string]: text.ComplexKeyboardStore} = {};
@@ -1226,9 +1222,8 @@ namespace com.keyman.keyboards {
           if (!languageFound) {
             // Construct response array of errors (failed-query keyboards)
             // that will be merged with stubs (successfully-queried keyboards)
-            let msg = this.alertLanguageUnavailable(lgName);
-            console.error(msg);
-            errorStub.push(new ErrorStub('languageName', lgName, new Error(msg)));
+            let stub: ErrorStub = {language: {name: lgName}, error: new Error(this.alertLanguageUnavailable(lgName))};
+            errorStub.push(stub);
           }
         }
 
@@ -1239,8 +1234,9 @@ namespace com.keyman.keyboards {
           // Merge this with errorStub
           let result = await this.keymanCloudRequest('&keyboardid='+cmd, false);
           if (result instanceof Error) {
-            // We only have cmd and not a language name for ErrorStub
-            errorStub.push(new ErrorStub('cmd', cmd, result));
+            // We don't have language info for this ErrorStub
+            let stub: ErrorStub = {error: result};
+            errorStub.push(stub);
             return Promise.resolve(errorStub);
           } else if (errorStub.length > 0) {
             return Promise.resolve(result.concat(errorStub));

@@ -51,7 +51,9 @@
       console.log('Adding ' + languages + ': ', result);
     }).catch(errorStubs => {
       // Consumer decides how to handle errors
-      // We'll concat the error messages to an alert
+      errorStubs.forEach(e => console.error(e));
+
+      // We'll also concat the error messages to an alert
       let errorMessages = errorStubs.map(e => e.error.message).join('\n');
       alert(errorMessages);
     });
