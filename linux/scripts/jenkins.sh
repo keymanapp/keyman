@@ -49,8 +49,8 @@ checkAndInstallRequirements()
 		fi
 	done
 
-	if [ ! -f /usr/bin/help2man ]; then
-		TOINSTALL="$TOINSTALL help2man"
+	if [ ! -f /usr/bin/perl ]; then
+		TOINSTALL="$TOINSTALL perl"
 	fi
 
 	if [ ! -f /usr/bin/meson ]; then
