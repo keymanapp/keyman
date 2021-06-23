@@ -8,7 +8,7 @@ set -u
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-THIS_DIR=$(dirname $THIS_SCRIPT)
+THIS_DIR=$(dirname "$THIS_SCRIPT")
 
 function display_usage {
     echo "Usage: $0 [--man] [--md] [--no-reconf]"
