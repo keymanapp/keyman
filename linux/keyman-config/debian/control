@@ -32,6 +32,7 @@ Homepage: https://www.keyman.com
 Package: keyman
 Architecture: all
 Depends:
+ libglib2.0-bin,
  python3-keyman-config,
  ${misc:Depends},
 Recommends:
