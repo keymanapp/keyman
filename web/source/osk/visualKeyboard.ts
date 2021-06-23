@@ -1055,6 +1055,7 @@ namespace com.keyman.osk {
 
       if(this.browserPendingLongpress) {
         this.browserPendingLongpress.cancel();
+        this.browserPendingLongpress = null;
       }
     }
 
@@ -1631,6 +1632,7 @@ namespace com.keyman.osk {
     // Clear and restart the popup timer
     if(this.browserPendingLongpress) {
       this.browserPendingLongpress.cancel();
+      this.browserPendingLongpress = null;
     }
 
     if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
@@ -1638,9 +1640,13 @@ namespace com.keyman.osk {
 
       // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
       // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
-      this.browserPendingLongpress = new browser.PendingLongpress(this, key);
+      let pl = this.browserPendingLongpress = new browser.PendingLongpress(this, key);
       this.browserPendingLongpress.promise.then(function(subkeyPopup) {
-        _this.browserPendingLongpress = null;
+        // Clear the longpress field upon any sort of fulfillment if it is still the current one.
+        if(_this.browserPendingLongpress == pl) {
+          _this.browserPendingLongpress = null;
+        }
+
         if(subkeyPopup) {
           // Clear key preview if any
           _this.showKeyTip(null,false);
