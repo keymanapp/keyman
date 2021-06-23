@@ -49,9 +49,11 @@
   function addKeyboardsForLanguage(languages) {
     kmw.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(result => {
       console.log('Adding ' + languages + ': ', result);
-    }).catch(error => {
+    }).catch(errorStubs => {
       // Consumer decides how to handle errors
-      alert(error);
+      // We'll concat the error messages to an alert
+      let errorMessages = errorStubs.map(e => e.error.message).join('\n');
+      alert(errorMessages);
     });
   }
 
