@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.73 alpha 2021-06-23
+
+* chore(windows): add engine test framework (#5337)
+* feat(linux): Auto-generate reference help (#5326)
+* fix(linux): Improve error handling if `lang_tags_map.py` is missing (#5345)
+
 ## 15.0.72 alpha 2021-06-22
 
 * fix(mac): .kmx max file version is now 0x0E00 (14.0) (#5329)
