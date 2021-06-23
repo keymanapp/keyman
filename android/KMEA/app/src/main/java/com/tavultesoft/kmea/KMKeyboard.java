@@ -507,60 +507,37 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
+    if(kOskFont == null || kOskFont.isEmpty())
+      kOskFont = kFont;
+
+    JSONObject jDisplayFont = makeFontPaths(kFont);
+    JSONObject jOskFont = makeFontPaths(kOskFont);
+
+    txtFont = getFontFilename(jDisplayFont);
+    oskFont = getFontFilename(jOskFont);
+
     String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
     setKeyboardRoot(packageID);
     String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
 
-    String tFont = "''";
-    String oFont = null;
-    if (kFont == null) {
-      txtFont = "";
-    } else {
-      if (FileUtils.hasFontExtension(kFont)) {
-        txtFont = kFont;
-        tFont = KMString.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kFont.substring(0, kFont.length() - 4), keyboardRoot, kFont);
-      } else {
-        txtFont = getFontFilename(kFont);
-        if (!txtFont.isEmpty()) {
-          tFont = makeFontPaths(kFont);
-        }
-      }
+    JSONObject reg = new JSONObject();
+    try {
+      reg.put("KN", keyboardName);
+      reg.put("KI", "Keyboard_" + keyboardID);
+      reg.put("KLC", languageID);
+      reg.put("KL", languageName);
+      reg.put("KF", keyboardPath);
+      reg.put("KP", packageID);
+
+      if (jDisplayFont != null) reg.put("KFont", jDisplayFont);
+      if (jOskFont != null) reg.put("KOskFont", jOskFont);
+    } catch(JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return false;
     }
 
-    if (kOskFont == null || kOskFont.isEmpty()) {
-      oskFont = null;
-    } else {
-      if (FileUtils.hasFontExtension(kOskFont)) {
-        oskFont = kOskFont;
-        oFont = KMString.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kOskFont.substring(0, kOskFont.length() - 4), keyboardRoot, kOskFont);
-      } else {
-        oskFont = getFontFilename(kOskFont);
-        if (!oskFont.isEmpty()) {
-          oFont = makeFontPaths(kOskFont);
-        } else {
-          oskFont = null;
-        }
-      }
-    }
-
-    if (oFont == null) {
-      oFont = tFont;
-    }
-
-    if (tFont.equals("''")) {
-      tFont = fontUndefined;
-    }
-    if (oFont.equals("''")) {
-      oFont = fontUndefined;
-    }
-
-    // Escape single-quoted names for javascript call
-    keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
-    languageName = languageName.replaceAll("\'", "\\\\'");
-
-    String jsFormat = "setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
-    String jsString = KMString.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
+    String jsString = KMString.format("setKeymanLanguage(%s)", reg.toString());
     loadJavascript(jsString);
 
     this.packageID = packageID;
@@ -695,17 +672,16 @@ final class KMKeyboard extends WebView {
   /**
    * getFontFilename
    * Parse a Font JSON object and return the font filename (ending in .ttf or .otf)
-   * @param jsonString String - Font JSON object as a string
+   * @param fontObj JSONObject - Font JSON object
    * @return String - Filename for the font. If font is invalid, return ""
    */
-  private String getFontFilename(String jsonString) {
+  private String getFontFilename(JSONObject fontObj) {
     String font = "";
-    if (jsonString == null || jsonString.isEmpty()) {
+    if (fontObj == null) {
       return font;
     }
     try {
-      JSONObject fontObj = new JSONObject(jsonString);
-      JSONArray sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontSource);
+      JSONArray sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontFiles);
       if (sourceArray != null) {
         String fontFile;
         int length = sourceArray.length();
@@ -717,7 +693,7 @@ final class KMKeyboard extends WebView {
           }
         }
       } else {
-        String fontFile = fontObj.optString(KMManager.KMKey_FontSource);
+        String fontFile = fontObj.optString(KMManager.KMKey_FontFiles);
         if (fontFile != null) {
           if (FileUtils.hasFontExtension(fontFile)) {
             font = fontFile;
@@ -1056,8 +1032,22 @@ final class KMKeyboard extends WebView {
    * @param font String font JSON object as a string
    * @return String of modified font information with full paths. If font is invalid, return "''"
    */
-  private String makeFontPaths(String font) {
+  private JSONObject makeFontPaths(String font) {
+
+    if(font == null) {
+      return null;
+    }
+
     try {
+      if (FileUtils.hasFontExtension(font)) {
+        JSONObject jfont = new JSONObject();
+        jfont.put(KMManager.KMKey_FontFamily, font.substring(0, font.length()-4));
+        JSONArray jfiles = new JSONArray();
+        jfiles.put(keyboardRoot + font);
+        jfont.put(KMManager.KMKey_FontFiles, jfiles);
+        return jfont;
+      }
+
       JSONObject fontObj = new JSONObject(font);
       JSONArray sourceArray;
       String fontFile;
@@ -1072,7 +1062,7 @@ final class KMKeyboard extends WebView {
       if (obj instanceof String) {
         fontFile = fontObj.getString(KMManager.KMKey_FontFiles);
         fontObj.put(KMManager.KMKey_FontFiles, keyboardRoot + obj);
-        return fontObj.toString();
+        return fontObj;
       } else if (obj instanceof JSONArray) {
         sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontFiles);
         if (sourceArray != null) {
@@ -1081,17 +1071,17 @@ final class KMKeyboard extends WebView {
             if (FileUtils.hasFontExtension(fontFile)) {
               fontObj.put(KMManager.KMKey_FontFiles, keyboardRoot + fontFile);
               fontObj.remove(KMManager.KMKey_FontSource);
-              return fontObj.toString();
+              return fontObj;
             }
           }
         }
       }
     } catch (JSONException e) {
       KMLog.LogException(TAG, "", e);
-      return "''";
+      return null;
     }
 
-    return font;
+    return null;
   }
 
   @SuppressLint("InflateParams")
