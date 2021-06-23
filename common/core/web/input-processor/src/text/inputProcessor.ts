@@ -133,7 +133,24 @@ namespace com.keyman.text {
             //
             // Consider use of https://developer.mozilla.org/en-US/docs/Web/API/Performance/now instead?
             // Would allow finer-tuned control.
-            let TIMEOUT_THRESHOLD = Date.now() + 16; // + 16ms.
+            let TIMEOUT_THRESHOLD: number = Number.MAX_VALUE;
+            let _globalThis = com.keyman.utils.getGlobalObject();
+            let timer: () => number;
+
+            // Available by default on `window` in browsers, but _not_ on `global` in Node, 
+            // surprisingly.  Since we can't use code dependent on `require` statements
+            // at present, we have to condition upon it actually existing.
+            if(_globalThis['performance'] && _globalThis['performance']['now']) {
+              timer = function() {
+                return _globalThis['performance']['now']();
+              };
+
+              TIMEOUT_THRESHOLD = timer() + 16; // + 16ms.
+            } // else {
+              // We _could_ just use Date.now() as a backup... but that (probably) only matters
+              // when unit testing.  So... we actually don't _need_ time thresholding when in 
+              // a Node environment.
+            // }
 
             // Tracks a minimum probability for keystroke probability.  Anything less will not be
             // included in alternate calculations. 
@@ -155,7 +172,7 @@ namespace com.keyman.text {
             for(let pair of keyDistribution) {
               if(pair.p < KEYSTROKE_EPSILON) {
                 break;
-              } else if(Date.now() >= TIMEOUT_THRESHOLD) {
+              } else if(timer && timer() >= TIMEOUT_THRESHOLD) {
                 break;
               }
 
