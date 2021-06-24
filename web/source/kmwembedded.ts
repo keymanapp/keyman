@@ -341,8 +341,6 @@ namespace com.keyman.text {
    *  @param  {string}  keyName   key identifier
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
-      let core = (<KeymanBase> keymanweb).core;
-
       var origArg = keyName;
       if(!keymanweb.core.activeKeyboard || !osk.vkbd) {
         return false;
@@ -356,19 +354,14 @@ namespace com.keyman.text {
 
       // Can't just split on '-' because some layers like ctrl-shift contain it.
       let separatorIndex = keyName.lastIndexOf('-');
-      var layer = core.keyboardProcessor.layerId;
+      //var layer = core.keyboardProcessor.layerId;
       if (separatorIndex > 0) {
-        layer = keyName.substring(0, separatorIndex);
         keyName = keyName.substring(separatorIndex+1);
-      }
-      if(layer == 'undefined') {
-        layer=core.keyboardProcessor.layerId;
       }
 
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(layer);
-      
+      var Lelem=keymanweb.domManager.getLastActiveElement();
       keymanweb.domManager.initActiveElement(Lelem);
 
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
