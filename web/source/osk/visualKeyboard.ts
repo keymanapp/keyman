@@ -1672,9 +1672,9 @@ namespace com.keyman.osk {
       this.currentTarget = null;
 
       // If popup is visible, need to move over popup, not over main keyboard
-      // TODO:  responsible for the shortcutting gesture for early subkey display.
-
-      // TODO: Could be made part of the browser-specific implementation's update func?
+      // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
+      // Not completely sure what the correct, generalized abstraction would be for that...
+      // and this PR's already big enough, anyway.
       if(key1 && key1['subKeys'] != null) {
         // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
         if((this.touchY - touch.pageY > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
@@ -1682,7 +1682,8 @@ namespace com.keyman.osk {
         }
       }
 
-      // As the previous block can trigger the start of the subkey gesture...
+      // If there is an active popup menu (which can occur from the previous block),
+      // a subkey popup exists; do not allow base key output.
       if(this.subkeyGesture) {
         return true;
       }
