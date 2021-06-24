@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 15.0.73 alpha 2021-06-23
+
+* chore(windows): add engine test framework (#5337)
+* feat(linux): Auto-generate reference help (#5326)
+* fix(linux): Improve error handling if `lang_tags_map.py` is missing (#5345)
+
+## 15.0.72 alpha 2021-06-22
+
+* fix(mac): .kmx max file version is now 0x0E00 (14.0) (#5329)
+* fix(mac): kmp.inf is windows-1252 (#5328)
+* fix(windows): restore endpoints for interface stability (#5254)
+* chore(linux): Build also on riscv64 to facilitate migration on Ubuntu 🍒 (#5323)
+* refactor(web): OSK key source-code reorganization (#5291)
+* refactor(web): osk key highlighting/preview behavior (#5292)
+* change(ios): setText now uses JSON serialization (#5321)
+
 ## 15.0.71 alpha 2021-06-18
 
 * feat(common): keyboard_processor wasm build (#5233)
