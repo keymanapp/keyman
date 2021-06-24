@@ -465,8 +465,10 @@ namespace com.keyman.osk {
      */
     showBuild() {
       let keymanweb = com.keyman.singleton;
-      keymanweb.util.alert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
-        +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
+      if (keymanweb.options.useAlerts) {
+        keymanweb.util.alert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
+          +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
+      }
     }
 
     /**

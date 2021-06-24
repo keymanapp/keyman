@@ -570,9 +570,11 @@ namespace com.keyman.keyboards {
                 // Thanks, Closure errors.
                 if(!this.keymanweb.isEmbedded) {
                   util.wait(false);
-                  util.alert(altString || msg, function() {
-                    this.keymanweb['setActiveKeyboard'](''); // The API call!
-                  }.bind(this));
+                  if (this.keymanweb.options.useAlerts) {
+                    util.alert(altString || msg, function() {
+                      this.keymanweb['setActiveKeyboard'](''); // The API call!
+                    }.bind(this));
+                  }
                 }
 
                 switch(msgType) { // in case we extend this later.
@@ -947,7 +949,9 @@ namespace com.keyman.keyboards {
 
           if(typeof(x[i]['filename']) == 'string') {
             if(!this.addStub(x[i])) {
-              alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
+              if (this.keymanweb.options.useAlerts) {
+                this.keymanweb.util.alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
+              }
             }
           } else {
             if(x[i]['language']) {
@@ -1327,7 +1331,9 @@ namespace com.keyman.keyboards {
     private alertLanguageUnavailable(languageName: string): string {
       let msg = 'No keyboards are available for '+ languageName + '. '
         +'Does it have another language name?';
-      this.keymanweb.util.alert(msg);
+      if (this.keymanweb.options.useAlerts) {
+        this.keymanweb.util.alert(msg);
+      }
       return msg;
     }
 
@@ -1338,7 +1344,9 @@ namespace com.keyman.keyboards {
      *
      **/
     private serverUnavailable(cmd) {
-      this.keymanweb.util.alert(cmd == '' ? 'Unable to connect to Keyman Cloud server!' : cmd);
+      if (this.keymanweb.options.useAlerts) {
+        this.keymanweb.util.alert(cmd == '' ? 'Unable to connect to Keyman Cloud server!' : cmd);
+      }
       this.keymanweb.warned=true;
     }
 
