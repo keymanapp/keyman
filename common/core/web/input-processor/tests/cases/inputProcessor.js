@@ -93,7 +93,7 @@ describe('InputProcessor', function() {
         core.activeKeyboard = keyboard;
         let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = key.constructKeyEvent(core.keyboardProcessor, context, device);
         
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -110,7 +110,7 @@ describe('InputProcessor', function() {
         core.activeKeyboard = keyboard;
         let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = key.constructKeyEvent(core.keyboardProcessor, context, device);
         
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -127,7 +127,7 @@ describe('InputProcessor', function() {
         let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         key.keyDistribution = testDistribution;
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = key.constructKeyEvent(core.keyboardProcessor, context, device);
         
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
@@ -145,7 +145,7 @@ describe('InputProcessor', function() {
         let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         key.keyDistribution = testDistribution;
-        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        let event = key.constructKeyEvent(core.keyboardProcessor, context, device);
         
         let behavior = core.processKeyEvent(event, context);
         assert.isNotNull(behavior);
