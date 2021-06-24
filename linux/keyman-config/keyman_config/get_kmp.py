@@ -6,7 +6,16 @@ import logging
 import requests
 import requests_cache
 import os
+from gi.repository import GObject
 from keyman_config import KeymanApiUrl, KeymanDownloadsUrl
+from keyman_config.deprecated_decorator import deprecated
+
+
+class InstallLocation(GObject.GEnum):
+    OS = 1
+    Shared = 2
+    User = 3
+    Unknown = 99
 
 
 def get_package_download_data(packageID, weekCache=False):
@@ -99,20 +108,46 @@ def keyman_cache_dir():
     return km_cache
 
 
+def _get_data_base_dir(area):
+    if area == InstallLocation.User:
+        return os.environ.get('XDG_DATA_HOME',
+                              os.path.join(os.path.expanduser('~'), '.local', 'share'))
+    if area == InstallLocation.Shared:
+        return '/usr/local/share'
+    return '/usr/share'
+
+
+@deprecated('Use get_keyman_dir(InstallLocation.User) instead')
 def user_keyman_dir():
-    home = os.path.expanduser("~")
-    datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-    return os.path.join(datahome, "keyman")
+    return get_keyman_dir(InstallLocation.User)
 
 
+def get_keyman_dir(area):
+    return os.path.join(_get_data_base_dir(area), 'keyman')
+
+
+@deprecated('Use get_keyman_font_dir(InstallLocation.User) instead')
 def user_keyman_font_dir():
-    home = os.path.expanduser("~")
-    datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-    return os.path.join(datahome, "fonts", "keyman")
+    return os.path.join(_get_data_base_dir(InstallLocation.User), 'fonts', 'keyman')
 
 
+def get_keyman_font_dir(area, keyboardid):
+    return os.path.join(_get_data_base_dir(area), 'fonts', 'keyman', keyboardid)
+
+
+@deprecated('Use get_keyboard_dir(InstallLocation.User, keyboardid) instead')
 def user_keyboard_dir(keyboardid):
-    return os.path.join(user_keyman_dir(), keyboardid)
+    return get_keyboard_dir(InstallLocation.User, keyboardid)
+
+
+def get_keyboard_dir(area, keyboardid):
+    return os.path.join(_get_data_base_dir(area), 'keyman', keyboardid)
+
+
+def get_keyman_doc_dir(area, keyboardid):
+    if area == InstallLocation.User:
+        return get_keyboard_dir(area, keyboardid)
+    return os.path.join(_get_data_base_dir(area), 'doc', 'keyman')
 
 
 def get_kmp_file(downloaddata, cache=False):

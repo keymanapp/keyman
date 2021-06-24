@@ -2,41 +2,14 @@
 
 import os
 import json
-from gi.repository import GObject
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
-from keyman_config.get_kmp import user_keyman_dir
+from keyman_config.get_kmp import get_keyman_dir, InstallLocation
+from keyman_config.deprecated_decorator import deprecated
 
 
-class InstallArea(GObject.GEnum):
-    IA_OS = 1
-    IA_SHARED = 2
-    IA_USER = 3
-    IA_UNKNOWN = 99
-
-
+@deprecated('Use get_keyman_dir(area) instead')
 def get_install_area_path(area):
-    """
-    Get the path of an install area.
-
-    Args:
-      area (InstallArea): install area to check
-            InstallArea.IA_USER: ~/.local/share/keyman
-            InstallArea.IA_SHARED: /usr/local/share/keyman
-            InstallArea.IA_OS: /usr/share/keyman
-            InstallArea.IA_UNKNOWN: /usr/share/keyman
-
-    Returns:
-        string: path of the install area
-    """
-    check_path = "/usr/share/keyman"
-    if area == InstallArea.IA_USER:
-        check_path = user_keyman_dir()
-    elif area == InstallArea.IA_SHARED:
-        check_path = "/usr/local/share/keyman"
-    elif area == InstallArea.IA_OS:
-        check_path = "/usr/share/keyman"
-
-    return check_path
+    return get_keyman_dir(area)
 
 
 def get_installed_kmp(area):
@@ -44,10 +17,10 @@ def get_installed_kmp(area):
     Get list of installed kmp in an install area.
 
     Args:
-        area (InstallArea): install area to check
-            InstallArea.IA_USER: ~/.local/share/keyman
-            InstallArea.IA_SHARED: /usr/local/share/keyman
-            InstallArea.IA_OS: /usr/share/keyman
+        area (InstallLocation): install area to check
+            InstallLocation.User: ~/.local/share/keyman
+            InstallLocation.Shared: /usr/local/share/keyman
+            InstallLocation.OS: /usr/share/keyman
     Returns:
         list: Installed kmp
             dict: Keyboard
@@ -59,7 +32,7 @@ def get_installed_kmp(area):
                 path (str): base path where keyboard is installed
                 description (str): Keyboard description
     """
-    check_paths = [get_install_area_path(area)]
+    check_paths = [get_keyman_dir(area)]
 
     return get_installed_kmp_paths(check_paths)
 
@@ -143,9 +116,9 @@ def get_kmp_version(packageID):
         None: if not found
     """
     version = None
-    user_kmp = get_installed_kmp(InstallArea.IA_USER)
-    shared_kmp = get_installed_kmp(InstallArea.IA_SHARED)
-    os_kmp = get_installed_kmp(InstallArea.IA_OS)
+    user_kmp = get_installed_kmp(InstallLocation.User)
+    shared_kmp = get_installed_kmp(InstallLocation.Shared)
+    os_kmp = get_installed_kmp(InstallLocation.OS)
 
     if packageID in os_kmp:
         version = os_kmp[packageID]['version']
@@ -180,7 +153,7 @@ def get_kmp_version_user(packageID):
         str: kmp version if kmp ID is installed
         None: if not found
     """
-    user_kmp = get_installed_kmp(InstallArea.IA_USER)
+    user_kmp = get_installed_kmp(InstallLocation.User)
     if packageID in user_kmp:
         return user_kmp[packageID]['version']
     else:
