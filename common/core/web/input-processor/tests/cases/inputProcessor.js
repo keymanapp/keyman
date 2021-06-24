@@ -57,8 +57,8 @@ describe('InputProcessor', function() {
 
     // At the time this test block was written...  810485 chars.
     // Let's force it to the same order of magnitude, even if the codebase grows.
-    if(coreSourceCode._kmwLength() > 1000000) {
-      coreSourceCode = coreSourceCode._kmwSubstring(0, 1000000);
+    if(coreSourceCode.length > 1000000) {
+      coreSourceCode = coreSourceCode.substring(0, 1000000);
     }
 
     this.beforeAll(function() {
