@@ -47,13 +47,8 @@
    * @param {string} languages. Could be comma-separated languages
    */
   function addKeyboardsForLanguage(languages) {
-    kmw.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(stubs => {
-      // Filter for just keyboard stubs
-      stubs.forEach(s => {
-        if (s instanceof com.keyman.keyboards.KeyboardStub) {
-          console.log('Adding keyboard for ' + s.KL);
-        }
-      });
+    kmw.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(result => {
+      console.log('Adding ' + languages + ': ', result);
     }).catch(errorStubs => {
       // Consumer decides how to handle errors
       errorStubs.forEach(e => console.error(e));
