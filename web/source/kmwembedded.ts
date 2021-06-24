@@ -297,7 +297,7 @@ namespace com.keyman.text {
 
     if(!isVisible) {
       if(delegator) {
-        delegator.resolve(null);
+        delegator.resolve(null, null);
         osk.vkbd.subkeyDelegator = null;
       }
     }
@@ -377,42 +377,20 @@ namespace com.keyman.text {
       keymanweb.domManager.initActiveElement(Lelem);
 
       var delegator: com.keyman.osk.embedded.SubkeyDelegator = null;
-      let selectedKey: com.keyman.osk.OSKKeySpec = null;
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
       if(osk.vkbd.subkeyDelegator) {
         delegator = osk.vkbd.subkeyDelegator as com.keyman.osk.embedded.SubkeyDelegator;
 
-        // This is set with the base key of our current subkey elsewhere within the engine.
-        var baseKey: com.keyman.osk.OSKKeySpec = delegator.baseKey.key.spec;
-        var found = false;
-
-        if(baseKey.coreID == keyName) {
-          selectedKey = baseKey;
-          found = true;
-        } else {
-          // ... yeah, there are some funky type shenanigans between the two.
-          // OSKKeySpec is the OSK's... reinterpretation of the ActiveKey type.
-          selectedKey = (baseKey as com.keyman.keyboards.ActiveKey).getSubkey(keyName) as com.keyman.osk.OSKKeySpec;
-          found = !!selectedKey;
-        }
-
-        if(!found) {
-          console.warn("Could not find subkey '" + origArg + "' under the current base key '" + baseKey.coreID + "'!");
+        try {
+          delegator.resolve(keyName, osk.vkbd);
+        } catch (e) {
+          let err = e as Error;
+          console.warn(err.message);
         }
 
         osk.vkbd.subkeyDelegator = null;
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
-      }
-
-      let Lkc: com.keyman.text.KeyEvent = null;
-      if(selectedKey) {
-        Lkc = osk.vkbd.keyEventFromSpec(selectedKey as com.keyman.keyboards.ActiveKey, null);
-        Lkc.vkCode=Lkc.Lcode;
-      }
-
-      if(delegator) {
-        delegator.resolve(Lkc);
       }
   };
 

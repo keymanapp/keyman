@@ -14,8 +14,34 @@ namespace com.keyman.osk.embedded {
       this.baseKey = e;
     }
 
-    public resolve(keyEvent: text.KeyEvent) {
+    public resolve(keyCoreID: string, vkbd: VisualKeyboard) {
       if(this.resolver) {
+        // This is set with the base key of our current subkey elsewhere within the engine.
+        var baseKey: OSKKeySpec = this.baseKey.key.spec;
+        var found = false;
+        let selectedKey: OSKKeySpec;
+
+        if(baseKey.coreID == keyCoreID) {
+          selectedKey = baseKey;
+          found = true;
+        } else {
+          // ... yeah, there are some funky type shenanigans between the two.
+          // OSKKeySpec is the OSK's... reinterpretation of the ActiveKey type.
+          selectedKey = (baseKey as keyboards.ActiveKey).getSubkey(keyCoreID) as OSKKeySpec;
+          found = !!selectedKey;
+        }
+
+        if(!found) {
+          this.resolver(null); // Maintains existing behavior.
+          throw new Error("Could not find subkey '" + keyCoreID + "' under base key '" + baseKey.coreID + "'!");
+        }
+
+        let keyEvent: text.KeyEvent = null;
+        if(selectedKey) {
+          keyEvent = vkbd.keyEventFromSpec(selectedKey as keyboards.ActiveKey, null);
+          keyEvent.vkCode=keyEvent.Lcode;
+        }
+
         this.resolver(keyEvent);
       }
       this.resolver = null;
