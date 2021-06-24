@@ -14,7 +14,7 @@ _km-package-install_completions()
     fi
 
     case "${prev}" in
-        "-k"|"--keyboardid")
+        "-p"|"--package")
             words=""
             if [[ ! -s ~/.cache/keyman/kmpdirlist ]] ; then
                 if [[ -e ./km-package-install ]]; then
@@ -29,6 +29,12 @@ _km-package-install_completions()
                 COMPREPLY=($(compgen -W "${words}" -- ${cur}))
                 return 0
             fi
+            ;;
+        "-f"|"--file")
+            local IFS=$'\n'
+            compopt -o filenames
+            COMPREPLY=( $(compgen -f -X "!"*.kmp -- $cur) $(compgen -d -- $cur) )
+            return 0
             ;;
         *)
         ;;
