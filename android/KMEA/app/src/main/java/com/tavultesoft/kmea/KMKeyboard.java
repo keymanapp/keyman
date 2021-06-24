@@ -1044,6 +1044,10 @@ final class KMKeyboard extends WebView {
   private String getSubkeyText(String keyID, String keyText) {
     String text = keyText;
     if (text.isEmpty()) {
+      if(keyID.indexOf("U_") != -1 && keyID.indexOf("+") != -1 ) {
+        // Chop off any appended '+____' portion of the key ID.
+        keyID = keyID.substring(0, keyID.indexOf("+"));
+      }
       text = keyID.replaceAll("U_", "\\\\u");
     }
     return text;
