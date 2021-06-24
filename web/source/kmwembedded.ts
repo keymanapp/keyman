@@ -374,15 +374,10 @@ namespace com.keyman.text {
           selectedKey = baseKey;
           found = true;
         } else {
-          // Search for the specified subkey so we can retrieve its useful properties.
-          // It should be within the popupBaseKey's subkey list.
-          for(let subKey of baseKey.sk) {
-            if(subKey.coreID == keyName) {
-              selectedKey = subKey;
-              found = true;
-              break;
-            }
-          }
+          // ... yeah, there are some funky type shenanigans between the two.
+          // OSKKeySpec is the OSK's... reinterpretation of the ActiveKey type.
+          selectedKey = (baseKey as com.keyman.keyboards.ActiveKey).getSubkey(keyName) as com.keyman.osk.OSKKeySpec;
+          found = !!selectedKey;
         }
 
         if(!found) {

@@ -221,10 +221,10 @@ namespace com.keyman.keyboards {
       return Lkc;
     }
 
-    public getSubkey(id: string): ActiveKey {
+    public getSubkey(coreID: string): ActiveKey {
       if(this.sk) {
         for(let key of this.sk) {
-          if(key.id == id) {
+          if(key.coreID == coreID) {
             return key;
           }
         }
