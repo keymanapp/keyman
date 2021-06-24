@@ -95,7 +95,7 @@ describe('InputProcessor', function() {
         let key = layout.getLayer('default').getKey('K_A');
         let event = key.constructKeyEvent(core.keyboardProcessor, context, device);
         
-        let behavior = core.processKeyEvent(event, context);
+        let behavior = core.processKeyEvent(event);
         assert.isNotNull(behavior);
       });
   
@@ -112,7 +112,7 @@ describe('InputProcessor', function() {
         let key = layout.getLayer('default').getKey('K_A');
         let event = key.constructKeyEvent(core.keyboardProcessor, context, device);
         
-        let behavior = core.processKeyEvent(event, context);
+        let behavior = core.processKeyEvent(event);
         assert.isNotNull(behavior);
       });
     });
@@ -129,7 +129,7 @@ describe('InputProcessor', function() {
         key.keyDistribution = testDistribution;
         let event = key.constructKeyEvent(core.keyboardProcessor, context, device);
         
-        let behavior = core.processKeyEvent(event, context);
+        let behavior = core.processKeyEvent(event);
         assert.isNotNull(behavior);
       });
   
@@ -147,7 +147,7 @@ describe('InputProcessor', function() {
         key.keyDistribution = testDistribution;
         let event = key.constructKeyEvent(core.keyboardProcessor, context, device);
         
-        let behavior = core.processKeyEvent(event, context);
+        let behavior = core.processKeyEvent(event);
         assert.isNotNull(behavior);
       });
     });
