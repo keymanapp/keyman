@@ -177,6 +177,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       editor.commit();
     }
 
+    KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
+    KMManager.setSpacebarText(spacebarText);
+
     setContentView(R.layout.activity_main);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
