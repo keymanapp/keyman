@@ -1655,8 +1655,7 @@ namespace com.keyman.osk {
       let key0 = previousKey;
       let key1 = currentKey;
 
-      // Clear previous key highlighting, allow subkey controller to
-      // highlight as appropriate.
+      // Clear previous key highlighting, allow subkey controller to highlight as appropriate.
       if(this.subkeyGesture) {
         if(key0) {
           key0.key.highlight(false);
@@ -1689,7 +1688,8 @@ namespace com.keyman.osk {
       }
 
       if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
-        //  Display the touch-hold keys (after a pause)
+        // While there may not be an active subkey menu, we should probably update which base key
+        // is being highlighted by the current touch & start a pending longpress for it.
         this.clearPopup();
         this.initGestures(key1, touch);
       }
