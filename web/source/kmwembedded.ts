@@ -62,7 +62,7 @@ namespace com.keyman.osk {
         // #3718: No longer prepend base key to subkey array
 
         let _this = this;
-        let pendingLongpress = new embedded.PendingLongpress(key);
+        let pendingLongpress = new embedded.PendingLongpress(this, key);
         pendingLongpress.promise.then(function(delegator) {
           _this.subkeyDelegator = delegator;
           if(delegator) {
@@ -297,7 +297,7 @@ namespace com.keyman.text {
 
     if(!isVisible) {
       if(delegator) {
-        delegator.resolve(null, null);
+        delegator.resolve(null);
         osk.vkbd.subkeyDelegator = null;
       }
     }
@@ -382,7 +382,7 @@ namespace com.keyman.text {
         delegator = osk.vkbd.subkeyDelegator as com.keyman.osk.embedded.SubkeyDelegator;
 
         try {
-          delegator.resolve(keyName, osk.vkbd);
+          delegator.resolve(keyName);
         } catch (e) {
           let err = e as Error;
           console.warn(err.message);

@@ -1,11 +1,14 @@
 namespace com.keyman.osk.embedded {
   export class SubkeyDelegator {
     private resolver: (keyEvent: text.KeyEvent) => void;
+    private readonly vkbd: VisualKeyboard;
 
     public readonly baseKey: KeyElement;
     public readonly promise: Promise<text.KeyEvent>;
 
-    constructor(e: KeyElement) {
+    constructor(vkbd: VisualKeyboard, e: KeyElement) {
+      this.vkbd = vkbd;
+
       let _this = this;
       this.promise = new Promise<text.KeyEvent>(function(resolve) {
         _this.resolver = resolve;
@@ -14,7 +17,7 @@ namespace com.keyman.osk.embedded {
       this.baseKey = e;
     }
 
-    public resolve(keyCoreID: string, vkbd: VisualKeyboard) {
+    public resolve(keyCoreID: string) {
       if(this.resolver) {
         // This is set with the base key of our current subkey elsewhere within the engine.
         var baseKey: OSKKeySpec = this.baseKey.key.spec;
@@ -38,7 +41,7 @@ namespace com.keyman.osk.embedded {
 
         let keyEvent: text.KeyEvent = null;
         if(selectedKey) {
-          keyEvent = vkbd.keyEventFromSpec(selectedKey as keyboards.ActiveKey, null);
+          keyEvent = this.vkbd.keyEventFromSpec(selectedKey as keyboards.ActiveKey, null);
           keyEvent.vkCode=keyEvent.Lcode;
         }
 
