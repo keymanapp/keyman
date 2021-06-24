@@ -41,12 +41,9 @@
       var attachText = attachType ? attachType : "default";
 
       var kmw=window.keyman;
-      if (attachType) {
-        kmw.init({
-          attachType: attachType});
-      } else {
-        kmw.init({});
-      }
+      kmw.init({
+        attachType: attachType ? attachType : ''
+      });
     </script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
