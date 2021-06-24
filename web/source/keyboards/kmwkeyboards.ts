@@ -135,7 +135,7 @@ namespace com.keyman.keyboards {
      */
     registrationResolvers: {[timeoutID: number] : RegistrationPromiseTuple} = {};
 
-    languageListPromise: Promise<(KeyboardStub)[]|Error> = null;
+    languageListPromise: Promise<(KeyboardStub)[]> = null;
 
     languageList: any[] = null; // List of keyboard languages available for KeymanCloud
 
@@ -1273,9 +1273,9 @@ namespace com.keyman.keyboards {
      *
      *  @param  {string}   cmd        command string
      *  @param  {boolean?} byLanguage if true, context=languages, else context=keyboards
-     *  @returns {Promise<(KeyboardStub[]|Error>} Promise of added keyboard stubs
+     *  @returns {Promise<(KeyboardStub[]>} Promise of added keyboard stubs
      **/
-    keymanCloudRequest(cmd: string, byLanguage?: boolean): Promise<KeyboardStub[]|Error> {
+    keymanCloudRequest(cmd: string, byLanguage?: boolean): Promise<KeyboardStub[]> {
       var kbdManager = this;
       var keymanweb = this.keymanweb;
 
