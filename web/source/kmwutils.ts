@@ -972,6 +972,18 @@ namespace com.keyman {
     }
 
     /**
+     * Customized internal alert. This is enabled/disabled by the option flag 'useAlerts'
+     *
+     * @param     {string}        s       alert text
+     * @param     {function()=}   fn      function to call when alert dismissed
+     */
+     internalAlert(s: string, fn?: () => void): void {
+       if (this.keyman.options.useAlerts) {
+         this.alert(s, fn);
+       }
+     }
+
+    /**
      *  Prepare the background and keyboard loading wait message box
      *  Should not be called before options are defined during initialization
      **/
