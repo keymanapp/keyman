@@ -348,13 +348,26 @@ namespace com.keyman.text {
 
     // Clones the state of an existing EditableElement, creating a Mock version of its state.
     static from(outputTarget: OutputTarget) {
-      let preText = outputTarget.getTextBeforeCaret();
-      let caretIndex = preText._kmwLength();
+      let clone: Mock;
 
-      // We choose to ignore (rather, pre-emptively remove) any actively-selected text,
-      // as since it's always removed instantly during any text mutation operations.
-      let clone = new Mock(preText + outputTarget.getTextAfterCaret(), caretIndex);
+      if(outputTarget instanceof Mock) {
+        // Avoids the need to run expensive kmwstring.ts / `_kmwLength()`
+        // calculations when deep-copying Mock instances.
+        let priorMock = outputTarget as Mock;
+        clone = new Mock(priorMock.text, priorMock.caretIndex);
+      } else {
+        // If we're 'cloning' a different OutputTarget type, we don't have a
+        // guaranteed way to more efficiently get these values; these are the
+        // best methods specified by the abstraction.
+        let preText = outputTarget.getTextBeforeCaret();
+        let caretIndex = preText._kmwLength();
 
+        // We choose to ignore (rather, pre-emptively remove) any actively-selected text,
+        // as since it's always removed instantly during any text mutation operations.
+        clone = new Mock(preText + outputTarget.getTextAfterCaret(), caretIndex);
+      }
+
+      // Also duplicate deadkey state!  (Needed for fat-finger ops.)
       clone.setDeadkeys(outputTarget.deadkeys());
 
       return clone;
