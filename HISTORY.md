@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.74 alpha 2021-06-24
+
+* fix(android): fixes application of nextlayer for subkeys with customized layer setting (#5350)
+* feat(common/core/web): engine correction-prep optimizations (#5319)
+* feat(linux): Add support for impish (Ubuntu 21.10) (#5334)
+* fix(linux): Add libglib2.0-bin to keyman Depends 🍒 (#5360)
+
 ## 15.0.73 alpha 2021-06-23
 
 * chore(windows): add engine test framework (#5337)
