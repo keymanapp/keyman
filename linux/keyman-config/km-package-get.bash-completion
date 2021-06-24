@@ -2,11 +2,13 @@
 
 _km-package-get_completions()
 {
-    local cur prev opts
+    local cur prev opts cache
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts="-h --help -v --verbose -vv --veryverbose --version"
+
+    cache=${XDG_CACHE_HOME:-~/.cache}/keyman/kmpdirlist
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -14,7 +16,7 @@ _km-package-get_completions()
     fi
 
     words=""
-    if [[ ! -e ~/.cache/keyman/kmpdirlist ]] ; then
+    if [[ ! -e $cache ]] ; then
         if [[ -e ./km-package-install ]]; then
             python3 -c "from imp import load_source;load_source('km_package_install', './km-package-install');from km_package_install import list_keyboards;list_keyboards()"
         else
@@ -22,8 +24,8 @@ _km-package-get_completions()
         fi
     fi
 
-    if [[ -r ~/.cache/keyman/kmpdirlist ]] ; then
-        for file in `cat ~/.cache/keyman/kmpdirlist`; do words="${words} ${file}"; done
+    if [[ -r $cache ]] ; then
+        for file in `cat $cache`; do words="${words} ${file}"; done
         COMPREPLY=($(compgen -W "${words}" -- ${cur}))
         return 0
     fi
