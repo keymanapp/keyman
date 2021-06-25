@@ -33,31 +33,12 @@ public enum VibrationSupport {
   case taptic // Has the Taptic engine, allowing use of UIImpactFeedbackGenerator for customizable vibrations
 }
 
-public enum SpacebarText {
-  case LANGUAGE
-  case KEYBOARD
-  case LANGUAGE_KEYBOARD
-  case BLANK
-
+public enum SpacebarText: String {
   // Maps to enum SpacebarText in kmwbase.ts
-  public static func fromString(mode: String) -> SpacebarText {
-    switch(mode) {
-      case "language": return LANGUAGE
-      case "keyboard": return KEYBOARD
-      case "languageKeyboard": return LANGUAGE_KEYBOARD
-      case "blank": return BLANK
-      default: return LANGUAGE_KEYBOARD
-    }
-  }
-
-  public func toString() -> String {
-    switch(self) {
-    case .LANGUAGE: return "language"
-    case .KEYBOARD: return "keyboard"
-    case .LANGUAGE_KEYBOARD: return "languageKeyboard"
-    case .BLANK: return "blank"
-    }
-  }
+  case LANGUAGE = "language"
+  case KEYBOARD = "keyboard"
+  case LANGUAGE_KEYBOARD = "languageKeyboard"
+  case BLANK = "blank"
 };
 
 /**
