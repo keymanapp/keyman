@@ -438,6 +438,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func updateShowBannerSetting() {
     keymanWeb.updateShowBannerSetting()
   }
+  
+  func updateSpacebarText() {
+    keymanWeb.updateSpacebarText()
+  }
 
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
     if isSystemKeyboard {
