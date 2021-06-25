@@ -1474,10 +1474,10 @@ namespace com.keyman.dom {
     /**
      * Function     Initialization
      * Scope        Public
-     * @param       {Object}  arg     object array of user-defined properties
+     * @param       {com.keyman.OptionType}  arg     object of user-defined properties
      * Description  KMW window initialization  
      */    
-    init: (arg:any) => Promise<any> = function(this: DOMManager, arg): Promise<any> { 
+    init: (arg: com.keyman.OptionType) => Promise<any> = function(this: DOMManager, arg): Promise<any> { 
       var i,j,c,e,p,eTextArea,eInput,opt,dTrailer,ds;
       var osk = this.keyman.osk;
       var util = this.keyman.util;

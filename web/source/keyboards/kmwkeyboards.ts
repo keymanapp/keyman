@@ -570,8 +570,8 @@ namespace com.keyman.keyboards {
                 // Thanks, Closure errors.
                 if(!this.keymanweb.isEmbedded) {
                   util.wait(false);
-                  util.alert(altString || msg, function() {
-                    this.keymanweb['setActiveKeyboard'](''); // The API call!
+                  util.internalAlert(altString || msg, function() {
+                      this.keymanweb['setActiveKeyboard'](''); // The API call!
                   }.bind(this));
                 }
 
@@ -947,7 +947,7 @@ namespace com.keyman.keyboards {
 
           if(typeof(x[i]['filename']) == 'string') {
             if(!this.addStub(x[i])) {
-              alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
+              this.keymanweb.util.internalAlert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
             }
           } else {
             if(x[i]['language']) {
@@ -1211,17 +1211,12 @@ namespace com.keyman.keyboards {
           if (!languageFound) {
             // TODO: Construct response array of errors (failed-query keyboards)
             // that will be merged with stubs (successfully-queried keyboards)
-            console.error('No keyboards are available for '+lgName+'. '+
-              'Does it have another language name?');
+            console.error(this.alertLanguageUnavailable(lgName));
           }
         }
 
         if(cmd == '') {
-          // TODO: Check useAlert flag to determine whether or not KeymanWeb should display its own alert messages
-          let msg = 'No keyboards are available for '+languages[0]+'. '
-              +'Does it have another language name?';
-          this.keymanweb.util.alert(msg);
-          return Promise.reject(new Error(msg));
+          return Promise.reject(new Error(this.alertLanguageUnavailable(languages[0])));
         } else {
           return this.keymanCloudRequest('&keyboardid='+cmd, false);
         }
@@ -1325,13 +1320,25 @@ namespace com.keyman.keyboards {
     }
 
     /**
+     * Display warning if language name unavailable to add keyboard
+     * @param {string} languageName
+     * @returns string of Error message
+     */
+    private alertLanguageUnavailable(languageName: string): string {
+      let msg = 'No keyboards are available for '+ languageName + '. '
+        +'Does it have another language name?';
+      this.keymanweb.util.internalAlert(msg);
+      return msg;
+    }
+
+    /**
      *  Display warning if Keyman Cloud server fails to respond
      *
      *  @param  {string}  cmd command string sent to Cloud
      *
      **/
     private serverUnavailable(cmd) {
-      this.keymanweb.util.alert(cmd == '' ? 'Unable to connect to Keyman Cloud server!' : cmd);
+      this.keymanweb.util.internalAlert(cmd == '' ? 'Unable to connect to Keyman Cloud server!' : cmd);
       this.keymanweb.warned=true;
     }
 
