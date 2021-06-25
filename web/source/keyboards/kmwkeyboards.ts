@@ -1242,7 +1242,6 @@ namespace com.keyman.keyboards {
         try {
           // Merge this with errorStub
           let result:(KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest('&keyboardid='+cmd, false);
-          console.log("Try to merge result and errorStub");
           if (Array.isArray(result)) {
             if (errorStub.length > 0) {
               result = result.concat(errorStub);
@@ -1253,7 +1252,7 @@ namespace com.keyman.keyboards {
           }
         } catch(err) {
             // We don't have language info for this ErrorStub
-            console.log("catch err");
+            console.error(err);
             let stub: ErrorStub = {error: err};
             errorStub.push(stub);
             return Promise.reject(errorStub);
