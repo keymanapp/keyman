@@ -42,4 +42,114 @@ describe('InputProcessor', function() {
       assert.isTrue(core.languageProcessor.mayPredict);
     });
   });
+
+  describe('efficiency tests', function() {
+    let testDistribution = [];
+    var keyboard;
+    let device = {
+      formFactor: 'phone',
+      OS: 'ios',
+      browser: 'safari'
+    }
+
+    // Easy peasy long context:  use the input processor's full source!
+    let coreSourceCode = fs.readFileSync('dist/index.js', 'utf-8');
+
+    // At the time this test block was written...  810485 chars.
+    // Let's force it to the same order of magnitude, even if the codebase grows.
+    if(coreSourceCode.length > 1000000) {
+      coreSourceCode = coreSourceCode.substring(0, 1000000);
+    }
+
+    this.beforeAll(function() {
+      testDistribution = [];
+
+      for(let c = 'A'.charCodeAt(0); c <= 'Z'.charCodeAt(0); c++) {
+        let char = String.fromCharCode(c);
+
+        testDistribution.push({
+          keyId: "K_" + char,
+          p: 1 / 26
+        });
+      }
+
+      // Load the keyboard.  We'll need an InputProcessor instance as an intermediary.
+      let core = new InputProcessor();
+
+      // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
+      // automatically set the keyboard as active.
+      let kbdScript = new vm.Script(fs.readFileSync('../tests/resources/keyboards/test_chirality.js'));
+      kbdScript.runInThisContext();
+
+      keyboard = core.activeKeyboard;
+    });
+
+    describe('without fat-fingering', function() {
+      it('with minimal context (no fat-fingers)', function() {
+        this.timeout(32); // ms
+        let core = new InputProcessor();
+        let context = new com.keyman.text.Mock("", 0);
+  
+        core.activeKeyboard = keyboard;
+        let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
+        let key = layout.getLayer('default').getKey('K_A');
+        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        
+        let behavior = core.processKeyEvent(event, context);
+        assert.isNotNull(behavior);
+      });
+  
+      it('with extremely long context (' + coreSourceCode._kmwLength() + ' chars, no fat-fingers)', function() {
+        // Assumes no SMP chars in the source, which is fine.
+        let context = new com.keyman.text.Mock(coreSourceCode, coreSourceCode._kmwLength());
+  
+        this.timeout(250); // 250 ms, excluding text import.
+        let core = new InputProcessor();  // I mean, it IS long context, and time
+                                          // thresholding is disabled within Node.
+  
+        core.activeKeyboard = keyboard;
+        let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
+        let key = layout.getLayer('default').getKey('K_A');
+        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        
+        let behavior = core.processKeyEvent(event, context);
+        assert.isNotNull(behavior);
+      });
+    });
+
+    describe('with fat-fingering', function() {
+      it('with minimal context (with fat-fingers)', function() {
+        this.timeout(32); // ms
+        let core = new InputProcessor();
+        let context = new com.keyman.text.Mock("", 0);
+  
+        core.activeKeyboard = keyboard;
+        let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
+        let key = layout.getLayer('default').getKey('K_A');
+        key.keyDistribution = testDistribution;
+        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        
+        let behavior = core.processKeyEvent(event, context);
+        assert.isNotNull(behavior);
+      });
+  
+      it('with extremely long context (' + coreSourceCode._kmwLength() + ' chars, with fat-fingers)', function() {
+        // Assumes no SMP chars in the source, which is fine.
+        let context = new com.keyman.text.Mock(coreSourceCode, coreSourceCode._kmwLength());
+  
+        this.timeout(250); // 250 ms, excluding text import.
+        let core = new InputProcessor();  // I mean, it IS long context, and time
+                                          // thresholding is disabled within Node.
+  
+        core.activeKeyboard = keyboard;
+        let layout = keyboard.layout(com.keyman.utils.FormFactor.Phone);
+        let key = layout.getLayer('default').getKey('K_A');
+        key.keyDistribution = testDistribution;
+        let event = key.constructKeyEvent(core.keyboardProcessor, device);
+        
+        let behavior = core.processKeyEvent(event, context);
+        assert.isNotNull(behavior);
+      });
+    });
+  });
 });

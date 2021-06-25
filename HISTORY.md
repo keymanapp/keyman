@@ -1,5 +1,57 @@
 # Keyman Version History
 
+## 15.0.74 alpha 2021-06-24
+
+* fix(android): fixes application of nextlayer for subkeys with customized layer setting (#5350)
+* feat(common/core/web): engine correction-prep optimizations (#5319)
+* feat(linux): Add support for impish (Ubuntu 21.10) (#5334)
+* fix(linux): Add libglib2.0-bin to keyman Depends 🍒 (#5360)
+
+## 15.0.73 alpha 2021-06-23
+
+* chore(windows): add engine test framework (#5337)
+* feat(linux): Auto-generate reference help (#5326)
+* fix(linux): Improve error handling if `lang_tags_map.py` is missing (#5345)
+
+## 15.0.72 alpha 2021-06-22
+
+* fix(mac): .kmx max file version is now 0x0E00 (14.0) (#5329)
+* fix(mac): kmp.inf is windows-1252 (#5328)
+* fix(windows): restore endpoints for interface stability (#5254)
+* chore(linux): Build also on riscv64 to facilitate migration on Ubuntu 🍒 (#5323)
+* refactor(web): OSK key source-code reorganization (#5291)
+* refactor(web): osk key highlighting/preview behavior (#5292)
+* change(ios): setText now uses JSON serialization (#5321)
+
+## 15.0.71 alpha 2021-06-18
+
+* feat(common): keyboard_processor wasm build (#5233)
+* chore(linux): Update changelogs to match Debian 🍒 (#5304)
+
+## 15.0.70 alpha 2021-06-17
+
+* fix(web): touch-move cancellation (#5290)
+* fix(developer): kmconvert help match reality (#5298)
+
+## 15.0.69 alpha 2021-06-16
+
+* refactor(web): OSK layout calculations - simplification (#5279)
+* refactor(web): VisualKeyboard - key event model (#5280)
+* refactor(web): OSK keytip abstraction (#5287)
+* refactor(web): encapsulation of browser-based subkey array popup (#5288)
+* chore(common): bash version for run-required-test-builds.sh (#5267)
+* fix(linux): Adjust version of dependency for ibus-keyman (#5281)
+
+## 15.0.68 alpha 2021-06-15
+
+* chore(common): Add YouTube links to Keyman 14 features (#5276)
+* chore(common): Check in crowdin strings for Spanish (Latin America) (#5269)
+* refactor(web): polishes management of OSK keys (#5257)
+* refactor(web): Visual Keyboard disentanglement - pass 1 (#5259)
+* refactor(web): VisualKeyboard height styling consistency (#5278)
+* fix(common/models): predictive-text engine use of NFD input (#5273)
+* chore(linux): Fix warnings (#5282)
+
 ## 15.0.67 alpha 2021-06-12
 
 * feat(linux): Fix Linux packaging on i386 (#5250)

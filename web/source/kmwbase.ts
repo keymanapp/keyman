@@ -669,7 +669,24 @@ namespace com.keyman {
      *  @return {Object}                          DIV object with filled keyboard layer content
      */
     ['BuildVisualKeyboard'](PInternalName, Pstatic, argFormFactor, argLayerId): HTMLElement {
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PInternalName, Pstatic, argFormFactor, argLayerId);
+      let PKbd: com.keyman.keyboards.Keyboard = null;
+
+      if(PInternalName != null) {
+        var p=PInternalName.toLowerCase().replace('keyboard_','');
+        var keyboardsList = this.keyboardManager.keyboards;
+
+        for(let Ln=0; Ln<keyboardsList.length; Ln++) {
+          if(p == keyboardsList[Ln]['KI'].toLowerCase().replace('keyboard_','')) {
+            // Requires the Keyboard wrapping object now.
+            PKbd = new com.keyman.keyboards.Keyboard(keyboardsList[Ln]);
+            break;
+          }
+        }
+      }
+
+      PKbd = PKbd || this.core.activeKeyboard;
+
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk);
     }
   }
 }

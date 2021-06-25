@@ -23,13 +23,12 @@ EXPORTS
       GetKeyboardPreservedKeys
 
 			GetActiveKeymanID
-			Keyman_RegisterControllerThread
-			Keyman_UnregisterControllerThread
-      Keyman_RegisterMasterController
-      Keyman_UnregisterMasterController
+			Keyman_RegisterControllerWindow
+			Keyman_UnregisterControllerWindow
 			Keyman_RestartEngine
 
       Keyman_SendMasterController
+			Keyman_PostControllers
       Keyman_PostMasterController
 
       Keyman_StartExit
@@ -40,3 +39,8 @@ EXPORTS
       Keyman_UpdateTouchPanelVisibility
 
       Keyman_Diagnostic
+
+      Keyman_RegisterMasterController
+      Keyman_UnregisterMasterController
+			Keyman_RegisterControllerThread
+			Keyman_UnregisterControllerThread

@@ -79,6 +79,15 @@ function help_product_path {
   fi
 }
 
+# Generate markdown help files
+function generate_markdown_help {
+  if [ $platform == 'linux' ]; then
+    pushd $KEYMAN_ROOT/linux/keyman-config > /dev/null
+    ./build-help.sh --md
+    popd
+  fi
+}
+
 ##
 ## Upload documentation updates to help.keyman.com
 ## Paths depend on $platform
@@ -198,6 +207,8 @@ if [ -z ${platform} ]; then
   display_usage
   exit 1
 fi
+
+generate_markdown_help || exit 1
 
 echo "Uploading Keyman for $platform documentation to help.keyman.com"
 

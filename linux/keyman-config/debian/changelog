@@ -1,4 +1,18 @@
-keyman-config (14.0.273-1) unstable; urgency=medium
+keyman-config (14.0.276-2) experimental; urgency=medium
+
+  * Team upload
+  * Add libglib2.0-bin to keyman Depends (closes: #990226)
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Wed, 23 Jun 2021 15:28:27 +0200
+
+keyman-config (14.0.276-1) experimental; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 11 Jun 2021 14:43:46 +0200
+
+keyman-config (14.0.273-1) experimental; urgency=medium
 
   * Keyman 14
 

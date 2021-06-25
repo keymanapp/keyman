@@ -12,6 +12,21 @@ _km-kvk2ldml_completions()
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
         return 0
     fi
+
+    case "${prev}" in
+        "-o"|"--output")
+            local IFS=$'\n'
+            compopt -o filenames
+            COMPREPLY=( $(compgen -f -- $cur) )
+            return 0
+            ;;
+        *)
+        ;;
+    esac
+
+    local IFS=$'\n'
+    compopt -o filenames
+    COMPREPLY=( $(compgen -f -X "!"*.kvk -- $cur) $(compgen -d -- $cur) )
 }
 
 complete -F _km-kvk2ldml_completions km-kvk2ldml

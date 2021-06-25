@@ -40,10 +40,20 @@ MESON_TARGET=debug
 MESON_TARGET=release
 !endif
 
+!ifdef GIT_BASH_FOR_KEYMAN
+CALLER=$(GIT_BASH_FOR_KEYMAN)
+!else
+CALLER=start /wait
+!endif
+!ifdef DEBUG
+BUILD_DEBUG=-d
+!else
+BUILD_DEBUG=
+!endif
+
 pull-core:
     cd $(ROOT)\..\common\core\desktop
-    build_cargo.bat $(CORE_DEBUG)
-    build.bat all $(MESON_TARGET) --static build tests
+    $(CALLER) ./build.sh -p native $(BUILD_DEBUG)
     cd $(ROOT)\src\engine\keyman32
 
 !include ..\..\Target.mak

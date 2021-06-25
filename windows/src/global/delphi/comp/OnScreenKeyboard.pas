@@ -1,18 +1,18 @@
 (*
   Name:             OnScreenKeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2006
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2006 - mcdurdin - Initial version
                     30 Aug 2006 - mcdurdin - Fix underlying layout published bug
                     14 Sep 2006 - mcdurdin - Add Transparent flag, retrieve aspected size, polish drawing
@@ -264,6 +264,8 @@ const   // I4098   // I4799
 implementation
 
 uses
+  System.Math,
+
   Glossary,
   ScanCodeMap,
   Types,
@@ -379,7 +381,7 @@ begin
   ParentBackground := True;
 
   UpdateEuroLayout;  // I764
-  
+
   if HasParent then // I1227, I904, I1102 - crash export OSK to BMP, PNG
     CalcKeyFontSizes;
 end;
@@ -730,7 +732,7 @@ begin
     begin
       k2 := FHoverKey;
       if Assigned(k) and not k.Enabled then k := nil;
-      
+
       FHoverKey := k;
       DoDrawKey(Canvas, k); //InvalidateKey(k);
       DoDrawKey(Canvas, k2); //InvalidateKey(k2);
@@ -1383,16 +1385,27 @@ var
 
         if GetTextExtentPoint32W(Canvas.Handle, PWideChar(FKeyValue), Length(FKeyValue), FTextExtent) then  // I2576
         begin
-          if FTextExtent.cx > (RText.Right - RText.Left) * FKeyboard.FScale then
+          if (FTextExtent.cx > (RText.Right - RText.Left) * FKeyboard.FScale) or
+            (FTextExtent.cy > (RText.Bottom - RText.Top) * FKeyboard.FScale) then
           begin
-            Font.Height := Trunc(Font.Height * (RText.Right - RText.Left) * FKeyboard.FScale / FTextExtent.cx);
-          end
-          else if FTextExtent.cy > (RText.Bottom - RText.Top) * FKeyboard.FScale then
-          begin
-            Font.Height := Trunc(Font.Height * (RText.Bottom - RText.Top) * FKeyboard.FScale / FTextExtent.cy);
-          end
+            // font.height may be either positive or negative, depending on whether
+            // internal leading is included. It doesn't matter, so long as we keep
+            // the same factor.
+            if Font.Height < 0 then
+              Font.Height := System.Math.Max(
+                Trunc(Font.Height * (RText.Right - RText.Left) * FKeyboard.FScale / FTextExtent.cx),
+                Trunc(Font.Height * (RText.Bottom - RText.Top) * FKeyboard.FScale / FTextExtent.cy)
+              )
+            else
+              Font.Height := System.Math.Min(
+                Trunc(Font.Height * (RText.Right - RText.Left) * FKeyboard.FScale / FTextExtent.cx),
+                Trunc(Font.Height * (RText.Bottom - RText.Top) * FKeyboard.FScale / FTextExtent.cy)
+              );
+          end;
         end;
 
+        // TODO: in future re-scale the font here per designer's preference
+        //       but this requires a file format change, so a much bigger scope
 
         if not Enabled then      Font.Color := $808080
         else                     Font.Color := clWindowText;

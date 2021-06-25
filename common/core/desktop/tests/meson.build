@@ -6,7 +6,8 @@
 #               19 Oct 2018 - TSE - Added kmnkbd directory for API unit tests.
 #
 
-cmpfiles = ['-c', 'import sys, filecmp; exit(not filecmp.cmp(*sys.argv[1:]))']
+# Note: this version of cmpfiles ignores line endings, which is better for platform independence
+cmpfiles = ['-c', 'import sys; a = open(sys.argv[1], \'r\').read(); b = open(sys.argv[2], \'r\').read(); exit(not (a==b))']
 stnds = join_paths(meson.source_root(), 'tests', 'standards')
 
 libsrc = include_directories(join_paths('../', 'src'))
