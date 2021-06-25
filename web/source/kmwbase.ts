@@ -101,7 +101,7 @@ namespace com.keyman {
     };
 
     // Stub functions (defined later in code only if required)
-    setDefaultDeviceOptions(opt){}
+    setDefaultDeviceOptions(opt: OptionType){}
     getStyleSheetPath(s){return s;}
     getKeyboardPath(f, p?){return f;}
     KC_(n, ln, Pelem){return '';}

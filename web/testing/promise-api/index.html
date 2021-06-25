@@ -57,15 +57,26 @@
   <body>
     <h2>KeymanWeb Sample Page - Promise API</h2>
     <p>This page is for testing the Promises returned from adding keyboards.
-      See <a href="https://github.com/keymanapp/keyman/issues/5044">Specification #5044</a>
+      See <a href="https://github.com/keymanapp/keyman/issues/5044">Specification #5044.</a>
+    </p>
+    <p>
+      This test page is best used with Developer mode, as output for both successes
+      and failures will be logged to the JS console.
+    </p>
+    <p>Visible alert-style feedback will only occur for invalid search terms, such as using "foobar"
+      for any of the three keyboard-adding options at the bottom of the page.
     </p>
 
-    <p id="modeSelect">You are currently testing under the alerts <em id="mode"> </em> mode.
+    <p id="modeSelect">You are currently testing under the internal alerts <em id="mode"> </em> mode.
     Two alert modes are available:
     <a id="alert_disabled" href="./index.html?useAlerts=false">Disabled</a> or
     <a id="alert_default" href="./index.html">Enabled (Default)</a></p>
+    <p>This will only affect whether or not KeymanWeb's alert modal is displayed.
+      A native browser alert and dev-console error log will occur regardless of this
+      setting when stub fetch errors occur.
+    </p>
 
-    <script>
+<script>
       document.getElementById("mode").textContent = alertText;
     </script>
 

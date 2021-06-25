@@ -30,7 +30,7 @@ if(!window['keyman']['initialized']) {
      */
     keymanweb.setDefaultDeviceOptions = function(opt : com.keyman.OptionType) {
       // Element attachment type
-      if (opt['attachType'] == '' || opt['attachType'] === undefined) {
+      if (!opt['attachType']) {
         opt['attachType'] = (device.touchable ? 'manual' : 'auto');
       }
     }
