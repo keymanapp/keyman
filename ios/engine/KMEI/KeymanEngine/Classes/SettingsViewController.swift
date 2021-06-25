@@ -146,8 +146,6 @@ open class SettingsViewController: UITableViewController {
     }
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     cell.selectionStyle = .none
-    //cell.selectionStyle = .default
-    //cell.isUserInteractionEnabled = true
     
     switch(cellIdentifier) {
       case "languages":
@@ -278,7 +276,6 @@ open class SettingsViewController: UITableViewController {
   // In a xib-based application, navigation from a table can be handled in -tableView:didSelectRowAtIndexPath:
   override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
-    //tableView.cellForRow(at: indexPath)?.isSelected = false
     performAction(for: indexPath)
   }
   
