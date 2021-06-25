@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import gi
 import logging
 import subprocess
@@ -66,15 +67,21 @@ def restart_ibus_subp():
 
 
 def restart_ibus(bus=None):
-    try:
-        if not bus:
-            bus = get_ibus_bus()
-        logging.info("restarting IBus")
-        bus.exit(True)
-        bus.destroy()
-    except Exception as e:
-        logging.warning("Failed to restart IBus")
-        logging.warning(e)
+    realuser = os.environ.get('SUDO_USER')
+    if realuser:
+        # we have been called with `sudo`. Restart ibus for the real user.
+        logging.info('restarting IBus by subprocess for user %s', realuser)
+        subprocess.run(['sudo', '-u', realuser, 'ibus', 'restart'])
+    else:
+        try:
+            if not bus:
+                bus = get_ibus_bus()
+            logging.info("restarting IBus")
+            bus.exit(True)
+            bus.destroy()
+        except Exception as e:
+            logging.warning("Failed to restart IBus")
+            logging.warning(e)
 
 
 def bus_has_engine(bus, name):
