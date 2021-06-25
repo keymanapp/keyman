@@ -1929,6 +1929,7 @@ public final class KMManager {
         }, 2000);
 
         InAppKeyboard.callJavascriptAfterLoad();
+        InAppKeyboard.setSpacebarText(spacebarText);
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_LOADED, null);
 
@@ -2178,6 +2179,7 @@ public final class KMManager {
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
 
         SystemKeyboard.callJavascriptAfterLoad();
+        SystemKeyboard.setSpacebarText(spacebarText);
       }
     }
 
