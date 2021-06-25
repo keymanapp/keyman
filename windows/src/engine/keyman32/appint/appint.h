@@ -92,6 +92,7 @@ public:
 	void Delete();
 	void Reset();
 	void Get(WCHAR *buf, int bufsize);
+  void GetSize(WCHAR* buf, int bufsize);
 	void Set(const WCHAR *buf);
 	WCHAR *BufMax(int n);
 	WCHAR *Buf(int n);

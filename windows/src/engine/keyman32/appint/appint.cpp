@@ -117,6 +117,24 @@ void AppContext::Get(WCHAR *buf, int bufsize)
 	//buf[bufsize-1] = 0;
 }
 
+void AppContext::GetSize(WCHAR* buf, int bufsize)
+{
+  // surrogate pairs need to be treated as a single unit.
+  // Buff Max handles the case where the surrogate pairs is split
+  // by the buff size
+  WCHAR* startIndex = this->BufMax(bufsize);
+
+  for (WCHAR* p = startIndex; *p && bufsize > 0; p++, bufsize--)
+  {
+    *buf = *p; 
+    if ((*p >= 0xD800 && *p <= 0xDBFF) && (bufsize - 2 > 0)) { buf++;  *buf = *(++p); bufsize--; }
+    buf++;
+  }
+
+  *buf = 0;
+
+}
+
 void AppContext::CopyFrom(AppContext *source)   // I3575
 {
   SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
