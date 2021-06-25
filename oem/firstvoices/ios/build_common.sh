@@ -27,6 +27,7 @@ display_usage ( ) {
     echo "  -lib-build      Actively rebuilds KMEI before copying its build products to project resources."
     echo "  -lib-nobuild    Prevents the build script from building KeymanEngine under any circumstances."
     echo "  -no-codesign    Performs the build without code signing."
+    echo "  -upload-sentry  Uploads debug symbols, etc, to Sentry"
     echo "  -debug          Sets the configuration to debug mode instead of release."
     echo
     echo "  If no settings are specified this script will grab a copy of the most recent build of KeymanEngine,"
@@ -85,6 +86,10 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-carthage)
             DO_CARTHAGE=false
+            ;;
+        -upload-sentry)
+            # Overrides default set by build-utils.sh.
+            UPLOAD_SENTRY=true
             ;;
         -no-archive)
             DO_ARCHIVE=false
@@ -187,7 +192,8 @@ if [ $CODE_SIGN = true ]; then
     echo "Preparing .ipa file for deployment."
     xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates \
                VERSION=$VERSION \
-               VERSION_WITH_TAG=$VERSION_WITH_TAG
+               VERSION_WITH_TAG=$VERSION_WITH_TAG \
+               UPLOAD_SENTRY=$UPLOAD_SENTRY
 
     assertDirExists "$ARCHIVE_PATH"
 
@@ -204,7 +210,8 @@ else
   xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
              $XCODEFLAGS -scheme "$TARGET" \
              VERSION=$VERSION \
-             VERSION_WITH_TAG=$VERSION_WITH_TAG
+             VERSION_WITH_TAG=$VERSION_WITH_TAG \
+             UPLOAD_SENTRY=$UPLOAD_SENTRY
 fi
 
 if [ $? = 0 ]; then
