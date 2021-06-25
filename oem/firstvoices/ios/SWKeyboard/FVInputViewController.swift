@@ -22,6 +22,13 @@ class FVInputViewController: InputViewController {
       KeymanEngine.log.outputLevel = .warning
     #endif
 
+    // Only true if it's the first init of the class under app-extension mode.
+    if !SentryManager.hasStarted {
+      // Sentry can send errors from app extensions when "Allow Full Access"
+      // is enabled.  They seem to get blocked otherwise, except in the Simulator.
+      SentryManager.start(sendingEnabled: true)
+    }
+
     Manager.applicationGroupIdentifier = FVConstants.groupID
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)

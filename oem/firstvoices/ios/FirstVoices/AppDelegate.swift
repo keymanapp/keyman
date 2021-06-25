@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-
+    SentryManager.start()
     FVRegionStorage.upgrade()
 
     #if DEBUG
@@ -28,6 +28,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     #else
       KeymanEngine.log.outputLevel = .warning
     #endif
+
+    // TODO:  we need a way for the setting to be toggled by users (opt-in).
+    // SentryManager.enabled = true;
 
     // Replace with your application group id
     Manager.applicationGroupIdentifier = FVConstants.groupID
