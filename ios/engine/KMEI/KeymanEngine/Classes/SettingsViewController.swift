@@ -78,6 +78,12 @@ open class SettingsViewController: UITableViewController {
       "reuseid": "enablecrashreporting"
       ])
 
+    itemsArray.append([
+      "title": NSLocalizedString("menu-settings-spacebar-text", bundle: engineBundle, comment: ""),
+      "subtitle": "",
+      "reuseid": "spacebartext"
+      ])
+    
     if let _ = URL(string: UIApplication.openSettingsURLString) {
       itemsArray.append([
         "title": NSLocalizedString("menu-settings-system-keyboard-menu", bundle: engineBundle, comment: ""),
@@ -140,6 +146,8 @@ open class SettingsViewController: UITableViewController {
     }
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     cell.selectionStyle = .none
+    //cell.selectionStyle = .default
+    //cell.isUserInteractionEnabled = true
     
     switch(cellIdentifier) {
       case "languages":
@@ -187,7 +195,7 @@ open class SettingsViewController: UITableViewController {
         enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
         enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         
-      case "systemkeyboardsettings", "installfile", "forcederror":
+      case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext":
         break
       default:
         SentryManager.captureAndLog("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
@@ -255,6 +263,11 @@ open class SettingsViewController: UITableViewController {
       case "enablecrashreporting":
         cell.detailTextLabel?.isEnabled = true
         break
+      case "spacebartext":
+        cell.accessoryType = .disclosureIndicator
+        cell.detailTextLabel?.text = NSLocalizedString("menu-settings-spacebar-hint-"+Manager.shared.spacebarText.toString(), bundle: engineBundle, comment: "")
+        cell.detailTextLabel?.isEnabled = true
+        break
       case "showbanner", "showgetstarted":
         cell.detailTextLabel?.isEnabled = false
       default:
@@ -265,6 +278,7 @@ open class SettingsViewController: UITableViewController {
   // In a xib-based application, navigation from a table can be handled in -tableView:didSelectRowAtIndexPath:
   override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
+    //tableView.cellForRow(at: indexPath)?.isSelected = false
     performAction(for: indexPath)
   }
   
@@ -293,8 +307,9 @@ open class SettingsViewController: UITableViewController {
             SentryManager.captureAndLog("Listener for framework signal to launch file browser is missing")
           }
         case "forcederror":
-            SentryManager.forceError()
-          break
+          SentryManager.forceError()
+        case "spacebartext":
+          showSpacebarText()
         default:
           break
       }
@@ -424,6 +439,16 @@ open class SettingsViewController: UITableViewController {
       setIsDoneButtonEnabled(nc, true)
     } else {
       SentryManager.captureAndLog("no navigation controller for showing languages???")
+    }
+  }
+  
+  func showSpacebarText() {
+    let vc = SpacebarTextViewController()
+    if let nc = navigationController {
+      nc.pushViewController(vc, animated: true)
+      setIsDoneButtonEnabled(nc, true)
+    } else {
+      SentryManager.captureAndLog("no navigation controller for showing spacebarText options")
     }
   }
   

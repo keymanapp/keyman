@@ -31,6 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // Replace with your application group id
     Manager.applicationGroupIdentifier = FVConstants.groupID
+    Manager.shared.spacebarText = SpacebarText.KEYBOARD
     return true
   }
 }

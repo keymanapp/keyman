@@ -278,6 +278,20 @@ public extension UserDefaults {
     }
   }
   
+  var optSpacebarText: SpacebarText {
+    get {
+      if let valueString = string(forKey: Key.optSpacebarText) {
+        return SpacebarText.fromString(mode: valueString)
+      } else {
+        return SpacebarText.LANGUAGE_KEYBOARD
+      }
+    }
+    
+    set(value) {
+      set(value.toString(), forKey: Key.optSpacebarText)
+    }
+  }
+ 
   // stores a dictionary of predict-enablement settings keyed to language ids, i.e., [langID: Bool]
   var predictionEnablements: [String: Bool]? {
     get {
