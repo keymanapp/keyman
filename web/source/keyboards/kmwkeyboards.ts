@@ -204,7 +204,9 @@ namespace com.keyman.keyboards {
     }
 
     registerDeferredStubs() {
-      this.addKeyboardArray(this.deferredStubs);
+      if (this.deferredStubs.length > 0) {
+        this.addKeyboardArray(this.deferredStubs);
+      }
 
       // KRS stubs (legacy format registration)
       for(var j=0; j<this.deferredKRS.length; j++) {
@@ -896,30 +898,51 @@ namespace com.keyman.keyboards {
     /**
      * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
      *
-     * @param {string|Object} x keyboard name string or keyboard metadata JSON object
+     * @param {string|KeyboardStub|(string|KeyboardStub)[]} x keyboard name string or keyboard metadata JSON object
      *
      */
-    addKeyboardArray(x: any[] | IArguments): void {
+    async addKeyboardArray(args: string | KeyboardStub | (string|KeyboardStub)[]): 
+        Promise<(KeyboardStub|ErrorStub)[]> {
+      let errorStub: ErrorStub[] = [];
+
+      // Determine number of keyboard args
+      let numArgs = 0, x: (string|KeyboardStub)[] = [];
+      if (args) {
+        if (args[0][0]) {
+          numArgs = args[0].length;
+          args[0].forEach(a =>
+            x.push(a));
+        } else {
+          numArgs = Array.isArray(args[0]) ? args[0].length : 1;
+          x = args[0];
+        }
+      }
       // Store all keyboard meta-data for registering later if called before initialization
       if(!this.keymanweb.initialized) {
-        for(var k=0; k<x.length; k++) {
+        for(var k=0; k<numArgs; k++) {
           this.deferredStubs.push(x[k]);
         }
-        return;
+        // TODO: this.promiseList
+        let stub: ErrorStub = {error: new Error("Not initialized")}
+        errorStub.push(stub);
+        return Promise.reject(errorStub);
       }
 
       // Ignore empty array passed as argument
-      if(x.length == 0) {
-        return;
+      if(numArgs == 0) {
+        let stub: ErrorStub = {error: new Error("No keyboards to add")}
+        errorStub.push(stub);
+        // Normally reject error, but this can be a warning
+        return Promise.resolve(errorStub);
       }
 
       // Create a temporary array of metadata objects from the arguments used
       var i,j,kp,kbid,lgid,kvid,cmd='',comma='';
       var cloudList: CloudRequestEntry[] = [];
-
+      let keyboardStubs: KeyboardStub[] = [];
       var tEntry: CloudRequestEntry;
 
-      for(i=0; i<x.length; i++) {
+      for(i=0; i<numArgs; i++) {
         if(typeof(x[i]) == 'string' && (<string>x[i]).length > 0) {
           var pList=(<string>x[i]).split('@'),lList=[''];
           if(pList[0].toLowerCase() == 'english') {
@@ -952,7 +975,7 @@ namespace com.keyman.keyboards {
           // Register any local keyboards immediately:
           // - must specify filename, keyboard name, language codes, region codes
           // - no request will be sent to cloud
-          var stub: KeyboardStub = <KeyboardStub> x[i];
+          let stub: KeyboardStub = <KeyboardStub> x[i];
 
           if(typeof(x[i]['filename']) == 'string') {
             if(!this.addStub(x[i])) {
@@ -975,18 +998,20 @@ namespace com.keyman.keyboards {
                 }
               }
             } else { // Single language element
-              tEntry = new CloudRequestEntry(x[i]['id'], x[i]['languages'][j]['id']);
+              tEntry = new CloudRequestEntry(x[i]['id'], x[i]['languages'][0]['id']);
               if(this.isUniqueRequest(cloudList, tEntry)) {
                 cloudList.push(tEntry);
               }
             }
           }
+
+          keyboardStubs.push(stub);
         }
       }
 
       // Return if all keyboards being registered are local and fully specified
       if(cloudList.length == 0) {
-        return;
+        return Promise.resolve(keyboardStubs);
       }
 
       // Update the keyboard metadata list from keyman.com - build the command
@@ -998,10 +1023,27 @@ namespace com.keyman.keyboards {
 
       // Request keyboard metadata from the Keyman Cloud keyboard metadata server
       try {
-        let promise = this.keymanCloudRequest(cmd,false);
+        let result: (KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest(cmd,false);
+        if (Array.isArray(result)) {
+          if (errorStub.length > 0) {
+            result = result.concat(errorStub);
+            return Promise.resolve(result);
+          } else {
+            return Promise.resolve(result);
+          }
+        }
       } catch(err) {
+        // We don't have keyboard info for this ErrorStub
         console.error(err);
+        let stub: ErrorStub = {error: err};
+        errorStub.push(stub);
+        return Promise.reject(errorStub);
       }
+
+      // retPromise?
+      // no keyboards added so return empty stub
+      console.log("end of addKeyboard. returning errorStub");
+      return Promise.resolve(errorStub);
     }
 
     /**

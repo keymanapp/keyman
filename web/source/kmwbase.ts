@@ -307,14 +307,28 @@ namespace com.keyman {
     /**
      * Exposed function to load keyboards by name. One or more arguments may be used
      *
-     * @param {string|Object} x keyboard name string or keyboard metadata JSON object
+     * @param {any[]} args keyboard name string or keyboard metadata JSON object
+     * @returns {Promise<(KeyboardStub|ErrorStub)[]} Promise of added keyboard/error stubs
      *
      */
-    ['addKeyboards'](x) {
-      if(arguments.length == 0) {
-        this.keyboardManager.keymanCloudRequest('',false);
+    async ['addKeyboards'](...args: any[]) : Promise<(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]> {
+      if (args[0].length == 0) {
+        // Get the cloud keyboard catalog
+        try {
+          let result:(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]|Error = 
+            await this.keyboardManager.keymanCloudRequest('',false);
+          console.log('Catalog: ', result);
+          let stubs: com.keyman.keyboards.KeyboardStub[] = [];
+          return Promise.resolve(stubs);
+        } catch(error) {
+          console.error(error);
+          let stubs: com.keyman.keyboards.ErrorStub[] = [];
+          let stub: com.keyman.keyboards.ErrorStub = {error: error};
+          stubs.push(stub);
+          return Promise.reject(stubs);
+        };
       } else {
-        this.keyboardManager.addKeyboardArray(arguments);
+        return this.keyboardManager.addKeyboardArray(args);
       }
     }
 
