@@ -1,4 +1,4 @@
-// JavaScript Document samplehdr.js: Keyboard management for KeymanWeb demonstration pages
+// JavaScript Document promisehdr.js: Keyboard management for KeymanWeb demonstration pages
 
 /*
     The keyboard name and/or BCP-47 language code must be specified for each keyboard that is to be available.
@@ -40,25 +40,30 @@
     and is called when the page loads.
 */
 
-  function loadKeyboards(nestLevel)
+  /**
+   * Add a keyboard by language name.  Note that the name must be spelled
+     correctly, or the keyboard will not be found.  (Using BCP-47 codes is
+     usually easier.)
+   * @param {string} languages. Could be comma-separated languages
+   */
+  function addKeyboardsForLanguage(languages) {
+    kmw.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(result => {
+      console.log('Adding ' + languages + ': ', result);
+    }).catch(error => {
+      // Consumer decides how to handle errors
+      alert(error);
+    });
+  }
+
+  function loadKeyboards()
   {
     var kmw=keyman;
-
-    var base_prefix = '../';
-    var prefix = './'; // The default - when prefix == 0.
-
-    if(nestLevel !== undefined && nestLevel > 0) {
-      prefix = '';
-      for(var i=0; i < nestLevel; i++) {
-        prefix = prefix + base_prefix;
-      }
-    }
 
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keyboard to be
     // locally sourced.
     kmw.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
-      filename:(prefix + 'us-1.0.js')});
+      filename:'../us-1.0.js'});
 
     // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the BCP-47 language code.
@@ -69,14 +74,14 @@
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
     // usually easier.)
-    kmw.addKeyboardsForLanguage('Dzongkha');
+    addKeyboardsForLanguage('Dzongkha');
 
     // Add a fully-specified, locally-sourced, keyboard with custom font
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
       languages: {
-          id:'lo',name:'Lao',region:'Asia',
+          id:'lo',name:'Lao',region:'Asia'
         },
-      filename:(prefix + 'lao_2008_basic-1.2.js')
+      filename:'../lao_2008_basic-1.2.js'
       });
 
     // The following two optional calls should be delayed until language menus are fully loaded:
@@ -107,7 +112,7 @@
       case 3:
         // Add keyboard for comma-separated language name(s)
         sKbd=document.getElementById('kbd_id3').value;
-        kmw.addKeyboardsForLanguage(sKbd);
+        addKeyboardsForLanguage(sKbd);
         break;
     }
   }

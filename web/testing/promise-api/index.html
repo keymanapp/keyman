@@ -12,7 +12,7 @@
     <!-- Enable IE9 Standards mode -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <title>KeymanWeb Sample Page - Unminified Source</title>
+    <title>KeymanWeb Testing Page - Promise API when Adding Keyboards</title>
 
     <!-- Your page CSS -->
     <style type='text/css'>
@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../release/unminified/web/keymanweb.js" type="application/javascript"></script>
+    <script src="../../release/unminified/web/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../release/unminified/web/kmwuitoggle.js"></script>
+    <script src="../../release/unminified/web/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -45,14 +45,16 @@
     </script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
-    <script src="commonHeader.js"></script>
+    <script src="promisehdr.js"></script>
 
   </head>
 
 <!-- Sample page HTML -->
   <body>
-    <h2>KeymanWeb Sample Page - Unminified Source</h2>
-
+    <h2>KeymanWeb Sample Page - Promise API</h2>
+    <p>This page is for testing the Promises returned from adding keyboards.
+	  See <a href="https://github.com/keymanapp/keyman/issues/5044">Specification #5044</a>
+    </p>
     <div>
     <!--
       The following DIV is used to position the Button or Toolbar User Interfaces on the page.
@@ -76,7 +78,7 @@
     <input type='input' id='kbd_id2' class='kmw-disabled' onkeypress="clickOnEnter(event,2);"/>
     <input type='button' id='btn2' onclick='addKeyboard(2);' value='Add' />
 
-    <h3>Add a keyboard by language name(s):</h3>
+    <h3>Add a keyboard by comma-separated language name(s):</h3>
     <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
     <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />
 
