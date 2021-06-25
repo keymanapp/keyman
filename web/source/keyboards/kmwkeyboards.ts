@@ -135,7 +135,7 @@ namespace com.keyman.keyboards {
      */
     registrationResolvers: {[timeoutID: number] : RegistrationPromiseTuple} = {};
 
-    languageListPromise: Promise<(KeyboardStub)[]> = null;
+    languageListPromise: Promise<(KeyboardStub|ErrorStub)[]> = null;
 
     languageList: any[] = null; // List of keyboard languages available for KeymanCloud
 
