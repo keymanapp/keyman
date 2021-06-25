@@ -183,7 +183,7 @@ namespace com.keyman.text {
   com.keyman.osk.VisualKeyboard.prototype.popupDelay = 400;  // Delay must be less than native touch-hold delay 
   
   // Set default device options
-  keymanweb.setDefaultDeviceOptions = function(opt) {
+  keymanweb.setDefaultDeviceOptions = function(opt: com.keyman.OptionType) {
     opt['attachType'] = 'manual';
     device.app=opt['app'];
     device.touchable=true; 
