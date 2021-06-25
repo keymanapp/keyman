@@ -3,7 +3,7 @@
 # Keyboard details window
 
 import json
-import os.path
+from os import path
 import qrcode
 
 import gi
@@ -40,8 +40,8 @@ class KeyboardDetailsView(Gtk.Dialog):
 
         self.set_border_width(6)
 
-        packageDir = os.path.join(kmp['areapath'], kmp['packageID'])
-        kmp_json = os.path.join(packageDir, "kmp.json")
+        packageDir = path.join(kmp['areapath'], kmp['packageID'])
+        kmp_json = path.join(packageDir, "kmp.json")
         info, system, options, keyboards, files = parsemetadata(kmp_json)
 
         if info is None:
@@ -58,15 +58,15 @@ class KeyboardDetailsView(Gtk.Dialog):
             return
 
         kbdata = None
-        jsonfile = os.path.join(packageDir, kmp['packageID'] + ".json")
-        if os.path.isfile(jsonfile):
+        jsonfile = path.join(packageDir, kmp['packageID'] + ".json")
+        if path.isfile(jsonfile):
             with open(jsonfile, "r") as read_file:
                 kbdata = json.load(read_file)
 
         grid = Gtk.Grid()
         # grid.set_column_homogeneous(True)
 
-        # kbdatapath = os.path.join("/usr/local/share/keyman", kmp["id"], kmp["id"] + ".json")
+        # kbdatapath = path.join("/usr/local/share/keyman", kmp["id"], kmp["id"] + ".json")
 
         # Package info
 
@@ -162,8 +162,8 @@ class KeyboardDetailsView(Gtk.Dialog):
         if keyboards:
             for kbd in keyboards:
                 kbdata = None
-                jsonfile = os.path.join(packageDir, kbd['id'] + ".json")
-                if os.path.isfile(jsonfile):
+                jsonfile = path.join(packageDir, kbd['id'] + ".json")
+                if path.isfile(jsonfile):
                     with open(jsonfile, "r") as read_file:
                         kbdata = json.load(read_file)
 
@@ -182,7 +182,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                 grid.attach_next_to(lbl_kbd_file, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = lbl_kbd_file
                 label = Gtk.Label()
-                label.set_text(os.path.join(packageDir, kbd['id'] + ".kmx"))
+                label.set_text(path.join(packageDir, kbd['id'] + ".kmx"))
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, lbl_kbd_file, Gtk.PositionType.RIGHT, 1, 1)
@@ -291,8 +291,8 @@ class KeyboardDetailsView(Gtk.Dialog):
                         # prevlabel = label8
                         # #TODO need to know which area keyboard is installed in to show this
                         # # label = Gtk.Label()
-                        # # welcome_file = os.path.join("/usr/local/share/doc/keyman", kmp["id"], "welcome.htm")
-                        # # if os.path.isfile(welcome_file):
+                        # # welcome_file = path.join("/usr/local/share/doc/keyman", kmp["id"], "welcome.htm")
+                        # # if path.isfile(welcome_file):
                         # #     label.set_text(_("Installed"))
                         # # else:
                         # #     label.set_text(_("Not installed"))
@@ -325,7 +325,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         # If it doesn't exist, generate QR code to share keyboard package
         path_qr = packageDir + "/qrcode.png"
         url = KeymanComUrl + "/go/keyboard/" + kmp['packageID'] + "/share"
-        if not os.path.isfile(path_qr):
+        if not path.isfile(path_qr):
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
