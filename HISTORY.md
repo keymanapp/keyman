@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.75 alpha 2021-06-25
+
+* fix(android): rotation is not updating keyboard (#5247)
+* fix(windows): osk scaling mismatch on horz axis (#5341)
+* fix(linux): Don't add duplicate entries when reinstalling keyboard (#5363)
+* fix(linux): fix tab completion for command line tools (#5362)
+* feat(web): Update addLanguageKeyboards to return a Promise (#5260)
+* feat(web): Add option useAlerts to control alerts() (#5302)
+
 ## 15.0.74 alpha 2021-06-24
 
 * fix(android): fixes application of nextlayer for subkeys with customized layer setting (#5350)
