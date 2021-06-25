@@ -209,7 +209,7 @@ extension KeymanWebViewController {
   }
     
   private func setSpacebarText(_ mode: SpacebarText) {
-    webView!.evaluateJavaScript("setSpacebarText('\(mode.toString())');", completionHandler: nil);
+    webView!.evaluateJavaScript("setSpacebarText('\(mode.rawValue)');", completionHandler: nil);
   }
   
   func updateSpacebarText() {
