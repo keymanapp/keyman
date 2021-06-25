@@ -306,7 +306,9 @@ def install_keyboards_to_gnome(keyboards, packageDir, language=None):
     # install all kmx for first lang not just packageID
     for kb in keyboards:
         ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir, language)
-        sources.append(('ibus', ibus_keyboard_id))
+        input_source = ('ibus', ibus_keyboard_id)
+        if input_source not in sources:
+            sources.append(input_source)
 
     gnomeKeyboardsUtil.write_input_sources(sources)
 
