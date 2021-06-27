@@ -105,6 +105,18 @@ while [[ $# -gt 0 ]] ; do
     shift
 done
 
+echo \
+  "Build flags:" \
+  "DO_UPDATE=$DO_UPDATE" \
+  "KMEI_FLAGS=$KMEI_FLAGS" \
+  "DO_ARCHIVE=$DO_ARCHIVE" \
+  "DO_CARTHAGE=$DO_CARTHAGE" \
+  "FORCE_KMEI_BUILD=$FORCE_KMEI_BUILD" \
+  "ALLOW_KMEI_BUILD=$ALLOW_KMEI_BUILD" \
+  "CODE_SIGN=$CODE_SIGN" \
+  "CONFIG=$CONFIG" \
+  ""
+
 #
 # Build Keyman Engine
 #
@@ -147,6 +159,8 @@ if [ $DO_UPDATE = true ]; then
     fi
 
     # Copy resources.
+    echo "Copying $KEYMAN_ENGINE_FRAMEWORK_SRC to $KEYMAN_ENGINE_FRAMEWORK_DST"
+    rm -rf "$KEYMAN_ENGINE_FRAMEWORK_DST"
     cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 fi
 
@@ -163,7 +177,7 @@ if [ $DO_CARTHAGE = true ]; then
 
   # Deleted workspace - a test for proper deployment to CocoaPods.  Doesn't matter here.
   rm -r ./Carthage/Checkouts/DeviceKit/CocoaPodsVerification/ || fail "Carthage dependency loading failed"
-  
+
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
   carthage build --use-xcframeworks --no-use-binaries --platform iOS || fail "Carthage dependency loading failed"
