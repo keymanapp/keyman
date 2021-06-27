@@ -38,17 +38,26 @@ For installed keyboard packages, click on this to associate another language wit
 If all the languages for a keyboard have already been installed,
 this won't change anything.
 
+## Change Display Language
+![](../../android_images/ic_translate_a.png)
+
+Click on this to change the display language of the Keyman for Android app. The list of available languages come from [translate.keyman.com](https://translate.keyman.com). If a translation is available, Keyman for Android will default to the device's default locale.
+
+## Spacebar Caption
+Click on this to change the displayed keyboard name on the spacebar. The options are:
+* Language name
+* Keyboard name
+* Language name + Keyboard name
+* Blank
+
+![](../../android_images/spacebar-caption-ap.png)
+
 ## Enable Keyman as system-wide keyboard
 By default, installed Keyman keyboards are only available to use within the Keyman app. Click on this setting to
 bring up the Android system configuration so Keyman can be added as a system-wide keyboard.
 
 ## Set Keyman as default keyboard
 Click on this to bring up the Android system configuration for setting Keyman as the default system-wide keyboard.
-
-## Change Display Language
-![](../../android_images/ic_translate_a.png)
-
-Click on this to change the display language of the Keyman for Android app. The list of available languages come from [translate.keyman.com](https://translate.keyman.com). If a translation is available, Keyman for Android will default to the device's default locale.
 
 ## Always show banner
 This toggle is reserved for future features. When off, the text suggestion banner is only displayed when
