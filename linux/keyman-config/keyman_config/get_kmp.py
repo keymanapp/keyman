@@ -6,7 +6,16 @@ import logging
 import requests
 import requests_cache
 import os
+from gi.repository import GObject
 from keyman_config import KeymanApiUrl, KeymanDownloadsUrl
+from keyman_config.deprecated_decorator import deprecated
+
+
+class InstallLocation(GObject.GEnum):
+    OS = 1
+    Shared = 2
+    User = 3
+    Unknown = 99
 
 
 def get_package_download_data(packageID, weekCache=False):
@@ -19,9 +28,9 @@ def get_package_download_data(packageID, weekCache=False):
     Returns:
         dict: Keyboard data
     """
-    logging.info("Getting download data for package %s", packageID)
-    api_url = KeymanDownloadsUrl + "/api/keyboard/1.0/" + packageID
-    logging.debug("At URL %s", api_url)
+    logging.info('Getting download data for package %s', packageID)
+    api_url = KeymanDownloadsUrl + '/api/keyboard/1.0/' + packageID
+    logging.debug('At URL %s', api_url)
     cache_dir = keyman_cache_dir()
     current_dir = os.getcwd()
     if weekCache:
@@ -32,7 +41,7 @@ def get_package_download_data(packageID, weekCache=False):
     requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
     now = time.ctime(int(time.time()))
     response = requests.get(api_url)
-    logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
+    logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
     os.chdir(current_dir)
     requests_cache.core.uninstall_cache()
     if response.status_code == 200:
@@ -51,9 +60,9 @@ def get_keyboard_data(keyboardID, weekCache=False):
     Returns:
         dict: Keyboard data
     """
-    logging.info("Getting data for keyboard %s", keyboardID)
-    api_url = KeymanApiUrl + "/keyboard/" + keyboardID
-    logging.debug("At URL %s", api_url)
+    logging.info('Getting data for keyboard %s', keyboardID)
+    api_url = KeymanApiUrl + '/keyboard/' + keyboardID
+    logging.debug('At URL %s', api_url)
     cache_dir = keyman_cache_dir()
     current_dir = os.getcwd()
     if weekCache:
@@ -64,7 +73,7 @@ def get_keyboard_data(keyboardID, weekCache=False):
     requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
     now = time.ctime(int(time.time()))
     response = requests.get(api_url)
-    logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
+    logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
     os.chdir(current_dir)
     requests_cache.core.uninstall_cache()
     if response.status_code == 200:
@@ -91,28 +100,54 @@ def keyman_cache_dir():
     Returns:
         str: path of user keyman cache folder
     """
-    home = os.path.expanduser("~")
-    cachebase = os.environ.get("XDG_CACHE_HOME", os.path.join(home, ".cache"))
-    km_cache = os.path.join(cachebase, "keyman")
+    home = os.path.expanduser('~')
+    cachebase = os.environ.get('XDG_CACHE_HOME', os.path.join(home, '.cache'))
+    km_cache = os.path.join(cachebase, 'keyman')
     if not os.path.isdir(km_cache):
         os.mkdir(km_cache)
     return km_cache
 
 
+def _get_data_base_dir(area):
+    if area == InstallLocation.User:
+        return os.environ.get('XDG_DATA_HOME',
+                              os.path.join(os.path.expanduser('~'), '.local', 'share'))
+    if area == InstallLocation.Shared:
+        return '/usr/local/share'
+    return '/usr/share'
+
+
+@deprecated('Use get_keyman_dir(InstallLocation.User) instead')
 def user_keyman_dir():
-    home = os.path.expanduser("~")
-    datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-    return os.path.join(datahome, "keyman")
+    return get_keyman_dir(InstallLocation.User)
 
 
+def get_keyman_dir(area):
+    return os.path.join(_get_data_base_dir(area), 'keyman')
+
+
+@deprecated('Use get_keyman_font_dir(InstallLocation.User) instead')
 def user_keyman_font_dir():
-    home = os.path.expanduser("~")
-    datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-    return os.path.join(datahome, "fonts", "keyman")
+    return os.path.join(_get_data_base_dir(InstallLocation.User), 'fonts', 'keyman')
 
 
+def get_keyman_font_dir(area, keyboardid):
+    return os.path.join(_get_data_base_dir(area), 'fonts', 'keyman', keyboardid)
+
+
+@deprecated('Use get_keyboard_dir(InstallLocation.User, keyboardid) instead')
 def user_keyboard_dir(keyboardid):
-    return os.path.join(user_keyman_dir(), keyboardid)
+    return get_keyboard_dir(InstallLocation.User, keyboardid)
+
+
+def get_keyboard_dir(area, keyboardid):
+    return os.path.join(_get_data_base_dir(area), 'keyman', keyboardid)
+
+
+def get_keyman_doc_dir(area, keyboardid):
+    if area == InstallLocation.User:
+        return get_keyboard_dir(area, keyboardid)
+    return os.path.join(_get_data_base_dir(area), 'doc', 'keyman')
 
 
 def get_kmp_file(downloaddata, cache=False):
@@ -126,7 +161,7 @@ def get_kmp_file(downloaddata, cache=False):
         str: path where kmp file has been downloaded
     """
     if 'kmp' not in downloaddata:
-        logging.info("get_kmp.py: Package does not have a kmp file available")
+        logging.info('get_kmp.py: Package does not have a kmp file available')
         return None
 
     downloadfile = os.path.join(get_download_folder(), os.path.basename(downloaddata['kmp']))
@@ -146,7 +181,7 @@ def download_kmp_file(url, kmpfile, cache=False):
     Returns:
         str: path where kmp file has been downloaded
     """
-    logging.info("Download URL: %s", url)
+    logging.info('Download URL: %s', url)
     downloadfile = None
 
     if cache:
@@ -162,11 +197,11 @@ def download_kmp_file(url, kmpfile, cache=False):
     try:
         response = requests.get(url)  # , stream=True)
     except requests.exceptions.ConnectionError:
-        logging.error("Connection error downloading %s", url)
+        logging.error('Connection error downloading %s', url)
         return downloadfile
 
     if cache:
-        logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
+        logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
         os.chdir(current_dir)
         requests_cache.core.uninstall_cache()
 
@@ -190,6 +225,6 @@ def get_kmp(packageID):
     if (downloaddata):
         return get_kmp_file(downloaddata)
     else:
-        logging.warning("get_kmp.py: Could not get download information about keyboard package.")
+        logging.warning('get_kmp.py: Could not get download information about keyboard package.')
         return None
     return

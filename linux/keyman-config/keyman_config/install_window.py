@@ -11,26 +11,26 @@ import webbrowser
 import tempfile
 import gi
 
-from keyman_config.fcitx_util import is_fcitx_running
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 
 from gi.repository import Gtk, WebKit2
 from distutils.version import StrictVersion
 from keyman_config import _
+from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
 from keyman_config.list_installed_kmp import get_kmp_version
 from keyman_config.kmpmetadata import get_fonts
 from keyman_config.welcome import WelcomeView
 from keyman_config.uninstall_kmp import uninstall_kmp
-from keyman_config.get_kmp import user_keyboard_dir
+from keyman_config.get_kmp import InstallLocation, get_keyboard_dir, get_keyman_dir
 from keyman_config.accelerators import bind_accelerator, init_accel
 
 
 def find_keyman_image(image_file):
-    img_path = os.path.join("/usr/share/keyman/icons", image_file)
+    img_path = os.path.join(get_keyman_dir(InstallLocation.OS), "icons", image_file)
     if not os.path.isfile(img_path):
-        img_path = os.path.join("/usr/local/share/keyman/icons/", image_file)
+        img_path = os.path.join(get_keyman_dir(InstallLocation.Shared), "icons", image_file)
         if not os.path.isfile(img_path):
             img_path = os.path.join("keyman_config/icons/", image_file)
             if not os.path.isfile(img_path):
@@ -302,7 +302,7 @@ class InstallKmpWindow(Gtk.Dialog):
             result = install_kmp(self.kmpfile, self.online, language=self.language)
             if result:
                 # If install_kmp returns a string, it is an instruction for the end user,
-                # because for fcitx they will need to take extra steps to complete 
+                # because for fcitx they will need to take extra steps to complete
                 # installation themselves.
                 dialog = Gtk.MessageDialog(
                     self, 0, Gtk.MessageType.INFO,
@@ -315,7 +315,8 @@ class InstallKmpWindow(Gtk.Dialog):
             if self.viewwindow:
                 self.viewwindow.refresh_installed_kmp()
             keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
-            welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
+            welcome_file = os.path.join(get_keyboard_dir(InstallLocation.User, keyboardid),
+                                        "welcome.htm")
             if os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
                 logging.debug(uri_path)

@@ -10,7 +10,8 @@ from enum import Enum
 from keyman_config import _
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
 from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
-from keyman_config.get_kmp import get_keyboard_data, user_keyboard_dir, user_keyman_font_dir
+from keyman_config.get_kmp import get_keyboard_data, get_keyboard_dir, get_keyman_doc_dir
+from keyman_config.get_kmp import get_keyman_font_dir, InstallLocation
 from keyman_config.kmpmetadata import get_metadata, KMFileTypes
 from keyman_config.convertico import extractico, checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
@@ -89,17 +90,17 @@ class InstallKmp():
             _("You do not have permissions to install the font files to the shared font area "
               "/usr/local/share/fonts"))
 
-        return self._install_kmp(inputfile, online, language)
+        return self._install_kmp(inputfile, online, language, InstallLocation.Shared)
 
     def install_kmp_user(self, inputfile, online=False, language=None):
+        return self._install_kmp(inputfile, online, language, InstallLocation.User)
+
+    def _install_kmp(self, inputfile, online, language, area):
         self.packageID = self._extract_package_id(inputfile)
-        self.packageDir = user_keyboard_dir(self.packageID)
-        self.kmpdocdir = self.packageDir
-        self.kmpfontdir = os.path.join(user_keyman_font_dir(), self.packageID)
+        self.packageDir = get_keyboard_dir(area, self.packageID)
+        self.kmpdocdir = get_keyman_doc_dir(area, self.packageID)
+        self.kmpfontdir = get_keyman_font_dir(area, self.packageID)
 
-        return self._install_kmp(inputfile, online, language)
-
-    def _install_kmp(self, inputfile, online, language):
         if not os.path.isdir(self.packageDir):
             os.makedirs(self.packageDir)
 
