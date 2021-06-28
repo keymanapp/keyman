@@ -45,6 +45,9 @@ namespace com.keyman {
     ui?: string;
     setActiveOnRegister?: string; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
 
+    // Determines the default text shown on the spacebar, if undefined, LANGUAGE_KEYBOARD
+    spacebarText?: SpacebarText;
+
     // Determines whether or not KeymanWeb should display its own alert messages
     useAlerts?: boolean;
   }
