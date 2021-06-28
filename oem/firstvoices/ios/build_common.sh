@@ -160,7 +160,7 @@ if [ $DO_UPDATE = true ]; then
 
     # Copy resources.
     echo "Copying $KEYMAN_ENGINE_FRAMEWORK_SRC to $KEYMAN_ENGINE_FRAMEWORK_DST"
-    rm -rf "$KEYMAN_ENGINE_FRAMEWORK_DST"KeymanEngine.xcframework
+    rm -rf "$KEYMAN_ENGINE_FRAMEWORK_DST"
     cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 fi
 
