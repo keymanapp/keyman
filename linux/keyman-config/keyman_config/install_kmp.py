@@ -51,7 +51,7 @@ class InstallKmp():
         self.kmpdocdir = ''
         self.kmpfontdir = ''
 
-    def _check_keyman_dir(basedir, error_message):
+    def _check_keyman_dir(self, basedir, error_message):
         # check if keyman subdir exists
         keyman_dir = os.path.join(basedir, "keyman")
         if os.path.isdir(keyman_dir):
