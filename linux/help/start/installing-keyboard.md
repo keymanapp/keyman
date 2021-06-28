@@ -8,6 +8,7 @@ Alternatively from the command line run `km-config`.
 ![](../linux_images/km-config.png "Keyman Configuration")
 
 ## Download from Keyman cloud repository
+
 From Keyman Configuration, click "Download". At the search page, enter the keyboard you want to download.
 
 ![](../linux_images/search-khmer-angkor.png "Search for khmer_angkor keyboard")
@@ -17,6 +18,7 @@ Clicking the keyboard brings the keyboard page which has a link for installation
 ![](../linux_images/download-khmer-angkor.png "Install khmer_angkor")
 
 ## Install Local .kmp keyboard package
+
 Keyman for Linux can also install keyboards from local .kmp keyboard packages. From Keyman Configuration,
 click "Install". Then browse to the local .kmp keyboard package and install.
 
