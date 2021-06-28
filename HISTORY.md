@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 15.0.75 alpha 2021-06-25
+
+* fix(android): rotation is not updating keyboard (#5247)
+* fix(windows): osk scaling mismatch on horz axis (#5341)
+* fix(linux): Don't add duplicate entries when reinstalling keyboard (#5363)
+* fix(linux): fix tab completion for command line tools (#5362)
+* feat(web): Update addLanguageKeyboards to return a Promise (#5260)
+* feat(web): Add option useAlerts to control alerts() (#5302)
+
+## 15.0.74 alpha 2021-06-24
+
+* fix(android): fixes application of nextlayer for subkeys with customized layer setting (#5350)
+* feat(common/core/web): engine correction-prep optimizations (#5319)
+* feat(linux): Add support for impish (Ubuntu 21.10) (#5334)
+* fix(linux): Add libglib2.0-bin to keyman Depends 🍒 (#5360)
+
+## 15.0.73 alpha 2021-06-23
+
+* chore(windows): add engine test framework (#5337)
+* feat(linux): Auto-generate reference help (#5326)
+* fix(linux): Improve error handling if `lang_tags_map.py` is missing (#5345)
+
 ## 15.0.72 alpha 2021-06-22
 
 * fix(mac): .kmx max file version is now 0x0E00 (14.0) (#5329)

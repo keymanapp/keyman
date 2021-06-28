@@ -36,6 +36,19 @@ namespace com.keyman {
     BLANK = 'blank'
   };
 
+  export interface OptionType {
+    root?: string;
+    resources?: string;
+    keyboards?: string;
+    fonts?: string;
+    attachType?: 'auto' | 'manual' | ''; // If blank or undefined, attachType will be assigned to "auto" or "manual"
+    ui?: string;
+    setActiveOnRegister?: string; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
+
+    // Determines whether or not KeymanWeb should display its own alert messages
+    useAlerts?: boolean;
+  }
+
   export class KeymanBase {
     _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
     _IE = 0;                   // browser version identification
@@ -80,21 +93,23 @@ namespace com.keyman {
 
     touchAliasing: dom.DOMEventHandlers;
 
-    // Defines option-tracking object as a string map.
-    options: { [name: string]: string; } = {
-      'root':'',
-      'resources':'',
-      'keyboards':'',
-      'fonts':'',
-      'attachType':'',
-      'ui':null,
-      'setActiveOnRegister':'true',
-      'spacebarText':SpacebarText.LANGUAGE_KEYBOARD
+    // Defines default option values
+    options: OptionType = {
+      root: '',
+      resources: '',
+      keyboards: '',
+      fonts: '',
+      attachType: '',
+      ui: null,
+      setActiveOnRegister: 'true', // TODO: convert to boolean
+      spacebarText: SpacebarText.LANGUAGE_KEYBOARD,
+
+      // Determines whether or not KeymanWeb should display its own alert messages
+      useAlerts: true
     };
 
-
     // Stub functions (defined later in code only if required)
-    setDefaultDeviceOptions(opt){}
+    setDefaultDeviceOptions(opt: OptionType){}
     getStyleSheetPath(s){return s;}
     getKeyboardPath(f, p?){return f;}
     KC_(n, ln, Pelem){return '';}
@@ -312,12 +327,17 @@ namespace com.keyman {
     }
 
     /**
-     *  Add default or all keyboards for a given language
+     *  Add default keyboards for given language(s)
      *
-     *  @param  {string}   arg    Language name (multiple arguments allowed)
+     *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
+     *  @returns {Promise<KeyboardStub[]>} Promise of added keyboard stubs
      **/
-    ['addKeyboardsForLanguage'](arg) {
-      this.keyboardManager.addLanguageKeyboards(arguments);
+    ['addKeyboardsForLanguage'](arg: string[]|string) : Promise<com.keyman.keyboards.KeyboardStub[]> {
+      if (typeof arg === 'string') {
+        return this.keyboardManager.addLanguageKeyboards(arg.split(',').map(item => item.trim()));
+      } else {
+        return this.keyboardManager.addLanguageKeyboards(arg);
+      }
     }
 
     /**

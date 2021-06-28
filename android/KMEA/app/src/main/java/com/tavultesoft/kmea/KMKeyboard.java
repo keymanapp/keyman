@@ -1020,6 +1020,10 @@ final class KMKeyboard extends WebView {
   private String getSubkeyText(String keyID, String keyText) {
     String text = keyText;
     if (text.isEmpty()) {
+      if(keyID.indexOf("U_") != -1 && keyID.indexOf("+") != -1 ) {
+        // Chop off any appended '+____' portion of the key ID.
+        keyID = keyID.substring(0, keyID.indexOf("+"));
+      }
       text = keyID.replaceAll("U_", "\\\\u");
     }
     return text;
@@ -1030,7 +1034,7 @@ final class KMKeyboard extends WebView {
    * 1. Replace "source" keys for "files" keys
    * 2. Create full font paths for .ttf or .svg
    * @param font String font JSON object as a string
-   * @return String of modified font information with full paths. If font is invalid, return "''"
+   * @return JSONObject of modified font information with full paths. If font is invalid, return `null`
    */
   private JSONObject makeFontPaths(String font) {
 

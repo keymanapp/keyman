@@ -1,7 +1,15 @@
 #!/usr/bin/python3
 
+import sys
 from keyman_config.bcp47tag import Bcp47Tag
-from keyman_config.standards.lang_tags_map import LangTagsMap
+
+try:
+    from keyman_config.standards.lang_tags_map import LangTagsMap
+except ImportError:
+    # Not localized because we don't have access yet to _(). However,
+    # this exception should only ever happen in development environment.
+    print('Can not find lang_tags_map.py. Did you run "make"?')
+    sys.exit(3)
 
 
 class CanonicalLanguageCodeUtils():

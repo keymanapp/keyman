@@ -40,15 +40,20 @@ MESON_TARGET=debug
 MESON_TARGET=release
 !endif
 
-pull-core:
-    cd $(ROOT)\..\common\core\desktop
-
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh -p native
+CALLER=$(GIT_BASH_FOR_KEYMAN)
 !else
-    start /wait ./build.sh -p native
+CALLER=start /wait
+!endif
+!ifdef DEBUG
+BUILD_DEBUG=-d
+!else
+BUILD_DEBUG=
 !endif
 
+pull-core:
+    cd $(ROOT)\..\common\core\desktop
+    $(CALLER) ./build.sh -p native $(BUILD_DEBUG)
     cd $(ROOT)\src\engine\keyman32
 
 !include ..\..\Target.mak
