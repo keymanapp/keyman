@@ -280,15 +280,16 @@ public extension UserDefaults {
   
   var optSpacebarText: SpacebarText {
     get {
-      if let valueString = string(forKey: Key.optSpacebarText) {
-        return SpacebarText.fromString(mode: valueString)
+      if let valueString = string(forKey: Key.optSpacebarText),
+         let value = SpacebarText(rawValue: valueString) {
+        return value
       } else {
         return SpacebarText.LANGUAGE_KEYBOARD
       }
     }
     
     set(value) {
-      set(value.toString(), forKey: Key.optSpacebarText)
+      set(value.rawValue, forKey: Key.optSpacebarText)
     }
   }
  

@@ -263,7 +263,7 @@ open class SettingsViewController: UITableViewController {
         break
       case "spacebartext":
         cell.accessoryType = .disclosureIndicator
-        cell.detailTextLabel?.text = NSLocalizedString("menu-settings-spacebar-hint-"+Manager.shared.spacebarText.toString(), bundle: engineBundle, comment: "")
+        cell.detailTextLabel?.text = NSLocalizedString("menu-settings-spacebar-hint-"+Manager.shared.spacebarText.rawValue, bundle: engineBundle, comment: "")
         cell.detailTextLabel?.isEnabled = true
         break
       case "showbanner", "showgetstarted":
