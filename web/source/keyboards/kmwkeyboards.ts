@@ -910,6 +910,37 @@ namespace com.keyman.keyboards {
     };
 
     /**
+     * Return a Promise of the merged keyboard stubs and error stubs
+     * @param {(KeyboardStub|ErrorStub)[]} keyboardStubs 
+     * @param {ErrorStub[]} errorStubs 
+     * @returns {Promise<KeyboardStub|ErrorStub)[]>}
+     */
+    private mergeStubs(keyboardStubs: (KeyboardStub|ErrorStub)[], errorStubs: ErrorStub[]) :
+        Promise<(KeyboardStub|ErrorStub)[]> {
+      if (errorStubs.length == 0) {
+        return Promise.resolve(keyboardStubs);
+      } if (keyboardStubs.length == 0) {
+        return Promise.reject(errorStubs);
+      } else {
+        // Merge this with errorStubs
+        let result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
+        return Promise.resolve(result.concat(errorStubs));
+      }
+  
+        /*
+        if (Array.isArray(result)) {
+          if (errorStubs.length > 0) {
+            result = result.concat(errorStubs);
+            return Promise.resolve(result);
+          } else {
+            return Promise.resolve(result);
+          }
+        }
+        */
+  
+    }
+
+    /**
      * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
      *
      * @param {(string|KeyboardStub)[]} x keyboard name string or keyboard metadata JSON object
@@ -1026,16 +1057,13 @@ namespace com.keyman.keyboards {
       }
 
       // Return if all keyboards being registered are local and fully specified
-      if(cloudList.length == 0) {
-        if (errorStubs.length == 0) {
-          return Promise.resolve(keyboardStubs);
-        } if (keyboardStubs.length == 0) {
-          return Promise.reject(errorStubs);
-        } else {
-          // Merge this with errorStubs
-          let result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
-          return Promise.resolve(result.concat(errorStubs));
+      try {
+        if(cloudList.length == 0) {
+          return this.mergeStubs(keyboardStubs, errorStubs);
         }
+      } catch (error) {
+        console.error(error);
+        return Promise.reject(error);
       }
 
       // Update the keyboard metadata list from keyman.com - build the command
@@ -1048,14 +1076,7 @@ namespace com.keyman.keyboards {
       // Request keyboard metadata from the Keyman Cloud keyboard metadata server
       try {
         let result: (KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest(cmd,false);
-        if (Array.isArray(result)) {
-          if (errorStubs.length > 0) {
-            result = result.concat(errorStubs);
-            return Promise.resolve(result);
-          } else {
-            return Promise.resolve(result);
-          }
-        }
+        return this.mergeStubs(result, errorStubs);
       } catch(err) {
         // We don't have keyboard info for this ErrorStub
         console.error(err);
@@ -1225,7 +1246,7 @@ namespace com.keyman.keyboards {
     async addLanguageKeyboards(languages: string[]): Promise<(KeyboardStub|ErrorStub)[]> {
       var i, j, lgName, cmd, addAll, retPromise;
 
-      let errorStub: ErrorStub[] = [];
+      let errorStubs: ErrorStub[] = [];
 
       // Defer registering keyboards by language until the language list has been loaded
       if (this.languageList == null) {
@@ -1237,8 +1258,8 @@ namespace com.keyman.keyboards {
             let msg = "Unable to retrieve the master language list.";
             console.error(msg, error)
             let stub: ErrorStub = {error: new Error(msg)};
-            errorStub.push(stub);
-            return Promise.reject(errorStub);
+            errorStubs.push(stub);
+            return Promise.reject(errorStubs);
           });
           this.languageListPromise = promise;
         }
@@ -1294,32 +1315,25 @@ namespace com.keyman.keyboards {
             // Construct response array of errors (failed-query keyboards)
             // that will be merged with stubs (successfully-queried keyboards)
             let stub: ErrorStub = {language: {name: lgName}, error: new Error(this.alertLanguageUnavailable(lgName))};
-            errorStub.push(stub);
+            errorStubs.push(stub);
           }
         }
 
         if(cmd == '') {
           // No command so return errors
-          return Promise.reject(errorStub);
+          return Promise.reject(errorStubs);
         } 
 
         try {
           // Merge this with errorStub
           let result:(KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest('&keyboardid='+cmd, false);
-          if (Array.isArray(result)) {
-            if (errorStub.length > 0) {
-              result = result.concat(errorStub);
-              return Promise.resolve(result);
-            } else {
-              return Promise.resolve(result);
-            }
-          }
+          return this.mergeStubs(result, errorStubs);
         } catch(err) {
             // We don't have language info for this ErrorStub
             console.error(err);
             let stub: ErrorStub = {error: err};
-            errorStub.push(stub);
-            return Promise.reject(errorStub);
+            errorStubs.push(stub);
+            return Promise.reject(errorStubs);
         }
       }
 
@@ -1327,7 +1341,7 @@ namespace com.keyman.keyboards {
         return retPromise;
       } else {
         // No keyboards added so return empty stub
-        return Promise.resolve(errorStub);
+        return Promise.resolve(errorStubs);
       }
     }
 
@@ -1349,75 +1363,73 @@ namespace com.keyman.keyboards {
       const URL='https://api.keyman.com/cloud/4.0/'
                 + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards');
 
-      let promise = new Promise(function(resolve: (result: KeyboardStub[]) => void, reject: (error: Error) => void) {
-        const Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
+      try {
+        let promise = new Promise(function(resolve: (result: KeyboardStub[]) => void, reject: (error: Error) => void) {
+          const Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
 
-        const queryConfig = '?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
-  
-        // Set callback timer
-        const timeoutID = window.setTimeout(function() {
-          delete kbdManager.registrationResolvers[timeoutID];
-          reject(new Error(CLOUD_TIMEOUT_ERR));
-        } ,10000);
+          const queryConfig = '?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
+    
+          // Set callback timer
+          const timeoutID = window.setTimeout(function() {
+            delete kbdManager.registrationResolvers[timeoutID];
+            reject(new Error(CLOUD_TIMEOUT_ERR));
+          } ,10000);
 
-        // Save the resolve / reject functions.
-        kbdManager.registrationResolvers[timeoutID] = {
-          resolve: resolve,
-          reject: reject
-        };
+          // Save the resolve / reject functions.
+          kbdManager.registrationResolvers[timeoutID] = {
+            resolve: resolve,
+            reject: reject
+          };
 
-        const tFlag='&timerid='+ timeoutID;
+          const tFlag='&timerid='+ timeoutID;
 
-        Lscript.onload = function(event: Event) {
-          window.clearTimeout(timeoutID);
-          // This case should only happen if a returned, otherwise-valid keyboard 
-          // script does not ever call `register`.  Also provides default handling
-          // should `register` fail to report results/failure correctly.
-          if(kbdManager.registrationResolvers[timeoutID]) {
+          Lscript.onload = function(event: Event) {
+            window.clearTimeout(timeoutID);
+            // This case should only happen if a returned, otherwise-valid keyboard 
+            // script does not ever call `register`.  Also provides default handling
+            // should `register` fail to report results/failure correctly.
+            if(kbdManager.registrationResolvers[timeoutID]) {
+              try {
+                reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
+              } finally {
+                delete kbdManager.registrationResolvers[timeoutID];
+              }
+            }
+          };
+
+          // Note:  at this time (24 May 2021), this is also happens for "successful" 
+          //        API calls where there is no matching keyboard ID.
+          //        
+          //        The returned 'error' JSON object is sent with an HTML error code (404)
+          //        and does not call `keyman.register`.  Even if it did the latter, the
+          //        404 code would likely prevent the returned script's call.
+          Lscript.onerror = function(event: string | Event, source?: string, 
+                                    lineno?: number, colno?: number, error?: Error) {
+            window.clearTimeout(timeoutID);
             try {
-              reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
+              let msg = CLOUD_MALFORMED_OBJECT_ERR;
+              if(error) {
+                msg = msg + ": " + error.message;
+              }
+              reject(new Error(msg));
             } finally {
               delete kbdManager.registrationResolvers[timeoutID];
             }
           }
-        };
 
-        // Note:  at this time (24 May 2021), this is also happens for "successful" 
-        //        API calls where there is no matching keyboard ID.
-        //        
-        //        The returned 'error' JSON object is sent with an HTML error code (404)
-        //        and does not call `keyman.register`.  Even if it did the latter, the
-        //        404 code would likely prevent the returned script's call.
-        Lscript.onerror = function(event: string | Event, source?: string, 
-                                  lineno?: number, colno?: number, error?: Error) {
-          window.clearTimeout(timeoutID);
+          Lscript.src = URL + queryConfig + cmd + tFlag;
+    
           try {
-            let msg = CLOUD_MALFORMED_OBJECT_ERR;
-            if(error) {
-              msg = msg + ": " + error.message;
-            }
-            reject(new Error(msg));
-          } finally {
-            delete kbdManager.registrationResolvers[timeoutID];
+            document.body.appendChild(Lscript);
+          } catch(ex) {
+            document.getElementsByTagName('head')[0].appendChild(Lscript);
           }
-        }
-
-        Lscript.src = URL + queryConfig + cmd + tFlag;
-  
-        try {
-          document.body.appendChild(Lscript);
-        } catch(ex) {
-          document.getElementsByTagName('head')[0].appendChild(Lscript);
-        }
-      });
-      // TODO:  Allow the site developer to handle error messaging via this catch.
-      //        This current version simply maintains pre-existing behavior.
-      promise.catch(function(error: Error) {
+        });
+        return promise;
+      } catch(error) {
         kbdManager.serverUnavailable(error.message);
         return Promise.reject(error);
-      });
-
-      return promise;
+      }
     }
 
     /**
