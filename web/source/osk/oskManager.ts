@@ -3,6 +3,8 @@
 /// <reference path="languageMenu.ts" />
 // Includes the banner
 /// <reference path="./bannerManager.ts" />
+// Defines desktop-centric OSK positioning + sizing behavior
+/// <reference path="layouts/targetedTitleBar.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 
@@ -23,11 +25,8 @@ namespace com.keyman.osk {
     banner: BannerManager;
     vkbd: VisualKeyboard;
     resizeIcon: HTMLDivElement;
-    closeButton: HTMLDivElement;
-    helpImg: HTMLDivElement;
-    configImg: HTMLDivElement;
-    pinImg: HTMLDivElement;
-    _TitleElement: HTMLSpanElement; // I1972 - KeymanWeb Titlebar should not be a link
+
+    desktopTitleBar: layouts.TargetedTitleBar;
 
     ready: boolean = false;
     loadRetry: number = 0;
@@ -160,8 +159,8 @@ namespace com.keyman.osk {
 
       this.loadRetry = 0;
 
-      if(this._TitleElement) {
-        this._TitleElement.innerHTML = 'KeymanWeb'; // I1972
+      if(this.desktopTitleBar) {
+        this.desktopTitleBar.setTitle('KeymanWeb'); // I1972
       }
 
 
@@ -213,11 +212,8 @@ namespace com.keyman.osk {
       // (Probably to avoid having a null keyboard. But maybe that *is* an option, if there remains a way to get the language menu,
       //  such as a minimized menu button?)
       if(activeKeyboard == null && !device.touchable) {
-        var Ldiv=util._CreateElement('div');
-        Ldiv.className = "kmw-title-bar";
-        Ldiv.appendChild(this._TitleBarInterior());
-        Ldiv.onmousedown = this._VMoveMouseDown;
-        this._Box.appendChild(Ldiv);
+        this.desktopTitleBar = new layouts.TargetedTitleBar();
+        this._Box.appendChild(this.desktopTitleBar.element);
 
         Ldiv = util._CreateElement('div');
         Ldiv.className='kmw-osk-none';
@@ -238,11 +234,9 @@ namespace com.keyman.osk {
           this._GenerateVisualKeyboard(null);
         } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
           //osk.ddOSK = false;
-          Ldiv=util._CreateElement('div');
-          Ldiv.className = "kmw-title-bar";
-          Ldiv.appendChild(this._TitleBarInterior());
-          Ldiv.onmousedown = this._VMoveMouseDown;
-          this._Box.appendChild(Ldiv);
+          this.desktopTitleBar = new layouts.TargetedTitleBar();
+          this._Box.appendChild(this.desktopTitleBar.element);
+          this._Box.appendChild(this.banner.element);
 
           //Add content
           var Ldiv = util._CreateElement('div');
@@ -253,11 +247,9 @@ namespace com.keyman.osk {
             activeKeyboard.insertHelpHTML(this._Box);
           }
         }
-        if(this._TitleElement)
-        {
-          this._TitleElement.innerHTML = "<span style='font-weight:bold'>"
-            + activeKeyboard.name + '</span> - ' + this._TitleElement.innerHTML; // I1972  // I2186
-          this._TitleElement.className=''; this._TitleElement.style.color='#fff';
+
+        if(this.desktopTitleBar) {
+          this.desktopTitleBar.setTitleFromKeyboard(activeKeyboard);
         }
       }
 
@@ -349,7 +341,8 @@ namespace com.keyman.osk {
 
       // Add header element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
-        this._Box.appendChild(this.controlBar());
+        this.desktopTitleBar = new layouts.TargetedTitleBar();
+        this._Box.appendChild(this.desktopTitleBar.element);
       }
 
       // Add suggestion banner bar to OSK
@@ -367,77 +360,6 @@ namespace com.keyman.osk {
       } else {
         this.vkbd.adjustHeights(this);
       }
-    }
-
-    /**
-     * Create a control bar with title and buttons for the desktop OSK
-     */
-    controlBar(): HTMLDivElement {
-      // TODO: merge with _TitleBarInterior?
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
-      var bar=util._CreateElement('div'),title='';
-      bar.id='keymanweb_title_bar';
-      bar.className='kmw-title-bar';
-      bar.onmousedown=this._VMoveMouseDown;
-
-      if(keymanweb.core.activeKeyboard) {
-        title=keymanweb.core.activeKeyboard.name;
-      }
-      var Ltitle=util._CreateElement('span');
-      Ltitle.className='kmw-title-bar-caption';
-      Ltitle.innerHTML=title;
-      bar.appendChild(Ltitle);
-
-      var Limg = this.closeButton = util._CreateElement('div');
-      Limg.id='kmw-close-button';
-      Limg.className='kmw-title-bar-image';
-      Limg.onmousedown=util._CancelMouse;
-      Limg.onclick=function(this: OSKManager) {
-        this._Hide(true);
-      }.bind(this);
-      bar.appendChild(Limg);
-
-      Limg = this.helpImg = util._CreateElement('div');
-      Limg.id='kmw-help-image';
-      Limg.className='kmw-title-bar-image';
-      Limg.title='KeymanWeb Help';
-      Limg.onclick=function() {
-        var p={};
-        util.callEvent('osk.helpclick',p);
-        if(window.event) {
-          window.event.returnValue=false;
-        }
-        return false;
-      }
-      Limg.onmousedown=util._CancelMouse;
-      bar.appendChild(Limg);
-
-      Limg = this.configImg = util._CreateElement('div');
-      Limg.id='kmw-config-image';
-      Limg.className='kmw-title-bar-image';
-      Limg.title='KeymanWeb Configuration Options';
-      Limg.onclick=function() {
-        var p={};
-        util.callEvent('osk.configclick',p);
-        if(window.event) {
-          window.event.returnValue=false;
-        }
-        return false;
-      }
-      Limg.onmousedown=util._CancelMouse;
-      bar.appendChild(Limg);
-
-      Limg = this.pinImg = util._CreateElement('div');  //I2186
-      Limg.id='kmw-pin-image';
-      Limg.className='kmw-title-bar-image';
-      Limg.title='Pin the On Screen Keyboard to its default location on the active text box';
-      Limg.onclick=this.handlePinClick;
-      Limg.onmousedown=util._CancelMouse;
-      bar.appendChild(Limg);
-
-      return bar;
     }
 
     /**
@@ -514,73 +436,10 @@ namespace com.keyman.osk {
       }
 
       this.doResizeMove(); //allow the UI to respond to OSK movements
-      if(this.pinImg) {
-        this.pinImg.style.display='none';
+      if(this.desktopTitleBar) {
+        this.desktopTitleBar.showPin(false);
       }
     }.bind(this);
-
-    private handlePinClick: (event: Event) => void = function(this: OSKManager, event: Event) {
-      this.restorePosition(true);
-      if(event) {
-        event.returnValue = false;
-      }
-    }.bind(this);
-
-    /**
-     * Function     _TitleBarInterior
-     * Scope        Private
-     * Description  Title bar interior formatting and element event handling
-     */
-    _TitleBarInterior() {
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
-      var Ldiv = util._CreateElement('div');
-      var Ls = Ldiv.style;
-      Ls.paddingLeft='2px';
-      Ls.cursor='move';
-      Ls.background='#ad4a28';
-      Ls.font='8pt Tahoma,Arial,sans-serif';  //I2186
-
-      // Add container for buttons, handle mousedown event
-      var LdivButtons = util._CreateElement('div');
-      LdivButtons.className = 'kmw-title-bar-actions';
-      LdivButtons.onmousedown=util._CancelMouse;
-
-      // Add close button, handle click and mousedown events
-      var Limg = util._CreateElement('div');
-      Limg.className='kmw-close-button';
-      Limg.onmousedown=util._CancelMouse;
-      Limg.onclick=function (this: OSKManager) {
-        this._Hide(true);
-      }.bind(this);
-      this.closeButton = Limg;
-      LdivButtons.appendChild(Limg);
-
-      // Add 'Unpin' button for restoring OSK to default location, handle mousedown and click events
-      Limg = this.pinImg = util._CreateElement('div');  //I2186
-      Limg.className='kmw-pin-image';
-      Limg.title='Pin the On Screen Keyboard to its default location on the active text box';
-      Limg.onclick=this.handlePinClick;
-      Limg.onmousedown=util._CancelMouse;
-      Limg.style.display='none';
-
-      // Do not use Unpin button on touch screens (OSK location fixed)
-      if(!util.device.touchable) {
-        LdivButtons.appendChild(Limg); // I3363 (Build 301)
-      }
-
-      // Attach button container to title bar
-      Ldiv.appendChild(LdivButtons);
-
-      // Add title bar caption
-      var Lcap=this._TitleElement=util._CreateElement('span');  // I1972
-      Lcap.className='kmw-title-bar-caption';
-      Lcap.innerHTML='KeymanWeb';
-      Ldiv.appendChild(Lcap);
-
-      return Ldiv;
-    }
 
     // End of TitleBarInterior
 
@@ -757,7 +616,7 @@ namespace com.keyman.osk {
      * @param       {Object}      e      event
      * Description  Process mouse down on OSK
      */
-    private _VMoveMouseDown = function(this: OSKManager, e: MouseEvent) {
+    /*private*/ _VMoveMouseDown = function(this: OSKManager, e: MouseEvent) {
       let keymanweb = com.keyman.singleton;
 
       var Lposx, Lposy;
@@ -787,8 +646,8 @@ namespace com.keyman.osk {
       this._VMoveX = Lposx - this._Box.offsetLeft;
       this._VMoveY = Lposy - this._Box.offsetTop;
 
-      if(keymanweb.isCJK()) {
-        this.pinImg.style.left='15px';
+      if(keymanweb.isCJK() && this.desktopTitleBar) {
+        this.desktopTitleBar.setPinCJKOffset();
       }
 
       document.onmousemove = this._VMoveMouseMove;
@@ -824,7 +683,9 @@ namespace com.keyman.osk {
       this.resizing = true;
 
       this.userPositioned = true;
-      this.pinImg.style.display='block';
+      if(this.desktopTitleBar) {
+        this.desktopTitleBar.showPin(true);
+      }
 
       if(this._VPreviousMouseButton != (typeof(e.which)=='undefined' ? e.button : e.which)) { // I1472 - Dragging off edge of browser window causes muckup
         return this._VResizeMoveMouseUp(e);
@@ -1180,8 +1041,8 @@ namespace com.keyman.osk {
       // Fix or release user dragging
       if('nomove' in p) {
         this.noDrag=p['nomove'];
-        if(this.pinImg) {
-          this.pinImg.style.display=(p['nomove'] || !this.userPositioned) ? 'none' : 'block';
+        if(this.desktopTitleBar) {
+          this.desktopTitleBar.showPin(!(p['nomove'] || !this.userPositioned));
         }
       }
       // Save the user-defined OSK size
@@ -1238,8 +1099,8 @@ namespace com.keyman.osk {
         }
       }
 
-      if(this.pinImg) {
-        this.pinImg.style.display=(this.userPositioned ? 'block' : 'none');
+      if(this.desktopTitleBar) {
+        this.desktopTitleBar.showPin(this.userPositioned);
       }
     }
 
@@ -1350,9 +1211,9 @@ namespace com.keyman.osk {
 
         this.saveCookie();
 
-        var pin=this.pinImg;
-        if(typeof pin != 'undefined' && pin != null)
-          pin.style.display=this.userPositioned?'block':'none';
+        if(this.desktopTitleBar) {
+          this.desktopTitleBar.showPin(this.userPositioned);
+        }
       }
 
       // If OSK still hidden, make visible only after all calculation finished
