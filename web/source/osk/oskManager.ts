@@ -27,6 +27,7 @@ namespace com.keyman.osk {
     helpImg: HTMLDivElement;
     configImg: HTMLDivElement;
     pinImg: HTMLDivElement;
+    _TitleElement: HTMLSpanElement; // I1972 - KeymanWeb Titlebar should not be a link
 
     ready: boolean = false;
     loadRetry: number = 0;
@@ -159,8 +160,8 @@ namespace com.keyman.osk {
 
       this.loadRetry = 0;
 
-      if(keymanweb._TitleElement) {
-        keymanweb._TitleElement.innerHTML = 'KeymanWeb'; // I1972
+      if(this._TitleElement) {
+        this._TitleElement.innerHTML = 'KeymanWeb'; // I1972
       }
 
 
@@ -252,11 +253,11 @@ namespace com.keyman.osk {
             activeKeyboard.insertHelpHTML(this._Box);
           }
         }
-        if(keymanweb._TitleElement)
+        if(this._TitleElement)
         {
-          keymanweb._TitleElement.innerHTML = "<span style='font-weight:bold'>"
-            + activeKeyboard.name + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
-          keymanweb._TitleElement.className=''; keymanweb._TitleElement.style.color='#fff';
+          this._TitleElement.innerHTML = "<span style='font-weight:bold'>"
+            + activeKeyboard.name + '</span> - ' + this._TitleElement.innerHTML; // I1972  // I2186
+          this._TitleElement.className=''; this._TitleElement.style.color='#fff';
         }
       }
 
@@ -573,7 +574,7 @@ namespace com.keyman.osk {
       Ldiv.appendChild(LdivButtons);
 
       // Add title bar caption
-      var Lcap=keymanweb._TitleElement=util._CreateElement('span');  // I1972
+      var Lcap=this._TitleElement=util._CreateElement('span');  // I1972
       Lcap.className='kmw-title-bar-caption';
       Lcap.innerHTML='KeymanWeb';
       Ldiv.appendChild(Lcap);

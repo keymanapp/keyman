@@ -43,7 +43,6 @@ namespace com.keyman {
   }
 
   export class KeymanBase {
-    _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
     _IE = 0;                   // browser version identification
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
