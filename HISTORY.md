@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 14.0.277 stable 2021-06-29
+
+* feat(android): silent install for referred kbd 🍒 (#5266)
+* chore(common): bash version for run-required-test-builds.sh 🍒 (#5268)
+* chore(common): Add YouTube links to Keyman 14 features 🍒  (#5285)
+* fix(common/models): predictive-text engine use of NFD input 🍒 (#5286)
+* fix(developer): kmconvert help match reality 🍒 (#5299)
+* chore(linux): Update changelogs to match Debian (#5303)
+* fix(mac): .kmx max file version is now 0x0E00 (14.0) 🍒 (#5331)
+* fix(mac): kmp.inf is windows-1252 🍒 (#5330)
+* fix(windows): improve keymanx64 start stability 🍒 (#5222)
+* chore(linux): Build also on riscv64 to facilitate migration on Ubuntu (#5322)
+* fix(android): fixes application of nextlayer for subkeys with customized layer setting 🍒 (#5351)
+* feat(common/core/web): engine correction-prep optimizations 🍒 (#5352)
+* fix(linux): Add libglib2.0-bin to keyman Depends (#5359)
+* fix(windows): osk scaling mismatch on horz axis 🍒 (#5342)
+* fix(linux): Don't add duplicate entries when reinstalling keyboard 🍒 (#5369)
+* chore: keyboard_info.source.json 1.0.6 🍒 (#5380)
+* feat(android): hide textarea for perf 🍒 (#5377)
+* change(ios): setText now uses JSON serialization 🍒 (#5333)
+
 ## 14.0.276 stable 2021-06-11
 
 * fix(linux): Exclude s390x from package builds for ibus-keyman 🍒 (#5220)
