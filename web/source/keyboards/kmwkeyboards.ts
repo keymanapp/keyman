@@ -203,14 +203,24 @@ namespace com.keyman.keyboards {
       return Lr;
     }
 
-    registerDeferredStubs() {
-      if (this.deferredStubs.length > 0) {
-        this.addKeyboardArray(this.deferredStubs);
-      }
+    async registerDeferredStubs(): Promise<(KeyboardStub|ErrorStub)[]> {
+      let result: (KeyboardStub|ErrorStub)[] = [];
+      try {
+        if (this.deferredStubs.length > 0) {
+          result = await this.addKeyboardArray(this.deferredStubs);
+        }
 
-      // KRS stubs (legacy format registration)
-      for(var j=0; j<this.deferredKRS.length; j++) {
-        this._registerStub(this.deferredKRS[j]);
+        // KRS stubs (legacy format registration)
+        for(var j=0; j<this.deferredKRS.length; j++) {
+          this._registerStub(this.deferredKRS[j]);
+        }
+
+        return Promise.resolve(result);
+      } catch (err) {
+        let errorStub: ErrorStub[] = [];
+        let stub: ErrorStub = {error: err};
+        errorStub.push(stub)
+        return Promise.reject(errorStub)
       }
     }
 
@@ -992,6 +1002,7 @@ namespace com.keyman.keyboards {
             }
           }
 
+          // TODO: Convert stub from one-to-many KeyboardStub[]
           keyboardStubs.push(stub);
         }
       }
