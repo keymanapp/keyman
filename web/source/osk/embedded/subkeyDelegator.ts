@@ -1,6 +1,8 @@
 /// <reference path="../realizedGesture.interface.ts" />
 
 namespace com.keyman.osk.embedded {
+  // "Delegator", rather than "Popup", because KMW delegates display + selection
+  // of subkeys to the host app when in the embedded context.
   export class SubkeyDelegator implements RealizedGesture {
     private resolver: (keyEvent: text.KeyEvent) => void;
     private readonly vkbd: VisualKeyboard;
