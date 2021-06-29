@@ -35,7 +35,8 @@ KMX_WCHAR *KMX_Context::BufMax(int n)
 	if(CurContext == p || n == 0) return p; // empty context or 0 characters requested, return pointer to end of context
 
   KMX_WCHAR *q = p;
-	for(; p != NULL && p > CurContext && (intptr_t)(q-p) < n; p = decxstr(p, CurContext));
+	for(; p != NULL && p > CurContext && (intptr_t)(q-p) < n; p = decxstr(p, CurContext))
+  ; // ; on new line to tell compiler empty loop is intentional
 
   if((intptr_t)(q-p) > n) p = incxstr(p); // Copes with deadkey or supplementary pair at start of returned buffer making it too long
 
