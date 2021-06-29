@@ -313,7 +313,11 @@ namespace com.keyman.osk {
       source: text.MutableSystemStore,
       newValue: string) {
       if(source.value != newValue) {
-        this.vkbd.layerId = newValue;
+        // Prevents console errors when a keyboard only displays help.
+        // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.
+        if(this.vkbd) {
+          this.vkbd.layerId = newValue;
+        }
         this._Show();
       }
     }.bind(this);
