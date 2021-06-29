@@ -1,18 +1,18 @@
 /*
   Name:             appint
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    23 Feb 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Remove NoSetShift flag
                     27 Jan 2009 - mcdurdin - I1797 - Add fallback for AIWin2000 app integration
                     11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
@@ -74,7 +74,7 @@ public:
 	AppActionQueue();
 	virtual void ResetQueue();
 	virtual BOOL QueueAction(int ItemType, DWORD dwData);
-  
+
   BOOL IsQueueEmpty() { return QueueSize == 0; }
   int GetQueueSize() { return QueueSize; }
 };
@@ -82,20 +82,89 @@ public:
 class AppContext
 {
 private:
-	WCHAR CurContext[MAXCONTEXT];
+	WCHAR CurContext[MAXCONTEXT]; //!< CurContext[0] is furthest from the caret and buffer is null terminated.
 	int pos;
 
 public:
 	AppContext();
+  /**
+   * @brief Copy "source" AppContext to this AppContext
+   *
+   * @param source AppContext to copy
+   */
   void CopyFrom(AppContext *source);
-	void Add(WCHAR ch);
+
+  /**
+   * @brief  Add a single code unit to the Current Context. Not necessarily a complete code point
+   *
+   * @param Code unit to add
+   */
+  void Add(WCHAR ch);
+
+  /**
+   * @brief  Removes a single code point from the end of the CurContext closest to the caret;
+   *         i.e. it will be both code units if a surrogate pair. If it is a deadkey it will
+   *         remove three code points: UC_SENTINEL, CODE_DEADKEY and deadkey value.
+   */
 	void Delete();
-	void Reset();
+
+  /**
+   * @brief Clears the CurContext and resets the position - pos - index
+   *
+   */
+  void Reset();
+
+  /**
+   * @brief  Copies the characters in CurContext to supplied buffer.
+   *         If bufsize is reached before the entire context was copied, the buf
+   *         will be truncated to number of valid characters possible with null character
+   *         termination. e.g. it will be one code unit less than bufsize if that would
+   *         have meant splitting a surrogate pair
+   * @param buf      The data buffer to copy current context
+   * @param bufsize  The number of code units ie size of the WCHAR buffer - not the code points
+   */
 	void Get(WCHAR *buf, int bufsize);
+
+  /**
+   * @brief Sets the CurContext to the supplied buf character array and updates the pos index.
+   *
+   * @param buf
+   */
 	void Set(const WCHAR *buf);
+
+  /**
+   * @brief  Returns a pointer to the character in the current context buffer which
+   *         will have at most n valid xstring units remaining until the null terminating
+   *         character. It will be one code unit less than bufsize if that would
+   *         have meant splitting a surrogate pair or deadkey.
+   *
+   * @param n        The maximum number of valid xstring units (not code points or code units)
+   * @return WCHAR*  Pointer to the start postion for a buffer of maximum n xstring units
+   */
 	WCHAR *BufMax(int n);
+
+  /**
+   * @brief  Returns a pointer to the character in the current context buffer which
+   *         will have at most n code units remaining until the the null terminating character.
+   *         Note: Unlike BufMax there is no checking for truncation of code points.
+   *         e.g. the pointer may point to a code unit that is half of a surrogate pair.
+   *
+   * @param n
+   * @return WCHAR* Pointer to the start postion for a buffer of maximum n characters
+   */
 	WCHAR *Buf(int n);
+
+  /**
+   * @brief Returns TRUE if the last xstring unit in the context is a deadkey
+   *
+   * @return BOOL
+   */
 	BOOL CharIsDeadkey();
+
+  /**
+  * @brief Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
+  * @return BOOL
+  */
   BOOL CharIsSurrogatePair();
 };
 
@@ -119,28 +188,27 @@ public:
 	//BOOL NoSetShift;
 
 	/* Information functions */
-	
+
 	virtual BOOL CanHandleWindow(HWND ahwnd) = 0;
 	virtual BOOL IsWindowHandled(HWND ahwnd) = 0;
 	virtual BOOL HandleWindow(HWND ahwnd) = 0;
 	virtual BOOL IsUnicode() = 0;
 
 	/* Context functions */
-	
+
 	virtual void ReadContext() = 0;
 	virtual void ResetContext() = 0;
   virtual void AddContext(WCHAR ch) = 0;  //I2436
 	virtual WCHAR *ContextBuf(int n) = 0;
 	virtual WCHAR *ContextBufMax(int n) = 0;
-	
+
 	/* Queue and sending functions */
-	
+
 	virtual BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags) = 0;
 	void SetCurrentShiftState(int ShiftFlags) { FShiftFlags = ShiftFlags; }
 	virtual BOOL SendActions() = 0;   // I4196
 };
 
 extern const LPSTR ItemTypes[];
-	
-#endif
 
+#endif
