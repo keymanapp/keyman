@@ -73,7 +73,7 @@ public:
    *         have meant splitting a surrogate pair or deadkey.
    *
    * @param n        The maximum number of valid xstring units (not code points or code units)
-   * @return WCHAR*  Pointer to the start postion for a buffer of maximum n xstring units
+   * @return KMX_WCHAR*  Pointer to the start postion for a buffer of maximum n xstring units
    */
   KMX_WCHAR *Buf(int n);
 
@@ -84,7 +84,7 @@ public:
    *         e.g. the pointer may point to a code unit that is half of a surrogate pair.
    *
    * @param n
-   * @return WCHAR* Pointer to the start postion for a buffer of maximum n characters
+   * @return KMX_WCHAR* Pointer to the start postion for a buffer of maximum n characters
    */
   KMX_WCHAR *BufMax(int n);
 
