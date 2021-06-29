@@ -82,7 +82,7 @@ public:
 class AppContext
 {
 private:
-	WCHAR CurContext[MAXCONTEXT]; //!< CurContext[0] is furthest from the caret and is null terminated.
+	WCHAR CurContext[MAXCONTEXT]; //!< CurContext[0] is furthest from the caret and buffer is null terminated.
 	int pos;
 
 public:
@@ -102,9 +102,9 @@ public:
   void Add(WCHAR ch);
 
   /**
-   * @brief Removes a single code point from the end of the CurContext closest to the caret
-   *  - ie it will be both code units if a surrogate pair. If it is a deadkey it will remove
-   * the deadkey code point and the sentinal code point.
+   * @brief  Removes a single code point from the end of the CurContext closest to the caret;
+   *         i.e. it will be both code units if a surrogate pair. If it is a deadkey it will
+   *         remove three code points: UC_SENTINEL, CODE_DEADKEY and deadkey value.
    */
 	void Delete();
 
@@ -115,13 +115,13 @@ public:
   void Reset();
 
   /**
-   * @brief Copies the characters in CurContext to supplied buffer.
-   * If bufsize is reached before the entire context was copied, the buf
-   * will be truncated to number of valid characters possible with null character
-   * termination. e.g. it will be one code unit less than buffsize if that would
-   * have meant spliting a surrogate pair
-   * @param buf  The data buffer to copy current context
-   * @param bufsize the number of code units ie size of the WCHAR buffer - not the code points
+   * @brief  Copies the characters in CurContext to supplied buffer.
+   *         If bufsize is reached before the entire context was copied, the buf
+   *         will be truncated to number of valid characters possible with null character
+   *         termination. e.g. it will be one code unit less than bufsize if that would
+   *         have meant splitting a surrogate pair
+   * @param buf      The data buffer to copy current context
+   * @param bufsize  The number of code units ie size of the WCHAR buffer - not the code points
    */
 	void Get(WCHAR *buf, int bufsize);
 
@@ -133,21 +133,21 @@ public:
 	void Set(const WCHAR *buf);
 
   /**
-   * @brief Returns a pointer to the character in the current context buffer which
-   * will have at most n valid characters remaining until the the null terminating character.
-   * eg it will be one code unit less than buffsize if that would
-   * have meant spliting a surrogate pair
+   * @brief  Returns a pointer to the character in the current context buffer which
+   *         will have at most n valid xstring units remaining until the null terminating
+   *         character. It will be one code unit less than bufsize if that would
+   *         have meant splitting a surrogate pair or deadkey.
    *
-   * @param n The maximum number of valid characters - (code points) not WCHAR size (code units)
-   * @return WCHAR* Pointer to the start postion for a buffer of maximum n characters
+   * @param n        The maximum number of valid xstring units (not code points or code units)
+   * @return WCHAR*  Pointer to the start postion for a buffer of maximum n xstring units
    */
 	WCHAR *BufMax(int n);
 
   /**
-   * @brief Returns a pointer to the character in the current context buffer which
-   * will have at most n characters remmaining until the the null terminating character.
-   * Note: Unlike BufMax there is no checking for truncation of code points.
-   * e.g. the pointer may point to a code unit that its half of a surrogate pair
+   * @brief  Returns a pointer to the character in the current context buffer which
+   *         will have at most n code units remaining until the the null terminating character.
+   *         Note: Unlike BufMax there is no checking for truncation of code points.
+   *         e.g. the pointer may point to a code unit that is half of a surrogate pair.
    *
    * @param n
    * @return WCHAR* Pointer to the start postion for a buffer of maximum n characters
@@ -155,14 +155,14 @@ public:
 	WCHAR *Buf(int n);
 
   /**
-   * @brief Returns TRUE if the latest code unit in the context is a deadkey
+   * @brief Returns TRUE if the last xstring unit in the context is a deadkey
    *
    * @return BOOL
    */
 	BOOL CharIsDeadkey();
 
   /**
-  * @brief Returns TRUE if the latest code unit in the CurContext is a surrogate pair.
+  * @brief Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
   * @return BOOL
   */
   BOOL CharIsSurrogatePair();
@@ -212,4 +212,3 @@ public:
 extern const LPSTR ItemTypes[];
 
 #endif
-

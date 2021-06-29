@@ -108,15 +108,17 @@ void AppContext::Reset()
 void AppContext::Get(WCHAR *buf, int bufsize)
 {
   // surrogate pairs need to be treated as a single unit, therefore use
-  // BuffMax to find the startIndex.
-  // Buff Max handles the case where the surrogate pairs is split
-  // by the buff size
-  WCHAR* startIndex = this->BufMax(bufsize);
-
-  for (WCHAR* p = startIndex; *p && bufsize > 0; p++, bufsize--)
+  // BufMax to find a start index.
+  // BufMax handles the case where a surrogate pair at the
+  // start of the buffer is split by bufsize
+  for (WCHAR *p = this->BufMax(bufsize); *p && bufsize > 0; p++, bufsize--)
   {
     *buf = *p;
-    if ((*p >= 0xD800 && *p <= 0xDBFF) && (bufsize - 2 > 0)) { buf++;  *buf = *(++p); bufsize--; }
+    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) { 
+      buf++; p++;
+      *buf = *p;
+      bufsize--;
+    }
     buf++;
   }
 
