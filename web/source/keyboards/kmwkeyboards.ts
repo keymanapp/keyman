@@ -898,28 +898,15 @@ namespace com.keyman.keyboards {
     /**
      * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
      *
-     * @param {string|KeyboardStub|(string|KeyboardStub)[]} x keyboard name string or keyboard metadata JSON object
+     * @param {(string|KeyboardStub)[]} x keyboard name string or keyboard metadata JSON object
      *
      */
-    async addKeyboardArray(args: string | KeyboardStub | (string|KeyboardStub)[]): 
-        Promise<(KeyboardStub|ErrorStub)[]> {
+    async addKeyboardArray(x: (string|KeyboardStub)[]): Promise<(KeyboardStub|ErrorStub)[]> {
       let errorStub: ErrorStub[] = [];
 
-      // Determine number of keyboard args
-      let numArgs = 0, x: (string|KeyboardStub)[] = [];
-      if (args) {
-        if (args[0][0]) {
-          numArgs = args[0].length;
-          args[0].forEach(a =>
-            x.push(a));
-        } else {
-          numArgs = Array.isArray(args[0]) ? args[0].length : 1;
-          x = args[0];
-        }
-      }
       // Store all keyboard meta-data for registering later if called before initialization
       if(!this.keymanweb.initialized) {
-        for(var k=0; k<numArgs; k++) {
+        for(var k=0; k<x.length; k++) {
           this.deferredStubs.push(x[k]);
         }
         // TODO: this.promiseList
@@ -929,7 +916,7 @@ namespace com.keyman.keyboards {
       }
 
       // Ignore empty array passed as argument
-      if(numArgs == 0) {
+      if(x.length == 0) {
         let stub: ErrorStub = {error: new Error("No keyboards to add")}
         errorStub.push(stub);
         // Normally reject error, but this can be a warning
@@ -942,7 +929,7 @@ namespace com.keyman.keyboards {
       let keyboardStubs: KeyboardStub[] = [];
       var tEntry: CloudRequestEntry;
 
-      for(i=0; i<numArgs; i++) {
+      for(i=0; i<x.length; i++) {
         if(typeof(x[i]) == 'string' && (<string>x[i]).length > 0) {
           var pList=(<string>x[i]).split('@'),lList=[''];
           if(pList[0].toLowerCase() == 'english') {
@@ -975,7 +962,7 @@ namespace com.keyman.keyboards {
           // Register any local keyboards immediately:
           // - must specify filename, keyboard name, language codes, region codes
           // - no request will be sent to cloud
-          let stub: KeyboardStub = <KeyboardStub> x[i];
+          let stub = x[i] as KeyboardStub;
 
           if(typeof(x[i]['filename']) == 'string') {
             if(!this.addStub(x[i])) {

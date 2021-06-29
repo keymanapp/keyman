@@ -311,24 +311,29 @@ namespace com.keyman {
      * @returns {Promise<(KeyboardStub|ErrorStub)[]} Promise of added keyboard/error stubs
      *
      */
-    async ['addKeyboards'](...args: any[]) : Promise<(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]> {
+    async ['addKeyboards'](...args: any[]) : 
+        Promise<(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]> {
       if (args[0].length == 0) {
         // Get the cloud keyboard catalog
+        let stubs: (com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[] = [];
         try {
           let result:(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]|Error = 
             await this.keyboardManager.keymanCloudRequest('',false);
           console.log('Catalog: ', result);
-          let stubs: com.keyman.keyboards.KeyboardStub[] = [];
           return Promise.resolve(stubs);
         } catch(error) {
           console.error(error);
-          let stubs: com.keyman.keyboards.ErrorStub[] = [];
           let stub: com.keyman.keyboards.ErrorStub = {error: error};
           stubs.push(stub);
           return Promise.reject(stubs);
         };
       } else {
-        return this.keyboardManager.addKeyboardArray(args);
+        let x: (string|com.keyman.keyboards.KeyboardStub)[] = [];
+        if (args[0][0]) {
+          args[0].forEach(a =>
+            x.push(a));
+        }
+        return this.keyboardManager.addKeyboardArray(x);
       }
     }
 
