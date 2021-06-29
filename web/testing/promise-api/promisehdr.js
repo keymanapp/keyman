@@ -102,9 +102,13 @@
     // One keyboard - 2 languages
     addKeyboards({id:'sil_euro_latin', name:'SIL EuroLatin', languages: [{id:'no'}, {id:'sv'}]}); // Loads from partial stub instead of the compact string.
 
-    // Two keyboards
+    // One invalid keyboard
+    addKeyboards({id: 'invalid', name:'Invalid'});
+
+    // Two keyboards, 1 invalid
     addKeyboards({id:'sil_cameroon_qwerty', name:'SIL Cameroon Qwerty', languages:[{id:'aal-latn'}]},
-                 {id:'khmer_angkor', name: 'Khmer Angkor', languages:[{id:'km'}]});
+                 {id:'khmer_angkor', name: 'Khmer Angkor', languages:[{id:'km'}]},
+                 {id: 'invalid2', name:'Invalid2'});
 
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is

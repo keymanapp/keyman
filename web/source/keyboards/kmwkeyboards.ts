@@ -72,6 +72,10 @@ namespace com.keyman.keyboards {
 
   // Information about a keyboard that fails to get added
   export interface ErrorStub {
+    keyboard?: {
+      id: string;
+      name: string;
+    },
     language?: {
       id?: string;
       name?: string;
@@ -217,10 +221,10 @@ namespace com.keyman.keyboards {
 
         return Promise.resolve(result);
       } catch (err) {
-        let errorStub: ErrorStub[] = [];
+        let errorStubs: ErrorStub[] = [];
         let stub: ErrorStub = {error: err};
-        errorStub.push(stub)
-        return Promise.reject(errorStub)
+        errorStubs.push(stub)
+        return Promise.reject(errorStubs)
       }
     }
 
@@ -912,29 +916,29 @@ namespace com.keyman.keyboards {
      *
      */
     async addKeyboardArray(x: (string|KeyboardStub)[]): Promise<(KeyboardStub|ErrorStub)[]> {
-      let errorStub: ErrorStub[] = [];
+      let errorStubs: ErrorStub[] = [];
 
       // Store all keyboard meta-data for registering later if called before initialization
       if(!this.keymanweb.initialized) {
         for(var k=0; k<x.length; k++) {
           this.deferredStubs.push(x[k]);
         }
-        // TODO: this.promiseList
+        // TODO: Replace this with an internal promise (keyboardDeferment)
         let stub: ErrorStub = {error: new Error("Not initialized")}
-        errorStub.push(stub);
-        return Promise.reject(errorStub);
+        errorStubs.push(stub);
+        return Promise.reject(errorStubs);
       }
 
       // Ignore empty array passed as argument
       if(x.length == 0) {
         let stub: ErrorStub = {error: new Error("No keyboards to add")}
-        errorStub.push(stub);
+        errorStubs.push(stub);
         // Normally reject error, but this can be a warning
-        return Promise.resolve(errorStub);
+        return Promise.resolve(errorStubs);
       }
 
       // Create a temporary array of metadata objects from the arguments used
-      var i,j,kp,kbid,lgid,kvid,cmd='',comma='';
+      var i,j,cmd='',comma='';
       var cloudList: CloudRequestEntry[] = [];
       let keyboardStubs: KeyboardStub[] = [];
       var tEntry: CloudRequestEntry;
@@ -985,6 +989,19 @@ namespace com.keyman.keyboards {
             }
 
             lList=x[i]['languages'];
+            if (!lList) {
+              let msg = 'To use a custom keyboard, you must specify languages.';
+              this.keymanweb.util.internalAlert(msg);
+              let e: ErrorStub = {
+                keyboard: {
+                  id : x[i]['id'],
+                  name: x[i]['name']
+                },
+                error: new Error(msg)
+              };
+              errorStubs.push(e);
+              continue;
+            }
 
             //Array or single entry?
             if(typeof(lList.length) == 'number') {
@@ -1003,13 +1020,22 @@ namespace com.keyman.keyboards {
           }
 
           // TODO: Convert stub from one-to-many KeyboardStub[]
+          // Involves mapping KeyboardStub properties
           keyboardStubs.push(stub);
         }
       }
 
       // Return if all keyboards being registered are local and fully specified
       if(cloudList.length == 0) {
-        return Promise.resolve(keyboardStubs);
+        if (errorStubs.length == 0) {
+          return Promise.resolve(keyboardStubs);
+        } if (keyboardStubs.length == 0) {
+          return Promise.reject(errorStubs);
+        } else {
+          // Merge this with errorStubs
+          let result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
+          return Promise.resolve(result.concat(errorStubs));
+        }
       }
 
       // Update the keyboard metadata list from keyman.com - build the command
@@ -1023,8 +1049,8 @@ namespace com.keyman.keyboards {
       try {
         let result: (KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest(cmd,false);
         if (Array.isArray(result)) {
-          if (errorStub.length > 0) {
-            result = result.concat(errorStub);
+          if (errorStubs.length > 0) {
+            result = result.concat(errorStubs);
             return Promise.resolve(result);
           } else {
             return Promise.resolve(result);
@@ -1034,14 +1060,12 @@ namespace com.keyman.keyboards {
         // We don't have keyboard info for this ErrorStub
         console.error(err);
         let stub: ErrorStub = {error: err};
-        errorStub.push(stub);
-        return Promise.reject(errorStub);
+        errorStubs.push(stub);
+        return Promise.reject(errorStubs);
       }
 
-      // retPromise?
       // no keyboards added so return empty stub
-      console.log("end of addKeyboard. returning errorStub");
-      return Promise.resolve(errorStub);
+      return Promise.resolve(errorStubs);
     }
 
     /**
