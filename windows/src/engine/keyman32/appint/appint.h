@@ -110,7 +110,6 @@ public:
 
   /**
    * @brief Clears the CurContext and resets the position - pos - index
-   *
    */
   void Reset();
 
