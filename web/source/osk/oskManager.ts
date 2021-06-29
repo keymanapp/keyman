@@ -5,6 +5,8 @@
 /// <reference path="./bannerManager.ts" />
 // Defines desktop-centric OSK positioning + sizing behavior
 /// <reference path="layouts/targetedTitleBar.ts" />
+// Defines desktop-centric OSK positioning + sizing behavior
+/// <reference path="layouts/targetedResizeBar.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 
@@ -24,9 +26,9 @@ namespace com.keyman.osk {
     _Box: HTMLDivElement;
     banner: BannerManager;
     vkbd: VisualKeyboard;
-    resizeIcon: HTMLDivElement;
 
     desktopTitleBar: layouts.TargetedTitleBar;
+    desktopResizeBar: layouts.TargetedResizeBar;
 
     ready: boolean = false;
     loadRetry: number = 0;
@@ -355,50 +357,12 @@ namespace com.keyman.osk {
 
       // Add footer element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
-        this._Box.appendChild(this.resizeBar());
+        this.desktopResizeBar = new layouts.TargetedResizeBar();
+        this._Box.appendChild(this.desktopResizeBar.element);
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {
         this.vkbd.adjustHeights(this);
       }
-    }
-
-    /**
-     * Create a bottom bar with a resizing icon for the desktop OSK
-     */
-    resizeBar(): HTMLDivElement {
-      let util = com.keyman.singleton.util;
-
-      var bar=util._CreateElement('div');
-      bar.className='kmw-footer';
-      bar.onmousedown=util._CancelMouse;
-
-      // Add caption
-      var Ltitle=util._CreateElement('div');
-      Ltitle.className='kmw-footer-caption';
-      Ltitle.innerHTML='<a href="https://keyman.com/developer/keymanweb/">KeymanWeb</a>';
-      Ltitle.id='keymanweb-osk-footer-caption';
-
-      // Display build number on shift+double click
-      util.attachDOMEvent(Ltitle,'dblclick', function(e) {
-        if(e && e.shiftKey) {
-          this.showBuild();
-        }
-        return false;
-      }.bind(this),false);
-
-      // Prevent selection of caption (IE - set by class for other browsers)
-      if('onselectstart' in Ltitle) Ltitle.onselectstart= util.selectStartHandler; //IE (Build 360)
-
-      bar.appendChild(Ltitle);
-
-      var Limg = util._CreateElement('div');
-      Limg.className='kmw-footer-resize';
-      Limg.onmousedown=this._VResizeMouseDown;
-      Limg.onmouseover=Limg.onmouseout=this._VResizeMouseOut;
-      bar.appendChild(Limg);
-      this.resizeIcon=Limg;
-      //TODO: the image never appears in IE8, have no idea why!
-      return bar;
     }
 
     /**
@@ -490,7 +454,7 @@ namespace com.keyman.osk {
      * @param       {Object}      e      event
      * Description  Process end of resizing of KMW UI
      */
-    private _VResizeMouseOut = function(this: OSKManager, e: Event) {
+    /*private*/ _VResizeMouseOut = function(this: OSKManager, e: Event) {
       e = com.keyman.singleton._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(!e) {
         return false;
@@ -514,7 +478,7 @@ namespace com.keyman.osk {
      * @param       {Object}      e      event
      * Description  Process resizing of KMW UI
      */
-    private _VResizeMouseDown = function(this: OSKManager, e: MouseEvent) {
+    /*private*/ _VResizeMouseDown = function(this: OSKManager, e: MouseEvent) {
       let keymanweb = com.keyman.singleton;
 
       keymanweb.uiManager.justActivated = true;
@@ -655,7 +619,7 @@ namespace com.keyman.osk {
       if(document.body.style.cursor) {
         document.body.style.cursor = 'move';
       }
-      if(e  &&  e.preventDefault) {
+      if(e && e.preventDefault) {
         e.preventDefault();
       }
       e.cancelBubble = true;
@@ -1032,8 +996,8 @@ namespace com.keyman.osk {
 
         // Fix or release user resizing
         if('nosize' in p) {
-          if(this.resizeIcon) {
-            this.resizeIcon.style.display=(p['nosize'] ? 'none' : 'block');
+          if(this.desktopResizeBar) {
+            this.desktopResizeBar.allowResizing(!p['nosize']);
           }
         }
 
