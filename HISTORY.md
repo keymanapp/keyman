@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.77 alpha 2021-06-29
+
+* fix(windows): #5336 appcontext get to handle small buffer (#5383)
+* fix(common): get handle caller buffer size small than internal Fixes … (#5390)
+
 ## 15.0.76 alpha 2021-06-28
 
 * feat(web): Add option useAlerts to control alerts() (#5302)
