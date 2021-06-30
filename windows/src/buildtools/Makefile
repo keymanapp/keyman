@@ -4,8 +4,8 @@
 
 NOTARGET_SIGNCODE=yes
 
-TARGETS=devtools sentrytool tds2dbg genkmnp getfilelocks isadmin mkver \
-  xslt buildunidata build_standards_data buildpkg test-klog delphiprojectmanager #help
+TARGETS=devtools sentrytool tds2dbg mkver \
+  buildunidata build_standards_data buildpkg test-klog delphiprojectmanager
 CLEANS=inst clean-buildtools
 
 !include ..\Header.mak
@@ -32,28 +32,12 @@ delphiprojectmanager:
     cd $(ROOT)\src\buildtools\delphiprojectmanager
     $(MAKE) $(TARGET)
 
-genkmnp:
-    cd $(ROOT)\src\buildtools\genkmnp
-    $(MAKE) $(TARGET)
-
-getfilelocks:
-    cd $(ROOT)\src\buildtools\getfilelocks
-    $(MAKE) $(TARGET)
-
 devtools:
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE) $(TARGET)
 
 mkver:
     cd $(ROOT)\src\buildtools\mkver
-    $(MAKE) $(TARGET)
-
-isadmin:
-    cd $(ROOT)\src\buildtools\isadmin
-    $(MAKE) $(TARGET)
-
-xslt:
-    cd $(ROOT)\src\buildtools\xslt
     $(MAKE) $(TARGET)
 
 inst:

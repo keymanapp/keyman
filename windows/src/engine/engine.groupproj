@@ -15,6 +15,9 @@
         <Projects Include="tsysinfox64\tsysinfox64.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="inst\insthelper\insthelper.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -59,14 +62,23 @@
     <Target Name="tsysinfox64:Make">
         <MSBuild Projects="tsysinfox64\tsysinfox64.dproj" Targets="Make"/>
     </Target>
+    <Target Name="insthelper">
+        <MSBuild Projects="inst\insthelper\insthelper.dproj"/>
+    </Target>
+    <Target Name="insthelper:Clean">
+        <MSBuild Projects="inst\insthelper\insthelper.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="insthelper:Make">
+        <MSBuild Projects="inst\insthelper\insthelper.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="keyman;kmcomapi;tsysinfo;tsysinfox64"/>
+        <CallTarget Targets="keyman;kmcomapi;tsysinfo;tsysinfox64;insthelper"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="keyman:Clean;kmcomapi:Clean;tsysinfo:Clean;tsysinfox64:Clean"/>
+        <CallTarget Targets="keyman:Clean;kmcomapi:Clean;tsysinfo:Clean;tsysinfox64:Clean;insthelper:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="keyman:Make;kmcomapi:Make;tsysinfo:Make;tsysinfox64:Make"/>
+        <CallTarget Targets="keyman:Make;kmcomapi:Make;tsysinfo:Make;tsysinfox64:Make;insthelper:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

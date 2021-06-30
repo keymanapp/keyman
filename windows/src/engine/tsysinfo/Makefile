@@ -16,11 +16,11 @@ build: version.res manifest.res dirs
     rc tsysinfo_x64.rc
     del tsysinfox64.bin
 
-    $(DCC32) tsysinfo.dpr
-    $(SENTRYTOOL_DELPHIPREP) tsysinfo.exe -dpr tsysinfo.dpr
-    $(TDS2DBG) tsysinfo.exe
-    $(COPY) tsysinfo.exe $(PROGRAM)\engine
-    if exist tsysinfo.dbg $(COPY) tsysinfo.dbg $(DEBUGPATH)\engine
+    $(DELPHI_MSBUILD) tsysinfo.dproj /p:Platform=Win32
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\tsysinfo.exe -dpr tsysinfo.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\tsysinfo.exe
+    $(COPY) $(WIN32_TARGET_PATH)\tsysinfo.exe $(PROGRAM)\engine
+    if exist $(WIN32_TARGET_PATH)\tsysinfo.dbg $(COPY) $(WIN32_TARGET_PATH)\tsysinfo.dbg $(DEBUGPATH)\engine
 
 clean: def-clean
     -del tsysinfox64.bin

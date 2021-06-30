@@ -57,7 +57,7 @@ procedure TPackageInfoTest.Setup;
 begin
   Assert.IgnoreCaseDefault := False;
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
-  DataPath := ExtractFilePath(ParamStr(0)) + '..\..\test\';
+  DataPath := ExtractFilePath(ParamStr(0)) + '..\..\..\test\';
 end;
 
 procedure TPackageInfoTest.TearDown;

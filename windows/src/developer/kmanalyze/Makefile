@@ -5,9 +5,9 @@
 !include ..\..\Defines.mak
 
 build: version.res dirs
-    $(MSBUILD) kmanalyze.sln $(MSBUILD_BUILD)
-    $(COPY) $(TARGET_PATH)\kmanalyze.exe $(PROGRAM)\developer
-    $(COPY) $(TARGET_PATH)\kmanalyze.pdb $(DEBUGPATH)\developer
+    $(MSBUILD) kmanalyze.vcxproj $(MSBUILD_BUILD)
+    $(COPY) $(WIN32_TARGET_PATH)\kmanalyze.exe $(PROGRAM)\developer
+    $(COPY) $(WIN32_TARGET_PATH)\kmanalyze.pdb $(DEBUGPATH)\developer
 
 clean: def-clean
     $(MSBUILD) kmanalyze.sln $(MSBUILD_CLEAN)

@@ -6,11 +6,12 @@
 
 build: version.res manifest.res keymanmenuitem.res icons.res osktoolbar.res dirs
     rc langswitch\langswitchmanager.rc
-    $(DCC32) keyman.dpr
-    $(SENTRYTOOL_DELPHIPREP) keyman.exe -dpr keyman.dpr
-    $(TDS2DBG) keyman.exe
-    $(COPY) keyman.exe $(PROGRAM)\engine
-    if exist keyman.dbg $(COPY) keyman.dbg $(DEBUGPATH)\engine
+    $(DELPHI_MSBUILD) keyman.dproj /p:Platform=Win32
+#    $(DCC32) keyman.dpr
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\keyman.exe -dpr keyman.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\keyman.exe
+    $(COPY) $(WIN32_TARGET_PATH)\keyman.exe $(PROGRAM)\engine
+    if exist $(WIN32_TARGET_PATH)\keyman.dbg $(COPY) $(WIN32_TARGET_PATH)\keyman.dbg $(DEBUGPATH)\engine
 
 clean: def-clean
 

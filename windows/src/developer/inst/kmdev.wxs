@@ -180,6 +180,14 @@
       </Component>
 
       <Component>
+        <File Name="kmndebug.dll" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="kmndebug.x64.dll" KeyPath="yes" />
+      </Component>
+
+      <Component>
         <File Name="kmcomp.exe" KeyPath="yes" />
       </Component>
 

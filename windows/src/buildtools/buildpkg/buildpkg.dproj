@@ -63,6 +63,8 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <Manifest_File>None</Manifest_File>
         <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
+        <DCC_DcuOutput>.\obj\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\bin\$(Platform)\$(Config)</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
