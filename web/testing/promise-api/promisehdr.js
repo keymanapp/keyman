@@ -45,6 +45,7 @@
  * @param {string | KeyboardStub | (string|KeyboardStub)[]} obj Info for adding a keyboard
  */
   function addKeyboards(...args) {
+    var kmw=keyman;
     var promise = kmw.addKeyboards(args);
     promise.then(result => {
       if (result.length > 0 && !result[0].error) {
@@ -69,6 +70,7 @@
    * @param {string} languages. Could be comma-separated languages
    */
   function addKeyboardsForLanguage(languages) {
+    var kmw=keyman;
     kmw.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(result => {
       console.log('Adding ' + languages + ': ', result);
     }).catch(errorStubs => {
@@ -83,8 +85,6 @@
 
   function loadKeyboards()
   {
-    var kmw=keyman;
-
     // No parameter adds entire cloud keyboard catalog
     //addKeyboards();
 
@@ -97,7 +97,7 @@
     // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the BCP-47 language code.
     // We use a different loading pattern here than in the samples version to provide a slightly different set of test cases.
-    addKeyboards('french','@he');
+    addKeyboards('spanish','@nqo');
 
     // One keyboard - 2 languages
     addKeyboards({id:'sil_euro_latin', name:'SIL EuroLatin', languages: [{id:'no'}, {id:'sv'}]}); // Loads from partial stub instead of the compact string.

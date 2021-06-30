@@ -123,9 +123,9 @@ namespace com.keyman.keyboards {
 
     firstCall: boolean = true; // First time to call keymanCloudRequest()
 
-    deferredStubs: any[] = []; // The list of user-provided keyboard stub registration objects.
-    deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register after initialization
-    deferredKR = [];           // Array of pending keyboards, to be installed at end of initialization
+    // For deferment of adding keyboards until keymanweb initialized
+    deferment: Promise<void> = null;
+    endDeferment:() => void;
 
     // The following was not actually utilized within KeymanWeb; I think it's handled via different logic.
     // See setDefaultKeyboard() below.
@@ -147,6 +147,11 @@ namespace com.keyman.keyboards {
 
     constructor(kmw: KeymanBase) {
       this.keymanweb = kmw;
+
+      let _this = this;
+      this.deferment = new Promise(function(resolve) {
+        _this.endDeferment = resolve;
+      });
     }
 
     getActiveKeyboardName(): string {
@@ -205,33 +210,6 @@ namespace com.keyman.keyboards {
         Lr=this.keymanweb._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
       }
       return Lr;
-    }
-
-    async registerDeferredStubs(): Promise<(KeyboardStub|ErrorStub)[]> {
-      let result: (KeyboardStub|ErrorStub)[] = [];
-      try {
-        if (this.deferredStubs.length > 0) {
-          result = await this.addKeyboardArray(this.deferredStubs);
-        }
-
-        // KRS stubs (legacy format registration)
-        for(var j=0; j<this.deferredKRS.length; j++) {
-          this._registerStub(this.deferredKRS[j]);
-        }
-
-        return Promise.resolve(result);
-      } catch (err) {
-        let errorStubs: ErrorStub[] = [];
-        let stub: ErrorStub = {error: err};
-        errorStubs.push(stub)
-        return Promise.reject(errorStubs)
-      }
-    }
-
-    registerDeferredKeyboards() {
-      for(var j=0; j<this.deferredKR.length; j++) {
-        this._registerKeyboard(this.deferredKR[j]);
-      }
     }
 
     /**
@@ -937,15 +915,9 @@ namespace com.keyman.keyboards {
     async addKeyboardArray(x: (string|KeyboardStub)[]): Promise<(KeyboardStub|ErrorStub)[]> {
       let errorStubs: ErrorStub[] = [];
 
-      // Store all keyboard meta-data for registering later if called before initialization
+      // Ensure keymanweb is initialized before continuing to add keyboards
       if(!this.keymanweb.initialized) {
-        for(var k=0; k<x.length; k++) {
-          this.deferredStubs.push(x[k]);
-        }
-        // TODO: Replace this with an internal promise (keyboardDeferment)
-        let stub: ErrorStub = {error: new Error("Not initialized")}
-        errorStubs.push(stub);
-        return Promise.reject(errorStubs);
+        let result = await this.deferment;
       }
 
       // Ignore empty array passed as argument
@@ -1510,11 +1482,10 @@ namespace com.keyman.keyboards {
      * @param       {Object}      Pk      Keyboard  object
      * Description  Register and load the keyboard
      */
-    _registerKeyboard(Pk) {
-      // If initialization not yet complete, list the keyboard to be registered on completion of initialization
+    async _registerKeyboard(Pk) {
+      // Ensure keymanweb is initialized before continuing to register keyboards
       if(!this.keymanweb.initialized) {
-        this.deferredKR.push(Pk);
-        return;
+        let result = await this.deferment;
       }
 
       if(Pk['_kmw']) {
@@ -1579,15 +1550,14 @@ namespace com.keyman.keyboards {
      * for the keyboard to be usable.
      *
      * @param       {Object}      Pstub     Keyboard stub object
-     * @return      {?number}               1 if already registered, else null
+     * @return      {Promise<?number>}      1 if already registered, else null
      */
-    _registerStub(Pstub): number {
+    async _registerStub(Pstub): Promise<number> {
       var Lk;
 
-      // In initialization not complete, list the stub to be registered on completion of initialization
+      // Ensure keymanweb is initialized before continuing to register stub
       if(!this.keymanweb.initialized) {
-        this.deferredKRS.push(Pstub);
-        return null;
+        let result = await this.deferment;
       }
 
       // The default stub is always the first keyboard stub loaded [and will be ignored by desktop browsers - not for beta, anyway]
@@ -1611,7 +1581,7 @@ namespace com.keyman.keyboards {
       for(Lk=0; Lk < this.keyboardStubs.length; Lk++) {
         if(this.keyboardStubs[Lk]['KI'] == Pstub['KI']) {
           if(Pstub['KLC'] == '' || (this.keyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
-            return 1; // no need to register
+            return Promise.resolve(1); // no need to register
           }
         }
       }
@@ -1632,7 +1602,7 @@ namespace com.keyman.keyboards {
         this.setActiveKeyboard(Pstub['KI'], Pstub['KLC']);
       }
 
-      return null;
+      return Promise.resolve(null);
     }
 
     /*

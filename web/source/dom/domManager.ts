@@ -1592,14 +1592,11 @@ namespace com.keyman.dom {
       // Create and save the remote keyboard loading delay indicator
       util.prepareWait();
 
-      // Register deferred keyboard stubs (addKeyboards() format)
-      this.keyman.keyboardManager.registerDeferredStubs();
-    
+      // Trigger registration of deferred keyboard stubs and keyboards
+      this.keyman.keyboardManager.endDeferment();
+
       // Initialize the desktop UI
       this.initializeUI();
-    
-      // Register deferred keyboards 
-      this.keyman.keyboardManager.registerDeferredKeyboards();
     
       // Exit initialization here if we're using an embedded code path.
       if(this.keyman.isEmbedded) {
