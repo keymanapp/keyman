@@ -2,6 +2,22 @@
 /// <reference path="../realizedGesture.interface.ts" />
 
 namespace com.keyman.osk.browser {
+  /**
+   * Represents a 'realized' longpress gesture's default implementation
+   * within KeymanWeb.  Once a touch sequence has been confirmed to 
+   * correspond to a longpress gesture, implementations of this class
+   * provide the following:
+   * * The UI needed to present a subkey menu
+   * * The state management needed to present feedback about the
+   * currently-selected subkey to the user
+   * * A `Promise` that will resolve to the user's selected subkey
+   * once the longpress operation is complete.
+   * 
+   * As selection of the subkey occurs after the subkey popup is
+   * displayed, selection of the subkey is inherently asynchronous.
+   * The `Promise` may also resolve to `null` if the user indicates
+   * the desire to cancel subkey selection.
+   */
   export class SubkeyPopup implements RealizedGesture {
     public readonly element: HTMLDivElement;
     public readonly shim: HTMLDivElement;

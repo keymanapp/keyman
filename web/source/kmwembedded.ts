@@ -265,7 +265,9 @@ namespace com.keyman.text {
   };
 
   /**
-   * Function called by Android and iOS when a device-implemented keyboard popup is displayed or hidden
+   * Function called by Android and iOS when a device-implemented keyboard popup 
+   * is displayed or hidden.  As this is controlled by the app, it's the perfect
+   * trigger for 'embedded'-mode gesture state management.
    * 
    *  @param  {boolean}  isVisible
    *     
@@ -274,15 +276,27 @@ namespace com.keyman.text {
     let gesture = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
     let pendingLongpress = osk.vkbd.pendingSubkey;
 
+    /*
+     * If a longpress popup was visible, but is no longer, this means that the
+     * associated longpress gesture was cancelled.  It is possible for the base key
+     * to emit if selected at this time, but only if appropriate - and this is
+     * managed by the `SubkeyDelegator`.
+     */
     if(!isVisible) {
       if(gesture) {
         gesture.resolve(null);
         osk.vkbd.subkeyGesture = null;
       } else if(pendingLongpress) {
         pendingLongpress.cancel();
+        osk.vkbd.pendingSubkey = null;
       }
     }
 
+    /*
+     * If the popup was not visible, but now is, that means our previously-pending
+     * longpress is now 'realized' (complete).  Certain aspects of the OSK rely on
+     * this state information, which will be properly updated by `resolve`.
+     */
     if(isVisible && pendingLongpress) {
       // Fulfills the first-stage promise.
       pendingLongpress.resolve();
@@ -340,7 +354,7 @@ namespace com.keyman.text {
 
       // Can't just split on '-' because some layers like ctrl-shift contain it.
       let separatorIndex = keyName.lastIndexOf('-');
-      //var layer = core.keyboardProcessor.layerId;
+
       if (separatorIndex > 0) {
         keyName = keyName.substring(separatorIndex+1);
       }
@@ -355,9 +369,11 @@ namespace com.keyman.text {
         let gesture = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
 
         try {
+          // Can trigger an error if the corresponding subkey cannot be found.
           gesture.resolve(keyName);
         } catch (e) {
           let err = e as Error;
+          // Prevent the Android app from triggering a "fatal error" keyboard reset.
           console.warn(err.message);
         }
 

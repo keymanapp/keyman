@@ -1,8 +1,18 @@
 /// <reference path="../realizedGesture.interface.ts" />
 
 namespace com.keyman.osk.embedded {
-  // "Delegator", rather than "Popup", because KMW delegates display + selection
-  // of subkeys to the host app when in the embedded context.
+  /**
+   * As the subkey popup view is handled by the host app when in embedded mode,
+   * this class represents the fact that KMW has "delegated" subkey UI and 
+   * selection to the host app.  Hence, "Delegator", rather than "Popup".
+   * 
+   * The `resolve` method should be triggered, in some fashion, by the host app
+   * whenever the user has completed their longpress, potentially selecting
+   * a subkey.
+   * 
+   * This class will also track the ongoing touch event in case the base key is
+   * reselected, which _is_ managed by this class, not the host app.
+   */
   export class SubkeyDelegator implements RealizedGesture {
     private resolver: (keyEvent: text.KeyEvent) => void;
     private readonly vkbd: VisualKeyboard;
@@ -24,6 +34,17 @@ namespace com.keyman.osk.embedded {
       this.baseKey = e;
     }
 
+    /**
+     * Resolves the ongoing longpress -> subkey gesture, fulfilling this
+     * `SubkeyDelegator`'s `promise` of a `KeyEvent`.
+     * 
+     * If no subkey is selected but the original base key is, `resolve(null)`
+     * will return a key event corresponding to the base key.
+
+     * 
+     * @param keyCoreID   {string}  The 'core ID' (id + modifier layer) of
+     *                              a selected subkey.  May be `null`.
+     */
     public resolve(keyCoreID: string) {
       if(this.resolver) {
         let keyEvent: text.KeyEvent = null;
@@ -69,6 +90,11 @@ namespace com.keyman.osk.embedded {
       // no-op; it's fully controlled on the app side.
     }
 
+    /**
+     * Allows this class to detect if the user may have changed their mind and
+     * re-selected the base key.
+     * @param touch 
+     */
     updateTouch(touch: Touch) {
       this.baseKeySelected = this.baseKey.key.isUnderTouch(touch);
 

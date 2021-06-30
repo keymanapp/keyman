@@ -2,6 +2,23 @@
 /// <reference path="../pendingGesture.interface.ts" />
 
 namespace com.keyman.osk.browser {
+  /**
+   * (Conceptually) represents a finite-state-machine that determines
+   * whether or not a series of touch events corresponds to a longpress
+   * touch input.  The `resolve` method may be used to trigger the
+   * subkey menu early, as with the upward quick-display shortcut.
+   * 
+   * This is the default implementation of longpress behavior for KMW.
+   * Alterate implementations are modeled through the `embedded`
+   * namespace's equivalent, which is designed to facilitate custom
+   * modeling for such gestures.
+   * 
+   * Once the conditions to recognize a longpress gesture have been
+   * fulfilled, this class's `promise` will resolve with a `SubkeyPopup`
+   * matching the gesture's 'base' key, which itself provides a
+   * `promise` field that will resolve to a `KeyEvent` once the touch
+   * sequence is completed.
+   */
   export class PendingLongpress implements PendingGesture {
     public readonly baseKey: KeyElement;
     public readonly promise: Promise<SubkeyPopup>;
