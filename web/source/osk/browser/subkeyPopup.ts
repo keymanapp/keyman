@@ -263,7 +263,13 @@ namespace com.keyman.osk.browser {
             this.currentSelection = sk;
           }
           sk.key.highlight(onKey);
-        } catch(ex){}
+        } catch(ex) {
+          if(ex.message) {
+            console.error("Unexpected error when attempting to update selected subkey:" + ex.message);
+          } else {
+            console.error("Unexpected error (and error type) when attempting to update selected subkey.");
+          }
+        }
       }
 
       // Use the popup duplicate of the base key if a phone with a visible popup array
