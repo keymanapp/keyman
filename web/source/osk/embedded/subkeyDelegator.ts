@@ -53,7 +53,7 @@ namespace com.keyman.osk.embedded {
           // Handle selection of base key underneath the subkey array.
           keyEvent = this.vkbd.keyEventFromSpec(this.baseKey.key.spec as keyboards.ActiveKey, null);
           this.baseKey.key.highlight(false);
-        } else {
+        } else if(keyCoreID != null) {
           // This is set with the base key of our current subkey elsewhere within the engine.
           let baseKey: OSKKeySpec = this.baseKey.key.spec;
           let selectedKey: OSKKeySpec;
