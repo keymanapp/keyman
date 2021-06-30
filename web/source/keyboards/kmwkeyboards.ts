@@ -1030,7 +1030,7 @@ namespace com.keyman.keyboards {
                 }
               }
             } else { // Single language element
-              tEntry = new CloudRequestEntry(x[i]['id'], x[i]['languages'][0]['id']);
+              tEntry = new CloudRequestEntry(x[i]['id'], x[i]['languages']['id']);
               if(this.isUniqueRequest(cloudList, tEntry)) {
                 cloudList.push(tEntry);
               }
