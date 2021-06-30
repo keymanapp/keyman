@@ -926,18 +926,6 @@ namespace com.keyman.keyboards {
         let result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
         return Promise.resolve(result.concat(errorStubs));
       }
-  
-        /*
-        if (Array.isArray(result)) {
-          if (errorStubs.length > 0) {
-            result = result.concat(errorStubs);
-            return Promise.resolve(result);
-          } else {
-            return Promise.resolve(result);
-          }
-        }
-        */
-  
     }
 
     /**
@@ -1022,7 +1010,6 @@ namespace com.keyman.keyboards {
             lList=x[i]['languages'];
             if (!lList) {
               let msg = 'To use a custom keyboard, you must specify languages.';
-              this.keymanweb.util.internalAlert(msg);
               let e: ErrorStub = {
                 keyboard: {
                   id : x[i]['id'],
