@@ -981,7 +981,7 @@ namespace com.keyman.keyboards {
 
             lList=x[i]['languages'];
             if (!lList) {
-              let msg = 'To use a custom keyboard, you must specify languages.';
+              let msg = 'To use keyboard \'' + x[i]['id'] + '\', you must specify languages.';
               let e: ErrorStub = {
                 keyboard: {
                   id : x[i]['id'],
