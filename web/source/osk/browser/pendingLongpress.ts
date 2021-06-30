@@ -23,12 +23,9 @@ namespace com.keyman.osk.browser {
       let _this = this;
       this.promise = new Promise<SubkeyPopup>(function(resolve, reject) {
         _this.resolver = resolve;
-        _this.timerId = window.setTimeout(
-          function() {
-            // It's no longer deferred; it's being fulfilled.
-            // Even if the actual subkey itself is still async.
-            _this.resolve();
-          }, _this.popupDelay);
+        // After the timeout, it's no longer deferred; it's being fulfilled.
+        // Even if the actual subkey itself is still async.
+        _this.timerId = window.setTimeout(_this.resolve, _this.popupDelay);
       });
     }
 

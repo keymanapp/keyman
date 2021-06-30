@@ -240,9 +240,9 @@ namespace com.keyman.osk.browser {
 
       for(let i=0; i < this.baseKey['subKeys'].length; i++) {
         try {
-          let sk= this.element.childNodes[i].firstChild as KeyElement;
+          let sk = this.element.childNodes[i].firstChild as KeyElement;
 
-          let onKey = sk.key.isUnderTouch(touch)
+          let onKey = sk.key.isUnderTouch(touch);
           if(onKey) {
             this.baseKey.key.highlight(false);
             this.currentSelection = sk;

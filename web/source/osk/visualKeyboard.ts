@@ -626,7 +626,6 @@ namespace com.keyman.osk {
       // Process and clear highlighting of pending target
       if(this.keyPending) {
         this.highlightKey(this.keyPending,false);
-        
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
           this.modelKeyClick(this.keyPending, e.changedTouches[0]);
