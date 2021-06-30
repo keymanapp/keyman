@@ -329,9 +329,14 @@ namespace com.keyman {
         };
       } else {
         let x: (string|com.keyman.keyboards.KeyboardStub)[] = [];
-        if (args[0][0]) {
+        if (Array.isArray(args[0])) {
           args[0].forEach(a =>
             x.push(a));
+        } else if (Array.isArray(args)) {
+          args.forEach(a =>
+            x.push(a));
+        } else {
+          x.push(args);
         }
         return this.keyboardManager.addKeyboardArray(x);
       }

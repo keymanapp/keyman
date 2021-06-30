@@ -226,12 +226,7 @@ var onScriptLoad = function(scriptURL, callback, timeout) {
 var loadKeyboardStub = function(stub, callback, timeout, params) {
   var kbdName = "Keyboard_" + stub.id;
 
-  var promise = keyman.addKeyboards(stub);
-  promise.then(result => {
-    console.log('Adding:', result);
-  }).catch(errorstubs => {
-    errorstubs.forEach(e => console.error(e));
-  });
+  keyman.addKeyboards(stub);
   if(!params || !params.passive) {
     keyman.setActiveKeyboard(kbdName, stub.languages.id);
   }
