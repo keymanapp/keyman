@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.78 alpha 2021-06-30
+
+* fix(web): console errors when using SHIFT w help-text 'osk' (#5392)
+
 ## 15.0.77 alpha 2021-06-29
 
 * fix(windows): #5336 appcontext get to handle small buffer (#5383)
