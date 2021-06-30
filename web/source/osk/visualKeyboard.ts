@@ -1671,8 +1671,6 @@ namespace com.keyman.osk {
 
       // If popup is visible, need to move over popup, not over main keyboard
       // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
-      // Not completely sure what the correct, generalized abstraction would be for that...
-      // and this PR's already big enough, anyway.
       if(key1 && key1['subKeys'] != null) {
         // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
         if((this.touchY - touch.pageY > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
