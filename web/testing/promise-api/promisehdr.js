@@ -107,7 +107,7 @@
 
     // Two keyboards, 1 invalid
     addKeyboards({id:'sil_cameroon_qwerty', name:'SIL Cameroon Qwerty', languages:[{id:'aal-latn'}]},
-                 {id:'khmer_angkor', name: 'Khmer Angkor', languages:[{id:'km'}]},
+                 {id:'khmer_angkor', name: 'Khmer Angkor', languages:{id:'km'}},
                  {id: 'invalid2', name:'Invalid2'});
 
     // Add a keyboard by language name.  Note that the name must be spelled
