@@ -367,16 +367,7 @@ namespace com.keyman.text {
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
       if(osk.vkbd.subkeyGesture) {
         let gesture = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
-
-        try {
-          // Can trigger an error if the corresponding subkey cannot be found.
-          gesture.resolve(keyName);
-        } catch (e) {
-          let err = e as Error;
-          // Prevent the Android app from triggering a "fatal error" keyboard reset.
-          console.warn(err.message);
-        }
-
+        gesture.resolve(keyName);
         osk.vkbd.subkeyGesture = null;
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");

@@ -70,7 +70,8 @@ namespace com.keyman.osk.embedded {
             // While we can't complete successfully, the subkey operation is done; we
             // should still signal that and update related gesture state management.
             this.resolver(null);
-            throw new Error("Could not find subkey '" + keyCoreID + "' under base key '" + baseKey.coreID + "'!");
+            console.error("Could not find subkey '" + keyCoreID + "' under base key '" + baseKey.coreID + "'!");
+            return;
           }
 
           keyEvent = this.vkbd.keyEventFromSpec(selectedKey as keyboards.ActiveKey, null);
