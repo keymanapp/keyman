@@ -5,7 +5,6 @@ namespace com.keyman.osk.browser {
   export class PendingLongpress implements PendingGesture {
     public readonly baseKey: KeyElement;
     public readonly promise: Promise<SubkeyPopup>;
-    //public readonly initialTouch: Touch;
 
     public readonly subkeyUI: SubkeyPopup;
 
@@ -15,10 +14,9 @@ namespace com.keyman.osk.browser {
     private timerId: number;
     private popupDelay: number = 500;
 
-    constructor(vkbd: VisualKeyboard, baseKey: KeyElement/*, initialTouch: Touch*/) {
+    constructor(vkbd: VisualKeyboard, baseKey: KeyElement) {
       this.vkbd = vkbd;
       this.baseKey = baseKey;
-      //this.initialTouch = initialTouch;
 
       let _this = this;
       this.promise = new Promise<SubkeyPopup>(function(resolve, reject) {

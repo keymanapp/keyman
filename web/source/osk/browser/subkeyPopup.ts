@@ -236,7 +236,6 @@ namespace com.keyman.osk.browser {
 
     updateTouch(touch: Touch) {
       this.currentSelection = null;
-      let matchFound = false;
 
       for(let i=0; i < this.baseKey['subKeys'].length; i++) {
         try {
@@ -246,14 +245,13 @@ namespace com.keyman.osk.browser {
           if(onKey) {
             this.baseKey.key.highlight(false);
             this.currentSelection = sk;
-            matchFound = true;
           }
           sk.key.highlight(onKey);
         } catch(ex){}
       }
 
       // Use the popup duplicate of the base key if a phone with a visible popup array
-      if(!matchFound && this.baseKey.key.isUnderTouch(touch)) {
+      if(this.currentSelection && this.baseKey.key.isUnderTouch(touch)) {
         this.baseKey.key.highlight(true);
         this.currentSelection = this.baseKey;
       }

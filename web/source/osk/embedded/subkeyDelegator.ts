@@ -35,21 +35,20 @@ namespace com.keyman.osk.embedded {
         } else {
           // This is set with the base key of our current subkey elsewhere within the engine.
           let baseKey: OSKKeySpec = this.baseKey.key.spec;
-          var found = false;
           let selectedKey: OSKKeySpec;
 
           if(baseKey.coreID == keyCoreID) {
             selectedKey = baseKey;
-            found = true;
           } else {
             // ... yeah, there are some funky type shenanigans between the two.
             // OSKKeySpec is the OSK's... reinterpretation of the ActiveKey type.
             selectedKey = (baseKey as keyboards.ActiveKey).getSubkey(keyCoreID) as OSKKeySpec;
-            found = !!selectedKey;
           }
 
-          if(!found) {
-            this.resolver(null); // Maintains existing behavior.
+          if(!selectedKey) {
+            // While we can't complete successfully, the subkey operation is done; we
+            // should still signal that and update related gesture state management.
+            this.resolver(null);
             throw new Error("Could not find subkey '" + keyCoreID + "' under base key '" + baseKey.coreID + "'!");
           }
 
