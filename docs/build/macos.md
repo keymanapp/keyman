@@ -34,22 +34,21 @@ Many dependencies are only required for specific projects.
 
 The remaining dependencies can be installed via script:
   `resources/devbox/macos/macos.sh`
-  
+
 This script will also update your environment to the values in:
   `resources/devbox/macos/keyman.macos.env.sh`
-  
+
 It will also add these environment settings to your `~/.bashrc`.
 
 These dependencies are also listed below if you'd prefer to install manually.
 
 ## Shared Dependencies
 
-* Shared: HomeBrew, Bash 5.0+, jq, Python 3, Meson, Ninja, Rust, coreutils
+* Shared: HomeBrew, Bash 5.0+, jq, Python 3, Meson, Ninja, Rust, coreutils, Pandoc
 
   ```shell
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  brew install bash jq python3 meson ninja rustup-init coreutils
-  brew install rustup-init
+  brew install bash jq python3 meson ninja rustup-init coreutils pandoc rustup-init
   ```
 
 * Web: node.js, emscripten, wasm-pack, openjdk 8
@@ -60,7 +59,7 @@ These dependencies are also listed below if you'd prefer to install manually.
   ```
 
 * iOS: swiftlint, carthage
-  
+
   ```shell
   brew install swiftlint carthage
   ```
@@ -71,10 +70,10 @@ These dependencies are also listed below if you'd prefer to install manually.
   brew install carthage cocoapods
   ```
 
-* Android: openjdk 8, Android SDK, Android Studio, Ant, Gradle, Maven, Pandoc
+* Android: openjdk 8, Android SDK, Android Studio, Ant, Gradle, Maven
 
   ```shell
-  brew install openjdk@8 android-sdk android-studio ant gradle maven pandoc
+  brew install openjdk@8 android-sdk android-studio ant gradle maven
   # update path
   source ../resources/devbox/macos/keyman.macos.env.sh
   # optionally install sdk images
@@ -99,3 +98,4 @@ These dependencies are also listed below if you'd prefer to install manually.
   ```
 
 * Run Android Studio once after installation to install additional components
+  such as emulator images and SDK updates.

@@ -26,11 +26,24 @@ PARAMFOUND=false
 
 function print_help() {
     echo "Usage: macos.sh targets"
-    echo "  targets: one or more of: "
-    echo "             android ios macos web all"
+    echo
+    echo "The targets parameter determines the platforms and components"
+    echo "that this script will setup your environment to build."
+    echo
+    echo "  group targets:"
+    echo "    all            build all platform targets"
+    echo "    all-optional   build all targets, including optional"
+    echo
+    echo "  platform targets:"
+    echo "    android ios macos web"
+    echo
     echo "  optional targets:"
-    echo "             kmcomp pandoc sentry-cli"
-    echo "Targets will automatically include dependency targets."
+    echo "    kmcomp       Keyman keyboard compiler"
+    echo "    pandoc       Documentation compiler"
+    echo "    sentry-cli   sentry.keyman.com debug symbol uploader"
+    echo
+    echo "Note: If a target has dependencies, those will automatically"
+    echo "      be included."
 }
 
 while [[ $# -gt 0 ]] ; do
@@ -75,6 +88,16 @@ while [[ $# -gt 0 ]] ; do
             REQUIRE_WEB=true
             PARAMFOUND=true
             ;;
+        all-optional)
+            REQUIRE_ANDROID=true
+            REQUIRE_IOS=true
+            REQUIRE_MACOS=true
+            REQUIRE_WEB=true
+            REQUIRE_KMCOMP=true
+            REQUIRE_PANDOC=true
+            REQUIRE_SENTRYCLI=true
+            PARAMFOUND=true
+            ;;
         *)
             echo "Error: unrecognised parameter."
             echo
@@ -86,7 +109,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 if ! $PARAMFOUND; then
-    echo "Error: must have a target parameter"
+    echo "Error: must specify target parameter"
     echo
     print_help
     exit 1
@@ -95,7 +118,7 @@ fi
 # This script will configure your development environment from a bare metal mac install. It should be idempotent.
 
 echo "This script will configure your macOS computer to build Keyman, installing build tools and prerequisites."
-echo "You can also do this yourself following the notes in building.md."
+echo "You can also do this yourself following the notes in docs/build/macos.md."
 echo
 read -p "Press ENTER to start install"
 
@@ -103,7 +126,7 @@ if $REQUIRE_IOS || $REQUIRE_ANDROID; then
   REQUIRE_WEB=true
 fi
 
-if $REQUIRE_ANDROID; then
+if $REQUIRE_IOS || $REQUIRE_MACOS || $REQUIRE_ANDROID; then
   REQUIRE_PANDOC=true
 fi
 
@@ -192,6 +215,7 @@ if $REQUIRE_MACOS || $REQUIRE_IOS || $REQUIRE_ANDROID; then
     echo "additional components:"
     if $REQUIRE_MACOS || $REQUIRE_IOS; then
         echo " * XCode"
+        echo "You may need to run xcode-select to choose the correct version of XCode command line tools."
     fi
     if $REQUIRE_ANDROID; then
         echo " * Android Studio"

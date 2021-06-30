@@ -8,13 +8,13 @@ WARNING: these are old configuration notes. See [index.md](../index.md) for curr
 * [Pandoc](#Install-Pandoc) for generating offline help
 
 ## Install Java
-It is recommended to use openJDK because of oracle license issues.
+It is recommended to use openJDK because of Oracle license issues.
 Tested with latest release for openJDK 8 from
 https://github.com/ojdkbuild/ojdkbuild
 
 1. Download and unpack the zip archive
-2. On on windows: use the default java path C:\Program Files\Java to avoid error message "Error 0x80010135 Path Too Long".
-3. Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-1.8.0.232-1
+2. On windows: use the default java path C:\Program Files\Java to avoid error message "Error 0x80010135 Path Too Long".
+3. Also set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-1.8.0.232-1
 
 ## Setup Android Studio
 
@@ -22,16 +22,19 @@ https://github.com/ojdkbuild/ojdkbuild
 2. For Windows users, set environment variable **ANDROID_HOME** to the location of your Android SDK. The default installation location is **C:\Users\\[USER]\AppData\Local\Android\sdk** where [USER] is your username. You may need to log out and log back in to take effect.
 
 For MacOS/Linux users, add the following to **~/.bashrc** or **~/.bash_profile**
+
 ```bash
 export ANDROID_HOME=$HOME/Android/Sdk
 export PATH=$PATH:$ANDROID_HOME/tools
 ```
 For MacOS users, add the following (adjusted appropriately) to **~/.bashrc** or **~/.bash_profile** if your Java version is too strange for gradlew to understand (e.g., 11.0.2)
+
 ```bash
 export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 echo $JAVA_HOME #should output: /Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home
 ```
 3. For Windows users, from a Git Bash Prompt window, cd to the **sdk/tools/bin** folder and accept all the SDK license agreements
+
 ```
 yes | ./sdkmanager.bat --licenses
 ```
