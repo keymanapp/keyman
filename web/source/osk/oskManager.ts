@@ -707,7 +707,7 @@ namespace com.keyman.osk {
         // Fix or release user resizing
         if('nosize' in p) {
           if(this.desktopLayout) {
-            this.desktopLayout.resizeBar.allowResizing(!p['nosize']);
+            this.desktopLayout.resizingEnabled = !p['nosize'];
           }
         }
 
@@ -716,7 +716,6 @@ namespace com.keyman.osk {
       if('nomove' in p) {
         this.noDrag=p['nomove'];
         if(this.desktopLayout) {
-          this.desktopLayout.titleBar.showPin(!(p['nomove'] || !this.userPositioned));
           this.desktopLayout.movementEnabled = !this.noDrag;
         }
       }

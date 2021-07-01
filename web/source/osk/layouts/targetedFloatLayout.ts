@@ -1,7 +1,6 @@
 /// <reference path="resizeBar.ts" />
 /// <reference path="titleBar.ts" />
-/// <reference path="mouseStartSnapshot.ts" />
-/// <reference path="customizationCoordinate.ts" />
+/// <reference path="mouseDragOperation.ts" />
 
 namespace com.keyman.osk.layouts {
   export class TargetedFloatLayout {
@@ -25,6 +24,7 @@ namespace com.keyman.osk.layouts {
 
     public set movementEnabled(flag: boolean) {
       this.titleDragHandler.enabled = flag;
+      this.titleBar.showPin(flag && this.oskView.userPositioned);
     }
 
     public get resizingEnabled(): boolean {
@@ -33,6 +33,7 @@ namespace com.keyman.osk.layouts {
 
     public set resizingEnabled(flag: boolean) {
       this.resizeDragHandler.enabled = flag;
+      this.resizeBar.allowResizing(flag);
     }
 
     public get isBeingMoved(): boolean {
@@ -50,6 +51,7 @@ namespace com.keyman.osk.layouts {
 
       this.oskView = view;
       this.titleDragHandler.enabled = !view.noDrag;
+      this.resizeDragHandler.enabled = true; // by default.
     }
 
     private get titleDragHandler(): MouseDragOperation {
@@ -171,10 +173,10 @@ namespace com.keyman.osk.layouts {
             newHeight = 0.1*screen.height;
           }
           if(newWidth > 0.9*screen.width) {
-            newWidth=0.9*screen.width;
+            newWidth = 0.9*screen.width;
           }
           if(newHeight > 0.5*screen.height) {
-            newWidth=0.5*screen.height;
+            newWidth = 0.5*screen.height;
           }
 
           // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font

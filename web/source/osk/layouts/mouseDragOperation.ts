@@ -1,7 +1,60 @@
-/// <reference path="customizationCoordinate.ts" />
-/// <reference path="mouseStartSnapshot.ts" />
-
 namespace com.keyman.osk.layouts {
+ class CustomizationCoordinate {
+    public readonly x: number;
+    public readonly y: number
+
+    public constructor(x: number, y: number) {
+      this.x = x;
+      this.y = y;
+    }
+
+    public static fromEvent(e: MouseEvent) {
+      if (e.pageX) {
+        return new CustomizationCoordinate(e.pageX, e.pageY);
+      } else if (e.clientX) {
+        const x = e.clientX + document.body.scrollLeft;
+        const y = e.clientY + document.body.scrollTop;
+
+        return new CustomizationCoordinate(x, y);
+      }
+    }
+  }
+
+  type MouseHandler = (this: GlobalEventHandlers, ev: MouseEvent) => any;
+
+  /**
+   * Used to store the page's original mouse handlers and properties
+   * when temporarily overridden by OSK moving or resizing handlers due
+   * to user interaction.
+   */
+  class MouseStartSnapshot {
+    private readonly _VPreviousMouseMove: MouseHandler;
+    private readonly _VPreviousMouseUp: MouseHandler;
+    private readonly _VPreviousCursor: string;
+    private readonly _VPreviousMouseButton: number;
+
+    constructor(e: MouseEvent) {
+      this._VPreviousMouseMove = document.onmousemove;
+      this._VPreviousMouseUp = document.onmouseup;
+
+      this._VPreviousCursor = document.body.style.cursor;
+      this._VPreviousMouseButton = (typeof(e.which)=='undefined' ? e.button : e.which);
+    }
+
+    restore() {
+      document.onmousemove = this._VPreviousMouseMove;
+      document.onmouseup = this._VPreviousMouseUp;
+
+      if(document.body.style.cursor) {
+        document.body.style.cursor = this._VPreviousCursor;
+      }
+    }
+
+    matchesCausingClick(e: MouseEvent): boolean {
+      return this._VPreviousMouseButton == (typeof(e.which)=='undefined' ? e.button : e.which);
+    }
+  }
+
   export abstract class MouseDragOperation {
     private _enabled: boolean;
     private _startCoord: CustomizationCoordinate;
