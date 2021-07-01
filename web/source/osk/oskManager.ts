@@ -377,8 +377,6 @@ namespace com.keyman.osk {
       }
     }.bind(this);
 
-    // End of TitleBarInterior
-
     /**
      * Function     enabled
      * Scope        Public
@@ -625,10 +623,8 @@ namespace com.keyman.osk {
       p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
 
       if(this.vkbd) {
-        p['width']  = p.width  = dom.Utils.getAbsoluteX(this.vkbd.kbdHelpDiv) -
-          dom.Utils.getAbsoluteX(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetWidth;
-        p['height'] = p.height = dom.Utils.getAbsoluteY(this.vkbd.kbdHelpDiv) -
-          dom.Utils.getAbsoluteY(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetHeight;
+        p['width']  = p.width  = this.vkbd.kbdDiv.offsetWidth;
+        p['height'] = p.height = this.vkbd.kbdDiv.offsetHeight;
       } else {
         p['width']  = p.width  = dom.Utils.getAbsoluteX(this._Box) + this._Box.offsetWidth;
         p['height'] = p.height = dom.Utils.getAbsoluteY(this._Box) + this._Box.offsetHeight;
@@ -806,7 +802,7 @@ namespace com.keyman.osk {
 
       // TODO:  Move this into the VisualKeyboard class!
       // The following code will always be executed except for externally created OSK such as EuroLatin
-      if(this.vkbd && this.vkbd.ddOSK) {
+      if(this.vkbd) {
         // Always adjust screen height if iPhone or iPod, to take account of viewport changes
         // Do NOT condition upon form-factor; this line prevents a bug with displaying
         // the predictive-text banner on the initial keyboard load.  (Issue #2907)

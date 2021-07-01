@@ -29,7 +29,6 @@ namespace com.keyman.osk {
     // Stores the base element for this instance of the visual keyboard.
     // Formerly known as osk._DivVKbd
     kbdDiv: HTMLDivElement;
-    kbdHelpDiv: HTMLDivElement;
     styleSheet: HTMLStyleElement;
 
     _width: number;
@@ -40,7 +39,6 @@ namespace com.keyman.osk {
     fontSize: string;
 
     // State-related properties
-    ddOSK: boolean = false;
     keyPending: KeyElement;
     touchPending: Touch;
     deleteKey: KeyElement;
@@ -117,14 +115,12 @@ namespace com.keyman.osk {
 
       let divLayerContainer = this.deviceDependentLayout(keyboard, device.formFactor as utils.FormFactor);
 
-      this.ddOSK = true;
-
       // Append the OSK layer group container element to the containing element
       //osk.keyMap = divLayerContainer;
       Lkbd.appendChild(divLayerContainer);
 
       // Set base class - OS and keyboard added for Build 360
-      this.kbdHelpDiv = this.kbdDiv = Lkbd;
+      this.kbdDiv = Lkbd;
 
       if(this.isStatic) {
         // The 'documentation' format uses the base element's child as the actual display base.
