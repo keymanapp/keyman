@@ -273,7 +273,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Use the popup duplicate of the base key if a phone with a visible popup array
-      if(this.currentSelection && this.baseKey.key.isUnderTouch(touch)) {
+      if(!this.currentSelection && this.baseKey.key.isUnderTouch(touch)) {
         this.baseKey.key.highlight(true);
         this.currentSelection = this.baseKey;
       }
