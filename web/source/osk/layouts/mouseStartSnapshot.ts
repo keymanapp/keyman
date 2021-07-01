@@ -2,9 +2,9 @@ namespace com.keyman.osk.layouts {
   export type MouseHandler = (this: GlobalEventHandlers, ev: MouseEvent) => any;
 
   /**
-   * Used to temporarily store the page's original mouse handlers when
-   * overridden by the OSK resizing handlers during an ongoing move or
-   * resize event.
+   * Used to store the page's original mouse handlers and properties
+   * when temporarily overridden by OSK moving or resizing handlers due
+   * to user interaction.
    */
   export class MouseStartSnapshot {
     private readonly _VPreviousMouseMove: MouseHandler;
