@@ -1,6 +1,7 @@
 **/*.aps
 **/BuildLog.htm
 **/*.recipe
+**/manifest.res
 
 # These are intermediate and output folders for VC++ and Delphi projects
 **/obj/Win32/

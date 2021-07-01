@@ -115,13 +115,6 @@
 # /engine/kmcomapi/
 /windows/src/engine/kmcomapi/kmcomapi.tlb
 
-# /engine/kmtip/
-/windows/src/engine/kmtip/kmtip.suo
-/windows/src/engine/kmtip/vc100.idb
-/windows/src/engine/kmtip/x64
-/windows/src/engine/kmtip/x86
-/windows/src/engine/kmtip/kmtip.opensdf
-
 # /engine/tsysinfo/
 /windows/src/engine/tsysinfo/tsysinfo_x64.res
 /windows/src/engine/tsysinfo/tsysinfox64.bin

@@ -6,8 +6,8 @@
 
 build: version.res dirs
     $(MSBUILD) etl2log.vcxproj $(MSBUILD_BUILD)
-    $(COPY) $(MSBUILD_TARGET)\etl2log.exe $(PROGRAM)\support
-    $(COPY) $(MSBUILD_TARGET)\etl2log.pdb $(DEBUGPATH)\support
+    $(COPY) $(WIN32_TARGET_PATH)\etl2log.exe $(PROGRAM)\support
+    $(COPY) $(WIN32_TARGET_PATH)\etl2log.pdb $(DEBUGPATH)\support
 
 clean: def-clean
     $(MSBUILD) etl2log.vcxproj $(MSBUILD_CLEAN)

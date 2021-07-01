@@ -120,7 +120,7 @@ DELPHIWARNINGS=-W-MESSAGE_DIRECTIVE -W-IMPLICIT_STRING_CAST -W-IMPLICIT_STRING_C
 
 DELPHIDPRPARAMS=-Q -B -GD -H -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win32\$(TARGET_PATH) -E.\bin\Win32\$(TARGET_PATH)
 DELPHIDPRPARAMS64=-Q -B -GD -H -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win64\$(TARGET_PATH) -E.\bin\Win64\$(TARGET_PATH)
-DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData
+DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData -NUobj\Win32\$(TARGET_PATH)
 
 !IFDEF NOUI
 DCC32="$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
@@ -170,11 +170,9 @@ MT=mt.exe
 VCBUILD=error
 
 !IFDEF DEBUG
-  MSBUILD_TARGET=Debug
   MSBUILD_BUILD=/t:Build /p:Configuration=Debug
   MSBUILD_CLEAN=/t:Clean /p:Configuration=Debug
 !ELSE
-  MSBUILD_TARGET=Release
   MSBUILD_BUILD=/t:Rebuild /p:Configuration=Release
   MSBUILD_CLEAN=/t:Clean /p:Configuration=Release
 !ENDIF
