@@ -43,8 +43,6 @@ namespace com.keyman.osk.layouts {
       let osk = com.keyman.singleton.osk;
       let util = com.keyman.singleton.util;
 
-      this._element.onmousedown = osk._VMoveMouseDown;
-
       this._helpButton.onclick = function() {
         var p={};
         util.callEvent('osk.helpclick',p);

@@ -17,6 +17,10 @@ namespace com.keyman.osk.layouts {
       return this._element;
     }
 
+    public get handle(): HTMLDivElement {
+      return this._resizeHandle;
+    }
+
     public allowResizing(flag: boolean) {
       this._resizeHandle.style.display = flag ? 'block' : 'none';
     }
@@ -65,8 +69,6 @@ namespace com.keyman.osk.layouts {
       var Limg = document.createElement('div');
       this.markUnselectable(Limg);
       Limg.className='kmw-footer-resize';
-      Limg.onmousedown=osk._VResizeMouseDown;
-      Limg.onmouseover=Limg.onmouseout=osk._VResizeMouseOut;
       bar.appendChild(Limg);
       this._resizeHandle=Limg;
       //TODO: the image never appears in IE8, have no idea why!
