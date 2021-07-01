@@ -39,7 +39,7 @@ end;
 
 procedure TKeyboardJSInfoTest.TestJSWithDebugCode;
 begin
-  with TKeyboardJSInfo.Create(ExtractFilePath(ParamStr(0))+'../../test/balochi_phonetic-1.1.js') do
+  with TKeyboardJSInfo.Create(ExtractFilePath(ParamStr(0))+'../../../test/balochi_phonetic-1.1.js') do
   try
     Assert.AreEqual('Balochi Phonetic', Name);
     Assert.AreEqual('1.1', Version);
@@ -52,7 +52,7 @@ end;
 
 procedure TKeyboardJSInfoTest.TestJSWithoutDebugCode;
 begin
-  with TKeyboardJSInfo.Create(ExtractFilePath(ParamStr(0))+'../../test/balochi_phonetic-1.1-debug.js') do
+  with TKeyboardJSInfo.Create(ExtractFilePath(ParamStr(0))+'../../../test/balochi_phonetic-1.1-debug.js') do
   try
     Assert.AreEqual('Balochi Phonetic', Name);
     Assert.AreEqual('1.1', Version);
