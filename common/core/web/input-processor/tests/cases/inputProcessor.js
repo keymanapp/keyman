@@ -103,7 +103,9 @@ describe('InputProcessor', function() {
         // Assumes no SMP chars in the source, which is fine.
         let context = new com.keyman.text.Mock(coreSourceCode, coreSourceCode._kmwLength());
   
-        this.timeout(250); // 250 ms, excluding text import.
+        this.timeout(500);                // 500 ms, excluding text import.
+                                          // These often run on VMs, so we'll be a bit generous.
+
         let core = new InputProcessor();  // I mean, it IS long context, and time
                                           // thresholding is disabled within Node.
   
@@ -137,8 +139,13 @@ describe('InputProcessor', function() {
         // Assumes no SMP chars in the source, which is fine.
         let context = new com.keyman.text.Mock(coreSourceCode, coreSourceCode._kmwLength());
   
-        this.timeout(250); // 250 ms, excluding text import.
-        let core = new InputProcessor();  // I mean, it IS long context, and time
+        this.timeout(500);                // 500 ms, excluding text import.
+                                          // These often run on VMs, so we'll be a bit generous.
+                                          //
+                                          // Keep at the same 'order of magnitude' as the
+                                          // 'without fat-fingers' test.
+
+        let core = new InputProcessor();  // It IS long context, and time
                                           // thresholding is disabled within Node.
   
         core.activeKeyboard = keyboard;
