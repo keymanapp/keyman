@@ -1,6 +1,7 @@
 /// <reference path="resizeBar.ts" />
 /// <reference path="titleBar.ts" />
 /// <reference path="mouseStartSnapshot.ts" />
+/// <reference path="customizationCoordinate.ts" />
 
 namespace com.keyman.osk.layouts {
   export class TargetedFloatLayout {
@@ -10,10 +11,8 @@ namespace com.keyman.osk.layouts {
     private oskView: OSKManager;
 
     // OSK resizing-event state fields
-    private _VMoveX: number;
-    private _VMoveY: number;
-    private _ResizeMouseX: number;
-    private _ResizeMouseY: number;
+    private _moveStart: CustomizationCoordinate;
+    private _resizeStart: CustomizationCoordinate;
     private _VOriginalWidth: number;
     private _VOriginalHeight: number;
 
@@ -80,17 +79,7 @@ namespace com.keyman.osk.layouts {
         return true;
       }
 
-      var Lposx, Lposy;
-      if (e.pageX) {
-        Lposx = e.pageX;
-        Lposy = e.pageY;
-      } else if(e.clientX) {
-        Lposx = e.clientX + document.body.scrollLeft;
-        Lposy = e.clientY + document.body.scrollTop;
-      }
-
-      this._ResizeMouseX = Lposx;
-      this._ResizeMouseY = Lposy;
+      this._resizeStart = CustomizationCoordinate.fromEvent(e);
 
       if(!this._mouseStartSnapshot) { // I1472 - Dragging off edge of browser window causes muckup
         this._mouseStartSnapshot = new MouseStartSnapshot(e);
@@ -125,18 +114,9 @@ namespace com.keyman.osk.layouts {
       if(!this._mouseStartSnapshot.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
         return this._VResizeMoveMouseUp(e);
       } else {
-        var Lposx, Lposy;
-
-        if (e.pageX) {
-          Lposx = e.pageX;
-          Lposy=e.pageY;
-        } else if (e.clientX) {
-          Lposx = e.clientX + document.body.scrollLeft;
-          Lposy = e.clientY + document.body.scrollTop;
-        }
-
-        var newWidth=(this._VOriginalWidth + Lposx - this._ResizeMouseX),
-            newHeight=(this._VOriginalHeight + Lposy - this._ResizeMouseY);
+        const coord = CustomizationCoordinate.fromEvent(e);
+        var newWidth=(this._VOriginalWidth   + coord.x - this._resizeStart.x),
+            newHeight=(this._VOriginalHeight + coord.y - this._resizeStart.y);
 
         // Set the smallest and largest OSK size
         if(newWidth < 0.2*screen.width) {
@@ -175,21 +155,14 @@ namespace com.keyman.osk.layouts {
         return true;
       }
 
-      var Lposx, Lposy;
-      if (e.pageX) {
-        Lposx = e.pageX;
-        Lposy = e.pageY;
-      } else if (e.clientX) {
-        Lposx = e.clientX + document.body.scrollLeft;
-        Lposy = e.clientY + document.body.scrollTop;
-      }
-
       if(!this._mouseStartSnapshot) { // I1472 - Dragging off edge of browser window causes muckup
         this._mouseStartSnapshot = new MouseStartSnapshot(e);
       }
 
-      this._VMoveX = Lposx - this.oskView._Box.offsetLeft;
-      this._VMoveY = Lposy - this.oskView._Box.offsetTop;
+      const coord = CustomizationCoordinate.fromEvent(e);
+      const _VMoveX = coord.x - this.oskView._Box.offsetLeft;
+      const _VMoveY = coord.y - this.oskView._Box.offsetTop;
+      this._moveStart = new CustomizationCoordinate(_VMoveX, _VMoveY);
 
       if(keymanweb.isCJK()) {
         this.titleBar.setPinCJKOffset();
@@ -226,18 +199,9 @@ namespace com.keyman.osk.layouts {
       if(!this._mouseStartSnapshot.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
         return this._VResizeMoveMouseUp(e);
       } else {
-        var Lposx, Lposy;
-
-        if (e.pageX) {
-          Lposx = e.pageX;
-          Lposy = e.pageY;
-        } else if (e.clientX) {
-          Lposx = e.clientX + document.body.scrollLeft;
-          Lposy = e.clientY + document.body.scrollTop;
-        }
-
-        this.oskView._Box.style.left = (Lposx-this._VMoveX)+'px';
-        this.oskView._Box.style.top = (Lposy-this._VMoveY)+'px';
+        const coord = CustomizationCoordinate.fromEvent(e);
+        this.oskView._Box.style.left = (coord.x-this._moveStart.x)+'px';
+        this.oskView._Box.style.top  = (coord.y-this._moveStart.y)+'px';
 
         var r=this.oskView.getRect();
         this.oskView.setSize(r.width, r.height, true);
