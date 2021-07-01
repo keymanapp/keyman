@@ -273,6 +273,7 @@ namespace com.keyman.keyboards {
       sp['KR'] = (typeof sp['KR'] === 'undefined') ? KeyboardManager.regions[rIndex] : sp['KR'];
       sp['KRC'] = (typeof sp['KRC'] === 'undefined') ? KeyboardManager.regionCodes[rIndex] : sp['KRC'];
       sp['KN'] = (typeof sp['KN'] === 'undefined') ? kp['name'] : sp['KN'];
+      sp['displayName'] = (typeof sp['displayName'] === 'undefined') ? kp['displayName'] : sp['displayName'];
 
       if(typeof(sp['KF']) == 'undefined') {
         rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
