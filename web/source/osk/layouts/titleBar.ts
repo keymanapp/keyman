@@ -1,5 +1,5 @@
 namespace com.keyman.osk.layouts {
-  export class TargetedTitleBar {
+  export class TitleBar {
     private _element: HTMLDivElement;
     private _unpinButton: HTMLDivElement;
     private _closeButton: HTMLDivElement;

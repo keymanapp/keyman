@@ -4,9 +4,9 @@
 // Includes the banner
 /// <reference path="./bannerManager.ts" />
 // Defines desktop-centric OSK positioning + sizing behavior
-/// <reference path="layouts/targetedTitleBar.ts" />
+/// <reference path="layouts/titleBar.ts" />
 // Defines desktop-centric OSK positioning + sizing behavior
-/// <reference path="layouts/targetedResizeBar.ts" />
+/// <reference path="layouts/resizeBar.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 
@@ -27,8 +27,8 @@ namespace com.keyman.osk {
     banner: BannerManager;
     vkbd: VisualKeyboard;
 
-    desktopTitleBar: layouts.TargetedTitleBar;
-    desktopResizeBar: layouts.TargetedResizeBar;
+    desktopTitleBar: layouts.TitleBar;
+    desktopResizeBar: layouts.ResizeBar;
 
     ready: boolean = false;
     loadRetry: number = 0;
@@ -214,7 +214,7 @@ namespace com.keyman.osk {
       // (Probably to avoid having a null keyboard. But maybe that *is* an option, if there remains a way to get the language menu,
       //  such as a minimized menu button?)
       if(activeKeyboard == null && !device.touchable) {
-        this.desktopTitleBar = new layouts.TargetedTitleBar();
+        this.desktopTitleBar = new layouts.TitleBar();
         this._Box.appendChild(this.desktopTitleBar.element);
 
         Ldiv = util._CreateElement('div');
@@ -236,7 +236,7 @@ namespace com.keyman.osk {
           this._GenerateVisualKeyboard(null);
         } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
           //osk.ddOSK = false;
-          this.desktopTitleBar = new layouts.TargetedTitleBar();
+          this.desktopTitleBar = new layouts.TitleBar();
           this._Box.appendChild(this.desktopTitleBar.element);
           this._Box.appendChild(this.banner.element);
 
@@ -343,7 +343,7 @@ namespace com.keyman.osk {
 
       // Add header element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
-        this.desktopTitleBar = new layouts.TargetedTitleBar();
+        this.desktopTitleBar = new layouts.TitleBar();
         this._Box.appendChild(this.desktopTitleBar.element);
       }
 
@@ -357,7 +357,7 @@ namespace com.keyman.osk {
 
       // Add footer element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
-        this.desktopResizeBar = new layouts.TargetedResizeBar();
+        this.desktopResizeBar = new layouts.ResizeBar();
         this._Box.appendChild(this.desktopResizeBar.element);
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {

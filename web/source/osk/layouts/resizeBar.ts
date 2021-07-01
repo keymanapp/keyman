@@ -1,5 +1,5 @@
 namespace com.keyman.osk.layouts {
-  export class TargetedResizeBar {
+  export class ResizeBar {
     private _element: HTMLDivElement;
     private _resizeHandle: HTMLDivElement;
 
