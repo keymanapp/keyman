@@ -153,18 +153,20 @@ namespace com.keyman.dom {
       this.doControlFocused(LfocusTarg, DOMEventHandlers.states.lastActiveElement);
     
       // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
-      if(device.touchable) {
-        osk._Enabled = true;
-      } else {
-        // Conditionally show the OSK when control receives the focus
-        if(osk.ready) {
-          if(this.keyman.isCJK()) {
-            osk._Enabled = true;
-          }
-          if(osk._Enabled) {
-            osk._Show();
-          } else {
-            osk._Hide(false);
+      if(osk) {
+        if(device.touchable) {
+          osk._Enabled = true;
+        } else {
+          // Conditionally show the OSK when control receives the focus
+          if(osk.ready) {
+            if(this.keyman.isCJK()) {
+              osk._Enabled = true;
+            }
+            if(osk._Enabled) {
+              osk._Show();
+            } else {
+              osk._Hide(false);
+            }
           }
         }
       }
@@ -260,7 +262,7 @@ namespace com.keyman.dom {
       this.doControlBlurred(Ltarg, e, isActivating);
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
-      if(this.keyman.osk.ready && !isActivating) {
+      if(this.keyman.osk && this.keyman.osk.ready && !isActivating) {
         this.keyman.osk._Hide(false);
       }
 
@@ -423,11 +425,13 @@ namespace com.keyman.dom {
       } else if(el && el.className.indexOf('kmw-disabled') >= 0) {
         return true; 
       }
-      
+
+      /*
       // Or if OSK not yet ready (for any reason)
-      if(!osk.ready) {
+      if(!osk || !osk.ready) {
         return true;
       }
+      */
       
       return PreProcessor.keyDown(e);
     }.bind(this);
@@ -474,9 +478,14 @@ namespace com.keyman.dom {
       var osk = this.keyman.osk;
 
       var Levent = PreProcessor._GetKeyEventProperties(e, false);
-      if(Levent == null || !osk.ready) {
+      if(Levent == null) {
         return true;
       }
+      /*
+      if(!osk || !osk.ready) {
+        return true;
+      }
+      */
       let outputTarget = PreProcessor.getEventOutputTarget(e) as dom.targets.OutputTarget;
       var inputEle = outputTarget.getElement();
 
@@ -642,7 +651,7 @@ namespace com.keyman.dom {
       //if(document.activeElement.nodeName != 'DIV' && document.activeElement.nodeName != 'BODY') document.activeElement.blur();
       
       // And display the OSK if not already visible
-      if(osk.ready && !osk._Visible) {
+      if(osk && osk.ready && !osk._Visible) {
         osk._Show();
       }
       
@@ -907,9 +916,8 @@ namespace com.keyman.dom {
      */         
     scrollBody(e: HTMLElement): void {
       var osk = this.keyman.osk;
-      var util = this.keyman.util;
 
-      if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk.ready) {
+      if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk || !osk.ready) {
         return;
       }
 

@@ -1587,7 +1587,9 @@ namespace com.keyman.dom {
       this.keyman.setInitialized(1);
 
       // Finish keymanweb and OSK initialization once all necessary resources are available
-      osk.prepare();
+      if(osk) {
+        osk.prepare();
+      }
     
       // Create and save the remote keyboard loading delay indicator
       util.prepareWait();
