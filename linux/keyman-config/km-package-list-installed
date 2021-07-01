@@ -25,26 +25,27 @@ def main():
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
     all = not args.user and not args.shared and not args.os
-    from keyman_config.list_installed_kmp import get_installed_kmp, get_install_area_path, InstallArea
+    from keyman_config.list_installed_kmp import get_installed_kmp
+    from keyman_config.get_kmp import get_keyman_dir, InstallLocation
     if args.user or all:
-        installed_kmp = get_installed_kmp(InstallArea.IA_USER)
+        installed_kmp = get_installed_kmp(InstallLocation.User)
         if args.verbose or args.veryverbose:
-            print("--- Installed user Keyman keyboard packages (%s) ---" % (get_install_area_path(InstallArea.IA_USER)))
+            print("--- Installed user Keyman keyboard packages (%s) ---" % (get_keyman_dir(InstallLocation.User)))
         else:
             print("--- Installed user Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
     if args.shared or all:
-        installed_kmp = get_installed_kmp(InstallArea.IA_SHARED)
+        installed_kmp = get_installed_kmp(InstallLocation.Shared)
         if args.verbose or args.veryverbose:
             print("--- Installed shared Keyman keyboard packages (%s) ---" %
-                  (get_install_area_path(InstallArea.IA_SHARED)))
+                  (get_keyman_dir(InstallLocation.Shared)))
         else:
             print("--- Installed shared Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
     if args.os or all:
-        installed_kmp = get_installed_kmp(InstallArea.IA_OS)
+        installed_kmp = get_installed_kmp(InstallLocation.OS)
         if args.verbose or args.veryverbose:
-            print("--- Installed OS Keyman keyboard packages (%s) ---" % (get_install_area_path(InstallArea.IA_OS)))
+            print("--- Installed OS Keyman keyboard packages (%s) ---" % (get_keyman_dir(InstallLocation.OS)))
         else:
             print("--- Installed OS Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)

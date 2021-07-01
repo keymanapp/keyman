@@ -132,7 +132,7 @@ namespace com.keyman.text {
   keymanweb.isEmbedded = true;
 
   // Set default device options
-  keymanweb.setDefaultDeviceOptions = function(opt) {
+  keymanweb.setDefaultDeviceOptions = function(opt: com.keyman.OptionType) {
     opt['attachType'] = 'manual';
     device.app=opt['app'];
     device.touchable=true; 

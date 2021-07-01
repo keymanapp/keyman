@@ -68,7 +68,7 @@ WCHAR *AppContext::Buf(int n)
 	return p;
 }
 
-WCHAR *AppContext::BufMax(int n)  // Used only by IMX DLLs
+WCHAR *AppContext::BufMax(int n)
 {
 	WCHAR *p = wcschr(CurContext, 0);  // I3091
 
@@ -107,14 +107,22 @@ void AppContext::Reset()
 
 void AppContext::Get(WCHAR *buf, int bufsize)
 {
-	for(WCHAR *p = CurContext; *p && bufsize > 0; p++, bufsize--)
-	{
-		*buf = *p; buf++;
-		if(*p >= 0xD800 && *p <= 0xDBFF) { *buf = *(++p); bufsize--; buf++; }
-	}
-	//wcsncpy(buf, CurContext, bufsize);
-	*buf = 0;
-	//buf[bufsize-1] = 0;
+  // surrogate pairs need to be treated as a single unit, therefore use
+  // BufMax to find a start index.
+  // BufMax handles the case where a surrogate pair at the
+  // start of the buffer is split by bufsize
+  for (WCHAR *p = this->BufMax(bufsize); *p && bufsize > 0; p++, bufsize--)
+  {
+    *buf = *p;
+    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) { 
+      buf++; p++;
+      *buf = *p;
+      bufsize--;
+    }
+    buf++;
+  }
+
+  *buf = 0;
 }
 
 void AppContext::CopyFrom(AppContext *source)   // I3575

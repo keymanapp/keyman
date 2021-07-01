@@ -317,7 +317,6 @@ begin
           Application.Title := 'Keyman Developer';
           //TBX.TBXSetTheme('OfficeXP2');
           if TikeActive then Exit;
-          InitClasses;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
           Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
           Application.Run;

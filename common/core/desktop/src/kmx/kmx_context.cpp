@@ -29,6 +29,19 @@ void KMX_Context::Add(KMX_WCHAR ch)
   //DebugLog("KMX_Context::Add(%x):  EXIT [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
 }
 
+KMX_WCHAR *KMX_Context::BufMax(int n)
+{
+  KMX_WCHAR *p = (KMX_WCHAR *) u16chr(CurContext, 0);
+	if(CurContext == p || n == 0) return p; // empty context or 0 characters requested, return pointer to end of context
+
+  KMX_WCHAR *q = p;
+	for(; p != NULL && p > CurContext && (intptr_t)(q-p) < n; p = decxstr(p, CurContext))
+  ; // ; on new line to tell compiler empty loop is intentional
+
+  if((intptr_t)(q-p) > n) p = incxstr(p); // Copes with deadkey or supplementary pair at start of returned buffer making it too long
+
+  return p;
+}
 
 KMX_WCHAR *KMX_Context::Buf(int n)
 {
@@ -63,11 +76,17 @@ void KMX_Context::Reset()
 
 void KMX_Context::Get(KMX_WCHAR *buf, int bufsize)
 {
-  for(KMX_WCHAR *p = CurContext; *p && bufsize > 0; p++, bufsize--)
+  for (KMX_WCHAR *p = this->BufMax(bufsize); *p && bufsize > 0; p++, bufsize--)
   {
-    *buf = *p; buf++;
-    if(*p >= 0xD800 && *p <= 0xDBFF) { *buf = *(++p); bufsize--; buf++; }
+    *buf = *p;
+    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) {
+      buf++; p++;
+      *buf = *p;
+      bufsize--;
+    }
+    buf++;
   }
+
   *buf = 0;
 }
 

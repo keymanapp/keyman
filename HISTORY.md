@@ -1,5 +1,43 @@
 # Keyman Version History
 
+## 15.0.78 alpha 2021-06-30
+
+* fix(web): console errors when using SHIFT w help-text 'osk' (#5392)
+
+## 15.0.77 alpha 2021-06-29
+
+* fix(windows): #5336 appcontext get to handle small buffer (#5383)
+* fix(common): get handle caller buffer size small than internal Fixes … (#5390)
+
+## 15.0.76 alpha 2021-06-28
+
+* feat(web): Add option useAlerts to control alerts() (#5302)
+* chore(android): Add help on Settings option to change spacebar caption (#5375)
+* feat(android): hide textarea for perf (#5376)
+* chore: keyboard_info.source.json 1.0.6 (#5379)
+* refactor(android): setKeyboard and setKeymanLanguage (#5338)
+* feat(web): Merge keyboard stub with error stub (#5340)
+* feat(linux): Add reference index page  (#5370)
+*  fix(linux): Fix restarting ibus when running with sudo  (#5371)
+* refactor(linux): Centralize paths (#5372)
+* fix(linux): Save QR code in temporary directory (#5373)
+
+## 15.0.75 alpha 2021-06-25
+
+* fix(android): rotation is not updating keyboard (#5247)
+* fix(windows): osk scaling mismatch on horz axis (#5341)
+* fix(linux): Don't add duplicate entries when reinstalling keyboard (#5363)
+* fix(linux): fix tab completion for command line tools (#5362)
+* feat(web): Update addLanguageKeyboards to return a Promise (#5260)
+* feat(web): Add option useAlerts to control alerts() (#5302)
+
+## 15.0.74 alpha 2021-06-24
+
+* fix(android): fixes application of nextlayer for subkeys with customized layer setting (#5350)
+* feat(common/core/web): engine correction-prep optimizations (#5319)
+* feat(linux): Add support for impish (Ubuntu 21.10) (#5334)
+* fix(linux): Add libglib2.0-bin to keyman Depends 🍒 (#5360)
+
 ## 15.0.73 alpha 2021-06-23
 
 * chore(windows): add engine test framework (#5337)

@@ -1,4 +1,6 @@
 /// <reference path="../kmwbase.ts" />
+// Includes a promise polyfill (needed for IE)
+/// <reference path="../../node_modules/es6-shim/es6-shim.min.js" />
 
 namespace com.keyman.keyboards {
   class CloudRequestEntry {
@@ -68,6 +70,15 @@ namespace com.keyman.keyboards {
     }
   }
 
+  // Information about a keyboard that fails to get added
+  export interface ErrorStub {
+    language?: {
+      id?: string;
+      name?: string;
+    }
+
+    error: Error;
+  }
   export class KeyboardTag {
     stores: {[text: string]: text.ComplexKeyboardStore} = {};
   }
@@ -85,15 +96,14 @@ namespace com.keyman.keyboards {
   // Represents unspecified errors that occur when registering the results of a successful API call.
   const CLOUD_STUB_REGISTRATION_ERR = "The Cloud API failed to find an appropriate keyboard.";
   // Represents custom, specified KMW errors that occur when registering the results of a successful API call.
-  const CLOUD_REGISTRATION_ERROR = "Error occurred while registering keyboards: ";
+  const CLOUD_REGISTRATION_ERR = "Error occurred while registering keyboards: ";
 
   const MISSING_KEYBOARD = function(kbdid: string) {
     return kbdid + ' keyboard not found.';
   }
 
   interface RegistrationPromiseTuple {
-    // TODO (#5044): the parameter for `resolve` should match the type of the Promise in keymanCloudRequest.
-    resolve: () => void;
+    resolve: (stubs: KeyboardStub[]) => void;
     reject: (err: Error) => void;
   }
 
@@ -106,6 +116,8 @@ namespace com.keyman.keyboards {
 
     activeStub: KeyboardStub = null;
     keyboardStubs: KeyboardStub[] = [];
+
+    firstCall: boolean = true; // First time to call keymanCloudRequest()
 
     deferredStubs: any[] = []; // The list of user-provided keyboard stub registration objects.
     deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register after initialization
@@ -123,8 +135,9 @@ namespace com.keyman.keyboards {
      */
     registrationResolvers: {[timeoutID: number] : RegistrationPromiseTuple} = {};
 
+    languageListPromise: Promise<(KeyboardStub|ErrorStub)[]> = null;
+
     languageList: any[] = null; // List of keyboard languages available for KeymanCloud
-    languagesPending: any[] = [];     // Array of languages waiting to be registered
 
     linkedScripts: HTMLScriptElement[] = [];
 
@@ -566,8 +579,8 @@ namespace com.keyman.keyboards {
                 // Thanks, Closure errors.
                 if(!this.keymanweb.isEmbedded) {
                   util.wait(false);
-                  util.alert(altString || msg, function() {
-                    this.keymanweb['setActiveKeyboard'](''); // The API call!
+                  util.internalAlert(altString || msg, function() {
+                      this.keymanweb['setActiveKeyboard'](''); // The API call!
                   }.bind(this));
                 }
 
@@ -943,7 +956,7 @@ namespace com.keyman.keyboards {
 
           if(typeof(x[i]['filename']) == 'string') {
             if(!this.addStub(x[i])) {
-              alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
+              this.keymanweb.util.internalAlert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
             }
           } else {
             if(x[i]['language']) {
@@ -984,7 +997,11 @@ namespace com.keyman.keyboards {
       }
 
       // Request keyboard metadata from the Keyman Cloud keyboard metadata server
-      this.keymanCloudRequest(cmd,false);
+      try {
+        let promise = this.keymanCloudRequest(cmd,false);
+      } catch(err) {
+        console.error(err);
+      }
     }
 
     /**
@@ -1067,11 +1084,11 @@ namespace com.keyman.keyboards {
     register(x) {
       const promiseid = x['timerid'];
 
-      let result: Error;
+      let result: KeyboardStub[] | Error;
       try {
         result = this._registerCore(x);
       } catch(err) {
-        result = new Error(CLOUD_REGISTRATION_ERROR + err);
+        result = new Error(CLOUD_REGISTRATION_ERR + err);
       }
       
       if(promiseid) {
@@ -1081,8 +1098,8 @@ namespace com.keyman.keyboards {
         try {
           if(result instanceof Error) {
             promiseFuncs.reject(result as Error);
-          } else { // TODO (#5044): pass `result` to the `resolve` function.
-            promiseFuncs.resolve();
+          } else {
+            promiseFuncs.resolve(result as KeyboardStub[]);
           }
         } finally {
           delete this.registrationResolvers[promiseid];
@@ -1095,8 +1112,9 @@ namespace com.keyman.keyboards {
      *
      * @param {Object}    x   metadata object
      **/
-    private _registerCore(x): Error { // TODO (#5044): should return heterogenous type; allow array of stubs.
+    private _registerCore(x): KeyboardStub[] | Error { // TODO (#5044): should return heterogenous type; allow array of stubs.
       var options=x['options'];
+      let currentKeyboardStubsCount = this.keyboardStubs.length;
 
       // Indicate if unable to register keyboard
       if(typeof(x['error']) == 'string') {
@@ -1129,34 +1147,60 @@ namespace com.keyman.keyboards {
         }
       } else if(options['context'] == 'language') { // Download the full list of supported keyboard languages
         this.languageList = x['languages'];
-        if(this.languagesPending) {
-          this.addLanguageKeyboards(this.languagesPending);
-        }
-        this.languagesPending = [];
       }
 
-      return null; // TODO (#5044): return the list of newly-registered stubs here.
+      return this.keyboardStubs.slice(currentKeyboardStubsCount);
     }
 
     /**
      *  Internal handler for processing keyboard registration, used only by `register`
      *
-     *  @param  {Object}   languages    Array of language names
+     *  @param  {string[]}   languages    Array of language names
+     *  @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard stubs
      **/
-    addLanguageKeyboards(languages) {
-      var i, j, lgName, cmd, first, addAll;
+    async addLanguageKeyboards(languages: string[]): Promise<(KeyboardStub|ErrorStub)[]> {
+      var i, j, lgName, cmd, addAll, retPromise;
+
+      let errorStub: ErrorStub[] = [];
 
       // Defer registering keyboards by language until the language list has been loaded
-      if(this.languageList == null) {
-        first = (this.languagesPending.length == 0);
-
-        for(i=0; i<languages.length; i++) {
-          this.languagesPending.push(languages[i]);
+      if (this.languageList == null) {
+        if (this.firstCall) {
+          this.firstCall = false;
+          let promise = this.keymanCloudRequest('',true);
+          // If promise is not error, then... (needs an error guard)
+          promise.catch(function(error) {
+            let msg = "Unable to retrieve the master language list.";
+            console.error(msg, error)
+            let stub: ErrorStub = {error: new Error(msg)};
+            errorStub.push(stub);
+            return Promise.reject(errorStub);
+          });
+          this.languageListPromise = promise;
         }
 
-        if(first) {
-          this.keymanCloudRequest('',true);
-        }
+        let _this = this;
+        retPromise = new Promise(function(resolve, reject) {
+          if (_this.languageListPromise) {
+            // 1: wait for the language list to be loaded properly
+            _this.languageListPromise.then(function() {
+              // 2: perform the actual query, now that we can find the language code
+              resolve(_this.addLanguageKeyboards(languages));
+            }).catch(function(error) {
+              return Promise.reject(error);
+            });
+          } else {
+            return _this.addLanguageKeyboards(languages);
+          }
+        }).then(function(result) {
+          if (result instanceof Error) {
+            return Promise.reject(result);
+          }
+          return Promise.resolve(result);
+        }).catch(function(error) {
+          return Promise.reject(error);
+        });
+      
       } else { // Identify and register each keyboard by language name
         cmd = '';
         for(i=0; i<languages.length; i++) {
@@ -1166,6 +1210,7 @@ namespace com.keyman.keyboards {
             lgName = lgName.substr(0,lgName.length-1);
           }
 
+          let languageFound: boolean = false;
           for(j=0; j<this.languageList.length; j++) {
             if(lgName == this.languageList[j]['name'].toLowerCase()) {
               if(cmd != '') {
@@ -1177,17 +1222,48 @@ namespace com.keyman.keyboards {
                 cmd = cmd + '$';
               }
 
+              languageFound = true;
               break;
             }
+          }
+          if (!languageFound) {
+            // Construct response array of errors (failed-query keyboards)
+            // that will be merged with stubs (successfully-queried keyboards)
+            let stub: ErrorStub = {language: {name: lgName}, error: new Error(this.alertLanguageUnavailable(lgName))};
+            errorStub.push(stub);
           }
         }
 
         if(cmd == '') {
-          this.keymanweb.util.alert('No keyboards are available for '+languages[0]+'. '
-            +'Does it have another language name?');
-        } else {
-          this.keymanCloudRequest('&keyboardid='+cmd,false);
+          // No command so return errors
+          return Promise.reject(errorStub);
+        } 
+
+        try {
+          // Merge this with errorStub
+          let result:(KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest('&keyboardid='+cmd, false);
+          if (Array.isArray(result)) {
+            if (errorStub.length > 0) {
+              result = result.concat(errorStub);
+              return Promise.resolve(result);
+            } else {
+              return Promise.resolve(result);
+            }
+          }
+        } catch(err) {
+            // We don't have language info for this ErrorStub
+            console.error(err);
+            let stub: ErrorStub = {error: err};
+            errorStub.push(stub);
+            return Promise.reject(errorStub);
         }
+      }
+
+      if (retPromise) {
+        return retPromise;
+      } else {
+        // No keyboards added so return empty stub
+        return Promise.resolve(errorStub);
       }
     }
 
@@ -1196,8 +1272,9 @@ namespace com.keyman.keyboards {
      *
      *  @param  {string}   cmd        command string
      *  @param  {boolean?} byLanguage if true, context=languages, else context=keyboards
+     *  @returns {Promise<(KeyboardStub[]>} Promise of added keyboard stubs
      **/
-    keymanCloudRequest(cmd: string, byLanguage?: boolean) {    
+    keymanCloudRequest(cmd: string, byLanguage?: boolean): Promise<KeyboardStub[]> {
       var kbdManager = this;
       var keymanweb = this.keymanweb;
 
@@ -1208,7 +1285,7 @@ namespace com.keyman.keyboards {
       const URL='https://api.keyman.com/cloud/4.0/'
                 + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards');
 
-      let promise = new Promise<void>(function(resolve: () => void, reject: (Error?) => void) {
+      let promise = new Promise(function(resolve: (result: KeyboardStub[]) => void, reject: (error: Error) => void) {
         const Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
 
         const queryConfig = '?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
@@ -1216,7 +1293,7 @@ namespace com.keyman.keyboards {
         // Set callback timer
         const timeoutID = window.setTimeout(function() {
           delete kbdManager.registrationResolvers[timeoutID];
-          reject(CLOUD_TIMEOUT_ERR);
+          reject(new Error(CLOUD_TIMEOUT_ERR));
         } ,10000);
 
         // Save the resolve / reject functions.
@@ -1269,13 +1346,26 @@ namespace com.keyman.keyboards {
           document.getElementsByTagName('head')[0].appendChild(Lscript);
         }
       });
-
       // TODO:  Allow the site developer to handle error messaging via this catch.
       //        This current version simply maintains pre-existing behavior.
       promise.catch(function(error: Error) {
-        kbdManager.serverUnavailable(error);
-        throw error;
+        kbdManager.serverUnavailable(error.message);
+        return Promise.reject(error);
       });
+
+      return promise;
+    }
+
+    /**
+     * Display warning if language name unavailable to add keyboard
+     * @param {string} languageName
+     * @returns string of Error message
+     */
+    private alertLanguageUnavailable(languageName: string): string {
+      let msg = 'No keyboards are available for '+ languageName + '. '
+        +'Does it have another language name?';
+      this.keymanweb.util.internalAlert(msg);
+      return msg;
     }
 
     /**
@@ -1283,9 +1373,9 @@ namespace com.keyman.keyboards {
      *
      *  @param  {string}  cmd command string sent to Cloud
      *
-     **/
-    private serverUnavailable(cmd) {
-      this.keymanweb.util.alert(cmd == '' ? 'Unable to connect to Keyman Cloud server!' : cmd);
+     */
+    private serverUnavailable(cmd: string): void {
+      this.keymanweb.util.internalAlert(cmd == '' ? 'Unable to connect to Keyman Cloud server!' : cmd);
       this.keymanweb.warned=true;
     }
 

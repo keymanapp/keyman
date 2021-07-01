@@ -667,7 +667,7 @@ namespace com.keyman {
       }
 
       if(eot != '' && (eot.indexOf('/') < 0)) {
-      eot = this.keyman.options['fonts']+eot;
+        eot = this.keyman.options['fonts']+eot;
       }
 
       if(svg != '' && (svg.indexOf('/') < 0)) {
@@ -903,7 +903,7 @@ namespace com.keyman {
     }
 
     /**
-     * Customized alert
+     * Customized alert.
      *
      * @param     {string}        s       alert text
      * @param     {function()=}   fn      function to call when alert dismissed
@@ -915,17 +915,25 @@ namespace com.keyman {
       (nn[1] as HTMLElement).innerHTML=s;
       (nn[2] as HTMLElement).style.display='none';
       bg.style.display='block';
-      if(arguments.length > 1) {
-        bg.dismiss=fn;
-      } else {
-        bg.dismiss=null;
-      }
+      bg.dismiss = arguments.length > 1 ? fn : null;
     }
 
     // Stub definition to be fleshed out depending upon native/embedded mode.
     wait(s: string|boolean): void {
 
     }
+
+    /**
+     * Customized internal alert. This is enabled/disabled by the option flag 'useAlerts'
+     *
+     * @param     {string}        s       alert text
+     * @param     {function()=}   fn      function to call when alert dismissed
+     */
+     internalAlert(s: string, fn?: () => void): void {
+       if (this.keyman.options.useAlerts) {
+         this.alert(s, fn);
+       }
+     }
 
     /**
      *  Prepare the background and keyboard loading wait message box
