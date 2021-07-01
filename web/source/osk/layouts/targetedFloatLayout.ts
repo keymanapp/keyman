@@ -10,25 +10,13 @@ namespace com.keyman.osk.layouts {
 
     private oskView: OSKManager;
 
-    // OSK resizing-event state fields
-    private _resizeStart: CustomizationCoordinate;
-    private _VOriginalWidth: number;
-    private _VOriginalHeight: number;
-
-    // Resize-event temporary storage
-    private _mouseStartSnapshot: MouseStartSnapshot;
+    // Encapsulations of the drag behaviors for OSK movement & resizing
     private _moveHandler: MouseDragOperation;
+    private _resizeHandler: MouseDragOperation;
 
     public constructor() {
       this.titleBar = new layouts.TitleBar(this.titleDragHandler);
-      this.resizeBar = new layouts.ResizeBar();
-
-      // Attach handlers to the title bar and resize bar as appropriate.
-      this.resizeBar.handle.onmousedown = this._VResizeMouseDown.bind(this);
-    }
-
-    public get isMovingOrResizing(): boolean {
-      return this._moveHandler.isActive || !!this._mouseStartSnapshot;
+      this.resizeBar = new layouts.ResizeBar(this.resizeDragHandler);
     }
 
     public get movementEnabled(): boolean {
@@ -39,8 +27,20 @@ namespace com.keyman.osk.layouts {
       this.titleDragHandler.enabled = flag;
     }
 
+    public get resizingEnabled(): boolean {
+      return this.resizeDragHandler.enabled;
+    }
+
+    public set resizingEnabled(flag: boolean) {
+      this.resizeDragHandler.enabled = flag;
+    }
+
     public get isBeingMoved(): boolean {
       return this.titleDragHandler.isActive;
+    }
+
+    public get isBeingResized(): boolean {
+      return this.resizeDragHandler.isActive;
     }
 
     attachToView(view: OSKManager) {
@@ -52,9 +52,8 @@ namespace com.keyman.osk.layouts {
       this.titleDragHandler.enabled = !view.noDrag;
     }
 
-
     private get titleDragHandler(): MouseDragOperation {
-      const _this = this;
+      const layout = this;
 
       if(this._moveHandler) {
         return this._moveHandler;
@@ -69,16 +68,16 @@ namespace com.keyman.osk.layouts {
         }
 
         onDragStart() {
-          if(!_this.oskView) {
+          if(!layout.oskView) {
             return;
           }
 
-          this.startX = _this.oskView._Box.offsetLeft;
-          this.startY = _this.oskView._Box.offsetTop;
+          this.startX = layout.oskView._Box.offsetLeft;
+          this.startY = layout.oskView._Box.offsetTop;
 
           let keymanweb = com.keyman.singleton;
           if(keymanweb.isCJK()) {
-            _this.titleBar.setPinCJKOffset();
+            layout.titleBar.setPinCJKOffset();
           }
 
           keymanweb.uiManager.justActivated = true;
@@ -86,24 +85,24 @@ namespace com.keyman.osk.layouts {
 
         // Note:  _this.oskView may not be initialized yet.
         onDragMove(cumulativeX: number, cumulativeY: number) {
-          if(!_this.oskView) {
+          if(!layout.oskView) {
             return;
           }
 
-          _this.titleBar.showPin(true);
-          _this.oskView.userPositioned = true;
+          layout.titleBar.showPin(true);
+          layout.oskView.userPositioned = true;
 
-          _this.oskView._Box.style.left = (this.startX + cumulativeX) + 'px';
-          _this.oskView._Box.style.top  = (this.startY + cumulativeY) + 'px';
+          layout.oskView._Box.style.left = (this.startX + cumulativeX) + 'px';
+          layout.oskView._Box.style.top  = (this.startY + cumulativeY) + 'px';
 
-          var r=_this.oskView.getRect();
-          _this.oskView.setSize(r.width, r.height, true);
-          _this.oskView.x = r.left;
-          _this.oskView.y = r.top;
+          var r=layout.oskView.getRect();
+          layout.oskView.setSize(r.width, r.height, true);
+          layout.oskView.x = r.left;
+          layout.oskView.y = r.top;
         }
 
         onDragRelease() {
-          if(!_this.oskView) {
+          if(!layout.oskView) {
             return;
           }
 
@@ -114,135 +113,100 @@ namespace com.keyman.osk.layouts {
           keymanweb.uiManager.justActivated = false;
           keymanweb.uiManager.setActivatingUI(false);
 
-          if(_this.oskView.vkbd) {
-            _this.oskView.vkbd.currentKey=null;
+          if(layout.oskView.vkbd) {
+            layout.oskView.vkbd.currentKey=null;
           }
 
-          _this.oskView.userPositioned = true;
-          _this.oskView.doResizeMove();
-          _this.oskView.saveCookie();
+          layout.oskView.userPositioned = true;
+          layout.oskView.doResizeMove();
+          layout.oskView.saveCookie();
         }
       }
 
       return this._moveHandler;
     }
 
-    /**
-     * Function     _VResizeMouseDown
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process resizing of KMW UI
-     */
-    private _VResizeMouseDown(e: MouseEvent) {
-      if(!e) {
-        return true;
+    private get resizeDragHandler(): MouseDragOperation {
+      const layout = this;
+
+      if(this._resizeHandler) {
+        return this._resizeHandler;
       }
 
-      this._resizeStart = CustomizationCoordinate.fromEvent(e);
+      this._resizeHandler = new class extends MouseDragOperation {
+        startWidth: number;
+        startHeight: number;
 
-      if(!this._mouseStartSnapshot) { // I1472 - Dragging off edge of browser window causes muckup
-        this._mouseStartSnapshot = new MouseStartSnapshot(e);
-      }
-
-      this._VOriginalWidth = this.oskView.vkbd.kbdDiv.offsetWidth;
-      this._VOriginalHeight = this.oskView.vkbd.kbdDiv.offsetHeight;
-
-      document.onmousemove = this._VResizeMouseMove.bind(this);
-      document.onmouseup = this._VResizeMouseUp.bind(this);
-
-      if(document.body.style.cursor) {
-        document.body.style.cursor = 'se-resize';
-      }
-
-      e.preventDefault();
-      e.cancelBubble = true;
-
-      let keymanweb = com.keyman.singleton;
-
-      keymanweb.uiManager.justActivated = true;
-      return false;
-    }
-
-    /**
-     * Function     _VResizeMouseMove
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process mouse movement during resizing of OSK
-     */
-    private _VResizeMouseMove(e: MouseEvent) {
-      if(!e) {
-        return true;
-      }
-
-      e.preventDefault();
-      e.cancelBubble = true;
-
-      if(!this._mouseStartSnapshot.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
-        return this._VResizeMouseUp(e);
-      } else {
-        const coord = CustomizationCoordinate.fromEvent(e);
-        let deltaX = coord.x - this._resizeStart.x;
-        let deltaY = coord.y - this._resizeStart.y;
-        var newWidth  = (this._VOriginalWidth   + deltaX),
-            newHeight = (this._VOriginalHeight  + deltaY);
-            
-        // Set the smallest and largest OSK size
-        if(newWidth < 0.2*screen.width) {
-          newWidth = 0.2*screen.width;
-        }
-        if(newHeight < 0.1*screen.height) {
-          newHeight = 0.1*screen.height;
-        }
-        if(newWidth > 0.9*screen.width) {
-          newWidth=0.9*screen.width;
-        }
-        if(newHeight > 0.5*screen.height) {
-          newWidth=0.5*screen.height;
+        constructor() {
+          super('se-resize'); // The type of cursor to use while 'active'.
         }
 
-        // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font
-        this.oskView.setSize(newWidth, newHeight);
+        onDragStart() {
+          if(!layout.oskView) {
+            return;
+          }
 
-        return false;
+          this.startWidth = layout.oskView.vkbd.kbdDiv.offsetWidth;
+          this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
+
+          let keymanweb = com.keyman.singleton;
+
+          keymanweb.uiManager.justActivated = true;
+        }
+
+        // Note:  _this.oskView may not be initialized yet.
+        onDragMove(cumulativeX: number, cumulativeY: number) {
+          if(!layout.oskView) {
+            return;
+          }
+
+          let newWidth  = this.startWidth  + cumulativeX;
+          let newHeight = this.startHeight + cumulativeY;
+          
+          // Set the smallest and largest OSK size
+          if(newWidth < 0.2*screen.width) {
+            newWidth = 0.2*screen.width;
+          }
+          if(newHeight < 0.1*screen.height) {
+            newHeight = 0.1*screen.height;
+          }
+          if(newWidth > 0.9*screen.width) {
+            newWidth=0.9*screen.width;
+          }
+          if(newHeight > 0.5*screen.height) {
+            newWidth=0.5*screen.height;
+          }
+
+          // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font
+          layout.oskView.setSize(newWidth, newHeight);
+        }
+
+        onDragRelease() {
+          if(!layout.oskView) {
+            return;
+          }
+
+          let keymanweb = com.keyman.singleton;
+
+          keymanweb.domManager.focusLastActiveElement();
+
+          keymanweb.uiManager.justActivated = false;
+          keymanweb.uiManager.setActivatingUI(false);
+
+          if(layout.oskView.vkbd) {
+            layout.oskView.vkbd.currentKey=null;
+          }
+
+          if(layout.oskView.vkbd) {
+            this.startWidth  = layout.oskView.vkbd.kbdDiv.offsetWidth;
+            this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
+          }
+          layout.oskView.doResizeMove();
+          layout.oskView.saveCookie();
+        }
       }
-    }
 
-    /**
-     * Function     _VResizeMoveMouseUp
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process mouse up during resizing of KMW UI
-     */
-    private _VResizeMouseUp(e: MouseEvent) {
-      if(!e) {
-        return true;
-      }
-
-      this._mouseStartSnapshot.restore();
-      this._mouseStartSnapshot = null;
-      
-      if(this.oskView.vkbd) {
-        this.oskView.vkbd.currentKey=null;
-      }
-
-      let keymanweb = com.keyman.singleton;
-
-      keymanweb.domManager.focusLastActiveElement();
-
-      keymanweb.uiManager.justActivated = false;
-      keymanweb.uiManager.setActivatingUI(false);
-
-      if(this.oskView.vkbd) {
-        this._VOriginalWidth = this.oskView.vkbd.kbdDiv.offsetWidth;
-        this._VOriginalHeight = this.oskView.vkbd.kbdDiv.offsetHeight;
-      }
-
-      this.oskView.doResizeMove();
-      this.oskView.saveCookie();
-
-      e.preventDefault();
-      e.cancelBubble = true;
-      return false;
+      return this._resizeHandler;
     }
   }
 }

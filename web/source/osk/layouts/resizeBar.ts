@@ -9,8 +9,12 @@ namespace com.keyman.osk.layouts {
       return false;
     };
 
-    public constructor() {
+    public constructor(dragHandler?: MouseDragOperation) {
       this._element = this.buildResizeBar();
+
+      if(dragHandler) {
+        this._resizeHandle.onmousedown = dragHandler.mouseDownHandler;
+      }
     }
 
     public get element(): HTMLDivElement {
