@@ -19,7 +19,6 @@ namespace com.keyman.osk.layouts {
 
     // Resize-event temporary storage
     private _mouseStartSnapshot: MouseStartSnapshot;
-    //private _VPreviousMouseButton: number;
 
     public constructor() {
       this.titleBar = new layouts.TitleBar();
