@@ -4,9 +4,7 @@
 // Includes the banner
 /// <reference path="./bannerManager.ts" />
 // Defines desktop-centric OSK positioning + sizing behavior
-/// <reference path="layouts/titleBar.ts" />
-// Defines desktop-centric OSK positioning + sizing behavior
-/// <reference path="layouts/resizeBar.ts" />
+/// <reference path="layouts/targetedFloatLayout.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 
@@ -27,8 +25,7 @@ namespace com.keyman.osk {
     banner: BannerManager;
     vkbd: VisualKeyboard;
 
-    desktopTitleBar: layouts.TitleBar;
-    desktopResizeBar: layouts.ResizeBar;
+    desktopLayout: layouts.TargetedFloatLayout;
 
     ready: boolean = false;
     loadRetry: number = 0;
@@ -161,8 +158,8 @@ namespace com.keyman.osk {
 
       this.loadRetry = 0;
 
-      if(this.desktopTitleBar) {
-        this.desktopTitleBar.setTitle('KeymanWeb'); // I1972
+      if(this.desktopLayout) {
+        this.desktopLayout.titleBar.setTitle('KeymanWeb'); // I1972
       }
 
 
@@ -214,8 +211,8 @@ namespace com.keyman.osk {
       // (Probably to avoid having a null keyboard. But maybe that *is* an option, if there remains a way to get the language menu,
       //  such as a minimized menu button?)
       if(activeKeyboard == null && !device.touchable) {
-        this.desktopTitleBar = new layouts.TitleBar();
-        this._Box.appendChild(this.desktopTitleBar.element);
+        const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+        this._Box.appendChild(layout.titleBar.element);
 
         Ldiv = util._CreateElement('div');
         Ldiv.className='kmw-osk-none';
@@ -236,8 +233,8 @@ namespace com.keyman.osk {
           this._GenerateVisualKeyboard(null);
         } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
           //osk.ddOSK = false;
-          this.desktopTitleBar = new layouts.TitleBar();
-          this._Box.appendChild(this.desktopTitleBar.element);
+          const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+          this._Box.appendChild(layout.titleBar.element);
           this._Box.appendChild(this.banner.element);
 
           //Add content
@@ -250,8 +247,8 @@ namespace com.keyman.osk {
           }
         }
 
-        if(this.desktopTitleBar) {
-          this.desktopTitleBar.setTitleFromKeyboard(activeKeyboard);
+        if(this.desktopLayout) {
+          this.desktopLayout.titleBar.setTitleFromKeyboard(activeKeyboard);
         }
       }
 
@@ -341,10 +338,11 @@ namespace com.keyman.osk {
       // Set box class - OS and keyboard added for Build 360
       this._Box.className=util.device.formFactor+' '+ util.device.OS.toLowerCase() + ' kmw-osk-frame';
 
+      const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+
       // Add header element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
-        this.desktopTitleBar = new layouts.TitleBar();
-        this._Box.appendChild(this.desktopTitleBar.element);
+        this._Box.appendChild(layout.titleBar.element);
       }
 
       // Add suggestion banner bar to OSK
@@ -357,8 +355,7 @@ namespace com.keyman.osk {
 
       // Add footer element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
-        this.desktopResizeBar = new layouts.ResizeBar();
-        this._Box.appendChild(this.desktopResizeBar.element);
+        this._Box.appendChild(layout.resizeBar.element);
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {
         this.vkbd.adjustHeights(this);
@@ -400,8 +397,8 @@ namespace com.keyman.osk {
       }
 
       this.doResizeMove(); //allow the UI to respond to OSK movements
-      if(this.desktopTitleBar) {
-        this.desktopTitleBar.showPin(false);
+      if(this.desktopLayout) {
+        this.desktopLayout.titleBar.showPin(false);
       }
     }.bind(this);
 
@@ -610,8 +607,8 @@ namespace com.keyman.osk {
       this._VMoveX = Lposx - this._Box.offsetLeft;
       this._VMoveY = Lposy - this._Box.offsetTop;
 
-      if(keymanweb.isCJK() && this.desktopTitleBar) {
-        this.desktopTitleBar.setPinCJKOffset();
+      if(keymanweb.isCJK() && this.desktopLayout) {
+        this.desktopLayout.titleBar.setPinCJKOffset();
       }
 
       document.onmousemove = this._VMoveMouseMove;
@@ -647,8 +644,8 @@ namespace com.keyman.osk {
       this.resizing = true;
 
       this.userPositioned = true;
-      if(this.desktopTitleBar) {
-        this.desktopTitleBar.showPin(true);
+      if(this.desktopLayout) {
+        this.desktopLayout.titleBar.showPin(true);
       }
 
       if(this._VPreviousMouseButton != (typeof(e.which)=='undefined' ? e.button : e.which)) { // I1472 - Dragging off edge of browser window causes muckup
@@ -996,8 +993,8 @@ namespace com.keyman.osk {
 
         // Fix or release user resizing
         if('nosize' in p) {
-          if(this.desktopResizeBar) {
-            this.desktopResizeBar.allowResizing(!p['nosize']);
+          if(this.desktopLayout) {
+            this.desktopLayout.resizeBar.allowResizing(!p['nosize']);
           }
         }
 
@@ -1005,8 +1002,8 @@ namespace com.keyman.osk {
       // Fix or release user dragging
       if('nomove' in p) {
         this.noDrag=p['nomove'];
-        if(this.desktopTitleBar) {
-          this.desktopTitleBar.showPin(!(p['nomove'] || !this.userPositioned));
+        if(this.desktopLayout) {
+          this.desktopLayout.titleBar.showPin(!(p['nomove'] || !this.userPositioned));
         }
       }
       // Save the user-defined OSK size
@@ -1063,8 +1060,8 @@ namespace com.keyman.osk {
         }
       }
 
-      if(this.desktopTitleBar) {
-        this.desktopTitleBar.showPin(this.userPositioned);
+      if(this.desktopLayout) {
+        this.desktopLayout.titleBar.showPin(this.userPositioned);
       }
     }
 
@@ -1175,8 +1172,8 @@ namespace com.keyman.osk {
 
         this.saveCookie();
 
-        if(this.desktopTitleBar) {
-          this.desktopTitleBar.showPin(this.userPositioned);
+        if(this.desktopLayout) {
+          this.desktopLayout.titleBar.showPin(this.userPositioned);
         }
       }
 
