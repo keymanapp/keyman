@@ -1,42 +1,8 @@
 /// <reference path="resizeBar.ts" />
 /// <reference path="titleBar.ts" />
+/// <reference path="mouseStartSnapshot.ts" />
 
 namespace com.keyman.osk.layouts {
-  type MouseHandler = (this: GlobalEventHandlers, ev: MouseEvent) => any;
-
-  /**
-   * Used to temporarily store the page's original mouse handlers when
-   * overridden by the OSK resizing handlers during an ongoing move or
-   * resize event.
-   */
-  class MousePropertyBackup {
-    private readonly _VPreviousMouseMove: MouseHandler;
-    private readonly _VPreviousMouseUp: MouseHandler;
-    private readonly _VPreviousCursor: string;
-    private readonly _VPreviousMouseButton: number;
-
-    constructor(e: MouseEvent) {
-      this._VPreviousMouseMove = document.onmousemove;
-      this._VPreviousMouseUp = document.onmouseup;
-
-      this._VPreviousCursor = document.body.style.cursor;
-      this._VPreviousMouseButton = (typeof(e.which)=='undefined' ? e.button : e.which);
-    }
-
-    restore() {
-      document.onmousemove = this._VPreviousMouseMove;
-      document.onmouseup = this._VPreviousMouseUp;
-
-      if(document.body.style.cursor) {
-        document.body.style.cursor = this._VPreviousCursor;
-      }
-    }
-
-    matchesCausingClick(e: MouseEvent): boolean {
-      return this._VPreviousMouseButton == (typeof(e.which)=='undefined' ? e.button : e.which);
-    }
-  }
-  
   export class TargetedFloatLayout {
     titleBar: layouts.TitleBar;
     resizeBar: layouts.ResizeBar;
@@ -52,7 +18,7 @@ namespace com.keyman.osk.layouts {
     private _VOriginalHeight: number;
 
     // Resize-event temporary storage
-    private _previousMouseProperties: MousePropertyBackup;
+    private _mouseStartSnapshot: MouseStartSnapshot;
     //private _VPreviousMouseButton: number;
 
     public constructor() {
@@ -66,8 +32,8 @@ namespace com.keyman.osk.layouts {
       this.resizeBar.handle.onmouseout  = this._VResizeMouseOut.bind(this);
     }
 
-    public get resizing(): boolean {
-      return !!this._previousMouseProperties;
+    public get isMovingOrResizing(): boolean {
+      return !!this._mouseStartSnapshot;
     }
 
     attachToView(view: OSKManager) {
@@ -127,8 +93,8 @@ namespace com.keyman.osk.layouts {
       this._ResizeMouseX = Lposx;
       this._ResizeMouseY = Lposy;
 
-      if(!this._previousMouseProperties) { // I1472 - Dragging off edge of browser window causes muckup
-        this._previousMouseProperties = new MousePropertyBackup(e);
+      if(!this._mouseStartSnapshot) { // I1472 - Dragging off edge of browser window causes muckup
+        this._mouseStartSnapshot = new MouseStartSnapshot(e);
       }
 
       this._VOriginalWidth = this.oskView.vkbd.kbdDiv.offsetWidth;
@@ -157,7 +123,7 @@ namespace com.keyman.osk.layouts {
         return true;
       }
 
-      if(!this._previousMouseProperties.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
+      if(!this._mouseStartSnapshot.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
         return this._VResizeMoveMouseUp(e);
       } else {
         var Lposx, Lposy;
@@ -219,8 +185,8 @@ namespace com.keyman.osk.layouts {
         Lposy = e.clientY + document.body.scrollTop;
       }
 
-      if(!this._previousMouseProperties) { // I1472 - Dragging off edge of browser window causes muckup
-        this._previousMouseProperties = new MousePropertyBackup(e);
+      if(!this._mouseStartSnapshot) { // I1472 - Dragging off edge of browser window causes muckup
+        this._mouseStartSnapshot = new MouseStartSnapshot(e);
       }
 
       this._VMoveX = Lposx - this.oskView._Box.offsetLeft;
@@ -258,7 +224,7 @@ namespace com.keyman.osk.layouts {
       this.oskView.userPositioned = true;
       this.titleBar.showPin(true);
 
-      if(!this._previousMouseProperties.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
+      if(!this._mouseStartSnapshot.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
         return this._VResizeMoveMouseUp(e);
       } else {
         var Lposx, Lposy;
@@ -302,8 +268,8 @@ namespace com.keyman.osk.layouts {
         this.oskView.vkbd.currentKey=null;
       }
 
-      this._previousMouseProperties.restore();
-      this._previousMouseProperties = null;
+      this._mouseStartSnapshot.restore();
+      this._mouseStartSnapshot = null;
 
       keymanweb.domManager.focusLastActiveElement();
 
