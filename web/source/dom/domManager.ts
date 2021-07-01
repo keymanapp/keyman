@@ -1478,8 +1478,7 @@ namespace com.keyman.dom {
      * Description  KMW window initialization  
      */    
     init: (arg: com.keyman.OptionType) => Promise<any> = function(this: DOMManager, arg): Promise<any> { 
-      var i,j,c,e,p,eTextArea,eInput,opt,dTrailer,ds;
-      var osk = this.keyman.osk;
+      var p,opt,dTrailer,ds;
       var util = this.keyman.util;
       var device = util.device;
 
@@ -1587,9 +1586,8 @@ namespace com.keyman.dom {
       this.keyman.setInitialized(1);
 
       // Finish keymanweb and OSK initialization once all necessary resources are available
-      if(osk) {
-        osk.prepare();
-      }
+      const osk = this.keyman.osk = new com.keyman.osk.OSKManager();
+      this.keyman.osk.prepare();
     
       // Create and save the remote keyboard loading delay indicator
       util.prepareWait();

@@ -27,7 +27,7 @@ if(!window['keyman']['ui']['name']) {
   try {
 
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
-    var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'];
+    var keymanweb=window['keyman'],util=keymanweb['util'];
     var dbg=keymanweb['debug'];
     
     // Disable UI for touch devices
@@ -113,65 +113,71 @@ if(!window['keyman']['ui']['name']) {
     keymanweb['addEventListener']('controlfocused',function(params){ui.doFocus(params.target,true, params['activeControl']);});
     keymanweb['addEventListener']('controlblurred',function(params){ui.doFocus(params.target,false, null);});
 
-    osk['addEventListener']('show',
-      function(oskPosition)
-      {
-        // Ensure that the ui.controller is visible if help is displayed
-        ui.controller.style.display = 'block';
-        ui.oskButton._setSelected(true);
-      
-  /* The following is probably not needed for KMW2, since OSK position is set by KMW, not by the UI        
-        //TODO:  This may not be correct - may need to refer to userLocated argument, not function???
-        // Check if OSK position is user-defined, return if so
-        if (osk['userLocated']()) return oskPosition;
-      
-        // Otherwise, return the position with respect to the focussed element
-        var someElement = keymanweb['getLastActiveElement'](), x, y, w, h, p;
-        if(someElement != null)
+    ui.registerEvents = function() {
+      let osk = keymanweb.osk;
+
+      if(!osk) {
+        return;
+      }
+
+      osk['addEventListener']('show',
+        function(oskPosition)
         {
-          p = util['getAbsolute'](someElement); x = p['x']; y = p['y'];
-          if(someElement.parentWindow && someElement.parentWindow.frameElement)
+          // Ensure that the ui.controller is visible if help is displayed
+          ui.controller.style.display = 'block';
+          ui.oskButton._setSelected(true);
+        
+    /* The following is probably not needed for KMW2, since OSK position is set by KMW, not by the UI        
+          //TODO:  This may not be correct - may need to refer to userLocated argument, not function???
+          // Check if OSK position is user-defined, return if so
+          if (osk['userLocated']()) return oskPosition;
+        
+          // Otherwise, return the position with respect to the focussed element
+          var someElement = keymanweb['getLastActiveElement'](), x, y, w, h, p;
+          if(someElement != null)
           {
-            w = someElement.parentWindow.frameElement.clientWidth;
-            h = someElement.parentWindow.frameElement.clientHeight;
-          }
-          else if(someElement.defaultView && someElement.defaultView.frameElement)
-          { 
-            w = someElement.defaultView.frameElement.clientWidth;
-            h = someElement.defaultView.frameElement.clientHeight;
+            p = util['getAbsolute'](someElement); x = p['x']; y = p['y'];
+            if(someElement.parentWindow && someElement.parentWindow.frameElement)
+            {
+              w = someElement.parentWindow.frameElement.clientWidth;
+              h = someElement.parentWindow.frameElement.clientHeight;
+            }
+            else if(someElement.defaultView && someElement.defaultView.frameElement)
+            { 
+              w = someElement.defaultView.frameElement.clientWidth;
+              h = someElement.defaultView.frameElement.clientHeight;
+            }
+            else
+            {
+              w = someElement.offsetWidth;
+              h = someElement.offsetHeight;
+            }
+      //TODO:  check the logic of this - it doesn't look right!!!  Signs on top, height??
+            var r = osk['getRect']();
+            x += 32;
+            if(y + h + (r.height - r.top) > (window.clientHeight?window.clientHeight:window.innerHeight) + document.documentElement.scrollTop && 
+              y - (r.height - r.top) >= document.documentElement.scrollTop)
+            {
+              y -= (r.height - r.top);
+            }
+            else
+              y += h;
           }
           else
           {
-            w = someElement.offsetWidth;
-            h = someElement.offsetHeight;
+            x = ui.controller.offsetLeft;
+            y = ui.controller.offsetTop + ui.controller.offsetHeight;
           }
-    //TODO:  check the logic of this - it doesn't look right!!!  Signs on top, height??
-          var r = osk['getRect']();
-          x += 32;
-          if(y + h + (r.height - r.top) > (window.clientHeight?window.clientHeight:window.innerHeight) + document.documentElement.scrollTop && 
-            y - (r.height - r.top) >= document.documentElement.scrollTop)
-          {
-            y -= (r.height - r.top);
-          }
-          else
-            y += h;
-        }
-        else
-        {
-          x = ui.controller.offsetLeft;
-          y = ui.controller.offsetTop + ui.controller.offsetHeight;
-        }
-        oskPosition['x'] = x; 
-        oskPosition['y'] = y; 
-  */      
-        return oskPosition;
+          oskPosition['x'] = x; 
+          oskPosition['y'] = y; 
+    */      
+          return oskPosition;
+        });
+      
+      osk['addEventListener']('hide', function(byUser) {
+          if(byUser['HiddenByUser']) ui.oskButton._setSelected(false);
       });
-    
-    osk['addEventListener']('hide',
-      function(byUser)
-      {
-        if(byUser['HiddenByUser']) ui.oskButton._setSelected(false);
-      });
+    };
     
     /**
      * Toggle the on screen keyboard display - KMW button control event 
@@ -181,7 +187,7 @@ if(!window['keyman']['ui']['name']) {
       // Check that user control of OSK is allowed
       if((keymanweb['getActiveKeyboard']() == '') || keymanweb['isCJK']() ) return;  
       
-      osk['show'](!osk['isEnabled']());  
+      keymanweb.osk['show'](!keymanweb.osk['isEnabled']());  
     }
     
     /**
@@ -441,7 +447,7 @@ if(!window['keyman']['ui']['name']) {
 
       // Then update the keyboard list if keyboards already loaded (i.e. in page script)
       ui.updateKeyboardList();     
-      
+      ui.registerEvents();
     }
 
     ui.shutdown = function() {

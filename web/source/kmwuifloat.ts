@@ -29,7 +29,6 @@ if(!window['keyman']['ui']['name']) {
     // Declare KeymanWeb, OnScreen keyboard and Util objects
     var keymanweb=window['keyman'];
     var util=keymanweb['util'];
-    var osk=keymanweb['osk'];
     var dbg=keymanweb['debug'];
 
     // Disable UI for touch devices
@@ -57,8 +56,9 @@ if(!window['keyman']['ui']['name']) {
      */     
     ui.toggleOSK = function()
     {
+      let osk = keymanweb.osk;
       keymanweb['focusLastActiveElement']();
-      if(osk['show']) 
+      if(osk && osk['show']) 
       {
         if(osk['isEnabled']()) osk['hide'](); else osk['show'](true);
       }
@@ -71,7 +71,7 @@ if(!window['keyman']['ui']['name']) {
      * Scope        Private   
      * Description  UI Initialization
      **/
-    ui.Initialize = function()
+    ui['initialize'] = ui.Initialize = function()
     { 
       // Must always initialize after keymanWeb itself, otherwise options are undefined
       if(!keymanweb['initialized'])
@@ -328,7 +328,11 @@ if(!window['keyman']['ui']['name']) {
           // (Conditionally) display the OSK button, and set the style 
           ui.addButtonOSK();        
         });
-                      
+      
+      let osk = keymanweb.osk;
+      if(!osk) {
+        return;
+      }
       /**
        * Show OSK event handler: show or hide the OSK button (never display if a CJK keyboard)
        */                
@@ -475,7 +479,7 @@ if(!window['keyman']['ui']['name']) {
         else 
         {
           ui.oskButton.style.display = 'block';
-          ui.oskButtonState(osk['isEnabled']());
+          ui.oskButtonState(keymanweb.osk['isEnabled']());
           ui.outerDiv.style.width = ui.KeyboardSelector.offsetWidth+56+'px';
         }      
       }

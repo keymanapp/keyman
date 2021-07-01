@@ -147,7 +147,7 @@ namespace com.keyman {
       this['interface'] = this.core.keyboardInterface;
 
       this.modelManager = new text.prediction.ModelManager();
-      this.osk = this['osk'] = new com.keyman.osk.OSKManager();
+      this.osk = this['osk'] = null;
 
       // Load properties from their static variants.
       this['build'] = com.keyman.environment.BUILD;
