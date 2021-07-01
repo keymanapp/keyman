@@ -71,7 +71,6 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
 * ProcessEvent organizes the messages and gives them to the appropriate routines to
 * process, and checks the state of Windows for the keyboard handling.
 */
-
 KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers)
 {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
@@ -142,10 +141,9 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
 *
 *   Called by:  ProcessEvent, recursive inside groups
 *
-* ProcessKey is where the keystroke conversion and output takes place.  This routine
+* ProcessGroup is where the keystroke conversion and output takes place.  This routine
 * has a lot of crucial code in it!
 */
-
 KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 {
   KMX_DWORD i;
@@ -381,12 +379,11 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 *
 * Returns:  0 to continue, 1 and 2 to return.
 *
-*   Called by:  ProcessKey
+*   Called by:  ProcessGroup
 *
 * PostString posts a string of "context", "index", "beep", characters and virtual keys
 * to the active application, via the Keyman PostKey buffer.
 */
-
 int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr, KMX_BOOL *pOutputKeystroke)
 {
   PKMX_WCHAR p, q, temp;
@@ -561,11 +558,10 @@ KMX_BOOL KMX_ProcessEvent::IsMatchingPlatform(LPSTORE s)  // I3432
 *
 * Returns:    0 on OK, 1 on not equal
 *
-*   Called by:  ProcessKey
+*   Called by:  ProcessGroup
 *
 * ContextMatch compares the context of a rule with the current context.
 */
-
 KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
 {
   KMX_WORD /*i,*/ n;

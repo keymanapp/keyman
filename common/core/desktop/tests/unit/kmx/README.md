@@ -52,11 +52,18 @@ c expected: pass.pass.pass.pass.pass.pass.
 
 ## Running the tests
 
-All tests can be run at once with `meson test`.
+All tests can be run at once with `./build.sh --debug tests`.
 
 Alternatively it's possible to run a single test with:
 
 ```bash
 cd common/core/desktop
-build/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys.kmn' 'tests/unit/kmx/038 - punctkeys.kmx'
+build/arch/debug/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys.kmn' 'tests/unit/kmx/038 - punctkeys.kmx'
+```
+
+or shorter:
+
+```bash
+cd common/core/desktop
+build/arch/debug/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys'.km{n,x}
 ```
