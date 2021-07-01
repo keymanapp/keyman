@@ -1,3 +1,5 @@
+/// <reference path="mouseDragOperation.ts" />
+
 namespace com.keyman.osk.layouts {
   export class TitleBar {
     private _element: HTMLDivElement;
@@ -7,9 +9,13 @@ namespace com.keyman.osk.layouts {
     private _configButton: HTMLDivElement;
     private _caption: HTMLSpanElement;
 
-    public constructor() {
+    public constructor(dragHandler?: MouseDragOperation) {
       this._element = this.buildTitleBar();
       this.attachHandlers();
+
+      if(dragHandler) {
+        this.element.onmousedown = dragHandler.mouseDownHandler;
+      }
     }
 
     private mouseCancellingHandler: (ev: MouseEvent) => boolean = function(ev: MouseEvent) {

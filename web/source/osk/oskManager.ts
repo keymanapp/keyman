@@ -717,6 +717,7 @@ namespace com.keyman.osk {
         this.noDrag=p['nomove'];
         if(this.desktopLayout) {
           this.desktopLayout.titleBar.showPin(!(p['nomove'] || !this.userPositioned));
+          this.desktopLayout.movementEnabled = !this.noDrag;
         }
       }
       // Save the user-defined OSK size
