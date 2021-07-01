@@ -888,10 +888,14 @@ namespace com.keyman.keyboards {
     };
 
     /**
-     * Return a Promise of the merged keyboard stubs and error stubs
-     * @param {(KeyboardStub|ErrorStub)[]} keyboardStubs 
-     * @param {ErrorStub[]} errorStubs 
-     * @returns {Promise<KeyboardStub|ErrorStub)[]>}
+     * Returns a Promise of the merged keyboard stubs and error stubs.
+     * 
+     * If the keyboard stub array is empty, will return a rejected Promise, 
+     * otherwise returns a resolved Promise.
+     *
+     * @param keyboardStubs  array of keyboard stubs to merge.
+     * @param errorStubs     array of error stubs to merge.
+     * @returns  resolved or rejected promise with merged array of stubs.
      */
     private mergeStubs(keyboardStubs: (KeyboardStub|ErrorStub)[], errorStubs: ErrorStub[]) :
         Promise<(KeyboardStub|ErrorStub)[]> {
