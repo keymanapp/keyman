@@ -59,6 +59,8 @@ namespace com.keyman.keyboards {
     'KFont': KeyboardFont;
     'KOskFont': KeyboardFont;
 
+    'displayName': string; // Display name as shown on spacebar
+
     // Used when loading a stub's keyboard.
     asyncLoader?: any;
 
@@ -658,7 +660,7 @@ namespace com.keyman.keyboards {
               manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
               manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
             }
-            
+
             manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);
 
             // Prepare and show the OSK for this keyboard

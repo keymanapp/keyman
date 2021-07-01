@@ -124,7 +124,7 @@ namespace com.keyman.osk {
       }
 
       // re-use canvas object for better performance
-      var canvas: HTMLCanvasElement = OSKKey.getTextMetrics['canvas'] || 
+      var canvas: HTMLCanvasElement = OSKKey.getTextMetrics['canvas'] ||
                                      (OSKKey.getTextMetrics['canvas'] = document.createElement("canvas"));
       var context = canvas.getContext("2d");
       context.font = fontSize + " " + fontFamily;
@@ -748,8 +748,8 @@ namespace com.keyman.osk {
       } else if(newWidth > 0.9*screen.width) {
         newWidth=0.9*screen.width;
       }
-  
-      // Default height decision made here: 
+
+      // Default height decision made here:
       // https://github.com/keymanapp/keyman/pull/4279#discussion_r560453929
       newHeight=util.toNumber(c['height'], 0.333 * newWidth);
 
@@ -764,8 +764,8 @@ namespace com.keyman.osk {
 
     /**
      * Sets & tracks the size of the VisualKeyboard's primary element.
-     * @param width 
-     * @param height 
+     * @param width
+     * @param height
      * @param pending Set to `true` if called during a resizing interaction
      */
     public setSize(width: number, height: number, pending?: boolean) {
@@ -1839,7 +1839,7 @@ namespace com.keyman.osk {
 
         // Preference order:
         // #1:  if a default subkey has been specified, select it.  (pending, for 15.0+)
-        // #2:  if no default subkey is specified, default to a subkey with the same 
+        // #2:  if no default subkey is specified, default to a subkey with the same
         //      key ID and layer / modifier spec.
         //if(skSpec.isDefault) { TODO for 15.0
         //  bk = skElement;
@@ -1870,16 +1870,36 @@ namespace com.keyman.osk {
     showLanguage() {
       let keyman = com.keyman.singleton;
 
-      var lgName='',kbdName='';
-      var activeStub = keyman.keyboardManager.activeStub;
+      let displayName: string = undefined;
+      let activeStub = keyman.keyboardManager.activeStub;
 
       if(activeStub) {
-        lgName=activeStub['KL'];
-        kbdName=activeStub['KN'];
-      } else if(keyman.getActiveLanguage(true)) {
-        lgName=keyman.getActiveLanguage(true);
+        if(activeStub['displayName']) {
+          displayName = activeStub['displayName'];
+        } else {
+          let
+            lgName: string = activeStub['KL'],
+            kbdName: string = activeStub['KN'];
+          kbdName = kbdName.replace(/\s*keyboard\s*/i,'');
+          switch(keyman.options['spacebarText']) {
+            case SpacebarText.KEYBOARD:
+              displayName = kbdName;
+              break;
+            case SpacebarText.LANGUAGE:
+              displayName = lgName;
+              break;
+            case SpacebarText.LANGUAGE_KEYBOARD:
+              displayName = (kbdName == lgName) ? lgName : lgName + ' - ' + kbdName;
+              break;
+            case SpacebarText.BLANK:
+              displayName = '';
+              break;
+            default:
+              displayName = kbdName;
+          }
+        }
       } else {
-        lgName='(System keyboard)';
+        displayName = '(System keyboard)';
       }
 
       try {
@@ -1891,19 +1911,13 @@ namespace com.keyman.osk {
           tParent.className +=' kmw-spacebar';
         }
 
-        t.className='kmw-spacebar-caption';
-        kbdName=kbdName.replace(/\s*keyboard\s*/i,'');
-
-        // We use a separate variable here to keep down on MutationObserver messages in keymanweb.js code.
-        var keyboardName = "";
-        if(kbdName == lgName) {
-          keyboardName=lgName;
-        } else {
-          keyboardName=lgName+' ('+kbdName+')';
+        if(t.className != 'kmw-spacebar-caption') {
+          t.className='kmw-spacebar-caption';
         }
+
         // It sounds redundant, but this dramatically cuts down on browser DOM processing.
-        if(t.innerHTML != keyboardName) {
-          t.innerHTML = keyboardName;
+        if(t.innerText != displayName) {
+          t.innerText = displayName;
         }
       }
       catch(ex){}
