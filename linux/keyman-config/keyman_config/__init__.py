@@ -39,9 +39,9 @@ else:
 KeymanDownloadsUrl = 'https://downloads.keyman.com'
 
 if 'unittest' in sys.modules.keys():
-    print('Not reporting to Sentry')
+    print('Not reporting to Sentry', file=sys.stderr)
 elif os.environ.get('KEYMAN_NOSENTRY'):
-    print('Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set')
+    print('Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set', file=sys.stderr)
 else:
     try:
         # Try new sentry-sdk first
@@ -87,4 +87,4 @@ else:
             })
         except ImportError:
             # even raven is not available. This is the case on Ubuntu 16.04. Just ignore.
-            print(_('Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting.'))
+            print(_('Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting.'), file=sys.stderr)
