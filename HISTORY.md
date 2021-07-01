@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.79 alpha 2021-07-01
+
+* docs: start consolidation of build config docs (#5324)
+* fix(developer): builder and editor commands were ignored (#5391)
+* chore(developer): remove obsolete InitClasses (#5403)
+* change(web): fat-finger-performance unit-test threshold (#5404)
+* fix(linux): Fix auto-generated help (#5399)
+* fix(linux): Improve bitmap conversion (#5401)
+
 ## 15.0.78 alpha 2021-06-30
 
 * fix(web): console errors when using SHIFT w help-text 'osk' (#5392)
