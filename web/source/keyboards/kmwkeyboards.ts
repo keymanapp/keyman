@@ -897,7 +897,7 @@ namespace com.keyman.keyboards {
      * @param errorStubs     array of error stubs to merge.
      * @returns  resolved or rejected promise with merged array of stubs.
      */
-    private mergeStubs(keyboardStubs: (KeyboardStub|ErrorStub)[], errorStubs: ErrorStub[]) :
+    private mergeAndResolveStubPromises(keyboardStubs: (KeyboardStub|ErrorStub)[], errorStubs: ErrorStub[]) :
         Promise<(KeyboardStub|ErrorStub)[]> {
       if (errorStubs.length == 0) {
         return Promise.resolve(keyboardStubs);
@@ -913,8 +913,8 @@ namespace com.keyman.keyboards {
     /**
      * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
      *
-     * @param {(string|KeyboardStub)[]} x keyboard name string or keyboard metadata JSON object
-     *
+     * @param x  keyboard name string or keyboard metadata JSON object
+     * @returns resolved or rejected promise with merged array of stubs.
      */
     async addKeyboardArray(x: (string|KeyboardStub)[]): Promise<(KeyboardStub|ErrorStub)[]> {
       let errorStubs: ErrorStub[] = [];
@@ -1022,7 +1022,7 @@ namespace com.keyman.keyboards {
       // Return if all keyboards being registered are local and fully specified
       try {
         if(cloudList.length == 0) {
-          return this.mergeStubs(keyboardStubs, errorStubs);
+          return this.mergeAndResolveStubPromises(keyboardStubs, errorStubs);
         }
       } catch (error) {
         console.error(error);
@@ -1039,7 +1039,7 @@ namespace com.keyman.keyboards {
       // Request keyboard metadata from the Keyman Cloud keyboard metadata server
       try {
         let result: (KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest(cmd,false);
-        return this.mergeStubs(result, errorStubs);
+        return this.mergeAndResolveStubPromises(result, errorStubs);
       } catch(err) {
         // We don't have keyboard info for this ErrorStub
         console.error(err);
@@ -1290,7 +1290,7 @@ namespace com.keyman.keyboards {
         try {
           // Merge this with errorStub
           let result:(KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest('&keyboardid='+cmd, false);
-          return this.mergeStubs(result, errorStubs);
+          return this.mergeAndResolveStubPromises(result, errorStubs);
         } catch(err) {
             // We don't have language info for this ErrorStub
             console.error(err);
