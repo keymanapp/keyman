@@ -67,6 +67,7 @@ namespace com.keyman.osk {
         // exist; all subkey control is delegated to the app.
         //
         // No function = big problem.
+        console.error("Missing `oskCreatePopup` function for engine integration.");
         return null;
       }
     };
