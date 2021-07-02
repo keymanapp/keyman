@@ -26,11 +26,12 @@ namespace com.keyman.text {
    */    
   KeyboardInterface.prototype.registerStub = function(Pstub): number {
     let keyman = com.keyman.singleton;
+    let status = null;
     keyman.keyboardManager._registerStub(Pstub).then(result => {
-      return result
+      status = result;
     });
 
-    return null;
+    return status;
   }
 
   /**
