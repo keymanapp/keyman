@@ -126,51 +126,7 @@ if(!window['keyman']['ui']['name']) {
           // Ensure that the ui.controller is visible if help is displayed
           ui.controller.style.display = 'block';
           ui.oskButton._setSelected(true);
-        
-    /* The following is probably not needed for KMW2, since OSK position is set by KMW, not by the UI        
-          //TODO:  This may not be correct - may need to refer to userLocated argument, not function???
-          // Check if OSK position is user-defined, return if so
-          if (osk['userLocated']()) return oskPosition;
-        
-          // Otherwise, return the position with respect to the focussed element
-          var someElement = keymanweb['getLastActiveElement'](), x, y, w, h, p;
-          if(someElement != null)
-          {
-            p = util['getAbsolute'](someElement); x = p['x']; y = p['y'];
-            if(someElement.parentWindow && someElement.parentWindow.frameElement)
-            {
-              w = someElement.parentWindow.frameElement.clientWidth;
-              h = someElement.parentWindow.frameElement.clientHeight;
-            }
-            else if(someElement.defaultView && someElement.defaultView.frameElement)
-            { 
-              w = someElement.defaultView.frameElement.clientWidth;
-              h = someElement.defaultView.frameElement.clientHeight;
-            }
-            else
-            {
-              w = someElement.offsetWidth;
-              h = someElement.offsetHeight;
-            }
-      //TODO:  check the logic of this - it doesn't look right!!!  Signs on top, height??
-            var r = osk['getRect']();
-            x += 32;
-            if(y + h + (r.height - r.top) > (window.clientHeight?window.clientHeight:window.innerHeight) + document.documentElement.scrollTop && 
-              y - (r.height - r.top) >= document.documentElement.scrollTop)
-            {
-              y -= (r.height - r.top);
-            }
-            else
-              y += h;
-          }
-          else
-          {
-            x = ui.controller.offsetLeft;
-            y = ui.controller.offsetTop + ui.controller.offsetHeight;
-          }
-          oskPosition['x'] = x; 
-          oskPosition['y'] = y; 
-    */      
+
           return oskPosition;
         });
       
