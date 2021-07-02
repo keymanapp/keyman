@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 15.0.79 alpha 2021-07-01
+
+* docs: start consolidation of build config docs (#5324)
+* fix(developer): builder and editor commands were ignored (#5391)
+* chore(developer): remove obsolete InitClasses (#5403)
+* change(web): fat-finger-performance unit-test threshold (#5404)
+* fix(linux): Fix auto-generated help (#5399)
+* fix(linux): Improve bitmap conversion (#5401)
+
+## 15.0.78 alpha 2021-06-30
+
+* fix(web): console errors when using SHIFT w help-text 'osk' (#5392)
+
+## 15.0.77 alpha 2021-06-29
+
+* fix(windows): #5336 appcontext get to handle small buffer (#5383)
+* fix(common): get handle caller buffer size small than internal Fixes … (#5390)
+
+## 15.0.76 alpha 2021-06-28
+
+* feat(web): Add option useAlerts to control alerts() (#5302)
+* chore(android): Add help on Settings option to change spacebar caption (#5375)
+* feat(android): hide textarea for perf (#5376)
+* chore: keyboard_info.source.json 1.0.6 (#5379)
+* refactor(android): setKeyboard and setKeymanLanguage (#5338)
+* feat(web): Merge keyboard stub with error stub (#5340)
+* feat(linux): Add reference index page  (#5370)
+*  fix(linux): Fix restarting ibus when running with sudo  (#5371)
+* refactor(linux): Centralize paths (#5372)
+* fix(linux): Save QR code in temporary directory (#5373)
+
 ## 15.0.75 alpha 2021-06-25
 
 * fix(android): rotation is not updating keyboard (#5247)

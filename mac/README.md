@@ -1,13 +1,5 @@
 # Keyman for macOS
 
-## Mac Tools Requirements/Setup
-
-* Install [Homebrew] *technically optional, but highly recommended*
-* Install Xcode 12.0+
-* Accept the Xcode license `sudo xcodebuild -license accept`
-* Install [Carthage] (`brew install carthage`) *see Homebrew note below*
-* Install [cocoapods] (`brew install cocoapods`)
-* Install [coreutils] (`brew install coreutils`)
 
 ## Keyman for macOS Development
 
@@ -120,9 +112,4 @@ Then run this command to fix the build environment:
 
 `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer`
 
-
-[Homebrew]: https://brew.sh/
-[Carthage]: https://github.com/Carthage/Carthage/blob/master/README.md
-[cocoapods]: https://cocoapods.org/
-[coreutils]: https://www.gnu.org/software/coreutils/
 [Install Keyman for macOS]: https://help.keyman.com/products/mac/current-version/start/install-keyman

@@ -24,10 +24,17 @@
 /// <reference path="text/prediction/modelManager.ts" />
 
 /***
-   KeymanWeb 11.0
-   Copyright 2017-2019 SIL International
+   KeymanWeb 14.0
+   Copyright 2017-2021 SIL International
 ***/
 namespace com.keyman {
+
+  export enum SpacebarText {
+    KEYBOARD = 'keyboard',
+    LANGUAGE = 'language',
+    LANGUAGE_KEYBOARD = 'languageKeyboard',
+    BLANK = 'blank'
+  };
 
   export interface OptionType {
     root?: string;
@@ -37,6 +44,9 @@ namespace com.keyman {
     attachType?: 'auto' | 'manual' | ''; // If blank or undefined, attachType will be assigned to "auto" or "manual"
     ui?: string;
     setActiveOnRegister?: string; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
+
+    // Determines the default text shown on the spacebar, if undefined, LANGUAGE_KEYBOARD
+    spacebarText?: SpacebarText;
 
     // Determines whether or not KeymanWeb should display its own alert messages
     useAlerts?: boolean;
@@ -86,7 +96,7 @@ namespace com.keyman {
 
     touchAliasing: dom.DOMEventHandlers;
 
-    // Defines option-tracking object as a string map.
+    // Defines default option values
     options: OptionType = {
       root: '',
       resources: '',
@@ -95,6 +105,7 @@ namespace com.keyman {
       attachType: '',
       ui: null,
       setActiveOnRegister: 'true', // TODO: convert to boolean
+      spacebarText: SpacebarText.LANGUAGE_KEYBOARD,
 
       // Determines whether or not KeymanWeb should display its own alert messages
       useAlerts: true

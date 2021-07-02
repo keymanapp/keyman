@@ -389,7 +389,7 @@ async function loadSettings() {
   var commands = [];
 
   var command = function (cmd) {
-    if (navigator.userAgent.indexOf('TIKE') < 0) {
+    if (navigator.userAgent.indexOf('Keyman') < 0) {
       // Don't execute command if not in the correct host application (allows for browser-based testing)
       return false;
     }

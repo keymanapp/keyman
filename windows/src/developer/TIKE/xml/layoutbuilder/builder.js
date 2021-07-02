@@ -1119,7 +1119,7 @@ $(function () {
   this.commands = [];
 
   this.command = function (cmd) {
-    if (navigator.userAgent.indexOf('TIKE') < 0) {
+    if (navigator.userAgent.indexOf('Keyman') < 0) {
       return false;
     }
     // queue commands to build a single portmanteau command when we return to idle
