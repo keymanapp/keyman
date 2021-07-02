@@ -29,9 +29,6 @@ namespace com.keyman.osk {
 
     desktopLayout: layouts.TargetedFloatLayout;
 
-    ready: boolean = false;
-    loadRetry: number = 0;
-
     // OSK state fields
     _Visible: boolean = false;
     _Enabled: boolean = true;
@@ -56,58 +53,50 @@ namespace com.keyman.osk {
     stateBitmasks = text.Codes.stateBitmasks;
     keyCodes = text.Codes.keyCodes;
 
-    // First time initialization of OSK
-    prepare() {
+    public constructor() {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      // Defer loading the OSK until KMW code initialization complete
-      if(!keymanweb['initialized']) {
-        window.setTimeout(this.prepare.bind(this), 200);
-        return;
-      }
-
       // OSK initialization - create DIV and set default styles
-      if(!this.ready) {
-        this._Box = util._CreateElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
-        document.body.appendChild(this._Box);
 
-        // Install the default OSK stylesheet
-        util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
+      this._Box = util._CreateElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
+      document.body.appendChild(this._Box);
 
-        // For mouse click to prevent loss of focus
-        util.attachDOMEvent(this._Box, 'mousedown', function(obj){
-          keymanweb.uiManager.setActivatingUI(true);
+      // Install the default OSK stylesheet
+      util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
+
+      // For mouse click to prevent loss of focus
+      util.attachDOMEvent(this._Box, 'mousedown', function(obj){
+        keymanweb.uiManager.setActivatingUI(true);
+        return false;
+      });
+
+      // And to prevent touch event default behaviour on mobile devices
+      // TODO: are these needed, or do they interfere with other OSK event handling ????
+      if(util.device.touchable) { // I3363 (Build 301)
+        var cancelEventFunc = function(e) {
+          if(e.cancelable) {
+            e.preventDefault();
+          }
+          e.stopPropagation();
           return false;
+        };
+
+        util.attachDOMEvent(this._Box, 'touchstart', function(e) {
+          keymanweb.uiManager.setActivatingUI(true);
+          return cancelEventFunc(e);
         });
 
-        // And to prevent touch event default behaviour on mobile devices
-        // TODO: are these needed, or do they interfere with other OSK event handling ????
-        if(util.device.touchable) { // I3363 (Build 301)
-          var cancelEventFunc = function(e) {
-            if(e.cancelable) {
-              e.preventDefault();
-            }
-            e.stopPropagation();
-            return false;
-          };
+        util.attachDOMEvent(this._Box, 'touchend', cancelEventFunc);
+        util.attachDOMEvent(this._Box, 'touchmove', cancelEventFunc);
+        util.attachDOMEvent(this._Box, 'touchcancel', cancelEventFunc);
 
-          util.attachDOMEvent(this._Box, 'touchstart', function(e) {
-            keymanweb.uiManager.setActivatingUI(true);
-            return cancelEventFunc(e);
-          });
-
-          util.attachDOMEvent(this._Box, 'touchend', cancelEventFunc);
-          util.attachDOMEvent(this._Box, 'touchmove', cancelEventFunc);
-          util.attachDOMEvent(this._Box, 'touchcancel', cancelEventFunc);
-
-          // Can only get (initial) viewport scale factor after page is fully loaded!
-          this.vpScale=util.getViewportScale();
-        }
+        // Can only get (initial) viewport scale factor after page is fully loaded!
+        this.vpScale=util.getViewportScale();
       }
+
       this.loadCookie();
       this.banner = new BannerManager();
-      this.ready=true;
     }
 
     /**
@@ -132,18 +121,6 @@ namespace com.keyman.osk {
       let device = util.device;
 
       var activeKeyboard = keymanweb.core.activeKeyboard;
-
-      // If _Load called before OSK is ready, must wait and call again
-      if(this._Box == null) {
-        if(this.loadRetry >= 99) {
-          return; // fail silently, but should not happen
-        }
-        window.setTimeout(this._Load.bind(this), 100);
-        this.loadRetry++;
-        return;
-      }
-
-      this.loadRetry = 0;
 
       this._Visible = false;  // I3363 (Build 301)
       var s = this._Box.style;

@@ -158,15 +158,13 @@ namespace com.keyman.dom {
           osk._Enabled = true;
         } else {
           // Conditionally show the OSK when control receives the focus
-          if(osk.ready) {
-            if(this.keyman.isCJK()) {
-              osk._Enabled = true;
-            }
-            if(osk._Enabled) {
-              osk._Show();
-            } else {
-              osk._Hide(false);
-            }
+          if(this.keyman.isCJK()) {
+            osk._Enabled = true;
+          }
+          if(osk._Enabled) {
+            osk._Show();
+          } else {
+            osk._Hide(false);
           }
         }
       }
@@ -262,7 +260,7 @@ namespace com.keyman.dom {
       this.doControlBlurred(Ltarg, e, isActivating);
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
-      if(this.keyman.osk && this.keyman.osk.ready && !isActivating) {
+      if(this.keyman.osk && !isActivating) {
         this.keyman.osk._Hide(false);
       }
 
@@ -428,7 +426,7 @@ namespace com.keyman.dom {
 
       /*
       // Or if OSK not yet ready (for any reason)
-      if(!osk || !osk.ready) {
+      if(!osk) {
         return true;
       }
       */
@@ -482,7 +480,7 @@ namespace com.keyman.dom {
         return true;
       }
       /*
-      if(!osk || !osk.ready) {
+      if(!osk) {
         return true;
       }
       */
@@ -651,7 +649,7 @@ namespace com.keyman.dom {
       //if(document.activeElement.nodeName != 'DIV' && document.activeElement.nodeName != 'BODY') document.activeElement.blur();
       
       // And display the OSK if not already visible
-      if(osk && osk.ready && !osk._Visible) {
+      if(osk && !osk._Visible) {
         osk._Show();
       }
       
@@ -917,7 +915,7 @@ namespace com.keyman.dom {
     scrollBody(e: HTMLElement): void {
       var osk = this.keyman.osk;
 
-      if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk || !osk.ready) {
+      if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk) {
         return;
       }
 

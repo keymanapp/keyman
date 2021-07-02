@@ -1117,7 +1117,7 @@ namespace com.keyman.dom {
       this.keyman.uiManager.doUnload();
       
       // Allow the OSK to release its own resources
-      if(this.keyman.osk.ready) {
+      if(this.keyman.osk) {
         this.keyman.osk.shutdown();
         this.keyman.osk._Unload(); // I3363 (Build 301)
       }
@@ -1585,9 +1585,8 @@ namespace com.keyman.dom {
       // Set exposed initialization flag member for UI (and other) code to use 
       this.keyman.setInitialized(1);
 
-      // Finish keymanweb and OSK initialization once all necessary resources are available
+      // Finish keymanweb and initialize the OSK once all necessary resources are available
       const osk = this.keyman.osk = new com.keyman.osk.OSKManager();
-      this.keyman.osk.prepare();
     
       // Create and save the remote keyboard loading delay indicator
       util.prepareWait();
