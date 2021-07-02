@@ -56,4 +56,11 @@ If more than one target is specified, the last one will take precedence.
 
 Before running unit tests on KeymanWeb, first run `./build.sh` according to the instructions above.
 
-Once the build is complete, running `npm test` will run the unit testing suite on your local machine in-browser.  Alternatively, see `unit_tests/test.sh`, which the former command executes.
+Once the build is complete, running `npm test` will run the unit testing suite on your local machine in-browser.
+Alternatively, see `unit_tests/test.sh`, which the former command executes.
+
+### Debugging Unit Test
+1. During development, to run a specific unit test, change the `it` to `it.only`.
+2. From this directory, run `./unit_tests/test.sh -debug`
+3. When the browser halts, click the "Debug" button which opens a new debugging tab.
+4. In the Dev console, you can set a breakpoint in your test and refresh the page to debug
