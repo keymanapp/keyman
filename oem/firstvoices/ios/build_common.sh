@@ -26,6 +26,7 @@ display_usage ( ) {
     echo "  -no-update      If an in-place copy of KeymanEngine.framework exists, does not seek out an updated copy."
     echo "  -lib-build      Actively rebuilds KMEI before copying its build products to project resources."
     echo "  -lib-nobuild    Prevents the build script from building KeymanEngine under any circumstances."
+    echo "  -no-carthage    Disables downloading and building for dependencies."
     echo "  -no-codesign    Performs the build without code signing."
     echo "  -debug          Sets the configuration to debug mode instead of release."
     echo
@@ -85,6 +86,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-carthage)
             DO_CARTHAGE=false
+            KMEI_FLAGS="$KMEI_FLAGS -no-carthage"
             ;;
         -no-archive)
             DO_ARCHIVE=false

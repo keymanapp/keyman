@@ -33,6 +33,14 @@ public enum VibrationSupport {
   case taptic // Has the Taptic engine, allowing use of UIImpactFeedbackGenerator for customizable vibrations
 }
 
+public enum SpacebarText: String {
+  // Maps to enum SpacebarText in kmwbase.ts
+  case LANGUAGE = "language"
+  case KEYBOARD = "keyboard"
+  case LANGUAGE_KEYBOARD = "languageKeyboard"
+  case BLANK = "blank"
+};
+
 /**
  * Obtains the bundle for KeymanEngine.framework.
  */
@@ -164,10 +172,28 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   //private var downloadQueue: HTTPDownloader?
   private var reachability: Reachability!
   var didSynchronize = false
+  
+  private var _spacebarText: SpacebarText
+  public var spacebarText: SpacebarText {
+    get {
+      return _spacebarText
+    }
+    set(value) {
+      _spacebarText = value
+
+      let userData = Storage.active.userDefaults
+      userData.optSpacebarText = _spacebarText
+      userData.synchronize()
+      
+      inputViewController.updateSpacebarText()
+    }
+  }
 
   // MARK: - Object Admin
 
   private override init() {
+    
+    _spacebarText = Storage.active.userDefaults.optSpacebarText
     super.init()
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
@@ -457,7 +483,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
     // Set a new keyboard if deleting the current one
     if kb.fullID == currentKeyboardID {
-      _ = setKeyboard(userKeyboards[0])
+      if userKeyboards.count > 0 {
+        _ = setKeyboard(userKeyboards[0])
+      }
     }
 
     if !userKeyboards.contains(where: { $0.id == kb.id }) {
