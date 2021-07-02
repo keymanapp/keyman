@@ -5,8 +5,9 @@ import numpy as np
 import os
 import sys
 import struct
-from PIL import Image
+from PIL import Image, ImageFile
 Image.LOAD_TRUNCATED_IMAGES = True
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 def changeblacktowhite(im):
