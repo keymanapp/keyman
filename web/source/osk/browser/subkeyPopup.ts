@@ -111,6 +111,7 @@ namespace com.keyman.osk.browser {
         let keyEvent: text.KeyEvent = null;
         if(this.currentSelection) {
           keyEvent = this.vkbd.initKeyEvent(this.currentSelection, touch);
+          this.currentSelection.key.highlight(false);
         }
         this.resolver(keyEvent);
       }
