@@ -1,5 +1,5 @@
 namespace com.keyman.osk {
-  /*
+  /**
    * Implementations of this interface allow individual types of gestures to
    * specify any additional user interaction and functionality (which may
    * include UI elements) appropriate for obtaining a key event that may be
@@ -19,7 +19,7 @@ namespace com.keyman.osk {
    * will be inherently async.  The simplest way to model this is with `Promise`s.
    * 
    * If appropriate for the modeled gesture type, an implementation may supply an
-   * instantly-resolving `Promise``.  This may be appropriate for modeling "flick"
+   * instantly-resolving `Promise`.  This may be appropriate for modeling "flick"
    * or "swipe" gestures in the future, which may require no additional input once
    * such a gesture is fully realized.
    */
