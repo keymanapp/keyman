@@ -41,9 +41,18 @@ describe('Engine - Browser Interactions', function() {
   });
 
   describe('RegisterStub', function() {
-    it.only('RegisterStub 2x on same keyboard', function(done) {
+    it('RegisterStub on same keyboard twice', function(done) {
       this.timeout(kmwconfig.timeouts.scriptLoad);
-      var keyman = com.keyman.singleton;
+
+      var test_callback = function() {
+        assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
+        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
+        keyman.removeKeyboards('lao_2008_basic');
+        assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
+        done();
+      }
+
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, kmwconfig.timeouts.scriptLoad, {passive: true});
 
       var stub = {
         'KI': 'Keyboard_lao_2008_basic',
@@ -52,7 +61,6 @@ describe('Engine - Browser Interactions', function() {
         'KL': 'Lao',
         'KF': 'resources/keyboards/lao_2008_basic.js'
       };
-      assert.isNull(com.keyman.text.KeyboardInterface.prototype.registerStub(stub), "Keyboard stub was not registered!");
       assert.equal(com.keyman.text.KeyboardInterface.prototype.registerStub(stub), 1, "Registering existing keyboard should return 1!");
       done();
     });

@@ -1557,11 +1557,9 @@ namespace com.keyman.keyboards {
      * for the keyboard to be usable.
      *
      * @param       {Object}      Pstub     Keyboard stub object
-     * @return      {Promise<?number>}      1 if already registered, else null
+     * @return      {Promise<?boolean>}      1 if already registered, else null
      */
-    async _registerStub(Pstub): Promise<number> {
-      var Lk;
-
+    async _registerStub(Pstub): Promise<boolean> {
       // Ensure keymanweb is initialized before continuing to register stub
       if(!this.keymanweb.initialized) {
         await this.deferment;
@@ -1584,15 +1582,6 @@ namespace com.keyman.keyboards {
         Pstub['KL'] = 'undefined';
       }
 
-      // If language code already defined (or not specified in stub), check to see if stub already registered
-      for(Lk=0; Lk < this.keyboardStubs.length; Lk++) {
-        if(this.keyboardStubs[Lk]['KI'] == Pstub['KI']) {
-          if(Pstub['KLC'] == '' || (this.keyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
-            return Promise.resolve(1); // no need to register
-          }
-        }
-      }
-
       // Register stub (add to KeyboardStubs array)
       this.keyboardStubs=this.keymanweb._push(this.keyboardStubs, Pstub); // TODO:  Resolve without need for the cast.
 
@@ -1609,7 +1598,7 @@ namespace com.keyman.keyboards {
         this.setActiveKeyboard(Pstub['KI'], Pstub['KLC']);
       }
 
-      return Promise.resolve(null);
+      return Promise.resolve(false);
     }
 
     /*
