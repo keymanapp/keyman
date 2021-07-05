@@ -22,11 +22,13 @@ KMX_Processor::KMX_Processor() : m_actions(&m_context), m_options(&m_keyboard) {
   m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];
   m_miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
   m_miniContextIfLen = 0;
+  m_debug_items = nullptr;
 }
 
 KMX_Processor::~KMX_Processor() {
   delete[] m_indexStack;
   delete[] m_miniContext;
+  if(m_debug_items) delete m_debug_items;
 }
 
 char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
@@ -76,6 +78,20 @@ KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWO
 
   m_kbp_state = state;
 
+  // If debugging is enabled, then ...
+  if(m_debug_items) {
+    delete m_debug_items;
+    m_debug_items = NULL;
+  }
+
+  state->debug_items().clear();
+  if(state->debug_items().is_enabled()) {
+    m_debug_items = new KMX_DebugItems(&state->debug_items());
+  } else {
+    // We want to have a clean debug state even if it is not in use
+    state->debug_items().push_end(0);
+  }
+
   if (m_environment.capsLock())
     modifiers |= CAPITALFLAG;
 
@@ -93,7 +109,21 @@ KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWO
 
   KMX_BOOL fOutputKeystroke = FALSE;
 
+  if(m_debug_items) {
+    km_kbp_state_debug_key_info key_info;
+    key_info.character = m_state.charCode;
+    key_info.modifier_state = modifiers;
+    key_info.vk = m_state.vkey;
+    m_debug_items->push_begin(&key_info, KM_KBP_DEBUG_FLAG_UNICODE);
+  }
+
   ProcessGroup(gp, &fOutputKeystroke);
+
+  if(m_debug_items) {
+    m_debug_items->push_end(fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
+    delete m_debug_items;
+    m_debug_items = nullptr;
+  }
 
   m_kbp_state = nullptr;
 
