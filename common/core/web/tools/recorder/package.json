@@ -20,7 +20,8 @@
     "@keymanapp/keyboard-processor": "^15.0.80",
     "@keymanapp/models-types": "^15.0.80",
     "@keymanapp/web-environment": "^15.0.80",
-    "@keymanapp/web-utils": "^15.0.80"
+    "@keymanapp/web-utils": "^15.0.80",
+    "@types/node": "^11.9.4"
   },
   "devDependencies": {
     "typescript": "^3.8.3"
