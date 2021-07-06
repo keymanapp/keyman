@@ -8,7 +8,6 @@
 #include <cstring>
 #include <iostream>
 #include <string>
-#include <io.h>
 #include <keyman/keyboardprocessor.h>
 #include "path.hpp"
 #include "state.hpp"
@@ -17,10 +16,34 @@
 namespace
 {
 
+// https://stackoverflow.com/a/29865/1836776
+void hexdump(void const *ptr, int buflen) {
+  unsigned char *buf = (unsigned char*)ptr;
+  int i, j;
+  for (i=0; i<buflen; i+=16) {
+    printf("%06x: ", i);
+    for (j=0; j<16; j++)
+      if (i+j < buflen)
+        printf("%02x ", buf[i+j]);
+      else
+        printf("   ");
+    printf(" ");
+    for (j=0; j<16; j++)
+      if (i+j < buflen)
+        printf("%c", isprint(buf[i+j]) ? buf[i+j] : '.');
+    printf("\n");
+  }
+}
+
 bool operator==(km_kbp_state_debug_item const & lhs,
                 km_kbp_state_debug_item const & rhs)
 {
-  return memcmp(&lhs, &rhs, sizeof(km_kbp_state_debug_item)) == 0;
+  int result = memcmp(&lhs, &rhs, sizeof(km_kbp_state_debug_item));
+  if(result != 0) {
+    hexdump(&lhs, sizeof(km_kbp_state_debug_item));
+    hexdump(&rhs, sizeof(km_kbp_state_debug_item));
+  }
+  return result == 0;
 }
 
 
@@ -56,7 +79,7 @@ void test_debugging_disabled() {
   try_status(km_kbp_state_debug_set(test_state, 0));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT));
   assert(debug_items(test_state, {
-    {KM_KBP_DEBUG_END, 0,},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END}
   }));
 }
 
@@ -64,8 +87,8 @@ void test_debugging_no_rule_match() {
   try_status(km_kbp_state_debug_set(test_state, 1));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT));
   assert(debug_items(test_state, {
-    {KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT, 'S'}},
-    {KM_KBP_DEBUG_END,},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {{KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT, 'S'}}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END}
   }));
 }
 
@@ -73,8 +96,8 @@ void test_debugging_function_key() {
   try_status(km_kbp_state_debug_set(test_state, 1));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F1, 0));
   assert(debug_items(test_state, {
-    {KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_F1, 0, 0}},
-    {KM_KBP_DEBUG_END, KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {{KM_KBP_VKEY_F1, 0, 0}}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE}
   }));
 }
 
@@ -104,7 +127,7 @@ int main(int argc, char *argv []) {
   if(arg_color && argc < 3) {
     return error_args();
   }
-  console_color::enabled = _isatty(_fileno(stdout)) || arg_color;
+  console_color::enabled = console_color::isaterminal() || arg_color;
 
   auto arg_path = argv[arg_color ? 2 : 1];
 
@@ -119,7 +142,7 @@ int main(int argc, char *argv []) {
 
   // Ensure the pre-run debug item state is not empty
   assert(debug_items(test_state, {
-    {KM_KBP_DEBUG_END, 0,},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END}
   }));
 
   // Test 1: Start with debugging disabled

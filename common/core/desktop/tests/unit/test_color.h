@@ -53,7 +53,7 @@ public:
     inline friend std::wostream& \
     operator<<(std::wostream& os, const name& mod) { \
         if(!enabled) return os; \
-        return os << "\033[" ## value ## "m"; \
+        return os << "\033[" value "m"; \
     } \
 }
 
@@ -63,5 +63,17 @@ __define_ansi_code__(underline, "4");
 __define_ansi_code__(reversed, "7");
 
 #undef __define_ansi_code__
+
+#ifdef _MSC_VER
+#include <io.h>
+inline bool isaterminal() {
+  return _isatty(_fileno(stdout));
+}
+#else
+#include <unistd.h>
+inline bool isaterminal() {
+  return isatty(STDOUT_FILENO);
+}
+#endif
 
 }

@@ -31,6 +31,19 @@ const km_kbp_cp *km::kbp::kmx::u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
   return o;
 }
 
+const km_kbp_cp *km::kbp::kmx::u16ncpy(km_kbp_cp *dst, const km_kbp_cp *src, size_t max) {
+  km_kbp_cp *o = dst;
+  while (*src && max > 0) {
+    *dst++ = *src++;
+    max--;
+  }
+  while(max > 0) {
+    *dst++ = 0;
+    max--;
+  }
+  return o;
+}
+
 size_t km::kbp::kmx::u16len(const km_kbp_cp *p) {
   int i = 0;
   while (*p) {

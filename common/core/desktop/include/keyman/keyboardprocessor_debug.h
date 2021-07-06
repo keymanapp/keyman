@@ -1,4 +1,4 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
  *
  * Keyman Keyboard Processor API - Debugger Interfaces
@@ -59,7 +59,7 @@ typedef struct {
  * A single debug event.
  */
 typedef struct {
-  uint8_t type;
+  uint32_t  type; // 32 bits is better optimized than 8 bits
   uint32_t flags;
   union {
     km_kbp_state_debug_key_info key_info;

@@ -31,7 +31,7 @@
 #define try_status(expr) { \
   auto __s = (expr); \
   if (__s != KM_KBP_STATUS_OK) { \
-    _assert_failed(__s, u#expr); \
+    _assert_failed(__s, u ## #expr); \
   } \
 }
 
@@ -40,6 +40,6 @@
 #endif
 #define assert(expr) { \
   if (!(expr)) { \
-    _assert_failed(0, u#expr); \
+    _assert_failed(0, u ## #expr); \
   } \
 }
