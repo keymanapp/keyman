@@ -20,9 +20,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\engine\keyman32.dll /t keyman-engine-windows
     $(SYMSTORE) $(DEBUGPATH)\engine\keyman32.pdb /t keyman-engine-windows
 
-backup:
-    $(WZZIP) $(BUILD)\engine\keyman32.zip  $(BACKUPDEFAULTS) keyman32.dll
-
 install:
     $(COPY) $(PROGRAM)\engine\keyman32.dll "$(INSTALLPATH_KEYMANENGINE)\keyman32.dll"
     echo You may want to manually tweak keyman-debug-etw.man and fill in $(INSTALLPATH_KEYMANENGINE)\keyman32.dll

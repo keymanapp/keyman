@@ -29,10 +29,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\engine\kmrefresh.x64.exe /t keyman-engine-windows
     $(SYMSTORE) $(DEBUGPATH)\engine\kmrefresh.x64.pdb /t keyman-engine-windows
 
-backup:
-    $(WZZIP) $(BUILD)\engine\kmrefresh.x86.exe  $(BACKUPDEFAULTS) kmrefresh.x86.exe
-    $(WZZIP) $(BUILD)\engine\kmrefresh.x64.exe  $(BACKUPDEFAULTS) kmrefresh.x64.exe
-
 install:
     $(COPY) $(PROGRAM)\engine\kmrefresh.x86.exe "$(INSTALLPATH_KEYMANENGINE)"
     $(COPY) $(PROGRAM)\engine\kmrefresh.x64.exe "$(INSTALLPATH_KEYMANENGINE)"
