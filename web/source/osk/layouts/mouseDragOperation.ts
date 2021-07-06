@@ -1,4 +1,8 @@
 namespace com.keyman.osk.layouts {
+  /**
+   * A file-internal class to standardize & simplify coordinate processing for mouse-drag
+   * operations used to manipulate the OSK's display properties.
+   */
  class CustomizationCoordinate {
     public readonly x: number;
     public readonly y: number
@@ -8,6 +12,7 @@ namespace com.keyman.osk.layouts {
       this.y = y;
     }
 
+    // Converts a MouseEvent into the base coordinates needed by the mouse-dragging operations.
     public static fromEvent(e: MouseEvent) {
       if (e.pageX) {
         return new CustomizationCoordinate(e.pageX, e.pageY);
