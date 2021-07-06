@@ -7,6 +7,8 @@
 /// <reference path="layouts/targetedFloatLayout.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
+// Models keyboards that present a help page, rather than a standard OSK.
+/// <reference path="helpPage.ts" />
 
 /***
    KeymanWeb 10.0
@@ -199,7 +201,7 @@ namespace com.keyman.osk {
         layout.attachToView(this);
         this._Box.appendChild(layout.titleBar.element);
 
-        Ldiv = util._CreateElement('div');
+        let Ldiv = util._CreateElement('div');
         Ldiv.className='kmw-osk-none';
         this._Box.appendChild(Ldiv);
       } else {
@@ -224,13 +226,9 @@ namespace com.keyman.osk {
           this._Box.appendChild(this.banner.element);
 
           //Add content
-          var Ldiv = util._CreateElement('div');
-          Ldiv.className='kmw-osk-static';
-          Ldiv.innerHTML = Lhelp;
-          this._Box.appendChild(Ldiv);
-          if(activeKeyboard.hasHelpHTML) {
-            activeKeyboard.insertHelpHTML(this._Box);
-          }
+          var helpPage = new HelpPage(activeKeyboard);
+          this._Box.appendChild(helpPage.root);
+          helpPage.postInsert();
         }
 
         if(this.desktopLayout) {
