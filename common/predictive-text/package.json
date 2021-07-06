@@ -25,7 +25,7 @@
     "@keymanapp/resources-gosh": "^15.0.81",
     "@types/node": "^10.17.21",
     "chai": "^4.3.4",
-    "karma": "^6.3.2",
+    "karma": "^6.3.4",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.2.0",
