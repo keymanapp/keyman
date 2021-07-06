@@ -253,6 +253,7 @@ namespace com.keyman.osk.browser {
 
     updateTouch(touch: Touch) {
       this.currentSelection = null;
+      this.baseKey.key.highlight(false);
 
       for(let i=0; i < this.baseKey['subKeys'].length; i++) {
         try {
@@ -260,7 +261,6 @@ namespace com.keyman.osk.browser {
 
           let onKey = sk.key.isUnderTouch(touch);
           if(onKey) {
-            this.baseKey.key.highlight(false);
             this.currentSelection = sk;
           }
           sk.key.highlight(onKey);
