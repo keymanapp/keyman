@@ -718,7 +718,7 @@ namespace com.keyman.osk {
           newWidth=0.9*screen.width;
         }
         if(newHeight > 0.5*screen.height) {
-          newWidth=0.5*screen.height;
+          newHeight=0.5*screen.height;
         }
 
         // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font
