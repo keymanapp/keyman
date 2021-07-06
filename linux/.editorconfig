@@ -1,7 +1,5 @@
-root = true
-
-[*.py]
+[*]
 trim_trailing_whitespace = true
-intent_stype = space
-intent_size = 4
+indent_style = space
+indent_size = 4
 
