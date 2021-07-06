@@ -399,7 +399,8 @@ final class KMKeyboard extends WebView {
         k.getKeyboardName(),
         k.getLanguageName(),
         k.getFont(),
-        k.getOSKFont());
+        k.getOSKFont(),
+        k.getDisplayName());
     }
 
     return retVal;
@@ -478,7 +479,16 @@ final class KMKeyboard extends WebView {
     return retVal;
   }
 
-  public boolean setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
+  public boolean setKeyboard(String packageID, String keyboardID, String languageID,
+                             String keyboardName, String languageName, String kFont,
+                             String kOskFont) {
+    return setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName,
+                       kFont, kOskFont, null);
+  }
+
+  public boolean setKeyboard(String packageID, String keyboardID, String languageID,
+                             String keyboardName, String languageName, String kFont,
+                             String kOskFont, String displayName) {
     if (packageID == null || keyboardID == null || languageID == null || keyboardName == null || languageName == null) {
       return false;
     }
@@ -507,6 +517,8 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
+    setKeyboardRoot(packageID);
+
     if(kOskFont == null || kOskFont.isEmpty())
       kOskFont = kFont;
 
@@ -518,7 +530,6 @@ final class KMKeyboard extends WebView {
 
     String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
-    setKeyboardRoot(packageID);
     String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
 
     JSONObject reg = new JSONObject();
@@ -532,6 +543,7 @@ final class KMKeyboard extends WebView {
 
       if (jDisplayFont != null) reg.put("KFont", jDisplayFont);
       if (jOskFont != null) reg.put("KOskFont", jOskFont);
+      if (displayName != null) reg.put("displayName", displayName);
     } catch(JSONException e) {
       KMLog.LogException(TAG, "", e);
       return false;
@@ -1038,7 +1050,7 @@ final class KMKeyboard extends WebView {
    */
   private JSONObject makeFontPaths(String font) {
 
-    if(font == null) {
+    if(font == null || font.equals("")) {
       return null;
     }
 
@@ -1318,6 +1330,11 @@ final class KMKeyboard extends WebView {
     if (kbEventListeners != null) {
       kbEventListeners.remove(listener);
     }
+  }
+
+  public void setSpacebarText(KMManager.SpacebarText mode) {
+    String jsString = KMString.format("setSpacebarText('%s')", mode.toString());
+    loadJavascript(jsString);
   }
 
   /* Implement handleTouchEvent to catch long press gesture without using Android system default time
