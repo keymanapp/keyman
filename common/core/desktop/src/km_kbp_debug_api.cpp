@@ -34,7 +34,7 @@ km_kbp_state_debug_get(
 ) {
   assert(state);
   if(!state) {
-    return -1;
+    return 0;
   }
   return state->debug_items().is_enabled() ? 1 : 0;
 }

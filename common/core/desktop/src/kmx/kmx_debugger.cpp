@@ -15,7 +15,6 @@ void KMX_DebugItems::push_item(uint8_t type, uint32_t flags, LPGROUP group, LPKE
   _items->assert_push_entry();
   km_kbp_state_debug_item item = {type, flags};
   item.kmx_info.rule = key;
-  //item.processor.store = store;
   u16ncpy(item.kmx_info.context, context, DEBUG_MAX_CONTEXT - 1);
   item.kmx_info.context[DEBUG_MAX_CONTEXT-1] = 0;
   item.kmx_info.group = group;
