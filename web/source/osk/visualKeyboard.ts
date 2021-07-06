@@ -4,9 +4,10 @@
 /// <reference path="keytip.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/pendingLongpress.ts" />
+/// <reference path="keyboardView.interface.ts" />
 
 namespace com.keyman.osk {
-  export class VisualKeyboard {
+  export class VisualKeyboard implements KeyboardView {
     // Legacy alias, maintaining a reference for code built against older
     // versions of KMW.
     static specialCharacters = OSKKey.specialCharacters;
@@ -132,6 +133,12 @@ namespace com.keyman.osk {
         Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
       }
     }
+
+    public get element(): HTMLDivElement {
+      return this.kbdDiv;
+    }
+
+    public postInsert(): void { }
 
     get width(): number {
       if(this._width) {
@@ -1201,7 +1208,7 @@ namespace com.keyman.osk {
       return null;
     }
 
-    show() {
+    updateState() {
       let device = this.device;
       var n,nLayer=-1, b = this.kbdDiv.childNodes[0].childNodes;
 
@@ -1543,7 +1550,7 @@ namespace com.keyman.osk {
       // Select the layer to display, and adjust sizes
       if(layout != null) {
         kbdObj.layerId = layerId;
-        kbdObj.show();
+        kbdObj.updateState();
         // This still feels fairly hacky... but something IS needed to constrain the height.
         // There are plans to address related concerns through some of the later aspects of 
         // the Web OSK-Core design.
