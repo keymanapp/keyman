@@ -324,11 +324,12 @@ namespace com.keyman.osk {
       // Set box class - OS and keyboard added for Build 360
       this._Box.className=util.device.formFactor+' '+ util.device.OS.toLowerCase() + ' kmw-osk-frame';
 
-      const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
-      layout.attachToView(this);
+      let layout: layouts.TargetedFloatLayout = null;
 
       // Add header element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
+        layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+        layout.attachToView(this);
         this._Box.appendChild(layout.titleBar.element);
       }
 
@@ -341,7 +342,7 @@ namespace com.keyman.osk {
       this._Box.appendChild(this.vkbd.kbdDiv);
 
       // Add footer element to OSK only for desktop browsers
-      if(util.device.formFactor == 'desktop') {
+      if(layout) {
         this._Box.appendChild(layout.resizeBar.element);
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {
