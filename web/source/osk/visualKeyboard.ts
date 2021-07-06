@@ -1201,7 +1201,7 @@ namespace com.keyman.osk {
       return null;
     }
 
-    show(host: OSKManager) {
+    show() {
       let device = this.device;
       var n,nLayer=-1, b = this.kbdDiv.childNodes[0].childNodes;
 
@@ -1228,13 +1228,6 @@ namespace com.keyman.osk {
         // Identify and save references to the language key, hide keyboard key, and space bar
         this.lgKey=this.getSpecialKey(nLayer,'K_LOPT');     //TODO: should be saved with layer
         this.hkKey=this.getSpecialKey(nLayer,'K_ROPT');
-
-        // Always adjust screen height if iPhone or iPod, to take account of viewport changes
-        // Do NOT condition upon form-factor; this line prevents a bug with displaying
-        // the predictive-text banner on the initial keyboard load.  (Issue #2907)
-        if(device.OS == 'iOS') {
-          this.adjustHeights(host);
-        }
       }
 
       // Define for both desktop and touchable OSK
@@ -1245,12 +1238,11 @@ namespace com.keyman.osk {
      * Adjust the absolute height of each keyboard element after a rotation
      *
      **/
-    adjustHeights(host: OSKManager) {
+    adjustHeights(height: number) {
       let keyman = com.keyman.singleton;
-      let _Box = host._Box;
       let device = this.device;
 
-      if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
+      if(!this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
         return false;
       }
 
@@ -1260,24 +1252,21 @@ namespace com.keyman.osk {
         fs=fs/keyman.util.getViewportScale();
       }
 
-      let paddedHeight = this.computedAdjustedOskHeight(host.getKeyboardHeight());
+      let paddedHeight = this.computedAdjustedOskHeight(height);
 
-      var b: HTMLElement = _Box, bs=b.style;
-      bs.height=bs.maxHeight=paddedHeight+'px';
-
-      b = this.kbdDiv.firstChild as HTMLElement;
+      let b = this.kbdDiv.firstChild as HTMLElement;
       let gs = this.kbdDiv.style;
-      bs=b.style;
+      let bs=b.style;
       // Sets the layer group to the correct height.
       gs.height=gs.maxHeight=paddedHeight+'px';
       bs.fontSize=fs+'em';
 
-      this.adjustLayerHeights(paddedHeight, host.getKeyboardHeight());
+      this.adjustLayerHeights(paddedHeight, height);
 
       return true;
     }
 
-    private computedAdjustedOskHeight(allottedHeight: number): number {
+    /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
       let device = this.device;
 
       var layers=this.kbdDiv.firstChild.childNodes;
@@ -1527,11 +1516,11 @@ namespace com.keyman.osk {
      *  @param  {Object}            PKbd            the keyboard object to be displayed
      *  @param  {string=}           argFormFactor   layout form factor, defaulting to 'desktop'
      *  @param  {(string|number)=}  argLayerId      name or index of layer to show, defaulting to 'default'
-     *  @param  {Object}            host            KeymanWeb's active OSKManager instance 
+     *  @param  {Object}            height          Target height for the rendered keyboard 
      *                                              (currently required for legacy reasons)
      *  @return {Object}                            DIV object with filled keyboard layer content
      */
-    static buildDocumentationKeyboard(PKbd: com.keyman.keyboards.Keyboard, argFormFactor,argLayerId, host: OSKManager): HTMLElement { // I777
+    static buildDocumentationKeyboard(PKbd: com.keyman.keyboards.Keyboard, argFormFactor,argLayerId, height: number): HTMLElement { // I777
       if(!PKbd) {
         return null;
       }
@@ -1554,10 +1543,11 @@ namespace com.keyman.osk {
       // Select the layer to display, and adjust sizes
       if(layout != null) {
         kbdObj.layerId = layerId;
-        // This feels _really_ hacky.  There are plans to address this through some
-        // of the later aspects of the Web OSK-Core design.
-        kbdObj.show(host);
-        kbdObj.adjustHeights(host); // Necessary for the row heights to be properly set!
+        kbdObj.show();
+        // This still feels fairly hacky... but something IS needed to constrain the height.
+        // There are plans to address related concerns through some of the later aspects of 
+        // the Web OSK-Core design.
+        kbdObj.adjustHeights(height); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
         kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
       } else {

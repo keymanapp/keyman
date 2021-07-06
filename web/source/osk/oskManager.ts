@@ -343,7 +343,10 @@ namespace com.keyman.osk {
         this._Box.appendChild(layout.resizeBar.element);
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {
-        this.vkbd.adjustHeights(this);
+        this.vkbd.adjustHeights(this.getKeyboardHeight());
+
+        var b: HTMLElement = this._Box, bs=b.style;
+        bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
       }
     }
 
@@ -817,8 +820,17 @@ namespace com.keyman.osk {
       // TODO:  Move this into the VisualKeyboard class!
       // The following code will always be executed except for externally created OSK such as EuroLatin
       if(this.vkbd && this.vkbd.ddOSK) {
+        // Always adjust screen height if iPhone or iPod, to take account of viewport changes
+        // Do NOT condition upon form-factor; this line prevents a bug with displaying
+        // the predictive-text banner on the initial keyboard load.  (Issue #2907)
+        if(device.touchable && device.OS == 'iOS') {
+          this.vkbd.adjustHeights(this.getKeyboardHeight());
+
+          var b: HTMLElement = this._Box, bs=b.style;
+          bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+        }
         // Enable the currently active keyboard layer and update the default nextLayer member
-        this.vkbd.show(this);
+        this.vkbd.show();
 
         // Extra style changes and overrides for touch-mode.
         if(device.touchable) {
