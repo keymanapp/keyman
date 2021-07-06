@@ -8,8 +8,8 @@ VERSION_TXT_PATH=..\..
 
 build: dirs version.res
     $(MSBUILD) imsample.sln $(MSBUILD_BUILD)
-    $(COPY) imsample.dll $(PROGRAM)\developer
-    $(COPY) imsample.pdb $(PROGRAM)\developer
+    $(COPY) $(WIN32_TARGET_PATH)\imsample.dll $(PROGRAM)\developer
+    $(COPY) $(WIN32_TARGET_PATH)\imsample.pdb $(PROGRAM)\developer
 
 signcode:
     $(SIGNCODE) /d "Keyman IMX Sample" $(PROGRAM)\developer\imsample.dll

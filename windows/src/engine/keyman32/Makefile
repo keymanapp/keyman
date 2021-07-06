@@ -6,17 +6,12 @@
 
 build: version.res dirs pull-core
     $(MSBUILD) keyman32.vcxproj $(MSBUILD_BUILD)
-    $(COPY) keyman32.dll $(PROGRAM)\engine
-    $(COPY) keyman32.pdb $(DEBUGPATH)\engine
-    $(COPY) keyman32.lib $(OUTLIB)
+    $(COPY) $(WIN32_TARGET_PATH)\keyman32.dll $(PROGRAM)\engine
+    $(COPY) $(WIN32_TARGET_PATH)\keyman32.pdb $(DEBUGPATH)\engine
+    #$(COPY) $(WIN32_TARGET_PATH)\keyman32.lib $(OUTLIB) done by vcxproj
 
 clean: def-clean
     $(MSBUILD) $(MSBUILD_CLEAN) keyman32.vcxproj
-    -del x86\release\buildlog.htm
-    -rmdir x86\release
-    -del x86\debug\buildlog.htm
-    -rmdir x86\debug
-    -rmdir x86
 
 signcode:
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\keyman32.dll

@@ -7,9 +7,9 @@
 PLATFORM=x64
 
 build: manifest.res version.res dirs
-    $(MSBUILD) keymanx64.sln $(MSBUILD_BUILD)
-    $(COPY) keymanx64.exe $(PROGRAM)\engine
-    $(COPY) keymanx64.pdb $(DEBUGPATH)\engine
+    $(MSBUILD) keymanx64.vcxproj $(MSBUILD_BUILD) /p:Platform=x64
+    $(COPY) $(X64_TARGET_PATH)\keymanx64.exe $(PROGRAM)\engine
+    $(COPY) $(X64_TARGET_PATH)\keymanx64.pdb $(DEBUGPATH)\engine
 
 clean: def-clean
     $(MSBUILD) $(MSBUILD_CLEAN) keymanx64.sln

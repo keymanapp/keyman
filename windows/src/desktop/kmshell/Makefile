@@ -5,11 +5,11 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons xml
-    $(DCC32) kmshell.dpr
-    $(SENTRYTOOL_DELPHIPREP) kmshell.exe -dpr kmshell.dpr
-    $(TDS2DBG) kmshell.exe
-    $(COPY) kmshell.exe $(PROGRAM)\desktop
-    if exist kmshell.dbg $(COPY) kmshell.dbg $(DEBUGPATH)\desktop
+    $(DELPHI_MSBUILD) kmshell.dproj /p:Platform=Win32
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmshell.exe -dpr kmshell.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmshell.exe
+    $(COPY) $(WIN32_TARGET_PATH)\kmshell.exe $(PROGRAM)\desktop
+    if exist $(WIN32_TARGET_PATH)\kmshell.dbg $(COPY) $(WIN32_TARGET_PATH)\kmshell.dbg $(DEBUGPATH)\desktop
 
 icons:
     rc icons.rc

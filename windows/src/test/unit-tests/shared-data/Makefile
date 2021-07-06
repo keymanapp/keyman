@@ -7,8 +7,8 @@
 test: build
     delphi\$(WIN32_TARGET_PATH)\delphishareddata.exe > delphi-win32.txt
     delphi\$(WIN64_TARGET_PATH)\delphishareddata.exe > delphi-win64.txt
-    cpp\$(TARGET_PATH)\cppshareddata.exe > cpp-win32.txt
-    cpp\x64\$(TARGET_PATH)\cppshareddata.exe > cpp-win64.txt  
+    cpp\$(WIN32_TARGET_PATH)\cppshareddata.exe > cpp-win32.txt
+    cpp\$(X64_TARGET_PATH)\cppshareddata.exe > cpp-win64.txt
     fc delphi-win32.txt delphi-win64.txt
     fc delphi-win32.txt cpp-win32.txt
     fc delphi-win32.txt cpp-win64.txt

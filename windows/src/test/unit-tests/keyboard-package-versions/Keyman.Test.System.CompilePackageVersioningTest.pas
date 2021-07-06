@@ -62,7 +62,7 @@ var
 begin
   Assert.IgnoreCaseDefault := False;
 
-  FRoot := ExtractFileDir(ExtractFileDir(ExtractFileDir(ParamStr(0))));
+  FRoot := ExtractFileDir(ExtractFileDir(ExtractFileDir(ExtractFileDir(ParamStr(0)))));
 
   //
   // Force load development version of kmcmpdll

@@ -7,11 +7,11 @@ VERSION_TXT_PATH=..\..
 !include ..\..\..\Defines.mak
 
 build: dirs version.res
-    $(DCC32) insthelper.dpr
-    $(SENTRYTOOL_DELPHIPREP) insthelper.dll -dpr insthelper.dpr
-    $(TDS2DBG) insthelper.dll
-    $(COPY) insthelper.dll $(PROGRAM)\inst
-    $(COPY) insthelper.dbg $(DEBUGPATH)\inst
+    $(DELPHI_MSBUILD) insthelper.dproj /p:Platform=Win32
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\insthelper.dll -dpr insthelper.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\insthelper.dll
+    $(COPY) $(WIN32_TARGET_PATH)\insthelper.dll $(PROGRAM)\inst
+    $(COPY) $(WIN32_TARGET_PATH)\insthelper.dbg $(DEBUGPATH)\inst
 
 clean: def-clean
     -del *.dll

@@ -11,6 +11,5 @@ build:
     $(DELPHI_MSBUILD) androidstringtokeymanlocalestring.dproj
 
 clean: def-clean
-    -rd /s/q Win32
 
 !include ..\..\..\Target.mak
