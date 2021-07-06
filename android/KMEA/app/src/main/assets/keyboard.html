@@ -31,6 +31,7 @@
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
       kmw['showKeyboardList'] = showMenu;
+      kmw['doGlobeKey'] = doGlobeKey;
       kmw['hideKeyboard'] = hideKeyboard;
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
@@ -130,7 +131,8 @@
 
     function setKeymanLanguage(k) {
       KeymanWeb.registerStub(k);
-      keyman.setActiveKeyboard(k.KP + '::'+k.KI, k.KLC);
+      // KMW will handle the k.KP:: namespacing
+      keyman.setActiveKeyboard(k.KI, k.KLC);
       keyman.osk.show(true);
     }
 
@@ -270,6 +272,15 @@
     function showMenu() {
       fragmentToggle = (fragmentToggle + 1) % 100;
       window.location.hash = 'globeKeyAction' + fragmentToggle;
+    }
+
+    function doGlobeKey(longpress) {
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      var hash = 'globeKeyAction-' + fragmentToggle;
+
+      hash = hash + '&longpress=' + encodeURIComponent(longpress);
+
+      window.location.hash = hash;
     }
 
     function hideKeyboard() {

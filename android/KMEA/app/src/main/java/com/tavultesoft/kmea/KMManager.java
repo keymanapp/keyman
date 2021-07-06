@@ -104,6 +104,7 @@ public final class KMManager {
   // Globe key actions
   public enum GlobeKeyAction {
     GLOBE_KEY_ACTION_SHOW_MENU,
+    // GLOBE_KEY_ACTION_SWITCH_TO_PREVIOUS_KEYBOARD,     // Switch to previous Keyman keyboard (reserved for flick)
     GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
     GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
     GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS,
@@ -152,8 +153,8 @@ public final class KMManager {
 
   private static boolean didLogHardwareKeystrokeException = false;
 
-  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
+  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
   // This is used to keep track of the starting system keyboard index while the screen is locked
   private static int sysKbStartingIndexOnLockScreen = -1;
 
@@ -1365,6 +1366,9 @@ public final class KMManager {
   public static void switchToNextKeyboard(Context context) {
     int index = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
     index++;
+    if (index >= KeyboardController.getInstance().get().size()) {
+      index = 0;
+    }
     Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
     if (kbInfo == null) {
       index = 0;
@@ -1378,6 +1382,8 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(kbInfo);
     }
+
+    registerAssociatedLexicalModel(kbInfo.getLanguageID());
   }
 
   protected static IBinder getToken() {
@@ -1844,6 +1850,11 @@ public final class KMManager {
     KeyboardPickerActivity.shouldCheckKeyboardUpdates = newValue;
   }
 
+  /**
+   * Get the default short press action for the globe key
+   * @param kbType - KeyboardType.KEYBOARD_TYPE_SYSTEM or KeyboardType.KEYBOARD_INAPP
+   * @return GlobeKeyAction
+   */
   public static GlobeKeyAction getGlobeKeyAction(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       return inappKbGlobeKeyAction;
@@ -1968,14 +1979,24 @@ public final class KMManager {
         editor.commit();
 
         if (KMManager.shouldAllowSetKeyboard()) {
-          if (InAppKeyboard.keyboardPickerEnabled) {
-            if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
+          int start = url.indexOf("longpress=") + 10;
+          String value = url.substring(start);
+          if (!value.isEmpty() && Boolean.valueOf(value)) {
+            // Longpress globe
+            if (InAppKeyboard.keyboardPickerEnabled) {
               showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-            } else if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-              switchToNextKeyboard(context);
             }
           } else {
-            switchToNextKeyboard(context);
+            // Handle shortpress globe
+            if (InAppKeyboard.keyboardPickerEnabled) {
+              if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
+                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+              } else if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
+                switchToNextKeyboard(context);
+              }
+            } else {
+              switchToNextKeyboard(context);
+            }
           }
         }
       } else if (url.indexOf("showHelpBubble") >= 0) {
@@ -2164,7 +2185,6 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
-
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
           @Override
@@ -2207,10 +2227,15 @@ public final class KMManager {
         editor.commit();
 
         if (KMManager.shouldAllowSetKeyboard()) {
+          int start = url.indexOf("longpress=") + 10;
+          String value = url.substring(start);
+          boolean longpress = !value.isEmpty() && Boolean.valueOf(value);
+
           if (SystemKeyboard.keyboardPickerEnabled) {
-            KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+            // Assign shortpress globe action
             GlobeKeyAction action = sysKbGlobeKeyAction;
-            if(keyguardManager.inKeyguardRestrictedInputMode()) {
+            KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+            if (keyguardManager.inKeyguardRestrictedInputMode()) {
               // Override system keyboard globe key action if screen is locked:
               // 1. Switch to next Keyman keyboard (no menu)
               // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
@@ -2227,6 +2252,11 @@ public final class KMManager {
             } else {
               // If screen isn't locked, reset the starting index
               sysKbStartingIndexOnLockScreen = -1;
+
+              if (longpress) {
+                // Check longpress globe action
+                action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+              }
             }
 
             switch (action) {
