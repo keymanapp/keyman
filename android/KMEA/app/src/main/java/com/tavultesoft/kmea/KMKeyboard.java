@@ -517,6 +517,8 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
+    setKeyboardRoot(packageID);
+
     if(kOskFont == null || kOskFont.isEmpty())
       kOskFont = kFont;
 
@@ -528,7 +530,6 @@ final class KMKeyboard extends WebView {
 
     String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
-    setKeyboardRoot(packageID);
     String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
 
     JSONObject reg = new JSONObject();
