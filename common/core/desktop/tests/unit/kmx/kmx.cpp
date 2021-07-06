@@ -18,6 +18,7 @@
 #include <type_traits>
 
 #include <kmx/kmx_processevent.h>
+#include <kmx/kmx_xstring.h>
 
 #include "path.hpp"
 #include "state.hpp"
@@ -34,6 +35,7 @@
 namespace
 {
 bool g_beep_found = false;
+bool g_caps_lock_on = false;
 
 struct key_event {
   km_kbp_virtual_key vk;
@@ -232,13 +234,63 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
   case KM_KBP_IT_EMIT_KEYSTROKE:
     std::cout << "action: emit keystroke" << std::endl;
     break;
+  case KM_KBP_IT_CAPSLOCK:
+    std::cout << "action: capsLock " << act.capsLock << std::endl;
+    g_caps_lock_on = act.capsLock;
+    break;
   default:
     assert(false); // NOT SUPPORTED
     break;
   }
 }
 
-int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
+int caps_lock_state() {
+  return g_caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
+}
+
+void toggle_caps_lock_state() {
+  g_caps_lock_on = !g_caps_lock_on;
+}
+
+km_kbp_option_item *get_keyboard_options(kmx_options options) {
+  km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
+
+  int i = 0;
+  for (auto it = options.begin(); it != options.end(); it++) {
+    if (it->type != KOT_INPUT) continue;
+
+    std::cout << "input option-key: " << it->key << std::endl;
+
+    std::u16string key = it->key;
+    if (key[0] == u'&') {
+      // environment value (aka system store)
+      key.erase(0, 1);
+      keyboard_opts[i].scope = KM_KBP_OPT_ENVIRONMENT;
+    }
+    else {
+      keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
+    }
+
+    km_kbp_cp *cp = new km_kbp_cp[key.length() + 1];
+    key.copy(cp, key.length());
+    cp[key.length()] = 0;
+
+    keyboard_opts[i].key = cp;
+
+    cp = new km_kbp_cp[it->value.length() + 1];
+    it->value.copy(cp, it->value.length());
+    cp[it->value.length()] = 0;
+
+    keyboard_opts[i].value = cp;
+
+    i++;
+  }
+
+  keyboard_opts[i] = KM_KBP_OPTIONS_END;
+  return keyboard_opts;
+}
+
+int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
   kmx_options options;
@@ -256,46 +308,11 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   try_status(km_kbp_keyboard_load(compiled.c_str(), &test_kb));
 
   // Setup state, environment
-
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
 
   // Setup keyboard options
-
   if (options.size() > 0) {
-    km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
-
-    int i = 0;
-    for (auto it = options.begin(); it != options.end(); it++) {
-      if (it->type != KOT_INPUT) continue;
-
-      std::cout << "input option-key: " << it->key << std::endl;
-
-      std::u16string key = it->key;
-      if (key[0] == u'&') {
-        // environment value (aka system store)
-        key.erase(0, 1);
-        keyboard_opts[i].scope = KM_KBP_OPT_ENVIRONMENT;
-      }
-      else {
-        keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
-      }
-
-      km_kbp_cp *cp = new km_kbp_cp[key.length() + 1];
-      key.copy(cp, key.length());
-      cp[key.length()] = 0;
-
-      keyboard_opts[i].key = cp;
-
-      cp = new km_kbp_cp[it->value.length() + 1];
-      it->value.copy(cp, it->value.length());
-      cp[it->value.length()] = 0;
-
-      keyboard_opts[i].value = cp;
-
-      i++;
-    }
-
-    keyboard_opts[i] = KM_KBP_OPTIONS_END;
+    km_kbp_option_item *keyboard_opts = get_keyboard_options(options);
 
     try_status(km_kbp_state_options_update(test_state, keyboard_opts));
 
@@ -313,10 +330,18 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
 
   // Run through key events, applying output for each event
   for (auto p = next_key(keys); p.vk != 0; p = next_key(keys)) {
-    try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state));
-
-    for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
-      apply_action(test_state, *act, text_store, options);
+    // Because a normal system tracks caps lock state itself,
+    // we mimic that in the tests. We assume caps lock state is
+    // updated on key_down before the processor receives the
+    // event.
+    if (p.vk == KM_KBP_VKEY_CAPS) {
+      toggle_caps_lock_state();
+    }
+    for (auto key_down = 1; key_down >= 0; key_down--) {
+      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | caps_lock_state(), key_down));
+      for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
+        apply_action(test_state, *act, text_store, options);
+      }
     }
   }
 
@@ -445,7 +470,8 @@ int load_source(const km::kbp::path & path, std::string & keys, std::u16string &
     s_context = "c context: ",
     s_option = "c option: ",
     s_option_expected = "c expected option: ",
-    s_option_saved = "c saved option: ";
+    s_option_saved = "c saved option: ",
+    s_capsLock = "c capsLock: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
   std::ifstream kmn(path.native());
@@ -481,6 +507,9 @@ int load_source(const km::kbp::path & path, std::string & keys, std::u16string &
     }
     else if (is_token(s_option_saved, line)) {
       if (!parse_option_string(line, options, KOT_SAVED)) return __LINE__;
+    }
+    else if (is_token(s_capsLock, line)) {
+      g_caps_lock_on = parse_source_string(line).compare(u"1") == 0;
     }
   }
 

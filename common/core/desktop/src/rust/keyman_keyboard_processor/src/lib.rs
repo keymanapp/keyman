@@ -107,7 +107,7 @@
   return KM_KBP_STATUS_OK;
   */
 
-pub fn rust_mock_process_event(_vk: u16, _modifier: u16) -> u32 {
+pub fn rust_mock_process_event(_vk: u16, _modifier: u16, _is_key_down: u8) -> u32 {
   return 0; //KM_KBP_STATUS_OK
 }
 
@@ -117,6 +117,6 @@ mod tests {
 
   #[test]
   fn test_rust_mock_process_event() {
-    assert_eq!(0, rust_mock_process_event(0, 0));
+    assert_eq!(0, rust_mock_process_event(0, 0, 0));
   }
 }

@@ -24,20 +24,29 @@ namespace kbp
     rust_mock_processor(km::kbp::path const &);
 //    ~mock_processor() override;
 
-    km_kbp_status process_event(km_kbp_state *state,
-                                km_kbp_virtual_key vk,
-                                uint16_t modifier_state) override;
+    km_kbp_status
+    process_event(
+      km_kbp_state *state,
+      km_kbp_virtual_key vk,
+      uint16_t modifier_state,
+      uint8_t is_key_down
+    ) override;
 
     virtual km_kbp_attr const & attributes() const override;
     km_kbp_status               validate() const override;
 
+    char16_t const *
+    lookup_option(
+      km_kbp_option_scope,
+      std::u16string const & key
+    ) const override;
 
-
-    char16_t const * lookup_option(km_kbp_option_scope,
-                  std::u16string const & key) const override;
-    option  update_option(km_kbp_option_scope,
-                  std::u16string const & key,
-                  std::u16string const & value) override;
+    option
+    update_option(
+      km_kbp_option_scope,
+      std::u16string const & key,
+      std::u16string const & value
+    ) override;
   };
 
   class rust_null_processor : public rust_mock_processor {

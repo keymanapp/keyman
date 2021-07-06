@@ -19,11 +19,18 @@ Following the comments are the normal rules of a Keyman keyboard.
 c Description: Tests Caps Lock env set
 ```
 
-- **option**: allows to put the system in a defined state. The example below turns
-  caps-lock off.
+- **option**: allows to put the system in a defined state. The example below sets the platform.
 
 ```text
-c option: &capsLock=0
+c option: &platform=linux
+```
+
+- **capsLock**: allows to set the caps lock state. The example below turns
+  caps-lock on at the start of the test. `[K_CAPS]` in the **keys** comment
+  allows toggling of caps lock.
+
+```text
+c capsLock: 1
 ```
 
 - **context**: allows to setup a string which serves as context
