@@ -106,8 +106,8 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
         SelectApplicationIntegration();   // I4287
         if (_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
         _td->state.windowunicode = !_td->app || _td->app->IsUnicode();
-
-        ActivateDLLs(_td->lpActiveKeyboard);
+        // TODO: 5011
+        //ActivateDLLs(_td->lpActiveKeyboard);
 
         return TRUE;
       }

@@ -76,43 +76,47 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
 }
 
 
-//BOOL LoadlpKeyboardCore(int i)
-//{
-//  PKEYMAN64THREADDATA _td = ThreadGlobals();
-//  if (!_td) return FALSE;
-//  if (_td->lpKeyboards[i].coreKeyboard) return TRUE;
-//  
-//
-//  if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
-//
-//  char buf[256];
-//  if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
-//
-//  //if (!LoadKeyboard(buf, &_td->lpKeyboards[i].Keyboard)) return FALSE;   // I5136
-//
-//  if  (KM_KBP_STATUS_OK != km_kbp_keyboard_load(buf, &_td->lpKeyboards[i].coreKeyboard)) return FALSE;
-//
-//  //LoadDLLs(&_td->lpKeyboards[i]);
-//
-//   // TODO: 5011 The activeKBState needs to maintian the state fror the context and options for
-//   // the current active keyoard
-//    // km_kbp_option_item test_env_opts
-//   //(km_kbp_state_create(&_td->lpKeyboards[i], env_opts, &activeKBState));
-//
-//// (km_kbp_state_options_update(activeKBState, keyboard_opts))
-//  LoadKeyboardOptions(&_td->lpKeyboards[i]);
-//
-//
-//
-//  return TRUE;
-//}
+BOOL LoadlpKeyboardCore(int i)
+{
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) return FALSE;
+  if (_td->lpKeyboards[i].coreKeyboard) return TRUE;
+  
+
+  if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
+
+  char buf[256];
+  if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
+  size_t charSize = strlen(buf) + 1;
+
+  wchar_t* keyboardPath = new wchar_t[charSize];
+
+  // Convert char* string to a wchar_t* string.
+  size_t convertedChars = 0;
+  mbstowcs_s(&convertedChars, keyboardPath, charSize, buf, _TRUNCATE);
+
+  if  (KM_KBP_STATUS_OK != km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard)) return FALSE;
+  // TODO: 5011 handle dlls
+  //LoadDLLs(&_td->lpKeyboards[i]);
+  const km_kbp_option_item test_env_opts[] =
+  {
+    KM_KBP_OPTIONS_END
+  };
+  km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->state.lpActiveKBState);
+  LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->state.lpActiveKBState);
+
+  // free keyboardPath 
+  delete [] keyboardPath;
+
+  return TRUE;
+}
 
 BOOL LoadlpKeyboard(int i)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
   if(_td->lpKeyboards[i].Keyboard) return TRUE;
-  // if(_td->lpKeyboards[i]) return TRUE;  // This test it is active but doesn't set it as acitve why?
+  
 
   if(_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
@@ -120,19 +124,8 @@ BOOL LoadlpKeyboard(int i)
   if(!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
 
   if(!LoadKeyboard(buf, &_td->lpKeyboards[i].Keyboard)) return FALSE;   // I5136
-//  if  (KM_KBP_STATUS_OK != km_kbp_keyboard_load(buf, &_td->lpKeyboards[i].coreKeyboard)) return FALSE;
 
-  //LoadDLLs(&_td->lpKeyboards[i]);
-
-   // TODO: 5011 The activeKBState needs to maintian the state fror the context and options for
-   // the current active keyoard
-    // km_kbp_option_item test_env_opts
-   //(km_kbp_state_create(&_td->lpKeyboards[i], env_opts, &activeKBState));
-
-// (km_kbp_state_options_update(activeKBState, keyboard_opts))
   LoadKeyboardOptions(&_td->lpKeyboards[i]);
-
-
 
   return TRUE;
 }

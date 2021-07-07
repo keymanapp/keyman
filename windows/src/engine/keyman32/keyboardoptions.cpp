@@ -19,9 +19,11 @@
 */
 #include "pch.h"
 #include "registry.h"
+#include <string>
 
 void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave);
 BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp);
+BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
 
 void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
 {   // I3594
@@ -30,6 +32,10 @@ void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
+  if (Globals::get_CoreIntegration())
+  {
+    return; // should never be called if using core processor
+  }
   // Called when another thread changes keyboard options and we are sharing keyboard settings
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
@@ -41,6 +47,10 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
+  if (Globals::get_CoreIntegration())
+  {
+    return; // should never be called if using core processor
+  }
   // This is a cleanup routine; we don't want to precondition all calls to it
   // so we do not assert
   if (kp == NULL || kp->Keyboard == NULL || kp->KeyboardOptions == NULL)
@@ -58,6 +68,11 @@ void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 {
+  if (Globals::get_CoreIntegration())
+  {
+    return; // should never be called if using core processor
+  }
+
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
   assert(kp->KeyboardOptions != NULL);
@@ -83,6 +98,10 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 
 void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 {
+  if (Globals::get_CoreIntegration())
+  {
+    return; // should never be called if using core processor
+  }
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
   assert(kp->KeyboardOptions != NULL);
@@ -119,6 +138,10 @@ void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 
 void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
 {
+  if (Globals::get_CoreIntegration())
+  {
+    return; // should never be called if using core processor
+  }
   IntSaveKeyboardOption(REGSZ_KeyboardOptions, kp, nStoreToSave);
 }
 
@@ -148,7 +171,7 @@ BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
         {
           if(kp->Keyboard->dpStoreArray[i].dpName != NULL && _wcsicmp(kp->Keyboard->dpStoreArray[i].dpName, buf) == 0)
           {
-            kp->KeyboardOptions[i].Value = new WCHAR[wcslen(val)+1];
+            kp->KeyboardOptions[i].Value = new WCHAR[wcslen(val)+1]; // is this a memory leak as 
             wcscpy_s(kp->KeyboardOptions[i].Value, wcslen(val)+1, val);
 
             kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
@@ -181,4 +204,61 @@ void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave)
   {
     r.WriteString(kp->Keyboard->dpStoreArray[nStoreToSave].dpName, kp->Keyboard->dpStoreArray[nStoreToSave].dpString);
   }
+}
+
+void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* const state)
+{
+  IntLoadKeyboardOptionsCore(REGSZ_KeyboardOptions, kp, state);
+}
+
+BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* state)
+{
+  assert(key != NULL);
+  assert(kp != NULL);
+  assert(kp->Keyboard != NULL);
+  assert(kp->KeyboardOptions == NULL); // not used for common core
+
+  RegistryReadOnly r(HKEY_CURRENT_USER);
+  if (r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key))
+  {
+    WCHAR buf[256];
+    int n = 0;
+    // Get the list of default options to determine size of list
+    const km_kbp_keyboard_attrs* keyboadAttrs;
+    km_kbp_keyboard_get_attrs(kp->coreKeyboard, &keyboadAttrs);
+    size_t listSize = km_kbp_options_list_size(keyboadAttrs->default_options);
+    km_kbp_option_item* keyboardOpts = new  km_kbp_option_item[listSize+1];
+
+    while (r.GetValueNames(buf, sizeof(buf) / sizeof(buf[0]), n))
+    {
+      buf[255] = 0;
+      WCHAR val[256];
+      WCHAR* PWVAL;
+      if (r.ReadString(buf, val, sizeof(val) / sizeof(val[0])) && val[0])
+      {
+        val[255] = 0;
+        keyboardOpts[n].scope = KM_KBP_OPT_KEYBOARD;
+        
+        size_t charSize = strlen(key) + 1;
+        wchar_t* KeyWCHAR = new WCHAR[charSize];
+        size_t convertedChars = 0;
+        mbstowcs_s(&convertedChars, KeyWCHAR, charSize, key, _TRUNCATE);
+        keyboardOpts[n].key = reinterpret_cast<char16_t*>(KeyWCHAR);
+
+        PWVAL = new WCHAR[wcslen(val) + 1]; // is this a memory leak as 
+        wcscpy_s(PWVAL, wcslen(val) + 1, val);
+        keyboardOpts[n].value = reinterpret_cast<char16_t*>(PWVAL);
+      }
+      n++;
+    }
+    /// once we have the option list we can then update the options using the public api call
+    km_kbp_state_options_update(state, keyboardOpts);
+   for (int i = 0; i < (int)listSize + 1; i++) {
+      delete[] keyboardOpts[i].key;
+      delete[] keyboardOpts[i].value;
+    }
+    delete keyboardOpts;
+    return TRUE;
+  }
+  return FALSE;
 }
