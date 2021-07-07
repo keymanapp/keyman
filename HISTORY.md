@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.82 alpha 2021-07-07
+
+* fix(common/models/types): fixes test script config (#5441)
+
 ## 15.0.81 alpha 2021-07-06
 
 * fix(android/engine): Fix font file path (#5424)
