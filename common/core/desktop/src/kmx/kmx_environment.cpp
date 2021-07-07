@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
+#include <kmx/kmx_processevent.h>
 #include <keyman/keyboardprocessor_consts.h>
 #include <state.hpp>
 #include <option.hpp>

@@ -2,12 +2,12 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
+#include <kmx/kmx_processevent.h>
 
 using namespace km::kbp;
 using namespace kmx;
 
-void KMX_Processor::ResetCapsLock(void)
+void KMX_ProcessEvent::ResetCapsLock(void)
 {
   DebugLog("ResetCapsLock: enter");
 
@@ -24,7 +24,7 @@ void KMX_Processor::ResetCapsLock(void)
 }
 
 
-void KMX_Processor::KeyCapsLockPress(KMX_BOOL FIsUp)
+void KMX_ProcessEvent::KeyCapsLockPress(KMX_BOOL FIsUp)
 {
   if(m_keyboard.Keyboard->dwFlags & KF_CAPSONONLY)
   {
@@ -43,7 +43,7 @@ void KMX_Processor::KeyCapsLockPress(KMX_BOOL FIsUp)
 }
 
 
-void KMX_Processor::KeyShiftPress(KMX_BOOL FIsUp)
+void KMX_ProcessEvent::KeyShiftPress(KMX_BOOL FIsUp)
 {
   if(!m_environment.capsLock()) return;
 
