@@ -111,6 +111,13 @@ public final class KMManager {
     GLOBE_KEY_ACTION_DO_NOTHING,
   }
 
+  public enum GlobeKeyState {
+    GLOBE_KEY_STATE_OFF,
+    GLOBE_KEY_STATE_DOWN,
+    GLOBE_KEY_STATE_UP,
+    GLOBE_KEY_STATE_LONGPRESS
+  }
+
   public enum FormFactor {
     PHONE,
     TABLET;
@@ -157,6 +164,9 @@ public final class KMManager {
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
   // This is used to keep track of the starting system keyboard index while the screen is locked
   private static int sysKbStartingIndexOnLockScreen = -1;
+
+  // This is used to keep track of the globe key shortpress and longpress
+  private static GlobeKeyState globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_OFF;
 
   private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
 
@@ -1979,14 +1989,25 @@ public final class KMManager {
         editor.commit();
 
         if (KMManager.shouldAllowSetKeyboard()) {
-          int start = url.indexOf("longpress=") + 10;
+          int start = url.indexOf("keydown=") + 8;
           String value = url.substring(start);
-          if (!value.isEmpty() && Boolean.valueOf(value)) {
+          boolean globeKeyDown = !value.isEmpty() && Boolean.valueOf(value);
+          switch(globeKeyState) {
+            case GLOBE_KEY_STATE_OFF:
+            case GLOBE_KEY_STATE_DOWN:
+            case GLOBE_KEY_STATE_UP:
+              globeKeyState
+          }
+          if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+
+          }
+          /*if (!value.isEmpty() && Boolean.valueOf(value)) {
             // Longpress globe
             if (InAppKeyboard.keyboardPickerEnabled) {
               showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
             }
-          } else {
+          }*/
+          if (!globeKeyDown) {
             // Handle shortpress globe
             if (InAppKeyboard.keyboardPickerEnabled) {
               if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {

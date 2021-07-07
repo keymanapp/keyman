@@ -14,53 +14,21 @@
 
 namespace com.keyman.osk {
 
-  // Used to distinguish shortpress from longpress on globe key
-  export class GlobeKeyState {
-    longpressGlobeKey: boolean = false;
-    globeKeyTimer: number;
-
-    setGlobeKeyTimer(): void {
-      this.longpressGlobeKey = false;
-
-      this.globeKeyTimer = window.setTimeout(function() {
-        this.longpressGlobeKey=true;
-      }.bind(this), 500)
-    }
-  }
-  
-  export class GlobeKeyHandler {
-    static globeKeyState = new GlobeKeyState();
-  }
-
    VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
     let keyman = com.keyman.singleton;
     let device = com.keyman.singleton.util.device;
 
     if(keyName.indexOf('K_LOPT') >= 0) {
-      if(keyDown) {
-        if (device.OS == 'Android') {
-          // Start the timer to distinguish between short and longpress of globe key
-          if (!GlobeKeyHandler.globeKeyState.globeKeyTimer || GlobeKeyHandler.globeKeyState.globeKeyTimer == 0) {
-            GlobeKeyHandler.globeKeyState.setGlobeKeyTimer();
-          }
-        } else {
+      if (device.OS == 'Android') {
+        if (typeof keyman['doGlobeKey'] == 'function') {
+          keyman['doGlobeKey'](keyDown);
+        }
+      } else {
+        if(keyDown) {
           this.menuEvent = e;
           if(typeof keyman['showKeyboardList'] == 'function') {
             keyman['showKeyboardList'];
           }
-        }
-      } else {
-        // Globe Key Up
-        if (device.OS == 'Android') {
-          this.menuEvent = e;
-          if(typeof keyman['doGlobeKey'] == 'function') {
-            // pass whether longpress on globe as parameter
-            keyman['doGlobeKey'](GlobeKeyHandler.globeKeyState.longpressGlobeKey);
-          }
-
-          // Clear longpress timer
-          GlobeKeyHandler.globeKeyState.longpressGlobeKey = false;
-          GlobeKeyHandler.globeKeyState.globeKeyTimer = 0;
         } else {
           if(this.menuEvent) {
             this.highlightKey(this.menuEvent, false);
@@ -68,9 +36,9 @@ namespace com.keyman.osk {
           if(typeof(window['menuKeyUp']) == 'function') {
             window['menuKeyUp']();
           }
-        }
-        this.menuEvent = null;
-      } 
+          this.menuEvent = null;
+        } 
+      }
     } else if(keyName.indexOf('K_ROPT') >= 0) {
       if(keyDown) {
         this.highlightKey(e,false);

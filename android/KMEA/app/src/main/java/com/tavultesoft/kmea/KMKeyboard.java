@@ -189,11 +189,16 @@ final class KMKeyboard extends WebView {
         if (subKeysList != null) {
           showSubKeys(context);
           return;
-        } /* For future implementation
+        } else {
+          // Until we implement banner longpress, can we assume it's globe longpress?
+
+          return;
+        /* For future implementation
         else if(suggestionJSON != null) {
           showSuggestionLongpress(context);
           return;
         }*/
+        }
       }
 
       @Override

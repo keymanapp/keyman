@@ -274,13 +274,13 @@
       window.location.hash = 'globeKeyAction' + fragmentToggle;
     }
 
-    function doGlobeKey(longpress) {
+    function doGlobeKey(keydown) {
       fragmentToggle = (fragmentToggle + 1) % 100;
       var hash = 'globeKeyAction-' + fragmentToggle;
 
-      hash = hash + '&longpress=' + encodeURIComponent(longpress);
+      hash = hash + '&keydown=' + encodeURIComponent(keydown);
 
-      window.location.hash = hash;
+      window.location.hash = hash; Disble KMW timer method
     }
 
     function hideKeyboard() {
