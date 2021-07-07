@@ -13,32 +13,24 @@
 /*****************************************/
 
 namespace com.keyman.osk {
-
    VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
     let keyman = com.keyman.singleton;
-    let device = com.keyman.singleton.util.device;
 
     if(keyName.indexOf('K_LOPT') >= 0) {
-      if (device.OS == 'Android') {
-        if (typeof keyman['doGlobeKey'] == 'function') {
-          keyman['doGlobeKey'](keyDown);
+      if(keyDown) {
+        this.menuEvent = e;
+        if(typeof keyman['showKeyboardList'] == 'function') {
+          keyman['showKeyboardList']();
         }
       } else {
-        if(keyDown) {
-          this.menuEvent = e;
-          if(typeof keyman['showKeyboardList'] == 'function') {
-            keyman['showKeyboardList'];
-          }
-        } else {
-          if(this.menuEvent) {
-            this.highlightKey(this.menuEvent, false);
-          }
-          if(typeof(window['menuKeyUp']) == 'function') {
-            window['menuKeyUp']();
-          }
-          this.menuEvent = null;
-        } 
-      }
+        if(this.menuEvent) {
+          this.highlightKey(this.menuEvent, false);
+        }
+        if(typeof(window['menuKeyUp']) == 'function') {
+          window['menuKeyUp']();
+        }
+        this.menuEvent = null;
+      } 
     } else if(keyName.indexOf('K_ROPT') >= 0) {
       if(keyDown) {
         this.highlightKey(e,false);

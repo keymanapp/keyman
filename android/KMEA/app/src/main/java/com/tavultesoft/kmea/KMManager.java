@@ -112,9 +112,8 @@ public final class KMManager {
   }
 
   public enum GlobeKeyState {
-    GLOBE_KEY_STATE_OFF,
-    GLOBE_KEY_STATE_DOWN,
     GLOBE_KEY_STATE_UP,
+    GLOBE_KEY_STATE_DOWN,
     GLOBE_KEY_STATE_LONGPRESS
   }
 
@@ -166,7 +165,7 @@ public final class KMManager {
   private static int sysKbStartingIndexOnLockScreen = -1;
 
   // This is used to keep track of the globe key shortpress and longpress
-  private static GlobeKeyState globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_OFF;
+  private static GlobeKeyState globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
 
   private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
 
@@ -1884,6 +1883,14 @@ public final class KMManager {
     }
   }
 
+  public static GlobeKeyState getGlobeKeyState() {
+    return globeKeyState;
+  }
+
+  public static void setGlobeKeyState(GlobeKeyState state) {
+    globeKeyState = state;
+  }
+
   protected static final class KMInAppKeyboardWebViewClient extends WebViewClient {
     public static Context context;
 
@@ -1988,26 +1995,26 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
-        if (KMManager.shouldAllowSetKeyboard()) {
-          int start = url.indexOf("keydown=") + 8;
-          String value = url.substring(start);
-          boolean globeKeyDown = !value.isEmpty() && Boolean.valueOf(value);
-          switch(globeKeyState) {
-            case GLOBE_KEY_STATE_OFF:
-            case GLOBE_KEY_STATE_DOWN:
-            case GLOBE_KEY_STATE_UP:
-              globeKeyState
+        // Update globeKeyState
+        int start = url.indexOf("keydown=") + 8;
+        String value = url.substring(start);
+        boolean globeKeyDown = !value.isEmpty() && Boolean.valueOf(value);
+        if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+          if (globeKeyDown) {
+            globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_DOWN;
+          } else {
+            globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
           }
-          if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+        }
 
-          }
-          /*if (!value.isEmpty() && Boolean.valueOf(value)) {
+        if (KMManager.shouldAllowSetKeyboard()) {
+          if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
             // Longpress globe
             if (InAppKeyboard.keyboardPickerEnabled) {
               showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+              globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
             }
-          }*/
-          if (!globeKeyDown) {
+          } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
             // Handle shortpress globe
             if (InAppKeyboard.keyboardPickerEnabled) {
               if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
@@ -2247,10 +2254,19 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
+        // Update globeKeyState
+        int start = url.indexOf("keydown=") + 8;
+        String value = url.substring(start);
+        boolean globeKeyDown = !value.isEmpty() && Boolean.valueOf(value);
+        if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+          if(globeKeyDown) {
+            globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_DOWN;
+          } else {
+            globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+          }
+        }
+
         if (KMManager.shouldAllowSetKeyboard()) {
-          int start = url.indexOf("longpress=") + 10;
-          String value = url.substring(start);
-          boolean longpress = !value.isEmpty() && Boolean.valueOf(value);
 
           if (SystemKeyboard.keyboardPickerEnabled) {
             // Assign shortpress globe action
@@ -2274,9 +2290,13 @@ public final class KMManager {
               // If screen isn't locked, reset the starting index
               sysKbStartingIndexOnLockScreen = -1;
 
-              if (longpress) {
+              if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
                 // Check longpress globe action
                 action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+                globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+              } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
+                // Ignore globe key down cause it may be queueing up for longpress
+                return false;
               }
             }
 

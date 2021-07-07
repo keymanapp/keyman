@@ -31,7 +31,7 @@
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
       kmw['showKeyboardList'] = showMenu;
-      kmw['doGlobeKey'] = doGlobeKey;
+      kmw['menuKeyUp'] = menuKeyUp;
       kmw['hideKeyboard'] = hideKeyboard;
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
@@ -269,18 +269,16 @@
       }
     }
 
+    // legacy function name for globe key down
     function showMenu() {
       fragmentToggle = (fragmentToggle + 1) % 100;
-      window.location.hash = 'globeKeyAction' + fragmentToggle;
+      window.location.hash = 'globeKeyAction-' + fragmentToggle + '&keydown=true';
     }
 
-    function doGlobeKey(keydown) {
+    // legacy function name for globe key up
+    function menuKeyUp() {
       fragmentToggle = (fragmentToggle + 1) % 100;
-      var hash = 'globeKeyAction-' + fragmentToggle;
-
-      hash = hash + '&keydown=' + encodeURIComponent(keydown);
-
-      window.location.hash = hash; Disble KMW timer method
+      window.location.hash = 'globeKeyAction-' + fragmentToggle + '&keydown=false';
     }
 
     function hideKeyboard() {
