@@ -16,15 +16,12 @@ namespace km {
 namespace kbp
 {
 
-using debug_item = km_kbp_state_debug_item;
-
-class debug_items : public std::vector<debug_item>
+class debug_items : public std::vector<km_kbp_state_debug_item>
 {
 private:
   bool _is_enabled;
 public:
-  template<typename... Args>
-  debug_items(Args&&... args);
+  template<typename... Args> debug_items(Args&&... args);
   void push_begin(km_kbp_state_debug_key_info *key_info, uint32_t flags);
   void push_end(uint32_t flags);
   void assert_push_entry();
@@ -34,7 +31,7 @@ public:
 
 template<typename... Args>
 debug_items::debug_items(Args&&... args)
-: std::vector<debug_item>(std::forward<Args>(args)...)
+: std::vector<km_kbp_state_debug_item>(std::forward<Args>(args)...)
 {
   // Ensure the debug_items list is terminated in case the client calls
   // km_kbp_state_debug_items before they call process_event.
