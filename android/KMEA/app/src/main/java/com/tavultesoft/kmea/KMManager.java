@@ -152,7 +152,7 @@ public final class KMManager {
 
   private static boolean didLogHardwareKeystrokeException = false;
 
-  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD; // For testing only. Do not merge to production
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   // This is used to keep track of the starting system keyboard index while the screen is locked
   private static int sysKbStartingIndexOnLockScreen = -1;
@@ -1365,6 +1365,9 @@ public final class KMManager {
   public static void switchToNextKeyboard(Context context) {
     int index = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
     index++;
+    if (index >= KeyboardController.getInstance().get().size()) {
+      index = 0;
+    }
     Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
     if (kbInfo == null) {
       index = 0;
@@ -1378,6 +1381,8 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(kbInfo);
     }
+
+    registerAssociatedLexicalModel(kbInfo.getLanguageID());
   }
 
   protected static IBinder getToken() {
