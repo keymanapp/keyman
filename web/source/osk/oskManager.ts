@@ -145,11 +145,6 @@ namespace com.keyman.osk {
 
       this.loadRetry = 0;
 
-      if(this.desktopLayout) {
-        this.desktopLayout.titleBar.setTitle('KeymanWeb'); // I1972
-      }
-
-
       this._Visible = false;  // I3363 (Build 301)
       var s = this._Box.style;
       s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
