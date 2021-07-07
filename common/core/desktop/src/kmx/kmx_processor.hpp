@@ -10,7 +10,7 @@
 
 #include <string>
 #include <keyman/keyboardprocessor.h>
-#include "kmx/kmx_processor.h"
+#include "kmx/kmx_processevent.h"
 #include "keyboard.hpp"
 #include "processor.hpp"
 
@@ -21,7 +21,7 @@ namespace kbp
   {
   private:
     bool               _valid;
-    kmx::KMX_Processor _kmx;
+    kmx::KMX_ProcessEvent _kmx;
   public:
     kmx_processor(path);
     km_kbp_status process_event(km_kbp_state *state,

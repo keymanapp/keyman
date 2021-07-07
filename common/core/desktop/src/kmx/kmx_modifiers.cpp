@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "kmx_processor.h"
+#include "kmx_processevent.h"
 
 using namespace km::kbp;
 using namespace kmx;
@@ -78,7 +78,7 @@ static KMX_BYTE states[MAX_RSHIFT][MAX_KSHIFT] = {
 * K_CTRLFLAG and K_ALTFLAG as well as specific keys correctly.
 */
 
-KMX_BOOL KMX_Processor::IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift) {
+KMX_BOOL KMX_ProcessEvent::IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift) {
   //
   // The rule shift must have ISVIRTUALKEY bit set for virt.keys
   //
