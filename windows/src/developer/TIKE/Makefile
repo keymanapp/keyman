@@ -76,10 +76,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\developer\tike.exe /t keyman-developer
     $(SYMSTORE) $(DEBUGPATH)\developer\tike.dbg /t keyman-developer
 
-backup:
-    $(WZZIP) $(BUILD)\developer\tike.zip  $(BACKUPDEFAULTS) tike.exe
-
-
 install:
     $(COPY) $(PROGRAM)\developer\tike.exe "$(INSTALLPATH_KEYMANDEVELOPER)\tike.exe"
 

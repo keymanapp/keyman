@@ -33,9 +33,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\desktop\setup.exe /t keyman-windows
     $(SYMSTORE) $(DEBUGPATH)\desktop\setup.dbg /t keyman-windows
 
-backup:
-    $(WZZIP) $(BUILD)\desktop\setup.zip  $(BACKUPDEFAULTS) setup.exe
-
 test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\setup.exe -validate_manifest
