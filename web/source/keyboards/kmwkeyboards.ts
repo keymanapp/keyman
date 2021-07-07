@@ -125,7 +125,7 @@ namespace com.keyman.keyboards {
 
     firstCall: boolean = true; // First time to call keymanCloudRequest()
 
-    // For deferment of adding keyboards until keymanweb initialized
+    // For deferment of adding keyboards until keymanweb initializes
     deferment: Promise<void> = null;
     endDeferment:() => void;
 
@@ -924,7 +924,7 @@ namespace com.keyman.keyboards {
 
       // Ensure keymanweb is initialized before continuing to add keyboards
       if(!this.keymanweb.initialized) {
-        let result = await this.deferment;
+        await this.deferment;
       }
 
       // Ignore empty array passed as argument

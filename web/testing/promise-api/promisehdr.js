@@ -105,9 +105,8 @@
     // One invalid keyboard
     addKeyboards({id: 'invalid', name:'Invalid'});
 
-    // Two keyboards, 1 invalid
+    // One keyboard, 1 invalid
     addKeyboards({id:'sil_cameroon_qwerty', name:'SIL Cameroon Qwerty', languages:[{id:'aal-latn'}]},
-                 {id:'khmer_angkor', name: 'Khmer Angkor', languages:{id:'km'}},
                  {id: 'invalid2', name:'Invalid2'});
 
     // Add a keyboard by language name.  Note that the name must be spelled
@@ -151,6 +150,10 @@
         // Add keyboard for comma-separated language name(s)
         sKbd=document.getElementById('kbd_id3').value;
         addKeyboardsForLanguage(sKbd);
+        break;
+      case 4:
+        // Add khmer_angkor keyboard with languages Object and no filename
+        addKeyboards({id:'khmer_angkor', name: 'Khmer Angkor', languages:{id:'km'}});
         break;
     }
   }
