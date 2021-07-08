@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.System.Project.ProjectFile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rework for Keyman Developer 7, XML based project
                     23 Aug 2006 - mcdurdin - Add IDEState property for automatic saving/loading of IDE state
@@ -58,7 +58,7 @@
                     30 May 2015 - mcdurdin - I4729 - If you attempt to load a non-XML file as a project, it silently fails and overwrites the file
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
-                    
+
 *)
 unit Keyman.Developer.System.Project.ProjectFile;  // I3306   // I4687
 
@@ -1044,16 +1044,7 @@ end;
 
 class function TProject.StringsTemplatePath: string;
 begin
-  Result := ExtractFilePath(ParamStr(0)) + 'locale\' + 'en';  // I2595
-  if FileExists(Result + '\xml\project\project.xsl') then
-    Result := Result + '\xml\project\'
-  else
-  begin
-    Result := ExtractFilePath(ParamStr(0)) + 'locale\' + 'en'; // I2595
-    if FileExists(Result + '\xml\project\project.xsl')
-      then Result := Result + '\xml\project\'
-      else Result := GetXMLTemplatePath + 'project\';
-  end;
+  Result := GetXMLTemplatePath + 'project\';
 end;
 
 class function TProject.GetUntitledProjectFilename(CurrentProcess: Boolean): string;
