@@ -129,8 +129,8 @@ namespace com.keyman.osk {
     ];
 
     static readonly HIGHLIGHT_CLASS = 'kmw-key-touched';
+    readonly spec: OSKKeySpec;
 
-    spec: OSKKeySpec;
     btn: KeyElement;
     label: HTMLSpanElement;
 
@@ -443,6 +443,12 @@ namespace com.keyman.osk {
       let y1 = y0 + btn.offsetHeight;
 
       return (x > x0 && x < x1 && y > y0 && y < y1);
+    }
+
+    public refreshLayout(vkbd: VisualKeyboard) {
+      if(this.label) { // space bar may not define the text span!
+        this.label.style.fontSize = this.getIdealFontSize(vkbd, this.btn.style);
+      }
     }
   }
 }
