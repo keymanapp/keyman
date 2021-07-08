@@ -212,7 +212,6 @@ namespace com.keyman.osk {
         if(kbdView instanceof VisualKeyboard) {
           this._Box.appendChild(layout.resizeBar.element);
         }
-        // For other devices, adjust the object heights, allowing for viewport scaling
       }
 
       // Initializes the size of a touch keyboard.
