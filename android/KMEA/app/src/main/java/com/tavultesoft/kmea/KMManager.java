@@ -1339,6 +1339,9 @@ public final class KMManager {
   public static void switchToNextKeyboard(Context context) {
     int index = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
     index++;
+    if (index >= KeyboardController.getInstance().get().size()) {
+      index = 0;
+    }
     Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
     if (kbInfo == null) {
       index = 0;
@@ -1352,6 +1355,8 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(kbInfo);
     }
+
+    registerAssociatedLexicalModel(kbInfo.getLanguageID());
   }
 
   protected static IBinder getToken() {
