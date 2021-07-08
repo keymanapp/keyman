@@ -35,7 +35,7 @@
 
 #define MAXCONTEXT_ITEMS 128
 #define KEYMAN_BACKSPACE 14
-#define KEYMAN_BACKSPACE_KEYSYM 0xff08
+#define KEYMAN_BACKSPACE_KEYSYM  IBUS_KEY_BackSpace
 #define KEYMAN_LCTRL 29
 #define KEYMAN_LALT 56
 #define KEYMAN_RCTRL 97
@@ -70,12 +70,12 @@ struct _IBusKeymanEngineClass {
 
 /* functions prototype */
 static void	ibus_keyman_engine_class_init	    (IBusKeymanEngineClass    *klass);
-static void	ibus_keyman_engine_init		    (IBusKeymanEngine		    *kmfl);
+static void	ibus_keyman_engine_init		    (IBusKeymanEngine		    *keyman);
 static GObject*
             ibus_keyman_engine_constructor    (GType                   type,
                                              guint                   n_construct_params,
                                              GObjectConstructParam  *construct_params);
-static void	ibus_keyman_engine_destroy		(IBusKeymanEngine		    *kmfl);
+static void	ibus_keyman_engine_destroy		(IBusKeymanEngine		    *keyman);
 static gboolean
 			ibus_keyman_engine_process_key_event
                                             (IBusEngine             *engine,
@@ -116,7 +116,7 @@ static void ibus_keyman_engine_property_hide
                                              const gchar            *prop_name);
 
 static void ibus_keyman_engine_commit_string
-                                            (IBusKeymanEngine         *kmfl,
+                                            (IBusKeymanEngine         *keyman,
                                              const gchar            *string);
 
 static IBusEngineClass *parent_class = NULL;
@@ -237,9 +237,9 @@ static void reset_context(IBusEngine *engine)
 }
 
 static void
-ibus_keyman_engine_init (IBusKeymanEngine *kmfl)
+ibus_keyman_engine_init (IBusKeymanEngine *keyman)
 {
-    kmfl->status_prop = ibus_property_new ("status",
+    keyman->status_prop = ibus_property_new ("status",
                                            PROP_TYPE_NORMAL,
                                            NULL,
                                            NULL,
@@ -248,14 +248,14 @@ ibus_keyman_engine_init (IBusKeymanEngine *kmfl)
                                            FALSE,
                                            0,
                                            NULL);
-    g_object_ref_sink(kmfl->status_prop);
-    kmfl->prop_list = ibus_prop_list_new ();
-    g_object_ref_sink(kmfl->prop_list);
-    ibus_prop_list_append (kmfl->prop_list,  kmfl->status_prop);
+    g_object_ref_sink(keyman->status_prop);
+    keyman->prop_list = ibus_prop_list_new ();
+    g_object_ref_sink(keyman->prop_list);
+    ibus_prop_list_append (keyman->prop_list,  keyman->status_prop);
 
-    kmfl->table = ibus_lookup_table_new (9, 0, TRUE, TRUE);
-    g_object_ref_sink(kmfl->table);
-    kmfl->state = NULL;
+    keyman->table = ibus_lookup_table_new (9, 0, TRUE, TRUE);
+    g_object_ref_sink(keyman->table);
+    keyman->state = NULL;
 }
 
 static GObject*
@@ -459,21 +459,21 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
 }
 
 static void
-ibus_keyman_engine_commit_string (IBusKeymanEngine *kmfl,
+ibus_keyman_engine_commit_string (IBusKeymanEngine *keyman,
                                 const gchar    *string)
 {
     IBusText *text;
     g_message("DAR: ibus_keyman_engine_commit_string - %s", string);
     text = ibus_text_new_from_static_string (string);
     g_object_ref_sink(text);
-    ibus_engine_commit_text ((IBusEngine *)kmfl, text);
+    ibus_engine_commit_text ((IBusEngine *)keyman, text);
     g_object_unref (text);
 }
 
-static void forward_backspace(IBusKeymanEngine *engine, unsigned int state)
+static void forward_backspace(IBusKeymanEngine *keyman, unsigned int state)
 {
     g_message("DAR: forward_backspace %d no keysym state %d", KEYMAN_BACKSPACE, state);
-    ibus_engine_forward_key_event((IBusEngine *)engine, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, state);
+    ibus_engine_forward_key_event((IBusEngine *)keyman, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, state);
 }
 
 // from android/KMEA/app/src/main/java/com/tavultesoft/kmea/KMHardwareKeyboardInterpreter.java
@@ -481,65 +481,62 @@ static void forward_backspace(IBusKeymanEngine *engine, unsigned int state)
 //private static final
 //  int scanCodeMap[] = {
 static km_kbp_virtual_key const keycode_to_vk[256] = {
-    0,      //        padding = 0x00;
-    KM_KBP_VKEY_ESC,      //        public static final int KEY_ESC = 0x01;
-    KM_KBP_VKEY_1,    //        public static final int KEY_1 = 0x02;
-    KM_KBP_VKEY_2,    //        public static final int KEY_2 = 0x03;
-    KM_KBP_VKEY_3,    //        public static final int KEY_3 = 0x04;
-    KM_KBP_VKEY_4,    //        public static final int KEY_4 = 0x05;
-    KM_KBP_VKEY_5,    //        public static final int KEY_5 = 0x06;
-    KM_KBP_VKEY_6,    //        public static final int KEY_6 = 0x07;
-    KM_KBP_VKEY_7,    //        public static final int KEY_7 = 0x08;
-    KM_KBP_VKEY_8,    //        public static final int KEY_8 = 0x09;
-    KM_KBP_VKEY_9,    //        public static final int KEY_9 = 0x0A;
-    KM_KBP_VKEY_0,    //        public static final int KEY_0 = 0x0B;
-    KM_KBP_VKEY_HYPHEN,    //        public static final int KEY_MINUS = 0x0C;
-    KM_KBP_VKEY_EQUAL,    //        public static final int KEY_EQUALS = 0x0D;
-    KM_KBP_VKEY_BKSP,      //        public static final int KEY_BACKSPACE = 0x0E;
-    KM_KBP_VKEY_TAB,      //        public static final int KEY_TAB = 0x0F;
-    KM_KBP_VKEY_Q,    //        public static final int KEY_Q = 0x10;
-    KM_KBP_VKEY_W,    //        public static final int KEY_W = 0x11;
-    KM_KBP_VKEY_E,    //        public static final int KEY_E = 0x12;
-    KM_KBP_VKEY_R,    //        public static final int KEY_R = 0x13;
-    KM_KBP_VKEY_T,    //        public static final int KEY_T = 0x14;
-    KM_KBP_VKEY_Y,    //        public static final int KEY_Y = 0x15;
-    KM_KBP_VKEY_U,    //        public static final int KEY_U = 0x16;
-    KM_KBP_VKEY_I,    //        public static final int KEY_I = 0x17;
-    KM_KBP_VKEY_O,    //        public static final int KEY_O = 0x18;
-    KM_KBP_VKEY_P,    //        public static final int KEY_P = 0x19;
-    KM_KBP_VKEY_LBRKT,    //        public static final int KEY_LEFTBRACE = 0x1A;
-    KM_KBP_VKEY_RBRKT,    //        public static final int KEY_RIGHTBRACE = 0x1B;
-    KM_KBP_VKEY_ENTER,     //        public static final int KEY_ENTER = 0x1C;
-    0,      //        public static final int KEY_LEFTCTRL = 0x1D;
-    KM_KBP_VKEY_A,    //        public static final int KEY_A = 0x1E;
-    KM_KBP_VKEY_S,    //        public static final int KEY_S = 0x1F;
-    KM_KBP_VKEY_D,    //        public static final int KEY_D = 0x20;
-    KM_KBP_VKEY_F,    //        public static final int KEY_F = 0x21;
-    KM_KBP_VKEY_G,    //        public static final int KEY_G = 0x22;
-    KM_KBP_VKEY_H,    //        public static final int KEY_H = 0x23;
-    KM_KBP_VKEY_J,    //        public static final int KEY_J = 0x24;
-    KM_KBP_VKEY_K,    //        public static final int KEY_K = 0x25;
-    KM_KBP_VKEY_L,    //        public static final int KEY_L = 0x26;
-    KM_KBP_VKEY_COLON,    //        public static final int KEY_SEMICOLON = 0x27;
-    KM_KBP_VKEY_QUOTE,    //        public static final int KEY_APOSTROPHE = 0x28;
-    KM_KBP_VKEY_BKQUOTE,    //        public static final int KEY_GRAVE = 0x29;
-    0,      //        public static final int KEY_LEFTSHIFT = 0x2A;
-    KM_KBP_VKEY_BKSLASH,    //        public static final int KEY_BACKSLASH = 0x2B;
-    KM_KBP_VKEY_Z,    //        public static final int KEY_Z = 0x2C;
-    KM_KBP_VKEY_X,    //        public static final int KEY_X = 0x2D;
-    KM_KBP_VKEY_C,    //        public static final int KEY_C = 0x2E;
-    KM_KBP_VKEY_V,    //        public static final int KEY_V = 0x2F;
-    KM_KBP_VKEY_B,    //        public static final int KEY_B = 0x30;
-    KM_KBP_VKEY_N,    //        public static final int KEY_N = 0x31;
-    KM_KBP_VKEY_M,    //        public static final int KEY_M = 0x32;
-    KM_KBP_VKEY_COMMA,    //        public static final int KEY_COMMA = 0x33;
-    KM_KBP_VKEY_PERIOD,    //        public static final int KEY_DOT = 0x34;
-    KM_KBP_VKEY_SLASH,    //        public static final int KEY_SLASH = 0x35;
-    0,      //        public static final int KEY_RIGHTSHIFT = 0x36;
-    KM_KBP_VKEY_NPSTAR,      //        public static final int KEY_KPASTERISK = 0x37;
-    0,      //        public static final int KEY_LEFTALT = 0x38;
-    KM_KBP_VKEY_SPACE,     //        public static final int KEY_SPACE = 0x39;
-    0,      //        public static final int KEY_CAPSLOCK = 0x3A;
+    0,                   //        padding = 0x00;
+    KM_KBP_VKEY_ESC,     //        public static final int KEY_ESC = 0x01;
+    KM_KBP_VKEY_1,       //        public static final int KEY_1 = 0x02;
+    KM_KBP_VKEY_2,       //        public static final int KEY_2 = 0x03;
+    KM_KBP_VKEY_3,       //        public static final int KEY_3 = 0x04;
+    KM_KBP_VKEY_4,       //        public static final int KEY_4 = 0x05;
+    KM_KBP_VKEY_5,       //        public static final int KEY_5 = 0x06;
+    KM_KBP_VKEY_6,       //        public static final int KEY_6 = 0x07;
+    KM_KBP_VKEY_7,       //        public static final int KEY_7 = 0x08;
+    KM_KBP_VKEY_8,       //        public static final int KEY_8 = 0x09;
+    KM_KBP_VKEY_9,       //        public static final int KEY_9 = 0x0A;
+    KM_KBP_VKEY_0,       //        public static final int KEY_0 = 0x0B;
+    KM_KBP_VKEY_HYPHEN,  //        public static final int KEY_MINUS = 0x0C;
+    KM_KBP_VKEY_EQUAL,   //        public static final int KEY_EQUALS = 0x0D;
+    KM_KBP_VKEY_BKSP,    //        public static final int KEY_BACKSPACE = 0x0E;
+    KM_KBP_VKEY_TAB,     //        public static final int KEY_TAB = 0x0F;
+    KM_KBP_VKEY_Q,       //        public static final int V_R = 0x13;
+    KM_KBP_VKEY_T,       //        public static final int KEY_T = 0x14;
+    KM_KBP_VKEY_Y,       //        public static final int KEY_Y = 0x15;
+    KM_KBP_VKEY_U,       //        public static final int KEY_U = 0x16;
+    KM_KBP_VKEY_I,       //        public static final int KEY_I = 0x17;
+    KM_KBP_VKEY_O,       //        public static final int KEY_O = 0x18;
+    KM_KBP_VKEY_P,       //        public static final int KEY_P = 0x19;
+    KM_KBP_VKEY_LBRKT,   //        public static final int KEY_LEFTBRACE = 0x1A;
+    KM_KBP_VKEY_RBRKT,   //        public static final int KEY_RIGHTBRACE = 0x1B;
+    KM_KBP_VKEY_ENTER,   //        public static final int KEY_ENTER = 0x1C;
+    0,                   //        public static final int KEY_LEFTCTRL = 0x1D;
+    KM_KBP_VKEY_A,       //        public static final int KEY_A = 0x1E;
+    KM_KBP_VKEY_S,       //        public static final int KEY_S = 0x1F;
+    KM_KBP_VKEY_D,       //        public static final int KEY_D = 0x20;
+    KM_KBP_VKEY_F,       //        public static final int KEY_F = 0x21;
+    KM_KBP_VKEY_G,       //        public static final int KEY_G = 0x22;
+    KM_KBP_VKEY_H,       //        public static final int KEY_H = 0x23;
+    KM_KBP_VKEY_J,       //        public static final int KEY_J = 0x24;
+    KM_KBP_VKEY_K,       //        public static final int KEY_K = 0x25;
+    KM_KBP_VKEY_L,       //        public static final int KEY_L = 0x26;
+    KM_KBP_VKEY_COLON,   //        public static final int KEY_SEMICOLON = 0x27;
+    KM_KBP_VKEY_QUOTE,   //        public static final int KEY_APOSTROPHE = 0x28;
+    KM_KBP_VKEY_BKQUOTE, //        public static final int KEY_GRAVE = 0x29;
+    0,                   //        public static final int KEY_LEFTSHIFT = 0x2A;
+    KM_KBP_VKEY_BKSLASH, //        public static final int KEY_BACKSLASH = 0x2B;
+    KM_KBP_VKEY_Z,       //        public static final int KEY_Z = 0x2C;
+    KM_KBP_VKEY_X,       //        public static final int KEY_X = 0x2D;
+    KM_KBP_VKEY_C,       //        public static final int KEY_C = 0x2E;
+    KM_KBP_VKEY_V,       //        public static final int KEY_V = 0x2F;
+    KM_KBP_VKEY_B,       //        public static final int KEY_B = 0x30;
+    KM_KBP_VKEY_N,       //        public static final int KEY_N = 0x31;
+    KM_KBP_VKEY_M,       //        public static final int KEY_M = 0x32;
+    KM_KBP_VKEY_COMMA,   //        public static final int KEY_COMMA = 0x33;
+    KM_KBP_VKEY_PERIOD,  //        public static final int KEY_DOT = 0x34;
+    KM_KBP_VKEY_SLASH,   //        public static final int KEY_SLASH = 0x35;
+    0,                   //        public static final int KEY_RIGHTSHIFT = 0x36;
+    KM_KBP_VKEY_NPSTAR,  //        public static final int KEY_KPASTERISK = 0x37;
+    0,                   //        public static final int KEY_LEFTALT = 0x38;
+    KM_KBP_VKEY_SPACE,   //        public static final int KEY_SPACE = 0x39;
+    KM_KBP_VKEY_CAPS,    //        public static final int KEY_CAPSLOCK = 0x3A;
     KM_KBP_VKEY_F1,      //        public static final int KEY_F1 = 0x3B;
     KM_KBP_VKEY_F2,      //        public static final int KEY_F2 = 0x3C;
     KM_KBP_VKEY_F3,      //        public static final int KEY_F3 = 0x3D;
@@ -549,31 +546,32 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     KM_KBP_VKEY_F7,      //        public static final int KEY_F7 = 0x41;
     KM_KBP_VKEY_F8,      //        public static final int KEY_F8 = 0x42;
     KM_KBP_VKEY_F9,      //        public static final int KEY_F9 = 0x43;
-    KM_KBP_VKEY_F10,      //        public static final int KEY_F10 = 0x44;
-    0,      //        public static final int KEY_NUMLOCK = 0x45;
-    0,      //        public static final int KEY_SCROLLLOCK = 0x46;
-    KM_KBP_VKEY_NP7,      //        public static final int KEY_KP7 = 0x47;
-    KM_KBP_VKEY_NP8,      //        public static final int KEY_KP8 = 0x48;
-    KM_KBP_VKEY_NP9,      //        public static final int KEY_KP9 = 0x49;
-    KM_KBP_VKEY_NPMINUS,      //        public static final int KEY_KPMINUS = 0x4A;
-    KM_KBP_VKEY_NP4,      //        public static final int KEY_KP4 = 0x4B;
-    KM_KBP_VKEY_NP5,      //        public static final int KEY_KP5 = 0x4C;
-    KM_KBP_VKEY_NP6,      //        public static final int KEY_KP6 = 0x4D;
-    KM_KBP_VKEY_NPPLUS,      //        public static final int KEY_KPPLUS = 0x4E;
-    KM_KBP_VKEY_NP1,      //        public static final int KEY_KP1 = 0x4F;
-    KM_KBP_VKEY_NP2,      //        public static final int KEY_KP2 = 0x50;
-    KM_KBP_VKEY_NP3,      //        public static final int KEY_KP3 = 0x51;
-    KM_KBP_VKEY_NP0,      //        public static final int KEY_KP0 = 0x52;
-    KM_KBP_VKEY_NPDOT,      //        public static final int KEY_KPDOT = 0x53;
-    0,      //        padding 0x54;
-    0,      //        public static final int KEY_ZENKAKUHANKAKU = 0x55;
+    KM_KBP_VKEY_F10,     //        public static final int KEY_F10 = 0x44;
+    0,                   //        public static final int KEY_NUMLOCK = 0x45;
+    0,                   //        public static final int KEY_SCROLLLOCK = 0x46;
+    KM_KBP_VKEY_NP7,     //        public static final int KEY_KP7 = 0x47;
+    KM_KBP_VKEY_NP8,     //        public static final int KEY_KP8 = 0x48;
+    KM_KBP_VKEY_NP9,     //        public static final int KEY_KP9 = 0x49;
+    KM_KBP_VKEY_NPMINUS, //        public static final int KEY_KPMINUS = 0x4A;
+    KM_KBP_VKEY_NP4,     //        public static final int KEY_KP4 = 0x4B;
+    KM_KBP_VKEY_NP5,     //        public static final int KEY_KP5 = 0x4C;
+    KM_KBP_VKEY_NP6,     //        public static final int KEY_KP6 = 0x4D;
+    KM_KBP_VKEY_NPPLUS,  //        public static final int KEY_KPPLUS = 0x4E;
+    KM_KBP_VKEY_NP1,     //        public static final int KEY_KP1 = 0x4F;
+    KM_KBP_VKEY_NP2,     //        public static final int KEY_KP2 = 0x50;
+    KM_KBP_VKEY_NP3,     //        public static final int KEY_KP3 = 0x51;
+    KM_KBP_VKEY_NP0,     //        public static final int KEY_KP0 = 0x52;
+    KM_KBP_VKEY_NPDOT,   //        public static final int KEY_KPDOT = 0x53;
+    0,                   //        padding 0x54;
+    0,                   //        public static final int KEY_ZENKAKUHANKAKU = 0x55;
     KM_KBP_VKEY_oE2,     //        public static final int KEY_102ND = 0x56;
+
     // additional on linux
-    KM_KBP_VKEY_F11,      //        public static final int KEY_F11 = 0x57;
+    KM_KBP_VKEY_F11,     //        public static final int KEY_F11 = 0x57;
     KM_KBP_VKEY_F12      //        public static final int KEY_F12 = 0x58;
 
     // Many more KEYS currently not used by KMW...
-  };
+};
 
 static gboolean ok_for_single_backspace(const km_kbp_action_item *action_items, int i, size_t num_actions)
 {
@@ -581,6 +579,245 @@ static gboolean ok_for_single_backspace(const km_kbp_action_item *action_items, 
         if (action_items[i].type == KM_KBP_IT_BACK || action_items[i].type == KM_KBP_IT_CHAR || action_items[i].type == KM_KBP_IT_EMIT_KEYSTROKE) {
             return FALSE;
         }
+    }
+    return TRUE;
+}
+
+static gboolean process_unicode_char_action(IBusKeymanEngine *keyman,
+                                            const km_kbp_action_item *action_item)
+{
+    if (g_unichar_type(action_item->character) == G_UNICODE_SURROGATE) {
+        if (keyman->firstsurrogate == 0) {
+            keyman->firstsurrogate = action_item->character;
+            g_message("first surrogate %d", keyman->firstsurrogate);
+        } else {
+            glong items_read, items_written;
+            gunichar2 utf16_pair[2] = {keyman->firstsurrogate, action_item->character};
+            gchar *utf8_pair = g_utf16_to_utf8 (utf16_pair, 2,
+                &items_read,
+                &items_written,
+                NULL);
+            if (keyman->char_buffer == NULL) {
+                keyman->char_buffer = utf8_pair;
+            } else {
+                gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8_pair, NULL);
+                g_free(keyman->char_buffer);
+                g_free(utf8_pair);
+                keyman->char_buffer = new_buffer;
+            }
+            keyman->firstsurrogate = 0;
+        }
+    } else {
+        gchar *utf8 = (gchar *) g_new0(gchar, 12);
+        gint numbytes = g_unichar_to_utf8(action_item->character, utf8);
+        if (numbytes > 12) {
+            g_error("g_unichar_to_utf8 overflowing buffer");
+            g_free(utf8);
+        } else {
+            g_message("unichar:U+%04x, bytes:%d, string:%s", action_item->character, numbytes, utf8);
+            if (keyman->char_buffer == NULL) {
+                g_message("setting buffer to converted unichar");
+                keyman->char_buffer = utf8;
+            } else {
+                g_message("appending converted unichar to CHAR buffer");
+                gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8, NULL);
+                g_free(keyman->char_buffer);
+                g_free(utf8);
+                keyman->char_buffer = new_buffer;
+            }
+            g_message("CHAR buffer is now %s", keyman->char_buffer);
+        }
+    }
+    return TRUE;
+}
+
+static gboolean process_alert_action()
+{
+    GdkDisplay *display = gdk_display_open(NULL);
+    if (display != NULL)
+    {
+        gdk_display_beep(display);
+        gdk_display_close(display);
+    }
+    return TRUE;
+}
+
+static gboolean
+process_backspace_action(
+    IBusEngine *engine,
+    const km_kbp_action_item *action_items,
+    int i,
+    size_t num_action_items)
+{
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+    if (keyman->char_buffer != NULL)
+    {
+        // ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+        g_message("removing one utf8 char from CHAR buffer");
+        glong end_pos = g_utf8_strlen(keyman->char_buffer, -1);
+        gchar *new_buffer;
+        if (end_pos == 1)
+        {
+            new_buffer = NULL;
+            g_message("resetting CHAR buffer to NULL");
+        }
+        else
+        {
+            new_buffer = g_utf8_substring(keyman->char_buffer, 0, end_pos - 1);
+            g_message("changing CHAR buffer to :%s:", new_buffer);
+        }
+        if (g_strcmp0(keyman->char_buffer, new_buffer) == 0)
+        {
+            g_message("oops, CHAR buffer hasn't changed");
+        }
+        g_free(keyman->char_buffer);
+        keyman->char_buffer = new_buffer;
+    }
+    else if (ok_for_single_backspace(action_items, i, num_action_items))
+    {
+        // single backspace can be handled by ibus as normal
+        g_message("no char actions, just single back");
+        return FALSE;
+    }
+    else
+    {
+        g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x",
+                  engine->client_capabilities, IBUS_CAP_SURROUNDING_TEXT);
+
+        if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
+        {
+            g_message("deleting surrounding text 1 char");
+            ibus_engine_delete_surrounding_text(engine, -1, 1);
+        }
+        else
+        {
+            g_message("forwarding backspace with reset context");
+            km_kbp_context_item *context_items;
+            km_kbp_context_get(km_kbp_state_context(keyman->state), &context_items);
+            reset_context(engine);
+            forward_backspace(keyman, 0);
+            km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
+            km_kbp_context_items_dispose(context_items);
+        }
+    }
+    return TRUE;
+}
+
+static gboolean process_persist_action(IBusKeymanEngine *keyman,
+                                       const km_kbp_action_item *action_item)
+{
+    // Save keyboard option
+    if (!action_item->option)
+        return TRUE;
+
+    // Allocate for 1 option plus 1 pad struct of 0's
+    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 2);
+    memmove(&(keyboard_opts[0]), action_item->option, sizeof(km_kbp_option_item));
+    km_kbp_status event_status = km_kbp_state_options_update(keyman->state, keyboard_opts);
+    if (event_status != KM_KBP_STATUS_OK)
+    {
+        g_warning("problem saving option for km_kbp_keyboard");
+    }
+    g_free(keyboard_opts);
+
+    // Put the keyboard option into DConf
+    if (action_item->option->key != NULL && action_item->option->value != NULL)
+    {
+        g_message("Saving keyboard option to DConf");
+        // Load the current keyboard options from DConf
+        keyman_put_options_todconf(keyman->kb_name, keyman->kb_name,
+                                    (gchar *)action_item->option->key,
+                                    (gchar *)action_item->option->value);
+    }
+    return TRUE;
+}
+
+static gboolean process_emit_keystroke_action(IBusKeymanEngine *keyman)
+{
+    if (keyman->char_buffer != NULL)
+    {
+        ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+        g_free(keyman->char_buffer);
+        keyman->char_buffer = NULL;
+    }
+    keyman->emitting_keystroke = TRUE;
+    return TRUE;
+}
+
+static gboolean process_invalidate_context_action(IBusEngine *engine)
+{
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+    km_kbp_context_clear(km_kbp_state_context(keyman->state));
+    reset_context(engine);
+    return TRUE;
+}
+
+static gboolean process_end_action(IBusKeymanEngine *keyman)
+{
+    keyman->firstsurrogate = 0;
+    if (keyman->char_buffer != NULL)
+    {
+        ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+        g_free(keyman->char_buffer);
+        keyman->char_buffer = NULL;
+    }
+    if (keyman->emitting_keystroke)
+    {
+        keyman->emitting_keystroke = FALSE;
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static gboolean
+process_actions(IBusEngine *engine,
+                const km_kbp_action_item *action_items,
+                size_t num_action_items)
+{
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+    for (int i = 0; i < num_action_items; i++)
+    {
+        gboolean continue_with_next_action = TRUE;
+        switch (action_items[i].type)
+        {
+        case KM_KBP_IT_CHAR:
+            g_message("CHAR action %d/%d", i + 1, (int)num_action_items);
+            continue_with_next_action = process_unicode_char_action(keyman, &action_items[i]);
+            break;
+        case KM_KBP_IT_MARKER:
+            g_message("MARKER action %d/%d", i + 1, (int)num_action_items);
+            break;
+        case KM_KBP_IT_ALERT:
+            g_message("ALERT action %d/%d", i + 1, (int)num_action_items);
+            continue_with_next_action = process_alert_action();
+            break;
+        case KM_KBP_IT_BACK:
+            g_message("BACK action %d/%d", i + 1, (int)num_action_items);
+            continue_with_next_action = process_backspace_action(engine, action_items, i, num_action_items);
+            break;
+        case KM_KBP_IT_PERSIST_OPT:
+            g_message("PERSIST_OPT action %d/%d", i + 1, (int)num_action_items);
+            continue_with_next_action = process_persist_action(keyman, &action_items[i]);
+            break;
+        case KM_KBP_IT_EMIT_KEYSTROKE:
+            g_message("EMIT_KEYSTROKE action %d/%d", i + 1, (int)num_action_items);
+            continue_with_next_action = process_emit_keystroke_action(keyman);
+            break;
+        case KM_KBP_IT_INVALIDATE_CONTEXT:
+            g_message("INVALIDATE_CONTEXT action %d/%d", i + 1, (int)num_action_items);
+            continue_with_next_action = process_invalidate_context_action(engine);
+            break;
+        case KM_KBP_IT_END:
+            g_message("END action %d/%d", i + 1, (int)num_action_items);
+            continue_with_next_action = process_end_action(keyman);
+            break;
+        default:
+            g_warning("Unknown action %d/%d(%d)", i + 1, (int)num_action_items,
+                      action_items[i].type);
+        }
+        if (!continue_with_next_action)
+            return FALSE;
     }
     return TRUE;
 }
@@ -693,183 +930,14 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
 
     // km_kbp_state_action_items to get action items
     size_t num_action_items;
-    gint numbytes;
     g_free(keyman->char_buffer);
     keyman->char_buffer = NULL;
     const km_kbp_action_item *action_items = km_kbp_state_action_items(keyman->state,
                                                      &num_action_items);
 
-    for (int i = 0; i < num_action_items; i++)
-    {
-        switch(action_items[i].type)
-        {
-            case KM_KBP_IT_CHAR:
-                g_message("CHAR action %d/%d", i+1, (int)num_action_items);
-                if (g_unichar_type(action_items[i].character) == G_UNICODE_SURROGATE) {
-                    if (keyman->firstsurrogate == 0) {
-                        keyman->firstsurrogate = action_items[i].character;
-                        g_message("first surrogate %d", keyman->firstsurrogate);
-                    }
-                    else {
-                        glong items_read, items_written;
-                        gunichar2 utf16_pair[2] = {keyman->firstsurrogate, action_items[i].character};
-                        gchar *utf8_pair = g_utf16_to_utf8 (utf16_pair, 2,
-                            &items_read,
-                            &items_written,
-                            NULL);
-                        if (keyman->char_buffer == NULL) {
-                            keyman->char_buffer = utf8_pair;
-                        }
-                        else {
-                            gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8_pair, NULL);
-                            g_free(keyman->char_buffer);
-                            g_free(utf8_pair);
-                            keyman->char_buffer = new_buffer;
-                        }
-                        keyman->firstsurrogate = 0;
-                    }
-                }
-                else {
-                    gchar *utf8 = (gchar *) g_new0(gchar, 12);
-                    numbytes = g_unichar_to_utf8(action_items[i].character, utf8);
-                    if (numbytes > 12) {
-                        g_error("g_unichar_to_utf8 overflowing buffer");
-                        g_free(utf8);
-                    }
-                    else {
-                        g_message("unichar:U+%04x, bytes:%d, string:%s", action_items[i].character, numbytes, utf8);
-                        if (keyman->char_buffer == NULL) {
-                            g_message("setting buffer to converted unichar");
-                            keyman->char_buffer = utf8;
-                        }
-                        else {
-                            g_message("appending converted unichar to CHAR buffer");
-                            gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8, NULL);
-                            g_free(keyman->char_buffer);
-                            g_free(utf8);
-                            keyman->char_buffer = new_buffer;
-                        }
-                        g_message("CHAR buffer is now %s", keyman->char_buffer);
-                    }
-                }
-                break;
-            case KM_KBP_IT_MARKER:
-                g_message("MARKER action %d/%d", i+1, (int)num_action_items);
-                break;
-            case KM_KBP_IT_ALERT:
-                g_message("ALERT action %d/%d", i+1, (int)num_action_items);
-                GdkDisplay *display = gdk_display_open(NULL);
-                if (display != NULL) {
-                    gdk_display_beep(display);
-                    gdk_display_close(display);
-                }
-                break;
-            case KM_KBP_IT_BACK:
-                g_message("BACK action %d/%d", i+1, (int)num_action_items);
-                if (keyman->char_buffer != NULL)
-                {
-                    // ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-                    g_message("removing one utf8 char from CHAR buffer");
-                    glong end_pos = g_utf8_strlen(keyman->char_buffer, -1);
-                    gchar *new_buffer;
-                    if (end_pos == 1) {
-                        new_buffer = NULL;
-                        g_message("resetting CHAR buffer to NULL");
-                    }
-                    else {
-                        new_buffer = g_utf8_substring(keyman->char_buffer, 0 , end_pos - 1);
-                        g_message("changing CHAR buffer to :%s:", new_buffer);
-                    }
-                    if (g_strcmp0(keyman->char_buffer, new_buffer) == 0) {
-                        g_message("oops, CHAR buffer hasn't changed");
-                    }
-                    g_free(keyman->char_buffer);
-                    keyman->char_buffer = new_buffer;
-                }
-                else if (ok_for_single_backspace(action_items, i, num_action_items)) {
-                    // single backspace can be handled by ibus as normal
-                    g_message("no char actions, just single back");
-                    return FALSE;
-                }
-                else {
-                    g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
+    if (!process_actions(engine, action_items, num_action_items))
+        return FALSE;
 
-                    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
-                        g_message("deleting surrounding text 1 char");
-                        ibus_engine_delete_surrounding_text(engine, -1, 1);
-                    } else {
-                        g_message("forwarding backspace with reset context");
-                        km_kbp_context_item *context_items;
-                        km_kbp_context_get(km_kbp_state_context(keyman->state),
-                            &context_items);
-                        reset_context(engine);
-                        forward_backspace(keyman, 0);
-                        km_kbp_context_set(km_kbp_state_context(keyman->state),
-                            context_items);
-                        km_kbp_context_items_dispose(context_items);
-                    }
-                }
-                break;
-            case KM_KBP_IT_PERSIST_OPT:
-                g_message("PERSIST_OPT action %d/%d", i+1, (int)num_action_items);
-                // Save keyboard option
-                if (action_items[i].option != NULL)
-                {
-                    // Allocate for 1 option plus 1 pad struct of 0's
-                    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 2);
-                    memmove(&(keyboard_opts[0]), action_items[i].option, sizeof(km_kbp_option_item));
-                    event_status = km_kbp_state_options_update(keyman->state, keyboard_opts);
-                    if (event_status != KM_KBP_STATUS_OK)
-                    {
-                        g_warning("problem saving option for km_kbp_keyboard");
-                    }
-                    g_free(keyboard_opts);
-
-                    // Put the keyboard option into DConf
-                    if (action_items[i].option != NULL && action_items[i].option->key != NULL &&
-                        action_items[i].option->value != NULL)
-                    {
-                        g_message("Saving keyboard option to DConf");
-                        // Load the current keyboard options from DConf
-                        keyman_put_options_todconf(keyman->kb_name, keyman->kb_name,
-                                (gchar *)action_items[i].option->key,
-                                (gchar *)action_items[i].option->value);
-                    }
-                }
-                break;
-            case KM_KBP_IT_EMIT_KEYSTROKE:
-                if (keyman->char_buffer != NULL)
-                {
-                    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-                    g_free(keyman->char_buffer);
-                    keyman->char_buffer = NULL;
-                }
-                g_message("EMIT_KEYSTROKE action %d/%d", i+1, (int)num_action_items);
-                keyman->emitting_keystroke = TRUE;
-                break;
-            case KM_KBP_IT_INVALIDATE_CONTEXT:
-                g_message("INVALIDATE_CONTEXT action %d/%d", i+1, (int)num_action_items);
-                km_kbp_context_clear(km_kbp_state_context(keyman->state));
-                reset_context(engine);
-                break;
-            case KM_KBP_IT_END:
-                g_message("END action %d/%d", i+1, (int)num_action_items);
-                keyman->firstsurrogate = 0;
-                if (keyman->char_buffer != NULL)
-                {
-                    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-                    g_free(keyman->char_buffer);
-                    keyman->char_buffer = NULL;
-                }
-                if (keyman->emitting_keystroke) {
-                    keyman->emitting_keystroke = FALSE;
-                    return FALSE;
-                }
-                break;
-            default:
-                g_warning("Unknown action %d/%d(%d)", i+1, (int)num_action_items, action_items[i].type);
-        }
-    }
     context = km_kbp_state_context(keyman->state);
     g_message("after processing all actions");
     g_free(get_current_context_text(context));
