@@ -1518,13 +1518,12 @@ namespace com.keyman.keyboards {
      * and a keyboard stub must be registered before the keyboard is loaded
      * for the keyboard to be usable.
      *
-     * @param       {Object}      kStub     Keyboard stub object
+     * @param       {Object}      Pstub     Keyboard stub object
      * @return      {?number}               1 if already registered, else null
      */
-    _registerStub(kStub): number {
+    _registerStub(Pstub): number {
       var Lk;
-      // Make a copy of the stubs to mutate and register
-      let Pstub = Object.assign({}, kStub);
+      Pstub = { ... Pstub}; // shallow clone the stub object
 
       // In initialization not complete, list the stub to be registered on completion of initialization
       if(!this.keymanweb.initialized) {
