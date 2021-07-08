@@ -128,8 +128,8 @@ public final class KMManager {
 
   private static boolean didLogHardwareKeystrokeException = false;
 
-  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD; // do not merge to production
-  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD; // do not merge to production
+  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   // This is used to keep track of the starting system keyboard index while the screen is locked
   private static int sysKbStartingIndexOnLockScreen = -1;
 
