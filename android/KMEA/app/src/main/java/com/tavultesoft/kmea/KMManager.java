@@ -451,6 +451,36 @@ public final class KMManager {
   }
 
   /**
+   * Handle the globe key longpress action. Currently just for INAPP only
+   * @param context
+   * @param keyboard
+   */
+  private static void doGlobeKeyLongpressAction(Context context, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      if (InAppKeyboard.keyboardPickerEnabled) {
+        showKeyboardPicker(context, keyboard);
+      }
+    }
+  }
+
+  /**
+   * Handle the globe key shortpress action. Currently just for INAPP only
+   * @param context
+   * @param keyboard
+   */
+  private static void doGlobeKeyShortpressAction(Context context, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      if (InAppKeyboard.keyboardPickerEnabled && inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
+        showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+      } else if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
+        switchToNextKeyboard(context);
+      } else {
+        switchToNextKeyboard(context);
+      }
+    }
+  }
+
+  /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
    * @return RelativeLayout.LayoutParams
@@ -1976,6 +2006,12 @@ public final class KMManager {
         return false;
       }
 
+      // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+      // just the first intended '#' to get URI-based query param processing.
+      // At some point, other parts of the function should be redone to allow use of ? instead
+      // of # in our WebView command "queries" entirely.
+      String cmd = url.replace("keyboard.html#", "keyboard.html?");
+      Uri urlCommand = Uri.parse(cmd);
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
@@ -1984,7 +2020,7 @@ public final class KMManager {
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.dismissKeyboard();
         }
-      } else if (url.indexOf("globeKeyAction") >= 0) {
+      } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
         InAppKeyboard.dismissHelpBubble();
         if (!InAppKeyboard.isHelpBubbleEnabled) {
           return false;
@@ -1995,38 +2031,7 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
-        // Update globeKeyState
-        int start = url.indexOf("keydown=") + 8;
-        String value = url.substring(start);
-        boolean globeKeyDown = !value.isEmpty() && Boolean.valueOf(value);
-        if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
-          if (globeKeyDown) {
-            globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_DOWN;
-          } else {
-            globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-          }
-        }
-
-        if (KMManager.shouldAllowSetKeyboard()) {
-          if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
-            // Longpress globe
-            if (InAppKeyboard.keyboardPickerEnabled) {
-              showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-              globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-            }
-          } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
-            // Handle shortpress globe
-            if (InAppKeyboard.keyboardPickerEnabled) {
-              if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
-                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-              } else if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-                switchToNextKeyboard(context);
-              }
-            } else {
-              switchToNextKeyboard(context);
-            }
-          }
-        }
+        handleGlobeKeyAction(urlCommand.getBooleanQueryParameter("keydown", false));
       } else if (url.indexOf("showHelpBubble") >= 0) {
         int start = url.indexOf("keyPos=") + 7;
         String value = url.substring(start);
@@ -2123,14 +2128,6 @@ public final class KMManager {
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
-        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
-        // just the first intended '#' to get URI-based query param processing.
-
-        // At some point, other parts of the function should be redone to allow use of ? instead
-        // of # in our WebView command "queries" entirely.
-        String cmd = url.replace("keyboard.html#", "keyboard.html?");
-        Uri urlCommand = Uri.parse(cmd);
-
         double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
         double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
@@ -2155,6 +2152,26 @@ public final class KMManager {
         */
       }
       return false;
+    }
+
+    private void handleGlobeKeyAction(boolean globeKeyDown) {
+      // Update globeKeyState
+      if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+        globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
+      }
+
+      if (KMManager.shouldAllowSetKeyboard()) {
+        if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+          // Longpress globe
+          doGlobeKeyLongpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+
+          // clear globeKeyState
+          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+        } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+          // Shortpress globe
+          doGlobeKeyShortpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+        }
+      }
     }
   }
 
@@ -2238,12 +2255,19 @@ public final class KMManager {
         return false;
       }
 
+      // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+      // just the first intended '#' to get URI-based query param processing.
+
+      // At some point, other parts of the function should be redone to allow use of ? instead
+      // of # in our WebView command "queries" entirely.
+      String cmd = url.replace("keyboard.html#", "keyboard.html?");
+      Uri urlCommand = Uri.parse(cmd);
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
         SystemKeyboard.dismissHelpBubble();
         IMService.requestHideSelf(0);
-      } else if (url.indexOf("globeKeyAction") >= 0) {
+      } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
         SystemKeyboard.dismissHelpBubble();
         if (!SystemKeyboard.isHelpBubbleEnabled) {
           return false;
@@ -2255,9 +2279,7 @@ public final class KMManager {
         editor.commit();
 
         // Update globeKeyState
-        int start = url.indexOf("keydown=") + 8;
-        String value = url.substring(start);
-        boolean globeKeyDown = !value.isEmpty() && Boolean.valueOf(value);
+        boolean globeKeyDown = urlCommand.getBooleanQueryParameter("keydown", false);
         if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
           globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
         }
@@ -2412,14 +2434,6 @@ public final class KMManager {
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
-        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
-        // just the first intended '#' to get URI-based query param processing.
-
-        // At some point, other parts of the function should be redone to allow use of ? instead
-        // of # in our WebView command "queries" entirely.
-        String cmd = url.replace("keyboard.html#", "keyboard.html?");
-        Uri urlCommand = Uri.parse(cmd);
-
         double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
         double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));

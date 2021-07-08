@@ -271,13 +271,15 @@
     // legacy function name for globe key down
     function showMenu() {
       fragmentToggle = (fragmentToggle + 1) % 100;
-      window.location.hash = 'globeKeyAction-' + fragmentToggle + '&keydown=true';
+      var hash = 'globeKeyAction&fragmentToggle=' + fragmentToggle + '&keydown=true';
+      window.location.hash = hash;
     }
 
     // legacy function name for globe key up
     function menuKeyUp() {
       fragmentToggle = (fragmentToggle + 1) % 100;
-      window.location.hash = 'globeKeyAction-' + fragmentToggle + '&keydown=false';
+      var hash = 'globeKeyAction&fragmentToggle=' + fragmentToggle + '&keydown=false';
+      window.location.hash = hash;
     }
 
     function hideKeyboard() {
