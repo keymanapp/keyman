@@ -33,7 +33,7 @@ namespace com.keyman.osk {
       }
     } else if(keyName.indexOf('K_ROPT') >= 0) {
       if(keyDown) {
-        this.highlightKey(e,false);           
+        this.highlightKey(e,false);            
         if(typeof keyman['hideKeyboard'] == 'function') {
           keyman['hideKeyboard']();
         }
