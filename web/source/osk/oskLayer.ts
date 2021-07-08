@@ -14,8 +14,6 @@ namespace com.keyman.osk {
       const gs=gDiv.style;
       gDiv.className='kmw-key-layer';
 
-      //gs.height=ls.height; // was never actually set at this point!?
-
       // Set font for layer if defined in layout
       if('font' in layout) {
         gs.fontFamily=layout['font'];
