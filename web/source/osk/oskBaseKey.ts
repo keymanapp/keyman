@@ -163,5 +163,18 @@ namespace com.keyman.osk {
         return (Math.round(v*100)/100)+unit; // round to 2 decimal places, making css more readable
       }
     }
+
+    public refreshLayout(vkbd: VisualKeyboard) {
+      super.refreshLayout(vkbd);
+
+      let util = com.keyman.singleton.util;
+      const device = vkbd.device;
+      const resizeLabels = (device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
+
+      // Rescale keycap labels on iPhone (iOS 7)
+      if(resizeLabels && this.capLabel) {
+        this.capLabel.style.fontSize = '6px';
+      }
+    }
   }
 }

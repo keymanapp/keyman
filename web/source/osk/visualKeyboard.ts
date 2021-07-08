@@ -1068,13 +1068,9 @@ namespace com.keyman.osk {
      * Adjust the absolute height of each keyboard element after a rotation
      *
      **/
-    adjustHeights(height: number) {
+    refreshLayout(height: number) {
       let keyman = com.keyman.singleton;
       let device = this.device;
-
-      if(!this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
-        return false;
-      }
 
       var fs=1.0;
       // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
@@ -1091,9 +1087,7 @@ namespace com.keyman.osk {
       gs.height=gs.maxHeight=paddedHeight+'px';
       bs.fontSize=fs+'em';
 
-      this.adjustLayerHeights(paddedHeight, height);
-
-      return true;
+      this.currentLayer.refreshLayout(this, paddedHeight, height);
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
@@ -1123,112 +1117,6 @@ namespace com.keyman.osk {
 
       return oskPaddedHeight;
     }
-
-    private adjustLayerHeights(paddedHeight: number, trueHeight: number) {
-      let device = this.device;
-      let layers = this.kbdDiv.firstChild.childNodes;
-
-      for(let nLayer=0;nLayer<layers.length; nLayer++) {
-        // Check the heights of each row, in case different layers have different row counts.
-        let layer = layers[nLayer] as HTMLElement;
-        let nRows=layers[nLayer].childNodes.length;
-        (<HTMLElement> layers[nLayer]).style.height=(paddedHeight)+'px';
-
-        let rowHeight = Math.floor(trueHeight/(nRows == 0 ? 1 : nRows));
-
-        if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-          layer.style.height = layer.style.maxHeight = paddedHeight + 'px';
-          rowHeight /= window.devicePixelRatio;
-        }
-
-        // Sets the layers to the correct height
-        let rowPad = Math.round(0.15*rowHeight);
-
-        for(let nRow=0; nRow<nRows; nRow++) {
-          let rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
-          let bottom = (nRows-nRow-1)*rowHeight+1;
-          if(!this.isStatic) {
-            rs.bottom=bottom+'px';
-          }
-          rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
-
-          // Calculate the exact vertical coordinate of the row's center.
-          this.kbdLayout.layer[nLayer].row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
-
-          let keys=layers[nLayer].childNodes[nRow].childNodes as NodeListOf<HTMLElement>;
-          this.adjustRowHeights(keys, rowHeight, bottom, rowPad);
-        }
-      }
-    }
-
-    private adjustRowHeights(keys: NodeListOf<HTMLElement>, rowHeight: number, bottom: number, pad: number) {
-      let util = com.keyman.singleton.util;
-      let device = this.device;
-
-      let resizeLabels = (device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
-
-      let nKeys=keys.length;
-      for(let nKey=0;nKey<nKeys;nKey++) {
-        let keySquare=keys[nKey] as HTMLElement;
-        //key.style.marginTop = (device.formFactor == 'phone' ? pad : 4)+'px';
-        //**no longer needed if base key label and popup icon are within btn, not container**
-
-        // Must set the height of the btn DIV, not the label (if any)
-        var j;
-        for(j=0; j<keySquare.childNodes.length; j++) {
-          if((keySquare.childNodes[j] as HTMLElement).classList.contains('kmw-key')) {
-            break;
-          }
-        }
-
-        // Set the kmw-key-square position
-        let ks=keySquare.style;
-        if(!this.isStatic) {
-          ks.bottom=(bottom-pad/2)+'px';
-        }
-        ks.height=ks.minHeight=(rowHeight)+'px';
-
-        // Set the kmw-key position
-        let keyElement = keySquare.childNodes[j] as KeyElement;
-        ks=keyElement.style;
-        if(!this.isStatic) {
-          ks.bottom=bottom+'px';
-        }
-        ks.height=ks.lineHeight=ks.minHeight=(rowHeight-pad)+'px';
-
-        if(keyElement.key) {
-          keyElement.key.refreshLayout(this);
-        }
-
-        // Rescale keycap labels on iPhone (iOS 7)
-        if(resizeLabels && (j > 0)) {
-          (keySquare.childNodes[0] as HTMLElement).style.fontSize='6px';
-        }
-      }
-    }
-
-    // /**
-    //  * Function     _VKeyGetTarget
-    //  * Scope        Private
-    //  * @param       {Object}    e     OSK event
-    //  * @return      {Object}          Target element for key in OSK
-    //  * Description  Identify the OSK key clicked
-    //  */
-    // _VKeyGetTarget(e: Event) {
-    //   var Ltarg;
-    //   e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-    //   Ltarg = util.eventTarget(e);
-    //   if (Ltarg == null) {
-    //     return null;
-    //   }
-    //   if (Ltarg.nodeType == 3) { // defeat Safari bug
-    //     Ltarg = Ltarg.parentNode;
-    //   }
-    //   if (Ltarg.tagName == 'SPAN') {
-    //     Ltarg = Ltarg.parentNode;
-    //   }
-    //   return Ltarg;
-    // }
 
     /**
      *  Append a style sheet for the current keyboard if needed for specifying an embedded font
@@ -1369,7 +1257,7 @@ namespace com.keyman.osk {
         // This still feels fairly hacky... but something IS needed to constrain the height.
         // There are plans to address related concerns through some of the later aspects of 
         // the Web OSK-Core design.
-        kbdObj.adjustHeights(height); // Necessary for the row heights to be properly set!
+        kbdObj.refreshLayout(height); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
         kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
       } else {

@@ -196,7 +196,7 @@ namespace com.keyman.osk {
         }
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {
-        this.vkbd.adjustHeights(this.getKeyboardHeight());
+        this.vkbd.refreshLayout(this.getKeyboardHeight());
 
         var b: HTMLElement = this._Box, bs=b.style;
         bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
@@ -784,7 +784,7 @@ namespace com.keyman.osk {
         // Do NOT condition upon form-factor; this line prevents a bug with displaying
         // the predictive-text banner on the initial keyboard load.  (Issue #2907)
         if(device.touchable && device.OS == 'iOS') {
-          this.vkbd.adjustHeights(this.getKeyboardHeight());
+          this.vkbd.refreshLayout(this.getKeyboardHeight());
 
           var b: HTMLElement = this._Box, bs=b.style;
           bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
