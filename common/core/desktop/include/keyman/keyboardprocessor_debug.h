@@ -26,6 +26,21 @@
 #define DEBUG_MAX_CONTEXT 80
 
 /**
+ * The number of stores that can be processed in a rule. This is taken from
+ * MAXSTOREOFFSETS in keyman32 (Windows) and is purely a convenience value.
+ * We can increase it if there is a demonstrated need.
+ */
+#define DEBUG_MAX_STORE_OFFSETS 20
+#define DEBUG_STORE_OFFSETS_SIZE (DEBUG_MAX_STORE_OFFSETS*2+1)
+
+/**
+ * These modifier flags are used internally in the kmx engine, so will be
+ * exposed only in debugging modifier states.
+ */
+#define KM_KBP_MODIFIER_VIRTUALKEY      0x4000
+#define KM_KBP_MODIFIER_VIRTUALCHARKEY  0x8000
+
+/**
  * Input key event data. The `character` member is derived from
  * a US English key event for vk + modifier_state, and is 0 if
  * the vk + modifier_state do not generate a character.
@@ -48,11 +63,12 @@ typedef struct {
  *
  * Used in all event types except KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_END.
  */
+
 typedef struct {
   km_kbp_cp context[DEBUG_MAX_CONTEXT];
   void *group;  // LPGROUP
-  void *store;  // LPSTORE
   void *rule;   // LPKEY
+  uint16_t store_offsets[DEBUG_STORE_OFFSETS_SIZE];	// pairs--store, char position, terminated by 0xFFFF // TODO use a better structure here
 } km_kbp_state_debug_kmx_info;
 
 /**
@@ -61,10 +77,8 @@ typedef struct {
 typedef struct {
   uint32_t  type; // 32 bits is better optimized than 8 bits
   uint32_t flags;
-  union {
-    km_kbp_state_debug_key_info key_info;
-    km_kbp_state_debug_kmx_info kmx_info;
-  };
+  km_kbp_state_debug_key_info key_info;
+  km_kbp_state_debug_kmx_info kmx_info;
 } km_kbp_state_debug_item;
 
 /**
