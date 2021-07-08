@@ -1,6 +1,6 @@
 /// <reference path="preProcessor.ts" />
 /// <reference path="utils.ts" />
-/// <reference path="oskRow.ts" />
+/// <reference path="oskLayer.ts" />
 /// <reference path="keytip.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/pendingLongpress.ts" />
@@ -313,28 +313,13 @@ namespace com.keyman.osk {
 
       for(n=0; n<layers.length; n++) {
         let layer=layers[n] as keyboards.ActiveLayer;
-        gDiv=document.createElement('div'), gs=gDiv.style;
-        gDiv.className='kmw-key-layer';
+        const layerObj = new OSKLayer(this, layout, layer, objectWidth, doCalibration);
 
         // Always make the first layer visible
-        gs.display=(n==0?'block':'none');
-        gs.height=ls.height;
+        layerObj.element.style.display = (n==0 ? 'block' : 'none');
 
-        // Set font for layer if defined in layout
-        if('font' in layout) gs.fontFamily=layout['font']; else gs.fontFamily='';
-
-        gDiv['layer']=gDiv['nextLayer']=layer['id'];
-        if(typeof layer['nextlayer'] == 'string') gDiv['nextLayer']=layer['nextlayer'];
-
-        // Create a DIV for each row of the group
-        let rows=layer['row'];
-
-        for(i=0; i<rows.length; i++) {
-          let rowObj = new OSKRow(this, layer, rows[i], objectWidth, doCalibration, layout["displayUnderlying"]);
-          gDiv.appendChild(rowObj.element);
-        }
         // Add layer to group
-        lDiv.appendChild(gDiv);
+        lDiv.appendChild(layerObj.element);
       }
 
       // Now that we've properly processed the keyboard's layout, mark it as calibrated.
