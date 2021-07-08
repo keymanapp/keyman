@@ -61,7 +61,7 @@ namespace km {
           persisted_store()[key] = value;
           break;
         case KM_KBP_OPT_ENVIRONMENT:
-          _kmx.GetEnvironment()->Load(key, value);
+          _kmx.GetEnvironment()->Set(key, value);
           break;
         default:
           return option();
