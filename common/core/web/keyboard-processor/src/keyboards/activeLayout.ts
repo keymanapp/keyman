@@ -234,7 +234,7 @@ namespace com.keyman.keyboards {
     }
   }
 
-  class ActiveRow implements LayoutRow {
+  export class ActiveRow implements LayoutRow {
     // Identify key labels (e.g. *Shift*) that require the special OSK font
     static readonly SPECIAL_LABEL=/\*\w+\*/;
 

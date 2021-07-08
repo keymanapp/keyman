@@ -73,7 +73,7 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(osk: VisualKeyboard, layout: keyboards.LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(osk: VisualKeyboard, displayUnderlying: boolean, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let spec = this.spec;
       let isDesktop = osk.device.formFactor == "desktop"
 
@@ -112,7 +112,7 @@ namespace com.keyman.osk {
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
 
       // Add the (US English) keycap label for layouts requesting display of underlying keys
-      if(layout["displayUnderlying"]) {
+      if(displayUnderlying) {
         let keyCap = this.generateKeyCapLabel();
 
         if(keyCap) {

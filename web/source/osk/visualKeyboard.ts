@@ -1,6 +1,6 @@
 /// <reference path="preProcessor.ts" />
 /// <reference path="utils.ts" />
-/// <reference path="oskBaseKey.ts" />
+/// <reference path="oskRow.ts" />
 /// <reference path="keytip.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/pendingLongpress.ts" />
@@ -264,8 +264,8 @@ namespace com.keyman.osk {
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
       var n: number, i: number, j: number;
       var layers: keyboards.LayoutLayer[], gDiv: HTMLDivElement;
-      var rowHeight: number, rDiv: HTMLDivElement;
-      var keys: keyboards.ActiveKey[], key: keyboards.ActiveKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
+      //var rowHeight: number
+      var gs: CSSStyleDeclaration;
 
       layers=layout['layer'];
 
@@ -291,9 +291,6 @@ namespace com.keyman.osk {
 
       // Set the OSK row height, **assuming all layers have the same number of rows**
 
-      // Calculate default row height
-      rowHeight = 100/layers[0].row.length;
-
       // Get the actual available document width and scale factor according to device type
       var objectWidth : number;
       if(formFactor == 'desktop' || this.isStatic) {
@@ -312,6 +309,7 @@ namespace com.keyman.osk {
       }
 
       let precalibrated = (keyboard.getLayoutState(formFactor) == keyboards.LayoutState.CALIBRATED);
+      const doCalibration = !precalibrated || this.isStatic;
 
       for(n=0; n<layers.length; n++) {
         let layer=layers[n] as keyboards.ActiveLayer;
@@ -332,54 +330,8 @@ namespace com.keyman.osk {
         let rows=layer['row'];
 
         for(i=0; i<rows.length; i++) {
-          rDiv=document.createElement('div');
-          rDiv.className='kmw-key-row';
-          // The following event trap is needed to prevent loss of focus in IE9 when clicking on a key gap.
-          // Unclear why normal _CreateElement prevention of loss of focus does not seem to work here.
-          // Appending handler to event handler chain does not work (other event handling remains active).
-          rDiv.onmousedown = function(e: MouseEvent) {
-            if(e) {
-              e.preventDefault();
-            }
-          }
-
-          let row=rows[i];
-          rs=rDiv.style;
-
-          // Set row height. (Phone and tablet heights are later recalculated
-          // and set in px, allowing for viewport scaling.)
-          rs.maxHeight=rs.height=rowHeight+'%';
-
-          // Apply defaults, setting the width and other undefined properties for each key
-          keys=row['key'];
-
-          if(!precalibrated || this.isStatic) {
-            // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
-            // adjusting the width of the last key to make the total exactly 100%.
-            // Overwrite the previously-computed percent.
-            // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
-            // All key widths and paddings are rounded for uniformity
-            for(j=0; j<keys.length; j++) {
-              key = keys[j];
-              // TODO:  reinstate rounding?
-              key['widthpc'] = key.proportionalWidth * objectWidth;
-              key['padpc'] = key.proportionalPad * objectWidth;
-            }
-          }
-
-          //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
-          var totalPercent=0;
-          for(j=0; j<keys.length; j++) {
-            key=keys[j];
-
-            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id']);
-            var keyTuple = keyGenerator.construct(this, layout, rs, totalPercent);
-
-            rDiv.appendChild(keyTuple.element);
-            totalPercent += keyTuple.percent;
-          }
-          // Add row to layer
-          gDiv.appendChild(rDiv);
+          let rowObj = new OSKRow(this, layer, rows[i], objectWidth, doCalibration, layout["displayUnderlying"]);
+          gDiv.appendChild(rowObj.element);
         }
         // Add layer to group
         lDiv.appendChild(gDiv);
