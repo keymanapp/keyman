@@ -130,8 +130,7 @@
 
     function setKeymanLanguage(k) {
       KeymanWeb.registerStub(k);
-      // registerStub will mutate k.KI to have k.KP:: namespacing that setActiveKeyboard expects
-      keyman.setActiveKeyboard(k.KI, k.KLC);
+      keyman.setActiveKeyboard(k.KP + '::'+k.KI, k.KLC);
       keyman.osk.show(true);
     }
 
