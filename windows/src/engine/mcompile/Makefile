@@ -22,9 +22,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\engine\mcompile.exe /t keyman-engine-windows
     $(SYMSTORE) $(DEBUGPATH)\engine\mcompile.pdb /t keyman-engine-windows
 
-backup:
-    $(WZZIP) $(BUILD)\engine\mcompile.exe  $(BACKUPDEFAULTS) mcompile.exe
-
 install:
     $(COPY) $(PROGRAM)\engine\mcompile.exe "$(INSTALLPATH_KEYMANENGINE)"
 

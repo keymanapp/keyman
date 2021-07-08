@@ -13,7 +13,7 @@
 #include <keyman/keyboardprocessor.h>
 #include "keyboard.hpp"
 #include "processor.hpp"
-#include "kmx/kmx_processevent.hpp"
+#include "kmx/kmx_processor.hpp"
 #include "mock/mock_processor.hpp"
 #include "rust/rust_mock_processor.hpp"
 

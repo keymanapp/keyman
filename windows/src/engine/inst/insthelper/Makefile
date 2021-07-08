@@ -23,7 +23,4 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\inst\insthelper.dll /t keyman-windows
     $(SYMSTORE) $(DEBUGPATH)\inst\insthelper.dbg /t keyman-windows
 
-backup:
-    $(WZZIP) $(BUILD)\inst\insthelper.zip  $(BACKUPDEFAULTS) insthelper.dll
-
 !include ..\..\..\Target.mak

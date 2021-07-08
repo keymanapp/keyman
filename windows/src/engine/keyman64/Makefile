@@ -20,9 +20,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\engine\keyman64.dll /t keyman-engine-windows
     $(SYMSTORE) $(DEBUGPATH)\engine\keyman64.pdb /t keyman-engine-windows
 
-backup:
-    $(WZZIP) $(BUILD)\engine\keyman64.zip  $(BACKUPDEFAULTS) keyman64.dll
-
 install:
     $(COPY) $(PROGRAM)\engine\keyman64.dll "$(INSTALLPATH_KEYMANENGINE)\keyman64.dll"
 

@@ -23,9 +23,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\desktop\kmconfig.exe /t keyman-windows
     $(SYMSTORE) $(DEBUGPATH)\desktop\kmconfig.dbg /t keyman-windows
 
-backup:
-    $(WZZIP) $(BUILD)\desktop\kmconfig.zip  $(BACKUPDEFAULTS) kmconfig.exe
-
 test-manifest:
     # test that linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\kmconfig.exe -validate_manifest
