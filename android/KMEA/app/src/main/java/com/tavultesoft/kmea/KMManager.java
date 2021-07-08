@@ -2259,11 +2259,7 @@ public final class KMManager {
         String value = url.substring(start);
         boolean globeKeyDown = !value.isEmpty() && Boolean.valueOf(value);
         if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
-          if(globeKeyDown) {
-            globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_DOWN;
-          } else {
-            globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-          }
+          globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
         }
 
         if (KMManager.shouldAllowSetKeyboard()) {
