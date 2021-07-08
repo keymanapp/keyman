@@ -17,11 +17,11 @@ namespace com.keyman.osk {
      * so that its geometry may be updated on rotations and keyboard resize events, as
      * said geometry needs to be accurate for fat-finger probability calculations.
      */
-    layout: keyboards.ActiveLayout;
-    layers: keyboards.LayoutLayer[];
+    kbdLayout: keyboards.ActiveLayout;
+    layerGroup: OSKLayerGroup;
+
     private _layerId: string = "default";
     readonly isRTL: boolean;
-    layerIndex: number;
 
     device: Device;
     isStatic: boolean = false;
@@ -46,11 +46,6 @@ namespace com.keyman.osk {
     nextLayer: string;
     currentKey: string;
 
-    // Special keys (for the currently-visible layer)
-    lgKey: KeyElement;
-    hkKey: KeyElement; // hide keyboard key
-    spaceBar: KeyElement;
-
     // Touch-tracking properties
     touchX: number;
     touchY: number;
@@ -73,6 +68,37 @@ namespace com.keyman.osk {
       this._layerId = value;
     }
 
+    get currentLayer(): OSKLayer {
+      if(this.layerGroup && this.layerId) {
+        return this.layerGroup.layers[this.layerId];
+      }
+    }
+
+    // Special keys (for the currently-visible layer)
+    get lgKey(): KeyElement {
+      if(this.currentLayer && this.currentLayer.globeKey) {
+        return this.currentLayer.globeKey.btn;
+      } else {
+        return null;
+      }
+    }
+
+    get hkKey(): KeyElement { // hide keyboard key
+      if(this.currentLayer && this.currentLayer.hideKey) {
+        return this.currentLayer.hideKey.btn;
+      } else {
+        return null;
+      }
+    }
+
+    get spaceBar(): KeyElement {
+      if(this.currentLayer && this.currentLayer.spaceBarKey) {
+        return this.currentLayer.spaceBarKey.btn;
+      } else {
+        return null;
+      }
+    }
+
     //#region OSK constructor and helpers
 
     /**
@@ -92,7 +118,7 @@ namespace com.keyman.osk {
       var Lkbd=document.createElement('div');
       let layout: keyboards.ActiveLayout;
       if(keyboard) {
-        layout = this.layout = keyboard.layout(device.formFactor as utils.FormFactor);
+        layout = this.kbdLayout = keyboard.layout(device.formFactor as utils.FormFactor);
         this.isRTL = keyboard.isRTL;
       } else {
         // This COULD be called with no backing keyboard; KMW will try to force-show the OSK even without
@@ -101,10 +127,9 @@ namespace com.keyman.osk {
         // In KMW's current state, it'd take a major break, though - Processor always has an activeKeyboard,
         // even if it's "hollow".
         let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
-        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as utils.FormFactor);
+        layout = this.kbdLayout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as utils.FormFactor);
         this.isRTL = false;
       }
-      this.layers=layout['layer'];
 
       // Override font if specified by keyboard
       if('font' in layout) {
@@ -113,11 +138,23 @@ namespace com.keyman.osk {
         this.fontFamily='';
       }
 
-      let divLayerContainer = this.deviceDependentLayout(keyboard, device.formFactor as utils.FormFactor);
+      // Now to build the actual layout.
+      const formFactor = device.formFactor as utils.FormFactor;
+      let layoutKeyboard = keyboard;
+      if(!layoutKeyboard) {
+        // May occasionally be null in embedded contexts; have seen this when iOS engine sets
+        // keyboard height during change of keyboards.
+        layoutKeyboard = new keyboards.Keyboard(null);
+      }
 
+      this.layerGroup = new OSKLayerGroup(this, layoutKeyboard, formFactor);
+
+      // Now that we've properly processed the keyboard's layout, mark it as calibrated.
+      keyboard.markLayoutCalibrated(formFactor);
+      
       // Append the OSK layer group container element to the containing element
       //osk.keyMap = divLayerContainer;
-      Lkbd.appendChild(divLayerContainer);
+      Lkbd.appendChild(this.layerGroup.element);
 
       // Set base class - OS and keyboard added for Build 360
       this.kbdDiv = Lkbd;
@@ -224,27 +261,6 @@ namespace com.keyman.osk {
       return new OSKKeySpec(undefined, '', keyboards.ActiveKey.DEFAULT_KEY.width, keyboards.ActiveKey.DEFAULT_KEY.sp as keyboards.ButtonClass,
           null, keyboards.ActiveKey.DEFAULT_KEY.pad);
     };
-
-    /**
-     * Create the OSK for a particular keyboard and device
-     *
-     * @param       {Object}              layout      OSK layout definition
-     * @param       {string}              formFactor  layout form factor
-     * @return      {Object}                          fully formatted OSK object
-     */
-    deviceDependentLayout(keyboard: keyboards.Keyboard, formFactor: utils.FormFactor): HTMLDivElement {
-      if(!keyboard) {
-        // May occasionally be null in embedded contexts; have seen this when iOS engine sets
-        // keyboard height during change of keyboards.
-        keyboard = new keyboards.Keyboard(null);
-      }
-
-      const groupObj = new OSKLayerGroup(this, keyboard, formFactor);
-
-      // Now that we've properly processed the keyboard's layout, mark it as calibrated.
-      keyboard.markLayoutCalibrated(formFactor);
-      return groupObj.element;
-    }
     //#endregion
 
     //#region OSK touch handlers
@@ -280,7 +296,7 @@ namespace com.keyman.osk {
       }
 
       let kbdAspectRatio = layerGroup.offsetWidth / this.kbdDiv.offsetHeight;
-      let baseKeyProbabilities = this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
+      let baseKeyProbabilities = this.kbdLayout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
 
       if(!this.subkeyGesture || !this.subkeyGesture.baseKey.key) {
         return baseKeyProbabilities;
@@ -570,7 +586,7 @@ namespace com.keyman.osk {
       // We need to adjust the offset properties by any offsets related to the active banner.
 
       // Determine the y-threshold at which touch-cancellation should automatically occur.
-      let rowCount = this.layers[this.layerIndex].row.length;
+      let rowCount = this.currentLayer.rows.length;
       let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
       var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold) : 5;
       if(key0 && e.touches[0].pageY < yMin) {
@@ -811,23 +827,14 @@ namespace com.keyman.osk {
      * Description  Updates the OSK's visual style for any toggled state keys
      */
     _UpdateVKShiftStyle(layerId?: string) {
-      var i, n, layer=null;
+      var i;
       let core = com.keyman.singleton.core;
 
-      if(layerId) {
-        for(n=0; n<this.layers.length; n++) {
-          if(this.layers[n]['id'] == this.layerId) {
-            break;
-          }
-        }
-
-        return;  // Failed to find the requested layer.
-      } else {
-        n=this.layerIndex;
-        layerId=this.layers[n]['id'];
+      if(!layerId) {
+        layerId = this.layerId;
       }
 
-      layer=this.layers[n];
+      const layer = this.layerGroup.layers[layerId].spec;
 
       // Set the on/off state of any visible state keys.
       var states = ['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
@@ -1035,45 +1042,18 @@ namespace com.keyman.osk {
       }
     }
 
-        /**
-     *  Set the reference to a special function key for the
-     *  currently visible OSK layer
-     *
-     *  @param    {number}  nLayer  Index of visible layer
-     *  @param    {string}  keyId   key identifier
-     *  @return   {Object}          Reference to key
-     */
-    getSpecialKey(nLayer: number, keyId: string): KeyElement {
-      let layers = this.kbdDiv.childNodes[0].childNodes;
-
-      if(nLayer >= 0 && nLayer < layers.length) {
-        // Special function keys will always be in bottom row (must modify code if not)
-        let rows = layers[nLayer].childNodes;
-        let keys = rows[rows.length-1].childNodes;
-        for(var k=0; k<keys.length; k++) {
-          let key = getKeyFrom(keys[k].firstChild);
-          if(key && key['keyId'] == keyId) {
-            return key;
-          }
-        }
-      }
-      return null;
-    }
-
     updateState() {
-      let device = this.device;
-      var n,nLayer=-1, b = this.kbdDiv.childNodes[0].childNodes;
+      var n, b = this.kbdDiv.childNodes[0].childNodes;
+      this.nextLayer = this.layerId;
+      if(this.currentLayer.nextlayer) {
+        this.nextLayer=this.currentLayer.nextlayer;
+      }
 
       for(n=0; n < b.length; n++) {
         let layerElement = <HTMLDivElement> b[n];
         if(layerElement['layer'] == this.layerId) {
           layerElement.style.display='block';
           //b[n].style.visibility='visible';
-          this.nextLayer=this.layerId;
-          this.layerIndex=nLayer=n;
-          if(typeof this.layers[n]['nextlayer'] == 'string') {
-            this.nextLayer=this.layers[n]['nextlayer'];
-          }
 
           // If osk._Show has been called, there's probably been a change in modifier or state key state.  Keep it updated!
           this._UpdateVKShiftStyle();
@@ -1082,15 +1062,6 @@ namespace com.keyman.osk {
           //layerElement.style.visibility='hidden';
         }
       }
-
-      if(device.touchable) {
-        // Identify and save references to the language key, hide keyboard key, and space bar
-        this.lgKey=this.getSpecialKey(nLayer,'K_LOPT');     //TODO: should be saved with layer
-        this.hkKey=this.getSpecialKey(nLayer,'K_ROPT');
-      }
-
-      // Define for both desktop and touchable OSK
-      this.spaceBar=this.getSpecialKey(nLayer,'K_SPACE'); //TODO: should be saved with layer
     }
 
     /**
@@ -1182,7 +1153,7 @@ namespace com.keyman.osk {
           rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
 
           // Calculate the exact vertical coordinate of the row's center.
-          this.layout.layer[nLayer].row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
+          this.kbdLayout.layer[nLayer].row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
 
           let keys=layers[nLayer].childNodes[nRow].childNodes as NodeListOf<HTMLElement>;
           this.adjustRowHeights(keys, rowHeight, bottom, rowPad);

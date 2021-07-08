@@ -356,6 +356,12 @@ namespace com.keyman.keyboards {
     row: ActiveRow[];
     id: string;
 
+    // These already exist on the objects, pre-polyfill...
+    // but they still need to be proactively declared on this type.
+    capsKey?: ActiveKey;
+    numKey?: ActiveKey;
+    scrollKey?: ActiveKey;
+
     totalWidth: number;
 
     defaultKeyProportionalWidth: number;

@@ -169,7 +169,7 @@ namespace com.keyman.osk {
       }
 
       // Apply an overriding class for 5-row layouts
-      var nRows=vkbd.layout['layer'][0]['row'].length;
+      var nRows=vkbd.kbdLayout['layer'][0]['row'].length;
       if(nRows > 4 && vkbd.device.formFactor == 'phone') {
         btn.className='kmw-key kmw-5rows kmw-key-'+OSKKey.BUTTON_CLASSES[n];
       } else {

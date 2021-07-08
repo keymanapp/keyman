@@ -4,6 +4,8 @@ namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
 
   export class OSKBaseKey extends OSKKey {
+    private capLabel: HTMLDivElement;
+
     constructor(spec: OSKKeySpec, layer: string) {
       super(spec, layer);
     }
@@ -112,12 +114,10 @@ namespace com.keyman.osk {
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
 
       // Add the (US English) keycap label for layouts requesting display of underlying keys
-      if(displayUnderlying) {
-        let keyCap = this.generateKeyCapLabel();
-
-        if(keyCap) {
-          btn.appendChild(keyCap);
-        }
+      let keyCap = this.capLabel = this.generateKeyCapLabel();
+      if(keyCap) {
+        btn.appendChild(keyCap);
+        keyCap.style.display = displayUnderlying ? 'block' : 'none';
       }
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
