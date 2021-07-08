@@ -13,7 +13,7 @@
 /*****************************************/
 
 namespace com.keyman.osk {
-   VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
+  VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
     let keyman = com.keyman.singleton;
 
     if(keyName.indexOf('K_LOPT') >= 0) {
@@ -30,10 +30,10 @@ namespace com.keyman.osk {
           window['menuKeyUp']();
         }
         this.menuEvent = null;
-      } 
+      }
     } else if(keyName.indexOf('K_ROPT') >= 0) {
       if(keyDown) {
-        this.highlightKey(e,false);
+        this.highlightKey(e,false);           
         if(typeof keyman['hideKeyboard'] == 'function') {
           keyman['hideKeyboard']();
         }
