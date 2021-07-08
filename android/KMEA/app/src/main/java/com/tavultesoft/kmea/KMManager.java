@@ -2285,59 +2285,58 @@ public final class KMManager {
         }
 
         if (KMManager.shouldAllowSetKeyboard()) {
-
-          if (SystemKeyboard.keyboardPickerEnabled) {
-            // Assign shortpress globe action
-            GlobeKeyAction action = sysKbGlobeKeyAction;
-            KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
-            if (keyguardManager.inKeyguardRestrictedInputMode()) {
-              // Override system keyboard globe key action if screen is locked:
-              // 1. Switch to next Keyman keyboard (no menu)
-              // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
-              if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
-                // All the Keyman keyboards have been cycled through
-                action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
-              } else {
-                if (sysKbStartingIndexOnLockScreen == -1) {
-                  // Initialize the system keyboard starting index while the screen is locked
-                  sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
-                }
-                action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
-              }
+          // Assign shortpress globe action
+          GlobeKeyAction action = sysKbGlobeKeyAction;
+          KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+          if (keyguardManager.inKeyguardRestrictedInputMode()) {
+            // Override system keyboard globe key action if screen is locked:
+            // 1. Switch to next Keyman keyboard (no menu)
+            // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
+            if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+              // All the Keyman keyboards have been cycled through
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
             } else {
-              // If screen isn't locked, reset the starting index
-              sysKbStartingIndexOnLockScreen = -1;
-
-              if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
-                // Check longpress globe action
-                action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-                globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-              } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
-                // Ignore globe key down cause it may be queueing up for longpress
-                return false;
+              if (sysKbStartingIndexOnLockScreen == -1) {
+                // Initialize the system keyboard starting index while the screen is locked
+                sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
               }
-            }
-
-            switch (action) {
-              case GLOBE_KEY_ACTION_SHOW_MENU:
-                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-                break;
-              case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
-                switchToNextKeyboard(context);
-                break;
-              case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
-                advanceToNextInputMode();
-                break;
-              case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
-                InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showInputMethodPicker();
-                break;
-              default:
-                // Do nothing
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
             }
           } else {
-            switchToNextKeyboard(context);
+            // If screen isn't locked, reset the starting index
+            sysKbStartingIndexOnLockScreen = -1;
+
+            if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+              // Check longpress globe action
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+              globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+            } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
+              // Ignore globe key down cause it may be queueing up for longpress
+              return false;
+            }
           }
+
+          switch (action) {
+            case GLOBE_KEY_ACTION_SHOW_MENU:
+              if (SystemKeyboard.keyboardPickerEnabled) {
+                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+              }
+              break;
+            case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
+              switchToNextKeyboard(context);
+              break;
+            case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
+              advanceToNextInputMode();
+              break;
+            case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
+              InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+              imm.showInputMethodPicker();
+              break;
+            default:
+              // Do nothing
+          }
+        } else {
+          switchToNextKeyboard(context);
         }
       } else if (url.indexOf("showHelpBubble") >= 0) {
         int start = url.indexOf("keyPos=") + 7;
