@@ -1625,6 +1625,7 @@ namespace com.keyman.keyboards {
      * @return      {Promise<?boolean>}      1 if already registered, else null
      */
     async _registerStub(Pstub): Promise<boolean> {
+      Pstub = { ... Pstub}; // shallow clone the stub object
       // Ensure keymanweb is initialized before continuing to register stub
       if(!this.keymanweb.initialized) {
         await this.deferment;
