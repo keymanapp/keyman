@@ -1043,8 +1043,16 @@ namespace com.keyman.osk {
     }
 
     updateState() {
+      // May happen for desktop-oriented keyboards that neglect to specify a touch layout.
+      // See `test_chirality.js` from the unit-test keyboard suite, which tests keystrokes
+      // using modifiers that lack corresponding visual-layout representation.
+      if(!this.currentLayer) {
+        return;
+      }
+
       var n, b = this.kbdDiv.childNodes[0].childNodes;
       this.nextLayer = this.layerId;
+
       if(this.currentLayer.nextlayer) {
         this.nextLayer=this.currentLayer.nextlayer;
       }
