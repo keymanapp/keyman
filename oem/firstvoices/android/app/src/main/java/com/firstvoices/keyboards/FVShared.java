@@ -272,6 +272,7 @@ final class FVShared {
                       keyboard.id,
                       null); // get first associated language ID
                     if (kbd != null) {
+                      kbd.setDisplayName(keyboard.name);
                       // TODO: Override fonts to NotoSansCanadianAboriginal.ttf
                       KMManager.addKeyboard(context, kbd);
                     }

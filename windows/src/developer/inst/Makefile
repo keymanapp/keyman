@@ -44,9 +44,6 @@ build:
 signcode:
     @rem
 
-backup:
-    @rem
-
 wrap-symbols:
     @rem
 

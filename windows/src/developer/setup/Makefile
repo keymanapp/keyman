@@ -5,13 +5,13 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons
-    $(DCC32) setup.dpr
-    $(SENTRYTOOL_DELPHIPREP) setup.exe -dpr setup.dpr
-    $(TDS2DBG) setup.exe
-    $(COPY) setup.exe $(PROGRAM)\developer
-    if exist setup.dbg $(COPY) setup.dbg $(DEBUGPATH)\developer\devsetup.dbg
-    -del devsetup.dbg
-    if exist setup.dbg ren setup.dbg devsetup.dbg
+    $(DELPHI_MSBUILD) setup.dproj /p:Platform=Win32
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\setup.exe -dpr setup.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\setup.exe
+    $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\developer
+    if exist $(WIN32_TARGET_PATH)\setup.dbg $(COPY) $(WIN32_TARGET_PATH)\setup.dbg $(DEBUGPATH)\developer\devsetup.dbg
+    -del $(WIN32_TARGET_PATH)\devsetup.dbg
+    if exist $(WIN32_TARGET_PATH)\setup.dbg ren $(WIN32_TARGET_PATH)\setup.dbg devsetup.dbg
 
 setup_dialog.res:
     rc setup_dialog.rc
@@ -31,9 +31,6 @@ wrap-symbols:
     # zipped debug symbols
     $(SYMSTORE) $(PROGRAM)\developer\setup.exe /t keyman-developer
     $(SYMSTORE) $(ROOT)\src\developer\setup\setup.dbg /t keyman-developer
-
-backup:
-    $(WZZIP) $(BUILD)\developer\devsetup.zip  $(BACKUPDEFAULTS) setup.exe
 
 test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true

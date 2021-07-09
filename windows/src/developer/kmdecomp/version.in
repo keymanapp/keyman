@@ -15,7 +15,7 @@
         VALUE "FileDescription", "Keyman decompiler\0"
         VALUE "FileVersion", "$VERSION\0"
         VALUE "InternalName", "KMDECOMP\0"
-        VALUE "LegalCopyright", "ù SIL International\0"
+        VALUE "LegalCopyright", "© SIL International\0"
         VALUE "LegalTrademarks", "\0"
         VALUE "OriginalFilename", "KMDECOMP.EXE\0"
         VALUE "ProductName", "Keyman Developer\0"

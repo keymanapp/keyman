@@ -11,7 +11,6 @@ build:
     $(DELPHI_MSBUILD) /p:CI=CI packageinfotestsuite.dproj
 
 clean: def-clean
-    -rd /s/q Win32
     -del test\*.out.*
 
 !include ..\..\..\Target.mak

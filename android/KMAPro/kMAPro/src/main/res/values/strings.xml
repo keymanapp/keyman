@@ -96,7 +96,35 @@
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Install Keyboard or Dictionary</string>
 
   <!-- Context: Keyman Settings menu -->
-  <string name="change_display_language" comment="Menu action to change interface language">Change display language</string>
+  <string name="change_display_language" comment="Menu action to change interface language">Display language</string>
+
+  <!-- Context: Keyman Settings menu -->
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Spacebar caption</string>
+
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Keyboard</string>
+
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">Language</string>
+
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">Language + Keyboard</string>
+
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">Blank</string>
+
+
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">Show keyboard name on spacebar</string>
+
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">Show language name on spacebar</string>
+
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Language and keyboard on spacebar</string>
+
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Do not show caption on spacebar</string>
 
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Always show banner</string>

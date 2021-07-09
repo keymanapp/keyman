@@ -207,6 +207,15 @@ extension KeymanWebViewController {
   func setPopupVisible(_ visible: Bool) {
     webView!.evaluateJavaScript("popupVisible(\(visible));", completionHandler: nil)
   }
+    
+  private func setSpacebarText(_ mode: SpacebarText) {
+    webView!.evaluateJavaScript("setSpacebarText('\(mode.rawValue)');", completionHandler: nil);
+  }
+  
+  func updateSpacebarText() {
+    let userData = Storage.active.userDefaults
+    setSpacebarText(userData.optSpacebarText)
+  }
 
   func setCursorRange(_ range: NSRange) {
     if range.location != NSNotFound {
@@ -279,7 +288,11 @@ extension KeymanWebViewController {
     if let packageID = keyboard.packageID {
       stub["KP"] = packageID
     }
-
+    
+    if let displayName = keyboard.displayName {
+      stub["displayName"] = displayName
+    }
+    
     // Warning:  without special handling, any `guard` that fails here can trigger an
     // infinite keyboard reload, as the keyboard page itself will note that the keyboard
     // failed to initialize properly.
@@ -698,6 +711,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
       newKb = Defaults.keyboard
     }
 
+    updateSpacebarText()
     updateShowBannerSetting()
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
@@ -1077,6 +1091,7 @@ extension KeymanWebViewController {
     webView!.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
     isLoading = true
 
+    updateSpacebarText()
     // Check for a change of "always show banner" state
     updateShowBannerSetting()
   }

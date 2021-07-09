@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 15.0.82 alpha 2021-07-07
+
+* fix(common/models/types): fixes test script config (#5441)
+
+## 15.0.81 alpha 2021-07-06
+
+* fix(android/engine): Fix font file path (#5424)
+* chore(common): npm audit fixes (#5419)
+* chore(web): updates regression test-deps to same versions as web (#5420)
+* chore(windows): make build paths consistent (#5405)
+
+## 15.0.80 alpha 2021-07-02
+
+* refactor(android): setKeyboard and setKeymanLanguage (#5338)
+* feat(web): spacebar text controls (#5348)
+* feat(android): Spacebar text controls (#5349)
+* feat(ios): refinement of spacebar-captioning PR (#5368)
+* fix(linux): Don't crash with corrupt keyboard (#5414)
+
 ## 15.0.79 alpha 2021-07-01
 
 * docs: start consolidation of build config docs (#5324)

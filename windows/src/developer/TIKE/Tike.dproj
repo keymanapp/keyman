@@ -75,6 +75,9 @@
         <DebugSourcePath>C:\keyman\7.0\src\engine\kmcomapi\com\keyboards\;C:\keyman\7.0\src\engine\kmcomapi\util\;C:\keyman\7.0\src\engine\kmcomapi\com\;C:\keyman\7.0\src\engine\kmcomapi\com\packages\;C:\keyman\7.0\src\engine\kmcomapi\processes\package\;$(DebugSourcePath)</DebugSourcePath>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_ExeOutput>.\bin\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_DcuOutput>.\obj\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>EmbeddedWebBrowser_XE;SpTBXLib_d16;keyman_components;$(DCC_UsePackage)</DCC_UsePackage>
@@ -111,6 +114,7 @@
         <VerInfo_Keys>CompanyName=;FileVersion=5.0.0.49;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <BT_BuildType>Debug</BT_BuildType>
+        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

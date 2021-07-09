@@ -30,11 +30,13 @@ public class Keyboard extends LanguageResource implements Serializable {
   private boolean isNewKeyboard;
   private String font;
   private String oskFont;
+  private String displayName;
 
   // JSON keys
   private static String KB_NEW_KEYBOARD_KEY = "isNewKeyboard";
   private static String KB_FONT_KEY = "font";
   private static String KB_OSK_FONT_KEY = "oskFont";
+  private static String KB_DISPLAY_NAME_KEY = "displayName";
 
   private static Keyboard FALLBACK_KEYBOARD;
 
@@ -100,6 +102,7 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.isNewKeyboard = false;
     this.font = k.getFont();
     this.oskFont = k.getOSKFont();
+    this.displayName = k.getDisplayName();
   }
 
   public String getKeyboardID() { return getResourceID(); }
@@ -111,6 +114,9 @@ public class Keyboard extends LanguageResource implements Serializable {
   public String getFont() { return font; }
 
   public String getOSKFont() { return oskFont; }
+
+  public String getDisplayName() { return displayName; }
+  public void setDisplayName(String displayName) { this.displayName = displayName; }
 
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
@@ -144,6 +150,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.isNewKeyboard = installedObj.getBoolean(KB_NEW_KEYBOARD_KEY);
       this.font = installedObj.getString(KB_FONT_KEY);
       this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
+      this.displayName = installedObj.optString(KB_DISPLAY_NAME_KEY, null);
     } catch (JSONException e) {
       KMLog.LogException(TAG, "fromJSON exception: ", e);
     }
@@ -156,6 +163,7 @@ public class Keyboard extends LanguageResource implements Serializable {
         o.put(KB_NEW_KEYBOARD_KEY, this.isNewKeyboard);
         o.put(KB_FONT_KEY, this.font);
         o.put(KB_OSK_FONT_KEY, this.oskFont);
+        o.put(KB_DISPLAY_NAME_KEY, this.displayName);
       } catch (JSONException e) {
         KMLog.LogException(TAG, "toJSON exception: ", e);
       }

@@ -5,6 +5,7 @@
 !include ..\..\Defines.mak
 
 build: dirs
+    @-mkdir obj\Win32\$(TARGET_PATH)
     $(DCC32DPK) mbColorLibD10.dpk
     $(MAKE) install
 

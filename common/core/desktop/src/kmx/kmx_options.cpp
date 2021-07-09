@@ -3,7 +3,7 @@
   Authors:          mcdurdin
 */
 #include "processor.hpp"
-#include "kmx_processor.h"
+#include "kmx_processevent.h"
 #include <option.hpp>
 #include <state.hpp>
 

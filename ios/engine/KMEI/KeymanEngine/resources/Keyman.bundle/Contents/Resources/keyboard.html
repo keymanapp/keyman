@@ -33,7 +33,7 @@
               hostPlatform: "ios"
             });
             sentryManager.init();
-            
+
             window.addEventListener('load', init, false);
             
             function init() {
@@ -318,6 +318,11 @@
               });
 
               keyman.modelManager.register(model);
+            }
+        
+            function setSpacebarText(mode) {
+                keyman.options['spacebarText'] = mode;
+                keyman.osk.show(true);
             }
         
             </script>

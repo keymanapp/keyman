@@ -15,6 +15,5 @@ build:
     $(DELPHI_MSBUILD) /p:CI=CI keyboardjsinfotestsuite.dproj
 
 clean: def-clean
-    -rd /s/q Win32
 
 !include ..\..\..\Target.mak

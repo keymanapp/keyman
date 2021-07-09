@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "kmx_processor.h"
+#include "kmx_processevent.h"
 
 using namespace km::kbp;
 using namespace kmx;
@@ -11,7 +11,7 @@ using namespace kmx;
 #include <share.h>
 #endif
 
-KMX_BOOL KMX_Processor::Load(km_kbp_path_name KeyboardName)
+KMX_BOOL KMX_ProcessEvent::Load(km_kbp_path_name KeyboardName)
 {
   if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
 
@@ -75,7 +75,7 @@ unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
   return crc;
 }
 
-KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard)
+KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard)
 {
   PKMX_BYTE buf;
   FILE *fp;
@@ -174,7 +174,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
   return TRUE;
 }
 
-PKMX_WCHAR KMX_Processor::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
+PKMX_WCHAR KMX_ProcessEvent::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
 {
   if(offset == 0) return NULL;
   return (PKMX_WCHAR)(base + offset);
@@ -188,7 +188,7 @@ PKMX_WCHAR KMX_Processor::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
     we don't copy the strings
   This method is used on 64-bit architectures.
 */
-LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
+LPKEYBOARD KMX_ProcessEvent::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
 
@@ -271,7 +271,7 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
  Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
  beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
 */
-LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
+LPKEYBOARD KMX_ProcessEvent::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
   KMX_DWORD i, j;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
@@ -311,7 +311,7 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 
 #endif
 
-KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, size_t sz)
+KMX_BOOL KMX_ProcessEvent::VerifyChecksum(PKMX_BYTE buf, size_t sz)
 {
   KMX_DWORD tempcs;
   PCOMP_KEYBOARD ckbp;
@@ -324,7 +324,7 @@ KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, size_t sz)
   return tempcs == CalculateBufferCRC(sz, buf);
 }
 
-KMX_BOOL KMX_Processor::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
+KMX_BOOL KMX_ProcessEvent::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
 {
   KMX_DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;

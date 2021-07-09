@@ -12,35 +12,13 @@
 /windows/src/**/*.stat
 /windows/src/**/*.hpp
 /windows/src/**/*.sdf
-/windows/src/**/*.dcu
 /windows/src/**/error.log
-/windows/src/**/*.tlog
-/windows/src/**/*.obj
-/windows/src/**/*.exe
-/windows/src/**/*.obj
-/windows/src/**/*.iobj
-/windows/src/**/*.intermediate.manifest
-/windows/src/**/*.lastbuildstate
-/windows/src/**/*.cache
-/windows/src/**/*.drc
-/windows/src/**/*.map
-/windows/src/**/*.rsm
-/windows/src/**/*.tds
-/windows/src/**/*.pdb
-/windows/src/**/*.ipdb
 /windows/src/**/.vs/
 /windows/src/**/version.RES
 /windows/src/**/__history/
 /windows/src/**/__recovery/
 /windows/src/**/*.identcache
 /windows/src/**/*.vcxproj.user
-/windows/src/**/ipch/
-/windows/src/**/*.dbg
-/windows/src/**/*.cod
-/windows/src/**/manifest.res
-/windows/src/**/*.dll
-/windows/src/**/*.exp
-/windows/src/**/*.lib
 /windows/src/**/version.res
 /windows/src/**/*.pch
 /windows/src/**/*.wixobj
@@ -137,23 +115,12 @@
 # /engine/kmcomapi/
 /windows/src/engine/kmcomapi/kmcomapi.tlb
 
-# /engine/kmtip/
-/windows/src/engine/kmtip/kmtip.suo
-/windows/src/engine/kmtip/vc100.idb
-/windows/src/engine/kmtip/x64
-/windows/src/engine/kmtip/x86
-/windows/src/engine/kmtip/kmtip.opensdf
-
 # /engine/tsysinfo/
 /windows/src/engine/tsysinfo/tsysinfo_x64.res
 /windows/src/engine/tsysinfo/tsysinfox64.bin
 
 # /engine/tsysinfox64/
 /windows/src/engine/tsysinfox64/x64
-
-# /online/database_unicode_conversion/
-
-# /online/fixup_downloadfile_subs/
 
 # /support/NetInputBoxTest/NetInputBoxTest/
 /windows/src/support/NetInputBoxTest/NetInputBoxTest/bin
@@ -162,67 +129,18 @@
 # /support/unload_keyboards/
 /windows/src/support/unload_keyboards/Win64
 
-# /test/msghooklister/
-
-# /test/msghooklister/src/
-
-# /test/msghooklister/src/App/
-
-# /test/msghooklister/src/Drv/
-
-# /test/msghooklister/x64/
-
-# /test/msghooklister/x86/
-
-# /test/test_finddefaultlang_latin/
-
-# /test/test_i1672/
-
-# /test/test_i2590/
-
-# /test/test_i2896/
-
-# /test/test_i2908/
-
 # /test/test_i2908/i2908/
 /windows/src/test/test_i2908/i2908/Debug
 
-# /test/test_i2934/
-
 # /test/test_i2934/test_i2934/
 /windows/src/test/test_i2934/test_i2934/Debug
-
-# /test/test_i2945 - option set not clearing/
-
-# /test/test_i3021 - bad backslash key/
-
-# /test/test_i3035 - safari compat/
-
-# /test/test_i3056/
-
-# /test/test_i3137/
-
-# /test/test_i3147/
-
-# /test/test_i3214/
-
-# /test/test_i3250/
-
-# /test/test_i3301/
 
 # /test/test_i3317/
 /windows/src/test/test_i3317/*.json
 /windows/src/test/test_i3317/*.js
 
-
-# /test/test_i3358 - media keys/
-
 # /test/test_i3633
 /windows/src/test/test_i3633/sig?
-
-# /test/test_vistaaltfixunit/
-
-# /test/wm_unichar/
 
 # VS Code
 .vscode/

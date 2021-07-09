@@ -45,9 +45,6 @@ wrap-symbols:
     $(SYMSTORE) $(DEBUGPATH)\developer\kmcomp.dbg /t keyman-developer
     #TODO: $(SYMSTORE) $(DEBUGPATH)\developer\kmcomp.x64.dbg /t keyman-developer
 
-backup:
-    $(WZZIP) $(BUILD)\developer\kmcomp.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmcomp.exe $(PROGRAM)\developer\kmcomp.x64.exe
-
 test-manifest:
     # test that (a) linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\kmcomp.exe -validate_manifest
