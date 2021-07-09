@@ -80,6 +80,17 @@ namespace com.keyman.osk {
       return null;
     }
 
+    public findKey(coreID: string): OSKBaseKey {
+      for(const row of this.rows) {
+        for(const key of row.keys) {
+          if(key.getCoreId() == coreID) {
+            return key;
+          }
+        }
+      }
+      return null;
+    }
+
     public refreshLayout(vkbd: VisualKeyboard, paddedHeight: number, trueHeight: number) {
       // Check the heights of each row, in case different layers have different row counts.
       let nRows = this.rows.length;
