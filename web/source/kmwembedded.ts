@@ -250,10 +250,10 @@ namespace com.keyman.text {
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    let osk = keymanweb.osk;
+    let osk: com.keyman.osk.OSKManager = keymanweb.osk;
     if(osk && osk.vkbd && osk.vkbd.adjustHeights(osk.getKeyboardHeight())) {
       var b: HTMLElement = osk._Box, bs=b.style;
-      bs.height=bs.maxHeight=osk.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+      bs.height=bs.maxHeight=osk.vkbd.computedAdjustedOskHeight(osk.getHeight())+'px';
 
       osk._Load();
     }
