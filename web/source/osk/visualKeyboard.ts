@@ -894,11 +894,22 @@ namespace com.keyman.osk {
       let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device.coreSpec);
 
       // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
+      let bitmask = 0;
       switch(Lkc.kName) {
         case 'K_CAPS':
+          bitmask = text.Codes.stateBitmasks.CAPS;
+          break;
         case 'K_NUMLOCK':
+          bitmask = text.Codes.stateBitmasks.NUM_LOCK;
+          break;
         case 'K_SCROLL':
-          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
+          bitmask = text.Codes.stateBitmasks.SCROLL_LOCK;
+          break;
+      }
+
+      if(bitmask) {
+        Lkc.Lstates ^= bitmask;
+        Lkc.LmodifierChange = true;
       }
 
       // End - mirrors _GetKeyEventProperties

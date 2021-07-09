@@ -76,7 +76,7 @@ namespace com.keyman.text {
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
       // of state management.
-      if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, outputTarget, !fromOSK)) {
+      if(this.keyboardProcessor.doModifierPress(keyEvent, outputTarget, !fromOSK) && !fromOSK) {
         return new RuleBehavior();
       }
 
