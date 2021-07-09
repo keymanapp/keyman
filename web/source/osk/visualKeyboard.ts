@@ -1095,7 +1095,10 @@ namespace com.keyman.osk {
       gs.height=gs.maxHeight=paddedHeight+'px';
       bs.fontSize=fs+'em';
 
-      this.currentLayer.refreshLayout(this, paddedHeight, height);
+      for(const layerId in this.layerGroup.layers) {
+        const layer = this.layerGroup.layers[layerId];
+        layer.refreshLayout(this, paddedHeight, height);
+      }
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
