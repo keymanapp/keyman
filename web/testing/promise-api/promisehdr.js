@@ -98,7 +98,6 @@
     // keyboard name and language code, or just the BCP-47 language code.
     // We use a different loading pattern here than in the samples version to provide a slightly different set of test cases.
     addKeyboards('spanish','@nqo');
-
     // One keyboard - 2 languages
     addKeyboards({id:'sil_euro_latin', name:'SIL EuroLatin', languages: [{id:'no'}, {id:'sv'}]}); // Loads from partial stub instead of the compact string.
 
@@ -106,7 +105,7 @@
     addKeyboards({id: 'invalid', name:'Invalid'});
 
     // One keyboard, 1 invalid
-    addKeyboards({id:'sil_cameroon_qwerty', name:'SIL Cameroon Qwerty', languages:[{id:'aal-latn'}]},
+    addKeyboards({id:'sil_cameroon_azerty', name:'SIL Cameroon Azerty', languages:[{id:'aal-latn'}]},
                  {id: 'invalid2', name:'Invalid2'});
 
     // Add a keyboard by language name.  Note that the name must be spelled
@@ -115,12 +114,14 @@
     addKeyboardsForLanguage('Dzongkha');
 
     // Add a fully-specified, locally-sourced, keyboard with custom font
-    addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
-      languages: {
-          id:'lo',name:'Lao',region:'Asia'
+    addKeyboards({id:'sil_cameroon_qwerty',name:'Cameroon QWERTY (SIL)',
+      languages:{
+        id:'aal-Latn',name:'Afade (Latin)',region:'Africa',
+        font:{family:'AndikaAfr',source:['./ANDIKAAFR-R.TTF']}
         },
-      filename:'../lao_2008_basic-1.2.js'
+      filename:'./sil_cameroon_qwerty.js'
       });
+
     // The following two optional calls should be delayed until language menus are fully loaded:
     //  (a) a specific mapped input element input is focused, to ensure that the OSK appears
     //  (b) a specific keyboard is loaded, rather than the keyboard last used.

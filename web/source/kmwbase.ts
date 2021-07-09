@@ -328,9 +328,7 @@ namespace com.keyman {
         // Get the cloud keyboard catalog
         let stubs: (com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[] = [];
         try {
-          let result:(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]|Error = 
-            await this.keyboardManager.keymanCloudRequest('',false);
-          console.log('Catalog: ', result);
+          await this.keyboardManager.keymanCloudRequest('',false);
           return Promise.resolve(stubs);
         } catch(error) {
           console.error(error);

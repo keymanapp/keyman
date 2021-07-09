@@ -70,6 +70,70 @@ namespace com.keyman.keyboards {
       this['KI'] = 'Keyboard_' + id;
       this['KLC'] = langCode;
     }
+
+    /**
+     * Utility to convert stubs to KeyboardStub[]
+     * @param arg 
+     * @returns (KeyboardStub|ErrorStub)[]
+     */
+    public static toStubs(arg: any): (KeyboardStub|ErrorStub)[] {
+      let errorMsg: string = '';
+      if (!arg) {
+        errorMsg = "Stub undefined";
+      } else if (!arg.id) {
+        errorMsg = "KeyboardStub has undefined id";
+      } else if (!arg.languages) {
+        errorMsg = "KeyboardStub has undefined languages"
+      }
+      if (errorMsg != '') {
+        return [{error: new Error(errorMsg)}];
+      }
+
+      // Extract all the languages
+      let languages: any[] = [];
+      if (typeof arg.languages === 'object') {
+        languages.push(arg.languages);
+      } else {
+        arg.languages.foreach(language => {
+          languages.push(language);
+        });
+      }
+
+      let stubs: KeyboardStub[] = [];
+      languages.forEach(language => {
+        let stub: KeyboardStub = new KeyboardStub(arg.id, language.id);
+
+        if (arg.name) {
+          stub['KN'] = arg.name
+        }
+        if (arg.filename) {
+          stub['KF'] = arg.filename;
+        }
+        if (arg.displayName) {
+          stub['displayName'] = arg.displayName;
+        }
+
+        if (language.name) {
+          stub['KL'] = language.name;
+        }
+        if (language.region) {
+          stub['KR'] = language.region;
+        }
+        // RegionCode? 
+        // stub['KRC'] = language.???;
+
+        if (language.font) {
+          stub['KFont'] = language.font;
+        }
+        if (language.oskFont) {
+          stub['KOskFont'] = language.oskFont;
+        }
+
+        stubs.push(stub);
+      })
+
+      return stubs;
+    }
   }
 
   // Information about a keyboard that fails to get added
@@ -1016,9 +1080,15 @@ namespace com.keyman.keyboards {
             }
           }
 
-          // TODO: Convert stub from one-to-many KeyboardStub[]
-          // Involves mapping KeyboardStub properties
-          keyboardStubs.push(stub);
+          // Convert stub from one-to-many KeyboardStub[]
+          let convertedStubs = KeyboardStub.toStubs(stub);
+          convertedStubs.forEach(s => {
+            if (s instanceof KeyboardStub) {
+              keyboardStubs.push(s);
+            } else {
+              errorStubs.push(s);
+            }
+          })
         }
       }
 
@@ -1329,73 +1399,68 @@ namespace com.keyman.keyboards {
       const URL='https://api.keyman.com/cloud/4.0/'
                 + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards');
 
-      try {
-        let promise = new Promise(function(resolve: (result: KeyboardStub[]) => void, reject: (error: Error) => void) {
-          const Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
+      let promise = new Promise(function(resolve: (result: KeyboardStub[]) => void, reject: (error: Error) => void) {
+        const Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
 
-          const queryConfig = '?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
-  
-          // Set callback timer
-          const timeoutID = window.setTimeout(function() {
-            delete kbdManager.registrationResolvers[timeoutID];
-            reject(new Error(CLOUD_TIMEOUT_ERR));
-          } ,10000);
+        const queryConfig = '?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
 
-          // Save the resolve / reject functions.
-          kbdManager.registrationResolvers[timeoutID] = {
-            resolve: resolve,
-            reject: reject
-          };
+        // Set callback timer
+        const timeoutID = window.setTimeout(function() {
+          delete kbdManager.registrationResolvers[timeoutID];
+          reject(new Error(CLOUD_TIMEOUT_ERR));
+        } ,10000);
 
-          const tFlag='&timerid='+ timeoutID;
+        // Save the resolve / reject functions.
+        kbdManager.registrationResolvers[timeoutID] = {
+          resolve: resolve,
+          reject: reject
+        };
 
-          Lscript.onload = function(event: Event) {
-            window.clearTimeout(timeoutID);
-          // This case should only happen if a returned, otherwise-valid keyboard 
-            // script does not ever call `register`.  Also provides default handling
-            // should `register` fail to report results/failure correctly.
-            if(kbdManager.registrationResolvers[timeoutID]) {
-              try {
-                reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
-              } finally {
-                delete kbdManager.registrationResolvers[timeoutID];
-              }
-            }
-          };
+        const tFlag='&timerid='+ timeoutID;
 
-        // Note:  at this time (24 May 2021), this is also happens for "successful" 
-          //        API calls where there is no matching keyboard ID.
-        //        
-          //        The returned 'error' JSON object is sent with an HTML error code (404)
-          //        and does not call `keyman.register`.  Even if it did the latter, the
-          //        404 code would likely prevent the returned script's call.
-        Lscript.onerror = function(event: string | Event, source?: string, 
-                                    lineno?: number, colno?: number, error?: Error) {
-            window.clearTimeout(timeoutID);
+        Lscript.onload = function(event: Event) {
+          window.clearTimeout(timeoutID);
+        // This case should only happen if a returned, otherwise-valid keyboard 
+          // script does not ever call `register`.  Also provides default handling
+          // should `register` fail to report results/failure correctly.
+          if(kbdManager.registrationResolvers[timeoutID]) {
             try {
-              let msg = CLOUD_MALFORMED_OBJECT_ERR;
-              if(error) {
-                msg = msg + ": " + error.message;
-              }
-              reject(new Error(msg));
+              reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
             } finally {
               delete kbdManager.registrationResolvers[timeoutID];
             }
           }
+        };
 
-          Lscript.src = URL + queryConfig + cmd + tFlag;
-  
+      // Note:  at this time (24 May 2021), this is also happens for "successful" 
+        //        API calls where there is no matching keyboard ID.
+      //        
+        //        The returned 'error' JSON object is sent with an HTML error code (404)
+        //        and does not call `keyman.register`.  Even if it did the latter, the
+        //        404 code would likely prevent the returned script's call.
+      Lscript.onerror = function(event: string | Event, source?: string, 
+                                  lineno?: number, colno?: number, error?: Error) {
+          window.clearTimeout(timeoutID);
           try {
-            document.body.appendChild(Lscript);
-          } catch(ex) {
-            document.getElementsByTagName('head')[0].appendChild(Lscript);
+            let msg = CLOUD_MALFORMED_OBJECT_ERR;
+            if(error) {
+              msg = msg + ": " + error.message;
+            }
+            reject(new Error(msg));
+          } finally {
+            delete kbdManager.registrationResolvers[timeoutID];
           }
-        });
-        return promise;
-      } catch(error) {
-        kbdManager.serverUnavailable(error.message);
-        return Promise.reject(error);
-      }
+        }
+
+        Lscript.src = URL + queryConfig + cmd + tFlag;
+
+        try {
+          document.body.appendChild(Lscript);
+        } catch(ex) {
+          document.getElementsByTagName('head')[0].appendChild(Lscript);
+        }
+      });
+      return promise;
     }
 
     /**
