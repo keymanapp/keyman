@@ -1325,6 +1325,7 @@ namespace com.keyman.keyboards {
      */
     _registerStub(Pstub): number {
       var Lk;
+      Pstub = { ... Pstub}; // shallow clone the stub object
 
       // In initialization not complete, list the stub to be registered on completion of initialization
       if(!this.keymanweb.initialized) {
