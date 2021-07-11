@@ -219,18 +219,12 @@ namespace com.keyman.keyboards {
 
         // If it's a state key modifier, trigger its effects as part of the
         // keystroke.
-        let bitmask = 0;
-        switch(Lkc.kName) {
-          case 'K_CAPS':
-            bitmask = text.Codes.stateBitmasks.CAPS;
-            break;
-          case 'K_NUMLOCK':
-            bitmask = text.Codes.stateBitmasks.NUM_LOCK;
-            break;
-          case 'K_SCROLL':
-            bitmask = text.Codes.stateBitmasks.SCROLL_LOCK;
-            break;
-        }
+        const bitmap = {
+          'K_CAPS': text.Codes.stateBitmasks.CAPS,
+          'K_NUMLOCK': text.Codes.stateBitmasks.NUM_LOCK,
+          'K_SCROLL': text.Codes.stateBitmasks.SCROLL_LOCK
+        };
+        const bitmask = bitmap[Lkc.kName];
 
         if(bitmask) {
           Lkc.Lstates ^= bitmask;
