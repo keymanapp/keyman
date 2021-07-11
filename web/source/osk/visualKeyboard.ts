@@ -602,7 +602,7 @@ namespace com.keyman.osk {
     layers: keyboards.LayoutLayer[];
     private layerId: string = "default";
     readonly isRTL: boolean;
-    layerIndex: number;
+    layerIndex: number = 0; // the index of the default layer
 
     device: Device;
     isStatic: boolean = false;
