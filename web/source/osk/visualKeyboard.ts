@@ -20,8 +20,8 @@ namespace com.keyman.osk {
     layout: keyboards.ActiveLayout;
     layers: keyboards.LayoutLayer[];
     private _layerId: string = "default";
+    layerIndex: number = 0; // the index of the default layer
     readonly isRTL: boolean;
-    layerIndex: number;
 
     device: Device;
     isStatic: boolean = false;
