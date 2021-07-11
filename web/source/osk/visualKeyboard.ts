@@ -801,11 +801,10 @@ namespace com.keyman.osk {
         layerId = this.layerId;
       }
 
-      const layerObj = this.layerGroup.layers[layerId];
-      if(!layerObj) {
+      const layer = this.layerGroup.layers[layerId];
+      if(!layer) {
         return;
       }
-      const layer = layerObj.spec;
 
       // Set the on/off state of any visible state keys.
       var states = ['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
@@ -817,15 +816,8 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i]['sp'] = core.keyboardProcessor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
-        let btn = layerObj.findKey(states[i]).btn;
-
-        if(btn != null) {
-          btn.key.setButtonClass(this);
-        } else {
-          let keyId = layerId+'-'+states[i];
-          console.warn("Could not find key to apply style: \"" + keyId + "\"");
-        }
+        keys[i].spec['sp'] = core.keyboardProcessor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
+        keys[i].setButtonClass(this);
       }
     }
 

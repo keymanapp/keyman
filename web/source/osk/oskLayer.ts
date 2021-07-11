@@ -10,6 +10,9 @@ namespace com.keyman.osk {
     public readonly globeKey:    OSKBaseKey;
     public readonly spaceBarKey: OSKBaseKey;
     public readonly hideKey:     OSKBaseKey;
+    public readonly capsKey:     OSKBaseKey;
+    public readonly numKey:      OSKBaseKey;
+    public readonly scrollKey:   OSKBaseKey;
 
     public get id(): string {
       return this.spec.id;
@@ -50,36 +53,24 @@ namespace com.keyman.osk {
 
       // Identify and save references to the language key, hide keyboard key, and space bar
       if(vkbd.device.touchable) {
-        this.globeKey  = this.getSpecialKey('K_LOPT');
-        this.hideKey   = this.getSpecialKey('K_ROPT');
+        this.globeKey  = this.findKey('K_LOPT');
+        this.hideKey   = this.findKey('K_ROPT');
       }
 
       // Define for both desktop and touchable OSK
-      this.spaceBarKey = this.getSpecialKey('K_SPACE');
+      this.spaceBarKey = this.findKey('K_SPACE');
+      this.capsKey     = this.findKey('K_CAPS');
+      this.numKey      = this.findKey('K_NUMLOCK');
+      this.scrollKey   = this.findKey('K_SCROLL');
     }
 
     /**
-     *  Set the reference to a special function key for the
-     *  currently visible OSK layer
+     *  Find the OSKBaseKey representing the specified
+     *  key ID for the currently visible OSK layer
      *
-     *  @param    {string}  layerId layer identifier
      *  @param    {string}  keyId   key identifier
      *  @return   {Object}          Reference to key
      */
-    private getSpecialKey(keyId: string): OSKBaseKey {
-      for(let row of this.rows) {
-        for(var k=0; k < row.keys.length; k++) {
-          const key = row.keys[k];
-          //let key = getKeyFrom(keys[k].firstChild);
-          if(key && key.spec.id == keyId) {
-            return key;
-          }
-        }
-      }
-    
-      return null;
-    }
-
     public findKey(coreID: string): OSKBaseKey {
       for(const row of this.rows) {
         for(const key of row.keys) {
