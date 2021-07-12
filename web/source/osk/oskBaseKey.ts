@@ -95,7 +95,7 @@ namespace com.keyman.osk {
       let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
       // Set button class
-      this.setButtonClass(osk);
+      this.setButtonClass();
 
       // Set key and button positioning properties.
       if(!isDesktop) {

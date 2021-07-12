@@ -828,7 +828,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i].setToggleState(this, core.keyboardProcessor.stateKeys[states[i]]);
+        keys[i].setToggleState(core.keyboardProcessor.stateKeys[states[i]]);
       }
     }
 

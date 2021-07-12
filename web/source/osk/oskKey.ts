@@ -151,7 +151,7 @@ namespace com.keyman.osk {
      *
      * @param       {Object=}   layout  source layout description (optional, sometimes)
      */
-    public setButtonClass(vkbd: VisualKeyboard) {
+    public setButtonClass() {
       let key = this.spec;
       let btn = this.btn;
 
@@ -168,13 +168,7 @@ namespace com.keyman.osk {
         n=0;
       }
 
-      // Apply an overriding class for 5-row layouts
-      var nRows=vkbd.kbdLayout['layer'][0]['row'].length;
-      if(nRows > 4 && vkbd.device.formFactor == 'phone') {
-        btn.className='kmw-key kmw-5rows kmw-key-'+OSKKey.BUTTON_CLASSES[n];
-      } else {
-        btn.className='kmw-key kmw-key-'+OSKKey.BUTTON_CLASSES[n];
-      }
+      btn.className='kmw-key kmw-key-'+OSKKey.BUTTON_CLASSES[n];
     }
 
     /**
@@ -184,7 +178,7 @@ namespace com.keyman.osk {
      * - special <=> special-on
      * @param {boolean=} flag The new toggle state 
      */
-    public setToggleState(vkbd: VisualKeyboard, flag?: boolean) {
+    public setToggleState(flag?: boolean) {
       let btnClassId: number;
       let classAsString: boolean;
 
@@ -223,7 +217,7 @@ namespace com.keyman.osk {
         this.spec['sp'] = ('' + this.spec['sp']) as keyboards.ButtonClass;
       }
 
-      this.setButtonClass(vkbd);
+      this.setButtonClass();
     }
 
     // "Frame key" - generally refers to non-linguistic keys on the keyboard

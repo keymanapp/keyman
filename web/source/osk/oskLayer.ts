@@ -29,6 +29,11 @@ namespace com.keyman.osk {
       const gs=gDiv.style;
       gDiv.className='kmw-key-layer';
 
+      var nRows=layer['row'].length;
+      if(nRows > 4 && vkbd.device.formFactor == 'phone') {
+        gDiv.className = gDiv.className + ' kmw-5rows';
+      }
+
       // Set font for layer if defined in layout
       if('font' in layout) {
         gs.fontFamily=layout['font'];
