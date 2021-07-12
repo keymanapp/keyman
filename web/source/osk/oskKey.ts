@@ -293,13 +293,13 @@ namespace com.keyman.osk {
       return metrics;
     }
 
-    getIdealFontSize(osk: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
+    getIdealFontSize(vkbd: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
       // Recompute the new width for use in autoscaling calculations below, just in case.
-      let emScale = osk.getKeyEmFontSize();
+      let emScale = vkbd.getKeyEmFontSize();
       let metrics = OSKKey.getTextMetrics(this.spec.text, emScale, style);
 
       let fontSpec = getFontSizeStyle(style.fontSize);
-      let keyWidth = this.getKeyWidth(osk);
+      let keyWidth = this.getKeyWidth(vkbd);
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
       const X_PADDING = 2;
@@ -365,21 +365,21 @@ namespace com.keyman.osk {
      *  @param  {string}  oldText
      *  @return {string}
      **/
-    protected renameSpecialKey(oldText: string, osk: VisualKeyboard): string {
+    protected renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string {
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
       switch(oldText) {
         case '*ZWNJ*':
           // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
           // possible / available though, and there's a different standard symbol on Android.
-          oldText = osk.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+          oldText = vkbd.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
             '*ZWNJAndroid*' :
             '*ZWNJiOS*';
           break;
         case '*Enter*':
-          oldText = osk.isRTL ? '*RTLEnter*' : '*LTREnter*';
+          oldText = vkbd.isRTL ? '*RTLEnter*' : '*LTREnter*';
           break;
         case '*BkSp*':
-          oldText = osk.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
+          oldText = vkbd.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
           break;
         default:
           // do nothing.
@@ -393,7 +393,7 @@ namespace com.keyman.osk {
     }
 
     // Produces a HTMLSpanElement with the key's actual text.
-    protected generateKeyText(osk: VisualKeyboard): HTMLSpanElement {
+    protected generateKeyText(vkbd: VisualKeyboard): HTMLSpanElement {
       let spec = this.spec;
 
       // Add OSK key labels
@@ -418,7 +418,7 @@ namespace com.keyman.osk {
 
       t.className='kmw-key-text';
 
-      let specialText = this.renameSpecialKey(keyText, osk);
+      let specialText = this.renameSpecialKey(keyText, vkbd);
       if(specialText != keyText) {
         // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
         keyText = specialText;
@@ -426,7 +426,7 @@ namespace com.keyman.osk {
       }
 
       // Grab our default for the key's font and font size.
-      ts.fontSize=osk.fontSize;     //Build 344, KMEW-90
+      ts.fontSize=vkbd.fontSize;     //Build 344, KMEW-90
 
       //Override font spec if set for this key in the layout
       if(typeof spec['font'] == 'string' && spec['font'] != '') {
@@ -444,11 +444,11 @@ namespace com.keyman.osk {
       if(ts.fontFamily) {
         styleSpec.fontFamily = ts.fontFamily;
       } else {
-        styleSpec.fontFamily = osk.fontFamily; // Helps with style sheet calculations.
+        styleSpec.fontFamily = vkbd.fontFamily; // Helps with style sheet calculations.
       }
 
       // Check the key's display width - does the key visualize well?
-      let emScale = osk.getKeyEmFontSize();
+      let emScale = vkbd.getKeyEmFontSize();
       var width: number = OSKKey.getTextMetrics(keyText, emScale, styleSpec).width;
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
@@ -460,13 +460,13 @@ namespace com.keyman.osk {
         // code points and use those in rendering the OSK. See #3039 for more details.
         // keyText = '\u25cc' + keyText;
 
-        if(osk.isRTL) {
+        if(vkbd.isRTL) {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }
       }
 
-      ts.fontSize = this.getIdealFontSize(osk, styleSpec);
+      ts.fontSize = this.getIdealFontSize(vkbd, styleSpec);
 
       // Finalize the key's text.
       t.innerHTML = keyText;
