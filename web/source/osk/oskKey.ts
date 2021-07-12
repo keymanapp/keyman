@@ -177,6 +177,55 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * For keys with button classes that support toggle states, this method
+     * may be used to toggle which state the key's button class is in.
+     * -  shift  <=>  shift-on
+     * - special <=> special-on
+     * @param {boolean=} flag The new toggle state 
+     */
+    public setToggleState(vkbd: VisualKeyboard, flag?: boolean) {
+      let btnClassId: number;
+      let classAsString: boolean;
+
+      if(classAsString = typeof this.spec['sp'] == 'string') {
+        btnClassId = parseInt(this.spec['sp'], 10);
+      } else {
+        btnClassId = this.spec['sp'];
+      }
+      
+      // 1 + 2:   shift  +  shift-on
+      // 3 + 4:  special + special-on
+      switch(OSKKey.BUTTON_CLASSES[btnClassId]) {
+        case 'shift':
+        case 'shift-on':
+          if(flag === undefined) {
+            flag = OSKKey.BUTTON_CLASSES[btnClassId] == 'shift';
+          }
+
+          this.spec['sp'] = 1 + (flag ? 1 : 0);
+          break;
+        // New functionality:  we made classes for this but never used 'em!
+        case 'special':
+        case 'special-on':
+          if(flag === undefined) {
+            flag = OSKKey.BUTTON_CLASSES[btnClassId] == 'special';
+          }
+
+          this.spec['sp'] = 3 + (flag ? 1 : 0);
+          break;
+        default:
+          return;
+      }
+
+      if(classAsString) {
+        // KMW currently doesn't handle raw numbers for 'sp' properly.
+        this.spec['sp'] = ('' + this.spec['sp']) as keyboards.ButtonClass;
+      }
+
+      this.setButtonClass(vkbd);
+    }
+
     // "Frame key" - generally refers to non-linguistic keys on the keyboard
     public isFrameKey(): boolean {
       let classIndex = this.spec['sp'] || 0;

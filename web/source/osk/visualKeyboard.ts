@@ -806,9 +806,20 @@ namespace com.keyman.osk {
         return;
       }
 
+      // So... through KMW 14, we actually never tracked the capsKey, numKey, and scrollKey
+      // properly for keyboard-defined layouts - only _default_, desktop-style layouts.
+      //
+      // We _could remedy this, but then... touch keyboards like khmer_angkor actually
+      // repurpose certain state keys, and in an inconsistent manner at that.
+      // Considering the potential complexity of touch layouts, with multiple possible
+      // layer-shift keys, it's likely best to just leave things as they are for now.
+      if(!core.activeKeyboard.usesDesktopLayoutOnDevice(this.device.coreSpec)) {
+        return;
+      }
+
       // Set the on/off state of any visible state keys.
-      var states = ['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
-      var keys   = [layer.capsKey, layer.numKey, layer.scrollKey];
+      const states   = ['K_CAPS',      'K_NUMLOCK',    'K_SCROLL'];
+      const keys     = [layer.capsKey, layer.numKey,   layer.scrollKey];
 
       for(i=0; i < keys.length; i++) {
         // Skip any keys not in the OSK!
@@ -816,8 +827,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i].spec['sp'] = core.keyboardProcessor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
-        keys[i].setButtonClass(this);
+        keys[i].setToggleState(this, core.keyboardProcessor.stateKeys[states[i]]);
       }
     }
 
