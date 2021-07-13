@@ -346,7 +346,7 @@ namespace com.keyman.osk {
         // approximation for that.  `this.kbdDiv` is the element controlling the OSK's width, set in px.
 
         // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
-        return Math.floor(vkbd.width * this.spec['widthpc'] / 100);
+        return Math.floor(vkbd.computedWidth * this.spec['widthpc'] / 100);
       }
     }
 

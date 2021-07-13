@@ -233,7 +233,7 @@ namespace com.keyman.osk {
 
     private get width(): number {
       if(this.vkbd) {
-        return this.vkbd.width;
+        return this.vkbd.computedWidth;
       } else {
         return this._baseWidth;
       }
@@ -241,7 +241,7 @@ namespace com.keyman.osk {
 
     private get height(): number {
       if(this.vkbd) {
-        return this.vkbd.height;
+        return this.vkbd.computedHeight;
       } else {
         return this._baseHeight;
       }
