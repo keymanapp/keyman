@@ -24,6 +24,7 @@
 void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave);
 BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp);
 BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
+void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value);
 
 void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
 {   // I3594
@@ -145,6 +146,25 @@ void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
   IntSaveKeyboardOption(REGSZ_KeyboardOptions, kp, nStoreToSave);
 }
 
+void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value)
+{
+  IntSaveKeyboardOptionREGCore(REGSZ_KeyboardOptions, kp, key, value);
+}
+
+void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value)
+{
+  assert(REGKey != NULL);
+  assert(kp != NULL);
+  assert(kp->coreKeyboard != NULL);
+  assert(kp->coreKeyboardOptions != NULL);
+  // TODO: 5011 just check for yourself that the core processor now checks if there size limit of the keyboard store has been reached.
+  RegistryFullAccess r(HKEY_CURRENT_USER);
+  if (r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(kp->Name, TRUE) && r.OpenKey(REGKey, TRUE))
+  {
+    std::wstring tempValue(value);
+    r.WriteString(key, &tempValue[0]);
+  }
+}
 
 BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
 {
@@ -171,7 +191,7 @@ BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
         {
           if(kp->Keyboard->dpStoreArray[i].dpName != NULL && _wcsicmp(kp->Keyboard->dpStoreArray[i].dpName, buf) == 0)
           {
-            kp->KeyboardOptions[i].Value = new WCHAR[wcslen(val)+1]; // is this a memory leak as 
+            kp->KeyboardOptions[i].Value = new WCHAR[wcslen(val)+1]; // is this a memory leak as
             wcscpy_s(kp->KeyboardOptions[i].Value, wcslen(val)+1, val);
 
             kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
@@ -233,21 +253,16 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
     {
       buf[255] = 0;
       WCHAR val[256];
-      WCHAR* PWVAL;
       if (r.ReadString(buf, val, sizeof(val) / sizeof(val[0])) && val[0])
       {
         val[255] = 0;
         keyboardOpts[n].scope = KM_KBP_OPT_KEYBOARD;
-        
-        size_t charSize = strlen(key) + 1;
-        wchar_t* KeyWCHAR = new WCHAR[charSize];
-        size_t convertedChars = 0;
-        mbstowcs_s(&convertedChars, KeyWCHAR, charSize, key, _TRUNCATE);
-        keyboardOpts[n].key = reinterpret_cast<char16_t*>(KeyWCHAR);
 
-        PWVAL = new WCHAR[wcslen(val) + 1]; // is this a memory leak as 
-        wcscpy_s(PWVAL, wcslen(val) + 1, val);
-        keyboardOpts[n].value = reinterpret_cast<char16_t*>(PWVAL);
+        std::wstring tempKey(buf);
+        keyboardOpts[n].key = reinterpret_cast<char16_t*>(&tempKey[0]);
+
+        std::wstring tempValue(value);
+        keyboardOpts[n].value = reinterpret_cast<char16_t*>(&tempValue[0]);
       }
       n++;
     }

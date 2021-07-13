@@ -32,3 +32,5 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp);
  * @param state core keyboard state used to update keyboard options
  */
 void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* state);
+
+void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value);
