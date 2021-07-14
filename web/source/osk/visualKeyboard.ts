@@ -219,7 +219,7 @@ namespace com.keyman.osk {
      * @param height
      * @param pending Set to `true` if called during a resizing interaction
      */
-    public setSize(width?: number, height?: number, pending?: boolean) {
+    public setSize(width: number, height: number, pending?: boolean) {
       this._width = width;
       this._height = height;
 
