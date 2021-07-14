@@ -62,7 +62,6 @@ namespace com.keyman.osk {
      */
     private _computedHeight: number;
 
-
     // Style-related properties
     fontFamily: string;
     fontSize: string;
@@ -231,8 +230,7 @@ namespace com.keyman.osk {
 
       // Computed during layout operations; allows caching instead of continuous recomputation.
       if(this.needsLayout) {
-        let osk = com.keyman.singleton.osk;
-        this.refreshLayout(osk.getKeyboardHeight());
+        this.refreshLayout();
       }
       return this._computedWidth;
     }
@@ -250,10 +248,25 @@ namespace com.keyman.osk {
 
       // Computed during layout operations; allows caching instead of continuous recomputation.
       if(this.needsLayout) {
-        let osk = com.keyman.singleton.osk;
-        this.refreshLayout(osk.getKeyboardHeight());
+        this.refreshLayout();
       }
       return this._computedHeight;
+    }
+
+    /**
+     * Uses fixed scaling for internal elements, rather than relative, percent-
+     * based scaling.
+     */
+    public get usesFixedScaling(): boolean {
+      if(!this.height || !this.height.absolute) {
+        return false;
+      }
+
+      if(!this.width || !this.width.absolute) {
+        return false;
+      }
+
+      return this.device.touchable;
     }
 
     /**
@@ -269,10 +282,12 @@ namespace com.keyman.osk {
       if(!pending && this.kbdDiv) {
         this.kbdDiv.style.width    = width ? this._width.styleString : '';
         this.kbdDiv.style.height   = height ? this._height.styleString : '';
-        this.kbdDiv.style.fontSize = height ? (this._height.scaledBy(1/8).styleString) : '';
 
-        let osk = com.keyman.singleton.osk;
-        this.refreshLayout(osk.getKeyboardHeight());
+        if(!this.device.touchable) {
+          this.kbdDiv.style.fontSize = height ? (this._height.scaledBy(1/8).styleString) : '';
+        }
+
+        this.refreshLayout();
       } else {
         this.needsLayout = true;
       }
@@ -1102,7 +1117,7 @@ namespace com.keyman.osk {
      * Used to refresh the VisualKeyboard's geometric layout and key sizes
      * when needed.
      */
-    refreshLayout(height: number) {
+    refreshLayout() {
       let keyman = com.keyman.singleton;
       let device = this.device;
 
@@ -1112,12 +1127,15 @@ namespace com.keyman.osk {
         fs=fs/keyman.util.getViewportScale();
       }
 
-      let paddedHeight = this.computedAdjustedOskHeight(height);
+      let paddedHeight: number;
+      if(this.height && this.height.absolute) {
+        paddedHeight = this.computedAdjustedOskHeight(this.height.val);
+      }
 
       let b = this.kbdDiv.firstChild as HTMLElement;
       let gs = this.kbdDiv.style;
       let bs=b.style;
-      if(device.touchable) {
+      if(this.usesFixedScaling) {
         // Sets the layer group to the correct height.
         gs.height = gs.maxHeight = paddedHeight + 'px';
       }
@@ -1161,7 +1179,7 @@ namespace com.keyman.osk {
       // Needs the refreshed layout info to work correctly.
       for(const layerId in this.layerGroup.layers) {
         const layer = this.layerGroup.layers[layerId];
-        layer.refreshLayout(this, paddedHeight, height);
+        layer.refreshLayout(this, paddedHeight, this.computedHeight);
       }
     }
 
@@ -1332,7 +1350,9 @@ namespace com.keyman.osk {
         // This still feels fairly hacky... but something IS needed to constrain the height.
         // There are plans to address related concerns through some of the later aspects of 
         // the Web OSK-Core design.
-        kbdObj.refreshLayout(height); // Necessary for the row heights to be properly set!
+        kbdObj.setSize(800, height); // Probably need something for width, too, rather than
+                                     // assuming 100%.
+        kbdObj.refreshLayout(); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
         kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
       } else {

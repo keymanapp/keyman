@@ -196,10 +196,7 @@ namespace com.keyman.osk {
         }
         // For other devices, adjust the object heights, allowing for viewport scaling
       } else {
-        this.vkbd.refreshLayout(this.getKeyboardHeight());
-
-        let b: HTMLElement = this._Box, bs=b.style;
-        bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+        this.refreshLayout();
       }
 
       // END:  construction of the actual internal layout for the overall OSK
@@ -786,10 +783,7 @@ namespace com.keyman.osk {
         // Do NOT condition upon form-factor; this line prevents a bug with displaying
         // the predictive-text banner on the initial keyboard load.  (Issue #2907)
         if(device.touchable && device.OS == 'iOS') {
-          this.vkbd.refreshLayout(this.getKeyboardHeight());
-
-          var b: HTMLElement = this._Box, bs=b.style;
-          bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+          this.refreshLayout();
         }
         // Enable the currently active keyboard layer and update the default nextLayer member
         this.vkbd.updateState();
@@ -876,6 +870,17 @@ namespace com.keyman.osk {
         Lpos['y']=this._Box.offsetTop;
         Lpos['userLocated']=this.userPositioned;
         this.doShow(Lpos);
+      }
+    }
+
+    public refreshLayout(): void {
+      if(this && this.vkbd && this.vkbd.device.touchable) {
+        this.vkbd.setSize(screen.width, this.getKeyboardHeight());
+        // Currently attempts to set the MOBILE KEYBOARD HEIGHT as part of the 'refresh'!
+        this.vkbd.refreshLayout();
+
+        var b: HTMLElement = this._Box, bs=b.style;
+        bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
       }
     }
 
