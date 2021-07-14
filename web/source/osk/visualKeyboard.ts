@@ -42,25 +42,13 @@ namespace com.keyman.osk {
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic width scaling. 
      */
-    private _width: ParsedLengthStyle;
+    private _width: number;
 
     /**
      * The configured height for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic height scaling. 
      */
-    private _height: ParsedLengthStyle;
-
-    /**
-     * The computed width for this VisualKeyboard.  May be null if auto sizing
-     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
-     */
-    private _computedWidth: number;
-
-    /**
-     * The computed height for this VisualKeyboard.  May be null if auto sizing
-     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
-     */
-    private _computedHeight: number;
+    private _height: number;
 
     // Style-related properties
     fontFamily: string;
@@ -205,7 +193,7 @@ namespace com.keyman.osk {
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic width scaling. 
      */
-    get width(): LengthStyle {
+    get width(): number {
       return this._width;
     }
 
@@ -213,44 +201,8 @@ namespace com.keyman.osk {
      * The configured height for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic height scaling. 
      */
-    get height(): LengthStyle {
+    get height(): number {
       return this._height;
-    }
-
-    /**
-     * The computed width for this VisualKeyboard.  May be null if auto sizing
-     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
-     */
-    get computedWidth(): number {
-      if(!this.kbdDiv) {
-        // Intermediate state - can be called during VisualKeyboard's constructor, before
-        // computedHeight can receive a value.
-        return undefined;
-      }
-
-      // Computed during layout operations; allows caching instead of continuous recomputation.
-      if(this.needsLayout) {
-        this.refreshLayout();
-      }
-      return this._computedWidth;
-    }
-
-    /**
-     * The computed height for this VisualKeyboard.  May be null if auto sizing
-     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
-     */
-    get computedHeight(): number {
-      if(!this.kbdDiv) {
-        // Intermediate state - can be called during VisualKeyboard's constructor, before
-        // computedHeight can receive a value.
-        return undefined;
-      }
-
-      // Computed during layout operations; allows caching instead of continuous recomputation.
-      if(this.needsLayout) {
-        this.refreshLayout();
-      }
-      return this._computedHeight;
     }
 
     /**
@@ -258,14 +210,6 @@ namespace com.keyman.osk {
      * based scaling.
      */
     public get usesFixedScaling(): boolean {
-      if(!this.height || !this.height.absolute) {
-        return false;
-      }
-
-      if(!this.width || !this.width.absolute) {
-        return false;
-      }
-
       return this.device.touchable;
     }
 
@@ -276,15 +220,15 @@ namespace com.keyman.osk {
      * @param pending Set to `true` if called during a resizing interaction
      */
     public setSize(width?: number, height?: number, pending?: boolean) {
-      this._width = ParsedLengthStyle.inPixels(width);
-      this._height = ParsedLengthStyle.inPixels(height);
+      this._width = width;
+      this._height = height;
 
       if(!pending && this.kbdDiv) {
-        this.kbdDiv.style.width    = width ? this._width.styleString : '';
-        this.kbdDiv.style.height   = height ? this._height.styleString : '';
+        this.kbdDiv.style.width    = width ? this._width + 'px' : '';
+        this.kbdDiv.style.height   = height ? this._height + 'px' : '';
 
         if(!this.device.touchable) {
-          this.kbdDiv.style.fontSize = height ? (this._height.scaledBy(1/8).styleString) : '';
+          this.kbdDiv.style.fontSize = height ? ((this._height/8) + 'px') : '';
         }
 
         this.refreshLayout();
@@ -297,17 +241,17 @@ namespace com.keyman.osk {
       this.needsLayout = true;
     }
 
-    public defaultFontSize(): number {
-      return this.computedHeight ? this.computedHeight / 8 : undefined;
+    public defaultDesktopFontSize(): number {
+      return this.height ? this.height / 8 : undefined;
     }
 
     /**
      * Called by OSKManager after resize operations in order to determine the final
      * size actually used by the visual keyboard.
      */
-    public refit() {
-      this._width  = ParsedLengthStyle.inPixels(this.kbdDiv.offsetWidth);
-      this._height = ParsedLengthStyle.inPixels(this.kbdDiv.offsetHeight);
+    public refit() {  // TODO:  Should probably remove; VisualKeyboard shouldn't be responsible for it.
+      this._width  = this.kbdDiv.offsetWidth;
+      this._height = this.kbdDiv.offsetHeight;
     }
 
     /**
@@ -1059,7 +1003,7 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
 
       if(this.device.formFactor == 'desktop') {
-        let kbdFontSize = this.defaultFontSize();
+        let kbdFontSize = this.defaultDesktopFontSize();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
         return kbdFontSize * keySquareScale;
       } else {
@@ -1128,8 +1072,8 @@ namespace com.keyman.osk {
       }
 
       let paddedHeight: number;
-      if(this.height && this.height.absolute) {
-        paddedHeight = this.computedAdjustedOskHeight(this.height.val);
+      if(this.height) {
+        paddedHeight = this.computedAdjustedOskHeight(this.height);
       }
 
       let b = this.kbdDiv.firstChild as HTMLElement;
@@ -1141,45 +1085,10 @@ namespace com.keyman.osk {
       }
       bs.fontSize=fs+'em';
 
-      // NEW CODE ------
-      
-      // Step 1:  have the necessary conditions been met?
-      const fixedSize = this.width && this.height && this.width.absolute && this.height.absolute;
-      const computedStyle = getComputedStyle(this.kbdDiv);
-      const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
-
-      // Step 2:  determine basic layout geometry
-      if(fixedSize) {
-        this._computedWidth  = this.width.val;
-        this._computedHeight = this.height.val;
-      } else if(isInDOM) {
-        this._computedWidth   = parseInt(computedStyle.width, 10);
-        if(!this._computedWidth) {
-          // For touch keyboards, the width _was_ specified on the layer group,
-          // not the root element (`kbdDiv`).
-          const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
-          this._computedWidth = parseInt(groupStyle.width, 10);
-        }
-        this._computedHeight  = parseInt(computedStyle.height, 10);
-      } else {
-        // Cannot perform layout operations!
-        return;
-      }
-
-      // Step 3:  perform layout operations.
-      // TODO:
-      // - for the active layer...
-      //   - adjust heights
-      //   - rescale key text
-
-      this.needsLayout = false;
-
-      // END NEW CODE -----------
-
       // Needs the refreshed layout info to work correctly.
       for(const layerId in this.layerGroup.layers) {
         const layer = this.layerGroup.layers[layerId];
-        layer.refreshLayout(this, paddedHeight, this.computedHeight);
+        layer.refreshLayout(this, paddedHeight, this.height);
       }
     }
 
