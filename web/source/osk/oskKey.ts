@@ -352,10 +352,10 @@ namespace com.keyman.osk {
 
     objectUnits(vkbd: VisualKeyboard): string {
       // Returns a unit string corresponding to how the width for each key is specified.
-      if(vkbd.device.formFactor == 'desktop' || vkbd.isStatic) {
-        return '%';
-      } else {
+      if(vkbd.usesFixedScaling) {
         return 'px';
+      } else {
+        return '%';
       }
     }
 

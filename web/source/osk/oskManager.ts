@@ -155,25 +155,14 @@ namespace com.keyman.osk {
 
       // Set scaling for mobile devices here.
       if(device.touchable) {
-        var fontScale: number = 1;
-        if(device.formFactor == 'phone') {
-          fontScale = 1.6 * (keymanweb.isEmbedded ? 0.65 : 0.6) * 1.2;  // Combines original scaling factor with one previously applied to the layer group.
-        } else {
-          // The following is a *temporary* fix for small format tablets, e.g. PendoPad
-          var pixelRatio = 1;
-          if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-            pixelRatio = window.devicePixelRatio;
-          }
-
-          if(device.OS == 'Android' && device.formFactor == 'tablet' && this.getHeight() < 300 * pixelRatio) {
-            fontScale *= 1.2;
-          } else {
-            fontScale *= 2; //'2.5em';
-          }
-        }
+        let fontScale = this.defaultFontSize(device, keymanweb.isEmbedded);
 
         // Finalize the font size parameter.
-        s.fontSize = fontScale + 'em';
+        if(fontScale.absolute) {
+          s.fontSize = fontScale.styleString;
+        } else {
+          s.fontSize = fontScale.val + 'em';
+        }
       }
 
       if(this.vkbd) {
@@ -629,6 +618,32 @@ namespace com.keyman.osk {
       }
 
       return width;
+    }
+
+    public defaultFontSize(device: Device, isEmbedded: boolean): ParsedLengthStyle {
+      if(device.touchable) {
+        var fontScale: number = 1;
+        if(device.formFactor == 'phone') {
+          fontScale = 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2;  // Combines original scaling factor with one previously applied to the layer group.
+        } else {
+          // The following is a *temporary* fix for small format tablets, e.g. PendoPad
+          var pixelRatio = 1;
+          if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+            pixelRatio = window.devicePixelRatio;
+          }
+
+          if(device.OS == 'Android' && device.formFactor == 'tablet' && this.getHeight() < 300 * pixelRatio) {
+            fontScale *= 1.2;
+          } else {
+            fontScale *= 2; //'2.5em';
+          }
+        }
+
+        // Finalize the font size parameter.
+        return ParsedLengthStyle.forScalar(fontScale);
+      } else {
+        return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
+      } 
     }
 
     /**

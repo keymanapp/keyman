@@ -13,11 +13,6 @@ namespace com.keyman.osk {
       }
     }
 
-    if(fs.indexOf('em') != -1) {
-      const val = parseFloat(fs);
-      return ParsedLengthStyle.forScalar(val);
-    } else {
-      return new ParsedLengthStyle(fs);
-    }
+    return new ParsedLengthStyle(fs);
   }
 }

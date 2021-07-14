@@ -204,7 +204,7 @@ namespace com.keyman.osk {
      * based scaling.
      */
     public get usesFixedScaling(): boolean {
-      return this.device.touchable;
+      return this.device.touchable && !this.isStatic;
     }
 
     /**
