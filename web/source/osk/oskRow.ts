@@ -52,18 +52,24 @@ namespace com.keyman.osk {
       }
 
       //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
-      var totalPercent=0;
       this.keys = [];
 
       for(let j=0; j<keys.length; j++) {
         const key=keys[j];
 
-        var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layerSpec.id);
-        var keyTuple = keyGenerator.construct(vkbd, displayUnderlying, rs, totalPercent);
-        this.keys.push(keyGenerator);
+        var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id);
 
-        rDiv.appendChild(keyTuple.element);
-        totalPercent += keyTuple.percent;
+        let widthSpec = new ParsedLengthStyle({
+          val: key['widthpc'] * (vkbd.usesFixedWidthScaling ? 1 : 1/100),
+          absolute: vkbd.usesFixedWidthScaling
+        });
+        let heightSpec = new ParsedLengthStyle(rs.height);
+
+        var element = keyObj.construct(vkbd, widthSpec, heightSpec);
+        keyObj.displaysKeyCap = displayUnderlying;
+        this.keys.push(keyObj);
+
+        rDiv.appendChild(element);
       }
     }
 

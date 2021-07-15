@@ -45,15 +45,15 @@ namespace com.keyman.osk {
           }
       }
 
+      let q = document.createElement('div');
+      q.className='kmw-key-label';
       if(x > 0) {
-        let q = document.createElement('div');
-        q.className='kmw-key-label';
         q.innerHTML=String.fromCharCode(x);
-        return q;
       } else {
         // Keyman-only virtual keys have no corresponding physical key.
-        return null;
+        // So, no text for the key-cap.
       }
+      return q;
     }
 
     private processSubkeys(btn: KeyElement, vkbd: VisualKeyboard) {
@@ -79,16 +79,14 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(vkbd: VisualKeyboard, displayUnderlying: boolean, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(vkbd: VisualKeyboard, width: ParsedLengthStyle, height: ParsedLengthStyle): HTMLDivElement {
       let spec = this.spec;
 
       let kDiv = document.createElement('div');
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
-      ks.width=this.objectGeometry(vkbd, spec['widthpc']);
-
-      let originalPercent = totalPercent;
+      ks.width = width.styleString;
 
       let btnEle = document.createElement('div');
       let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
@@ -97,7 +95,7 @@ namespace com.keyman.osk {
       this.setButtonClass();
 
       // Set key and button positioning properties.
-      ks.marginLeft = this.objectGeometry(vkbd, spec['padpc']);
+      ks.marginLeft = spec['padpc'] + (width.absolute ? 'px' : '%');
 
       // Ensure that:
       // 1. The key square's height matches its row's height.
@@ -105,22 +103,12 @@ namespace com.keyman.osk {
       // 2. The key element (btn) has width matching its key square.
       //    - The height will be different to provide visual row padding,
       //      creating a small gap between key rows.
-      if(vkbd.usesFixedScaling) {
-        ks.height=rowStyle.height;
-        btn.style.width=ks.width;
-      } else {
-        ks.height='100%';
-        btn.style.width = '100%';
-      }
-
-      totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
+      ks.height = height.absolute ? height.styleString : '100%';
+      btn.style.width = width.absolute ? width.styleString : '100%';
 
       // Add the (US English) keycap label for layouts requesting display of underlying keys
       let keyCap = this.capLabel = this.generateKeyCapLabel();
-      if(keyCap) {
-        btn.appendChild(keyCap);
-        keyCap.style.display = displayUnderlying ? 'block' : 'none';
-      }
+      btn.appendChild(keyCap);
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       btn.id=this.getId();
@@ -154,15 +142,7 @@ namespace com.keyman.osk {
       //t.style.webkitUserSelect='none';
 
       // The 'return value' of this process.
-      return {element: kDiv, percent: totalPercent - originalPercent};
-    }
-
-    objectGeometry(vkbd: VisualKeyboard, v: number): string {
-      if(vkbd.usesFixedWidthScaling) {
-        return (Math.round(v*100)/100)+'px';
-      } else {
-        return v + '%'; // round to 2 decimal places, making css more readable
-      }
+      return kDiv;
     }
 
     public refreshLayout(vkbd: VisualKeyboard) {
@@ -176,6 +156,17 @@ namespace com.keyman.osk {
       if(resizeLabels && this.capLabel) {
         this.capLabel.style.fontSize = '6px';
       }
+    }
+
+    public get displaysKeyCap(): boolean {
+      return this.capLabel && this.capLabel.style.display == 'block';
+    }
+
+    public set displaysKeyCap(flag: boolean) {
+      if(!this.capLabel) {
+        throw new Error("Key element not yet constructed; cannot display key cap");
+      }
+      this.capLabel.style.display = flag ? 'block' : 'none';
     }
   }
 }
