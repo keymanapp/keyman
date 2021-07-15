@@ -83,15 +83,10 @@ namespace com.keyman.osk {
         if(vkbd.usesFixedHeightScaling) {
           // Set the kmw-key-square position
           const kss = keySquare.style;
-          if(!vkbd.isStatic) {
-            kss.bottom=(bottom-pad/2)+'px';
-          }
+          const kes = keyElement.style;
           kss.height=kss.minHeight=(rowHeight)+'px';
 
-          const kes = keyElement.style;
-          if(!vkbd.isStatic) {
-            kes.bottom=bottom+'px';
-          }
+          kes.top = (pad/2) + 'px';
           kes.height=kes.lineHeight=kes.minHeight=(rowHeight-pad)+'px';
         }
 

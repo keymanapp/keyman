@@ -81,7 +81,6 @@ namespace com.keyman.osk {
 
     construct(vkbd: VisualKeyboard, displayUnderlying: boolean, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let spec = this.spec;
-      let isDesktop = vkbd.device.formFactor == "desktop"
 
       let kDiv = document.createElement('div');
       kDiv.className='kmw-key-square';
@@ -98,27 +97,20 @@ namespace com.keyman.osk {
       this.setButtonClass();
 
       // Set key and button positioning properties.
-      if(!isDesktop) {
-        // Regularize interkey spacing by rounding key width and padding (Build 390)
-        ks.left=this.objectGeometry(vkbd, totalPercent+spec['padpc']);
-        if(!vkbd.isStatic) {
-          ks.bottom=rowStyle.bottom;
-        }
+      ks.marginLeft = this.objectGeometry(vkbd, spec['padpc']);
 
-        let parsedRowStyle = new ParsedLengthStyle(rowStyle.height);
-        if(parsedRowStyle.absolute) {
-          ks.height=rowStyle.height;  // must be specified in px for rest of layout to work correctly
-        } else {
-          ks.height='100%';
-        }
-
-        if(!vkbd.isStatic) {
-          // Set distinct phone and tablet button position properties
-          btn.style.left=ks.left;
-          btn.style.width=ks.width;
-        }
+      // Ensure that:
+      // 1. The key square's height matches its row's height.
+      //    - Needed for key lookup from mouse / touch coordinates
+      // 2. The key element (btn) has width matching its key square.
+      //    - The height will be different to provide visual row padding,
+      //      creating a small gap between key rows.
+      if(vkbd.usesFixedScaling) {
+        ks.height=rowStyle.height;
+        btn.style.width=ks.width;
       } else {
-        ks.marginLeft=this.objectGeometry(vkbd, spec['padpc']);
+        ks.height='100%';
+        btn.style.width = '100%';
       }
 
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
