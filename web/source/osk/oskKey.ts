@@ -301,12 +301,27 @@ namespace com.keyman.osk {
     }
 
     getIdealFontSize(vkbd: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
-      // Recompute the new width for use in autoscaling calculations below, just in case.
-      let emScale = vkbd.getKeyEmFontSize();
-      let metrics = OSKKey.getTextMetrics(this.spec.text, emScale, style);
+      let buttonStyle = getComputedStyle(this.btn);
+      let keyWidth = parseFloat(buttonStyle.width);
+      let emScale = 1;
+
+      // Not yet available; it'll be handled in a later layout pass.
+      if(!buttonStyle.fontSize) {
+        // NOTE:  preserves old behavior for use in documentation keyboards, for now.
+        // Once we no longer need to maintain this code block, we can drop all current
+        // method parameters safely.
+        //
+        // Recompute the new width for use in autoscaling calculations below, just in case.
+        emScale = vkbd.getKeyEmFontSize();
+        keyWidth = this.getKeyWidth(vkbd);
+      } else {
+        // When available, just use computedStyle instead.
+        style = buttonStyle;
+      }
 
       let fontSpec = getFontSizeStyle(style.fontSize || '1em');
-      let keyWidth = this.getKeyWidth(vkbd);
+      let metrics = OSKKey.getTextMetrics(this.spec.text, emScale, style);
+
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
       const X_PADDING = 2;
