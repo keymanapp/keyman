@@ -56,14 +56,14 @@ namespace com.keyman.osk {
       }
     }
 
-    private processSubkeys(btn: KeyElement, osk: VisualKeyboard) {
+    private processSubkeys(btn: KeyElement, vkbd: VisualKeyboard) {
       // Add reference to subkey array if defined
       var bsn: number, bsk=btn['subKeys'] = this.spec['sk'];
       // Transform any special keys into their PUA representations.
       for(bsn=0; bsn<bsk.length; bsn++) {
         if(bsk[bsn]['sp'] == '1' || bsk[bsn]['sp'] == '2') {
           var oldText=bsk[bsn]['text'];
-          bsk[bsn]['text']=this.renameSpecialKey(oldText, osk);
+          bsk[bsn]['text']=this.renameSpecialKey(oldText, vkbd);
         }
 
         // If a subkey doesn't have a defined layer property, copy it from the base key's layer by default.
@@ -79,15 +79,15 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(osk: VisualKeyboard, displayUnderlying: boolean, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(vkbd: VisualKeyboard, displayUnderlying: boolean, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let spec = this.spec;
-      let isDesktop = osk.device.formFactor == "desktop"
+      let isDesktop = vkbd.device.formFactor == "desktop"
 
       let kDiv = document.createElement('div');
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
-      ks.width=this.objectGeometry(osk, spec['widthpc']);
+      ks.width=this.objectGeometry(vkbd, spec['widthpc']);
 
       let originalPercent = totalPercent;
 
@@ -100,19 +100,25 @@ namespace com.keyman.osk {
       // Set key and button positioning properties.
       if(!isDesktop) {
         // Regularize interkey spacing by rounding key width and padding (Build 390)
-        ks.left=this.objectGeometry(osk, totalPercent+spec['padpc']);
-        if(!osk.isStatic) {
+        ks.left=this.objectGeometry(vkbd, totalPercent+spec['padpc']);
+        if(!vkbd.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
-        ks.height=rowStyle.height;  // must be specified in px for rest of layout to work correctly
 
-        if(!osk.isStatic) {
+        let parsedRowStyle = new ParsedLengthStyle(rowStyle.height);
+        if(parsedRowStyle.absolute) {
+          ks.height=rowStyle.height;  // must be specified in px for rest of layout to work correctly
+        } else {
+          ks.height='100%';
+        }
+
+        if(!vkbd.isStatic) {
           // Set distinct phone and tablet button position properties
           btn.style.left=ks.left;
           btn.style.width=ks.width;
         }
       } else {
-        ks.marginLeft=this.objectGeometry(osk, spec['padpc']);
+        ks.marginLeft=this.objectGeometry(vkbd, spec['padpc']);
       }
 
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
@@ -129,22 +135,22 @@ namespace com.keyman.osk {
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
       // TODO: replace inline function calls??
-      if(!osk.isStatic && !osk.device.touchable) {
+      if(!vkbd.isStatic && !vkbd.device.touchable) {
         // Highlight key while mouse down or if moving back over originally selected key
-        btn.onmouseover=btn.onmousedown=osk.mouseOverMouseDownHandler; // Build 360
+        btn.onmouseover=btn.onmousedown=vkbd.mouseOverMouseDownHandler; // Build 360
 
         // Remove highlighting when key released or moving off selected element
-        btn.onmouseup=btn.onmouseout=osk.mouseUpMouseOutHandler; //Build 360
+        btn.onmouseup=btn.onmouseout=vkbd.mouseUpMouseOutHandler; //Build 360
       }
 
       // Make sure the key text is the element's first child - processSubkeys()
       // will add an extra element if subkeys exist, which can interfere with
       // keyboard/language name display on the space bar!
-      btn.appendChild(this.label = this.generateKeyText(osk));
+      btn.appendChild(this.label = this.generateKeyText(vkbd));
 
       // Handle subkey-related tasks.
       if(typeof(spec['sk']) != 'undefined' && spec['sk'] != null) {
-        this.processSubkeys(btn, osk);
+        this.processSubkeys(btn, vkbd);
       } else {
         btn['subKeys']=null;
       }

@@ -1240,6 +1240,7 @@ namespace com.keyman.osk {
       device.formFactor = formFactor;
       if(formFactor != 'desktop') {
         device.OS = 'iOS';
+        device.touchable = true;
       }
 
       let layout = PKbd.layout(formFactor);
@@ -1256,9 +1257,10 @@ namespace com.keyman.osk {
         // the Web OSK-Core design.
         kbdObj.setSize(800, height); // Probably need something for width, too, rather than
                                      // assuming 100%.
-        kbdObj.refreshLayout(); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
-        kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
+        kbd.style.fontSize  = kbdObj.kbdDiv.style.fontSize;
+        kbd.style.height    = kbdObj.kbdDiv.style.height;
+        kbd.style.maxHeight = kbdObj.kbdDiv.style.maxHeight;
       } else {
         kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd.name+".</p>";
       }
