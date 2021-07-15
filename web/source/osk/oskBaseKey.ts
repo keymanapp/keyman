@@ -166,11 +166,10 @@ namespace com.keyman.osk {
     }
 
     objectGeometry(vkbd: VisualKeyboard, v: number): string {
-      let unit = this.objectUnits(vkbd);
-      if(unit == '%') {
-        return v + unit;
-      } else { // unit == 'px'
-        return (Math.round(v*100)/100)+unit; // round to 2 decimal places, making css more readable
+      if(vkbd.usesFixedWidthScaling) {
+        return (Math.round(v*100)/100)+'px';
+      } else {
+        return v + '%'; // round to 2 decimal places, making css more readable
       }
     }
 

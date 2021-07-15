@@ -358,26 +358,15 @@ namespace com.keyman.osk {
     }
 
     getKeyWidth(vkbd: VisualKeyboard): number {
-      let units = this.objectUnits(vkbd);
-
-      if(units == 'px') {
+      if(vkbd.usesFixedWidthScaling) {
         // For mobile devices, we presently specify width directly in pixels.  Just use that!
         return this.spec['widthpc'];
-      } else if(units == '%') {
+      } else {
         // For desktop devices, each key is given a %age of the total OSK width.  We'll need to compute an
         // approximation for that.  `this.kbdDiv` is the element controlling the OSK's width, set in px.
 
         // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
         return Math.floor(vkbd.width * this.spec['widthpc'] / 100);
-      }
-    }
-
-    objectUnits(vkbd: VisualKeyboard): string {
-      // Returns a unit string corresponding to how the width for each key is specified.
-      if(vkbd.usesFixedScaling) {
-        return 'px';
-      } else {
-        return '%';
       }
     }
 

@@ -92,7 +92,7 @@ namespace com.keyman.osk {
       let nRows = this.rows.length;
       let rowHeight = Math.floor(trueHeight/(nRows == 0 ? 1 : nRows));
 
-      if(vkbd.usesFixedScaling) {
+      if(vkbd.usesFixedHeightScaling) {
         this.element.style.height=(paddedHeight)+'px';
 
 
@@ -108,7 +108,7 @@ namespace com.keyman.osk {
       for(let nRow=0; nRow<nRows; nRow++) {
         let bottom = (nRows-nRow-1)*rowHeight+1;
 
-        if(vkbd.usesFixedScaling) {
+        if(vkbd.usesFixedHeightScaling) {
           // Calculate the exact vertical coordinate of the row's center.
           this.spec.row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
         }

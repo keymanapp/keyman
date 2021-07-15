@@ -210,10 +210,18 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Uses fixed scaling for internal elements, rather than relative, percent-
-     * based scaling.
+     * Uses fixed scaling for widths of internal elements, rather than relative,
+     * percent-based scaling.
      */
-    public get usesFixedScaling(): boolean {
+    public get usesFixedWidthScaling(): boolean {
+      return this.device.touchable && !this.isStatic;
+    }
+
+    /**
+     * Uses fixed scaling for heights of internal elements, rather than relative,
+     * percent-based scaling.
+     */
+    public get usesFixedHeightScaling(): boolean {
       return this.device.touchable && !this.isStatic;
     }
 
@@ -1074,7 +1082,7 @@ namespace com.keyman.osk {
       let b = this.kbdDiv.firstChild as HTMLElement;
       let gs = this.kbdDiv.style;
       let bs=b.style;
-      if(this.usesFixedScaling) {
+      if(this.usesFixedHeightScaling) {
         // Sets the layer group to the correct height.
         gs.height = gs.maxHeight = paddedHeight + 'px';
       }

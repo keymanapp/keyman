@@ -69,7 +69,7 @@ namespace com.keyman.osk {
 
     public refreshLayout(vkbd: VisualKeyboard, rowHeight: number, bottom: number, pad: number) {
       const rs = this.element.style;
-      if(vkbd.usesFixedScaling) {
+      if(vkbd.usesFixedHeightScaling) {
         if(!vkbd.isStatic) {
           rs.bottom=bottom+'px';
         }
@@ -80,7 +80,7 @@ namespace com.keyman.osk {
         const keySquare  = key.btn.parentElement;
         const keyElement = key.btn;
 
-        if(vkbd.usesFixedScaling) {
+        if(vkbd.usesFixedHeightScaling) {
           // Set the kmw-key-square position
           const kss = keySquare.style;
           if(!vkbd.isStatic) {
