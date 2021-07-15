@@ -59,6 +59,10 @@ namespace com.keyman.osk {
       return new ParsedLengthStyle({val: val, absolute: false});
     }
 
+    public static special(val: number, suffix: 'em' | 'rem'): ParsedLengthStyle {
+      return new ParsedLengthStyle({val: val, absolute: false, special: suffix});
+    }
+
     private static parseLengthStyle(spec: string): LengthStyle {
       var val: number;
   

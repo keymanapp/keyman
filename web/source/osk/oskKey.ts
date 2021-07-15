@@ -263,6 +263,13 @@ namespace com.keyman.osk {
      * This version has been substantially modified to work for this particular application.
      */
     static getTextMetrics(text: string, emScale: number, style: {fontFamily?: string, fontSize: string}): TextMetrics {
+      // Since we may mutate the incoming style, let's make sure to copy it first.
+      // Only the relevant properties, though.
+      style = {
+        fontFamily: style.fontFamily,
+        fontSize: style.fontSize
+      };
+
       // A final fallback - having the right font selected makes a world of difference.
       if(!style.fontFamily) {
         style.fontFamily = getComputedStyle(document.body).fontFamily;
@@ -298,7 +305,7 @@ namespace com.keyman.osk {
       let emScale = vkbd.getKeyEmFontSize();
       let metrics = OSKKey.getTextMetrics(this.spec.text, emScale, style);
 
-      let fontSpec = getFontSizeStyle(style.fontSize);
+      let fontSpec = getFontSizeStyle(style.fontSize || '1em');
       let keyWidth = this.getKeyWidth(vkbd);
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
@@ -424,9 +431,6 @@ namespace com.keyman.osk {
         keyText = specialText;
         spec['font'] = "SpecialOSK";
       }
-
-      // Grab our default for the key's font and font size.
-      ts.fontSize=vkbd.fontSize;     //Build 344, KMEW-90
 
       //Override font spec if set for this key in the layout
       if(typeof spec['font'] == 'string' && spec['font'] != '') {

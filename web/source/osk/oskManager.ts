@@ -46,13 +46,13 @@ namespace com.keyman.osk {
      * The configured width for this OSKManager.  May be `undefined` or `null`
      * to allow automatic width scaling. 
      */
-     private _width: ParsedLengthStyle;
+    private _width: ParsedLengthStyle;
 
-     /**
-      * The configured height for this OSKManager.  May be `undefined` or `null`
-      * to allow automatic height scaling. 
-      */
-     private _height: ParsedLengthStyle;
+    /**
+     * The configured height for this OSKManager.  May be `undefined` or `null`
+     * to allow automatic height scaling. 
+     */
+    private _height: ParsedLengthStyle;
 
     /**
      * The computed width for this OSKManager.  May be null if auto sizing
@@ -65,6 +65,12 @@ namespace com.keyman.osk {
     * is allowed and the OSKManager is not currently in the DOM hierarchy.
     */
     private _computedHeight: number;
+
+    /**
+     * The base font size to use for hosted `Banner`s and `VisualKeyboard`
+     * instances.
+     */
+    private _baseFontSize: ParsedLengthStyle;
 
     private needsLayout: boolean = true;
 
@@ -148,23 +154,6 @@ namespace com.keyman.osk {
       s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
       s.position = (device.formFactor == 'desktop' ? 'absolute' : 'fixed');
 
-      // Use smaller base font size for mobile devices
-      //if(screen.availHeight < 500) s.fontSize='10pt';
-      //else if(screen.availHeight < 800) s.fontSize='11pt';
-      //else s.fontSize='12pt';
-
-      // Set scaling for mobile devices here.
-      if(device.touchable) {
-        let fontScale = this.defaultFontSize(device, keymanweb.isEmbedded);
-
-        // Finalize the font size parameter.
-        if(fontScale.absolute) {
-          s.fontSize = fontScale.styleString;
-        } else {
-          s.fontSize = fontScale.val + 'em';
-        }
-      }
-
       if(this.vkbd) {
         this.vkbd.shutdown();
       }
@@ -190,12 +179,14 @@ namespace com.keyman.osk {
       // Add suggestion banner bar to OSK
       if (this.banner) {
         this._Box.appendChild(this.banner.element);
+        this.banner.element.style.fontSize = this.baseFontSize;
       }
 
       let kbdView: KeyboardView = this._GenerateKeyboardView(activeKeyboard);
       this._Box.appendChild(kbdView.element);
       if(kbdView instanceof VisualKeyboard) {
         this.vkbd = kbdView;
+        kbdView.fontSize = this.parsedBaseFontSize;
       }
       kbdView.postInsert();
 
@@ -290,6 +281,50 @@ namespace com.keyman.osk {
         this.refreshLayout();
       }
       return this._computedHeight;
+    }
+
+    /**
+     * The top-level style string for the font size used by the predictive banner 
+     * and the primary keyboard visualization elements.
+     */
+    get baseFontSize(): string {
+      return this.parsedBaseFontSize.styleString;
+    }
+
+    private get parsedBaseFontSize(): ParsedLengthStyle {
+      if(!this._baseFontSize) {
+        let keymanweb = com.keyman.singleton;
+        let device = keymanweb.util.device;
+        this._baseFontSize = this.defaultFontSize(device, keymanweb.isEmbedded);
+      }
+
+      return this._baseFontSize;
+    }
+
+    public defaultFontSize(device: Device, isEmbedded: boolean): ParsedLengthStyle {
+      if(device.touchable) {
+        var fontScale: number = 1;
+        if(device.formFactor == 'phone') {
+          fontScale = 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2;  // Combines original scaling factor with one previously applied to the layer group.
+        } else {
+          // The following is a *temporary* fix for small format tablets, e.g. PendoPad
+          var pixelRatio = 1;
+          if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+            pixelRatio = window.devicePixelRatio;
+          }
+
+          if(device.OS == 'Android' && device.formFactor == 'tablet' && this.getHeight() < 300 * pixelRatio) {
+            fontScale *= 1.2;
+          } else {
+            fontScale *= 2; //'2.5em';
+          }
+        }
+
+        // Finalize the font size parameter.
+        return ParsedLengthStyle.special(fontScale, 'em');
+      } else {
+        return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
+      } 
     }
 
     private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKManager,
@@ -618,32 +653,6 @@ namespace com.keyman.osk {
       }
 
       return width;
-    }
-
-    public defaultFontSize(device: Device, isEmbedded: boolean): ParsedLengthStyle {
-      if(device.touchable) {
-        var fontScale: number = 1;
-        if(device.formFactor == 'phone') {
-          fontScale = 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2;  // Combines original scaling factor with one previously applied to the layer group.
-        } else {
-          // The following is a *temporary* fix for small format tablets, e.g. PendoPad
-          var pixelRatio = 1;
-          if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-            pixelRatio = window.devicePixelRatio;
-          }
-
-          if(device.OS == 'Android' && device.formFactor == 'tablet' && this.getHeight() < 300 * pixelRatio) {
-            fontScale *= 1.2;
-          } else {
-            fontScale *= 2; //'2.5em';
-          }
-        }
-
-        // Finalize the font size parameter.
-        return ParsedLengthStyle.forScalar(fontScale);
-      } else {
-        return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
-      } 
     }
 
     /**

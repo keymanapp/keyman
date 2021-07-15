@@ -46,7 +46,8 @@ namespace com.keyman.osk {
 
     // Style-related properties
     fontFamily: string;
-    fontSize: string;
+    private _fontSize: ParsedLengthStyle;
+    // fontSize: string;
 
     // State-related properties
     keyPending: KeyElement;
@@ -197,6 +198,15 @@ namespace com.keyman.osk {
      */
     get height(): number {
       return this._height;
+    }
+
+    get fontSize(): ParsedLengthStyle {
+      return this._fontSize;
+    }
+
+    set fontSize(value: ParsedLengthStyle) {
+      this._fontSize = value;
+      this.kbdDiv.style.fontSize = value.styleString;
     }
 
     /**
@@ -987,28 +997,25 @@ namespace com.keyman.osk {
      * Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
      * This function allows us to calculate the font size in those situations.
      */
-    getKeyEmFontSize() {
-      let keyman = com.keyman.singleton;
+    getKeyEmFontSize(): number {
+      if(!this.fontSize) {
+        return 0;
+      }
 
       if(this.device.formFactor == 'desktop') {
-        let kbdFontSize = this.defaultDesktopFontSize();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
-        return kbdFontSize * keySquareScale;
+        return this.fontSize.scaledBy(keySquareScale).val;
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = getFontSizeStyle(emSizeStr).val;
 
         var emScale = 1;
         if(!this.isStatic) {
-          // Reading this requires the OSK to be active, so we filter out
-          // BuildVisualKeyboard calls here.
-          let boxFontStyle = getFontSizeStyle(keyman.osk._Box);
-
           // Double-check against the font scaling applied to the _Box element.
-          if(boxFontStyle.absolute) {
-            return boxFontStyle.val;
+          if(this.fontSize.absolute) {
+            return this.fontSize.val;
           } else {
-            emScale = boxFontStyle.val;
+            emScale = this.fontSize.val;
           }
         }
         return emSize * emScale;
