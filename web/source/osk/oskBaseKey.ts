@@ -5,9 +5,11 @@ namespace com.keyman.osk {
 
   export class OSKBaseKey extends OSKKey {
     private capLabel: HTMLDivElement;
+    private heightRatio: number;
 
-    constructor(spec: OSKKeySpec, layer: string) {
+    constructor(spec: OSKKeySpec, layer: string, heightRatio: number) {
       super(spec, layer);
+      this.heightRatio = heightRatio;
     }
 
     getId(): string {
@@ -79,32 +81,17 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(vkbd: VisualKeyboard, width: ParsedLengthStyle, height: ParsedLengthStyle): HTMLDivElement {
+    construct(vkbd: VisualKeyboard): HTMLDivElement {
       let spec = this.spec;
 
       let kDiv = document.createElement('div');
       kDiv.className='kmw-key-square';
-
-      let ks=kDiv.style;
-      ks.width = width.styleString;
 
       let btnEle = document.createElement('div');
       let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
       // Set button class
       this.setButtonClass();
-
-      // Set key and button positioning properties.
-      ks.marginLeft = spec['padpc'] + (width.absolute ? 'px' : '%');
-
-      // Ensure that:
-      // 1. The key square's height matches its row's height.
-      //    - Needed for key lookup from mouse / touch coordinates
-      // 2. The key element (btn) has width matching its key square.
-      //    - The height will be different to provide visual row padding,
-      //      creating a small gap between key rows.
-      ks.height = height.absolute ? height.styleString : '100%';
-      btn.style.width = width.absolute ? width.styleString : '100%';
 
       // Add the (US English) keycap label for layouts requesting display of underlying keys
       let keyCap = this.capLabel = this.generateKeyCapLabel();
@@ -138,14 +125,23 @@ namespace com.keyman.osk {
       // Add text to button and button to placeholder div
       kDiv.appendChild(btn);
 
-      // Prevent user selection of key captions
-      //t.style.webkitUserSelect='none';
-
       // The 'return value' of this process.
-      return kDiv;
+      return this.square = kDiv;
     }
 
     public refreshLayout(vkbd: VisualKeyboard) {
+      let key = this.spec as keyboards.ActiveKey;
+      this.square.style.width = vkbd.layoutWidth.scaledBy(key.proportionalWidth).styleString;
+      this.square.style.marginLeft = vkbd.layoutWidth.scaledBy(key.proportionalPad).styleString;
+      this.btn.style.width = vkbd.usesFixedWidthScaling ? this.square.style.width : '100%';
+      
+      if(vkbd.usesFixedHeightScaling) {
+        // Matches its row's height.
+        this.square.style.height = vkbd.layoutHeight.scaledBy(this.heightRatio).styleString;
+      } else {
+        this.square.style.height = '100%'; // use the full row height
+      }
+
       super.refreshLayout(vkbd);
 
       let util = com.keyman.singleton.util;

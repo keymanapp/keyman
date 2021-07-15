@@ -218,6 +218,22 @@ namespace com.keyman.osk {
       return this._height;
     }
 
+    get layoutWidth(): ParsedLengthStyle {
+      if(this.usesFixedWidthScaling) {
+        return ParsedLengthStyle.inPixels(this.width);
+      } else {
+        return ParsedLengthStyle.forScalar(1);
+      }
+    }
+
+    get layoutHeight(): ParsedLengthStyle {
+      if(this.usesFixedHeightScaling) {
+        return ParsedLengthStyle.inPixels(this.height);
+      } else {
+        return ParsedLengthStyle.forScalar(1);
+      }
+    }
+
     get fontSize(): ParsedLengthStyle {
       return this._fontSize;
     }

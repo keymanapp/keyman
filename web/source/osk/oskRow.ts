@@ -36,36 +36,18 @@ namespace com.keyman.osk {
 
       // Apply defaults, setting the width and other undefined properties for each key
       const keys=rowSpec.key;
-
-      if(doCalibration) {
-        // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
-        // adjusting the width of the last key to make the total exactly 100%.
-        // Overwrite the previously-computed percent.
-        // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
-        // All key widths and paddings are rounded for uniformity
-        for(let j=0; j<keys.length; j++) {
-          const key = keys[j];
-          // TODO:  reinstate rounding?
-          key['widthpc'] = key.proportionalWidth * objectWidth;
-          key['padpc']   = key.proportionalPad   * objectWidth;
-        }
-      }
-
-      //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
       this.keys = [];
 
+      // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
+      // adjusting the width of the last key to make the total exactly 100%.
+      // Overwrite the previously-computed percent.
+      // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
+      // All key widths and paddings are rounded for uniformity
       for(let j=0; j<keys.length; j++) {
-        const key=keys[j];
-
-        var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id);
-
-        let widthSpec = new ParsedLengthStyle({
-          val: key['widthpc'] * (vkbd.usesFixedWidthScaling ? 1 : 1/100),
-          absolute: vkbd.usesFixedWidthScaling
-        });
-        let heightSpec = new ParsedLengthStyle(rs.height);
-
-        var element = keyObj.construct(vkbd, widthSpec, heightSpec);
+        const key = keys[j];
+        var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id, 1 / layerSpec.row.length);
+        
+        var element = keyObj.construct(vkbd);
         keyObj.displaysKeyCap = displayUnderlying;
         this.keys.push(keyObj);
 
