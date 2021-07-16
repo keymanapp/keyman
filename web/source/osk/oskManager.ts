@@ -123,7 +123,24 @@ namespace com.keyman.osk {
       }
 
       this.loadCookie();
-      this.banner = new BannerManager();
+
+      // Predictive-text hooks.
+      const bannerMgr = this.banner = new BannerManager();
+      const _this = this;
+
+      // Register a listener for model change events so that we can hot-swap the banner as needed.
+      // Handled here b/c banner changes may trigger a need to re-layout the OSK.
+      keymanweb.core.languageProcessor.on('statechange', 
+                                          function(state: text.prediction.StateChangeEnum) {
+        let currentType = bannerMgr.activeType;
+        bannerMgr.selectBanner(state);
+
+        if(currentType != bannerMgr.activeType) {
+          _this.refreshLayout();
+        }
+
+        return true;
+      });
     }
 
     /**
@@ -200,7 +217,8 @@ namespace com.keyman.osk {
 
       // Initializes the size of a touch keyboard.
       if(this.vkbd && device.touchable) {
-        this.vkbd.setSize(screen.width, this.getKeyboardHeight());
+        let targetOSKHeight = this.vkbd.computedAdjustedOskHeight(this.getKeyboardHeight());
+        this.setSize(screen.width, targetOSKHeight);
       }
       // END:  construction of the actual internal layout for the overall OSK
 
@@ -554,10 +572,22 @@ namespace com.keyman.osk {
     }
 
     /*private*/ setSize(width?: number, height?: number, pending?: boolean) {
+      let mutatedFlag = false;
+
       if(width && height) {
-        this._width = ParsedLengthStyle.inPixels(width);
-        this._height = ParsedLengthStyle.inPixels(height);
+        mutatedFlag = !this._width || !this._height;
+
+        const parsedWidth = ParsedLengthStyle.inPixels(width);
+        const parsedHeight = ParsedLengthStyle.inPixels(height);
+
+        mutatedFlag = mutatedFlag || parsedWidth.styleString  != this._width.styleString;
+        mutatedFlag = mutatedFlag || parsedHeight.styleString != this._height.styleString;
+
+        this._width = parsedWidth;
+        this._height = parsedHeight;
       }
+
+      this.needsLayout = this.needsLayout || mutatedFlag;
 
       if(this.vkbd) {
         this.vkbd.setSize(width, height, pending);
@@ -852,10 +882,6 @@ namespace com.keyman.osk {
         Ls.visibility='hidden';
       }
 
-      if(this.needsLayout) {
-        this.refreshLayout();
-      }
-
       if(device.touchable) {
         /* In case it's still '0' from a hide() operation.
          * Happens when _Show is called before the transitionend events are processed,
@@ -878,9 +904,6 @@ namespace com.keyman.osk {
           let ks = this.vkbd.kbdDiv.style;
           ks.position = Ls.position='fixed';
           ks.bottom = Ls.left=Ls.bottom='0px';
-          let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv).style.height;
-          vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
-          Ls.height=Ls.maxHeight= (this.getBannerHeight() + parseInt(vkbdHeight, 10) + 5 /* kmw-banner-bar top in css */) + 'px';
           Ls.border='none';
           Ls.borderTop='1px solid gray';
 
@@ -891,6 +914,10 @@ namespace com.keyman.osk {
 
       //TODO: may need to return here for touch devices??
       Ls.display='block'; //Ls.visibility='visible';
+
+      if(this.needsLayout) { // first thing after it's made visible.
+        this.refreshLayout();
+      }
 
       if(this.vkbd) {
         this.vkbd.showLanguage();
@@ -930,6 +957,7 @@ namespace com.keyman.osk {
         }
         this._Enabled=true;
         this._Visible=true;
+
         if(this.vkbd) {
           this.vkbd.refit();
         }
@@ -979,12 +1007,15 @@ namespace com.keyman.osk {
       // Step 3:  perform layout operations.
       this.needsLayout = false;
       if(this.vkbd) {
+        // +5:  from kmw-banner-bar's 'top' attribute.
+        const vkbdHeight = this.computedHeight - (this.banner.height ? this.banner.height + 5 : 0);
+        this.vkbd.setSize(this.computedWidth, vkbdHeight);
         this.vkbd.refreshLayout();
       }
 
       if(this && this.vkbd && this.vkbd.device.touchable) {
         var b: HTMLElement = this._Box, bs=b.style;
-        bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+        bs.height=bs.maxHeight=this.computedHeight+'px';
       }
     }
 
