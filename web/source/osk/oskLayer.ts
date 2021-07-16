@@ -20,9 +20,7 @@ namespace com.keyman.osk {
 
     public constructor(vkbd: VisualKeyboard,
                        layout: keyboards.ActiveLayout,
-                       layer: keyboards.ActiveLayer,
-                       objectWidth: number,
-                       doCalibration: boolean) {
+                       layer: keyboards.ActiveLayer) {
       this.spec = layer;
       
       const gDiv = this.element = document.createElement('div');
