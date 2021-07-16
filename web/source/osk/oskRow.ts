@@ -11,8 +11,6 @@ namespace com.keyman.osk {
     public constructor(vkbd: VisualKeyboard, 
                        layerSpec: keyboards.ActiveLayer,
                        rowSpec: keyboards.ActiveRow,
-                       objectWidth: number,
-                       doCalibration: boolean,
                        displayUnderlying: boolean) {
       const rDiv = this.element = document.createElement('div');
       rDiv.className='kmw-key-row';
@@ -55,14 +53,14 @@ namespace com.keyman.osk {
       }
     }
 
-    public refreshLayout(vkbd: VisualKeyboard, rowHeight: number, bottom: number, pad: number) {
+    public refreshLayout(vkbd: VisualKeyboard, rowHeight: number) {
       const rs = this.element.style;
       if(vkbd.usesFixedHeightScaling) {
-        if(!vkbd.isStatic) {
-          rs.bottom=bottom+'px';
-        }
         rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
       }
+
+      // Sets the layers to the correct height
+      const rowPad = Math.round(0.15*rowHeight);
 
       for(const key of this.keys) {
         const keySquare  = key.btn.parentElement;
@@ -74,8 +72,8 @@ namespace com.keyman.osk {
           const kes = keyElement.style;
           kss.height=kss.minHeight=(rowHeight)+'px';
 
-          kes.top = (pad/2) + 'px';
-          kes.height=kes.lineHeight=kes.minHeight=(rowHeight-pad)+'px';
+          kes.top = (rowPad/2) + 'px';
+          kes.height=kes.lineHeight=kes.minHeight=(rowHeight-rowPad)+'px';
         }
 
         if(keyElement.key) {

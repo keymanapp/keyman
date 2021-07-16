@@ -21,7 +21,7 @@
 .phone .kmw-osk-inner-frame{margin:0;background:transparent;}
 .phone .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
 .phone .kmw-key-layer{position:fixed;left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.phone .kmw-key-row {position:fixed;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
+.phone .kmw-key-row {position:relative;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
 .phone .kmw-key-square {position:relative; display:inline-block;height:100%;max-height:100%;overflow:visible; margin:0 0 0 0;z-index: 10000;padding:0 0 0 0;background-color:transparent;cursor:default; border:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}
 .phone .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001;padding:0; background-color:transparent;cursor:default;}
 .phone .kmw-key {display:block;position:relative;margin:0px;border-radius:6px;text-align:center; box-sizing:border-box; overflow:hidden;
@@ -170,7 +170,7 @@
 .tablet .kmw-osk-inner-frame{margin:0;background:transparent;}
 .tablet .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
 .tablet .kmw-key-layer{position:fixed;left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.tablet .kmw-key-row {position:fixed;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
+.tablet .kmw-key-row {position:relative;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
 .tablet .kmw-key-square {position:relative; display:inline-block; height:100%; max-height:100%; overflow:hidden; margin:0 0 0 0; z-index: 10000; padding:0 0 0 0; background-color:transparent;cursor:default; border:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}
 .tablet .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001; padding:0; background-color:transparent; cursor:default;}  
 .tablet .kmw-key {display:block;position:relative;margin:0px;border-radius:8px;text-align:center;box-sizing:border-box;overflow:visible;
@@ -249,7 +249,7 @@
 .desktop .kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
 .desktop .kmw-key-layer-group{width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;}
 .desktop .kmw-key-layer{width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.desktop .kmw-key-row{position:static;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}        
+.desktop .kmw-key-row{position:relative;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}        
 .desktop .kmw-key-square{position:relative;height:100%;display:inline-block;float:left;margin:0 0 0 5px;z-index:10000; font-size:0.8em;overflow:hidden;
           padding:1px 0 1px 0;background-color:transparent;cursor:default;box-sizing:border-box;-moz-box-sizing:border-box;border:solid 1px transparent}
 .desktop .kmw-key {display:block;margin:0;border-radius:6px;text-align:center;box-sizing:border-box;-moz-box-sizing:border-box;
@@ -436,7 +436,7 @@ div.android #keytip {background-color:#f00;}
 .desktop-static.kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
 .desktop-static .kmw-key-layer-group{width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;}
 .desktop-static .kmw-key-layer{width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.desktop-static .kmw-key-row{position:static;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}        
+.desktop-static .kmw-key-row{position:relative;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}        
 .desktop-static .kmw-key-square{position:relative;height:100%;display:inline-block;float:left;margin:0 0 0 5px;z-index:10000; font-size:0.8em;overflow:hidden;
           padding:1px 0 1px 0;background-color:transparent;cursor:default;box-sizing:border-box;-moz-box-sizing:border-box;border:solid 1px transparent}
 .desktop-static .kmw-key {display:block;margin:0;border-radius:6px;text-align:center;box-sizing:border-box;-moz-box-sizing:border-box;
