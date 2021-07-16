@@ -232,6 +232,9 @@ namespace com.keyman.osk {
     }
 
     get fontSize(): ParsedLengthStyle {
+      if(!this._fontSize) {
+        this._fontSize = new ParsedLengthStyle('1em');
+      }
       return this._fontSize;
     }
 
@@ -274,9 +277,14 @@ namespace com.keyman.osk {
       this._height = height;
 
       if(!pending && this.kbdDiv) {
-        this.kbdDiv.style.width    = width ? this._width+'px' : '';
-        this.kbdDiv.style.height   = height ? this._height+'px' : '';
-        this.kbdDiv.style.fontSize = height ? (this._height/8)+'px' : '';
+        this.kbdDiv.style.width    = width ? this._width + 'px' : '';
+        this.kbdDiv.style.height   = height ? this._height + 'px' : '';
+
+        if(!this.device.touchable && height) {
+          this.fontSize = new ParsedLengthStyle((this._height/8) + 'px');
+        }
+
+        this.refreshLayout();
       }
     }
 
@@ -1112,14 +1120,15 @@ namespace com.keyman.osk {
         paddedHeight = this.computedAdjustedOskHeight(this.height);
       }
 
-      let b = this.kbdDiv.firstChild as HTMLElement;
+      let b = this.layerGroup.element as HTMLElement;
       let gs = this.kbdDiv.style;
       let bs=b.style;
       if(this.usesFixedHeightScaling) {
         // Sets the layer group to the correct height.
         gs.height = gs.maxHeight = paddedHeight + 'px';
       }
-      bs.fontSize=fs+'em';
+
+      bs.fontSize=this.fontSize.scaledBy(fs).styleString;
 
       // Needs the refreshed layout info to work correctly.
       for(const layerId in this.layerGroup.layers) {
@@ -1172,12 +1181,17 @@ namespace com.keyman.osk {
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
       let device = this.device;
 
-      var layers=this.kbdDiv.firstChild.childNodes;
+      if(!this.layerGroup) {
+        return allottedHeight;
+      }
+
+      const layers=this.layerGroup.layers;
       let oskHeight = 0;
 
       // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
-      for(let i = 0; i < layers.length; i++) {
-        let nRows = layers[i].childNodes.length;
+      for(const layerID in layers) {
+        const layer = layers[layerID];
+        let nRows = layer.rows.length;
         let rowHeight = Math.floor(allottedHeight/(nRows == 0 ? 1 : nRows));
         let layerHeight = nRows * rowHeight;
 
@@ -1360,6 +1374,20 @@ namespace com.keyman.osk {
       }
       // Add a faint border
       kbd.style.border='1px solid #ccc';
+
+      // Once the element is inserted into the DOM, refresh the layout so that proper text scaling may apply.
+      const refreshInterval = window.setInterval(function() {
+        let computedStyle = getComputedStyle(kbd);
+        if(computedStyle.fontSize) {
+          if(kbd.style.fontSize) {
+            // Preserve the new setting (provided by CSS)
+            kbdObj.fontSize = new ParsedLengthStyle(kbd.style.fontSize);
+          }
+          kbdObj.refreshLayout();
+          window.clearInterval(refreshInterval);
+        }
+      }, 10);
+
       return kbd;
     }
 

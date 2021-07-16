@@ -303,6 +303,8 @@ namespace com.keyman.osk {
       let buttonStyle = getComputedStyle(this.btn);
       let keyWidth = parseFloat(buttonStyle.width);
       let emScale = 1;
+    
+      const originalSize = getFontSizeStyle(style.fontSize || '1em');
 
       // Not yet available; it'll be handled in a later layout pass.
       if(!buttonStyle.fontSize) {
@@ -347,14 +349,19 @@ namespace com.keyman.osk {
       // Never upscale keys past the default - only downscale them.
       // Proportion < 1:  ratio of key width to (padded [loosely speaking]) text width
       //                  maxProportion determines the 'padding' involved.
+      //
       if(proportion < 1) {
-        if(fontSpec.absolute) {
+        if(originalSize.absolute) {
           return proportion * fontSpec.val + 'px';
         } else {
-          return proportion * fontSpec.val + 'em';
+          return proportion * originalSize.val + 'em';
         }
       } else {
-        return fontSpec.val + (fontSpec.absolute ? 'px' : 'em');
+        if(originalSize.absolute) {
+          return fontSpec.val + 'px';
+        } else {
+          return originalSize.val + 'em';
+        }
       }
     }
 
