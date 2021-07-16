@@ -7,30 +7,16 @@ namespace com.keyman.osk {
   export class OSKRow {
     public readonly element: HTMLDivElement;
     public readonly keys: OSKBaseKey[];
+    private readonly heightFraction: number;
 
     public constructor(vkbd: VisualKeyboard, 
                        layerSpec: keyboards.ActiveLayer,
-                       rowSpec: keyboards.ActiveRow,
-                       displayUnderlying: boolean) {
+                       rowSpec: keyboards.ActiveRow) {
       const rDiv = this.element = document.createElement('div');
       rDiv.className='kmw-key-row';
-      // The following event trap is needed to prevent loss of focus in IE9 when clicking on a key gap.
-      // Unclear why normal _CreateElement prevention of loss of focus does not seem to work here.
-      // Appending handler to event handler chain does not work (other event handling remains active).
-      rDiv.onmousedown = function(e: MouseEvent) {
-        if(e) {
-          e.preventDefault();
-        }
-      }
-
-      const rs=rDiv.style;
 
       // Calculate default row height
-      const rowHeight = 100/layerSpec.row.length;
-
-      // Set row height. (Phone and tablet heights are later recalculated
-      // and set in px, allowing for viewport scaling.)
-      rs.maxHeight=rs.height=rowHeight+'%';
+      this.heightFraction = 1 / layerSpec.row.length;
 
       // Apply defaults, setting the width and other undefined properties for each key
       const keys=rowSpec.key;
@@ -43,24 +29,39 @@ namespace com.keyman.osk {
       // All key widths and paddings are rounded for uniformity
       for(let j=0; j<keys.length; j++) {
         const key = keys[j];
-        var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id, 1 / layerSpec.row.length);
+        var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id, this.heightFraction);
         
         var element = keyObj.construct(vkbd);
-        keyObj.displaysKeyCap = displayUnderlying;
         this.keys.push(keyObj);
 
         rDiv.appendChild(element);
       }
     }
 
-    public refreshLayout(vkbd: VisualKeyboard, rowHeight: number) {
+    public get displaysKeyCaps(): boolean {
+      if(this.keys.length > 0) {
+        return this.keys[0].displaysKeyCap;
+      } else {
+        return undefined;
+      }
+    }
+
+    public set displaysKeyCaps(flag: boolean) {
+      for(const key of this.keys) {
+        key.displaysKeyCap = flag;
+      }
+    }
+
+    public refreshLayout(vkbd: VisualKeyboard) {
       const rs = this.element.style;
+
+      const height = vkbd.layoutHeight.scaledBy(this.heightFraction);
       if(vkbd.usesFixedHeightScaling) {
-        rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
+        rs.maxHeight=rs.lineHeight=rs.height=height.styleString;
       }
 
-      // Sets the layers to the correct height
-      const rowPad = Math.round(0.15*rowHeight);
+      // Only used for fixed-height scales at present.
+      const rowPad = Math.round(0.15 * vkbd.height * this.heightFraction);
 
       for(const key of this.keys) {
         const keySquare  = key.btn.parentElement;
@@ -70,10 +71,10 @@ namespace com.keyman.osk {
           // Set the kmw-key-square position
           const kss = keySquare.style;
           const kes = keyElement.style;
-          kss.height=kss.minHeight=(rowHeight)+'px';
+          kss.height=kss.minHeight=height.styleString;
 
           kes.top = (rowPad/2) + 'px';
-          kes.height=kes.lineHeight=kes.minHeight=(rowHeight-rowPad)+'px';
+          kes.height=kes.lineHeight=kes.minHeight=(height.val-rowPad)+'px';
         }
 
         if(keyElement.key) {

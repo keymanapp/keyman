@@ -51,7 +51,8 @@ namespace com.keyman.osk {
       this.rows = [];
 
       for(let i=0; i<rows.length; i++) {
-        let rowObj = new OSKRow(vkbd, layer, rows[i], layout["displayUnderlying"]);
+        let rowObj = new OSKRow(vkbd, layer, rows[i]);
+        rowObj.displaysKeyCaps = layout["displayUnderlying"];
         gDiv.appendChild(rowObj.element);
         this.rows.push(rowObj);
       }
@@ -115,7 +116,7 @@ namespace com.keyman.osk {
           }
         }
 
-        oskRow.refreshLayout(vkbd, rowHeight);
+        oskRow.refreshLayout(vkbd);
       }
     }
   }
