@@ -55,27 +55,29 @@ namespace com.keyman.osk {
     public refreshLayout(vkbd: VisualKeyboard) {
       const rs = this.element.style;
 
-      const height = vkbd.layoutHeight.scaledBy(this.heightFraction);
+      const rowHeight = vkbd.layoutHeight.scaledBy(this.heightFraction);
       if(vkbd.usesFixedHeightScaling) {
-        rs.maxHeight=rs.lineHeight=rs.height=height.styleString;
+        rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
       }
 
       // Only used for fixed-height scales at present.
-      const rowPad = Math.round(0.15 * vkbd.height * this.heightFraction);
+      const padRatio = 0.15;
+
+      const keyHeightBase = vkbd.usesFixedHeightScaling ? rowHeight : ParsedLengthStyle.forScalar(1);
+      const padTop = keyHeightBase.scaledBy(padRatio / 2);
+      const keyHeight = keyHeightBase.scaledBy(1 - padRatio);
 
       for(const key of this.keys) {
         const keySquare  = key.btn.parentElement;
         const keyElement = key.btn;
 
-        if(vkbd.usesFixedHeightScaling) {
-          // Set the kmw-key-square position
-          const kss = keySquare.style;
-          const kes = keyElement.style;
-          kss.height=kss.minHeight=height.styleString;
+        // Set the kmw-key-square position
+        const kss = keySquare.style;
+        kss.height=kss.minHeight=keyHeightBase.styleString;
 
-          kes.top = (rowPad/2) + 'px';
-          kes.height=kes.lineHeight=kes.minHeight=(height.val-rowPad)+'px';
-        }
+        const kes = keyElement.style;
+        kes.top = padTop.styleString;
+        kes.height=kes.lineHeight=kes.minHeight=keyHeight.styleString;
 
         if(keyElement.key) {
           keyElement.key.refreshLayout(vkbd);
