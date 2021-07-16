@@ -190,12 +190,7 @@ namespace com.keyman.osk {
       // Set base class - OS and keyboard added for Build 360
       this.kbdDiv = Lkbd;
 
-      if(this.isStatic) {
-        // The 'documentation' format uses the base element's child as the actual display base.
-        (Lkbd.childNodes[0] as HTMLDivElement).className = device.formFactor + '-static kmw-osk-inner-frame';
-      } else {
-        Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
-      }
+      Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
     }
 
     public get element(): HTMLDivElement {
@@ -1328,11 +1323,22 @@ namespace com.keyman.osk {
       if(formFactor != 'desktop') {
         device.OS = 'iOS';
         device.touchable = true;
+      } else {
+        device.OS = 'windows';
+        device.touchable = false;
       }
 
       let layout = PKbd.layout(formFactor);
 
       let kbdObj = new VisualKeyboard(PKbd, device, true);
+
+      // The 'documentation' format uses the base element's child as the actual display base.
+      // Since there's no backing kmw-osk-frame, we do need the static-class kmw-osk-inner-frame
+      // to perform background styling on our behalf.  We'll trust the actual, live keyboard rules
+      // for the other elements, which in turn needs the non-static variant of the CSS rules.
+      kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className + ' ' + device.formFactor
+        + '-static ' + device.OS.toLowerCase();
+
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
 
       // Select the layer to display, and adjust sizes
