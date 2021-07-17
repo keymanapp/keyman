@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.84 alpha 2021-07-09
+
+* fix(web): Copy the keyboard stubs for registration (#5438)
+* fix(android/engine): register lexical model in switchToNextKeyboard (#5439)
+
 ## 15.0.83 alpha 2021-07-08
 
 * change(ios): setText now uses JSON serialization (#5321)
