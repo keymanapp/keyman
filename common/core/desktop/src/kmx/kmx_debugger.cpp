@@ -6,7 +6,7 @@
  * Functions for preparing kmx debug events
  */
 
-#include <kmx/kmx_processor.h>
+#include <kmx/kmx_processevent.h>
 
 using namespace km::kbp;
 using namespace kmx;
