@@ -32,9 +32,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\developer\setup.exe /t keyman-developer
     $(SYMSTORE) $(ROOT)\src\developer\setup\setup.dbg /t keyman-developer
 
-backup:
-    $(WZZIP) $(BUILD)\developer\devsetup.zip  $(BACKUPDEFAULTS) setup.exe
-
 test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\setup.exe -validate_manifest

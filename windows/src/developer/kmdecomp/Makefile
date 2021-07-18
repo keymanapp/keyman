@@ -20,9 +20,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\developer\kmdecomp.exe /t keyman-developer
     $(SYMSTORE) $(DEBUGPATH)\developer\kmdecomp.pdb /t keyman-developer
 
-backup:
-    $(WZZIP) $(BUILD)\developer\kmdecomp.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmdecomp.exe
-
 test-manifest:
     @rem This target needed as dependency for KMDECOMP
 

@@ -25,7 +25,7 @@ namespace kmx {
 
 #define GLOBAL_ContextStackSize 80
 
-class KMX_Processor {
+class KMX_ProcessEvent {
 private:
   PKMX_WORD m_indexStack;
   PKMX_WCHAR m_miniContext;
@@ -82,8 +82,8 @@ private:
   KMX_BOOL IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift);
 
 public:
-  KMX_Processor();
-  ~KMX_Processor();
+  KMX_ProcessEvent();
+  ~KMX_ProcessEvent();
 
   KMX_BOOL Load(km_kbp_path_name keyboardName);
   KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers);  // returns FALSE on error or key not matched

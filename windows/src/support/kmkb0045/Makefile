@@ -15,8 +15,5 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Tavultesoft KMKB0045" $(PROGRAM)\support\kmkb0045.exe
 
-backup:
-    $(WZZIP) $(BUILD)\support\kmkb0045.zip  $(BACKUPDEFAULTS) kmkb0045.exe
-
 
 !include ..\..\Target.mak

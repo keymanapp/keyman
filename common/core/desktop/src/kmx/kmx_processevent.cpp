@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "kmx_processor.h"
+#include "kmx_processevent.h"
 #include "state.hpp"
 
 using namespace km::kbp;
@@ -627,7 +627,6 @@ KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
           bEqual = u16cmp(ss, t->dpString) == 0;
         }
       }
-
       if(*(pp+3) == 1 && bEqual) return FALSE;
       if(*(pp+3) == 2 && !bEqual) return FALSE;
     }

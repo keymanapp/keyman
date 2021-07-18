@@ -17,7 +17,4 @@ clean: def-clean
 signcode:
     $(SIGNCODE) /d "Package Installer Creator for Server" $(PROGRAM)\online\Buildpkg.exe
 
-backup:
-    rem #$(WZZIP) $(BUILD)\buildtools\Buildpkg.zip $(BACKUPDEFAULTS) Buildpkg.exe
-
 !include ..\..\Target.mak

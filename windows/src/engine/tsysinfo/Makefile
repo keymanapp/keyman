@@ -32,9 +32,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\engine\tsysinfo.exe /t keyman-engine-windows
     $(SYMSTORE) $(DEBUGPATH)\engine\tsysinfo.dbg /t keyman-engine-windows
 
-backup:
-    $(WZZIP) $(BUILD)\engine\tsysinfo.zip  $(BACKUPDEFAULTS) tsysinfo.exe
-
 install:
     $(COPY) $(PROGRAM)\engine\tsysinfo.exe "$(INSTALLPATH_KEYMANENGINE)"
     $(COPY) $(ROOT)\src\engine\tsysinfo\*.xsl "$(INSTALLPATH_KEYMANENGINE)"

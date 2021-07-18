@@ -65,7 +65,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
       String version = lexicalModelJSON.optString(KMManager.KMKey_Version, "1.0");
       version = lexicalModelJSON.optString(KMManager.KMKey_LexicalModelVersion, version);
 
-      String helpLink = ""; // TOODO: Handle help links
+      String helpLink = lexicalModelJSON.optString(KMManager.KMKey_CustomHelpLink, "");
 
       // language ID and language name from lexicalModelJSON. Iterate through language array
       String languageID = "", languageName = "";
@@ -95,9 +95,8 @@ public class LexicalModel extends LanguageResource implements Serializable {
   public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName,
                       String languageID, String languageName,  String version,
                       String helpLink, String kmp) {
-    // TODO: handle help links
     super(packageID, lexicalModelID, lexicalModelName, languageID, languageName,
-        version, "", kmp);
+        version, helpLink, kmp);
   }
 
   @Override
