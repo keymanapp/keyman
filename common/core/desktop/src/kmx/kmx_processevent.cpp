@@ -15,17 +15,17 @@ KMX_BOOL km::kbp::kmx::g_debug_KeymanLog = TRUE;
 KMX_BOOL km::kbp::kmx::g_silent = FALSE;
 
 /*
-* KMX_Processor
+* KMX_ProcessEvent
 */
 
-KMX_Processor::KMX_Processor() : m_actions(&m_context), m_options(&m_keyboard) {
+KMX_ProcessEvent::KMX_ProcessEvent() : m_actions(&m_context), m_options(&m_keyboard) {
   m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];
   m_miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
   m_miniContextIfLen = 0;
   m_debug_items = nullptr;
 }
 
-KMX_Processor::~KMX_Processor() {
+KMX_ProcessEvent::~KMX_ProcessEvent() {
   delete[] m_indexStack;
   delete[] m_miniContext;
   if(m_debug_items) delete m_debug_items;
@@ -72,7 +72,7 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
 * process, and checks the state of Windows for the keyboard handling.
 */
 
-KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers)
+KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers)
 {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
 
@@ -144,7 +144,7 @@ KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWO
 * has a lot of crucial code in it!
 */
 
-KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
+KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 {
   KMX_DWORD i;
   LPKEY kkp = NULL;
@@ -347,7 +347,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 * to the active application, via the Keyman PostKey buffer.
 */
 
-int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr, KMX_BOOL *pOutputKeystroke)
+int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr, KMX_BOOL *pOutputKeystroke)
 {
   PKMX_WCHAR p, q, temp;
   LPSTORE s;
@@ -465,7 +465,7 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
 }
 
 
-KMX_BOOL KMX_Processor::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
+KMX_BOOL KMX_ProcessEvent::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 {
   KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
                 u16icmp(layoutName, static_cast<const km_kbp_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
@@ -473,7 +473,7 @@ KMX_BOOL KMX_Processor::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
   return bEqual;
 }
 
-KMX_BOOL KMX_Processor::IsMatchingPlatformString(PKMX_WCHAR platform)  // I3432
+KMX_BOOL KMX_ProcessEvent::IsMatchingPlatformString(PKMX_WCHAR platform)  // I3432
 {
   // TODO retrieve platform string from client environment
   // TODO cleanup to use a vector<string>.
@@ -492,7 +492,7 @@ KMX_BOOL KMX_Processor::IsMatchingPlatformString(PKMX_WCHAR platform)  // I3432
   return FALSE;
 }
 
-KMX_BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
+KMX_BOOL KMX_ProcessEvent::IsMatchingPlatform(LPSTORE s)  // I3432
 {
   PKMX_WCHAR t = new KMX_WCHAR[u16len(s->dpString)+1];
   u16cpy(t, /*wcslen(s->dpString)+1,*/ s->dpString);
@@ -526,7 +526,7 @@ KMX_BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
 * ContextMatch compares the context of a rule with the current context.
 */
 
-KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
+KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
 {
   KMX_WORD /*i,*/ n;
   PKMX_WCHAR p, q, qbuf, temp;
@@ -667,43 +667,43 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
   return *p == *q; /*at least one must ==0 at this point*/
 }
 
-KMX_Actions *KMX_Processor::GetActions() {
+KMX_Actions *KMX_ProcessEvent::GetActions() {
   return &m_actions;
 }
 
-KMX_Context *KMX_Processor::GetContext() {
+KMX_Context *KMX_ProcessEvent::GetContext() {
   return &m_context;
 }
 
-KMX_Options *KMX_Processor::GetOptions() {
+KMX_Options *KMX_ProcessEvent::GetOptions() {
   return &m_options;
 }
 
-KMX_Options const *KMX_Processor::GetOptions() const {
+KMX_Options const *KMX_ProcessEvent::GetOptions() const {
   return &m_options;
 }
 
-KMX_Environment *KMX_Processor::GetEnvironment() {
+KMX_Environment *KMX_ProcessEvent::GetEnvironment() {
   return &m_environment;
 }
 
-KMX_Environment const *KMX_Processor::GetEnvironment() const {
+KMX_Environment const *KMX_ProcessEvent::GetEnvironment() const {
   return &m_environment;
 }
 
-LPINTKEYBOARDINFO KMX_Processor::GetKeyboard() {
+LPINTKEYBOARDINFO KMX_ProcessEvent::GetKeyboard() {
   return &m_keyboard;
 }
 
 
-KMX_BOOL KMX_Processor::ReleaseKeyboardMemory(LPKEYBOARD kbd)
+KMX_BOOL KMX_ProcessEvent::ReleaseKeyboardMemory(LPKEYBOARD kbd)
 {
   if (!kbd) return TRUE;
   delete kbd;
   return TRUE;
 }
 
-PKMX_WCHAR KMX_Processor::GetSystemStore(LPKEYBOARD kb, KMX_DWORD SystemID)
+PKMX_WCHAR KMX_ProcessEvent::GetSystemStore(LPKEYBOARD kb, KMX_DWORD SystemID)
 {
   for (KMX_DWORD i = 0; i < kb->cxStoreArray; i++)
     if (kb->dpStoreArray[i].dwSystemID == SystemID) return kb->dpStoreArray[i].dpString;
