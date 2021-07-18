@@ -12,6 +12,7 @@
 #include "kmx_xstring.h"
 #include "kmx_options.h"
 #include "kmx_environment.h"
+#include "kmx_debugger.h"
 
 /***************************************************************************/
 
@@ -32,10 +33,13 @@ private:
   KMSTATE m_state;
   km_kbp_state *m_kbp_state;
 
+
   kmx::KMX_Actions m_actions;
   kmx::KMX_Context m_context;
   kmx::KMX_Options m_options;
   kmx::KMX_Environment m_environment;
+
+  kmx::KMX_DebugItems *m_debug_items;
 
   INTKEYBOARDINFO m_keyboard = { 0 };
   KMX_DWORD m_modifiers = 0;
