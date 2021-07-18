@@ -1,10 +1,10 @@
 {
   "name": "@keymanapp/models-types",
-  "version": "15.0.81",
+  "version": "15.0.85",
   "description": "Type definitions in used in the modeling (lexical model/predictive text) component of Keyman.",
   "types": "./index.d.ts",
   "scripts": {
-    "test": "tsc test.ts"
+    "test": "tsc test.ts -lib es6"
   },
   "repository": {
     "type": "git",

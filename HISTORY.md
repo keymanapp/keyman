@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 15.0.84 alpha 2021-07-09
+
+* fix(web): Copy the keyboard stubs for registration (#5438)
+* fix(android/engine): register lexical model in switchToNextKeyboard (#5439)
+
+## 15.0.83 alpha 2021-07-08
+
+* change(ios): setText now uses JSON serialization (#5321)
+* feat(common/core/web): engine correction-prep optimizations (#5319)
+* change(web): fat-finger-performance unit-test threshold (#5404)
+* feat(web): spacebar text controls (#5348)
+* chore(windows): remove backup build step (#5434)
+* refactor(common/core/desktop): Fix file and class names 🚧 (#5445)
+* refactor(web): longpresses, groundwork for additional gestures 🍕 (#5387)
+* fix(android/engine): Display dictionary help link (#5427)
+* refactor(common/core/desktop): Rename Load method 🚧 (#5444)
+
+## 15.0.82 alpha 2021-07-07
+
+* fix(common/models/types): fixes test script config (#5441)
+
+## 15.0.81 alpha 2021-07-06
+
+* fix(android/engine): Fix font file path (#5424)
+* chore(common): npm audit fixes (#5419)
+* chore(web): updates regression test-deps to same versions as web (#5420)
+* chore(windows): make build paths consistent (#5405)
+
 ## 15.0.80 alpha 2021-07-02
 
 * refactor(android): setKeyboard and setKeymanLanguage (#5338)

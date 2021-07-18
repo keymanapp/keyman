@@ -244,7 +244,6 @@ build-release-wrapper: clean-output global-versions
     $(MAKE) -DSIGNCODE_BUILD build-release
     $(MAKE) signcode
     $(MAKE) -DTARGET=test test
-    $(MAKE) backup
 !endif
 
     cd $(ROOT)\src\engine\inst
@@ -259,9 +258,6 @@ build-release-wrapper: clean-output global-versions
     $(MAKE) build-release-wrapper-oem
 
     cd $(ROOT)\src\developer\inst
-    $(MAKE)
-
-    cd $(ROOT)\src\buildtools\inst
     $(MAKE)
 !endif
 

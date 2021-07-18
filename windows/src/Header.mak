@@ -19,7 +19,7 @@ ROOT=c:\keyman\windows
 !include $(ROOT)\src\Defines.mak
 
 #
-# The targets build, signcode, symbols, backup are standard
+# The targets build, signcode, symbols are standard
 # targets for all projects
 #
 
@@ -32,18 +32,12 @@ signcode:
 
 symbols:
     $(MAKE) -DTARGET=symbols $(TARGETS)
-
-backup:
-    $(MAKE) -DTARGET=backup $(TARGETS)
 !ELSE
 signcode:
     rem no signcode required
 
 symbols:
     rem no symbols required
-
-backup:
-    rem no backup required
 !ENDIF
 
 build-release:

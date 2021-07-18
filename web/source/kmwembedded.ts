@@ -2,6 +2,7 @@
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 /// <reference path="osk/embedded/keytip.ts" />
+/// <reference path="osk/embedded/pendingLongpress.ts" />
 
 // KeymanWeb 11.0
 // Copyright 2019 SIL International
@@ -52,17 +53,22 @@ namespace com.keyman.osk {
      * 
      * @param {Object}  key   base key element
      */            
-    VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
-      let util = com.keyman.singleton.util;
-      if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
+    VisualKeyboard.prototype.startLongpress = function(this: VisualKeyboard, key: KeyElement): PendingGesture {
+      if(typeof(window['oskCreatePopup']) == 'function') {
         var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
             yBase = dom.Utils.getAbsoluteY(key);
 
         // #3718: No longer prepend base key to subkey array
-
-        this.popupBaseKey = key;
-        this.popupPending=true;
         window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
+
+        return new embedded.PendingLongpress(this, key);
+      } else {
+        // When embedded within our Android app, we expect the `oskCreatePopup` function to
+        // exist; all subkey control is delegated to the app.
+        //
+        // No function = big problem.
+        console.error("Missing `oskCreatePopup` function for engine integration.");
+        return null;
       }
     };
 
@@ -72,10 +78,6 @@ namespace com.keyman.osk {
         this.keytip = new osk.embedded.KeyTip(window['oskCreateKeyPreview'], window['oskClearKeyPreview']);
       }
     };
-
-    VisualKeyboard.prototype.highlightSubKeys = function(this: VisualKeyboard, k, x, y) {
-      // a dummy function; it's only really used for 'native' KMW.
-    }
 
     VisualKeyboard.prototype.waitForFonts = function(this: VisualKeyboard, kfd, ofd) {
       // a dummy function; it's only really used for 'native' KMW.
@@ -134,8 +136,6 @@ namespace com.keyman.text {
   // Skip full page initialization - skips native-mode only code
   keymanweb.isEmbedded = true;
 
-  com.keyman.osk.VisualKeyboard.prototype.popupDelay = 400;  // Delay must be less than native touch-hold delay 
-  
   // Set default device options
   keymanweb.setDefaultDeviceOptions = function(opt: com.keyman.OptionType) {
     opt['attachType'] = 'manual';
@@ -270,14 +270,45 @@ namespace com.keyman.text {
   };
 
   /**
-   * Function called by Android and iOS when a device-implemented keyboard popup is displayed or hidden
+   * Function called by Android and iOS when a device-implemented keyboard popup 
+   * is displayed or hidden.  As this is controlled by the app, we use it as a
+   * trigger for 'embedded'-mode gesture state management.
    * 
    *  @param  {boolean}  isVisible
    *     
    **/
-  keymanweb['popupVisible'] = function(isVisible)
-  {
-    osk.vkbd.popupVisible = isVisible;
+  keymanweb['popupVisible'] = function(isVisible) {
+    let gesture = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
+    let pendingLongpress = osk.vkbd.pendingSubkey;
+
+    /*
+     * If a longpress popup was visible, but is no longer, this means that the
+     * associated longpress gesture was cancelled.  It is possible for the base
+     * key to emit if selected at this time; detecton of this is managed by 
+     * the `SubkeyDelegator` class.
+     */
+    if(!isVisible) {
+      if(gesture) {
+        gesture.resolve(null);
+        osk.vkbd.subkeyGesture = null;
+      } else if(pendingLongpress) {
+        pendingLongpress.cancel();
+        osk.vkbd.pendingSubkey = null;
+      }
+    }
+
+    /*
+     * If the popup was not visible, but now is, that means our previously-pending
+     * longpress is now 'realized' (complete).  The OSK relies upon this state 
+     * information, which will be properly updated by `resolve`.
+     * 
+     * Prominent uses of such state info helps prevent change of base key, key
+     * previews, and key output from occurring while a subkey popup remains active.
+     */
+    if(isVisible && pendingLongpress) {
+      // Fulfills the first-stage promise.
+      pendingLongpress.resolve();
+    }
   };
 
   /**
@@ -318,8 +349,6 @@ namespace com.keyman.text {
    *  @param  {string}  keyName   key identifier
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
-      let core = (<KeymanBase> keymanweb).core;
-
       var origArg = keyName;
       if(!keymanweb.core.activeKeyboard || !osk.vkbd) {
         return false;
@@ -333,99 +362,24 @@ namespace com.keyman.text {
 
       // Can't just split on '-' because some layers like ctrl-shift contain it.
       let separatorIndex = keyName.lastIndexOf('-');
-      var layer = core.keyboardProcessor.layerId;
+
       if (separatorIndex > 0) {
-        layer = keyName.substring(0, separatorIndex);
         keyName = keyName.substring(separatorIndex+1);
-      }
-      if(layer == 'undefined') {
-        layer=core.keyboardProcessor.layerId;
       }
 
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(layer);
-      
+      var Lelem=keymanweb.domManager.getLastActiveElement();
       keymanweb.domManager.initActiveElement(Lelem);
 
-      var nextLayer: string;
-
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
-      if(osk.vkbd.popupBaseKey && osk.vkbd.popupBaseKey['key']) {
-        // This is set with the base key of our current subkey elsewhere within the engine.
-        var baseKey: com.keyman.osk.OSKKeySpec = osk.vkbd.popupBaseKey['key'].spec;
-        var found = false;
-
-        if(baseKey.coreID == keyName) {
-          nextLayer = baseKey.nextlayer;
-          found = true;
-        } else {
-          // Search for the specified subkey so we can retrieve its useful properties.
-          // It should be within the popupBaseKey's subkey list.
-          for(let subKey of baseKey.sk) {
-            if(subKey.coreID == keyName) {
-              // ... to consider:  why are we not just taking the keyspec wholesale right here?
-              nextLayer = subKey.nextlayer;
-              found = true;
-              break;
-            }
-          }
-        }
-
-        if(!found) {
-          console.warn("Could not find subkey '" + origArg + "' under the current base key '" + baseKey.coreID + "'!");
-        }
+      if(osk.vkbd.subkeyGesture) {
+        let gesture = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
+        gesture.resolve(keyName);
+        osk.vkbd.subkeyGesture = null;
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }
-
-      let Codes = com.keyman.text.Codes;
-      
-      // Check the virtual key 
-      let Lkc: com.keyman.text.KeyEvent = {
-        Lmodifiers: keyShiftState,
-        Lstates: 0,
-        Lcode: Codes.keyCodes[keyName],
-        LisVirtualKey: true,
-        kName: keyName,
-        kNextLayer: nextLayer,
-        vkCode: null, // was originally undefined
-        isSynthetic: true,
-        device: keymanweb.util.device.coreSpec
-      };
-
-      // Process modifier key action
-      if(core.keyboardProcessor.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
-        return true;      
-      }
-
-      // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
-      // we can handle many other pre-processing steps the same way with this common method.
-      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
-
-      //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
-      //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
-      if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
-        // Addresses modifier SHIFT keys.
-        if(nextLayer) {
-          core.keyboardProcessor.selectLayer(Lkc);
-        }
-        return false;
-      }
-
-      Lkc.vkCode=Lkc.Lcode;
-
-      // Now that we have a valid key event, hand it off to the Processor for execution.
-      // This allows the Processor to also handle any predictive-text tasks necessary.
-      let retVal = com.keyman.osk.PreProcessor.handleClick(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem), null);
-
-      // Special case for embedded to pass K_TAB back to device to process
-      if(Lkc.Lcode == Codes.keyCodes["K_TAB"] || Lkc.Lcode == Codes.keyCodes["K_TABBACK"] 
-          || Lkc.Lcode == Codes.keyCodes["K_TABFWD"]) {
-        return false;
-      }
-
-      return retVal;
   };
 
   /**

@@ -23,9 +23,6 @@ signcode:
 wrap-symbols:
 		rem no symbols
 
-backup:
-    $(WZZIP) $(BUILD)\engine\keymanmc.zip  $(BACKUPDEFAULTS) keymanmc.dll
-
 install:
     $(COPY) $(PROGRAM)\engine\keymanmc.dll "$(INSTALLPATH_KEYMANENGINE)\keymanmc.dll"
 	reg add HKLM\SYSTEM\CurrentControlSet\services\eventlog\Application\Keyman /v CategoryCount /t REG_DWORD /d 1 /f

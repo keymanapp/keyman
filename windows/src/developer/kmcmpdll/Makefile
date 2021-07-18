@@ -39,9 +39,6 @@ wrap-symbols:
     $(SYMSTORE) $(DEBUGPATH)\developer\kmcmpdll.pdb /t keyman-developer
     $(SYMSTORE) $(DEBUGPATH)\developer\kmcmpdll.x64.pdb /t keyman-developer
 
-backup:
-    $(WZZIP) $(BUILD)\developer\kmcmpdll.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmcmpdll.dll $(PROGRAM)\developer\kmcmpdll.x64.dll
-
 test-manifest:
     @rem This target needed as dependency for TIKE and KMCMPDLL
 

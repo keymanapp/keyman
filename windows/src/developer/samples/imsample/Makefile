@@ -18,9 +18,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\developer\imsample.dll /t keyman-developer
     $(SYMSTORE) $(DEBUGPATH)\developer\imsample.pdb /t keyman-developer
 
-backup:
-    $(WZZIP) $(BUILD)\developer\imsample.zip  $(BACKUPDEFAULTS) imsample.dll
-
 clean: def-clean
     $(MSBUILD) imsample.sln $(MSBUILD_CLEAN)
 

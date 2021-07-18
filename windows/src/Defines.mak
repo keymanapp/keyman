@@ -205,8 +205,6 @@ WIXHEAT=$(WIXPATH)\heat.exe
 
 LINKPATH=link.exe
 
-BACKUPDEFAULTS=*.map *.tds *.rsm *.dbg *.pdb *.cod
-
 TORTOISEPROC=C:\Progra~1\TortoiseSVN\bin\TortoiseProc.exe
 
 #

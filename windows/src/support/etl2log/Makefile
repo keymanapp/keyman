@@ -19,7 +19,4 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\support\etl2log.exe /t keyman-windows
     $(SYMSTORE) $(DEBUGPATH)\support\etl2log.pdb /t keyman-windows
 
-backup:
-    $(WZZIP) $(BUILD)\support\etl2log.zip  $(BACKUPDEFAULTS) etl2log.exe
-
 !include ..\..\Target.mak

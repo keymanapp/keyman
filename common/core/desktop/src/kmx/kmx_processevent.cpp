@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "kmx_processor.h"
+#include "kmx_processevent.h"
 #include "state.hpp"
 
 using namespace km::kbp;

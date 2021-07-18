@@ -20,7 +20,7 @@ private:
     km_kbp_cp const * default_value);
 public:
   KMX_Environment();
-  void Load(std::u16string const & key, std::u16string const & value);
+  void Set(std::u16string const & key, std::u16string const & value);
   char16_t const * LookUp(std::u16string const & key) const;
 
   KMX_BOOL capsLock() const noexcept { return _capsLock; }
