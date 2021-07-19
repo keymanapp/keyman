@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.85 alpha 2021-07-19
+
+* feat(common/core/desktop): kmx debugger basic infrastructure 🐞 (#5425)
+* feat(common/core/desktop): add debug events 🐞 (#5448)
+* chore(developer): fixup devtime paths (#5449)
+* refactor(web): partial encapsulation of the desktop title bar and resize bar 🍕 (#5393)
+* refactor(web): osk move & resize handler encapsulation 🍕 (#5409)
+
 ## 15.0.84 alpha 2021-07-09
 
 * fix(web): Copy the keyboard stubs for registration (#5438)
