@@ -9,12 +9,20 @@ namespace com.keyman.osk.layouts {
       return false;
     };
 
-    public constructor() {
+    public constructor(dragHandler?: MouseDragOperation) {
       this._element = this.buildResizeBar();
+
+      if(dragHandler) {
+        this._resizeHandle.onmousedown = dragHandler.mouseDownHandler;
+      }
     }
 
     public get element(): HTMLDivElement {
       return this._element;
+    }
+
+    public get handle(): HTMLDivElement {
+      return this._resizeHandle;
     }
 
     public allowResizing(flag: boolean) {
@@ -65,8 +73,6 @@ namespace com.keyman.osk.layouts {
       var Limg = document.createElement('div');
       this.markUnselectable(Limg);
       Limg.className='kmw-footer-resize';
-      Limg.onmousedown=osk._VResizeMouseDown;
-      Limg.onmouseover=Limg.onmouseout=osk._VResizeMouseOut;
       bar.appendChild(Limg);
       this._resizeHandle=Limg;
       //TODO: the image never appears in IE8, have no idea why!

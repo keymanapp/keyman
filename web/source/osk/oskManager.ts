@@ -14,7 +14,6 @@
 ***/
 
 namespace com.keyman.osk {
-  type MouseHandler = (this: GlobalEventHandlers, ev: MouseEvent) => any;
   type OSKRect = {'left'?: number, 'top'?: number, 'width'?: number, 'height'?: number,
     'nosize'?: boolean, 'nomove'?: boolean};
   type OSKPos = {'left'?: number, 'top'?: number};
@@ -47,21 +46,6 @@ namespace com.keyman.osk {
     // If a keyboard has been loaded, the VisualKeyboard values override these.
     _baseWidth: number;
     _baseHeight: number;
-
-    // OSK resizing-event state fields
-    resizing: boolean;
-    _VMoveX: number;
-    _VMoveY: number;
-    _ResizeMouseX: number;
-    _ResizeMouseY: number;
-    _VOriginalWidth: number;
-    _VOriginalHeight: number;
-
-    // Resize-event temporary storage
-    _VPreviousMouseMove: MouseHandler;
-    _VPreviousMouseUp: MouseHandler;
-    _VPreviousCursor: string;
-    _VPreviousMouseButton: number;
 
     // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
     modifierCodes = text.Codes.modifierCodes;
@@ -212,6 +196,7 @@ namespace com.keyman.osk {
       //  such as a minimized menu button?)
       if(activeKeyboard == null && !device.touchable) {
         const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+        layout.attachToView(this);
         this._Box.appendChild(layout.titleBar.element);
 
         Ldiv = util._CreateElement('div');
@@ -234,6 +219,7 @@ namespace com.keyman.osk {
         } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
           //osk.ddOSK = false;
           const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+          layout.attachToView(this);
           this._Box.appendChild(layout.titleBar.element);
           this._Box.appendChild(this.banner.element);
 
@@ -343,6 +329,7 @@ namespace com.keyman.osk {
       // Add header element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
         layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+        layout.attachToView(this);
         this._Box.appendChild(layout.titleBar.element);
       }
 
@@ -447,280 +434,6 @@ namespace com.keyman.osk {
     }.bind(this);
 
     /**
-     * Function     _VResizeMouseOver, _VResizeMouseOut
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process end of resizing of KMW UI
-     */
-    /*private*/ _VResizeMouseOut = function(this: OSKManager, e: Event) {
-      e = com.keyman.singleton._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return false;
-      }
-
-      if(e  &&  e.preventDefault) {
-        e.preventDefault();
-      }
-
-      var r=this.getRect();
-      this.setSize(r.width, r.height, true);
-      e.cancelBubble = true;
-      return false;
-    }.bind(this);
-
-    private _VResizeMouseOver = this._VResizeMouseOut;
-
-    /**
-     * Function     _VResizeMouseDown
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process resizing of KMW UI
-     */
-    /*private*/ _VResizeMouseDown = function(this: OSKManager, e: MouseEvent) {
-      let keymanweb = com.keyman.singleton;
-
-      keymanweb.uiManager.justActivated = true;
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      this.resizing = true;
-      var Lposx,Lposy;
-      if (e.pageX) {
-        Lposx = e.pageX;
-        Lposy = e.pageY;
-      } else if(e.clientX) {
-        Lposx = e.clientX + document.body.scrollLeft;
-        Lposy = e.clientY + document.body.scrollTop;
-      }
-
-      this._ResizeMouseX = Lposx;
-      this._ResizeMouseY = Lposy;
-      if(document.onmousemove != this._VResizeMouseMove  &&  document.onmousemove != this._VMoveMouseMove) { // I1472 - Dragging off edge of browser window causes muckup
-        this._VPreviousMouseMove = document.onmousemove;
-        this._VPreviousMouseUp = document.onmouseup;
-      }
-      this._VPreviousCursor = document.body.style.cursor;
-      this._VPreviousMouseButton = (typeof(e.which)=='undefined' ? e.button : e.which);
-
-      this._VOriginalWidth = this.vkbd.kbdDiv.offsetWidth;
-      this._VOriginalHeight = this.vkbd.kbdDiv.offsetHeight;
-      document.onmousemove = this._VResizeMouseMove;
-      document.onmouseup = this._VResizeMoveMouseUp;
-
-      if(document.body.style.cursor) {
-        document.body.style.cursor = 'se-resize';
-      }
-      if(e  &&  e.preventDefault) {
-        e.preventDefault();
-      }
-      e.cancelBubble = true;
-      return false;
-    }.bind(this);
-
-    /**
-     * Function     _VResizeMouseMove
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process mouse movement during resizing of OSK
-     */
-    _VResizeMouseMove = function(this: OSKManager, e: MouseEvent) {
-      var Lposx,Lposy;
-      e = com.keyman.singleton._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-      this.resizing = true;
-
-      if(this._VPreviousMouseButton != (typeof(e.which)=='undefined' ? e.button : e.which)) { // I1472 - Dragging off edge of browser window causes muckup
-        return this._VResizeMoveMouseUp(e);
-      } else {
-        if (e.pageX) {
-          Lposx = e.pageX;
-          Lposy=e.pageY;
-        } else if (e.clientX) {
-          Lposx = e.clientX + document.body.scrollLeft;
-          Lposy = e.clientY + document.body.scrollTop;
-        }
-
-        var newWidth=(this._VOriginalWidth + Lposx - this._ResizeMouseX),
-            newHeight=(this._VOriginalHeight + Lposy - this._ResizeMouseY);
-
-        // Set the smallest and largest OSK size
-        if(newWidth < 0.2*screen.width) {
-          newWidth = 0.2*screen.width;
-        }
-        if(newHeight < 0.1*screen.height) {
-          newHeight = 0.1*screen.height;
-        }
-        if(newWidth > 0.9*screen.width) {
-          newWidth=0.9*screen.width;
-        }
-        if(newHeight > 0.5*screen.height) {
-          newWidth=0.5*screen.height;
-        }
-
-        // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font
-        this.setSize(newWidth, newHeight);
-
-        if(e  &&  e.preventDefault) {
-          e.preventDefault();
-        }
-        e.cancelBubble = true;
-        return false;
-      }
-    }.bind(this);
-
-    /**
-     * Function     _VMoveMouseDown
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process mouse down on OSK
-     */
-    /*private*/ _VMoveMouseDown = function(this: OSKManager, e: MouseEvent) {
-      let keymanweb = com.keyman.singleton;
-
-      var Lposx, Lposy;
-      keymanweb.uiManager.justActivated = true;
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      this.resizing = true;
-      if (e.pageX) {
-        Lposx = e.pageX;
-        Lposy = e.pageY;
-      } else if (e.clientX) {
-        Lposx = e.clientX + document.body.scrollLeft;
-        Lposy = e.clientY + document.body.scrollTop;
-      }
-
-      if(document.onmousemove != this._VResizeMouseMove  &&  document.onmousemove != this._VMoveMouseMove) { // I1472 - Dragging off edge of browser window causes muckup
-        this._VPreviousMouseMove = document.onmousemove;
-        this._VPreviousMouseUp = document.onmouseup;
-      }
-
-      this._VPreviousCursor = document.body.style.cursor;
-      this._VPreviousMouseButton = (typeof(e.which)=='undefined' ? e.button : e.which);
-
-      this._VMoveX = Lposx - this._Box.offsetLeft;
-      this._VMoveY = Lposy - this._Box.offsetTop;
-
-      if(keymanweb.isCJK() && this.desktopLayout) {
-        this.desktopLayout.titleBar.setPinCJKOffset();
-      }
-
-      document.onmousemove = this._VMoveMouseMove;
-      document.onmouseup = this._VResizeMoveMouseUp;
-      if(document.body.style.cursor) {
-        document.body.style.cursor = 'move';
-      }
-      if(e && e.preventDefault) {
-        e.preventDefault();
-      }
-      e.cancelBubble = true;
-      return false;
-    }.bind(this);
-
-    /**
-     * Process mouse drag on OSK
-     *
-     * @param       {Object}      e      event
-     */
-    private _VMoveMouseMove = function(this: OSKManager, e: MouseEvent) {
-      let keymanweb = com.keyman.singleton;
-
-      var Lposx, Lposy;
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      if(this.noDrag) {
-        return true;
-      }
-
-      this.resizing = true;
-
-      this.userPositioned = true;
-      if(this.desktopLayout) {
-        this.desktopLayout.titleBar.showPin(true);
-      }
-
-      if(this._VPreviousMouseButton != (typeof(e.which)=='undefined' ? e.button : e.which)) { // I1472 - Dragging off edge of browser window causes muckup
-        return this._VResizeMoveMouseUp(e);
-      } else {
-        if (e.pageX) {
-          Lposx = e.pageX;
-          Lposy = e.pageY;
-        } else if (e.clientX) {
-          Lposx = e.clientX + document.body.scrollLeft;
-          Lposy = e.clientY + document.body.scrollTop;
-        }
-
-        this._Box.style.left = (Lposx-this._VMoveX)+'px';
-        this._Box.style.top = (Lposy-this._VMoveY)+'px';
-
-        if(e  &&  e.preventDefault) {
-          e.preventDefault();
-        }
-
-        var r=this.getRect();
-        this.setSize(r.width, r.height, true);
-        this.x = r.left;
-        this.y = r.top;
-        e.cancelBubble = true;
-        return false;
-      }
-    }.bind(this);
-
-    /**
-     * Function     _VResizeMoveMouseUp
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process mouse up during resizing of KMW UI
-     */
-    private _VResizeMoveMouseUp = function(this: OSKManager, e: MouseEvent) {
-      let keymanweb = com.keyman.singleton;
-
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      this.resizing = false;
-      if(this.vkbd) {
-        this.vkbd.currentKey=null;
-      }
-
-      document.onmousemove = this._VPreviousMouseMove;
-      document.onmouseup = this._VPreviousMouseUp;
-
-      if(document.body.style.cursor) {
-        document.body.style.cursor = this._VPreviousCursor;
-      }
-
-      keymanweb.domManager.focusLastActiveElement();
-      if(e  &&  e.preventDefault) {
-        e.preventDefault();
-      }
-
-      keymanweb.uiManager.justActivated = false;
-      keymanweb.uiManager.setActivatingUI(false);
-
-      if(this.vkbd) {
-        this._VOriginalWidth = this.vkbd.kbdDiv.offsetWidth;
-        this._VOriginalHeight = this.vkbd.kbdDiv.offsetHeight;
-        }
-      this.doResizeMove();
-      e.cancelBubble = true;
-      this.saveCookie();
-      return false;
-    }.bind(this);
-
-    /**
      * Save size, position, font size and visibility of OSK
      */
     saveCookie() {
@@ -798,7 +511,7 @@ namespace com.keyman.osk {
       }
     }
 
-    private setSize(width?: number, height?: number, pending?: boolean) {
+    /*private*/ setSize(width?: number, height?: number, pending?: boolean) {
       if(width && height) {
         this._baseWidth = width;
         this._baseHeight = height;
@@ -950,12 +663,14 @@ namespace com.keyman.osk {
 
       var b = this._Box, bs = b.style;
       if('left' in p) {
-        bs.left=(p['left']-dom.Utils.getAbsoluteX(b)+b.offsetLeft)+'px';
+        this.x = p['left'] - dom.Utils.getAbsoluteX(b) + b.offsetLeft;
+        bs.left= this.x + 'px';
         this.dfltX=bs.left;
       }
 
       if('top' in p) {
-        bs.top=(p['top']-dom.Utils.getAbsoluteY(b)+b.offsetTop)+'px';
+        this.y = p['top'] - dom.Utils.getAbsoluteY(b) + b.offsetTop;
+        bs.top = this.y + 'px';
         this.dfltY=bs.top;
       }
 
@@ -995,7 +710,7 @@ namespace com.keyman.osk {
         // Fix or release user resizing
         if('nosize' in p) {
           if(this.desktopLayout) {
-            this.desktopLayout.resizeBar.allowResizing(!p['nosize']);
+            this.desktopLayout.resizingEnabled = !p['nosize'];
           }
         }
 
@@ -1004,7 +719,7 @@ namespace com.keyman.osk {
       if('nomove' in p) {
         this.noDrag=p['nomove'];
         if(this.desktopLayout) {
-          this.desktopLayout.titleBar.showPin(!p['nomove'] && this.userPositioned);
+          this.desktopLayout.movementEnabled = !this.noDrag;
         }
       }
       // Save the user-defined OSK size
