@@ -187,6 +187,36 @@
 /* Title for the main Settings menu */
 "menu-settings-title" = "Keyman Settings";
 
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Do not show caption on spacebar";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Show keyboard name on spacebar";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Show language name on spacebar";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Show language and keyboard name on spacebar";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Spacebar Caption";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Spacebar Caption";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Blank";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Keyboard";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Language";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Language and keyboard";
+
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Keyboard download failed";
 

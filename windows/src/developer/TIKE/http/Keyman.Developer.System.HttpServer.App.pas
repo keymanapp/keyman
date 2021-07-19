@@ -58,20 +58,7 @@ begin
 
   if FStandardTemplatePath = '' then
   begin
-    FStandardTemplatePath := ExtractFilePath(ParamStr(0)) + 'locale\' + 'en';
-    // I2595
-
-    if FileExists(FStandardTemplatePath + '\xml\help\contexthelp.xml') then
-      FStandardTemplatePath := FStandardTemplatePath + '\xml\help\'
-    else
-    begin
-      FStandardTemplatePath := ExtractFilePath(ParamStr(0)) + 'locale\' + 'en';
-      // I2595
-      if FileExists(FStandardTemplatePath + '\xml\help\contexthelp.xml') then
-        FStandardTemplatePath := FStandardTemplatePath + '\xml\help\'
-      else
-        FStandardTemplatePath := GetXMLTemplatePath + 'help\';
-    end;
+    FStandardTemplatePath := GetXMLTemplatePath + 'help\';
   end;
 
   if (doc <> 'help/') and (doc <> 'help/index') then
@@ -300,7 +287,7 @@ end;
 
 constructor TAppHttpResponder.Create;
 begin
-  FAppRoot := ExtractFilePath(ParamStr(0)) + 'xml\app\';
+  FAppRoot := GetXMLTemplatePath + 'app\';
 end;
 
 procedure TAppHttpResponder.ProcessRequest(AContext: TIdContext;

@@ -70,8 +70,8 @@
         <VerInfo_Keys>CompanyName=;FileDescription=Tavultesoft IKE;FileVersion=5.0.0.26;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=5.0.0.0;Comments=</VerInfo_Keys>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
-        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\bin\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_DcuOutput>.\obj\$(Platform)\$(Config)</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>

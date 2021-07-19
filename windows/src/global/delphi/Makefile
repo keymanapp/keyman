@@ -14,6 +14,7 @@ keyman-components: dirs compile install
     # $(COPY) keyman_components.bpl $(OUTLIB)
 
 compile:
+    @-mkdir obj\Win32\$(TARGET_PATH)
     $(DCC32DPK) keyman_components.dpk
 
 install:

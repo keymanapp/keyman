@@ -32,9 +32,6 @@ web:
 signcode:
     @rem
 
-backup:
-    @rem
-
 clean:
     @rem
 

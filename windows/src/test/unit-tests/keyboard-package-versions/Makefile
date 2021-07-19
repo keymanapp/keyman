@@ -15,7 +15,6 @@ build:
     $(DELPHI_MSBUILD) /p:CI=CI keyboardpackageversionstestsuite.dproj
 
 clean: def-clean
-    -rd /s/q Win32
     -del *.kmp
     -del test-1.0\*.kmx
     -del test-2.0\*.kmx

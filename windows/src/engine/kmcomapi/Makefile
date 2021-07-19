@@ -50,7 +50,4 @@ wrap-symbols:
     $(SYMSTORE) $(DEBUGPATH)\engine\kmcomapi.dbg /t keyman-engine-windows
     #TODO: $(SYMSTORE) $(PROGRAM)\engine\kmcomapi.x64.dbg /t keyman-engine-windows
 
-backup:
-    $(WZZIP) $(BUILD)\engine\kmcomapi.zip  $(BACKUPDEFAULTS) $(WIN32_TARGET_PATH)\kmcomapi.dll $(WIN64_TARGET_PATH)\kmcomapi.x64.dll $(WIN32_TARGET_PATH)\kmcomapi.dbg
-
 !include ..\..\Target.mak

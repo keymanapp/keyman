@@ -6,6 +6,7 @@
 
 build: dirs
     cd packages
+    @-mkdir obj\Win32\$(TARGET_PATH)
     $(DCC32DPK) CEF4Delphi.dpk
     cd ..
     $(MAKE) install

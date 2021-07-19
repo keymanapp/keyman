@@ -43,7 +43,11 @@ namespace com.keyman.osk.browser {
       
       this.vkbd = vkbd;
       this.baseKey = e;
-      this.currentSelection = null;
+      
+      // If the user doesn't move their finger and releases, we'll output the base key
+      // by default.
+      this.currentSelection = e;
+      e.key.highlight(true);
 
       // A tag we directly set on a key element during its construction.
       let subKeySpec: OSKKeySpec[] = e['subKeys'];
@@ -111,6 +115,7 @@ namespace com.keyman.osk.browser {
         let keyEvent: text.KeyEvent = null;
         if(this.currentSelection) {
           keyEvent = this.vkbd.initKeyEvent(this.currentSelection, touch);
+          this.currentSelection.key.highlight(false);
         }
         this.resolver(keyEvent);
       }
@@ -252,6 +257,7 @@ namespace com.keyman.osk.browser {
 
     updateTouch(touch: Touch) {
       this.currentSelection = null;
+      this.baseKey.key.highlight(false);
 
       for(let i=0; i < this.baseKey['subKeys'].length; i++) {
         try {
@@ -259,7 +265,6 @@ namespace com.keyman.osk.browser {
 
           let onKey = sk.key.isUnderTouch(touch);
           if(onKey) {
-            this.baseKey.key.highlight(false);
             this.currentSelection = sk;
           }
           sk.key.highlight(onKey);

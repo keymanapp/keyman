@@ -63,6 +63,11 @@ namespace com.keyman.osk {
 
         return new embedded.PendingLongpress(this, key);
       } else {
+        // When embedded within our Android app, we expect the `oskCreatePopup` function to
+        // exist; all subkey control is delegated to the app.
+        //
+        // No function = big problem.
+        console.error("Missing `oskCreatePopup` function for engine integration.");
         return null;
       }
     };
@@ -270,7 +275,7 @@ namespace com.keyman.text {
 
   /**
    * Function called by Android and iOS when a device-implemented keyboard popup 
-   * is displayed or hidden.  As this is controlled by the app, it's the perfect
+   * is displayed or hidden.  As this is controlled by the app, we use it as a
    * trigger for 'embedded'-mode gesture state management.
    * 
    *  @param  {boolean}  isVisible
@@ -282,9 +287,9 @@ namespace com.keyman.text {
 
     /*
      * If a longpress popup was visible, but is no longer, this means that the
-     * associated longpress gesture was cancelled.  It is possible for the base key
-     * to emit if selected at this time, but only if appropriate - and this is
-     * managed by the `SubkeyDelegator`.
+     * associated longpress gesture was cancelled.  It is possible for the base
+     * key to emit if selected at this time; detecton of this is managed by 
+     * the `SubkeyDelegator` class.
      */
     if(!isVisible) {
       if(gesture) {
@@ -298,8 +303,11 @@ namespace com.keyman.text {
 
     /*
      * If the popup was not visible, but now is, that means our previously-pending
-     * longpress is now 'realized' (complete).  Certain aspects of the OSK rely on
-     * this state information, which will be properly updated by `resolve`.
+     * longpress is now 'realized' (complete).  The OSK relies upon this state 
+     * information, which will be properly updated by `resolve`.
+     * 
+     * Prominent uses of such state info helps prevent change of base key, key
+     * previews, and key output from occurring while a subkey popup remains active.
      */
     if(isVisible && pendingLongpress) {
       // Fulfills the first-stage promise.

@@ -85,8 +85,8 @@
         <DCC_AssertionsAtRuntime>false</DCC_AssertionsAtRuntime>
         <ImageDebugInfo>true</ImageDebugInfo>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
-        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
-        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\bin\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_DcuOutput>.\obj\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
@@ -266,7 +266,7 @@
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas"/>
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas"/>
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
-        <DCCReference Include="Keyman.Developer.System.Project.ProjectLogConsole.pas" />
+        <DCCReference Include="Keyman.Developer.System.Project.ProjectLogConsole.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Console.pas"/>
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>

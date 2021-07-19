@@ -15,7 +15,4 @@ clean: def-clean
 signcode:
     rem no signcode
 
-backup:
-    rem no backup
-
 !include ..\..\Target.mak
