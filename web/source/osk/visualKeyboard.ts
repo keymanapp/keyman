@@ -1915,8 +1915,10 @@ namespace com.keyman.osk {
           t.className='kmw-spacebar-caption';
         }
 
-        // It sounds redundant, but this dramatically cuts down on browser DOM processing.
-        if(t.innerText != displayName) {
+        // It sounds redundant, but this dramatically cuts down on browser DOM processing;
+        // but sometimes innerText is reported empty when it actually isn't, so set it
+        // anyway in that case (Safari, iOS 14.4)
+        if(t.innerText != displayName || displayName == '') {
           t.innerText = displayName;
         }
       }
