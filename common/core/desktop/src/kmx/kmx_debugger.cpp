@@ -11,7 +11,15 @@
 using namespace km::kbp;
 using namespace kmx;
 
-void KMX_DebugItems::push_item(uint8_t type, uint32_t flags, LPGROUP group, LPKEY key, PKMX_WCHAR context, PKMX_WORD index_stack) {
+void KMX_DebugItems::push_item(
+  uint8_t type,
+  uint32_t flags,
+  LPGROUP group,
+  LPKEY key,
+  PKMX_WCHAR context,
+  PKMX_WORD index_stack,
+  int first_action
+) {
   _items->assert_push_entry();
   km_kbp_state_debug_item item = {type, flags};
   item.kmx_info.rule = key;
@@ -24,6 +32,8 @@ void KMX_DebugItems::push_item(uint8_t type, uint32_t flags, LPGROUP group, LPKE
   }
   item.kmx_info.context[DEBUG_MAX_CONTEXT-1] = 0;
   item.kmx_info.group = group;
+  item.kmx_info.first_action = first_action;
+
   _items->emplace_back(item);
 }
 

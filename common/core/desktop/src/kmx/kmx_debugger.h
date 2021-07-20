@@ -27,7 +27,8 @@ private:
     LPGROUP group = nullptr,
     LPKEY key = nullptr,
     PKMX_WCHAR context = nullptr,
-    PKMX_WORD index_stack = nullptr
+    PKMX_WORD index_stack = nullptr,
+    int first_action = 0
   );
   void fill_store_offsets(
     km_kbp_state_debug_kmx_info *info,
@@ -39,15 +40,16 @@ public:
   void push_end(uint32_t flags);
   void push_group_enter(LPGROUP group);
   void push_group_exit(LPGROUP group, uint32_t flags);
-  void push_nomatch_enter(LPGROUP group);
+  void push_nomatch_enter(LPGROUP group, int first_action);
   void push_nomatch_exit(LPGROUP group);
-  void push_match_enter(LPGROUP group);
+  void push_match_enter(LPGROUP group, int first_action);
   void push_match_exit(LPGROUP group);
   void push_rule_enter(
     LPGROUP group,
     LPKEY key,
     PKMX_WCHAR context,
-    PKMX_WORD index_stack
+    PKMX_WORD index_stack,
+    int first_action
   );
   void push_rule_exit(
     LPGROUP group,
@@ -90,8 +92,8 @@ KMX_DebugItems::push_group_exit(LPGROUP group, uint32_t flags) {
 }
 
 inline void
-KMX_DebugItems::push_nomatch_enter(LPGROUP group) {
-  push_item(KM_KBP_DEBUG_NOMATCH_ENTER, 0, group);
+KMX_DebugItems::push_nomatch_enter(LPGROUP group, int first_action) {
+  push_item(KM_KBP_DEBUG_NOMATCH_ENTER, 0, group, nullptr, nullptr, nullptr, first_action);
 }
 
 inline void
@@ -100,8 +102,8 @@ KMX_DebugItems::push_nomatch_exit(LPGROUP group) {
 }
 
 inline void
-KMX_DebugItems::push_match_enter(LPGROUP group) {
-  push_item(KM_KBP_DEBUG_MATCH_ENTER, 0, group);
+KMX_DebugItems::push_match_enter(LPGROUP group, int first_action) {
+  push_item(KM_KBP_DEBUG_MATCH_ENTER, 0, group, nullptr, nullptr, nullptr, first_action);
 }
 
 inline void
@@ -114,9 +116,10 @@ KMX_DebugItems::push_rule_enter(
   LPGROUP group,
   LPKEY key,
   PKMX_WCHAR context,
-  PKMX_WORD index_stack
+  PKMX_WORD index_stack,
+  int first_action
 ) {
-  push_item(KM_KBP_DEBUG_RULE_ENTER, 0, group, key, context, index_stack);
+  push_item(KM_KBP_DEBUG_RULE_ENTER, 0, group, key, context, index_stack, first_action);
 }
 
 inline void

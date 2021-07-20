@@ -77,7 +77,7 @@ bool are_store_offsets_equal(const uint16_t (&lhs)[DEBUG_STORE_OFFSETS_SIZE], co
 bool operator==(km_kbp_state_debug_item const & lhs,
                 km_kbp_state_debug_item const & rhs)
 {
-  auto result = (lhs.type == rhs.type && lhs.flags == rhs.flags);
+  auto result = (lhs.type == rhs.type && lhs.flags == rhs.flags && lhs.kmx_info.first_action == rhs.kmx_info.first_action);
   if(result) {
     LPGROUP lgp = static_cast<LPGROUP>(lhs.kmx_info.group), rgp = static_cast<LPGROUP>(rhs.kmx_info.group);
     LPKEY lrule = static_cast<LPKEY>(lhs.kmx_info.rule), rrule = static_cast<LPKEY>(rhs.kmx_info.rule);
@@ -327,9 +327,9 @@ void test_multiple_groups() {
       km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"", &gp, &kp1, {0xFFFF}}},
       km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"", &gp, &kp1, {0xFFFF}}},
 
-      km_kbp_state_debug_item{KM_KBP_DEBUG_MATCH_ENTER, 0, {}, {u"", &gp}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_MATCH_ENTER, 0, {}, {u"", &gp, nullptr, {}, 1}},
         km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gpa}},
-          km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"a", &gpa, &kpa, {0xFFFF}}},
+          km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"a", &gpa, &kpa, {0xFFFF}, 1}},
           km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"a", &gpa, &kpa, {0xFFFF}}},
         km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gpa}},
       km_kbp_state_debug_item{KM_KBP_DEBUG_MATCH_EXIT, 0, {}, {u"", &gp}},

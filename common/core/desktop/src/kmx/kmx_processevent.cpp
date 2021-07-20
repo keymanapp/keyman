@@ -270,7 +270,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     {
       /* NoMatch rule found, and is a character key */
       if(m_debug_items) {
-        m_debug_items->push_nomatch_enter(gp);
+        m_debug_items->push_nomatch_enter(gp, m_actions.Length());
       }
       PostString(gp->dpNoMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
       if(m_debug_items) {
@@ -309,7 +309,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   m_miniContext[GLOBAL_ContextStackSize-1] = 0;
 
   if(m_debug_items) {
-    m_debug_items->push_rule_enter(gp, kkp, m_miniContext, m_indexStack);
+    m_debug_items->push_rule_enter(gp, kkp, m_miniContext, m_indexStack, m_actions.Length());
   }
 
   /*
@@ -355,7 +355,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 
   if(shouldProcessNomatch && gp->dpMatch && *gp->dpMatch) {
     if(m_debug_items) {
-      m_debug_items->push_match_enter(gp);
+      m_debug_items->push_match_enter(gp, m_actions.Length());
     }
     PostString(gp->dpMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
     if(m_debug_items) {
