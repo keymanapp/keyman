@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.86 alpha 2021-07-20
+
+* chore(android): improve error reporting for kmw (#5468)
+
 ## 15.0.85 alpha 2021-07-19
 
 * feat(common/core/desktop): kmx debugger basic infrastructure 🐞 (#5425)
