@@ -121,6 +121,30 @@ public final class KMManager {
     STABLE
   }
 
+  public enum SpacebarText {
+    LANGUAGE,
+    KEYBOARD,
+    LANGUAGE_KEYBOARD,
+    BLANK;
+
+    // Maps to enum SpacebarText in kmwbase.ts
+    public static SpacebarText fromString(String mode) {
+      if(mode == null) return LANGUAGE_KEYBOARD;
+      switch(mode) {
+        case "language": return LANGUAGE;
+        case "keyboard": return KEYBOARD;
+        case "languageKeyboard": return LANGUAGE_KEYBOARD;
+        case "blank": return BLANK;
+      }
+      return LANGUAGE_KEYBOARD;
+    }
+
+    public String toString()  {
+      String modes[] = { "language", "keyboard", "languageKeyboard", "blank" };
+      return modes[this.ordinal()];
+    }
+  };
+
   private static InputMethodService IMService;
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
@@ -132,6 +156,8 @@ public final class KMManager {
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   // This is used to keep track of the starting system keyboard index while the screen is locked
   private static int sysKbStartingIndexOnLockScreen = -1;
+
+  private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
 
   protected static boolean InAppKeyboardLoaded = false;
   protected static boolean SystemKeyboardLoaded = false;
@@ -190,6 +216,7 @@ public final class KMManager {
   public static final String KMKey_OskFont = "oskFont";
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
+  public static final String KMKey_FontFamily = "family";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
 
@@ -416,7 +443,6 @@ public final class KMManager {
   /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
-   * @param keyboard KeyboardType
    * @return RelativeLayout.LayoutParams
    */
   private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
@@ -1782,6 +1808,20 @@ public final class KMManager {
 
     if (SystemKeyboard != null) {
       SystemKeyboard.isHelpBubbleEnabled = newValue;
+    }
+  }
+
+  public static SpacebarText getSpacebarText() {
+    return spacebarText;
+  }
+
+  public static void setSpacebarText(SpacebarText mode) {
+    spacebarText = mode;
+    if(InAppKeyboard != null) {
+      InAppKeyboard.setSpacebarText(mode);
+    }
+    if(SystemKeyboard != null) {
+      SystemKeyboard.setSpacebarText(mode);
     }
   }
 
