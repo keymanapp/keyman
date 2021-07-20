@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 14.0.278 stable 2021-07-20
+
+* change(common/core/web): fat-finger-performance unit-test threshold 🍒 (#5417)
+* fix(linux): Improve bitmap conversion 🍒 (#5410)
+* fix(linux): Save QR code in temporary directory 🍒 (#5411)
+* fix(linux): Fix restarting ibus when running with `sudo` 🍒 (#5413)
+* fix(linux): Don't crash with corrupt keyboard 🍒 (#5421)
+* fix(web): fixes osk resize-popping effect (#5428)
+* fix(android/engine): register lexical model in switchToNextKeyboard 🍒  (#5447)
+* feat(web): spacebar text controls 🍒 🌌 (#5406)
+* feat(android): Spacebar text controls 🍒 🌌 (#5407)
+* feat(ios): add spacebar text controls 🍒 🌌 (#5408)
+* chore(android): improve error reporting for kmw 🍒 (#5469)
+
 ## 14.0.277 stable 2021-06-29
 
 * feat(android): silent install for referred kbd 🍒 (#5266)
