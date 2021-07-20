@@ -208,6 +208,9 @@ public:
 	virtual BOOL SendActions() = 0;   // I4196
 };
 
+/* Helper function to convert App context array into core engine context */
+BOOL context_items_from_aapcontext(WCHAR const* buf, km_kbp_context_item** outPtr);
+
 extern const LPSTR ItemTypes[];
 
 #endif

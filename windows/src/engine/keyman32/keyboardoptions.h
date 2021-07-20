@@ -33,4 +33,4 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp);
  */
 void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* state);
 
-void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value);
+void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);

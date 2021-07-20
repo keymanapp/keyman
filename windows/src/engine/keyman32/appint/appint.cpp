@@ -203,3 +203,38 @@ AppIntegration::AppIntegration()
 	hwnd = NULL;
   FShiftFlags = 0;
 }
+
+/* Helper function to convert App context array into core engine context */
+BOOL context_items_from_aapcontext(WCHAR const* buf, km_kbp_context_item** outPtr)
+{
+  
+  km_kbp_context_item* context_items  = new km_kbp_context_item[wcslen(buf) + 1];
+  // would like to check bad allocation but nothrow not known to this compilier
+  WCHAR const *p = buf;
+  uint8_t contextIndex = 0;
+  while (*p) {
+    if (*p == UC_SENTINEL) {
+      // we know the only uc_sentinel code in the context is code_deadkey, which has only 1 parameter: uc_sentinel code_deadkey <deadkey_id>
+      // setup dead key context item
+      p += 2;
+      context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {*p} };
+    }
+    else {  // setup character need to handl surrogate
+       if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF) {
+        DWORD uni32char = (((*p) - 0xD800) * 0x400 + ((*(p + 1)) - 0xDBFF) + 0x10000);
+        context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {uni32char} };
+        p++;
+      }
+      else {
+        // handle as a single
+         context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
+      }
+    }
+    p++;
+  }
+  // terminate the context_items array.
+  context_items[contextIndex] = km_kbp_context_item KM_KBP_CONTEXT_ITEM_END;
+
+  *outPtr = context_items;
+  return true;
+}

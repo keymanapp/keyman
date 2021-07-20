@@ -201,5 +201,6 @@ typedef struct tagKEYBOARD
 #include "registry.h"
 #include "unicode.h"
 #include "xstring.h"
+#include <vector>
 
 #endif	// _KEYMAN64_H

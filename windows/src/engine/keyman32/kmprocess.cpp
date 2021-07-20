@@ -89,6 +89,7 @@ char *getcontext_debug() {
 	return Debug_UnicodeString(_td->app->ContextBufMax(128));
 }
 
+
 /*
 *	BOOL ProcessHook();
 *
@@ -145,7 +146,7 @@ BOOL ProcessHook()
     PWSTR buf;
     buf = _td->app->ContextBufMax(MAXCONTEXT);
     km_kbp_context_item *citems = nullptr;
-    km_kbp_context_items_from_utf16(reinterpret_cast<char16_t*>(buf), &citems);
+    context_items_from_aapcontext(buf, &citems);
     km_kbp_context_set(km_kbp_state_context(_td->state.lpActiveKBState), citems);
     km_kbp_context_items_dispose(citems);
     km_kbp_process_event(_td->state.lpActiveKBState, _td->state.vkey, static_cast<uint16_t>(Globals::get_ShiftState()));
@@ -158,19 +159,6 @@ BOOL ProcessHook()
   ///  TODO: 5011 process all the actions and data munge them into here.
   ///  Need to update(replace) the platform layer keyman32 context with the context from the core engine
 
-  km_kbp_cp buf[MAXCONTEXT];
-  size_t contextSize;
-  km_kbp_context_item* context_items;
-  km_kbp_context* LPCONTEXT = km_kbp_state_context(_td->state.lpActiveKBState);
-
-
-  if (km_kbp_context_get(LPCONTEXT, &context_items) == KM_KBP_STATUS_OK) {
-    km_kbp_context_items_to_utf16(context_items, NULL, &contextSize);
-    //buf = new km_kbp_cp[contextSize];
-    km_kbp_context_items_to_utf16(context_items, buf, &contextSize);
-  }
-  km_kbp_context_items_dispose(context_items);
-  _td->app->SetContext(reinterpret_cast<wchar_t*>(buf));
 
   // Now that we have updated the context update that action queue in the AIINT
   for (auto act = km_kbp_state_action_items(_td->state.lpActiveKBState, nullptr); act->type != KM_KBP_IT_END; act++) {
@@ -184,7 +172,7 @@ BOOL ProcessHook()
         _td->app->QueueAction(QIT_BELL, 0);
         break;
       case KM_KBP_IT_CHAR:
-        if (Uni_IsSMP(act->character)) {
+       if (Uni_IsSMP(act->character)) {
           _td->app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(act->character)));
           _td->app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(act->character)));
         }
@@ -192,12 +180,16 @@ BOOL ProcessHook()
           _td->app->QueueAction(QIT_CHAR, act->character);
         }
         break;
+      case KM_KBP_IT_MARKER:
+          // Marker in the kmx_processor is the unicode character cast to uint64_t
+          // however it is not meant to be the key. we just will not be able to have our
+          // engine cache track the dead key. 
+          _td->app->QueueAction(QIT_DEADKEY, act->marker);
+        break;
       case KM_KBP_IT_BACK:
-        // TODO: extract exact infor from DEADKEY in actin tiem
         _td->app->QueueAction(QIT_BACK,BK_DEADKEY);
         break;
       case KM_KBP_IT_PERSIST_OPT:
-          /// update keyboard options at the platform layer. ie this where keyboardoptions.cpp will have save keyboard option that needs to be written
         if (act->option != NULL)
         {
           // Allocate for 1 option plus 1 pad struct of 0's
@@ -215,7 +207,9 @@ BOOL ProcessHook()
             act->option->value != NULL)
           {
             // log"Saving keyboard option to registry");
-            SaveKeyboardOptionREGCore(_td->lpActiveKeyboard, reinterpret_cast<LPCWSTR>(act->option->key), reinterpret_cast<LPCWSTR>(act->option->value));
+            LPWSTR value = new WCHAR[sizeof(act->option->value) + 1];
+            wcscpy_s(value, sizeof(act->option->value) + 1, reinterpret_cast<LPCWSTR>(act->option->value));
+            SaveKeyboardOptionREGCore(_td->lpActiveKeyboard, reinterpret_cast<LPCWSTR>(act->option->key), value);
           }
         }
         break;
@@ -226,14 +220,12 @@ BOOL ProcessHook()
       case KM_KBP_IT_EMIT_KEYSTROKE:
         fOutputKeystroke = TRUE;
         break;
-      case KM_KBP_IT_MARKER:
-        break;
+
       default:
         assert(false); // NOT SUPPORTED
         break;
 
           }
-
 
      }
 

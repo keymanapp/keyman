@@ -19,12 +19,11 @@
 */
 #include "pch.h"
 #include "registry.h"
-#include <string>
 
 void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave);
 BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp);
 BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* const state);
-void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value);
+void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
 
 void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
 {   // I3594
@@ -146,12 +145,12 @@ void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
   IntSaveKeyboardOption(REGSZ_KeyboardOptions, kp, nStoreToSave);
 }
 
-void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value)
+void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
 {
   IntSaveKeyboardOptionREGCore(REGSZ_KeyboardOptions, kp, key, value);
 }
 
-void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value)
+void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
 {
   assert(REGKey != NULL);
   assert(kp != NULL);
@@ -161,8 +160,7 @@ void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR k
   RegistryFullAccess r(HKEY_CURRENT_USER);
   if (r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(kp->Name, TRUE) && r.OpenKey(REGKey, TRUE))
   {
-    std::wstring tempValue(value);
-    r.WriteString(key, &tempValue[0]);
+    r.WriteString(key, value);
   }
 }
 
@@ -258,11 +256,9 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
         val[255] = 0;
         keyboardOpts[n].scope = KM_KBP_OPT_KEYBOARD;
 
-        std::wstring tempKey(buf);
-        keyboardOpts[n].key = reinterpret_cast<char16_t*>(&tempKey[0]);
+        keyboardOpts[n].key = reinterpret_cast<char16_t*>(&buf[0]);
 
-        std::wstring tempValue(value);
-        keyboardOpts[n].value = reinterpret_cast<char16_t*>(&tempValue[0]);
+        keyboardOpts[n].value = reinterpret_cast<char16_t*>(&buf[0]);
       }
       n++;
     }
