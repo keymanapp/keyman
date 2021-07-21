@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.279 stable 2021-07-21
+
+* fix(ios): keyboard swapping 🍒 (#5476)
+
 ## 14.0.278 stable 2021-07-20
 
 * change(common/core/web): fat-finger-performance unit-test threshold 🍒 (#5417)
