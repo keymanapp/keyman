@@ -140,7 +140,7 @@
 #define REGSZ_AutomaticallyReportErrors "automatically report errors"              // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
 #define REGSZ_AutomaticallyReportUsage  "automatically report usage"               // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
 
-#define REGSZ_CoreIntegration "Turn on common core" // Turns on the common core - instead of windows core
+#define REGSZ_CoreIntegration "use common core" // Turns on the common core - instead of windows core
 
 /* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry
    correctly -- readonly wherever possible. */

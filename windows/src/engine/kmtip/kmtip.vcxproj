@@ -104,6 +104,18 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">kmtip64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">kmtip64</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

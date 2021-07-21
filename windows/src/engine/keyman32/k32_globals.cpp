@@ -386,7 +386,8 @@ void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL 
 */
 BOOL Globals::InitSettings() {
   /* Check for common core vs windows core */
-  f_CoreIntegration = Reg_GetDebugFlag(REGSZ_CoreIntegration, FALSE);
+  f_CoreIntegration = Reg_GetDebugFlag(REGSZ_CoreIntegration, TRUE);
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::InitSettings - Coreintegration set in '" REGSZ_CoreIntegration "' to %x", f_CoreIntegration);
   f_vk_prefix = _VK_PREFIX_DEFAULT;
   RegistryReadOnly reg(HKEY_LOCAL_MACHINE);
   if (reg.OpenKeyReadOnly(REGSZ_KeymanLM) &&

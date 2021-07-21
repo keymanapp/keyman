@@ -184,7 +184,7 @@ BOOL ProcessHook()
           // Marker in the kmx_processor is the unicode character cast to uint64_t
           // however it is not meant to be the key. we just will not be able to have our
           // engine cache track the dead key. 
-          _td->app->QueueAction(QIT_DEADKEY, act->marker);
+          _td->app->QueueAction(QIT_DEADKEY, (DWORD)act->marker);
         break;
       case KM_KBP_IT_BACK:
         _td->app->QueueAction(QIT_BACK,BK_DEADKEY);

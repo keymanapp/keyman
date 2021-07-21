@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\windows\src\global\inc;$(KEYMAN_ROOT)\windows\src\ext\sentry</IncludePath>
+    <IncludePath>$(KEYMAN_ROOT)\common\core\desktop\include;$(KEYMAN_ROOT)\common\core\desktop\build\x86\$(Configuration)\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\windows\src\global\inc;$(KEYMAN_ROOT)\windows\src\ext\sentry</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -84,7 +84,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\windows\src\global\inc;$(KEYMAN_ROOT)\windows\src\ext\sentry</IncludePath>
+    <IncludePath>$(KEYMAN_ROOT)\common\core\desktop\build\x86\$(Configuration)\include;$(KEYMAN_ROOT)\common\core\desktop\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\windows\src\global\inc;$(KEYMAN_ROOT)\windows\src\ext\sentry</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -179,8 +179,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Projects\keyman\open\windows\src\global\inc\keyman64.h" />
     <ClInclude Include="..\..\ext\sentry\sentry.h" />
+    <ClInclude Include="..\..\global\inc\keyman64.h" />
     <ClInclude Include="..\..\global\inc\keymansentry.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
