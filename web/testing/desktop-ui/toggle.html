@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for 
       a large number of languages.
     -->
-    <script src="../../release/unminified/web/kmwuitoolbar.js"></script>
+    <script src="../../release/unminified/web/kmwuitoggle.js"></script>
  
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -45,18 +45,18 @@
 
 <!-- Sample page HTML -->  
   <body onload='kmw.addKeyboards();'> 
-    <h2>KeymanWeb Sample Page - Toolbar UI Testing</h2>
-    <p>This page is designed to facilitate testing of various aspects of the Toolbar UI for
+    <h2>KeymanWeb Testing Page - Desktop UI module Testing</h2>
+    <p>This page is designed to facilitate testing of various aspects of the Toggle UI for
       KeymanWeb.  Originally developed to help address issue #1275.
     </p>
-    <div>
-    <!-- 
-      The following DIV is used to position the Button or Toolbar User Interfaces on the page.
-      If omitted, those User Interfaces will appear at the top of the document body.
-      (It is ignored by other User Interfaces.)
-    -->
-    <div id='KeymanWebControl'></div>                                                                                   
-
+    <p>Testable UI modules:</p>
+    <ul>
+      <li><a href="button.html">Button UI</a></li>
+      <li><a href="float.html">Float UI</a></li>
+      <li><strong>Toggle UI</strong> (you are here)</li>
+      <li><a href="toolbar.html">Toolbar UI</a></li>
+    </ul>
+    <div>                                                                                
     <h3>Type in your language in this text area:</h3>
     <textarea id='ta1' class='test' placeholder='Type here'></textarea>
   
