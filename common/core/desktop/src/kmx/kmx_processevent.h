@@ -12,6 +12,7 @@
 #include "kmx_xstring.h"
 #include "kmx_options.h"
 #include "kmx_environment.h"
+#include "kmx_debugger.h"
 
 /***************************************************************************/
 
@@ -24,7 +25,7 @@ namespace kmx {
 
 #define GLOBAL_ContextStackSize 80
 
-class KMX_Processor {
+class KMX_ProcessEvent {
 private:
   PKMX_WORD m_indexStack;
   PKMX_WCHAR m_miniContext;
@@ -32,10 +33,13 @@ private:
   KMSTATE m_state;
   km_kbp_state *m_kbp_state;
 
+
   kmx::KMX_Actions m_actions;
   kmx::KMX_Context m_context;
   kmx::KMX_Options m_options;
   kmx::KMX_Environment m_environment;
+
+  kmx::KMX_DebugItems *m_debug_items;
 
   INTKEYBOARDINFO m_keyboard = { 0 };
   KMX_DWORD m_modifiers = 0;
@@ -78,8 +82,8 @@ private:
   KMX_BOOL IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift);
 
 public:
-  KMX_Processor();
-  ~KMX_Processor();
+  KMX_ProcessEvent();
+  ~KMX_ProcessEvent();
 
   KMX_BOOL Load(km_kbp_path_name keyboardName);
   KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers);  // returns FALSE on error or key not matched

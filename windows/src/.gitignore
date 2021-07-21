@@ -1,16 +1,15 @@
 **/*.aps
 **/BuildLog.htm
 **/*.recipe
+**/manifest.res
 
-# Delphi target folders -- by including Debug/ and Release/ we avoid accidentally matching folders that we might create otherwise
-**/Win64/Debug/
-**/Win64/Release/
-**/Win32/Debug/
-**/Win32/Release/
-
-# These are intermediate and output folders for VC++
-**/obj
-**/x64
+# These are intermediate and output folders for VC++ and Delphi projects
+**/obj/Win32/
+**/obj/Win64/
+**/obj/x64/
+**/bin/Win32/
+**/bin/Win64/
+**/bin/x64/
 
 # Temporary build files for VC++
 **/*.FileListAbsolute.txt

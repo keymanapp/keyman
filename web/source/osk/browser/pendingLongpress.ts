@@ -40,7 +40,7 @@ namespace com.keyman.osk.browser {
         _this.resolver = resolve;
         // After the timeout, it's no longer deferred; it's being fulfilled.
         // Even if the actual subkey itself is still async.
-        _this.timerId = window.setTimeout(_this.resolve, _this.popupDelay);
+        _this.timerId = window.setTimeout(_this.resolve.bind(_this), _this.popupDelay);
       });
     }
 

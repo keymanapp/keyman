@@ -83,8 +83,8 @@
         <DCC_UsePackage>vclie50;Vcl50;Inetdb50;Inet50;Vcldb50;Vclx50;Vclbde50;proide50;keyman_components;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DebugSourcePath>C:\keyman\7.0\src\keyman\kmshell\startup\;$(DebugSourcePath)</DebugSourcePath>
-        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
-        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\bin\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_DcuOutput>.\obj\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">

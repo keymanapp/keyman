@@ -5,14 +5,14 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons locale
-    $(DCC32) setup.dpr
-    $(SENTRYTOOL_DELPHIPREP) setup.exe -dpr setup.dpr
-    $(TDS2DBG) setup.exe
-    $(COPY) setup.exe $(PROGRAM)\desktop
+    $(DELPHI_MSBUILD) setup.dproj /p:Platform=Win32
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\setup.exe -dpr setup.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\setup.exe
+    $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\desktop
 
     # This version of setup.exe is for redistribution as a
     # bundled installer and is not signed
-    $(COPY) setup.exe $(PROGRAM)\desktop\setup-redist.exe
+    $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\desktop\setup-redist.exe
 
 locale:
     $(ROOT)\bin\buildtools\devtools.exe -buildsetupstrings locale\ .\
@@ -32,9 +32,6 @@ signcode:
 wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\desktop\setup.exe /t keyman-windows
     $(SYMSTORE) $(DEBUGPATH)\desktop\setup.dbg /t keyman-windows
-
-backup:
-    $(WZZIP) $(BUILD)\desktop\setup.zip  $(BACKUPDEFAULTS) setup.exe
 
 test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true

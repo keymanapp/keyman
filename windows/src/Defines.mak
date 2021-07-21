@@ -103,6 +103,12 @@ MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_QUICK_BUILD_KEYMAN) $(MAKEFLAG_USERDEFINE
 # Delphi build commands
 #
 
+!IFDEF DEBUG
+TARGET_PATH=Debug
+!ELSE
+TARGET_PATH=Release
+!ENDIF
+
 # DEVTOOLS=$(ROOT)\src\buildtools\devtools\devtools.exe
 DEVTOOLS=$(PROGRAM)\buildtools\devtools.exe
 
@@ -112,9 +118,9 @@ DELPHIWARNINGS=-W+MESSAGE_DIRECTIVE -W+IMPLICIT_STRING_CAST -W+IMPLICIT_STRING_C
 DELPHIWARNINGS=-W-MESSAGE_DIRECTIVE -W-IMPLICIT_STRING_CAST -W-IMPLICIT_STRING_CAST_LOSS -W-EXPLICIT_STRING_CAST -W-EXPLICIT_STRING_CAST_LOSS -W-CVT_WCHAR_TO_ACHAR -W-CVT_NARROWING_STRING_LOST -W-CVT_ACHAR_TO_WCHAR -W-CVT_WIDENING_STRING_LOST -W-UNICODE_TO_LOCALE -W-LOCALE_TO_UNICODE -W-IMPLICIT_VARIANTS -W-IMPLICIT_INTEGER_CAST_LOSS -W-IMPLICIT_CONVERSION_LOSS -W-COMBINING_SIGNED_UNSIGNED64 -W-COMBINING_SIGNED_UNSIGNED64
 !ENDIF
 
-DELPHIDPRPARAMS=-Q -B -GD -H -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win
-DELPHIDPRPARAMS64=-Q -B -GD -H -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win
-DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData
+DELPHIDPRPARAMS=-Q -B -GD -H -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win32\$(TARGET_PATH) -E.\bin\Win32\$(TARGET_PATH)
+DELPHIDPRPARAMS64=-Q -B -GD -H -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win64\$(TARGET_PATH) -E.\bin\Win64\$(TARGET_PATH)
+DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData -NUobj\Win32\$(TARGET_PATH)
 
 !IFDEF NOUI
 DCC32="$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
@@ -138,15 +144,13 @@ DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 # Warning: whitespace is horribly significant in the following macro -- particularly lack of space before &&
 DELPHI_MSBUILD=set DCC32PATH=$(DCC32PATH)&& $(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_DEBUG)
 
-!IFDEF DEBUG
-TARGET_PATH=Debug
-!ELSE
-TARGET_PATH=Release
-!ENDIF
+# Visual C++ x86, x64
+WIN32_TARGET_PATH=bin\Win32\$(TARGET_PATH)
+X64_TARGET_PATH=bin\x64\$(TARGET_PATH)
 
-WIN32_TARGET_PATH=Win32\$(TARGET_PATH)
-WIN64_TARGET_PATH=Win64\$(TARGET_PATH)
-X64_TARGET_PATH=x64\$(TARGET_PATH)
+# Delphi x86, x64
+# WIN32_TARGET_PATH=...
+WIN64_TARGET_PATH=bin\Win64\$(TARGET_PATH)
 
 #
 # Other program build commands
@@ -166,11 +170,9 @@ MT=mt.exe
 VCBUILD=error
 
 !IFDEF DEBUG
-  MSBUILD_TARGET=Debug
   MSBUILD_BUILD=/t:Build /p:Configuration=Debug
   MSBUILD_CLEAN=/t:Clean /p:Configuration=Debug
 !ELSE
-  MSBUILD_TARGET=Release
   MSBUILD_BUILD=/t:Rebuild /p:Configuration=Release
   MSBUILD_CLEAN=/t:Clean /p:Configuration=Release
 !ENDIF
@@ -202,8 +204,6 @@ WIXLIT=$(WIXPATH)\lit.exe -wx -nologo
 WIXHEAT=$(WIXPATH)\heat.exe
 
 LINKPATH=link.exe
-
-BACKUPDEFAULTS=*.map *.tds *.rsm *.dbg *.pdb *.cod
 
 TORTOISEPROC=C:\Progra~1\TortoiseSVN\bin\TortoiseProc.exe
 

@@ -30,6 +30,7 @@ build-jcldbg:
 
 build-jvcl-docking:
     cd $(EXT)\jedi\packages
+    @-mkdir obj\Win32\$(TARGET_PATH)
     $(DCC32DPK) Jcl.dpk
     $(DCC32DPK) JclVcl.dpk
     $(DCC32DPK) JvCore.dpk

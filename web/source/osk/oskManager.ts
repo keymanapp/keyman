@@ -623,12 +623,14 @@ namespace com.keyman.osk {
 
       var b = this._Box, bs = b.style;
       if('left' in p) {
-        bs.left=(p['left']-dom.Utils.getAbsoluteX(b)+b.offsetLeft)+'px';
+        this.x = p['left'] - dom.Utils.getAbsoluteX(b) + b.offsetLeft;
+        bs.left= this.x + 'px';
         this.dfltX=bs.left;
       }
 
       if('top' in p) {
-        bs.top=(p['top']-dom.Utils.getAbsoluteY(b)+b.offsetTop)+'px';
+        this.y = p['top'] - dom.Utils.getAbsoluteY(b) + b.offsetTop;
+        bs.top = this.y + 'px';
         this.dfltY=bs.top;
       }
 

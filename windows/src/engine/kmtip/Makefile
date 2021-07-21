@@ -6,11 +6,11 @@
 
 build: version.res dirs
     $(MSBUILD) kmtip.vcxproj $(MSBUILD_BUILD) /p:Platform=Win32
+    $(COPY) $(WIN32_TARGET_PATH)\kmtip.dll $(PROGRAM)\engine
+    $(COPY) $(WIN32_TARGET_PATH)\kmtip.pdb $(DEBUGPATH)\engine
     $(MSBUILD) kmtip.vcxproj $(MSBUILD_BUILD) /p:Platform=x64
-    $(COPY) x86\kmtip.dll $(PROGRAM)\engine
-    $(COPY) x64\kmtip64.dll $(PROGRAM)\engine\kmtip64.dll
-    $(COPY) x86\kmtip.pdb $(DEBUGPATH)\engine
-    $(COPY) x64\kmtip64.pdb $(DEBUGPATH)\engine\kmtip64.pdb
+    $(COPY) $(X64_TARGET_PATH)\kmtip64.dll $(PROGRAM)\engine\kmtip64.dll
+    $(COPY) $(X64_TARGET_PATH)\kmtip64.pdb $(DEBUGPATH)\engine\kmtip64.pdb
 
 clean: def-clean
     $(MSBUILD) kmtip.vcxproj $(MSBUILD_CLEAN) /p:Platform=Win32
@@ -25,10 +25,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\engine\kmtip64.dll /t keyman-engine-windows
     $(SYMSTORE) $(DEBUGPATH)\engine\kmtip.pdb /t keyman-engine-windows
     $(SYMSTORE) $(DEBUGPATH)\engine\kmtip64.pdb /t keyman-engine-windows
-
-backup:
-    $(WZZIP) $(BUILD)\engine\kmtip.zip x86\kmtip.pdb $(BACKUPDEFAULTS) x86\kmtip.dll
-    $(WZZIP) $(BUILD)\engine\kmtip64.zip x64\kmtip64.pdb $(BACKUPDEFAULTS) x64\kmtip64.dll
 
 install:
     $(COPY) $(PROGRAM)\engine\kmtip.dll "$(INSTALLPATH_KEYMANENGINE)\kmtip.dll"

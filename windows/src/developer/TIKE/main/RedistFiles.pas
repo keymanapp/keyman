@@ -64,7 +64,6 @@ function GetRedistProjectTemplatePath: string;
 function GetWixPath: string;
 function GetStockKCTPath: string;
 function GetDebugKMCmpDllPath: string;
-function GetUITemplatePath: string;
 function GetUnicodeDataSourcePath(DefaultPath: string = ''): string;  // I3463
 function GetXMLTemplatePath: string;
 function GetDeveloperRootPath: string;
@@ -77,6 +76,7 @@ uses
   Winapi.Windows,
 
   DebugPaths,
+  KeymanPaths,
   Upload_Settings,
   ErrorControlledRegistry,
   RegistryKeys;
@@ -133,14 +133,16 @@ begin
   Result := GetDebugPath('Debug_KMCMPDLLPath', ExtractFilePath(ParamStr(0)));
 end;
 
-function GetUITemplatePath: string;
-begin
-  Result := GetDebugPath('Debug_UITemplatePath', ExtractFilePath(ParamStr(0))+'uitemplates\');
-end;
-
 function GetXMLTemplatePath: string;
+var
+  root: string;
+const
+  DevTemplatePath = 'windows\src\developer\tike\xml\';
 begin
-  Result := GetDebugPath('Debug_XMLTemplatePath', ExtractFilePath(ParamStr(0))+'xml\');
+  if TKeymanPaths.RunningFromSource(root)
+    then Result := root + DevTemplatePath
+    else Result := ExtractFilePath(ParamStr(0))+'xml\';
+  Result := GetDebugPath('Debug_XMLTemplatePath', Result);
 end;
 
 

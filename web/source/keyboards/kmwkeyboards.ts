@@ -61,6 +61,8 @@ namespace com.keyman.keyboards {
     'KFont': KeyboardFont;
     'KOskFont': KeyboardFont;
 
+    'displayName': string; // Display name as shown on spacebar
+
     // Used when loading a stub's keyboard.
     asyncLoader?: any;
 
@@ -308,6 +310,7 @@ namespace com.keyman.keyboards {
       sp['KR'] = (typeof sp['KR'] === 'undefined') ? KeyboardManager.regions[rIndex] : sp['KR'];
       sp['KRC'] = (typeof sp['KRC'] === 'undefined') ? KeyboardManager.regionCodes[rIndex] : sp['KRC'];
       sp['KN'] = (typeof sp['KN'] === 'undefined') ? kp['name'] : sp['KN'];
+      sp['displayName'] = (typeof sp['displayName'] === 'undefined') ? kp['displayName'] : sp['displayName'];
 
       if(typeof(sp['KF']) == 'undefined') {
         rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
@@ -699,7 +702,7 @@ namespace com.keyman.keyboards {
               manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
               manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
             }
-            
+
             manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);
 
             // Prepare and show the OSK for this keyboard
@@ -1096,7 +1099,7 @@ namespace com.keyman.keyboards {
       } catch(err) {
         result = new Error(CLOUD_REGISTRATION_ERR + err);
       }
-      
+
       if(promiseid) {
         const promiseFuncs = this.registrationResolvers[promiseid];
         window.clearTimeout(promiseid);
@@ -1295,7 +1298,7 @@ namespace com.keyman.keyboards {
         const Lscript: HTMLScriptElement = keymanweb.util._CreateElement('script');
 
         const queryConfig = '?jsonp=keyman.register&languageidtype=bcp47&version='+keymanweb['version'];
-  
+
         // Set callback timer
         const timeoutID = window.setTimeout(function() {
           delete kbdManager.registrationResolvers[timeoutID];
@@ -1312,7 +1315,7 @@ namespace com.keyman.keyboards {
 
         Lscript.onload = function(event: Event) {
           window.clearTimeout(timeoutID);
-          // This case should only happen if a returned, otherwise-valid keyboard 
+          // This case should only happen if a returned, otherwise-valid keyboard
           // script does not ever call `register`.  Also provides default handling
           // should `register` fail to report results/failure correctly.
           if(kbdManager.registrationResolvers[timeoutID]) {
@@ -1324,13 +1327,13 @@ namespace com.keyman.keyboards {
           }
         };
 
-        // Note:  at this time (24 May 2021), this is also happens for "successful" 
+        // Note:  at this time (24 May 2021), this is also happens for "successful"
         //        API calls where there is no matching keyboard ID.
-        //        
+        //
         //        The returned 'error' JSON object is sent with an HTML error code (404)
         //        and does not call `keyman.register`.  Even if it did the latter, the
         //        404 code would likely prevent the returned script's call.
-        Lscript.onerror = function(event: string | Event, source?: string, 
+        Lscript.onerror = function(event: string | Event, source?: string,
                                   lineno?: number, colno?: number, error?: Error) {
           window.clearTimeout(timeoutID);
           try {
@@ -1345,7 +1348,7 @@ namespace com.keyman.keyboards {
         }
 
         Lscript.src = URL + queryConfig + cmd + tFlag;
-  
+
         try {
           document.body.appendChild(Lscript);
         } catch(ex) {
@@ -1526,6 +1529,7 @@ namespace com.keyman.keyboards {
      */
     _registerStub(Pstub): number {
       var Lk;
+      Pstub = { ... Pstub}; // shallow clone the stub object
 
       // In initialization not complete, list the stub to be registered on completion of initialization
       if(!this.keymanweb.initialized) {

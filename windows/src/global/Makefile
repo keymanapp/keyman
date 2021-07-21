@@ -36,9 +36,6 @@ clean:
 signcode:
   @rem no signcode
 
-backup:
-  @rem
-
 test-manifest:
   @rem
 
