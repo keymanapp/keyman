@@ -73,6 +73,14 @@ class ModelCompositor {
 
     if(!(transformDistribution instanceof Array)) {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
+    } else if(transformDistribution.length == 0) {
+      transformDistribution.push({
+        sample: {
+          insert: '',
+          deleteLeft: 0
+        },
+        p: 1.0
+      })
     }
 
     let inputTransform = transformDistribution.sort(function(a, b) {
