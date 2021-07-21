@@ -406,7 +406,7 @@ namespace com.keyman.text {
 
         for(i=0; i < lockNames.length; i++) {
           if(lockStates & Codes.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = lockStates & Codes.modifierCodes[lockNames[i]];
+            this.stateKeys[lockKeys[i]] = !!(lockStates & Codes.modifierCodes[lockNames[i]]);
           }
         }
       } else if(d) {
@@ -427,8 +427,42 @@ namespace com.keyman.text {
         }
       }
 
+      this.updateStates();
+
+      if(this.activeKeyboard.isMnemonic && this.stateKeys['K_CAPS']) {
+        // Modifier keypresses doesn't trigger mnemonic manipulation of modifier state.
+        // Only an output key does; active use of Caps will also flip the SHIFT flag.
+        if(!e || !KeyboardProcessor.isModifier(e)) {
+          // Mnemonic keystrokes manipulate the SHIFT property based on CAPS state.
+          // We need to unflip them when tracking the OSK layer.
+          keyShiftState ^= Codes.modifierCodes['SHIFT'];
+        }
+      }
+
       this.layerId = this.getLayerId(keyShiftState);
       return true;
+    }
+
+    private updateStates(): void {
+      var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
+      var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+
+      for(let i=0; i < lockKeys.length; i++) {
+        const key = lockKeys[i];
+        const flag = this.stateKeys[key];
+        const onBit = lockNames[i];
+        const offBit = 'NO_' + lockNames[i];
+
+        // Ensures that the current mod-state info properly matches the currently-simulated
+        // state key states.
+        if(flag) {
+          this.modStateFlags |= Codes.modifierCodes[onBit];
+          this.modStateFlags &= ~Codes.modifierCodes[offBit];
+        } else {
+          this.modStateFlags &= ~Codes.modifierCodes[onBit];
+          this.modStateFlags |= Codes.modifierCodes[offBit];
+        }
+      }
     }
 
     getLayerId(modifier: number): string {
