@@ -157,54 +157,54 @@ BOOL ProcessHook()
   ///  TODO: 5011 process all the actions and data munge them into here.
   ///  Need to update(replace) the platform layer keyman32 context with the context from the core engine
 
-  buf[0] = 0; // clear buffer
-  size_t contextSize;
-  km_kbp_context_items_to_utf16(_td->activeKbState,buf, &contextSize);
+  //buf[0] = 0; // clear buffer
+  //size_t contextSize;
+  //km_kbp_context_items_to_utf16(_td->activeKbState,buf, &contextSize);
   // call a public function to set the Context Or if we aren't going to update the interface for aiTIP
   // Then reset the context and call append for each char in buf.
 
   // Now that we have updated the context update that action queue in the AIINT
-    for (auto act = km_kbp_state_action_items(_td->activeKbState, nullptr); act->type != KM_KBP_IT_END; act++) {
+  //  for (auto act = km_kbp_state_action_items(_td->activeKbState, nullptr); act->type != KM_KBP_IT_END; act++) {
 
-      switch (act.type)
-      {
-        case KM_KBP_IT_END:
-          // error assert(false);
-        break;
-        case KM_KBP_IT_ALERT:
-          _td->app->QueueAction(QIT_BELL, 0);
-          break;
-        case KM_KBP_IT_CHAR:
-            // unicode scalar value is stored in
-            //act->character;
-          _td->app->QueueAction(QIT_CHAR,Convert_to_utf16(act->character));
-          break;
-        case KM_KBP_IT_MARKER:
-          // act->marker
-          _td->app->QueueAction(QIT_DEADKEY,Convert_To_KEY(act->marker));
-          break;
-        case KM_KBP_IT_BACK:
-          /// TODO: 5011 The context is changed in processing engine so this may not match the cached context in the (this) keyman32 layer.
-          _td->app->QueueAction(QIT_BACK,BK_DEADKEY);
-          break;
-        case KM_KBP_IT_PERSIST_OPT:
-             /// update keyboard options at the platform layer.
-          break;
-        case KM_KBP_IT_INVALIDATE_CONTEXT:
-          // Reset context
-           _td->app->ResetContext();
-          break;
-        case KM_KBP_IT_EMIT_KEYSTROKE:
-          fOutputKeystroke = TRUE;
-          break;
-        default:
-          assert(false); // NOT SUPPORTED
-          break;
+    //   switch (act.type)
+    //   {
+    //     case KM_KBP_IT_END:
+    //       // error assert(false);
+    //     break;
+    //     case KM_KBP_IT_ALERT:
+    //       _td->app->QueueAction(QIT_BELL, 0);
+    //       break;
+    //     case KM_KBP_IT_CHAR:
+    //         // unicode scalar value is stored in
+    //         //act->character;
+    //       _td->app->QueueAction(QIT_CHAR,Convert_to_utf16(act->character));
+    //       break;
+    //     case KM_KBP_IT_MARKER:
+    //       // act->marker
+    //       _td->app->QueueAction(QIT_DEADKEY,Convert_To_KEY(act->marker));
+    //       break;
+    //     case KM_KBP_IT_BACK:
+    //       /// TODO: 5011 The context is changed in processing engine so this may not match the cached context in the (this) keyman32 layer.
+    //       _td->app->QueueAction(QIT_BACK,BK_DEADKEY);
+    //       break;
+    //     case KM_KBP_IT_PERSIST_OPT:
+    //          /// update keyboard options at the platform layer.
+    //       break;
+    //     case KM_KBP_IT_INVALIDATE_CONTEXT:
+    //       // Reset context
+    //        _td->app->ResetContext();
+    //       break;
+    //     case KM_KBP_IT_EMIT_KEYSTROKE:
+    //       fOutputKeystroke = TRUE;
+    //       break;
+    //     default:
+    //       assert(false); // NOT SUPPORTED
+    //       break;
 
-            }
+    //         }
 
 
-    }
+    // }
 
  /// TODO: 5011 process this in action items iterations. Do we want to process this when we find the action in the list from the core engine or
  // do we process the emit key stroke with whatever we have queued up to this point.

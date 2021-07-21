@@ -53,9 +53,91 @@
 
 // I3594  // I4220
 
+BOOL SelectKeyboardCore(DWORD KeymanID)
+{
+  int i;
+  HWND hwnd = GetFocus();
+
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) return FALSE;
+
+  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ENTER SelectKeyboard-------------------------------------------");
+  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ENTER SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+    GetKeyboardLayout(0),
+    _td->ActiveKeymanID,
+    _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
+    //_td->NextKeyboardLayout,
+    KeymanID);
+
+  __try
+  {
+    if (_td->ForceFileName[0])
+    {
+      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: Ignored due to ForceFile");
+      return FALSE;	// Keyboard file is force-loaded
+    }
+
+    KMHideIM();
+    /** TODO: 5011 is this just IDML dlls */
+    //if (_td->lpActiveKeyboard) DeactivateDLLs(_td->lpActiveKeyboard);
+    _td->lpActiveKeyboard = NULL;
+    _td->ActiveKeymanID = KEYMANID_NONKEYMAN;
+
+    //SendDebugMessageFormat(hwnd,sdmGlobal,0,"SelectKeyboard: nKeyboards=%d", nKeyboards);
+
+    for (i = 0; i < _td->nKeyboards; i++)
+    {
+      if (_td->lpKeyboards[i].KeymanID == KeymanID)
+      {
+        if (!_td->lpKeyboards[i].Keyboard && !LoadlpKeyboard(i))
+        {
+          SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: Unable to load");
+          return TRUE;
+        }
+
+        _td->lpActiveKeyboard = &_td->lpKeyboards[i];
+        _td->ActiveKeymanID = _td->lpActiveKeyboard->KeymanID;
+
+        SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: NewKeymanID: %x", _td->ActiveKeymanID);
+
+        if (_td->app) _td->app->ResetContext();
+        ResetCapsLock();
+
+        SelectApplicationIntegration();   // I4287
+        if (_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
+        _td->state.windowunicode = !_td->app || _td->app->IsUnicode();
+
+        ActivateDLLs(_td->lpActiveKeyboard);
+
+        return TRUE;
+      }
+      if (IsFocusedThread())
+      {
+        SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: Keyboard Not Found");
+      }
+    }
+  }
+
+    __finally
+    {
+      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+        GetKeyboardLayout(0),
+        _td->ActiveKeymanID,
+        _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
+        KeymanID);
+      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboard-------------------------------------------");
+    }
+    return TRUE;
+  
+}
+
 BOOL SelectKeyboard(DWORD KeymanID)
 {
-	int i;
+  if (Globals::get_CoreIntegration())
+  {
+    return SelectKeyboardCore(KeymanID);
+  }
+  int i;
   HWND hwnd = GetFocus();
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
@@ -78,7 +160,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
 		}
 
 		KMHideIM();
-
+    /** TODO: 5011 is this just IDML dlls */
 		if(_td->lpActiveKeyboard) DeactivateDLLs(_td->lpActiveKeyboard);
 		_td->lpActiveKeyboard = NULL;
 		_td->ActiveKeymanID = KEYMANID_NONKEYMAN;

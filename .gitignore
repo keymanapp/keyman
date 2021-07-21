@@ -162,7 +162,8 @@ resources/environment.sh
 
 # Copy of the master VERSION.md used for Linux packaging
 /common/core/desktop/VERSION.md
-
+# Test common core keyboard files
+common/core/desktop/tests/unit/kmx/*.kmx
 **/node_modules/
 lerna-debug.log
 

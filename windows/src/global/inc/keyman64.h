@@ -76,6 +76,7 @@
 #include <assert.h>
 #include <msctf.h>
 #include "compiler.h"
+#include <keyman/keyboardprocessor.h>
 
 #ifdef _WIN64
 #define LIBRARY_NAME "KEYMAN64"
