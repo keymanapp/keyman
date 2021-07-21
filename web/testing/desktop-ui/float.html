@@ -33,18 +33,23 @@
       a large number of languages.
     -->
     <script src="../../release/unminified/web/kmwuifloat.js"></script>
+
+    <!-- Add keyboard management script for local selection of keyboards to use -->
+    <script src="../commonHeader.js"></script>
  
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       var kmw=window.keyman;
       kmw.init({
-		      attachType:'auto'
-        });
+        attachType:'auto'
+      }).then(function() {
+        loadKeyboards(1);
+      });
     </script> 
   </head>
 
 <!-- Sample page HTML -->  
-  <body onload='kmw.addKeyboards();'> 
+  <body> 
     <h2>KeymanWeb Testing Page - Desktop UI module Testing</h2>
     <p>This page is designed to facilitate testing of various aspects of the Float UI for
       KeymanWeb.
