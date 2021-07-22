@@ -8,8 +8,7 @@ namespace
 {
 
 inline
-bool operator==(km_kbp_option_item const & lhs, km_kbp_option_item const & rhs)
-{
+bool operator==(km_kbp_option_item const & lhs, km_kbp_option_item const & rhs) {
   return lhs.scope == rhs.scope
       && std::u16string(lhs.key) == rhs.key
       && std::u16string(lhs.value) == rhs.value;
@@ -47,13 +46,13 @@ void print_action_item(const char *title, km_kbp_action_item const & item) {
   }
 }
 
-bool operator==(km_kbp_action_item const & lhs,
-                km_kbp_action_item const & rhs)
-{
+bool operator==(
+  km_kbp_action_item const & lhs,
+  km_kbp_action_item const & rhs
+) {
   auto result = (lhs.type == rhs.type);
   if(result) {
-    switch(lhs.type)
-    {
+    switch(lhs.type) {
       case KM_KBP_IT_END:                break;
       case KM_KBP_IT_CHAR:               result = lhs.character == rhs.character; break;
       case KM_KBP_IT_MARKER:             result = lhs.marker == rhs.marker; break;
@@ -74,9 +73,10 @@ bool operator==(km_kbp_action_item const & lhs,
   return result;
 }
 
-bool action_items(km_kbp_state const * state,
-                  std::initializer_list<km_kbp_action_item> const & expected)
-{
+bool action_items(
+  km_kbp_state const * state,
+  std::initializer_list<km_kbp_action_item> const & expected
+) {
   size_t n = 0;
   auto act = km_kbp_state_action_items(state, &n);
 
@@ -86,7 +86,9 @@ bool action_items(km_kbp_state const * state,
       print_action_item("next expected item:", rhs);
       return false;
     }
-    if (!(*act++ == rhs)) return false;
+    if (!(*act++ == rhs)) {
+      return false;
+    }
   }
 
   if(n != 0) {

@@ -337,7 +337,6 @@ int print_sizeof() {
   std::cout << std::endl;
   std::cout << "keyboardprocessor.h:" << std::endl;
   std::cout << "sizeof(km_kbp_context_item): " << sizeof(km_kbp_context_item) << std::endl;
-  std::cout << "sizeof(km_kbp_context_item): " << sizeof(km_kbp_context_item) << std::endl;
   std::cout << "sizeof(km_kbp_action_item): " << sizeof(km_kbp_action_item) << std::endl;
   std::cout << "sizeof(km_kbp_option_item): " << sizeof(km_kbp_option_item) << std::endl;
   std::cout << "sizeof(km_kbp_keyboard_attrs): " << sizeof(km_kbp_keyboard_attrs) << std::endl;
