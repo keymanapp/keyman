@@ -65,10 +65,15 @@ typedef struct {
  */
 
 typedef struct {
-  km_kbp_cp context[DEBUG_MAX_CONTEXT];
+  km_kbp_cp context[DEBUG_MAX_CONTEXT];     // The context matched by the rule (? may not need this?) // TODO: rename to context_matched
   void *group;  // LPGROUP
   void *rule;   // LPKEY
   uint16_t store_offsets[DEBUG_STORE_OFFSETS_SIZE];	// pairs--store, char position, terminated by 0xFFFF // TODO use a better structure here
+
+  /// Track the actions index in the actions that will be returned to
+  /// the debugger; the debugger uses this to determine when to
+  /// execute the actions when single-stepping.
+  uint16_t first_action;
 } km_kbp_state_debug_kmx_info;
 
 /**

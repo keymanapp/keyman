@@ -89,7 +89,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
     m_debug_items = new KMX_DebugItems(&state->debug_items());
   } else {
     // We want to have a clean debug state even if it is not in use
-    state->debug_items().push_end(0);
+    state->debug_items().push_end(m_actions.Length(), 0);
   }
 
   if (m_environment.capsLock())
@@ -120,7 +120,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
   ProcessGroup(gp, &fOutputKeystroke);
 
   if(m_debug_items) {
-    m_debug_items->push_end(fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
+    m_debug_items->push_end(m_actions.Length(), fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
     // m_debug_items is just a helper class that pushes to state->debug_items(),
     // so we can throw it away after we are done with it
     delete m_debug_items;
@@ -154,7 +154,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   int sdmfI;
 
   if(m_debug_items) {
-    m_debug_items->push_group_enter(gp);
+    m_debug_items->push_group_enter(m_actions.Length(), gp);
   }
 
   /*
@@ -180,7 +180,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     DebugLog("Aborting output: m_state.LoopTimes exceeded.");
     m_state.StopOutput = TRUE;
     if(m_debug_items) {
-      m_debug_items->push_group_exit(gp, KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW);
+      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW, gp);
     }
     return FALSE;
   }
@@ -250,7 +250,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
           m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
           if(m_debug_items) {
-            m_debug_items->push_group_exit(gp, KM_KBP_DEBUG_FLAG_NOMATCH);
+            m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
           }
           *pOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
@@ -260,7 +260,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
         if(m_debug_items) {
-          m_debug_items->push_group_exit(gp, KM_KBP_DEBUG_FLAG_NOMATCH);
+          m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
         }
         *pOutputKeystroke = TRUE;
         return FALSE;
@@ -270,11 +270,11 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     {
       /* NoMatch rule found, and is a character key */
       if(m_debug_items) {
-        m_debug_items->push_nomatch_enter(gp);
+        m_debug_items->push_nomatch_enter(m_actions.Length(), gp);
       }
       PostString(gp->dpNoMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
       if(m_debug_items) {
-        m_debug_items->push_nomatch_exit(gp);
+        m_debug_items->push_nomatch_exit(m_actions.Length(), gp);
       }
     }
     else if (m_state.charCode != 0 && m_state.charCode != 0xFFFF && gp->fUsingKeys)
@@ -284,7 +284,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     }
 
     if(m_debug_items) {
-      m_debug_items->push_group_exit(gp, KM_KBP_DEBUG_FLAG_NOMATCH);
+      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
     }
     return TRUE;
   }
@@ -309,7 +309,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   m_miniContext[GLOBAL_ContextStackSize-1] = 0;
 
   if(m_debug_items) {
-    m_debug_items->push_rule_enter(gp, kkp, m_miniContext, m_indexStack);
+    m_debug_items->push_rule_enter(m_actions.Length(), gp, kkp, m_miniContext, m_indexStack);
   }
 
   /*
@@ -350,21 +350,21 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   KMX_BOOL shouldProcessNomatch = PostString(p, m_keyboard.Keyboard, NULL, pOutputKeystroke) == psrCheckMatches;
 
   if(m_debug_items) {
-    m_debug_items->push_rule_exit(gp, kkp, m_miniContext, m_indexStack);
+    m_debug_items->push_rule_exit(m_actions.Length(), gp, kkp, m_miniContext, m_indexStack);
   }
 
   if(shouldProcessNomatch && gp->dpMatch && *gp->dpMatch) {
     if(m_debug_items) {
-      m_debug_items->push_match_enter(gp);
+      m_debug_items->push_match_enter(m_actions.Length(), gp);
     }
     PostString(gp->dpMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
     if(m_debug_items) {
-      m_debug_items->push_match_exit(gp);
+      m_debug_items->push_match_exit(m_actions.Length(), gp);
     }
   }
 
   if(m_debug_items) {
-    m_debug_items->push_group_exit(gp, 0);
+    m_debug_items->push_group_exit(m_actions.Length(), 0, gp);
   }
 
   return TRUE;
