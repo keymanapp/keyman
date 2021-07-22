@@ -332,7 +332,7 @@ namespace com.keyman.text.prediction {
       }
 
       let transform = transcription.transform;
-      var promise = this.currentPromise = this.lmEngine.predict(alternates || transcription.transform, context);
+      var promise = this.currentPromise = this.lmEngine.predict(alternates, context);
 
       let lp = this;
       return promise.then(function(suggestions: Suggestion[]) {
