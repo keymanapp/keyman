@@ -253,8 +253,15 @@ class ModelCompositor {
     for(let prediction of rawPredictions) {
       // Combine duplicate samples.
       let displayText = prediction.sample.displayAs;
+      let preserveAsKeep = displayText == keepOptionText;
 
-      if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
+      // De-duplication should be case-insensitive, but NOT
+      // diacritic-insensitive.
+      if(this.lexicalModel.languageUsesCasing) {
+        preserveAsKeep = preserveAsKeep || displayText == this.lexicalModel.applyCasing('lower', keepOptionText);
+      }
+
+      if(preserveAsKeep) {
         // Preserve the original, pre-keyed version of the text.
         if(!keepOption) {
           let baseTransform = prediction.sample.transform;
