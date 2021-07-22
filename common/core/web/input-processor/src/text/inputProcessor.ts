@@ -171,6 +171,11 @@ namespace com.keyman.text {
               if(pair.p < KEYSTROKE_EPSILON) {
                 break;
               } else if(timer && timer() >= TIMEOUT_THRESHOLD) {
+                // It's always possible that the thread _executing_ our JS got paused,
+                // even if JS itself is single-threaded.
+                if(alternates.length == 0) {
+                  alternates = undefined;
+                }
                 break;
               }
 
