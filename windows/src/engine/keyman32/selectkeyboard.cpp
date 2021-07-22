@@ -61,8 +61,8 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
 
-  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ENTER SelectKeyboard-------------------------------------------");
-  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ENTER SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ENTER SelectKeyboardCore-------------------------------------------");
+  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ENTER SelectKeyboardCore: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
     GetKeyboardLayout(0),
     _td->ActiveKeymanID,
     _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
@@ -91,14 +91,14 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
       {
         if (!_td->lpKeyboards[i].Keyboard && !LoadlpKeyboard(i))
         {
-          SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: Unable to load");
+          SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboardCore: Unable to load");
           return TRUE;
         }
 
         _td->lpActiveKeyboard = &_td->lpKeyboards[i];
         _td->ActiveKeymanID = _td->lpActiveKeyboard->KeymanID;
 
-        SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: NewKeymanID: %x", _td->ActiveKeymanID);
+        SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboardCore: NewKeymanID: %x", _td->ActiveKeymanID);
 
         if (_td->app) _td->app->ResetContext();
         ResetCapsLock();
@@ -113,19 +113,19 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
       }
       if (IsFocusedThread())
       {
-        SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: Keyboard Not Found");
+        SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboardCore: Keyboard Not Found");
       }
     }
   }
 
     __finally
     {
-      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboardCore: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
         GetKeyboardLayout(0),
         _td->ActiveKeymanID,
         _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
         KeymanID);
-      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboard-------------------------------------------");
+      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboardCore-------------------------------------------");
     }
     return TRUE;
   
@@ -160,7 +160,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
 		}
 
 		KMHideIM();
-    /** TODO: 5011 is this just IDML dlls */
+
 		if(_td->lpActiveKeyboard) DeactivateDLLs(_td->lpActiveKeyboard);
 		_td->lpActiveKeyboard = NULL;
 		_td->ActiveKeymanID = KEYMANID_NONKEYMAN;

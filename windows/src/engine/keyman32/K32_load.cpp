@@ -89,19 +89,32 @@ BOOL LoadlpKeyboardCore(int i)
   if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
   size_t charSize = strlen(buf) + 1;
 
-  wchar_t* keyboardPath = new wchar_t[charSize];
+  LPWSTR keyboardPath = new WCHAR[charSize];
 
   // Convert char* string to a wchar_t* string.
   size_t convertedChars = 0;
   mbstowcs_s(&convertedChars, keyboardPath, charSize, buf, _TRUNCATE);
 
+  if (_td->lpKeyboards[i].coreKeyboard)
+  {
+    km_kbp_keyboard_dispose(_td->lpKeyboards[i].coreKeyboard);
+    _td->lpKeyboards[i].coreKeyboard = NULL;
+  }
+
   if  (KM_KBP_STATUS_OK != km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard)) return FALSE;
-  // TODO: 5011 handle dlls
+  // TODO: 5442 handle dlls
   //LoadDLLs(&_td->lpKeyboards[i]);
   const km_kbp_option_item test_env_opts[] =
   {
     KM_KBP_OPTIONS_END
   };
+
+  if (_td->state.lpActiveKBState)
+  {
+      km_kbp_state_dispose(_td->state.lpActiveKBState);
+      _td->state.lpActiveKBState = NULL;
+  }
+
   km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->state.lpActiveKBState);
   LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->state.lpActiveKBState);
 
@@ -113,6 +126,10 @@ BOOL LoadlpKeyboardCore(int i)
 
 BOOL LoadlpKeyboard(int i)
 {
+  if (Globals::get_CoreIntegration())
+  {
+    return LoadlpKeyboardCore(i);
+  }
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
   if(_td->lpKeyboards[i].Keyboard) return TRUE;

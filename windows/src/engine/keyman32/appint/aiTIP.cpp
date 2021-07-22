@@ -205,9 +205,11 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->state.msg.lParam = 0;
 	_td->state.msg.message = wm_keymankeydown;
 	_td->state.vkey = (WORD) wParam;
-  /// TODO: 5011 set the modifier _td->state.modifer
-   /// TODO: 5011 set the correct active keyboard.
+  
+   
 	_td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
+  /// TODO: 5442 set the correct active keyboard - need with call backs
+  _td->state.lpCoreKb = _td->lpActiveKeyboard->coreKeyboard;
 
   _td->state.windowunicode = TRUE;
 	_td->state.startgroup = &_td->state.lpkb->dpGroupArray[_td->state.lpkb->StartGroup[BEGIN_UNICODE]];

@@ -204,12 +204,11 @@ AppIntegration::AppIntegration()
   FShiftFlags = 0;
 }
 
-/* Helper function to convert App context array into core engine context */
-BOOL context_items_from_aapcontext(WCHAR const* buf, km_kbp_context_item** outPtr)
+BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr)
 {
-  
+
   km_kbp_context_item* context_items  = new km_kbp_context_item[wcslen(buf) + 1];
-  // would like to check bad allocation but nothrow not known to this compilier
+  // would like to check bad allocation but nothrow not known to this compiler
   WCHAR const *p = buf;
   uint8_t contextIndex = 0;
   while (*p) {
@@ -219,7 +218,7 @@ BOOL context_items_from_aapcontext(WCHAR const* buf, km_kbp_context_item** outPt
       p += 2;
       context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {*p} };
     }
-    else {  // setup character need to handl surrogate
+    else {  // setup character need to handle surrogate
        if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF) {
         DWORD uni32char = (((*p) - 0xD800) * 0x400 + ((*(p + 1)) - 0xDBFF) + 0x10000);
         context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {uni32char} };

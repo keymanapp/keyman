@@ -28,9 +28,16 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp);
 /**
  *  Loads the keyboard options from the windows registry
  *
- * @param kp keyboard info object with options to be updated
- * @param state core keyboard state used to update keyboard options
+ * @param  kp     keyboard info object with options to be updated
+ * @param  state  core keyboard state used to update keyboard options
  */
 void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* state);
 
+/**
+ *  Saves the keyboard option to the windows registry
+ *
+ * @param  kp     keyboard info object with for which the option is to be updated
+ * @param  key    keyboard key to save
+ * @param  value  keyboard option value to save
+ */
 void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);

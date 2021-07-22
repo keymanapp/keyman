@@ -110,7 +110,7 @@ BOOL ProcessHook()
 
 	LPGROUP gp = _td->state.startgroup;
 
-	fOutputKeystroke = FALSE;  // TODO: 5442 no longer needs to be global once we use core processor
+  fOutputKeystroke = FALSE;  // TODO: 5442 no longer needs to be global once we use core processor
   BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
   //
   // If we are running in the debugger, don't do a second run through
@@ -146,7 +146,7 @@ BOOL ProcessHook()
     PWSTR buf;
     buf = _td->app->ContextBufMax(MAXCONTEXT);
     km_kbp_context_item *citems = nullptr;
-    context_items_from_aapcontext(buf, &citems);
+    ContextItemsFromAppContext(buf, &citems);
     km_kbp_context_set(km_kbp_state_context(_td->state.lpActiveKBState), citems);
     km_kbp_context_items_dispose(citems);
     km_kbp_process_event(_td->state.lpActiveKBState, _td->state.vkey, static_cast<uint16_t>(Globals::get_ShiftState()));
@@ -155,18 +155,15 @@ BOOL ProcessHook()
     ProcessGroup(gp); // TODO: 5442 remove
   }
 
-
-  ///  TODO: 5011 process all the actions and data munge them into here.
-  ///  Need to update(replace) the platform layer keyman32 context with the context from the core engine
-
-
-  // Now that we have updated the context update that action queue in the AIINT
+  
+  // Process the action items from the core. This actions will modify the windows context (AppContext).
+  // Therefore it is not required to copy the context from the core to the windows context.
   for (auto act = km_kbp_state_action_items(_td->state.lpActiveKBState, nullptr); act->type != KM_KBP_IT_END; act++) {
 
     switch (act->type)
     {
     case KM_KBP_IT_END:
-      // error assert(false);
+      assert(false);
       break;
       case KM_KBP_IT_ALERT:
         _td->app->QueueAction(QIT_BELL, 0);
@@ -181,9 +178,6 @@ BOOL ProcessHook()
         }
         break;
       case KM_KBP_IT_MARKER:
-          // Marker in the kmx_processor is the unicode character cast to uint64_t
-          // however it is not meant to be the key. we just will not be able to have our
-          // engine cache track the dead key. 
           _td->app->QueueAction(QIT_DEADKEY, (DWORD)act->marker);
         break;
       case KM_KBP_IT_BACK:
@@ -192,13 +186,14 @@ BOOL ProcessHook()
       case KM_KBP_IT_PERSIST_OPT:
         if (act->option != NULL)
         {
-          // Allocate for 1 option plus 1 pad struct of 0's
+          // Allocate for 1 option plus 1 pad struct of 0's for KM_KBP_IT_END
           km_kbp_option_item* keyboardOpts = new km_kbp_option_item[2];
           memmove(&(keyboardOpts[0]), act->option, sizeof(km_kbp_option_item));
           km_kbp_status eventStatus = km_kbp_state_options_update(_td->state.lpActiveKBState, keyboardOpts);
           if (eventStatus != KM_KBP_STATUS_OK)
           {
            // log warning "problem saving option for km_kbp_keyboard");
+            SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Problems saving optionf for keybooard [%s].", _td->lpActiveKeyboard->Name);
           }
           delete[] keyboardOpts;
 
@@ -207,6 +202,7 @@ BOOL ProcessHook()
             act->option->value != NULL)
           {
             // log"Saving keyboard option to registry");
+            SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Saving option to registry for keybooard [%s].", _td->lpActiveKeyboard->Name);
             LPWSTR value = new WCHAR[sizeof(act->option->value) + 1];
             wcscpy_s(value, sizeof(act->option->value) + 1, reinterpret_cast<LPCWSTR>(act->option->value));
             SaveKeyboardOptionREGCore(_td->lpActiveKeyboard, reinterpret_cast<LPCWSTR>(act->option->key), value);
@@ -229,7 +225,6 @@ BOOL ProcessHook()
 
      }
 
- /// TODO: 5011 Emit Keystroke will always be the last action item if it exits in the action item quue
   if (fOutputKeystroke && !_td->app->IsQueueEmpty()) {
     //
     // #2759: The keyboard has requested that the default output

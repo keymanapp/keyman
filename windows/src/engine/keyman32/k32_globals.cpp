@@ -290,7 +290,6 @@ static BOOL
 static BOOL
   f_CoreIntegration = TRUE;
 
-
 #pragma data_seg()
 /***************************************************************************/
 

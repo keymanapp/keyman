@@ -154,9 +154,6 @@ void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR k
 {
   assert(REGKey != NULL);
   assert(kp != NULL);
-  assert(kp->coreKeyboard != NULL);
-  assert(kp->coreKeyboardOptions != NULL);
-  // TODO: 5011 just check for yourself that the core processor now checks if there size limit of the keyboard store has been reached.
   RegistryFullAccess r(HKEY_CURRENT_USER);
   if (r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(kp->Name, TRUE) && r.OpenKey(REGKey, TRUE))
   {
@@ -189,7 +186,7 @@ BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
         {
           if(kp->Keyboard->dpStoreArray[i].dpName != NULL && _wcsicmp(kp->Keyboard->dpStoreArray[i].dpName, buf) == 0)
           {
-            kp->KeyboardOptions[i].Value = new WCHAR[wcslen(val)+1]; // is this a memory leak as
+            kp->KeyboardOptions[i].Value = new WCHAR[wcslen(val)+1];
             wcscpy_s(kp->KeyboardOptions[i].Value, wcslen(val)+1, val);
 
             kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
@@ -251,24 +248,31 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
     {
       buf[255] = 0;
       WCHAR val[256];
+
       if (r.ReadString(buf, val, sizeof(val) / sizeof(val[0])) && val[0])
       {
         val[255] = 0;
         keyboardOpts[n].scope = KM_KBP_OPT_KEYBOARD;
 
-        keyboardOpts[n].key = reinterpret_cast<char16_t*>(&buf[0]);
+        km_kbp_cp* cp = new km_kbp_cp[wcslen(buf) + 1];
+        wcscpy_s(reinterpret_cast<LPWSTR>(cp), wcslen(buf) + 1, buf);
+        keyboardOpts[n].key = cp;
 
-        keyboardOpts[n].value = reinterpret_cast<char16_t*>(&buf[0]);
+        cp = new km_kbp_cp[wcslen(val) + 1];
+        wcscpy_s(reinterpret_cast<LPWSTR>(cp), wcslen(val) + 1, val);
+        keyboardOpts[n].value = cp;
       }
       n++;
     }
+
+    keyboardOpts[n] = KM_KBP_OPTIONS_END;
     /// once we have the option list we can then update the options using the public api call
     km_kbp_state_options_update(state, keyboardOpts);
    for (int i = 0; i < (int)listSize + 1; i++) {
       delete[] keyboardOpts[i].key;
       delete[] keyboardOpts[i].value;
     }
-    delete keyboardOpts;
+    delete[] keyboardOpts;
     return TRUE;
   }
   return FALSE;
