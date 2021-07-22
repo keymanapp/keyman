@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.87 alpha 2021-07-22
+
+* fix(ios): keyboard swapping (#5475)
+* refactor(linux): Refactor processing actions in separate methods 🚧 (#5452)
+
 ## 15.0.86 alpha 2021-07-20
 
 * chore(android): improve error reporting for kmw (#5468)
