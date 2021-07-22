@@ -26,9 +26,11 @@ For WASM builds:
   You can get the official Python installer from the official Python site:
   <https://www.python.org/downloads/windows/>
 
-  Ensure you have Python3 correctly installed and can run the command `pip`.
+  Ensure you have Python 3 correctly installed and can run the command `pip` or
+  `python -m pip`.
 
-  Ensure that Python 3 is on the path ahead of Python 2 (if installed).
+  Ensure that Python 3 is on the path ahead of Python 2 (if installed):
+  `python --version` should return `Python 3.9.1` or similar.
 
 * Install meson:
 
