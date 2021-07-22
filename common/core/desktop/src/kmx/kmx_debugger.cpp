@@ -13,12 +13,12 @@ using namespace kmx;
 
 void KMX_DebugItems::push_item(
   uint8_t type,
+  uint16_t first_action,
   uint32_t flags,
   LPGROUP group,
   LPKEY key,
   PKMX_WCHAR context,
-  PKMX_WORD index_stack,
-  int first_action
+  PKMX_WORD index_stack
 ) {
   _items->assert_push_entry();
   km_kbp_state_debug_item item = {type, flags};

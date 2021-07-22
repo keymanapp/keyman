@@ -50,7 +50,8 @@ void print_debug_item(const char *title, km_kbp_state_debug_item const & item) {
 
   std::cout
     << "  kmx_info: "<< std::endl
-    << "    context: '" << item.kmx_info.context << "'" << std::endl;
+    << "    context: '" << item.kmx_info.context << "'" << std::endl
+    << "    action:  " << item.kmx_info.first_action << std::endl;
 
   if(gp) std::cout
     << "    group:   " << gp->dpName << std::endl;
@@ -245,9 +246,12 @@ void test_debugging_no_rule_match() {
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT, 'S'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END}
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 1}}
   }));
+  // assert(action_items(test_state, {
+//TODO
+  // }));
 }
 
 /**
@@ -261,8 +265,8 @@ void test_debugging_function_key() {
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_F1, 0, 0}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END, KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE}
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE, {}, {u"", nullptr, nullptr, {}, 1}}
   }));
 }
 
@@ -281,16 +285,16 @@ void test_basic_rule_matches() {
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_D, KM_KBP_MODIFIER_SHIFT, 'D'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0}, // action item will emit a default 'D'
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 1}}, // action item will emit a default 'D'
   }));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_E, KM_KBP_MODIFIER_SHIFT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_E, KM_KBP_MODIFIER_SHIFT, 'E'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0}, // action item will emit a default 'E'
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 1}}, // action item will emit a default 'E'
   }));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F, KM_KBP_MODIFIER_SHIFT));
@@ -298,9 +302,9 @@ void test_basic_rule_matches() {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_F, KM_KBP_MODIFIER_SHIFT, 'F'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
       km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"DE", &gp, &kp, {0xFFFF}}},
-      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"DE", &gp, &kp, {0xFFFF}}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0}, // action item will emit rule transform
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"DE", &gp, &kp, {0xFFFF}, 5 /* bksp bksp E04 E05 E06 */ }},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp, nullptr, {}, 5 /* from above */ }},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 5 /* from above */ }},
   }));
 }
 
@@ -325,17 +329,17 @@ void test_multiple_groups() {
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
       km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"", &gp, &kp1, {0xFFFF}}},
-      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"", &gp, &kp1, {0xFFFF}}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"", &gp, &kp1, {0xFFFF}, 1}},
 
       km_kbp_state_debug_item{KM_KBP_DEBUG_MATCH_ENTER, 0, {}, {u"", &gp, nullptr, {}, 1}},
-        km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gpa}},
+        km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gpa, nullptr, {}, 1}},
           km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"a", &gpa, &kpa, {0xFFFF}, 1}},
-          km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"a", &gpa, &kpa, {0xFFFF}}},
-        km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gpa}},
-      km_kbp_state_debug_item{KM_KBP_DEBUG_MATCH_EXIT, 0, {}, {u"", &gp}},
+          km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"a", &gpa, &kpa, {0xFFFF}, 3}},
+        km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gpa, nullptr, {}, 3}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_MATCH_EXIT, 0, {}, {u"", &gp, nullptr, {}, 3}},
 
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0}, // action item will emit a 'b'
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp, nullptr, {}, 3}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 3}}, // action item will emit a 'b'
   }));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0));
@@ -346,9 +350,9 @@ void test_multiple_groups() {
       km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"b", &gp, &kp2, {0xFFFF}}},
         km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gpb}},
           km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"b", &gpb, &kpb, {0xFFFF}}},
-          km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"b", &gpb, &kpb, {0xFFFF}}},
-        km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gpb}},
-      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"b", &gp, &kp2, {0xFFFF}}},
+          km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"b", &gpb, &kpb, {0xFFFF}, 4}},
+        km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gpb, nullptr, {}, 4}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"b", &gp, &kp2, {0xFFFF}, 4}},
 
       //See #5440 for why match does not fire here:
       //km_kbp_state_debug_item{KM_KBP_DEBUG_MATCH_ENTER, 0, {}, {u"", &gp}},
@@ -356,8 +360,8 @@ void test_multiple_groups() {
       //  km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, KM_KBP_DEBUG_FLAG_NOMATCH, {}, {u"", &gpa}},
       //km_kbp_state_debug_item{KM_KBP_DEBUG_MATCH_EXIT, 0, {}, {u"", &gp}},
 
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0}, // action item will "abc"
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp, nullptr, {}, 4}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 4}}, // action item will "abc"
   }));
 }
 
@@ -380,10 +384,10 @@ void test_store_offsets() {
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
       km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"", &gp, &kpa, {0xFFFF}}},
-      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"", &gp, &kpa, {0xFFFF}}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"", &gp, &kpa, {0xFFFF}, 4}},
 
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0}, // action item will emit a 'exay'
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp, nullptr, {}, 4}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 4}}, // action item will emit a 'exay'
   }));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_B, 0));
@@ -395,10 +399,10 @@ void test_store_offsets() {
       // store: store(diaeresisBase) 'ae'
       // context: exay
       km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"exay", &gp, &kpb, {6, 1, 6, 0, 0xFFFF}}},
-      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"exay", &gp, &kpb, {6, 1, 6, 0, 0xFFFF}}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"exay", &gp, &kpb, {6, 1, 6, 0, 0xFFFF}, 6}},
 
-    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp}},
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp, nullptr, {}, 6}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 6}},
   }));
 }
 
