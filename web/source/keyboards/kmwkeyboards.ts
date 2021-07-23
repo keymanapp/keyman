@@ -563,7 +563,9 @@ namespace com.keyman.keyboards {
             // Re-initializate OSK before returning if required
             if(this.keymanweb.mustReloadKeyboard) {
               activeKeyboard.refreshLayouts();
-              osk._Load();
+              if(osk) {
+                osk._Load();
+              }
             }
             return Promise.resolve();
           }
@@ -621,7 +623,7 @@ namespace com.keyman.keyboards {
             // Ensure we're not already loading the keyboard.
             if(!this.keyboardStubs[Ln].asyncLoader) {
               // Always (temporarily) hide the OSK when loading a new keyboard, to ensure that a failure to load doesn't leave the current OSK displayed
-              if(osk.ready) {
+              if(osk) {
                 osk._Hide(false);
               }
 
@@ -687,7 +689,9 @@ namespace com.keyman.keyboards {
       }
 
       // Initialize the OSK (provided that the base code has been loaded)
-      osk._Load();
+      if(osk) {
+        osk._Load();
+      }
       return Promise.resolve();
     }
 
@@ -760,7 +764,9 @@ namespace com.keyman.keyboards {
             manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);
 
             // Prepare and show the OSK for this keyboard
-            osk._Load();
+            if(osk) {
+              osk._Load();
+            }
           }
 
           // Remove the wait message, if defined

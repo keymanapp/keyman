@@ -96,7 +96,7 @@ if kmcomp.found()
     kbd_log = custom_target(kbd + '.kmx'.underscorify(),
       output: kbd + '.log',
       input: kbd_src,
-      command: kmcomp_cmd + ['-s', '@INPUT@', kbd_obj, '@OUTPUT@']
+      command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
     )
 
     test(kbd, kmx, depends: kbd_log, args: [kbd_src, kbd_obj])
