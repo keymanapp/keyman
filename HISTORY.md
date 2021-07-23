@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.88 alpha 2021-07-23
+
+* refactor(web): osk move & resize handler encapsulation 🍕 (#5409)
+* fix(ios): keyboard swapping (#5475)
+* feat(common/core): debug action index 🐞 (#5470)
+* refactor(web): osk inner-frame abstraction (help text vs std OSK) 🍕 (#5430)
+* refactor(web): delayed OSK initialization 🍕 (#5412)
+* chore(common/core): Implement capsAlwaysOff system store 🚧 (#5432)
+
 ## 15.0.87 alpha 2021-07-22
 
 * fix(ios): keyboard swapping (#5475)
