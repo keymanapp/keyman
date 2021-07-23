@@ -328,6 +328,18 @@ public class ResourceFileManager {
       throw KMPError.resourceNotInPackage
     }
 
+    /**
+     * A surprisingly critical line.  The Manager.shared instance must be initialized at some
+     * point before the resources are _actually_ stored and reigstered.  Otherwise, the initial
+     * Migrations pass (called early in Manager.init) will interpret the installation as from a
+     * different engine version and will break anything installed before it's run.
+     *
+     * Fortunately... all 14.0's installation methods pass through this single method in order to
+     * do the actual "storing" and "registering".  So, it's a decent-enough place to force
+     * Manager.shared's init.
+     */
+    _ = Manager.shared
+
     do {
       try copyWithOverwrite(from: package.sourceFolder,
                             to: Storage.active.packageDir(for: package)!)
