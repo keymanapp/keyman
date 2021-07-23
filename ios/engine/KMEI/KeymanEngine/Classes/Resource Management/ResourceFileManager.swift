@@ -17,7 +17,36 @@ import UIKit
 public class ResourceFileManager {
   public static let shared = ResourceFileManager()
 
+  private var haveRunMigrations: Bool = false
+
   fileprivate init() {
+  }
+
+  func runMigrationsIfNeeded() {
+    if !haveRunMigrations {
+      // Set here in order to prevent recursively calling itself in case
+      // Migrations itself needs to use installation methods.
+      haveRunMigrations = true
+
+      // We must make sure that all resources are properly migrated before
+      // allowing any new resources to be installed.
+      Migrations.migrate(storage: Storage.active)
+      Migrations.updateResources(storage: Storage.active)
+
+      if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
+        Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
+
+        // Ensure the default keyboard is installed in this case.
+        do {
+          try Storage.active.installDefaultKeyboard(from: Resources.bundle)
+        } catch {
+          log.error("Failed to copy default keyboard from bundle: \(error)")
+        }
+      }
+      Migrations.engineVersion = Version.latestFeature
+    }
+
+    haveRunMigrations = true
   }
 
   public var installedPackages: [KeymanPackage] {
@@ -328,17 +357,13 @@ public class ResourceFileManager {
       throw KMPError.resourceNotInPackage
     }
 
-    /**
-     * A surprisingly critical line.  The Manager.shared instance must be initialized at some
-     * point before the resources are _actually_ stored and reigstered.  Otherwise, the initial
-     * Migrations pass (called early in Manager.init) will interpret the installation as from a
-     * different engine version and will break anything installed before it's run.
-     *
-     * Fortunately... all 14.0's installation methods pass through this single method in order to
-     * do the actual "storing" and "registering".  So, it's a decent-enough place to force
-     * Manager.shared's init.
-     */
-    _ = Manager.shared
+    // Resources should only be installed after Migrations have been run.
+    // Otherwise, the Migrations engine may misinterpret the installed format
+    // on an app's first install.
+    //
+    // It is possible for a KeymanEngine framework consumer to reach this point
+    // without `Manager.init` having been run.
+    runMigrationsIfNeeded()
 
     do {
       try copyWithOverwrite(from: package.sourceFolder,
