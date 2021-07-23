@@ -22,11 +22,13 @@ KMX_ProcessEvent::KMX_ProcessEvent() : m_actions(&m_context), m_options(&m_keybo
   m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];
   m_miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
   m_miniContextIfLen = 0;
+  m_debug_items = nullptr;
 }
 
 KMX_ProcessEvent::~KMX_ProcessEvent() {
   delete[] m_indexStack;
   delete[] m_miniContext;
+  if(m_debug_items) delete m_debug_items;
 }
 
 char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
@@ -76,6 +78,20 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
 
   m_kbp_state = state;
 
+  // If debugging is enabled, then ...
+  if(m_debug_items) {
+    delete m_debug_items;
+    m_debug_items = NULL;
+  }
+
+  state->debug_items().clear();
+  if(state->debug_items().is_enabled()) {
+    m_debug_items = new KMX_DebugItems(&state->debug_items());
+  } else {
+    // We want to have a clean debug state even if it is not in use
+    state->debug_items().push_end(m_actions.Length(), 0);
+  }
+
   if (m_environment.capsLock())
     modifiers |= CAPITALFLAG;
 
@@ -93,7 +109,23 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
 
   KMX_BOOL fOutputKeystroke = FALSE;
 
+  if(m_debug_items) {
+    km_kbp_state_debug_key_info key_info;
+    key_info.character = m_state.charCode;
+    key_info.modifier_state = modifiers;
+    key_info.vk = m_state.vkey;
+    m_debug_items->push_begin(&key_info, KM_KBP_DEBUG_FLAG_UNICODE);
+  }
+
   ProcessGroup(gp, &fOutputKeystroke);
+
+  if(m_debug_items) {
+    m_debug_items->push_end(m_actions.Length(), fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
+    // m_debug_items is just a helper class that pushes to state->debug_items(),
+    // so we can throw it away after we are done with it
+    delete m_debug_items;
+    m_debug_items = nullptr;
+  }
 
   m_kbp_state = nullptr;
 
@@ -121,6 +153,10 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   PKMX_WCHAR p;
   int sdmfI;
 
+  if(m_debug_items) {
+    m_debug_items->push_group_enter(m_actions.Length(), gp);
+  }
+
   /*
    If the number of nested groups goes higher than 50, then break out - this is
    a limitation of stack size.  This is basically a catch-all for freaky apps that
@@ -143,6 +179,9 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   {
     DebugLog("Aborting output: m_state.LoopTimes exceeded.");
     m_state.StopOutput = TRUE;
+    if(m_debug_items) {
+      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW, gp);
+    }
     return FALSE;
   }
 
@@ -210,6 +249,9 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         PKMX_WCHAR pdeletecontext = m_context.Buf(1);   // I4933
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
           m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
+          if(m_debug_items) {
+            m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+          }
           *pOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
         }
@@ -217,6 +259,9 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
+        if(m_debug_items) {
+          m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+        }
         *pOutputKeystroke = TRUE;
         return FALSE;
       }
@@ -224,7 +269,13 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0)
     {
       /* NoMatch rule found, and is a character key */
+      if(m_debug_items) {
+        m_debug_items->push_nomatch_enter(m_actions.Length(), gp);
+      }
       PostString(gp->dpNoMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
+      if(m_debug_items) {
+        m_debug_items->push_nomatch_exit(m_actions.Length(), gp);
+      }
     }
     else if (m_state.charCode != 0 && m_state.charCode != 0xFFFF && gp->fUsingKeys)
     {
@@ -232,6 +283,9 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
       m_actions.QueueAction(QIT_CHAR, m_state.charCode);
     }
 
+    if(m_debug_items) {
+      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+    }
     return TRUE;
   }
 
@@ -253,6 +307,10 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     u16cpy(m_miniContext, /*GLOBAL_ContextStackSize,*/ m_context.Buf(xstrlen_ignoreifopt(kkp->dpContext)) /*, GLOBAL_ContextStackSize*/);  // I3162   // I3536
 
   m_miniContext[GLOBAL_ContextStackSize-1] = 0;
+
+  if(m_debug_items) {
+    m_debug_items->push_rule_enter(m_actions.Length(), gp, kkp, m_miniContext, m_indexStack);
+  }
 
   /*
    The next section includes several optimizations that make the code a little harder
@@ -289,12 +347,24 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 
   /* Use PostString to post the rest of the output string. */
 
-  if(PostString(p, m_keyboard.Keyboard, NULL, pOutputKeystroke) == psrCheckMatches)
-  {
-    if(gp->dpMatch && *gp->dpMatch)
-    {
-      PostString(gp->dpMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
+  KMX_BOOL shouldProcessNomatch = PostString(p, m_keyboard.Keyboard, NULL, pOutputKeystroke) == psrCheckMatches;
+
+  if(m_debug_items) {
+    m_debug_items->push_rule_exit(m_actions.Length(), gp, kkp, m_miniContext, m_indexStack);
+  }
+
+  if(shouldProcessNomatch && gp->dpMatch && *gp->dpMatch) {
+    if(m_debug_items) {
+      m_debug_items->push_match_enter(m_actions.Length(), gp);
     }
+    PostString(gp->dpMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
+    if(m_debug_items) {
+      m_debug_items->push_match_exit(m_actions.Length(), gp);
+    }
+  }
+
+  if(m_debug_items) {
+    m_debug_items->push_group_exit(m_actions.Length(), 0, gp);
   }
 
   return TRUE;
@@ -557,7 +627,6 @@ KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
           bEqual = u16cmp(ss, t->dpString) == 0;
         }
       }
-
       if(*(pp+3) == 1 && bEqual) return FALSE;
       if(*(pp+3) == 2 && !bEqual) return FALSE;
     }

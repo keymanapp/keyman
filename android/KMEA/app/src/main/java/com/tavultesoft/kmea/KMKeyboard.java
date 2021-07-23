@@ -657,7 +657,7 @@ final class KMKeyboard extends WebView {
         breadcrumb.setData("keyboardVersion", this.keyboardVersion);
       }
       Sentry.addBreadcrumb(breadcrumb);
-      Sentry.captureMessage("sendKMWError", SentryLevel.ERROR);
+      Sentry.captureMessage(message, SentryLevel.ERROR);
     }
   }
 

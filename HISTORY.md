@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 15.0.87 alpha 2021-07-22
+
+* fix(ios): keyboard swapping (#5475)
+* refactor(linux): Refactor processing actions in separate methods 🚧 (#5452)
+
+## 15.0.86 alpha 2021-07-20
+
+* chore(android): improve error reporting for kmw (#5468)
+
+## 15.0.85 alpha 2021-07-19
+
+* feat(common/core/desktop): kmx debugger basic infrastructure 🐞 (#5425)
+* feat(common/core/desktop): add debug events 🐞 (#5448)
+* chore(developer): fixup devtime paths (#5449)
+* refactor(web): partial encapsulation of the desktop title bar and resize bar 🍕 (#5393)
+* refactor(web): osk move & resize handler encapsulation 🍕 (#5409)
+
+## 15.0.84 alpha 2021-07-09
+
+* fix(web): Copy the keyboard stubs for registration (#5438)
+* fix(android/engine): register lexical model in switchToNextKeyboard (#5439)
+
 ## 15.0.83 alpha 2021-07-08
 
 * change(ios): setText now uses JSON serialization (#5321)

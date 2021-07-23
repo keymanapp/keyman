@@ -15,7 +15,7 @@
 
 #include "context.hpp"
 #include "option.hpp"
-
+#include "debug.hpp"
 
 namespace km {
 namespace kbp
@@ -122,6 +122,7 @@ protected:
     kbp::context              _ctxt;
     kbp::abstract_processor & _processor;
     kbp::actions              _actions;
+    kbp::debug_items          _debug_items;
 
 public:
     state(kbp::abstract_processor & kb, km_kbp_option_item const *env);
@@ -137,6 +138,9 @@ public:
 
     kbp::actions        & actions() noexcept        { return _actions; }
     kbp::actions const  & actions() const noexcept  { return _actions; }
+
+    kbp::debug_items        & debug_items() noexcept        { return _debug_items; }
+    kbp::debug_items const  & debug_items() const noexcept  { return _debug_items; }
 };
 
 } // namespace kbp

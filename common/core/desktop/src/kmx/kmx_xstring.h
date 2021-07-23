@@ -27,7 +27,8 @@ PKMX_CHAR wstrtostr(PKMX_WCHAR in);
 PKMX_WCHAR strtowstr(PKMX_CHAR in);
 
 const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch);
-const km_kbp_cp *u16cpy(km_kbp_cp *dst, const km_kbp_cp *src);  // TODO: add buffer size, also u16ncpy version
+const km_kbp_cp *u16cpy(km_kbp_cp *dst, const km_kbp_cp *src);  // TODO: deprecate all usages
+const km_kbp_cp *u16ncpy(km_kbp_cp *dst, const km_kbp_cp *src, size_t max);
 size_t u16len(const km_kbp_cp *p);
 int u16cmp(const km_kbp_cp *p, const km_kbp_cp *q);
 int u16icmp(const km_kbp_cp *p, const km_kbp_cp *q);
