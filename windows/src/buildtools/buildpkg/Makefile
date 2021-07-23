@@ -5,19 +5,16 @@
 !include ..\..\Defines.mak
 
 build: version.res dirs
-    $(DCC32) Buildpkg.dpr
-    $(SENTRYTOOL_DELPHIPREP) buildpkg.exe -dpr buildpkg.dpr
-    $(TDS2DBG) buildpkg.exe
-    $(COPY) Buildpkg.exe $(PROGRAM)\online
-    $(COPY) Buildpkg.exe $(PROGRAM)\buildtools
-    if exist buildpkg.dbg $(COPY) buildpkg.dbg $(DEBUGPATH)\buildtools
+    $(DELPHI_MSBUILD) buildpkg.dproj /p:Platform=Win32
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\buildpkg.exe -dpr buildpkg.dpr
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\buildpkg.exe
+    $(COPY) $(WIN32_TARGET_PATH)\Buildpkg.exe $(PROGRAM)\online
+    $(COPY) $(WIN32_TARGET_PATH)\Buildpkg.exe $(PROGRAM)\buildtools
+    if exist $(WIN32_TARGET_PATH)\buildpkg.dbg $(COPY) $(WIN32_TARGET_PATH)\buildpkg.dbg $(DEBUGPATH)\buildtools
 
 clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Package Installer Creator for Server" $(PROGRAM)\online\Buildpkg.exe
-
-backup:
-    rem #$(WZZIP) $(BUILD)\buildtools\Buildpkg.zip $(BACKUPDEFAULTS) Buildpkg.exe
 
 !include ..\..\Target.mak

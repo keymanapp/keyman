@@ -6,7 +6,7 @@
 #include <iterator>
 #include <codecvt>
 #include <locale>
-#include "kmx_processor.h"
+#include "kmx_processevent.h"
 #include "utfcodec.hpp"
 
 
@@ -28,6 +28,19 @@ const km_kbp_cp *km::kbp::kmx::u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
     *dst++ = *src++;
   }
   *dst = 0;
+  return o;
+}
+
+const km_kbp_cp *km::kbp::kmx::u16ncpy(km_kbp_cp *dst, const km_kbp_cp *src, size_t max) {
+  km_kbp_cp *o = dst;
+  while (*src && max > 0) {
+    *dst++ = *src++;
+    max--;
+  }
+  while(max > 0) {
+    *dst++ = 0;
+    max--;
+  }
   return o;
 }
 

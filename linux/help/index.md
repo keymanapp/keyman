@@ -22,4 +22,4 @@ Need help using Keyman for Linux? In time, this product documentation will grow 
 
 ## Help Topics
 
-### [Reference](reference/)
+* [Reference](reference/)

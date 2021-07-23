@@ -18,9 +18,6 @@ clean: def-clean
 signcode:
     rem Not signing this utility
 
-backup:
-    rem No source code backup needed
-
 wrap-symbols:
     @rem
 

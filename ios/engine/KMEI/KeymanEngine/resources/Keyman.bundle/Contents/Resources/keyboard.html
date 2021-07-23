@@ -33,7 +33,7 @@
               hostPlatform: "ios"
             });
             sentryManager.init();
-            
+
             window.addEventListener('load', init, false);
             
             function init() {
@@ -134,7 +134,7 @@
 
                 KeymanWeb.registerStub(stub);
 
-                kmw.setActiveKeyboard(stub.KI, stub.KLC);
+                kmw.setActiveKeyboard(stub.KP + '::' + stub.KI, stub.KLC);
                 kmw.osk.show(true);
             }
             
@@ -318,6 +318,11 @@
               });
 
               keyman.modelManager.register(model);
+            }
+        
+            function setSpacebarText(mode) {
+                keyman.options['spacebarText'] = mode;
+                keyman.osk.show(true);
             }
         
             </script>

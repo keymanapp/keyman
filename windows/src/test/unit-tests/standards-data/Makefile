@@ -11,6 +11,5 @@ build:
     $(DELPHI_MSBUILD) /p:CI=CI standardsdata.dproj
 
 clean: def-clean
-    -rd /s/q Win32
 
 !include ..\..\..\Target.mak

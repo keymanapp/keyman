@@ -63,6 +63,11 @@ namespace com.keyman.osk {
 
         return new embedded.PendingLongpress(this, key);
       } else {
+        // When embedded within our Android app, we expect the `oskCreatePopup` function to
+        // exist; all subkey control is delegated to the app.
+        //
+        // No function = big problem.
+        console.error("Missing `oskCreatePopup` function for engine integration.");
         return null;
       }
     };
@@ -251,7 +256,7 @@ namespace com.keyman.text {
    */
   keymanweb['correctOSKTextSize']=function() {
     let osk: com.keyman.osk.OSKManager = keymanweb.osk;
-    if(osk && osk.vkbd) {
+    if(osk?.vkbd) {
       osk.vkbd.refreshLayout(osk.getKeyboardHeight());
 
       var b: HTMLElement = osk._Box, bs=b.style;
@@ -272,7 +277,7 @@ namespace com.keyman.text {
 
   /**
    * Function called by Android and iOS when a device-implemented keyboard popup 
-   * is displayed or hidden.  As this is controlled by the app, it's the perfect
+   * is displayed or hidden.  As this is controlled by the app, we use it as a
    * trigger for 'embedded'-mode gesture state management.
    * 
    *  @param  {boolean}  isVisible
@@ -285,9 +290,9 @@ namespace com.keyman.text {
 
     /*
      * If a longpress popup was visible, but is no longer, this means that the
-     * associated longpress gesture was cancelled.  It is possible for the base key
-     * to emit if selected at this time, but only if appropriate - and this is
-     * managed by the `SubkeyDelegator`.
+     * associated longpress gesture was cancelled.  It is possible for the base
+     * key to emit if selected at this time; detecton of this is managed by 
+     * the `SubkeyDelegator` class.
      */
     if(!isVisible) {
       if(gesture) {
@@ -301,8 +306,11 @@ namespace com.keyman.text {
 
     /*
      * If the popup was not visible, but now is, that means our previously-pending
-     * longpress is now 'realized' (complete).  Certain aspects of the OSK rely on
-     * this state information, which will be properly updated by `resolve`.
+     * longpress is now 'realized' (complete).  The OSK relies upon this state 
+     * information, which will be properly updated by `resolve`.
+     * 
+     * Prominent uses of such state info helps prevent change of base key, key
+     * previews, and key output from occurring while a subkey popup remains active.
      */
     if(isVisible && pendingLongpress) {
       // Fulfills the first-stage promise.
@@ -392,19 +400,18 @@ namespace com.keyman.text {
    *  @return {boolean} false when KMW _has_ fully handled the event and true when not.
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0): boolean {
-    let keyman = com.keyman.singleton;
-    if(!keyman.core.activeKeyboard || code == 0) {
+    if(!keymanweb.core.activeKeyboard || code == 0) {
       return false;
     }
 
     // Clear any pending (non-popup) key
-    keyman.osk.vkbd.keyPending = null;
+    keymanweb.osk.vkbd.keyPending = null;
     
     // Note:  this assumes Lelem is properly attached and has an element interface.
     // Currently true in the Android and iOS apps.
     var Lelem = keymanweb.domManager.getLastActiveElement();
     
-    keyman.domManager.initActiveElement(Lelem);
+    keymanweb.domManager.initActiveElement(Lelem);
 
     // Check the virtual key 
     var Lkc: com.keyman.text.KeyEvent = {
@@ -414,7 +421,7 @@ namespace com.keyman.text {
       Lstates: lstates,
       LisVirtualKey: true,
       kName: '',
-      device: keyman.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
+      device: keymanweb.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
       isSynthetic: false
     }; 
 
@@ -423,7 +430,7 @@ namespace com.keyman.text {
       // off to the processor for its actual execution.
 
       // Should return 'false' when KMW _has_ fully handled the event and 'true' when not.
-      return !keyman.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
+      return !keymanweb.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
     } catch (err) {
       console.error(err.message, err);
       return false;

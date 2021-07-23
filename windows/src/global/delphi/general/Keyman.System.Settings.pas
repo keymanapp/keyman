@@ -95,7 +95,7 @@ const
       ValueType: kstInteger
   );
 
-  BaseKeymanSettings: array[0..34] of TKeymanSettingBase = (
+  BaseKeymanSettings: array[0..33] of TKeymanSettingBase = (
 
     // TIKE:UTikeDebugMode.TikeDebugMode
     (
@@ -292,15 +292,6 @@ const
       RootKey: HKCU;
       Key: SRegKey_KeymanDebug_CU;
       Description: 'Stock files for branding'
-    ),
-
-    // TIKE:RedistFiles.GetUITemplatePath
-    (
-      ID: 'development.paths.developer.ui_templates';
-      Name: 'Debug_UITemplatePath';
-      RootKey: HKCU;
-      Key: SRegKey_KeymanDebug_CU;
-      Description: 'Path to UI templates'
     ),
 
     // TIKE:RedistFiles.GetWixPath

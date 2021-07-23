@@ -134,6 +134,11 @@
       keyman.osk.show(true);
     }
 
+    function setSpacebarText(mode) {
+      keyman.options['spacebarText'] = mode;
+      keyman.osk.show(true);
+    }
+
     /**
      * Inserts the selected string <i>s</i>
      * @param dn  Number of pre-caret code points (UTF+8 characters) to delete

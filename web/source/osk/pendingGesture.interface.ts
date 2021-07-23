@@ -1,8 +1,8 @@
 namespace com.keyman.osk {
   /**
    * Used for evaluating potential gestures.  Classes adhering to this interface
-   * should instantiated whenever the (implied) state-machine allows a new touch
-   * event to mark the start of a potential new gesture.
+   * should be instantiated whenever the (implied) state-machine allows a new
+   * touch event to mark the start of a potential new gesture.
    * 
    * For example, whenever a user touches a base key and there are no "realized"
    * (fully-completed, but as-of-yet unresolved) gestures, that state allows the

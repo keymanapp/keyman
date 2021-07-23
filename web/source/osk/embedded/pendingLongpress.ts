@@ -8,9 +8,11 @@ namespace com.keyman.osk.embedded {
    * serves mostly to communicate longpress state management from the
    * app to the VisualKeyboard.
    * 
-   * The `resolve()` function should be triggered, in some fashion, by
-   * the host app whenever it has recognized a completed longpress and
-   * will begin displaying its subkey popup.
+   * The `resolve()` function should be triggered by the host app
+   * whenever it has recognized a completed longpress and has thus
+   * begun displaying its subkey popup.  (Should these two events
+   * ever become separated in time, the latter is the more critical
+   * aspect.)
    */
   export class PendingLongpress implements PendingGesture {
     private resolver: (delegator: SubkeyDelegator) => void;

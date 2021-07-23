@@ -143,7 +143,9 @@ if(!window['keyman']['ui']['name']) {
       // Check that user control of OSK is allowed
       if((keymanweb['getActiveKeyboard']() == '') || keymanweb['isCJK']() ) return;  
       
-      keymanweb.osk['show'](!keymanweb.osk['isEnabled']());  
+      if(keymanweb.osk) {
+        keymanweb.osk['show'](!keymanweb.osk['isEnabled']());  
+      }
     }
     
     /**

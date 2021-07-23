@@ -12,6 +12,7 @@ public class KeymanSettingsActivity extends BaseActivity {
   protected static final String installKeyboardOrDictionaryKey = "InstallKeyboardOrDictionary";
   protected static final String showBannerKey = "ShowBanner";
   protected static final String sendCrashReport = "SendCrashReport";
+  public static final String spacebarTextKey = "SpacebarText";
 
   protected KeymanSettingsFragment innerFragment;
 

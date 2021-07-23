@@ -207,8 +207,8 @@ namespace com.keyman.osk {
       } else if(newWidth > 0.9*screen.width) {
         newWidth=0.9*screen.width;
       }
-  
-      // Default height decision made here: 
+
+      // Default height decision made here:
       // https://github.com/keymanapp/keyman/pull/4279#discussion_r560453929
       newHeight=util.toNumber(c['height'], 0.333 * newWidth);
 
@@ -223,8 +223,8 @@ namespace com.keyman.osk {
 
     /**
      * Sets & tracks the size of the VisualKeyboard's primary element.
-     * @param width 
-     * @param height 
+     * @param width
+     * @param height
      * @param pending Set to `true` if called during a resizing interaction
      */
     public setSize(width: number, height: number, pending?: boolean) {
@@ -745,9 +745,9 @@ namespace com.keyman.osk {
 
       // Future note:  we need to refactor osk.OSKKeySpec to instead be a 'tag field' for
       // keyboards.ActiveKey.  (Prob with generics, allowing the Web-only parts to
-      // be fully specified within the tag.)  
+      // be fully specified within the tag.)
       //
-      // Would avoid the type shenanigans needed here because of our current type-abuse setup 
+      // Would avoid the type shenanigans needed here because of our current type-abuse setup
       // for key spec tracking.
       let keySpec = (e['key'] ? e['key'].spec : null) as unknown as keyboards.ActiveKey;
       if(!keySpec) {
@@ -782,6 +782,7 @@ namespace com.keyman.osk {
         Lkc.keyDistribution = this.getTouchProbabilities(touch);;
       }
 
+      // Return the event object.
       return Lkc;
     }
 
@@ -852,16 +853,36 @@ namespace com.keyman.osk {
     showLanguage() {
       let keyman = com.keyman.singleton;
 
-      var lgName='',kbdName='';
-      var activeStub = keyman.keyboardManager.activeStub;
+      let displayName: string = undefined;
+      let activeStub = keyman.keyboardManager.activeStub;
 
       if(activeStub) {
-        lgName=activeStub['KL'];
-        kbdName=activeStub['KN'];
-      } else if(keyman.getActiveLanguage(true)) {
-        lgName=keyman.getActiveLanguage(true);
+        if(activeStub['displayName']) {
+          displayName = activeStub['displayName'];
+        } else {
+          let
+            lgName: string = activeStub['KL'],
+            kbdName: string = activeStub['KN'];
+          kbdName = kbdName.replace(/\s*keyboard\s*/i,'');
+          switch(keyman.options['spacebarText']) {
+            case SpacebarText.KEYBOARD:
+              displayName = kbdName;
+              break;
+            case SpacebarText.LANGUAGE:
+              displayName = lgName;
+              break;
+            case SpacebarText.LANGUAGE_KEYBOARD:
+              displayName = (kbdName == lgName) ? lgName : lgName + ' - ' + kbdName;
+              break;
+            case SpacebarText.BLANK:
+              displayName = '';
+              break;
+            default:
+              displayName = kbdName;
+          }
+        }
       } else {
-        lgName='(System keyboard)';
+        displayName = '(System keyboard)';
       }
 
       try {
@@ -873,19 +894,15 @@ namespace com.keyman.osk {
           tParent.className +=' kmw-spacebar';
         }
 
-        t.className='kmw-spacebar-caption';
-        kbdName=kbdName.replace(/\s*keyboard\s*/i,'');
-
-        // We use a separate variable here to keep down on MutationObserver messages in keymanweb.js code.
-        var keyboardName = "";
-        if(kbdName == lgName) {
-          keyboardName=lgName;
-        } else {
-          keyboardName=lgName+' ('+kbdName+')';
+        if(t.className != 'kmw-spacebar-caption') {
+          t.className='kmw-spacebar-caption';
         }
-        // It sounds redundant, but this dramatically cuts down on browser DOM processing.
-        if(t.innerHTML != keyboardName) {
-          t.innerHTML = keyboardName;
+
+        // It sounds redundant, but this dramatically cuts down on browser DOM processing;
+        // but sometimes innerText is reported empty when it actually isn't, so set it
+        // anyway in that case (Safari, iOS 14.4)
+        if(t.innerText != displayName || displayName == '') {
+          t.innerText = displayName;
         }
       }
       catch(ex){}
@@ -1204,7 +1221,7 @@ namespace com.keyman.osk {
      *  @param  {Object}            PKbd            the keyboard object to be displayed
      *  @param  {string=}           argFormFactor   layout form factor, defaulting to 'desktop'
      *  @param  {(string|number)=}  argLayerId      name or index of layer to show, defaulting to 'default'
-     *  @param  {Object}            height          Target height for the rendered keyboard 
+     *  @param  {number}            height          Target height for the rendered keyboard 
      *                                              (currently required for legacy reasons)
      *  @return {Object}                            DIV object with filled keyboard layer content
      */

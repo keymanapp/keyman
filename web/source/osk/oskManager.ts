@@ -198,7 +198,7 @@ namespace com.keyman.osk {
       } else {
         this.vkbd.refreshLayout(this.getKeyboardHeight());
 
-        var b: HTMLElement = this._Box, bs=b.style;
+        let b: HTMLElement = this._Box, bs=b.style;
         bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
       }
 
@@ -212,7 +212,7 @@ namespace com.keyman.osk {
         kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
       }
 
-      var kbdClassSuffix = ' kmw-keyboard-' + kbdID;
+      const kbdClassSuffix = ' kmw-keyboard-' + kbdID;
       kbdView.element.className = kbdView.element.className + kbdClassSuffix;
 
       this.banner.appendStyles();
@@ -623,12 +623,14 @@ namespace com.keyman.osk {
 
       var b = this._Box, bs = b.style;
       if('left' in p) {
-        bs.left=(p['left']-dom.Utils.getAbsoluteX(b)+b.offsetLeft)+'px';
+        this.x = p['left'] - dom.Utils.getAbsoluteX(b) + b.offsetLeft;
+        bs.left= this.x + 'px';
         this.dfltX=bs.left;
       }
 
       if('top' in p) {
-        bs.top=(p['top']-dom.Utils.getAbsoluteY(b)+b.offsetTop)+'px';
+        this.y = p['top'] - dom.Utils.getAbsoluteY(b) + b.offsetTop;
+        bs.top = this.y + 'px';
         this.dfltY=bs.top;
       }
 

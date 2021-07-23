@@ -26,6 +26,7 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
     case font
     case oskFont
     case isCustom
+    case displayName
   }
 
   public private(set) var id: String
@@ -38,6 +39,7 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
   public var font: Font?
   public var oskFont: Font?
   public var isCustom: Bool
+  public var displayName: String?
 
   public static let sharingLink = "\(KeymanHosts.KEYMAN_COM)/go/keyboard/%@/share"
 

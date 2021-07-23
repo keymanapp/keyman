@@ -30,9 +30,6 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\developer\kmconvert.exe /t keyman-developer
     $(SYMSTORE) $(DEBUGPATH)\developer\kmconvert.dbg /t keyman-developer
 
-backup:
-    $(WZZIP) $(BUILD)\developer\kmconvert.zip  $(BACKUPDEFAULTS) kmconvert.exe
-
 test-manifest:
     # test that (a) linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\kmconvert.exe -validate_manifest

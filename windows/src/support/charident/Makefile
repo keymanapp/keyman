@@ -17,7 +17,4 @@ wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\support\charident.exe /t keyman-windows
     #TODO: $(SYMSTORE) $(DEBUGPATH)\support\charident.dbg /t keyman-windows
 
-backup:
-    $(WZZIP) $(BUILD)\support\charident.zip  $(BACKUPDEFAULTS) charident.exe
-
 !include ..\..\Target.mak

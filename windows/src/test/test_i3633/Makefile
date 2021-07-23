@@ -4,8 +4,8 @@
 
 !include ..\..\Defines.mak
 
-SIGCHECK=-$(ROOT)\src\test\test_i3633\sigcheck -q -s -e -v -accepteula
-VERIFY=.\verify -d $(KEYMAN_ROOT)\VERSION.md
+SIGCHECK=-$(WIN32_TARGET_PATH)\sigcheck -q -s -e -v -accepteula
+VERIFY=$(WIN32_TARGET_PATH)\verify -d $(KEYMAN_ROOT)\VERSION.md
 
 test: test-bin
 
@@ -20,8 +20,8 @@ test-install: prereq
 
 
 prereq:
-  $(DCC32) verify.dpr
-  copy sigcheck.bin sigcheck.exe
+  $(DELPHI_MSBUILD) verify.dproj /p:Platform=Win32
+  copy sigcheck.bin $(WIN32_TARGET_PATH)\sigcheck.exe
 
 
 clean: def-clean

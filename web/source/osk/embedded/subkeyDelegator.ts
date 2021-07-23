@@ -2,9 +2,10 @@
 
 namespace com.keyman.osk.embedded {
   /**
-   * As the subkey popup view is handled by the host app when in embedded mode,
-   * this class represents the fact that KMW has "delegated" subkey UI and 
-   * selection to the host app.  Hence, "Delegator", rather than "Popup".
+   * As the subkey popup view is handled by the host app when in embedded mode
+   * within our Android app, this class represents the fact that KMW has
+   * "delegated" subkey UI and selection to the host app.  Hence, "Delegator",
+   * rather than "Popup".
    * 
    * The `resolve` method should be triggered, in some fashion, by the host app
    * whenever the user has completed their longpress, potentially selecting
@@ -40,7 +41,6 @@ namespace com.keyman.osk.embedded {
      * 
      * If no subkey is selected but the original base key is, `resolve(null)`
      * will return a key event corresponding to the base key.
-
      * 
      * @param keyCoreID   {string}  The 'core ID' (id + modifier layer) of
      *                              a selected subkey.  May be `null`.
@@ -76,7 +76,7 @@ namespace com.keyman.osk.embedded {
 
           keyEvent = this.vkbd.keyEventFromSpec(selectedKey as keyboards.ActiveKey, null);
           keyEvent.vkCode=keyEvent.Lcode;
-        }
+        } // else /* if(keyCoreID == null) */ keyEvent = null; // As initialized at the top.
 
         this.resolver(keyEvent);
       }
