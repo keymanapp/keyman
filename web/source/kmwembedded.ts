@@ -256,7 +256,7 @@ namespace com.keyman.text {
    */
   keymanweb['correctOSKTextSize']=function() {
     let osk = keymanweb.osk;
-    if(osk && osk.vkbd && osk.vkbd.adjustHeights(osk.getKeyboardHeight())) {
+    if(osk?.vkbd?.adjustHeights(osk.getKeyboardHeight())) {
       var b: HTMLElement = osk._Box, bs=b.style;
       bs.height=bs.maxHeight=osk.vkbd.computedAdjustedOskHeight(osk.getHeight())+'px';
 

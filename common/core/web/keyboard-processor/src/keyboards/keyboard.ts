@@ -107,6 +107,12 @@ namespace com.keyman.keyboards {
       return this.scriptObject['KH'];
     }
 
+    /**
+     * Embedded JS script designed for use with a keyboard's HTML help text.  Always defined
+     * within the file referenced by &kmw_embedjs in a keyboard's source, though that file
+     * may also contain _other_ script definitions as well.  (`KHF` must be explicitly defined
+     * within that file.)
+     */
     get hasScript(): boolean {
       return !!this.scriptObject['KHF'];
     }
