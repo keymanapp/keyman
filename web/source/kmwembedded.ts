@@ -124,7 +124,7 @@ namespace com.keyman.text {
 
 (function() {
   // Declare KeymanWeb and related objects
-  var keymanweb=window['keyman'], osk: com.keyman.osk.OSKManager = keymanweb['osk'],util=keymanweb['util'],device=util.device;
+  var keymanweb=window['keyman'],util=keymanweb['util'],device=util.device;
   var dom = com.keyman.dom;
 
   // Allow definition of application name
@@ -255,7 +255,7 @@ namespace com.keyman.text {
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    let osk = keymanweb.osk;
+    let osk: com.keyman.osk.OSKManager = keymanweb.osk;
     if(osk?.vkbd?.adjustHeights(osk.getKeyboardHeight())) {
       var b: HTMLElement = osk._Box, bs=b.style;
       bs.height=bs.maxHeight=osk.vkbd.computedAdjustedOskHeight(osk.getHeight())+'px';
@@ -282,6 +282,7 @@ namespace com.keyman.text {
    *     
    **/
   keymanweb['popupVisible'] = function(isVisible) {
+    let osk = keymanweb.osk;
     let gesture = osk.vkbd.subkeyGesture as com.keyman.osk.embedded.SubkeyDelegator;
     let pendingLongpress = osk.vkbd.pendingSubkey;
 
@@ -321,8 +322,8 @@ namespace com.keyman.text {
    *  @return  {string}      comma-separated x,y,w,h of language menu key
    *  
    **/
-  keymanweb['touchMenuPos'] = function()
-  {
+  keymanweb['touchMenuPos'] = function() {
+    let osk = keymanweb.osk;
     if(osk.vkbd.lgKey == null) {
       return '';
     }
@@ -353,6 +354,7 @@ namespace com.keyman.text {
    *  @param  {string}  keyName   key identifier
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
+      let osk = keymanweb.osk;
       var origArg = keyName;
       if(!keymanweb.core.activeKeyboard || !osk.vkbd) {
         return false;
@@ -396,19 +398,18 @@ namespace com.keyman.text {
    *  @return {boolean} false when KMW _has_ fully handled the event and true when not.
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0): boolean {
-    let keyman = com.keyman.singleton;
-    if(!keyman.core.activeKeyboard || code == 0) {
+    if(!keymanweb.core.activeKeyboard || code == 0) {
       return false;
     }
 
     // Clear any pending (non-popup) key
-    osk.vkbd.keyPending = null;
+    keymanweb.osk.vkbd.keyPending = null;
     
     // Note:  this assumes Lelem is properly attached and has an element interface.
     // Currently true in the Android and iOS apps.
     var Lelem = keymanweb.domManager.getLastActiveElement();
     
-    keyman.domManager.initActiveElement(Lelem);
+    keymanweb.domManager.initActiveElement(Lelem);
 
     // Check the virtual key 
     var Lkc: com.keyman.text.KeyEvent = {
@@ -418,7 +419,7 @@ namespace com.keyman.text {
       Lstates: lstates,
       LisVirtualKey: true,
       kName: '',
-      device: keyman.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
+      device: keymanweb.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
       isSynthetic: false
     }; 
 
@@ -427,7 +428,7 @@ namespace com.keyman.text {
       // off to the processor for its actual execution.
 
       // Should return 'false' when KMW _has_ fully handled the event and 'true' when not.
-      return !keyman.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
+      return !keymanweb.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
     } catch (err) {
       console.error(err.message, err);
       return false;

@@ -252,8 +252,11 @@ namespace com.keyman.osk {
       this.bannerContainer.appendChild(banner.getDiv());
 
       // Don't forget to adjust the OSK in case we're now using a blank Banner!
+      // Null guard b/c this function can be trigggered during OSK initialization.
       let keyman = com.keyman.singleton;
-      keyman['osk']._Show();
+      if(keyman['osk']) {
+        keyman['osk']._Show();
+      }
     }
 
     public get activeType(): BannerType {
