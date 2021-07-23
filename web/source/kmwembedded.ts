@@ -398,19 +398,18 @@ namespace com.keyman.text {
    *  @return {boolean} false when KMW _has_ fully handled the event and true when not.
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0): boolean {
-    let keyman = com.keyman.singleton;
-    if(!keyman.core.activeKeyboard || code == 0) {
+    if(!keymanweb.core.activeKeyboard || code == 0) {
       return false;
     }
 
     // Clear any pending (non-popup) key
-    keyman.osk.vkbd.keyPending = null;
+    keymanweb.osk.vkbd.keyPending = null;
     
     // Note:  this assumes Lelem is properly attached and has an element interface.
     // Currently true in the Android and iOS apps.
     var Lelem = keymanweb.domManager.getLastActiveElement();
     
-    keyman.domManager.initActiveElement(Lelem);
+    keymanweb.domManager.initActiveElement(Lelem);
 
     // Check the virtual key 
     var Lkc: com.keyman.text.KeyEvent = {
@@ -420,7 +419,7 @@ namespace com.keyman.text {
       Lstates: lstates,
       LisVirtualKey: true,
       kName: '',
-      device: keyman.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
+      device: keymanweb.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
       isSynthetic: false
     }; 
 
@@ -429,7 +428,7 @@ namespace com.keyman.text {
       // off to the processor for its actual execution.
 
       // Should return 'false' when KMW _has_ fully handled the event and 'true' when not.
-      return !keyman.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
+      return !keymanweb.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
     } catch (err) {
       console.error(err.message, err);
       return false;

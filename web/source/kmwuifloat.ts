@@ -479,7 +479,11 @@ if(!window['keyman']['ui']['name']) {
         else 
         {
           ui.oskButton.style.display = 'block';
-          ui.oskButtonState(keymanweb.osk['isEnabled']());
+          if(keymanweb.osk) {
+            ui.oskButtonState(keymanweb.osk['isEnabled']());
+          } else {
+            ui.oskButtonState(false);
+          }
           ui.outerDiv.style.width = ui.KeyboardSelector.offsetWidth+56+'px';
         }      
       }

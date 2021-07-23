@@ -228,9 +228,7 @@ if(!window['keyman']['ui']['name']) {
       /**
        * UI Functions called by KeymanWeb or OSK
        */     
-      osk['addEventListener']('show',
-      function(oskPosition)
-      { 
+      osk['addEventListener']('show', function(oskPosition) { 
         var t=keymanweb['getLastActiveElement']();
         if(t)
         {  
@@ -246,9 +244,7 @@ if(!window['keyman']['ui']['name']) {
       }); 
 
       /* TODO: why is this still needed??? Does it actually do anything?? */ 
-      osk['addEventListener']('hide',
-      function(hiddenByUser)
-      { 
+      osk['addEventListener']('hide', function(hiddenByUser) { 
         if((arguments.length > 0) && hiddenByUser)
         {
           var _a = document.getElementById('KMW_Keyboard');

@@ -1014,6 +1014,9 @@ if(!window['keyman']['ui']['name']) {
 
     ui.registerEvents = function() {
       let osk = keymanweb.osk;
+      if(!osk) {
+        return;
+      }
 
       osk['addEventListener']('show',ui.onShowOSK);
       osk['addEventListener']('hide',ui.onHideOSK);

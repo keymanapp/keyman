@@ -424,13 +424,6 @@ namespace com.keyman.dom {
         return true; 
       }
 
-      /*
-      // Or if OSK not yet ready (for any reason)
-      if(!osk) {
-        return true;
-      }
-      */
-      
       return PreProcessor.keyDown(e);
     }.bind(this);
 
@@ -479,11 +472,7 @@ namespace com.keyman.dom {
       if(Levent == null) {
         return true;
       }
-      /*
-      if(!osk) {
-        return true;
-      }
-      */
+
       let outputTarget = PreProcessor.getEventOutputTarget(e) as dom.targets.OutputTarget;
       var inputEle = outputTarget.getElement();
 
