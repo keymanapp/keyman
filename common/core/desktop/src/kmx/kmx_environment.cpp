@@ -16,7 +16,6 @@ namespace {
     *DEFAULT_BASELAYOUT                     = u"kbdus.dll",
     *DEFAULT_BASELAYOUTALT                  = u"en-US",
     *DEFAULT_SIMULATEALTGR                  = u"0",
-    *DEFAULT_CAPSLOCK                       = u"0",
     *DEFAULT_BASELAYOUTGIVESCTRLRALTFORRALT = u"0";
 }
 
@@ -25,7 +24,6 @@ KMX_Environment::KMX_Environment() {
   Set(KM_KBP_KMX_ENV_BASELAYOUT, DEFAULT_BASELAYOUT);
   Set(KM_KBP_KMX_ENV_BASELAYOUTALT, DEFAULT_BASELAYOUTALT);
   Set(KM_KBP_KMX_ENV_SIMULATEALTGR, DEFAULT_SIMULATEALTGR);
-  Set(KM_KBP_KMX_ENV_CAPSLOCK, DEFAULT_CAPSLOCK);
   Set(KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT, DEFAULT_BASELAYOUTGIVESCTRLRALTFORRALT);
 }
 
@@ -45,9 +43,6 @@ char16_t const * KMX_Environment::LookUp(std::u16string const & key) const {
   }
   else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_SIMULATEALTGR)) {
     return _simulateAltGr ? u"1" : u"0";
-  }
-  else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_CAPSLOCK)) {
-    return _capsLock ? u"1" : u"0";
   }
   else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT)) {
     return _baseLayoutGivesCtrlRAltForRAlt ? u"1" : u"0";
@@ -73,9 +68,6 @@ void KMX_Environment::Set(std::u16string const & key, std::u16string const & val
   }
   else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_SIMULATEALTGR)) {
     _simulateAltGr = value == u"1";
-  }
-  else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_CAPSLOCK)) {
-    _capsLock = value == u"1";
   }
   else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT)) {
     _baseLayoutGivesCtrlRAltForRAlt = value == u"1";

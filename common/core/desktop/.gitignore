@@ -9,3 +9,5 @@ wasm.build
 TIER.md
 VERSION.md
 shellHelperFunctions.sh
+
+src/rust/keyman_keyboard_processor/target/

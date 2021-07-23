@@ -478,6 +478,7 @@ typedef struct {
     uintptr_t           marker;          // MARKER type
     km_kbp_option_item const * option;   // OPT types
     km_kbp_usv          character;       // CHAR type
+    uint8_t             capsLock;        // CAPSLOCK type, 1 to turn on, 0 to turn off
   };
 } km_kbp_action_item;
 
@@ -494,6 +495,7 @@ enum km_kbp_action_type {
           // for applications where context is cached, this clears the context;
           // for applications where context is read from the focused text store,
           // the context is just re-read and markers flushed.
+  KM_KBP_IT_CAPSLOCK    = 8,  // Enable or disable capsLock
   KM_KBP_IT_MAX_TYPE_ID
 };
 
@@ -940,7 +942,8 @@ KMN_API
 km_kbp_status
 km_kbp_process_event(km_kbp_state *state,
                      km_kbp_virtual_key vk,
-                     uint16_t modifier_state);
+                     uint16_t modifier_state,
+                     uint8_t is_key_down);
 
 #if defined(__cplusplus)
 } // extern "C"
