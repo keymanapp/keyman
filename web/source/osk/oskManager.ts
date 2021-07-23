@@ -7,6 +7,9 @@
 /// <reference path="layouts/targetedFloatLayout.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
+// Models keyboards that present a help page, rather than a standard OSK.
+/// <reference path="helpPageView.ts" />
+/// <reference path="emptyView.ts" />
 
 /***
    KeymanWeb 10.0
@@ -142,11 +145,6 @@ namespace com.keyman.osk {
 
       this.loadRetry = 0;
 
-      if(this.desktopLayout) {
-        this.desktopLayout.titleBar.setTitle('KeymanWeb'); // I1972
-      }
-
-
       this._Visible = false;  // I3363 (Build 301)
       var s = this._Box.style;
       s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
@@ -191,52 +189,43 @@ namespace com.keyman.osk {
       this._Box.onmouseover = this._VKbdMouseOver;
       this._Box.onmouseout = this._VKbdMouseOut;
 
-      // TODO: find out and document why this should not be done for touch devices!!
-      // (Probably to avoid having a null keyboard. But maybe that *is* an option, if there remains a way to get the language menu,
-      //  such as a minimized menu button?)
-      if(activeKeyboard == null && !device.touchable) {
-        const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+      // START:  construction of the actual internal layout for the overall OSK
+      let layout: layouts.TargetedFloatLayout = null;
+
+      // Add header element to OSK only for desktop browsers
+      if(util.device.formFactor == 'desktop') {
+        layout = this.desktopLayout = new layouts.TargetedFloatLayout();
         layout.attachToView(this);
+        this.desktopLayout.titleBar.setTitleFromKeyboard(activeKeyboard);
         this._Box.appendChild(layout.titleBar.element);
-
-        Ldiv = util._CreateElement('div');
-        Ldiv.className='kmw-osk-none';
-        this._Box.appendChild(Ldiv);
-      } else {
-        var Lhelp='';
-        this._Box.className = "";
-        if(activeKeyboard != null) {
-          // Note:  must exist in order for insertHelpHTML to be used!
-          Lhelp=activeKeyboard.helpText;
-        }
-
-        // Generate a visual keyboard from the layout (or layout default)
-        // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
-        if(activeKeyboard && activeKeyboard.layout(device.formFactor as utils.FormFactor)) {
-          this._GenerateVisualKeyboard(activeKeyboard);
-        } else if(!activeKeyboard) {
-          this._GenerateVisualKeyboard(null);
-        } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
-          //osk.ddOSK = false;
-          const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
-          layout.attachToView(this);
-          this._Box.appendChild(layout.titleBar.element);
-          this._Box.appendChild(this.banner.element);
-
-          //Add content
-          var Ldiv = util._CreateElement('div');
-          Ldiv.className='kmw-osk-static';
-          Ldiv.innerHTML = Lhelp;
-          this._Box.appendChild(Ldiv);
-          if(activeKeyboard.hasHelpHTML) {
-            activeKeyboard.insertHelpHTML(this._Box);
-          }
-        }
-
-        if(this.desktopLayout) {
-          this.desktopLayout.titleBar.setTitleFromKeyboard(activeKeyboard);
-        }
       }
+
+      // Add suggestion banner bar to OSK
+      if (this.banner) {
+        this._Box.appendChild(this.banner.element);
+      }
+
+      let kbdView: KeyboardView = this._GenerateKeyboardView(activeKeyboard);
+      this._Box.appendChild(kbdView.element);
+      if(kbdView instanceof VisualKeyboard) {
+        this.vkbd = kbdView;
+      }
+      kbdView.postInsert();
+
+      // Add footer element to OSK only for desktop browsers
+      if(this.desktopLayout) {
+        if(kbdView instanceof VisualKeyboard) {
+          this._Box.appendChild(layout.resizeBar.element);
+        }
+        // For other devices, adjust the object heights, allowing for viewport scaling
+      } else {
+        this.vkbd.adjustHeights(this.getKeyboardHeight());
+
+        let b: HTMLElement = this._Box, bs=b.style;
+        bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+      }
+
+      // END:  construction of the actual internal layout for the overall OSK
 
       // Correct the classname for the (inner) OSK frame (Build 360)
       var kbdID: string = (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
@@ -245,15 +234,9 @@ namespace com.keyman.osk {
         // Assumes that keyboard IDs may not contain the ':' symbol.
         kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
       }
-      var innerFrame=<HTMLDivElement> this._Box.firstChild,
-        kbdClass = ' kmw-keyboard-' + kbdID;
-      if(innerFrame.id == 'keymanweb_title_bar') {
-        // Desktop order is title_bar, banner_container, inner-frame
-        innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;
-      } else if (innerFrame.id == 'keymanweb_banner_container') {
-        innerFrame=<HTMLDivElement> innerFrame.nextSibling;
-      }
-      innerFrame.className = 'kmw-osk-inner-frame' + kbdClass;
+
+      const kbdClassSuffix = ' kmw-keyboard-' + kbdID;
+      kbdView.element.className = kbdView.element.className + kbdClassSuffix;
 
       this.banner.appendStyles();
 
@@ -300,54 +283,58 @@ namespace com.keyman.osk {
       }
     }.bind(this);
 
-    /**
-     * Function     _GenerateVisualKeyboard
-     * Scope        Private
-     * @param       {Object}      PVK         Visual keyboard name
-     * @param       {Object}      Lhelp       true if OSK defined for this keyboard
-     * @param       {Object}      layout0
-     * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
-     * Description  Generates the visual keyboard element and attaches it to KMW
-     */
-    private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard) {
+    private _GenerateKeyboardView(keyboard: keyboards.Keyboard): KeyboardView {
+      let device = com.keyman.singleton.util.device;
+
       if(this.vkbd) {
         this.vkbd.shutdown();
       }
 
-      let util = com.keyman.singleton.util;
-      this.vkbd = new VisualKeyboard(keyboard, util.device);
+      this._Box.className = "";
+
+      // Case 1:  since we hide the system keyboard on touch devices, we need
+      //          to display SOMETHING that can accept input.
+      if(keyboard == null && !device.touchable) {
+        // We do not (currently) allow selecting the default system keyboard on
+        // touch form-factors.  Likely b/c mnemonic difficulties.
+        return new EmptyView();
+      } else {
+        // Generate a visual keyboard from the layout (or layout default)
+        // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
+        if(keyboard && keyboard.layout(device.formFactor as utils.FormFactor)) {
+          return this._GenerateVisualKeyboard(keyboard);
+        } else if(!keyboard /* && device.touchable (implied) */) {
+          // Show a basic, "hollow" OSK that at least allows input, since we're
+          // on a touch device and hiding the system keyboard
+          return this._GenerateVisualKeyboard(null);
+        } else {
+          // A keyboard help-page or help-text is still a visualization, even not a standard OSK.
+          return new HelpPageView(keyboard);
+        }
+      }
+    }
+
+    /**
+     * Function     _GenerateVisualKeyboard
+     * Scope        Private
+     * @param       {Object}      keyboard    The keyboard to visualize
+     * Description  Generates the visual keyboard element and attaches it to KMW
+     */
+    private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard): VisualKeyboard {
+      let device = com.keyman.singleton.util.device;
+
+      // Root element sets its own classes, one of which is 'kmw-osk-inner-frame'.
+      let vkbd = new VisualKeyboard(keyboard, device);
 
       // Ensure the OSK's current layer is kept up to date.
       let core = com.keyman.singleton.core; // Note:  will eventually be a class field.
       core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
 
       // Set box class - OS and keyboard added for Build 360
-      this._Box.className=util.device.formFactor+' '+ util.device.OS.toLowerCase() + ' kmw-osk-frame';
-
-      let layout: layouts.TargetedFloatLayout = null;
-
-      // Add header element to OSK only for desktop browsers
-      if(util.device.formFactor == 'desktop') {
-        layout = this.desktopLayout = new layouts.TargetedFloatLayout();
-        layout.attachToView(this);
-        this._Box.appendChild(layout.titleBar.element);
-      }
-
-      // Add suggestion banner bar to OSK
-      if (this.banner) {
-        this._Box.appendChild(this.banner.element);
-      }
+      this._Box.className=device.formFactor+' '+ device.OS.toLowerCase() + ' kmw-osk-frame';
 
       // Add primary keyboard element to OSK
-      this._Box.appendChild(this.vkbd.kbdDiv);
-
-      // Add footer element to OSK only for desktop browsers
-      if(layout) {
-        this._Box.appendChild(layout.resizeBar.element);
-        // For other devices, adjust the object heights, allowing for viewport scaling
-      } else {
-        this.vkbd.adjustHeights(this);
-      }
+      return vkbd;
     }
 
     /**
@@ -822,8 +809,17 @@ namespace com.keyman.osk {
       // TODO:  Move this into the VisualKeyboard class!
       // The following code will always be executed except for externally created OSK such as EuroLatin
       if(this.vkbd && this.vkbd.ddOSK) {
+        // Always adjust screen height if iPhone or iPod, to take account of viewport changes
+        // Do NOT condition upon form-factor; this line prevents a bug with displaying
+        // the predictive-text banner on the initial keyboard load.  (Issue #2907)
+        if(device.touchable && device.OS == 'iOS') {
+          this.vkbd.adjustHeights(this.getKeyboardHeight());
+
+          var b: HTMLElement = this._Box, bs=b.style;
+          bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+        }
         // Enable the currently active keyboard layer and update the default nextLayer member
-        this.vkbd.show(this);
+        this.vkbd.updateState();
 
         // Extra style changes and overrides for touch-mode.
         if(device.touchable) {
