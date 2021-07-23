@@ -1540,7 +1540,7 @@ namespace com.keyman.osk {
      *  @param  {Object}            PKbd            the keyboard object to be displayed
      *  @param  {string=}           argFormFactor   layout form factor, defaulting to 'desktop'
      *  @param  {(string|number)=}  argLayerId      name or index of layer to show, defaulting to 'default'
-     *  @param  {Object}            height          Target height for the rendered keyboard 
+     *  @param  {number}            height          Target height for the rendered keyboard 
      *                                              (currently required for legacy reasons)
      *  @return {Object}                            DIV object with filled keyboard layer content
      */
