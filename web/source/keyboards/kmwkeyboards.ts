@@ -119,8 +119,8 @@ namespace com.keyman.keyboards {
         if (language.region) {
           stub['KR'] = language.region;
         }
-        // RegionCode? 
-        // stub['KRC'] = language.???;
+
+        // Can ignore ['KRC'] RegionCodes used by the Toolbar UI
 
         if (language.font) {
           stub['KFont'] = language.font;
