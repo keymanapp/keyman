@@ -59,13 +59,15 @@ namespace km {
       return option(scope, key, i->second);
     }
 
-extern "C" uint32_t rust_mock_process_event(uint16_t vk, uint16_t modifier);
+    extern "C" uint32_t rust_mock_process_event(uint16_t vk, uint16_t modifier, uint8_t is_key_down);
 
-    km_kbp_status rust_mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state)
-    {
+    km_kbp_status rust_mock_processor::process_event(km_kbp_state *state,
+                                                    km_kbp_virtual_key vk,
+                                                    uint16_t modifier_state,
+                                                    uint8_t is_key_down) {
       (void)(state);
-      //km_kbd_rust_state rust_state(state);
-      return rust_mock_process_event(vk, modifier_state);
+      // km_kbd_rust_state rust_state(state);
+      return rust_mock_process_event(vk, modifier_state, is_key_down);
     }
 
     km_kbp_attr const & rust_mock_processor::attributes() const {

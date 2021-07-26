@@ -53,7 +53,6 @@ namespace com.keyman {
   }
 
   export class KeymanBase {
-    _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
     _IE = 0;                   // browser version identification
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
@@ -159,7 +158,7 @@ namespace com.keyman {
       this['interface'] = this.core.keyboardInterface;
 
       this.modelManager = new text.prediction.ModelManager();
-      this.osk = this['osk'] = new com.keyman.osk.OSKManager();
+      this.osk = this['osk'] = null;
 
       // Load properties from their static variants.
       this['build'] = com.keyman.environment.BUILD;
@@ -697,7 +696,7 @@ namespace com.keyman {
 
       PKbd = PKbd || this.core.activeKeyboard;
 
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk);
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.getKeyboardHeight());
     }
   }
 }

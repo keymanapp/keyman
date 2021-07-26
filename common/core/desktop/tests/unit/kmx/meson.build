@@ -56,7 +56,7 @@ tests = [
   '030 - multiple groups',
   '031 - caps lock',
 #  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
-#  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
+  '033 - caps always off',
   '034 - options double set reset',
   '035 - options double set staged',
   '036 - options - double reset staged',
@@ -70,7 +70,8 @@ tests = [
 
   '044 - if and context',
   '045 - deadkey and context',
-  '046 - deadkey and contextex'
+  '046 - deadkey and contextex',
+  '047 - caps always off initially on'
 ]
 
 if build_machine.system() == 'windows'

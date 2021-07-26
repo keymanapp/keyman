@@ -1,8 +1,8 @@
 c Description: Tests Caps Lock
 c keys: [K_1][SHIFT K_2][K_A][SHIFT K_B]
 c expected: pass.pass.pass.pass.
-c option: &capsLock=1
-c context: 
+c capsLock: 1
+c context:
 
 store(&version) '10.0'
 

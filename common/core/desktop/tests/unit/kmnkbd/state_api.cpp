@@ -128,20 +128,20 @@ int main(int argc, char * argv[])
   if (attrs->max_context < 16) return __LINE__;
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,
-                                  KM_KBP_MODIFIER_SHIFT));
+                                  KM_KBP_MODIFIER_SHIFT, 1));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}, {KM_KBP_IT_END}}));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_I,
-                                  KM_KBP_MODIFIER_SHIFT));
+                                  KM_KBP_MODIFIER_SHIFT, 1));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('I')}}, {KM_KBP_IT_END}}));
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L, 0));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L, 0, 1));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('l')}}, {KM_KBP_IT_END}}));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1));
   assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {0}}, {KM_KBP_IT_END}}));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L,
-                                  KM_KBP_MODIFIER_SHIFT));
+                                  KM_KBP_MODIFIER_SHIFT, 1));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('L')}}, {KM_KBP_IT_END}}));
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F2,0));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F2, 0, 1));
   assert(action_items(test_state, {{KM_KBP_IT_PERSIST_OPT, {0,},
                       {uintptr_t(&expected_persist_opt)}}, {KM_KBP_IT_END}}));
 

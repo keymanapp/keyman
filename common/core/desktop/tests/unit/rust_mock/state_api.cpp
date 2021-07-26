@@ -165,7 +165,9 @@ int main(int, char * [])
   if (attrs->max_context < 16) return __LINE__;
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,
-                                  KM_KBP_MODIFIER_SHIFT));
+                                  KM_KBP_MODIFIER_SHIFT, true));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,
+                                  KM_KBP_MODIFIER_SHIFT, false));
 
   //TEMP
   action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}});
