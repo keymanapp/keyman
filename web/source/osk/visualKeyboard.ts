@@ -1128,7 +1128,8 @@ namespace com.keyman.osk {
         gs.height = gs.maxHeight = paddedHeight + 'px';
       }
 
-      bs.fontSize=this.fontSize.scaledBy(fs).styleString;
+      // The font-scaling applied on the layer group.
+      bs.fontSize=ParsedLengthStyle.forScalar(fs).styleString;
 
       // Needs the refreshed layout info to work correctly.
       for(const layerId in this.layerGroup.layers) {

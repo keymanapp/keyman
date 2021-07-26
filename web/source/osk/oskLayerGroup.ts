@@ -7,7 +7,6 @@ namespace com.keyman.osk {
 
     public constructor(vkbd: VisualKeyboard, keyboard: keyboards.Keyboard, formFactor: utils.FormFactor) {
       let layout = keyboard.layout(formFactor);
-      let oskManager = com.keyman.singleton.osk;
 
       const lDiv = this.element = document.createElement('div');
       const ls=lDiv.style;
