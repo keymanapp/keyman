@@ -766,7 +766,11 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_BACK:
                 g_message("BACK action %d/%d", i+1, (int)num_action_items);
-                if (keyman->char_buffer != NULL)
+                if (action_items[i].backspace.expected_type == KM_KBP_IT_MARKER)
+                {
+                    g_message("skipping marker type");
+                }
+                else if (keyman->char_buffer != NULL)
                 {
                     // ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
                     g_message("removing one utf8 char from CHAR buffer");

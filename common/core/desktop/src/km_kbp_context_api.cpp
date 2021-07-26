@@ -76,6 +76,11 @@ namespace {
 
       *sz_ptr = buf_size - (e - i);
 
+      // Skip over any final markers - they are execluded from context
+      while(ci->type == KM_KBP_CT_MARKER) {
+        ci++;
+      }
+
       return ci->type == KM_KBP_CT_END
               ? KM_KBP_STATUS_OK
               : KM_KBP_STATUS_INSUFFICENT_BUFFER;

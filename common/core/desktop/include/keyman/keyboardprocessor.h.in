@@ -471,13 +471,20 @@ services framework to transform the text store in the Client Application, among
 other actions.
 ```c
 */
+
+typedef struct {
+  uint8_t expected_type;            /// one of KM_KBP_IT_CHAR, KM_KBP_IT_MARKER, KM_KBP_IT_END (when type to delete is unknown)
+  uintptr_t expected_value;         /// used mainly in unit tests
+} km_kbp_backspace_item;
+
 typedef struct {
   uint8_t   type;
   uint8_t   _reserved[sizeof(void*)-sizeof(uint8_t)];
   union {
-    uintptr_t           marker;          // MARKER type
-    km_kbp_option_item const * option;   // OPT types
-    km_kbp_usv          character;       // CHAR type
+    uintptr_t             marker;          // MARKER type
+    km_kbp_option_item    const * option;   // OPT types
+    km_kbp_usv            character;       // CHAR type
+    km_kbp_backspace_item backspace;
   };
 } km_kbp_action_item;
 
