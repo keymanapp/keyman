@@ -323,7 +323,7 @@ namespace com.keyman {
      */
     async ['addKeyboards'](...args: any[]) : 
         Promise<(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]> {
-      if (args[0].length == 0) {
+      if (!args || !args[0] || args[0].length == 0) {
         // Get the cloud keyboard catalog
         let stubs: (com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[] = [];
         try {
