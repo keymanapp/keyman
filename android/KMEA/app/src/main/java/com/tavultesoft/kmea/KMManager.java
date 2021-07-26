@@ -472,9 +472,7 @@ public final class KMManager {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       if (InAppKeyboard.keyboardPickerEnabled && inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
         showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-      } else if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-        switchToNextKeyboard(context);
-      } else {
+      } else { /* inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD */
         switchToNextKeyboard(context);
       }
     }
