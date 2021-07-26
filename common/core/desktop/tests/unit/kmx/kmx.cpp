@@ -26,14 +26,6 @@
 #include "../test_assert.h"
 #include "../test_color.h"
 
-/*#define   try_status(expr) \
-{auto __s = (expr); if (__s != KM_KBP_STATUS_OK) std::exit(100*__LINE__+__s);}
-
-#ifdef assert
-#undef assert
-#endif
-#define assert(expr) {if (!(expr)) std::exit(100*__LINE__); }*/
-
 namespace
 {
 bool g_beep_found = false;
@@ -347,10 +339,15 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
     size_t n = 0;
     try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
     try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
-    std::cout << "n=" << n << std::endl;
     km_kbp_cp *buf = new km_kbp_cp[n];
-
     try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
+
+    // Verify that both our local test_context and the core's test_state.context have
+    // not diverged
+    auto ci = citems;
+    for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END && test_ci->type != KM_KBP_CT_END; ci++, test_ci++) {
+      assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+    }
 
     km_kbp_context_items_dispose(citems);
     if (text_store != buf) {
@@ -370,6 +367,14 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
   km_kbp_cp *buf = new km_kbp_cp[n];
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
+
+  // Verify that both our local test_context and the core's test_state.context have
+  // not diverged
+  auto ci = citems;
+  for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END && test_ci->type != KM_KBP_CT_END; ci++, test_ci++) {
+    assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+  }
+
   km_kbp_context_items_dispose(citems);
 
   std::cout << "expected  : " << string_to_hex(expected) << " [" << expected << "]" << std::endl;
