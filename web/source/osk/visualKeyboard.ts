@@ -409,6 +409,8 @@ namespace com.keyman.osk {
       }
     }
 
+    //#region Input handling start
+
     /**
      * The main OSK touch start event handler
      *
@@ -441,7 +443,7 @@ namespace com.keyman.osk {
       // Get nearest key if touching a hidden key or the end of a key row
       if((key && ((key.className.indexOf('key-hidden') >= 0) || (key.className.indexOf('key-blank') >= 0)))
         || t.className.indexOf('kmw-key-row') >= 0) {
-        key = this.findNearestKey(e,t);
+        key = this.findNearestKey(e.changedTouches[0],t);
       }
       // Do not do anything if no key identified!
       if(key == null) {
@@ -559,7 +561,7 @@ namespace com.keyman.osk {
         t = this.keyTarget(tt.target);
         if(!t) {
           var t1 = document.elementFromPoint(tt.clientX,tt.clientY);
-          t = this.findNearestKey(e, <HTMLElement> t1);
+          t = this.findNearestKey(e.changedTouches[0], <HTMLElement> t1);
         }
 
         this.highlightKey(t,false);
@@ -601,7 +603,7 @@ namespace com.keyman.osk {
       // Find the nearest key to the touch point if not on a visible key
       if((key1 && key1.className.indexOf('key-hidden') >= 0) ||
         (t1 && (!key1) && t1.className.indexOf('key-row') >= 0)) {
-          key1 = this.findNearestKey(e,t1);
+          key1 = this.findNearestKey(e.changedTouches[0],t1);
       }
 
       // Stop repeat if no longer on BKSP key
@@ -653,6 +655,8 @@ namespace com.keyman.osk {
       }
     }.bind(this);
 
+    //#endregion
+
     /**
      * Get the current key target from the touch point element within the key
      *
@@ -687,14 +691,13 @@ namespace com.keyman.osk {
      *  @return {Object}      nearest key to touch point
      *
      **/
-    findNearestKey(e: TouchEvent, t: HTMLElement): KeyElement {
-      if((!e) || (typeof e.changedTouches == 'undefined')
-        || (e.changedTouches.length == 0)) {
+    findNearestKey(touch: Touch, t: HTMLElement): KeyElement {
+      if(!touch) {
         return null;
       }
 
       // Get touch point on screen
-      var x = e.changedTouches[0].pageX;
+      var x = touch.pageX;
 
       // Get key-row beneath touch point
       while(t && t.className !== undefined && t.className.indexOf('key-row') < 0) {
