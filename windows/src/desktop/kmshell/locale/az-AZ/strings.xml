@@ -51,11 +51,11 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
-  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman hələ də çalışır. Dil klaviaturanızı istənilən vaxt istifadə etmək üçün bu işarəni vurun</string>
+  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman hələ də işləyir. Dil klaviaturanızı istənilən vaxt istifadə etmək üçün bu nişana klikləyin</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0.234 -->
-  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman artıq çalışır. Dil klaviaturanızı istifadə etmək üçün sistem bildiriş sahəsindəki Keyman simgesini vurun</string>
+  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman artıq işləyir. Dil klaviaturanızı istifadə etmək üçün sistem bildiriş sahəsindəki Keyman nişanına klikləyin</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -67,7 +67,7 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Keyboards" comment="Keyboard Layouts tab name">Klaviatura tərtibləri</string>
+  <string name="S_Keyboards" comment="Keyboard Layouts tab name">Klaviatura düzülüşləri</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -79,7 +79,7 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Options_AccessChar" comment="Direct access to the Options tab using alt+">O</string>
+  <string name="S_Options_AccessChar" comment="Direct access to the Options tab using alt+">S</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -87,7 +87,7 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkeys_AccessChar" comment="Direct access to the Hotkeys tab using alt+">H</string>
+  <string name="S_Hotkeys_AccessChar" comment="Direct access to the Hotkeys tab using alt+">Q</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -95,15 +95,15 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Support_AccessChar" comment="Direct access to the Support tab using alt+">S</string>
+  <string name="S_Support_AccessChar" comment="Direct access to the Support tab using alt+">D</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.493.0 -->
-  <string name="S_KeepInTouch" comment="Keep in touch tab name">Əlaqə saxlayın</string>
+  <string name="S_KeepInTouch" comment="Keep in touch tab name">Əlaqədə qalın</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.492.0 -->
-  <string name="S_KeepInTouch_AccessChar" comment="Direct access to the Keep in Touch tab using alt+">T</string>
+  <string name="S_KeepInTouch_AccessChar" comment="Direct access to the Keep in Touch tab using alt+">Ə</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -115,7 +115,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.442.0 -->
-  <string name="S_Caption_KeyboardVersion" comment="Keyboard download window, etc. - term for keyboard version">Klaviatura versiyası</string>
+  <string name="S_Caption_KeyboardVersion" comment="Keyboard download window, etc. - term for keyboard version">Klaviatura versiyası:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -123,7 +123,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Website" comment="Keyboard download window, etc. - term for website">Veb səhifə:</string>
+  <string name="S_Caption_Website" comment="Keyboard download window, etc. - term for website">Veb sayt:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -135,11 +135,11 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">Klaviatura tərtibləri:</string>
+  <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">Klaviatura düzülüşləri:</string>
   <!-- Context: Keyboard Install Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
-  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">Klaviatura tərtibləri:</string>
+  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">Klaviatura düzülüşü:</string>
   <!-- Context: Keyboard Install Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
@@ -155,11 +155,11 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_LayoutType_Positional" comment="Keyboard download window, etc. - term for the fixed keyboard layout type">Fixed (Mövqə)</string>
+  <string name="S_LayoutType_Positional" comment="Keyboard download window, etc. - term for the fixed keyboard layout type">Sabit (Mövqe)</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_LayoutType_Mnemonic" comment="Keyboard download window, etc. - term for the mnemonic keyboard layout type">Windows tərtibatına uyğunlaşdırıldı (Yadda salıcı)</string>
+  <string name="S_LayoutType_Mnemonic" comment="Keyboard download window, etc. - term for the mnemonic keyboard layout type">Windows düzülüşünə gətirildi (Xatırladıcı)</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
@@ -171,43 +171,43 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
-  <string name="S_Languages_Install" comment="Add language profile">Dil əlavə etmək</string>
+  <string name="S_Languages_Install" comment="Add language profile">Dil əlavə et</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">Ekran klaviaturasında:</string>
+  <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">Ekran klaviaturası:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_OnScreenKeyboard_Custom" comment="(OSK) Custom term">Fərdiləşdirilən</string>
+  <string name="S_OnScreenKeyboard_Custom" comment="(OSK) Custom term">Özəl</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OnScreenKeyboard_Installed" comment="(OSK) Installed term">Qurulmuş</string>
+  <string name="S_OnScreenKeyboard_Installed" comment="(OSK) Installed term">Quraşdırılmış</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_OnScreenKeyboard_NotInstalled" comment="(OSK) Not installed term">Qurulmamış</string>
+  <string name="S_OnScreenKeyboard_NotInstalled" comment="(OSK) Not installed term">Quraşdırılmamış</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_Caption_Documentation" comment="Term for the Documentation">Sənədləşməsi</string>
+  <string name="S_Caption_Documentation" comment="Term for the Documentation">Sənədləşdirmə:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_Documentation_Installed" comment="(Documentation) Installed term">Qurulmuş</string>
+  <string name="S_Documentation_Installed" comment="(Documentation) Installed term">Quraşdırılmış</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.306.0 -->
-  <string name="S_Documentation_NotInstalled" comment="(Documentation) Not installed term">Qurulmamış</string>
+  <string name="S_Documentation_NotInstalled" comment="(Documentation) Not installed term">Quraşdırılmamış</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Message" comment="Keyboard download window, etc. - term for additional messages">Mesaj</string>
+  <string name="S_Caption_Message" comment="Keyboard download window, etc. - term for additional messages">Mesaj:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">Müəllif hüquqları:</string>
+  <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">Müəllif hüququ:</string>
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
@@ -215,11 +215,11 @@
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">Klaviaturanı quraşdırmaq</string>
+  <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">Klaviaturanı quraşdır...</string>
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_DownloadKeyboard" comment="Keyboard Layouts - download keyboard button">Klaviatura yüklənir...</string>
+  <string name="S_Button_DownloadKeyboard" comment="Keyboard Layouts - download keyboard button">Klaviaturanı endir...</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
@@ -227,24 +227,24 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">Quraşdırılmış klaviatura yoxdur. Keyman veb saytından klaviatura düzeni qurmaq üçün Klaviaturanı Yüklə düyməsini vurun.</string>
+  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">Qurulu heç bir klaviaturanız yoxdur. Keyman veb saytından klaviatura düzülüşünü quraşdırmaq üçün Klaviatura Endir düyməsini klikləyin.</string>
   <!-- Parameters: %1$s = keyboard layout name -->
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- Introduced: 7.1.251.0 -->
   <!-- String Type: PlainText -->
-  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">Yalnız bir idarəedicisinizsə \'%1$s\' klaviaturasını silə bilərsiniz</string>
+  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">Əgər administratorsunuzsa, \"%1$s\" klaviaturasını silə bilərsiniz</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
-  <string name="S_Keyboard_Share" comment="Keyboard Layouts - share selected keyboard button">Klaviaturanı paylaşmaq</string>
+  <string name="S_Keyboard_Share" comment="Keyboard Layouts - share selected keyboard button">Klaviaturanı paylaş</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
-  <string name="S_Keyboard_Share_QRCode" comment="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">Bu klaviaturanı başqa bir cihaza yükləmək üçün bu kodu tarayın</string>
+  <string name="S_Keyboard_Share_QRCode" comment="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">Bu klaviaturanı başqa bir cihazda yükləmək üçün bu kodu skan edin və ya </string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
-  <string name="S_Keyboard_Share_Link" comment="Keyboard Layouts - text for link to share">onlayn paylaşmaq</string>
+  <string name="S_Keyboard_Share_Link" comment="Keyboard Layouts - text for link to share">onlayn paylaşın</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 13.0.40.0 -->
@@ -256,35 +256,35 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="kogStartup" comment="Options section - Startup">Başlamaq</string>
+  <string name="kogStartup" comment="Options section - Startup">Açılış</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="kogOSK" comment="Options section - OSK">Ekran klaviaturasında</string>
+  <string name="kogOSK" comment="Options section - OSK">Ekran klaviaturası</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="kogAdvanced" comment="Options section - Advanced">Genişləndirilmiş</string>
+  <string name="kogAdvanced" comment="Options section - Advanced">Qabaqcıl</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koKeyboardHotkeysAreToggle" comment="General options - hotkeys toggle on AND off a keyboard layout">Klaviatura qısa yol düymələri klaviatura aktivləşdirməsini dəyişir</string>
+  <string name="koKeyboardHotkeysAreToggle" comment="General options - hotkeys toggle on AND off a keyboard layout">Klaviatura qısayol düymələri klaviatura aktivləşdirməsini dəyişdirir</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Ctrl + Alt ilə AltGr simulyasiya edin</string>
+  <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Ctrl + Alt ilə \"AltGr\"i simulyasiya edin</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
-  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Donanım açar düymələrini düz açarlar kimi qəbul edin</string>
+  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Aparat təminatı özəl düymələrinə düz düymələr kimi davran</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
-  <string name="koShowHints" comment="General options - show/hide hint messages (resets hint messages individually disabled)">Eyham mesajlarını göstərin</string>
+  <string name="koShowHints" comment="General options - show/hide hint messages (resets hint messages individually disabled)">Məsləhət mesajlarını göstər</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0 -->
-  <string name="koAutomaticallyReportErrors" comment="General options - report errors to Keyman team automatically">Səhvləri avtomatik olaraq keyman.com saytına bildirmək</string>
+  <string name="koAutomaticallyReportErrors" comment="General options - report errors to Keyman team automatically">Xətaları avtomatik olaraq keyman.com-da bildir</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0 -->
