@@ -43,6 +43,7 @@ public:
   void push_persist(option const &);
   void push_persist(option const &&);
   void push_emit_keystroke(km_kbp_virtual_key vk=0);
+  void push_capslock(bool);
   void push_invalidate_context();
 
   void commit();
@@ -95,7 +96,6 @@ void actions::push_emit_keystroke(km_kbp_virtual_key vk) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
   emplace_back(km_kbp_action_item {KM_KBP_IT_EMIT_KEYSTROKE, {0,}, {vk}});
 }
-
 
 inline
 void actions::push_invalidate_context() {

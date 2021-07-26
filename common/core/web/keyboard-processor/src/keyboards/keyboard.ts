@@ -98,24 +98,33 @@ namespace com.keyman.keyboards {
     }
 
     /**
-     * HTML help text which is a one liner intended for the status bar of the desktop OSK originally.
+     * HTML help text, as specified by either the &kmw_helptext or &kmw_helpfile system stores.
      * 
-     * Reference: https://help.keyman.com/developer/language/reference/kmw_helptext
+     * Reference: https://help.keyman.com/developer/language/reference/kmw_helptext,
+     *            https://help.keyman.com/developer/language/reference/kmw_helpfile
      */
     get helpText(): string {
       return this.scriptObject['KH'];
     }
 
-    get hasHelpHTML(): boolean {
+    /**
+     * Embedded JS script designed for use with a keyboard's HTML help text.  Always defined
+     * within the file referenced by &kmw_embedjs in a keyboard's source, though that file
+     * may also contain _other_ script definitions as well.  (`KHF` must be explicitly defined
+     * within that file.)
+     */
+    get hasScript(): boolean {
       return !!this.scriptObject['KHF'];
     }
 
     /**
-     * Replaces the OSK with custom HTML, which may be interactive (like with sil_euro_latin).
+     * Embeds a custom script for use by the OSK, which may be interactive (like with sil_euro_latin).
+     * Note:  this must be called AFTER any contents of `helpText` have been inserted into the DOM.
+     * (See sil_euro_latin's source -> sil_euro_latin_js.txt)
      * 
-     * Reference: https://help.keyman.com/developer/language/reference/kmw_helpfile
+     * Reference: https://help.keyman.com/developer/language/reference/kmw_embedjs
      */
-    insertHelpHTML(e: any) {
+    embedScript(e: any) {
       // e:  Expects the OSKManager's _Box element.  We don't add type info here b/c it would
       //     reference the DOM.
       this.scriptObject['KHF'](e);

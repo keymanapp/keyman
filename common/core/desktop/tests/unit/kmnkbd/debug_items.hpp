@@ -31,7 +31,6 @@ typedef struct tagDEBUG_KEY
   KMX_WCHAR const * dpContext;
 } DEBUG_KEY, *LPDEBUG_KEY;
 
-
 const char *debug_item_types[] = {
   "KM_KBP_DEBUG_BEGIN", // = 0,
   "//KM_KBP_DEBUG_BEGIN_ANSI", // = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
@@ -85,9 +84,10 @@ bool are_store_offsets_equal(const uint16_t (&lhs)[DEBUG_STORE_OFFSETS_SIZE], co
   //  !memcmp(lhs, rhs, sizeof(lhs));
 }
 
-bool operator==(km_kbp_state_debug_item const & lhs,
-                km_kbp_state_debug_item const & rhs)
-{
+bool operator==(
+  km_kbp_state_debug_item const & lhs,
+  km_kbp_state_debug_item const & rhs
+) {
   auto result = (lhs.type == rhs.type && lhs.flags == rhs.flags && lhs.kmx_info.first_action == rhs.kmx_info.first_action);
   if(result) {
     LPGROUP lgp = static_cast<LPGROUP>(lhs.kmx_info.group), rgp = static_cast<LPGROUP>(rhs.kmx_info.group);
@@ -110,7 +110,7 @@ bool operator==(km_kbp_state_debug_item const & lhs,
         assert(rgp != nullptr);
         assert(lgp->dpName != nullptr);
         assert(rgp->dpName != nullptr);
-        result = !u16cmp(lgp->dpName, rgp->dpName);
+        result = u16cmp(lgp->dpName, rgp->dpName) == 0;
         break;
       case KM_KBP_DEBUG_RULE_ENTER:
       case KM_KBP_DEBUG_RULE_EXIT:
@@ -120,7 +120,7 @@ bool operator==(km_kbp_state_debug_item const & lhs,
         assert(rgp->dpName != nullptr);
         assert(lrule != nullptr);
         assert(rrule != nullptr);
-        result = !u16cmp(lgp->dpName, rgp->dpName) &&
+        result = u16cmp(lgp->dpName, rgp->dpName) == 0 &&
           lrule->Line == rrule->Line &&
           lrule->Key == rrule->Key &&
           lrule->ShiftFlags == rrule->ShiftFlags &&
@@ -141,9 +141,10 @@ bool operator==(km_kbp_state_debug_item const & lhs,
 }
 
 
-bool debug_items(km_kbp_state const * state,
-                  std::initializer_list<km_kbp_state_debug_item> const & expected)
-{
+bool debug_items(
+  km_kbp_state const * state,
+  std::initializer_list<km_kbp_state_debug_item> const & expected
+) {
   size_t n = 0;
   auto act = km_kbp_state_debug_items(state, &n);
 

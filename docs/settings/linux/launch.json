@@ -5,6 +5,38 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch fixupHistory",
+      "program": "${workspaceFolder}/resources/build/version/dist/index.js",
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "args": ["history", "version"],
+      "type": "node"
+    },
+    {
+      "type": "gdb",
+      "request": "launch",
+      "name": "Launch kmx unit tests",
+      "target": "build/arch/debug/tests/unit/kmx/kmx",
+      "cwd": "${workspaceRoot}/common/core/desktop/",
+      "arguments": "tests/unit/kmx/033\\ -\\ caps\\ always\\ off.km{n,x}",
+      "valuesFormatting": "parseText"
+    },
+    {
+      // kill ibus-engine-keyman, if running
+      // start: gdbserver 10.3.0.53:2345 /media/sf_Develop/keyman/keyman/linux/ibus-keyman/src/ibus-engine-keyman
+      // then attach debugger in vscode
+      "type": "gdb",
+      "request": "attach",
+      "name": "Attach to gdbserver",
+      "executable": "./linux/ibus-keyman/src/ibus-engine-keyman",
+      "target": "10.3.0.53:2345",
+      "remote": true,
+      "cwd": "${workspaceFolder}/linux/ibus-keyman",
+      "valuesFormatting": "parseText"
+    },
+    {
       "name": "Python: Current File",
       "type": "python",
       "request": "launch",
@@ -17,7 +49,46 @@
       "request": "launch",
       "program": "linux/keyman-config/km-config",
       "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "KEYMAN_NOSENTRY": "1"
+      }
+    },
+    {
+      "name": "km-package-install",
+      "type": "python",
+      "request": "launch",
+      "program": "linux/keyman-config/km-package-install",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "KEYMAN_NOSENTRY": "1"
+      }
+    },
+    {
+      "name": "Python: ibus-keyman unit tests",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/linux/ibus-keyman/test/test_ibus_keyman.py",
+      "args": [
+        "001 - basic input UnicodeI"
+      ],
+      "cwd": "${workspaceFolder}/linux/ibus-keyman/test/",
       "console": "integratedTerminal"
+    },
+    {
+      "type": "perl",
+      "name": "help2md",
+      "request": "launch",
+      "program": "${workspaceFolder}/linux/keyman-config/buildtools/help2md",
+      "args": ["${workspaceFolder}/linux/keyman-config/km-package-install", "--output=${workspaceFolder}/linux/keyman-config/debian/man/km-package-install.md", "--name=Keyman keyboards installation and information", "--opt-include=${workspaceFolder}/linux/keyman-config/maninc/km-package-install.inc"],
+      "cwd": "${workspaceFolder}/linux/keyman-config",
+      "stopOnEntry": true,
+      "reloadModules": true,
+      "env": {
+        "KEYMAN_NOSENTRY": "1",
+        "PERL5LIB": "${HOME}/perl5/lib/perl5:${PERL5LIB}"
+      }
     }
   ]
 }

@@ -19,11 +19,18 @@ Following the comments are the normal rules of a Keyman keyboard.
 c Description: Tests Caps Lock env set
 ```
 
-- **option**: allows to put the system in a defined state. The example below turns
-  caps-lock off.
+- **option**: allows to put the system in a defined state. The example below sets the platform.
 
 ```text
-c option: &capsLock=0
+c option: &platform=linux
+```
+
+- **capsLock**: allows to set the caps lock state. The example below turns
+  caps-lock on at the start of the test. `[K_CAPS]` in the **keys** comment
+  allows toggling of caps lock.
+
+```text
+c capsLock: 1
 ```
 
 - **context**: allows to setup a string which serves as context
@@ -52,11 +59,18 @@ c expected: pass.pass.pass.pass.pass.pass.
 
 ## Running the tests
 
-All tests can be run at once with `meson test`.
+All tests can be run at once with `./build.sh --debug tests`.
 
 Alternatively it's possible to run a single test with:
 
 ```bash
 cd common/core/desktop
-build/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys.kmn' 'tests/unit/kmx/038 - punctkeys.kmx'
+build/arch/debug/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys.kmn' 'tests/unit/kmx/038 - punctkeys.kmx'
+```
+
+or shorter:
+
+```bash
+cd common/core/desktop
+build/arch/debug/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys'.km{n,x}
 ```
