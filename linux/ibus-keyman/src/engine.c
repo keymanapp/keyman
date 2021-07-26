@@ -216,7 +216,6 @@ static void reset_context(IBusEngine *engine)
 
         ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
         context_pos = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
-    
         context_start = context_pos > MAXCONTEXT_ITEMS ? context_pos - MAXCONTEXT_ITEMS : 0;
         surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_pos);
         g_message("new context is:%u:%s: cursor:%d anchor:%d", context_pos - context_start, surrounding_text, cursor_pos, anchor_pos);

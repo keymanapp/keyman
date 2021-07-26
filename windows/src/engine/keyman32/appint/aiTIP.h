@@ -1,18 +1,18 @@
 /*
   Name:             aiTIP
   Copyright:        Copyright (C) SIL International.
-  Documentation:
-  Description:
+ Documentation:    
+  Description:      
   Create Date:      11 Dec 2009
 
   Modified Date:    23 Feb 2016
   Authors:          mcdurdin
-  Related Files:
-  Dependencies:
+  Related Files:    
+  Dependencies:     
 
-  Bugs:
-  Todo:
-  Notes:
+  Bugs:             
+  Todo:             
+  Notes:            
   History:          11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
                     24 Jun 2010 - mcdurdin - I2436 - Add space to context for AIWin2000Unicode when not matched
                     24 Apr 2014 - mcdurdin - I4196 - V9.0 - wm_kmmoreposting must be refactored for TIP work as it is not sequential
@@ -78,7 +78,7 @@ public:
 	virtual BOOL QueueAction(int ItemType, DWORD dwData);
 
 	/* Information functions */
-
+   
 	virtual BOOL CanHandleWindow(HWND ahwnd);
 	virtual BOOL IsWindowHandled(HWND ahwnd);
 	virtual BOOL HandleWindow(HWND ahwnd);

@@ -51,7 +51,7 @@
                     03 Feb 2015 - mcdurdin - I4582 - V9.0 - Most underlying layout code in Keyman32 is now obsolete and needs to be removed
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
 */
-/***************************************************************************/ // I4006   // I4169
+/***************************************************************************/   // I4006   // I4169
 
 #ifndef _KEYMAN64_H
 #define _KEYMAN64_H
@@ -86,6 +86,7 @@
 
 #define NOT_IMPLEMENTED assert(FALSE)
 
+
 #define ERROR_APP_MASK 0x20000000L
 #define ERROR_KEYMAN_ALREADY_INIT (ERROR_APP_MASK | 0x00000001L)
 #define ERROR_KEYMAN_SHUTTING_DOWN (ERROR_APP_MASK | 0x00000002L)
@@ -100,14 +101,14 @@
 
 /* RefreshKeyboards message parameters */
 
-#define KR_REQUEST_REFRESH 0
-#define KR_PRE_REFRESH 1
-#define KR_REFRESH 2
-#define KR_SETTINGS_CHANGED 3 // Broadcast when Keyman Configuration settings change
+#define KR_REQUEST_REFRESH  0
+#define KR_PRE_REFRESH      1
+#define KR_REFRESH          2
+#define KR_SETTINGS_CHANGED 3   // Broadcast when Keyman Configuration settings change
 
 /* WM_KEY* message analysis */
 
-#define KEYMSG_LPARAM_SCAN(lParam) ((BYTE)(((lParam)&0xFF0000) >> 16))
+#define KEYMSG_LPARAM_SCAN(lParam) ((BYTE)(((lParam) & 0xFF0000) >> 16))
 #define KEYMSG_FLAG_EXTENDED(lParam) (HIWORD(lParam) & KF_EXTENDED ? 1 : 0)
 #define KEYMSG_FLAG_DLGMODE(lParam) (HIWORD(lParam) & KF_DLGMODE ? 1 : 0)
 #define KEYMSG_FLAG_MENUMODE(lParam) (HIWORD(lParam) & KF_MENUMODE ? 1 : 0)
@@ -116,7 +117,7 @@
 #define KEYMSG_FLAG_UP(lParam) (HIWORD(lParam) & KF_UP ? 1 : 0)
 
 // TODO: Deprecate overloading of scancodes and use dwExtraInfo instead
-#define SCAN_FLAG_KEYMAN_KEY_EVENT 0xFF
+#define SCAN_FLAG_KEYMAN_KEY_EVENT          0xFF
 
 #define EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT 0x4B4D0000
 
@@ -127,13 +128,13 @@
 
 // wParam for wm_keyman
 // These messages should be posted to a window
-#define KM_DISABLEUI 1
-#define KM_ENABLEUI 2
+#define KM_DISABLEUI	1
+#define KM_ENABLEUI		2
 // These messages should be sent to a window
 //#define KM_GETUISTATE	3
-#define KM_FOCUSCHANGED 5  // Never use this flag: internal to Keyman
-#define KM_ACTIVECHANGED 6 // Never use this flag: internal to Keyman
-#define KM_EXITFLUSH 8     // Disconnects GetMessage hook
+#define KM_FOCUSCHANGED	5		// Never use this flag: internal to Keyman
+#define KM_ACTIVECHANGED 6  // Never use this flag: internal to Keyman
+#define KM_EXITFLUSH  8 // Disconnects GetMessage hook
 
 #define KMF_WINDOWCHANGED 1
 
@@ -201,6 +202,5 @@ typedef struct tagKEYBOARD
 #include "registry.h"
 #include "unicode.h"
 #include "xstring.h"
-#include <vector>
 
 #endif	// _KEYMAN64_H
