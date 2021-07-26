@@ -1044,8 +1044,6 @@ namespace com.keyman.keyboards {
           // Register any local keyboards immediately:
           // - must specify filename, keyboard name, language codes, region codes
           // - no request will be sent to cloud
-          let stub = x[i] as KeyboardStub;
-
           if(typeof(x[i]['filename']) == 'string') {
             if(!this.addStub(x[i])) {
               this.keymanweb.util.internalAlert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
@@ -1087,7 +1085,7 @@ namespace com.keyman.keyboards {
           }
 
           // Convert stub from one-to-many KeyboardStub[]
-          let convertedStubs = KeyboardStub.toStubs(stub);
+          let convertedStubs = KeyboardStub.toStubs(x[i]);
           convertedStubs.forEach(s => {
             if (s instanceof KeyboardStub) {
               keyboardStubs.push(s);
@@ -1563,7 +1561,7 @@ namespace com.keyman.keyboards {
     async _registerKeyboard(Pk) {
       // Ensure keymanweb is initialized before continuing to register keyboards
       if(!this.keymanweb.initialized) {
-        let result = await this.deferment;
+        await this.deferment;
       }
 
       if(Pk['_kmw']) {
