@@ -473,9 +473,16 @@ other actions.
 */
 
 typedef struct {
-  uint8_t expected_type;            /// one of KM_KBP_IT_CHAR, KM_KBP_IT_MARKER, KM_KBP_IT_END (when type to delete is unknown)
-  uintptr_t expected_value;         /// used mainly in unit tests
+  uint8_t expected_type;     // km_kbp_backspace_type
+  uintptr_t expected_value;  // used mainly in unit tests
 } km_kbp_backspace_item;
+
+enum km_kbp_backspace_type {
+  KM_KBP_BT_UNKNOWN    = 0,  // Used at beginning of context; user-initiated backspace
+  KM_KBP_BT_CHAR       = 1,  // Deleting a character prior to insertion point
+  KM_KBP_BT_MARKER     = 2,  // Deleting a marker prior to insertion point
+  KM_KBP_BT_MAX_TYPE_ID
+};
 
 typedef struct {
   uint8_t   type;

@@ -39,7 +39,7 @@ public:
   void push_character(km_kbp_usv usv);
   void push_marker(uintptr_t marker);
   void push_alert();
-  void push_backspace(km_kbp_action_type expected_type, uintptr_t expected_value = 0);
+  void push_backspace(km_kbp_backspace_type expected_type, uintptr_t expected_value = 0);
   void push_persist(option const &);
   void push_persist(option const &&);
   void push_emit_keystroke(km_kbp_virtual_key vk=0);
@@ -81,7 +81,7 @@ void actions::push_alert() {
 
 
 inline
-void actions::push_backspace(km_kbp_action_type expected_type, uintptr_t expected_value) {
+void actions::push_backspace(km_kbp_backspace_type expected_type, uintptr_t expected_value) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
   km_kbp_action_item item = {KM_KBP_IT_BACK};
   item.backspace.expected_type = expected_type;

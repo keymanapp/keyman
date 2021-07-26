@@ -119,7 +119,7 @@ namespace km {
         {
         case KM_KBP_VKEY_BKSP:
           state->context().pop_back();
-          state->actions().push_backspace(KM_KBP_IT_END); // Assuming we don't know the character
+          state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
           break;
 
         case KM_KBP_VKEY_F2:

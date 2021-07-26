@@ -52,7 +52,7 @@ dk(8b) dk(8c) + 'x' > '8=Fail6 '
 
 c [K_9] [K_X] [K_X] -> test that
 
-+ '9' > '<' dk(9a) dk(9b) '>' dk(9c) dk(9d)
++ '9' > '{' dk(9a) dk(9b) '}' dk(9c) dk(9d)
 
-dk(9b) '>' dk(9c) dk(9d) + 'x' > dk(9e) '>' dk(9f) dk(9g)
-'<' dk(9a) dk(9e) '>' dk(9f) dk(9g) + 'x' > '9=OK'
+dk(9b) '}' dk(9c) dk(9d) + 'x' > dk(9e) '}' dk(9f) dk(9g)
+'{' dk(9a) dk(9e) '}' dk(9f) dk(9g) + 'x' > '9=OK'

@@ -40,8 +40,8 @@ void print_action_item(const char *title, km_kbp_action_item const & item) {
     break;
   case KM_KBP_IT_BACK:
     std::cout << "  delete:  " <<
-      (item.backspace.expected_type == KM_KBP_IT_CHAR ? "char" :
-      item.backspace.expected_type == KM_KBP_IT_MARKER ? "marker" :
+      (item.backspace.expected_type == KM_KBP_BT_CHAR ? "char" :
+      item.backspace.expected_type == KM_KBP_BT_MARKER ? "marker" :
       "unknown") << " (" <<
       item.backspace.expected_value << ")" << std::endl;
     break;

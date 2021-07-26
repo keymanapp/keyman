@@ -186,7 +186,7 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
     // processing at start of a text store, e.g. delete from a previous cell
     // in a table. Or, if Keyman has a cached context, then there may be
     // additional text in the text store that Keyman can't see.
-    if(act.backspace.expected_type == KM_KBP_IT_MARKER) {
+    if(act.backspace.expected_type == KM_KBP_BT_MARKER) {
       assert(!context.empty());
       assert(context.back().type == KM_KBP_CT_MARKER);
       context.pop_back();
