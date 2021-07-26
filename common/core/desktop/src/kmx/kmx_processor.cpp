@@ -146,54 +146,45 @@ kmx_processor::process_event(
       state->actions().push_alert();
       break;
     case QIT_BACK:
-          switch (a.dwData) {
-          case BK_DEFAULT:
-            // This only happens if we know we have context to delete. Last item must be a character
-            assert(!state->context().empty() && state->context().back().type != KM_KBP_IT_MARKER);
-            if(!state->context().empty()) {
-              pop_context_push_backspace_action(state);
-            } else {
-              // Note: only runs on non-debug build, fail safe
-              state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
-            }
-            break;
-          case BK_DEADKEY:
-            // This only happens if we know we have context to delete. Last item must be a deadkey
-            assert(!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER);
-            if(!state->context().empty()) {
-              pop_context_push_backspace_action(state);
-            } else {
-              // Note: only runs on non-debug build, fail safe
-              state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
-            }
-
-            break;
-          case BK_BACKSPACE:
-            // User-initiated backspace. We need to delete deadkeys from context, both sides of the character deleted
-            while (!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER) {
-              pop_context_push_backspace_action(state);
-            }
-            if (!state->context().empty()) {
-              state->actions().push_backspace(KM_KBP_BT_CHAR, state->context().back().character);
-              state->context().pop_back();
-            } else {
-              // Even if context is empty, we send the backspace event, because we may not
-              // know the context.
-              state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
-            }
-            // Delete deadkey markers prior to char
-            while (!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER) {
-              pop_context_push_backspace_action(state);
-            }
-            break;
-          default:
-            assert(false);
-          }
-          break;    
+      switch (a.dwData) {
+      case BK_DEFAULT:
+        // This only happens if we know we have context to delete. Last item must be a character
+        assert(!state->context().empty() && state->context().back().type != KM_KBP_IT_MARKER);
+        if(!state->context().empty()) {
+          pop_context_push_backspace_action(state);
+        } else {
+          // Note: only runs on non-debug build, fail safe
+          state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
         }
-        // Even if context is empty, we send the backspace event, because we may not
-        // know the context.
-        state->actions().push_backspace();
+        break;
+      case BK_DEADKEY:
+        // This only happens if we know we have context to delete. Last item must be a deadkey
+        assert(!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER);
+        if(!state->context().empty()) {
+          pop_context_push_backspace_action(state);
+        } else {
+          // Note: only runs on non-debug build, fail safe
+          state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
+        }
+
+        break;
+      case BK_BACKSPACE:
+        // User-initiated backspace. We need to delete deadkeys from context, both sides of the character deleted
+        while (!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER) {
+          pop_context_push_backspace_action(state);
+        }
+        if (!state->context().empty()) {
+          state->actions().push_backspace(KM_KBP_BT_CHAR, state->context().back().character);
+          state->context().pop_back();
+        } else {
+          // Even if context is empty, we send the backspace event, because we may not
+          // know the context.
+          state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
+        }
+        // Delete deadkey markers prior to char
+        while (!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER) {
+          pop_context_push_backspace_action(state);
+        }
         break;
       default:
         assert(false);
