@@ -934,7 +934,7 @@ namespace com.keyman.osk {
       }
 
       try {
-        var t=<HTMLElement> this.spaceBar.firstChild;
+        var t=<HTMLElement> this.spaceBar.key.label;
         let tParent = <HTMLElement> t.parentNode;
         if(typeof(tParent.className) == 'undefined' || tParent.className == '') {
           tParent.className='kmw-spacebar';
