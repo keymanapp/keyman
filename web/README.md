@@ -62,6 +62,14 @@ Alternatively, see `unit_tests/test.sh`, which the former command executes.
 ### Debugging Unit Tests
 1. During development, to run a specific unit test, change the `it` to `it.only`.
     You can also run all tests under a specific group with `describe.only`.
-2. From this directory, run `./unit_tests/test.sh -debug`
+2. From this directory, run `./unit_tests/test.sh -debug`.
+Alternatively, from `web/` or any `web/` subdirectory,
+    ```
+    npm run test -- -debug
+    ```
+    The `--` part tells `npm` to funnel anything to the script as the script's command-line parameters.
+    As long as it's run from somewhere within the `web/` folder's hierarchy, that line will always run from `web/`,
+    as that's where `package.json` is.
+
 3. When the browser halts, click the "Debug" button which opens a new debugging tab.
 4. In the Dev console, you can set a breakpoint in your test and refresh the page to debug
