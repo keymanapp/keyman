@@ -4,6 +4,7 @@
 */
 #include "kmx_processevent.h"
 #include "state.hpp"
+#include <keyman/keyboardprocessor_consts.h>
 
 using namespace km::kbp;
 using namespace kmx;
@@ -60,20 +61,26 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
 }
 
 /*
-* KMX_BOOL ProcessEvent();
+ * Process Events
 *
-* Parameters: none
+ * ProcessEvent organizes the messages and gives them to the appropriate routines to
+ * process, and checks the state of Windows for the keyboard handling.
+ * Called by FilterFunc.
 *
-* Returns:  TRUE if keystroke should be eaten
+ * @param state      A pointer to the state object.
+ * @param vkey       A virtual key to be processed.
+ * @param modifiers  The combinations of modifier keys set at the time vkey was pressed,
+ *                   bitmask from the km_kbp_modifier_state enum.
+ * @param isKeyDown  TRUE if this is called on KeyDown event, FALSE if called on KeyUp event
 *
-*   Called by:  FilterFunc
-*
-* ProcessEvent organizes the messages and gives them to the appropriate routines to
-* process, and checks the state of Windows for the keyboard handling.
+ * @return           TRUE if keystroke should be eaten
 */
-
-KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers)
-{
+KMX_BOOL KMX_ProcessEvent::ProcessEvent(
+  km_kbp_state *state,
+  KMX_UINT vkey,
+  KMX_DWORD modifiers,
+  KMX_BOOL isKeyDown
+) {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
 
   m_kbp_state = state;
@@ -92,8 +99,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
     state->debug_items().push_end(m_actions.Length(), 0);
   }
 
-  if (m_environment.capsLock())
-    modifiers |= CAPITALFLAG;
+  ResetCapsLock(modifiers);
 
   m_state.vkey = vkey;
   m_state.charCode = VKeyToChar(modifiers, vkey);
@@ -102,6 +108,21 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
 
   if (kbd->StartGroup[BEGIN_UNICODE] == (KMX_DWORD) -1) {
     DebugLog("Non-Unicode keyboards are not supported.");
+    m_kbp_state = nullptr;
+    return FALSE;
+  }
+
+  switch (vkey) {
+  case KM_KBP_VKEY_CAPS:
+    KeyCapsLockPress(modifiers, isKeyDown);
+    break;
+  case KM_KBP_VKEY_SHIFT:
+    KeyShiftPress(modifiers, isKeyDown);
+    break;
+  }
+
+  if (!isKeyDown) {
+    m_kbp_state = nullptr;
     return FALSE;
   }
 
@@ -142,10 +163,9 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
 *
 *   Called by:  ProcessEvent, recursive inside groups
 *
-* ProcessKey is where the keystroke conversion and output takes place.  This routine
+* ProcessGroup is where the keystroke conversion and output takes place.  This routine
 * has a lot of crucial code in it!
 */
-
 KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 {
   KMX_DWORD i;
@@ -275,7 +295,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
       PostString(gp->dpNoMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
       if(m_debug_items) {
         m_debug_items->push_nomatch_exit(m_actions.Length(), gp);
-      }
+    }
     }
     else if (m_state.charCode != 0 && m_state.charCode != 0xFFFF && gp->fUsingKeys)
     {
@@ -357,7 +377,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     if(m_debug_items) {
       m_debug_items->push_match_enter(m_actions.Length(), gp);
     }
-    PostString(gp->dpMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
+      PostString(gp->dpMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
     if(m_debug_items) {
       m_debug_items->push_match_exit(m_actions.Length(), gp);
     }
@@ -381,12 +401,11 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 *
 * Returns:  0 to continue, 1 and 2 to return.
 *
-*   Called by:  ProcessKey
+*   Called by:  ProcessGroup
 *
 * PostString posts a string of "context", "index", "beep", characters and virtual keys
 * to the active application, via the Keyman PostKey buffer.
 */
-
 int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr, KMX_BOOL *pOutputKeystroke)
 {
   PKMX_WCHAR p, q, temp;
@@ -561,11 +580,10 @@ KMX_BOOL KMX_ProcessEvent::IsMatchingPlatform(LPSTORE s)  // I3432
 *
 * Returns:    0 on OK, 1 on not equal
 *
-*   Called by:  ProcessKey
+*   Called by:  ProcessGroup
 *
 * ContextMatch compares the context of a rule with the current context.
 */
-
 KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
 {
   KMX_WORD /*i,*/ n;

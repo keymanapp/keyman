@@ -12,7 +12,6 @@ class KMX_Environment {
 private:
   KMX_BOOL _simulateAltGr, _baseLayoutGivesCtrlRAltForRAlt;
   std::u16string _baseLayout, _baseLayoutAlt;
-  KMX_BOOL _capsLock;
   std::u16string _platform;
   void InitOption(
     std::vector<option> & default_env,
@@ -23,7 +22,6 @@ public:
   void Set(std::u16string const & key, std::u16string const & value);
   char16_t const * LookUp(std::u16string const & key) const;
 
-  KMX_BOOL capsLock() const noexcept { return _capsLock; }
   KMX_BOOL simulateAltGr() const noexcept { return _simulateAltGr; }
   KMX_BOOL baseLayoutGivesCtrlRAltForRAlt() const noexcept { return _baseLayoutGivesCtrlRAltForRAlt; }
   const std::u16string & baseLayout() const noexcept { return _baseLayout; }

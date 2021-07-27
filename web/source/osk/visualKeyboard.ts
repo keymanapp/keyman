@@ -22,6 +22,7 @@ namespace com.keyman.osk {
     layerGroup: OSKLayerGroup;
 
     private _layerId: string = "default";
+    layerIndex: number = 0; // the index of the default layer
     readonly isRTL: boolean;
 
     device: Device;
@@ -774,14 +775,6 @@ namespace com.keyman.osk {
       // First check the virtual key, and process shift, control, alt or function keys
       let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device.coreSpec);
 
-      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
-      switch(Lkc.kName) {
-        case 'K_CAPS':
-        case 'K_NUMLOCK':
-        case 'K_SCROLL':
-          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
-      }
-
       // End - mirrors _GetKeyEventProperties
 
       if(core.languageProcessor.isActive && touch) {
@@ -817,11 +810,11 @@ namespace com.keyman.osk {
       // So... through KMW 14, we actually never tracked the capsKey, numKey, and scrollKey
       // properly for keyboard-defined layouts - only _default_, desktop-style layouts.
       //
-      // We _could remedy this, but then... touch keyboards like khmer_angkor actually
+      // We _could_ remedy this, but then... touch keyboards like khmer_angkor actually
       // repurpose certain state keys, and in an inconsistent manner at that.
       // Considering the potential complexity of touch layouts, with multiple possible
       // layer-shift keys, it's likely best to just leave things as they are for now.
-      if(!core.activeKeyboard.usesDesktopLayoutOnDevice(this.device.coreSpec)) {
+      if(!core.activeKeyboard?.usesDesktopLayoutOnDevice(this.device.coreSpec)) {
         return;
       }
 
