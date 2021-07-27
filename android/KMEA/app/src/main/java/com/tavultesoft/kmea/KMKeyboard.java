@@ -189,11 +189,15 @@ final class KMKeyboard extends WebView {
         if (subKeysList != null) {
           showSubKeys(context);
           return;
-        } /* For future implementation
+        } else if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
+          KMManager.setGlobeKeyState(KMManager.GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS);
+          return;
+        /* For future implementation
         else if(suggestionJSON != null) {
           showSuggestionLongpress(context);
           return;
         }*/
+        }
       }
 
       @Override
