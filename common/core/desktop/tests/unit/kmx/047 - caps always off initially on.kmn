@@ -1,7 +1,8 @@
-c Description: Tests Caps Lock always off
+c Description: Tests Caps Lock always off, entry to the test has Caps Lock
+c              on to test that it is then switched off on first keystroke event.
 c keys: [K_1][K_CAPS][K_2][K_CAPS][K_3]
 c expected: pass.pass.pass.
-c capsLock: 0
+c capsLock: 1
 c context:
 
 store(&version) '10.0'

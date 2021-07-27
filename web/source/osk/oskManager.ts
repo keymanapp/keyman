@@ -347,6 +347,12 @@ namespace com.keyman.osk {
     private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKManager,
       source: text.MutableSystemStore,
       newValue: string) {
+      // This handler is also triggered on state-key state changes (K_CAPS) that 
+      // may not actually change the layer.
+      if(this.vkbd) {
+        this.vkbd._UpdateVKShiftStyle();
+      }
+
       if(source.value != newValue) {
         // Prevents console errors when a keyboard only displays help.
         // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.

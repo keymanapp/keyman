@@ -317,14 +317,36 @@ namespace com.keyman {
     /**
      * Exposed function to load keyboards by name. One or more arguments may be used
      *
-     * @param {string|Object} x keyboard name string or keyboard metadata JSON object
+     * @param {any[]} args keyboard name string or keyboard metadata JSON object
+     * @returns {Promise<(KeyboardStub|ErrorStub)[]} Promise of added keyboard/error stubs
      *
      */
-    ['addKeyboards'](x) {
-      if(arguments.length == 0) {
-        this.keyboardManager.keymanCloudRequest('',false);
+    async ['addKeyboards'](...args: any[]) : 
+        Promise<(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]> {
+      if (!args || !args[0] || args[0].length == 0) {
+        // Get the cloud keyboard catalog
+        let stubs: (com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[] = [];
+        try {
+          await this.keyboardManager.keymanCloudRequest('',false);
+          return Promise.resolve(stubs);
+        } catch(error) {
+          console.error(error);
+          let stub: com.keyman.keyboards.ErrorStub = {error: error};
+          stubs.push(stub);
+          return Promise.reject(stubs);
+        };
       } else {
-        this.keyboardManager.addKeyboardArray(arguments);
+        let x: (string|com.keyman.keyboards.KeyboardStub)[] = [];
+        if (Array.isArray(args[0])) {
+          args[0].forEach(a =>
+            x.push(a));
+        } else if (Array.isArray(args)) {
+          args.forEach(a =>
+            x.push(a));
+        } else {
+          x.push(args);
+        }
+        return this.keyboardManager.addKeyboardArray(x);
       }
     }
 
