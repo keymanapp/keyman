@@ -216,6 +216,20 @@ namespace com.keyman.keyboards {
       // This part depends on the keyboard processor's active state.
       if(keyboardProcessor) {
         keyboardProcessor.setSyntheticEventDefaults(Lkc);
+
+        // If it's a state key modifier, trigger its effects as part of the
+        // keystroke.
+        const bitmap = {
+          'K_CAPS': text.Codes.stateBitmasks.CAPS,
+          'K_NUMLOCK': text.Codes.stateBitmasks.NUM_LOCK,
+          'K_SCROLL': text.Codes.stateBitmasks.SCROLL_LOCK
+        };
+        const bitmask = bitmap[Lkc.kName];
+
+        if(bitmask) {
+          Lkc.Lstates ^= bitmask;
+          Lkc.LmodifierChange = true;
+        }
       }
 
       return Lkc;

@@ -21,6 +21,7 @@ namespace com.keyman.osk {
     layerGroup: OSKLayerGroup;
 
     private _layerId: string = "default";
+    layerIndex: number = 0; // the index of the default layer
     readonly isRTL: boolean;
 
     device: Device;
@@ -766,14 +767,6 @@ namespace com.keyman.osk {
 
       // First check the virtual key, and process shift, control, alt or function keys
       let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device.coreSpec);
-
-      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
-      switch(Lkc.kName) {
-        case 'K_CAPS':
-        case 'K_NUMLOCK':
-        case 'K_SCROLL':
-          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
-      }
 
       // End - mirrors _GetKeyEventProperties
 

@@ -40,6 +40,29 @@
     and is called when the page loads.
 */
 
+/**
+ * Add keyboards
+ * @param {string | KeyboardStub | (string|KeyboardStub)[]} obj Info for adding a keyboard
+ */
+  function addKeyboards(...args) {
+    var kmw=keyman;
+    var promise = kmw.addKeyboards(args);
+    promise.then(result => {
+      if (result.length > 0 && !result[0].error) {
+        console.log('Adding: ', result);
+      } else {
+        console.log('Nothing added');
+      }
+    }).catch(errorStubs => {
+      // Consumer decides how to handle errors
+      errorStubs.forEach(e => console.error(e));
+
+      // We'll also concat the error messages to an alert
+      var errorMessages = errorStubs.map(e => e.error.message).join('\n');
+      alert(errorMessages);
+    });
+  }
+
   /**
    * Add a keyboard by language name.  Note that the name must be spelled
      correctly, or the keyboard will not be found.  (Using BCP-47 codes is
@@ -47,6 +70,7 @@
    * @param {string} languages. Could be comma-separated languages
    */
   function addKeyboardsForLanguage(languages) {
+    var kmw=keyman;
     kmw.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(result => {
       console.log('Adding ' + languages + ': ', result);
     }).catch(errorStubs => {
@@ -54,26 +78,35 @@
       errorStubs.forEach(e => console.error(e));
 
       // We'll also concat the error messages to an alert
-      let errorMessages = errorStubs.map(e => e.error.message).join('\n');
+      var errorMessages = errorStubs.map(e => e.error.message).join('\n');
       alert(errorMessages);
     });
   }
 
   function loadKeyboards()
   {
-    var kmw=keyman;
+    // No parameter adds entire cloud keyboard catalog
+    //addKeyboards();
 
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keyboard to be
     // locally sourced.
-    kmw.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
+    addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
       filename:'../us-1.0.js'});
 
     // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the BCP-47 language code.
     // We use a different loading pattern here than in the samples version to provide a slightly different set of test cases.
-    kmw.addKeyboards('french','@he');
-    kmw.addKeyboards({id:'sil_euro_latin', name:'SIL EuroLatin', languages: [{id:'no'}, {id:'sv'}]}); // Loads from partial stub instead of the compact string.
+    addKeyboards('spanish','@nqo');
+    // One keyboard - 2 languages
+    addKeyboards({id:'sil_euro_latin', name:'SIL EuroLatin', languages: [{id:'no'}, {id:'sv'}]}); // Loads from partial stub instead of the compact string.
+
+    // One invalid keyboard
+    addKeyboards({id: 'invalid', name:'Invalid'});
+
+    // One keyboard, 1 invalid
+    addKeyboards({id:'sil_cameroon_azerty', name:'SIL Cameroon Azerty', languages:[{id:'aal-latn'}]},
+                 {id: 'invalid2', name:'Invalid2'});
 
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
@@ -81,11 +114,12 @@
     addKeyboardsForLanguage('Dzongkha');
 
     // Add a fully-specified, locally-sourced, keyboard with custom font
-    kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
-      languages: {
-          id:'lo',name:'Lao',region:'Asia'
+    addKeyboards({id:'sil_cameroon_qwerty',name:'Cameroon QWERTY (SIL)',
+      languages:{
+        id:'aal-Latn',name:'Afade (Latin)',region:'Africa',
+        font:{family:'AndikaAfr',source:['./ANDIKAAFR-R.TTF']}
         },
-      filename:'../lao_2008_basic-1.2.js'
+      filename:'./sil_cameroon_qwerty.js'
       });
 
     // The following two optional calls should be delayed until language menus are fully loaded:
@@ -107,7 +141,7 @@
     {
       case 1:
         sKbd=document.getElementById('kbd_id1').value;
-        kmw.addKeyboards(sKbd);
+        addKeyboards(sKbd);
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
@@ -117,6 +151,10 @@
         // Add keyboard for comma-separated language name(s)
         sKbd=document.getElementById('kbd_id3').value;
         addKeyboardsForLanguage(sKbd);
+        break;
+      case 4:
+        // Add khmer_angkor keyboard with languages Object and no filename
+        addKeyboards({id:'khmer_angkor', name: 'Khmer Angkor', languages:{id:'km'}});
         break;
     }
   }
