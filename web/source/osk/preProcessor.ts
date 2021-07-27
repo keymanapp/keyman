@@ -9,14 +9,6 @@ namespace com.keyman.osk {
       // First check the virtual key, and process shift, control, alt or function keys
       let Lkc = e.constructKeyEvent(core.keyboardProcessor, dom.Utils.getOutputTarget(Lelem), keyman.util.device.coreSpec);
 
-      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
-      switch(Lkc.kName) {
-        case 'K_CAPS':
-        case 'K_NUMLOCK':
-        case 'K_SCROLL':
-          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
-      }
-
       // End - mirrors _GetKeyEventProperties
       return Lkc;
     }
