@@ -18,6 +18,11 @@
 #include <keyman/keyboardprocessor_bits.h>
 #include <keyman/keyboardprocessor_vkeys.h>
 
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
 /**
  * The maximum size of context in km_kbp_cp units for a single debug
  * event. This is taken from MAXCONTEXT in keyman32 (Windows) and is purely
@@ -150,3 +155,7 @@ km_kbp_state_debug_get(km_kbp_state const *state);
 KMN_API
 km_kbp_state_debug_item const *
 km_kbp_state_debug_items(km_kbp_state const *state, size_t *num_items);
+
+#if defined(__cplusplus)
+} // extern "C"
+#endif
