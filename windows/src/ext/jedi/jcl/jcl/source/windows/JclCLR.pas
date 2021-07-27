@@ -1161,7 +1161,8 @@ end;
 
 destructor TJclClrTableStream.Destroy;
 begin
-  FreeAndNil(FTables);
+  // MCD 2021-07-27: FTables was never an object -- looks like a bug in this (unused) unit
+  //FreeAndNil(FTables);
   inherited Destroy;
 end;
 

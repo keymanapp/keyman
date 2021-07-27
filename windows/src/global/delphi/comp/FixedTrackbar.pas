@@ -66,9 +66,12 @@ end;
   Tested on VER330 (10.3) - 29 Oct 2019 - mcdurdin
 }
 
+{$IFNDEF VER340}
+{$MESSAGE WARN 'Not yet checked against Delphi 10.4'}
 {$IFNDEF VER330}
 {$IFNDEF VER320}
 {$MESSAGE ERROR 'Check that this fix is still applicable for a new version of Delphi. Checked against Delphi 10.2, 10.3' }
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 

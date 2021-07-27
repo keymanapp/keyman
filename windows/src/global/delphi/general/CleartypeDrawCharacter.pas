@@ -591,7 +591,11 @@ begin
   StrPCopy(lf.lfFaceName, FFontName); //'Code2000');
   hdc := GetDC(0);
   //FPlane0FontName := 'Code2000';
+{$IFDEF VER340}
+  if EnumFontFamiliesEx(hdc, lf, @EnumFallbackFonts, 0, 0) <> 0 then
+{$ELSE}
   if EnumFontFamiliesEx(hdc, lf, @EnumFallbackFonts, 0, 0) then
+{$ENDIF}
   begin
     FPlane0FontName := FFontName;
     Result := True;
