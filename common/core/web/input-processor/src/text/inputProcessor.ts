@@ -75,9 +75,13 @@ namespace com.keyman.text {
       }
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
-      // of state management.
-      if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, outputTarget, !fromOSK)) {
-        return new RuleBehavior();
+      // of state management.  `doModifierPress` must always run.
+      if(this.keyboardProcessor.doModifierPress(keyEvent, outputTarget, !fromOSK)) {
+        // If run on a desktop platform, we know that modifier & state key presses may not
+        // produce output, so we may make an immediate return safely.
+        if(!fromOSK) {
+          return new RuleBehavior();
+        }
       }
 
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
