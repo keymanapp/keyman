@@ -1,5 +1,5 @@
 ///<reference path="visualKeyboard.ts" />
-///<reference path="../dom/uiTouchHandlerBase.ts" />
+///<reference path="uiTouchHandlerBase.ts" />
 
 namespace com.keyman.osk {
   // Base class for a banner above the keyboard in the OSK
@@ -417,7 +417,7 @@ namespace com.keyman.osk {
     }
   }
 
-  export class SuggestionManager extends dom.UITouchHandlerBase<HTMLDivElement> {
+  export class SuggestionManager extends UITouchHandlerBase<HTMLDivElement> {
     private selected: BannerSuggestion;
 
     platformHold: (suggestion: BannerSuggestion, isCustom: boolean) => void;
