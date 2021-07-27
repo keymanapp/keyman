@@ -43,25 +43,9 @@ uses
 { TInstallPackages }
 
 const
-{$IFDEF VER310}
-  SKey_Delphi = 'Software\Embarcadero\BDS\18.0';
-  SPath_DelphiCommonPackageBPLFiles = '%0:sEmbarcadero\Studio\18.0\bpl\';
-  SPath_DelphiCommonPackageDCPFiles = '%0:sEmbarcadero\Studio\18.0\dcp\';
-{$ELSE}
-{$IFDEF VER320}
-  SKey_Delphi = 'Software\Embarcadero\BDS\19.0';
-  SPath_DelphiCommonPackageBPLFiles = '%0:sEmbarcadero\Studio\19.0\bpl\';
-  SPath_DelphiCommonPackageDCPFiles = '%0:sEmbarcadero\Studio\19.0\dcp\';
-{$ELSE}
-{$IFDEF VER330}
-  SKey_Delphi = 'Software\Embarcadero\BDS\20.0';
-  SPath_DelphiCommonPackageBPLFiles = '%0:sEmbarcadero\Studio\20.0\bpl\';
-  SPath_DelphiCommonPackageDCPFiles = '%0:sEmbarcadero\Studio\20.0\dcp\';
-{$ELSE}
-  ERROR: New version of compiler needs new defines
-{$ENDIF VER330}
-{$ENDIF VER320}
-{$ENDIF VER310}
+  SKey_Delphi = 'Software\Embarcadero\BDS\'+DelphiMajorVersion;
+  SPath_DelphiCommonPackageBPLFiles = '%0:sEmbarcadero\Studio\'+DelphiMajorVersion+'\bpl\';
+  SPath_DelphiCommonPackageDCPFiles = '%0:sEmbarcadero\Studio\'+DelphiMajorVersion+'\dcp\';
 
   SKey_DelphiKnownPackages = SKey_Delphi + '\Known Packages';
   SKey_DelphiDisabledPackages = SKey_Delphi + '\Disabled Packages';

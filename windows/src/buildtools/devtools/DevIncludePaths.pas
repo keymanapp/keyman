@@ -20,6 +20,9 @@ unit DevIncludePaths;
 
 interface
 
+uses
+  DevDelphiCompileWrapper;
+
 type
   TIncludePaths = class
     //class function Get: string;
@@ -55,25 +58,9 @@ const
   ///SKey_IncludePaths = 'Software\S4S\Developer\Paths';
   ///SValue_DevIncludePaths = 'Include Paths';
 
-  // These paths may need updating when changing releases
-{$IFDEF VER310}
-  SKey_DelphiLibrary = 'Software\Embarcadero\BDS\18.0\Library\Win32';
-  SFile_DelphiEnvironmentProject = '%AppData%\Embarcadero\BDS\18.0\EnvOptions.proj';
-{$ELSE}
-{$IFDEF VER320}
-  SKey_DelphiLibrary = 'Software\Embarcadero\BDS\19.0\Library\Win32';
-  SKey_DelphiLibrary64 = 'Software\Embarcadero\BDS\19.0\Library\Win64';
-  SFile_DelphiEnvironmentProject = '%AppData%\Embarcadero\BDS\19.0\EnvOptions.proj';
-{$ELSE}
-{$IFDEF VER330}
-  SKey_DelphiLibrary = 'Software\Embarcadero\BDS\20.0\Library\Win32';
-  SKey_DelphiLibrary64 = 'Software\Embarcadero\BDS\20.0\Library\Win64';
-  SFile_DelphiEnvironmentProject = '%AppData%\Embarcadero\BDS\20.0\EnvOptions.proj';
-{$ELSE}
-  ERROR: New version of compiler needs new defines
-{$ENDIF VER330}
-{$ENDIF VER320}
-{$ENDIF VER310}
+  SKey_DelphiLibrary = 'Software\Embarcadero\BDS\'+DelphiMajorVersion+'\Library\Win32';
+  SKey_DelphiLibrary64 = 'Software\Embarcadero\BDS\'+DelphiMajorVersion+'\Library\Win64';
+  SFile_DelphiEnvironmentProject = '%AppData%\Embarcadero\BDS\'+DelphiMajorVersion+'\EnvOptions.proj';
 
   SValue_DelphiBrowsingPath = 'Browsing Path';
   SValue_DelphiSearchPath = 'Search Path';

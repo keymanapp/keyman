@@ -8,6 +8,9 @@ unit DevDelphiStarterCompileWrapper;
 
 interface
 
+uses
+  SourceRootPath;
+
 type
   TDelphiStarterCompileWrapper = class
   private
@@ -18,17 +21,8 @@ type
     class function Run(Quiet: Boolean = False; Silent: Boolean = False): Boolean;  // I3378
   end;
 
-{$IFDEF VER320}
 const
-  SBDSExe = 'C:\Program Files (x86)\Embarcadero\Studio\19.0\bin\BDS.EXE';
-{$ELSE}
-{$IFDEF VER330}
-const
-  SBDSExe = 'C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\BDS.EXE';
-{$ELSE}
-ERROR: SBDSExe is not defined
-{$ENDIF}
-{$ENDIF}
+  SBDSExe = DelphiMajorVersion + 'bin\BDS.EXE';
 
 implementation
 

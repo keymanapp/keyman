@@ -2,6 +2,26 @@ unit SourceRootPath;
 
 interface
 
+{$IFDEF VER310}
+const DelphiMajorVersion = '18.0'; 
+{$ELSE}
+{$IFDEF VER320}
+const DelphiMajorVersion = '19.0'; 
+{$ELSE}
+{$IFDEF VER330}
+const DelphiMajorVersion = '20.0'; 
+{$ELSE}
+{$IFDEF VER340}
+const DelphiMajorVersion = '21.0';
+{$ELSE}
+ERROR: must define Delphi version
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+
+const DelphiBasePath = 'C:\Program Files (x86)\Embarcadero\Studio\' + DelphiMajorVersion + '\';
+
 function CSourcePath: string;
 function CSourceRootPath: string; //='C:\Projects\keyman\open\windows\src';
 function CSourceBinRootPath: string; //='C:\Projects\keyman\open\windows\bin';
