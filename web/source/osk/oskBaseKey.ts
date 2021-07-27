@@ -5,11 +5,11 @@ namespace com.keyman.osk {
 
   export class OSKBaseKey extends OSKKey {
     private capLabel: HTMLDivElement;
-    private heightRatio: number;
+    public readonly row: OSKRow;
 
-    constructor(spec: OSKKeySpec, layer: string, heightRatio: number) {
+    constructor(spec: OSKKeySpec, layer: string, row: OSKRow) {
       super(spec, layer);
-      this.heightRatio = heightRatio;
+      this.row = row;
     }
 
     getId(): string {
@@ -137,7 +137,7 @@ namespace com.keyman.osk {
       
       if(vkbd.usesFixedHeightScaling) {
         // Matches its row's height.
-        this.square.style.height = vkbd.layoutHeight.scaledBy(this.heightRatio).styleString;
+        this.square.style.height = vkbd.layoutHeight.scaledBy(this.row.heightFraction).styleString;
       } else {
         this.square.style.height = '100%'; // use the full row height
       }

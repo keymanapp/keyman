@@ -7,7 +7,7 @@ namespace com.keyman.osk {
   export class OSKRow {
     public readonly element: HTMLDivElement;
     public readonly keys: OSKBaseKey[];
-    private readonly heightFraction: number;
+    public readonly heightFraction: number;
 
     public constructor(vkbd: VisualKeyboard, 
                        layerSpec: keyboards.ActiveLayer,
@@ -29,7 +29,7 @@ namespace com.keyman.osk {
       // All key widths and paddings are rounded for uniformity
       for(let j=0; j<keys.length; j++) {
         const key = keys[j];
-        var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id, this.heightFraction);
+        var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id, this);
         
         var element = keyObj.construct(vkbd);
         this.keys.push(keyObj);
