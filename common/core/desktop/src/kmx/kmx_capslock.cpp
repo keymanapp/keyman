@@ -16,10 +16,11 @@ using namespace kmx;
  *
  * @param[in,out] modifiers   The modifier key bitmap
  * @param         capsLockOn  The desired caps lock state
+ * @param         force       Set caps lock state even if modifiers already show correct state
  */
-void KMX_ProcessEvent::SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn) {
+void KMX_ProcessEvent::SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn, KMX_BOOL force) {
   KMX_BOOL capsLockCurrentlyOn = IsCapsLockOn(modifiers);
-  if (capsLockCurrentlyOn == capsLockOn) {
+  if (capsLockCurrentlyOn == capsLockOn && !force) {
     return;
   }
 
@@ -44,7 +45,7 @@ void KMX_ProcessEvent::SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn) {
 void KMX_ProcessEvent::ResetCapsLock(KMX_DWORD &modifiers) {
   if (m_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF) {
     DebugLog("ResetCapsLock: caps lock should be always off");
-    SetCapsLock(modifiers, FALSE);
+    SetCapsLock(modifiers, FALSE, TRUE);
   }
 }
 
@@ -56,13 +57,17 @@ void KMX_ProcessEvent::ResetCapsLock(KMX_DWORD &modifiers) {
  * @param[in,out]  modifiers    The modifier key bitmap
  * @param          isKeyDown    TRUE if this is called on KeyDown event, FALSE if
  *                              called on KeyUp event
+ * @return TRUE to skip further processing, FALSE to continue with normal key handling
  */
-void KMX_ProcessEvent::KeyCapsLockPress(KMX_DWORD &modifiers, KMX_BOOL isKeyDown) {
+KMX_BOOL KMX_ProcessEvent::KeyCapsLockPress(KMX_DWORD &modifiers, KMX_BOOL isKeyDown) {
   if (m_keyboard.Keyboard->dwFlags & KF_CAPSONONLY && !isKeyDown) {
     SetCapsLock(modifiers, TRUE);
-  } else if (m_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF && isKeyDown) {
-    SetCapsLock(modifiers, FALSE);
+  } else if (m_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF) {
+    if (isKeyDown)
+      SetCapsLock(modifiers, FALSE, TRUE);
+    return TRUE;
   }
+  return FALSE;
 }
 
 /**
