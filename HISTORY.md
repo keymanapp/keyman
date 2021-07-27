@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 15.0.89 alpha 2021-07-27
+
+* feat(web): spacebar text controls (#5348)
+* refactor(common/core/desktop): Rename Load method 🚧 (#5444)
+* fix(android/engine): register lexical model in switchToNextKeyboard (#5439)
+* refactor(web): delayed OSK initialization 🍕 (#5412)
+* feat(web): Update addKeyboards to return Promise (#5389)
+* fix(common/core/web): error from early fat-finger termination due to OS interruptions (#5479)
+* fix(common/core/web): OSK state-key management (#5456)
+* feat(android/engine): Improve globe key experience (#5437)
+
 ## 15.0.88 alpha 2021-07-23
 
 * refactor(web): osk move & resize handler encapsulation 🍕 (#5409)
