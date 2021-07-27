@@ -727,6 +727,7 @@ namespace com.keyman.osk {
       // Replace the target key, if any, by the new target key
       // Do not replace a null target, as that indicates the key has already been released
       if(key1 && this.keyPending) {
+        this.highlightKey(key0, false);
         this.keyPending = key1;
         this.touchPending = e.touches[0];
       }
