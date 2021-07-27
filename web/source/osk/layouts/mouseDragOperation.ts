@@ -1,29 +1,7 @@
+/// <reference path="../inputEventCoordinate.ts" />
+
 namespace com.keyman.osk.layouts {
-  /**
-   * A file-internal class to standardize & simplify coordinate processing for mouse-drag
-   * operations used to manipulate the OSK's display properties.
-   */
- class CustomizationCoordinate {
-    public readonly x: number;
-    public readonly y: number
 
-    public constructor(x: number, y: number) {
-      this.x = x;
-      this.y = y;
-    }
-
-    // Converts a MouseEvent into the base coordinates needed by the mouse-dragging operations.
-    public static fromEvent(e: MouseEvent) {
-      if (e.pageX) {
-        return new CustomizationCoordinate(e.pageX, e.pageY);
-      } else if (e.clientX) {
-        const x = e.clientX + document.body.scrollLeft;
-        const y = e.clientY + document.body.scrollTop;
-
-        return new CustomizationCoordinate(x, y);
-      }
-    }
-  }
 
   type MouseHandler = (this: GlobalEventHandlers, ev: MouseEvent) => any;
 
@@ -62,7 +40,7 @@ namespace com.keyman.osk.layouts {
 
   export abstract class MouseDragOperation {
     private _enabled: boolean;
-    private _startCoord: CustomizationCoordinate;
+    private _startCoord: InputEventCoordinate;
     private _mouseStartSnapshot: MouseStartSnapshot;
 
     private startHandler: (e: MouseEvent) => void;
@@ -114,7 +92,7 @@ namespace com.keyman.osk.layouts {
         this._mouseStartSnapshot = new MouseStartSnapshot(e);
       }
 
-      this._startCoord = CustomizationCoordinate.fromEvent(e);
+      this._startCoord = InputEventCoordinate.fromMouseEvent(e);
 
       document.onmousemove = this._VMoveMouseMove.bind(this);
       document.onmouseup = this._VMoveMouseUp.bind(this);
@@ -151,7 +129,7 @@ namespace com.keyman.osk.layouts {
       if(!this._mouseStartSnapshot.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
         return this._VMoveMouseUp(e);
       } else {
-        const coord = CustomizationCoordinate.fromEvent(e);
+        const coord = InputEventCoordinate.fromMouseEvent(e);
         const deltaX = coord.x - this._startCoord.x;
         const deltaY = coord.y - this._startCoord.y;
 
