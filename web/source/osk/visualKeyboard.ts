@@ -1022,6 +1022,12 @@ namespace com.keyman.osk {
     layerChangeHandler: text.SystemStoreMutationHandler = function(this: VisualKeyboard,
                                                                    source: text.MutableSystemStore,
                                                                    newValue: string) {
+      // This handler is also triggered on state-key state changes (K_CAPS) that 
+      // may not actually change the layer.
+      if(this) {
+        this._UpdateVKShiftStyle();
+      }
+
       if(source.value != newValue) {
         this.layerId = newValue;
         let keyman = com.keyman.singleton;
