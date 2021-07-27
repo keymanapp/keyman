@@ -2169,6 +2169,9 @@ public final class KMManager {
           // Shortpress globe
           doGlobeKeyShortpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
         }
+      } else {
+        // clear globeKeyState
+        globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
       }
     }
   }
@@ -2334,6 +2337,9 @@ public final class KMManager {
               // Do nothing
           }
         } else {
+          // Clear globeKeyState
+          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+
           switchToNextKeyboard(context);
         }
       } else if (url.indexOf("showHelpBubble") >= 0) {
