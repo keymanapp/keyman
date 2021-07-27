@@ -810,7 +810,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
 
     g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
 
-    gboolean isKeyDown = !!(state & IBUS_RELEASE_MASK);
+    gboolean isKeyDown = !(state & IBUS_RELEASE_MASK);
 
     // REVIEW: why don't we handle these keys?
     switch (keycode) {
@@ -877,7 +877,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     g_message("before process key event");
     km_kbp_context *context = km_kbp_state_context(keyman->state);
     g_free(get_current_context_text(context));
-    g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x", km_mod_state);
+    g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x, isKeyDown=%d", km_mod_state, isKeyDown);
     km_kbp_status event_status =
         km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown);
     context = km_kbp_state_context(keyman->state);
