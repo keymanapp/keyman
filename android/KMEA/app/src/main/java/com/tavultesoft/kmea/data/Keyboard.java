@@ -150,7 +150,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.isNewKeyboard = installedObj.getBoolean(KB_NEW_KEYBOARD_KEY);
       this.font = installedObj.getString(KB_FONT_KEY);
       this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
-      this.displayName = installedObj.getString(KB_DISPLAY_NAME_KEY);
+      this.displayName = installedObj.optString(KB_DISPLAY_NAME_KEY, null);
     } catch (JSONException e) {
       KMLog.LogException(TAG, "fromJSON exception: ", e);
     }
