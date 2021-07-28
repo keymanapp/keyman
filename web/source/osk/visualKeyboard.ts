@@ -440,27 +440,63 @@ namespace com.keyman.osk {
       let oskX = this.element.offsetLeft + (_Box?.offsetLeft || 0);
       let oskY = this.element.offsetTop  + (_Box?.offsetTop || 0);
 
-      // If the OSK is using fixed positioning (thus, viewport-relative), we need to
-      // convert the 'clientX'-like values into 'pageX'-like values.
-      if(this.usesFixedPositioning) {
-        oskX += window.pageXOffset;
-        oskY += window.pageYOffset;
-      }
-
-      const width = this.width;
-      const height = this.height;
-
       // Determine the out-of-bounds threshold at which touch-cancellation should automatically occur.
       // Assuming square key-squares, we'll use 1/3 the height of a row for bounds detection
       // for both dimensions.
       const rowCount = this.currentLayer.rows.length;
       const buffer = (0.333 * this.height / rowCount);
+      
+      // Determine the OSK's boundaries and the boundaries of the page / view.
+      // These values are needed in .pageX / .pageY coordinates for the final calcs.
+      let leftBound = oskX - buffer;
+      let rightBound = oskX + this.width + buffer;
+      let topBound = oskY - buffer;
+      let bottomBound = oskY + this.height + buffer;
 
-      // ... and begin!
+      // If the OSK is using fixed positioning (thus, viewport-relative), we need to
+      // convert the 'clientX'-like values into 'pageX'-like values.
+      if(this.usesFixedPositioning) {
+        leftBound   += window.pageXOffset;
+        rightBound  += window.pageXOffset;
+        topBound    += window.pageYOffset;
+        bottomBound += window.pageYOffset;
+      }
 
-      if(coord.x < oskX - buffer || coord.x > oskX + width + buffer) {
+      // Determine the needed linear translation to screen coordinates.
+      const xDelta = window.screenLeft - window.pageXOffset;
+      const yDelta = window.screenTop  - window.pageYOffset;
+
+      // Also translate the initial touch's screen coord, as it affects our bounding box logic.
+      const initScreenCoord = new InputEventCoordinate(this.initTouchCoord.x + xDelta,
+                                                       this.initTouchCoord.y + yDelta);
+
+      // Detection:  is the OSK aligned with any screen boundaries?
+      // If so, create a 'fuzzy' zone around the edges not near the initial touch point that allow
+      // move-based cancellation.
+
+      // If the initial input screen-coord is at least 5 pixels from the screen's left AND
+      // the OSK's left boundary is within 2 pixels from the screen's left...
+      if(initScreenCoord.x >= 5 && leftBound + xDelta <= 2) {
+        leftBound = 2 - xDelta; // new `leftBound` is set to 2 pixels from the screen's left.
+      }
+
+      if(initScreenCoord.x <= screen.width - 5 && rightBound + xDelta >= screen.width - 2) {
+        rightBound = (screen.width - 2) - xDelta; // new `rightBound` 2px from screen's right.
+      }
+
+      if(initScreenCoord.y >= 5 && topBound + yDelta <= 2) {
+        topBound = 2 - yDelta;
+      }
+
+      if(initScreenCoord.y <= screen.height - 5 && bottomBound + yDelta >= screen.height - 2) {
+        bottomBound = (screen.height - 2) - yDelta;
+      }
+
+      // Now to check where the input coordinate lies in relation to the final bounding box!
+
+      if(coord.x < leftBound || coord.x > rightBound) {
         return false;
-      } else if(coord.y < oskY - buffer || coord.y > oskY + height + buffer) {
+      } else if(coord.y < topBound || coord.y > bottomBound) {
         return false;
       } else {
         return true;
@@ -588,13 +624,9 @@ namespace com.keyman.osk {
         this.optionKey(t, t.id, false);
       }
 
-      // Now to incorporate this next bit...?
-
       // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
       // This is not completely effective and needs some tweaking, especially on Android
-      var x = input.x;
-      var beyondEdge = ((x < 2 && this.initTouchCoord.x > 5) || (x > window.innerWidth - 2 && this.initTouchCoord.y < window.innerWidth - 5));
-      if(beyondEdge) {
+      if(!this.detectWithinBounds(input)) {
         this.moveCancel(input);
         this.touchCount--;
         return;
