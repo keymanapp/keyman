@@ -55,7 +55,7 @@ tests = [
 
   '030 - multiple groups',
   '031 - caps lock',
-#  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
+  '032 - caps control',
   '033 - caps always off',
   '034 - options double set reset',
   '035 - options double set staged',
