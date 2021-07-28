@@ -65,7 +65,7 @@ namespace com.keyman.osk {
 
     // State-related properties
     keyPending: KeyElement;
-    touchPending: Touch;
+    touchPending: InputEventCoordinate;
     deleteKey: KeyElement;
     deleting: number; // Tracks a timer id for repeated deletions.
     nextLayer: string;
@@ -173,6 +173,12 @@ namespace com.keyman.osk {
       }
 
       this.layerGroup = new OSKLayerGroup(this, layoutKeyboard, formFactor);
+      
+      // For 'live' touch keyboards, attach touch-based event handling.
+      if(this.device.touchable && !this.isStatic) {
+        const touchEngine = new TouchEventEngine(this);
+        touchEngine.registerEventHandlers();
+      }
 
       // Now that we've properly processed the keyboard's layout, mark it as calibrated.
       // TODO:  drop the whole 'calibration' thing.  The newer layout system supersedes the
@@ -310,12 +316,12 @@ namespace com.keyman.osk {
     //#endregion
 
     //#region OSK touch handlers
-    getTouchCoordinatesOnKeyboard(touch: Touch) {
+    getTouchCoordinatesOnKeyboard(input: InputEventCoordinate) {
       let keyman = com.keyman.singleton;
 
       // We need to compute the 'local', keyboard-based coordinates for the touch.
       let kbdCoords = keyman.util.getAbsolute(this.kbdDiv as HTMLElement);
-      let offsetCoords = {x: touch.pageX - kbdCoords.x, y: touch.pageY - kbdCoords.y};
+      let offsetCoords = {x: input.x - kbdCoords.x, y: input.y - kbdCoords.y};
 
       // The layer group's element always has the proper width setting, unlike kbdDiv itself.
       offsetCoords.x /= this.layerGroup.element.offsetWidth;
@@ -324,7 +330,7 @@ namespace com.keyman.osk {
       return offsetCoords;
     }
 
-    getTouchProbabilities(touch: Touch): text.KeyDistribution {
+    getTouchProbabilities(input: InputEventCoordinate): text.KeyDistribution {
       let keyman = com.keyman.singleton;
       if(!keyman.core.languageProcessor.mayCorrect) {
         return null;
@@ -333,7 +339,7 @@ namespace com.keyman.osk {
       // Note:  if subkeys are active, they will still be displayed at this time.
       // TODO:  In such cases, we should build an ActiveLayout (of sorts) for subkey displays,
       //        update their geometries to the actual display values, and use the results here.
-      let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
+      let touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
       let layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.
       let width = layerGroup.offsetWidth, height = this.kbdDiv.offsetHeight;
       // Prevent NaN breakages.
@@ -418,14 +424,14 @@ namespace com.keyman.osk {
      *  @param  {Event} e   touch start event object
      *
      */
-    touch: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
+    touch(input: InputEventCoordinate) {
       // Identify the key touched
-      var t = <HTMLElement> e.changedTouches[0].target, key = this.keyTarget(t);
+      var t = <HTMLElement> input.target, key = this.keyTarget(t);
 
       // Save the touch point
-      this.touchX = e.changedTouches[0].pageX;
+      this.touchX = input.x;
       // Used for quick-display of popup keys (defined in highlightSubKeys)
-      this.touchY = e.changedTouches[0].pageY;
+      this.touchY = input.y;
 
       // Set the key for the new touch point to be current target, if defined
       this.currentTarget = key;
@@ -439,12 +445,12 @@ namespace com.keyman.osk {
       }
 
       // Keep track of number of active (unreleased) touch points
-      this.touchCount = e.touches.length;
+      this.touchCount = input.activeInputCount;
 
       // Get nearest key if touching a hidden key or the end of a key row
       if((key && ((key.className.indexOf('key-hidden') >= 0) || (key.className.indexOf('key-blank') >= 0)))
         || t.className.indexOf('kmw-key-row') >= 0) {
-        key = this.findNearestKey(e.changedTouches[0],t);
+        key = this.findNearestKey(input, t);
       }
       // Do not do anything if no key identified!
       if(key == null) {
@@ -472,7 +478,7 @@ namespace com.keyman.osk {
       } else if(keyName == 'K_BKSP') {
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
-        this.modelKeyClick(key, e.changedTouches[0]);
+        this.modelKeyClick(key, input);
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
@@ -483,8 +489,8 @@ namespace com.keyman.osk {
 
           if(this.subkeyGesture && this.subkeyGesture instanceof browser.SubkeyPopup) {
             let subkeyPopup = this.subkeyGesture as browser.SubkeyPopup;
-            subkeyPopup.updateTouch(e.changedTouches[0]);
-            subkeyPopup.finalize(e.changedTouches[0]);
+            subkeyPopup.updateTouch(input);
+            subkeyPopup.finalize(input);
           } else {
             this.modelKeyClick(this.keyPending, this.touchPending);
           }
@@ -493,12 +499,12 @@ namespace com.keyman.osk {
           this.touchCount--;
         } else {
           // If this key has subkey, start timer to display subkeys after delay, set up release
-          this.initGestures(key, e.changedTouches[0]);
+          this.initGestures(key, input);
         }
         this.keyPending = key;
-        this.touchPending = e.changedTouches[0];
+        this.touchPending = input;
       }
-    }.bind(this);
+    }
 
     /**
      * OSK touch release event handler
@@ -506,7 +512,7 @@ namespace com.keyman.osk {
      *  @param  {Event} e   touch release event object
      *
      **/
-    release: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
+    release(input: InputEventCoordinate): void {
       // Prevent incorrect multi-touch behaviour if native or device popup visible
       var t = this.currentTarget;
 
@@ -515,13 +521,13 @@ namespace com.keyman.osk {
 
       if((this.subkeyGesture && this.subkeyGesture.isVisible())) {
         // Ignore release if a multiple touch
-        if(e.touches.length > 0) {
+        if(input.activeInputCount > 0) {
           return;
         }
 
         if(this.subkeyGesture instanceof browser.SubkeyPopup) {
           let subkeyPopup = this.subkeyGesture as browser.SubkeyPopup;
-          subkeyPopup.finalize(e.changedTouches[0]);
+          subkeyPopup.finalize(input);
         }
         this.highlightKey(this.keyPending,false);
         this.keyPending = null;
@@ -537,7 +543,7 @@ namespace com.keyman.osk {
 
       // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
       // This is not completely effective and needs some tweaking, especially on Android
-      var x = e.changedTouches[0].pageX;
+      var x = input.x;
       var beyondEdge = ((x < 2 && this.touchX > 5) || (x > window.innerWidth - 2 && this.touchX < window.innerWidth - 5));
 
       // Save then decrement current touch count
@@ -551,23 +557,47 @@ namespace com.keyman.osk {
         this.highlightKey(this.keyPending,false);
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          this.modelKeyClick(this.keyPending, e.changedTouches[0]);
+          this.modelKeyClick(this.keyPending, input);
         }
         this.clearPopup();
         this.keyPending = null;
         this.touchPending = null;
         // Always clear highlighting of current target on release (multi-touch)
       } else {
-        var tt = e.changedTouches[0];
+        var tt = input;
         t = this.keyTarget(tt.target);
         if(!t) {
-          var t1 = document.elementFromPoint(tt.clientX,tt.clientY);
-          t = this.findNearestKey(e.changedTouches[0], <HTMLElement> t1);
+          // Operates relative to the viewport, not based on the actual coordinate on the page.
+          var t1 = document.elementFromPoint(input.x - window.pageXOffset, input.y - window.pageYOffset);
+          t = this.findNearestKey(input, <HTMLElement> t1);
         }
 
         this.highlightKey(t,false);
       }
-    }.bind(this);
+    }
+
+    cancel(input: InputEventCoordinate): void {
+      // Do not attempt to support reselection of target key for overlapped keystrokes.
+      // Perform _after_ ensuring possible sticky keys have been cancelled.
+      if(input.activeInputCount > 1) {
+        return;
+      }
+
+      // Gesture-updates should probably be a separate call from other touch-move aspects.
+
+      // Update all gesture tracking.  The function returns true if further input processing
+      // should be blocked.
+      if(this.updateGestures(null, this.keyPending, input)) {
+        return;
+      }
+
+      this.cancelDelete();
+
+      this.highlightKey(this.keyPending,false);
+      this.showKeyTip(null,false);
+      this.keyPending = null;
+      this.touchPending = null;
+    }
 
     /**
      * OSK touch move event handler
@@ -575,41 +605,28 @@ namespace com.keyman.osk {
      *  @param  {Event} e   touch move event object
      *
      **/
-    moveOver: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
-      // Standard event maintenance
-      e.preventDefault();
-      e.cancelBubble=true;
-
-      if(typeof e.stopImmediatePropagation == 'function') {
-        e.stopImmediatePropagation();
-      } else if(typeof e.stopPropagation == 'function') {
-        e.stopPropagation();
-      }
-
-      // ... an interesting caveat.
+    moveOver(input: InputEventCoordinate): void {
       // Shouldn't be possible, but just in case.
       if(this.touchCount == 0) {
         this.cancelDelete();
         return;
       }
 
-      // Resolves the touch -> coordinate.
       // Get touch position
-      var x=typeof e.touches == 'object' ? e.touches[0].clientX : e.clientX,
-          y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
-
-      // Determine corresponding key.  (Doesn't use it yet; just determines it)
+      const x = input.x - window.pageXOffset;
+      const y = input.y - window.pageYOffset;
 
       // Move target key and highlighting
-      this.touchPending = e.changedTouches[0];
-      var t1 = <HTMLElement> document.elementFromPoint(x,y),
-          key0 = this.keyPending,
-          key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
+      this.touchPending = input;
+      // Operates on viewport-based coordinates, not page-based.
+      var t1 = <HTMLElement> document.elementFromPoint(x,y);
+      const key0 = this.keyPending;
+      let key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
 
       // Find the nearest key to the touch point if not on a visible key
       if((key1 && key1.className.indexOf('key-hidden') >= 0) ||
         (t1 && (!key1) && t1.className.indexOf('key-row') >= 0)) {
-          key1 = this.findNearestKey(e.changedTouches[0],t1);
+          key1 = this.findNearestKey(input, t1);
       }
 
       // Cancels BKSP if it's not the key.  (Note... could also cancel BKSP if the ongoing
@@ -624,7 +641,7 @@ namespace com.keyman.osk {
 
       // Do not attempt to support reselection of target key for overlapped keystrokes.
       // Perform _after_ ensuring possible sticky keys have been cancelled.
-      if(e.touches.length > 1) {
+      if(input.activeInputCount > 1) {
         return;
       }
 
@@ -632,25 +649,8 @@ namespace com.keyman.osk {
 
       // Update all gesture tracking.  The function returns true if further input processing
       // should be blocked.
-      if(this.updateGestures(key1, key0, e.changedTouches[0])) {
+      if(this.updateGestures(key1, key0, input)) {
         return;
-      }
-
-      // _Box has (most of) the useful client values.
-      let height = this.kbdDiv.offsetHeight;
-      // We need to adjust the offset properties by any offsets related to the active banner.
-
-      // Touch-cancel detection... which doesn't depend on key1.  Huh.
-
-      // Determine the y-threshold at which touch-cancellation should automatically occur.
-      let rowCount = this.currentLayer.rows.length;
-      let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
-      var yMin = Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold);
-      if(key0 && e.touches[0].pageY < yMin) {
-        this.highlightKey(key0,false);
-        this.showKeyTip(null,false);
-        this.keyPending = null;
-        this.touchPending = null;
       }
 
       // Identify current touch position (to manage off-key release)
@@ -662,22 +662,22 @@ namespace com.keyman.osk {
       // Do not replace a null target, as that indicates the key has already been released
       if(key1 && this.keyPending) {
         this.keyPending = key1;
-        this.touchPending = e.touches[0];
+        this.touchPending = input;
       }
 
       if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
         // While there may not be an active subkey menu, we should probably update which base key
         // is being highlighted by the current touch & start a pending longpress for it.
         this.clearPopup();
-        this.initGestures(key1, e.changedTouches[0]);
+        this.initGestures(key1, input);
       }
 
       if(this.keyPending) {
         if(key0 != key1 || key1.className.indexOf('kmw-key-touched') < 0) {
-          this.highlightKey(key1,true);
+          this.highlightKey(key1, true);
         }
       }
-    }.bind(this);
+    }
 
     //#endregion
 
@@ -715,13 +715,13 @@ namespace com.keyman.osk {
      *  @return {Object}      nearest key to touch point
      *
      **/
-    findNearestKey(touch: Touch, t: HTMLElement): KeyElement {
-      if(!touch) {
+    findNearestKey(input: InputEventCoordinate, t: HTMLElement): KeyElement {
+      if(!input) {
         return null;
       }
 
       // Get touch point on screen
-      var x = touch.pageX;
+      var x = input.x;
 
       // Get key-row beneath touch point
       while(t && t.className !== undefined && t.className.indexOf('key-row') < 0) {
@@ -801,15 +801,15 @@ namespace com.keyman.osk {
     }
     //#endregion
 
-    modelKeyClick(e: osk.KeyElement, touch?: Touch) {
-      let keyEvent = this.initKeyEvent(e, touch);
+    modelKeyClick(e: osk.KeyElement, input?: InputEventCoordinate) {
+      let keyEvent = this.initKeyEvent(e, input);
 
       // TODO:  convert into an actual event, raised by the VisualKeyboard.
       //        Its code is intended to lie outside of the OSK-Core library/module.
       PreProcessor.raiseKeyEvent(keyEvent);
     }
 
-    initKeyEvent(e: osk.KeyElement, touch?: Touch) {
+    initKeyEvent(e: osk.KeyElement, input?: InputEventCoordinate) {
       // Turn off key highlighting (or preview)
       this.highlightKey(e,false);
 
@@ -826,10 +826,10 @@ namespace com.keyman.osk {
       }
       
       // Return the event object.
-      return this.keyEventFromSpec(keySpec, touch);
+      return this.keyEventFromSpec(keySpec, input);
     }
 
-    keyEventFromSpec(keySpec: keyboards.ActiveKey, touch?: Touch) {
+    keyEventFromSpec(keySpec: keyboards.ActiveKey, input?: InputEventCoordinate) {
       let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
 
       // Start:  mirrors _GetKeyEventProperties
@@ -839,9 +839,9 @@ namespace com.keyman.osk {
 
       // End - mirrors _GetKeyEventProperties
 
-      if(core.languageProcessor.isActive && touch) {
-        Lkc.source = touch;
-        Lkc.keyDistribution = this.getTouchProbabilities(touch);;
+      if(core.languageProcessor.isActive && input) {
+        Lkc.source = input;
+        Lkc.keyDistribution = this.getTouchProbabilities(input);;
       }
 
       // Return the event object.
@@ -1436,7 +1436,7 @@ namespace com.keyman.osk {
      * @param touch   The starting touch coordinates for the gesture
      * @returns 
      */
-    initGestures(key: KeyElement, touch: Touch) {
+    initGestures(key: KeyElement, input: InputEventCoordinate) {
       if(key['subKeys']) {
         let _this = this;
 
@@ -1474,10 +1474,10 @@ namespace com.keyman.osk {
      * 
      * @param currentKey    The key currently underneath the most recent touch coordinate
      * @param previousKey   The previously-selected key
-     * @param touch         The current touch-coordinate for the gesture
+     * @param input         The current mouse or touch coordinate for the gesture
      * @returns true if should fully capture input, false if input should 'fall through'.
      */
-    updateGestures(currentKey: KeyElement, previousKey: KeyElement, touch: Touch): boolean {
+    updateGestures(currentKey: KeyElement, previousKey: KeyElement, input: InputEventCoordinate): boolean {
       let key0 = previousKey;
       let key1 = currentKey;
 
@@ -1486,7 +1486,7 @@ namespace com.keyman.osk {
         if(key0) {
           key0.key.highlight(false);
         }
-        this.subkeyGesture.updateTouch(touch);
+        this.subkeyGesture.updateTouch(input);
 
         this.keyPending = null;
         this.touchPending = null;
@@ -1500,7 +1500,7 @@ namespace com.keyman.osk {
       // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
       if(key1 && key1['subKeys'] != null) {
         // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-        if((this.touchY - touch.pageY > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
+        if((this.touchY - input.y > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
           this.pendingSubkey.resolve();
         }
       }

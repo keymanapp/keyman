@@ -482,13 +482,30 @@ namespace com.keyman.osk {
       return t;
     }
 
-    public isUnderTouch(touch: Touch): boolean {
-      let x = touch.clientX;
-      let y = touch.clientY;
+    public isUnderTouch(input: InputEventCoordinate): boolean {
+      let x = input.x;
+      let y = input.y;
 
       let btn = this.btn;
+      // These functions do not account for 'fixed' positioning.
       let x0 = dom.Utils.getAbsoluteX(btn); 
-      let y0 = dom.Utils.getAbsoluteY(btn);//-document.body.scrollTop;
+      let y0 = dom.Utils.getAbsoluteY(btn);
+
+      let isFixed = false;
+      let node: HTMLElement = btn;
+      while(node) {
+        if(getComputedStyle(node).position == 'fixed') {
+          isFixed = true;
+          break;
+        } else {
+          node = node.offsetParent as HTMLElement;
+        }
+      }
+      
+      if(isFixed) {
+        x0 += window.pageXOffset;
+        y0 += window.pageYOffset;
+      }
       
       let x1 = x0 + btn.offsetWidth;
       let y1 = y0 + btn.offsetHeight;

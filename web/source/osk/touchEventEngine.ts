@@ -15,15 +15,16 @@ namespace com.keyman.osk {
     }
 
     registerEventHandlers() {
-      this.eventRoot.addEventListener('touchstart', this._touchStart);
-      this.eventRoot.addEventListener('touchmove',  this._touchMove);
-      this.eventRoot.addEventListener('touchend',   this._touchEnd);
+      this.eventRoot.addEventListener('touchstart', this._touchStart, true);
+      this.eventRoot.addEventListener('touchmove',  this._touchMove, false);
+      // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
+      this.eventRoot.addEventListener('touchend',   this._touchEnd, true);
     }
 
     unregisterEventHandlers() {
-      this.eventRoot.removeEventListener('touchstart', this._touchStart);
-      this.eventRoot.removeEventListener('touchmove',  this._touchMove);
-      this.eventRoot.removeEventListener('touchend',   this._touchEnd);
+      this.eventRoot.removeEventListener('touchstart', this._touchStart, true);
+      this.eventRoot.removeEventListener('touchmove',  this._touchMove, false);
+      this.eventRoot.removeEventListener('touchend',   this._touchEnd, true);
     }
 
     private preventPropagation(e: TouchEvent) {
@@ -44,33 +45,12 @@ namespace com.keyman.osk {
 
     onTouchMove(event: TouchEvent) {
       this.preventPropagation(event);
-
-      // This method is responsible for determining whether a touch 'moved'
-      // or was 'cancelled'.
-      
-      // Determine the important geometric values involved
       const coord = InputEventCoordinate.fromTouchEvent(event);
 
-      const _Box = this.vkbd.element.offsetParent as HTMLElement;
-      const oskX = this.vkbd.element.offsetLeft + (_Box?.offsetLeft || 0);
-      const oskY = this.vkbd.element.offsetTop  + (_Box?.offsetTop || 0);
-      const width = this.vkbd.width;
-      const height = this.vkbd.height;
-
-      // Determine the out-of-bounds threshold at which touch-cancellation should automatically occur.
-      // Assuming square key-squares, we'll use 1/3 the height of a row for bounds detection
-      // for both dimensions.
-      const rowCount = this.vkbd.currentLayer.rows.length;
-      const buffer = (0.333 * this.vkbd.height / rowCount);
-
-      // ... and begin!
-
-      if(coord.x < oskX - buffer || coord.x > oskX + width + buffer) {
-        this.onInputCancel(coord);
-      } else if(coord.y < oskY - buffer || coord.y > oskY + height + buffer) {
-        this.onInputCancel(coord);
-      } else {
+      if(this.detectWithinBounds(coord)) {
         this.onInputMove(coord);
+      } else {
+        this.onInputCancel(coord);
       }
     }
 
