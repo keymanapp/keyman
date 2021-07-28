@@ -34,7 +34,8 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
   if (Globals::get_CoreIntegration())
   {
-    return; // should never be called if using core processor
+    assert(TRUE); // should never be called if using core processor
+    return; 
   }
   // Called when another thread changes keyboard options and we are sharing keyboard settings
   assert(kp != NULL);
@@ -49,7 +50,8 @@ void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
   if (Globals::get_CoreIntegration())
   {
-    return; // should never be called if using core processor
+    assert(TRUE); // should never be called if using core processor
+    return;
   }
   // This is a cleanup routine; we don't want to precondition all calls to it
   // so we do not assert
@@ -70,7 +72,8 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 {
   if (Globals::get_CoreIntegration())
   {
-    return; // should never be called if using core processor
+    assert(TRUE); // should never be called if using core processor
+    return;
   }
 
   assert(kp != NULL);
@@ -100,7 +103,8 @@ void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 {
   if (Globals::get_CoreIntegration())
   {
-    return; // should never be called if using core processor
+    assert(TRUE); // should never be called if using core processor
+    return;
   }
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
@@ -140,7 +144,8 @@ void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
 {
   if (Globals::get_CoreIntegration())
   {
-    return; // should never be called if using core processor
+    assert(TRUE); // should never be called if using core processor
+    return;
   }
   IntSaveKeyboardOption(REGSZ_KeyboardOptions, kp, nStoreToSave);
 }
@@ -154,6 +159,9 @@ void IntSaveKeyboardOptionREGCore(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR k
 {
   assert(REGKey != NULL);
   assert(kp != NULL);
+  assert(key);
+  assert(value);
+
   RegistryFullAccess r(HKEY_CURRENT_USER);
   if (r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(kp->Name, TRUE) && r.OpenKey(REGKey, TRUE))
   {
@@ -239,9 +247,9 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
     WCHAR buf[256];
     int n = 0;
     // Get the list of default options to determine size of list
-    const km_kbp_keyboard_attrs* keyboadAttrs;
-    km_kbp_keyboard_get_attrs(kp->coreKeyboard, &keyboadAttrs);
-    size_t listSize = km_kbp_options_list_size(keyboadAttrs->default_options);
+    const km_kbp_keyboard_attrs* keyboardAttrs;
+    km_kbp_keyboard_get_attrs(kp->coreKeyboard, &keyboardAttrs);
+    size_t listSize = km_kbp_options_list_size(keyboardAttrs->default_options);
     km_kbp_option_item* keyboardOpts = new  km_kbp_option_item[listSize+1];
 
     while (r.GetValueNames(buf, sizeof(buf) / sizeof(buf[0]), n))

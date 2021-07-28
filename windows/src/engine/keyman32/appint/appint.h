@@ -209,7 +209,7 @@ public:
 };
 
 /**
- * Convert AppContext array into a array of core context items.
+ * Convert AppContext array into an array of core context items.
  * Caller is responsible for freeing the memory.
  *
  * @param   buf     appcontext character array

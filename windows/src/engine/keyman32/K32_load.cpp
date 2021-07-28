@@ -80,8 +80,9 @@ BOOL LoadlpKeyboardCore(int i)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
+
   if (_td->lpKeyboards[i].coreKeyboard) return TRUE;
-  
+
 
   if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
@@ -93,15 +94,15 @@ BOOL LoadlpKeyboardCore(int i)
 
   // Convert char* string to a wchar_t* string.
   size_t convertedChars = 0;
-  mbstowcs_s(&convertedChars, keyboardPath, charSize, buf, _TRUNCATE);
-
-  if (_td->lpKeyboards[i].coreKeyboard)
-  {
-    km_kbp_keyboard_dispose(_td->lpKeyboards[i].coreKeyboard);
-    _td->lpKeyboards[i].coreKeyboard = NULL;
+  if (!mbstowcs_s(&convertedChars, keyboardPath, charSize, buf, _TRUNCATE)) {
+    goto ExitError;
+  }
+  if (KM_KBP_STATUS_OK != km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard)) {
+    goto ExitError;
   }
 
-  if  (KM_KBP_STATUS_OK != km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard)) return FALSE;
+  delete[] keyboardPath;
+
   // TODO: 5442 handle dlls
   //LoadDLLs(&_td->lpKeyboards[i]);
   const km_kbp_option_item test_env_opts[] =
@@ -109,19 +110,23 @@ BOOL LoadlpKeyboardCore(int i)
     KM_KBP_OPTIONS_END
   };
 
-  if (_td->state.lpActiveKBState)
+  if (_td->lpKeyboards[i].lpActiveKBState)
   {
-      km_kbp_state_dispose(_td->state.lpActiveKBState);
-      _td->state.lpActiveKBState = NULL;
+    km_kbp_state_dispose(_td->lpKeyboards[i].lpActiveKBState);
+    _td->lpKeyboards[i].lpActiveKBState = NULL;
   }
 
-  km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->state.lpActiveKBState);
-  LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->state.lpActiveKBState);
+  if (KM_KBP_STATUS_OK != km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpActiveKBState)) return FALSE;
 
-  // free keyboardPath 
-  delete [] keyboardPath;
+  LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpActiveKBState);
 
   return TRUE;
+
+ExitError:
+  if (keyboardPath) {
+    delete[] keyboardPath;
+  }
+  return FALSE;
 }
 
 BOOL LoadlpKeyboard(int i)
@@ -134,13 +139,14 @@ BOOL LoadlpKeyboard(int i)
   if(!_td) return FALSE;
   if(_td->lpKeyboards[i].Keyboard) return TRUE;
   
-
   if(_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
   char buf[256];
   if(!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
 
   if(!LoadKeyboard(buf, &_td->lpKeyboards[i].Keyboard)) return FALSE;   // I5136
+
+  LoadDLLs(&_td->lpKeyboards[i]);
 
   LoadKeyboardOptions(&_td->lpKeyboards[i]);
 
