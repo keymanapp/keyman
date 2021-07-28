@@ -30,9 +30,5 @@ namespace com.keyman.osk {
     onInputEnd(coord: InputEventCoordinate) {
       this.vkbd.release(coord);
     }
-
-    // onInputEndCancel(coord: InputEventCoordinate) {
-    //   // TODO:
-    // }
   }
 }
