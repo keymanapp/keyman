@@ -6,6 +6,7 @@
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/pendingLongpress.ts" />
 /// <reference path="keyboardView.interface.ts" />
+/// <reference path="touchEventEngine.ts" />
 
 namespace com.keyman.osk {
   export class VisualKeyboard implements KeyboardView {
@@ -575,6 +576,7 @@ namespace com.keyman.osk {
      *
      **/
     moveOver: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
+      // Standard event maintenance
       e.preventDefault();
       e.cancelBubble=true;
 
@@ -584,15 +586,19 @@ namespace com.keyman.osk {
         e.stopPropagation();
       }
 
+      // ... an interesting caveat.
       // Shouldn't be possible, but just in case.
       if(this.touchCount == 0) {
         this.cancelDelete();
         return;
       }
 
+      // Resolves the touch -> coordinate.
       // Get touch position
       var x=typeof e.touches == 'object' ? e.touches[0].clientX : e.clientX,
           y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
+
+      // Determine corresponding key.  (Doesn't use it yet; just determines it)
 
       // Move target key and highlighting
       this.touchPending = e.changedTouches[0];
@@ -606,10 +612,15 @@ namespace com.keyman.osk {
           key1 = this.findNearestKey(e.changedTouches[0],t1);
       }
 
+      // Cancels BKSP if it's not the key.  (Note... could also cancel BKSP if the ongoing
+      // input is cancelled, regardless of key, just to be safe.)
+
       // Stop repeat if no longer on BKSP key
       if(key1 && (typeof key1.id == 'string') && (key1.id.indexOf('-K_BKSP') < 0)) {
         this.cancelDelete();
       }
+
+      // Cancels if it's a multitouch attempt.
 
       // Do not attempt to support reselection of target key for overlapped keystrokes.
       // Perform _after_ ensuring possible sticky keys have been cancelled.
@@ -617,18 +628,19 @@ namespace com.keyman.osk {
         return;
       }
 
+      // Gesture-updates should probably be a separate call from other touch-move aspects.
+
       // Update all gesture tracking.  The function returns true if further input processing
       // should be blocked.
       if(this.updateGestures(key1, key0, e.changedTouches[0])) {
         return;
       }
 
-      // Identify current touch position (to manage off-key release)
-      this.currentTarget = key1;
-
       // _Box has (most of) the useful client values.
       let height = this.kbdDiv.offsetHeight;
       // We need to adjust the offset properties by any offsets related to the active banner.
+
+      // Touch-cancel detection... which doesn't depend on key1.  Huh.
 
       // Determine the y-threshold at which touch-cancellation should automatically occur.
       let rowCount = this.currentLayer.rows.length;
@@ -641,11 +653,23 @@ namespace com.keyman.osk {
         this.touchPending = null;
       }
 
+      // Identify current touch position (to manage off-key release)
+      this.currentTarget = key1;
+
+      // Only NOW do we denote the newly-selected key as the currently-focused key.
+
       // Replace the target key, if any, by the new target key
       // Do not replace a null target, as that indicates the key has already been released
       if(key1 && this.keyPending) {
         this.keyPending = key1;
         this.touchPending = e.touches[0];
+      }
+
+      if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
+        // While there may not be an active subkey menu, we should probably update which base key
+        // is being highlighted by the current touch & start a pending longpress for it.
+        this.clearPopup();
+        this.initGestures(key1, e.changedTouches[0]);
       }
 
       if(this.keyPending) {
@@ -1487,12 +1511,6 @@ namespace com.keyman.osk {
         return true;
       }
 
-      if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
-        // While there may not be an active subkey menu, we should probably update which base key
-        // is being highlighted by the current touch & start a pending longpress for it.
-        this.clearPopup();
-        this.initGestures(key1, touch);
-      }
       return false;
     }
 
