@@ -4,7 +4,7 @@ title: Keyman for Android (Tablet Layout)
 
 |   | Keyboard Keys <br/>(Keyboard Present) |
 |---|---|
-| ![](../android_images/globe-at.png) | Select another language/keyboard |
+| ![](../android_images/globe-at.png) | Globe key<br/>Short press and release this key to select another language/keyboard<br/> Long press and release this key to display the keyboard picker menu |
 | ![](../android_images/hide-keyboard-at.png) | Hide the keyboard |
 | ![](../android_images/backspace-at.png) | Backspace |
 | ![](../android_images/return-at.png) | Return |
@@ -13,7 +13,7 @@ title: Keyman for Android (Tablet Layout)
 
 ----
 
-|   | Toolbar Icons
+|   | Toolbar Icons |
 |---|---|
 | ![](../android_images/share-a.png) | Share your text with other atps like Messages, Gmail, or Twitter. Some versions of Android also let you copy your text to the clipboard. |
 | ![](../android_images/browser-a.png) | Open the Keyman Browser to use the web in your language |
