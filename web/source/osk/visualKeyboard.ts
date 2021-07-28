@@ -34,12 +34,6 @@ namespace com.keyman.osk {
     styleSheet: HTMLStyleElement;
 
     /**
-     * Denotes when the VisualKeyboard needs to recalculate its layout geometry and
-     * text sizes.
-     */
-    private needsLayout: boolean = true;
-
-    /**
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic width scaling. 
      */
@@ -1155,13 +1149,7 @@ namespace com.keyman.osk {
         return;
       }
 
-      // Step 3:  perform layout operations.
-      // TODO:
-      // - for the active layer...
-      //   - adjust heights
-      //   - rescale key text
-
-      this.needsLayout = false;
+      // Step 3:  perform layout operations.  (Handled by 'old code' section below.)
 
       // END NEW CODE -----------
 
