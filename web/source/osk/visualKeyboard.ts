@@ -72,8 +72,7 @@ namespace com.keyman.osk {
     currentKey: string;
 
     // Touch-tracking properties
-    touchX: number;
-    touchY: number;
+    initTouchCoord: InputEventCoordinate;
     touchCount: number;
     currentTarget: KeyElement;
 
@@ -269,6 +268,23 @@ namespace com.keyman.osk {
     }
 
     /**
+     * Denotes if the VisualKeyboard or its containing OSKView / OSKManager uses
+     * fixed positioning.
+     */
+    public get usesFixedPositioning(): boolean {
+      let node: HTMLElement = this.element;
+      while(node) {
+        if(getComputedStyle(node).position == 'fixed') {
+          return true;
+        } else {
+          node = node.offsetParent as HTMLElement;
+        }
+      }
+
+      return false;
+    }
+
+    /**
      * Sets & tracks the size of the VisualKeyboard's primary element.
      * @param width
      * @param height
@@ -418,6 +434,39 @@ namespace com.keyman.osk {
 
     //#region Input handling start
 
+    detectWithinBounds(coord: InputEventCoordinate): boolean {
+      // Determine the important geometric values involved
+      const _Box = this.element.offsetParent as HTMLElement;
+      let oskX = this.element.offsetLeft + (_Box?.offsetLeft || 0);
+      let oskY = this.element.offsetTop  + (_Box?.offsetTop || 0);
+
+      // If the OSK is using fixed positioning (thus, viewport-relative), we need to
+      // convert the 'clientX'-like values into 'pageX'-like values.
+      if(this.usesFixedPositioning) {
+        oskX += window.pageXOffset;
+        oskY += window.pageYOffset;
+      }
+
+      const width = this.width;
+      const height = this.height;
+
+      // Determine the out-of-bounds threshold at which touch-cancellation should automatically occur.
+      // Assuming square key-squares, we'll use 1/3 the height of a row for bounds detection
+      // for both dimensions.
+      const rowCount = this.currentLayer.rows.length;
+      const buffer = (0.333 * this.height / rowCount);
+
+      // ... and begin!
+
+      if(coord.x < oskX - buffer || coord.x > oskX + width + buffer) {
+        return false;
+      } else if(coord.y < oskY - buffer || coord.y > oskY + height + buffer) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
     /**
      * The main OSK touch start event handler
      *
@@ -428,10 +477,8 @@ namespace com.keyman.osk {
       // Identify the key touched
       var t = <HTMLElement> input.target, key = this.keyTarget(t);
 
-      // Save the touch point
-      this.touchX = input.x;
-      // Used for quick-display of popup keys (defined in highlightSubKeys)
-      this.touchY = input.y;
+      // Save the touch point, which is used for quick-display of popup keys (defined in highlightSubKeys)
+      this.initTouchCoord = input;
 
       // Set the key for the new touch point to be current target, if defined
       this.currentTarget = key;
@@ -541,10 +588,17 @@ namespace com.keyman.osk {
         this.optionKey(t, t.id, false);
       }
 
+      // Now to incorporate this next bit...?
+
       // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
       // This is not completely effective and needs some tweaking, especially on Android
       var x = input.x;
-      var beyondEdge = ((x < 2 && this.touchX > 5) || (x > window.innerWidth - 2 && this.touchX < window.innerWidth - 5));
+      var beyondEdge = ((x < 2 && this.initTouchCoord.x > 5) || (x > window.innerWidth - 2 && this.initTouchCoord.y < window.innerWidth - 5));
+      if(beyondEdge) {
+        this.moveCancel(input);
+        this.touchCount--;
+        return;
+      }
 
       // Save then decrement current touch count
       var tc=this.touchCount;
@@ -556,7 +610,7 @@ namespace com.keyman.osk {
       if(this.keyPending) {
         this.highlightKey(this.keyPending,false);
         // Output character unless moved off key
-        if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
+        if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0) {
           this.modelKeyClick(this.keyPending, input);
         }
         this.clearPopup();
@@ -576,17 +630,16 @@ namespace com.keyman.osk {
       }
     }
 
-    cancel(input: InputEventCoordinate): void {
+    moveCancel(input: InputEventCoordinate): void {
       // Do not attempt to support reselection of target key for overlapped keystrokes.
       // Perform _after_ ensuring possible sticky keys have been cancelled.
       if(input.activeInputCount > 1) {
         return;
       }
 
-      // Gesture-updates should probably be a separate call from other touch-move aspects.
-
       // Update all gesture tracking.  The function returns true if further input processing
-      // should be blocked.
+      // should be blocked.  (Keeps the subkey array operating when the input coordinate has
+      // moved outside the OSK's boundaries.)
       if(this.updateGestures(null, this.keyPending, input)) {
         return;
       }
@@ -595,6 +648,7 @@ namespace com.keyman.osk {
 
       this.highlightKey(this.keyPending,false);
       this.showKeyTip(null,false);
+      this.clearPopup();
       this.keyPending = null;
       this.touchPending = null;
     }
@@ -1500,7 +1554,7 @@ namespace com.keyman.osk {
       // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
       if(key1 && key1['subKeys'] != null) {
         // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-        if((this.touchY - input.y > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
+        if((this.initTouchCoord.y - input.y > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
           this.pendingSubkey.resolve();
         }
       }

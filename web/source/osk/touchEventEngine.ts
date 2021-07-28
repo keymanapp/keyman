@@ -47,10 +47,10 @@ namespace com.keyman.osk {
       this.preventPropagation(event);
       const coord = InputEventCoordinate.fromTouchEvent(event);
 
-      if(this.detectWithinBounds(coord)) {
+      if(this.vkbd.detectWithinBounds(coord)) {
         this.onInputMove(coord);
       } else {
-        this.onInputCancel(coord);
+        this.onInputMoveCancel(coord);
       }
     }
 
