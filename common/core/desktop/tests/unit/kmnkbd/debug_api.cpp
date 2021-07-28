@@ -152,7 +152,6 @@ void test_basic_rule_matches() {
   }));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_E, KM_KBP_MODIFIER_SHIFT, 1));
-
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_E, KM_KBP_MODIFIER_SHIFT, 'E'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -166,7 +165,6 @@ void test_basic_rule_matches() {
   }));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F, KM_KBP_MODIFIER_SHIFT, 1));
-
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_F, KM_KBP_MODIFIER_SHIFT, 'F'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -177,11 +175,11 @@ void test_basic_rule_matches() {
   }));
 
   km_kbp_action_item bksp_d = {KM_KBP_IT_BACK};
-  bksp_d.backspace.expected_type = KM_KBP_IT_CHAR;
+  bksp_d.backspace.expected_type = KM_KBP_BT_CHAR;
   bksp_d.backspace.expected_value = 'D';
 
   km_kbp_action_item bksp_e = {KM_KBP_IT_BACK};
-  bksp_e.backspace.expected_type = KM_KBP_IT_CHAR;
+  bksp_e.backspace.expected_type = KM_KBP_BT_CHAR;
   bksp_e.backspace.expected_value = 'E';
 
   assert(action_items(test_state, {
@@ -230,7 +228,7 @@ void test_multiple_groups() {
   }));
 
   km_kbp_action_item bksp_a = {KM_KBP_IT_BACK};
-  bksp_a.backspace.expected_type = KM_KBP_IT_CHAR;
+  bksp_a.backspace.expected_type = KM_KBP_BT_CHAR;
   bksp_a.backspace.expected_value = 'a';
 
   assert(action_items(test_state, {
@@ -241,7 +239,6 @@ void test_multiple_groups() {
   }));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1));
-
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_2, 0, '2'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -264,7 +261,7 @@ void test_multiple_groups() {
   }));
 
   km_kbp_action_item bksp_b = {KM_KBP_IT_BACK};
-  bksp_b.backspace.expected_type = KM_KBP_IT_CHAR;
+  bksp_b.backspace.expected_type = KM_KBP_BT_CHAR;
   bksp_b.backspace.expected_value = 'b';
 
   assert(action_items(test_state, {
@@ -311,7 +308,6 @@ void test_store_offsets() {
   }));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_B, 0, 1));
-
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_B, 0, 'b'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -332,10 +328,10 @@ void test_store_offsets() {
       {KM_KBP_IT_BACK},
       {KM_KBP_IT_BACK}
   };
-  bksp[0].backspace.expected_type = KM_KBP_IT_CHAR;
-  bksp[1].backspace.expected_type = KM_KBP_IT_CHAR;
-  bksp[2].backspace.expected_type = KM_KBP_IT_CHAR;
-  bksp[3].backspace.expected_type = KM_KBP_IT_CHAR;
+  bksp[0].backspace.expected_type = KM_KBP_BT_CHAR;
+  bksp[1].backspace.expected_type = KM_KBP_BT_CHAR;
+  bksp[2].backspace.expected_type = KM_KBP_BT_CHAR;
+  bksp[3].backspace.expected_type = KM_KBP_BT_CHAR;
   bksp[0].backspace.expected_value = 'y';
   bksp[1].backspace.expected_value = 'a';
   bksp[2].backspace.expected_value = 'x';

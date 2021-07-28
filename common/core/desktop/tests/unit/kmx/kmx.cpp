@@ -372,7 +372,8 @@ int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged
     auto ci = citems;
-    for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END && test_ci->type != KM_KBP_CT_END; ci++, test_ci++) {
+    for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
+      assert(ci->type != KM_KBP_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
       assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
     }
 
@@ -398,7 +399,8 @@ int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   // Verify that both our local test_context and the core's test_state.context have
   // not diverged
   auto ci = citems;
-  for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END && test_ci->type != KM_KBP_CT_END; ci++, test_ci++) {
+  for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
+    assert(ci->type != KM_KBP_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
     assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
   }
 
