@@ -5,6 +5,6 @@
 @Library('lsdev-pipeline-library') _
 
 keymanPackaging {
-	distributionsToPackage = 'bionic focal groovy hirsute impish'
+	distributionsToPackage = 'bionic focal hirsute'
 	arches = 'amd64 i386'
 }
