@@ -37,6 +37,13 @@ void print_action_item(const char *title, km_kbp_action_item const & item) {
   case KM_KBP_IT_CHAR:
     std::cout << "  char:    '" << std::u32string(1, item.character) << "' (" << item.character << ")" << std::endl;
     break;
+  case KM_KBP_IT_BACK:
+    std::cout << "  delete:  " <<
+      (item.backspace.expected_type == KM_KBP_BT_CHAR ? "char" :
+      item.backspace.expected_type == KM_KBP_BT_MARKER ? "marker" :
+      "unknown") << " (" <<
+      item.backspace.expected_value << ")" << std::endl;
+    break;
   case KM_KBP_IT_PERSIST_OPT:
     std::cout
       << "  option:  key:   " << item.option->key << std::endl
@@ -57,7 +64,8 @@ bool operator==(
       case KM_KBP_IT_CHAR:               result = lhs.character == rhs.character; break;
       case KM_KBP_IT_MARKER:             result = lhs.marker == rhs.marker; break;
       case KM_KBP_IT_ALERT:              break;
-      case KM_KBP_IT_BACK:               break;
+      case KM_KBP_IT_BACK:               result = lhs.backspace.expected_type == rhs.backspace.expected_type &&
+                                                  lhs.backspace.expected_value == rhs.backspace.expected_value; break;
       case KM_KBP_IT_PERSIST_OPT:        result = *lhs.option == *rhs.option; break;
       case KM_KBP_IT_EMIT_KEYSTROKE:     break;
       case KM_KBP_IT_INVALIDATE_CONTEXT: break;
