@@ -42,12 +42,10 @@
 #define MAXCONTEXT_ITEMS 128
 #define KEYMAN_BACKSPACE 14
 #define KEYMAN_BACKSPACE_KEYSYM  IBUS_KEY_BackSpace
-#define KEYMAN_LCTRL 29
-#define KEYMAN_LALT 56
-#define KEYMAN_RCTRL 97
-#define KEYMAN_RALT 100
-#define KEYMAN_CAPS 0x3a
-#define KEYMAN_CAPS_KEYSYM  IBUS_KEY_Caps_Lock
+#define KEYMAN_LCTRL 29 // 0x1D
+#define KEYMAN_LALT  56 // 0x38
+#define KEYMAN_RCTRL 97 // 0x61
+#define KEYMAN_RALT 100 // 0x64
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
@@ -522,7 +520,7 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     KM_KBP_VKEY_LBRKT,    // KEY_LEFTBRACE = 0x1A;
     KM_KBP_VKEY_RBRKT,    // KEY_RIGHTBRACE = 0x1B;
     KM_KBP_VKEY_ENTER,    // KEY_ENTER = 0x1C;
-    0,                    // KEY_LEFTCTRL = 0x1D;
+    KM_KBP_VKEY_CONTROL,  // KEY_LEFTCTRL = 0x1D;
     KM_KBP_VKEY_A,        // KEY_A = 0x1E;
     KM_KBP_VKEY_S,        // KEY_S = 0x1F;
     KM_KBP_VKEY_D,        // KEY_D = 0x20;
@@ -535,7 +533,7 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     KM_KBP_VKEY_COLON,    // KEY_SEMICOLON = 0x27;
     KM_KBP_VKEY_QUOTE,    // KEY_APOSTROPHE = 0x28;
     KM_KBP_VKEY_BKQUOTE,  // KEY_GRAVE = 0x29;
-    0,                    // KEY_LEFTSHIFT = 0x2A;
+    KM_KBP_VKEY_SHIFT,    // KEY_LEFTSHIFT = 0x2A;
     KM_KBP_VKEY_BKSLASH,  // KEY_BACKSLASH = 0x2B;
     KM_KBP_VKEY_Z,        // KEY_Z = 0x2C;
     KM_KBP_VKEY_X,        // KEY_X = 0x2D;
@@ -547,9 +545,9 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     KM_KBP_VKEY_COMMA,    // KEY_COMMA = 0x33;
     KM_KBP_VKEY_PERIOD,   // KEY_DOT = 0x34;
     KM_KBP_VKEY_SLASH,    // KEY_SLASH = 0x35;
-    0,                    // KEY_RIGHTSHIFT = 0x36;
+    KM_KBP_VKEY_SHIFT,    // KEY_RIGHTSHIFT = 0x36;
     KM_KBP_VKEY_NPSTAR,   // KEY_KPASTERISK = 0x37;
-    0,                    // KEY_LEFTALT = 0x38;
+    KM_KBP_VKEY_ALT,      // KEY_LEFTALT = 0x38;
     KM_KBP_VKEY_SPACE,    // KEY_SPACE = 0x39;
     KM_KBP_VKEY_CAPS,     // KEY_CAPSLOCK = 0x3A;
     KM_KBP_VKEY_F1,       // KEY_F1 = 0x3B;
@@ -581,7 +579,19 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     0,                    // KEY_ZENKAKUHANKAKU = 0x55;
     KM_KBP_VKEY_oE2,      // KEY_102ND = 0x56;
     KM_KBP_VKEY_F11,      // KEY_F11 = 0x57;
-    KM_KBP_VKEY_F12       // KEY_F12 = 0x58;
+    KM_KBP_VKEY_F12,      // KEY_F12 = 0x58;
+    0,                    // KEY_RO = 0x59;
+    0,                    // KEY_KATAKANA = 0x5a;
+    0,                    // KEY_HIRAGANA = 0x5b;
+    0,                    // KEY_HENKAN = 0x5c;
+    0,                    // KEY_KATAKANAHIRAGANA = 0x5d;
+    0,                    // KEY_MUHENKAN = 0x5e;
+    0,                    // KEY_KPJPCOMMA = 0x5f;
+    0,                    // KEY_KPENTER = 0x60;
+    KM_KBP_VKEY_CONTROL,  // KEY_RIGHTCTRL = 0x61;
+    0,                    // KEY_KPSLASH = 0x62;
+    0,                    // KEY_SYSRQ = 0x63;
+    KM_KBP_VKEY_ALT       // KEY_RIGHTALT = 0x64;
 
     // Many more KEYS currently not used by KMW...
 };

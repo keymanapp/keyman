@@ -99,7 +99,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
     state->debug_items().push_end(m_actions.Length(), 0);
   }
 
-  ResetCapsLock(modifiers);
+  ResetCapsLock(modifiers, isKeyDown);
 
   m_state.vkey = vkey;
   m_state.charCode = VKeyToChar(modifiers, vkey);
