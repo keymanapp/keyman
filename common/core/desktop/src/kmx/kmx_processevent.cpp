@@ -286,13 +286,13 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         }
 
         // Emit a backspace to delete the character
-        m_actions.QueueAction(QIT_BACK, BK_DEFAULT); // side effect: also removes last char from context
+        m_actions.QueueAction(QIT_BACK, BK_DEFAULT);  // side effect: also removes last char from context
 
         // And delete any deadkeys prior to insertion point again
         pdeletecontext = m_context.Buf(1);
         while(pdeletecontext && *pdeletecontext == UC_SENTINEL) {
-          m_actions.QueueAction(QIT_BACK, BK_DEADKEY);
-          pdeletecontext = m_context.Buf(1); // side effect: also removes last char from context
+          m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
+          pdeletecontext = m_context.Buf(1);
         }
 
       } else {   // I4024   // I4128   // I4287   // I4290
