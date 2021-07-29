@@ -40,22 +40,6 @@ namespace com.keyman.osk {
       var tKey=vkbd.getDefaultKeyObject();
       tKey['fontsize']=ls.fontSize;
 
-      // ***Delete any empty rows at the end added by compiler bug...
-      for(n=0; n<layers.length; n++) {
-        let layer=layers[n];
-        let rows=layer['row'];
-        for(i=rows.length; i>0; i--) {
-          if(rows[i-1]['key'].length > 0) {
-            break;
-          }
-        }
-
-        if(i < rows.length) {
-          rows.splice(i-rows.length,rows.length-i);
-        }
-      }
-      // ...remove to here when compiler bug fixed ***
-
       // Set the OSK row height, **assuming all layers have the same number of rows**
 
       // Get the actual available document width and scale factor according to device type
