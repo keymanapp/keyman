@@ -15,7 +15,6 @@ uses
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   compile in '..\..\global\delphi\general\compile.pas',
   KeymanDeveloperOptions in 'main\KeymanDeveloperOptions.pas',
-  keyman32_int in '..\..\global\delphi\general\keyman32_int.pas',
   int_kmdebug in '..\..\global\delphi\general\int_kmdebug.pas',
   UfrmKeyTest in 'debug\UfrmKeyTest.pas' {frmKeyTest},
   CompilePackage in '..\..\global\delphi\general\CompilePackage.pas',
@@ -286,7 +285,9 @@ uses
   sentry in '..\..\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
-  Keyman.Developer.System.Project.UrlRenderer in 'project\Keyman.Developer.System.Project.UrlRenderer.pas';
+  Keyman.Developer.System.Project.UrlRenderer in 'project\Keyman.Developer.System.Project.UrlRenderer.pas',
+  Keyman.System.KeymanCore in '..\..\global\delphi\general\Keyman.System.KeymanCore.pas',
+  Keyman.System.KeymanCoreDebug in '..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -318,8 +319,8 @@ begin
           //TBX.TBXSetTheme('OfficeXP2');
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-          Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-          Application.Run;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  Application.Run;
         end;
       finally
         FInitializeCEF.Free;

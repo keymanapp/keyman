@@ -37,7 +37,7 @@ type
     function GetHelpTopic: string; override;
 
   public
-    procedure UpdateDeadkeyDisplay(deadkeys: TList);
+    procedure UpdateDeadkeyDisplay(deadkeys: TDebugDeadkeyInfoList);
     procedure DeselectDeadkeys;
   end;
 
@@ -73,14 +73,13 @@ begin
     else DebugForm.SelectDeadKey(lbDeadKeys.Items.Objects[lbDeadKeys.ItemIndex] as TDeadKeyInfo);
 end;
 
-procedure TfrmDebugStatus_DeadKeys.UpdateDeadkeyDisplay(deadkeys: TList);
+procedure TfrmDebugStatus_DeadKeys.UpdateDeadkeyDisplay(deadkeys: TDebugDeadkeyInfoList);
 var
-  i: Integer;
+  dk: TDeadkeyInfo;
 begin
   ClearDeadKeys;
-  for i := 0 to deadkeys.Count - 1 do
-    with TDeadKeyInfo(deadkeys[i]) do
-      lbDeadkeys.Items.AddObject('deadkey('+Deadkey.Name+') ('+IntToStr(Position)+')', TDeadKeyInfo(deadkeys[i]));
+  for dk in deadkeys do
+    lbDeadkeys.Items.AddObject('deadkey('+dk.Deadkey.Name+') ('+IntToStr(dk.Position)+')', dk);
 end;
 
 end.

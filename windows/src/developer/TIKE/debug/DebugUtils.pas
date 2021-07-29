@@ -27,7 +27,6 @@ interface
 
 uses
   System.UITypes,
-  keymanapi_TLB,
   Winapi.msctf,
   keyman_msctf;
 
@@ -42,8 +41,6 @@ type
     class var FProfileMgr: ITfInputProcessorProfileMgr;   // I3655
     class procedure InitMSCTF;   // I3655
   public
-    class function GetDebugHostKeyboard: IKeymanKeyboardInstalled;
-    class function SelectTSFProfileForKeyboardLanguage(Lang: IKeymanKeyboardLanguageInstalled): HRESULT;   // I3655   // I4020
     class function GetActiveTSFProfile(var Profile: TDebugUtilProfile): HRESULT;   // I4020
     class function SetActiveTSFProfile(Profile: TDebugUtilProfile): HRESULT;   // I4020
   end;
@@ -53,18 +50,9 @@ implementation
 uses
   System.SysUtils,
   System.Win.ComObj,
-  Vcl.Controls,
-  Vcl.Dialogs,
-  Vcl.Forms,
   Winapi.ActiveX,
-
-//  UfrmMessages,
-
   KeymanDeveloperUtils,
   utiltsf;
-
-const
-  SDebugHostKeyboardName = 'debughost';
 
 { TDebugUtils }
 
@@ -77,94 +65,11 @@ begin
   Result := FProfileMgr.GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, Profile.profile);
 end;
 
-class function TDebugUtils.GetDebugHostKeyboard: IKeymanKeyboardInstalled;
-    function FindDebugHostKeyboard: IKeymanKeyboardInstalled;
-    var
-      i: Integer;
-    begin
-      for i := 0 to kmcom.Keyboards.Count - 1 do
-      begin
-        if kmcom.Keyboards[i].ID = SDebugHostKeyboardName then
-        begin
-          Result := kmcom.Keyboards[i];
-          Exit;
-        end;
-      end;
-      Result := nil;
-    end;
-var
-  DebugHostKeyboard: string;
-begin
-  Result := FindDebugHostKeyboard;
-  if not Assigned(Result) then
-  begin
-    DebugHostKeyboard := ExtractFilePath(ParamStr(0))+SDebugHostKeyboardName+'.kmx';
-    if not FileExists(DebugHostKeyboard) then
-    begin
-      ShowMessage('Debug Host Keyboard file debughost.kmx is missing from '+ExtractFilePath(ParamStr(0))+'.');
-      Exit(nil);
-    end;
-
-    if MessageDlg('Debug Host Keyboard file debughost.kmx must be installed to enable debugging.  Install it now?',
-        mtConfirmation, mbOkCancel, 0) = mrCancel then
-      Exit(nil);
-
-    WaitForElevatedConfiguration(Application.Handle, '-i "'+DebugHostKeyboard+'" -s', True);
-    kmcom.Keyboards.Refresh;
-
-    Result := FindDebugHostKeyboard;
-    if not Assigned(Result) then
-    begin
-      ShowMessage('Debug Host Keyboard was not successfully installed.');
-      Exit(nil);
-    end;
-  end;
-
-  if Result.Languages.Count = 0 then
-  begin
-    if MessageDlg('Debug Host Keyboard file debughost.kmx must be configured to enable debugging.  Configure it now?',
-        mtConfirmation, mbOkCancel, 0) = mrCancel then
-      Exit(nil);
-
-    WaitForElevatedConfiguration(Application.Handle, '-ikl "'+Result.ID+'" "en" -s', True);
-    Result := nil;
-    kmcom.Keyboards.Refresh;
-    Result := FindDebugHostKeyboard;
-    if Result = nil then
-    begin
-      ShowMessage('Debug Host Keyboard was not successfully installed.');
-      Exit;
-    end;
-
-    if Result.Languages.Count = 0 then
-    begin
-      ShowMessage('Debug Host Keyboard is not associated with any languages');
-      Exit(nil);
-    end;
-  end;
-end;
-
 class procedure TDebugUtils.InitMSCTF;   // I4020
 begin
   FProfiles := CreateComObject(CLASS_TF_InputProcessorProfiles) as ITfInputProcessorProfiles;
   if not Supports(FProfiles, ITfInputProcessorProfileMgr, FProfileMgr) then  // I2864
     FProfileMgr := nil;
-end;
-
-class function TDebugUtils.SelectTSFProfileForKeyboardLanguage(Lang: IKeymanKeyboardLanguageInstalled): HRESULT;
-var
-  ProfileGUID: TGUID;   // I4020
-begin
-  if not Assigned(FProfiles) then
-    InitMSCTF;
-
-  FProfiles.ChangeCurrentLanguage(Lang.langID);   // I4767
-
-//  frmMessages.Add('Debugger', Format('Activating Debugger: Lang=%x clsid=%s guid=%s', [Lang.LangID, GUIDToString(c_clsidKMTipTextService), GUIDToString(Lang.ProfileGUID)]));
-
-  ProfileGUID := Lang.ProfileGUID;
-  Result := FProfileMgr.ActivateProfile(TF_PROFILETYPE_INPUTPROCESSOR, Lang.langID,
-    c_clsidKMTipTextService, ProfileGUID, 0, TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);   // I4248   // I4767
 end;
 
 class function TDebugUtils.SetActiveTSFProfile(Profile: TDebugUtilProfile): HRESULT;   // I4020   // I4331

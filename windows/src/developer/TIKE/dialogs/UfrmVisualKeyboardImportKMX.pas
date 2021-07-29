@@ -27,7 +27,6 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ComCtrls, StdCtrls, kmxfile, VisualKeyboard, UfrmTike,
-  keymanapi_TLB,
   DebugUtils;
 
 const
@@ -52,7 +51,6 @@ type
     FHasANSI, FHasUnicode, FUnicode: Boolean;
     FLeftRightCtrlAlt: Boolean;
     FShow102Key: Boolean;
-    FDebugHostKeyboard: IKeymanKeyboardInstalled;
     FLastProfile: TDebugUtilProfile;
 
     procedure WMUserSendNextKey(var Message: TMessage); message WM_User_SendNextKey;
@@ -79,7 +77,6 @@ implementation
 
 uses
   Keyman.Developer.System.HelpTopics,
-  keyman32_int,
   KeymanDeveloperUtils,
   kmxfileconsts,
   debugging,
@@ -115,7 +112,7 @@ procedure TfrmVisualKeyboardImportKMX.FormDestroy(Sender: TObject);
 var
   i: Integer;
 begin
-  Keyman_StopForcingKeyboard;
+//  Keyman_StopForcingKeyboard;
   for i := 0 to keys.Count - 1 do TVKKey(keys[i]).Free;
   keys.Free;
   TDebugUtils.SetActiveTSFProfile(FLastProfile);
@@ -154,20 +151,7 @@ begin
     Exit;
   end;
 
-  SetStatus('Finding debug host keyboard');
-  FDebugHostKeyboard := TDebugUtils.GetDebugHostKeyboard;
-  if FDebugHostKeyboard = nil then
-  begin
-    DoFail('Unable to import keyboard layout -- the debug host keyboard is not installed.');
-    Exit;
-  end;
-
   SetStatus('Starting Keyman');
-  if not StartKeymanDesktopPro(FWasStarted) then
-  begin
-    DoFail('Unable to start Keyman for debugging - please make sure that Keyman is correctly installed (the error code was '+IntToHex(GetLastError, 8)+').');  // I3173   // I3504
-    Exit;
-  end;
 
   if FWasStarted then
   begin
@@ -184,22 +168,18 @@ begin
   end;
 
   SetStatus('Selecting keyboard');
-  if Keyman_ForceKeyboard(FFileName) then
+  // TODO:
+{  if Keyman_ForceKeyboard(FFileName) then
   begin
     nkey := 0;
     FUnicode := not FHasANSI;
 
-    hr := TDebugUtils.SelectTSFProfileForKeyboardLanguage(FDebugHostKeyboard.Languages[0]);   // I3655   // I4156
-    if FAILED(hr) then
-    begin
-      DoFail(Format('Unable to start debugging -- failed to switch to language with error %x', [hr]));
-      Exit;
-    end;
 
 //    ShowMessage(Format('nkeys: %d', [keys.count]));
     PostMessage(Handle, WM_User_SendNextKey, 0, 0);
     Exit;
   end;
+  }
 
   ShowMessage('Could not load keyboard for import.');
   ModalResult := mrCancel;

@@ -59,6 +59,7 @@ interface
 uses
   System.Classes,
   System.Generics.Collections,
+  System.StrUtils,
   System.SysUtils,
   Vcl.AppEvnts,
   Vcl.Buttons,
@@ -81,8 +82,9 @@ uses
   DebugUtils,
   HintLabel,
   PaintPanel,
-  keymanapi_TLB,
   KeymanDeveloperDebuggerMemo,
+  Keyman.System.KeymanCore,
+  Keyman.System.KeymanCoreDebug,
   msctf,
   UframeTextEditor,
   UfrmMDIEditor,
@@ -155,7 +157,7 @@ type
     //FControlCaptions: TStringList;
 
     { Deadkey member variables }
-    deadkeys: TList;
+    deadkeys: TDebugDeadkeyInfoList;
     FSelectedDeadkey: TDeadKeyInfo;
     //hklSystemKeyboard: HKL;
     FSaveShiftState: Integer;
@@ -174,7 +176,6 @@ type
     procedure ExecuteEventAction(n: Integer);
     procedure ExecuteEventRule(n: Integer);
     procedure SetExecutionPointLine(ALine: Integer);
-    procedure AddDebugAction(ItemType, dwData: Integer);
     procedure AddRuleMatch(ItemType: Integer; di: PAIDebugInfo);
     procedure SetUIStatus(const Value: TDebugUIStatus);
     procedure DisableUI;
@@ -184,7 +185,7 @@ type
     procedure SetStatusText(Value: string);
     procedure UpdateDebugStatusForm;   // I4809
 
-    procedure KeymanGetContext(var Message: TMessage);
+//    procedure KeymanGetContext(var Message: TMessage);
 
     procedure AddDebug(s: WideString);
 
@@ -193,6 +194,8 @@ type
 
   { ANSI Test}
   private
+    keyboard: pkm_kbp_keyboard;
+    state: pkm_kbp_state;
     FANSITest: Boolean;
     FEditorMemo: TframeTextEditor;
 
@@ -214,8 +217,18 @@ type
     procedure SetSingleStepMode(const Value: Boolean);
     procedure ResetDebug;
     procedure SetupDebug;
-    procedure WMUSERUpdateForceKeyboard(var Message: TMessage); message WM_USER_UpdateForceKeyboard;   // I4767
-    procedure UpdateCharacterGrid;   // I4808
+    procedure UpdateCharacterGrid;
+
+    function ProcessKeyEvent(var Message: TMessage): Boolean;
+    function ProcessActionItem(key: Word; action: pkm_kbp_action_item): Boolean;
+    procedure CleanupCoreState;
+    procedure Action_DeleteBack(expected_type: uint8_t; expected_value: uintptr_t);
+    procedure Action_Char(const character: km_kbp_usv);
+    procedure Action_Marker(marker: uintptr_t);
+    function SetKeyEventContext: Boolean;
+    procedure Action_EmitKeystroke(const key: Word);
+    procedure ProcessDebugItem(debug: pkm_kbp_state_debug_item);
+    function HandleMemoKeydown(var Message: TMessage): Boolean;
 
   protected
     function GetHelpTopic: string; override;
@@ -291,7 +304,6 @@ uses
   dmActionsKeyboardEditor,
   dmActionsMain,
   Glossary,
-  keyman32_int,
   Keyman.Developer.System.Project.ProjectLog,
   KeyNames,
   kmxfile,
@@ -335,14 +347,33 @@ const
     'QIT_VSHIFTDOWN', 'QIT_VSHIFTUP', 'QIT_CHAR',
     'QIT_DEADKEY', 'QIT_BELL', 'QIT_BACK');
 
+const
+  // WM_KEYDOWN bits; KEYFLAG_KEYMAN is a reserved value
+  KEYFLAG_KEYMAN   = $02000000;
+  KEYFLAG_EXTENDED = $01000000;
+
 {-------------------------------------------------------------------------------
  - Form events                                                                 -
  ------------------------------------------------------------------------------}
 
+var
+ KeymanCoreLoaded: Boolean = False;
+
+procedure InitKeymanCore;
+begin
+  if not KeymanCoreLoaded then
+  begin
+    // TODO: debugpath for this
+    _km_kbp_set_library_path(ExtractFilePath(ParamStr(0)) + '..\..\..\..\..\..\..\common\core\desktop\build\x86\debug\src\' + kmnkbp0);
+    KeymanCoreLoaded := True;
+  end;
+end;
 procedure TfrmDebug.FormCreate(Sender: TObject);
 begin
   inherited;
 //  InitMSCTF;   // I3655
+
+  InitKeymanCore;
 
   TDebugUtils.GetActiveTSFProfile(FLastActiveProfile);   // I4331
   FBreakpoints := TDebugBreakpoints.Create;
@@ -362,8 +393,8 @@ end;
 procedure TfrmDebug.FormDestroy(Sender: TObject);
 begin
   ResetDebug;
-  FBreakpoints.Free;
-  FEvents.Free;
+  FreeAndNil(FBreakpoints);
+  FreeAndNil(FEvents);
   //UninitControlCaptions;
   //UninitSystemKeyboard;
   UninitDeadkeys;
@@ -384,7 +415,7 @@ end;
  - Memo management                                                             -
  ------------------------------------------------------------------------------}
 
-procedure TfrmDebug.KeymanGetContext(var Message: TMessage);
+(*procedure TfrmDebug.KeymanGetContext(var Message: TMessage);
 var
   selstart, selend: Integer;
   i: Integer;
@@ -447,7 +478,7 @@ begin
     else AddDebug('KeymanGetContext (KeyUp): Context="'+ws+'"');
     Message.Result := 1;
   end;
-end;
+end;*)
 
 procedure TfrmDebug.memoGotFocus(Sender: TObject);
 begin
@@ -473,70 +504,269 @@ begin
   end;
 end;
 
-procedure TfrmDebug.memoMessage(Sender: TObject; var Message: TMessage;
-  var Handled: Boolean);
+function TfrmDebug.HandleMemoKeydown(var Message: TMessage): Boolean;
 begin
-  if UIStatus = duiClosing then Exit;  // Don't process while destroying...
-
-  Handled := True;
-  if (Message.Msg = WM_SYSCHAR) and FUIDisabled then
-    Exit
-  else if (Message.Msg = WM_KEYDOWN) and
-      (Message.wParam = VK_ESCAPE) and
+  if (Message.wParam = VK_ESCAPE) and
       (GetKeyState(VK_SHIFT) < 0) and
       (UIStatus <> duiPaused) then   // I4033
     UIStatus := duiPaused
-  else if (Message.Msg = WM_KEYDOWN) and
-    (Message.wParam = VK_F6) and
+  else if (Message.wParam = VK_F6) and
     (GetKeyState(VK_CONTROL) >= 0) and
     (GetKeyState(VK_MENU) >= 0) and
     (UIStatus <> duiFocusedForInput) then
   begin
     EditorMemo.SetFocus;
   end
-  else if (Message.Msg = WM_KEYDOWN) and
-      (Message.wParam = VK_ESCAPE) and
+  else if (Message.wParam = VK_ESCAPE) and
       (GetKeyState(VK_SHIFT) < 0) and
       (UIStatus = duiPaused) then
     UIStatus := duiFocusedForInput
-  else if Message.Msg = WM_KEYDOWN then
+  else if (Message.Msg = WM_KEYDOWN) and
+    (UIStatus = duiFocusedForInput) then
   begin
-    Handled := False;
-    Exit;    // Stop adding rules to be executed if paused
-  end
-  else if not (UIStatus in [duiFocusedForInput, duiReceivingEvents, duiReadyForInput]) then
-  begin
-    Handled := False;
-    Exit;    // Stop adding rules to be executed if paused
-  end
-  else if Message.Msg = WM_KEYMANDEBUG_CANDEBUG then
-  begin
-//    AddDebug('WM_KEYMANDEBUG_CANDEBUG');
-    Message.Result := 1
-  end
-  else if Message.Msg = WM_KEYMANDEBUG_GETUNICODESTATUS then
-  begin
-//    AddDebug('WM_KEYMANDEBUG_GETUNICODESTATUS');
-    if FANSITest then Message.Result := 0 else Message.Result := 1;
-  end
-  else if Message.Msg = WM_KEYMANDEBUG_GETCONTEXT then
-  begin
-    AddDebug('WM_KEYMANDEBUG_GETCONTEXT');
-    KeymanGetContext(Message);
-  end
-  else if Message.Msg = WM_KEYMANDEBUG_ACTION then
-  begin
-//    AddDebug('WM_KEYMANDEBUG_ACTION');
-    AddDebugAction(Message.wParam, Message.lParam)
-  end
-  else if Message.Msg = WM_KEYMANDEBUG_RULEMATCH then
-  begin
-//    AddDebug('WM_KEYMANDEBUG_RULEMATCH');
-    AddRuleMatch(Message.wParam, PAIDebugInfo(Message.lParam))
+    Exit(ProcessKeyEvent(Message));
   end
   else
-    Handled := False;
+    Exit(False);
+
+  Result := True;
 end;
+procedure TfrmDebug.memoMessage(Sender: TObject; var Message: TMessage;
+  var Handled: Boolean);
+begin
+  if UIStatus = duiClosing then
+  begin
+    Handled := False;
+    Exit;  // Don't process while destroying...
+  end;
+
+  case Message.Msg of
+    WM_KEYDOWN:
+      Handled := HandleMemoKeydown(Message);
+    WM_SYSCHAR:
+      Handled := FUIDisabled;
+    WM_CHAR:
+      Handled := True;
+  else
+    // TODO: any other gaps here?
+    Handled := False;
+    // Stop adding rules to be executed if paused
+//    Handled := (UIStatus in [duiFocusedForInput, duiReceivingEvents, duiReadyForInput]);
+  end;
+end;
+
+function TfrmDebug.SetKeyEventContext: Boolean;
+var
+  context: pkm_kbp_context;
+  context_items: TArray<km_kbp_context_item>;
+  n, i: Integer;
+  ch: Char;
+  dk: TDeadKeyInfo;
+begin
+  context := km_kbp_state_context(state);
+
+  n := 0;
+  SetLength(context_items, Length(memo.Text)+1);
+  i := 1;
+  while i <= memo.SelStart + memo.SelLength do
+  begin
+    ch := memo.Text[i];
+    if Uni_IsSurrogate1(ch) and (i < Length(memo.Text)) and
+      Uni_IsSurrogate2(memo.Text[i+1]) then
+    begin
+      context_items[n]._type := KM_KBP_CT_CHAR;
+      context_items[n].character := Uni_SurrogateToUTF32(ch, memo.Text[i+1]);
+      Inc(i);
+    end
+    else if Ord(ch) = $FFFC then
+    begin
+      context_items[n]._type := KM_KBP_CT_MARKER;
+      dk := deadkeys.GetFromPosition(i-1);
+      Assert(Assigned(dk));
+      context_items[n].marker := dk.Deadkey.Value+1; // TODO: remove +1 -1 messes for deadkey codes //GetDeadkeyMarker(i);
+    end
+    else
+    begin
+      context_items[n]._type := KM_KBP_CT_CHAR;
+      context_items[n].character := Ord(ch);
+    end;
+    Inc(i);
+    Inc(n);
+  end;
+
+  context_items[n]._type := KM_KBP_CT_END;
+  Result := km_kbp_context_set(context, @context_items[0]) = KM_KBP_STATUS_OK;
+end;
+
+function TfrmDebug.ProcessKeyEvent(var Message: TMessage): Boolean;
+var
+  modifier: uint16_t;
+  action: pkm_kbp_action_item;
+  debug: pkm_kbp_state_debug_item;
+  action_index: Integer;
+begin
+  Assert(Assigned(state));
+  modifier := 0;
+  if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_LCTRL or KM_KBP_MODIFIER_CTRL;
+  if GetKeyState(VK_RCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_RCTRL or KM_KBP_MODIFIER_CTRL;
+  if GetKeyState(VK_LMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_LALT or KM_KBP_MODIFIER_ALT;
+  if GetKeyState(VK_RMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_RALT or KM_KBP_MODIFIER_ALT;
+  if GetKeyState(VK_SHIFT) < 0 then modifier := modifier or KM_KBP_MODIFIER_SHIFT;
+  if (GetKeyState(VK_CAPITAL) and 1) = 1 then modifier := modifier or KM_KBP_MODIFIER_CAPS;
+
+  if not SetKeyEventContext then
+    Exit(False);
+
+  if km_kbp_process_event(state, Message.WParam, modifier, 1) = KM_KBP_STATUS_OK then
+  begin
+    // Process keystroke
+    Result := True;
+
+    debug := km_kbp_state_debug_items(state, nil);
+    action := km_kbp_state_action_items(state, nil);
+    action_index := 0;
+    while debug._type <> KM_KBP_DEBUG_END do
+    begin
+      ProcessDebugItem(debug);
+      if debug.kmx_info.first_action > action_index then
+      begin
+        while (action._type <> KM_KBP_IT_END) and (action_index < debug.kmx_info.first_action) do
+        begin
+          // TODO: we'll need to do this alongside step-wise debugging later
+          Result := Result and ProcessActionItem(Message.WParam, action);
+          Inc(action);
+          Inc(action_index);
+        end;
+      end;
+      Inc(debug);
+    end;
+
+    if action._type = KM_KBP_IT_INVALIDATE_CONTEXT then
+    begin
+      Inc(action);
+    end;
+
+    // By the time we get to the end of rule processing, all actions should have
+    // already been undertaken
+    Assert(action._type = KM_KBP_IT_END);
+
+    // Now, we'll run the actions, as we don't yet have the mapping for single
+    // step data (TODO)
+    UIStatus := duiReceivingEvents;
+    Run; // TODO: remove this from here
+    UIStatus := duiFocusedForInput;
+  end
+  else
+    Result := False;
+end;
+
+procedure TfrmDebug.ProcessDebugItem(debug: pkm_kbp_state_debug_item);
+begin
+  {case debug._type of
+    KM_KBP_DEBUG_BEGIN: km_kbp_debug_type = 0;
+    //KM_KBP_DEBUG_BEGIN_ANSI: km_kbp_debug_type = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
+    KM_KBP_DEBUG_GROUP_ENTER: km_kbp_debug_type = 2;
+    KM_KBP_DEBUG_GROUP_EXIT: km_kbp_debug_type = 3;
+    KM_KBP_DEBUG_RULE_ENTER: km_kbp_debug_type = 4;
+    KM_KBP_DEBUG_RULE_EXIT: km_kbp_debug_type = 5;
+    KM_KBP_DEBUG_MATCH_ENTER: km_kbp_debug_type = 6;
+    KM_KBP_DEBUG_MATCH_EXIT: km_kbp_debug_type = 7;
+    KM_KBP_DEBUG_NOMATCH_ENTER: km_kbp_debug_type = 8;
+    KM_KBP_DEBUG_NOMATCH_EXIT: km_kbp_debug_type = 9;
+    KM_KBP_DEBUG_END: km_kbp_debug_type = 10;
+  end;}
+end;
+
+function TfrmDebug.ProcessActionItem(key: Word; action: pkm_kbp_action_item): Boolean;
+begin
+  Result := True;
+  case action._type of
+    KM_KBP_IT_CHAR:           Action_Char(action.character);
+    KM_KBP_IT_MARKER:         Action_Marker(action.marker); //      = 2,  // Correlates to kmn's "deadkey" markers.
+    KM_KBP_IT_ALERT:          ; //       = 3,  // The keyboard has triggered a alert/beep/bell.
+    KM_KBP_IT_BACK:           Action_DeleteBack(action.backspace.expected_type, action.backspace.expected_value);
+    KM_KBP_IT_PERSIST_OPT:    ; // = 5,  // The indicated option needs to be stored.
+    KM_KBP_IT_EMIT_KEYSTROKE: Action_EmitKeystroke(key);
+    else Assert(False, 'Action type '+IntToStr(Ord(action._type))+' is unexpected.');
+  end;
+end;
+
+procedure TfrmDebug.Action_EmitKeystroke(const key: Word);
+var
+  event: TDebugEvent;
+begin
+  case key of
+    VK_TAB: Action_Char(9);
+    VK_RETURN: Action_Char(13);
+    VK_BACK:   Action_DeleteBack(Ord(KM_KBP_BT_UNKNOWN), 0);
+    else
+    begin
+      // TODO: VSHIFTDOWN, VSHIFTUP
+      event := TDebugEvent.Create;
+      event.EventType := etAction;
+      event.Action.ActionType := QIT_VKEYDOWN;
+      event.Action.dwData := key;
+      FEvents.Add(event);
+      event := TDebugEvent.Create;
+      event.EventType := etAction;
+      event.Action.ActionType := QIT_VKEYUP;
+      event.Action.dwData := key;
+      FEvents.Add(event);
+    end;
+    //else Assert(False);
+  end;
+end;
+
+///
+/// Insert a UTF-32 character at the insertion point.
+/// TODO: define behaviour around selection
+///
+procedure TfrmDebug.Action_Char(const character: km_kbp_usv);
+var
+  event: TDebugEvent;
+begin
+  event := TDebugEvent.Create;
+  event.EventType := etAction;
+  event.Action.ActionType := QIT_CHAR;
+  event.Action.Text := Uni_UTF32CharToUTF16(character);
+  FEvents.Add(event);
+end;
+
+///
+/// Delete the codepoint preceding the insertion point.
+/// TODO: define behaviour around selection
+///
+procedure TfrmDebug.Action_DeleteBack(
+  expected_type: uint8_t;            /// one of KM_KBP_IT_CHAR, KM_KBP_IT_MARKER, KM_KBP_IT_END (when type to delete is unknown)
+  expected_value: uintptr_t         /// used mainly in unit tests
+);
+var
+  event: TDebugEvent;
+begin
+  event := TDebugEvent.Create;
+  event.EventType := etAction;
+  event.Action.ActionType := QIT_BACK;
+  event.Action.dwData := expected_type;
+  FEvents.Add(event);
+end;
+
+///
+///
+procedure TfrmDebug.Action_Marker(marker: uintptr_t);
+var
+  event: TDebugEvent;
+begin
+  // kmx requires that markers are between 1 and $FFFF
+  // ($FFFD in practical terms)
+  Assert((marker > 0) and (marker <= High(WORD)));
+
+  event := TDebugEvent.Create;
+  event.EventType := etAction;
+  event.Action.ActionType := QIT_DEADKEY;
+  event.Action.dwData := marker;
+  FEvents.Add(event);
+end;
+
 
 procedure TfrmDebug.StepForward;
 begin
@@ -656,21 +886,68 @@ begin
   end;
 end;
 
+
 procedure TfrmDebug.ExecuteEventAction(n: Integer);
-  procedure Backspace(BackspaceType: Integer);
+  procedure Backspace(BackspaceType: km_kbp_backspace_type);
   var
-    i, m, n: Integer;
+    m, n: Integer;
+    dk: TDeadKeyInfo;
   begin
+    // Offset is zero-based, but string is 1-based. Beware!
     n := memo.SelStart;
-    m := n - 1;
+    m := n;
 
-    if (n > 1) and Uni_IsSurrogate2(memo.Text[n]) then
-      Dec(m);
+    case BackspaceType of
+      KM_KBP_BT_MARKER:
+        begin
+          Assert(m >= 1);
+          Assert(memo.Text[m] = #$FFFC);
+          dk := deadkeys.GetFromPosition(m-1);
+          Assert(Assigned(dk));
+          dk.Delete;
+          Dec(m);
+        end;
+      KM_KBP_BT_CHAR:
+        begin
+          Assert(m >= 1);
+          Assert(memo.Text[m] <> #$FFFC);
+          if (m > 1) and
+              Uni_IsSurrogate2(memo.Text[m]) and
+              Uni_IsSurrogate1(memo.Text[m-1]) then
+            Dec(m, 2)
+          else
+            Dec(m);
+        end;
+      KM_KBP_BT_UNKNOWN:
+        begin
+          while (m >= 1) and (memo.Text[m] = #$FFFC) do
+          begin
+            dk := deadkeys.GetFromPosition(m-1);
+            Assert(Assigned(dk));
+            dk.Delete;
+            Dec(m);
+          end;
 
-    for i := 0 to deadkeys.Count-1 do
-      if (TDeadKeyInfo(deadkeys[i]).Position >= m-1) and
-        (TDeadKeyInfo(deadkeys[i]).Position < n-1) then
-        TDeadKeyInfo(deadkeys[i]).Delete;
+          // Delete character
+          if (m > 1) and
+              Uni_IsSurrogate2(memo.Text[m]) and
+              Uni_IsSurrogate1(memo.Text[m-1]) then
+            Dec(m, 2)
+          else
+            Dec(m);
+
+          // Also delete deadkeys to left of current character
+          while (m >= 1) and (memo.Text[m] = #$FFFC) do
+          begin
+            dk := deadkeys.GetFromPosition(m-1);
+            Assert(Assigned(dk));
+            dk.Delete;
+            Dec(m);
+          end;
+        end;
+    else
+      Assert(False, 'Unrecognised backspace type');
+    end;
 
     memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
     memo.SelStart := m;
@@ -685,6 +962,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
 
 var
   i: Integer;
+  msg: TMessage;
 begin
   DisableUI;
   ClearKeyStack;
@@ -694,7 +972,11 @@ begin
     case ActionType of
       QIT_VKEYDOWN:   if (LOBYTE(dwData) < VK_F1) or (LOBYTE(dwData) > VK_F12) then
                       begin
-                        if (dwData and $100) = $100 then i := $01000000 else i := 0;
+                        i := KEYFLAG_KEYMAN;
+                        if (dwData and $100) = $100 then
+                          // Extended Key State
+                          i := i or KEYFLAG_EXTENDED;
+
                         if GetKeyState(VK_MENU) < 0
                           then PostMessage(memo.Handle, WM_SYSKEYDOWN, LOBYTE(dwData), i)
                           else PostMessage(memo.Handle, WM_KEYDOWN, LOBYTE(dwData), i);
@@ -709,12 +991,19 @@ begin
                         ClearKeyStack;
                         if FANSITest
                           then PostMessageA(memo.Handle, WM_CHAR, Ord(AnsiChar(Text[i])), 0) //TODO: ANSI support
-                          else PostMessageW(memo.Handle, WM_CHAR, Ord(Text[i]), 0);  // I3310
-                        Application.ProcessMessages;
+                          else
+                          begin
+                            msg.Msg := WM_CHAR;
+                            msg.WParam := Ord(Text[i]);
+                            msg.LParam := 0;
+                            memo.Dispatch(msg);
+                          end;
+//                          else PostMessageW(memo.Handle, WM_CHAR, Ord(Text[i]), 0);  // I3310
+//                        Application.ProcessMessages;
                       end;
       QIT_DEADKEY:    AddDeadkey(dwData);
       QIT_BELL:       MessageBeep(0);
-      QIT_BACK:       for i := 1 to Length(Text) do Backspace(Ord(Text[i])-1);
+      QIT_BACK:       Backspace(km_kbp_backspace_type(dwData));
     end;
     Application.ProcessMessages;
 //    AddDEBUG(Format('%d: %d [%s]', [ActionType, dwData, Text]));
@@ -738,111 +1027,70 @@ begin
 end;
 
 procedure TfrmDebug.SetForceKeyboard(Value: Boolean);
+var
+  hkl: THandle;
+  status: km_kbp_status;
 begin
   if Value <> FForceKeyboard then
   begin
     FForceKeyboard := Value;
-    PostMessage(Handle, WM_USER_UpdateForceKeyboard, WPARAM(FForceKeyboard), 0);   // I4767
+
+    if FForceKeyboard then
+    begin
+      try
+        if SystemParametersInfo(SPI_GETDEFAULTINPUTLANG, 0, @hkl, 0) then
+        begin
+          FLastActiveProfile.Profile.dwProfileType := TF_PROFILETYPE_KEYBOARDLAYOUT;
+          FLastActiveProfile.Profile.langid := HKLToLanguageID(hkl);
+          FLastActiveProfile.Profile.HKL := hkl;
+        end
+        else
+          TDebugUtils.GetActiveTSFProfile(FLastActiveProfile);   // I4331
+
+        memo.SetFocus;
+
+        keyboard := nil;
+        state := nil;
+
+        status := km_kbp_keyboard_load(PChar(FFileName), keyboard);
+        if status <> KM_KBP_STATUS_OK then
+          raise Exception.CreateFmt('Unable to start debugger -- keyboard load failed with error %x', [Ord(status)]);
+
+        status := km_kbp_state_create(keyboard, @KM_KBP_OPTIONS_END, state);
+        if status <> KM_KBP_STATUS_OK then
+          raise Exception.CreateFmt('Unable to start debugger -- state creation failed with error %x', [Ord(status)]);
+
+        status := km_kbp_state_debug_set(state, 1);
+        if status <> KM_KBP_STATUS_OK then
+          raise Exception.CreateFmt('Unable to start debugger -- enabling debug failed with error %x', [Ord(status)]);
+      except
+        on E:Exception do
+        begin
+          CleanupCoreState;
+          Winapi.Windows.SetFocus(0);
+          HideDebugForm;
+          FForceKeyboard := False;
+          ShowMessage(E.Message);
+          Exit;
+        end;
+      end;
+    end
+    else
+    begin
+      TDebugUtils.SetActiveTSFProfile(FLastActiveProfile);   // I4331
+      CleanupCoreState;
+    end;
   end;
 end;
 
-procedure TfrmDebug.WMUSERUpdateForceKeyboard(var Message: TMessage);   // I4767
-    procedure FailTidyUp;
-    begin
-      Winapi.Windows.SetFocus(0);
-      HideDebugForm;
-      FForceKeyboard := False;
-    end;
-
-var
-  FLastError: Cardinal;
-  FWasStarted: Boolean;
-  FDebugHostKeyboard: IKeymanKeyboardInstalled;
-  hr: HRESULT;
-  hkl: THandle;
+procedure TfrmDebug.CleanupCoreState;
 begin
-  if {memo.Focused and} Message.WParam <> 0 then
-  begin
-    try
-      if SystemParametersInfo(SPI_GETDEFAULTINPUTLANG, 0, @hkl, 0) then
-      begin
-        FLastActiveProfile.Profile.dwProfileType := TF_PROFILETYPE_KEYBOARDLAYOUT;
-        FLastActiveProfile.Profile.langid := HKLToLanguageID(hkl);
-        FLastActiveProfile.Profile.HKL := hkl;
-      end
-      else
-        TDebugUtils.GetActiveTSFProfile(FLastActiveProfile);   // I4331
-      FDebugHostKeyboard := TDebugUtils.GetDebugHostKeyboard;   // I3655
-      if FDebugHostKeyboard = nil then
-      begin
-        FailTidyUp;
-        ShowMessage('Unable to start debugging -- the debug host keyboard is not installed.');
-        Exit;
-      end;
-
-      if not StartKeymanDesktopPro(FWasStarted) then  // I3283   // I3503
-      begin
-        FLastError := GetLastError;
-        FailTidyUp;
-        ShowMessage('Unable to start Keyman for debugging - please make sure that Keyman is correctly installed (the error code was '+IntToHex(FLastError, 8)+').');  // I3173   // I3504
-        Exit;
-      end;
-      if FWasStarted then  // I3283   // I3503
-      begin
-        // Give Keyman Engine a chance to correctly attach focus after it starts
-        Winapi.Windows.SetFocus(0);
-        Winapi.Windows.SetFocus(memo.Handle);
-        Exit;
-      end;
-
-      hr := TDebugUtils.SelectTSFProfileForKeyboardLanguage(FDebugHostKeyboard.Languages[0]);   // I3655   // I4020
-      if FAILED(hr) then
-      begin
-        FailTidyUp;
-        ShowMessage(Format('Unable to start debugging -- failed to switch to language with error %x', [hr]));
-        Exit;
-      end;
-
-      //kmcom.Control.ActiveKeyboard := FDebugHostKeyboard;
-
-      if not Keyman_ForceKeyboard(FFileName) then
-      begin
-        FLastError := GetLastError;  // I3173   // I3504
-        {Keyman_Exit; I3283   // I3503
-        if not Keyman_Initialise(Application.MainForm.Handle, True) or not Keyman_ForceKeyboard(FFileName) then
-        begin}
-          Winapi.Windows.SetFocus(0);
-          HideDebugForm;
-          ShowMessage('Unable to start debugger - please make sure that Keyman Developer is correctly installed (the error code was '+IntToHex(FLastError, 8)+').');  // I3173   // I3504
-          //(Editor as TfrmEditor).HideDebugForm;
-          FForceKeyboard := False;
-          Exit;
-        {end;}
-        end;
-    except
-      on E:Exception do
-      begin
-        ShowMessage(E.Message);
-        FForceKeyboard := False;
-        Exit;
-      end;
-{        on E:EKeymanNotInstalled do
-      begin
-        FForceKeyboard := False;
-        ShowMessage(E.Message);
-        Exit;
-      end;}
-    end;
-  end
-  else
-  begin
-    if not Keyman_StopForcingKeyboard then
-    begin
-      if GetLastError <> $20000009 then  // I3283 - ignore unload errors that may arise when Keyman Engine is starting   // I3503
-        ShowMessage('The keyboard failed to unload with the error '+IntToHex(GetLastError,8)+'.');  // I3173   // I3504
-    end;
-    TDebugUtils.SetActiveTSFProfile(FLastActiveProfile);   // I4331
-  end;
+  if state <> nil then
+    km_kbp_state_dispose(state);
+  state := nil;
+  if keyboard <> nil then
+    km_kbp_keyboard_dispose(keyboard);
+  keyboard := nil;
 end;
 
 function TfrmDebug.DiscoverRuleLine(ItemType: Integer; di: PAIDebugInfo): Integer;
@@ -987,40 +1235,6 @@ begin
   // Do NOTHING AT PRESENT
 end;
 
-procedure TfrmDebug.AddDebugAction(ItemType, dwData: Integer);
-var
-  ev: TDebugEvent;
-begin
-  if not Assigned(debugkeyboard) then Exit;
-
-  ResetEvents;
-
-  if FIgnoreKeyUp then Exit;
-
-  if FEvents.Count > 0 then
-  begin
-    ev := FEvents[FEvents.Count-1];
-    if (ev.EventType = etAction) and (ev.Action.ActionType = ItemType) then
-    begin
-      case ItemType of
-        QIT_CHAR: begin ev.Action.Text := ev.Action.Text + WChar(dwData); Exit; end;
-        QIT_BACK: begin ev.Action.Text := ev.Action.Text + WChar(dwData+1); Exit; end;
-      end;
-    end;
-  end;
-
-  ev := TDebugEvent.Create;
-  FEvents.Add(ev);
-  ev.EventType := etAction;
-  ev.Action.ActionType := ItemType;
-  ev.Action.dwData := dwData;
-
-  case ItemType of
-    QIT_CHAR: ev.Action.Text := WChar(dwData);
-    QIT_BACK: ev.Action.Text := WChar(dwData+1);
-  end;
-end;
-
 {-------------------------------------------------------------------------------
  - Preliminary debug stuff only                                                -
  ------------------------------------------------------------------------------}
@@ -1154,6 +1368,7 @@ begin
     (frmDebugStatus as TfrmDebugStatus).Key.ShowKey(nil);
   ExecutionPointLine := -1;
   ClearDeadkeys;  // I1699
+  CleanupCoreState;
 end;
 
 procedure TfrmDebug.SetupDebug;
@@ -1363,7 +1578,7 @@ var
 begin
   Found := False;
   for i := deadkeys.Count - 1 downto 0 do
-    if TDeadKeyInfo(deadkeys[i]).Deleted then
+    if deadkeys[i].Deleted then
     begin
       ClearDeadkeyStyle;
       deadkeys.Delete(i);
@@ -1387,15 +1602,12 @@ end;
 
 procedure TfrmDebug.InitDeadkeys;
 begin
-  deadkeys := TList.Create;
+  deadkeys := TDebugDeadkeyInfoList.Create;
 end;
 
 procedure TfrmDebug.ClearDeadkeys;
-var
-  i: Integer;
 begin
   ClearDeadkeyStyle;
-  for i := 0 to deadkeys.Count - 1 do TDeadKeyInfo(deadkeys[i]).Free;
   deadkeys.Clear;
   UpdateDeadkeyDisplay;
 end;
@@ -1425,6 +1637,7 @@ begin
     dk.Free //silent failure
   else
   begin
+    // TODO: this method of inserting chars differs from Action_Char;
     memo.SelText := WideChar($FFFC);
     memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
     memo.SelLength := 0;
@@ -1437,7 +1650,7 @@ end;
 
 procedure TfrmDebug.FillDeadkeys(startpos: Integer; var s: WideString);
 var
-  i, j: Integer;
+  i: Integer;
   dk: TDeadKeyInfo;
 begin
 //  Dec(startpos);
@@ -1446,9 +1659,8 @@ begin
   begin
     if s[i] = #$FFFC then
     begin
-      for j := 0 to deadkeys.Count - 1 do
+      for dk in deadkeys do
       begin
-        dk := TDeadKeyInfo(deadkeys[j]);
         if dk.Position = startpos then
         begin
           s[i] := WChr(UC_SENTINEL);
@@ -1494,83 +1706,8 @@ begin
 end;
 
 {-------------------------------------------------------------------------------
- - Control captions -- adding and removing '&' depending on FUIDisabled        -
+ - Control captions                                                            -
  ------------------------------------------------------------------------------}
-
-(*
-procedure TfrmDebug.InitControlCaptions;
-begin
-  FControlCaptions := TStringList.Create;
-  ControlCaption[tabDebugStores] := 'Element&s';
-  ControlCaption[tabDebugCallStack] := '&Call stack';
-  ControlCaption[tabDebugDeadkeys] := 'Deadke&ys';
-  ControlCaption[tabDebugRegressionTesting] := '&Regression testing';
-
-  ControlCaption[cmdRegTestStartStopLog] := 'Start &log';
-  ControlCaption[cmdRegTestStartStopTest] := 'R&un test';
-  ControlCaption[cmdRegTestOptions] := '&Options';
-end;
-
-procedure TfrmDebug.UninitControlCaptions;
-begin
-  FreeAndNil(FControlCaptions);
-end;
-
-procedure TfrmDebug.UpdateControlCaption(i: Integer);
-    function RemoveAmp(s: string): string;
-    var
-      n: Integer;
-    begin
-      for n := Length(s) downto 1 do
-        if s[n] = '&' then Delete(s, n, 1);
-      Result := s;
-    end;
-var
-  s: string;
-begin
-  if FUIDisabled then s := RemoveAmp(FControlCaptions[i]) else s := FControlCaptions[i];
-  if FControlCaptions.Objects[i] is TSpeedButton then
-    (FControlCaptions.Objects[i] as TSpeedButton).Caption := s
-  else if FControlCaptions.Objects[i] is TBitBtn then
-    (FControlCaptions.Objects[i] as TBitBtn).Caption := s
-  else if FControlCaptions.Objects[i] is TTabSheet then
-    (FControlCaptions.Objects[i] as TTabSheet).Caption := s;
-end;
-
-procedure TfrmDebug.UpdateControlCaptions;
-var
-  i: Integer;
-begin
-  if not Assigned(FControlCaptions) then Exit;
-  for i := 0 to FControlCaptions.Count - 1 do
-    UpdateControlCaption(i);
-end;
-
-procedure TfrmDebug.SetControlCaption(FControl: TControl; const Caption: TCaption);
-var
-  n: Integer;
-begin
-  if not Assigned(FControlCaptions) then Exit;
-
-  n := FControlCaptions.IndexOfObject(FControl);
-  if n = -1
-    then n := FControlCaptions.AddObject(Caption, FControl)
-    else FControlCaptions[n] := Caption;
-
-  UpdateControlCaption(n);
-end;
-
-function TfrmDebug.GetControlCaption(FControl: TControl): TCaption;
-var
-  n: Integer;
-begin
-  if not Assigned(FControlCaptions) then Exit;
-  n := FControlCaptions.IndexOfObject(FControl);
-  if n = -1
-    then Result := ''
-    else Result := FControlCaptions[n];
-end;
-*)
 
 function TfrmDebug.ShortcutDisabled(Key: Word): Boolean;
 begin
@@ -1659,9 +1796,9 @@ begin
       sgChars.Objects[J, 0] := Pointer(1);
       sgChars.Cells[J, 0] := '???';
       for K := 0 to deadkeys.Count-1 do
-        if TDeadKeyInfo(deadkeys[K]).Position = I+SelStart-2 then
+        if deadkeys[K].Position = I-1 then
         begin
-          sgChars.Cells[J, 0] := TDeadKeyInfo(deadkeys[K]).Deadkey.Name;
+          sgChars.Cells[J, 0] := deadkeys[K].Deadkey.Name;
           break;
         end;
       sgChars.Cells[J, 1] := 'Deadkey';

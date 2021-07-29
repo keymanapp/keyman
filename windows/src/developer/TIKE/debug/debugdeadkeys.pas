@@ -19,7 +19,12 @@ unit debugdeadkeys;
 
 interface
 
-uses Classes, debugkeyboard, SysUtils, KeymanDeveloperDebuggerMemo;
+uses
+  System.Classes,
+  System.Generics.Collections,
+  System.SysUtils,
+  debugkeyboard,
+  KeymanDeveloperDebuggerMemo;
 
 type
   TDeadKeyInfo = class // Kept as a list of active deadkeys
@@ -35,6 +40,11 @@ type
     property Deleted: Boolean read FDeleted;
   end;
 
+  TDebugDeadkeyInfoList = class(TObjectList<TDeadkeyInfo>)
+  public
+    function GetFromPosition(pos: Integer): TDeadkeyInfo;
+  end;
+
 implementation
 
 { TDeadKeyInfo }
@@ -42,6 +52,16 @@ implementation
 procedure TDeadKeyInfo.Delete;
 begin
   FDeleted := True;
+end;
+
+{ TDebugDeadkeyInfoList }
+
+function TDebugDeadkeyInfoList.GetFromPosition(pos: Integer): TDeadkeyInfo;
+begin
+  for Result in Self do
+    if Result.Position = pos then
+      Exit;
+  Result := nil;
 end;
 
 end.
