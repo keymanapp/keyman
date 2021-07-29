@@ -19,17 +19,17 @@ namespace kmx {
 #define KEYMANID_IGNORE     0xFFFFFFFE
 #define KEYMANID_INVALID    0xFFFFFFFD
 
-/* Shift flags for hotkeys (version 1.0) */ 
+/* Shift flags for hotkeys (version 1.0) */
 
 #define SHIFTFLAG 0x2000
 #define CTRLFLAG 0x4000
 #define ALTFLAG 0x8000
 
-/* Miscellaneous flags and defines */ 
+/* Miscellaneous flags and defines */
 
 #define MAXGROUPS 128
 
-/* File version identifiers */ 
+/* File version identifiers */
 
 #define VERSION_30  0x00000300
 #define VERSION_31  0x00000301
@@ -52,7 +52,6 @@ namespace kmx {
 
 #define BK_DEFAULT    0
 #define BK_DEADKEY    1
-#define BK_BACKSPACE  2
 
 // Different begin types
 #define BEGIN_ANSI    0
@@ -127,7 +126,7 @@ namespace kmx {
 
 #define TSS__MAX        38
 
-/* wm_keyman_control_internal message control codes */ 
+/* wm_keyman_control_internal message control codes */
 
 #define KMCI_SELECTKEYBOARD     3   // I3933
 #define KMCI_SELECTKEYBOARD_TSF 4   // I3933
@@ -205,7 +204,7 @@ namespace kmx {
 #define K_CTRLFLAG    0x0020    // Either ctrl flag
 #define K_ALTFLAG   0x0040    // Either alt flag
 //#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
-                                // Used internally (currently, only by KMW) to ensure Meta-key 
+                                // Used internally (currently, only by KMW) to ensure Meta-key
                                 // shortcuts safely bypass rules
                                 // Meta key = Command key on macOS, Windows key on Windows
 #define CAPITALFLAG   0x0100    // Caps lock on
@@ -222,7 +221,7 @@ namespace kmx {
 
 struct COMP_STORE {
   KMX_DWORD dwSystemID;
-  KMX_DWORD dpName; 
+  KMX_DWORD dpName;
   KMX_DWORD dpString;
   };
 
@@ -237,30 +236,30 @@ struct COMP_KEY {
 struct COMP_GROUP {
   KMX_DWORD dpName;
   KMX_DWORD dpKeyArray;   // [LPKEY] address of first item in key array
-  KMX_DWORD dpMatch;      
-  KMX_DWORD dpNoMatch;    
+  KMX_DWORD dpMatch;
+  KMX_DWORD dpNoMatch;
   KMX_DWORD cxKeyArray;   // in array entries
   KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
   };
 
 struct COMP_KEYBOARD {
   KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
-  
+
   KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
-  
+
   KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
   KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-  KMX_DWORD IsRegistered;   // 0010 
+  KMX_DWORD IsRegistered;   // 0010
   KMX_DWORD version;        // 0014 keyboard version
-  
+
   KMX_DWORD cxStoreArray;   // 0018 in array entries
   KMX_DWORD cxGroupArray;   // 001C in array entries
 
   KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
   KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
-  
+
   KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
-  
+
   KMX_DWORD dwFlags;        // 0030 Flags for the keyboard file
 
   KMX_DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)

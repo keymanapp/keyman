@@ -49,13 +49,7 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
     break;
 
   case QIT_BACK:
-    if(dwData == BK_BACKSPACE)  // User pressed backspace so delete deadkeys
-      while(m_context->CharIsDeadkey()) m_context->Delete();
-
     m_context->Delete();
-
-    if(dwData == BK_BACKSPACE)  // User pressed backspace so delete deadkeys
-      while(m_context->CharIsDeadkey()) m_context->Delete();
     break;
   }
 
