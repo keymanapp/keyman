@@ -251,4 +251,4 @@ BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL 
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
 #endif  // _KEYMAN64_LIGHT
-#endif	// _KEYMANENGINE_H
+#endif  // _KEYMANENGINE_H
