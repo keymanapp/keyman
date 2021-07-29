@@ -14,7 +14,7 @@ import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.WebViewUtil;
+import com.tavultesoft.kmea.util.WebViewUtils;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -137,7 +137,7 @@ public class WebViewFragment extends Fragment implements BlockingStep {
       @Override
       public void onPageFinished(WebView view, String url) {
         // Inject a meta viewport tag into the head of the file if it doesn't exist
-        WebViewUtil.injectViewport(view);
+        WebViewUtils.injectViewport(view);
       }
     });
 

@@ -75,6 +75,7 @@ import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.util.WebViewUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -365,6 +366,15 @@ public final class KMManager {
     }
 
     return appVersion;
+  }
+
+  /**
+   * Get the Keyman Engine mode based on the Chrome version
+   * @param aContext
+   * @return WebViewUtils.EngineModeType
+   */
+  public static WebViewUtils.EngineModeType getEngineMode(Context aContext) {
+    return WebViewUtils.getEngineModeType(aContext, "");
   }
 
   // Check if a keyboard namespace is reserved

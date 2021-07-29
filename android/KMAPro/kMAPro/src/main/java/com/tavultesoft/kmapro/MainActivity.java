@@ -40,6 +40,8 @@ import com.keyman.android.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 import com.tavultesoft.kmea.util.KMString;
+import com.tavultesoft.kmea.util.WebViewUtils;
+import com.tavultesoft.kmea.util.WebViewUtils.EngineModeType;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -197,6 +199,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
+    checkChromeVersion();
     CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
     checkGetStarted();
   }
@@ -762,6 +765,24 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     boolean maySendCrashReport = prefs.getBoolean(KeymanSettingsActivity.sendCrashReport, true);
     KMManager.setMaySendCrashReport(maySendCrashReport);
+  }
+
+  private void checkChromeVersion() {
+    if (WebViewUtils.getEngineModeType(context,"") != EngineModeType.ENGINE_MODE_TYPE_FULL) {
+      // Notify minimum Chrome version needed
+      String message = "Minimum Chrome version 57 needed for Keyman.";
+      //KMLog.LogError(TAG, message);
+      Toast.makeText(getApplicationContext(), message,
+        Toast.LENGTH_LONG).show();
+
+      // Launch PlayStore to update Chrome
+      try {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.android.chrome"));
+        startActivity(intent);
+      } catch (android.content.ActivityNotFoundException e) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/apps/details?id=com.android.chome")));
+      }
+    }
   }
 
   private Uri requestPermissionIntentUri;
