@@ -1,12 +1,13 @@
 #!/bin/bash -e
 # $1 - project name with appended tier, e.g. ibus-kmfl-alpha
+# $2 - GPG key used for signing the source package
 
 PROGRAM_NAME="$(basename "$0")"
 
 . $HOME/ci-builder-scripts/bash/common.sh
 init --no-package
 
-keyman_projects="keyman-keyboardprocessor kmflcomp libkmfl ibus-kmfl keyman-config ibus-keyman"
+keyman_projects="keyman kmflcomp libkmfl ibus-kmfl"
 
 tier="stable"
 
@@ -20,9 +21,9 @@ proj="$1"
 proj=${proj%"-alpha"}
 proj=${proj%"-beta"}
 
-if [ "$proj" == "keyman-keyboardprocessor" ]; then
-	fullsourcename="keyboardprocessor"
-	sourcedir="../common/core/desktop"
+if [ "$proj" == "keyman" ]; then
+	fullsourcename="keyman"
+	sourcedir="$KEYMAN_ROOT"
 else
 	# check if project is known
 	if [[ $keyman_projects =~ (^|[[:space:]])$proj($|[[:space:]]) ]]; then
@@ -76,9 +77,6 @@ rm -rf $sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 log "Make source package for $fullsourcename"
 log "reconfigure"
-if [ "$proj" == "keyman-keyboardprocessor" ]; then
-	mkdir -p keyboardprocessor
-fi
 JENKINS="yes" TIER="$tier" ./scripts/reconf.sh $sourcename
 
 log "Make origdist"
@@ -92,5 +90,9 @@ for file in `ls builddebs/*.dsc`; do
 	debsign -k$2 $file
 done
 
-mkdir -p $sourcedir
-mv builddebs/* $sourcedir
+if [ "$proj" == "keyman" ]; then
+    mv builddebs/* ..
+else
+    mkdir -p $sourcedir
+    mv builddebs/* $sourcedir
+fi

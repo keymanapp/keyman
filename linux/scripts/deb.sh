@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Build Debian packages of Keyman with pbuilder
+# Build Debian source packages of Keyman
+# and optionally also binary packages with pbuilder
 
 # It must be run from the keyman/linux directory
 
@@ -13,7 +14,7 @@ set -e
 
 all_distributions="focal"
 distributions=""
-all_projects="kmflcomp libkmfl keyman-keyboardprocessor ibus-kmfl keyman-config ibus-keyman"
+all_projects="keyman kmflcomp libkmfl ibus-kmfl"
 projects=""
 echo "all_distributions: ${all_distributions}"
 echo "all_projects: ${all_projects}"
@@ -74,7 +75,7 @@ fi
 echo "distributions: ${distributions}"
 echo "projects: ${projects}"
 
-BASEDIR=`pwd`
+BASEDIR=$(pwd)
 #echo "basedir is $BASEDIR"
 
 mkdir -p builddebs
@@ -90,8 +91,8 @@ for proj in ${projects}; do
 	#echo "vers3:${vers}"
 	cp -a ../dist/${proj}_${vers}.orig.tar.gz .
 	tar xfz ${proj}_${vers}.orig.tar.gz
-	if [ "keyman-keyboardprocessor" == "$proj" ]; then
-		cp -a ../../common/core/desktop/debian ${proj}-${vers}
+	if [ "keyman" == "$proj" ]; then
+		cp -a ../../debian ${proj}-${vers}
 	else
 		cp -a ../${proj}/debian ${proj}-${vers}
 	fi

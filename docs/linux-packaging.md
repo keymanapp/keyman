@@ -89,8 +89,9 @@ are scattered over several source repos:
     - [jenkins.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh)
       gets called from `lsdev-pipeline-library` to create a source package.
 
-  - [linux/*/debian](https://github.com/keymanapp/keyman/tree/master/linux/ibus-kmfl/debian) -
-    each package has a separate `debian` subdirectory with the meta data for the Linux package.
+  - [debian](https://github.com/keymanapp/keyman/tree/master/debian) - this is the `debian`
+    subdirectory for Keyman for Linux with the meta data for the Linux package. The legacy
+    kmfl-related packages have separate debian subdirectories under `linux/*/debian`.
     See [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/) for
     details to the various files.
 
@@ -113,8 +114,8 @@ are scattered over several source repos:
 - build job installs
   [dependencies](https://github.com/keymanapp/keyman/blob/master/linux/build/agent/install-deps)
   on the current build agent
-- build job creates a source package for the linux packages (keyman-keyboardprocessor, kmflcomp,
-  libkmfl, ibus-kmfl, keyman-config, and ibus-keyman). This is done by calling
+- build job creates a source package for the linux packages (keyman, kmflcomp,
+  libkmfl, and ibus-kmfl). This is done by calling
   [scripts/jenkins.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh).
 - build job creates the binary package for each linux package on each distribution (currently
   bionic, focal, and groovy) and each architecture (amd64, i386 only for bionic)
@@ -168,7 +169,7 @@ Building packages happen in the [Keyman source tree](https://github.com/keymanap
 The Keyman
 [`linux/scripts/jenkins.sh`](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh)
 script can be used to create a source package (replace `packageName` with the name of the package,
-i.e. one of keyman-keyboardprocessor, kmflcomp, libkmfl, ibus-kmfl, keyman-config, and ibus-keyman).
+i.e. one of keyman, kmflcomp, libkmfl, and ibus-kmfl).
 
 ```bash
 cd linux
@@ -176,20 +177,15 @@ cd linux
 ```
 
 This creates a source package (`<packageName>_<version>-1.dsc`) and some `*.tar.?z` files in the
-`linux/<packageName>` subdirectory.
-
-**NOTE:** The subdirectory for `keyman-keyboardprocessor` is `common/core/desktop`, for
-all other packages `linux/<packageName>`.
+`linux/legacy/<packageName>` subdirectory, respective in the source root directory for `keyman`.
 
 ci-builder-script's [`build-package`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/build-package)
 script creates the binary packages:
 
 ```bash
-cd linux/${packageName}
+cd linux/legacy/${packageName}
 ~/ci-builder-scripts/bash/build-package \
     --dists "focal bionic" --arches "amd64 i386" \
-    --main-package-name "My great package" \
-    --supported-distros "bionic focal" \
     --debkeyid ${DEBSIGNKEY} --build-in-place --no-upload
 ```
 
@@ -218,10 +214,12 @@ Package builds on Launchpad are triggered manually by running the Keyman script
    to your launchpad account
 4. Set the following environment variables in your `~/.profile` or `~/.bashrc` (so you don't have
    to set them every time)
-  `export GPGKEY=[key_id]` using the `key_id` of your GPG key
-  `DEBEMAIL="your.email.address@example.org"`
-  `DEBFULLNAME="Firstname Lastname"`
-  `export DEBEMAIL DEBFULLNAME`
+
+    ```bash
+    export GPGKEY=[key_id] # using the `key_id` of your GPG key
+    export DEBEMAIL="your.email.address@example.org"
+    export DEBFULLNAME="Firstname Lastname"
+    ```
 
 ### Building packages on Launchpad
 
