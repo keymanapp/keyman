@@ -11,7 +11,7 @@
   <script src="keyman-sentry.js"></script>
   <script type="text/javascript">
     var device = window.jsInterface.getDeviceType();
-    var oskHeight = window.jsInterface.getKeyboardHeight();
+    var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.devicePixelRatio);
     var oskWidth = 0;
     var fragmentToggle = 0;
 
@@ -74,7 +74,7 @@
 
     function setOskHeight(h) {
       if(h > 0) {
-        oskHeight = h;
+        oskHeight = Math.ceil(h / window.devicePixelRatio);
       }
       var kmw=window['keyman'];
       if(kmw && kmw.core && kmw.core.activeKeyboard) {
@@ -90,7 +90,11 @@
     }
 
     function getOskHeight() {
-      return oskHeight;
+      var height = oskHeight;
+      if(keyman.osk.banner._activeType != 'blank') {
+        height = height; // Android's perspective - banner height is wholly separate.
+      }
+      return height;
     }
 
     function getOskWidth() {
