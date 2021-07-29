@@ -96,8 +96,8 @@ namespace com.keyman.osk.embedded {
      * re-selected the base key.
      * @param touch 
      */
-    updateTouch(touch: Touch) {
-      this.baseKeySelected = this.baseKey.key.isUnderTouch(touch);
+    updateTouch(input: InputEventCoordinate) {
+      this.baseKeySelected = this.baseKey.key.isUnderTouch(input);
 
       // Prevent highlighting & selection before the touch has moved from the base key.
       if(this.movedFromBaseKey) {
