@@ -107,7 +107,7 @@
 "kmp-error-file-system" = "Paket quraşdırma xətası - fayl sistem xətası";
 
 /* Error installing a Keyman package - could not copy package files */
-"kmp-error-file-copying" = "Paket quraşdırma xətası - tələb olunan fayllar köçürə bilmədi";
+"kmp-error-file-copying" = "Paket quraşdırma xətası - tələb olunan fayllar kopyalana bilmədi";
 
 /* Error opening a Keyman package - package is not valid */
 "kmp-error-invalid" = "Paketin faylı zədəlidir.";
