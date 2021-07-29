@@ -1089,8 +1089,6 @@ namespace com.keyman.osk {
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
-      let device = this.device;
-
       var layers=this.kbdDiv.firstChild.childNodes;
       let oskHeight = 0;
 
@@ -1108,10 +1106,6 @@ namespace com.keyman.osk {
       // This isn't set anywhere else; it's a legacy part of the original methods.
       const oskPad = 0;
       let oskPaddedHeight = oskHeight + oskPad;
-
-      if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-        oskPaddedHeight /= window.devicePixelRatio;
-      }
 
       return oskPaddedHeight;
     }

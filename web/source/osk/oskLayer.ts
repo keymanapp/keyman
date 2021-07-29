@@ -94,12 +94,6 @@ namespace com.keyman.osk {
 
       if(vkbd.usesFixedHeightScaling) {
         this.element.style.height=(paddedHeight)+'px';
-
-
-        if(vkbd.device.OS == 'Android' && 'devicePixelRatio' in window) {
-          this.element.style.height = this.element.style.maxHeight = paddedHeight + 'px';
-          rowHeight /= window.devicePixelRatio;
-        }
       }
 
       // Sets the layers to the correct height

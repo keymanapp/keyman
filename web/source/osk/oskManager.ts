@@ -218,7 +218,7 @@ namespace com.keyman.osk {
       // Initializes the size of a touch keyboard.
       if(this.vkbd && device.touchable) {
         let targetOSKHeight = this.vkbd.computedAdjustedOskHeight(this.getKeyboardHeight());
-        this.setSize(screen.width, targetOSKHeight);
+        this.setSize(screen.width, targetOSKHeight + this.getBannerHeight());
       }
       // END:  construction of the actual internal layout for the overall OSK
 
@@ -596,7 +596,7 @@ namespace com.keyman.osk {
       this.needsLayout = this.needsLayout || mutatedFlag;
 
       if(this.vkbd) {
-        this.vkbd.setSize(width, height, pending);
+        this.vkbd.setSize(width, height - this.getBannerHeight(), pending);
       }
     }
 
@@ -637,15 +637,6 @@ namespace com.keyman.osk {
       // Correct for viewport scaling (iOS - Android 4.2 does not want this, at least on Galaxy Tab 3))
       if(device.OS == 'iOS') {
         height=height/keymanweb.util.getViewportScale();
-      }
-
-      // Correct for devicePixelratio - needed on Android 4.1.2 phones,
-      // for Opera, Chrome and Firefox, but not for native browser!   Exclude native browser for Build 344.
-      if(device.OS == 'Android' && device.formFactor == 'phone' && 'devicePixelRatio' in window) {
-        var bMatch=/Firefox|Chrome|OPR/;
-        if(bMatch.test(navigator.userAgent)) {
-          height = height*window.devicePixelRatio;
-        }
       }
 
       return height;
