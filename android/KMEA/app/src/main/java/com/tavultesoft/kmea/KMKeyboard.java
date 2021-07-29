@@ -1091,7 +1091,7 @@ final class KMKeyboard extends WebView {
         }
       }
     } catch (JSONException e) {
-      KMLog.LogException(TAG, "", e);
+      KMLog.LogException(TAG, "Failed to make font for '"+font+"'", e);
       return null;
     }
 
