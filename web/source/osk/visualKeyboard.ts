@@ -75,27 +75,15 @@ namespace com.keyman.osk {
 
     // Special keys (for the currently-visible layer)
     get lgKey(): KeyElement { // currently, must be visible for the touch language menu.
-      if(this.currentLayer && this.currentLayer.globeKey) {
-        return this.currentLayer.globeKey.btn;
-      } else {
-        return null;
-      }
+      return this.currentLayer?.globeKey?.btn;
     }
 
     private get hkKey(): KeyElement { // hide keyboard key
-      if(this.currentLayer && this.currentLayer.hideKey) {
-        return this.currentLayer.hideKey.btn;
-      } else {
-        return null;
-      }
+      return this.currentLayer?.hideKey?.btn;
     }
 
     public get spaceBar(): KeyElement { // also referenced by the touch language menu.
-      if(this.currentLayer && this.currentLayer.spaceBarKey) {
-        return this.currentLayer.spaceBarKey.btn;
-      } else {
-        return null;
-      }
+      return this.currentLayer?.spaceBarKey?.btn;
     }
 
     //#region OSK constructor and helpers
