@@ -30,11 +30,7 @@ namespace com.keyman.osk {
       gDiv.className='kmw-key-layer';
 
       // Set font for layer if defined in layout
-      if('font' in layout) {
-        gs.fontFamily=layout['font'];
-      } else {
-        gs.fontFamily='';
-      }
+      gs.fontFamily = 'font' in layout ? layout['font'] : '';
 
       this.nextlayer = gDiv['layer'] = layer['id'];
       if(typeof layer['nextlayer'] == 'string') {

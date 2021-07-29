@@ -70,9 +70,7 @@ namespace com.keyman.osk {
     }
 
     get currentLayer(): OSKLayer {
-      if(this.layerGroup && this.layerId) {
-        return this.layerGroup.layers[this.layerId];
-      }
+      return this.layerId ? this.layerGroup?.layers[this.layerId] : null;
     }
 
     // Special keys (for the currently-visible layer)
