@@ -279,6 +279,7 @@
     <ResourceCompile Include="Keyman64.RC" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\global\inc\keymanengine.h" />
     <ClInclude Include="..\keyman32\addins.h" />
     <ClInclude Include="..\keyman32\appint\aiTIP.h" />
     <ClInclude Include="..\keyman32\appint\aiWin2000Unicode.h" />
