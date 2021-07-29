@@ -22,5 +22,5 @@ For a debug build:
 ```
 
 To use the header files from the source repo, add the additional parameter
-`KEYMAN_PROC_CFLAGS="-I../../common/core/desktop/build/include -I../../common/core/desktop/include"`
+`KEYMAN_PROC_CFLAGS="-I../../common/core/desktop/build/arch/debug/include -I../../common/core/desktop/include"`
 to `./configure`.

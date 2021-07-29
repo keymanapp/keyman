@@ -1,0 +1,14 @@
+linux/keyman-config/com.keyman.gschema.xml  usr/share/glib-2.0/schemas/
+linux/keyman-config/icons/128/km-config.png  usr/share/icons/hicolor/128x128/apps/
+linux/keyman-config/icons/16/application-x-kmp.png  usr/share/icons/hicolor/16x16/mimetypes/
+linux/keyman-config/icons/24/application-x-kmp.png  usr/share/icons/hicolor/24x24/mimetypes/
+linux/keyman-config/icons/24/km-config.png  usr/share/icons/hicolor/24x24/apps/
+linux/keyman-config/icons/32/application-x-kmp.png  usr/share/icons/hicolor/32x32/mimetypes/
+linux/keyman-config/icons/32/km-config.png  usr/share/icons/hicolor/32x32/apps/
+linux/keyman-config/icons/48/application-x-kmp.png  usr/share/icons/hicolor/48x48/mimetypes/
+linux/keyman-config/icons/48/km-config.png  usr/share/icons/hicolor/48x48/apps/
+linux/keyman-config/icons/64/application-x-kmp.png  usr/share/icons/hicolor/64x64/mimetypes/
+linux/keyman-config/icons/64/km-config.png  usr/share/icons/hicolor/64x64/apps/
+linux/keyman-config/keyman_config/icons/*  usr/share/keyman/icons/
+debian/com.keyman.config.appdata.xml  usr/share/metainfo
+debian/km-config.desktop  usr/share/applications

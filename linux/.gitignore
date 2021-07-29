@@ -99,3 +99,9 @@ debianpackage/
 *.tar.gz
 *.dsc
 help/reference/
+
+# Cached/auto-compiled Python bytecode
+*.pyc
+
+# Debian watch file - we generate it from watch.in
+watch

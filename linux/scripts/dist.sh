@@ -16,47 +16,33 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 BASEDIR=$(pwd)
-autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
-extra_projects="keyboardprocessor keyman-config"
+legacy_projects="kmflcomp libkmfl ibus-kmfl"
+extra_projects="keyman"
 
 if [ "$1" == "origdist" ]; then
-    if [ "$2" != "" ]; then
-        echo "$2"
-        if [ ! -d "$2" ]; then
-            echo "project $2 does not exist"
-            exit 1
-        fi
-        if [ "$2" == "keyman-config" ] || [ "$2" == "keyboardprocessor" ]; then
-            autotool_projects=""
-            extra_projects="$2"
-        else
-            autotool_projects="$2"
-            extra_projects=""
-        fi
-    fi
-else
-    if [ "$1" != "" ]; then
-        echo "$1"
-        if [ ! -d "$1" ]; then
-            echo "project $1 does not exist"
-            exit 1
-        fi
-        if [ "$1" == "keyman-config" ] || [ "$1" == "keyboardprocessor" ]; then
-            autotool_projects=""
-            extra_projects="$1"
-        else
-            autotool_projects="$1"
-            extra_projects=""
-        fi
-    fi
+    create_origdist=1
+    shift
 fi
 
+if [ "$1" != "" ]; then
+    echo "$1"
+    if [ "$1" == "keyman" ]; then
+        legacy_projects=""
+        extra_projects="$1"
+    elif [ -d "$1" ]; then
+        legacy_projects="$1"
+        extra_projects=""
+    else
+        echo "project $1 does not exist"
+        exit 1
+    fi
+fi
 
 rm -rf dist
 mkdir -p dist
 
 # configure and make dist for autotool projects
-for proj in ${autotool_projects}; do
+for proj in ${legacy_projects}; do
     echo "configure $proj"
     cd $proj
     rm -rf ../build-$proj
@@ -69,35 +55,38 @@ for proj in ${autotool_projects}; do
 done
 
 for proj in ${extra_projects}; do
-    # dist for keyman-config
-    if [ "${proj}" == "keyman-config" ]; then
-        cd keyman-config
-        echo "3.0 (native)" > debian/source/format
-        dch keyman-config --newversion ${VERSION} --force-bad-version --nomultimaint
-        dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
-            --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
-            --tar-ignore=buildtools/build-langtags.py --tar-ignore=__pycache__ -Zgzip -b .
-        mv ../keyman-config_*.tar.gz ../dist/keyman-config-${VERSION}.tar.gz
-        echo "3.0 (quilt)" > debian/source/format
-    elif [ "${proj}" == "keyboardprocessor" ]; then
-        cd ../common/core
-        kbpvers="keyman-keyboardprocessor-$VERSION"
-        cp -a desktop $kbpvers
-        cp ../../VERSION.md $kbpvers
-        cp ../../TIER.md $kbpvers
-        mkdir -p $kbpvers/scripts
-        cp ../../resources/shellHelperFunctions.sh $kbpvers/scripts
-        tar cvzf $kbpvers.tar.gz --exclude=debian --exclude=build --exclude=.gitignore $kbpvers
-        rm -rf $kbpvers
-        cp $kbpvers.tar.gz ../../linux/dist
-    fi
+    # dist for keyman
+    cp -a debian ../
+    cd ..
+    echo "3.0 (native)" > debian/source/format
+    dch keyman --newversion ${VERSION} --force-bad-version --nomultimaint
+    dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
+        --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
+        --tar-ignore=.github --tar-ignore=.vscode --tar-ignore=android \
+        --tar-ignore=common/core/web --tar-ignore=common/lexical-model-types \
+        --tar-ignore=common/models --tar-ignore=common/predictive-text \
+        --tar-ignore=common/test --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
+        --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
+        --tar-ignore=linux/help --tar-ignore=linux/ibus-kmfl --tar-ignore=linux/Jenkinsfile \
+        --tar-ignore=linux/keyboardprocessor --tar-ignore=linux/kmflcomp \
+        --tar-ignore=linux/libkmfl --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
+        --tar-ignore=linux/build* --tar-ignore=common/core/desktop/build \
+        --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
+        --tar-ignore=resources/scopes --tar-ignore=resources/web-environment \
+        --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
+        --tar-ignore=resources/build/vswhere* --tar-ignore=results \
+        --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \
+        --tar-ignore=dist --tar-ignore=.pbuilderrc --tar-ignore=VERSION \
+        --tar-ignore=scripts -Zgzip -b .
+    mv ../keyman_${VERSION}.tar.gz linux/dist/keyman-${VERSION}.tar.gz
+    echo "3.0 (quilt)" > debian/source/format
     cd $BASEDIR
 done
 
 # create orig.tar.gz
-if [ "$1" == "origdist" ]; then
+if [ -n "$create_origdist" ]; then
     cd dist
-    for proj in ${autotool_projects}; do
+    for proj in ${legacy_projects}; do
         tmp=$(basename ${proj}*.tar.gz .tar.gz)
         origname=${tmp/$proj-/$proj\_}
         index=$(expr index "${origname}" _)
@@ -105,18 +94,11 @@ if [ "$1" == "origdist" ]; then
     done
 
     for proj in ${extra_projects}; do
-        if [ "${proj}" == "keyman-config" ]; then
-            pkgvers="keyman-config-$VERSION"
-            tar xfz keyman-config-${VERSION}.tar.gz
-            mv keyman-config ${pkgvers}
-            tar cfz keyman-config_${VERSION}.orig.tar.gz ${pkgvers}
-            rm keyman-config-${VERSION}.tar.gz
-            rm -rf ${pkgvers}
-        elif [ "${proj}" == "keyboardprocessor" ]; then
-            tmp=$(basename keyman-keyboardprocessor*.tar.gz .tar.gz)
-            origname=${tmp/keyman-keyboardprocessor-/keyman-keyboardprocessor\_}
-            index=$(expr index "${origname}" _)
-            mv keyman-keyboardprocessor*.tar.gz ${origname}.orig.tar.gz
-        fi
+        pkgvers="keyman-$VERSION"
+        tar xfz keyman-${VERSION}.tar.gz
+        mv -v keyman ${pkgvers} 2>/dev/null || mv -v $(find . -mindepth 1 -maxdepth 1 -type d) ${pkgvers}
+        tar cfz keyman_${VERSION}.orig.tar.gz ${pkgvers}
+        rm keyman-${VERSION}.tar.gz
+        rm -rf ${pkgvers}
     done
 fi
