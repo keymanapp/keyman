@@ -1,87 +1,16 @@
 import {
-//    error as logError,
-//    info as logInfo,
     warning as logWarning
 } from '@actions/core';
 
 import { GitHub } from '@actions/github';
-
-import { findLastHistoryPR, getAssociatedPR} from './graphql/queries';
-import { spawnChild } from './util/spawnAwait';
 import { readFileSync, writeFileSync } from 'fs';
 import { gt } from 'semver';
-
-const getPullRequestInformation = async (
-  octokit: GitHub, base: string
-): Promise<string | undefined> => {
-  const response = await octokit.graphql(
-    findLastHistoryPR(base)
-  );
-
-  if (response === null) {
-    return undefined;
-  }
-
-  //logInfo(JSON.stringify(response));
-
-  const {
-    search: {
-      nodes: [
-        {
-          mergeCommit: {
-            oid: commit_id
-          }
-        }
-      ]
-    }
-  } = response;
-
-  return commit_id;
-};
+import { reportHistory } from './reportHistory';
 
 interface PRInformation {
   title: string;
   number: number;
 }
-
-const getAssociatedPRInformation = async (
-  octokit: GitHub,
-  commit_id: string
-): Promise<PRInformation | undefined> => {
-  const response = await octokit.graphql(
-    getAssociatedPR,
-    { sha: commit_id }
-  );
-
-  if (response === null || response.repository.commit === null) {
-    return undefined;
-  }
-
-  //console.log(JSON.stringify(response));
-
-  const {
-    repository: {
-      commit: {
-        parents: {
-          nodes: [
-            {
-              associatedPullRequests: {
-                nodes: [
-                  {
-                    title: title,
-                    number: number
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      }
-    }
-  } = response;
-
-  return { title, number };
-};
 
 // ------------------------------------------------------------------------------------
 // splitPullsIntoHistory
@@ -255,53 +184,21 @@ export const fixupHistory = async (
 ): Promise<number> => {
 
   //
-  // Get the last auto history merge commit ref
-  //
-
-  const commit_id = await getPullRequestInformation(octokit, base);
-  if (commit_id === undefined) {
-    logWarning('Unable to fetch pull request information.');
-    return -1;
-  }
-
-  //
-  // Now, use git log to retrieve list of merge commit refs since then
-  //
-
-  const git_result = (await spawnChild('git', ['log', '--merges', /*'--first-parent',*/ '--format=%H', base, `${commit_id}..`])).trim();
-  if(git_result.length == 0 && !force) {
-    // We won't throw on this
-    logWarning('No pull requests found since previous increment');
-    return 0;
-  }
-
-  const new_commits = git_result.split(/\r?\n/g);
-  //console.log(JSON.stringify(new_commits, null, 2));
-
-  //
-  // Retrieve the pull requests associated with each merge
+  // Get pull request details
   //
 
   let pulls: PRInformation[] = [];
 
-  if(git_result.length == 0) {
-    pulls.push({
-      title: 'No changes made',
-      number: 0
-    });
-  }
-  else {
-    for(const commit of new_commits) {
-      const pr = await getAssociatedPRInformation(octokit, commit);
-      if(pr === undefined) {
-        logWarning(`commit ref ${commit} has no associated pull request.`);
-        continue;
-      }
-      pulls.push(pr);
-    }
+  try {
+    pulls = await reportHistory(octokit, base, force);
+  } catch(e) {
+    logWarning(e);
+    return -1;
   }
 
-  //logInfo(JSON.stringify(pulls, null, 2));
+  if(pulls == null) {
+    return -1;
+  }
 
   //
   // Splice these into HISTORY.md
@@ -313,7 +210,7 @@ export const fixupHistory = async (
   // Write a comment to GitHub for each of the pulls
   //
 
-  if(git_result.length > 0) {
+  if(historyResult.pulls.length > 0) {
     await sendCommentToPullRequestAndRelatedIssues(octokit, historyResult.pulls);
   }
 
