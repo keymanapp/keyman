@@ -8,3 +8,4 @@
 #include "gtest/gtest.h"
 #include <Windows.h>
 #include "keyman64.h"
+#include "keymanengine.h"
