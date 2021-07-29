@@ -1116,6 +1116,7 @@ namespace com.keyman.osk {
       }
 
       // The font-scaling applied on the layer group.
+      gs.fontSize = this.fontSize.styleString;
       bs.fontSize=ParsedLengthStyle.forScalar(fs).styleString;
 
       // Needs the refreshed layout info to work correctly.
