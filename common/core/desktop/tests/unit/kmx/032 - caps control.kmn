@@ -19,6 +19,7 @@ group(Main) using keys
 + [NCAPS K_2] > 'fail.'
 + [CAPS K_2] > 'pass.'
 
+c Shift will free caps lock when it is released, so this test should still have Caps Lock on.
 + [NCAPS SHIFT K_3] > 'fail.'
 + [CAPS SHIFT K_3] > 'pass.'
 
