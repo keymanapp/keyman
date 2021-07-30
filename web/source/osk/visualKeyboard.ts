@@ -248,10 +248,6 @@ namespace com.keyman.osk {
       }
     }
 
-    public defaultDesktopFontSize(): number {
-      return this.height ? this.height / 8 : undefined;
-    }
-
     /**
      * Called by OSKManager after resize operations in order to determine the final
      * size actually used by the visual keyboard.

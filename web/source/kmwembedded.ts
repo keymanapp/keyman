@@ -257,10 +257,8 @@ namespace com.keyman.text {
   keymanweb['correctOSKTextSize']=function() {
     let osk: com.keyman.osk.OSKManager = keymanweb.osk;
     if(osk?.vkbd) {
-      osk.refreshLayout();
-
-      // ... that `refreshLayout` is probably redundant:  _Load should fully reload the keyboard.
-      osk._Load();
+      osk._Load(); // TODO:  replace with osk.refreshLayout() in the future once it can perfectly
+                   //        handle rotations.
     }
   };
 

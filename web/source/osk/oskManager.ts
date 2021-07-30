@@ -270,12 +270,6 @@ namespace com.keyman.osk {
      * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
      */
     get computedWidth(): number {
-      // if(!this.kbdDiv) {
-      //   // Intermediate state - can be called during VisualKeyboard's constructor, before
-      //   // computedHeight can receive a value.
-      //   return undefined;
-      // }
-
       // Computed during layout operations; allows caching instead of continuous recomputation.
       if(this.needsLayout) {
         this.refreshLayout();
@@ -288,12 +282,6 @@ namespace com.keyman.osk {
      * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
      */
     get computedHeight(): number {
-      // if(!this.kbdDiv) {
-      //   // Intermediate state - can be called during VisualKeyboard's constructor, before
-      //   // computedHeight can receive a value.
-      //   return undefined;
-      // }
-
       // Computed during layout operations; allows caching instead of continuous recomputation.
       if(this.needsLayout) {
         this.refreshLayout();
@@ -586,14 +574,14 @@ namespace com.keyman.osk {
         const parsedWidth = ParsedLengthStyle.inPixels(width);
         const parsedHeight = ParsedLengthStyle.inPixels(height);
 
-        mutatedFlag ||= parsedWidth.styleString  != this._width.styleString;
-        mutatedFlag ||= parsedHeight.styleString != this._height.styleString;
+        mutatedFlag = mutatedFlag || parsedWidth.styleString  != this._width.styleString;
+        mutatedFlag = mutatedFlag || parsedHeight.styleString != this._height.styleString;
 
         this._width = parsedWidth;
         this._height = parsedHeight;
       }
 
-      this.needsLayout ||= mutatedFlag;
+      this.needsLayout = this.needsLayout || mutatedFlag;
 
       if(this.vkbd) {
         this.vkbd.setSize(width, height - this.getBannerHeight(), pending);
@@ -1001,8 +989,10 @@ namespace com.keyman.osk {
         return;
       }
 
-      // Step 3:  perform layout operations.
+      // Must be set before any references to the .computedWidth and .computedHeight properties!
       this.needsLayout = false;
+
+      // Step 3:  perform layout operations.
       if(this.vkbd) {
         // +5:  from kmw-banner-bar's 'top' attribute.
         const vkbdHeight = this.computedHeight - (this.banner.height ? this.banner.height + 5 : 0);
@@ -1010,7 +1000,7 @@ namespace com.keyman.osk {
         this.vkbd.refreshLayout();
       }
 
-      if(this && this.vkbd && this.vkbd.device.touchable) {
+      if(this.vkbd?.device.touchable) {
         var b: HTMLElement = this._Box, bs=b.style;
         bs.height=bs.maxHeight=this.computedHeight+'px';
       }
