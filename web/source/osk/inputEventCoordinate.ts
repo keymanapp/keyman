@@ -14,28 +14,25 @@ namespace com.keyman.osk {
       }
     }
 
-    // Converts a MouseEvent into the base coordinates needed by the mouse-dragging operations.
-    public static fromMouseEvent(e: MouseEvent) {
-      if (e.pageX) {
-        return new InputEventCoordinate(e.pageX, e.pageY, e);
-      } else if (e.clientX) {
-        const x = e.clientX + document.body.scrollLeft;
-        const y = e.clientY + document.body.scrollTop;
-
-        return new InputEventCoordinate(x, y, e);
+    // Converts a MouseEvent or TouchEvent into the base coordinates needed 
+    // by the mouse-dragging operations.
+    public static fromEvent(e: MouseEvent | TouchEvent) {
+      let coordSource: MouseEvent | Touch;
+      if(e instanceof TouchEvent) {
+        coordSource = e.changedTouches[0];
+      } else {
+        coordSource = e;
       }
-    }
 
-    public static fromTouchEvent(e: TouchEvent) {
-      let touch = e.changedTouches[0];
-
-      if(touch.pageX) {
-        return new InputEventCoordinate(touch.pageX, touch.pageY, e);
-      } else if (touch.clientX) {
-        const x = touch.clientX + document.body.scrollLeft;
-        const y = touch.clientY + document.body.scrollTop;
+      if (coordSource.pageX) {
+        return new InputEventCoordinate(coordSource.pageX, coordSource.pageY, e);
+      } else if (coordSource.clientX) {
+        const x = coordSource.clientX + document.body.scrollLeft;
+        const y = coordSource.clientY + document.body.scrollTop;
 
         return new InputEventCoordinate(x, y, e);
+      } else {
+        return new InputEventCoordinate(null, null, e);
       }
     }
 

@@ -92,7 +92,7 @@ namespace com.keyman.osk.layouts {
         this._mouseStartSnapshot = new MouseStartSnapshot(e);
       }
 
-      this._startCoord = InputEventCoordinate.fromMouseEvent(e);
+      this._startCoord = InputEventCoordinate.fromEvent(e);
 
       document.onmousemove = this._VMoveMouseMove.bind(this);
       document.onmouseup = this._VMoveMouseUp.bind(this);
@@ -129,7 +129,7 @@ namespace com.keyman.osk.layouts {
       if(!this._mouseStartSnapshot.matchesCausingClick(e)) { // I1472 - Dragging off edge of browser window causes muckup
         return this._VMoveMouseUp(e);
       } else {
-        const coord = InputEventCoordinate.fromMouseEvent(e);
+        const coord = InputEventCoordinate.fromEvent(e);
         const deltaX = coord.x - this._startCoord.x;
         const deltaY = coord.y - this._startCoord.y;
 

@@ -40,12 +40,12 @@ namespace com.keyman.osk {
     }
 
     onTouchStart(event: TouchEvent) {
-      this.onInputStart(InputEventCoordinate.fromTouchEvent(event));
+      this.onInputStart(InputEventCoordinate.fromEvent(event));
     }
 
     onTouchMove(event: TouchEvent) {
       this.preventPropagation(event);
-      const coord = InputEventCoordinate.fromTouchEvent(event);
+      const coord = InputEventCoordinate.fromEvent(event);
 
       if(this.vkbd.detectWithinBounds(coord)) {
         this.onInputMove(coord);
@@ -55,7 +55,7 @@ namespace com.keyman.osk {
     }
 
     onTouchEnd(event: TouchEvent) {
-      this.onInputEnd(InputEventCoordinate.fromTouchEvent(event));
+      this.onInputEnd(InputEventCoordinate.fromEvent(event));
     }
   }
 }
