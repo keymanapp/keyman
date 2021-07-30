@@ -1121,6 +1121,7 @@ begin
           begin
             if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
             Result := Result + nlt+Format('r=this.g%s(t,e);', [JavaScript_Name(rec.Use.GroupIndex, rec.Use.Group.szName)]);    // I1959   // I3681
+            Result := Result + nlt+'m=2;';  // #5440 - match desktop behavior
             len := -1;
           end;
         CODE_CALL:
@@ -1130,6 +1131,7 @@ begin
             if n = -1 then
               n := FCallFunctions.Add(CallFunctionName(rec.Call.Store.dpString));
             Result := Result + nlt+Format('r=this.c%d(t,e);', [n]);    // I1959   // I3681
+            Result := Result + nlt+'m=2;';  // #5440 - match desktop behavior
             len := -1;
           end;
         CODE_SETOPT:    // I3429
@@ -2173,7 +2175,7 @@ begin
 
 		if Assigned(fgp.dpMatch) then
       Result := Result + Format(
-        '%sif(m) {%s'+
+        '%sif(m==1) {%s'+
         '%s%s%s'+
         '%s}%s',
         [FTabstop+FTabstop, nl,
