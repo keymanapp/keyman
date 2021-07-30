@@ -47,5 +47,13 @@ namespace com.keyman.osk {
     public get target() {
       return this.source?.target;
     }
+
+    public get isFromTouch(): boolean {
+      return this.source instanceof TouchEvent;
+    }
+
+    public get isFromMouse(): boolean {
+      return this.source instanceof MouseEvent;
+    }
   }
 }

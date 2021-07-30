@@ -100,16 +100,6 @@ namespace com.keyman.osk {
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       btn.id=this.getId();
 
-      // Define callbacks to handle key touches: iOS and Android tablets and phones
-      // TODO: replace inline function calls??
-      if(!vkbd.isStatic && !vkbd.device.touchable) {
-        // Highlight key while mouse down or if moving back over originally selected key
-        btn.onmouseover=btn.onmousedown=vkbd.mouseOverMouseDownHandler; // Build 360
-
-        // Remove highlighting when key released or moving off selected element
-        btn.onmouseup=btn.onmouseout=vkbd.mouseUpMouseOutHandler; //Build 360
-      }
-
       // Make sure the key text is the element's first child - processSubkeys()
       // will add an extra element if subkeys exist, which can interfere with
       // keyboard/language name display on the space bar!

@@ -7,6 +7,7 @@
 /// <reference path="browser/pendingLongpress.ts" />
 /// <reference path="keyboardView.interface.ts" />
 /// <reference path="touchEventEngine.ts" />
+/// <reference path="mouseEventEngine.ts" />
 
 namespace com.keyman.osk {
   export class VisualKeyboard implements KeyboardView {
@@ -174,9 +175,14 @@ namespace com.keyman.osk {
       this.layerGroup = new OSKLayerGroup(this, layoutKeyboard, formFactor);
       
       // For 'live' touch keyboards, attach touch-based event handling.
-      if(this.device.touchable && !this.isStatic) {
-        const touchEngine = new TouchEventEngine(this);
-        touchEngine.registerEventHandlers();
+      if(!this.isStatic) {
+        if(this.device.touchable) {
+          const touchEngine = new TouchEventEngine(this);
+          touchEngine.registerEventHandlers();
+        } else {
+          const mouseEngine = new MouseEventEngine(this);
+          mouseEngine.registerEventHandlers();
+        }
       }
 
       // Now that we've properly processed the keyboard's layout, mark it as calibrated.
@@ -533,7 +539,12 @@ namespace com.keyman.osk {
       // Get nearest key if touching a hidden key or the end of a key row
       if((key && ((key.className.indexOf('key-hidden') >= 0) || (key.className.indexOf('key-blank') >= 0)))
         || t.className.indexOf('kmw-key-row') >= 0) {
-        key = this.findNearestKey(input, t);
+
+        // Perform "fudged" selection ops if and only if we're not sure about the precision of the
+        // input source.  Mouse-based selection IS precise, so no need for "fudging" there.
+        if(!input.isFromMouse) {
+          key = this.findNearestKey(input, t);
+        }
       }
       // Do not do anything if no key identified!
       if(key == null) {
@@ -1080,67 +1091,6 @@ namespace com.keyman.osk {
         key.key.highlight(on);
       }
     }
-
-    //#region Mouse-event handling
-    /**
-     * Mouse down/mouse over event handler (desktop only)
-     *
-     * @param   {Event}  e  mouse over/mouse down event object
-     */
-    mouseOverMouseDownHandler = function(this: VisualKeyboard, e: MouseEvent) {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
-
-      var t = <HTMLElement> util.eventTarget(e);
-      if(t === null || this.device.formFactor != 'desktop') {
-        return;
-      }
-
-      if(t.nodeName == 'SPAN') {
-        t = <HTMLElement> t.parentNode;
-      }
-
-      let key = this.keyTarget(t);
-
-      if(util.eventType(e) == 'mousedown') {
-        this.currentKey=key.id;
-        util._CancelMouse(e);
-        this.highlightKey(key, true);
-      } else if(key.id == this.currentKey) {
-        this.highlightKey(key, true);
-      }
-    }.bind(this);
-
-    /**
-     * Mouse up/mouse out event handler (desktop only)
-     *
-     * @param   {Event}  e  mouse up/out event object
-     */
-    mouseUpMouseOutHandler = function(this: VisualKeyboard, e: MouseEvent) {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
-
-      var t=<HTMLElement> util.eventTarget(e);
-      if(t === null || this.device.formFactor != 'desktop') {
-        return;
-      }
-
-      if(t.nodeName == 'SPAN') {
-        t = <HTMLElement> t.parentNode;
-      }
-
-      let key = this.keyTarget(t);
-      this.highlightKey(key, false);
-
-      // Process as click if mouse button released anywhere over key
-      if(util.eventType(e) == 'mouseup') {
-        if(key.id == this.currentKey) {
-          this.modelKeyClick(key);
-        }
-        this.currentKey='';
-      }
-    }.bind(this);
-    //#endregion
 
     /**
      * Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
