@@ -11,12 +11,18 @@
 
     <include layout="@layout/titlebar" />
 
+    <include layout="@layout/update_chrome_layout"
+      android:visibility="gone"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/titlebar"/>
+
     <com.tavultesoft.kmea.KMTextView
         android:id="@+id/kmTextView"
         android:background="@drawable/textview_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/titlebar"
+        android:layout_below="@id/updateChromeLayout"
         android:ems="10"
         android:inputType="textMultiLine|textNoSuggestions"
         android:hint="@string/textview_hint"

@@ -41,7 +41,7 @@ import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.WebViewUtils;
-import com.tavultesoft.kmea.util.WebViewUtils.EngineModeType;
+import com.tavultesoft.kmea.util.WebViewUtils.EngineWebViewVersionStatus;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -87,6 +87,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -768,20 +770,23 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void checkChromeVersion() {
-    if (WebViewUtils.getEngineModeType(context,"") != EngineModeType.ENGINE_MODE_TYPE_FULL) {
-      // Notify minimum Chrome version needed
-      String message = "Minimum Chrome version 57 needed for Keyman.";
-      //KMLog.LogError(TAG, message);
-      Toast.makeText(getApplicationContext(), message,
-        Toast.LENGTH_LONG).show();
+    if (WebViewUtils.getEngineWebViewVersionStatus(context,"") != EngineWebViewVersionStatus.FULL) {
+      LinearLayout updateChromeLayout = (LinearLayout) findViewById(R.id.updateChromeLayout);
+      updateChromeLayout.setVisibility(View.VISIBLE);
 
-      // Launch PlayStore to update Chrome
-      try {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.android.chrome"));
-        startActivity(intent);
-      } catch (android.content.ActivityNotFoundException e) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/apps/details?id=com.android.chome")));
-      }
+      Button updateChromeButton = (Button)findViewById(R.id.updateChromeButton);
+      updateChromeButton.setOnClickListener(new View.OnClickListener() {
+        public void onClick(View v) {
+          // Launch PlayStore to update Chrome
+          try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.android.chrome"));
+            startActivity(intent);
+          } catch (android.content.ActivityNotFoundException e) {
+            // Link to Chrome if user is not signed in to Play Store
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome")));
+          }
+        }
+      });
     }
   }
 

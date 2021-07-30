@@ -4,44 +4,48 @@
 package com.tavultesoft.kmea.util;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import com.tavultesoft.kmea.util.KMLog;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class WebViewUtils {
   public static final String TAG = "WebViewUtils";
 
   // Keyman Engine functionality based on Chrome version
-  public enum EngineModeType {
-    ENGINE_MODE_TYPE_DISABLED, // WebView doesn't support touch keyboard features
-    ENGINE_MODE_TYPE_DEGRADED, // WebView supports touch keyboards but not LDML keyboards
-    ENGINE_MODE_TYPE_FULL;     // WebView supports touch keyboards and LDML keyboards
+  public enum EngineWebViewVersionStatus {
+    DISABLED, // WebView doesn't support touch keyboard features
+    DEGRADED, // WebView supports touch keyboards but not LDML keyboards
+    FULL;     // WebView supports touch keyboards and LDML keyboards
   }
+
+  private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d\\.]+)\\s.*$";
+  private static final Pattern installPattern = Pattern.compile(CHROME_INSTALL_PATTERN_FORMATSTR);
 
   /**
    * Get the Keyman Engine mode based on the Chrome version.
    * @param context       - The context
    * @param chromeVersion - String of the device's Chrome version.
    *                      If not provided, the device's Chrome version is queried
-   * @return EngineModeType
+   * @return EngineWebViewVersionStatus
    */
-  public static EngineModeType getEngineModeType(Context context, String chromeVersion) {
+  public static EngineWebViewVersionStatus getEngineWebViewVersionStatus(Context context, String chromeVersion) {
     if (context == null) {
-      return EngineModeType.ENGINE_MODE_TYPE_DISABLED;
+      return EngineWebViewVersionStatus.DISABLED;
     }
     if (chromeVersion == null || chromeVersion.isEmpty()) {
       chromeVersion = getChromeVersion(context);
     }
 
     if (FileUtils.compareVersions(chromeVersion, "57.0") == FileUtils.VERSION_GREATER) {
-      return EngineModeType.ENGINE_MODE_TYPE_FULL;
+      return EngineWebViewVersionStatus.FULL;
     } else if (FileUtils.compareVersions(chromeVersion, "37.0") == FileUtils.VERSION_GREATER) {
-      return EngineModeType.ENGINE_MODE_TYPE_DEGRADED;
+      return EngineWebViewVersionStatus.DEGRADED;
     }
 
-    return EngineModeType.ENGINE_MODE_TYPE_DISABLED;
+    return EngineWebViewVersionStatus.DISABLED;
   }
 
   // Inject a meta viewport tag into the head of the file if it doesn't exist
@@ -82,17 +86,19 @@ public final class WebViewUtils {
    */
   private static String getChromeVersion(Context context) {
     if (context == null) {
+      KMLog.LogInfo(TAG, "Chrome not installed");
       return "";
     }
-    try {
-      PackageInfo pInfo;
-      pInfo = context.getPackageManager().getPackageInfo("com.android.chrome", PackageManager.GET_ACTIVITIES);
-      if (pInfo != null) {
-        return pInfo.versionName;
-      }
-    } catch (PackageManager.NameNotFoundException e) {
-      KMLog.LogInfo(TAG, "Chrome not installed");
+
+    WebView mWebView = new WebView(context);
+    String userAgentString = mWebView.getSettings().getUserAgentString();
+
+    Matcher matcher = installPattern.matcher(userAgentString);
+    if (matcher.matches() && matcher.groupCount() >= 1 && matcher.group(1) != null) {
+      return matcher.group(1);
     }
+
+    KMLog.LogInfo(TAG, "Chrome not installed");
     return "";
   }
 }

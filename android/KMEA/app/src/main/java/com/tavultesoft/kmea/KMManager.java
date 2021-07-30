@@ -371,10 +371,10 @@ public final class KMManager {
   /**
    * Get the Keyman Engine mode based on the Chrome version
    * @param aContext
-   * @return WebViewUtils.EngineModeType
+   * @return WebViewUtils.EngineWebViewVersionStatus
    */
-  public static WebViewUtils.EngineModeType getEngineMode(Context aContext) {
-    return WebViewUtils.getEngineModeType(aContext, "");
+  public static WebViewUtils.EngineWebViewVersionStatus getEngineMode(Context aContext) {
+    return WebViewUtils.getEngineWebViewVersionStatus(aContext, "");
   }
 
   // Check if a keyboard namespace is reserved

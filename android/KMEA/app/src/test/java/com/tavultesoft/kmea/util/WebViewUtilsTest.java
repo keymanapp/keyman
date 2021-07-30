@@ -24,30 +24,30 @@ public class WebViewUtilsTest {
   }
 
   @Test
-  public void test_ChromeEmpty_EngineModeTypeDisabled() {
+  public void test_ChromeEmpty_EngineWebViewVersionStatusDisabled() {
     String chromeVersion = "";
-    Assert.assertEquals(WebViewUtils.getEngineModeType(context, chromeVersion),
-      WebViewUtils.EngineModeType.ENGINE_MODE_TYPE_DISABLED);
+    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, chromeVersion),
+      WebViewUtils.EngineWebViewVersionStatus.DISABLED);
   }
 
   @Test
-  public void test_Chrome36_EngineModeTypeDisabled() {
+  public void test_Chrome36_EngineWebViewVersionStatusDisabled() {
     String chromeVersion = "36.0";
-    Assert.assertEquals(WebViewUtils.getEngineModeType(context, chromeVersion),
-      WebViewUtils.EngineModeType.ENGINE_MODE_TYPE_DISABLED);
+    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, chromeVersion),
+      WebViewUtils.EngineWebViewVersionStatus.DISABLED);
   }
 
   @Test
-  public void test_Chrome57_EngineModeTypeDegraded() {
+  public void test_Chrome57_EngineWebViewVersionStatusDegraded() {
     String chromeVersion = "57.0";
-    Assert.assertEquals(WebViewUtils.getEngineModeType(context, chromeVersion),
-      WebViewUtils.EngineModeType.ENGINE_MODE_TYPE_DEGRADED);
+    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, chromeVersion),
+      WebViewUtils.EngineWebViewVersionStatus.DEGRADED);
   }
 
   @Test
-  public void test_Chrome58_EngineModeTypeFull() {
+  public void test_Chrome58_EngineWebViewVersionStatusFull() {
     String chromeVersion = "58.0";
-    Assert.assertEquals(WebViewUtils.getEngineModeType(context, chromeVersion),
-      WebViewUtils.EngineModeType.ENGINE_MODE_TYPE_FULL);
+    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, chromeVersion),
+      WebViewUtils.EngineWebViewVersionStatus.FULL);
   }
 }
