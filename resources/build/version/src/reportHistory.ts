@@ -126,7 +126,9 @@ export const reportHistory = async (
         logWarning(`commit ref ${commit} has no associated pull request.`);
         continue;
       }
-      pulls.push(pr);
+      if(pulls.find(p => p.number == pr.number) == undefined) {
+        pulls.push(pr);
+      }
     }
   }
 

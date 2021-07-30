@@ -89,10 +89,13 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<{count: n
     }
 
     let found = false;
-    for(const line of historyChunks.current) {
-      if(line.match(pullNumberRe)) {
-        found = true;
-        break;
+    // Look for the PR in any other chunk -- can be found with merges of master into PR or chained PRs
+    for(const chunk of ['newer','current','older']) {
+      for(const line of historyChunks[chunk]) {
+        if(line.match(pullNumberRe)) {
+          found = true;
+          break;
+        }
       }
     }
 
