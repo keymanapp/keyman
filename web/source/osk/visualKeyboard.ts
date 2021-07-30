@@ -602,7 +602,7 @@ namespace com.keyman.osk {
     layers: keyboards.LayoutLayer[];
     private layerId: string = "default";
     readonly isRTL: boolean;
-    layerIndex: number;
+    layerIndex: number = 0; // the index of the default layer
 
     device: Device;
     isStatic: boolean = false;
@@ -1022,6 +1022,12 @@ namespace com.keyman.osk {
     layerChangeHandler: text.SystemStoreMutationHandler = function(this: VisualKeyboard,
                                                                    source: text.MutableSystemStore,
                                                                    newValue: string) {
+      // This handler is also triggered on state-key state changes (K_CAPS) that 
+      // may not actually change the layer.
+      if(this) {
+        this._UpdateVKShiftStyle();
+      }
+
       if(source.value != newValue) {
         this.layerId = newValue;
         let keyman = com.keyman.singleton;
