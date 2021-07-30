@@ -586,14 +586,14 @@ namespace com.keyman.osk {
         const parsedWidth = ParsedLengthStyle.inPixels(width);
         const parsedHeight = ParsedLengthStyle.inPixels(height);
 
-        mutatedFlag = mutatedFlag || parsedWidth.styleString  != this._width.styleString;
-        mutatedFlag = mutatedFlag || parsedHeight.styleString != this._height.styleString;
+        mutatedFlag ||= parsedWidth.styleString  != this._width.styleString;
+        mutatedFlag ||= parsedHeight.styleString != this._height.styleString;
 
         this._width = parsedWidth;
         this._height = parsedHeight;
       }
 
-      this.needsLayout = this.needsLayout || mutatedFlag;
+      this.needsLayout ||= mutatedFlag;
 
       if(this.vkbd) {
         this.vkbd.setSize(width, height - this.getBannerHeight(), pending);

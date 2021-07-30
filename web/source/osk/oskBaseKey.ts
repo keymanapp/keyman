@@ -167,9 +167,9 @@ namespace com.keyman.osk {
 
     objectGeometry(vkbd: VisualKeyboard, v: number): string {
       if(vkbd.usesFixedWidthScaling) {
-        return (Math.round(v*100)/100)+'px';
+        return (Math.round(v*100)/100)+'px'; // round to 2 decimal places, making css more readable
       } else {
-        return v + '%'; // round to 2 decimal places, making css more readable
+        return v + '%';
       }
     }
 

@@ -90,11 +90,8 @@
     }
 
     function getOskHeight() {
-      var height = oskHeight;
-      if(keyman.osk.banner._activeType != 'blank') {
-        height = height; // Android's perspective - banner height is wholly separate.
-      }
-      return height;
+      // banner height is calculated completely separately, unlike iOS
+      return oskHeight;
     }
 
     function getOskWidth() {
