@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 15.0.90 alpha 2021-08-01
+
+* chore(windows): patches for Delphi 10.4 (#5496)
+* chore(common/core): additional debug tests 🐞 (#5482)
+* chore(android): Update globe key help and whatsnew (#5495)
+* chore(common/core): handle deletion of markers in actions 🐞 (#5489)
+* chore(linux): Remove Groovy and Impish builds (#5502)
+* chore(common): stable history update (#5515)
+* chore(android): log fontpath error (#5516)
+* chore(windows): fixup cef interfaces for CEF 90 (#5514)
+* chore(common/core): refactor backspace handling 🐞 (#5512)
+* chore(windows): split keyman64 header to keymanengine (#5522)
+* fix(ios/engine): engine migration always precedes installs (#5484)
+* chore(common): Add C++ formatting rules (#5523)
+* fix(developer): compiler use and match behavior for Web should be same as Core (#5525)
+
 ## 15.0.89 alpha 2021-07-27
 
 * feat(web): spacebar text controls (#5348)
