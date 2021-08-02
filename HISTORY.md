@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.91 alpha 2021-08-02
+
+* fix(web): stuck key highlighting from touchpoint movement (#5490)
+
 ## 15.0.90 alpha 2021-08-01
 
 * chore(windows): patches for Delphi 10.4 (#5496)
