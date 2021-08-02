@@ -41,6 +41,10 @@ if [ "$1" != "" ]; then
         extra_projects=""
         legacy_projects=""
         autotool_projects="$1"
+    elif [ -d "legacy/$1" ]; then
+        extra_projects=""
+        legacy_projects="$1"
+        autotool_projects=""
     else
         echo "project $1 does not exist"
         exit 1
@@ -58,7 +62,7 @@ for proj in ${autotool_projects}; do
 done
 
 for proj in ${legacy_projects}; do
-    cd $proj
+    cd legacy/$proj
     echo "Reconfiguring $proj to version ${VERSION}"
     autoreconf -if
     cd $BASEDIR

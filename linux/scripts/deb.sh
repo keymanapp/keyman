@@ -94,7 +94,7 @@ for proj in ${projects}; do
 	if [ "keyman" == "$proj" ]; then
 		cp -a ../../debian ${proj}-${vers}
 	else
-		cp -a ../${proj}/debian ${proj}-${vers}
+		cp -a ../legacy/${proj}/debian ${proj}-${vers}
 	fi
 	cd ${proj}-${vers}
 	dch -v ${vers}-1 "local build"

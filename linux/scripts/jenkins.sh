@@ -28,7 +28,7 @@ else
 	# check if project is known
 	if [[ $keyman_projects =~ (^|[[:space:]])$proj($|[[:space:]]) ]]; then
 		fullsourcename="$1"
-		sourcedir="$proj"
+		sourcedir="legacy/$proj"
 	else
 		stderr "$proj not in known projects ($keyman_projects)"
 		exit -1

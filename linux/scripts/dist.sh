@@ -22,7 +22,7 @@ extra_projects="keyman"
 if [ "$1" == "origdist" ]; then
     if [ "$2" != "" ]; then
         echo "$2"
-        if [ ! -d "$2" ] && [ "$2" != "keyman" ]; then
+        if [ ! -d "legacy/$2" ] && [ "$2" != "keyman" ]; then
             echo "project $2 does not exist"
             exit 1
         fi
@@ -37,7 +37,7 @@ if [ "$1" == "origdist" ]; then
 else
     if [ "$1" != "" ]; then
         echo "$1"
-        if [ ! -d "$1" ] && [ "$1" != "keyman" ]; then
+        if [ ! -d "legacy/$1" ] && [ "$1" != "keyman" ]; then
             echo "project $1 does not exist"
             exit 1
         fi
@@ -58,11 +58,11 @@ mkdir -p dist
 # configure and make dist for autotool projects
 for proj in ${legacy_projects}; do
     echo "configure $proj"
-    cd $proj
-    rm -rf ../build-$proj
-    mkdir -p ../build-$proj
-    cd ../build-$proj
-    GTK_CFLAGS="-I/usr/include/gtk-3.0" GTK_LIBS="-lgtk-3 -lgdk-3" JSON_GLIB_CFLAGS="-I/usr/include/json-glib-1.0" JSON_GLIB_LIBS="-ljson-glib-1.0" KEYMAN_PROC_CFLAGS="-I/usr/include/keyman" KEYMAN_PROC_LIBS="-lkmnkbp" ../$proj/configure
+    cd legacy/$proj
+    rm -rf ../../build-$proj
+    mkdir -p ../../build-$proj
+    cd ../../build-$proj
+    GTK_CFLAGS="-I/usr/include/gtk-3.0" GTK_LIBS="-lgtk-3 -lgdk-3" JSON_GLIB_CFLAGS="-I/usr/include/json-glib-1.0" JSON_GLIB_LIBS="-ljson-glib-1.0" KEYMAN_PROC_CFLAGS="-I/usr/include/keyman" KEYMAN_PROC_LIBS="-lkmnkbp" ../legacy/$proj/configure
     make dist
     mv *.tar.gz ../dist
     cd $BASEDIR
@@ -81,9 +81,9 @@ for proj in ${extra_projects}; do
         --tar-ignore=common/models --tar-ignore=common/predictive-text \
         --tar-ignore=common/test --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
         --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
-        --tar-ignore=linux/help --tar-ignore=linux/ibus-kmfl --tar-ignore=linux/Jenkinsfile \
-        --tar-ignore=linux/keyboardprocessor --tar-ignore=linux/kmflcomp \
-        --tar-ignore=linux/libkmfl --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
+        --tar-ignore=linux/help --tar-ignore=linux/Jenkinsfile \
+        --tar-ignore=linux/keyboardprocessor --tar-ignore=linux/legacy \
+        --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
         --tar-ignore=linux/build* --tar-ignore=common/core/desktop/build \
         --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
         --tar-ignore=resources/scopes --tar-ignore=resources/web-environment \
