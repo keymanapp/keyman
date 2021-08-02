@@ -133,6 +133,7 @@ do
     echo "$line" >> $PLAY_RELEASE_NOTES
   else
     # 450 chars reached
+    warn "Warning: Play Store release notes approaching 500 character limit"
     echo '* Additional bug fixes and improvements' >> $PLAY_RELEASE_NOTES
     break
   fi  
