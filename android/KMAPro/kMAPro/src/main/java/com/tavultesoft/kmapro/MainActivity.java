@@ -87,6 +87,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -201,7 +202,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
-    checkChromeVersion();
+    // Use in-app keyboard WebView to check the Chrome version
+    checkChromeVersion(KMManager.getKMKeyboard(KeyboardType.KEYBOARD_TYPE_INAPP));
     CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
     checkGetStarted();
   }
@@ -769,8 +771,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMManager.setMaySendCrashReport(maySendCrashReport);
   }
 
-  private void checkChromeVersion() {
-    if (WebViewUtils.getEngineWebViewVersionStatus(context,"") != EngineWebViewVersionStatus.FULL) {
+  private void checkChromeVersion(WebView webView) {
+    if (WebViewUtils.getEngineWebViewVersionStatus(context, webView, "") != EngineWebViewVersionStatus.FULL) {
       LinearLayout updateChromeLayout = (LinearLayout) findViewById(R.id.updateChromeLayout);
       updateChromeLayout.setVisibility(View.VISIBLE);
 

@@ -26,28 +26,28 @@ public class WebViewUtilsTest {
   @Test
   public void test_ChromeEmpty_EngineWebViewVersionStatusDisabled() {
     String chromeVersion = "";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, chromeVersion),
+    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
       WebViewUtils.EngineWebViewVersionStatus.DISABLED);
   }
 
   @Test
   public void test_Chrome36_EngineWebViewVersionStatusDisabled() {
     String chromeVersion = "36.0";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, chromeVersion),
+    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
       WebViewUtils.EngineWebViewVersionStatus.DISABLED);
   }
 
   @Test
   public void test_Chrome57_EngineWebViewVersionStatusDegraded() {
     String chromeVersion = "57.0";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, chromeVersion),
+    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
       WebViewUtils.EngineWebViewVersionStatus.DEGRADED);
   }
 
   @Test
   public void test_Chrome58_EngineWebViewVersionStatusFull() {
     String chromeVersion = "58.0";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, chromeVersion),
+    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
       WebViewUtils.EngineWebViewVersionStatus.FULL);
   }
 }

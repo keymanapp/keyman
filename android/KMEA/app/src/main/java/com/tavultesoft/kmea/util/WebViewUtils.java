@@ -27,16 +27,18 @@ public final class WebViewUtils {
   /**
    * Get the Keyman Engine mode based on the Chrome version.
    * @param context       - The context
+   * @param webView       - If provided, the Chrome version of webView is used
    * @param chromeVersion - String of the device's Chrome version.
    *                      If not provided, the device's Chrome version is queried
    * @return EngineWebViewVersionStatus
    */
-  public static EngineWebViewVersionStatus getEngineWebViewVersionStatus(Context context, String chromeVersion) {
+  public static EngineWebViewVersionStatus getEngineWebViewVersionStatus(
+      Context context, WebView webView, String chromeVersion) {
     if (context == null) {
       return EngineWebViewVersionStatus.DISABLED;
     }
     if (chromeVersion == null || chromeVersion.isEmpty()) {
-      chromeVersion = getChromeVersion(context);
+      chromeVersion = getChromeVersion(context, webView);
     }
 
     if (FileUtils.compareVersions(chromeVersion, "57.0") == FileUtils.VERSION_GREATER) {
@@ -82,15 +84,16 @@ public final class WebViewUtils {
   /**
    * Get the Chrome version. Returns "0.0" if context is null or Chrome not installed.
    * @param context - The context
+   * @param webView - If provided, the user agent string for the webview is parsed
    * @return String - Version string of Chrome
    */
-  private static String getChromeVersion(Context context) {
+  private static String getChromeVersion(Context context, WebView webView) {
     if (context == null) {
       KMLog.LogInfo(TAG, "Chrome not installed");
       return "0.0";
     }
 
-    WebView mWebView = new WebView(context);
+    WebView mWebView = (webView != null) ? webView : new WebView(context);
     String userAgentString = mWebView.getSettings().getUserAgentString();
 
     Matcher matcher = installPattern.matcher(userAgentString);
