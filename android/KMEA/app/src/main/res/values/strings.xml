@@ -39,6 +39,9 @@
     <string name="label_close_keyman" comment="Close the Keyman application">Close Keyman</string>
 
     <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Next Input Method</string>
+
+    <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item">Download</string>
 
     <!-- Context: Button label -->

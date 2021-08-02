@@ -374,6 +374,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\global\inc\keymanengine.h" />
     <ClInclude Include="addins.h" />
     <ClInclude Include="appint\aiTIP.h" />
     <ClInclude Include="appint\aiWin2000Unicode.h" />

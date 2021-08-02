@@ -31,6 +31,7 @@
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
       kmw['showKeyboardList'] = showMenu;
+      kmw['menuKeyUp'] = menuKeyUp;
       kmw['hideKeyboard'] = hideKeyboard;
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
@@ -90,11 +91,8 @@
     }
 
     function getOskHeight() {
-      var height = oskHeight;
-      if(keyman.osk.banner._activeType != 'blank') {
-        height = height; // Android's perspective - banner height is wholly separate.
-      }
-      return height;
+      // banner height is calculated completely separately, unlike iOS
+      return oskHeight;
     }
 
     function getOskWidth() {
@@ -271,9 +269,18 @@
       }
     }
 
+    // legacy function name for globe key down
     function showMenu() {
       fragmentToggle = (fragmentToggle + 1) % 100;
-      window.location.hash = 'globeKeyAction' + fragmentToggle;
+      var hash = 'globeKeyAction&fragmentToggle=' + fragmentToggle + '&keydown=true';
+      window.location.hash = hash;
+    }
+
+    // legacy function name for globe key up
+    function menuKeyUp() {
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      var hash = 'globeKeyAction&fragmentToggle=' + fragmentToggle + '&keydown=false';
+      window.location.hash = hash;
     }
 
     function hideKeyboard() {
