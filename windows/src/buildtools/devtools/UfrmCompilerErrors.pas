@@ -106,22 +106,10 @@ uses
   RegExpr,
   Registry,
   RegistryKeys,
-  shellapi;
+  shellapi,
+  SourceRootPath;
 
-{$IFDEF VER310}
-const BDSPath = 'C:\Program Files (x86)\Embarcadero\Studio\18.0\bin\bds.EXE';
-{$ELSE}
-{$IFDEF VER320}
-const BDSPath = 'C:\Program Files (x86)\Embarcadero\Studio\19.0\bin\bds.EXE';
-{$ELSE}
-{$IFDEF VER330}
-const BDSPath = 'C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\bds.EXE';
-{$ELSE}
-ERROR: BDSPath is not defined
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-
+const BDSPath = DelphiBasePath + 'bin\bds.exe';
 
 {$R *.DFM}
 
