@@ -373,7 +373,7 @@ public final class KMManager {
    * @param aContext
    * @return WebViewUtils.EngineWebViewVersionStatus
    */
-  public static WebViewUtils.EngineWebViewVersionStatus getEngineMode(Context aContext) {
+  public static WebViewUtils.EngineWebViewVersionStatus getEngineWebViewVersionStatus(Context aContext) {
     return WebViewUtils.getEngineWebViewVersionStatus(aContext, "");
   }
 

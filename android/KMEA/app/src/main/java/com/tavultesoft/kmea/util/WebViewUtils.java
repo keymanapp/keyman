@@ -21,7 +21,7 @@ public final class WebViewUtils {
     FULL;     // WebView supports touch keyboards and LDML keyboards
   }
 
-  private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d\\.]+)\\s.*$";
+  private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d\\.]+).*$";
   private static final Pattern installPattern = Pattern.compile(CHROME_INSTALL_PATTERN_FORMATSTR);
 
   /**
@@ -80,14 +80,14 @@ public final class WebViewUtils {
   }
 
   /**
-   * Get the Chrome version. Returns empty string if Chrome not installed.
+   * Get the Chrome version. Returns "0.0" if context is null or Chrome not installed.
    * @param context - The context
-   * @return String
+   * @return String - Version string of Chrome
    */
   private static String getChromeVersion(Context context) {
     if (context == null) {
       KMLog.LogInfo(TAG, "Chrome not installed");
-      return "";
+      return "0.0";
     }
 
     WebView mWebView = new WebView(context);
@@ -99,6 +99,6 @@ public final class WebViewUtils {
     }
 
     KMLog.LogInfo(TAG, "Chrome not installed");
-    return "";
+    return "0.0";
   }
 }
