@@ -117,4 +117,12 @@ if [ $TIER = "stable" ]; then
   PLAY_RELEASE_NOTES="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/play/release-notes/en-US/default.txt"
 fi
 echo "Generating Play Store release notes to $PLAY_RELEASE_NOTES"
-cp $KEYMAN_ROOT/android/help/about/whatsnew.md $PLAY_RELEASE_NOTES
+
+# Filtering for lines starting with '*'
+grep '^\s*\*.*$' "$KEYMAN_ROOT/android/help/about/whatsnew.md" > $PLAY_RELEASE_NOTES
+
+# Check release notes are under Play Store limit of 500 characters
+if test "$( wc -m < $PLAY_RELEASE_NOTES )" -gt 500; then
+  warn "Warning: Play Store release notes over 500 characters"
+  echo '* Bug fixes and improvements' > $PLAY_RELEASE_NOTES
+fi
