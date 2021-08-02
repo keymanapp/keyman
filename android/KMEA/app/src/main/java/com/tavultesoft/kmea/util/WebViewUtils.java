@@ -21,7 +21,7 @@ public final class WebViewUtils {
     FULL;     // WebView supports touch keyboards and LDML keyboards
   }
 
-  private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d\\.]+).*$";
+  private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d.]+).*$";
   private static final Pattern installPattern = Pattern.compile(CHROME_INSTALL_PATTERN_FORMATSTR);
 
   /**
