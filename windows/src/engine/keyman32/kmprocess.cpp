@@ -147,7 +147,8 @@ BOOL ProcessHook()
     ContextItemsFromAppContext(contextBuf, &citems);
     km_kbp_context_set(km_kbp_state_context(_td->lpActiveKeyboard->lpActiveKBState), citems);
     km_kbp_context_items_dispose(citems);
-    if (KM_KBP_STATUS_OK != km_kbp_process_event(_td->lpActiveKeyboard->lpActiveKBState, _td->state.vkey, static_cast<uint16_t>(Globals::get_ShiftState()))) return FALSE;
+    //_td->state.vkey == VK_DOWN
+    if (KM_KBP_STATUS_OK != km_kbp_process_event(_td->lpActiveKeyboard->lpActiveKBState, _td->state.vkey, static_cast<uint16_t>(Globals::get_ShiftState()), 1)) return FALSE;
     ProcessActions(&fOutputKeystroke);
   }
   else {

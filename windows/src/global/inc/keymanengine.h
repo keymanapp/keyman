@@ -77,6 +77,9 @@ typedef struct tagINTKEYBOARDINFO
   LPINTKEYBOARDOPTIONS KeyboardOptions;
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
+  km_kbp_keyboard* coreKeyboard;
+  km_kbp_option_item* coreKeyboardOptions;
+  km_kbp_state* lpActiveKBState;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
 
 typedef struct tagINI
@@ -89,14 +92,17 @@ typedef struct tagINI
 typedef struct tagKMSTATE
 {
   BOOL NoMatches;
+  MSG msg;
+  // TODO: 5442 will remove these once windows core is deprecated
   BOOL StopOutput;
   int LoopTimes;
-  MSG msg;
-  WORD vkey; // I934
-  WCHAR charCode;   // I4582
-  BOOL windowunicode;   // I4287
+  // TODO: 5442
+  WORD vkey;           // I934
+  WCHAR charCode;      // I4582
+  BOOL windowunicode;  // I4287
   LPKEYBOARD lpkb;
-  LPGROUP startgroup;
+  km_kbp_keyboard* lpCoreKb;  //  future use with IMDLL
+  LPGROUP startgroup;         // TODO: 5442 will remove this once windows core is deprecated
 } KMSTATE;
 
 // I3616
@@ -232,6 +238,7 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "addins.h"
 #include "keymancontrol.h"
 #include "keyboardoptions.h"
+#include "kmprocessactions.h"
 
 #include "syskbd.h"
 #include "vkscancodes.h"
