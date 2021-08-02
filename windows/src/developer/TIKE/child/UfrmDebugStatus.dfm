@@ -14,7 +14,7 @@ inherited frmDebugStatus: TfrmDebugStatus
     Top = 0
     Width = 418
     Height = 281
-    ActivePage = tabDebugRegressionTesting
+    ActivePage = tabDebugKey
     Align = alClient
     TabOrder = 0
     object tabDebugKey: TTabSheet
@@ -23,30 +23,24 @@ inherited frmDebugStatus: TfrmDebugStatus
     end
     object tabDebugStores: TTabSheet
       Caption = 'Elements'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 418
-      ExplicitHeight = 258
     end
     object tabDebugCallStack: TTabSheet
       Caption = 'Call stack'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 418
-      ExplicitHeight = 258
     end
     object tabDebugDeadkeys: TTabSheet
       Caption = 'Deadkeys'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 418
-      ExplicitHeight = 258
     end
     object tabDebugRegressionTesting: TTabSheet
       Caption = 'Regression testing'
       ImageIndex = 3
+    end
+    object tabDebugEvents: TTabSheet
+      Caption = 'Events'
+      ImageIndex = 5
+      ExplicitLeft = 8
+      ExplicitTop = 28
     end
   end
 end

@@ -309,7 +309,7 @@ begin
       data := data + WChar(Message.lParam);
     end;
   end
-  else if Message.Msg = WM_KEYMANDEBUG_RULEMATCH then
+(*  else if Message.Msg = WM_KEYMANDEBUG_RULEMATCH then
   begin
 //    AddDebug('WM_KEYMANDEBUG_RULEMATCH');
     if (Message.wParam = QID_BEGIN_UNICODE) or (Message.wParam = QID_BEGIN_ANSI) then
@@ -319,7 +319,7 @@ begin
 //      lb.items.Add('QID_END');
       PostMessage(Handle, WM_User_ProcessKeyOutput, 0, 0);
     end;
-  end
+  end*)
   else
     inherited;
 end;

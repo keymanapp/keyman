@@ -39,7 +39,7 @@ uses
   UframeTextEditor;
 
 type
-  TfrmDebugStatus_Child = class(TTIKEForm)
+  TfrmDebugStatus_Child = class(TTikeForm)
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private

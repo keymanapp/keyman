@@ -1,18 +1,18 @@
 (*
   Name:             debugging
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    14 Sep 2006
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Fix packing for TKeymanKey and TKeymanGroup
                     14 Sep 2006 - mcdurdin - Add SaveShiftState function
 *)
@@ -20,7 +20,14 @@ unit debugging;
 
 interface
 
-uses Windows, Messages, Classes, kmxfile, debugkeyboard;
+uses
+  System.Classes,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  debugkeyboard,
+  Keyman.System.KeymanCoreDebug,
+  kmxfile;
 
 type
   { KMX file structures }
@@ -76,18 +83,6 @@ const
   MAXSTOREOFFSETS=20;
 
 type
-  TAIDebugInfo = record
-    cbSize: Integer;
-    ItemType: Integer;
-    Context, Output: PWideChar;
-    Rule: PKeymanKey;
-    Group: PKeymanGroup;
-    Flags: DWord;
-    StoreOffsets: array[0..MAXSTOREOFFSETS*2] of Word;
-  end;
-
-  PAIDebugInfo = ^TAIDebugInfo;
-
   TAIDebugKeyInfo = record
     VirtualKey: UINT;
 	  ShiftFlags: DWORD;
@@ -110,10 +105,11 @@ type
     Rule: TKeymanKeyEx;
     Group: TKeymanGroupEx;
     Key: TAIDebugKeyInfo;
-    Context, Output: WideString;
+    Context: WideString;
+    //, Output: WideString;
     StoreOffsets: array[0..20] of Word; //TKeymanStoreEx;
     nStores: Integer;
-    procedure FillStoreList(di: PAIDebugInfo; KeyboardMemory: PChar);
+    procedure FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
   end;
 
   TDebugEventCursor = record
@@ -149,23 +145,11 @@ type
     function Add(Item: TDebugEvent): Integer;
   end;
 
-const
-  QID_FLAG_RECURSIVE_OVERFLOW = $0001;
-  QID_FLAG_NOMATCH = $0002;
+//const
+//  QID_FLAG_RECURSIVE_OVERFLOW = $0001;
+//  QID_FLAG_NOMATCH = $0002;
 
 const
-  QID_BEGIN_UNICODE = 0;
-  QID_BEGIN_ANSI    = 1;
-  QID_GROUP_ENTER   = 2;
-  QID_GROUP_EXIT    = 3;
-  QID_RULE_ENTER    = 4;
-  QID_RULE_EXIT     = 5;
-  QID_MATCH_ENTER   = 6;
-  QID_MATCH_EXIT    = 7;
-  QID_NOMATCH_ENTER = 8;
-  QID_NOMATCH_EXIT  = 9;
-  QID_END           = 10;
-
   QIT_VKEYDOWN   = 0;
   QIT_VKEYUP     = 1;
   QIT_VSHIFTDOWN = 2;
@@ -207,7 +191,8 @@ function SaveShiftState: Integer;
 
 implementation
 
-uses SysUtils;
+uses
+  System.SysUtils;
 
 { TDebugEventList }
 
@@ -360,7 +345,7 @@ end;
 
 { TDebugEventRuleData }
 
-procedure TDebugEventRuleData.FillStoreList(di: PAIDebugInfo; KeyboardMemory: PChar);
+procedure TDebugEventRuleData.FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
   function StoreOffset(kfh: PKeyboardFileHeader; i: Word): PChar;
   begin
     Result := KeyboardMemory;
@@ -377,9 +362,9 @@ procedure TDebugEventRuleData.FillStoreList(di: PAIDebugInfo; KeyboardMemory: PC
 begin
   nStores := 0;
 //  kfh := PKeyboardFileHeader(KeyboardMemory);
-  while di.StoreOffsets[nStores*2] <> $FFFF do
+  while event.kmx_info.store_offsets[nStores*2] <> $FFFF do
   begin
-    StoreOffsets[nStores] := di.StoreOffsets[nStores*2+1];
+    StoreOffsets[nStores] := event.kmx_info.store_offsets[nStores*2+1];
 //    Stores[nStores].Store := PKeyboardFileStore(StoreOffset(kfh, di.StoreOffsets[nStores*2]))^;
 //    Stores[nStores].MatchPosition := di.StoreOffsets[nStores*2+1];
     Inc(nStores);

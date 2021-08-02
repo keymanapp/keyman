@@ -147,7 +147,7 @@ type
     FExecutionPointLine: Integer;
     debugkeyboard: TDebugKeyboard;
     FCurrentEvent: Integer;
-    FIgnoreKeyUp, FDefaultFont: Boolean;
+    FDefaultFont: Boolean;
     FEvents: TDebugEventList;
     FUIStatus: TDebugUIStatus;
     FUIDisabled: Boolean;
@@ -169,14 +169,13 @@ type
     { Keyman32 integration functions }
     function frmDebugStatus: TForm;
 
-    function DiscoverRuleLine(ItemType: Integer; di: PAIDebugInfo): Integer;
+    function DiscoverRuleLine(debug: pkm_kbp_state_debug_item): Integer;
     procedure ResetEvents;
     procedure ExecuteEvent(n: Integer);
     procedure WMUserDebugEnd(var Message: TMessage); message WM_USER_DebugEnd;
     procedure ExecuteEventAction(n: Integer);
     procedure ExecuteEventRule(n: Integer);
     procedure SetExecutionPointLine(ALine: Integer);
-    procedure AddRuleMatch(ItemType: Integer; di: PAIDebugInfo);
     procedure SetUIStatus(const Value: TDebugUIStatus);
     procedure DisableUI;
     procedure EnableUI;
@@ -186,8 +185,6 @@ type
     procedure UpdateDebugStatusForm;   // I4809
 
 //    procedure KeymanGetContext(var Message: TMessage);
-
-    procedure AddDebug(s: WideString);
 
     { Debug panel functions }
     procedure AddDeadkey(dkCode: Integer);
@@ -395,8 +392,6 @@ begin
   ResetDebug;
   FreeAndNil(FBreakpoints);
   FreeAndNil(FEvents);
-  //UninitControlCaptions;
-  //UninitSystemKeyboard;
   UninitDeadkeys;
 end;
 
@@ -414,71 +409,6 @@ end;
 {-------------------------------------------------------------------------------
  - Memo management                                                             -
  ------------------------------------------------------------------------------}
-
-(*procedure TfrmDebug.KeymanGetContext(var Message: TMessage);
-var
-  selstart, selend: Integer;
-  i: Integer;
-  s: string;
-  ws: WideString;
-begin
-  selstart := memo.SelStart;
-  selend := selstart + memo.SelLength;
-  if selend < selstart then
-  begin
-    //n := selend;
-    selstart := selend;
-    //selend := n;
-  end;
-  if selstart = 0 then
-    Message.Result := 0
-  else
-  begin
-    if selstart < Integer(Message.wParam) then
-    begin
-      ws := Copy(memo.Text, 1, selstart);
-      FillDeadkeys(0, ws);
-    end
-    else
-    begin
-      ws := Copy(memo.Text, selstart - Integer(Message.wParam) + 2, selstart - 1);
-      FillDeadKeys(selstart - Integer(Message.wParam) + 1, ws);  // 26-09-2002: Fixed bug reported by Karljurgen
-    end;
-
-    if FANSITest then
-    begin
-      // zero extend ANSI string -- not convert to Unicode
-      s := ws;  // ws := '';  // Fix bug reported by D.Thormoset, 12/8/02... BAD MARC -- should have waited until post release
-      for i := 1 to Length(s) do
-          // START Fix bug reported by D.Thormoset, 12/8/02... BAD MARC -- should have waited until post release
-        if ws[i] <> WideChar(UC_SENTINEL) then
-          // END Fix bug reported by D.Thormoset, 12/8/02... BAD MARC -- should have waited until post release
-          ws[i] := WideChar(Ord(s[i]));
-    end;
-
-    //if not FIgnoreKeyUp then AddDebug('ws(NOT KeyUp pre): '+ws)
-    //else AddDebug('ws(KeyUp pre): '+ws);
-
-    // Need to update the buffer with the contents of the current debug messages
-    //if  = 0 then
-      for i := FCurrentEvent to FEvents.Count - 1 do    { was i := 0 to FEvents.Count - 1 }
-        if FEvents[i].EventType = etAction then
-          case FEvents[i].Action.ActionType of
-            QIT_CHAR:       ws := ws + FEvents[i].Action.Text;
-            QIT_DEADKEY:    ws := ws + WChr(UC_SENTINEL) + WChr(CODE_DEADKEY) + WChr(FEvents[i].Action.dwData);
-            QIT_BACK:       Delete(ws, Length(ws) - Length(FEvents[i].Action.Text) + 1, 1000);
-          end;
-
-    while Length(ws) > Integer(Message.wParam) - 1 do
-      // After FillDeadKeys, can be too many chrs in buffer.  So delete until we have less than MAXCONTEXT
-      if ws[1] = WChr(UC_SENTINEL) then Delete(ws, 1, 3) else Delete(ws, 1, 1);
-
-    lstrcpyW(PWideChar(Message.lParam), PWideChar(ws));
-    if not FIgnoreKeyUp then AddDebug('KeymanGetContext (KeyDown): Context="'+ws+'"')
-    else AddDebug('KeymanGetContext (KeyUp): Context="'+ws+'"');
-    Message.Result := 1;
-  end;
-end;*)
 
 procedure TfrmDebug.memoGotFocus(Sender: TObject);
 begin
@@ -531,12 +461,14 @@ begin
 
   Result := True;
 end;
+
 procedure TfrmDebug.memoMessage(Sender: TObject; var Message: TMessage;
   var Handled: Boolean);
 begin
+  Handled := False;
+
   if UIStatus = duiClosing then
   begin
-    Handled := False;
     Exit;  // Don't process while destroying...
   end;
 
@@ -547,11 +479,6 @@ begin
       Handled := FUIDisabled;
     WM_CHAR:
       Handled := True;
-  else
-    // TODO: any other gaps here?
-    Handled := False;
-    // Stop adding rules to be executed if paused
-//    Handled := (UIStatus in [duiFocusedForInput, duiReceivingEvents, duiReadyForInput]);
   end;
 end;
 
@@ -617,6 +544,8 @@ begin
   if not SetKeyEventContext then
     Exit(False);
 
+  FEvents.Clear;
+
   if km_kbp_process_event(state, Message.WParam, modifier, 1) = KM_KBP_STATUS_OK then
   begin
     // Process keystroke
@@ -627,22 +556,24 @@ begin
     action_index := 0;
     while debug._type <> KM_KBP_DEBUG_END do
     begin
-      ProcessDebugItem(debug);
       if debug.kmx_info.first_action > action_index then
       begin
         while (action._type <> KM_KBP_IT_END) and (action_index < debug.kmx_info.first_action) do
         begin
-          // TODO: we'll need to do this alongside step-wise debugging later
           Result := Result and ProcessActionItem(Message.WParam, action);
           Inc(action);
           Inc(action_index);
         end;
       end;
+      ProcessDebugItem(debug);
       Inc(debug);
     end;
 
+    ProcessDebugItem(debug);
+
     if action._type = KM_KBP_IT_INVALIDATE_CONTEXT then
     begin
+      // We may receive a context invalidation but we can ignore it
       Inc(action);
     end;
 
@@ -650,31 +581,86 @@ begin
     // already been undertaken
     Assert(action._type = KM_KBP_IT_END);
 
-    // Now, we'll run the actions, as we don't yet have the mapping for single
-    // step data (TODO)
-    UIStatus := duiReceivingEvents;
-    Run; // TODO: remove this from here
-    UIStatus := duiFocusedForInput;
+    if FSingleStepMode then
+    begin
+      UIStatus := duiDebugging;
+      FCurrentEvent := 1;
+      (frmDebugStatus as TfrmDebugStatus).Events.SetEvents(FEvents);
+      ExecuteEvent(0);
+    end
+    else
+    begin
+      FRunning := True;
+      UIStatus := duiDebugging;
+      FCurrentEvent := 0;
+      Run;
+    end;
   end
   else
     Result := False;
 end;
 
 procedure TfrmDebug.ProcessDebugItem(debug: pkm_kbp_state_debug_item);
+var
+  ev: TDebugEvent;
+  rule: PKeymanKey;
+  group: PKeymanGroup;
 begin
-  {case debug._type of
-    KM_KBP_DEBUG_BEGIN: km_kbp_debug_type = 0;
-    //KM_KBP_DEBUG_BEGIN_ANSI: km_kbp_debug_type = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
-    KM_KBP_DEBUG_GROUP_ENTER: km_kbp_debug_type = 2;
-    KM_KBP_DEBUG_GROUP_EXIT: km_kbp_debug_type = 3;
-    KM_KBP_DEBUG_RULE_ENTER: km_kbp_debug_type = 4;
-    KM_KBP_DEBUG_RULE_EXIT: km_kbp_debug_type = 5;
-    KM_KBP_DEBUG_MATCH_ENTER: km_kbp_debug_type = 6;
-    KM_KBP_DEBUG_MATCH_EXIT: km_kbp_debug_type = 7;
-    KM_KBP_DEBUG_NOMATCH_ENTER: km_kbp_debug_type = 8;
-    KM_KBP_DEBUG_NOMATCH_EXIT: km_kbp_debug_type = 9;
-    KM_KBP_DEBUG_END: km_kbp_debug_type = 10;
-  end;}
+  if not Assigned(debugkeyboard) then Exit;
+
+  ev := TDebugEvent.Create;
+  ev.EventType := etRuleMatch;
+  ev.Rule.ItemType := debug._type;
+  ev.Rule.Flags := debug.flags; // TODO: are these flags right?
+
+  if Assigned(debug.kmx_info.rule) then
+  begin
+    rule := PKeymanKey(debug.kmx_info.rule);
+    ev.Rule.Line := rule.Line;
+    ev.Rule.Rule.Key := rule.Key;
+    ev.Rule.Rule.Line := rule.Line;
+    ev.Rule.Rule.ShiftFlags := rule.ShiftFlags;
+    ev.Rule.Rule.dpOutput := rule.dpOutput;
+    ev.Rule.Rule.dpContext := rule.dpContext;
+    ev.Rule.FillStoreList(debug, debugkeyboard.Memory.Memory);
+  end
+  else
+    ev.Rule.Line := DiscoverRuleLine(debug);
+
+  ev.Rule.Context := debug.kmx_info.Context;
+  if Assigned(debug.kmx_info.group) then
+  begin
+    group := PKeymanGroup(debug.kmx_info.group);
+    ev.Rule.Group.dpName := group.dpName;
+    ev.Rule.Group.dpMatch := group.dpMatch;
+    ev.Rule.Group.dpNoMatch := group.dpNoMatch;
+    ev.Rule.Group.fUsingKeys := group.fUsingKeys;
+  end;
+
+  FEvents.Add(ev);
+
+  { Update user interface }
+
+  (*
+  if ev.Rule.ItemType = KM_KBP_DEBUG_BEGIN then
+  begin
+    UIStatus := duiReceivingEvents;
+    ev.Rule.Key := PAIDebugKeyInfo(di.Flags)^;
+    if (ev.Rule.key.VirtualKey = VK_ESCAPE) and ((ev.Rule.key.ShiftFlags and K_SHIFTFLAG) <> 0) then Exit; // Shift+Esc
+    (frmDebugStatus as TfrmDebugStatus).Key.ShowKey(@ev.Rule.Key);
+    (frmDebugStatus as TfrmDebugStatus).RegTest.RegTestLogKey(@ev.Rule.Key);
+
+    if not ev.Rule.Key.IsUp then
+      AddDebug('KEYDOWN: Char: '+ ev.Rule.Key.Character+
+        ' VK: '+IntToHex(ev.Rule.Key.VirtualKey,4)+
+        ' Shift: '+IntToHex(ev.Rule.Key.ShiftFlags, 4)+
+        ' DeadChar: '+ev.Rule.Key.DeadKeyCharacter);
+  end;
+
+  if ev.Rule.ItemType = QID_END then
+    { Now we disable Keyman keyboard as we are at the end of the key processing sequence }
+    PostMessage(Handle, WM_USER_DebugEnd, 0, 0);
+  *)
 end;
 
 function TfrmDebug.ProcessActionItem(key: Word; action: pkm_kbp_action_item): Boolean;
@@ -779,8 +765,11 @@ begin
       ExecuteEvent(FCurrentEvent);
       Inc(FCurrentEvent);
     end;
-    ExecuteEvent(FCurrentEvent);
-    Inc(FCurrentEvent);
+    if FCurrentEvent < FEVents.Count then
+    begin
+      ExecuteEvent(FCurrentEvent);
+      Inc(FCurrentEvent);
+    end;
   end;
 
   if FCurrentEvent = FEvents.Count then
@@ -853,7 +842,7 @@ var
 begin
   with FEvents[n].Rule do
   begin
-    if (Flags and QID_FLAG_NOMATCH) = QID_FLAG_NOMATCH then s := ' NoMatch in Group' else s := '';
+    if (Flags and KM_KBP_DEBUG_FLAG_NOMATCH) = KM_KBP_DEBUG_FLAG_NOMATCH then s := ' NoMatch in Group' else s := '';
     s := Format('RULEMATCH %s%s', [qid[ItemType],  s]);
     if Line > 0 then
     begin
@@ -865,8 +854,13 @@ begin
       if IsBreakPointLine(Line-1) then
       begin
         { Stop running, if breakpoint options are also met }
-        if not (ItemType in [QID_GROUP_EXIT, QID_RULE_EXIT, QID_MATCH_EXIT, QID_NOMATCH_EXIT, QID_END]) or
-            FKeymanDeveloperOptions.DebuggerBreakWhenExitingLine then
+        if not (ItemType in [
+          KM_KBP_DEBUG_GROUP_EXIT,
+          KM_KBP_DEBUG_RULE_EXIT,
+          KM_KBP_DEBUG_MATCH_EXIT,
+          KM_KBP_DEBUG_NOMATCH_EXIT,
+          KM_KBP_DEBUG_END
+        ]) or FKeymanDeveloperOptions.DebuggerBreakWhenExitingLine then
           FFoundBreakpoint := True;
       end;
     end;
@@ -875,13 +869,21 @@ begin
     { Update call stack, execution point line }
 
     case ItemType of
-      QID_BEGIN_UNICODE, QID_BEGIN_ANSI, QID_GROUP_ENTER,
-      QID_RULE_ENTER, QID_NOMATCH_ENTER, QID_MATCH_ENTER:
+      KM_KBP_DEBUG_BEGIN,
+      KM_KBP_DEBUG_GROUP_ENTER,
+      KM_KBP_DEBUG_RULE_ENTER,
+      KM_KBP_DEBUG_NOMATCH_ENTER,
+      KM_KBP_DEBUG_MATCH_ENTER:
         (frmDebugStatus as TfrmDebugStatus).CallStack.CallStackPush(FEvents[n].Rule);
-      QID_RULE_EXIT, QID_NOMATCH_EXIT, QID_MATCH_EXIT, QID_GROUP_EXIT:
+      KM_KBP_DEBUG_RULE_EXIT,
+      KM_KBP_DEBUG_NOMATCH_EXIT,
+      KM_KBP_DEBUG_MATCH_EXIT,
+      KM_KBP_DEBUG_GROUP_EXIT:
         (frmDebugStatus as TfrmDebugStatus).CallStack.CallStackPop;
-      QID_END:
+      KM_KBP_DEBUG_END:
         begin (frmDebugStatus as TfrmDebugStatus).CallStack.CallStackClear; ExecutionPointLine := -1; end;
+    else
+      Assert(False);
     end;
   end;
 end;
@@ -1093,31 +1095,34 @@ begin
   keyboard := nil;
 end;
 
-function TfrmDebug.DiscoverRuleLine(ItemType: Integer; di: PAIDebugInfo): Integer;
+function TfrmDebug.DiscoverRuleLine(debug: pkm_kbp_state_debug_item): Integer;
 var
   grp, i: Integer;
+  group: PKeymanGroup;
 begin
   grp := -1;
   Result := 0;
 
-  if Assigned(di.Group) then
+  if Assigned(debug.kmx_info.group) then
+  begin
+    group := PKeymanGroup(debug.kmx_info.group);
     for i := 0 to debugkeyboard.Groups.Count - 1 do
-      if di.Group.dpName = debugkeyboard.Groups[i].Name then
+      if group.dpName = debugkeyboard.Groups[i].Name then
       begin
         grp := i;
         Break;
       end;
+  end;
 
-  case ItemType of
-    QID_END:           Result := debugkeyboard.BeginUnicodeLine;
-    QID_BEGIN_UNICODE: Result := debugkeyboard.BeginUnicodeLine;
-    QID_BEGIN_ANSI:    Result := debugkeyboard.BeginANSILine;
-    QID_GROUP_ENTER,
-    QID_GROUP_EXIT:    if grp > -1 then Result := debugkeyboard.Groups[grp].Line;
-    QID_MATCH_ENTER,
-    QID_MATCH_EXIT:    if grp > -1 then Result := debugkeyboard.Groups[grp].MatchLine;
-    QID_NOMATCH_ENTER,
-    QID_NOMATCH_EXIT:  if grp > -1 then Result := debugkeyboard.Groups[grp].NomatchLine;
+  case debug._type of
+    KM_KBP_DEBUG_END:           Result := debugkeyboard.BeginUnicodeLine;
+    KM_KBP_DEBUG_BEGIN:         Result := debugkeyboard.BeginUnicodeLine;
+    KM_KBP_DEBUG_GROUP_ENTER,
+    KM_KBP_DEBUG_GROUP_EXIT:    if grp > -1 then Result := debugkeyboard.Groups[grp].Line;
+    KM_KBP_DEBUG_MATCH_ENTER,
+    KM_KBP_DEBUG_MATCH_EXIT:    if grp > -1 then Result := debugkeyboard.Groups[grp].MatchLine;
+    KM_KBP_DEBUG_NOMATCH_ENTER,
+    KM_KBP_DEBUG_NOMATCH_EXIT:  if grp > -1 then Result := debugkeyboard.Groups[grp].NomatchLine;
   end;
 end;
 
@@ -1160,79 +1165,6 @@ begin
     if memo.Focused
       then UIStatus := duiFocusedForInput
       else UIStatus := duiReadyForInput;
-end;
-
-procedure TfrmDebug.AddRuleMatch(ItemType: Integer; di: PAIDebugInfo);
-var
-  ev: TDebugEvent;
-begin
-  if not Assigned(debugkeyboard) then Exit;
-
-  ResetEvents;
-
-  if (ItemType = QID_BEGIN_UNICODE) or (ItemType = QID_BEGIN_ANSI) then
-  begin
-    FIgnoreKeyUp := PAIDebugKeyInfo(di.Flags).IsUp;
-    (frmDebugStatus as TfrmDebugStatus).DeadKeys.DeselectDeadkeys;
-  end;
-  if FIgnoreKeyUp then Exit;
-
-  ev := TDebugEvent.Create;
-  FEvents.Add(ev);
-  ev.EventType := etRuleMatch;
-  ev.Rule.ItemType := ItemType;
-  ev.Rule.Flags := di.Flags;
-
-  if Assigned(di.Rule) then
-  begin
-    ev.Rule.Line := di.Rule.Line;
-    ev.Rule.Rule.Key := di.Rule^.Key;
-    ev.Rule.Rule.Line := di.Rule^.Line;
-    ev.Rule.Rule.ShiftFlags := di.Rule^.ShiftFlags;
-    ev.Rule.Rule.dpOutput := di.Rule^.dpOutput;
-    ev.Rule.Rule.dpContext := di.Rule^.dpContext;
-    ev.Rule.FillStoreList(di, debugkeyboard.Memory.Memory);
-  end
-  else
-    ev.Rule.Line := DiscoverRuleLine(ItemType, di);
-
-  if Assigned(di.Context) then ev.Rule.Context := di.Context;
-  if Assigned(di.Output) then ev.Rule.Output := di.Output;
-  if Assigned(di.Group) then
-  begin
-    ev.Rule.Group.dpName := di.Group^.dpName;
-    ev.Rule.Group.dpMatch := di.Group^.dpMatch;
-    ev.Rule.Group.dpNoMatch := di.Group^.dpNoMatch;
-    ev.Rule.Group.fUsingKeys := di.Group^.fUsingKeys;
-  end;
-
-  { Update user interface }
-
-  if (ev.Rule.ItemType = QID_BEGIN_UNICODE) or (ev.Rule.ItemType = QID_BEGIN_ANSI) then
-  begin
-    UIStatus := duiReceivingEvents;
-    ev.Rule.Key := PAIDebugKeyInfo(di.Flags)^;
-    if (ev.Rule.key.VirtualKey = VK_ESCAPE) and ((ev.Rule.key.ShiftFlags and K_SHIFTFLAG) <> 0) then Exit; // Shift+Esc
-    (frmDebugStatus as TfrmDebugStatus).Key.ShowKey(@ev.Rule.Key);
-    (frmDebugStatus as TfrmDebugStatus).RegTest.RegTestLogKey(@ev.Rule.Key);
-
-    if not ev.Rule.Key.IsUp then
-      AddDebug('KEYDOWN: Char: '+ ev.Rule.Key.Character+
-        ' VK: '+IntToHex(ev.Rule.Key.VirtualKey,4)+
-        ' Shift: '+IntToHex(ev.Rule.Key.ShiftFlags, 4)+
-        ' DeadChar: '+ev.Rule.Key.DeadKeyCharacter);
-  end;
-
-  if ev.Rule.ItemType = QID_END then
-    { Now we disable Keyman keyboard as we are at the end of the key processing sequence }
-    PostMessage(Handle, WM_USER_DebugEnd, 0, 0);
-end;
-
-procedure TfrmDebug.AddDebug(s: WideString);
-begin
-  if TikeDebugMode then
-    frmMessages.Add(plsInfo, 'Debugger', s, 0, 0);
-  // Do NOTHING AT PRESENT
 end;
 
 {-------------------------------------------------------------------------------

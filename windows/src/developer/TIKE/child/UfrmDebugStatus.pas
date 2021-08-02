@@ -23,15 +23,36 @@ unit UfrmDebugStatus;  // I3306
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, DebugBitBtn, ExtCtrls, DebugListBox, ComCtrls,
-  DebugListView, PaintPanel, DebugDeadkeys, UfrmDebug,
-  debugging, debugkeyboard, RegressionTest,
-  UfrmDebugStatus_Key,
-  UfrmDebugStatus_Elements,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Buttons,
+  Vcl.ComCtrls,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.StdCtrls,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  DebugBitBtn,
+  DebugDeadkeys,
+  debugging,
+  debugkeyboard,
+  DebugListBox,
+  DebugListView,
+  PaintPanel,
+  RegressionTest,
+  UfrmDebug,
   UfrmDebugStatus_CallStack,
   UfrmDebugStatus_Deadkeys,
-  UfrmDebugStatus_RegTest, UfrmTike;
+  UfrmDebugStatus_Elements,
+  UfrmDebugStatus_Events,
+  UfrmDebugStatus_Key,
+  UfrmDebugStatus_RegTest,
+  UfrmTike;
 
 const
   DebugTab_Status            = 0;
@@ -41,13 +62,14 @@ const
   DebugTab_RegressionTesting = 4;
 
 type
-  TfrmDebugStatus = class(TTIKEForm)
+  TfrmDebugStatus = class(TTikeForm)
     pagesDebug: TPageControl;
     tabDebugStores: TTabSheet;
     tabDebugCallStack: TTabSheet;
     tabDebugDeadkeys: TTabSheet;
     tabDebugRegressionTesting: TTabSheet;
     tabDebugKey: TTabSheet;
+    tabDebugEvents: TTabSheet;
     procedure FormCreate(Sender: TObject);
   private
     FDebugForm: TfrmDebug;
@@ -56,6 +78,7 @@ type
     FElements: TfrmDebugStatus_Elements;
     FRegTest: TfrmDebugStatus_RegTest;
     FKey: TfrmDebugStatus_Key;
+    FEvents: TfrmDebugStatus_Events;
 
     procedure SetDebugForm(const Value: TfrmDebug);
     procedure SetDisplayFont(const Value: TFont);
@@ -72,13 +95,13 @@ type
     property CallStack: TfrmDebugStatus_CallStack read FCallStack;
     property DeadKeys: TfrmDebugStatus_DeadKeys read FDeadKeys;
     property RegTest: TfrmDebugStatus_RegTest read FRegTest;
+    property Events: TfrmDebugStatus_Events read FEvents;
   end;
 
 implementation
 
 uses
   Keyman.Developer.System.HelpTopics,
-
   UfrmMain;
 
 {$R *.dfm}
@@ -107,6 +130,10 @@ begin
   FRegTest := TfrmDebugStatus_RegTest.Create(Self);
   FRegTest.Parent := tabDebugRegressionTesting;
   FRegTest.Visible := True;
+
+  FEvents := TfrmDebugStatus_Events.Create(Self);
+  FEvents.Parent := tabDebugEvents;
+  FEvents.Visible := True;
 end;
 
 function TfrmDebugStatus.GetHelpTopic: string;
@@ -129,6 +156,7 @@ begin
   FCallStack.SetDebugKeyboard(FDebugKeyboard);
   FDeadKeys.SetDebugKeyboard(FDebugKeyboard);
   FRegTest.SetDebugKeyboard(FDebugKeyboard);
+  FEvents.SetDebugKeyboard(FDebugKeyboard);
 end;
 
 procedure TfrmDebugStatus.SetDisplayFont(const Value: TFont);
@@ -140,6 +168,7 @@ begin
   FCallStack.SetDisplayFont(Value);
   FDeadKeys.SetDisplayFont(Value);
   FRegTest.SetDisplayFont(Value);
+  FEvents.SetDisplayFont(Value);
 end;
 
 end.

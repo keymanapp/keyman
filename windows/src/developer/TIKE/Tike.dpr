@@ -129,7 +129,7 @@ uses
   UfrmCharacterMapFilter in '..\..\global\delphi\charmap\UfrmCharacterMapFilter.pas' {frmCharacterMapFilter},
   UfrmUnicodeDataStatus in '..\..\global\delphi\charmap\UfrmUnicodeDataStatus.pas' {frmUnicodeDataStatus},
   UfrmDebugStatus_RegTest in 'debug\UfrmDebugStatus_RegTest.pas' {frmDebugStatus_RegTest},
-  UfrmDebugStatus_CallStack in 'debug\UfrmDebugStatus_CallStack.pas' {frmDebugStatus_CallStack},
+  UfrmDebugStatus_Events in 'debug\UfrmDebugStatus_Events.pas' {frmDebugStatus_Events},
   UfrmDebugStatus_Deadkeys in 'debug\UfrmDebugStatus_Deadkeys.pas' {frmDebugStatus_DeadKeys},
   UfrmDebugStatus_Elements in 'debug\UfrmDebugStatus_Elements.pas' {frmDebugStatus_Elements},
   UfrmDebugStatus in 'child\UfrmDebugStatus.pas' {frmDebugStatus},
@@ -287,7 +287,8 @@ uses
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.Developer.System.Project.UrlRenderer in 'project\Keyman.Developer.System.Project.UrlRenderer.pas',
   Keyman.System.KeymanCore in '..\..\global\delphi\general\Keyman.System.KeymanCore.pas',
-  Keyman.System.KeymanCoreDebug in '..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas';
+  Keyman.System.KeymanCoreDebug in '..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas',
+  UfrmDebugStatus_CallStack in 'debug\UfrmDebugStatus_CallStack.pas' {frmDebugStatus_CallStack};
 
 {$R *.RES}
 {$R ICONS.RES}

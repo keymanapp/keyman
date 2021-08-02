@@ -94,17 +94,17 @@ pkm_kbp_state_debug_item = ^km_kbp_state_debug_item;
 km_kbp_debug_type = type uint32_t;
 
 const
-  KM_KBP_DEBUG_BEGIN: km_kbp_debug_type = 0;
+  KM_KBP_DEBUG_BEGIN = 0;
   //KM_KBP_DEBUG_BEGIN_ANSI: km_kbp_debug_type = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
-  KM_KBP_DEBUG_GROUP_ENTER: km_kbp_debug_type = 2;
-  KM_KBP_DEBUG_GROUP_EXIT: km_kbp_debug_type = 3;
-  KM_KBP_DEBUG_RULE_ENTER: km_kbp_debug_type = 4;
-  KM_KBP_DEBUG_RULE_EXIT: km_kbp_debug_type = 5;
-  KM_KBP_DEBUG_MATCH_ENTER: km_kbp_debug_type = 6;
-  KM_KBP_DEBUG_MATCH_EXIT: km_kbp_debug_type = 7;
-  KM_KBP_DEBUG_NOMATCH_ENTER: km_kbp_debug_type = 8;
-  KM_KBP_DEBUG_NOMATCH_EXIT: km_kbp_debug_type = 9;
-  KM_KBP_DEBUG_END: km_kbp_debug_type = 10;
+  KM_KBP_DEBUG_GROUP_ENTER = 2;
+  KM_KBP_DEBUG_GROUP_EXIT = 3;
+  KM_KBP_DEBUG_RULE_ENTER = 4;
+  KM_KBP_DEBUG_RULE_EXIT = 5;
+  KM_KBP_DEBUG_MATCH_ENTER = 6;
+  KM_KBP_DEBUG_MATCH_EXIT = 7;
+  KM_KBP_DEBUG_NOMATCH_ENTER = 8;
+  KM_KBP_DEBUG_NOMATCH_EXIT = 9;
+  KM_KBP_DEBUG_END = 10;
 
 // Flags for KM_KBP_DEBUG_GROUP_EXIT
 const KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW = $0001;

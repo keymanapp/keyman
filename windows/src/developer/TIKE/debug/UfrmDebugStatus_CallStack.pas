@@ -48,6 +48,7 @@ implementation
 
 uses
   Keyman.Developer.System.HelpTopics,
+  Keyman.System.KeymanCoreDebug,
 
   UKeyBitmap;
 
@@ -71,11 +72,9 @@ var
   s: string;
 begin
   case rule.ItemType of
-    QID_BEGIN_UNICODE:
+    KM_KBP_DEBUG_BEGIN:
       lbCallStack.Items.AddObject('begin Unicode', rule);
-    QID_BEGIN_ANSI:
-      lbCallStack.Items.AddObject('begin ANSI', rule);
-    QID_GROUP_ENTER:
+    KM_KBP_DEBUG_GROUP_ENTER:
       if rule.Group.dpName <> '' then
       begin
         s := 'group('+rule.Group.dpName+')';
@@ -84,11 +83,11 @@ begin
       end
       else
         lbCallStack.Items.AddObject('Unknown group', rule);
-    QID_RULE_ENTER:
+    KM_KBP_DEBUG_RULE_ENTER:
       lbCallStack.Items.AddObject('rule at line '+IntToStr(rule.line), rule);
-    QID_MATCH_ENTER:
+    KM_KBP_DEBUG_MATCH_ENTER:
       lbCallStack.Items.AddObject('match rule', rule);
-    QID_NOMATCH_ENTER:
+    KM_KBP_DEBUG_NOMATCH_ENTER:
       lbCallStack.Items.AddObject('nomatch rule', rule);
   end;
 end;

@@ -284,8 +284,8 @@
         <DCCReference Include="debug\UfrmDebugStatus_RegTest.pas">
             <Form>frmDebugStatus_RegTest</Form>
         </DCCReference>
-        <DCCReference Include="debug\UfrmDebugStatus_CallStack.pas">
-            <Form>frmDebugStatus_CallStack</Form>
+        <DCCReference Include="debug\UfrmDebugStatus_Events.pas">
+            <Form>frmDebugStatus_Events</Form>
         </DCCReference>
         <DCCReference Include="debug\UfrmDebugStatus_Deadkeys.pas">
             <Form>frmDebugStatus_DeadKeys</Form>
@@ -547,6 +547,10 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanCore.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas"/>
+        <DCCReference Include="debug\UfrmDebugStatus_CallStack.pas">
+            <Form>frmDebugStatus_CallStack</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
