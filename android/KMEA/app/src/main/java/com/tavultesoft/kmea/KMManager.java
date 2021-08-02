@@ -104,10 +104,17 @@ public final class KMManager {
   // Globe key actions
   public enum GlobeKeyAction {
     GLOBE_KEY_ACTION_SHOW_MENU,
+    // GLOBE_KEY_ACTION_SWITCH_TO_PREVIOUS_KEYBOARD,     // Switch to previous Keyman keyboard (reserved for flick)
     GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
     GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
     GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS,
     GLOBE_KEY_ACTION_DO_NOTHING,
+  }
+
+  public enum GlobeKeyState {
+    GLOBE_KEY_STATE_UP,
+    GLOBE_KEY_STATE_DOWN,
+    GLOBE_KEY_STATE_LONGPRESS
   }
 
   public enum FormFactor {
@@ -152,10 +159,13 @@ public final class KMManager {
 
   private static boolean didLogHardwareKeystrokeException = false;
 
-  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
+  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
   // This is used to keep track of the starting system keyboard index while the screen is locked
   private static int sysKbStartingIndexOnLockScreen = -1;
+
+  // This is used to keep track of the globe key shortpress and longpress
+  private static GlobeKeyState globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
 
   private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
 
@@ -438,6 +448,34 @@ public final class KMManager {
     }
 
     return false;
+  }
+
+  /**
+   * Handle the globe key longpress action. Currently just for INAPP only
+   * @param context
+   * @param keyboard
+   */
+  private static void doGlobeKeyLongpressAction(Context context, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      if (InAppKeyboard.keyboardPickerEnabled) {
+        showKeyboardPicker(context, keyboard);
+      }
+    }
+  }
+
+  /**
+   * Handle the globe key shortpress action. Currently just for INAPP only
+   * @param context
+   * @param keyboard
+   */
+  private static void doGlobeKeyShortpressAction(Context context, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      if (InAppKeyboard.keyboardPickerEnabled && inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
+        showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+      } else { /* inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD */
+        switchToNextKeyboard(context);
+      }
+    }
   }
 
   /**
@@ -1849,6 +1887,11 @@ public final class KMManager {
     KeyboardPickerActivity.shouldCheckKeyboardUpdates = newValue;
   }
 
+  /**
+   * Get the default short press action for the globe key
+   * @param kbType - KeyboardType.KEYBOARD_TYPE_SYSTEM or KeyboardType.KEYBOARD_INAPP
+   * @return GlobeKeyAction
+   */
   public static GlobeKeyAction getGlobeKeyAction(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       return inappKbGlobeKeyAction;
@@ -1866,6 +1909,14 @@ public final class KMManager {
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       sysKbGlobeKeyAction = action;
     }
+  }
+
+  public static GlobeKeyState getGlobeKeyState() {
+    return globeKeyState;
+  }
+
+  public static void setGlobeKeyState(GlobeKeyState state) {
+    globeKeyState = state;
   }
 
   protected static final class KMInAppKeyboardWebViewClient extends WebViewClient {
@@ -1953,6 +2004,12 @@ public final class KMManager {
         return false;
       }
 
+      // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+      // just the first intended '#' to get URI-based query param processing.
+      // At some point, other parts of the function should be redone to allow use of ? instead
+      // of # in our WebView command "queries" entirely.
+      String cmd = url.replace("keyboard.html#", "keyboard.html?");
+      Uri urlCommand = Uri.parse(cmd);
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
@@ -1961,7 +2018,7 @@ public final class KMManager {
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.dismissKeyboard();
         }
-      } else if (url.indexOf("globeKeyAction") >= 0) {
+      } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
         InAppKeyboard.dismissHelpBubble();
         if (!InAppKeyboard.isHelpBubbleEnabled) {
           return false;
@@ -1972,17 +2029,7 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
-        if (KMManager.shouldAllowSetKeyboard()) {
-          if (InAppKeyboard.keyboardPickerEnabled) {
-            if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
-              showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-            } else if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-              switchToNextKeyboard(context);
-            }
-          } else {
-            switchToNextKeyboard(context);
-          }
-        }
+        handleGlobeKeyAction(urlCommand.getBooleanQueryParameter("keydown", false));
       } else if (url.indexOf("showHelpBubble") >= 0) {
         int start = url.indexOf("keyPos=") + 7;
         String value = url.substring(start);
@@ -2079,14 +2126,6 @@ public final class KMManager {
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
-        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
-        // just the first intended '#' to get URI-based query param processing.
-
-        // At some point, other parts of the function should be redone to allow use of ? instead
-        // of # in our WebView command "queries" entirely.
-        String cmd = url.replace("keyboard.html#", "keyboard.html?");
-        Uri urlCommand = Uri.parse(cmd);
-
         double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
         double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
@@ -2111,6 +2150,29 @@ public final class KMManager {
         */
       }
       return false;
+    }
+
+    private void handleGlobeKeyAction(boolean globeKeyDown) {
+      // Update globeKeyState
+      if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+        globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
+      }
+
+      if (KMManager.shouldAllowSetKeyboard()) {
+        if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+          // Longpress globe
+          doGlobeKeyLongpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+
+          // clear globeKeyState
+          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+        } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+          // Shortpress globe
+          doGlobeKeyShortpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+        }
+      } else {
+        // clear globeKeyState
+        globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+      }
     }
   }
 
@@ -2169,7 +2231,6 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
-
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
           @Override
@@ -2195,12 +2256,19 @@ public final class KMManager {
         return false;
       }
 
+      // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+      // just the first intended '#' to get URI-based query param processing.
+
+      // At some point, other parts of the function should be redone to allow use of ? instead
+      // of # in our WebView command "queries" entirely.
+      String cmd = url.replace("keyboard.html#", "keyboard.html?");
+      Uri urlCommand = Uri.parse(cmd);
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
         SystemKeyboard.dismissHelpBubble();
         IMService.requestHideSelf(0);
-      } else if (url.indexOf("globeKeyAction") >= 0) {
+      } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
         SystemKeyboard.dismissHelpBubble();
         if (!SystemKeyboard.isHelpBubbleEnabled) {
           return false;
@@ -2211,49 +2279,68 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
-        if (KMManager.shouldAllowSetKeyboard()) {
-          if (SystemKeyboard.keyboardPickerEnabled) {
-            KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
-            GlobeKeyAction action = sysKbGlobeKeyAction;
-            if(keyguardManager.inKeyguardRestrictedInputMode()) {
-              // Override system keyboard globe key action if screen is locked:
-              // 1. Switch to next Keyman keyboard (no menu)
-              // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
-              if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
-                // All the Keyman keyboards have been cycled through
-                action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
-              } else {
-                if (sysKbStartingIndexOnLockScreen == -1) {
-                  // Initialize the system keyboard starting index while the screen is locked
-                  sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
-                }
-                action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
-              }
-            } else {
-              // If screen isn't locked, reset the starting index
-              sysKbStartingIndexOnLockScreen = -1;
-            }
+        // Update globeKeyState
+        boolean globeKeyDown = urlCommand.getBooleanQueryParameter("keydown", false);
+        if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+          globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
+        }
 
-            switch (action) {
-              case GLOBE_KEY_ACTION_SHOW_MENU:
-                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-                break;
-              case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
-                switchToNextKeyboard(context);
-                break;
-              case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
-                advanceToNextInputMode();
-                break;
-              case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
-                InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showInputMethodPicker();
-                break;
-              default:
-                // Do nothing
+        if (KMManager.shouldAllowSetKeyboard()) {
+          // Assign shortpress globe action
+          GlobeKeyAction action = sysKbGlobeKeyAction;
+          KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+          if (keyguardManager.inKeyguardRestrictedInputMode()) {
+            // Override system keyboard globe key action if screen is locked:
+            // 1. Switch to next Keyman keyboard (no menu)
+            // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
+            if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+              // All the Keyman keyboards have been cycled through
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
+            } else {
+              if (sysKbStartingIndexOnLockScreen == -1) {
+                // Initialize the system keyboard starting index while the screen is locked
+                sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
+              }
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
             }
           } else {
-            switchToNextKeyboard(context);
+            // If screen isn't locked, reset the starting index
+            sysKbStartingIndexOnLockScreen = -1;
+
+            if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+              // Check longpress globe action
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+              globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+            } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
+              // Ignore globe key down cause it may be queueing up for longpress
+              return false;
+            }
           }
+
+          switch (action) {
+            case GLOBE_KEY_ACTION_SHOW_MENU:
+              if (SystemKeyboard.keyboardPickerEnabled) {
+                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+              }
+              break;
+            case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
+              switchToNextKeyboard(context);
+              break;
+            case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
+              advanceToNextInputMode();
+              break;
+            case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
+              InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+              imm.showInputMethodPicker();
+              break;
+            default:
+              // Do nothing
+          }
+        } else {
+          // Clear globeKeyState
+          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+
+          switchToNextKeyboard(context);
         }
       } else if (url.indexOf("showHelpBubble") >= 0) {
         int start = url.indexOf("keyPos=") + 7;
@@ -2350,14 +2437,6 @@ public final class KMManager {
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
-        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
-        // just the first intended '#' to get URI-based query param processing.
-
-        // At some point, other parts of the function should be redone to allow use of ? instead
-        // of # in our WebView command "queries" entirely.
-        String cmd = url.replace("keyboard.html#", "keyboard.html?");
-        Uri urlCommand = Uri.parse(cmd);
-
         double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
         double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));

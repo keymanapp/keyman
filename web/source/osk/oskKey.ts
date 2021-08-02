@@ -199,7 +199,8 @@ namespace com.keyman.osk {
 
           this.spec['sp'] = 1 + (flag ? 1 : 0);
           break;
-        // New functionality:  we made classes for this but never used 'em!
+        // Added in 15.0:  special key highlight toggling.
+        // Was _intended_ in earlier versions, but not actually implemented.
         case 'special':
         case 'special-on':
           if(flag === undefined) {

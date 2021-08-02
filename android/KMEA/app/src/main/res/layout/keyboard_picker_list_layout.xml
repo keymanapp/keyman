@@ -30,7 +30,7 @@
             android:layout_marginStart="@dimen/close_button_margin"
             android:layout_weight="1"
             android:singleLine="true"
-            android:text="@string/label_close_keyman" />
+            android:text="@string/label_next_input_method" />
 
         <Space
             android:layout_width="wrap_content"

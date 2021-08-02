@@ -266,7 +266,16 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
       KMX_BOOL fIsBackspace = m_state.vkey == KM_KBP_VKEY_BKSP && (m_modifiers & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(fIsBackspace) {   // I4838   // I4933
+
+        // Delete deadkeys prior to insertion point
         PKMX_WCHAR pdeletecontext = m_context.Buf(1);   // I4933
+        while(pdeletecontext && *pdeletecontext == UC_SENTINEL) {
+          m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
+          pdeletecontext = m_context.Buf(1);
+        }
+
+        // If there is now no character in the context, we want to
+        // emit the backspace for application to use
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
           m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
           if(m_debug_items) {
@@ -275,7 +284,17 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
           *pOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
         }
-        m_actions.QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
+
+        // Emit a backspace to delete the character
+        m_actions.QueueAction(QIT_BACK, BK_DEFAULT);  // side effect: also removes last char from context
+
+        // And delete any deadkeys prior to insertion point again
+        pdeletecontext = m_context.Buf(1);
+        while(pdeletecontext && *pdeletecontext == UC_SENTINEL) {
+          m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
+          pdeletecontext = m_context.Buf(1);
+        }
+
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);

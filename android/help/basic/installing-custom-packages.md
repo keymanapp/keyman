@@ -53,7 +53,7 @@ This documentation helps you to get started using the keyboard.
 
 ![](../android_images/khmer-welcome-a.png)
 
-Click the **"OK"** button to finish installing the keyboard. You should be able to select it from the Keyman globe
+Click the **"OK"** button to finish installing the keyboard. You should be able to select it from the Keyman globe key 
 and start typing with it in any app.
 
 ![](../android_images/dist-install1-ap.png)
