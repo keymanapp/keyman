@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.92 alpha 2021-08-03
+
+* fix(android/app): Check Play Store release notes less than 500 chars (#5535)
+
 ## 15.0.91 alpha 2021-08-02
 
 * fix(web): stuck key highlighting from touchpoint movement (#5490)
