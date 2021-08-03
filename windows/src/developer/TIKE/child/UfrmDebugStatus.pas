@@ -39,7 +39,6 @@ uses
 
   DebugBitBtn,
   DebugDeadkeys,
-  debugging,
   debugkeyboard,
   DebugListBox,
   DebugListView,

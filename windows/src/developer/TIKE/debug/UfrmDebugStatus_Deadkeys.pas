@@ -22,7 +22,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DebugListBox, debugging, debugdeadkeys,
+  Dialogs, StdCtrls, DebugListBox, debugdeadkeys,
   UfrmDebugStatus_Child;
 
 type

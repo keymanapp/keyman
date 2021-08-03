@@ -28,7 +28,7 @@ uses
   System.Types,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, DebugListBox, Buttons, DebugBitBtn, ExtCtrls, Menus,
-  regressiontest, debugging, UfrmDebugStatus_Child,
+  regressiontest, UfrmDebugStatus_Child,
   Keyman.System.Debug.DebugEvent;
 
 type

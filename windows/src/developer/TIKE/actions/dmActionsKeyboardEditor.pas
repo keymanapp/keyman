@@ -142,9 +142,9 @@ uses
   System.Win.ComObj,
   Winapi.Windows,
 
-  debugging,
   KMDActions,
   KMDActionInterfaces,
+  Keyman.System.Debug.DebugUIStatus,
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.UI.Project.kmnProjectFileUI,
   Keyman.Developer.System.Project.kpsProjectFile,

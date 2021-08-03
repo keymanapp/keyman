@@ -1,3 +1,8 @@
+{
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Wrapper for Keyman Core debug interfaces
+}
 unit Keyman.System.Debug.DebugCore;
 
 interface

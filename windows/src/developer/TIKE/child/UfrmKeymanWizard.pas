@@ -568,6 +568,7 @@ uses
   System.Win.ComObj,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.System.Debug.DebugUIStatus,
   Keyman.System.QRCode,
   Keyman.UI.FontUtils,
 
@@ -577,7 +578,6 @@ uses
   Clipbrd,
   compile,
   CompileKeymanWeb,
-  debugging,
   dmActionsMain,
   KeymanDeveloperOptions,
   KeymanVersion,

@@ -23,7 +23,7 @@ interface
 uses
   System.Contnrs,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, DebugListView, XString, debugging, Menus,
+  Dialogs, ComCtrls, DebugListView, XString, Menus,
   UfrmDebugStatus_Child, Keyman.System.Debug.DebugEvent;
 
 type

@@ -27,8 +27,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, debugging, ExtCtrls, PaintPanel, UfrmDebugStatus_Child, Vcl.StdCtrls,
-  regressiontest, Keyman.System.Debug.DebugEvent;
+  Dialogs, ExtCtrls, PaintPanel, UfrmDebugStatus_Child, Vcl.StdCtrls,
+  regressiontest,
+  Keyman.System.Debug.DebugEvent,
+  Keyman.System.Debug.DebugUIStatus;
 
 type
   TfrmDebugStatus_Key = class(TfrmDebugStatus_Child)

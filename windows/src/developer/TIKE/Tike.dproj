@@ -183,7 +183,7 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.ProjectSaver.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="main\debugging.pas"/>
+        <DCCReference Include="main\Keyman.System.Debug.DebugUIStatus.pas"/>
         <DCCReference Include="rel\keymanstrings.pas"/>
         <DCCReference Include="help\kwhelp.pas"/>
         <DCCReference Include="main\UKeyBitmap.pas"/>
@@ -413,7 +413,6 @@
         <DCCReference Include="oskbuilder\TouchLayout.pas"/>
         <DCCReference Include="oskbuilder\TouchLayoutDefinitions.pas"/>
         <DCCReference Include="main\CharMapDropTool_TntCustomEdit.pas"/>
-        <DCCReference Include="debug\DebugUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CheckboxGridHelper.pas"/>
         <DCCReference Include="dialogs\UfrmAddKeyboardFeature.pas">

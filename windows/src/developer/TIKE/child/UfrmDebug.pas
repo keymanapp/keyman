@@ -1,58 +1,9 @@
-(*
-  Name:             UfrmDebug
-  Copyright:        Copyright (C) SIL International.
-  Documentation:
-  Description:
-  Create Date:      20 Jun 2006
-
-  Modified Date:    3 Aug 2015
-  Authors:          mcdurdin
-  Related Files:
-  Dependencies:
-
-  Bugs:
-  Todo:             If input is entered into the editor, close the debug form after query -- don't worry about this.
-  Notes:
-  History:          20 Jun 2006 - mcdurdin - Initial version
-                    01 Aug 2006 - mcdurdin - Rename FTikeOptiosn to FKeymanDeveloperOptions
-                    23 Aug 2006 - mcdurdin - Extracted from TfrmEditor to be a dockable window
-                    14 Sep 2006 - mcdurdin - Rework as a dockable panel
-                    28 Sep 2006 - mcdurdin - Added CanDebug flag
-                    04 Dec 2006 - mcdurdin - Tweak debugging startup
-                    04 Jan 2007 - mcdurdin - Fix Keyman Debugger activation when switching in and out of Keyman Desktop
-                    22 Jan 2007 - mcdurdin - Fix font display
-                    30 Jan 2007 - mcdurdin - Remove pro edition watermark
-                    05 Nov 2007 - mcdurdin - Added system debugging
-                    05 Nov 2007 - mcdurdin - I1129 - Block rapid typing (99%)
-                    19 Nov 2007 - mcdurdin - I1157 - const string parameters
-                    16 Jan 2009 - mcdurdin - I1699 - Fix crash in debugger when clearing deadkeys
-                    17 Dec 2010 - mcdurdin - I2594 - Fix crash when closing debugger
-                    18 Mar 2011 - mcdurdin - I2801 - Debugger doesn't work on first attempt
-                    18 Mar 2011 - mcdurdin - I2713 - Fix crash when closing debugger
-                    18 Mar 2011 - mcdurdin - I2770 - Fix crash when closing debugger
-                    18 Mar 2011 - mcdurdin - I1603 - Cursor position can go wrong in debugger when deadkeys are used
-                    03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
-                    18 May 2012 - mcdurdin - I3323 - V9.0 - Change from Plus-MemoU to Plus-Memo
-                    18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
-                    17 Aug 2012 - mcdurdin - I3310 - V9.0 - Unicode in Delphi fixes
-                    24 Jan 2012 - mcdurdin - I3173 - Unusual crash when ending debug session now handled and additional error info provided
-                    23 Mar 2012 - mcdurdin - I3283 - Debugger should start Keyman Desktop if it isn't running
-                    03 Nov 2012 - mcdurdin - I3503 - V9.0 - Merge of I3283 - Debugger should start Keyman Desktop if it isn't running
-                    03 Nov 2012 - mcdurdin - I3504 - V9.0 - Merge of I3173 - Unusual crash when ending debug session now handled and additional error info provided
-                    04 Dec 2013 - mcdurdin - I3655 - V9.0 - Keyboard debugger does not appear to function in 9.0.419.0
-                    10 Jan 2014 - mcdurdin - I4020 - V9.0 - Refactor TSF debug profile management into TDebugUtils
-                    07 Feb 2014 - mcdurdin - I4033 - V9.0 - Enable SHIFT+ESC to pause debugger with TSF
-                    31 Dec 2014 - mcdurdin - I4331 - V9.0 - Debugger development
-                    04 May 2015 - mcdurdin - I4695 - V9.0 - Debugger needs to use project file filename not internal name
-                    23 Jun 2015 - mcdurdin - I4767 - Keyboard debugger does not always activate profile correctly
-                    24 Jul 2015 - mcdurdin - I4796 - Refresh Keyman Developer look and feel for release
-                    03 Aug 2015 - mcdurdin - I4808 - Add character preview to debug window
-                    03 Aug 2015 - mcdurdin - I4809 - Track keystrokes in debug status form
-
-*)
-
-
-unit UfrmDebug;  // I3323  // I3306
+{
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Interactive keyboard debugger host form
+}
+unit UfrmDebug;
 
 interface
 
@@ -77,14 +28,13 @@ uses
 
   CaptionPanel,
   debugdeadkeys,
-  debugging,
   debugkeyboard,
-  DebugUtils,
   HintLabel,
   PaintPanel,
   KeymanDeveloperDebuggerMemo,
   Keyman.System.Debug.DebugCore,
   Keyman.System.Debug.DebugEvent,
+  Keyman.System.Debug.DebugUIStatus,
   Keyman.System.KeymanCore,
   Keyman.System.KeymanCoreDebug,
   msctf,
@@ -143,7 +93,6 @@ type
     FBreakpoints: TDebugBreakpoints;
     FRunning, FFoundBreakpoint, FForceKeyboard: Boolean;
     FFileName: string;
-    //FEditor: TfrmTikeEditor;
     FExecutionPointLine: Integer;
     debugkeyboard: TDebugKeyboard;
     _FCurrentEvent: Integer;
@@ -153,17 +102,8 @@ type
     FUIDisabled: Boolean;
     LastSelStart: Integer;
 
-    { Control caption member variables }
-    //FControlCaptions: TStringList;
-
     { Deadkey member variables }
     FSelectedDeadkey: TDeadKeyInfo;
-    //hklSystemKeyboard: HKL;
-    FSaveShiftState: Integer;
-    FLastActiveProfile: TDebugUtilProfile;   // I4331
-
-    { Editor integration functions }
-//    function EditorMemo: TPlusMemoU;
 
     { Keyman32 integration functions }
     function frmDebugStatus: TfrmDebugStatus;
@@ -241,11 +181,8 @@ type
 
     property SingleStepMode: Boolean read FSingleStepMode write SetSingleStepMode;
 
-    //procedure SetSystemKeyboardID(ID: string);
-
     property DebugFileName: WideString read FDebugFileName write FDebugFileName;
     property CompiledFileName: string read FFileName write FFileName;   // I4695
-    //property Editor: TfrmTikeEditor read FEditor write FEditor;
     property EditorMemo: TframeTextEditor read FEditorMemo write FEditorMemo;
 
     property ExecutionPointLine: Integer read FExecutionPointLine write SetExecutionPointLine;
@@ -257,7 +194,6 @@ type
 
     procedure ListBreakpoints;
 
-    //property UIDisabled: Boolean read GetUIDisabled;
     function ShortcutDisabled(Key: Word): Boolean;
 
     property CurrentEvent: TDebugEvent read GetCurrentEvent;
@@ -338,7 +274,6 @@ begin
 
   InitKeymanCore;
 
-  TDebugUtils.GetActiveTSFProfile(FLastActiveProfile);   // I4331
   FBreakpoints := TDebugBreakpoints.Create;
 
   FExecutionPointLine := -1;
@@ -831,17 +766,6 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     end;
   end;
 
-  procedure DoVShiftDown(dwData: DWord);
-  begin
-    FSaveShiftState := SaveShiftState;
-    SetShiftState(memo.Handle, dwData);
-  end;
-
-  procedure DoVShiftUp;
-  begin
-    SetShiftState(memo.Handle, FSaveShiftState); //ClearShiftState(memo.Handle, dwData);
-  end;
-
   procedure DoChar(const text: string);
   var
     i: Integer;
@@ -896,13 +820,10 @@ begin
   if not FRunning then
   begin
     FUIDisabled := False;
-//    UpdateControlCaptions;
   end;
 end;
 
 procedure TfrmDebug.SetForceKeyboard(Value: Boolean);
-var
-  hkl: THandle;
 begin
   if Value <> FForceKeyboard then
   begin
@@ -911,15 +832,6 @@ begin
     if FForceKeyboard then
     begin
       try
-        if SystemParametersInfo(SPI_GETDEFAULTINPUTLANG, 0, @hkl, 0) then
-        begin
-          FLastActiveProfile.Profile.dwProfileType := TF_PROFILETYPE_KEYBOARDLAYOUT;
-          FLastActiveProfile.Profile.langid := HKLToLanguageID(hkl);
-          FLastActiveProfile.Profile.HKL := hkl;
-        end
-        else
-          TDebugUtils.GetActiveTSFProfile(FLastActiveProfile);   // I4331
-
         memo.SetFocus;
 
         FDebugCore := TDebugCore.Create(FFileName, True);
@@ -939,7 +851,6 @@ begin
     end
     else
     begin
-      TDebugUtils.SetActiveTSFProfile(FLastActiveProfile);   // I4331
       CleanupCoreState;
     end;
   end;
