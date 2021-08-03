@@ -14,6 +14,7 @@ main (gint argc, gchar **argv)
 {
     struct stat filestat;
     kmp_details details;
+    gchar *kmp_json;
 
     if (argc < 2)
     {
@@ -22,11 +23,12 @@ main (gint argc, gchar **argv)
       return EXIT_FAILURE;
     }
 
-    stat(argv[1], &filestat);
+    kmp_json = g_strdup_printf("%s/kmp.json", argv[1]);
+    stat(kmp_json, &filestat);
     if (!S_ISREG(filestat.st_mode))
     {
       g_print ("Usage: kmpdetails <kmp.json>\n");
-      g_print ("ERROR: file %s not found\n", argv[1]);
+      g_print ("ERROR: file %s not found\n", kmp_json);
       return EXIT_FAILURE;
     }
 
