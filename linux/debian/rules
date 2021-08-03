@@ -47,7 +47,7 @@ override_dh_auto_test:
 	# keymankeyboardprocessor
 	cd common/core/desktop && ./build.sh tests
 	# ibus-keyman
-	cd linux/ibus-keyman && make check VERBOSE=1 || true
+	cd linux/ibus-keyman && make check VERBOSE=1
 	# keyman-config
 	dh_auto_test --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 
