@@ -243,6 +243,7 @@
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
     <ClCompile Include="..\..\global\vc\registry.cpp" />
+    <ClCompile Include="..\keyman32\kmprocessactions.cpp" />
     <ClCompile Include="..\keyman32\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -307,6 +308,7 @@
     <ClInclude Include="..\keyman32\keyeventsenderthread.h" />
     <ClInclude Include="..\keyman32\keystate.h" />
     <ClInclude Include="..\..\global\inc\Kmnreg.h" />
+    <ClInclude Include="..\keyman32\kmprocessactions.h" />
     <ClInclude Include="..\keyman32\kmprot.h" />
     <ClInclude Include="..\..\global\inc\kmprot_hwkey.h" />
     <ClInclude Include="..\..\global\inc\kmprot_licencenumber.h" />

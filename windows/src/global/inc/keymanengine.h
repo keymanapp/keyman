@@ -18,6 +18,15 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
 #endif
 
+// For keyboardprocessor_bits.h
+#ifndef KMN_KBP_STATIC
+#define KMN_KBP_STATIC
+#endif
+// For keyboardprocessor_bits.h
+#ifndef _WIN32
+#define _WIN32 1
+#endif
+
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0600
 #endif
@@ -30,6 +39,7 @@
 #include <assert.h>
 #include <msctf.h>
 #include "compiler.h"
+#include <keyman/keyboardprocessor.h>
 
 /***************************************************************************/
 

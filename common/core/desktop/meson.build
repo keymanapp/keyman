@@ -9,7 +9,8 @@ project('keyboardprocessor', 'cpp', 'c',
         version: run_command(find_program('getversion.bat', 'getversion.sh')).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
-                           'cpp_std=c++14'])
+                           'cpp_std=c++14',
+                           'b_vscrt=mt'])
 
 message('meson.project_version(): ' + meson.project_version() + '\n')
 compiler = meson.get_compiler('cpp')

@@ -142,6 +142,8 @@ BOOL ProcessHook()
 	}
 
   if (isUsingCoreProcessor) {
+    // TODO: 5011 remove debug message
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: ");
     PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
     km_kbp_context_item *citems = nullptr;
     ContextItemsFromAppContext(contextBuf, &citems);
@@ -152,6 +154,8 @@ BOOL ProcessHook()
     ProcessActions(&fOutputKeystroke);
   }
   else {
+    // TODO: 5011 remove debug message
+    SendDebugMessageFormat(0, sdmGlobal, 0,"ProcessGroup: ");
     ProcessGroup(gp); // TODO: 5442 remove
   }
 
