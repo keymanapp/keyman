@@ -28,7 +28,8 @@ uses
   System.Types,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, DebugListBox, Buttons, DebugBitBtn, ExtCtrls, Menus,
-  regressiontest, debugging, UfrmDebug, UfrmDebugStatus_Child;
+  regressiontest, debugging, UfrmDebugStatus_Child,
+  Keyman.System.Debug.DebugEvent;
 
 type
   TfrmDebugStatus_RegTest = class(TfrmDebugStatus_Child)
@@ -245,7 +246,7 @@ var
   ws: WideString;
 begin
   ws := memoDebug.Text;
-  DebugForm.FillDeadkeys(0, ws);
+  DebugCore.Deadkeys.FillDeadkeys(0, ws);
   Result := FRegTest.Events[FRegTest.CurrentEvent].PostContext = ws;
 end;
 
@@ -256,7 +257,7 @@ begin
   if not RegTestLogging then Exit;
   rte := TRegressionTestEvent.Create(FRegTest);
   rte.VKey := key.VirtualKey;
-  rte.ShiftState := key.ShiftFlags;
+  rte.ShiftState := key.Modifiers; // Core modifiers are compatible with Keyman32 shiftstates
   FRegTest.Events.Add(rte);
   RegTestAddLog(rte);
   lbRegTestLog.ItemIndex := lbRegTestLog.Items.Count - 1;
@@ -273,7 +274,7 @@ begin
   rte := FRegTest.Events[FRegTest.Events.Count - 1];
 
   ws := memoDebug.Text;
-  DebugForm.FillDeadkeys(0, ws);
+  DebugCore.Deadkeys.FillDeadkeys(0, ws);
 
   rte.PostContext := ws;
 end;

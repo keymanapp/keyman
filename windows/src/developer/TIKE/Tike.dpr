@@ -288,7 +288,9 @@ uses
   Keyman.Developer.System.Project.UrlRenderer in 'project\Keyman.Developer.System.Project.UrlRenderer.pas',
   Keyman.System.KeymanCore in '..\..\global\delphi\general\Keyman.System.KeymanCore.pas',
   Keyman.System.KeymanCoreDebug in '..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas',
-  UfrmDebugStatus_CallStack in 'debug\UfrmDebugStatus_CallStack.pas' {frmDebugStatus_CallStack};
+  UfrmDebugStatus_CallStack in 'debug\UfrmDebugStatus_CallStack.pas' {frmDebugStatus_CallStack},
+  Keyman.System.Debug.DebugEvent in 'debug\Keyman.System.Debug.DebugEvent.pas',
+  Keyman.System.Debug.DebugCore in 'debug\Keyman.System.Debug.DebugCore.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

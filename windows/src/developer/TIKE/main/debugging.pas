@@ -22,14 +22,19 @@ interface
 
 uses
   System.Classes,
+  System.Generics.Collections,
   Winapi.Messages,
   Winapi.Windows,
 
   debugkeyboard,
+  Keyman.System.KeymanCore,
   Keyman.System.KeymanCoreDebug,
   kmxfile;
 
 type
+  TDebugUIStatus = (duiInvalid, duiPaused, duiFocusedForInput, duiReadyForInput, duiReceivingEvents, duiDebugging,
+    duiClosing, duiDebuggingOutput, duiTest);
+
   { KMX file structures }
 
   TKeymanStoreEx = record
@@ -79,77 +84,12 @@ type
 
   { DebugInfo structure passed from Keyman32 }
 
-const
-  MAXSTOREOFFSETS=20;
-
-type
-  TAIDebugKeyInfo = record
-    VirtualKey: UINT;
-	  ShiftFlags: DWORD;
-	  Character, DeadKeyCharacter: WCHAR;
-    IsUp: BOOL;
-  end;
-
-  PAIDebugKeyInfo = ^TAIDebugKeyInfo;
-
-  { DebugEvent structure -- an event has occurred }
-
-  TDebugEventActionData = class
-    ActionType, dwData: Integer;
-    Text: WideString;
-  end;
-
-  TDebugEventRuleData = class
-    ItemType, Line: Integer;
-    Flags: DWord;
-    Rule: TKeymanKeyEx;
-    Group: TKeymanGroupEx;
-    Key: TAIDebugKeyInfo;
-    Context: WideString;
-    //, Output: WideString;
-    StoreOffsets: array[0..20] of Word; //TKeymanStoreEx;
-    nStores: Integer;
-    procedure FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
-  end;
-
-  TDebugEventCursor = record
-    X, Y: Integer;
-  end;
-
-  TDebugEventType = (etAction, etRuleMatch);
-
-  TDebugEvent = class
-  private
-    FEventType: TDebugEventType;
-    FAction: TDebugEventActionData;
-    FRule: TDebugEventRuleData;
-    FCursor: TDebugEventCursor;
-    procedure SetEventType(const Value: TDebugEventType);
-  public
-    constructor Create;
-    destructor Destroy; override;
-    property Action: TDebugEventActionData read FAction;
-    property Rule: TDebugEventRuleData read FRule;
-    property Cursor: TDebugEventCursor read FCursor;
-    property EventType: TDebugEventType read FEventType write SetEventType;
-  end;
-
-  TDebugEventList = class(TList)
-  protected
-    function Get(Index: Integer): TDebugEvent;
-    procedure Put(Index: Integer; Item: TDebugEvent);
-  public
-    destructor Destroy; override;
-    procedure Clear; override;
-    property Items[Index: Integer]: TDebugEvent read Get write Put; default;
-    function Add(Item: TDebugEvent): Integer;
-  end;
 
 //const
 //  QID_FLAG_RECURSIVE_OVERFLOW = $0001;
 //  QID_FLAG_NOMATCH = $0002;
 
-const
+{const
   QIT_VKEYDOWN   = 0;
   QIT_VKEYUP     = 1;
   QIT_VSHIFTDOWN = 2;
@@ -158,6 +98,7 @@ const
   QIT_DEADKEY    = 5;
   QIT_BELL       = 6;
   QIT_BACK       = 7;
+}
 
 const
   K_LCTRLFLAG      = $0001; // Left Control flag
@@ -193,26 +134,6 @@ implementation
 
 uses
   System.SysUtils;
-
-{ TDebugEventList }
-
-function TDebugEventList.Get(Index: Integer): TDebugEvent;        begin Result := TDebugEvent(inherited Get(Index)); end;
-procedure TDebugEventList.Put(Index: Integer; Item: TDebugEvent); begin inherited Put(Index, Pointer(Item)); end;
-function TDebugEventList.Add(Item: TDebugEvent): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-
-procedure TDebugEventList.Clear;
-var
-  i: Integer;
-begin
-  for i := 0 to Count - 1 do Items[i].Free;
-  inherited Clear;
-end;
-
-destructor TDebugEventList.Destroy;
-begin
-  Clear;
-  inherited Destroy;
-end;
 
 { Shift state code for the debug window }
 
@@ -309,66 +230,6 @@ begin
 	kbstate[VK_CONTROL]  := 0;
 	kbstate[VK_SHIFT]    := 0;
 	SetKeyboardState(kbstate);
-end;
-
-{ TDebugEvent }
-
-constructor TDebugEvent.Create;
-begin
-  inherited Create;
-  FEventType := etRuleMatch;
-  EventType := etAction;    // Force change of EventType
-end;
-
-destructor TDebugEvent.Destroy;
-begin
-  FreeAndNil(FAction);
-  FreeAndNil(FRule);
-  inherited;
-end;
-
-procedure TDebugEvent.SetEventType(const Value: TDebugEventType);
-begin
-  if FEventType <> Value then
-  begin
-    case FEventType of
-      etAction:    FreeAndNil(FAction);
-      etRuleMatch: FreeAndNil(FRule);
-    end;
-    FEventType := Value;
-    case FEventType of
-      etAction:    FAction := TDebugEventActionData.Create;
-      etRuleMatch: FRule := TDebugEventRuleData.Create;
-    end;
-  end;
-end;
-
-{ TDebugEventRuleData }
-
-procedure TDebugEventRuleData.FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
-  function StoreOffset(kfh: PKeyboardFileHeader; i: Word): PChar;
-  begin
-    Result := KeyboardMemory;
-    Inc(Result, kfh.dpStoreArray);
-    while i > 0 do
-    begin
-      Inc(Result, SizeOf(TKeyboardFileStore));
-      Dec(i);
-    end;
-  end;
-
-{var
-  kfh: PKeyboardFileHeader;}
-begin
-  nStores := 0;
-//  kfh := PKeyboardFileHeader(KeyboardMemory);
-  while event.kmx_info.store_offsets[nStores*2] <> $FFFF do
-  begin
-    StoreOffsets[nStores] := event.kmx_info.store_offsets[nStores*2+1];
-//    Stores[nStores].Store := PKeyboardFileStore(StoreOffset(kfh, di.StoreOffsets[nStores*2]))^;
-//    Stores[nStores].MatchPosition := di.StoreOffsets[nStores*2+1];
-    Inc(nStores);
-  end;
 end;
 
 initialization

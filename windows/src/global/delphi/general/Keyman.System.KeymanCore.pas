@@ -176,7 +176,7 @@ type
   );
 
   km_kbp_backspace_item = record
-    expected_type: uint8_t;            /// km_kbp_backspace_type
+    expected_type: uint8_t;            /// TODO: km_kbp_backspace_type
     expected_value: uintptr_t;         /// used mainly in unit tests
   end;
 
@@ -309,7 +309,7 @@ km_kbp_process_event(
 // keyboardprocessor_vkeys.h
 
 const
-// enum km_kbp_modifier_state
+// enum km_kbp_modifier_state - matches Keyman32 shift states
   KM_KBP_MODIFIER_LCTRL       = 1 shl 0;
   KM_KBP_MODIFIER_RCTRL       = 1 shl 1;
   KM_KBP_MODIFIER_LALT        = 1 shl 2;

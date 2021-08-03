@@ -26,10 +26,13 @@ uses
   UfrmDebugStatus_Child;
 
 type
+  TDebugStatus_SelectDeadkeyEvent = procedure(DeadKey: TDeadKeyInfo) of object;
+
   TfrmDebugStatus_DeadKeys = class(TfrmDebugStatus_Child)
     lbDeadkeys: TDebugListBox;
     procedure lbDeadkeysClick(Sender: TObject);
   private
+    FOnSelectDeadkey: TDebugStatus_SelectDeadkeyEvent;
     { Deadkey functions }
     procedure ClearDeadKeys;
 
@@ -37,8 +40,10 @@ type
     function GetHelpTopic: string; override;
 
   public
-    procedure UpdateDeadkeyDisplay(deadkeys: TDebugDeadkeyInfoList);
+    procedure UpdateDeadkeyDisplay;
     procedure DeselectDeadkeys;
+
+    property OnSelectDeadkey: TDebugStatus_SelectDeadkeyEvent read FOnSelectDeadkey write FOnSelectDeadkey;
   end;
 
 implementation
@@ -68,18 +73,21 @@ end;
 
 procedure TfrmDebugStatus_DeadKeys.lbDeadkeysClick(Sender: TObject);
 begin
+  if not Assigned(FOnSelectDeadkey) then
+    Exit;
   if lbDeadKeys.ItemIndex < 0
-    then DebugForm.SelectDeadKey(nil)
-    else DebugForm.SelectDeadKey(lbDeadKeys.Items.Objects[lbDeadKeys.ItemIndex] as TDeadKeyInfo);
+    then FOnSelectDeadKey(nil)
+    else FOnSelectDeadKey(lbDeadKeys.Items.Objects[lbDeadKeys.ItemIndex] as TDeadKeyInfo);
 end;
 
-procedure TfrmDebugStatus_DeadKeys.UpdateDeadkeyDisplay(deadkeys: TDebugDeadkeyInfoList);
+procedure TfrmDebugStatus_DeadKeys.UpdateDeadkeyDisplay;
 var
   dk: TDeadkeyInfo;
 begin
   ClearDeadKeys;
-  for dk in deadkeys do
-    lbDeadkeys.Items.AddObject('deadkey('+dk.Deadkey.Name+') ('+IntToStr(dk.Position)+')', dk);
+  if Assigned(DebugCore) then
+    for dk in DebugCore.Deadkeys do
+      lbDeadkeys.Items.AddObject('deadkey('+dk.Deadkey.Name+') ('+IntToStr(dk.Position)+')', dk);
 end;
 
 end.

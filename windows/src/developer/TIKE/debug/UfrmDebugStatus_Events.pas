@@ -21,7 +21,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DebugListBox, debugging, UfrmDebugStatus_Child;
+  Dialogs, StdCtrls, DebugListBox, debugging, UfrmDebugStatus_Child,
+  Keyman.System.Debug.DebugEvent;
 
 type
   TfrmDebugStatus_Events = class(TfrmDebugStatus_Child)
@@ -44,6 +45,7 @@ implementation
 
 uses
   Keyman.Developer.System.HelpTopics,
+  Keyman.System.KeymanCore,
   Keyman.System.KeymanCoreDebug,
 
   UKeyBitmap;
@@ -123,14 +125,15 @@ var
   s: string;
 begin
   case action.ActionType of
-    QIT_VKEYDOWN:    AddItem('vkeydown', action);
-    QIT_VKEYUP:      AddItem('vkeyup', action);
-    QIT_VSHIFTDOWN:  AddItem('vshiftdown', action);
-    QIT_VSHIFTUP:    AddItem('vshiftup', action);
-    QIT_CHAR:        AddItem('char', action);
-    QIT_DEADKEY:     AddItem('deadkey', action);
-    QIT_BELL:        AddItem('bell', action);
-    QIT_BACK:        AddItem('back', action);
+    KM_KBP_IT_EMIT_KEYSTROKE: AddItem('emit_keystroke', action);
+//    QIT_VSHIFTDOWN:  AddItem('vshiftdown', action);
+//    QIT_VSHIFTUP:    AddItem('vshiftup', action);
+    KM_KBP_IT_CHAR:        AddItem('char', action);
+    KM_KBP_IT_MARKER:     AddItem('marker', action);
+    KM_KBP_IT_ALERT:        AddItem('alert', action);
+    KM_KBP_IT_BACK:        AddItem('back', action);
+    KM_KBP_IT_PERSIST_OPT: AddItem('persist_opt', action);
+    KM_KBP_IT_INVALIDATE_CONTEXT:  AddItem('invalidate_context', action);
     else             AddItem('Unknown action ???', action);
   end;
 end;

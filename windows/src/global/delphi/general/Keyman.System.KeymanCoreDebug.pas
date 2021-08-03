@@ -79,7 +79,7 @@ pkm_kbp_state_debug_kmx_info = ^km_kbp_state_debug_kmx_info;
 
 {$ALIGN 8}
 km_kbp_state_debug_item = record
-  _type: uint32_t; // 32 bits is better optimized than 8 bits
+  _type: uint32_t; // TODO: _type as enum, 8 bit with padding? 32 bits is better optimized than 8 bits
   flags: uint32_t;
   key_info: km_kbp_state_debug_key_info;
   kmx_info: km_kbp_state_debug_kmx_info;

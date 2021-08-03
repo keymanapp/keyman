@@ -28,7 +28,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, debugging, ExtCtrls, PaintPanel, UfrmDebugStatus_Child, Vcl.StdCtrls,
-  regressiontest, UfrmDebug;
+  regressiontest, Keyman.System.Debug.DebugEvent;
 
 type
   TfrmDebugStatus_Key = class(TfrmDebugStatus_Child)
@@ -122,11 +122,11 @@ begin
   end
   else
   begin
-    CreateKeyBitmap(imgKeyCap.Picture.Bitmap, panKey.Color, key.ShiftFlags, key.VirtualKey, key.Character, KeyBitmap);
+    CreateKeyBitmap(imgKeyCap.Picture.Bitmap, panKey.Color, key.Modifiers, key.VirtualKey, #0, KeyBitmap);
 
     rte := TRegressionTestEvent.Create(FRegTest);   // I4809
     rte.VKey := key.VirtualKey;
-    rte.ShiftState := key.ShiftFlags;
+    rte.ShiftState := key.Modifiers; // these bitmasks are compatible
     FRegTest.Events.Add(rte);
 
     lbKeystrokeLog.ItemIndex := lbKeystrokeLog.Items.AddObject(rte.ShiftStateAsString + SKeyNames[rte.VKey], rte);   // I4809

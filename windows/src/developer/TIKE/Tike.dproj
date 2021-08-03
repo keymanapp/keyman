@@ -551,6 +551,8 @@
             <Form>frmDebugStatus_CallStack</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="debug\Keyman.System.Debug.DebugEvent.pas"/>
+        <DCCReference Include="debug\Keyman.System.Debug.DebugCore.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

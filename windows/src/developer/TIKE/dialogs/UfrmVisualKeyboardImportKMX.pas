@@ -303,11 +303,11 @@ begin
   begin
 //    AddDebug('WM_KEYMANDEBUG_ACTION');
 //    ShowMessage('data received: '+IntToStr(Message.wParam));
-    if Message.wParam = QIT_CHAR then
+{    if Message.wParam = QIT_CHAR then
     begin
 //      lb.items.Add('QIT_CHAR');
       data := data + WChar(Message.lParam);
-    end;
+    end;}
   end
 (*  else if Message.Msg = WM_KEYMANDEBUG_RULEMATCH then
   begin

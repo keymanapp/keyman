@@ -1,18 +1,18 @@
 (*
   Name:             UfrmDebugStatus
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Initial version
                     04 Dec 2006 - mcdurdin - Tweak display of debug pages, to Unicode
                     04 Jan 2007 - mcdurdin - Remove old code
@@ -43,10 +43,13 @@ uses
   debugkeyboard,
   DebugListBox,
   DebugListView,
+  KeymanDeveloperDebuggerMemo,
+  Keyman.System.Debug.DebugCore,
+  Keyman.System.Debug.DebugEvent,
   PaintPanel,
   RegressionTest,
-  UfrmDebug,
   UfrmDebugStatus_CallStack,
+  UfrmDebugStatus_Child,
   UfrmDebugStatus_Deadkeys,
   UfrmDebugStatus_Elements,
   UfrmDebugStatus_Events,
@@ -72,23 +75,25 @@ type
     tabDebugEvents: TTabSheet;
     procedure FormCreate(Sender: TObject);
   private
-    FDebugForm: TfrmDebug;
+    FChildren: TArray<TfrmDebugStatus_Child>;
     FCallStack: TfrmDebugStatus_CallStack;
     FDeadKeys: TfrmDebugStatus_DeadKeys;
     FElements: TfrmDebugStatus_Elements;
     FRegTest: TfrmDebugStatus_RegTest;
     FKey: TfrmDebugStatus_Key;
     FEvents: TfrmDebugStatus_Events;
+    FCurrentEvent: TDebugEvent;
 
-    procedure SetDebugForm(const Value: TfrmDebug);
     procedure SetDisplayFont(const Value: TFont);
+    procedure SetCurrentEvent(const Value: TDebugEvent);
 
   protected
     function GetHelpTopic: string; override;
   public
-    property DebugForm: TfrmDebug read FDebugForm write SetDebugForm;
-
     property DisplayFont: TFont write SetDisplayFont;
+    property CurrentEvent: TDebugEvent read FCurrentEvent write SetCurrentEvent;
+    procedure SetDebugCore(const Value: TDebugCore);
+    procedure SetDebugMemo(const Value: TKeymanDeveloperDebuggerMemo);
 
     property Key: TfrmDebugStatus_Key read FKey;
     property Elements: TfrmDebugStatus_Elements read FElements;
@@ -108,32 +113,39 @@ uses
 
 procedure TfrmDebugStatus.FormCreate(Sender: TObject);
 begin
-  //pagesDebug.ActivePage := tabDebugStores;
+  pagesDebug.ActivePage := tabDebugKey;
   inherited;
-  
+
+  SetLength(FChildren, 6);
   FKey := TfrmDebugStatus_Key.Create(Self);
   FKey.Parent := tabDebugKey;
   FKey.Visible := True;
+  FChildren[0] := FKey;
 
   FElements := TfrmDebugStatus_Elements.Create(Self);
   FElements.Parent := tabDebugStores;
   FElements.Visible := True;
+  FChildren[1] := FElements;
 
   FCallStack := TfrmDebugStatus_CallStack.Create(Self);
   FCallStack.Parent := tabDebugCallStack;
   FCallStack.Visible := True;
+  FChildren[2] := FCallstack;
 
   FDeadKeys := TfrmDebugStatus_DeadKeys.Create(Self);
   FDeadKeys.Parent := tabDebugDeadkeys;
   FDeadKeys.Visible := True;
+  FChildren[3] := FDeadKeys;
 
   FRegTest := TfrmDebugStatus_RegTest.Create(Self);
   FRegTest.Parent := tabDebugRegressionTesting;
   FRegTest.Visible := True;
+  FChildren[4] := FRegTest;
 
   FEvents := TfrmDebugStatus_Events.Create(Self);
   FEvents.Parent := tabDebugEvents;
   FEvents.Visible := True;
+  FChildren[5] := FEvents;
 end;
 
 function TfrmDebugStatus.GetHelpTopic: string;
@@ -141,34 +153,43 @@ begin
   Result := SHelpTopic_Context_DebugStatus;
 end;
 
-procedure TfrmDebugStatus.SetDebugForm(const Value: TfrmDebug);
+procedure TfrmDebugStatus.SetCurrentEvent(const Value: TDebugEvent);
 var
-  FDebugKeyboard: TDebugKeyboard;
+  child: TfrmDebugStatus_Child;
 begin
-  FDebugForm := Value;
-  Visible := Assigned(Value);
+  FCurrentEvent := Value;
+  for child in FChildren do
+    child.SetCurrentEvent(Value);
+end;
 
-  if Assigned(Value) then FDebugKeyboard := Value.GetDebugKeyboard
-  else FDebugKeyboard := nil;
+procedure TfrmDebugStatus.SetDebugCore(const Value: TDebugCore);
+var
+  child: TfrmDebugStatus_Child;
+begin
+  for child in FChildren do
+  begin
+    child.SetDebugCore(Value);
+  end;
+end;
 
-  FKey.SetDebugKeyboard(FDebugKeyboard);
-  FElements.SetDebugKeyboard(FDebugKeyboard);
-  FCallStack.SetDebugKeyboard(FDebugKeyboard);
-  FDeadKeys.SetDebugKeyboard(FDebugKeyboard);
-  FRegTest.SetDebugKeyboard(FDebugKeyboard);
-  FEvents.SetDebugKeyboard(FDebugKeyboard);
+procedure TfrmDebugStatus.SetDebugMemo(const Value: TKeymanDeveloperDebuggerMemo);
+var
+  child: TfrmDebugStatus_Child;
+begin
+  for child in FChildren do
+  begin
+    child.SetDebugMemo(Value);
+  end;
 end;
 
 procedure TfrmDebugStatus.SetDisplayFont(const Value: TFont);
+var
+  child: TfrmDebugStatus_Child;
 begin
-  //FDisplayFont.Assign(Value);
-
-  FKey.SetDisplayFont(Value);
-  FElements.SetDisplayFont(Value);
-  FCallStack.SetDisplayFont(Value);
-  FDeadKeys.SetDisplayFont(Value);
-  FRegTest.SetDisplayFont(Value);
-  FEvents.SetDisplayFont(Value);
+  for child in FChildren do
+  begin
+    child.SetDisplayFont(Value);
+  end;
 end;
 
 end.

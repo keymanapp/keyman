@@ -1,18 +1,18 @@
 (*
   Name:             UfrmDebugStatus_Child
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Initial version
                     18 May 2012 - mcdurdin - I3323 - V9.0 - Change from Plus-MemoU to Plus-Memo
                     03 Aug 2015 - mcdurdin - I4809 - Track keystrokes in debug status form
@@ -32,10 +32,12 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
+
   KeymanDeveloperDebuggerMemo,
+  Keyman.System.Debug.DebugCore,
+  Keyman.System.Debug.DebugEvent,
   debugkeyboard,
   UfrmTike,
-  UfrmDebug,
   UframeTextEditor;
 
 type
@@ -46,14 +48,17 @@ type
     FDebugKeyboard: TDebugKeyboard;
     FDisplayFont: TFont;
     FEditorMemo: TframeTextEditor;
+    FDebugMemo: TKeymanDeveloperDebuggerMemo;
+    FCurrentEvent: TDebugEvent;
+    FDebugCore: TDebugCore;
   protected
     property EditorMemo: TframeTextEditor read FEditorMemo;
     property debugkeyboard: TDebugKeyboard read FDebugKeyboard;
     property DisplayFont: TFont read FDisplayFont;
+    property CurrentEvent: TDebugEvent read FCurrentEvent;
+    property DebugCore: TDebugCore read FDebugCore;
 
     function memoDebug: TKeymanDeveloperDebuggerMemo;
-    function frmDebugStatus: TForm;
-    function DebugForm: TfrmDebug;
 
     procedure DebugKeyboardChanged; virtual;
     procedure DisplayFontChanged; virtual;
@@ -61,21 +66,16 @@ type
     procedure SetDisplayFont(Value: TFont);
     procedure SetDebugKeyboard(const Value: TDebugKeyboard);
     procedure SetEditorMemo(Value: TframeTextEditor);
+    procedure SetDebugMemo(Value: TKeymanDeveloperDebuggerMemo);
+    procedure SetCurrentEvent(const Value: TDebugEvent);
+    procedure SetDebugCore(const Value: TDebugCore);
   end;
 
 implementation
 
-uses
-  UfrmDebugStatus;
-
 {$R *.dfm}
 
 { TfrmDebugStatus_Child }
-
-function TfrmDebugStatus_Child.DebugForm: TfrmDebug;
-begin
-  Result := (frmDebugStatus as TfrmDebugStatus).DebugForm;
-end;
 
 procedure TfrmDebugStatus_Child.DebugKeyboardChanged;
 begin
@@ -99,23 +99,30 @@ begin
   FDisplayFont.Free;
 end;
 
-function TfrmDebugStatus_Child.frmDebugStatus: TForm;
-begin
-  Result := Owner as TForm;
-end;
-
 function TfrmDebugStatus_Child.memoDebug: TKeymanDeveloperDebuggerMemo;
 begin
-  if DebugForm <> nil then   // I4809
-    Result := DebugForm.memo
-  else
-    Result := nil;
+  Result := FDebugMemo;
+end;
+
+procedure TfrmDebugStatus_Child.SetCurrentEvent(const Value: TDebugEvent);
+begin
+  FCurrentEvent := Value;
+end;
+
+procedure TfrmDebugStatus_Child.SetDebugCore(const Value: TDebugCore);
+begin
+  FDebugCore := Value;
 end;
 
 procedure TfrmDebugStatus_Child.SetDebugKeyboard(const Value: TDebugKeyboard);
 begin
   FDebugKeyboard := Value;
   DebugKeyboardChanged;
+end;
+
+procedure TfrmDebugStatus_Child.SetDebugMemo(Value: TKeymanDeveloperDebuggerMemo);
+begin
+  FDebugMemo := Value;
 end;
 
 procedure TfrmDebugStatus_Child.SetDisplayFont(Value: TFont);
