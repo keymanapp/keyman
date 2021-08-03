@@ -553,6 +553,7 @@
         </DCCReference>
         <DCCReference Include="debug\Keyman.System.Debug.DebugEvent.pas"/>
         <DCCReference Include="debug\Keyman.System.Debug.DebugCore.pas"/>
+        <DCCReference Include="main\Keyman.System.VisualKeyboardImportKMX.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

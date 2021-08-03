@@ -1,20 +1,10 @@
-(*
-  Name:             UfrmDebugStatus_CallStack
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      14 Sep 2006
-
-  Modified Date:    14 Sep 2006
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          14 Sep 2006 - mcdurdin - Initial version
-*)
+{
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Displays a list of debug events and actions for current keystroke. This is
+ * intended for internal use only and would not normally be visible for end
+ * users of Keyman Developer.
+}
 unit UfrmDebugStatus_Events;
 
 interface

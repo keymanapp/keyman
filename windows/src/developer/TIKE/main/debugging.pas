@@ -116,16 +116,6 @@ const
   K_NOTSCROLLFLAG  = $2000; // Scroll lock NOT on
   K_ISVIRTUALKEY   = $4000; // It is a Virtual Key Sequence
 
-var
-	WM_KEYMANDEBUG_CANDEBUG,
- 	WM_KEYMANDEBUG_GETUNICODESTATUS,
-	WM_KEYMANDEBUG_GETCONTEXT,
-	WM_KEYMANDEBUG_ACTION,
- 	WM_KEYMANDEBUG_RULEMATCH,
-  WM_KEYMANKEYDOWN: Word;
-
-
-
 procedure SetShiftState(hwnd: HWND; AShiftFlags: Integer);
 procedure ClearShiftState(hwnd: HWND; AShiftFlags: Integer);
 function SaveShiftState: Integer;
@@ -232,11 +222,4 @@ begin
 	SetKeyboardState(kbstate);
 end;
 
-initialization
-	WM_KEYMANDEBUG_CANDEBUG         := RegisterWindowMessage('WM_KEYMANDEBUG_CANDEBUG');
-	WM_KEYMANDEBUG_GETUNICODESTATUS := RegisterWindowMessage('WM_KEYMANDEBUG_GETUNICODESTATUS');
-	WM_KEYMANDEBUG_GETCONTEXT       := RegisterWindowMessage('WM_KEYMANDEBUG_GETCONTEXT');
-	WM_KEYMANDEBUG_ACTION           := RegisterWindowMessage('WM_KEYMANDEBUG_ACTION');
-	WM_KEYMANDEBUG_RULEMATCH        := RegisterWindowMessage('WM_KEYMANDEBUG_RULEMATCH');
-  WM_KEYMANKEYDOWN                := RegisterWindowMessage('WM_KEYMANKEYDOWN');
 end.

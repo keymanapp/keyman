@@ -1,3 +1,8 @@
+{
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Debug interface for Keyman Core, matches keyboardprocessor_debug.h
+}
 unit Keyman.System.KeymanCoreDebug;
 
 interface

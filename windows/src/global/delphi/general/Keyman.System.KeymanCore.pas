@@ -1,11 +1,14 @@
+{
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Interface for Keyman Core, matches keyboardprocessor.h
+}
 unit Keyman.System.KeymanCore;
 
 interface
 
 {$WARN SYMBOL_PLATFORM OFF}
 {$ALIGN 8}
-
-// This matches keyboardprocessor.h
 
 type
   uint8_t = Byte;

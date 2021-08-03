@@ -290,7 +290,8 @@ uses
   Keyman.System.KeymanCoreDebug in '..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas',
   UfrmDebugStatus_CallStack in 'debug\UfrmDebugStatus_CallStack.pas' {frmDebugStatus_CallStack},
   Keyman.System.Debug.DebugEvent in 'debug\Keyman.System.Debug.DebugEvent.pas',
-  Keyman.System.Debug.DebugCore in 'debug\Keyman.System.Debug.DebugCore.pas';
+  Keyman.System.Debug.DebugCore in 'debug\Keyman.System.Debug.DebugCore.pas',
+  Keyman.System.VisualKeyboardImportKMX in 'main\Keyman.System.VisualKeyboardImportKMX.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

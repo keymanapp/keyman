@@ -84,7 +84,14 @@ type
       state: pkm_kbp_state;
       vk: uint16_t;
       modifier_state: uint16_t;
-      debugkeyboard: TDebugKeyboard): Boolean;
+      debugkeyboard: TDebugKeyboard
+    ): Boolean; overload;
+
+    function AddStateItems(
+      state: pkm_kbp_state;
+      vk: uint16_t;
+      modifier_state: uint16_t
+    ): Boolean; overload;
   end;
 
 implementation
@@ -289,6 +296,23 @@ begin
   begin
     ev.Rule.Key.VirtualKey := vk;
     ev.Rule.Key.Modifiers := modifier_state;
+  end;
+end;
+
+function TDebugEventList.AddStateItems(
+  state: pkm_kbp_state;
+  vk: uint16_t;
+  modifier_state: uint16_t
+): Boolean;
+var
+  action: pkm_kbp_action_item;
+begin
+  Result := True;
+  action := km_kbp_state_action_items(state, nil);
+  while (action._type <> KM_KBP_IT_END) do
+  begin
+    Result := Result and AddActionItem(vk, action);
+    Inc(action);
   end;
 end;
 
