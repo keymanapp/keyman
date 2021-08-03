@@ -527,12 +527,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         url = url.toLowerCase();
         try {
           if (progressDialog == null) {
-            progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
-            progressDialog.setCancelable(true); // Cancelable in case there's exceptions
-            progressDialog.show();
-
-            // Download the KMP to app cache
             Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
             downloadIntent.putExtra("url", url);
             downloadIntent.putExtra("filename", filename);
@@ -541,6 +535,19 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             downloadIntent.putExtra("receiver", resultReceiver);
             downloadIntent.putExtra("installMode", installMode);
 
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
+            progressDialog.setCancelable(true); // Cancelable in case there's exceptions
+            progressDialog.show();
+            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+              @Override
+              public void onCancel(DialogInterface dialog) {
+                // stopService(downloadIntent); has no effect
+                cleanupPackageInstall();
+              }
+            });
+
+            // Download the KMP to app cache
             startService(downloadIntent);
           }
         } catch (Exception e) {
