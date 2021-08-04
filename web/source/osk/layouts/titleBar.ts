@@ -1,13 +1,16 @@
 /// <reference path="mouseDragOperation.ts" />
+/// <reference path="../oskViewComponent.ts" />
 
 namespace com.keyman.osk.layouts {
-  export class TitleBar {
+  export class TitleBar implements OSKViewComponent {
     private _element: HTMLDivElement;
     private _unpinButton: HTMLDivElement;
     private _closeButton: HTMLDivElement;
     private _helpButton: HTMLDivElement;
     private _configButton: HTMLDivElement;
     private _caption: HTMLSpanElement;
+
+    private static readonly DISPLAY_HEIGHT = ParsedLengthStyle.inPixels(20); // As set in kmwosk.css
 
     public constructor(dragHandler?: MouseDragOperation) {
       this._element = this.buildTitleBar();
@@ -16,6 +19,10 @@ namespace com.keyman.osk.layouts {
       if(dragHandler) {
         this.element.onmousedown = dragHandler.mouseDownHandler;
       }
+    }
+
+    public get layoutHeight(): ParsedLengthStyle {
+      return TitleBar.DISPLAY_HEIGHT;
     }
 
     private mouseCancellingHandler: (ev: MouseEvent) => boolean = function(ev: MouseEvent) {
@@ -162,6 +169,10 @@ namespace com.keyman.osk.layouts {
       Limg.onmousedown = this.mouseCancellingHandler;
 
       return Limg;
+    }
+
+    public refreshLayout() {
+      // The title bar is adaptable as it is and needs no adjustments.
     }
   }
 }

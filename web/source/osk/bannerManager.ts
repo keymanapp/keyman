@@ -1,4 +1,5 @@
 /// <reference path="banner.ts" />
+/// <reference path="oskViewComponent.ts" />
 
 namespace com.keyman.osk {
   /**
@@ -49,7 +50,7 @@ namespace com.keyman.osk {
    *       needs to reserve this space (i.e: Keyman for iOS),
    *       rather than as its standalone app.
    */
-  export class BannerManager {
+  export class BannerManager implements OSKViewComponent {
     private _activeType: BannerType;
     private _options: BannerOptions = {};
     private bannerContainer: HTMLDivElement;
@@ -278,5 +279,11 @@ namespace com.keyman.osk {
         this.activeBanner.height = h;
       }
     }
+
+    public get layoutHeight(): ParsedLengthStyle {
+      return ParsedLengthStyle.inPixels(this.height);
+    }
+
+    public refreshLayout() {};
   }
 }
