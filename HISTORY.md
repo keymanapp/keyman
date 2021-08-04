@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.93 alpha 2021-08-04
+
+* fix(linux): Improve uninstallation (#5505)
+* refactor(linux): Reformat keycode_to_vk table (#5508)
+* refactor(linux): Cleanup import of os.path (#5529)
+* chore(common/core): Allow shell script for kmcomp (#5498)
+* refactor(common/core): Move comment to where it belongs (#5518)
+
 ## 15.0.92 alpha 2021-08-03
 
 * fix(android/app): Check Play Store release notes less than 500 chars (#5535)
