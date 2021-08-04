@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import logging
-import os.path
+import os
 from shutil import rmtree
 
 from keyman_config.fcitx_util import is_fcitx_running
