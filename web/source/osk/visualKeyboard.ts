@@ -222,7 +222,7 @@ namespace com.keyman.osk {
       this._width = width;
       this._height = height;
 
-      if(!pending && this.kbdDiv) {
+      if(this.kbdDiv) {
         this.kbdDiv.style.width    = width ? this._width + 'px' : '';
         this.kbdDiv.style.height   = height ? this._height + 'px' : '';
 
@@ -230,7 +230,9 @@ namespace com.keyman.osk {
           this.kbdDiv.style.fontSize = height ? ((this._height/8) + 'px') : '';
         }
 
-        this.refreshLayout();
+        if(!pending) {
+          this.refreshLayout();
+        }
       }
     }
 
