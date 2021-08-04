@@ -1,3 +1,12 @@
+    {$ifdef VER340}
+     {$define DELPHI_5_UP}
+     {$define DELPHI_6_UP}
+     {$define DELPHI_7_UP}
+     {$define DELPHI_8_UP}
+     {$define DELPHI_9_UP}
+     {$define DELPHI_10_UP}
+    {$endif}
+
     {$ifdef VER330}
      {$define DELPHI_5_UP}
      {$define DELPHI_6_UP}

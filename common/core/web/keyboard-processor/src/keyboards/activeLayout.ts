@@ -636,6 +636,35 @@ namespace com.keyman.keyboards {
     }
 
     /**
+     * Refer to https://github.com/keymanapp/keyman/issues/254, which mentions
+     * KD-11 from a prior issue-tracking system from the closed-source days that
+     * resulted in an unintended extra empty row.
+     * 
+     * It'll be pretty rare to see a keyboard affected by the bug, but we don't
+     * 100% control all keyboards out there, so it's best we make sure the edge
+     * case is covered.
+     * 
+     * @param layers The layer group to be loaded for the form factor.  Will be
+     *               mutated by this operation.
+     */
+    static correctLayerEmptyRowBug(layers: LayoutLayer[]) {
+      for(let n=0; n<layers.length; n++) {
+        let layer=layers[n];
+        let rows=layer['row'];
+        let i: number;
+        for(i=rows.length; i>0; i--) {
+          if(rows[i-1]['key'].length > 0) {
+            break;
+          }
+        }
+
+        if(i < rows.length) {
+          rows.splice(i-rows.length,rows.length-i);
+        }
+      }
+    }
+
+    /**
      *
      * @param layout
      * @param formFactor
@@ -651,6 +680,7 @@ namespace com.keyman.keyboards {
       let layerMap: {[layerId: string]: ActiveLayer} = {};
       var rows: LayoutRow[];
 
+      ActiveLayout.correctLayerEmptyRowBug(layout['layer']);
       layers=layout['layer'];
 
       // ***Delete any empty rows at the end added by compiler bug...

@@ -650,7 +650,9 @@ process_backspace_action(
   size_t num_action_items
 ) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
-  if (keyman->char_buffer != NULL) {
+  if (action_items[i].backspace.expected_type == KM_KBP_IT_MARKER) {
+    g_message("skipping marker type");
+  } else if (keyman->char_buffer != NULL) {
     // ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
     g_message("removing one utf8 char from CHAR buffer");
     glong end_pos = g_utf8_strlen(keyman->char_buffer, -1);

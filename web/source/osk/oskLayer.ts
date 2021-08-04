@@ -33,15 +33,16 @@ namespace com.keyman.osk {
       }
 
       // Set font for layer if defined in layout
-      if('font' in layout) {
-        gs.fontFamily=layout['font'];
-      } else {
-        gs.fontFamily='';
-      }
+      gs.fontFamily = 'font' in layout ? layout['font'] : '';
 
       this.nextlayer = gDiv['layer'] = layer['id'];
       if(typeof layer['nextlayer'] == 'string') {
-        this.nextlayer = layer['nextlayer'];
+        // The gDiv['nextLayer'] is no longer referenced in KMW 15.0+, but is
+        // maintained for partial back-compat in case any site devs actually 
+        // relied on its value from prior versions.
+        //
+        // We won't pay attention to any mutations to the gDiv copy, though.
+        gDiv['nextLayer'] = this.nextlayer = layer['nextlayer'];
       }
 
       // Create a DIV for each row of the group

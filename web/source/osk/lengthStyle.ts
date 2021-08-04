@@ -11,20 +11,7 @@ namespace com.keyman.osk {
     public readonly special: 'em' | 'rem';
 
     public constructor(style: LengthStyle | string) {
-      if(typeof style == 'string') {
-        const parsed = ParsedLengthStyle.parseLengthStyle(style);
-        this.val = parsed.val;
-        this.absolute = parsed.absolute;
-        if(parsed.special) {
-          this.special = parsed.special;
-        }
-      } else {
-        this.val = style.val;
-        this.absolute = style.absolute;
-        if(style.special) {
-          this.special = style.special;
-        }
-      }
+      Object.assign(this, typeof style == 'string' ? ParsedLengthStyle.parseLengthStyle(style) : style);
     }
 
     public get styleString(): string {
@@ -64,35 +51,26 @@ namespace com.keyman.osk {
     }
 
     private static parseLengthStyle(spec: string): LengthStyle {
-      var val: number;
+      const val = parseFloat(spec);
   
-      if(spec.indexOf('px') != -1) {
-        val = parseFloat(spec);
-        return {val: val, absolute: true};
-      } else if(spec.indexOf('pt') != -1) {
-        // 16 px ~= 12 pt.
-        // Reference: https://kyleschaeffer.com/css-font-size-em-vs-px-vs-pt-vs-percent
-        val = parseFloat(spec);
-        return {val: (4 * val / 3), absolute: true};
-      } else if(spec.indexOf('%') != -1) {
-        val = parseFloat(spec);
-        return {val: val/100, absolute: false};
-      } else if(!isNaN(val = Number(spec))) {
-        // Note:  this one is NOT natively handled by browsers!
-        //        We'll treat it as if it were 'pt', since that's likely the user's
-        //        most familiar font size unit.
-        return {val: (4 * val / 3), absolute: true};
-      } else if(spec.indexOf('rem') != -1) {
-        val = parseFloat(spec);
-        return {val: val, absolute: false, special: 'rem'};
-      } else if(spec.indexOf('em') != -1) {
-        val = parseFloat(spec);
-        return {val: val, absolute: false, special: 'em'};
-      } else {
+      if(isNaN(val)) {
         // Cannot parse.
         console.error("Could not properly parse specified length style info: '" + spec + "'.");
         return null;
       }
+
+      return spec.indexOf('px') != -1 ? {val: val, absolute: true} :
+        // 16 px ~= 12 pt.
+        // Reference: https://kyleschaeffer.com/css-font-size-em-vs-px-vs-pt-vs-percent
+        spec.indexOf('pt') != -1 ? {val: (4 * val / 3), absolute: true} :
+        spec.indexOf('%') != -1 ? {val: val/100, absolute: false} :
+        spec.indexOf('rem') != -1 ? {val: val, absolute: false, special: 'rem'} :
+        spec.indexOf('em') != -1 ?  {val: val, absolute: false, special: 'em'} :
+        // At this point, assuming either Number or number in a string without units
+        // Note:  this one is NOT natively handled by browsers!
+        //        We'll treat it as if it were 'pt', since that's likely the user's
+        //        most familiar font size unit.
+        {val: (4 * val / 3), absolute: true};
     }
   }
 }
