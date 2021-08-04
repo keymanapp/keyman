@@ -11,6 +11,17 @@ from keyman_config.ibus_util import uninstall_from_ibus, get_ibus_bus, restart_i
 from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_ibus_keyboard_id, is_gnome_shell
 
 
+def delete_dir(dir):
+    if not os.path.isdir(dir):
+        logging.error("%s is not a directory", dir)
+        return False
+    if os.path.islink(dir):
+        os.unlink(dir)
+    else:
+        rmtree(dir)
+    return True
+
+
 def uninstall_kmp_shared(packageID):
     """
     Uninstall a kmp from /usr/local/share/keyman
@@ -36,7 +47,7 @@ def uninstall_kmp_shared(packageID):
             logging.error(
                 "You do not have permissions to uninstall the documentation. You need to run this with `sudo`")
             exit(3)
-        rmtree(kbdocdir)
+        delete_dir(kbdocdir)
         logging.info("Removed documentation directory: %s", kbdocdir)
     else:
         logging.info("No documentation directory")
@@ -45,7 +56,7 @@ def uninstall_kmp_shared(packageID):
             logging.error(
                 "You do not have permissions to uninstall the font files. You need to run this with `sudo`")
             exit(3)
-        rmtree(kbfontdir)
+        delete_dir(kbfontdir)
         logging.info("Removed font directory: %s", kbfontdir)
     else:
         logging.info("No font directory")
@@ -60,7 +71,7 @@ def uninstall_kmp_shared(packageID):
     else:
         logging.warning("could not uninstall keyboards")
 
-    rmtree(kbdir)
+    delete_dir(kbdir)
     logging.info("Removed keyman directory: %s", kbdir)
     logging.info("Finished uninstalling shared keyboard: %s", packageID)
 
@@ -126,11 +137,11 @@ def uninstall_kmp_user(packageID):
             uninstall_keyboards_from_ibus(keyboards, kbdir)
     else:
         logging.warning("could not uninstall keyboards")
-    rmtree(kbdir)
+    delete_dir(kbdir)
     logging.info("Removed user keyman directory: %s", kbdir)
     fontdir = get_keyman_font_dir(InstallLocation.User, packageID)
     if os.path.isdir(fontdir):
-        rmtree(fontdir)
+        delete_dir(fontdir)
         logging.info("Removed user keyman font directory: %s", fontdir)
     logging.info("Finished uninstalling local keyboard: %s", packageID)
 
