@@ -4,7 +4,7 @@
  * Description: Used for apply core processor actions to
  *              Keyman for Windows engine.
  */
-#include "pch.h" 
+#include "pch.h"
 
 static BOOL processUnicodeChar(AITIP* app, const km_kbp_action_item* actionItem) {
   if (Uni_IsSMP(actionItem->character)) {
@@ -54,9 +54,9 @@ static BOOL processPersistOpt(
     if (eventStatus != KM_KBP_STATUS_OK)
     {
       // log warning "problem saving option for km_kbp_keyboard");
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Problems saving optionf for keybooard [%s].", activeKeyboard->Name);
+      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Error %d saving option for keyboard [%s].", eventStatus, activeKeyboard->Name);
     }
-    
+
     for (int i = 0; i < 2; i++) {
       delete[] keyboardOpts[i].key;
       delete[] keyboardOpts[i].value;
