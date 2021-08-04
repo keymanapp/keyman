@@ -122,6 +122,7 @@ type
 
   private
     FDebugCore: TDebugCore;
+    FDeadkeys: TDebugDeadkeyInfoList;
     FEditorMemo: TframeTextEditor;
 
     FDebugFileName: WideString;
@@ -258,6 +259,7 @@ begin
   inherited;
 
   FBreakpoints := TDebugBreakpoints.Create;
+  FDeadkeys := TDebugDeadkeyInfoList.Create;
 
   FExecutionPointLine := -1;
   FUIStatus := duiInvalid;
@@ -269,6 +271,8 @@ begin
 
   frmDebugStatus.SetDebugMemo(memo);
   frmDebugStatus.Deadkeys.OnSelectDeadkey := SelectDeadkey;
+  frmDebugStatus.DeadKeys.Deadkeys := FDeadkeys;
+  frmDebugStatus.RegTest.Deadkeys := FDeadkeys;
   frmDebugStatus.Visible := True;
 end;
 
@@ -279,6 +283,8 @@ begin
   FreeAndNil(FEvents);
   UninitDeadkeys;
   frmDebugStatus.Deadkeys.OnSelectDeadkey := nil;
+  frmDebugStatus.DeadKeys.Deadkeys := nil;
+  frmDebugStatus.RegTest.Deadkeys := nil;
   frmDebugStatus.Visible := False;
 end;
 
@@ -395,7 +401,7 @@ begin
     else if Ord(ch) = $FFFC then
     begin
       context_items[n]._type := KM_KBP_CT_MARKER;
-      dk := FDebugCore.Deadkeys.GetFromPosition(i-1);
+      dk := FDeadkeys.GetFromPosition(i-1);
       Assert(Assigned(dk));
       context_items[n].marker := dk.Deadkey.Value+1; // TODO: remove +1 -1 messes for deadkey codes //GetDeadkeyMarker(i);
     end
@@ -638,7 +644,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         begin
           Assert(m >= 1);
           Assert(memo.Text[m] = #$FFFC);
-          dk := FDebugCore.Deadkeys.GetFromPosition(m-1);
+          dk := FDeadkeys.GetFromPosition(m-1);
           Assert(Assigned(dk));
           dk.Delete;
           Dec(m);
@@ -658,7 +664,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         begin
           while (m >= 1) and (memo.Text[m] = #$FFFC) do
           begin
-            dk := FDebugCore.Deadkeys.GetFromPosition(m-1);
+            dk := FDeadkeys.GetFromPosition(m-1);
             Assert(Assigned(dk));
             dk.Delete;
             Dec(m);
@@ -675,7 +681,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
           // Also delete deadkeys to left of current character
           while (m >= 1) and (memo.Text[m] = #$FFFC) do
           begin
-            dk := FDebugCore.Deadkeys.GetFromPosition(m-1);
+            dk := FDeadkeys.GetFromPosition(m-1);
             Assert(Assigned(dk));
             dk.Delete;
             Dec(m);
@@ -720,7 +726,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
       memo.SelLength := 0;
       dk.Position := memo.SelStart - 1;
-      FDebugCore.Deadkeys.Add(dk);
+      FDeadkeys.Add(dk);
       //PostMessage(memo.Handle, WM_UNICHAR, $FFFC, 0); Application.ProcessMessages;
       UpdateDeadkeyDisplay;
     end;
@@ -885,6 +891,7 @@ begin
   ExecutionPointLine := -1;
   ClearDeadkeys;  // I1699
   CleanupCoreState;
+  memo.Text := '';
 end;
 
 procedure TfrmDebug.SetupDebug;
@@ -1169,11 +1176,11 @@ var
   Found: Boolean;
 begin
   Found := False;
-  for i := FDebugCore.Deadkeys.Count - 1 downto 0 do
-    if FDebugCore.Deadkeys[i].Deleted then
+  for i := FDeadkeys.Count - 1 downto 0 do
+    if FDeadkeys[i].Deleted then
     begin
       ClearDeadkeyStyle;
-      FDebugCore.Deadkeys.Delete(i);
+      FDeadkeys.Delete(i);
       Found := True;
     end;
   if Found then UpdateDeadkeyDisplay;
@@ -1195,14 +1202,14 @@ end;
 procedure TfrmDebug.ClearDeadkeys;
 begin
   ClearDeadkeyStyle;
-  if Assigned(FDebugCore) then
-    FDebugCore.Deadkeys.Clear;
+  FDeadkeys.Clear;
   UpdateDeadkeyDisplay;
 end;
 
 procedure TfrmDebug.UninitDeadkeys;
 begin
   ClearDeadkeys;
+  FreeAndNil(FDeadkeys);
 end;
 
 procedure TfrmDebug.ClearDeadkeyStyle;
@@ -1325,10 +1332,10 @@ begin
     begin
       sgChars.Objects[J, 0] := Pointer(1);
       sgChars.Cells[J, 0] := '???';
-      for K := 0 to FDebugCore.Deadkeys.Count-1 do
-        if FDebugCore.Deadkeys[K].Position = I-1 then
+      for K := 0 to FDeadkeys.Count-1 do
+        if FDeadkeys[K].Position = I-1 then
         begin
-          sgChars.Cells[J, 0] := FDebugCore.Deadkeys[K].Deadkey.Name;
+          sgChars.Cells[J, 0] := FDeadkeys[K].Deadkey.Name;
           break;
         end;
       sgChars.Cells[J, 1] := 'Deadkey';

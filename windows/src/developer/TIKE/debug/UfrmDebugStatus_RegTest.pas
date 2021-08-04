@@ -28,7 +28,7 @@ uses
   System.Types,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, DebugListBox, Buttons, DebugBitBtn, ExtCtrls, Menus,
-  regressiontest, UfrmDebugStatus_Child,
+  regressiontest, UfrmDebugStatus_Child, debugdeadkeys,
   Keyman.System.Debug.DebugEvent;
 
 type
@@ -68,6 +68,7 @@ type
     FRegTestRunning: Boolean;
     FRegTest: TRegressionTest;
     FRegTestNum: Integer;
+    FDeadkeys: TDebugDeadkeyInfoList;
 
     procedure SetRegTestLogging(const Value: Boolean);
     procedure EnableRegTestControls;
@@ -76,6 +77,7 @@ type
     function RegTestValid: Boolean;
     procedure RegTestAddLog(rte: TRegressionTestEvent);
     procedure BatchRegTest;
+    procedure SetDeadkeys(const Value: TDebugDeadkeyInfoList);
 
   protected
     function GetHelpTopic: string; override;
@@ -91,6 +93,8 @@ type
     property RegTestLogging: Boolean read FRegTestLogging write SetRegTestLogging;
     property RegTestRunning: Boolean read FRegTestRunning write SetRegTestRunning;
     property RegTestNum: Integer read FRegTestNum write FRegTestNum;
+
+    property Deadkeys: TDebugDeadkeyInfoList read FDeadkeys write SetDeadkeys;
   end;
 
 implementation
@@ -98,7 +102,6 @@ implementation
 uses
   Keyman.Developer.System.HelpTopics,
 
-  debugDeadkeys,
   KeyNames,
   TextFileFormat,
   UfrmEditor,
@@ -213,6 +216,12 @@ begin
   mnuDebugRegTestOpen.Enabled := not RegTestRunning and not RegTestLogging;
 end;
 
+procedure TfrmDebugStatus_RegTest.SetDeadkeys(
+  const Value: TDebugDeadkeyInfoList);
+begin
+  FDeadkeys := Value;
+end;
+
 procedure TfrmDebugStatus_RegTest.SetRegTestLogging(const Value: Boolean);
 begin
   FRegTestLogging := Value;
@@ -246,7 +255,8 @@ var
   ws: WideString;
 begin
   ws := memoDebug.Text;
-  DebugCore.Deadkeys.FillDeadkeys(0, ws);
+  if Assigned(FDeadkeys) then
+    FDeadkeys.FillDeadkeys(0, ws);
   Result := FRegTest.Events[FRegTest.CurrentEvent].PostContext = ws;
 end;
 
@@ -274,7 +284,8 @@ begin
   rte := FRegTest.Events[FRegTest.Events.Count - 1];
 
   ws := memoDebug.Text;
-  DebugCore.Deadkeys.FillDeadkeys(0, ws);
+  if Assigned(FDeadkeys) then
+    FDeadkeys.FillDeadkeys(0, ws);
 
   rte.PostContext := ws;
 end;
