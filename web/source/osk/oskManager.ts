@@ -40,18 +40,12 @@ namespace com.keyman.osk {
     keyCodes = text.Codes.keyCodes;
 
     public constructor() {
-      super();
+      super(com.keyman.singleton.util.device.coreSpec);
 
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      // OSK initialization - create DIV and set default styles
-
-      this._Box = util._CreateElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
       document.body.appendChild(this._Box);
-
-      // Install the default OSK stylesheet
-      util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
 
       // For mouse click to prevent loss of focus
       util.attachDOMEvent(this._Box, 'mousedown', function(obj){
@@ -86,7 +80,7 @@ namespace com.keyman.osk {
       this.loadCookie();
 
       // Predictive-text hooks.
-      const bannerMgr = this.bannerView = new BannerManager();
+      const bannerMgr = this.bannerView;
       const _this = this;
 
       // Register a listener for model change events so that we can hot-swap the banner as needed.
@@ -102,6 +96,12 @@ namespace com.keyman.osk {
 
         return true;
       });
+
+      // Add header element to OSK only for desktop browsers
+      if(util.device.formFactor == 'desktop') {
+        const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+        this.headerView = layout.titleBar;
+      }
     }
 
     /**
@@ -115,172 +115,30 @@ namespace com.keyman.osk {
       this._Box = null;
     }
 
-    /**
-     * Function     _Load
-     * Scope        Private
-     * Description  OSK initialization when keyboard selected
-     */
-    _Load() { // Load Help
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-      let device = util.device;
-
-      var activeKeyboard = keymanweb.core.activeKeyboard;
-
+    protected preKeyboardLoad() {
+      
+    }
+    protected postKeyboardLoad() {
       this._Visible = false;  // I3363 (Build 301)
-      var s = this._Box.style;
-      s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
-      s.position = (device.formFactor == 'desktop' ? 'absolute' : 'fixed');
-
-      if(this.vkbd) {
-        this.vkbd.shutdown();
-      }
-      this.keyboardView = null;
-
-      // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
-      this._Box.innerHTML = '';
 
       this._Box.onmouseover = this._VKbdMouseOver;
       this._Box.onmouseout = this._VKbdMouseOut;
 
-      // START:  construction of the actual internal layout for the overall OSK
-      let layout: layouts.TargetedFloatLayout = null;
-
       // Add header element to OSK only for desktop browsers
-      if(util.device.formFactor == 'desktop') {
-        layout = this.desktopLayout = new layouts.TargetedFloatLayout();
-        layout.attachToView(this);
-        this.headerView = layout.titleBar;
-        this.desktopLayout.titleBar.setTitleFromKeyboard(activeKeyboard);
-        this._Box.appendChild(layout.titleBar.element);
-      }
-
-      // Add suggestion banner bar to OSK
-      if (this.banner) {
-        this._Box.appendChild(this.banner.element);
-        this.banner.element.style.fontSize = this.baseFontSize;
-      }
-
-      let kbdView: KeyboardView = this.keyboardView = this._GenerateKeyboardView(activeKeyboard);
-      this._Box.appendChild(kbdView.element);
-      if(kbdView instanceof VisualKeyboard) {
-        kbdView.fontSize = this.parsedBaseFontSize;
-      }
-      kbdView.postInsert();
-
-      // Add footer element to OSK only for desktop browsers
       if(this.desktopLayout) {
-        if(kbdView instanceof VisualKeyboard) {
-          this._Box.appendChild(layout.resizeBar.element);
+        const layout = this.desktopLayout;
+        layout.attachToView(this);
+        this.desktopLayout.titleBar.setTitleFromKeyboard(this.activeKeyboard);
+
+        if(this.vkbd) {
           this.footerView = layout.resizeBar;
+          this._Box.appendChild(this.footerView.element);
         }
-      }
-
-      // Initializes the size of a touch keyboard.
-      if(this.vkbd && device.touchable) {
-        let targetOSKHeight = this.vkbd.computedAdjustedOskHeight(this.getDefaultKeyboardHeight());
-        this.setSize(this.getWidth(), targetOSKHeight + this.banner.height);
-      }
-      // END:  construction of the actual internal layout for the overall OSK
-
-      // Correct the classname for the (inner) OSK frame (Build 360)
-      var kbdID: string = (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
-      if(keymanweb.isEmbedded && kbdID.indexOf('::') != -1) {
-        // De-namespaces the ID for use with CSS classes.
-        // Assumes that keyboard IDs may not contain the ':' symbol.
-        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
-      }
-
-      const kbdClassSuffix = ' kmw-keyboard-' + kbdID;
-      kbdView.element.className = kbdView.element.className + kbdClassSuffix;
-
-      this.banner.appendStyles();
-
-      if(this.vkbd) {
-        // Create the key preview (for phones)
-        this.vkbd.createKeyTip();
-
-        // Append a stylesheet for this keyboard for keyboard specific styles
-        // or if needed to specify an embedded font
-        this.vkbd.appendStyleSheet();
       }
 
       if(this._Enabled) {
         this._Show();
       }
-    }
-
-    private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKManager,
-      source: text.MutableSystemStore,
-      newValue: string) {
-      // This handler is also triggered on state-key state changes (K_CAPS) that 
-      // may not actually change the layer.
-      if(this.vkbd) {
-        this.vkbd._UpdateVKShiftStyle();
-      }
-
-      if(source.value != newValue) {
-        // Prevents console errors when a keyboard only displays help.
-        // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.
-        if(this.vkbd) {
-          this.vkbd.layerId = newValue;
-        }
-        this._Show();
-      }
-    }.bind(this);
-
-    private _GenerateKeyboardView(keyboard: keyboards.Keyboard): KeyboardView {
-      let device = com.keyman.singleton.util.device;
-
-      if(this.vkbd) {
-        this.vkbd.shutdown();
-      }
-
-      this._Box.className = "";
-
-      // Case 1:  since we hide the system keyboard on touch devices, we need
-      //          to display SOMETHING that can accept input.
-      if(keyboard == null && !device.touchable) {
-        // We do not (currently) allow selecting the default system keyboard on
-        // touch form-factors.  Likely b/c mnemonic difficulties.
-        return new EmptyView();
-      } else {
-        // Generate a visual keyboard from the layout (or layout default)
-        // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
-        if(keyboard && keyboard.layout(device.formFactor as utils.FormFactor)) {
-          return this._GenerateVisualKeyboard(keyboard);
-        } else if(!keyboard /* && device.touchable (implied) */) {
-          // Show a basic, "hollow" OSK that at least allows input, since we're
-          // on a touch device and hiding the system keyboard
-          return this._GenerateVisualKeyboard(null);
-        } else {
-          // A keyboard help-page or help-text is still a visualization, even not a standard OSK.
-          return new HelpPageView(keyboard);
-        }
-      }
-    }
-
-    /**
-     * Function     _GenerateVisualKeyboard
-     * Scope        Private
-     * @param       {Object}      keyboard    The keyboard to visualize
-     * Description  Generates the visual keyboard element and attaches it to KMW
-     */
-    private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard): VisualKeyboard {
-      let device = com.keyman.singleton.util.device;
-
-      // Root element sets its own classes, one of which is 'kmw-osk-inner-frame'.
-      let vkbd = new VisualKeyboard(keyboard, device);
-
-      // Ensure the OSK's current layer is kept up to date.
-      let core = com.keyman.singleton.core; // Note:  will eventually be a class field.
-      core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
-
-      // Set box class - OS and keyboard added for Build 360
-      this._Box.className=device.formFactor+' '+ device.OS.toLowerCase() + ' kmw-osk-frame';
-
-      // Add primary keyboard element to OSK
-      return vkbd;
     }
 
     /**
@@ -481,7 +339,7 @@ namespace com.keyman.osk {
      *
      *  @return   {number}    height in pixels
      **/
-    getWidth(): number {
+    getDefaultWidth(): number {
       let keymanweb = com.keyman.singleton;
       let device = keymanweb.util.device;
 

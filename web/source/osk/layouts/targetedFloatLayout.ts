@@ -45,10 +45,6 @@ namespace com.keyman.osk.layouts {
     }
 
     attachToView(view: OSKManager) {
-      if(this.oskView) {
-        throw new Error("This layout is already attached to an OSK.");
-      }
-
       this.oskView = view;
       this.titleDragHandler.enabled = !view.noDrag;
       this.resizeDragHandler.enabled = true; // by default.

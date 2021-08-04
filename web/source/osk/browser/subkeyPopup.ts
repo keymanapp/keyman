@@ -132,7 +132,7 @@ namespace com.keyman.osk.browser {
       // And correct its position with respect to that element
       let ss=subKeys.style;
       var x = dom.Utils.getAbsoluteX(e)+0.5*(e.offsetWidth-subKeys.offsetWidth);
-      var xMax = keyman.osk.getWidth() - subKeys.offsetWidth;
+      var xMax = keyman.osk.computedWidth - subKeys.offsetWidth;
 
       if(x > xMax) {
         x=xMax;
