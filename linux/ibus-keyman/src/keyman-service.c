@@ -58,7 +58,7 @@ static void km_service_bus_acquired (GDBusConnection *connection,
                                      const gchar     *name,
                                      gpointer         data);
 
-G_DEFINE_TYPE (KeymanService, km_service, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE(KeymanService, km_service, G_TYPE_OBJECT)
 
 static void
 km_service_init (KeymanService *service)
@@ -68,9 +68,7 @@ km_service_init (KeymanService *service)
 
     g_message("WDG: km_service_init");
 
-    service->priv = priv = G_TYPE_INSTANCE_GET_PRIVATE (service,
-                                                        KM_TYPE_SERVICE,
-                                                        KeymanServicePrivate);
+    service->priv = priv = (KeymanServicePrivate*)km_service_get_instance_private(service);
 
     priv->name = g_strdup ("None");
     priv->ldmlfile = g_strdup ("");
@@ -194,8 +192,6 @@ km_service_class_init (KeymanServiceClass *klass)
                                                           "",
                                                           G_PARAM_READWRITE |
                                                           G_PARAM_STATIC_STRINGS));
-
-    g_type_class_add_private (klass, sizeof (KeymanServicePrivate));
 }
 
 static GVariant *
