@@ -148,8 +148,8 @@ namespace com.keyman.osk.layouts {
             return;
           }
 
-          this.startWidth = layout.oskView.vkbd.kbdDiv.offsetWidth;
-          this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
+          this.startWidth = layout.oskView.computedWidth;
+          this.startHeight = layout.oskView.computedHeight;
 
           let keymanweb = com.keyman.singleton;
 
@@ -200,8 +200,8 @@ namespace com.keyman.osk.layouts {
           }
 
           if(layout.oskView.vkbd) {
-            this.startWidth  = layout.oskView.vkbd.kbdDiv.offsetWidth;
-            this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
+            this.startWidth  = layout.oskView.computedWidth;
+            this.startHeight = layout.oskView.computedHeight;
           }
           layout.oskView.refreshLayout(); // Finalize the resize.
           layout.oskView.doResizeMove();
