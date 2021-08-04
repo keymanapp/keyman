@@ -20,8 +20,6 @@ kmx = executable('kmx', 'kmx.cpp',
     dependencies: [rust_mock_processor],
     objects: lib.extract_all_objects())
 
-kmcomp = find_program('kmcomp.exe', required: false)
-
 tests = [
   '000 - null keyboard',
   '001 - basic input UnicodeI',
@@ -75,12 +73,18 @@ tests = [
 ]
 
 if build_machine.system() == 'windows'
+  kmcomp = find_program('kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
 else
-  wine = find_program('wine', required: false)
-  kmcomp_cmd = [wine, kmcomp]
-  if not wine.found()
-    kmcomp = disabler()
+  kmcomp = find_program('kmcomp', required: false)
+  kmcomp_cmd = [kmcomp]
+  if not kmcomp.found()
+    wine = find_program('wine', required: false)
+    kmcomp = find_program('kmcomp.exe', required: false)
+    kmcomp_cmd = [wine, kmcomp]
+    if not wine.found()
+      kmcomp = disabler()
+    endif
   endif
 endif
 
