@@ -94,34 +94,20 @@ namespace com.keyman.osk {
     }
 
     get currentLayer(): OSKLayer {
-      if(this.layerGroup && this.layerId) {
-        return this.layerGroup.layers[this.layerId];
-      }
+      return this.layerId ? this.layerGroup?.layers[this.layerId] : null;
     }
 
     // Special keys (for the currently-visible layer)
     get lgKey(): KeyElement { // currently, must be visible for the touch language menu.
-      if(this.currentLayer && this.currentLayer.globeKey) {
-        return this.currentLayer.globeKey.btn;
-      } else {
-        return null;
-      }
+      return this.currentLayer?.globeKey?.btn;
     }
 
     private get hkKey(): KeyElement { // hide keyboard key
-      if(this.currentLayer && this.currentLayer.hideKey) {
-        return this.currentLayer.hideKey.btn;
-      } else {
-        return null;
-      }
+      return this.currentLayer?.hideKey?.btn;
     }
 
     public get spaceBar(): KeyElement { // also referenced by the touch language menu.
-      if(this.currentLayer && this.currentLayer.spaceBarKey) {
-        return this.currentLayer.spaceBarKey.btn;
-      } else {
-        return null;
-      }
+      return this.currentLayer?.spaceBarKey?.btn;
     }
 
     //#region OSK constructor and helpers
@@ -247,6 +233,7 @@ namespace com.keyman.osk {
 
     set fontSize(value: ParsedLengthStyle) {
       this._fontSize = value;
+      this.kbdDiv.style.fontSize = value.styleString;
     }
 
     /**
@@ -300,7 +287,7 @@ namespace com.keyman.osk {
       this._width = width;
       this._height = height;
 
-      if(!pending && this.kbdDiv) {
+      if(this.kbdDiv) {
         this.kbdDiv.style.width    = width ? this._width + 'px' : '';
         this.kbdDiv.style.height   = height ? this._height + 'px' : '';
 
@@ -308,12 +295,10 @@ namespace com.keyman.osk {
           this.fontSize = new ParsedLengthStyle((this._height/8) + 'px');
         }
 
-        this.refreshLayout();
+        if(!pending) {
+          this.refreshLayout();
+        }
       }
-    }
-
-    public defaultFontSize(): number {
-      return this.height ? this.height / 8 : undefined;
     }
 
     /**
@@ -758,6 +743,7 @@ namespace com.keyman.osk {
       // Replace the target key, if any, by the new target key
       // Do not replace a null target, as that indicates the key has already been released
       if(key1 && this.keyPending) {
+        this.highlightKey(key0, false);
         this.keyPending = key1;
         this.touchPending = input;
       }

@@ -1,5 +1,32 @@
 # Keyman Version History
 
+## 15.0.90 alpha 2021-08-01
+
+* chore(windows): patches for Delphi 10.4 (#5496)
+* chore(common/core): additional debug tests 🐞 (#5482)
+* chore(android): Update globe key help and whatsnew (#5495)
+* chore(common/core): handle deletion of markers in actions 🐞 (#5489)
+* chore(linux): Remove Groovy and Impish builds (#5502)
+* chore(common): stable history update (#5515)
+* chore(android): log fontpath error (#5516)
+* chore(windows): fixup cef interfaces for CEF 90 (#5514)
+* chore(common/core): refactor backspace handling 🐞 (#5512)
+* chore(windows): split keyman64 header to keymanengine (#5522)
+* fix(ios/engine): engine migration always precedes installs (#5484)
+* chore(common): Add C++ formatting rules (#5523)
+* fix(developer): compiler use and match behavior for Web should be same as Core (#5525)
+
+## 15.0.89 alpha 2021-07-27
+
+* feat(web): spacebar text controls (#5348)
+* refactor(common/core/desktop): Rename Load method 🚧 (#5444)
+* fix(android/engine): register lexical model in switchToNextKeyboard (#5439)
+* refactor(web): delayed OSK initialization 🍕 (#5412)
+* feat(web): Update addKeyboards to return Promise (#5389)
+* fix(common/core/web): error from early fat-finger termination due to OS interruptions (#5479)
+* fix(common/core/web): OSK state-key management (#5456)
+* feat(android/engine): Improve globe key experience (#5437)
+
 ## 15.0.88 alpha 2021-07-23
 
 * refactor(web): osk move & resize handler encapsulation 🍕 (#5409)
@@ -816,6 +843,81 @@
 ## 15.0.1 alpha 2020-12-14
 
 * chore: prepare 15.0 alpha (#4129)
+
+## 14.0.279 stable 2021-07-21
+
+* fix(ios): keyboard swapping 🍒 (#5476)
+
+## 14.0.278 stable 2021-07-20
+
+* change(common/core/web): fat-finger-performance unit-test threshold 🍒 (#5417)
+* fix(linux): Improve bitmap conversion 🍒 (#5410)
+* fix(linux): Save QR code in temporary directory 🍒 (#5411)
+* fix(linux): Fix restarting ibus when running with `sudo` 🍒 (#5413)
+* fix(linux): Don't crash with corrupt keyboard 🍒 (#5421)
+* fix(web): fixes osk resize-popping effect (#5428)
+* fix(android/engine): register lexical model in switchToNextKeyboard 🍒  (#5447)
+* feat(web): spacebar text controls 🍒 🌌 (#5406)
+* feat(android): Spacebar text controls 🍒 🌌 (#5407)
+* feat(ios): add spacebar text controls 🍒 🌌 (#5408)
+* chore(android): improve error reporting for kmw 🍒 (#5469)
+
+## 14.0.277 stable 2021-06-29
+
+* feat(android): silent install for referred kbd 🍒 (#5266)
+* chore(common): bash version for run-required-test-builds.sh 🍒 (#5268)
+* chore(common): Add YouTube links to Keyman 14 features 🍒  (#5285)
+* fix(common/models): predictive-text engine use of NFD input 🍒 (#5286)
+* fix(developer): kmconvert help match reality 🍒 (#5299)
+* chore(linux): Update changelogs to match Debian (#5303)
+* fix(mac): .kmx max file version is now 0x0E00 (14.0) 🍒 (#5331)
+* fix(mac): kmp.inf is windows-1252 🍒 (#5330)
+* fix(windows): improve keymanx64 start stability 🍒 (#5222)
+* chore(linux): Build also on riscv64 to facilitate migration on Ubuntu (#5322)
+* fix(android): fixes application of nextlayer for subkeys with customized layer setting 🍒 (#5351)
+* feat(common/core/web): engine correction-prep optimizations 🍒 (#5352)
+* fix(linux): Add libglib2.0-bin to keyman Depends (#5359)
+* fix(windows): osk scaling mismatch on horz axis 🍒 (#5342)
+* fix(linux): Don't add duplicate entries when reinstalling keyboard 🍒 (#5369)
+* chore: keyboard_info.source.json 1.0.6 🍒 (#5380)
+* feat(android): hide textarea for perf 🍒 (#5377)
+* change(ios): setText now uses JSON serialization 🍒 (#5333)
+
+## 14.0.276 stable 2021-06-11
+
+* fix(linux): Exclude s390x from package builds for ibus-keyman 🍒 (#5220)
+* fix(web): Always pass kill_browserstack 🍒  (#5235)
+* feat(android): Automatically install keyboard through Play Store 🍒 (#5231)
+* fix(oem/fv/ios): app encryption flag for app store uploads (14.0) (#5243)
+* fix(common/core/web): optimizes transform construction 🍒 (#5255)
+* fix(android): rotation is not updating keyboard 🍒 (#5262)
+* feat(android): silent install for referred kbd 🍒 (#5266)
+* fix(windows): disable new hotkey modifier check (#5270)
+
+## 14.0.275 stable 2021-06-04
+
+* fix(linux): Swap order of dependencies for Debian package 🍒 (#5070)
+* fix(android/engine): Check lexical-model file exists before using 🍒  (#5080)
+* fix(developer): kmconvert commandline and deploy 🍒 (#5083)
+* fix(web): position popups correctly in landscape mode on Android and during Chrome emulation 🍒 (#5090)
+* fix(common/core/desktop): Fix warnings when compiling for armhf 🍒 (#5109)
+* fix(common/core/desktop): Don't segfault on invalid .kmx file 🍒 (#5110)
+* chore(common): Check in crowdin strings for Amharic 🍒  (#5117)
+* chore(linux): Swap order of dependency 🍒 (#5114)
+* fix(developer): TframeTextEditor.SetText was not synchronous 🍒 (#5097)
+* chore(ios): update fv cert ref 🍒 (#5124)
+* chore(ios): works around wrong-workspace Carthage 0.38 lookup issue (#5135)
+* fix(web): multi touch handling 🍒 (#5142)
+* chore(ios): artifact prep script now in-repo (#5141)
+* chore(web): Add CI script to kill BrowserStack tunnel 🍒  (#5152)
+* fix(ios): artifact upload preparation 🍒 (#5161)
+* chore(android): Add -clean flag to build script 🍒  (#5177)
+* fix(windows): avoid cached hotkey state 🍒 (#5189)
+* fix(android/samples): Set gradlew executable for Tests 🍒  (#5199)
+* fix(common/core/desktop): Fix failing tests on armhf 🍒 (#5204)
+* feat(web): Add script to deploy KeymanWeb release to s.keyman.com 🍒  (#5179)
+* chore(ios): renames problematic app selectors 🍒 (#5174)
+* fix(developer): support spaces in regression tests 🍒 (#5218)
 
 ## 14.0.274 stable 2021-05-11
 

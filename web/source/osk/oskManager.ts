@@ -269,12 +269,6 @@ namespace com.keyman.osk {
      * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
      */
     get computedWidth(): number {
-      // if(!this.kbdDiv) {
-      //   // Intermediate state - can be called during VisualKeyboard's constructor, before
-      //   // computedHeight can receive a value.
-      //   return undefined;
-      // }
-
       // Computed during layout operations; allows caching instead of continuous recomputation.
       if(this.needsLayout) {
         this.refreshLayout();
@@ -287,12 +281,6 @@ namespace com.keyman.osk {
      * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
      */
     get computedHeight(): number {
-      // if(!this.kbdDiv) {
-      //   // Intermediate state - can be called during VisualKeyboard's constructor, before
-      //   // computedHeight can receive a value.
-      //   return undefined;
-      // }
-
       // Computed during layout operations; allows caching instead of continuous recomputation.
       if(this.needsLayout) {
         this.refreshLayout();
@@ -1000,8 +988,10 @@ namespace com.keyman.osk {
         return;
       }
 
-      // Step 3:  perform layout operations.
+      // Must be set before any references to the .computedWidth and .computedHeight properties!
       this.needsLayout = false;
+
+      // Step 3:  perform layout operations.
       if(this.vkbd) {
         // +5:  from kmw-banner-bar's 'top' attribute.
         const vkbdHeight = this.computedHeight - (this.banner.height ? this.banner.height + 5 : 0);

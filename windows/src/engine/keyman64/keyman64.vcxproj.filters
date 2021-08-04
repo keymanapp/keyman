@@ -83,6 +83,7 @@
     <ClInclude Include="..\..\global\inc\unicode.h" />
     <ClInclude Include="..\..\global\inc\Vkeys.h" />
     <ClInclude Include="..\keyman32\vkscancodes.h" />
+    <ClInclude Include="..\..\global\inc\keymanengine.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\keyman32\keyman-debug-etw.man" />
