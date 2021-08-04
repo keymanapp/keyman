@@ -883,7 +883,7 @@ begin
   ForceKeyboard := False;
   FreeAndNil(debugkeyboard);
   if (frmDebugStatus <> nil) then
-    frmDebugStatus.RegTest.SetDebugKeyboard(nil);
+    frmDebugStatus.SetDebugKeyboard(nil);
   SetCurrentEvent(1);
   ResetEvents;
   if (frmDebugStatus <> nil) and Assigned(frmDebugStatus.Key) then   // I2594
@@ -904,7 +904,7 @@ begin
 
     debugkeyboard := TDebugKeyboard.Create(FFileName);
     frmDebugStatus.RegTest.RegTestSetup(buf, FFileName, False);   // I3655
-    frmDebugStatus.RegTest.SetDebugKeyboard(debugkeyboard);
+    frmDebugStatus.SetDebugKeyboard(debugkeyboard);
     frmDebugStatus.Elements.ClearStores;
   end
   else ResetDebug;

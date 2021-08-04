@@ -92,6 +92,7 @@ type
     property DisplayFont: TFont write SetDisplayFont;
     property CurrentEvent: TDebugEvent read FCurrentEvent write SetCurrentEvent;
     procedure SetDebugCore(const Value: TDebugCore);
+    procedure SetDebugKeyboard(const Value: TDebugKeyboard);
     procedure SetDebugMemo(const Value: TKeymanDeveloperDebuggerMemo);
 
     property Key: TfrmDebugStatus_Key read FKey;
@@ -168,6 +169,16 @@ begin
   for child in FChildren do
   begin
     child.SetDebugCore(Value);
+  end;
+end;
+
+procedure TfrmDebugStatus.SetDebugKeyboard(const Value: TDebugKeyboard);
+var
+  child: TfrmDebugStatus_Child;
+begin
+  for child in FChildren do
+  begin
+    child.SetDebugKeyboard(Value);
   end;
 end;
 

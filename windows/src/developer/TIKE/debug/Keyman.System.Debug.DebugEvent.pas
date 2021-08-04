@@ -1,3 +1,8 @@
+{
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Wrapper around Core debug events and actions, interleaved into a single list.
+}
 unit Keyman.System.Debug.DebugEvent;
 
 interface
@@ -19,8 +24,6 @@ type
   TAIDebugKeyInfo = record
     VirtualKey: UINT;
 	  Modifiers: DWORD;
-//	  Character, DeadKeyCharacter: WCHAR;
-//    IsUp: BOOL;
   end;
 
   PAIDebugKeyInfo = ^TAIDebugKeyInfo;
@@ -40,7 +43,6 @@ type
     Group: TKeymanGroupEx;
     Key: TAIDebugKeyInfo;
     Context: WideString;
-    //, Output: WideString;
     StoreOffsets: array[0..20] of Word; //TKeymanStoreEx;
     nStores: Integer;
     procedure FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
@@ -76,8 +78,12 @@ type
     procedure Action_EmitKeystroke(const key: Word);
     procedure Action_Marker(marker: uintptr_t);
     function AddActionItem(key: Word; action: pkm_kbp_action_item): Boolean;
-    procedure AddDebugItem(debug: pkm_kbp_state_debug_item; debugkeyboard: TDebugKeyboard;
-      vk: uint16_t; modifier_state: uint16_t);
+    procedure AddDebugItem(
+      debug: pkm_kbp_state_debug_item;
+      debugkeyboard: TDebugKeyboard;
+      vk: uint16_t;
+      modifier_state: uint16_t
+    );
   public
     function AddStateItems(
       state: pkm_kbp_state;
@@ -104,8 +110,8 @@ uses
 constructor TDebugEvent.Create;
 begin
   inherited Create;
-  FEventType := etRuleMatch;
-  EventType := etAction;    // Force change of EventType
+  FEventType := etAction;
+  FAction := TDebugEventActionData.Create;
 end;
 
 destructor TDebugEvent.Destroy;
@@ -136,10 +142,10 @@ begin
   Result := True;
   case action._type of
     KM_KBP_IT_CHAR:           Action_Char(action.character);
-    KM_KBP_IT_MARKER:         Action_Marker(action.marker); //      = 2,  // Correlates to kmn's "deadkey" markers.
-    KM_KBP_IT_ALERT:          ; //       = 3,  // The keyboard has triggered a alert/beep/bell.
+    KM_KBP_IT_MARKER:         Action_Marker(action.marker); // Correlates to kmn's "deadkey" markers.
+    KM_KBP_IT_ALERT:          ; // TODO: The keyboard has triggered a alert/beep/bell.
     KM_KBP_IT_BACK:           Action_DeleteBack(action.backspace.expected_type, action.backspace.expected_value);
-    KM_KBP_IT_PERSIST_OPT:    ; // = 5,  // The indicated option needs to be stored.
+    KM_KBP_IT_PERSIST_OPT:    ; // TODO: The indicated option needs to be stored.
     KM_KBP_IT_EMIT_KEYSTROKE: Action_EmitKeystroke(key);
     else Assert(False, 'Action type '+IntToStr(Ord(action._type))+' is unexpected.');
   end;
@@ -150,8 +156,8 @@ var
   event: TDebugEvent;
 begin
   case key of
-    VK_TAB: Action_Char(9);
-    VK_RETURN: Action_Char(13);
+    VK_TAB:    Action_Char(9);  // Emit a tab character
+    VK_RETURN: Action_Char(13); // New line character
     VK_BACK:   Action_DeleteBack(Ord(KM_KBP_BT_UNKNOWN), 0);
     else
     begin
@@ -184,8 +190,8 @@ end;
 /// TODO: define behaviour around selection
 ///
 procedure TDebugEventList.Action_DeleteBack(
-  expected_type: uint8_t;            /// one of KM_KBP_IT_CHAR, KM_KBP_IT_MARKER, KM_KBP_IT_END (when type to delete is unknown)
-  expected_value: uintptr_t         /// used mainly in unit tests
+  expected_type: uint8_t;    /// one of KM_KBP_BT_CHAR, KM_KBP_BT_MARKER, KM_KBP_BT_UNKNOWN
+  expected_value: uintptr_t  /// used mainly in unit tests
 );
 var
   event: TDebugEvent;
@@ -198,6 +204,7 @@ begin
 end;
 
 ///
+/// Insert a deadkey marker into the output
 ///
 procedure TDebugEventList.Action_Marker(marker: uintptr_t);
 var
@@ -371,9 +378,6 @@ procedure TDebugEventRuleData.FillStoreList(event: pkm_kbp_state_debug_item; Key
       Dec(i);
     end;
   end;
-
-{var
-  kfh: PKeyboardFileHeader;}
 begin
   nStores := 0;
 //  kfh := PKeyboardFileHeader(KeyboardMemory);
