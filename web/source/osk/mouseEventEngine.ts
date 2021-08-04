@@ -57,6 +57,9 @@ namespace com.keyman.osk {
           this.onInputMoveCancel(coord);
         }
         return;
+      } else if(!this.hasActiveClick) {
+        // Can interfere with OSK drag-handlers (title bar, resize bar) otherwise.
+        return;
       }
 
       this.preventPropagation(event);
