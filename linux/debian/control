@@ -76,7 +76,7 @@ Architecture: all
 Depends:
  dconf-cli,
  gir1.2-webkit2-4.0,
- ibus-keyman,
+ keyman-engine,
  python3-bs4,
  python3-gi,
  python3-sentry-sdk | python3-raven,
@@ -155,6 +155,8 @@ Depends:
  libkmnkbp0-0 (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends},
+Provides:
+ keyman-engine
 Description: Keyman engine for IBus
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
  open source keyboarding platform which allows anyone to write a keyboard
