@@ -66,10 +66,10 @@ android {
 // how to configure the sentry android gradle plugin
 sentry {
     // Disables or enables the automatic configuration of Native symbols
-    uploadNativeSymbols true
+    uploadNativeSymbols = true
 
     // Does or doesn't include the source code of native code for Sentry
-    includeNativeSources true
+    includeNativeSources = true
 }
 
 String env_keys_json_file = System.getenv("oem_firstvoices_keys_json_file")
@@ -104,6 +104,7 @@ repositories {
         dirs 'libs'
     }
     google()
+    mavenCentral()
 }
 
 dependencies {
