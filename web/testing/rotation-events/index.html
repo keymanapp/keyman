@@ -73,7 +73,7 @@
     e.value = e.value + event + ': w.iw='+window.innerWidth+' w.ih='+window.innerHeight+orientText+orient+'\n';
     
     if(event == 'kmw.ri' || event == 'kmw.rh' || event == 'kmw.re') {
-      e.value = e.value + '  osk.w=' + keyman.osk.getWidth() + ' osk.h=' + keyman.osk.getHeight() + ' kmw.vs=' + keyman.util.getViewportScale() + '\n';
+      e.value = e.value + '  osk.w=' + keyman.osk.computedWidth + ' osk.h=' + keyman.osk.computedHeight + ' kmw.vs=' + keyman.util.getViewportScale() + '\n';
     }
     
     e.scrollTop = e.scrollHeight;

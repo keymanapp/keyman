@@ -149,7 +149,7 @@ namespace com.keyman.osk.browser {
       let constrainPopup = keyman.isEmbedded;
 
       let cs = getComputedStyle(subKeys);
-      let oskHeight = keyman.osk.getHeight();
+      let oskHeight = keyman.osk.computedHeight;
       let bottomY = parseInt(cs.bottom, 10);
       let popupHeight = parseInt(cs.height, 10);
 
