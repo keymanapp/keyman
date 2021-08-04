@@ -151,6 +151,7 @@ class LanguageSettingsViewController: UITableViewController {
           doPredictionsSwitch!.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
           doPredictionsSwitch!.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doPredictionsSwitch!)
+          cell.contentView.isUserInteractionEnabled = false
 
           doPredictionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
           doPredictionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
@@ -166,6 +167,7 @@ class LanguageSettingsViewController: UITableViewController {
           doCorrectionsSwitch!.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
           doCorrectionsSwitch!.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doCorrectionsSwitch!)
+          cell.contentView.isUserInteractionEnabled = false
 
           doCorrectionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
           doCorrectionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
