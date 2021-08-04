@@ -221,6 +221,7 @@ namespace com.keyman.osk {
 
     set fontSize(value: ParsedLengthStyle) {
       this._fontSize = value;
+      this.kbdDiv.style.fontSize = value.styleString;
     }
 
     /**
