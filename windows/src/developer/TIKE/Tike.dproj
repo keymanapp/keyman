@@ -413,7 +413,6 @@
         <DCCReference Include="oskbuilder\TouchLayout.pas"/>
         <DCCReference Include="oskbuilder\TouchLayoutDefinitions.pas"/>
         <DCCReference Include="main\CharMapDropTool_TntCustomEdit.pas"/>
-        <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CheckboxGridHelper.pas"/>
         <DCCReference Include="dialogs\UfrmAddKeyboardFeature.pas">
             <Form>frmAddKeyboardFeature</Form>

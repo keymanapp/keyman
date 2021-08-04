@@ -147,7 +147,7 @@ uses
   Vcl.Grids, KeyboardFonts,
   TempFileManager,
   UfrmDebugStatus,
-  UKeymanTargets, msctf, Winapi.UxTheme, Vcl.Themes,
+  UKeymanTargets, Winapi.UxTheme, Vcl.Themes,
   System.Generics.Collections, LeftTabbedPageControl, Vcl.CheckLst;
 
 type

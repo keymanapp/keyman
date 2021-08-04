@@ -37,7 +37,6 @@ uses
   Keyman.System.Debug.DebugUIStatus,
   Keyman.System.KeymanCore,
   Keyman.System.KeymanCoreDebug,
-  msctf,
   UframeTextEditor,
   UfrmDebugStatus,
   UfrmMDIEditor,
@@ -110,14 +109,13 @@ type
 
     procedure ResetEvents;
     procedure ExecuteEvent(n: Integer);
-    procedure WMUserDebugEnd(var Message: TMessage); message WM_USER_DebugEnd;
     procedure ExecuteEventAction(n: Integer);
     procedure ExecuteEventRule(n: Integer);
     procedure SetExecutionPointLine(ALine: Integer);
     procedure SetUIStatus(const Value: TDebugUIStatus);
     procedure DisableUI;
     procedure EnableUI;
-    procedure SetForceKeyboard(Value: Boolean);
+    procedure SetForceKeyboard(Value: Boolean); // TODO: refactor this away -- we should use only FUIStatus
     function GetStatusText: string;
     procedure SetStatusText(Value: string);
     procedure UpdateDebugStatusForm;   // I4809
@@ -255,35 +253,18 @@ const
  - Form events                                                                 -
  ------------------------------------------------------------------------------}
 
-var
- KeymanCoreLoaded: Boolean = False;
-
-procedure InitKeymanCore;
-begin
-  if not KeymanCoreLoaded then
-  begin
-    // TODO: debugpath for this
-    _km_kbp_set_library_path(ExtractFilePath(ParamStr(0)) + '..\..\..\..\..\..\..\common\core\desktop\build\x86\debug\src\' + kmnkbp0);
-    KeymanCoreLoaded := True;
-  end;
-end;
 procedure TfrmDebug.FormCreate(Sender: TObject);
 begin
   inherited;
-//  InitMSCTF;   // I3655
-
-  InitKeymanCore;
 
   FBreakpoints := TDebugBreakpoints.Create;
 
   FExecutionPointLine := -1;
-  //InitControlCaptions;
   FUIStatus := duiInvalid;
   FEvents := TDebugEventList.Create;
   FDefaultFont := True;
   memo.Align := alClient;
 
-  //InitSystemKeyboard;
   UIStatus := duiReadyForInput;
 
   frmDebugStatus.SetDebugMemo(memo);
@@ -871,38 +852,6 @@ begin
   end;
 end;
 
-procedure TfrmDebug.WMUserDebugEnd(var Message: TMessage);
-begin
-  if UIStatus = duiPaused then
-  begin
-    SetCurrentEvent(1);
-    ResetEvents;
-    frmDebugStatus.Key.ShowKey(nil);
-    Exit;
-  end;
-
-  if FEvents.Count > 0 then
-  begin
-    if FSingleStepMode then
-    begin
-      UIStatus := duiDebugging;
-      SetCurrentEvent(1);
-      ExecuteEvent(0);
-    end
-    else
-    begin
-      FRunning := True;
-      UIStatus := duiDebugging;
-      SetCurrentEvent(0);
-      Run;
-    end;
-  end
-  else
-    if memo.Focused
-      then UIStatus := duiFocusedForInput
-      else UIStatus := duiReadyForInput;
-end;
-
 procedure TfrmDebug.HideDebugForm;
 begin
   frmKeymanDeveloper.ShowDebug(False);   // I4796
@@ -916,18 +865,15 @@ begin
   frmKeymanDeveloper.ShowDebug(True);   // I4796
 
   FDebugVisible := True;
-//  FFileName := ChangeFileExt(DebugFileName, '.kmx');
 
   //UpdateFont(nil);
   SetupDebug;
 
-  //Keyman_Initialise(Application.MainFormHandle, True);  // I2801  // I3283 - remove   // I3503
   memo.SetFocus;
 end;
 
 procedure TfrmDebug.ResetDebug;
 begin
-  //SelectSystemLayout(False);
   ForceKeyboard := False;
   FreeAndNil(debugkeyboard);
   if (frmDebugStatus <> nil) then
@@ -1033,8 +979,6 @@ begin
   if Assigned(FOnUpdateExecutionPoint) then
     FOnUpdateExecutionPoint(Self, ALine);
 end;
-
-
 
 procedure TfrmDebug.UpdateFont(FFont: TFont);
 begin

@@ -18,7 +18,8 @@ type
     FKeyboard: pkm_kbp_keyboard;
     FState: pkm_kbp_state;
     FDeadkeys: TDebugDeadkeyInfoList;
-
+    class var KeymanCoreLoaded: Boolean;
+    class procedure InitKeymanCore; static;
   public
     constructor Create(const Filename: string; EnableDebug: Boolean);
     destructor Destroy; override;
@@ -30,7 +31,9 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+
+  KeymanPaths;
 
 { TDebugCore }
 
@@ -39,6 +42,8 @@ var
   status: km_kbp_status;
 begin
   inherited Create;
+
+  InitKeymanCore;
 
   FKeyboard := nil;
   FState := nil;
@@ -70,6 +75,18 @@ begin
   FKeyboard := nil;
   FreeAndNil(FDeadkeys);
   inherited Destroy;
+end;
+
+class procedure TDebugCore.InitKeymanCore;
+var
+  path: string;
+begin
+  if not KeymanCoreLoaded then
+  begin
+    path := TKeymanPaths.KeymanCoreLibraryPath(kmnkbp0);
+    _km_kbp_set_library_path(path);
+    KeymanCoreLoaded := True;
+  end;
 end;
 
 end.

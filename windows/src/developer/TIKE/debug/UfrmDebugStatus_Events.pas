@@ -111,8 +111,6 @@ procedure TfrmDebugStatus_Events.AddActionEvent(action: TDebugEventActionData);
   begin
     lbCallStack.Items.AddObject(StringOfChar(' ', FIndent)+message, data);
   end;
-var
-  s: string;
 begin
   case action.ActionType of
     KM_KBP_IT_EMIT_KEYSTROKE: AddItem('emit_keystroke', action);
