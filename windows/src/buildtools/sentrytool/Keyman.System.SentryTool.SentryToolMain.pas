@@ -20,98 +20,32 @@ var
   FInfile, FOutfile, FProjectFile, FRootPath, FIncludePath: string;
   FDelphiSearchFile: TDelphiSearchFile = nil;
 
-  CmdParams: array of string;
-
-// Note: this is lifted from System.pas, which doesn't
-// make GetParamStr a public symbol, sadly.
-function GetParamStr(P: PChar; var Param: string): PChar;
-var
-  i, Len: Integer;
-  Start, S: PChar;
-begin
-  // U-OK
-  while True do
-  begin
-    while (P[0] <> #0) and (P[0] <= ' ') do
-      Inc(P);
-    if (P[0] = '"') and (P[1] = '"') then Inc(P, 2) else Break;
-  end;
-  Len := 0;
-  Start := P;
-  while P[0] > ' ' do
-  begin
-    if P[0] = '"' then
-    begin
-      Inc(P);
-      while (P[0] <> #0) and (P[0] <> '"') do
-      begin
-        Inc(Len);
-        Inc(P);
-      end;
-      if P[0] <> #0 then
-        Inc(P);
-    end
-    else
-    begin
-      Inc(Len);
-      Inc(P);
-    end;
-  end;
-
-  SetLength(Param, Len);
-
-  P := Start;
-  S := Pointer(Param);
-  i := 0;
-  while P[0] > ' ' do
-  begin
-    if P[0] = '"' then
-    begin
-      Inc(P);
-      while (P[0] <> #0) and (P[0] <> '"') do
-      begin
-        S[i] := P^;
-        Inc(P);
-        Inc(i);
-      end;
-      if P[0] <> #0 then Inc(P);
-    end
-    else
-    begin
-      S[i] := P^;
-      Inc(P);
-      Inc(i);
-    end;
-  end;
-
-  Result := P;
-end;
+  CmdParams: TArray<string>;
 
 function LoadParamsFromFile(const Filename: string): Boolean;
 var
-  p: PChar;
   cmd, s: string;
   str: TStringList;
 begin
-  cmd := '';
   str := TStringList.Create;
   try
     str.LoadFromFile(Filename);
+
+    cmd := '';
     for s in str do
       cmd := cmd + Trim(s) + ' ';
+
+    // We'll reuse str here to parse now...
+    str.Delimiter := ' ';
+    str.QuoteChar := '"';
+    str.StrictDelimiter := True;
+    str.DelimitedText := Trim(cmd);
+
+    CmdParams := str.ToStringArray;
   finally
     str.Free;
   end;
-  p := PChar(cmd);
-  while p <> #0 do
-  begin
-    p := GetParamStr(p, s);
-    if s <> '' then
-    begin
-      SetLength(CmdParams, Length(CmdParams)+1);
-      CmdParams[High(CmdParams)] := s;
-    end;
-  end;
+
   Result := True;
 end;
 
