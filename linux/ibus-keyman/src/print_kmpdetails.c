@@ -29,10 +29,12 @@ main (gint argc, gchar **argv)
     {
       g_print ("Usage: kmpdetails <kmp.json>\n");
       g_print ("ERROR: file %s not found\n", kmp_json);
+      g_free(kmp_json);
       return EXIT_FAILURE;
     }
 
-    setlocale (LC_ALL, "C.UTF-8");
+    g_free(kmp_json);
+    setlocale(LC_ALL, "C.UTF-8");
 
     get_kmp_details(argv[1], &details);
     print_kmp_details(&details);
