@@ -1335,6 +1335,17 @@ final class KMKeyboard extends WebView {
     }
   }
 
+  public void reloadAfterError() {
+    Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
+    if (firstKeyboard != null) {
+      // Revert to first keyboard in the list
+      setKeyboard(firstKeyboard);
+    } else {
+      // Fallback to sil_euro_latin (though 3rd party keyboards wont have it)
+      setKeyboard(KMManager.getDefaultKeyboard(context));
+    }
+  }
+
   public void setSpacebarText(KMManager.SpacebarText mode) {
     String jsString = KMString.format("setSpacebarText('%s')", mode.toString());
     loadJavascript(jsString);

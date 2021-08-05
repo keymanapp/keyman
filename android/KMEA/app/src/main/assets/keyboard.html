@@ -22,6 +22,10 @@
 
     window.addEventListener('load', init, false);
 
+    function loadDefaultKeyboard() {
+      notifyHost('reloadAfterError');
+    }
+
     function init() {
       //document.body.style.backgroundColor="transparent";
       //window.console.log('Device type = '+device);
@@ -47,6 +51,8 @@
       kmw.addEventListener('keyboardloaded', setIsChiral);
       kmw.addEventListener('keyboardchange', setIsChiral);
       kmw.core.languageProcessor.on('statechange', onStateChange);
+
+      document.body.addEventListener('touchend', loadDefaultKeyboard);
 
       notifyHost('pageLoaded');
     }

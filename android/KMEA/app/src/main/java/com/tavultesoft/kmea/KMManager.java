@@ -2104,6 +2104,8 @@ public final class KMManager {
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
         */
+      } else if (url.indexOf("reloadAfterError") >= 0) {
+        InAppKeyboard.reloadAfterError();
       }
       return false;
     }
@@ -2375,8 +2377,9 @@ public final class KMManager {
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
         */
+      } else if (url.indexOf("reloadAfterError") >= 0) {
+        SystemKeyboard.reloadAfterError();
       }
-
       return false;
     }
   }
