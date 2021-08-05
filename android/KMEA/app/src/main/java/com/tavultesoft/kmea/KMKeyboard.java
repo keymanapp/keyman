@@ -1048,7 +1048,7 @@ final class KMKeyboard extends WebView {
    */
   private JSONObject makeFontPaths(String font) {
 
-    if(font == null) {
+    if(font == null || font.equals("")) {
       return null;
     }
 
@@ -1091,7 +1091,7 @@ final class KMKeyboard extends WebView {
         }
       }
     } catch (JSONException e) {
-      KMLog.LogException(TAG, "", e);
+      KMLog.LogException(TAG, "Failed to make font for '"+font+"'", e);
       return null;
     }
 

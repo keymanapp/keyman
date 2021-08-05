@@ -323,8 +323,16 @@ namespace com.keyman.text.prediction {
         this.lmEngine.resetContext(context);
       }
 
+      let alternates = transcription.alternates;
+      if(!alternates || alternates.length == 0) {
+        alternates = [{
+          sample: transcription.transform,
+          p: 1.0
+        }];
+      }
+
       let transform = transcription.transform;
-      var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);
+      var promise = this.currentPromise = this.lmEngine.predict(alternates, context);
 
       let lp = this;
       return promise.then(function(suggestions: Suggestion[]) {

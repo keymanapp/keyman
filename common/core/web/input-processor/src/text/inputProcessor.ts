@@ -78,9 +78,13 @@ namespace com.keyman.text {
       }
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
-      // of state management.
-      if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, !fromOSK)) {
-        return new RuleBehavior();
+      // of state management.  `doModifierPress` must always run.
+      if(this.keyboardProcessor.doModifierPress(keyEvent, !fromOSK)) {
+        // If run on a desktop platform, we know that modifier & state key presses may not
+        // produce output, so we may make an immediate return safely.
+        if(!fromOSK) {
+          return new RuleBehavior();
+        }
       }
 
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
@@ -172,6 +176,11 @@ namespace com.keyman.text {
               if(pair.p < KEYSTROKE_EPSILON) {
                 break;
               } else if(timer && timer() >= TIMEOUT_THRESHOLD) {
+                // Note:  it's always possible that the thread _executing_ our JS
+                // got paused by the OS, even if JS itself is single-threaded.
+                //
+                // The case where `alternates` is initialized (line 167) but empty
+                // (because of net-zero loop iterations) MUST be handled.
                 break;
               }
 
@@ -188,6 +197,8 @@ namespace com.keyman.text {
               
               // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
               // so we expect users to never intend their use.
+              //
+              // Also possible that this set of conditions fail for all evaluated alternates.
               if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
                 let transform: Transform = alternateBehavior.transcription.transform;
                 
@@ -216,7 +227,9 @@ namespace com.keyman.text {
         // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
         
         // Notify the ModelManager of new input - it's predictive text time!
-        ruleBehavior.transcription.alternates = alternates;
+        if(alternates && alternates.length > 0) {
+          ruleBehavior.transcription.alternates = alternates;
+        }
         // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
         ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription);
 

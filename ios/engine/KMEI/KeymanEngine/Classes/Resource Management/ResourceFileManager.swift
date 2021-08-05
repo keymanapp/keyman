@@ -17,7 +17,36 @@ import UIKit
 public class ResourceFileManager {
   public static let shared = ResourceFileManager()
 
+  private var haveRunMigrations: Bool = false
+
   fileprivate init() {
+  }
+
+  func runMigrationsIfNeeded() {
+    if !haveRunMigrations {
+      // Set here in order to prevent recursively calling itself in case
+      // Migrations itself needs to use installation methods.
+      haveRunMigrations = true
+
+      // We must make sure that all resources are properly migrated before
+      // allowing any new resources to be installed.
+      Migrations.migrate(storage: Storage.active)
+      Migrations.updateResources(storage: Storage.active)
+
+      if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
+        Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
+
+        // Ensure the default keyboard is installed in this case.
+        do {
+          try Storage.active.installDefaultKeyboard(from: Resources.bundle)
+        } catch {
+          log.error("Failed to copy default keyboard from bundle: \(error)")
+        }
+      }
+      Migrations.engineVersion = Version.latestFeature
+    }
+
+    haveRunMigrations = true
   }
 
   public var installedPackages: [KeymanPackage] {
@@ -327,6 +356,14 @@ public class ResourceFileManager {
       log.error("Resource with full ID \(missingResource.description) not in package")
       throw KMPError.resourceNotInPackage
     }
+
+    // Resources should only be installed after Migrations have been run.
+    // Otherwise, the Migrations engine may misinterpret the installed format
+    // on an app's first install.
+    //
+    // It is possible for a KeymanEngine framework consumer to reach this point
+    // without `Manager.init` having been run.
+    runMigrationsIfNeeded()
 
     do {
       try copyWithOverwrite(from: package.sourceFolder,

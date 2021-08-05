@@ -312,7 +312,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         prevlabel = lbl_pad
 
         # If it doesn't exist, generate QR code to share keyboard package
-        path_qr = path.join(tempfile.gettempdir(), kmp['packageID'] + '_qrcode.png')
+        path_qr = os.path.join(tempfile.gettempdir(), kmp['packageID'] + '_qrcode.png')
         url = KeymanComUrl + "/go/keyboard/" + kmp['packageID'] + "/share"
         if not os.path.isfile(path_qr):
             qr = qrcode.QRCode(
