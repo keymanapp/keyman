@@ -37,7 +37,19 @@ namespace com.keyman.text {
       } else if((char = DefaultOutput.forBaseKeys(Lkc, ruleBehavior)) != null) {
         return char;
       } else {
-        return null;
+        // // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
+        // // Not originally defined for text output within defaultKeyOutput.
+        // // We can't enable it yet, as it'll cause hardware keystrokes in the DOM to output '\t' rather
+        // // than rely on the browser-default handling.
+        let code = DefaultOutput.codeForEvent(Lkc);
+        switch(code) {
+        //   case Codes.keyCodes['K_TAB']:
+        //   case Codes.keyCodes['K_TABBACK']:
+        //   case Codes.keyCodes['K_TABFWD']:
+        //     return '\t';
+          default:
+           return null;
+        }
       }
     }
 
@@ -182,11 +194,8 @@ namespace com.keyman.text {
           return Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
         } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
           return Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
-        } else if(n == Codes.keyCodes['K_TAB'] || n == Codes.keyCodes['K_TABBACK'] || n == Codes.keyCodes['K_TABFWD']) {
-          // If TAB may be treated as a 'command key', it'll have been filtered out before this point.
-          return '\t';
         }
-       } catch (e) {
+      } catch (e) {
         if(ruleBehavior) {
           ruleBehavior.errorLog = "Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default');
         }
