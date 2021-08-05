@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.94 alpha 2021-08-05
+
+* chore(ios,windows): Update crowdin strings for Azerbaijani (#5486)
+* chore(android): Update sentry-android-gradle-plugin to 2.1.0 (#5546)
+* fix(web): Have util.wait check useAlerts option (#5538)
+* fix(android): gracefully handle errors in KMW keyboards (#5423)
+* chore(linux): Remove compiler warning in ibus-keyman (#5549)
+
 ## 15.0.93 alpha 2021-08-04
 
 * fix(linux): Improve uninstallation (#5505)
