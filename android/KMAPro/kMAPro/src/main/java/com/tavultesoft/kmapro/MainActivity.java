@@ -542,7 +542,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
               @Override
               public void onCancel(DialogInterface dialog) {
-                // stopService(downloadIntent); has no effect
+                stopService(downloadIntent);
                 cleanupPackageInstall();
               }
             });

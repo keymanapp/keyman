@@ -10,6 +10,7 @@ import com.tavultesoft.kmea.util.KMLog;
 
 public class DownloadIntentService extends IntentService {
   private static final String TAG = "DownloadIntentSvc";
+  private boolean cancelDownload = false; // If download cancelled, don't install
 
   public DownloadIntentService() {
     super(DownloadIntentService.class.getName());
@@ -29,11 +30,15 @@ public class DownloadIntentService extends IntentService {
     try {
       int result = FileUtils.download(getApplicationContext(), url, destination, filename);
       if (result == FileUtils.DOWNLOAD_SUCCESS) {
-        bundle.putString("destination", destination);
         bundle.putString("filename", filename);
-        bundle.putString("language", languageID);
-        bundle.putSerializable("installMode", installMode);
-        receiver.send(FileUtils.DOWNLOAD_SUCCESS, bundle);
+        if (!this.cancelDownload) {
+          bundle.putString("destination", destination);
+          bundle.putString("language", languageID);
+          bundle.putSerializable("installMode", installMode);
+          receiver.send(FileUtils.DOWNLOAD_SUCCESS, bundle);
+        } else {
+          receiver.send(FileUtils.DOWNLOAD_CANCELLED, bundle);
+        }
       } else {
         receiver.send(FileUtils.DOWNLOAD_ERROR, bundle);
       }
@@ -41,5 +46,11 @@ public class DownloadIntentService extends IntentService {
       receiver.send(FileUtils.DOWNLOAD_ERROR, Bundle.EMPTY);
       KMLog.LogException(TAG, "", e);
     }
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    this.cancelDownload = true;
   }
 }
