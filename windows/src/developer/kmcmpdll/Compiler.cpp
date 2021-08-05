@@ -85,6 +85,8 @@
 #include "edition.h"
 
 #include "onlineconstants.h"
+#include "CharToKeyConversion.h"
+#include "CasedKeys.h"
 
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
@@ -108,7 +110,7 @@ DWORD ProcessGroupFinish(PFILE_KEYBOARD fk);
 DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p);
 DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p);
 DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str);
-DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, int IsUnicode);
+DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode);
 DWORD ProcessEthnologueStore(PWSTR p); // I2646
 DWORD ProcessHotKey(PWSTR p, DWORD *hk);
 DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PWSTR szName, PDWORD FileSize, PBYTE *Buf);
@@ -135,6 +137,7 @@ DWORD process_save(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx);
 DWORD process_platform(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx);  // I3430
 DWORD process_baselayout(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx);  // I3430
 DWORD process_set_synonym(DWORD dwSystemID, PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx);  // I3437
+DWORD process_expansion(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx, int max);
 
 BOOL IsValidKeyboardVersion(WCHAR *dpString);   // I4140
 
@@ -189,6 +192,7 @@ const PWCHAR StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX L"KEYBOARDVERSION",   // I4140
   SSN__PREFIX L"KMW_EMBEDCSS",
   SSN__PREFIX L"TARGETS",   // I4504
+  SSN__PREFIX L"CASEDKEYS", // #2241
   NULL
 };
 
@@ -868,83 +872,6 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
   return CERR_None;
 }
 
-/* Following code lifted from syskbd.cpp and tweaked for compiler use. Todo: consolidate */
-
-#define VK_COLON	0xBA
-#define VK_EQUAL	0xBB
-#define VK_COMMA	0xBC
-#define VK_HYPHEN	0xBD
-#define VK_PERIOD	0xBE
-#define	VK_SLASH	0xBF
-#define VK_ACCENT	0xC0
-#define VK_LBRKT	0xDB
-#define VK_BKSLASH	0xDC
-#define VK_RBRKT	0xDD
-#define VK_QUOTE	0xDE
-#define VK_xDF		0xDF
-
-WCHAR VKToChar(WORD keyCode, UINT shiftFlags)
-{
-  char shiftedDigit[] = ")!@#$%^&*(";
-  int n, Shift;
-
-  if (!(shiftFlags & ISVIRTUALKEY)) return keyCode;
-
-  if (shiftFlags & (LCTRLFLAG | RCTRLFLAG | LALTFLAG | RALTFLAG)) return 0;
-
-  if (keyCode >= '0' && keyCode <= '9')
-  {
-    n = keyCode - '0';
-    return ((shiftFlags & K_SHIFTFLAG) ? shiftedDigit[n] : keyCode);
-  }
-
-  if (keyCode >= 'A' && keyCode <= 'Z')
-  {
-    Shift = (shiftFlags & K_SHIFTFLAG);
-    if (shiftFlags & (CAPITALFLAG)) Shift = !Shift;
-    return (Shift ? keyCode : keyCode + 32);
-  }
-
-  if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9)
-  {
-    if (!(shiftFlags & NUMLOCKFLAG)) return 0;
-    return keyCode - (VK_NUMPAD0 - '0');
-  }
-
-  Shift = (shiftFlags & K_SHIFTFLAG);
-
-  switch (keyCode)
-  {
-  case VK_ACCENT:
-    return Shift ? '~' : '`';
-  case VK_HYPHEN:
-    return Shift ? '_' : '-';
-  case VK_EQUAL:
-    return Shift ? '+' : '=';
-  case VK_BKSLASH:
-    return Shift ? '|' : 92;
-  case VK_LBRKT:
-    return Shift ? '{' : '[';
-  case VK_RBRKT:
-    return Shift ? '}' : ']';
-  case VK_COLON:
-    return Shift ? ':' : ';';
-  case VK_QUOTE:
-    return Shift ? '"' : 39;
-  case VK_COMMA:
-    return Shift ? '<' : ',';
-  case VK_PERIOD:
-    return Shift ? '>' : '.';
-  case VK_SLASH:
-    return Shift ? '?' : '/';
-  case VK_SPACE:
-    return ' ';
-  }
-  return 0;
-  //keyCode;
-}
-
-
 int cmpkeys(const void *key, const void *elem)
 {
   PFILE_KEY akey, aelem;
@@ -972,6 +899,7 @@ int cmpkeys(const void *key, const void *elem)
 DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 {
   PFILE_GROUP gp;
+  DWORD msg;
 
   if (fk->currentGroup == 0xFFFFFFFF) return CERR_None;
   // Just got to first group - so nothing to finish yet
@@ -979,6 +907,7 @@ DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
   gp = &fk->dpGroupArray[fk->currentGroup];
 
   // Finish off the previous group stuff!
+  if ((msg = ExpandCapsRulesForGroup(fk, gp)) != CERR_None) return msg;
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), cmpkeys);
 
   return CERR_None;
@@ -1051,12 +980,10 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
     // we don't mix up named character codes which weren't supported in 5.x
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
     // Add a single char store as a defined character constant
-    char *codename = wstrtostr(sp->szName);
     if (Uni_IsSurrogate1(*sp->dpString))
-      CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), codename, fk->cxStoreArray);
+      CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), sp->szName, fk->cxStoreArray);
     else
-      CodeConstants->AddCode(sp->dpString[0], codename, fk->cxStoreArray);
-    delete[] codename;
+      CodeConstants->AddCode(sp->dpString[0], sp->szName, fk->cxStoreArray);
     CodeConstants->reindex(); // has to be done after every character add due to possible use in another store.   // I4982
   }
 
@@ -1255,6 +1182,11 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
   case TSS_MNEMONIC:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_MnemonicLayout);
     FMnemonicLayout = atoiW(sp->dpString) == 1;
+    if (FMnemonicLayout && FindSystemStore(fk, TSS_CASEDKEYS) != NULL) {
+      // The &CasedKeys system store is not supported for
+      // mnemonic layouts
+      return CERR_CasedKeysNotSupportedWithMnemonicLayout;
+    }
     break;
 
   case TSS_NAME:
@@ -1385,6 +1317,13 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     }
 
     break;
+
+  case TSS_CASEDKEYS:
+    if ((msg = VerifyCasedKeys(sp)) != CERR_None) {
+      return msg;
+    }
+    break;
+
   default:
     return CERR_InvalidSystemStore;
   }
@@ -1483,7 +1422,7 @@ DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PWSTR context, PW
         int anyStore = *(q + 2) - 1;
 
         if (xstrlen(fk->dpStoreArray[indexStore].dpString) < xstrlen(fk->dpStoreArray[anyStore].dpString)) {
-          AddWarning(CWARN_IndexStoreShort);
+          AddWarning(CWARN_IndexStoreShort); //TODO: if this fails, then we return FALSE instead of an error
         }
       } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);
@@ -1502,6 +1441,40 @@ DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PWSTR context, PW
     }
   }
   return CERR_None;
+}
+
+/**
+ * Checks that the order of statements in the context matches the specification
+ *   Rule structure: [context] ['+' key] '>' output
+ *   Context structure: [nul] [if()|baselayout()|platform()]+ [char|any|context()|deadkey()|dk()|index()|notany()|outs()]
+ * Test that nul is first, then if(), baselayout(), platform() statements are before any other content
+ */
+BOOL CheckContextStatementPositions(PWSTR context) {
+  BOOL hadContextChar = FALSE;
+  for (PWSTR p = context; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL) {
+      switch (*(p + 1)) {
+      case CODE_NUL:
+        if (p > context) {
+          AddWarning(CWARN_NulNotFirstStatementInContext);
+        }
+        break;
+      case CODE_IFOPT:
+      case CODE_IFSYSTEMSTORE:
+        if (hadContextChar) {
+          AddWarning(CWARN_IfShouldBeAtStartOfContext);
+        }
+        break;
+      default:
+        hadContextChar = TRUE;
+      }
+    }
+    else {
+      hadContextChar = TRUE;
+    }
+  }
+
+  return TRUE;
 }
 
 /**
@@ -1558,6 +1531,8 @@ DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
     if ((msg = GetXString(fk, str, L"c\n", pklOut, GLOBAL_BUFSIZE - 1, (int)(INT_PTR)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
 
     if (pklOut[0] == 0) return CERR_ZeroLengthString;
+
+    CheckContextStatementPositions(pklIn);
 
     // Test index and context offsets in context
     if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
@@ -1872,7 +1847,6 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
   DWORD i;
   BOOL finished = FALSE;
   WCHAR c;
-  PSTR codename;
 
   PWCHAR tstr = NULL;
   int tstrMax = 0;
@@ -1924,6 +1898,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
       case '$':  type = 16; break;	// named code constants
       case 'P':  type = 17; break;  // platform (synonym for if(&platform))  // I3430
       case 'L':  type = 18; break;  // layer (synonym for set(&layer))  // I3437
+      case '.':  type = 19; break;  // .. allows us to specify ranges -- either vkeys or characters
       default:
         if (iswdigit(*p)) type = 0;	// octal number
         else type = 99;				// error!
@@ -2425,12 +2400,10 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
       case 16:
         VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
         q = p + 1;
-        while (iswalnum(*q) || *q == '-' || *q == '_') q++;
+        while (*q && !iswspace(*q)) q++;
         c = *q; *q = 0;
-        codename = wstrtostr(p + 1);
+        n = CodeConstants->GetCode(p + 1, &i);
         *q = c;
-        n = CodeConstants->GetCode(codename, &i);
-        delete[] codename;
         if (n == 0) return CERR_InvalidNamedCode;
         if (i < 0xFFFFFFFFL) CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);   // I2993
         if (n > 0xFFFF)
@@ -2461,6 +2434,13 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return CERR_InvalidToken;
         err = process_set_synonym(TSS_LAYER, fk, q, tstr, &mx);
+        if (err != CERR_None) return err;
+        continue;
+      case 19:  // #2241
+        if (*(p + 1) != '.') return CERR_InvalidToken;
+        if (sFlag) return CERR_InvalidInVirtualKeySection;
+        p += 2;
+        err = process_expansion(fk, p, tstr, &mx, max);
         if (err != CERR_None) return err;
         continue;
       default:
@@ -2628,6 +2608,104 @@ DWORD process_reset(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)
   tstr[(*mx)++] = CODE_RESETOPT;
   tstr[(*mx)++] = (WCHAR)(i + 1);
   tstr[(*mx)] = 0;
+
+  return CERR_None;
+}
+
+DWORD process_expansion(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx, int max) {
+  BOOL isVKey = FALSE;
+
+  WORD BaseKey=0, BaseShiftFlags=0;
+  DWORD BaseChar=0;
+
+  if (*mx == 0) {
+    return CERR_ExpansionMustFollowCharacterOrVKey;
+  }
+  LPWSTR p = &tstr[*mx];
+  p = decxstr(p, tstr);
+  if (*p == UC_SENTINEL) {
+    if (*(p + 1) != CODE_EXTENDED) {
+      return CERR_ExpansionMustFollowCharacterOrVKey;
+    }
+    isVKey = TRUE;
+    BaseKey = *(p + 3);
+    BaseShiftFlags = *(p + 2);
+  }
+  else {
+    BaseChar = Uni_UTF16ToUTF32(p);
+  }
+
+  // Look ahead at next element
+  WCHAR temp[GLOBAL_BUFSIZE];
+  PWCHAR r = NULL;
+
+  DWORD msg;
+
+  if ((msg = GetXString(fk, q, L"", temp, _countof(temp) - 1, 0, &r, FALSE, TRUE)) != CERR_None)
+  {
+    return msg;
+  }
+
+  WORD HighKey, HighShiftFlags;
+  DWORD HighChar;
+
+  switch(temp[0]) {
+  case 0:
+    return isVKey ? CERR_VKeyExpansionMustBeFollowedByVKey : CERR_CharacterExpansionMustBeFollowedByCharacter;
+  case UC_SENTINEL:
+    // Verify that range is valid virtual key range
+    if(!isVKey) {
+      return CERR_CharacterExpansionMustBeFollowedByCharacter;
+    }
+    if (temp[1] != CODE_EXTENDED) {
+      return CERR_VKeyExpansionMustBeFollowedByVKey;
+    }
+    HighKey = temp[3], HighShiftFlags = temp[2];
+    if (HighShiftFlags != BaseShiftFlags) {
+      return CERR_VKeyExpansionMustUseConsistentShift;
+    }
+    if (HighKey <= BaseKey) {
+      return CERR_ExpansionMustBePositive;
+    }
+    // Verify space in buffer
+    if (*mx + (HighKey - BaseKey) * 5 + 1 >= max) return CERR_BufferOverflow;
+    // Inject an expansion.
+    for (BaseKey++; BaseKey < HighKey; BaseKey++) {
+      // < HighKey because caller will add HighKey to output
+      tstr[(*mx)++] = UC_SENTINEL;
+      tstr[(*mx)++] = CODE_EXTENDED;
+      tstr[(*mx)++] = BaseShiftFlags;
+      tstr[(*mx)++] = BaseKey;
+      tstr[(*mx)++] = UC_SENTINEL_EXTENDEDEND;
+    }
+    tstr[*mx] = 0;
+    break;
+  default:
+    // Verify that range is a valid character range
+    if (isVKey) {
+      return CERR_VKeyExpansionMustBeFollowedByVKey;
+    }
+
+    HighChar = Uni_UTF16ToUTF32(temp);
+    if (HighChar <= BaseChar) {
+      return CERR_ExpansionMustBePositive;
+    }
+    // Inject an expansion.
+    for (BaseChar++; BaseChar < HighChar; BaseChar++) {
+      // < HighChar because caller will add HighChar to output
+      if (Uni_IsSMP(BaseChar)) {
+        // We'll test on each char to avoid complex calculations crossing SMP boundary
+        if (*mx + 3 >= max) return CERR_BufferOverflow;
+        tstr[(*mx)++] = (WCHAR) Uni_UTF32ToSurrogate1(BaseChar);
+        tstr[(*mx)++] = (WCHAR) Uni_UTF32ToSurrogate2(BaseChar);
+      }
+      else {
+        if (*mx + 2 >= max) return CERR_BufferOverflow;
+        tstr[(*mx)++] = (WCHAR) BaseChar;
+      }
+    }
+    tstr[*mx] = 0;
+  }
 
   return CERR_None;
 }
@@ -3529,4 +3607,17 @@ extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
   if (mode == 0) {
     RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }
+}
+
+PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, DWORD dwSystemID) {
+  assert(fk != NULL);
+  assert(dwSystemID != 0);
+
+  PFILE_STORE sp = fk->dpStoreArray;
+  for (DWORD i = 0; i < fk->cxStoreArray; i++, sp++) {
+    if (sp->dwSystemID == dwSystemID) {
+      return sp;
+    }
+  }
+  return NULL;
 }

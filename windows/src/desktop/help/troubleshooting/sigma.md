@@ -14,7 +14,7 @@ Sigma. For instance, if you typed ησὴ you would get ηςὴ.
 This is due to a bug with the Microsoft Word "AutoFormat As You Type"
 Ordinals setting.
 
-TODO: check with Office 2017?
+This error has been addressed in Office 2017.
 
 In Microsoft Word 2010:
 

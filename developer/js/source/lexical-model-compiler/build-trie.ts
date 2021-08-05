@@ -138,7 +138,7 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     }
     wordsSeenInThisFile.add(wordform);
 
-    wordlist[wordform] = (wordlist[wordform] || 0) + count;
+    wordlist[wordform] = (isNaN(wordlist[wordform]) ? 0 : wordlist[wordform] || 0) + count;
   }
 }
 
@@ -459,15 +459,22 @@ namespace Trie {
    * @param node The node to start summing weights.
    */
   function sumWeights(node: Node): number {
+    let val: number;
     if (node.type === 'leaf') {
-      return node.entries
+      val = node.entries
         .map(entry => entry.weight)
+        //.map(entry => isNaN(entry.weight) ? 1 : entry.weight)
         .reduce((acc, count) => acc + count, 0);
     } else {
-      return Object.keys(node.children)
+      val = Object.keys(node.children)
         .map((key) => sumWeights(node.children[key]))
         .reduce((acc, count) => acc + count, 0);
     }
+
+    if(isNaN(val)) {
+      console.error("Unexpected NaN has appeared!");
+    }
+    return val;
   }
 }
 

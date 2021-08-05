@@ -177,7 +177,13 @@ var
 begin
   if not FileExists(ChangeFileExt(FFileName, Ext_ProjectSourceUser)) then Exit;
 
-  doc := LoadXMLDocument(ChangeFileExt(FFileName, Ext_ProjectSourceUser)); //TXMLDocument.Create(nil);
+  try
+    doc := LoadXMLDocument(ChangeFileExt(FFileName, Ext_ProjectSourceUser));
+  except
+    on E:Exception do
+      raise EProjectLoader.Create('Error loading project user settings file: '+E.Message);
+  end;
+
 
   root := doc.DocumentElement;
   if root.NodeName <> 'KeymanDeveloperProjectUser' then

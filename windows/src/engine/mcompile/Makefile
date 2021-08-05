@@ -6,8 +6,8 @@
 
 build: manifest.res version.res dirs
     $(MSBUILD) mcompile.sln $(MSBUILD_BUILD)
-    $(COPY) mcompile.exe $(PROGRAM)\engine
-    $(COPY) mcompile.pdb $(DEBUGPATH)\engine
+    $(COPY) $(WIN32_TARGET_PATH)\mcompile.exe $(PROGRAM)\engine
+    $(COPY) $(WIN32_TARGET_PATH)\mcompile.pdb $(DEBUGPATH)\engine
 
 clean: def-clean
     $(MSBUILD) $(MSBUILD_CLEAN) mcompile.sln
@@ -21,9 +21,6 @@ signcode:
 wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\engine\mcompile.exe /t keyman-engine-windows
     $(SYMSTORE) $(DEBUGPATH)\engine\mcompile.pdb /t keyman-engine-windows
-
-backup:
-    $(WZZIP) $(BUILD)\engine\mcompile.exe  $(BACKUPDEFAULTS) mcompile.exe
 
 install:
     $(COPY) $(PROGRAM)\engine\mcompile.exe "$(INSTALLPATH_KEYMANENGINE)"

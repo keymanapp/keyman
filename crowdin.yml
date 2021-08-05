@@ -26,13 +26,15 @@ files:
 
 
   # Android files
+  # Reference: https://developer.android.com/guide/topics/resources/multilingual-support
 
   - source: /android/KMEA/app/src/main/res/values/strings.xml
     dest: /android/engine/strings.xml
     translation: /android/KMEA/app/src/main/res/values-%android_code%/strings.xml
     languages_mapping:
-      # Prevent invalid region pap-rPAP
+      # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
       android_code:
+        es-419: b+es+419
         pap: pap
 
   - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
@@ -41,6 +43,7 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP
       android_code:
+        es-419: b+es+419
         pap: pap
 
   # Windows files
@@ -53,6 +56,7 @@ files:
     languages_mapping:
       locale:
         de: de
+        fr: fr
 
   - source: /windows/src/desktop/setup/locale/en/strings.xml
     dest: /windows/setup/strings.xml
@@ -61,12 +65,13 @@ files:
     languages_mapping:
       locale:
         de: de
+        fr: fr
 
   # iOS files
 
   - source: /ios/engine/KMEI/KeymanEngine/Classes/en.lproj/ResourceInfoView.strings
     dest: /ios/engine/ResourceInfoView.strings
-    translation: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/%osx_code%/%original_file_name%
+    translation: /ios/engine/KMEI/KeymanEngine/Classes/%osx_code%/%original_file_name%
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
     dest: /ios/engine/Localizable.strings

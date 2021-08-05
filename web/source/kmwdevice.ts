@@ -84,11 +84,15 @@ namespace com.keyman {
           //
           // Firefox uses '.' between version components, while Chrome and Safari use
           // '_' instead.  So, we have to check for both.  Yay.
-          let regex = /Intel Mac OS X (10(?:[_\.]\d+)+)/i;
+          let regex = /Intel Mac OS X (\d+(?:[_\.]\d+)+)/i;
           let results = regex.exec(agent);
           
           // Match result:  a version string with components separated by underscores.
-          if(results.length > 1 && results[1]) {
+          if(!results) {
+            console.warn("KMW could not properly parse the user agent string."
+              + "A suboptimal keyboard layout may result.");
+            this.OS='MacOSX';
+          } else if(results.length > 1 && results[1]) {
             // Convert version string into a usable form.
             let versionString = results[1].replace('_', '.');
             let version = new utils.Version(versionString);

@@ -15,7 +15,6 @@ type
 
   TKeyboardProjectTemplate = class(TProjectTemplate)
   private
-    FTargets: TKeymanTargets;
     FIconFilename: string;
     FOSKFilename: string;
     FTouchLayoutFilename: string;
@@ -81,8 +80,7 @@ uses
 
 constructor TKeyboardProjectTemplate.Create(const BasePath, KeyboardID: string; Targets: TKeymanTargets);
 begin
-  inherited Create(BasePath, KeyboardID);
-  FTargets := Targets;
+  inherited Create(BasePath, KeyboardID, Targets);
 end;
 
 procedure TKeyboardProjectTemplate.Generate;
@@ -130,22 +128,22 @@ end;
 
 function TKeyboardProjectTemplate.HasIcon: Boolean;
 begin
-  Result := FIncludeIcon and ((KMXKeymanTargets+[ktAny]) * FTargets <> []);
+  Result := FIncludeIcon and ((KMXKeymanTargets+[ktAny]) * Targets <> []);
 end;
 
 function TKeyboardProjectTemplate.HasKMX: Boolean;
 begin
-  Result := (KMXKeymanTargets+[ktAny]) * FTargets <> [];
+  Result := (KMXKeymanTargets+[ktAny]) * Targets <> [];
 end;
 
 function TKeyboardProjectTemplate.HasKVKS: Boolean;
 begin
-  Result := (KeymanTargetsUsingKVK+[ktAny]) * FTargets <> [];
+  Result := (KeymanTargetsUsingKVK+[ktAny]) * Targets <> [];
 end;
 
 function TKeyboardProjectTemplate.HasTouchLayout: Boolean;
 begin
-  Result := (TouchKeymanTargets+[ktAny]) * FTargets <> [];
+  Result := (TouchKeymanTargets+[ktAny]) * Targets <> [];
 end;
 
 procedure TKeyboardProjectTemplate.WriteKeyboardInfo;
@@ -175,7 +173,7 @@ begin
       kp.SetSystemStoreValue(ssCopyright, Copyright);
     kp.SetSystemStoreValue(ssVersion, SKeymanKeyboardVersion);
     kp.SetSystemStoreValue(ssKeyboardVersion, Version);
-    kp.SetSystemStoreValue(ssTargets, KeymanTargetsToString(FTargets));
+    kp.SetSystemStoreValue(ssTargets, KeymanTargetsToString(Targets));
 
     if HasIcon then
       kp.Features.Add(kfIcon);

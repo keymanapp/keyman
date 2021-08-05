@@ -166,6 +166,9 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
     PreviewWidth = 240
     PreviewHeight = 60
     FontTypes = [ftTrueTypeAnsi, ftTrueTypeSymbol]
+    ShowPreview = False
+    ShowPreviewFontName = False
+    ShowPreviewInList = False
   end
   object editCodeSize: TEdit
     Left = 391
@@ -193,6 +196,9 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
     PreviewWidth = 240
     PreviewHeight = 60
     FontTypes = [ftTrueTypeAnsi, ftTrueTypeSymbol]
+    ShowPreview = False
+    ShowPreviewFontName = False
+    ShowPreviewInList = False
   end
   object editCharSize: TEdit
     Left = 391
@@ -220,6 +226,9 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
     PreviewWidth = 240
     PreviewHeight = 60
     FontTypes = [ftTrueTypeAnsi, ftTrueTypeSymbol]
+    ShowPreview = False
+    ShowPreviewFontName = False
+    ShowPreviewInList = False
   end
   object editOSKSize: TEdit
     Left = 391
@@ -288,6 +297,9 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
     PreviewWidth = 240
     PreviewHeight = 60
     FontTypes = [ftTrueTypeAnsi, ftTrueTypeSymbol]
+    ShowPreview = False
+    ShowPreviewFontName = False
+    ShowPreviewInList = False
   end
   object fcbTouchLayoutTablet: TscFontComboBox
     Left = 176
@@ -308,6 +320,9 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
     PreviewWidth = 240
     PreviewHeight = 60
     FontTypes = [ftTrueTypeAnsi, ftTrueTypeSymbol]
+    ShowPreview = False
+    ShowPreviewFontName = False
+    ShowPreviewInList = False
   end
   object fcbTouchLayoutDesktop: TscFontComboBox
     Left = 176
@@ -328,5 +343,8 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
     PreviewWidth = 240
     PreviewHeight = 60
     FontTypes = [ftTrueTypeAnsi, ftTrueTypeSymbol]
+    ShowPreview = False
+    ShowPreviewFontName = False
+    ShowPreviewInList = False
   end
 end

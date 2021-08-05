@@ -32,5 +32,10 @@ extension TestUtils.Downloading {
     override func resume() {
       closure()
     }
+
+    override func cancel() {
+      // We must prevent the original cancel() from occurring, as it'll
+      // cause asynchronous errors otherwise.
+    }
   }
 }

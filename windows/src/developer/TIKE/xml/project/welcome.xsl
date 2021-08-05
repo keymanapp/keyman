@@ -47,6 +47,11 @@
       </div>
 
       <div style="padding: 0 10px 10px 10px;">
+        <xsl:call-template name="button">
+          <xsl:with-param name="caption">Open project folder</xsl:with-param>
+          <xsl:with-param name="command">keyman:openprojectfolder</xsl:with-param>
+        </xsl:call-template>
+
         <div style="clear:both">
           <h2>Recent Files</h2>
         </div>

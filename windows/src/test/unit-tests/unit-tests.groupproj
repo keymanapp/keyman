@@ -1,0 +1,120 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{DCA265A9-3A49-4050-90F9-A3256D67AA43}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="standards-data\standardsdata.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="jsonutil\JsonUtilTests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="keyboard-js-info\KeyboardJSInfoTestSuite.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmx-file-languages\KMXFileLanguagesTestSuite.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="package-info\PackageInfoTestSuite.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ui-language-manager\UILanguageManagerTest.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="windows-setup\WindowsSetupTest.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="standardsdata">
+        <MSBuild Projects="standards-data\standardsdata.dproj"/>
+    </Target>
+    <Target Name="standardsdata:Clean">
+        <MSBuild Projects="standards-data\standardsdata.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="standardsdata:Make">
+        <MSBuild Projects="standards-data\standardsdata.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="JsonUtilTests">
+        <MSBuild Projects="jsonutil\JsonUtilTests.dproj"/>
+    </Target>
+    <Target Name="JsonUtilTests:Clean">
+        <MSBuild Projects="jsonutil\JsonUtilTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="JsonUtilTests:Make">
+        <MSBuild Projects="jsonutil\JsonUtilTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="KeyboardJSInfoTestSuite">
+        <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj"/>
+    </Target>
+    <Target Name="KeyboardJSInfoTestSuite:Clean">
+        <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KeyboardJSInfoTestSuite:Make">
+        <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="KeyboardPackageVersionsTestSuite">
+        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj"/>
+    </Target>
+    <Target Name="KeyboardPackageVersionsTestSuite:Clean">
+        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KeyboardPackageVersionsTestSuite:Make">
+        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="KMXFileLanguagesTestSuite">
+        <MSBuild Projects="kmx-file-languages\KMXFileLanguagesTestSuite.dproj"/>
+    </Target>
+    <Target Name="KMXFileLanguagesTestSuite:Clean">
+        <MSBuild Projects="kmx-file-languages\KMXFileLanguagesTestSuite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KMXFileLanguagesTestSuite:Make">
+        <MSBuild Projects="kmx-file-languages\KMXFileLanguagesTestSuite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PackageInfoTestSuite">
+        <MSBuild Projects="package-info\PackageInfoTestSuite.dproj"/>
+    </Target>
+    <Target Name="PackageInfoTestSuite:Clean">
+        <MSBuild Projects="package-info\PackageInfoTestSuite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PackageInfoTestSuite:Make">
+        <MSBuild Projects="package-info\PackageInfoTestSuite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="UILanguageManagerTest">
+        <MSBuild Projects="ui-language-manager\UILanguageManagerTest.dproj"/>
+    </Target>
+    <Target Name="UILanguageManagerTest:Clean">
+        <MSBuild Projects="ui-language-manager\UILanguageManagerTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="UILanguageManagerTest:Make">
+        <MSBuild Projects="ui-language-manager\UILanguageManagerTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WindowsSetupTest">
+        <MSBuild Projects="windows-setup\WindowsSetupTest.dproj"/>
+    </Target>
+    <Target Name="WindowsSetupTest:Clean">
+        <MSBuild Projects="windows-setup\WindowsSetupTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WindowsSetupTest:Make">
+        <MSBuild Projects="windows-setup\WindowsSetupTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="standardsdata;JsonUtilTests;KeyboardJSInfoTestSuite;KeyboardPackageVersionsTestSuite;KMXFileLanguagesTestSuite;PackageInfoTestSuite;UILanguageManagerTest;WindowsSetupTest"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="standardsdata:Clean;JsonUtilTests:Clean;KeyboardJSInfoTestSuite:Clean;KeyboardPackageVersionsTestSuite:Clean;KMXFileLanguagesTestSuite:Clean;PackageInfoTestSuite:Clean;UILanguageManagerTest:Clean;WindowsSetupTest:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="standardsdata:Make;JsonUtilTests:Make;KeyboardJSInfoTestSuite:Make;KeyboardPackageVersionsTestSuite:Make;KMXFileLanguagesTestSuite:Make;PackageInfoTestSuite:Make;UILanguageManagerTest:Make;WindowsSetupTest:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

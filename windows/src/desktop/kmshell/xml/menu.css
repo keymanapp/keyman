@@ -1,6 +1,6 @@
 ﻿/* Popup menu styles */
 .menu
-{ 
+{
   white-space: nowrap;
   position: absolute;
   display: block;
@@ -9,23 +9,23 @@
   border: solid 1px #ACA899;
   font-size: 11px;
   padding: 4px;
-  background-image: url("menugrey.gif"); 
-  background-repeat: repeat-y; 
+  background-image: url("menugrey.gif");
+  background-repeat: repeat-y;
   background-position: 0 0;
   width: 220px;
   z-index: 100;
 }
 
 .menuitem
-{ 
-  display: block; 
-  padding: 4px 4px 4px 28px; 
+{
+  display: block;
+  padding: 4px 4px 4px 28px;
   margin: 1px;
   cursor: default;
 }
- 
+
 .hover
-{ 
+{
   color: #000000;
   background: #FFE3DB;
   border: solid 1px #DB704F;
@@ -33,8 +33,8 @@
 }
 
 .down
-{ 
-  background: #DB704F; 
+{
+  background: #DB704F;
 }
 
 #menubackground {

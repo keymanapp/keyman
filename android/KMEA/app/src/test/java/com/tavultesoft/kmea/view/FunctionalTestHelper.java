@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Helper methods for functional tests.
  */
-class FunctionalTestHelper {
+public class FunctionalTestHelper {
 
   /**
    * initialize keyman for tests.

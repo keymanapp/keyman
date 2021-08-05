@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import os
+import time
 import gi
 import logging
 import subprocess
@@ -10,11 +12,12 @@ from gi.repository import IBus, Gio
 
 def get_ibus_bus():
     try:
-        for i in range(10000):
+        for i in range(5):
             bus = IBus.Bus()
             if bus.is_connected() and bus.is_global_engine_enabled():
                 return bus
             bus.destroy()
+            time.sleep(1)
     except Exception as e:
         logging.warning("Failed get bus")
         logging.warning(e)
@@ -66,15 +69,21 @@ def restart_ibus_subp():
 
 
 def restart_ibus(bus=None):
-    try:
-        if not bus:
-            bus = get_ibus_bus()
-        logging.info("restarting IBus")
-        bus.exit(True)
-        bus.destroy()
-    except Exception as e:
-        logging.warning("Failed to restart IBus")
-        logging.warning(e)
+    realuser = os.environ.get('SUDO_USER')
+    if realuser:
+        # we have been called with `sudo`. Restart ibus for the real user.
+        logging.info('restarting IBus by subprocess for user %s', realuser)
+        subprocess.run(['sudo', '-u', realuser, 'ibus', 'restart'])
+    else:
+        try:
+            if not bus:
+                bus = get_ibus_bus()
+            logging.info("restarting IBus")
+            bus.exit(True)
+            bus.destroy()
+        except Exception as e:
+            logging.warning("Failed to restart IBus")
+            logging.warning(e)
 
 
 def bus_has_engine(bus, name):

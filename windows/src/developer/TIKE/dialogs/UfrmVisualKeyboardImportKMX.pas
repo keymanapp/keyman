@@ -355,19 +355,14 @@ var
   vk: TVKKey;
   n: Integer;
 begin
-//  lb.items.Add('AddKey: ENTER');
-
   if nkey >= keys.count then
   begin
-//    lb.items.Add('AddKey: EXIT: bug!');
-    exit;
+    Exit;
   end;
 
-//  lb.items.Add(Format('AddKey: nkey: %d data: "%s" vk: %s ', [nkey, data, VKeyNames[TVKKey(keys[nkey]).vkey]]));
-  if (data <> '') then //and (nkey < keys.Count) then
+  if Trim(data) <> '' then
   begin
     vk := TVKKey(keys[nkey]);
-//    ShowMessage(Format('key: %d shift: %d text: "%s"', [vk.vkey, vk.shift, data]));
     n := FVK.Keys.IndexOf(vk.vkey, vk.shift);
     if n < 0
       then k := TVisualKeyboardKey.Create
@@ -379,11 +374,9 @@ begin
     if n < 0 then FVK.Keys.Add(k);
   end;
 
-//  data := '';
   Inc(nkey);
 
   PostMessage(Handle, WM_User_SendNextKey, 0, 0);   // I4156
-//  lb.items.Add('AddKey: Exit (nkey now='+IntToStr(nkey));
 end;
 
 {-------------------------------------------------------------------------------

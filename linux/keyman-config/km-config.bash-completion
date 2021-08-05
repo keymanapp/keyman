@@ -1,0 +1,36 @@
+#/usr/bin/env bash
+
+_km-config_completions()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="-h --help -v --verbose -vv --veryverbose --version -i --install"
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+
+    # default IFS splits 'file://' into 'file', ':' and '//'
+    if [ "${prev}" == ":" -a "${COMP_WORDS[COMP_CWORD-2]}" == "file" ]; then
+        local flag=${COMP_WORDS[COMP_CWORD-3]}
+        if [ $flag == "-i" -o $flag == "--install" ]; then
+            prev=$flag
+        fi
+    fi
+
+    case "${prev}" in
+        "-i"|"--install")
+            local IFS=$'\n'
+            compopt -o filenames
+            COMPREPLY=( $(compgen -f -X "!"*.kmp -- $cur) $(compgen -d -- $cur) )
+            return 0
+            ;;
+        *)
+        ;;
+    esac
+}
+
+complete -F _km-config_completions km-config

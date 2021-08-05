@@ -1,6 +1,7 @@
 // Defines a 'polyfill' of sorts for NPM's events module
 /// <reference path="../includes/events.ts" />
 /// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/keyboardProcessor.ts" />
+/// <reference path="contextWindow.ts" />
 /// <reference path="prediction/languageProcessor.ts" />
 
 namespace com.keyman.text {
@@ -54,14 +55,13 @@ namespace com.keyman.text {
      *
      * Handles default output and keyboard processing for both OSK and physical keystrokes.
      * 
-     * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
+     * @param       {Object}      keyEvent      The abstracted KeyEvent to use for keystroke processing
+     * @param       {Object}      outputTarget  The OutputTarget receiving the KeyEvent
+     * @returns     {Object}                    A RuleBehavior object describing the cumulative effects of
+     *                                          all matched keyboard rules.
      */
-    processKeyEvent(keyEvent: KeyEvent) {
+    processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       let formFactor = keyEvent.device.formFactor;
-
-      // Determine the current target for text output and create a "mock" backup
-      // of its current, pre-input state.  Current, long-existing assumption - it's DOM-backed.
-      let outputTarget = keyEvent.Ltarg;
       let fromOSK = keyEvent.isSynthetic;
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
@@ -70,14 +70,18 @@ namespace com.keyman.text {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.keyboardProcessor.selectLayer(keyEvent)) {
-          return true;
+          return new RuleBehavior();
         }
       }
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
-      // of state management.
-      if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, !fromOSK)) {
-        return true;
+      // of state management.  `doModifierPress` must always run.
+      if(this.keyboardProcessor.doModifierPress(keyEvent, outputTarget, !fromOSK)) {
+        // If run on a desktop platform, we know that modifier & state key presses may not
+        // produce output, so we may make an immediate return safely.
+        if(!fromOSK) {
+          return new RuleBehavior();
+        }
       }
 
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
@@ -88,16 +92,21 @@ namespace com.keyman.text {
 
         // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
         if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
-          return;
+          return new RuleBehavior();
           // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
         } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && this.languageProcessor.tryAcceptSuggestion('space')) {
-          return;
+          return new RuleBehavior();
         }
       }
 
       // // ...end I3363 (Build 301)
 
+      // Create a "mock" backup of the current outputTarget in its pre-input state.
+      // Current, long-existing assumption - it's DOM-backed.
       let preInputMock = Mock.from(outputTarget);
+
+      // We presently need the true keystroke to run on the FULL context.  That index is still
+      // needed for some indexing operations when comparing two different output targets.
       let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget);
 
       // Swap layer as appropriate.
@@ -112,14 +121,69 @@ namespace com.keyman.text {
         // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
         // Also, don't do fat-finger stuff if predictive text isn't enabled.
         if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
+          let keyDistribution = keyEvent.keyDistribution;
+
+          // We don't need to track absolute indexing during alternate-generation; 
+          // only position-relative, so it's better to use a sliding window for context
+          // when making alternates.  (Slightly worse for short text, matters greatly
+          // for long text.)
+          let contextWindow = new ContextWindow(preInputMock, ContextWindow.ENGINE_RULE_WINDOW);
+          let windowedMock = contextWindow.toMock();
+
           // Note - we don't yet do fat-fingering with longpress keys.
-          if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
+          if(keyDistribution && keyEvent.kbdLayer) {
+            // Tracks a 'deadline' for fat-finger ops, just in case both context is long enough
+            // and device is slow enough that the calculation takes too long.
+            //
+            // Consider use of https://developer.mozilla.org/en-US/docs/Web/API/Performance/now instead?
+            // Would allow finer-tuned control.
+            let TIMEOUT_THRESHOLD: number = Number.MAX_VALUE;
+            let _globalThis = com.keyman.utils.getGlobalObject();
+            let timer: () => number;
+
+            // Available by default on `window` in browsers, but _not_ on `global` in Node, 
+            // surprisingly.  Since we can't use code dependent on `require` statements
+            // at present, we have to condition upon it actually existing.
+            if(_globalThis['performance'] && _globalThis['performance']['now']) {
+              timer = function() {
+                return _globalThis['performance']['now']();
+              };
+
+              TIMEOUT_THRESHOLD = timer() + 16; // + 16ms.
+            } // else {
+              // We _could_ just use Date.now() as a backup... but that (probably) only matters
+              // when unit testing.  So... we actually don't _need_ time thresholding when in 
+              // a Node environment.
+            // }
+
+            // Tracks a minimum probability for keystroke probability.  Anything less will not be
+            // included in alternate calculations. 
+            //
+            // Seek to match SearchSpace.EDIT_DISTANCE_COST_SCALE from the predictive-text engine.
+            // Reasoning for the selected value may be seen there.  Short version - keystrokes 
+            // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
+            let KEYSTROKE_EPSILON = Math.exp(-5);
+
+            // Sort the distribution into probability-descending order.
+            keyDistribution.sort((a, b) => b.p - a.p);
+
             let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
     
             let totalMass = 0; // Tracks sum of non-error probabilities.
-            for(let pair of keyEvent.keyDistribution) {
-              let mock = Mock.from(preInputMock);
+            for(let pair of keyDistribution) {
+              if(pair.p < KEYSTROKE_EPSILON) {
+                break;
+              } else if(timer && timer() >= TIMEOUT_THRESHOLD) {
+                // Note:  it's always possible that the thread _executing_ our JS
+                // got paused by the OS, even if JS itself is single-threaded.
+                //
+                // The case where `alternates` is initialized (line 167) but empty
+                // (because of net-zero loop iterations) MUST be handled.
+                break;
+              }
+
+              let mock = Mock.from(windowedMock);
               
               let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
               if(!altKey) {
@@ -127,11 +191,13 @@ namespace com.keyman.text {
                 continue;
               }
 
-              let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, mock, keyEvent.device);
+              let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, keyEvent.device);
               let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
               
               // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
               // so we expect users to never intend their use.
+              //
+              // Also possible that this set of conditions fail for all evaluated alternates.
               if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
                 let transform: Transform = alternateBehavior.transcription.transform;
                 
@@ -155,12 +221,14 @@ namespace com.keyman.text {
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
-        ruleBehavior.finalize(this.keyboardProcessor);
+        ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
 
         // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
         
         // Notify the ModelManager of new input - it's predictive text time!
-        ruleBehavior.transcription.alternates = alternates;
+        if(alternates && alternates.length > 0) {
+          ruleBehavior.transcription.alternates = alternates;
+        }
         // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
         ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription);
 
@@ -173,17 +241,7 @@ namespace com.keyman.text {
 
       /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
 
-      // TODO:  rework the return value to be `ruleBehavior` instead.  Functions that call this one are
-      //        the ones that should worry about event handler returns, etc.  Not this one.
-      //
-      //        They should also be the ones to handle the TODOs seen earlier in this function -
-      //        once THOSE are properly relocated.  (They're too DOM-heavy to remain in web-core.)
-
-      // Only return true (for the eventual event handler's return value) if we didn't match a rule.
-
-      // Alas, the above notes are the goal, and will be separately addressed by #3695.  For now, a hacky
-      // workaround in order to not break default behaviors.
-      return ruleBehavior && !ruleBehavior.triggerKeyDefault;  // return `true` if the key is considered fully handled.
+      return ruleBehavior;
     }
 
     public resetContext(outputTarget?: OutputTarget) {

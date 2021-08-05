@@ -23,6 +23,8 @@ type
     FVersion: string;
     FBCP47Tags: string;
     FProjectType: TKeymanProjectType;
+    FTargets: TKeymanTargets;
+    FFullCopyright: string;
 
   protected
     const
@@ -50,14 +52,17 @@ type
     property BasePath: string read FBasePath;
     property ID: string read FID;
   public
-    constructor Create(const BasePath, ID: string);
+    constructor Create(const BasePath, ID: string; ATargets: TKeymanTargets);
 
     procedure Generate; virtual; abstract;
 
     property ProjectType: TKeymanProjectType read FProjectType;
 
+    property Targets: TKeymanTargets read FTargets;
+
     property Name: string read FName write FName;
     property Copyright: string read FCopyright write FCopyright;
+    property FullCopyright: string read FFullCopyright write FFullCopyright;
     property Author: string read FAuthor write FAuthor;
     property Version: string read FVersion write FVersion;
     property BCP47Tags: string read FBCP47Tags write FBCP47Tags;
@@ -87,12 +92,13 @@ uses
 
 { TProjectTemplate }
 
-constructor TProjectTemplate.Create(const BasePath, ID: string);
+constructor TProjectTemplate.Create(const BasePath, ID: string; ATargets: TKeymanTargets);
 begin
   inherited Create;
   FBasePath := IncludeTrailingPathDelimiter(ExpandFileName(BasePath));
   FID := ID;
   FVersion := '1.0';
+  FTargets := ATargets;
 end;
 
 function TProjectTemplate.GetFilename(Base: string): string;
@@ -193,7 +199,7 @@ var
 
       bcp47tag := TBCP47Tag.Create(tag);
       try
-        bcp47tag.Tag := TCanonicalLanguageCodeUtils.FindBestTag(bcp47tag.Tag, False);
+        bcp47tag.Tag := TCanonicalLanguageCodeUtils.FindBestTag(bcp47tag.Tag, False, False);
         Result := Result + '"' + bcp47tag.Tag + '"';
       finally
         bcp47tag.Free;
@@ -211,7 +217,8 @@ var
     begin
       if kt = ktAny then
         Continue;
-      Result := Result + ' * ' + SKeymanTargetNames[kt] + #13#10;
+      if (kt in FTargets) or (ktAny in FTargets) then
+        Result := Result + ' * ' + SKeymanTargetNames[kt] + #13#10;
     end;
   end;
 
@@ -230,6 +237,7 @@ begin
   s := ReplaceStr(s, '$NAME', FName);
   s := ReplaceStr(s, '$VERSION', FVersion);
   s := ReplaceStr(s, '$COPYRIGHT', FCopyright);
+  s := ReplaceStr(s, '$FULLCOPYRIGHT', FFullCopyright);
   s := ReplaceStr(s, '$AUTHOR', FAuthor);
   s := ReplaceStr(s, '$DATE', FormatDateTime('yyyy-mm-dd', Now));
   if Pos('$LANGUAGES_KEYBOARD_INFO', s) > 0 then

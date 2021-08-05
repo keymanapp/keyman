@@ -6,7 +6,7 @@
 #include <iterator>
 #include <codecvt>
 #include <locale>
-#include "kmx_processor.h"
+#include "kmx_processevent.h"
 #include "utfcodec.hpp"
 
 
@@ -28,6 +28,19 @@ const km_kbp_cp *km::kbp::kmx::u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
     *dst++ = *src++;
   }
   *dst = 0;
+  return o;
+}
+
+const km_kbp_cp *km::kbp::kmx::u16ncpy(km_kbp_cp *dst, const km_kbp_cp *src, size_t max) {
+  km_kbp_cp *o = dst;
+  while (*src && max > 0) {
+    *dst++ = *src++;
+    max--;
+  }
+  while(max > 0) {
+    *dst++ = 0;
+    max--;
+  }
   return o;
 }
 
@@ -121,7 +134,7 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
     case CODE_INDEX:    return p+2;
     case CODE_USE:      return p+1;
     case CODE_DEADKEY:    return p+1;
-    case CODE_EXTENDED:   p += 2; while(*p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
+    case CODE_EXTENDED:   p += 2; while(*p && *p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
     case CODE_CLEARCONTEXT: return p+1;
     case CODE_CALL:     return p+1;
     case CODE_CONTEXTEX:  return p+1;
@@ -138,7 +151,6 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
 {
   if(p <= pStart) {
-    assert("Attempted to move prior to start of string");
     return NULL;
   }
 

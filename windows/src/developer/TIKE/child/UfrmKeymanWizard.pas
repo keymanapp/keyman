@@ -236,10 +236,6 @@ type
     cmdISOLang_Lookup: TButton;
     Panel1: TPanel;
     lblCongrats: TLabel;
-    cmdCompile: TButton;
-    cmdStartDebugging: TButton;
-    cmdAddToProject: TButton;
-    cmdOpenContainingFolder2: TButton;
     panBuildWindows: TPanel;
     lblInstallHint: TLabel;
     lblCompileTargetHeader: TLabel;
@@ -267,6 +263,19 @@ type
     lblLanguageKeyman10Note: TLabel;
     lblLanguageKeyman10Title: TLabel;
     imgQRCode: TImage;
+    panOpenInExplorer: TPanel;
+    lblOpenInExplorer: TLabel;
+    cmdOpenSourceFolder: TButton;
+    cmdOpenBuildFolder: TButton;
+    cmdOpenProjectFolder: TButton;
+    panFileActions: TPanel;
+    lblFileActions: TLabel;
+    cmdAddToProject: TButton;
+    cmdStartDebugging: TButton;
+    cmdCompile: TButton;
+    panWarnMixedShiftStates: TPanel;
+    cmdFixupShiftStates: TButton;
+    lblWarnMixedShiftStates: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
@@ -294,7 +303,7 @@ type
       Shift: TShiftState);
     procedure chkLayoutDisplay102KeyClick(Sender: TObject);
     procedure cmdInsertCopyrightClick(Sender: TObject);
-    procedure cmdOpenContainingFolder2Click(Sender: TObject);
+    procedure cmdOpenSourceFolderClick(Sender: TObject);
     procedure editKeyOutputCodeClick(Sender: TObject);
     procedure editKeyOutputTextClick(Sender: TObject);
     procedure tmrUpdateCharacterMapTimer(Sender: TObject);
@@ -332,6 +341,9 @@ type
     procedure pagesTouchLayoutChanging(Sender: TObject;
       var AllowChange: Boolean);
     procedure lbDebugHostsClick(Sender: TObject);
+    procedure cmdOpenBuildFolderClick(Sender: TObject);
+    procedure cmdOpenProjectFolderClick(Sender: TObject);
+    procedure cmdFixupShiftStatesClick(Sender: TObject);
   private
     frameSource: TframeTextEditor;
 
@@ -395,10 +407,10 @@ type
     function SaveBitmap: Boolean;
     procedure LoadBitmap;
 
-    procedure MoveSourceToParser(UpdateLRShift, FixupShiftStates: Boolean);   // I4137
+    procedure MoveSourceToParser(UpdateLRShift: Boolean);   // I4137
     procedure MoveParserToSource;
 
-    procedure UpdateControls(UpdateLRShift, FixupShiftStates: Boolean);   // I4137
+    procedure UpdateControls(UpdateLRShift: Boolean);   // I4137
 
     procedure BitmapModifiedChanged(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -738,6 +750,8 @@ begin
   gridFeatures.Enabled := gridFeatures.RowCount > 1;   // I4587   // I4427
   cmdEditFeature.Enabled := gridFeatures.RowCount > 1;   // I4587   // I4427
   cmdRemoveFeature.Enabled := gridFeatures.RowCount > 1;   // I4587   // I4427
+
+  cmdOpenProjectFolder.Enabled := Assigned(ProjectFile.Project);
 end;
 
 procedure TfrmKeymanWizard.FocusTab;
@@ -1310,19 +1324,9 @@ begin
   end;
 
   // I2532 BEGIN - fix l/r shift transfer from source failure
-  if FLRShift and FAShift and FixupShiftStates then   // I4137
-  begin
-    FOldLayoutSetup := FLayoutSetup;
-    FLayoutSetup := True;
-    chkSplitCtrlAlt.Checked := True;
-    if Layout_FixupRules_LRShift(False) then
-    begin
-      kbdLayout.LRShift := chkSplitCtrlAlt.Checked;
-      FLayoutSetup := FOldLayoutSetup;
-      Layout_SetAllKeyDetails;
-    end;
-  end
-  else if (chkSplitCtrlAlt.Checked <> FLRShift) and UpdateLRShift then  // I2532
+  panWarnMixedShiftStates.Visible := FLRShift and FAShift;
+
+  if (chkSplitCtrlAlt.Checked <> FLRShift) and UpdateLRShift then  // I2532
   begin
     FOldLayoutSetup := FLayoutSetup;
     FLayoutSetup := True;
@@ -1536,7 +1540,7 @@ begin
   end;
 
   if not IsInParserMode then   // I4557
-    MoveSourceToParser(False, False);
+    MoveSourceToParser(False);
 
   Result := True;
 end;
@@ -1650,6 +1654,23 @@ begin
   c := FeatureTab(FFeature.ID);
   if Assigned(c) then
     pages.ActivePage := c;
+end;
+
+procedure TfrmKeymanWizard.cmdFixupShiftStatesClick(Sender: TObject);
+var
+  FOldLayoutSetup: Boolean;
+begin
+  FOldLayoutSetup := FLayoutSetup;
+  FLayoutSetup := True;
+  if Layout_FixupRules_LRShift(False) then
+  begin
+    chkSplitCtrlAlt.Checked := True;
+    kbdLayout.LRShift := True;
+    FLayoutSetup := FOldLayoutSetup;
+    Layout_SetAllKeyDetails;
+  end
+  else
+    FLayoutSetup := FOldLayoutSetup;
 end;
 
 procedure TfrmKeymanWizard.LoadFeature(ID: TKeyboardParser_FeatureID);
@@ -2026,7 +2047,7 @@ begin
     Free;
   end;
 
-  UpdateControls(True, False);   // I4137
+  UpdateControls(True);   // I4137
   Layout_UpdateCharacterSet;
   LoadSettings;
 
@@ -2082,7 +2103,7 @@ begin
   FControlDown := False;   // I4680
 
   if not IsInParserMode then   // I4557
-    MoveSourceToParser(True,False);
+    MoveSourceToParser(True);
 
   try
     FKeyboardParser.AddRequiredLines;
@@ -2348,14 +2369,14 @@ begin
   // TODO: other file types
 end;
 
-procedure TfrmKeymanWizard.UpdateControls(UpdateLRShift, FixupShiftStates: Boolean);   // I4137
+procedure TfrmKeymanWizard.UpdateControls(UpdateLRShift: Boolean);   // I4137
 var
   i, n: Integer;
   nb: Integer;
 begin
   //   // I4723 - removed line
   FLoading := True;
-  Layout_SetAllKeyDetails(UpdateLRShift, FixupShiftStates);  // I2532   // I4137
+  Layout_SetAllKeyDetails(UpdateLRShift);  // I2532   // I4137
   editName.Text := FKeyboardParser.GetSystemStoreValue(ssName);
   SetTargetsListBoxFromTargets(FKeyboardParser.GetSystemStoreValue(ssTargets));   // I4504
   editMessage.Text := FKeyboardParser.GetSystemStoreValue(ssMessage);
@@ -2575,13 +2596,13 @@ begin
   frameSource.EditorText := FKeyboardParser.KeyboardText;
 end;
 
-procedure TfrmKeymanWizard.MoveSourceToParser(UpdateLRShift, FixupShiftStates: Boolean);   // I4137
+procedure TfrmKeymanWizard.MoveSourceToParser(UpdateLRShift: Boolean);   // I4137
 begin
   FCurrentRule := nil;
   FKeyboardParser.FileName := FileName;
   FKeyboardParser.KeyboardText := frameSource.EditorText;
   ConfirmSaveOfOldEditorWindows;
-  UpdateControls(UpdateLRShift, FixupShiftStates);   // I4137
+  UpdateControls(UpdateLRShift);   // I4137
 end;
 
 procedure TfrmKeymanWizard.NotifyStartedWebDebug;
@@ -2631,7 +2652,7 @@ begin
 
     kbdLayout.LRShift := chkSplitCtrlAlt.Checked;
 
-    Layout_SetAllKeyDetails(False, True);   // I4137
+    Layout_SetAllKeyDetails;
     Layout_FocusOutput;
   finally
     FLayoutSetup := False;
@@ -2754,9 +2775,20 @@ begin
   editCopyright.SetFocus;
 end;
 
-procedure TfrmKeymanWizard.cmdOpenContainingFolder2Click(Sender: TObject);
+procedure TfrmKeymanWizard.cmdOpenSourceFolderClick(Sender: TObject);
 begin
   OpenContainingFolder(FileName);
+end;
+
+procedure TfrmKeymanWizard.cmdOpenBuildFolderClick(Sender: TObject);
+begin
+  OpenContainingFolder((ProjectFile as TkmnProjectFile).TargetFilename);
+end;
+
+procedure TfrmKeymanWizard.cmdOpenProjectFolderClick(Sender: TObject);
+begin
+  if Assigned(ProjectFile.Project) then
+    OpenContainingFolder(ProjectFile.Project.FileName);
 end;
 
 procedure TfrmKeymanWizard.cmdOpenDebugHostClick(Sender: TObject);
@@ -2851,7 +2883,7 @@ begin
     begin
       for i := 0 to FKeyboardParser.Lines.Count - 1 do
         FKeyboardParser.Lines[i].ConvertToANSI;
-      UpdateControls(True, False);   // I4137
+      UpdateControls(True);   // I4137
     end;
   end;
   frameSource.TextFileFormat := FTextFileFormat;
@@ -3077,7 +3109,7 @@ begin
 
   if not IsInParserMode then   // I4557
   begin
-    MoveSourceToParser(True, False);   // I4137
+    MoveSourceToParser(True);   // I4137
   end;
 
   for f := Low(f) to High(f) do
@@ -3105,7 +3137,7 @@ begin
       MoveParserToSource;
   end
   else if not IsInParserMode and not FLoading then   // I4557
-    MoveSourceToParser(True, True);   // I4137
+    MoveSourceToParser(True);   // I4137
 end;
 
 procedure TfrmKeymanWizard.LoadOSK;   // I4034

@@ -83,6 +83,8 @@ type
     function MessageEvent(Level: TSentryLevel; const Message: string; IncludeStack: Boolean = False): string;
     function ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): string;
 
+    procedure Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
+
     property OnBeforeEvent: TSentryClientBeforeEvent read FOnBeforeEvent write FOnBeforeEvent;
     property OnAfterEvent: TSentryClientAfterEvent read FOnAfterEvent write FOnAfterEvent;
 
@@ -354,6 +356,18 @@ begin
     Inc(p, 2);
     Inc(AGuid);
   end;
+end;
+
+procedure TSentryClient.Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
+var
+  crumb: sentry_value_t;
+begin
+  crumb := sentry_value_new_breadcrumb(PAnsiChar(UTF8Encode(BreadcrumbType)), PAnsiChar(UTF8Encode(Message)));
+  if Category <> '' then
+    sentry_value_set_by_key(crumb, 'category', sentry_value_new_string(PAnsiChar(UTF8Encode(Category))));
+  if Level <> '' then
+    sentry_value_set_by_key(crumb, 'level', sentry_value_new_string(PAnsiChar(UTF8Encode(Level))));
+  sentry_add_breadcrumb(crumb);
 end;
 
 function TSentryClient.ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;

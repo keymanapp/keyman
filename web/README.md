@@ -1,20 +1,8 @@
 # Keyman Web
-The Original Code is (C) 2017-2018 SIL International
+The Original Code is (C) SIL International
 
-## Minimum Web Compilation Requirements
-
-* Java 7+ (required by the Google Closure Compiler)
-    * This can be ignored for Keyman Developer builds.
-* A local installation of [Node.js](https://nodejs.org/) v8.9+.
-	* Builds will call `npm install` to automatically install further necessary build dependencies.
-
-	* Linux users can run the following to update to LTS version of nodejs
-
-```
-sudo apt-get install python-software-properties
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install nodejs
-```
+## Prerequisites
+See [build configuration](../docs/build/index.md) for details on how to configure your build environment.
 
 **********************************************************************
 
@@ -68,4 +56,20 @@ If more than one target is specified, the last one will take precedence.
 
 Before running unit tests on KeymanWeb, first run `./build.sh` according to the instructions above.
 
-Once the build is complete, running `npm test` will run the unit testing suite on your local machine in-browser.  Alternatively, see `unit_tests/test.sh`, which the former command executes.
+Once the build is complete, running `npm test` will run the unit testing suite on your local machine in-browser.
+Alternatively, see `unit_tests/test.sh`, which the former command executes.
+
+### Debugging Unit Tests
+1. During development, to run a specific unit test, change the `it` to `it.only`.
+    You can also run all tests under a specific group with `describe.only`.
+2. From this directory, run `./unit_tests/test.sh -debug`.
+Alternatively, from `web/` or any `web/` subdirectory,
+    ```
+    npm run test -- -debug
+    ```
+    The `--` part tells `npm` to funnel anything to the script as the script's command-line parameters.
+    As long as it's run from somewhere within the `web/` folder's hierarchy, that line will always run from `web/`,
+    as that's where `package.json` is.
+
+3. When the browser halts, click the "Debug" button which opens a new debugging tab.
+4. In the Dev console, you can set a breakpoint in your test and refresh the page to debug

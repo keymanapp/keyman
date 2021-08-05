@@ -397,7 +397,7 @@ begin
           for i := 0 to PackageLanguageMetadata.Count - 1 do
           begin
 
-            BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(PackageLanguageMetadata[i].ID, True);
+            BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(PackageLanguageMetadata[i].ID, True, True);
             if BCP47Tag <> '' then
             begin
               if TMitigateWin10_1803.IsMitigationRequired(BCP47Tag, ml) then
@@ -430,7 +430,7 @@ begin
         FLanguageInstalled := False;
         for i := 0 to PackageLanguageMetadata.Count - 1 do
         begin
-          BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(PackageLanguageMetadata[i].ID, True);
+          BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(PackageLanguageMetadata[i].ID, True, True);
           if BCP47Tag <> '' then
             FLanguageInstalled := LegacyRegisterAndInstallLanguageProfile(BCP47Tag, kbdname, ki.KeyboardName, FIconFileName, PackageLanguageMetadata[i].Name);
           if FLanguageInstalled then

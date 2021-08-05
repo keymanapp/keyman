@@ -25,3 +25,8 @@ case "${OSTYPE}" in
 esac
 
 readonly JQ
+
+# JQ with inplace file replacement
+function jqi() {
+  cat <<< "$($JQ -c "$1" < "$2")" > "$2"
+}

@@ -13,10 +13,12 @@ uses
   Vcl.Grids,
   Vcl.StdCtrls,
   Winapi.Messages,
-  Winapi.Windows;
+  Winapi.Windows,
+
+  UfrmKeymanBase;
 
 type
-  TfrmSettingsAddTSFApp = class(TForm)
+  TfrmSettingsAddTSFApp = class(TfrmKeymanBase)
     cmdOK: TButton;
     cmdCancel: TButton;
     Label1: TLabel;

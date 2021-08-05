@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]] ; do
     -skip-package-install|-S)
       FETCH_DEPS=false
       ;;
-    -h|-help|-?)
+    -h|-help|-\?)
       display_usage
       exit
       ;;

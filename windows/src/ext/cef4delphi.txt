@@ -23,16 +23,28 @@ CEF4Delphi_binary repository is kept in sync with the cef4delphi source
 version.
 
 Build and notes
------------
+---------------
 
 Cef4Delphi also requires the CEF binary distribution from
-http://opensource.spotify.com/cefbuilds/index.html, cloned at
+https://www.spotify.com/au/opensource/, cloned at
 https://github.com/keymanapp/CEF4Delphi_binary. Build agents will
 source this repository in order to build the installer for
 of Keyman Developer. On a development machine, clone the
 CEF4Delphi_binary repository and set the registry value
 [HKEY_CURRENT_USER\Software\Keyman\Debug] Debug_CEFPath [REG_SZ] to
 the root of the cloned repo in order to run Keyman Developer.
+
+Note that some of the files in the CEF4Delphi_binary repo are larger
+than 100MB, which GitHub does not handle, so they have been zipped.
+buildtools/cef-checkout.sh will extract them during a release build, but
+for development use, you'll need to extract them yourself.
+
+Debug symbols for CEF can be found at:
+https://cef-builds.spotifycdn.com/index.html#windows32
+
+Note that these symbols are too large to upload to sentry.keyman.com;
+instead, it should be possible to upload them to downloads.keyman.com
+using symsrv.
 
 License - MPL 1.1
 -----------------

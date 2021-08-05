@@ -1,23 +1,13 @@
 # Keyman for iOS
 
 ## Prerequisites
-* Xcode 9.1
-* iOS 8+
-* SwiftLint (`brew install swiftlint`)
-* Carthage (`brew install carthage`)
-* [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
-* Coreutils (`brew install coreutils`)
-* sentry-cli (`brew install getsentry/tools/sentry-cli`) to utilize Sentry-based error reporting
-* jq (`brew install jq`)
+See [build configuration](../docs/build/index.md) for details on how to configure your build environment.
 
 ## Keyman App
-
 The source for our published iOS Keyman app is found within the **keyman/** subdirectory. This project only contains
 the views specific to the Keyman app, while the core functionality is found in KeymanEngine.framework.
 
 ### Building
-Building Keyman Web is a precursor for compiling KMEI, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
-
 To build Keyman for iOS, please run the build.sh build script within this folder.
 You will need to run with the command-line argument `-no-codesign` or establish alternate code-signing permissions to
 complete the build for the final app.
@@ -88,11 +78,3 @@ The KeymanEngine project contains a demo app that demonstrates usage of the fram
 create a system keyboard.
 
 To build the samples, `cd` into the project directory and run `./build.sh`.
-
-### Compiling the app's offline help
-Extra prerequisite:
-* `wget` (`brew install wget`)
-
-The script `build-help.sh` uses the `wget` tool to construct an offline bundle from the current
-online version of help on help.keyman.com.  When significant changes to help content have been
-made, it is advisable to manually re-run this script to update the app's offline content.

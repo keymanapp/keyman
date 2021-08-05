@@ -213,7 +213,7 @@ def get_nstring(file, fileContent, offset):
     stringlength = struct.unpack_from("<H", fileContent, offset)
     file.seek(offset + 2)
     if stringlength[0] > 256:
-        logging.error("error: suspiciously long string. ABORT.")
+        logging.critical("error: suspiciously long string. ABORT.")
         sys.exit(5)
     if stringlength[0]:
         # don't read the null string terminator

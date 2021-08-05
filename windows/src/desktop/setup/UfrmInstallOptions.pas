@@ -286,7 +286,7 @@ begin
   chkInstallKeyman.Checked := FInstallInfo.ShouldInstallKeyman;
   chkInstallKeyman.OnClick := chkInstallKeymanClick;
   chkInstallKeyman.Enabled := FInstallInfo.IsNewerAvailable and FInstallInfo.IsInstalled;
-  cbKeymanLocation.Enabled := chkInstallKeyman.Enabled and (cbKeymanLocation.Items.Count > 1);
+  cbKeymanLocation.Enabled := chkInstallKeyman.Checked and (cbKeymanLocation.Items.Count > 1);
 
   lblTitleLocation.Left := cbKeymanLocation.Left + sbTargets.Left;
 
@@ -347,7 +347,8 @@ begin
   lblAssociatedKeyboardLanguage.Visible := FInstallInfo.Packages.Count > 0;
 
   // Special case: if there are no options to change, don't present them
-  if (FInstallInfo.Packages.Count = 0) and not chkInstallKeyman.Enabled then
+  if (FInstallInfo.Packages.Count = 0) and not chkInstallKeyman.Enabled and
+    (cbKeymanLocation.Items.Count < 2) then
   begin
     sbTargets.Visible := False;
     lblSelectModulesToInstall.Visible := False;

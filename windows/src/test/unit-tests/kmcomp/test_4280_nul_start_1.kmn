@@ -1,0 +1,13 @@
+c test_4280_nul_start_1
+
+store(&VERSION) '10.0'
+store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c nul should be first statement in context
+if(&platform = 'windows') nul + 'e' > '<windows!'
+
+

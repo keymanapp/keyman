@@ -41,7 +41,7 @@ type
   end;
 
 const
-  HelpArray: array[0..73] of THelpArray = (   // I4840
+  HelpArray: array[0..74] of THelpArray = (   // I4840
     (Word: 'BITMAP' ),
     (Word: 'begin' ),
     (Word: 'COPYRIGHT' ),
@@ -53,6 +53,7 @@ const
 {9} (Word: 'VERSION' ),
 
     (Word: '&BITMAP'; Topic: 'bitmap' ),
+    (Word: '&CasedKeys'; Topic: 'casedkeys' ),
     (Word: '&COPYRIGHT'; Topic: 'copyright' ),
     (Word: '&EthnologueCode'; Topic: 'ethnologuecode' ),   // I4840
     (Word: '&HOTKEY'; Topic: 'hotkey' ),

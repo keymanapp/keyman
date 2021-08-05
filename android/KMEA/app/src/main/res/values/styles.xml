@@ -11,23 +11,39 @@
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
+      <item name="android:listViewStyle">@style/AppTheme.Light.ListView</item>
     </style>
 
-  <style name="AppTheme.Dialog.Alert" parent="Theme.AppCompat.Light.Dialog.Alert">
-      <item name="android:textColor">@android:color/black</item>
-      <item name="android:textColorHint">@android:color/darker_gray</item>
-      <item name="android:textColorPrimary">@android:color/black</item>
+    <style name="AppTheme.Light.Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:background">@android:color/white</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorSecondary">@android:color/black</item>
+        <item name="android:textColorHint">@android:color/darker_gray</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Alert" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorSecondary">@android:color/black</item>
+        <item name="android:textColorHint">@android:color/darker_gray</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 
     <style name="AppTheme.Dialog.Progress" parent="AppTheme.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <style name="Divider">
-        <item name="android:background">@android:color/holo_red_dark</item>
+    <style name="AppTheme.Light.ListView" parent="android:style/Widget.ListView">
+        <item name="android:listSelector">@drawable/list_item</item>
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <style name="Divider.horizontal" parent="Divider">
+    <style name="AppTheme.Divider">
+      <item name="android:background">?attr/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.Divider.horizontal" parent="AppTheme.Divider">
       <item name="android:layout_width">match_parent</item>
       <item name="android:layout_height">1dp</item>
     </style>

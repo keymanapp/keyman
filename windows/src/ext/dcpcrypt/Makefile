@@ -5,6 +5,7 @@
 !include ..\..\Defines.mak
 
 build: dirs
+    @-mkdir obj\Win32\$(TARGET_PATH)
     $(DCC32DPK) DCPdelphi2009.dpk
     $(MAKE) install
 

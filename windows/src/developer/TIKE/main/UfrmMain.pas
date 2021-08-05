@@ -1,18 +1,18 @@
 (*
   Name:             UfrmMain
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rework ui using sp-TBX
                     02 Aug 2006 - mcdurdin - Remove old menu
@@ -410,15 +410,12 @@ type
 var
   frmKeymanDeveloper: TfrmKeymanDeveloper;
 
-procedure InitClasses;
-
 implementation
 
 uses
   System.Math,
   Winapi.WinInet,
   Winapi.ShlObj,
-  Winapi.Urlmon,
   Winapi.UxTheme,
   System.Win.ComObj,
   Vcl.Themes,
@@ -1141,6 +1138,8 @@ begin
       end
       else
       begin
+        FFileName := ExpandUNCFileName(FFileName);
+
         if FCloseNewFile then
           if Assigned(ActiveEditor) then
             if not ActiveEditor.Modified and ActiveEditor.Untitled then
@@ -1154,11 +1153,11 @@ begin
         else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
         else if FileHasModelTsExt(FFileName) then Result := OpenModelEditor(FFileName)
         else                       Result := OpenEditor(FFileName, TfrmEditor);
+
+        if Assigned(Result) then
+          AddMRU(FFileName);
       end;
 
-      if Assigned(Result) then
-        AddMRU(FFileName);
-      
     except
       on E:EFOpenError do
         ShowMessage('Unable to open the file '''+FFileName+'''.');
@@ -1540,13 +1539,6 @@ begin
   // Tell project window to refresh!
   if ProjectForm <> nil then
     ProjectForm.SetGlobalProject;
-end;
-
-procedure InitClasses;  // I3350
-const
-  CUserAgent: AnsiString = 'Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.1; WOW64; Trident/5.0; TIKE/'+SKeymanVersion+')';   // I4045
-begin
-   OleCheck(UrlMkSetSessionOption(URLMON_OPTION_USERAGENT, PAnsiChar(CUserAgent), Length(CUserAgent), 0));   // I4045
 end;
 
 end.

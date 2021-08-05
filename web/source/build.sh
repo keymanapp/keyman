@@ -1,5 +1,5 @@
 #! /bin/bash
-# 
+#
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
 
@@ -21,13 +21,13 @@ display_usage ( ) {
     echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean] [-upload-sentry]"
     echo
     echo "  -ui               to compile only desktop user interface modules"
-    echo "  -test             to compile for testing without copying resources or" 
+    echo "  -test             to compile for testing without copying resources or"
     echo "                    updating the saved version number.  Assumes dependencies
                               are unaltered."
     echo "  -embed            to compile only the KMEA/KMEI embedded engine."
     echo "  -web              to compile only the KeymanWeb engine."
     echo "  -debug_embedded   to compile a readable version of the embedded KMEA/KMEI code"
-    echo "  -no_minify        to disable the minification '/release/' build sections -"  
+    echo "  -no_minify        to disable the minification '/release/' build sections -"
     echo "                      the '/release/unminified' subfolders will still be built."
     echo "  -clean            to erase pre-existing build products before the build."
     echo "  -upload-sentry    to upload debug symbols to our Sentry server"
@@ -64,14 +64,14 @@ minifier="$CLOSURECOMPILERPATH/compiler.jar"
 # with TypeScript's `extend` implementation (it doesn't recognize a constructor without manual edits).
 # We also get a global `this` warning from the same.
 #
-# `checkVars` is blocked b/c Closure will otherwise fail on TypeScript namespacing, as each original TS 
+# `checkVars` is blocked b/c Closure will otherwise fail on TypeScript namespacing, as each original TS
 # source file will redeclare the namespace variable, despite being merged into a single file post-compilation.
 #
 # `jsDocMissingType` prevents errors on type documentation Closure thinks is missing.  TypeScript may not
 # have the same requirements, and we trust TypeScript over Closure.
 minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars --jscomp_off=jsdocMissingType --jscomp_off=uselessCode --jscomp_off=missingRequire --jscomp_off=strictMissingRequire"
 
-# We use these to prevent Closure from auto-inserting its own polyfills.  Turns out, they can break in the 
+# We use these to prevent Closure from auto-inserting its own polyfills.  Turns out, they can break in the
 # WebView used by Android API 19, which our app still supports.
 #
 # Also, we currently apply all needed polyfills either manually or during TS compilation; we don't need the extra,
@@ -153,21 +153,21 @@ finish_nominify ( ) {
 }
 
 copy_resources ( ) {
-    echo 
+    echo
     echo Copy resources to $1/ui, .../osk
 
     # Create our entire compilation results path.  Can't one-line them due to shell-script parsing errors.
-    if ! [ -d $1/ui ];      then 
-        mkdir -p "$1/ui"      
+    if ! [ -d $1/ui ];      then
+        mkdir -p "$1/ui"
     fi
-    if ! [ -d $1/osk ];     then 
-        mkdir -p "$1/osk"     
+    if ! [ -d $1/osk ];     then
+        mkdir -p "$1/osk"
     fi
-    if ! [ -d $1/src/ui ];  then 
-        mkdir -p "$1/src/ui"  
+    if ! [ -d $1/src/ui ];  then
+        mkdir -p "$1/src/ui"
     fi
-    if ! [ -d $1/src/osk ]; then 
-        mkdir -p "$1/src/osk" 
+    if ! [ -d $1/src/osk ]; then
+        mkdir -p "$1/src/osk"
     fi
 
     cp -Rf $SOURCE/resources/ui  $1/  >/dev/null
@@ -287,7 +287,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_FULLWEB=false
             BUILD_DEBUG_EMBED=true
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
         -no_minify)
@@ -509,7 +509,7 @@ if [ $BUILD_UI = true ]; then
 
     finish_nominify $UI "${UI_TARGET[@]}"
 
-    echo \'Native\' UI TypeScript has been compiled into the $INTERMEDIATE/ folder 
+    echo \'Native\' UI TypeScript has been compiled into the $INTERMEDIATE/ folder
 
     if [ $DO_MINIFY = true ]; then
         echo Minify ToolBar UI

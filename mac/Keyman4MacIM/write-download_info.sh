@@ -56,7 +56,7 @@ while [[ $# -gt 0 ]] ; do
                 shift # past argument
             fi
             ;;
-        -h|-?|-help|--help)
+        -h|-\?|-help|--help)
             display_usage
             ;;
         -*)

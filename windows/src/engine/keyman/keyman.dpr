@@ -70,7 +70,6 @@ uses
   UfrmOSKFontHelper in 'viskbd\UfrmOSKFontHelper.pas' {frmOSKFontHelper},
   HintConsts in '..\..\global\delphi\hints\HintConsts.pas',
   KeymanHints in 'KeymanHints.pas',
-  UfrmKeymanBase in '..\..\global\delphi\ui\UfrmKeymanBase.pas' {frmKeymanBase: TTntForm},
   Hints in '..\..\global\delphi\hints\Hints.pas',
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',

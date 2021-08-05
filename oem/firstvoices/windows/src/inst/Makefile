@@ -11,7 +11,7 @@ MSI=firstvoices.msi
 EXE=firstvoices.exe
 KMP=fv_all.kmp
 INTEXE=firstvoices-fv_all.exe
-APPTITLE="FirstVoices Keyboards"
+APPTITLE="Keyman for FirstVoices"
 TITLEIMAGE=setuptitle.png
 
 # If doing manual build of the project, manual-setup is the default target
@@ -27,6 +27,9 @@ prereq:
 
     cd $(FVROOT)\src\inst
     $(MKVER_U) download.in download.mak
+
+    cd $(FVROOT)\src\xml
+    $(MKVER_U) sentry.init.js.in sentry.init.js
 
     #
     # Build FirstVoices keyboards fv_all.kmp

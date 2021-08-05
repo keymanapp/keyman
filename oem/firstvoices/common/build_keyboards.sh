@@ -35,11 +35,10 @@ function die {
 }
 
 function display_usage {
-  echo "Usage: build_keyboards.sh [-download-keyboards] [-download-js-keyboards] [-copy-keyboards] [-clean-keyboards] [-debug] [-h|-?]"
+  echo "Usage: build_keyboards.sh [-download-keyboards] [-copy-keyboards] [-clean-keyboards] [-debug] [-h|-?]"
   echo "Builds all keyboards used by the app and copies them into the"
   echo "target path."
   echo "  -download-keyboards: Download fv_all.kmp from downloads.keyman.com"
-  echo "  -download-js-keyboards: Download js keyboards from downloads.keyman.com"
   echo "  -copy-keyboards: Only copy the keyboards; don't rebuild them"
   echo "  -clean-keyboards: Clean the keyboards from this repo"
   echo "  -debug: Build debug versions of the keyboards"
@@ -50,7 +49,6 @@ DO_CLEAN=true
 DO_COPY=true
 DO_BUILD=true
 DO_DOWNLOAD=false
-DO_JS_DOWNLOAD=false # Remove when iOS handles fv-all.kmp
 
 while [[ $# -gt 0 ]] ; do
   key="$1"
@@ -60,16 +58,10 @@ while [[ $# -gt 0 ]] ; do
       DO_COPY=false
       DO_BUILD=false
       ;;
-    -download-js-keyboards)
-      DO_DOWNLOAD=true
-      DO_JS_DOWNLOAD=true
-      DO_COPY=false
-      DO_BUILD=false
-      ;;
     -copy-keyboards)
       DO_BUILD=false
       ;;
-    -h|-?)
+    -h|-\?)
       display_usage
       ;;
     -clean-keyboards)
@@ -126,7 +118,7 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
       if [ $DO_COPY = true ]; then
         echo "Copying $id ($name) to $KEYBOARDS_TARGET"
         mkdir -p "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id"
-        unzip -o release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/" 
+        unzip -o release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/"
         cp release/$shortname/$id/build/$id.keyboard_info "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
       fi
 #        die "done"
@@ -145,28 +137,10 @@ if [ $DO_DOWNLOAD = true ]; then
   URL_DOWNLOAD=https://downloads.keyman.com
   URL_API_VERSION=${URL_DOWNLOAD}/api/keyboard/
 
-  if [ $DO_JS_DOWNLOAD = true ]; then
-    # iOS still copies individual JS keyboard files
-    {
-      # Skip header line
-      read
-
-      # Read CSV and build each referenced keyboard
-      while IFS=, read -r shortname id name region old_keyboard; do
-        echo "Downloading $id ($name)"
-        # Get latest version
-        URL_DOWNLOAD_FILE=`curl -s "$URL_API_VERSION/$id" | "$JQ" -r .js`
-        curl -s "$URL_DOWNLOAD_FILE" > "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.js"
-        curl -s "${URL_DOWNLOAD_FILE%.*}.keyboard_info" > "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
-      done
-    } < "$SCRIPT_ROOT/../keyboards.csv"
-  else
-    # Desktop and Android use fv_all.kmp
-    id="fv_all"
-    echo "Downloading $id"
-    URL_DOWNLOAD_FILE=`curl -s "$URL_API_VERSION/$id" | "$JQ" -r .kmp`
-    curl -s "$URL_DOWNLOAD_FILE" > "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.kmp"
-  fi
+  id="fv_all"
+  echo "Downloading $id"
+  URL_DOWNLOAD_FILE=`curl -s "$URL_API_VERSION/$id" | "$JQ" -r .kmp`
+  curl -s "$URL_DOWNLOAD_FILE" > "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.kmp"
 fi
 
 echo "Keyboards built successfully."

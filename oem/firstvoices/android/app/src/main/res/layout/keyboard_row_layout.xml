@@ -5,26 +5,29 @@
     android:background="@drawable/list_item" >
     
     <LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginLeft="10dp"
-		android:layout_alignParentLeft="true"
-		android:layout_centerVertical="true"
-		android:orientation="vertical"
-		android:id="@+id/linearLayout">
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout">
  
-		<TextView
-			android:id="@+id/text1"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="15dp"
-			android:layout_marginBottom="15dp"
-			android:textSize="14sp"
-			android:textStyle="bold" />
+        <TextView
+            android:id="@+id/text1"
+            android:background="@android:color/transparent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:textSize="14sp"
+            android:textStyle="bold" />
  
-	</LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
+        android:background="@android:color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="10dp"

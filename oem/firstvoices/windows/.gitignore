@@ -6,6 +6,7 @@ src/inst/*.exe
 src/inst/download.mak
 src/inst/fv_all.kmp
 src/xml/localedef.dtd
+src/xml/sentry.init.js
 **/Thumbs.db
 
 # Temporary ignores

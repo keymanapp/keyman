@@ -1,0 +1,118 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "10.0.1202.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "readme.htm"
+  },
+  "info": {
+    "name": {
+      "description": "SEN\u0106O\u0166EN"
+    },
+    "copyright": {
+      "description": "(c) 2008-2018 FirstVoices, SIL International. Portions (c) 2006 Chris Harvey"
+    },
+    "version": {
+      "description": "9.1"
+    },
+    "author": {
+      "description": ""
+    },
+    "website": {
+      "description": "https://www.firstvoices.com",
+      "url": "https://www.firstvoices.com"
+    }
+  },
+  "files": [
+    {
+      "name": "AboriginalSansBOLD.ttf",
+      "description": "Font Aboriginal Sans Bold"
+    },
+    {
+      "name": "AboriginalSansBOLDITALIC.ttf",
+      "description": "Font Aboriginal Sans Bold Italic"
+    },
+    {
+      "name": "AboriginalSansITALIC.ttf",
+      "description": "Font Aboriginal Sans Italic"
+    },
+    {
+      "name": "AboriginalSansREGULAR.ttf",
+      "description": "Font Aboriginal Sans"
+    },
+    {
+      "name": "AboriginalSerifBOLD.ttf",
+      "description": "Font Aboriginal Serif Bold"
+    },
+    {
+      "name": "AboriginalSerifBOLDITALIC.ttf",
+      "description": "Font Aboriginal Serif Bold Italic"
+    },
+    {
+      "name": "AboriginalSerifITALIC.ttf",
+      "description": "Font Aboriginal Serif Italic"
+    },
+    {
+      "name": "AboriginalSerifREGULAR.ttf",
+      "description": "Font Aboriginal Serif"
+    },
+    {
+      "name": "readme.htm",
+      "description": "File readme.htm"
+    },
+    {
+      "name": "FVLogo.gif",
+      "description": "File FVLogo.gif"
+    },
+    {
+      "name": "keyman.png",
+      "description": "File keyman.png"
+    },
+    {
+      "name": "lgBlue162x31.png",
+      "description": "File lgBlue162x31.png"
+    },
+    {
+      "name": "Sencoten.png",
+      "description": "File Sencoten.png"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "fv_sencoten.js",
+      "description": "File fv_sencoten.js"
+    },
+    {
+      "name": "fv_sencoten.kvk",
+      "description": "File fv_sencoten.kvk"
+    },
+    {
+      "name": "fv_sencoten.kmx",
+      "description": "Keyboard SEN\u0106O\u0166EN"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "SEN\u0106O\u0166EN",
+      "id": "fv_sencoten",
+      "version": "9.1",
+      "languages": [
+        {
+          "name": "Straits Salish (Latin)",
+          "id": "str-Latn"
+        }
+      ]
+    }
+  ]
+}

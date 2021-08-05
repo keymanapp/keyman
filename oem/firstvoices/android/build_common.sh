@@ -62,7 +62,7 @@ while [[ $# -gt 0 ]] ; do
         -lib-nobuild|-no-lib-build)
             ALLOW_KMEA_BUILD=false
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
     esac
@@ -109,7 +109,7 @@ if [ $DO_UPDATE = true ]; then
       exit 1
     fi
 
-    # Copy Keyman Engine aar to 
+    # Copy Keyman Engine aar to
     cp "$KEYMAN_ENGINE_SRC" "$KEYMAN_ENGINE_DST"
 fi
 

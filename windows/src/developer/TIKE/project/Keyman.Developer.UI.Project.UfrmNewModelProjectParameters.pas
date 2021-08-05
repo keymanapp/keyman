@@ -56,6 +56,8 @@ type
     Bevel1: TBevel;
     lblProjectFilename: TLabel;
     editProjectFilename: TEdit;
+    Label1: TLabel;
+    editFullCopyright: TEdit;
     procedure cmdOKClick(Sender: TObject);
     procedure editModelIDComponentChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -72,6 +74,7 @@ type
     procedure editModelIDChange(Sender: TObject);
     procedure cmdBrowseClick(Sender: TObject);
     procedure editModelNameChange(Sender: TObject);
+    procedure editFullCopyrightChange(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -96,6 +99,7 @@ type
     function GetUniq: string;
     procedure UpdateModelIDFromComponents;
     procedure UpdateProjectFilename;
+    function GetFullCopyright: string;
   protected
     function GetHelpTopic: string; override;
     property AuthorID: string read GetAuthorID;
@@ -103,6 +107,7 @@ type
     property Uniq: string read GetUniq;
   public
     property Copyright: string read GetCopyright;
+    property FullCopyright: string read GetFullCopyright;
     property Version: string read GetVersion;
     property Author: string read GetAuthor;
     property ModelName: string read GetModelName;
@@ -147,6 +152,7 @@ begin
     try
       pt.Name := f.ModelName;
       pt.Copyright := f.Copyright;
+      pt.FullCopyright := f.FullCopyright;
       pt.Author := f.Author;
       pt.Version := f.Version;
       pt.BCP47Tags := f.BCP47Tags;
@@ -311,6 +317,12 @@ begin
   EnableControls;
 end;
 
+procedure TfrmNewModelProjectParameters.editFullCopyrightChange(
+  Sender: TObject);
+begin
+  EnableControls;
+end;
+
 procedure TfrmNewModelProjectParameters.editModelIDChange(Sender: TObject);
 begin
   UpdateProjectFilename;
@@ -376,6 +388,11 @@ end;
 function TfrmNewModelProjectParameters.GetCopyright: string;
 begin
   Result := Trim(editCopyright.Text);
+end;
+
+function TfrmNewModelProjectParameters.GetFullCopyright: string;
+begin
+  Result := editFullCopyright.Text;
 end;
 
 function TfrmNewModelProjectParameters.GetModelID: string;
@@ -457,7 +474,8 @@ end;
 procedure TfrmNewModelProjectParameters.UpdateAuthorIDFromAuthor;
 begin
   editAuthorID.Text := TLexicalModelUtils.CleanLexicalModelIDComponent(Author);
-  editCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
+  editCopyright.Text := Char($00A9 {copyright})+' '+Author;
+  editFullCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
 end;
 
 procedure TfrmNewModelProjectParameters.UpdateUniqFromModelName;

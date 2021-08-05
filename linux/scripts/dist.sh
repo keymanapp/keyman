@@ -76,7 +76,7 @@ for proj in ${extra_projects}; do
         dch keyman-config --newversion ${VERSION} --force-bad-version --nomultimaint
         dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
             --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
-            --tar-ignore=__pycache__ -Zgzip -b .
+            --tar-ignore=buildtools/build-langtags.py --tar-ignore=__pycache__ -Zgzip -b .
         mv ../keyman-config_*.tar.gz ../dist/keyman-config-${VERSION}.tar.gz
         echo "3.0 (quilt)" > debian/source/format
     elif [ "${proj}" == "keyboardprocessor" ]; then
@@ -84,6 +84,9 @@ for proj in ${extra_projects}; do
         kbpvers="keyman-keyboardprocessor-$VERSION"
         cp -a desktop $kbpvers
         cp ../../VERSION.md $kbpvers
+        cp ../../TIER.md $kbpvers
+        mkdir -p $kbpvers/scripts
+        cp ../../resources/shellHelperFunctions.sh $kbpvers/scripts
         tar cvzf $kbpvers.tar.gz --exclude=debian --exclude=build --exclude=.gitignore $kbpvers
         rm -rf $kbpvers
         cp $kbpvers.tar.gz ../../linux/dist

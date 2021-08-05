@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFServerComponent;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -53,9 +51,9 @@ interface
 uses
   {$IFDEF DELPHI16_UP}
     {$IFDEF MSWINDOWS}WinApi.Windows, WinApi.Messages, WinApi.ActiveX,{$ENDIF}
-    System.Classes, Vcl.Controls, Vcl.Graphics, Vcl.Forms, System.Math,
+    System.Classes, System.Math,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes, Forms, Controls, Graphics, ActiveX, Math,
+    {$IFDEF MSWINDOWS}Windows, ActiveX,{$ENDIF} Classes, Math,
     {$IFDEF FPC}
     LCLProc, LCLType, LCLIntf, LResources, LMessages, InterfaceBase,
     {$ELSE}
@@ -70,6 +68,7 @@ const
   DEFAULT_CEFSERVER_BACKLOG  = 10;
 
 type
+  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
   TCEFServerComponent = class(TComponent, IServerEvents)
     protected
       FHandler                : ICefServerHandler;
@@ -138,13 +137,40 @@ type
 procedure Register;
 {$ENDIF}
 
+// *********************************************************
+// ********************** ATTENTION ! **********************
+// *********************************************************
+// **                                                     **
+// **  MANY OF THE EVENTS IN CEF4DELPHI COMPONENTS LIKE   **
+// **  TCHROMIUM, TFMXCHROMIUM OR TCEFAPPLICATION ARE     **
+// **  EXECUTED IN A CEF THREAD BY DEFAULT.               **
+// **                                                     **
+// **  WINDOWS CONTROLS MUST BE CREATED AND DESTROYED IN  **
+// **  THE SAME THREAD TO AVOID ERRORS.                   **
+// **  SOME OF THEM RECREATE THE HANDLERS IF THEY ARE     **
+// **  MODIFIED AND CAN CAUSE THE SAME ERRORS.            **
+// **                                                     **
+// **  DON'T CREATE, MODIFY OR DESTROY WINDOWS CONTROLS   **
+// **  INSIDE THE CEF4DELPHI EVENTS AND USE               **
+// **  SYNCHRONIZATION OBJECTS TO PROTECT VARIABLES AND   **
+// **  FIELDS IF THEY ARE ALSO USED IN THE MAIN THREAD.   **
+// **                                                     **
+// **  READ THIS FOR MORE INFORMATION :                   **
+// **  https://www.briskbard.com/index.php?pageid=cef     **
+// **                                                     **
+// **  USE OUR FORUMS FOR MORE QUESTIONS :                **
+// **  https://www.briskbard.com/forum/                   **
+// **                                                     **
+// *********************************************************
+// *********************************************************
+
 implementation
 
 uses
-  uCEFLibFunctions, uCEFApplication, uCEFMiscFunctions;
+  uCEFLibFunctions, uCEFApplicationCore, uCEFMiscFunctions;
 
 // For more information about the TCEFServerComponent properties and functions
-// read the code comments in the CEF3 source file /include/capi/cef_server_cap.h
+// read the code comments in the CEF source file /include/capi/cef_server_cap.h
 
 constructor TCEFServerComponent.Create(AOwner: TComponent);
 begin
@@ -294,10 +320,10 @@ begin
   Result := Initialized and FServer.IsValidConnection(connection_id);
 end;
 
-procedure TCEFServerComponent.SendHttp200response(connection_id : Integer;
-                                                  const content_type : ustring;
-                                                  const data         : Pointer;
-                                                        data_size    : NativeUInt);
+procedure TCEFServerComponent.SendHttp200response(      connection_id : Integer;
+                                                  const content_type  : ustring;
+                                                  const data          : Pointer;
+                                                        data_size     : NativeUInt);
 begin
   if Initialized then FServer.SendHttp200response(connection_id, content_type, data, data_size);
 end;
@@ -312,8 +338,8 @@ begin
   if Initialized then FServer.SendHttp500response(connection_id, error_message);
 end;
 
-procedure TCEFServerComponent.SendHttpResponse(connection_id : Integer;
-                                               response_code : Integer;
+procedure TCEFServerComponent.SendHttpResponse(      connection_id  : Integer;
+                                                     response_code  : Integer;
                                                const content_type   : ustring;
                                                      content_length : int64;
                                                const extra_headers  : ICefStringMultimap);

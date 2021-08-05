@@ -14,7 +14,7 @@ frequently asked questions, tutorials, and videos.
 * [Does Keyman for Windows run on Mac?](common/mac)
 
 ## Ask for Help
-[Ask other users in the SIL Keyman Keyman Community](https://community.software.sil.org/c/keyman)
+[Ask other users in the SIL Keyman Community](https://community.software.sil.org/c/keyman)
 
 ## Help Topics
 

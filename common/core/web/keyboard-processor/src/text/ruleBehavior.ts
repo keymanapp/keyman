@@ -4,9 +4,10 @@ namespace com.keyman.text {
    */
   export class RuleBehavior {
     /**
-     * The before-and-after Transform from matching a keyboard rule.
+     * The before-and-after Transform from matching a keyboard rule.  May be `null`
+     * if no keyboard rules were matched for the keystroke.
      */
-    transcription: Transcription;
+    transcription: Transcription = null;
 
     /**
      * Indicates whether or not a BEEP command was issued by the matched keyboard rule.
@@ -26,7 +27,7 @@ namespace com.keyman.text {
     /**
      * Denotes a non-output default behavior; this should be evaluated later, against the true keystroke.
      */
-    triggersDefaultCommand?: boolean;
+    triggersDefaultCommand: boolean = false;
 
     /**
      * Denotes error log messages generated when attempting to generate this behavior.
@@ -53,8 +54,10 @@ namespace com.keyman.text {
      */
     triggerKeyDefault?: boolean;
 
-    finalize(processor: KeyboardProcessor) {
-      let outputTarget = this.transcription.keystroke.Ltarg;
+    finalize(processor: KeyboardProcessor, outputTarget: OutputTarget) {
+      if(!this.transcription) {
+        throw "Cannot finalize a RuleBehavior with no transcription.";
+      }
 
       if(processor.beepHandler && this.beep) {
         processor.beepHandler(outputTarget);
@@ -83,7 +86,7 @@ namespace com.keyman.text {
 
       if(this.triggersDefaultCommand) {
         let keyEvent = this.transcription.keystroke;
-        DefaultOutput.applyCommand(keyEvent);
+        DefaultOutput.applyCommand(keyEvent, outputTarget);
       }
 
       if(processor.warningLogger && this.warningLog) {

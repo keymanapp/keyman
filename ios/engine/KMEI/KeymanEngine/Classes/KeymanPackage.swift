@@ -190,6 +190,16 @@ public class KeymanPackage {
       distributionMethod = downloadURL != nil ? .cloud : .unknown
       self.downloadURL = downloadURL
     }
+
+    // Used to store metadata for newly-downloaded results from the keyboard search.
+    // To save a version, we require also having a known URL.
+    internal init(downloadURL: URL, version: Version) {
+      self.timestampForLastQuery = NSDate().timeIntervalSince1970
+      self.latestVersion = version.fullString
+      self.downloadURL = downloadURL
+
+      distributionMethod = .cloud
+    }
   }
 
   static private let kmpFile = "kmp.json"
@@ -396,7 +406,9 @@ public class KeymanPackage {
         }
       }
     } catch {
-      log.error("error parsing keyman package: \(error)")
+      // It's not an app or engine error when the package itself is invalid.
+      // Definitely worth noting, though.
+      SentryManager.breadcrumbAndLog("error parsing keyman package: \(error)", sentryLevel: .error)
     }
     
     return nil

@@ -3,8 +3,13 @@
 /// <reference path="languageMenu.ts" />
 // Includes the banner
 /// <reference path="./bannerManager.ts" />
+// Defines desktop-centric OSK positioning + sizing behavior
+/// <reference path="layouts/targetedFloatLayout.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
+// Models keyboards that present a help page, rather than a standard OSK.
+/// <reference path="helpPageView.ts" />
+/// <reference path="emptyView.ts" />
 
 /***
    KeymanWeb 10.0
@@ -12,7 +17,6 @@
 ***/
 
 namespace com.keyman.osk {
-  type MouseHandler = (this: GlobalEventHandlers, ev: MouseEvent) => any;
   type OSKRect = {'left'?: number, 'top'?: number, 'width'?: number, 'height'?: number,
     'nosize'?: boolean, 'nomove'?: boolean};
   type OSKPos = {'left'?: number, 'top'?: number};
@@ -22,14 +26,8 @@ namespace com.keyman.osk {
     _Box: HTMLDivElement;
     banner: BannerManager;
     vkbd: VisualKeyboard;
-    resizeIcon: HTMLDivElement;
-    closeButton: HTMLDivElement;
-    helpImg: HTMLDivElement;
-    configImg: HTMLDivElement;
-    pinImg: HTMLDivElement;
 
-    ready: boolean = false;
-    loadRetry: number = 0;
+    desktopLayout: layouts.TargetedFloatLayout;
 
     // OSK state fields
     _Visible: boolean = false;
@@ -49,79 +47,56 @@ namespace com.keyman.osk {
     _baseWidth: number;
     _baseHeight: number;
 
-    // OSK resizing-event state fields
-    resizing: boolean;
-    _VMoveX: number;
-    _VMoveY: number;
-    _ResizeMouseX: number;
-    _ResizeMouseY: number;
-    _VOriginalWidth: number;
-    _VOriginalHeight: number;
-
-    // Resize-event temporary storage
-    _VPreviousMouseMove: MouseHandler;
-    _VPreviousMouseUp: MouseHandler;
-    _VPreviousCursor: string;
-    _VPreviousMouseButton: number;
-
     // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
     modifierCodes = text.Codes.modifierCodes;
     modifierBitmasks = text.Codes.modifierBitmasks;
     stateBitmasks = text.Codes.stateBitmasks;
     keyCodes = text.Codes.keyCodes;
 
-    // First time initialization of OSK
-    prepare() {
+    public constructor() {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      // Defer loading the OSK until KMW code initialization complete
-      if(!keymanweb['initialized']) {
-        window.setTimeout(this.prepare.bind(this), 200);
-        return;
-      }
-
       // OSK initialization - create DIV and set default styles
-      if(!this.ready) {
-        this._Box = util._CreateElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
-        document.body.appendChild(this._Box);
 
-        // Install the default OSK stylesheet
-        util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
+      this._Box = util._CreateElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
+      document.body.appendChild(this._Box);
 
-        // For mouse click to prevent loss of focus
-        util.attachDOMEvent(this._Box, 'mousedown', function(obj){
-          keymanweb.uiManager.setActivatingUI(true);
+      // Install the default OSK stylesheet
+      util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
+
+      // For mouse click to prevent loss of focus
+      util.attachDOMEvent(this._Box, 'mousedown', function(obj){
+        keymanweb.uiManager.setActivatingUI(true);
+        return false;
+      });
+
+      // And to prevent touch event default behaviour on mobile devices
+      // TODO: are these needed, or do they interfere with other OSK event handling ????
+      if(util.device.touchable) { // I3363 (Build 301)
+        var cancelEventFunc = function(e) {
+          if(e.cancelable) {
+            e.preventDefault();
+          }
+          e.stopPropagation();
           return false;
+        };
+
+        util.attachDOMEvent(this._Box, 'touchstart', function(e) {
+          keymanweb.uiManager.setActivatingUI(true);
+          return cancelEventFunc(e);
         });
 
-        // And to prevent touch event default behaviour on mobile devices
-        // TODO: are these needed, or do they interfere with other OSK event handling ????
-        if(util.device.touchable) { // I3363 (Build 301)
-          var cancelEventFunc = function(e) {
-            if(e.cancelable) {
-              e.preventDefault();
-            }
-            e.stopPropagation();
-            return false;
-          };
+        util.attachDOMEvent(this._Box, 'touchend', cancelEventFunc);
+        util.attachDOMEvent(this._Box, 'touchmove', cancelEventFunc);
+        util.attachDOMEvent(this._Box, 'touchcancel', cancelEventFunc);
 
-          util.attachDOMEvent(this._Box, 'touchstart', function(e) {
-            keymanweb.uiManager.setActivatingUI(true);
-            return cancelEventFunc(e);
-          });
-
-          util.attachDOMEvent(this._Box, 'touchend', cancelEventFunc);
-          util.attachDOMEvent(this._Box, 'touchmove', cancelEventFunc);
-          util.attachDOMEvent(this._Box, 'touchcancel', cancelEventFunc);
-
-          // Can only get (initial) viewport scale factor after page is fully loaded!
-          this.vpScale=util.getViewportScale();
-        }
+        // Can only get (initial) viewport scale factor after page is fully loaded!
+        this.vpScale=util.getViewportScale();
       }
+
       this.loadCookie();
       this.banner = new BannerManager();
-      this.ready=true;
     }
 
     /**
@@ -146,23 +121,6 @@ namespace com.keyman.osk {
       let device = util.device;
 
       var activeKeyboard = keymanweb.core.activeKeyboard;
-
-      // If _Load called before OSK is ready, must wait and call again
-      if(this._Box == null) {
-        if(this.loadRetry >= 99) {
-          return; // fail silently, but should not happen
-        }
-        window.setTimeout(this._Load.bind(this), 100);
-        this.loadRetry++;
-        return;
-      }
-
-      this.loadRetry = 0;
-
-      if(keymanweb._TitleElement) {
-        keymanweb._TitleElement.innerHTML = 'KeymanWeb'; // I1972
-      }
-
 
       this._Visible = false;  // I3363 (Build 301)
       var s = this._Box.style;
@@ -197,8 +155,10 @@ namespace com.keyman.osk {
         s.fontSize = fontScale + 'em';
       }
 
+      if(this.vkbd) {
+        this.vkbd.shutdown();
+      }
       this.vkbd = null;
-      // TODO:  Consider a 'vkbd.release()' method?
 
       // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
       this._Box.innerHTML = '';
@@ -206,68 +166,54 @@ namespace com.keyman.osk {
       this._Box.onmouseover = this._VKbdMouseOver;
       this._Box.onmouseout = this._VKbdMouseOut;
 
-      // TODO: find out and document why this should not be done for touch devices!!
-      // (Probably to avoid having a null keyboard. But maybe that *is* an option, if there remains a way to get the language menu,
-      //  such as a minimized menu button?)
-      if(activeKeyboard == null && !device.touchable) {
-        var Ldiv=util._CreateElement('div');
-        Ldiv.className = "kmw-title-bar";
-        Ldiv.appendChild(this._TitleBarInterior());
-        Ldiv.onmousedown = this._VMoveMouseDown;
-        this._Box.appendChild(Ldiv);
+      // START:  construction of the actual internal layout for the overall OSK
+      let layout: layouts.TargetedFloatLayout = null;
 
-        Ldiv = util._CreateElement('div');
-        Ldiv.className='kmw-osk-none';
-        this._Box.appendChild(Ldiv);
-      } else {
-        var Lhelp='';
-        this._Box.className = "";
-        if(activeKeyboard != null) {
-          // Note:  must exist in order for insertHelpHTML to be used!
-          Lhelp=activeKeyboard.helpText;
-        }
-
-        // Generate a visual keyboard from the layout (or layout default)
-        // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
-        if(activeKeyboard && activeKeyboard.layout(device.formFactor as utils.FormFactor)) {
-          this._GenerateVisualKeyboard(activeKeyboard);
-        } else if(!activeKeyboard) {
-          this._GenerateVisualKeyboard(null);
-        } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
-          //osk.ddOSK = false;
-          Ldiv=util._CreateElement('div');
-          Ldiv.className = "kmw-title-bar";
-          Ldiv.appendChild(this._TitleBarInterior());
-          Ldiv.onmousedown = this._VMoveMouseDown;
-          this._Box.appendChild(Ldiv);
-
-          //Add content
-          var Ldiv = util._CreateElement('div');
-          Ldiv.className='kmw-osk-static';
-          Ldiv.innerHTML = Lhelp;
-          this._Box.appendChild(Ldiv);
-          if(activeKeyboard.hasHelpHTML) {
-            activeKeyboard.insertHelpHTML(this._Box);
-          }
-        }
-        if(keymanweb._TitleElement)
-        {
-          keymanweb._TitleElement.innerHTML = "<span style='font-weight:bold'>"
-            + activeKeyboard.name + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
-          keymanweb._TitleElement.className=''; keymanweb._TitleElement.style.color='#fff';
-        }
+      // Add header element to OSK only for desktop browsers
+      if(util.device.formFactor == 'desktop') {
+        layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+        layout.attachToView(this);
+        this.desktopLayout.titleBar.setTitleFromKeyboard(activeKeyboard);
+        this._Box.appendChild(layout.titleBar.element);
       }
+
+      // Add suggestion banner bar to OSK
+      if (this.banner) {
+        this._Box.appendChild(this.banner.element);
+      }
+
+      let kbdView: KeyboardView = this._GenerateKeyboardView(activeKeyboard);
+      this._Box.appendChild(kbdView.element);
+      if(kbdView instanceof VisualKeyboard) {
+        this.vkbd = kbdView;
+      }
+      kbdView.postInsert();
+
+      // Add footer element to OSK only for desktop browsers
+      if(this.desktopLayout) {
+        if(kbdView instanceof VisualKeyboard) {
+          this._Box.appendChild(layout.resizeBar.element);
+        }
+        // For other devices, adjust the object heights, allowing for viewport scaling
+      } else {
+        this.vkbd.adjustHeights(this.getKeyboardHeight());
+
+        let b: HTMLElement = this._Box, bs=b.style;
+        bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+      }
+
+      // END:  construction of the actual internal layout for the overall OSK
 
       // Correct the classname for the (inner) OSK frame (Build 360)
-      var innerFrame=<HTMLDivElement> this._Box.firstChild,
-        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
-      if(innerFrame.id == 'keymanweb_title_bar') {
-        // Desktop order is title_bar, banner_container, inner-frame
-        innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;
-      } else if (innerFrame.id == 'keymanweb_banner_container') {
-        innerFrame=<HTMLDivElement> innerFrame.nextSibling;
+      var kbdID: string = (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
+      if(keymanweb.isEmbedded && kbdID.indexOf('::') != -1) {
+        // De-namespaces the ID for use with CSS classes.
+        // Assumes that keyboard IDs may not contain the ':' symbol.
+        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
       }
-      innerFrame.className = 'kmw-osk-inner-frame' + kbdClass;
+
+      const kbdClassSuffix = ' kmw-keyboard-' + kbdID;
+      kbdView.element.className = kbdView.element.className + kbdClassSuffix;
 
       this.banner.appendStyles();
 
@@ -301,164 +247,77 @@ namespace com.keyman.osk {
       }
     }
 
+    private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKManager,
+      source: text.MutableSystemStore,
+      newValue: string) {
+      // This handler is also triggered on state-key state changes (K_CAPS) that 
+      // may not actually change the layer.
+      if(this.vkbd) {
+        this.vkbd._UpdateVKShiftStyle();
+      }
+
+      if(source.value != newValue) {
+        // Prevents console errors when a keyboard only displays help.
+        // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.
+        if(this.vkbd) {
+          this.vkbd.layerId = newValue;
+        }
+        this._Show();
+      }
+    }.bind(this);
+
+    private _GenerateKeyboardView(keyboard: keyboards.Keyboard): KeyboardView {
+      let device = com.keyman.singleton.util.device;
+
+      if(this.vkbd) {
+        this.vkbd.shutdown();
+      }
+
+      this._Box.className = "";
+
+      // Case 1:  since we hide the system keyboard on touch devices, we need
+      //          to display SOMETHING that can accept input.
+      if(keyboard == null && !device.touchable) {
+        // We do not (currently) allow selecting the default system keyboard on
+        // touch form-factors.  Likely b/c mnemonic difficulties.
+        return new EmptyView();
+      } else {
+        // Generate a visual keyboard from the layout (or layout default)
+        // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
+        if(keyboard && keyboard.layout(device.formFactor as utils.FormFactor)) {
+          return this._GenerateVisualKeyboard(keyboard);
+        } else if(!keyboard /* && device.touchable (implied) */) {
+          // Show a basic, "hollow" OSK that at least allows input, since we're
+          // on a touch device and hiding the system keyboard
+          return this._GenerateVisualKeyboard(null);
+        } else {
+          // A keyboard help-page or help-text is still a visualization, even not a standard OSK.
+          return new HelpPageView(keyboard);
+        }
+      }
+    }
+
     /**
      * Function     _GenerateVisualKeyboard
      * Scope        Private
-     * @param       {Object}      PVK         Visual keyboard name
-     * @param       {Object}      Lhelp       true if OSK defined for this keyboard
-     * @param       {Object}      layout0
-     * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
+     * @param       {Object}      keyboard    The keyboard to visualize
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
-    private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard) {
-      this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard);
-      let util = com.keyman.singleton.util;
+    private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard): VisualKeyboard {
+      let device = com.keyman.singleton.util.device;
+
+      // Root element sets its own classes, one of which is 'kmw-osk-inner-frame'.
+      let vkbd = new VisualKeyboard(keyboard, device);
+
+      // Ensure the OSK's current layer is kept up to date.
+      let core = com.keyman.singleton.core; // Note:  will eventually be a class field.
+      core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
 
       // Set box class - OS and keyboard added for Build 360
-      this._Box.className=util.device.formFactor+' '+ util.device.OS.toLowerCase() + ' kmw-osk-frame';
-
-      // Add header element to OSK only for desktop browsers
-      if(util.device.formFactor == 'desktop') {
-        this._Box.appendChild(this.controlBar());
-      }
-
-      // Add suggestion banner bar to OSK
-      if (this.banner) {
-        this._Box.appendChild(this.banner.element);
-      }
+      this._Box.className=device.formFactor+' '+ device.OS.toLowerCase() + ' kmw-osk-frame';
 
       // Add primary keyboard element to OSK
-      this._Box.appendChild(this.vkbd.kbdDiv);
-
-      // Add footer element to OSK only for desktop browsers
-      if(util.device.formFactor == 'desktop') {
-        this._Box.appendChild(this.resizeBar());
-        // For other devices, adjust the object heights, allowing for viewport scaling
-      } else {
-        this.vkbd.adjustHeights();
-      }
-    }
-
-    /**
-     * Create a control bar with title and buttons for the desktop OSK
-     */
-    controlBar(): HTMLDivElement {
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
-      var bar=util._CreateElement('div'),title='';
-      bar.id='keymanweb_title_bar';
-      bar.className='kmw-title-bar';
-      bar.onmousedown=this._VMoveMouseDown;
-
-      if(keymanweb.core.activeKeyboard) {
-        title=keymanweb.core.activeKeyboard.name;
-      }
-      var Ltitle=util._CreateElement('span');
-      Ltitle.className='kmw-title-bar-caption';
-      Ltitle.innerHTML=title;
-      bar.appendChild(Ltitle);
-
-      var Limg = this.closeButton = util._CreateElement('div');
-      Limg.id='kmw-close-button';
-      Limg.className='kmw-title-bar-image';
-      Limg.onmousedown=util._CancelMouse;
-      Limg.onclick=function(this: OSKManager) {
-        this._Hide(true);
-      }.bind(this);
-      bar.appendChild(Limg);
-
-      Limg = this.helpImg = util._CreateElement('div');
-      Limg.id='kmw-help-image';
-      Limg.className='kmw-title-bar-image';
-      Limg.title='KeymanWeb Help';
-      Limg.onclick=function() {
-        var p={};
-        util.callEvent('osk.helpclick',p);
-        if(window.event) {
-          window.event.returnValue=false;
-        }
-        return false;
-      }
-      Limg.onmousedown=util._CancelMouse;
-      bar.appendChild(Limg);
-
-      Limg = this.configImg = util._CreateElement('div');
-      Limg.id='kmw-config-image';
-      Limg.className='kmw-title-bar-image';
-      Limg.title='KeymanWeb Configuration Options';
-      Limg.onclick=function() {
-        var p={};
-        util.callEvent('osk.configclick',p);
-        if(window.event) {
-          window.event.returnValue=false;
-        }
-        return false;
-      }
-      Limg.onmousedown=util._CancelMouse;
-      bar.appendChild(Limg);
-
-      Limg = this.pinImg = util._CreateElement('div');  //I2186
-      Limg.id='kmw-pin-image';
-      Limg.className='kmw-title-bar-image';
-      Limg.title='Pin the On Screen Keyboard to its default location on the active text box';
-      Limg.onclick=function(this: OSKManager) {
-        this.loadCookie();
-        this.userPositioned=false;
-        this.saveCookie();
-        this._Show();
-        this.doResizeMove(); //allow the UI to respond to OSK movements
-        if(this.pinImg) {
-          this.pinImg.style.display='none';
-        }
-        if(window.event) {
-          window.event.returnValue=false;
-        }
-        return false;
-      }.bind(this);
-      Limg.onmousedown=util._CancelMouse;
-      bar.appendChild(Limg);
-
-      return bar;
-    }
-
-    /**
-     * Create a bottom bar with a resizing icon for the desktop OSK
-     */
-    resizeBar(): HTMLDivElement {
-      let util = com.keyman.singleton.util;
-
-      var bar=util._CreateElement('div');
-      bar.className='kmw-footer';
-      bar.onmousedown=util._CancelMouse;
-
-      // Add caption
-      var Ltitle=util._CreateElement('div');
-      Ltitle.className='kmw-footer-caption';
-      Ltitle.innerHTML='<a href="https://keyman.com/developer/keymanweb/">KeymanWeb</a>';
-      Ltitle.id='keymanweb-osk-footer-caption';
-
-      // Display build number on shift+double click
-      util.attachDOMEvent(Ltitle,'dblclick', function(e) {
-        if(e && e.shiftKey) {
-          this.showBuild();
-        }
-        return false;
-      }.bind(this),false);
-
-      // Prevent selection of caption (IE - set by class for other browsers)
-      if('onselectstart' in Ltitle) Ltitle.onselectstart= util.selectStartHandler; //IE (Build 360)
-
-      bar.appendChild(Ltitle);
-
-      var Limg = util._CreateElement('div');
-      Limg.className='kmw-footer-resize';
-      Limg.onmousedown=this._VResizeMouseDown;
-      Limg.onmouseover=Limg.onmouseout=this._VResizeMouseOut;
-      bar.appendChild(Limg);
-      this.resizeIcon=Limg;
-      //TODO: the image never appears in IE8, have no idea why!
-      return bar;
+      return vkbd;
     }
 
     /**
@@ -466,87 +325,40 @@ namespace com.keyman.osk {
      */
     showBuild() {
       let keymanweb = com.keyman.singleton;
-      keymanweb.util.alert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
-        +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
+      keymanweb.util.internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
+          +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
     }
 
     /**
-     * Move OSK back to default position
+     * Function     restorePosition
+     * Scope        Public
+     * @param       {boolean?}      keepDefaultPosition  If true, does not reset the default x,y set by `setRect`.
+     *                                                   If false or omitted, resets the default x,y as well.
+     * Description  Move OSK back to default position, floating under active input element
      */
-    restorePosition: () => void = function(this: OSKManager) {
-      if(this._Visible) {
+    ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: OSKManager, keepDefaultPosition?: boolean) {
+      let isVisible = this._Visible;
+      if(isVisible) {
         com.keyman.singleton.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
-        this.loadCookie();
-        this.userPositioned=false;
-        this.saveCookie();
+      }
+
+      this.loadCookie();
+      this.userPositioned=false;
+      if(!keepDefaultPosition) {
+        delete this.dfltX;
+        delete this.dfltY;
+      }
+      this.saveCookie();
+
+      if(isVisible) {
         this._Show();
-        this.doResizeMove(); //allow the UI to respond to OSK movements
       }
-      if(this.pinImg) {
-        this.pinImg.style.display='none';
-      }
-      if(window.event) {
-        window.event.returnValue=false;
+
+      this.doResizeMove(); //allow the UI to respond to OSK movements
+      if(this.desktopLayout) {
+        this.desktopLayout.titleBar.showPin(false);
       }
     }.bind(this);
-
-    /**
-     * Function     _TitleBarInterior
-     * Scope        Private
-     * Description  Title bar interior formatting and element event handling
-     */
-    _TitleBarInterior() {
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
-      var Ldiv = util._CreateElement('div');
-      var Ls = Ldiv.style;
-      Ls.paddingLeft='2px';
-      Ls.cursor='move';
-      Ls.background='#ad4a28';
-      Ls.font='8pt Tahoma,Arial,sans-serif';  //I2186
-
-      // Add container for buttons, handle mousedown event
-      var LdivButtons = util._CreateElement('div');
-      LdivButtons.className = 'kmw-title-bar-actions';
-      LdivButtons.onmousedown=util._CancelMouse;
-
-      // Add close button, handle click and mousedown events
-      var Limg = util._CreateElement('div');
-      Limg.className='kmw-close-button';
-      Limg.onmousedown=util._CancelMouse;
-      Limg.onclick=function (this: OSKManager) {
-        this._Hide(true);
-      }.bind(this);
-      this.closeButton = Limg;
-      LdivButtons.appendChild(Limg);
-
-      // Add 'Unpin' button for restoring OSK to default location, handle mousedown and click events
-      Limg = this.pinImg = util._CreateElement('div');  //I2186
-      Limg.className='kmw-pin-image';
-      Limg.title='Pin the On Screen Keyboard to its default location on the active text box';
-      Limg.onclick=this.restorePosition;
-      Limg.onmousedown=util._CancelMouse;
-      Limg.style.display='none';
-
-      // Do not use Unpin button on touch screens (OSK location fixed)
-      if(!util.device.touchable) {
-        LdivButtons.appendChild(Limg); // I3363 (Build 301)
-      }
-
-      // Attach button container to title bar
-      Ldiv.appendChild(LdivButtons);
-
-      // Add title bar caption
-      var Lcap=keymanweb._TitleElement=util._CreateElement('span');  // I1972
-      Lcap.className='kmw-title-bar-caption';
-      Lcap.innerHTML='KeymanWeb';
-      Ldiv.appendChild(Lcap);
-
-      return Ldiv;
-    }
-
-    // End of TitleBarInterior
 
     /**
      * Function     enabled
@@ -587,278 +399,6 @@ namespace com.keyman.osk {
      */
     private _VKbdMouseOut = function(this: OSKManager, e) {
       com.keyman.singleton.uiManager.setActivatingUI(false);
-    }.bind(this);
-
-    /**
-     * Function     _VResizeMouseOver, _VResizeMouseOut
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process end of resizing of KMW UI
-     */
-    private _VResizeMouseOut = function(this: OSKManager, e: Event) {
-      e = com.keyman.singleton._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return false;
-      }
-
-      if(e  &&  e.preventDefault) {
-        e.preventDefault();
-      }
-
-      var r=this.getRect();
-      this.setSize(r.width, r.height, true);
-      e.cancelBubble = true;
-      return false;
-    }.bind(this);
-
-    private _VResizeMouseOver = this._VResizeMouseOut;
-
-    /**
-     * Function     _VResizeMouseDown
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process resizing of KMW UI
-     */
-    private _VResizeMouseDown = function(this: OSKManager, e: MouseEvent) {
-      let keymanweb = com.keyman.singleton;
-
-      keymanweb.uiManager.justActivated = true;
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      this.resizing = true;
-      var Lposx,Lposy;
-      if (e.pageX) {
-        Lposx = e.pageX;
-        Lposy = e.pageY;
-      } else if(e.clientX) {
-        Lposx = e.clientX + document.body.scrollLeft;
-        Lposy = e.clientY + document.body.scrollTop;
-      }
-
-      this._ResizeMouseX = Lposx;
-      this._ResizeMouseY = Lposy;
-      if(document.onmousemove != this._VResizeMouseMove  &&  document.onmousemove != this._VMoveMouseMove) { // I1472 - Dragging off edge of browser window causes muckup
-        this._VPreviousMouseMove = document.onmousemove;
-        this._VPreviousMouseUp = document.onmouseup;
-      }
-      this._VPreviousCursor = document.body.style.cursor;
-      this._VPreviousMouseButton = (typeof(e.which)=='undefined' ? e.button : e.which);
-
-      this._VOriginalWidth = this.vkbd.kbdDiv.offsetWidth;
-      this._VOriginalHeight = this.vkbd.kbdDiv.offsetHeight;
-      document.onmousemove = this._VResizeMouseMove;
-      document.onmouseup = this._VResizeMoveMouseUp;
-
-      if(document.body.style.cursor) {
-        document.body.style.cursor = 'se-resize';
-      }
-      if(e  &&  e.preventDefault) {
-        e.preventDefault();
-      }
-      e.cancelBubble = true;
-      return false;
-    }.bind(this);
-
-    /**
-     * Function     _VResizeMouseMove
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process mouse movement during resizing of OSK
-     */
-    _VResizeMouseMove = function(this: OSKManager, e: MouseEvent) {
-      var Lposx,Lposy;
-      e = com.keyman.singleton._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-      this.resizing = true;
-
-      if(this._VPreviousMouseButton != (typeof(e.which)=='undefined' ? e.button : e.which)) { // I1472 - Dragging off edge of browser window causes muckup
-        return this._VResizeMoveMouseUp(e);
-      } else {
-        if (e.pageX) {
-          Lposx = e.pageX;
-          Lposy=e.pageY;
-        } else if (e.clientX) {
-          Lposx = e.clientX + document.body.scrollLeft;
-          Lposy = e.clientY + document.body.scrollTop;
-        }
-
-        var newWidth=(this._VOriginalWidth + Lposx - this._ResizeMouseX),
-            newHeight=(this._VOriginalHeight + Lposy - this._ResizeMouseY);
-
-        // Set the smallest and largest OSK size
-        if(newWidth < 0.2*screen.width) {
-          newWidth = 0.2*screen.width;
-        }
-        if(newHeight < 0.1*screen.height) {
-          newHeight = 0.1*screen.height;
-        }
-        if(newWidth > 0.9*screen.width) {
-          newWidth=0.9*screen.width;
-        }
-        if(newHeight > 0.5*screen.height) {
-          newWidth=0.5*screen.height;
-        }
-
-        // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font
-        this.setSize(newWidth, newHeight);
-
-        if(e  &&  e.preventDefault) {
-          e.preventDefault();
-        }
-        e.cancelBubble = true;
-        return false;
-      }
-    }.bind(this);
-
-    /**
-     * Function     _VMoveMouseDown
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process mouse down on OSK
-     */
-    private _VMoveMouseDown = function(this: OSKManager, e: MouseEvent) {
-      let keymanweb = com.keyman.singleton;
-
-      var Lposx, Lposy;
-      keymanweb.uiManager.justActivated = true;
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      this.resizing = true;
-      if (e.pageX) {
-        Lposx = e.pageX;
-        Lposy = e.pageY;
-      } else if (e.clientX) {
-        Lposx = e.clientX + document.body.scrollLeft;
-        Lposy = e.clientY + document.body.scrollTop;
-      }
-
-      if(document.onmousemove != this._VResizeMouseMove  &&  document.onmousemove != this._VMoveMouseMove) { // I1472 - Dragging off edge of browser window causes muckup
-        this._VPreviousMouseMove = document.onmousemove;
-        this._VPreviousMouseUp = document.onmouseup;
-      }
-
-      this._VPreviousCursor = document.body.style.cursor;
-      this._VPreviousMouseButton = (typeof(e.which)=='undefined' ? e.button : e.which);
-
-      this._VMoveX = Lposx - this._Box.offsetLeft;
-      this._VMoveY = Lposy - this._Box.offsetTop;
-
-      if(keymanweb.isCJK()) {
-        this.pinImg.style.left='15px';
-      }
-
-      document.onmousemove = this._VMoveMouseMove;
-      document.onmouseup = this._VResizeMoveMouseUp;
-      if(document.body.style.cursor) {
-        document.body.style.cursor = 'move';
-      }
-      if(e  &&  e.preventDefault) {
-        e.preventDefault();
-      }
-      e.cancelBubble = true;
-      return false;
-    }.bind(this);
-
-    /**
-     * Process mouse drag on OSK
-     *
-     * @param       {Object}      e      event
-     */
-    private _VMoveMouseMove = function(this: OSKManager, e: MouseEvent) {
-      let keymanweb = com.keyman.singleton;
-
-      var Lposx, Lposy;
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      if(this.noDrag) {
-        return true;
-      }
-
-      this.resizing = true;
-
-      this.userPositioned = true;
-      this.pinImg.style.display='block';
-
-      if(this._VPreviousMouseButton != (typeof(e.which)=='undefined' ? e.button : e.which)) { // I1472 - Dragging off edge of browser window causes muckup
-        return this._VResizeMoveMouseUp(e);
-      } else {
-        if (e.pageX) {
-          Lposx = e.pageX;
-          Lposy = e.pageY;
-        } else if (e.clientX) {
-          Lposx = e.clientX + document.body.scrollLeft;
-          Lposy = e.clientY + document.body.scrollTop;
-        }
-
-        this._Box.style.left = (Lposx-this._VMoveX)+'px';
-        this._Box.style.top = (Lposy-this._VMoveY)+'px';
-
-        if(e  &&  e.preventDefault) {
-          e.preventDefault();
-        }
-
-        var r=this.getRect();
-        this.setSize(r.width, r.height, true);
-        this.x = r.left;
-        this.y = r.top;
-        e.cancelBubble = true;
-        return false;
-      }
-    }.bind(this);
-
-    /**
-     * Function     _VResizeMoveMouseUp
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Process mouse up during resizing of KMW UI
-     */
-    private _VResizeMoveMouseUp = function(this: OSKManager, e: MouseEvent) {
-      let keymanweb = com.keyman.singleton;
-
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      this.resizing = false;
-      if(this.vkbd) {
-        this.vkbd.currentKey=null;
-      }
-
-      document.onmousemove = this._VPreviousMouseMove;
-      document.onmouseup = this._VPreviousMouseUp;
-
-      if(document.body.style.cursor) {
-        document.body.style.cursor = this._VPreviousCursor;
-      }
-
-      keymanweb.domManager.focusLastActiveElement();
-      if(e  &&  e.preventDefault) {
-        e.preventDefault();
-      }
-
-      keymanweb.uiManager.justActivated = false;
-      keymanweb.uiManager.setActivatingUI(false);
-
-      if(this.vkbd) {
-        this._VOriginalWidth = this.vkbd.kbdDiv.offsetWidth;
-        this._VOriginalHeight = this.vkbd.kbdDiv.offsetHeight;
-        }
-      this.doResizeMove();
-      e.cancelBubble = true;
-      this.saveCookie();
-      return false;
     }.bind(this);
 
     /**
@@ -939,7 +479,7 @@ namespace com.keyman.osk {
       }
     }
 
-    private setSize(width?: number, height?: number, pending?: boolean) {
+    /*private*/ setSize(width?: number, height?: number, pending?: boolean) {
       if(width && height) {
         this._baseWidth = width;
         this._baseHeight = height;
@@ -1066,10 +606,8 @@ namespace com.keyman.osk {
       p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
 
       if(this.vkbd) {
-        p['width']  = p.width  = dom.Utils.getAbsoluteX(this.vkbd.kbdHelpDiv) -
-          dom.Utils.getAbsoluteX(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetWidth;
-        p['height'] = p.height = dom.Utils.getAbsoluteY(this.vkbd.kbdHelpDiv) -
-          dom.Utils.getAbsoluteY(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetHeight;
+        p['width']  = p.width  = this.vkbd.kbdDiv.offsetWidth;
+        p['height'] = p.height = this.vkbd.kbdDiv.offsetHeight;
       } else {
         p['width']  = p.width  = dom.Utils.getAbsoluteX(this._Box) + this._Box.offsetWidth;
         p['height'] = p.height = dom.Utils.getAbsoluteY(this._Box) + this._Box.offsetHeight;
@@ -1091,12 +629,14 @@ namespace com.keyman.osk {
 
       var b = this._Box, bs = b.style;
       if('left' in p) {
-        bs.left=(p['left']-dom.Utils.getAbsoluteX(b)+b.offsetLeft)+'px';
+        this.x = p['left'] - dom.Utils.getAbsoluteX(b) + b.offsetLeft;
+        bs.left= this.x + 'px';
         this.dfltX=bs.left;
       }
 
       if('top' in p) {
-        bs.top=(p['top']-dom.Utils.getAbsoluteY(b)+b.offsetTop)+'px';
+        this.y = p['top'] - dom.Utils.getAbsoluteY(b) + b.offsetTop;
+        bs.top = this.y + 'px';
         this.dfltY=bs.top;
       }
 
@@ -1135,8 +675,8 @@ namespace com.keyman.osk {
 
         // Fix or release user resizing
         if('nosize' in p) {
-          if(this.resizeIcon) {
-            this.resizeIcon.style.display=(p['nosize'] ? 'none' : 'block');
+          if(this.desktopLayout) {
+            this.desktopLayout.resizingEnabled = !p['nosize'];
           }
         }
 
@@ -1144,8 +684,8 @@ namespace com.keyman.osk {
       // Fix or release user dragging
       if('nomove' in p) {
         this.noDrag=p['nomove'];
-        if(this.pinImg) {
-          this.pinImg.style.display=(p['nomove'] || !this.userPositioned) ? 'none' : 'block';
+        if(this.desktopLayout) {
+          this.desktopLayout.movementEnabled = !this.noDrag;
         }
       }
       // Save the user-defined OSK size
@@ -1202,8 +742,8 @@ namespace com.keyman.osk {
         }
       }
 
-      if(this.pinImg) {
-        this.pinImg.style.display=(this.userPositioned ? 'block' : 'none');
+      if(this.desktopLayout) {
+        this.desktopLayout.titleBar.showPin(this.userPositioned);
       }
     }
 
@@ -1247,15 +787,25 @@ namespace com.keyman.osk {
 
       // TODO:  Move this into the VisualKeyboard class!
       // The following code will always be executed except for externally created OSK such as EuroLatin
-      if(this.vkbd && this.vkbd.ddOSK) {
+      if(this.vkbd) {
+        // Always adjust screen height if iPhone or iPod, to take account of viewport changes
+        // Do NOT condition upon form-factor; this line prevents a bug with displaying
+        // the predictive-text banner on the initial keyboard load.  (Issue #2907)
+        if(device.touchable && device.OS == 'iOS') {
+          this.vkbd.adjustHeights(this.getKeyboardHeight());
+
+          var b: HTMLElement = this._Box, bs=b.style;
+          bs.height=bs.maxHeight=this.vkbd.computedAdjustedOskHeight(this.getHeight())+'px';
+        }
         // Enable the currently active keyboard layer and update the default nextLayer member
-        this.vkbd.show();
+        this.vkbd.updateState();
 
         // Extra style changes and overrides for touch-mode.
         if(device.touchable) {
-          Ls.position='fixed';
-          Ls.left=Ls.bottom='0px';
-          let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
+          let ks = this.vkbd.kbdDiv.style;
+          ks.position = Ls.position='fixed';
+          ks.bottom = Ls.left=Ls.bottom='0px';
+          let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv).style.height;
           vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
           Ls.height=Ls.maxHeight= (this.getBannerHeight() + parseInt(vkbdHeight, 10) + 5 /* kmw-banner-bar top in css */) + 'px';
           Ls.border='none';
@@ -1313,9 +863,9 @@ namespace com.keyman.osk {
 
         this.saveCookie();
 
-        var pin=this.pinImg;
-        if(typeof pin != 'undefined' && pin != null)
-          pin.style.display=this.userPositioned?'block':'none';
+        if(this.desktopLayout) {
+          this.desktopLayout.titleBar.showPin(this.userPositioned);
+        }
       }
 
       // If OSK still hidden, make visible only after all calculation finished

@@ -254,28 +254,21 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
 
   @Override
   public void onNextClicked(final StepperLayout.OnNextClickedCallback callback) {
-    // Send data to calling Activity
+    // Do nothing
+  }
+
+  @Override
+  public void onCompleteClicked(StepperLayout.OnCompleteClickedCallback callback) {
     if (!isInstallingPackage) {
       this.callback.onLanguagesSelected(addKeyboardsList);
     } else {
       this.callback.onLanguagesSelected(PackageProcessor.PP_TARGET_KEYBOARDS, packageID, languageList);
     }
 
-    new Handler().postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        //you can do anythings you want
-        callback.goToNextStep();
-      }
-    }, 1000L);// delay open another fragment,
-  }
-  @Override
-  public void onCompleteClicked(StepperLayout.OnCompleteClickedCallback callback) {
-    if (!isInstallingPackage) {
-      this.callback.onLanguagesSelected(addKeyboardsList);
-    }
+    // Cleanup
     getActivity().finish();
   }
+
   @Override
   public void onBackClicked(StepperLayout.OnBackClickedCallback callback) {
     callback.goToPrevStep();

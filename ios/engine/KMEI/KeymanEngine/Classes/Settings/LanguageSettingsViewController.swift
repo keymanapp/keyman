@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Sentry
 
 private let toolbarButtonTag = 100
 
@@ -150,10 +151,9 @@ class LanguageSettingsViewController: UITableViewController {
           doPredictionsSwitch!.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
           doPredictionsSwitch!.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doPredictionsSwitch!)
-          if #available(iOSApplicationExtension 9.0, *) {
-            doPredictionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-            doPredictionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-          }
+
+          doPredictionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          doPredictionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         } else if 1 == indexPath.row {
           correctionsCell = cell
           cell.accessoryType = .none
@@ -166,10 +166,9 @@ class LanguageSettingsViewController: UITableViewController {
           doCorrectionsSwitch!.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
           doCorrectionsSwitch!.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doCorrectionsSwitch!)
-          if #available(iOSApplicationExtension 9.0, *) {
-            doCorrectionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-            doCorrectionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-          }
+
+          doCorrectionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          doCorrectionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
 
           // Disable interactivity if the prediction toggle is set to 'off'.
           doCorrectionsSwitch!.isHidden = !userDefaults.predictSettingForLanguage(languageID: self.language.id)
@@ -253,7 +252,7 @@ class LanguageSettingsViewController: UITableViewController {
           }
 
         default:
-          cell.textLabel?.text = "error"
+          cell.textLabel?.text = NSLocalizedString("alert-error-title", bundle: engineBundle, comment: "")
       }
     }
   }
@@ -307,6 +306,7 @@ class LanguageSettingsViewController: UITableViewController {
           break
         case .error(let error):
           if let error = error {
+            // Note: Errors may result from network issues.
             log.error(String(describing: error))
           }
         case .success(let package, let fullID):
@@ -344,7 +344,7 @@ class LanguageSettingsViewController: UITableViewController {
 
     // If user defaults for keyboards list does not exist, do nothing.
     guard let globalUserKeyboards = userData.userKeyboards else {
-      log.error("no keyboards in the global keyboards list!")
+      SentryManager.captureAndLog("no keyboards in the global keyboards list!")
       return nil
     }
 
@@ -354,6 +354,11 @@ class LanguageSettingsViewController: UITableViewController {
       }
       return index
     } else {
+      let event = Sentry.Event(level: .debug)
+      event.message = SentryMessage(formatted: "Keyboard index requested for uninstalled keyboard")
+      event.extra = ["id": matchingFullID]
+      SentrySDK.capture(event: event)
+
       log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
       return nil
     }
@@ -366,7 +371,7 @@ class LanguageSettingsViewController: UITableViewController {
 
     // If user defaults for keyboards list does not exist, do nothing.
     guard let globalUserKeyboards = userData.userKeyboards else {
-      log.error("no keyboards in the global keyboards list!")
+      SentryManager.captureAndLog("no keyboards in the global keyboards list!")
       return
     }
 
@@ -380,6 +385,11 @@ class LanguageSettingsViewController: UITableViewController {
       let infoView = ResourceInfoViewController(for: thisKb, mayDelete: mayDelete)
       navigationController?.pushViewController(infoView, animated: true)
     } else {
+      let event = Sentry.Event(level: .debug)
+      event.message = SentryMessage(formatted: "Keyboard index requested for uninstalled keyboard")
+      event.extra = ["id": matchingFullID]
+      SentrySDK.capture(event: event)
+
       log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
       return
     }

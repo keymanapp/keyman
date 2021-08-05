@@ -119,7 +119,8 @@ uses
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
-  Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas';
+  Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
+  Keyman.Developer.System.ValidateRepoChanges in 'Keyman.Developer.System.ValidateRepoChanges.pas';
 
 {$R icons.RES}
 {$R version.res}
@@ -144,7 +145,11 @@ begin
       Run;
     except
       on E: Exception do
-        SentryHandleException(E);
+        if not SentryHandleException(E) then
+        begin
+          writeln(E.Message);
+          ExitCode := 99;
+        end;
     end;
   finally
     TKeymanSentryClient.Stop;

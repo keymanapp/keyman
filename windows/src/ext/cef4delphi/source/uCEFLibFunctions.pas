@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFLibFunctions;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -56,9 +54,25 @@ uses
   {$ELSE}
     {$IFDEF MSWINDOWS}Windows,{$ENDIF} Math,
   {$ENDIF}
+  {$IFDEF LINUX}
+    {$IFDEF FPC}xlib,{$ENDIF}
+    {$IFDEF FMX}uCEFLinuxTypes,{$ENDIF}
+  {$ENDIF}
   uCEFTypes;
 
 var
+  // *********************************
+  // *********** API HASH ************
+  // *********************************
+
+  // /include/cef_api_hash.h
+  cef_api_hash               : function(entry: integer): PAnsiChar; cdecl;
+
+
+  // *********************************
+  // ************* CAPI **************
+  // *********************************
+
   // /include/capi/cef_app_capi.h
   cef_initialize             : function(const args: PCefMainArgs; const settings: PCefSettings; application: PCefApp; windows_sandbox_info: Pointer): Integer; cdecl;
   cef_shutdown               : procedure; cdecl;
@@ -70,8 +84,8 @@ var
   cef_enable_highdpi_support : procedure; cdecl;
 
   // /include/capi/cef_browser_capi.h
-  cef_browser_host_create_browser      : function(const windowInfo: PCefWindowInfo; client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; request_context: PCefRequestContext): Integer; cdecl;
-  cef_browser_host_create_browser_sync : function(const windowInfo: PCefWindowInfo; client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; request_context: PCefRequestContext): PCefBrowser; cdecl;
+  cef_browser_host_create_browser      : function(const windowInfo: PCefWindowInfo; client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; extra_info: PCefDictionaryValue; request_context: PCefRequestContext): Integer; cdecl;
+  cef_browser_host_create_browser_sync : function(const windowInfo: PCefWindowInfo; client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; extra_info: PCefDictionaryValue; request_context: PCefRequestContext): PCefBrowser; cdecl;
 
   // /include/capi/cef_command_line_capi.h
   cef_command_line_create     : function : PCefCommandLine; cdecl;
@@ -79,8 +93,6 @@ var
 
   // /include/capi/cef_cookie_capi.h
   cef_cookie_manager_get_global_manager   : function(callback: PCefCompletionCallback): PCefCookieManager; cdecl;
-  cef_cookie_manager_get_blocking_manager : function : PCefCookieManager; cdecl;
-  cef_cookie_manager_create_manager       : function(const path: PCefString; persist_session_cookies: Integer; callback: PCefCompletionCallback): PCefCookieManager; cdecl;
 
   // /include/capi/cef_crash_util.h
   cef_crash_reporting_enabled : function : integer; cdecl;
@@ -102,6 +114,9 @@ var
   // /include/capi/cef_image_capi.h
   cef_image_create : function : PCefImage; cdecl;
 
+  // /include/capi/cef_media_router_capi.h
+  cef_media_router_get_global : function : PCefMediaRouter; cdecl;
+
   // /include/capi/cef_menu_model_capi.h
   cef_menu_model_create : function(delegate: PCefMenuModelDelegate): PCefMenuModel; cdecl;
 
@@ -121,7 +136,8 @@ var
   cef_uriencode                       : function(const text: PCefString; use_plus: Integer): PCefStringUserFree; cdecl;
   cef_uridecode                       : function(const text: PCefString; convert_to_utf8: Integer; unescape_rule: TCefUriUnescapeRule): PCefStringUserFree; cdecl;
   cef_parse_json                      : function(const json_string: PCefString; options: TCefJsonParserOptions): PCefValue; cdecl;
-  cef_parse_jsonand_return_error      : function(const json_string: PCefString; options: TCefJsonParserOptions; error_code_out: PCefJsonParserError; error_msg_out: PCefString): PCefValue; cdecl;
+  cef_parse_json_buffer               : function(const json: Pointer; json_size: NativeUInt; options: TCefJsonParserOptions): PCefValue; cdecl;
+  cef_parse_jsonand_return_error      : function(const json_string: PCefString; options: TCefJsonParserOptions; error_msg_out: PCefString): PCefValue; cdecl;
   cef_write_json                      : function(node: PCefValue; options: TCefJsonWriterOptions): PCefStringUserFree; cdecl;
 
   // /include/capi/cef_path_util_capi.h
@@ -161,7 +177,6 @@ var
 
   // /include/capi/cef_ssl_info_capi.h
   cef_is_cert_status_error       : function(status : TCefCertStatus) : integer; cdecl;
-  cef_is_cert_status_minor_error : function(status : TCefCertStatus) : integer; cdecl;
 
   // /include/capi/cef_stream_capi.h
   cef_stream_reader_create_for_file    : function(const fileName: PCefString): PCefStreamReader; cdecl;
@@ -230,8 +245,14 @@ var
   // /include/capi/cef_zip_reader_capi.h
   cef_zip_reader_create : function(stream: PCefStreamReader): PCefZipReader; cdecl;
 
+
+
+  // *********************************
+  // ********** CAPI VIEWS ***********
+  // *********************************
+
   // /include/capi/views/cef_browser_view_capi.h
-  cef_browser_view_create          : function(client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; request_context: PCefRequestContext; delegate: PCefBrowserViewDelegate): PCefBrowserView; cdecl;
+  cef_browser_view_create          : function(client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; extra_info: PCefDictionaryValue; request_context: PCefRequestContext; delegate: PCefBrowserViewDelegate): PCefBrowserView; cdecl;
   cef_browser_view_get_for_browser : function(browser: PCefBrowser): PCefBrowserView; cdecl;
 
   // /include/capi/views/cef_display_capi.h
@@ -239,13 +260,13 @@ var
   cef_display_get_nearest_point   : function(const point: PCefPoint; input_pixel_coords: Integer): PCefDisplay; cdecl;
   cef_display_get_matching_bounds : function(const bounds: PCefRect; input_pixel_coords: Integer): PCefDisplay; cdecl;
   cef_display_get_count           : function : NativeUInt; cdecl;
-  cef_display_get_alls            : procedure(var displaysCount: NativeUInt; var displays: PCefDisplay); cdecl;
+  cef_display_get_alls            : procedure(displaysCount: PNativeUInt; displays: PPCefDisplay); cdecl;
 
   // /include/capi/views/cef_label_button_capi.h
-  cef_label_button_create         : function(delegate: PCefButtonDelegate; const text: PCefString; with_frame: Integer): PCefLabelButton; cdecl;
+  cef_label_button_create         : function(delegate: PCefButtonDelegate; const text: PCefString): PCefLabelButton; cdecl;
 
   // /include/capi/views/cef_menu_button_capi.h
-  cef_menu_button_create          : function(delegate: PCefMenuButtonDelegate; const text: PCefString; with_frame, with_menu_marker: Integer): PCefMenuButton; cdecl;
+  cef_menu_button_create          : function(delegate: PCefMenuButtonDelegate; const text: PCefString): PCefMenuButton; cdecl;
 
   // /include/capi/views/cef_panel_capi.h
   cef_panel_create                : function(delegate: PCefPanelDelegate): PCefPanel; cdecl;
@@ -259,10 +280,16 @@ var
   // /include/capi/views/cef_window_capi.h
   cef_window_create_top_level     : function(delegate: PCefWindowDelegate): PCefWindow; cdecl;
 
+
+
+  // *********************************
+  // *********** INTERNAL ************
+  // *********************************
+
   // /include/internal/cef_logging_internal.h
   cef_get_min_log_level : function : Integer; cdecl;
   cef_get_vlog_level    : function(const file_start: PAnsiChar; N: NativeInt): Integer; cdecl;
-  cef_log               : procedure(const file_: PAnsiChar; line, severity: Integer; const message: PAnsiChar); cdecl;
+  cef_log               : procedure(const file_: PAnsiChar; line, severity: Integer; const message_: PAnsiChar); cdecl;
 
   // /include/internal/cef_string_list.h
   cef_string_list_alloc  : function : TCefStringList; cdecl;
@@ -276,9 +303,9 @@ var
   // /include/internal/cef_string_map.h
   cef_string_map_alloc  : function : TCefStringMap; cdecl;
   cef_string_map_size   : function(map: TCefStringMap): NativeUInt; cdecl;
-  cef_string_map_find   : function(map: TCefStringMap; const key: PCefString; var value: TCefString): Integer; cdecl;
-  cef_string_map_key    : function(map: TCefStringMap; index: NativeUInt; var key: TCefString): Integer; cdecl;
-  cef_string_map_value  : function(map: TCefStringMap; index: NativeUInt; var value: TCefString): Integer; cdecl;
+  cef_string_map_find   : function(map: TCefStringMap; const key: PCefString; value: PCefString): Integer; cdecl;
+  cef_string_map_key    : function(map: TCefStringMap; index: NativeUInt; key: PCefString): Integer; cdecl;
+  cef_string_map_value  : function(map: TCefStringMap; index: NativeUInt; value: PCefString): Integer; cdecl;
   cef_string_map_append : function(map: TCefStringMap; const key, value: PCefString): Integer; cdecl;
   cef_string_map_clear  : procedure(map: TCefStringMap); cdecl;
   cef_string_map_free   : procedure(map: TCefStringMap); cdecl;
@@ -287,9 +314,9 @@ var
   cef_string_multimap_alloc      : function : TCefStringMultimap; cdecl;
   cef_string_multimap_size       : function(map: TCefStringMultimap): NativeUInt; cdecl;
   cef_string_multimap_find_count : function(map: TCefStringMultimap; const key: PCefString): NativeUInt; cdecl;
-  cef_string_multimap_enumerate  : function(map: TCefStringMultimap; const key: PCefString; value_index: NativeUInt; var value: TCefString): Integer; cdecl;
-  cef_string_multimap_key        : function(map: TCefStringMultimap; index: NativeUInt; var key: TCefString): Integer; cdecl;
-  cef_string_multimap_value      : function(map: TCefStringMultimap; index: NativeUInt; var value: TCefString): Integer; cdecl;
+  cef_string_multimap_enumerate  : function(map: TCefStringMultimap; const key: PCefString; value_index: NativeUInt; value: PCefString): Integer; cdecl;
+  cef_string_multimap_key        : function(map: TCefStringMultimap; index: NativeUInt; key: PCefString): Integer; cdecl;
+  cef_string_multimap_value      : function(map: TCefStringMultimap; index: NativeUInt; value: PCefString): Integer; cdecl;
   cef_string_multimap_append     : function(map: TCefStringMultimap; const key, value: PCefString): Integer; cdecl;
   cef_string_multimap_clear      : procedure(map: TCefStringMultimap); cdecl;
   cef_string_multimap_free       : procedure(map: TCefStringMultimap); cdecl;

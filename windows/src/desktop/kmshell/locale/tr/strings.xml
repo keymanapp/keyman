@@ -98,7 +98,6 @@
   <string name="S_Hotkey_OpenTextEditor" comment="/PlainText: ">Metin Düzenleyici Aç</string>
   <string name="S_Hotkey_ShowCharacterMap" comment="/PlainText: ">Karakter Haritası Bölmesini Göster</string>
   <string name="S_Hotkey_ShowFontHelper" comment="/PlainText: ">Yazı Tipi Yardımcısı Bölmesini Göster</string>
-  <string name="S_Hotkey_ShowKeyboardUsage" comment="/PlainText: ">Klavye Kullanım Bölmesini Göster</string>
   <string name="S_Hotkey_ShowOnScreenKeyboard" comment="/PlainText: ">Ekran Klavye Bölmesi Göster</string>
   <string name="S_Hotkey_SwitchLanguage" comment="/PlainText: ">Dil Değiştiricisini Açın</string>
   <string name="S_Hotkey_TurnKeymanOff" comment="/PlainText: ">Keyman'u Kapat</string>
@@ -208,15 +207,6 @@
   <string name="S_Update_OldVersionHead" comment="/PlainText: ">Eski Versiyon</string>
   <string name="S_Update_SizeHead" comment="/PlainText: ">Boyut</string>
   <string name="S_Update_Title" comment="/PlainText: ">Güncellenmiş Keyman Bileşenler Mevcut</string>
-  <string name="S_Usage_Config" comment="/PlainText: ">Keyman Yapılandırma</string>
-  <string name="S_Usage_Help" comment="/PlainText: ">Keyman Yardım</string>
-  <string name="S_Usage_KeyboardDocumentation" comment="/HTML: ">Ek belgeleri ve/veya Ekran Klavyesini görüntülemek için aşağıdaki düğmeleri tıklayın.</string>
-  <string name="S_Usage_KeyboardNoDocumentation" comment="/HTML: ">Bu klavye düzeni bir Hemen Başlayın veya Kullanım kılavuzu içermez. Lütfen bu klavye düzenini kullanma hakkında daha fazla bilgi için Başlat Menüsünü kontrol edin veya klavye geliştiricisine başvurun.</string>
-  <string name="S_Usage_KeymanOff" comment="/HTML: ">Keyman içinde herhangi bir klavye düzeni seçili değil.  Klavye düzenini seçmek için yukarıdaki araç çubuğundaki klavye simgelerinden herhangi birine tıklayın.</string>
-  <string name="S_Usage_NoKeyboardsInstalled" comment="/HTML: ">Herhangi bir klavye düzeni kurulu veya yüklü değildir.  Bir klavye düzeni kopyası yüklemek için Keyman Konfigürasyon kısmına tıklayın.</string>
-  <string name="S_Usage_OSK" comment="/PlainText: ">Ekran Klavyesi</string>
-  <string name="S_Usage_Tutorial" comment="/PlainText: ">Hemen Başlayın</string>
-  <string name="S_Usage_Welcome" comment="/PlainText: ">Klavye Yardımı</string>
   <string name="S_Yes" comment="/PlainText: ">Evet</string>
   <string name="S_OSKContext_SaveAsWebPage" comment="/PlainText: ">Web sayfası olarak kaydet...</string>
   <string name="S_OSKContext_ShowToolbar" comment="/PlainText: ">Araç Çubuğu Göster</string>
@@ -301,9 +291,7 @@
   <string name="S_Menu_SwitchKeymanOff" comment="/PlainText: ">Keyman'u &amp;Kapat</string>
   <string name="S_Toolbar_ViewCharacterMap" comment="/PlainText: ">Karakter Haritasını İncele</string>
   <string name="S_Toolbar_ViewFontHelper" comment="/PlainText: ">Yazı Tipi Yardımcısını Görüntüle</string>
-  <string name="S_Toolbar_ViewKeyboardUsage" comment="/PlainText: ">Klavye Kullanımını Görüntüle</string>
   <string name="S_Toolbar_ViewOnScreenKeyboard" comment="/PlainText: ">Ekran Klavyesi Göster</string>
-  <string name="S_Menu_KeyboardUsage" comment="/PlainText: ">&amp;Klavye Kullanımı</string>
   <string name="S_Menu_FontHelper" comment="/PlainText: ">&amp;Font Yardımcısı</string>
   <string name="S_Menu_CharacterMap" comment="/PlainText: ">Karakter &amp;Haritası</string>
   <string name="S_Menu_TextEditor" comment="/PlainText: ">&amp;Metin Düzenleyici...</string>

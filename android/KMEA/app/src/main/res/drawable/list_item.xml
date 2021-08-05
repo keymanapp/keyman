@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:state_activated="false" android:state_pressed="true" android:drawable="@color/activated_bg" />
-    <item android:state_activated="false" android:state_selected="true" android:drawable="@color/selected_bg" />
-	<item android:state_activated="true" android:drawable="@color/activated_bg" />
-	<item android:drawable="@android:color/white" />
+  <item android:state_activated="false" android:state_pressed="true" android:drawable="@color/activated_bg" />
+  <item android:state_activated="false" android:state_selected="true" android:drawable="@color/selected_bg" />
+  <item android:state_activated="true" android:drawable="@color/activated_bg" />
+  <item android:drawable="@android:color/transparent" />
 </selector>

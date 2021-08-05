@@ -1,18 +1,18 @@
 /*
   Name:             preservedkeymap
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Dec 2012
 
   Modified Date:    10 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Dec 2012 - mcdurdin - I3623 - V9.0 - Add preserved key mapping from .kmx file
                     17 Jan 2013 - mcdurdin - I3762 - V9.0 - underlying layout cannot be controlled cleanly via TSF so support translation
                     11 Aug 2013 - mcdurdin - I3775 - V9.0 - Fail I3762 - AltGr combinations are not matched on French base layout
@@ -158,8 +158,8 @@ BOOL PreservedKeyMap::MapUSCharToVK(UINT *puKey, UINT *puShiftFlags)
 {
   if(*puKey >= 0x20 && *puKey < 0x7F)
   {
+    *puShiftFlags = ISVIRTUALKEY | (USCharMap[*puKey - 0x20].shift ? K_SHIFTFLAG : 0);
     *puKey = USCharMap[*puKey - 0x20].key;
-    *puShiftFlags = USCharMap[*puKey - 0x20].shift ? (ISVIRTUALKEY | K_SHIFTFLAG) : 0;
     return TRUE;
   }
   return FALSE;
@@ -241,8 +241,8 @@ BOOL PreservedKeyMap::MapKeyboard(KEYBOARD *pKeyboard, PreservedKey **pPreserved
 
   m_BaseKeyboardUsesAltGr = KeyboardGivesCtrlRAltForRAlt();   // I4592
 
-  // This is not the same as m_BaseKeyboardUsesAltGr -- we are turning 
-  // the simulation back on after (possibly) turning it off, for a 
+  // This is not the same as m_BaseKeyboardUsesAltGr -- we are turning
+  // the simulation back on after (possibly) turning it off, for a
   // consistent experience. TODO: determine if m_BaseKeyboardUseAltGr
   // is still needed given we always use kbdus as base for Keyman 10+
   BOOL bSimulateAltGr = Globals::get_SimulateAltGr();
@@ -299,7 +299,7 @@ BOOL PreservedKeyMap::MapKeyboard(KEYBOARD *pKeyboard, PreservedKey **pPreserved
             CoCreateGuid(&pKeys[n].guid);
             n++;
 
-            if (bSimulateAltGr && (pKeys[n-1].key.uModifiers & RALT_MATCHING_MASK) == TF_MOD_RALT) 
+            if (bSimulateAltGr && (pKeys[n-1].key.uModifiers & RALT_MATCHING_MASK) == TF_MOD_RALT)
             {
               // Do this for RALT and RALT+SHIFT only, so we've tested against that mask
               // Copy the key and fix modifiers

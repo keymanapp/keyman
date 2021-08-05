@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 
 const WCHAR cp1252[256] = {
   /*0x00*/  0x0000,  //Null

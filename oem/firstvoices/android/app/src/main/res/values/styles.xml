@@ -1,8 +1,30 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="AppTheme.Base" />
+
+    <style name="AppTheme.Base" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@android:color/white</item>
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/firstvoices_gold</item>
+
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <item name="android:textColorSecondary">@android:color/black</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:tint">@android:color/black</item>
+        <item name="android:colorAccent">@color/firstvoices_red</item>
+    </style>
+
+    <style name="AppTheme.Toolbar" parent="Base.Widget.AppCompat.Toolbar">
+        <item name="android:colorPrimary">@android:color/white</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <item name="android:textColorSecondary">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.Divider">
+        <item name="android:background">@color/firstvoices_red</item>
     </style>
 
 </resources>

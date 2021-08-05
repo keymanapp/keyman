@@ -1,0 +1,15 @@
+c This file tests that expansions are valid, using kmdecomp to verify
+store(&NAME) 'Test Expansions'
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(char_range) 'a' .. 'z'
+store(alpha_not_bq) 'ac'..'pr'..'z'
+store(key_range) [K_A] .. [K_e]
+
+store(schar_range) U+10001 .. U+10006
+store(schar_range2) U+1000 .. U+1006
+
+store(char_range_silly) 'c' .. 'd'
+store(key_range_silly) [K_C] .. [K_D]

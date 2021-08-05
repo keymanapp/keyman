@@ -1,7 +1,3 @@
-*
-{
-  font-family: Tahoma;
-}
 #state
 {
   display: none;
@@ -10,7 +6,7 @@
 #displaylanguage
 {
   left: 8px;
-  font-size: 11px;
+  font-size: 12px;
   position: absolute;
   top: 64px;
   color: #000000;
@@ -23,7 +19,7 @@
 {
   position: absolute;
   left: 0px;
-  top: 37px;
+  top: 40px;
   width: 117px;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -72,7 +68,7 @@
 {
   background: #79C3DA;
   width: 117px;
-  height: 37px;
+  height: 40px;
   position: absolute;
   top: 0;
   left: 0;
@@ -83,7 +79,7 @@
   background: none;
   overflow-x: hidden;
   overflow-y: auto;
-  font-size: 12px;
+  font-size: 13px;
   border-right: 1px solid #6D6C6F;
   border-top: 1px solid #6D6C6F;
   border-bottom: 1px solid #6D6C6F;
@@ -132,12 +128,25 @@
   border-right: 1px solid #6D6C6F;
 }
 
+.footer_instant {
+  font-size: 12px;
+  padding-top: 3px;
+  padding-right: 3px;
+}
+
 input[type='submit'], input[type='button'], button
 {
   background: #F68924;
   border-radius: 4px;
   color: #33333f;
   border: none;
+  vertical-align: top;
+}
+
+input[type='submit']:disabled, input[type='button']:disabled, button:disabled
+{
+  color: #c0c0cf;
+  background: #80808f;
 }
 
 a.hotkey:link, a.hotkey:visited
@@ -171,9 +180,10 @@ html
 
 .helplinks
 {
-  padding: 4px 4px 0 0;
+  padding: 6px 4px 0 0;
   float: right;
-  font: 12px Tahoma;
+  font-size: 12px;
+  font-weight: normal;
 }
 .helplinks a
 {
@@ -391,30 +401,30 @@ table tr
 }
 
 #keyboards .item .list_icon {
-  float: left; 
+  float: left;
   margin: 2px 6px 4px 1px;
 }
 
 /* no keyboards installed box */
 
 .info#keyboards {
-  position: absolute; 
+  position: absolute;
   top: 25%;
 }
 
 .info#keyboards > div {
-  position: relative; 
-  left: 0; 
-  top: 0; 
-  font-size: 13.3px; 
-  margin: 0 12px; 
-  border: solid 1px gray; 
-  padding: 8px; 
+  position: relative;
+  left: 0;
+  top: 0;
+  font-size: 13.3px;
+  margin: 0 12px;
+  border: solid 1px gray;
+  padding: 8px;
   background: #F5F6BE
 }
 
 .info#keyboards > div > img {
-  float: left; 
+  float: left;
   margin: 0 8px 0 0;
 }
 
@@ -530,6 +540,8 @@ table tr
 }
 .keyboard-language:hover a
 {
+  position: relative;
+  z-index: 10;
   visibility: visible;
 }
 
@@ -586,7 +598,6 @@ table tr
   font-weight: bold;
   color: #001020;
   padding: 4px 8px;
-  height: 16px;
 }
 
 .options_list_help
@@ -601,11 +612,11 @@ table tr
   overflow: hidden;
 }
 
-#options_base_keyboard_current { 
-  display: inline-block; 
+#options_base_keyboard_current {
+  display: inline-block;
   padding-top: 5px;
 }
-  
+
 /* Hotkey Styles */
 
 #subcontent_hotkeys .list_item
@@ -714,7 +725,7 @@ th
 
 .support_links {
   right: 0;
-  top: 38px;
+  top: 41px;
   width: 140px;
   height: 100%;
   padding: 12px;
@@ -780,7 +791,6 @@ th
   margin: 6px 0px 0 10px;
   font-size: 12pt !important;
   font-weight: bold;
-  font-family: Calibri !important;
   height: 32px !important;
   background: #0AB8A0;
   color: white;
@@ -811,14 +821,15 @@ th
 {
   clear: left;
   float: left;
-  font: bold 11px Tahoma;
+  font-size: 11px;
+  font-weight: bold;
   color: #333;
 }
 .support_line_content
 {
   float: left;
   margin-left: 20px;
-  font: 11px Tahoma;
+  font-size: 11px;
   color: black;
 }
 .support_line_content .beta
@@ -836,7 +847,7 @@ th
 }
 .support_content_header
 {
-  font: 16px Tahoma;
+  font-size: 16px;
   margin: 10px 0;
   color: #333;
 }
@@ -873,7 +884,6 @@ th
 
 #pro_content {
   padding: 5px 20px 5px 20px;
-  font-family: Calibri !important;
 }
 
 .pro_title {
@@ -901,7 +911,6 @@ th
 #pro_upgrade_button_bottom input {
   font-size: 14pt !important;
   font-weight: bold;
-  font-family: Calibri !important;
   height: 32px !important;
   background: #0AB8A0;
   color: white;
@@ -915,7 +924,6 @@ th
 #pro_content p {
   font-size: 14pt;
   color: #444444;
-  font-family: Calibri;
   font-weight: bold;
 }
 
@@ -929,7 +937,6 @@ th
   border: solid 1px #cccccc;
   font-size: 11pt;
   padding: 4px 8px;
-  font-family: Calibri !important;
 }
 
 #pro_features th {
@@ -957,16 +964,16 @@ th
 }
 
 .keyboard-language-title {
-  color: #444444; 
-  float:right; 
-  padding-top: 5px; 
+  color: #444444;
+  float:right;
+  padding-top: 5px;
   margin-right: 8px;
   text-decoration: none;
 }
 
 .keyboard-language-title .language-icon {
-  padding-top: 0px; 
-  margin-top: -2px; 
+  padding-top: 0px;
+  margin-top: -2px;
   margin-left: 8px;
   visibility: visible;
 }
@@ -982,7 +989,7 @@ th
   padding-left: 8px;
 }
 
-.keyboard-language-title:hover, 
+.keyboard-language-title:hover,
 .keyboard-language-title:active {
   text-decoration: underline;
   cursor: pointer;
@@ -1005,7 +1012,7 @@ th
 }
 
 #keepintouch_content {
-  height: 100%; 
+  height: 100%;
   overflow: hidden;
 }
 

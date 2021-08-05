@@ -51,6 +51,7 @@ begin
     iwk.KeyboardIDTemplate := FParameters.KeyboardID;
     iwk.NameTemplate := FParameters.Name;
     iwk.Copyright := FParameters.Copyright;
+    iwk.FullCopyright := FParameters.FullCopyright;
     iwk.Version := FParameters.Version;
     iwk.BCP47Tags := FParameters.BCP47Tags;
     iwk.Author := FParameters.Author;
@@ -75,8 +76,11 @@ var
 begin
   kpt := TKeyboardProjectTemplate.Create(FParameters.Destination, FParameters.KeyboardID, FParameters.Targets);
   try
-    kpt.Name := FParameters.Name;
+    if FParameters.Name = ''
+      then kpt.Name := FParameters.KeyboardID
+      else kpt.Name := FParameters.Name;
     kpt.Copyright := FParameters.Copyright;
+    kpt.FullCopyright := FParameters.FullCopyright;
     kpt.Version := FParameters.Version;
     kpt.BCP47Tags := FParameters.BCP47Tags;
     kpt.Author := FParameters.Author;
@@ -114,6 +118,7 @@ begin
   try
     mpt.Name := FParameters.Name;
     mpt.Copyright := FParameters.Copyright;
+    mpt.FullCopyright := FParameters.FullCopyright;
     mpt.Version := FParameters.Version;
     mpt.BCP47Tags := FParameters.BCP47Tags;
     mpt.Author := FParameters.Author;

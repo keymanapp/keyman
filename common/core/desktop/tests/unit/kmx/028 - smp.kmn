@@ -1,7 +1,7 @@
-c Description: Tests SMP characters
-c keys: [K_1][K_2]
-c expected: \U0001F642hi\U0001F600
-c context: 
+c Description: Tests SMP characters; see #4361
+c keys: [K_1][K_2][K_3][K_4]
+c expected: \U0001F601y
+c context:
 
 store(&version) '10.0'
 
@@ -11,3 +11,5 @@ group(Main) using keys
 
 + [K_1] > U+1F642
 U+1F642 + [K_2] > context 'hi' U+1F600
+U+1F600 + [K_3] > 'x'
+U+1F642 'hix' + [K_4] > U+1F601 'y'

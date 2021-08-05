@@ -1,13 +1,25 @@
 #!/usr/bin/python3
 
 import logging
-import os.path
+import os
 from shutil import rmtree
 
-from keyman_config.get_kmp import user_keyboard_dir, user_keyman_font_dir
+from keyman_config.fcitx_util import is_fcitx_running
+from keyman_config.get_kmp import InstallLocation, get_keyboard_dir, get_keyman_doc_dir, get_keyman_font_dir
 from keyman_config.kmpmetadata import get_metadata
 from keyman_config.ibus_util import uninstall_from_ibus, get_ibus_bus, restart_ibus
 from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_ibus_keyboard_id, is_gnome_shell
+
+
+def delete_dir(dir):
+    if not os.path.isdir(dir):
+        logging.error("%s is not a directory", dir)
+        return False
+    if os.path.islink(dir):
+        os.unlink(dir)
+    else:
+        rmtree(dir)
+    return True
 
 
 def uninstall_kmp_shared(packageID):
@@ -17,13 +29,13 @@ def uninstall_kmp_shared(packageID):
     Args:
         packageID (str): Keyboard package ID
     """
-    kbdir = os.path.join('/usr/local/share/keyman', packageID)
+    kbdir = get_keyboard_dir(InstallLocation.Shared, packageID)
     if not os.path.isdir(kbdir):
         logging.error("Keyboard directory for %s does not exist. Aborting", packageID)
         exit(3)
 
-    kbdocdir = os.path.join('/usr/local/share/doc/keyman', packageID)
-    kbfontdir = os.path.join('/usr/local/share/fonts/keyman', packageID)
+    kbdocdir = get_keyman_doc_dir(InstallLocation.Shared, packageID)
+    kbfontdir = get_keyman_font_dir(InstallLocation.Shared, packageID)
 
     logging.info("Uninstalling shared keyboard: %s", packageID)
     if not os.access(kbdir, os.X_OK | os.W_OK):  # Check for write access of keyman dir
@@ -35,7 +47,7 @@ def uninstall_kmp_shared(packageID):
             logging.error(
                 "You do not have permissions to uninstall the documentation. You need to run this with `sudo`")
             exit(3)
-        rmtree(kbdocdir)
+        delete_dir(kbdocdir)
         logging.info("Removed documentation directory: %s", kbdocdir)
     else:
         logging.info("No documentation directory")
@@ -44,7 +56,7 @@ def uninstall_kmp_shared(packageID):
             logging.error(
                 "You do not have permissions to uninstall the font files. You need to run this with `sudo`")
             exit(3)
-        rmtree(kbfontdir)
+        delete_dir(kbfontdir)
         logging.info("Removed font directory: %s", kbfontdir)
     else:
         logging.info("No font directory")
@@ -59,7 +71,7 @@ def uninstall_kmp_shared(packageID):
     else:
         logging.warning("could not uninstall keyboards")
 
-    rmtree(kbdir)
+    delete_dir(kbdir)
     logging.info("Removed keyman directory: %s", kbdir)
     logging.info("Finished uninstalling shared keyboard: %s", packageID)
 
@@ -99,6 +111,10 @@ def uninstall_keyboards_from_gnome(keyboards, packageDir):
     gnomeKeyboardsUtil.write_input_sources(sources)
 
 
+def _uninstall_keyboards_from_fcitx5():
+    return _('Please use fcitx5-configtool to remove the keyboard from the group')
+
+
 def uninstall_kmp_user(packageID):
     """
     Uninstall a kmp from ~/.local/share/keyman
@@ -106,24 +122,26 @@ def uninstall_kmp_user(packageID):
     Args:
         packageID (str): Keyboard package ID
     """
-    kbdir = user_keyboard_dir(packageID)
+    kbdir = get_keyboard_dir(InstallLocation.User, packageID)
     if not os.path.isdir(kbdir):
         logging.error("Keyboard directory for %s does not exist. Aborting", packageID)
         exit(3)
     logging.info("Uninstalling local keyboard: %s", packageID)
     info, system, options, keyboards, files = get_metadata(kbdir)
     if keyboards:
-        if is_gnome_shell():
+        if is_fcitx_running():
+            _uninstall_keyboards_from_fcitx5()
+        elif is_gnome_shell():
             uninstall_keyboards_from_gnome(keyboards, kbdir)
         else:
             uninstall_keyboards_from_ibus(keyboards, kbdir)
     else:
         logging.warning("could not uninstall keyboards")
-    rmtree(kbdir)
+    delete_dir(kbdir)
     logging.info("Removed user keyman directory: %s", kbdir)
-    fontdir = os.path.join(user_keyman_font_dir(), packageID)
+    fontdir = get_keyman_font_dir(InstallLocation.User, packageID)
     if os.path.isdir(fontdir):
-        rmtree(fontdir)
+        delete_dir(fontdir)
         logging.info("Removed user keyman font directory: %s", fontdir)
     logging.info("Finished uninstalling local keyboard: %s", packageID)
 

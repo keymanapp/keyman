@@ -15,7 +15,7 @@
 
 #include "context.hpp"
 #include "option.hpp"
-
+#include "debug.hpp"
 
 namespace km {
 namespace kbp
@@ -39,10 +39,11 @@ public:
   void push_character(km_kbp_usv usv);
   void push_marker(uintptr_t marker);
   void push_alert();
-  void push_backspace();
+  void push_backspace(km_kbp_backspace_type expected_type, uintptr_t expected_value = 0);
   void push_persist(option const &);
   void push_persist(option const &&);
   void push_emit_keystroke(km_kbp_virtual_key vk=0);
+  void push_capslock(bool);
   void push_invalidate_context();
 
   void commit();
@@ -81,9 +82,12 @@ void actions::push_alert() {
 
 
 inline
-void actions::push_backspace() {
+void actions::push_backspace(km_kbp_backspace_type expected_type, uintptr_t expected_value) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_kbp_action_item {KM_KBP_IT_BACK, {0,}, {0}});
+  km_kbp_action_item item = {KM_KBP_IT_BACK};
+  item.backspace.expected_type = expected_type;
+  item.backspace.expected_value = expected_value;
+  emplace_back(item);
 }
 
 
@@ -92,7 +96,6 @@ void actions::push_emit_keystroke(km_kbp_virtual_key vk) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
   emplace_back(km_kbp_action_item {KM_KBP_IT_EMIT_KEYSTROKE, {0,}, {vk}});
 }
-
 
 inline
 void actions::push_invalidate_context() {
@@ -122,6 +125,7 @@ protected:
     kbp::context              _ctxt;
     kbp::abstract_processor & _processor;
     kbp::actions              _actions;
+    kbp::debug_items          _debug_items;
 
 public:
     state(kbp::abstract_processor & kb, km_kbp_option_item const *env);
@@ -137,6 +141,9 @@ public:
 
     kbp::actions        & actions() noexcept        { return _actions; }
     kbp::actions const  & actions() const noexcept  { return _actions; }
+
+    kbp::debug_items        & debug_items() noexcept        { return _debug_items; }
+    kbp::debug_items const  & debug_items() const noexcept  { return _debug_items; }
 };
 
 } // namespace kbp

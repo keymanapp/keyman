@@ -1,6 +1,9 @@
 #!/bin/bash
 # Build KMSample1
 
+set -e
+set -u
+
 display_usage ( ) {
     echo "build.sh [-no-daemon] [-debug]"
     echo
@@ -30,7 +33,7 @@ while [[ $# -gt 0 ]] ; do
         -debug)
             ONLY_DEBUG=true
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
     esac

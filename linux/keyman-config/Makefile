@@ -1,7 +1,10 @@
 #!/usr/bin/make
 
-default: clean version man
+default: clean version man langtags
 	python3 setup.py build
+
+langtags:
+	cd buildtools && python3 ./build-langtags.py
 
 install: # run as sudo
 	pip3 install qrcode sentry-sdk
@@ -29,7 +32,8 @@ uninstall: clean # run as sudo
 	rm -f /usr/local/bin/km-package-uninstall
 
 clean:
-	-rm -rf dist make_deb build keyman_config/version.py *.egg-info __pycache__
+	-rm -rf dist make_deb build keyman_config/version.py *.egg-info __pycache__ \
+		keyman_config/standards/lang_tags_map.py
 
 devdist: version
 	python3 setup.py egg_info -b.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M` sdist
@@ -49,13 +53,7 @@ deb: dist
 	rm /tmp/keyman_version
 
 man:
-	mkdir -p debian/man
-	help2man -N ./km-package-get -o debian/man/km-package-get.1 -n "Download a Keyman keyboard package" -I maninc/km-package-get.inc
-	help2man -N ./km-package-install -o debian/man/km-package-install.1 -n "Install a Keyman keyboard package" -I maninc/km-package-install.inc
-	help2man -N ./km-config -o debian/man/km-config.1 -n "Keyman keyboards installation and information" -I maninc/km-config.inc
-	help2man -N ./km-kvk2ldml -o debian/man/km-kvk2ldml.1 -n "Convert a Keyman on-screen keyboard file to LDML" -I maninc/km-kvk2ldml.inc
-	help2man -N ./km-package-list-installed -o debian/man/km-package-list-installed.1 -n "List installed Keyman keyboard packages" -I maninc/km-package-list-installed.inc
-	help2man -N ./km-package-uninstall -o debian/man/km-package-uninstall.1 -n "Uninstall a Keyman keyboard package" -I maninc/km-package-uninstall.inc
+	./build-help.sh --man --no-reconf
 
 version:
 	cd .. && ./scripts/reconf.sh keyman-config

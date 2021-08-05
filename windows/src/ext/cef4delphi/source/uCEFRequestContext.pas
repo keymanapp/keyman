@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFRequestContext;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -56,7 +54,7 @@ uses
   {$ELSE}
   Classes, SysUtils,
   {$ENDIF}
-  uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes;
+  uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes, uCEFCompletionCallback;
 
 type
   TCefRequestContextRef = class(TCefBaseRefCountedRef, ICefRequestContext)
@@ -66,8 +64,8 @@ type
       function  IsGlobal: Boolean;
       function  GetHandler: ICefRequestContextHandler;
       function  GetCachePath: ustring;
-      function  GetDefaultCookieManager(const callback: ICefCompletionCallback): ICefCookieManager;
-      function  GetDefaultCookieManagerProc(const callback: TCefCompletionCallbackProc): ICefCookieManager;
+      function  GetCookieManager(const callback: ICefCompletionCallback): ICefCookieManager;
+      function  GetCookieManagerProc(const callback: TCefCompletionCallbackProc): ICefCookieManager;
       function  RegisterSchemeHandlerFactory(const schemeName, domainName: ustring; const factory: ICefSchemeHandlerFactory): Boolean;
       function  ClearSchemeHandlerFactories: Boolean;
       procedure PurgePluginListCache(reloadPages: Boolean);
@@ -77,28 +75,45 @@ type
       function  CanSetPreference(const name: ustring): Boolean;
       function  SetPreference(const name: ustring; const value: ICefValue; out error: ustring): Boolean;
       procedure ClearCertificateExceptions(const callback: ICefCompletionCallback);
+      procedure ClearHttpAuthCredentials(const callback: ICefCompletionCallback);
       procedure CloseAllConnections(const callback: ICefCompletionCallback);
       procedure ResolveHost(const origin: ustring; const callback: ICefResolveCallback);
-      function  ResolveHostCached(const origin: ustring; const resolvedIps: TStrings): TCefErrorCode;
       procedure LoadExtension(const root_directory: ustring; const manifest: ICefDictionaryValue; const handler: ICefExtensionHandler);
       function  DidLoadExtension(const extension_id: ustring): boolean;
       function  HasExtension(const extension_id: ustring): boolean;
       function  GetExtensions(const extension_ids: TStringList): boolean;
       function  GetExtension(const extension_id: ustring): ICefExtension;
+      function  GetMediaRouter: ICefMediaRouter;
 
     public
       class function UnWrap(data: Pointer): ICefRequestContext;
       class function Global: ICefRequestContext;
       class function New(const settings: PCefRequestContextSettings; const handler: ICefRequestContextHandler = nil): ICefRequestContext; overload;
-      class function New(const aCache, aAcceptLanguageList : ustring; aPersistSessionCookies, aPersistUserPreferences, aIgnoreCertificateErrors, aEnableNetSecurityExpiration : boolean; const handler: ICefRequestContextHandler = nil): ICefRequestContext; overload;
+      class function New(const aCache, aAcceptLanguageList : ustring; aPersistSessionCookies, aPersistUserPreferences, aIgnoreCertificateErrors : boolean; const handler: ICefRequestContextHandler = nil): ICefRequestContext; overload;
       class function Shared(const other: ICefRequestContext; const handler: ICefRequestContextHandler): ICefRequestContext;
+  end;
+
+  TCefClearCertificateExceptionsCompletionCallback = class(TCefCustomCompletionCallback)
+    protected
+      procedure OnComplete; override;
+  end;
+
+  TCefClearHttpAuthCredentialsCompletionCallback = class(TCefCustomCompletionCallback)
+    protected
+      procedure OnComplete; override;
+  end;
+
+  TCefCloseAllConnectionsCompletionCallback = class(TCefCustomCompletionCallback)
+    protected
+      procedure OnComplete; override;
   end;
 
 implementation
 
 uses
-  uCEFMiscFunctions, uCEFLibFunctions, uCEFValue, uCEFDictionaryValue, uCEFCookieManager,
-  uCEFCompletionCallback, uCEFRequestContextHandler, uCEFExtension, uCEFStringList;
+  uCEFMiscFunctions, uCEFLibFunctions, uCEFValue, uCEFDictionaryValue,
+  uCEFCookieManager, uCEFRequestContextHandler, uCEFExtension, uCEFStringList,
+  uCEFMediaRouter;
 
 function TCefRequestContextRef.ClearSchemeHandlerFactories: Boolean;
 begin
@@ -110,19 +125,26 @@ begin
   Result := CefStringFreeAndGet(PCefRequestContext(FData)^.get_cache_path(PCefRequestContext(FData)));
 end;
 
-function TCefRequestContextRef.GetDefaultCookieManager(const callback: ICefCompletionCallback): ICefCookieManager;
+function TCefRequestContextRef.GetCookieManager(const callback: ICefCompletionCallback): ICefCookieManager;
 begin
-  Result := TCefCookieManagerRef.UnWrap(PCefRequestContext(FData)^.get_default_cookie_manager(PCefRequestContext(FData), CefGetData(callback)));
+  Result := TCefCookieManagerRef.UnWrap(PCefRequestContext(FData)^.get_cookie_manager(PCefRequestContext(FData), CefGetData(callback)));
 end;
 
-function TCefRequestContextRef.GetDefaultCookieManagerProc(const callback: TCefCompletionCallbackProc): ICefCookieManager;
+function TCefRequestContextRef.GetCookieManagerProc(const callback: TCefCompletionCallbackProc): ICefCookieManager;
 begin
-  Result := GetDefaultCookieManager(TCefFastCompletionCallback.Create(callback));
+  Result := GetCookieManager(TCefFastCompletionCallback.Create(callback));
 end;
 
 function TCefRequestContextRef.GetHandler: ICefRequestContextHandler;
+var
+  TempHandler : PCefRequestContextHandler;
 begin
-  Result := TCefRequestContextHandlerRef.UnWrap(PCefRequestContext(FData)^.get_handler(PCefRequestContext(FData)));
+  TempHandler := PCefRequestContext(FData)^.get_handler(PCefRequestContext(FData));
+
+  if (TempHandler <> nil) then
+    Result := TCefRequestContextHandlerRef.UnWrap(TempHandler)
+   else
+    Result := nil;
 end;
 
 class function TCefRequestContextRef.Global: ICefRequestContext;
@@ -145,8 +167,8 @@ begin
   Result := PCefRequestContext(FData)^.is_sharing_with(PCefRequestContext(FData), CefGetData(other)) <> 0;
 end;
 
-class function TCefRequestContextRef.New(const settings: PCefRequestContextSettings;
-                                         const handler: ICefRequestContextHandler): ICefRequestContext;
+class function TCefRequestContextRef.New(const settings : PCefRequestContextSettings;
+                                         const handler  : ICefRequestContextHandler): ICefRequestContext;
 begin
   Result := UnWrap(cef_request_context_create_context(settings, CefGetData(handler)));
 end;
@@ -156,7 +178,6 @@ class function TCefRequestContextRef.New(const aCache                       : us
                                                aPersistSessionCookies       : boolean;
                                                aPersistUserPreferences      : boolean;
                                                aIgnoreCertificateErrors     : boolean;
-                                               aEnableNetSecurityExpiration : boolean;
                                          const handler                      : ICefRequestContextHandler): ICefRequestContext;
 var
   TempSettings : TCefRequestContextSettings;
@@ -166,7 +187,6 @@ begin
   TempSettings.persist_session_cookies        := Ord(aPersistSessionCookies);
   TempSettings.persist_user_preferences       := Ord(aPersistUserPreferences);
   TempSettings.ignore_certificate_errors      := Ord(aIgnoreCertificateErrors);
-  TempSettings.enable_net_security_expiration := Ord(aEnableNetSecurityExpiration);
   TempSettings.accept_language_list           := CefString(aAcceptLanguageList);
 
   Result := UnWrap(cef_request_context_create_context(@TempSettings, CefGetData(handler)));
@@ -212,15 +232,21 @@ function TCefRequestContextRef.SetPreference(const name  : ustring;
 var
   TempName, TempError : TCefString;
 begin
+  CefStringInitialize(@TempError);
+
   TempName := CefString(name);
-  FillChar(TempError, SizeOf(TempError), 0);
   Result   := PCefRequestContext(FData)^.set_preference(PCefRequestContext(FData), @TempName, CefGetData(value), @TempError) <> 0;
-  error    := CefString(@TempError);
+  error    := CefStringClearAndGet(@TempError);
 end;
 
 procedure TCefRequestContextRef.ClearCertificateExceptions(const callback: ICefCompletionCallback);
 begin
   PCefRequestContext(FData)^.clear_certificate_exceptions(PCefRequestContext(FData), CefGetData(callback));
+end;
+
+procedure TCefRequestContextRef.ClearHttpAuthCredentials(const callback: ICefCompletionCallback);
+begin
+  PCefRequestContext(FData)^.clear_http_auth_credentials(PCefRequestContext(FData), CefGetData(callback));
 end;
 
 procedure TCefRequestContextRef.CloseAllConnections(const callback: ICefCompletionCallback);
@@ -235,18 +261,6 @@ var
 begin
   TempOrigin := CefString(origin);
   PCefRequestContext(FData)^.resolve_host(PCefRequestContext(FData), @TempOrigin, CefGetData(callback));
-end;
-
-function TCefRequestContextRef.ResolveHostCached(const origin      : ustring;
-                                                 const resolvedIps : TStrings): TCefErrorCode;
-var
-  TempSL     : ICefStringList;
-  TempOrigin : TCefString;
-begin
-  TempSL     := TCefStringListOwn.Create;
-  TempOrigin := CefString(origin);
-  Result     := PCefRequestContext(FData)^.resolve_host_cached(PCefRequestContext(FData), @TempOrigin, TempSL.Handle);
-  TempSL.CopyToStrings(resolvedIps);
 end;
 
 procedure TCefRequestContextRef.LoadExtension(const root_directory: ustring; const manifest: ICefDictionaryValue; const handler: ICefExtensionHandler);
@@ -295,6 +309,11 @@ begin
   Result := TCefExtensionRef.UnWrap(PCefRequestContext(FData)^.get_extension(PCefRequestContext(FData), @TempID));
 end;
 
+function TCefRequestContextRef.GetMediaRouter: ICefMediaRouter;
+begin
+  Result := TCefMediaRouterRef.UnWrap(PCefRequestContext(FData)^.get_media_router(PCefRequestContext(FData)));
+end;
+
 function TCefRequestContextRef.RegisterSchemeHandlerFactory(const schemeName : ustring;
                                                             const domainName : ustring;
                                                             const factory    : ICefSchemeHandlerFactory): Boolean;
@@ -321,6 +340,57 @@ begin
     Result := Create(data) as ICefRequestContext
    else
     Result := nil;
+end;
+
+
+// TCefClearCertificateExceptionsCompletionCallback
+
+procedure TCefClearCertificateExceptionsCompletionCallback.OnComplete;
+begin
+  try
+    try
+      if (FEvents <> nil) then IChromiumEvents(FEvents).doCertificateExceptionsCleared;
+    except
+      on e : exception do
+        if CustomExceptionHandler('TCefClearCertificateExceptionsCompletionCallback.OnComplete', e) then raise;
+    end;
+  finally
+    FEvents := nil;
+  end;
+end;
+
+
+// TCefClearHttpAuthCredentialsCompletionCallback
+
+procedure TCefClearHttpAuthCredentialsCompletionCallback.OnComplete;
+begin
+  try
+    try
+      if (FEvents <> nil) then IChromiumEvents(FEvents).doHttpAuthCredentialsCleared;
+    except
+      on e : exception do
+        if CustomExceptionHandler('TCefClearHttpAuthCredentialsCompletionCallback.OnComplete', e) then raise;
+    end;
+  finally
+    FEvents := nil;
+  end;
+end;
+
+
+// TCefCloseAllConnectionsCompletionCallback
+
+procedure TCefCloseAllConnectionsCompletionCallback.OnComplete;
+begin
+  try
+    try
+      if (FEvents <> nil) then IChromiumEvents(FEvents).doAllConnectionsClosed;
+    except
+      on e : exception do
+        if CustomExceptionHandler('TCefCloseAllConnectionsCompletionCallback.OnComplete', e) then raise;
+    end;
+  finally
+    FEvents := nil;
+  end;
 end;
 
 end.

@@ -1,0 +1,10 @@
+c Tests cased keys - invalid codes
+store(&NAME) 'Test &CasedKeys'
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(&CasedKeys) U+1000
+
++ [K_A] > 'aaah'
++ [SHIFT K_A] > 'AAAH'

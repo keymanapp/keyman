@@ -491,7 +491,7 @@ static PWSTR VKeyNames[256] = {
     lpuch("B10"), // lpuch("K_SLASH"),				// &HBF
     lpuch("E00"), // lpuch("K_BKQUOTE"),			// &HC0
 
-    lpuch(""), // lpuch("K_?C1"),				// &HC1
+    lpuch("B11"), // lpuch("K_?C1"),				// &HC1 - brazilian portuguese ABNT2 /? left of right-shift
     lpuch(""), // lpuch("K_?C2"),				// &HC2
     lpuch(""), // lpuch("K_?C3"),				// &HC3
     lpuch(""), // lpuch("K_?C4"),				// &HC4
@@ -525,7 +525,7 @@ static PWSTR VKeyNames[256] = {
     lpuch(""), // lpuch("K_oDF"),				// &HDF
     lpuch(""), // lpuch("K_oE0"),				// &HE0
     lpuch(""), // lpuch("K_oE1"),				// &HE1
-    lpuch("B00"), // lpuch("K_oE2"),				// &HE2
+    lpuch("B00"), // lpuch("K_oE2"),				// &HE2 // European key right of left-shift
     lpuch(""), // lpuch("K_oE3"),				// &HE3
     lpuch(""), // lpuch("K_oE4"),				// &HE4
 

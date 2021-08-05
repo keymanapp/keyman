@@ -17,7 +17,36 @@ import UIKit
 public class ResourceFileManager {
   public static let shared = ResourceFileManager()
 
+  private var haveRunMigrations: Bool = false
+
   fileprivate init() {
+  }
+
+  func runMigrationsIfNeeded() {
+    if !haveRunMigrations {
+      // Set here in order to prevent recursively calling itself in case
+      // Migrations itself needs to use installation methods.
+      haveRunMigrations = true
+
+      // We must make sure that all resources are properly migrated before
+      // allowing any new resources to be installed.
+      Migrations.migrate(storage: Storage.active)
+      Migrations.updateResources(storage: Storage.active)
+
+      if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
+        Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
+
+        // Ensure the default keyboard is installed in this case.
+        do {
+          try Storage.active.installDefaultKeyboard(from: Resources.bundle)
+        } catch {
+          SentryManager.captureAndLog(error, message: "Failed to copy default keyboard from bundle: \(error)")
+        }
+      }
+      Migrations.engineVersion = Version.latestFeature
+    }
+
+    haveRunMigrations = true
   }
 
   public var installedPackages: [KeymanPackage] {
@@ -125,7 +154,7 @@ public class ResourceFileManager {
       try copyWithOverwrite(from: url, to: destinationUrl)
       return destinationUrl
     } catch {
-      log.error(error)
+      SentryManager.captureAndLog(error)
       return nil
     }
   }
@@ -137,7 +166,7 @@ public class ResourceFileManager {
    */
   public func prepareKMPInstall(from url: URL) throws -> KeymanPackage {
     // Once selected, start the standard install process.
-    log.info("Installing KMP from \(url)")
+    SentryManager.breadcrumbAndLog("Opening KMP from \(url)")
 
     // Step 1: Copy it to a temporary location, making it a .zip in the process
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
@@ -228,27 +257,23 @@ public class ResourceFileManager {
         activitySpinner.centerXAnchor.constraint(equalTo: rootVC.view.centerXAnchor).isActive = true
         activitySpinner.centerYAnchor.constraint(equalTo: rootVC.view.centerYAnchor).isActive = true
         rootVC.view.isUserInteractionEnabled = false
-      } else if status == .complete {
+      } else if status == .complete || status == .cancelled {
         // Report completion!
         activitySpinner.stopAnimating()
         activitySpinner.removeFromSuperview()
         rootVC.view.isUserInteractionEnabled = true
-        rootVC.dismiss(animated: true, completion: nil)
+        rootVC.dismiss(animated: true) {
+          Manager.shared.showKeyboard()
+        }
         successHandler?(package)
       }
     }
 
     if let navVC = rootVC as? UINavigationController {
-      packageInstaller.promptForLanguages(inNavigationVC: navVC) {
-        // The user will be on the main screen after this, so we should resummon the keyboard.
-        Manager.shared.showKeyboard()
-      }
+      packageInstaller.promptForLanguages(inNavigationVC: navVC)
     } else {
       let nvc = UINavigationController.init()
-      packageInstaller.promptForLanguages(inNavigationVC: nvc) {
-        // The user will be on the main screen after this, so we should resummon the keyboard.
-        Manager.shared.showKeyboard()
-      }
+      packageInstaller.promptForLanguages(inNavigationVC: nvc)
       rootVC.present(nvc, animated: true, completion: nil)
     }
   }
@@ -265,13 +290,14 @@ public class ResourceFileManager {
   }
 
   public func buildKMPError(_ error: KMPError) -> UIAlertController {
-    return buildSimpleAlert(title: "Error", message: error.localizedDescription)
+    return buildSimpleAlert(title: NSLocalizedString("alert-error-title", bundle: engineBundle, comment: ""),
+                            message: error.localizedDescription)
   }
 
   public func buildSimpleAlert(title: String, message: String, completionHandler: (() -> Void)? = nil ) -> UIAlertController {
     let alertController = UIAlertController(title: title, message: message,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: { _ in
                                               completionHandler?()
@@ -331,6 +357,14 @@ public class ResourceFileManager {
       throw KMPError.resourceNotInPackage
     }
 
+    // Resources should only be installed after Migrations have been run.
+    // Otherwise, the Migrations engine may misinterpret the installed format
+    // on an app's first install.
+    //
+    // It is possible for a KeymanEngine framework consumer to reach this point
+    // without `Manager.init` having been run.
+    runMigrationsIfNeeded()
+
     do {
       try copyWithOverwrite(from: package.sourceFolder,
                             to: Storage.active.packageDir(for: package)!)
@@ -370,7 +404,9 @@ public class ResourceFileManager {
   internal func addResource<Resource: LanguageResource>(_ resource: Resource) {
     let path = Storage.active.resourceURL(for: resource)!.path
     if !FileManager.default.fileExists(atPath: path) {
-      log.error("Could not add resource of type: \(resource.fullID.type) with ID: \(resource.id) because the resource file does not exist")
+      // Is 'internal' and only called after packages have been installed,
+      // thus when the files should already be in-place.
+      SentryManager.captureAndLog("Could not add resource of type: \(resource.fullID.type) with ID: \(resource.id) because the resource file does not exist")
       return
     }
 
@@ -402,6 +438,6 @@ public class ResourceFileManager {
 
     userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userDefaults.synchronize()
-    log.info("Added \(resource.fullID.type) with ID: \(resource.id) and language code: \(resource.languageID)")
+    SentryManager.breadcrumbAndLog("Added \(resource.fullID.type) with ID: \(resource.id) and language code: \(resource.languageID)")
   }
 }

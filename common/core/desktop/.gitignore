@@ -1,2 +1,13 @@
 .vs/
-build*/
+build/
+configure/
+
+# cross-compile for meson wasm, built from wasm.build.<platform>.in
+wasm.build
+
+# These files may be copied here during Linux package builds
+TIER.md
+VERSION.md
+shellHelperFunctions.sh
+
+src/rust/keyman_keyboard_processor/target/

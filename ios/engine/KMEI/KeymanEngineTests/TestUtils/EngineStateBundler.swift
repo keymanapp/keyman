@@ -47,14 +47,21 @@ extension TestUtils {
         try FileManager.default.copyItem(at: storageDirectory, to: bundleConstructionURL.appendingPathComponent("Library").appendingPathComponent("keyman"))
 
         log.info("Preferences directory source: \(preferencesDirectory)")
+        let pListPath = bundleConstructionURL.appendingPathComponent("Library").appendingPathComponent("Preferences")
+
+        let testEngineFilename = "com.keyman.testing.KeymanEngineTestHost.plist"
+        let appGroupFilename = "group.KM4I.plist"
         // If trying to ensure that UserDefaults is properly synchronized for this copy operation,
         // go to the folder for the link above in Finder and watch the file to ensure it's properly
         // fleshed out.
         //
         // Set a breakpoint to the following line, only resuming when the plist is fully flushed to
         // the file system.  You may need to rename it in the resulting bundle.
-        try FileManager.default.copyItem(at: preferencesDirectory, to:
-            bundleConstructionURL.appendingPathComponent("Library").appendingPathComponent("Preferences"))
+        try FileManager.default.copyItem(at: preferencesDirectory, to: pListPath)
+
+        // sleep(1000)
+
+        try FileManager.default.moveItem(at: pListPath.appendingPathComponent(testEngineFilename), to: pListPath.appendingPathComponent(appGroupFilename))
       }
 
       let attachmentFile = try Zip.quickZipFiles([bundleConstructionURL], fileName: "bundleArchive")

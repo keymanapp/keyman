@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
-  
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:include href="elements.xsl"/>
 
   <xsl:variable name="dialoginfo_onlineupdate" select="$dialoginfo/Dialog[@Id='OnlineUpdate'][1]" />
-  
+
   <xsl:template match="/">
 
 <html>
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+  <script src="/app/sentry.bundle.min.js"></script>
+  <script src="/app/sentry.init.js"></script>
 <title><xsl:value-of select="$locale/string[@name='S_Update_Title']"/></title>
 <style type="text/css">
 
-* { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />; }
+* { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI"; }
 
 html { overflow: hidden }
 
@@ -21,12 +24,12 @@ body {
  font-size:		11px;
  text-align:	justify;
  margin:	0px;
- width:         482px;
+ width:         469px;
  overflow: hidden;
 }
 
 .button {
- font: 11px <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />;
+ font: 11px <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI";
  height: 23px; width: 128px;
 }
 
@@ -36,17 +39,17 @@ body {
   .shieldButton {  }
   .shieldButton img { display: inline !important; }
 </xsl:if>
-  
+
 div {
-  font: 13.3px <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />
+  font: 13.3px <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI";
 }
 
-#border { 
+#border {
   border: none;
-  width: <xsl:value-of select="$dialoginfo_onlineupdate/@Width - 2" />px; 
-  height: <xsl:value-of select="$dialoginfo_onlineupdate/@Height - 2" />px;
+  width: 469px;
+  height: 375px;
   }
-  
+
 #header { background: white;  }
 
 #content {
@@ -59,10 +62,10 @@ div {
   bottom: 10px;
   text-align: center;
   width: 100%;
-}  
+}
 
 #UpdateContainer {
-	height: 76px;
+	height: 220px;
 	overflow-y: auto;
 	border: solid 1px gray;
 	margin: 12px 8px;
@@ -86,7 +89,6 @@ div {
 					{
 						if(event.keyCode == 13 <![CDATA[&&]]> (!event.srcElement.type || event.srcElement.type != 'button') <![CDATA[&&]]> !document.getElementById('submitButton').disabled)
 						{
-              
 							event.cancelBubble = true; event.returnValue = false;
 							location.href='keyman:installnow';
 						}
@@ -96,7 +98,6 @@ div {
 							location.href='keyman:installlater';
 						}
 					}
-          
           function updateTick(id)
           {
             enableControls();
@@ -105,7 +106,6 @@ div {
             if(e.checked) location.href='keyman:tickupdate?id='+id;
             else location.href='keyman:untickupdate?id='+id;
           }
-          
           function enableControls()
           {
             var e = false, admin = false;
@@ -131,9 +131,7 @@ div {
 <body onload="javascript:enableControls()">
 <div id="border">
   <div id="header">
-    <img alt='Keyman'>
-      <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath' />keyman-desktop.png</xsl:attribute>
-    </img>  
+    <img alt='Keyman' src="/app/keyman-desktop.png" />
   </div>
   <div id='content'>
     <div id="NewVersionAvailable"><xsl:copy-of select="($locale/string[@name='S_Update_NewVersionAvailable'])[1]" /></div>
@@ -152,9 +150,7 @@ div {
   </div>
   <div id="footer">
     <button type="submit" id="submitButton" class='button shieldButton' onclick="javascript:location.href='keyman:installnow'">
-      <img alt="" style="vertical-align:middle; width: 16px; margin: 0 4px 0 2px;">
-        <xsl:attribute name="src"><xsl:value-of select='/Keyman/templatepath' />shield.png</xsl:attribute>
-      </img> 
+      <img alt="" style="vertical-align:middle; width: 16px; margin: 0 4px 0 2px;" src="/app/shield.png" />
       <xsl:value-of select="$locale/string[@name='S_Update_Button_InstallNow']"/>
     </button>
     &#160;

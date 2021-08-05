@@ -134,7 +134,10 @@ begin
     try
       UninstallTip(FOwner.ID, Get_LangID, Get_ProfileGUID, False);
       if IsTransientLanguageID(Get_LangID) then
+      begin
         SetLangID(0);
+        FProfileGUID := GUID_NULL;
+      end;
     finally
       Free;
     end;

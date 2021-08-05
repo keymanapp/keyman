@@ -18,10 +18,12 @@ uses
   Winapi.Windows,
 
   uCEFChromium,
+  uCEFChromiumCore,
   uCEFChromiumEvents,
   uCEFChromiumWindow,
   uCEFInterfaces,
   uCEFTypes,
+  uCEFWinControl,
   uCEFWindowParent,
 
   Keyman.System.CEFManager,
@@ -38,7 +40,6 @@ const
   CEF_BEFOREBROWSE = WM_USER + 307;
   CEF_TITLECHANGE = WM_USER + 309;
   CEF_COMMAND = WM_USER + 310;
-  CEF_RESIZEFROMDOCUMENT = WM_USER + 311;
   CEF_SETFOCUS = WM_USER + 312;
   CEF_LOADINGSTATECHANGE = WM_USER + 313;
 
@@ -81,7 +82,6 @@ type
   TCEFHostPreKeySyncEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean) of object;
   TCEFHostKeyEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean) of object;
   TCEFHostTitleChangeEvent = procedure(Sender: TObject; const title: string) of object;
-  TCEFHostResizeFromDocumentEvent = procedure(Sender: TObject; width, height: Integer) of object;
   TCEFHostLoadingStateChangeEvent = procedure(Sender: TObject; isLoading, canGoBack, canGoForward: Boolean) of object;
 
   TframeCEFHost = class(TForm, IKeymanCEFHost)
@@ -96,10 +96,11 @@ type
     procedure cefAfterCreated(Sender: TObject; const browser: ICefBrowser);
     procedure cefBeforeClose(Sender: TObject; const browser: ICefBrowser);
     procedure cefClose(Sender: TObject; const browser: ICefBrowser;
-      out Result: Boolean);
+      var aAction: TCefCloseBrowserAction);
     procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
-      const event: PCefKeyEvent; osEvent: PMsg; out isKeyboardShortcut,
+      const event: PCefKeyEvent; osEvent: TCefEventHandle; out isKeyboardShortcut,
       Result: Boolean);   // I2986
+
     procedure cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
                          const frame: ICefFrame; httpStatusCode: Integer);
     procedure cefBeforeBrowse(Sender: TObject; const browser: ICefBrowser;
@@ -121,16 +122,14 @@ type
                              var windowInfo: TCefWindowInfo;
                              var client: ICefClient;
                              var settings: TCefBrowserSettings;
+                             var extra_info: ICefDictionaryValue;
                              var noJavascriptAccess: Boolean;
                              var Result: Boolean);
     procedure cefSetFocus(Sender: TObject; const browser: ICefBrowser;
       source: TCefFocusSource; out Result: Boolean);
     procedure cefTitleChange(Sender: TObject; const browser: ICefBrowser;
       const title: ustring);
-    procedure cefProcessMessageReceived(Sender: TObject;
-      const browser: ICefBrowser; sourceProcess: TCefProcessId;
-      const message: ICefProcessMessage; out Result: Boolean);
-    procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
+    procedure cefWidgetCompMsg(Sender: TObject; var aMessage: TMessage; var aHandled: Boolean);
     procedure cefLoadingStateChange(Sender: TObject; const browser: ICefBrowser;
       isLoading, canGoBack, canGoForward: Boolean);
   private
@@ -152,7 +151,6 @@ type
     FOnBeforeBrowseEx: TCEFHostBeforeBrowseExEvent;
     FOnTitleChange: TCEFHostTitleChangeEvent;
     FOnCommand: TCEFCommandEvent;
-    FOnResizeFromDocument: TCEFHostResizeFromDocumentEvent;
     FOnHelpTopic: TNotifyEvent;
     FIsCreated: Boolean;
     FOnLoadingStateChange: TCEFHostLoadingStateChangeEvent;
@@ -161,6 +159,7 @@ type
 
     // IKeymanCEFHost
     procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
+    function GetDebugInfo: string;
 
     procedure Handle_CEF_DESTROY(var Message: TMessage);
     procedure Handle_CEF_AFTERDESTROY(var Message: TMessage);
@@ -171,7 +170,6 @@ type
     procedure Handle_CEF_BEFOREBROWSE(var message: TMessage);
     procedure Handle_CEF_TITLECHANGE(var message: TMessage);
     procedure Handle_CEF_COMMAND(var message: TMessage);
-    procedure Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);
     procedure Handle_CEF_SETFOCUS(var message: TMessage);
     procedure Handle_CEF_LOADINGSTATECHANGE(var message: TMessage);
 
@@ -186,7 +184,6 @@ type
     procedure Navigate; overload;
     procedure DoBeforeBrowse(const url: string; isMain, isPopup, ShouldOpenUrlIfNotHandled: Boolean; out Handled: Boolean);
   public
-    procedure DoResizeByContent;
     procedure SetFocus; override;
     procedure StartClose;
     procedure Navigate(const url: string); overload;
@@ -204,7 +201,6 @@ type
     property OnTitleChange: TCEFHostTitleChangeEvent read FOnTitleChange write FOnTitleChange;
     property OnPreKeySyncEvent: TCEFHostPreKeySyncEvent read FOnPreKeySyncEvent write FOnPreKeySyncEvent;
     property OnKeyEvent: TCEFHostKeyEvent read FOnKeyEvent write FOnKeyEvent;
-    property OnResizeFromDocument: TCEFHostResizeFromDocumentEvent read FOnResizeFromDocument write FOnResizeFromDocument;
     property OnLoadingStateChange: TCEFHostLoadingStateChangeEvent read FOnLoadingStateChange write FOnLoadingStateChange;
   end;
 
@@ -298,6 +294,12 @@ begin
   PostMessage(FCallbackWnd, CEF_SHOW, 0, 0);
 end;
 
+function TframeCEFHost.GetDebugInfo: string;
+begin
+  Result := FNextURL;
+  if Assigned(Owner) then Result := Owner.ClassName+':'+Result;
+end;
+
 function TframeCEFHost.HasFocus: Boolean;
 begin
   AssertVclThread;
@@ -323,7 +325,7 @@ begin
   FreeMem(p);
 end;
 
-procedure TframeCEFHost.cefWidgetCompMsg(var aMessage: TMessage;
+procedure TframeCEFHost.cefWidgetCompMsg(Sender: TObject; var aMessage: TMessage;
   var aHandled: Boolean);
 begin
   AssertCefThread;
@@ -391,7 +393,6 @@ begin
     CEF_BEFOREBROWSE: Handle_CEF_BEFOREBROWSE(Message);
     CEF_TITLECHANGE: Handle_CEF_TITLECHANGE(Message);
     CEF_COMMAND: Handle_CEF_COMMAND(Message);
-    CEF_RESIZEFROMDOCUMENT: Handle_CEF_RESIZEFROMDOCUMENT(Message);
     CEF_SETFOCUS: Handle_CEF_SETFOCUS(Message);
     CEF_LOADINGSTATECHANGE: Handle_CEF_LOADINGSTATECHANGE(Message);
   end;
@@ -558,11 +559,11 @@ begin
 end;
 
 procedure TframeCEFHost.cefClose(Sender: TObject; const browser: ICefBrowser;
-  out Result: Boolean);
+  var aAction: TCefCloseBrowserAction);
 begin
   AssertCefThread;
   PostMessage(FCallbackWnd, CEF_DESTROY, 0, 0);
-  Result := True;
+  aAction := cbaClose;
 end;
 
 procedure TframeCEFHost.Handle_CEF_DESTROY(var Message: TMessage);
@@ -652,13 +653,6 @@ begin
       (message.WParam and CEF_LOADINGSTATECHANGE_CANGOFORWARD) <> 0);
 end;
 
-procedure TframeCEFHost.Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);
-begin
-  AssertVclThread;
-  if Assigned(FOnResizeFromDocument) then
-    FOnResizeFromDocument(Self, message.WParam, message.LParam);
-end;
-
 procedure TframeCEFHost.Handle_CEF_SETFOCUS(var message: TMessage);
 begin
   AssertVclThread;
@@ -667,7 +661,7 @@ begin
 end;
 
 procedure TframeCEFHost.cefPreKeyEvent(Sender: TObject;
-  const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: PMsg;
+  const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: TCefEventHandle;
   out isKeyboardShortcut, Result: Boolean);
 var
   p: PCEFHostKeyEventData;
@@ -720,7 +714,9 @@ procedure TframeCEFHost.cefBeforePopup(Sender: TObject;
   targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
   userGesture: Boolean; const popupFeatures: TCefPopupFeatures;
   var windowInfo: TCefWindowInfo; var client: ICefClient;
-  var settings: TCefBrowserSettings; var noJavascriptAccess, Result: Boolean);
+  var settings: TCefBrowserSettings;
+  var extra_info: ICefDictionaryValue;
+  var noJavascriptAccess, Result: Boolean);
 begin
   AssertCefThread;
   DoBeforeBrowse(targetUrl, frame.IsMain, True, True, Result);
@@ -739,7 +735,7 @@ end;
 procedure TframeCEFHost.cefSetFocus(Sender: TObject; const browser: ICefBrowser;
   source: TCefFocusSource; out Result: Boolean);
 begin
-  Result := source = FOCUS_SOURCE_NAVIGATION;
+  Result := source = FOCUS_SOURCE_SYSTEM;
 end;
 
 procedure TframeCEFHost.cefTitleChange(Sender: TObject;
@@ -782,23 +778,6 @@ begin
   AssertVclThread;
   inherited;
   if cef <> nil then cef.NotifyMoveOrResizeStarted;
-end;
-
-procedure TframeCEFHost.DoResizeByContent;
-var
-  msg : ICefProcessMessage;
-begin
-  // Use the ArgumentList property if you need to pass some parameters.
-  msg := TCefProcessMessageRef.New(TCEFManager.ProcessMessage_GetWindowSize); // Same name than TCefCustomRenderProcessHandler.MessageName
-  cef.SendProcessMessage(PID_RENDERER, msg);
-end;
-
-procedure TframeCEFHost.cefProcessMessageReceived(Sender: TObject;
-  const browser: ICefBrowser; sourceProcess: TCefProcessId;
-  const message: ICefProcessMessage; out Result: Boolean);
-begin
-  if message.Name = TCEFManager.ProcessMessage_GetWindowSize then
-    PostMessage(FCallbackWnd, CEF_RESIZEFROMDOCUMENT, message.ArgumentList.GetInt(0), message.ArgumentList.GetInt(1));
 end;
 
 end.

@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+    <title>EuroLatin Keyboard</title>
+    <style type='text/css'>
+        table.chars {
+            border-collapse: collapse;
+        }
+        
+        table.chars td {
+            border: solid 1px #c0c0c0;
+            font: 1.2em Tahoma;
+            width: 1.5em;
+            text-align: center;
+            cursor: default
+        }
+        
+        table.chars th {
+            border: solid 1px #c0c0c0;
+            font: bold 1.2em Arial;
+            width: 1.5em;
+            background: #c0c0c0
+        }
+        
+        p {
+            font: 10pt Tahoma;
+        }
+        
+        h1 {
+            font: bold 16pt Tahoma;
+            color: #4444cc
+        }
+        
+        h2 {
+            font: bold 12pt Tahoma;
+            color: #4444cc
+        }
+        
+        table.display tr td {
+            font: 10pt Tahoma;
+            border: solid 1px #ccccff;
+            padding: 4px
+        }
+        
+        table.display tr th {
+            font: bold 10pt Tahoma;
+            border: solid 1px #ccccff;
+            padding: 4px;
+            text-align: left
+        }
+        
+        table.display {
+            border-collapse: collapse;
+        }
+        
+        #info {
+            position: absolute;
+            background-color: #F6FAB8;
+            border: solid 1px gray;
+            padding: 2px;
+            font: 8pt Arial
+        }
+        /* Languages List */
+        
+        .langs {
+            clear: right;
+            float: left;
+            margin: 0 0 0 16px;
+        }
+        
+        .langs div {
+            font: 8pt Tahoma;
+            padding: 1px 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>EuroLatin keyboard</h1>
+
+    <p>This keyboard enables you to type in most Latin-script languages, including all European Latin-script languages. The keyboard uses simple sequences of <code>symbol + character</code> to type letters and other characters not available on a standard
+        keyboard. It is designed for use with any Latin-script hardware keyboard.</p>
+
+    <h1 id='languages'>Supported Languages</h1>
+    <p>Languages supported by this keyboard include:</p>
+    <div class='langs'>
+        <div>Afrikaans</div>
+        <div>Albanian (Arbëreshë,<br/>Arvanitika, Gheg, Tosk)</div>
+        <div>Aragonese</div>
+        <div>Arpitan</div>
+        <div>Asturian</div>
+        <div>Aluet</div>
+        <div>Bahamas Creole</div>
+        <div>Balearic</div>
+        <div>Basque</div>
+        <div>Bavarian</div>
+        <div>Bislama</div>
+        <div>Breton</div>
+        <div>Bosnian</div>
+        <div>Catalan</div>
+        <div>Cimbrian</div>
+        <div>Corsican</div>
+        <div>Cornish</div>
+        <div>Crimean Tatar</div>
+        <div>Croatian</div>
+        <div>Czech</div>
+        <div>Danish</div>
+        <div>Drents</div>
+        <div>Dutch</div>
+        <div>Emiliano-Romagnolo</div>
+        <div>Esperanto</div>
+        <div>Estonian</div>
+        <div>Extremaduran</div>
+        <div>Fala</div>
+        <div>Faroese</div>
+        <div>Finnish (Standard,<br/>Kven, Tornedalen)</div>
+        <div>Franconian</div>
+        <div>French</div>
+        <div>Frisian</div>
+        <div>Friulian</div>
+        <div>Gaelic, Scottish</div>
+        <div>Gagauz (Latin script)</div>
+        <div>Galician</div>
+        <div>German</div>
+        <div>Greenlandic</div>
+    </div>
+
+    <div class='langs'>
+        <div>Gronings</div>
+        <div>Guarani</div>
+        <div>Gullah</div>
+        <div>Hawaiian</div>
+        <div>Haitian</div>
+        <div>Hungarian</div>
+        <div>Icelandic</div>
+        <div>Inuktitut</div>
+        <div>Irish</div>
+        <div>Istriot</div>
+        <div>Italian</div>
+        <div>Jamaican Creole</div>
+        <div>Jutish</div>
+        <div>Karelian</div>
+        <div>Kashubian</div>
+        <div>Kölsch</div>
+        <div>Ladin</div>
+        <div>Latin</div>
+        <div>Latvian</div>
+        <div>Ligurian</div>
+        <div>Limburgish</div>
+        <div>Lithuanian</div>
+        <div>Lombard</div>
+        <div>Luxembourgish</div>
+        <div>Maltese</div>
+        <div>Manx</div>
+        <div>Mirandese</div>
+        <div>Mócheno</div>
+        <div>Neapolitan-Calabrese</div>
+        <div>Norwegian</div>
+        <div>Nynorsk</div>
+        <div>Occitan</div>
+        <div>Oromo</div>
+        <div>Papiamentu</div>
+        <div>Pfaelzisch</div>
+        <div>Picard</div>
+        <div>Piemontese</div>
+        <div>Polish</div>
+        <div>Portuguese</div>
+        <div>Prussian</div>
+        <div>Quechua</div>
+    </div>
+
+    <div class='langs'>
+        <div>Romani</div>
+        <div>Romanian</div>
+        <div>Romansch</div>
+        <div>Saami (Latin Script)</div>
+        <div>Sallands</div>
+        <div>Sardinian</div>
+        <div>Saterfriesisch</div>
+        <div>Saxon</div>
+        <div>Scots</div>
+        <div>Serbian (Latin script)</div>
+        <div>Sicilian</div>
+        <div>Silesian</div>
+        <div>Slovak</div>
+        <div>Slovenian</div>
+        <div>Sorbian</div>
+        <div>Spanish</div>
+        <div>Stellingwerfs</div>
+        <div>Swabian</div>
+        <div>Swahili</div>
+        <div>Swedish</div>
+        <div>Swiss German</div>
+        <div>Tagalog</div>
+        <div>Tok Pisin</div>
+        <div>Turkish</div>
+        <div>Twents</div>
+        <div>Valencian</div>
+        <div>Veluws</div>
+        <div>Venetian</div>
+        <div>Vlaams</div>
+        <div>Walloon</div>
+        <div>Walser</div>
+        <div>Welsh</div>
+        <div>Westphalien</div>
+        <div>Wolof</div>
+        <div>Xhosa</div>
+        <div>Yupik</div>
+        <div>Zapotec</div>
+        <div>Zeeuws</div>
+        <div>Zhuang</div>
+        <div>Zulu</div>
+    </div>
+
+    <div style='clear: both'></div>
+
+    <p>This keyboard is available online at <a href='https://keyman.com/keyboards/sil_euro_latin'>keyman.com/keyboards/sil_euro_latin</a></p>
+    <p>You can access help for this keyboard from the Keyboard Usage tool on the Keyman Desktop toolbar, or from the EuroLatin folder in your Windows Start Menu.</p>
+    <p>Email <a href='mailto:support@keyman.com'>technical support</a> if you have any further questions.</p>
+
+    <p>&copy; 1994-2020 SIL International</p>
+
+</body>
+
+</html>

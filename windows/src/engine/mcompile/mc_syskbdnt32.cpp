@@ -27,7 +27,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "pch.h"
 #include "../../engine/keyman32/kbd.h"	/* DDK kbdlayout */
 
 

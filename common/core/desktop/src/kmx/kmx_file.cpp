@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "kmx_processor.h"
+#include "kmx_processevent.h"
 
 using namespace km::kbp;
 using namespace kmx;
@@ -11,7 +11,7 @@ using namespace kmx;
 #include <share.h>
 #endif
 
-KMX_BOOL KMX_Processor::Load(km_kbp_path_name KeyboardName)
+KMX_BOOL KMX_ProcessEvent::Load(km_kbp_path_name KeyboardName)
 {
   if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
 
@@ -75,14 +75,14 @@ unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
   return crc;
 }
 
-KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard)
+KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard)
 {
   PKMX_BYTE buf;
   FILE *fp;
   LPKEYBOARD kbp;
   PKMX_BYTE filebase;
 
-  DebugLog("Loading file %ws", fileName);
+  DebugLog("Loading file '%s'", fileName);
   if(!fileName || !lpKeyboard)
   {
     DebugLog("Bad Filename");
@@ -119,7 +119,13 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
   }
 
 #ifdef KMX_64BIT
-  buf = new KMX_BYTE[sz*3];
+  // allocate enough memory for expanded data structure + original data.
+  // Expanded data structure is double the size of data on disk (8-byte
+  // pointers) - on disk the "pointers" are relative to the beginning of
+  // the file.
+  // We save the original data at the end of buf; we don't copy strings, so
+  // those will remain in the location at the end of the buffer.
+  buf = new KMX_BYTE[sz * 3];
 #else
   buf = new KMX_BYTE[sz];
 #endif
@@ -156,7 +162,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
 #ifdef KMX_64BIT
   kbp = CopyKeyboard(buf, filebase);
 #else
-  kbp = FixupKeyboard(buf, filebase, sz);
+  kbp = FixupKeyboard(buf, filebase);
 #endif
 
   if(!kbp) return FALSE;
@@ -168,20 +174,21 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
   return TRUE;
 }
 
-PKMX_WCHAR KMX_Processor::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
+PKMX_WCHAR KMX_ProcessEvent::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
 {
   if(offset == 0) return NULL;
   return (PKMX_WCHAR)(base + offset);
 }
 
 #ifdef KMX_64BIT
-
 /**
-  CopyKeyboard will copy the data read into bufp from x86-sized structures into x64-sized structures starting at base
-  * We know the base is dwFileSize * 3
-  * After this function finishes, we still need to keep the original data
+  CopyKeyboard will copy the data read into bufp from x86-sized structures into
+  x64-sized structures starting at `base`
+  * After this function finishes, we still need to keep the original data because
+    we don't copy the strings
+  This method is used on 64-bit architectures.
 */
-LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
+LPKEYBOARD KMX_ProcessEvent::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
 
@@ -231,8 +238,8 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
     i < kbp->cxGroupArray;
     i++, gp++, cgp++)
   {
-    gp->dpName = (PKMX_WCHAR)(base + cgp->dpName);
-    gp->dpKeyArray = (LPKEY) bufp;
+    gp->dpName = StringOffset(base, cgp->dpName);
+    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKEY) bufp : NULL;
     gp->cxKeyArray = cgp->cxKeyArray;
     bufp += sizeof(KEY) * gp->cxKeyArray;
     gp->dpMatch = StringOffset(base, cgp->dpMatch);
@@ -260,8 +267,11 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 }
 
 #else
-
-LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize)
+/**
+ Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
+ beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
+*/
+LPKEYBOARD KMX_ProcessEvent::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
   KMX_DWORD i, j;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
@@ -285,14 +295,14 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWOR
   for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)
   {
     gp->dpName = StringOffset(base, cgp->dpName);
-    gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
-    if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
-    if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
+    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKEY) (base + cgp->dpKeyArray) : NULL;
+    gp->dpMatch = StringOffset(base, cgp->dpMatch);
+    gp->dpNoMatch = StringOffset(base, cgp->dpNoMatch);
 
     for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++)
     {
-      kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
-      kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
+      kp->dpOutput = StringOffset(base, ckp->dpOutput);
+      kp->dpContext = StringOffset(base, ckp->dpContext);
     }
   }
 
@@ -301,7 +311,7 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWOR
 
 #endif
 
-KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, size_t sz)
+KMX_BOOL KMX_ProcessEvent::VerifyChecksum(PKMX_BYTE buf, size_t sz)
 {
   KMX_DWORD tempcs;
   PCOMP_KEYBOARD ckbp;
@@ -314,7 +324,7 @@ KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, size_t sz)
   return tempcs == CalculateBufferCRC(sz, buf);
 }
 
-KMX_BOOL KMX_Processor::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
+KMX_BOOL KMX_ProcessEvent::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
 {
   KMX_DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;

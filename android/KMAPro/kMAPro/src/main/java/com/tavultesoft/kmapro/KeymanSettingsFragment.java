@@ -11,6 +11,7 @@ import android.provider.Settings;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.preference.CheckBoxPreference;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
@@ -20,11 +21,14 @@ import com.tavultesoft.kmea.DisplayLanguages;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Dataset;
 
+import java.util.HashMap;
+
 public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static final String TAG = "SettingsFragment";
   private static Context context;
 
   private Preference languagesPreference, installKeyboardOrDictionary, displayLanguagePreference;
+  private ListPreference spacebarTextPreference;
   private CheckBoxPreference setSystemKeyboardPreference;
   private CheckBoxPreference setDefaultKeyboardPreference;
 
@@ -57,6 +61,49 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     displayLanguagePreference.setWidgetLayoutResource(R.layout.preference_translate_icon_layout);
     Intent displayLanguageIntent = new Intent(context, KeymanSettingsLocalizeActivity.class);
     displayLanguagePreference.setIntent(displayLanguageIntent);
+
+    /* Spacebar Caption Preference */
+
+    spacebarTextPreference = new ListPreference(context);
+    spacebarTextPreference.setKey(KeymanSettingsActivity.spacebarTextKey);
+
+    spacebarTextPreference.setTitle(getString(R.string.spacebar_caption)); // getString(R.string.change_display_language));
+
+    CharSequence[] entries = {
+      getString(R.string.spacebar_caption_language),
+      getString(R.string.spacebar_caption_keyboard),
+      getString(R.string.spacebar_caption_language_keyboard),
+      getString(R.string.spacebar_caption_blank)
+    };
+
+    HashMap<KMManager.SpacebarText,String> captions = new HashMap<>();
+    captions.put(KMManager.SpacebarText.LANGUAGE, getString(R.string.spacebar_caption_hint_language));
+    captions.put(KMManager.SpacebarText.KEYBOARD, getString(R.string.spacebar_caption_hint_keyboard));
+    captions.put(KMManager.SpacebarText.LANGUAGE_KEYBOARD, getString(R.string.spacebar_caption_hint_language_keyboard));
+    captions.put(KMManager.SpacebarText.BLANK, getString(R.string.spacebar_caption_hint_blank));
+
+    CharSequence[] entryValues = {
+      KMManager.SpacebarText.LANGUAGE.toString(),
+      KMManager.SpacebarText.KEYBOARD.toString(),
+      KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString(),
+      KMManager.SpacebarText.BLANK.toString()
+    };
+
+    spacebarTextPreference.setEntries(entries);
+    spacebarTextPreference.setEntryValues(entryValues);
+    spacebarTextPreference.setValue(KMManager.getSpacebarText().toString());
+    spacebarTextPreference.setSummary(captions.get(KMManager.getSpacebarText()));
+    spacebarTextPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if(newValue == null)
+          return false;
+        KMManager.SpacebarText mode = KMManager.SpacebarText.fromString((String) newValue);
+        KMManager.setSpacebarText(mode);
+        spacebarTextPreference.setSummary(captions.get(mode));
+        return true;
+      }
+    });
 
     /*
       Automatically does the following:
@@ -121,6 +168,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     screen.addPreference(languagesPreference);
     screen.addPreference(installKeyboardOrDictionary);
     screen.addPreference(displayLanguagePreference);
+    screen.addPreference(spacebarTextPreference);
 
     screen.addPreference(setSystemKeyboardPreference);
     screen.addPreference(setDefaultKeyboardPreference);

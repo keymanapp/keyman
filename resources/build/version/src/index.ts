@@ -8,7 +8,7 @@ import { readFileSync } from 'fs';
 
 const argv = yargs
   .command(['history'], 'Fixes up HISTORY.md with pull request data')
-  .command(['version'], 'Increments the current ptach version in VERSION.md')
+  .command(['version'], 'Increments the current patch version in VERSION.md')
   .demandCommand(1, 2)
   .options({
     'base': {
@@ -22,6 +22,11 @@ const argv = yargs
       demandOption: true,
       alias: 't',
       type: 'string'
+    },
+
+    'force': {
+      description: 'Force a version increment even if no changes found',
+      type: 'boolean'
     }
   })
   .help()
@@ -53,7 +58,7 @@ const main = async (): Promise<void> => {
 
   if(argv._.includes('history')) {
     logInfo(`# Validating history for ${version}`);
-    changeCount = await fixupHistory(octokit, argv.base);
+    changeCount = await fixupHistory(octokit, argv.base, argv.force);
     logInfo(`# ${changeCount} change(s) found for ${version}\n`);
   }
 

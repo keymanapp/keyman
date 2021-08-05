@@ -1,73 +1,18 @@
 # Keyman for Android & Keyman Engine for Android
 
 ## Prerequisites
-* Android Studio 4.1+
-* Java SE Development Kit 8 
-* [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
-
-## Install Java
-It is recommended to use openJDK because of oracle license issues.
-Tested with latest release for openJDK 8 from
-https://github.com/ojdkbuild/ojdkbuild
-
-1. Download and unpack the zip archive
-2. On on windows: use the default java path C:\Program Files\Java to avoid error message "Error 0x80010135 Path Too Long".
-3. Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-1.8.0.232-1
+See [build configuration](../docs/build/index.md) for details on how to configure your build environment.
 
 ## Keyman Minimum Android Requirements
 Keyman for Android has a minSdkVersion of 21 for [Android 5.0 Lollipop](https://developer.android.com/about/versions/lollipop)
-
-## Setup Android Studio
-
-1. Download [Android Studio](https://developer.android.com/studio/index.html) and install with these [instructions](https://developer.android.com/studio/install.html).
-2. For Windows users, set environment variable **ANDROID_HOME** to the location of your Android SDK. The default installation location is **C:\Users\\[USER]\AppData\Local\Android\sdk** where [USER] is your username. You may need to log out and log back in to take effect.
-
-For MacOS/Linux users, add the following to **~/.bashrc** or **~/.bash_profile**
-```bash
-export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/tools
-```
-For MacOS users, add the following (adjusted appropriately) to **~/.bashrc** or **~/.bash_profile** if your Java version is too strange for gradlew to understand (e.g., 11.0.2)
-```bash
-export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-echo $JAVA_HOME #should output: /Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home
-```
-3. For Windows users, from a Git Bash Prompt window, cd to the **sdk/tools/bin** folder and accept all the SDK license agreements
-```
-yes | ./sdkmanager.bat --licenses
-```
-For MacOS users, from a Terminal window, cd to the **~/Library/Android/sdk/tools/bin** folder and accept all the SDK license agreements
-```bash
-yes | ./sdkmanager --licenses
-```
-4. If you plan to test on a physical device via USB, install the appropriate [OEM USB drivers](https://developer.android.com/studio/run/oem-usb.html)
-5. Install [Java SE Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 ## Keyman for Android Development
 Keyman for Android (formerly named KMAPro) can be built from a command line (preferred) or Android Studio.
 
 Building Keyman Web is a precursor for compiling KMEA, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
 
-### Install JQ
-jq 1.6+ is used during the build process to determine the latest versions of the default keyboard (sil_euro_latin.kmp) and lexical-model (en.nrc.mtnt.model.kmp) packages to download. For builds on Windows, jq is already included in `/resources/build/`
-
-On Linux
-`sudo apt install jq`
-
 ### Crash Reporting
 Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server https://sentry.keyman.com. The analytics for Debug are associated with an App Bundle ID `com.tavultesoft.kmapro.debug`.
-
-#### Setting up sentry-cli
-Contact the Keyman team if you need access to sentry.keyman.com for development. 
-You will also need to install [sentry-cli](https://docs.sentry.io/cli/installation/) for uploading Debug symbols. 
-After setting up your personal [Auth token](http://sentry.keyman.com/settings/account/api/auth-tokens/), add the following to **~/.bashrc**
-```bash
-export SENTRY_AUTH_TOKEN={your Sentry auth token}
-export SENTRY_URL=https://sentry.keyman.com
-export SENTRY_ORG=keyman
-export SENTRY_PROJECT=keyman-android
-```
-To validate your configuration, from the `android/` folder run `sentry-cli info`.
  
 ### Compiling From Command Line
 1. Launch a command prompt and cd to the directory **keyman/android**
@@ -109,12 +54,14 @@ To validate your configuration, from the `android/` folder run `sentry-cli info`
        the device serial number listed in step 2.
 
 ### Compiling the app's offline help
-Extra prerequisite:
-* `wget`
+Keyman for Android help is maintained in the Markdown files in android/help/.
+The script `build-help.sh` uses the `pandoc` tool to convert the Markdown files into html.
 
-The script `build-help.sh` uses the `wget` tool to construct an offline bundle from the current
-online version of help on help.keyman.com.  When significant changes to help content have been
-made, it is advisable to manually re-run this script to update the app's offline content.
+```bash
+./build-help.sh htm
+```
+
+This script is automatically called when Keyman for Android is built.
 
 ### Sample Projects
 
@@ -163,7 +110,7 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
 4. Check that the `android{}` object, includes the following:
 ```gradle
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
@@ -181,14 +128,16 @@ repositories {
         dirs 'libs'
     }
     google()
+    mavenCentral()
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
-    implementation 'com.google.android.material:material:1.2.1'
-    api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:2.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0-rc01'
+    implementation 'com.google.android.material:material:1.3.0'
+    api (name:'keyman-engine', ext:'aar')
+    implementation 'io.sentry:sentry-android:4.3.0'
+    implementation 'androidx.preference:preference:1.1.1'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {

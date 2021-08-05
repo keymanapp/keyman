@@ -43,6 +43,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.Win.Registry,
   Winapi.Windows,
 
   Keyman.System.LanguageCodeUtils,
@@ -50,8 +51,10 @@ uses
   BCP47Tag,
   glossary,
   kmint,
+  RegistryKeys,
   utilkmshell,
-  utilexecute;
+  utilexecute,
+  utilsystem;
 
 { TTIPMaintenance }
 
@@ -68,6 +71,7 @@ end;
 class function TTIPMaintenance.InstallTipForPackage(const PackageFilename, BCP47Tag: string): Boolean;
 var
   PackageID: string;
+  n: Integer;
   pack: IKeymanPackageInstalled;
 begin
   // This function has a known limitation: if a package contains more than one keyboard,
@@ -75,9 +79,11 @@ begin
   // considered an acceptable limitation at this time
 
   PackageID := ChangeFileExt(ExtractFileName(PackageFilename), '');
-  pack := kmcom.Packages[PackageID];
-  if not Assigned(pack) then
+  n := kmcom.Packages.IndexOf(PackageID);
+  if n < 0 then
     Exit(False);
+
+  pack := kmcom.Packages[n];
 
   if pack.Keyboards.Count = 0 then
     Exit(False);
@@ -199,8 +205,58 @@ begin
 end;
 
 class function TTIPMaintenance.GetUserDefaultLanguage: string;
+var
+  r: TRegistry;
+  tags: TStringList;
+  v: string;
+  keys: TStringList;
+  key: string;
 begin
-  Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL))
+  // Fallback result
+  Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL));
+
+  // For Win10, look in CPL/International/UserProfile
+  r := TRegistry.Create;
+  try
+    if not r.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) then
+      Exit;
+    if r.ValueExists(SRegValue_CPIUP_InputMethodOverride) then
+    begin
+      // Lookup the override input method BCP 47 tag
+      v := r.ReadString(SRegValue_CPIUP_InputMethodOverride);
+      keys := TStringList.Create;
+      try
+        r.GetKeyNames(keys);
+        for key in keys do
+        begin
+          if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + key) and
+            r.ValueExists(v) then
+          begin
+            Result := key;
+            Break;
+          end;
+        end;
+      finally
+        keys.Free;
+      end;
+    end
+    else if r.ValueExists(SRegValue_CPIUP_Languages) then
+    begin
+      // The first tag is the default language tag
+      tags := TStringList.Create;
+      try
+        r.ReadMultiString(SRegValue_CPIUP_Languages, tags);
+        if tags.Count > 0 then
+        begin
+          Result := tags[0].Trim;
+        end;
+      finally
+        tags.Free;
+      end;
+    end;
+  finally
+    r.Free;
+  end;
 end;
 
 class function TTIPMaintenance.GetFirstLanguage(Keyboard: IKeymanKeyboardFile): string;

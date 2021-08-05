@@ -1,0 +1,26 @@
+c This tests #4423 -- single character stores that trigger the named character constants
+c code and resulted in a codepage conversion error.
+
+store(&VERSION) '10.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(&includecodes) 'test_namedcodeconstants.txt'
+
+store(főő) '0'
+store(bar) '1'
+store(smp) U+12345
+store(😉) '🤪'
+
+$főő + 'a' > 'b'
+$bar + 'a' > 'c'
+
+$hangul_syllable_go + 'a' > 'd'
+
+$mycode + 'a' > 'e'
+
+$smp + 'a' > 'f'
+$😉 + 'a' > '😡'
++ 'x' > $😉

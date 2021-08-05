@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="ssLanguageName">អង់គ្លេស</string>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">ភាសាខ្មែរ</string>
   <string name="ssApplicationTitle">រៀបចំ $APPNAME $VERSION</string>
   <string name="ssTitle">ដំឡើង $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION ត្រូវ​បាន​ដំឡើង​ដោយ​ជោគជ័យ។</string>
   <string name="ssCancelQuery">តើ​អ្នក​ពិត​ជា​ចង់​បោះបង់​ការដំឡើង​ $APPNAME ឬ?</string>
   <string name="ssBootstrapExtractingBundle">កំពុង​ស្រង់​បណ្ដុំ...</string>
-  <string name="ssBootstrapCheckingPackages" comment="ssBootstrapCheckingPackages: this message is shown when the installer is loading each package that is in the local folder and determining if it should be installed. It is a status message which appears only briefly and requires no user interaction.">កំពុង​ពិនិត្យ​កញ្ចប់...</string>
+  <string name="ssBootstrapCheckingPackages">កំពុង​ពិនិត្យ​កញ្ចប់...</string>
   <string name="ssBootstrapCheckingForUpdates">កំពុង​ពិនិត្យ​រកការអាប់ដេត​អនឡាញ</string>
   <string name="ssBootstrapCheckingInstalledVersions">កំពុង​ពិនិត្យ​រក​ជំនាន់​ដែល​បាន​ដំឡើង...</string>
   <string name="ssBootstrapReady">កំពុង​បញ្ចប់...</string>
@@ -18,7 +18,7 @@
   <string name="ssActionInstallPackageLanguage">• %0:s %1:s សម្រាប់ %2:s %3:s</string>
   <string name="ssActionNothingToInstall">គ្មាន​អ្វី​ដំឡើង​ទេ។</string>
   <!-- Parameters: %0:s download size -->
-  <string name="ssActionDownload" comment="ssActionDownload&#10;Parameters: %0:s download size&#10;For example &quot;(13.5MB download)&quot;&#10;This is used when listing each of the files to be installed.">(ទំហំ​ទាញយក %0:s)</string>
+  <string name="ssActionDownload">(ទំហំ​ទាញយក %0:s)</string>
   <string name="ssActionInstall">ការរៀបចំ​នឹង​ដំឡើង៖</string>
   <string name="ssFreeCaption">$APPNAME $VERSION ​ជាកម្មវិធី​​កូដ​ចំហឥត​គិត​ថ្លៃ</string>
   <string name="ssLicenseLink">អាន​អាជ្ញា​បណ្ណ</string>
@@ -56,7 +56,7 @@
   <!-- Parameters: %0:s: installed version -->
   <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s ត្រូវ​បាន​ដំឡើង​រួច​ហើយ។</string>
   <!-- Parameters: %0:s: version, %1:s: size -->
-  <string name="ssOptionsDownloadKeymanVersion" comment="ssOptionsDownloadKeymanVersion&#10;Parameters: %0:s: version, %1:s: size&#10;&#10;Download is a verb in this case. This is shown in the Options dialog box.">ទាញ​យក​ជំនាន់ %0:s (%1:s)</string>
+  <string name="ssOptionsDownloadKeymanVersion">ទាញ​យក​ជំនាន់ %0:s (%1:s)</string>
   <!-- Parameters: %0:s: version -->
   <string name="ssOptionsInstallKeymanVersion">ជំនាន់ %0:s</string>
   <!-- Parameters: %0:s: package name %1:s -->

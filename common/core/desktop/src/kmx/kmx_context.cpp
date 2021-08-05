@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
+#include <kmx/kmx_processevent.h>
 
 using namespace km::kbp;
 using namespace kmx;
@@ -29,12 +29,25 @@ void KMX_Context::Add(KMX_WCHAR ch)
   //DebugLog("KMX_Context::Add(%x):  EXIT [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
 }
 
+KMX_WCHAR *KMX_Context::BufMax(int n)
+{
+  KMX_WCHAR *p = (KMX_WCHAR *) u16chr(CurContext, 0);
+	if(CurContext == p || n == 0) return p; // empty context or 0 characters requested, return pointer to end of context
+
+  KMX_WCHAR *q = p;
+	for(; p != NULL && p > CurContext && (intptr_t)(q-p) < n; p = decxstr(p, CurContext))
+  ; // ; on new line to tell compiler empty loop is intentional
+
+  if((intptr_t)(q-p) > n) p = incxstr(p); // Copes with deadkey or supplementary pair at start of returned buffer making it too long
+
+  return p;
+}
 
 KMX_WCHAR *KMX_Context::Buf(int n)
 {
   KMX_WCHAR *p;
 
-  for(p = (KMX_WCHAR *) u16chr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p, CurContext), n--);
+  for(p = (KMX_WCHAR *) u16chr(CurContext, 0); p != NULL && n > 0 && p > CurContext; p = decxstr(p, CurContext), n--);
 
   if(n > 0) return NULL;
   return p;
@@ -51,7 +64,7 @@ void KMX_Context::Delete()
 
   if(pos > 0) pos--;
   CurContext[pos] = 0;
-  //DebugLog("KMX_Context::Delete:  EXIT: %s", Debug_UnicodeString(CurContext));
+  //DebugLog("KMX_Context::Delete:  EXIT [%d]: %s", pos, Debug_UnicodeString(CurContext));
 }
 
 void KMX_Context::Reset()
@@ -63,11 +76,17 @@ void KMX_Context::Reset()
 
 void KMX_Context::Get(KMX_WCHAR *buf, int bufsize)
 {
-  for(KMX_WCHAR *p = CurContext; *p && bufsize > 0; p++, bufsize--)
+  for (KMX_WCHAR *p = this->BufMax(bufsize); *p && bufsize > 0; p++, bufsize--)
   {
-    *buf = *p; buf++;
-    if(*p >= 0xD800 && *p <= 0xDBFF) { *buf = *(++p); bufsize--; buf++; }
+    *buf = *p;
+    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) {
+      buf++; p++;
+      *buf = *p;
+      bufsize--;
+    }
+    buf++;
   }
+
   *buf = 0;
 }
 
@@ -81,7 +100,7 @@ void KMX_Context::CopyFrom(KMX_Context *source)   // I3575
 
 void KMX_Context::Set(const KMX_WCHAR *buf)
 {
-  DebugLog("KMX_Context::Set(%s): ENTER: %s", Debug_UnicodeString(buf), Debug_UnicodeString(CurContext, 1));
+  DebugLog("KMX_Context::Set(%s): ENTER [%d]: %s", Debug_UnicodeString(buf), pos, Debug_UnicodeString(CurContext, 1));
   const KMX_WCHAR *p;
   KMX_WCHAR *q;
 
@@ -90,7 +109,7 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
   // of the string, not the start
   p = u16chr(buf, 0);
   q = (KMX_WCHAR*)p;
-  while(p > buf && (intptr_t)(q-p) < MAXCONTEXT - 1) {
+  while(p != NULL && p > buf && (intptr_t)(q-p) < MAXCONTEXT - 1) {
     p = decxstr((KMX_WCHAR*)p, (KMX_WCHAR*)buf);
   }
 
@@ -107,10 +126,10 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
   }
 
   *q = 0;
-  pos = (intptr_t)(q-CurContext);
+  pos = (int)(intptr_t)(q-CurContext);
   CurContext[MAXCONTEXT-1] = 0;
 
-  //DebugLog("KMX_Context::Set(%s):  EXIT: %s", Debug_UnicodeString(buf), Debug_UnicodeString(CurContext, 1));
+  //DebugLog("KMX_Context::Set(%s):  EXIT [%d]: %s", Debug_UnicodeString(buf), pos, Debug_UnicodeString(CurContext, 1));
 }
 
 KMX_BOOL KMX_Context::CharIsDeadkey()

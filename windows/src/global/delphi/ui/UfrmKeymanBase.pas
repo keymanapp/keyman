@@ -64,18 +64,21 @@ uses
   System.Win.Registry,
 
   ErrorControlledRegistry,
+  Keyman.System.KeymanSentryClient,
   RegistryKeys;
 
 {$R *.DFM}
 
 procedure TfrmKeymanBase.TntFormCreate(Sender: TObject);
 begin
+  TKeymanSentryClient.Breadcrumb('user', 'Created form '+ClassName, 'form-create');
   RegisterWindow;  // I2720
 end;
 
 procedure TfrmKeymanBase.TntFormDestroy(Sender: TObject);
 begin
   DeregisterWindow;  // I2720
+  TKeymanSentryClient.Breadcrumb('user', 'Destroyed form '+ClassName, 'form-destroy');
 end;
 
 function TfrmKeymanBase.TntFormHelp(Command: Word; Data: NativeInt; var CallHelp: Boolean): Boolean;

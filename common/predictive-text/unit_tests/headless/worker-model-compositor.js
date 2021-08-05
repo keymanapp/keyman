@@ -10,6 +10,71 @@ var ModelCompositor = require('../../build/intermediate').ModelCompositor;
 
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
+    describe('Basic suggestion generation', function() {
+      var plainModel = new TrieModel(jsonFixture('tries/english-1000'), 
+        {wordBreaker: wordBreakers.default}
+      );
+
+      it('generates suggestions with expected properties', function() {
+        let compositor = new ModelCompositor(plainModel);
+        let context = {
+          left: 'th', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        let inputTransform = {
+          insert: 'e',
+          deleteLeft: 0
+        };
+
+        let suggestions = compositor.predict(inputTransform, context);
+        suggestions.forEach(function(suggestion) {
+          // Suggstions are built based on the context state BEFORE the triggering 
+          // input, replacing the prediction's root with the complete word.
+          //
+          // This is necessary, in part, for proper display-string construction.
+          assert.equal(suggestion.transform.deleteLeft, 2);
+        });
+
+        let keep = suggestions.find(function(suggestion) {
+          return suggestion.tag == 'keep';
+        });
+
+        assert.isDefined(keep);
+        assert.equal(keep.transform.insert, 'the ');
+
+        // Expect an appended space.
+        let expectedEntries = ['they ', 'there ', 'their ', 'these ', 'themselves '];
+        expectedEntries.forEach(function(entry) {
+          assert.isDefined(suggestions.find(function(suggestion) {
+            return suggestion.transform.insert == entry;
+          }));
+        });
+      });
+
+      it('properly handles suggestions after a backspace', function() {
+        let compositor = new ModelCompositor(plainModel);
+        let context = {
+          left: 'the ', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        let inputTransform = {
+          insert: '',
+          deleteLeft: 1
+        };
+
+        let suggestions = compositor.predict(inputTransform, context);
+        suggestions.forEach(function(suggestion) {
+          // Suggestions always delete the full root of the suggestion.
+          //
+          // After a backspace, that means the text 'the' - 3 chars.
+          // Char 4 is for the original backspace, as suggstions are built
+          // based on the context state BEFORE the triggering input -
+          // here, a backspace.
+          assert.equal(suggestion.transform.deleteLeft, 4);
+        });
+      });
+    });
+
     describe('applySuggestionCasing', function() {
       let plainApplyCasing = function(caseToApply, text) {
         switch(caseToApply) {
@@ -764,7 +829,7 @@ describe('ModelCompositor', function() {
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
@@ -802,7 +867,7 @@ describe('ModelCompositor', function() {
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Accepting the suggestion adds an extra context state.

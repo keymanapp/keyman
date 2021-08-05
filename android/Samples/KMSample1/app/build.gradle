@@ -4,7 +4,8 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
@@ -18,7 +19,7 @@ android {
     defaultConfig {
         applicationId "com.keyman.kmsample1"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
     }
@@ -40,9 +41,9 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.appcompat:appcompat:1.3.0-rc01'
+    implementation 'com.google.android.material:material:1.3.0'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:3.1.0'
+    implementation 'io.sentry:sentry-android:4.3.0'
     implementation 'androidx.preference:preference:1.1.1'
 }

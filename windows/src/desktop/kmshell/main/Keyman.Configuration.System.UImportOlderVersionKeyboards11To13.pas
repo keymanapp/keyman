@@ -4,10 +4,12 @@ interface
 
 type
   TImportOlderVersionKeyboards11To13 = class
+  private
+    class function ShouldRun: Boolean;
+    class procedure ReRegisterTips;
   public
     class procedure Execute;
     class procedure BackupCurrentUser;
-    class procedure ReRegisterTips;
     class procedure ImportCurrentUser;
   end;
 
@@ -37,6 +39,9 @@ uses
 
 class procedure TImportOlderVersionKeyboards11To13.Execute;  // I2361
 begin
+  if not ShouldRun then
+    Exit;
+
   // execute KMshell as login user to backup list of installed Keyman TIPs
   TUtilExecute.CreateProcessAsShellUser(ParamStr(0), '"'+ParamStr(0)+'" -upgradekeyboards=13,backup', True);
 
@@ -101,6 +106,9 @@ var
   uks: TUpgradeKeyboardList;
   uk: TUpgradeKeyboard;
 begin
+  if not ShouldRun then
+    Exit;
+
   uks := LoadUpgradeKeyboards;
   r := TRegistry.Create;
   try
@@ -175,6 +183,36 @@ begin
   // The following code re-registers all the profiles
   kmcom.Refresh;
   (kmcom.Keyboards as IKeymanKeyboardsInstalled2).RefreshInstalledKeyboards;
+end;
+
+class function TImportOlderVersionKeyboards11To13.ShouldRun: Boolean;
+var
+  r: TRegistry;
+  keys: TStringList;
+  i: Integer;
+begin
+  r := TRegistry.Create(KEY_READ);
+  keys := TStringList.Create;
+  try
+    r.RootKey := HKEY_LOCAL_MACHINE;
+    if not r.OpenKeyReadOnly(SRegKey_InstalledKeyboards_LM) then
+      // No keyboards exist, no upgrade necessary
+      Exit(False);
+
+    r.GetKeyNames(keys);
+    if keys.Count = 0 then
+      // No keyboards exist, no upgrade necessary
+      Exit(False);
+
+    for i := 0 to keys.Count - 1 do
+      if r.KeyExists('\' + SRegKey_InstalledKeyboards_LM + '\' + keys[i] + '\' + SRegSubKey_TransientLanguageProfiles) then
+        // The keyboard has already been upgraded to 14.0, we mustn't upgrade again
+        Exit(False);
+
+    Result := True;
+  finally
+    r.Free;
+  end;
 end;
 
 class procedure TImportOlderVersionKeyboards11To13.ImportCurrentUser;

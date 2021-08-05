@@ -117,8 +117,6 @@ private:
     // state
     //
 
-    GUID guidActiveProfile;   // I4274
-
     BOOL _keystrokeSinkInitialized;
     BOOL fEatenBuf[256];
 
@@ -132,6 +130,8 @@ private:
     size_t _cPreservedKeyCount;
 
     DWORD _dwDeepIntegration;   // I4375
+
+    BOOL _tryAndStartKeyman;
 
     LONG _cRef;     // COM ref count
 };

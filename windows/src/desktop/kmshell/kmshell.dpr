@@ -97,7 +97,6 @@ uses
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
-  UfrmScriptError in '..\..\global\delphi\general\UfrmScriptError.pas' {frmScriptError},
   BaseKeyboards in '..\..\global\delphi\general\BaseKeyboards.pas',
   LoadIndirectStringUnit in '..\..\engine\keyman\langswitch\LoadIndirectStringUnit.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',

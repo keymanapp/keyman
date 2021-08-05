@@ -26,11 +26,13 @@ if(!window['keyman']['initialized']) {
 
     /**
      * Set default device options
-     * @param {Object}  opt device options object
+     * @param {OptionType}  opt device options object
      */
-    keymanweb.setDefaultDeviceOptions=function(opt) {
+    keymanweb.setDefaultDeviceOptions = function(opt : com.keyman.OptionType) {
       // Element attachment type
-      if(opt['attachType'] == '') opt['attachType'] = (device.touchable ? 'manual' : 'auto');
+      if (!opt['attachType']) {
+        opt['attachType'] = (device.touchable ? 'manual' : 'auto');
+      }
     }
 
   /**
@@ -40,7 +42,7 @@ if(!window['keyman']['initialized']) {
      */
     util.wait = function(s) {
       // Keyboards loaded with page are initialized before the page is ready,
-      // so cannot use the wait indicater (and don't need it, anyway)
+      // so cannot use the wait indicator (and don't need it, anyway)
       // Do not display if a blocking cloud server error has occurred (to prevent multiple errors)
       var bg=this.waiting;
       if(typeof(bg) == 'undefined' || bg == null || keymanweb.warned) {
@@ -51,7 +53,7 @@ if(!window['keyman']['initialized']) {
       if(s) {
         bg.pending=true;
         window.setTimeout(function() {
-            if(bg.pending) {
+            if(bg.pending && keymanweb.options.useAlerts) {
               window.scrollTo(0,0);
               nn[0].style.display='none';
               nn[1].className='kmw-wait-text'; nn[1].innerHTML=s;

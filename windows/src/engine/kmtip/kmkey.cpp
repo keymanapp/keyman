@@ -290,6 +290,9 @@ void CKMTipTextService::_UninitKeyman() {
 }
 
 void CKMTipTextService::_TryAndStartKeyman() {
+  if (!_tryAndStartKeyman)
+      return;
+
   HANDLE hEventSource = RegisterEventSource(NULL, "Keyman");
   if (!hEventSource) {
     // This is unlikely to occur, but if it does, there's probably

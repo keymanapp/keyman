@@ -398,7 +398,10 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.addListener('suggestionsready', manager.updateSuggestions);
       keyman.core.languageProcessor.addListener('tryaccept', manager.tryAccept);
       keyman.core.languageProcessor.addListener('tryrevert', manager.tryRevert);
+    }
 
+    postConfigure() {
+      let keyman = com.keyman.singleton;
       // Trigger a null-based initial prediction to kick things off.
       keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget());
     }
@@ -490,7 +493,7 @@ namespace com.keyman.osk {
       // Utilized by the mobile apps; allows them to 'take over' touch handling,
       // blocking it within KMW when the apps are already managing an ongoing touch-hold.
       let keyman = com.keyman.singleton;
-      return keyman['osk'].vkbd.popupVisible;
+      return keyman['osk'].vkbd.subkeyGesture && keyman.isEmbedded;
     }
 
     protected dealiasSubTarget(target: HTMLDivElement): HTMLDivElement {

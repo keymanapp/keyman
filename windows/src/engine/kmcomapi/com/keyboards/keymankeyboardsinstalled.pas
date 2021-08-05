@@ -40,6 +40,7 @@ type
   TKeymanKeyboardsInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardsInstalled, IKeymanKeyboardsInstalled2, IIntKeymanKeyboardsInstalled)   // I4376
   private
     FKeyboards: TKeyboardList;
+    procedure TriggerWindowsLanguageSync;
   protected
     procedure DoRefresh; override;
 
@@ -69,14 +70,18 @@ uses
   System.Variants,
   Winapi.msctf,
   custinterfaces,
+  DebugPaths,
   keymankeyboardfile,
   keymanpackageinstalled,
   keymanpackagesinstalled,
+  KeymanPaths,
   KLog,
   kpinstallkeyboard,
   keyman_msctf,
   OnlineConstants,
   regkeyboards,
+  RegistryKeys,
+  utilexecute,
   utilfiletypes;
 
 constructor TKeymanKeyboardsInstalled.Create(AContext: TKeymanContext);
@@ -182,6 +187,46 @@ begin
   end;
 
   Context.Control.AutoApplyKeyman;
+
+  TriggerWindowsLanguageSync;
+end;
+
+// This triggers a synchronisation of the language settings to the
+// cloud, which avoids an issue where language setting changes are
+// overwritten on a subsequent reboot of the system.
+//
+// See #4447 and kmrefresh.cpp for additional detail.
+//
+// Although the sync function is not supported on Windows 7, 8.1,
+// we'll call kmrefresh.exe anyway, as we cannot be sure which version
+// of Windows we are running on -- the calling process may be lied to
+// if it does not have an appropriate manifest. kmrefresh.exe is safe
+// to run as it will simply exit if it does not find the appropriate
+// endpoint to call.
+//
+// On x64 systems, we must call the x64 version of the process, as the
+// x86 version does not appear to work.
+procedure TKeymanKeyboardsInstalled.TriggerWindowsLanguageSync;
+var
+  processName: string;
+  FWow64: LongBool;
+begin
+  if not Reg_GetDebugFlag(SRegValue_Flag_SyncLanguagesToCloud, True) then
+    Exit;
+
+{$IFDEF WIN64}
+  processName := 'kmrefresh.x64.exe';
+{$ELSE}
+  if IsWow64Process(GetCurrentProcess, FWow64) and FWow64
+    then processName := 'kmrefresh.x64.exe'
+    else processName := 'kmrefresh.x86.exe';
+{$ENDIF}
+
+  TUtilExecute.Execute(
+    TKeymanPaths.KeymanEngineInstallPath(processName),
+    ExtractFileDir(ParamStr(0)),
+    SW_HIDE
+  );
 end;
 
 procedure TKeymanKeyboardsInstalled.DoRefresh;

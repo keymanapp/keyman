@@ -1,0 +1,11 @@
+c test_4280_nul_start_2
+
+store(&VERSION) '10.0'
+store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c nul should be first statement in context
+'a' nul + 'x' > 'zeep'

@@ -173,7 +173,9 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       if let langName = keyboardLanguages[l]?.name {
         log.info("keyboard language \(l) \(langName) has lexical model")
       } else {
-        log.error("lexical model language \(l) has no keyboard installed!")
+        // Legacy behavior:  we automatically install all MTNT language codes, even without
+        // a matching keyboard for the more specific variant(s).
+        SentryManager.breadcrumbAndLog("lexical model language \(l) has no keyboard installed!")
       }
     }
 
@@ -195,11 +197,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     } else {
       let selectionColor = UIView()
 
-      if #available(iOSApplicationExtension 11.0, *) {
-        selectionColor.backgroundColor = UIColor(named: "SelectionPrimary")
-      } else {
-        selectionColor.backgroundColor = Colors.selectionPrimary
-      }
+      selectionColor.backgroundColor = Colors.selectionPrimary
 
       if keyboards.count < 2 {
         cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
@@ -308,6 +306,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 
       switch(package.resourceType()) {
         case .keyboard:
+          Manager.shared.inputViewController.setShouldReload()
           msg = NSLocalizedString("notification-download-success-keyboard", bundle: engineBundle, comment: "")
         case .lexicalModel:
           msg = NSLocalizedString("notification-download-success-lexical-model", bundle: engineBundle, comment: "")
@@ -334,7 +333,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 
     log.info("keyboardDownloadFailed: InstalledLanguagesViewController")
 
-    DispatchQueue.main.sync {
+    DispatchQueue.main.async {
       var msg: String
       switch(packageKey.type) {
         case .keyboard:
@@ -343,7 +342,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
           msg = NSLocalizedString("notification-download-failure-lexical-model", bundle: engineBundle, comment: "")
       }
 
-      if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+      if let toolbar = self.navigationController?.toolbar as? ResourceDownloadStatusToolbar {
         toolbar.displayStatus(msg, withIndicator: false, duration: 3.0)
       }
 
@@ -366,8 +365,8 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   }
 
   private func batchUpdateCompleted(results: BatchUpdateCompletedNotification) {
-    DispatchQueue.main.sync {
-      if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+    DispatchQueue.main.async {
+      if let toolbar = self.navigationController?.toolbar as? ResourceDownloadStatusToolbar {
         if results.failures.count == 0 {
           let formatString = NSLocalizedString("notification-update-success", bundle: engineBundle, comment: "")
           toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.successes.count), withIndicator: false, duration: 3.0)
@@ -379,7 +378,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
         }
       }
 
-      restoreNavigation()
+      self.restoreNavigation()
     }
   }
   
@@ -439,13 +438,14 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 }
 
 extension InstalledLanguagesViewController {
-  
-  @objc func addClicked(_ sender: Any) {
+
+  public func launchKeyboardSearch() {
     let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultDownloadClosure() { result in
       switch result {
         case .cancelled:
           break
         case .error(let error):
+          // Note: Errors may result from network issues.
           if let error = error {
             log.error(String(describing: error))
           }
@@ -458,6 +458,10 @@ extension InstalledLanguagesViewController {
     })
 
     navigationController!.pushViewController(keyboardSearchVC, animated: true)
+  }
+
+  @objc func addClicked(_ sender: Any) {
+    launchKeyboardSearch()
   }
 }
 

@@ -46,7 +46,7 @@ type
     frameSource: TframeTextEditor;
     FSetup: Integer;
     FModified: Boolean;
-    FOnModifiedChanged: TNotifyEvent;
+    FOnChanged: TNotifyEvent;
     FFilename: string;
     procedure UpdateData;
     function MoveCodeToWordlist: Boolean;
@@ -67,7 +67,7 @@ type
     function SaveToFile(const Filename: string): Boolean;
     property Filename: string read FFilename;
     property Modified: Boolean read FModified write SetModified;
-    property OnModifiedChanged: TNotifyEvent read FOnModifiedChanged write FOnModifiedChanged;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
   end;
 
 implementation
@@ -212,10 +212,9 @@ var
   w: TWordlistWord;
 begin
   if FSetup > 0 then Exit;
+
   Inc(FSetup);
   try
-    Modified := True;
-
     if ARow = gridWordlist.RowCount - 1 then
     begin
       if (Value = '') or (Value = S_AddRowText) then
@@ -232,12 +231,16 @@ begin
     begin
       w := FWordlist.Word[ARow-1];
       case ACol of
-        0: w.Word := Value;
-        1: w.Frequency := StrToIntDef(Value, 0);
-        2: w.Comment := Value;
+        0: if w.Word = Value then Exit else w.Word := Value;
+        1: if w.Frequency = StrToIntDef(Value, 0) then Exit else w.Frequency := StrToIntDef(Value, 0);
+        2: if w.Comment = Value then Exit else w.Comment := Value;
       end;
       FWordlist.Word[ARow-1] := w;
     end;
+
+    Modified := True;
+    if Assigned(FOnChanged) then
+      FOnChanged(Self);
   finally
     Dec(FSetup);
   end;
@@ -291,18 +294,17 @@ end;
 
 procedure TframeWordlistEditor.SetModified(const Value: Boolean);
 begin
-  if FModified <> Value then
-  begin
-    FModified := Value;
-    if Assigned(FOnModifiedChanged) then
-      FOnModifiedChanged(Self);
-  end;
+  FModified := Value;
 end;
 
 procedure TframeWordlistEditor.SourceChanged(Sender: TObject);
 begin
   if FSetup = 0 then
+  begin
     Modified := True;
+    if Assigned(FOnChanged) then
+      FOnChanged(Self);
+  end;
 end;
 
 procedure TframeWordlistEditor.FillCode;

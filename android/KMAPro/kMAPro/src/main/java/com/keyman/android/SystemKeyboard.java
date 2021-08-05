@@ -5,6 +5,7 @@
 package com.keyman.android;
 
 import com.tavultesoft.kmapro.BuildConfig;
+import com.tavultesoft.kmapro.KeymanSettingsActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
@@ -63,6 +64,11 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
     interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.setInputMethodService(this); // for HW interface
+
+    SharedPreferences prefs = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
+    KMManager.setSpacebarText(spacebarText);
+
     KMManager.executeResourceUpdate(this);
   }
 
@@ -136,7 +142,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.setMayPredictOverride(inputType);
     if (KMManager.getMayPredictOverride()) {
       KMManager.setBannerOptions(false);
-    } else {
+    } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
       // Check if predictions needs to be re-enabled per Settings preference
       Context appContext = getApplicationContext();
       Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
@@ -165,6 +171,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onStartInputView(EditorInfo attribute, boolean restarting) {
     super.onStartInputView(attribute, restarting);
+    setInputView(onCreateInputView());
   }
 
   @Override

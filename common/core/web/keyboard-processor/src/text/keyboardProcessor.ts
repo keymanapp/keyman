@@ -104,12 +104,11 @@ namespace com.keyman.text {
      * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults 
      * where and when appropriate.
      *
-     * @param   {object}  Lkc  The pre-analyzed key event object
-     * @param   {boolean} usingOSK
+     * @param   {object}  Lkc           The pre-analyzed KeyEvent object
+     * @param   {boolean} outputTarget  The OutputTarget receiving the KeyEvent
      * @return  {string}
      */
-    defaultRuleBehavior(Lkc: KeyEvent): RuleBehavior {
-      let outputTarget = Lkc.Ltarg;
+    defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       let preInput = Mock.from(outputTarget);
       let ruleBehavior = new RuleBehavior();
 
@@ -154,7 +153,7 @@ namespace com.keyman.text {
           special = DefaultOutput.forSpecialEmulation(Lkc)
           if(special == EmulationKeystrokes.Backspace) {
             // A browser's default backspace may fail to delete both parts of an SMP character.
-            this.keyboardInterface.defaultBackspace(Lkc.Ltarg);
+            this.keyboardInterface.defaultBackspace(outputTarget);
           } else if(special || DefaultOutput.isCommand(Lkc)) { // Filters out 'commands' like TAB.
             // We only do the "for special emulation" cases under the condition above... aside from backspace
             // Let the browser handle those.
@@ -236,7 +235,7 @@ namespace com.keyman.text {
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
-        let defaultBehavior = this.defaultRuleBehavior(keyEvent);
+        let defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget);
         if(defaultBehavior) {
           matchBehavior.mergeInDefaults(defaultBehavior);
           matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
@@ -263,7 +262,6 @@ namespace com.keyman.text {
         // To facilitate storing relevant commands, we should probably reverse-lookup
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
-        mappingEvent.Ltarg = new Mock(); // helps prevent breakage for mnemonics.
         mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
         var mappedChar: string = DefaultOutput.forAny(mappingEvent, true);
         
@@ -410,7 +408,7 @@ namespace com.keyman.text {
 
         for(i=0; i < lockNames.length; i++) {
           if(lockStates & Codes.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = lockStates & Codes.modifierCodes[lockNames[i]];
+            this.stateKeys[lockKeys[i]] = !!(lockStates & Codes.modifierCodes[lockNames[i]]);
           }
         }
       } else if(d) {
@@ -431,8 +429,42 @@ namespace com.keyman.text {
         }
       }
 
+      this.updateStates();
+
+      if(this.activeKeyboard.isMnemonic && this.stateKeys['K_CAPS']) {
+        // Modifier keypresses doesn't trigger mnemonic manipulation of modifier state.
+        // Only an output key does; active use of Caps will also flip the SHIFT flag.
+        if(!e || !KeyboardProcessor.isModifier(e)) {
+          // Mnemonic keystrokes manipulate the SHIFT property based on CAPS state.
+          // We need to unflip them when tracking the OSK layer.
+          keyShiftState ^= Codes.modifierCodes['SHIFT'];
+        }
+      }
+
       this.layerId = this.getLayerId(keyShiftState);
       return true;
+    }
+
+    private updateStates(): void {
+      var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
+      var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+
+      for(let i=0; i < lockKeys.length; i++) {
+        const key = lockKeys[i];
+        const flag = this.stateKeys[key];
+        const onBit = lockNames[i];
+        const offBit = 'NO_' + lockNames[i];
+
+        // Ensures that the current mod-state info properly matches the currently-simulated
+        // state key states.
+        if(flag) {
+          this.modStateFlags |= Codes.modifierCodes[onBit];
+          this.modStateFlags &= ~Codes.modifierCodes[offBit];
+        } else {
+          this.modStateFlags &= ~Codes.modifierCodes[onBit];
+          this.modStateFlags |= Codes.modifierCodes[offBit];
+        }
+      }
     }
 
     getLayerId(modifier: number): string {
@@ -643,9 +675,7 @@ namespace com.keyman.text {
 
     // Returns true if the key event is a modifier press, allowing keyPress to return selectively
     // in those cases.
-    doModifierPress(Levent: KeyEvent, isKeyDown: boolean): boolean {
-      let outputTarget = Levent.Ltarg;
-
+    doModifierPress(Levent: KeyEvent, outputTarget: OutputTarget, isKeyDown: boolean): boolean {
       if(!this.activeKeyboard) {
         return false;
       }

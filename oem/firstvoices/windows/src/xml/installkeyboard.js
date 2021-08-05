@@ -25,7 +25,7 @@ function genkeydown(event) {
   } else {
     return true;
   }
-  event.cancelBubble = true; 
+  event.cancelBubble = true;
   event.returnValue = false;
   return false;
 }
@@ -35,7 +35,7 @@ function framekeydown() {
 }
 
 document.onkeydown = function() {
-  return genkeydown(event); 
+  return genkeydown(event);
 }
 
 function setupframehotkeys() {
@@ -47,8 +47,14 @@ function setupframehotkeys() {
 
 window.onload = function() {
   setupframehotkeys();
-  
+
   if(document.getElementById('tabs') != null) {
     tabClick(document.getElementById('tabDetails'));
   }
+}
+
+function keyboard_install(elevate) {
+  let href = elevate ? 'keyman:keyboard_installallusers?' : 'keyman:keyboard_install?';
+  let keyboards = Array.from(document.querySelectorAll('select.keyboardLanguage'));
+  location.href = href + keyboards.map((e) => e.id.substring('keyboardLanguage_'.length) + '=' + e.value).join('&');
 }

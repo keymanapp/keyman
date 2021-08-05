@@ -10,6 +10,7 @@ import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.Tier;
+import com.tavultesoft.kmea.util.KMString;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,14 +24,14 @@ public final class KMPLink {
   public static final String KMP_STAGING_HOST = "keyman-staging.com";
 
   private static final String KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR = "^http(s)?://(%s|%s)/keyboards/install/([^\\?/]+)(\\?(.+))?$";
-  private static final String installPatternFormatStr = String.format(KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR,
+  private static final String installPatternFormatStr = KMString.format(KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR,
     KMP_PRODUCTION_HOST,
     KMP_STAGING_HOST);
   private static final Pattern installPattern = Pattern.compile(installPatternFormatStr);
 
   // Keyman 14.0+ keyboard download links from Keyman server
   private static final String KMP_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR = "^https://(%s|%s)(/go/package/download/)(\\w+)(\\?platform=android&tier=(alpha|beta|stable))(&bcp47=)?(.+)?";
-  private static final String downloadPatternFormatStr = String.format(KMP_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR,
+  private static final String downloadPatternFormatStr = KMString.format(KMP_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR,
     KMP_PRODUCTION_HOST,
     KMP_STAGING_HOST);
   private static final Pattern downloadPattern = Pattern.compile(downloadPatternFormatStr);
@@ -105,7 +106,7 @@ public final class KMPLink {
    * @return String of keyman.com host
    */
   public static String getHost() {
-    switch (KMManager.getTier(BuildConfig.VERSION_NAME)) {
+    switch (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME)) {
       case ALPHA:
       case BETA:
         return KMP_STAGING_HOST;
@@ -135,11 +136,11 @@ public final class KMPLink {
     if (matcher.matches() && matcher.group(3) != null) {
       String host = matcher.group(2);
       String packageID = matcher.group(3);
-      String tier = KMManager.getTier(BuildConfig.VERSION_NAME).toString().toLowerCase();
+      String tier = KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME).toString().toLowerCase();
       Uri installUri = Uri.parse(url);
       String languageID = installUri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
 
-      String downloadURL = String.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
+      String downloadURL = KMString.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
         host,
         packageID);
       uri = Uri.parse(downloadURL)
@@ -175,12 +176,12 @@ public final class KMPLink {
     // Validate deep link with package ID and optional bcp47 tag
     if (matcher.matches() && matcher.group(1) != null) {
       Uri installUri = Uri.parse(url);
-      String tier = KMManager.getTier(BuildConfig.VERSION_NAME).toString().toLowerCase();
+      String tier = KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME).toString().toLowerCase();
       String host = (tier.equals("alpha") || tier.equals("beta")) ? KMP_STAGING_HOST : KMP_PRODUCTION_HOST;
       String keyboardID = installUri.getQueryParameter("keyboard");
       String languageID = installUri.getQueryParameter("language");
 
-      String downloadURL = String.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
+      String downloadURL = KMString.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
         host,
         keyboardID); // Using keyboardID instead of packageID
       uri = Uri.parse(downloadURL)

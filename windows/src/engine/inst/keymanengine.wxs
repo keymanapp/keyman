@@ -6,12 +6,14 @@
              Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
 
     <ComponentGroupRef Id="KeymanEngineComponents" />
+    <ComponentGroupRef Id="KeymanEngineSentryComponents" />
 
     <Directory Id="TARGETDIR" Name="SourceDir" ComponentGuidGenerationSeed="50d43807-710f-4ed9-b503-637558eb0651">
       <Directory Id="CommonFilesFolder">
         <Directory Id="KEYMANROOT" Name="Keyman">
           <Directory Id="KEYMAN_ENGINE" Name="Keyman Engine">
             <Directory Id="INSTALLDIR">
+              <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
               <Directory Id="xml" Name="xml">
                 <Directory Id="osk" Name="osk" FileSource="..\..\engine\xml\osk\">
                   <Component Id="xml" Guid="{58D31506-F964-47AF-B4A0-51107A74C2FE}">

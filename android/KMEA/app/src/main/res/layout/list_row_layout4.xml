@@ -5,6 +5,7 @@
     android:background="@drawable/list_item" >
 
     <LinearLayout
+        android:background="@android:color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -15,6 +16,7 @@
         <TextView
           android:id="@+id/text1"
           android:textColor="@drawable/textview_item"
+          android:background="@android:color/transparent"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="15dp"

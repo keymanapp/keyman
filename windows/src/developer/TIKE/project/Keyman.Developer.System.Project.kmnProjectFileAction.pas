@@ -167,7 +167,7 @@ begin
           Result := CompileVisualKeyboard(FKVKSourceFile, FKVKTargetFile);
 
         if Result then
-          Result := ckw.Compile(OwnerProject, FileName, FOutFileName, Debug, ProjectCompilerMessage);   // I3681   // I4140   // I4865   // I4866
+          Result := ckw.Compile(OwnerProject, FileName, FOutFileName, Debug, ProjectCompilerMessageW);   // I3681   // I4140   // I4865   // I4866
 
         if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 

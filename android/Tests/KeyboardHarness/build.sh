@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]] ; do
         -debug)
             ONLY_DEBUG=true
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
     esac

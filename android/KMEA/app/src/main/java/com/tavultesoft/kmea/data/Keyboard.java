@@ -14,6 +14,7 @@ import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,16 +24,19 @@ import java.io.Serializable;
 
 public class Keyboard extends LanguageResource implements Serializable {
   private static final String TAG = "Keyboard";
-  private static final String HELP_URL_FORMATSTR = "https://help.keyman.com/keyboard/%s/%s";
+  public static final String HELP_URL_HOST = "https://help.keyman.com/";
+  private static final String HELP_URL_FORMATSTR = "%s/keyboard/%s/%s";
 
   private boolean isNewKeyboard;
   private String font;
   private String oskFont;
+  private String displayName;
 
   // JSON keys
   private static String KB_NEW_KEYBOARD_KEY = "isNewKeyboard";
   private static String KB_FONT_KEY = "font";
   private static String KB_OSK_FONT_KEY = "oskFont";
+  private static String KB_DISPLAY_NAME_KEY = "displayName";
 
   private static Keyboard FALLBACK_KEYBOARD;
 
@@ -71,7 +75,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, null);
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
-        String.format(HELP_URL_FORMATSTR, this.resourceID, this.version));
+        KMString.format(HELP_URL_FORMATSTR, HELP_URL_HOST, this.resourceID, this.version));
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
@@ -83,7 +87,7 @@ public class Keyboard extends LanguageResource implements Serializable {
                   boolean isNewKeyboard, String font, String oskFont) {
     super(packageID, keyboardID, keyboardName, languageID, languageName, version,
       (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-        String.format(HELP_URL_FORMATSTR, keyboardID, version),
+        KMString.format(HELP_URL_FORMATSTR, HELP_URL_HOST, keyboardID, version),
       kmp);
 
     this.isNewKeyboard = isNewKeyboard;
@@ -98,6 +102,7 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.isNewKeyboard = false;
     this.font = k.getFont();
     this.oskFont = k.getOSKFont();
+    this.displayName = k.getDisplayName();
   }
 
   public String getKeyboardID() { return getResourceID(); }
@@ -109,6 +114,9 @@ public class Keyboard extends LanguageResource implements Serializable {
   public String getFont() { return font; }
 
   public String getOSKFont() { return oskFont; }
+
+  public String getDisplayName() { return displayName; }
+  public void setDisplayName(String displayName) { this.displayName = displayName; }
 
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
@@ -142,6 +150,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.isNewKeyboard = installedObj.getBoolean(KB_NEW_KEYBOARD_KEY);
       this.font = installedObj.getString(KB_FONT_KEY);
       this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
+      this.displayName = installedObj.optString(KB_DISPLAY_NAME_KEY, null);
     } catch (JSONException e) {
       KMLog.LogException(TAG, "fromJSON exception: ", e);
     }
@@ -154,6 +163,7 @@ public class Keyboard extends LanguageResource implements Serializable {
         o.put(KB_NEW_KEYBOARD_KEY, this.isNewKeyboard);
         o.put(KB_FONT_KEY, this.font);
         o.put(KB_OSK_FONT_KEY, this.oskFont);
+        o.put(KB_DISPLAY_NAME_KEY, this.displayName);
       } catch (JSONException e) {
         KMLog.LogException(TAG, "toJSON exception: ", e);
       }

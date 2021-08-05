@@ -1,3 +1,23 @@
+ibus-keyman (14.0.276-2) experimental; urgency=medium
+
+  * Team upload
+  * Build also on riscv64 to facilitate migration on Ubuntu
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Fri, 18 Jun 2021 11:14:59 +0200
+
+ibus-keyman (14.0.276-1) experimental; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 11 Jun 2021 14:43:56 +0200
+
+ibus-keyman (14.0.273-1) experimental; urgency=medium
+
+  * Keyman 14
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 26 Apr 2021 18:24:41 +0200
+
 ibus-keyman (11.0.103-4) unstable; urgency=medium
 
   * don't attempt to restart ibus without sudo and ps

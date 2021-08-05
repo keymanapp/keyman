@@ -73,6 +73,7 @@ import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
@@ -103,10 +104,17 @@ public final class KMManager {
   // Globe key actions
   public enum GlobeKeyAction {
     GLOBE_KEY_ACTION_SHOW_MENU,
+    // GLOBE_KEY_ACTION_SWITCH_TO_PREVIOUS_KEYBOARD,     // Switch to previous Keyman keyboard (reserved for flick)
     GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
     GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
     GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS,
     GLOBE_KEY_ACTION_DO_NOTHING,
+  }
+
+  public enum GlobeKeyState {
+    GLOBE_KEY_STATE_UP,
+    GLOBE_KEY_STATE_DOWN,
+    GLOBE_KEY_STATE_LONGPRESS
   }
 
   public enum FormFactor {
@@ -120,6 +128,30 @@ public final class KMManager {
     STABLE
   }
 
+  public enum SpacebarText {
+    LANGUAGE,
+    KEYBOARD,
+    LANGUAGE_KEYBOARD,
+    BLANK;
+
+    // Maps to enum SpacebarText in kmwbase.ts
+    public static SpacebarText fromString(String mode) {
+      if(mode == null) return LANGUAGE_KEYBOARD;
+      switch(mode) {
+        case "language": return LANGUAGE;
+        case "keyboard": return KEYBOARD;
+        case "languageKeyboard": return LANGUAGE_KEYBOARD;
+        case "blank": return BLANK;
+      }
+      return LANGUAGE_KEYBOARD;
+    }
+
+    public String toString()  {
+      String modes[] = { "language", "keyboard", "languageKeyboard", "blank" };
+      return modes[this.ordinal()];
+    }
+  };
+
   private static InputMethodService IMService;
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
@@ -127,10 +159,15 @@ public final class KMManager {
 
   private static boolean didLogHardwareKeystrokeException = false;
 
-  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
+  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
   // This is used to keep track of the starting system keyboard index while the screen is locked
   private static int sysKbStartingIndexOnLockScreen = -1;
+
+  // This is used to keep track of the globe key shortpress and longpress
+  private static GlobeKeyState globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+
+  private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
 
   protected static boolean InAppKeyboardLoaded = false;
   protected static boolean SystemKeyboardLoaded = false;
@@ -179,7 +216,6 @@ public final class KMManager {
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";
   public static final String KMKey_KeyboardCount = "kbCount";
-  public static final String KMKey_HelpLink = "helpLink";
   public static final String KMKey_Icon = "icon";
   public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_KeyboardID = "kbId";
@@ -190,14 +226,9 @@ public final class KMManager {
   public static final String KMKey_OskFont = "oskFont";
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
+  public static final String KMKey_FontFamily = "family";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
-
-  // DEPRECATED
-  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
-
-  // DEPRECATED
-  public static final String KMKey_CustomModel = "CustomModel";
 
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
@@ -208,6 +239,11 @@ public final class KMManager {
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
   public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
+
+  // DEPRECATED keys
+  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
+  public static final String KMKey_CustomModel = "CustomModel";
+  public static final String KMKey_HelpLink = "helpLink";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -279,12 +315,12 @@ public final class KMManager {
   /**
    * Extract KMEA tier from versionName. Uses parameter so we can unit test.
    * @param versionName String - If not provided, determine tier from
-   *                    com.tavultesoft.kmea.BuildConfig.VERSION_NAME
+   *                    com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME
    * @return Tier (ALPHA, BETA, STABLE)
    */
   public static Tier getTier(String versionName) {
     if (versionName == null || versionName.isEmpty()) {
-      versionName = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+      versionName = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     }
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+)-(alpha|beta|stable).*");
     Matcher matcher = pattern.matcher(versionName);
@@ -300,12 +336,12 @@ public final class KMManager {
   }
 
   /**
-   * Extract KMEA major version #.# from VERSION_NAME
+   * Extract KMEA major version #.# from KEYMAN_ENGINE_VERSION_NAME
    * @return String
    */
   public static String getMajorVersion() {
     // Regex needs to match the entire string
-    String appVersion = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+    String appVersion = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+)\\.\\d+.*");
     Matcher matcher = pattern.matcher(appVersion);
     if (matcher.matches() && matcher.groupCount() >= 1) {
@@ -316,12 +352,12 @@ public final class KMManager {
   }
 
   /**
-   * Extract KMEA version #.#.# from VERSION_NAME
+   * Extract KMEA version #.#.# from KEYMAN_ENGINE_VERSION_NAME
    * @return String
    */
   public static String getVersion() {
     // Regex needs to match the entire string
-    String appVersion = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+    String appVersion = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+).*");
     Matcher matcher = pattern.matcher(appVersion);
     if (matcher.matches() && matcher.groupCount() >= 1) {
@@ -415,9 +451,36 @@ public final class KMManager {
   }
 
   /**
+   * Handle the globe key longpress action. Currently just for INAPP only
+   * @param context
+   * @param keyboard
+   */
+  private static void doGlobeKeyLongpressAction(Context context, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      if (InAppKeyboard.keyboardPickerEnabled) {
+        showKeyboardPicker(context, keyboard);
+      }
+    }
+  }
+
+  /**
+   * Handle the globe key shortpress action. Currently just for INAPP only
+   * @param context
+   * @param keyboard
+   */
+  private static void doGlobeKeyShortpressAction(Context context, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      if (InAppKeyboard.keyboardPickerEnabled && inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
+        showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+      } else { /* inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD */
+        switchToNextKeyboard(context);
+      }
+    }
+  }
+
+  /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
-   * @param keyboard KeyboardType
    * @return RelativeLayout.LayoutParams
    */
   private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
@@ -466,6 +529,18 @@ public final class KMManager {
   public static void hideSystemKeyboard() {
     if (SystemKeyboard != null) {
       SystemKeyboard.hideKeyboard();
+    }
+  }
+
+  public static boolean isKeyboardLoaded(KeyboardType type) {
+    if (type == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return InAppKeyboardLoaded;
+    } else if (type == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return SystemKeyboardLoaded;
+    } else {
+      String msg = "Keyboard type undefined";
+      KMLog.LogError(TAG, msg);
+      return false;
     }
   }
 
@@ -938,7 +1013,7 @@ public final class KMManager {
       public boolean accept(File pathname) {
         String name = pathname.getName();
 
-        String patternStr = String.format("^([A-Za-z0-9-_]+)-([0-9.]+)(\\.js)$");
+        String patternStr = KMString.format("^([A-Za-z0-9-_]+)-([0-9.]+)(\\.js)$");
         Pattern pattern = Pattern.compile(patternStr);
         Matcher matcher = pattern.matcher(name);
         if (matcher.matches() && (matcher.groupCount() == 3) &&
@@ -997,22 +1072,29 @@ public final class KMManager {
    * Get the font typeface from a fully pathed font name
    * @param context
    * @param fontFilename String - full path to the font file
-   * @return Typeface
+   * @return Typeface - null if font file doesn't exist or is Woff on Android 7.0 / 7.1
    */
   public static Typeface getFontTypeface(Context context, String fontFilename) {
-    Typeface font = null;
-
     try {
       if ((fontFilename != null) && FileUtils.hasFontExtension(fontFilename)) {
+        // Ignore .woff files if Android 7.0 / 7.1 (Issue #4896)
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) &&
+            (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) &&
+            fontFilename.toLowerCase().endsWith(FileUtils.WOFFFONT)) {
+          return null;
+        }
+
         File file = new File(fontFilename);
         if (file.exists()) {
-          font = Typeface.createFromFile(file);
+          return Typeface.createFromFile(file);
         }
       }
     } catch (Exception e) {
       KMLog.LogException(TAG, "Failed to create Typeface: " + fontFilename, e);
     }
-    return font;
+
+    // No valid font to load
+    return null;
   }
 
   public static List<Keyboard> getKeyboardsList(Context context) {
@@ -1031,7 +1113,16 @@ public final class KMManager {
     String pkgID = lexicalModelInfo.get(KMKey_PackageID);
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
     String languageID = lexicalModelInfo.get(KMKey_LanguageID);
-    String path = "file://" + getLexicalModelsDir() + pkgID + File.separator + modelID + ".model.js";
+    boolean modelFileExists = true;
+    File modelFile = new File(getLexicalModelsDir(), pkgID + File.separator + modelID + ".model.js");
+    String path = "file://" + modelFile.getAbsolutePath();
+
+    // Disable sugestions if lexical-model file doesn't exist
+    if (!modelFile.exists()) {
+      modelFileExists = false;
+      setBannerOptions(false);
+      KMLog.LogError(TAG, modelFile.getAbsolutePath() + " does not exist");
+    }
 
     JSONObject modelObj = new JSONObject();
     JSONArray languageJSONArray = new JSONArray();
@@ -1058,15 +1149,15 @@ public final class KMManager {
     boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params;
-    if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+    if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange && modelFileExists) {
       params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
-    if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+    if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange && modelFileExists) {
       params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
   }
@@ -1077,7 +1168,7 @@ public final class KMManager {
       currentLexicalModel = null;
     }
 
-    String url = String.format("deregisterModel('%s')", modelID);
+    String url = KMString.format("deregisterModel('%s')", modelID);
     if (InAppKeyboard != null) { // && InAppKeyboardLoaded) {
       InAppKeyboard.loadJavascript(url);
     }
@@ -1089,7 +1180,7 @@ public final class KMManager {
   }
 
   public static boolean setBannerOptions(boolean mayPredict) {
-    String url = String.format("setBannerOptions(%s)", mayPredict);
+    String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
     }
@@ -1312,6 +1403,9 @@ public final class KMManager {
   public static void switchToNextKeyboard(Context context) {
     int index = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
     index++;
+    if (index >= KeyboardController.getInstance().get().size()) {
+      index = 0;
+    }
     Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
     if (kbInfo == null) {
       index = 0;
@@ -1325,6 +1419,8 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(kbInfo);
     }
+
+    registerAssociatedLexicalModel(kbInfo.getLanguageID());
   }
 
   protected static IBinder getToken() {
@@ -1458,7 +1554,7 @@ public final class KMManager {
 
       for (File file : files) {
         String filename = file.getName();
-        String base = String.format("%s-", keyboardID);
+        String base = KMString.format("%s-", keyboardID);
         int index = filename.indexOf(base);
         if (index == 0) {
           int firstIndex = base.length();
@@ -1621,14 +1717,14 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-        InAppKeyboard.loadJavascript(String.format("updateKMText('%s')", kmText));
+        InAppKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
       InAppKeyboardShouldIgnoreTextChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-        SystemKeyboard.loadJavascript(String.format("updateKMText('%s')", kmText));
+        SystemKeyboard.loadJavascript(KMString.format("updateKMText('%s')", kmText));
         result = true;
       }
 
@@ -1642,7 +1738,7 @@ public final class KMManager {
     boolean result = false;
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreSelectionChange) {
-        InAppKeyboard.loadJavascript(String.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
@@ -1657,7 +1753,7 @@ public final class KMManager {
           }
         }
 
-        SystemKeyboard.loadJavascript(String.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        SystemKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
@@ -1693,7 +1789,7 @@ public final class KMManager {
     int index = KeyboardController.INDEX_NOT_FOUND;
 
     if (keyboardID != null & languageID != null) {
-      String kbKey = String.format("%s_%s", languageID, keyboardID);
+      String kbKey = KMString.format("%s_%s", languageID, keyboardID);
       index = KeyboardController.getInstance().getKeyboardIndex(kbKey);
     }
 
@@ -1712,7 +1808,7 @@ public final class KMManager {
     boolean result = false;
 
     if (packageID != null && keyboardID != null && languageID != null) {
-      File keyboardFile = new File(getPackagesDir(), packageID + File.separator + String.format("%s.js", keyboardID));
+      File keyboardFile = new File(getPackagesDir(), packageID + File.separator + KMString.format("%s.js", keyboardID));
       result = KeyboardController.getInstance().keyboardExists(packageID, keyboardID, languageID) &&
         keyboardFile.exists();
     }
@@ -1724,7 +1820,7 @@ public final class KMManager {
     boolean result = false;
 
     if (packageID != null && languageID != null &&  modelID != null) {
-      String lmKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+      String lmKey = KMString.format("%s_%s_%s", packageID, languageID, modelID);
       result = KeyboardPickerActivity.containsLexicalModel(context, lmKey);
     }
 
@@ -1753,6 +1849,20 @@ public final class KMManager {
     }
   }
 
+  public static SpacebarText getSpacebarText() {
+    return spacebarText;
+  }
+
+  public static void setSpacebarText(SpacebarText mode) {
+    spacebarText = mode;
+    if(InAppKeyboard != null) {
+      InAppKeyboard.setSpacebarText(mode);
+    }
+    if(SystemKeyboard != null) {
+      SystemKeyboard.setSpacebarText(mode);
+    }
+  }
+
   public static boolean canAddNewKeyboard() {
     return KeyboardPickerActivity.canAddNewKeyboard;
   }
@@ -1777,6 +1887,11 @@ public final class KMManager {
     KeyboardPickerActivity.shouldCheckKeyboardUpdates = newValue;
   }
 
+  /**
+   * Get the default short press action for the globe key
+   * @param kbType - KeyboardType.KEYBOARD_TYPE_SYSTEM or KeyboardType.KEYBOARD_INAPP
+   * @return GlobeKeyAction
+   */
   public static GlobeKeyAction getGlobeKeyAction(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       return inappKbGlobeKeyAction;
@@ -1794,6 +1909,14 @@ public final class KMManager {
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       sysKbGlobeKeyAction = action;
     }
+  }
+
+  public static GlobeKeyState getGlobeKeyState() {
+    return globeKeyState;
+  }
+
+  public static void setGlobeKeyState(GlobeKeyState state) {
+    globeKeyState = state;
   }
 
   protected static final class KMInAppKeyboardWebViewClient extends WebViewClient {
@@ -1819,36 +1942,36 @@ public final class KMManager {
         KMLog.LogError(TAG, "pageLoaded and InAppKeyboard null");
         return;
       }
+      InAppKeyboard.keyboardSet = false;
+      currentLexicalModel = null;
 
-      if (url.startsWith("file")) { //endsWith(KMFilename_KeyboardHtml)) {
+      if (url.startsWith("file")) { // TODO: is this test necessary?
         InAppKeyboardLoaded = true;
 
-        if (!InAppKeyboard.keyboardSet) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-          if (index < 0) {
-            index = 0;
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+        if (index < 0) {
+          index = 0;
+        }
+        Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
+        String langId = null;
+        if (keyboardInfo != null) {
+          langId = keyboardInfo.getLanguageID();
+          InAppKeyboard.setKeyboard(keyboardInfo);
+        } else {
+          // Revert to default (index 0) or fallback keyboard
+          keyboardInfo = KMManager.getKeyboardInfo(context, 0);
+          if (keyboardInfo == null) {
+            // Not logging to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
+            keyboardInfo = KMManager.getDefaultKeyboard(context);
           }
-          Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-          String langId = null;
           if (keyboardInfo != null) {
             langId = keyboardInfo.getLanguageID();
             InAppKeyboard.setKeyboard(keyboardInfo);
-          } else {
-            // Revert to default (index 0) or fallback keyboard
-            keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-            if (keyboardInfo == null) {
-              // Not logging to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
-              keyboardInfo = KMManager.getDefaultKeyboard(context);
-            }
-            if (keyboardInfo != null) {
-              langId = keyboardInfo.getLanguageID();
-              InAppKeyboard.setKeyboard(keyboardInfo);
-            }
           }
-
-          registerAssociatedLexicalModel(langId);
         }
+
+        registerAssociatedLexicalModel(langId);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -1862,6 +1985,7 @@ public final class KMManager {
         }, 2000);
 
         InAppKeyboard.callJavascriptAfterLoad();
+        InAppKeyboard.setSpacebarText(spacebarText);
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_LOADED, null);
 
@@ -1880,6 +2004,12 @@ public final class KMManager {
         return false;
       }
 
+      // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+      // just the first intended '#' to get URI-based query param processing.
+      // At some point, other parts of the function should be redone to allow use of ? instead
+      // of # in our WebView command "queries" entirely.
+      String cmd = url.replace("keyboard.html#", "keyboard.html?");
+      Uri urlCommand = Uri.parse(cmd);
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
@@ -1888,7 +2018,7 @@ public final class KMManager {
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.dismissKeyboard();
         }
-      } else if (url.indexOf("globeKeyAction") >= 0) {
+      } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
         InAppKeyboard.dismissHelpBubble();
         if (!InAppKeyboard.isHelpBubbleEnabled) {
           return false;
@@ -1899,17 +2029,7 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
-        if (KMManager.shouldAllowSetKeyboard()) {
-          if (InAppKeyboard.keyboardPickerEnabled) {
-            if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
-              showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-            } else if (inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-              switchToNextKeyboard(context);
-            }
-          } else {
-            switchToNextKeyboard(context);
-          }
-        }
+        handleGlobeKeyAction(urlCommand.getBooleanQueryParameter("keydown", false));
       } else if (url.indexOf("showHelpBubble") >= 0) {
         int start = url.indexOf("keyPos=") + 7;
         String value = url.substring(start);
@@ -2006,14 +2126,6 @@ public final class KMManager {
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
-        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
-        // just the first intended '#' to get URI-based query param processing.
-
-        // At some point, other parts of the function should be redone to allow use of ? instead
-        // of # in our WebView command "queries" entirely.
-        String cmd = url.replace("keyboard.html#", "keyboard.html?");
-        Uri urlCommand = Uri.parse(cmd);
-
         double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
         double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
@@ -2038,6 +2150,29 @@ public final class KMManager {
         */
       }
       return false;
+    }
+
+    private void handleGlobeKeyAction(boolean globeKeyDown) {
+      // Update globeKeyState
+      if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+        globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
+      }
+
+      if (KMManager.shouldAllowSetKeyboard()) {
+        if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+          // Longpress globe
+          doGlobeKeyLongpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+
+          // clear globeKeyState
+          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+        } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+          // Shortpress globe
+          doGlobeKeyShortpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+        }
+      } else {
+        // clear globeKeyState
+        globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+      }
     }
   }
 
@@ -2065,35 +2200,36 @@ public final class KMManager {
         return;
       }
 
-      if (url.startsWith("file:")) {
-        SystemKeyboardLoaded = true;
-        if (!SystemKeyboard.keyboardSet) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-          if (index < 0) {
-            index = 0;
-          }
-          Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-          String langId = null;
-          if (keyboardInfo != null) {
-            langId  = keyboardInfo.getLanguageID();
-            SystemKeyboard.setKeyboard(keyboardInfo);
-          } else {
-            // Revert to default (index 0) or fallback keyboard
-            keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-            if (keyboardInfo == null) {
-              KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-              keyboardInfo = KMManager.getDefaultKeyboard(context);
-            }
-            if (keyboardInfo != null) {
-              langId = keyboardInfo.getLanguageID();
-              SystemKeyboard.setKeyboard(keyboardInfo);
-            }
-          }
+      SystemKeyboard.keyboardSet = false;
+      currentLexicalModel = null;
 
-          registerAssociatedLexicalModel(langId);
+      if (url.startsWith("file:")) { // TODO: is this test necessary?
+        SystemKeyboardLoaded = true;
+
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+        if (index < 0) {
+          index = 0;
+        }
+        Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
+        String langId = null;
+        if (keyboardInfo != null) {
+          langId  = keyboardInfo.getLanguageID();
+          SystemKeyboard.setKeyboard(keyboardInfo);
+        } else {
+          // Revert to default (index 0) or fallback keyboard
+          keyboardInfo = KMManager.getKeyboardInfo(context, 0);
+          if (keyboardInfo == null) {
+            KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
+            keyboardInfo = KMManager.getDefaultKeyboard(context);
+          }
+          if (keyboardInfo != null) {
+            langId = keyboardInfo.getLanguageID();
+            SystemKeyboard.setKeyboard(keyboardInfo);
+          }
         }
 
+        registerAssociatedLexicalModel(langId);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -2109,6 +2245,7 @@ public final class KMManager {
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
 
         SystemKeyboard.callJavascriptAfterLoad();
+        SystemKeyboard.setSpacebarText(spacebarText);
       }
     }
 
@@ -2119,12 +2256,19 @@ public final class KMManager {
         return false;
       }
 
+      // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+      // just the first intended '#' to get URI-based query param processing.
+
+      // At some point, other parts of the function should be redone to allow use of ? instead
+      // of # in our WebView command "queries" entirely.
+      String cmd = url.replace("keyboard.html#", "keyboard.html?");
+      Uri urlCommand = Uri.parse(cmd);
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
         SystemKeyboard.dismissHelpBubble();
         IMService.requestHideSelf(0);
-      } else if (url.indexOf("globeKeyAction") >= 0) {
+      } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
         SystemKeyboard.dismissHelpBubble();
         if (!SystemKeyboard.isHelpBubbleEnabled) {
           return false;
@@ -2135,49 +2279,68 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
-        if (KMManager.shouldAllowSetKeyboard()) {
-          if (SystemKeyboard.keyboardPickerEnabled) {
-            KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
-            GlobeKeyAction action = sysKbGlobeKeyAction;
-            if(keyguardManager.inKeyguardRestrictedInputMode()) {
-              // Override system keyboard globe key action if screen is locked:
-              // 1. Switch to next Keyman keyboard (no menu)
-              // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
-              if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
-                // All the Keyman keyboards have been cycled through
-                action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
-              } else {
-                if (sysKbStartingIndexOnLockScreen == -1) {
-                  // Initialize the system keyboard starting index while the screen is locked
-                  sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
-                }
-                action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
-              }
-            } else {
-              // If screen isn't locked, reset the starting index
-              sysKbStartingIndexOnLockScreen = -1;
-            }
+        // Update globeKeyState
+        boolean globeKeyDown = urlCommand.getBooleanQueryParameter("keydown", false);
+        if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+          globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
+        }
 
-            switch (action) {
-              case GLOBE_KEY_ACTION_SHOW_MENU:
-                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-                break;
-              case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
-                switchToNextKeyboard(context);
-                break;
-              case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
-                advanceToNextInputMode();
-                break;
-              case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
-                InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showInputMethodPicker();
-                break;
-              default:
-                // Do nothing
+        if (KMManager.shouldAllowSetKeyboard()) {
+          // Assign shortpress globe action
+          GlobeKeyAction action = sysKbGlobeKeyAction;
+          KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+          if (keyguardManager.inKeyguardRestrictedInputMode()) {
+            // Override system keyboard globe key action if screen is locked:
+            // 1. Switch to next Keyman keyboard (no menu)
+            // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
+            if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+              // All the Keyman keyboards have been cycled through
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
+            } else {
+              if (sysKbStartingIndexOnLockScreen == -1) {
+                // Initialize the system keyboard starting index while the screen is locked
+                sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
+              }
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
             }
           } else {
-            switchToNextKeyboard(context);
+            // If screen isn't locked, reset the starting index
+            sysKbStartingIndexOnLockScreen = -1;
+
+            if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+              // Check longpress globe action
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+              globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+            } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
+              // Ignore globe key down cause it may be queueing up for longpress
+              return false;
+            }
           }
+
+          switch (action) {
+            case GLOBE_KEY_ACTION_SHOW_MENU:
+              if (SystemKeyboard.keyboardPickerEnabled) {
+                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+              }
+              break;
+            case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
+              switchToNextKeyboard(context);
+              break;
+            case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
+              advanceToNextInputMode();
+              break;
+            case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
+              InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+              imm.showInputMethodPicker();
+              break;
+            default:
+              // Do nothing
+          }
+        } else {
+          // Clear globeKeyState
+          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+
+          switchToNextKeyboard(context);
         }
       } else if (url.indexOf("showHelpBubble") >= 0) {
         int start = url.indexOf("keyPos=") + 7;
@@ -2274,14 +2437,6 @@ public final class KMManager {
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
-        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
-        // just the first intended '#' to get URI-based query param processing.
-
-        // At some point, other parts of the function should be redone to allow use of ? instead
-        // of # in our WebView command "queries" entirely.
-        String cmd = url.replace("keyboard.html#", "keyboard.html?");
-        Uri urlCommand = Uri.parse(cmd);
-
         double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
         double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
@@ -2388,22 +2543,24 @@ public final class KMManager {
 
           if (dn <= 0) {
             if (start == end) {
-              if (!s.isEmpty() && s.charAt(0) == '\n') {
+              if (s.length() > 0 && s.charAt(0) == '\n') {
                 textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
               } else {
                 // *** TO DO: Try to find a solution to the bug on API < 17, insert overwrites on next line
-                InAppKeyboardShouldIgnoreTextChange = true;
-                InAppKeyboardShouldIgnoreSelectionChange = true;
-                textView.getText().insert(start, s);
+                if (s.length() > 0) {
+                  InAppKeyboardShouldIgnoreTextChange = true;
+                  InAppKeyboardShouldIgnoreSelectionChange = true;
+                  textView.getText().insert(start, s);
+                }
               }
             } else {
-              if (!s.isEmpty() && s.charAt(0) == '\n') {
+              if (s.length() > 0 && s.charAt(0) == '\n') {
                 InAppKeyboardShouldIgnoreTextChange = true;
                 InAppKeyboardShouldIgnoreSelectionChange = true;
                 textView.getText().replace(start, end, "");
                 textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
               } else {
-                if (s.isEmpty()) {
+                if (s.length() == 0) {
                   textView.getText().delete(start, end);
                 } else {
                   InAppKeyboardShouldIgnoreTextChange = true;

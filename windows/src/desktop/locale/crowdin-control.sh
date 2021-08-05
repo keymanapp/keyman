@@ -67,7 +67,7 @@ while [[ $# -gt 0 ]] ; do
     download)
       ACTION=download
       ;;
-    -h|-?|-help|--help)
+    -h|-\?|-help|--help)
       display_usage
       ;;
     *)

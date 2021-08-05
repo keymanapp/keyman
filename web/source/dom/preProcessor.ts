@@ -23,7 +23,6 @@ namespace com.keyman.dom {
      * @param       {boolean=}    keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
      * @return      {Object.<string,*>}     KMW keyboard event object: 
      * Description  Get object with target element, key code, shift state, virtual key state 
-     *                Ltarg=target element
      *                Lcode=keyCode
      *                Lmodifiers=shiftState
      *                LisVirtualKeyCode e.g. ctrl/alt key
@@ -37,15 +36,7 @@ namespace com.keyman.dom {
       e = keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(e.cancelBubble === true) {
         return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
-      }    
-
-      let target = keyman.util.eventTarget(e) as HTMLElement;
-      if (target == null) {
-        return null;
-      } else if (target.nodeType == 3) {// defeat Safari bug
-        target = target.parentNode as HTMLElement;
       }
-      s.Ltarg = Utils.getOutputTarget(target);
 
       s.Lcode = this._GetEventKeyCode(e);
       if (s.Lcode == null) {
@@ -157,6 +148,19 @@ namespace com.keyman.dom {
        */
       s.Lmodifiers |= (e.metaKey ? modifierCodes['META']: 0);
 
+      // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
+      s.device = keyman.util.physicalDevice.coreSpec;
+
+      // Perform any browser-specific key remapping before other remaps and mnemonic transforms. 
+      // (See https://github.com/keymanapp/keyman/issues/1125.)
+      if(!keyman.isEmbedded && s.device.browser == utils.Browser.Firefox) {
+      // Browser key identifiers are not completely consistent; Firefox has a few (for US punctuation)
+      // that differ from the norm.  Refer to https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode.
+        if(KeyMapping.browserMap.FF['k'+s.Lcode]) {
+          s.Lcode = KeyMapping.browserMap.FF['k'+s.Lcode];
+        }
+      }
+
       // Mnemonic handling.
       if(activeKeyboard && activeKeyboard.isMnemonic) {
         // The following will never set a code corresponding to a modifier key, so it's fine to do this,
@@ -167,9 +171,6 @@ namespace com.keyman.dom {
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
       var LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
       s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
-
-      // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
-      s.device = keyman.util.physicalDevice.coreSpec;
 
       // This is based on a KeyboardEvent, so it's not considered 'synthetic' within web-core.
       s.isSynthetic = false;
@@ -189,7 +190,6 @@ namespace com.keyman.dom {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           s = {
             Lcode: KeyMapping._USKeyCodeToCharCode(s),
-            Ltarg: s.Ltarg,
             Lmodifiers: 0,
             LisVirtualKey: false,
             vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
@@ -200,17 +200,20 @@ namespace com.keyman.dom {
           };
         }
       }
-
-      // Check for any browser-based keymapping before returning the object.
-      if(!keyman.isEmbedded && s.device.browser == utils.Browser.Firefox) {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
-        if(KeyMapping.browserMap.FF['k'+s.Lcode]) {
-          s.Lcode = KeyMapping.browserMap.FF['k'+s.Lcode];
-        }
-      }
       
       return s;
+    }
+
+    public static getEventOutputTarget(e: KeyboardEvent): text.OutputTarget {
+      let keyman = com.keyman.singleton;
+      let target = keyman.util.eventTarget(e) as HTMLElement;
+      if (target == null) {
+        return null;
+      } else if (target.nodeType == 3) {// defeat Safari bug
+        target = target.parentNode as HTMLElement;
+      }
+
+      return dom.Utils.getOutputTarget(target);
     }
 
     /**
@@ -232,7 +235,8 @@ namespace com.keyman.dom {
         return true;
       }
 
-      var LeventMatched = !!core.processKeyEvent(Levent);
+      let outputTarget = PreProcessor.getEventOutputTarget(e);
+      var LeventMatched = (core.processKeyEvent(Levent, outputTarget) != null);
 
       if(LeventMatched) {
         if(e  &&  e.preventDefault) {
@@ -262,7 +266,8 @@ namespace com.keyman.dom {
         return true;
       }
 
-      return core.keyboardProcessor.doModifierPress(Levent, false);
+      let outputTarget = PreProcessor.getEventOutputTarget(e);
+      return core.keyboardProcessor.doModifierPress(Levent, outputTarget, false);
     }
 
     static keyPress(e: KeyboardEvent): boolean {
@@ -294,7 +299,8 @@ namespace com.keyman.dom {
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
       // Only reached if it's a mnemonic keyboard.
-      if(DOMEventHandlers.states.swallowKeypress || core.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
+      let outputTarget = PreProcessor.getEventOutputTarget(e);
+      if(DOMEventHandlers.states.swallowKeypress || core.keyboardInterface.processKeystroke(outputTarget, Levent)) {
         DOMEventHandlers.states.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();

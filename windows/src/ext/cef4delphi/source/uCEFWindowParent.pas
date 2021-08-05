@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFWindowParent;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -52,7 +50,7 @@ interface
 
 uses
   {$IFDEF DELPHI16_UP}
-  {$IFDEF MSWINDOWS}WinApi.Windows, WinApi.Messages,{$ENDIF} System.Classes, Vcl.Controls, Vcl.Graphics,
+    {$IFDEF MSWINDOWS}WinApi.Windows, WinApi.Messages,{$ENDIF} System.Classes, Vcl.Controls, Vcl.Graphics,
   {$ELSE}
     {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes, Forms, Controls, Graphics,
     {$IFDEF FPC}
@@ -61,38 +59,14 @@ uses
     Messages,
     {$ENDIF}
   {$ENDIF}
-  uCEFTypes, uCEFInterfaces;
+  uCEFWinControl, uCEFTypes, uCEFInterfaces;
 
 type
-  TCEFWindowParent = class(TWinControl)
+  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
+  TCEFWindowParent = class(TCEFWinControl)
     protected
-      function  GetChildWindowHandle : THandle; virtual;
-
+      {$IFDEF MSWINDOWS}
       procedure WndProc(var aMessage: TMessage); override;
-
-    public
-      procedure UpdateSize;
-      function  TakeSnapshot(var aBitmap : TBitmap) : boolean;
-      function  DestroyChildWindow : boolean;
-      procedure CreateHandle; override;
-      procedure Resize; override;
-
-      property  ChildWindowHandle : THandle   read GetChildWindowHandle;
-
-    published
-      property  Align;
-      property  Anchors;
-      property  Color;
-      property  Constraints;
-      property  TabStop;
-      property  TabOrder;
-      property  Visible;
-      property  Enabled;
-      property  ShowHint;
-      property  Hint;
-      property  DoubleBuffered;
-      {$IFDEF DELPHI12_UP}
-      property  ParentDoubleBuffered;
       {$ENDIF}
   end;
 
@@ -105,47 +79,7 @@ implementation
 uses
   uCEFMiscFunctions, uCEFClient, uCEFConstants;
 
-function TCEFWindowParent.GetChildWindowHandle : THandle;
-begin
-  if not(csDesigning in ComponentState) and HandleAllocated then
-    Result := GetWindow(Handle, GW_CHILD)
-   else
-    Result := 0;
-end;
-
-procedure TCEFWindowParent.Resize;
-begin
-  inherited Resize;
-
-  UpdateSize;
-end;
-
-procedure TCEFWindowParent.CreateHandle;
-begin
-  inherited;
-end;
-
-procedure TCEFWindowParent.UpdateSize;
-var
-  TempRect : TRect;
-  hdwp: THandle;
-  TempHandle : THandle;
-begin
-  TempHandle := ChildWindowHandle;
-  if (TempHandle = 0) then Exit;
-
-  TempRect := GetClientRect;
-  hdwp     := BeginDeferWindowPos(1);
-
-  try
-    hdwp := DeferWindowPos(hdwp, TempHandle, HWND_TOP,
-                           TempRect.left, TempRect.top, TempRect.right - TempRect.left, TempRect.bottom - TempRect.top,
-                           SWP_NOZORDER);
-  finally
-    EndDeferWindowPos(hdwp);
-  end;
-end;
-
+{$IFDEF MSWINDOWS}
 procedure TCEFWindowParent.WndProc(var aMessage: TMessage);
 var
   TempHandle : THandle;
@@ -159,10 +93,7 @@ begin
       end;
 
     WM_ERASEBKGND:
-      begin
-        TempHandle := ChildWindowHandle;
-        if (TempHandle = 0) then inherited WndProc(aMessage);
-      end;
+      if (ChildWindowHandle = 0) then inherited WndProc(aMessage);
 
     CM_WANTSPECIALKEY:
       if not(TWMKey(aMessage).CharCode in [VK_LEFT .. VK_DOWN, VK_RETURN, VK_ESCAPE]) then
@@ -175,43 +106,7 @@ begin
     else inherited WndProc(aMessage);
   end;
 end;
-
-function TCEFWindowParent.TakeSnapshot(var aBitmap : TBitmap) : boolean;
-var
-  TempHWND   : HWND;
-  TempDC     : HDC;
-  TempRect   : TRect;
-  TempWidth  : Integer;
-  TempHeight : Integer;
-begin
-  Result   := False;
-  TempHWND := ChildWindowHandle;
-
-  if (TempHWND <> 0) then
-    begin
-      {$IFDEF DELPHI16_UP}Winapi.{$ENDIF}Windows.GetClientRect(TempHWND, TempRect);
-      TempDC     := GetDC(TempHWND);
-      TempWidth  := TempRect.Right  - TempRect.Left;
-      TempHeight := TempRect.Bottom - TempRect.Top;
-
-      aBitmap        := TBitmap.Create;
-      aBitmap.Height := TempHeight;
-      aBitmap.Width  := TempWidth;
-
-      Result := BitBlt(aBitmap.Canvas.Handle, 0, 0, TempWidth, TempHeight,
-                       TempDC, 0, 0, SRCCOPY);
-
-      ReleaseDC(TempHWND, TempDC);
-    end;
-end;
-
-function TCEFWindowParent.DestroyChildWindow : boolean;
-var
-  TempHWND : HWND;
-begin
-  TempHWND := ChildWindowHandle;
-  Result   := (TempHWND <> 0) and DestroyWindow(TempHWND);
-end;
+{$ENDIF}
 
 {$IFDEF FPC}
 procedure Register;

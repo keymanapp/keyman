@@ -35,6 +35,8 @@ type
 
     class procedure ReportHandledException(E: Exception; const Message: string = ''; IncludeStack: Boolean = True);
 
+    class procedure Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
+
     class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
     class procedure Stop;
     class property Client: TSentryClient read FClient;
@@ -94,19 +96,32 @@ const
 { TKeymanSentryClient }
 
 function FindSentryDLL: string;
+var
+  keyman_root: string;
 begin
-  // It might be in same folder as executable (probably true for Developer)
-  Result := ExtractFilePath(ParamStr(0)) + sentry_dll;
+  // If we are in a development situation, use the dev version
+  // of the DLL. Beware mixing and matching which can happen
+  // when testing DLLs that are registered and loaded from
+  // Program Files if Keyman is installed.
+  if TKeymanPaths.RunningFromSource(keyman_root) then
+  begin
+    Result := keyman_root + DEV_SENTRY_PATH;
+    if FileExists(Result) then
+      Exit;
+  end;
+
+  // When installed, it should be in the sentry-x.y.z folder for the executable
+  Result := ExtractFilePath(ParamStr(0)) + '\sentry-'+SENTRY_SDK_VERSION+'\' + sentry_dll;
   if FileExists(Result) then Exit;
 
-  // Keyman Engine install dir or registry override next (for Engine, Desktop)
-  Result := TKeymanPaths.KeymanEngineInstallPath(sentry_dll);
-  if (Result <> '') and FileExists(Result) then Exit;
+  Result := '';
+end;
 
-  // Last gasp, if we are in a development situation
-  Result := GetEnvironmentVariable(KEYMAN_ROOT);
-  if Result <> '' then
-    Result := IncludeTrailingPathDelimiter(Result) + DEV_SENTRY_PATH;
+class procedure TKeymanSentryClient.Breadcrumb(const BreadcrumbType, Message,
+  Category, Level: string);
+begin
+  if Enabled then
+    Client.Breadcrumb(BreadcrumbType, Message, Category, Level);
 end;
 
 procedure TKeymanSentryClient.ClientAfterEvent(Sender: TObject;
@@ -282,7 +297,7 @@ var
   reg: TRegistry;
   o: TSentryClientOptions;
   f: TSentryClientFlags;
-  RegKey: string;
+  path, RegKey: string;
 begin
   Assert(not Assigned(FInstance));
 
@@ -293,7 +308,12 @@ begin
   if not Enabled then
     Exit;
 
-  sentry_set_library_path(FindSentryDLL);
+  path := FindSentryDLL;
+  if path = '' then
+    // Cannot find sentry.dll
+    Exit;
+
+  sentry_set_library_path(path);
 
   o.Debug := False;
 
@@ -336,8 +356,8 @@ begin
     reg.Free;
   end;
 
-  o.HandlerPath := ExtractFilePath(FindSentryDLL) + 'crashpad_handler.exe';
-  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-db';
+  o.HandlerPath := ExtractFilePath(path) + 'crashpad_handler.exe';
+  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-0.4.9-db';
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;

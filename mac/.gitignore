@@ -5,6 +5,7 @@
 Keyman4MacIM/output/*
 Keyman4MacIM/Keyman4MacIM/Frameworks/**
 Keyman4MacIM/Pods/**
+Keyman4MacIM/Keyman4MacIM/Help/
 Keyman4Mac/Keyman4Mac/Frameworks/**
 Carthage/**
 **/build

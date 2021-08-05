@@ -92,9 +92,8 @@ type
   TSetupBootstrap = class
   private
     ProgramPath: string;
-    FTempPath: string;
     FExtractOnly: Boolean;
-    FContinueSetup: Boolean;
+    FContinueSetupFilename: string;
     FStartAfterInstall: Boolean;  // I2738
     FDisableUpgradeFrom6Or7Or8: Boolean; // I2847   // I4293
     FPromptForReboot: Boolean;  // I3355   // I3500
@@ -107,10 +106,11 @@ type
     procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string);
     function CreateTempDir: string;
     procedure RemoveTempDir(const path: string);
-    procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline,
-      FExtractOnly, FContinueSetup, FStartAfterInstall,
-      FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath,
-      FTier: string);
+    procedure ProcessCommandLine(
+      var FPromptForReboot, FSilent, FForceOffline, FExtractOnly: Boolean;
+      var FContinueSetupFilename: string;
+      var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean;
+      var FPackages, FExtractPath, FTier: string);
     procedure SetExitVal(c: Integer);
     function IsKeymanDesktop7Installed: string;
     function IsKeymanDesktop8Installed: string;
@@ -144,6 +144,7 @@ end;
 
 procedure TSetupBootstrap.Run;
 var
+  FTempPath: string;
   frmDownloadProgress: TfrmDownloadProgress;
   FResult: Boolean;
 BEGIN
@@ -161,10 +162,30 @@ BEGIN
         try
           { Display the dialog }
 
-          ProcessCommandLine(FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
+          ProcessCommandLine(
+            FPromptForReboot, FSilent, FForceOffline, FExtractOnly,
+            FContinueSetupFilename, FStartAfterInstall,
+            FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
+
           GetRunTools.Silent := FSilent;
 
-          if FExtractOnly then
+          if FContinueSetupFilename <> '' then
+          begin
+            if not FileExists(FContinueSetupFilename) then
+            begin
+              GetRunTools.LogError('Control file '+FContinueSetupFilename+' for continuing setup is missing. Cannot continue.');
+              SetExitVal(ERROR_FILE_NOT_FOUND);
+              Exit;
+            end;
+
+            FInstallInfo.LoadFromJSONFile(FContinueSetupFilename);
+
+            // We're using an existing temp folder, so throw away the one we
+            // just created and use the other one instead.
+            RemoveDir(FTempPath);
+            FTempPath := FInstallInfo.TempPath;
+          end
+          else if FExtractOnly then
           begin
             DoExtractOnly(FSilent, FExtractOnly_Path);
             Exit;
@@ -176,28 +197,33 @@ BEGIN
 
           ProgramPath := ExtractFilePath(ParamStr(0));
 
-          if not FSilent then
+          if FContinueSetupFilename = '' then
           begin
-            frmDownloadProgress := TfrmDownloadProgress.Create(nil);
-            try
-              frmDownloadProgress.Callback := LocateResourcesCallback;
-              if frmDownloadProgress.ShowModal = mrCancel then
+            // We only need to collect install info if we are not
+            // continuing a previous setup run.
+            if not FSilent then
+            begin
+              frmDownloadProgress := TfrmDownloadProgress.Create(nil);
+              try
+                frmDownloadProgress.Callback := LocateResourcesCallback;
+                if frmDownloadProgress.ShowModal = mrCancel then
+                  Exit;
+              finally
+                frmDownloadProgress.Free;
+              end;
+            end
+            else
+            begin
+              FResult := True;
+              LocateResourcesCallback(nil, FResult);
+              if not FResult then
                 Exit;
-            finally
-              frmDownloadProgress.Free;
             end;
-          end
-          else
-          begin
-            FResult := True;
-            LocateResourcesCallback(nil, FResult);
-            if not FResult then
-              Exit;
           end;
 
           with TfrmRunDesktop.Create(nil) do    // I2562
           try
-            ContinueSetup := FContinueSetup;
+            ContinueSetup := FContinueSetupFilename <> '';
             StartAfterInstall := FStartAfterInstall; // I2738
             DisableUpgradeFrom6Or7Or8 := FDisableUpgradeFrom6Or7Or8;  // I2847   // I4293
             if FSilent
@@ -213,7 +239,17 @@ BEGIN
         SetExitVal(ERROR_SUCCESS);
 
       finally
-        RemoveTempDir(FTempPath);
+        if FContinueSetupFilename <> '' then
+        begin
+          System.SysUtils.DeleteFile(FContinueSetupFilename);
+        end;
+        if not GetRunTools.MustReboot then
+        begin
+          // If we are going to reboot, then we don't want to delete the
+          // temporary files, because they will be used to continue setup
+          // after rebooting.
+          RemoveTempDir(FTempPath);
+        end;
       end;
     except
       on e:Exception do
@@ -232,6 +268,8 @@ BEGIN
 end;
 
 procedure TSetupBootstrap.LocateResourcesCallback(Owner: TfrmDownloadProgress; var Result: Boolean);
+var
+  FProcessFileName: string;
 begin
   Result := False;
 
@@ -255,7 +293,16 @@ begin
   // it to download khmer_angkor from the Keyman cloud and install it
   // for bcp47 tag km. See the setup documentation for more
   // examples.
-  FInstallInfo.LocatePackagesAndTierFromFilename(ParamStr(0));
+{$IFDEF DEBUG}
+  // In order to run this in the debugger, it's much easier to define
+  // an environment variable than to rename the executable, but we don't
+  // want this except for debug builds.
+  FProcessFileName := GetEnvironmentVariable('KEYMAN_SETUP_TESTFILENAME');
+  if FProcessFileName = '' then
+{$ENDIF}
+  FProcessFileName := ParamStr(0);
+
+  FInstallInfo.LocatePackagesAndTierFromFilename(FProcessFileName);
 
   // Additionally, packages can be specified on the command line, with
   // the -p parameter, e.g. -p khmer_angkor=km,sil_euro_latin=fr
@@ -492,7 +539,12 @@ begin
     DeletePath(ExcludeTrailingPathDelimiter(path));  // I3476
 end;
 
-procedure TSetupBootstrap.ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath, FTier: string);  // I2847  // I3355   // I3500   // I4293
+procedure TSetupBootstrap.ProcessCommandLine(
+  var FPromptForReboot, FSilent, FForceOffline, FExtractOnly: Boolean;
+  var FContinueSetupFilename: string;
+  var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean;
+  var FPackages, FExtractPath, FTier: string
+);
 var
   i: Integer;
 begin
@@ -500,14 +552,17 @@ begin
   FSilent := False;
   FForceOffline := False;
   FExtractOnly := False;
-  FContinueSetup := False;
+  FContinueSetupFilename := '';
   FDisableUpgradeFrom6Or7Or8 := False; // I2847   // I4293
   FStartAfterInstall := True;  // I2738
   i := 1;
   while i <= ParamCount do
   begin
     if WideSameText(ParamStr(i), '-c') then
-      FContinueSetup := True
+    begin
+      Inc(i);
+      FContinueSetupFilename := ParamStr(i);
+    end
     else if WideSameText(ParamStr(i), '-s') then
     begin
       FSilent := True;
@@ -555,7 +610,9 @@ end;
 
 procedure TSetupBootstrap.SetExitVal(c: Integer);
 begin
-  // TODO: write the exit code to the logfile
+  if c = ERROR_SUCCESS
+    then GetRunTools.LogInfo('Install finished successfully')
+    else GetRunTools.LogError('Install failed, exiting with error code '+IntToStr(c), False);
   ExitCode := c;
 end;
 

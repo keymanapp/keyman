@@ -25,7 +25,7 @@ if(!window['keyman']['ui']['name']) {
   try {
 
     // Declare KeymanWeb, OnScreen keyboard and Util objects
-    var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],dbg=keymanweb['debug'];
+    var keymanweb=window['keyman'],util=keymanweb['util'],dbg=keymanweb['debug'];
 
     // Disable UI for touch devices
     if(util['isTouchDevice']()) throw '';
@@ -282,6 +282,8 @@ if(!window['keyman']['ui']['name']) {
       // Set Europe to be the default region
       ui.selectedRegion = 'eu';
 
+      ui.registerEvents();
+
       // Restore focus
       keymanweb['focusLastActiveElement']();
     }
@@ -531,7 +533,7 @@ if(!window['keyman']['ui']['name']) {
             var itemNode = ui.createNode('li');
             kbdText = lang.keyboards[n]['Name'].replace(/\s?keyboard/i,'');
             // We append the full BCP-47 code here for disambiguation when regional and/or script variants exist.
-            kbdText = kbdText + " [" + lang.keyboards[n].LanguageCode + "]";
+            kbdText = kbdText + " [" + lang.keyboards[n]['LanguageCode'] + "]";
             aNode = ui.createNode('a', null, null, kbdText);
             aNode.href = '#';
             aNode.title = '';
@@ -749,6 +751,11 @@ if(!window['keyman']['ui']['name']) {
      **/
     ui.showOSK = function(event)
     {
+      let osk = keymanweb.osk;
+
+      if(!osk) {
+        return;
+      }
       //Toggle OSK on or off
       if(osk && keymanweb['getActiveKeyboard']() != '')
       {
@@ -907,6 +914,7 @@ if(!window['keyman']['ui']['name']) {
             }
             else
             {
+              let osk = keymanweb.osk;
               ui.oskButtonNode.className = (osk && osk['isEnabled']()) ? 'kmw_button_selected' : 'kmw_button';
             }
           }
@@ -992,7 +1000,6 @@ if(!window['keyman']['ui']['name']) {
       //a UI-set position, and returning the corrected position to the UI
       return oskPosition;
     }
-    osk['addEventListener']('show',ui.onShowOSK);
 
     /**
      * Update appearance of OSK button whenever the OSK is hidden by the user
@@ -1003,7 +1010,17 @@ if(!window['keyman']['ui']['name']) {
     {
       if(ui.init && p['HiddenByUser']) ui.oskButtonNode.className = 'kmw_button';
     }
-    osk['addEventListener']('hide',ui.onHideOSK);
+
+
+    ui.registerEvents = function() {
+      let osk = keymanweb.osk;
+      if(!osk) {
+        return;
+      }
+
+      osk['addEventListener']('show',ui.onShowOSK);
+      osk['addEventListener']('hide',ui.onHideOSK);
+    }
 
     /**
      * Function     showKeyboardsPopup

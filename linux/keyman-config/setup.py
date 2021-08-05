@@ -8,6 +8,7 @@ setup(
     name="keyman_config",
     version=__version__,
     packages=find_packages(),
+    py_modules=['keyman_config.standards.lang_tags_map'],
     scripts=['km-config', 'km-package-get',
              'km-package-install', 'km-kvk2ldml',
              'km-package-uninstall',

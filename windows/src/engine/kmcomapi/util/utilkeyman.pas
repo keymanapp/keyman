@@ -57,7 +57,6 @@ function GetKeyboardIconFileName(const KeyboardFileName: string): string;   // I
 function GetKeymanInstallPath: string;
 
 function GetDefaultHKL: HKL;   // I3581   // I3619   // I3619
-function GetDefaultKeyboardID: HKL;   // I4169
 
 var
   FInstallingKeyman: Boolean = False;
@@ -304,20 +303,6 @@ function GetDefaultHKL: HKL;   // I3581   // I3619   // I3619
 begin
   if not SystemParametersInfo(SPI_GETDEFAULTINPUTLANG, 0, @Result, 0) then
     Result := 0;
-end;
-
-function GetDefaultKeyboardID: HKL;   // I4169
-const
-  BaseKeyboardID_USEnglish: Integer = $00000409;
-begin
-  if not SystemParametersInfo(SPI_GETDEFAULTINPUTLANG, 0, @Result, 0) then
-    Result := 0;
-
-  if Result <> 0 then
-    Result := HKLToKeyboardID(Result);
-
-  if Result = 0 then
-    Result := BaseKeyboardID_USEnglish;
 end;
 
 end.

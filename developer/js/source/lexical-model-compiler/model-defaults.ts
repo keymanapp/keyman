@@ -49,22 +49,22 @@ export function defaultSearchTermToKey(wordform: string): string {
  */
 export function defaultCasedSearchTermToKey(wordform: string, applyCasing: CasingFunction): string {
   // While this is a bit WET, as the basic `defaultSearchTermToKey` exists and performs some of
-  // the same functions, repetition is the easiest way to allow the function to be safely compiled 
+  // the same functions, repetition is the easiest way to allow the function to be safely compiled
   // with ease by use of `.toString()`.
   return Array.from(wordform
         .normalize('NFKD')
         // Remove any combining diacritics (if input is in NFKD)
         .replace(/[\u0300-\u036F]/g, '')
       ) // end of `Array.from`
-      .map(c => applyCasing('lower', c))
+      .map(function(c) { return applyCasing('lower', c)})
       .join('');
 }
 
 /**
  * Specifies default casing behavior for lexical models when `languageUsesCasing` is
  * set to true.
- * @param casing One of 'lower' (lowercased), 'upper' (uppercased), or 'initial'.  
- * 
+ * @param casing One of 'lower' (lowercased), 'upper' (uppercased), or 'initial'.
+ *
  * 'initial' is designed to cover cases like sentence-initial & proper noun capitalization in English.
  * This may be overwritten as appropriate in model-specific implementations.
  * @param text The text to be modified.
@@ -76,15 +76,15 @@ export function defaultApplyCasing(casing: CasingForm, text: string): string {
     case 'upper':
       return text.toUpperCase();
     case 'initial':
-      let headCode = text.charCodeAt(0);
+      var headCode = text.charCodeAt(0);
       // The length of the first code unit, as measured in code points.
-      let headUnitLength = 1;
+      var headUnitLength = 1;
 
-      // Is the first character a high surrogate, indicating possible use of UTF-16 
+      // Is the first character a high surrogate, indicating possible use of UTF-16
       // surrogate pairs?  Also, is the string long enough for there to BE a pair?
       if(text.length > 1 && headCode >= 0xD800 && headCode <= 0xDBFF) {
         // It's possible, so now we check for low surrogates.
-        let lowSurrogateCode = text.charCodeAt(1);
+        var lowSurrogateCode = text.charCodeAt(1);
 
         if(lowSurrogateCode >= 0xDC00 && lowSurrogateCode <= 0xDFFF) {
           // We have a surrogate pair; this pair is the 'first' character.

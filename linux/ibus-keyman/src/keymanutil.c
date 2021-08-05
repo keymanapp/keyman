@@ -437,7 +437,7 @@ keyman_put_options_todconf(gchar *package_id,
     if (child_settings != NULL)
     {
         g_message("writing keyboard options to DConf");
-        g_settings_set_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY, options);
+        g_settings_set_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY, (const gchar *const *)options);
     }
 
     g_object_unref(G_OBJECT(child_settings));

@@ -69,6 +69,9 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
   private let languageCode: String?
   private let session: URLSession
 
+  private var progressView: UIProgressView?
+  private var observation: NSKeyValueObservation? = nil
+
   private static var ENDPOINT_ROOT: URL {
     var baseURL = KeymanHosts.KEYMAN_COM
     baseURL.appendPathComponent("go")
@@ -93,6 +96,10 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     fatalError("init(coder:) has not been implemented")
   }
 
+  deinit {
+    observation = nil
+  }
+
   public override func loadView() {
     let webView = WKWebView()
     webView.navigationDelegate = self
@@ -104,6 +111,18 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
       webView.load(URLRequest(url: KeyboardSearchViewController.ENDPOINT_ROOT))
     }
 
+    progressView = UIProgressView(progressViewStyle: .bar)
+    progressView!.translatesAutoresizingMaskIntoConstraints = false
+    observation = webView.observe(\.estimatedProgress) { _, _ in
+      if let progressView = self.progressView {
+        progressView.setProgress(Float(webView.estimatedProgress), animated: true)
+        progressView.isHidden = progressView.progress > 0.99
+      }
+    }
+    progressView!.setProgress(1, animated: false)
+    progressView!.isHidden = true
+
+    webView.addSubview(progressView!)
     view = webView
   }
 
@@ -131,6 +150,47 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     }
 
     decisionHandler(.allow)
+    // Makes it clear that there IS a progress bar, in case of super-slow response.
+    progressView?.setProgress(0, animated: false)
+    // This way, if the load is instant, the 0.01 doesn't really stand out.
+    progressView?.setProgress(0.01, animated: true)
+    progressView?.isHidden = false
+  }
+
+  private func failWithAlert(for error: Error) {
+    let errorTitle = NSLocalizedString("alert-no-connection-title", bundle: engineBundle, comment: "")
+    let alert = ResourceFileManager.shared.buildSimpleAlert(title: errorTitle, message: error.localizedDescription) {
+      // If we are in a UINavigationViewController and are not its root view...
+      if let navVC = self.navigationController, navVC.viewControllers.first != self {
+        navVC.popViewController(animated: true)
+      } else {
+        self.dismiss(animated: true)
+      }
+    }
+
+    self.present(alert, animated: true)
+  }
+
+  public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    failWithAlert(for: error)
+  }
+
+  public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    failWithAlert(for: error)
+  }
+
+
+  override public func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+
+    if let navVC = self.navigationController {
+      progressView?.topAnchor.constraint(equalTo: navVC.navigationBar.bottomAnchor).isActive = true
+    } else {
+      progressView?.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+    }
+
+    progressView?.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+    progressView?.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
   }
 
   override public func viewWillDisappear(_ animated: Bool) {
@@ -194,6 +254,15 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
             // Illegal state - we already checked this.
             fatalError()
         }
+
+        // We've likely installed the package, and we already know
+        // the package's current publishing state - we literally just
+        // downloaded it from the cloud as part of the keyboard search.
+        //
+        // Why query later when we know the query's answer NOW?
+        let publishState = KeymanPackage.DistributionStateMetadata(downloadURL: packageURL, version: package.version)
+
+        Storage.active.userDefaults.cachedPackageQueryMetadata[package.key] = publishState
       }
 
       downloadManager.downloadPackage(withKey: packageKey, from: packageURL, withNotifications: true, completionBlock: downloadClosure)

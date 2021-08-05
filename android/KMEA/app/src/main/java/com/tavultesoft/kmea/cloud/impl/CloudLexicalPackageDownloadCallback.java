@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
@@ -98,9 +99,7 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
   @Override
   public void applyCloudDownloadToModel(Context aContext, Void aModel, CloudKeyboardDownloadReturns aCloudResult)
   {
-    Toast.makeText(aContext,
-      aContext.getString(R.string.dictionary_download_finished),
-      Toast.LENGTH_SHORT).show();
+    BaseActivity.makeToast(aContext, R.string.dictionary_download_finished, Toast.LENGTH_SHORT);
 
     if(aCloudResult.installedResource != null)
     {

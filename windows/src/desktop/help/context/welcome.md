@@ -1,3 +1,0 @@
----
-title: Welcome to Keyman
----

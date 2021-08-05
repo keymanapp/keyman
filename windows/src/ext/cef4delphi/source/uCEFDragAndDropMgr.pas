@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -43,17 +43,22 @@ unit uCEFDragAndDropMgr;
 
 {$I cef.inc}
 
+{$IFNDEF FPC}{$IFNDEF DELPHI12_UP}
+  // Workaround for "Internal error" in old Delphi versions caused by uint64 handling
+  {$R-}
+{$ENDIF}{$ENDIF}
+
 interface
 
 uses
   {$IFDEF DELPHI16_UP}
   {$IFDEF MSWINDOWS}WinApi.Windows, WinApi.ActiveX, WinApi.ShlObj, WinApi.ShellApi,{$ENDIF}
-  System.Classes, Vcl.Controls, System.SysUtils, System.Math, System.StrUtils, System.AnsiStrings,
+  System.Classes, System.SysUtils, System.Math, System.StrUtils, System.AnsiStrings,
   {$ELSE}
   {$IFDEF MSWINDOWS}Windows, ActiveX, ShlObj, Shellapi,{$ENDIF}
-  Classes, Controls, SysUtils, Math, StrUtils,
+  Classes, SysUtils, Math, StrUtils, {$IFDEF DELPHI12_UP}AnsiStrings,{$ENDIF}
   {$ENDIF}
-  uCEFDragData, uCEFInterfaces, uCEFTypes, uOLEDragAndDrop;
+  uCEFDragData, uCEFInterfaces, uCEFTypes, uCEFOLEDragAndDrop;
 
 type
   TDragEnterEvent = procedure(Sender: TObject; const aDragData : ICefDragData; grfKeyState: Longint; pt: TPoint; var dwEffect: Longint) of object;
@@ -115,6 +120,14 @@ implementation
 
 uses
   uCEFMiscFunctions, uCEFWriteHandler, uCEFStreamWriter, uCEFConstants;
+
+{$IFDEF FPC}
+const
+  //CFSTR_FILEDESCRIPTORA            = 'FileGroupDescriptor';              // CF_FILEGROUPDESCRIPTORA
+  CFSTR_FILEDESCRIPTORW            = 'FileGroupDescriptorW';             // CF_FILEGROUPDESCRIPTORW
+  CFSTR_FILEDESCRIPTOR             = CFSTR_FILEDESCRIPTORW;
+  CFSTR_FILECONTENTS               = 'FileContents';                     // CF_FILECONTENTS
+{$ENDIF}
 
 // *****************************************************
 // **************** TCEFDragAndDropMgr *****************
@@ -352,21 +365,21 @@ begin
                 BODY_END_TAG      + CRLF +
                 HTML_END_TAG;
 
-  TempPos    := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(HTML_START_TAG, TempString) + length(HTML_START_TAG);
+  TempPos    := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(HTML_START_TAG, TempString) + length(HTML_START_TAG);
   TempDigits := ZeroFiller(TempPos, length(PATTERN1));
-  TempString := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}StringReplace(TempString, PATTERN1, TempDigits, [rfReplaceAll]);
+  TempString := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}StringReplace(TempString, PATTERN1, TempDigits, [rfReplaceAll]);
 
-  TempPos    := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(HTML_END_TAG, TempString);
+  TempPos    := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(HTML_END_TAG, TempString);
   TempDigits := ZeroFiller(TempPos, length(PATTERN2));
-  TempString := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}StringReplace(TempString, PATTERN2, TempDigits, [rfReplaceAll]);
+  TempString := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}StringReplace(TempString, PATTERN2, TempDigits, [rfReplaceAll]);
 
-  TempPos    := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(FRAGMENT_START, TempString) + length(FRAGMENT_START);
+  TempPos    := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(FRAGMENT_START, TempString) + length(FRAGMENT_START);
   TempDigits := ZeroFiller(TempPos, length(PATTERN3));
-  TempString := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}StringReplace(TempString, PATTERN3, TempDigits, [rfReplaceAll]);
+  TempString := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}StringReplace(TempString, PATTERN3, TempDigits, [rfReplaceAll]);
 
-  TempPos    := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(FRAGMENT_END, TempString);
+  TempPos    := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(FRAGMENT_END, TempString);
   TempDigits := ZeroFiller(TempPos, length(PATTERN4));
-  TempString := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}StringReplace(TempString, PATTERN4, TempDigits, [rfReplaceAll]);
+  TempString := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}StringReplace(TempString, PATTERN4, TempDigits, [rfReplaceAll]);
 
   Result := TempString;
 end;
@@ -443,12 +456,12 @@ begin
       TempFragStartCommentPos := pos(FRAGMENT_START, cf_html);
 
       if (TempFragStartCommentPos > 0) then
-        TempFragStartCommentPos := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx('-->', cf_html, TempFragStartCommentPos + length(FRAGMENT_START));
+        TempFragStartCommentPos := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx('-->', cf_html, TempFragStartCommentPos + length(FRAGMENT_START));
 
       if (TempFragStartCommentPos > 0) then
         begin
           TempFragStartCommentPos := TempFragStartCommentPos + 3;
-          TempFragEndCommentPos   := {$IFDEF DELPHI18_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(FRAGMENT_END, cf_html, TempFragStartCommentPos);
+          TempFragEndCommentPos   := {$IFDEF DELPHI12_UP}{$IFDEF DELPHI16_UP}System.{$ENDIF}AnsiStrings.{$ENDIF}PosEx(FRAGMENT_END, cf_html, TempFragStartCommentPos);
         end
        else
         if (TempFragStart > 0) and
@@ -549,6 +562,7 @@ begin
         begin
           TempText := PWideChar(TempPointer);
           TempPos  := LastDelimiter(#13, TempText);
+          if (TempPos <= 0) then TempPos := LastDelimiter(#10, TempText);
 
           if (TempPos > 0) then
             begin
@@ -666,7 +680,11 @@ begin
         while (TempEnumFrmt.Next(1, TempFormat, nil) = S_OK) and not(TempUsed) do
           begin
             try
+              {$IFNDEF FPC}
               TempMedium.unkForRelease := nil;
+              {$ELSE}
+              TempMedium.PUnkForRelease := nil;
+              {$ENDIF}
 
               if ((TempFormat.tymed and TYMED_HGLOBAL) <> 0) and
                  (aDataObject.GetData(TempFormat, TempMedium) = S_OK) then
@@ -721,7 +739,11 @@ begin
           TempResEffect  := DROPEFFECT_NONE;
           TempDataObject := TOLEDataObject.Create(TempFormatArray, TempMediumArray, i);
           TempDropSource := TOLEDropSource.Create;
+          {$IFNDEF FPC}
           TempResult     := DoDragDrop(TempDataObject, TempDropSource, FOLEEffect, TempResEffect);
+          {$ELSE}
+          TempResult     := DoDragDrop(TempDataObject, TempDropSource, DWORD(FOLEEffect), LPDWORD(TempResEffect));
+          {$ENDIF}
 
           if (TempResult <> DRAGDROP_S_DROP) then TempResEffect := DROPEFFECT_NONE;
           FCurrentDragData := nil;

@@ -127,6 +127,7 @@ typedef struct {
 - (KeymanVersionInfo)versionInfo;
 - (NSString *)keymanDataPath;
 - (NSArray *)legacyAppsUserDefaults;
+- (void)registerConfigurationWindow:(NSWindowController *)window;
 @end
 
 #endif /* KMInputMethodAppDelegate_h */

@@ -6,11 +6,15 @@
 
 function triggerBuilds() {
   local base=`git branch --show-current`
-  eval TEAMCITY_VCS_ID='${'vcs_$base'}'
+  # convert stable-14.0 to stable_14_0 to fit in with the definitions
+  # in trigger-definitions.inc.sh
+  local bcbase=${base//[-.]/_}
+  eval TEAMCITY_VCS_ID='${'vcs_$bcbase'}'
   echo "base=$base, TEAMCITY_VCS_ID=${TEAMCITY_VCS_ID}"
 
+
   for platform in ${available_platforms[@]}; do
-    eval builds='(${'bc_${base}_${platform}'[@]})'
+    eval builds='(${'bc_${bcbase}_${platform}'[@]})'
     for build in "${builds[@]}"; do
       if [[ $build == "" ]]; then continue; fi
       if [ "${build:(-8)}" == "_Jenkins" ]; then
@@ -69,10 +73,10 @@ function triggerJenkinsBuild() {
   local TAG=""
   # This will only be true if we created and pushed a tag
   if [ "${action:-""}" == "commit" ]; then
-    TAG=", \"tag\": \"$GIT_TAG\""
+    TAG=", \"tag\": \"$GIT_TAG\", \"tag2\": \"$GIT_TAG\""
   fi
 
-  if [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
+  if [[ $JENKINS_BRANCH != stable-* ]] && [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
     JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
   fi
 

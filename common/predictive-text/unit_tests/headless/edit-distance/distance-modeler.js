@@ -332,8 +332,8 @@ describe('Correction Distance Modeler', function() {
       let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
       checkResults_teh(iter);
 
-      // Debugging method:  a simple loop for printing out the generated sets, in succession.
-      //
+      // // Debugging method:  a simple loop for printing out the generated sets, in succession.
+      // //
       // for(let i = 1; i <= 8; i++) {  // After 8 tiers, we run out of entries for this particular case.
       //   console.log();
       //   console.log("Batch " + i);
@@ -343,14 +343,17 @@ describe('Correction Distance Modeler', function() {
 
       //   set = set.value;
 
-      //   let entries = set[0].map(function(sequence) {
-      //     return sequence.map(value => value.key).join('');
+      //   let entries = set.map(function(result) {
+      //     return result.matchString;
       //   });
 
-      //   console.log("Entry count: " + set[0].length);
+      //   console.log("Entry count: " + set.length);
       //   entries.sort();
       //   console.log(entries);
-      //   console.log(set[1]);
+      //   console.log("Probablility:  " + set[0].totalCost);
+      //   console.log("Analysis (first entry):");
+      //   console.log(" - Edit cost:  " + set[0].knownCost);
+      //   console.log(" - Input cost: " + set[0].inputSamplingCost);
       // }
     });
 

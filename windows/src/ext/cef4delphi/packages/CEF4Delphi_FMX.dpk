@@ -1,5 +1,4 @@
 package CEF4Delphi_FMX;
-
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
@@ -12,18 +11,18 @@ package CEF4Delphi_FMX;
 {$LOCALSYMBOLS ON}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
-{$OPTIMIZATION OFF}
+{$OPTIMIZATION ON}
 {$OVERFLOWCHECKS ON}
 {$RANGECHECKS ON}
 {$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
-{$STACKFRAMES ON}
+{$STACKFRAMES OFF}
 {$TYPEDADDRESS OFF}
 {$VARSTRINGCHECKS ON}
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DEFINE DEBUG}
+{$DEFINE $(FrameworkType)}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'CEF4Delphi'}
 {$IMPLICITBUILD OFF}
@@ -103,7 +102,7 @@ contains
   uCEFZipReader in '..\source\uCEFZipReader.pas',
   uCEFResponse in '..\source\uCEFResponse.pas',
   uCEFCookieVisitor in '..\source\uCEFCookieVisitor.pas',
-  uCEFV8Exception in '..\source\uCEFV8Exception.pas',
+  uCEFv8Exception in '..\source\uCEFv8Exception.pas',
   uCEFResourceBundleHandler in '..\source\uCEFResourceBundleHandler.pas',
   uCEFSetCookieCallback in '..\source\uCEFSetCookieCallback.pas',
   uCEFDeleteCookiesCallback in '..\source\uCEFDeleteCookiesCallback.pas',
@@ -132,6 +131,7 @@ contains
   uCEFImage in '..\source\uCEFImage.pas',
   uCEFMenuModelDelegate in '..\source\uCEFMenuModelDelegate.pas',
   uCEFWindowParent in '..\source\uCEFWindowParent.pas',
+  uCEFChromiumCore in '..\source\uCEFChromiumCore.pas',
   uCEFChromium in '..\source\uCEFChromium.pas',
   uCEFChromiumEvents in '..\source\uCEFChromiumEvents.pas',
   uCEFChromiumOptions in '..\source\uCEFChromiumOptions.pas',
@@ -149,12 +149,12 @@ contains
   uCEFBaseRefCounted in '..\source\uCEFBaseRefCounted.pas',
   uCEFBaseScopedWrapper in '..\source\uCEFBaseScopedWrapper.pas',
   uCEFAccessibilityHandler in '..\source\uCEFAccessibilityHandler.pas',
-  uOLEDragAndDrop in '..\source\uOLEDragAndDrop.pas',
+  uCEFOLEDragAndDrop in '..\source\uCEFOLEDragAndDrop.pas',
   uCEFDragAndDropMgr in '..\source\uCEFDragAndDropMgr.pas',
   uCEFGetExtensionResourceCallback in '..\source\uCEFGetExtensionResourceCallback.pas',
   uCEFExtension in '..\source\uCEFExtension.pas',
   uCEFExtensionHandler in '..\source\uCEFExtensionHandler.pas',
-  uBufferPanel in '..\source\uBufferPanel.pas',
+  uCEFBufferPanel in '..\source\uCEFBufferPanel.pas',
   uCEFApp in '..\source\uCEFApp.pas',
   uCEFWorkScheduler in '..\source\uCEFWorkScheduler.pas',
   uCEFWorkSchedulerThread in '..\source\uCEFWorkSchedulerThread.pas',
@@ -162,12 +162,75 @@ contains
   uCEFServerHandler in '..\source\uCEFServerHandler.pas',
   uCEFServerEvents in '..\source\uCEFServerEvents.pas',
   uCEFServerComponent in '..\source\uCEFServerComponent.pas',
-  uFMXBufferPanel in '..\source\uFMXBufferPanel.pas',
-  uFMXChromium in '..\source\uFMXChromium.pas',
-  uFMXWorkScheduler in '..\source\uFMXWorkScheduler.pas',
+  uCEFFMXBufferPanel in '..\source\uCEFFMXBufferPanel.pas',
+  uCEFFMXChromium in '..\source\uCEFFMXChromium.pas',
+  uCEFFMXWorkScheduler in '..\source\uCEFFMXWorkScheduler.pas',
   uCEFStringList in '..\source\uCEFStringList.pas',
-  uFMXWindowParent in '..\source\uFMXWindowParent.pas',
-  uCEFv8ArrayBufferReleaseCallback in '..\source\uCEFv8ArrayBufferReleaseCallback.pas';
+  uCEFFMXWindowParent in '..\source\uCEFFMXWindowParent.pas',
+  uCEFv8ArrayBufferReleaseCallback in '..\source\uCEFv8ArrayBufferReleaseCallback.pas',
+  uCEFWinControl in '..\source\uCEFWinControl.pas',
+  uCEFLinkedWindowParent in '..\source\uCEFLinkedWindowParent.pas',
+  uCEFUrlRequestClientEvents in '..\source\uCEFUrlRequestClientEvents.pas',
+  uCEFUrlRequestClientComponent in '..\source\uCEFUrlRequestClientComponent.pas',
+  uCEFOSRIMEHandler in '..\source\uCEFOSRIMEHandler.pas',
+  uCEFCookieAccessFilter in '..\source\uCEFCookieAccessFilter.pas',
+  uCEFResourceRequestHandler in '..\source\uCEFResourceRequestHandler.pas',
+  uCEFResourceSkipCallback in '..\source\uCEFResourceSkipCallback.pas',
+  uCEFResourceReadCallback in '..\source\uCEFResourceReadCallback.pas',
+  uCEFSentinel in '..\source\uCEFSentinel.pas',
+  uCEFApplicationCore in '..\source\uCEFApplicationCore.pas',
+  uCEFOAuth2Helper in '..\source\uCEFOAuth2Helper.pas',
+  uCEFMediaSource in '..\source\uCEFMediaSource.pas',
+  uCEFMediaSink in '..\source\uCEFMediaSink.pas',
+  uCEFMediaRouteCreateCallback in '..\source\uCEFMediaRouteCreateCallback.pas',
+  uCEFMediaRoute in '..\source\uCEFMediaRoute.pas',
+  uCEFMediaObserver in '..\source\uCEFMediaObserver.pas',
+  uCEFMediaRouter in '..\source\uCEFMediaRouter.pas',
+  uCEFRegistration in '..\source\uCEFRegistration.pas',
+  uCEFDisplay in '..\source\uCEFDisplay.pas',
+  uCEFLayout in '..\source\uCEFLayout.pas',
+  uCEFBoxLayout in '..\source\uCEFBoxLayout.pas',
+  uCEFFillLayout in '..\source\uCEFFillLayout.pas',
+  uCEFView in '..\source\uCEFView.pas',
+  uCEFViewDelegate in '..\source\uCEFViewDelegate.pas',
+  uCEFTextfield in '..\source\uCEFTextfield.pas',
+  uCEFTextfieldDelegate in '..\source\uCEFTextfieldDelegate.pas',
+  uCEFScrollView in '..\source\uCEFScrollView.pas',
+  uCEFPanel in '..\source\uCEFPanel.pas',
+  uCEFPanelDelegate in '..\source\uCEFPanelDelegate.pas',
+  uCEFBrowserView in '..\source\uCEFBrowserView.pas',
+  uCEFBrowserViewDelegate in '..\source\uCEFBrowserViewDelegate.pas',
+  uCEFButton in '..\source\uCEFButton.pas',
+  uCEFButtonDelegate in '..\source\uCEFButtonDelegate.pas',
+  uCEFLabelButton in '..\source\uCEFLabelButton.pas',
+  uCEFMenuButton in '..\source\uCEFMenuButton.pas',
+  uCEFMenuButtonPressedLock in '..\source\uCEFMenuButtonPressedLock.pas',
+  uCEFMenuButtonDelegate in '..\source\uCEFMenuButtonDelegate.pas',
+  uCEFWindow in '..\source\uCEFWindow.pas',
+  uCEFWindowDelegate in '..\source\uCEFWindowDelegate.pas',
+  uCEFViewsFrameworkEvents in '..\source\uCEFViewsFrameworkEvents.pas',
+  uCEFViewComponent in '..\source\uCEFViewComponent.pas',
+  uCEFTextfieldComponent in '..\source\uCEFTextfieldComponent.pas',
+  uCEFScrollViewComponent in '..\source\uCEFScrollViewComponent.pas',
+  uCEFPanelComponent in '..\source\uCEFPanelComponent.pas',
+  uCEFWindowComponent in '..\source\uCEFWindowComponent.pas',
+  uCEFBrowserViewComponent in '..\source\uCEFBrowserViewComponent.pas',
+  uCEFButtonComponent in '..\source\uCEFButtonComponent.pas',
+  uCEFLabelButtonComponent in '..\source\uCEFLabelButtonComponent.pas',
+  uCEFMenuButtonComponent in '..\source\uCEFMenuButtonComponent.pas',
+  uCEFAudioHandler in '..\source\uCEFAudioHandler.pas',
+  uCEFDevToolsMessageObserver in '..\source\uCEFDevToolsMessageObserver.pas',
+  uCEFMediaSinkDeviceInfoCallback in '..\source\uCEFMediaSinkDeviceInfoCallback.pas',
+  uCEFJson in '..\source\uCEFJson.pas',
+  uCEFBitmapBitBuffer in '..\source\uCEFBitmapBitBuffer.pas',
+  uCEFPrintHandler in '..\source\uCEFPrintHandler.pas',
+  uCEFPrintDialogCallback in '..\source\uCEFPrintDialogCallback.pas',
+  uCEFPrintJobCallback in '..\source\uCEFPrintJobCallback.pas',
+  uCEFLinuxConstants in '..\source\uCEFLinuxConstants.pas',
+  uCEFLinuxTypes in '..\source\uCEFLinuxTypes.pas',
+  uCEFLinuxFunctions in '..\source\uCEFLinuxFunctions.pas',
+  uCEFWorkSchedulerQueueThread in '..\source\uCEFWorkSchedulerQueueThread.pas',
+  uCEFLinkedWinControlBase in '..\source\uCEFLinkedWinControlBase.pas';
 
 end.
 

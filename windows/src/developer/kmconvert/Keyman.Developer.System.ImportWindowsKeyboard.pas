@@ -5,7 +5,8 @@ interface
 uses
   System.SysUtils,
 
-  Keyman.Developer.System.KeyboardProjectTemplate;
+  Keyman.Developer.System.KeyboardProjectTemplate,
+  UKeymanTargets;
 
 type
   EImportWindowsKeyboard = class(Exception);
@@ -25,6 +26,8 @@ type
     FKeyboardIDTemplate: string;
     FBCP47Tags: string;
     FCopyright: string;
+    FTargets: TKeymanTargets;
+    FFullCopyright: string;
     function LoadKLIDDetails: Boolean;
     function ImportKeyboard(const DestinationFilename, DestinationKVKSFilename: string): Boolean;
     function GenerateIcon(const IconFilename: string): Boolean;
@@ -41,6 +44,8 @@ type
     function ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;
     function FindBCP47TagForKLID: string; overload;
     function GetProjectFilename: string;
+    procedure SetTargets(const Value: TKeymanTargets);
+    procedure SetFullCopyright(const Value: string);
  public
     function Execute: Boolean; overload;
 
@@ -53,9 +58,11 @@ type
     property KeyboardIDTemplate: string read FKeyboardIDTemplate write SetKeyboardIDTemplate;
     property NameTemplate: string read FNameTemplate write SetNameTemplate;
     property Copyright: string read FCopyright write SetCopyright;
+    property FullCopyright: string read FFullCopyright write SetFullCopyright;
     property Version: string read FVersion write SetVersion;
     property BCP47Tags: string read FBCP47Tags write SetBCP47Tags;
     property Author: string read FAuthor write SetAuthor;
+    property Targets: TKeymanTargets read FTargets write SetTargets;
 
     property ProjectFilename: string read GetProjectFilename;
   end;
@@ -78,7 +85,6 @@ uses
   KeyboardParser,
   kmxfileconsts,
   RegistryKeys,
-  UKeymanTargets,
   utilfiletypes;
 
 { TImportWindowsKeyboard }
@@ -152,6 +158,11 @@ begin
   FDestinationPath := IncludeTrailingPathDelimiter(Value);
 end;
 
+procedure TImportWindowsKeyboard.SetFullCopyright(const Value: string);
+begin
+  FFullCopyright := Value;
+end;
+
 procedure TImportWindowsKeyboard.SetKeyboardIDTemplate(const Value: string);
 begin
   if Value = ''
@@ -176,6 +187,11 @@ begin
   FSourceKLID := Value;
 end;
 
+procedure TImportWindowsKeyboard.SetTargets(const Value: TKeymanTargets);
+begin
+  FTargets := Value;
+end;
+
 procedure TImportWindowsKeyboard.SetVersion(const Value: string);
 begin
   FVersion := Value;
@@ -194,7 +210,7 @@ begin
 
   // Create a new folder in destination path
 
-  FTemplate := TKeyboardProjectTemplate.Create(FDestinationPath, Format(FKeyboardIDTemplate, [FBaseKeyboardID]), KMXKeymanTargets + [ktWeb]);
+  FTemplate := TKeyboardProjectTemplate.Create(FDestinationPath, Format(FKeyboardIDTemplate, [FBaseKeyboardID]), FTargets);
   try
     //
     // These parameters apply to .kmn and .kps so set them even though
@@ -203,6 +219,7 @@ begin
 
     FTemplate.Name := Format(FNameTemplate, [FBaseName]);
     FTemplate.Copyright := FCopyright;
+    FTemplate.FullCopyright := FFullCopyright;
     FTemplate.Author := FAuthor;
     FTemplate.Version := FVersion;
     FTemplate.IncludeIcon := True;
@@ -240,10 +257,12 @@ begin
     // Load the source .kmn and add bitmap, copyright, visualkeyboard, touch layout fields
     InjectSystemStores(FTemplate.KeyboardFilename, FTemplate.OSKFilename, FTemplate.IconFilename, FTemplate.TouchLayoutFilename);
 
-    // Take the generated OSK and convert it into a default touch layout
-    if not ConvertOSKToTouchLayout(FTemplate.OSKFilename, FTemplate.TouchLayoutFilename) then
-      Exit(Fail('Unable to create a default touch layout based on the OSK for '+FTemplate.KeyboardFilename));
-
+    if FTemplate.TouchLayoutFilename <> '' then
+    begin
+      // Take the generated OSK and convert it into a default touch layout
+      if not ConvertOSKToTouchLayout(FTemplate.OSKFilename, FTemplate.TouchLayoutFilename) then
+        Exit(Fail('Unable to create a default touch layout based on the OSK for '+FTemplate.KeyboardFilename));
+    end;
   finally
     FreeAndNil(FTemplate);
   end;
@@ -278,7 +297,8 @@ begin
     kp.LoadFromFile(KeyboardFilename);
     kp.Features.Add(kfIcon);
     kp.Features.Add(kfOSK);
-    kp.Features.Add(kfTouchLayout);
+    if (TouchKeymanTargets+[ktAny]) * FTargets <> [] then
+      kp.Features.Add(kfTouchLayout);
     // TODO: Are these file settings actually doing anything? Or is it controlled
     // entirely by kp.Features.Add -- which could cause this to fall over a little
     // if we change filenames for any reason in the future
@@ -287,6 +307,7 @@ begin
     kp.SetSystemStoreValue(ssVisualKeyboard, ExtractFileName(OSKFilename));
     kp.SetSystemStoreValue(ssBitmap, ExtractFilename(IconFilename));
     kp.SetSystemStoreValue(ssLayoutFile, ExtractFileName(TouchLayoutFilename));
+    kp.SetSystemStoreValue(ssTargets, KeymanTargetsToString(FTargets));
     kp.SetSystemStoreValue(ssCopyright, FCopyright);
     if FVersion <> '' then
       kp.SetSystemStoreValue(ssKeyboardVersion, FVersion);

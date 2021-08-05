@@ -32,14 +32,12 @@ namespace com.keyman.text.prediction {
       let model = this.languageModelMap[lgCode];
       var loadPromise: Promise<void>;
 
-      if(core.activeModel !== model) {
-        if(core.activeModel) {
-          core.languageProcessor.unloadModel();
-        }
+      if(core.activeModel) {
+        core.languageProcessor.unloadModel();
+      }
 
-        if(model) {
-          loadPromise = core.languageProcessor.loadModel(model);
-        }
+      if(model) {
+        loadPromise = core.languageProcessor.loadModel(model);
       }
     }
 

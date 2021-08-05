@@ -253,7 +253,6 @@ type
     procedure WMUserStart(var Message: TMessage); message WM_USER_Start;
     procedure WMUserParameterPass(var Message: TMessage); message WM_USER_ParameterPass;
     procedure WMUserSendFontChange(var Message: TMessage); message WM_USER_SendFontChange;
-    procedure WMUserPlatformComms(var Message: TMessage); message WM_USER_PlatformComms;
     procedure WMUserVisualKeyboardClosed(var Message: TMessage); message WM_USER_VisualKeyboardClosed;   // I4243
     procedure SetTrayIcon(rp: TRunningProduct; kbd: IKeymanKeyboardInstalled);
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton;
@@ -272,9 +271,7 @@ type
     //procedure SnapToolHelp;
     procedure RecreateTaskbarIcons;
     function StartKeymanEngine: Boolean;
-    procedure SendPlatformComms64(msg, value: DWORD);
-    procedure ClosePlatformComms64;
-    procedure StartPlatformComms64;
+    procedure StartKeymanX64;
     procedure OpenTextEditor;
     //function GetCachedKeymanID(hkl: DWORD): DWORD;
     procedure ShowLanguageSwitchForm;
@@ -294,7 +291,6 @@ type
 
     procedure PostGlobalKeyboardChange(FActiveKeyboard: TLangSwitchKeyboard);   // I4271
     function IsControllerWindow(AHandle: THandle): Boolean;   // I4731
-    function GetControllerWindows: THandleArray;   // I4731
     procedure UpdateFocusInfo;   // I4731
     procedure UnregisterControllerWindows;   // I4731
     function IsSysTrayWindow(AHandle: THandle): Boolean;
@@ -378,10 +374,6 @@ const
 
 const
   MSGFLT_ADD = 1;
-
-const
-  PC_CLOSE = 2;
-  PC_GETAPPLICATION = 4;
 
 const
   KEYMANID_NONKEYMAN = -1;
@@ -550,12 +542,10 @@ begin
   if Assigned(FLangSwitchRefreshWatcher) then
   begin
     FLangSwitchRefreshWatcher.Terminate;
-    FLangSwitchRefreshWatcher := nil;
+    FreeAndNil(FLangSwitchRefreshWatcher);
   end;
 
   FreeAndNil(FInputPane);
-
-  ClosePlatformComms64;
 
   UnregisterHotkeys;
 
@@ -568,7 +558,6 @@ begin
   end;
   if Assigned(frmVisualKeyboard) then // I1096 - silent exception when Keyman closes
   begin
-    frmVisualKeyboard.Unregister;   // I2444 - Keyman tries to re-init because OSK was not unregistering until after Keyman_Exit
     //frmVisualKeyboard.Hide;
     //frmVisualKeyboard.Release;
     FreeAndNil(frmVisualKeyboard);  // I2692
@@ -604,15 +593,8 @@ begin
 end;
 
 function TfrmKeyman7Main.IsControllerWindow(AHandle: THandle): Boolean;   // I4731
-var
-  AHandles: THandleArray;
-  i: Integer;
 begin
-  AHandles := GetControllerWindows;
-  for i := Low(AHandles) to High(AHandles) do
-    if AHandles[i] = AHandle then
-      Exit(True);
-  Result := False;
+  Result := GetWindowThreadProcessId(AHandle, nil) = GetCurrentThreadId;
 end;
 
 function TfrmKeyman7Main.IsSysTrayWindow(AHandle: THandle): Boolean;   // I4731
@@ -626,39 +608,16 @@ begin
     SameText(buf, 'NotifyIconOverflowWindow');
 end;
 
-function TfrmKeyman7Main.GetControllerWindows: THandleArray;   // I4731
-var
-  LS, VK: Integer;
-begin
-  if Assigned(frmLanguageSwitch) then LS := 1 else LS := 0;
-  if Assigned(frmVisualKeyboard) then VK := 1 else VK := 0;
-
-  SetLength(Result, 3 + LS + VK);
-  Result[0] := Application.Handle;
-  Result[1] := Handle;
-  Result[2] := frmKeymanMenu.Handle;
-  if LS > 0 then Result[3] := frmLanguageSwitch.Handle;
-  if VK > 0 then Result[3+LS] := frmVisualKeyboard.Handle;
-end;
-
 procedure TfrmKeyman7Main.RegisterControllerWindows;  // I3092
-var
-  AHandles: THandleArray;
-  i: Integer;
 begin
-  AHandles := GetControllerWindows;
-  for i := Low(AHandles) to High(AHandles) do
-    kmint.KeymanEngineControl.RegisterControllerWindow(AHandles[i]);   // I4731
+  kmint.KeymanEngineControl.RegisterMasterController(Application.Handle);
+  kmint.KeymanEngineControl.RegisterControllerThread(GetCurrentThreadId);
 end;
 
 procedure TfrmKeyman7Main.UnregisterControllerWindows;   // I4731
-var
-  AHandles: THandleArray;
-  i: Integer;
 begin
-  AHandles := GetControllerWindows;
-  for i := Low(AHandles) to High(AHandles) do
-    kmint.KeymanEngineControl.UnregisterControllerWindow(AHandles[i]);
+  kmint.KeymanEngineControl.UnregisterMasterController(Application.Handle);
+  kmint.KeymanEngineControl.UnregisterControllerThread(GetCurrentThreadId);
 end;
 
 function TfrmKeyman7Main.LoadProduct: Boolean;
@@ -929,7 +888,13 @@ begin
   case Value of
     NWB_IDENTIFYICON: FMessage := MsgFromId(SKBalloonClickToSelectKeyboard);  // I3010  // I3042
     NWB_TUTORIALFINISHED: FMessage := MsgFromId(SKBalloonOSKClosed);   // I3010  // I3042
-    else FMessage := '';
+    NWB_KEYMANRUNNING:
+      begin
+        FMessage := MsgFromId(SKBalloonKeymanIsRunning);
+        if FMessage = '' then
+          FMessage := MsgFromId(SKBalloonClickToSelectKeyboard);
+      end;
+    else Exit;
   end;
 
   if FMessage <> '' then
@@ -957,7 +922,6 @@ begin
   begin
     frmLanguageSwitch := TfrmLanguageSwitch.Create(Self);
     frmLanguageSwitch.OnHidden := LanguageSwitchFormHidden;
-    kmint.KeymanEngineControl.RegisterControllerWindow(frmLanguageSwitch.Handle);
   end;
 
   Keyboard := FLangSwitchManager.ActiveKeyboard;   // I3949
@@ -1283,14 +1247,6 @@ begin
   end;
 end;
 
-procedure TfrmKeyman7Main.WMUserPlatformComms(var Message: TMessage);
-begin
-  case Message.wParam of
-    PC_GETAPPLICATION:
-      Message.Result := Application.Handle;   // I3758
-  end;
-end;
-
 procedure TfrmKeyman7Main.WMUserSendFontChange(var Message: TMessage);
 begin
   PostMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
@@ -1362,7 +1318,7 @@ begin
 
   kmint.KeymanEngineControl.RestartEngine; // I1486
 
-  StartPlatformComms64;
+  StartKeymanX64;
 
   RegisterHotkeys;
 end;
@@ -1378,6 +1334,8 @@ begin
   inherited;
   if Message.Msg = wm_keyman_control then
   begin
+    // While keyman32 will never send messages to this window,
+    // kmcomapi currently can.
     Message.Result := ProcessWMKeymanControl(LoWord(Message.WParam), HiWord(Message.WParam), Message.LParam);   // I3961
   end
   else if Message.Msg = wm_test_keyman_functioning then
@@ -1642,7 +1600,7 @@ begin
   if FEnableCrashTest and (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0) then
     TKeymanSentryClient.Validate(True);
 
-  TKeymanDesktopShell.OpenHelpJump('context_traymenu', Self.ActiveKeyboard);
+  TKeymanDesktopShell.OpenHelpJump('index', Self.ActiveKeyboard);
 end;
 
 procedure TfrmKeyman7Main.MnuRunProgram(Sender: TObject);   // I4606
@@ -1900,7 +1858,7 @@ begin
   else
     tmrRefresh.Tag := tmrRefresh.Tag + 1;
 
-  PostMessage(Handle, wm_keyman_control, KMC_REFRESH, 0);
+  PostMessage(Application.Handle, wm_keyman_control, KMC_REFRESH, 0);
 end;
 
 procedure TfrmKeyman7Main.tmrTestKeymanFunctioningTimer(Sender: TObject);
@@ -1963,25 +1921,6 @@ begin
   FInUpdateOSKVisibility := False;
 end;
 
-procedure TfrmKeyman7Main.SendPlatformComms64(msg, value: DWORD);
-var
-  hwnd: THandle;
-begin
-  // TODO: Test Wow64
-  KL.Log('SendPlatformComms64 ENTER: %d %d', [msg, value]);
-
-  hwnd := FindWindow('Keymanx64', nil);
-  if hwnd <> 0 then
-    PostMessage(hwnd, WM_USER_PlatformComms, msg, value);
-
-  KL.Log('SendPlatformComms64 EXIT');
-end;
-
-procedure TfrmKeyman7Main.ClosePlatformComms64;
-begin
-  SendPlatformComms64(PC_CLOSE, 0);
-end;
-
 type
   TLangSwitchRefreshWatcher = class(TThread)
   private
@@ -2001,34 +1940,49 @@ begin
   if Assigned(FLangSwitchRefreshWatcher) then
   begin
     FLangSwitchRefreshWatcher.Terminate;
+    FreeAndNil(FLangSwitchRefreshWatcher);
   end;
-  FLangSwitchRefreshWatcher := TLangSwitchRefreshWatcher.Create(Handle);
-  FLangSwitchRefreshWatcher.FreeOnTerminate := True;
+  FLangSwitchRefreshWatcher := TLangSwitchRefreshWatcher.Create(Application.Handle);
   FLangSwitchRefreshWatcher.Start;
 end;
 
-procedure TfrmKeyman7Main.StartPlatformComms64;
+procedure TfrmKeyman7Main.StartKeymanX64;
 var
-  dir, s: WideString;
+  cmd, dir, params: string;
   sei: TShellExecuteInfoW;
 begin
   if not IsWow64 then Exit;   // I4374
 
-  dir := ExtractFilePath(ParamStr(0));
-  s := dir + 'keymanx64.exe';
+  try
+    // TODO: use TKeymanPaths to find keymanx64?
+    dir := ExtractFilePath(ParamStr(0));
+    cmd := dir + 'keymanx64.exe';
+    params := Format('%d %d', [GetCurrentProcessId, Application.Handle]);
 
-  if not FileExists(s) then Exit; // Keyman x64 is not installed
+    if not FileExists(cmd) then
+      // We'll get notification of the issue but it won't
+      // crash the process
+      raise Exception.Create(cmd+' could not be found');
 
-  FillChar(sei, SizeOf(sei), 0);
-  sei.cbSize := SizeOf(sei);
-  sei.Wnd := Handle;
-  sei.lpVerb := 'open';
-  sei.lpFile := PWideChar(s);
-  sei.lpParameters := '';
-  sei.lpDirectory := PWideChar(dir);
-  sei.nShow := SW_SHOW;
+    FillChar(sei, SizeOf(sei), 0);
+    sei.cbSize := SizeOf(sei);
+    sei.Wnd := Handle;
+    sei.lpVerb := 'open';
+    sei.lpFile := PWideChar(cmd);
+    sei.lpParameters := PChar(params);
+    sei.lpDirectory := PWideChar(dir);
+    sei.nShow := SW_SHOW;
 
-  if not ShellExecuteExW(@sei) then Exit; // log
+    if not ShellExecuteExW(@sei) then
+      RaiseLastOSError;
+  except
+    on E:Exception do
+    begin
+      // We're going to handle any exceptions here but we'd like to know that
+      // they happened
+      TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanx64', True);
+    end;
+  end;
 end;
 
 procedure TfrmKeyman7Main.HotkeyWndProc(var Message: TMessage);
@@ -2181,7 +2135,7 @@ begin
             REG_NOTIFY_CHANGE_LAST_SET, hEvent, True) <> ERROR_SUCCESS then
           Exit;
 
-        // Finally, tell the main form to get ready to process the refresh
+        // Finally, tell the master controller to get ready to process the refresh
         PostMessage(FOwnerHandle, wm_keyman_control, MAKELONG(KMC_REFRESH, 1), 0);
       until False;
 
@@ -2211,5 +2165,4 @@ initialization
   ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
   ChangeWindowMessageFilter(wm_keyman_globalswitch_process, MSGFLT_ADD);
   ChangeWindowMessageFilter(wm_keyman_control_internal, MSGFLT_ADD);   // I3933
-  ChangeWindowMessageFilter(WM_USER_PlatformComms, MSGFLT_ADD);
 end.

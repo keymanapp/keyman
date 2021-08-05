@@ -9,6 +9,12 @@ New versions should be deployed to **keymanapp/keyman/windows/src/global/inst/ke
 
 # .keyboard_info version history
 
+## 2019-09-06 1.0.6 stable
+* No changes (see api.keyman.com#36 and api.keyman.com#59. Reverted in 2020-06-10.).
+
+## 2018-12-18 1.0.5 stable
+* Deprecate languages[] array. Update KeyboardLanguageInfo object to include subtag names.
+
 ## 2018-11-26 1.0.4 stable
 * Add helpLink field - a link to a keyboard's help page on help.keyman.com if it exists.
 

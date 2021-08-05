@@ -7,6 +7,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
@@ -80,8 +81,7 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
   @Override
   public void applyCloudDownloadToModel(Context aContext, Void aModel, List<CloudLexicalModelMetaDataDownloadCallback.MetaDataResult> aCloudResult) {
     if (aCloudResult.isEmpty()) {
-      String msg = aContext.getString(R.string.catalog_unavailable);
-      Toast.makeText(aContext, msg, Toast.LENGTH_SHORT).show();
+      BaseActivity.makeToast(aContext, R.string.catalog_unavailable, Toast.LENGTH_SHORT);
       KMLog.LogError(TAG, "Could not reach server");
       return;
     }
@@ -104,16 +104,12 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
         if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyboardLexicalModels) {
           if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_r.additionalDownloadid))
           {
-            Toast.makeText(aContext,
-              aContext.getString(R.string.dictionary_download_is_running_in_background),
-              Toast.LENGTH_SHORT).show();
+            BaseActivity.makeToast(aContext, R.string.dictionary_download_is_running_in_background, Toast.LENGTH_SHORT);
             continue;
           }
           CloudLexicalPackageDownloadCallback _callback = new CloudLexicalPackageDownloadCallback();
 
-          Toast.makeText(aContext,
-            aContext.getString(R.string.dictionary_download_start_in_background),
-            Toast.LENGTH_SHORT).show();
+          BaseActivity.makeToast(aContext, R.string.dictionary_download_start_in_background, Toast.LENGTH_SHORT);
 
           CloudDownloadMgr.getInstance().executeAsDownload(aContext,
             _r.additionalDownloadid, null, _callback,
@@ -152,8 +148,7 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
             KMLog.LogException(TAG, "Error parsing lexical model from api.keyman.com. ", e);
           }
         } else {
-          String msg = aContext.getString(R.string.no_associated_model);
-          Toast.makeText(aContext, msg, Toast.LENGTH_SHORT).show();
+          BaseActivity.makeToast(aContext, R.string.no_associated_model, Toast.LENGTH_SHORT);
         }
       }
 

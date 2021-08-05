@@ -24,12 +24,11 @@ uses
   keymanapi_TLB;
 
 const
-  CInterfaceHotkeys: array[0..8] of KeymanHotkeyTarget = (
+  CInterfaceHotkeys: array[0..7] of KeymanHotkeyTarget = (
     khKeymanOff,
     khKeyboardMenu,
     khVisualKeyboard,
     khKeymanConfiguration,
-    khKeyboardUsage,
     khFontHelper,
     khCharacterMap,
     khTextEditor,

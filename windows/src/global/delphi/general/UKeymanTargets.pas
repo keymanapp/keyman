@@ -22,7 +22,7 @@ const
   ];
 
   TouchKeymanTargets: TKeymanTargets = [
-    ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet,
+    ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet,
     ktMobile, ktTablet
   ];
 

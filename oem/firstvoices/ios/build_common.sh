@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -26,6 +26,7 @@ display_usage ( ) {
     echo "  -no-update      If an in-place copy of KeymanEngine.framework exists, does not seek out an updated copy."
     echo "  -lib-build      Actively rebuilds KMEI before copying its build products to project resources."
     echo "  -lib-nobuild    Prevents the build script from building KeymanEngine under any circumstances."
+    echo "  -no-carthage    Disables downloading and building for dependencies."
     echo "  -no-codesign    Performs the build without code signing."
     echo "  -debug          Sets the configuration to debug mode instead of release."
     echo
@@ -85,11 +86,12 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-carthage)
             DO_CARTHAGE=false
+            KMEI_FLAGS="$KMEI_FLAGS -no-carthage"
             ;;
         -no-archive)
             DO_ARCHIVE=false
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
         -clean)
@@ -118,7 +120,7 @@ else
     PLATFORM_TARGET="iphoneos"
 fi
 
-KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-$PLATFORM_TARGET/KeymanEngine.framework"
+KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG/KeymanEngine.xcframework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 if [ $DO_UPDATE = true ]; then
@@ -153,9 +155,20 @@ fi
 # First things first - update our dependencies.
 
 if [ $DO_CARTHAGE = true ]; then
-    echo
-    echo "Load dependencies with Carthage"
-    carthage bootstrap --platform iOS || fail "carthage boostrap failed"
+  echo
+  echo "Load dependencies with Carthage"
+
+  carthage checkout || fail "Carthage dependency loading failed"
+
+  # Carthage sometimes picks the wrong .xcworkspace if two are available in a dependency's repo.
+  # Easiest way to override it - delete the wrong one (or just its scheme)
+
+  # Deleted workspace - a test for proper deployment to CocoaPods.  Doesn't matter here.
+  rm -r ./Carthage/Checkouts/DeviceKit/CocoaPodsVerification/ || fail "Carthage dependency loading failed"
+  
+  # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
+  # which affects the sentry-cocoa dependency.
+  carthage build --use-xcframeworks --no-use-binaries --platform iOS || fail "Carthage dependency loading failed"
 fi
 
 #
@@ -187,7 +200,7 @@ if [ $CODE_SIGN = true ]; then
   else
     xcodebuild $XCODEFLAGS -scheme "$TARGET" \
                VERSION=$VERSION \
-               VERSION_WITH_TAG=$VERSION_WITH_TAG    
+               VERSION_WITH_TAG=$VERSION_WITH_TAG
   fi
 else
   xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \

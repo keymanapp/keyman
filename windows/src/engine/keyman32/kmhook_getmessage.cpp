@@ -109,8 +109,6 @@ LRESULT CALLBACK kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	return res;
 }
 
-void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
-
 LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	LPMSG mp;
@@ -281,9 +279,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
 
-	if(mp->message == WM_ACTIVATEAPP && mp->wParam)
-		UpdateKeymanUI();
-
 	if(*Globals::hwndIM() != 0)
 	{
 		if(mp->message == wm_keymanim_close)
@@ -344,11 +339,9 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	{
 	case KM_DISABLEUI:
 		_td->KeymanUIDisabled = TRUE;
-		UpdateKeymanUI();
 		break;
 	case KM_ENABLEUI:
 		_td->KeymanUIDisabled = FALSE;
-		UpdateKeymanUI();
 		break;
 	case KM_FOCUSCHANGED:
     if(lParam & KMF_WINDOWCHANGED)
@@ -403,11 +396,6 @@ void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void UpdateKeymanUI()
-{
-	Globals::PostControllers(wm_keyman_control, KMC_CHANGEUISTATE, 2);  // TODO: Fixup constant
-}
-
 /*
   GetCapsAndNumlockState:
 
@@ -443,8 +431,12 @@ void GetCapsAndNumlockState() {   // I4793
 
 /*
   Update the Keyman shift state based on the key event. This has to be
-  done from the GetMessage hook because we don't consistently receive
-  modifier events in some applications (e.g. ALT in Firefox) via TSF.
+  done from both the GetMessage hook and the TSF methods, because we don't
+  consistently receive modifier events in some applications (e.g. ALT in Firefox)
+  via TSF, and we don't receive the notifications via the GetMessage hook when
+  in UWP apps (#4369).
+
+  TODO: test whether we still need the GetMessage hook for reading modifier state.
 */
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
   UINT flag = 0;
@@ -453,8 +445,6 @@ void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
     case VK_SHIFT:   flag = K_SHIFTFLAG; break;
     case VK_MENU:    flag = isExtended ? RALTFLAG : LALTFLAG; break;
     case VK_CONTROL: flag = isExtended ? RCTRLFLAG : LCTRLFLAG; break;
-    case VK_CAPITAL: flag = CAPITALFLAG; break;
-    case VK_NUMLOCK: flag = NUMLOCKFLAG; break;
   }
 
   UINT oldShiftState = Globals::get_ShiftState();

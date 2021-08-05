@@ -111,8 +111,8 @@ build_hhc_entry() {
 build_hhc() {
   local TARGET_PATH="$1"
 
-  if [ -f "$TARGET_PATH/index.html" ]; then
-    build_hhc_entry "$TARGET_PATH/index.html"
+  if [ -f "$TARGET_PATH/index.htm" ]; then
+    build_hhc_entry "$TARGET_PATH/index.htm"
   fi
 
   echo '
@@ -122,7 +122,7 @@ build_hhc() {
   for file in "$TARGET_PATH"/*; do
     if [ -d "$file" ]; then
       build_hhc "$file"
-    elif [[ "$file" == */*.html && "$file" != */index.html ]]; then
+    elif [[ "$file" == */*.htm && "$file" != */index.htm ]]; then
       build_hhc_entry "$file"
     fi
   done
@@ -136,7 +136,8 @@ build_hhc() {
 # Compile all .md to .htm
 #
 
-MDLUA="$THIS_DIR/htmlink.lua"
+MDLUA="$KEYMAN_ROOT/resources/build/htm-link.lua"
+CSS="../../../../resources/build/offline-help-style-spec.txt"
 MD=`find -name "*.md"`
 DESTCHM="$THIS_DIR/../../../bin/help/desktop"
 
@@ -156,10 +157,10 @@ if $DO_CHM; then
 
   if $DO_CHM_CONVERSION; then
     for INFILE in $MD; do
-      OUTFILE="$DESTCHM/${INFILE%.md}.html"
+      OUTFILE="$DESTCHM/${INFILE%.md}.htm"
       echo "Processing $INFILE to $(basename "$OUTFILE")"
       mkdir -p "$(dirname "$OUTFILE")"
-      pandoc -s --lua-filter="$MDLUA" -t html -o "$OUTFILE" $INFILE
+      pandoc -s -H "$CSS" --lua-filter="$MDLUA" -t html -o "$OUTFILE" $INFILE
     done
   fi
 
@@ -177,7 +178,7 @@ if $DO_CHM; then
   pushd "$DESTCHM" > /dev/null
 
   cp "$THIS_DIR/keymandesktop.hhp" "$DESTCHM/keymandesktop.hhp"
-  find -name '*.html' >> "$DESTCHM/keymandesktop.hhp"
+  find -name '*.htm' >> "$DESTCHM/keymandesktop.hhp"
 
   build_hhc_header
   build_hhc .

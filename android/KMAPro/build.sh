@@ -69,7 +69,7 @@ while [[ $# -gt 0 ]] ; do
             DO_KEYBOARDS_DOWNLOAD=true
             DO_MODELS_DOWNLOAD=true
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
     esac
@@ -111,6 +111,11 @@ else
   DAEMON_FLAG=
 fi
 
+# Convert markdown to html for offline help
+echo "Converting markdown to html for offline help"
+cd "$KEYMAN_ROOT/android"
+./build-help.sh htm
+cd "$KEYMAN_ROOT/android/KMAPro"
 
 # Download default keyboard and dictionary
 if [ "$DO_KEYBOARDS_DOWNLOAD" = true ]; then

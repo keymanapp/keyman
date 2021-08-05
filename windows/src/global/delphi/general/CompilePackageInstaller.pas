@@ -294,10 +294,10 @@ begin
         WriteMessage('Redist path not specified, loading default ('+FRedistSetupPath+')');
       end;
 
-      if not FileExists(FRedistSetupPath + 'setup.exe') or
+      if not FileExists(FRedistSetupPath + 'setup.exe') and
          not FileExists(FRedistSetupPath + 'setup-redist.exe') then
       begin
-        FatalMessage('setup.exe or setup-redist.exe are missing from redist ('+FRedistSetupPath+').');
+        FatalMessage('Neither setup.exe nor setup-redist.exe are present in redist ('+FRedistSetupPath+').');
         Exit;
       end;
 

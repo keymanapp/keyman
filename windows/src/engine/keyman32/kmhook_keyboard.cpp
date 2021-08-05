@@ -1,18 +1,18 @@
 /*
   Name:             kmhook_keyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Hotkeys testing
                     14 Sep 2006 - mcdurdin - Initialise process when no messages have been passed
                     30 May 2007 - mcdurdin - I864 - Log exceptions in hook procedures
@@ -72,7 +72,7 @@ BOOL ForegroundWindowIsRDP();   // I4197
 
 BOOL InLanguageSwitchKeySequence = FALSE;
 HWND hwndLanguageSwitch = 0;
-		
+
 BOOL ForegroundWindowIsRDP() {   // I4197
   //TODO: Cache result
   DWORD dwProcessId;
@@ -121,12 +121,12 @@ BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD Shift
     if(!hotkey) return FALSE;
   }
 
-  if((hotkey->HotkeyValue & HK_CTRL) && (wParam == VK_CONTROL || wParam == VK_LCONTROL || wParam == VK_RCONTROL) && !isUp && (ShiftState & K_MODIFIERFLAG & ~(LCTRLFLAG|RCTRLFLAG)) == 0)   // I4124
+  if((hotkey->HotkeyValue & HK_CTRL) && (wParam == VK_CONTROL || wParam == VK_LCONTROL || wParam == VK_RCONTROL) && !isUp && (ShiftState & ~(HK_CTRL|HK_RCTRL_INVALID)) == 0)   // I4124
   {
     InLanguageSwitchKeySequence = TRUE;
     return FALSE;
   }
-  else if((hotkey->HotkeyValue & HK_ALT) && (wParam == VK_MENU || wParam == VK_LMENU || wParam == VK_RMENU) && !extended && !isUp && (ShiftState & K_MODIFIERFLAG & ~LALTFLAG) == 0)   // I4124
+  else if((hotkey->HotkeyValue & HK_ALT) && (wParam == VK_MENU || wParam == VK_LMENU || wParam == VK_RMENU) && !extended && !isUp && (ShiftState & ~HK_ALT) == 0)   // I4124
   {
     InLanguageSwitchKeySequence = TRUE;
     return FALSE;
@@ -139,12 +139,12 @@ BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD Shift
       {
         InLanguageSwitchKeySequence = FALSE;
         //ReportActiveKeyboard(_td, PC_UPDATE);
-        Globals::PostControllers(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
+        Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
         PostDummyKeyEvent();   // I4124   // I4844
         keybd_event(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);    // I4203
         return TRUE;
       }
-      
+
       return FALSE;
     }
     else
@@ -176,15 +176,15 @@ int ProcessLanguageSwitchShiftKey(WPARAM wParam, BOOL isUp)
   {
     case VK_LSHIFT:
     case VK_RSHIFT:
-    case VK_SHIFT:   
-    case VK_CONTROL: 
+    case VK_SHIFT:
+    case VK_CONTROL:
     case VK_LCONTROL:   // I4124
     case VK_RCONTROL:   // I4124
-    case VK_MENU:    
+    case VK_MENU:
     case VK_LMENU:   // I4124
     case VK_RMENU:   // I4124
       break;
-    default:         
+    default:
       return 1;
   }
 

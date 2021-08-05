@@ -116,7 +116,7 @@ extension Queries {
       }
 
       urlComponents.queryItems = queryItems + [URLQueryItem(name: "platform", value: "ios")]
-      log.info("Querying package versions through API endpoint: \(urlComponents.url!)")
+      SentryManager.breadcrumbAndLog("Querying package versions through API endpoint: \(urlComponents.url!)")
 
       // Step 2:  configure the completion closure.
       let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: Result.self, completionBlock: fetchCompletion)

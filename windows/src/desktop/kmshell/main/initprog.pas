@@ -337,6 +337,34 @@ begin
   end;
 end;
 
+function DoCheckTIPInstallStatus(FSilent: Boolean): Boolean;
+begin
+(*
+  Note: this needs a significant refactor because enumerating input processor
+        profiles under Administrator account may return different results to an
+        end user account. It is also much less likely that a keyboard will not
+        be available with Keyman 14's keyboard registration model. So we may be
+        able to avoid using this altogether.
+
+        For now, we will disable this check here and in the future may re-enable
+        it and rewrite it if it proves necessary to improve profile stability.
+
+        See #4893.
+  if not TKeyboardTIPCheck.CheckKeyboardTIPInstallStatus then
+  begin
+    if FSilent then
+      Exit(False);
+
+    if MessageDlg('Some keyboard profiles have been damaged. Correct these now?', mtConfirmation, mbOkCancel, 0) = mrOk then
+    begin
+      WaitForElevatedConfiguration(0, '-repair', True);
+      // TKeyboardTIPCheck.ReEnablePostRepair; //possible future mitigation idea, see #4893.
+    end;
+  end;
+*)
+  Result := True;
+end;
+
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
   FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean; FParentWindow: THandle);
 var
@@ -400,11 +428,7 @@ begin
 
   if not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout]) then   // I4773
   begin
-    if not TKeyboardTIPCheck.CheckKeyboardTIPInstallStatus then
-    begin
-      if MessageDlg('Some keyboard profiles have been damaged. Correct these now?', mtConfirmation, mbOkCancel, 0) = mrOk then
-        WaitForElevatedConfiguration(0, '-repair', True);
-    end;
+    DoCheckTIPInstallStatus(False);
   end;
 
   // I1818 - remove start mode change
@@ -429,10 +453,10 @@ begin
         else ExitCode := 2;
 
     fmOnlineUpdateAdmin:
-      OnlineUpdateAdmin(FirstKeyboardFileName);
+      OnlineUpdateAdmin(nil, FirstKeyboardFileName);
 
     fmOnlineUpdateCheck:
-      with TOnlineUpdateCheck.Create(FForce, FSilent) do
+      with TOnlineUpdateCheck.Create(nil, FForce, FSilent) do
       try
         Run;
       finally
@@ -480,7 +504,7 @@ begin
     fmTextEditor:
       begin  // I2720
         FMutex := TKeymanMutex.Create('KeymanTextEditor');
-        if FMutex.MutexOwned then OpenTextEditor(nil) else FocusTextEditor;
+        if FMutex.MutexOwned then OpenTextEditor else FocusTextEditor;
       end;
 
     fmBaseKeyboard:   // I4169
@@ -534,19 +558,10 @@ begin
         else ExitCode := 1;
 
     fmRepair:   // I4773
-      if not TKeyboardTIPCheck.CheckKeyboardTIPInstallStatus then
-      begin
-        if not FSilent then
-        begin
-          if MessageDlg('Some of the keyboard profiles have been damaged. Correct these now?', mtConfirmation, mbOkCancel, 0) = mrOk then
-            WaitForElevatedConfiguration(0, '-repair', True);
-          ExitCode := 0;
-        end
-        else
-          ExitCode := 1;
-      end
-      else
-        ExitCode := 0;
+      if DoCheckTIPInstallStatus(FSilent)
+        then ExitCode := 0
+        else ExitCode := 1;
+
     fmKeepInTouch:
       ShowKeepInTouchForm(True);   // I4658
 

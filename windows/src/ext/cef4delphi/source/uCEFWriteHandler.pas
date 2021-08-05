@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,20 +41,20 @@ unit uCEFWriteHandler;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
 interface
 
 uses
-  {$IFDEF DELPHI16_UP}
-  {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF}
-  {$ELSE}
-  Windows,
+  {$IFDEF MSWINDOWS}
+    {$IFDEF DELPHI16_UP}
+    WinApi.Windows,
+    {$ELSE}
+    Windows,
+    {$ENDIF}
   {$ENDIF}
   uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes;
 
@@ -98,6 +98,11 @@ type
 implementation
 
 uses
+  {$IFDEF DELPHI16_UP}
+  System.Math,
+  {$ELSE}
+  Math,
+  {$ENDIF}
   uCEFMiscFunctions, uCEFLibFunctions;
 
 
@@ -215,9 +220,11 @@ end;
 constructor TCefBytesWriteHandler.Create(aGrow : NativeUInt);
 begin
   inherited Create;
-
+  {$IFDEF MSWINDOWS}
   InitializeCriticalSection(FCriticalSection);
-
+  {$ELSE}
+  InitCriticalSection(FCriticalSection);
+  {$ENDIF}
   FGrow       := aGrow;
   FBufferSize := aGrow;
   FOffset     := 0;
@@ -229,15 +236,11 @@ destructor TCefBytesWriteHandler.Destroy;
 begin
   if (FBuffer <> nil) then FreeMem(FBuffer);
 
-  DeleteCriticalSection(FCriticalSection);
-
-  FCriticalSection.DebugInfo      := nil;
-  FCriticalSection.LockCount      := 0;
-  FCriticalSection.RecursionCount := 0;
-  FCriticalSection.OwningThread   := 0;
-  FCriticalSection.LockSemaphore  := 0;
-  {$IFNDEF FPC}
-  FCriticalSection.Reserved       := 0;
+  {$IFDEF MSWINDOWS}
+    DeleteCriticalSection(FCriticalSection);
+    FillChar(FCriticalSection, SizeOf(FCriticalSection), 0);
+  {$ELSE}
+    DoneCriticalSection(FCriticalSection);
   {$ENDIF}
 
   inherited Destroy;
@@ -246,22 +249,27 @@ end;
 function TCefBytesWriteHandler.Write(const ptr: Pointer; size, n: NativeUInt): NativeUInt;
 var
   TempPointer : pointer;
+  TempSize    : int64;
 begin
   EnterCriticalSection(FCriticalSection);
+  try
+    TempSize := size * n;
 
-  if ((FOffset + (size * n)) >= FBufferSize) and (Grow(size * n) = 0) then
-    Result := 0
-   else
-    begin
-      TempPointer := Pointer(cardinal(FBuffer) + FOffset);
+    if ((FOffset + TempSize) >= FBufferSize) and (Grow(TempSize) = 0) then
+      Result := 0
+     else
+      begin
+        TempPointer := Pointer(cardinal(FBuffer) + FOffset);
 
-      CopyMemory(TempPointer, ptr, size * n);
+        Move(ptr^, TempPointer^, TempSize);
 
-      FOffset := FOffset + (size * n);
-      Result  := n;
-    end;
+        FOffset := FOffset + TempSize;
+        Result  := n;
+      end;
 
-  LeaveCriticalSection(FCriticalSection);
+  finally
+    LeaveCriticalSection(FCriticalSection);
+  end;
 end;
 
 function TCefBytesWriteHandler.Seek(offset: Int64; whence: Integer): Integer;
@@ -337,21 +345,25 @@ end;
 
 function TCefBytesWriteHandler.Grow(size : NativeUInt) : NativeUInt;
 var
-  s : NativeUInt;
+  TempTotal : int64;
 begin
   EnterCriticalSection(FCriticalSection);
+  try
 
-  if (size > FGrow) then
-    s := size
-   else
-    s := FGrow;
+    if (size < FGrow) then
+      TempTotal := FGrow
+     else
+      TempTotal := size;
 
-  ReallocMem(FBuffer, FBufferSize + s);
+    inc(TempTotal, FBufferSize);
 
-  FBufferSize := FBufferSize + s;
-  Result      := FBufferSize;
+    ReallocMem(FBuffer, TempTotal);
 
-  LeaveCriticalSection(FCriticalSection);
+    FBufferSize := TempTotal;
+    Result      := FBufferSize;
+  finally
+    LeaveCriticalSection(FCriticalSection);
+  end;
 end;
 
 end.

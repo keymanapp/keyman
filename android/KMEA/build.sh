@@ -92,7 +92,7 @@ while [[ $# -gt 0 ]] ; do
             KMWFLAGS=-debug_embedded
             KMW_PATH=unminified
             ;;
-        -h|-?)
+        -h|-\?)
             display_usage
             ;;
         -no-test)
@@ -193,5 +193,7 @@ mv $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/k
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/KeyboardHarness/app/libs/keyman-engine.aar
-
+if [ ! -z ${RELEASE_OEM+x} ]; then
+  cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/../oem/firstvoices/android/app/libs/keyman-engine.aar
+fi
 cd ..\

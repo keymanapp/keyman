@@ -115,7 +115,6 @@ uses
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
-  utilrun in 'util\utilrun.pas',
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
@@ -152,7 +151,8 @@ uses
   Keyman.System.Process.KPInstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas',
   Keyman.System.Process.KPUninstallKeyboardLanguage in 'processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
-  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
+  Keyman.System.BaseKeyboard in 'util\Keyman.System.BaseKeyboard.pas';
 
 {$R *.TLB}
 {$R *.RES}

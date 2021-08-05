@@ -21,6 +21,7 @@ import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -341,7 +342,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
       String langID = lexicalModelInfo.get(KMManager.KMKey_LanguageID);
 
       if (pkgID != null && modelID != null && langID != null) {
-        String lmKey = String.format("%s_%s_%s", pkgID, langID, modelID);
+        String lmKey = KMString.format("%s_%s_%s", pkgID, langID, modelID);
         if (lmKey.length() >= 5) {
           int x = getLexicalModelIndex(context, lmKey);
           if (x >= 0) {
@@ -468,7 +469,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
   // Gets a raw list of installed lexical models.
   @SuppressWarnings("unchecked")
   private static ArrayList<HashMap<String, String>> getList(Context context, String filename) {
-    ArrayList<HashMap<String, String>> list = null;
+    ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
     File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), filename);
     if (file.exists()) {
       try {
@@ -477,7 +478,6 @@ public final class KeyboardPickerActivity extends BaseActivity {
         inputStream.close();
       } catch (Exception e) {
         KMLog.LogException(TAG, "Failed to read " + filename + ". Error: ", e);
-        list = null;
       }
     }
 
@@ -569,7 +569,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     }
 
     for(HashMap<String, String> lmInfo : lexicalModelsList) {
-      String key = String.format("%s_%s_%s", lmInfo.get(KMManager.KMKey_PackageID),
+      String key = KMString.format("%s_%s_%s", lmInfo.get(KMManager.KMKey_PackageID),
         lmInfo.get(KMManager.KMKey_LanguageID), lmInfo.get(KMManager.KMKey_LexicalModelID));
       if (lexicalModelKey.equalsIgnoreCase(key)) {
         return true;
@@ -599,7 +599,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
         String pkgId = lmInfo.get(KMManager.KMKey_PackageID);
         String langId = lmInfo.get(KMManager.KMKey_LanguageID);
         String lmId = lmInfo.get(KMManager.KMKey_LexicalModelID);
-        String lmKey = String.format("%s_%s_%s", pkgId, langId, lmId);
+        String lmKey = KMString.format("%s_%s_%s", pkgId, langId, lmId);
         if (lmKey.equals(lexicalModelKey)) {
           index = i;
           break;
@@ -641,7 +641,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
       keyboardInfo.get(KMManager.KMKey_LanguageID),
       keyboardInfo.get(KMManager.KMKey_LanguageName),
       keyboardInfo.get(KMManager.KMKey_KeyboardVersion),
-      keyboardInfo.get(KMManager.KMKey_HelpLink),
+      keyboardInfo.get(KMManager.KMKey_CustomHelpLink),
       keyboardInfo.get(KMManager.KMKey_KMPLink),
       isNewKeyboard,
       keyboardInfo.get(KMManager.KMKey_Font),

@@ -5,14 +5,20 @@
 # History:      19  Oct 2018 - TSE - Added test for context API functions.
 #
 
+if compiler.get_id() == 'emscripten'
+  tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
+  test_path = '/'
+else
+  tests_flags = []
+  test_path = meson.current_source_dir()
+endif
+
 kmx = executable('kmx', 'kmx.cpp',
     cpp_args: defns,
     include_directories: [inc, libsrc],
-    link_args: links,
+    link_args: links + tests_flags,
+    dependencies: [rust_mock_processor],
     objects: lib.extract_all_objects())
-
-copyfile = ['-c', 'import sys, shutil', 'shutil.copyfile(*sys.argv[1:])']
-kmcomp = find_program('kmcomp.exe', required: false)
 
 tests = [
   '000 - null keyboard',
@@ -48,7 +54,7 @@ tests = [
   '030 - multiple groups',
   '031 - caps lock',
 #  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
-#  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
+  '033 - caps always off',
   '034 - options double set reset',
   '035 - options double set staged',
   '036 - options - double reset staged',
@@ -62,44 +68,48 @@ tests = [
 
   '044 - if and context',
   '045 - deadkey and context',
-  '046 - deadkey and contextex'
+  '046 - deadkey and contextex',
+  '047 - caps always off initially on'
 ]
 
 if build_machine.system() == 'windows'
+  kmcomp = find_program('kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
 else
-  wine = find_program('wine', required: false)
-  kmcomp_cmd = [wine, kmcomp]
-  if not wine.found()
-    # We assign the unfound wine external program object to kmcomp
-    # to cause the kmcomp object to fail too, as without wine we
-    # cannot execute kmcomp.exe on non-Windows systems.
-    # NOTE: a disabler() would be ideal here, but we need to support
-    # pre 0.45 versions of meson.
-    kmcomp = wine
+  kmcomp = find_program('kmcomp', required: false)
+  kmcomp_cmd = [kmcomp]
+  if not kmcomp.found()
+    wine = find_program('wine', required: false)
+    kmcomp = find_program('kmcomp.exe', required: false)
+    kmcomp_cmd = [wine, kmcomp]
+    if not wine.found()
+      kmcomp = disabler()
+    endif
   endif
 endif
 
+if compiler.get_id() == 'emscripten'
+  # The .kmx files are linked in to the unit test,
+  # so kmcomp is too late here
+  kmcomp = disabler()
+endif
+
 if kmcomp.found()
-  # This is only expected to work in meson 0.48+
-  # so not on bionic or xenial without using pip
   foreach kbd : tests
     kbd_src = files(kbd + '.kmn')
-    kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
+    kbd_obj = join_paths(meson.current_source_dir(), kbd) + '.kmx'
     kbd_log = custom_target(kbd + '.kmx'.underscorify(),
       output: kbd + '.log',
       input: kbd_src,
-      command: kmcomp_cmd + ['-s', '@INPUT@', kbd_obj, '@OUTPUT@']
+      command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
     )
 
     test(kbd, kmx, depends: kbd_log, args: [kbd_src, kbd_obj])
   endforeach
 else
   foreach kbd : tests
-    # meson 0.40 on xenial backports aborts if files used in args
-    # was e.g. kbd_src = files(kbd + '.kmn')
-    kbd_src = join_paths(meson.current_source_dir(),kbd) + '.kmn'
-    kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
+    kbd_src = join_paths(test_path, kbd) + '.kmn'
+    kbd_obj = join_paths(test_path, kbd) + '.kmx'
 
     test(kbd, kmx, args: [kbd_src, kbd_obj])
   endforeach

@@ -16,13 +16,7 @@ extension JSONDecoder.DateDecodingStrategy {
     return .formatted(formatter)
   }
   static var ios8601WithFallback: JSONDecoder.DateDecodingStrategy {
-    if #available(iOS 10.0, *) {
-      return .iso8601
-    }
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US_POSIX")
-    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-    return .formatted(formatter)
+    return .iso8601
   }
   
   static var ios8601WithMilliseconds: JSONDecoder.DateDecodingStrategy {

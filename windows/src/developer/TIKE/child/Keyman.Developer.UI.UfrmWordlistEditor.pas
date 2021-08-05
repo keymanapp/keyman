@@ -53,7 +53,7 @@ begin
   frame := TframeWordlistEditor.Create(Self);
   frame.Align := alClient;
   frame.Parent := Self;
-  frame.OnModifiedChanged := FrameModified;
+  frame.OnChanged := FrameModified;
 end;
 
 procedure TfrmWordlistEditor.FormDestroy(Sender: TObject);

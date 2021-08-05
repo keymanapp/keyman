@@ -4,6 +4,8 @@
 
 package com.tavultesoft.kmea;
 
+import android.content.Context;
+
 public class DisplayLanguages {
   private static final String TAG = "DisplayLanguages";
   public static final String displayLanguageKey = "DisplayLanguage";
@@ -29,12 +31,25 @@ public class DisplayLanguages {
 
   // Display Language types (as named in translate.keyman.com)
   // Order doesn't matter since we're storing BCP-47 tags in the settings preference
-  public static final DisplayLanguageType[] DisplayLanguages =
-  {
-    new DisplayLanguageType(unspecifiedLocale, "Default Locale"),
-    new DisplayLanguageType("de-DE", "German"),
-    new DisplayLanguageType("km-KH", "Khmer"),
-    new DisplayLanguageType("ann", "Obolo")
-  };
-
+  // Additional notes:
+  // Java uses deprecated two-letter code "in" for Indonesian
+  //
+  // Spanish (Latin America) folder is b+es+419 but the locale uses es-419
+  // Reference: https://developer.android.com/guide/topics/resources/multilingual-support#postN
+  public static final DisplayLanguageType[] getDisplayLanguages(Context context) {
+    DisplayLanguageType[] languages = {
+      new DisplayLanguageType(unspecifiedLocale, context.getString(R.string.default_locale)),
+      new DisplayLanguageType("am-ET", "አማርኛ (Amharic)"),
+      new DisplayLanguageType("az-AZ", "Azərbaycanca (Azəricə)"),
+      new DisplayLanguageType("en", "English"),
+      new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
+      new DisplayLanguageType("fr-FR", "French"),
+      new DisplayLanguageType("in-ID", "Indonesian"),
+      new DisplayLanguageType("de-DE", "German"),
+      new DisplayLanguageType("km-KH", "Khmer"),
+      new DisplayLanguageType("ann", "Obolo"),
+      new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde") // or Fulah
+    };
+    return languages;
+  }
 }

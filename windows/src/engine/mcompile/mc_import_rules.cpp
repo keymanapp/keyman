@@ -19,8 +19,9 @@
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
 */
 
-#include "stdafx.h"
+#include "pch.h"
 #include <vector>
+#include <string>
 
 enum ShiftState {
     Base = 0,                    // 0

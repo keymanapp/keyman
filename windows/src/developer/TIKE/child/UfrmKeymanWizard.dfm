@@ -177,7 +177,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     Top = 0
     Width = 1043
     Height = 645
-    ActivePage = pageTouchLayout
+    ActivePage = pageDetails
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -198,6 +198,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sbDetails: TScrollBox
         Left = 0
         Top = 0
@@ -960,6 +963,36 @@ inherited frmKeymanWizard: TfrmKeymanWizard
               TabOrder = 2
               OnClick = chkLayoutDisplay102KeyClick
             end
+            object panWarnMixedShiftStates: TPanel
+              Left = 492
+              Top = 59
+              Width = 317
+              Height = 54
+              BevelOuter = bvLowered
+              Color = clCream
+              ParentBackground = False
+              TabOrder = 5
+              Visible = False
+              object lblWarnMixedShiftStates: TLabel
+                Left = 8
+                Top = 8
+                Width = 183
+                Height = 39
+                Caption = 
+                  'Warning: mixing left/right and non-specific modifiers means some' +
+                  ' rules are not visible here'
+                WordWrap = True
+              end
+              object cmdFixupShiftStates: TButton
+                Left = 200
+                Top = 16
+                Width = 107
+                Height = 25
+                Caption = 'Fixup Shift States'
+                TabOrder = 0
+                OnClick = cmdFixupShiftStatesClick
+              end
+            end
           end
         end
         object pageLayoutCode: TTabSheet
@@ -1022,6 +1055,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageTouchLayout: TTabSheet
       Caption = 'Touch Layout'
       ImageIndex = 16
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesTouchLayout: TPageControl
         Left = 0
         Top = 0
@@ -1036,6 +1072,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
@@ -1100,48 +1140,15 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
-        object cmdCompile: TButton
-          Left = 10
-          Top = 40
-          Width = 137
-          Height = 25
-          Action = modActionsKeyboardEditor.actKeyboardCompile
-          TabOrder = 0
-        end
-        object cmdStartDebugging: TButton
-          Left = 153
-          Top = 40
-          Width = 137
-          Height = 25
-          Action = modActionsKeyboardEditor.actDebugStartDebugger
-          TabOrder = 1
-        end
-        object cmdAddToProject: TButton
-          Left = 442
-          Top = 40
-          Width = 137
-          Height = 25
-          Action = modActionsMain.actProjectAddCurrentEditorFile
-          TabOrder = 2
-        end
-        object cmdOpenContainingFolder2: TButton
-          Left = 298
-          Top = 40
-          Width = 138
-          Height = 25
-          Caption = '&Open Containing Folder'
-          TabOrder = 3
-          OnClick = cmdOpenContainingFolder2Click
-        end
         object panBuildWindows: TPanel
           Left = 10
-          Top = 96
+          Top = 202
           Width = 295
           Height = 265
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 4
+          TabOrder = 2
           object lblInstallHint: TLabel
             Left = 9
             Top = 39
@@ -1189,13 +1196,13 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         object panBuildKMW: TPanel
           Left = 323
-          Top = 96
+          Top = 202
           Width = 454
           Height = 265
           BevelOuter = bvNone
           Color = 15921906
           ParentBackground = False
-          TabOrder = 5
+          TabOrder = 3
           object lblDebugHostCaption: TLabel
             Left = 12
             Top = 70
@@ -1258,6 +1265,103 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Caption = 'Send addresses to &email...'
             TabOrder = 2
             OnClick = cmdSendURLsToEmailClick
+          end
+        end
+        object panOpenInExplorer: TPanel
+          Left = 10
+          Top = 117
+          Width = 767
+          Height = 67
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 1
+          object lblOpenInExplorer: TLabel
+            Left = 9
+            Top = 6
+            Width = 115
+            Height = 17
+            Caption = 'Open in Explorer'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object cmdOpenSourceFolder: TButton
+            Left = 9
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = '&Open source folder'
+            TabOrder = 0
+            OnClick = cmdOpenSourceFolderClick
+          end
+          object cmdOpenBuildFolder: TButton
+            Left = 153
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = 'Open &build folder'
+            TabOrder = 1
+            OnClick = cmdOpenBuildFolderClick
+          end
+          object cmdOpenProjectFolder: TButton
+            Left = 297
+            Top = 33
+            Width = 138
+            Height = 25
+            Caption = 'Open pro&ject folder'
+            TabOrder = 2
+            OnClick = cmdOpenProjectFolderClick
+          end
+        end
+        object panFileActions: TPanel
+          Left = 10
+          Top = 32
+          Width = 767
+          Height = 67
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 0
+          object lblFileActions: TLabel
+            Left = 9
+            Top = 6
+            Width = 75
+            Height = 17
+            Caption = 'File actions'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object cmdAddToProject: TButton
+            Left = 295
+            Top = 33
+            Width = 137
+            Height = 25
+            Action = modActionsMain.actProjectAddCurrentEditorFile
+            TabOrder = 2
+          end
+          object cmdStartDebugging: TButton
+            Left = 152
+            Top = 33
+            Width = 137
+            Height = 25
+            Action = modActionsKeyboardEditor.actDebugStartDebugger
+            TabOrder = 1
+          end
+          object cmdCompile: TButton
+            Left = 9
+            Top = 33
+            Width = 137
+            Height = 25
+            Action = modActionsKeyboardEditor.actKeyboardCompile
+            TabOrder = 0
           end
         end
       end

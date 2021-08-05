@@ -90,6 +90,7 @@ const PWCHAR StoreTokens[MAX_SYSTEM_STORE] = {   // I4652
   SSN__PREFIX L"KEYBOARDVERSION",   // I4140
 	SSN__PREFIX L"KMW_EMBEDCSS",
   SSN__PREFIX L"TARGETS",   // I4504
+  SSN__PREFIX L"CASEDKEYS",
 	NULL
 };
 
@@ -183,7 +184,7 @@ PWCHAR KeyString(LPKEY key)
 
 PWCHAR ifvalue(WCHAR ch)
 {
-  if(ch == L'1') return L"!=";
+  if(ch == 1) return L"!=";
   return L"=";
 }
 
@@ -254,7 +255,7 @@ PWCHAR ExtString(PWCHAR str)
           else
 					  wsprintfW(p, L"[%s%s] ", flagstr(*str), VKeyNames[*(str+1)]);
         }
-				str++;
+				str+=2; // skip UC_SENTINEL_EXTENDEDEND
 				p = wcschr(p, 0);
 				break;
 			case CODE_SWITCH:

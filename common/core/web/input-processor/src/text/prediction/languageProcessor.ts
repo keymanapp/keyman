@@ -2,6 +2,7 @@
 ///<reference path="../../../node_modules/@keymanapp/lexical-model-layer/message.d.ts" />
 ///<reference path="../../../node_modules/@keymanapp/lexical-model-layer/index.ts" />
 ///<reference path="../../includes/events.ts" />
+/// <reference path="../contextWindow.ts" />
 
 namespace com.keyman.text.prediction {
   export interface ModelSpec {
@@ -33,7 +34,7 @@ namespace com.keyman.text.prediction {
    */
   export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
 
-  export type StateChangeEnum = 'active'|'inactive';
+  export type StateChangeEnum = 'active'|'configured'|'inactive';
   /**
    * Corresponds to the 'statechange' LanguageProcessor event.
    */
@@ -50,29 +51,6 @@ namespace com.keyman.text.prediction {
    * Corresponds to the 'invalidatesuggestions' LanguageProcessor event.
    */
   export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
-
-  export class TranscriptionContext implements Context {
-    left: string;
-    right?: string;
-
-    startOfBuffer: boolean;
-    endOfBuffer: boolean;
-
-    constructor(mock: Mock, config: Configuration) {
-      this.left = mock.getTextBeforeCaret();
-      this.startOfBuffer = this.left._kmwLength() <= config.leftContextCodePoints;
-      if(!this.startOfBuffer) {
-        // Our custom substring version will return the last n characters if param #1 is given -n.
-        this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
-      }
-
-      this.right = mock.getTextAfterCaret();
-      this.endOfBuffer = this.right._kmwLength() <= config.rightContextCodePoints;
-      if(!this.endOfBuffer) {
-        this.right = this.right._kmwSubstr(0, config.rightContextCodePoints);
-      }
-    }
-  }
 
   export class ReadySuggestions {
     suggestions: Suggestion[];
@@ -137,17 +115,31 @@ namespace com.keyman.text.prediction {
       let source = specType == 'file' ? model.path : model.code;
       let lp = this;
 
-      // We should wait until the model is successfully loaded before setting our state values.
-      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
-        lp.currentModel = model;
-        lp.configuration = config;
+      // We pre-emptively emit so that the banner's DOM elements may update synchronously.
+      // Prevents an ugly "flash of unstyled content" layout issue during keyboard load
+      // on our mobile platforms when embedded.
+      lp.currentModel = model;
+      if(this.mayPredict) {
+        lp.emit('statechange', 'active');
+      }
 
-        try {
-          lp.emit('statechange', 'active');
-        } catch (err) {
-          // Does this provide enough logging information?
-          console.error("Could not load model '" + model.id + "': " + (err as Error).message);
+      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
+        lp.configuration = config;
+        lp.emit('statechange', 'configured');
+      }).catch(function(error) { 
+        // Does this provide enough logging information?
+        let message: string;
+        if(error instanceof Error) {
+          message = error.message;
+        } else {
+          message = String(error);
         }
+        console.error("Could not load model '" + model.id + "': " + message);
+
+        // Since the model couldn't load, immediately deactivate.  Visually, it'll look
+        // like the banner crashed shortly after load.
+        lp.currentModel = null;
+        lp.emit('statechange', 'inactive');
       });
     }
 
@@ -161,7 +153,11 @@ namespace com.keyman.text.prediction {
         return;
       }
 
-      if(outputTarget) {
+      // Don't attempt predictions when disabled!
+      // invalidateContext otherwise bypasses .predict()'s check against this.
+      if(!this.isActive) {
+        return;
+      } else if(outputTarget) {
         let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
         this.predict_internal(transcription, true);
       } else {
@@ -175,7 +171,7 @@ namespace com.keyman.text.prediction {
         return null;
       }
 
-      let context = new TranscriptionContext(Mock.from(target), this.configuration);
+      let context = new ContextWindow(Mock.from(target), this.configuration);
       return this.lmEngine.wordbreak(context);
     }
 
@@ -229,7 +225,7 @@ namespace com.keyman.text.prediction {
 
         // Builds the reversion option according to the loaded lexical model's known
         // syntactic properties.
-        let suggestionContext = new TranscriptionContext(original.preInput, this.configuration);
+        let suggestionContext = new ContextWindow(original.preInput, this.configuration);
 
         // We must accept the Suggestion from its original context, which was before
         // `original.transform` was applied.
@@ -243,7 +239,7 @@ namespace com.keyman.text.prediction {
             // the input will be automatically rewound to the preInput state.
             transform: original.transform,
             // The ID part is critical; the reversion can't be applied without it.
-            transformId: original.token, // reversions use the additive inverse.
+            transformId: -original.token, // reversions use the additive inverse.
             displayAs: reversion.displayAs,  // The real reason we needed to call the LMLayer.
             id: reversion.id,
             tag: reversion.tag
@@ -289,7 +285,7 @@ namespace com.keyman.text.prediction {
       outputTarget.apply(transform);
 
       // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-      let promise = this.lmEngine.revertSuggestion(reversion, new TranscriptionContext(original.preInput, this.configuration))
+      let promise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration))
 
       let lp = this;
       return promise.then(function(suggestions: Suggestion[]) {
@@ -320,15 +316,23 @@ namespace com.keyman.text.prediction {
         return null;
       }
 
-      let context = new TranscriptionContext(transcription.preInput, this.configuration);
+      let context = new ContextWindow(transcription.preInput, this.configuration);
       this.recordTranscription(transcription);
 
       if(resetContext) {
         this.lmEngine.resetContext(context);
       }
 
+      let alternates = transcription.alternates;
+      if(!alternates || alternates.length == 0) {
+        alternates = [{
+          sample: transcription.transform,
+          p: 1.0
+        }];
+      }
+
       let transform = transcription.transform;
-      var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);
+      var promise = this.currentPromise = this.lmEngine.predict(alternates, context);
 
       let lp = this;
       return promise.then(function(suggestions: Suggestion[]) {
@@ -395,7 +399,13 @@ namespace com.keyman.text.prediction {
       this._mayPredict = flag;
 
       if(oldVal != flag) {
-        this.emit('statechange', flag ? 'active' : 'inactive');
+        // If there's no model to be activated and we've reached this point,
+        // the banner should remain inactive, as it already was.
+        // If it there was one and we've reached this point, we're globally
+        // deactivating, so we're fine.
+        if(this.activeModel) {
+          this.emit('statechange', flag ? 'active' : 'inactive');
+        }
       }
     }
 

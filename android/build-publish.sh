@@ -50,7 +50,7 @@ while [[ $# -gt 0 ]] ; do
     -fv)
         DO_FV=true
         ;;
-    -h|-?)
+    -h|-\?)
         display_usage
         ;;
   esac

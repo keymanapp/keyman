@@ -1,0 +1,48 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "12.0.1500.0",
+    "fileVersion": "12.0"
+  },
+  "options": {
+    "followKeyboardVersion": false
+  },
+  "info": {
+    "author": {
+      "description": "Eddie Antonio Santos",
+      "url": "mailto:Eddie.Santos@nrc-cnrc.gc.ca"
+    },
+    "copyright": {
+      "description": "© 2019 Timothy Montler and the W̱SÁNEĆ School Board"
+    },
+    "name": {
+      "description": "SENĆOŦEN (Saanich Dialect) Lexical Model"
+    },
+    "version": {
+      "description": "1.0.5"
+    }
+  },
+  "files": [
+    {
+      "name": "nrc.str.sencoten.model.js",
+      "description": "Lexical model nrc.str.sencoten.model.js",
+      "copyLocation": "0",
+      "fileType": ".model.js"
+    }
+  ],
+  "lexicalModels": [
+    {
+      "name": "SENĆOŦEN dictionary",
+      "id": "nrc.str.sencoten",
+      "languages": [
+        {
+          "name": "North Straits Salish",
+          "id": "str"
+        },
+        {
+          "name": "SENĆOŦEN",
+          "id": "str-Latn"
+        }
+      ]
+    }
+  ]
+}

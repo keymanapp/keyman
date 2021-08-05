@@ -1,18 +1,18 @@
 /*
   Name:             k32_globals
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    6 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Add hotkeys globals
                     14 Sep 2006 - mcdurdin - Add IsKeymanSystemWindow and UpdateActiveWindows functions
                     04 Dec 2006 - mcdurdin - Add PostProcessControllers and IsControllerProcess functions
@@ -69,7 +69,7 @@
 /*                                                                         */
 /***************************************************************************/
 
-UINT 
+UINT
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
   wm_keyman_keyevent = 0,   // for serialized input
@@ -86,7 +86,7 @@ UINT
 
 	wm_keymanim_close = 0,
 	wm_keymanim_contextchanged = 0,
-	
+
 	wm_test_keyman_functioning = 0;
 
 //HWND hwndIM = 0, hwndIMOldFocus = 0;
@@ -100,7 +100,7 @@ static CRITICAL_SECTION csGlobals;
 PKEYMAN64THREADDATA Globals_InitThread()
 {
   EnterCriticalSection(&csGlobals);
-  
+
   PKEYMAN64THREADDATA lpvData;
 
   if(Globals::get_Keyman_Shutdown())  // I3092
@@ -190,7 +190,7 @@ void Globals_UninitProcess()
 PKEYMAN64THREADDATA ThreadGlobals()
 {
   EnterCriticalSection(&csGlobals);
-  
+
   PKEYMAN64THREADDATA lpvData = NULL;
   if(dwTlsIndex != TLS_OUT_OF_INDEXES)
   {
@@ -220,7 +220,7 @@ BOOL Globals_ProcessInitialised()
 //static INI     // I3158   // I3524
 //    f_Ini = {0};								// KEYMAN.INI options
 
-static HHOOK 
+static HHOOK
     f_hhookGetMessage = NULL,				// GETMESSAGE hook handle
     f_hhookCallWndProc = NULL;			// CALLWNDPROC hook handle
 
@@ -236,7 +236,7 @@ static HWND
 static UINT
   f_WindowsVersion = 0;			// Windows Version
 
-static BOOL 
+static BOOL
     f_Keyman_Initialised = FALSE,
     f_Keyman_Shutdown = FALSE;
 
@@ -256,10 +256,13 @@ static BOOL
 #define MAXCONTROLLERS 128
 
 static HWND
-	f_ControllerWindow[MAXCONTROLLERS] = {0};
+  f_MasterController = NULL;
+
+static DWORD
+	f_ControllerThreads[MAXCONTROLLERS] = {0};
 
 static int
-	f_MaxControllers = 0;
+	f_MaxControllerThreads = 0;
 
 static BOOL
   f_SimulateAltGr = FALSE,   // I4583
@@ -280,14 +283,14 @@ __declspec(align(8)) static LONG
   f_RefreshTag = 0;
 #endif
 
-static BOOL 
-  f_debug_KeymanLog = FALSE, 
+static BOOL
+  f_debug_KeymanLog = FALSE,
   f_debug_ToConsole = FALSE;
 
 #pragma data_seg()
 /***************************************************************************/
 
-DWORD	//static 
+DWORD	//static
 	f_ShiftState = 0;
 
 HANDLE f_hLockMutex = 0;
@@ -364,13 +367,15 @@ void Globals::SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboa
 }
 
 void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL mnemonicDeadkeyConversionMode) {   // I4583   // I4552
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::SetBaseKeyboardFlags(baseKeyboard='%s', simulateAltGr=%d, mnemonicDeadkeyConversionMode=%d",
+    baseKeyboard, simulateAltGr, mnemonicDeadkeyConversionMode);
   strcpy_s(f_BaseKeyboard, baseKeyboard);
   f_SimulateAltGr = simulateAltGr;
   f_MnemonicDeadkeyConversionMode = mnemonicDeadkeyConversionMode;
 }
 
 /**
-  Loads settings that are globally applied at application startup. These cannot 
+  Loads settings that are globally applied at application startup. These cannot
   be changed until Keyman is restarted.
 */
 BOOL Globals::InitSettings() {
@@ -392,7 +397,7 @@ BOOL Globals::Lock()
     f_hLockMutex = CreateMutex(NULL, FALSE, "Tavultesoft_KeymanEngine_GlobalLock");
     if(f_hLockMutex == 0) return FALSE;
   }
-    
+
   if(WaitForSingleObject(f_hLockMutex, 1000) == WAIT_OBJECT_0) return TRUE;  // I3183   // I3530
   SetLastError(ERROR_TIMEOUT);  // I3183   // I3530
   return FALSE;  // I3183   // I3530
@@ -400,7 +405,7 @@ BOOL Globals::Lock()
 
 BOOL Globals::InitHandles()  // I3040
 {
-  if(f_hLockMutex == 0) 
+  if(f_hLockMutex == 0)
     f_hLockMutex = CreateMutex(NULL, FALSE, "Tavultesoft_KeymanEngine_GlobalLock");
   if(f_hLockMutex == 0) return FALSE;
   SetObjectToLowIntegrity(f_hLockMutex);
@@ -420,7 +425,8 @@ BOOL Globals::ResetControllers()  // I3092
 
   if(!Globals::Lock()) return FALSE;
 
-  f_MaxControllers = 0;
+  f_MasterController = NULL;
+  f_MaxControllerThreads = 0;
   /*   I3158   // I3524
   f_Ini.ContextStackSize = 0;
   f_Ini.MaxKeyboards = 0;
@@ -458,8 +464,9 @@ BOOL Globals::IsControllerWindow(HWND hwnd)
 {
   if(!Lock()) return FALSE;
   CheckControllers();
-	for(int i = 0; i < f_MaxControllers; i++)
-		if(hwnd == f_ControllerWindow[i])
+  DWORD tid = GetWindowThreadProcessId(hwnd, NULL);
+	for(int i = 0; i < f_MaxControllerThreads; i++)
+		if(tid == f_ControllerThreads[i])
     {
       Unlock();
       return TRUE;
@@ -469,30 +476,14 @@ BOOL Globals::IsControllerWindow(HWND hwnd)
 	return FALSE;
 }
 
-void Globals::PostProcessControllers(UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  if(!Lock()) return;
-  CheckControllers();
-  DWORD pid;
-	for(int i = 0; i < f_MaxControllers; i++)
-  {
-    GetWindowThreadProcessId(f_ControllerWindow[i], &pid);
-    if(pid == GetCurrentProcessId()) 
-      PostMessage(f_ControllerWindow[i], msg, wParam, lParam);
-  }
-  Unlock();
-}
-
-BOOL Globals::IsControllerProcess()
+BOOL Globals::IsControllerThread(DWORD tid)
 {
   if(!Lock()) return FALSE;
   CheckControllers();
-  DWORD pid;
-	for(int i = 0; i < f_MaxControllers; i++)
+	for(int i = 0; i < f_MaxControllerThreads; i++)
   {
-    GetWindowThreadProcessId(f_ControllerWindow[i], &pid);
-    if(pid == GetCurrentProcessId())
-    { 
+    if(f_ControllerThreads[i] == tid)
+    {
       Unlock();
       return TRUE;
     }
@@ -501,39 +492,26 @@ BOOL Globals::IsControllerProcess()
   return FALSE;
 }
 
-void Globals::PostControllers(UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  if(!Lock()) return;
-  CheckControllers();
-	 SendDebugMessageFormat(GetFocus(), sdmGlobal, 0, "PostControllers [%x : %x, %x]", msg, wParam, lParam);
-	for(int i = 0; i < f_MaxControllers; i++) {
-  	if(!PostMessage(f_ControllerWindow[i], msg, wParam, lParam)) {
-      DebugLastError("PostMessage");
-    }
-  }
-  Unlock();
-}
-
 void Globals::PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   if(!Lock()) return;
   CheckControllers();
-	if(f_MaxControllers == 0)
+	if(f_MasterController == NULL)
 	{
 		SendDebugMessageFormat(0, sdmGlobal, 0, "PostMasterController: no controllers [%x : %x, %x]", msg, wParam, lParam);
     Unlock();
 		return;
 	}
-  
+
   if(ShouldDebug(sdmGlobal))
   {
   	char buf[64];
-	  GetClassName(f_ControllerWindow[0], buf, 64);
+	  GetClassName(f_MasterController, buf, 64);
 	  buf[63] = 0;
-	  SendDebugMessageFormat(f_ControllerWindow[0], sdmGlobal, 0, "PostMasterController %s [%x : %x, %x]", buf, msg, wParam, lParam);
+	  SendDebugMessageFormat(f_MasterController, sdmGlobal, 0, "PostMasterController %s [%x : %x, %x]", buf, msg, wParam, lParam);
   }
 
-	if(!PostMessage(f_ControllerWindow[0], msg, wParam, lParam)) {
+	if(!PostMessage(f_MasterController, msg, wParam, lParam)) {
     DebugLastError("PostMessage");
   }
   Unlock();
@@ -543,25 +521,25 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   if(!Lock()) return 0;
   CheckControllers();
-	if(f_MaxControllers == 0)
+	if(f_MasterController == NULL)
 	{
     Unlock();
 		SendDebugMessageFormat(0, sdmGlobal, 0, "SendMasterController: no controllers [%x : %x, %x]", msg, wParam, lParam);
 		return 0;
 	}
 
-  HWND hwnd = f_ControllerWindow[0];
+  HWND hwnd = f_MasterController;
   Unlock();
-  
+
   if(ShouldDebug(sdmGlobal))
   {
   	char buf[64];
-	  GetClassName(f_ControllerWindow[0], buf, 64);
+	  GetClassName(hwnd, buf, 64);
 	  buf[63] = 0;
-	  SendDebugMessageFormat(f_ControllerWindow[0], sdmGlobal, 0, "SendMasterController %s [%x : %x, %x]", buf, msg, wParam, lParam);
+	  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SendMasterController %s [%x : %x, %x]", buf, msg, wParam, lParam);
   }
 
-  // Window may be taken out of list between Lock and Unlock but let's not worry about this 
+  // Window may be taken out of list between Lock and Unlock but let's not worry about this
 
   SetLastError(ERROR_SUCCESS);
   DWORD_PTR dwResult = 0;
@@ -575,7 +553,10 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 
 extern "C" void  _declspec(dllexport) WINAPI Keyman_PostControllers(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-  Globals::PostControllers(msg, wParam, lParam);
+  // no-op (removed as part of #5060)
+  UNREFERENCED_PARAMETER(msg);
+  UNREFERENCED_PARAMETER(wParam);
+  UNREFERENCED_PARAMETER(lParam);
 }
 
 extern "C" void  _declspec(dllexport) WINAPI Keyman_PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
@@ -590,35 +571,64 @@ extern "C" LRESULT  _declspec(dllexport) WINAPI Keyman_SendMasterController(UINT
 
 extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_RegisterControllerWindow(HWND hwnd)
 {
+  // no-op (removed as part of #5060)
+  UNREFERENCED_PARAMETER(hwnd);
+  return TRUE;
+}
+
+extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_RegisterControllerThread(DWORD tid)
+{
   if(!Globals::Lock())
   {
     // last error set by Globals::Lock
     return FALSE;
   }
-	if(f_MaxControllers == MAXCONTROLLERS)
+
+	if(f_MaxControllerThreads == MAXCONTROLLERS)
   {
     Globals::Unlock(); // I2814
     SetLastError(ERROR_KEYMAN_TOO_MANY_CONTROLLERS);  // I3183   // I3530
     return FALSE;
   }
-	if(Globals::IsControllerWindow(hwnd))
+	if(Globals::IsControllerThread(tid))
   {
     Globals::Unlock(); // I2814
     return TRUE;
   }
-	f_ControllerWindow[f_MaxControllers++] = hwnd;
+	f_ControllerThreads[f_MaxControllerThreads++] = tid;
   Globals::Unlock();
   return TRUE;
 }
 
-extern "C" BOOL _declspec(dllexport) WINAPI Keyman_UnregisterControllerWindow(HWND hwnd)
+extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_RegisterMasterController(HWND hwnd)
+{
+  if (!Globals::Lock())
+  {
+    // last error set by Globals::Lock
+    return FALSE;
+  }
+
+  f_MasterController = hwnd;
+
+  Globals::Unlock();
+  return TRUE;
+}
+
+extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_UnregisterControllerWindow(HWND hwnd)
+{
+  // no-op (removed as part of #5060)
+  UNREFERENCED_PARAMETER(hwnd);
+  return TRUE;
+}
+
+extern "C" BOOL _declspec(dllexport) WINAPI Keyman_UnregisterControllerThread(DWORD tid)
 {
   if(!Globals::Lock()) return FALSE;
-  for(int i = 0; i < f_MaxControllers; i++)
-		if(f_ControllerWindow[i] == hwnd)
+  for(int i = 0; i < f_MaxControllerThreads; i++)
+		if(f_ControllerThreads[i] == tid)
 		{
-			for(int j = i+1; j < f_MaxControllers; j++) f_ControllerWindow[j-1] = f_ControllerWindow[j];
-			f_MaxControllers--;
+			for(int j = i+1; j < f_MaxControllerThreads; j++) f_ControllerThreads[j-1] = f_ControllerThreads[j];
+			f_MaxControllerThreads--;
       Globals::Unlock();
 			return TRUE;
 		}
@@ -626,32 +636,18 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_UnregisterControllerWindow(HW
 	return FALSE;
 }
 
+extern "C" BOOL _declspec(dllexport) WINAPI Keyman_UnregisterMasterController()
+{
+  if (!Globals::Lock()) return FALSE;
+  f_MasterController = NULL;
+  Globals::Unlock();
+  return TRUE;
+}
+
 BOOL IsKeymanSystemWindow(HWND hwnd)
 {
 	if(hwnd == 0 || IsSysTrayWindow(hwnd)) return TRUE;  // I2866
-
-
-	DWORD pidC, pidHWND;
-	GetWindowThreadProcessId(hwnd, &pidHWND);
-	
-  if(!Globals::Lock()) return FALSE;
-
-  for(int i = 0; i < f_MaxControllers; i++)
-	{
-		if(f_ControllerWindow[i] == hwnd)
-    {
-      Globals::Unlock();
-      return TRUE; 
-    }
-		GetWindowThreadProcessId(f_ControllerWindow[i], &pidC);
-		if(pidC == pidHWND)
-    {
-      Globals::Unlock();
-      return TRUE;
-    }
-	}
-  Globals::Unlock();
-	return FALSE;
+  return Globals::IsControllerWindow(hwnd);
 }
 
 BOOL IsTooltipWindow(HWND hwnd)
@@ -666,14 +662,14 @@ void UpdateActiveWindows()
   GUITHREADINFO gti;
   gti.cbSize = sizeof(GUITHREADINFO);
   GetGUIThreadInfo(0, &gti);
-  
+
 	if(IsKeymanSystemWindow(gti.hwndActive) || IsKeymanSystemWindow(gti.hwndFocus)) return;
   if(IsTooltipWindow(gti.hwndActive) || IsTooltipWindow(gti.hwndFocus)) return;
-	
+
 	*Globals::hLastActiveWnd() = gti.hwndActive;
 	*Globals::hLastFocusWnd() = gti.hwndFocus;
 
-  Globals::PostControllers(wm_keyman_control, KMC_SETFOCUSINFO, 0);
+  Globals::PostMasterController(wm_keyman_control, KMC_SETFOCUSINFO, 0);
 }
 
 BOOL IsSysTrayWindow(HWND hwnd)

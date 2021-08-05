@@ -1,18 +1,18 @@
 (*
   Name:             UfrmProxyConfiguration
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Jan 2007
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Jan 2007 - mcdurdin - Initial version
                     30 May 2007 - mcdurdin - I825 - Added proxy username and password
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
@@ -74,6 +74,7 @@ procedure TfrmProxyConfiguration.TntFormCreate(Sender: TObject);
 begin
   inherited;
   FRenderPage := 'proxyconfiguration';
+  HelpTopic := 'context/proxy-configuration';
   Content_Render;
 end;
 

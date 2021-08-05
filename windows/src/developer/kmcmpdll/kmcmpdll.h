@@ -1,6 +1,7 @@
 #pragma once
 
 #include <windows.h>
+#include "compfile.h"
 
 BOOL AddCompileString(LPSTR buf);
 BOOL AddCompileMessage(DWORD msg);
@@ -10,3 +11,6 @@ BOOL AddCompileMessage(DWORD msg);
 
 extern BOOL FWarnDeprecatedCode;
 extern int currentLine;
+
+PWSTR strtowstr(PSTR in);
+PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, DWORD dwSystemID);

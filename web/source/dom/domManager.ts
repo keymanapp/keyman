@@ -1117,7 +1117,7 @@ namespace com.keyman.dom {
       this.keyman.uiManager.doUnload();
       
       // Allow the OSK to release its own resources
-      if(this.keyman.osk.ready) {
+      if(this.keyman.osk) {
         this.keyman.osk.shutdown();
         this.keyman.osk._Unload(); // I3363 (Build 301)
       }
@@ -1474,12 +1474,11 @@ namespace com.keyman.dom {
     /**
      * Function     Initialization
      * Scope        Public
-     * @param       {Object}  arg     object array of user-defined properties
+     * @param       {com.keyman.OptionType}  arg     object of user-defined properties
      * Description  KMW window initialization  
      */    
-    init: (arg:any) => Promise<any> = function(this: DOMManager, arg): Promise<any> { 
-      var i,j,c,e,p,eTextArea,eInput,opt,dTrailer,ds;
-      var osk = this.keyman.osk;
+    init: (arg: com.keyman.OptionType) => Promise<any> = function(this: DOMManager, arg): Promise<any> { 
+      var p,opt,dTrailer,ds;
       var util = this.keyman.util;
       var device = util.device;
 
@@ -1586,20 +1585,17 @@ namespace com.keyman.dom {
       // Set exposed initialization flag member for UI (and other) code to use 
       this.keyman.setInitialized(1);
 
-      // Finish keymanweb and OSK initialization once all necessary resources are available
-      osk.prepare();
+      // Finish keymanweb and initialize the OSK once all necessary resources are available
+      const osk = this.keyman.osk = new com.keyman.osk.OSKManager();
     
       // Create and save the remote keyboard loading delay indicator
       util.prepareWait();
 
-      // Register deferred keyboard stubs (addKeyboards() format)
-      this.keyman.keyboardManager.registerDeferredStubs();
-    
+      // Trigger registration of deferred keyboard stubs and keyboards
+      this.keyman.keyboardManager.endDeferment();
+
       // Initialize the desktop UI
       this.initializeUI();
-    
-      // Register deferred keyboards 
-      this.keyman.keyboardManager.registerDeferredKeyboards();
     
       // Exit initialization here if we're using an embedded code path.
       if(this.keyman.isEmbedded) {
@@ -1709,7 +1705,7 @@ namespace com.keyman.dom {
         * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
         */
       
-      if(MutationObserver) {
+      if(typeof MutationObserver == 'function') {
         var observationTarget = document.querySelector('body'), observationConfig: MutationObserverInit;
         if(this.keyman.options['attachType'] != 'manual') { //I1961
           observationConfig = { childList: true, subtree: true};

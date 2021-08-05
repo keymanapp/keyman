@@ -24,12 +24,35 @@
 /// <reference path="text/prediction/modelManager.ts" />
 
 /***
-   KeymanWeb 11.0
-   Copyright 2017-2019 SIL International
+   KeymanWeb 14.0
+   Copyright 2017-2021 SIL International
 ***/
 namespace com.keyman {
+
+  export enum SpacebarText {
+    KEYBOARD = 'keyboard',
+    LANGUAGE = 'language',
+    LANGUAGE_KEYBOARD = 'languageKeyboard',
+    BLANK = 'blank'
+  };
+
+  export interface OptionType {
+    root?: string;
+    resources?: string;
+    keyboards?: string;
+    fonts?: string;
+    attachType?: 'auto' | 'manual' | ''; // If blank or undefined, attachType will be assigned to "auto" or "manual"
+    ui?: string;
+    setActiveOnRegister?: string; // TODO: Convert to boolean. Option loader needs to be able to receive this as a string or boolean
+
+    // Determines the default text shown on the spacebar, if undefined, LANGUAGE_KEYBOARD
+    spacebarText?: SpacebarText;
+
+    // Determines whether or not KeymanWeb should display its own alert messages
+    useAlerts?: boolean;
+  }
+
   export class KeymanBase {
-    _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
     _IE = 0;                   // browser version identification
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
@@ -72,20 +95,23 @@ namespace com.keyman {
 
     touchAliasing: dom.DOMEventHandlers;
 
-    // Defines option-tracking object as a string map.
-    options: { [name: string]: string; } = {
-      'root':'',
-      'resources':'',
-      'keyboards':'',
-      'fonts':'',
-      'attachType':'',
-      'ui':null,
-      'setActiveOnRegister':'true'
+    // Defines default option values
+    options: OptionType = {
+      root: '',
+      resources: '',
+      keyboards: '',
+      fonts: '',
+      attachType: '',
+      ui: null,
+      setActiveOnRegister: 'true', // TODO: convert to boolean
+      spacebarText: SpacebarText.LANGUAGE_KEYBOARD,
+
+      // Determines whether or not KeymanWeb should display its own alert messages
+      useAlerts: true
     };
 
-
     // Stub functions (defined later in code only if required)
-    setDefaultDeviceOptions(opt){}
+    setDefaultDeviceOptions(opt: OptionType){}
     getStyleSheetPath(s){return s;}
     getKeyboardPath(f, p?){return f;}
     KC_(n, ln, Pelem){return '';}
@@ -132,7 +158,7 @@ namespace com.keyman {
       this['interface'] = this.core.keyboardInterface;
 
       this.modelManager = new text.prediction.ModelManager();
-      this.osk = this['osk'] = new com.keyman.osk.OSKManager();
+      this.osk = this['osk'] = null;
 
       // Load properties from their static variants.
       this['build'] = com.keyman.environment.BUILD;
@@ -291,24 +317,51 @@ namespace com.keyman {
     /**
      * Exposed function to load keyboards by name. One or more arguments may be used
      *
-     * @param {string|Object} x keyboard name string or keyboard metadata JSON object
+     * @param {any[]} args keyboard name string or keyboard metadata JSON object
+     * @returns {Promise<(KeyboardStub|ErrorStub)[]} Promise of added keyboard/error stubs
      *
      */
-    ['addKeyboards'](x) {
-      if(arguments.length == 0) {
-        this.keyboardManager.keymanCloudRequest('',false);
+    async ['addKeyboards'](...args: any[]) : 
+        Promise<(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]> {
+      if (!args || !args[0] || args[0].length == 0) {
+        // Get the cloud keyboard catalog
+        let stubs: (com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[] = [];
+        try {
+          await this.keyboardManager.keymanCloudRequest('',false);
+          return Promise.resolve(stubs);
+        } catch(error) {
+          console.error(error);
+          let stub: com.keyman.keyboards.ErrorStub = {error: error};
+          stubs.push(stub);
+          return Promise.reject(stubs);
+        };
       } else {
-        this.keyboardManager.addKeyboardArray(arguments);
+        let x: (string|com.keyman.keyboards.KeyboardStub)[] = [];
+        if (Array.isArray(args[0])) {
+          args[0].forEach(a =>
+            x.push(a));
+        } else if (Array.isArray(args)) {
+          args.forEach(a =>
+            x.push(a));
+        } else {
+          x.push(args);
+        }
+        return this.keyboardManager.addKeyboardArray(x);
       }
     }
 
     /**
-     *  Add default or all keyboards for a given language
+     *  Add default keyboards for given language(s)
      *
-     *  @param  {string}   arg    Language name (multiple arguments allowed)
+     *  @param  {string|string[]}   arg    Language name (multiple arguments allowed)
+     *  @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
      **/
-    ['addKeyboardsForLanguage'](arg) {
-      this.keyboardManager.addLanguageKeyboards(arguments);
+    ['addKeyboardsForLanguage'](arg: string[]|string) : Promise<(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]> {
+      if (typeof arg === 'string') {
+        return this.keyboardManager.addLanguageKeyboards(arg.split(',').map(item => item.trim()));
+      } else {
+        return this.keyboardManager.addLanguageKeyboards(arg);
+      }
     }
 
     /**
@@ -648,7 +701,24 @@ namespace com.keyman {
      *  @return {Object}                          DIV object with filled keyboard layer content
      */
     ['BuildVisualKeyboard'](PInternalName, Pstatic, argFormFactor, argLayerId): HTMLElement {
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PInternalName, Pstatic, argFormFactor, argLayerId);
+      let PKbd: com.keyman.keyboards.Keyboard = null;
+
+      if(PInternalName != null) {
+        var p=PInternalName.toLowerCase().replace('keyboard_','');
+        var keyboardsList = this.keyboardManager.keyboards;
+
+        for(let Ln=0; Ln<keyboardsList.length; Ln++) {
+          if(p == keyboardsList[Ln]['KI'].toLowerCase().replace('keyboard_','')) {
+            // Requires the Keyboard wrapping object now.
+            PKbd = new com.keyman.keyboards.Keyboard(keyboardsList[Ln]);
+            break;
+          }
+        }
+      }
+
+      PKbd = PKbd || this.core.activeKeyboard;
+
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.getKeyboardHeight());
     }
   }
 }

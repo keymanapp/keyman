@@ -2,7 +2,7 @@
 // ***************************** CEF4Delphi *******************************
 // ************************************************************************
 //
-// CEF4Delphi is based on DCEF3 which uses CEF3 to embed a chromium-based
+// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
 // browser in Delphi applications.
 //
 // The original license of DCEF3 still applies to CEF4Delphi.
@@ -10,7 +10,7 @@
 // For more information about CEF4Delphi visit :
 //         https://www.briskbard.com/index.php?lang=en&pageid=cef
 //
-//        Copyright © 2018 Salvador Diaz Fau. All rights reserved.
+//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
 //
 // ************************************************************************
 // ************ vvvv Original license and comments below vvvv *************
@@ -41,10 +41,8 @@ unit uCEFApp;
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-{$ENDIF}
+{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 {$I cef.inc}
 
@@ -56,7 +54,7 @@ uses
   {$ELSE}
   Classes,
   {$ENDIF}
-  uCEFTypes, uCEFInterfaces, uCEFBaseRefCounted, uCEFSchemeRegistrar, uCEFApplication;
+  uCEFTypes, uCEFInterfaces, uCEFBaseRefCounted, uCEFSchemeRegistrar, uCEFApplicationCore;
 
 type
   TCefAppOwn = class(TCefBaseRefCountedOwn, ICefApp)
@@ -67,13 +65,15 @@ type
       procedure GetBrowserProcessHandler(var aHandler : ICefBrowserProcessHandler); virtual; abstract;
       procedure GetRenderProcessHandler(var aHandler : ICefRenderProcessHandler); virtual; abstract;
 
+      procedure RemoveReferences; virtual; abstract;
+
     public
       constructor Create; virtual;
   end;
 
   TCustomCefApp = class(TCefAppOwn)
     protected
-      FCefApp                : TCefApplication;
+      FCefApp                : TCefApplicationCore;
       FResourceBundleHandler : ICefResourceBundleHandler;
       FBrowserProcessHandler : ICefBrowserProcessHandler;
       FRenderProcessHandler  : ICefRenderProcessHandler;
@@ -85,10 +85,11 @@ type
       procedure GetRenderProcessHandler(var aHandler : ICefRenderProcessHandler); override;
 
       procedure InitializeVars;
+      procedure RemoveReferences; override;
 
     public
-      constructor Create(const aCefApp : TCefApplication); reintroduce;
-      procedure   BeforeDestruction; override;
+      constructor Create(const aCefApp : TCefApplicationCore); reintroduce;
+      destructor  Destroy; override;
   end;
 
 
@@ -100,15 +101,15 @@ uses
   {$ELSE}
   SysUtils,
   {$ENDIF}
-  uCEFLibFunctions, uCEFMiscFunctions, uCEFCommandLine, uCEFConstants,
+  uCEFMiscFunctions, uCEFCommandLine, uCEFConstants,
   uCEFBrowserProcessHandler, uCEFResourceBundleHandler, uCEFRenderProcessHandler;
 
 
 // TCefAppOwn
 
-procedure cef_app_on_before_command_line_processing(self: PCefApp;
-                                                    const process_type: PCefString;
-                                                          command_line: PCefCommandLine); stdcall;
+procedure cef_app_on_before_command_line_processing(      self         : PCefApp;
+                                                    const process_type : PCefString;
+                                                          command_line : PCefCommandLine); stdcall;
 var
   TempObject : TObject;
 begin
@@ -119,7 +120,8 @@ begin
                                                          TCefCommandLineRef.UnWrap(command_line));
 end;
 
-procedure cef_app_on_register_custom_schemes(self: PCefApp; registrar: PCefSchemeRegistrar); stdcall;
+procedure cef_app_on_register_custom_schemes(self      : PCefApp;
+                                             registrar : PCefSchemeRegistrar); stdcall;
 var
   TempWrapper : TCefSchemeRegistrarRef;
   TempObject  : TObject;
@@ -214,13 +216,13 @@ end;
 // TCustomCefApp
 
 
-constructor TCustomCefApp.Create(const aCefApp : TCefApplication);
+constructor TCustomCefApp.Create(const aCefApp : TCefApplicationCore);
 begin
   inherited Create;
 
-  FCefApp := aCefApp;
-
   InitializeVars;
+
+  FCefApp := aCefApp;
 
   if (FCefApp <> nil) then
     begin
@@ -235,20 +237,33 @@ begin
     end;
 end;
 
-procedure TCustomCefApp.BeforeDestruction;
+destructor TCustomCefApp.Destroy;
 begin
-  FCefApp := nil;
+  RemoveReferences;
 
-  InitializeVars;
-
-  inherited BeforeDestruction;
+  inherited Destroy;
 end;
 
 procedure TCustomCefApp.InitializeVars;
 begin
+  FCefApp                := nil;
   FResourceBundleHandler := nil;
   FBrowserProcessHandler := nil;
   FRenderProcessHandler  := nil;
+end;
+
+procedure TCustomCefApp.RemoveReferences;
+begin
+  if (FResourceBundleHandler <> nil) then
+    FResourceBundleHandler.RemoveReferences;
+
+  if (FBrowserProcessHandler <> nil) then
+    FBrowserProcessHandler.RemoveReferences;
+
+  if (FRenderProcessHandler <> nil) then
+    FRenderProcessHandler.RemoveReferences;
+
+  InitializeVars;
 end;
 
 procedure TCustomCefApp.OnBeforeCommandLineProcessing(const processType: ustring; const commandLine: ICefCommandLine);

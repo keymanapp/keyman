@@ -351,6 +351,7 @@ var
   dwError: Cardinal;
   pvData: Pointer;
   RetryCount: Integer;
+  dwFlags,
   dwLength: DWord;
   dwReserved: DWord;
   FProxyOptions: INTERNET_PER_CONN_OPTION_LIST;
@@ -376,7 +377,7 @@ begin
       FProxyOption[1].dwValue := PROXY_TYPE_PROXY;
       InternetSetOption(hInet, INTERNET_OPTION_PER_CONNECTION_OPTION, @FProxyOptions, SizeOf(FProxyOptions));
     end;
-    
+
     InternetSetStatusCallback(hInet, @StaticInternetStatusCallback);
 
     if FHTTPS
@@ -396,6 +397,13 @@ begin
       if hRequest = nil then
         raise EHTTPUploader.Create('HttpOpenRequest failed', GetLastError);
       try
+        // Just like Chrome, we ignore certificate revocation. This is important
+        // because sometimes Windows has trouble with its revocation cache and
+        // this can lead to error 12057
+        dwFlags := SECURITY_FLAG_IGNORE_REVOCATION;
+        if not InternetSetOption(hRequest, INTERNET_OPTION_SECURITY_FLAGS, @dwFlags, sizeof(dwFlags)) then
+          raise EHTTPUploader.Create('InternetSetOption SECURITY_FLAGS failed', GetLastError);
+
         strBoundary := GenerateMultipartBoundary;
         contentTypeHeader := GenerateContentTypeHeader(strBoundary);
 

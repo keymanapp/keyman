@@ -143,6 +143,8 @@ namespace com.keyman.osk {
             this.alwaysShow = optionSpec[key];
             break;
           case 'mayPredict':
+            // If this toggles our internal flag, it will generate events
+            // that reconfigures the banner (and internal engine state) appropriately.
             keyman.core.languageProcessor.mayPredict = optionSpec[key]
             break;
           case 'mayCorrect':
@@ -156,9 +158,12 @@ namespace com.keyman.osk {
             // Invalid option specified!
         }
         this._options[key] = optionSpec[key];
-      }
 
-      this.selectBanner();
+        // If no banner instance exists yet, go with a safe, blank initialization.
+        if(!this.activeBanner) {
+          this.selectBanner('inactive');
+        }
+      }
     }
 
     /**
@@ -208,16 +213,22 @@ namespace com.keyman.osk {
      * allowing logic to automatically hot-swap `Banner`s as needed.
      * @param state 
      */
-    private selectBanner(state?: text.prediction.StateChangeEnum) {
-      let keyman = com.keyman.singleton;
-
+    private selectBanner(state: text.prediction.StateChangeEnum) {
       // Only display a SuggestionBanner when LanguageProcessor states it is active.s
-      if(keyman.core.languageProcessor.isActive) {
+      if(state == 'active') {
         this.setBanner('suggestion');
-      } else if(this.alwaysShow) {
-        this.setBanner('image');
-      } else {
-        this.setBanner('blank');
+      } else if(state == 'inactive') {
+        if(this.alwaysShow) {
+          this.setBanner('image');
+        } else {
+          this.setBanner('blank');
+        }
+      } else if(state == 'configured') {
+        let suggestionBanner = this.activeBanner as SuggestionBanner;
+        if(suggestionBanner.postConfigure) {
+          // Triggers the initially-displayed suggestions.s
+          suggestionBanner.postConfigure();
+        }
       }
     }
 
@@ -241,8 +252,11 @@ namespace com.keyman.osk {
       this.bannerContainer.appendChild(banner.getDiv());
 
       // Don't forget to adjust the OSK in case we're now using a blank Banner!
+      // Null guard b/c this function can be trigggered during OSK initialization.
       let keyman = com.keyman.singleton;
-      keyman['osk']._Show();
+      if(keyman['osk']) {
+        keyman['osk']._Show();
+      }
     }
 
     public get activeType(): BannerType {

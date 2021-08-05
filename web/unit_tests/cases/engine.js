@@ -10,12 +10,12 @@ describe('Engine - Browser Interactions', function() {
 
   beforeEach(function(done) {
     fixture.load("singleInput.html");
-    
+
     window.setTimeout(function() {
       done()
     }, kmwconfig.timeouts.eventDelay);
   });
-  
+
   after(function() {
     teardownKMW();
   });
@@ -23,7 +23,7 @@ describe('Engine - Browser Interactions', function() {
   afterEach(function() {
     fixture.cleanup();
   });
-  
+
   describe('Keyboard Loading', function() {
     it('Local', function(done) {
       this.timeout(kmwconfig.timeouts.scriptLoad);
@@ -38,6 +38,33 @@ describe('Engine - Browser Interactions', function() {
 
       loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, kmwconfig.timeouts.scriptLoad, {passive: true});
     });
+  });
+
+  describe('RegisterStub', function() {
+    it('RegisterStub on same keyboard twice', function(done) {
+      this.timeout(kmwconfig.timeouts.scriptLoad);
+
+      var test_callback = function() {
+        assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
+        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
+        keyman.removeKeyboards('lao_2008_basic');
+        assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
+        done();
+      }
+
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, kmwconfig.timeouts.scriptLoad, {passive: true});
+
+      var stub = {
+        'KI': 'Keyboard_lao_2008_basic',
+        'KN': 'Lao 2008 Basic',
+        'KLC': 'lo',
+        'KL': 'Lao',
+        'KF': 'resources/keyboards/lao_2008_basic.js'
+      };
+      assert.equal(com.keyman.text.KeyboardInterface.prototype.registerStub(stub), 1, "Registering existing keyboard should return 1!");
+      done();
+    });
+
   });
 
   describe('Variable Stores', function() {
@@ -76,7 +103,7 @@ describe('Engine - Browser Interactions', function() {
           assert.equal(value, 1, "Did not properly save and reload variable store setting");
 
           KeymanWeb.saveStore(storeName, 0);
-          
+
 
           done();
         }

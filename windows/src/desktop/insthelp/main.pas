@@ -46,7 +46,28 @@ uses
   Winapi.Windows,
   Keyman.System.InstHelp.KeymanStartTaskUninstall,
   klog,
-  RegistryKeys;
+  RegistryKeys,
+  UserMessages;
+
+procedure ShutdownKeyman;
+var
+  hwnd: THandle;
+  Counter: Integer;
+const
+  KMC_StopProduct = 1;  // from UfrmKeyman7Main.pas
+begin
+  hwnd := FindWindow('TfrmKeyman7Main', nil);
+  if hwnd <> 0 then
+  begin
+    PostMessage(hwnd, WM_USER_ParameterPass, KMC_StopProduct, 0);
+    Counter := 0;
+    while (FindWindow('TfrmKeyman7Main', nil) <> 0) and (Counter < 10) do
+    begin
+      Sleep(1000); // We'll wait up to 10 seconds to give Keyman Engine time to shut down
+      Inc(Counter);
+    end;
+  end;
+end;
 
 procedure UninstallUser;
 var
@@ -59,6 +80,8 @@ var
 begin
   KL.MethodEnter(nil, 'Uninstall', []);
   try
+    ShutdownKeyman;
+
     { I985: desktop_xxx.pxx not removed from registry at uninstall }
     if RegOpenKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_WindowsRun_CU), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
     begin

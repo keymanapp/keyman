@@ -1,0 +1,288 @@
+<style>
+/**************************************
+ * CSS RESET
+ * ***********************************/
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+  padding-left: 10px;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+}
+
+tbody {
+    display: table-row-group;
+    vertical-align: middle;
+}
+
+table td{
+	padding: 4px;
+}
+
+html{
+		font-family: 'Cabin', sans-serif;
+		color: #333;
+}
+
+html p,
+html dd,
+html li {
+  font-family: 'Calibri', sans-serif;
+  font-size: 14pt;
+}
+
+body {
+	line-height: inherit;
+}
+
+/**************************************
+ * Page Layout CSS
+ * ***********************************/
+
+html{
+    cursor: default;
+    background: #fff;
+}
+
+:not(div.interface-hierarchy) blockquote {
+  margin-left: 32px;
+  margin-bottom: 16px;
+  background: rgba(242,242,242,0.9);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+h1{
+	text-align: left;
+	font-size: 28pt;
+	padding: 40px 10px 10px 10px;
+}
+
+h2{
+	font-size: 20pt;
+	line-height: 1.4;
+	padding: 32px 10px 10px 10px;
+}
+
+h3{
+	font-size: 16pt;
+	font-weight: 600;
+	padding: 16px 10px 10px 10px;
+}
+
+h3, h2, h1 {
+  color: #B92034;
+  margin-top: 10px;
+}
+
+h1 a, h2 a, h3 a {
+  color: #B92034;
+}
+
+h1 a:visited, h2 a:visited, h3 a:visited {
+  color: #B92034;
+}
+
+h4{
+  font-size: 14pt;
+  font-weight: 600;
+  padding: 4px 10px 4px 10px;
+}
+
+p, dl, .itemizedlist {
+	padding: 0px 10px 10px 10px;
+	line-height: 1.4;
+	font-size: 14pt;
+}
+
+p a{
+	color: #B92034;
+	text-decoration: underline;
+	cursor: pointer;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+li{
+	margin-left: 30px;
+	list-style: disc;
+	list-style-position: outside;
+	line-height: 1.4;
+  font-size: 14pt;
+}
+
+img.center{
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+
+img.inline {
+  margin: 0;
+}
+
+.itemizedlist li{
+	list-style-position: outside;
+}
+
+li {
+  margin-bottom: 12px;
+}
+
+/* TODO: deprecate this since prismjs handles it. This also conflicts with the line-numbers plugin */
+pre {
+  margin-left: 9px;
+  margin-right: 9px;
+  padding: 9px;
+  line-height: 1.4;
+}
+
+pre code {
+  line-height: 1.4;
+}
+
+ol li a{
+	color: #B92034;
+}
+
+code {
+  font-family: Consolas, Courier, "Courier New", mono;
+  font-size: 10.5pt;
+}
+
+strong, b {
+  font-weight: bold;
+}
+
+i, cite, em, var, address, dfn {
+font-style: italic;
+}
+
+dt {
+  margin-top: 16px;
+}
+
+dt:first-child {
+  margin-top: 0;
+}
+
+dd {
+  margin-left: 32pt;
+}
+
+table.standard-table td,
+table.standard-table th {
+  border: solid #e0e0dc;
+  border-width: 0 1px 1px 0;
+  padding: 6px;
+  text-align: left;
+}
+table.standard-table th {
+  border: 2px solid #fff;
+  border-bottom: 2px solid #d4dde4;
+  background: #eaeff2;
+  background: rgba(212,221,228,.5);
+  font-family: 'Open Sans Light',sans-serif;
+  font-size: 14px;
+  padding: 2px 8px 4px;
+  font-weight: 700;
+}
+
+table.standard-table td {
+  background-color: #f9fafb;
+  background-color: rgba(212,221,228,.15);
+  border: 2px solid #fff;
+  box-shadow: inset 0 -1px 0 0 #eaeff2;
+  box-shadow: inset 0 -1px 0 0 rgba(212,221,228,.5);
+}
+
+article dl dt span.readonly {
+  background-color: #666769;
+  font-size: 13px;
+  color: white;
+  padding: 1px 6px 3px;
+  border-radius: 6px;
+}
+
+article dl dd span.optional {
+	background-color: #9c9c9c;
+	font-size: 13px;
+	font-style: italic;
+	font-weight: lighter;
+	color: white;
+	padding: 1px 6px 3px;
+	border-radius: 6px;
+}
+
+/* Font styling limited to Ascii characters */
+kbd {
+    background: none repeat scroll 0 0 #CCCCD0;
+		border: 1px solid #808080;
+		border-right: 2px solid #606060;
+    border-bottom: 2px solid #606060;
+    border-radius: 4px;
+    color: #000000;
+    font-family: "NotoSans-Regular-Ascii";
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    padding: 1px 4px;
+    min-width: 1.5em;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Make the <kbd> element look like an iOS key. */
+kbd.ios {
+    background-color: #fafafa; /* faaa fa fa fa fa faaaa far better... */
+    border: 0;
+    box-shadow: /* Hard shadow */     0 1px rgba(0,0,0,0.4),
+                /* Diffuse shadow */  0 1px 4px rgba(0,0,0,0.2),
+                /* Highlight */ inset 0 1px white;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+</style>

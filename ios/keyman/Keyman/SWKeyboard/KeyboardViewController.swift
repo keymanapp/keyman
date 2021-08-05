@@ -21,13 +21,9 @@ class KeyboardViewController: InputViewController {
       // is enabled.  They seem to get blocked otherwise, except in the Simulator.
       SentryManager.start(sendingEnabled: true)
     }
+    _ = log
+    _ = KeymanEngine.log
 
-    #if DEBUG
-      KeymanEngine.log.outputLevel = .debug
-      KeymanEngine.log.logAppDetails()
-    #else
-      KeymanEngine.log.outputLevel = .warning
-    #endif
     Manager.applicationGroupIdentifier = "group.KM4I"
 
     let bundle = Bundle(for: KeyboardViewController.self)
@@ -67,7 +63,7 @@ class KeyboardViewController: InputViewController {
   func setupTopBarImage(size: CGSize) {
     let imgPath = getTopBarImage(size: size)
     guard let path = imgPath else {
-      log.error("No image specified for the image banner!")
+      SentryManager.captureAndLog("No image specified for the image banner!")
       return
     }
 

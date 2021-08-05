@@ -19,7 +19,5 @@ signcode:
 
 wrap-symbols:
     rem
-backup:
-    $(WZZIP) $(BUILD)\desktop\km_yim.zip  $(BACKUPDEFAULTS) km_yim.exe
 
 !include ..\..\Target.mak

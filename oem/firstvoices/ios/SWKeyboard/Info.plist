@@ -43,7 +43,7 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.keyboard-service</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>FVInputViewController</string>
+		<string>$(PRODUCT_MODULE_NAME).FVInputViewController</string>
 	</dict>
 </dict>
 </plist>

@@ -56,8 +56,6 @@ public class SelectLanguageActivity extends AppCompatActivity implements
     JSONObject pkgInfo = kmpProcessor.loadPackageInfo(packagePath);
 
     String pkgName = kmpProcessor.getPackageName(pkgInfo);
-    boolean hasWelcome = kmpProcessor.hasWelcome(pkgInfo);
-
 
     if (keyboard == null) {
       KMLog.LogError(TAG, "Package " + packageID + " has 0 keyboards");
@@ -66,7 +64,7 @@ public class SelectLanguageActivity extends AppCompatActivity implements
 
     mStepperLayout = (StepperLayout) findViewById(R.id.stepperLayout);
     mStepperAdapter = new StepperAdapter(getSupportFragmentManager(), this,
-      isInstallingPackage, packagePath, pkgTarget, packageID, pkgName, keyboard, hasWelcome);
+      isInstallingPackage, packagePath, pkgTarget, packageID, pkgName, keyboard);
     mStepperLayout.setAdapter(mStepperAdapter);
     mStepperLayout.setListener(this);
 

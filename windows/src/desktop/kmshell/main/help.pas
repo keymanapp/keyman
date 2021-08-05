@@ -31,15 +31,16 @@ function GetCHMPath: WideString;
 implementation
 
 uses
+  System.SysUtils,
+  Vcl.Dialogs,
+  Winapi.Windows,
+
   custinterfaces,
-  Dialogs,
   KeymanPaths,
   kmint,
   MessageIdentifiers,
   MessageIdentifierConsts,
-  utilexecute,
-  SysUtils,
-  Windows;
+  utilexecute;
 
 function GetCHMPath: WideString;
 var
@@ -51,7 +52,7 @@ begin
     Result := GetLocalePath + LanguageCode + '\' + FFileName;
 
   if not FileExists(Result) then
-    Result := TKeymanPaths.KeymanDesktopInstallPath(FFileName);
+    Result := TKeymanPaths.KeymanHelpPath(FFileName);
 
   if not FileExists(Result) then
     Result := '';
@@ -70,6 +71,8 @@ begin
 
   if topicname = '' then topicname := 'index';
 
+  // We don't use Application.HelpJump here, because we need to load the topic
+  // and leave the help file open after the application closes
   TUtilExecute.Shell(0, 'hh.exe', '', '"mk:@MSITStore:'+s+'::'+topicname+'.htm"');  // I3349   // I3993   // I3676
 end;
 

@@ -10,7 +10,8 @@ tests = [
   ['context-api', 'context_api.cpp'],
   ['keyboard-api', 'keyboard_api.cpp'],
 #  ['options-api', 'options_api.cpp'],
-  ['state-api', 'state_api.cpp']
+  ['state-api', 'state_api.cpp'],
+  ['debug-api', 'debug_api.cpp'],
 ]
 
 foreach t : tests
@@ -18,7 +19,8 @@ foreach t : tests
     cpp_args: defns,
     include_directories: [inc, libsrc],
     link_args: links,
+    dependencies: [rust_mock_processor],
     objects: lib.extract_all_objects())
 
-  test(t[0], bin)
+  test(t[0], bin, args: ['--color', meson.current_source_dir()])
 endforeach

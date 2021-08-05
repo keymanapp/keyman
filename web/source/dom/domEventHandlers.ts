@@ -153,11 +153,11 @@ namespace com.keyman.dom {
       this.doControlFocused(LfocusTarg, DOMEventHandlers.states.lastActiveElement);
     
       // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
-      if(device.touchable) {
-        osk._Enabled = true;
-      } else {
-        // Conditionally show the OSK when control receives the focus
-        if(osk.ready) {
+      if(osk) {
+        if(device.touchable) {
+          osk._Enabled = true;
+        } else {
+          // Conditionally show the OSK when control receives the focus
           if(this.keyman.isCJK()) {
             osk._Enabled = true;
           }
@@ -202,6 +202,16 @@ namespace com.keyman.dom {
 
       if(Ltarg['body']) {
         Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
+      }
+
+      // Makes sure we properly detect the TouchAliasElement root, 
+      // rather than one of its constituent children.
+      if(this.keyman.util.device.touchable) {
+        Ltarg = findTouchAliasTarget(Ltarg);
+
+        if(!Ltarg) {
+          return true;
+        }
       }
 
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
@@ -250,7 +260,7 @@ namespace com.keyman.dom {
       this.doControlBlurred(Ltarg, e, isActivating);
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
-      if(this.keyman.osk.ready && !isActivating) {
+      if(this.keyman.osk && !isActivating) {
         this.keyman.osk._Hide(false);
       }
 
@@ -413,12 +423,7 @@ namespace com.keyman.dom {
       } else if(el && el.className.indexOf('kmw-disabled') >= 0) {
         return true; 
       }
-      
-      // Or if OSK not yet ready (for any reason)
-      if(!osk.ready) {
-        return true;
-      }
-      
+
       return PreProcessor.keyDown(e);
     }.bind(this);
 
@@ -464,16 +469,18 @@ namespace com.keyman.dom {
       var osk = this.keyman.osk;
 
       var Levent = PreProcessor._GetKeyEventProperties(e, false);
-      if(Levent == null || !osk.ready) {
+      if(Levent == null) {
         return true;
       }
-      var inputEle = (Levent.Ltarg as targets.OutputTarget).getElement();
+
+      let outputTarget = PreProcessor.getEventOutputTarget(e) as dom.targets.OutputTarget;
+      var inputEle = outputTarget.getElement();
 
       // Since this part concerns DOM element + browser interaction management, we preprocess it for
       // browser form commands before passing control to the Processor module.
       if(Levent.Lcode == 13) {
         var ignore = false;
-        if(Levent.Ltarg instanceof inputEle.ownerDocument.defaultView.HTMLTextAreaElement) {
+        if(outputTarget instanceof inputEle.ownerDocument.defaultView.HTMLTextAreaElement) {
           ignore = true;
         }
       
@@ -514,6 +521,34 @@ namespace com.keyman.dom {
       super(keyman);
     }
 
+    private static selectTouch(e: TouchEvent): Touch {
+      /**
+       * During multi-touch event's, it's possible for one or more touches of said multi-touch
+       * to be against irrelevant parts of the page.  We only want to consider touches against
+       * valid OutputTargets - against elements of the page that KMW can attach to.
+       * With touch active... that's a TouchAliasElement.
+       */
+      let isValidTouch = function(touch: Touch, target: EventTarget): boolean {
+        return e.target == target && !!(findTouchAliasTarget(touch.target as HTMLElement));
+      }
+
+      // The event at least tells us the event's target, which can be used to help check
+      // whether or not individual `Touch`es may be related to this specific event for
+      // an ongoing multitouch scenario.
+      let target = e.target;
+      
+      // Find the first touch affected by this event that matches the current target.
+      for(let i=0; i < e.changedTouches.length; i++) {
+        if(isValidTouch(e.changedTouches[i], target)) {
+          return e.changedTouches[i];
+        }
+      }
+
+      // Shouldn't be possible.  Just in case, we'd prefer a silent failure that allows
+      // callers to silently abort.
+      throw new Error("Could not select valid Touch for event.");
+    }
+
     /**
      * Handle receiving focus by simulated input field 
      *      
@@ -528,12 +563,23 @@ namespace com.keyman.dom {
       };
 
       if(e && dom.Utils.instanceof(e, "TouchEvent")) {
-        tEvent=(e as TouchEvent).touches[0];
+        try {
+          tEvent=DOMTouchHandlers.selectTouch(e as TouchEvent);
+        } catch(err) {
+          console.warn(err);
+          return;
+        }
       } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
         tEvent={clientX:0, clientY:0}
+
         // Will usually be called from setActiveElement, which should define DOMEventHandlers.states.lastActiveElement
         if(DOMEventHandlers.states.lastActiveElement) {
-          tEvent.target = DOMEventHandlers.states.lastActiveElement['kmw_ip'];
+          tEvent.target = DOMEventHandlers.states.lastActiveElement;
+          // Shouldn't happen, but... just in case.  Implemented late in 14.0 beta, so
+          // this detail was kept, though it's likely safe to eliminate.
+          if(tEvent.target['kmw_ip']) {
+            tEvent.target = tEvent.target['kmw_ip'];
+          }
         // but will default to first input or text area on page if DOMEventHandlers.states.lastActiveElement is null
         } else {
           tEvent.target = this.keyman.domManager.sortedInputs[0]['kmw_ip'];
@@ -542,33 +588,42 @@ namespace com.keyman.dom {
 
       this.setFocusWithTouch(tEvent);
     }.bind(this);
-      
+
+    // Also handles initial touch responses.
     setFocusWithTouch(tEvent: {clientX: number, clientY: number, target?: EventTarget}) {
       var osk = this.keyman.osk;
 
       var touchX=tEvent.clientX,touchY=tEvent.clientY;
-      var tTarg=tEvent.target as HTMLElement;
-      var scroller: HTMLElement;
 
-      // Identify the scroller element
-      if(tTarg && dom.Utils.instanceof(tTarg, "HTMLSpanElement")) {
-        scroller=tTarg.parentNode as HTMLElement;
-      } else if(tTarg && (tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0)) {
-        scroller=tTarg.firstChild as HTMLElement;
-      } else {
-        scroller=tTarg;
+      // Some specifics rely upon which child of the TouchAliasElement received the actual event.
+      let tTarg=tEvent.target as HTMLElement;
+
+      // Determines the actual TouchAliasElement - the part tied to an OutputTarget.
+      let target = findTouchAliasTarget(tTarg);
+
+      if(!target) {
+        return;
       }
 
-      // And the actual target element        
-      var target=scroller.parentNode as TouchAliasElement;
+      // Some parts rely upon the scroller element.
+      let scroller = target.firstChild as HTMLElement;
 
       // Move the caret and refocus if necessary     
       if(DOMEventHandlers.states.activeElement != target) {
         // Hide the KMW caret
         let prevTarget = <TouchAliasElement> DOMEventHandlers.states.activeElement;
-        if(prevTarget) {
+
+        // We're not 100% sure whether or not the next line can occur,
+        // but it's a decent failsafe regardless.
+        if(prevTarget && prevTarget['kmw_ip']) {
+          prevTarget = prevTarget['kmw_ip'] as TouchAliasElement;
+        }
+
+        // Make sure that we have the right type so that the expected method exists.
+        if(prevTarget && dom.Utils.instanceof(prevTarget, "TouchAliasElement")) {
           prevTarget.hideCaret();
         }
+
         DOMEventHandlers.states.activeElement=target;
         // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
         // We must explicitly set the focus in order to remove focus from any non-KMW input
@@ -583,12 +638,13 @@ namespace com.keyman.dom {
       //if(document.activeElement.nodeName != 'DIV' && document.activeElement.nodeName != 'BODY') document.activeElement.blur();
       
       // And display the OSK if not already visible
-      if(osk.ready && !osk._Visible) {
+      if(osk && !osk._Visible) {
         osk._Show();
       }
       
-      // If clicked on DIV, set caret to end of text
-      if(tTarg && dom.Utils.instanceof(tTarg, "TouchAliasElement")) {
+      // If clicked on DIV on the main element, rather than any part of the text representation,
+      // set caret to end of text
+      if(tTarg && tTarg == target) {
         var x,cp;
         x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);        
         if(target.dir == 'rtl') { 
@@ -599,8 +655,9 @@ namespace com.keyman.dom {
         }
     
         target.setTextCaret(cp);
-        target.scrollInput();        
-      } else { // Otherwise, if clicked on text in SPAN, set at touch position
+        target.scrollInput();
+        // nextSibling - the scrollbar element.  
+      } else if(tTarg != scroller.nextSibling) { // Otherwise, if clicked on text in SPAN, set at touch position
         var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
         caret=scroller.childNodes[1]; //caret span
         cpMin=0;
@@ -759,15 +816,26 @@ namespace com.keyman.dom {
      * Handle the touch move event for an input element
      */         
     dragInput: (e: TouchEvent|MouseEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent|MouseEvent) {
-      // Prevent dragging window 
-      e.preventDefault();
+      // Prevent dragging window
+      if(e.cancelable) {
+        // If a touch-alias element is scrolling, this may be false.
+        // Tends to result in a spam of console errors when e.cancelable == false.
+        e.preventDefault();
+      }
       e.stopPropagation();      
 
       // Identify the target from the touch list or the event argument (IE 10 only)
       var target: HTMLElement;
+      let touch: Touch;
       
       if(dom.Utils.instanceof(e, "TouchEvent")) {
-        target = (e as TouchEvent).targetTouches[0].target as HTMLElement;
+        try {
+          touch=DOMTouchHandlers.selectTouch(e as TouchEvent);
+        } catch(err) {
+          console.warn(err);
+          return;
+        }
+        target = touch.target as HTMLElement;
       } else {
         target = e.target as HTMLElement;
       }
@@ -776,15 +844,17 @@ namespace com.keyman.dom {
       }
       
       // Identify the input element from the touch event target (touched element may be contained by input)
-      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) target=<HTMLElement> target.parentNode;
-      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) target=<HTMLElement> target.parentNode;
-      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) return;
-      
+      target = findTouchAliasTarget(target);
+
+      if(!target) {
+        return;
+      }
+
       var x, y;
 
       if(dom.Utils.instanceof(e, "TouchEvent")) {
-        x = (e as TouchEvent).touches[0].screenX;
-        y = (e as TouchEvent).touches[0].screenY;
+        x = touch.screenX;
+        y = touch.screenY;
       } else {
         x = (e as MouseEvent).screenX;
         y = (e as MouseEvent).screenY;
@@ -822,6 +892,7 @@ namespace com.keyman.dom {
           }    
         }
       }
+      // Should refactor to use TouchAliasElement's version; target is an instance of the class.
       this.setScrollBar(target);
     }.bind(this);
 
@@ -832,9 +903,8 @@ namespace com.keyman.dom {
      */         
     scrollBody(e: HTMLElement): void {
       var osk = this.keyman.osk;
-      var util = this.keyman.util;
 
-      if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk.ready) {
+      if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk) {
         return;
       }
 

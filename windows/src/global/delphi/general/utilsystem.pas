@@ -329,11 +329,13 @@ var
   sei: TShellExecuteInfo;
   s: string;
 begin
-  s := '/select,'+FileName;
+  if not FileExists(FileName)
+    then s := '"'+ExtractFilePath(FileName)+'"'
+    else s := '/select,"'+FileName+'"';
   FillChar(sei, SizeOf(sei), 0);
   sei.cbSize := SizeOf(TShellExecuteInfo);
   sei.lpVerb := 'open';
-  sei.lpFile := 'explorer'; //PChar(s);
+  sei.lpFile := 'explorer';
   sei.lpParameters := PChar(s);
   sei.nShow := SW_SHOWNORMAL;
   ShellExecuteEx(@sei);

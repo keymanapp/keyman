@@ -211,6 +211,7 @@ begin
     Data := TInstallKeyboardSharedData.Create(FXML, FTempPath, FPackagePath, FFiles);
     PageTag := modWebHttpServer.SharedData.Add(Data);
     FRenderPage := 'installkeyboard';
+    HelpTopic := 'context/install-keyboard';
     Content_Render('tag='+IntToStr(PageTag));
   finally
     Screen.Cursor := crDefault;
@@ -302,7 +303,7 @@ begin
         Manager.UpdateProgress('Installing Keyboard', 0, 0);
         t := TTempFileManager.Get('.log');
         try
-          if WaitForElevatedConfiguration(Handle, '-log "'+t.Name+'" -s -i "'+FInstallFile+'='+BCP47Tag+'" -nowelcome') = 0 then
+          if WaitForElevatedConfiguration(GetForegroundWindow, '-log "'+t.Name+'" -s -i "'+FInstallFile+'='+BCP47Tag+'" -nowelcome') = 0 then
           begin
             // install the keyboard tip
             if not InstallTipForKeyboard(BCP47Tag) then

@@ -7,7 +7,8 @@
   android:layout_height="wrap_content"
   android:orientation="vertical">
 
-  <View style="@style/Divider.horizontal" />
+  <View style="@style/AppTheme.Divider.horizontal"
+    android:background="@android:color/holo_red_dark"/>
 
   <ImageView
     android:id="@+id/qrCode"

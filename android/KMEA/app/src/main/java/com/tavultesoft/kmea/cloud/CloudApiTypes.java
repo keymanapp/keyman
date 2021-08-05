@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
 
@@ -150,16 +151,19 @@ public class CloudApiTypes {
      * @return File - handle to the downloaded file in cache
      */
     public File cacheAndOpenDestinationFile(Context context) {
+      File cachedFile = null;
       DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
       Uri data = downloadManager.getUriForDownloadedFile(downloadId);
-      DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
-      String filename = info.getFilename();
-      File cachedFile = info.getFile();
 
-      if (filename == null || filename.isEmpty() || cachedFile == null || !cachedFile.exists()) {
+      if (data != null) {
+        DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
+        String filename = info.getFilename();
+        cachedFile = info.getFile();
+      }
+
+      if (cachedFile == null) {
         // failed to retrieve downloaded file
-        String message = context.getString(R.string.failed_to_retrieve_file);
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        BaseActivity.makeToast(context, R.string.failed_to_retrieve_file, Toast.LENGTH_LONG);
       }
 
       return cachedFile;

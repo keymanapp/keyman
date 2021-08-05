@@ -56,7 +56,7 @@ extension Queries {
       var urlComponents = MODEL_ENDPOINT
 
       urlComponents.queryItems = [URLQueryItem(name: "q", value: "bcp47:\(bcp47)")]
-      log.info("Querying package versions through API endpoint: \(urlComponents.url!)")
+      SentryManager.breadcrumbAndLog("Querying package versions through API endpoint: \(urlComponents.url!)")
 
       // Step 2:  configure the completion closure.
       let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: [Result].self, completionBlock: fetchCompletion)

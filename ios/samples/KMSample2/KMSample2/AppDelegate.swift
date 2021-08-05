@@ -20,6 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     KeymanEngine.log.logAppDetails()
 
     // Replace with your application group id
+    // Ensure this happens before installing any keyboards or models within the engine
+    // whenever using App Group Identifiers.
     Manager.applicationGroupIdentifier = "group.KMSample"
     return true
   }

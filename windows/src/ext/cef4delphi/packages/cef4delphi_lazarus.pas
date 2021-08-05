@@ -39,13 +39,34 @@ uses
   uCEFStringMap, uCEFStringMultimap, uCEFStringVisitor, uCEFTask, 
   uCEFTaskRunner, uCEFThread, uCEFTypes, uCEFUrlRequest, uCEFUrlrequestClient, 
   uCEFv8Accessor, uCEFv8ArrayBufferReleaseCallback, uCEFv8Context, 
-  uCEFV8Exception, uCEFv8Handler, uCEFv8Interceptor, uCEFv8StackFrame, 
+  uCEFv8Exception, uCEFv8Handler, uCEFv8Interceptor, uCEFv8StackFrame, 
   uCEFv8StackTrace, uCEFv8Value, uCEFValue, uCEFWaitableEvent, 
   uCEFWebPluginInfo, uCEFWebPluginInfoVisitor, uCEFWebPluginUnstableCallback, 
   uCEFWindowParent, uCEFWorkScheduler, uCEFWorkSchedulerThread, 
   uCEFWriteHandler, uCEFX509Certificate, uCEFX509CertPrincipal, uCEFXmlReader, 
-  uCEFZipReader, uCEFChromium, uBufferPanel, uCEFServer, uCEFServerComponent, 
-  uCEFServerEvents, uCEFServerHandler, LazarusPackageIntf;
+  uCEFZipReader, uCEFChromiumCore, uCEFChromium, uCEFBufferPanel, uCEFServer, 
+  uCEFServerComponent, uCEFServerEvents, uCEFServerHandler, uCEFWinControl, 
+  uCEFLinkedWindowParent, uCEFUrlRequestClientEvents, 
+  uCEFUrlRequestClientComponent, uCEFOSRIMEHandler, uCEFCookieAccessFilter, 
+  uCEFResourceReadCallback, uCEFResourceRequestHandler, 
+  uCEFResourceSkipCallback, uCEFSentinel, uCEFApplicationCore, 
+  uCEFOAuth2Helper, uCEFMediaObserver, uCEFMediaRoute, 
+  uCEFMediaRouteCreateCallback, uCEFMediaRouter, uCEFMediaSink, 
+  uCEFMediaSource, uCEFRegistration, uCEFWindowDelegate, uCEFWindow, 
+  uCEFMenuButtonDelegate, uCEFMenuButtonPressedLock, uCEFMenuButton, 
+  uCEFLabelButton, uCEFButtonDelegate, uCEFButton, uCEFBrowserViewDelegate, 
+  uCEFBrowserView, uCEFPanelDelegate, uCEFPanel, uCEFScrollView, 
+  uCEFTextfieldDelegate, uCEFTextfield, uCEFViewDelegate, uCEFView, 
+  uCEFFillLayout, uCEFBoxLayout, uCEFLayout, uCEFDisplay, 
+  uCEFMenuButtonComponent, uCEFLabelButtonComponent, uCEFButtonComponent, 
+  uCEFBrowserViewComponent, uCEFWindowComponent, uCEFPanelComponent, 
+  uCEFScrollViewComponent, uCEFTextfieldComponent, uCEFViewComponent, 
+  uCEFViewsFrameworkEvents, uCEFAudioHandler, uCEFDevToolsMessageObserver, 
+  uCEFMediaSinkDeviceInfoCallback, uCEFJson, uCEFBitmapBitBuffer, 
+  uCEFPrintDialogCallback, uCEFPrintHandler, uCEFPrintJobCallback, 
+  uCEFLinuxFunctions, uCEFLinuxTypes, uCEFLinuxConstants, 
+  uCEFWorkSchedulerQueueThread, uCEFLinkedWinControlBase, uCEFLazarusCocoa, 
+  uCEFBrowserWindow, uCEFOsrBrowserWindow, LazarusPackageIntf;
 
 implementation
 
@@ -55,8 +76,21 @@ begin
   RegisterUnit('uCEFWindowParent', @uCEFWindowParent.Register);
   RegisterUnit('uCEFWorkScheduler', @uCEFWorkScheduler.Register);
   RegisterUnit('uCEFChromium', @uCEFChromium.Register);
-  RegisterUnit('uBufferPanel', @uBufferPanel.Register);
+  RegisterUnit('uCEFBufferPanel', @uCEFBufferPanel.Register);
   RegisterUnit('uCEFServerComponent', @uCEFServerComponent.Register);
+  RegisterUnit('uCEFLinkedWindowParent', @uCEFLinkedWindowParent.Register);
+  RegisterUnit('uCEFUrlRequestClientComponent', 
+    @uCEFUrlRequestClientComponent.Register);
+  RegisterUnit('uCEFSentinel', @uCEFSentinel.Register);
+  RegisterUnit('uCEFMenuButtonComponent', @uCEFMenuButtonComponent.Register);
+  RegisterUnit('uCEFLabelButtonComponent', @uCEFLabelButtonComponent.Register);
+  RegisterUnit('uCEFBrowserViewComponent', @uCEFBrowserViewComponent.Register);
+  RegisterUnit('uCEFWindowComponent', @uCEFWindowComponent.Register);
+  RegisterUnit('uCEFPanelComponent', @uCEFPanelComponent.Register);
+  RegisterUnit('uCEFScrollViewComponent', @uCEFScrollViewComponent.Register);
+  RegisterUnit('uCEFTextfieldComponent', @uCEFTextfieldComponent.Register);
+  RegisterUnit('uCEFBrowserWindow', @uCEFBrowserWindow.Register);
+  RegisterUnit('uCEFOsrBrowserWindow', @uCEFOsrBrowserWindow.Register);
 end;
 
 initialization

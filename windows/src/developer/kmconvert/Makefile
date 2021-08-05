@@ -12,6 +12,11 @@ build: version.res manifest.res dirs icons
     $(COPY) $(WIN32_TARGET_PATH)\kmconvert.exe $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\kmconvert.dbg $(COPY) $(WIN32_TARGET_PATH)\kmconvert.dbg $(DEBUGPATH)\developer
 
+    # Copy template files to project
+    -rd /s/q $(ROOT)\bin\developer\projects\templates
+    -mkdir $(ROOT)\bin\developer\projects\templates
+    xcopy /s /y data\* $(ROOT)\bin\developer\projects\templates
+
 icons:
     rc icons.rc
 
@@ -24,9 +29,6 @@ signcode:
 wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\developer\kmconvert.exe /t keyman-developer
     $(SYMSTORE) $(DEBUGPATH)\developer\kmconvert.dbg /t keyman-developer
-
-backup:
-    $(WZZIP) $(BUILD)\developer\kmconvert.zip  $(BACKUPDEFAULTS) kmconvert.exe
 
 test-manifest:
     # test that (a) linked manifest exists and correct

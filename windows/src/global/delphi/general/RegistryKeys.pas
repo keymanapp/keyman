@@ -270,6 +270,7 @@ const
   SRegValue_CPIUP_Languages = 'Languages';
   SRegValue_CPIUP_TransientLangId = 'TransientLangId';
   SRegValue_CPIUP_CachedLanguageName = 'CachedLanguageName';
+  SRegValue_CPIUP_InputMethodOverride = 'InputMethodOverride';
 
   { User profile keys }
 
@@ -446,8 +447,10 @@ const
   SRegKey_KeymanEngineDebug_CU = SRegKey_KeymanEngineRoot_CU + '\Debug';
 
   SRegValue_Flag_UseRegisterHotkey = 'Flag_UseRegisterHotkey';
+  SRegValue_Flag_UseCachedHotkeyModifierState = 'Flag_UseCachedHotkeyModifierState';
   SRegValue_Flag_ShouldSerializeInput = 'Flag_ShouldSerializeInput';
   SRegValue_Flag_UseAutoStartTask = 'Flag_UseAutoStartTask';
+  SRegValue_Flag_SyncLanguagesToCloud = 'Flag_SyncLanguagesToCloud';
 
 // Fixed path names
 const

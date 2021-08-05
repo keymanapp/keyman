@@ -94,6 +94,8 @@ const
   SRegKey_UpgradeBackupPath_LM = '\'+SRegKey_KeymanEngine_LM+'\Upgrade Backup\';  // I2642
   SRegKey_UpgradeBackupPath_CU = '\'+SRegKey_KeymanEngine_CU+'\Upgrade Backup\';  // I2642
 
+  SRegValue_UpgradeRunKeyman = 'Upgrade - Start Keyman with Windows';
+
 const
   SFolderTavultesoft_                = 'Tavultesoft';                              // PF, PFC, AD, CAD
 

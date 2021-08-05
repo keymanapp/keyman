@@ -1,33 +1,38 @@
 package com.firstvoices.keyboards;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
-public final class RegionListActivity extends Activity {
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-	@Override
+public final class RegionListActivity extends AppCompatActivity {
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		final Context context = this;
+        super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        final Context context = this;
+
+        // Setup layout
+        setContentView(R.layout.activity_list_layout);
+        final Toolbar toolbar = findViewById(R.id.list_toolbar);
+        final TextView textView = findViewById(R.id.bar_title);
+        textView.setText(R.string.regions);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         final FVShared.FVRegionList regionList = FVShared.getInstance().getRegionList();
-
-		// Setup layout
-
-		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		setContentView(R.layout.list_layout);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.region_title_layout);
-        View titleDivider = getWindow().getDecorView().findViewById(getResources().getIdentifier("titleDivider", "id", "android"));
-        titleDivider.setBackgroundColor(Color.rgb(170, 18, 37));
-
         FVRegionListAdapter listAdapter = new FVRegionListAdapter(context, regionList);
         listAdapter.listFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf");
         final ListView listView = findViewById(R.id.listView);
@@ -52,12 +57,11 @@ public final class RegionListActivity extends Activity {
             }
         });
         listView.setSelectionFromTop(getIntent().getIntExtra("listPosition", 0), getIntent().getIntExtra("offsetY", 0));
+    }
 
-		final ImageButton backButton = findViewById(R.id.left_button);
-		backButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				finish();
-			}
-		});
-	}
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
+    }
 }

@@ -3,31 +3,34 @@
 # Install confirmation with details window
 
 import logging
-import os.path
+import os
 import pathlib
+import subprocess
 import sys
 import webbrowser
 import tempfile
 import gi
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 
 from gi.repository import Gtk, WebKit2
 from distutils.version import StrictVersion
 from keyman_config import _
+from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
 from keyman_config.list_installed_kmp import get_kmp_version
 from keyman_config.kmpmetadata import get_fonts
 from keyman_config.welcome import WelcomeView
 from keyman_config.uninstall_kmp import uninstall_kmp
-from keyman_config.get_kmp import user_keyboard_dir
+from keyman_config.get_kmp import InstallLocation, get_keyboard_dir, get_keyman_dir
 from keyman_config.accelerators import bind_accelerator, init_accel
 
 
 def find_keyman_image(image_file):
-    img_path = os.path.join("/usr/share/keyman/icons", image_file)
+    img_path = os.path.join(get_keyman_dir(InstallLocation.OS), "icons", image_file)
     if not os.path.isfile(img_path):
-        img_path = os.path.join("/usr/local/share/keyman/icons/", image_file)
+        img_path = os.path.join(get_keyman_dir(InstallLocation.Shared), "icons", image_file)
         if not os.path.isfile(img_path):
             img_path = os.path.join("keyman_config/icons/", image_file)
             if not os.path.isfile(img_path):
@@ -62,10 +65,13 @@ class InstallKmpWindow(Gtk.Dialog):
         with tempfile.TemporaryDirectory() as tmpdirname:
             extract_kmp(kmpfile, tmpdirname)
             info, system, options, keyboards, files = get_metadata(tmpdirname)
-            self.kbname = keyboards[0]['name']
+            if len(keyboards) > 0 and 'name' in keyboards[0]:
+                self.kbname = keyboards[0]['name']
+            else:
+                self.kbname = keyboardid
             self.checkcontinue = True
 
-            if installed_kmp_ver:
+            if installed_kmp_ver and info and 'version' in info and 'description' in info['version']:
                 if info['version']['description'] == installed_kmp_ver:
                     dialog = Gtk.MessageDialog(
                         viewkmp, 0, Gtk.MessageType.QUESTION,
@@ -132,9 +138,10 @@ class InstallKmpWindow(Gtk.Dialog):
             label = Gtk.Label()
             keyboardlayout = ""
             for kb in keyboards:
-                if keyboardlayout != "":
-                    keyboardlayout = keyboardlayout + "\n"
-                keyboardlayout = keyboardlayout + kb['name']
+                if 'name' in kb:
+                    if keyboardlayout != "":
+                        keyboardlayout = keyboardlayout + "\n"
+                    keyboardlayout = keyboardlayout + kb['name']
             label.set_text(keyboardlayout)
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
@@ -151,13 +158,14 @@ class InstallKmpWindow(Gtk.Dialog):
                 label = Gtk.Label()
                 fontlist = ""
                 for font in fonts:
-                    if fontlist != "":
-                        fontlist = fontlist + "\n"
-                    if font['description'][:5] == "Font ":
-                        fontdesc = font['description'][5:]
-                    else:
-                        fontdesc = font['description']
-                    fontlist = fontlist + fontdesc
+                    if 'description' in font:
+                        if fontlist != "":
+                            fontlist = fontlist + "\n"
+                        if font['description'][:5] == "Font ":
+                            fontdesc = font['description'][5:]
+                        else:
+                            fontdesc = font['description']
+                        fontlist = fontlist + fontdesc
                 label.set_text(fontlist)
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
@@ -169,24 +177,26 @@ class InstallKmpWindow(Gtk.Dialog):
             grid.attach_next_to(label3, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = label3
             label = Gtk.Label()
-            label.set_text(info['version']['description'])
+            if info and 'version' in info and 'description' in info['version']:
+                label.set_text(info['version']['description'])
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, label3, Gtk.PositionType.RIGHT, 1, 1)
 
             if info and 'author' in info:
+                author = info['author']
                 label4 = Gtk.Label()
                 label4.set_text(_("Author:   "))
                 label4.set_halign(Gtk.Align.END)
                 grid.attach_next_to(label4, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label4
                 label = Gtk.Label()
-                if 'url' in info['author']:
+                if 'url' in author and 'description' in author:
                     label.set_markup(
-                        "<a href=\"" + info['author']['url'] + "\" title=\"" +
-                        info['author']['url'] + "\">" + info['author']['description'] + "</a>")
-                else:
-                    label.set_text(info['author']['description'])
+                        "<a href=\"" + author['url'] + "\" title=\"" +
+                        author['url'] + "\">" + author['description'] + "</a>")
+                elif 'description' in author:
+                    label.set_text(author['description'])
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, label4, Gtk.PositionType.RIGHT, 1, 1)
@@ -199,9 +209,10 @@ class InstallKmpWindow(Gtk.Dialog):
                 grid.attach_next_to(label5, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label5
                 label = Gtk.Label()
-                label.set_markup(
-                    "<a href=\"" + info['website']['description'] + "\">" +
-                    info['website']['description'] + "</a>")
+                if 'description' in info['website']:
+                    label.set_markup(
+                        "<a href=\"" + info['website']['description'] + "\">" +
+                        info['website']['description'] + "</a>")
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, label5, Gtk.PositionType.RIGHT, 1, 1)
@@ -212,7 +223,8 @@ class InstallKmpWindow(Gtk.Dialog):
                 label6.set_halign(Gtk.Align.END)
                 grid.attach_next_to(label6, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 label = Gtk.Label()
-                label.set_text(info['copyright']['description'])
+                if 'description' in info['copyright']:
+                    label.set_text(info['copyright']['description'])
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
@@ -228,26 +240,34 @@ class InstallKmpWindow(Gtk.Dialog):
             readme_file = os.path.join(tmpdirname, self.readme)
 
             if os.path.isfile(readme_file):
-                with open(readme_file, "r") as read_file:
-                    readme_data = read_file.read()
-                    readme_uri = pathlib.Path(readme_file).as_uri()
-                    logging.debug(readme_data)
-                    webview.load_html(readme_data, readme_uri)
-                s = Gtk.ScrolledWindow()
-                s.add(webview)
-                self.page2.pack_start(s, True, True, 0)
+                try:
+                    with open(readme_file, "r") as read_file:
+                        readme_data = read_file.read()
+                        readme_added = True
+                        readme_uri = pathlib.Path(readme_file).as_uri()
+                        logging.debug(readme_data)
+                        webview.load_html(readme_data, readme_uri)
+                        s = Gtk.ScrolledWindow()
+                        s.add(webview)
+                        self.page2.pack_start(s, True, True, 0)
 
-                self.notebook = Gtk.Notebook()
-                self.notebook.set_tab_pos(Gtk.PositionType.BOTTOM)
-                mainhbox.pack_start(self.notebook, True, True, 0)
-                self.notebook.append_page(
-                    self.page1,
-                    Gtk.Label(_('Details')))
-                self.notebook.append_page(
-                    self.page2,
-                    Gtk.Label(_('README')))
+                        self.notebook = Gtk.Notebook()
+                        self.notebook.set_tab_pos(Gtk.PositionType.BOTTOM)
+                        mainhbox.pack_start(self.notebook, True, True, 0)
+                        self.notebook.append_page(
+                            self.page1,
+                            Gtk.Label(_('Details')))
+                        self.notebook.append_page(
+                            self.page2,
+                            Gtk.Label(_('README')))
+                except UnicodeDecodeError:
+                    readme_added = False
             else:
+                readme_added = False
+
+            if not readme_added:
                 mainhbox.pack_start(self.page1, True, True, 0)
+
         self.get_content_area().pack_start(mainhbox, True, True, 0)
 
         hbox = Gtk.Box(spacing=6)
@@ -288,11 +308,24 @@ class InstallKmpWindow(Gtk.Dialog):
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
         try:
-            install_kmp(self.kmpfile, self.online, language=self.language)
+            result = install_kmp(self.kmpfile, self.online, language=self.language)
+            if result:
+                # If install_kmp returns a string, it is an instruction for the end user,
+                # because for fcitx they will need to take extra steps to complete
+                # installation themselves.
+                dialog = Gtk.MessageDialog(
+                    self, 0, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK, result)
+                dialog.run()
+                dialog.destroy()
+                if is_fcitx_running():
+                    subprocess.run(['fcitx5-configtool'])
+
             if self.viewwindow:
                 self.viewwindow.refresh_installed_kmp()
             keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
-            welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
+            welcome_file = os.path.join(get_keyboard_dir(InstallLocation.User, keyboardid),
+                                        "welcome.htm")
             if os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
                 logging.debug(uri_path)

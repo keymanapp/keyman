@@ -1,18 +1,18 @@
 (*
   Name:             UfrmInstallKeyboardFromWeb
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Oct 2006
 
   Modified Date:    2 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Oct 2006 - mcdurdin - Initial version
                     05 Dec 2006 - mcdurdin - Refactor using XML-Renderer
                     12 Dec 2006 - mcdurdin - Capitalize form name
@@ -42,6 +42,8 @@ uses
   Vcl.Graphics,
   Winapi.Messages,
   Winapi.Windows,
+
+  Keyman.UI.UframeCEFHost,
   UfrmWebContainer,
   UfrmDownloadProgress,
   UfrmKeymanBase;
@@ -68,6 +70,8 @@ type
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
+    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean); override;
+    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean); override;
   end;
 
 implementation
@@ -76,6 +80,7 @@ uses
   System.Net.HttpClient,
   System.Net.URLClient,
   System.RegularExpressions,
+  uCEFTypes,
 
   httpuploader,
   GlobalProxySettings,
@@ -112,6 +117,7 @@ begin
   cef.OnLoadingStateChange := cefLoadingStateChange;
 
   FRenderPage := 'downloadkeyboard';
+  HelpTopic := 'context/download-keyboard';
 
   Content_Render;
 end;
@@ -135,6 +141,18 @@ begin
     not TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsGo));         // don't capture the launch url https://keyman.com/go/windows/download-keyboards
 end;
 
+procedure TfrmInstallKeyboardFromWeb.cefKeyEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
+begin
+  if (e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN]) and
+      (e.event.windows_key_code = VK_ESCAPE) then
+  begin
+    ModalResult := mrCancel
+  end
+  else
+    inherited;
+end;
+
 procedure TfrmInstallKeyboardFromWeb.cefLoadingStateChange(Sender: TObject;
   isLoading, canGoBack, canGoForward: Boolean);
 begin
@@ -144,6 +162,16 @@ begin
       then cef.cef.ExecuteJavaScript('updateBackButtonState(true)', cef.cef.Browser.MainFrame.Url)
       else cef.cef.ExecuteJavaScript('updateBackButtonState(false)', cef.cef.Browser.MainFrame.Url);
   end;
+end;
+
+procedure TfrmInstallKeyboardFromWeb.cefPreKeySyncEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
+begin
+  if (e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN]) and
+      (e.event.windows_key_code = VK_ESCAPE) then
+    Handled := True
+  else
+    inherited;
 end;
 
 procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseEx(Sender: TObject; const Url: string;
@@ -230,6 +258,7 @@ begin
   FTempFilename := FDownloadFilename + '.download';
   Client := THTTPClient.Create;
   try
+    Client.SecureProtocols := [THTTPSecureProtocol.TLS1, THTTPSecureProtocol.TLS11, THTTPSecureProtocol.TLS12];
     Client.OnReceiveData := HttpReceiveData;
 
     Stream := TFileStream.Create(FTempFilename, fmCreate);

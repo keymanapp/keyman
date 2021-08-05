@@ -4,5 +4,6 @@ project.xcworkspace
 xcuserdata
 build
 KeymanEngine.framework
+KeymanEngine.xcframework
 FirstVoices/Keyboards
 Carthage

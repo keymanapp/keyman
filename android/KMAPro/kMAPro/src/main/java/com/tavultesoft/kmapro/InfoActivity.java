@@ -1,13 +1,10 @@
 /**
- * Copyright (C) 2017-2019 SIL International. All rights reserved.
+ * Copyright (C) 2017-2021 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
 
 import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.BuildConfig;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.FormFactor;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -19,17 +16,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
-import androidx.appcompat.app.AppCompatActivity;
 
 public class InfoActivity extends BaseActivity {
   private final static String TAG = "InfoActivity";
   private WebView webView;
-  private final String HELP_PRODUCTION_HOST = "help.keyman.com";
-  private final String HELP_STAGING_HOST = "help.keyman-staging.com";
-  private final String HELP_BASE_FORMAT_STR = "https://%s/products/android/%s/%s?embed=android&formfactor=%s";
-  private String kmUrl = "";
-  private final String htmlPath = "file:///android_asset/info/products/android";
-  private final String htmlPage = "index.php";
+  private final String htmlPath = "file:///android_asset/info";
+  private final String htmlPage = "index.html";
   private String kmOfflineUrl = "";
 
   @SuppressLint("SetJavaScriptEnabled")
@@ -48,36 +40,12 @@ public class InfoActivity extends BaseActivity {
     String versionTitle = String.format(getString(R.string.title_version), versionStr);
     version.setText(versionTitle);
 
-    // Extract the the major minor version from the full version string
-    String[] versionArray = versionStr.split("\\.", 3);
-    String majorMinorVersion = String.format("%s.%s", versionArray[0], versionArray[1]);
-
-    // Determine the appropriate form factor
-    FormFactor ff = KMManager.getFormFactor();
-    String formFactor;
-
-    if(ff == FormFactor.PHONE) {
-      formFactor = "phone";
-    } else {
-      formFactor = "tablet";
-    }
-
-    String helpHost = "";
-    switch (KMManager.getTier(BuildConfig.VERSION_NAME)) {
-      case ALPHA:
-      case BETA:
-        helpHost = HELP_STAGING_HOST;
-        break;
-      default:
-        helpHost = HELP_PRODUCTION_HOST;
-    }
-
-    kmUrl = String.format(HELP_BASE_FORMAT_STR, helpHost, majorMinorVersion, htmlPage, formFactor);
     // The offline mirroring process (currently) adds .html to the end of the whole string.
-    kmOfflineUrl = String.format("%s/%s/%s.html", htmlPath, formFactor, htmlPage);
+    kmOfflineUrl = String.format("%s/%s", htmlPath, htmlPage);
     webView = (WebView) findViewById(R.id.infoWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
     webView.getSettings().setJavaScriptEnabled(true);
+    webView.getSettings().setAllowFileAccess(true);
     webView.getSettings().setUseWideViewPort(true);
     webView.getSettings().setLoadWithOverviewMode(true);
     webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -107,13 +75,8 @@ public class InfoActivity extends BaseActivity {
       }
     });
 
-    if (KMManager.hasConnection(context)) {
-      // Load app info page from server
-      webView.loadUrl(kmUrl);
-    } else {
-      // Load app info page from assets
-      webView.loadUrl(kmOfflineUrl);
-    }
+    // Always load offline info page from assets
+    webView.loadUrl(kmOfflineUrl);
   }
 
   @Override
