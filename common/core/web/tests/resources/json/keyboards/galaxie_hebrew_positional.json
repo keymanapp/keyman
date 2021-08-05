@@ -1,0 +1,10 @@
+{
+  "id": "galaxie_hebrew_positional",
+  "name":"Galaxie Hebrew (Positional)",
+  "languages":{
+    "id":"he",
+    "name": "Hebrew",
+    "region": 3
+  },
+  "filename":"resources/keyboards/galaxie_hebrew_positional-2.2.js"
+}
