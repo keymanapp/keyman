@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.280 stable 2021-08-05
+
+* chore(ios,windows): Update crowdin strings for Azerbaijani 🍒  (#5487)
+
 ## 14.0.279 stable 2021-07-21
 
 * fix(ios): keyboard swapping 🍒 (#5476)
