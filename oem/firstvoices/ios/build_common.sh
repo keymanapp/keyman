@@ -29,6 +29,7 @@ display_usage ( ) {
     echo "  -no-carthage    Disables downloading and building for dependencies."
     echo "  -no-codesign    Performs the build without code signing."
     echo "  -debug          Sets the configuration to debug mode instead of release."
+    echo "  -all-artifacts  Produces all build artifacts, including a Simulator-installable copy of the .app"
     echo
     echo "  If no settings are specified this script will grab a copy of the most recent build of KeymanEngine,"
     echo "  performing an initial build of it if necessary."
@@ -60,6 +61,7 @@ do_clean ( ) {
 
 DO_UPDATE=true
 DO_ARCHIVE=true
+DO_SIMULATOR_TARGET=false
 DO_CARTHAGE=true
 FORCE_KMEI_BUILD=false
 ALLOW_KMEI_BUILD=true
@@ -102,6 +104,9 @@ while [[ $# -gt 0 ]] ; do
         -debug)
             CONFIG=Debug
             KMEI_FLAGS="$KMEI_FLAGS -debug"
+            ;;
+        -all-artifacts)
+            DO_SIMULATOR_TARGET=true
             ;;
     esac
     shift
@@ -186,25 +191,34 @@ if [ $CODE_SIGN = true ]; then
   if [ $DO_ARCHIVE = true ]; then
     # Time to prepare the deployment archive data.
     echo ""
-    echo "Preparing .ipa file for deployment."
+    echo "Preparing .ipa file for deployment to real devices."
     xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
 
     assertDirExists "$ARCHIVE_PATH"
 
-    xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
+    xcodebuild $XCODEFLAGS_EXT -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
                -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
   else
-    xcodebuild $XCODEFLAGS -scheme "$TARGET" \
+    xcodebuild $XCODEFLAGS_EXT -scheme "$TARGET" \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
   fi
 else
   xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
-             $XCODEFLAGS -scheme "$TARGET" \
+             $XCODEFLAGS_EXT -scheme "$TARGET" \
+             VERSION=$VERSION \
+             VERSION_WITH_TAG=$VERSION_WITH_TAG
+fi
+
+if [ $DO_SIMULATOR_TARGET == true ]; then
+  echo "Preparing .app file as Simulator-targeted build artifact."
+  xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+             $XCODEFLAGS_EXT -scheme "$TARGET" \
+             -sdk iphonesimulator \
              VERSION=$VERSION \
              VERSION_WITH_TAG=$VERSION_WITH_TAG
 fi
