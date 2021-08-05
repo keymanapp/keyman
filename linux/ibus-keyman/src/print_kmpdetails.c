@@ -27,7 +27,7 @@ main (gint argc, gchar **argv)
     stat(kmp_json, &filestat);
     if (!S_ISREG(filestat.st_mode))
     {
-      g_print ("Usage: kmpdetails <kmp.json>\n");
+      g_print ("Usage: kmpdetails <path to kmp.json>\n");
       g_print ("ERROR: file %s not found\n", kmp_json);
       g_free(kmp_json);
       return EXIT_FAILURE;
