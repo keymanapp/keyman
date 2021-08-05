@@ -1,5 +1,5 @@
 /* Title for the bookmarks menu within the embedded browser */
-"browser-bookmarks-add-title" = "Əlfəcin əlavə etmək";
+"browser-bookmarks-add-title" = "Əlfəcin əlavə et";
 
 /* Title for the bookmarks menu within the embedded browser */
 "browser-bookmarks-none" = "Əlfəcin yoxdur";
@@ -17,7 +17,7 @@
 "error-opening-page" = "Səhifə açıla bilmir";
 
 /* Long-form used when installing a font in order to display a language properly. */
-"font-install-description" = "Bütün tətbiqlərinizdə %@ görüntüsünü düzgün görünmək üçün Quraşdır'a toxunun";
+"font-install-description" = "Bütün tətbiqlərinizdə %@ in düzgün görünməsi üçün \"Quraşdır\"a toxunun";
 
 /* The name of the iOS Settings menu option for keyboards */
 "ios-settings-keyboards" = "Klaviaturalar";
@@ -30,13 +30,13 @@ underneath the app's name within the app-specific keyboard menu.) */
 "language-for-font" = "%@ Şrift";
 
 /* Used for 'add' options within menus */
-"menu-add" = "Əlavə etmək";
+"menu-add" = "Əlavə et";
 
 /* Used to indicate a sequence of menu options that a user needs to copy.  May be chained.  Example:  "Keyboards (1) > Enable Keyman (2)" */
 "menu-breadcrumbing" = "%1$@ > %2$@";
 
 /* Used to exit a menu without choosing an option */
-"menu-cancel" = "Ləğv etmək";
+"menu-cancel" = "İmtina";
 
 /* Menu option that erases all previously-typed text. */
 "menu-clear-text" = "Mətni təmizlə";
@@ -51,13 +51,13 @@ underneath the app's name within the app-specific keyboard menu.) */
 "menu-more" = "Daha çox";
 
 /* Menu option used to edit keyboard and dictionary settings */
-"menu-settings" = "Parametrlər";
+"menu-settings" = "Tənzimləmələr";
 
 /* Menu option that displays the iOS Share menu */
 "menu-share" = "Paylaş";
 
 /* Menu option that displays an embedded web browser. */
-"menu-show-browser" = "Brauzer";
+"menu-show-browser" = "Səyyah";
 
 /* Menu option used to control in-app font size. */
 "menu-text-size" = "Mətn ölçüsü";
@@ -66,16 +66,16 @@ underneath the app's name within the app-specific keyboard menu.) */
 "text-size-label" = "Mətn ölçüsü:%i";
 
 /* Text to indicate that a user should set a toggle within iOS Settings to 'active'. */
-"toggle-to-enable" = "%@ İşə salmaq";
+"toggle-to-enable" = "Fəallaşdır: %@";
 
 /* First option on the Get Started tutorial - Add a keyboard for your language */
-"tutorial-add-keyboard" = "Sizin diliniz üçün klaviaturanı əlavə edin";
+"tutorial-add-keyboard" = "Diliniz üçün klaviatura əlavə edin";
 
 /* Third option on the Get Started tutorial - Displays app help. */
 "tutorial-show-help" = "Ətraflı məlumat";
 
 /* Second option on the Get Started tutorial - Set up Keyman as system-wide keyboard */
-"tutorial-system-keyboard" = "Keyman ümumsistem klaviatura kimi işə salmaq";
+"tutorial-system-keyboard" = "\"Keyman\"ı geniş sistem klaviaturası kimi quraşdırın";
 
 /* Used to display app version (as in \"Version: 1.0.2\" */
-"version-label" = "Versiya %@";
+"version-label" = "Versiya: %@";
