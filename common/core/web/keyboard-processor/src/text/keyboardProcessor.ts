@@ -224,7 +224,7 @@ namespace com.keyman.text {
         matchBehavior = this.keyboardInterface.processKeystroke(outputTarget, keyEvent);
       }
 
-      if(matchBehavior.triggerKeyDefault) {
+      if(!matchBehavior || matchBehavior.triggerKeyDefault) {
         // Restore the virtual key code if a mnemonic keyboard is being used
         // If no vkCode value was stored, maintain the original Lcode value.
         keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
@@ -237,7 +237,11 @@ namespace com.keyman.text {
         // Many keyboards rely upon these 'implied rules'.
         let defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget);
         if(defaultBehavior) {
-          matchBehavior.mergeInDefaults(defaultBehavior);
+          if(!matchBehavior) {
+            matchBehavior = defaultBehavior;
+          } else {
+            matchBehavior.mergeInDefaults(defaultBehavior);
+          }
           matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
         } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
 

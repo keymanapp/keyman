@@ -239,8 +239,6 @@ namespace com.keyman.text {
         }
       }
 
-      /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
-
       return ruleBehavior;
     }
 
