@@ -80,6 +80,8 @@ final class KMKeyboard extends WebView {
   private boolean ShouldShowHelpBubble = false;
   private boolean isChiral = false;
 
+  private int currentKeyboardErrorReports = 0;
+
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
   protected boolean isHelpBubbleEnabled = true;
@@ -153,7 +155,6 @@ final class KMKeyboard extends WebView {
 
         // Send console errors to Sentry in case they're missed by KMW sentryManager
         // (Ignoring spurious message "No keyboard stubs exist = ...")
-        // TODO: Analyze if this error warrants reverting to default keyboard
         // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
 
         if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
@@ -163,14 +164,6 @@ final class KMKeyboard extends WebView {
           String sourceID = cm.sourceId().replaceAll(NAVIGATION_PATTERN, "$1$2");
           sendKMWError(cm.lineNumber(), sourceID, cm.message());
           sendError(packageID, keyboardID, "");
-          Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
-          if (firstKeyboard != null) {
-            // Revert to first keyboard in the list
-            setKeyboard(firstKeyboard);
-          } else {
-            // Fallback to sil_euro_latin (though 3rd party keyboards wont have it)
-            setKeyboard(KMManager.getDefaultKeyboard(context));
-          }
         }
 
         return true;
@@ -497,6 +490,9 @@ final class KMKeyboard extends WebView {
       return false;
     }
 
+    // Reset the counter for showing / sending errors related to the selected keybard
+    currentKeyboardErrorReports = 0;
+
     boolean retVal = true;
     // keyboardVersion only needed for legacy cloud/ keyboards.
     // Otherwise, no need for the JSON overhead of determining the keyboard version from kmp.json
@@ -591,12 +587,20 @@ final class KMKeyboard extends WebView {
   // Display localized Toast notification that keyboard selection failed, so loading default keyboard.
   // Also sends a message to Sentry (not localized)
   private void sendError(String packageID, String keyboardID, String languageID) {
-    BaseActivity.makeToast(context, R.string.fatal_keyboard_error, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
+    this.currentKeyboardErrorReports++;
 
-    // Don't use localized string R.string.fatal_keyboard_error msg for Sentry
-    String msg = KMString.format("Fatal keyboard error with %1$s:%2$s for %3$s language. Loading default keyboard.",
-      packageID, keyboardID, languageID);
-    Sentry.captureMessage(msg);
+    if(this.currentKeyboardErrorReports == 1) {
+      BaseActivity.makeToast(context, R.string.fatal_keyboard_error_short, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
+    }
+
+    if(this.currentKeyboardErrorReports < 5) {
+      // We'll only report up to 5 errors in a given keyboard to avoid spamming
+      // errors and using unnecessary bandwidth doing so
+      // Don't use localized string R.string.fatal_keyboard_error msg for Sentry
+      String msg = KMString.format("Error in keyboard %1$s:%2$s for %3$s language.",
+        packageID, keyboardID, languageID);
+      Sentry.captureMessage(msg);
+    }
   }
 
   // Set the base path of the keyboard depending on the package ID
@@ -1333,6 +1337,17 @@ final class KMKeyboard extends WebView {
   public static void removeOnKeyboardEventListener(OnKeyboardEventListener listener) {
     if (kbEventListeners != null) {
       kbEventListeners.remove(listener);
+    }
+  }
+
+  public void reloadAfterError() {
+    Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
+    if (firstKeyboard != null) {
+      // Revert to first keyboard in the list
+      setKeyboard(firstKeyboard);
+    } else {
+      // Fallback to sil_euro_latin (though 3rd party keyboards wont have it)
+      setKeyboard(KMManager.getDefaultKeyboard(context));
     }
   }
 
