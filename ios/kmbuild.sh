@@ -302,7 +302,9 @@ if [ $DO_KEYMANAPP = true ]; then
 
     if [ $DO_CODE_SIGN == true ]; then
       echo "Preparing .ipa file for deployment to real devices"
-      xcodebuild $XCODEFLAGS_EXT -exportArchive -archivePath $ARCHIVE_PATH \
+      # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
+      # Xcode to generate a build error.
+      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
                   -exportOptionsPlist exportAppStore.plist \
                   -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
     fi
