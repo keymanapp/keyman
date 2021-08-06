@@ -528,7 +528,7 @@ namespace com.keyman.osk {
         return;
       }
 
-      this.render();
+      this.makeVisible();
 
       var Ls = this._Box.style;
 
@@ -633,9 +633,8 @@ namespace com.keyman.osk {
       }
 
       // Save current size if visible
-      if(this._Box && this._Box.style.display == 'block' && this.vkbd) {
-        this.vkbd.refit();
-      }
+      const priorDisplayStyle = this._Box.style.display;
+      this.makeHidden(hiddenByUser);
 
       if(hiddenByUser) {
         //osk.loadCookie(); // preserve current offset and userlocated state
@@ -651,6 +650,9 @@ namespace com.keyman.osk {
       this._Visible = false;
       if(this._Box && device.touchable && this._Box.offsetHeight > 0) { // I3363 (Build 301)
         var os=this._Box.style;
+        // Prevent insta-hide behavior; we want an animated fadeout here.
+        os.display = priorDisplayStyle;
+
         //Firefox doesn't transition opacity if start delay is explicitly set to 0!
         if(typeof(os.MozBoxSizing) == 'string') {
           os.transition='opacity 0.8s linear';
@@ -678,10 +680,6 @@ namespace com.keyman.osk {
             this._Box.addEventListener('webkitTransitionEnd', this.hideNow, false);
           }
         }.bind(this), 200);      // Wait a bit before starting, to allow for moving to another element
-      } else {
-        if(this._Box) {
-          this._Box.style.display = 'none';
-        }
       }
 
       // Allow UI to execute code when hiding the OSK
