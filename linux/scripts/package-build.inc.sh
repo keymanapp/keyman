@@ -21,7 +21,7 @@ function checkPrerequisites() {
     if [ "${PROJECT}" != "" ]; then
         projects="${PROJECT}"
     else
-        projects="keyman-keyboardprocessor kmflcomp libkmfl ibus-kmfl keyman-config ibus-keyman"
+        projects="keyman kmflcomp libkmfl ibus-kmfl"
     fi
 }
 
@@ -29,13 +29,13 @@ function downloadSource() {
     local packageDir
     packageDir=$1
 
-    if [ "${proj}" == "keyman-keyboardprocessor" ]; then
-       cd ${BASEDIR}/../common/core/desktop
+    if [ "${proj}" == "keyman" ]; then
+       cd ${BASEDIR}/..
     else
        cd ${proj}
     fi
 
-    if [ "${proj}" == "keyman-config" ]; then
+    if [ "${proj}" == "keyman" ]; then
         make clean
     fi
 

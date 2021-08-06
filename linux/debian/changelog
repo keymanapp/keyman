@@ -1,3 +1,9 @@
+keyman (15.0.90) UNRELEASED; urgency=medium
+
+  * Consolidate source packages
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 02 Aug 2021 18:13:58 +0200
+
 keyman-config (14.0.276-2) experimental; urgency=medium
 
   * Team upload

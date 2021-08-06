@@ -1,0 +1,6 @@
+linux/keyman-config/km-config.bash-completion km-config
+linux/keyman-config/km-kvk2ldml.bash-completion km-kvk2ldml
+linux/keyman-config/km-package-get.bash-completion km-package-get
+linux/keyman-config/km-package-install.bash-completion km-package-install
+linux/keyman-config/km-package-list-installed.bash-completion km-package-list-installed
+linux/keyman-config/km-package-uninstall.bash-completion km-package-uninstall
