@@ -47,32 +47,7 @@ namespace com.keyman.osk {
 
       document.body.appendChild(this._Box);
 
-      // For mouse click to prevent loss of focus
-      util.attachDOMEvent(this._Box, 'mousedown', function(obj){
-        keymanweb.uiManager.setActivatingUI(true);
-        return false;
-      });
-
-      // And to prevent touch event default behaviour on mobile devices
-      // TODO: are these needed, or do they interfere with other OSK event handling ????
-      if(util.device.touchable) { // I3363 (Build 301)
-        var cancelEventFunc = function(e) {
-          if(e.cancelable) {
-            e.preventDefault();
-          }
-          e.stopPropagation();
-          return false;
-        };
-
-        util.attachDOMEvent(this._Box, 'touchstart', function(e) {
-          keymanweb.uiManager.setActivatingUI(true);
-          return cancelEventFunc(e);
-        });
-
-        util.attachDOMEvent(this._Box, 'touchend', cancelEventFunc);
-        util.attachDOMEvent(this._Box, 'touchmove', cancelEventFunc);
-        util.attachDOMEvent(this._Box, 'touchcancel', cancelEventFunc);
-
+      if(util.device.touchable) {
         // Can only get (initial) viewport scale factor after page is fully loaded!
         this.vpScale=util.getViewportScale();
       }
@@ -853,15 +828,6 @@ namespace com.keyman.osk {
      */
     ['addEventListener'](event: string, func: (obj) => boolean) {
       return com.keyman.singleton.util.addEventListener('osk.'+event, func);
-    }
-
-    ['shutdown']() {
-      // Remove the OSK's elements from the document, allowing them to be properly cleaned up.
-      // Necessary for clean engine testing.
-      var _box = this._Box;
-      if(_box.parentElement) {
-        _box.parentElement.removeChild(_box);
-      }
     }
   }
 }

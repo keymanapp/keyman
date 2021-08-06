@@ -17,7 +17,121 @@ namespace com.keyman.osk {
 
     protected device: com.keyman.utils.DeviceSpec;
 
+    private _boxBaseMouseDown:        (e: MouseEvent) => boolean; 
+    private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
+    private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
+
     private keyboard: keyboards.Keyboard;
+    
+    /**
+     * The configured width for this OSKManager.  May be `undefined` or `null`
+     * to allow automatic width scaling. 
+     */
+    private _width: ParsedLengthStyle;
+
+    /**
+     * The configured height for this OSKManager.  May be `undefined` or `null`
+     * to allow automatic height scaling. 
+     */
+    private _height: ParsedLengthStyle;
+
+    /**
+     * The computed width for this OSKManager.  May be null if auto sizing
+     * is allowed and the OSKManager is not currently in the DOM hierarchy.
+     */
+    private _computedWidth: number;
+
+    /**
+    * The computed height for this OSKManager.  May be null if auto sizing
+    * is allowed and the OSKManager is not currently in the DOM hierarchy.
+    */
+    private _computedHeight: number;
+
+    /**
+     * The base font size to use for hosted `Banner`s and `VisualKeyboard`
+     * instances.
+     */
+    private _baseFontSize: ParsedLengthStyle;
+
+    private needsLayout: boolean = true;
+
+    constructor(deviceSpec: com.keyman.utils.DeviceSpec) {
+      this.device = deviceSpec;
+
+      // OSK initialization - create DIV and set default styles
+      this._Box = document.createElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
+      this._Box.style.userSelect = 'none';
+
+      // Initializes the two constant OSKComponentView fields.
+      this.bannerView   = new BannerManager();
+      this.keyboardView = null;
+
+      let keymanweb = com.keyman.singleton;
+      let util = keymanweb.util;
+
+      // Install the default OSK stylesheet
+      util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
+
+      this.setBaseMouseEventListeners();
+      if(deviceSpec.touchable) {
+        this.setBaseTouchEventListeners();
+      }
+    }
+
+    private setBaseMouseEventListeners() {
+      let keymanweb = com.keyman.singleton;
+
+      this._boxBaseMouseDown = function(e) {
+        keymanweb.uiManager.setActivatingUI(true);
+        return false;
+      }
+
+      this._Box.addEventListener('mousedown', this._boxBaseMouseDown, false);
+    }
+
+    private removeBaseMouseEventListeners() {
+      if(this._boxBaseMouseDown) {
+        this._Box.removeEventListener('mousedown', this._boxBaseMouseDown, false);
+        this._boxBaseMouseDown = null;
+      }
+    }
+
+    private setBaseTouchEventListeners() {
+      // And to prevent touch event default behaviour on mobile devices
+      let keymanweb = com.keyman.singleton;
+
+      var cancelEventFunc = this._boxBaseTouchEventCancel = function(e) {
+        if(e.cancelable) {
+          e.preventDefault();
+        }
+        e.stopPropagation();
+        return false;
+      };
+
+      this._boxBaseTouchStart = function(e) {
+        keymanweb.uiManager.setActivatingUI(true);
+        return cancelEventFunc(e);
+      }
+
+      this._Box.addEventListener('touchstart', this._boxBaseTouchStart, false);
+      this._Box.addEventListener('touchmove',  this._boxBaseTouchEventCancel, false);
+      this._Box.addEventListener('touchend',  this._boxBaseTouchEventCancel, false);
+      this._Box.addEventListener('touchcancel',  this._boxBaseTouchEventCancel, false);
+    }
+
+    private removeBaseTouchEventListeners() {
+      if(!this._boxBaseTouchEventCancel) {
+        return;
+      }
+
+      this._Box.removeEventListener('touchstart', this._boxBaseTouchStart, false);
+      this._Box.removeEventListener('touchmove',  this._boxBaseTouchEventCancel, false);
+      this._Box.removeEventListener('touchend',  this._boxBaseTouchEventCancel, false);
+      this._Box.removeEventListener('touchcancel',  this._boxBaseTouchEventCancel, false);
+
+      this._boxBaseTouchEventCancel = null;
+      this._boxBaseTouchStart = null;
+    }
 
     public get vkbd(): VisualKeyboard {
       if(this.keyboardView instanceof VisualKeyboard) {
@@ -30,38 +144,6 @@ namespace com.keyman.osk {
     public get banner(): BannerManager {  // Maintains old reference point used by embedding apps.
       return this.bannerView;
     }
-
-    /**
-     * The configured width for this OSKManager.  May be `undefined` or `null`
-     * to allow automatic width scaling. 
-     */
-     private _width: ParsedLengthStyle;
-
-     /**
-      * The configured height for this OSKManager.  May be `undefined` or `null`
-      * to allow automatic height scaling. 
-      */
-     private _height: ParsedLengthStyle;
- 
-     /**
-      * The computed width for this OSKManager.  May be null if auto sizing
-      * is allowed and the OSKManager is not currently in the DOM hierarchy.
-      */
-     private _computedWidth: number;
- 
-     /**
-     * The computed height for this OSKManager.  May be null if auto sizing
-     * is allowed and the OSKManager is not currently in the DOM hierarchy.
-     */
-     private _computedHeight: number;
- 
-     /**
-      * The base font size to use for hosted `Banner`s and `VisualKeyboard`
-      * instances.
-      */
-     private _baseFontSize: ParsedLengthStyle;
- 
-     private needsLayout: boolean = true;
 
     /**
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
@@ -154,24 +236,6 @@ namespace com.keyman.osk {
     public set activeKeyboard(keyboard: keyboards.Keyboard) {
       this.keyboard = keyboard;
       this.loadActiveKeyboard();
-    }
-
-    constructor(deviceSpec: com.keyman.utils.DeviceSpec) {
-      this.device = deviceSpec;
-
-      // OSK initialization - create DIV and set default styles
-      this._Box = document.createElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
-      this._Box.style.userSelect = 'none';
-
-      // Initializes the two constant OSKComponentView fields.
-      this.bannerView   = new BannerManager();
-      this.keyboardView = null;
-
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
-      // Install the default OSK stylesheet
-      util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
     }
 
     /* private */ computeFrameHeight(): number {
@@ -407,6 +471,19 @@ namespace com.keyman.osk {
 
       // Add primary keyboard element to OSK
       return vkbd;
+    }
+
+    ['shutdown']() {
+      // Disable the OSK's event handlers.
+      this.removeBaseMouseEventListeners();
+      this.removeBaseTouchEventListeners();
+
+      // Remove the OSK's elements from the document, allowing them to be properly cleaned up.
+      // Necessary for clean engine testing.
+      var _box = this._Box;
+      if(_box.parentElement) {
+        _box.parentElement.removeChild(_box);
+      }
     }
   }
 }
