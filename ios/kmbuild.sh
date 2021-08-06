@@ -37,7 +37,7 @@ display_usage ( ) {
     echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
     echo "  -debug                  Sets the configuration to debug mode instead of release."
     echo "  -download-resources     Download up-to-date versions of the engine's default resources from downloads.keyman.com."
-    echo "  -add-sim-artifact       Produces all build artifacts, including a Simulator-installable copy of the .app"
+    echo "  -add-sim-artifact       Also produce a Simulator-installable .app build artifact"
 exit 1
 }
 

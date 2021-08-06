@@ -29,7 +29,7 @@ display_usage ( ) {
     echo "  -no-carthage       Disables downloading and building for dependencies."
     echo "  -no-codesign       Performs the build without code signing."
     echo "  -debug             Sets the configuration to debug mode instead of release."
-    echo "  -add-sim-artifact  Produces all build artifacts, including a Simulator-installable copy of the .app"
+    echo "  -add-sim-artifact  Also produce a Simulator-installable .app build artifact"
     echo
     echo "  If no settings are specified this script will grab a copy of the most recent build of KeymanEngine,"
     echo "  performing an initial build of it if necessary."
