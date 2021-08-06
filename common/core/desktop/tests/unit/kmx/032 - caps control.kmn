@@ -32,5 +32,6 @@ c Shift will free caps lock when it is released, so this test should still have 
 + [NCAPS K_6] > 'fail.'
 + [CAPS K_6] > 'pass.'
 
+c Shift was pressed and released ([K_SHIFT]) so Caps should be off before this
 + [CAPS K_7] > 'fail.'
 + [NCAPS K_7] > 'pass.'
