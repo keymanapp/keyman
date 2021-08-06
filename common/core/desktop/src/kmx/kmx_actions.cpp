@@ -45,7 +45,12 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
     break;
 
   case QIT_CHAR:
-    m_context->Add((KMX_WORD) dwData);
+    if(Uni_IsSMP(dwData)) {
+      m_context->Add(Uni_UTF32ToSurrogate1(dwData));
+      m_context->Add(Uni_UTF32ToSurrogate2(dwData));
+    } else {
+      m_context->Add((KMX_WORD) dwData);
+    }
     break;
 
   case QIT_BACK:
