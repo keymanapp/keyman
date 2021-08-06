@@ -55,6 +55,7 @@ implementation
 
 uses
   kmxfileconsts,
+  Unicode,
   VKeyChars;
 
 { TVisualKeyboardImportKMX }
@@ -117,10 +118,23 @@ begin
     data := '';
     for i := 0 to FEvents.Count - 1 do
     begin
-      if (FEvents[i].EventType = etAction) and
-        (FEvents[i].Action.ActionType = KM_KBP_IT_CHAR) then
+      if FEvents[i].EventType <> etAction then
       begin
-        data := data + FEvents[i].Action.Text;
+        Continue;
+      end;
+
+      case FEvents[i].Action.ActionType of
+        KM_KBP_IT_CHAR:
+          data := data + FEvents[i].Action.Text;
+        KM_KBP_IT_BACK:
+          if data.Length > 0 then
+          begin
+            if (data.Length > 1) and
+                Uni_IsSurrogate1(data[data.Length-1]) and
+                Uni_IsSurrogate2(data[data.Length])
+              then Delete(data, data.Length - 1, 2)
+              else Delete(data, data.Length, 1);
+          end;
       end;
     end;
 
@@ -187,7 +201,7 @@ begin
   FShow102Key := False;
 
   for i := 0 to keys.Count - 1 do
-    if TVKKey(keys[i]).vkey = $E2 then
+    if TVKKey(keys[i]).vkey = KM_KBP_VKEY_oE2 then
     begin
       FShow102Key := True;
       Exit;
