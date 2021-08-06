@@ -90,9 +90,6 @@ namespace com.keyman.osk {
       this._Box = null;
     }
 
-    protected preKeyboardLoad() {
-      
-    }
     protected postKeyboardLoad() {
       this._Visible = false;  // I3363 (Build 301)
 
@@ -519,17 +516,19 @@ namespace com.keyman.osk {
      */
     _Show(Px?: number, Py?: number) {
       let keymanweb = com.keyman.singleton;
-      let device = keymanweb.util.device;
+      let device = this.device;
 
       // Do not try to display OSK if undefined, or no active element
-      if(this._Box == null || keymanweb.domManager.getActiveElement() == null) {
+      if(keymanweb.domManager.getActiveElement() == null) {
         return;
       }
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if((!device.touchable) && (keymanweb.core.activeKeyboard == null || !this._Enabled)) {
+      if((!device.touchable) && (this.activeKeyboard == null || !this._Enabled)) {
         return;
       }
+
+      this.render();
 
       var Ls = this._Box.style;
 
@@ -549,33 +548,15 @@ namespace com.keyman.osk {
         Ls.opacity='1';
       }
 
-      // TODO:  Move this into the VisualKeyboard class!
       // The following code will always be executed except for externally created OSK such as EuroLatin
-      if(this.vkbd) {
-        // Enable the currently active keyboard layer and update the default nextLayer member
-        this.vkbd.updateState();
+      if(this.vkbd && device.touchable) {
+        Ls.position='fixed';
+        Ls.left=Ls.bottom='0px';
+        Ls.border='none';
+        Ls.borderTop='1px solid gray';
 
-        // Extra style changes and overrides for touch-mode.
-        if(device.touchable) {
-          let ks = this.vkbd.kbdDiv.style;
-          ks.position = Ls.position='fixed';
-          ks.bottom = Ls.left=Ls.bottom='0px';
-          Ls.border='none';
-          Ls.borderTop='1px solid gray';
-
-          this._Enabled=true;
-          this._Visible=true; // I3363 (Build 301)
-        }
-      }
-
-      //TODO: may need to return here for touch devices??
-      Ls.display='block'; //Ls.visibility='visible';
-
-      // first thing after it's made visible.
-      this.refreshLayoutIfNeeded();
-
-      if(this.vkbd) {
-        this.vkbd.showLanguage();
+        this._Enabled=true;
+        this._Visible=true; // I3363 (Build 301)
       }
 
       if(device.formFactor == 'desktop') {
@@ -622,13 +603,6 @@ namespace com.keyman.osk {
         if(this.desktopLayout) {
           this.desktopLayout.titleBar.showPin(this.userPositioned);
         }
-      }
-
-      // If OSK still hidden, make visible only after all calculation finished
-      if(Ls.visibility == 'hidden') {
-        window.setTimeout(function(){
-          this._Box.style.visibility='visible';
-        }.bind(this), 0);
       }
 
       // Allow desktop UI to execute code when showing the OSK

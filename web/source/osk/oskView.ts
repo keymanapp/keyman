@@ -473,6 +473,34 @@ namespace com.keyman.osk {
       return vkbd;
     }
 
+    // Corresponds to _Show, but acts as a core, common method for use by all display patterns.
+    protected render() {
+      // Do not try to display/render the OSK if undefined
+      if(!this._Box) {
+        return;
+      }
+
+      // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
+      this.keyboardView.updateState();
+
+      this._Box.style.display='block'; // Is 'none' when hidden.
+
+      // First thing after it's made visible.
+      this.refreshLayoutIfNeeded();
+
+      if(this.keyboardView instanceof VisualKeyboard) {
+        this.keyboardView.showLanguage();
+      }
+
+      // If OSK still hidden, make visible only after all calculation finished
+      if(this._Box.style.visibility == 'hidden') {
+        let _this = this;
+        window.setTimeout(function() {
+          _this._Box.style.visibility = 'visible';
+        }, 0);
+      }
+    }
+
     ['shutdown']() {
       // Disable the OSK's event handlers.
       this.removeBaseMouseEventListeners();
