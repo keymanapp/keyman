@@ -99,7 +99,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
     state->debug_items().push_end(m_actions.Length(), 0);
   }
 
-  ResetCapsLock(modifiers);
+  ResetCapsLock(modifiers, isKeyDown);
 
   m_state.vkey = vkey;
   m_state.charCode = VKeyToChar(modifiers, vkey);
@@ -114,7 +114,8 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
 
   switch (vkey) {
   case KM_KBP_VKEY_CAPS:
-    KeyCapsLockPress(modifiers, isKeyDown);
+    if (KeyCapsLockPress(modifiers, isKeyDown))
+      return TRUE;
     break;
   case KM_KBP_VKEY_SHIFT:
     KeyShiftPress(modifiers, isKeyDown);
