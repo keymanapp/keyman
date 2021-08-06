@@ -2,17 +2,17 @@
   Name:             UfrmDebugStatus_Elements
   Copyright:        Copyright (C) SIL International.
   Documentation:
-  Description:      
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    30 May 2007
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Initial version
                     30 May 2007 - mcdurdin - I800 - Fix crash when resizing store elements
 *)
@@ -23,8 +23,8 @@ interface
 uses
   System.Contnrs,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, DebugListView, XString, debugging, Menus,
-  UfrmDebugStatus_Child;
+  Dialogs, ComCtrls, DebugListView, XString, Menus,
+  UfrmDebugStatus_Child, Keyman.System.Debug.DebugEvent;
 
 type
   TfrmDebugStatus_Elements = class(TfrmDebugStatus_Child)
@@ -209,7 +209,7 @@ begin
   if xfoHexadecimal in FShowHexadecimal
     then FShowHexadecimal := []
     else FShowHexadecimal := [xfoHexadecimal];
-  UpdateStores((frmDebugStatus as TfrmDebugStatus).DebugForm.CurrentEvent);
+  UpdateStores(CurrentEvent);
   lvElements.Repaint;
 end;
 
@@ -221,7 +221,7 @@ begin
   ResizeStoreGrid;
 end;
 
-procedure TfrmDebugStatus_Elements.UpdateStores(Event: TDebugEvent);
+procedure TfrmDebugStatus_Elements.UpdateStores(Event: Keyman.System.Debug.DebugEvent.TDebugEvent);
 var
   ncontext, i: Integer;
   e: TXStringElement;

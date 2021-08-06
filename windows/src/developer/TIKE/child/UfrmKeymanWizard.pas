@@ -147,7 +147,7 @@ uses
   Vcl.Grids, KeyboardFonts,
   TempFileManager,
   UfrmDebugStatus,
-  UKeymanTargets, msctf, Winapi.UxTheme, Vcl.Themes,
+  UKeymanTargets, Winapi.UxTheme, Vcl.Themes,
   System.Generics.Collections, LeftTabbedPageControl, Vcl.CheckLst;
 
 type
@@ -568,6 +568,7 @@ uses
   System.Win.ComObj,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.System.Debug.DebugUIStatus,
   Keyman.System.QRCode,
   Keyman.UI.FontUtils,
 
@@ -2922,6 +2923,13 @@ procedure TfrmKeymanWizard.SetupDebugForm;
 begin
   panDebugHost.Visible := False;
 
+  FDebugStatusForm := TfrmDebugStatus.Create(Self);
+  FDebugStatusForm.BorderStyle := bsNone;
+  FDebugStatusForm.Parent := panDebugStatusHost;
+  FDebugStatusForm.Align := alClient;
+  FDebugStatusForm.Visible := True;
+  //FDebugForm.RefreshOptions;
+
   FDebugForm := TfrmDebug.Create(Self);
   FDebugForm.BorderStyle := bsNone;
   FDebugForm.Parent := panDebugWindowHost;
@@ -2931,13 +2939,6 @@ begin
   FDebugForm.OnUpdateExecutionPoint := DebugUpdateExecutionPoint;
   FDebugForm.Visible := True;
   FDebugForm.EditorMemo := frameSource;
-
-  FDebugStatusForm := TfrmDebugStatus.Create(Self);
-  FDebugStatusForm.BorderStyle := bsNone;
-  FDebugStatusForm.Parent := panDebugStatusHost;
-  FDebugStatusForm.Align := alClient;
-  FDebugStatusForm.Visible := True;
-  //FDebugForm.RefreshOptions;
 end;
 
 function TfrmKeymanWizard.ShouldRememberFocus(Control: TWinControl): Boolean;   // I4679

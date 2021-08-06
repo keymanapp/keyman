@@ -73,8 +73,6 @@ procedure InstallPackage(const nm: string; FCanInstallUnreg: Boolean);
 procedure UninstallKeyboard(const nm: string);
 procedure UninstallPackage(const nm: string);
 
-function StartKeymanDesktopPro(var WasStarted: Boolean): Boolean;  // I3283   // I3503
-
 function GetKeymanInstallPath: string;
 
 function IsBitmapLine(s: string): Boolean;
@@ -569,46 +567,6 @@ end;
 procedure RemoveOldestTikeTestFonts(FMaxLessOne: Boolean);
 begin
   RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDETestFonts_CU);
-end;
-
-const  // I3283   // I3503
-  ERROR_KEYMAN_PRODUCT_NOT_FOUND = $2000000B;
-  ERROR_KEYMAN_COM_NOT_READY = $2000000C;
-
-function StartKeymanDesktopPro(var WasStarted: Boolean): Boolean;  // I3283   // I3503
-var
-  t: DWord;
-begin
-  Result := False;
-  WasStarted := False;
-
-  if not Assigned(kmcom) then
-  begin
-    SetLastError(ERROR_KEYMAN_COM_NOT_READY);
-    Exit;
-  end;
-
-  if not kmcom.Control.IsKeymanRunning then
-  begin
-    kmcom.Control.StartKeyman;   // I5135
-
-    t := GetTickCount;
-    while not kmcom.Control.IsKeymanRunning do
-    begin
-      Application.ProcessMessages;
-      if GetTickCount - t > 15000 then
-      begin
-        if MessageDlg('Keyman has not yet started.  Continue waiting?', mtConfirmation, mbOkCancel, 0) = mrCancel then
-        begin
-          SetLastError(ERROR_TIMEOUT);
-          Exit;
-        end;
-      end;
-    end;
-    WasStarted := True;
-  end;
-
-  Result := True;
 end;
 
 function GetKMShellPath(var ps: string): Boolean;   // I3655

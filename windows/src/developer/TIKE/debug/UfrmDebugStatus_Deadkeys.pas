@@ -22,23 +22,31 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DebugListBox, debugging, debugdeadkeys,
+  Dialogs, StdCtrls, DebugListBox, debugdeadkeys,
   UfrmDebugStatus_Child;
 
 type
+  TDebugStatus_SelectDeadkeyEvent = procedure(DeadKey: TDeadKeyInfo) of object;
+
   TfrmDebugStatus_DeadKeys = class(TfrmDebugStatus_Child)
     lbDeadkeys: TDebugListBox;
     procedure lbDeadkeysClick(Sender: TObject);
   private
+    FOnSelectDeadkey: TDebugStatus_SelectDeadkeyEvent;
+    FDeadkeys: TDebugDeadkeyInfoList;
     { Deadkey functions }
     procedure ClearDeadKeys;
+    procedure SetDeadkeys(const Value: TDebugDeadkeyInfoList);
 
   protected
     function GetHelpTopic: string; override;
 
   public
-    procedure UpdateDeadkeyDisplay(deadkeys: TList);
+    procedure UpdateDeadkeyDisplay;
     procedure DeselectDeadkeys;
+
+    property Deadkeys: TDebugDeadkeyInfoList read FDeadkeys write SetDeadkeys;
+    property OnSelectDeadkey: TDebugStatus_SelectDeadkeyEvent read FOnSelectDeadkey write FOnSelectDeadkey;
   end;
 
 implementation
@@ -68,19 +76,28 @@ end;
 
 procedure TfrmDebugStatus_DeadKeys.lbDeadkeysClick(Sender: TObject);
 begin
+  if not Assigned(FOnSelectDeadkey) then
+    Exit;
   if lbDeadKeys.ItemIndex < 0
-    then DebugForm.SelectDeadKey(nil)
-    else DebugForm.SelectDeadKey(lbDeadKeys.Items.Objects[lbDeadKeys.ItemIndex] as TDeadKeyInfo);
+    then FOnSelectDeadKey(nil)
+    else FOnSelectDeadKey(lbDeadKeys.Items.Objects[lbDeadKeys.ItemIndex] as TDeadKeyInfo);
 end;
 
-procedure TfrmDebugStatus_DeadKeys.UpdateDeadkeyDisplay(deadkeys: TList);
+procedure TfrmDebugStatus_DeadKeys.SetDeadkeys(
+  const Value: TDebugDeadkeyInfoList);
+begin
+  FDeadkeys := Value;
+  UpdateDeadkeyDisplay;
+end;
+
+procedure TfrmDebugStatus_DeadKeys.UpdateDeadkeyDisplay;
 var
-  i: Integer;
+  dk: TDeadkeyInfo;
 begin
   ClearDeadKeys;
-  for i := 0 to deadkeys.Count - 1 do
-    with TDeadKeyInfo(deadkeys[i]) do
-      lbDeadkeys.Items.AddObject('deadkey('+Deadkey.Name+') ('+IntToStr(Position)+')', TDeadKeyInfo(deadkeys[i]));
+  if Assigned(FDeadkeys) then
+    for dk in FDeadkeys do
+      lbDeadkeys.Items.AddObject('deadkey('+dk.Deadkey.Name+') ('+IntToStr(dk.Position)+')', dk);
 end;
 
 end.
