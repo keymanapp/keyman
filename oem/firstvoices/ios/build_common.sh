@@ -198,7 +198,10 @@ if [ $CODE_SIGN = true ]; then
 
     assertDirExists "$ARCHIVE_PATH"
 
-    xcodebuild $XCODEFLAGS_EXT -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
+
+    # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
+    # Xcode to generate a build error.
+    xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
                -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
