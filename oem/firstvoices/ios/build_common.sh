@@ -22,13 +22,14 @@ fi
 display_usage ( ) {
     echo "build.sh [-no-update] | [-no-archive] | [-lib-build] | [-lib-ignore] | [-clean]"
     echo
-    echo "  -clean          Removes all previously-existing build products for this project before building."
-    echo "  -no-update      If an in-place copy of KeymanEngine.framework exists, does not seek out an updated copy."
-    echo "  -lib-build      Actively rebuilds KMEI before copying its build products to project resources."
-    echo "  -lib-nobuild    Prevents the build script from building KeymanEngine under any circumstances."
-    echo "  -no-codesign    Performs the build without code signing."
-    echo "  -debug          Sets the configuration to debug mode instead of release."
-    echo "  -all-artifacts  Produces all build artifacts, including a Simulator-installable copy of the .app"
+    echo "  -clean             Removes all previously-existing build products for this project before building."
+    echo "  -no-update         If an in-place copy of KeymanEngine.framework exists, does not seek out an updated copy."
+    echo "  -lib-build         Actively rebuilds KMEI before copying its build products to project resources."
+    echo "  -lib-nobuild       Prevents the build script from building KeymanEngine under any circumstances."
+    echo "  -no-carthage       Disables downloading and building for dependencies."
+    echo "  -no-codesign       Performs the build without code signing."
+    echo "  -debug             Sets the configuration to debug mode instead of release."
+    echo "  -add-sim-artifact  Produces all build artifacts, including a Simulator-installable copy of the .app"
     echo
     echo "  If no settings are specified this script will grab a copy of the most recent build of KeymanEngine,"
     echo "  performing an initial build of it if necessary."
@@ -103,7 +104,7 @@ while [[ $# -gt 0 ]] ; do
             CONFIG=Debug
             KMEI_FLAGS="$KMEI_FLAGS -debug"
             ;;
-        -all-artifacts)
+        -add-sim-artifact)
             DO_SIMULATOR_TARGET=true
             ;;
     esac
