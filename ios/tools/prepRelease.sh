@@ -98,8 +98,8 @@ KEYMANAPP_IPA_DST="keyman-ios-${BUILD_NUMBER}.ipa"
 echo "Copying Keyman IPA ${KEYMANAPP_IPA} => ${UPLOAD_DIR}/${KEYMANAPP_IPA_DST}..."
 cp "${KEYMANAPP_IPA}" "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_IPA_DST}"
 
-KEYMANAPP_SIM_IPA="build/Build/Products/Release-iphonesimulator/Keyman.ipa"
-KEYMANAPP_SIM_IPA_DST="keyman-ios-simulator-${BUILD_NUMBER}.ipa"
+KEYMANAPP_SIM_IPA="build/Build/Products/Release-iphonesimulator/Keyman.app"
+KEYMANAPP_SIM_IPA_DST="keyman-ios-simulator-${BUILD_NUMBER}.app"
 
 echo "Copying Keyman simulator artifact ${KEYMANAPP_SIM_IPA} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_IPA_DST}..."
 cp "${KEYMANAPP_SIM_IPA}" "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_IPA_DST}"
@@ -115,8 +115,8 @@ if [ ${RELEASE_OEM_FIRSTVOICES} = true ]; then
   echo "Copying FirstVoices IPA ${FIRSTVOICESAPP_IPA} => ${UPLOAD_DIR}/${FIRSTVOICESAPP_IPA_DST}..."
   cp "${FIRSTVOICESAPP_IPA}" "${WORK_DIR}/${UPLOAD_DIR}/${FIRSTVOICESAPP_IPA_DST}"
 
-  FIRSTVOICESAPP_SIM_IPA="../oem/firstvoices/ios/build/Build/Products/Release-iphonesimulator/FirstVoices.ipa"
-  FIRSTVOICESAPP_SIM_IPA_DST="firstvoices-ios-simulator-${BUILD_NUMBER}.ipa"
+  FIRSTVOICESAPP_SIM_IPA="../oem/firstvoices/ios/build/Build/Products/Release-iphonesimulator/FirstVoices.app"
+  FIRSTVOICESAPP_SIM_IPA_DST="firstvoices-ios-simulator-${BUILD_NUMBER}.app"
 
   echo "Copying FirstVoices IPA ${FIRSTVOICESAPP_SIM_IPA} => ${UPLOAD_DIR}/${FIRSTVOICESAPP_SIM_IPA_DST}..."
   cp "${FIRSTVOICESAPP_SIM_IPA}" "${WORK_DIR}/${UPLOAD_DIR}/${FIRSTVOICESAPP_SIM_IPA_DST}"
