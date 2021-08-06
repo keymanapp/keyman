@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 15.0.95 alpha 2021-08-06
+
+* fix(windows): wrap text in keyboard installation dialog (#5559)
+* fix(windows): tsysinfo format grid correctly (#5556)
+* feat(android): Add API for checking Chrome version (#5520)
+* fix(android/app): Fix cleanup when progress dialog cancelled (#5541)
+* fix(common/core/desktop): split smp for context chars (#5562)
+* feat(developer): debugger uses Keyman Core 🐞 (#5513)
+* fix(common/models): keep/suggestion diacritic sensitivity when de-duping (#5480)
+* fix(web): Blank spacebar text when displayName is empty string (#5555)
+* chore(linux): Consolidate Debian source packages 📦 (#5536)
+* chore(common/core): Linux side of caps-lock stores 🚧 (#5497)
+
 ## 15.0.94 alpha 2021-08-05
 
 * chore(ios,windows): Update crowdin strings for Azerbaijani (#5486)
