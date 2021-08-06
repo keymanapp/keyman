@@ -38,7 +38,7 @@ describe('Engine - Unmatched Final Groups', function() {
     assert.equal(keyboard.id, "Keyboard_galaxie_hebrew_positional");
   });
 
-  it('Emits default tab AND matches rule from early group', function() {
+  it('Emits default enter AND matches rule from early group', function() {
     let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
     testSuite.test(proctor);
   });
