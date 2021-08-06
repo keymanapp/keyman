@@ -298,6 +298,8 @@ if [ $DO_KEYMANAPP = true ]; then
 
     assertDirExists "$ARCHIVE_PATH"
 
+    # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
+    # Xcode to generate a build error.
     xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
                 -exportOptionsPlist exportAppStore.plist \
                 -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
