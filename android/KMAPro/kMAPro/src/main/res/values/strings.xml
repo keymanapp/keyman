@@ -194,9 +194,6 @@
   <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">Package %1$s failed to install</string>
 
   <!-- Context: KMP Package strings -->
-  <string name="cancelled_downloading_package" comment="Cancelled download of package">Cancelled downloading %1$s package</string>
-
-  <!-- Context: KMP Package strings -->
   <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">Downloading keyboard package\n%1$s&#8230;</string>
 
   <!-- Context: KMP Package strings -->

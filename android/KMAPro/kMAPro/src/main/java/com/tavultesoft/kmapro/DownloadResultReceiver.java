@@ -48,10 +48,7 @@ public class DownloadResultReceiver extends ResultReceiver {
         context.startActivity(packageIntent);
         break;
       case FileUtils.DOWNLOAD_CANCELLED :
-        downloadedFilename = resultData.getString("filename");
-        String message = String.format(context.getString(R.string.cancelled_downloading_package), downloadedFilename);
-        Toast.makeText(context, message,
-          Toast.LENGTH_SHORT).show();
+        // NO-OP
         break;
     }
     super.onReceiveResult(resultCode, resultData);

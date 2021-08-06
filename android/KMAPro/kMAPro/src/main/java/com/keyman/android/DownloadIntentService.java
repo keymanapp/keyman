@@ -30,8 +30,8 @@ public class DownloadIntentService extends IntentService {
     try {
       int result = FileUtils.download(getApplicationContext(), url, destination, filename);
       if (result == FileUtils.DOWNLOAD_SUCCESS) {
-        bundle.putString("filename", filename);
         if (!this.cancelDownload) {
+          bundle.putString("filename", filename);
           bundle.putString("destination", destination);
           bundle.putString("language", languageID);
           bundle.putSerializable("installMode", installMode);
