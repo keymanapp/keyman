@@ -102,7 +102,7 @@ KEYMANAPP_SIM_IPA="build/Build/Products/Release-iphonesimulator/Keyman.ipa"
 KEYMANAPP_SIM_IPA_DST="keyman-ios-simulator-${BUILD_NUMBER}.ipa"
 
 echo "Copying Keyman simulator artifact ${KEYMANAPP_SIM_IPA} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_IPA_DST}..."
-cp "${KEYMANAPP_IPA}" "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_IPA_DST}"
+cp "${KEYMANAPP_SIM_IPA}" "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_IPA_DST}"
 
 #
 # FirstVoices app
