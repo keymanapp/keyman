@@ -24,7 +24,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 verify_on_mac
 
 display_usage ( ) {
-    echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-all-artifacts] [-no-build] [-upload-sentry]"
+    echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-add-sim-artifact] [-no-build] [-upload-sentry]"
     echo
     echo "  -clean                  Removes all previously-existing build products for KMEI and the Keyman app before building."
     echo "  -no-kmw                 Uses existing keyman.js, doesn't try to build"
@@ -37,7 +37,7 @@ display_usage ( ) {
     echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
     echo "  -debug                  Sets the configuration to debug mode instead of release."
     echo "  -download-resources     Download up-to-date versions of the engine's default resources from downloads.keyman.com."
-    echo "  -all-artifacts          Produces all build artifacts, including a Simulator-installable copy of the .app"
+    echo "  -add-sim-artifact       Produces all build artifacts, including a Simulator-installable copy of the .app"
 exit 1
 }
 
@@ -106,7 +106,7 @@ while [[ $# -gt 0 ]] ; do
         -download-resources)
             DO_KMP_DOWNLOADS=true
             ;;
-        -all-artifacts)
+        -add-sim-artifact)
             DO_SIMULATOR_TARGET=true
             ;;
     esac
