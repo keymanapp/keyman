@@ -481,10 +481,32 @@ public final class KMManager {
    */
   private static void doGlobeKeyShortpressAction(Context context, KeyboardType keyboard) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
-      if (InAppKeyboard.keyboardPickerEnabled && inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
-        showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-      } else { /* inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD */
-        switchToNextKeyboard(context);
+      if (KMManager.shouldAllowSetKeyboard) {
+        // Assign shortpress globe action
+        GlobeKeyAction action = inappKbGlobeKeyAction;
+
+        if (action == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD &&
+          KeyboardController.getInstance().get().size() == 1) {
+          // Override when keyboard switch and only 1 keyboard installed ==>show menu
+          action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+        }
+
+        switch (action) {
+          case GLOBE_KEY_ACTION_SHOW_MENU:
+            if (InAppKeyboard.keyboardPickerEnabled) {
+              showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+            }
+            break;
+          case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
+            switchToNextKeyboard(context);
+            break;
+          case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
+          case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
+            // For InApp keyboard, do nothing
+            break;
+          default:
+            // Do nothing
+        }
       }
     }
   }
@@ -2327,6 +2349,10 @@ public final class KMManager {
             } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
               // Ignore globe key down cause it may be queueing up for longpress
               return false;
+            } else if (action == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD &&
+                KeyboardController.getInstance().get().size() == 1) {
+              // Override when keyboard switch and only 1 keyboard installed ==>show menu
+              action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
             }
           }
 
