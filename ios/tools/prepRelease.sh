@@ -106,7 +106,7 @@ echo "Zipping Keyman simulator artifact ${KEYMANAPP_SIM_APP} => ${UPLOAD_DIR}/${
 cd "${KEYMANAPP_SIM_FOLDER}"
 zip -qrX "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}" "Keyman.app"
 echo "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}"
-cd $WORK_DIR
+cd "$WORK_DIR"
 
 #
 # FirstVoices app
@@ -126,7 +126,7 @@ if [ "${RELEASE_OEM_FIRSTVOICES}" = true ]; then
   echo "Zipping FirstVoices simulator artifact ${FIRSTVOICESAPP_SIM_APP} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}..."
   cd "${FIRSTVOICESAPP_SIM_FOLDER}"
   zip -qrX "${WORK_DIR}/${UPLOAD_DIR}/${FIRSTVOICESAPP_SIM_APP_DST}" "FirstVoices.app"
-  cd $WORK_DIR
+  cd "$WORK_DIR"
 fi
 
 #
