@@ -18,7 +18,7 @@
                     28 Nov 2012 - mcdurdin - I3594 - V9.0 - Remove old SelectKeyboard code and related messages
 */
 #include "pch.h"
-#include "registry.h"
+//#include "registry.h"
 
 void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave);
 BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp);
@@ -34,7 +34,7 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
   if (Globals::get_CoreIntegration())
   {
-    assert(TRUE); // should never be called if using core processor
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadSharedKeyboardOptions: Error called in core integration mode");
     return; 
   }
   // Called when another thread changes keyboard options and we are sharing keyboard settings
@@ -48,11 +48,11 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
-  if (Globals::get_CoreIntegration())
+  /*if (Globals::get_CoreIntegration())
   {
-    assert(TRUE); // should never be called if using core processor
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "FreeKeyboardOptions: Error called in core integration mode");
     return;
-  }
+  }*/
   // This is a cleanup routine; we don't want to precondition all calls to it
   // so we do not assert
   if (kp == NULL || kp->Keyboard == NULL || kp->KeyboardOptions == NULL)
@@ -72,7 +72,7 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 {
   if (Globals::get_CoreIntegration())
   {
-    assert(TRUE); // should never be called if using core processor
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "SetKeyboardOption: Error called in core integration mode");
     return;
   }
 
@@ -103,7 +103,7 @@ void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 {
   if (Globals::get_CoreIntegration())
   {
-    assert(TRUE); // should never be called if using core processor
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "ResetKeyboardOption: Error called in core integration mode");
     return;
   }
   assert(kp != NULL);
@@ -144,7 +144,7 @@ void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
 {
   if (Globals::get_CoreIntegration())
   {
-    assert(TRUE); // should never be called if using core processor
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "SaveKeyboardOption: Error called in core integration mode");
     return;
   }
   IntSaveKeyboardOption(REGSZ_KeyboardOptions, kp, nStoreToSave);
@@ -231,6 +231,7 @@ void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave)
 
 void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* const state)
 {
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadKeyboardOptionsREGCore: Enter");
   IntLoadKeyboardOptionsCore(REGSZ_KeyboardOptions, kp, state);
 }
 

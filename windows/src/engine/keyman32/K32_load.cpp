@@ -78,6 +78,7 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
 
 BOOL LoadlpKeyboardCore(int i)
 {
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadlpKeyboardCore: Enter ---");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
 
@@ -94,11 +95,17 @@ BOOL LoadlpKeyboardCore(int i)
 
   // Convert char* string to a wchar_t* string.
   size_t convertedChars = 0;
-  if (!mbstowcs_s(&convertedChars, keyboardPath, charSize, buf, _TRUNCATE)) {
-    goto ExitError;
+  if (mbstowcs_s(&convertedChars, keyboardPath, charSize, buf, _TRUNCATE)) {
+    //goto ExitError;
+    delete[] keyboardPath;
+    return FALSE;
   }
-  if (KM_KBP_STATUS_OK != km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard)) {
-    goto ExitError;
+  km_kbp_status_codes err_code = (km_kbp_status_codes)km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard);
+  //if (KM_KBP_STATUS_OK != km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard)) {
+  if (err_code != KM_KBP_STATUS_OK) {
+    //goto ExitError;
+    delete[] keyboardPath;
+    return FALSE;
   }
 
   delete[] keyboardPath;
@@ -116,17 +123,23 @@ BOOL LoadlpKeyboardCore(int i)
     _td->lpKeyboards[i].lpActiveKBState = NULL;
   }
 
-  if (KM_KBP_STATUS_OK != km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpActiveKBState)) return FALSE;
+  // if (KM_KBP_STATUS_OK != km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpActiveKBState)) return FALSE;
+  err_code = (km_kbp_status_codes)km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpActiveKBState);
+  if (err_code != KM_KBP_STATUS_OK) {
+    return FALSE;
+  }
+  
 
   LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpActiveKBState);
 
   return TRUE;
+  //return FALSE;
 
-ExitError:
-  if (keyboardPath) {
-    delete[] keyboardPath;
-  }
-  return FALSE;
+//ExitError:
+//  if (keyboardPath) {
+//    delete[] keyboardPath;
+//  }
+//  return FALSE;
 }
 
 BOOL LoadlpKeyboard(int i)
