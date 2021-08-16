@@ -22,6 +22,7 @@ from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.get_kmp import user_keyboard_dir
+from gi.overrides.GLib import GError
 
 
 class ViewInstalledWindowBase(Gtk.Window):
@@ -228,19 +229,26 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
 
             welcome_file = os.path.join(path, "welcome.htm")
             options_file = os.path.join(path, "options.htm")
-            icofile = os.path.join(path, kmpdata['packageID'] + bmppng)
+            icofile_name = os.path.join(path, kmpdata['packageID'] + bmppng)
 
             if not os.path.isfile(welcome_file):
                 welcome_file = None
             if not os.path.isfile(options_file):
                 options_file = None
-            if not os.path.isfile(icofile):
-                icofile = os.path.join(path, kmpdata['keyboardID'] + bmppng)
-                if not os.path.isfile(icofile):
-                    icofile = find_keyman_image("icon_kmp.png")
+            if not os.path.isfile(icofile_name):
+                icofile_name = os.path.join(path, kmpdata['keyboardID'] + bmppng)
+                if not os.path.isfile(icofile_name):
+                    icofile_name = find_keyman_image("icon_kmp.png")
+
+            try:
+                icofile = GdkPixbuf.Pixbuf.new_from_file_at_size(icofile_name, 16, 16)
+            except GError:
+                _, value, _ = sys.exc_info()
+                logging.info("Error reading icon file %s: %s" % (icofile_name, value.message))
+                icofile = None
 
             store.append([
-                GdkPixbuf.Pixbuf.new_from_file_at_size(icofile, 16, 16),
+                icofile,
                 kmpdata['name'],
                 kmpdata['version'],
                 kmpdata['packageID'],
