@@ -29,6 +29,7 @@ interface
 uses
   System.Classes,
   System.SysUtils,
+  Vcl.AppEvnts,
   Vcl.Controls,
   Vcl.Dialogs,
   Vcl.Forms,
@@ -47,6 +48,8 @@ type
     procedure TntFormDestroy(Sender: TObject);
   private
     FHelpTopic: string;
+    baseAppEvents: TApplicationEvents;
+    procedure baseAppEventsMessage(var Msg: tagMSG; var Handled: Boolean);
     procedure RegisterWindow;  // I2720
     procedure DeregisterWindow;  // I2720
     class function RegisteredName: string;  // I2720
@@ -93,6 +96,14 @@ end;
 
 procedure TfrmKeymanBase.TntFormShow(Sender: TObject);
 begin
+  if (fsModal in FormState) and not Assigned(Owner) then
+  begin
+    baseAppEvents := TApplicationEvents.Create(Self);
+    baseAppEvents.OnMessage := baseAppEventsMessage;
+  end
+  else
+    FreeAndNil(baseAppEvents);
+
   PostMessage(Handle, WM_USER_FormShown, 0, 0);
 end;
 
@@ -108,6 +119,16 @@ end;
 class function TfrmKeymanBase.RegisteredName: string;  // I2720
 begin
   Result := AppName + ':' + ClassName;
+end;
+
+procedure TfrmKeymanBase.baseAppEventsMessage(var Msg: tagMSG;
+  var Handled: Boolean);
+begin
+  if (Msg.message = WM_SYSCOMMAND) and (Msg.wParam = SC_RESTORE) then
+  begin
+    // Handle the case where Win+M pressed, window never restores
+    PostMessage(Handle, WM_SHOWWINDOW, 1, SW_PARENTOPENING);
+  end;
 end;
 
 procedure TfrmKeymanBase.CreateHandle;
