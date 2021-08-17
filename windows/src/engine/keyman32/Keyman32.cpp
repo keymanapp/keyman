@@ -566,17 +566,33 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
   _td->lpActiveKeyboard->KeyboardOptions = NULL;*/
   _splitpath_s(FileName, NULL, 0, NULL, 0, _td->lpActiveKeyboard->Name, sizeof(_td->lpActiveKeyboard->Name), NULL, 0);
 
-	if(LoadKeyboard(_td->ForceFileName, &_td->lpActiveKeyboard->Keyboard))
-	{
-		SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_ForceKeyboard: %s OK", FileName);
-		ResetCapsLock();
-		LoadDLLs(_td->lpActiveKeyboard);
-		ActivateDLLs(_td->lpActiveKeyboard);
-    LoadKeyboardOptions(_td->lpActiveKeyboard);   // I2437 - Crash unloading keyboard due to keyboard options not set
-    RefreshPreservedKeys(TRUE);
-		return TRUE;
-	}
-
+  if (Globals::get_CoreIntegration()) {
+    LPWSTR keyboardPath = new WCHAR[MAX_PATH];
+      size_t convertedChars = 0;
+    if (mbstowcs_s(&convertedChars, keyboardPath, MAX_PATH, _td->ForceFileName, _TRUNCATE)) {
+      delete[] keyboardPath;
+      return FALSE;
+    }
+    
+    km_kbp_status_codes err_code = (km_kbp_status_codes)km_kbp_keyboard_load(keyboardPath, &_td->lpActiveKeyboard->coreKeyboard);
+      if (err_code != KM_KBP_STATUS_OK) {
+        delete[] keyboardPath;
+        return FALSE;
+      }
+    delete[] keyboardPath;
+    SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard: %s OK", FileName);
+    return TRUE;
+  } else {
+    if (LoadKeyboard(_td->ForceFileName, &_td->lpActiveKeyboard->Keyboard)) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard: %s OK", FileName);
+      ResetCapsLock();
+      LoadDLLs(_td->lpActiveKeyboard);
+      ActivateDLLs(_td->lpActiveKeyboard);
+      LoadKeyboardOptions(_td->lpActiveKeyboard);  // I2437 - Crash unloading keyboard due to keyboard options not set
+      RefreshPreservedKeys(TRUE);
+      return TRUE;
+    }
+  }
 	SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_ForceKeyboard: %s FAIL", FileName);
 
 	delete _td->lpActiveKeyboard;

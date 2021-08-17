@@ -35,7 +35,7 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
   if (Globals::get_CoreIntegration())
   {
     SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadSharedKeyboardOptions: Error called in core integration mode");
-    return; 
+    return;
   }
   // Called when another thread changes keyboard options and we are sharing keyboard settings
   assert(kp != NULL);
@@ -48,11 +48,11 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
-  /*if (Globals::get_CoreIntegration())
+  if (Globals::get_CoreIntegration())
   {
     SendDebugMessageFormat(0, sdmAIDefault, 0, "FreeKeyboardOptions: Error called in core integration mode");
     return;
-  }*/
+  }
   // This is a cleanup routine; we don't want to precondition all calls to it
   // so we do not assert
   if (kp == NULL || kp->Keyboard == NULL || kp->KeyboardOptions == NULL)
@@ -239,8 +239,6 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
 {
   assert(key != NULL);
   assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions == NULL); // not used for common core
 
   RegistryReadOnly r(HKEY_CURRENT_USER);
   if (r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key))

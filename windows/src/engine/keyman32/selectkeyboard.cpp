@@ -79,7 +79,7 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
 
     KMHideIM();
     /** TODO: 5011 is this just IDML dlls */
-    //if (_td->lpActiveKeyboard) DeactivateDLLs(_td->lpActiveKeyboard);
+    if (_td->lpActiveKeyboard) DeactivateDLLs(_td->lpActiveKeyboard);
     _td->lpActiveKeyboard = NULL;
     _td->ActiveKeymanID = KEYMANID_NONKEYMAN;
 
@@ -89,7 +89,7 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
     {
       if (_td->lpKeyboards[i].KeymanID == KeymanID)
       {
-        if (!_td->lpKeyboards[i].Keyboard && !LoadlpKeyboard(i))
+        if (!_td->lpKeyboards[i].coreKeyboard && !LoadlpKeyboard(i))
         {
           SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboardCore: Unable to load");
           return TRUE;
@@ -128,7 +128,7 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
       SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboardCore-------------------------------------------");
     }
     return TRUE;
-  
+
 }
 
 BOOL SelectKeyboard(DWORD KeymanID)

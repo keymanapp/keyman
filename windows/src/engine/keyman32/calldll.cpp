@@ -144,6 +144,7 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 	if(lpkbi->nIMDLLs > 0) if(!UnloadDLLs(lpkbi)) return FALSE;
 
 	if(!GetKeyboardFileName(lpkbi->Name, fullname, _MAX_PATH)) return FALSE;
+  if (!lpkbi->Keyboard) return FALSE;
 
 	for(DWORD i = 0; i < lpkbi->Keyboard->cxStoreArray; i++)
 	{
@@ -224,7 +225,7 @@ BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi)
 void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
 {
 	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Enter");
-
+  if (!lpkbi->Keyboard) return;
 	if(storenum >= lpkbi->Keyboard->cxStoreArray) return;
 
 	LPSTORE s = &lpkbi->Keyboard->dpStoreArray[storenum];

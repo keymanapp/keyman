@@ -140,9 +140,11 @@ BOOL ProcessHook()
 		else
 			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
-
+  // TODO: 5011 remove debug message
+ // PWSTR contextTestBuf            = _td->app->ContextBufMax(MAXCONTEXT);
+ // SendDebugMessageFormat(0, sdmAIDefault, 0, "Kmprocess::ProcessHook Before cxt=%s", Debug_UnicodeString(contextTestBuf, 1));
   if (isUsingCoreProcessor) {
-    // TODO: 5011 remove debug message
+
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: ");
     PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
     km_kbp_context_item *citems = nullptr;
@@ -211,6 +213,9 @@ BOOL ProcessHook()
 		_td->app->SetCurrentShiftState(Globals::get_ShiftState());
 		_td->app->SendActions();   // I4196
 	}
+  // output context for debugging
+  // PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
+  // SendDebugMessageFormat(0, sdmAIDefault, 0, "Kmprocess::ProcessHook After cxt=%s", Debug_UnicodeString(contextBuf, 1));
 
 	_td->app->QueueDebugInformation(QID_END, NULL, NULL, NULL, NULL, 0);
 
@@ -233,7 +238,11 @@ BOOL ProcessHook()
 
 BOOL ProcessGroup(LPGROUP gp)
 {
-	DWORD i;
+  if (Globals::get_CoreIntegration()) {
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "KMPROCESS:ProcessGroup: Error called in core integration mode");
+    return FALSE;
+  }
+  DWORD i;
 	LPKEY kkp = NULL;
 	PWSTR p;
 	int sdmfI;
@@ -531,7 +540,11 @@ BOOL ProcessGroup(LPGROUP gp)
 
 int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
 {
-	PWSTR p, q, temp;
+  if (Globals::get_CoreIntegration()) {
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "KMPROCESS:PostString: Error called in core integration mode");
+    return FALSE;
+  }
+  PWSTR p, q, temp;
   LPSTORE s;
   int n1, n2;
 	int i, n, shift;
@@ -696,6 +709,10 @@ BOOL IsMatchingPlatform(LPSTORE s)  // I3432
 
 BOOL ContextMatch(LPKEY kkp)
 {
+  if (Globals::get_CoreIntegration()) {
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "KMPROCESS:ContextMatch: Error called in core integration mode");
+    return FALSE;
+  }
 	WORD /*i,*/ n;
 	PWSTR p, q, qbuf, temp;
 	LPWORD indexp;

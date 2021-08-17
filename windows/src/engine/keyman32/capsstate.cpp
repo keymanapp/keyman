@@ -37,6 +37,8 @@ void ResetCapsLock(void)
 
   if (!_td->lpActiveKeyboard) return;
 
+  if (!_td->lpActiveKeyboard->Keyboard) return;
+
   SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: enter");
 
   if (_td->lpActiveKeyboard->Keyboard->dwFlags & KF_CAPSALWAYSOFF)
@@ -58,6 +60,7 @@ void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return;
   if (!_td->lpActiveKeyboard) return;    // pass through to window
+  if (!_td->lpActiveKeyboard->Keyboard) return;
 
   if (_td->lpActiveKeyboard->Keyboard->dwFlags & KF_CAPSONONLY)
   {
@@ -85,6 +88,7 @@ void KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return;
   if (!_td->lpActiveKeyboard) return;    // pass through to window
+  if (!_td->lpActiveKeyboard->Keyboard) return;
 
   if (_td->lpActiveKeyboard->Keyboard->dwFlags & KF_SHIFTFREESCAPS)
   {

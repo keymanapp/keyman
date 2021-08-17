@@ -198,6 +198,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
     *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;   // I3588
   }
 
+  BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
 	_td->TIPFUpdateable = Updateable;
   _td->TIPFPreserved = Preserved;   // I4290
 
@@ -205,39 +206,57 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->state.msg.lParam = 0;
 	_td->state.msg.message = wm_keymankeydown;
 	_td->state.vkey = (WORD) wParam;
-  
-   
-	_td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
-  /// TODO: 5442 set the correct active keyboard - need with call backs
-  _td->state.lpCoreKb = _td->lpActiveKeyboard->coreKeyboard;
+
+  if (isUsingCoreProcessor) {
+    /// TODO: 5442 set the correct active keyboard - need with call backs
+    _td->state.lpCoreKb = _td->lpActiveKeyboard->coreKeyboard;
+
+  } else {
+    _td->state.lpkb       = _td->lpActiveKeyboard->Keyboard;
+    _td->state.startgroup = &_td->state.lpkb->dpGroupArray[_td->state.lpkb->StartGroup[BEGIN_UNICODE]];
+  }
 
   _td->state.windowunicode = TRUE;
-	_td->state.startgroup = &_td->state.lpkb->dpGroupArray[_td->state.lpkb->StartGroup[BEGIN_UNICODE]];
 
-	_td->state.NoMatches = TRUE;
-	_td->state.LoopTimes = 0;
-	_td->state.StopOutput = FALSE;
+  _td->state.NoMatches  = TRUE;
+  _td->state.LoopTimes  = 0;
+  _td->state.StopOutput = FALSE;
 
   _td->state.charCode = CharFromVK(&_td->state.vkey, Globals::get_ShiftState());   // I4582
 
 	_td->TIPProcessOutput = outfunc;
 	_td->TIPGetContext = ctfunc;
 
-  AppContextWithStores *savedContext = NULL;   // I4370   // I4978
-  if(!Updateable) {   // I4370
-    savedContext = new AppContextWithStores(_td->lpActiveKeyboard->Keyboard->cxStoreArray);   // I4978
-    _td->app->SaveContext(savedContext);
-  }
+  AppContextWithStores *savedContext = NULL;  // I4370   // I4978
+  AppContext *savedContextUsingCore  = NULL; // used for common core
 
-	BOOL res = ProcessHook();
-
-  if(!Updateable) {   // I4370
-    if(res) {   // I4585
-      // Reset the context if match found
-      _td->app->RestoreContext(savedContext);
+  if (!Updateable) {
+    if (isUsingCoreProcessor) {
+      savedContextUsingCore = new AppContext();
+      _td->app->CopyContext(savedContextUsingCore);
+    } else {                                                                                   // I4370
+      savedContext = new AppContextWithStores(_td->lpActiveKeyboard->Keyboard->cxStoreArray);  // I4978
+      _td->app->SaveContext(savedContext);
     }
-    delete savedContext;
-    savedContext = NULL;
+  }
+  BOOL res = ProcessHook();
+
+  if (!Updateable) {
+    if (isUsingCoreProcessor) {
+      if (res) {
+        // Reset the context if match found
+        _td->app->RestoreContextOnly(savedContextUsingCore);
+      }
+      delete savedContextUsingCore;
+      savedContextUsingCore = NULL;
+    } else {      // I4370
+      if (res) {  // I4585
+        // Reset the context if match found
+        _td->app->RestoreContext(savedContext);
+      }
+      delete savedContext;
+      savedContext = NULL;
+    }
   }
 
 	_td->TIPProcessOutput = NULL;
@@ -455,6 +474,14 @@ void AITIP::RestoreContext(AppContextWithStores *savedContext) {   // I4370   //
       savedContext->KeyboardOptions[i].Value = NULL;
     }
   }
+}
+
+void AITIP::CopyContext(AppContext *savedContext) {
+  savedContext->CopyFrom(context);
+}
+
+void AITIP::RestoreContextOnly(AppContext *savedContext) {
+  context->CopyFrom(savedContext);
 }
 
 /* Output actions */
