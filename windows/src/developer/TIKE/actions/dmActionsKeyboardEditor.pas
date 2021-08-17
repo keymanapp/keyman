@@ -1,18 +1,18 @@
 (*
   Name:             dmActionsKeyboardEditor
   Copyright:        Copyright (C) SIL International.
-  Documentation:
-  Description:
+  Documentation:    
+  Description:      
   Create Date:      23 Aug 2006
 
   Modified Date:    4 May 2015
   Authors:          mcdurdin
-  Related Files:
-  Dependencies:
+  Related Files:    
+  Dependencies:     
 
-  Bugs:
-  Todo:
-  Notes:
+  Bugs:             
+  Todo:             
+  Notes:            
   History:          23 Aug 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Add debugger actions
                     28 Sep 2006 - mcdurdin - Added Test Keyboard menu item
@@ -33,7 +33,7 @@
                     04 Nov 2014 - mcdurdin - I4504 - V9.0 - Consolidate the compile action into single command
                     04 May 2015 - mcdurdin - I4686 - V9.0 - Refactor compile into project file action
                     04 May 2015 - mcdurdin - I4687 - V9.0 - Split project UI actions into separate classes
-
+                    
 *)
 unit dmActionsKeyboardEditor;  // I3306  // I3323
 
@@ -213,7 +213,7 @@ end;
 
 procedure TmodActionsKeyboardEditor.actDebugDebuggerModeUpdate(Sender: TObject);
 begin
-  actDebugDebuggerMode.Checked := actDebugDebuggerMode.Enabled and (ActiveEditor.DebugForm.UIStatus <> duiTest);
+  actDebugDebuggerMode.Checked := (ActiveEditor <> nil) and (ActiveEditor.DebugForm.UIStatus <> duiTest);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugPauseExecute(Sender: TObject);
@@ -243,7 +243,7 @@ end;
 
 procedure TmodActionsKeyboardEditor.actDebugRunUpdate(Sender: TObject);
 begin
-  actDebugRun.Enabled := IsDebuggerVisible and not IsDebuggerInTestMode and
+  actDebugRun.Enabled := IsDebuggerVisible and not IsDebuggerInTestMode and 
     (ActiveEditor.DebugForm.UIStatus = duiDebugging);
 end;
 
