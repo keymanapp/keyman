@@ -426,6 +426,12 @@ namespace com.keyman.osk {
     //#region Input handling start
 
     detectWithinBounds(coord: InputEventCoordinate): boolean {
+      // Shortcuts the method during unit testing, as we don't currently
+      // provide coordinate values in its synthetic events.
+      if(coord.x === null && coord.y === null) {
+        return true;
+      }
+
       // Determine the important geometric values involved
       const _Box = this.element.offsetParent as HTMLElement;
       let oskX = this.element.offsetLeft + (_Box?.offsetLeft || 0);

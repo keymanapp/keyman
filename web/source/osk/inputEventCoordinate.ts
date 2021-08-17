@@ -18,10 +18,16 @@ namespace com.keyman.osk {
     // by the mouse-dragging operations.
     public static fromEvent(e: MouseEvent | TouchEvent) {
       let coordSource: MouseEvent | Touch;
-      if(e instanceof TouchEvent) {
+
+      // Desktop Safari versions as recent as 14.1 do not support TouchEvents.
+      // So, just in case, a two-fold conditional check to avoid issues with a direct
+      // 'instanceof' against the type.
+      if(window['TouchEvent'] && e instanceof TouchEvent) {
         coordSource = e.changedTouches[0];
+      } else if(e['changedTouches']) {
+        coordSource = e['changedTouches'][0] as Touch;
       } else {
-        coordSource = e;
+        coordSource = e as MouseEvent;
       }
 
       if (coordSource.pageX) {
@@ -49,7 +55,7 @@ namespace com.keyman.osk {
     }
 
     public get isFromTouch(): boolean {
-      return this.source instanceof TouchEvent;
+      return !this.isFromMouse;
     }
 
     public get isFromMouse(): boolean {
