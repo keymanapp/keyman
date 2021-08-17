@@ -49,7 +49,7 @@ type
   end;
 
   TDebugEventCursor = record
-    X, Y: Integer;
+    SelStart, SelLength: Integer;
   end;
 
   TDebugEventType = (etAction, etRuleMatch);

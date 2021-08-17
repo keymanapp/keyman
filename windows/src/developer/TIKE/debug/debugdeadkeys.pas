@@ -31,12 +31,14 @@ type
   private
     FDeleted: Boolean;
     FPosition: Integer;
+    FSavedPosition: Integer;
   public
     //Position: Integer;
     memo: TKeymanDeveloperDebuggerMemo;  // I3323
     Deadkey: TDebugDeadkey;
     procedure Delete;
     property Position: Integer read FPosition write FPosition;
+    property SavedPosition: Integer read FSavedPosition write FSavedPosition;
     property Deleted: Boolean read FDeleted;
   end;
 
