@@ -1,0 +1,4 @@
+debian/com.keyman.ibus_keyman.metainfo.xml usr/share/metainfo
+usr/libexec/ibus-engine-keyman
+usr/share/ibus/component/keyman.xml
+usr/share/keyman/icons/default.png

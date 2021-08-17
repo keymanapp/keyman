@@ -1,2 +1,2 @@
 #!/bin/sh
-./print_kmpdetails $srcdir/test/kmp.json
+./print_kmpdetails $srcdir/test

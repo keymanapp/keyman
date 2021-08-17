@@ -64,7 +64,8 @@ namespace com.keyman.osk.browser {
 
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
-      ss.bottom=(parseInt(e.style.bottom,10)+parseInt(e.style.height,10)+4)+'px';
+      let rowElement = (e.key as OSKBaseKey).row.element;
+      ss.bottom = (vkbd.height - rowElement.offsetTop) + 'px';
 
       // Set key font according to layout, or defaulting to OSK font
       // (copied, not inherited, since OSK is not a parent of popup keys)
@@ -74,7 +75,7 @@ namespace com.keyman.osk.browser {
       ss.fontSize=keyman.util.getStyleValue(e,'font-size');
       ss.visibility='hidden';
 
-      var nKeys=subKeySpec.length,nRow,nRows,nCols;
+      var nKeys=subKeySpec.length,nRows,nCols;
       nRows=Math.min(Math.ceil(nKeys/9),2);
       nCols=Math.ceil(nKeys/nRows);
       if(nRows > 1) {

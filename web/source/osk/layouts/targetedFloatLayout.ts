@@ -180,7 +180,7 @@ namespace com.keyman.osk.layouts {
           }
 
           // Explicitly set OSK width, height,  and font size - cannot safely rely on scaling from font
-          layout.oskView.setSize(newWidth, newHeight);
+          layout.oskView.setSize(newWidth, newHeight, true);
         }
 
         onDragRelease() {
@@ -203,6 +203,7 @@ namespace com.keyman.osk.layouts {
             this.startWidth  = layout.oskView.vkbd.kbdDiv.offsetWidth;
             this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
           }
+          layout.oskView.refreshLayout(); // Finalize the resize.
           layout.oskView.doResizeMove();
           layout.oskView.saveCookie();
         }

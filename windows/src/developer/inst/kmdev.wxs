@@ -200,10 +200,6 @@
       </Component>
 
       <Component>
-        <File Name="debughost.kmx" KeyPath="yes" Source="..\..\developer\tike\redist\debughost.kmx" />
-      </Component>
-
-      <Component>
         <File Name="keyboard_info.distribution.json" Source="..\..\global\inst\data\keyboard_info\" KeyPath="yes" />
       </Component>
 
