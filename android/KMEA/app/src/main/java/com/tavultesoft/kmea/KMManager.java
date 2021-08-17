@@ -163,7 +163,7 @@ public final class KMManager {
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
   // This is used to keep track of the starting system keyboard index while the screen is locked
-  private static int sysKbStartingIndexOnLockScreen = -1;
+  private static int startingKeyboardIndexOnLockScreen = -1;
 
   // This is used to keep track of the globe key shortpress and longpress
   private static GlobeKeyState globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
@@ -469,13 +469,13 @@ public final class KMManager {
     // Override globe key action if screen is locked:
     // 1. Switch to next Keyman keyboard (no menu)
     // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
-    if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+    if (startingKeyboardIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
       // all the Keyman keyboards have been cycled through
       advanceToNextInputMode();
     } else {
-      if (sysKbStartingIndexOnLockScreen == -1) {
+      if (startingKeyboardIndexOnLockScreen == -1) {
         // Initialize the system keyboard starting index while the screen is locked
-        sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
+        startingKeyboardIndexOnLockScreen = getCurrentKeyboardIndex(context);
       }
       switchToNextKeyboard(context);
     }
@@ -487,19 +487,21 @@ public final class KMManager {
    * @param keyboard
    */
   private static void doGlobeKeyLongpressAction(Context context, KeyboardType keyboard) {
-    boolean keyboardPickerEnabled = false;
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      keyboardPickerEnabled = InAppKeyboard != null && InAppKeyboard.keyboardPickerEnabled;
+      if (InAppKeyboard == null || !InAppKeyboard.keyboardPickerEnabled) {
+        return;
+      }
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      keyboardPickerEnabled = SystemKeyboard != null && SystemKeyboard.keyboardPickerEnabled;
+      if (SystemKeyboard == null || !SystemKeyboard.keyboardPickerEnabled) {
+        return;
+      }
     } else {
       // assertion failure?
+      KMLog.LogError(TAG, "doGlobeKeyLongpressAction with keyboard type " + keyboard);
       return;
     }
 
-    if (keyboardPickerEnabled) {
-      showKeyboardPicker(context, keyboard);
-    }
+    showKeyboardPicker(context, keyboard);
   }
 
   /**
@@ -520,38 +522,42 @@ public final class KMManager {
         return;
       }
       action = sysKbGlobeKeyAction;
+    } else {
+      // assertion failure?
+      KMLog.LogError(TAG, "doGlobeKeyShortpressAction with keyboard type " + keyboard);
+      return;
     }
-      if (action == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD &&
-        KeyboardController.getInstance().get().size() == 1) {
-        // Override when keyboard switch and only 1 keyboard installed ==>show menu
-        action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-      }
 
-      switch (action) {
-        case GLOBE_KEY_ACTION_SHOW_MENU:
-          if (keyboardPickerEnabled) {
-            showKeyboardPicker(context, keyboard);
-          }
-          break;
-        case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
-          switchToNextKeyboard(context);
-          break;
-        case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
-          // Only do this for system keyboard
-          if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-            advanceToNextInputMode();
-          }
-          break;
-        case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
-          // Only do this for system keyboard
-          if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showInputMethodPicker();
-          }
-          break;
-        default:
-          // Do nothing
-      }
+    if (action == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD &&
+      KeyboardController.getInstance().get().size() == 1) {
+      // Override when keyboard switch and only 1 keyboard installed ==>show menu
+      action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+    }
+
+    switch (action) {
+      case GLOBE_KEY_ACTION_SHOW_MENU:
+        if (keyboardPickerEnabled) {
+          showKeyboardPicker(context, keyboard);
+        }
+        break;
+      case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
+        switchToNextKeyboard(context);
+        break;
+      case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
+        // Only do this for system keyboard
+        if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+          advanceToNextInputMode();
+        }
+        break;
+      case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
+        // Only do this for system keyboard
+        if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+          InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+          imm.showInputMethodPicker();
+        }
+        break;
+      default:
+        // Do nothing
     }
   }
 
@@ -2015,7 +2021,7 @@ public final class KMManager {
         }
       } else {
         // If screen isn't locked, reset the starting index
-        sysKbStartingIndexOnLockScreen = -1;
+        startingKeyboardIndexOnLockScreen = -1;
 
         // Normal handling for globe key
         if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
@@ -2033,8 +2039,8 @@ public final class KMManager {
       // clear globeKeyState
       globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
 
-      // System Keyboard previously switched to next keyboard even though !shouldAllowSetKeyboard
-      //switchToNextKeyboard(context);
+      // TODO: This should not be allowed because !shouldAllowSetKeyboard (#5570)
+      switchToNextKeyboard(context);
     }
   }
 
