@@ -511,7 +511,6 @@ public final class KMManager {
    */
   private static void doGlobeKeyShortpressAction(Context context, KeyboardType keyboard) {
     GlobeKeyAction action = GlobeKeyAction.GLOBE_KEY_ACTION_DO_NOTHING;
-    boolean keyboardPickerEnabled = false;
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard == null || !InAppKeyboard.keyboardPickerEnabled) {
         return;
@@ -536,9 +535,7 @@ public final class KMManager {
 
     switch (action) {
       case GLOBE_KEY_ACTION_SHOW_MENU:
-        if (keyboardPickerEnabled) {
-          showKeyboardPicker(context, keyboard);
-        }
+        showKeyboardPicker(context, keyboard);
         break;
       case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
         switchToNextKeyboard(context);
