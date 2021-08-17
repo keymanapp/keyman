@@ -328,8 +328,6 @@ final class KMKeyboard extends WebView {
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
     loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
 
-    RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
-    this.setLayoutParams(params);
     if (dismissHelpBubble()) {
       Handler handler = new Handler();
       handler.postDelayed(new Runnable() {
