@@ -34,9 +34,7 @@ void ResetCapsLock(void)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return;
-
   if (!_td->lpActiveKeyboard) return;
-
   if (!_td->lpActiveKeyboard->Keyboard) return;
 
   SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: enter");

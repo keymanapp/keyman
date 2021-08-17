@@ -81,10 +81,7 @@ BOOL LoadlpKeyboardCore(int i)
   SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadlpKeyboardCore: Enter ---");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
-
   if (_td->lpKeyboards[i].coreKeyboard) return TRUE;
-
-
   if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
   char buf[256];
@@ -133,7 +130,6 @@ BOOL LoadlpKeyboardCore(int i)
   LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpActiveKBState);
 
   return TRUE;
-  //return FALSE;
 
 //ExitError:
 //  if (keyboardPath) {
@@ -151,7 +147,6 @@ BOOL LoadlpKeyboard(int i)
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
   if(_td->lpKeyboards[i].Keyboard) return TRUE;
-  
   if(_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
   char buf[256];

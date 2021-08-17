@@ -128,7 +128,6 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
       SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboardCore-------------------------------------------");
     }
     return TRUE;
-
 }
 
 BOOL SelectKeyboard(DWORD KeymanID)

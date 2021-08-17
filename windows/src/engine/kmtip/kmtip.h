@@ -2,10 +2,10 @@
   Name:             kmtip
   Copyright:        Copyright (C) SIL International.
   Documentation:    
-  Description:      CKMTipTextService declaration.
-  Create Date:      7 Sep 2009
+  Description:      
+  Create Date:      11 Dec 2009
 
-  Modified Date:    27 Jan 2015
+  Modified Date:    23 Feb 2016
   Authors:          mcdurdin
   Related Files:    
   Dependencies:     
