@@ -991,7 +991,7 @@ namespace com.keyman.osk {
       let activeStub = keyman.keyboardManager.activeStub;
 
       if(activeStub) {
-        if(activeStub['displayName']) {
+        if(activeStub['displayName'] != null) {
           displayName = activeStub['displayName'];
         } else {
           let

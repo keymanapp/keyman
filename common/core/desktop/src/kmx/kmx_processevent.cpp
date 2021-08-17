@@ -99,7 +99,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
     state->debug_items().push_end(m_actions.Length(), 0);
   }
 
-  ResetCapsLock(modifiers);
+  ResetCapsLock(modifiers, isKeyDown);
 
   m_state.vkey = vkey;
   m_state.charCode = VKeyToChar(modifiers, vkey);
@@ -114,7 +114,8 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
 
   switch (vkey) {
   case KM_KBP_VKEY_CAPS:
-    KeyCapsLockPress(modifiers, isKeyDown);
+    if (KeyCapsLockPress(modifiers, isKeyDown))
+      return TRUE;
     break;
   case KM_KBP_VKEY_SHIFT:
     KeyShiftPress(modifiers, isKeyDown);
@@ -177,26 +178,24 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     m_debug_items->push_group_enter(m_actions.Length(), gp);
   }
 
+  LPKEYBOARD kbd = m_keyboard.Keyboard;
+
+  sdmfI = -1;
+
+  for (i = 0; i < kbd->cxGroupArray; i++) {
+    if (gp == &kbd->dpGroupArray[i]) {
+      sdmfI = i;
+      break;
+    }
+  }
+
   /*
    If the number of nested groups goes higher than 50, then break out - this is
    a limitation of stack size.  This is basically a catch-all for freaky apps that
    cause message loopbacks and nasty things like that.  Okay, it's really a catch all
    for bugs!  This means the user's system shouldn't hang.
   */
-
-  LPKEYBOARD kbd = m_keyboard.Keyboard;
-
-  sdmfI = -1;
-
-  for(i = 0; i < kbd->cxGroupArray; i++)
-    if(gp == &kbd->dpGroupArray[i])
-    {
-      sdmfI = i;
-      break;
-    }
-
-  if(++m_state.LoopTimes > 50)
-  {
+  if (++m_state.LoopTimes > 50) {
     DebugLog("Aborting output: m_state.LoopTimes exceeded.");
     m_state.StopOutput = TRUE;
     if(m_debug_items) {

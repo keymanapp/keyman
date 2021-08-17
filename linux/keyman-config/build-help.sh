@@ -63,13 +63,13 @@ fi
 
 if [ -n "$generate_man" ]; then
     echo "Generating man pages..."
-    mkdir -p debian/man
-    buildtools/help2man -N ./km-package-get -o debian/man/km-package-get.1 -n "Download a Keyman keyboard package" -I maninc/km-package-get.inc
-    buildtools/help2man -N ./km-package-install -o debian/man/km-package-install.1 -n "Install a Keyman keyboard package" -I maninc/km-package-install.inc
-    buildtools/help2man -N ./km-config -o debian/man/km-config.1 -n "Launches Keyman Configuration for installing and showing information about Keyman keyboards" -I maninc/km-config.inc
-    buildtools/help2man -N ./km-kvk2ldml -o debian/man/km-kvk2ldml.1 -n "Convert a Keyman on-screen keyboard file to LDML" -I maninc/km-kvk2ldml.inc
-    buildtools/help2man -N ./km-package-list-installed -o debian/man/km-package-list-installed.1 -n "List installed Keyman keyboard packages" -I maninc/km-package-list-installed.inc
-    buildtools/help2man -N ./km-package-uninstall -o debian/man/km-package-uninstall.1 -n "Uninstall a Keyman keyboard package" -I maninc/km-package-uninstall.inc
+    mkdir -p ../../debian/man
+    buildtools/help2man -N ./km-package-get -o ../../debian/man/km-package-get.1 -n "Download a Keyman keyboard package" -I maninc/km-package-get.inc
+    buildtools/help2man -N ./km-package-install -o ../../debian/man/km-package-install.1 -n "Install a Keyman keyboard package" -I maninc/km-package-install.inc
+    buildtools/help2man -N ./km-config -o ../../debian/man/km-config.1 -n "Launches Keyman Configuration for installing and showing information about Keyman keyboards" -I maninc/km-config.inc
+    buildtools/help2man -N ./km-kvk2ldml -o ../../debian/man/km-kvk2ldml.1 -n "Convert a Keyman on-screen keyboard file to LDML" -I maninc/km-kvk2ldml.inc
+    buildtools/help2man -N ./km-package-list-installed -o ../../debian/man/km-package-list-installed.1 -n "List installed Keyman keyboard packages" -I maninc/km-package-list-installed.inc
+    buildtools/help2man -N ./km-package-uninstall -o ../../debian/man/km-package-uninstall.1 -n "Uninstall a Keyman keyboard package" -I maninc/km-package-uninstall.inc
 fi
 
 if [ -n "$generate_help" ]; then

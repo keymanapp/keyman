@@ -75,6 +75,7 @@ import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.util.WebViewUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -365,6 +366,16 @@ public final class KMManager {
     }
 
     return appVersion;
+  }
+
+  /**
+   * Get the Keyman Engine mode based on the Chrome version
+   * @param aContext
+   * @param webView - If provided, the Chrome version of webView is deterermined
+   * @return WebViewUtils.EngineWebViewVersionStatus
+   */
+  public static WebViewUtils.EngineWebViewVersionStatus getEngineWebViewVersionStatus(Context aContext, WebView webView) {
+    return WebViewUtils.getEngineWebViewVersionStatus(aContext, webView, "");
   }
 
   // Check if a keyboard namespace is reserved
@@ -2148,6 +2159,8 @@ public final class KMManager {
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
         */
+      } else if (url.indexOf("reloadAfterError") >= 0) {
+        InAppKeyboard.reloadAfterError();
       }
       return false;
     }
@@ -2459,8 +2472,9 @@ public final class KMManager {
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
         */
+      } else if (url.indexOf("reloadAfterError") >= 0) {
+        SystemKeyboard.reloadAfterError();
       }
-
       return false;
     }
   }

@@ -1,6 +1,6 @@
 c Description: Tests Caps Lock env set
-c keys: [K_1][K_CAPS][K_2][SHIFT K_3][K_4][K_CAPS][K_5][K_CAPS][K_6]
-c expected: pass.pass.pass.pass.pass.pass.
+c keys: [K_1][K_CAPS][K_2][SHIFT K_3][K_4][K_CAPS][K_5][K_CAPS][K_6][K_SHIFT][K_7]
+c expected: pass.pass.pass.pass.pass.pass.pass.
 c capsLock: 0
 c context:
 
@@ -19,8 +19,9 @@ group(Main) using keys
 + [NCAPS K_2] > 'fail.'
 + [CAPS K_2] > 'pass.'
 
-+ [NCAPS K_3] > 'fail.'
-+ [CAPS K_3] > 'pass.'
+c Shift will free caps lock when it is released, so this test should still have Caps Lock on.
++ [NCAPS SHIFT K_3] > 'fail.'
++ [CAPS SHIFT K_3] > 'pass.'
 
 + [CAPS K_4] > 'fail.'
 + [NCAPS K_4] > 'pass.'
@@ -31,3 +32,6 @@ group(Main) using keys
 + [NCAPS K_6] > 'fail.'
 + [CAPS K_6] > 'pass.'
 
+c Shift was pressed and released ([K_SHIFT]) so Caps should be off before this
++ [CAPS K_7] > 'fail.'
++ [NCAPS K_7] > 'pass.'

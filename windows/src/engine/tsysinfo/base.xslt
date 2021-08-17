@@ -7,37 +7,37 @@
     <head>
       <style type="text/css">
 
-        table 
+        table
         {
-          border-collapse: collapse; 
+          border-collapse: collapse;
         }
 
-        h1 
+        h1
         {
           font: bold 16pt Calibri, Tahoma;
           margin: 16px 0 4px 0;
           color: #444444;
         }
 
-        h2 
+        h2
         {
-          font: bold 12pt Calibri, Tahoma; 
-          margin: 16px 0 4px 0; 
+          font: bold 12pt Calibri, Tahoma;
+          margin: 16px 0 4px 0;
           color: #444444;
         }
 
-        td, th 
+        td, th
         {
           border: solid 1px #cccccc;
           font: 9pt Calibri, Tahoma;
           padding: 2px 4px
         }
 
-        th 
+        th
         {
-          background: #444444; 
-          border: solid 1px #444444; 
-          color: white; 
+          background: #444444;
+          border: solid 1px #444444;
+          color: white;
           font-weight: bold
         }
 
@@ -45,10 +45,10 @@
         .Folder,
         .Location
         {
-          font-weight: bold; 
+          font-weight: bold;
           background: #eeeeee
         }
-        
+
         .RegistryValueBinary
         {
           font: 8pt Consolas,Courier;
@@ -59,40 +59,40 @@
         }
 
         .FileName,
-        .FileDate 
+        .FileDate
         {
           white-space: nowrap
         }
-        
+
         td.expand
         {
           cursor: pointer
         }
-        
+
         td.expand span
-        { 
-          display: block; 
-          width: 12px; 
-          height: 13px; 
-          border: solid 1px #444444; 
-          overflow: hidden; 
-          color: #444444; 
-          font-weight: normal; 
-          text-align: center; 
-          font-size: 10pt; 
-          font-family: Arial; 
-          line-height: 0.7em; 
-          padding: 1px 0 0 0; 
+        {
+          display: block;
+          width: 12px;
+          height: 13px;
+          border: solid 1px #444444;
+          overflow: hidden;
+          color: #444444;
+          font-weight: normal;
+          text-align: center;
+          font-size: 10pt;
+          font-family: Arial;
+          line-height: 0.7em;
+          padding: 1px 0 0 0;
           margin: 0 2px
         }
 
-        tr.Module 
-        { 
+        tr.Module
+        {
           display: none;
         }
-        
+
         tr.Process td
-        { 
+        {
           font-weight: bold
         }
       </style>
@@ -105,12 +105,12 @@
             for(var i = tr.rowIndex + 1; i &lt; table.rows.length; i++)
             {
               if(table.rows[i].className == 'Process') break;
-              if(table.rows[i].style.display == '') { table.rows[i].style.display = 'block'; fExpanding = true; }
+              if(table.rows[i].style.display == '') { table.rows[i].style.display = 'table-row'; fExpanding = true; }
               else { table.rows[i].style.display = ''; fExpanding = false; }
-            }              
+            }
             td.childNodes[0].innerHTML = fExpanding ? '-' : '+';
           }
-          
+
           function showBinaryData(elem)
           {
             var data = elem.parentElement.parentElement.childNodes(1);
@@ -150,7 +150,7 @@
     </tr>
     <xsl:apply-templates select="*" mode="Folder" />
   </xsl:template>
-  
+
   <xsl:template mode="Folder" match="File">
     <tr>
       <td class="FileName"><xsl:value-of select="@Name"/></td>
@@ -178,13 +178,13 @@
       </tbody>
     </table>
   </xsl:template>
-  
+
   <xsl:template mode="Registry" match="Key">
     <tr><td colspan="3" class="Key"><xsl:value-of select="@Path"/></td></tr>
     <xsl:apply-templates select="Value" mode="Registry" />
     <xsl:apply-templates select="Key" mode="Registry" />
   </xsl:template>
-  
+
   <xsl:template mode="Registry" match="Value">
     <tr>
       <td><xsl:value-of select="@Name" /></td>
@@ -204,5 +204,5 @@
       </td>
     </tr>
   </xsl:template>
-  
-</xsl:stylesheet> 
+
+</xsl:stylesheet>

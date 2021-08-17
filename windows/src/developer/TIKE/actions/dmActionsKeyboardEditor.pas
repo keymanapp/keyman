@@ -137,13 +137,14 @@ var
 implementation
 
 uses
-  ComObj,
-  Forms,
+  Vcl.Forms,
   Vcl.Menus,
+  System.Win.ComObj,
   Winapi.Windows,
 
   KMDActions,
   KMDActionInterfaces,
+  Keyman.System.Debug.DebugUIStatus,
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.UI.Project.kmnProjectFileUI,
   Keyman.Developer.System.Project.kpsProjectFile,

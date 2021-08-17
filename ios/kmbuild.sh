@@ -24,7 +24,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 verify_on_mac
 
 display_usage ( ) {
-    echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-no-build] [-upload-sentry]"
+    echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-add-sim-artifact] [-no-build] [-upload-sentry]"
     echo
     echo "  -clean                  Removes all previously-existing build products for KMEI and the Keyman app before building."
     echo "  -no-kmw                 Uses existing keyman.js, doesn't try to build"
@@ -37,6 +37,7 @@ display_usage ( ) {
     echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
     echo "  -debug                  Sets the configuration to debug mode instead of release."
     echo "  -download-resources     Download up-to-date versions of the engine's default resources from downloads.keyman.com."
+    echo "  -add-sim-artifact       Also produce a Simulator-installable .app build artifact"
 exit 1
 }
 
@@ -55,6 +56,7 @@ BUILD_PATH=$DERIVED_DATA/Build/Products
 DO_KMW_BUILD=true
 DO_KEYMANAPP=true
 DO_ARCHIVE=true
+DO_SIMULATOR_TARGET=false
 DO_CARTHAGE=true
 CLEAN_ONLY=false
 CONFIG=Release
@@ -103,6 +105,9 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -download-resources)
             DO_KMP_DOWNLOADS=true
+            ;;
+        -add-sim-artifact)
+            DO_SIMULATOR_TARGET=true
             ;;
     esac
     shift # past argument
@@ -284,7 +289,7 @@ if [ $DO_KEYMANAPP = true ]; then
   else
     # Time to prepare the deployment archive data.
     echo ""
-    echo "Preparing .xcarchive."
+    echo "Preparing .xcarchive for real devices."
     xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -archivePath $ARCHIVE_PATH \
                 archive -allowProvisioningUpdates \
@@ -296,11 +301,23 @@ if [ $DO_KEYMANAPP = true ]; then
     assertDirExists "$ARCHIVE_PATH"
 
     if [ $DO_CODE_SIGN == true ]; then
-      echo "Preparing .ipa file for deployment"
+      echo "Preparing .ipa file for deployment to real devices"
+      # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
+      # Xcode to generate a build error.
       xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
                   -exportOptionsPlist exportAppStore.plist \
                   -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
     fi
+  fi
+
+  if [ $DO_SIMULATOR_TARGET == true ]; then
+    echo "Preparing .app file for simulator-targeted artifact for testing"
+    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+                -sdk iphonesimulator \
+                VERSION=$VERSION \
+                VERSION_WITH_TAG=$VERSION_WITH_TAG \
+                VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+                UPLOAD_SENTRY=$UPLOAD_SENTRY 
   fi
 
   echo ""

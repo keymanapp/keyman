@@ -53,7 +53,7 @@ if(!window['keyman']['initialized']) {
       if(s) {
         bg.pending=true;
         window.setTimeout(function() {
-            if(bg.pending) {
+            if(bg.pending && keymanweb.options.useAlerts) {
               window.scrollTo(0,0);
               nn[0].style.display='none';
               nn[1].className='kmw-wait-text'; nn[1].innerHTML=s;
