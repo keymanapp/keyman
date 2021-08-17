@@ -924,7 +924,7 @@ namespace com.keyman.osk {
 
       if(core.languageProcessor.isActive && input) {
         Lkc.source = input;
-        Lkc.keyDistribution = this.getTouchProbabilities(input);;
+        Lkc.keyDistribution = this.getTouchProbabilities(input);
       }
 
       // Return the event object.
@@ -1002,7 +1002,7 @@ namespace com.keyman.osk {
       let activeStub = keyman.keyboardManager.activeStub;
 
       if(activeStub) {
-        if(activeStub['displayName']) {
+        if(activeStub['displayName'] != null) {
           displayName = activeStub['displayName'];
         } else {
           let

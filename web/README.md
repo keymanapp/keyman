@@ -1,4 +1,4 @@
-# Keyman Web
+# Keyman Engine for Web
 The Original Code is (C) SIL International
 
 ## Prerequisites
@@ -8,20 +8,20 @@ See [build configuration](../docs/build/index.md) for details on how to configur
 
 The following folders contain the distribution for KeymanWeb:
 
-	source                      Source code
-	sources/resources/osk       OSK resources for inclusion in mobile app builds;
-	                            keymanweb-osk.ttf is maintained at https://github.com/silnrsi/font-keymanweb-osk
-	unit_tests                  Automated testing resources
+    source                       Source code
+    source/resources/osk         OSK resources for inclusion in mobile app builds;
+                                 keymanweb-osk.ttf is maintained at https://github.com/silnrsi/font-keymanweb-osk
+    unit_tests                   Automated testing resources
 
-	intermediate    	Intermediate compiled code; TypeScript source is compiled here before it is minified.
-	release/web			Fully-compiled KeymanWeb modules for testing
-	release/embedded	Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
-	release/unminified/web       Fully-compiled but non-minified KeymanWeb modules
-	release/unminified/embedded  Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
+    intermediate                 Intermediate compiled code; TypeScript source is compiled here before it is minified.
+    release/web                  Fully-compiled KeymanWeb modules for testing
+    release/embedded             Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
+    release/unminified/web       Fully-compiled but non-minified KeymanWeb modules
+    release/unminified/embedded  Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
 
-	samples				Sample pages demonstrating ways to link with KeymanWeb
-	testing     		Test-case web-pages for various aspects of KeymanWeb functionality
-	unit_tests			A Node-driven test suite for automated testing of KeymanWeb
+    samples                      Sample pages demonstrating ways to link with KeymanWeb
+    testing                      Test-case web-pages for various aspects of KeymanWeb functionality
+    unit_tests                   A Node-driven test suite for automated testing of KeymanWeb
 
 ## Usage
 Open **index.html** or **samples/index.html** in your browser. Be sure to compile KeymanWeb before viewing the pages.
@@ -46,7 +46,7 @@ To view pages using compiled KeymanWeb,
     - to compile a readable version of the embedded KMEA/KMEI code
 *  `-no_minify`
     - to disable the minified '/release/web' and '/release/embedded' build sections.
-	- the '/release/unminified/web' and '/release/unminified/embedded' folders will still be built.
+    - the '/release/unminified/web' and '/release/unminified/embedded' folders will still be built.
 *  `-clean`
     - to erase pre-existing build products before the build.
 

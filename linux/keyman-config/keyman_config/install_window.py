@@ -3,7 +3,7 @@
 # Install confirmation with details window
 
 import logging
-import os.path
+import os
 import pathlib
 import subprocess
 import sys

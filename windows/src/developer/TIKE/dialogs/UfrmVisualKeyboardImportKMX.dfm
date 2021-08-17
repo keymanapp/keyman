@@ -8,7 +8,6 @@ inherited frmVisualKeyboardImportKMX: TfrmVisualKeyboardImportKMX
   ClientWidth = 221
   Font.Name = 'MS Sans Serif'
   Position = poScreenCenter
-  OnDestroy = FormDestroy
   ExplicitWidth = 227
   ExplicitHeight = 100
   PixelsPerInch = 96

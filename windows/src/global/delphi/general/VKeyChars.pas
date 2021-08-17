@@ -19,7 +19,7 @@ unit VKeyChars;
 
 interface
 
-const SUSVkeyChars: array[0..1,0..255] of WideChar = (
+const SUSVkeyChars: array[0..1,0..255] of Char = (
 (
 	#$0,         //'??00',					// &H0
 	#$0,         //'?Left Mouse Button',	// &H1
@@ -563,6 +563,55 @@ const SUSVkeyChars: array[0..1,0..255] of WideChar = (
 	#$0         //'??FF'					// &HFF
 ));
 
+type
+  TUSVKey = record
+    IsShift: Boolean;
+    VKey: Word;
+  end;
+
+function CharToUSVKey(ch: AnsiChar): TUSVKey;
+
 implementation
+
+var
+  _CharToUSVKey: array[0..127] of TUSVKey;
+  _Initialized: Boolean = False;
+
+procedure Init; forward;
+
+function CharToUSVKey(ch: AnsiChar): TUSVKey;
+begin
+  if Ord(ch) > 127 then
+  begin
+    Result.VKey := 0;
+    Result.IsShift := False;
+    Exit;
+  end;
+
+  if not _Initialized then
+    Init;
+
+  Result := _CharToUSVKey[Ord(ch)];
+end;
+
+procedure Init;
+var
+  shift, vk: Integer;
+  ch: Char;
+begin
+  _Initialized := True;
+  for shift := 0 to 1 do
+  begin
+    for vk := 0 to 255 do
+    begin
+      ch := SUSVkeyChars[shift, vk];
+      if ch <> #0 then
+      begin
+        _CharToUSVKey[Ord(ch)].IsShift := shift = 1;
+        _CharToUSVKey[Ord(ch)].VKey := vk;
+      end;
+    end;
+  end;
+end;
 
 end.

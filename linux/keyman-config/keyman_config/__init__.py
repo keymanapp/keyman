@@ -2,7 +2,7 @@ import getpass
 import gettext
 import importlib
 import logging
-import os.path
+import os
 import platform
 import sys
 

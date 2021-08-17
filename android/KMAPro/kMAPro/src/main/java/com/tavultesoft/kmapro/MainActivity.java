@@ -40,6 +40,8 @@ import com.keyman.android.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 import com.tavultesoft.kmea.util.KMString;
+import com.tavultesoft.kmea.util.WebViewUtils;
+import com.tavultesoft.kmea.util.WebViewUtils.EngineWebViewVersionStatus;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -85,6 +87,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -197,6 +202,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
+    // Use in-app keyboard WebView to check the Chrome version
+    checkChromeVersion(KMManager.getKMKeyboard(KeyboardType.KEYBOARD_TYPE_INAPP));
     CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
     checkGetStarted();
   }
@@ -527,12 +534,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         url = url.toLowerCase();
         try {
           if (progressDialog == null) {
-            progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
-            progressDialog.setCancelable(true); // Cancelable in case there's exceptions
-            progressDialog.show();
-
-            // Download the KMP to app cache
             Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
             downloadIntent.putExtra("url", url);
             downloadIntent.putExtra("filename", filename);
@@ -541,6 +542,19 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             downloadIntent.putExtra("receiver", resultReceiver);
             downloadIntent.putExtra("installMode", installMode);
 
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
+            progressDialog.setCancelable(true); // Cancelable in case there's exceptions
+            progressDialog.show();
+            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+              @Override
+              public void onCancel(DialogInterface dialog) {
+                stopService(downloadIntent);
+                cleanupPackageInstall();
+              }
+            });
+
+            // Download the KMP to app cache
             startService(downloadIntent);
           }
         } catch (Exception e) {
@@ -762,6 +776,27 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     boolean maySendCrashReport = prefs.getBoolean(KeymanSettingsActivity.sendCrashReport, true);
     KMManager.setMaySendCrashReport(maySendCrashReport);
+  }
+
+  private void checkChromeVersion(WebView webView) {
+    if (WebViewUtils.getEngineWebViewVersionStatus(context, webView, "") != EngineWebViewVersionStatus.FULL) {
+      LinearLayout updateChromeLayout = (LinearLayout) findViewById(R.id.updateChromeLayout);
+      updateChromeLayout.setVisibility(View.VISIBLE);
+
+      Button updateChromeButton = (Button)findViewById(R.id.updateChromeButton);
+      updateChromeButton.setOnClickListener(new View.OnClickListener() {
+        public void onClick(View v) {
+          // Launch PlayStore to update Chrome
+          try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.android.chrome"));
+            startActivity(intent);
+          } catch (android.content.ActivityNotFoundException e) {
+            // Link to Chrome if user is not signed in to Play Store
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome")));
+          }
+        }
+      });
+    }
   }
 
   private Uri requestPermissionIntentUri;

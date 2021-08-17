@@ -20,7 +20,10 @@ unit debugkeyboard;
 
 interface
 
-uses Classes, SysUtils;
+uses
+  System.Classes,
+  System.SysUtils,
+  kmxfile;
 
 { Load line number details from compiled keyboard }
 
@@ -77,10 +80,54 @@ type
     destructor Destroy; override;
   end;
 
+  { KMX file structures mapped into memory }
+
+  TKeymanStoreEx = record
+    Store: TKeyboardFileStore;
+    MatchPosition: Integer;
+  end;
+
+  PKeymanStoreEx = ^TKeymanStoreEx;
+
+  TKeymanKey = packed record
+    Key: WideChar; packing: Word;
+    Line: Cardinal;
+    ShiftFlags: Cardinal;
+    dpOutput: PWideChar;
+    dpContext: PWideChar;
+  end;
+
+  PKeymanKey = ^TKeymanKey;
+
+  TKeymanKeyEx = record
+    Key: WideCHAR;
+    Line: Cardinal;
+    ShiftFlags: Cardinal;
+    dpOutput: string;
+    dpContext: string;
+  end;
+
+  TKeymanGroup = packed record
+    dpName: PWideChar;
+    dpKeyArray: PKeymanKey;
+    dpMatch: PWideChar;
+    dpNoMatch: PWideChar;
+    cxKeyArray: Cardinal;
+    fUsingKeys: LongBool;
+  end;
+
+  PKeymanGroup = ^TKeymanGroup;
+
+  TKeymanGroupEx = record
+    dpName: string;
+    dpMatch: string;
+    dpNoMatch: string;
+    fUsingKeys: LongBool;
+  end;
+
 implementation
 
 uses
-  kmxfile,
   kmxfileconsts;
 
 { TDebugGroupList }

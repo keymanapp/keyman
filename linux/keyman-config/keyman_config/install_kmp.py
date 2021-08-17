@@ -2,7 +2,7 @@
 
 import json
 import logging
-import os.path
+import os
 import zipfile
 from shutil import rmtree
 from enum import Enum

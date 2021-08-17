@@ -1,7 +1,5 @@
 inherited frmDebugStatus_RegTest: TfrmDebugStatus_RegTest
   Caption = 'frmDebugStatus_RegTest'
-  ExplicitWidth = 320
-  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
   object panRegTestCommands: TPanel
