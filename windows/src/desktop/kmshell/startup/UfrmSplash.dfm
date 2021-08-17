@@ -11,9 +11,4 @@ inherited frmSplash: TfrmSplash
   ExplicitHeight = 452
   PixelsPerInch = 96
   TextHeight = 13
-  object ApplicationEvents1: TApplicationEvents
-    OnMessage = ApplicationEvents1Message
-    Left = 192
-    Top = 152
-  end
 end
