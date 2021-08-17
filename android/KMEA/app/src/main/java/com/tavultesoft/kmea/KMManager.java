@@ -489,15 +489,12 @@ public final class KMManager {
   private static void doGlobeKeyLongpressAction(Context context, KeyboardType keyboard) {
     boolean keyboardPickerEnabled = false;
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (InAppKeyboard == null) {
-        return;
-      }
-      keyboardPickerEnabled = InAppKeyboard.keyboardPickerEnabled;
+      keyboardPickerEnabled = InAppKeyboard != null && InAppKeyboard.keyboardPickerEnabled;
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (SystemKeyboard == null) {
-        return;
-      }
-      keyboardPickerEnabled = SystemKeyboard.keyboardPickerEnabled;
+      keyboardPickerEnabled = SystemKeyboard != null && SystemKeyboard.keyboardPickerEnabled;
+    } else {
+      // assertion failure?
+      return;
     }
 
     if (keyboardPickerEnabled) {
@@ -508,26 +505,22 @@ public final class KMManager {
   /**
    * Handle the globe key shortpress action
    * @param context
-   * @param keyboard KeboardType of KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
+   * @param keyboard KeyboardType of KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
    */
   private static void doGlobeKeyShortpressAction(Context context, KeyboardType keyboard) {
     GlobeKeyAction action = GlobeKeyAction.GLOBE_KEY_ACTION_DO_NOTHING;
     boolean keyboardPickerEnabled = false;
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (InAppKeyboard == null) {
+      if (InAppKeyboard == null || !InAppKeyboard.keyboardPickerEnabled) {
         return;
       }
-      keyboardPickerEnabled = InAppKeyboard.keyboardPickerEnabled;
       action = inappKbGlobeKeyAction;
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (SystemKeyboard == null) {
+      if (SystemKeyboard == null || !SystemKeyboard.keyboardPickerEnabled) {
         return;
       }
-      keyboardPickerEnabled = SystemKeyboard.keyboardPickerEnabled;
       action = sysKbGlobeKeyAction;
     }
-
-    if (keyboardPickerEnabled) {
       if (action == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD &&
         KeyboardController.getInstance().get().size() == 1) {
         // Override when keyboard switch and only 1 keyboard installed ==>show menu
@@ -2015,7 +2008,7 @@ public final class KMManager {
 
     if (KMManager.shouldAllowSetKeyboard()) {
       KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
-      // inKeyguardRestrictedInputMode() deprecated, so check isKeyboardLocked to determine if screen is locked
+      // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
       if (keyguardManager.isKeyguardLocked()) {
         if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
           doGlobeKeyLockscreenAction(context);
