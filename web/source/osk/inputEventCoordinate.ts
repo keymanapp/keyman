@@ -43,7 +43,7 @@ namespace com.keyman.osk {
     }
 
     public get activeInputCount(): number {
-      if(this.source instanceof TouchEvent) {
+      if(window['TouchEvent'] && this.source instanceof TouchEvent) {
         return this.source.touches.length;
       } else {
         return 1;
