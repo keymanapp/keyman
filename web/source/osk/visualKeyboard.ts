@@ -913,7 +913,7 @@ namespace com.keyman.osk {
 
       if(core.languageProcessor.isActive && input) {
         Lkc.source = input;
-        Lkc.keyDistribution = this.getTouchProbabilities(input);;
+        Lkc.keyDistribution = this.getTouchProbabilities(input);
       }
 
       // Return the event object.

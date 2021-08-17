@@ -8,7 +8,7 @@ namespace com.keyman.osk {
       this.vkbd = vkbd;
     }
 
-    protected get eventRoot(): HTMLDivElement {
+    protected get eventRoot(): HTMLElement {
       return this.vkbd.layerGroup.element;
     }
 
