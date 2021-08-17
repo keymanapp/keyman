@@ -4,6 +4,8 @@ namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
 
   export class OSKBaseKey extends OSKKey {
+    private capLabel: HTMLDivElement;
+
     constructor(spec: OSKKeySpec, layer: string) {
       super(spec, layer);
     }
@@ -11,6 +13,10 @@ namespace com.keyman.osk {
     getId(): string {
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       return this.spec.elementID;
+    }
+
+    getCoreId(): string {
+      return this.spec.coreID;
     }
 
     // Produces a small reference label for the corresponding physical key on a US keyboard.
@@ -73,7 +79,7 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(osk: VisualKeyboard, layout: keyboards.LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(osk: VisualKeyboard, displayUnderlying: boolean, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let spec = this.spec;
       let isDesktop = osk.device.formFactor == "desktop"
 
@@ -112,12 +118,10 @@ namespace com.keyman.osk {
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
 
       // Add the (US English) keycap label for layouts requesting display of underlying keys
-      if(layout["displayUnderlying"]) {
-        let keyCap = this.generateKeyCapLabel();
-
-        if(keyCap) {
-          btn.appendChild(keyCap);
-        }
+      let keyCap = this.capLabel = this.generateKeyCapLabel();
+      if(keyCap) {
+        btn.appendChild(keyCap);
+        keyCap.style.display = displayUnderlying ? 'block' : 'none';
       }
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
@@ -161,6 +165,19 @@ namespace com.keyman.osk {
         return v + unit;
       } else { // unit == 'px'
         return (Math.round(v*100)/100)+unit; // round to 2 decimal places, making css more readable
+      }
+    }
+
+    public refreshLayout(vkbd: VisualKeyboard) {
+      super.refreshLayout(vkbd);
+
+      let util = com.keyman.singleton.util;
+      const device = vkbd.device;
+      const resizeLabels = (device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
+
+      // Rescale keycap labels on iPhone (iOS 7)
+      if(resizeLabels && this.capLabel) {
+        this.capLabel.style.fontSize = '6px';
       }
     }
   }

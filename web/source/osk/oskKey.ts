@@ -129,8 +129,8 @@ namespace com.keyman.osk {
     ];
 
     static readonly HIGHLIGHT_CLASS = 'kmw-key-touched';
+    readonly spec: OSKKeySpec;
 
-    spec: OSKKeySpec;
     btn: KeyElement;
     label: HTMLSpanElement;
 
@@ -169,12 +169,62 @@ namespace com.keyman.osk {
       }
 
       // Apply an overriding class for 5-row layouts
-      var nRows=vkbd.layout['layer'][0]['row'].length;
+      var nRows=vkbd.kbdLayout['layer'][0]['row'].length;
       if(nRows > 4 && vkbd.device.formFactor == 'phone') {
         btn.className='kmw-key kmw-5rows kmw-key-'+OSKKey.BUTTON_CLASSES[n];
       } else {
         btn.className='kmw-key kmw-key-'+OSKKey.BUTTON_CLASSES[n];
       }
+    }
+
+    /**
+     * For keys with button classes that support toggle states, this method
+     * may be used to toggle which state the key's button class is in.
+     * -  shift  <=>  shift-on
+     * - special <=> special-on
+     * @param {boolean=} flag The new toggle state 
+     */
+    public setToggleState(vkbd: VisualKeyboard, flag?: boolean) {
+      let btnClassId: number;
+      let classAsString: boolean;
+
+      if(classAsString = typeof this.spec['sp'] == 'string') {
+        btnClassId = parseInt(this.spec['sp'], 10);
+      } else {
+        btnClassId = this.spec['sp'];
+      }
+      
+      // 1 + 2:   shift  +  shift-on
+      // 3 + 4:  special + special-on
+      switch(OSKKey.BUTTON_CLASSES[btnClassId]) {
+        case 'shift':
+        case 'shift-on':
+          if(flag === undefined) {
+            flag = OSKKey.BUTTON_CLASSES[btnClassId] == 'shift';
+          }
+
+          this.spec['sp'] = 1 + (flag ? 1 : 0);
+          break;
+        // Added in 15.0:  special key highlight toggling.
+        // Was _intended_ in earlier versions, but not actually implemented.
+        case 'special':
+        case 'special-on':
+          if(flag === undefined) {
+            flag = OSKKey.BUTTON_CLASSES[btnClassId] == 'special';
+          }
+
+          this.spec['sp'] = 3 + (flag ? 1 : 0);
+          break;
+        default:
+          return;
+      }
+
+      if(classAsString) {
+        // KMW currently doesn't handle raw numbers for 'sp' properly.
+        this.spec['sp'] = ('' + this.spec['sp']) as keyboards.ButtonClass;
+      }
+
+      this.setButtonClass(vkbd);
     }
 
     // "Frame key" - generally refers to non-linguistic keys on the keyboard
@@ -443,6 +493,12 @@ namespace com.keyman.osk {
       let y1 = y0 + btn.offsetHeight;
 
       return (x > x0 && x < x1 && y > y0 && y < y1);
+    }
+
+    public refreshLayout(vkbd: VisualKeyboard) {
+      if(this.label) { // space bar may not define the text span!
+        this.label.style.fontSize = this.getIdealFontSize(vkbd, this.btn.style);
+      }
     }
   }
 }
