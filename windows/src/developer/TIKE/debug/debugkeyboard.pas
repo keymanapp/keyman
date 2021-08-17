@@ -218,7 +218,10 @@ begin
               dk := TDebugDeadKey.Create;
               DeadKeys.Add(dk);
               n := Pos(' ', s); if n = 0 then n := Length(s)+1;
-              dk.Value := StrToIntDef(Copy(s,1,n-1), -1);
+              // The deadkey value stored in the debug data is zero-based but
+              // we need to work with a 1-based value (0 conflates with
+              // end-of-string in extended strings)
+              dk.Value := StrToIntDef(Copy(s,1,n-1), -2) + 1;
               dk.Name := Copy(s,n+1, 128);
             end
             else
