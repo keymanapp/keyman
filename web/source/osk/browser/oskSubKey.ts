@@ -43,7 +43,7 @@ namespace com.keyman.osk.browser {
       let btnEle=document.createElement('div');
       let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
-      this.setButtonClass(osk);
+      this.setButtonClass();
       btn.id = this.getId();
 
       // Must set button size (in px) dynamically, not from CSS

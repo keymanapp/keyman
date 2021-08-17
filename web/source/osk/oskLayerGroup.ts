@@ -28,8 +28,6 @@ namespace com.keyman.osk {
         ls.fontSize=layout['fontsize'];
       }
 
-      vkbd.fontSize=ls.fontSize;       //TODO: move outside function*********
-
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
       var n: number, i: number, j: number;
       var layers: keyboards.LayoutLayer[];

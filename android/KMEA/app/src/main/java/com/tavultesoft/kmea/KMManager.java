@@ -494,7 +494,7 @@ public final class KMManager {
    * combined banner height and keyboard height
    * @return RelativeLayout.LayoutParams
    */
-  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+  public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(

@@ -69,27 +69,31 @@ namespace com.keyman.osk {
 
     public refreshLayout(vkbd: VisualKeyboard, rowHeight: number, bottom: number, pad: number) {
       const rs = this.element.style;
-      if(!vkbd.isStatic) {
-        rs.bottom=bottom+'px';
+      if(vkbd.usesFixedHeightScaling) {
+        if(!vkbd.isStatic) {
+          rs.bottom=bottom+'px';
+        }
+        rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
       }
-      rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
 
       for(const key of this.keys) {
         const keySquare  = key.btn.parentElement;
         const keyElement = key.btn;
 
-        // Set the kmw-key-square position
-        const kss = keySquare.style;
-        if(!vkbd.isStatic) {
-          kss.bottom=(bottom-pad/2)+'px';
-        }
-        kss.height=kss.minHeight=(rowHeight)+'px';
+        if(vkbd.usesFixedHeightScaling) {
+          // Set the kmw-key-square position
+          const kss = keySquare.style;
+          if(!vkbd.isStatic) {
+            kss.bottom=(bottom-pad/2)+'px';
+          }
+          kss.height=kss.minHeight=(rowHeight)+'px';
 
-        const kes = keyElement.style;
-        if(!vkbd.isStatic) {
-          kes.bottom=bottom+'px';
+          const kes = keyElement.style;
+          if(!vkbd.isStatic) {
+            kes.bottom=bottom+'px';
+          }
+          kes.height=kes.lineHeight=kes.minHeight=(rowHeight-pad)+'px';
         }
-        kes.height=kes.lineHeight=kes.minHeight=(rowHeight-pad)+'px';
 
         if(keyElement.key) {
           keyElement.key.refreshLayout(vkbd);

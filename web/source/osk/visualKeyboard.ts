@@ -1,4 +1,5 @@
 /// <reference path="preProcessor.ts" />
+/// <reference path="lengthStyle.ts" />
 /// <reference path="utils.ts" />
 /// <reference path="oskLayerGroup.ts" />
 /// <reference path="keytip.interface.ts" />
@@ -32,12 +33,22 @@ namespace com.keyman.osk {
     kbdDiv: HTMLDivElement;
     styleSheet: HTMLStyleElement;
 
-    _width: number;
-    _height: number;
+    /**
+     * The configured width for this VisualKeyboard.  May be `undefined` or `null`
+     * to allow automatic width scaling. 
+     */
+    private _width: number;
+
+    /**
+     * The configured height for this VisualKeyboard.  May be `undefined` or `null`
+     * to allow automatic height scaling. 
+     */
+    private _height: number;
 
     // Style-related properties
     fontFamily: string;
-    fontSize: string;
+    private _fontSize: ParsedLengthStyle;
+    // fontSize: string;
 
     // State-related properties
     keyPending: KeyElement;
@@ -159,53 +170,46 @@ namespace com.keyman.osk {
     }
 
     public postInsert(): void { }
-
+ 
+    /**
+     * The configured width for this VisualKeyboard.  May be `undefined` or `null`
+     * to allow automatic width scaling. 
+     */
     get width(): number {
-      if(this._width) {
-        return this._width;
-      } else {
-        this.loadSizeFromCookie();
-        return this.width;
-      }
+      return this._width;
     }
 
+    /**
+     * The configured height for this VisualKeyboard.  May be `undefined` or `null`
+     * to allow automatic height scaling. 
+     */
     get height(): number {
-      if(this._height) {
-        return this._height;
-      } else {
-        this.loadSizeFromCookie();
-        return this.height;
-      }
+      return this._height;
     }
 
-    protected loadSizeFromCookie() {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
+    get fontSize(): ParsedLengthStyle {
+      return this._fontSize;
+    }
 
-      // If no prior cookie exists, it merely returns an empty object / cookie.
-      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      var newWidth: number, newHeight: number;
+    set fontSize(value: ParsedLengthStyle) {
+      this._fontSize = value;
+      this.kbdDiv.style.fontSize = value.styleString;
+    }
 
-      // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-      newWidth=util.toNumber(c['width'], 0.333 * screen.width); // Default - 1/3rd of screen's width.
+    /**
+     * Uses fixed scaling for widths of internal elements, rather than relative,
+     * percent-based scaling.
+     */
+    public get usesFixedWidthScaling(): boolean {
+      return this.device.touchable && !this.isStatic;
+    }
 
-      if(newWidth < 0.2*screen.width) {
-        newWidth = 0.2*screen.width;
-      } else if(newWidth > 0.9*screen.width) {
-        newWidth=0.9*screen.width;
-      }
-
-      // Default height decision made here:
-      // https://github.com/keymanapp/keyman/pull/4279#discussion_r560453929
-      newHeight=util.toNumber(c['height'], 0.333 * newWidth);
-
-      if(newHeight < 0.15*screen.height) {
-        newHeight = 0.15 * screen.height;
-      } else if(newHeight > 0.5*screen.height) {
-        newHeight=0.5*screen.height;
-      }
-
-      this.setSize(newWidth, newHeight);
+    /**
+     * Uses fixed scaling for heights of internal elements, rather than relative,
+     * percent-based scaling.
+     */
+    public get usesFixedHeightScaling(): boolean {
+      return this.device.touchable && !this.isStatic;
     }
 
     /**
@@ -218,24 +222,27 @@ namespace com.keyman.osk {
       this._width = width;
       this._height = height;
 
-      if(!pending && this.kbdDiv) {
-        this.kbdDiv.style.width=this._width+'px';
-        this.kbdDiv.style.height=this._height+'px';
-        this.kbdDiv.style.fontSize=(this._height/8)+'px';
-      }
-    }
+      if(this.kbdDiv) {
+        this.kbdDiv.style.width    = width ? this._width + 'px' : '';
+        this.kbdDiv.style.height   = height ? this._height + 'px' : '';
 
-    public defaultFontSize(): number {
-      return this.height / 8;
+        if(!this.device.touchable) {
+          this.kbdDiv.style.fontSize = height ? ((this._height/8) + 'px') : '';
+        }
+
+        if(!pending) {
+          this.refreshLayout();
+        }
+      }
     }
 
     /**
      * Called by OSKManager after resize operations in order to determine the final
      * size actually used by the visual keyboard.
      */
-    public refit() {
-      this._width=this.kbdDiv.offsetWidth;
-      this._height=this.kbdDiv.offsetHeight;
+    public refit() {  // TODO:  Should probably remove; VisualKeyboard shouldn't be responsible for it.
+      this._width  = this.kbdDiv.offsetWidth;
+      this._height = this.kbdDiv.offsetHeight;
     }
 
     /**
@@ -515,7 +522,6 @@ namespace com.keyman.osk {
      *
      **/
     moveOver: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
-      let keyman = com.keyman.singleton;
       e.preventDefault();
       e.cancelBubble=true;
 
@@ -568,14 +574,13 @@ namespace com.keyman.osk {
       this.currentTarget = key1;
 
       // _Box has (most of) the useful client values.
-      let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
       let height = this.kbdDiv.offsetHeight;
       // We need to adjust the offset properties by any offsets related to the active banner.
 
       // Determine the y-threshold at which touch-cancellation should automatically occur.
       let rowCount = this.currentLayer.rows.length;
       let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
-      var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold) : 5;
+      var yMin = Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold);
       if(key0 && e.touches[0].pageY < yMin) {
         this.highlightKey(key0,false);
         this.showKeyTip(null,false);
@@ -808,7 +813,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i].setToggleState(this, core.keyboardProcessor.stateKeys[states[i]]);
+        keys[i].setToggleState(core.keyboardProcessor.stateKeys[states[i]]);
       }
     }
 
@@ -978,28 +983,25 @@ namespace com.keyman.osk {
      * Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
      * This function allows us to calculate the font size in those situations.
      */
-    getKeyEmFontSize() {
-      let keyman = com.keyman.singleton;
+    getKeyEmFontSize(): number {
+      if(!this.fontSize) {
+        return 0;
+      }
 
       if(this.device.formFactor == 'desktop') {
-        let kbdFontSize = this.defaultFontSize();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
-        return kbdFontSize * keySquareScale;
+        return this.fontSize.scaledBy(keySquareScale).val;
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = getFontSizeStyle(emSizeStr).val;
 
         var emScale = 1;
         if(!this.isStatic) {
-          // Reading this requires the OSK to be active, so we filter out
-          // BuildVisualKeyboard calls here.
-          let boxFontStyle = getFontSizeStyle(keyman.osk._Box);
-
           // Double-check against the font scaling applied to the _Box element.
-          if(boxFontStyle.absolute) {
-            return boxFontStyle.val;
+          if(this.fontSize.absolute) {
+            return this.fontSize.val;
           } else {
-            emScale = boxFontStyle.val;
+            emScale = this.fontSize.val;
           }
         }
         return emSize * emScale;
@@ -1037,10 +1039,10 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Adjust the absolute height of each keyboard element after a rotation
-     *
-     **/
-    refreshLayout(height: number) {
+     * Used to refresh the VisualKeyboard's geometric layout and key sizes
+     * when needed.
+     */
+    refreshLayout() {
       let keyman = com.keyman.singleton;
       let device = this.device;
 
@@ -1050,24 +1052,28 @@ namespace com.keyman.osk {
         fs=fs/keyman.util.getViewportScale();
       }
 
-      let paddedHeight = this.computedAdjustedOskHeight(height);
+      let paddedHeight: number;
+      if(this.height) {
+        paddedHeight = this.computedAdjustedOskHeight(this.height);
+      }
 
       let b = this.kbdDiv.firstChild as HTMLElement;
       let gs = this.kbdDiv.style;
       let bs=b.style;
-      // Sets the layer group to the correct height.
-      gs.height=gs.maxHeight=paddedHeight+'px';
+      if(this.usesFixedHeightScaling) {
+        // Sets the layer group to the correct height.
+        gs.height = gs.maxHeight = paddedHeight + 'px';
+      }
       bs.fontSize=fs+'em';
 
+      // Needs the refreshed layout info to work correctly.
       for(const layerId in this.layerGroup.layers) {
         const layer = this.layerGroup.layers[layerId];
-        layer.refreshLayout(this, paddedHeight, height);
+        layer.refreshLayout(this, paddedHeight, this.height);
       }
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
-      let device = this.device;
-
       var layers=this.kbdDiv.firstChild.childNodes;
       let oskHeight = 0;
 
@@ -1085,10 +1091,6 @@ namespace com.keyman.osk {
       // This isn't set anywhere else; it's a legacy part of the original methods.
       const oskPad = 0;
       let oskPaddedHeight = oskHeight + oskPad;
-
-      if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-        oskPaddedHeight /= window.devicePixelRatio;
-      }
 
       return oskPaddedHeight;
     }
@@ -1218,6 +1220,7 @@ namespace com.keyman.osk {
       device.formFactor = formFactor;
       if(formFactor != 'desktop') {
         device.OS = 'iOS';
+        device.touchable = true;
       }
 
       let layout = PKbd.layout(formFactor);
@@ -1232,9 +1235,12 @@ namespace com.keyman.osk {
         // This still feels fairly hacky... but something IS needed to constrain the height.
         // There are plans to address related concerns through some of the later aspects of 
         // the Web OSK-Core design.
-        kbdObj.refreshLayout(height); // Necessary for the row heights to be properly set!
+        kbdObj.setSize(800, height); // Probably need something for width, too, rather than
+                                     // assuming 100%.
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
-        kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
+        kbd.style.fontSize  = kbdObj.kbdDiv.style.fontSize;
+        kbd.style.height    = kbdObj.kbdDiv.style.height;
+        kbd.style.maxHeight = kbdObj.kbdDiv.style.maxHeight;
       } else {
         kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd.name+".</p>";
       }
