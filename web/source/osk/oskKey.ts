@@ -52,8 +52,6 @@ namespace com.keyman.osk {
     layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
     nextlayer?: string;
     pad?: string;
-    widthpc?: number; // Added during OSK construction.
-    padpc?: number; // Added during OSK construction.
     sk?: OSKKeySpec[];
 
     constructor(id: string, text?: string, width?: string, sp?: number | keyboards.ButtonClass, nextlayer?: string, pad?: string) {
@@ -133,6 +131,7 @@ namespace com.keyman.osk {
 
     btn: KeyElement;
     label: HTMLSpanElement;
+    square: HTMLDivElement;
 
     /**
      * The layer of the OSK on which the key is displayed.
@@ -305,6 +304,8 @@ namespace com.keyman.osk {
       let buttonStyle = getComputedStyle(this.btn);
       let keyWidth = parseFloat(buttonStyle.width);
       let emScale = 1;
+    
+      const originalSize = getFontSizeStyle(style.fontSize || '1em');
 
       // Not yet available; it'll be handled in a later layout pass.
       if(!buttonStyle.fontSize) {
@@ -349,26 +350,25 @@ namespace com.keyman.osk {
       // Never upscale keys past the default - only downscale them.
       // Proportion < 1:  ratio of key width to (padded [loosely speaking]) text width
       //                  maxProportion determines the 'padding' involved.
+      //
       if(proportion < 1) {
-        if(fontSpec.absolute) {
+        if(originalSize.absolute) {
           return proportion * fontSpec.val + 'px';
         } else {
-          return proportion * fontSpec.val + 'em';
+          return proportion * originalSize.val + 'em';
+        }
+      } else {
+        if(originalSize.absolute) {
+          return fontSpec.val + 'px';
+        } else {
+          return originalSize.val + 'em';
         }
       }
     }
 
     getKeyWidth(vkbd: VisualKeyboard): number {
-      if(vkbd.usesFixedWidthScaling) {
-        // For mobile devices, we presently specify width directly in pixels.  Just use that!
-        return this.spec['widthpc'];
-      } else {
-        // For desktop devices, each key is given a %age of the total OSK width.  We'll need to compute an
-        // approximation for that.  `this.kbdDiv` is the element controlling the OSK's width, set in px.
-
-        // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
-        return Math.floor(vkbd.width * this.spec['widthpc'] / 100);
-      }
+      let key = this.spec as keyboards.ActiveKey;
+      return key.proportionalWidth * vkbd.width;
     }
 
     /**

@@ -7,93 +7,77 @@ namespace com.keyman.osk {
   export class OSKRow {
     public readonly element: HTMLDivElement;
     public readonly keys: OSKBaseKey[];
+    public readonly heightFraction: number;
 
     public constructor(vkbd: VisualKeyboard, 
                        layerSpec: keyboards.ActiveLayer,
-                       rowSpec: keyboards.ActiveRow,
-                       objectWidth: number,
-                       doCalibration: boolean,
-                       displayUnderlying: boolean) {
+                       rowSpec: keyboards.ActiveRow) {
       const rDiv = this.element = document.createElement('div');
       rDiv.className='kmw-key-row';
-      // The following event trap is needed to prevent loss of focus in IE9 when clicking on a key gap.
-      // Unclear why normal _CreateElement prevention of loss of focus does not seem to work here.
-      // Appending handler to event handler chain does not work (other event handling remains active).
-      rDiv.onmousedown = function(e: MouseEvent) {
-        if(e) {
-          e.preventDefault();
-        }
-      }
-
-      const rs=rDiv.style;
 
       // Calculate default row height
-      const rowHeight = 100/layerSpec.row.length;
-
-      // Set row height. (Phone and tablet heights are later recalculated
-      // and set in px, allowing for viewport scaling.)
-      rs.maxHeight=rs.height=rowHeight+'%';
+      this.heightFraction = 1 / layerSpec.row.length;
 
       // Apply defaults, setting the width and other undefined properties for each key
       const keys=rowSpec.key;
-
-      if(doCalibration) {
-        // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
-        // adjusting the width of the last key to make the total exactly 100%.
-        // Overwrite the previously-computed percent.
-        // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
-        // All key widths and paddings are rounded for uniformity
-        for(let j=0; j<keys.length; j++) {
-          const key = keys[j];
-          // TODO:  reinstate rounding?
-          key['widthpc'] = key.proportionalWidth * objectWidth;
-          key['padpc']   = key.proportionalPad   * objectWidth;
-        }
-      }
-
-      //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
-      var totalPercent=0;
       this.keys = [];
 
+      // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
+      // adjusting the width of the last key to make the total exactly 100%.
+      // Overwrite the previously-computed percent.
+      // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
+      // All key widths and paddings are rounded for uniformity
       for(let j=0; j<keys.length; j++) {
-        const key=keys[j];
+        const key = keys[j];
+        var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id, this);
+        
+        var element = keyObj.construct(vkbd);
+        this.keys.push(keyObj);
 
-        var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layerSpec.id);
-        var keyTuple = keyGenerator.construct(vkbd, displayUnderlying, rs, totalPercent);
-        this.keys.push(keyGenerator);
-
-        rDiv.appendChild(keyTuple.element);
-        totalPercent += keyTuple.percent;
+        rDiv.appendChild(element);
       }
     }
 
-    public refreshLayout(vkbd: VisualKeyboard, rowHeight: number, bottom: number, pad: number) {
-      const rs = this.element.style;
-      if(vkbd.usesFixedHeightScaling) {
-        if(!vkbd.isStatic) {
-          rs.bottom=bottom+'px';
-        }
-        rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
+    public get displaysKeyCaps(): boolean {
+      if(this.keys.length > 0) {
+        return this.keys[0].displaysKeyCap;
+      } else {
+        return undefined;
       }
+    }
+
+    public set displaysKeyCaps(flag: boolean) {
+      for(const key of this.keys) {
+        key.displaysKeyCap = flag;
+      }
+    }
+
+    public refreshLayout(vkbd: VisualKeyboard) {
+      const rs = this.element.style;
+
+      const rowHeight = vkbd.layoutHeight.scaledBy(this.heightFraction);
+      if(vkbd.usesFixedHeightScaling) {
+        rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
+      }
+
+      // Only used for fixed-height scales at present.
+      const padRatio = 0.15;
+
+      const keyHeightBase = vkbd.usesFixedHeightScaling ? rowHeight : ParsedLengthStyle.forScalar(1);
+      const padTop = keyHeightBase.scaledBy(padRatio / 2);
+      const keyHeight = keyHeightBase.scaledBy(1 - padRatio);
 
       for(const key of this.keys) {
         const keySquare  = key.btn.parentElement;
         const keyElement = key.btn;
 
-        if(vkbd.usesFixedHeightScaling) {
-          // Set the kmw-key-square position
-          const kss = keySquare.style;
-          if(!vkbd.isStatic) {
-            kss.bottom=(bottom-pad/2)+'px';
-          }
-          kss.height=kss.minHeight=(rowHeight)+'px';
+        // Set the kmw-key-square position
+        const kss = keySquare.style;
+        kss.height=kss.minHeight=keyHeightBase.styleString;
 
-          const kes = keyElement.style;
-          if(!vkbd.isStatic) {
-            kes.bottom=bottom+'px';
-          }
-          kes.height=kes.lineHeight=kes.minHeight=(rowHeight-pad)+'px';
-        }
+        const kes = keyElement.style;
+        kes.top = padTop.styleString;
+        kes.height=kes.lineHeight=kes.minHeight=keyHeight.styleString;
 
         if(keyElement.key) {
           keyElement.key.refreshLayout(vkbd);

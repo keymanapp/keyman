@@ -20,9 +20,7 @@ namespace com.keyman.osk {
 
     public constructor(vkbd: VisualKeyboard,
                        layout: keyboards.ActiveLayout,
-                       layer: keyboards.ActiveLayer,
-                       objectWidth: number,
-                       doCalibration: boolean) {
+                       layer: keyboards.ActiveLayer) {
       this.spec = layer;
       
       const gDiv = this.element = document.createElement('div');
@@ -52,7 +50,8 @@ namespace com.keyman.osk {
       this.rows = [];
 
       for(let i=0; i<rows.length; i++) {
-        let rowObj = new OSKRow(vkbd, layer, rows[i], objectWidth, doCalibration, layout["displayUnderlying"]);
+        let rowObj = new OSKRow(vkbd, layer, rows[i]);
+        rowObj.displaysKeyCaps = layout["displayUnderlying"];
         gDiv.appendChild(rowObj.element);
         this.rows.push(rowObj);
       }
@@ -97,19 +96,20 @@ namespace com.keyman.osk {
         this.element.style.height=(paddedHeight)+'px';
       }
 
-      // Sets the layers to the correct height
-      let rowPad = Math.round(0.15*rowHeight);
-
       for(let nRow=0; nRow<nRows; nRow++) {
+        const oskRow = this.rows[nRow];
         let bottom = (nRows-nRow-1)*rowHeight+1;
 
         if(vkbd.usesFixedHeightScaling) {
           // Calculate the exact vertical coordinate of the row's center.
           this.spec.row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
+        
+          if(nRow == nRows-1) {
+            oskRow.element.style.bottom = '1px';
+          }
         }
 
-        const oskRow = this.rows[nRow];
-        oskRow.refreshLayout(vkbd, rowHeight, bottom, rowPad);
+        oskRow.refreshLayout(vkbd);
       }
     }
   }

@@ -58,7 +58,7 @@ namespace com.keyman.osk.browser {
       btn.appendChild(this.label = this.generateKeyText(osk));
       kDiv.appendChild(btn);
 
-      return kDiv;
+      return this.square = kDiv;
     }
 
     public allowsKeyTip(): boolean {

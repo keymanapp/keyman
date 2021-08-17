@@ -45,6 +45,18 @@ namespace com.keyman.osk {
      */
     private _height: number;
 
+    /**
+     * The computed width for this VisualKeyboard.  May be null if auto sizing
+     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
+     */
+    private _computedWidth: number;
+
+    /**
+     * The computed height for this VisualKeyboard.  May be null if auto sizing
+     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
+     */
+    private _computedHeight: number;
+
     // Style-related properties
     fontFamily: string;
     private _fontSize: ParsedLengthStyle;
@@ -148,6 +160,8 @@ namespace com.keyman.osk {
       this.layerGroup = new OSKLayerGroup(this, layoutKeyboard, formFactor);
 
       // Now that we've properly processed the keyboard's layout, mark it as calibrated.
+      // TODO:  drop the whole 'calibration' thing.  The newer layout system supersedes the
+      // need for it.  (Is no longer really used, so the drop ought be clean.)
       keyboard.markLayoutCalibrated(formFactor);
       
       // Append the OSK layer group container element to the containing element
@@ -157,12 +171,7 @@ namespace com.keyman.osk {
       // Set base class - OS and keyboard added for Build 360
       this.kbdDiv = Lkbd;
 
-      if(this.isStatic) {
-        // The 'documentation' format uses the base element's child as the actual display base.
-        (Lkbd.childNodes[0] as HTMLDivElement).className = device.formFactor + '-static kmw-osk-inner-frame';
-      } else {
-        Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
-      }
+      Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
     }
 
     public get element(): HTMLDivElement {
@@ -187,7 +196,26 @@ namespace com.keyman.osk {
       return this._height;
     }
 
+    get layoutWidth(): ParsedLengthStyle {
+      if(this.usesFixedWidthScaling) {
+        return ParsedLengthStyle.inPixels(this.width);
+      } else {
+        return ParsedLengthStyle.forScalar(1);
+      }
+    }
+
+    get layoutHeight(): ParsedLengthStyle {
+      if(this.usesFixedHeightScaling) {
+        return ParsedLengthStyle.inPixels(this.height);
+      } else {
+        return ParsedLengthStyle.forScalar(1);
+      }
+    }
+
     get fontSize(): ParsedLengthStyle {
+      if(!this._fontSize) {
+        this._fontSize = new ParsedLengthStyle('1em');
+      }
       return this._fontSize;
     }
 
@@ -213,12 +241,20 @@ namespace com.keyman.osk {
     }
 
     /**
+     * Uses fixed scaling for internal elements, rather than relative, percent-
+     * based scaling.
+     */
+    public get usesFixedScaling(): boolean {
+      return this.device.touchable;
+    }
+
+    /**
      * Sets & tracks the size of the VisualKeyboard's primary element.
      * @param width
      * @param height
      * @param pending Set to `true` if called during a resizing interaction
      */
-    public setSize(width: number, height: number, pending?: boolean) {
+    public setSize(width?: number, height?: number, pending?: boolean) {
       this._width = width;
       this._height = height;
 
@@ -226,8 +262,8 @@ namespace com.keyman.osk {
         this.kbdDiv.style.width    = width ? this._width + 'px' : '';
         this.kbdDiv.style.height   = height ? this._height + 'px' : '';
 
-        if(!this.device.touchable) {
-          this.kbdDiv.style.fontSize = height ? ((this._height/8) + 'px') : '';
+        if(!this.device.touchable && height) {
+          this.fontSize = new ParsedLengthStyle((this._height/8) + 'px');
         }
 
         if(!pending) {
@@ -871,7 +907,7 @@ namespace com.keyman.osk {
       }
 
       try {
-        var t=<HTMLElement> this.spaceBar.firstChild;
+        var t=<HTMLElement> this.spaceBar.key.label;
         let tParent = <HTMLElement> t.parentNode;
         if(typeof(tParent.className) == 'undefined' || tParent.className == '') {
           tParent.className='kmw-spacebar';
@@ -1057,29 +1093,72 @@ namespace com.keyman.osk {
         paddedHeight = this.computedAdjustedOskHeight(this.height);
       }
 
-      let b = this.kbdDiv.firstChild as HTMLElement;
+      let b = this.layerGroup.element as HTMLElement;
       let gs = this.kbdDiv.style;
       let bs=b.style;
       if(this.usesFixedHeightScaling) {
         // Sets the layer group to the correct height.
         gs.height = gs.maxHeight = paddedHeight + 'px';
       }
-      bs.fontSize=fs+'em';
+
+      // The font-scaling applied on the layer group.
+      gs.fontSize = this.fontSize.styleString;
+      bs.fontSize=ParsedLengthStyle.forScalar(fs).styleString;
 
       // Needs the refreshed layout info to work correctly.
       for(const layerId in this.layerGroup.layers) {
         const layer = this.layerGroup.layers[layerId];
         layer.refreshLayout(this, paddedHeight, this.height);
       }
+
+      // NEW CODE ------
+      
+      // Step 1:  have the necessary conditions been met?
+      const fixedSize = this.width && this.height;
+      const computedStyle = getComputedStyle(this.kbdDiv);
+      const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
+
+      // Step 2:  determine basic layout geometry
+      if(fixedSize) {
+        this._computedWidth  = this.width;
+        this._computedHeight = this.height;
+      } else if(isInDOM) {
+        this._computedWidth   = parseInt(computedStyle.width, 10);
+        if(!this._computedWidth) {
+          // For touch keyboards, the width _was_ specified on the layer group,
+          // not the root element (`kbdDiv`).
+          const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
+          this._computedWidth = parseInt(groupStyle.width, 10);
+        }
+        this._computedHeight  = parseInt(computedStyle.height, 10);
+      } else {
+        // Cannot perform layout operations!
+        return;
+      }
+
+      // Step 3:  perform layout operations.  (Handled by 'old code' section below.)
+
+      // END NEW CODE -----------
+
+      // Needs the refreshed layout info to work correctly.
+      for(const layerId in this.layerGroup.layers) {
+        const layer = this.layerGroup.layers[layerId];
+        layer.refreshLayout(this, paddedHeight, this._computedHeight);
+      }
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
-      var layers=this.kbdDiv.firstChild.childNodes;
+      if(!this.layerGroup) {
+        return allottedHeight;
+      }
+
+      const layers=this.layerGroup.layers;
       let oskHeight = 0;
 
       // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
-      for(let i = 0; i < layers.length; i++) {
-        let nRows = layers[i].childNodes.length;
+      for(const layerID in layers) {
+        const layer = layers[layerID];
+        let nRows = layer.rows.length;
         let rowHeight = Math.floor(allottedHeight/(nRows == 0 ? 1 : nRows));
         let layerHeight = nRows * rowHeight;
 
@@ -1221,11 +1300,22 @@ namespace com.keyman.osk {
       if(formFactor != 'desktop') {
         device.OS = 'iOS';
         device.touchable = true;
+      } else {
+        device.OS = 'windows';
+        device.touchable = false;
       }
 
       let layout = PKbd.layout(formFactor);
 
       let kbdObj = new VisualKeyboard(PKbd, device, true);
+
+      // The 'documentation' format uses the base element's child as the actual display base.
+      // Since there's no backing kmw-osk-frame, we do need the static-class kmw-osk-inner-frame
+      // to perform background styling on our behalf.  We'll trust the actual, live keyboard rules
+      // for the other elements, which in turn needs the non-static variant of the CSS rules.
+      kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className + ' ' + device.formFactor
+        + '-static ' + device.OS.toLowerCase();
+
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
 
       // Select the layer to display, and adjust sizes
@@ -1237,6 +1327,7 @@ namespace com.keyman.osk {
         // the Web OSK-Core design.
         kbdObj.setSize(800, height); // Probably need something for width, too, rather than
                                      // assuming 100%.
+        kbdObj.refreshLayout(); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
         kbd.style.fontSize  = kbdObj.kbdDiv.style.fontSize;
         kbd.style.height    = kbdObj.kbdDiv.style.height;
@@ -1246,6 +1337,20 @@ namespace com.keyman.osk {
       }
       // Add a faint border
       kbd.style.border='1px solid #ccc';
+
+      // Once the element is inserted into the DOM, refresh the layout so that proper text scaling may apply.
+      const refreshInterval = window.setInterval(function() {
+        let computedStyle = getComputedStyle(kbd);
+        if(computedStyle.fontSize) {
+          if(kbd.style.fontSize) {
+            // Preserve the new setting (provided by CSS)
+            kbdObj.fontSize = new ParsedLengthStyle(kbd.style.fontSize);
+          }
+          kbdObj.refreshLayout();
+          window.clearInterval(refreshInterval);
+        }
+      }, 10);
+
       return kbd;
     }
 

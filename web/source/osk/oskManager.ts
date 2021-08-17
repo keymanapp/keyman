@@ -212,7 +212,6 @@ namespace com.keyman.osk {
         if(kbdView instanceof VisualKeyboard) {
           this._Box.appendChild(layout.resizeBar.element);
         }
-        // For other devices, adjust the object heights, allowing for viewport scaling
       }
 
       // Initializes the size of a touch keyboard.
@@ -998,11 +997,11 @@ namespace com.keyman.osk {
         const vkbdHeight = this.computedHeight - (this.banner.height ? this.banner.height + 5 : 0);
         this.vkbd.setSize(this.computedWidth, vkbdHeight);
         this.vkbd.refreshLayout();
-      }
 
-      if(this.vkbd?.device.touchable) {
-        var b: HTMLElement = this._Box, bs=b.style;
-        bs.height=bs.maxHeight=this.computedHeight+'px';
+        if(this.vkbd.usesFixedHeightScaling) {
+          var b: HTMLElement = this._Box, bs=b.style;
+          bs.height=bs.maxHeight=this.computedHeight+'px';
+        }
       }
     }
 
