@@ -125,7 +125,7 @@ else
 fi
 
 KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-$PLATFORM_TARGET/KeymanEngine.framework"
-KEYMAN_ENGINE_SIM_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-universal/KeymanEngine.framework"
+KEYMAN_ENGINE_SIM_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-iphonesimulator/KeymanEngine.framework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 if [ $DO_UPDATE = true ]; then
