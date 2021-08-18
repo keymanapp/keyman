@@ -28,9 +28,9 @@ static BOOL processAlert(AITIP* app) {
 }
 
 static BOOL processBack(AITIP* app, const km_kbp_action_item* actionItem) {
-  if (actionItem->backspace.expected_type == KM_KBP_IT_MARKER) {
+  if (actionItem->backspace.expected_type == KM_KBP_BT_MARKER) {
     app->QueueAction(QIT_BACK, BK_DEADKEY);
-  } else if (actionItem->backspace.expected_type == KM_KBP_IT_CHAR) {
+  } else /* actionItem->backspace.expected_type == KM_KBP_BT_CHAR, KM_KBP_BT_UNKNOWN */ {
     app->QueueAction(QIT_BACK, 0);
   }
   return TRUE;
@@ -99,8 +99,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 
   for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpActiveKBState, nullptr); act->type != KM_KBP_IT_END; act++) {
     BOOL continueProcessingActions = TRUE;
-    switch (act->type)
-    {
+    switch (act->type) {
     case KM_KBP_IT_CHAR:
       continueProcessingActions = processUnicodeChar(_td->app, act);
       break;

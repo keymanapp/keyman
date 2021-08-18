@@ -175,7 +175,7 @@ public:
 
 class RegistryFullAccess: public RegistryReadOnly
 {
-protected:  
+protected:
 	HKEY GetKey(LPCSTR AKey);
 	BOOL IntRecursiveDeleteKey(HKEY hkey);
 

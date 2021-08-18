@@ -568,17 +568,17 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
 
   if (Globals::get_CoreIntegration()) {
     LPWSTR keyboardPath = new WCHAR[MAX_PATH];
-      size_t convertedChars = 0;
+    size_t convertedChars = 0;
     if (mbstowcs_s(&convertedChars, keyboardPath, MAX_PATH, _td->ForceFileName, _TRUNCATE)) {
       delete[] keyboardPath;
       return FALSE;
     }
     
     km_kbp_status_codes err_code = (km_kbp_status_codes)km_kbp_keyboard_load(keyboardPath, &_td->lpActiveKeyboard->coreKeyboard);
-      if (err_code != KM_KBP_STATUS_OK) {
-        delete[] keyboardPath;
-        return FALSE;
-      }
+    if (err_code != KM_KBP_STATUS_OK) {
+      delete[] keyboardPath;
+      return FALSE;
+    }
     delete[] keyboardPath;
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard: %s OK", FileName);
     return TRUE;
@@ -1006,7 +1006,7 @@ void ReleaseKeyboards(BOOL Lock)
 		if(Lock) UnloadDLLs(&_td->lpKeyboards[i]);
     FreeKeyboardOptions(&_td->lpKeyboards[i]);
 		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
-    ReleaseKeyboardMemoryCore(_td->lpKeyboards[i].coreKeyboard);
+  ReleaseKeyboardMemoryCore(_td->lpKeyboards[i].coreKeyboard);
     
     if(_td->lpKeyboards[i].Profiles) delete _td->lpKeyboards[i].Profiles;   // I3581
 	}

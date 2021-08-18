@@ -272,9 +272,10 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
     }
 
     keyboardOpts[n] = KM_KBP_OPTIONS_END;
-    /// once we have the option list we can then update the options using the public api call
+    // once we have the option list we can then update the options using the public api call
     km_kbp_state_options_update(state, keyboardOpts);
-   for (int i = 0; i < (int)listSize + 1; i++) {
+
+    for (int i = 0; i < (int)listSize + 1; i++) {
       delete[] keyboardOpts[i].key;
       delete[] keyboardOpts[i].value;
     }
