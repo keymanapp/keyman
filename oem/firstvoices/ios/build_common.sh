@@ -125,6 +125,7 @@ else
 fi
 
 KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-$PLATFORM_TARGET/KeymanEngine.framework"
+KEYMAN_ENGINE_SIM_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-universal/KeymanEngine.framework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 if [ $DO_UPDATE = true ]; then
@@ -217,6 +218,10 @@ else
 fi
 
 if [ $DO_SIMULATOR_TARGET == true ]; then
+  echo "Replacing .framework with Simulator-compatible version"
+  # Replace the previous framework copy in case the main build was for release.
+  cp -Rf "$KEYMAN_ENGINE_SIM_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
+
   echo "Preparing .app file as Simulator-targeted build artifact."
   xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
              $XCODEFLAGS_EXT -scheme "$TARGET" \
