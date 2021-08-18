@@ -754,7 +754,6 @@ static gboolean process_emit_keystroke_action(IBusKeymanEngine *keyman) {
 
 static gboolean process_invalidate_context_action(IBusEngine *engine) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
-  km_kbp_context_clear(km_kbp_state_context(keyman->state));
   reset_context(engine);
   return TRUE;
 }
