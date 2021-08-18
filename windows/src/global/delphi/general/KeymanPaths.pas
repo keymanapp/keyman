@@ -36,6 +36,7 @@ type
     class function KeyboardsInstallDir: string; static;
     class function KeymanConfigStaticHttpFilesPath(const filename: string = ''): string; static;
     class function KeymanCustomisationPath: string; static;
+    class function KeymanCoreLibraryPath(const Filename: string): string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
     class function CEFSubprocessPath: string; static;
@@ -424,6 +425,26 @@ begin
   if keyman_root <> '' then
     keyman_root := IncludeTrailingPathDelimiter(keyman_root);
   Result := (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length));
+end;
+
+class function TKeymanPaths.KeymanCoreLibraryPath(const Filename: string): string;
+var
+  keyman_root: string;
+begin
+  // Look up KEYMAN_ROOT development variable -- if found and executable
+  // within that path then use that as source path
+  if TKeymanPaths.RunningFromSource(keyman_root) then
+  begin
+    Exit(keyman_root + 'common\core\desktop\build\x86\debug\src\' + Filename);
+  end;
+
+  Result := GetDebugPath('KeymanCoreLibraryPath', '');
+  if Result = '' then
+  begin
+    Result := ExtractFilePath(ParamStr(0));
+  end;
+
+  Result := IncludeTrailingPathDelimiter(Result) + Filename;
 end;
 
 end.

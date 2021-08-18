@@ -42,14 +42,12 @@ type
     cmdPrint: TButton;
     cmdBack: TButton;
     cmdForward: TButton;
-    ApplicationEvents1: TApplicationEvents;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure cmdPrintClick(Sender: TObject);
     procedure cmdBackClick(Sender: TObject);
     procedure cmdForwardClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
   private
     cef: TframeCEFHost;
     FFileName: string;
@@ -100,18 +98,6 @@ begin
   end;
 
   ShowFile(FFileName);
-end;
-
-procedure TfrmHTML.ApplicationEvents1Message(var Msg: tagMSG;
-  var Handled: Boolean);
-begin
-  if (Msg.message = WM_SYSCOMMAND) and (Msg.wParam = SC_RESTORE) then
-  begin
-    // Handle the case where Win+M pressed, window never restores
-    SendMessage(Application.Handle, WM_SHOWWINDOW, 1, 0);
-    SendMessage(Handle, WM_SHOWWINDOW, 1, SW_PARENTOPENING);
-    OpenIcon(Handle);
-  end;
 end;
 
 procedure TfrmHTML.cmdBackClick(Sender: TObject);

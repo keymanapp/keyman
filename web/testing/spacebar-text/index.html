@@ -41,6 +41,12 @@
         },
         filename:'rac_balti.js',
         displayName: 'My Custom Name'
+      }, {id:'lao_2008_basic',name:'Lao 2008 Basic',
+        languages:{
+          id:'lo',name:'Lao'
+        },
+        filename:'../lao_2008_basic-1.2.js',
+        displayName: ''
       },
       '@en');
     }, false);
@@ -57,10 +63,12 @@
 <!-- Sample page HTML -->
 <body>
   <h2>KeymanWeb Sample Page - SpacebarText Testing</h2>
-  <p>See <a href='https://github.com/keymanapp/keyman/pull/5348'>PR #5348</a> for details.</p>
+  <p>See <a href='https://github.com/keymanapp/keyman/pull/5348'>PR #5348</a>
+    and <a href='https://github.com/keymanapp/keyman/issue/5524'>issue #5524</a> for details.</p>
   <p>The English keyboard should have its spacebar caption modified by the radio controls,
     whereas the Balti keyboard has a custom caption specified in its `addKeyboards` call.
   </p>
+  <p>Lao 2008 has a custom blank caption (empty string "")</p>
 
   <hr/>
   <div>

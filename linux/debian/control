@@ -1,0 +1,177 @@
+Source: keyman
+Section: text
+Priority: optional
+Maintainer: Debian Input Method Team <debian-input-method@lists.debian.org>
+Uploaders:
+ Keyman team <support@keyman.com>,
+ Eberhard Beilharz <eb1@sil.org>,
+Build-Depends:
+ bash-completion,
+ debhelper (>= 11),
+ dh-python,
+ gir1.2-webkit2-4.0,
+ ibus,
+ liblocale-gettext-perl,
+ perl,
+ python3-all (>= 3.5),
+ python3-dbus,
+ python3-gi,
+ python3-lxml,
+ python3-magic,
+ python3-numpy,
+ python3-pil,
+ python3-pip,
+ python3-qrcode,
+ python3-sentry-sdk | python3-raven,
+ python3-requests,
+ python3-requests-cache,
+ python3-setuptools,
+ meson (>= 0.45),
+ ninja-build,
+ cargo,
+ libgtk-3-dev,
+ libibus-1.0-dev (>= 1.2),
+ libjson-glib-dev (>= 1.4.0),
+ pkg-config,
+Standards-Version: 4.5.1
+Vcs-Git: https://github.com/keymanapp/keyman.git
+Vcs-Browser: https://github.com/keymanapp/keyman
+Homepage: https://www.keyman.com
+
+Package: keyman
+Architecture: all
+Depends:
+ libglib2.0-bin,
+ python3-keyman-config,
+ ${misc:Depends},
+Recommends:
+ onboard-keyman,
+Description: Type in your language with Keyman for Linux
+ Keyman makes it possible for you to type in over 1,000 languages on Windows,
+ macOS, Linux, iPhone, iPad, Android tablets and phones, and even instantly
+ in your web browser. With the world’s most powerful keyboarding engine,
+ intuitive and rapid text input is now possible in your language, and for
+ over 99% of the global population’s mother tongues!
+ .
+ Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+ open source keyboarding platform which allows anyone to write a keyboard
+ layout for their language. Keyman is available for many platforms, including
+ Windows, macOS, iOS, Android, Linux and the web.
+ .
+ Keyboard layouts are defined with a clear and easy to understand keyboard
+ grammar. Keyman's contextual input model means keyboard layouts can be
+ intelligent and make it simple to type even the most complex languages.
+ Keyboard layouts are distributed through an open catalog to all major desktop
+ and mobile platforms.
+ .
+ Install, uninstall and view information about Keyman keyboard
+ packages.
+ .
+ This package depends on all that is needed for using Keyman
+ for Linux.
+
+Package: python3-keyman-config
+Section: python
+Architecture: all
+Depends:
+ dconf-cli,
+ gir1.2-webkit2-4.0,
+ keyman-engine,
+ python3-bs4,
+ python3-gi,
+ python3-sentry-sdk | python3-raven,
+ ${misc:Depends},
+ ${python3:Depends},
+Description: Keyman for Linux configuration
+ Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+ open source keyboarding platform which allows anyone to write a keyboard
+ layout for their language. Keyman is available for many platforms, including
+ Windows, macOS, iOS, Android, Linux and the web.
+ .
+ Keyboard layouts are defined with a clear and easy to understand keyboard
+ grammar. Keyman's contextual input model means keyboard layouts can be
+ intelligent and make it simple to type even the most complex languages.
+ Keyboard layouts are distributed through an open catalog to all major desktop
+ and mobile platforms.
+ .
+ Python module to install, uninstall and view information about Keyman
+ keyboard packages.
+
+Package: libkmnkbp-dev
+Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Section: libdevel
+Depends:
+ libkmnkbp0-0 (= ${binary:Version}),
+ ${misc:Depends},
+Multi-Arch: same
+Description: Development files for Keyman keyboard processing library
+ Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+ open source keyboarding platform which allows anyone to write a keyboard layout
+ for their language. Keyman is available for many platforms, including Windows,
+ macOS, iOS, Android, Linux and the web.
+ .
+ Keyboard layouts are defined with a clear and easy to understand keyboard
+ grammar. Keyman's contextual input model means keyboard layouts can be
+ intelligent and make it simple to type even the most complex languages.
+ Keyboard layouts are distributed through an open catalog to all major desktop
+ and mobile platforms.
+ .
+ The Keyman keyboardprocessor library processes input from input method engines
+ and applies rules from compiled Keyman 11 or earlier kmx keyboard files.
+ .
+ This package contains development headers and libraries.
+
+Package: libkmnkbp0-0
+Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Section: libs
+Pre-Depends:
+ ${misc:Pre-Depends},
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Suggests:
+ keyman,
+Multi-Arch: same
+Description: Keyman keyboard processing library
+ Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+ open source keyboarding platform which allows anyone to write a keyboard layout
+ for their language. Keyman is available for many platforms, including Windows,
+ macOS, iOS, Android, Linux and the web.
+ .
+ Keyboard layouts are defined with a clear and easy to understand keyboard
+ grammar. Keyman's contextual input model means keyboard layouts can be
+ intelligent and make it simple to type even the most complex languages.
+ Keyboard layouts are distributed through an open catalog to all major desktop
+ and mobile platforms.
+ .
+ The Keyman keyboardprocessor library processes input from input method engines
+ and applies rules from compiled Keyman 11 or earlier kmx keyboard files.
+
+Package: ibus-keyman
+Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Depends:
+ ibus (>= 1.3.7),
+ sudo,
+ libkmnkbp0-0 (= ${binary:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends},
+Provides:
+ keyman-engine
+Description: Keyman engine for IBus
+ Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+ open source keyboarding platform which allows anyone to write a keyboard
+ layout for their language. Keyman is available for many platforms, including
+ Windows, macOS, iOS, Android, Linux and the web.
+ .
+ Keyboard layouts are defined with a clear and easy to understand keyboard
+ grammar. Keyman's contextual input model means keyboard layouts can be
+ intelligent and make it simple to type even the most complex languages.
+ Keyboard layouts are distributed through an open catalog to all major desktop
+ and mobile platforms.
+ .
+ IBus-keyman is a IM (input method) Engine for multiple languages, based on
+ IBus.
+ .
+ This package provides the Keyman IM engine for IBus. With this module, you
+ can use keyboard layouts designed for Keyman version 11 or earlier under the
+ IBus platform.

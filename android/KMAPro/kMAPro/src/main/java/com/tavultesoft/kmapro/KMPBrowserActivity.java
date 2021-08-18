@@ -24,7 +24,7 @@ import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.KMPLink;
 import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.WebViewUtil;
+import com.tavultesoft.kmea.util.WebViewUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -166,7 +166,7 @@ public class KMPBrowserActivity extends BaseActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    WebViewUtil.cleanup(webView);
+    WebViewUtils.cleanup(webView);
   }
 
   @Override

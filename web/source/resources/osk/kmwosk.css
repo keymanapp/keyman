@@ -16,18 +16,24 @@
 
 /* kmw-key-square applies only to OSK key elements, kmw-key-square-ex applies only to popup key elements */
 
+/* Common key-layout properties (all form factor + OS combinations) */
+
+.kmw-key-row {position: relative; width: 100%; height: 20%; margin: 0px; padding: 0px; border: 0px; overflow: hidden}
+.kmw-key-square {display: inline-block; position: relative; z-index: 10000; margin: 0px; border: 0px;
+  padding: 0px; box-sizing: border-box; -moz-box-sizing: border-box;}
+.kmw-key {display: block; position: relative; margin: 0px; text-align: center; box-sizing: border-box;
+  -moz-box-sizing: border-box;}
+
+/* Now for divergent properties & target-device styling */
+
 .phone.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         -webkit-user-select:none;}
 .phone .kmw-osk-inner-frame{margin:0;background:transparent;}
 .phone .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
 .phone .kmw-key-layer{position:fixed;left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.phone .kmw-key-row {position:fixed;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
-.phone .kmw-key-square {position:fixed; display:inline-block;height:100%;max-height:100%;overflow:visible; margin:0 0 0 0;z-index: 10000;padding:0 0 0 0;background-color:transparent;cursor:default; border:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+.phone .kmw-key-square {height:100%;max-height:100%;overflow:visible;background-color:transparent;cursor:default;-webkit-tap-highlight-color:rgba(0,0,0,0)}
 .phone .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001;padding:0; background-color:transparent;cursor:default;}
-.phone .kmw-key {display:block;position:fixed;margin:0px;border-radius:6px;text-align:center; box-sizing:border-box; overflow:hidden;
-        border:solid 2px #999999;
-        box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;
-        }
+.phone .kmw-key {border-radius:6px;overflow:hidden;border:solid 2px #999999;box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}
 
 .phone .kmw-suggestion-text,
 .tablet .kmw-suggestion-text {
@@ -45,7 +51,6 @@
 }
 
 .phone.windows .kmw-key-row{max-width:80%;}
-.phone.windows .kmw-key {position:static;}
 
 .phone .kmw-5rows {padding-top: 0;}
 .phone .kmw-key-label{position:absolute;left:5%;top:1%;font:0.5em Arial;color:#aaa; background-color:transparent;z-index:10000;}
@@ -170,13 +175,9 @@
 .tablet .kmw-osk-inner-frame{margin:0;background:transparent;}
 .tablet .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
 .tablet .kmw-key-layer{position:fixed;left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.tablet .kmw-key-row {position:fixed;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
-.tablet .kmw-key-square {position:fixed; display:inline-block; height:100%; max-height:100%; overflow:hidden; margin:0 0 0 0; z-index: 10000; padding:0 0 0 0; background-color:transparent;cursor:default; border:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+.tablet .kmw-key-square {height:100%; max-height:100%; overflow:hidden;background-color:transparent;cursor:default;-webkit-tap-highlight-color:rgba(0,0,0,0)}
 .tablet .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001; padding:0; background-color:transparent; cursor:default;}  
-.tablet .kmw-key {display:block;position:fixed;margin:0px;border-radius:8px;text-align:center;box-sizing:border-box;overflow:visible;
-        border:solid 2px #999999;
-        box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;
- }
+.tablet .kmw-key {border-radius:8px;overflow:visible;border:solid 2px #999999;box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}
 
 .tablet .kmw-key-label{position:absolute;left:7%;top:2%;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
 .tablet .kmw-key-text{position:relative;left:0;top:0;-webkit-user-select:none;} 
@@ -249,11 +250,8 @@
 .desktop .kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
 .desktop .kmw-key-layer-group{width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;}
 .desktop .kmw-key-layer{width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.desktop .kmw-key-row{position:static;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}        
-.desktop .kmw-key-square{position:relative;height:100%;display:inline-block;float:left;margin:0 0 0 5px;z-index:10000; font-size:0.8em;overflow:hidden;
-          padding:1px 0 1px 0;background-color:transparent;cursor:default;box-sizing:border-box;-moz-box-sizing:border-box;border:solid 1px transparent}
-.desktop .kmw-key {display:block;margin:0;border-radius:6px;text-align:center;box-sizing:border-box;-moz-box-sizing:border-box;
-          overflow:hidden;width:100%;height:100%;}
+.desktop .kmw-key-square{height:100%;font-size:0.8em;overflow:hidden;background-color:transparent;cursor:default;}
+.desktop .kmw-key {border-radius:6px;overflow:hidden;width:100%;height:100%;}
 .desktop .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
 
 /* Popup icon style (and content)*/
@@ -434,35 +432,11 @@ div.android #keytip {background-color:#f00;}
 /* Static styles */
 
 .desktop-static.kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
-.desktop-static .kmw-key-layer-group{width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;}
-.desktop-static .kmw-key-layer{width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.desktop-static .kmw-key-row{position:static;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}        
-.desktop-static .kmw-key-square{position:relative;height:100%;display:inline-block;float:left;margin:0 0 0 5px;z-index:10000; font-size:0.8em;overflow:hidden;
-          padding:1px 0 1px 0;background-color:transparent;cursor:default;box-sizing:border-box;-moz-box-sizing:border-box;border:solid 1px transparent}
-.desktop-static .kmw-key {display:block;margin:0;border-radius:6px;text-align:center;box-sizing:border-box;-moz-box-sizing:border-box;
-          overflow:hidden;width:100%;height:100%;}
-.desktop-static .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
-.desktop-static .kmw-key-text{position:relative;left:2px;top:2px;}
+.desktop-static .kmw-key-layer{position: relative}
 
 .phone-static.kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
-.phone-static .kmw-key-layer-group{width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;}
-.phone-static .kmw-key-layer{width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.phone-static .kmw-key-row{position:relative;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}        
-.phone-static .kmw-key-square{position:absolute;height:100%;display:inline-block;float:left;margin:0 0 0 5px;z-index:10000; font-size:0.8em;overflow:hidden;
-          padding:1px 0 1px 0;background-color:transparent;cursor:default;box-sizing:border-box;-moz-box-sizing:border-box;}
-.phone-static .kmw-key {display:block;margin:0;border-radius:6px;text-align:center;box-sizing:border-box;-moz-box-sizing:border-box;
-          overflow:hidden;width:100%;height:100%;}
-.phone-static .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
-.phone-static .kmw-key-text{position:relative;left:2px;top:2px;}
+.phone-static .kmw-key-layer{position: relative}
 
 .tablet-static.kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
-.tablet-static .kmw-key-layer-group{width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;}
-.tablet-static .kmw-key-layer{width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
-.tablet-static .kmw-key-row{position:relative;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}        
-.tablet-static .kmw-key-square{position:absolute;height:100%;display:inline-block;float:left;margin:0 0 0 5px;z-index:10000; font-size:0.8em;overflow:hidden;
-          padding:1px 0 1px 0;background-color:transparent;cursor:default;box-sizing:border-box;-moz-box-sizing:border-box;}
-.tablet-static .kmw-key {display:block;margin:0;border-radius:6px;text-align:center;box-sizing:border-box;-moz-box-sizing:border-box;
-          overflow:hidden;width:100%;height:100%;}
-.tablet-static .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
-.tablet-static .kmw-key-text{position:relative;left:2px;top:2px;}
+.tablet-static .kmw-key-layer{position: relative}
 

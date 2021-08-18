@@ -16,25 +16,38 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 BASEDIR="$KEYMAN_ROOT/linux"
 echo "basedir is $BASEDIR"
-autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
+legacy_projects="kmflcomp libkmfl ibus-kmfl"
+autotool_projects="ibus-keyman"
 extra_projects="keyboardprocessor keyman-config"
 
 if [ "$1" != "" ]; then
-    if [ "$1" == "keyboardprocessor" ]; then
+    if [ "$1" == "keyman" ]; then
+        echo "reconfiguring only keyman"
+        extra_projects="keyman"
+        legacy_projects=""
+        autotool_projects=""
+    elif [ "$1" == "keyboardprocessor" ]; then
         echo "reconfiguring only keyboardprocessor"
         extra_projects="keyboardprocessor"
+        legacy_projects=""
         autotool_projects=""
-    elif [ ! -d "$1" ]; then
-        echo "project $1 does not exist"
-        exit 1
     elif [ "$1" == "keyman-config" ]; then
         echo "reconfiguring only keyman-config"
         extra_projects="keyman-config"
+        legacy_projects=""
+        autotool_projects=""
+    elif [ -d "$1" ]; then
+        echo "reconfiguring only $1"
+        extra_projects=""
+        legacy_projects=""
+        autotool_projects="$1"
+    elif [ -d "legacy/$1" ]; then
+        extra_projects=""
+        legacy_projects="$1"
         autotool_projects=""
     else
-        echo "reconfiguring only $1"
-        autotool_projects="$1"
-        extra_projects=""
+        echo "project $1 does not exist"
+        exit 1
     fi
 fi
 
@@ -42,21 +55,26 @@ echo "Found tier ${TIER}, version ${VERSION}"
 
 # autoreconf the projects
 for proj in ${autotool_projects}; do
-    if [ "${proj}" != "keyman-config" ]; then
-        cd $proj
-        echo "Reconfiguring $proj to version ${VERSION}"
-        autoreconf -if
-        cd $BASEDIR
-    fi
+    cd $proj
+    echo "Reconfiguring $proj to version ${VERSION}"
+    autoreconf -if
+    cd $BASEDIR
+done
+
+for proj in ${legacy_projects}; do
+    cd legacy/$proj
+    echo "Reconfiguring $proj to version ${VERSION}"
+    autoreconf -if
+    cd $BASEDIR
 done
 
 for proj in ${extra_projects}; do
-    if [ "${proj}" == "keyboardprocessor" ]; then
+    if [ "${proj}" == "keyboardprocessor" -o "${proj}" == "keyman" ]; then
         rm -rf keyboardprocessor
         cp ../VERSION.md ../common/core/desktop/
         ../common/core/desktop/build.sh -t keyboardprocessor configure
     fi
-    if [ "${proj}" == "keyman-config" ]; then
+    if [ "${proj}" == "keyman-config"  -o "${proj}" == "keyman" ]; then
         cd keyman-config
         make clean
         cd keyman_config
@@ -68,7 +86,6 @@ for proj in ${extra_projects}; do
             -e "s/_TIER_/${TIER}/g" \
             -e "s/_ENVIRONMENT_/${VERSION_ENVIRONMENT}/g" \
             version.py.in > version.py
-
         cd ../buildtools && python3 ./build-langtags.py
     fi
     cd $BASEDIR

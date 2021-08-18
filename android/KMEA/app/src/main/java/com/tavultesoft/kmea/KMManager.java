@@ -75,6 +75,7 @@ import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.util.WebViewUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -367,6 +368,16 @@ public final class KMManager {
     return appVersion;
   }
 
+  /**
+   * Get the Keyman Engine mode based on the Chrome version
+   * @param aContext
+   * @param webView - If provided, the Chrome version of webView is deterermined
+   * @return WebViewUtils.EngineWebViewVersionStatus
+   */
+  public static WebViewUtils.EngineWebViewVersionStatus getEngineWebViewVersionStatus(Context aContext, WebView webView) {
+    return WebViewUtils.getEngineWebViewVersionStatus(aContext, webView, "");
+  }
+
   // Check if a keyboard namespace is reserved
   public static boolean isReservedNamespace(String packageID) {
     if (packageID.equals(KMDefault_UndefinedPackageID)) {
@@ -483,7 +494,7 @@ public final class KMManager {
    * combined banner height and keyboard height
    * @return RelativeLayout.LayoutParams
    */
-  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+  public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(

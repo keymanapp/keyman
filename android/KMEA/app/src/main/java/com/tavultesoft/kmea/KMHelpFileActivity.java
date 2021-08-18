@@ -31,7 +31,7 @@ import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.HelpFile;
-import com.tavultesoft.kmea.util.WebViewUtil;
+import com.tavultesoft.kmea.util.WebViewUtils;
 
 import java.io.File;
 
@@ -144,7 +144,7 @@ public class KMHelpFileActivity extends BaseActivity {
       @Override
       public void onPageFinished(WebView view, String url) {
         // Inject a meta viewport tag into the head of the file if it doesn't exist
-        WebViewUtil.injectViewport(view);
+        WebViewUtils.injectViewport(view);
       }
     });
 
@@ -167,7 +167,7 @@ public class KMHelpFileActivity extends BaseActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    WebViewUtil.cleanup(webView);
+    WebViewUtils.cleanup(webView);
   }
 
   @Override
