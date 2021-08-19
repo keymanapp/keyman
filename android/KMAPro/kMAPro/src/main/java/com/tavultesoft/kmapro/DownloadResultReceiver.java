@@ -47,6 +47,9 @@ public class DownloadResultReceiver extends ResultReceiver {
         packageIntent.putExtras(bundle);
         context.startActivity(packageIntent);
         break;
+      case FileUtils.DOWNLOAD_CANCELLED :
+        // NO-OP
+        break;
     }
     super.onReceiveResult(resultCode, resultData);
   }

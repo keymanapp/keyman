@@ -825,7 +825,7 @@ begin
     if kbd = nil then Exit;
     pkg := kbd.OwnerPackage;
     if pkg <> nil
-      then DoShowPackageWelcome(pkg, True)
+      then DoShowPackageWelcome(Self, pkg, True)
       else ShowMessage(MsgFromIdFormat(SKPackageDoesNotIncludeWelcome, ['']));
   //  kmcom.Control.ActiveKeyboard.
   end

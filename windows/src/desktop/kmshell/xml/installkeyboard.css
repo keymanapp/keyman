@@ -123,5 +123,6 @@ div {
 }
 .otherdetails {
   font-size: 13.3px;
+  overflow-wrap: anywhere;
   vertical-align: top;
 }

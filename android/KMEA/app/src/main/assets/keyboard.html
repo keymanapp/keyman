@@ -11,7 +11,7 @@
   <script src="keyman-sentry.js"></script>
   <script type="text/javascript">
     var device = window.jsInterface.getDeviceType();
-    var oskHeight = window.jsInterface.getKeyboardHeight();
+    var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.devicePixelRatio);
     var oskWidth = 0;
     var fragmentToggle = 0;
 
@@ -21,6 +21,10 @@
     sentryManager.init();
 
     window.addEventListener('load', init, false);
+
+    function loadDefaultKeyboard() {
+      notifyHost('reloadAfterError');
+    }
 
     function init() {
       //document.body.style.backgroundColor="transparent";
@@ -49,6 +53,8 @@
       kmw.addEventListener('keyboardchange', setIsChiral);
       kmw.core.languageProcessor.on('statechange', onStateChange);
 
+      document.body.addEventListener('touchend', loadDefaultKeyboard);
+
       notifyHost('pageLoaded');
     }
 
@@ -75,7 +81,7 @@
 
     function setOskHeight(h) {
       if(h > 0) {
-        oskHeight = h;
+        oskHeight = Math.ceil(h / window.devicePixelRatio);
       }
       var kmw=window['keyman'];
       if(kmw && kmw.core && kmw.core.activeKeyboard) {
@@ -91,6 +97,7 @@
     }
 
     function getOskHeight() {
+      // banner height is calculated completely separately, unlike iOS
       return oskHeight;
     }
 

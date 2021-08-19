@@ -256,11 +256,9 @@ namespace com.keyman.text {
    */
   keymanweb['correctOSKTextSize']=function() {
     let osk: com.keyman.osk.OSKManager = keymanweb.osk;
-    if(osk?.vkbd?.adjustHeights(osk.getKeyboardHeight())) {
-      var b: HTMLElement = osk._Box, bs=b.style;
-      bs.height=bs.maxHeight=osk.vkbd.computedAdjustedOskHeight(osk.getHeight())+'px';
-
-      osk._Load();
+    if(osk?.vkbd) {
+      osk._Load(); // TODO:  replace with osk.refreshLayout() in the future once it can perfectly
+                   //        handle rotations.
     }
   };
 

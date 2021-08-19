@@ -8,7 +8,8 @@ procedure CreateKeyBitmap(imgKeyCap: TBitmap; PanelColor: TColor; ShiftFlags, Vi
 
 implementation
 
-uses debugging;
+uses
+  kmxfileconsts;
 
 procedure CreateKeyBitmap(imgKeyCap: TBitmap; PanelColor: TColor; ShiftFlags, VirtualKey: Integer; Character: WideChar; var KeyBitmap: TBitmap);//, Virtuakey:
   function CreateKey(txt: string): TBitmap;
@@ -74,12 +75,12 @@ begin
   FreeAndNil(KeyBitmap);
 
   bmp := nil;
-  if (ShiftFlags and (K_CTRLFLAG or K_LCTRLFLAG)) <> 0 then bmp := AddKeyPicture(bmp, 'Ctrl');
-  if (ShiftFlags and (K_RCTRLFLAG)) <> 0               then bmp := AddKeyPicture(bmp, 'R Ctrl');
-  if (ShiftFlags and (K_SHIFTFLAG)) <> 0               then bmp := AddKeyPicture(bmp, 'Shift');
-  if (ShiftFlags and (K_ALTFLAG or K_LALTFLAG)) <> 0   then bmp := AddKeyPicture(bmp, 'Alt');
-  if (ShiftFlags and (K_RALTFLAG)) <> 0                then bmp := AddKeyPicture(bmp, 'AltGr');
-  if (ShiftFlags and (K_CAPITALFLAG)) <> 0             then bmp := AddKeyPicture(bmp, 'Caps Lock');
+  if (ShiftFlags and (KMX_CTRLFLAG or KMX_LCTRLFLAG)) <> 0 then bmp := AddKeyPicture(bmp, 'Ctrl');
+  if (ShiftFlags and (KMX_RCTRLFLAG)) <> 0               then bmp := AddKeyPicture(bmp, 'R Ctrl');
+  if (ShiftFlags and (KMX_SHIFTFLAG)) <> 0               then bmp := AddKeyPicture(bmp, 'Shift');
+  if (ShiftFlags and (KMX_ALTFLAG or KMX_LALTFLAG)) <> 0   then bmp := AddKeyPicture(bmp, 'Alt');
+  if (ShiftFlags and (KMX_RALTFLAG)) <> 0                then bmp := AddKeyPicture(bmp, 'AltGr');
+  if (ShiftFlags and (KMX_CAPITALFLAG)) <> 0             then bmp := AddKeyPicture(bmp, 'Caps Lock');
   if Character <> #0 then
     if Character = ' '
       then s := StringOfChar(' ', 48) // Special handling for spacebar

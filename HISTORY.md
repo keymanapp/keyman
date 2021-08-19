@@ -1,5 +1,54 @@
 # Keyman Version History
 
+## 15.0.96 alpha 2021-08-19
+
+* refactor(web): delayed OSK initialization 🍕 (#5412)
+* fix(common/core/web): OSK state-key management (#5456)
+* fix(web): stuck key highlighting from touchpoint movement (#5490)
+* docs(linux): Fix readme for ibus-keyman (#5565)
+* chore(common/core): Add uninstall option to build script (#5564)
+* feat(web): setup build artifacts for manual tests (#5582)
+* feat(ios): adds option for Simulator-compatible testing artifact (#5557)
+* refactor(web): OSK layout hierarchy encapsulation 📐  (#5451)
+* refactor(web): reworks VisualKeyboard layout spec design 📐 (#5459)
+* refactor(web): overhaul of OSK key layout calcs + styling, merges desktop & touch logic 📐 (#5462)
+* fix(android): keyboard's black bar bug (#5521)
+* fix(android): removes duplicated line (#5587)
+* fix(linux): Check for valid kmp file (#5583)
+* fix(linux): Handle corrupt icon file (#5585)
+* fix(windows): handle restoring modal dialogs consistently (#5586)
+* chore(android): Remove runConfigurations.xml files (#5572)
+* fix(windows): Welcome should always show in front (#4657)
+
+## 15.0.95 alpha 2021-08-06
+
+* fix(windows): wrap text in keyboard installation dialog (#5559)
+* fix(windows): tsysinfo format grid correctly (#5556)
+* feat(android): Add API for checking Chrome version (#5520)
+* fix(android/app): Fix cleanup when progress dialog cancelled (#5541)
+* fix(common/core/desktop): split smp for context chars (#5562)
+* feat(developer): debugger uses Keyman Core 🐞 (#5513)
+* fix(common/models): keep/suggestion diacritic sensitivity when de-duping (#5480)
+* fix(web): Blank spacebar text when displayName is empty string (#5555)
+* chore(linux): Consolidate Debian source packages 📦 (#5536)
+* chore(common/core): Linux side of caps-lock stores 🚧 (#5497)
+
+## 15.0.94 alpha 2021-08-05
+
+* chore(ios,windows): Update crowdin strings for Azerbaijani (#5486)
+* chore(android): Update sentry-android-gradle-plugin to 2.1.0 (#5546)
+* fix(web): Have util.wait check useAlerts option (#5538)
+* fix(android): gracefully handle errors in KMW keyboards (#5423)
+* chore(linux): Remove compiler warning in ibus-keyman (#5549)
+
+## 15.0.93 alpha 2021-08-04
+
+* fix(linux): Improve uninstallation (#5505)
+* refactor(linux): Reformat keycode_to_vk table (#5508)
+* refactor(linux): Cleanup import of os.path (#5529)
+* chore(common/core): Allow shell script for kmcomp (#5498)
+* refactor(common/core): Move comment to where it belongs (#5518)
+
 ## 15.0.92 alpha 2021-08-03
 
 * fix(android/app): Check Play Store release notes less than 500 chars (#5535)

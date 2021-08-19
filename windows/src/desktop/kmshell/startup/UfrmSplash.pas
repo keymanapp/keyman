@@ -49,17 +49,15 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, UfrmKeymanBase, keymanapi_TLB, jpeg,
   UfrmWebContainer,
-  UserMessages, Vcl.AppEvnts;
+  UserMessages;
 
 type
   TfrmSplash = class(TfrmWebContainer)
-    ApplicationEvents1: TApplicationEvents;
     procedure TntFormCreate(Sender: TObject);
     procedure Command_Start;
     procedure Command_Exit;
     procedure TntFormShow(Sender: TObject);
     procedure TntFormActivate(Sender: TObject);
-    procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
   private
     FShouldDisplay: Boolean;
     FShowConfigurationOnLoad: Boolean;
@@ -178,17 +176,6 @@ end;
 function TfrmSplash.ShouldSetAppTitle: Boolean;  // I2786
 begin
   Result := True;
-end;
-
-procedure TfrmSplash.ApplicationEvents1Message(var Msg: tagMSG;
-  var Handled: Boolean);   // I4356
-begin
-  if (Msg.message = WM_SYSCOMMAND) and (Msg.wParam = SC_RESTORE) then
-  begin
-    // Handle the case where Win+M pressed, window never restores
-    // Only really happens with Splash.
-    PostMessage(Handle, WM_SHOWWINDOW, 1, SW_PARENTOPENING);
-  end;
 end;
 
 procedure TfrmSplash.Command_Start;

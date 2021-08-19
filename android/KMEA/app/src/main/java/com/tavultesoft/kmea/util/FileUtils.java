@@ -29,6 +29,7 @@ public final class FileUtils {
 
   public static final int DOWNLOAD_ERROR = -1;
   public static final int DOWNLOAD_SUCCESS = 1;
+  public static final int DOWNLOAD_CANCELLED = 2;
 
   public static final int VERSION_INVALID = -2;
   public static final int VERSION_EQUAL = 0;

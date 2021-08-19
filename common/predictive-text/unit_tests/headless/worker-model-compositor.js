@@ -472,7 +472,10 @@ describe('ModelCompositor', function() {
       var suggestions = composite.predict([thr, the], context);
   
       // Get the top suggest for 'the' and 'thr*'.
-      var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'The' || s.displayAs === '“The”'; })[0];
+      // As of 15.0+, because of #5429, the keep suggestion `"The"` will not be merged
+      // with the model's suggestion of `the`.
+      var capTheSuggestion = suggestions.filter(function (s) { return s.displayAs === '“The”'; })[0];
+      var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the'})[0];
       var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
   
       // Sanity check: do we have actual real-valued probabilities?
@@ -480,6 +483,7 @@ describe('ModelCompositor', function() {
       assert.isBelow(thrSuggestion.p, 1.0);
       assert.isAbove(theSuggestion.p, 0.0);
       assert.isBelow(theSuggestion.p, 1.0);
+      assert.equal(capTheSuggestion.tag, 'keep'); // The keep suggestion
       // 'the' should be the intended the result here.
       assert.isAbove(theSuggestion.p, thrSuggestion.p);
     });

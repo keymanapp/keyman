@@ -420,13 +420,13 @@ uses
   System.Win.ComObj,
   Vcl.Themes,
 
+  keymanapi_tlb,
   Keyman.System.CEFManager,
 
   CharMapDropTool,
   compile,
   HTMLHelpViewer,
   KLog,
-  keymanapi_TLB,
   KeymanVersion,
   OnlineConstants,
   Keyman.System.KeymanSentryClient,
@@ -527,6 +527,7 @@ begin
     Free;
   end;
 
+  // TODO: move this out of here and alongside keyboard install helpers
   try
     kmcom := CoKeyman.Create;
   except

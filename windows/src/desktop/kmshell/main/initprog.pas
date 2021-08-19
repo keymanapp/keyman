@@ -614,7 +614,7 @@ var
 begin
   n := kmcom.Packages.IndexOf(PackageName);
   if n >= 0 then
-    DoShowPackageWelcome(kmcom.Packages[n], True);
+    DoShowPackageWelcome(nil, kmcom.Packages[n], True);
 end;
 
 procedure PrintKeyboard(KeyboardName: WideString);  // I2329

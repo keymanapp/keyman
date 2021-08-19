@@ -52,8 +52,6 @@ namespace com.keyman.osk {
     layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
     nextlayer?: string;
     pad?: string;
-    widthpc?: number; // Added during OSK construction.
-    padpc?: number; // Added during OSK construction.
     sk?: OSKKeySpec[];
 
     constructor(id: string, text?: string, width?: string, sp?: number | keyboards.ButtonClass, nextlayer?: string, pad?: string) {
@@ -129,10 +127,11 @@ namespace com.keyman.osk {
     ];
 
     static readonly HIGHLIGHT_CLASS = 'kmw-key-touched';
+    readonly spec: OSKKeySpec;
 
-    spec: OSKKeySpec;
     btn: KeyElement;
     label: HTMLSpanElement;
+    square: HTMLDivElement;
 
     /**
      * The layer of the OSK on which the key is displayed.
@@ -151,7 +150,7 @@ namespace com.keyman.osk {
      *
      * @param       {Object=}   layout  source layout description (optional, sometimes)
      */
-    public setButtonClass(vkbd: VisualKeyboard) {
+    public setButtonClass() {
       let key = this.spec;
       let btn = this.btn;
 
@@ -168,13 +167,57 @@ namespace com.keyman.osk {
         n=0;
       }
 
-      // Apply an overriding class for 5-row layouts
-      var nRows=vkbd.layout['layer'][0]['row'].length;
-      if(nRows > 4 && vkbd.device.formFactor == 'phone') {
-        btn.className='kmw-key kmw-5rows kmw-key-'+OSKKey.BUTTON_CLASSES[n];
+      btn.className='kmw-key kmw-key-'+OSKKey.BUTTON_CLASSES[n];
+    }
+
+    /**
+     * For keys with button classes that support toggle states, this method
+     * may be used to toggle which state the key's button class is in.
+     * -  shift  <=>  shift-on
+     * - special <=> special-on
+     * @param {boolean=} flag The new toggle state 
+     */
+    public setToggleState(flag?: boolean) {
+      let btnClassId: number;
+      let classAsString: boolean;
+
+      if(classAsString = typeof this.spec['sp'] == 'string') {
+        btnClassId = parseInt(this.spec['sp'], 10);
       } else {
-        btn.className='kmw-key kmw-key-'+OSKKey.BUTTON_CLASSES[n];
+        btnClassId = this.spec['sp'];
       }
+      
+      // 1 + 2:   shift  +  shift-on
+      // 3 + 4:  special + special-on
+      switch(OSKKey.BUTTON_CLASSES[btnClassId]) {
+        case 'shift':
+        case 'shift-on':
+          if(flag === undefined) {
+            flag = OSKKey.BUTTON_CLASSES[btnClassId] == 'shift';
+          }
+
+          this.spec['sp'] = 1 + (flag ? 1 : 0);
+          break;
+        // Added in 15.0:  special key highlight toggling.
+        // Was _intended_ in earlier versions, but not actually implemented.
+        case 'special':
+        case 'special-on':
+          if(flag === undefined) {
+            flag = OSKKey.BUTTON_CLASSES[btnClassId] == 'special';
+          }
+
+          this.spec['sp'] = 3 + (flag ? 1 : 0);
+          break;
+        default:
+          return;
+      }
+
+      if(classAsString) {
+        // KMW currently doesn't handle raw numbers for 'sp' properly.
+        this.spec['sp'] = ('' + this.spec['sp']) as keyboards.ButtonClass;
+      }
+
+      this.setButtonClass();
     }
 
     // "Frame key" - generally refers to non-linguistic keys on the keyboard
@@ -220,6 +263,13 @@ namespace com.keyman.osk {
      * This version has been substantially modified to work for this particular application.
      */
     static getTextMetrics(text: string, emScale: number, style: {fontFamily?: string, fontSize: string}): TextMetrics {
+      // Since we may mutate the incoming style, let's make sure to copy it first.
+      // Only the relevant properties, though.
+      style = {
+        fontFamily: style.fontFamily,
+        fontSize: style.fontSize
+      };
+
       // A final fallback - having the right font selected makes a world of difference.
       if(!style.fontFamily) {
         style.fontFamily = getComputedStyle(document.body).fontFamily;
@@ -250,13 +300,30 @@ namespace com.keyman.osk {
       return metrics;
     }
 
-    getIdealFontSize(osk: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
-      // Recompute the new width for use in autoscaling calculations below, just in case.
-      let emScale = osk.getKeyEmFontSize();
+    getIdealFontSize(vkbd: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
+      let buttonStyle = getComputedStyle(this.btn);
+      let keyWidth = parseFloat(buttonStyle.width);
+      let emScale = 1;
+    
+      const originalSize = getFontSizeStyle(style.fontSize || '1em');
+
+      // Not yet available; it'll be handled in a later layout pass.
+      if(!buttonStyle.fontSize) {
+        // NOTE:  preserves old behavior for use in documentation keyboards, for now.
+        // Once we no longer need to maintain this code block, we can drop all current
+        // method parameters safely.
+        //
+        // Recompute the new width for use in autoscaling calculations below, just in case.
+        emScale = vkbd.getKeyEmFontSize();
+        keyWidth = this.getKeyWidth(vkbd);
+      } else {
+        // When available, just use computedStyle instead.
+        style = buttonStyle;
+      }
+
+      let fontSpec = getFontSizeStyle(style.fontSize || '1em');
       let metrics = OSKKey.getTextMetrics(this.spec.text, emScale, style);
 
-      let fontSpec = getFontSizeStyle(style.fontSize);
-      let keyWidth = this.getKeyWidth(osk);
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
       const X_PADDING = 2;
@@ -283,37 +350,25 @@ namespace com.keyman.osk {
       // Never upscale keys past the default - only downscale them.
       // Proportion < 1:  ratio of key width to (padded [loosely speaking]) text width
       //                  maxProportion determines the 'padding' involved.
+      //
       if(proportion < 1) {
-        if(fontSpec.absolute) {
+        if(originalSize.absolute) {
           return proportion * fontSpec.val + 'px';
         } else {
-          return proportion * fontSpec.val + 'em';
+          return proportion * originalSize.val + 'em';
+        }
+      } else {
+        if(originalSize.absolute) {
+          return fontSpec.val + 'px';
+        } else {
+          return originalSize.val + 'em';
         }
       }
     }
 
     getKeyWidth(vkbd: VisualKeyboard): number {
-      let units = this.objectUnits(vkbd);
-
-      if(units == 'px') {
-        // For mobile devices, we presently specify width directly in pixels.  Just use that!
-        return this.spec['widthpc'];
-      } else if(units == '%') {
-        // For desktop devices, each key is given a %age of the total OSK width.  We'll need to compute an
-        // approximation for that.  `this.kbdDiv` is the element controlling the OSK's width, set in px.
-
-        // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
-        return Math.floor(vkbd.width * this.spec['widthpc'] / 100);
-      }
-    }
-
-    objectUnits(vkbd: VisualKeyboard): string {
-      // Returns a unit string corresponding to how the width for each key is specified.
-      if(vkbd.device.formFactor == 'desktop' || vkbd.isStatic) {
-        return '%';
-      } else {
-        return 'px';
-      }
+      let key = this.spec as keyboards.ActiveKey;
+      return key.proportionalWidth * vkbd.width;
     }
 
     /**
@@ -322,21 +377,21 @@ namespace com.keyman.osk {
      *  @param  {string}  oldText
      *  @return {string}
      **/
-    protected renameSpecialKey(oldText: string, osk: VisualKeyboard): string {
+    protected renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string {
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
       switch(oldText) {
         case '*ZWNJ*':
           // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
           // possible / available though, and there's a different standard symbol on Android.
-          oldText = osk.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+          oldText = vkbd.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
             '*ZWNJAndroid*' :
             '*ZWNJiOS*';
           break;
         case '*Enter*':
-          oldText = osk.isRTL ? '*RTLEnter*' : '*LTREnter*';
+          oldText = vkbd.isRTL ? '*RTLEnter*' : '*LTREnter*';
           break;
         case '*BkSp*':
-          oldText = osk.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
+          oldText = vkbd.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
           break;
         default:
           // do nothing.
@@ -350,7 +405,7 @@ namespace com.keyman.osk {
     }
 
     // Produces a HTMLSpanElement with the key's actual text.
-    protected generateKeyText(osk: VisualKeyboard): HTMLSpanElement {
+    protected generateKeyText(vkbd: VisualKeyboard): HTMLSpanElement {
       let spec = this.spec;
 
       // Add OSK key labels
@@ -375,15 +430,12 @@ namespace com.keyman.osk {
 
       t.className='kmw-key-text';
 
-      let specialText = this.renameSpecialKey(keyText, osk);
+      let specialText = this.renameSpecialKey(keyText, vkbd);
       if(specialText != keyText) {
         // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
         keyText = specialText;
         spec['font'] = "SpecialOSK";
       }
-
-      // Grab our default for the key's font and font size.
-      ts.fontSize=osk.fontSize;     //Build 344, KMEW-90
 
       //Override font spec if set for this key in the layout
       if(typeof spec['font'] == 'string' && spec['font'] != '') {
@@ -401,11 +453,11 @@ namespace com.keyman.osk {
       if(ts.fontFamily) {
         styleSpec.fontFamily = ts.fontFamily;
       } else {
-        styleSpec.fontFamily = osk.fontFamily; // Helps with style sheet calculations.
+        styleSpec.fontFamily = vkbd.fontFamily; // Helps with style sheet calculations.
       }
 
       // Check the key's display width - does the key visualize well?
-      let emScale = osk.getKeyEmFontSize();
+      let emScale = vkbd.getKeyEmFontSize();
       var width: number = OSKKey.getTextMetrics(keyText, emScale, styleSpec).width;
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
@@ -417,13 +469,13 @@ namespace com.keyman.osk {
         // code points and use those in rendering the OSK. See #3039 for more details.
         // keyText = '\u25cc' + keyText;
 
-        if(osk.isRTL) {
+        if(vkbd.isRTL) {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }
       }
 
-      ts.fontSize = this.getIdealFontSize(osk, styleSpec);
+      ts.fontSize = this.getIdealFontSize(vkbd, styleSpec);
 
       // Finalize the key's text.
       t.innerHTML = keyText;
@@ -443,6 +495,12 @@ namespace com.keyman.osk {
       let y1 = y0 + btn.offsetHeight;
 
       return (x > x0 && x < x1 && y > y0 && y < y1);
+    }
+
+    public refreshLayout(vkbd: VisualKeyboard) {
+      if(this.label) { // space bar may not define the text span!
+        this.label.style.fontSize = this.getIdealFontSize(vkbd, this.btn.style);
+      }
     }
   }
 }

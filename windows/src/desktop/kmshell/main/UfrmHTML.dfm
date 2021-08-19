@@ -70,9 +70,4 @@ object frmHTML: TfrmHTML
     TabOrder = 4
     OnClick = cmdForwardClick
   end
-  object ApplicationEvents1: TApplicationEvents
-    OnMessage = ApplicationEvents1Message
-    Left = 232
-    Top = 160
-  end
 end
