@@ -139,7 +139,7 @@ export const reportHistory = async (
         const e = re.exec(git_pr_data);
         if(e) {
           if(this_git_tag != '') {
-            const this_git_date = (await spawnChild('git', ['log', '--format=%cs','-n', '1', git_tag])).trim();
+            const this_git_date = (await spawnChild('git', ['log', '--format=%cs','-n', '1', this_git_tag])).trim();
             // Transform the tag into our regular HISTORY.md format
             const tag_format = /^release-(\d+\.\d+\.\d+)(-(.+))?$/.exec(this_git_tag);
             if(tag_format) {
