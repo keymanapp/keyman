@@ -9,6 +9,7 @@ from keyman_config.uninstall_kmp import uninstall_kmp
 
 import datetime
 import time
+from zipfile import is_zipfile
 
 
 def get_languages():
@@ -120,7 +121,7 @@ def main():
 
     if args.file:
         name, ext = os.path.splitext(args.file)
-        if ext != ".kmp":
+        if ext != ".kmp" or not is_zipfile(args.file):
             logging.error("km-package-install: Input file %s is not a kmp file.", args.file)
             logging.error("km-package-install -f <kmpfile>")
             sys.exit(2)
