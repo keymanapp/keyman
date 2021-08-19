@@ -27,7 +27,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static final String TAG = "SettingsFragment";
   private static Context context;
 
-  private Preference languagesPreference, installKeyboardOrDictionary, displayLanguagePreference;
+  private Preference languagesPreference, installKeyboardOrDictionary, displayLanguagePreference,
+    adjustKeyboardHeight;
   private ListPreference spacebarTextPreference;
   private CheckBoxPreference setSystemKeyboardPreference;
   private CheckBoxPreference setDefaultKeyboardPreference;
@@ -61,6 +62,13 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     displayLanguagePreference.setWidgetLayoutResource(R.layout.preference_translate_icon_layout);
     Intent displayLanguageIntent = new Intent(context, KeymanSettingsLocalizeActivity.class);
     displayLanguagePreference.setIntent(displayLanguageIntent);
+
+    adjustKeyboardHeight = new Preference(context);
+    adjustKeyboardHeight.setKey(AdjustKeyboardHeightActivity.adjustKeyboardHeightKey);
+    adjustKeyboardHeight.setTitle(getString(R.string.adjust_keyboard_height));
+    adjustKeyboardHeight.setWidgetLayoutResource(R.layout.preference_height_icon_layout);
+    Intent adjustKeyboardHeightIntent = new Intent(context, AdjustKeyboardHeightActivity.class);
+    adjustKeyboardHeight.setIntent(adjustKeyboardHeightIntent);
 
     /* Spacebar Caption Preference */
 
@@ -168,6 +176,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     screen.addPreference(languagesPreference);
     screen.addPreference(installKeyboardOrDictionary);
     screen.addPreference(displayLanguagePreference);
+    screen.addPreference(adjustKeyboardHeight);
     screen.addPreference(spacebarTextPreference);
 
     screen.addPreference(setSystemKeyboardPreference);

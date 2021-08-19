@@ -260,6 +260,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     super.onResume();
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
+    resizeTextView(textView.isKeyboardVisible());
 
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
@@ -576,7 +577,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
   }
 
-  private void resizeTextView(boolean isKeyboardVisible) {
+  public void resizeTextView(boolean isKeyboardVisible) {
     int bannerHeight = 0;
     int keyboardHeight = 0;
     if (isKeyboardVisible) {

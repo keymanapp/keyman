@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <include layout="@layout/titlebar" />
+
+  <TextView
+    android:id="@+id/drag_the_keyboard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/titlebar"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:text="@string/drag_the_keyboard"
+    />
+
+  <TextView
+    android:id="@+id/rotate_the_device"
+    android:layout_below="@id/drag_the_keyboard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:text="@string/rotate_the_device"
+    />
+
+  <Button
+    android:id="@+id/reset_to_defaults"
+    style="@style/Widget.AppCompat.Button.Colored"
+    android:background="@color/keyman_blue"
+    android:textColor="@color/ms_white"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/rotate_the_device"
+    android:layout_centerInParent="true"
+    android:singleLine="true"
+    android:layout_marginTop="8dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:text="@string/reset_to_defaults" />
+
+    <!-- Resizable keyboard "image -->
+    <ImageView
+      android:id="@+id/sample_keyboard"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/keyboard_height"
+      android:contentDescription="@string/adjust_keyboard_height"
+      android:background="@drawable/dash_border"
+      android:layout_alignParentBottom="true"
+      android:paddingStart="@dimen/close_button_margin"
+      android:paddingEnd="@dimen/close_button_margin"
+      android:src="@drawable/keyman_logo"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+</RelativeLayout>
