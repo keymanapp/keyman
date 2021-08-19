@@ -82,7 +82,7 @@ const getAssociatedPRInformation = async (
  */
 
 export const reportHistory = async (
-  octokit: GitHub, base: string, force: boolean
+  octokit: GitHub, base: string, force: boolean, useGitHubPRInfo: boolean
 ): Promise<PRInformation[]> => {
 
   //
@@ -98,7 +98,7 @@ export const reportHistory = async (
   // Now, use git log to retrieve list of merge commit refs since then
   //
 
-  const git_result = (await spawnChild('git', ['log', '--merges', /*'--first-parent',*/ '--format=%H', base, `${commit_id}..`])).trim();
+  const git_result = (await spawnChild('git', ['log', '--merges', '--first-parent', '--format=%H', `origin/${base}`, `${commit_id}..origin/${base}`])).trim();
   if(git_result.length == 0 && !force) {
     // We won't throw on this
     logWarning('No pull requests found since previous increment');
@@ -110,7 +110,6 @@ export const reportHistory = async (
   //
   // Retrieve the pull requests associated with each merge
   //
-
   let pulls: PRInformation[] = [];
 
   if(git_result.length == 0) {
@@ -118,19 +117,33 @@ export const reportHistory = async (
       title: 'No changes made',
       number: 0
     });
-  }
-  else {
+  } else {
+    const re = /#(\d+)/;
     for(const commit of new_commits) {
-      const pr = await getAssociatedPRInformation(octokit, commit);
-      if(pr === undefined) {
-        logWarning(`commit ref ${commit} has no associated pull request.`);
-        continue;
-      }
-      if(pulls.find(p => p.number == pr.number) == undefined) {
-        pulls.push(pr);
+      if(!useGitHubPRInfo) {
+        const git_pr_title = (await spawnChild('git', ['log', '--format=%b', '-n', '1', commit])).trim();
+        const git_pr_data = (await spawnChild('git', ['log', '--format=%s', '-n', '1', commit])).trim();
+        const e = re.exec(git_pr_data);
+        if(e) {
+          const pr: PRInformation = {
+            title: git_pr_title,
+            number: parseInt(e[1], 10)
+          };
+          if(pulls.find(p => p.number == pr.number) == undefined) {
+            pulls.push(pr);
+          }
+        }
+      } else {
+        const pr = await getAssociatedPRInformation(octokit, commit);
+        if(pr === undefined) {
+          logWarning(`commit ref ${commit} has no associated pull request.`);
+          continue;
+        }
+        if(pulls.find(p => p.number == pr.number) == undefined) {
+          pulls.push(pr);
+        }
       }
     }
   }
-
   return pulls;
 };

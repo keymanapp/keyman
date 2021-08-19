@@ -29,6 +29,11 @@ const argv = yargs
     'force': {
       description: 'Force a version increment even if no changes found',
       type: 'boolean'
+    },
+
+    'github-pr': {
+      description: 'Query GitHub for Pull Request number and title instead of parsing from merge commit comments',
+      type: 'boolean'
     }
   })
   .help()
@@ -59,7 +64,7 @@ const main = async (): Promise<void> => {
   //
 
   if(argv._.includes('report-history')) {
-    let pulls = await reportHistory(octokit, argv.base, argv.force);
+    let pulls = await reportHistory(octokit, argv.base, argv.force, argv['github-pr']);
     for(const pull of pulls) {
       logInfo(`* ${pull.title}: ${pull.number}`);
     }

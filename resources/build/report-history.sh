@@ -17,6 +17,20 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 BUILD=false
 BASE=`git branch --show-current`
 GITHUB_TOKEN=
+GITHUB_PR=
+
+display_usage() {
+  echo "Usage: report-history.sh [options] --token <github-token>"
+  echo
+  echo "  --token|-t <github-token>   Specifies a GitHub login token"
+  echo "  --base|-b  <base>           Specifies branch to report on: master, beta, stable-x.y (default: master)"
+  echo "  --rebuild|-r                Rebuild version.js used in this script"
+  echo "  --help|-?                   Show this help"
+  echo "  --github-pr                 Query GitHub for Pull Request number and title instead of parsing from merge commit comments"
+  echo
+  echo "Prints a report of outstanding changes on the branch <base> that will "
+  echo "be incorporated into the next build."
+}
 
 # Parse args
 shopt -s nocasematch
@@ -38,6 +52,9 @@ while [[ $# -gt 0 ]] ; do
     --base|-b)
       BASE="$2"
       shift
+      ;;
+    --github-pr)
+      GITHUB_PR=$key
       ;;
     *)
       fail "Invalid parameters. Use --help for help"
@@ -66,5 +83,5 @@ if $BUILD; then
 fi
 
 pushd "$KEYMAN_ROOT" > /dev/null
-node resources/build/version/lib/index.js report-history -t "$GITHUB_TOKEN" -b "$BASE"
+node resources/build/version/lib/index.js report-history -t "$GITHUB_TOKEN" -b "$BASE" $GITHUB_PR
 popd > /dev/null
