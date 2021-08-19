@@ -1,6 +1,6 @@
 c Description: Tests a simple deadkey rule in Unicode
-c keys: [SHIFT K_6][K_A][SHIFT K_6][K_SHIFT][K_A][SHIFT K_6][RALT K_B][K_A][SHIFT K_6][K_CAPS][K_A]
-c expected: pass.pass.pass.pass.
+c keys: [SHIFT K_6][K_A]
+c expected: \u00E2
 c context:
 
 store(&VERSION) '9.0'
@@ -11,4 +11,4 @@ group(main) using keys
 
 + '^' > deadkey(1)
 
-dk(1) + [K_A] > 'pass.'
+dk(1) + 'a' >  U+00E2

@@ -1,6 +1,6 @@
 c Description: Tests Caps Lock
-c keys: [K_1][SHIFT K_2][SHIFT K_3][K_A][SHIFT K_B][K_C][K_CAPS][K_D]
-c expected: pass.pass.pass.pass.pass.pass.pass.
+c keys: [K_1][SHIFT K_2][SHIFT K_3][K_A][SHIFT K_B]
+c expected: pass.pass.pass.pass.pass.
 c capsLock: 1
 c context:
 
@@ -24,11 +24,3 @@ group(Main) using keys
 
 + 'b' > 'pass.'
 + 'B' > 'fail.'
-
-c Caps is on. The virtual key should match.
-+ [SHIFT K_C] > 'fail.'
-+ [K_C] > 'pass.'
-
-c Caps was pressed and released, so Caps is now off.  The virtual key should still match.
-+ [SHIFT K_D] > 'fail.'
-+ [K_D] > 'pass.'
