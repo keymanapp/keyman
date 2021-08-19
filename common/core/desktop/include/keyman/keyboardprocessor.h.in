@@ -839,7 +839,6 @@ A pointer to a `km_kbp_action_item` list, of `*num_items` in length. This data
 becomes invalid when the state object is destroyed, or after a call to
 `km_kbp_process_event`. Do not modify the contents of this data. The returned
 array is terminated with a `KM_KBP_IT_END` entry.
-in the action item queue.
 ##### Parameters:
 - __state__: A pointer to the opaque `km_kbp_state` object to be queried.
 - __num_items__:

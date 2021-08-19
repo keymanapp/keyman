@@ -54,7 +54,7 @@ static BOOL processPersistOpt(
     wcscpy_s(reinterpret_cast<LPWSTR>(cp), sizeof(actionItem->option->value) + 1, reinterpret_cast<LPCWSTR>(actionItem->option->value));
     keyboardOpts[0].value = cp;
     keyboardOpts[1] = KM_KBP_OPTIONS_END;
-    km_kbp_status eventStatus = km_kbp_state_options_update(keyboardState, keyboardOpts);
+    km_kbp_status eventStatus = (km_kbp_status_codes)km_kbp_state_options_update(keyboardState, keyboardOpts);
     if (eventStatus != KM_KBP_STATUS_OK)
     {
       // log warning "problem saving option for km_kbp_keyboard");

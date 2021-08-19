@@ -1000,7 +1000,7 @@ void ReleaseKeyboards(BOOL Lock)
 		if(Lock) UnloadDLLs(&_td->lpKeyboards[i]);
     FreeKeyboardOptions(&_td->lpKeyboards[i]);
 		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
-  ReleaseKeyboardMemoryCore(_td->lpKeyboards[i].coreKeyboard);
+    ReleaseKeyboardMemoryCore(_td->lpKeyboards[i].coreKeyboard);
     
     if(_td->lpKeyboards[i].Profiles) delete _td->lpKeyboards[i].Profiles;   // I3581
 	}

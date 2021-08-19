@@ -75,7 +75,6 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
   return n;
 }
 
-
 BOOL LoadlpKeyboardCore(int i)
 {
   SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadlpKeyboardCore: Enter ---");
@@ -83,6 +82,11 @@ BOOL LoadlpKeyboardCore(int i)
   if (!_td) return FALSE;
   if (_td->lpKeyboards[i].coreKeyboard) return TRUE;
   if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
+
+  if (_td->lpKeyboards[i].lpActiveKBState) {
+    km_kbp_state_dispose(_td->lpKeyboards[i].lpActiveKBState);
+    _td->lpKeyboards[i].lpActiveKBState = NULL;
+  }
 
   char buf[256];
   if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
@@ -101,13 +105,6 @@ BOOL LoadlpKeyboardCore(int i)
     KM_KBP_OPTIONS_END
   };
 
-  if (_td->lpKeyboards[i].lpActiveKBState)
-  {
-    km_kbp_state_dispose(_td->lpKeyboards[i].lpActiveKBState);
-    _td->lpKeyboards[i].lpActiveKBState = NULL;
-  }
-
-  // if (KM_KBP_STATUS_OK != km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpActiveKBState)) return FALSE;
   err_code = (km_kbp_status_codes)km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpActiveKBState);
   if (err_code != KM_KBP_STATUS_OK) {
     return FALSE;
