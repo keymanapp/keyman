@@ -10,6 +10,13 @@
 /// <reference path="mouseEventEngine.ts" />
 
 namespace com.keyman.osk {
+  interface BoundingRect {
+    left: number,
+    right: number,
+    top: number,
+    bottom: number
+  };
+
   export class VisualKeyboard implements KeyboardView {
     // Legacy alias, maintaining a reference for code built against older
     // versions of KMW.
@@ -425,13 +432,13 @@ namespace com.keyman.osk {
 
     //#region Input handling start
 
-    detectWithinBounds(coord: InputEventCoordinate): boolean {
-      // Shortcuts the method during unit testing, as we don't currently
-      // provide coordinate values in its synthetic events.
-      if(coord.x === null && coord.y === null) {
-        return true;
-      }
-
+    /**
+     * Determines a "fuzzy boundary" area around the OSK within which active mouse and
+     * touch events will be maintained, even if their coordinates lie outside of the OSK's
+     * true visual bounds.
+     * @returns A `BoundingRect`, in `.pageX` / `.pageY` coordinates.
+     */
+    private getInteractiveBoundingRect(): BoundingRect {
       // Determine the important geometric values involved
       const _Box = this.element.offsetParent as HTMLElement;
       let oskX = this.element.offsetLeft + (_Box?.offsetLeft || 0);
@@ -442,30 +449,51 @@ namespace com.keyman.osk {
       // for both dimensions.
       const rowCount = this.currentLayer.rows.length;
       const buffer = (0.333 * this.height / rowCount);
-      
+
       // Determine the OSK's boundaries and the boundaries of the page / view.
       // These values are needed in .pageX / .pageY coordinates for the final calcs.
-      let leftBound = oskX - buffer;
-      let rightBound = oskX + this.width + buffer;
-      let topBound = oskY - buffer;
-      let bottomBound = oskY + this.height + buffer;
-
+      let boundingRect: BoundingRect = {
+        left: oskX - buffer,
+        right: oskX + this.width + buffer,
+        top: oskY - buffer,
+        bottom: oskY + this.height + buffer
+      };
+      
       // If the OSK is using fixed positioning (thus, viewport-relative), we need to
       // convert the 'clientX'-like values into 'pageX'-like values.
       if(this.usesFixedPositioning) {
-        leftBound   += window.pageXOffset;
-        rightBound  += window.pageXOffset;
-        topBound    += window.pageYOffset;
-        bottomBound += window.pageYOffset;
+        boundingRect.left   += window.pageXOffset;
+        boundingRect.right  += window.pageXOffset;
+        boundingRect.top    += window.pageYOffset;
+        boundingRect.bottom += window.pageYOffset;
       }
 
+      return boundingRect;
+    }
+
+    /**
+     * Adjusts a potential "interactive boundary" definition by enforcing an 
+     * "event cancellation zone" near screen boundaries that are not directly adjacent 
+     * to the ongoing input event's initial coordinate.
+     * 
+     * This facilitates modeling of conventional cancellation gestures where a user would
+     * drag the mouse or touch point off the OSK, as mouse and touch event handlers receive
+     * no input beyond screen boundaries.
+     * 
+     * @param baseBounds The baseline interactive bounding area to be adjusted
+     * @param startCoord The initial coordinate of a currently-ongoing input event
+     * @returns 
+     */
+    private applyScreenMarginBoundsThresholding(baseBounds: BoundingRect,
+                                                startCoord: InputEventCoordinate): BoundingRect {
       // Determine the needed linear translation to screen coordinates.
       const xDelta = window.screenLeft - window.pageXOffset;
       const yDelta = window.screenTop  - window.pageYOffset;
 
+      let adjustedBounds: BoundingRect = { ... baseBounds };
+
       // Also translate the initial touch's screen coord, as it affects our bounding box logic.
-      const initScreenCoord = new InputEventCoordinate(this.initTouchCoord.x + xDelta,
-                                                       this.initTouchCoord.y + yDelta);
+      const initScreenCoord = new InputEventCoordinate(startCoord.x + xDelta, startCoord.y + yDelta);
 
       // Detection:  is the OSK aligned with any screen boundaries?
       // If so, create a 'fuzzy' zone around the edges not near the initial touch point that allow
@@ -473,27 +501,40 @@ namespace com.keyman.osk {
 
       // If the initial input screen-coord is at least 5 pixels from the screen's left AND
       // the OSK's left boundary is within 2 pixels from the screen's left...
-      if(initScreenCoord.x >= 5 && leftBound + xDelta <= 2) {
-        leftBound = 2 - xDelta; // new `leftBound` is set to 2 pixels from the screen's left.
+      if(initScreenCoord.x >= 5 && baseBounds.left + xDelta <= 2) {
+        adjustedBounds.left = 2 - xDelta; // new `leftBound` is set to 2 pixels from the screen's left.
       }
 
-      if(initScreenCoord.x <= screen.width - 5 && rightBound + xDelta >= screen.width - 2) {
-        rightBound = (screen.width - 2) - xDelta; // new `rightBound` 2px from screen's right.
+      if(initScreenCoord.x <= screen.width - 5 && baseBounds.right + xDelta >= screen.width - 2) {
+        adjustedBounds.right = (screen.width - 2) - xDelta; // new `rightBound` 2px from screen's right.
       }
 
-      if(initScreenCoord.y >= 5 && topBound + yDelta <= 2) {
-        topBound = 2 - yDelta;
+      if(initScreenCoord.y >= 5 && baseBounds.top + yDelta <= 2) {
+        adjustedBounds.top = 2 - yDelta;
       }
 
-      if(initScreenCoord.y <= screen.height - 5 && bottomBound + yDelta >= screen.height - 2) {
-        bottomBound = (screen.height - 2) - yDelta;
+      if(initScreenCoord.y <= screen.height - 5 && baseBounds.bottom + yDelta >= screen.height - 2) {
+        adjustedBounds.bottom = (screen.height - 2) - yDelta;
       }
+
+      return adjustedBounds;
+    }
+
+    detectWithinInteractiveBounds(coord: InputEventCoordinate): boolean {
+      // Shortcuts the method during unit testing, as we don't currently
+      // provide coordinate values in its synthetic events.
+      if(coord.x === null && coord.y === null) {
+        return true;
+      }
+
+      const baseBoundingRect = this.getInteractiveBoundingRect();
+      const adjustedBoundingRect = this.applyScreenMarginBoundsThresholding(baseBoundingRect, this.initTouchCoord);
 
       // Now to check where the input coordinate lies in relation to the final bounding box!
 
-      if(coord.x < leftBound || coord.x > rightBound) {
+      if(coord.x < adjustedBoundingRect.left || coord.x > adjustedBoundingRect.right) {
         return false;
-      } else if(coord.y < topBound || coord.y > bottomBound) {
+      } else if(coord.y < adjustedBoundingRect.top || coord.y > adjustedBoundingRect.bottom) {
         return false;
       } else {
         return true;
@@ -628,7 +669,7 @@ namespace com.keyman.osk {
 
       // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
       // This is not completely effective and needs some tweaking, especially on Android
-      if(!this.detectWithinBounds(input)) {
+      if(!this.detectWithinInteractiveBounds(input)) {
         this.moveCancel(input);
         this.touchCount--;
         return;

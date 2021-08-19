@@ -64,7 +64,7 @@ namespace com.keyman.osk {
 
       this.preventPropagation(event);
 
-      if(this.vkbd.detectWithinBounds(coord)) {
+      if(this.vkbd.detectWithinInteractiveBounds(coord)) {
         this.onInputMove(coord);
       } else {
         this.onInputMoveCancel(coord);
