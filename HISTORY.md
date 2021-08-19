@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.97 alpha 2021-08-19
+
+* fix(linux): Fix uploading to launchpad 📦 (#5607)
+
 ## 15.0.96 alpha 2021-08-19
 
 * refactor(web): delayed OSK initialization 🍕 (#5412)
