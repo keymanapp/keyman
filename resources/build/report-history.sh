@@ -18,6 +18,10 @@ BUILD=false
 BASE=`git branch --show-current`
 GITHUB_TOKEN=
 GITHUB_PR=
+FROM=
+FROM_VALUE=
+TO=
+TO_VALUE=
 
 display_usage() {
   echo "Usage: report-history.sh [options] --token <github-token>"
@@ -25,11 +29,13 @@ display_usage() {
   echo "  --token|-t <github-token>   Specifies a GitHub login token"
   echo "  --base|-b  <base>           Specifies branch to report on: master, beta, stable-x.y (default: master)"
   echo "  --rebuild|-r                Rebuild version.js used in this script"
+  echo "  --from <version|commit>     Starting version to report from (must be on same branch)"
+  echo "  --to <version|commit>       Finishing version to report to (must be on same branch)"
   echo "  --help|-?                   Show this help"
   echo "  --github-pr                 Query GitHub for Pull Request number and title instead of parsing from merge commit comments"
   echo
-  echo "Prints a report of outstanding changes on the branch <base> that will "
-  echo "be incorporated into the next build."
+  echo "If --from and --to are not specified, then prints a report of outstanding changes on the branch <base> that will "
+  echo "be incorporated into the next build, otherwise prints a report of all changes between those two builds."
 }
 
 # Parse args
@@ -55,6 +61,16 @@ while [[ $# -gt 0 ]] ; do
       ;;
     --github-pr)
       GITHUB_PR=$key
+      ;;
+    --from)
+      FROM=--from
+      FROM_VALUE="$2"
+      shift
+      ;;
+    --to)
+      TO=--to
+      TO_VALUE="$2"
+      shift
       ;;
     *)
       fail "Invalid parameters. Use --help for help"
@@ -83,5 +99,5 @@ if $BUILD; then
 fi
 
 pushd "$KEYMAN_ROOT" > /dev/null
-node resources/build/version/lib/index.js report-history -t "$GITHUB_TOKEN" -b "$BASE" $GITHUB_PR
+node resources/build/version/lib/index.js report-history -t "$GITHUB_TOKEN" -b "$BASE" $GITHUB_PR $FROM "$FROM_VALUE" $TO "$TO_VALUE"
 popd > /dev/null
