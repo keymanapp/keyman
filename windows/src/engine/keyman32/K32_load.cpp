@@ -86,26 +86,13 @@ BOOL LoadlpKeyboardCore(int i)
 
   char buf[256];
   if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
-  size_t charSize = strlen(buf) + 1;
-
-  LPWSTR keyboardPath = new WCHAR[charSize];
-
-  // Convert char* string to a wchar_t* string.
-  size_t convertedChars = 0;
-  if (mbstowcs_s(&convertedChars, keyboardPath, charSize, buf, _TRUNCATE)) {
-    //goto ExitError;
-    delete[] keyboardPath;
-    return FALSE;
-  }
+  PWCHAR keyboardPath = strtowstr(buf);
   km_kbp_status_codes err_code = (km_kbp_status_codes)km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard);
-  //if (KM_KBP_STATUS_OK != km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard)) {
   if (err_code != KM_KBP_STATUS_OK) {
-    //goto ExitError;
-    delete[] keyboardPath;
+    delete keyboardPath;
     return FALSE;
   }
-
-  delete[] keyboardPath;
+  delete keyboardPath;
 
   // TODO: 5442 handle dlls
   //LoadDLLs(&_td->lpKeyboards[i]);
@@ -125,17 +112,10 @@ BOOL LoadlpKeyboardCore(int i)
   if (err_code != KM_KBP_STATUS_OK) {
     return FALSE;
   }
-  
 
   LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpActiveKBState);
 
   return TRUE;
-
-//ExitError:
-//  if (keyboardPath) {
-//    delete[] keyboardPath;
-//  }
-//  return FALSE;
 }
 
 BOOL LoadlpKeyboard(int i)

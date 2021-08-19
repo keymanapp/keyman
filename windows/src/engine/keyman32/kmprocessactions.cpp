@@ -123,8 +123,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
       continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpActiveKBState);
       break;
     case KM_KBP_IT_END:
-      assert(false);
-      break;
+      // fallthrough
     default:
       assert(false); // NOT SUPPORTED
       break;

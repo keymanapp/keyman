@@ -217,8 +217,7 @@ BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr)
       // setup dead key context item
       p += 2;
       context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {*p} };
-    }
-    else if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF) {
+    } else if (Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p + 1))) {
       // handle surrogate
       context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
       p++;
