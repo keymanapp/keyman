@@ -14,6 +14,7 @@
     android:layout_below="@+id/titlebar"
     android:layout_marginStart="@dimen/activity_horizontal_margin"
     android:text="@string/drag_the_keyboard"
+    android:textSize="@dimen/adjust_keyboard_height_label_textsize"
     />
 
   <TextView
@@ -23,6 +24,7 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/activity_horizontal_margin"
     android:text="@string/rotate_the_device"
+    android:textSize="@dimen/adjust_keyboard_height_label_textsize"
     />
 
   <Button
@@ -38,7 +40,8 @@
     android:layout_marginTop="8dp"
     android:paddingStart="8dp"
     android:paddingEnd="8dp"
-    android:text="@string/reset_to_defaults" />
+    android:text="@string/reset_to_defaults"
+    android:textSize="@dimen/adjust_keyboard_height_label_textsize" />
 
     <!-- Resizable keyboard "image -->
     <ImageView
