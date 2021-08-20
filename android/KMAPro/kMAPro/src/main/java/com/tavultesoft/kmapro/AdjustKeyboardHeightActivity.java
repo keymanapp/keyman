@@ -70,7 +70,8 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
 
     sampleKeyboard = (ImageView) findViewById(R.id.sample_keyboard);
     layoutParams = sampleKeyboard.getLayoutParams();
-    refreshSampleKeyboard(context, true);
+    currentHeight = KMManager.getKeyboardHeight(context);
+    refreshSampleKeyboard(context);
 
     resetButton = (Button) findViewById(R.id.reset_to_defaults);
     resetButton.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +82,8 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
         editor.commit();
 
         // Restore default height
-        refreshSampleKeyboard(context, true);
+        currentHeight = KMManager.getKeyboardHeight(context);
+        refreshSampleKeyboard(context);
       }
     });
 
@@ -96,7 +98,12 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             // Increasing the keyboard height is a negative y
             currentHeight -= y;
 
-            refreshSampleKeyboard(context, false);
+            // Apply lower and upper bounds on currentHeight
+            int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
+            currentHeight = Math.max(defaultHeight/2, currentHeight);
+            currentHeight = Math.min(defaultHeight*2, currentHeight);
+
+            refreshSampleKeyboard(context);
             break;
           case MotionEvent.ACTION_UP:
             // Save the currentHeight when the user releases
@@ -115,13 +122,8 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   /**
    * Refresh the layout for the sample keyboard
    * @param context
-   * @param updateCurrentHeight - boolean if true, updates currentHeight
    */
-  private void refreshSampleKeyboard(Context context, boolean updateCurrentHeight) {
-    if (updateCurrentHeight) {
-      currentHeight = KMManager.getKeyboardHeight(context);
-    }
-
+  private void refreshSampleKeyboard(Context context) {
     layoutParams.height = currentHeight;
     sampleKeyboard.setLayoutParams(layoutParams);
   }
@@ -133,13 +135,14 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     layoutParams = sampleKeyboard.getLayoutParams();
 
     // When the user rotates the device, restore currentHeight
-    refreshSampleKeyboard(this,true);
+    currentHeight = KMManager.getKeyboardHeight(this);
+    refreshSampleKeyboard(this);
   }
 
   @Override
   public void onBackPressed() {
     // Apply the adjusted height on exit
-    KMManager.setKeyboardHeight(this, currentHeight);
+    KMManager.applyKeyboardHeight(this, currentHeight);
 
     super.onBackPressed();
   }

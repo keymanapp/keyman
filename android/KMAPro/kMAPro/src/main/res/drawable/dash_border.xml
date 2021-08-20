@@ -3,7 +3,6 @@
   <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
       <shape android:shape="rectangle">
-        <solid android:color="@color/keyman_red"/>
         <corners android:radius="10dp" />
         <stroke android:width="3dp" android:dashWidth="12dp" android:color="@color/ms_black" android:dashGap="5dp" />
       </shape>

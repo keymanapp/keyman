@@ -46,14 +46,13 @@
       android:layout_width="match_parent"
       android:layout_height="@dimen/keyboard_height"
       android:contentDescription="@string/adjust_keyboard_height"
+      android:scaleType="fitXY"
+      android:src="@drawable/blank_osk"
       android:background="@drawable/dash_border"
       android:layout_alignParentBottom="true"
-      android:paddingStart="@dimen/close_button_margin"
-      android:paddingEnd="@dimen/close_button_margin"
-      android:src="@drawable/keyman_logo"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+      android:paddingStart="@dimen/blank_osk_padding"
+      android:paddingEnd="@dimen/blank_osk_padding"
+      android:paddingTop="@dimen/blank_osk_padding"
+      android:paddingBottom="@dimen/blank_osk_padding"/>
 
 </RelativeLayout>

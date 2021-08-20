@@ -1664,7 +1664,7 @@ public final class KMManager {
     return defaultHeight;
   }
 
-  public static void setKeyboardHeight(Context context, int height) {
+  public static void applyKeyboardHeight(Context context, int height) {
     if (InAppKeyboard != null && InAppKeyboardLoaded) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
