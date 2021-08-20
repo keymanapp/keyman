@@ -87,7 +87,7 @@ begin
         if dk.Position = startpos then
         begin
           s[i] := WChr(UC_SENTINEL);
-          s := Copy(s, 1, i) + WChr(CODE_DEADKEY) + WChr(dk.Deadkey.Value+1) + Copy(s, i+1, Length(s));
+          s := Copy(s, 1, i) + WChr(CODE_DEADKEY) + WChr(dk.Deadkey.Value) + Copy(s, i+1, Length(s));
           Inc(i, 2);
           Break;
         end;

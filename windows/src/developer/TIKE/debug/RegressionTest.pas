@@ -255,7 +255,7 @@ begin
   for i := 0 to DebugKeyboard.Deadkeys.Count - 1 do
     if DebugKeyboard.Deadkeys[i].name = name then
     begin
-      Result := DebugKeyboard.Deadkeys[i].Value+1;
+      Result := DebugKeyboard.Deadkeys[i].Value;
       Exit;
     end;
 end;
@@ -445,7 +445,7 @@ var
   i: Integer;
 begin
   for i := 0 to FRegressionTest.DebugKeyboard.Deadkeys.Count - 1 do
-    if FRegressionTest.DebugKeyboard.Deadkeys[i].Value+1 = dkCode then
+    if FRegressionTest.DebugKeyboard.Deadkeys[i].Value = dkCode then
     begin
       Result := FRegressionTest.DebugKeyboard.Deadkeys[i].Name;
       Exit;

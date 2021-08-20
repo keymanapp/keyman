@@ -421,7 +421,7 @@ begin
       context_items[n]._type := KM_KBP_CT_MARKER;
       dk := FDeadkeys.GetFromPosition(i-1);
       Assert(Assigned(dk));
-      context_items[n].marker := dk.Deadkey.Value+1; // TODO: remove +1 -1 messes for deadkey codes //GetDeadkeyMarker(i);
+      context_items[n].marker := dk.Deadkey.Value;
     end
     else
     begin
@@ -784,7 +784,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     dk.Memo := memo;
     dk.Deadkey := nil;
     for i := 0 to debugkeyboard.Deadkeys.Count - 1 do
-      if debugkeyboard.Deadkeys[i].Value+1 = dkCode then
+      if debugkeyboard.Deadkeys[i].Value = dkCode then
       begin
         dk.Deadkey := debugkeyboard.Deadkeys[i];
         Break;
