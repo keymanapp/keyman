@@ -28,7 +28,6 @@ type
     Label1: TLabel;
     Label2: TLabel;
     cmdOK: TButton;
-    cmdTestWithoutDebugger: TButton;
     cmdCancel: TButton;
     chkAutoRecompile: TCheckBox;
     procedure cmdOKClick(Sender: TObject);

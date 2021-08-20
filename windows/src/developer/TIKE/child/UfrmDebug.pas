@@ -126,7 +126,6 @@ type
 
     FDebugFileName: WideString;
     FSingleStepMode: Boolean;
-    FCanDebug: Boolean;
     FOnUpdateExecutionPoint: TDebugLineEvent;
     FOnClearBreakpoint: TDebugLineEvent;
     FOnSetBreakpoint: TDebugLineEvent;
@@ -173,7 +172,6 @@ type
 
     function GetDebugKeyboard: TDebugKeyboard;
 
-    property CanDebug: Boolean read FCanDebug write FCanDebug;
     property UIStatus: TDebugUIStatus read FUIStatus write SetUIStatus;
 
     property SingleStepMode: Boolean read FSingleStepMode write SetSingleStepMode;
@@ -340,7 +338,7 @@ begin
       (UIStatus = duiPaused) then
     UIStatus := duiFocusedForInput
   else if (Message.Msg = WM_KEYDOWN) and
-    (UIStatus = duiFocusedForInput) then
+    (UIStatus in [duiTest, duiFocusedForInput]) then
   begin
     Exit(ProcessKeyEvent(Message));
   end
@@ -488,7 +486,8 @@ begin
     else
     begin
       FRunning := True;
-      UIStatus := duiDebugging;
+      if UIStatus <> duiTest then
+        UIStatus := duiDebugging;
       SetCurrentEvent(0);
       Run;
     end;
@@ -539,8 +538,6 @@ end;
 
 procedure TfrmDebug.Run;
 begin
-  if UIStatus = duiTest then Exit;
-
   FFoundBreakpoint := False;
   FRunning := True;
   try
@@ -548,7 +545,7 @@ begin
     begin
       ExecuteEvent(_FCurrentEvent);
       SetCurrentEvent(_FCurrentEvent + 1);
-      if FFoundBreakpoint then
+      if FFoundBreakpoint and (UIStatus <> duiTest) then
       begin
         FRunning := False;
         ExecutionPointLine := ExecutionPointLine;
@@ -571,11 +568,15 @@ begin
     FRunning := False;
     EnableUI;
     UpdateCharacterGrid;
+    // We want to refresh the memo and character grid for rapid typing
+    memo.Update;
+    sgChars.Update;
   end;
 
-  if memo.Focused
-    then UIStatus := duiFocusedForInput
-    else UIStatus := duiReadyForInput;
+  if UIStatus <> duiTest then
+    if memo.Focused
+      then UIStatus := duiFocusedForInput
+      else UIStatus := duiReadyForInput;
 
   frmDebugStatus.RegTest.RegTestLogContext;
   frmDebugStatus.RegTest.RegTestNextKey;
@@ -862,7 +863,6 @@ begin
       KM_KBP_IT_PERSIST_OPT: ; //TODO
       KM_KBP_IT_INVALIDATE_CONTEXT: ; // no-op
     end;
-    Application.ProcessMessages;
 //    AddDEBUG(Format('%d: %d [%s]', [ActionType, dwData, Text]));
   end;
   EnableUI;
@@ -936,32 +936,28 @@ procedure TfrmDebug.SetupDebug;
 var
   buf: array[0..KL_NAMELENGTH] of Char;
 begin
-  if UIStatus <> duiTest then
-  begin
-    GetKeyboardLayoutName(buf);
+  GetKeyboardLayoutName(buf);
 
-    try
+  try
 
-      FDebugCore := TDebugCore.Create(FFileName, True);
-      frmDebugStatus.SetDebugCore(FDebugCore);
+    FDebugCore := TDebugCore.Create(FFileName, True);
+    frmDebugStatus.SetDebugCore(FDebugCore);
 
-    except
-      on E:Exception do
-      begin
-        CleanupCoreState;
-        Winapi.Windows.SetFocus(0);
-        HideDebugForm;
-        ShowMessage(E.Message);
-        Exit;
-      end;
+  except
+    on E:Exception do
+    begin
+      CleanupCoreState;
+      Winapi.Windows.SetFocus(0);
+      HideDebugForm;
+      ShowMessage(E.Message);
+      Exit;
     end;
+  end;
 
-    debugkeyboard := TDebugKeyboard.Create(FFileName);
-    frmDebugStatus.RegTest.RegTestSetup(buf, FFileName, False);   // I3655
-    frmDebugStatus.SetDebugKeyboard(debugkeyboard);
-    frmDebugStatus.Elements.ClearStores;
-  end
-  else ResetDebug;
+  debugkeyboard := TDebugKeyboard.Create(FFileName);
+  frmDebugStatus.RegTest.RegTestSetup(buf, FFileName, False);   // I3655
+  frmDebugStatus.SetDebugKeyboard(debugkeyboard);
+  frmDebugStatus.Elements.ClearStores;
 end;
 
 {-------------------------------------------------------------------------------
@@ -1075,28 +1071,14 @@ var
 begin
   if FUIStatus <> Value then
   begin
-    if not FCanDebug and (Value <> duiTest) then Exit;
-
     FOldUIStatus := FUIStatus;
     FUIStatus := Value;
-
-    if FOldUIStatus = duiTest then
-    begin
-      SetupDebug;
-    end;
 
     case Value of
       duiTest:
         begin
           StatusText := 'Simple Test';
           memo.ReadOnly := False;
-          ResetDebug;
-          if memo.Focused then
-          begin
-            GetParentForm(memo).ActiveControl := nil;
-            memo.SetFocus;
-            memoGotFocus(Self);
-          end;
         end;
       duiDebugging:
         begin

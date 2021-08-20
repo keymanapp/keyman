@@ -213,8 +213,7 @@ end;
 
 procedure TmodActionsKeyboardEditor.actDebugDebuggerModeUpdate(Sender: TObject);
 begin
-  actDebugDebuggerMode.Enabled := (ActiveEditor <> nil) and (ActiveEditor.DebugForm.CanDebug);
-  actDebugDebuggerMode.Checked := actDebugDebuggerMode.Enabled and (ActiveEditor.DebugForm.UIStatus <> duiTest);
+  actDebugDebuggerMode.Checked := (ActiveEditor <> nil) and (ActiveEditor.DebugForm.UIStatus <> duiTest);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugPauseExecute(Sender: TObject);
