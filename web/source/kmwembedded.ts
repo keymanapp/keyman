@@ -426,7 +426,9 @@ namespace com.keyman.text {
       // off to the processor for its actual execution.
 
       // Should return 'false' when KMW _has_ fully handled the event and 'true' when not.
-      return !keymanweb.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
+      const ruleBehavior: com.keyman.text.RuleBehavior = keymanweb.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
+
+      return !ruleBehavior || ruleBehavior.triggerKeyDefault;
     } catch (err) {
       console.error(err.message, err);
       return false;

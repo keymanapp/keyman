@@ -14,6 +14,7 @@ function loadKeyboards() {
 
   // Existing unit_test stubs at the time of writing:
   var preloadFiles = [
+    filePrefix + "galaxie_hebrew_positional.json",
     filePrefix + "khmer_angkor.json",
     filePrefix + "lao_2008_basic.json",
     filePrefix + "options_with_save.json",

@@ -63,7 +63,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      let retVal = (keyman.core.processKeyEvent(Lkc, outputTarget) != null);
+      let retVal = !!keyman.core.processKeyEvent(Lkc, outputTarget);
 
       return retVal;
     }
