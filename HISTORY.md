@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 15.0.98 alpha 2021-08-20
+
+* fix(windows): Ignore Access Denied error creating task (#4365)
+* fix(web): Have util.wait check useAlerts option (#5538)
+* fix(developer): debugger cleanup 🐞 (#5588)
+* chore(developer): debug deadkey 1-based values 🐞 (#5592)
+* chore(developer): refactor forcekeyboard in debug 🐞 (#5593)
+* fix(developer): get Test Mode working again 🐞 (#5594)
+* chore(developer): hide debug events panel 🐞 (#5595)
+* fix(common/core/web): behavior with unmatched final group (#5553)
+* fix(ios): iOS 13 and 14 only - stuck settings toggles (#5548)
+* fix(linux): Fix lost context after pressing K_SHIFT 🚧 (#5601)
+
 ## 15.0.97 alpha 2021-08-19
 
 * fix(linux): Fix uploading to launchpad 📦 (#5607)
