@@ -161,6 +161,7 @@ open class SettingsViewController: UITableViewController {
         showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showBannerSwitch)
+        cell.contentView.isUserInteractionEnabled = false
 
         showBannerSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
         showBannerSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
@@ -175,6 +176,7 @@ open class SettingsViewController: UITableViewController {
         showAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showAgainSwitch)
+        cell.contentView.isUserInteractionEnabled = false
 
         showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
         showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
@@ -189,6 +191,7 @@ open class SettingsViewController: UITableViewController {
         enableReportingSwitch.addTarget(self, action: #selector(self.reportingSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(enableReportingSwitch)
+        cell.contentView.isUserInteractionEnabled = false
 
         enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
         enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
