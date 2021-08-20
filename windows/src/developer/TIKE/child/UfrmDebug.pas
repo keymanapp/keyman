@@ -90,7 +90,7 @@ type
 
     FDebugVisible: Boolean;
     FBreakpoints: TDebugBreakpoints;
-    FRunning, FFoundBreakpoint, FForceKeyboard: Boolean;
+    FRunning, FFoundBreakpoint: Boolean;
     FFileName: string;
     FExecutionPointLine: Integer;
     debugkeyboard: TDebugKeyboard;
@@ -115,7 +115,6 @@ type
     procedure SetUIStatus(const Value: TDebugUIStatus);
     procedure DisableUI;
     procedure EnableUI;
-    procedure SetForceKeyboard(Value: Boolean); // TODO: refactor this away -- we should use only FUIStatus
     function GetStatusText: string;
     procedure SetStatusText(Value: string);
     procedure UpdateDebugStatusForm;   // I4809
@@ -160,7 +159,6 @@ type
 
   { General }
   protected
-    property ForceKeyboard: Boolean read FForceKeyboard write SetForceKeyboard;
     property StatusText: string read GetStatusText write SetStatusText;
   public
     procedure UpdateFont(FFont: TFont);
@@ -306,10 +304,8 @@ end;
 
 procedure TfrmDebug.memoGotFocus(Sender: TObject);
 begin
-  case UIStatus of
-    duiReadyForInput: UIStatus := duiFocusedForInput;
-    duiTest: ForceKeyboard := True;
-  end;
+  if UIStatus = duiReadyForInput then
+    UIStatus := duiFocusedForInput;
 
   memoSelMove(memo);
 end;
@@ -322,10 +318,8 @@ end;
 
 procedure TfrmDebug.memoLostFocus(Sender: TObject);
 begin
-  case UIStatus of
-    duiTest: ForceKeyboard := False;
-    duiFocusedForInput: UIStatus := duiReadyForInput;
-  end;
+  if UIStatus = duiFocusedForInput then
+    UIStatus := duiReadyForInput;
 end;
 
 function TfrmDebug.HandleMemoKeydown(var Message: TMessage): Boolean;
@@ -888,39 +882,6 @@ begin
   end;
 end;
 
-procedure TfrmDebug.SetForceKeyboard(Value: Boolean);
-begin
-  if Value <> FForceKeyboard then
-  begin
-    FForceKeyboard := Value;
-
-    if FForceKeyboard then
-    begin
-      try
-        memo.SetFocus;
-
-        FDebugCore := TDebugCore.Create(FFileName, True);
-        frmDebugStatus.SetDebugCore(FDebugCore);
-
-      except
-        on E:Exception do
-        begin
-          CleanupCoreState;
-          Winapi.Windows.SetFocus(0);
-          HideDebugForm;
-          FForceKeyboard := False;
-          ShowMessage(E.Message);
-          Exit;
-        end;
-      end;
-    end
-    else
-    begin
-      CleanupCoreState;
-    end;
-  end;
-end;
-
 procedure TfrmDebug.CleanupCoreState;
 begin
   FreeAndNil(FDebugCore);
@@ -958,7 +919,6 @@ end;
 
 procedure TfrmDebug.ResetDebug;
 begin
-  ForceKeyboard := False;
   FreeAndNil(debugkeyboard);
   if (frmDebugStatus <> nil) then
     frmDebugStatus.SetDebugKeyboard(nil);
@@ -979,6 +939,22 @@ begin
   if UIStatus <> duiTest then
   begin
     GetKeyboardLayoutName(buf);
+
+    try
+
+      FDebugCore := TDebugCore.Create(FFileName, True);
+      frmDebugStatus.SetDebugCore(FDebugCore);
+
+    except
+      on E:Exception do
+      begin
+        CleanupCoreState;
+        Winapi.Windows.SetFocus(0);
+        HideDebugForm;
+        ShowMessage(E.Message);
+        Exit;
+      end;
+    end;
 
     debugkeyboard := TDebugKeyboard.Create(FFileName);
     frmDebugStatus.RegTest.RegTestSetup(buf, FFileName, False);   // I3655
@@ -1106,7 +1082,6 @@ begin
 
     if FOldUIStatus = duiTest then
     begin
-      ForceKeyboard := False;
       SetupDebug;
     end;
 
@@ -1127,7 +1102,6 @@ begin
         begin
           //SelectSystemLayout(False);
           EnableUI;
-          //ForceKeyboard := False;
           StatusText := 'Debugging';
           memo.ReadOnly := True;
         end;
@@ -1142,7 +1116,6 @@ begin
           DisableUI;
           frmDebugStatus.Elements.UpdateStores(nil);
           frmDebugStatus.Key.ShowKey(nil);
-          ForceKeyboard := True;
           StatusText := 'Focused for input';
           memo.ReadOnly := False;
           //SelectSystemLayout(True);
@@ -1159,7 +1132,6 @@ begin
               frmDebugStatus.Elements.UpdateStores(nil);
               frmDebugStatus.Key.ShowKey(nil);
             end;
-            ForceKeyboard := False;
             StatusText := 'Ready for input';
             memo.ReadOnly := True;
           end;
@@ -1169,7 +1141,6 @@ begin
           //SelectSystemLayout(False);
           EnableUI;
           FUIDisabled := False;   // I4033
-          ForceKeyboard := False;   // I4033
           StatusText := 'Paused';
           memo.ReadOnly := True;
         end;
