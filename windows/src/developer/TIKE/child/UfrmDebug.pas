@@ -99,10 +99,10 @@ type
     FEvents: TDebugEventList;
     FUIStatus: TDebugUIStatus;
     FUIDisabled: Boolean;
-    LastSelStart: Integer;
 
     { Deadkey member variables }
     FSelectedDeadkey: TDeadKeyInfo;
+    FSavedSelection: TMemoSelection;
 
     { Keyman32 integration functions }
     function frmDebugStatus: TfrmDebugStatus;
@@ -214,6 +214,7 @@ uses
   dmActionsMain,
   Glossary,
   Keyman.Developer.System.Project.ProjectLog,
+  Keyman.UI.Debug.CharacterGridRenderer,
   KeyNames,
   kmxfile,
   kmxfileconsts,
@@ -385,6 +386,23 @@ var
 begin
   context := km_kbp_state_context(FDebugCore.State);
 
+  if memo.SelLength > 0 then
+  begin
+    // When there is a selection, we'll treat it as
+    // empty context, because it does not make sense
+    // for the keyboard to interact either with text
+    // to the left of the selection, nor at the end
+    // of the selection.
+    //
+    // Furthermore, telling Keyman Core that there is
+    // an empty context helps it to do a 'normal'
+    // backspace in the case of backspace key, rather
+    // than deleting the last character of the selection
+    // (Keyman Core is not aware of selection).
+    km_kbp_context_clear(context);
+    Exit(True);
+  end;
+
   n := 0;
   SetLength(context_items, Length(memo.Text)+1);
   i := 1;
@@ -521,6 +539,8 @@ begin
     frmDebugStatus.RegTest.RegTestLogContext;
     frmDebugStatus.RegTest.RegTestNextKey;
   end;
+
+  UpdateCharacterGrid;
 end;
 
 procedure TfrmDebug.Run;
@@ -555,6 +575,8 @@ begin
     end;
   finally
     FRunning := False;
+    EnableUI;
+    UpdateCharacterGrid;
   end;
 
   if memo.Focused
@@ -570,9 +592,11 @@ end;
 procedure TfrmDebug.ExecuteEvent(n: Integer);
 begin
   memo.ReadOnly := False;
+  memo.Selection := FSavedSelection;
   if FEvents[n].EventType = etAction
     then ExecuteEventAction(n)
     else ExecuteEventRule(n);
+  FSavedSelection := memo.Selection;
   memo.ReadOnly := True;
 end;
 
@@ -630,14 +654,67 @@ end;
 
 
 procedure TfrmDebug.ExecuteEventAction(n: Integer);
+  type
+    TMemoSelectionState = record
+      Selection: TMemoSelection;
+      Length: Integer;
+    end;
+
+  function SaveMemoSelectionState: TMemoSelectionState;
+  var
+    dk: TDeadKeyInfo;
+  begin
+    Result.Selection := memo.Selection;
+    Result.Length := Length(memo.Text);
+    for dk in FDeadkeys do
+    begin
+      if dk.Position >= Result.Selection.Start
+        then dk.SavedPosition := -(Result.Length - dk.Position)
+        else dk.SavedPosition := dk.Position;
+    end;
+  end;
+
+  procedure RealignMemoSelectionState(state: TMemoSelectionState);
+  var
+    dk: TDeadKeyInfo;
+    L: Integer;
+    s: string;
+  begin
+    s := memo.Text;
+    L := Length(s);
+    for dk in FDeadkeys do
+      if dk.SavedPosition < 0 then
+      begin
+        dk.Position := L + dk.SavedPosition;
+        if (dk.Position < 0) or (dk.Position >= L) or (s[dk.Position + 1] <> #$FFFC) then
+          // This can happen if the deadkey was in a replaced selection
+          dk.Delete;
+      end;
+
+    UpdateDeadkeys;
+  end;
+
   procedure DoBackspace(BackspaceType: km_kbp_backspace_type);
   var
     m, n: Integer;
     dk: TDeadKeyInfo;
+    state: TMemoSelectionState;
   begin
     // Offset is zero-based, but string is 1-based. Beware!
+    state := SaveMemoSelectionState;
     n := memo.SelStart;
     m := n;
+
+    if memo.SelLength > 0 then
+    begin
+      // If the memo has a selection, we have given Core an empty context,
+      // which forces it to emit a KM_KBP_BT_UNKNOWN backspace, which is
+      // exactly what we want here. We just delete the selection
+      Assert(BackspaceType = KM_KBP_BT_UNKNOWN);
+      memo.SelText := '';
+      RealignMemoSelectionState(state);
+      Exit;
+    end;
 
     case BackspaceType of
       KM_KBP_BT_MARKER:
@@ -693,22 +770,17 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
 
     memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
     memo.SelStart := m;
-  end;
 
-  procedure ClearKeyStack;
-  var
-    msg: TMsg;
-  begin
-    while PeekMessage(msg, memo.Handle, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE) do;
+    RealignMemoSelectionState(state);
   end;
 
   procedure DoDeadkey(dkCode: Integer);
   var
     dk: TDeadKeyInfo;
     i: Integer;
+    state: TMemoSelectionState;
   begin
     dk := TDeadKeyInfo.Create;
-    //dk.Position := memo.SelStart;
     dk.Memo := memo;
     dk.Deadkey := nil;
     for i := 0 to debugkeyboard.Deadkeys.Count - 1 do
@@ -721,20 +793,27 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       dk.Free //silent failure
     else
     begin
-      // TODO: this method of inserting chars differs from Action_Char;
+      state := SaveMemoSelectionState;
+
       memo.SelText := WideChar($FFFC);
       memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
       memo.SelLength := 0;
       dk.Position := memo.SelStart - 1;
+
+      RealignMemoSelectionState(state);
+
       FDeadkeys.Add(dk);
-      //PostMessage(memo.Handle, WM_UNICHAR, $FFFC, 0); Application.ProcessMessages;
       UpdateDeadkeyDisplay;
+
     end;
   end;
+
 
   procedure DoEmitKeystroke(dwData: DWord);
   var
     flag: Integer;
+    msg: TMessage;
+    state: TMemoSelectionState;
   begin
     if (LOBYTE(dwData) < VK_F1) or (LOBYTE(dwData) > VK_F12) then
     begin
@@ -743,31 +822,31 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         // Extended Key State
         flag := flag or KEYFLAG_EXTENDED;
 
+      state := SaveMemoSelectionState;
       if GetKeyState(VK_MENU) < 0
-        then PostMessage(memo.Handle, WM_SYSKEYDOWN, LOBYTE(dwData), flag)
-        else PostMessage(memo.Handle, WM_KEYDOWN, LOBYTE(dwData), flag);
+        then msg.Msg := WM_SYSKEYDOWN
+        else msg.Msg := WM_KEYDOWN;
+      msg.WParam := LOBYTE(dwData);
+      msg.LParam := flag;
+      memo.Dispatch(msg);
+      if GetKeyState(VK_MENU) < 0
+        then msg.Msg := WM_SYSKEYUP
+        else msg.Msg := WM_KEYUP;
+      memo.Dispatch(msg);
 
-  {   if GetKeyState(VK_MENU) < 0
-        then PostMessage(memo.Handle, WM_SYSKEYUP, dwData, 0)
-        else PostMessage(memo.Handle, WM_KEYUP, dwData, 0);}
+      RealignMemoSelectionState(state);
     end;
   end;
 
   procedure DoChar(const text: string);
   var
-    i: Integer;
-    msg: TMessage;
+    state: TMemoSelectionState;
   begin
-    for i := 1 to Length(Text) do
-    begin
-      ClearKeyStack;
-      msg.Msg := WM_CHAR;
-      msg.WParam := Ord(Text[i]);
-      msg.LParam := 0;
-      memo.Dispatch(msg);
-//                          else PostMessageW(memo.Handle, WM_CHAR, Ord(Text[i]), 0);  // I3310
-//                        Application.ProcessMessages;
-    end;
+    state := SaveMemoSelectionState;
+    memo.SelText := Text;
+    memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
+    memo.SelLength := 0;
+    RealignMemoSelectionState(state);
   end;
 
   procedure DoBell;
@@ -777,7 +856,6 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
 
 begin
   DisableUI;
-  ClearKeyStack;
   frmDebugStatus.Elements.UpdateStores(nil);
   with FEvents[n].Action do
   begin
@@ -1135,15 +1213,9 @@ begin
 end;
 
 procedure TfrmDebug.sgCharsDrawCell(Sender: TObject; ACol, ARow: Integer;
-  Rect: TRect; State: TGridDrawState);   // I4808
+  Rect: TRect; State: TGridDrawState);
 begin
-  if (ARow = 0) and (sgChars.Objects[ACol, ARow] = Pointer(0))
-    then sgChars.Canvas.Font := memo.Font
-    else sgChars.Canvas.Font := sgChars.Font;
-  sgChars.Canvas.TextRect(Rect,
-    (Rect.Right + Rect.Left - sgChars.Canvas.TextWidth(sgChars.Cells[ACol, ARow])) div 2,
-    (Rect.Top + Rect.Bottom - sgChars.Canvas.TextHeight(sgChars.Cells[ACol, ARow])) div 2,
-    sgChars.Cells[ACol, ARow]);
+  TCharacterGridRenderer.Render(sgChars, ACol, ARow, Rect, State, memo.Font);
 end;
 
 procedure TfrmDebug.SetSingleStepMode(const Value: Boolean);
@@ -1160,11 +1232,6 @@ procedure TfrmDebug.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   UIStatus := duiClosing;
 end;
-
-{function TfrmDebug.GetUIDisabled: Boolean;
-begin
-  Result := FUIStatus in [duiFocusedForInput, duiReceivingEvents];
-end;}
 
 {-------------------------------------------------------------------------------
  - Deadkeys                                                                    -
@@ -1195,8 +1262,10 @@ end;
 procedure TfrmDebug.UpdateDeadkeyDisplay;
 begin
   if not (csDestroying in ComponentState) then
+  begin
     frmDebugStatus.DeadKeys.UpdateDeadKeyDisplay;
-  UpdateCharacterGrid;   // I4808
+    UpdateCharacterGrid;   // I4808
+  end;
 end;
 
 procedure TfrmDebug.ClearDeadkeys;
@@ -1232,7 +1301,6 @@ end;
 
 procedure TfrmDebug.memoChange(Sender: TObject);
 begin
-  LastSelStart := memo.SelStart;
   UpdateDeadkeys;
   memoSelMove(memo);
 end;
@@ -1254,116 +1322,32 @@ begin
     Result := True
   else if GetKeyState(VK_CONTROL) < 0 then
   begin
-    if Key in [Ord('A').. Ord('Z'), Ord('0')..Ord('9')] then
+    if Key in [Ord('A')..Ord('Z'), Ord('0')..Ord('9')] then
       Result := True;
   end;
 end;
 
 procedure TfrmDebug.memoSelMove(Sender: TObject);
-var
-  ch: WideString;
 begin
   if memo.Focused then
   begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
-    if memo.SelText = ''
-      then ch := Unicode.CopyChar(memo.Text, memo.SelStart-1, 1)
-      else ch := Copy(memo.SelText, 1, 16);
-
-    if ch = ''
-      then frmKeymanDeveloper.barStatus.Panels[2].Text := ''
-      else frmKeymanDeveloper.barStatus.Panels[2].Text := FormatUnicode(ch);
   end;
 
-  UpdateCharacterGrid;   // I4808
+  if not memo.ReadOnly then
+  begin
+    FSavedSelection := memo.Selection;
+    UpdateCharacterGrid;   // I4808
+  end;
 end;
 
 procedure TfrmDebug.UpdateCharacterGrid;   // I4808
-var
-  SelStart, SelLength, MaxCols, I: Integer;
-  s: string;
-  J: Integer;
-  K: Integer;
 begin
-  MaxCols := sgChars.ClientWidth div (sgChars.DefaultColWidth + 1);
-
-  if memo.SelLength < 0 then
-  begin
-    SelStart := memo.SelStart + memo.SelLength;
-    SelLength := -memo.SelLength;
-  end
-  else if memo.SelLength > 0 then
-  begin
-    SelStart := memo.SelStart;
-    SelLength := memo.SelLength;
-  end
-  else
-  begin
-    SelStart := 0;
-    SelLength := memo.SelStart;
-  end;
-
-  s := Copy(memo.Text, 1, SelStart+SelLength);
-
-  J := 0; I := SelStart + SelLength; // I is 1-based Delphi string index
-  while (J < MaxCols) and (I > SelStart) do
-  begin
-    if (I > 1) and Uni_IsSurrogate2(s[I]) and Uni_IsSurrogate1(s[I-1]) then
-      Dec(I);
-    Inc(J); Dec(I);
-  end;
-
-  if J = 0 then
-  begin
-    sgChars.ColCount := 1;
-    sgChars.Objects[0,0] := Pointer(0);
-    sgChars.Cells[0,0] := '';
-    sgChars.Cells[0,1] := '';
+  if csDestroying in ComponentState then
     Exit;
-  end
-  else
-    sgChars.ColCount := J;
 
-  Inc(I);
-  J := 0;
-  while J < sgChars.ColCount do
-  begin
-    if Ord(S[I]) = $FFFC then
-    begin
-      sgChars.Objects[J, 0] := Pointer(1);
-      sgChars.Cells[J, 0] := '???';
-      for K := 0 to FDeadkeys.Count-1 do
-        if FDeadkeys[K].Position = I-1 then
-        begin
-          sgChars.Cells[J, 0] := FDeadkeys[K].Deadkey.Name;
-          break;
-        end;
-      sgChars.Cells[J, 1] := 'Deadkey';
-    end
-    else if Uni_IsSurrogate1(s[I]) and (I < Length(s)) and Uni_IsSurrogate2(s[I+1]) then
-    begin
-      sgChars.Objects[J, 0] := Pointer(0);
-      sgChars.Cells[J, 0] := Copy(s, I ,2);
-      sgChars.Cells[J, 1] := 'U+'+IntToHex(Uni_SurrogateToUTF32(s[I], s[I+1]), 5);
-      Inc(I);
-    end
-    else
-    begin
-      sgChars.Objects[J, 0] := Pointer(0);
-      sgChars.Cells[J, 0] := s[I];
-      sgChars.Cells[J, 1] := 'U+'+IntToHex(Ord(s[i]), 4);
-    end;
-    Inc(J); Inc(I);
-  end;
-
-  with sgChars.Canvas do
-  begin
-    Font := memo.Font;
-    sgChars.RowHeights[0] := TextHeight('A') + 4;
-    Font := sgChars.Font;
-    sgChars.RowHeights[1] := TextHeight('A') + 4;
-  end;
-  sgChars.Height := sgChars.RowHeights[0] + sgChars.RowHeights[1] + 4;
+  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, memo.SelStart, memo.SelLength, memo.Selection.Anchor);
+  TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 
 {-------------------------------------------------------------------------------
