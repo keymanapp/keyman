@@ -10,7 +10,9 @@
     <dimen name="titlebar_label_textsize">16sp</dimen>
     <dimen name="button_playstore_margin">8dp</dimen>
     <dimen name="button_playstore_padding">10dp</dimen>
+    <dimen name="blank_osk_padding">5dp</dimen>
     <dimen name="update_chrome_label_textsize">16sp</dimen>
+    <dimen name="adjust_keyboard_height_label_textsize">12sp</dimen>
     <dimen name="info_label_textsize">12sp</dimen>
     <dimen name="info_label_height">30dp</dimen>
     <dimen name="package_label_width">350dp</dimen>
