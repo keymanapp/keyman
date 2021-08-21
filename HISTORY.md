@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.99 alpha 2021-08-21
+
+* feat(android/app): Add menu to adjust keyboard height (#5606)
+
 ## 15.0.98 alpha 2021-08-20
 
 * fix(windows): Ignore Access Denied error creating task (#4365)
