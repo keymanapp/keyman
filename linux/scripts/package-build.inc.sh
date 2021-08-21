@@ -32,7 +32,7 @@ function downloadSource() {
     if [ "${proj}" == "keyman" ]; then
        cd ${BASEDIR}
     else
-       cd ${proj}
+       cd legacy/${proj}
     fi
 
     if [ "${proj}" == "keyman" ]; then
