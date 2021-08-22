@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.100 alpha 2021-08-22
+
+* fix(linux): Fix uploading to launchpad for legacy projects 📦 (#5612)
+
 ## 15.0.99 alpha 2021-08-21
 
 * feat(android/app): Add menu to adjust keyboard height (#5606)
