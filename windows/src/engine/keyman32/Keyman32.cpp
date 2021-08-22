@@ -569,11 +569,11 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
   if (Globals::get_CoreIntegration()) {
     PWCHAR keyboardPath   = strtowstr(_td->ForceFileName);
     km_kbp_status_codes err_code = (km_kbp_status_codes)km_kbp_keyboard_load(keyboardPath, &_td->lpActiveKeyboard->coreKeyboard);
+    delete keyboardPath;
     if (err_code != KM_KBP_STATUS_OK) {
-      delete keyboardPath;
+      // TODO log failure
       return FALSE;
     }
-    delete keyboardPath;
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core 
     return TRUE;
   } else {

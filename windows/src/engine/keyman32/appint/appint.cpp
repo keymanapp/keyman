@@ -207,6 +207,7 @@ AppIntegration::AppIntegration()
 BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr)
 {
   assert(buf);
+  assert(outPtr);
   km_kbp_context_item* context_items  = new km_kbp_context_item[wcslen(buf) + 1];
   WCHAR const *p = buf;
   uint8_t contextIndex = 0;
@@ -221,8 +222,7 @@ BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr)
       // handle surrogate
       context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
       p++;
-    }
-    else {
+    } else {
          context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
     }
     p++;

@@ -70,7 +70,7 @@ static BOOL processPersistOpt(
       actionItem->option->value != NULL)
     {
       // log"Saving keyboard option to registry");
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Saving option to registry for keybooard [%s].", activeKeyboard->Name);
+      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Saving option to registry for keyboard [%s].", activeKeyboard->Name);
       LPWSTR value = new WCHAR[sizeof(actionItem->option->value) + 1];
       wcscpy_s(value, sizeof(actionItem->option->value) + 1, reinterpret_cast<LPCWSTR>(actionItem->option->value));
       SaveKeyboardOptionREGCore(activeKeyboard, reinterpret_cast<LPCWSTR>(actionItem->option->key), value);
@@ -88,7 +88,6 @@ static BOOL processInvalidateContext(
   return TRUE;
 }
 
- // TODO: 5011  make this function a new file
 BOOL ProcessActions(BOOL* emitKeyStroke)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();

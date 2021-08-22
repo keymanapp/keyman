@@ -92,11 +92,11 @@ BOOL LoadlpKeyboardCore(int i)
   if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
   PWCHAR keyboardPath = strtowstr(buf);
   km_kbp_status_codes err_code = (km_kbp_status_codes)km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard);
-  if (err_code != KM_KBP_STATUS_OK) {
-    delete keyboardPath;
+  delete keyboardPath;
+  if (err_code != KM_KBP_STATUS_OK) {\
+    SendDebugMessageFormat(...); // TODO: log err_code
     return FALSE;
   }
-  delete keyboardPath;
 
   // TODO: 5442 handle dlls
   //LoadDLLs(&_td->lpKeyboards[i]);
