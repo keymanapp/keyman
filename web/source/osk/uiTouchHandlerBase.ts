@@ -1,4 +1,4 @@
-namespace com.keyman.dom {
+namespace com.keyman.osk {
   /**
    * This class was added to facilitate scroll handling for overflow-x elements, though it could
    * be extended in the future to accept overflow-y if needed.

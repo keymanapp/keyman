@@ -111,11 +111,11 @@ namespace com.keyman.osk.browser {
       }
     }
 
-    finalize(touch: Touch) {
+    finalize(input: InputEventCoordinate) {
       if(this.resolver) {
         let keyEvent: text.KeyEvent = null;
         if(this.currentSelection) {
-          keyEvent = this.vkbd.initKeyEvent(this.currentSelection, touch);
+          keyEvent = this.vkbd.initKeyEvent(this.currentSelection, input);
           this.currentSelection.key.highlight(false);
         }
         this.resolver(keyEvent);
@@ -256,7 +256,7 @@ namespace com.keyman.osk.browser {
       }
     }
 
-    updateTouch(touch: Touch) {
+    updateTouch(input: InputEventCoordinate) {
       this.currentSelection = null;
       this.baseKey.key.highlight(false);
 
@@ -264,7 +264,7 @@ namespace com.keyman.osk.browser {
         try {
           let sk = this.element.childNodes[i].firstChild as KeyElement;
 
-          let onKey = sk.key.isUnderTouch(touch);
+          let onKey = sk.key.isUnderTouch(input);
           if(onKey) {
             this.currentSelection = sk;
           }
@@ -279,7 +279,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Use the popup duplicate of the base key if a phone with a visible popup array
-      if(!this.currentSelection && this.baseKey.key.isUnderTouch(touch)) {
+      if(!this.currentSelection && this.baseKey.key.isUnderTouch(input)) {
         this.baseKey.key.highlight(true);
         this.currentSelection = this.baseKey;
       }
