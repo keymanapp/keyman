@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.101 alpha 2021-08-23
+
+* refactor(web): overhaul of OSK key layout calcs + styling, merges desktop & touch logic 📐 (#5462)
+* fix(android): keyboard's black bar bug (#5521)
+* refactor(web): prep work for mouse-based use of touch events 👆  (#5506)
+* refactor(web): mouse-based use of touch handlers 👆  (#5530)
+
 ## 15.0.100 alpha 2021-08-22
 
 * fix(linux): Fix uploading to launchpad for legacy projects 📦 (#5612)
