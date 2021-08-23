@@ -81,7 +81,12 @@ public class InfoActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
-    finish();
-    overridePendingTransition(0, android.R.anim.fade_out);
+    if (webView != null && webView.canGoBack()) {
+      webView.goBack();
+    } else {
+      super.onBackPressed();
+      finish();
+      overridePendingTransition(0, android.R.anim.fade_out);
+    }
   }
 }
