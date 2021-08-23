@@ -400,7 +400,7 @@ namespace com.keyman.osk {
       this.postKeyboardLoad();
     }
 
-    private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKManager,
+    private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKView,
       source: text.MutableSystemStore,
       newValue: string) {
       // This handler is also triggered on state-key state changes (K_CAPS) that 
@@ -415,7 +415,10 @@ namespace com.keyman.osk {
         if(this.vkbd) {
           this.vkbd.layerId = newValue;
         }
-        this._Show();
+
+        // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
+        this.keyboardView.updateState();
+        this.refreshLayoutIfNeeded();
       }
     }.bind(this);
 
@@ -473,7 +476,8 @@ namespace com.keyman.osk {
       return vkbd;
     }
 
-    // Corresponds to _Show, but acts as a core, common method for use by all display patterns.
+    // Corresponds to the desktop OSK's _Show, but acts as a core, common method 
+    // usable by all display patterns.
     protected makeVisible() {
       // Do not try to display/render the OSK if undefined
       if(!this._Box) {
