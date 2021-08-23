@@ -1,4 +1,9 @@
 namespace com.keyman.osk {
+  /**
+   * Represents the current location of the current cursor / touchpoint during
+   * an ongoing OSK input event.  This class standardizes to .pageX (document)
+   * coordinates, rather than .clientX (viewport) coordinates.
+   */
   export class InputEventCoordinate {
     public readonly x: number;
     public readonly y: number;
@@ -24,6 +29,8 @@ namespace com.keyman.osk {
         coordSource = e;
       }
 
+      // For MouseEvents, .pageX is slightly less supported in older browsers when
+      // compared to .clientX.  They're about equally supported for TouchEvents.
       if (coordSource.pageX) {
         return new InputEventCoordinate(coordSource.pageX, coordSource.pageY, e);
       } else if (coordSource.clientX) {
