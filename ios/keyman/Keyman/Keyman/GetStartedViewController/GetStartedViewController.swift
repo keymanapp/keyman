@@ -28,6 +28,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     NotificationCenter.default.addObserver(self, selector: #selector(self.refreshTable),
                                            name: UIApplication.didBecomeActiveNotification, object: nil)
 
+    navItem.title = NSLocalizedString("menu-get-started", comment: "")
     tableView.isScrollEnabled = false
 
     let icon = UIImageView(image: #imageLiteral(resourceName: "887-notepad.png"))

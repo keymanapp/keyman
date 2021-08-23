@@ -13,9 +13,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>%u lüğət quraşdırılıb</string>
+        <string>%u lüğət quraşdırıldı</string>
         <key>other</key>
-        <string>%u lüğətlər quraşdırıldı</string>
+        <string>%u lüğət quraşdırıldı</string>
       </dict>
     </dict>
     <key>notification-update-failed</key>
