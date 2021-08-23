@@ -230,6 +230,8 @@ public final class KMManager {
   public static final String KMKey_FontFamily = "family";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
+  public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
+  public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
 
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
@@ -563,7 +565,7 @@ public final class KMManager {
    * combined banner height and keyboard height
    * @return RelativeLayout.LayoutParams
    */
-  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+  public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -1719,7 +1721,29 @@ public final class KMManager {
   }
 
   public static int getKeyboardHeight(Context context) {
-    return (int) context.getResources().getDimension(R.dimen.keyboard_height);
+    int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    int orientation = context.getResources().getConfiguration().orientation;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
+    }
+
+    return defaultHeight;
+  }
+
+  public static void applyKeyboardHeight(Context context, int height) {
+    if (InAppKeyboard != null && InAppKeyboardLoaded) {
+      InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      InAppKeyboard.setLayoutParams(params);
+    }
+    if (SystemKeyboard != null && SystemKeyboardLoaded) {
+      SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      SystemKeyboard.setLayoutParams(params);
+    }
   }
 
   public static void setDebugMode(boolean value) {

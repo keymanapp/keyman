@@ -256,11 +256,9 @@ namespace com.keyman.text {
    */
   keymanweb['correctOSKTextSize']=function() {
     let osk: com.keyman.osk.OSKManager = keymanweb.osk;
-    if(osk?.vkbd?.adjustHeights(osk.getKeyboardHeight())) {
-      var b: HTMLElement = osk._Box, bs=b.style;
-      bs.height=bs.maxHeight=osk.vkbd.computedAdjustedOskHeight(osk.getHeight())+'px';
-
-      osk._Load();
+    if(osk?.vkbd) {
+      osk._Load(); // TODO:  replace with osk.refreshLayout() in the future once it can perfectly
+                   //        handle rotations.
     }
   };
 
@@ -428,7 +426,9 @@ namespace com.keyman.text {
       // off to the processor for its actual execution.
 
       // Should return 'false' when KMW _has_ fully handled the event and 'true' when not.
-      return !keymanweb.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
+      const ruleBehavior: com.keyman.text.RuleBehavior = keymanweb.core.processKeyEvent(Lkc, com.keyman.dom.Utils.getOutputTarget(Lelem));
+
+      return !ruleBehavior || ruleBehavior.triggerKeyDefault;
     } catch (err) {
       console.error(err.message, err);
       return false;

@@ -52,6 +52,7 @@ import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -317,11 +318,16 @@ final class KMKeyboard extends WebView {
     super.onConfigurationChanged(newConfig);
     dismissKeyPreview(0);
     dismissSubKeysWindow();
+
+    RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
+    this.setLayoutParams(params);
+
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
     loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
+
     if (dismissHelpBubble()) {
       Handler handler = new Handler();
       handler.postDelayed(new Runnable() {

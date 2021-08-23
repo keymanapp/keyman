@@ -482,9 +482,6 @@ namespace com.keyman.osk {
           languageMenu.keyman.keyboardManager.doKeyboardChange(this.kn,this.kc);
           languageMenu.keyman.domManager.focusLastActiveElement();
           languageMenu.hide();
-
-          // Update the OSK with the new keyboard
-          languageMenu.keyman.osk._Show();
         }
         return true;
       };

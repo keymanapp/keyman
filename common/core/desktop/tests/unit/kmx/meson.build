@@ -69,7 +69,8 @@ tests = [
   '044 - if and context',
   '045 - deadkey and context',
   '046 - deadkey and contextex',
-  '047 - caps always off initially on'
+  '047 - caps always off initially on',
+  '048 - modifier keys keep context'
 ]
 
 if build_machine.system() == 'windows'

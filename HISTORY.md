@@ -1,5 +1,50 @@
 # Keyman Version History
 
+## 15.0.100 alpha 2021-08-22
+
+* fix(linux): Fix uploading to launchpad for legacy projects 📦 (#5612)
+
+## 15.0.99 alpha 2021-08-21
+
+* feat(android/app): Add menu to adjust keyboard height (#5606)
+
+## 15.0.98 alpha 2021-08-20
+
+* fix(windows): Ignore Access Denied error creating task (#4365)
+* fix(web): Have util.wait check useAlerts option (#5538)
+* fix(developer): debugger cleanup 🐞 (#5588)
+* chore(developer): debug deadkey 1-based values 🐞 (#5592)
+* chore(developer): refactor forcekeyboard in debug 🐞 (#5593)
+* fix(developer): get Test Mode working again 🐞 (#5594)
+* chore(developer): hide debug events panel 🐞 (#5595)
+* fix(common/core/web): behavior with unmatched final group (#5553)
+* fix(ios): iOS 13 and 14 only - stuck settings toggles (#5548)
+* fix(linux): Fix lost context after pressing K_SHIFT 🚧 (#5601)
+
+## 15.0.97 alpha 2021-08-19
+
+* fix(linux): Fix uploading to launchpad 📦 (#5607)
+
+## 15.0.96 alpha 2021-08-19
+
+* refactor(web): delayed OSK initialization 🍕 (#5412)
+* fix(common/core/web): OSK state-key management (#5456)
+* fix(web): stuck key highlighting from touchpoint movement (#5490)
+* docs(linux): Fix readme for ibus-keyman (#5565)
+* chore(common/core): Add uninstall option to build script (#5564)
+* feat(web): setup build artifacts for manual tests (#5582)
+* feat(ios): adds option for Simulator-compatible testing artifact (#5557)
+* refactor(web): OSK layout hierarchy encapsulation 📐  (#5451)
+* refactor(web): reworks VisualKeyboard layout spec design 📐 (#5459)
+* refactor(web): overhaul of OSK key layout calcs + styling, merges desktop & touch logic 📐 (#5462)
+* fix(android): keyboard's black bar bug (#5521)
+* fix(android): removes duplicated line (#5587)
+* fix(linux): Check for valid kmp file (#5583)
+* fix(linux): Handle corrupt icon file (#5585)
+* fix(windows): handle restoring modal dialogs consistently (#5586)
+* chore(android): Remove runConfigurations.xml files (#5572)
+* fix(windows): Welcome should always show in front (#4657)
+
 ## 15.0.95 alpha 2021-08-06
 
 * fix(windows): wrap text in keyboard installation dialog (#5559)

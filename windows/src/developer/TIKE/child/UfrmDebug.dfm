@@ -52,7 +52,7 @@ inherited frmDebug: TfrmDebug
     FixedCols = 0
     RowCount = 2
     FixedRows = 0
-    ScrollBars = ssHorizontal
+    ScrollBars = ssNone
     TabOrder = 1
     OnDrawCell = sgCharsDrawCell
     ColWidths = (

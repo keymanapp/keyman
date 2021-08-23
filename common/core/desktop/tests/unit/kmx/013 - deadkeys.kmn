@@ -1,13 +1,13 @@
 c Description: Tests a simple deadkey rule in Unicode
 c keys: [SHIFT K_6][K_A]
 c expected: \u00E2
-c context: 
+c context:
 
 store(&VERSION) '9.0'
 
 begin unicode > use(main)
 
-group(main) using keys 
+group(main) using keys
 
 + '^' > deadkey(1)
 

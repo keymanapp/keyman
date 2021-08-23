@@ -119,7 +119,10 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
     break;
   case KM_KBP_VKEY_SHIFT:
     KeyShiftPress(modifiers, isKeyDown);
-    break;
+    return TRUE;
+  case KM_KBP_VKEY_CONTROL:
+  case KM_KBP_VKEY_ALT:
+    return TRUE;
   }
 
   if (!isKeyDown) {
@@ -293,7 +296,6 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
           m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
           pdeletecontext = m_context.Buf(1);
         }
-
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
@@ -313,7 +315,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
       PostString(gp->dpNoMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
       if(m_debug_items) {
         m_debug_items->push_nomatch_exit(m_actions.Length(), gp);
-    }
+      }
     }
     else if (m_state.charCode != 0 && m_state.charCode != 0xFFFF && gp->fUsingKeys)
     {

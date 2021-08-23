@@ -86,6 +86,8 @@ type
     procedure SetDisplayFont(const Value: TFont);
     procedure SetCurrentEvent(const Value: TDebugEvent);
 
+    class var FShowDebuggerEventsPanel: Boolean;
+    class procedure SetShowDebuggerEventsPanel(Value: Boolean); static;
   protected
     function GetHelpTopic: string; override;
   public
@@ -101,6 +103,8 @@ type
     property DeadKeys: TfrmDebugStatus_DeadKeys read FDeadKeys;
     property RegTest: TfrmDebugStatus_RegTest read FRegTest;
     property Events: TfrmDebugStatus_Events read FEvents;
+
+    class property ShowDebuggerEventsPanel: Boolean read FShowDebuggerEventsPanel write SetShowDebuggerEventsPanel;
   end;
 
 implementation
@@ -146,6 +150,7 @@ begin
   FEvents.Parent := tabDebugEvents;
   FEvents.Visible := True;
   FChildren[5] := FEvents;
+  tabDebugEvents.TabVisible := FShowDebuggerEventsPanel;
 end;
 
 function TfrmDebugStatus.GetHelpTopic: string;
@@ -199,6 +204,20 @@ begin
   for child in FChildren do
   begin
     child.SetDisplayFont(Value);
+  end;
+end;
+
+class procedure TfrmDebugStatus.SetShowDebuggerEventsPanel(Value: Boolean);
+var
+  i: Integer;
+begin
+  if FShowDebuggerEventsPanel <> Value then
+  begin
+    FShowDebuggerEventsPanel := Value;
+
+    for i := 0 to Screen.FormCount - 1 do
+      if Screen.Forms[i] is TfrmDebugStatus then
+        (Screen.Forms[i] as TfrmDebugStatus).tabDebugEvents.TabVisible := Value;
   end;
 end;
 

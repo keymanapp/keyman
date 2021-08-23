@@ -6,14 +6,10 @@ inherited frmMustIncludeDebug: TfrmMustIncludeDebug
   Caption = 'Keyman Developer Debugger'
   ClientHeight = 133
   ClientWidth = 393
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
   Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
+  ExplicitWidth = 399
+  ExplicitHeight = 162
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -23,19 +19,22 @@ inherited frmMustIncludeDebug: TfrmMustIncludeDebug
     Height = 39
     Caption = 
       'You must include debug information in the compiled keyboard befo' +
-      're you can use the debugger.  You can do this yourself by select' +
-      'ing the "Include debug information" option in the Keyboard menu.'
+      're you can use the debugger or test window.  You can do this you' +
+      'rself by selecting the "Include debug information" option in the' +
+      ' Keyboard menu.'
     WordWrap = True
   end
   object Label2: TLabel
     Left = 8
     Top = 52
-    Width = 298
+    Width = 343
     Height = 13
-    Caption = 'Recompile now with debug information and start the debugger?'
+    Caption = 
+      'Recompile now with debug information and start the debug/test se' +
+      'ssion?'
   end
   object cmdOK: TButton
-    Left = 56
+    Left = 120
     Top = 100
     Width = 73
     Height = 25
@@ -44,17 +43,8 @@ inherited frmMustIncludeDebug: TfrmMustIncludeDebug
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdTestWithoutDebugger: TButton
-    Left = 216
-    Top = 100
-    Width = 121
-    Height = 25
-    Caption = '&Test without debugger'
-    ModalResult = 7
-    TabOrder = 3
-  end
   object cmdCancel: TButton
-    Left = 136
+    Left = 200
     Top = 100
     Width = 73
     Height = 25
@@ -66,9 +56,11 @@ inherited frmMustIncludeDebug: TfrmMustIncludeDebug
   object chkAutoRecompile: TCheckBox
     Left = 8
     Top = 72
-    Width = 333
+    Width = 343
     Height = 17
-    Caption = '&Always recompile with debug information before debugging.'
+    Caption = 
+      '&Always recompile with debug information before debugging or tes' +
+      'ting.'
     TabOrder = 0
   end
 end

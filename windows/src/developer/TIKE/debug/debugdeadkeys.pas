@@ -31,12 +31,14 @@ type
   private
     FDeleted: Boolean;
     FPosition: Integer;
+    FSavedPosition: Integer;
   public
     //Position: Integer;
     memo: TKeymanDeveloperDebuggerMemo;  // I3323
     Deadkey: TDebugDeadkey;
     procedure Delete;
     property Position: Integer read FPosition write FPosition;
+    property SavedPosition: Integer read FSavedPosition write FSavedPosition;
     property Deleted: Boolean read FDeleted;
   end;
 
@@ -85,7 +87,7 @@ begin
         if dk.Position = startpos then
         begin
           s[i] := WChr(UC_SENTINEL);
-          s := Copy(s, 1, i) + WChr(CODE_DEADKEY) + WChr(dk.Deadkey.Value+1) + Copy(s, i+1, Length(s));
+          s := Copy(s, 1, i) + WChr(CODE_DEADKEY) + WChr(dk.Deadkey.Value) + Copy(s, i+1, Length(s));
           Inc(i, 2);
           Break;
         end;
