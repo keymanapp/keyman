@@ -471,7 +471,8 @@ public final class KMManager {
     // Override globe key action if screen is locked:
     // 1. Switch to next Keyman keyboard (no menu)
     // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
-    if (startingKeyboardIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+    if (startingKeyboardIndexOnLockScreen == getCurrentKeyboardIndex(context) ||
+        KeyboardController.getInstance().get().size() == 1) {
       // all the Keyman keyboards have been cycled through
       advanceToNextInputMode();
     } else {
@@ -676,6 +677,9 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.onPause();
     }
+
+    // Lock screen triggers onPause, so clear globeKeyState
+    globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
   }
 
   public static void onDestroy() {
@@ -2037,9 +2041,11 @@ public final class KMManager {
       KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
       // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
       if (keyguardManager.isKeyguardLocked()) {
-        if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
           doGlobeKeyLockscreenAction(context);
         }
+        // clear globeKeyState
+        globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
       } else {
         // If screen isn't locked, reset the starting index
         startingKeyboardIndexOnLockScreen = -1;
