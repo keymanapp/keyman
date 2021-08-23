@@ -532,11 +532,6 @@ namespace com.keyman.osk {
 
       var Ls = this._Box.style;
 
-      // Do not display OSK until it has been positioned correctly
-      if(device.touchable && Ls.bottom == '') {
-        Ls.visibility='hidden';
-      }
-
       if(device.touchable) {
         /* In case it's still '0' from a hide() operation.
          * Happens when _Show is called before the transitionend events are processed,
