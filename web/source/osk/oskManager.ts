@@ -54,24 +54,6 @@ namespace com.keyman.osk {
 
       this.loadCookie();
 
-      // Predictive-text hooks.
-      const bannerMgr = this.bannerView;
-      const _this = this;
-
-      // Register a listener for model change events so that we can hot-swap the banner as needed.
-      // Handled here b/c banner changes may trigger a need to re-layout the OSK.
-      keymanweb.core.languageProcessor.on('statechange', 
-                                          function(state: text.prediction.StateChangeEnum) {
-        let currentType = bannerMgr.activeType;
-        bannerMgr.selectBanner(state);
-
-        if(currentType != bannerMgr.activeType) {
-          _this.refreshLayout();
-        }
-
-        return true;
-      });
-
       // Add header element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
         const layout = this.desktopLayout = new layouts.TargetedFloatLayout();

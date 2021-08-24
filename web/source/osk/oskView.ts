@@ -76,6 +76,21 @@ namespace com.keyman.osk {
       if(deviceSpec.touchable) {
         this.setBaseTouchEventListeners();
       }
+
+      // Register a listener for model change events so that we can hot-swap the banner as needed.
+      // Handled here b/c banner changes may trigger a need to re-layout the OSK.
+      const _this = this;
+      keymanweb.core.languageProcessor.on('statechange', 
+                                          function(state: text.prediction.StateChangeEnum) {
+        let currentType = _this.bannerView.activeType;
+        _this.bannerView.selectBanner(state);
+
+        if(currentType != _this.bannerView.activeType) {
+          _this.bannerView.refreshLayout();
+        }
+
+        return true;
+      });
     }
 
     private setBaseMouseEventListeners() {
