@@ -179,6 +179,8 @@ public final class KMManager {
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
   protected static HashMap<String, String> currentLexicalModel = null;
+  protected static WebViewUtils.EngineWebViewVersionStatus engineWebViewVersionStatus =
+    WebViewUtils.EngineWebViewVersionStatus.UNDETERMINED;
 
   public final static String predictionPrefSuffix = ".mayPredict";
   public final static String correctionPrefSuffix = ".mayCorrect";
@@ -371,13 +373,20 @@ public final class KMManager {
   }
 
   /**
-   * Get the Keyman Engine mode based on the Chrome version
-   * @param aContext
-   * @param webView - If provided, the Chrome version of webView is deterermined
+   * Get the Keyman Engine mode.
    * @return WebViewUtils.EngineWebViewVersionStatus
    */
-  public static WebViewUtils.EngineWebViewVersionStatus getEngineWebViewVersionStatus(Context aContext, WebView webView) {
-    return WebViewUtils.getEngineWebViewVersionStatus(aContext, webView, "");
+  public static WebViewUtils.EngineWebViewVersionStatus getEngineWebViewVersionStatus() {
+    return engineWebViewVersionStatus;
+  }
+
+  /**
+   * Set the Keyman Engine mode based on the Chrome version
+   * @param aContext
+   * @param webView - If provided, the Chrome version of the WebView is determined
+   */
+  public static void setEngineWebViewVersionStatus(Context aContext, WebView webView) {
+    engineWebViewVersionStatus = WebViewUtils.getEngineWebViewVersionStatus(aContext, webView, "");
   }
 
   // Check if a keyboard namespace is reserved
@@ -515,6 +524,8 @@ public final class KMManager {
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
       InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
       InAppKeyboard.loadKeyboard();
+
+      setEngineWebViewVersionStatus(appContext, InAppKeyboard);
     }
   }
 
@@ -528,6 +539,8 @@ public final class KMManager {
       SystemKeyboard.setWebViewClient(new KMSystemKeyboardWebViewClient(appContext));
       SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
       SystemKeyboard.loadKeyboard();
+
+      setEngineWebViewVersionStatus(appContext, SystemKeyboard);
     }
   }
 
