@@ -314,6 +314,15 @@ void _OutputThreadDebugString(char *s) {
 }
 #endif
 
+BOOL IsDebugAssertEnabled()
+{
+#ifdef _DEBUG
+  return IsDebuggerPresent();
+#else
+  return FALSE;
+#endif
+}
+
 void WINAPI Keyman_Diagnostic(int mode) {
   if (mode == 0) {
     RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);

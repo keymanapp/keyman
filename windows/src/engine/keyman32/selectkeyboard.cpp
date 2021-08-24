@@ -89,7 +89,7 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
     {
       if (_td->lpKeyboards[i].KeymanID == KeymanID)
       {
-        if (!_td->lpKeyboards[i].coreKeyboard && !LoadlpKeyboard(i))
+        if (!_td->lpKeyboards[i].lpCoreKeyboard && !LoadlpKeyboard(i))
         {
           SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboardCore: Unable to load");
           return TRUE;

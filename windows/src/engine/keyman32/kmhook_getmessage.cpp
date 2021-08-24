@@ -264,7 +264,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	if(_td->lpActiveKeyboard)
 	{
 		_td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
-    _td->state.lpCoreKb = _td->lpActiveKeyboard->coreKeyboard;
+    _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 	}
    // I4412
 	if(mp->message == wm_keymanshift)
@@ -351,7 +351,7 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 		  if(_td->lpActiveKeyboard) {
 			  _td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
-        _td->state.lpCoreKb = _td->lpActiveKeyboard->coreKeyboard;
+        _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 		  }
 
       SelectApplicationIntegration();

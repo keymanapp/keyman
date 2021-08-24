@@ -77,24 +77,26 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
 
 BOOL LoadlpKeyboardCore(int i)
 {
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadlpKeyboardCore: Enter ---");
+  SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: Enter ---");
+  
+
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
-  if (_td->lpKeyboards[i].coreKeyboard) return TRUE;
+  if (_td->lpKeyboards[i].lpCoreKeyboard) return TRUE;
   if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
-  if (_td->lpKeyboards[i].lpActiveKBState) {
-    km_kbp_state_dispose(_td->lpKeyboards[i].lpActiveKBState);
-    _td->lpKeyboards[i].lpActiveKBState = NULL;
+  if (_td->lpKeyboards[i].lpCoreKeyboardState) {
+    km_kbp_state_dispose(_td->lpKeyboards[i].lpCoreKeyboardState);
+    _td->lpKeyboards[i].lpCoreKeyboardState = NULL;
   }
 
   char buf[256];
   if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
   PWCHAR keyboardPath = strtowstr(buf);
-  km_kbp_status_codes err_code = (km_kbp_status_codes)km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].coreKeyboard);
+  km_kbp_status err_status = km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].lpCoreKeyboard);
   delete keyboardPath;
-  if (err_code != KM_KBP_STATUS_OK) {\
-    SendDebugMessageFormat(...); // TODO: log err_code
+  if (err_status != KM_KBP_STATUS_OK) {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_keyboard_load failed with error status [%d]", err_status);
     return FALSE;
   }
 
@@ -105,12 +107,14 @@ BOOL LoadlpKeyboardCore(int i)
     KM_KBP_OPTIONS_END
   };
 
-  err_code = (km_kbp_status_codes)km_kbp_state_create(_td->lpKeyboards[i].coreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpActiveKBState);
-  if (err_code != KM_KBP_STATUS_OK) {
+  err_status = km_kbp_state_create(_td->lpKeyboards[i].lpCoreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpCoreKeyboardState);
+  if (err_status != KM_KBP_STATUS_OK) {
+    SendDebugMessageFormat(
+        0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_state_create failed with error status [%d]", err_status);
     return FALSE;
   }
 
-  LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpActiveKBState);
+  LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpCoreKeyboardState);
 
   return TRUE;
 }

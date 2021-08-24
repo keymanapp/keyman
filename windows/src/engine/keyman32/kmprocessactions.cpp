@@ -45,15 +45,8 @@ static BOOL processPersistOpt(
   {
     // Allocate for 1 option plus 1 pad struct of 0's for KM_KBP_IT_END
     km_kbp_option_item keyboardOpts[2] = { 0 };
-
-    km_kbp_cp* cp = new km_kbp_cp[sizeof(actionItem->option->key) + 1];
-    wcscpy_s(reinterpret_cast<LPWSTR>(cp), sizeof(actionItem->option->key) + 1, reinterpret_cast<LPCWSTR>(actionItem->option->key));
-    keyboardOpts[0].key = cp;
-
-    cp = new km_kbp_cp[sizeof(actionItem->option->value) + 1];
-    wcscpy_s(reinterpret_cast<LPWSTR>(cp), sizeof(actionItem->option->value) + 1, reinterpret_cast<LPCWSTR>(actionItem->option->value));
-    keyboardOpts[0].value = cp;
-    keyboardOpts[1] = KM_KBP_OPTIONS_END;
+    keyboardOpts[0].key = actionItem->option->key;
+    keyboardOpts[0].value     = actionItem->option->value;
     km_kbp_status eventStatus = (km_kbp_status_codes)km_kbp_state_options_update(keyboardState, keyboardOpts);
     if (eventStatus != KM_KBP_STATUS_OK)
     {
@@ -61,10 +54,6 @@ static BOOL processPersistOpt(
       SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Error %d saving option for keyboard [%s].", eventStatus, activeKeyboard->Name);
     }
 
-    for (int i = 0; i < 2; i++) {
-      delete[] keyboardOpts[i].key;
-      delete[] keyboardOpts[i].value;
-    }
     // Put the keyboard option into Windows Registry
     if (actionItem->option != NULL && actionItem->option->key != NULL &&
       actionItem->option->value != NULL)
@@ -96,7 +85,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
   // Process the action items from the core. This actions will modify the windows context (AppContext).
   // Therefore it is not required to copy the context from the core to the windows context.
 
-  for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpActiveKBState, nullptr); act->type != KM_KBP_IT_END; act++) {
+  for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
     BOOL continueProcessingActions = TRUE;
     switch (act->type) {
     case KM_KBP_IT_CHAR:
@@ -112,14 +101,14 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
       continueProcessingActions = processBack(_td->app, act);
       break;
     case KM_KBP_IT_PERSIST_OPT:
-      continueProcessingActions = processPersistOpt(act, _td->lpActiveKeyboard->lpActiveKBState, _td->lpActiveKeyboard);
+      continueProcessingActions = processPersistOpt(act, _td->lpActiveKeyboard->lpCoreKeyboardState, _td->lpActiveKeyboard);
       break;
     case KM_KBP_IT_EMIT_KEYSTROKE:
       *emitKeyStroke = TRUE;
       continueProcessingActions = TRUE;
       break;
     case KM_KBP_IT_INVALIDATE_CONTEXT:
-      continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpActiveKBState);
+      continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
       break;
     case KM_KBP_IT_END:
       // fallthrough

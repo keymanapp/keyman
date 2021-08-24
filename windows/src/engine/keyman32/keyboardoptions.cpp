@@ -31,11 +31,7 @@ void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
-  if (Globals::get_CoreIntegration())
-  {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadSharedKeyboardOptions: Error called in core integration mode");
-    return;
-  }
+  DebugAssert(!Globals::get_CoreIntegration(), "LoadSharedKeyboardOptions: Error called in core integration mode");
   // Called when another thread changes keyboard options and we are sharing keyboard settings
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
@@ -47,11 +43,7 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
-  if (Globals::get_CoreIntegration())
-  {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "FreeKeyboardOptions: Error called in core integration mode");
-    return;
-  }
+  DebugAssert(!Globals::get_CoreIntegration(),"FreeKeyboardOptions: Error called in core integration mode");
   // This is a cleanup routine; we don't want to precondition all calls to it
   // so we do not assert
   if (kp == NULL || kp->Keyboard == NULL || kp->KeyboardOptions == NULL)
@@ -69,12 +61,7 @@ void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 {
-  if (Globals::get_CoreIntegration())
-  {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "SetKeyboardOption: Error called in core integration mode");
-    return;
-  }
-
+  DebugAssert(!Globals::get_CoreIntegration(), "SetKeyboardOption: Error called in core integration mode");
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
   assert(kp->KeyboardOptions != NULL);
@@ -100,11 +87,7 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 
 void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 {
-  if (Globals::get_CoreIntegration())
-  {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "ResetKeyboardOption: Error called in core integration mode");
-    return;
-  }
+  DebugAssert(!Globals::get_CoreIntegration(), "ResetKeyboardOption: Error called in core integration mode");
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
   assert(kp->KeyboardOptions != NULL);
@@ -141,11 +124,7 @@ void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 
 void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
 {
-  if (Globals::get_CoreIntegration())
-  {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "SaveKeyboardOption: Error called in core integration mode");
-    return;
-  }
+  DebugAssert(!Globals::get_CoreIntegration(), "SaveKeyboardOption: Error called in core integration mode");
   IntSaveKeyboardOption(REGSZ_KeyboardOptions, kp, nStoreToSave);
 }
 
@@ -230,7 +209,7 @@ void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave)
 
 void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* const state)
 {
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "LoadKeyboardOptionsREGCore: Enter");
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: Enter");
   IntLoadKeyboardOptionsCore(REGSZ_KeyboardOptions, kp, state);
 }
 
@@ -246,7 +225,11 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
     int n = 0;
     // Get the list of default options to determine size of list
     const km_kbp_keyboard_attrs* keyboardAttrs;
-    km_kbp_keyboard_get_attrs(kp->coreKeyboard, &keyboardAttrs);
+    km_kbp_status err_status = km_kbp_keyboard_get_attrs(kp->lpCoreKeyboard, &keyboardAttrs);
+    if (err_status != KM_KBP_STATUS_OK) {
+      SendDebugMessageFormat(
+          0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
+    }
     size_t listSize = km_kbp_options_list_size(keyboardAttrs->default_options);
     km_kbp_option_item* keyboardOpts = new  km_kbp_option_item[listSize+1];
 
@@ -273,7 +256,11 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
 
     keyboardOpts[n] = KM_KBP_OPTIONS_END;
     // once we have the option list we can then update the options using the public api call
-    km_kbp_state_options_update(state, keyboardOpts);
+    err_status = km_kbp_state_options_update(state, keyboardOpts);
+    if (err_status != KM_KBP_STATUS_OK) {
+      SendDebugMessageFormat(
+          0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_state_options_update failed with error status [%d]", err_status);
+    }
 
     for (int i = 0; i < (int)listSize + 1; i++) {
       delete[] keyboardOpts[i].key;

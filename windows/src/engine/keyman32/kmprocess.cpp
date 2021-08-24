@@ -151,7 +151,7 @@ BOOL ProcessHook()
     ContextItemsFromAppContext(contextBuf, &citems);
     if (KM_KBP_STATUS_OK !=
       (km_kbp_status_codes)km_kbp_context_set(
-        km_kbp_state_context(_td->lpActiveKeyboard->lpActiveKBState), citems)) {
+        km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
       km_kbp_context_items_dispose(citems);
       return FALSE;
     }
@@ -159,7 +159,7 @@ BOOL ProcessHook()
     //_td->state.vkey == VK_DOWN
     if (KM_KBP_STATUS_OK !=
       (km_kbp_status_codes)km_kbp_process_event(
-            _td->lpActiveKeyboard->lpActiveKBState, _td->state.vkey, static_cast<uint16_t>(Globals::get_ShiftState()), 1)) {
+            _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey, static_cast<uint16_t>(Globals::get_ShiftState()), 1)) {
       return FALSE;
     }
 
@@ -248,10 +248,7 @@ BOOL ProcessHook()
 
 BOOL ProcessGroup(LPGROUP gp)
 {
-  if (Globals::get_CoreIntegration()) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "KMPROCESS:ProcessGroup: Error called in core integration mode");
-    return FALSE;
-  }
+  DebugAssertRetValue(!Globals::get_CoreIntegration(), "KMPROCESS:ProcessGroup: Error called in core integration mode", FALSE);
   DWORD i;
 	LPKEY kkp = NULL;
 	PWSTR p;
@@ -550,10 +547,7 @@ BOOL ProcessGroup(LPGROUP gp)
 
 int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
 {
-  if (Globals::get_CoreIntegration()) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "KMPROCESS:PostString: Error called in core integration mode");
-    return FALSE;
-  }
+  DebugAssertRetValue(!Globals::get_CoreIntegration(), "KKMPROCESS:PostString: Error called in core integration mode", FALSE);
   PWSTR p, q, temp;
   LPSTORE s;
   int n1, n2;
@@ -719,10 +713,7 @@ BOOL IsMatchingPlatform(LPSTORE s)  // I3432
 
 BOOL ContextMatch(LPKEY kkp)
 {
-  if (Globals::get_CoreIntegration()) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "KMPROCESS:ContextMatch: Error called in core integration mode");
-    return FALSE;
-  }
+  DebugAssertRetValue(!Globals::get_CoreIntegration(), "KMPROCESS:ContextMatch: Error called in core integration mode", FALSE);
 	WORD /*i,*/ n;
 	PWSTR p, q, qbuf, temp;
 	LPWORD indexp;

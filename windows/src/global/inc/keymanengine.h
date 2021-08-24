@@ -87,9 +87,9 @@ typedef struct tagINTKEYBOARDINFO
   LPINTKEYBOARDOPTIONS KeyboardOptions;
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
-  km_kbp_keyboard* coreKeyboard;
-  km_kbp_option_item* coreKeyboardOptions;
-  km_kbp_state* lpActiveKBState;
+  km_kbp_keyboard* lpCoreKeyboard;
+  km_kbp_option_item* lpCoreKeyboardOptions;
+  km_kbp_state* lpCoreKeyboardState;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
 
 typedef struct tagINI
@@ -127,6 +127,8 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
 );
 
 BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
+BOOL ReleaseStateMemoryCore(km_kbp_state** state);
+BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard** kbd);
 
 void PostGETNEXT(HWND hwnd);
 BOOL CompareMsg(LPMSG MsgA, LPMSG MsgB);
@@ -167,6 +169,8 @@ void PostDummyKeyEvent();  // I3301 - Handle I3250 regression with inadvertent m
 
 /* Debugging functions */
 
+BOOL IsDebugAssertEnabled();
+
 #ifndef SendDebugMessage
    // I4379
 typedef enum ATSDMState { sdmInternat, sdmAIDefault, sdmMessage, sdmKeyboard, sdmGlobal, sdmMenu, sdmDebug, sdmLoad, sdmOther } TSDMState;
@@ -192,6 +196,27 @@ char* Debug_UnicodeString(PWSTR s, int x = 0);
 
 BOOL ShouldDebug_1(); // TSDMState state);
 
+#define DebugAssertRetValue(condition, message, retValue)               \
+  {                                                                     \
+    if (!(condition)) {                                                 \
+      SendDebugMessage_1(0, sdmGlobal, 0, __FILE__, __LINE__, message); \
+      if (IsDebugAssertEnabled()) {                                     \
+        assert(condition);                                              \
+      }                                                                 \
+      return retValue;                                                  \
+    }                                                                   \
+  }
+
+#define DebugAssert(condition, message)                                 \
+  {                                                                     \
+    if (!(condition)) {                                                 \
+      SendDebugMessage_1(0, sdmGlobal, 0, __FILE__, __LINE__, message); \
+      if (IsDebugAssertEnabled()) {                                     \
+        assert(condition);                                              \
+      }                                                                 \
+      return;                                                           \
+    }                                                                   \
+  }
 #endif
 
 #ifdef _DEBUG

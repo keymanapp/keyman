@@ -568,13 +568,25 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
   // TODO: 5442 - remove if/ else as there will no longer be the old LoadKeyboard option
   if (Globals::get_CoreIntegration()) {
     PWCHAR keyboardPath   = strtowstr(_td->ForceFileName);
-    km_kbp_status_codes err_code = (km_kbp_status_codes)km_kbp_keyboard_load(keyboardPath, &_td->lpActiveKeyboard->coreKeyboard);
+    km_kbp_status err_status = km_kbp_keyboard_load(keyboardPath, &_td->lpActiveKeyboard->lpCoreKeyboard);
     delete keyboardPath;
-    if (err_code != KM_KBP_STATUS_OK) {
-      // TODO log failure
+    if (err_status != KM_KBP_STATUS_OK) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_load failed with error status [%d]", err_status); // TODO: 5442 - remove word Core
       return FALSE;
     }
-    SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core 
+    SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core
+                                                                                        
+    // LoadDLLs(&_td->lpKeyboards[i]);
+    const km_kbp_option_item test_env_opts[] = {KM_KBP_OPTIONS_END};
+    err_status =
+        km_kbp_state_create(_td->lpActiveKeyboard->lpCoreKeyboard, test_env_opts, &_td->lpActiveKeyboard->lpCoreKeyboardState);
+    if (err_status != KM_KBP_STATUS_OK) {
+      SendDebugMessageFormat(
+          0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_state_create failed with error status [%d]", err_status);
+      return FALSE;
+    }
+    LoadKeyboardOptionsREGCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);
+    RefreshPreservedKeys(TRUE);
     return TRUE;
   } else {
     if (LoadKeyboard(_td->ForceFileName, &_td->lpActiveKeyboard->Keyboard)) {
@@ -619,6 +631,8 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard()
 		_td->ForceFileName[0] = 0;
     FreeKeyboardOptions(_td->lpActiveKeyboard);
 		ReleaseKeyboardMemory(_td->lpActiveKeyboard->Keyboard);
+    ReleaseStateMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboardState);
+    ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
     RefreshPreservedKeys(FALSE);
     delete _td->lpActiveKeyboard;
 		_td->lpActiveKeyboard = NULL;
@@ -663,11 +677,18 @@ BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd)
 	return TRUE;
 }
 
-BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard* kbd)
-{
-  if (!kbd) return TRUE;
-  km_kbp_keyboard_dispose(kbd);
-  kbd = NULL;
+BOOL ReleaseStateMemoryCore(km_kbp_state **state) {
+  if (!*state) return TRUE;
+  km_kbp_state_dispose(*state);
+  *state = NULL;
+  return TRUE;
+}
+
+BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard **kbd) {
+  if (!*kbd)
+    return TRUE;
+  km_kbp_keyboard_dispose(*kbd);
+  *kbd = NULL;
   return TRUE;
 }
 
@@ -1000,7 +1021,8 @@ void ReleaseKeyboards(BOOL Lock)
 		if(Lock) UnloadDLLs(&_td->lpKeyboards[i]);
     FreeKeyboardOptions(&_td->lpKeyboards[i]);
 		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
-    ReleaseKeyboardMemoryCore(_td->lpKeyboards[i].coreKeyboard);
+    ReleaseStateMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboardState);
+    ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
     
     if(_td->lpKeyboards[i].Profiles) delete _td->lpKeyboards[i].Profiles;   // I3581
 	}

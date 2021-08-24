@@ -209,18 +209,17 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 
   if (isUsingCoreProcessor) {
     // TODO: 5442 set the correct active keyboard - need with call backs
-    _td->state.lpCoreKb = _td->lpActiveKeyboard->coreKeyboard;
+    _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 
   } else {
     _td->state.lpkb       = _td->lpActiveKeyboard->Keyboard;
     _td->state.startgroup = &_td->state.lpkb->dpGroupArray[_td->state.lpkb->StartGroup[BEGIN_UNICODE]];
+    _td->state.NoMatches  = TRUE;
+    _td->state.LoopTimes  = 0;
+    _td->state.StopOutput = FALSE;
   }
 
   _td->state.windowunicode = TRUE;
-
-  _td->state.NoMatches  = TRUE;
-  _td->state.LoopTimes  = 0;
-  _td->state.StopOutput = FALSE;
 
   _td->state.charCode = CharFromVK(&_td->state.vkey, Globals::get_ShiftState());   // I4582
 
