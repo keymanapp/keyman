@@ -20,6 +20,11 @@ if __name__ == '__main__':
                         'package. INSTALL can either be a downloaded .kmp file, a file:// URL ' +
                         'pointing to a .kmp file, or a keyman:// URL, possibly with a ' +
                         'bcp47=<language> specified.')
+    parser.add_argument('url', nargs='?', default='', metavar='INSTALL',
+                        help='download and/or install .kmp ' +
+                        'package. INSTALL can either be a downloaded .kmp file, a file:// URL ' +
+                        'pointing to a .kmp file, or a keyman:// URL, possibly with a ' +
+                        'bcp47=<language> specified.')
 
     args = parser.parse_args()
     if args.verbose:
@@ -31,6 +36,8 @@ if __name__ == '__main__':
 
     if args.install:
         download_and_install_package(args.install)
+    elif args.url:
+        download_and_install_package(args.url)
     else:
         from keyman_config.view_installed import ViewInstalledWindow
         w = ViewInstalledWindow()
