@@ -187,6 +187,13 @@ object modActionsKeyboardEditor: TmodActionsKeyboardEditor
       OnExecute = actDebugViewStateExecute
       OnUpdate = actDebugViewStateUpdate
     end
+    object actDebugSwitchToDebuggerWindow: TAction
+      Category = 'Debug Control'
+      Caption = 'Switch to debugger'
+      ShortCut = 117
+      OnExecute = actDebugSwitchToDebuggerWindowExecute
+      OnUpdate = actDebugSwitchToDebuggerWindowUpdate
+    end
   end
   object dlgFont: TFontDialog
     Font.Charset = DEFAULT_CHARSET
