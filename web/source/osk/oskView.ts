@@ -479,8 +479,8 @@ namespace com.keyman.osk {
     // Corresponds to the desktop OSK's _Show, but acts as a core, common method 
     // usable by all display patterns.
     protected makeVisible() {
-      // Do not try to display/render the OSK if undefined
-      if(!this._Box) {
+      // Do not try to display/render the OSK if undefined or no keyboard is loaded.
+      if(!this._Box || !this.keyboardView) {
         return;
       }
 
