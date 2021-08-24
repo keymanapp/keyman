@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.102 alpha 2021-08-24
+
+* fix(android/engine): UX improvement when 1 keyboard installed (#5570)
+* chore(windows): sentrytool param file support (#4172)
+* fix(developer): F6 in debugger and cef focus (#5597)
+* chore(common): add report-history.sh (#5527)
+* chore(common): more on report-history (#5603)
+* chore: fixup HISTORY.md (#5604)
+* chore(android/app): Add in-app help for adjusting keyboard height (#5621)
+
 ## 15.0.101 alpha 2021-08-23
 
 * refactor(web): overhaul of OSK key layout calcs + styling, merges desktop & touch logic 📐 (#5462)
