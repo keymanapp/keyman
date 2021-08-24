@@ -1,5 +1,6 @@
 // Includes the banner
 /// <reference path="./bannerManager.ts" />
+
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 // Models keyboards that present a help page, rather than a standard OSK.
@@ -86,7 +87,7 @@ namespace com.keyman.osk {
         _this.bannerView.selectBanner(state);
 
         if(currentType != _this.bannerView.activeType) {
-          _this.bannerView.refreshLayout();
+          _this.refreshLayout();
         }
 
         return true;
@@ -306,6 +307,10 @@ namespace com.keyman.osk {
       this.needsLayout = false;
 
       // Step 3:  perform layout operations.
+      this.headerView.refreshLayout();
+      this.bannerView.refreshLayout();
+      this.footerView.refreshLayout();
+
       if(this.vkbd) {
         let availableHeight = this.computedHeight - this.computeFrameHeight();
 
@@ -495,7 +500,7 @@ namespace com.keyman.osk {
 
     // Corresponds to the desktop OSK's _Show, but acts as a core, common method 
     // usable by all display patterns.
-    protected makeVisible() {
+    /*protected*/ makeVisible() {
       // Do not try to display/render the OSK if undefined or no keyboard is loaded.
       if(!this._Box || !this.keyboardView) {
         return;
@@ -522,7 +527,7 @@ namespace com.keyman.osk {
       }
     }
 
-    protected makeHidden(hiddenByUser: boolean) {
+    /*protected*/ makeHidden(hiddenByUser: boolean) {
       // Save current size if visible
       if(this._Box && this._Box.style.display == 'block' && this.keyboardView instanceof VisualKeyboard) {
         this.keyboardView.refit();
@@ -544,6 +549,120 @@ namespace com.keyman.osk {
       if(_box.parentElement) {
         _box.parentElement.removeChild(_box);
       }
+    }
+
+    /* ---- Legacy interfacing methods and fields ----
+     *
+     * The endgoal is to eliminate the need for these entirely, but extra work and care
+     * will be necessary to achieve said endgoal for these methods.
+     *
+     * The simplest way forward is to maintain them, then resolve them independently,
+     * one at a time.
+     */
+  
+    /*
+     * Display KMW OSK at specified position (returns nothing)
+     * 
+     * The positioning parameters only make sense for the FloatingOSKView type;
+     * other implementations should use no parameters whatsoever.
+     *
+     * @param       {number=}     Px      x-coordinate for OSK rectangle
+     * @param       {number=}     Py      y-coordinate for OSK rectangle
+     */
+    public abstract _Show(Px?: number, Py?: number);
+
+    /**
+     * Hide Keymanweb On Screen Keyboard
+     *
+     * @param       {boolean}   hiddenByUser    Distinguish between hiding on loss of focus and explicit hiding by user
+     */
+    public abstract _Hide(hiddenByUser: boolean);
+
+    /**
+     * Display build number
+     * 
+     * In the future, this should raise an event that the consuming KeymanWeb
+     * engine may listen for & respond to, rather than having it integrated
+     * as part of the OSK itself. 
+     */
+    showBuild() {
+      let keymanweb = com.keyman.singleton;
+      keymanweb.util.internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
+          +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
+    }
+
+    /**
+     * Display list of installed keyboards in pop-up menu
+     * 
+     * In the future, this language menu should be defined as a UI module like the standard
+     * desktop UI modules.  The globe key should then trigger an event to _request_ that the
+     * consuming engine display the active UI module's menu.
+     * 
+     **/
+    showLanguageMenu() {
+      let menu = new LanguageMenu(com.keyman.singleton);
+      menu.show();
+    }
+
+    /**
+     * Function     hideNow
+     * Scope        Private
+     * Description  Hide the OSK unconditionally and immediately, cancel any pending transition
+     * 
+     * Usages:
+     * - during rotations to temporarily hide the OSK during layout ops
+     * - when controls lose focus (N/A to embedded mode)
+     * 
+     * Somewhat conflated with the _Show / _Hide methods, which often serve more as an
+     * "enable" vs "disable" feature on the OSK - though that distinction isn't super-clear.
+     * 
+     * Definitely needs clearer design & modeling, at the least.
+     */
+    hideNow: () => void = function(this: OSKView) { // I3363 (Build 301)
+      this._Box.removeEventListener('transitionend', this.hideNow, false);
+      this._Box.removeEventListener('webkitTransitionEnd', this.hideNow, false);
+
+      if(document.body.className.indexOf('osk-always-visible') >= 0) {
+        return;
+      }
+
+      var os=this._Box.style;
+      os.display='none';
+      os.opacity='1';
+      this._Visible=false;
+      os.transition=os.msTransition=os.MozTransition=os.WebkitTransition='';
+
+      if(this.vkbd) {
+        this.vkbd.onHide();
+      }
+    }.bind(this);
+
+    // OSK state fields
+    //
+    // They're not very well defined or encapsulated; there's definitely room for more
+    // "polish" here.
+    _Visible: boolean = false;
+    _Enabled: boolean = true;
+
+    /**
+     * Function     enabled
+     * Scope        Public
+     * @return      {boolean|number}    True if KMW OSK enabled
+     * Description  Test if KMW OSK is enabled
+     */
+     ['isEnabled'](): boolean {
+      return this._Enabled;
+    }
+
+    /**
+     * Function     isVisible
+     * Scope        Public
+     * @return      {boolean|number}    True if KMW OSK visible
+     * Description  Test if KMW OSK is actually visible
+     * Note that this will usually return false after any UI event that results in (temporary) loss of input focus
+     */
+    ['isVisible'](): boolean {
+      return this._Visible;
     }
   }
 }

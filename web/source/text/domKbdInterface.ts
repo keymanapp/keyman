@@ -111,7 +111,9 @@ namespace com.keyman.text {
 
   KeyboardInterface.prototype['showPinnedHelp'] = function(): void {
     let keyman = com.keyman.singleton;
-    keyman.osk.userPositioned=true;
+    if(keyman.osk instanceof osk.FloatingOSKView) {
+      keyman.osk.userPositioned=true;
+    }
     keyman.osk._Show(-1,-1);
   }
 

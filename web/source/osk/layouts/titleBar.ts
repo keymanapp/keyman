@@ -79,9 +79,12 @@ namespace com.keyman.osk.layouts {
         return false;
       };
 
-      this._unpinButton.onclick = function () {
-        osk.restorePosition(true);
-        return false;
+      if(osk instanceof FloatingOSKView) {
+        const _osk = osk as FloatingOSKView;
+        this._unpinButton.onclick = function () {
+          _osk.restorePosition(true);
+          return false;
+        }
       }
     }
 

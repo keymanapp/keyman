@@ -18,12 +18,7 @@ namespace com.keyman.osk {
   type OSKPos = {'left'?: number, 'top'?: number};
 
   export class FloatingOSKView extends OSKView {
-    desktopLayout: layouts.TargetedFloatLayout;
-
-    // OSK state fields
-    _Visible: boolean = false;
-    _Enabled: boolean = true;
-    vpScale: number = 1;
+    readonly desktopLayout: layouts.TargetedFloatLayout;
 
     // OSK positioning fields
     userPositioned: boolean = false;
@@ -42,41 +37,13 @@ namespace com.keyman.osk {
     public constructor() {
       super(com.keyman.singleton.util.device.coreSpec);
 
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
       document.body.appendChild(this._Box);
-
-      if(util.device.touchable) {
-        // Can only get (initial) viewport scale factor after page is fully loaded!
-        this.vpScale=util.getViewportScale();
-      }
 
       this.loadCookie();
 
-      // Predictive-text hooks.
-      const bannerMgr = this.bannerView;
-      const _this = this;
-
-      // Register a listener for model change events so that we can hot-swap the banner as needed.
-      // Handled here b/c banner changes may trigger a need to re-layout the OSK.
-      keymanweb.core.languageProcessor.on('statechange', 
-                                          function(state: text.prediction.StateChangeEnum) {
-        let currentType = bannerMgr.activeType;
-        bannerMgr.selectBanner(state);
-
-        if(currentType != bannerMgr.activeType) {
-          _this.refreshLayout();
-        }
-
-        return true;
-      });
-
       // Add header element to OSK only for desktop browsers
-      if(util.device.formFactor == 'desktop') {
-        const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
-        this.headerView = layout.titleBar;
-      }
+      const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+      this.headerView = layout.titleBar;
     }
 
     /**
@@ -97,29 +64,18 @@ namespace com.keyman.osk {
       this._Box.onmouseout = this._VKbdMouseOut;
 
       // Add header element to OSK only for desktop browsers
-      if(this.desktopLayout) {
-        const layout = this.desktopLayout;
-        layout.attachToView(this);
-        this.desktopLayout.titleBar.setTitleFromKeyboard(this.activeKeyboard);
+      const layout = this.desktopLayout;
+      layout.attachToView(this);
+      this.desktopLayout.titleBar.setTitleFromKeyboard(this.activeKeyboard);
 
-        if(this.vkbd) {
-          this.footerView = layout.resizeBar;
-          this._Box.appendChild(this.footerView.element);
-        }
+      if(this.vkbd) {
+        this.footerView = layout.resizeBar;
+        this._Box.appendChild(this.footerView.element);
       }
 
       if(this._Enabled) {
         this._Show();
       }
-    }
-
-    /**
-     * Display build number
-     */
-    showBuild() {
-      let keymanweb = com.keyman.singleton;
-      keymanweb.util.internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
-          +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
     }
 
     /**
@@ -129,7 +85,7 @@ namespace com.keyman.osk {
      *                                                   If false or omitted, resets the default x,y as well.
      * Description  Move OSK back to default position, floating under active input element
      */
-    ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: OSKManager, keepDefaultPosition?: boolean) {
+    ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: AnchoredOSKView, keepDefaultPosition?: boolean) {
       let isVisible = this._Visible;
       if(isVisible) {
         com.keyman.singleton.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
@@ -148,9 +104,7 @@ namespace com.keyman.osk {
       }
 
       this.doResizeMove(); //allow the UI to respond to OSK movements
-      if(this.desktopLayout) {
-        this.desktopLayout.titleBar.showPin(false);
-      }
+      this.desktopLayout.titleBar.showPin(false);
     }.bind(this);
 
     /**
@@ -180,7 +134,7 @@ namespace com.keyman.osk {
      * @param       {Object}      e      event
      * Description  Activate the KMW UI on mouse over
      */
-    private _VKbdMouseOver = function(this: OSKManager, e) {
+    private _VKbdMouseOver = function(this: AnchoredOSKView, e) {
       com.keyman.singleton.uiManager.setActivatingUI(true);
     }.bind(this);
 
@@ -190,7 +144,7 @@ namespace com.keyman.osk {
      * @param       {Object}      e      event
      * Description  Cancel activation of KMW UI on mouse out
      */
-    private _VKbdMouseOut = function(this: OSKManager, e) {
+    private _VKbdMouseOut = function(this: AnchoredOSKView, e) {
       com.keyman.singleton.uiManager.setActivatingUI(false);
     }.bind(this);
 
@@ -436,18 +390,14 @@ namespace com.keyman.osk {
 
         // Fix or release user resizing
         if('nosize' in p) {
-          if(this.desktopLayout) {
-            this.desktopLayout.resizingEnabled = !p['nosize'];
-          }
+          this.desktopLayout.resizingEnabled = !p['nosize'];
         }
 
       }
       // Fix or release user dragging
       if('nomove' in p) {
         this.noDrag=p['nomove'];
-        if(this.desktopLayout) {
-          this.desktopLayout.movementEnabled = !this.noDrag;
-        }
+        this.desktopLayout.movementEnabled = !this.noDrag;
       }
       // Save the user-defined OSK size
       this.saveCookie();
@@ -474,7 +424,7 @@ namespace com.keyman.osk {
      * Description  Set position of OSK window, but limit to screen, and ignore if  a touch input device
      */
     ['setPos'](p: OSKPos) {
-      if(typeof(this._Box) == 'undefined' || com.keyman.singleton.util.device.touchable) {
+      if(typeof(this._Box) == 'undefined') {
         return; // I3363 (Build 301)
       }
 
@@ -524,7 +474,7 @@ namespace com.keyman.osk {
       }
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if((!device.touchable) && (this.activeKeyboard == null || !this._Enabled)) {
+      if(this.activeKeyboard == null || !this._Enabled) {
         return;
       }
 
@@ -532,82 +482,54 @@ namespace com.keyman.osk {
 
       var Ls = this._Box.style;
 
-      if(device.touchable) {
-        /* In case it's still '0' from a hide() operation.
-         * Happens when _Show is called before the transitionend events are processed,
-         * which can happen in bulk-rendering contexts.
-         *
-         * (Opacity is only modified when device.touchable = true, though a couple of extra
-         * conditions may apply.)
-         */
-        Ls.opacity='1';
-      }
-
-      // The following code will always be executed except for externally created OSK such as EuroLatin
-      if(this.vkbd && device.touchable) {
-        Ls.position='fixed';
-        Ls.left=Ls.bottom='0px';
-        Ls.border='none';
-        Ls.borderTop='1px solid gray';
-
-        this._Enabled=true;
-        this._Visible=true; // I3363 (Build 301)
-      }
-
-      if(device.formFactor == 'desktop') {
-        Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
-        Ls.left='0px';
-        this.loadCookie();
-        if(Px >= 0) { //probably never happens, legacy support only
-          Ls.left = Px + 'px'; Ls.top = Py + 'px';
+      Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
+      Ls.left='0px';
+      this.loadCookie();
+      if(Px >= 0) { //probably never happens, legacy support only
+        Ls.left = Px + 'px'; Ls.top = Py + 'px';
+      } else {
+        if(this.userPositioned) {
+          Ls.left=this.x+'px';
+          Ls.top=this.y+'px';
         } else {
-          if(this.userPositioned) {
-            Ls.left=this.x+'px';
-            Ls.top=this.y+'px';
-          } else {
-            var el=keymanweb.domManager.getActiveElement();
+          var el=keymanweb.domManager.getActiveElement();
 
-            // Special case - design mode iframes.  Don't use the active element (inside the design-mode doc);
-            // use its containing iframe from the doc itself.
-            let ownerDoc = el.ownerDocument;
-            if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) {
-              el = ownerDoc.defaultView.frameElement as HTMLElement;
-            }
-            if(this.dfltX) {
-              Ls.left=this.dfltX;
-            } else if(typeof el != 'undefined' && el != null) {
-              Ls.left=dom.Utils.getAbsoluteX(el) + 'px';
-            }
+          // Special case - design mode iframes.  Don't use the active element (inside the design-mode doc);
+          // use its containing iframe from the doc itself.
+          let ownerDoc = el.ownerDocument;
+          if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) {
+            el = ownerDoc.defaultView.frameElement as HTMLElement;
+          }
+          if(this.dfltX) {
+            Ls.left=this.dfltX;
+          } else if(typeof el != 'undefined' && el != null) {
+            Ls.left=dom.Utils.getAbsoluteX(el) + 'px';
+          }
 
-            if(this.dfltY) {
-              Ls.top=this.dfltY;
-            } else if(typeof el != 'undefined' && el != null) {
-              Ls.top=(dom.Utils.getAbsoluteY(el) + el.offsetHeight)+'px';
-            }
+          if(this.dfltY) {
+            Ls.top=this.dfltY;
+          } else if(typeof el != 'undefined' && el != null) {
+            Ls.top=(dom.Utils.getAbsoluteY(el) + el.offsetHeight)+'px';
           }
         }
-        this._Enabled=true;
-        this._Visible=true;
-
-        if(this.vkbd) {
-          this.vkbd.refit();
-        }
-
-        this.saveCookie();
-
-        if(this.desktopLayout) {
-          this.desktopLayout.titleBar.showPin(this.userPositioned);
-        }
       }
+      this._Enabled=true;
+      this._Visible=true;
+
+      if(this.vkbd) {
+        this.vkbd.refit();
+      }
+
+      this.saveCookie();
+
+      this.desktopLayout.titleBar.showPin(this.userPositioned);
 
       // Allow desktop UI to execute code when showing the OSK
-      if(!device.touchable) {
-        var Lpos={};
-        Lpos['x']=this._Box.offsetLeft;
-        Lpos['y']=this._Box.offsetTop;
-        Lpos['userLocated']=this.userPositioned;
-        this.doShow(Lpos);
-      }
+      var Lpos={};
+      Lpos['x']=this._Box.offsetLeft;
+      Lpos['y']=this._Box.offsetTop;
+      Lpos['userLocated']=this.userPositioned;
+      this.doShow(Lpos);
     }
 
     /**
@@ -621,11 +543,6 @@ namespace com.keyman.osk {
       // The test for CJK languages is necessary to prevent a picklist (displayed in the OSK) from being hidden by the user
       // Once picklist functionality is separated out, this will no longer be needed.
       // Logic is: execute always if hidden on lost focus, but if requested by user, only if not CJK
-
-      if(keymanweb.isEmbedded) {
-        // We never hide the keyboard in embedded mode
-        return;
-      }
 
       // Save current size if visible
       const priorDisplayStyle = this._Box.style.display;
@@ -661,7 +578,7 @@ namespace com.keyman.osk {
         // Opacity can be transitioned and is probably the simplest alternative.
         // We must condition on osk._Visible in case focus has since been moved to another
         // input (in which case osk._Visible will be non-zero)
-        window.setTimeout(function(this: OSKManager) {
+        window.setTimeout(function(this: AnchoredOSKView) {
           var os=this._Box.style;
           if(this._Visible) {
             // Leave opacity alone and clear transition if another element activated
@@ -687,30 +604,6 @@ namespace com.keyman.osk {
         keymanweb.domManager.focusLastActiveElement();
       }
     }
-
-        /**
-     * Function     hideNow
-     * Scope        Private
-     * Description  Hide the OSK unconditionally and immediately, cancel any pending transition
-     */
-    hideNow: () => void = function(this: OSKManager) { // I3363 (Build 301)
-      this._Box.removeEventListener('transitionend', this.hideNow, false);
-      this._Box.removeEventListener('webkitTransitionEnd', this.hideNow, false);
-
-      if(document.body.className.indexOf('osk-always-visible') >= 0) {
-        return;
-      }
-
-      var os=this._Box.style;
-      os.display='none';
-      os.opacity='1';
-      this._Visible=false;
-      os.transition=os.msTransition=os.MozTransition=os.WebkitTransition='';
-
-      if(this.vkbd) {
-        this.vkbd.onHide();
-      }
-    }.bind(this);
 
     /**
      * Function     hide
@@ -742,14 +635,6 @@ namespace com.keyman.osk {
      */
     doHide(p) {
       return com.keyman.singleton.util.callEvent('osk.hide',p);
-    }
-
-    /**
-     * Display list of installed keyboards in pop-up menu
-     **/
-    showLanguageMenu() {
-      let menu = new LanguageMenu(com.keyman.singleton);
-      menu.show();
     }
 
     /**

@@ -19,7 +19,8 @@
 // Defines the ui management code that tracks UI activation and such.
 /// <reference path="kmwuimanager.ts" />
 // Defines OSK management code.
-/// <reference path="osk/oskManager.ts" />
+/// <reference path="osk/anchoredOskView.ts" />
+/// <reference path="osk/floatingOskView.ts" />
 // Defines the model manager.
 /// <reference path="text/prediction/modelManager.ts" />
 
@@ -84,7 +85,7 @@ namespace com.keyman {
 
     // Internal objects
     ['util']: Util;
-    ['osk']: com.keyman.osk.OSKManager;
+    ['osk']: com.keyman.osk.OSKView;
     ['ui']: any;
     keyboardManager: keyboards.KeyboardManager;
     domManager: dom.DOMManager;
