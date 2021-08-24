@@ -5,10 +5,12 @@ import { sendCommentToPullRequestAndRelatedIssues, fixupHistory } from './fixupH
 import { incrementVersion } from './incrementVersion';
 const yargs = require('yargs');
 import { readFileSync } from 'fs';
+import { reportHistory } from './reportHistory';
 
 const argv = yargs
   .command(['history'], 'Fixes up HISTORY.md with pull request data')
   .command(['version'], 'Increments the current patch version in VERSION.md')
+  .command(['report-history'], 'Print list of outstanding PRs waiting for the next build')
   .demandCommand(1, 2)
   .options({
     'base': {
@@ -26,6 +28,11 @@ const argv = yargs
 
     'force': {
       description: 'Force a version increment even if no changes found',
+      type: 'boolean'
+    },
+
+    'github-pr': {
+      description: 'Query GitHub for Pull Request number and title instead of parsing from merge commit comments',
       type: 'boolean'
     }
   })
@@ -49,6 +56,18 @@ const main = async (): Promise<void> => {
   if(argv._.includes('test-current-pulls')) {
     logInfo(`# Doing a test run for ${version} against PR #881`);
     await sendCommentToPullRequestAndRelatedIssues(octokit, [881]);
+    process.exit(0);
+  }
+
+  //
+  // Report on upcoming changes
+  //
+
+  if(argv._.includes('report-history')) {
+    let pulls = await reportHistory(octokit, argv.base, argv.force, argv['github-pr']);
+    for(const pull of pulls) {
+      logInfo(`* ${pull.title}: ${pull.number}`);
+    }
     process.exit(0);
   }
 
