@@ -211,7 +211,7 @@ namespace com.keyman.osk {
      * @param state 
      */
     selectBanner(state: text.prediction.StateChangeEnum) {
-      // Only display a SuggestionBanner when LanguageProcessor states it is active.s
+      // Only display a SuggestionBanner when LanguageProcessor states it is active.
       if(state == 'active') {
         this.setBanner('suggestion');
       } else if(state == 'inactive') {
@@ -223,7 +223,7 @@ namespace com.keyman.osk {
       } else if(state == 'configured') {
         let suggestionBanner = this.activeBanner as SuggestionBanner;
         if(suggestionBanner.postConfigure) {
-          // Triggers the initially-displayed suggestions.s
+          // Triggers the initially-displayed suggestions.
           suggestionBanner.postConfigure();
         }
       }
@@ -252,7 +252,7 @@ namespace com.keyman.osk {
       // Null guard b/c this function can be trigggered during OSK initialization.
       let keyman = com.keyman.singleton;
       if(keyman['osk']) {
-        keyman['osk']._Show();
+        keyman['osk'].refreshLayout();
       }
     }
 
