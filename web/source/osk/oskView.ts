@@ -316,9 +316,9 @@ namespace com.keyman.osk {
       this.needsLayout = false;
 
       // Step 3:  perform layout operations.
-      this.headerView.refreshLayout();
+      this.headerView?.refreshLayout();
       this.bannerView.refreshLayout();
-      this.footerView.refreshLayout();
+      this.footerView?.refreshLayout();
 
       if(this.vkbd) {
         let availableHeight = this.computedHeight - this.computeFrameHeight();
