@@ -5,8 +5,10 @@
 
 # must be run from linux dir
 
-# parameters: [PROJECT="<project>"] ./scripts/debian.sh
-# PROJECT="<project>" only process this project
+# parameters: [PROJECT=<project>] [DIST=<dist>] ./scripts/debian.sh
+# PROJECT=<project>   only process this project
+# DIST=<dist>         distribution to create packages for (unstable, experimental, etc). If not
+#                     specified UNRELEASED will be used.
 
 set -e
 
@@ -29,7 +31,10 @@ for proj in ${projects}; do
     downloadSource debianpackage
 
     cd ${proj}-${version}
-    dch -v ${version}-1 "Re-release to Debian"
+    if [ -n $DIST ]; then
+        EXTRA_ARGS="--distribution $DIST --force-distribution"
+    fi
+    dch --newversion ${version}-1 ${EXTRA_ARGS} "Re-release to Debian"
     debuild -d -S -sa -Zxz
     cd ${BASEDIR}
 done
