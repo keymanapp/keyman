@@ -4,13 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/ms_white"
     tools:context=".InfoActivity" >
 
-    <WebView
-        android:id="@+id/infoWebView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="@dimen/info_label_height"/>
+    <ImageButton
+      style="?android:attr/actionButtonStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/close_button"
+      android:layout_alignParentEnd="true"
+      android:src="@drawable/ic_action_close"
+      android:contentDescription="@string/label_close"/>
+
+  <WebView
+    android:id="@+id/infoWebView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@id/close_button"
+    android:layout_marginBottom="@dimen/info_label_height" />
 
     <!-- Version string on the bottom of the page -->
     <TextView

@@ -14,6 +14,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 
@@ -31,6 +32,13 @@ public class InfoActivity extends BaseActivity {
     final Context context = this;
 
     setContentView(R.layout.activity_info);
+
+    final ImageButton closeButton = (ImageButton) findViewById(R.id.close_button);
+    closeButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        finish();
+      }
+    });
 
     TextView version = findViewById(R.id.infoVersion);
 
