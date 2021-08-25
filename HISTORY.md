@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.103 alpha 2021-08-25
+
+* chore(linux): Improve debian package script (#5626)
+* chore(linux): Fix uploading to Sentry (#5623)
+
 ## 15.0.102 alpha 2021-08-24
 
 * fix(android/engine): UX improvement when 1 keyboard installed (#5570)
