@@ -429,6 +429,8 @@ namespace com.keyman.osk {
         // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.
         if(this.vkbd) {
           this.vkbd.layerId = newValue;
+          // Ensure that the layer's spacebar is properly captioned.
+          this.vkbd.showLanguage();
         }
 
         // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
