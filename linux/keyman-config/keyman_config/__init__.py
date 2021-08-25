@@ -13,6 +13,7 @@ from .version import __releaseversion__
 from .version import __tier__
 from .version import __pkgversion__
 from .version import __environment__
+from .version import __uploadsentry__
 
 
 def _(txt):
@@ -39,9 +40,11 @@ else:
 KeymanDownloadsUrl = 'https://downloads.keyman.com'
 
 if 'unittest' in sys.modules.keys():
-    print('Not reporting to Sentry')
+    print('Not reporting to Sentry', file=sys.stderr)
 elif os.environ.get('KEYMAN_NOSENTRY'):
-    print('Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set')
+    print('Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set', file=sys.stderr)
+elif not __uploadsentry__:
+    print('Not reporting to Sentry because UPLOAD_SENTRY is false (%s)' % __environment__, file=sys.stderr)
 else:
     try:
         # Try new sentry-sdk first
@@ -51,8 +54,8 @@ else:
         HaveSentryNewSdk = True
 
         sentry_logging = LoggingIntegration(
-            level=logging.INFO,          # Capture info and above as breadcrumbs
-            event_level=logging.CRITICAL # Send critical errors as events
+            level=logging.INFO,           # Capture info and above as breadcrumbs
+            event_level=logging.CRITICAL  # Send critical errors as events
         )
         SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357@sentry.keyman.com/12"
         sentry_sdk.init(
@@ -87,4 +90,4 @@ else:
             })
         except ImportError:
             # even raven is not available. This is the case on Ubuntu 16.04. Just ignore.
-            print(_('Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting.'))
+            print(_('Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting.'), file=sys.stderr)
