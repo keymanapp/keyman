@@ -439,8 +439,7 @@ namespace com.keyman.dom {
       var lastElem = this.getLastActiveElement();
       if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
         this.clearLastActiveElement();
-        //this.keyman.osk._Hide(false);
-        this.keyman.osk.makeHidden(false);
+        this.keyman.osk._Hide(false);
       }
       
       return;
@@ -1755,8 +1754,7 @@ namespace com.keyman.dom {
         this.keyman.ui['initialize']();
         // Display the OSK (again) if enabled, in order to set its position correctly after
         // adding the UI to the page 
-        //this.keyman.osk._Show();
-        this.keyman.osk.makeVisible();
+        this.keyman.osk._Show();
       } else if(this.keyman.isEmbedded) {
         // UI modules aren't utilized in embedded mode.  There's nothing to init, so we simply
         // return instead of waiting for a UI module that will never come.

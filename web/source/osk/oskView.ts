@@ -509,7 +509,7 @@ namespace com.keyman.osk {
 
     // Corresponds to the desktop OSK's _Show, but acts as a core, common method 
     // usable by all display patterns.
-    /*protected*/ makeVisible() {
+    protected makeVisible() {
       // Do not try to display/render the OSK if undefined or no keyboard is loaded.
       if(!this._Box || !this.keyboardView) {
         return;
@@ -536,7 +536,7 @@ namespace com.keyman.osk {
       }
     }
 
-    /*protected*/ makeHidden(hiddenByUser: boolean) {
+    protected makeHidden(hiddenByUser: boolean) {
       // Save current size if visible
       if(this._Box && this._Box.style.display == 'block' && this.keyboardView instanceof VisualKeyboard) {
         this.keyboardView.refit();
