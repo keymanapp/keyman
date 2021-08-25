@@ -1590,9 +1590,9 @@ namespace com.keyman.dom {
 
       // Finish keymanweb and initialize the OSK once all necessary resources are available
       if(device.touchable) {
-        this.keyman.osk = new com.keyman.osk.AnchoredOSKView();
+        this.keyman.osk = new com.keyman.osk.AnchoredOSKView(device.coreSpec);
       } else {
-        this.keyman.osk = new com.keyman.osk.FloatingOSKView();
+        this.keyman.osk = new com.keyman.osk.FloatingOSKView(device.coreSpec);
       }
       const osk = this.keyman.osk;
     

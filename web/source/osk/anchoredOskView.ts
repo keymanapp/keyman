@@ -13,20 +13,14 @@
 ***/
 
 namespace com.keyman.osk {
-  type OSKRect = {'left'?: number, 'top'?: number, 'width'?: number, 'height'?: number,
-    'nosize'?: boolean, 'nomove'?: boolean};
   type OSKPos = {'left'?: number, 'top'?: number};
 
   export class AnchoredOSKView extends OSKView {
     desktopLayout: layouts.TargetedFloatLayout;
 
     // OSK positioning fields
-    userPositioned: boolean = false;
     x: number;
     y: number;
-    noDrag: boolean = false;
-    dfltX: string;
-    dfltY: string;
 
     // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
     modifierCodes = text.Codes.modifierCodes;
@@ -34,12 +28,10 @@ namespace com.keyman.osk {
     stateBitmasks = text.Codes.stateBitmasks;
     keyCodes = text.Codes.keyCodes;
 
-    public constructor() {
-      super(com.keyman.singleton.util.device.coreSpec);
+    public constructor(modeledDevice: utils.DeviceSpec) {
+      super(modeledDevice);
 
       document.body.appendChild(this._Box);
-
-      this.loadCookie();
     }
 
     /**
@@ -72,24 +64,7 @@ namespace com.keyman.osk {
      * Description  Move OSK back to default position, floating under active input element
      */
     ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: AnchoredOSKView, keepDefaultPosition?: boolean) {
-      let isVisible = this._Visible;
-      if(isVisible) {
-        com.keyman.singleton.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
-      }
-
-      this.loadCookie();
-      this.userPositioned=false;
-      if(!keepDefaultPosition) {
-        delete this.dfltX;
-        delete this.dfltY;
-      }
-      this.saveCookie();
-
-      if(isVisible) {
-        this._Show();
-      }
-
-      this.doResizeMove(); //allow the UI to respond to OSK movements
+      return;
     }.bind(this);
 
     /**
@@ -111,84 +86,6 @@ namespace com.keyman.osk {
     private _VKbdMouseOut = function(this: AnchoredOSKView, e) {
       com.keyman.singleton.uiManager.setActivatingUI(false);
     }.bind(this);
-
-    /**
-     * Save size, position, font size and visibility of OSK
-     */
-    saveCookie() {
-      let util = com.keyman.singleton.util;
-
-      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      var p = this.getPos();
-
-      c['visible'] = this._Enabled ? 1 : 0;
-      c['userSet'] = this.userPositioned ? 1 : 0;
-      c['left'] = p.left;
-      c['top'] = p.top;
-
-      if(this.vkbd) {
-        c['width'] = this.width.val;
-        c['height'] = this.height.val;
-      }
-
-      util.saveCookie('KeymanWeb_OnScreenKeyboard',c);
-    }
-
-    /**
-     * Restore size, position, font size and visibility of desktop OSK
-     *
-     *  @return {boolean}
-     */
-    loadCookie(): void {
-      let util = com.keyman.singleton.util;
-
-      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-
-      this._Enabled = util.toNumber(c['visible'], 1) == 1;
-      this.userPositioned = util.toNumber(c['userSet'], 0) == 1;
-      this.x = util.toNumber(c['left'],-1);
-      this.y = util.toNumber(c['top'],-1);
-
-      // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-      var dfltWidth=0.3*screen.width;
-      //if(util.toNumber(c['width'],0) == 0) dfltWidth=0.5*screen.width;
-      var newWidth=util.toNumber(c['width'],dfltWidth),
-          newHeight=util.toNumber(c['height'],0.15*screen.height);
-
-      // Limit the OSK dimensions to reasonable values
-      if(newWidth < 0.2*screen.width) {
-        newWidth = 0.2*screen.width;
-      }
-      if(newHeight < 0.1*screen.height) {
-        newHeight = 0.1*screen.height;
-      }
-      if(newWidth > 0.9*screen.width) {
-        newWidth=0.9*screen.width;
-      }
-      if(newHeight > 0.5*screen.height) {
-        newHeight=0.5*screen.height;
-      }
-
-      this.setSize(newWidth, newHeight);
-
-      // and OSK position if user located
-      if(this.x == -1 || this.y == -1 || (!this._Box)) {
-        this.userPositioned = false;
-      }
-
-      if(this.x < window.pageXOffset-0.8*newWidth) {
-        this.x=window.pageXOffset-0.8*newWidth;
-      }
-      if(this.y < 0) {
-        this.x=-1;
-        this.y=-1;
-        this.userPositioned=false;
-      }
-
-      if(this.userPositioned && this._Box) {
-        this.setPos({'left': this.x, 'top': this.y});
-      }
-    }
 
     /**
      * Get the wanted height of the OSK for touch devices (does not include banner height)
@@ -257,104 +154,13 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Allow UI to update OSK position and properties
-     *
-     * @param       {Object=}     p       object with coordinates and userdefined flag
-     *
-     */
-    doResizeMove(p?) {
-      return com.keyman.singleton.util.callEvent('osk.resizemove',p);
-    }
-
-    /**
-     * Function     getRect //TODO:  This is probably not correct, anyway!!!!!
-     * Scope        Public
-     * @return      {Object.<string,number>}   Array object with position and size of OSK container
-     * Description  Get rectangle containing KMW Virtual Keyboard
-     */
-    ['getRect'](): OSKRect {		// I2405
-      var p: OSKRect = {};
-
-      // Always return these based upon _Box; using this.vkbd will fail to account for banner and/or
-      // the desktop OSK border.
-      p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
-      p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
-
-      if(this.vkbd) {
-        p['width']  = p.width  = this.vkbd.kbdDiv.offsetWidth;
-        p['height'] = p.height = this.vkbd.kbdDiv.offsetHeight;
-      } else {
-        p['width']  = p.width  = dom.Utils.getAbsoluteX(this._Box) + this._Box.offsetWidth;
-        p['height'] = p.height = dom.Utils.getAbsoluteY(this._Box) + this._Box.offsetHeight;
-      }
-      return p;
-    }
-
-    /**
      * Allow the UI or page to set the position and size of the OSK
      * and (optionally) override user repositioning or sizing
      *
      * @param       {Object.<string,number>}   p  Array object with position and size of OSK container
     **/
     ['setRect'](p: OSKRect) {
-      let util = com.keyman.singleton.util;
-      if(this._Box == null || util.device.formFactor != 'desktop') {
-        return;
-      }
-
-      var b = this._Box, bs = b.style;
-      if('left' in p) {
-        this.x = p['left'] - dom.Utils.getAbsoluteX(b) + b.offsetLeft;
-        bs.left= this.x + 'px';
-        this.dfltX=bs.left;
-      }
-
-      if('top' in p) {
-        this.y = p['top'] - dom.Utils.getAbsoluteY(b) + b.offsetTop;
-        bs.top = this.y + 'px';
-        this.dfltY=bs.top;
-      }
-
-      //Do not allow user resizing for non-standard keyboards (e.g. EuroLatin)
-      if(this.vkbd != null) {
-        var d=this.vkbd.kbdDiv, ds=d.style;
-
-        // Set width, but limit to reasonable value
-        if('width' in p) {
-          var w=(p['width']-(b.offsetWidth-d.offsetWidth));
-          if(w < 0.2*screen.width) {
-            w=0.2*screen.width;
-          }
-          if(w > 0.9*screen.width) {
-            w=0.9*screen.width;
-          }
-          ds.width=w+'px';
-          // Use of the `computed` variant is here temporary.
-          // Shouldn't use `setSize` for this in the long-term.
-          this.setSize(w, this.computedHeight, true);
-        }
-
-        // Set height, but limit to reasonable value
-        // This sets the default font size for the OSK in px, but that
-        // can be modified at the key text level by setting
-        // the font size in em in the kmw-key-text class
-        if('height' in p) {
-          var h=(p['height']-(b.offsetHeight-d.offsetHeight));
-          if(h < 0.1*screen.height) {
-            h=0.1*screen.height;
-          }
-          if(h > 0.5*screen.height) {
-            h=0.5*screen.height;
-          }
-          ds.height=h+'px'; ds.fontSize=(h/8)+'px';
-          // Use of the `computed` variant is here temporary.
-          // Shouldn't use `setSize` for this in the long-term.
-          this.setSize(this.computedWidth, h, true);
-        }
-
-      }
-      // Save the user-defined OSK size
-      this.saveCookie();
+      return;
     }
 
     /**
@@ -445,7 +251,6 @@ namespace com.keyman.osk {
       if(hiddenByUser) {
         //osk.loadCookie(); // preserve current offset and userlocated state
         this._Enabled = ((keymanweb.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
-        this.saveCookie();  // Save current OSK state, size and position (desktop only)
       } else if(device.formFactor == 'desktop') {
         //Allow desktop OSK to remain visible on blur if body class set
         if(document.body.className.indexOf('osk-always-visible') >= 0) {
@@ -500,16 +305,6 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Function     hide
-     * Scope        Public
-     * Description  Prevent display of OSK window on focus
-     */
-    ['hide']() {
-      this._Enabled = false;
-      this._Hide(true);
-    }
-
-    /**
      * Allow UI to respond to OSK being shown (passing position and properties)
      *
      * @param       {Object=}       p     object with coordinates and userdefined flag
@@ -529,51 +324,6 @@ namespace com.keyman.osk {
      */
     doHide(p) {
       return com.keyman.singleton.util.callEvent('osk.hide',p);
-    }
-
-    /**
-     * Function     userPositioned
-     * Scope        Public
-     * @return      {(boolean|number)}          true if user located
-     * Description  Test if OSK window has been repositioned by user
-     */
-    ['userLocated']() {
-      return this.userPositioned;
-    }
-
-    /**
-     * Description  Display KMW OSK (at position set in callback to UI)
-     * Function     show
-     * Scope        Public
-     * @param       {(boolean|number)=}      bShow     True to display, False to hide, omitted to toggle
-     */
-    ['show'](bShow: boolean) {
-      if(arguments.length > 0) {
-        this._Enabled=bShow;
-        if(bShow) {
-          this._Show();
-        } else {
-          this._Hide(true);
-        }
-      } else {
-        if(this._Visible) {
-          this._Hide(true);
-        } else {
-          this._Show();
-        }
-      }
-    }
-
-    /**
-     * Function     addEventListener
-     * Scope        Public
-     * @param       {string}            event     event name
-     * @param       {function(Object)}  func      event handler
-     * @return      {boolean}
-     * Description  Wrapper function to add and identify OSK-specific event handlers
-     */
-    ['addEventListener'](event: string, func: (obj) => boolean) {
-      return com.keyman.singleton.util.addEventListener('osk.'+event, func);
     }
   }
 }

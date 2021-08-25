@@ -34,8 +34,8 @@ namespace com.keyman.osk {
     stateBitmasks = text.Codes.stateBitmasks;
     keyCodes = text.Codes.keyCodes;
 
-    public constructor() {
-      super(com.keyman.singleton.util.device.coreSpec);
+    public constructor(modeledDevice: utils.DeviceSpec) {
+      super(modeledDevice);
 
       document.body.appendChild(this._Box);
 
@@ -85,7 +85,7 @@ namespace com.keyman.osk {
      *                                                   If false or omitted, resets the default x,y as well.
      * Description  Move OSK back to default position, floating under active input element
      */
-    ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: AnchoredOSKView, keepDefaultPosition?: boolean) {
+    ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: FloatingOSKView, keepDefaultPosition?: boolean) {
       let isVisible = this._Visible;
       if(isVisible) {
         com.keyman.singleton.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
@@ -300,30 +300,6 @@ namespace com.keyman.osk {
      */
     doResizeMove(p?) {
       return com.keyman.singleton.util.callEvent('osk.resizemove',p);
-    }
-
-    /**
-     * Function     getRect //TODO:  This is probably not correct, anyway!!!!!
-     * Scope        Public
-     * @return      {Object.<string,number>}   Array object with position and size of OSK container
-     * Description  Get rectangle containing KMW Virtual Keyboard
-     */
-    ['getRect'](): OSKRect {		// I2405
-      var p: OSKRect = {};
-
-      // Always return these based upon _Box; using this.vkbd will fail to account for banner and/or
-      // the desktop OSK border.
-      p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
-      p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
-
-      if(this.vkbd) {
-        p['width']  = p.width  = this.vkbd.kbdDiv.offsetWidth;
-        p['height'] = p.height = this.vkbd.kbdDiv.offsetHeight;
-      } else {
-        p['width']  = p.width  = dom.Utils.getAbsoluteX(this._Box) + this._Box.offsetWidth;
-        p['height'] = p.height = dom.Utils.getAbsoluteY(this._Box) + this._Box.offsetHeight;
-      }
-      return p;
     }
 
     /**
@@ -606,16 +582,6 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Function     hide
-     * Scope        Public
-     * Description  Prevent display of OSK window on focus
-     */
-    ['hide']() {
-      this._Enabled = false;
-      this._Hide(true);
-    }
-
-    /**
      * Allow UI to respond to OSK being shown (passing position and properties)
      *
      * @param       {Object=}       p     object with coordinates and userdefined flag
@@ -645,41 +611,6 @@ namespace com.keyman.osk {
      */
     ['userLocated']() {
       return this.userPositioned;
-    }
-
-    /**
-     * Description  Display KMW OSK (at position set in callback to UI)
-     * Function     show
-     * Scope        Public
-     * @param       {(boolean|number)=}      bShow     True to display, False to hide, omitted to toggle
-     */
-    ['show'](bShow: boolean) {
-      if(arguments.length > 0) {
-        this._Enabled=bShow;
-        if(bShow) {
-          this._Show();
-        } else {
-          this._Hide(true);
-        }
-      } else {
-        if(this._Visible) {
-          this._Hide(true);
-        } else {
-          this._Show();
-        }
-      }
-    }
-
-    /**
-     * Function     addEventListener
-     * Scope        Public
-     * @param       {string}            event     event name
-     * @param       {function(Object)}  func      event handler
-     * @return      {boolean}
-     * Description  Wrapper function to add and identify OSK-specific event handlers
-     */
-    ['addEventListener'](event: string, func: (obj) => boolean) {
-      return com.keyman.singleton.util.addEventListener('osk.'+event, func);
     }
   }
 }

@@ -8,6 +8,15 @@
 /// <reference path="emptyView.ts" />
 
 namespace com.keyman.osk {
+  export type OSKRect = {
+    'left'?: number,
+    'top'?: number,
+    'width'?: number,
+    'height'?: number,
+    'nosize'?: boolean,
+    'nomove'?: boolean
+  };
+
   export abstract class OSKView {
     _Box: HTMLDivElement;
 
@@ -551,6 +560,25 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * Function     getRect
+     * Scope        Public
+     * @return      {Object.<string,number>}   Array object with position and size of OSK container
+     * Description  Get rectangle containing KMW Virtual Keyboard
+     */
+     ['getRect'](): OSKRect {		// I2405
+      var p: OSKRect = {};
+
+      // Always return these based upon _Box; using this.vkbd will fail to account for banner and/or
+      // the desktop OSK border.
+      p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
+      p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
+
+      p['width'] = this.computedWidth;
+      p['height'] = this.computedHeight;
+      return p;
+    }
+
     /* ---- Legacy interfacing methods and fields ----
      *
      * The endgoal is to eliminate the need for these entirely, but extra work and care
@@ -663,6 +691,51 @@ namespace com.keyman.osk {
      */
     ['isVisible'](): boolean {
       return this._Visible;
+    }
+
+    /**
+     * Function     hide
+     * Scope        Public
+     * Description  Prevent display of OSK window on focus
+     */
+     ['hide']() {
+      this._Enabled = false;
+      this._Hide(true);
+    }
+
+    /**
+     * Description  Display KMW OSK (at position set in callback to UI)
+     * Function     show
+     * Scope        Public
+     * @param       {(boolean|number)=}      bShow     True to display, False to hide, omitted to toggle
+     */
+     ['show'](bShow: boolean) {
+      if(arguments.length > 0) {
+        this._Enabled=bShow;
+        if(bShow) {
+          this._Show();
+        } else {
+          this._Hide(true);
+        }
+      } else {
+        if(this._Visible) {
+          this._Hide(true);
+        } else {
+          this._Show();
+        }
+      }
+    }
+
+    /**
+     * Function     addEventListener
+     * Scope        Public
+     * @param       {string}            event     event name
+     * @param       {function(Object)}  func      event handler
+     * @return      {boolean}
+     * Description  Wrapper function to add and identify OSK-specific event handlers
+     */
+    ['addEventListener'](event: string, func: (obj) => boolean) {
+      return com.keyman.singleton.util.addEventListener('osk.'+event, func);
     }
   }
 }
