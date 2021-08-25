@@ -1221,12 +1221,9 @@ namespace com.keyman.dom {
       }
 
       this.keyman.uiManager.justActivated = true;
-      if(lastElem.ownerDocument && lastElem instanceof lastElem.ownerDocument.defaultView.HTMLIFrameElement && 
-          this.keyman.domManager._IsMozillaEditableIframe(lastElem as HTMLIFrameElement,0)) {
-        lastElem.ownerDocument.defaultView.focus(); // I3363 (Build 301)
-      } else if(lastElem.focus) {
-        lastElem.focus();
-      }
+
+      const target = Utils.getOutputTarget(lastElem);
+      target.focus();
     }
 
     /**

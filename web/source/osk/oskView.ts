@@ -158,6 +158,16 @@ namespace com.keyman.osk {
       this._boxBaseTouchStart = null;
     }
 
+    public get activeTarget(): dom.targets.OutputTarget {
+      const el=com.keyman.singleton.domManager.getActiveElement();
+      return dom.Utils.getOutputTarget(el);
+    }
+
+    public get lastActiveTarget(): dom.targets.OutputTarget {
+      const el = com.keyman.singleton.domManager.getLastActiveElement();
+      return dom.Utils.getOutputTarget(el);
+    }
+
     public get vkbd(): VisualKeyboard {
       if(this.keyboardView instanceof VisualKeyboard) {
         return this.keyboardView;

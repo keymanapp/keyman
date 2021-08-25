@@ -57,6 +57,10 @@ namespace com.keyman.dom.targets {
       return this.root;
     }
 
+    focus(): void {
+      this.doc.defaultView.focus(); // I3363 (Build 301)
+    }
+
     hasSelection(): boolean {
       let Lsel = this.doc.getSelection();
       let outerSel = document.getSelection();
