@@ -264,7 +264,7 @@ for troubleshooting and setting up for `dput` upload.
 Unless you're a Debian maintainer you can't directly upload to the Debian repos.
 Instead you upload to <mentors.debian.net> and then look for a sponsor who will
 review the packages and upload them for you. Be prepared that this might take some
-persistence, and if somebody looks at it it might take some iterations to get it
+persistence, and if somebody looks at it, it might take some iterations to get it
 accepted.
 
 The Keyman packages are maintained on the Debian side by the
