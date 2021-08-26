@@ -402,10 +402,7 @@
         <DCCReference Include="oskbuilder\UframeTouchLayoutBuilder.pas">
             <Form>frameTouchLayoutBuilder</Form>
         </DCCReference>
-        <DCCReference Include="oskbuilder\TouchLayoutUtils.pas">
-            <Form>,
-  UfrmSelectTouchLayoutTemplate in &apos;oskbuilder\UfrmSelectTouchLayoutTemplate.pas&apos; {frmSelectTouchLayoutTemplate</Form>
-        </DCCReference>
+        <DCCReference Include="oskbuilder\TouchLayoutUtils.pas"/>
         <DCCReference Include="oskbuilder\UfrmSelectTouchLayoutTemplate.pas">
             <Form>frmSelectTouchLayoutTemplate</Form>
         </DCCReference>
@@ -553,6 +550,10 @@
         <DCCReference Include="debug\Keyman.System.Debug.DebugCore.pas"/>
         <DCCReference Include="main\Keyman.System.VisualKeyboardImportKMX.pas"/>
         <DCCReference Include="debug\Keyman.UI.Debug.CharacterGridRenderer.pas"/>
+        <DCCReference Include="debug\UfrmDebugStatus_Options.pas">
+            <Form>frmDebugStatus_Options</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
