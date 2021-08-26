@@ -33,6 +33,25 @@ public class InfoActivity extends BaseActivity {
 
     setContentView(R.layout.activity_info);
 
+    // Navigation buttons
+    final ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
+    backButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onBackPressed();
+      }
+    });
+
+    final ImageButton forwardButton = (ImageButton) findViewById(R.id.forward_button);
+    forwardButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (webView != null && webView.canGoForward()) {
+          webView.goForward();
+        }
+      }
+    });
+
     final ImageButton closeButton = (ImageButton) findViewById(R.id.close_button);
     closeButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
