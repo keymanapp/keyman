@@ -661,6 +661,9 @@ namespace com.keyman.text {
       } else {
         this.layerId = 'default';
       }
+
+      let baseModifierState = text.KeyboardProcessor.getModifierState(this.layerId);
+      this.modStateFlags = baseModifierState | keyEvent.Lstates;
     }
 
     static isModifier(Levent: KeyEvent): boolean {
