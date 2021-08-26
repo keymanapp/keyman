@@ -675,7 +675,7 @@ namespace com.keyman.keyboards {
               // It works much more reliably if deferred (KMEW-101, build 356)
               // The effect of a delay can also be tested, for example, by setting the timeout to 5000
               var manager = this;
-              loadingStub.asyncLoader.promise = new Promise(function(resolve, reject) {
+              loadingStub.asyncLoader.promise = new Promise<void>(function(resolve, reject) {
                 window.setTimeout(function(){
                   manager.installKeyboard(resolve, reject, loadingStub);
                 },0);
@@ -818,7 +818,7 @@ namespace com.keyman.keyboards {
       // This allows us to ensure the keyboard is set correctly without waiting for focus event
       // triggers - very helpful for automated testing.
       if(!this.keymanweb.isEmbedded) {
-        this.keymanweb.touchAliasing._BlurKeyboardSettings(PInternalName, PLgCode);
+        this.keymanweb.touchAliasing._BlurKeyboardSettings(this.keymanweb.domManager.lastActiveElement, PInternalName, PLgCode);
       }
     }
 

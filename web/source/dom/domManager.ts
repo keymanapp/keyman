@@ -438,6 +438,9 @@ namespace com.keyman.dom {
 
       var lastElem = this.lastActiveElement;
       if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
+        if(this.activeElement == lastElem) {
+          this.activeElement = null;
+        }
         this.lastActiveElement = null;
         this.keyman.osk._Hide(false);
       }
@@ -1238,7 +1241,9 @@ namespace com.keyman.dom {
     set lastActiveElement(Pelem: HTMLElement) {
       DOMEventHandlers.states._lastActiveElement = Pelem;
 
-      // TODO:  Pass to OSK!
+      if(this.lastActiveElement == null && this.activeElement == null) {
+        this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
+      }
     }
 
     get activeElement(): HTMLElement {
@@ -1248,7 +1253,34 @@ namespace com.keyman.dom {
     set activeElement(Pelem: HTMLElement) {
       DOMEventHandlers.states._activeElement = Pelem;
 
-      // TODO:  Pass to OSK!
+      var isActivating = this.keyman.uiManager.isActivating;
+
+      // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
+      const osk = this.keyman.osk;
+      const device = this.keyman.util.device;
+      if(this.keyman.osk) {
+        if(!Pelem) {
+          if(this.keyman.osk && !isActivating) {
+            this.keyman.osk._Hide(false);
+          }
+        } else {
+          // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
+          if(device.touchable) {
+            osk._Enabled = true;
+            osk._Show();
+          } else {
+            // Conditionally show the OSK when control receives the focus
+            if(this.keyman.isCJK()) {
+              osk._Enabled = true;
+            }
+            if(osk._Enabled) {
+              osk._Show();
+            } else {
+              osk._Hide(false);
+            }
+          }
+        }
+      }
     }
 
     /**
@@ -1280,19 +1312,17 @@ namespace com.keyman.dom {
       // If we're changing controls, don't forget to properly manage the keyboard settings!
       // It's only an issue on 'native' (non-embedded) code paths.
       if(!this.keyman.isEmbedded) {
-        this.keyman.touchAliasing._BlurKeyboardSettings();
+        this.keyman.touchAliasing._BlurKeyboardSettings(this.keyman.domManager.lastActiveElement);
       }
 
       // No need to reset context if we stay within the same element.
-      if(DOMEventHandlers.states._activeElement != e) {
+      if(this.activeElement != e) {
         this.keyman['resetContext'](e as HTMLElement);
       }
 
-      //DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
-      // TODO:  Needs revisiting.
-      this.activeElement = DOMEventHandlers.states._lastActiveElement = e;
+      this.activeElement = this.lastActiveElement = e;
       if(!this.keyman.isEmbedded) {
-        this.keyman.touchAliasing._FocusKeyboardSettings(false);
+        this.keyman.touchAliasing._FocusKeyboardSettings(e, false);
       }
 
       // Allow external focusing KMEW-123
