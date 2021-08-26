@@ -11,7 +11,7 @@ namespace com.keyman.dom {
         // Since this may be used to test modularly, we can't depend on the existence of the KMW global.
         let keyman = com.keyman['singleton'];
         if(keyman) {
-          Lelem = keyman.domManager.getLastActiveElement();
+          Lelem = keyman.domManager.lastActiveElement;
         }
         
         if(!Lelem) {

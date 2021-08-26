@@ -257,7 +257,7 @@ namespace com.keyman {
       if (!e) {
         e = window.event as E;
         if(!e) {
-          var elem: HTMLElement = this.domManager.getLastActiveElement();
+          var elem: HTMLElement = this.domManager.lastActiveElement;
           if(elem) {
             let doc = elem.ownerDocument;
             var win: Window;
@@ -528,7 +528,7 @@ namespace com.keyman {
     ['resetContext'](e?: HTMLElement) {
       let elem = e;
       if(!elem) {
-        elem = dom.DOMEventHandlers.states.activeElement;
+        elem = this.domManager.activeElement;
       }
       let outputTarget = dom.Utils.getOutputTarget(elem);
       if(outputTarget) {
@@ -615,7 +615,7 @@ namespace com.keyman {
      * @return      {Object}
      */
     ['getLastActiveElement']() {
-      return this.domManager.getLastActiveElement();
+      return this.domManager.lastActiveElement;
     }
 
     /**

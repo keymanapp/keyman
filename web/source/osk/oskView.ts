@@ -159,12 +159,12 @@ namespace com.keyman.osk {
     }
 
     public get activeTarget(): dom.targets.OutputTarget {
-      const el=com.keyman.singleton.domManager.getActiveElement();
+      const el=com.keyman.singleton.domManager.activeElement;
       return dom.Utils.getOutputTarget(el);
     }
 
     public get lastActiveTarget(): dom.targets.OutputTarget {
-      const el = com.keyman.singleton.domManager.getLastActiveElement();
+      const el = com.keyman.singleton.domManager.lastActiveElement;
       return dom.Utils.getOutputTarget(el);
     }
 

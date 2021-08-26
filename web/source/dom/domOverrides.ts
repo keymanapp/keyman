@@ -18,18 +18,18 @@ namespace com.keyman.dom {
 
   let headlessRuleBehaviorFinalize = text.RuleBehavior.prototype.finalize;
   text.RuleBehavior.prototype.finalize = function(this: text.RuleBehavior, processor: text.KeyboardProcessor, outputTarget: text.OutputTarget) {
+    let keyman = com.keyman.singleton;
     // Execute the standard baseline stuff first.
     headlessRuleBehaviorFinalize.call(this, processor);
 
     // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
     let ruleTransform = this.transcription.transform;
     if(ruleTransform.insert != "" || ruleTransform.deleteLeft > 0 || ruleTransform.deleteRight > 0) {
-      if(outputTarget instanceof targets.OutputTarget && outputTarget.getElement() == dom.DOMEventHandlers.states.activeElement) {
+      if(outputTarget instanceof targets.OutputTarget && outputTarget.getElement() == keyman.domManager.activeElement) {
         dom.DOMEventHandlers.states.changed = true;
       }
     }
 
-    let keyman = com.keyman.singleton;
     // KMEA and KMEI (embedded mode) use direct insertion of the character string
     if(keyman.isEmbedded) {
       // A special embedded callback used to setup direct callbacks to app-native code.

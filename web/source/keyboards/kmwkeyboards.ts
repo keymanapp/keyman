@@ -471,7 +471,7 @@ namespace com.keyman.keyboards {
 
       this.doBeforeKeyboardChange(PInternalName,PLgCode);
       let p: Promise<void> = this._SetActiveKeyboard(PInternalName,PLgCode,true);
-      if(this.keymanweb.domManager.getLastActiveElement() != null) {
+      if(this.keymanweb.domManager.lastActiveElement != null) {
         this.keymanweb.domManager.focusLastActiveElement(); // TODO:  Resolve without need for the cast.
       }
       // If we ever allow PLgCode to be set by default, we can auto-detect the language code
@@ -593,7 +593,7 @@ namespace com.keyman.keyboards {
           // As a rotation may have occurred since the keyboard was swapped out,
           // we should refresh its layouts.
           keyman.core.activeKeyboard.refreshLayouts();
-          this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
+          this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.lastActiveElement);  // I2077 - LTR/RTL timing
 
           // and update the active stub
           for(var Ls=0; Ls<this.keyboardStubs.length; Ls++) {
@@ -685,7 +685,7 @@ namespace com.keyman.keyboards {
             return this.keyboardStubs[Ln].asyncLoader.promise;
           }
         }
-        this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
+        this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.lastActiveElement);  // I2077 - LTR/RTL timing
       }
 
       // Initialize the OSK (provided that the base code has been loaded)
@@ -756,9 +756,9 @@ namespace com.keyman.keyboards {
             manager.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
             core.activeKeyboard=new Keyboard(kbd);
 
-            if(manager.keymanweb.domManager.getLastActiveElement() != null) { // TODO:  Resolve without need for the cast.
+            if(manager.keymanweb.domManager.lastActiveElement != null) { // TODO:  Resolve without need for the cast.
               manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
-              manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
+              manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.lastActiveElement);
             }
 
             manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);

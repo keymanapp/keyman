@@ -436,9 +436,9 @@ namespace com.keyman.dom {
         baseElement.onkeyup = this.getHandlers(Pelem)._KeyUp;  
       }
 
-      var lastElem = this.getLastActiveElement();
+      var lastElem = this.lastActiveElement;
       if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
-        this.clearLastActiveElement();
+        this.lastActiveElement = null;
         this.keyman.osk._Hide(false);
       }
       
@@ -1124,7 +1124,7 @@ namespace com.keyman.dom {
         }
       }
       
-      this.clearLastActiveElement();
+      this.lastActiveElement = null;
     }.bind(this);
 
     /* ------ Defines independent, per-control keyboard setting behavior for the API. ------ */
@@ -1163,7 +1163,7 @@ namespace com.keyman.dom {
         // If Pelem is the focused element/active control, we should set the keyboard in place now.
         // 'kmw_ip' is the touch-alias for the original page's control.
 
-        var lastElem = this.getLastActiveElement();
+        var lastElem = this.lastActiveElement;
         if(lastElem && (lastElem == Pelem || lastElem == Pelem['kmw_ip'])) {
 
           if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
@@ -1215,7 +1215,7 @@ namespace com.keyman.dom {
      * Set focus to last active target element (browser-dependent)
      */    
     focusLastActiveElement() {
-      var lastElem = this.getLastActiveElement();
+      var lastElem = this.lastActiveElement;
       if(!lastElem) {
         return;
       }
@@ -1231,20 +1231,24 @@ namespace com.keyman.dom {
      * 
      * @return      {Element}        
      */    
-    getLastActiveElement(): HTMLElement {
-      return DOMEventHandlers.states.lastActiveElement;
+    get lastActiveElement(): HTMLElement {
+      return DOMEventHandlers.states._lastActiveElement;
     }
 
-    clearLastActiveElement() {
-      DOMEventHandlers.states.lastActiveElement = null;
+    set lastActiveElement(Pelem: HTMLElement) {
+      DOMEventHandlers.states._lastActiveElement = Pelem;
+
+      // TODO:  Pass to OSK!
     }
 
-    getActiveElement(): HTMLElement {
-      return DOMEventHandlers.states.activeElement;
+    get activeElement(): HTMLElement {
+      return DOMEventHandlers.states._activeElement;
     }
 
-    _setActiveElement(Pelem: HTMLElement) {
-      DOMEventHandlers.states.activeElement = Pelem;
+    set activeElement(Pelem: HTMLElement) {
+      DOMEventHandlers.states._activeElement = Pelem;
+
+      // TODO:  Pass to OSK!
     }
 
     /**
@@ -1280,11 +1284,13 @@ namespace com.keyman.dom {
       }
 
       // No need to reset context if we stay within the same element.
-      if(DOMEventHandlers.states.activeElement != e) {
+      if(DOMEventHandlers.states._activeElement != e) {
         this.keyman['resetContext'](e as HTMLElement);
       }
 
-      DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
+      //DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
+      // TODO:  Needs revisiting.
+      this.activeElement = DOMEventHandlers.states._lastActiveElement = e;
       if(!this.keyman.isEmbedded) {
         this.keyman.touchAliasing._FocusKeyboardSettings(false);
       }
@@ -1311,8 +1317,8 @@ namespace com.keyman.dom {
      * @param  {Element}
      */
     initActiveElement(Lelem: HTMLElement) {
-      if(DOMEventHandlers.states.activeElement == null) {
-        DOMEventHandlers.states.activeElement = Lelem;
+      if(this.activeElement == null) {
+        this.activeElement = Lelem;
       }
     }
 
@@ -1326,7 +1332,7 @@ namespace com.keyman.dom {
      * @param      {number|boolean}  bBack     Direction to move (0 or 1)
      */
     moveToNext(bBack: number|boolean) {
-      var i,t=this.sortedInputs, activeBase=this.getActiveElement();
+      var i,t=this.sortedInputs, activeBase = this.activeElement;
       var touchable = this.keyman.util.device.touchable;
       
       if(t.length == 0) {
