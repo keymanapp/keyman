@@ -10,12 +10,23 @@
 # proj = only build for this project
 # dist = only build for this distribution
 
+# Environment variables:
+# PR_NAME: value added to the version number if set
+# BUILD_NUMBER: value added to the version number if set. Defaults to 1.
+
 set -e
 
 all_distributions="focal"
 distributions=""
 all_projects="keyman kmflcomp libkmfl ibus-kmfl"
 projects=""
+
+if [ -n "${PR_NAME}" ]; then
+	revision="-1~${PR_NAME}-${BUILD_NUMBER:-0}"
+else
+	revision="-1"
+fi
+
 echo "all_distributions: ${all_distributions}"
 echo "all_projects: ${all_projects}"
 
@@ -97,7 +108,7 @@ for proj in ${projects}; do
 		cp -a ../legacy/${proj}/debian ${proj}-${vers}
 	fi
 	cd ${proj}-${vers}
-	dch -v ${vers}-1 "local build"
+	dch -v ${vers}${revision} "local build"
 	echo "${proj}-${vers}"
 	debuild -d -S -sa -Zxz -us -uc
 	cd $BASEDIR/builddebs
@@ -114,10 +125,10 @@ for proj in ${projects}; do
 	cd builddebs
 	echo "$proj version ${vers}"
 	rm -rf ${proj}-${vers}
-	dpkg-source -x ${proj}_${vers}-1.dsc
+	dpkg-source -x ${proj}_${vers}${revision}.dsc
 	cd ${proj}-${vers}
 	for dist in ${distributions}; do
-		dch -v ${vers}-1+${dist} "local build for ${dist}"
+		dch -v ${vers}${revision}+${dist} "local build for ${dist}"
 		echo "dist: $dist"
 		DIST=${dist} pdebuild --pbuilder cowbuilder --buildresult /var/cache/pbuilder/result/${dist} -- --basepath /var/cache/pbuilder/base-${dist}.cow --distribution ${dist} --override-config --othermirror="deb [trusted=yes] file:/var/cache/pbuilder/result/${dist} ./" --bindmounts /var/cache/pbuilder/result/${dist}  --hookdir /var/cache/pbuilder/hook.d/${dist}
 	done
