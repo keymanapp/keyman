@@ -32,6 +32,9 @@ namespace com.keyman.osk {
     private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
     private keyboard: keyboards.Keyboard;
+
+    private _target:     dom.targets.OutputTarget;
+    private _lastTarget: dom.targets.OutputTarget;
     
     /**
      * The configured width for this OSKManager.  May be `undefined` or `null`
@@ -159,13 +162,19 @@ namespace com.keyman.osk {
     }
 
     public get activeTarget(): dom.targets.OutputTarget {
-      const el=com.keyman.singleton.domManager.activeElement;
-      return dom.Utils.getOutputTarget(el);
+      return this._target;
+    }
+
+    public set activeTarget(targ: dom.targets.OutputTarget) {
+      this._target = targ;
     }
 
     public get lastActiveTarget(): dom.targets.OutputTarget {
-      const el = com.keyman.singleton.domManager.lastActiveElement;
-      return dom.Utils.getOutputTarget(el);
+      return this._lastTarget;
+    }
+
+    public set lastActiveTarget(targ: dom.targets.OutputTarget) {
+      this._lastTarget = targ;
     }
 
     public get vkbd(): VisualKeyboard {

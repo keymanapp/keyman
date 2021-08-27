@@ -1241,8 +1241,14 @@ namespace com.keyman.dom {
     set lastActiveElement(Pelem: HTMLElement) {
       DOMEventHandlers.states._lastActiveElement = Pelem;
 
-      if(this.lastActiveElement == null && this.activeElement == null) {
-        this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
+      const osk = this.keyman.osk;
+      if(osk) {
+        const target = dom.Utils.getOutputTarget(Pelem);
+        osk.lastActiveTarget = target;
+
+        if(this.lastActiveElement == null && this.activeElement == null) {
+          this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
+        }
       }
     }
 
@@ -1258,7 +1264,11 @@ namespace com.keyman.dom {
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
       const osk = this.keyman.osk;
       const device = this.keyman.util.device;
-      if(this.keyman.osk) {
+
+      if(osk) {
+        const target = dom.Utils.getOutputTarget(Pelem);
+        osk.activeTarget = target;
+
         if(!Pelem) {
           if(this.keyman.osk && !isActivating) {
             this.keyman.osk._Hide(false);
