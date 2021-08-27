@@ -40,6 +40,10 @@ inherited frmDebugStatus: TfrmDebugStatus
       Caption = 'Options'
       ImageIndex = 6
     end
+    object tabDebugPlatform: TTabSheet
+      Caption = 'Platform'
+      ImageIndex = 7
+    end
     object tabDebugEvents: TTabSheet
       Caption = 'Events'
       ImageIndex = 5

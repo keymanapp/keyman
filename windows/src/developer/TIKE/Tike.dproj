@@ -550,6 +550,10 @@
         <DCCReference Include="debug\Keyman.System.Debug.DebugCore.pas"/>
         <DCCReference Include="main\Keyman.System.VisualKeyboardImportKMX.pas"/>
         <DCCReference Include="debug\Keyman.UI.Debug.CharacterGridRenderer.pas"/>
+        <DCCReference Include="debug\UfrmDebugStatus_Platform.pas">
+            <Form>frmDebugStatus_Platform</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <DCCReference Include="debug\UfrmDebugStatus_Options.pas">
             <Form>frmDebugStatus_Options</Form>
             <FormType>dfm</FormType>
