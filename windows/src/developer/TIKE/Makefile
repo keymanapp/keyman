@@ -88,6 +88,7 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Developer" $(PROGRAM)\developer\tike.exe
+    $(SIGNCODE) /d "Keyman Core" $(PROGRAM)\developer\kmnkbp0-0.dll
 
 wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\developer\tike.exe /t keyman-developer
