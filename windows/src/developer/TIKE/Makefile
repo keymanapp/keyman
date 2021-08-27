@@ -11,6 +11,7 @@ build: version.res manifest.res icons dirs xml
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tike.exe
     $(COPY) $(WIN32_TARGET_PATH)\tike.exe $(PROGRAM)\developer
     $(COPY) kmlmc.cmd $(PROGRAM)\developer
+    $(COPY) $(ROOT)\..\common\core\desktop\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEBUGPATH)\developer
 
 xml: pull-keymanweb pull-npm sentry-init.js
@@ -78,6 +79,7 @@ wrap-symbols:
 
 install:
     $(COPY) $(PROGRAM)\developer\tike.exe "$(INSTALLPATH_KEYMANDEVELOPER)\tike.exe"
+    $(COPY) $(PROGRAM)\developer\kmnkbp0-0.dll "$(INSTALLPATH_KEYMANDEVELOPER)\kmnkbp0-0.dll"
 
 test-manifest:
     # test that linked manifest exists and correct
