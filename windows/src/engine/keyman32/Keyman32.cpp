@@ -583,6 +583,8 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
     if (err_status != KM_KBP_STATUS_OK) {
       SendDebugMessageFormat(
           0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_state_create failed with error status [%d]", err_status);
+      // Dispose of the keyboard to leave us in a consitent state
+      ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
       return FALSE;
     }
     LoadKeyboardOptionsREGCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);

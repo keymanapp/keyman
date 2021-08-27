@@ -196,6 +196,8 @@ char* Debug_UnicodeString(PWSTR s, int x = 0);
 
 BOOL ShouldDebug_1(); // TSDMState state);
 
+// On failed condition it will always log "message" and return "retValue"
+// it will also assert if a debugger is attached for a debug build.
 #define DebugAssertRetValue(condition, message, retValue)               \
   {                                                                     \
     if (!(condition)) {                                                 \

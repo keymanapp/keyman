@@ -86,6 +86,7 @@ BOOL LoadlpKeyboardCore(int i)
   if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
   if (_td->lpKeyboards[i].lpCoreKeyboardState) {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: a keyboard km_kbp_state exits without matching keyboard - disposing of state");
     km_kbp_state_dispose(_td->lpKeyboards[i].lpCoreKeyboardState);
     _td->lpKeyboards[i].lpCoreKeyboardState = NULL;
   }
@@ -111,6 +112,8 @@ BOOL LoadlpKeyboardCore(int i)
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
         0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_state_create failed with error status [%d]", err_status);
+    // Dispose of the keyboard to leave us in a consitent state
+    ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
     return FALSE;
   }
 
