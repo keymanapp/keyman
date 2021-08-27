@@ -7,4 +7,5 @@
 keymanPackaging {
 	distributionsToPackage = 'bionic focal hirsute'
 	arches = 'amd64 i386'
+	packagesToBuild = ['keyman-keyboardprocessor', 'kmflcomp', 'libkmfl', 'ibus-kmfl', 'keyman-config', 'ibus-keyman']
 }
