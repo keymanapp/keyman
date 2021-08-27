@@ -43,6 +43,7 @@ public class InfoActivity extends BaseActivity {
     });
 
     final ImageButton forwardButton = (ImageButton) findViewById(R.id.forward_button);
+    forwardButton.setEnabled(false);
     forwardButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -99,6 +100,9 @@ public class InfoActivity extends BaseActivity {
 
       @Override
       public void onPageFinished(WebView view, String url) {
+        if (webView != null) {
+          forwardButton.setEnabled(webView.canGoForward());
+        }
       }
     });
 
