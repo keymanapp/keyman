@@ -11,25 +11,14 @@
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   WCHAR *expectedContext = L"A";
-  const km_kbp_action_item *actionItem;
-  km_kbp_action_item itemAddChar = {
-      KM_KBP_IT_CHAR,
-      {
-          0,
-      },
-      {'A'}};
+  km_kbp_action_item itemAddChar = { KM_KBP_IT_CHAR, {0,}, {'A'}};
 
   processUnicodeChar(&testApp, &itemAddChar);
   WCHAR *contextBuf = testApp.ContextBufMax(MAXCONTEXT);
   EXPECT_STREQ(contextBuf, expectedContext);
  
   km_kbp_usv testSurrogateChar    = Uni_SurrogateToUTF32(0xD801, 0xDC37);  //𐐷';
-  km_kbp_action_item itemAddChar2 = {
-      KM_KBP_IT_CHAR,
-      {
-          0,
-      },
-      {testSurrogateChar}};
+  km_kbp_action_item itemAddChar2 = {KM_KBP_IT_CHAR, {0,}, {testSurrogateChar}};
   WCHAR expectedStringSurrogate[] = {'A', 0xD801, 0xDC37, 0};
   processUnicodeChar(&testApp, &itemAddChar2);
   contextBuf = testApp.ContextBufMax(MAXCONTEXT);
@@ -46,14 +35,9 @@ TEST(AITIP, processMarkertest) {
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   WCHAR expectedContext[] = {UC_SENTINEL, CODE_DEADKEY, 2, 0};
-  const km_kbp_action_item *actionItem;
   uintptr_t marker               = 2;
-  km_kbp_action_item itemAddMarker = {
-      KM_KBP_IT_MARKER,
-      {
-          0,
-      },
-      {marker}};
+  km_kbp_action_item itemAddMarker = {KM_KBP_IT_MARKER, {0,}, {marker}};
+
   processMarker(&testApp, &itemAddMarker);
   WCHAR *contextBuf = testApp.ContextBufMax(MAXCONTEXT);
   EXPECT_STREQ(contextBuf, expectedContext);
@@ -71,21 +55,11 @@ TEST(AITIP, processBackDeadkeytest) {
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   WCHAR expectedContext[] = {'A', 0};
-  
-  km_kbp_action_item itemAddChar = {
-      KM_KBP_IT_CHAR,
-      {
-          0,
-      },
-      {'A'}};
+  km_kbp_action_item itemAddChar = {KM_KBP_IT_CHAR, {0,}, {'A'}};
+
   processUnicodeChar(&testApp, &itemAddChar);
   uintptr_t marker                 = 2;
-  km_kbp_action_item itemAddMarker = {
-      KM_KBP_IT_MARKER,
-      {
-          0,
-      },
-      {marker}};
+  km_kbp_action_item itemAddMarker = {KM_KBP_IT_MARKER, {0,}, {marker}};
   processMarker(&testApp, &itemAddMarker);
   km_kbp_action_item itemBackSpace = {KM_KBP_IT_BACK};
   itemBackSpace.backspace.expected_type  = KM_KBP_IT_MARKER;
@@ -109,13 +83,8 @@ TEST(AITIP, processBackCharactertest) {
   AITIP testApp;
   WCHAR expectedContext[] = {'A', 0};
   WCHAR expectedContextFinal[] = {0};
+  km_kbp_action_item itemAddChar = {KM_KBP_IT_CHAR, {0,}, {'A'}};
 
-  km_kbp_action_item itemAddChar = {
-      KM_KBP_IT_CHAR,
-      {
-          0,
-      },
-      {'A'}};
   processUnicodeChar(&testApp, &itemAddChar);
   itemAddChar.character            = 'B';
   processUnicodeChar(&testApp, &itemAddChar);
@@ -146,13 +115,8 @@ TEST(AITIP, processBackUnexpectedChartest) {
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   WCHAR expectedContext[] = {'A', 0};
+  km_kbp_action_item itemAddChar = {KM_KBP_IT_CHAR, {0,}, {'A'}};
 
-  km_kbp_action_item itemAddChar = {
-      KM_KBP_IT_CHAR,
-      {
-          0,
-      },
-      {'A'}};
   processUnicodeChar(&testApp, &itemAddChar);
   itemAddChar.character = 'C';
   processUnicodeChar(&testApp, &itemAddChar);
@@ -176,13 +140,8 @@ TEST(AITIP, processInvalidateContextTest) {
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   WCHAR expectedContext[] = {0};
+  km_kbp_action_item itemAddChar = {KM_KBP_IT_CHAR, {0,}, {'A'}};
 
-  km_kbp_action_item itemAddChar = {
-      KM_KBP_IT_CHAR,
-      {
-          0,
-      },
-      {'A'}};
   processUnicodeChar(&testApp, &itemAddChar);
   itemAddChar.character = 'B';
   processUnicodeChar(&testApp, &itemAddChar);

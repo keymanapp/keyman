@@ -101,7 +101,7 @@ BOOL LoadlpKeyboardCore(int i)
     return FALSE;
   }
 
-  // TODO: 5442 handle dlls
+  // TODO: 5650 handle dlls
   //LoadDLLs(&_td->lpKeyboards[i]);
   const km_kbp_option_item test_env_opts[] =
   {

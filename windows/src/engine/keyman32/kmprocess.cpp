@@ -140,9 +140,7 @@ BOOL ProcessHook()
 		else
 			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
-  // TODO: 5011 remove debug message
- // PWSTR contextTestBuf            = _td->app->ContextBufMax(MAXCONTEXT);
- // SendDebugMessageFormat(0, sdmAIDefault, 0, "Kmprocess::ProcessHook Before cxt=%s", Debug_UnicodeString(contextTestBuf, 1));
+  
   if (isUsingCoreProcessor) {
 
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: ");
@@ -166,8 +164,6 @@ BOOL ProcessHook()
     ProcessActions(&fOutputKeystroke);
   }
   else {
-    // TODO: 5011 remove debug message
-    SendDebugMessageFormat(0, sdmGlobal, 0,"ProcessGroup: ");
     ProcessGroup(gp); // TODO: 5442 remove
   }
 

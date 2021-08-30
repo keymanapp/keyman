@@ -575,7 +575,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
       return FALSE;
     }
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core
-                                                                                        
+    // TODO: #5650 Equivalent for common core                                                            
     // LoadDLLs(&_td->lpKeyboards[i]);
     const km_kbp_option_item test_env_opts[] = {KM_KBP_OPTIONS_END};
     err_status =
@@ -587,6 +587,9 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
       ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
       return FALSE;
     }
+    // TODO: 5650 LoadDLLs
+    // TODO: 5652 verify - ResetCapsLock(); 
+    ResetCapsLock();
     LoadKeyboardOptionsREGCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);
     RefreshPreservedKeys(TRUE);
     return TRUE;

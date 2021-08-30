@@ -208,7 +208,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->state.vkey = (WORD) wParam;
 
   if (isUsingCoreProcessor) {
-    // TODO: 5442 set the correct active keyboard - need with call backs
     _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 
   } else {
