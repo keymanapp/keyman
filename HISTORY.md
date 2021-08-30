@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.106 alpha 2021-08-30
+
+* fix(linux): Remove Linux workspace (#5654)
+
 ## 15.0.105 alpha 2021-08-27
 
 * feat(android/app): Add navigation buttons to Info Activity (#5622)
