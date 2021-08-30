@@ -59,6 +59,7 @@
 
 #include "keymanutil.h"
 #include "kmpdetails.h"
+#include "keyman-version.h"
 
 #define N_(text) text
 
@@ -150,7 +151,7 @@ ibus_keyman_engine_desc_new (gchar * file_name,
     return engine_desc;
 }
 
-GList * 
+GList *
 ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
 {
     GList *p, *k, *l, *e;
@@ -283,10 +284,10 @@ ibus_keyman_get_component (void)
 
     component = ibus_component_new ("org.freedesktop.IBus.Keyman",
                                     N_("Keyman"),
-                                    "10.99.0",
+                                    KEYMAN_VERSION,
                                     "GPL",
-                                    "Daniel Glassey <wdg@debian.org>",
-                                    "http://www.keyman.com",
+                                    "Keyman team <support@keyman.com>",
+                                    "https://keyman.com",
                                     "",
                                     "ibus-keyman");
 

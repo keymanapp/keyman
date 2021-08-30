@@ -99,6 +99,7 @@ AC_CONFIG_FILES([ po/Makefile.in
 Makefile
 src/Makefile
 src/keyman.xml.in
+src/keyman-version.h
 icons/Makefile
 m4/Makefile
 ])
