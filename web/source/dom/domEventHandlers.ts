@@ -594,7 +594,7 @@ namespace com.keyman.dom {
           prevTarget.hideCaret();
         }
 
-        this.keyman.domManager.activeElement=target;
+        this.keyman.domManager.activeElement = target;
         // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
         // We must explicitly set the focus in order to remove focus from any non-KMW input
         target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
@@ -717,7 +717,7 @@ namespace com.keyman.dom {
       if(this.keyman.domManager.activeElement && Utils.instanceof(this.keyman.domManager.activeElement, "TouchAliasElement")) {
         (this.keyman.domManager.activeElement as TouchAliasElement).hideCaret();
       }
-      this.keyman.domManager.activeElement=null; 
+      this.keyman.domManager.activeElement = null; 
       this.keyman.domManager.lastActiveElement = null;
       this.keyman.osk.hideNow();
     };

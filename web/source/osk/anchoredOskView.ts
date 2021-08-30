@@ -57,7 +57,7 @@ namespace com.keyman.osk {
       this._Box.onmouseover = this._VKbdMouseOver;
       this._Box.onmouseout = this._VKbdMouseOut;
 
-      if(this._Enabled) {
+      if(this.displayIfActive) {
         this._Show();
       }
     }
@@ -225,7 +225,6 @@ namespace com.keyman.osk {
         Ls.border='none';
         Ls.borderTop='1px solid gray';
 
-        this._Enabled=true;
         this._Visible=true; // I3363 (Build 301)
       }
     }
@@ -253,7 +252,7 @@ namespace com.keyman.osk {
 
       if(hiddenByUser) {
         //osk.loadCookie(); // preserve current offset and userlocated state
-        this._Enabled = ((keymanweb.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
+        this.displayIfActive = ((keymanweb.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
       } else if(device.formFactor == 'desktop') {
         //Allow desktop OSK to remain visible on blur if body class set
         if(document.body.className.indexOf('osk-always-visible') >= 0) {
@@ -303,7 +302,7 @@ namespace com.keyman.osk {
 
       // If hidden by the UI, be sure to restore the focus
       if(hiddenByUser) {
-        this.lastActiveTarget.focus();
+        this.activeTarget?.focus();
       }
     }
 

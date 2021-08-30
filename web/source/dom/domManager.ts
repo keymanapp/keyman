@@ -1243,9 +1243,6 @@ namespace com.keyman.dom {
 
       const osk = this.keyman.osk;
       if(osk) {
-        const target = dom.Utils.getOutputTarget(Pelem);
-        osk.lastActiveTarget = target;
-
         if(this.lastActiveElement == null && this.activeElement == null) {
           this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
         }
@@ -1263,33 +1260,36 @@ namespace com.keyman.dom {
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
       const osk = this.keyman.osk;
-      const device = this.keyman.util.device;
+      // const device = this.keyman.util.device;
 
       if(osk) {
-        const target = dom.Utils.getOutputTarget(Pelem);
-        osk.activeTarget = target;
-
-        if(!Pelem) {
-          if(this.keyman.osk && !isActivating) {
-            this.keyman.osk._Hide(false);
-          }
-        } else {
-          // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
-          if(device.touchable) {
-            osk._Enabled = true;
-            osk._Show();
-          } else {
-            // Conditionally show the OSK when control receives the focus
-            if(this.keyman.isCJK()) {
-              osk._Enabled = true;
-            }
-            if(osk._Enabled) {
-              osk._Show();
-            } else {
-              osk._Hide(false);
-            }
-          }
+        const target = Pelem?._kmwAttachment?.interface || null;
+        if(osk && (target || !isActivating)) {
+          // Do not unset the field if the UI is activated.
+          osk.activeTarget = target;
         }
+
+        // if(!Pelem) {
+        //   if(osk && !isActivating) {
+        //     osk._Hide(false);
+        //   }
+        // } else {
+        //   // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
+        //   if(device.touchable) {
+        //     osk.displayIfActive = true;
+        //     osk._Show();
+        //   } else {
+        //     // Conditionally show the OSK when control receives the focus
+        //     if(this.keyman.isCJK()) {
+        //       osk.displayIfActive = true;
+        //     }
+        //     if(osk.displayIfActive) {
+        //       osk._Show();
+        //     } else {
+        //       osk._Hide(false);
+        //     }
+        //   }
+        // }
       }
     }
 

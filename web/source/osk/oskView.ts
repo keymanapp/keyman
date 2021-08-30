@@ -17,6 +17,12 @@ namespace com.keyman.osk {
     'nomove'?: boolean
   };
 
+  export enum ActivationMode {
+    disabled    = "disabled",
+    permanent   = "permanent",
+    conditional = "conditional"
+  }
+  
   export abstract class OSKView {
     _Box: HTMLDivElement;
 
@@ -25,7 +31,8 @@ namespace com.keyman.osk {
     keyboardView: KeyboardView;  // Which implements OSKViewComponent
     footerView:   OSKViewComponent;
 
-    protected device: com.keyman.utils.DeviceSpec;
+    protected readonly device: com.keyman.utils.DeviceSpec;
+    protected readonly hostDevice: com.keyman.utils.DeviceSpec;
 
     private _boxBaseMouseDown:        (e: MouseEvent) => boolean; 
     private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
@@ -34,7 +41,6 @@ namespace com.keyman.osk {
     private keyboard: keyboards.Keyboard;
 
     private _target:     dom.targets.OutputTarget;
-    private _lastTarget: dom.targets.OutputTarget;
     
     /**
      * The configured width for this OSKManager.  May be `undefined` or `null`
@@ -68,8 +74,18 @@ namespace com.keyman.osk {
 
     private needsLayout: boolean = true;
 
-    constructor(deviceSpec: com.keyman.utils.DeviceSpec) {
+    //
+    private _activationMode: ActivationMode = ActivationMode.conditional;
+    private _displayIfActive: boolean = true;
+    private _currentlyBuffering: boolean = false;
+
+    constructor(deviceSpec: com.keyman.utils.DeviceSpec, hostDevice?: com.keyman.utils.DeviceSpec) {
       this.device = deviceSpec;
+
+      if(!hostDevice) {
+        hostDevice = deviceSpec;
+      }
+      this.hostDevice = hostDevice;
 
       // OSK initialization - create DIV and set default styles
       this._Box = document.createElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
@@ -167,14 +183,75 @@ namespace com.keyman.osk {
 
     public set activeTarget(targ: dom.targets.OutputTarget) {
       this._target = targ;
+      this.commonCheckAndDisplay();
     }
 
-    public get lastActiveTarget(): dom.targets.OutputTarget {
-      return this._lastTarget;
+    get activationMode(): ActivationMode {
+      if(!this._activationMode) {
+        this._activationMode = ActivationMode.conditional;
+      }
+
+      return this._activationMode;
     }
 
-    public set lastActiveTarget(targ: dom.targets.OutputTarget) {
-      this._lastTarget = targ;
+    set activationMode(mode: ActivationMode) {
+      this._activationMode = mode;
+      this.commonCheckAndDisplay();
+    }
+
+    get activationConditionsMet(): boolean {
+      switch(this.activationMode) {
+        case 'permanent':
+          return true;
+        case 'disabled':
+          return false;
+        case 'conditional':
+          return !!this.activeTarget;
+        default:
+          console.error("Unexpected activation mode set for the OSK.");
+          return false;
+      }
+    }
+
+    get displayIfActive(): boolean {
+      return this._displayIfActive;
+    }
+
+    set displayIfActive(flag: boolean) {
+      // if is touch device or is CJK keyboard, this.displayIfActive must remain true.
+      if(this.keyboard?.isCJK && !flag) {
+        console.warn("Cannot hide display of OSK for CJK keyboards.");
+        flag = true;
+      } else if(this.hostDevice.touchable && !flag) {
+        console.warn("Cannot hide display of OSK when hosted on touch-based devices.");
+        flag = true;
+      }
+
+      this._displayIfActive = flag;
+      this.commonCheckAndDisplay();
+    }
+
+    protected get currentlyBuffering(): boolean {
+      return this._currentlyBuffering;
+    }
+
+    protected set currentlyBuffering(flag: boolean) {
+      this._currentlyBuffering = flag;
+      this.commonCheckAndDisplay();
+    }
+
+    private commonCheckAndDisplay() {
+      // If other code has noted that display-related changes are currently accumulating,
+      // bypass display logic.
+      if(this._currentlyBuffering) {
+        return;
+      }
+
+      if(this.activationConditionsMet && this.displayIfActive) {
+        this._Show();
+      } else {
+        this._Hide(false);
+      }
     }
 
     public get vkbd(): VisualKeyboard {
@@ -280,6 +357,10 @@ namespace com.keyman.osk {
     public set activeKeyboard(keyboard: keyboards.Keyboard) {
       this.keyboard = keyboard;
       this.loadActiveKeyboard();
+
+      if(this.keyboard?.isCJK) {
+        this.displayIfActive = true;
+      }
     }
 
     /* private */ computeFrameHeight(): number {
@@ -675,7 +756,6 @@ namespace com.keyman.osk {
     // They're not very well defined or encapsulated; there's definitely room for more
     // "polish" here.
     _Visible: boolean = false;
-    _Enabled: boolean = true;
 
     /**
      * Function     enabled
@@ -684,7 +764,7 @@ namespace com.keyman.osk {
      * Description  Test if KMW OSK is enabled
      */
      ['isEnabled'](): boolean {
-      return this._Enabled;
+      return this.displayIfActive;
     }
 
     /**
@@ -704,7 +784,7 @@ namespace com.keyman.osk {
      * Description  Prevent display of OSK window on focus
      */
      ['hide']() {
-      this._Enabled = false;
+      this.displayIfActive = false;
       this._Hide(true);
     }
 
@@ -716,18 +796,22 @@ namespace com.keyman.osk {
      */
      ['show'](bShow: boolean) {
       if(arguments.length > 0) {
-        this._Enabled=bShow;
-        if(bShow) {
-          this._Show();
-        } else {
-          this._Hide(true);
-        }
+        this.displayIfActive=bShow;
+        // if(bShow) {
+        //   this._Show();
+        // } else {
+        //   this._Hide(true);
+        // }
       } else {
-        if(this._Visible) {
-          this._Hide(true);
-        } else {
-          this._Show();
+        if(this.activationConditionsMet) {
+          this.displayIfActive = !this.displayIfActive;
         }
+
+        // // if(this._Visible) {
+        //   this._Hide(true);
+        // // } else {
+        //   this._Show();
+        // // }
       }
     }
 

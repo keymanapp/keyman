@@ -614,7 +614,7 @@ namespace com.keyman.keyboards {
             && ((this.keyboardStubs[Ln]['KLC'] == PLgCode) || (PLgCode == '---'))) {
             // Force OSK display for CJK keyboards (keyboards using a pick list)
             if(this.isCJK(this.keyboardStubs[Ln]) || util.device.touchable) {
-              osk._Enabled = true;
+              osk.displayIfActive = true;
             }
 
             // Create a script to load from the server - when it finishes loading, it will register itself,

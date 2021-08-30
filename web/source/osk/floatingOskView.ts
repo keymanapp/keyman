@@ -74,7 +74,9 @@ namespace com.keyman.osk {
         this._Box.appendChild(this.footerView.element);
       }
 
-      if(this._Enabled) {
+      this.loadCookie();
+
+      if(this.displayIfActive) {
         this._Show();
       }
     }
@@ -89,7 +91,7 @@ namespace com.keyman.osk {
     ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: FloatingOSKView, keepDefaultPosition?: boolean) {
       let isVisible = this._Visible;
       if(isVisible) {
-        this.lastActiveTarget.focus();  // I2036 - OSK does not unpin to correct location
+        this.activeTarget?.focus();  // I2036 - OSK does not unpin to correct location
       }
 
       this.loadCookie();
@@ -115,7 +117,7 @@ namespace com.keyman.osk {
      * Description  Test if KMW OSK is enabled
      */
     ['isEnabled'](): boolean {
-      return this._Enabled;
+      return this.displayIfActive;
     }
 
     /**
@@ -158,7 +160,7 @@ namespace com.keyman.osk {
       var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
       var p = this.getPos();
 
-      c['visible'] = this._Enabled ? 1 : 0;
+      c['visible'] = this.displayIfActive ? 1 : 0;
       c['userSet'] = this.userPositioned ? 1 : 0;
       c['left'] = p.left;
       c['top'] = p.top;
@@ -181,7 +183,11 @@ namespace com.keyman.osk {
 
       var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
 
-      this._Enabled = util.toNumber(c['visible'], 1) == 1;
+      const displayIfActive = util.toNumber(c['visible'], 1) == 1;
+      if(this.displayIfActive != displayIfActive) {
+        // Setter triggers functions that can go recursive without the conditional check.
+        this.displayIfActive = displayIfActive;
+      }
       this.userPositioned = util.toNumber(c['userSet'], 0) == 1;
       this.x = util.toNumber(c['left'],-1);
       this.y = util.toNumber(c['top'],-1);
@@ -448,7 +454,7 @@ namespace com.keyman.osk {
       }
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if(this.activeKeyboard == null || !this._Enabled) {
+      if(this.activeKeyboard == null || !this.displayIfActive) {
         return;
       }
 
@@ -458,7 +464,6 @@ namespace com.keyman.osk {
 
       Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
       Ls.left='0px';
-      this.loadCookie();
       if(Px >= 0) { //probably never happens, legacy support only
         Ls.left = Px + 'px'; Ls.top = Py + 'px';
       } else {
@@ -481,7 +486,7 @@ namespace com.keyman.osk {
           }
         }
       }
-      this._Enabled=true;
+
       this._Visible=true;
 
       if(this.vkbd) {
@@ -518,7 +523,7 @@ namespace com.keyman.osk {
 
       if(hiddenByUser) {
         //osk.loadCookie(); // preserve current offset and userlocated state
-        this._Enabled = ((keymanweb.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
+        this.displayIfActive = ((keymanweb.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
         this.saveCookie();  // Save current OSK state, size and position (desktop only)
       } else if(device.formFactor == 'desktop') {
         //Allow desktop OSK to remain visible on blur if body class set
@@ -569,7 +574,7 @@ namespace com.keyman.osk {
 
       // If hidden by the UI, be sure to restore the focus
       if(hiddenByUser) {
-        this.lastActiveTarget.focus();
+        this.activeTarget?.focus();
       }
     }
 
