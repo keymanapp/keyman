@@ -44,6 +44,7 @@
       kmw['setActiveElement'](ta);
 
       ta.readOnly = false;
+      checkTextArea();
 
       // Tell KMW the default banner height to use
       com.keyman.osk.Banner.DEFAULT_HEIGHT =
@@ -341,6 +342,27 @@
         hexString += theHex;
       }
       return hexString;
+    }
+
+    /**
+     * Check the WebView version and determine if the textarea that KeymanWeb uses needs to be "visible".
+     * Normally, this textarea is not displayed to avoid redundant layout calculations.
+     * In older WebViews on Android 5.0 though, selectionStart and selectionEnd positions fail to
+     * update unless the textarea is visible.
+     * Reference: Issue #5376
+     */
+    function checkTextArea() {
+      var uaRe = /Chrome\/([0-9]*)./g;
+      var chromeMajorVersion = uaRe.exec(navigator.userAgent);
+      if (chromeMajorVersion && parseInt(chromeMajorVersion[1]) <= 37) {
+        var ta = document.getElementById('ta');
+        if (ta != null) {
+          ta.style.display = '';
+          ta.style.position = 'absolute';
+          ta.style.left = '-500px';
+          ta.style.top = '0px';
+        }
+      }
     }
 
   </script>
