@@ -389,7 +389,7 @@ namespace com.keyman.text {
       }
 
       // Determine the "functional" layer
-      let layer = 'default';
+      let layer = displayLayer;
       separatorIndex = keyName.lastIndexOf('+');
       if (separatorIndex > 0) {
         layer = keyName.substring(separatorIndex+1);
