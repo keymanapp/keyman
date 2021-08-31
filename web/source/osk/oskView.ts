@@ -18,8 +18,8 @@ namespace com.keyman.osk {
   };
 
   export enum ActivationMode {
-    disabled    = "disabled",
-    permanent   = "permanent",
+    static      = "static",  // For use by documentation keyboards, eventually.
+    manual      = "manual",
     conditional = "conditional"
   }
   
@@ -77,6 +77,7 @@ namespace com.keyman.osk {
     //
     private _activationMode: ActivationMode = ActivationMode.conditional;
     private _displayIfActive: boolean = true;
+    private _manualShouldDisplay: boolean = true;
     private _currentlyBuffering: boolean = false;
 
     constructor(deviceSpec: com.keyman.utils.DeviceSpec, hostDevice?: com.keyman.utils.DeviceSpec) {
@@ -201,10 +202,10 @@ namespace com.keyman.osk {
 
     get activationConditionsMet(): boolean {
       switch(this.activationMode) {
-        case 'permanent':
+        case 'manual':
           return true;
-        case 'disabled':
-          return false;
+        case 'static':
+          return true;
         case 'conditional':
           return !!this.activeTarget;
         default:
@@ -224,6 +225,10 @@ namespace com.keyman.osk {
         flag = true;
       } else if(this.hostDevice.touchable && !flag) {
         console.warn("Cannot hide display of OSK when hosted on touch-based devices.");
+        flag = true;
+      } else if(this.activationMode == 'static') {
+        // Silently fail; it's a documentation keyboard.
+        // This is the primary difference between 'manual' and 'static'.
         flag = true;
       }
 
@@ -796,22 +801,11 @@ namespace com.keyman.osk {
      */
      ['show'](bShow: boolean) {
       if(arguments.length > 0) {
-        this.displayIfActive=bShow;
-        // if(bShow) {
-        //   this._Show();
-        // } else {
-        //   this._Hide(true);
-        // }
+        this.displayIfActive = bShow;
       } else {
         if(this.activationConditionsMet) {
           this.displayIfActive = !this.displayIfActive;
         }
-
-        // // if(this._Visible) {
-        //   this._Hide(true);
-        // // } else {
-        //   this._Show();
-        // // }
       }
     }
 

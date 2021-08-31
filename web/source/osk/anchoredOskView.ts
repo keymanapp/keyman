@@ -32,6 +32,11 @@ namespace com.keyman.osk {
       super(modeledDevice);
 
       document.body.appendChild(this._Box);
+
+      let keymanweb = com.keyman.singleton;
+      if(keymanweb.isEmbedded) {
+        this.activationMode == ActivationMode.manual;
+      }
     }
 
     /**
@@ -241,8 +246,7 @@ namespace com.keyman.osk {
       // Once picklist functionality is separated out, this will no longer be needed.
       // Logic is: execute always if hidden on lost focus, but if requested by user, only if not CJK
 
-      if(keymanweb.isEmbedded) {
-        // We never hide the keyboard in embedded mode
+      if(this.activationMode != 'conditional' && this.displayIfActive) {
         return;
       }
 

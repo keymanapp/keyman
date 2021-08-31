@@ -1268,28 +1268,6 @@ namespace com.keyman.dom {
           // Do not unset the field if the UI is activated.
           osk.activeTarget = target;
         }
-
-        // if(!Pelem) {
-        //   if(osk && !isActivating) {
-        //     osk._Hide(false);
-        //   }
-        // } else {
-        //   // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
-        //   if(device.touchable) {
-        //     osk.displayIfActive = true;
-        //     osk._Show();
-        //   } else {
-        //     // Conditionally show the OSK when control receives the focus
-        //     if(this.keyman.isCJK()) {
-        //       osk.displayIfActive = true;
-        //     }
-        //     if(osk.displayIfActive) {
-        //       osk._Show();
-        //     } else {
-        //       osk._Hide(false);
-        //     }
-        //   }
-        // }
       }
     }
 
