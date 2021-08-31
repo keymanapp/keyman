@@ -78,7 +78,10 @@ namespace com.keyman.osk {
     private _activationMode: ActivationMode = ActivationMode.conditional;
     private _displayIfActive: boolean = true;
     private _manualShouldDisplay: boolean = true;
+
     private _currentlyBuffering: boolean = false;
+    private _animatedHideTimeout: number;
+    private _animatedHideResolver: () => void;
 
     constructor(deviceSpec: com.keyman.utils.DeviceSpec, hostDevice?: com.keyman.utils.DeviceSpec) {
       this.device = deviceSpec;
@@ -627,14 +630,151 @@ namespace com.keyman.osk {
       }
     }
 
-    protected makeHidden(hiddenByUser: boolean) {
+    public startHide(hiddenByUser: boolean) {
+      if(!this.mayHide(hiddenByUser)) {
+        return;
+      }
+
+      if(hiddenByUser) {
+        this._displayIfActive = ((this.keyboard.isCJK || this.hostDevice.touchable)? true : false); // I3363 (Build 301)
+      }
+
+      let promise: Promise<boolean> = null;
+      if(this._Box && this.hostDevice.touchable && !(this.keyboardView instanceof EmptyView)) {
+        promise = this.useHideAnimation();
+      } else {
+        promise = Promise.resolve(true);
+      }
+
+      const _this = this;
+      promise.then(function(shouldHide: boolean) {
+        if(shouldHide) {
+          _this.finalizeHide();
+        }
+      });
+
+      // Allow UI to execute code when hiding the OSK
+      var p={};
+      p['HiddenByUser']=hiddenByUser;
+      this.doHide(p);
+
+      // If hidden by the UI, be sure to restore the focus
+      if(hiddenByUser) {
+        this.activeTarget?.focus();
+      }
+    }
+
+    protected finalizeHide() {
       // Save current size if visible
       if(this._Box && this._Box.style.display == 'block' && this.keyboardView instanceof VisualKeyboard) {
         this.keyboardView.refit();
       }
 
+      if(document.body.className.indexOf('osk-always-visible') >= 0) {
+        return;
+      }
+
       if(this._Box) {
-        this._Box.style.display = 'none';
+        let bs=this._Box.style;
+        bs.display = 'none';
+        bs.transition = '';
+        bs.opacity = '1';
+        this._Visible=false;
+      }
+
+      if(this.vkbd) {
+        this.vkbd.onHide();
+      }
+    }
+
+    protected mayHide(hiddenByUser: boolean): boolean {
+      if(this.activationMode != 'conditional' && this.displayIfActive) {
+        return false;
+      }
+
+      if(!hiddenByUser && this.hostDevice.formFactor == 'desktop') {
+        //Allow desktop OSK to remain visible on blur if body class set
+        if(document.body.className.indexOf('osk-always-visible') >= 0) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    protected useHideAnimation(): Promise<boolean> {
+      const os = this._Box.style;
+      const _this = this;
+      const promise = new Promise<void>(function(resolve) {
+        os.transition='opacity 0.5s linear 0';
+
+        _this._animatedHideResolver = resolve;
+
+        // Cannot hide the OSK smoothly using a transitioned drop, since for
+        // position:fixed elements transitioning is incompatible with translate3d(),
+        // and also does not work with top, bottom or height styles.
+        // Opacity can be transitioned and is probably the simplest alternative.
+        // We must condition on osk._Visible in case focus has since been moved to another
+        // input (in which case osk._Visible will be non-zero)
+        _this._animatedHideTimeout = window.setTimeout(function(this: AnchoredOSKView) {
+          if(_this._animatedHideResolver) {
+            _this._animatedHideResolver();
+          }
+
+          _this._animatedHideTimeout = 0;
+          _this._animatedHideResolver = null;
+        }.bind(_this), 200); // Wait a bit before starting, to allow for moving to another element
+      });
+
+      return promise.then(function() {
+        if(_this._Visible) {
+          // Leave opacity alone and clear transition if another element activated
+          os.transition='';
+          return false;
+        } else {
+          // Set opacity to zero, should decrease smoothly.  Starts the actual animation.
+          os.opacity='0';
+
+          // Listen for the animation's end.
+          return new Promise<void>(function(resolve) {
+            _this._animatedHideResolver = resolve;
+            // Actually hide the OSK at the end of the transition
+            _this._Box.addEventListener('transitionend', _this._animatedHideResolver, false);
+            _this._Box.addEventListener('webkitTransitionEnd', _this._animatedHideResolver, false);
+          }).then(function() {
+            // Remove the promise's resolver method from future handling.
+            _this._Box.removeEventListener('transitionend', _this._animatedHideResolver, false);
+            _this._Box.removeEventListener('webkitTransitionEnd', _this._animatedHideResolver, false);
+
+            // The hide animation is considered complete now.
+            return true;
+          });
+        }
+      });
+    }
+
+    public hideNow() {
+      // Two possible uses for _animatedHideResolver:
+      // - _animatedHideTimeout is set:   animation is waiting to start
+      // - _animatedHideTimeout is null:  animation has already started.
+
+      // Was an animated hide waiting to start?  Just cancel it.
+      if(this._animatedHideTimeout) {
+        window.clearTimeout(this._animatedHideTimeout);
+        this._animatedHideResolver = null;
+        this._animatedHideTimeout = 0;
+      }
+
+      // Was an animated hide already in progress?  If so, just trigger it early.
+      if(this._animatedHideResolver) {
+        this._animatedHideResolver();  // also triggers finalizeHide().
+        this._animatedHideResolver = null;
+      } else {
+        const os = this._Box.style;
+        os.transition='';
+        os.opacity='0';
+
+        this.finalizeHide();
       }
     }
 
@@ -723,39 +863,6 @@ namespace com.keyman.osk {
       menu.show();
     }
 
-    /**
-     * Function     hideNow
-     * Scope        Private
-     * Description  Hide the OSK unconditionally and immediately, cancel any pending transition
-     * 
-     * Usages:
-     * - during rotations to temporarily hide the OSK during layout ops
-     * - when controls lose focus (N/A to embedded mode)
-     * 
-     * Somewhat conflated with the _Show / _Hide methods, which often serve more as an
-     * "enable" vs "disable" feature on the OSK - though that distinction isn't super-clear.
-     * 
-     * Definitely needs clearer design & modeling, at the least.
-     */
-    hideNow: () => void = function(this: OSKView) { // I3363 (Build 301)
-      this._Box.removeEventListener('transitionend', this.hideNow, false);
-      this._Box.removeEventListener('webkitTransitionEnd', this.hideNow, false);
-
-      if(document.body.className.indexOf('osk-always-visible') >= 0) {
-        return;
-      }
-
-      var os=this._Box.style;
-      os.display='none';
-      os.opacity='1';
-      this._Visible=false;
-      os.transition=os.msTransition=os.MozTransition=os.WebkitTransition='';
-
-      if(this.vkbd) {
-        this.vkbd.onHide();
-      }
-    }.bind(this);
-
     // OSK state fields
     //
     // They're not very well defined or encapsulated; there's definitely room for more
@@ -807,6 +914,28 @@ namespace com.keyman.osk {
           this.displayIfActive = !this.displayIfActive;
         }
       }
+    }
+
+    /**
+     * Allow UI to respond to OSK being shown (passing position and properties)
+     *
+     * @param       {Object=}       p     object with coordinates and userdefined flag
+     * @return      {boolean}
+     *
+     */
+     doShow(p) {
+      return com.keyman.singleton.util.callEvent('osk.show',p);
+    }
+
+    /**
+     * Allow UI to update respond to OSK being hidden
+     *
+     * @param       {Object=}       p     object with coordinates and userdefined flag
+     * @return      {boolean}
+     *
+     */
+    doHide(p) {
+      return com.keyman.singleton.util.callEvent('osk.hide',p);
     }
 
     /**

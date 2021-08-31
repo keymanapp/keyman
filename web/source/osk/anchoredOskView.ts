@@ -240,74 +240,7 @@ namespace com.keyman.osk {
      * @param       {boolean}   hiddenByUser    Distinguish between hiding on loss of focus and explicit hiding by user
      */
     _Hide(hiddenByUser: boolean) {
-      let keymanweb = com.keyman.singleton;
-      let device = keymanweb.util.device;
-      // The test for CJK languages is necessary to prevent a picklist (displayed in the OSK) from being hidden by the user
-      // Once picklist functionality is separated out, this will no longer be needed.
-      // Logic is: execute always if hidden on lost focus, but if requested by user, only if not CJK
-
-      if(this.activationMode != 'conditional' && this.displayIfActive) {
-        return;
-      }
-
-      // Save current size if visible
-      const priorDisplayStyle = this._Box.style.display;
-      this.makeHidden(hiddenByUser);
-
-      if(hiddenByUser) {
-        //osk.loadCookie(); // preserve current offset and userlocated state
-        this.displayIfActive = ((keymanweb.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
-      } else if(device.formFactor == 'desktop') {
-        //Allow desktop OSK to remain visible on blur if body class set
-        if(document.body.className.indexOf('osk-always-visible') >= 0) {
-          return;
-        }
-      }
-
-      this._Visible = false;
-      if(this._Box && device.touchable && this._Box.offsetHeight > 0) { // I3363 (Build 301)
-        var os=this._Box.style;
-        // Prevent insta-hide behavior; we want an animated fadeout here.
-        os.display = priorDisplayStyle;
-
-        //Firefox doesn't transition opacity if start delay is explicitly set to 0!
-        if(typeof(os.MozBoxSizing) == 'string') {
-          os.transition='opacity 0.8s linear';
-        } else {
-          os.transition=os.msTransition=os.WebkitTransition='opacity 0.5s linear 0';
-        }
-
-        // Cannot hide the OSK smoothly using a transitioned drop, since for
-        // position:fixed elements transitioning is incompatible with translate3d(),
-        // and also does not work with top, bottom or height styles.
-        // Opacity can be transitioned and is probably the simplest alternative.
-        // We must condition on osk._Visible in case focus has since been moved to another
-        // input (in which case osk._Visible will be non-zero)
-        window.setTimeout(function(this: AnchoredOSKView) {
-          var os=this._Box.style;
-          if(this._Visible) {
-            // Leave opacity alone and clear transition if another element activated
-            os.transition=os.msTransition=os.MozTransition=os.WebkitTransition='';
-          } else {
-            // Set opacity to zero, should decrease smoothly
-            os.opacity='0';
-
-            // Actually hide the OSK at the end of the transition
-            this._Box.addEventListener('transitionend', this.hideNow, false);
-            this._Box.addEventListener('webkitTransitionEnd', this.hideNow, false);
-          }
-        }.bind(this), 200);      // Wait a bit before starting, to allow for moving to another element
-      }
-
-      // Allow UI to execute code when hiding the OSK
-      var p={};
-      p['HiddenByUser']=hiddenByUser;
-      this.doHide(p);
-
-      // If hidden by the UI, be sure to restore the focus
-      if(hiddenByUser) {
-        this.activeTarget?.focus();
-      }
+      this.startHide(hiddenByUser);
     }
 
     /**
