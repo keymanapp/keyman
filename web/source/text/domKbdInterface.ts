@@ -101,7 +101,7 @@ namespace com.keyman.text {
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
   KeyboardInterface.prototype['hideHelp'] = function(): void {
     let keyman = com.keyman.singleton;
-    keyman.osk._Hide(true);
+    keyman.osk.startHide(true);
   }
 
   KeyboardInterface.prototype['showHelp'] = function(Px: number, Py: number): void {

@@ -442,7 +442,7 @@ namespace com.keyman.dom {
           this.activeElement = null;
         }
         this.lastActiveElement = null;
-        this.keyman.osk._Hide(false);
+        this.keyman.osk.startHide(false);
       }
       
       return;

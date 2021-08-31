@@ -241,7 +241,7 @@ namespace com.keyman.osk {
       if(this.activationConditionsMet && this.displayIfActive) {
         this._Show();
       } else {
-        this._Hide(false);
+        this.startHide(false);
       }
     }
 
@@ -854,13 +854,6 @@ namespace com.keyman.osk {
     public abstract _Show(Px?: number, Py?: number);
 
     /**
-     * Hide Keymanweb On Screen Keyboard
-     *
-     * @param       {boolean}   hiddenByUser    Distinguish between hiding on loss of focus and explicit hiding by user
-     */
-    public abstract _Hide(hiddenByUser: boolean);
-
-    /**
      * Display build number
      * 
      * In the future, this should raise an event that the consuming KeymanWeb
@@ -920,7 +913,7 @@ namespace com.keyman.osk {
      */
      ['hide']() {
       this.displayIfActive = false;
-      this._Hide(true);
+      this.startHide(true);
     }
 
     /**

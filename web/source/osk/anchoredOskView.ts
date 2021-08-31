@@ -221,15 +221,6 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Hide Keymanweb On Screen Keyboard
-     *
-     * @param       {boolean}   hiddenByUser    Distinguish between hiding on loss of focus and explicit hiding by user
-     */
-    _Hide(hiddenByUser: boolean) {
-      this.startHide(hiddenByUser);
-    }
-
-    /**
      * Allow UI to respond to OSK being shown (passing position and properties)
      *
      * @param       {Object=}       p     object with coordinates and userdefined flag

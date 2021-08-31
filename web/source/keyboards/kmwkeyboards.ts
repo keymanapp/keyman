@@ -577,7 +577,7 @@ namespace com.keyman.keyboards {
 
       // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
       if(PInternalName == '') {
-        osk._Hide(false);
+        osk.startHide(false);
 
         if(!this.keymanweb.isEmbedded) {
           util.wait(false);
@@ -624,7 +624,7 @@ namespace com.keyman.keyboards {
             if(!this.keyboardStubs[Ln].asyncLoader) {
               // Always (temporarily) hide the OSK when loading a new keyboard, to ensure that a failure to load doesn't leave the current OSK displayed
               if(osk) {
-                osk._Hide(false);
+                osk.startHide(false);
               }
 
               var loadingStub = this.keyboardStubs[Ln];

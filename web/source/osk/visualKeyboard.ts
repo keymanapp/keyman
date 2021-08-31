@@ -1591,7 +1591,7 @@ namespace com.keyman.osk {
         oskManager.showLanguageMenu();
       } else if(keyName.indexOf('K_ROPT') >= 0) {
         keyman.uiManager.setActivatingUI(false);
-        oskManager._Hide(true);
+        oskManager.startHide(true);
         let active = keyman.domManager.activeElement;
         if(dom.Utils.instanceof(active, "TouchAliasElement")) {
           (active as dom.TouchAliasElement).hideCaret();

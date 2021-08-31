@@ -498,15 +498,6 @@ namespace com.keyman.osk {
       this.doShow(Lpos);
     }
 
-    /**
-     * Hide Keymanweb On Screen Keyboard
-     *
-     * @param       {boolean}   hiddenByUser    Distinguish between hiding on loss of focus and explicit hiding by user
-     */
-    _Hide(hiddenByUser: boolean) {
-      this.startHide(hiddenByUser);
-    }
-
     public startHide(hiddenByUser: boolean) {
       super.startHide(hiddenByUser);
 
