@@ -584,6 +584,20 @@ namespace com.keyman.osk {
       return vkbd;
     }
 
+    public present() {
+      // Do not try to display OSK if no active element
+      if(!this.mayShow()) {
+        return;
+      }
+
+      this.makeVisible();
+      this.setDisplayPositioning();
+
+      if(this.vkbd) {
+        this.vkbd.refit();
+      }
+    }
+
     // Corresponds to the desktop OSK's _Show, but acts as a core, common method 
     // usable by all display patterns.
     protected makeVisible() {
@@ -604,6 +618,17 @@ namespace com.keyman.osk {
         this.keyboardView.showLanguage();
       }
 
+      this._Visible=true;
+
+      /* In case it's still '0' from a hide() operation.
+       * Happens when _Show is called before the transitionend events are processed,
+       * which can happen in bulk-rendering contexts.
+       *
+       * (Opacity is only modified when device.touchable = true, though a couple of extra
+       * conditions may apply.)
+       */
+      this._Box.style.opacity = '1';
+
       // If OSK still hidden, make visible only after all calculation finished
       if(this._Box.style.visibility == 'hidden') {
         let _this = this;
@@ -612,6 +637,8 @@ namespace com.keyman.osk {
         }, 0);
       }
     }
+
+    protected abstract setDisplayPositioning();
 
     public startHide(hiddenByUser: boolean) {
       if(!this.mayHide(hiddenByUser)) {
@@ -668,6 +695,19 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         this.vkbd.onHide();
       }
+    }
+
+    protected mayShow(): boolean {
+      if(!this.activationConditionsMet) {
+        return false;
+      }
+
+      // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
+      if(this.keyboardView instanceof EmptyView || !this.displayIfActive) {
+        return false;
+      }
+
+      return true;
     }
 
     protected mayHide(hiddenByUser: boolean): boolean {

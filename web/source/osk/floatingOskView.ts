@@ -22,6 +22,7 @@ namespace com.keyman.osk {
 
     // OSK positioning fields
     userPositioned: boolean = false;
+    specifiedPosition: boolean = false;
     x: number;
     y: number;
     noDrag: boolean = false;
@@ -441,6 +442,31 @@ namespace com.keyman.osk {
       }
     }
 
+    public setDisplayPositioning() {
+      var Ls = this._Box.style;
+
+      Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
+      Ls.left='0px';
+      if(this.specifiedPosition) {
+        Ls.left = this.x+'px';
+        Ls.top  = this.y+'px';
+      } else {
+        var el = this.activeTarget?.getElement();
+
+        if(this.dfltX) {
+          Ls.left=this.dfltX;
+        } else if(typeof el != 'undefined' && el != null) {
+          Ls.left=dom.Utils.getAbsoluteX(el) + 'px';
+        }
+
+        if(this.dfltY) {
+          Ls.top=this.dfltY;
+        } else if(typeof el != 'undefined' && el != null) {
+          Ls.top=(dom.Utils.getAbsoluteY(el) + el.offsetHeight)+'px';
+        }
+      }
+    }
+
     /**
      * Display KMW OSK at specified position (returns nothing)
      *
@@ -448,53 +474,21 @@ namespace com.keyman.osk {
      * @param       {number=}     Py      y-coordinate for OSK rectangle
      */
     _Show(Px?: number, Py?: number) {
-      if(!this.activationConditionsMet) {
+      if(!this.mayShow()) {
         return;
       }
 
-      // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if(this.activeKeyboard == null || !this.displayIfActive) {
-        return;
+      this.specifiedPosition = Px >= 0 || Py >= 0; //probably never happens, legacy support only
+      if(this.specifiedPosition) { 
+        this.x = Px;
+        this.y = Py;
       }
 
-      this.makeVisible();
-
-      var Ls = this._Box.style;
-
-      Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
-      Ls.left='0px';
-      if(Px >= 0) { //probably never happens, legacy support only
-        Ls.left = Px + 'px'; Ls.top = Py + 'px';
-      } else {
-        if(this.userPositioned) {
-          Ls.left=this.x+'px';
-          Ls.top=this.y+'px';
-        } else {
-          var el = this.activeTarget?.getElement();
-
-          if(this.dfltX) {
-            Ls.left=this.dfltX;
-          } else if(typeof el != 'undefined' && el != null) {
-            Ls.left=dom.Utils.getAbsoluteX(el) + 'px';
-          }
-
-          if(this.dfltY) {
-            Ls.top=this.dfltY;
-          } else if(typeof el != 'undefined' && el != null) {
-            Ls.top=(dom.Utils.getAbsoluteY(el) + el.offsetHeight)+'px';
-          }
-        }
-      }
-
-      this._Visible=true;
-
-      if(this.vkbd) {
-        this.vkbd.refit();
-      }
-
-      this.saveCookie();
-
+      // Combines the two paths with set positioning.
+      this.specifiedPosition = this.specifiedPosition || this.userPositioned;
       this.desktopLayout.titleBar.showPin(this.userPositioned);
+
+      this.present();
 
       // Allow desktop UI to execute code when showing the OSK
       var Lpos={};

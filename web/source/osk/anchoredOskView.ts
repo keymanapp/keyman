@@ -198,30 +198,8 @@ namespace com.keyman.osk {
       return; // I3363 (Build 301)
     }
 
-    /**
-     * Display KMW OSK at specified position (returns nothing)
-     *
-     * @param       {number=}     Px      x-coordinate for OSK rectangle
-     * @param       {number=}     Py      y-coordinate for OSK rectangle
-     */
-    _Show(Px?: number, Py?: number) {
-      // Do not try to display OSK if no active element
-      if(!this.activationConditionsMet || !this.displayIfActive) {
-        return;
-      }
-
-      this.makeVisible();
-
-      var Ls = this._Box.style;
-
-      /* In case it's still '0' from a hide() operation.
-        * Happens when _Show is called before the transitionend events are processed,
-        * which can happen in bulk-rendering contexts.
-        *
-        * (Opacity is only modified when device.touchable = true, though a couple of extra
-        * conditions may apply.)
-        */
-      Ls.opacity='1';
+    protected setDisplayPositioning() {
+      let Ls = this._Box.style;
 
       // The following code will always be executed except for externally created OSK such as EuroLatin
       if(this.vkbd) {
@@ -229,9 +207,17 @@ namespace com.keyman.osk {
         Ls.left=Ls.bottom='0px';
         Ls.border='none';
         Ls.borderTop='1px solid gray';
-
-        this._Visible=true; // I3363 (Build 301)
       }
+    }
+
+    /**
+     * Display KMW OSK at specified position (returns nothing)
+     *
+     * @param       {number=}     Px      x-coordinate for OSK rectangle
+     * @param       {number=}     Py      y-coordinate for OSK rectangle
+     */
+    _Show(Px?: number, Py?: number) {
+      this.present();
     }
 
     /**
