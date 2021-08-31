@@ -495,6 +495,10 @@ namespace com.keyman.osk {
     }
 
     present() {
+      if(!this.mayShow()) {
+        return;
+      }
+
       this.desktopLayout.titleBar.showPin(this.userPositioned);
 
       super.present();
