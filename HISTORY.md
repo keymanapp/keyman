@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.107 alpha 2021-08-31
+
+* fix(linux): Fix launch of km-config (#5631)
+
 ## 15.0.106 alpha 2021-08-30
 
 * fix(linux): Remove Linux workspace (#5654)
