@@ -374,18 +374,25 @@ namespace com.keyman.text {
       /* Clear any pending (non-popup) key */
       osk.vkbd.keyPending = null;
 
-      // Changes for Build 353 to resolve KMEI popup key issues      
+      // Changes for Build 353 to resolve KMEI popup key issues
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
 
       // Can't just split on '-' because some layers like ctrl-shift contain it.
       let separatorIndex = keyName.lastIndexOf('-');
-      var layer = core.keyboardProcessor.layerId;
+      var displayLayer = core.keyboardProcessor.layerId;
       if (separatorIndex > 0) {
-        layer = keyName.substring(0, separatorIndex);
+        displayLayer = keyName.substring(0, separatorIndex);
         keyName = keyName.substring(separatorIndex+1);
       }
-      if(layer == 'undefined') {
-        layer=core.keyboardProcessor.layerId;
+      if(displayLayer == 'undefined') {
+        displayLayer=core.keyboardProcessor.layerId;
+      }
+
+      // Determine the "functional" layer
+      let layer = displayLayer;
+      separatorIndex = keyName.lastIndexOf('+');
+      if (separatorIndex > 0) {
+        layer = keyName.substring(separatorIndex+1);
       }
 
       // Note:  this assumes Lelem is properly attached and has an element interface.
@@ -425,6 +432,11 @@ namespace com.keyman.text {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }
 
+      // Now that we've checked if key is found, split "functional layer" from keyName
+      if (separatorIndex > 0) {
+        keyName = keyName.substring(0, separatorIndex);
+      }
+
       let Codes = com.keyman.text.Codes;
       
       // Check the virtual key 
@@ -435,6 +447,8 @@ namespace com.keyman.text {
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
         kName: keyName,
+        kLayer: layer,
+        kbdLayer: displayLayer,
         kNextLayer: nextLayer,
         vkCode: null, // was originally undefined
         isSynthetic: true,
