@@ -63,7 +63,7 @@ namespace com.keyman.osk {
       this._Box.onmouseout = this._VKbdMouseOut;
 
       if(this.displayIfActive) {
-        this._Show();
+        this.present();
       }
     }
 
@@ -208,16 +208,6 @@ namespace com.keyman.osk {
         Ls.border='none';
         Ls.borderTop='1px solid gray';
       }
-    }
-
-    /**
-     * Display KMW OSK at specified position (returns nothing)
-     *
-     * @param       {number=}     Px      x-coordinate for OSK rectangle
-     * @param       {number=}     Py      y-coordinate for OSK rectangle
-     */
-    _Show(Px?: number, Py?: number) {
-      this.present();
     }
 
     /**

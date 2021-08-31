@@ -239,7 +239,7 @@ namespace com.keyman.osk {
 
     private commonCheckAndDisplay() {
       if(this.activationConditionsMet && this.displayIfActive) {
-        this._Show();
+        this.present();
       } else {
         this.startHide(false);
       }
@@ -590,22 +590,6 @@ namespace com.keyman.osk {
         return;
       }
 
-      this.makeVisible();
-      this.setDisplayPositioning();
-
-      if(this.vkbd) {
-        this.vkbd.refit();
-      }
-    }
-
-    // Corresponds to the desktop OSK's _Show, but acts as a core, common method 
-    // usable by all display patterns.
-    protected makeVisible() {
-      // Do not try to display/render the OSK if undefined or no keyboard is loaded.
-      if(!this._Box || !this.keyboardView) {
-        return;
-      }
-
       // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
       this.keyboardView.updateState();
 
@@ -621,11 +605,9 @@ namespace com.keyman.osk {
       this._Visible=true;
 
       /* In case it's still '0' from a hide() operation.
-       * Happens when _Show is called before the transitionend events are processed,
-       * which can happen in bulk-rendering contexts.
        *
-       * (Opacity is only modified when device.touchable = true, though a couple of extra
-       * conditions may apply.)
+       * (Opacity is only modified when device.touchable = true, 
+       * though a couple of extra conditions may apply.)
        */
       this._Box.style.opacity = '1';
 
@@ -635,6 +617,12 @@ namespace com.keyman.osk {
         window.setTimeout(function() {
           _this._Box.style.visibility = 'visible';
         }, 0);
+      }
+
+      this.setDisplayPositioning();
+
+      if(this.vkbd) {
+        this.vkbd.refit();
       }
     }
 
@@ -703,8 +691,12 @@ namespace com.keyman.osk {
       }
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if(this.keyboardView instanceof EmptyView || !this.displayIfActive) {
+      if(!this.keyboardView || this.keyboardView instanceof EmptyView || !this.displayIfActive) {
         return false;
+      }
+
+      if(!this._Box) {
+        return;
       }
 
       return true;
@@ -841,17 +833,6 @@ namespace com.keyman.osk {
      * The simplest way forward is to maintain them, then resolve them independently,
      * one at a time.
      */
-  
-    /*
-     * Display KMW OSK at specified position (returns nothing)
-     * 
-     * The positioning parameters only make sense for the FloatingOSKView type;
-     * other implementations should use no parameters whatsoever.
-     *
-     * @param       {number=}     Px      x-coordinate for OSK rectangle
-     * @param       {number=}     Py      y-coordinate for OSK rectangle
-     */
-    public abstract _Show(Px?: number, Py?: number);
 
     /**
      * Display build number

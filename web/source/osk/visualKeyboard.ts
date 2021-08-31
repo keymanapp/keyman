@@ -1175,7 +1175,8 @@ namespace com.keyman.osk {
           layerElement.style.display='block';
           //b[n].style.visibility='visible';
 
-          // If osk._Show has been called, there's probably been a change in modifier or state key state.  Keep it updated!
+          // Most functions that call this one often indicate a change in modifier 
+          // or state key state.  Keep it updated!
           this._UpdateVKShiftStyle();
         } else {
           layerElement.style.display='none';

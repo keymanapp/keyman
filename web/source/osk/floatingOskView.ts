@@ -78,7 +78,7 @@ namespace com.keyman.osk {
       this.loadCookie();
 
       if(this.displayIfActive) {
-        this._Show();
+        this.present();
       }
     }
 
@@ -104,7 +104,7 @@ namespace com.keyman.osk {
       this.saveCookie();
 
       if(isVisible) {
-        this._Show();
+        this.present();
       }
 
       this.doResizeMove(); //allow the UI to respond to OSK movements
@@ -465,6 +465,10 @@ namespace com.keyman.osk {
           Ls.top=(dom.Utils.getAbsoluteY(el) + el.offsetHeight)+'px';
         }
       }
+
+      // Unset the flag, keeping 'specified position' specific to single
+      // presentAtPosition calls.
+      this.specifiedPosition = false;
     }
 
     /**
@@ -473,7 +477,7 @@ namespace com.keyman.osk {
      * @param       {number=}     Px      x-coordinate for OSK rectangle
      * @param       {number=}     Py      y-coordinate for OSK rectangle
      */
-    _Show(Px?: number, Py?: number) {
+    presentAtPosition(Px?: number, Py?: number) {
       if(!this.mayShow()) {
         return;
       }
@@ -486,9 +490,14 @@ namespace com.keyman.osk {
 
       // Combines the two paths with set positioning.
       this.specifiedPosition = this.specifiedPosition || this.userPositioned;
-      this.desktopLayout.titleBar.showPin(this.userPositioned);
 
       this.present();
+    }
+
+    present() {
+      this.desktopLayout.titleBar.showPin(this.userPositioned);
+
+      super.present();
 
       // Allow desktop UI to execute code when showing the OSK
       var Lpos={};

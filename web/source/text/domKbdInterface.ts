@@ -106,7 +106,11 @@ namespace com.keyman.text {
 
   KeyboardInterface.prototype['showHelp'] = function(Px: number, Py: number): void {
     let keyman = com.keyman.singleton;
-    keyman.osk._Show(Px,Py);
+    if(keyman.osk instanceof osk.FloatingOSKView) {
+      keyman.osk.presentAtPosition(Px,Py);
+    } else {
+      keyman.osk.present();
+    }
   }
 
   KeyboardInterface.prototype['showPinnedHelp'] = function(): void {
@@ -114,7 +118,10 @@ namespace com.keyman.text {
     if(keyman.osk instanceof osk.FloatingOSKView) {
       keyman.osk.userPositioned=true;
     }
-    keyman.osk._Show(-1,-1);
+    // Automatically reuses previously-set positioning.
+    // Other OSK API functions must have previously been used to set the 
+    // pinned position.
+    keyman.osk.present();
   }
 
   // Also needed for some legacy CJK keyboards.
