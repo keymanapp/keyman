@@ -179,6 +179,13 @@ namespace com.keyman.osk {
       this._boxBaseTouchStart = null;
     }
 
+    /**
+     * Gets and sets the IME-like interface (`OutputTarget`) to be affected by events from
+     * the OSK.
+     * 
+     * If `activationMode` is `'conditional'`, this property's state controls the visibility
+     * of the OSKView.
+     */
     public get activeTarget(): text.OutputTarget {
       return this._target;
     }
@@ -188,6 +195,14 @@ namespace com.keyman.osk {
       this.commonCheckAndDisplay();
     }
 
+    /**
+     * Determines the activation state model used to control presentation of the OSK.
+     * - `'conditional'`:  Only displays if `activeTarget` is non-null - if there is an active
+     * target that can receive the OSK's context-manipulation events.
+     * - `'manual'`:  Display is directly controlled by manipulating the value of `displayIfActive`.
+     *   It may be displayed while `activeTarget` is `null`.
+     * - `'static'`:  The OSK should be permanently displayed and may never be hidden.
+     */
     get activationMode(): ActivationMode {
       if(!this._activationMode) {
         this._activationMode = ActivationMode.conditional;
@@ -201,7 +216,11 @@ namespace com.keyman.osk {
       this.commonCheckAndDisplay();
     }
 
-    get activationConditionsMet(): boolean {
+    /**
+     * Implementation of the activation modeling described in the documentation for
+     * `activationMode`.
+     */
+    protected get activationConditionsMet(): boolean {
       switch(this.activationMode) {
         case 'manual':
           return true;
@@ -215,6 +234,15 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * A property denoting whether or not the OSK should be presented if it meets its
+     * activation conditions. 
+     * 
+     * When `activationMode == 'manual'`, `displayIfActive == true` is the lone
+     * activation condition.
+     * 
+     * Note: cannot be set to `false` if `activationMode == 'static'`.
+     */
     get displayIfActive(): boolean {
       return this._displayIfActive;
     }
@@ -237,6 +265,10 @@ namespace com.keyman.osk {
       this.commonCheckAndDisplay();
     }
 
+    /**
+     * Used by the activation & visibility properties as a common helper; all of their
+     * setters rely on this function to manage presentation (showing / hiding) of the OSK.
+     */
     private commonCheckAndDisplay() {
       if(this.activationConditionsMet && this.displayIfActive) {
         this.present();
@@ -630,19 +662,34 @@ namespace com.keyman.osk {
       this.setDisplayPositioning();
     }
 
+    /**
+     * Method usable by subclasses of OSKView to control that OSKView type's
+     * positioning behavior when needed by the present() method.
+     */
     protected abstract setDisplayPositioning();
 
-    public startHide(hiddenByUser: boolean) {
+    /**
+     * Method used to start a potentially-asynchronous hide of the OSK.
+     * @param hiddenByUser `true` if this hide operation was directly requested by the user.
+     */
+    public startHide(hiddenByUser: boolean): void {
       if(!this.mayHide(hiddenByUser)) {
         return;
       }
 
       if(hiddenByUser) {
+        // The one location outside of the `displayIfActive` property that bypasses the setter.
+        // Avoids needless recursion that could be triggered by it, as we're already in the
+        // process of hiding the OSK anyway.
         this._displayIfActive = ((this.keyboard.isCJK || this.hostDevice.touchable)? true : false); // I3363 (Build 301)
       }
 
       let promise: Promise<boolean> = null;
       if(this._Box && this.hostDevice.touchable && !(this.keyboardView instanceof EmptyView)) {
+        /**
+         * Note:  this refactored code appears to reflect a currently-dead code path.  14.0's
+         * equivalent is either extremely niche or is actually inaccessible.
+         */
         promise = this.useHideAnimation();
       } else {
         promise = Promise.resolve(true);
@@ -666,6 +713,9 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * Performs the _actual_ logic and functionality involved in hiding the OSK.
+     */
     protected finalizeHide() {
       if(document.body.className.indexOf('osk-always-visible') >= 0) {
         return;
@@ -684,6 +734,10 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * 
+     * @returns `false` if the OSK is in an invalid state for being presented to the user.
+     */
     protected mayShow(): boolean {
       if(!this.activationConditionsMet) {
         return false;
@@ -701,6 +755,11 @@ namespace com.keyman.osk {
       return true;
     }
 
+    /**
+     * 
+     * @param hiddenByUser 
+     * @returns `false` if the OSK is in an invalid state for being hidden from the user.
+     */
     protected mayHide(hiddenByUser: boolean): boolean {
       if(this.activationMode != 'conditional' && this.displayIfActive) {
         return false;
@@ -716,6 +775,18 @@ namespace com.keyman.osk {
       return true;
     }
 
+    /**
+     * Applies CSS styling and handling needed to perform a fade animation when
+     * hiding the OSK.
+     * 
+     * Note:  currently reflects an effectively-dead code path, though this is
+     * likely not intentional.  Other parts of the KMW engine seem to call hideNow()
+     * synchronously after each and every part of the engine that calls this function,
+     * cancelling the Promise.
+     * 
+     * @returns A Promise denoting either cancellation of the hide (`false`) or
+     * completion of the hide & its animation (`true`)
+     */
     protected useHideAnimation(): Promise<boolean> {
       const os = this._Box.style;
       const _this = this;
@@ -767,6 +838,11 @@ namespace com.keyman.osk {
       });
     }
 
+    /**
+     * Used to synchronously hide the OSK, cancelling any async hide animations that have
+     * not started and immediately completing the hide of any hide ops pending completion
+     * of their animation.
+     */
     public hideNow() {
       // Two possible uses for _animatedHideResolver:
       // - _animatedHideTimeout is set:   animation is waiting to start
@@ -859,10 +935,9 @@ namespace com.keyman.osk {
       menu.show();
     }
 
-    // OSK state fields
+    // OSK state fields & events
     //
-    // They're not very well defined or encapsulated; there's definitely room for more
-    // "polish" here.
+    // These are relatively stable and may be preserved as they are.
     _Visible: boolean = false;
 
     /**
