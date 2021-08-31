@@ -91,7 +91,7 @@ namespace com.keyman.osk {
      */
     ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: FloatingOSKView, keepDefaultPosition?: boolean) {
       let isVisible = this._Visible;
-      if(isVisible) {
+      if(isVisible && this.activeTarget instanceof dom.targets.OutputTarget) {
         this.activeTarget?.focus();  // I2036 - OSK does not unpin to correct location
       }
 
@@ -451,7 +451,10 @@ namespace com.keyman.osk {
         Ls.left = this.x+'px';
         Ls.top  = this.y+'px';
       } else {
-        var el = this.activeTarget?.getElement();
+        let el: HTMLElement = null;
+        if(this.activeTarget instanceof dom.targets.OutputTarget) {
+          el = this.activeTarget?.getElement();
+        }
 
         if(this.dfltX) {
           Ls.left=this.dfltX;

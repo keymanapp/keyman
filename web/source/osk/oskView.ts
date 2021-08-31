@@ -40,7 +40,7 @@ namespace com.keyman.osk {
 
     private keyboard: keyboards.Keyboard;
 
-    private _target:     dom.targets.OutputTarget;
+    private _target:  text.OutputTarget;
     
     /**
      * The configured width for this OSKManager.  May be `undefined` or `null`
@@ -179,11 +179,11 @@ namespace com.keyman.osk {
       this._boxBaseTouchStart = null;
     }
 
-    public get activeTarget(): dom.targets.OutputTarget {
+    public get activeTarget(): text.OutputTarget {
       return this._target;
     }
 
-    public set activeTarget(targ: dom.targets.OutputTarget) {
+    public set activeTarget(targ: text.OutputTarget) {
       this._target = targ;
       this.commonCheckAndDisplay();
     }
@@ -584,7 +584,15 @@ namespace com.keyman.osk {
       return vkbd;
     }
 
-    public present() {
+    /**
+     * The main function for presenting the OSKView.
+     * 
+     * This includes:
+     * - refreshing its layout
+     * - displaying it
+     * - positioning it
+     */
+    public present(): void {
       // Do not try to display OSK if no active element
       if(!this.mayShow()) {
         return;
@@ -620,10 +628,6 @@ namespace com.keyman.osk {
       }
 
       this.setDisplayPositioning();
-
-      if(this.vkbd) {
-        this.vkbd.refit();
-      }
     }
 
     protected abstract setDisplayPositioning();
@@ -657,17 +661,12 @@ namespace com.keyman.osk {
       this.doHide(p);
 
       // If hidden by the UI, be sure to restore the focus
-      if(hiddenByUser) {
+      if(hiddenByUser && this.activeTarget instanceof dom.targets.OutputTarget) {
         this.activeTarget?.focus();
       }
     }
 
     protected finalizeHide() {
-      // Save current size if visible
-      if(this._Box && this._Box.style.display == 'block' && this.keyboardView instanceof VisualKeyboard) {
-        this.keyboardView.refit();
-      }
-
       if(document.body.className.indexOf('osk-always-visible') >= 0) {
         return;
       }

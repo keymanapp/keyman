@@ -309,15 +309,6 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Called by OSKManager after resize operations in order to determine the final
-     * size actually used by the visual keyboard.
-     */
-    public refit() {  // TODO:  Should probably remove; VisualKeyboard shouldn't be responsible for it.
-      this._width  = this.kbdDiv.offsetWidth;
-      this._height = this.kbdDiv.offsetHeight;
-    }
-
-    /**
      * Returns the default properties for a key object, used to construct
      * both a base keyboard key and popup keys
      *
