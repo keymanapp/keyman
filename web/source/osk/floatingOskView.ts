@@ -448,8 +448,7 @@ namespace com.keyman.osk {
      * @param       {number=}     Py      y-coordinate for OSK rectangle
      */
     _Show(Px?: number, Py?: number) {
-      // Do not try to display OSK if no active element
-      if(!this.activeTarget) {
+      if(!this.activationConditionsMet) {
         return;
       }
 

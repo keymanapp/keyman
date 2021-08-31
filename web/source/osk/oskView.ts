@@ -77,9 +77,7 @@ namespace com.keyman.osk {
     //
     private _activationMode: ActivationMode = ActivationMode.conditional;
     private _displayIfActive: boolean = true;
-    private _manualShouldDisplay: boolean = true;
 
-    private _currentlyBuffering: boolean = false;
     private _animatedHideTimeout: number;
     private _animatedHideResolver: () => void;
 
@@ -239,22 +237,7 @@ namespace com.keyman.osk {
       this.commonCheckAndDisplay();
     }
 
-    protected get currentlyBuffering(): boolean {
-      return this._currentlyBuffering;
-    }
-
-    protected set currentlyBuffering(flag: boolean) {
-      this._currentlyBuffering = flag;
-      this.commonCheckAndDisplay();
-    }
-
     private commonCheckAndDisplay() {
-      // If other code has noted that display-related changes are currently accumulating,
-      // bypass display logic.
-      if(this._currentlyBuffering) {
-        return;
-      }
-
       if(this.activationConditionsMet && this.displayIfActive) {
         this._Show();
       } else {

@@ -206,7 +206,7 @@ namespace com.keyman.osk {
      */
     _Show(Px?: number, Py?: number) {
       // Do not try to display OSK if no active element
-      if(!this.activeTarget) {
+      if(!this.activationConditionsMet || !this.displayIfActive) {
         return;
       }
 
