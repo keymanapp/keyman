@@ -225,7 +225,7 @@ namespace com.keyman.osk {
      * and the primary keyboard visualization elements.
      */
     get baseFontSize(): string {
-      return this.parsedBaseFontSize.styleString;
+      return this.parsedBaseFontSize?.styleString;
     }
 
     protected get parsedBaseFontSize(): ParsedLengthStyle {
@@ -294,9 +294,18 @@ namespace com.keyman.osk {
       }
 
       this.needsLayout = this.needsLayout || mutatedFlag;
+      this.refreshLayoutIfNeeded(pending);
     }
 
-    public refreshLayout(): void {
+    protected setNeedsLayout() {
+      this.needsLayout = true;
+    }
+
+    public refreshLayout(pending?: boolean): void {
+      if(!this.keyboardView) {
+        return;
+      }
+
       // Step 1:  have the necessary conditions been met?
       const fixedSize = this.width && this.height && this.width.absolute && this.height.absolute;
       const computedStyle = getComputedStyle(this._Box);
@@ -318,9 +327,11 @@ namespace com.keyman.osk {
       this.needsLayout = false;
 
       // Step 3:  perform layout operations.
-      this.headerView?.refreshLayout();
-      this.bannerView.refreshLayout();
-      this.footerView?.refreshLayout();
+      if(!pending) {
+        this.headerView?.refreshLayout();
+        this.bannerView.refreshLayout();
+        this.footerView?.refreshLayout();
+      }
 
       if(this.vkbd) {
         let availableHeight = this.computedHeight - this.computeFrameHeight();
@@ -329,8 +340,10 @@ namespace com.keyman.osk {
         if(this.bannerView.height > 0) {
           availableHeight -= this.bannerView.height + 5;
         }
-        this.vkbd.setSize(this.computedWidth, availableHeight);
-        this.vkbd.refreshLayout();
+        this.vkbd.setSize(this.computedWidth, availableHeight, pending);
+        if(!pending) {
+          this.vkbd.refreshLayout();
+        }
 
         if(this.vkbd.usesFixedHeightScaling) {
           var b: HTMLElement = this._Box, bs=b.style;
@@ -339,9 +352,9 @@ namespace com.keyman.osk {
       }
     }
 
-    public refreshLayoutIfNeeded() {
+    public refreshLayoutIfNeeded(pending?: boolean) {
       if(this.needsLayout) {
-        this.refreshLayout();
+        this.refreshLayout(pending);
       }
     }
 
@@ -371,6 +384,7 @@ namespace com.keyman.osk {
         this.vkbd.shutdown();
       }
       this.keyboardView = null;
+      this.needsLayout = true;
 
       // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
       this._Box.innerHTML = '';
