@@ -72,7 +72,7 @@ def get_ibus_keyboard_id(keyboard, packageDir, language=None, ignore_language=Fa
     kmx_file = os.path.join(packageDir, keyboard['id'] + ".kmx")
     if ignore_language:
         return kmx_file
-    if language is not None:
+    if language is not None and language != '':
         logging.debug(language)
         return "%s:%s" % (language, kmx_file)
     if "languages" in keyboard and len(keyboard["languages"]) > 0:
