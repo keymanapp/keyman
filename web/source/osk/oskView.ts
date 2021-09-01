@@ -413,7 +413,7 @@ namespace com.keyman.osk {
       if(Number.isInteger(height as number)) {
         parsedHeight = ParsedLengthStyle.inPixels(height as number);
       } else {
-        parsedWidth = new ParsedLengthStyle(height as LengthStyle);
+        parsedHeight = new ParsedLengthStyle(height as LengthStyle);
       }
 
       if(width && height) {
@@ -598,7 +598,7 @@ namespace com.keyman.osk {
     }.bind(this);
 
     private _GenerateKeyboardView(keyboard: keyboards.Keyboard): KeyboardView {
-      let device = com.keyman.singleton.util.device;
+      let device = this.device;
 
       if(this.vkbd) {
         this.vkbd.shutdown();
@@ -635,10 +635,10 @@ namespace com.keyman.osk {
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
     private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard): VisualKeyboard {
-      let device = com.keyman.singleton.util.device;
+      let device = this.device;
 
       // Root element sets its own classes, one of which is 'kmw-osk-inner-frame'.
-      let vkbd = new VisualKeyboard(keyboard, device);
+      let vkbd = new VisualKeyboard(keyboard, device, this.hostDevice);
 
       // Ensure the OSK's current layer is kept up to date.
       let core = com.keyman.singleton.core; // Note:  will eventually be a class field.
@@ -879,6 +879,9 @@ namespace com.keyman.osk {
      * of their animation.
      */
     public hideNow() {
+      if(!this.mayHide(false)) {
+        return;
+      }
       // Two possible uses for _animatedHideResolver:
       // - _animatedHideTimeout is set:   animation is waiting to start
       // - _animatedHideTimeout is null:  animation has already started.

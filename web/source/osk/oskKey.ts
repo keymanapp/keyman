@@ -383,7 +383,7 @@ namespace com.keyman.osk {
         case '*ZWNJ*':
           // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
           // possible / available though, and there's a different standard symbol on Android.
-          oldText = vkbd.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+          oldText = vkbd.device.OS == com.keyman.utils.OperatingSystem.Android ?
             '*ZWNJAndroid*' :
             '*ZWNJiOS*';
           break;

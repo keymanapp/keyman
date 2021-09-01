@@ -26,14 +26,14 @@
 
 /* Now for divergent properties & target-device styling */
 
-.phone.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
+.phone.kmw-osk-frame{left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         -webkit-user-select:none;}
 .phone .kmw-osk-inner-frame{margin:0;background:transparent;}
-.phone .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
-.phone .kmw-key-layer{position:fixed;left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
+.phone .kmw-key-layer-group{left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
+.phone .kmw-key-layer{left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
 .phone .kmw-key-square {height:100%;max-height:100%;overflow:visible;background-color:transparent;cursor:default;-webkit-tap-highlight-color:rgba(0,0,0,0)}
 .phone .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001;padding:0; background-color:transparent;cursor:default;}
-.phone .kmw-key {border-radius:6px;overflow:hidden;border:solid 2px #999999;box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}
+.phone .kmw-key {border-radius:6px;overflow:hidden;box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}
 
 .phone .kmw-suggestion-text,
 .tablet .kmw-suggestion-text {
@@ -170,11 +170,11 @@
 
 .phone.android .kmw-suggest-option.kmw-suggest-touched {background-color:#bbb;}
 
-.tablet.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
+.tablet.kmw-osk-frame{left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
 .tablet .kmw-osk-inner-frame{margin:0;background:transparent;}
-.tablet .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
-.tablet .kmw-key-layer{position:fixed;left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
+.tablet .kmw-key-layer-group{;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
+.tablet .kmw-key-layer{left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
 .tablet .kmw-key-square {height:100%; max-height:100%; overflow:hidden;background-color:transparent;cursor:default;-webkit-tap-highlight-color:rgba(0,0,0,0)}
 .tablet .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001; padding:0; background-color:transparent; cursor:default;}  
 .tablet .kmw-key {border-radius:8px;overflow:visible;border:solid 2px #999999;box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}

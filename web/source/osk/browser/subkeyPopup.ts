@@ -160,7 +160,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Add the callout
-      if(vkbd.device.formFactor != 'phone' || vkbd.device.OS != 'iOS') {
+      if(vkbd.device.formFactor != 'phone' || vkbd.device.OS != 'ios') {
         this.callout = this.addCallout(e, delta);
       }
     }

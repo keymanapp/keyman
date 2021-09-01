@@ -16,22 +16,15 @@ namespace com.keyman.osk {
   type OSKPos = {'left'?: number, 'top'?: number};
 
   export class InlinedOSKView extends OSKView {
-    desktopLayout: layouts.TargetedFloatLayout;
-
-    // OSK positioning fields
-    x: number;
-    y: number;
-
     // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
     modifierCodes = text.Codes.modifierCodes;
     modifierBitmasks = text.Codes.modifierBitmasks;
     stateBitmasks = text.Codes.stateBitmasks;
     keyCodes = text.Codes.keyCodes;
 
-    public constructor(modeledDevice: utils.DeviceSpec) {
-      super(modeledDevice);
+    public constructor(modeledDevice: utils.DeviceSpec, hostDevice?: utils.DeviceSpec) {
+      super(modeledDevice, hostDevice);
 
-      document.body.appendChild(this._Box);
       this.activationMode = ActivationMode.manual;
     }
 
@@ -53,6 +46,7 @@ namespace com.keyman.osk {
     protected setBoxStyling() {
       const s = this._Box.style;
       s.display  = 'none';
+      s.position = 'static';
     }
 
     protected postKeyboardLoad() {
@@ -136,8 +130,8 @@ namespace com.keyman.osk {
     **/
     getPos(): OSKPos {
       var Lkbd=this._Box, p={
-        left: this._Visible ? Lkbd.offsetLeft : this.x,
-        top: this._Visible ? Lkbd.offsetTop : this.y
+        left: this._Visible ? Lkbd.offsetLeft : undefined,
+        top:  this._Visible ? Lkbd.offsetTop  : undefined
       };
 
       return p;

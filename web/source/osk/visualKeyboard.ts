@@ -34,7 +34,8 @@ namespace com.keyman.osk {
     layerIndex: number = 0; // the index of the default layer
     readonly isRTL: boolean;
 
-    device: Device;
+    device: com.keyman.utils.DeviceSpec;
+    hostDevice: com.keyman.utils.DeviceSpec;
     isStatic: boolean = false;
 
     // Stores the base element for this instance of the visual keyboard.
@@ -126,8 +127,9 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
-    constructor(keyboard: keyboards.Keyboard, device: Device, isStatic?: boolean) {
+    constructor(keyboard: keyboards.Keyboard, device: com.keyman.utils.DeviceSpec, hostDevice?: com.keyman.utils.DeviceSpec, isStatic?: boolean) {
       this.device = device;
+      this.hostDevice = hostDevice || device;
       if(isStatic) {
         this.isStatic = isStatic;
       }
@@ -169,7 +171,7 @@ namespace com.keyman.osk {
       
       // For 'live' touch keyboards, attach touch-based event handling.
       if(!this.isStatic) {
-        if(this.device.touchable) {
+        if(this.hostDevice.touchable) {
           const touchEngine = new TouchEventEngine(this);
           touchEngine.registerEventHandlers();
         } else {
@@ -217,7 +219,13 @@ namespace com.keyman.osk {
 
     get layoutWidth(): ParsedLengthStyle {
       if(this.usesFixedWidthScaling) {
-        return ParsedLengthStyle.inPixels(this.width);
+        let baseWidth = this.width;
+        let cs = getComputedStyle(this.element);
+        if(cs.border) {
+          let borderWidth = new ParsedLengthStyle(cs.borderWidth).val;
+          baseWidth -= borderWidth*2;
+        }
+        return ParsedLengthStyle.inPixels(baseWidth);
       } else {
         return ParsedLengthStyle.forScalar(1);
       }
@@ -225,7 +233,13 @@ namespace com.keyman.osk {
 
     get layoutHeight(): ParsedLengthStyle {
       if(this.usesFixedHeightScaling) {
-        return ParsedLengthStyle.inPixels(this.height);
+        let baseHeight = this.height;
+        let cs = getComputedStyle(this.element);
+        if(cs.border) {
+          let borderHeight = new ParsedLengthStyle(cs.borderWidth).val;
+          baseHeight -= borderHeight*2;
+        }
+        return ParsedLengthStyle.inPixels(baseHeight);
       } else {
         return ParsedLengthStyle.forScalar(1);
       }
@@ -956,7 +970,7 @@ namespace com.keyman.osk {
       // Start:  mirrors _GetKeyEventProperties
 
       // First check the virtual key, and process shift, control, alt or function keys
-      let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device.coreSpec);
+      let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device);
 
       // End - mirrors _GetKeyEventProperties
 
@@ -997,7 +1011,7 @@ namespace com.keyman.osk {
       // repurpose certain state keys, and in an inconsistent manner at that.
       // Considering the potential complexity of touch layouts, with multiple possible
       // layer-shift keys, it's likely best to just leave things as they are for now.
-      if(!core.activeKeyboard?.usesDesktopLayoutOnDevice(this.device.coreSpec)) {
+      if(!core.activeKeyboard?.usesDesktopLayoutOnDevice(this.device)) {
         return;
       }
 
@@ -1186,7 +1200,7 @@ namespace com.keyman.osk {
 
       var fs=1.0;
       // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
-      if(device.OS == 'iOS' && !keyman.isEmbedded) {
+      if(device.OS == 'ios' && !keyman.isEmbedded) {
         fs=fs/keyman.util.getViewportScale();
       }
 
@@ -1409,7 +1423,7 @@ namespace com.keyman.osk {
 
       let layout = PKbd.layout(formFactor);
 
-      let kbdObj = new VisualKeyboard(PKbd, device, true);
+      let kbdObj = new VisualKeyboard(PKbd, device.coreSpec, device.coreSpec, true);
 
       // The 'documentation' format uses the base element's child as the actual display base.
       // Since there's no backing kmw-osk-frame, we do need the static-class kmw-osk-inner-frame
