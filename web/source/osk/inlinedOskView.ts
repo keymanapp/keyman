@@ -35,6 +35,10 @@ namespace com.keyman.osk {
       this.activationMode = ActivationMode.manual;
     }
 
+    public get element(): HTMLDivElement {
+      return this._Box;
+    }
+
     /**
      * Function     _Unload
      * Scope        Private
@@ -44,6 +48,11 @@ namespace com.keyman.osk {
       this.keyboardView = null;
       this.bannerView = null;
       this._Box = null;
+    }
+
+    protected setBoxStyling() {
+      const s = this._Box.style;
+      s.display  = 'none';
     }
 
     protected postKeyboardLoad() {

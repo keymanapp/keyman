@@ -404,13 +404,13 @@ namespace com.keyman.osk {
         return;
       }
 
-      if(width instanceof Number) {
+      if(Number.isInteger(width as number)) {
         parsedWidth = ParsedLengthStyle.inPixels(width as number);
       } else {
         parsedWidth = new ParsedLengthStyle(width as LengthStyle);
       }
 
-      if(height instanceof Number) {
+      if(Number.isInteger(height as number)) {
         parsedHeight = ParsedLengthStyle.inPixels(height as number);
       } else {
         parsedWidth = new ParsedLengthStyle(height as LengthStyle);
