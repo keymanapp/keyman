@@ -440,6 +440,13 @@ namespace com.keyman.osk {
       this.needsLayout = false;
 
       // Step 3:  perform layout operations.
+      if(!this._baseFontSize && this.parsedBaseFontSize) {
+        // Make sure to initialize the default font size if it hasn't already been set!
+        this.banner.element.style.fontSize = this.baseFontSize;
+        if(this.vkbd) {
+          this.vkbd.fontSize = this.parsedBaseFontSize;
+        }
+      }
       if(!pending) {
         this.headerView?.refreshLayout();
         this.bannerView.refreshLayout();
@@ -511,13 +518,9 @@ namespace com.keyman.osk {
 
       // Add suggestion banner bar to OSK
       this._Box.appendChild(this.banner.element);
-      this.banner.element.style.fontSize = this.baseFontSize;
 
       let kbdView: KeyboardView = this.keyboardView = this._GenerateKeyboardView(this.activeKeyboard);
       this._Box.appendChild(kbdView.element);
-      if(kbdView instanceof VisualKeyboard) {
-        kbdView.fontSize = this.parsedBaseFontSize;
-      }
       kbdView.postInsert();
 
       // Add footer element to OSK only for desktop browsers
