@@ -363,12 +363,10 @@ namespace com.keyman.osk {
 
     protected abstract postKeyboardLoad(): void;
 
-    private loadActiveKeyboard() {
-      let device = this.device;
+    protected abstract setBoxStyling(): void;
 
-      var s = this._Box.style;
-      s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
-      s.position = (device.formFactor == 'desktop' ? 'absolute' : 'fixed');
+    private loadActiveKeyboard() {
+      this.setBoxStyling();
 
       if(this.vkbd) {
         this.vkbd.shutdown();
