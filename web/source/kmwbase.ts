@@ -21,6 +21,7 @@
 // Defines OSK management code.
 /// <reference path="osk/anchoredOskView.ts" />
 /// <reference path="osk/floatingOskView.ts" />
+/// <reference path="osk/inlinedOskView.ts" />
 // Defines the model manager.
 /// <reference path="text/prediction/modelManager.ts" />
 

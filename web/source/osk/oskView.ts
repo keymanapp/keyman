@@ -386,18 +386,38 @@ namespace com.keyman.osk {
       }
     }
 
-    /* private */ computeFrameHeight(): number {
+    private computeFrameHeight(): number {
       return (this.headerView?.layoutHeight.val || 0) + (this.footerView?.layoutHeight.val || 0);
     }
 
-    /*private*/ setSize(width?: number, height?: number, pending?: boolean) {
+    setSize(width?: number | LengthStyle, height?: number | LengthStyle, pending?: boolean) {
       let mutatedFlag = false;
+
+      let parsedWidth: ParsedLengthStyle;
+      let parsedHeight: ParsedLengthStyle;
+
+      if(!width && width !== 0) {
+        return;
+      }
+
+      if(!height && height !== 0) {
+        return;
+      }
+
+      if(width instanceof Number) {
+        parsedWidth = ParsedLengthStyle.inPixels(width as number);
+      } else {
+        parsedWidth = new ParsedLengthStyle(width as LengthStyle);
+      }
+
+      if(height instanceof Number) {
+        parsedHeight = ParsedLengthStyle.inPixels(height as number);
+      } else {
+        parsedWidth = new ParsedLengthStyle(height as LengthStyle);
+      }
 
       if(width && height) {
         mutatedFlag = !this._width || !this._height;
-
-        const parsedWidth = ParsedLengthStyle.inPixels(width);
-        const parsedHeight = ParsedLengthStyle.inPixels(height);
 
         mutatedFlag = mutatedFlag || parsedWidth.styleString  != this._width.styleString;
         mutatedFlag = mutatedFlag || parsedHeight.styleString != this._height.styleString;
