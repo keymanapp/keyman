@@ -71,7 +71,14 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         this.footerView = layout.resizeBar;
         this._Box.appendChild(this.footerView.element);
+      } else {
+        if(this.footerView) {
+          this._Box.removeChild(this.footerView.element);
+        }
+        this.footerView = null;
       }
+
+      this.setNeedsLayout();
 
       if(this._Enabled) {
         this._Show();
