@@ -1137,12 +1137,14 @@ public final class KMManager {
    * Sets mayPredictOverride true if the InputType field is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * Also true for numeric text fields
    * @param inputType android.text.InputType
    */
   public static void setMayPredictOverride(int inputType) {
     mayPredictOverride =
       ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
-       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)));
+       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)) ||
+       isNumericField(inputType));
   }
 
   /**
@@ -1151,6 +1153,16 @@ public final class KMManager {
    */
   public static boolean getMayPredictOverride() {
     return mayPredictOverride;
+  }
+
+  /**
+   * Determines if the InputType field is a numeric field
+   * @param inputType
+   * @return boolean
+   */
+  public static boolean isNumericField(int inputType) {
+    return (((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER) ||
+      ((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_PHONE));
   }
 
   /**
