@@ -395,12 +395,6 @@ namespace com.keyman.osk {
       if(this.footerView) {
         this._Box.appendChild(this.footerView.element);
       }
-
-      // Initializes the size of a touch keyboard.
-      if(this.vkbd && device.touchable) {
-        let targetOSKHeight = this.vkbd.computedAdjustedOskHeight(this.getDefaultKeyboardHeight());
-        this.setSize(this.getDefaultWidth(), targetOSKHeight + this.banner.height);
-      }
       // END:  construction of the actual internal layout for the overall OSK
 
       // Correct the classname for the (inner) OSK frame (Build 360)

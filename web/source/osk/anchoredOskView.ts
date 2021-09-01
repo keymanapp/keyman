@@ -46,6 +46,12 @@ namespace com.keyman.osk {
     }
 
     protected postKeyboardLoad() {
+      // Initializes the size of a touch keyboard.
+      if(this.vkbd && this.device.touchable) {
+        let targetOSKHeight = this.vkbd.computedAdjustedOskHeight(this.getDefaultKeyboardHeight());
+        this.setSize(this.getDefaultWidth(), targetOSKHeight + this.banner.height);
+      }
+
       this._Visible = false;  // I3363 (Build 301)
 
       this._Box.onmouseover = this._VKbdMouseOver;
