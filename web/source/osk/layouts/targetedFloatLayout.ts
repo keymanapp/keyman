@@ -46,6 +46,7 @@ namespace com.keyman.osk.layouts {
 
     attachToView(view: FloatingOSKView) {
       this.oskView = view;
+      this.titleBar.attachHandlers(view);
       this.titleDragHandler.enabled = !view.noDrag;
       this.resizeDragHandler.enabled = true; // by default.
     }
