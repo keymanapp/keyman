@@ -284,14 +284,6 @@ namespace com.keyman.osk {
       }
 
       this.needsLayout = this.needsLayout || mutatedFlag;
-
-      if(this.vkbd) {
-        let availableHeight = height - this.computeFrameHeight();
-        if(this.bannerView.height > 0) {
-          availableHeight -= this.bannerView.height + 5;
-        }
-        this.vkbd.setSize(width, availableHeight, pending);
-      }
     }
 
     public refreshLayout(): void {
