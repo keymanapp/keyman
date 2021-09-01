@@ -59,6 +59,15 @@ namespace com.keyman.osk {
       this._Box = null;
     }
 
+    protected setBoxStyling() {
+      const s = this._Box.style;
+
+      s.zIndex   = '9999';
+      s.display  = 'none';
+      s.width    = 'auto';
+      s.position = 'absolute';
+    }
+
     protected postKeyboardLoad() {
       this._Visible = false;  // I3363 (Build 301)
 

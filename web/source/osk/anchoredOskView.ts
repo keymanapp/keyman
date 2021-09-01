@@ -50,6 +50,15 @@ namespace com.keyman.osk {
       this._Box = null;
     }
 
+    protected setBoxStyling() {
+      const s = this._Box.style;
+
+      s.zIndex   = '9999';
+      s.display  = 'none';
+      s.width    = '100%';
+      s.position = 'fixed';
+    }
+
     protected postKeyboardLoad() {
       // Initializes the size of a touch keyboard.
       if(this.vkbd && this.device.touchable) {
