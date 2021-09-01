@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.108 alpha 2021-09-01
+
+* fix(linux): Use first keyboard language if none given (#5655)
+
 ## 15.0.107 alpha 2021-08-31
 
 * fix(linux): Fix launch of km-config (#5631)
