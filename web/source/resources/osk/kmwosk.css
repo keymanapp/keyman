@@ -318,6 +318,10 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   border-radius: 0 0 6px 6px; z-index:10001; pointer-events:none;
 }
 
+#kmw-keytip {
+  z-index: 10000
+}
+
 /* Key preview styles */
 div.ios div.kmw-keytip {
   position:fixed; left:0; top:0; width:3em; height:3em; background-color:rgb(0,0,0,0);overflow:visible;
