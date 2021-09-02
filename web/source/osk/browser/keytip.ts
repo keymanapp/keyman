@@ -32,7 +32,11 @@ namespace com.keyman.osk.browser {
 
       // Create and display the preview
       if(on) {
-        var xLeft = dom.Utils.getAbsoluteX(key),
+        // The key element is positioned relative to its key-square, which is,
+        // in turn, relative to its row.  Rows take 100% width, so this is sufficient.
+        //
+        // May need adjustment for borders if ever enabled for the desktop form-factor target.
+        var xLeft = (key.offsetParent as HTMLElement).offsetLeft,
             xWidth = key.offsetWidth,
             xHeight = key.offsetHeight,
             kc = key.key.label,
@@ -47,7 +51,8 @@ namespace com.keyman.osk.browser {
         kts.top = 'auto';
         // Matches how the subkey positioning is set.
         let rowElement = (key.key as OSKBaseKey).row.element;
-        kts.bottom = (vkbd.height - rowElement.offsetHeight - rowElement.offsetTop) + 'px';
+        const _Box = vkbd.element.parentNode as HTMLDivElement;
+        kts.bottom = _Box.offsetHeight - rowElement.offsetHeight - rowElement.offsetTop + 'px'; 
         kts.textAlign = 'center';
         kts.overflow = 'visible';
         kts.fontFamily = util.getStyleValue(kc,'font-family');

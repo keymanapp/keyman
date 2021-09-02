@@ -46,7 +46,9 @@ namespace com.keyman.osk {
     protected setBoxStyling() {
       const s = this._Box.style;
       s.display  = 'none';
-      s.position = 'static';
+      // Positioned with no relative offset from its default position.
+      // This allows _Box to still serve as an offsetParent for keytip & subkey menu positioning.
+      s.position = 'relative';
     }
 
     protected postKeyboardLoad() {

@@ -314,7 +314,7 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 
 /* Style for callout used on phones */
 #kmw-popup-callout {
-  position:fixed; display:block; background-color: #fdfdfe; 
+  position:absolute; display:block; background-color: #fdfdfe; 
   border-radius: 0 0 6px 6px; z-index:10001; pointer-events:none;
 }
 
@@ -324,7 +324,7 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 
 /* Key preview styles */
 div.ios div.kmw-keytip {
-  position:fixed; left:0; top:0; width:3em; height:3em; background-color:rgb(0,0,0,0);overflow:visible;
+  position:absolute; left:0; top:0; width:3em; height:3em; background-color:rgb(0,0,0,0);overflow:visible;
 }
 
 /* Dark mode - ensure text is colored appropriately for key tips. */
@@ -340,7 +340,7 @@ div.ios div.kmw-keytip {
 }
 
 div.android div.kmw-keytip {
-  position:fixed; left:0; top:0; width:3em; height:3em; 
+  position:absolute; left:0; top:0; width:3em; height:3em; 
   color:#fff;
   background-color: rgb(0,0,0,0);
   overflow:visible;
