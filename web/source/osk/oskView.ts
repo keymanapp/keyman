@@ -449,8 +449,9 @@ namespace com.keyman.osk {
         this._computedWidth  = this.width.val;
         this._computedHeight = this.height.val;
       } else if(isInDOM) {
-        this._computedWidth   = parseInt(computedStyle.width, 10);
-        this._computedHeight  = parseInt(computedStyle.height, 10);
+        const parent = this._Box.offsetParent as HTMLElement;
+        this._computedWidth  = this.width.val  * (this.width.absolute  ? 1 : parent.offsetWidth);
+        this._computedHeight = this.height.val * (this.height.absolute ? 1 : parent.offsetHeight);
       } else {
         // Cannot perform layout operations!
         return;
@@ -486,10 +487,8 @@ namespace com.keyman.osk {
         }
 
         const bs = this._Box.style;
-        const widthStyle  = this.vkbd.usesFixedWidthScaling  ? this.computedWidth +'px' : this.width.styleString;
-        const heightStyle = this.vkbd.usesFixedHeightScaling ? this.computedHeight+'px' : this.height.styleString;
-        bs.width  = bs.maxWidth  = widthStyle;
-        bs.height = bs.maxHeight = heightStyle;
+        bs.width  = bs.maxWidth  = this.computedWidth + 'px';
+        bs.height = bs.maxHeight = this.computedHeight + 'px';
       }
     }
 

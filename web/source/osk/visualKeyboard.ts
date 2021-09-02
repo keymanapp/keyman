@@ -36,7 +36,10 @@ namespace com.keyman.osk {
 
     device: com.keyman.utils.DeviceSpec;
     hostDevice: com.keyman.utils.DeviceSpec;
+
     isStatic: boolean = false;
+    _fixedWidthScaling:  boolean = false;
+    _fixedHeightScaling: boolean = true;
 
     // Stores the base element for this instance of the visual keyboard.
     // Formerly known as osk._DivVKbd
@@ -133,6 +136,9 @@ namespace com.keyman.osk {
       if (isStatic) {
         this.isStatic = isStatic;
       }
+
+      this._fixedWidthScaling  = this.device.touchable && !this.isStatic;
+      this._fixedHeightScaling = this.device.touchable && !this.isStatic;
 
       // Create the collection of HTML elements from the device-dependent layout object
       var Lkbd = document.createElement('div');
@@ -263,7 +269,11 @@ namespace com.keyman.osk {
      * percent-based scaling.
      */
     public get usesFixedWidthScaling(): boolean {
-      return this.device.touchable && !this.isStatic;
+      return this._fixedWidthScaling;
+    }
+
+    public set usesFixedWidthScaling(val: boolean) {
+      this._fixedWidthScaling = val;
     }
 
     /**
@@ -271,15 +281,11 @@ namespace com.keyman.osk {
      * percent-based scaling.
      */
     public get usesFixedHeightScaling(): boolean {
-      return this.device.touchable && !this.isStatic;
+      return this._fixedHeightScaling;
     }
 
-    /**
-     * Uses fixed scaling for internal elements, rather than relative, percent-
-     * based scaling.
-     */
-    public get usesFixedScaling(): boolean {
-      return this.device.touchable;
+    public set usesFixedHeightScaling(val: boolean) {
+      this._fixedHeightScaling = val;
     }
 
     /**
