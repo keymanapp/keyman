@@ -104,7 +104,7 @@ namespace com.keyman.osk {
       util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
 
       this.setBaseMouseEventListeners();
-      if(deviceSpec.touchable) {
+      if(hostDevice.touchable) {
         this.setBaseTouchEventListeners();
       }
 
