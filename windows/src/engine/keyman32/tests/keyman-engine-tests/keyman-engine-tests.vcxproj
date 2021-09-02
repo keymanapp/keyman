@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="appinttests.cpp" />
+    <ClCompile Include="keyboardoptionstests.cpp" />
     <ClCompile Include="kmprocessactionstests.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -252,6 +252,7 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
         keyboardOpts[n].value = cp;
       }
       n++;
+      // TODO: 5653 check that n doesn't exceed the listSize from the keyboard.
     }
 
     keyboardOpts[n] = KM_KBP_OPTIONS_END;
@@ -261,13 +262,45 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
       SendDebugMessageFormat(
           0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_state_options_update failed with error status [%d]", err_status);
     }
-
-    for (int i = 0; i < (int)listSize + 1; i++) {
-      delete[] keyboardOpts[i].key;
-      delete[] keyboardOpts[i].value;
-    }
-    delete[] keyboardOpts;
+    // TODO: 5653 let maintain a copy of the keyboard core here
+    kp->lpCoreKeyboardOptions = keyboardOpts;
+    //for (int i = 0; i < (int)listSize + 1; i++) {
+    //  delete[] keyboardOpts[i].key;
+   //   delete[] keyboardOpts[i].value;
+   // }
+  //  delete[] keyboardOpts;
     return TRUE;
   }
+  // TODO: 5653 free the memory. 
   return FALSE;
+}
+
+
+// call this get curret options
+BOOL
+UpdateKeyboardOptions(km_kbp_state* const kpState, km_kbp_option_item *kbOptions) {
+
+  int listSize = km_kbp_options_list_size(kbOptions);
+  // Create a option list based on this size look up each key and store the return value in it.
+  // then at the end return this options list.
+
+  km_kbp_cp const* retValue = nullptr;
+  for (int i = 0; i < listSize; i++) {
+    km_kbp_status err_status = km_kbp_state_option_lookup(kpState, kbOptions[i].scope, kbOptions[i].key,
+        &retValue);
+    if (err_status != KM_KBP_STATUS_OK) {
+      SendDebugMessageFormat(
+          0, sdmKeyboard, 0, "SaveCoreOptions: km_kbp_state_option_lookup failed with error status [%d]", err_status);
+      continue;
+    }
+    // compare to see if changed
+    if (wcscmp(reinterpret_cast<LPCWSTR>(retValue), reinterpret_cast<LPCWSTR>(kbOptions[i].value)) != 0) {
+      //delete kbOptions[i].value;
+      LPCWSTR val = reinterpret_cast<LPCWSTR>(retValue);
+      km_kbp_cp* cp = new km_kbp_cp[wcslen(val) + 1];
+      wcscpy_s(reinterpret_cast<LPWSTR>(cp), wcslen(val) + 1, val);
+      kbOptions[i].value = cp;
+    }
+  }
+  return TRUE;
 }

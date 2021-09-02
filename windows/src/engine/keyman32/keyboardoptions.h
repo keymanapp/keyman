@@ -22,6 +22,7 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead);
 void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset);
 void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave);
 void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp);
+BOOL UpdateKeyboardOptions(km_kbp_state* const kpState, km_kbp_option_item *kbOptions);
 
 /* Common core integration functions */
 
