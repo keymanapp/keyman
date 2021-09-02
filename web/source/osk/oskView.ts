@@ -293,7 +293,7 @@ namespace com.keyman.osk {
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic width scaling. 
      */
-    get width(): LengthStyle {
+    get width(): ParsedLengthStyle {
       return this._width;
     }
 
@@ -301,7 +301,7 @@ namespace com.keyman.osk {
      * The configured height for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic height scaling. 
      */
-    get height(): LengthStyle {
+    get height(): ParsedLengthStyle {
       return this._height;
     }
 
@@ -485,10 +485,11 @@ namespace com.keyman.osk {
           this.vkbd.refreshLayout();
         }
 
-        if(this.vkbd.usesFixedHeightScaling) {
-          var b: HTMLElement = this._Box, bs=b.style;
-          bs.height=bs.maxHeight=this.computedHeight+'px';
-        }
+        const bs = this._Box.style;
+        const widthStyle  = this.vkbd.usesFixedWidthScaling  ? this.computedWidth +'px' : this.width.styleString;
+        const heightStyle = this.vkbd.usesFixedHeightScaling ? this.computedHeight+'px' : this.height.styleString;
+        bs.width  = bs.maxWidth  = widthStyle;
+        bs.height = bs.maxHeight = heightStyle;
       }
     }
 
@@ -969,8 +970,10 @@ namespace com.keyman.osk {
      * 
      **/
     showLanguageMenu() {
-      let menu = new LanguageMenu(com.keyman.singleton);
-      menu.show();
+      if(this.hostDevice.touchable) {
+        let menu = new LanguageMenu(com.keyman.singleton);
+        menu.show();
+      }
     }
 
     // OSK state fields & events

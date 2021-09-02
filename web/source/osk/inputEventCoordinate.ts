@@ -53,7 +53,8 @@ namespace com.keyman.osk {
       if(window['TouchEvent'] && this.source instanceof TouchEvent) {
         return this.source.touches.length;
       } else {
-        return 1;
+        const event = this.source as MouseEvent;
+        return event.buttons > 0 ? 1 : 0;
       }
     }
 
