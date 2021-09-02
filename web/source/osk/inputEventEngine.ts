@@ -3,13 +3,11 @@
 namespace com.keyman.osk {
   export abstract class InputEventEngine {
     protected readonly vkbd: VisualKeyboard;
+    protected readonly eventRoot: HTMLElement;
 
-    public constructor(vkbd: VisualKeyboard) {
+    public constructor(vkbd: VisualKeyboard, eventRoot: HTMLElement) {
       this.vkbd = vkbd;
-    }
-
-    protected get eventRoot(): HTMLElement {
-      return this.vkbd.layerGroup.element;
+      this.eventRoot = eventRoot;
     }
 
     abstract registerEventHandlers();

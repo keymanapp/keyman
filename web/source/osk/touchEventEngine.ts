@@ -7,7 +7,7 @@ namespace com.keyman.osk {
     private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
     public constructor(vkbd: VisualKeyboard) {
-      super(vkbd);
+      super(vkbd, vkbd.element);
 
       this._touchStart = this.onTouchStart.bind(this);
       this._touchMove  = this.onTouchMove.bind(this);

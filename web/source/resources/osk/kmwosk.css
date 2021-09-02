@@ -388,7 +388,7 @@ div.android #keytip {background-color:#f00;}
 #kmw-language-menu .current {font-weight:bold;}
 
 /* Popup key styles */
-#kmw-popup-keys {position:fixed;display:block;width:auto;height:auto;overflow-y:visible;
+#kmw-popup-keys {position:absolute;display:block;width:auto;height:auto;overflow-y:visible;
         padding: 4px; border: 1px solid #ddd; border-radius:8px;
         background-color:#fdfdfe; border:none; z-index:10000;}
  
