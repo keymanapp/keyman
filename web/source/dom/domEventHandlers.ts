@@ -744,7 +744,7 @@ namespace com.keyman.dom {
       }
 
       //Hide the OSK
-      if(!DOMEventHandlers.states.focusing) {
+      if(!DOMEventHandlers.states.focusing && !this.keyman.uiManager.justActivated) {
         this.cancelInput();
       }
     }.bind(this);

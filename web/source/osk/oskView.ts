@@ -859,6 +859,10 @@ namespace com.keyman.osk {
      * of their animation.
      */
     public hideNow() {
+      if(!this._Box) {
+        return;
+      }
+
       // Two possible uses for _animatedHideResolver:
       // - _animatedHideTimeout is set:   animation is waiting to start
       // - _animatedHideTimeout is null:  animation has already started.
