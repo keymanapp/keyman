@@ -22,7 +22,37 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead);
 void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset);
 void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave);
 void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp);
-BOOL UpdateKeyboardOptions(km_kbp_state* const kpState, km_kbp_option_item *kbOptions);
+/**
+ * Updates the supplied Keyboard processor options list from the keyboard processor pointed
+ * to by the state pointer.
+ *
+ * @param         lpCoreKeyboardState   The core keyboardprocessor state which as the source options
+ * @param[in,out] lpCoreKeyboardOptions The core keyboard options to be updated
+ * @return        BOOL      True if one or more options were updated
+ */
+BOOL UpdateKeyboardOptionsCore(km_kbp_state* const lpCoreKeyboardState, km_kbp_option_item *lpCoreKeyboardOptions);
+
+/**
+ * Returns a copy of the core keyboard processors current keyboard options
+ * The caller is responsible for freeing the returned km_kbp_option_item's list.
+ *
+ * @param  kp                  A pointer the keyboard info object that constains the
+ *                             keyboardprocessor state and keyboard for the source options list.
+ *
+ * @return km_kbp_option_item* The copy of the options list or NULL if copy failed
+ */
+km_kbp_option_item* SaveKeyboardOptionsCore(LPINTKEYBOARDINFO kp);
+
+/**
+ * Restore the core keyboard processor options to from the supplied keyboard
+ * list of `km_kbp_option_item`s
+ *
+ * @param lpCoreKeyboardState   The state pointer for the keyboard processor
+ * @param lpCoreKeyboardOptions The list of `km_kbp_option_item`s to restore
+ *
+ * return BOOL TRUE when the call to update keyboard processor was successful
+ */
+BOOL RestoreKeyboardOptionsCore(km_kbp_state* const lpCoreKeyboardState, km_kbp_option_item* lpCoreKeyboardOptions);
 
 /* Common core integration functions */
 

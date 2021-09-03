@@ -226,17 +226,29 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->TIPGetContext = ctfunc;
 
   AppContextWithStores *savedContext = NULL;  // I4370   // I4978
-  AppContext *savedContextUsingCore  = NULL; // used for common core
-
+  AppContext *savedContextUsingCore  = NULL;  // used for common core
+  km_kbp_option_item *SavedKBDOptions = NULL; // used for common core
   if (!Updateable) {
     if (isUsingCoreProcessor) {
       savedContextUsingCore = new AppContext();
       _td->app->CopyContext(savedContextUsingCore);
+      SavedKBDOptions = SaveKeyboardOptionsCore(_td->lpActiveKeyboard);
+      // TODO: 5653  ---- Alternate option ---
+      // Instead of allocating memory for each option
+      // just update the changed options. Consider the commented out method UpdateCoreKeyboard
+      // options.
+      /*if (_td->lpActiveKeyboard->lpCoreKeyboardOptions) {
+        UpdateKeyboardOptionsCore(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->lpActiveKeyboard->lpCoreKeyboardOptions);
+      } else {
+        _td->lpActiveKeyboard->lpCoreKeyboardOptions = SaveKeyboardOptionsCore(_td->lpActiveKeyboard);
+      }*/
+      //////// End alternate option
     } else {                                                                                   // I4370
       savedContext = new AppContextWithStores(_td->lpActiveKeyboard->Keyboard->cxStoreArray);  // I4978
       _td->app->SaveContext(savedContext);
     }
   }
+
   BOOL res = ProcessHook();
 
   if (!Updateable) {
@@ -244,16 +256,22 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
       if (res) {
         // Reset the context if match found
         _td->app->RestoreContextOnly(savedContextUsingCore);
+        RestoreKeyboardOptionsCore(_td->lpActiveKeyboard->lpCoreKeyboardState, SavedKBDOptions);
+        delete SavedKBDOptions;
+        SavedKBDOptions = NULL;
+        // TODO: 5653  ---- Alternate option --- Instead of allocating memory for each option
+        //RestoreKeyboardOptionsCore(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->lpActiveKeyboard->lpCoreKeyboardOptions);
+        /// --- End Alternate option
+        delete savedContextUsingCore;
+        savedContextUsingCore = NULL;
       }
-      delete savedContextUsingCore;
-      savedContextUsingCore = NULL;
     } else {      // I4370
       if (res) {  // I4585
         // Reset the context if match found
         _td->app->RestoreContext(savedContext);
+        delete savedContext;
+        savedContext = NULL;
       }
-      delete savedContext;
-      savedContext = NULL;
     }
   }
 
