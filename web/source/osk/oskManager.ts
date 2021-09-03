@@ -540,10 +540,14 @@ namespace com.keyman.osk {
       this.y = util.toNumber(c['top'],-1);
 
       // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-      var dfltWidth=0.3*screen.width;
+      let dfltWidth=0.3*screen.width;
+      let dfltHeight=0.15*screen.height;
       //if(util.toNumber(c['width'],0) == 0) dfltWidth=0.5*screen.width;
-      var newWidth=util.toNumber(c['width'],dfltWidth),
-          newHeight=util.toNumber(c['height'],0.15*screen.height);
+      let newWidth  = parseInt(c['width'], 10);
+      let newHeight = parseInt(c['height'], 10);
+      let isNewCookie = isNaN(newHeight);
+      newWidth  = isNaN(newWidth)  ? dfltWidth  : newWidth;
+      newHeight = isNaN(newHeight) ? dfltHeight : newHeight;
 
       // Limit the OSK dimensions to reasonable values
       if(newWidth < 0.2*screen.width) {
@@ -557,6 +561,17 @@ namespace com.keyman.osk {
       }
       if(newHeight > 0.5*screen.height) {
         newHeight=0.5*screen.height;
+      }
+
+      if(isNewCookie) {
+        // Adds some space to account for the OSK's header and footer, should they exist.
+        if(this.headerView && this.headerView.layoutHeight.absolute) {
+          newHeight += this.headerView.layoutHeight.val;
+        }
+
+        if(this.footerView && this.footerView.layoutHeight.absolute) {
+          newHeight += this.footerView.layoutHeight.val;
+        }
       }
 
       this.setSize(newWidth, newHeight);
