@@ -1244,6 +1244,9 @@ namespace com.keyman.dom {
       const osk = this.keyman.osk;
       if(osk) {
         if(this.lastActiveElement == null && this.activeElement == null) {
+          if(this.keyman.osk.activeTarget) {
+            this.keyman.osk.activeTarget = null;
+          }
           this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
         }
       }
