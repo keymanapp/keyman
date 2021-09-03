@@ -655,6 +655,10 @@ namespace com.keyman.osk {
      * Definitely needs clearer design & modeling, at the least.
      */
     hideNow: () => void = function(this: OSKView) { // I3363 (Build 301)
+      if(!this._Box) {
+        return;
+      }
+
       this._Box.removeEventListener('transitionend', this.hideNow, false);
       this._Box.removeEventListener('webkitTransitionEnd', this.hideNow, false);
 
