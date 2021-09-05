@@ -51,6 +51,14 @@ namespace
 
   km_kbp_option_item const empty_options_list[] = {KM_KBP_OPTIONS_END};
 
+  km_kbp_option_item const api_mock_options[] =
+  {
+    {u"hello",   u"world", KM_KBP_OPT_KEYBOARD},
+    {u"isdummy",     u"yes", KM_KBP_OPT_ENVIRONMENT},
+    {u"testing",     u"maybe", KM_KBP_OPT_ENVIRONMENT},
+    KM_KBP_OPTIONS_END
+  };
+
 #if 0
   km::kbp::state mock_state(test_kb, test_env);
   km::kbp::state empty_state(empty_options_list, empty_options_list);
@@ -114,10 +122,15 @@ constexpr char const *mock_json = "\
 
 int main(int, char * [])
 {
-#if 0
-  // Simple sanity tests on an empty options.
+
+  // Simple sanity tests on an empty options and mock options with 3 items.
   if (km_kbp_options_list_size(empty_options_list) != 0)
     return __LINE__;
+
+  if (km_kbp_options_list_size(api_mock_options) != 3)
+    return __LINE__;
+
+#if 0
   km_kbp_cp const *value;
   auto s = km_kbp_options_lookup(api_empty_options,
                                      KM_KBP_OPT_ENVIRONMENT,
