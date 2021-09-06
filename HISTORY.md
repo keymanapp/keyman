@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.109 alpha 2021-09-06
+
+* fix(android/engine): Fix backspace on Android 5.0 (#5660)
+
 ## 15.0.108 alpha 2021-09-01
 
 * fix(linux): Use first keyboard language if none given (#5655)
