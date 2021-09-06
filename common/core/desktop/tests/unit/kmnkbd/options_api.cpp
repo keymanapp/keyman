@@ -17,6 +17,7 @@
 
 namespace
 {
+#if 0
   km_kbp_option_item const test_env[] =
   {
     {u"isdummy",   u"yes", 0},
@@ -48,7 +49,7 @@ namespace
     {u"hello",   u"!", KM_KBP_OPT_UNKNOWN},
     KM_KBP_OPTIONS_END
   };
-
+#endif
   km_kbp_option_item const empty_options_list[] = {KM_KBP_OPTIONS_END};
 
   km_kbp_option_item const api_mock_options[] =
@@ -62,7 +63,7 @@ namespace
 #if 0
   km::kbp::state mock_state(test_kb, test_env);
   km::kbp::state empty_state(empty_options_list, empty_options_list);
-#endif
+
 
   std::string get_json_doc(km_kbp_state * const state)
   {
@@ -77,16 +78,13 @@ namespace
   #define assert_lookup_equals(k,v,s) {if (!_assert_lookup_equals(k,v,s)) return __LINE__; }
   bool _assert_lookup_equals(std::u16string const key, std::u16string value, km_kbp_option_scope scope)
   {
-#if 0
+
     km_kbp_cp const * ret = nullptr;
     auto s = km_kbp_state_option_lookup(api_mock_options, scope,
                                          key.c_str(),
                                          &ret);
     bool v = s == KM_KBP_STATUS_OK && ret == value;
     return v;
-#else
-    return true;
-#endif
   }
 
 constexpr char const *empty_json = "\
@@ -117,7 +115,7 @@ constexpr char const *mock_json = "\
         }\n\
     }\n\
 }\n";
-
+#endif
 }
 
 int main(int, char * [])
