@@ -283,7 +283,7 @@ UpdateKeyboardOptionsCore(
   km_kbp_state* const lpCoreKeyboardState,
   km_kbp_option_item *lpCoreKeyboardOptions) {
 
-  int listSize = km_kbp_options_list_size(lpCoreKeyboardOptions);
+  int listSize = (int)km_kbp_options_list_size(lpCoreKeyboardOptions);
   // Create a option list based on this size look up each key and store the return value in it.
   // then at the end return this options list.
   BOOL changed = FALSE;
@@ -317,7 +317,7 @@ SaveKeyboardOptionsCore(LPINTKEYBOARDINFO kp) {
         0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
     return nullptr;
   }
-  int listSize                  = km_kbp_options_list_size(keyboardAttrs->default_options);
+  int listSize                  = (int)km_kbp_options_list_size(keyboardAttrs->default_options);
   km_kbp_option_item* SavedkeyboardOpts = new km_kbp_option_item[listSize + 1];
   km_kbp_cp const* retValue               = nullptr;
 
