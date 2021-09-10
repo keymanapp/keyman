@@ -46,6 +46,7 @@ uses
   System.Win.Registry,
   Winapi.Windows,
 
+  Keyman.System.KeymanSentryClient,
   Keyman.System.LanguageCodeUtils,
 
   BCP47Tag,
@@ -93,6 +94,28 @@ begin
     else Result := DoInstall(pack.Keyboards[0].ID, BCP47Tag);
 end;
 
+procedure AddDiagnosticBreadcrumb(const KeyboardID: string);
+var
+  keys: TStringList;
+  RootPath: string;
+  reg: TRegistry;
+begin
+  keys := TStringList.Create;
+  reg := TRegistry.Create(KEY_READ);
+  try
+    reg.RootKey := HKEY_LOCAL_MACHINE;
+    RootPath := SRegKey_InstalledKeyboards_LM+'\'+KeyboardID+'\'+SRegSubKey_LanguageProfiles;
+    if reg.OpenKeyReadOnly(RootPath) then
+    begin
+      reg.GetKeyNames(keys);
+      TKeymanSentryClient.Breadcrumb('Registry', RootPath + #13#10 + keys.Text);
+    end;
+  finally
+    reg.Free;
+    keys.Free;
+  end;
+end;
+
 class function TTIPMaintenance.InstallTip(LangID: Integer; const KeyboardID, BCP47Tag,
   KeyboardToRemove: string): Boolean;
 var
@@ -103,7 +126,12 @@ begin
     Exit(False);
 
   // TODO: can this fail?
-  (lang as IKeymanKeyboardLanguageInstalled2).InstallTip(LangID, KeyboardToRemove);
+  try
+    (lang as IKeymanKeyboardLanguageInstalled2).InstallTip(LangID, KeyboardToRemove);
+  except
+    AddDiagnosticBreadcrumb(KeyboardID);
+    raise;
+  end;
   Result := True;
 end;
 
@@ -117,7 +145,7 @@ begin
     Exit(False);
 
   // TODO: can this fail?
-  (lang as IKeymanKeyboardLanguageInstalled2).RegisterTip(LangID);
+    (lang as IKeymanKeyboardLanguageInstalled2).RegisterTip(LangID);
   Result := True;
 end;
 
