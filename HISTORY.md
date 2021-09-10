@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.104 alpha 2021-08-26
+
+* chore(linux): Update changelog files (#5637)
+* fix(web): Check keyboard before marking layout calibrated (#5630)
+
 ## 15.0.103 alpha 2021-08-25
 
 * chore(linux): Improve debian package script (#5626)
