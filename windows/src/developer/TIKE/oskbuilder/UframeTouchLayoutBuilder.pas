@@ -292,6 +292,8 @@ begin
     end;
   end;
 
+  FSavedLayoutJS := '';
+
   DoModified;
 end;
 
