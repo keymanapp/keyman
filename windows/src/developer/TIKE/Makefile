@@ -4,13 +4,14 @@
 
 !include ..\..\Defines.mak
 
-build: version.res manifest.res icons dirs xml
+build: version.res manifest.res icons dirs xml pull-core
     cd $(ROOT)\src\developer\tike
     $(DELPHI_MSBUILD) tike.dproj /p:Platform=Win32
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\tike.exe -dpr tike.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tike.exe
     $(COPY) $(WIN32_TARGET_PATH)\tike.exe $(PROGRAM)\developer
     $(COPY) kmlmc.cmd $(PROGRAM)\developer
+    $(COPY) $(ROOT)\..\common\core\desktop\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEBUGPATH)\developer
 
 xml: pull-keymanweb pull-npm sentry-init.js
@@ -22,6 +23,22 @@ xml: pull-keymanweb pull-npm sentry-init.js
 sentry-init.js:
     cd $(ROOT)\src\developer\tike\xml\app\lib\sentry
     $(MKVER_U) init.js.in init.js
+
+pull-core:
+    cd $(ROOT)\..\common\core\desktop
+!ifdef GIT_BASH_FOR_KEYMAN
+!ifdef DEBUG
+    $(GIT_BASH_FOR_KEYMAN) build.sh --debug
+!else
+    $(GIT_BASH_FOR_KEYMAN) build.sh
+!endif
+!else
+!ifdef DEBUG
+    start /wait ./build.sh --debug
+!else
+    start /wait ./build.sh
+!endif
+!endif
 
 pull-npm:
     #
@@ -71,6 +88,7 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Developer" $(PROGRAM)\developer\tike.exe
+    $(SIGNCODE) /d "Keyman Core" $(PROGRAM)\developer\kmnkbp0-0.dll
 
 wrap-symbols:
     $(SYMSTORE) $(PROGRAM)\developer\tike.exe /t keyman-developer
@@ -78,6 +96,7 @@ wrap-symbols:
 
 install:
     $(COPY) $(PROGRAM)\developer\tike.exe "$(INSTALLPATH_KEYMANDEVELOPER)\tike.exe"
+    $(COPY) $(PROGRAM)\developer\kmnkbp0-0.dll "$(INSTALLPATH_KEYMANDEVELOPER)\kmnkbp0-0.dll"
 
 test-manifest:
     # test that linked manifest exists and correct
