@@ -56,7 +56,6 @@ uses
   UfrmDebugStatus_Options,
   UfrmDebugStatus_Platform,
   UfrmDebugStatus_RegTest,
-  UfrmDebugStatus_Options,
   UfrmTike;
 
 const
