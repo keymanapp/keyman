@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.110 alpha 2021-09-10
+
+* fix(android/engine): Fix localization on Android M (#5670)
+
 ## 15.0.109 alpha 2021-09-06
 
 * fix(android/engine): Fix backspace on Android 5.0 (#5660)
