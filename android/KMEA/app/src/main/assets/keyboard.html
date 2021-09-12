@@ -196,7 +196,9 @@
     // Tell KMW to switch to "numeric" layer
     function setNumericLayer() {
       var kmw=window['keyman'];
-      kmw.setNumericLayer();
+      if (kmw && kmw.core && kmw.core.activeKeyboard) {
+        kmw.setNumericLayer();
+      }
     }
 
     function updateKMText(text) {
