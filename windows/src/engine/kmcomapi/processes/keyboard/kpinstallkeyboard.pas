@@ -316,7 +316,7 @@ var
   FLanguages: TArray<Integer>;
   FLanguageInstalled: Boolean;
   ki: TKeyboardInfo;
-  kbdname: string;
+  KeyboardID: string;
   FDestPath: string;
   FDestFileName: string;
   FIconFileName: string;
@@ -325,6 +325,7 @@ var
   i: Integer;
   kpil: TKPInstallKeyboardLanguage;
   ml: TMitigateWin10_1803.TMitigatedLanguage;
+  KeyboardName: string;
 
 type
   TWSLCallback = reference to procedure(r: TRegistryErrorControlled);
@@ -367,7 +368,11 @@ begin
 
   FDefaultHKL := GetDefaultHKL;
 
-  kbdname := GetShortKeyboardName(FileName);
+  KeyboardID := GetShortKeyboardName(FileName);
+
+  if ki.KeyboardName = ''
+    then KeyboardName := KeyboardID
+    else KeyboardName := ki.KeyboardName;
 
   if ikPartOfPackage in FInstallOptions
     then FDestPath := GetPackageInstallPath(PackageID)
@@ -412,7 +417,7 @@ begin
               kpil := TKPInstallKeyboardLanguage.Create(Context);
               try
                 if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, []) and not IsTransientLanguageID(LangID) then
-                  kpil.RegisterTip(kbdname, BCP47Tag, ki.KeyboardName, LangID, FIconFileName, PackageLanguageMetadata[i].Name);
+                  kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardName, LangID, FIconFileName, PackageLanguageMetadata[i].Name);
               finally
                 kpil.Free;
               end;
@@ -432,7 +437,7 @@ begin
         begin
           BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(PackageLanguageMetadata[i].ID, True, True);
           if BCP47Tag <> '' then
-            FLanguageInstalled := LegacyRegisterAndInstallLanguageProfile(BCP47Tag, kbdname, ki.KeyboardName, FIconFileName, PackageLanguageMetadata[i].Name);
+            FLanguageInstalled := LegacyRegisterAndInstallLanguageProfile(BCP47Tag, KeyboardID, KeyboardName, FIconFileName, PackageLanguageMetadata[i].Name);
           if FLanguageInstalled then
             Break;
         end;
@@ -443,7 +448,7 @@ begin
           // This is most likely to happen on Win7 where custom BCP 47 tags
           // are not allowed
           AddLanguage(HKLToLanguageID(FDefaultHKL));
-          LegacyRegisterAndInstallLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
+          LegacyRegisterAndInstallLanguageProfile(FLanguages, KeyboardID, KeyboardName, FIconFileName);   // I3581   // I3707
         end;
       end;
     end
@@ -466,7 +471,7 @@ begin
       if ikLegacyRegisterAndInstallProfiles in FInstallOptions then
       begin
         // Registers only the first language
-        LegacyRegisterAndInstallLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
+        LegacyRegisterAndInstallLanguageProfile(FLanguages, KeyboardID, KeyboardName, FIconFileName);   // I3581   // I3707
       end;
 
       // Save the list of preferred languages for the keyboard, translated to BCP47 tags
@@ -490,7 +495,7 @@ begin
 
               kpil := TKPInstallKeyboardLanguage.Create(Context);
               try
-                kpil.RegisterTip(kbdname, BCP47Tag, ki.KeyboardName, FLanguages[i], FIconFileName, '');      //TODO: language name
+                kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardName, FLanguages[i], FIconFileName, '');      //TODO: language name
               finally
                 kpil.Free;
               end;
@@ -504,7 +509,7 @@ begin
     // Write the four transient language ID profiles
     kpil := TKPInstallKeyboardLanguage.Create(Context);
     try
-      kpil.RegisterTransientTips(kbdname, ki.KeyboardName, FIconFileName);
+      kpil.RegisterTransientTips(KeyboardID, KeyboardName, FIconFileName);
     finally
       kpil.Free;
     end;
