@@ -83,8 +83,10 @@ crowdin download -b master --dryrun
 To upload source files to Crowdin:
 
 ```bash
-crowdin upload sources
+crowdin upload sources -b master
 ```
+
+Note: this command uses the crowdin "branch" name (top-level folder), and doesn't necessarily correspond to the GitHub "branch" name.
 
 ### Updating DisplayLanguages.java in Keyman Engine for Android
 In Keyman for Android, the settings menu for changing display languages is maintained in
