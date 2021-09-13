@@ -139,7 +139,7 @@ begin
     end;
     PLATFORM_OS_IOS:
     begin
-      cbPlatformUI.ItemIndex := PLATFORM_UI_HARDWARE;
+      cbPlatformUI.ItemIndex := PLATFORM_UI_TOUCH;
       cbPlatformUI.Enabled := False;
       Fill(cbPlatformFormFactor, PlatformFormFactor_NonDesktop);
       if cbPlatformFormFactor.ItemIndex < 0 then
