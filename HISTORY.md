@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.111 alpha 2021-09-13
+
+* fix(developer): include Keyman Core in Keyman Developer (#5649)
+* fix(developer): ensure file modified after import from layout (#5676)
+* chore(android/engine): Fix dictionary selector and back arrow styling (#5667)
+* fix(web,android/app): Select numeric layer when entering a numeric field (#5664)
+
 ## 15.0.110 alpha 2021-09-10
 
 * fix(android/engine): Fix localization on Android M (#5670)
