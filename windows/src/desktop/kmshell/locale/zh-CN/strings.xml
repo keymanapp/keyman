@@ -19,7 +19,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonYes" comment="Yes button in message boxes">&amp;是</string>
+  <string name="SKButtonYes" comment="Yes button in message boxes">是 (&amp;Y)</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
