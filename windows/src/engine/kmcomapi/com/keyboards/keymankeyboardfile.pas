@@ -195,7 +195,9 @@ end;
 
 function TKeymanKeyboardFile.Get_Name: WideString;
 begin
-  Result := FKeyboardInfo.KeyboardName;
+  if FKeyboardInfo.KeyboardName = ''
+    then Result := Get_ID
+    else Result := FKeyboardInfo.KeyboardName;
 end;
 
 function TKeymanKeyboardFile.Get_Version: WideString;
