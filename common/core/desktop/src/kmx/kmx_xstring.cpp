@@ -119,33 +119,55 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 
 PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
 {
-  if(*p == 0) return p;
-  if(*p != UC_SENTINEL)
-  {
-    if(*p >= 0xD800 && *p <= 0xDBFF && *(p+1) >= 0xDC00 && *(p+1) <= 0xDFFF) return p+2;
-    return p+1;
-  }
+  int deltaptr;			// how many bytes to jump over 
 
-  p+=2;
-  switch(*(p-1))
+  if (*p == 0) return p;
+  if (*p != UC_SENTINEL)
   {
-    case CODE_ANY:      return p+1;
-    case CODE_NOTANY:   return p+1;
-    case CODE_INDEX:    return p+2;
-    case CODE_USE:      return p+1;
-    case CODE_DEADKEY:    return p+1;
-    case CODE_EXTENDED:   p += 2; while(*p && *p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
-    case CODE_CLEARCONTEXT: return p+1;
-    case CODE_CALL:     return p+1;
-    case CODE_CONTEXTEX:  return p+1;
-    case CODE_IFOPT:    return p+3;
-    case CODE_IFSYSTEMSTORE: return p+3;
-    case CODE_SETOPT:   return p+2;
-    case CODE_SETSYSTEMSTORE: return p+2;
-    case CODE_RESETOPT: return p+1;
-    case CODE_SAVEOPT:  return p+1;
-    default:        return p;
+    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF) return p + 2;
+    return p + 1;
   }
+  else
+  {
+    // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
+    if (*(p + 1) == CODE_EXTENDED) {
+      p += 2;
+      while (*(p - 1) && *p && *p != UC_SENTINEL_EXTENDEDEND)
+        p++;
+
+      if (*p == 0) return p;
+      if (*p == UC_SENTINEL_EXTENDEDEND)		return p + 1;
+    }
+
+    //  UC_SENTINEL(FFFF) followed by other control
+    switch (*(p + 1))
+    {
+    case CODE_ANY:						deltaptr = 3; break;
+    case CODE_NOTANY:					deltaptr = 3; break;
+    case CODE_INDEX:					deltaptr = 4; break;
+    case CODE_USE:						deltaptr = 3; break;
+    case CODE_DEADKEY:				deltaptr = 3; break;
+    case CODE_CLEARCONTEXT:		deltaptr = 3; break;
+    case CODE_CALL:						deltaptr = 3; break;
+    case CODE_CONTEXTEX:			deltaptr = 3; break;
+    case CODE_IFOPT:          deltaptr = 5; break;
+    case CODE_IFSYSTEMSTORE:	deltaptr = 5; break;
+    case CODE_SETOPT:					deltaptr = 4; break;
+    case CODE_SETSYSTEMSTORE:	deltaptr = 4; break;
+    case CODE_RESETOPT:				deltaptr = 3; break;
+    case CODE_SAVEOPT:				deltaptr = 3; break;
+    default:									deltaptr = 2;
+    }
+
+    // check for \0 between FFFF and next printable character
+    for (int i = 0; i < (deltaptr); i++) {
+      if (*p==0)
+        return p;
+      p += 1;    }
+    
+    return p;
+  }
+  return p;
 }
 
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
