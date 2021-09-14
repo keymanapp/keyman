@@ -23,9 +23,7 @@
     <!-- Context: Button label -->
     <string name="label_close_keyman" comment="Close the Keyman application">关闭 Keyman</string>
     <!-- Context: Button label -->
-    <string name="label_forward" comment="Button to go forward">Forward</string>
     <!-- Context: Button label -->
-    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Next Input Method</string>
     <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item">下载</string>
     <!-- Context: Button label -->
@@ -73,7 +71,6 @@
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">       %1$s键盘错误:%2$s为%3$s 语言。正在加载默认键盘。</string>
     <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Error in keyboard %1$s:%2$s for %3$s language.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">正在检查相关字典以下载</string>
     <!-- Context: Model Updates -->
