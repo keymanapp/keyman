@@ -55,14 +55,17 @@ const
   PLATFORM_OS_ANDROID = 3;
   PLATFORM_OS_IOS = 4;
 
-  PlatformFormFactor: array[0..2] of string = (
-    'Desktop',
+  PlatformFormFactor_Desktop: array[0..0] of string = (
+    'Desktop'
+  );
+  PLATFORM_FF_DESKTOP_DESKTOP = 0;
+
+  PlatformFormFactor_NonDesktop: array[0..1] of string = (
     'Tablet',
     'Phone'
   );
-  PLATFORM_FF_DESKTOP = 0;
-  PLATFORM_FF_TABLET = 1;
-  PLATFORM_FF_PHONE = 2;
+  PLATFORM_FF_NONDESKTOP_TABLET = 1;
+  PLATFORM_FF_NONDESKTOP_PHONE = 2;
 
   PlatformApplication: array[0..1] of string = (
     'Native',
@@ -109,6 +112,22 @@ begin
   SetPlatform;
 end;
 
+procedure Fill(cb: TComboBox; const a: array of string);
+var
+  s: string;
+  n: Integer;
+begin
+  n := cb.ItemIndex;
+  cb.Clear;
+  cb.Items.BeginUpdate;
+  for s in a do
+    cb.Items.Add(s);
+  cb.Items.EndUpdate;
+  if (n < cb.Items.Count) and (n > 0)
+    then cb.ItemIndex := n
+    else cb.ItemIndex := 0;
+end;
+
 procedure TfrmDebugStatus_Platform.EnableControlsAndSetValues;
 var
   e: Boolean;
@@ -133,22 +152,25 @@ begin
     begin
       cbPlatformUI.ItemIndex := PLATFORM_UI_HARDWARE;
       cbPlatformUI.Enabled := False;
-      cbPlatformFormFactor.ItemIndex := PLATFORM_FF_DESKTOP;
+      Fill(cbPlatformFormFactor, PlatformFormFactor_Desktop);
+      cbPlatformFormFactor.ItemIndex := PLATFORM_FF_DESKTOP_DESKTOP;
       cbPlatformFormFactor.Enabled := False;
     end;
     PLATFORM_OS_IOS:
     begin
-      cbPlatformUI.ItemIndex := PLATFORM_UI_HARDWARE;
+      cbPlatformUI.ItemIndex := PLATFORM_UI_TOUCH;
       cbPlatformUI.Enabled := False;
-      if cbPlatformFormFactor.ItemIndex = PLATFORM_FF_DESKTOP then
-        cbPlatformFormFactor.ItemIndex := PLATFORM_FF_TABLET;
+      Fill(cbPlatformFormFactor, PlatformFormFactor_NonDesktop);
+      if cbPlatformFormFactor.ItemIndex < 0 then
+        cbPlatformFormFactor.ItemIndex := PLATFORM_FF_NONDESKTOP_TABLET;
       cbPlatformFormFactor.Enabled := True;
     end;
     PLATFORM_OS_ANDROID:
     begin
       cbPlatformUI.Enabled := True;
-      if cbPlatformFormFactor.ItemIndex = PLATFORM_FF_DESKTOP then
-        cbPlatformFormFactor.ItemIndex := PLATFORM_FF_TABLET;
+      Fill(cbPlatformFormFactor, PlatformFormFactor_NonDesktop);
+      if cbPlatformFormFactor.ItemIndex < 0 then
+        cbPlatformFormFactor.ItemIndex := PLATFORM_FF_NONDESKTOP_TABLET;
       cbPlatformFormFactor.Enabled := True;
     end;
   end;
@@ -167,22 +189,11 @@ begin
 end;
 
 procedure TfrmDebugStatus_Platform.FormCreate(Sender: TObject);
-  procedure Fill(cb: TComboBox; const a: array of string);
-  var
-    s: string;
-  begin
-    cb.Clear;
-    cb.Items.BeginUpdate;
-    for s in a do
-      cb.Items.Add(s);
-    cb.Items.EndUpdate;
-    cb.ItemIndex := 0;
-  end;
 begin
   inherited;
   Fill(cbPlatformOS, PlatformOS);
   Fill(cbPlatformUI, PlatformUI);
-  Fill(cbPlatformFormFactor, PlatformFormFactor);
+  // cbPlatformFormFactor is filled based on state of cbPlatformOS
   Fill(cbPlatformApplication, PlatformApplication);
   Fill(cbPlatformBrowser, PlatformBrowser);
 end;
