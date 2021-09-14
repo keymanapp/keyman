@@ -23,7 +23,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonNo" comment="No button in message boxes">&amp;否</string>
+  <string name="SKButtonNo" comment="No button in message boxes">否 (&amp;N)</string>
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -599,11 +599,11 @@
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconMenuText" comment="Update icon - install menu item">查看并 &amp;安装Keyman更新</string>
+  <string name="SKUpdate_IconMenuText" comment="Update icon - install menu item">查看并 安装Keyman更新 (&amp;i)</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">退&amp;出线上更新检查</string>
+  <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">退出线上更新检查 (&amp;x)</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
@@ -731,35 +731,35 @@
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">关闭 Keyman &amp;</string>
+  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">关闭 Keyman (&amp;O)</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">屏幕 &amp;键盘</string>
+  <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">屏幕 键盘 (&amp;K)</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_FontHelper" comment="Systray item - Font Helper [&amp; precedes alt + access-character]">&amp;字体帮助器</string>
+  <string name="S_Menu_FontHelper" comment="Systray item - Font Helper [&amp; precedes alt + access-character]">字体帮助器 (&amp;F)</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_CharacterMap" comment="Systray item - Character Map [&amp; precedes alt + access-character]">字符 &amp;浏览</string>
+  <string name="S_Menu_CharacterMap" comment="Systray item - Character Map [&amp; precedes alt + access-character]">字符 浏览 (&amp;M)</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_TextEditor" comment="Systray item - Text Editor [&amp; precedes alt + access-character]">&amp;文本编辑器...</string>
+  <string name="S_Menu_TextEditor" comment="Systray item - Text Editor [&amp; precedes alt + access-character]">文本编辑器 (&amp;T)...</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Configuration" comment="Systray item - Configuration [&amp; precedes alt + access-character]">&amp;配置...</string>
+  <string name="S_Menu_Configuration" comment="Systray item - Configuration [&amp; precedes alt + access-character]">配置 (&amp;C)...</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Help" comment="Systray item - Help [&amp; precedes alt + access-character]">&amp;帮助...</string>
+  <string name="S_Menu_Help" comment="Systray item - Help [&amp; precedes alt + access-character]">帮助 (&amp;H)...</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_Exit" comment="Systray item - Exit [&amp; precedes alt + access-character]">退&amp;出</string>
+  <string name="S_Menu_Exit" comment="Systray item - Exit [&amp; precedes alt + access-character]">退出 (&amp;x)</string>
   <!-- Context: On Screen Keyboard Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -788,7 +788,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.239.0 -->
-  <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">&amp;打印...</string>
+  <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">打印 (&amp;P)...</string>
   <!-- Parameters: %1$s = Package to be uninstalled -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
