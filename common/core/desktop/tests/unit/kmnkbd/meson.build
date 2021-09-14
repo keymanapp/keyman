@@ -2,16 +2,11 @@
 # Description:  Cross platform build script to compile libkmnkbp API unit tests.
 # Create Date:  19 Oct 2018
 # Authors:      Tim Eves (TSE)
-# History:      19  Oct 2018 - TSE - Added test for context API functions.
 #
 
 defns=['-DKMN_KBP_STATIC']
 tests = [
-  ['context-api', 'context_api.cpp'],
-  ['keyboard-api', 'keyboard_api.cpp'],
-#  ['options-api', 'options_api.cpp'],
-  ['state-api', 'state_api.cpp'],
-  ['debug-api', 'debug_api.cpp'],
+  ['kmx_xstring', 'test_kmx_xstring.cpp'],
 ]
 
 foreach t : tests
