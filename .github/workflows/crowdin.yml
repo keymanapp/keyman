@@ -4,8 +4,6 @@ on:
   schedule:
     # At 06:00 every two weeks
     - cron: '0 6 1,15 * *'
-  push:
-    branches: [ chore/common/gh-sync-crowdin ] #master ]
 
 jobs:
   upload-sources-to-crowdin:
