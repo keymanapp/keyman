@@ -19,9 +19,11 @@ namespace com.keyman.osk {
       this.heightFraction = 1 / layerSpec.row.length;
 
       // Apply defaults, setting the width and other undefined properties for each key
-      const keys=rowSpec.key;
       this.keys = [];
-
+      const keys=rowSpec.key;
+      if (typeof keys === 'undefined') {
+        return;
+      }
       // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
       // adjusting the width of the last key to make the total exactly 100%.
       // Overwrite the previously-computed percent.
