@@ -1,4 +1,4 @@
-name: Crowdin Action
+name: Upload translation sources to Crowdin translate.keyman.com
 
 on:
   schedule:
