@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.112 alpha 2021-09-14
+
+* chore(common): Update to Unicode 14.0 (#5686)
+* chore(common): Add GitHub action to upload sources to crowdin (#5687)
+* fix(windows): fallback to filename if `&name` not set (#5684)
+
 ## 15.0.111 alpha 2021-09-13
 
 * fix(developer): include Keyman Core in Keyman Developer (#5649)
