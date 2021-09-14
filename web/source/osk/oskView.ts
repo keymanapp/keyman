@@ -215,7 +215,7 @@ namespace com.keyman.osk {
      * and the primary keyboard visualization elements.
      */
     get baseFontSize(): string {
-      return this.parsedBaseFontSize?.styleString;
+      return this.parsedBaseFontSize?.styleString || '';
     }
 
     protected get parsedBaseFontSize(): ParsedLengthStyle {
