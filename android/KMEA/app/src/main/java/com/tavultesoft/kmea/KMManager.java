@@ -163,7 +163,7 @@ public final class KMManager {
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
   // This is used to keep track of the starting system keyboard index while the screen is locked
-  private static int sysKbStartingIndexOnLockScreen = -1;
+  private static int startingKeyboardIndexOnLockScreen = -1;
 
   // This is used to keep track of the globe key shortpress and longpress
   private static GlobeKeyState globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
@@ -179,6 +179,8 @@ public final class KMManager {
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
   protected static HashMap<String, String> currentLexicalModel = null;
+  protected static WebViewUtils.EngineWebViewVersionStatus engineWebViewVersionStatus =
+    WebViewUtils.EngineWebViewVersionStatus.UNDETERMINED;
 
   public final static String predictionPrefSuffix = ".mayPredict";
   public final static String correctionPrefSuffix = ".mayCorrect";
@@ -230,6 +232,8 @@ public final class KMManager {
   public static final String KMKey_FontFamily = "family";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
+  public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
+  public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
 
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
@@ -369,13 +373,20 @@ public final class KMManager {
   }
 
   /**
-   * Get the Keyman Engine mode based on the Chrome version
-   * @param aContext
-   * @param webView - If provided, the Chrome version of webView is deterermined
+   * Get the Keyman Engine mode.
    * @return WebViewUtils.EngineWebViewVersionStatus
    */
-  public static WebViewUtils.EngineWebViewVersionStatus getEngineWebViewVersionStatus(Context aContext, WebView webView) {
-    return WebViewUtils.getEngineWebViewVersionStatus(aContext, webView, "");
+  public static WebViewUtils.EngineWebViewVersionStatus getEngineWebViewVersionStatus() {
+    return engineWebViewVersionStatus;
+  }
+
+  /**
+   * Set the Keyman Engine mode based on the Chrome version
+   * @param aContext
+   * @param webView - If provided, the Chrome version of the WebView is determined
+   */
+  public static void setEngineWebViewVersionStatus(Context aContext, WebView webView) {
+    engineWebViewVersionStatus = WebViewUtils.getEngineWebViewVersionStatus(aContext, webView, "");
   }
 
   // Check if a keyboard namespace is reserved
@@ -462,30 +473,100 @@ public final class KMManager {
   }
 
   /**
-   * Handle the globe key longpress action. Currently just for INAPP only
+   * Handle the globe key action on the lock screen
    * @param context
-   * @param keyboard
    */
-  private static void doGlobeKeyLongpressAction(Context context, KeyboardType keyboard) {
-    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
-      if (InAppKeyboard.keyboardPickerEnabled) {
-        showKeyboardPicker(context, keyboard);
+  private static void doGlobeKeyLockscreenAction(Context context) {
+    // Override globe key action if screen is locked:
+    // 1. Switch to next Keyman keyboard (no menu)
+    // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
+    if (startingKeyboardIndexOnLockScreen == getCurrentKeyboardIndex(context) ||
+        KeyboardController.getInstance().get().size() == 1) {
+      // all the Keyman keyboards have been cycled through
+      advanceToNextInputMode();
+    } else {
+      if (startingKeyboardIndexOnLockScreen == -1) {
+        // Initialize the system keyboard starting index while the screen is locked
+        startingKeyboardIndexOnLockScreen = getCurrentKeyboardIndex(context);
       }
+      switchToNextKeyboard(context);
     }
   }
 
   /**
-   * Handle the globe key shortpress action. Currently just for INAPP only
+   * Handle the globe key longpress action.
    * @param context
    * @param keyboard
    */
-  private static void doGlobeKeyShortpressAction(Context context, KeyboardType keyboard) {
-    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
-      if (InAppKeyboard.keyboardPickerEnabled && inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
-        showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-      } else { /* inappKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD */
-        switchToNextKeyboard(context);
+  private static void doGlobeKeyLongpressAction(Context context, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (InAppKeyboard == null || !InAppKeyboard.keyboardPickerEnabled) {
+        return;
       }
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      if (SystemKeyboard == null || !SystemKeyboard.keyboardPickerEnabled) {
+        return;
+      }
+    } else {
+      // assertion failure?
+      KMLog.LogError(TAG, "doGlobeKeyLongpressAction with keyboard type " + keyboard);
+      return;
+    }
+
+    showKeyboardPicker(context, keyboard);
+  }
+
+  /**
+   * Handle the globe key shortpress action
+   * @param context
+   * @param keyboard KeyboardType of KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
+   */
+  private static void doGlobeKeyShortpressAction(Context context, KeyboardType keyboard) {
+    GlobeKeyAction action = GlobeKeyAction.GLOBE_KEY_ACTION_DO_NOTHING;
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (InAppKeyboard == null || !InAppKeyboard.keyboardPickerEnabled) {
+        return;
+      }
+      action = inappKbGlobeKeyAction;
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      if (SystemKeyboard == null || !SystemKeyboard.keyboardPickerEnabled) {
+        return;
+      }
+      action = sysKbGlobeKeyAction;
+    } else {
+      // assertion failure?
+      KMLog.LogError(TAG, "doGlobeKeyShortpressAction with keyboard type " + keyboard);
+      return;
+    }
+
+    if (action == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD &&
+      KeyboardController.getInstance().get().size() == 1) {
+      // Override when keyboard switch and only 1 keyboard installed ==>show menu
+      action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+    }
+
+    switch (action) {
+      case GLOBE_KEY_ACTION_SHOW_MENU:
+        showKeyboardPicker(context, keyboard);
+        break;
+      case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
+        switchToNextKeyboard(context);
+        break;
+      case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
+        // Only do this for system keyboard
+        if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+          advanceToNextInputMode();
+        }
+        break;
+      case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
+        // Only do this for system keyboard
+        if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+          InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+          imm.showInputMethodPicker();
+        }
+        break;
+      default:
+        // Do nothing
     }
   }
 
@@ -494,7 +575,7 @@ public final class KMManager {
    * combined banner height and keyboard height
    * @return RelativeLayout.LayoutParams
    */
-  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+  public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -513,6 +594,8 @@ public final class KMManager {
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
       InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
       InAppKeyboard.loadKeyboard();
+
+      setEngineWebViewVersionStatus(appContext, InAppKeyboard);
     }
   }
 
@@ -526,6 +609,8 @@ public final class KMManager {
       SystemKeyboard.setWebViewClient(new KMSystemKeyboardWebViewClient(appContext));
       SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
       SystemKeyboard.loadKeyboard();
+
+      setEngineWebViewVersionStatus(appContext, SystemKeyboard);
     }
   }
 
@@ -605,6 +690,9 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.onPause();
     }
+
+    // Lock screen triggers onPause, so clear globeKeyState
+    globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
   }
 
   public static void onDestroy() {
@@ -1049,12 +1137,14 @@ public final class KMManager {
    * Sets mayPredictOverride true if the InputType field is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * Also true for numeric text fields
    * @param inputType android.text.InputType
    */
   public static void setMayPredictOverride(int inputType) {
     mayPredictOverride =
       ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
-       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)));
+       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)) ||
+       isNumericField(inputType));
   }
 
   /**
@@ -1063,6 +1153,16 @@ public final class KMManager {
    */
   public static boolean getMayPredictOverride() {
     return mayPredictOverride;
+  }
+
+  /**
+   * Determines if the InputType field is a numeric field
+   * @param inputType
+   * @return boolean
+   */
+  public static boolean isNumericField(int inputType) {
+    return (((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER) ||
+      ((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_PHONE));
   }
 
   /**
@@ -1650,7 +1750,29 @@ public final class KMManager {
   }
 
   public static int getKeyboardHeight(Context context) {
-    return (int) context.getResources().getDimension(R.dimen.keyboard_height);
+    int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    int orientation = context.getResources().getConfiguration().orientation;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
+    }
+
+    return defaultHeight;
+  }
+
+  public static void applyKeyboardHeight(Context context, int height) {
+    if (InAppKeyboard != null && InAppKeyboardLoaded) {
+      InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      InAppKeyboard.setLayoutParams(params);
+    }
+    if (SystemKeyboard != null && SystemKeyboardLoaded) {
+      SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      SystemKeyboard.setLayoutParams(params);
+    }
   }
 
   public static void setDebugMode(boolean value) {
@@ -1914,8 +2036,7 @@ public final class KMManager {
   }
 
   public static void setGlobeKeyAction(KeyboardType kbType, GlobeKeyAction action) {
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP &&
-        action != GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       inappKbGlobeKeyAction = action;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       sysKbGlobeKeyAction = action;
@@ -1928,6 +2049,51 @@ public final class KMManager {
 
   public static void setGlobeKeyState(GlobeKeyState state) {
     globeKeyState = state;
+  }
+
+  /**
+   * Handle the globe key action
+   * @param globeKeyDown boolean if the globe key state is GLOBE_KEY_STATE_DOWN
+   * @param keyboardType KeyboardType KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
+   */
+  private static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
+    // Update globeKeyState
+    if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+      globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
+    }
+
+    if (KMManager.shouldAllowSetKeyboard()) {
+      KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+      // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
+      if (keyguardManager.isKeyguardLocked()) {
+        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+          doGlobeKeyLockscreenAction(context);
+        }
+        // clear globeKeyState
+        globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+      } else {
+        // If screen isn't locked, reset the starting index
+        startingKeyboardIndexOnLockScreen = -1;
+
+        // Normal handling for globe key
+        if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
+          // Longpress globe
+          doGlobeKeyLongpressAction(context, keyboardType);
+
+          // clear globeKeyState
+          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+        } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+          // Shortpress globe
+          doGlobeKeyShortpressAction(context, keyboardType);
+        }
+      }
+    } else {
+      // clear globeKeyState
+      globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
+
+      // TODO: This should not be allowed because !shouldAllowSetKeyboard (#5570)
+      switchToNextKeyboard(context);
+    }
   }
 
   protected static final class KMInAppKeyboardWebViewClient extends WebViewClient {
@@ -2009,7 +2175,7 @@ public final class KMManager {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      Log.d("KMEA", "shouldOverrideUrlLoading [inapp]: "+url);
+      Log.d("KMEA", "shouldOverrideUrlLoading [inapp]: " + url);
       if (InAppKeyboard == null) {
         KMLog.LogError(TAG, "shouldOverrideUrlLoading and InAppKeyboard null");
         return false;
@@ -2021,7 +2187,7 @@ public final class KMManager {
       // of # in our WebView command "queries" entirely.
       String cmd = url.replace("keyboard.html#", "keyboard.html?");
       Uri urlCommand = Uri.parse(cmd);
-      if(url.indexOf("pageLoaded") >= 0) {
+      if (url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
         if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
@@ -2040,7 +2206,8 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
-        handleGlobeKeyAction(urlCommand.getBooleanQueryParameter("keydown", false));
+        handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
+          KeyboardType.KEYBOARD_TYPE_INAPP);
       } else if (url.indexOf("showHelpBubble") >= 0) {
         int start = url.indexOf("keyPos=") + 7;
         String value = url.substring(start);
@@ -2129,7 +2296,7 @@ public final class KMManager {
         boolean isModelActive = change.equals("active");
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         boolean modelPredictionPref = false;
-        if(currentLexicalModel != null) {
+        if (currentLexicalModel != null) {
           modelPredictionPref = prefs.getBoolean(getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
         }
         currentBanner = (isModelActive && modelPredictionPref) ?
@@ -2163,29 +2330,6 @@ public final class KMManager {
         InAppKeyboard.reloadAfterError();
       }
       return false;
-    }
-
-    private void handleGlobeKeyAction(boolean globeKeyDown) {
-      // Update globeKeyState
-      if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
-        globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
-      }
-
-      if (KMManager.shouldAllowSetKeyboard()) {
-        if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
-          // Longpress globe
-          doGlobeKeyLongpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-
-          // clear globeKeyState
-          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-        } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
-          // Shortpress globe
-          doGlobeKeyShortpressAction(context, KeyboardType.KEYBOARD_TYPE_INAPP);
-        }
-      } else {
-        // clear globeKeyState
-        globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-      }
     }
   }
 
@@ -2292,69 +2436,8 @@ public final class KMManager {
         editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
         editor.commit();
 
-        // Update globeKeyState
-        boolean globeKeyDown = urlCommand.getBooleanQueryParameter("keydown", false);
-        if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
-          globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
-        }
-
-        if (KMManager.shouldAllowSetKeyboard()) {
-          // Assign shortpress globe action
-          GlobeKeyAction action = sysKbGlobeKeyAction;
-          KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
-          if (keyguardManager.inKeyguardRestrictedInputMode()) {
-            // Override system keyboard globe key action if screen is locked:
-            // 1. Switch to next Keyman keyboard (no menu)
-            // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
-            if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
-              // All the Keyman keyboards have been cycled through
-              action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
-            } else {
-              if (sysKbStartingIndexOnLockScreen == -1) {
-                // Initialize the system keyboard starting index while the screen is locked
-                sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
-              }
-              action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
-            }
-          } else {
-            // If screen isn't locked, reset the starting index
-            sysKbStartingIndexOnLockScreen = -1;
-
-            if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
-              // Check longpress globe action
-              action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-              globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-            } else if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
-              // Ignore globe key down cause it may be queueing up for longpress
-              return false;
-            }
-          }
-
-          switch (action) {
-            case GLOBE_KEY_ACTION_SHOW_MENU:
-              if (SystemKeyboard.keyboardPickerEnabled) {
-                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-              }
-              break;
-            case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
-              switchToNextKeyboard(context);
-              break;
-            case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
-              advanceToNextInputMode();
-              break;
-            case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
-              InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-              imm.showInputMethodPicker();
-              break;
-            default:
-              // Do nothing
-          }
-        } else {
-          // Clear globeKeyState
-          globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-
-          switchToNextKeyboard(context);
-        }
+        handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
+          KeyboardType.KEYBOARD_TYPE_SYSTEM);
       } else if (url.indexOf("showHelpBubble") >= 0) {
         int start = url.indexOf("keyPos=") + 7;
         String value = url.substring(start);

@@ -289,7 +289,8 @@ uses
   UfrmDebugStatus_CallStack in 'debug\UfrmDebugStatus_CallStack.pas' {frmDebugStatus_CallStack},
   Keyman.System.Debug.DebugEvent in 'debug\Keyman.System.Debug.DebugEvent.pas',
   Keyman.System.Debug.DebugCore in 'debug\Keyman.System.Debug.DebugCore.pas',
-  Keyman.System.VisualKeyboardImportKMX in 'main\Keyman.System.VisualKeyboardImportKMX.pas';
+  Keyman.System.VisualKeyboardImportKMX in 'main\Keyman.System.VisualKeyboardImportKMX.pas',
+  Keyman.UI.Debug.CharacterGridRenderer in 'debug\Keyman.UI.Debug.CharacterGridRenderer.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

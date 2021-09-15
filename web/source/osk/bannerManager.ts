@@ -72,10 +72,6 @@ namespace com.keyman.osk {
       // any 'manually set' options come post-construction.
       // This will also automatically set the default banner in place.
       this.setOptions(BannerManager.DEFAULT_OPTIONS);
-
-      // Register a listener for model change events so that we can hot-swap the banner as needed.
-      let keyman = com.keyman.singleton;
-      keyman.core.languageProcessor.on('statechange', this.selectBanner.bind(this));
     }
 
     /**
@@ -213,7 +209,7 @@ namespace com.keyman.osk {
      * allowing logic to automatically hot-swap `Banner`s as needed.
      * @param state 
      */
-    private selectBanner(state: text.prediction.StateChangeEnum) {
+    selectBanner(state: text.prediction.StateChangeEnum) {
       // Only display a SuggestionBanner when LanguageProcessor states it is active.s
       if(state == 'active') {
         this.setBanner('suggestion');

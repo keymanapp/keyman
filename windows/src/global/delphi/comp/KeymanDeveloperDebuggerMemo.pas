@@ -28,11 +28,18 @@ uses
 type
   TKeymanDeveloperDebuggerMessageEvent = procedure(Sender: TObject; var Message: TMessage; var Handled: Boolean) of object;
 
+  TMemoSelection = record
+    Start, Finish: Integer;
+    Anchor: Integer;
+  end;
+
   TKeymanDeveloperDebuggerMemo = class(TMemo)
   private
     FOnMessage: TKeymanDeveloperDebuggerMessageEvent;
     FAllowUnicodeInput: Boolean;
     procedure SetAllowUnicode(const Value: Boolean);
+    function GetSelection: TMemoSelection;
+    procedure SetSelection(const Value: TMemoSelection);
   protected
     procedure CreateHandle; override;
     procedure WndProc(var Message: TMessage); override;
@@ -41,6 +48,7 @@ type
   published
     property AllowUnicode: Boolean read FAllowUnicodeInput write SetAllowUnicode default True;
     property OnMessage: TKeymanDeveloperDebuggerMessageEvent read FOnMessage write FOnMessage;
+    property Selection: TMemoSelection read GetSelection write SetSelection;
   end;
 
 procedure Register;
@@ -63,6 +71,17 @@ begin
     else SetWindowLongA(Handle, GWL_WNDPROC, GetWindowLong(Handle, GWL_WNDPROC));
 end;
 
+function TKeymanDeveloperDebuggerMemo.GetSelection: TMemoSelection;
+begin
+  // EM_GETSEL doesn't tell us the anchor position, but we can figure
+  // it out with this kludge. I am not aware of side effects from this
+  // at this time.
+  SendMessage(Handle, EM_GETSEL, NativeUInt(@Result.Start), NativeUInt(@Result.Finish));
+  SendMessage(Handle, EM_SETSEL, -1, 0);
+  SendMessage(Handle, EM_GETSEL, NativeUInt(@Result.Anchor), 0);
+  SetSelection(Result);
+end;
+
 procedure TKeymanDeveloperDebuggerMemo.SetAllowUnicode(const Value: Boolean);
 begin
   if Value <> fAllowUnicodeInput then
@@ -70,6 +89,14 @@ begin
     fAllowUnicodeInput := Value;
     if HandleAllocated then RecreateWnd;
   end;
+end;
+
+procedure TKeymanDeveloperDebuggerMemo.SetSelection(
+  const Value: TMemoSelection);
+begin
+  if Value.Anchor = Value.Start
+    then SendMessage(Handle, EM_SETSEL, Value.Finish, Value.Start)
+    else SendMessage(Handle, EM_SETSEL, Value.Start, Value.Finish);
 end;
 
 procedure TKeymanDeveloperDebuggerMemo.WndProc(var Message: TMessage);

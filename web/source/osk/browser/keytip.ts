@@ -39,14 +39,6 @@ namespace com.keyman.osk.browser {
             edge = 0,
             previewFontScale = 1.8;
 
-        // Find key text element
-        for(var i=0; i<key.childNodes.length; i++) {
-          kc = <HTMLElement> key.childNodes[i];
-          if(kc.classList.contains('kmw-key-text')) {
-            break;
-          }
-        }
-
         // Canvas dimensions must be set explicitly to prevent clipping
         this.canvas.width = 1.6 * xWidth;
         this.canvas.height = 2.3 * xHeight;
@@ -54,7 +46,8 @@ namespace com.keyman.osk.browser {
         let kts = this.element.style;
         kts.top = 'auto';
         // Matches how the subkey positioning is set.
-        kts.bottom = (parseInt(key.style.bottom, 10))+'px';
+        let rowElement = (key.key as OSKBaseKey).row.element;
+        kts.bottom = (vkbd.height - rowElement.offsetHeight - rowElement.offsetTop) + 'px';
         kts.textAlign = 'center';
         kts.overflow = 'visible';
         kts.fontFamily = util.getStyleValue(kc,'font-family');

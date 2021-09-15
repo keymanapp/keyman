@@ -4,13 +4,21 @@ namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
 
   export class OSKBaseKey extends OSKKey {
-    constructor(spec: OSKKeySpec, layer: string) {
+    private capLabel: HTMLDivElement;
+    public readonly row: OSKRow;
+
+    constructor(spec: OSKKeySpec, layer: string, row: OSKRow) {
       super(spec, layer);
+      this.row = row;
     }
 
     getId(): string {
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       return this.spec.elementID;
+    }
+
+    getCoreId(): string {
+      return this.spec.coreID;
     }
 
     // Produces a small reference label for the corresponding physical key on a US keyboard.
@@ -39,25 +47,25 @@ namespace com.keyman.osk {
           }
       }
 
+      let q = document.createElement('div');
+      q.className='kmw-key-label';
       if(x > 0) {
-        let q = document.createElement('div');
-        q.className='kmw-key-label';
         q.innerHTML=String.fromCharCode(x);
-        return q;
       } else {
         // Keyman-only virtual keys have no corresponding physical key.
-        return null;
+        // So, no text for the key-cap.
       }
+      return q;
     }
 
-    private processSubkeys(btn: KeyElement, osk: VisualKeyboard) {
+    private processSubkeys(btn: KeyElement, vkbd: VisualKeyboard) {
       // Add reference to subkey array if defined
       var bsn: number, bsk=btn['subKeys'] = this.spec['sk'];
       // Transform any special keys into their PUA representations.
       for(bsn=0; bsn<bsk.length; bsn++) {
         if(bsk[bsn]['sp'] == '1' || bsk[bsn]['sp'] == '2') {
           var oldText=bsk[bsn]['text'];
-          bsk[bsn]['text']=this.renameSpecialKey(oldText, osk);
+          bsk[bsn]['text']=this.renameSpecialKey(oldText, vkbd);
         }
 
         // If a subkey doesn't have a defined layer property, copy it from the base key's layer by default.
@@ -73,74 +81,33 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(osk: VisualKeyboard, layout: keyboards.LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(vkbd: VisualKeyboard): HTMLDivElement {
       let spec = this.spec;
-      let isDesktop = osk.device.formFactor == "desktop"
 
       let kDiv = document.createElement('div');
       kDiv.className='kmw-key-square';
-
-      let ks=kDiv.style;
-      ks.width=this.objectGeometry(osk, spec['widthpc']);
-
-      let originalPercent = totalPercent;
 
       let btnEle = document.createElement('div');
       let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
       // Set button class
-      this.setButtonClass(osk);
-
-      // Set key and button positioning properties.
-      if(!isDesktop) {
-        // Regularize interkey spacing by rounding key width and padding (Build 390)
-        ks.left=this.objectGeometry(osk, totalPercent+spec['padpc']);
-        if(!osk.isStatic) {
-          ks.bottom=rowStyle.bottom;
-        }
-        ks.height=rowStyle.height;  // must be specified in px for rest of layout to work correctly
-
-        if(!osk.isStatic) {
-          // Set distinct phone and tablet button position properties
-          btn.style.left=ks.left;
-          btn.style.width=ks.width;
-        }
-      } else {
-        ks.marginLeft=this.objectGeometry(osk, spec['padpc']);
-      }
-
-      totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
+      this.setButtonClass();
 
       // Add the (US English) keycap label for layouts requesting display of underlying keys
-      if(layout["displayUnderlying"]) {
-        let keyCap = this.generateKeyCapLabel();
-
-        if(keyCap) {
-          btn.appendChild(keyCap);
-        }
-      }
+      let keyCap = this.capLabel = this.generateKeyCapLabel();
+      btn.appendChild(keyCap);
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       btn.id=this.getId();
 
-      // Define callbacks to handle key touches: iOS and Android tablets and phones
-      // TODO: replace inline function calls??
-      if(!osk.isStatic && !osk.device.touchable) {
-        // Highlight key while mouse down or if moving back over originally selected key
-        btn.onmouseover=btn.onmousedown=osk.mouseOverMouseDownHandler; // Build 360
-
-        // Remove highlighting when key released or moving off selected element
-        btn.onmouseup=btn.onmouseout=osk.mouseUpMouseOutHandler; //Build 360
-      }
-
       // Make sure the key text is the element's first child - processSubkeys()
       // will add an extra element if subkeys exist, which can interfere with
       // keyboard/language name display on the space bar!
-      btn.appendChild(this.label = this.generateKeyText(osk));
+      btn.appendChild(this.label = this.generateKeyText(vkbd));
 
       // Handle subkey-related tasks.
       if(typeof(spec['sk']) != 'undefined' && spec['sk'] != null) {
-        this.processSubkeys(btn, osk);
+        this.processSubkeys(btn, vkbd);
       } else {
         btn['subKeys']=null;
       }
@@ -148,20 +115,44 @@ namespace com.keyman.osk {
       // Add text to button and button to placeholder div
       kDiv.appendChild(btn);
 
-      // Prevent user selection of key captions
-      //t.style.webkitUserSelect='none';
-
       // The 'return value' of this process.
-      return {element: kDiv, percent: totalPercent - originalPercent};
+      return this.square = kDiv;
     }
 
-    objectGeometry(vkbd: VisualKeyboard, v: number): string {
-      let unit = this.objectUnits(vkbd);
-      if(unit == '%') {
-        return v + unit;
-      } else { // unit == 'px'
-        return (Math.round(v*100)/100)+unit; // round to 2 decimal places, making css more readable
+    public refreshLayout(vkbd: VisualKeyboard) {
+      let key = this.spec as keyboards.ActiveKey;
+      this.square.style.width = vkbd.layoutWidth.scaledBy(key.proportionalWidth).styleString;
+      this.square.style.marginLeft = vkbd.layoutWidth.scaledBy(key.proportionalPad).styleString;
+      this.btn.style.width = vkbd.usesFixedWidthScaling ? this.square.style.width : '100%';
+      
+      if(vkbd.usesFixedHeightScaling) {
+        // Matches its row's height.
+        this.square.style.height = vkbd.layoutHeight.scaledBy(this.row.heightFraction).styleString;
+      } else {
+        this.square.style.height = '100%'; // use the full row height
       }
+
+      super.refreshLayout(vkbd);
+
+      let util = com.keyman.singleton.util;
+      const device = vkbd.device;
+      const resizeLabels = (device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
+
+      // Rescale keycap labels on iPhone (iOS 7)
+      if(resizeLabels && this.capLabel) {
+        this.capLabel.style.fontSize = '6px';
+      }
+    }
+
+    public get displaysKeyCap(): boolean {
+      return this.capLabel && this.capLabel.style.display == 'block';
+    }
+
+    public set displaysKeyCap(flag: boolean) {
+      if(!this.capLabel) {
+        throw new Error("Key element not yet constructed; cannot display key cap");
+      }
+      this.capLabel.style.display = flag ? 'block' : 'none';
     }
   }
 }

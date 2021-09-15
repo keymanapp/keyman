@@ -236,7 +236,8 @@ namespace com.keyman.dom {
       }
 
       let outputTarget = PreProcessor.getEventOutputTarget(e);
-      var LeventMatched = (core.processKeyEvent(Levent, outputTarget) != null);
+      const ruleBehavior = core.processKeyEvent(Levent, outputTarget);
+      const LeventMatched = ruleBehavior && !ruleBehavior.triggerKeyDefault;
 
       if(LeventMatched) {
         if(e  &&  e.preventDefault) {

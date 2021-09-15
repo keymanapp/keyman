@@ -735,7 +735,7 @@ end;
 procedure TframeCEFHost.cefSetFocus(Sender: TObject; const browser: ICefBrowser;
   source: TCefFocusSource; out Result: Boolean);
 begin
-  Result := source = FOCUS_SOURCE_SYSTEM;
+  Result := source = FOCUS_SOURCE_NAVIGATION;
 end;
 
 procedure TframeCEFHost.cefTitleChange(Sender: TObject;

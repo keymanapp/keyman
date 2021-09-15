@@ -408,7 +408,11 @@ begin
         Exit;
       end;
     end;
-    FKeyboardName := ki.KeyboardName;
+
+    if ki.KeyboardName = ''
+      then FKeyboardName := GetShortKeyboardName(FName)
+      else FKeyboardName := ki.KeyboardName;
+
     FEncodings := ki.Encodings;
     FIsRegistered := ki.IsRegistered;
     FMessage := ki.MessageString;

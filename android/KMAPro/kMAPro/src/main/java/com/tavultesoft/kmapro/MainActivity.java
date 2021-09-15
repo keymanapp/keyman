@@ -40,7 +40,6 @@ import com.keyman.android.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.WebViewUtils;
 import com.tavultesoft.kmea.util.WebViewUtils.EngineWebViewVersionStatus;
 
 import android.Manifest;
@@ -260,6 +259,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     super.onResume();
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
+    resizeTextView(textView.isKeyboardVisible());
 
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
@@ -576,7 +576,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
   }
 
-  private void resizeTextView(boolean isKeyboardVisible) {
+  public void resizeTextView(boolean isKeyboardVisible) {
     int bannerHeight = 0;
     int keyboardHeight = 0;
     if (isKeyboardVisible) {
@@ -779,7 +779,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void checkChromeVersion(WebView webView) {
-    if (WebViewUtils.getEngineWebViewVersionStatus(context, webView, "") != EngineWebViewVersionStatus.FULL) {
+    if (KMManager.getEngineWebViewVersionStatus() != EngineWebViewVersionStatus.FULL) {
       LinearLayout updateChromeLayout = (LinearLayout) findViewById(R.id.updateChromeLayout);
       updateChromeLayout.setVisibility(View.VISIBLE);
 
