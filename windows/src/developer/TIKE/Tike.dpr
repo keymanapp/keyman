@@ -15,7 +15,6 @@ uses
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   compile in '..\..\global\delphi\general\compile.pas',
   KeymanDeveloperOptions in 'main\KeymanDeveloperOptions.pas',
-  int_kmdebug in '..\..\global\delphi\general\int_kmdebug.pas',
   UfrmKeyTest in 'debug\UfrmKeyTest.pas' {frmKeyTest},
   CompilePackage in '..\..\global\delphi\general\CompilePackage.pas',
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',

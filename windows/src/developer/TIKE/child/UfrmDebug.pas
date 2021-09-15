@@ -508,8 +508,18 @@ begin
 end;
 
 procedure TfrmDebug.StepForward;
+var
+  StepTwice: Boolean;
 begin
   if UIStatus = duiTest then Exit;
+
+  // We don't need to step through each individual set() call manually, so
+  // we'll just step forward again until we reach the end of the set() calls
+  // for the current rule
+  StepTwice :=
+    (_FCurrentEvent < FEvents.Count) and
+    (FEvents[_FCurrentEvent].EventType = etRuleMatch) and
+    (FEvents[_FCurrentEvent].Rule.ItemType = KM_KBP_DEBUG_SET_OPTION);
 
   if _FCurrentEvent < FEvents.Count then
   begin
@@ -536,6 +546,9 @@ begin
   end;
 
   UpdateCharacterGrid;
+
+  if StepTwice then
+    StepForward;
 end;
 
 procedure TfrmDebug.Run;
@@ -603,6 +616,11 @@ procedure TfrmDebug.ExecuteEventRule(n: Integer);
     frmDebugStatus.Key.ShowKey(@ev.Rule.Key);
     frmDebugStatus.RegTest.RegTestLogKey(@ev.Rule.Key);
   end;
+
+  procedure ExecuteSetOption(ev: TDebugEvent);
+  begin
+    frmDebugStatus.Options.SetOptionValue(ev.Rule.OptionStoreName, ev.Rule.OptionValue);
+  end;
 begin
   with FEvents[n].Rule do
   begin
@@ -643,6 +661,8 @@ begin
         frmDebugStatus.CallStack.CallStackPop;
       KM_KBP_DEBUG_END:
         begin frmDebugStatus.CallStack.CallStackClear; ExecutionPointLine := -1; end;
+      KM_KBP_DEBUG_SET_OPTION:
+        ExecuteSetOption(FEvents[n]);
     else
       Assert(False);
     end;

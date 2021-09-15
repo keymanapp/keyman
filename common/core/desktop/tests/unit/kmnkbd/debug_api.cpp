@@ -348,6 +348,33 @@ void test_store_offsets() {
   }));
 }
 
+/**
+ * Test 7: set option
+ */
+void test_set_option() {
+  setup("021 - options.kmx");
+  DEBUG_GROUP gp = {u"Main"};
+  DEBUG_KEY kp1 = { '1', /*line*/16, },
+            kp0 = { '0', /*line*/17, };
+  DEBUG_STORE sp = {0, u"foo", u"1"};
+
+  try_status(km_kbp_state_debug_set(test_state, 1));
+
+  // '1' -> set_option
+
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_1, 0, 1));
+  assert(debug_items(test_state, {
+    km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_1, 0, '1'}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
+
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"", &gp, &kp1, {0xFFFF}}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_SET_OPTION, 0, {}, {u"", nullptr, nullptr, {}, 0, {&sp, u"1"}}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"", &gp, &kp1, {0xFFFF}, 0}},
+
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp, nullptr, {}, 0}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 0}},
+  }));
+}
 
 
 constexpr const auto help_str = "\
@@ -377,6 +404,7 @@ int print_sizeof() {
   std::cout << "sizeof(km_kbp_state_debug_item): " << sizeof(km_kbp_state_debug_item) << std::endl;
   std::cout << "sizeof(km_kbp_state_debug_key_info): " << sizeof(km_kbp_state_debug_key_info) << std::endl;
   std::cout << "sizeof(km_kbp_state_debug_kmx_info): " << sizeof(km_kbp_state_debug_kmx_info) << std::endl;
+  std::cout << "sizeof(km_kbp_state_debug_kmx_option_info): " << sizeof(km_kbp_state_debug_kmx_option_info) << std::endl;
   std::cout << "sizeof([enum] km_kbp_debug_type): " << sizeof(km_kbp_debug_type) << std::endl;
   exit(1);
 }
@@ -408,6 +436,7 @@ int main(int argc, char *argv []) {
   test_basic_rule_matches();
   test_multiple_groups();
   test_store_offsets();
+  test_set_option();
 
   // Destroy them
   teardown();

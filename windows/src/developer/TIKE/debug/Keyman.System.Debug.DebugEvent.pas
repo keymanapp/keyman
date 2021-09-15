@@ -41,6 +41,8 @@ type
     Flags: DWord;
     Rule: TKeymanKeyEx;
     Group: TKeymanGroupEx;
+    OptionStoreName: string;
+    OptionValue: string;
     Key: TAIDebugKeyInfo;
     Context: WideString;
     StoreOffsets: array[0..20] of Word; //TKeymanStoreEx;
@@ -256,6 +258,7 @@ var
   ev: TDebugEvent;
   rule: PKeymanKey;
   group: PKeymanGroup;
+  store: PKeymanStore;
 begin
   if not Assigned(debugkeyboard) then Exit;
 
@@ -296,6 +299,13 @@ begin
   begin
     ev.Rule.Key.VirtualKey := vk;
     ev.Rule.Key.Modifiers := modifier_state;
+  end;
+
+  if ev.Rule.ItemType = KM_KBP_DEBUG_SET_OPTION then
+  begin
+    store := PKeymanStore(debug.kmx_info.option.store);
+    ev.Rule.OptionStoreName := store.dpName;
+    ev.Rule.OptionValue := debug.kmx_info.option.value;
   end;
 end;
 

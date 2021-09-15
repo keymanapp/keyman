@@ -58,6 +58,11 @@ public:
     PKMX_WCHAR context,
     PKMX_WORD index_stack
   );
+  void push_set_option(
+    uint16_t first_action,
+    LPSTORE option_store,
+    KMX_WCHAR const * value
+  );
 };
 
 inline

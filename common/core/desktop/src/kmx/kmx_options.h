@@ -8,6 +8,7 @@
 #include "option.hpp"
 
 #include "kmx_base.h"
+#include "kmx_debugger.h"
 
 namespace km {
 namespace kbp {
@@ -21,13 +22,17 @@ class KMX_Options
 {
 private:
   LPINTKEYBOARDINFO _kp;
+  KMX_DebugItems *m_debug_items;
+  KMX_Actions& m_actions;
 
   void AddOptionsStoresFromXString(PKMX_WCHAR s);
 
   int _GetIndex(std::u16string const &key) const;
 
 public:
-  KMX_Options(LPINTKEYBOARDINFO kp) : _kp(kp) {}
+  KMX_Options(LPINTKEYBOARDINFO kp, KMX_Actions& actions) : _kp(kp), m_actions(actions) {
+    m_debug_items = nullptr;
+  }
   ~KMX_Options();
 
   void Init(std::vector<option> &opts);
@@ -38,6 +43,10 @@ public:
   void Set(std::u16string const &key, std::u16string const &value);
   void Reset(abstract_processor &, int nStoreToReset);
   void Save(state & state, int nStoreToSave);
+
+  void SetInternalDebugItems(KMX_DebugItems *debug_items) {
+    m_debug_items = debug_items;
+  }
 
   STORE const * begin() const;
   STORE const * end() const;
