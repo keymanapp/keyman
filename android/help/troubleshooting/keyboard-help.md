@@ -6,7 +6,7 @@ title: How To - Getting Keyboard Help
 When a keyboard package is installed, it usually includes help information for using the keyboard.
 
 Step 1)
-Open the keyboard list by touching the globe key.
+Open the keyboard list by long pressing and releasing the globe key.
 
 ![](../android_images/globe-ap.png)
 

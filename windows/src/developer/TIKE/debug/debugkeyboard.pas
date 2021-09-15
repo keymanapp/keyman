@@ -20,7 +20,10 @@ unit debugkeyboard;
 
 interface
 
-uses Classes, SysUtils;
+uses
+  System.Classes,
+  System.SysUtils,
+  kmxfile;
 
 { Load line number details from compiled keyboard }
 
@@ -77,10 +80,54 @@ type
     destructor Destroy; override;
   end;
 
+  { KMX file structures mapped into memory }
+
+  TKeymanStoreEx = record
+    Store: TKeyboardFileStore;
+    MatchPosition: Integer;
+  end;
+
+  PKeymanStoreEx = ^TKeymanStoreEx;
+
+  TKeymanKey = packed record
+    Key: WideChar; packing: Word;
+    Line: Cardinal;
+    ShiftFlags: Cardinal;
+    dpOutput: PWideChar;
+    dpContext: PWideChar;
+  end;
+
+  PKeymanKey = ^TKeymanKey;
+
+  TKeymanKeyEx = record
+    Key: WideCHAR;
+    Line: Cardinal;
+    ShiftFlags: Cardinal;
+    dpOutput: string;
+    dpContext: string;
+  end;
+
+  TKeymanGroup = packed record
+    dpName: PWideChar;
+    dpKeyArray: PKeymanKey;
+    dpMatch: PWideChar;
+    dpNoMatch: PWideChar;
+    cxKeyArray: Cardinal;
+    fUsingKeys: LongBool;
+  end;
+
+  PKeymanGroup = ^TKeymanGroup;
+
+  TKeymanGroupEx = record
+    dpName: string;
+    dpMatch: string;
+    dpNoMatch: string;
+    fUsingKeys: LongBool;
+  end;
+
 implementation
 
 uses
-  kmxfile,
   kmxfileconsts;
 
 { TDebugGroupList }
@@ -171,7 +218,10 @@ begin
               dk := TDebugDeadKey.Create;
               DeadKeys.Add(dk);
               n := Pos(' ', s); if n = 0 then n := Length(s)+1;
-              dk.Value := StrToIntDef(Copy(s,1,n-1), -1);
+              // The deadkey value stored in the debug data is zero-based but
+              // we need to work with a 1-based value (0 conflates with
+              // end-of-string in extended strings)
+              dk.Value := StrToIntDef(Copy(s,1,n-1), -2) + 1;
               dk.Name := Copy(s,n+1, 128);
             end
             else

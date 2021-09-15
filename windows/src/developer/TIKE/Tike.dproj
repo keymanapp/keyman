@@ -134,7 +134,6 @@
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\compile.pas"/>
         <DCCReference Include="main\KeymanDeveloperOptions.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\keyman32_int.pas"/>
         <DCCReference Include="..\..\global\delphi\general\int_kmdebug.pas"/>
         <DCCReference Include="debug\UfrmKeyTest.pas">
             <Form>frmKeyTest</Form>
@@ -184,7 +183,7 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.ProjectSaver.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="main\debugging.pas"/>
+        <DCCReference Include="main\Keyman.System.Debug.DebugUIStatus.pas"/>
         <DCCReference Include="rel\keymanstrings.pas"/>
         <DCCReference Include="help\kwhelp.pas"/>
         <DCCReference Include="main\UKeyBitmap.pas"/>
@@ -285,8 +284,8 @@
         <DCCReference Include="debug\UfrmDebugStatus_RegTest.pas">
             <Form>frmDebugStatus_RegTest</Form>
         </DCCReference>
-        <DCCReference Include="debug\UfrmDebugStatus_CallStack.pas">
-            <Form>frmDebugStatus_CallStack</Form>
+        <DCCReference Include="debug\UfrmDebugStatus_Events.pas">
+            <Form>frmDebugStatus_Events</Form>
         </DCCReference>
         <DCCReference Include="debug\UfrmDebugStatus_Deadkeys.pas">
             <Form>frmDebugStatus_DeadKeys</Form>
@@ -414,8 +413,6 @@
         <DCCReference Include="oskbuilder\TouchLayout.pas"/>
         <DCCReference Include="oskbuilder\TouchLayoutDefinitions.pas"/>
         <DCCReference Include="main\CharMapDropTool_TntCustomEdit.pas"/>
-        <DCCReference Include="debug\DebugUtils.pas"/>
-        <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CheckboxGridHelper.pas"/>
         <DCCReference Include="dialogs\UfrmAddKeyboardFeature.pas">
             <Form>frmAddKeyboardFeature</Form>
@@ -546,6 +543,16 @@
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanCore.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas"/>
+        <DCCReference Include="debug\UfrmDebugStatus_CallStack.pas">
+            <Form>frmDebugStatus_CallStack</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="debug\Keyman.System.Debug.DebugEvent.pas"/>
+        <DCCReference Include="debug\Keyman.System.Debug.DebugCore.pas"/>
+        <DCCReference Include="main\Keyman.System.VisualKeyboardImportKMX.pas"/>
+        <DCCReference Include="debug\Keyman.UI.Debug.CharacterGridRenderer.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -607,6 +614,18 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
+                <DeployFile LocalName="bin\Win32\Debug\Tike.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win32">
+                        <RemoteName>Tike.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin\Win32\Debug\Tike.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>Tike.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Tike.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
                         <RemoteName>Tike.rsm</RemoteName>

@@ -23,6 +23,7 @@ private:
   debug_items *_items;
   void push_item(
     uint8_t type,
+    uint16_t first_action,
     uint32_t flags = 0,
     LPGROUP group = nullptr,
     LPKEY key = nullptr,
@@ -36,20 +37,22 @@ private:
 public:
   KMX_DebugItems(debug_items *items);
   void push_begin(km_kbp_state_debug_key_info *key_info, uint32_t flags);
-  void push_end(uint32_t flags);
-  void push_group_enter(LPGROUP group);
-  void push_group_exit(LPGROUP group, uint32_t flags);
-  void push_nomatch_enter(LPGROUP group);
-  void push_nomatch_exit(LPGROUP group);
-  void push_match_enter(LPGROUP group);
-  void push_match_exit(LPGROUP group);
+  void push_end(uint16_t first_action, uint32_t flags);
+  void push_group_enter(uint16_t first_action, LPGROUP group);
+  void push_group_exit(uint16_t first_action, uint32_t flags, LPGROUP group);
+  void push_nomatch_enter(uint16_t first_action, LPGROUP group);
+  void push_nomatch_exit(uint16_t first_action, LPGROUP group);
+  void push_match_enter(uint16_t first_action, LPGROUP group);
+  void push_match_exit(uint16_t first_action, LPGROUP group);
   void push_rule_enter(
+    uint16_t first_action,
     LPGROUP group,
     LPKEY key,
     PKMX_WCHAR context,
     PKMX_WORD index_stack
   );
   void push_rule_exit(
+    uint16_t first_action,
     LPGROUP group,
     LPKEY key,
     PKMX_WCHAR context,
@@ -75,58 +78,63 @@ KMX_DebugItems::push_begin(
 }
 
 inline void
-KMX_DebugItems::push_end(uint32_t flags) {
-  _items->push_end(flags);
+KMX_DebugItems::push_end(
+  uint16_t first_action,
+  uint32_t flags
+) {
+  _items->push_end(first_action, flags);
 }
 
 inline void
-KMX_DebugItems::push_group_enter(LPGROUP group) {
-  push_item(KM_KBP_DEBUG_GROUP_ENTER, 0, group);
+KMX_DebugItems::push_group_enter(uint16_t first_action, LPGROUP group) {
+  push_item(KM_KBP_DEBUG_GROUP_ENTER, first_action, 0, group);
 }
 
 inline void
-KMX_DebugItems::push_group_exit(LPGROUP group, uint32_t flags) {
-  push_item(KM_KBP_DEBUG_GROUP_EXIT, flags, group);
+KMX_DebugItems::push_group_exit(uint16_t first_action, uint32_t flags, LPGROUP group) {
+  push_item(KM_KBP_DEBUG_GROUP_EXIT, first_action, flags, group);
 }
 
 inline void
-KMX_DebugItems::push_nomatch_enter(LPGROUP group) {
-  push_item(KM_KBP_DEBUG_NOMATCH_ENTER, 0, group);
+KMX_DebugItems::push_nomatch_enter(uint16_t first_action, LPGROUP group) {
+  push_item(KM_KBP_DEBUG_NOMATCH_ENTER, first_action, 0, group);
 }
 
 inline void
-KMX_DebugItems::push_nomatch_exit(LPGROUP group) {
-  push_item(KM_KBP_DEBUG_NOMATCH_EXIT, 0, group);
+KMX_DebugItems::push_nomatch_exit(uint16_t first_action, LPGROUP group) {
+  push_item(KM_KBP_DEBUG_NOMATCH_EXIT, first_action, 0, group);
 }
 
 inline void
-KMX_DebugItems::push_match_enter(LPGROUP group) {
-  push_item(KM_KBP_DEBUG_MATCH_ENTER, 0, group);
+KMX_DebugItems::push_match_enter(uint16_t first_action, LPGROUP group) {
+  push_item(KM_KBP_DEBUG_MATCH_ENTER, first_action, 0, group);
 }
 
 inline void
-KMX_DebugItems::push_match_exit(LPGROUP group) {
-  push_item(KM_KBP_DEBUG_MATCH_EXIT, 0, group);
+KMX_DebugItems::push_match_exit(uint16_t first_action, LPGROUP group) {
+  push_item(KM_KBP_DEBUG_MATCH_EXIT, first_action, 0, group);
 }
 
 inline void
 KMX_DebugItems::push_rule_enter(
+  uint16_t first_action,
   LPGROUP group,
   LPKEY key,
   PKMX_WCHAR context,
   PKMX_WORD index_stack
 ) {
-  push_item(KM_KBP_DEBUG_RULE_ENTER, 0, group, key, context, index_stack);
+  push_item(KM_KBP_DEBUG_RULE_ENTER, first_action, 0, group, key, context, index_stack);
 }
 
 inline void
 KMX_DebugItems::push_rule_exit(
+  uint16_t first_action,
   LPGROUP group,
   LPKEY key,
   PKMX_WCHAR context,
   PKMX_WORD index_stack
 ) {
-  push_item(KM_KBP_DEBUG_RULE_EXIT, 0, group, key, context, index_stack);
+  push_item(KM_KBP_DEBUG_RULE_EXIT, first_action, 0, group, key, context, index_stack);
 }
 
 } // namespace kmx

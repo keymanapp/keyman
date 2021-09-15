@@ -75,6 +75,7 @@ type
     actDebugViewState: TAction;
     actKeyboardFontHelper: TAction;
     actKeyboardFonts: TAction;
+    actDebugSwitchToDebuggerWindow: TAction;
     procedure actKeyboardCompileExecute(Sender: TObject);
     procedure actionsKeyboardEditorUpdate(Action: TBasicAction;
       var Handled: Boolean);
@@ -122,6 +123,8 @@ type
     procedure actKeyboardFontHelperExecute(Sender: TObject);
     procedure actKeyboardFontsExecute(Sender: TObject);
     procedure actKeyboardCompileUpdate(Sender: TObject);
+    procedure actDebugSwitchToDebuggerWindowUpdate(Sender: TObject);
+    procedure actDebugSwitchToDebuggerWindowExecute(Sender: TObject);
   private
     function IsDebuggerVisible: Boolean;
     function IsDebuggerInTestMode: Boolean;
@@ -137,13 +140,14 @@ var
 implementation
 
 uses
-  ComObj,
-  Forms,
+  Vcl.Forms,
   Vcl.Menus,
+  System.Win.ComObj,
   Winapi.Windows,
 
   KMDActions,
   KMDActionInterfaces,
+  Keyman.System.Debug.DebugUIStatus,
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.UI.Project.kmnProjectFileUI,
   Keyman.Developer.System.Project.kpsProjectFile,
@@ -212,8 +216,7 @@ end;
 
 procedure TmodActionsKeyboardEditor.actDebugDebuggerModeUpdate(Sender: TObject);
 begin
-  actDebugDebuggerMode.Enabled := (ActiveEditor <> nil) and (ActiveEditor.DebugForm.CanDebug);
-  actDebugDebuggerMode.Checked := actDebugDebuggerMode.Enabled and (ActiveEditor.DebugForm.UIStatus <> duiTest);
+  actDebugDebuggerMode.Checked := (ActiveEditor <> nil) and (ActiveEditor.DebugForm.UIStatus <> duiTest);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugPauseExecute(Sender: TObject);
@@ -330,6 +333,19 @@ end;
 procedure TmodActionsKeyboardEditor.actDebugStopDebuggerUpdate(Sender: TObject);
 begin
   actDebugStopDebugger.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible;
+end;
+
+procedure TmodActionsKeyboardEditor.actDebugSwitchToDebuggerWindowExecute(
+  Sender: TObject);
+begin
+  ActiveEditor.DebugForm.SetFocus;
+end;
+
+procedure TmodActionsKeyboardEditor.actDebugSwitchToDebuggerWindowUpdate(
+  Sender: TObject);
+begin
+  actDebugSwitchToDebuggerWindow.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible and
+    ((Screen.ActiveControl = nil) or (Screen.ActiveControl.Owner <> ActiveEditor.DebugForm));
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugTestModeExecute(Sender: TObject);

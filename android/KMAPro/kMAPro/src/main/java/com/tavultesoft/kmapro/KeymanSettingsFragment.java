@@ -27,7 +27,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static final String TAG = "SettingsFragment";
   private static Context context;
 
-  private Preference languagesPreference, installKeyboardOrDictionary, displayLanguagePreference;
+  private Preference languagesPreference, installKeyboardOrDictionary, displayLanguagePreference,
+    adjustKeyboardHeight;
   private ListPreference spacebarTextPreference;
   private CheckBoxPreference setSystemKeyboardPreference;
   private CheckBoxPreference setDefaultKeyboardPreference;
@@ -61,6 +62,49 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     displayLanguagePreference.setWidgetLayoutResource(R.layout.preference_translate_icon_layout);
     Intent displayLanguageIntent = new Intent(context, KeymanSettingsLocalizeActivity.class);
     displayLanguagePreference.setIntent(displayLanguageIntent);
+
+    // Blocks the default checkmark interaction; we want to control the checkmark's state separately
+    // from within update() based on if the user has taken the appropriate actions with the OS.
+    final Preference.OnPreferenceChangeListener checkBlocker = new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        return false;
+      }
+    };
+
+    setSystemKeyboardPreference = new CheckBoxPreference(context);
+    setSystemKeyboardPreference.setTitle(R.string.enable_system_keyboard);
+    setSystemKeyboardPreference.setSingleLineTitle(false);
+    setSystemKeyboardPreference.setDefaultValue(SystemIMESettings.isEnabledAsSystemKB(context));
+    setSystemKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+        startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+        return false;
+      }
+    });
+    setSystemKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
+
+    setDefaultKeyboardPreference = new CheckBoxPreference(context);
+    setDefaultKeyboardPreference.setTitle(R.string.set_keyman_as_default);
+    setDefaultKeyboardPreference.setSingleLineTitle(false);
+    setDefaultKeyboardPreference.setDefaultValue(SystemIMESettings.isDefaultKB(context));
+    setDefaultKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+        InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imManager.showInputMethodPicker();
+        return false;
+      }
+    });
+
+    setDefaultKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
+    adjustKeyboardHeight = new Preference(context);
+    adjustKeyboardHeight.setKey(AdjustKeyboardHeightActivity.adjustKeyboardHeightKey);
+    adjustKeyboardHeight.setTitle(getString(R.string.adjust_keyboard_height));
+    adjustKeyboardHeight.setWidgetLayoutResource(R.layout.preference_height_icon_layout);
+    Intent adjustKeyboardHeightIntent = new Intent(context, AdjustKeyboardHeightActivity.class);
+    adjustKeyboardHeight.setIntent(adjustKeyboardHeightIntent);
 
     /* Spacebar Caption Preference */
 
@@ -129,49 +173,16 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     sendCrashReportPreference.setSummaryOff(getString(R.string.show_send_crash_report_off));
     sendCrashReportPreference.setDefaultValue(true);
 
-    // Blocks the default checkmark interaction; we want to control the checkmark's state separately
-    // from within update() based on if the user has taken the appropriate actions with the OS.
-    final Preference.OnPreferenceChangeListener checkBlocker = new Preference.OnPreferenceChangeListener() {
-      @Override
-      public boolean onPreferenceChange(Preference preference, Object newValue) {
-        return false;
-      }
-    };
 
-    setSystemKeyboardPreference = new CheckBoxPreference(context);
-    setSystemKeyboardPreference.setTitle(R.string.enable_system_keyboard);
-    setSystemKeyboardPreference.setSingleLineTitle(false);
-    setSystemKeyboardPreference.setDefaultValue(SystemIMESettings.isEnabledAsSystemKB(context));
-    setSystemKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-      @Override
-      public boolean onPreferenceClick(Preference preference) {
-        startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
-        return false;
-      }
-    });
-    setSystemKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
-
-    setDefaultKeyboardPreference = new CheckBoxPreference(context);
-    setDefaultKeyboardPreference.setTitle(R.string.set_keyman_as_default);
-    setDefaultKeyboardPreference.setSingleLineTitle(false);
-    setDefaultKeyboardPreference.setDefaultValue(SystemIMESettings.isDefaultKB(context));
-    setDefaultKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-      @Override
-      public boolean onPreferenceClick(Preference preference) {
-        InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imManager.showInputMethodPicker();
-        return false;
-      }
-    });
-    setDefaultKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
 
     screen.addPreference(languagesPreference);
     screen.addPreference(installKeyboardOrDictionary);
     screen.addPreference(displayLanguagePreference);
-    screen.addPreference(spacebarTextPreference);
-
     screen.addPreference(setSystemKeyboardPreference);
     screen.addPreference(setDefaultKeyboardPreference);
+
+    screen.addPreference(adjustKeyboardHeight);
+    screen.addPreference(spacebarTextPreference);
 
     screen.addPreference(bannerPreference);
     screen.addPreference(getStartedPreference);

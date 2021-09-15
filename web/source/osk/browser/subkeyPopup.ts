@@ -64,7 +64,8 @@ namespace com.keyman.osk.browser {
 
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
-      ss.bottom=(parseInt(e.style.bottom,10)+parseInt(e.style.height,10)+4)+'px';
+      let rowElement = (e.key as OSKBaseKey).row.element;
+      ss.bottom = (vkbd.height - rowElement.offsetTop) + 'px';
 
       // Set key font according to layout, or defaulting to OSK font
       // (copied, not inherited, since OSK is not a parent of popup keys)
@@ -74,7 +75,7 @@ namespace com.keyman.osk.browser {
       ss.fontSize=keyman.util.getStyleValue(e,'font-size');
       ss.visibility='hidden';
 
-      var nKeys=subKeySpec.length,nRow,nRows,nCols;
+      var nKeys=subKeySpec.length,nRows,nCols;
       nRows=Math.min(Math.ceil(nKeys/9),2);
       nCols=Math.ceil(nKeys/nRows);
       if(nRows > 1) {
@@ -110,11 +111,11 @@ namespace com.keyman.osk.browser {
       }
     }
 
-    finalize(touch: Touch) {
+    finalize(input: InputEventCoordinate) {
       if(this.resolver) {
         let keyEvent: text.KeyEvent = null;
         if(this.currentSelection) {
-          keyEvent = this.vkbd.initKeyEvent(this.currentSelection, touch);
+          keyEvent = this.vkbd.initKeyEvent(this.currentSelection, input);
           this.currentSelection.key.highlight(false);
         }
         this.resolver(keyEvent);
@@ -255,7 +256,7 @@ namespace com.keyman.osk.browser {
       }
     }
 
-    updateTouch(touch: Touch) {
+    updateTouch(input: InputEventCoordinate) {
       this.currentSelection = null;
       this.baseKey.key.highlight(false);
 
@@ -263,7 +264,7 @@ namespace com.keyman.osk.browser {
         try {
           let sk = this.element.childNodes[i].firstChild as KeyElement;
 
-          let onKey = sk.key.isUnderTouch(touch);
+          let onKey = sk.key.isUnderTouch(input);
           if(onKey) {
             this.currentSelection = sk;
           }
@@ -278,7 +279,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Use the popup duplicate of the base key if a phone with a visible popup array
-      if(!this.currentSelection && this.baseKey.key.isUnderTouch(touch)) {
+      if(!this.currentSelection && this.baseKey.key.isUnderTouch(input)) {
         this.baseKey.key.highlight(true);
         this.currentSelection = this.baseKey;
       }

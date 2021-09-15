@@ -25,7 +25,7 @@ if(!window['keyman']['ui']['name']) {
 
   try {
     // Declare KeymanWeb, OnScreen keyboard and Util objects
-    var keymanweb=window['keyman'],osk=keymanweb['osk'],
+    var keymanweb=window['keyman'],
       util=keymanweb['util'],dbg=keymanweb['debug'];
     
     // Disable UI for touch devices
@@ -101,7 +101,8 @@ if(!window['keyman']['ui']['name']) {
         _name=null;
       
       keymanweb['focusLastActiveElement']();
-      if(osk['isEnabled']()) osk['show'](true);    
+      let osk = keymanweb.osk;
+      if(osk && osk['isEnabled']()) osk['show'](true);    
 
       ui._ShowKeyboardButton(_name);
       return false;
@@ -213,17 +214,21 @@ if(!window['keyman']['ui']['name']) {
         } 
         else
         {
-          kbdId.className = osk['isEnabled']() ? 'kmw_show' : 'kmw_hide';
+          let osk = keymanweb.osk;
+          kbdId.className = osk && osk['isEnabled']() ? 'kmw_show' : 'kmw_hide';
         }
       }
     }  
   
-    /**
-     * UI Functions called by KeymanWeb or OSK
-     */     
-    osk['addEventListener']('show',
-      function(oskPosition)
-      { 
+    ui.registerEvents = function() {
+      let osk = keymanweb.osk;
+      if(!osk) {
+        return;
+      }
+      /**
+       * UI Functions called by KeymanWeb or OSK
+       */     
+      osk['addEventListener']('show', function(oskPosition) { 
         var t=keymanweb['getLastActiveElement']();
         if(t)
         {  
@@ -237,16 +242,16 @@ if(!window['keyman']['ui']['name']) {
         ui._ShowKeyboardButton();
         return oskPosition; 
       }); 
-  /* TODO: why is this still needed??? Does it actually do anything?? */ 
-    osk['addEventListener']('hide',
-      function(hiddenByUser)
-      { 
+
+      /* TODO: why is this still needed??? Does it actually do anything?? */ 
+      osk['addEventListener']('hide', function(hiddenByUser) { 
         if((arguments.length > 0) && hiddenByUser)
         {
           var _a = document.getElementById('KMW_Keyboard');
           if(_a) _a.className = 'kmw_hide';
         }    
       }); 
+    }
     
     /**
      * Show or hide the OSK (always visible for CJK keyboards)
@@ -257,7 +262,9 @@ if(!window['keyman']['ui']['name']) {
     ui._ShowKeymanWebKeyboard = function(_anchor) 
     { 
       var kbdId=document.getElementById("KMW_Keyboard");
-      if((kbdId.className!='kmw_disabled') && osk['show']) 
+      let osk = keymanweb.osk;
+
+      if((kbdId.className!='kmw_disabled') && osk && osk['show']) 
       {
         if(osk['isEnabled']()) osk['hide'](); else osk['show'](true);
       }
@@ -270,8 +277,7 @@ if(!window['keyman']['ui']['name']) {
     /**
      * Initialize Button User Interface
      **/   
-    ui.Initialize = function()
-    {
+    ui['initialize'] = ui.Initialize = function() {
       //Never initialize UI before KMW (parameters will be undefined)
       if(!keymanweb['initialized'])
       {
@@ -384,7 +390,8 @@ if(!window['keyman']['ui']['name']) {
       util['attachDOMEvent'](_sfEl,'mouseover',ui._SelectorMouseOver);
       util['attachDOMEvent'](_sfEl,'mouseout',ui._SelectorMouseOut);    
       util['attachDOMEvent'](_sfEl,'mouseup',ui._SelectorMouseUp);
-      
+
+      ui.registerEvents();
       keymanweb['focusLastActiveElement']();  	//TODO: this needs to be extended - if no element is active, try and identify an enabled input element
     }
 

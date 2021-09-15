@@ -47,6 +47,9 @@ display_usage() {
   echo "  install           Install all libraries"
   echo "    install-rust      Install rust libraries"
   echo "    install-cpp       Install c++ libraries"
+  echo "  uninstall         Uninstall all libraries"
+  echo "    uninstall-rust    Uninstall rust libraries"
+  echo "    uninstall-cpp     Uninstall c++ libraries"
   echo
   echo "Rust libraries will be in:      TARGETPATH/rust/<arch>/<buildtype>"
   echo "Rust web libraries will be in:  TARGETPATH/rust/web/<buildtype>"
@@ -69,6 +72,8 @@ TESTS_RUST=false
 TESTS_CPP=false
 INSTALL_RUST=false
 INSTALL_CPP=false
+UNINSTALL_RUST=false
+UNINSTALL_CPP=false
 QUIET=false
 TARGET_PATH="$THIS_DIR/build"
 ADDITIONAL_ARGS=
@@ -145,6 +150,24 @@ while [[ $# -gt 0 ]] ; do
       HAS_TARGET=true
       INSTALL_CPP=true
       ;;
+    uninstall)
+      HAS_TARGET=true
+      UNINSTALL_RUST=true
+      # ninja records the files it installs, so unless we install first we don't know
+      # what to uninstall. Installing will overwrite the existing files, if we then
+      # then uninstall the files get removed - unless previously we had additional files.
+      INSTALL_CPP=true
+      UNINSTALL_CPP=true
+      ;;
+    uninstall-rust)
+      HAS_TARGET=true
+      UNINSTALL_RUST=true
+      ;;
+    uninstall-cpp)
+      HAS_TARGET=true
+      INSTALL_CPP=true
+      UNINSTALL_CPP=true
+      ;;
     --)
       shift
       ADDITIONAL_ARGS=$@
@@ -184,6 +207,8 @@ displayInfo "" \
     "TESTS_CPP: $TESTS_CPP" \
     "INSTALL_RUST: $INSTALL_RUST" \
     "INSTALL_CPP: $INSTALL_CPP" \
+    "UNINSTALL_RUST: $UNINSTALL_RUST" \
+    "UNINSTALL_CPP: $UNINSTALL_CPP" \
     "CARGO_TARGET: $CARGO_TARGET" \
     "MESON_TARGET: $MESON_TARGET" \
     "TARGET_PATH: $TARGET_PATH" \
@@ -340,6 +365,18 @@ build_standard() {
     echo_heading "======= Installing C++ libraries for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja install
+    popd > /dev/null
+  fi
+
+  if $UNINSTALL_RUST; then
+    echo_heading "======= Uninstalling Rust libraries for $BUILD_PLATFORM ======="
+    # TODO
+  fi
+
+  if $UNINSTALL_CPP; then
+    echo_heading "======= Uninstalling C++ libraries for $BUILD_PLATFORM ======="
+    pushd "$MESON_PATH" > /dev/null
+    ninja uninstall
     popd > /dev/null
   fi
 }

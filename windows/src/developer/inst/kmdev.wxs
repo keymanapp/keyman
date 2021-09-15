@@ -200,7 +200,7 @@
       </Component>
 
       <Component>
-        <File Name="debughost.kmx" KeyPath="yes" Source="..\..\developer\tike\redist\debughost.kmx" />
+        <File Name="kmnkbp0-0.dll" KeyPath="yes" />
       </Component>
 
       <Component>

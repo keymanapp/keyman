@@ -15,7 +15,6 @@ uses
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   compile in '..\..\global\delphi\general\compile.pas',
   KeymanDeveloperOptions in 'main\KeymanDeveloperOptions.pas',
-  keyman32_int in '..\..\global\delphi\general\keyman32_int.pas',
   int_kmdebug in '..\..\global\delphi\general\int_kmdebug.pas',
   UfrmKeyTest in 'debug\UfrmKeyTest.pas' {frmKeyTest},
   CompilePackage in '..\..\global\delphi\general\CompilePackage.pas',
@@ -53,7 +52,7 @@ uses
   Keyman.Developer.System.Project.ProjectSaver in 'project\Keyman.Developer.System.Project.ProjectSaver.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',
-  debugging in 'main\debugging.pas',
+  Keyman.System.Debug.DebugUIStatus in 'main\Keyman.System.Debug.DebugUIStatus.pas',
   keymanstrings in 'rel\keymanstrings.pas',
   kwhelp in 'help\kwhelp.pas',
   UKeyBitmap in 'main\UKeyBitmap.pas',
@@ -130,7 +129,7 @@ uses
   UfrmCharacterMapFilter in '..\..\global\delphi\charmap\UfrmCharacterMapFilter.pas' {frmCharacterMapFilter},
   UfrmUnicodeDataStatus in '..\..\global\delphi\charmap\UfrmUnicodeDataStatus.pas' {frmUnicodeDataStatus},
   UfrmDebugStatus_RegTest in 'debug\UfrmDebugStatus_RegTest.pas' {frmDebugStatus_RegTest},
-  UfrmDebugStatus_CallStack in 'debug\UfrmDebugStatus_CallStack.pas' {frmDebugStatus_CallStack},
+  UfrmDebugStatus_Events in 'debug\UfrmDebugStatus_Events.pas' {frmDebugStatus_Events},
   UfrmDebugStatus_Deadkeys in 'debug\UfrmDebugStatus_Deadkeys.pas' {frmDebugStatus_DeadKeys},
   UfrmDebugStatus_Elements in 'debug\UfrmDebugStatus_Elements.pas' {frmDebugStatus_Elements},
   UfrmDebugStatus in 'child\UfrmDebugStatus.pas' {frmDebugStatus},
@@ -190,8 +189,6 @@ uses
   TouchLayout in 'oskbuilder\TouchLayout.pas',
   TouchLayoutDefinitions in 'oskbuilder\TouchLayoutDefinitions.pas',
   CharMapDropTool_TntCustomEdit in 'main\CharMapDropTool_TntCustomEdit.pas',
-  DebugUtils in 'debug\DebugUtils.pas',
-  keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   Winapi.UxTheme,
   CheckboxGridHelper in '..\..\global\delphi\general\CheckboxGridHelper.pas',
   UfrmAddKeyboardFeature in 'dialogs\UfrmAddKeyboardFeature.pas' {frmAddKeyboardFeature},
@@ -286,7 +283,14 @@ uses
   sentry in '..\..\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
-  Keyman.Developer.System.Project.UrlRenderer in 'project\Keyman.Developer.System.Project.UrlRenderer.pas';
+  Keyman.Developer.System.Project.UrlRenderer in 'project\Keyman.Developer.System.Project.UrlRenderer.pas',
+  Keyman.System.KeymanCore in '..\..\global\delphi\general\Keyman.System.KeymanCore.pas',
+  Keyman.System.KeymanCoreDebug in '..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas',
+  UfrmDebugStatus_CallStack in 'debug\UfrmDebugStatus_CallStack.pas' {frmDebugStatus_CallStack},
+  Keyman.System.Debug.DebugEvent in 'debug\Keyman.System.Debug.DebugEvent.pas',
+  Keyman.System.Debug.DebugCore in 'debug\Keyman.System.Debug.DebugCore.pas',
+  Keyman.System.VisualKeyboardImportKMX in 'main\Keyman.System.VisualKeyboardImportKMX.pas',
+  Keyman.UI.Debug.CharacterGridRenderer in 'debug\Keyman.UI.Debug.CharacterGridRenderer.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -318,8 +322,8 @@ begin
           //TBX.TBXSetTheme('OfficeXP2');
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-          Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-          Application.Run;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  Application.Run;
         end;
       finally
         FInitializeCEF.Free;

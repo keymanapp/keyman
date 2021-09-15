@@ -18,10 +18,12 @@ uses
   Winapi.Windows,
 
   uCEFChromium,
+  uCEFChromiumCore,
   uCEFChromiumEvents,
   uCEFChromiumWindow,
   uCEFInterfaces,
   uCEFTypes,
+  uCEFWinControl,
   uCEFWindowParent,
 
   Keyman.System.CEFManager,
@@ -94,10 +96,11 @@ type
     procedure cefAfterCreated(Sender: TObject; const browser: ICefBrowser);
     procedure cefBeforeClose(Sender: TObject; const browser: ICefBrowser);
     procedure cefClose(Sender: TObject; const browser: ICefBrowser;
-      out Result: Boolean);
+      var aAction: TCefCloseBrowserAction);
     procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
-      const event: PCefKeyEvent; osEvent: PMsg; out isKeyboardShortcut,
+      const event: PCefKeyEvent; osEvent: TCefEventHandle; out isKeyboardShortcut,
       Result: Boolean);   // I2986
+
     procedure cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
                          const frame: ICefFrame; httpStatusCode: Integer);
     procedure cefBeforeBrowse(Sender: TObject; const browser: ICefBrowser;
@@ -119,13 +122,14 @@ type
                              var windowInfo: TCefWindowInfo;
                              var client: ICefClient;
                              var settings: TCefBrowserSettings;
+                             var extra_info: ICefDictionaryValue;
                              var noJavascriptAccess: Boolean;
                              var Result: Boolean);
     procedure cefSetFocus(Sender: TObject; const browser: ICefBrowser;
       source: TCefFocusSource; out Result: Boolean);
     procedure cefTitleChange(Sender: TObject; const browser: ICefBrowser;
       const title: ustring);
-    procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
+    procedure cefWidgetCompMsg(Sender: TObject; var aMessage: TMessage; var aHandled: Boolean);
     procedure cefLoadingStateChange(Sender: TObject; const browser: ICefBrowser;
       isLoading, canGoBack, canGoForward: Boolean);
   private
@@ -321,7 +325,7 @@ begin
   FreeMem(p);
 end;
 
-procedure TframeCEFHost.cefWidgetCompMsg(var aMessage: TMessage;
+procedure TframeCEFHost.cefWidgetCompMsg(Sender: TObject; var aMessage: TMessage;
   var aHandled: Boolean);
 begin
   AssertCefThread;
@@ -555,11 +559,11 @@ begin
 end;
 
 procedure TframeCEFHost.cefClose(Sender: TObject; const browser: ICefBrowser;
-  out Result: Boolean);
+  var aAction: TCefCloseBrowserAction);
 begin
   AssertCefThread;
   PostMessage(FCallbackWnd, CEF_DESTROY, 0, 0);
-  Result := True;
+  aAction := cbaClose;
 end;
 
 procedure TframeCEFHost.Handle_CEF_DESTROY(var Message: TMessage);
@@ -657,7 +661,7 @@ begin
 end;
 
 procedure TframeCEFHost.cefPreKeyEvent(Sender: TObject;
-  const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: PMsg;
+  const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: TCefEventHandle;
   out isKeyboardShortcut, Result: Boolean);
 var
   p: PCEFHostKeyEventData;
@@ -710,7 +714,9 @@ procedure TframeCEFHost.cefBeforePopup(Sender: TObject;
   targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
   userGesture: Boolean; const popupFeatures: TCefPopupFeatures;
   var windowInfo: TCefWindowInfo; var client: ICefClient;
-  var settings: TCefBrowserSettings; var noJavascriptAccess, Result: Boolean);
+  var settings: TCefBrowserSettings;
+  var extra_info: ICefDictionaryValue;
+  var noJavascriptAccess, Result: Boolean);
 begin
   AssertCefThread;
   DoBeforeBrowse(targetUrl, frame.IsMain, True, True, Result);

@@ -10,12 +10,12 @@
 #include <string>
 
 #include <keyman/keyboardprocessor.h>
+
 #include "path.hpp"
-
 #include "state.hpp"
+#include "action_items.hpp"
 
-#define   try_status(expr) \
-{auto __s = (expr); if (__s != KM_KBP_STATUS_OK) std::exit(100*__LINE__+__s);}
+#include "../test_assert.h"
 
 namespace
 {
@@ -81,50 +81,13 @@ constexpr km_kbp_option_item const expected_persist_opt = {
   KM_KBP_OPT_KEYBOARD
 };
 
-inline
-bool operator==(km_kbp_option_item const & lhs, km_kbp_option_item const & rhs)
-{
-  return lhs.scope == rhs.scope
-      && std::u16string(lhs.key) == rhs.key
-      && std::u16string(lhs.value) == rhs.value;
-}
-
-
-bool operator==(km_kbp_action_item const & lhs,
-                km_kbp_action_item const & rhs)
-{
-  if (lhs.type != rhs.type) return false;
-  switch(lhs.type)
-  {
-    case KM_KBP_IT_CHAR:        return lhs.character == rhs.character;
-    case KM_KBP_IT_MARKER:      return lhs.marker == rhs.marker;
-    case KM_KBP_IT_PERSIST_OPT: return *lhs.option == *rhs.option;
-    default: break;
-  }
-
-  return true;
-}
-
-#ifdef assert
-#undef assert
-#endif
-#define assert(expr) {if (!(expr)) return __LINE__; }
-bool action_items(km_kbp_state const * state,
-                  std::initializer_list<km_kbp_action_item> const & expected)
-{
-  size_t n = 0;
-  auto act = km_kbp_state_action_items(state, &n);
-
-  for (auto &rhs: expected)
-    if (!(*act++ == rhs)) return false;
-
-  return true;
-}
-
 } // namespace
 
-int main(int, char * [])
+int main(int argc, char * argv[])
 {
+  auto arg_color = std::string(argc > 1 ? argv[1] : "") == "--color";
+  console_color::enabled = console_color::isaterminal() || arg_color;
+
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr,
                * test_clone = nullptr;
@@ -165,22 +128,22 @@ int main(int, char * [])
   if (attrs->max_context < 16) return __LINE__;
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,
-                                  KM_KBP_MODIFIER_SHIFT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}}));
+                                  KM_KBP_MODIFIER_SHIFT, 1));
+  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}, {KM_KBP_IT_END}}));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_I,
-                                  KM_KBP_MODIFIER_SHIFT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('I')}}}));
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L, 0));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('l')}}}));
+                                  KM_KBP_MODIFIER_SHIFT, 1));
+  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('I')}}, {KM_KBP_IT_END}}));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L, 0, 1));
+  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('l')}}, {KM_KBP_IT_END}}));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0));
-  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {0}}}));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1));
+  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {0}}, {KM_KBP_IT_END}}));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L,
-                                  KM_KBP_MODIFIER_SHIFT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('L')}}}));
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F2,0));
+                                  KM_KBP_MODIFIER_SHIFT, 1));
+  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('L')}}, {KM_KBP_IT_END}}));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F2, 0, 1));
   assert(action_items(test_state, {{KM_KBP_IT_PERSIST_OPT, {0,},
-                      {uintptr_t(&expected_persist_opt)}}}));
+                      {uintptr_t(&expected_persist_opt)}}, {KM_KBP_IT_END}}));
 
   // Test debug dump
   auto doc1 = get_json_doc(*test_state),

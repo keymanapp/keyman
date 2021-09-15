@@ -2,7 +2,7 @@ import getpass
 import gettext
 import importlib
 import logging
-import os.path
+import os
 import platform
 import sys
 
@@ -13,6 +13,7 @@ from .version import __releaseversion__
 from .version import __tier__
 from .version import __pkgversion__
 from .version import __environment__
+from .version import __uploadsentry__
 
 
 def _(txt):
@@ -42,6 +43,8 @@ if 'unittest' in sys.modules.keys():
     print('Not reporting to Sentry', file=sys.stderr)
 elif os.environ.get('KEYMAN_NOSENTRY'):
     print('Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set', file=sys.stderr)
+elif not __uploadsentry__:
+    print('Not reporting to Sentry because UPLOAD_SENTRY is false (%s)' % __environment__, file=sys.stderr)
 else:
     try:
         # Try new sentry-sdk first
@@ -51,8 +54,8 @@ else:
         HaveSentryNewSdk = True
 
         sentry_logging = LoggingIntegration(
-            level=logging.INFO,          # Capture info and above as breadcrumbs
-            event_level=logging.CRITICAL # Send critical errors as events
+            level=logging.INFO,           # Capture info and above as breadcrumbs
+            event_level=logging.CRITICAL  # Send critical errors as events
         )
         SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357@sentry.keyman.com/12"
         sentry_sdk.init(

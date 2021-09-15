@@ -73,6 +73,25 @@ class ModelCompositor {
 
     if(!(transformDistribution instanceof Array)) {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
+    } else if(transformDistribution.length == 0) {
+      /*
+         Robust stop-gap: if our other filters somehow fail, this fixes the 
+         zero-length array by making it match the form of the array that
+         would result if it were instead called with the other legal 
+         parameter type - a single Transform.
+
+         Unfortunately, the method will lack all data about even 
+         the original keystroke that resulted in the call... but this way, 
+         we can at least get some predictions rather than shortcutting 
+         and producing none whatsoever.      
+      */
+      transformDistribution.push({
+        sample: {
+          insert: '',
+          deleteLeft: 0
+        },
+        p: 1.0
+      })
     }
 
     let inputTransform = transformDistribution.sort(function(a, b) {
@@ -253,8 +272,15 @@ class ModelCompositor {
     for(let prediction of rawPredictions) {
       // Combine duplicate samples.
       let displayText = prediction.sample.displayAs;
+      let preserveAsKeep = displayText == keepOptionText;
 
-      if(displayText == keepOptionText || (lexicalModel.toKey && displayText == lexicalModel.toKey(keepOptionText)) ) {
+      // De-duplication should be case-insensitive, but NOT
+      // diacritic-insensitive.
+      if(this.lexicalModel.languageUsesCasing) {
+        preserveAsKeep = preserveAsKeep || displayText == this.lexicalModel.applyCasing('lower', keepOptionText);
+      }
+
+      if(preserveAsKeep) {
         // Preserve the original, pre-keyed version of the text.
         if(!keepOption) {
           let baseTransform = prediction.sample.transform;

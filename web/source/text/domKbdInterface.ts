@@ -25,8 +25,19 @@ namespace com.keyman.text {
    * @return      {?number}               1 if already registered, else null
    */    
   KeyboardInterface.prototype.registerStub = function(Pstub): number {
-    let keyman = com.keyman.singleton;
-    return keyman.keyboardManager._registerStub(Pstub);
+    let keyboardManager = com.keyman.singleton.keyboardManager;
+    if (keyboardManager.keymanweb.initialized) {
+      // If language code already defined (or not specified in stub), check to see if stub already registered
+      for(let Lk=0; Lk < keyboardManager.keyboardStubs.length; Lk++) {
+        if(keyboardManager.keyboardStubs[Lk]['KI'] == Pstub['KI']) {
+          if(Pstub['KLC'] == '' || (keyboardManager.keyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
+            return 1; // no need to register
+          }
+        }
+      }
+    }
+    keyboardManager._registerStub(Pstub);
+    return null;
   }
 
   /**

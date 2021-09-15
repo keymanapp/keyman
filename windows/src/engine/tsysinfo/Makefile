@@ -20,6 +20,7 @@ build: version.res manifest.res dirs
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\tsysinfo.exe -dpr tsysinfo.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tsysinfo.exe
     $(COPY) $(WIN32_TARGET_PATH)\tsysinfo.exe $(PROGRAM)\engine
+    $(COPY) $(ROOT)\src\engine\tsysinfo\*.xsl "$(PROGRAM)\engine"
     if exist $(WIN32_TARGET_PATH)\tsysinfo.dbg $(COPY) $(WIN32_TARGET_PATH)\tsysinfo.dbg $(DEBUGPATH)\engine
 
 clean: def-clean

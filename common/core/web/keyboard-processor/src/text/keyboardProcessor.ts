@@ -101,7 +101,7 @@ namespace com.keyman.text {
     }
 
     /**
-     * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults 
+     * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults
      * where and when appropriate.
      *
      * @param   {object}  Lkc           The pre-analyzed KeyEvent object
@@ -125,7 +125,7 @@ namespace com.keyman.text {
 
           // We'd rather let the browser handle these keys, but we're using emulated keystrokes, forcing KMW
           // to emulate default behavior here.
-        } else if((special = DefaultOutput.forSpecialEmulation(Lkc)) != null) { 
+        } else if((special = DefaultOutput.forSpecialEmulation(Lkc)) != null) {
           switch(special) {
             case EmulationKeystrokes.Backspace:
               this.keyboardInterface.defaultBackspace(outputTarget);
@@ -139,12 +139,12 @@ namespace com.keyman.text {
             default:
               // In case we extend the allowed set, but forget to implement its handling case above.
               ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + (special as String).kmwCharCodeAt(0).toString(16) + ") went unhandled!";
-          } 
+          }
         } else {
           // Back to the standard default, pending normal matching.
           matched = false;
         }
-      } 
+      }
 
       let isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
@@ -196,7 +196,7 @@ namespace com.keyman.text {
           // Special case for U_xxxx keys. This vk code will never be used
           // in a keyboard, so we use this to ensure that keystroke processing
           // occurs for the key.
-          Lkc.Lcode = 1; 
+          Lkc.Lcode = 1;
         }
       }
 
@@ -216,15 +216,15 @@ namespace com.keyman.text {
          * The `this.installInterface()` call is insurance against something I've seen in unit tests when things break a bit.
          *
          * Currently, when a KMW shutdown doesn't go through properly or completely, sometimes we end up with parallel
-         * versions of KMW running, and an old, partially-shutdown one will "snipe" a command meant for the most-recent 
-         * one's test. So, installing here ensures that the active Processor has its matching KeyboardInterface ready, 
+         * versions of KMW running, and an old, partially-shutdown one will "snipe" a command meant for the most-recent
+         * one's test. So, installing here ensures that the active Processor has its matching KeyboardInterface ready,
          * even should that occur.
          */
         this.installInterface();
         matchBehavior = this.keyboardInterface.processKeystroke(outputTarget, keyEvent);
       }
 
-      if(!matchBehavior) {
+      if(!matchBehavior || matchBehavior.triggerKeyDefault) {
         // Restore the virtual key code if a mnemonic keyboard is being used
         // If no vkCode value was stored, maintain the original Lcode value.
         keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
@@ -235,7 +235,15 @@ namespace com.keyman.text {
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
-        matchBehavior = this.defaultRuleBehavior(keyEvent, outputTarget);
+        let defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget);
+        if(defaultBehavior) {
+          if(!matchBehavior) {
+            matchBehavior = defaultBehavior;
+          } else {
+            matchBehavior.mergeInDefaults(defaultBehavior);
+          }
+          matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
+        } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
 
         this.keyboardInterface.activeTargetOutput = null;
       }
@@ -254,13 +262,13 @@ namespace com.keyman.text {
         for(var key in Lkc) {
           mappingEvent[key] = Lkc[key];
         }
-        
+
         // To facilitate storing relevant commands, we should probably reverse-lookup
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
         var mappedChar: string = DefaultOutput.forAny(mappingEvent, true);
-        
+
         /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
          * rules, but allows us to replicate/emulate commands after rule processing if needed.
          * (Like backspaces)
@@ -309,11 +317,11 @@ namespace com.keyman.text {
       if(layerId.indexOf('leftctrl') >= 0) {
         modifier |= Codes.modifierCodes['LCTRL'];
         ctrlMatched=true;
-      } 
+      }
       if(layerId.indexOf('rightctrl') >= 0) {
         modifier |= Codes.modifierCodes['RCTRL'];
         ctrlMatched=true;
-      } 
+      }
       if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
         modifier |= Codes.modifierCodes['CTRL'];
       }
@@ -322,11 +330,11 @@ namespace com.keyman.text {
       if(layerId.indexOf('leftalt') >= 0) {
         modifier |= Codes.modifierCodes['LALT'];
         altMatched=true;
-      } 
+      }
       if(layerId.indexOf('rightalt') >= 0) {
         modifier |= Codes.modifierCodes['RALT'];
         altMatched=true;
-      } 
+      }
       if(layerId.indexOf('alt')  >= 0 && !altMatched) {
         modifier |= Codes.modifierCodes['ALT'];
       }
@@ -337,13 +345,13 @@ namespace com.keyman.text {
     /**
      * @summary Look up a custom virtual key code in the virtual key code dictionary KVKD.  On first run, will build the dictionary.
      *
-     * `VKDictionary` is constructed from the keyboard's `KVKD` member. This list is constructed 
-     * at compile-time and is a list of 'additional' virtual key codes, starting at 256 (i.e. 
-     * outside the range of standard virtual key codes). These additional codes are both 
-     * `[T_xxx]` and `[U_xxxx]` custom key codes from the Keyman keyboard language. However, 
-     * `[U_xxxx]` keys only generate an entry in `KVKD` if there is a corresponding rule that 
-     * is associated with them in the keyboard rules. If the `[U_xxxx]` key code is only 
-     * referenced as the id of a key in the touch layout, then it does not get an entry in 
+     * `VKDictionary` is constructed from the keyboard's `KVKD` member. This list is constructed
+     * at compile-time and is a list of 'additional' virtual key codes, starting at 256 (i.e.
+     * outside the range of standard virtual key codes). These additional codes are both
+     * `[T_xxx]` and `[U_xxxx]` custom key codes from the Keyman keyboard language. However,
+     * `[U_xxxx]` keys only generate an entry in `KVKD` if there is a corresponding rule that
+     * is associated with them in the keyboard rules. If the `[U_xxxx]` key code is only
+     * referenced as the id of a key in the touch layout, then it does not get an entry in
      * the `KVKD` property.
      *
      * @private
@@ -356,7 +364,7 @@ namespace com.keyman.text {
         var a=[];
         if(typeof activeKeyboard.scriptObject['KVKD'] == 'string') {
           // Build the VK dictionary
-          // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.  
+          // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.
           // Makes the VKDictionary member unnecessary.
           //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
           var s=activeKeyboard.scriptObject['KVKD'].split(' ');
@@ -396,7 +404,7 @@ namespace com.keyman.text {
         lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(this.activeKeyboard.isChiral && (this.activeKeyboard.emulatesAltGr) && 
+        if(this.activeKeyboard.isChiral && (this.activeKeyboard.emulatesAltGr) &&
             (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~Codes.modifierCodes['RALT'];
@@ -404,7 +412,7 @@ namespace com.keyman.text {
 
         for(i=0; i < lockNames.length; i++) {
           if(lockStates & Codes.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = lockStates & Codes.modifierCodes[lockNames[i]];
+            this.stateKeys[lockKeys[i]] = !!(lockStates & Codes.modifierCodes[lockNames[i]]);
           }
         }
       } else if(d) {
@@ -425,8 +433,42 @@ namespace com.keyman.text {
         }
       }
 
+      this.updateStates();
+
+      if(this.activeKeyboard.isMnemonic && this.stateKeys['K_CAPS']) {
+        // Modifier keypresses doesn't trigger mnemonic manipulation of modifier state.
+        // Only an output key does; active use of Caps will also flip the SHIFT flag.
+        if(!e || !KeyboardProcessor.isModifier(e)) {
+          // Mnemonic keystrokes manipulate the SHIFT property based on CAPS state.
+          // We need to unflip them when tracking the OSK layer.
+          keyShiftState ^= Codes.modifierCodes['SHIFT'];
+        }
+      }
+
       this.layerId = this.getLayerId(keyShiftState);
       return true;
+    }
+
+    private updateStates(): void {
+      var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
+      var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+
+      for(let i=0; i < lockKeys.length; i++) {
+        const key = lockKeys[i];
+        const flag = this.stateKeys[key];
+        const onBit = lockNames[i];
+        const offBit = 'NO_' + lockNames[i];
+
+        // Ensures that the current mod-state info properly matches the currently-simulated
+        // state key states.
+        if(flag) {
+          this.modStateFlags |= Codes.modifierCodes[onBit];
+          this.modStateFlags &= ~Codes.modifierCodes[offBit];
+        } else {
+          this.modStateFlags &= ~Codes.modifierCodes[onBit];
+          this.modStateFlags |= Codes.modifierCodes[offBit];
+        }
+      }
     }
 
     getLayerId(modifier: number): string {
@@ -603,7 +645,7 @@ namespace com.keyman.text {
             }
           }
         }
-        
+
         if(s == '') {
           s = 'default';
         }
@@ -624,8 +666,8 @@ namespace com.keyman.text {
     static isModifier(Levent: KeyEvent): boolean {
       switch(Levent.Lcode) {
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
-        case 17: 
-        case 18: 
+        case 17:
+        case 18:
         case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
         case 144:
         case 145:
@@ -647,7 +689,7 @@ namespace com.keyman.text {
         outputTarget.deadkeys().clear();
       } else if(KeyboardProcessor.isModifier(Levent)) {
         // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-        this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
+        this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
         if(!Levent.device.touchable) {
           return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
         } else {
@@ -656,7 +698,7 @@ namespace com.keyman.text {
       }
 
       if(Levent.LmodifierChange) {
-        this.activeKeyboard.notify(0, outputTarget, 1); 
+        this.activeKeyboard.notify(0, outputTarget, 1);
         this._UpdateVKShift(Levent, 0, 1);
       }
 
@@ -672,9 +714,11 @@ namespace com.keyman.text {
     };
 
     setNumericLayer(device: utils.DeviceSpec) {
-      let layout = this.activeKeyboard.layout(device.formFactor);
-      if(layout.getLayer('numeric')) {
-        this.layerId = 'numeric';
+      if (this.activeKeyboard) {
+        let layout = this.activeKeyboard.layout(device.formFactor);
+        if(layout.getLayer('numeric')) {
+          this.layerId = 'numeric';
+        }
       }
     };
   }

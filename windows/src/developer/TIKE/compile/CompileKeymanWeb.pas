@@ -1121,6 +1121,7 @@ begin
           begin
             if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
             Result := Result + nlt+Format('r=this.g%s(t,e);', [JavaScript_Name(rec.Use.GroupIndex, rec.Use.Group.szName)]);    // I1959   // I3681
+            Result := Result + nlt+'m=2;';  // #5440 - match desktop behavior
             len := -1;
           end;
         CODE_CALL:
@@ -1130,6 +1131,7 @@ begin
             if n = -1 then
               n := FCallFunctions.Add(CallFunctionName(rec.Call.Store.dpString));
             Result := Result + nlt+Format('r=this.c%d(t,e);', [n]);    // I1959   // I3681
+            Result := Result + nlt+'m=2;';  // #5440 - match desktop behavior
             len := -1;
           end;
         CODE_SETOPT:    // I3429
@@ -2113,6 +2115,30 @@ begin
   fgp := fk.dpGroupArray;
 	for i := 0 to Integer(fk.cxGroupArray)-1 do  // I1964
   begin
+    {
+      Note on `r` and `m` variables in a group function:
+
+      `m` can have one of three values:
+        0: no rule from this group was matched
+        1: a rule from this group was matched and did not include a `use`
+           statement
+        2: a rule from this group matched and did include a `use` statement
+           (#5440)
+
+      `m` is only used within a rule group to control the firing of the
+      `match` and `nomatch` rules.
+
+      `r` can have one of two values:
+        0: no rule from the final group matched (even if a rule from an
+           higher-level group did)
+        1: a rule from the final group did match;
+
+      `r` serves as the rule group's return value and is forwarded
+      recursively, best serving as a flag for whether or not default
+      output for a key should be emitted (0 means yes, emit the
+      default character output for that key).
+    }
+
     Result := Result + Format(
       '%sthis.g%s=function(t,e) {%s'+
       '%svar k=KeymanWeb,r=%d,m=0;%s',     //I1959
@@ -2173,7 +2199,7 @@ begin
 
 		if Assigned(fgp.dpMatch) then
       Result := Result + Format(
-        '%sif(m) {%s'+
+        '%sif(m==1) {%s'+
         '%s%s%s'+
         '%s}%s',
         [FTabstop+FTabstop, nl,

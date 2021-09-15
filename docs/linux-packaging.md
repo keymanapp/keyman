@@ -20,8 +20,10 @@ pso enabled.
 
 ## Package builds
 
-Package builds happen on Launchpad and Jenkins. Package builds for the official Ubuntu/Debian
-repos happen outside of our control.
+Package builds happen on [Launchpad](#package-builds-on-launchpad) and
+[Jenkins](#package-builds-on-jenkins). Package builds for the official Ubuntu/Debian
+repos happen outside of our control. However, we
+[upload source packages](#uploading-debian-source-packages) to the Debian community.
 
 ## Package builds on Jenkins
 
@@ -89,8 +91,9 @@ are scattered over several source repos:
     - [jenkins.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh)
       gets called from `lsdev-pipeline-library` to create a source package.
 
-  - [linux/*/debian](https://github.com/keymanapp/keyman/tree/master/linux/ibus-kmfl/debian) -
-    each package has a separate `debian` subdirectory with the meta data for the Linux package.
+  - [linux/debian](https://github.com/keymanapp/keyman/tree/master/linux/debian) - this is the `debian`
+    subdirectory for Keyman for Linux with the meta data for the Linux package. The legacy
+    kmfl-related packages have separate debian subdirectories under `linux/*/debian`.
     See [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/) for
     details to the various files.
 
@@ -113,8 +116,8 @@ are scattered over several source repos:
 - build job installs
   [dependencies](https://github.com/keymanapp/keyman/blob/master/linux/build/agent/install-deps)
   on the current build agent
-- build job creates a source package for the linux packages (keyman-keyboardprocessor, kmflcomp,
-  libkmfl, ibus-kmfl, keyman-config, and ibus-keyman). This is done by calling
+- build job creates a source package for the linux packages (keyman, kmflcomp,
+  libkmfl, and ibus-kmfl). This is done by calling
   [scripts/jenkins.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh).
 - build job creates the binary package for each linux package on each distribution (currently
   bionic, focal, and groovy) and each architecture (amd64, i386 only for bionic)
@@ -168,7 +171,7 @@ Building packages happen in the [Keyman source tree](https://github.com/keymanap
 The Keyman
 [`linux/scripts/jenkins.sh`](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh)
 script can be used to create a source package (replace `packageName` with the name of the package,
-i.e. one of keyman-keyboardprocessor, kmflcomp, libkmfl, ibus-kmfl, keyman-config, and ibus-keyman).
+i.e. one of keyman, kmflcomp, libkmfl, and ibus-kmfl).
 
 ```bash
 cd linux
@@ -176,20 +179,15 @@ cd linux
 ```
 
 This creates a source package (`<packageName>_<version>-1.dsc`) and some `*.tar.?z` files in the
-`linux/<packageName>` subdirectory.
-
-**NOTE:** The subdirectory for `keyman-keyboardprocessor` is `common/core/desktop`, for
-all other packages `linux/<packageName>`.
+`linux/legacy/<packageName>` subdirectory, respective in the source root directory for `keyman`.
 
 ci-builder-script's [`build-package`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/build-package)
 script creates the binary packages:
 
 ```bash
-cd linux/${packageName}
+cd linux/legacy/${packageName}
 ~/ci-builder-scripts/bash/build-package \
     --dists "focal bionic" --arches "amd64 i386" \
-    --main-package-name "My great package" \
-    --supported-distros "bionic focal" \
     --debkeyid ${DEBSIGNKEY} --build-in-place --no-upload
 ```
 
@@ -218,10 +216,12 @@ Package builds on Launchpad are triggered manually by running the Keyman script
    to your launchpad account
 4. Set the following environment variables in your `~/.profile` or `~/.bashrc` (so you don't have
    to set them every time)
-  `export GPGKEY=[key_id]` using the `key_id` of your GPG key
-  `DEBEMAIL="your.email.address@example.org"`
-  `DEBFULLNAME="Firstname Lastname"`
-  `export DEBEMAIL DEBFULLNAME`
+
+    ```bash
+    export GPGKEY=[key_id] # using the `key_id` of your GPG key
+    export DEBEMAIL="your.email.address@example.org"
+    export DEBFULLNAME="Firstname Lastname"
+    ```
 
 ### Building packages on Launchpad
 
@@ -259,7 +259,71 @@ to Launchpad:
 Refer to the [launchpad uploading help](https://help.launchpad.net/Packaging/PPA/Uploading)
 for troubleshooting and setting up for `dput` upload.
 
+## Uploading Debian source packages
+
+Unless you're a Debian maintainer you can't directly upload to the Debian repos.
+Instead you upload to <mentors.debian.net> and then look for a sponsor who will
+review the packages and upload them for you. Be prepared that this might take some
+persistence, and if somebody looks at it, it might take some iterations to get it
+accepted.
+
+The Keyman packages are maintained on the Debian side by the
+[Debian Input Method Team](https://wiki.debian.org/Teams/IMEPackagingTeam).
+
+**NOTE:** All `changelog` files should contain the exact same entry that was previously
+accepted into the Debian repo (plus the new entry for the new update). This means that
+when your upload got accepted into Debian (not <mentors.debian.net>) you'll have to
+update the `changelog` files to match what got accepted (sometimes the Debian maintainers
+will create additional package versions).
+
+### Prerequisites
+
+- an account on [mentors.debian.net](https://mentors.debian.net/accounts/register/)
+- an entry for `mentors` in your `.dput.cf` file:
+
+  ```bash
+  [mentors]
+  fqdn = mentors.debian.net
+  incoming = /upload
+  method = https
+  allow_unsigned_uploads = 0
+  progress_indicator = 2
+  # Allow uploads for UNRELEASED packages
+  allowed_distributions = .*
+  ```
+
+- subscribe to the [debian-input-method](debian-input-method@lists.debian.org) mailing list
+
+### Updating and uploading Debian package
+
+This is done in several steps:
+
+1. Download the source code from <download.keyman.com> and create the source package by running
+   `scripts/debian.sh`
+2. sign the source package (you might be able to omit this step if the source package already
+   got signed with the correct key in the previous step)
+3. upload to mentors
+4. file a RFS bug (Request For Sponsorship) against the `sponsorship-requests` pseudo-package,
+   cc'ing `debian-input-method`
+
+The first three steps can be done by running these commands:
+
+```bash
+cd linux
+DIST=unstable scripts/debian.sh
+cd debianpackage/
+debsign -k$DEBSIGN_KEYID --re-sign *.changes
+dput mentors *.changes
+```
+
 ## Reference
 
 See the [Linux readme](https://github.com/keymanapp/keyman/blob/master/linux/README.md)
 for how to build Keyman on Linux etc.
+
+### References for Debian packaging
+
+- [mentors intro](https://mentors.debian.net/intro-maintainers/), especially section
+  3 (Publish your package)
+- explanation of the [sponsoring process](https://mentors.debian.net/sponsors/)
+- [personal package upload page](https://mentors.debian.net/packages/my/)

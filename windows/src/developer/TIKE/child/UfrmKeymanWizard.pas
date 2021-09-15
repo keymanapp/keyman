@@ -147,7 +147,7 @@ uses
   Vcl.Grids, KeyboardFonts,
   TempFileManager,
   UfrmDebugStatus,
-  UKeymanTargets, msctf, Winapi.UxTheme, Vcl.Themes,
+  UKeymanTargets, Winapi.UxTheme, Vcl.Themes,
   System.Generics.Collections, LeftTabbedPageControl, Vcl.CheckLst;
 
 type
@@ -568,6 +568,7 @@ uses
   System.Win.ComObj,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.System.Debug.DebugUIStatus,
   Keyman.System.QRCode,
   Keyman.UI.FontUtils,
 
@@ -1043,63 +1044,58 @@ procedure TfrmKeymanWizard.StartDebugging(FStartTest: Boolean);
     end;
   end;
 
+var
+  FContainsDebugInformation: Boolean;
 begin
   if IsInParserMode then   // I4557
     MoveParserToSource;
 
   pages.ActivePage := pageLayout; //pageSource; { For debugging }
   pagesLayout.ActivePage := pageLayoutCode;
-  
+
   if not IsDebugVisible then
   begin
-    if not KeyboardContainsDebugInformation or FStartTest then
+    FContainsDebugInformation := KeyboardContainsDebugInformation;
+
+    if not FContainsDebugInformation and
+        not FKeymanDeveloperOptions.DebuggerAutoRecompileWithDebugInfo then
     begin
-      if not FStartTest and not FKeymanDeveloperOptions.DebuggerAutoRecompileWithDebugInfo then
-      begin
-        with TfrmMustIncludeDebug.Create(Application.MainForm) do
-        try
-          case ShowModal of
-            mrOK:     ;
-            mrYes:    frmKeymanDeveloper.RefreshOptions;
-            mrCancel: Exit;
-            mrNo:     FStartTest := True;
-          end;
-        finally
-          Free;
+      with TfrmMustIncludeDebug.Create(Application.MainForm) do
+      try
+        case ShowModal of
+          mrOK:     ; // will recompile with debug
+          mrYes:    frmKeymanDeveloper.RefreshOptions;
+          mrCancel: Exit;
         end;
+      finally
+        Free;
       end;
     end;
 
-    if FStartTest then
+    if FStartTest
+      then FDebugForm.UIStatus := duiTest
+      else FDebugForm.UIStatus := duiReadyForInput;
+
+    (ProjectFileUI as TkmnProjectFileUI).Debug := True;   // I4687
+
+    frmMessages.Clear;   // I4686
+
+    if not (ProjectFileUI as TkmnProjectFileUI).DoAction(pfaCompile, False) then
     begin
-      FDebugForm.CanDebug := False;
-      FDebugForm.UIStatus := duiTest;
-    end
-    else
+      ShowMessage(SKErrorsInCompile);
+      Exit;
+    end;
+
+    if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
     begin
-      FDebugForm.CanDebug := True;
-      FDebugForm.UIStatus := duiReadyForInput;
-      (ProjectFileUI as TkmnProjectFileUI).Debug := True;   // I4687
+      ShowMessage(SKKeyboardKMXDoesNotExist);
+      Exit;
+    end;
 
-      frmMessages.Clear;   // I4686
-
-      if not (ProjectFileUI as TkmnProjectFileUI).DoAction(pfaCompile, False) then
-      begin
-        ShowMessage(SKErrorsInCompile);
-        Exit;
-      end;
-
-      if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
-      begin
-        ShowMessage(SKKeyboardKMXDoesNotExist);
-        Exit;
-      end;
-
-      if not KeyboardContainsDebugInformation then
-      begin
-        ShowMessage(SKMustIncludeDebug);
-        Exit;
-      end;
+    if not KeyboardContainsDebugInformation then
+    begin
+      ShowMessage(SKMustIncludeDebug);
+      Exit;
     end;
 
     if FDebugForm.DefaultFont then
@@ -2922,6 +2918,13 @@ procedure TfrmKeymanWizard.SetupDebugForm;
 begin
   panDebugHost.Visible := False;
 
+  FDebugStatusForm := TfrmDebugStatus.Create(Self);
+  FDebugStatusForm.BorderStyle := bsNone;
+  FDebugStatusForm.Parent := panDebugStatusHost;
+  FDebugStatusForm.Align := alClient;
+  FDebugStatusForm.Visible := True;
+  //FDebugForm.RefreshOptions;
+
   FDebugForm := TfrmDebug.Create(Self);
   FDebugForm.BorderStyle := bsNone;
   FDebugForm.Parent := panDebugWindowHost;
@@ -2931,13 +2934,6 @@ begin
   FDebugForm.OnUpdateExecutionPoint := DebugUpdateExecutionPoint;
   FDebugForm.Visible := True;
   FDebugForm.EditorMemo := frameSource;
-
-  FDebugStatusForm := TfrmDebugStatus.Create(Self);
-  FDebugStatusForm.BorderStyle := bsNone;
-  FDebugStatusForm.Parent := panDebugStatusHost;
-  FDebugStatusForm.Align := alClient;
-  FDebugStatusForm.Visible := True;
-  //FDebugForm.RefreshOptions;
 end;
 
 function TfrmKeymanWizard.ShouldRememberFocus(Control: TWinControl): Boolean;   // I4679

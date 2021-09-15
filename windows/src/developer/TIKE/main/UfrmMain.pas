@@ -159,7 +159,7 @@ type
     Project1: TMenuItem;
     mnuKeyboard: TMenuItem;
     mnuDebug: TMenuItem;
-    ools1: TMenuItem;
+    mnuTools: TMenuItem;
     Help1: TMenuItem;
     New1: TMenuItem;
     Open1: TMenuItem;
@@ -275,6 +275,8 @@ type
     N2: TMenuItem;
     estLexicalModel1: TMenuItem;
     mnuToolsDebugTestsCompilerExceptionTest: TMenuItem;
+    mnuToolsDebugTestsShowDebuggerEventsPanel: TMenuItem;
+    N3: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -292,8 +294,9 @@ type
     procedure mnuDebugSetWindowSizeForScreenshotsClick(Sender: TObject);
     procedure pagesChange(Sender: TObject);
     procedure pagesCloseTab(Sender: TObject; Index: Integer);
-    procedure ools1Click(Sender: TObject);
+    procedure mnuToolsClick(Sender: TObject);
     procedure mnuToolsDebugTestsCompilerExceptionTestClick(Sender: TObject);
+    procedure mnuToolsDebugTestsShowDebuggerEventsPanelClick(Sender: TObject);
 
   private
     AppStorage: TJvAppRegistryStorage;
@@ -420,13 +423,13 @@ uses
   System.Win.ComObj,
   Vcl.Themes,
 
+  keymanapi_tlb,
   Keyman.System.CEFManager,
 
   CharMapDropTool,
   compile,
   HTMLHelpViewer,
   KLog,
-  keymanapi_TLB,
   KeymanVersion,
   OnlineConstants,
   Keyman.System.KeymanSentryClient,
@@ -527,6 +530,7 @@ begin
     Free;
   end;
 
+  // TODO: move this out of here and alongside keyboard install helpers
   try
     kmcom := CoKeyman.Create;
   except
@@ -1365,9 +1369,10 @@ begin
   end;
 end;
 
-procedure TfrmKeymanDeveloper.ools1Click(Sender: TObject);
+procedure TfrmKeymanDeveloper.mnuToolsClick(Sender: TObject);
 begin
   mnuToolsDebugTests.Visible := (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0);
+  mnuToolsDebugTestsShowDebuggerEventsPanel.Checked := TfrmDebugStatus.ShowDebuggerEventsPanel;
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectClick(Sender: TObject);
@@ -1413,6 +1418,12 @@ end;
 procedure TfrmKeymanDeveloper.mnuToolsDebugTestsExceptionTestClick(Sender: TObject);
 begin
   TKeymanSentryClient.Validate(True);
+end;
+
+procedure TfrmKeymanDeveloper.mnuToolsDebugTestsShowDebuggerEventsPanelClick(
+  Sender: TObject);
+begin
+  TfrmDebugStatus.ShowDebuggerEventsPanel := not TfrmDebugStatus.ShowDebuggerEventsPanel;
 end;
 
 procedure TfrmKeymanDeveloper.SetActiveChild(const Value: TfrmTikeChild);

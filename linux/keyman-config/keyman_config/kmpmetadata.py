@@ -4,7 +4,7 @@ import json
 import configparser
 import logging
 import sys
-import os.path
+import os
 import magic
 from enum import Enum
 from json.decoder import JSONDecodeError

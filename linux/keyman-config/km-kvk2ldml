@@ -2,7 +2,7 @@
 
 import argparse
 import logging
-import os.path
+import os
 import sys
 
 from keyman_config import __version__

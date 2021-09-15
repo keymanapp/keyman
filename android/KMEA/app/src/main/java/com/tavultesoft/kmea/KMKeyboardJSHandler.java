@@ -39,7 +39,6 @@ public abstract class KMKeyboardJSHandler {
   @JavascriptInterface
   public int getKeyboardHeight() {
     int kbHeight = KMManager.getKeyboardHeight(context);
-    kbHeight -= kbHeight % 20;
     return kbHeight;
   }
 

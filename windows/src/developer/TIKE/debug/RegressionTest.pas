@@ -30,7 +30,6 @@ uses
   System.SysUtils,
   Winapi.Windows,
 
-  debugging,
   debugkeyboard;
 
 type
@@ -181,13 +180,13 @@ var
 begin
   // Send modifier states
   n := 0;
-  if (FShiftState and K_SHIFTFLAG) <> 0 then AddInput(VK_SHIFT, 0);
-  if FShiftState and K_LCTRLFLAG <> 0 then AddInput(VK_CONTROL, 0);
-  if FShiftState and K_RCTRLFLAG <> 0 then AddInput(VK_CONTROL, KEYEVENTF_EXTENDEDKEY);
-  if FShiftState and K_LALTFLAG <> 0 then  AddInput(VK_MENU, 0);
-  if FShiftState and K_RALTFLAG <> 0 then  AddInput(VK_MENU, KEYEVENTF_EXTENDEDKEY);
+  if (FShiftState and KMX_SHIFTFLAG) <> 0 then AddInput(VK_SHIFT, 0);
+  if FShiftState and KMX_LCTRLFLAG <> 0 then AddInput(VK_CONTROL, 0);
+  if FShiftState and KMX_RCTRLFLAG <> 0 then AddInput(VK_CONTROL, KEYEVENTF_EXTENDEDKEY);
+  if FShiftState and KMX_LALTFLAG <> 0 then  AddInput(VK_MENU, 0);
+  if FShiftState and KMX_RALTFLAG <> 0 then  AddInput(VK_MENU, KEYEVENTF_EXTENDEDKEY);
 
-  case FShiftState and K_CAPITALFLAG of
+  case FShiftState and KMX_CAPITALFLAG of
     1: if (GetKeyState(VK_CAPITAL) and 1) = 0 then AddInput(VK_CAPITAL, 0);
     0: if (GetKeyState(VK_CAPITAL) and 1) = 1 then AddInput(VK_CAPITAL, KEYEVENTF_KEYUP);
   end;
@@ -195,11 +194,11 @@ begin
   AddInput(FVKey, 0);
   AddInput(FVKey, KEYEVENTF_KEYUP);
 
-  if FShiftState and K_RALTFLAG <> 0 then  AddInput(VK_MENU, KEYEVENTF_KEYUP or KEYEVENTF_EXTENDEDKEY);
-  if FShiftState and K_LALTFLAG <> 0 then  AddInput(VK_MENU, KEYEVENTF_KEYUP);
-  if FShiftState and K_RCTRLFLAG <> 0 then AddInput(VK_CONTROL, KEYEVENTF_KEYUP or KEYEVENTF_EXTENDEDKEY);
-  if FShiftState and K_LCTRLFLAG <> 0 then AddInput(VK_CONTROL, KEYEVENTF_KEYUP);
-  if (FShiftState and K_SHIFTFLAG) <> 0 then AddInput(VK_SHIFT, KEYEVENTF_KEYUP);
+  if FShiftState and KMX_RALTFLAG <> 0 then  AddInput(VK_MENU, KEYEVENTF_KEYUP or KEYEVENTF_EXTENDEDKEY);
+  if FShiftState and KMX_LALTFLAG <> 0 then  AddInput(VK_MENU, KEYEVENTF_KEYUP);
+  if FShiftState and KMX_RCTRLFLAG <> 0 then AddInput(VK_CONTROL, KEYEVENTF_KEYUP or KEYEVENTF_EXTENDEDKEY);
+  if FShiftState and KMX_LCTRLFLAG <> 0 then AddInput(VK_CONTROL, KEYEVENTF_KEYUP);
+  if (FShiftState and KMX_SHIFTFLAG) <> 0 then AddInput(VK_SHIFT, KEYEVENTF_KEYUP);
 
   if SendInput(n, keys[0], sizeof(TInput)) = 0 then
     RaiseLastOSError;
@@ -256,7 +255,7 @@ begin
   for i := 0 to DebugKeyboard.Deadkeys.Count - 1 do
     if DebugKeyboard.Deadkeys[i].name = name then
     begin
-      Result := DebugKeyboard.Deadkeys[i].Value+1;
+      Result := DebugKeyboard.Deadkeys[i].Value;
       Exit;
     end;
 end;
@@ -357,12 +356,12 @@ begin
     if Assigned(c1) then
     begin
       // Find all the shift states
-      if Assigned(FindNode('shift', c1)) then ev.FShiftState := ev.FShiftState or K_SHIFTFLAG;
-      if Assigned(FindNode('ctrl', c1)) then ev.FShiftState := ev.FShiftState or K_LCTRLFLAG;
-      if Assigned(FindNode('rctrl', c1)) then ev.FShiftState := ev.FShiftState or K_RCTRLFLAG;
-      if Assigned(FindNode('alt', c1)) then ev.FShiftState := ev.FShiftState or K_LALTFLAG;
-      if Assigned(FindNode('altgr', c1)) then ev.FShiftState := ev.FShiftState or K_RALTFLAG;
-      if Assigned(FindNode('caps', c1)) then ev.FShiftState := ev.FShiftState or K_CAPITALFLAG;
+      if Assigned(FindNode('shift', c1)) then ev.FShiftState := ev.FShiftState or KMX_SHIFTFLAG;
+      if Assigned(FindNode('ctrl', c1)) then ev.FShiftState := ev.FShiftState or KMX_LCTRLFLAG;
+      if Assigned(FindNode('rctrl', c1)) then ev.FShiftState := ev.FShiftState or KMX_RCTRLFLAG;
+      if Assigned(FindNode('alt', c1)) then ev.FShiftState := ev.FShiftState or KMX_LALTFLAG;
+      if Assigned(FindNode('altgr', c1)) then ev.FShiftState := ev.FShiftState or KMX_RALTFLAG;
+      if Assigned(FindNode('caps', c1)) then ev.FShiftState := ev.FShiftState or KMX_CAPITALFLAG;
     end;
 
     ev.FPostContext := '';
@@ -446,7 +445,7 @@ var
   i: Integer;
 begin
   for i := 0 to FRegressionTest.DebugKeyboard.Deadkeys.Count - 1 do
-    if FRegressionTest.DebugKeyboard.Deadkeys[i].Value+1 = dkCode then
+    if FRegressionTest.DebugKeyboard.Deadkeys[i].Value = dkCode then
     begin
       Result := FRegressionTest.DebugKeyboard.Deadkeys[i].Name;
       Exit;
@@ -496,12 +495,12 @@ begin
   if FShiftState = 0 then Exit;
 
   ws := '';
-  if (FShiftState and (K_CTRLFLAG or K_LCTRLFLAG)) <> 0 then ws := ws + '<ctrl/>';
-  if (FShiftState and (K_RCTRLFLAG)) <> 0               then ws := ws + '<rctrl/>';
-  if (FShiftState and (K_SHIFTFLAG)) <> 0               then ws := ws + '<shift/>';
-  if (FShiftState and (K_ALTFLAG or K_LALTFLAG)) <> 0   then ws := ws + '<alt/>';
-  if (FShiftState and (K_RALTFLAG)) <> 0                then ws := ws + '<altgr/>';
-  if (FShiftState and (K_CAPITALFLAG)) <> 0             then ws := ws + '<capslock/>';
+  if (FShiftState and (KMX_CTRLFLAG or KMX_LCTRLFLAG)) <> 0 then ws := ws + '<ctrl/>';
+  if (FShiftState and (KMX_RCTRLFLAG)) <> 0               then ws := ws + '<rctrl/>';
+  if (FShiftState and (KMX_SHIFTFLAG)) <> 0               then ws := ws + '<shift/>';
+  if (FShiftState and (KMX_ALTFLAG or KMX_LALTFLAG)) <> 0   then ws := ws + '<alt/>';
+  if (FShiftState and (KMX_RALTFLAG)) <> 0                then ws := ws + '<altgr/>';
+  if (FShiftState and (KMX_CAPITALFLAG)) <> 0             then ws := ws + '<capslock/>';
 
   Result := '<shiftstate>'+ws+'</shiftstate>';
 end;
@@ -517,12 +516,12 @@ begin
   Result := '';
   if FShiftState = 0 then Exit;
   s := '';
-  if (FShiftState and (K_CTRLFLAG or K_LCTRLFLAG)) <> 0 then Add('Control');
-  if (FShiftState and (K_RCTRLFLAG)) <> 0               then Add('RControl');
-  if (FShiftState and (K_SHIFTFLAG)) <> 0               then Add('Shift');
-  if (FShiftState and (K_ALTFLAG or K_LALTFLAG)) <> 0   then Add('Alt');
-  if (FShiftState and (K_RALTFLAG)) <> 0                then Add('AltGr');
-  if (FShiftState and (K_CAPITALFLAG)) <> 0             then Add('CapsLock');
+  if (FShiftState and (KMX_CTRLFLAG or KMX_LCTRLFLAG)) <> 0 then Add('Control');
+  if (FShiftState and (KMX_RCTRLFLAG)) <> 0               then Add('RControl');
+  if (FShiftState and (KMX_SHIFTFLAG)) <> 0               then Add('Shift');
+  if (FShiftState and (KMX_ALTFLAG or KMX_LALTFLAG)) <> 0   then Add('Alt');
+  if (FShiftState and (KMX_RALTFLAG)) <> 0                then Add('AltGr');
+  if (FShiftState and (KMX_CAPITALFLAG)) <> 0             then Add('CapsLock');
   Result := s;
 end;
 

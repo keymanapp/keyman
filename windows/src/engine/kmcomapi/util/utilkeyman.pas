@@ -145,7 +145,8 @@ begin
       s := ReadString(SRegValue_KeymanFile);
       try
         GetKeyboardInfo(s, False, ki);
-        Result := ki.KeyboardName;
+        if ki.KeyboardName <> '' then
+          Result := ki.KeyboardName;
       except
         ;
       end;
@@ -170,7 +171,8 @@ begin
       s := ReadString(SRegValue_KeymanFile);
       try
         GetKeyboardInfo(s, False, ki);
-        Result := ki.KeyboardName;
+        if ki.KeyboardName <> '' then
+          Result := ki.KeyboardName;
       except
         ;
       end;

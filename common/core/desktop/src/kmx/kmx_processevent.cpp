@@ -4,6 +4,7 @@
 */
 #include "kmx_processevent.h"
 #include "state.hpp"
+#include <keyman/keyboardprocessor_consts.h>
 
 using namespace km::kbp;
 using namespace kmx;
@@ -60,20 +61,26 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
 }
 
 /*
-* KMX_BOOL ProcessEvent();
+ * Process Events
 *
-* Parameters: none
+ * ProcessEvent organizes the messages and gives them to the appropriate routines to
+ * process, and checks the state of Windows for the keyboard handling.
+ * Called by FilterFunc.
 *
-* Returns:  TRUE if keystroke should be eaten
+ * @param state      A pointer to the state object.
+ * @param vkey       A virtual key to be processed.
+ * @param modifiers  The combinations of modifier keys set at the time vkey was pressed,
+ *                   bitmask from the km_kbp_modifier_state enum.
+ * @param isKeyDown  TRUE if this is called on KeyDown event, FALSE if called on KeyUp event
 *
-*   Called by:  FilterFunc
-*
-* ProcessEvent organizes the messages and gives them to the appropriate routines to
-* process, and checks the state of Windows for the keyboard handling.
+ * @return           TRUE if keystroke should be eaten
 */
-
-KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers)
-{
+KMX_BOOL KMX_ProcessEvent::ProcessEvent(
+  km_kbp_state *state,
+  KMX_UINT vkey,
+  KMX_DWORD modifiers,
+  KMX_BOOL isKeyDown
+) {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
 
   m_kbp_state = state;
@@ -89,11 +96,10 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
     m_debug_items = new KMX_DebugItems(&state->debug_items());
   } else {
     // We want to have a clean debug state even if it is not in use
-    state->debug_items().push_end(0);
+    state->debug_items().push_end(m_actions.Length(), 0);
   }
 
-  if (m_environment.capsLock())
-    modifiers |= CAPITALFLAG;
+  ResetCapsLock(modifiers, isKeyDown);
 
   m_state.vkey = vkey;
   m_state.charCode = VKeyToChar(modifiers, vkey);
@@ -102,6 +108,25 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
 
   if (kbd->StartGroup[BEGIN_UNICODE] == (KMX_DWORD) -1) {
     DebugLog("Non-Unicode keyboards are not supported.");
+    m_kbp_state = nullptr;
+    return FALSE;
+  }
+
+  switch (vkey) {
+  case KM_KBP_VKEY_CAPS:
+    if (KeyCapsLockPress(modifiers, isKeyDown))
+      return TRUE;
+    break;
+  case KM_KBP_VKEY_SHIFT:
+    KeyShiftPress(modifiers, isKeyDown);
+    return TRUE;
+  case KM_KBP_VKEY_CONTROL:
+  case KM_KBP_VKEY_ALT:
+    return TRUE;
+  }
+
+  if (!isKeyDown) {
+    m_kbp_state = nullptr;
     return FALSE;
   }
 
@@ -120,7 +145,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
   ProcessGroup(gp, &fOutputKeystroke);
 
   if(m_debug_items) {
-    m_debug_items->push_end(fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
+    m_debug_items->push_end(m_actions.Length(), fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
     // m_debug_items is just a helper class that pushes to state->debug_items(),
     // so we can throw it away after we are done with it
     delete m_debug_items;
@@ -142,10 +167,9 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_
 *
 *   Called by:  ProcessEvent, recursive inside groups
 *
-* ProcessKey is where the keystroke conversion and output takes place.  This routine
+* ProcessGroup is where the keystroke conversion and output takes place.  This routine
 * has a lot of crucial code in it!
 */
-
 KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 {
   KMX_DWORD i;
@@ -154,7 +178,18 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   int sdmfI;
 
   if(m_debug_items) {
-    m_debug_items->push_group_enter(gp);
+    m_debug_items->push_group_enter(m_actions.Length(), gp);
+  }
+
+  LPKEYBOARD kbd = m_keyboard.Keyboard;
+
+  sdmfI = -1;
+
+  for (i = 0; i < kbd->cxGroupArray; i++) {
+    if (gp == &kbd->dpGroupArray[i]) {
+      sdmfI = i;
+      break;
+    }
   }
 
   /*
@@ -163,24 +198,11 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
    cause message loopbacks and nasty things like that.  Okay, it's really a catch all
    for bugs!  This means the user's system shouldn't hang.
   */
-
-  LPKEYBOARD kbd = m_keyboard.Keyboard;
-
-  sdmfI = -1;
-
-  for(i = 0; i < kbd->cxGroupArray; i++)
-    if(gp == &kbd->dpGroupArray[i])
-    {
-      sdmfI = i;
-      break;
-    }
-
-  if(++m_state.LoopTimes > 50)
-  {
+  if (++m_state.LoopTimes > 50) {
     DebugLog("Aborting output: m_state.LoopTimes exceeded.");
     m_state.StopOutput = TRUE;
     if(m_debug_items) {
-      m_debug_items->push_group_exit(gp, KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW);
+      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW, gp);
     }
     return FALSE;
   }
@@ -246,21 +268,39 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
       KMX_BOOL fIsBackspace = m_state.vkey == KM_KBP_VKEY_BKSP && (m_modifiers & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(fIsBackspace) {   // I4838   // I4933
+
+        // Delete deadkeys prior to insertion point
         PKMX_WCHAR pdeletecontext = m_context.Buf(1);   // I4933
+        while(pdeletecontext && *pdeletecontext == UC_SENTINEL) {
+          m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
+          pdeletecontext = m_context.Buf(1);
+        }
+
+        // If there is now no character in the context, we want to
+        // emit the backspace for application to use
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
           m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
           if(m_debug_items) {
-            m_debug_items->push_group_exit(gp, KM_KBP_DEBUG_FLAG_NOMATCH);
+            m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
           }
           *pOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
         }
-        m_actions.QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
+
+        // Emit a backspace to delete the character
+        m_actions.QueueAction(QIT_BACK, BK_DEFAULT);  // side effect: also removes last char from context
+
+        // And delete any deadkeys prior to insertion point again
+        pdeletecontext = m_context.Buf(1);
+        while(pdeletecontext && *pdeletecontext == UC_SENTINEL) {
+          m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
+          pdeletecontext = m_context.Buf(1);
+        }
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
         if(m_debug_items) {
-          m_debug_items->push_group_exit(gp, KM_KBP_DEBUG_FLAG_NOMATCH);
+          m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
         }
         *pOutputKeystroke = TRUE;
         return FALSE;
@@ -270,11 +310,11 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     {
       /* NoMatch rule found, and is a character key */
       if(m_debug_items) {
-        m_debug_items->push_nomatch_enter(gp);
+        m_debug_items->push_nomatch_enter(m_actions.Length(), gp);
       }
       PostString(gp->dpNoMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
       if(m_debug_items) {
-        m_debug_items->push_nomatch_exit(gp);
+        m_debug_items->push_nomatch_exit(m_actions.Length(), gp);
       }
     }
     else if (m_state.charCode != 0 && m_state.charCode != 0xFFFF && gp->fUsingKeys)
@@ -284,7 +324,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     }
 
     if(m_debug_items) {
-      m_debug_items->push_group_exit(gp, KM_KBP_DEBUG_FLAG_NOMATCH);
+      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
     }
     return TRUE;
   }
@@ -309,7 +349,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   m_miniContext[GLOBAL_ContextStackSize-1] = 0;
 
   if(m_debug_items) {
-    m_debug_items->push_rule_enter(gp, kkp, m_miniContext, m_indexStack);
+    m_debug_items->push_rule_enter(m_actions.Length(), gp, kkp, m_miniContext, m_indexStack);
   }
 
   /*
@@ -350,21 +390,21 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   KMX_BOOL shouldProcessNomatch = PostString(p, m_keyboard.Keyboard, NULL, pOutputKeystroke) == psrCheckMatches;
 
   if(m_debug_items) {
-    m_debug_items->push_rule_exit(gp, kkp, m_miniContext, m_indexStack);
+    m_debug_items->push_rule_exit(m_actions.Length(), gp, kkp, m_miniContext, m_indexStack);
   }
 
   if(shouldProcessNomatch && gp->dpMatch && *gp->dpMatch) {
     if(m_debug_items) {
-      m_debug_items->push_match_enter(gp);
+      m_debug_items->push_match_enter(m_actions.Length(), gp);
     }
-    PostString(gp->dpMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
+      PostString(gp->dpMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
     if(m_debug_items) {
-      m_debug_items->push_match_exit(gp);
+      m_debug_items->push_match_exit(m_actions.Length(), gp);
     }
   }
 
   if(m_debug_items) {
-    m_debug_items->push_group_exit(gp, 0);
+    m_debug_items->push_group_exit(m_actions.Length(), 0, gp);
   }
 
   return TRUE;
@@ -381,12 +421,11 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 *
 * Returns:  0 to continue, 1 and 2 to return.
 *
-*   Called by:  ProcessKey
+*   Called by:  ProcessGroup
 *
 * PostString posts a string of "context", "index", "beep", characters and virtual keys
 * to the active application, via the Keyman PostKey buffer.
 */
-
 int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr, KMX_BOOL *pOutputKeystroke)
 {
   PKMX_WCHAR p, q, temp;
@@ -561,11 +600,10 @@ KMX_BOOL KMX_ProcessEvent::IsMatchingPlatform(LPSTORE s)  // I3432
 *
 * Returns:    0 on OK, 1 on not equal
 *
-*   Called by:  ProcessKey
+*   Called by:  ProcessGroup
 *
 * ContextMatch compares the context of a rule with the current context.
 */
-
 KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
 {
   KMX_WORD /*i,*/ n;

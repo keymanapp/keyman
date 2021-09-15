@@ -1,13 +1,23 @@
 /// <reference path="preProcessor.ts" />
+/// <reference path="lengthStyle.ts" />
 /// <reference path="utils.ts" />
-/// <reference path="oskBaseKey.ts" />
+/// <reference path="oskLayerGroup.ts" />
 /// <reference path="keytip.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/pendingLongpress.ts" />
+/// <reference path="keyboardView.interface.ts" />
+/// <reference path="touchEventEngine.ts" />
+/// <reference path="mouseEventEngine.ts" />
 
 namespace com.keyman.osk {
+  interface BoundingRect {
+    left: number,
+    right: number,
+    top: number,
+    bottom: number
+  };
 
-  export class VisualKeyboard {
+  export class VisualKeyboard implements KeyboardView {
     // Legacy alias, maintaining a reference for code built against older
     // versions of KMW.
     static specialCharacters = OSKKey.specialCharacters;
@@ -17,11 +27,12 @@ namespace com.keyman.osk {
      * so that its geometry may be updated on rotations and keyboard resize events, as
      * said geometry needs to be accurate for fat-finger probability calculations.
      */
-    layout: keyboards.ActiveLayout;
-    layers: keyboards.LayoutLayer[];
+    kbdLayout: keyboards.ActiveLayout;
+    layerGroup: OSKLayerGroup;
+
     private _layerId: string = "default";
+    layerIndex: number = 0; // the index of the default layer
     readonly isRTL: boolean;
-    layerIndex: number;
 
     device: Device;
     isStatic: boolean = false;
@@ -29,33 +40,47 @@ namespace com.keyman.osk {
     // Stores the base element for this instance of the visual keyboard.
     // Formerly known as osk._DivVKbd
     kbdDiv: HTMLDivElement;
-    kbdHelpDiv: HTMLDivElement;
     styleSheet: HTMLStyleElement;
 
-    _width: number;
-    _height: number;
+    /**
+     * The configured width for this VisualKeyboard.  May be `undefined` or `null`
+     * to allow automatic width scaling. 
+     */
+    private _width: number;
+
+    /**
+     * The configured height for this VisualKeyboard.  May be `undefined` or `null`
+     * to allow automatic height scaling. 
+     */
+    private _height: number;
+
+    /**
+     * The computed width for this VisualKeyboard.  May be null if auto sizing
+     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
+     */
+    private _computedWidth: number;
+
+    /**
+     * The computed height for this VisualKeyboard.  May be null if auto sizing
+     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
+     */
+    private _computedHeight: number;
 
     // Style-related properties
     fontFamily: string;
-    fontSize: string;
+    private _fontSize: ParsedLengthStyle;
+    // fontSize: string;
 
     // State-related properties
-    ddOSK: boolean = false;
     keyPending: KeyElement;
-    touchPending: Touch;
+    touchPending: InputEventCoordinate;
     deleteKey: KeyElement;
     deleting: number; // Tracks a timer id for repeated deletions.
     nextLayer: string;
     currentKey: string;
 
-    // Special keys (for the currently-visible layer)
-    lgKey: KeyElement;
-    hkKey: KeyElement; // hide keyboard key
-    spaceBar: KeyElement;
-
     // Touch-tracking properties
-    touchX: number;
-    touchY: number;
+    initTouchCoord: InputEventCoordinate;
     touchCount: number;
     currentTarget: KeyElement;
 
@@ -73,6 +98,23 @@ namespace com.keyman.osk {
 
     set layerId(value: string) {
       this._layerId = value;
+    }
+
+    get currentLayer(): OSKLayer {
+      return this.layerId ? this.layerGroup?.layers[this.layerId] : null;
+    }
+
+    // Special keys (for the currently-visible layer)
+    get lgKey(): KeyElement { // currently, must be visible for the touch language menu.
+      return this.currentLayer?.globeKey?.btn;
+    }
+
+    private get hkKey(): KeyElement { // hide keyboard key
+      return this.currentLayer?.hideKey?.btn;
+    }
+
+    public get spaceBar(): KeyElement { // also referenced by the touch language menu.
+      return this.currentLayer?.spaceBarKey?.btn;
     }
 
     //#region OSK constructor and helpers
@@ -94,7 +136,7 @@ namespace com.keyman.osk {
       var Lkbd=document.createElement('div');
       let layout: keyboards.ActiveLayout;
       if(keyboard) {
-        layout = this.layout = keyboard.layout(device.formFactor as utils.FormFactor);
+        layout = this.kbdLayout = keyboard.layout(device.formFactor as utils.FormFactor);
         this.isRTL = keyboard.isRTL;
       } else {
         // This COULD be called with no backing keyboard; KMW will try to force-show the OSK even without
@@ -103,10 +145,9 @@ namespace com.keyman.osk {
         // In KMW's current state, it'd take a major break, though - Processor always has an activeKeyboard,
         // even if it's "hollow".
         let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
-        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as utils.FormFactor);
+        layout = this.kbdLayout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as utils.FormFactor);
         this.isRTL = false;
       }
-      this.layers=layout['layer'];
 
       // Override font if specified by keyboard
       if('font' in layout) {
@@ -115,71 +156,134 @@ namespace com.keyman.osk {
         this.fontFamily='';
       }
 
-      let divLayerContainer = this.deviceDependentLayout(keyboard, device.formFactor as utils.FormFactor);
+      // Now to build the actual layout.
+      const formFactor = device.formFactor as utils.FormFactor;
+      let layoutKeyboard = keyboard;
+      if(!layoutKeyboard) {
+        // May occasionally be null in embedded contexts; have seen this when iOS engine sets
+        // keyboard height during change of keyboards.
+        layoutKeyboard = new keyboards.Keyboard(null);
+      }
 
-      this.ddOSK = true;
+      this.layerGroup = new OSKLayerGroup(this, layoutKeyboard, formFactor);
+      
+      // For 'live' touch keyboards, attach touch-based event handling.
+      if(!this.isStatic) {
+        if(this.device.touchable) {
+          const touchEngine = new TouchEventEngine(this);
+          touchEngine.registerEventHandlers();
+        } else {
+          const mouseEngine = new MouseEventEngine(this);
+          mouseEngine.registerEventHandlers();
+        }
+      }
 
+      // Now that we've properly processed the keyboard's layout, mark it as calibrated.
+      // TODO:  drop the whole 'calibration' thing.  The newer layout system supersedes the
+      // need for it.  (Is no longer really used, so the drop ought be clean.)
+      if (keyboard) {
+        keyboard.markLayoutCalibrated(formFactor);
+      }
+      
       // Append the OSK layer group container element to the containing element
       //osk.keyMap = divLayerContainer;
-      Lkbd.appendChild(divLayerContainer);
+      Lkbd.appendChild(this.layerGroup.element);
 
       // Set base class - OS and keyboard added for Build 360
-      this.kbdHelpDiv = this.kbdDiv = Lkbd;
+      this.kbdDiv = Lkbd;
 
-      if(this.isStatic) {
-        // The 'documentation' format uses the base element's child as the actual display base.
-        (Lkbd.childNodes[0] as HTMLDivElement).className = device.formFactor + '-static kmw-osk-inner-frame';
-      } else {
-        Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
-      }
+      Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
     }
 
+    public get element(): HTMLDivElement {
+      return this.kbdDiv;
+    }
+
+    public postInsert(): void { }
+ 
+    /**
+     * The configured width for this VisualKeyboard.  May be `undefined` or `null`
+     * to allow automatic width scaling. 
+     */
     get width(): number {
-      if(this._width) {
-        return this._width;
-      } else {
-        this.loadSizeFromCookie();
-        return this.width;
-      }
+      return this._width;
     }
 
+    /**
+     * The configured height for this VisualKeyboard.  May be `undefined` or `null`
+     * to allow automatic height scaling. 
+     */
     get height(): number {
-      if(this._height) {
-        return this._height;
+      return this._height;
+    }
+
+    get layoutWidth(): ParsedLengthStyle {
+      if(this.usesFixedWidthScaling) {
+        return ParsedLengthStyle.inPixels(this.width);
       } else {
-        this.loadSizeFromCookie();
-        return this.height;
+        return ParsedLengthStyle.forScalar(1);
       }
     }
 
-    protected loadSizeFromCookie() {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
+    get layoutHeight(): ParsedLengthStyle {
+      if(this.usesFixedHeightScaling) {
+        return ParsedLengthStyle.inPixels(this.height);
+      } else {
+        return ParsedLengthStyle.forScalar(1);
+      }
+    }
 
-      // If no prior cookie exists, it merely returns an empty object / cookie.
-      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
-      var newWidth: number, newHeight: number;
+    get fontSize(): ParsedLengthStyle {
+      if(!this._fontSize) {
+        this._fontSize = new ParsedLengthStyle('1em');
+      }
+      return this._fontSize;
+    }
 
-      // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-      newWidth=util.toNumber(c['width'], 0.333 * screen.width); // Default - 1/3rd of screen's width.
+    set fontSize(value: ParsedLengthStyle) {
+      this._fontSize = value;
+      this.kbdDiv.style.fontSize = value.styleString;
+    }
 
-      if(newWidth < 0.2*screen.width) {
-        newWidth = 0.2*screen.width;
-      } else if(newWidth > 0.9*screen.width) {
-        newWidth=0.9*screen.width;
+    /**
+     * Uses fixed scaling for widths of internal elements, rather than relative,
+     * percent-based scaling.
+     */
+    public get usesFixedWidthScaling(): boolean {
+      return this.device.touchable && !this.isStatic;
+    }
+
+    /**
+     * Uses fixed scaling for heights of internal elements, rather than relative,
+     * percent-based scaling.
+     */
+    public get usesFixedHeightScaling(): boolean {
+      return this.device.touchable && !this.isStatic;
+    }
+
+    /**
+     * Uses fixed scaling for internal elements, rather than relative, percent-
+     * based scaling.
+     */
+    public get usesFixedScaling(): boolean {
+      return this.device.touchable;
+    }
+
+    /**
+     * Denotes if the VisualKeyboard or its containing OSKView / OSKManager uses
+     * fixed positioning.
+     */
+    public get usesFixedPositioning(): boolean {
+      let node: HTMLElement = this.element;
+      while(node) {
+        if(getComputedStyle(node).position == 'fixed') {
+          return true;
+        } else {
+          node = node.offsetParent as HTMLElement;
+        }
       }
 
-      // Default height decision made here:
-      // https://github.com/keymanapp/keyman/pull/4279#discussion_r560453929
-      newHeight=util.toNumber(c['height'], 0.333 * newWidth);
-
-      if(newHeight < 0.15*screen.height) {
-        newHeight = 0.15 * screen.height;
-      } else if(newHeight > 0.5*screen.height) {
-        newHeight=0.5*screen.height;
-      }
-
-      this.setSize(newWidth, newHeight);
+      return false;
     }
 
     /**
@@ -188,28 +292,31 @@ namespace com.keyman.osk {
      * @param height
      * @param pending Set to `true` if called during a resizing interaction
      */
-    public setSize(width: number, height: number, pending?: boolean) {
+    public setSize(width?: number, height?: number, pending?: boolean) {
       this._width = width;
       this._height = height;
 
-      if(!pending && this.kbdDiv) {
-        this.kbdDiv.style.width=this._width+'px';
-        this.kbdDiv.style.height=this._height+'px';
-        this.kbdDiv.style.fontSize=(this._height/8)+'px';
-      }
-    }
+      if(this.kbdDiv) {
+        this.kbdDiv.style.width    = width ? this._width + 'px' : '';
+        this.kbdDiv.style.height   = height ? this._height + 'px' : '';
 
-    public defaultFontSize(): number {
-      return this.height / 8;
+        if(!this.device.touchable && height) {
+          this.fontSize = new ParsedLengthStyle((this._height/8) + 'px');
+        }
+
+        if(!pending) {
+          this.refreshLayout();
+        }
+      }
     }
 
     /**
      * Called by OSKManager after resize operations in order to determine the final
      * size actually used by the visual keyboard.
      */
-    public refit() {
-      this._width=this.kbdDiv.offsetWidth;
-      this._height=this.kbdDiv.offsetHeight;
+    public refit() {  // TODO:  Should probably remove; VisualKeyboard shouldn't be responsible for it.
+      this._width  = this.kbdDiv.offsetWidth;
+      this._height = this.kbdDiv.offsetHeight;
     }
 
     /**
@@ -222,189 +329,24 @@ namespace com.keyman.osk {
       return new OSKKeySpec(undefined, '', keyboards.ActiveKey.DEFAULT_KEY.width, keyboards.ActiveKey.DEFAULT_KEY.sp as keyboards.ButtonClass,
           null, keyboards.ActiveKey.DEFAULT_KEY.pad);
     };
-
-    /**
-     * Create the OSK for a particular keyboard and device
-     *
-     * @param       {Object}              layout      OSK layout definition
-     * @param       {string}              formFactor  layout form factor
-     * @return      {Object}                          fully formatted OSK object
-     */
-    deviceDependentLayout(keyboard: keyboards.Keyboard, formFactor: utils.FormFactor): HTMLDivElement {
-      if(!keyboard) {
-        // May occasionally be null in embedded contexts; have seen this when iOS engine sets
-        // keyboard height during change of keyboards.
-        keyboard = new keyboards.Keyboard(null);
-      }
-      let layout = keyboard.layout(formFactor);
-      let oskManager = com.keyman.singleton.osk;
-
-      var lDiv=document.createElement('div'), ls=lDiv.style;
-
-      // Set OSK box default style
-      lDiv.className='kmw-key-layer-group';
-
-      // Return empty DIV if no layout defined
-      if(layout == null) {
-        return lDiv;
-      }
-
-      // Set default OSK font size (Build 344, KMEW-90)
-      let layoutFS = layout['fontsize'];
-      if(typeof layoutFS == 'undefined' || layoutFS == null || layoutFS == '') {
-        ls.fontSize='1em';
-      } else {
-        ls.fontSize=layout['fontsize'];
-      }
-
-      this.fontSize=ls.fontSize;       //TODO: move outside function*********
-
-      // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-      var n: number, i: number, j: number;
-      var layers: keyboards.LayoutLayer[], gDiv: HTMLDivElement;
-      var rowHeight: number, rDiv: HTMLDivElement;
-      var keys: keyboards.ActiveKey[], key: keyboards.ActiveKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
-
-      layers=layout['layer'];
-
-      // Set key default attributes (must use exportable names!)
-      var tKey=this.getDefaultKeyObject();
-      tKey['fontsize']=ls.fontSize;
-
-      // ***Delete any empty rows at the end added by compiler bug...
-      for(n=0; n<layers.length; n++) {
-        let layer=layers[n];
-        let rows=layer['row'];
-        for(i=rows.length; i>0; i--) {
-          if(rows[i-1]['key'].length > 0) {
-            break;
-          }
-        }
-
-        if(i < rows.length) {
-          rows.splice(i-rows.length,rows.length-i);
-        }
-      }
-      // ...remove to here when compiler bug fixed ***
-
-      // Set the OSK row height, **assuming all layers have the same number of rows**
-
-      // Calculate default row height
-      rowHeight = 100/layers[0].row.length;
-
-      // Get the actual available document width and scale factor according to device type
-      var objectWidth : number;
-      if(formFactor == 'desktop' || this.isStatic) {
-        objectWidth = 100;
-      } else {
-        objectWidth = oskManager.getWidth();
-      }
-
-      if(!this.isStatic && this.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
-                                                                        // Not to mention, it's rather redundant.
-        lDiv.addEventListener('touchstart', this.touch, true);
-        // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
-        lDiv.addEventListener('touchend', this.release,true);
-        lDiv.addEventListener('touchmove', this.moveOver,false);
-        //lDiv.addEventListener('touchcancel', osk.cancel,false); //event never generated by iOS
-      }
-
-      let precalibrated = (keyboard.getLayoutState(formFactor) == keyboards.LayoutState.CALIBRATED);
-
-      for(n=0; n<layers.length; n++) {
-        let layer=layers[n] as keyboards.ActiveLayer;
-        gDiv=document.createElement('div'), gs=gDiv.style;
-        gDiv.className='kmw-key-layer';
-
-        // Always make the first layer visible
-        gs.display=(n==0?'block':'none');
-        gs.height=ls.height;
-
-        // Set font for layer if defined in layout
-        if('font' in layout) gs.fontFamily=layout['font']; else gs.fontFamily='';
-
-        gDiv['layer']=gDiv['nextLayer']=layer['id'];
-        if(typeof layer['nextlayer'] == 'string') gDiv['nextLayer']=layer['nextlayer'];
-
-        // Create a DIV for each row of the group
-        let rows=layer['row'];
-
-        for(i=0; i<rows.length; i++) {
-          rDiv=document.createElement('div');
-          rDiv.className='kmw-key-row';
-          // The following event trap is needed to prevent loss of focus in IE9 when clicking on a key gap.
-          // Unclear why normal _CreateElement prevention of loss of focus does not seem to work here.
-          // Appending handler to event handler chain does not work (other event handling remains active).
-          rDiv.onmousedown = function(e: MouseEvent) {
-            if(e) {
-              e.preventDefault();
-            }
-          }
-
-          let row=rows[i];
-          rs=rDiv.style;
-
-          // Set row height. (Phone and tablet heights are later recalculated
-          // and set in px, allowing for viewport scaling.)
-          rs.maxHeight=rs.height=rowHeight+'%';
-
-          // Apply defaults, setting the width and other undefined properties for each key
-          keys=row['key'];
-
-          if(!precalibrated || this.isStatic) {
-            // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
-            // adjusting the width of the last key to make the total exactly 100%.
-            // Overwrite the previously-computed percent.
-            // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
-            // All key widths and paddings are rounded for uniformity
-            for(j=0; j<keys.length; j++) {
-              key = keys[j];
-              // TODO:  reinstate rounding?
-              key['widthpc'] = key.proportionalWidth * objectWidth;
-              key['padpc'] = key.proportionalPad * objectWidth;
-            }
-          }
-
-          //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
-          var totalPercent=0;
-          for(j=0; j<keys.length; j++) {
-            key=keys[j];
-
-            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id']);
-            var keyTuple = keyGenerator.construct(this, layout, rs, totalPercent);
-
-            rDiv.appendChild(keyTuple.element);
-            totalPercent += keyTuple.percent;
-          }
-          // Add row to layer
-          gDiv.appendChild(rDiv);
-        }
-        // Add layer to group
-        lDiv.appendChild(gDiv);
-      }
-
-      // Now that we've properly processed the keyboard's layout, mark it as calibrated.
-      keyboard.markLayoutCalibrated(formFactor);
-      return lDiv;
-    }
     //#endregion
 
     //#region OSK touch handlers
-    getTouchCoordinatesOnKeyboard(touch: Touch) {
+    getTouchCoordinatesOnKeyboard(input: InputEventCoordinate) {
       let keyman = com.keyman.singleton;
 
       // We need to compute the 'local', keyboard-based coordinates for the touch.
       let kbdCoords = keyman.util.getAbsolute(this.kbdDiv as HTMLElement);
-      let offsetCoords = {x: touch.pageX - kbdCoords.x, y: touch.pageY - kbdCoords.y};
+      let offsetCoords = {x: input.x - kbdCoords.x, y: input.y - kbdCoords.y};
 
-      let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
-      offsetCoords.x /= layerGroup.offsetWidth;
+      // The layer group's element always has the proper width setting, unlike kbdDiv itself.
+      offsetCoords.x /= this.layerGroup.element.offsetWidth;
       offsetCoords.y /= this.kbdDiv.offsetHeight;
 
       return offsetCoords;
     }
 
-    getTouchProbabilities(touch: Touch): text.KeyDistribution {
+    getTouchProbabilities(input: InputEventCoordinate): text.KeyDistribution {
       let keyman = com.keyman.singleton;
       if(!keyman.core.languageProcessor.mayCorrect) {
         return null;
@@ -413,8 +355,8 @@ namespace com.keyman.osk {
       // Note:  if subkeys are active, they will still be displayed at this time.
       // TODO:  In such cases, we should build an ActiveLayout (of sorts) for subkey displays,
       //        update their geometries to the actual display values, and use the results here.
-      let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
-      let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
+      let touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
+      let layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.
       let width = layerGroup.offsetWidth, height = this.kbdDiv.offsetHeight;
       // Prevent NaN breakages.
       if(!width || !height) {
@@ -422,7 +364,7 @@ namespace com.keyman.osk {
       }
 
       let kbdAspectRatio = layerGroup.offsetWidth / this.kbdDiv.offsetHeight;
-      let baseKeyProbabilities = this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
+      let baseKeyProbabilities = this.kbdLayout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
 
       if(!this.subkeyGesture || !this.subkeyGesture.baseKey.key) {
         return baseKeyProbabilities;
@@ -490,20 +432,129 @@ namespace com.keyman.osk {
       }
     }
 
+    //#region Input handling start
+
+    /**
+     * Determines a "fuzzy boundary" area around the OSK within which active mouse and
+     * touch events will be maintained, even if their coordinates lie outside of the OSK's
+     * true visual bounds.
+     * @returns A `BoundingRect`, in `.pageX` / `.pageY` coordinates.
+     */
+    private getInteractiveBoundingRect(): BoundingRect {
+      // Determine the important geometric values involved
+      const _Box = this.element.offsetParent as HTMLElement;
+      let oskX = this.element.offsetLeft + (_Box?.offsetLeft || 0);
+      let oskY = this.element.offsetTop  + (_Box?.offsetTop || 0);
+
+      // Determine the out-of-bounds threshold at which touch-cancellation should automatically occur.
+      // Assuming square key-squares, we'll use 1/3 the height of a row for bounds detection
+      // for both dimensions.
+      const rowCount = this.currentLayer.rows.length;
+      const buffer = (0.333 * this.height / rowCount);
+
+      // Determine the OSK's boundaries and the boundaries of the page / view.
+      // These values are needed in .pageX / .pageY coordinates for the final calcs.
+      let boundingRect: BoundingRect = {
+        left: oskX - buffer,
+        right: oskX + this.width + buffer,
+        top: oskY - buffer,
+        bottom: oskY + this.height + buffer
+      };
+      
+      // If the OSK is using fixed positioning (thus, viewport-relative), we need to
+      // convert the 'clientX'-like values into 'pageX'-like values.
+      if(this.usesFixedPositioning) {
+        boundingRect.left   += window.pageXOffset;
+        boundingRect.right  += window.pageXOffset;
+        boundingRect.top    += window.pageYOffset;
+        boundingRect.bottom += window.pageYOffset;
+      }
+
+      return boundingRect;
+    }
+
+    /**
+     * Adjusts a potential "interactive boundary" definition by enforcing an 
+     * "event cancellation zone" near screen boundaries that are not directly adjacent 
+     * to the ongoing input event's initial coordinate.
+     * 
+     * This facilitates modeling of conventional cancellation gestures where a user would
+     * drag the mouse or touch point off the OSK, as mouse and touch event handlers receive
+     * no input beyond screen boundaries.
+     * 
+     * @param baseBounds The baseline interactive bounding area to be adjusted
+     * @param startCoord The initial coordinate of a currently-ongoing input event
+     * @returns 
+     */
+    private applyScreenMarginBoundsThresholding(baseBounds: BoundingRect,
+                                                startCoord: InputEventCoordinate): BoundingRect {
+      // Determine the needed linear translation to screen coordinates.
+      const xDelta = window.screenLeft - window.pageXOffset;
+      const yDelta = window.screenTop  - window.pageYOffset;
+
+      let adjustedBounds: BoundingRect = { ... baseBounds };
+
+      // Also translate the initial touch's screen coord, as it affects our bounding box logic.
+      const initScreenCoord = new InputEventCoordinate(startCoord.x + xDelta, startCoord.y + yDelta);
+
+      // Detection:  is the OSK aligned with any screen boundaries?
+      // If so, create a 'fuzzy' zone around the edges not near the initial touch point that allow
+      // move-based cancellation.
+
+      // If the initial input screen-coord is at least 5 pixels from the screen's left AND
+      // the OSK's left boundary is within 2 pixels from the screen's left...
+      if(initScreenCoord.x >= 5 && baseBounds.left + xDelta <= 2) {
+        adjustedBounds.left = 2 - xDelta; // new `leftBound` is set to 2 pixels from the screen's left.
+      }
+
+      if(initScreenCoord.x <= screen.width - 5 && baseBounds.right + xDelta >= screen.width - 2) {
+        adjustedBounds.right = (screen.width - 2) - xDelta; // new `rightBound` 2px from screen's right.
+      }
+
+      if(initScreenCoord.y >= 5 && baseBounds.top + yDelta <= 2) {
+        adjustedBounds.top = 2 - yDelta;
+      }
+
+      if(initScreenCoord.y <= screen.height - 5 && baseBounds.bottom + yDelta >= screen.height - 2) {
+        adjustedBounds.bottom = (screen.height - 2) - yDelta;
+      }
+
+      return adjustedBounds;
+    }
+
+    detectWithinInteractiveBounds(coord: InputEventCoordinate): boolean {
+      // Shortcuts the method during unit testing, as we don't currently
+      // provide coordinate values in its synthetic events.
+      if(coord.x === null && coord.y === null) {
+        return true;
+      }
+
+      const baseBoundingRect = this.getInteractiveBoundingRect();
+      const adjustedBoundingRect = this.applyScreenMarginBoundsThresholding(baseBoundingRect, this.initTouchCoord);
+
+      // Now to check where the input coordinate lies in relation to the final bounding box!
+
+      if(coord.x < adjustedBoundingRect.left || coord.x > adjustedBoundingRect.right) {
+        return false;
+      } else if(coord.y < adjustedBoundingRect.top || coord.y > adjustedBoundingRect.bottom) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
     /**
      * The main OSK touch start event handler
      *
      *  @param  {Event} e   touch start event object
      *
      */
-    touch: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
+    touch(input: InputEventCoordinate) {
       // Identify the key touched
-      var t = <HTMLElement> e.changedTouches[0].target, key = this.keyTarget(t);
+      var t = <HTMLElement> input.target, key = this.keyTarget(t);
 
-      // Save the touch point
-      this.touchX = e.changedTouches[0].pageX;
-      // Used for quick-display of popup keys (defined in highlightSubKeys)
-      this.touchY = e.changedTouches[0].pageY;
+      // Save the touch point, which is used for quick-display of popup keys (defined in highlightSubKeys)
+      this.initTouchCoord = input;
 
       // Set the key for the new touch point to be current target, if defined
       this.currentTarget = key;
@@ -517,12 +568,17 @@ namespace com.keyman.osk {
       }
 
       // Keep track of number of active (unreleased) touch points
-      this.touchCount = e.touches.length;
+      this.touchCount = input.activeInputCount;
 
       // Get nearest key if touching a hidden key or the end of a key row
       if((key && ((key.className.indexOf('key-hidden') >= 0) || (key.className.indexOf('key-blank') >= 0)))
         || t.className.indexOf('kmw-key-row') >= 0) {
-        key = this.findNearestKey(e,t);
+
+        // Perform "fudged" selection ops if and only if we're not sure about the precision of the
+        // input source.  Mouse-based selection IS precise, so no need for "fudging" there.
+        if(!input.isFromMouse) {
+          key = this.findNearestKey(input, t);
+        }
       }
       // Do not do anything if no key identified!
       if(key == null) {
@@ -550,7 +606,7 @@ namespace com.keyman.osk {
       } else if(keyName == 'K_BKSP') {
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
-        this.modelKeyClick(key, e.changedTouches[0]);
+        this.modelKeyClick(key, input);
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
@@ -561,8 +617,8 @@ namespace com.keyman.osk {
 
           if(this.subkeyGesture && this.subkeyGesture instanceof browser.SubkeyPopup) {
             let subkeyPopup = this.subkeyGesture as browser.SubkeyPopup;
-            subkeyPopup.updateTouch(e.changedTouches[0]);
-            subkeyPopup.finalize(e.changedTouches[0]);
+            subkeyPopup.updateTouch(input);
+            subkeyPopup.finalize(input);
           } else {
             this.modelKeyClick(this.keyPending, this.touchPending);
           }
@@ -571,12 +627,12 @@ namespace com.keyman.osk {
           this.touchCount--;
         } else {
           // If this key has subkey, start timer to display subkeys after delay, set up release
-          this.initGestures(key, e.changedTouches[0]);
+          this.initGestures(key, input);
         }
         this.keyPending = key;
-        this.touchPending = e.changedTouches[0];
+        this.touchPending = input;
       }
-    }.bind(this);
+    }
 
     /**
      * OSK touch release event handler
@@ -584,7 +640,7 @@ namespace com.keyman.osk {
      *  @param  {Event} e   touch release event object
      *
      **/
-    release: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
+    release(input: InputEventCoordinate): void {
       // Prevent incorrect multi-touch behaviour if native or device popup visible
       var t = this.currentTarget;
 
@@ -593,13 +649,13 @@ namespace com.keyman.osk {
 
       if((this.subkeyGesture && this.subkeyGesture.isVisible())) {
         // Ignore release if a multiple touch
-        if(e.touches.length > 0) {
+        if(input.activeInputCount > 0) {
           return;
         }
 
         if(this.subkeyGesture instanceof browser.SubkeyPopup) {
           let subkeyPopup = this.subkeyGesture as browser.SubkeyPopup;
-          subkeyPopup.finalize(e.changedTouches[0]);
+          subkeyPopup.finalize(input);
         }
         this.highlightKey(this.keyPending,false);
         this.keyPending = null;
@@ -615,8 +671,11 @@ namespace com.keyman.osk {
 
       // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
       // This is not completely effective and needs some tweaking, especially on Android
-      var x = e.changedTouches[0].pageX;
-      var beyondEdge = ((x < 2 && this.touchX > 5) || (x > window.innerWidth - 2 && this.touchX < window.innerWidth - 5));
+      if(!this.detectWithinInteractiveBounds(input)) {
+        this.moveCancel(input);
+        this.touchCount--;
+        return;
+      }
 
       // Save then decrement current touch count
       var tc=this.touchCount;
@@ -628,24 +687,48 @@ namespace com.keyman.osk {
       if(this.keyPending) {
         this.highlightKey(this.keyPending,false);
         // Output character unless moved off key
-        if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          this.modelKeyClick(this.keyPending, e.changedTouches[0]);
+        if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0) {
+          this.modelKeyClick(this.keyPending, input);
         }
         this.clearPopup();
         this.keyPending = null;
         this.touchPending = null;
         // Always clear highlighting of current target on release (multi-touch)
       } else {
-        var tt = e.changedTouches[0];
+        var tt = input;
         t = this.keyTarget(tt.target);
         if(!t) {
-          var t1 = document.elementFromPoint(tt.clientX,tt.clientY);
-          t = this.findNearestKey(e, <HTMLElement> t1);
+          // Operates relative to the viewport, not based on the actual coordinate on the page.
+          var t1 = document.elementFromPoint(input.x - window.pageXOffset, input.y - window.pageYOffset);
+          t = this.findNearestKey(input, <HTMLElement> t1);
         }
 
         this.highlightKey(t,false);
       }
-    }.bind(this);
+    }
+
+    moveCancel(input: InputEventCoordinate): void {
+      // Do not attempt to support reselection of target key for overlapped keystrokes.
+      // Perform _after_ ensuring possible sticky keys have been cancelled.
+      if(input.activeInputCount > 1) {
+        return;
+      }
+
+      // Update all gesture tracking.  The function returns true if further input processing
+      // should be blocked.  (Keeps the subkey array operating when the input coordinate has
+      // moved outside the OSK's boundaries.)
+      if(this.updateGestures(null, this.keyPending, input)) {
+        return;
+      }
+
+      this.cancelDelete();
+
+      this.highlightKey(this.keyPending,false);
+      this.showKeyTip(null,false);
+      this.clearPopup();
+      this.keyPending = null;
+      this.touchPending = null;
+    }
 
     /**
      * OSK touch move event handler
@@ -653,17 +736,7 @@ namespace com.keyman.osk {
      *  @param  {Event} e   touch move event object
      *
      **/
-    moveOver: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
-      let keyman = com.keyman.singleton;
-      e.preventDefault();
-      e.cancelBubble=true;
-
-      if(typeof e.stopImmediatePropagation == 'function') {
-        e.stopImmediatePropagation();
-      } else if(typeof e.stopPropagation == 'function') {
-        e.stopPropagation();
-      }
-
+    moveOver(input: InputEventCoordinate): void {
       // Shouldn't be possible, but just in case.
       if(this.touchCount == 0) {
         this.cancelDelete();
@@ -671,70 +744,74 @@ namespace com.keyman.osk {
       }
 
       // Get touch position
-      var x=typeof e.touches == 'object' ? e.touches[0].clientX : e.clientX,
-          y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
+      const x = input.x - window.pageXOffset;
+      const y = input.y - window.pageYOffset;
 
       // Move target key and highlighting
-      this.touchPending = e.changedTouches[0];
-      var t1 = <HTMLElement> document.elementFromPoint(x,y),
-          key0 = this.keyPending,
-          key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
+      this.touchPending = input;
+      // Operates on viewport-based coordinates, not page-based.
+      var t1 = <HTMLElement> document.elementFromPoint(x,y);
+      const key0 = this.keyPending;
+      let key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
 
       // Find the nearest key to the touch point if not on a visible key
       if((key1 && key1.className.indexOf('key-hidden') >= 0) ||
         (t1 && (!key1) && t1.className.indexOf('key-row') >= 0)) {
-          key1 = this.findNearestKey(e,t1);
+          key1 = this.findNearestKey(input, t1);
       }
+
+      // Cancels BKSP if it's not the key.  (Note... could also cancel BKSP if the ongoing
+      // input is cancelled, regardless of key, just to be safe.)
 
       // Stop repeat if no longer on BKSP key
       if(key1 && (typeof key1.id == 'string') && (key1.id.indexOf('-K_BKSP') < 0)) {
         this.cancelDelete();
       }
 
+      // Cancels if it's a multitouch attempt.
+
       // Do not attempt to support reselection of target key for overlapped keystrokes.
       // Perform _after_ ensuring possible sticky keys have been cancelled.
-      if(e.touches.length > 1) {
+      if(input.activeInputCount > 1) {
         return;
       }
 
+      // Gesture-updates should probably be a separate call from other touch-move aspects.
+
       // Update all gesture tracking.  The function returns true if further input processing
       // should be blocked.
-      if(this.updateGestures(key1, key0, e.changedTouches[0])) {
+      if(this.updateGestures(key1, key0, input)) {
         return;
       }
 
       // Identify current touch position (to manage off-key release)
       this.currentTarget = key1;
 
-      // _Box has (most of) the useful client values.
-      let _Box = this.kbdDiv.parentElement ? this.kbdDiv.parentElement : keyman.osk._Box;
-      let height = this.kbdDiv.offsetHeight;
-      // We need to adjust the offset properties by any offsets related to the active banner.
-
-      // Determine the y-threshold at which touch-cancellation should automatically occur.
-      let rowCount = this.layers[this.layerIndex].row.length;
-      let yBufferThreshold = (0.333 * height / rowCount); // Allows vertical movement by 1/3 the height of a row.
-      var yMin = (this.kbdDiv && _Box) ? Math.max(5, this.kbdDiv.offsetTop - yBufferThreshold) : 5;
-      if(key0 && e.touches[0].pageY < yMin) {
-        this.highlightKey(key0,false);
-        this.showKeyTip(null,false);
-        this.keyPending = null;
-        this.touchPending = null;
-      }
+      // Only NOW do we denote the newly-selected key as the currently-focused key.
 
       // Replace the target key, if any, by the new target key
       // Do not replace a null target, as that indicates the key has already been released
       if(key1 && this.keyPending) {
+        this.highlightKey(key0, false);
         this.keyPending = key1;
-        this.touchPending = e.touches[0];
+        this.touchPending = input;
+      }
+
+      if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
+        // While there may not be an active subkey menu, we should probably update which base key
+        // is being highlighted by the current touch & start a pending longpress for it.
+        this.clearPopup();
+        this.initGestures(key1, input);
       }
 
       if(this.keyPending) {
         if(key0 != key1 || key1.className.indexOf('kmw-key-touched') < 0) {
-          this.highlightKey(key1,true);
+          this.highlightKey(key1, true);
         }
       }
-    }.bind(this);
+    }
+
+    //#endregion
 
     /**
      * Get the current key target from the touch point element within the key
@@ -770,14 +847,13 @@ namespace com.keyman.osk {
      *  @return {Object}      nearest key to touch point
      *
      **/
-    findNearestKey(e: TouchEvent, t: HTMLElement): KeyElement {
-      if((!e) || (typeof e.changedTouches == 'undefined')
-        || (e.changedTouches.length == 0)) {
+    findNearestKey(input: InputEventCoordinate, t: HTMLElement): KeyElement {
+      if(!input) {
         return null;
       }
 
       // Get touch point on screen
-      var x = e.changedTouches[0].pageX;
+      var x = input.x;
 
       // Get key-row beneath touch point
       while(t && t.className !== undefined && t.className.indexOf('key-row') < 0) {
@@ -857,15 +933,15 @@ namespace com.keyman.osk {
     }
     //#endregion
 
-    modelKeyClick(e: osk.KeyElement, touch?: Touch) {
-      let keyEvent = this.initKeyEvent(e, touch);
+    modelKeyClick(e: osk.KeyElement, input?: InputEventCoordinate) {
+      let keyEvent = this.initKeyEvent(e, input);
 
       // TODO:  convert into an actual event, raised by the VisualKeyboard.
       //        Its code is intended to lie outside of the OSK-Core library/module.
       PreProcessor.raiseKeyEvent(keyEvent);
     }
 
-    initKeyEvent(e: osk.KeyElement, touch?: Touch) {
+    initKeyEvent(e: osk.KeyElement, input?: InputEventCoordinate) {
       // Turn off key highlighting (or preview)
       this.highlightKey(e,false);
 
@@ -882,10 +958,10 @@ namespace com.keyman.osk {
       }
       
       // Return the event object.
-      return this.keyEventFromSpec(keySpec, touch);
+      return this.keyEventFromSpec(keySpec, input);
     }
 
-    keyEventFromSpec(keySpec: keyboards.ActiveKey, touch?: Touch) {
+    keyEventFromSpec(keySpec: keyboards.ActiveKey, input?: InputEventCoordinate) {
       let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
 
       // Start:  mirrors _GetKeyEventProperties
@@ -893,19 +969,11 @@ namespace com.keyman.osk {
       // First check the virtual key, and process shift, control, alt or function keys
       let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device.coreSpec);
 
-      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
-      switch(Lkc.kName) {
-        case 'K_CAPS':
-        case 'K_NUMLOCK':
-        case 'K_SCROLL':
-          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
-      }
-
       // End - mirrors _GetKeyEventProperties
 
-      if(core.languageProcessor.isActive && touch) {
-        Lkc.source = touch;
-        Lkc.keyDistribution = this.getTouchProbabilities(touch);;
+      if(core.languageProcessor.isActive && input) {
+        Lkc.source = input;
+        Lkc.keyDistribution = this.getTouchProbabilities(input);
       }
 
       // Return the event object.
@@ -915,66 +983,38 @@ namespace com.keyman.osk {
     // cancel = function(e) {} //cancel event is never generated by iOS
 
     /**
-     * Function     findKeyElement
-     * Scope        Private
-     * @param       {string}   layerId
-     * @param       {string}   keyId
-     * Description  Finds the DOM element associated with the specified key, if it exists.
-     */
-    findKeyElement(layerId: string, keyId: string) {
-      let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;
-
-      for(let i = 0; i < layerGroup.childElementCount; i++) {
-        // TODO:  At some point, our OSK construction should 'link' a TS metadata type to this,
-        // like with OSKKey / KeyElement for keys.
-        let layer = layerGroup.childNodes[i] as HTMLDivElement;
-        // row -> key-square -> actual KeyElement.
-        let currentLayerId = (layer.firstChild.firstChild.firstChild as KeyElement).key.layer
-        if(currentLayerId == layerId) {
-          // Layer identified!  Now to find the key.  First - iterate over rows.
-          for(let r = 0; r < layer.childElementCount; r++) {
-            let row = layer.childNodes[r] as HTMLDivElement;
-            for(let k = 0; k < row.childElementCount; k++) {
-              let key = row.childNodes[k].firstChild as KeyElement;
-              if(key.keyId == keyId) {
-                return key;
-              }
-            }
-          }
-        }
-      }
-
-      return null;
-    }
-
-    /**
      * Function     _UpdateVKShiftStyle
      * Scope        Private
      * @param       {string=}   layerId
      * Description  Updates the OSK's visual style for any toggled state keys
      */
     _UpdateVKShiftStyle(layerId?: string) {
-      var i, n, layer=null;
+      var i;
       let core = com.keyman.singleton.core;
 
-      if(layerId) {
-        for(n=0; n<this.layers.length; n++) {
-          if(this.layers[n]['id'] == this.layerId) {
-            break;
-          }
-        }
-
-        return;  // Failed to find the requested layer.
-      } else {
-        n=this.layerIndex;
-        layerId=this.layers[n]['id'];
+      if(!layerId) {
+        layerId = this.layerId;
       }
 
-      layer=this.layers[n];
+      const layer = this.layerGroup.layers[layerId];
+      if(!layer) {
+        return;
+      }
+
+      // So... through KMW 14, we actually never tracked the capsKey, numKey, and scrollKey
+      // properly for keyboard-defined layouts - only _default_, desktop-style layouts.
+      //
+      // We _could_ remedy this, but then... touch keyboards like khmer_angkor actually
+      // repurpose certain state keys, and in an inconsistent manner at that.
+      // Considering the potential complexity of touch layouts, with multiple possible
+      // layer-shift keys, it's likely best to just leave things as they are for now.
+      if(!core.activeKeyboard?.usesDesktopLayoutOnDevice(this.device.coreSpec)) {
+        return;
+      }
 
       // Set the on/off state of any visible state keys.
-      var states = ['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
-      var keys   = [layer.capsKey, layer.numKey, layer.scrollKey];
+      const states   = ['K_CAPS',      'K_NUMLOCK',    'K_SCROLL'];
+      const keys     = [layer.capsKey, layer.numKey,   layer.scrollKey];
 
       for(i=0; i < keys.length; i++) {
         // Skip any keys not in the OSK!
@@ -982,21 +1022,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i]['sp'] = core.keyboardProcessor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
-        let keyId = layerId+'-'+states[i]
-        var btn = document.getElementById(keyId) as KeyElement;
-
-        if(btn == null) {
-          //This can happen when using BuildDocumentationKeyboard, as the OSK isn't yet in the
-          //document hierarchy.  Sometimes.  (It's weird.)
-          btn = this.findKeyElement(layerId, states[i]);
-        }
-
-        if(btn != null) {
-          btn.key.setButtonClass(this);
-        } else {
-          console.warn("Could not find key to apply style: \"" + keyId + "\"");
-        }
+        keys[i].setToggleState(core.keyboardProcessor.stateKeys[states[i]]);
       }
     }
 
@@ -1025,7 +1051,7 @@ namespace com.keyman.osk {
       let activeStub = keyman.keyboardManager.activeStub;
 
       if(activeStub) {
-        if(activeStub['displayName']) {
+        if(activeStub['displayName'] != null) {
           displayName = activeStub['displayName'];
         } else {
           let
@@ -1054,7 +1080,7 @@ namespace com.keyman.osk {
       }
 
       try {
-        var t=<HTMLElement> this.spaceBar.firstChild;
+        var t=<HTMLElement> this.spaceBar.key.label;
         let tParent = <HTMLElement> t.parentNode;
         if(typeof(tParent.className) == 'undefined' || tParent.className == '') {
           tParent.className='kmw-spacebar';
@@ -1101,138 +1127,55 @@ namespace com.keyman.osk {
       }
     }
 
-    //#region Mouse-event handling
-    /**
-     * Mouse down/mouse over event handler (desktop only)
-     *
-     * @param   {Event}  e  mouse over/mouse down event object
-     */
-    mouseOverMouseDownHandler = function(this: VisualKeyboard, e: MouseEvent) {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
-
-      var t = <HTMLElement> util.eventTarget(e);
-      if(t === null || this.device.formFactor != 'desktop') {
-        return;
-      }
-
-      if(t.nodeName == 'SPAN') {
-        t = <HTMLElement> t.parentNode;
-      }
-
-      let key = this.keyTarget(t);
-
-      if(util.eventType(e) == 'mousedown') {
-        this.currentKey=key.id;
-        util._CancelMouse(e);
-        this.highlightKey(key, true);
-      } else if(key.id == this.currentKey) {
-        this.highlightKey(key, true);
-      }
-    }.bind(this);
-
-    /**
-     * Mouse up/mouse out event handler (desktop only)
-     *
-     * @param   {Event}  e  mouse up/out event object
-     */
-    mouseUpMouseOutHandler = function(this: VisualKeyboard, e: MouseEvent) {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
-
-      var t=<HTMLElement> util.eventTarget(e);
-      if(t === null || this.device.formFactor != 'desktop') {
-        return;
-      }
-
-      if(t.nodeName == 'SPAN') {
-        t = <HTMLElement> t.parentNode;
-      }
-
-      let key = this.keyTarget(t);
-      this.highlightKey(key, false);
-
-      // Process as click if mouse button released anywhere over key
-      if(util.eventType(e) == 'mouseup') {
-        if(key.id == this.currentKey) {
-          this.modelKeyClick(key);
-        }
-        this.currentKey='';
-      }
-    }.bind(this);
-    //#endregion
-
     /**
      * Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
      * This function allows us to calculate the font size in those situations.
      */
-    getKeyEmFontSize() {
-      let keyman = com.keyman.singleton;
+    getKeyEmFontSize(): number {
+      if(!this.fontSize) {
+        return 0;
+      }
 
       if(this.device.formFactor == 'desktop') {
-        let kbdFontSize = this.defaultFontSize();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
-        return kbdFontSize * keySquareScale;
+        return this.fontSize.scaledBy(keySquareScale).val;
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = getFontSizeStyle(emSizeStr).val;
 
         var emScale = 1;
         if(!this.isStatic) {
-          // Reading this requires the OSK to be active, so we filter out
-          // BuildVisualKeyboard calls here.
-          let boxFontStyle = getFontSizeStyle(keyman.osk._Box);
-
           // Double-check against the font scaling applied to the _Box element.
-          if(boxFontStyle.absolute) {
-            return boxFontStyle.val;
+          if(this.fontSize.absolute) {
+            return this.fontSize.val;
           } else {
-            emScale = boxFontStyle.val;
+            emScale = this.fontSize.val;
           }
         }
         return emSize * emScale;
       }
     }
 
-        /**
-     *  Set the reference to a special function key for the
-     *  currently visible OSK layer
-     *
-     *  @param    {number}  nLayer  Index of visible layer
-     *  @param    {string}  keyId   key identifier
-     *  @return   {Object}          Reference to key
-     */
-    getSpecialKey(nLayer: number, keyId: string): KeyElement {
-      let layers = this.kbdDiv.childNodes[0].childNodes;
-
-      if(nLayer >= 0 && nLayer < layers.length) {
-        // Special function keys will always be in bottom row (must modify code if not)
-        let rows = layers[nLayer].childNodes;
-        let keys = rows[rows.length-1].childNodes;
-        for(var k=0; k<keys.length; k++) {
-          let key = getKeyFrom(keys[k].firstChild);
-          if(key && key['keyId'] == keyId) {
-            return key;
-          }
-        }
+    updateState() {
+      // May happen for desktop-oriented keyboards that neglect to specify a touch layout.
+      // See `test_chirality.js` from the unit-test keyboard suite, which tests keystrokes
+      // using modifiers that lack corresponding visual-layout representation.
+      if(!this.currentLayer) {
+        return;
       }
-      return null;
-    }
 
-    show(host: OSKManager) {
-      let device = this.device;
-      var n,nLayer=-1, b = this.kbdDiv.childNodes[0].childNodes;
+      var n, b = this.kbdDiv.childNodes[0].childNodes;
+      this.nextLayer = this.layerId;
+
+      if(this.currentLayer.nextlayer) {
+        this.nextLayer=this.currentLayer.nextlayer;
+      }
 
       for(n=0; n < b.length; n++) {
         let layerElement = <HTMLDivElement> b[n];
         if(layerElement['layer'] == this.layerId) {
           layerElement.style.display='block';
           //b[n].style.visibility='visible';
-          this.nextLayer=this.layerId;
-          this.layerIndex=nLayer=n;
-          if(typeof this.layers[n]['nextlayer'] == 'string') {
-            this.nextLayer=this.layers[n]['nextlayer'];
-          }
 
           // If osk._Show has been called, there's probably been a change in modifier or state key state.  Keep it updated!
           this._UpdateVKShiftStyle();
@@ -1241,36 +1184,15 @@ namespace com.keyman.osk {
           //layerElement.style.visibility='hidden';
         }
       }
-
-      if(device.touchable) {
-        // Identify and save references to the language key, hide keyboard key, and space bar
-        this.lgKey=this.getSpecialKey(nLayer,'K_LOPT');     //TODO: should be saved with layer
-        this.hkKey=this.getSpecialKey(nLayer,'K_ROPT');
-
-        // Always adjust screen height if iPhone or iPod, to take account of viewport changes
-        // Do NOT condition upon form-factor; this line prevents a bug with displaying
-        // the predictive-text banner on the initial keyboard load.  (Issue #2907)
-        if(device.OS == 'iOS') {
-          this.adjustHeights(host);
-        }
-      }
-
-      // Define for both desktop and touchable OSK
-      this.spaceBar=this.getSpecialKey(nLayer,'K_SPACE'); //TODO: should be saved with layer
     }
 
     /**
-     * Adjust the absolute height of each keyboard element after a rotation
-     *
-     **/
-    adjustHeights(host: OSKManager) {
+     * Used to refresh the VisualKeyboard's geometric layout and key sizes
+     * when needed.
+     */
+    refreshLayout() {
       let keyman = com.keyman.singleton;
-      let _Box = host._Box;
       let device = this.device;
-
-      if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
-        return false;
-      }
 
       var fs=1.0;
       // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
@@ -1278,32 +1200,77 @@ namespace com.keyman.osk {
         fs=fs/keyman.util.getViewportScale();
       }
 
-      let paddedHeight = this.computedAdjustedOskHeight(host.getKeyboardHeight());
+      let paddedHeight: number;
+      if(this.height) {
+        paddedHeight = this.computedAdjustedOskHeight(this.height);
+      }
 
-      var b: HTMLElement = _Box, bs=b.style;
-      bs.height=bs.maxHeight=paddedHeight+'px';
-
-      b = this.kbdDiv.firstChild as HTMLElement;
+      let b = this.layerGroup.element as HTMLElement;
       let gs = this.kbdDiv.style;
-      bs=b.style;
-      // Sets the layer group to the correct height.
-      gs.height=gs.maxHeight=paddedHeight+'px';
-      bs.fontSize=fs+'em';
+      let bs=b.style;
+      if(this.usesFixedHeightScaling) {
+        // Sets the layer group to the correct height.
+        gs.height = gs.maxHeight = paddedHeight + 'px';
+      }
 
-      this.adjustLayerHeights(paddedHeight, host.getKeyboardHeight());
+      // The font-scaling applied on the layer group.
+      gs.fontSize = this.fontSize.styleString;
+      bs.fontSize=ParsedLengthStyle.forScalar(fs).styleString;
 
-      return true;
+      // Needs the refreshed layout info to work correctly.
+      for(const layerId in this.layerGroup.layers) {
+        const layer = this.layerGroup.layers[layerId];
+        layer.refreshLayout(this, paddedHeight, this.height);
+      }
+
+      // NEW CODE ------
+      
+      // Step 1:  have the necessary conditions been met?
+      const fixedSize = this.width && this.height;
+      const computedStyle = getComputedStyle(this.kbdDiv);
+      const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
+
+      // Step 2:  determine basic layout geometry
+      if(fixedSize) {
+        this._computedWidth  = this.width;
+        this._computedHeight = this.height;
+      } else if(isInDOM) {
+        this._computedWidth   = parseInt(computedStyle.width, 10);
+        if(!this._computedWidth) {
+          // For touch keyboards, the width _was_ specified on the layer group,
+          // not the root element (`kbdDiv`).
+          const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
+          this._computedWidth = parseInt(groupStyle.width, 10);
+        }
+        this._computedHeight  = parseInt(computedStyle.height, 10);
+      } else {
+        // Cannot perform layout operations!
+        return;
+      }
+
+      // Step 3:  perform layout operations.  (Handled by 'old code' section below.)
+
+      // END NEW CODE -----------
+
+      // Needs the refreshed layout info to work correctly.
+      for(const layerId in this.layerGroup.layers) {
+        const layer = this.layerGroup.layers[layerId];
+        layer.refreshLayout(this, paddedHeight, this._computedHeight);
+      }
     }
 
-    private computedAdjustedOskHeight(allottedHeight: number): number {
-      let device = this.device;
+    /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
+      if(!this.layerGroup) {
+        return allottedHeight;
+      }
 
-      var layers=this.kbdDiv.firstChild.childNodes;
+      const layers=this.layerGroup.layers;
       let oskHeight = 0;
 
       // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
-      for(let i = 0; i < layers.length; i++) {
-        let nRows = layers[i].childNodes.length;
+      for(const layerID in layers) {
+        const layer = layers[layerID];
+        let nRows = layer.rows.length;
         let rowHeight = Math.floor(allottedHeight/(nRows == 0 ? 1 : nRows));
         let layerHeight = nRows * rowHeight;
 
@@ -1316,126 +1283,8 @@ namespace com.keyman.osk {
       const oskPad = 0;
       let oskPaddedHeight = oskHeight + oskPad;
 
-      if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-        oskPaddedHeight /= window.devicePixelRatio;
-      }
-
       return oskPaddedHeight;
     }
-
-    private adjustLayerHeights(paddedHeight: number, trueHeight: number) {
-      let device = this.device;
-      let layers = this.kbdDiv.firstChild.childNodes;
-
-      for(let nLayer=0;nLayer<layers.length; nLayer++) {
-        // Check the heights of each row, in case different layers have different row counts.
-        let layer = layers[nLayer] as HTMLElement;
-        let nRows=layers[nLayer].childNodes.length;
-        (<HTMLElement> layers[nLayer]).style.height=(paddedHeight)+'px';
-
-        let rowHeight = Math.floor(trueHeight/(nRows == 0 ? 1 : nRows));
-
-        if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-          layer.style.height = layer.style.maxHeight = paddedHeight + 'px';
-          rowHeight /= window.devicePixelRatio;
-        }
-
-        // Sets the layers to the correct height
-        let rowPad = Math.round(0.15*rowHeight);
-
-        for(let nRow=0; nRow<nRows; nRow++) {
-          let rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
-          let bottom = (nRows-nRow-1)*rowHeight+1;
-          if(!this.isStatic) {
-            rs.bottom=bottom+'px';
-          }
-          rs.maxHeight=rs.lineHeight=rs.height=rowHeight+'px';
-
-          // Calculate the exact vertical coordinate of the row's center.
-          this.layout.layer[nLayer].row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
-
-          let keys=layers[nLayer].childNodes[nRow].childNodes as NodeListOf<HTMLElement>;
-          this.adjustRowHeights(keys, rowHeight, bottom, rowPad);
-        }
-      }
-    }
-
-    private adjustRowHeights(keys: NodeListOf<HTMLElement>, rowHeight: number, bottom: number, pad: number) {
-      let util = com.keyman.singleton.util;
-      let device = this.device;
-
-      let resizeLabels = (device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
-
-      let nKeys=keys.length;
-      for(let nKey=0;nKey<nKeys;nKey++) {
-        let keySquare=keys[nKey] as HTMLElement;
-        //key.style.marginTop = (device.formFactor == 'phone' ? pad : 4)+'px';
-        //**no longer needed if base key label and popup icon are within btn, not container**
-
-        // Must set the height of the btn DIV, not the label (if any)
-        var j;
-        for(j=0; j<keySquare.childNodes.length; j++) {
-          if((keySquare.childNodes[j] as HTMLElement).classList.contains('kmw-key')) {
-            break;
-          }
-        }
-
-        // Set the kmw-key-square position
-        let ks=keySquare.style;
-        if(!this.isStatic) {
-          ks.bottom=(bottom-pad/2)+'px';
-        }
-        ks.height=ks.minHeight=(rowHeight)+'px';
-
-        // Set the kmw-key position
-        let keyElement = keySquare.childNodes[j] as KeyElement;
-        ks=keyElement.style;
-        if(!this.isStatic) {
-          ks.bottom=bottom+'px';
-        }
-        ks.height=ks.lineHeight=ks.minHeight=(rowHeight-pad)+'px';
-
-        // Get the kmw-key-text element & style.
-        for(j=0; j<keyElement.childNodes.length; j++) {
-          if((keyElement.childNodes[j] as HTMLElement).classList.contains('kmw-key-text')) {
-            break;
-          }
-        }
-
-        let keyTextSpan = keyElement.childNodes[j] as HTMLElement;
-        if(keyElement.key && keyTextSpan) { // space bar may not define the text span!
-          keyTextSpan.style.fontSize = keyElement.key.getIdealFontSize(this, ks);
-        }
-
-        // Rescale keycap labels on iPhone (iOS 7)
-        if(resizeLabels && (j > 0)) {
-          (keySquare.childNodes[0] as HTMLElement).style.fontSize='6px';
-        }
-      }
-    }
-
-    // /**
-    //  * Function     _VKeyGetTarget
-    //  * Scope        Private
-    //  * @param       {Object}    e     OSK event
-    //  * @return      {Object}          Target element for key in OSK
-    //  * Description  Identify the OSK key clicked
-    //  */
-    // _VKeyGetTarget(e: Event) {
-    //   var Ltarg;
-    //   e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-    //   Ltarg = util.eventTarget(e);
-    //   if (Ltarg == null) {
-    //     return null;
-    //   }
-    //   if (Ltarg.nodeType == 3) { // defeat Safari bug
-    //     Ltarg = Ltarg.parentNode;
-    //   }
-    //   if (Ltarg.tagName == 'SPAN') {
-    //     Ltarg = Ltarg.parentNode;
-    //   }
-    //   return Ltarg;
-    // }
 
     /**
      *  Append a style sheet for the current keyboard if needed for specifying an embedded font
@@ -1545,11 +1394,11 @@ namespace com.keyman.osk {
      *  @param  {Object}            PKbd            the keyboard object to be displayed
      *  @param  {string=}           argFormFactor   layout form factor, defaulting to 'desktop'
      *  @param  {(string|number)=}  argLayerId      name or index of layer to show, defaulting to 'default'
-     *  @param  {Object}            host            KeymanWeb's active OSKManager instance
+     *  @param  {number}            height          Target height for the rendered keyboard 
      *                                              (currently required for legacy reasons)
      *  @return {Object}                            DIV object with filled keyboard layer content
      */
-    static buildDocumentationKeyboard(PKbd: com.keyman.keyboards.Keyboard, argFormFactor,argLayerId, host: OSKManager): HTMLElement { // I777
+    static buildDocumentationKeyboard(PKbd: com.keyman.keyboards.Keyboard, argFormFactor,argLayerId, height: number): HTMLElement { // I777
       if(!PKbd) {
         return null;
       }
@@ -1562,27 +1411,58 @@ namespace com.keyman.osk {
       device.formFactor = formFactor;
       if(formFactor != 'desktop') {
         device.OS = 'iOS';
+        device.touchable = true;
+      } else {
+        device.OS = 'windows';
+        device.touchable = false;
       }
 
       let layout = PKbd.layout(formFactor);
 
       let kbdObj = new VisualKeyboard(PKbd, device, true);
+
+      // The 'documentation' format uses the base element's child as the actual display base.
+      // Since there's no backing kmw-osk-frame, we do need the static-class kmw-osk-inner-frame
+      // to perform background styling on our behalf.  We'll trust the actual, live keyboard rules
+      // for the other elements, which in turn needs the non-static variant of the CSS rules.
+      kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className + ' ' + device.formFactor
+        + '-static ' + device.OS.toLowerCase();
+
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
 
       // Select the layer to display, and adjust sizes
       if(layout != null) {
         kbdObj.layerId = layerId;
-        // This feels _really_ hacky.  There are plans to address this through some
-        // of the later aspects of the Web OSK-Core design.
-        kbdObj.show(host);
-        kbdObj.adjustHeights(host); // Necessary for the row heights to be properly set!
+        kbdObj.updateState();
+        // This still feels fairly hacky... but something IS needed to constrain the height.
+        // There are plans to address related concerns through some of the later aspects of 
+        // the Web OSK-Core design.
+        kbdObj.setSize(800, height); // Probably need something for width, too, rather than
+                                     // assuming 100%.
+        kbdObj.refreshLayout(); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
-        kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
+        kbd.style.fontSize  = kbdObj.kbdDiv.style.fontSize;
+        kbd.style.height    = kbdObj.kbdDiv.style.height;
+        kbd.style.maxHeight = kbdObj.kbdDiv.style.maxHeight;
       } else {
         kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd.name+".</p>";
       }
       // Add a faint border
       kbd.style.border='1px solid #ccc';
+
+      // Once the element is inserted into the DOM, refresh the layout so that proper text scaling may apply.
+      const refreshInterval = window.setInterval(function() {
+        let computedStyle = getComputedStyle(kbd);
+        if(computedStyle.fontSize) {
+          if(kbd.style.fontSize) {
+            // Preserve the new setting (provided by CSS)
+            kbdObj.fontSize = new ParsedLengthStyle(kbd.style.fontSize);
+          }
+          kbdObj.refreshLayout();
+          window.clearInterval(refreshInterval);
+        }
+      }, 10);
+
       return kbd;
     }
 
@@ -1627,7 +1507,7 @@ namespace com.keyman.osk {
      * @param touch   The starting touch coordinates for the gesture
      * @returns 
      */
-    initGestures(key: KeyElement, touch: Touch) {
+    initGestures(key: KeyElement, input: InputEventCoordinate) {
       if(key['subKeys']) {
         let _this = this;
 
@@ -1665,10 +1545,10 @@ namespace com.keyman.osk {
      * 
      * @param currentKey    The key currently underneath the most recent touch coordinate
      * @param previousKey   The previously-selected key
-     * @param touch         The current touch-coordinate for the gesture
+     * @param input         The current mouse or touch coordinate for the gesture
      * @returns true if should fully capture input, false if input should 'fall through'.
      */
-    updateGestures(currentKey: KeyElement, previousKey: KeyElement, touch: Touch): boolean {
+    updateGestures(currentKey: KeyElement, previousKey: KeyElement, input: InputEventCoordinate): boolean {
       let key0 = previousKey;
       let key1 = currentKey;
 
@@ -1677,7 +1557,7 @@ namespace com.keyman.osk {
         if(key0) {
           key0.key.highlight(false);
         }
-        this.subkeyGesture.updateTouch(touch);
+        this.subkeyGesture.updateTouch(input);
 
         this.keyPending = null;
         this.touchPending = null;
@@ -1691,7 +1571,7 @@ namespace com.keyman.osk {
       // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
       if(key1 && key1['subKeys'] != null) {
         // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-        if((this.touchY - touch.pageY > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
+        if((this.initTouchCoord.y - input.y > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
           this.pendingSubkey.resolve();
         }
       }
@@ -1702,12 +1582,6 @@ namespace com.keyman.osk {
         return true;
       }
 
-      if(key0 && key1 && (key1 != key0) && (key1.id != '')) {
-        // While there may not be an active subkey menu, we should probably update which base key
-        // is being highlighted by the current touch & start a pending longpress for it.
-        this.clearPopup();
-        this.initGestures(key1, touch);
-      }
       return false;
     }
 

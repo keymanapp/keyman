@@ -322,7 +322,7 @@ function TKeymanControl.KeymanCustomisation: IKeymanCustomisation;
 begin
   if not Assigned(FKeymanCustomisation) then
     FKeymanCustomisation := TCustomisationAutoObject.Create(Context, IKeymanUserInterface,
-    TKeymanPaths.KeymanDesktopInstallPath('desktop_pro.pxx'));
+    TKeymanPaths.KeymanCustomisationPath);
   Result := FKeymanCustomisation;
 end;
 

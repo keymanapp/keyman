@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import logging
-import os.path
+import os
 import urllib.parse
 
 import gi

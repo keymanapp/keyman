@@ -7,6 +7,7 @@
 
 #include "state.hpp"
 #include "processor.hpp"
+#include <keyman/keyboardprocessor_consts.h>
 
 using namespace km::kbp;
 
@@ -26,6 +27,13 @@ void actions::push_persist(option const &&opt) {
   emplace_back(std::move(ai));
 }
 
+void actions::push_capslock(bool turnOn) {
+  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
+  km_kbp_action_item ai = {KM_KBP_IT_CAPSLOCK, {0,}, {0}};
+  ai.capsLock           = turnOn;
+  emplace_back(std::move(ai));
+}
+
 
 state::state(km::kbp::abstract_processor & ap, km_kbp_option_item const *env)
   : _processor(ap)
@@ -34,7 +42,7 @@ state::state(km::kbp::abstract_processor & ap, km_kbp_option_item const *env)
     //assert(env->scope == KM_KBP_OPT_ENVIRONMENT); // todo do we need scope? or can we find a way to eliminate it?
     ap.update_option(env->scope
                         ? km_kbp_option_scope(env->scope)
-                        : KM_KBP_OPT_ENVIRONMENT, 
+                        : KM_KBP_OPT_ENVIRONMENT,
                      env->key,
                      env->value);
   }

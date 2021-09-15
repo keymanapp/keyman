@@ -103,23 +103,31 @@ namespace km {
       return option(scope, key, i->second);
     }
 
-
-    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state)
-    {
+    km_kbp_status
+    mock_processor::process_event(
+      km_kbp_state *state,
+      km_kbp_virtual_key vk,
+      uint16_t modifier_state,
+      uint8_t is_key_down
+    ) {
       assert(state);
       if (!state)
         return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-      try
-      {
-        // At the start of every process_event allways clear the action_items
+      if (!is_key_down) {
+        // TODO: Implement caps lock handling
+        return KM_KBP_STATUS_OK;
+      }
+
+      try {
+        // At the start of every process_event always clear the action_items
         state->actions().clear();
 
         switch (vk)
         {
         case KM_KBP_VKEY_BKSP:
           state->context().pop_back();
-          state->actions().push_backspace();
+          state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
           break;
 
         case KM_KBP_VKEY_F2:
@@ -162,15 +170,12 @@ namespace km {
         }
 
         state->actions().commit();
-      }
-      catch (std::bad_alloc &)
-      {
+      } catch (std::bad_alloc &) {
         state->actions().clear();
         return KM_KBP_STATUS_NO_MEM;
       }
 
       return KM_KBP_STATUS_OK;
-
     }
 
     km_kbp_attr const & mock_processor::attributes() const {

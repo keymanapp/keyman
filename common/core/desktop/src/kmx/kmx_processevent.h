@@ -75,9 +75,11 @@ private:
 
   /* Caps Lock and modifier management */
 
-  void ResetCapsLock(void);
-  void KeyCapsLockPress(KMX_BOOL FIsUp);
-  void KeyShiftPress(KMX_BOOL FIsUp);
+  KMX_BOOL IsCapsLockOn(KMX_DWORD modifiers);
+  void SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn, KMX_BOOL force = FALSE);
+  void ResetCapsLock(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
+  KMX_BOOL KeyCapsLockPress(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
+  void KeyShiftPress(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
 
   KMX_BOOL IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift);
 
@@ -86,7 +88,7 @@ public:
   ~KMX_ProcessEvent();
 
   KMX_BOOL Load(km_kbp_path_name keyboardName);
-  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers);  // returns FALSE on error or key not matched
+  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_BOOL isKeyDown);  // returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
@@ -96,6 +98,10 @@ public:
   KMX_Environment const *GetEnvironment() const;
   LPINTKEYBOARDINFO GetKeyboard();
 };
+
+inline KMX_BOOL KMX_ProcessEvent::IsCapsLockOn(KMX_DWORD modifiers) {
+  return modifiers & CAPITALFLAG ? TRUE : FALSE;
+}
 
 /* Global Constants */
 

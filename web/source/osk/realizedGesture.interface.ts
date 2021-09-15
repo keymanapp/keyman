@@ -29,6 +29,6 @@ namespace com.keyman.osk {
 
     clear(): void;
     isVisible(): boolean;
-    updateTouch(touch: Touch): void;
+    updateTouch(input: InputEventCoordinate): void;
   }
 }

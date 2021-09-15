@@ -128,6 +128,7 @@ repositories {
         dirs 'libs'
     }
     google()
+    mavenCentral()
 }
 
 dependencies {

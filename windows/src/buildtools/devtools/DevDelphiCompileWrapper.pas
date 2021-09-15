@@ -20,23 +20,16 @@ unit DevDelphiCompileWrapper;  // I3339
 
 interface
 
+uses
+  SourceRootPath;
+
 type
   TDelphiCompileWrapper = class
   public
     class function Run(Quiet: Boolean = False; Silent: Boolean = False): Boolean;  // I3378
   end;
 
-{$IFDEF VER310}
-const dcc32 = 'C:\Program Files (x86)\Embarcadero\Studio\18.0\bin\DCC32.EXE';
-{$ELSE}
-{$IFDEF VER320}
-const dcc32 = 'C:\Program Files (x86)\Embarcadero\Studio\19.0\bin\DCC32.EXE';
-{$ELSE}
-{$IFDEF VER330}
-const dcc32 = 'C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\DCC32.EXE';
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
+const dcc32 = DelphiBasePath + 'bin\DCC32.exe';
 
 implementation
 

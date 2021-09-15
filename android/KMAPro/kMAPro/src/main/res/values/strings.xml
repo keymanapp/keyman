@@ -31,6 +31,12 @@
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">Version: %1$s</string>
 
+  <!-- Context: Text label when old Chrome version installed -->
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">
+    Keyman requires Chrome version 57 or newer.</string>
+
+  <!-- Context: Button label -->
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">Update Chrome</string>
 
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">Start typing here&#8230;</string>
@@ -97,6 +103,9 @@
 
   <!-- Context: Keyman Settings menu -->
   <string name="change_display_language" comment="Menu action to change interface language">Display language</string>
+
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Adjust keyboard height</string>
 
   <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Spacebar caption</string>
@@ -170,6 +179,15 @@
 
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">All languages already installed</string>
+
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Drag the keyboard to resize the height</string>
+
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Rotate the device to adjust portrait and landscape</string>
+
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="reset_to_defaults" comment="Button to reset to default heights">Reset to Defaults</string>
 
 
   <!-- Context: Keyman Web Browser -->

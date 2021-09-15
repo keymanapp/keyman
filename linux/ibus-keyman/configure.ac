@@ -58,6 +58,11 @@ PKG_CHECK_MODULES(GTK, [
     gtk+-3.0 >= 2.4
 ])
 
+# Check X11
+PKG_CHECK_MODULES(X11, [
+  x11 >= 1.6
+])
+
 # check atkspi 2.0
 #PKG_CHECK_MODULES(ATSPI, [
 #    atspi-2 >= 2.0

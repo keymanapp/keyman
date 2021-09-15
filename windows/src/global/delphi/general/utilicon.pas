@@ -83,7 +83,11 @@ function ConvertBitmapsToAlphaIcon(b: array of Vcl.Graphics.TBitmap; const IconF
 var
   bmp: array of TGPBitmap;
   i: Integer;
+{$IFDEF VER330}
   gdiptoken: Cardinal;
+{$ELSE}
+  gdiptoken: ULong_ptr;
+{$ENDIF}
   StartupInput: TGdiplusStartupInput;
 begin
   StartupInput.DebugEventCallback := nil;
@@ -124,7 +128,11 @@ var
   bmp: array[0..5] of TGPBitmap;
   i: Integer;
   bm: Vcl.Graphics.TBitmap;
+{$IFDEF VER330}
   gdiptoken: Cardinal;
+{$ELSE}
+  gdiptoken: ULong_ptr;
+{$ENDIF}
   StartupInput: TGdiplusStartupInput;
 begin
   StartupInput.DebugEventCallback := nil;

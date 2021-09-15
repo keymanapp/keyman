@@ -71,14 +71,14 @@ class GnomeKeyboardsUtilTests(unittest.TestCase):
         self.MockSettingsClass.return_value.set_value.assert_called_once_with(
             "sources", keyboards)
 
-    @patch('keyman_config.install_kmp.os.system')
+    @patch('keyman_config.os.system')
     def test_IsGnomeShell_RunningGnomeShell(self, mockSystem):
         # Setup
         mockSystem.return_value = 0
         # Execute/Verify
         self.assertEqual(is_gnome_shell(), True)
 
-    @patch('keyman_config.install_kmp.os.system')
+    @patch('keyman_config.os.system')
     def test_IsGnomeShell_NotRunningGnomeShell(self, mockSystem):
         # Setup
         mockSystem.return_value = 1
