@@ -220,8 +220,10 @@ namespace com.keyman.dom {
         }
       }
       
-      ////keymanweb._SelectionControl = null;    
-      this._BlurKeyboardSettings(this.keyman.domManager.lastActiveElement);
+      ////keymanweb._SelectionControl = null;
+      if(this.keyman.domManager.lastActiveElement) {
+        this._BlurKeyboardSettings(this.keyman.domManager.lastActiveElement);
+      }
 
       // Now that we've handled all prior-element maintenance, update the active and 'last-active element'.
       this.keyman.domManager.activeElement = null; // I3363 (Build 301)
@@ -690,7 +692,9 @@ namespace com.keyman.dom {
        *
        * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
        */  
-      this._BlurKeyboardSettings(this.keyman.domManager.lastActiveElement);
+      if(this.keyman.domManager.lastActiveElement) {
+        this._BlurKeyboardSettings(this.keyman.domManager.lastActiveElement);
+      }
 
       // With the attachment API update, we now directly track the old legacy control behavior.
       this.keyman.domManager.lastActiveElement = target;
@@ -714,8 +718,12 @@ namespace com.keyman.dom {
      * Close OSK and remove simulated caret on losing focus
      */          
     cancelInput(): void {
-      if(this.keyman.domManager.activeElement && Utils.instanceof(this.keyman.domManager.activeElement, "TouchAliasElement")) {
-        (this.keyman.domManager.activeElement as TouchAliasElement).hideCaret();
+      if(this.keyman.domManager.activeElement) {
+        if(Utils.instanceof(this.keyman.domManager.activeElement, "TouchAliasElement")) {
+          (this.keyman.domManager.activeElement as TouchAliasElement).hideCaret();
+        }
+
+        this._BlurKeyboardSettings(this.keyman.domManager.activeElement);
       }
       this.keyman.domManager.activeElement=null; 
       this.keyman.domManager.lastActiveElement = null;
@@ -733,6 +741,10 @@ namespace com.keyman.dom {
         elem = e.relatedTarget as HTMLElement;
       }
 
+      this.executeBlur(elem);      
+    }.bind(this);
+
+    executeBlur(elem: HTMLElement) {
       this.keyman['resetContext']();
 
       if(elem) {
@@ -747,7 +759,7 @@ namespace com.keyman.dom {
       if(!DOMEventHandlers.states.focusing && !this.keyman.uiManager.justActivated) {
         this.cancelInput();
       }
-    }.bind(this);
+    }
 
     /**
      * Display and position a scrollbar in the input field if needed

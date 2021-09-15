@@ -1714,9 +1714,14 @@ namespace com.keyman.dom {
           }        
           this.keyman.util.attachDOMEvent(document.body, 'touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
         } else {
+          const _this = this;
           (<any>this.keyman).conditionallyHideOsk = function() {
             // Should not hide OSK if simply closing the language menu (30/4/15)
-            if((<any>keyman).hideOnRelease && !osk['lgList']) osk.hideNow();
+            // or if the focusing timer (setFocusTimer) is still active.
+            if((<any>keyman).hideOnRelease && !osk['lgList'] && !DOMEventHandlers.states.focusing) {
+              _this.touchHandlers.executeBlur(null);
+              osk.hideNow();
+            }
             (<any>keyman).hideOnRelease=false;
           };
           (<any>this.keyman).hideOskIfOnBody = function(e) {
