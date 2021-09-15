@@ -625,7 +625,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     
   // MARK: - Adhoc keyboards
   public func parseKbdKMP(_ folder: URL, isCustom: Bool) throws -> Void {
-    guard let kmp = KeymanPackage.parse(folder) as? KeyboardKeymanPackage else {
+    guard let kmp = try? KeymanPackage.parse(folder) as? KeyboardKeymanPackage else {
       throw KMPError.wrongPackageType
     }
 
@@ -640,7 +640,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     
   // MARK: - Adhoc lexical models
   static public func parseLMKMP(_ folder: URL, isCustom: Bool) throws -> Void {
-    guard let kmp = KeymanPackage.parse(folder) as? LexicalModelKeymanPackage else {
+    guard let kmp = try? KeymanPackage.parse(folder) as? LexicalModelKeymanPackage else {
       throw KMPError.wrongPackageType
     }
 
