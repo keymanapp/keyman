@@ -339,8 +339,7 @@ begin
       (GetKeyState(VK_SHIFT) < 0) and
       (UIStatus = duiPaused) then
     UIStatus := duiFocusedForInput
-  else if (Message.Msg = WM_KEYDOWN) and
-    (UIStatus in [duiTest, duiFocusedForInput]) then
+  else if UIStatus in [duiTest, duiFocusedForInput] then
   begin
     Exit(ProcessKeyEvent(Message));
   end
@@ -361,7 +360,8 @@ begin
   end;
 
   case Message.Msg of
-    WM_KEYDOWN:
+    WM_KEYDOWN,
+    WM_SYSKEYDOWN:
       Handled := HandleMemoKeydown(Message);
     WM_SYSCHAR:
       Handled := FUIDisabled;
@@ -454,10 +454,10 @@ var
 begin
   Assert(Assigned(FDebugCore));
   modifier := 0;
-  if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_LCTRL or KM_KBP_MODIFIER_CTRL;
-  if GetKeyState(VK_RCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_RCTRL or KM_KBP_MODIFIER_CTRL;
-  if GetKeyState(VK_LMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_LALT or KM_KBP_MODIFIER_ALT;
-  if GetKeyState(VK_RMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_RALT or KM_KBP_MODIFIER_ALT;
+  if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_LCTRL;
+  if GetKeyState(VK_RCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_RCTRL;
+  if GetKeyState(VK_LMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_LALT;
+  if GetKeyState(VK_RMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_RALT;
   if GetKeyState(VK_SHIFT) < 0 then modifier := modifier or KM_KBP_MODIFIER_SHIFT;
   if (GetKeyState(VK_CAPITAL) and 1) = 1 then modifier := modifier or KM_KBP_MODIFIER_CAPS;
 
