@@ -354,8 +354,7 @@ void test_store_offsets() {
 void test_set_option() {
   setup("021 - options.kmx");
   DEBUG_GROUP gp = {u"Main"};
-  DEBUG_KEY kp1 = { '1', /*line*/16, },
-            kp0 = { '0', /*line*/17, };
+  DEBUG_KEY kp1 = { '1', /*line*/16, };
   DEBUG_STORE sp = {0, u"foo", u"1"};
 
   try_status(km_kbp_state_debug_set(test_state, 1));
