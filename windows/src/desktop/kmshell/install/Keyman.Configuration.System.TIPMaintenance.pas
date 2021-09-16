@@ -33,7 +33,11 @@ type
     class function GetFirstLanguage(Keyboard: IKeymanKeyboardFile): string; overload;
 
     /// <summary>Get the BCP47 tag for the user's default language</summary>
-    class function GetUserDefaultLanguage: string; static;
+    class function GetUserDefaultLanguage: string; overload; static;
+    class procedure GetUserDefaultLanguage(var BCP47: string; var LangID: Integer); overload; static;
+
+    /// <summary>Get the -default-lang parameter string for kmshell</summary>
+    class function GetUserDefaultLangParameterString: string; static;
   private
     class function GetKeyboardLanguage(const KeyboardID,
       BCP47Tag: string): IKeymanKeyboardLanguageInstalled; static;
@@ -152,7 +156,7 @@ begin
   if RegistrationRequired then
   begin
     // This calls back into TTIPMaintenance.RegisterTip
-    if WaitForElevatedConfiguration(0, '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'"') <> 0 then
+    if WaitForElevatedConfiguration(0, '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" '+GetUserDefaultLangParameterString) <> 0 then
       Exit(False);
   end;
 
@@ -204,16 +208,61 @@ begin
     Result := False;
 end;
 
+class function TTIPMaintenance.GetUserDefaultLangParameterString: string;
+var
+  LangID: Integer;
+  BCP47: string;
+begin
+  GetUserDefaultLanguage(BCP47, LangID);
+  Result := '-default-lang '+BCP47+' '+IntToHex(LangID,4);
+end;
+
 class function TTIPMaintenance.GetUserDefaultLanguage: string;
+var
+  LangID: Integer;
+begin
+  GetUserDefaultLanguage(Result, LangID);
+end;
+
+class procedure TTIPMaintenance.GetUserDefaultLanguage(var BCP47: string; var LangID: Integer);
 var
   r: TRegistry;
   tags: TStringList;
   v: string;
   keys: TStringList;
   key: string;
+
+  function GetLangIDFromValueName: Integer;
+  var
+    values: TStringList;
+    v: string;
+  begin
+    // In HKCU\Control Panel\International\User Profile\<bcp47>, already opened
+    // by the caller, look for a value name such as '0453:00000453' or
+    // '0804:{81D4E9C9-1D3B-41BC-9E6C-4B40BF79E35E}{FA550B04-5AD7-411F-A5AC-CA038EC515D7}'
+    // and grab the LangID from there.
+    values := TStringList.Create;
+    try
+      r.GetValueNames(values);
+      for v in values do
+      begin
+        if Copy(v, 5, 1) = ':' then
+        begin
+          Result := StrToIntDef('$' + Copy(v, 1, 4), 0);
+          if Result > 0 then
+            Exit;
+        end;
+      end;
+    finally
+      values.Free;
+    end;
+    Result := 0;
+  end;
+
 begin
   // Fallback result
-  Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL));
+  LangID := HKLToLanguageID(GetDefaultHKL);
+  BCP47 := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(LangID);
 
   // For Win10, look in CPL/International/UserProfile
   r := TRegistry.Create;
@@ -232,7 +281,8 @@ begin
           if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + key) and
             r.ValueExists(v) then
           begin
-            Result := key;
+            BCP47 := key;
+            LangID := GetLangIDFromValueName;
             Break;
           end;
         end;
@@ -248,7 +298,9 @@ begin
         r.ReadMultiString(SRegValue_CPIUP_Languages, tags);
         if tags.Count > 0 then
         begin
-          Result := tags[0].Trim;
+          BCP47 := tags[0].Trim;
+          if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + tags[0].Trim) then
+            LangID := GetLangIDFromValueName;
         end;
       finally
         tags.Free;
