@@ -21,13 +21,13 @@
   <string name="ssActionDownload">(%0:s 下载)</string>
   <string name="ssActionInstall">安装程序将会安装：</string>
   <string name="ssFreeCaption">$APPNAME $VERSION 是免费，公开的资源</string>
-  <string name="ssLicenseLink">&amp;阅读许可证</string>
-  <string name="ssInstallOptionsLink">安装 &amp;选项</string>
+  <string name="ssLicenseLink">阅读许可证 (&amp;R)</string>
+  <string name="ssInstallOptionsLink">安装 选项 (&amp;O)</string>
   <string name="ssMessageBoxTitle">$APPNAME 设置</string>
   <string name="ssOkButton">確定</string>
-  <string name="ssInstallButton">&amp;安装</string>
+  <string name="ssInstallButton">安装 (&amp;I)</string>
   <string name="ssCancelButton">取消</string>
-  <string name="ssExitButton">退出&amp;x</string>
+  <string name="ssExitButton">退出 (&amp;X)</string>
   <string name="ssStatusInstalling">正在安装 $APPNAME</string>
   <string name="ssStatusRemovingOlderVersions">删除旧版本</string>
   <string name="ssStatusComplete">安装完成</string>
