@@ -225,7 +225,7 @@ namespace com.keyman.osk {
      * and the primary keyboard visualization elements.
      */
     get baseFontSize(): string {
-      return this.parsedBaseFontSize?.styleString;
+      return this.parsedBaseFontSize?.styleString || '';
     }
 
     protected get parsedBaseFontSize(): ParsedLengthStyle {
@@ -624,7 +624,7 @@ namespace com.keyman.osk {
     showBuild() {
       let keymanweb = com.keyman.singleton;
       keymanweb.util.internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
-          +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
+          +'<span style="font-size:0.8em">Copyright &copy; 2021 SIL International</span>');
     }
 
     /**

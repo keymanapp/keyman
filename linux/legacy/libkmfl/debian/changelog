@@ -1,3 +1,10 @@
+libkmfl (14.0.280-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 23 Aug 2021 17:38:05 +0200
+
 libkmfl (14.0.276-1) experimental; urgency=medium
 
   * New upstream release

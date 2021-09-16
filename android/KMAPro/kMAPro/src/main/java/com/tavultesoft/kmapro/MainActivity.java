@@ -40,7 +40,6 @@ import com.keyman.android.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMPLink;
 import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.WebViewUtils;
 import com.tavultesoft.kmea.util.WebViewUtils.EngineWebViewVersionStatus;
 
 import android.Manifest;
@@ -780,7 +779,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void checkChromeVersion(WebView webView) {
-    if (WebViewUtils.getEngineWebViewVersionStatus(context, webView, "") != EngineWebViewVersionStatus.FULL) {
+    if (KMManager.getEngineWebViewVersionStatus() != EngineWebViewVersionStatus.FULL) {
       LinearLayout updateChromeLayout = (LinearLayout) findViewById(R.id.updateChromeLayout);
       updateChromeLayout.setVisibility(View.VISIBLE);
 
