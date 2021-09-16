@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{61F7EA69-424D-41F9-B734-1EF0661A564C}"
 	ProjectSection(SolutionItems) = preProject
 		chm.xsl = chm.xsl
@@ -58,5 +60,8 @@ Global
 		{773446EB-3B8A-4D7A-848E-A6A643A0F78A} = {61F7EA69-424D-41F9-B734-1EF0661A564C}
 		{2C8697CC-0686-48E5-AFB5-E836E96D4FAD} = {61F7EA69-424D-41F9-B734-1EF0661A564C}
 		{D17860DB-EFA1-444B-BE05-5889A338F552} = {61F7EA69-424D-41F9-B734-1EF0661A564C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {851170CA-647E-425B-8179-B3219E64423E}
 	EndGlobalSection
 EndGlobal
