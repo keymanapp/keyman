@@ -485,6 +485,9 @@
 		CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationTests.swift; sourceTree = "<group>"; };
 		CEE0321024C56735005BFC73 /* Packages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packages.swift; sourceTree = "<group>"; };
 		CEE0321224C58C90005BFC73 /* KeymanHosts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanHosts.swift; sourceTree = "<group>"; };
+		CEEC467526F2F5EE009A5B7D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ResourceInfoView.strings"; sourceTree = "<group>"; };
+		CEEC467D26F2F76E009A5B7D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		CEEC467E26F2F777009A5B7D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
 		CEEF81AD2672FBE900EE6A07 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/ResourceInfoView.strings"; sourceTree = "<group>"; };
 		CEEF81B72673016900EE6A07 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		CEEF81B82673016E00EE6A07 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "es-419"; path = "es-419.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
@@ -1167,6 +1170,7 @@
 				az,
 				am,
 				"es-419",
+				"zh-Hans",
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1551,6 +1555,7 @@
 				CE72B3D22643AB60006821CE /* az */,
 				CEBD34552655117800EB2EA8 /* am */,
 				CEEF81B82673016E00EE6A07 /* es-419 */,
+				CEEC467E26F2F777009A5B7D /* zh-Hans */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1566,6 +1571,7 @@
 				CE72B3D32643AB65006821CE /* az */,
 				CEBD34542655117400EB2EA8 /* am */,
 				CEEF81B72673016900EE6A07 /* es-419 */,
+				CEEC467D26F2F76E009A5B7D /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1582,6 +1588,7 @@
 				CE72B3D12643AA9D006821CE /* az */,
 				CEBD34532655115800EB2EA8 /* am */,
 				CEEF81AD2672FBE900EE6A07 /* es-419 */,
+				CEEC467526F2F5EE009A5B7D /* zh-Hans */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";
