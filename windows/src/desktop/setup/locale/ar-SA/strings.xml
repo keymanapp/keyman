@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">العربية</string>
+  <string name="ssApplicationTitle">تثبيت $APPNAME $VERSION</string>
+  <string name="ssTitle">تثبيت $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">تم تثبيت $APPNAME $VERSION بنجاح.</string>
+  <string name="ssCancelQuery">هل أنت متأكد من أنك ترغب بإلغاء تثبيت $APPNAME؟</string>
+  <string name="ssBootstrapExtractingBundle">يجري استخراج الحزمة...</string>
+  <string name="ssBootstrapCheckingPackages">التحقق من الحزم...</string>
+  <string name="ssBootstrapCheckingForUpdates">البحث عن تحديثات على الإنترنت...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">التحقق من الإصدارات المثبتة...</string>
+  <string name="ssBootstrapReady">يجري الإتمام...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s لأجل %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">لا يوجد شيء ليتم تثبيته.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(تحميل %0:s)</string>
+  <string name="ssActionInstall">سيقوم ملف التنصيب بتثبيت:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION مجاني ومفتوح المصدر</string>
+  <string name="ssLicenseLink">&amp;اقرأ الرخصة</string>
+  <string name="ssInstallOptionsLink">&amp;خيارات التثبيت</string>
+  <string name="ssMessageBoxTitle">تنصيب $APPNAME</string>
+  <string name="ssOkButton">موافق</string>
+  <string name="ssInstallButton">&amp;تثبيت</string>
+  <string name="ssCancelButton">إلغاء</string>
+  <string name="ssExitButton">&amp;خروج</string>
+  <string name="ssStatusInstalling">تثبيت $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">إزالة إصدارات قديمة</string>
+  <string name="ssStatusComplete">اكتمل التثبيت</string>
+  <string name="ssQueryRestart">عليك إعادة تشغيل ويندوز قبل اكتمال التثبيت. بعد إعادة تثبيت الويندوز، سيستمر التنصيب. هل ترغب بإعادة التشغيل الآن؟</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">لم يتمكن ويندوز من أن يعيد التشغلي تلقائيًا. عليك إعادة تشغيله قبل محاولتك بدء تشغيل $APPNAME.</string>
+  <string name="ssMustRestart">عليك إعادة تشغيل ويندوز لاكتمال التنصيب. عندما تعيد تشغيل ويندوز، سينتهي التنصيب.</string>
+  <string name="ssOldOsVersionInstallKeyboards">يتطلب $APPNAME $VERSION ويندوز 7 أو أحدث منه كي يتم التثبيت. لكن تم العثور على Keyman Desktop الإصدار 7 أو 8 أو 9. هل ترغب بتثبيت لوحات المفاتيح المضمنة في ملف التنصيب هذه في نسخة Keyman Desktop المثبتة؟</string>
+  <string name="ssOldOsVersionDownload">يتطلب إصدار $APPNAME ويندوز 7 أو أحدث للتثبيت. هل ترغب بتحميل Keyman Desktop الإصدار 8؟</string>
+  <string name="ssOptionsTitle">خيارات التثبيت</string>
+  <string name="ssOptionsTitleInstallOptions">خيارات التثبيت</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">إعدادات $APPNAME الافتراضية</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">وحدات لتثبيتها أو تحديثها</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">لغة لوحة المفاتيح ذات الصلة</string>
+  <string name="ssOptionsTitleLocation">الإصدار الذي سيتم تثبيته</string>
+  <string name="ssOptionsStartWithWindows">ابدأ $APPNAME عند بدء تشغيل ويندوز</string>
+  <string name="ssOptionsStartAfterInstall">ابدأ $APPNAME عند اكتمال التثبيت</string>
+  <string name="ssOptionsCheckForUpdates">تحقق دوريًا من التحديثات عبر الإنترنت</string>
+  <string name="ssOptionsUpgradeKeyboards">تحديث لوحات المفاتيح المثبتة مكه إصدارات قديمة لأجل الإصدار $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">مشاركة إحصاءات الاستخدام مجهولة المصدر مع keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">إصدار تنصيب: %0:s</string>
+  <string name="ssOptionsInstallKeyman">تثبيت $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">تحديث $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s مثبت بالفعل.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">تحميل الإصدار %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">إصدار %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">تثبيت %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">تحميل الإصدار %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">الإصدار %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">اختر اللغة التي تريد ربطها بلوحة مفاتيح %0:s</string>
+  <string name="ssOptionsDefaultLanguage">اللغة الأساسية</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">تحميل %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">تحميل %0:s</string>
+  <string name="ssOffline">تعذر على تنصيب $APPNAME الاتصال بموقع keyman.com لتحميل الموارد الإضافية.
+
+يرجى التحقق من أنك متصل بالإنترنت وأنك قد منحت تنصيب $APPNAME الإذن للوصول إلى الإنترنت في إعدادات الجدار الناري.
+
+انقر على إلغاء للخروج من التنصيب، وإعادة المحاولة لمحاولة تثبيت الموارد مجددًا أو تجاهل للاستمرار دون اتصال.</string>
+</resources>

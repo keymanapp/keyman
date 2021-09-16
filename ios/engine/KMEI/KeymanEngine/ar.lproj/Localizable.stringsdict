@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>%u قاموس مثبت</string>
+        <key>one</key>
+        <string>%u قاموس مثبت</string>
+        <key>two</key>
+        <string>%u قواميس مثبتة</string>
+        <key>few</key>
+        <string>%u قواميس مثبتة</string>
+        <key>many</key>
+        <string>%u قواميس مثبتة</string>
+        <key>other</key>
+        <string>%u قواميس مثبتة</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>zero</key>
+        <string>%u تحديث فشل</string>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u تحديث فشل</string>
+        <key>two</key>
+        <string>%u تحديث فشل</string>
+        <key>few</key>
+        <string>%u تحديثات فشلت</string>
+        <key>many</key>
+        <string>%u تحديثات فشلت</string>
+        <key>other</key>
+        <string>%u تحديثات فشلت</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>zero</key>
+        <string>%u تحديث نجح</string>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u تحديث نجح</string>
+        <key>two</key>
+        <string>%u تحديث نجح</string>
+        <key>few</key>
+        <string>%u تحديثات نجحت</string>
+        <key>many</key>
+        <string>%u تحديثات نجحت</string>
+        <key>other</key>
+        <string>%u تحديثات نجحت</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>%u لوحة مفاتيح مثبتة</string>
+        <key>one</key>
+        <string>%u لوحة مفاتيح مثبتة</string>
+        <key>two</key>
+        <string>%u لوحة مفاتيح مثبتة</string>
+        <key>few</key>
+        <string>%u لوحات مفاتيح مثبتة</string>
+        <key>many</key>
+        <string>%u لوحات مفاتيح مثبتة</string>
+        <key>other</key>
+        <string>%u لوحات مفاتيح مثبتة</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>%u لغة مثبتة</string>
+        <key>one</key>
+        <string>%u لغة مثبتة</string>
+        <key>two</key>
+        <string>%u لغة مثبتة</string>
+        <key>few</key>
+        <string>%u لغات مثبتة</string>
+        <key>many</key>
+        <string>%u لغات مثبتة</string>
+        <key>other</key>
+        <string>%u لغات مثبتة</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>تم العثور على %u لوحة مفاتيح في حزمة:</string>
+        <key>one</key>
+        <string>تم العثور على %u لوحة مفاتيح في حزمة:</string>
+        <key>two</key>
+        <string>تم العثور على %u لوحة مفاتيح في حزمة:</string>
+        <key>few</key>
+        <string>تم العثور على %u لوحات مفاتيح في حزمة:</string>
+        <key>many</key>
+        <string>تم العثور على %u لوحات مفاتيح في حزمة:</string>
+        <key>other</key>
+        <string>تم العثور على %u لوحات مفاتيح في حزمة:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>تم العثور على %u قاموس في حزمة:</string>
+        <key>one</key>
+        <string>تم العثور على %u قاموس في حزمة:</string>
+        <key>two</key>
+        <string>تم العثور على %u قاموس في حزمة:</string>
+        <key>few</key>
+        <string>تم العثور على %u قواميس في حزمة:</string>
+        <key>many</key>
+        <string>تم العثور على %u قواميس في حزمة:</string>
+        <key>other</key>
+        <string>تم العثور على %u قواميس في حزمة:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>

@@ -36,6 +36,7 @@ files:
       android_code:
         es-419: b+es+419
         pap: pap
+        ar: ar
 
   - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
     dest: /android/app/strings.xml
@@ -45,6 +46,7 @@ files:
       android_code:
         es-419: b+es+419
         pap: pap
+        ar: ar
 
   # Windows files
   # Note: we use type: android for the Windows project files

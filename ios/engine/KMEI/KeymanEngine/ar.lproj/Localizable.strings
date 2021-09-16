@@ -1,0 +1,248 @@
+/* A descriptive message used for errors when the app is already busy downloading */
+"alert-download-error-busy" = "يجري التحميل بالفعل.";
+
+/* A descriptive message used when a download fails */
+"alert-download-error-detail" = "حدث خطأ أثناء التحميل أو التثبيت.";
+
+/* Title for a "download failed" alert */
+"alert-download-error-title" = "خطأ تحميل";
+
+/* Title for a general alert about errors */
+"alert-error-title" = "خطأ";
+
+/* A descriptive message used when no internet connection is detected */
+"alert-no-connection-detail" = "تعذر الوصول إلى خادم Keyman. يرجى المحاولة لاحقًا.";
+
+/* Title for a "no connection" alert */
+"alert-no-connection-title" = "خطأ اتصال";
+
+/* Short text for a 'back' navigational command.  Used to return to the previous screen */
+"command-back" = "عودة";
+
+/* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
+"command-cancel" = "إلغاء";
+
+/* Short text for a 'done' command.  Used to back out of settings menus after changes have been made */
+"command-done" = "تم";
+
+/* Short text for an 'install' command.  Used to confirm installation of a package. */
+"command-install" = "تثبيت";
+
+/* Short text for a 'next' navigational command.  Used to advance to the next screen */
+"command-next" = "التالي";
+
+/* Short text for an 'OK' command.  Used for some error alerts */
+"command-ok" = "موافق";
+
+/* Short text for confirmining 'uninstall' commands. */
+"command-uninstall" = "إلغاء تثبيت";
+
+/* Text for the command to uninstall a keyboard */
+"command-uninstall-keyboard" = "إلغاء تثبيت لوحة المفاتيح";
+
+/* Confirmation text to display before uninstalling a keyboard */
+"command-uninstall-keyboard-confirm" = "هل ترغب بإزالة تثبيت لوحة المفاتيح هذه؟";
+
+/* Text for the command to uninstall a lexical model */
+"command-uninstall-lexical-model" = "إلغاء تثبيت القاموس";
+
+/* Confirmation text to display before uninstalling a lexical model */
+"command-uninstall-lexical-model-confirm" = "هل ترغب بإزالة تثبيت هذا القاموس؟";
+
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "يتعذر تحميل لوحة المفاتيح المطلوبة";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "يتعذر تحميل القاموس المطلوب";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file" = "تعذر العثور على ملف مطلوب.";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file-critical" = "تعذر العثور على ملف جوهري. يرجى محاولة إعادة تثبيت التطبيق.";
+
+/* Text for errors in data received from search queries */
+"error-query-decoding" = "يعاني الخادم حاليًا من مشاكل فنية";
+
+/* A descriptive message used when a download fails */
+"error-query-general" = "خطأ في التواصل مع الخادم";
+
+/* Text for error when a search query is unexpectedly empty */
+"error-query-no-data" = "فشل الخادم في الاستجابة";
+
+/* Text for general errors where not much information is known */
+"error-unknown" = "وقع خطأ غير متوقع";
+
+/* Text for error when updating a resource:  cannot download because no source is available */
+"error-update-no-link" = "لا يوجد مصدر للتحديثات لهذه الحزمة";
+
+/* Text for error when updating a resource:  Keyman does not know how to update the resource */
+"error-update-not-managed" = "لا يمكن تحديث المصدر لأنه لا يديره محرك Keyman";
+
+/* Text for the command to open the help page of a keyboard, as shown on resource information views */
+"info-command-help-keyboard" = "مساعدة لوحة المفاتيح";
+
+/* Text for the command to open the help page of a lexical model, as shown on resource information views */
+"info-command-help-lexical-model" = "مساعدة القاموس";
+
+/* Text label for displaying a keyboard's version, as shown on resource information views */
+"info-label-version-keyboard" = "إصدار لوحة المفاتيح";
+
+/* Text label for displaying a lexical model's version, as shown on resource information views */
+"info-label-version-lexical-model" = "إصدار القاموس";
+
+/* Label used for the "package info" / readme tab with the package installation prompt on phones. */
+"installer-label-package-info" = "معلومات الحزمة";
+
+/* Label used for the language-selection tab with the package installation prompt on phones. */
+"installer-label-select-languages" = "اختر اللغة أو اللغات";
+
+/* Label used with a package's version, as seen within the package installation prompt.  Example:  "Version: 14.0.0" */
+"installer-label-version" = "الإصدار: %@";
+
+/* Section header for languages supported by a package, as seen within the package installation prompt */
+"installer-section-available-languages" = "اللغات المتوفرة";
+
+/* Text for the help popup for changing keyboards with the globe key */
+"keyboard-help-change" = "اضغط هنا لتغيير لوحة المفاتيح";
+
+/* Text for the command to exit the Keyman keyboard in favor of other keyboards installed on the system */
+"keyboard-menu-exit" = "إغلاق %@";
+
+/* Error installing a Keyman package - could not allocate a location to install it */
+"kmp-error-file-system" = "خطأ في تثبيت الحزمة - خطأ ملف نظام";
+
+/* Error installing a Keyman package - could not copy package files */
+"kmp-error-file-copying" = "خطأ في تثبيت الحزمة - يتعذر نسخ الملفات المطلوبة";
+
+/* Error opening a Keyman package - package is not valid */
+"kmp-error-invalid" = "ملف الحزمة معطوب.";
+
+/* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
+"kmp-error-missing-resource" = "لا تحوي هذه الحزمة على لوحة المفاتيح أو القاموس المطلوب.";
+
+/* Error opening a Keyman package - cannot parse contents */
+"kmp-error-no-metadata" = "لم تتم تركيب الحزمة بنجاح - محتويات غير معروفة.";
+
+/* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
+"kmp-error-wrong-type" = "لا تحتوي هذه الحزمة على نوع المصادر المطلوب.";
+
+/* Title for the Installed Languages menu */
+"menu-installed-languages-title" = "اللغات المثبتة";
+
+/* Section header for lexical models within a language-specific settings menu */
+"menu-langsettings-label-lexical-models" = "القواميس";
+
+/* Section header for keyboards within a language-specific settings menu */
+"menu-langsettings-section-keyboards" = "لوحة المفاتيح";
+
+/* Section header for the settings toggles within a language-specific settings menu */
+"menu-langsettings-section-settings" = "إعداد اللغة";
+
+/* Title for the language-specific settings menus */
+"menu-langsettings-title" = "إعدادات %@";
+
+/* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-correct" = "تفعيل التصحيحات";
+
+/* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-predict" = "تفعيل التوقعات";
+
+/* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-message" = "هل ترغب بتثبيت هذا القاموس؟";
+
+/* Title for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-title" = "%1$@: %2$@";
+
+/* Text for an info alert indicating that no lexical models are available */
+"menu-lexical-model-none-message" = "لا تتوفر قواميس";
+
+/* Title for the lexical model menu, a submenu of the language-specific settings menus */
+"menu-lexical-model-title" = "قواميس %@";
+
+/* Title for the keyboard picker */
+"menu-picker-title" = "لوحات مفاتيح";
+
+/* Primary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report" = "السماح بالإبلاغ عن الأخطاء";
+
+/* Secondary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report-description" = "قد تطلب \"الوصول الكامل\"";
+
+/* Primary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file" = "تثبيت من الملف";
+
+/* Secondary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file-description" = "البحث عن ملفات .kmp";
+
+/* Primary text for the Settings menu option that displays the iOS system menu options for the app's keyboard */
+"menu-settings-system-keyboard-menu" = "إعدادات لوحة مفاتيح النظام";
+
+/* Label for the "Show Banner" toggle on the main settings screen */
+"menu-settings-show-banner" = "إظهار الشارة";
+
+/* Label for the "Get Started" automatic display toggle seen in the Settings menu */
+"menu-settings-startup-get-started" = "عرض 'شاشة البدأ' عند التشغيل";
+
+/* Title for the main Settings menu */
+"menu-settings-title" = "إعدادات Keyman";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "لا تعرض النص عند الضغط على مفتاح المسافة";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "أظهر اسم لوحة المفاتيح على مفتاح المسافة";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "أظهر اسم اللغة عند ضغط المسافة";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "أظهر اسم اللغة ولوحة المفاتيح عند على مفتاح المسافة";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "نص مفتاح المسافة";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "نص مفتاح المسافة";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "فارغ";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "لوح مفاتيح";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "اللغة";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "اللغة ولوحة المفاتيح";
+
+/* Short text for notification:  download failure for keyboard */
+"notification-download-failure-keyboard" = "فشل تحميل لوحة المفاتيح";
+
+/* Short text for notification:  download failure for lexical model */
+"notification-download-failure-lexical-model" = "فشل تحميل لوحة المفاتيح";
+
+/* Short text for notification:  download success for keyboard */
+"notification-download-success-keyboard" = "تم تحميل لوحة المفاتيح بنجاح";
+
+/* Short text for notification:  download success for lexical model */
+"notification-download-success-lexical-model" = "تم تحميل النموذج الاصطلاحي بنجاح";
+
+/* Short text for notification:  downloading a keyboard */
+"notification-downloading-keyboard" = "يجري تحميل لوحة مفاتيح\U2026";
+
+/* Short text for notification:  downloading a lexical model */
+"notification-downloading-lexical-model" = "يجري تحميل لوحة مفاتيح\U2026";
+
+/* Short text for notification:  an update is available */
+"notification-update-available" = "يتوفر تحديث";
+
+/* Short text for notification:  currently updating */
+"notification-update-processing" = "يجري تحديث\U2026";
+
+/* Text indicating success at installing new keyboards or dictionaries */
+"success-install" = "تم التثبيت بنجاح.";
+
+/* A title to use in alerts indicating 'success' at whatever task the user requested */
+"success-title" = "نجحت العملية";

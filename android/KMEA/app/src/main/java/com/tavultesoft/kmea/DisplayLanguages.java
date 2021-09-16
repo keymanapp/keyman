@@ -40,6 +40,7 @@ public class DisplayLanguages {
     DisplayLanguageType[] languages = {
       new DisplayLanguageType(unspecifiedLocale, context.getString(R.string.default_locale)),
       new DisplayLanguageType("am-ET", "አማርኛ (Amharic)"),
+      new DisplayLanguageType("ar", "(Arabic) العربية"),
       new DisplayLanguageType("az-AZ", "Azərbaycanca (Azəricə)"),
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
