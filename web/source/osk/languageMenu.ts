@@ -339,7 +339,7 @@ namespace com.keyman.osk {
         }
 
         let languageMenu = this;
-        // Several keyboards for this language
+        // An additional documentation comment.
         if(lgBar.kList.length > 1) {
           lgBar.className='kbd-list';
           lgBar.innerHTML=langs[k]+'...';

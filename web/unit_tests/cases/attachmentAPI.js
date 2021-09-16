@@ -124,6 +124,7 @@ describe('Attachment API', function() {
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not use manage keyboard settings correctly for global-linked control!");
 
     // Swap back and check that the settings persist.
+    // Another example edit.
     keyman.setActiveElement(input);
     eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
