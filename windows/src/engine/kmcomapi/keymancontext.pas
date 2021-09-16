@@ -32,6 +32,8 @@ type
   private
     FKeyman: TObject;
     FController: TKeymanController;
+    FDefaultBCP47: string;
+    FDefaultLangID: Integer;
     function GetErrors: IIntKeymanErrors;
     function GetKeyboards: IIntKeymanKeyboardsInstalled;
     function GetPackages: IIntKeymanPackagesInstalled;
@@ -50,6 +52,9 @@ type
     property SystemInfo: IIntKeymanSystemInfo read GetSystemInfo;
     property Control: IIntKeymanControl read GetControl;
     property Controller: TKeymanController read FController;
+
+    property DefaultBCP47: string read FDefaultBCP47 write FDefaultBCP47;
+    property DefaultLangID: Integer read FDefaultLangID write FDefaultLangID;
   end;
 
 implementation
