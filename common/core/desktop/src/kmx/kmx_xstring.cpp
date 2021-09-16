@@ -139,7 +139,7 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
       if (*p == 0) return p;
       if (*p == UC_SENTINEL_EXTENDEDEND)		return p + 1;
     }
-
+ 
     //  UC_SENTINEL(FFFF) followed by other special
     switch (*(p + 1))
     {

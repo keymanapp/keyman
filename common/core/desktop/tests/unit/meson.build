@@ -20,7 +20,7 @@ if get_option('default_library') != 'static'
     message('Python ctypes is incompatible with built shared object. Disabling some tests.')
   endif
 endif
-
+ 
 subdir('unit/json')
 subdir('unit/utftest')
 subdir('unit/kmnkbd')
