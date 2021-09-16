@@ -23,34 +23,14 @@ This displays the number of installed languages in parentheses `()`. Click this 
 screen where you can [install new keyboards](../../start/installing-keyboards) from the keyman.com catalog.
 
 ## Install Keyboard or Dictionary
-This displays a few ways to install a keyboard package or dictionary package.
+![](../../android_images/ic_content_add.png)
 
-![](../../android_images/settings-screen-install-keyboard-dictionary.png)
-
-### Install from keyman.com
-Click on this to search for a keyboard from keyman.com and install. The process is the same as [installing keyboards](../../start/installing-keyboards).
-
-### Install from local file
-Click on this to [install custom keyboard and dictionary packages](../installing-custom-packages).
-
-### Add languages to installed keyboard
-For installed keyboard packages, click on this to associate another language with a keyboard.
-If all the languages for a keyboard have already been installed,
-this won't change anything.
+Click on this to display a [menu](install-keyboard-or-dictionary) that has a few ways to install a keyboard package or dictionary package.
 
 ## Change Display Language
 ![](../../android_images/ic_translate_a.png)
 
 Click on this to change the display language of the Keyman for Android app. The list of available languages come from [translate.keyman.com](https://translate.keyman.com). If a translation is available, Keyman for Android will default to the device's default locale.
-
-## Spacebar Caption
-Click on this to change the displayed keyboard name on the spacebar. The options are:
-* Language name
-* Keyboard name
-* Language name + Keyboard name
-* Blank
-
-![](../../android_images/spacebar-caption-ap.png)
 
 ## Enable Keyman as system-wide keyboard
 By default, installed Keyman keyboards are only available to use within the Keyman app. Click on this setting to
@@ -58,6 +38,14 @@ bring up the Android system configuration so Keyman can be added as a system-wid
 
 ## Set Keyman as default keyboard
 Click on this to bring up the Android system configuration for setting Keyman as the default system-wide keyboard.
+
+## Adjust Keyboard Height
+![](../../android_images/adjust-height.png)
+
+Click on this to [adjust the keyboard height](adjust-keyboard-height).
+
+## Spacebar Caption
+Click on this to [change the displayed keyboard name](spacebar-caption) on the spacebar.
 
 ## Always show banner
 This toggle is reserved for future features. When off, the text suggestion banner is only displayed when

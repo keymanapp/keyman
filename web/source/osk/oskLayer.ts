@@ -76,10 +76,10 @@ namespace com.keyman.osk {
      *  @param    {string}  keyId   key identifier
      *  @return   {Object}          Reference to key
      */
-    public findKey(coreID: string): OSKBaseKey {
+    private findKey(keyId: string): OSKBaseKey {
       for(const row of this.rows) {
         for(const key of row.keys) {
-          if(key.getCoreId() == coreID) {
+          if(key.getBaseId() == keyId) {
             return key;
           }
         }

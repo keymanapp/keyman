@@ -32,7 +32,7 @@ public class SentryManager {
       log.debug("Sentry error logging enabled.")
     #endif
 
-    let infoDict = Bundle.main.infoDictionary
+    let infoDict = Bundle(for: SentryManager.self).infoDictionary
     let versionWithTag = infoDict?["KeymanVersionWithTag"] as? String ?? ""
     let environment = infoDict?["KeymanVersionEnvironment"] as? String ?? ""
     let release = "release-\(versionWithTag)"

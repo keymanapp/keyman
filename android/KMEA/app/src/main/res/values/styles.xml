@@ -34,6 +34,10 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="AppTheme.ToolbarBackArrow" parent="AppTheme">
+      <item name="android:textColorSecondary">@android:color/black</item>
+    </style>
+
     <style name="AppTheme.Light.ListView" parent="android:style/Widget.ListView">
         <item name="android:listSelector">@drawable/list_item</item>
         <item name="android:textColor">@android:color/black</item>
