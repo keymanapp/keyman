@@ -3,7 +3,7 @@
 # Create Date:  19 Oct 2018
 # Authors:      Tim Eves (TSE)
 #
-
+ 
 defns=['-DKMN_KBP_STATIC']
 tests = [
   ['kmx_xstring', 'test_kmx_xstring.cpp'],

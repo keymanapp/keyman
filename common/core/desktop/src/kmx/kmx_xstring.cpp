@@ -278,7 +278,7 @@ int km::kbp::kmx::xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return u16ncmp(ch1, ch2, (intptr_t)(nch1-ch1));
 }
-
+ 
 PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
 {
   PKMX_WCHAR result;
