@@ -8,7 +8,7 @@ defns=['-DKMN_KBP_STATIC']
 tests = [
   ['kmx_xstring', 'test_kmx_xstring.cpp'],
 ]
-
+ 
 foreach t : tests
   bin = executable(t[0], t[1],
     cpp_args: defns,
