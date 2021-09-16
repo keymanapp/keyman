@@ -4,7 +4,7 @@ title: Keyman for Android (Tablet Layout)
 
 |   | Keyboard Keys <br/>(Keyboard Present) |
 |---|---|
-| ![](../android_images/globe-at.png) | Globe key<br/>Short press and release this key to select another language/keyboard<br/> Long press and release this key to display the keyboard picker menu |
+| ![](../android_images/globe-at.png) | Globe key<br/>Short press and release this key to: display the keyboard picker menu (when 1 keyboard installed) or select another language/keyboard (when 2+ keyboards installed)<br> Long press and release this key to display the keyboard picker menu |
 | ![](../android_images/hide-keyboard-at.png) | Hide the keyboard |
 | ![](../android_images/backspace-at.png) | Backspace |
 | ![](../android_images/return-at.png) | Return |

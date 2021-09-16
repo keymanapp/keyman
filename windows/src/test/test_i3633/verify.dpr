@@ -62,6 +62,13 @@ begin
     end;
   end;
 
+  if str[0].ToLower.Contains('kmnkbp0-0') then
+  begin
+    // Keyman Core does not include version information
+    // TODO: this will be resolved in #5672
+    Exit('');
+  end;
+
   if str[3] <> 'SIL International' then
   begin
     Exit('File has wrong company name');

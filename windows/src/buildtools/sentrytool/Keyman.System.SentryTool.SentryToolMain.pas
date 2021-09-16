@@ -20,31 +20,92 @@ var
   FInfile, FOutfile, FProjectFile, FRootPath, FIncludePath: string;
   FDelphiSearchFile: TDelphiSearchFile = nil;
 
+  CmdParams: TArray<string>;
+
+function LoadParamsFromFile(const Filename: string): Boolean;
+var
+  cmd, s: string;
+  str: TStringList;
+begin
+  str := TStringList.Create;
+  try
+    str.LoadFromFile(Filename);
+
+    cmd := '';
+    for s in str do
+      cmd := cmd + Trim(s) + ' ';
+
+    // We'll reuse str here to parse now...
+    str.Delimiter := ' ';
+    str.QuoteChar := '"';
+    str.StrictDelimiter := True;
+    str.DelimitedText := Trim(cmd);
+
+    CmdParams := str.ToStringArray;
+  finally
+    str.Free;
+  end;
+
+  Result := True;
+end;
+
+function LoadParamsFromCmdline: Boolean;
+var
+  i: Integer;
+begin
+  SetLength(CmdParams, ParamCount);
+  for i := 0 to ParamCount - 1 do
+    CmdParams[i] := ParamStr(i+1);
+  Result := True;
+end;
+
+function CmdParamStr(n: Integer): string;
+begin
+  Assert(n >= 0);
+  if n = 0 then
+    Result := ParamStr(0)
+  else if n > Length(CmdParams)
+    then Result := ''
+    else Result := CmdParams[n-1];
+end;
+
+function CmdParamCount: Integer;
+begin
+  Result := Length(CmdParams);
+end;
+
 function ParseParams: Boolean;
 var
   n: Integer;
 begin
+  if Copy(ParamStr(1), 1, 1) = '@' then
+  begin
+    if not LoadParamsFromFile(Copy(ParamStr(1), 2, MaxInt)) then Exit(False);
+  end
+  else
+    if not LoadParamsFromCmdline then Exit(False);
+
   n := 1;
-  FDebug := ParamStr(n) = '-v';
+  FDebug := CmdParamStr(n) = '-v';
   if FDebug then Inc(n);
-  if ParamStr(n) <> 'delphiprep' then Exit(False);
+  if CmdParamStr(n) <> 'delphiprep' then Exit(False);
   Inc(n);
 
-  while n <= ParamCount do
+  while n <= CmdParamCount do
   begin
-    if ParamStr(n) = '-dpr' then
-      FProjectFile := ParamStr(n+1)
-    else if ParamStr(n) = '-i' then
-      FIncludePath := ParamStr(n+1)
-    else if ParamStr(n) = '-o' then
-      FOutFile := ParamStr(n+1)
-    else if ParamStr(n) = '-r' then
-      FRootPath := ParamStr(n+1)
+    if CmdParamStr(n) = '-dpr' then
+      FProjectFile := CmdParamStr(n+1)
+    else if CmdParamStr(n) = '-i' then
+      FIncludePath := CmdParamStr(n+1)
+    else if CmdParamStr(n) = '-o' then
+      FOutFile := CmdParamStr(n+1)
+    else if CmdParamStr(n) = '-r' then
+      FRootPath := CmdParamStr(n+1)
     else
     begin
       if FInfile = '' then
       begin
-        FInfile := ParamStr(n);
+        FInfile := CmdParamStr(n);
         Inc(n);
         Continue;
       end;
