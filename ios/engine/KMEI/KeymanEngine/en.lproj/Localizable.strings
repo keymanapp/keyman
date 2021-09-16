@@ -128,7 +128,7 @@
 "kmp-error-no-metadata" = "This package was not properly built - contents unknown.";
 
 /* Error opening a Keyman package - package's contents are for desktop platforms only */
-"kmp-error-unsupported" = "The package's contents are not supported on mobile devices.";
+"kmp-error-unsupported" = "This package does not include support for your device.";
 
 /* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
 "kmp-error-wrong-type" = "This package does not contain the expected resource type.";
