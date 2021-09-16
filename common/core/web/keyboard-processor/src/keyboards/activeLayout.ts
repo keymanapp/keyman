@@ -653,7 +653,7 @@ namespace com.keyman.keyboards {
         let rows=layer['row'];
         let i: number;
         for(i=rows.length-1; i>=0; i--) {
-          if(!Array.isArray(rows[i]['key'])) {
+          if(!Array.isArray(rows[i]['key']) || rows[i]['key'].length == 0) {
             rows.splice(i, 1)
           }
         }

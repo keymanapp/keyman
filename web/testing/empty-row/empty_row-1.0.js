@@ -17,7 +17,8 @@ function Keyboard_empty_row() {
             "layer": [{
                 "id": "default",
                 "row": [{
-                    "id": "1"
+                    "id": "1",
+                    "key": []
                 }, {
                     "id": "2",
                     "key": [{
