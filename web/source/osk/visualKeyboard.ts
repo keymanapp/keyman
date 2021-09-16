@@ -181,9 +181,7 @@ namespace com.keyman.osk {
       // Now that we've properly processed the keyboard's layout, mark it as calibrated.
       // TODO:  drop the whole 'calibration' thing.  The newer layout system supersedes the
       // need for it.  (Is no longer really used, so the drop ought be clean.)
-      if (keyboard) {
-        keyboard.markLayoutCalibrated(formFactor);
-      }
+      layoutKeyboard.markLayoutCalibrated(formFactor);
       
       // Append the OSK layer group container element to the containing element
       //osk.keyMap = divLayerContainer;

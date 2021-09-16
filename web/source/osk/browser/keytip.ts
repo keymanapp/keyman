@@ -87,7 +87,7 @@ namespace com.keyman.osk.browser {
         }
 
         let cs = getComputedStyle(this.element);
-        let oskHeight = keyman.osk.getHeight();
+        let oskHeight = keyman.osk.computedHeight;
         let bottomY = parseInt(cs.bottom, 10);
         let tipHeight = parseInt(cs.height, 10);
 
