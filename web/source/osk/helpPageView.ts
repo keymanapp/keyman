@@ -30,5 +30,10 @@ namespace com.keyman.osk {
     }
 
     public updateState() { }
+    public refreshLayout() { }
+
+    public get layoutHeight(): ParsedLengthStyle {
+      return ParsedLengthStyle.inPercent(100);
+    }
   }
 }

@@ -4,7 +4,7 @@ namespace com.keyman.osk {
    * OSKManager / OSKView.  Most keyboards will default to use of a VisualKeyboard,
    * though some will use HelpPage for certain form factors.
    */
-  export interface KeyboardView {
+  export interface KeyboardView extends OSKViewComponent {
     readonly element: HTMLDivElement;
 
     /**

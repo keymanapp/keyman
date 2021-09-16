@@ -24,8 +24,23 @@ namespace com.keyman.osk {
   export class OSKManager {
     // Important OSK elements (and container classes)
     _Box: HTMLDivElement;
-    banner: BannerManager;
-    vkbd: VisualKeyboard;
+
+    headerView:   OSKViewComponent;
+    bannerView:   BannerManager; // Which implements OSKViewComponent
+    keyboardView: KeyboardView;  // Which implements OSKViewComponent
+    footerView:   OSKViewComponent;
+
+    public get vkbd(): VisualKeyboard {
+      if(this.keyboardView instanceof VisualKeyboard) {
+        return this.keyboardView;
+      } else {
+        return null;
+      }
+    }
+
+    public get banner(): BannerManager {  // Maintains old reference point used by embedding apps.
+      return this.bannerView;
+    }
 
     desktopLayout: layouts.TargetedFloatLayout;
 
@@ -125,7 +140,7 @@ namespace com.keyman.osk {
       this.loadCookie();
 
       // Predictive-text hooks.
-      const bannerMgr = this.banner = new BannerManager();
+      const bannerMgr = this.bannerView = new BannerManager();
       const _this = this;
 
       // Register a listener for model change events so that we can hot-swap the banner as needed.
@@ -149,8 +164,8 @@ namespace com.keyman.osk {
      * Description  Clears OSK variables prior to exit (JMD 1.9.1 - relocation of local variables 3/9/10)
      */
     _Unload() {
-      this.vkbd = null;
-      this.banner = null;
+      this.keyboardView = null;
+      this.bannerView = null;
       this._Box = null;
     }
 
@@ -174,7 +189,7 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         this.vkbd.shutdown();
       }
-      this.vkbd = null;
+      this.keyboardView = null;
 
       // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
       this._Box.innerHTML = '';
@@ -189,6 +204,7 @@ namespace com.keyman.osk {
       if(util.device.formFactor == 'desktop') {
         layout = this.desktopLayout = new layouts.TargetedFloatLayout();
         layout.attachToView(this);
+        this.headerView = layout.titleBar;
         this.desktopLayout.titleBar.setTitleFromKeyboard(activeKeyboard);
         this._Box.appendChild(layout.titleBar.element);
       }
@@ -199,10 +215,9 @@ namespace com.keyman.osk {
         this.banner.element.style.fontSize = this.baseFontSize;
       }
 
-      let kbdView: KeyboardView = this._GenerateKeyboardView(activeKeyboard);
+      let kbdView: KeyboardView = this.keyboardView = this._GenerateKeyboardView(activeKeyboard);
       this._Box.appendChild(kbdView.element);
       if(kbdView instanceof VisualKeyboard) {
-        this.vkbd = kbdView;
         kbdView.fontSize = this.parsedBaseFontSize;
       }
       kbdView.postInsert();
@@ -211,6 +226,7 @@ namespace com.keyman.osk {
       if(this.desktopLayout) {
         if(kbdView instanceof VisualKeyboard) {
           this._Box.appendChild(layout.resizeBar.element);
+          this.footerView = layout.resizeBar;
         }
       }
 
@@ -499,6 +515,7 @@ namespace com.keyman.osk {
       c['userSet'] = this.userPositioned ? 1 : 0;
       c['left'] = p.left;
       c['top'] = p.top;
+      c['_version'] = utils.Version.CURRENT.toString();
 
       if(this.vkbd) {
         c['width'] = this.width.val;
@@ -522,12 +539,17 @@ namespace com.keyman.osk {
       this.userPositioned = util.toNumber(c['userSet'], 0) == 1;
       this.x = util.toNumber(c['left'],-1);
       this.y = util.toNumber(c['top'],-1);
+      let cookieVersionString = c['_version'];
 
       // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-      var dfltWidth=0.3*screen.width;
+      let dfltWidth=0.3*screen.width;
+      let dfltHeight=0.15*screen.height;
       //if(util.toNumber(c['width'],0) == 0) dfltWidth=0.5*screen.width;
-      var newWidth=util.toNumber(c['width'],dfltWidth),
-          newHeight=util.toNumber(c['height'],0.15*screen.height);
+      let newWidth  = parseInt(c['width'], 10);
+      let newHeight = parseInt(c['height'], 10);
+      let isNewCookie = isNaN(newHeight);
+      newWidth  = isNaN(newWidth)  ? dfltWidth  : newWidth;
+      newHeight = isNaN(newHeight) ? dfltHeight : newHeight;
 
       // Limit the OSK dimensions to reasonable values
       if(newWidth < 0.2*screen.width) {
@@ -541,6 +563,20 @@ namespace com.keyman.osk {
       }
       if(newHeight > 0.5*screen.height) {
         newHeight=0.5*screen.height;
+      }
+
+      // if(!cookieVersionString) - this component was not tracked until 15.0.
+      // Before that point, the OSK's title bar and resize bar heights were not included
+      // in the OSK's cookie-persisted height.
+      if(isNewCookie || !cookieVersionString) {
+        // Adds some space to account for the OSK's header and footer, should they exist.
+        if(this.headerView && this.headerView.layoutHeight.absolute) {
+          newHeight += this.headerView.layoutHeight.val;
+        }
+
+        if(this.footerView && this.footerView.layoutHeight.absolute) {
+          newHeight += this.footerView.layoutHeight.val;
+        }
       }
 
       this.setSize(newWidth, newHeight);
@@ -583,7 +619,11 @@ namespace com.keyman.osk {
       this.needsLayout = this.needsLayout || mutatedFlag;
 
       if(this.vkbd) {
-        this.vkbd.setSize(width, height - this.getBannerHeight(), pending);
+        let availableHeight = height - this.computeFrameHeight();
+        if(this.bannerView.height > 0) {
+          availableHeight -= this.bannerView.height + 5;
+        }
+        this.vkbd.setSize(width, availableHeight, pending);
       }
     }
 
@@ -839,6 +879,10 @@ namespace com.keyman.osk {
       }
     }
 
+    /* private */ computeFrameHeight(): number {
+      return (this.headerView?.layoutHeight.val || 0) + (this.footerView?.layoutHeight.val || 0);
+    }
+
     /**
      * Display KMW OSK at specified position (returns nothing)
      *
@@ -993,9 +1037,13 @@ namespace com.keyman.osk {
 
       // Step 3:  perform layout operations.
       if(this.vkbd) {
-        // +5:  from kmw-banner-bar's 'top' attribute.
-        const vkbdHeight = this.computedHeight - (this.banner.height ? this.banner.height + 5 : 0);
-        this.vkbd.setSize(this.computedWidth, vkbdHeight);
+        let availableHeight = this.computedHeight - this.computeFrameHeight();
+
+        // +5:  from kmw-banner-bar's 'top' attribute when active
+        if(this.bannerView.height > 0) {
+          availableHeight -= this.bannerView.height + 5;
+        }
+        this.vkbd.setSize(this.computedWidth, availableHeight);
         this.vkbd.refreshLayout();
 
         if(this.vkbd.usesFixedHeightScaling) {

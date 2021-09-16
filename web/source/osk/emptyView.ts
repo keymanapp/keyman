@@ -13,5 +13,11 @@ namespace com.keyman.osk {
     // No operations needed; this is a stand-in for the desktop OSK when no keyboard is active.
     public postInsert() { }
     public updateState() { }
+
+    public refreshLayout() { }
+
+    public get layoutHeight(): ParsedLengthStyle {
+      return ParsedLengthStyle.inPixels(0);
+    }
   }
 }

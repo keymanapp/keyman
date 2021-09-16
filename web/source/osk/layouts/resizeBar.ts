@@ -1,7 +1,11 @@
+/// <reference path="../oskViewComponent.ts" />
+
 namespace com.keyman.osk.layouts {
-  export class ResizeBar {
+  export class ResizeBar implements OSKViewComponent {
     private _element: HTMLDivElement;
     private _resizeHandle: HTMLDivElement;
+
+    private static readonly DISPLAY_HEIGHT = ParsedLengthStyle.inPixels(16); // As set in kmwosk.css
 
     private mouseCancellingHandler: (ev: MouseEvent) => boolean = function(ev: MouseEvent) {
       ev.preventDefault();
@@ -15,6 +19,10 @@ namespace com.keyman.osk.layouts {
       if(dragHandler) {
         this._resizeHandle.onmousedown = dragHandler.mouseDownHandler;
       }
+    }
+
+    public get layoutHeight(): ParsedLengthStyle {
+      return ResizeBar.DISPLAY_HEIGHT;
     }
 
     public get element(): HTMLDivElement {
@@ -77,6 +85,10 @@ namespace com.keyman.osk.layouts {
       this._resizeHandle=Limg;
       //TODO: the image never appears in IE8, have no idea why!
       return bar;
+    }
+
+    public refreshLayout() {
+      // The title bar is adaptable as it is and needs no adjustments.
     }
   }
 }
