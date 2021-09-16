@@ -1,15 +1,11 @@
-/// <reference path="../kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+// Includes KMW-added property declaration extensions for HTML elements.
+/// <reference path="../kmwexthtml.ts" />
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
-// Includes the banner
-/// <reference path="./bannerManager.ts" />
+/// <reference path="lengthStyle.ts" />
 // Defines desktop-centric OSK positioning + sizing behavior
 /// <reference path="layouts/targetedFloatLayout.ts" />
-// Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
-/// <reference path="visualKeyboard.ts" />
-// Models keyboards that present a help page, rather than a standard OSK.
-/// <reference path="helpPageView.ts" />
-/// <reference path="emptyView.ts" />
+/// <reference path="oskView.ts" />
 
 /***
    KeymanWeb 10.0
@@ -21,12 +17,7 @@ namespace com.keyman.osk {
     'nosize'?: boolean, 'nomove'?: boolean};
   type OSKPos = {'left'?: number, 'top'?: number};
 
-  export class OSKManager {
-    // Important OSK elements (and container classes)
-    _Box: HTMLDivElement;
-    banner: BannerManager;
-    vkbd: VisualKeyboard;
-
+  export class OSKManager extends OSKView {
     desktopLayout: layouts.TargetedFloatLayout;
 
     // OSK state fields
@@ -42,38 +33,6 @@ namespace com.keyman.osk {
     dfltX: string;
     dfltY: string;
 
-    /**
-     * The configured width for this OSKManager.  May be `undefined` or `null`
-     * to allow automatic width scaling. 
-     */
-    private _width: ParsedLengthStyle;
-
-    /**
-     * The configured height for this OSKManager.  May be `undefined` or `null`
-     * to allow automatic height scaling. 
-     */
-    private _height: ParsedLengthStyle;
-
-    /**
-     * The computed width for this OSKManager.  May be null if auto sizing
-     * is allowed and the OSKManager is not currently in the DOM hierarchy.
-     */
-    private _computedWidth: number;
-
-    /**
-    * The computed height for this OSKManager.  May be null if auto sizing
-    * is allowed and the OSKManager is not currently in the DOM hierarchy.
-    */
-    private _computedHeight: number;
-
-    /**
-     * The base font size to use for hosted `Banner`s and `VisualKeyboard`
-     * instances.
-     */
-    private _baseFontSize: ParsedLengthStyle;
-
-    private needsLayout: boolean = true;
-
     // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
     modifierCodes = text.Codes.modifierCodes;
     modifierBitmasks = text.Codes.modifierBitmasks;
@@ -81,66 +40,25 @@ namespace com.keyman.osk {
     keyCodes = text.Codes.keyCodes;
 
     public constructor() {
+      super(com.keyman.singleton.util.device.coreSpec);
+
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      // OSK initialization - create DIV and set default styles
-
-      this._Box = util._CreateElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
       document.body.appendChild(this._Box);
 
-      // Install the default OSK stylesheet
-      util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
-
-      // For mouse click to prevent loss of focus
-      util.attachDOMEvent(this._Box, 'mousedown', function(obj){
-        keymanweb.uiManager.setActivatingUI(true);
-        return false;
-      });
-
-      // And to prevent touch event default behaviour on mobile devices
-      // TODO: are these needed, or do they interfere with other OSK event handling ????
-      if(util.device.touchable) { // I3363 (Build 301)
-        var cancelEventFunc = function(e) {
-          if(e.cancelable) {
-            e.preventDefault();
-          }
-          e.stopPropagation();
-          return false;
-        };
-
-        util.attachDOMEvent(this._Box, 'touchstart', function(e) {
-          keymanweb.uiManager.setActivatingUI(true);
-          return cancelEventFunc(e);
-        });
-
-        util.attachDOMEvent(this._Box, 'touchend', cancelEventFunc);
-        util.attachDOMEvent(this._Box, 'touchmove', cancelEventFunc);
-        util.attachDOMEvent(this._Box, 'touchcancel', cancelEventFunc);
-
+      if(util.device.touchable) {
         // Can only get (initial) viewport scale factor after page is fully loaded!
         this.vpScale=util.getViewportScale();
       }
 
       this.loadCookie();
 
-      // Predictive-text hooks.
-      const bannerMgr = this.banner = new BannerManager();
-      const _this = this;
-
-      // Register a listener for model change events so that we can hot-swap the banner as needed.
-      // Handled here b/c banner changes may trigger a need to re-layout the OSK.
-      keymanweb.core.languageProcessor.on('statechange', 
-                                          function(state: text.prediction.StateChangeEnum) {
-        let currentType = bannerMgr.activeType;
-        bannerMgr.selectBanner(state);
-
-        if(currentType != bannerMgr.activeType) {
-          _this.refreshLayout();
-        }
-
-        return true;
-      });
+      // Add header element to OSK only for desktop browsers
+      if(util.device.formFactor == 'desktop') {
+        const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
+        this.headerView = layout.titleBar;
+      }
     }
 
     /**
@@ -149,260 +67,32 @@ namespace com.keyman.osk {
      * Description  Clears OSK variables prior to exit (JMD 1.9.1 - relocation of local variables 3/9/10)
      */
     _Unload() {
-      this.vkbd = null;
-      this.banner = null;
+      this.keyboardView = null;
+      this.bannerView = null;
       this._Box = null;
     }
 
-    /**
-     * Function     _Load
-     * Scope        Private
-     * Description  OSK initialization when keyboard selected
-     */
-    _Load() { // Load Help
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-      let device = util.device;
-
-      var activeKeyboard = keymanweb.core.activeKeyboard;
-
+    protected postKeyboardLoad() {
       this._Visible = false;  // I3363 (Build 301)
-      var s = this._Box.style;
-      s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
-      s.position = (device.formFactor == 'desktop' ? 'absolute' : 'fixed');
-
-      if(this.vkbd) {
-        this.vkbd.shutdown();
-      }
-      this.vkbd = null;
-
-      // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
-      this._Box.innerHTML = '';
 
       this._Box.onmouseover = this._VKbdMouseOver;
       this._Box.onmouseout = this._VKbdMouseOut;
 
-      // START:  construction of the actual internal layout for the overall OSK
-      let layout: layouts.TargetedFloatLayout = null;
-
       // Add header element to OSK only for desktop browsers
-      if(util.device.formFactor == 'desktop') {
-        layout = this.desktopLayout = new layouts.TargetedFloatLayout();
-        layout.attachToView(this);
-        this.desktopLayout.titleBar.setTitleFromKeyboard(activeKeyboard);
-        this._Box.appendChild(layout.titleBar.element);
-      }
-
-      // Add suggestion banner bar to OSK
-      if (this.banner) {
-        this._Box.appendChild(this.banner.element);
-        this.banner.element.style.fontSize = this.baseFontSize;
-      }
-
-      let kbdView: KeyboardView = this._GenerateKeyboardView(activeKeyboard);
-      this._Box.appendChild(kbdView.element);
-      if(kbdView instanceof VisualKeyboard) {
-        this.vkbd = kbdView;
-        kbdView.fontSize = this.parsedBaseFontSize;
-      }
-      kbdView.postInsert();
-
-      // Add footer element to OSK only for desktop browsers
       if(this.desktopLayout) {
-        if(kbdView instanceof VisualKeyboard) {
-          this._Box.appendChild(layout.resizeBar.element);
+        const layout = this.desktopLayout;
+        layout.attachToView(this);
+        this.desktopLayout.titleBar.setTitleFromKeyboard(this.activeKeyboard);
+
+        if(this.vkbd) {
+          this.footerView = layout.resizeBar;
+          this._Box.appendChild(this.footerView.element);
         }
-      }
-
-      // Initializes the size of a touch keyboard.
-      if(this.vkbd && device.touchable) {
-        let targetOSKHeight = this.vkbd.computedAdjustedOskHeight(this.getKeyboardHeight());
-        this.setSize(this.getWidth(), targetOSKHeight + this.getBannerHeight());
-      }
-      // END:  construction of the actual internal layout for the overall OSK
-
-      // Correct the classname for the (inner) OSK frame (Build 360)
-      var kbdID: string = (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
-      if(keymanweb.isEmbedded && kbdID.indexOf('::') != -1) {
-        // De-namespaces the ID for use with CSS classes.
-        // Assumes that keyboard IDs may not contain the ':' symbol.
-        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
-      }
-
-      const kbdClassSuffix = ' kmw-keyboard-' + kbdID;
-      kbdView.element.className = kbdView.element.className + kbdClassSuffix;
-
-      this.banner.appendStyles();
-
-      if(this.vkbd) {
-        // Create the key preview (for phones)
-        this.vkbd.createKeyTip();
-
-        // Append a stylesheet for this keyboard for keyboard specific styles
-        // or if needed to specify an embedded font
-        this.vkbd.appendStyleSheet();
       }
 
       if(this._Enabled) {
         this._Show();
       }
-    }
-
-    /**
-     * The configured width for this VisualKeyboard.  May be `undefined` or `null`
-     * to allow automatic width scaling. 
-     */
-     get width(): LengthStyle {
-      return this._width;
-    }
-
-    /**
-     * The configured height for this VisualKeyboard.  May be `undefined` or `null`
-     * to allow automatic height scaling. 
-     */
-    get height(): LengthStyle {
-      return this._height;
-    }
-
-    /**
-     * The computed width for this VisualKeyboard.  May be null if auto sizing
-     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
-     */
-    get computedWidth(): number {
-      // Computed during layout operations; allows caching instead of continuous recomputation.
-      if(this.needsLayout) {
-        this.refreshLayout();
-      }
-      return this._computedWidth;
-    }
-
-    /**
-     * The computed height for this VisualKeyboard.  May be null if auto sizing
-     * is allowed and the VisualKeyboard is not currently in the DOM hierarchy.
-     */
-    get computedHeight(): number {
-      // Computed during layout operations; allows caching instead of continuous recomputation.
-      if(this.needsLayout) {
-        this.refreshLayout();
-      }
-      return this._computedHeight;
-    }
-
-    /**
-     * The top-level style string for the font size used by the predictive banner 
-     * and the primary keyboard visualization elements.
-     */
-    get baseFontSize(): string {
-      return this.parsedBaseFontSize.styleString;
-    }
-
-    private get parsedBaseFontSize(): ParsedLengthStyle {
-      if(!this._baseFontSize) {
-        let keymanweb = com.keyman.singleton;
-        let device = keymanweb.util.device;
-        this._baseFontSize = this.defaultFontSize(device, keymanweb.isEmbedded);
-      }
-
-      return this._baseFontSize;
-    }
-
-    public defaultFontSize(device: Device, isEmbedded: boolean): ParsedLengthStyle {
-      if(device.touchable) {
-        var fontScale: number = 1;
-        if(device.formFactor == 'phone') {
-          fontScale = 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2;  // Combines original scaling factor with one previously applied to the layer group.
-        } else {
-          // The following is a *temporary* fix for small format tablets, e.g. PendoPad
-          var pixelRatio = 1;
-          if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-            pixelRatio = window.devicePixelRatio;
-          }
-
-          if(device.OS == 'Android' && device.formFactor == 'tablet' && this.getHeight() < 300 * pixelRatio) {
-            fontScale *= 1.2;
-          } else {
-            fontScale *= 2; //'2.5em';
-          }
-        }
-
-        // Finalize the font size parameter.
-        return ParsedLengthStyle.special(fontScale, 'em');
-      } else {
-        return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
-      } 
-    }
-
-    private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKManager,
-      source: text.MutableSystemStore,
-      newValue: string) {
-      // This handler is also triggered on state-key state changes (K_CAPS) that 
-      // may not actually change the layer.
-      if(this.vkbd) {
-        this.vkbd._UpdateVKShiftStyle();
-      }
-
-      if(source.value != newValue) {
-        // Prevents console errors when a keyboard only displays help.
-        // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.
-        if(this.vkbd) {
-          this.vkbd.layerId = newValue;
-        }
-        this._Show();
-      }
-    }.bind(this);
-
-    private _GenerateKeyboardView(keyboard: keyboards.Keyboard): KeyboardView {
-      let device = com.keyman.singleton.util.device;
-
-      if(this.vkbd) {
-        this.vkbd.shutdown();
-      }
-
-      this._Box.className = "";
-
-      // Case 1:  since we hide the system keyboard on touch devices, we need
-      //          to display SOMETHING that can accept input.
-      if(keyboard == null && !device.touchable) {
-        // We do not (currently) allow selecting the default system keyboard on
-        // touch form-factors.  Likely b/c mnemonic difficulties.
-        return new EmptyView();
-      } else {
-        // Generate a visual keyboard from the layout (or layout default)
-        // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
-        if(keyboard && keyboard.layout(device.formFactor as utils.FormFactor)) {
-          return this._GenerateVisualKeyboard(keyboard);
-        } else if(!keyboard /* && device.touchable (implied) */) {
-          // Show a basic, "hollow" OSK that at least allows input, since we're
-          // on a touch device and hiding the system keyboard
-          return this._GenerateVisualKeyboard(null);
-        } else {
-          // A keyboard help-page or help-text is still a visualization, even not a standard OSK.
-          return new HelpPageView(keyboard);
-        }
-      }
-    }
-
-    /**
-     * Function     _GenerateVisualKeyboard
-     * Scope        Private
-     * @param       {Object}      keyboard    The keyboard to visualize
-     * Description  Generates the visual keyboard element and attaches it to KMW
-     */
-    private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard): VisualKeyboard {
-      let device = com.keyman.singleton.util.device;
-
-      // Root element sets its own classes, one of which is 'kmw-osk-inner-frame'.
-      let vkbd = new VisualKeyboard(keyboard, device);
-
-      // Ensure the OSK's current layer is kept up to date.
-      let core = com.keyman.singleton.core; // Note:  will eventually be a class field.
-      core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
-
-      // Set box class - OS and keyboard added for Build 360
-      this._Box.className=device.formFactor+' '+ device.OS.toLowerCase() + ' kmw-osk-frame';
-
-      // Add primary keyboard element to OSK
-      return vkbd;
     }
 
     /**
@@ -499,6 +189,7 @@ namespace com.keyman.osk {
       c['userSet'] = this.userPositioned ? 1 : 0;
       c['left'] = p.left;
       c['top'] = p.top;
+      c['_version'] = utils.Version.CURRENT.toString();
 
       if(this.vkbd) {
         c['width'] = this.width.val;
@@ -522,12 +213,17 @@ namespace com.keyman.osk {
       this.userPositioned = util.toNumber(c['userSet'], 0) == 1;
       this.x = util.toNumber(c['left'],-1);
       this.y = util.toNumber(c['top'],-1);
+      let cookieVersionString = c['_version'];
 
       // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
-      var dfltWidth=0.3*screen.width;
+      let dfltWidth=0.3*screen.width;
+      let dfltHeight=0.15*screen.height;
       //if(util.toNumber(c['width'],0) == 0) dfltWidth=0.5*screen.width;
-      var newWidth=util.toNumber(c['width'],dfltWidth),
-          newHeight=util.toNumber(c['height'],0.15*screen.height);
+      let newWidth  = parseInt(c['width'], 10);
+      let newHeight = parseInt(c['height'], 10);
+      let isNewCookie = isNaN(newHeight);
+      newWidth  = isNaN(newWidth)  ? dfltWidth  : newWidth;
+      newHeight = isNaN(newHeight) ? dfltHeight : newHeight;
 
       // Limit the OSK dimensions to reasonable values
       if(newWidth < 0.2*screen.width) {
@@ -541,6 +237,20 @@ namespace com.keyman.osk {
       }
       if(newHeight > 0.5*screen.height) {
         newHeight=0.5*screen.height;
+      }
+
+      // if(!cookieVersionString) - this component was not tracked until 15.0.
+      // Before that point, the OSK's title bar and resize bar heights were not included
+      // in the OSK's cookie-persisted height.
+      if(isNewCookie || !cookieVersionString) {
+        // Adds some space to account for the OSK's header and footer, should they exist.
+        if(this.headerView && this.headerView.layoutHeight.absolute) {
+          newHeight += this.headerView.layoutHeight.val;
+        }
+
+        if(this.footerView && this.footerView.layoutHeight.absolute) {
+          newHeight += this.footerView.layoutHeight.val;
+        }
       }
 
       this.setSize(newWidth, newHeight);
@@ -564,42 +274,11 @@ namespace com.keyman.osk {
       }
     }
 
-    /*private*/ setSize(width?: number, height?: number, pending?: boolean) {
-      let mutatedFlag = false;
-
-      if(width && height) {
-        mutatedFlag = !this._width || !this._height;
-
-        const parsedWidth = ParsedLengthStyle.inPixels(width);
-        const parsedHeight = ParsedLengthStyle.inPixels(height);
-
-        mutatedFlag = mutatedFlag || parsedWidth.styleString  != this._width.styleString;
-        mutatedFlag = mutatedFlag || parsedHeight.styleString != this._height.styleString;
-
-        this._width = parsedWidth;
-        this._height = parsedHeight;
-      }
-
-      this.needsLayout = this.needsLayout || mutatedFlag;
-
-      if(this.vkbd) {
-        this.vkbd.setSize(width, height - this.getBannerHeight(), pending);
-      }
-    }
-
-    /**
-     * Get the wanted height of the banner (does not include the keyboard)
-     *  @return   {number}    height in pixels
-     */
-    getBannerHeight(): number {
-      return (this.banner != null) ? this.banner.height : 0;
-    }
-
     /**
      * Get the wanted height of the OSK for touch devices (does not include banner height)
      *  @return   {number}    height in pixels
      **/
-    getKeyboardHeight(): number {
+    getDefaultKeyboardHeight(): number {
       let keymanweb = com.keyman.singleton;
       let device = keymanweb.util.device;
 
@@ -630,19 +309,11 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Get the wanted height of the OSK for touch devices (banner height + rows of keys)
-     *  @return   {number}    height in pixels
-     **/
-    getHeight(): number {
-      return this.getBannerHeight() + this.getKeyboardHeight();
-    }
-
-    /**
      * Get the wanted width of the OSK for touch devices
      *
      *  @return   {number}    height in pixels
      **/
-    getWidth(): number {
+    getDefaultWidth(): number {
       let keymanweb = com.keyman.singleton;
       let device = keymanweb.util.device;
 
@@ -847,24 +518,21 @@ namespace com.keyman.osk {
      */
     _Show(Px?: number, Py?: number) {
       let keymanweb = com.keyman.singleton;
-      let device = keymanweb.util.device;
+      let device = this.device;
 
       // Do not try to display OSK if undefined, or no active element
-      if(this._Box == null || keymanweb.domManager.getActiveElement() == null) {
+      if(keymanweb.domManager.getActiveElement() == null) {
         return;
       }
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if((!device.touchable) && (keymanweb.core.activeKeyboard == null || !this._Enabled)) {
+      if((!device.touchable) && (this.activeKeyboard == null || !this._Enabled)) {
         return;
       }
 
-      var Ls = this._Box.style;
+      this.makeVisible();
 
-      // Do not display OSK until it has been positioned correctly
-      if(device.touchable && Ls.bottom == '') {
-        Ls.visibility='hidden';
-      }
+      var Ls = this._Box.style;
 
       if(device.touchable) {
         /* In case it's still '0' from a hide() operation.
@@ -877,34 +545,15 @@ namespace com.keyman.osk {
         Ls.opacity='1';
       }
 
-      // TODO:  Move this into the VisualKeyboard class!
       // The following code will always be executed except for externally created OSK such as EuroLatin
-      if(this.vkbd) {
-        // Enable the currently active keyboard layer and update the default nextLayer member
-        this.vkbd.updateState();
+      if(this.vkbd && device.touchable) {
+        Ls.position='fixed';
+        Ls.left=Ls.bottom='0px';
+        Ls.border='none';
+        Ls.borderTop='1px solid gray';
 
-        // Extra style changes and overrides for touch-mode.
-        if(device.touchable) {
-          let ks = this.vkbd.kbdDiv.style;
-          ks.position = Ls.position='fixed';
-          ks.bottom = Ls.left=Ls.bottom='0px';
-          Ls.border='none';
-          Ls.borderTop='1px solid gray';
-
-          this._Enabled=true;
-          this._Visible=true; // I3363 (Build 301)
-        }
-      }
-
-      //TODO: may need to return here for touch devices??
-      Ls.display='block'; //Ls.visibility='visible';
-
-      if(this.needsLayout) { // first thing after it's made visible.
-        this.refreshLayout();
-      }
-
-      if(this.vkbd) {
-        this.vkbd.showLanguage();
+        this._Enabled=true;
+        this._Visible=true; // I3363 (Build 301)
       }
 
       if(device.formFactor == 'desktop') {
@@ -953,13 +602,6 @@ namespace com.keyman.osk {
         }
       }
 
-      // If OSK still hidden, make visible only after all calculation finished
-      if(Ls.visibility == 'hidden') {
-        window.setTimeout(function(){
-          this._Box.style.visibility='visible';
-        }.bind(this), 0);
-      }
-
       // Allow desktop UI to execute code when showing the OSK
       if(!device.touchable) {
         var Lpos={};
@@ -967,41 +609,6 @@ namespace com.keyman.osk {
         Lpos['y']=this._Box.offsetTop;
         Lpos['userLocated']=this.userPositioned;
         this.doShow(Lpos);
-      }
-    }
-
-    public refreshLayout(): void {
-      // Step 1:  have the necessary conditions been met?
-      const fixedSize = this.width && this.height && this.width.absolute && this.height.absolute;
-      const computedStyle = getComputedStyle(this._Box);
-      const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
-
-      // Step 2:  determine basic layout geometry
-      if(fixedSize) {
-        this._computedWidth  = this.width.val;
-        this._computedHeight = this.height.val;
-      } else if(isInDOM) {
-        this._computedWidth   = parseInt(computedStyle.width, 10);
-        this._computedHeight  = parseInt(computedStyle.height, 10);
-      } else {
-        // Cannot perform layout operations!
-        return;
-      }
-
-      // Must be set before any references to the .computedWidth and .computedHeight properties!
-      this.needsLayout = false;
-
-      // Step 3:  perform layout operations.
-      if(this.vkbd) {
-        // +5:  from kmw-banner-bar's 'top' attribute.
-        const vkbdHeight = this.computedHeight - (this.banner.height ? this.banner.height + 5 : 0);
-        this.vkbd.setSize(this.computedWidth, vkbdHeight);
-        this.vkbd.refreshLayout();
-
-        if(this.vkbd.usesFixedHeightScaling) {
-          var b: HTMLElement = this._Box, bs=b.style;
-          bs.height=bs.maxHeight=this.computedHeight+'px';
-        }
       }
     }
 
@@ -1023,9 +630,8 @@ namespace com.keyman.osk {
       }
 
       // Save current size if visible
-      if(this._Box && this._Box.style.display == 'block' && this.vkbd) {
-        this.vkbd.refit();
-      }
+      const priorDisplayStyle = this._Box.style.display;
+      this.makeHidden(hiddenByUser);
 
       if(hiddenByUser) {
         //osk.loadCookie(); // preserve current offset and userlocated state
@@ -1041,6 +647,9 @@ namespace com.keyman.osk {
       this._Visible = false;
       if(this._Box && device.touchable && this._Box.offsetHeight > 0) { // I3363 (Build 301)
         var os=this._Box.style;
+        // Prevent insta-hide behavior; we want an animated fadeout here.
+        os.display = priorDisplayStyle;
+
         //Firefox doesn't transition opacity if start delay is explicitly set to 0!
         if(typeof(os.MozBoxSizing) == 'string') {
           os.transition='opacity 0.8s linear';
@@ -1068,10 +677,6 @@ namespace com.keyman.osk {
             this._Box.addEventListener('webkitTransitionEnd', this.hideNow, false);
           }
         }.bind(this), 200);      // Wait a bit before starting, to allow for moving to another element
-      } else {
-        if(this._Box) {
-          this._Box.style.display = 'none';
-        }
       }
 
       // Allow UI to execute code when hiding the OSK
@@ -1192,15 +797,6 @@ namespace com.keyman.osk {
      */
     ['addEventListener'](event: string, func: (obj) => boolean) {
       return com.keyman.singleton.util.addEventListener('osk.'+event, func);
-    }
-
-    ['shutdown']() {
-      // Remove the OSK's elements from the document, allowing them to be properly cleaned up.
-      // Necessary for clean engine testing.
-      var _box = this._Box;
-      if(_box.parentElement) {
-        _box.parentElement.removeChild(_box);
-      }
     }
   }
 }

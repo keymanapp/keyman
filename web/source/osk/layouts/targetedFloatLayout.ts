@@ -45,10 +45,6 @@ namespace com.keyman.osk.layouts {
     }
 
     attachToView(view: OSKManager) {
-      if(this.oskView) {
-        throw new Error("This layout is already attached to an OSK.");
-      }
-
       this.oskView = view;
       this.titleDragHandler.enabled = !view.noDrag;
       this.resizeDragHandler.enabled = true; // by default.
@@ -148,8 +144,8 @@ namespace com.keyman.osk.layouts {
             return;
           }
 
-          this.startWidth = layout.oskView.vkbd.kbdDiv.offsetWidth;
-          this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
+          this.startWidth = layout.oskView.computedWidth;
+          this.startHeight = layout.oskView.computedHeight;
 
           let keymanweb = com.keyman.singleton;
 
@@ -200,8 +196,8 @@ namespace com.keyman.osk.layouts {
           }
 
           if(layout.oskView.vkbd) {
-            this.startWidth  = layout.oskView.vkbd.kbdDiv.offsetWidth;
-            this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
+            this.startWidth  = layout.oskView.computedWidth;
+            this.startHeight = layout.oskView.computedHeight;
           }
           layout.oskView.refreshLayout(); // Finalize the resize.
           layout.oskView.doResizeMove();

@@ -1,4 +1,5 @@
 /// <reference path="banner.ts" />
+/// <reference path="oskViewComponent.ts" />
 
 namespace com.keyman.osk {
   /**
@@ -49,7 +50,7 @@ namespace com.keyman.osk {
    *       needs to reserve this space (i.e: Keyman for iOS),
    *       rather than as its standalone app.
    */
-  export class BannerManager {
+  export class BannerManager implements OSKViewComponent {
     private _activeType: BannerType;
     private _options: BannerOptions = {};
     private bannerContainer: HTMLDivElement;
@@ -210,7 +211,7 @@ namespace com.keyman.osk {
      * @param state 
      */
     selectBanner(state: text.prediction.StateChangeEnum) {
-      // Only display a SuggestionBanner when LanguageProcessor states it is active.s
+      // Only display a SuggestionBanner when LanguageProcessor states it is active.
       if(state == 'active') {
         this.setBanner('suggestion');
       } else if(state == 'inactive') {
@@ -222,7 +223,7 @@ namespace com.keyman.osk {
       } else if(state == 'configured') {
         let suggestionBanner = this.activeBanner as SuggestionBanner;
         if(suggestionBanner.postConfigure) {
-          // Triggers the initially-displayed suggestions.s
+          // Triggers the initially-displayed suggestions.
           suggestionBanner.postConfigure();
         }
       }
@@ -251,7 +252,7 @@ namespace com.keyman.osk {
       // Null guard b/c this function can be trigggered during OSK initialization.
       let keyman = com.keyman.singleton;
       if(keyman['osk']) {
-        keyman['osk']._Show();
+        keyman['osk'].refreshLayout();
       }
     }
 
@@ -278,5 +279,11 @@ namespace com.keyman.osk {
         this.activeBanner.height = h;
       }
     }
+
+    public get layoutHeight(): ParsedLengthStyle {
+      return ParsedLengthStyle.inPixels(this.height);
+    }
+
+    public refreshLayout() {};
   }
 }

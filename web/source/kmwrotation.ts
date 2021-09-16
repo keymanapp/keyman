@@ -54,7 +54,7 @@ namespace com.keyman {
       
       osk._Load();
       if(this.oskVisible) {
-        osk._Show();
+        osk.refreshLayout();
       }
 
       this.isActive = false;

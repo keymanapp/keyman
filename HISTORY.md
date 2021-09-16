@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.113 alpha 2021-09-16
+
+* fix(ios): version-tagging for errors logged from the system keyboard (#5693)
+* fix(web): spacebar caption when functional layer differs from display layer (#5688)
+* refactor(web): OSK modularization - view components, layout cleanup  ️ (#5619)
+* refactor(web): OSK modularization - common-path code -> OSKView  ️ (#5620)
+* fix(common/core/web): Remove empty rows in OSK (#5699)
+
 ## 15.0.112 alpha 2021-09-14
 
 * chore(common): Update to Unicode 14.0 (#5686)

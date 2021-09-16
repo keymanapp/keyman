@@ -718,7 +718,7 @@ namespace com.keyman {
 
       PKbd = PKbd || this.core.activeKeyboard;
 
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.getKeyboardHeight());
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.computedHeight);
     }
   }
 }
