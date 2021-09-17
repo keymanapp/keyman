@@ -22,9 +22,12 @@ type
     FState: pkm_kbp_state;
     class var KeymanCoreLoaded: Boolean;
     class procedure InitKeymanCore; static;
+    function GetKMXPlatform: string;
+    procedure SetKMXPlatform(const Value: string);
   public
     constructor Create(const Filename: string; EnableDebug: Boolean);
     destructor Destroy; override;
+    property KMXPlatform: string read GetKMXPlatform write SetKMXPlatform;
     property Keyboard: pkm_kbp_keyboard read FKeyboard;
     property State: pkm_kbp_state read FState;
   end;
@@ -84,6 +87,36 @@ begin
     _km_kbp_set_library_path(path);
     KeymanCoreLoaded := True;
   end;
+end;
+
+function TDebugCore.GetKMXPlatform: string;
+var
+  p: pkm_kbp_cp;
+  status: km_kbp_status;
+begin
+  status := km_kbp_state_option_lookup(
+    FState,
+    KM_KBP_OPT_ENVIRONMENT,
+    pkm_kbp_cp(PWideChar(KM_KBP_KMX_ENV_PLATFORM)),
+    p
+  );
+  if status <> KM_KBP_STATUS_OK then
+    raise EDebugCore.CreateFmt('Unable to locate platform, error %x', [Ord(status)]);
+  Result := PWideChar(p);
+end;
+
+procedure TDebugCore.SetKMXPlatform(const Value: string);
+var
+  options: array[0..1] of km_kbp_option_item;
+  status: km_kbp_status;
+begin
+  options[0].key := pkm_kbp_cp(PWideChar(KM_KBP_KMX_ENV_PLATFORM));
+  options[0].value := pkm_kbp_cp(PWideChar(Value));
+  options[0].scope := KM_KBP_OPT_ENVIRONMENT;
+  options[1] := KM_KBP_OPTIONS_END;
+  status := km_kbp_state_options_update(FState, @options[0]);
+  if status <> KM_KBP_STATUS_OK then
+    raise EDebugCore.CreateFmt('Unable to set platform, error %x', [Ord(status)]);
 end;
 
 end.

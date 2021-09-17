@@ -54,6 +54,7 @@ uses
   UfrmDebugStatus_Events,
   UfrmDebugStatus_Key,
   UfrmDebugStatus_RegTest,
+  UfrmDebugStatus_Options,
   UfrmTike;
 
 const
@@ -62,6 +63,8 @@ const
   DebugTab_CallStack         = 2;
   DebugTab_Deadkeys          = 3;
   DebugTab_RegressionTesting = 4;
+  DebugTab_Options           = 5;
+  DebugTab_Events            = 6;
 
 type
   TfrmDebugStatus = class(TTikeForm)
@@ -72,6 +75,7 @@ type
     tabDebugRegressionTesting: TTabSheet;
     tabDebugKey: TTabSheet;
     tabDebugEvents: TTabSheet;
+    tabDebugOptions: TTabSheet;
     procedure FormCreate(Sender: TObject);
   private
     FChildren: TArray<TfrmDebugStatus_Child>;
@@ -81,6 +85,7 @@ type
     FRegTest: TfrmDebugStatus_RegTest;
     FKey: TfrmDebugStatus_Key;
     FEvents: TfrmDebugStatus_Events;
+    FOptions: TfrmDebugStatus_Options;
     FCurrentEvent: TDebugEvent;
 
     procedure SetDisplayFont(const Value: TFont);
@@ -103,6 +108,7 @@ type
     property DeadKeys: TfrmDebugStatus_DeadKeys read FDeadKeys;
     property RegTest: TfrmDebugStatus_RegTest read FRegTest;
     property Events: TfrmDebugStatus_Events read FEvents;
+    property Options: TfrmDebugStatus_Options read FOptions;
 
     class property ShowDebuggerEventsPanel: Boolean read FShowDebuggerEventsPanel write SetShowDebuggerEventsPanel;
   end;
@@ -120,36 +126,41 @@ begin
   pagesDebug.ActivePage := tabDebugKey;
   inherited;
 
-  SetLength(FChildren, 6);
+  SetLength(FChildren, 7);
   FKey := TfrmDebugStatus_Key.Create(Self);
   FKey.Parent := tabDebugKey;
   FKey.Visible := True;
-  FChildren[0] := FKey;
+  FChildren[DebugTab_Status] := FKey;
 
   FElements := TfrmDebugStatus_Elements.Create(Self);
   FElements.Parent := tabDebugStores;
   FElements.Visible := True;
-  FChildren[1] := FElements;
+  FChildren[DebugTab_Stores] := FElements;
 
   FCallStack := TfrmDebugStatus_CallStack.Create(Self);
   FCallStack.Parent := tabDebugCallStack;
   FCallStack.Visible := True;
-  FChildren[2] := FCallstack;
+  FChildren[DebugTab_CallStack] := FCallStack;
 
   FDeadKeys := TfrmDebugStatus_DeadKeys.Create(Self);
   FDeadKeys.Parent := tabDebugDeadkeys;
   FDeadKeys.Visible := True;
-  FChildren[3] := FDeadKeys;
+  FChildren[DebugTab_Deadkeys] := FDeadKeys;
 
   FRegTest := TfrmDebugStatus_RegTest.Create(Self);
   FRegTest.Parent := tabDebugRegressionTesting;
   FRegTest.Visible := True;
-  FChildren[4] := FRegTest;
+  FChildren[DebugTab_RegressionTesting] := FRegTest;
+
+  FOptions := TfrmDebugStatus_Options.Create(Self);
+  FOptions.Parent := tabDebugOptions;
+  FOptions.Visible := True;
+  FChildren[DebugTab_Options] := FOptions;
 
   FEvents := TfrmDebugStatus_Events.Create(Self);
   FEvents.Parent := tabDebugEvents;
   FEvents.Visible := True;
-  FChildren[5] := FEvents;
+  FChildren[DebugTab_Events] := FEvents;
   tabDebugEvents.TabVisible := FShowDebuggerEventsPanel;
 end;
 

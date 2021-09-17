@@ -36,11 +36,13 @@ inherited frmDebugStatus: TfrmDebugStatus
       Caption = 'Regression testing'
       ImageIndex = 3
     end
+    object tabDebugOptions: TTabSheet
+      Caption = 'Options'
+      ImageIndex = 6
+    end
     object tabDebugEvents: TTabSheet
       Caption = 'Events'
       ImageIndex = 5
-      ExplicitLeft = 8
-      ExplicitTop = 28
     end
   end
 end
