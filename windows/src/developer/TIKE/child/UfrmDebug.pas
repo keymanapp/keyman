@@ -145,6 +145,8 @@ type
     function SetKeyEventContext: Boolean;
     function HandleMemoKeydown(var Message: TMessage): Boolean;
     procedure SetCurrentEvent(Value: Integer);
+    procedure FinishBatch;
+    procedure StartBatch;
 
   protected
     function GetHelpTopic: string; override;
@@ -892,8 +894,8 @@ procedure TfrmDebug.ResetEvents;
 begin
   if _FCurrentEvent > 0 then
   begin
-    SetCurrentEvent(0);
     FEvents.Clear;
+    SetCurrentEvent(0);
   end;
 end;
 
@@ -1065,6 +1067,21 @@ begin
       else UIStatus := duiReadyForInput;
 end;
 
+procedure TfrmDebug.StartBatch;
+begin
+  frmDebugStatus.StartBatch;
+end;
+
+procedure TfrmDebug.FinishBatch;
+begin
+  if (frmDebugStatus <> nil) then // I2770, I2713
+  begin
+    frmDebugStatus.FinishBatch;
+    frmDebugStatus.Elements.UpdateStores(nil);
+    frmDebugStatus.Key.ShowKey(nil);
+  end;
+end;
+
 procedure TfrmDebug.SetUIStatus(const Value: TDebugUIStatus);
 var
   FOldUIStatus: TDebugUIStatus;
@@ -1084,20 +1101,14 @@ begin
         begin
           //SelectSystemLayout(False);
           EnableUI;
+          StartBatch;
           StatusText := 'Debugging';
-          memo.ReadOnly := True;
-        end;
-      duiReceivingEvents:
-        begin
-          DisableUI;
-          StatusText := 'Receiving events';
           memo.ReadOnly := True;
         end;
       duiFocusedForInput:
         begin
           DisableUI;
-          frmDebugStatus.Elements.UpdateStores(nil);
-          frmDebugStatus.Key.ShowKey(nil);
+          FinishBatch;
           StatusText := 'Focused for input';
           memo.ReadOnly := False;
           //SelectSystemLayout(True);
@@ -1109,11 +1120,7 @@ begin
           begin
             //SelectSystemLayout(False);
             EnableUI;
-            if (frmDebugStatus <> nil) then // I2770, I2713
-            begin
-              frmDebugStatus.Elements.UpdateStores(nil);
-              frmDebugStatus.Key.ShowKey(nil);
-            end;
+            FinishBatch;
             StatusText := 'Ready for input';
             memo.ReadOnly := True;
           end;

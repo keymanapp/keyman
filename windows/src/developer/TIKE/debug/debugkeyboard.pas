@@ -22,53 +22,49 @@ interface
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.SysUtils,
   kmxfile;
 
 { Load line number details from compiled keyboard }
 
 type
+  TDebugKeyList = class;
+
+  TDebugKey = class
+    Key: WORD;
+    Line: Cardinal;
+    ShiftFlags: Cardinal;
+    dpOutput: string;
+    dpContext: string;
+  end;
+
   TDebugGroup = class
-    Name: WideString;
+    Name: string;
     Line, MatchLine, NomatchLine: Integer;
+    Base: PKeyboardFileGroup;
+    Keys: TDebugKeyList;
+    Match: string;
+    Nomatch: string;
+    constructor Create;
+    destructor Destroy; override;
   end;
 
   TDebugStore = class
     SystemID: Integer;
-    Name, AString: WideString;
+    Name, AString: string;
+    Base: PKeyboardFileStore;
   end;
 
   TDebugDeadkey = class
-    Name: WideString;
+    Name: string;
     Value: Integer;
   end;
 
-  TDebugGroupList = class(TList)
-  protected
-    function Get(Index: Integer): TDebugGroup;
-    procedure Put(Index: Integer; Item: TDebugGroup);
-  public
-    property Items[Index: Integer]: TDebugGroup read Get write Put; default;
-    function Add(Item: TDebugGroup): Integer;
-  end;
-
-  TDebugStoreList = class(TList)
-  protected
-    function Get(Index: Integer): TDebugStore;
-    procedure Put(Index: Integer; Item: TDebugStore);
-  public
-    property Items[Index: Integer]: TDebugStore read Get write Put; default;
-    function Add(Item: TDebugStore): Integer;
-  end;
-
-  TDebugDeadkeyList = class(TList)
-  protected
-    function Get(Index: Integer): TDebugDeadkey;
-    procedure Put(Index: Integer; Item: TDebugDeadkey);
-  public
-    property Items[Index: Integer]: TDebugDeadkey read Get write Put; default;
-    function Add(Item: TDebugDeadkey): Integer;
-  end;
+  TDebugGroupList = class(TObjectList<TDebugGroup>);
+  TDebugStoreList = class(TObjectList<TDebugStore>);
+  TDebugDeadkeyList = class(TObjectList<TDebugDeadkey>);
+  TDebugKeyList = class(TObjectList<TDebugKey>);
 
   TDebugKeyboard = class
     BeginUnicodeLine, BeginANSILine: Integer;
@@ -130,37 +126,35 @@ implementation
 uses
   kmxfileconsts;
 
-{ TDebugGroupList }
-
-function TDebugGroupList.Get(Index: Integer): TDebugGroup;        begin Result := TDebugGroup(inherited Get(Index)); end;
-procedure TDebugGroupList.Put(Index: Integer; Item: TDebugGroup); begin inherited Put(Index, Pointer(Item)); end;
-function TDebugGroupList.Add(Item: TDebugGroup): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-
-{ TDebugDeadkeyList }
-
-function TDebugDeadkeyList.Get(Index: Integer): TDebugDeadkey;        begin Result := TDebugDeadkey(inherited Get(Index)); end;
-procedure TDebugDeadkeyList.Put(Index: Integer; Item: TDebugDeadkey); begin inherited Put(Index, Pointer(Item)); end;
-function TDebugDeadkeyList.Add(Item: TDebugDeadkey): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-
-{ TDebugStoreList }
-
-function TDebugStoreList.Get(Index: Integer): TDebugStore;          begin Result := TDebugStore(inherited Get(Index)); end;
-procedure TDebugStoreList.Put(Index: Integer; Item: TDebugStore);   begin inherited Put(Index, Pointer(Item)); end;
-function TDebugStoreList.Add(Item: TDebugStore): Integer;           begin Result := inherited Add(Pointer(Item)); end;
-
 { TDebugKeyboard }
 
 constructor TDebugKeyboard.Create(Filename: string);
 var
   ki: TKeyboardInfo;
-  pch, pch2: PByte;  // I3310
+  pch, pch2, pchg: PByte;  // I3310
   kfs: PKeyboardFileStore;
+  kfg: PKeyboardFileGroup;
   kfh: PKeyboardFileHeader;
-  grp, ln, i, n: Integer;
+  grp, ln, i, j, n: Integer;
   dk: TDebugDeadKey;
   ch: WideChar;
   store: TDebugStore;
-  s: WideString;
+  group: TDebugGroup;
+  s: string;
+  kfk: PKeyboardFileKey;
+  key: TDebugKey;
+
+  function StringFromMemory(dp: Cardinal): string;
+  var
+    pch: PByte;
+  begin
+    if dp = 0 then
+      Exit('');
+    pch := ki.MemoryDump.Memory;
+    Inc(pch, dp);
+    Result := PChar(pch);
+  end;
+
 begin
   inherited Create;
 
@@ -184,23 +178,45 @@ begin
     begin
       pch := PByte(Memory);  // I3310
       kfh := PKeyboardFileHeader(Memory);
+
+      Inc(pch, kfh.dpGroupArray);
+      kfg := PKeyboardFileGroup(pch);
+
+      for i := 0 to kfh.cxGroupArray - 1 do
+      begin
+        group := TDebugGroup.Create;
+        group.Base := kfg;
+        group.Match := StringFromMemory(kfg.dpMatch);
+        group.Nomatch := StringFromMemory(kfg.dpNoMatch);
+        Groups.Add(group);
+
+        pch := PByte(Memory);
+        Inc(pch, kfg.dpKeyArray);
+        kfk := PKeyboardFileKey(pch);
+        for j := 0 to kfg.cxKeyArray - 1 do
+        begin
+          key := TDebugKey.Create;
+          key.Key := kfk.Key;
+          key.Line := kfk.Line;
+          key.ShiftFlags := kfk.ShiftFlags;
+          key.dpOutput := StringFromMemory(kfk.dpOutput);
+          key.dpContext := StringFromMemory(kfk.dpContext);
+          group.Keys.Add(key);
+          Inc(kfk);
+        end;
+      end;
+
+      pch := PByte(Memory);  // I3310
       Inc(pch, kfh.dpStoreArray);
+      kfs := PKeyboardFileStore(pch);
 
       for i := 0 to kfh.cxStoreArray - 1 do
       begin
-        kfs := PKeyboardFileStore(pch);
-
         store := TDebugStore.Create;
+        store.Base := kfs;
         store.SystemID := kfs.dwSystemID;
-
-        pch2 := PByte(Memory);  // I3310
-        Inc(pch2, kfs.dpName);
-        store.Name := PWideChar(pch2);
-
-        pch2 := PByte(Memory);  // I3310
-        Inc(pch2, kfs.dpString);
-        store.AString := PWideChar(pch2);
-
+        store.Name := StringFromMemory(kfs.dpName);
+        store.AString := StringFromMemory(kfs.dpString);
         Stores.Add(store);
 
         if kfs.dwSystemID = TSS_DEBUG_LINE then
@@ -240,25 +256,32 @@ begin
             end;
           end;
         end;
-        Inc(pch, SizeOf(TKeyboardFileStore));
+        Inc(kfs);
       end;
     end;
   end;
-//  else
-  //  Memory := nil;
 end;
 
 destructor TDebugKeyboard.Destroy;
-var
-  i: Integer;
 begin
-  for i := 0 to Groups.Count - 1 do Groups[i].Free;
-  for i := 0 to Deadkeys.Count - 1 do Deadkeys[i].Free;
-  for i := 0 to Stores.Count - 1 do Stores[i].Free;
   Groups.Free;
   Deadkeys.Free;
   Stores.Free;
   Memory.Free;
+  inherited Destroy;
+end;
+
+{ TDebugGroup }
+
+constructor TDebugGroup.Create;
+begin
+  inherited Create;
+  Keys := TDebugKeyList.Create;
+end;
+
+destructor TDebugGroup.Destroy;
+begin
+  Keys.Free;
   inherited Destroy;
 end;
 

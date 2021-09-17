@@ -8,8 +8,14 @@ unit Keyman.System.Debug.DebugUIStatus;
 interface
 
 type
-  TDebugUIStatus = (duiInvalid, duiPaused, duiFocusedForInput, duiReadyForInput, duiReceivingEvents, duiDebugging,
-    duiClosing, duiDebuggingOutput, duiTest);
+  TDebugUIStatus = (
+    duiInvalid,
+    duiPaused,
+    duiFocusedForInput,
+    duiReadyForInput,
+    duiDebugging,
+    duiClosing,
+    duiTest);
 
 implementation
 
