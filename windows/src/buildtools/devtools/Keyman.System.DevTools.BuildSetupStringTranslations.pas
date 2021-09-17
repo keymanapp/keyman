@@ -65,9 +65,11 @@ begin
 
     // If string is too long, Delphi doesn't like it
     if (i mod 64) = 0 then
+    begin
       if InQuotes
-        then Result := Result + '''+'''
-        else Result := Result + '+';
+        then Result := Result + '''+'#13#10'    '''
+        else Result := Result + '+'#13#10'    ';
+    end;
   end;
   if InQuotes then
     Result := Result + '''';
