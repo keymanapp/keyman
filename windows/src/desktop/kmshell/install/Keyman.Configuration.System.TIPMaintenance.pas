@@ -327,7 +327,7 @@ begin
         if tags.Count > 0 then
         begin
           BCP47 := tags[0].Trim;
-          if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + tags[0].Trim) then
+          if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47) then
             LangID := GetLangIDFromValueName;
         end;
       finally
