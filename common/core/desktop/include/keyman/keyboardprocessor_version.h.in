@@ -1,0 +1,7 @@
+#define stringify(x) to_string(x)
+#define to_string(x) #x
+
+#define VERSION_MAJOR @majorver@
+#define VERSION_MINOR @minorver@
+#define VERSION_PATCH @patchver@
+#define VERSION_STRING stringify(@majorver@ ## . ## @minorver@ ## . ## @patchver@ ## .0)
