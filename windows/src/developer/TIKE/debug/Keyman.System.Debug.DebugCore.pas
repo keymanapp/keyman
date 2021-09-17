@@ -27,6 +27,8 @@ type
   public
     constructor Create(const Filename: string; EnableDebug: Boolean);
     destructor Destroy; override;
+    function GetOption(const name: string): string;
+    procedure SetOption(const name, value: string);
     property KMXPlatform: string read GetKMXPlatform write SetKMXPlatform;
     property Keyboard: pkm_kbp_keyboard read FKeyboard;
     property State: pkm_kbp_state read FState;
@@ -117,6 +119,36 @@ begin
   status := km_kbp_state_options_update(FState, @options[0]);
   if status <> KM_KBP_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to set platform, error %x', [Ord(status)]);
+end;
+
+function TDebugCore.GetOption(const name: string): string;
+var
+  p: pkm_kbp_cp;
+  status: km_kbp_status;
+begin
+  status := km_kbp_state_option_lookup(
+    FState,
+    KM_KBP_OPT_KEYBOARD,
+    pkm_kbp_cp(PWideChar(name)),
+    p
+  );
+  if status <> KM_KBP_STATUS_OK then
+    raise EDebugCore.CreateFmt('Unable to locate option %s, error %x', [name, Ord(status)]);
+  Result := PWideChar(p);
+end;
+
+procedure TDebugCore.SetOption(const name, value: string);
+var
+  options: array[0..1] of km_kbp_option_item;
+  status: km_kbp_status;
+begin
+  options[0].key := pkm_kbp_cp(PWideChar(Name));
+  options[0].value := pkm_kbp_cp(PWideChar(Value));
+  options[0].scope := KM_KBP_OPT_KEYBOARD;
+  options[1] := KM_KBP_OPTIONS_END;
+  status := km_kbp_state_options_update(FState, @options[0]);
+  if status <> KM_KBP_STATUS_OK then
+    raise EDebugCore.CreateFmt('Unable to set option %s, error %x', [name, Ord(status)]);
 end;
 
 end.

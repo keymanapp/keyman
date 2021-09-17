@@ -53,8 +53,9 @@ uses
   UfrmDebugStatus_Elements,
   UfrmDebugStatus_Events,
   UfrmDebugStatus_Key,
-  UfrmDebugStatus_RegTest,
   UfrmDebugStatus_Options,
+  UfrmDebugStatus_Platform,
+  UfrmDebugStatus_RegTest,
   UfrmTike;
 
 const
@@ -63,8 +64,10 @@ const
   DebugTab_CallStack         = 2;
   DebugTab_Deadkeys          = 3;
   DebugTab_RegressionTesting = 4;
-  DebugTab_Options           = 5;
-  DebugTab_Events            = 6;
+  DebugTab_Platform          = 5;
+  DebugTab_Options           = 6;
+  DebugTab_Events            = 7;
+  DebugTab__Max = 8;
 
 type
   TfrmDebugStatus = class(TTikeForm)
@@ -76,6 +79,7 @@ type
     tabDebugKey: TTabSheet;
     tabDebugEvents: TTabSheet;
     tabDebugOptions: TTabSheet;
+    tabDebugPlatform: TTabSheet;
     procedure FormCreate(Sender: TObject);
   private
     FChildren: TArray<TfrmDebugStatus_Child>;
@@ -86,6 +90,7 @@ type
     FKey: TfrmDebugStatus_Key;
     FEvents: TfrmDebugStatus_Events;
     FOptions: TfrmDebugStatus_Options;
+    FPlatform: TfrmDebugStatus_Platform;
     FCurrentEvent: TDebugEvent;
 
     procedure SetDisplayFont(const Value: TFont);
@@ -101,6 +106,8 @@ type
     procedure SetDebugCore(const Value: TDebugCore);
     procedure SetDebugKeyboard(const Value: TDebugKeyboard);
     procedure SetDebugMemo(const Value: TKeymanDeveloperDebuggerMemo);
+    procedure StartBatch;
+    procedure FinishBatch;
 
     property Key: TfrmDebugStatus_Key read FKey;
     property Elements: TfrmDebugStatus_Elements read FElements;
@@ -126,7 +133,7 @@ begin
   pagesDebug.ActivePage := tabDebugKey;
   inherited;
 
-  SetLength(FChildren, 7);
+  SetLength(FChildren, DebugTab__Max);
   FKey := TfrmDebugStatus_Key.Create(Self);
   FKey.Parent := tabDebugKey;
   FKey.Visible := True;
@@ -156,6 +163,11 @@ begin
   FOptions.Parent := tabDebugOptions;
   FOptions.Visible := True;
   FChildren[DebugTab_Options] := FOptions;
+
+  FPlatform := TfrmDebugStatus_Platform.Create(Self);
+  FPlatform.Parent := tabDebugPlatform;
+  FPlatform.Visible := True;
+  FChildren[DebugTab_Platform] := FPlatform;
 
   FEvents := TfrmDebugStatus_Events.Create(Self);
   FEvents.Parent := tabDebugEvents;
@@ -229,6 +241,26 @@ begin
     for i := 0 to Screen.FormCount - 1 do
       if Screen.Forms[i] is TfrmDebugStatus then
         (Screen.Forms[i] as TfrmDebugStatus).tabDebugEvents.TabVisible := Value;
+  end;
+end;
+
+procedure TfrmDebugStatus.StartBatch;
+var
+  child: TfrmDebugStatus_Child;
+begin
+  for child in FChildren do
+  begin
+    child.StartBatch;
+  end;
+end;
+
+procedure TfrmDebugStatus.FinishBatch;
+var
+  child: TfrmDebugStatus_Child;
+begin
+  for child in FChildren do
+  begin
+    child.FinishBatch;
   end;
 end;
 

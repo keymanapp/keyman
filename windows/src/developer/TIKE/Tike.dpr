@@ -291,6 +291,7 @@ uses
   Keyman.System.Debug.DebugCore in 'debug\Keyman.System.Debug.DebugCore.pas',
   Keyman.System.VisualKeyboardImportKMX in 'main\Keyman.System.VisualKeyboardImportKMX.pas',
   Keyman.UI.Debug.CharacterGridRenderer in 'debug\Keyman.UI.Debug.CharacterGridRenderer.pas',
+  UfrmDebugStatus_Platform in 'debug\UfrmDebugStatus_Platform.pas' {frmDebugStatus_Platform},
   UfrmDebugStatus_Options in 'debug\UfrmDebugStatus_Options.pas' {frmDebugStatus_Options};
 
 {$R *.RES}
