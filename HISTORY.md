@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 14.0.281 stable 2021-09-17
+
+* fix(common/models): keep/suggestion diacritic sensitivity when de-duping (#5552)
+* feat(ios): adds option for Simulator-compatible testing artifact (#5569)
+* chore(ios,windows): Update crowdin strings for Azerbaijani (#5487)
+* fix(oem/fv/ios): build configuration for 14.0's test-oriented simulator artifact (#5596)
+* fix(linux): Handle corrupt icon file (#5589)
+* fix(linux): Check for valid kmp file (#5590)
+* chore: fixup stable HISTORY.md (#5605)
+* chore(linux): Improve debian package script (#5624)
+* chore(linux): Fix uploading to Sentry (#5625)
+* chore(linux): Update changelog files (#5636)
+* fix(ios): iOS 13 and 14 only - stuck settings toggles (#5611)
+* fix(web): Fix layers for embedded longpress keys (#5651)
+* fix(linux): Use first keyboard language if none given (#5657)
+* fix(android/engine): Fix backspace on Android 5.0 (#5674)
+* chore(common): report-history (#5678)
+* fix(developer): ensure file modified after import from layout (#5677)
+* test(windows): investigate TIP crash (#5679)
+* fix(common/core/web): Remove empty rows in OSK (#5703)
+* fix(windows): fallback to filename if `&name` not set (#5685)
+
 ## 14.0.280 stable 2021-08-02
 
 * fix(android): displayName for keyboard was not optional (#5492)
