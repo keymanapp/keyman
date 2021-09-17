@@ -642,11 +642,11 @@
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUILanguageName" comment="User interface language name in the UI language">英语</string>
+  <string name="SKUILanguageName" comment="User interface language name in the UI language">中文</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKUILanguageNameWithEnglish" comment="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">英语</string>
+  <string name="SKUILanguageNameWithEnglish" comment="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">中文 (Chinese Simplified)</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
