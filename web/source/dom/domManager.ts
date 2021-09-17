@@ -1246,9 +1246,7 @@ namespace com.keyman.dom {
         if(this.lastActiveElement == null && this.activeElement == null) {
           // Assigning to the property does have side-effects.
           // If the property is already unset, it's best to not unset it again.
-          if(osk.activeTarget) {
-            osk.activeTarget = null;
-          }
+          osk.activeTarget = null;
           this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
         }
       }

@@ -191,6 +191,11 @@ namespace com.keyman.osk {
     }
 
     public set activeTarget(targ: text.OutputTarget) {
+      // If already null & set to null again, take no action.
+      if(this._target == null && targ == null) {
+        return;
+      }
+
       this._target = targ;
       this.commonCheckAndDisplay();
     }
@@ -226,7 +231,7 @@ namespace com.keyman.osk {
           return true;
         case 'static':
           return true;
-        case 'conditional':
+        case 'automatic':
           return !!this.activeTarget;
         default:
           console.error("Unexpected activation mode set for the OSK.");
@@ -776,7 +781,7 @@ namespace com.keyman.osk {
      * @returns `false` if the OSK is in an invalid state for being hidden from the user.
      */
     protected mayHide(hiddenByUser: boolean): boolean {
-      if(this.activationMode != 'conditional' && this.displayIfActive) {
+      if(this.activationMode != 'automatic' && this.displayIfActive) {
         return false;
       }
 
