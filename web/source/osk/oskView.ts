@@ -20,7 +20,7 @@ namespace com.keyman.osk {
   export enum ActivationMode {
     static      = "static",  // For use by documentation keyboards, eventually.
     manual      = "manual",
-    conditional = "conditional"
+    automatic = "automatic"
   }
   
   export abstract class OSKView {
@@ -75,7 +75,7 @@ namespace com.keyman.osk {
     private needsLayout: boolean = true;
 
     //
-    private _activationMode: ActivationMode = ActivationMode.conditional;
+    private _activationMode: ActivationMode = ActivationMode.automatic;
     private _displayIfActive: boolean = true;
 
     private _animatedHideTimeout: number;
@@ -191,6 +191,11 @@ namespace com.keyman.osk {
     }
 
     public set activeTarget(targ: text.OutputTarget) {
+      // If already null & set to null again, take no action.
+      if(this._target == null && targ == null) {
+        return;
+      }
+
       this._target = targ;
       this.commonCheckAndDisplay();
     }
@@ -205,7 +210,7 @@ namespace com.keyman.osk {
      */
     get activationMode(): ActivationMode {
       if(!this._activationMode) {
-        this._activationMode = ActivationMode.conditional;
+        this._activationMode = ActivationMode.automatic;
       }
 
       return this._activationMode;
@@ -226,7 +231,7 @@ namespace com.keyman.osk {
           return true;
         case 'static':
           return true;
-        case 'conditional':
+        case 'automatic':
           return !!this.activeTarget;
         default:
           console.error("Unexpected activation mode set for the OSK.");
@@ -248,6 +253,10 @@ namespace com.keyman.osk {
     }
 
     set displayIfActive(flag: boolean) {
+      if(this.displayIfActive == flag) {
+        return;
+      }
+
       // if is touch device or is CJK keyboard, this.displayIfActive must remain true.
       if(this.keyboard?.isCJK && !flag) {
         console.warn("Cannot hide display of OSK for CJK keyboards.");
@@ -334,7 +343,7 @@ namespace com.keyman.osk {
      * and the primary keyboard visualization elements.
      */
     get baseFontSize(): string {
-      return this.parsedBaseFontSize?.styleString;
+      return this.parsedBaseFontSize?.styleString || '';
     }
 
     protected get parsedBaseFontSize(): ParsedLengthStyle {
@@ -784,7 +793,7 @@ namespace com.keyman.osk {
       }
 
       if(!this._Box) {
-        return;
+        return false;
       }
 
       return true;
@@ -796,7 +805,7 @@ namespace com.keyman.osk {
      * @returns `false` if the OSK is in an invalid state for being hidden from the user.
      */
     protected mayHide(hiddenByUser: boolean): boolean {
-      if(this.activationMode != 'conditional' && this.displayIfActive) {
+      if(this.activationMode != 'automatic' && this.displayIfActive) {
         return false;
       }
 
@@ -958,7 +967,7 @@ namespace com.keyman.osk {
     showBuild() {
       let keymanweb = com.keyman.singleton;
       keymanweb.util.internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
-          +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
+          +'<span style="font-size:0.8em">Copyright &copy; 2021 SIL International</span>');
     }
 
     /**

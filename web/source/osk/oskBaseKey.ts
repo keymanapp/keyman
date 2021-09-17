@@ -21,6 +21,10 @@ namespace com.keyman.osk {
       return this.spec.coreID;
     }
 
+    getBaseId(): string {
+      return this.spec.baseKeyID;
+    }
+
     // Produces a small reference label for the corresponding physical key on a US keyboard.
     private generateKeyCapLabel(): HTMLDivElement {
       // Create the default key cap labels (letter keys, etc.)

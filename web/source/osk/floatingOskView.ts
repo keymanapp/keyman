@@ -180,6 +180,7 @@ namespace com.keyman.osk {
       c['userSet'] = this.userPositioned ? 1 : 0;
       c['left'] = p.left;
       c['top'] = p.top;
+      c['_version'] = utils.Version.CURRENT.toString();
 
       if(this.vkbd) {
         c['width'] = this.width.val;
@@ -199,14 +200,11 @@ namespace com.keyman.osk {
 
       var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
 
-      const displayIfActive = util.toNumber(c['visible'], 1) == 1;
-      if(this.displayIfActive != displayIfActive) {
-        // Setter triggers functions that can go recursive without the conditional check.
-        this.displayIfActive = displayIfActive;
-      }
+      this.displayIfActive = util.toNumber(c['visible'], 1) == 1;
       this.userPositioned = util.toNumber(c['userSet'], 0) == 1;
       this.x = util.toNumber(c['left'],-1);
       this.y = util.toNumber(c['top'],-1);
+      let cookieVersionString = c['_version'];
 
       // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
       let dfltWidth=0.3*screen.width;
@@ -232,7 +230,10 @@ namespace com.keyman.osk {
         newHeight=0.5*screen.height;
       }
 
-      if(isNewCookie) {
+      // if(!cookieVersionString) - this component was not tracked until 15.0.
+      // Before that point, the OSK's title bar and resize bar heights were not included
+      // in the OSK's cookie-persisted height.
+      if(isNewCookie || !cookieVersionString) {
         // Adds some space to account for the OSK's header and footer, should they exist.
         if(this.headerView && this.headerView.layoutHeight.absolute) {
           newHeight += this.headerView.layoutHeight.val;
@@ -477,7 +478,7 @@ namespace com.keyman.osk {
 
       Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
       Ls.left='0px';
-      if(this.specifiedPosition) {
+      if(this.specifiedPosition || this.userPositioned) {
         Ls.left = this.x+'px';
         Ls.top  = this.y+'px';
       } else {
