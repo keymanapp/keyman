@@ -20,8 +20,10 @@ pso enabled.
 
 ## Package builds
 
-Package builds happen on Launchpad and Jenkins. Package builds for the official Ubuntu/Debian
-repos happen outside of our control.
+Package builds happen on [Launchpad](#package-builds-on-launchpad) and
+[Jenkins](#package-builds-on-jenkins). Package builds for the official Ubuntu/Debian
+repos happen outside of our control. However, we
+[upload source packages](#uploading-debian-source-packages) to the Debian community.
 
 ## Package builds on Jenkins
 
@@ -257,7 +259,71 @@ to Launchpad:
 Refer to the [launchpad uploading help](https://help.launchpad.net/Packaging/PPA/Uploading)
 for troubleshooting and setting up for `dput` upload.
 
+## Uploading Debian source packages
+
+Unless you're a Debian maintainer you can't directly upload to the Debian repos.
+Instead you upload to <mentors.debian.net> and then look for a sponsor who will
+review the packages and upload them for you. Be prepared that this might take some
+persistence, and if somebody looks at it, it might take some iterations to get it
+accepted.
+
+The Keyman packages are maintained on the Debian side by the
+[Debian Input Method Team](https://wiki.debian.org/Teams/IMEPackagingTeam).
+
+**NOTE:** All `changelog` files should contain the exact same entry that was previously
+accepted into the Debian repo (plus the new entry for the new update). This means that
+when your upload got accepted into Debian (not <mentors.debian.net>) you'll have to
+update the `changelog` files to match what got accepted (sometimes the Debian maintainers
+will create additional package versions).
+
+### Prerequisites
+
+- an account on [mentors.debian.net](https://mentors.debian.net/accounts/register/)
+- an entry for `mentors` in your `.dput.cf` file:
+
+  ```bash
+  [mentors]
+  fqdn = mentors.debian.net
+  incoming = /upload
+  method = https
+  allow_unsigned_uploads = 0
+  progress_indicator = 2
+  # Allow uploads for UNRELEASED packages
+  allowed_distributions = .*
+  ```
+
+- subscribe to the [debian-input-method](debian-input-method@lists.debian.org) mailing list
+
+### Updating and uploading Debian package
+
+This is done in several steps:
+
+1. Download the source code from <download.keyman.com> and create the source package by running
+   `scripts/debian.sh`
+2. sign the source package (you might be able to omit this step if the source package already
+   got signed with the correct key in the previous step)
+3. upload to mentors
+4. file a RFS bug (Request For Sponsorship) against the `sponsorship-requests` pseudo-package,
+   cc'ing `debian-input-method`
+
+The first three steps can be done by running these commands:
+
+```bash
+cd linux
+DIST=unstable scripts/debian.sh
+cd debianpackage/
+debsign -k$DEBSIGN_KEYID --re-sign *.changes
+dput mentors *.changes
+```
+
 ## Reference
 
 See the [Linux readme](https://github.com/keymanapp/keyman/blob/master/linux/README.md)
 for how to build Keyman on Linux etc.
+
+### References for Debian packaging
+
+- [mentors intro](https://mentors.debian.net/intro-maintainers/), especially section
+  3 (Publish your package)
+- explanation of the [sponsoring process](https://mentors.debian.net/sponsors/)
+- [personal package upload page](https://mentors.debian.net/packages/my/)

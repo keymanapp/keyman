@@ -16,9 +16,10 @@ public final class WebViewUtils {
 
   // Keyman Engine functionality based on Chrome version
   public enum EngineWebViewVersionStatus {
-    DISABLED, // WebView doesn't support touch keyboard features
-    DEGRADED, // WebView supports touch keyboards but not LDML keyboards
-    FULL;     // WebView supports touch keyboards and LDML keyboards
+    UNDETERMINED, // Functionality not determined yet
+    DISABLED,     // WebView doesn't support touch keyboard features
+    DEGRADED,     // WebView supports touch keyboards but not LDML keyboards
+    FULL;         // WebView supports touch keyboards and LDML keyboards
   }
 
   private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d.]+).*$";
@@ -41,13 +42,13 @@ public final class WebViewUtils {
       chromeVersion = getChromeVersion(context, webView);
     }
 
-    if (FileUtils.compareVersions(chromeVersion, "57.0") == FileUtils.VERSION_GREATER) {
-      return EngineWebViewVersionStatus.FULL;
-    } else if (FileUtils.compareVersions(chromeVersion, "37.0") == FileUtils.VERSION_GREATER) {
+    if (FileUtils.compareVersions("37.0", chromeVersion) == FileUtils.VERSION_GREATER) {
+      return EngineWebViewVersionStatus.DISABLED;
+    } else if (FileUtils.compareVersions("57.0", chromeVersion) == FileUtils.VERSION_GREATER) {
       return EngineWebViewVersionStatus.DEGRADED;
     }
 
-    return EngineWebViewVersionStatus.DISABLED;
+    return EngineWebViewVersionStatus.FULL;
   }
 
   // Inject a meta viewport tag into the head of the file if it doesn't exist

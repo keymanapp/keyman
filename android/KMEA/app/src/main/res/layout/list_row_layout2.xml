@@ -33,6 +33,7 @@
     
     <ImageView
         android:id="@+id/image1"
+        android:background="@android:color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

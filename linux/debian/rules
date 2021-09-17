@@ -39,7 +39,7 @@ override_dh_auto_build:
 	# keyman-config
 	cd linux/keyman-config && \
 		make man && \
-		sed -i -e "s/^__pkgversion__ = \"\"/__pkgversion__ = \"$(DEB_VERSION)\"/g" keyman_config/version.py && \
+		sed -i -e "s/^__pkgversion__ = \"[^\"]*\"/__pkgversion__ = \"$(DEB_VERSION)\"/g" keyman_config/version.py && \
 		make compile-po
 	dh_auto_build --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 

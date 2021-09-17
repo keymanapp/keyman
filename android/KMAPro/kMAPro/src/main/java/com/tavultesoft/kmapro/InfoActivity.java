@@ -14,6 +14,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 
@@ -31,6 +32,33 @@ public class InfoActivity extends BaseActivity {
     final Context context = this;
 
     setContentView(R.layout.activity_info);
+
+    // Navigation buttons
+    final ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
+    backButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onBackPressed();
+      }
+    });
+
+    final ImageButton forwardButton = (ImageButton) findViewById(R.id.forward_button);
+    forwardButton.setEnabled(false);
+    forwardButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (webView != null && webView.canGoForward()) {
+          webView.goForward();
+        }
+      }
+    });
+
+    final ImageButton closeButton = (ImageButton) findViewById(R.id.close_button);
+    closeButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        finish();
+      }
+    });
 
     TextView version = findViewById(R.id.infoVersion);
 
@@ -72,6 +100,9 @@ public class InfoActivity extends BaseActivity {
 
       @Override
       public void onPageFinished(WebView view, String url) {
+        if (webView != null) {
+          forwardButton.setEnabled(webView.canGoForward());
+        }
       }
     });
 
@@ -81,7 +112,12 @@ public class InfoActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
-    finish();
-    overridePendingTransition(0, android.R.anim.fade_out);
+    if (webView != null && webView.canGoBack()) {
+      webView.goBack();
+    } else {
+      super.onBackPressed();
+      finish();
+      overridePendingTransition(0, android.R.anim.fade_out);
+    }
   }
 }
