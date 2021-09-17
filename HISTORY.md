@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.114 alpha 2021-09-17
+
+* feat(developer): Debugger platform option (#5640)
+* feat(developer): Debugger keyboard options (#5647)
+* fix(developer): add version info to Core (#5711)
+* fix(common/core/web): layer reset on physical keystroke after OSK interaction (#5641)
+* fix(ios): prevents installation of packages without JS (#5698)
+
 ## 15.0.113 alpha 2021-09-16
 
 * fix(ios): version-tagging for errors logged from the system keyboard (#5693)
