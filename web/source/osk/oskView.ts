@@ -20,7 +20,7 @@ namespace com.keyman.osk {
   export enum ActivationMode {
     static      = "static",  // For use by documentation keyboards, eventually.
     manual      = "manual",
-    conditional = "conditional"
+    automatic = "automatic"
   }
   
   export abstract class OSKView {
@@ -75,7 +75,7 @@ namespace com.keyman.osk {
     private needsLayout: boolean = true;
 
     //
-    private _activationMode: ActivationMode = ActivationMode.conditional;
+    private _activationMode: ActivationMode = ActivationMode.automatic;
     private _displayIfActive: boolean = true;
 
     private _animatedHideTimeout: number;
@@ -205,7 +205,7 @@ namespace com.keyman.osk {
      */
     get activationMode(): ActivationMode {
       if(!this._activationMode) {
-        this._activationMode = ActivationMode.conditional;
+        this._activationMode = ActivationMode.automatic;
       }
 
       return this._activationMode;
@@ -764,7 +764,7 @@ namespace com.keyman.osk {
       }
 
       if(!this._Box) {
-        return;
+        return false;
       }
 
       return true;
