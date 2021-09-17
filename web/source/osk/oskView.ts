@@ -253,6 +253,10 @@ namespace com.keyman.osk {
     }
 
     set displayIfActive(flag: boolean) {
+      if(this.displayIfActive == flag) {
+        return;
+      }
+
       // if is touch device or is CJK keyboard, this.displayIfActive must remain true.
       if(this.keyboard?.isCJK && !flag) {
         console.warn("Cannot hide display of OSK for CJK keyboards.");

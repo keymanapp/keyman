@@ -200,11 +200,7 @@ namespace com.keyman.osk {
 
       var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
 
-      const displayIfActive = util.toNumber(c['visible'], 1) == 1;
-      if(this.displayIfActive != displayIfActive) {
-        // Setter triggers functions that can go recursive without the conditional check.
-        this.displayIfActive = displayIfActive;
-      }
+      this.displayIfActive = util.toNumber(c['visible'], 1) == 1;
       this.userPositioned = util.toNumber(c['userSet'], 0) == 1;
       this.x = util.toNumber(c['left'],-1);
       this.y = util.toNumber(c['top'],-1);
@@ -482,7 +478,7 @@ namespace com.keyman.osk {
 
       Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
       Ls.left='0px';
-      if(this.specifiedPosition) {
+      if(this.specifiedPosition || this.userPositioned) {
         Ls.left = this.x+'px';
         Ls.top  = this.y+'px';
       } else {
