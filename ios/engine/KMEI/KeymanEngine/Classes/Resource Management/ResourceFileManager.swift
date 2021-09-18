@@ -54,7 +54,7 @@ public class ResourceFileManager {
 
     var backingPackages: [KeymanPackage] = []
     for resource in userResources {
-      if let package = KeymanPackage.parse(Storage.active.resourceDir(for: resource)!) {
+      if let package = try? KeymanPackage.parse(Storage.active.resourceDir(for: resource)!) {
         // On successful parse, just ensure that we haven't already listed the package.
         if !backingPackages.contains(where: { $0.id == package.id }) {
           backingPackages.append(package)
@@ -86,14 +86,14 @@ public class ResourceFileManager {
 
   public func getInstalledPackage<Resource: LanguageResource>(for resource: Resource) -> Resource.Package? {
     if let packageDir = Storage.active.resourceDir(for: resource) {
-      return KeymanPackage.parse(packageDir) as? Resource.Package
+      return try? KeymanPackage.parse(packageDir) as? Resource.Package
     } else {
       return nil
     }
   }
 
   public func getInstalledPackage(withKey key: KeymanPackage.Key) -> KeymanPackage? {
-    return KeymanPackage.parse(Storage.active.packageDir(forKey: key))
+    return try? KeymanPackage.parse(Storage.active.packageDir(forKey: key))
   }
 
   internal func packageDownloadTempPath(forKey key: KeymanPackage.Key) -> URL {
@@ -183,10 +183,14 @@ public class ResourceFileManager {
     var extractionFolder = cacheDirectory
     extractionFolder.appendPathComponent("temp/\(archiveUrl.lastPathComponent)")
 
-    if let kmp = try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder) {
-      return kmp
-    } else {
-      throw KMPError.invalidPackage
+    do {
+      if let package = try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder) {
+        return package
+      } else {
+        throw KMPError.doesNotExist
+      }
+    } catch {
+      throw error
     }
   }
 
