@@ -102,10 +102,7 @@ nothing in that event.
 #include <stdlib.h>
 #include <keyman/keyboardprocessor_bits.h>
 #include <keyman/keyboardprocessor_vkeys.h>
-
-#define KM_KBP_LIB_CURRENT  @lib_curr@
-#define KM_KBP_LIB_AGE      @lib_age@
-#define KM_KBP_LIB_REVISION @lib_rev@
+#include <keyman/keyboardprocessor_version.h>
 
 #if defined(__cplusplus)
 extern "C"
