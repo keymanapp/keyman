@@ -185,6 +185,9 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char* file, i
 #define ShouldDebug(state) ShouldDebug_1()
 #define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __FILE__,__LINE__,__FUNCTION__))
 #define DebugLastError0(error, context) (DebugLastError_1((error), (context), __FILE__,__LINE__,__FUNCTION__))
+// On failed condition log "message", return FALSE
+// and assert if a debugger is attached for a debug build.
+#define DebugAssert(condition, message) (DebugAssert_1((condition),(message), __FILE__, __LINE__))
 int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char* file, int line, char* msg);
 int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char* file, int line, char* fmt, ...);
 void DebugLastError_1(DWORD err, char* context, char* file, int line, char* func);
@@ -193,32 +196,9 @@ void DebugShift(char* function, char* point);
 BOOL DebugSignalPause(BOOL fIsUp);
 char* Debug_VirtualKey(WORD vk);
 char* Debug_UnicodeString(PWSTR s, int x = 0);
-
+BOOL DebugAssert_1(BOOL condition, char* msg, char* file, int line);
 BOOL ShouldDebug_1(); // TSDMState state);
 
-// On failed condition it will always log "message" and return "retValue"
-// it will also assert if a debugger is attached for a debug build.
-#define DebugAssertRetValue(condition, message, retValue)               \
-  {                                                                     \
-    if (!(condition)) {                                                 \
-      SendDebugMessage_1(0, sdmGlobal, 0, __FILE__, __LINE__, message); \
-      if (IsDebugAssertEnabled()) {                                     \
-        assert(condition);                                              \
-      }                                                                 \
-      return retValue;                                                  \
-    }                                                                   \
-  }
-
-#define DebugAssert(condition, message)                                 \
-  {                                                                     \
-    if (!(condition)) {                                                 \
-      SendDebugMessage_1(0, sdmGlobal, 0, __FILE__, __LINE__, message); \
-      if (IsDebugAssertEnabled()) {                                     \
-        assert(condition);                                              \
-      }                                                                 \
-      return;                                                           \
-    }                                                                   \
-  }
 #endif
 
 #ifdef _DEBUG
