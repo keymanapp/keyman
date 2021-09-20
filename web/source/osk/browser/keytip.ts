@@ -31,7 +31,9 @@ namespace com.keyman.osk.browser {
       let util = keyman.util;
 
       // Create and display the preview
-      if(on) {
+      // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
+      // decent null-guard check.
+      if(on && key.offsetParent) {
         // The key element is positioned relative to its key-square, which is,
         // in turn, relative to its row.  Rows take 100% width, so this is sufficient.
         //

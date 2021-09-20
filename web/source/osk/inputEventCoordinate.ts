@@ -50,8 +50,8 @@ namespace com.keyman.osk {
     }
 
     public get activeInputCount(): number {
-      if(window['TouchEvent'] && this.source instanceof TouchEvent) {
-        return this.source.touches.length;
+      if(window['TouchEvent'] && this.source['touches'] !== undefined && this.source['touches'] !== null) {
+        return this.source['touches'].length;
       } else {
         const event = this.source as MouseEvent;
         return event.buttons > 0 ? 1 : 0;
