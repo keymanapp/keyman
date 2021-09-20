@@ -233,9 +233,6 @@ int main(int argc, char *argv []) {
   // Global setup
   //std::string path(argv[1]);
 
-  if(argc < 2) {
-   return error_args();
- }
 
   auto arg_color = argc > 1 && std::string(argv[1]) == "--color";
   if(arg_color && argc < 3) {
