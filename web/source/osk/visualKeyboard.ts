@@ -37,6 +37,8 @@ namespace com.keyman.osk {
     device: com.keyman.utils.DeviceSpec;
     hostDevice: com.keyman.utils.DeviceSpec;
 
+    inputEngine: InputEventEngine;
+
     isStatic: boolean = false;
     _fixedWidthScaling:  boolean = false;
     _fixedHeightScaling: boolean = true;
@@ -191,12 +193,11 @@ namespace com.keyman.osk {
       // Needs to occur AFTER this.kbdDiv is initialized.
       if (!this.isStatic) {
         if (this.hostDevice.touchable) {
-          const touchEngine = new TouchEventEngine(this);
-          touchEngine.registerEventHandlers();
+          this.inputEngine = new TouchEventEngine(this);
         } else {
-          const mouseEngine = new MouseEventEngine(this);
-          mouseEngine.registerEventHandlers();
+          this.inputEngine = new MouseEventEngine(this);
         }
+        this.inputEngine.registerEventHandlers();
       }
 
       Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
@@ -1711,6 +1712,10 @@ namespace com.keyman.osk {
       // Prevents style-sheet pollution from multiple keyboard swaps.
       if (this.styleSheet) {
         keyman.util.removeStyleSheet(this.styleSheet);
+      }
+
+      if(this.inputEngine) {
+        this.inputEngine.unregisterEventHandlers();
       }
     }
   }
