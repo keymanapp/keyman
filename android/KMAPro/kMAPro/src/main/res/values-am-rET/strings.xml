@@ -18,6 +18,10 @@
   <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">ማሻሻያዎችን ይጫኑ</string>
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">ስሪት %1$s</string>
+  <!-- Context: Text label when old Chrome version installed -->
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">ኪይማን የክሮም ስሪትን 57 ወይም አዲስ ይፈልጋል።</string>
+  <!-- Context: Button label -->
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">ክሮምን ማዘመን</string>
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">እዚህ ጋር መጻፍ ይጀምሩ &#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
@@ -37,7 +41,7 @@
   <!-- Context: Get Started menu -->
   <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">ኪይማኑን ለሲስተም ኪቦርድ እንዲሆን ያድርጉ</string>
   <!-- Context: Get Started menu -->
-  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">ኪማኑን መደበና የፊደል ገበታ ይሰይሙ</string>
+  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">ኪማኑን መደበኛ የፊደል ገበታ ይሰይሙ</string>
   <!-- Context: Get Started menu -->
   <string name="more_info" comment="Open the Keyman for Android help page">ተጨማሪ መረጃ</string>
   <!-- Context: Get Started menu -->
@@ -56,7 +60,27 @@
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">የተጫነ የፊደል ገበታ ወይም መዝገበ ቃላት</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="change_display_language" comment="Menu action to change interface language">የኪማኑን የገጽታ ቋንቋ ይቀይሩ</string>
+  <string name="change_display_language" comment="Menu action to change interface language">የገጽታ ቋንቋ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">የቋንቋ ገበታውን ቁመት ማስተካከል</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">የስፔስባሩ መግለጫ ጽሁፍ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">የፊደል ገበታ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">ቋንቋ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">ቋንቋና የፊደል ገበታ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">ባዶ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">የፊደል ገበታ ሰሌዳውን በስፔስ ባሩ ላይ አሳይ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">የቋንቋውን ስም በስፔስ ባሩ ላይ አሳይ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">ቋንቋና የፊደል ገበታውን በስፔስ ባሩ ላይ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">የስፔስባሩ መግለጫ ጽሁፍ አታሳይ</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">ሁልጊዜ ባነሩን አሳይ</string>
   <!-- Context: Keyman Settings menu -->
@@ -87,6 +111,12 @@
   <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">%1$s የተጨመረ ቋንቋ %2$s</string>
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">ሁሉም ቋንቋዎች ቀደም ሲል ተጭኗል</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">የፊደል ገበታ ሰሌዳውን በመጎተት ቁመቱን አስተካክል</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">ዲቫይሱን በማሽከርከር ፖርትሬቱንና ላንድስኬፑን አስተካክል</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="reset_to_defaults" comment="Button to reset to default heights">ወደ ቀደመው ሴቲንግ መልስ</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">ፈልግ ወይም URL ጻፍ</string>
   <!-- Context: Keyman Web Browser -->
