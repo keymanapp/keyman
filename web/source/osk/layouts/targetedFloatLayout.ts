@@ -7,7 +7,7 @@ namespace com.keyman.osk.layouts {
     titleBar: layouts.TitleBar;
     resizeBar: layouts.ResizeBar;
 
-    private oskView: OSKManager;
+    private oskView: FloatingOSKView;
 
     // Encapsulations of the drag behaviors for OSK movement & resizing
     private _moveHandler: MouseDragOperation;
@@ -44,8 +44,9 @@ namespace com.keyman.osk.layouts {
       return this.resizeDragHandler.isActive;
     }
 
-    attachToView(view: OSKManager) {
+    attachToView(view: FloatingOSKView) {
       this.oskView = view;
+      this.titleBar.attachHandlers(view);
       this.titleDragHandler.enabled = !view.noDrag;
       this.resizeDragHandler.enabled = true; // by default.
     }

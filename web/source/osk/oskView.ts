@@ -1,5 +1,6 @@
 // Includes the banner
 /// <reference path="./bannerManager.ts" />
+
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 // Models keyboards that present a help page, rather than a standard OSK.
@@ -7,6 +8,15 @@
 /// <reference path="emptyView.ts" />
 
 namespace com.keyman.osk {
+  export type OSKRect = {
+    'left'?: number,
+    'top'?: number,
+    'width'?: number,
+    'height'?: number,
+    'nosize'?: boolean,
+    'nomove'?: boolean
+  };
+
   export abstract class OSKView {
     _Box: HTMLDivElement;
 
@@ -86,7 +96,7 @@ namespace com.keyman.osk {
         _this.bannerView.selectBanner(state);
 
         if(currentType != _this.bannerView.activeType) {
-          _this.bannerView.refreshLayout();
+          _this.refreshLayout();
         }
 
         return true;
@@ -205,7 +215,7 @@ namespace com.keyman.osk {
      * and the primary keyboard visualization elements.
      */
     get baseFontSize(): string {
-      return this.parsedBaseFontSize.styleString;
+      return this.parsedBaseFontSize?.styleString || '';
     }
 
     protected get parsedBaseFontSize(): ParsedLengthStyle {
@@ -274,17 +284,18 @@ namespace com.keyman.osk {
       }
 
       this.needsLayout = this.needsLayout || mutatedFlag;
-
-      if(this.vkbd) {
-        let availableHeight = height - this.computeFrameHeight();
-        if(this.bannerView.height > 0) {
-          availableHeight -= this.bannerView.height + 5;
-        }
-        this.vkbd.setSize(width, availableHeight, pending);
-      }
+      this.refreshLayoutIfNeeded(pending);
     }
 
-    public refreshLayout(): void {
+    protected setNeedsLayout() {
+      this.needsLayout = true;
+    }
+
+    public refreshLayout(pending?: boolean): void {
+      if(!this.keyboardView) {
+        return;
+      }
+
       // Step 1:  have the necessary conditions been met?
       const fixedSize = this.width && this.height && this.width.absolute && this.height.absolute;
       const computedStyle = getComputedStyle(this._Box);
@@ -306,6 +317,12 @@ namespace com.keyman.osk {
       this.needsLayout = false;
 
       // Step 3:  perform layout operations.
+      if(!pending) {
+        this.headerView?.refreshLayout();
+        this.bannerView.refreshLayout();
+        this.footerView?.refreshLayout();
+      }
+
       if(this.vkbd) {
         let availableHeight = this.computedHeight - this.computeFrameHeight();
 
@@ -313,8 +330,10 @@ namespace com.keyman.osk {
         if(this.bannerView.height > 0) {
           availableHeight -= this.bannerView.height + 5;
         }
-        this.vkbd.setSize(this.computedWidth, availableHeight);
-        this.vkbd.refreshLayout();
+        this.vkbd.setSize(this.computedWidth, availableHeight, pending);
+        if(!pending) {
+          this.vkbd.refreshLayout();
+        }
 
         if(this.vkbd.usesFixedHeightScaling) {
           var b: HTMLElement = this._Box, bs=b.style;
@@ -323,9 +342,9 @@ namespace com.keyman.osk {
       }
     }
 
-    public refreshLayoutIfNeeded() {
+    public refreshLayoutIfNeeded(pending?: boolean) {
       if(this.needsLayout) {
-        this.refreshLayout();
+        this.refreshLayout(pending);
       }
     }
 
@@ -344,17 +363,16 @@ namespace com.keyman.osk {
 
     protected abstract postKeyboardLoad(): void;
 
-    private loadActiveKeyboard() {
-      let device = this.device;
+    protected abstract setBoxStyling(): void;
 
-      var s = this._Box.style;
-      s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
-      s.position = (device.formFactor == 'desktop' ? 'absolute' : 'fixed');
+    private loadActiveKeyboard() {
+      this.setBoxStyling();
 
       if(this.vkbd) {
         this.vkbd.shutdown();
       }
       this.keyboardView = null;
+      this.needsLayout = true;
 
       // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
       this._Box.innerHTML = '';
@@ -380,12 +398,6 @@ namespace com.keyman.osk {
       // Add footer element to OSK only for desktop browsers
       if(this.footerView) {
         this._Box.appendChild(this.footerView.element);
-      }
-
-      // Initializes the size of a touch keyboard.
-      if(this.vkbd && device.touchable) {
-        let targetOSKHeight = this.vkbd.computedAdjustedOskHeight(this.getDefaultKeyboardHeight());
-        this.setSize(this.getDefaultWidth(), targetOSKHeight + this.banner.height);
       }
       // END:  construction of the actual internal layout for the overall OSK
 
@@ -544,6 +556,184 @@ namespace com.keyman.osk {
       if(_box.parentElement) {
         _box.parentElement.removeChild(_box);
       }
+    }
+
+    /**
+     * Function     getRect
+     * Scope        Public
+     * @return      {Object.<string,number>}   Array object with position and size of OSK container
+     * Description  Get rectangle containing KMW Virtual Keyboard
+     */
+     ['getRect'](): OSKRect {		// I2405
+      var p: OSKRect = {};
+
+      // Always return these based upon _Box; using this.vkbd will fail to account for banner and/or
+      // the desktop OSK border.
+      p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
+      p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
+
+      p['width'] = this.computedWidth;
+      p['height'] = this.computedHeight;
+      return p;
+    }
+
+    /* ---- Legacy interfacing methods and fields ----
+     *
+     * The endgoal is to eliminate the need for these entirely, but extra work and care
+     * will be necessary to achieve said endgoal for these methods.
+     *
+     * The simplest way forward is to maintain them, then resolve them independently,
+     * one at a time.
+     */
+  
+    /*
+     * Display KMW OSK at specified position (returns nothing)
+     * 
+     * The positioning parameters only make sense for the FloatingOSKView type;
+     * other implementations should use no parameters whatsoever.
+     *
+     * @param       {number=}     Px      x-coordinate for OSK rectangle
+     * @param       {number=}     Py      y-coordinate for OSK rectangle
+     */
+    public abstract _Show(Px?: number, Py?: number);
+
+    /**
+     * Hide Keymanweb On Screen Keyboard
+     *
+     * @param       {boolean}   hiddenByUser    Distinguish between hiding on loss of focus and explicit hiding by user
+     */
+    public abstract _Hide(hiddenByUser: boolean);
+
+    /**
+     * Display build number
+     * 
+     * In the future, this should raise an event that the consuming KeymanWeb
+     * engine may listen for & respond to, rather than having it integrated
+     * as part of the OSK itself. 
+     */
+    showBuild() {
+      let keymanweb = com.keyman.singleton;
+      keymanweb.util.internalAlert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
+          +'<span style="font-size:0.8em">Copyright &copy; 2021 SIL International</span>');
+    }
+
+    /**
+     * Display list of installed keyboards in pop-up menu
+     * 
+     * In the future, this language menu should be defined as a UI module like the standard
+     * desktop UI modules.  The globe key should then trigger an event to _request_ that the
+     * consuming engine display the active UI module's menu.
+     * 
+     **/
+    showLanguageMenu() {
+      let menu = new LanguageMenu(com.keyman.singleton);
+      menu.show();
+    }
+
+    /**
+     * Function     hideNow
+     * Scope        Private
+     * Description  Hide the OSK unconditionally and immediately, cancel any pending transition
+     * 
+     * Usages:
+     * - during rotations to temporarily hide the OSK during layout ops
+     * - when controls lose focus (N/A to embedded mode)
+     * 
+     * Somewhat conflated with the _Show / _Hide methods, which often serve more as an
+     * "enable" vs "disable" feature on the OSK - though that distinction isn't super-clear.
+     * 
+     * Definitely needs clearer design & modeling, at the least.
+     */
+    hideNow: () => void = function(this: OSKView) { // I3363 (Build 301)
+      this._Box.removeEventListener('transitionend', this.hideNow, false);
+      this._Box.removeEventListener('webkitTransitionEnd', this.hideNow, false);
+
+      if(document.body.className.indexOf('osk-always-visible') >= 0) {
+        return;
+      }
+
+      var os=this._Box.style;
+      os.display='none';
+      os.opacity='1';
+      this._Visible=false;
+      os.transition=os.msTransition=os.MozTransition=os.WebkitTransition='';
+
+      if(this.vkbd) {
+        this.vkbd.onHide();
+      }
+    }.bind(this);
+
+    // OSK state fields
+    //
+    // They're not very well defined or encapsulated; there's definitely room for more
+    // "polish" here.
+    _Visible: boolean = false;
+    _Enabled: boolean = true;
+
+    /**
+     * Function     enabled
+     * Scope        Public
+     * @return      {boolean|number}    True if KMW OSK enabled
+     * Description  Test if KMW OSK is enabled
+     */
+     ['isEnabled'](): boolean {
+      return this._Enabled;
+    }
+
+    /**
+     * Function     isVisible
+     * Scope        Public
+     * @return      {boolean|number}    True if KMW OSK visible
+     * Description  Test if KMW OSK is actually visible
+     * Note that this will usually return false after any UI event that results in (temporary) loss of input focus
+     */
+    ['isVisible'](): boolean {
+      return this._Visible;
+    }
+
+    /**
+     * Function     hide
+     * Scope        Public
+     * Description  Prevent display of OSK window on focus
+     */
+     ['hide']() {
+      this._Enabled = false;
+      this._Hide(true);
+    }
+
+    /**
+     * Description  Display KMW OSK (at position set in callback to UI)
+     * Function     show
+     * Scope        Public
+     * @param       {(boolean|number)=}      bShow     True to display, False to hide, omitted to toggle
+     */
+     ['show'](bShow: boolean) {
+      if(arguments.length > 0) {
+        this._Enabled=bShow;
+        if(bShow) {
+          this._Show();
+        } else {
+          this._Hide(true);
+        }
+      } else {
+        if(this._Visible) {
+          this._Hide(true);
+        } else {
+          this._Show();
+        }
+      }
+    }
+
+    /**
+     * Function     addEventListener
+     * Scope        Public
+     * @param       {string}            event     event name
+     * @param       {function(Object)}  func      event handler
+     * @return      {boolean}
+     * Description  Wrapper function to add and identify OSK-specific event handlers
+     */
+    ['addEventListener'](event: string, func: (obj) => boolean) {
+      return com.keyman.singleton.util.addEventListener('osk.'+event, func);
     }
   }
 }

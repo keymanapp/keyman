@@ -1119,7 +1119,9 @@ namespace com.keyman.dom {
       // Allow the OSK to release its own resources
       if(this.keyman.osk) {
         this.keyman.osk.shutdown();
-        this.keyman.osk._Unload(); // I3363 (Build 301)
+        if(this.keyman.osk['_Unload']) {
+          this.keyman.osk['_Unload'](); // I3363 (Build 301)
+        }
       }
       
       this.clearLastActiveElement();
@@ -1555,7 +1557,7 @@ namespace com.keyman.dom {
       // Do not initialize until the document has been fully loaded
       if(document.readyState !== 'complete')
       {
-        return new Promise(function(resolve) {
+        return new Promise<void>(function(resolve) {
           window.setTimeout(function(){
             domManager.init(arg).then(function() {
               resolve();
@@ -1586,7 +1588,12 @@ namespace com.keyman.dom {
       this.keyman.setInitialized(1);
 
       // Finish keymanweb and initialize the OSK once all necessary resources are available
-      const osk = this.keyman.osk = new com.keyman.osk.OSKManager();
+      if(device.touchable) {
+        this.keyman.osk = new com.keyman.osk.AnchoredOSKView(device.coreSpec);
+      } else {
+        this.keyman.osk = new com.keyman.osk.FloatingOSKView(device.coreSpec);
+      }
+      const osk = this.keyman.osk;
     
       // Create and save the remote keyboard loading delay indicator
       util.prepareWait();
@@ -1633,6 +1640,7 @@ namespace com.keyman.dom {
       
       // I3363 (Build 301)
       if(device.touchable) {
+        const osk = keyman.osk as osk.AnchoredOSKView;
         // Handle OSK touchend events (prevent propagation)
         osk._Box.addEventListener('touchend',function(e){
           e.stopPropagation();
@@ -1746,7 +1754,7 @@ namespace com.keyman.dom {
         this.keyman.ui['initialize']();
         // Display the OSK (again) if enabled, in order to set its position correctly after
         // adding the UI to the page 
-        this.keyman.osk._Show();     
+        this.keyman.osk._Show();
       } else if(this.keyman.isEmbedded) {
         // UI modules aren't utilized in embedded mode.  There's nothing to init, so we simply
         // return instead of waiting for a UI module that will never come.
