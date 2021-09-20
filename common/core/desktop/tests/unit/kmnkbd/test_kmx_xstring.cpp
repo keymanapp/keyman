@@ -247,9 +247,5 @@ int main(int argc, char *argv []) {
 
   test_incxstr();
 
-  // Destroy them
-  //teardown();
-
-
   return 0;
 }
