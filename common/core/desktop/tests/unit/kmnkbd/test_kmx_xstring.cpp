@@ -243,7 +243,6 @@ int main(int argc, char *argv []) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
-  //arg_path = argv[arg_color ? 2 : 1];
 
   test_incxstr();
 
