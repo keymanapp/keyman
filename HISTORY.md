@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.115 alpha 2021-09-20
+
+* chore(common/core): cleanup version headers (#5719)
+* refactor(web): OSK modularization - specialized OSKView classes  ️ (#5633)
+* feat(developer): track changes to option values better in debugger (#5696)
+* fix(developer): support chiral modifiers in debugger (#5697)
+
 ## 15.0.114 alpha 2021-09-17
 
 * feat(developer): Debugger platform option (#5640)
