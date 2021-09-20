@@ -215,12 +215,9 @@ void test_incxstr() {
 }
 
 constexpr const auto help_str = "\
-debug_api [--color] <SOURCE_PATH>|--print-sizeof\n\
+test_kmx_xstring [--color]\n\
 \n\
-  --color         Force color output\n\
-  --print-sizeof  Emit structure sizes for interop debug\n\
-  SOURCE_PATH     Path where debug_api.cpp is found; kmx files are\n\
-                  located relative to this path.\n";
+  --color         Force color output\n";
 
 int error_args() {
   std::cerr << "debug_api: Invalid arguments." << std::endl;
