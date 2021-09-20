@@ -235,9 +235,6 @@ int main(int argc, char *argv []) {
 
 
   auto arg_color = argc > 1 && std::string(argv[1]) == "--color";
-  if(arg_color && argc < 3) {
-    return error_args();
-  }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
 
