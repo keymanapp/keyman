@@ -50,6 +50,7 @@ namespace com.keyman.osk {
     }
 
     public get activeInputCount(): number {
+      // May not be an ACTUAL touch event during unit tests.
       if(window['TouchEvent'] && this.source['touches'] !== undefined && this.source['touches'] !== null) {
         return this.source['touches'].length;
       } else {
