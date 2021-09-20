@@ -220,7 +220,7 @@ test_kmx_xstring [--color]\n\
   --color         Force color output\n";
 
 int error_args() {
-  std::cerr << "debug_api: Invalid arguments." << std::endl;
+  std::cerr << "test_kmx_xstring: Invalid arguments." << std::endl;
   std::cout << help_str;
   return 1;
 }
