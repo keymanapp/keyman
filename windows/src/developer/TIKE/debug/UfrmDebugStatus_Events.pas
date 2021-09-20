@@ -101,6 +101,8 @@ begin
     KM_KBP_DEBUG_NOMATCH_ENTER,
     KM_KBP_DEBUG_NOMATCH_EXIT:
       AddItem(rule.ItemType = KM_KBP_DEBUG_NOMATCH_ENTER, 'nomatch rule', rule);
+    KM_KBP_DEBUG_SET_OPTION:
+      AddItem(True, 'set option', rule);
     else
       lbCallStack.Items.AddObject('???', rule);
   end;

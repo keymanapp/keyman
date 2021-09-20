@@ -121,6 +121,14 @@ type
     fUsingKeys: LongBool;
   end;
 
+  TKeymanStore = packed record
+    dwSystemID: Cardinal;
+    dpName: PWideChar;
+    dpValue: PWideChar;
+  end;
+
+  PKeymanStore = ^TKeymanStore;
+
 implementation
 
 uses

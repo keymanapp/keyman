@@ -37,6 +37,26 @@ void KMX_DebugItems::push_item(
   _items->emplace_back(item);
 }
 
+void KMX_DebugItems::push_set_option(
+  uint16_t first_action,
+  LPSTORE option_store,
+  KMX_WCHAR const * value
+) {
+  _items->assert_push_entry();
+  km_kbp_state_debug_item item = {KM_KBP_DEBUG_SET_OPTION, 0};
+  item.kmx_info.first_action = first_action;
+  item.kmx_info.rule = nullptr;
+  item.kmx_info.group = nullptr;
+  item.kmx_info.context[0] = 0;
+  item.key_info.character = 0;
+  item.key_info.modifier_state = 0;
+  item.key_info.vk = 0;
+  item.kmx_info.store_offsets[0] = 0xFFFF;
+  item.kmx_info.option.store = option_store;
+  u16ncpy(item.kmx_info.option.value, value, DEBUG_MAX_CONTEXT - 1);
+  _items->emplace_back(item);
+}
+
 void KMX_DebugItems::fill_store_offsets(km_kbp_state_debug_kmx_info *info, PKMX_WORD index_stack) {
 
   int i, n;
