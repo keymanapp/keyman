@@ -95,11 +95,12 @@ BOOL LoadlpKeyboardCore(int i)
   if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
   PWCHAR keyboardPath = strtowstr(buf);
   km_kbp_status err_status = km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].lpCoreKeyboard);
-  delete keyboardPath;
   if (err_status != KM_KBP_STATUS_OK) {
-    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_keyboard_load failed with error status [%d]", err_status);
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
+    delete keyboardPath;
     return FALSE;
   }
+  delete keyboardPath;
 
   // TODO: 5650 handle dlls
   //LoadDLLs(&_td->lpKeyboards[i]);
@@ -112,7 +113,7 @@ BOOL LoadlpKeyboardCore(int i)
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
         0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_state_create failed with error status [%d]", err_status);
-    // Dispose of the keyboard to leave us in a consitent state
+    // Dispose of the keyboard to leave us in a consistent state
     ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
     return FALSE;
   }

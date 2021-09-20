@@ -223,7 +223,7 @@ BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr)
       context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
       p++;
     } else {
-         context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
+      context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
     }
     p++;
   }

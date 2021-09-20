@@ -569,11 +569,12 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
   if (Globals::get_CoreIntegration()) {
     PWCHAR keyboardPath   = strtowstr(_td->ForceFileName);
     km_kbp_status err_status = km_kbp_keyboard_load(keyboardPath, &_td->lpActiveKeyboard->lpCoreKeyboard);
-    delete keyboardPath;
     if (err_status != KM_KBP_STATUS_OK) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_load failed with error status [%d]", err_status); // TODO: 5442 - remove word Core
+      SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status); // TODO: 5442 - remove word Core
+      delete keyboardPath;
       return FALSE;
     }
+    delete keyboardPath;
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core
     // TODO: #5650 Equivalent for common core                                                            
     // LoadDLLs(&_td->lpKeyboards[i]);

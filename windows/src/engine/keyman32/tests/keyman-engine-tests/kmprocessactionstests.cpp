@@ -2,10 +2,10 @@
 #include "kmprocessactions.cpp"
 
 // Test the Process Actions private functions 
-// Note: The following actions are not tested KM_KBP_IT_ALERT, KM_KBP_IT_PERSIST_OPT, KM_KBP_IT_EMIT_KEYSTROKE
+// TODO: The following actions are not tested KM_KBP_IT_ALERT, KM_KBP_IT_PERSIST_OPT, KM_KBP_IT_EMIT_KEYSTROKE
 
 // KM_KBP_IT_CHAR - processUnicodeChar
-  TEST(AITIP, processUnicodeChartest) {
+TEST(AITIP, processUnicodeChartest) {
   Globals_InitProcess();
 
   WCHAR callbuf[MAXCONTEXT];
