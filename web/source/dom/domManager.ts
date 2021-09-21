@@ -109,6 +109,13 @@ namespace com.keyman.dom {
         // On shutdown, we remove our general focus-suppression handlers as well.
         this.keyman.util.detachDOMEvent(document.body, 'focus', DOMManager.suppressFocusCheck, true);
         this.keyman.util.detachDOMEvent(document.body, 'blur', DOMManager.suppressFocusCheck, true);
+
+        // Also, the base-page touch handlers for activation management.
+        if(this.touchStartActivationHandler) {
+          this.keyman.util.detachDOMEvent(document.body, 'touchstart', this.touchStartActivationHandler, false);
+          this.keyman.util.detachDOMEvent(document.body, 'touchmove',  this.touchMoveActivationHandler,  false);
+          this.keyman.util.detachDOMEvent(document.body, 'touchend',   this.touchEndActivationHandler,   false);
+        }
       } catch (e) {
         console.error("Error occurred during shutdown");
         console.error(e);
