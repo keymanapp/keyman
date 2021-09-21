@@ -2,7 +2,8 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <vector>
+#include <vector>>
+#include <array>
 #include <iterator>
 #include <codecvt>
 #include <locale>
@@ -11,6 +12,7 @@
 
 
 
+using namespace std;
 using namespace km::kbp;
 using namespace kmx;
 
@@ -119,58 +121,39 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 
 PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
 {
-  int deltaptr;			// how many bytes to jump over 
-
-  if (*p == 0) return p;
-  if (*p != UC_SENTINEL)
-  {
-    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF) return p + 2;
+  if (*p == 0)
+    return p;
+  if (*p != UC_SENTINEL) {
+    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)
+      return p + 2;
     return p + 1;
   }
-  else
-  {
-    // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
-    if (*(p + 1) == CODE_EXTENDED) {
-      p += 2;
-      while (*(p - 1) && *p && *p != UC_SENTINEL_EXTENDEDEND)
-        p++;
-
-      if (*p == 0) return p;
-      if (*p == UC_SENTINEL_EXTENDEDEND)		return p + 1;
-    }
-  
-    //  UC_SENTINEL(FFFF) followed by other special
-    switch (*(p + 1))
-    {
-    case CODE_ANY:						deltaptr = 3; break;
-    case CODE_NOTANY:					deltaptr = 3; break;
-    case CODE_INDEX:					deltaptr = 4; break;
-    case CODE_USE:						deltaptr = 3; break;
-    case CODE_DEADKEY:				deltaptr = 3; break;
-    case CODE_CLEARCONTEXT:		deltaptr = 3; break;
-    case CODE_CALL:						deltaptr = 3; break;
-    case CODE_CONTEXTEX:			deltaptr = 3; break;
-    case CODE_IFOPT:          deltaptr = 5; break;
-    case CODE_IFSYSTEMSTORE:	deltaptr = 5; break;
-    case CODE_SETOPT:					deltaptr = 4; break;
-    case CODE_SETSYSTEMSTORE:	deltaptr = 4; break;
-    case CODE_RESETOPT:				deltaptr = 3; break;
-    case CODE_SAVEOPT:				deltaptr = 3; break;
-    default:									deltaptr = 2;
-    }
-
-    // check for \0 between FFFF and next printable character
-    for (int i = 0; i < deltaptr; i++) {
-      if (*p==0) {
-        return p;
-      }
+  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
+  if (*(p + 1) == CODE_EXTENDED) {
+    p += 2;
+    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
       p++;
-    }
-    return p;
+    if (*p == 0)
+      return p;
+    return p + 1;
+  }
 
+  // CODE_PTR defined in kmx_processevent.h
+  for (int i = 0; i < size(CODE_PTR[0]); i++) {
+    if (*(p + 1) == CODE_PTR[0][i]) {
+      deltaptr = CODE_PTR[1][i];
+      break;
+    }
+  }
+
+  // check for \0 between FFFF and next printable character
+  for (int i = 0; i < deltaptr; i++) {
+    if (*p == 0) {
+      return p;
+    }
+    p++;
   }
   return p;
-
 }
 
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
