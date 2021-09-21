@@ -317,9 +317,9 @@ SaveKeyboardOptionsCore(LPINTKEYBOARDINFO kp) {
         0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
     return nullptr;
   }
-  int listSize                  = (int)km_kbp_options_list_size(keyboardAttrs->default_options);
-  km_kbp_option_item* SavedkeyboardOpts = new km_kbp_option_item[listSize + 1];
-  km_kbp_cp const* retValue               = nullptr;
+  int listSize = (int)km_kbp_options_list_size(keyboardAttrs->default_options);
+  km_kbp_option_item* savedKeyboardOpts = new km_kbp_option_item[listSize + 1];
+  km_kbp_cp const* retValue = nullptr;
 
   km_kbp_option_item const* kbDefaultOpts = keyboardAttrs->default_options;
   for (int i = 0; i < listSize; i++, ++kbDefaultOpts) {
