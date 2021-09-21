@@ -836,7 +836,12 @@ namespace com.keyman.osk {
       });
 
       return promise.then(function() {
-        if(_this._Visible) {
+        // Repro for passing this condition:
+        // 1.  Touch an input element of the page
+        // 2.  Within a second (before the focusing timer expires), touch the base page.
+        //     See domEventHandlers.ts, `focusTimer` / `setFocusTimer`.
+        // 3.  After the timer expires, touch the base page again.
+        if(_this._Visible && _this.activationConditionsMet) {
           // Leave opacity alone and clear transition if another element activated
           os.transition='';
           return false;
