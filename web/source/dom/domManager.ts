@@ -73,6 +73,11 @@ namespace com.keyman.dom {
     _BeepTimeout: number = 0;       // BeepTimeout - a flag indicating if there is an active 'beep'. 
                                     // Set to 1 if there is an active 'beep', otherwise leave as '0'.
 
+    // Used for special touch-based page interactions re: element activation on touch devices.
+    deactivateOnScroll: boolean = false;
+    deactivateOnRelease: boolean = false;
+    touchY: number; // For scroll-related aspects on iOS.
+
     constructor(keyman: KeymanBase) {
       this.keyman = keyman;
       
@@ -1251,6 +1256,13 @@ namespace com.keyman.dom {
     }
 
     set activeElement(Pelem: HTMLElement) {
+      // Ensure that a TouchAliasElement is hidden whenever it is deactivated for input.
+      if(this.activeElement) {
+        if(Utils.instanceof(this.keyman.domManager.activeElement, "TouchAliasElement")) {
+          (this.keyman.domManager.activeElement as TouchAliasElement).hideCaret();
+        }
+      }
+
       DOMEventHandlers.states._activeElement = Pelem;
 
       var isActivating = this.keyman.uiManager.isActivating;
@@ -1694,43 +1706,64 @@ namespace com.keyman.dom {
         // the touch end event after a move. c.f. http://code.google.com/p/chromium/issues/detail?id=152913
         // The best compromise behaviour is simply to hide the OSK whenever any 
         // non-input and non-OSK element is touched.
+        const _this = this;
         if(device.OS == 'Android' && navigator.userAgent.indexOf('Chrome') > 0) {
-          (<any>this.keyman).hideOskWhileScrolling=function(e) {           
+          (<any>this.keyman).detectIfScrollShouldHide=function(e) {
+            _this.deactivateOnScroll=false;
+            _this.deactivateOnRelease=true;
             if(typeof(osk._Box) == 'undefined') return;
             if(typeof(osk._Box.style) == 'undefined') return;
 
             // The following tests are needed to prevent the OSK from being hidden during normal input!
-            p=e.target.parentNode;
+            let p=e.target.parentNode;
             if(typeof(p) != 'undefined' && p != null) {
-              if(p.className.indexOf('keymanweb-input') >= 0) return; 
-              if(p.className.indexOf('kmw-key-') >= 0) return; 
+              if(p.className.indexOf('keymanweb-input') >= 0) return;
+              if(p.className.indexOf('kmw-key-') >= 0) return;
               if(typeof(p.parentNode) != 'undefined') {
                 p=p.parentNode;
-                if(p.className.indexOf('keymanweb-input') >= 0) return; 
-                if(p.className.indexOf('kmw-key-') >= 0) return; 
+                if(p.className.indexOf('keymanweb-input') >= 0) return;
+                if(p.className.indexOf('kmw-key-') >= 0) return;
               }
-            }          
-            osk.hideNow(); 
-          }        
-          this.keyman.util.attachDOMEvent(document.body, 'touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
-        } else {
-          const _this = this;
+            }
+
+            _this.deactivateOnScroll = true;
+          };
+          (<any>this.keyman).hideOskWhileScrolling=function(e) {           
+            if(_this.deactivateOnScroll) {
+              DOMEventHandlers.states.focusing = false;
+              _this.activeElement = null;
+            }
+          };
           (<any>this.keyman).conditionallyHideOsk = function() {
             // Should not hide OSK if simply closing the language menu (30/4/15)
             // or if the focusing timer (setFocusTimer) is still active.
-            if((<any>keyman).hideOnRelease && !osk['lgList'] && !DOMEventHandlers.states.focusing) {
-              _this.touchHandlers.executeBlur(null);
-              osk.hideNow();
+            if(_this.deactivateOnRelease && !osk['lgList'] && !DOMEventHandlers.states.focusing) {
+              _this.activeElement = null;
             }
-            (<any>keyman).hideOnRelease=false;
+            _this.deactivateOnRelease=false;
+          };
+          this.keyman.util.attachDOMEvent(document.body, 'touchstart', (<any>this.keyman).detectIfScrollShouldHide, false);
+          this.keyman.util.attachDOMEvent(document.body, 'touchmove', (<any>this.keyman).hideOskWhileScrolling, false);
+          this.keyman.util.attachDOMEvent(document.body, 'touchend', (<any>this.keyman).conditionallyHideOsk, false);
+        } else {
+          (<any>this.keyman).conditionallyHideOsk = function() {
+            // Should not hide OSK if simply closing the language menu (30/4/15)
+            // or if the focusing timer (setFocusTimer) is still active.
+            if(_this.deactivateOnRelease && !osk['lgList'] && !DOMEventHandlers.states.focusing) {
+              _this.activeElement = null;
+            }
+            _this.deactivateOnRelease=false;
           };
           (<any>this.keyman).hideOskIfOnBody = function(e) {
-            (<any>keyman).touchY=e.touches[0].screenY;
-            (<any>keyman).hideOnRelease=true;
+            _this.touchY=e.touches[0].screenY;
+            _this.deactivateOnRelease=true;
           };
           (<any>this.keyman).cancelHideIfScrolling = function(e) {
-            var y=e.touches[0].screenY,y0=(<any>keyman).touchY;    
-            if(y-y0 > 5 || y0-y < 5) (<any>keyman).hideOnRelease = false;
+            const y = e.touches[0].screenY;
+            const y0 = _this.touchY;
+            if(y-y0 > 5 || y0-y < 5) {
+              _this.deactivateOnRelease = false;
+            }
           };
 
           this.keyman.util.attachDOMEvent(document.body, 'touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
