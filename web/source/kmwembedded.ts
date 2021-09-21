@@ -322,7 +322,7 @@ namespace com.keyman.text {
    **/
   keymanweb['touchMenuPos'] = function() {
     let osk = keymanweb.osk;
-    if(osk.vkbd.lgKey == null) {
+    if(osk.vkbd == null || osk.vkbd.lgKey == null) {
       return '';
     }
 
