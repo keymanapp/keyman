@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.116 alpha 2021-09-21
+
+* fix(common/core): insure list pntr is incremented (#5669)
+* chore(common): Check in crowdin strings for Simplified Chinese (#5681)
+* fix(web): Null check for calculating globe key position (#5724)
+
 ## 15.0.115 alpha 2021-09-20
 
 * chore(common/core): cleanup version headers (#5719)
