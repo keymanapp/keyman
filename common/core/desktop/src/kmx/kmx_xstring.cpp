@@ -116,7 +116,6 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 *
 * xstrlen calculates the length of a string, ignoring some special chars.
 */
-
 PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
 
   if (*p == 0)
@@ -153,6 +152,7 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
   }
   return p;
  }
+
 
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
 {

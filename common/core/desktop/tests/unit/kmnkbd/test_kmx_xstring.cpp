@@ -215,15 +215,12 @@ void test_incxstr() {
 }
 
 constexpr const auto help_str = "\
-debug_api [--color] <SOURCE_PATH>|--print-sizeof\n\
+test_kmx_xstring [--color]\n\
 \n\
-  --color         Force color output\n\
-  --print-sizeof  Emit structure sizes for interop debug\n\
-  SOURCE_PATH     Path where debug_api.cpp is found; kmx files are\n\
-                  located relative to this path.\n";
+  --color         Force color output\n";
 
 int error_args() {
-  std::cerr << "debug_api: Invalid arguments." << std::endl;
+  std::cerr << "test_kmx_xstring: Invalid arguments." << std::endl;
   std::cout << help_str;
   return 1;
 }
@@ -233,23 +230,12 @@ int main(int argc, char *argv []) {
   // Global setup
   //std::string path(argv[1]);
 
-  if(argc < 2) {
-   return error_args();
- }
 
-  auto arg_color = std::string(argv[1]) == "--color";
-  if(arg_color && argc < 3) {
-    return error_args();
-  }
+  auto arg_color = argc > 1 && std::string(argv[1]) == "--color";
   console_color::enabled = console_color::isaterminal() || arg_color;
 
-  //arg_path = argv[arg_color ? 2 : 1];
 
   test_incxstr();
-
-  // Destroy them
-  //teardown();
-
 
   return 0;
 }
