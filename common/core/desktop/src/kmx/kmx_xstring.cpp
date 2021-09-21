@@ -160,10 +160,12 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
     }
 
     // check for \0 between FFFF and next printable character
-    for (int i = 0; i < (deltaptr); i++) {
-      if (*p==0)
+    for (int i = 0; i < deltaptr; i++) {
+      if (*p==0) {
         return p;
-      p += 1;    }
+      }
+      p++;
+    }
     return p;
 
   }
