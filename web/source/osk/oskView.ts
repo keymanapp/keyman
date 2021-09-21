@@ -498,6 +498,9 @@ namespace com.keyman.osk {
         const bs = this._Box.style;
         bs.width  = bs.maxWidth  = this.computedWidth + 'px';
         bs.height = bs.maxHeight = this.computedHeight + 'px';
+
+        let keyman = com.keyman.singleton;
+        keyman.alignInputs();
       }
     }
 
