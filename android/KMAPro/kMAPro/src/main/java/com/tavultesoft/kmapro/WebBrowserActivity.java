@@ -458,8 +458,8 @@ public class WebBrowserActivity extends BaseActivity {
     ImageButton backButton = (ImageButton) findViewById(R.id.backButton);
     ImageButton forwardButton = (ImageButton) findViewById(R.id.forwardButton);
 
-    setImageButtonEnabled(backButton, R.drawable.ic_navigation_back, webView.canGoBack());
-    setImageButtonEnabled(forwardButton, R.drawable.ic_navigation_forward, webView.canGoForward());
+    setImageButtonEnabled(backButton, R.drawable.ic_action_back, webView.canGoBack());
+    setImageButtonEnabled(forwardButton, R.drawable.ic_action_forward, webView.canGoForward());
   }
 
   private void setImageButtonEnabled(ImageButton imgButton, int resId, boolean enabled) {
