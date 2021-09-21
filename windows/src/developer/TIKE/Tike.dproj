@@ -557,6 +557,9 @@
             <Form>frmDebugStatus_Options</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas">
+            <Form>$R *.RES</Form>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
