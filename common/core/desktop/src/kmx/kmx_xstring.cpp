@@ -135,7 +135,6 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
       while (*(p - 1) && *p && *p != UC_SENTINEL_EXTENDEDEND)
         p++;
 
-      //if (!(*(p))) return p;
       if (*p == 0) return p;
       if (*p == UC_SENTINEL_EXTENDEDEND)		return p + 1;
     }
