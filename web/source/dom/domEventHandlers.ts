@@ -718,13 +718,6 @@ namespace com.keyman.dom {
      * Close OSK and remove simulated caret on losing focus
      */          
     cancelInput(): void {
-      if(this.keyman.domManager.activeElement) {
-        if(Utils.instanceof(this.keyman.domManager.activeElement, "TouchAliasElement")) {
-          (this.keyman.domManager.activeElement as TouchAliasElement).hideCaret();
-        }
-
-        this._BlurKeyboardSettings(this.keyman.domManager.activeElement);
-      }
       this.keyman.domManager.activeElement = null; 
       this.keyman.domManager.lastActiveElement = null;
       this.keyman.osk.hideNow();
