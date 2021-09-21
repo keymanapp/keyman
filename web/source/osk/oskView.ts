@@ -31,7 +31,7 @@ namespace com.keyman.osk {
     keyboardView: KeyboardView;  // Which implements OSKViewComponent
     footerView:   OSKViewComponent;
 
-    protected readonly device: com.keyman.utils.DeviceSpec;
+    protected device: com.keyman.utils.DeviceSpec;
     protected readonly hostDevice: com.keyman.utils.DeviceSpec;
 
     private _boxBaseMouseDown:        (e: MouseEvent) => boolean; 
@@ -198,6 +198,24 @@ namespace com.keyman.osk {
 
       this._target = targ;
       this.commonCheckAndDisplay();
+    }
+
+
+    public get targetDevice(): com.keyman.utils.DeviceSpec {
+      return this.device;
+    }
+
+    public set targetDevice(spec: com.keyman.utils.DeviceSpec) {
+      if(this.allowsDeviceChange(spec)) {
+        this.device = spec;
+        this.loadActiveKeyboard();
+      } else {
+        console.error("May not change target device for this OSKView type.");
+      }
+    }
+
+    protected allowsDeviceChange(newSpec: com.keyman.utils.DeviceSpec): boolean {
+      return false;
     }
 
     /**

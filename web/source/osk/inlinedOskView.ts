@@ -174,5 +174,9 @@ namespace com.keyman.osk {
     doHide(p) {
       return com.keyman.singleton.util.callEvent('osk.hide',p);
     }
+
+    protected allowsDeviceChange(newSpec: com.keyman.utils.DeviceSpec): boolean {
+      return true;
+    }
   }
 }
