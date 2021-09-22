@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.117 alpha 2021-09-22
+
+* fix(developer): run kmlmc from Keyman source path (#5727)
+
 ## 15.0.116 alpha 2021-09-21
 
 * fix(common/core): insure list pntr is incremented (#5669)
