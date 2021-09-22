@@ -514,7 +514,9 @@ namespace com.keyman.osk {
         }
 
         const bs = this._Box.style;
-        bs.width  = bs.maxWidth  = this.computedWidth + 'px';
+        // Do NOT set maxWidth - this breaks formatting for help text keyboards
+        // like sil_euro_latin.
+        bs.width  = this.computedWidth + 'px';
         bs.height = bs.maxHeight = this.computedHeight + 'px';
 
         let keyman = com.keyman.singleton;
