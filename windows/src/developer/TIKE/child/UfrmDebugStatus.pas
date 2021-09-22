@@ -53,6 +53,8 @@ uses
   UfrmDebugStatus_Elements,
   UfrmDebugStatus_Events,
   UfrmDebugStatus_Key,
+  UfrmDebugStatus_Options,
+  UfrmDebugStatus_Platform,
   UfrmDebugStatus_RegTest,
   UfrmTike;
 
@@ -62,6 +64,10 @@ const
   DebugTab_CallStack         = 2;
   DebugTab_Deadkeys          = 3;
   DebugTab_RegressionTesting = 4;
+  DebugTab_Platform          = 5;
+  DebugTab_Options           = 6;
+  DebugTab_Events            = 7;
+  DebugTab__Max = 8;
 
 type
   TfrmDebugStatus = class(TTikeForm)
@@ -72,6 +78,8 @@ type
     tabDebugRegressionTesting: TTabSheet;
     tabDebugKey: TTabSheet;
     tabDebugEvents: TTabSheet;
+    tabDebugOptions: TTabSheet;
+    tabDebugPlatform: TTabSheet;
     procedure FormCreate(Sender: TObject);
   private
     FChildren: TArray<TfrmDebugStatus_Child>;
@@ -81,6 +89,8 @@ type
     FRegTest: TfrmDebugStatus_RegTest;
     FKey: TfrmDebugStatus_Key;
     FEvents: TfrmDebugStatus_Events;
+    FOptions: TfrmDebugStatus_Options;
+    FPlatform: TfrmDebugStatus_Platform;
     FCurrentEvent: TDebugEvent;
 
     procedure SetDisplayFont(const Value: TFont);
@@ -96,6 +106,8 @@ type
     procedure SetDebugCore(const Value: TDebugCore);
     procedure SetDebugKeyboard(const Value: TDebugKeyboard);
     procedure SetDebugMemo(const Value: TKeymanDeveloperDebuggerMemo);
+    procedure StartBatch;
+    procedure FinishBatch;
 
     property Key: TfrmDebugStatus_Key read FKey;
     property Elements: TfrmDebugStatus_Elements read FElements;
@@ -103,6 +115,7 @@ type
     property DeadKeys: TfrmDebugStatus_DeadKeys read FDeadKeys;
     property RegTest: TfrmDebugStatus_RegTest read FRegTest;
     property Events: TfrmDebugStatus_Events read FEvents;
+    property Options: TfrmDebugStatus_Options read FOptions;
 
     class property ShowDebuggerEventsPanel: Boolean read FShowDebuggerEventsPanel write SetShowDebuggerEventsPanel;
   end;
@@ -120,36 +133,46 @@ begin
   pagesDebug.ActivePage := tabDebugKey;
   inherited;
 
-  SetLength(FChildren, 6);
+  SetLength(FChildren, DebugTab__Max);
   FKey := TfrmDebugStatus_Key.Create(Self);
   FKey.Parent := tabDebugKey;
   FKey.Visible := True;
-  FChildren[0] := FKey;
+  FChildren[DebugTab_Status] := FKey;
 
   FElements := TfrmDebugStatus_Elements.Create(Self);
   FElements.Parent := tabDebugStores;
   FElements.Visible := True;
-  FChildren[1] := FElements;
+  FChildren[DebugTab_Stores] := FElements;
 
   FCallStack := TfrmDebugStatus_CallStack.Create(Self);
   FCallStack.Parent := tabDebugCallStack;
   FCallStack.Visible := True;
-  FChildren[2] := FCallstack;
+  FChildren[DebugTab_CallStack] := FCallStack;
 
   FDeadKeys := TfrmDebugStatus_DeadKeys.Create(Self);
   FDeadKeys.Parent := tabDebugDeadkeys;
   FDeadKeys.Visible := True;
-  FChildren[3] := FDeadKeys;
+  FChildren[DebugTab_Deadkeys] := FDeadKeys;
 
   FRegTest := TfrmDebugStatus_RegTest.Create(Self);
   FRegTest.Parent := tabDebugRegressionTesting;
   FRegTest.Visible := True;
-  FChildren[4] := FRegTest;
+  FChildren[DebugTab_RegressionTesting] := FRegTest;
+
+  FOptions := TfrmDebugStatus_Options.Create(Self);
+  FOptions.Parent := tabDebugOptions;
+  FOptions.Visible := True;
+  FChildren[DebugTab_Options] := FOptions;
+
+  FPlatform := TfrmDebugStatus_Platform.Create(Self);
+  FPlatform.Parent := tabDebugPlatform;
+  FPlatform.Visible := True;
+  FChildren[DebugTab_Platform] := FPlatform;
 
   FEvents := TfrmDebugStatus_Events.Create(Self);
   FEvents.Parent := tabDebugEvents;
   FEvents.Visible := True;
-  FChildren[5] := FEvents;
+  FChildren[DebugTab_Events] := FEvents;
   tabDebugEvents.TabVisible := FShowDebuggerEventsPanel;
 end;
 
@@ -218,6 +241,26 @@ begin
     for i := 0 to Screen.FormCount - 1 do
       if Screen.Forms[i] is TfrmDebugStatus then
         (Screen.Forms[i] as TfrmDebugStatus).tabDebugEvents.TabVisible := Value;
+  end;
+end;
+
+procedure TfrmDebugStatus.StartBatch;
+var
+  child: TfrmDebugStatus_Child;
+begin
+  for child in FChildren do
+  begin
+    child.StartBatch;
+  end;
+end;
+
+procedure TfrmDebugStatus.FinishBatch;
+var
+  child: TfrmDebugStatus_Child;
+begin
+  for child in FChildren do
+  begin
+    child.FinishBatch;
   end;
 end;
 

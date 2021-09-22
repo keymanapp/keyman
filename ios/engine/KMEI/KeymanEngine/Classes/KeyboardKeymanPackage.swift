@@ -14,7 +14,7 @@ public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
   override internal init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
     self.keyboards = []
-    
+
     if let packagedKeyboards = metadata.keyboards {
       for keyboard in packagedKeyboards {
         keyboard.packageId = self.id
@@ -22,7 +22,7 @@ public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
         if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
           keyboards.append(keyboard)
         } else {
-          log.debug("\(keyboard.name) not valid / corresponding file not found")
+          SentryManager.breadcrumbAndLog("\(keyboard.name) not valid / corresponding file not found")
         }
       }
     }

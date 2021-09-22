@@ -31,6 +31,13 @@ typedef struct tagDEBUG_KEY
   KMX_WCHAR const * dpContext;
 } DEBUG_KEY, *LPDEBUG_KEY;
 
+typedef struct tagDEBUG_STORE
+{
+  KMX_DWORD dwSystemID;
+  KMX_WCHAR const * dpName;
+  KMX_WCHAR const * dpValue;
+} DEBUG_STORE, *LPDEBUG_STORE;
+
 const char *debug_item_types[] = {
   "KM_KBP_DEBUG_BEGIN", // = 0,
   "//KM_KBP_DEBUG_BEGIN_ANSI", // = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
@@ -42,12 +49,14 @@ const char *debug_item_types[] = {
   "KM_KBP_DEBUG_MATCH_EXIT", // = 7,
   "KM_KBP_DEBUG_NOMATCH_ENTER", // = 8,
   "KM_KBP_DEBUG_NOMATCH_EXIT", // = 9,
-  "KM_KBP_DEBUG_END" // = 10,
+  "KM_KBP_DEBUG_END", // = 10,
+  "KM_KBP_DEBUG_SET_OPTION", // = 11
 };
 
 void print_debug_item(const char *title, km_kbp_state_debug_item const & item) {
   LPGROUP gp = static_cast<LPGROUP>(item.kmx_info.group);
   LPKEY rule = static_cast<LPKEY>(item.kmx_info.rule);
+  LPSTORE store = static_cast<LPSTORE>(item.kmx_info.option.store);
 
   std::cout
     << "debug_item " << title << std::endl
@@ -77,6 +86,12 @@ void print_debug_item(const char *title, km_kbp_state_debug_item const & item) {
     std::ostream_iterator<uint16_t>(std::cout, " ")
   );
   std::cout << std::endl;
+  if(store) std::cout
+    << "    option.store: " << std::endl
+    << "      name:  " << store->dpName << std::endl
+    << "      value: " << store->dpString << std::endl;
+  if(store) std::cout
+    << "    option.value: " << item.kmx_info.option.value << std::endl;
 }
 
 bool are_store_offsets_equal(const uint16_t (&lhs)[DEBUG_STORE_OFFSETS_SIZE], const uint16_t (&rhs)[DEBUG_STORE_OFFSETS_SIZE]) {
@@ -92,6 +107,7 @@ bool operator==(
   if(result) {
     LPGROUP lgp = static_cast<LPGROUP>(lhs.kmx_info.group), rgp = static_cast<LPGROUP>(rhs.kmx_info.group);
     LPKEY lrule = static_cast<LPKEY>(lhs.kmx_info.rule), rrule = static_cast<LPKEY>(rhs.kmx_info.rule);
+    LPSTORE loption_store = static_cast<LPSTORE>(lhs.kmx_info.option.store), roption_store = static_cast<LPSTORE>(rhs.kmx_info.option.store);
     switch(lhs.type) {
       case KM_KBP_DEBUG_BEGIN:
         result = lhs.key_info.character == rhs.key_info.character &&
@@ -126,6 +142,12 @@ bool operator==(
           lrule->ShiftFlags == rrule->ShiftFlags &&
           u16cmp(lhs.kmx_info.context, rhs.kmx_info.context) == 0 &&
           are_store_offsets_equal(lhs.kmx_info.store_offsets, rhs.kmx_info.store_offsets);
+        break;
+      case KM_KBP_DEBUG_SET_OPTION:
+        assert(loption_store != nullptr && roption_store != nullptr);
+        result =
+          u16cmp(loption_store->dpName, roption_store->dpName) == 0 &&
+          u16cmp(lhs.kmx_info.option.value, rhs.kmx_info.option.value) == 0;
         break;
       default:
         assert(false);

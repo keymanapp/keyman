@@ -1,0 +1,248 @@
+/* A descriptive message used for errors when the app is already busy downloading */
+"alert-download-error-busy" = "已经在忙着下载。";
+
+/* A descriptive message used when a download fails */
+"alert-download-error-detail" = "下载或安装过程中发生错误。";
+
+/* Title for a "download failed" alert */
+"alert-download-error-title" = "下载错误";
+
+/* Title for a general alert about errors */
+"alert-error-title" = "错误";
+
+/* A descriptive message used when no internet connection is detected */
+"alert-no-connection-detail" = "无法连接到Keyman服务器。请稍后再试。";
+
+/* Title for a "no connection" alert */
+"alert-no-connection-title" = "连接错误";
+
+/* Short text for a 'back' navigational command.  Used to return to the previous screen */
+"command-back" = "返回";
+
+/* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
+"command-cancel" = "取消";
+
+/* Short text for a 'done' command.  Used to back out of settings menus after changes have been made */
+"command-done" = "完成";
+
+/* Short text for an 'install' command.  Used to confirm installation of a package. */
+"command-install" = "安装";
+
+/* Short text for a 'next' navigational command.  Used to advance to the next screen */
+"command-next" = "下一个";
+
+/* Short text for an 'OK' command.  Used for some error alerts */
+"command-ok" = "确定";
+
+/* Short text for confirmining 'uninstall' commands. */
+"command-uninstall" = "卸载";
+
+/* Text for the command to uninstall a keyboard */
+"command-uninstall-keyboard" = "卸载键盘";
+
+/* Confirmation text to display before uninstalling a keyboard */
+"command-uninstall-keyboard-confirm" = "您想卸载此键盘吗？";
+
+/* Text for the command to uninstall a lexical model */
+"command-uninstall-lexical-model" = "卸载字典";
+
+/* Confirmation text to display before uninstalling a lexical model */
+"command-uninstall-lexical-model-confirm" = "你想要卸载这个字典吗？";
+
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Unable to load the requested keyboard";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Unable to load the requested dictionary";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file" = "找不到必需文件。";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file-critical" = "找不到关键文件。请尝试重新安装应用程序。";
+
+/* Text for errors in data received from search queries */
+"error-query-decoding" = "服务器目前遇到技术问题";
+
+/* A descriptive message used when a download fails */
+"error-query-general" = "与服务器通信出错";
+
+/* Text for error when a search query is unexpectedly empty */
+"error-query-no-data" = "服务器响应失败";
+
+/* Text for general errors where not much information is known */
+"error-unknown" = "发生意外错误";
+
+/* Text for error when updating a resource:  cannot download because no source is available */
+"error-update-no-link" = "此软件包没有可用的更新源";
+
+/* Text for error when updating a resource:  Keyman does not know how to update the resource */
+"error-update-not-managed" = "无法更新由Keyman引擎管理的资源";
+
+/* Text for the command to open the help page of a keyboard, as shown on resource information views */
+"info-command-help-keyboard" = "键盘帮助";
+
+/* Text for the command to open the help page of a lexical model, as shown on resource information views */
+"info-command-help-lexical-model" = "字典帮助";
+
+/* Text label for displaying a keyboard's version, as shown on resource information views */
+"info-label-version-keyboard" = "键盘版本";
+
+/* Text label for displaying a lexical model's version, as shown on resource information views */
+"info-label-version-lexical-model" = "字典版本";
+
+/* Label used for the "package info" / readme tab with the package installation prompt on phones. */
+"installer-label-package-info" = "软件包信息";
+
+/* Label used for the language-selection tab with the package installation prompt on phones. */
+"installer-label-select-languages" = "选择语言";
+
+/* Label used with a package's version, as seen within the package installation prompt.  Example:  "Version: 14.0.0" */
+"installer-label-version" = "版本： %@";
+
+/* Section header for languages supported by a package, as seen within the package installation prompt */
+"installer-section-available-languages" = "可用语言";
+
+/* Text for the help popup for changing keyboards with the globe key */
+"keyboard-help-change" = "点击此处更改键盘";
+
+/* Text for the command to exit the Keyman keyboard in favor of other keyboards installed on the system */
+"keyboard-menu-exit" = "关闭 %@";
+
+/* Error installing a Keyman package - could not allocate a location to install it */
+"kmp-error-file-system" = "安装软件包时发生错误 - 文件系统错误";
+
+/* Error installing a Keyman package - could not copy package files */
+"kmp-error-file-copying" = "安装软件包时发生错误 - 无法复制所需文件";
+
+/* Error opening a Keyman package - package is not valid */
+"kmp-error-invalid" = "安装包的文件已被损坏。";
+
+/* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
+"kmp-error-missing-resource" = "此软件包不包含要求的键盘或字典。";
+
+/* Error opening a Keyman package - cannot parse contents */
+"kmp-error-no-metadata" = "此软件包未被正确构建-内容未知。";
+
+/* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
+"kmp-error-wrong-type" = "此软件包不包含预期的资源类型。";
+
+/* Title for the Installed Languages menu */
+"menu-installed-languages-title" = "已安装的语言";
+
+/* Section header for lexical models within a language-specific settings menu */
+"menu-langsettings-label-lexical-models" = "字典";
+
+/* Section header for keyboards within a language-specific settings menu */
+"menu-langsettings-section-keyboards" = "键盘";
+
+/* Section header for the settings toggles within a language-specific settings menu */
+"menu-langsettings-section-settings" = "语言设置";
+
+/* Title for the language-specific settings menus */
+"menu-langsettings-title" = "%@ 设置";
+
+/* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-correct" = "启用校正";
+
+/* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-predict" = "启用预测";
+
+/* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-message" = "您想要安装这个字典吗？";
+
+/* Title for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-title" = "%1$@: %2$@";
+
+/* Text for an info alert indicating that no lexical models are available */
+"menu-lexical-model-none-message" = "没有可用的字典";
+
+/* Title for the lexical model menu, a submenu of the language-specific settings menus */
+"menu-lexical-model-title" = "%@ 字典";
+
+/* Title for the keyboard picker */
+"menu-picker-title" = "键盘";
+
+/* Primary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report" = "允许错误报告";
+
+/* Secondary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report-description" = "可能需要“完全访问”";
+
+/* Primary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file" = "从文件安装";
+
+/* Secondary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file-description" = "浏览 .kmp 文件";
+
+/* Primary text for the Settings menu option that displays the iOS system menu options for the app's keyboard */
+"menu-settings-system-keyboard-menu" = "系统键盘设置";
+
+/* Label for the "Show Banner" toggle on the main settings screen */
+"menu-settings-show-banner" = "显示横幅";
+
+/* Label for the "Get Started" automatic display toggle seen in the Settings menu */
+"menu-settings-startup-get-started" = "启动时显示 '开始'";
+
+/* Title for the main Settings menu */
+"menu-settings-title" = "Keyman 设置";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Do not show caption on spacebar";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Show keyboard name on spacebar";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Show language name on spacebar";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Show language and keyboard name on spacebar";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Spacebar Caption";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Spacebar Caption";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Blank";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Keyboard";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Language";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Language and keyboard";
+
+/* Short text for notification:  download failure for keyboard */
+"notification-download-failure-keyboard" = "键盘下载失败";
+
+/* Short text for notification:  download failure for lexical model */
+"notification-download-failure-lexical-model" = "字典下载失败";
+
+/* Short text for notification:  download success for keyboard */
+"notification-download-success-keyboard" = "键盘下载成功";
+
+/* Short text for notification:  download success for lexical model */
+"notification-download-success-lexical-model" = "Lexical 模型下载成功";
+
+/* Short text for notification:  downloading a keyboard */
+"notification-downloading-keyboard" = "正在下载键盘\U2026";
+
+/* Short text for notification:  downloading a lexical model */
+"notification-downloading-lexical-model" = "正在下载字典\U2026";
+
+/* Short text for notification:  an update is available */
+"notification-update-available" = "有可用的更新";
+
+/* Short text for notification:  currently updating */
+"notification-update-processing" = "正在更新\U2026";
+
+/* Text indicating success at installing new keyboards or dictionaries */
+"success-install" = "安装成功。";
+
+/* A title to use in alerts indicating 'success' at whatever task the user requested */
+"success-title" = "成功";

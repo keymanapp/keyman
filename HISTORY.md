@@ -1,5 +1,34 @@
 # Keyman Version History
 
+## 15.0.116 alpha 2021-09-21
+
+* fix(common/core): insure list pntr is incremented (#5669)
+* chore(common): Check in crowdin strings for Simplified Chinese (#5681)
+* fix(web): Null check for calculating globe key position (#5724)
+
+## 15.0.115 alpha 2021-09-20
+
+* chore(common/core): cleanup version headers (#5719)
+* refactor(web): OSK modularization - specialized OSKView classes  ️ (#5633)
+* feat(developer): track changes to option values better in debugger (#5696)
+* fix(developer): support chiral modifiers in debugger (#5697)
+
+## 15.0.114 alpha 2021-09-17
+
+* feat(developer): Debugger platform option (#5640)
+* feat(developer): Debugger keyboard options (#5647)
+* fix(developer): add version info to Core (#5711)
+* fix(common/core/web): layer reset on physical keystroke after OSK interaction (#5641)
+* fix(ios): prevents installation of packages without JS (#5698)
+
+## 15.0.113 alpha 2021-09-16
+
+* fix(ios): version-tagging for errors logged from the system keyboard (#5693)
+* fix(web): spacebar caption when functional layer differs from display layer (#5688)
+* refactor(web): OSK modularization - view components, layout cleanup  ️ (#5619)
+* refactor(web): OSK modularization - common-path code -> OSKView  ️ (#5620)
+* fix(common/core/web): Remove empty rows in OSK (#5699)
+
 ## 15.0.112 alpha 2021-09-14
 
 * chore(common): Update to Unicode 14.0 (#5686)
