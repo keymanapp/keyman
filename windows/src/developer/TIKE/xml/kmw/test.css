@@ -70,7 +70,11 @@ h2 {
 }
 
 #content {
-  margin: 8px 16px;
+  margin: 0px 16px 8px;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: center;
 }
 
 .test {
@@ -123,10 +127,6 @@ h2 {
   display: inline;
 }
 
-.control {
-
-}
-
 .touch-device #character-grid {
   white-space: nowrap;
   overflow-x: scroll;
@@ -134,7 +134,7 @@ h2 {
 
 #character-grid {
   min-height: 49px;
-  margin: 8px 0;
+  margin: 0 0 8px 0;
   border: solid 1px #cccccc;
 }
 
@@ -174,4 +174,49 @@ h2 {
 .char-code {
   font: 8pt Consolas,Courier;
   padding: 4px;
+}
+
+
+/* iPhone positioning */
+
+#osk-host-frame {
+  margin: 16px 0;
+}
+
+#osk-host-frame.iPadMini {
+  margin: 0;
+  background-image: url(tablet-ipad-landscape.png);
+  background-repeat: no-repeat;
+  padding-left: 97px;
+  background-position-y: -358px;
+  height: 360px;
+  width: 927px;
+  padding-top: 62px;
+}
+
+#osk-host-frame.iPadMini .kmw-osk-frame,
+#osk-host-frame.iPadMini .kmw-key-layer-group {
+  border-radius: 0 0 5px 5px;
+}
+
+#osk-host-frame.iPhone {
+  margin: 0;
+  background-image: url(phone-iphone5-portrait.png);
+  background-position-x: 0px;
+  background-position-y: -794px;
+  height: 374px;
+  width: 600px;
+  background-repeat: no-repeat;
+  padding-left: 91px;
+  padding-right: 50px;
+  padding-top: 64px;
+}
+
+#osk-host-frame.iPhone .kmw-osk-frame,
+#osk-host-frame.iPhone .kmw-key-layer-group {
+  border-radius: 0 0 3px 3px;
+}
+
+#input-area, #character-grid {
+  width: 100%;
 }

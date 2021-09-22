@@ -1,3 +1,22 @@
+const keyboardSelect = document.getElementById('keyboard-select');
+const ta1 = document.getElementById('ta1');
+const charGrid = document.getElementById('character-grid');
+
+keyman.addEventListener('keyboardregistered', function(keyboardProperties) {
+  console.log('keyboardregistered:'+JSON.stringify(keyboardProperties)+' [active='+keyman.getActiveKeyboard()+';'+keyman.core.activeKeyboard+']');
+  buildKeyboardList();
+});
+
+keyman.addEventListener('keyboardloaded', function(keyboardProperties) {
+  // Note: see #5730 for why we have a timeout here
+  //console.log('keyboardloaded:'+JSON.stringify(keyboardProperties)+' [active='+keyman.getActiveKeyboard()+';'+keyman.core.activeKeyboard+']');
+  //buildKeyboardList();
+  window.setTimeout(function() {
+    //console.log('keyboardloaded.timeout:'+JSON.stringify(keyboardProperties)+' [active='+keyman.getActiveKeyboard()+';'+keyman.core.activeKeyboard+']');
+    buildKeyboardList();
+  }, 10);
+});
+
 keyman.init({
   ui:'button',
   resources:'/resource/',
@@ -6,8 +25,25 @@ keyman.init({
   attachType:'auto'
 });
 
-var ta1 = document.getElementById('ta1');
-var charGrid = document.getElementById('character-grid');
+buildKeyboardList();
+
+function buildKeyboardList() {
+  let keyboards = keyman.getKeyboards();
+  keyboardSelect.innerHTML = ''; // In the future perhaps we can use: keyboardSelect.replaceChildren();
+
+  let opt = document.createElement('option');
+  opt.value = '';
+  opt.innerText = '(system keyboard)';
+  keyboardSelect.appendChild(opt);
+  for(let keyboard of keyboards) {
+    let opt = document.createElement('option');
+    opt.value = keyboard.InternalName;
+    opt.innerText = keyboard.Name;
+    keyboardSelect.appendChild(opt);
+  }
+  keyboardSelect.value = keyman.getActiveKeyboard();
+}
+
 var lastContent = null;
 
 if(keyman.util.isTouchDevice()) {
@@ -160,13 +196,15 @@ window.onload = function() {
       Windows:         { browser: 'chrome', formFactor: 'desktop', OS: 'windows', touchable: false, dimensions: [640, 300] },
       macOS:           { browser: 'chrome', formFactor: 'desktop', OS: 'macosx',  touchable: false, dimensions: [640, 300] },
       Linux:           { browser: 'chrome', formFactor: 'desktop', OS: 'linux',   touchable: false, dimensions: [640, 300] },
-      iPhone:          { browser: 'chrome', formFactor: 'phone',   OS: 'ios',     touchable: true,  dimensions: [320, 200] },
-      iPadMini:        { browser: 'chrome', formFactor: 'tablet',  OS: 'ios',     touchable: true,  dimensions: [640, 300] },
-      SamsungGalaxyS5: { browser: 'chrome', formFactor: 'phone',   OS: 'android', touchable: true,  dimensions: [320, 200] },
+      iPhone:          { browser: 'chrome', formFactor: 'phone',   OS: 'ios',     touchable: true,  dimensions: [527, 280] },
+      iPadMini:        { browser: 'chrome', formFactor: 'tablet',  OS: 'ios',     touchable: true,  dimensions: [829, 300] },
+      SamsungGalaxyS5: { browser: 'chrome', formFactor: 'phone',   OS: 'android', touchable: true,  dimensions: [520, 270] },
       SamsungTablet:   { browser: 'chrome', formFactor: 'tablet',  OS: 'android', touchable: true,  dimensions: [640, 300] },
     };
 
     const targetDevice = devices[deviceSelect.value] || devices.Windows;
+
+    document.getElementById('osk-host-frame').className = deviceSelect.value;
 
     if(newOSK) {
       document.getElementById('osk-host').removeChild(newOSK.element);
@@ -184,7 +222,6 @@ window.onload = function() {
 
     keyman.osk = newOSK;
     newOSK.activeKeyboard = keyman.core.activeKeyboard;
-    document.getElementById('keyboard-name').innerText = keyman.core.activeKeyboard ? keyman.core.activeKeyboard.name : '(system keyboard)';
     keyman.alignInputs();
   }
 
@@ -193,8 +230,9 @@ window.onload = function() {
   keyman.addEventListener('keyboardchange', function(keyboardProperties) {
     keyman.osk = newOSK;
     newOSK.activeKeyboard = keyman.core.activeKeyboard;
-    document.getElementById('keyboard-name').innerText = keyman.core.activeKeyboard ? keyman.core.activeKeyboard.name : '(system keyboard)';
+    keyboardSelect.value = keyboardProperties.internalName;
     keyman.alignInputs();
+    //console.log('keyboardchange:'+JSON.stringify(keyboardProperties)+' [active='+keyman.getActiveKeyboard()+';'+keyman.core.activeKeyboard+']');
   });
 }
 
@@ -214,31 +252,28 @@ function registerModel(model, src) {
   opt.value = model;
   opt['data-src'] = src;
   modelList.appendChild(opt);
-
-  if(firstModel) {
-    keyman.modelManager.register({
-      id: model,
-      languages: ['en'],
-      path: 'http://'+location.host+'/model/'+src
-    });
-    document.getElementById('model-list-empty').style.display = 'none';
-    firstModel = false;
-  }
 }
 
+keyboardSelect.addEventListener('change', function() {
+  keyman.setActiveKeyboard(keyboardSelect.value);
+  ta1.focus();
+});
+
 modelList.addEventListener('change', function() {
-  if(modelList.value == null) return;
   let model = modelList.value;
   if(modelList.selectedOptions.length == 0) return;
   let opt = modelList.selectedOptions[0];
 
-  let lastModel = keyman.modelManager.activeModel;
+
+  let lastModel = keyman.core.activeModel;
   if(lastModel) {
     keyman.modelManager.deregister(lastModel.id);
   }
-  keyman.modelManager.register({
-    id: model,
-    languages: ['en'],
-    path: 'http://'+location.host+'/model/'+opt['data-src']
-  });
+  if(model != '') {
+    keyman.modelManager.register({
+      id: model,
+      languages: ['en'],
+      path: 'http://'+location.host+'/model/'+opt['data-src']
+    });
+  }
 });
