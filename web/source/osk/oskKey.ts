@@ -478,7 +478,7 @@ namespace com.keyman.osk {
       ts.fontSize = this.getIdealFontSize(vkbd, styleSpec);
 
       // Finalize the key's text.
-      t.innerHTML = keyText;
+      t.innerText = keyText;
 
       return t;
     }
