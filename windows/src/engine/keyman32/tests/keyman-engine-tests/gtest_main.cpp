@@ -2,7 +2,7 @@
  * @file
  * @copyright (c) 2013 Stephan Brenner
  * @license   This project is released under the MIT License.
- *
+ * repo: https://github.com/stbrenner/gtest_mem
  * Adapted in 2021 from the gtest_mem.cpp
  * This file implements a main() function for Google Test that runs all tests
  * and detects memory leaks.
@@ -44,7 +44,7 @@ private:
 
 GTEST_API_ int
 main(int argc, char** argv) {
-  cout << "Running main() from pch.cpp" << endl;
+  cout << "Running main() from gtest_main.cpp" << endl;
 
   InitGoogleTest(&argc, argv);
   UnitTest::GetInstance()->listeners().Append(new MemoryLeakDetector());
