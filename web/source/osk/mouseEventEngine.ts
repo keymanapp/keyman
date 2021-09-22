@@ -6,29 +6,11 @@ namespace com.keyman.osk {
     private readonly _mouseMove:  typeof MouseEventEngine.prototype.onMouseMove;
     private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
 
-    private vkbd: VisualKeyboard;
     private hasActiveClick: boolean = false;
     private ignoreSequence: boolean = false;
 
-    public constructor(
-      controller: any,
-      eventRoot: HTMLElement,
-      inputStartHandler:      InputHandler,
-      inputMoveHandler:       InputHandler,
-      inputMoveCancelHandler: InputHandler,
-      inputEndHandler:        InputHandler
-    ) {
-      super(
-        eventRoot,
-        inputStartHandler,
-        inputMoveHandler,
-        inputMoveCancelHandler,
-        inputEndHandler
-      );
-
-      if(controller instanceof VisualKeyboard) {
-        this.vkbd = controller;
-      }
+    public constructor(config: InputEventEngineConfig) {
+      super(config);
 
       this._mouseStart = this.onMouseStart.bind(this);
       this._mouseMove  = this.onMouseMove.bind(this);
@@ -36,29 +18,32 @@ namespace com.keyman.osk {
     }
 
     public static forVisualKeyboard(vkbd: VisualKeyboard) {
-      // document.body is the event root b/c we need to track the mouse if it leaves
-      // the VisualKeyboard's hierarchy.
-      return new MouseEventEngine(
-        vkbd,
-        document.body,
-        vkbd.touch.bind(vkbd),
-        vkbd.moveOver.bind(vkbd),
-        vkbd.moveCancel.bind(vkbd),
-        vkbd.release.bind(vkbd)
-      );
+      const config: InputEventEngineConfig = {
+        targetRoot: vkbd.element,
+        // document.body is the event root b/c we need to track the mouse if it leaves
+        // the VisualKeyboard's hierarchy.
+        eventRoot: document.body,
+        inputStartHandler: vkbd.touch.bind(vkbd),
+        inputMoveHandler: vkbd.moveOver.bind(vkbd),
+        inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
+        inputEndHandler: vkbd.release.bind(vkbd),
+        coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
+      };
+
+      return new MouseEventEngine(config);
     }
 
     registerEventHandlers() {
-      this.eventRoot.addEventListener('mousedown', this._mouseStart, true);
-      this.eventRoot.addEventListener('mousemove',  this._mouseMove, false);
+      this.config.eventRoot.addEventListener('mousedown', this._mouseStart, true);
+      this.config.eventRoot.addEventListener('mousemove',  this._mouseMove, false);
       // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
-      this.eventRoot.addEventListener('mouseup',   this._mouseEnd, true);
+      this.config.eventRoot.addEventListener('mouseup',   this._mouseEnd, true);
     }
 
     unregisterEventHandlers() {
-      this.eventRoot.removeEventListener('mousedown', this._mouseStart, true);
-      this.eventRoot.removeEventListener('mousemove',  this._mouseMove, false);
-      this.eventRoot.removeEventListener('mouseup',   this._mouseEnd, true);
+      this.config.eventRoot.removeEventListener('mousedown', this._mouseStart, true);
+      this.config.eventRoot.removeEventListener('mousemove',  this._mouseMove, false);
+      this.config.eventRoot.removeEventListener('mouseup',   this._mouseEnd, true);
     }
 
     private preventPropagation(e: MouseEvent) {
@@ -75,7 +60,7 @@ namespace com.keyman.osk {
     }
 
     onMouseStart(event: MouseEvent) {
-      if(!this.vkbd.element.contains(event.target as Node)) {
+      if(!this.config.targetRoot.contains(event.target as Node)) {
         this.ignoreSequence = true;
         return;
       }
@@ -105,7 +90,7 @@ namespace com.keyman.osk {
 
       this.preventPropagation(event);
 
-      if(this.vkbd.detectWithinInteractiveBounds(coord)) {
+      if(this.config.coordConstrainedWithinInteractiveBounds(coord)) {
         this.onInputMove(coord);
       } else {
         this.onInputMoveCancel(coord);

@@ -3,58 +3,57 @@
 namespace com.keyman.osk {
   export type InputHandler = (coord: InputEventCoordinate) => void;
 
+  export interface InputEventEngineConfig {
+    /**
+     * Specifies the element that input listeners should be attached to.
+     */
+    readonly eventRoot: HTMLElement;
+    /**
+     * Specifies the most specific common ancestor element of any event target
+     * that the InputEventEngine should consider.
+     */
+    readonly targetRoot: HTMLElement;
+
+    readonly coordConstrainedWithinInteractiveBounds: (coord: InputEventCoordinate) => boolean;
+
+    readonly inputStartHandler?:      InputHandler;
+    readonly inputMoveHandler?:       InputHandler;
+    readonly inputMoveCancelHandler?: InputHandler;
+    readonly inputEndHandler?:        InputHandler;
+  }
+
   export abstract class InputEventEngine {
-    protected readonly eventRoot: HTMLElement;
+    protected readonly config: InputEventEngineConfig;
 
-    private inputStartHandler:  InputHandler;
-    private inputMoveHandler:   InputHandler;
-    private inputCancelHandler: InputHandler;
-    private inputEndHandler:    InputHandler;
-
-    public constructor(
-      eventRoot: HTMLElement,
-      inputStartHandler:      InputHandler,
-      inputMoveHandler:       InputHandler,
-      inputMoveCancelHandler: InputHandler,
-      inputEndHandler:        InputHandler
-    ) {
-      this.eventRoot = eventRoot;
-
-      this.inputStartHandler =  inputStartHandler;
-      this.inputMoveHandler =   inputMoveHandler;
-      this.inputCancelHandler = inputMoveCancelHandler;
-      this.inputEndHandler =    inputEndHandler;
+    public constructor(config: InputEventEngineConfig) {
+      this.config = config;
     }
 
     abstract registerEventHandlers();
     abstract unregisterEventHandlers();
 
     onInputStart(coord: InputEventCoordinate) {
-      if(this.inputStartHandler) {
-        this.inputStartHandler(coord);
+      if(this.config.inputStartHandler) {
+        this.config.inputStartHandler(coord);
       }
-      //this.vkbd.touch(coord);
     }
 
     onInputMove(coord: InputEventCoordinate) {
-      if(this.inputMoveHandler) {
-        this.inputMoveHandler(coord);
+      if(this.config.inputMoveHandler) {
+        this.config.inputMoveHandler(coord);
       }
-      //this.vkbd.moveOver(coord);
     }
 
     onInputMoveCancel(coord: InputEventCoordinate) {
-      if(this.inputCancelHandler) {
-        this.inputCancelHandler(coord);
+      if(this.config.inputMoveCancelHandler) {
+        this.config.inputMoveCancelHandler(coord);
       }
-      //this.vkbd.moveCancel(coord);
     }
 
     onInputEnd(coord: InputEventCoordinate) {
-      if(this.inputEndHandler) {
-        this.inputEndHandler(coord);
+      if(this.config.inputEndHandler) {
+        this.config.inputEndHandler(coord);
       }
-      //this.vkbd.release(coord);
     }
   }
 }
