@@ -31,6 +31,9 @@ TEST(KEYBOARDOPTIONS, UpdateKeyboardOptionsCore) {
   value         = kp->lpCoreKeyboardOptions[0].value;
   expectedValue = u"triggered";
   EXPECT_TRUE(value == expectedValue);
+  DisposeKeyboardOptionsCore(&kp->lpCoreKeyboardOptions);
+  ReleaseStateMemoryCore(&kp->lpCoreKeyboardState);
+  ReleaseKeyboardMemoryCore(&kp->lpCoreKeyboard);
   delete kp;
 
 }
@@ -61,12 +64,15 @@ TEST(KEYBOARDOPTIONS, SaveRestoreKeyboardOptionsCore) {
   km_kbp_cp const *retValue = nullptr;
   EXPECT_TRUE(RestoreKeyboardOptionsCore(kp->lpCoreKeyboardState, SavedKBDOptions));
   EXPECT_EQ(km_kbp_state_option_lookup(kp->lpCoreKeyboardState, KM_KBP_OPT_KEYBOARD, test_env_opts[0].key, &retValue), KM_KBP_STATUS_OK);
-  
+
   value         = retValue;
   expectedValue                     = u"not tiggered";
   EXPECT_TRUE(value == expectedValue);
 
-  delete NewKBDOptions;
-  delete SavedKBDOptions;
+  DisposeKeyboardOptionsCore(&NewKBDOptions);
+  DisposeKeyboardOptionsCore(&SavedKBDOptions);
+
+  ReleaseStateMemoryCore(&kp->lpCoreKeyboardState);
+  ReleaseKeyboardMemoryCore(&kp->lpCoreKeyboard);
   delete kp;
 }

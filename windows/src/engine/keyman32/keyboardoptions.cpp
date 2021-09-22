@@ -332,12 +332,12 @@ SaveKeyboardOptionsCore(LPINTKEYBOARDINFO kp) {
           0, sdmKeyboard, 0, "SaveCoreOptions: km_kbp_state_option_lookup failed with error status [%d]", err_status);
       continue;
     }
-    SavedkeyboardOpts[i].key   = CloneKMKBPCP(kbDefaultOpts->key);
-    SavedkeyboardOpts[i].value = CloneKMKBPCP(retValue);
-    SavedkeyboardOpts[i].scope = KM_KBP_OPT_KEYBOARD;
+    savedKeyboardOpts[i].key   = CloneKMKBPCP(kbDefaultOpts->key);
+    savedKeyboardOpts[i].value = CloneKMKBPCP(retValue);
+    savedKeyboardOpts[i].scope = KM_KBP_OPT_KEYBOARD;
   }
-  SavedkeyboardOpts[listSize] = KM_KBP_OPTIONS_END;
-  return SavedkeyboardOpts;
+  savedKeyboardOpts[listSize] = KM_KBP_OPTIONS_END;
+  return savedKeyboardOpts;
 }
 
 BOOL
@@ -350,5 +350,16 @@ RestoreKeyboardOptionsCore(
         0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_state_options_update failed with error status [%d]", err_status);
     return FALSE;
   }
+  return TRUE;
+}
+
+BOOL
+DisposeKeyboardOptionsCore(km_kbp_option_item** lpCoreKeyboardOptions) {
+  size_t listSize          = km_kbp_options_list_size(*lpCoreKeyboardOptions);
+  for (int i = 0; i < (int)listSize; i++) {
+    delete[] (*lpCoreKeyboardOptions)[i].key;
+    delete[] (*lpCoreKeyboardOptions)[i].value;
+  }
+  delete[] *lpCoreKeyboardOptions;
   return TRUE;
 }

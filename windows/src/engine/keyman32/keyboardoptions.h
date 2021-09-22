@@ -72,3 +72,11 @@ void LoadKeyboardOptionsREGCore(LPINTKEYBOARDINFO kp, km_kbp_state* state);
  * @param  value  keyboard option value to save
  */
 void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
+
+/**
+ *  Free the allocated resources belonging to a key_kbp_option_items object
+ *  that was created on the heap most likely using SaveKeyboardOptionREGCore
+ *
+ * @param  lpCoreKeyboardOptions  keyboard options items to be freed
+ */
+BOOL DisposeKeyboardOptionsCore(km_kbp_option_item** lpCoreKeyboardOptions);

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "kmprocessactions.cpp"
 
-// Test the Process Actions private functions 
+// Test the Process Actions private functions
 // Note: The following actions are not tested KM_KBP_IT_ALERT, KM_KBP_IT_PERSIST_OPT, KM_KBP_IT_EMIT_KEYSTROKE
 
 // KM_KBP_IT_CHAR - processUnicodeChar
@@ -16,7 +16,7 @@
   processUnicodeChar(&testApp, &itemAddChar);
   WCHAR *contextBuf = testApp.ContextBufMax(MAXCONTEXT);
   EXPECT_STREQ(contextBuf, expectedContext);
- 
+
   km_kbp_usv testSurrogateChar    = Uni_SurrogateToUTF32(0xD801, 0xDC37);  //𐐷';
   km_kbp_action_item itemAddChar2 = {KM_KBP_IT_CHAR, {0,}, {testSurrogateChar}};
   WCHAR expectedStringSurrogate[] = {'A', 0xD801, 0xDC37, 0};
@@ -46,11 +46,10 @@ TEST(AITIP, processMarkertest) {
   Globals_UninitProcess();
 }
 
-// KM_KBP_IT_BACK - processBack 
+// KM_KBP_IT_BACK - processBack
 // First test processing a backspace for a deadkey
 TEST(AITIP, processBackDeadkeytest) {
   Globals_InitProcess();
-  Globals_InitThread();
 
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
@@ -77,7 +76,6 @@ TEST(AITIP, processBackDeadkeytest) {
 // Also test for Unknown Character
 TEST(AITIP, processBackCharactertest) {
   Globals_InitProcess();
-  Globals_InitThread();
 
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
@@ -110,7 +108,6 @@ TEST(AITIP, processBackCharactertest) {
 // Note currently we don't check for a character match this should be updated
 TEST(AITIP, processBackUnexpectedChartest) {
   Globals_InitProcess();
-  Globals_InitThread();
 
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
@@ -135,7 +132,6 @@ TEST(AITIP, processBackUnexpectedChartest) {
 // KM_KBP_IT_INVALIDATE_CONTEXT - processInvalidateContext
 TEST(AITIP, processInvalidateContextTest) {
   Globals_InitProcess();
-  Globals_InitThread();
 
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
@@ -147,11 +143,10 @@ TEST(AITIP, processInvalidateContextTest) {
   processUnicodeChar(&testApp, &itemAddChar);
 
   // A keyboard a state is need to test processInvalidateContext
-  km_kbp_option_item test_env_opts[] = {{u"hello", u"world", 0}, KM_KBP_OPTIONS_END};
+  km_kbp_option_item test_env_opts[] = {{u"hello", u"world", KM_KBP_OPT_KEYBOARD}, KM_KBP_OPTIONS_END};
   km_kbp_keyboard *testKB = nullptr;
-  km_kbp_state *testState = nullptr, *test_clone = nullptr;
-  km_kbp_path_name dummyPath = L"dummyActions.mock";
-  km_kbp_status err_status = km_kbp_keyboard_load(dummyPath, &testKB);
+  km_kbp_state *testState = nullptr;
+  km_kbp_path_name dummyPath      = L"dummyActions.mock";
   EXPECT_EQ(km_kbp_keyboard_load(dummyPath, &testKB), KM_KBP_STATUS_OK);
   EXPECT_EQ(km_kbp_state_create(testKB, test_env_opts, &testState), KM_KBP_STATUS_OK);
 
@@ -162,7 +157,6 @@ TEST(AITIP, processInvalidateContextTest) {
   // dispose keyboard
   km_kbp_state_dispose(testState);
   km_kbp_keyboard_dispose(testKB);
-
   UninitialiseProcess(FALSE);
   Globals_UninitProcess();
 }

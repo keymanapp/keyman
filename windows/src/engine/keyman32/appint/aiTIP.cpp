@@ -233,16 +233,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
       savedContextUsingCore = new AppContext();
       _td->app->CopyContext(savedContextUsingCore);
       SavedKBDOptions = SaveKeyboardOptionsCore(_td->lpActiveKeyboard);
-      // TODO: 5653  ---- Alternate option ---
-      // Instead of allocating memory for each option
-      // just update the changed options. Consider the commented out method UpdateCoreKeyboard
-      // options.
-      /*if (_td->lpActiveKeyboard->lpCoreKeyboardOptions) {
-        UpdateKeyboardOptionsCore(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->lpActiveKeyboard->lpCoreKeyboardOptions);
-      } else {
-        _td->lpActiveKeyboard->lpCoreKeyboardOptions = SaveKeyboardOptionsCore(_td->lpActiveKeyboard);
-      }*/
-      //////// End alternate option
     } else {                                                                                   // I4370
       savedContext = new AppContextWithStores(_td->lpActiveKeyboard->Keyboard->cxStoreArray);  // I4978
       _td->app->SaveContext(savedContext);
@@ -257,11 +247,8 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
         // Reset the context if match found
         _td->app->RestoreContextOnly(savedContextUsingCore);
         RestoreKeyboardOptionsCore(_td->lpActiveKeyboard->lpCoreKeyboardState, SavedKBDOptions);
-        delete SavedKBDOptions;
+        DisposeKeyboardOptionsCore(&SavedKBDOptions);
         SavedKBDOptions = NULL;
-        // TODO: 5653  ---- Alternate option --- Instead of allocating memory for each option
-        //RestoreKeyboardOptionsCore(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->lpActiveKeyboard->lpCoreKeyboardOptions);
-        /// --- End Alternate option
         delete savedContextUsingCore;
         savedContextUsingCore = NULL;
       }

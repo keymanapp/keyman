@@ -38,6 +38,7 @@
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <LibraryPath>$(ProjectDir)..\..\..\..\..\..\common\core\desktop\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\..\..\common\core\desktop\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
+    <Microsoft-googletest-v140-windesktop-msvcstl-static-rt-static-Disable-gtest_main>true</Microsoft-googletest-v140-windesktop-msvcstl-static-rt-static-Disable-gtest_main>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(ProjectDir)..\..\..\..\global\inc;$(ProjectDir)..\..;$(IncludePath)</IncludePath>
