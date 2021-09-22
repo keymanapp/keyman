@@ -248,7 +248,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
         _td->app->RestoreContextOnly(savedContextUsingCore);
         RestoreKeyboardOptionsCore(_td->lpActiveKeyboard->lpCoreKeyboardState, SavedKBDOptions);
         DisposeKeyboardOptionsCore(&SavedKBDOptions);
-        SavedKBDOptions = NULL;
         delete savedContextUsingCore;
         savedContextUsingCore = NULL;
       }

@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="appinttests.cpp" />
+    <ClCompile Include="gtest_main.cpp" />
     <ClCompile Include="keyboardoptionstests.cpp" />
     <ClCompile Include="kmprocessactionstests.cpp" />
     <ClCompile Include="pch.cpp">

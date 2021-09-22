@@ -361,5 +361,5 @@ DisposeKeyboardOptionsCore(km_kbp_option_item** lpCoreKeyboardOptions) {
     delete[] (*lpCoreKeyboardOptions)[i].value;
   }
   delete[] *lpCoreKeyboardOptions;
-  return TRUE;
+  *lpCoreKeyboardOptions = NULL;
 }
