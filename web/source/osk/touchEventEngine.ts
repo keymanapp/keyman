@@ -6,12 +6,42 @@ namespace com.keyman.osk {
     private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
     private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
-    public constructor(vkbd: VisualKeyboard) {
-      super(vkbd, vkbd.element);
+    private vkbd: VisualKeyboard;
+
+    public constructor(
+      controller: any,
+      eventRoot: HTMLElement,
+      inputStartHandler:      InputHandler,
+      inputMoveHandler:       InputHandler,
+      inputMoveCancelHandler: InputHandler,
+      inputEndHandler:        InputHandler
+    ) {
+      super(
+        eventRoot,
+        inputStartHandler,
+        inputMoveHandler,
+        inputMoveCancelHandler,
+        inputEndHandler
+      );
+
+      if(controller instanceof VisualKeyboard) {
+        this.vkbd = controller;
+      }
 
       this._touchStart = this.onTouchStart.bind(this);
       this._touchMove  = this.onTouchMove.bind(this);
       this._touchEnd   = this.onTouchEnd.bind(this);
+    }
+
+    public static forVisualKeyboard(vkbd: VisualKeyboard) {
+      return new TouchEventEngine(
+        vkbd,
+        vkbd.element,
+        vkbd.touch.bind(vkbd),
+        vkbd.moveOver.bind(vkbd),
+        vkbd.moveCancel.bind(vkbd),
+        vkbd.release.bind(vkbd)
+      );
     }
 
     registerEventHandlers() {

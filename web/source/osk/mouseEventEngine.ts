@@ -6,17 +6,46 @@ namespace com.keyman.osk {
     private readonly _mouseMove:  typeof MouseEventEngine.prototype.onMouseMove;
     private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
 
+    private vkbd: VisualKeyboard;
     private hasActiveClick: boolean = false;
     private ignoreSequence: boolean = false;
 
-    public constructor(vkbd: VisualKeyboard) {
-      // document.body is the event root b/c we need to track the mouse if it leaves
-      // the VisualKeyboard's hierarchy.
-      super(vkbd, document.body);
+    public constructor(
+      controller: any,
+      eventRoot: HTMLElement,
+      inputStartHandler:      InputHandler,
+      inputMoveHandler:       InputHandler,
+      inputMoveCancelHandler: InputHandler,
+      inputEndHandler:        InputHandler
+    ) {
+      super(
+        eventRoot,
+        inputStartHandler,
+        inputMoveHandler,
+        inputMoveCancelHandler,
+        inputEndHandler
+      );
+
+      if(controller instanceof VisualKeyboard) {
+        this.vkbd = controller;
+      }
 
       this._mouseStart = this.onMouseStart.bind(this);
       this._mouseMove  = this.onMouseMove.bind(this);
       this._mouseEnd   = this.onMouseEnd.bind(this);
+    }
+
+    public static forVisualKeyboard(vkbd: VisualKeyboard) {
+      // document.body is the event root b/c we need to track the mouse if it leaves
+      // the VisualKeyboard's hierarchy.
+      return new MouseEventEngine(
+        vkbd,
+        document.body,
+        vkbd.touch.bind(vkbd),
+        vkbd.moveOver.bind(vkbd),
+        vkbd.moveCancel.bind(vkbd),
+        vkbd.release.bind(vkbd)
+      );
     }
 
     registerEventHandlers() {
