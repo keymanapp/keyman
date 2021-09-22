@@ -558,7 +558,7 @@ namespace com.keyman.keyboards {
 
             // Append a stylesheet for this keyboard for keyboard specific styles
             // or if needed to specify an embedded font
-            osk.vkbd.appendStyleSheet();
+            osk.vkbd?.appendStyleSheet();
 
             // Re-initializate OSK before returning if required
             if(this.keymanweb.mustReloadKeyboard) {

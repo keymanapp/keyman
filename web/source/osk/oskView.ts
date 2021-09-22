@@ -514,14 +514,20 @@ namespace com.keyman.osk {
         }
 
         const bs = this._Box.style;
-        // Do NOT set maxWidth - this breaks formatting for help text keyboards
-        // like sil_euro_latin.
-        bs.width  = this.computedWidth + 'px';
+        // OSK size settings can only be reliably applied to standard VisualKeyboard
+        // visualizations, not to help text or empty views.
+        bs.width  = bs.maxWidth  = this.computedWidth + 'px';
         bs.height = bs.maxHeight = this.computedHeight + 'px';
 
-        let keyman = com.keyman.singleton;
-        keyman.alignInputs();
+      } else {
+        const bs = this._Box.style;
+        bs.width  = 'auto';
+        bs.height = 'auto';
+        bs.maxWidth = bs.maxHeight = '';
       }
+
+      let keyman = com.keyman.singleton;
+      keyman.alignInputs();
     }
 
     public refreshLayoutIfNeeded(pending?: boolean) {
