@@ -58,6 +58,8 @@ namespace com.keyman.osk {
     private alwaysShow: boolean;
     private imagePath?: string = "";
 
+    private readonly hostDevice: utils.DeviceSpec;
+
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
       alwaysShow: false,
       mayPredict: true,
@@ -65,9 +67,10 @@ namespace com.keyman.osk {
       imagePath: ""
     }
 
-    constructor() {
+    constructor(hostDevice: utils.DeviceSpec) {
       // Step 1 - establish the container element.  Must come before this.setOptions.
       this.constructContainer();
+      this.hostDevice = hostDevice;
 
       // Initialize with the default options - 
       // any 'manually set' options come post-construction.
@@ -191,7 +194,7 @@ namespace com.keyman.osk {
           banner = new ImageBanner(this.imagePath, Banner.DEFAULT_HEIGHT);
           break;
         case 'suggestion':
-          banner = new SuggestionBanner(height);
+          banner = new SuggestionBanner(this.hostDevice, height);
           break;
         default:
           throw new Error("Invalid type specified for the banner!");

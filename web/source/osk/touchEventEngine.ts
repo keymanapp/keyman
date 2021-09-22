@@ -28,6 +28,21 @@ namespace com.keyman.osk {
       return new TouchEventEngine(config);
     }
 
+    public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
+      const config: InputEventEngineConfig = {
+        targetRoot: banner.getDiv(),
+        // document.body is the event root b/c we need to track the mouse if it leaves
+        // the VisualKeyboard's hierarchy.
+        eventRoot: banner.getDiv(),
+        inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
+        inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
+        inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
+        coordConstrainedWithinInteractiveBounds: function() { return true; }
+      };
+
+      return new TouchEventEngine(config);
+    }
+
     registerEventHandlers() {
       this.config.eventRoot.addEventListener('touchstart', this._touchStart, true);
       this.config.eventRoot.addEventListener('touchmove',  this._touchMove, false);

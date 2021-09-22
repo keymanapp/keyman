@@ -33,6 +33,21 @@ namespace com.keyman.osk {
       return new MouseEventEngine(config);
     }
 
+    public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
+      const config: InputEventEngineConfig = {
+        targetRoot: banner.getDiv(),
+        // document.body is the event root b/c we need to track the mouse if it leaves
+        // the VisualKeyboard's hierarchy.
+        eventRoot: document.body,
+        inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
+        inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
+        inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
+        coordConstrainedWithinInteractiveBounds: function() { return true; }
+      };
+
+      return new MouseEventEngine(config);
+    }
+
     registerEventHandlers() {
       this.config.eventRoot.addEventListener('mousedown', this._mouseStart, true);
       this.config.eventRoot.addEventListener('mousemove',  this._mouseMove, false);
