@@ -54,7 +54,7 @@ namespace com.keyman.osk.browser {
         // Matches how the subkey positioning is set.
         let rowElement = (key.key as OSKBaseKey).row.element;
         const _Box = vkbd.element.parentNode as HTMLDivElement;
-        kts.bottom = _Box.offsetHeight - rowElement.offsetHeight - rowElement.offsetTop + 'px'; 
+        kts.bottom = (_Box.offsetHeight - rowElement.offsetHeight - rowElement.offsetTop + key.offsetTop) + 'px';
         kts.textAlign = 'center';
         kts.overflow = 'visible';
         kts.fontFamily = util.getStyleValue(kc,'font-family');
