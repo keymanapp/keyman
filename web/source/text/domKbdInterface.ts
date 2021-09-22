@@ -116,7 +116,17 @@ namespace com.keyman.text {
   KeyboardInterface.prototype['showPinnedHelp'] = function(): void {
     let keyman = com.keyman.singleton;
     if(keyman.osk instanceof osk.FloatingOSKView) {
-      keyman.osk.userPositioned=true;
+      // An old KMW bug previously auto-unset the affected field when this function was
+      // used by CJK keyboards during rule processing.  As a result, we need to condition
+      // on whether or not:
+      // 1.  The active keyboard is CJK
+      // 2.  A keyboard rule is actively processing.
+      //
+      // If BOTH are true, we do NOT mutate keyman.osk.userPositioned.
+      // Otherwise, not all conditions are met, so we still allow OSK pinning.
+      if(!keyman.core.activeKeyboard.isCJK || !this.ruleBehavior) {
+        keyman.osk.userPositioned=true;
+      }
     }
     // Automatically reuses previously-set positioning.
     // Other OSK API functions must have previously been used to set the 

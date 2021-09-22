@@ -31,7 +31,7 @@ namespace com.keyman.osk {
     keyboardView: KeyboardView;  // Which implements OSKViewComponent
     footerView:   OSKViewComponent;
 
-    protected readonly device: com.keyman.utils.DeviceSpec;
+    protected device: com.keyman.utils.DeviceSpec;
     protected readonly hostDevice: com.keyman.utils.DeviceSpec;
 
     private _boxBaseMouseDown:        (e: MouseEvent) => boolean; 
@@ -198,6 +198,24 @@ namespace com.keyman.osk {
 
       this._target = targ;
       this.commonCheckAndDisplay();
+    }
+
+
+    public get targetDevice(): com.keyman.utils.DeviceSpec {
+      return this.device;
+    }
+
+    public set targetDevice(spec: com.keyman.utils.DeviceSpec) {
+      if(this.allowsDeviceChange(spec)) {
+        this.device = spec;
+        this.loadActiveKeyboard();
+      } else {
+        console.error("May not change target device for this OSKView type.");
+      }
+    }
+
+    protected allowsDeviceChange(newSpec: com.keyman.utils.DeviceSpec): boolean {
+      return false;
     }
 
     /**
@@ -496,9 +514,20 @@ namespace com.keyman.osk {
         }
 
         const bs = this._Box.style;
+        // OSK size settings can only be reliably applied to standard VisualKeyboard
+        // visualizations, not to help text or empty views.
         bs.width  = bs.maxWidth  = this.computedWidth + 'px';
         bs.height = bs.maxHeight = this.computedHeight + 'px';
+
+      } else {
+        const bs = this._Box.style;
+        bs.width  = 'auto';
+        bs.height = 'auto';
+        bs.maxWidth = bs.maxHeight = '';
       }
+
+      let keyman = com.keyman.singleton;
+      keyman.alignInputs();
     }
 
     public refreshLayoutIfNeeded(pending?: boolean) {
@@ -856,7 +885,12 @@ namespace com.keyman.osk {
       });
 
       return promise.then(function() {
-        if(_this._Visible) {
+        // Repro for passing this condition:
+        // 1.  Touch an input element of the page
+        // 2.  Within a second (before the focusing timer expires), touch the base page.
+        //     See domEventHandlers.ts, `focusTimer` / `setFocusTimer`.
+        // 3.  After the timer expires, touch the base page again.
+        if(_this._Visible && _this.activationConditionsMet) {
           // Leave opacity alone and clear transition if another element activated
           os.transition='';
           return false;
