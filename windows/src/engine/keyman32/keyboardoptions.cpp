@@ -293,7 +293,7 @@ UpdateKeyboardOptionsCore(
         &retValue);
     if (err_status != KM_KBP_STATUS_OK) {
       SendDebugMessageFormat(
-          0, sdmKeyboard, 0, "SaveCoreOptions: km_kbp_state_option_lookup failed with error status [%d]", err_status);
+          0, sdmKeyboard, 0, "UpdateKeyboardOptionsCore: km_kbp_state_option_lookup failed with error status [%d]", err_status);
       continue;
     }
     // compare to see if changed
@@ -314,7 +314,7 @@ SaveKeyboardOptionsCore(LPINTKEYBOARDINFO kp) {
   km_kbp_status err_status = km_kbp_keyboard_get_attrs(kp->lpCoreKeyboard, &keyboardAttrs);
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
+        0, sdmKeyboard, 0, "SaveKeyboardOptionsCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
     return nullptr;
   }
   int listSize = (int)km_kbp_options_list_size(keyboardAttrs->default_options);
@@ -329,7 +329,7 @@ SaveKeyboardOptionsCore(LPINTKEYBOARDINFO kp) {
         km_kbp_state_option_lookup(kp->lpCoreKeyboardState, KM_KBP_OPT_KEYBOARD, kbDefaultOpts->key, &retValue);
     if (err_status != KM_KBP_STATUS_OK) {
       SendDebugMessageFormat(
-          0, sdmKeyboard, 0, "SaveCoreOptions: km_kbp_state_option_lookup failed with error status [%d]", err_status);
+          0, sdmKeyboard, 0, "SaveKeyboardOptionsCore: km_kbp_state_option_lookup failed with error status [%d]", err_status);
       continue;
     }
     savedKeyboardOpts[i].key   = CloneKMKBPCP(kbDefaultOpts->key);
@@ -347,13 +347,13 @@ RestoreKeyboardOptionsCore(
   km_kbp_status err_status = km_kbp_state_options_update(lpCoreKeyboardState, lpCoreKeyboardOptions);
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
-        0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_state_options_update failed with error status [%d]", err_status);
+        0, sdmKeyboard, 0, "RestoreKeyboardOptionsCore: km_kbp_state_options_update failed with error status [%d]", err_status);
     return FALSE;
   }
   return TRUE;
 }
 
-BOOL
+void
 DisposeKeyboardOptionsCore(km_kbp_option_item** lpCoreKeyboardOptions) {
   size_t listSize          = km_kbp_options_list_size(*lpCoreKeyboardOptions);
   for (int i = 0; i < (int)listSize; i++) {

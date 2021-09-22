@@ -26,7 +26,7 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp);
  * Updates the supplied Keyboard processor options list from the keyboard processor pointed
  * to by the state pointer.
  *
- * @param         lpCoreKeyboardState   The core keyboardprocessor state which as the source options
+ * @param         lpCoreKeyboardState   The core keyboardprocessor state which has the source options
  * @param[in,out] lpCoreKeyboardOptions The core keyboard options to be updated
  * @return        BOOL      True if one or more options were updated
  */
@@ -36,7 +36,7 @@ BOOL UpdateKeyboardOptionsCore(km_kbp_state* const lpCoreKeyboardState, km_kbp_o
  * Returns a copy of the core keyboard processors current keyboard options
  * The caller is responsible for freeing the returned km_kbp_option_item's list.
  *
- * @param  kp                  A pointer the keyboard info object that constains the
+ * @param  kp                  A pointer to the keyboard info object that contains the
  *                             keyboardprocessor state and keyboard for the source options list.
  *
  * @return km_kbp_option_item* The copy of the options list or NULL if copy failed
@@ -44,7 +44,7 @@ BOOL UpdateKeyboardOptionsCore(km_kbp_state* const lpCoreKeyboardState, km_kbp_o
 km_kbp_option_item* SaveKeyboardOptionsCore(LPINTKEYBOARDINFO kp);
 
 /**
- * Restore the core keyboard processor options to from the supplied keyboard
+ * Restore the core keyboard processor options to the supplied keyboard
  * list of `km_kbp_option_item`s
  *
  * @param lpCoreKeyboardState   The state pointer for the keyboard processor
@@ -79,4 +79,4 @@ void SaveKeyboardOptionREGCore(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
  *
  * @param  lpCoreKeyboardOptions  keyboard options items to be freed
  */
-BOOL DisposeKeyboardOptionsCore(km_kbp_option_item** lpCoreKeyboardOptions);
+void DisposeKeyboardOptionsCore(km_kbp_option_item** lpCoreKeyboardOptions);
