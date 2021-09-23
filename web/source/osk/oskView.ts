@@ -31,7 +31,7 @@ namespace com.keyman.osk {
     keyboardView: KeyboardView;  // Which implements OSKViewComponent
     footerView:   OSKViewComponent;
 
-    protected readonly device: com.keyman.utils.DeviceSpec;
+    protected device: com.keyman.utils.DeviceSpec;
     protected readonly hostDevice: com.keyman.utils.DeviceSpec;
 
     private _boxBaseMouseDown:        (e: MouseEvent) => boolean; 
@@ -104,7 +104,7 @@ namespace com.keyman.osk {
       util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
 
       this.setBaseMouseEventListeners();
-      if(deviceSpec.touchable) {
+      if(hostDevice.touchable) {
         this.setBaseTouchEventListeners();
       }
 
@@ -198,6 +198,24 @@ namespace com.keyman.osk {
 
       this._target = targ;
       this.commonCheckAndDisplay();
+    }
+
+
+    public get targetDevice(): com.keyman.utils.DeviceSpec {
+      return this.device;
+    }
+
+    public set targetDevice(spec: com.keyman.utils.DeviceSpec) {
+      if(this.allowsDeviceChange(spec)) {
+        this.device = spec;
+        this.loadActiveKeyboard();
+      } else {
+        console.error("May not change target device for this OSKView type.");
+      }
+    }
+
+    protected allowsDeviceChange(newSpec: com.keyman.utils.DeviceSpec): boolean {
+      return false;
     }
 
     /**
@@ -302,7 +320,7 @@ namespace com.keyman.osk {
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic width scaling. 
      */
-    get width(): LengthStyle {
+    get width(): ParsedLengthStyle {
       return this._width;
     }
 
@@ -310,7 +328,7 @@ namespace com.keyman.osk {
      * The configured height for this VisualKeyboard.  May be `undefined` or `null`
      * to allow automatic height scaling. 
      */
-    get height(): LengthStyle {
+    get height(): ParsedLengthStyle {
       return this._height;
     }
 
@@ -395,18 +413,38 @@ namespace com.keyman.osk {
       }
     }
 
-    /* private */ computeFrameHeight(): number {
+    private computeFrameHeight(): number {
       return (this.headerView?.layoutHeight.val || 0) + (this.footerView?.layoutHeight.val || 0);
     }
 
-    /*private*/ setSize(width?: number, height?: number, pending?: boolean) {
+    setSize(width?: number | LengthStyle, height?: number | LengthStyle, pending?: boolean) {
       let mutatedFlag = false;
+
+      let parsedWidth: ParsedLengthStyle;
+      let parsedHeight: ParsedLengthStyle;
+
+      if(!width && width !== 0) {
+        return;
+      }
+
+      if(!height && height !== 0) {
+        return;
+      }
+
+      if(Number.isInteger(width as number)) {
+        parsedWidth = ParsedLengthStyle.inPixels(width as number);
+      } else {
+        parsedWidth = new ParsedLengthStyle(width as LengthStyle);
+      }
+
+      if(Number.isInteger(height as number)) {
+        parsedHeight = ParsedLengthStyle.inPixels(height as number);
+      } else {
+        parsedHeight = new ParsedLengthStyle(height as LengthStyle);
+      }
 
       if(width && height) {
         mutatedFlag = !this._width || !this._height;
-
-        const parsedWidth = ParsedLengthStyle.inPixels(width);
-        const parsedHeight = ParsedLengthStyle.inPixels(height);
 
         mutatedFlag = mutatedFlag || parsedWidth.styleString  != this._width.styleString;
         mutatedFlag = mutatedFlag || parsedHeight.styleString != this._height.styleString;
@@ -438,8 +476,9 @@ namespace com.keyman.osk {
         this._computedWidth  = this.width.val;
         this._computedHeight = this.height.val;
       } else if(isInDOM) {
-        this._computedWidth   = parseInt(computedStyle.width, 10);
-        this._computedHeight  = parseInt(computedStyle.height, 10);
+        const parent = this._Box.offsetParent as HTMLElement;
+        this._computedWidth  = this.width.val  * (this.width.absolute  ? 1 : parent.offsetWidth);
+        this._computedHeight = this.height.val * (this.height.absolute ? 1 : parent.offsetHeight);
       } else {
         // Cannot perform layout operations!
         return;
@@ -474,11 +513,21 @@ namespace com.keyman.osk {
           this.vkbd.refreshLayout();
         }
 
-        if(this.vkbd.usesFixedHeightScaling) {
-          var b: HTMLElement = this._Box, bs=b.style;
-          bs.height=bs.maxHeight=this.computedHeight+'px';
-        }
+        const bs = this._Box.style;
+        // OSK size settings can only be reliably applied to standard VisualKeyboard
+        // visualizations, not to help text or empty views.
+        bs.width  = bs.maxWidth  = this.computedWidth + 'px';
+        bs.height = bs.maxHeight = this.computedHeight + 'px';
+
+      } else {
+        const bs = this._Box.style;
+        bs.width  = 'auto';
+        bs.height = 'auto';
+        bs.maxWidth = bs.maxHeight = '';
       }
+
+      let keyman = com.keyman.singleton;
+      keyman.alignInputs();
     }
 
     public refreshLayoutIfNeeded(pending?: boolean) {
@@ -587,7 +636,7 @@ namespace com.keyman.osk {
     }.bind(this);
 
     private _GenerateKeyboardView(keyboard: keyboards.Keyboard): KeyboardView {
-      let device = com.keyman.singleton.util.device;
+      let device = this.device;
 
       if(this.vkbd) {
         this.vkbd.shutdown();
@@ -624,10 +673,10 @@ namespace com.keyman.osk {
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
     private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard): VisualKeyboard {
-      let device = com.keyman.singleton.util.device;
+      let device = this.device;
 
       // Root element sets its own classes, one of which is 'kmw-osk-inner-frame'.
-      let vkbd = new VisualKeyboard(keyboard, device);
+      let vkbd = new VisualKeyboard(keyboard, device, this.hostDevice);
 
       // Ensure the OSK's current layer is kept up to date.
       let core = com.keyman.singleton.core; // Note:  will eventually be a class field.
@@ -873,7 +922,7 @@ namespace com.keyman.osk {
      * of their animation.
      */
     public hideNow() {
-      if(!this._Box) {
+      if(!this.mayHide(false) || !this._Box) {
         return;
       }
 
@@ -964,8 +1013,10 @@ namespace com.keyman.osk {
      * 
      **/
     showLanguageMenu() {
-      let menu = new LanguageMenu(com.keyman.singleton);
-      menu.show();
+      if(this.hostDevice.touchable) {
+        let menu = new LanguageMenu(com.keyman.singleton);
+        menu.show();
+      }
     }
 
     // OSK state fields & events

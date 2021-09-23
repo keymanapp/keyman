@@ -7,9 +7,12 @@ namespace com.keyman.osk {
     private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
 
     private hasActiveClick: boolean = false;
+    private ignoreSequence: boolean = false;
 
     public constructor(vkbd: VisualKeyboard) {
-      super(vkbd);
+      // document.body is the event root b/c we need to track the mouse if it leaves
+      // the VisualKeyboard's hierarchy.
+      super(vkbd, document.body);
 
       this._mouseStart = this.onMouseStart.bind(this);
       this._mouseMove  = this.onMouseMove.bind(this);
@@ -43,12 +46,21 @@ namespace com.keyman.osk {
     }
 
     onMouseStart(event: MouseEvent) {
+      if(!this.vkbd.element.contains(event.target as Node)) {
+        this.ignoreSequence = true;
+        return;
+      }
+
       this.preventPropagation(event);
       this.onInputStart(InputEventCoordinate.fromEvent(event));
       this.hasActiveClick = true;
     }
 
     onMouseMove(event: MouseEvent) {
+      if(this.ignoreSequence) {
+        return;
+      }
+
       const coord = InputEventCoordinate.fromEvent(event);
 
       if(!event.buttons) {
@@ -72,6 +84,11 @@ namespace com.keyman.osk {
     }
 
     onMouseEnd(event: MouseEvent) {
+      if(this.ignoreSequence) {
+        this.ignoreSequence = false;
+        return;
+      }
+
       if(!event.buttons) {
         this.hasActiveClick = false;
       }

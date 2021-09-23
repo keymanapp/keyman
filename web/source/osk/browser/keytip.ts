@@ -31,8 +31,14 @@ namespace com.keyman.osk.browser {
       let util = keyman.util;
 
       // Create and display the preview
-      if(on) {
-        var xLeft = dom.Utils.getAbsoluteX(key),
+      // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
+      // decent null-guard check.
+      if(on && key.offsetParent) {
+        // The key element is positioned relative to its key-square, which is,
+        // in turn, relative to its row.  Rows take 100% width, so this is sufficient.
+        //
+        // May need adjustment for borders if ever enabled for the desktop form-factor target.
+        var xLeft = (key.offsetParent as HTMLElement).offsetLeft,
             xWidth = key.offsetWidth,
             xHeight = key.offsetHeight,
             kc = key.key.label,
@@ -47,7 +53,8 @@ namespace com.keyman.osk.browser {
         kts.top = 'auto';
         // Matches how the subkey positioning is set.
         let rowElement = (key.key as OSKBaseKey).row.element;
-        kts.bottom = (vkbd.height - rowElement.offsetHeight - rowElement.offsetTop) + 'px';
+        const _Box = vkbd.element.parentNode as HTMLDivElement;
+        kts.bottom = _Box.offsetHeight - rowElement.offsetHeight - rowElement.offsetTop + 'px'; 
         kts.textAlign = 'center';
         kts.overflow = 'visible';
         kts.fontFamily = util.getStyleValue(kc,'font-family');
@@ -118,7 +125,7 @@ namespace com.keyman.osk.browser {
      *  @param  {number}  h height of touched key, px
      *  @param  {number}  edge  -1 left edge, 1 right edge, else 0
      */
-    drawPreview(canvas: HTMLCanvasElement, device: com.keyman.Device, w: number, h: number, edge: number, delta?: number) {
+    drawPreview(canvas: HTMLCanvasElement, device: com.keyman.utils.DeviceSpec, w: number, h: number, edge: number, delta?: number) {
       delta = delta || 0;
 
       var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height + delta,
@@ -130,7 +137,7 @@ namespace com.keyman.osk.browser {
       h2 = h2 > hBoundedMax ? hBoundedMax : h2;
       h3 = hMax > hBoundedMax ? hBoundedMax : h3;
 
-      if(device.OS == 'Android') {
+      if(device.OS == utils.OperatingSystem.Android) {
         r = 3;
       }
 
@@ -150,11 +157,13 @@ namespace com.keyman.osk.browser {
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
       // Define appearance of preview (cannot be done directly in CSS)
-      if(device.OS == 'Android') {
+      if(device.OS == utils.OperatingSystem.Android) {
         var wx=(w1+w2)/2;
         w1 = w2 = wx;
       }
-      ctx.fillStyle = device.styles.popupCanvasBackgroundColor;
+
+      let styleConsts = new utils.StyleConstants(device);
+      ctx.fillStyle = styleConsts.popupCanvasBackgroundColor;
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#cccccc';
 
@@ -163,7 +172,7 @@ namespace com.keyman.osk.browser {
       ctx.beginPath();
       ctx.moveTo(w0+r,0);
       ctx.arcTo(w3,0,w3,r,r);
-      if(device.OS == 'Android') {
+      if(device.OS == utils.OperatingSystem.Android) {
         ctx.arcTo(w3,h1,w2,h2,r);
         ctx.arcTo(w2,h2,w1,h2,r);
       } else {
