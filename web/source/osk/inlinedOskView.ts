@@ -7,14 +7,18 @@
 /// <reference path="layouts/targetedFloatLayout.ts" />
 /// <reference path="oskView.ts" />
 
-/***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
-***/
+/*
+ * Keyman is copyright (c) SIL International.  MIT License.
+ */
 
 namespace com.keyman.osk {
   type OSKPos = {'left'?: number, 'top'?: number};
 
+  /**
+   * Defines a version of the OSK that produces an element designed for site-controlled
+   * insertion into the DOM.  Rather than "floating" over the page, this version is inlined
+   * as part of the host page's layout.
+   */
   export class InlinedOSKView extends OSKView {
     // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
     modifierCodes = text.Codes.modifierCodes;
@@ -33,9 +37,9 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Function     _Unload
-     * Scope        Private
-     * Description  Clears OSK variables prior to exit (JMD 1.9.1 - relocation of local variables 3/9/10)
+     * Clears OSK variables prior to exit (JMD 1.9.1 - relocation of local variables 3/9/10)
+     * 
+     * This should probably be merged or incorporated into the `shutdown` method at some point.
      */
     _Unload() {
       this.keyboardView = null;
@@ -63,39 +67,37 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Function     restorePosition
-     * Scope        Public
-     * @param       {boolean?}      keepDefaultPosition  If true, does not reset the default x,y set by `setRect`.
-     *                                                   If false or omitted, resets the default x,y as well.
-     * Description  Move OSK back to default position, floating under active input element
+     * Moves the OSK back to default position, floating under active input element
+     * 
+     * Is a long-published API intended solely for use with the FloatingOSKView use pattern.
+     * @param  keepDefaultPosition  If true, does not reset the default x,y set by `setRect`.
+     *                              If false or omitted, resets the default x,y as well.
      */
     ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: AnchoredOSKView, keepDefaultPosition?: boolean) {
       return;
     }.bind(this);
 
     /**
-     * Function     _VKbdMouseOver
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Activate the KMW UI on mouse over
+     * Activates the KMW UI on mouse over, allowing DOMManager to preserve the
+     * active element's (conceptual) focus during OSK interactions.
      */
     private _VKbdMouseOver = function(this: AnchoredOSKView, e) {
       com.keyman.singleton.uiManager.setActivatingUI(true);
     }.bind(this);
 
     /**
-     * Function     _VKbdMouseOut
-     * Scope        Private
-     * @param       {Object}      e      event
-     * Description  Cancel activation of KMW UI on mouse out
+     * Cancels activation of the KMW UI on mouse out, which is used to disable
+     * DOMManager's focus-preservation mode.
+     * 
+     * @see _VKbdMouseOver
      */
     private _VKbdMouseOut = function(this: AnchoredOSKView, e) {
       com.keyman.singleton.uiManager.setActivatingUI(false);
     }.bind(this);
 
     /**
-     * Get the wanted height of the OSK
-     *  @return   {number}    height in pixels
+     * Get the default height for the OSK
+     * @return  height in pixels
      **/
     getDefaultKeyboardHeight(): number {
       if(this.keyboardView instanceof VisualKeyboard) {
@@ -107,9 +109,8 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Get the wanted width of the OSK
-     *
-     *  @return   {number}    height in pixels
+     * Get the default width for the OSK
+     * @return width in pixels
      **/
     getDefaultWidth(): number {
       return this.computedWidth;
@@ -118,8 +119,11 @@ namespace com.keyman.osk {
     /**
      * Allow the UI or page to set the position and size of the OSK
      * and (optionally) override user repositioning or sizing
+     * 
+     * Designed solely for use with the FloatingOSKView use pattern, but is a
+     * long-standing API endpoint that needs preservation.
      *
-     * @param       {Object.<string,number>}   p  Array object with position and size of OSK container
+     * @param  p  Array object with position and size of OSK container
     **/
     ['setRect'](p: OSKRect) {
       return;
@@ -128,7 +132,7 @@ namespace com.keyman.osk {
     /**
      * Get position of OSK window
      *
-     * @return      {Object.<string,number>}     Array object with OSK window position
+     * @return Array object with OSK window position
     **/
     getPos(): OSKPos {
       var Lkbd=this._Box, p={
@@ -140,10 +144,11 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Function     setPos
-     * Scope        Private
-     * @param       {Object.<string,number>}    p     Array object with OSK left, top
-     * Description  Set position of OSK window, but limit to screen, and ignore if  a touch input device
+     * Set position of OSK window, but limited to the screen.
+     * 
+     * Designed solely for use with the FloatingOSKView use pattern, but is a
+     * long-standing API endpoint that needs preservation.
+     * @param  p Array object with OSK left, top
      */
     ['setPos'](p: OSKPos) {
       return; // I3363 (Build 301)
@@ -156,8 +161,8 @@ namespace com.keyman.osk {
     /**
      * Allow UI to respond to OSK being shown (passing position and properties)
      *
-     * @param       {Object=}       p     object with coordinates and userdefined flag
-     * @return      {boolean}
+     * @param  p  object with coordinates and userdefined flag
+     * @return 
      *
      */
     doShow(p) {
@@ -165,11 +170,10 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Allow UI to update respond to OSK being hidden
+     * Allows UI modules to update state when the OSK is being hidden
      *
-     * @param       {Object=}       p     object with coordinates and userdefined flag
-     * @return      {boolean}
-     *
+     * @param  p  object with coordinates and userdefined flag
+     * @return 
      */
     doHide(p) {
       return com.keyman.singleton.util.callEvent('osk.hide',p);
