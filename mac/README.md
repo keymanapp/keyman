@@ -1,5 +1,7 @@
 # Keyman for macOS
 
+## Prerequisites
+See [build configuration](../docs/build/index.md) for details on how to configure your build environment.
 
 ## Keyman for macOS Development
 

@@ -12,4 +12,6 @@ Carthage/**
 **/output
 localenv.sh
 setup/textinputsource/textinputsource
+setup/textinputsource/textinputsource.arm64
+setup/textinputsource/textinputsource.x86_64
 setup/Install Keyman.app

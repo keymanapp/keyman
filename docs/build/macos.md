@@ -1,13 +1,15 @@
 # Setup your Keyman build environment on macOS
 
+This document describes prerequisites and tools required for building various Keyman projects on macOS. Each project will also have additional notes linked below.
+
 ## Target Projects
 
 On macOS, you can build the following projects:
 
-* Keyman for Android
-* Keyman for iOS
-* Keyman for macOS
-* KeymanWeb
+* Keyman for Android ([additional details](../../android/README.md))
+* Keyman for iOS ([additional details](../../ios/README.md))
+* Keyman for macOS ([additional details](../../mac/README.md))
+* KeymanWeb ([additional details](../../web/README.md))
 
 The following libraries can also be built:
 
@@ -24,11 +26,13 @@ The following projects **cannot** be built on macOS:
 
 * Minimum macOS version: macOS Catalina 10.15 or Big Sur 11.0
 
+**Note:** to make a fully M1-compatible release build of Keyman for macOS (for the setup Applescript), Big Sur 11.0 is required, as osacompile on earlier versions does not build for arm64 (M1). The build will still work on earlier versions, but the installer won't be able to run on M1 Macs that do not have Rosetta 2 installed.
+
 ## Prerequisites
 
 Many dependencies are only required for specific projects.
 
-* XCode (iOS, macOS)
+* XCode (iOS, macOS) 12.4 or later
   * Install from App Store
   * Accept the Xcode license: `sudo xcodebuild -license accept`
 
