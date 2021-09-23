@@ -209,11 +209,8 @@ namespace com.keyman.osk {
      * @param       {number=}     Py      y-coordinate for OSK rectangle
      */
     _Show(Px?: number, Py?: number) {
-      let keymanweb = com.keyman.singleton;
-      let device = this.device;
-
-      // Do not try to display OSK if undefined, or no active element
-      if(keymanweb.domManager.getActiveElement() == null) {
+      // Do not try to display OSK if no active element
+      if(!this.activeTarget) {
         return;
       }
 
@@ -315,7 +312,7 @@ namespace com.keyman.osk {
 
       // If hidden by the UI, be sure to restore the focus
       if(hiddenByUser) {
-        keymanweb.domManager.focusLastActiveElement();
+        this.lastActiveTarget.focus();
       }
     }
 

@@ -158,6 +158,16 @@ namespace com.keyman.osk {
       this._boxBaseTouchStart = null;
     }
 
+    public get activeTarget(): dom.targets.OutputTarget {
+      const el=com.keyman.singleton.domManager.activeElement;
+      return dom.Utils.getOutputTarget(el);
+    }
+
+    public get lastActiveTarget(): dom.targets.OutputTarget {
+      const el = com.keyman.singleton.domManager.lastActiveElement;
+      return dom.Utils.getOutputTarget(el);
+    }
+
     public get vkbd(): VisualKeyboard {
       if(this.keyboardView instanceof VisualKeyboard) {
         return this.keyboardView;
@@ -645,6 +655,10 @@ namespace com.keyman.osk {
      * Definitely needs clearer design & modeling, at the least.
      */
     hideNow: () => void = function(this: OSKView) { // I3363 (Build 301)
+      if(!this._Box) {
+        return;
+      }
+
       this._Box.removeEventListener('transitionend', this.hideNow, false);
       this._Box.removeEventListener('webkitTransitionEnd', this.hideNow, false);
 

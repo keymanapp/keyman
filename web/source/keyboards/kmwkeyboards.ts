@@ -471,7 +471,7 @@ namespace com.keyman.keyboards {
 
       this.doBeforeKeyboardChange(PInternalName,PLgCode);
       let p: Promise<void> = this._SetActiveKeyboard(PInternalName,PLgCode,true);
-      if(this.keymanweb.domManager.getLastActiveElement() != null) {
+      if(this.keymanweb.domManager.lastActiveElement != null) {
         this.keymanweb.domManager.focusLastActiveElement(); // TODO:  Resolve without need for the cast.
       }
       // If we ever allow PLgCode to be set by default, we can auto-detect the language code
@@ -593,7 +593,7 @@ namespace com.keyman.keyboards {
           // As a rotation may have occurred since the keyboard was swapped out,
           // we should refresh its layouts.
           keyman.core.activeKeyboard.refreshLayouts();
-          this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
+          this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.lastActiveElement);  // I2077 - LTR/RTL timing
 
           // and update the active stub
           for(var Ls=0; Ls<this.keyboardStubs.length; Ls++) {
@@ -675,7 +675,7 @@ namespace com.keyman.keyboards {
               // It works much more reliably if deferred (KMEW-101, build 356)
               // The effect of a delay can also be tested, for example, by setting the timeout to 5000
               var manager = this;
-              loadingStub.asyncLoader.promise = new Promise(function(resolve, reject) {
+              loadingStub.asyncLoader.promise = new Promise<void>(function(resolve, reject) {
                 window.setTimeout(function(){
                   manager.installKeyboard(resolve, reject, loadingStub);
                 },0);
@@ -685,7 +685,7 @@ namespace com.keyman.keyboards {
             return this.keyboardStubs[Ln].asyncLoader.promise;
           }
         }
-        this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
+        this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.lastActiveElement);  // I2077 - LTR/RTL timing
       }
 
       // Initialize the OSK (provided that the base code has been loaded)
@@ -756,9 +756,9 @@ namespace com.keyman.keyboards {
             manager.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
             core.activeKeyboard=new Keyboard(kbd);
 
-            if(manager.keymanweb.domManager.getLastActiveElement() != null) { // TODO:  Resolve without need for the cast.
+            if(manager.keymanweb.domManager.lastActiveElement != null) { // TODO:  Resolve without need for the cast.
               manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
-              manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
+              manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.lastActiveElement);
             }
 
             manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);
@@ -818,7 +818,7 @@ namespace com.keyman.keyboards {
       // This allows us to ensure the keyboard is set correctly without waiting for focus event
       // triggers - very helpful for automated testing.
       if(!this.keymanweb.isEmbedded) {
-        this.keymanweb.touchAliasing._BlurKeyboardSettings(PInternalName, PLgCode);
+        this.keymanweb.touchAliasing._BlurKeyboardSettings(this.keymanweb.domManager.lastActiveElement, PInternalName, PLgCode);
       }
     }
 

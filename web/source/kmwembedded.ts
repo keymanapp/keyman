@@ -124,7 +124,7 @@ namespace com.keyman.text {
 
 (function() {
   // Declare KeymanWeb and related objects
-  var keymanweb=window['keyman'],util=keymanweb['util'],device=util.device;
+  var keymanweb=window['keyman'], util=keymanweb['util'],device=util.device;
   var dom = com.keyman.dom;
 
   // Allow definition of application name
@@ -322,7 +322,7 @@ namespace com.keyman.text {
    **/
   keymanweb['touchMenuPos'] = function() {
     let osk = keymanweb.osk;
-    if(osk.vkbd == null || osk.vkbd.lgKey == null) {
+    if(osk == null || osk.vkbd == null || osk.vkbd.lgKey == null) {
       return '';
     }
 
@@ -373,7 +373,7 @@ namespace com.keyman.text {
 
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement();
+      var Lelem=keymanweb.domManager.lastActiveElement;
       keymanweb.domManager.initActiveElement(Lelem);
 
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
@@ -405,7 +405,7 @@ namespace com.keyman.text {
     
     // Note:  this assumes Lelem is properly attached and has an element interface.
     // Currently true in the Android and iOS apps.
-    var Lelem = keymanweb.domManager.getLastActiveElement();
+    var Lelem = keymanweb.domManager.lastActiveElement;
     
     keymanweb.domManager.initActiveElement(Lelem);
 

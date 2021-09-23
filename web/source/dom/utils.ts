@@ -6,12 +6,12 @@ namespace com.keyman.dom {
      * Finds the `OutputTarget` associated with the specified element, or the currently-active element if not specified.
      * @param Lelem The element corresponding to the desired `OutputTarget`
      */
-    static getOutputTarget(Lelem?: HTMLElement): text.OutputTarget {
+    static getOutputTarget(Lelem?: HTMLElement): dom.targets.OutputTarget {
       if(!Lelem) {
         // Since this may be used to test modularly, we can't depend on the existence of the KMW global.
         let keyman = com.keyman['singleton'];
         if(keyman) {
-          Lelem = keyman.domManager.getLastActiveElement();
+          Lelem = keyman.domManager.lastActiveElement;
         }
         
         if(!Lelem) {

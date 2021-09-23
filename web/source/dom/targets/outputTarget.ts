@@ -5,6 +5,13 @@ namespace com.keyman.dom.targets {
      */
     abstract getElement(): HTMLElement;
 
+    public focus(): void {
+      const ele = this.getElement();
+      if(ele.focus) {
+        ele.focus();
+      }
+    }
+
     /**
      * A helper method for doInputEvent; creates a simple common event and default dispatching.
      * @param elem 

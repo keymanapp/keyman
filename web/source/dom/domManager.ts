@@ -73,6 +73,15 @@ namespace com.keyman.dom {
     _BeepTimeout: number = 0;       // BeepTimeout - a flag indicating if there is an active 'beep'. 
                                     // Set to 1 if there is an active 'beep', otherwise leave as '0'.
 
+    // Used for special touch-based page interactions re: element activation on touch devices.
+    deactivateOnScroll: boolean = false;
+    deactivateOnRelease: boolean = false;
+    touchY: number; // For scroll-related aspects on iOS.
+
+    touchStartActivationHandler: (e: TouchEvent) => boolean;
+    touchMoveActivationHandler:  (e: TouchEvent) => boolean;
+    touchEndActivationHandler:   (e: TouchEvent) => boolean;
+
     constructor(keyman: KeymanBase) {
       this.keyman = keyman;
       
@@ -100,6 +109,13 @@ namespace com.keyman.dom {
         // On shutdown, we remove our general focus-suppression handlers as well.
         this.keyman.util.detachDOMEvent(document.body, 'focus', DOMManager.suppressFocusCheck, true);
         this.keyman.util.detachDOMEvent(document.body, 'blur', DOMManager.suppressFocusCheck, true);
+
+        // Also, the base-page touch handlers for activation management.
+        if(this.touchStartActivationHandler) {
+          this.keyman.util.detachDOMEvent(document.body, 'touchstart', this.touchStartActivationHandler, false);
+          this.keyman.util.detachDOMEvent(document.body, 'touchmove',  this.touchMoveActivationHandler,  false);
+          this.keyman.util.detachDOMEvent(document.body, 'touchend',   this.touchEndActivationHandler,   false);
+        }
       } catch (e) {
         console.error("Error occurred during shutdown");
         console.error(e);
@@ -436,9 +452,12 @@ namespace com.keyman.dom {
         baseElement.onkeyup = this.getHandlers(Pelem)._KeyUp;  
       }
 
-      var lastElem = this.getLastActiveElement();
+      var lastElem = this.lastActiveElement;
       if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
-        this.clearLastActiveElement();
+        if(this.activeElement == lastElem) {
+          this.activeElement = null;
+        }
+        this.lastActiveElement = null;
         this.keyman.osk._Hide(false);
       }
       
@@ -1124,7 +1143,7 @@ namespace com.keyman.dom {
         }
       }
       
-      this.clearLastActiveElement();
+      this.lastActiveElement = null;
     }.bind(this);
 
     /* ------ Defines independent, per-control keyboard setting behavior for the API. ------ */
@@ -1163,7 +1182,7 @@ namespace com.keyman.dom {
         // If Pelem is the focused element/active control, we should set the keyboard in place now.
         // 'kmw_ip' is the touch-alias for the original page's control.
 
-        var lastElem = this.getLastActiveElement();
+        var lastElem = this.lastActiveElement;
         if(lastElem && (lastElem == Pelem || lastElem == Pelem['kmw_ip'])) {
 
           if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
@@ -1215,18 +1234,15 @@ namespace com.keyman.dom {
      * Set focus to last active target element (browser-dependent)
      */    
     focusLastActiveElement() {
-      var lastElem = this.getLastActiveElement();
+      var lastElem = this.lastActiveElement;
       if(!lastElem) {
         return;
       }
 
       this.keyman.uiManager.justActivated = true;
-      if(lastElem.ownerDocument && lastElem instanceof lastElem.ownerDocument.defaultView.HTMLIFrameElement && 
-          this.keyman.domManager._IsMozillaEditableIframe(lastElem as HTMLIFrameElement,0)) {
-        lastElem.ownerDocument.defaultView.focus(); // I3363 (Build 301)
-      } else if(lastElem.focus) {
-        lastElem.focus();
-      }
+
+      const target = Utils.getOutputTarget(lastElem);
+      target.focus();
     }
 
     /**
@@ -1234,20 +1250,60 @@ namespace com.keyman.dom {
      * 
      * @return      {Element}        
      */    
-    getLastActiveElement(): HTMLElement {
-      return DOMEventHandlers.states.lastActiveElement;
+    get lastActiveElement(): HTMLElement {
+      return DOMEventHandlers.states._lastActiveElement;
     }
 
-    clearLastActiveElement() {
-      DOMEventHandlers.states.lastActiveElement = null;
+    set lastActiveElement(Pelem: HTMLElement) {
+      DOMEventHandlers.states._lastActiveElement = Pelem;
+
+      if(this.lastActiveElement == null && this.activeElement == null) {
+        this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
+      }
     }
 
-    getActiveElement(): HTMLElement {
-      return DOMEventHandlers.states.activeElement;
+    get activeElement(): HTMLElement {
+      return DOMEventHandlers.states._activeElement;
     }
 
-    _setActiveElement(Pelem: HTMLElement) {
-      DOMEventHandlers.states.activeElement = Pelem;
+    set activeElement(Pelem: HTMLElement) {
+      // Ensure that a TouchAliasElement is hidden whenever it is deactivated for input.
+      if(this.activeElement) {
+        if(Utils.instanceof(this.keyman.domManager.activeElement, "TouchAliasElement")) {
+          (this.keyman.domManager.activeElement as TouchAliasElement).hideCaret();
+        }
+      }
+
+      DOMEventHandlers.states._activeElement = Pelem;
+
+      var isActivating = this.keyman.uiManager.isActivating;
+
+      // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
+      const osk = this.keyman.osk;
+      const device = this.keyman.util.device;
+      if(this.keyman.osk) {
+        if(!Pelem) {
+          if(this.keyman.osk && !isActivating) {
+            this.keyman.osk._Hide(false);
+          }
+        } else {
+          // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
+          if(device.touchable) {
+            osk._Enabled = true;
+            osk._Show();
+          } else {
+            // Conditionally show the OSK when control receives the focus
+            if(this.keyman.isCJK()) {
+              osk._Enabled = true;
+            }
+            if(osk._Enabled) {
+              osk._Show();
+            } else {
+              osk._Hide(false);
+            }
+          }
+        }
+      }
     }
 
     /**
@@ -1279,17 +1335,17 @@ namespace com.keyman.dom {
       // If we're changing controls, don't forget to properly manage the keyboard settings!
       // It's only an issue on 'native' (non-embedded) code paths.
       if(!this.keyman.isEmbedded) {
-        this.keyman.touchAliasing._BlurKeyboardSettings();
+        this.keyman.touchAliasing._BlurKeyboardSettings(this.keyman.domManager.lastActiveElement);
       }
 
       // No need to reset context if we stay within the same element.
-      if(DOMEventHandlers.states.activeElement != e) {
+      if(this.activeElement != e) {
         this.keyman['resetContext'](e as HTMLElement);
       }
 
-      DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
+      this.activeElement = this.lastActiveElement = e;
       if(!this.keyman.isEmbedded) {
-        this.keyman.touchAliasing._FocusKeyboardSettings(false);
+        this.keyman.touchAliasing._FocusKeyboardSettings(e, false);
       }
 
       // Allow external focusing KMEW-123
@@ -1314,8 +1370,8 @@ namespace com.keyman.dom {
      * @param  {Element}
      */
     initActiveElement(Lelem: HTMLElement) {
-      if(DOMEventHandlers.states.activeElement == null) {
-        DOMEventHandlers.states.activeElement = Lelem;
+      if(this.activeElement == null) {
+        this.activeElement = Lelem;
       }
     }
 
@@ -1329,7 +1385,7 @@ namespace com.keyman.dom {
      * @param      {number|boolean}  bBack     Direction to move (0 or 1)
      */
     moveToNext(bBack: number|boolean) {
-      var i,t=this.sortedInputs, activeBase=this.getActiveElement();
+      var i,t=this.sortedInputs, activeBase = this.activeElement;
       var touchable = this.keyman.util.device.touchable;
       
       if(t.length == 0) {
@@ -1653,52 +1709,71 @@ namespace com.keyman.dom {
         ds.height=(screen.width/2)+'px';
         document.body.appendChild(dTrailer);  
         
-        // On Chrome, scrolling up or down causes the URL bar to be shown or hidden 
-        // according to whether or not the document is at the top of the screen.
-        // But when doing that, each OSK row top and height gets modified by Chrome
-        // looking very ugly.  Itwould be best to hide the OSK then show it again 
-        // when the user scroll finishes, but Chrome has no way to reliably report
-        // the touch end event after a move. c.f. http://code.google.com/p/chromium/issues/detail?id=152913
-        // The best compromise behaviour is simply to hide the OSK whenever any 
-        // non-input and non-OSK element is touched.
-        if(device.OS == 'Android' && navigator.userAgent.indexOf('Chrome') > 0) {
-          (<any>this.keyman).hideOskWhileScrolling=function(e) {           
-            if(typeof(osk._Box) == 'undefined') return;
-            if(typeof(osk._Box.style) == 'undefined') return;
+        // Sets up page-default touch-based handling for activation-state management.
+        // These always trigger for the page, wherever a touch may occur. Does not 
+        // prevent element-specific or OSK-key-specific handling from triggering.
+        const _this = this;
+        this.touchStartActivationHandler=function(e) {
+          _this.deactivateOnRelease=true;
+          _this.touchY=e.touches[0].screenY;
+
+          // On Chrome, scrolling up or down causes the URL bar to be shown or hidden 
+          // according to whether or not the document is at the top of the screen.
+          // But when doing that, each OSK row top and height gets modified by Chrome
+          // looking very ugly.  It would be best to hide the OSK then show it again 
+          // when the user scroll finishes, but Chrome has no way to reliably report
+          // the touch end event after a move. c.f. http://code.google.com/p/chromium/issues/detail?id=152913
+          // The best compromise behaviour is simply to hide the OSK whenever any 
+          // non-input and non-OSK element is touched.
+          _this.deactivateOnScroll=false;
+          if(device.OS == 'Android' && navigator.userAgent.indexOf('Chrome') > 0) {
+            // _this.deactivateOnScroll has the inverse of the 'true' default,
+            // but that fact actually facilitates the following conditional logic.
+            if(typeof(osk._Box) == 'undefined') return false;
+            if(typeof(osk._Box.style) == 'undefined') return false;
 
             // The following tests are needed to prevent the OSK from being hidden during normal input!
-            p=e.target.parentNode;
+            let p=(e.target as HTMLElement).parentElement;
             if(typeof(p) != 'undefined' && p != null) {
-              if(p.className.indexOf('keymanweb-input') >= 0) return; 
-              if(p.className.indexOf('kmw-key-') >= 0) return; 
-              if(typeof(p.parentNode) != 'undefined') {
-                p=p.parentNode;
-                if(p.className.indexOf('keymanweb-input') >= 0) return; 
-                if(p.className.indexOf('kmw-key-') >= 0) return; 
+              if(p.className.indexOf('keymanweb-input') >= 0) return false;
+              if(p.className.indexOf('kmw-key-') >= 0) return false;
+              if(typeof(p.parentElement) != 'undefined') {
+                p=p.parentElement;
+                if(p.className.indexOf('keymanweb-input') >= 0) return false;
+                if(p.className.indexOf('kmw-key-') >= 0) return false;
               }
-            }          
-            osk.hideNow(); 
-          }        
-          this.keyman.util.attachDOMEvent(document.body, 'touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
-        } else {
-          (<any>this.keyman).conditionallyHideOsk = function() {
-            // Should not hide OSK if simply closing the language menu (30/4/15)
-            if((<any>keyman).hideOnRelease && !osk['lgList']) osk.hideNow();
-            (<any>keyman).hideOnRelease=false;
-          };
-          (<any>this.keyman).hideOskIfOnBody = function(e) {
-            (<any>keyman).touchY=e.touches[0].screenY;
-            (<any>keyman).hideOnRelease=true;
-          };
-          (<any>this.keyman).cancelHideIfScrolling = function(e) {
-            var y=e.touches[0].screenY,y0=(<any>keyman).touchY;    
-            if(y-y0 > 5 || y0-y < 5) (<any>keyman).hideOnRelease = false;
-          };
+            }
 
-          this.keyman.util.attachDOMEvent(document.body, 'touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
-          this.keyman.util.attachDOMEvent(document.body, 'touchmove',(<any>this.keyman).cancelHideIfScrolling,false);      
-          this.keyman.util.attachDOMEvent(document.body, 'touchend',(<any>this.keyman).conditionallyHideOsk,false);      
-        } 
+            _this.deactivateOnScroll = true;
+          }
+          return false;
+        };
+        this.touchMoveActivationHandler = function(e) {
+          if(_this.deactivateOnScroll) {  // Android / Chrone case.
+            DOMEventHandlers.states.focusing = false;
+            _this.activeElement = null;
+          }
+
+          const y = e.touches[0].screenY;
+          const y0 = _this.touchY;
+          if(y-y0 > 5 || y0-y < 5) {
+            _this.deactivateOnRelease = false;
+          }
+          return false;
+        };
+        this.touchEndActivationHandler = function() {
+          // Should not hide OSK if simply closing the language menu (30/4/15)
+          // or if the focusing timer (setFocusTimer) is still active.
+          if(_this.deactivateOnRelease && !osk['lgList'] && !DOMEventHandlers.states.focusing) {
+            _this.activeElement = null;
+          }
+          _this.deactivateOnRelease=false;
+          return false;
+        };
+
+        this.keyman.util.attachDOMEvent(document.body, 'touchstart', this.touchStartActivationHandler,false);
+        this.keyman.util.attachDOMEvent(document.body, 'touchmove',  this.touchMoveActivationHandler, false);
+        this.keyman.util.attachDOMEvent(document.body, 'touchend',   this.touchEndActivationHandler,  false);
       }
 
       //document.body.appendChild(keymanweb._StyleBlock);

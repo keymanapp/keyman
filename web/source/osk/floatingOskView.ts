@@ -44,6 +44,7 @@ namespace com.keyman.osk {
       // Add header element to OSK only for desktop browsers
       const layout = this.desktopLayout = new layouts.TargetedFloatLayout();
       this.headerView = layout.titleBar;
+      layout.titleBar.attachHandlers(this);
     }
 
     /**
@@ -104,7 +105,7 @@ namespace com.keyman.osk {
     ['restorePosition']: (keepDefaultPosition?: boolean) => void = function(this: FloatingOSKView, keepDefaultPosition?: boolean) {
       let isVisible = this._Visible;
       if(isVisible) {
-        com.keyman.singleton.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
+        this.lastActiveTarget.focus();  // I2036 - OSK does not unpin to correct location
       }
 
       this.loadCookie();
@@ -477,11 +478,8 @@ namespace com.keyman.osk {
      * @param       {number=}     Py      y-coordinate for OSK rectangle
      */
     _Show(Px?: number, Py?: number) {
-      let keymanweb = com.keyman.singleton;
-      let device = this.device;
-
-      // Do not try to display OSK if undefined, or no active element
-      if(keymanweb.domManager.getActiveElement() == null) {
+      // Do not try to display OSK if no active element
+      if(!this.activeTarget) {
         return;
       }
 
@@ -504,14 +502,8 @@ namespace com.keyman.osk {
           Ls.left=this.x+'px';
           Ls.top=this.y+'px';
         } else {
-          var el=keymanweb.domManager.getActiveElement();
+          var el = this.activeTarget?.getElement();
 
-          // Special case - design mode iframes.  Don't use the active element (inside the design-mode doc);
-          // use its containing iframe from the doc itself.
-          let ownerDoc = el.ownerDocument;
-          if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) {
-            el = ownerDoc.defaultView.frameElement as HTMLElement;
-          }
           if(this.dfltX) {
             Ls.left=this.dfltX;
           } else if(typeof el != 'undefined' && el != null) {
@@ -613,7 +605,7 @@ namespace com.keyman.osk {
 
       // If hidden by the UI, be sure to restore the focus
       if(hiddenByUser) {
-        keymanweb.domManager.focusLastActiveElement();
+        this.lastActiveTarget.focus();
       }
     }
 
