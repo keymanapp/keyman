@@ -114,9 +114,10 @@ h2 {
   display: none;
 }
 
-.touch-device #install-link,
-.touch-device #install-link-packages,
+.install-link-packages,
+#install-link-packages,
 #model-link,
+.touch-device #install-link,
 .touch-device-ios #install-link-ios,
 .touch-device-android #install-link-android {
   display: inline-block;
