@@ -34,7 +34,7 @@
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:contentDescription="@string/image_button"
-            android:src="@drawable/ic_navigation_back" />
+            android:src="@drawable/ic_action_back" />
         
         <ImageButton
             android:id="@+id/forwardButton"
@@ -45,7 +45,7 @@
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:contentDescription="@string/image_button"
-            android:src="@drawable/ic_navigation_forward" />
+            android:src="@drawable/ic_action_forward" />
         
         <ImageButton
             android:id="@+id/bookmarksButton"
