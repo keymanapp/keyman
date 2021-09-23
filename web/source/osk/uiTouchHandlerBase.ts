@@ -409,11 +409,6 @@ namespace com.keyman.osk {
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
         let base = this.baseElement;
-        //let parent = base.parentElement; // parentElement is _Box
-        // let top = base.offsetTop;
-        // if(parent) {
-        //   top += parent.offsetTop;
-        // }
         let top = dom.Utils.getAbsoluteY(base);
         let height = base.offsetHeight;
         let yMin = Math.max(5, top - 0.25 * height);
