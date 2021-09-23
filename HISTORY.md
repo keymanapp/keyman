@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 15.0.118 alpha 2021-09-23
+
+* chore(deps): bump ansi-regex from 5.0.0 to 5.0.1 in /resources/build/version (#5741)
+* refactor(web): active element management in relation to OSK display control  ️ (#5644)
+* refactor(web): osk activation and visibility modeling  ️ (#5661)
+* chore(android/app): Remove runConfigruations.xml file (#5743)
+* feat(web): new OSK type - the inlined OSK (#5665)
+* chore(web): inline osk test page (#5728)
+* feat(web): enables mouse interactivity for the predictive banner (#5739)
+* fix(mac): add support for M1 processor (#5701)
+
 ## 15.0.117 alpha 2021-09-22
 
 * fix(developer): run kmlmc from Keyman source path (#5727)
