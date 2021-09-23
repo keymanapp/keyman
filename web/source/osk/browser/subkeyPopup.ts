@@ -107,7 +107,7 @@ namespace com.keyman.osk.browser {
       this.shim.id = 'kmw-popup-shim';
 
       // Highlight the duplicated base key or ideal subkey (if a phone)
-      if(vkbd.device.formFactor == 'phone') {
+      if(vkbd.device.formFactor == utils.FormFactor.Phone) {
         this.selectDefaultSubkey(vkbd, e, subKeys /* == this.element */);
       }
     }
@@ -161,7 +161,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Add the callout
-      if(vkbd.device.formFactor != 'phone' || vkbd.device.OS != 'ios') {
+      if(vkbd.device.formFactor != utils.FormFactor.Phone || vkbd.device.OS != utils.OperatingSystem.iOS) {
         this.callout = this.addCallout(e, delta);
       }
     }

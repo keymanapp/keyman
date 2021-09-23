@@ -137,7 +137,7 @@ namespace com.keyman.osk.browser {
       h2 = h2 > hBoundedMax ? hBoundedMax : h2;
       h3 = hMax > hBoundedMax ? hBoundedMax : h3;
 
-      if(device.OS == 'android') {
+      if(device.OS == utils.OperatingSystem.Android) {
         r = 3;
       }
 
@@ -157,7 +157,7 @@ namespace com.keyman.osk.browser {
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
       // Define appearance of preview (cannot be done directly in CSS)
-      if(device.OS == 'android') {
+      if(device.OS == utils.OperatingSystem.Android) {
         var wx=(w1+w2)/2;
         w1 = w2 = wx;
       }
@@ -172,7 +172,7 @@ namespace com.keyman.osk.browser {
       ctx.beginPath();
       ctx.moveTo(w0+r,0);
       ctx.arcTo(w3,0,w3,r,r);
-      if(device.OS == 'android') {
+      if(device.OS == utils.OperatingSystem.Android) {
         ctx.arcTo(w3,h1,w2,h2,r);
         ctx.arcTo(w2,h2,w1,h2,r);
       } else {
