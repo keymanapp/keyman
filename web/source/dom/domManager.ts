@@ -458,7 +458,7 @@ namespace com.keyman.dom {
           this.activeElement = null;
         }
         this.lastActiveElement = null;
-        this.keyman.osk._Hide(false);
+        this.keyman.osk.startHide(false);
       }
       
       return;
@@ -1257,8 +1257,14 @@ namespace com.keyman.dom {
     set lastActiveElement(Pelem: HTMLElement) {
       DOMEventHandlers.states._lastActiveElement = Pelem;
 
-      if(this.lastActiveElement == null && this.activeElement == null) {
-        this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
+      const osk = this.keyman.osk;
+      if(osk) {
+        if(this.lastActiveElement == null && this.activeElement == null) {
+          // Assigning to the property does have side-effects.
+          // If the property is already unset, it's best to not unset it again.
+          osk.activeTarget = null;
+          this.keyman.osk.hideNow(); // originally from a different one, seemed to serve the same role?
+        }
       }
     }
 
@@ -1280,28 +1286,13 @@ namespace com.keyman.dom {
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
       const osk = this.keyman.osk;
-      const device = this.keyman.util.device;
-      if(this.keyman.osk) {
-        if(!Pelem) {
-          if(this.keyman.osk && !isActivating) {
-            this.keyman.osk._Hide(false);
-          }
-        } else {
-          // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
-          if(device.touchable) {
-            osk._Enabled = true;
-            osk._Show();
-          } else {
-            // Conditionally show the OSK when control receives the focus
-            if(this.keyman.isCJK()) {
-              osk._Enabled = true;
-            }
-            if(osk._Enabled) {
-              osk._Show();
-            } else {
-              osk._Hide(false);
-            }
-          }
+      // const device = this.keyman.util.device;
+
+      if(osk) {
+        const target = Pelem?._kmwAttachment?.interface || null;
+        if(osk && (target || !isActivating)) {
+          // Do not unset the field if the UI is activated.
+          osk.activeTarget = target;
         }
       }
     }
@@ -1829,7 +1820,7 @@ namespace com.keyman.dom {
         this.keyman.ui['initialize']();
         // Display the OSK (again) if enabled, in order to set its position correctly after
         // adding the UI to the page 
-        this.keyman.osk._Show();
+        this.keyman.osk.present();
       } else if(this.keyman.isEmbedded) {
         // UI modules aren't utilized in embedded mode.  There's nothing to init, so we simply
         // return instead of waiting for a UI module that will never come.

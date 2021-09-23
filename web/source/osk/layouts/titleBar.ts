@@ -73,7 +73,7 @@ namespace com.keyman.osk.layouts {
       }
 
       this._closeButton.onclick = function () {
-        osk._Hide(true);
+        osk.startHide(true);
         return false;
       };
 

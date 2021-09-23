@@ -17,6 +17,12 @@ namespace com.keyman.osk {
     'nomove'?: boolean
   };
 
+  export enum ActivationMode {
+    static      = "static",  // For use by documentation keyboards, eventually.
+    manual      = "manual",
+    automatic = "automatic"
+  }
+  
   export abstract class OSKView {
     _Box: HTMLDivElement;
 
@@ -25,13 +31,16 @@ namespace com.keyman.osk {
     keyboardView: KeyboardView;  // Which implements OSKViewComponent
     footerView:   OSKViewComponent;
 
-    protected device: com.keyman.utils.DeviceSpec;
+    protected readonly device: com.keyman.utils.DeviceSpec;
+    protected readonly hostDevice: com.keyman.utils.DeviceSpec;
 
     private _boxBaseMouseDown:        (e: MouseEvent) => boolean; 
     private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
     private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
     private keyboard: keyboards.Keyboard;
+
+    private _target:  text.OutputTarget;
     
     /**
      * The configured width for this OSKManager.  May be `undefined` or `null`
@@ -65,8 +74,20 @@ namespace com.keyman.osk {
 
     private needsLayout: boolean = true;
 
-    constructor(deviceSpec: com.keyman.utils.DeviceSpec) {
+    //
+    private _activationMode: ActivationMode = ActivationMode.automatic;
+    private _displayIfActive: boolean = true;
+
+    private _animatedHideTimeout: number;
+    private _animatedHideResolver: () => void;
+
+    constructor(deviceSpec: com.keyman.utils.DeviceSpec, hostDevice?: com.keyman.utils.DeviceSpec) {
       this.device = deviceSpec;
+
+      if(!hostDevice) {
+        hostDevice = deviceSpec;
+      }
+      this.hostDevice = hostDevice;
 
       // OSK initialization - create DIV and set default styles
       this._Box = document.createElement('div');   // Container for OSK (Help DIV, displayed when user clicks Help icon)
@@ -158,14 +179,111 @@ namespace com.keyman.osk {
       this._boxBaseTouchStart = null;
     }
 
-    public get activeTarget(): dom.targets.OutputTarget {
-      const el=com.keyman.singleton.domManager.activeElement;
-      return dom.Utils.getOutputTarget(el);
+    /**
+     * Gets and sets the IME-like interface (`OutputTarget`) to be affected by events from
+     * the OSK.
+     * 
+     * If `activationMode` is `'conditional'`, this property's state controls the visibility
+     * of the OSKView.
+     */
+    public get activeTarget(): text.OutputTarget {
+      return this._target;
     }
 
-    public get lastActiveTarget(): dom.targets.OutputTarget {
-      const el = com.keyman.singleton.domManager.lastActiveElement;
-      return dom.Utils.getOutputTarget(el);
+    public set activeTarget(targ: text.OutputTarget) {
+      // If already null & set to null again, take no action.
+      if(this._target == null && targ == null) {
+        return;
+      }
+
+      this._target = targ;
+      this.commonCheckAndDisplay();
+    }
+
+    /**
+     * Determines the activation state model used to control presentation of the OSK.
+     * - `'conditional'`:  Only displays if `activeTarget` is non-null - if there is an active
+     * target that can receive the OSK's context-manipulation events.
+     * - `'manual'`:  Display is directly controlled by manipulating the value of `displayIfActive`.
+     *   It may be displayed while `activeTarget` is `null`.
+     * - `'static'`:  The OSK should be permanently displayed and may never be hidden.
+     */
+    get activationMode(): ActivationMode {
+      if(!this._activationMode) {
+        this._activationMode = ActivationMode.automatic;
+      }
+
+      return this._activationMode;
+    }
+
+    set activationMode(mode: ActivationMode) {
+      this._activationMode = mode;
+      this.commonCheckAndDisplay();
+    }
+
+    /**
+     * Implementation of the activation modeling described in the documentation for
+     * `activationMode`.
+     */
+    protected get activationConditionsMet(): boolean {
+      switch(this.activationMode) {
+        case 'manual':
+          return true;
+        case 'static':
+          return true;
+        case 'automatic':
+          return !!this.activeTarget;
+        default:
+          console.error("Unexpected activation mode set for the OSK.");
+          return false;
+      }
+    }
+
+    /**
+     * A property denoting whether or not the OSK should be presented if it meets its
+     * activation conditions. 
+     * 
+     * When `activationMode == 'manual'`, `displayIfActive == true` is the lone
+     * activation condition.
+     * 
+     * Note: cannot be set to `false` if `activationMode == 'static'`.
+     */
+    get displayIfActive(): boolean {
+      return this._displayIfActive;
+    }
+
+    set displayIfActive(flag: boolean) {
+      if(this.displayIfActive == flag) {
+        return;
+      }
+
+      // if is touch device or is CJK keyboard, this.displayIfActive must remain true.
+      if(this.keyboard?.isCJK && !flag) {
+        console.warn("Cannot hide display of OSK for CJK keyboards.");
+        flag = true;
+      } else if(this.hostDevice.touchable && !flag) {
+        console.warn("Cannot hide display of OSK when hosted on touch-based devices.");
+        flag = true;
+      } else if(this.activationMode == 'static') {
+        // Silently fail; it's a documentation keyboard.
+        // This is the primary difference between 'manual' and 'static'.
+        flag = true;
+      }
+
+      this._displayIfActive = flag;
+      this.commonCheckAndDisplay();
+    }
+
+    /**
+     * Used by the activation & visibility properties as a common helper; all of their
+     * setters rely on this function to manage presentation (showing / hiding) of the OSK.
+     */
+    private commonCheckAndDisplay() {
+      if(this.activationConditionsMet && this.displayIfActive) {
+        this.present();
+      } else {
+        this.startHide(false);
+      }
     }
 
     public get vkbd(): VisualKeyboard {
@@ -271,6 +389,10 @@ namespace com.keyman.osk {
     public set activeKeyboard(keyboard: keyboards.Keyboard) {
       this.keyboard = keyboard;
       this.loadActiveKeyboard();
+
+      if(this.keyboard?.isCJK) {
+        this.displayIfActive = true;
+      }
     }
 
     /* private */ computeFrameHeight(): number {
@@ -327,6 +449,13 @@ namespace com.keyman.osk {
       this.needsLayout = false;
 
       // Step 3:  perform layout operations.
+      if(!this._baseFontSize && this.parsedBaseFontSize) {
+        // Make sure to initialize the default font size if it hasn't already been set!
+        this.banner.element.style.fontSize = this.baseFontSize;
+        if(this.vkbd) {
+          this.vkbd.fontSize = this.parsedBaseFontSize;
+        }
+      }
       if(!pending) {
         this.headerView?.refreshLayout();
         this.bannerView.refreshLayout();
@@ -396,13 +525,9 @@ namespace com.keyman.osk {
 
       // Add suggestion banner bar to OSK
       this._Box.appendChild(this.banner.element);
-      this.banner.element.style.fontSize = this.baseFontSize;
 
       let kbdView: KeyboardView = this.keyboardView = this._GenerateKeyboardView(this.activeKeyboard);
       this._Box.appendChild(kbdView.element);
-      if(kbdView instanceof VisualKeyboard) {
-        kbdView.fontSize = this.parsedBaseFontSize;
-      }
       kbdView.postInsert();
 
       // Add footer element to OSK only for desktop browsers
@@ -515,11 +640,17 @@ namespace com.keyman.osk {
       return vkbd;
     }
 
-    // Corresponds to the desktop OSK's _Show, but acts as a core, common method 
-    // usable by all display patterns.
-    protected makeVisible() {
-      // Do not try to display/render the OSK if undefined or no keyboard is loaded.
-      if(!this._Box || !this.keyboardView) {
+    /**
+     * The main function for presenting the OSKView.
+     * 
+     * This includes:
+     * - refreshing its layout
+     * - displaying it
+     * - positioning it
+     */
+    public present(): void {
+      // Do not try to display OSK if no active element
+      if(!this.mayShow()) {
         return;
       }
 
@@ -535,6 +666,15 @@ namespace com.keyman.osk {
         this.keyboardView.showLanguage();
       }
 
+      this._Visible=true;
+
+      /* In case it's still '0' from a hide() operation.
+       *
+       * (Opacity is only modified when device.touchable = true, 
+       * though a couple of extra conditions may apply.)
+       */
+      this._Box.style.opacity = '1';
+
       // If OSK still hidden, make visible only after all calculation finished
       if(this._Box.style.visibility == 'hidden') {
         let _this = this;
@@ -542,16 +682,222 @@ namespace com.keyman.osk {
           _this._Box.style.visibility = 'visible';
         }, 0);
       }
+
+      this.setDisplayPositioning();
     }
 
-    protected makeHidden(hiddenByUser: boolean) {
-      // Save current size if visible
-      if(this._Box && this._Box.style.display == 'block' && this.keyboardView instanceof VisualKeyboard) {
-        this.keyboardView.refit();
+    /**
+     * Method usable by subclasses of OSKView to control that OSKView type's
+     * positioning behavior when needed by the present() method.
+     */
+    protected abstract setDisplayPositioning();
+
+    /**
+     * Method used to start a potentially-asynchronous hide of the OSK.
+     * @param hiddenByUser `true` if this hide operation was directly requested by the user.
+     */
+    public startHide(hiddenByUser: boolean): void {
+      if(!this.mayHide(hiddenByUser)) {
+        return;
+      }
+
+      if(hiddenByUser) {
+        // The one location outside of the `displayIfActive` property that bypasses the setter.
+        // Avoids needless recursion that could be triggered by it, as we're already in the
+        // process of hiding the OSK anyway.
+        this._displayIfActive = ((this.keyboard.isCJK || this.hostDevice.touchable)? true : false); // I3363 (Build 301)
+      }
+
+      let promise: Promise<boolean> = null;
+      if(this._Box && this.hostDevice.touchable && !(this.keyboardView instanceof EmptyView)) {
+        /**
+         * Note:  this refactored code appears to reflect a currently-dead code path.  14.0's
+         * equivalent is either extremely niche or is actually inaccessible.
+         */
+        promise = this.useHideAnimation();
+      } else {
+        promise = Promise.resolve(true);
+      }
+
+      const _this = this;
+      promise.then(function(shouldHide: boolean) {
+        if(shouldHide) {
+          _this.finalizeHide();
+        }
+      });
+
+      // Allow UI to execute code when hiding the OSK
+      var p={};
+      p['HiddenByUser']=hiddenByUser;
+      this.doHide(p);
+
+      // If hidden by the UI, be sure to restore the focus
+      if(hiddenByUser && this.activeTarget instanceof dom.targets.OutputTarget) {
+        this.activeTarget?.focus();
+      }
+    }
+
+    /**
+     * Performs the _actual_ logic and functionality involved in hiding the OSK.
+     */
+    protected finalizeHide() {
+      if(document.body.className.indexOf('osk-always-visible') >= 0) {
+        return;
       }
 
       if(this._Box) {
-        this._Box.style.display = 'none';
+        let bs=this._Box.style;
+        bs.display = 'none';
+        bs.transition = '';
+        bs.opacity = '1';
+        this._Visible=false;
+      }
+
+      if(this.vkbd) {
+        this.vkbd.onHide();
+      }
+    }
+
+    /**
+     * 
+     * @returns `false` if the OSK is in an invalid state for being presented to the user.
+     */
+    protected mayShow(): boolean {
+      if(!this.activationConditionsMet) {
+        return false;
+      }
+
+      // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
+      if(!this.keyboardView || this.keyboardView instanceof EmptyView || !this.displayIfActive) {
+        return false;
+      }
+
+      if(!this._Box) {
+        return false;
+      }
+
+      return true;
+    }
+
+    /**
+     * 
+     * @param hiddenByUser 
+     * @returns `false` if the OSK is in an invalid state for being hidden from the user.
+     */
+    protected mayHide(hiddenByUser: boolean): boolean {
+      if(this.activationMode != 'automatic' && this.displayIfActive) {
+        return false;
+      }
+
+      if(!hiddenByUser && this.hostDevice.formFactor == 'desktop') {
+        //Allow desktop OSK to remain visible on blur if body class set
+        if(document.body.className.indexOf('osk-always-visible') >= 0) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    /**
+     * Applies CSS styling and handling needed to perform a fade animation when
+     * hiding the OSK.
+     * 
+     * Note:  currently reflects an effectively-dead code path, though this is
+     * likely not intentional.  Other parts of the KMW engine seem to call hideNow()
+     * synchronously after each and every part of the engine that calls this function,
+     * cancelling the Promise.
+     * 
+     * @returns A Promise denoting either cancellation of the hide (`false`) or
+     * completion of the hide & its animation (`true`)
+     */
+    protected useHideAnimation(): Promise<boolean> {
+      const os = this._Box.style;
+      const _this = this;
+      const promise = new Promise<void>(function(resolve) {
+        os.transition='opacity 0.5s linear 0';
+
+        _this._animatedHideResolver = resolve;
+
+        // Cannot hide the OSK smoothly using a transitioned drop, since for
+        // position:fixed elements transitioning is incompatible with translate3d(),
+        // and also does not work with top, bottom or height styles.
+        // Opacity can be transitioned and is probably the simplest alternative.
+        // We must condition on osk._Visible in case focus has since been moved to another
+        // input (in which case osk._Visible will be non-zero)
+        _this._animatedHideTimeout = window.setTimeout(function(this: AnchoredOSKView) {
+          if(_this._animatedHideResolver) {
+            _this._animatedHideResolver();
+          }
+
+          _this._animatedHideTimeout = 0;
+          _this._animatedHideResolver = null;
+        }.bind(_this), 200); // Wait a bit before starting, to allow for moving to another element
+      });
+
+      return promise.then(function() {
+        // Repro for passing this condition:
+        // 1.  Touch an input element of the page
+        // 2.  Within a second (before the focusing timer expires), touch the base page.
+        //     See domEventHandlers.ts, `focusTimer` / `setFocusTimer`.
+        // 3.  After the timer expires, touch the base page again.
+        if(_this._Visible && _this.activationConditionsMet) {
+          // Leave opacity alone and clear transition if another element activated
+          os.transition='';
+          return false;
+        } else {
+          // Set opacity to zero, should decrease smoothly.  Starts the actual animation.
+          os.opacity='0';
+
+          // Listen for the animation's end.
+          return new Promise<void>(function(resolve) {
+            _this._animatedHideResolver = resolve;
+            // Actually hide the OSK at the end of the transition
+            _this._Box.addEventListener('transitionend', _this._animatedHideResolver, false);
+            _this._Box.addEventListener('webkitTransitionEnd', _this._animatedHideResolver, false);
+          }).then(function() {
+            // Remove the promise's resolver method from future handling.
+            _this._Box.removeEventListener('transitionend', _this._animatedHideResolver, false);
+            _this._Box.removeEventListener('webkitTransitionEnd', _this._animatedHideResolver, false);
+
+            // The hide animation is considered complete now.
+            return true;
+          });
+        }
+      });
+    }
+
+    /**
+     * Used to synchronously hide the OSK, cancelling any async hide animations that have
+     * not started and immediately completing the hide of any hide ops pending completion
+     * of their animation.
+     */
+    public hideNow() {
+      if(!this._Box) {
+        return;
+      }
+
+      // Two possible uses for _animatedHideResolver:
+      // - _animatedHideTimeout is set:   animation is waiting to start
+      // - _animatedHideTimeout is null:  animation has already started.
+
+      // Was an animated hide waiting to start?  Just cancel it.
+      if(this._animatedHideTimeout) {
+        window.clearTimeout(this._animatedHideTimeout);
+        this._animatedHideResolver = null;
+        this._animatedHideTimeout = 0;
+      }
+
+      // Was an animated hide already in progress?  If so, just trigger it early.
+      if(this._animatedHideResolver) {
+        this._animatedHideResolver();  // also triggers finalizeHide().
+        this._animatedHideResolver = null;
+      } else {
+        const os = this._Box.style;
+        os.transition='';
+        os.opacity='0';
+
+        this.finalizeHide();
       }
     }
 
@@ -595,24 +941,6 @@ namespace com.keyman.osk {
      * The simplest way forward is to maintain them, then resolve them independently,
      * one at a time.
      */
-  
-    /*
-     * Display KMW OSK at specified position (returns nothing)
-     * 
-     * The positioning parameters only make sense for the FloatingOSKView type;
-     * other implementations should use no parameters whatsoever.
-     *
-     * @param       {number=}     Px      x-coordinate for OSK rectangle
-     * @param       {number=}     Py      y-coordinate for OSK rectangle
-     */
-    public abstract _Show(Px?: number, Py?: number);
-
-    /**
-     * Hide Keymanweb On Screen Keyboard
-     *
-     * @param       {boolean}   hiddenByUser    Distinguish between hiding on loss of focus and explicit hiding by user
-     */
-    public abstract _Hide(hiddenByUser: boolean);
 
     /**
      * Display build number
@@ -640,49 +968,10 @@ namespace com.keyman.osk {
       menu.show();
     }
 
-    /**
-     * Function     hideNow
-     * Scope        Private
-     * Description  Hide the OSK unconditionally and immediately, cancel any pending transition
-     * 
-     * Usages:
-     * - during rotations to temporarily hide the OSK during layout ops
-     * - when controls lose focus (N/A to embedded mode)
-     * 
-     * Somewhat conflated with the _Show / _Hide methods, which often serve more as an
-     * "enable" vs "disable" feature on the OSK - though that distinction isn't super-clear.
-     * 
-     * Definitely needs clearer design & modeling, at the least.
-     */
-    hideNow: () => void = function(this: OSKView) { // I3363 (Build 301)
-      if(!this._Box) {
-        return;
-      }
-
-      this._Box.removeEventListener('transitionend', this.hideNow, false);
-      this._Box.removeEventListener('webkitTransitionEnd', this.hideNow, false);
-
-      if(document.body.className.indexOf('osk-always-visible') >= 0) {
-        return;
-      }
-
-      var os=this._Box.style;
-      os.display='none';
-      os.opacity='1';
-      this._Visible=false;
-      os.transition=os.msTransition=os.MozTransition=os.WebkitTransition='';
-
-      if(this.vkbd) {
-        this.vkbd.onHide();
-      }
-    }.bind(this);
-
-    // OSK state fields
+    // OSK state fields & events
     //
-    // They're not very well defined or encapsulated; there's definitely room for more
-    // "polish" here.
+    // These are relatively stable and may be preserved as they are.
     _Visible: boolean = false;
-    _Enabled: boolean = true;
 
     /**
      * Function     enabled
@@ -691,7 +980,7 @@ namespace com.keyman.osk {
      * Description  Test if KMW OSK is enabled
      */
      ['isEnabled'](): boolean {
-      return this._Enabled;
+      return this.displayIfActive;
     }
 
     /**
@@ -711,8 +1000,8 @@ namespace com.keyman.osk {
      * Description  Prevent display of OSK window on focus
      */
      ['hide']() {
-      this._Enabled = false;
-      this._Hide(true);
+      this.displayIfActive = false;
+      this.startHide(true);
     }
 
     /**
@@ -723,19 +1012,34 @@ namespace com.keyman.osk {
      */
      ['show'](bShow: boolean) {
       if(arguments.length > 0) {
-        this._Enabled=bShow;
-        if(bShow) {
-          this._Show();
-        } else {
-          this._Hide(true);
-        }
+        this.displayIfActive = bShow;
       } else {
-        if(this._Visible) {
-          this._Hide(true);
-        } else {
-          this._Show();
+        if(this.activationConditionsMet) {
+          this.displayIfActive = !this.displayIfActive;
         }
       }
+    }
+
+    /**
+     * Allow UI to respond to OSK being shown (passing position and properties)
+     *
+     * @param       {Object=}       p     object with coordinates and userdefined flag
+     * @return      {boolean}
+     *
+     */
+     doShow(p) {
+      return com.keyman.singleton.util.callEvent('osk.show',p);
+    }
+
+    /**
+     * Allow UI to update respond to OSK being hidden
+     *
+     * @param       {Object=}       p     object with coordinates and userdefined flag
+     * @return      {boolean}
+     *
+     */
+    doHide(p) {
+      return com.keyman.singleton.util.callEvent('osk.hide',p);
     }
 
     /**

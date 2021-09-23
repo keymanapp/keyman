@@ -309,15 +309,6 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Called by OSKManager after resize operations in order to determine the final
-     * size actually used by the visual keyboard.
-     */
-    public refit() {  // TODO:  Should probably remove; VisualKeyboard shouldn't be responsible for it.
-      this._width  = this.kbdDiv.offsetWidth;
-      this._height = this.kbdDiv.offsetHeight;
-    }
-
-    /**
      * Returns the default properties for a key object, used to construct
      * both a base keyboard key and popup keys
      *
@@ -1175,7 +1166,8 @@ namespace com.keyman.osk {
           layerElement.style.display='block';
           //b[n].style.visibility='visible';
 
-          // If osk._Show has been called, there's probably been a change in modifier or state key state.  Keep it updated!
+          // Most functions that call this one often indicate a change in modifier 
+          // or state key state.  Keep it updated!
           this._UpdateVKShiftStyle();
         } else {
           layerElement.style.display='none';
@@ -1591,7 +1583,7 @@ namespace com.keyman.osk {
         oskManager.showLanguageMenu();
       } else if(keyName.indexOf('K_ROPT') >= 0) {
         keyman.uiManager.setActivatingUI(false);
-        oskManager._Hide(true);
+        oskManager.startHide(true);
         let active = keyman.domManager.activeElement;
         if(dom.Utils.instanceof(active, "TouchAliasElement")) {
           (active as dom.TouchAliasElement).hideCaret();
