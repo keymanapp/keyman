@@ -94,7 +94,7 @@ namespace com.keyman.osk {
       this._Box.style.userSelect = 'none';
 
       // Initializes the two constant OSKComponentView fields.
-      this.bannerView   = new BannerManager();
+      this.bannerView   = new BannerManager(this.hostDevice);
       this.keyboardView = null;
 
       let keymanweb = com.keyman.singleton;

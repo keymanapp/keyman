@@ -193,9 +193,9 @@ namespace com.keyman.osk {
       // Needs to occur AFTER this.kbdDiv is initialized.
       if (!this.isStatic) {
         if (this.hostDevice.touchable) {
-          this.inputEngine = new TouchEventEngine(this);
+          this.inputEngine = TouchEventEngine.forVisualKeyboard(this);
         } else {
-          this.inputEngine = new MouseEventEngine(this);
+          this.inputEngine = MouseEventEngine.forVisualKeyboard(this);
         }
         this.inputEngine.registerEventHandlers();
       }
