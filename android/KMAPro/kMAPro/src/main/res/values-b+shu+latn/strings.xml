@@ -17,7 +17,7 @@
   <!-- Context: Menu Action -->
   <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Dys shu\'ul aljudad</string>
   <!-- Context: Title -->
-  <string name="title_version" comment="Title of Keyman for Android version">Nafar:%1$s</string>
+  <string name="title_version" comment="Title of Keyman for Android version">Nafar: %1$s</string>
   <!-- Context: Text label when old Chrome version installed -->
   <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">Keyman bidor nafar hana Chrome 57 walla jadida.</string>
   <!-- Context: Button label -->
