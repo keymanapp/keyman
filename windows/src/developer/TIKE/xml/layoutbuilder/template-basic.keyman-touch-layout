@@ -377,7 +377,7 @@
               {"id": "K_2","layer":"shift","text": "@"},
               {"id": "K_3","layer":"shift","text": "#"},
               {"id": "K_5","layer":"shift","text": "%"},
-              {"id": "K_6","layer":"shift","text": "&"},
+              {"id": "K_7","layer":"shift","text": "&"},
               {"id": "K_HYPHEN","layer":"shift","text": "_"},
               {"id": "K_EQUAL","text": "=","layer":"default"},
               {"id": "K_BKSLASH","layer":"shift","text": "|"},
