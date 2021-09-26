@@ -25,6 +25,11 @@ namespace com.keyman.text {
     saveStore: {[name: string]: VariableStore} = {};
 
     /**
+     * A set of variable stores with possible changes to be applied during finalization.
+     */
+     variableStores: keyboards.VariableStoreDictionary = {};
+
+    /**
      * Denotes a non-output default behavior; this should be evaluated later, against the true keystroke.
      */
     triggersDefaultCommand: boolean = false;
@@ -46,9 +51,9 @@ namespace com.keyman.text {
 
     /**
      * In reference to https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852:
-     * 
-     * If the final group processed is a context and keystroke group (using keys), 
-     * and there is no nomatch rule, and the keystroke is not matched in the group, 
+     *
+     * If the final group processed is a context and keystroke group (using keys),
+     * and there is no nomatch rule, and the keystroke is not matched in the group,
      * the keystroke's default behavior should trigger, regardless of whether or not any
      * rules in prior groups matched.
      */
@@ -78,6 +83,8 @@ namespace com.keyman.text {
         }
       }
 
+      processor.keyboardInterface.applyVariableStores(this.variableStores);
+
       if(processor.keyboardInterface.variableStoreSerializer) {
         for(let storeID in this.saveStore) {
           processor.keyboardInterface.variableStoreSerializer.saveStore(processor.activeKeyboard.id, storeID, this.saveStore[storeID]);
@@ -99,13 +106,13 @@ namespace com.keyman.text {
     /**
      * Merges default-related behaviors from another RuleBehavior into this one.  Assumes that the current instance
      * "came first" chronologically.  Both RuleBehaviors must be sourced from the same keystroke.
-     * 
+     *
      * Intended use:  merging rule-based behavior with default key behavior during scenarios like those described
      * at https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852.
-     * 
+     *
      * This function does not attempt a "complete" merge for two fully-constructed RuleBehaviors!  Things
      * WILL break for unintended uses.
-     * @param other 
+     * @param other
      */
     mergeInDefaults(other: RuleBehavior) {
       let keystroke = this.transcription.keystroke;
@@ -115,7 +122,7 @@ namespace com.keyman.text {
       }
 
       this.triggersDefaultCommand = this.triggersDefaultCommand || other.triggersDefaultCommand;
-      
+
       let mergingMock = Mock.from(this.transcription.preInput);
       mergingMock.apply(this.transcription.transform);
       mergingMock.apply(other.transcription.transform);

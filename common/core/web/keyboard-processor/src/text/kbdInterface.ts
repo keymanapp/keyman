@@ -972,6 +972,9 @@ namespace com.keyman.text {
       // Capture the initial state of the OutputTarget before any rules are matched.
       let preInput = Mock.from(outputTarget);
 
+      // Capture the initial state of any variable stores
+      const cachedVariableStores = this.activeKeyboard.variableStores;
+
       // Establishes the results object, allowing corresponding commands to set values here as appropriate.
       this.ruleBehavior = new RuleBehavior();
 
@@ -987,6 +990,12 @@ namespace com.keyman.text {
       // Finalize the rule's results.
       this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke);
 
+      // We always backup the changes to variable stores to the RuleBehavior, to
+      // be applied during finalization, then restore them to the cached initial
+      // values to avoid side-effects with predictive text mocks.
+      this.ruleBehavior.variableStores = this.activeKeyboard.variableStores;
+      this.activeKeyboard.variableStores = cachedVariableStores;
+
       // `matched` refers to whether or not the FINAL rule (from any group) matched, rather than
       // whether or not ANY rule matched.  If the final rule doesn't match, we trigger the key's
       // default behavior (if appropriate).
@@ -999,6 +1008,19 @@ namespace com.keyman.text {
       this.ruleBehavior = null;
 
       return behavior;
+    }
+
+    /**
+     * Applies the dictionary of variable store values to the active keyboard
+     *
+     * Has no effect on keyboards compiled with 14.0 or earlier; system store
+     * names are not exposed unless compiled with Developer 15.0 or later.
+     *
+     * @param VariableStoreDictionary A dictionary of stores which should be
+     *                                found in the keyboard
+     */
+    applyVariableStores(stores: com.keyman.keyboards.VariableStoreDictionary): void {
+      this.activeKeyboard.variableStores = stores;
     }
 
     /**
