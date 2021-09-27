@@ -38,7 +38,9 @@ void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
-  DebugAssert(!Globals::get_CoreIntegration(), "LoadSharedKeyboardOptions: Error called in core integration mode");
+  if(!DebugAssert(!Globals::get_CoreIntegration(), "LoadSharedKeyboardOptions: Error called in core integration mode")) {
+    return;
+  }
   // Called when another thread changes keyboard options and we are sharing keyboard settings
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
@@ -50,7 +52,9 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
-  DebugAssert(!Globals::get_CoreIntegration(),"FreeKeyboardOptions: Error called in core integration mode");
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "FreeKeyboardOptions: Error called in core integration mode")) {
+    return;
+  }
   // This is a cleanup routine; we don't want to precondition all calls to it
   // so we do not assert
   if (kp == NULL || kp->Keyboard == NULL || kp->KeyboardOptions == NULL)
@@ -68,7 +72,9 @@ void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 {
-  DebugAssert(!Globals::get_CoreIntegration(), "SetKeyboardOption: Error called in core integration mode");
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "SetKeyboardOption: Error called in core integration mode")) {
+    return;
+  }
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
   assert(kp->KeyboardOptions != NULL);
@@ -94,7 +100,9 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 
 void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 {
-  DebugAssert(!Globals::get_CoreIntegration(), "ResetKeyboardOption: Error called in core integration mode");
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "ResetKeyboardOption: Error called in core integration mode")) {
+    return;
+  }
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
   assert(kp->KeyboardOptions != NULL);
@@ -131,7 +139,9 @@ void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 
 void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
 {
-  DebugAssert(!Globals::get_CoreIntegration(), "SaveKeyboardOption: Error called in core integration mode");
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "SaveKeyboardOption: Error called in core integration mode")) {
+    return;
+  }
   IntSaveKeyboardOption(REGSZ_KeyboardOptions, kp, nStoreToSave);
 }
 
@@ -236,6 +246,7 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
     if (err_status != KM_KBP_STATUS_OK) {
       SendDebugMessageFormat(
           0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
+      return FALSE;
     }
     size_t listSize = km_kbp_options_list_size(keyboardAttrs->default_options);
     km_kbp_option_item* keyboardOpts = new  km_kbp_option_item[listSize+1];

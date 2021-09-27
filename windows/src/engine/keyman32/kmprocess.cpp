@@ -244,7 +244,9 @@ BOOL ProcessHook()
 
 BOOL ProcessGroup(LPGROUP gp)
 {
-  DebugAssertRetValue(!Globals::get_CoreIntegration(), "KMPROCESS:ProcessGroup: Error called in core integration mode", FALSE);
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "KMPROCESS:ProcessGroup: Error called in core integration mode")) {
+    return FALSE;
+  }
   DWORD i;
 	LPKEY kkp = NULL;
 	PWSTR p;
@@ -543,7 +545,9 @@ BOOL ProcessGroup(LPGROUP gp)
 
 int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
 {
-  DebugAssertRetValue(!Globals::get_CoreIntegration(), "KKMPROCESS:PostString: Error called in core integration mode", FALSE);
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "KKMPROCESS:PostString: Error called in core integration mode")) {
+    return FALSE;
+  }
   PWSTR p, q, temp;
   LPSTORE s;
   int n1, n2;
@@ -709,7 +713,9 @@ BOOL IsMatchingPlatform(LPSTORE s)  // I3432
 
 BOOL ContextMatch(LPKEY kkp)
 {
-  DebugAssertRetValue(!Globals::get_CoreIntegration(), "KMPROCESS:ContextMatch: Error called in core integration mode", FALSE);
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "KMPROCESS:ContextMatch: Error called in core integration mode")) {
+    return FALSE;
+  }
 	WORD /*i,*/ n;
 	PWSTR p, q, qbuf, temp;
 	LPWORD indexp;
