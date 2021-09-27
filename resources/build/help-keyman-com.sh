@@ -120,10 +120,10 @@ function upload_keyman_help {
     exit 1
   fi
 
+  rm -rf "$dstpath"
   mkdir -p "$dstpath"
 
-  rm -rf "$dstpath/*"
-  cp -r "$helppath"/* "$dstpath/"
+  cp -rv "$helppath"/* "$dstpath/"
 }
 
 #
