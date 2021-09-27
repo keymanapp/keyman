@@ -8,6 +8,8 @@ You must have a Keyman keyboard installed to type with Keyman for macOS in your 
 
 Here's how to download and install a Keyman keyboard within Keyman for macOS:
 
+[![](../mac_images/video.png) Watch Video](https://youtu.be/VirHygx8iqg) for installing the Khmer Angkor keyboard for Keyman for macOS.
+
 1. Choose Keyman from the Input menu in the menu bar.
 2. Open Keyman Configuration, from the Configuration link under Keyman in the Input menu.
    Note: If you just installed Keyman and the Configuration menu is not available, please
