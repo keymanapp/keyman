@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.282 stable 2021-09-27
+
+* fix(mac): add support for M1 processor (#5737)
+* chore(mac): Add help links for installing Keyman and keyboards (#5748)
+* fix: help.keyman.com script file cleanup (#5750)
+
 ## 14.0.281 stable 2021-09-17
 
 * fix(common/models): keep/suggestion diacritic sensitivity when de-duping (#5552)
