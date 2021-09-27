@@ -1016,8 +1016,8 @@ namespace com.keyman.text {
      * Has no effect on keyboards compiled with 14.0 or earlier; system store
      * names are not exposed unless compiled with Developer 15.0 or later.
      *
-     * @param VariableStoreDictionary A dictionary of stores which should be
-     *                                found in the keyboard
+     * @param stores A dictionary of stores which should be found in the
+     *               keyboard
      */
     applyVariableStores(stores: com.keyman.keyboards.VariableStoreDictionary): void {
       this.activeKeyboard.variableStores = stores;
