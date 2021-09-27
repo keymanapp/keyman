@@ -2,16 +2,16 @@ if(typeof keyman === 'undefined') {
   console.log('Keyboard requires KeymanWeb 10.0 or later');
   if(typeof tavultesoft !== 'undefined') tavultesoft.keymanweb.util.alert("This keyboard requires KeymanWeb 10.0 or later");
 } else {
-KeymanWeb.KR(new Keyboard_testvariable());
+KeymanWeb.KR(new Keyboard_oldtestvariable());
 }
-function Keyboard_testvariable()
+function Keyboard_oldtestvariable()
 {
   var modCodes = keyman.osk.modifierCodes;
   var keyCodes = keyman.osk.keyCodes;
 
   this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;
-  this.KI="Keyboard_testvariable";
-  this.KN="testvariable";
+  this.KI="Keyboard_oldtestvariable";
+  this.KN="oldtestvariable";
   this.KMINVER="10.0";
   this.KV={F:' 1em "Arial"',K102:0};
   this.KV.KLS={
