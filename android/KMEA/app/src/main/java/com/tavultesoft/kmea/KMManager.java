@@ -16,12 +16,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -52,6 +54,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import androidx.core.content.ContextCompat;
 
 import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
@@ -722,23 +726,21 @@ public final class KMManager {
 
   public static boolean hasConnection(Context context) {
     ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-    NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-    if (wifiNetwork != null && wifiNetwork.isConnected()) {
-      return true;
-    }
-
-    NetworkInfo mobileNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-    if (mobileNetwork != null && mobileNetwork.isConnected()) {
-      return true;
-    }
-
-    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    if (activeNetwork != null && activeNetwork.isConnected()) {
+    NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+    if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
       return true;
     }
 
     return false;
+  }
+
+  public static boolean hasInternetPermission(Context context) {
+    // Check if the Internet permission has been granted
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      return (context.checkSelfPermission(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED);
+    }
+
+    return ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED;
   }
 
   private static void copyAssets(Context context) {
