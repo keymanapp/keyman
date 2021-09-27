@@ -13,6 +13,15 @@ window.addEventListener('load', function() {
   });
 
   keyman.addKeyboards({
+    id: 'oldtestvariable',
+    name: 'oldtestvariable',
+    languages: [{
+      id:'en', name:'English'
+    }],
+    filename: './oldtestvariable.js'
+  });
+
+  keyman.addKeyboards({
     id: 'us',
     name: 'English US',
     languages: [{
