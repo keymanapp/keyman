@@ -109,6 +109,7 @@ TEST_F(KMPROCESSACTIONS, processBackCharactertest) {
 // KM_KBP_IT_BACK - processBack
 // Press Backspace for a character doesn't match expected character
 // Note currently we don't check for a character match this should be updated
+
 TEST_F(KMPROCESSACTIONS, processBackUnexpectedChartest) {
 
   WCHAR callbuf[MAXCONTEXT];
@@ -130,6 +131,7 @@ TEST_F(KMPROCESSACTIONS, processBackUnexpectedChartest) {
 
 // KM_KBP_IT_INVALIDATE_CONTEXT - processInvalidateContext
 TEST_F(KMPROCESSACTIONS, processInvalidateContextTest) {
+
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   WCHAR expectedContext[] = {0};
@@ -140,11 +142,10 @@ TEST_F(KMPROCESSACTIONS, processInvalidateContextTest) {
   processUnicodeChar(&testApp, &itemAddChar);
 
   // A keyboard a state is need to test processInvalidateContext
-  km_kbp_option_item test_env_opts[] = {{u"hello", u"world", 0}, KM_KBP_OPTIONS_END};
+  km_kbp_option_item test_env_opts[] = {{u"hello", u"world", KM_KBP_OPT_KEYBOARD}, KM_KBP_OPTIONS_END};
   km_kbp_keyboard *testKB = nullptr;
-  km_kbp_state *testState = nullptr, *test_clone = nullptr;
-  km_kbp_path_name dummyPath = L"dummyActions.mock";
-  km_kbp_status err_status = km_kbp_keyboard_load(dummyPath, &testKB);
+  km_kbp_state *testState = nullptr;
+  km_kbp_path_name dummyPath      = L"dummyActions.mock";
   EXPECT_EQ(km_kbp_keyboard_load(dummyPath, &testKB), KM_KBP_STATUS_OK);
   EXPECT_EQ(km_kbp_state_create(testKB, test_env_opts, &testState), KM_KBP_STATUS_OK);
 
@@ -155,4 +156,5 @@ TEST_F(KMPROCESSACTIONS, processInvalidateContextTest) {
   // dispose keyboard
   km_kbp_state_dispose(testState);
   km_kbp_keyboard_dispose(testKB);
+
 }
